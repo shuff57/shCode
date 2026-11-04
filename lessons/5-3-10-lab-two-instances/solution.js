@@ -1,4 +1,4 @@
-// 5.6.11 Lab: Two sprites, two property values (reference solution).
+// 7.1.11 Lab: Two sprites, two property values (reference solution).
 
 class Box {
   constructor(c) {

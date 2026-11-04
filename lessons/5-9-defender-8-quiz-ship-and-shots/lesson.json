@@ -1,11 +1,11 @@
 {
   "id": "5-9-defender-8-quiz-ship-and-shots",
-  "title": "5.9.8 Check: Ship and shots",
+  "title": "7.4.8 Check: Ship and shots",
   "description": "Six multiple-choice questions on keeping the ship on the canvas, the cooldown, removing shots, overlaps() and the playing gate. Checked instantly.",
   "type": "assignment",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.9 Project: Defender, Part A",
+  "unit": "7.4 Project: Defender, Part A",
   "preview": "quiz",
   "week": 14,
   "slos": [
@@ -20,7 +20,7 @@
     "questions": [
       {
         "id": "q1-rate",
-        "source": "5.9.2",
+        "source": "7.4.2",
         "question": "`cooldown` is set to 12 after each shot. Holding Space for one second (60 frames) fires how many shots?",
         "options": [
           "12",
@@ -36,7 +36,7 @@
       },
       {
         "id": "q2-clamp",
-        "source": "5.9.2",
+        "source": "7.4.2",
         "question": "What do `if (ship.x < 20) ship.x = 20;` and its partner do?",
         "options": [
           "They keep the ship on the canvas",
@@ -52,7 +52,7 @@
       },
       {
         "id": "q3-start",
-        "source": "5.9.3",
+        "source": "7.4.3",
         "question": "A beat (`frameCount % 12 === 0`) and a cooldown both give a 12-frame gap. What can only the cooldown do?",
         "options": [
           "Run more than once in a single frame",
@@ -68,7 +68,7 @@
       },
       {
         "id": "q4-back",
-        "source": "5.9.4",
+        "source": "7.4.4",
         "question": "Why does `moveBullets()` loop from the end of `bullets` to the start?",
         "options": [
           "Counting down is faster than counting up",
@@ -84,7 +84,7 @@
       },
       {
         "id": "q5-once",
-        "source": "5.9.5",
+        "source": "7.4.5",
         "question": "`overlaps()` is true on every frame a shot touches the drone. Why does one shot score only 1?",
         "options": [
           "`overlaps()` is not true again until the shot has stopped touching",
@@ -100,7 +100,7 @@
       },
       {
         "id": "q6-freeze",
-        "source": "5.9.7",
+        "source": "7.4.7",
         "question": "When `baseHp` reaches 0 the code sets `playing = false` and nothing else. Why does everything stop moving?",
         "options": [
           "The base deletes every sprite on the canvas when its hp runs out",

@@ -1,11 +1,11 @@
 {
   "id": "5-5-18-lab-wave-spawner",
-  "title": "5.8.18 Lab: Build a wave",
+  "title": "7.3.18 Lab: Build a wave",
   "description": "Build the spawner yourself: a frameCount timer that sends three enemies only when the field is clear, a hit that goes to the first one, and a filter that reaps the dead. Uses every idea in the module.",
   "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.8 Inside a Class",
+  "unit": "7.3 Inside a Class",
   "preview": "moshion",
   "week": 14,
   "slos": [
@@ -19,7 +19,7 @@
       "title": "Send a wave when the field is clear",
       "instructions": "In `draw()`, send three enemies together — one at `x = 90`, one at `x = 260`, one at `x = 430`, all at `y = 100` — but only when there are none left, and only on a timer rather than every frame. Run it: three arrive, nothing new appears until all three are gone, then three more.",
       "hints": [
-        "Both conditions go in one `if`: `enemies.length === 0` for the empty field, and `frameCount % 90 === 0` for the timer. Reread 5.8.17 (Worked Example: The wave spawner).",
+        "Both conditions go in one `if`: `enemies.length === 0` for the empty field, and `frameCount % 90 === 0` for the timer. Reread 7.3.17 (Worked Example: The wave spawner).",
         "`frameCount === 90` would be true for one frame only. The `%` makes it come back."
       ]
     },
@@ -44,7 +44,7 @@
     {
       "id": "r1",
       "title": "A wave only arrives on a timer",
-      "description": "The spawn check uses `frameCount` and a modulo, so it is true once every N frames rather than every frame. Help: 5.8.17 (Worked Example: The wave spawner)",
+      "description": "The spawn check uses `frameCount` and a modulo, so it is true once every N frames rather than every frame. Help: 7.3.17 (Worked Example: The wave spawner)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bif\\s*\\([^{};]*?(?:frameCount\\s*%\\s*\\(?\\s*(?:\\d+|[A-Za-z_$][\\w$]*)\\s*\\)?\\s*\\)?\\s*===?\\s*0(?![\\w.])|(?<![\\w.])0\\s*===?\\s*\\(?\\s*frameCount\\s*%)(?=[^{};]*\\)\\s*(?:\\{\\s*[^}\\s]|[^{\\s;)]))|(?:const|let|var)\\s+\\w+\\s*=[^;{}]*?(?:frameCount\\s*%\\s*\\(?\\s*(?:\\d+|[A-Za-z_$][\\w$]*)\\s*\\)?\\s*\\)?\\s*===?\\s*0(?![\\w.])|(?<![\\w.])0\\s*===?\\s*\\(?\\s*frameCount\\s*%)",
@@ -56,7 +56,7 @@
     {
       "id": "r2",
       "title": "A wave only arrives when the field is clear",
-      "description": "The spawn check also asks whether the list is empty, so a new group waits for the last one to be cleared. Help: 5.8.17 (Worked Example: The wave spawner)",
+      "description": "The spawn check also asks whether the list is empty, so a new group waits for the last one to be cleared. Help: 7.3.17 (Worked Example: The wave spawner)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bif\\s*\\([^{};]*?(?:enemies\\.length\\s*\\)?\\s*(?:===?\\s*0(?![\\w.])|<\\s*1(?![\\w.])|<=\\s*0(?![\\w.]))|(?<![\\w.])0\\s*===?\\s*\\(?\\s*enemies\\.length\\b|!\\s*\\(?\\s*enemies\\.length\\b)(?=[^{};]*\\)\\s*(?:\\{\\s*[^}\\s]|[^{\\s;)]))|(?:const|let|var)\\s+\\w+\\s*=[^;{}]*?(?:enemies\\.length\\s*\\)?\\s*(?:===?\\s*0(?![\\w.])|<\\s*1(?![\\w.])|<=\\s*0(?![\\w.]))|(?<![\\w.])0\\s*===?\\s*\\(?\\s*enemies\\.length\\b|!\\s*\\(?\\s*enemies\\.length\\b)",
@@ -68,7 +68,7 @@
     {
       "id": "r3",
       "title": "New enemies are pushed onto the list",
-      "description": "Each arriving enemy is a new instance put into the `enemies` array. Help: 5.7.13 (Lab: An array of Enemies)",
+      "description": "Each arriving enemy is a new instance put into the `enemies` array. Help: 7.2.13 (Lab: An array of Enemies)",
       "type": "regex",
       "file": "script.js",
       "pattern": "enemies\\.push\\s*\\(\\s*new\\s+Enemy\\s*\\(|enemies\\s*=\\s*\\[[^\\]]*?new\\s+Enemy\\s*\\(|\\bnew\\s+Enemy\\s*\\([^;]*;[\\s\\S]{0,200}?enemies\\.push\\s*\\(",
@@ -80,7 +80,7 @@
     {
       "id": "r4",
       "title": "The dead are filtered out",
-      "description": "The list is rebuilt from the living with `filter`, and stored back into `enemies` (a loop from the end that splices out the dead also counts). Help: 5.8.13 (Lab: Reap the dead with filter)",
+      "description": "The list is rebuilt from the living with `filter`, and stored back into `enemies` (a loop from the end that splices out the dead also counts). Help: 7.3.13 (Lab: Reap the dead with filter)",
       "type": "regex",
       "file": "script.js",
       "pattern": "enemies\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,120}?(?:isAlive\\s*\\(\\s*\\)|\\bhp\\s*\\)?\\s*(?:>\\s*0(?![\\w.])|>=\\s*1(?![\\w.])|!==?\\s*0(?![\\w.]))|[^\\w.]0\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\w+\\.)?hp\\b)|(?:const|let|var)\\s+(\\w+)\\s*=\\s*enemies\\s*\\.\\s*filter\\s*\\([\\s\\S]{0,120}?(?:isAlive\\s*\\(\\s*\\)|\\bhp\\s*\\)?\\s*(?:>\\s*0(?![\\w.])|>=\\s*1(?![\\w.])|!==?\\s*0(?![\\w.]))|[^\\w.]0\\s*(?:<|!==?)\\s*\\(?\\s*(?:\\w+\\.)?hp\\b)[\\s\\S]{0,200}?\\benemies\\s*=\\s*\\1\\b|for\\s*\\(\\s*(?:let|var)\\s+(\\w+)\\s*=\\s*enemies\\s*\\.\\s*length\\s*-\\s*1\\b[^)]*\\)\\s*\\{?(?:[^{}]|\\{[^{}]*\\})*?\\bif\\s*\\([^{};]*?(?:!\\s*\\(?\\s*[\\w$.\\[\\]]*?isAlive\\s*\\(\\s*\\)|[\\w$.\\[\\]]*?\\bisAlive\\s*\\(\\s*\\)\\s*===?\\s*false\\b|[\\w$.\\[\\]]*?\\bhp\\s*\\)?\\s*(?:<=\\s*0|<\\s*1|===?\\s*0)(?![\\w.])|[^\\w.]0\\s*(?:>=|===?)\\s*\\(?\\s*[\\w$.\\[\\]]*?\\bhp\\b)[^{};]*\\)\\s*(?:\\{[^{}]*?|[^{};]*?)\\benemies\\s*\\.\\s*splice\\s*\\(\\s*\\2\\s*,\\s*1\\s*\\)",
@@ -98,7 +98,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.8.18 Lab: Build a wave\". The task they were given: draw() has three empty steps. First, when the field is clear, send a wave of three new enemies (at x = 90, 260 and 430, all at y = 100), but only on a frameCount timer, not on every frame. Second, Space knocks one hp off the first enemy in the list, and does nothing when the list is empty. Third, keep only the enemies that are still alive, storing the filtered list back in enemies. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. frameCount starts at 0 and goes up by 1 every frame, so frameCount % 90 === 0 is true once every 90 frames, while frameCount === 90 is true on one frame only, ever. Each enemy has takeHit(n) and isAlive(). Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (takeHit, isAlive) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. Step two (Space hits the first enemy) has no criterion; do not mark anything down for it. The exact x and y numbers are not a criterion either. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.3.18 Lab: Build a wave\". The task they were given: draw() has three empty steps. First, when the field is clear, send a wave of three new enemies (at x = 90, 260 and 430, all at y = 100), but only on a frameCount timer, not on every frame. Second, Space knocks one hp off the first enemy in the list, and does nothing when the list is empty. Third, keep only the enemies that are still alive, storing the filtered list back in enemies. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. frameCount starts at 0 and goes up by 1 every frame, so frameCount % 90 === 0 is true once every 90 frames, while frameCount === 90 is true on one frame only, ever. Each enemy has takeHit(n) and isAlive(). Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (takeHit, isAlive) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. Step two (Space hits the first enemy) has no criterion; do not mark anything down for it. The exact x and y numbers are not a criterion either. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
     "rubric": [
       {
         "id": "r1",

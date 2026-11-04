@@ -1,4 +1,4 @@
-// 5.11.5 Lab: Bullet, and a hit that takes an enemy (reference solution).
+// 7.6.5 Lab: Bullet, and a hit that takes an enemy (reference solution).
 
 const BASE_Y = 370;   // anything that falls below this line has reached the base
 

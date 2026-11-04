@@ -1,11 +1,11 @@
 {
   "id": "5-9-defender-6-lab-hit-the-drone",
-  "title": "5.9.6 Lab: Hit the drone",
+  "title": "7.4.6 Lab: Hit the drone",
   "description": "Shots fly straight through the falling drone. Use overlaps() so a shot that touches it scores, leaves the screen and the array, and sends the drone back to the top.",
   "type": "lesson",
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.9 Project: Defender, Part A",
+  "unit": "7.4 Project: Defender, Part A",
   "preview": "moshion",
   "week": 14,
   "slos": [
@@ -35,7 +35,7 @@
     {
       "id": "r1",
       "title": "overlaps is used on the drone",
-      "description": "Each shot asks overlaps(drone) on every frame. Help: 5.9.5 (Reading: Did the shot hit?)",
+      "description": "Each shot asks overlaps(drone) on every frame. Help: 7.4.5 (Reading: Did the shot hit?)",
       "type": "inFunction",
       "function": [
         "hitDrone",
@@ -52,7 +52,7 @@
     {
       "id": "r2",
       "title": "The shot that hit leaves the screen and the array",
-      "description": "Inside the overlaps if, the shot is deleted and spliced out of bullets on the frame it hits. Help: 5.9.5 (Reading: Did the shot hit?)",
+      "description": "Inside the overlaps if, the shot is deleted and spliced out of bullets on the frame it hits. Help: 7.4.5 (Reading: Did the shot hit?)",
       "type": "inFunction",
       "function": [
         "hitDrone",
@@ -69,7 +69,7 @@
     {
       "id": "r3",
       "title": "A hit scores 1 and resets the drone",
-      "description": "Inside the same if, score goes up by 1 and the drone goes back to the top. Help: 5.9.5 (Reading: Did the shot hit?)",
+      "description": "Inside the same if, score goes up by 1 and the drone goes back to the top. Help: 7.4.5 (Reading: Did the shot hit?)",
       "type": "inFunction",
       "function": [
         "hitDrone",
@@ -92,7 +92,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.9.6 Lab: Hit the drone\". The task they were given: Shots fly straight through the falling drone. All the work is in hitDrone(), which already loops backwards over bullets. Inside the loop, test whether bullets[i] overlaps the drone. When it does, on that same frame: delete the shot's sprite and splice it out of bullets, add 1 to score, and call resetDrone(), which sends the drone back above the top at a random x. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. overlaps() stays true on every frame two sprites touch, which is why a shot that hit has to leave on that frame. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (hitDrone, resetDrone) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's hitDrone() loop has only STEP comments inside it: missing on every criterion. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.4.6 Lab: Hit the drone\". The task they were given: Shots fly straight through the falling drone. All the work is in hitDrone(), which already loops backwards over bullets. Inside the loop, test whether bullets[i] overlaps the drone. When it does, on that same frame: delete the shot's sprite and splice it out of bullets, add 1 to score, and call resetDrone(), which sends the drone back above the top at a random x. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. overlaps() stays true on every frame two sprites touch, which is why a shot that hit has to leave on that frame. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (hitDrone, resetDrone) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's hitDrone() loop has only STEP comments inside it: missing on every criterion. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
     "rubric": [
       {
         "id": "r1",

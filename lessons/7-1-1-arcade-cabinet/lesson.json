@@ -1,11 +1,11 @@
 {
   "id": "7-1-1-arcade-cabinet",
-  "title": "7.1.1 Arcade Cabinet (Q2 Synthesis)",
+  "title": "8.1.1 Arcade Cabinet (Q2 Synthesis)",
   "description": "Q2 synthesis: ship a game you designed. The checklist is the spec: twelve things the game must contain. Everything else is your call.",
   "type": "project",
   "estimateMins": 300,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "7.1 Arcade Cabinet (Q2 Synthesis)",
+  "unit": "8.1 Arcade Cabinet (Q2 Synthesis)",
   "preview": "moshion",
   "week": 18,
   "slos": [
@@ -83,7 +83,7 @@
     {
       "id": "req1",
       "title": "A class of your own",
-      "description": "A class you declared yourself: any name, any purpose, capitalised like every class you have written since 5.4. The checker cannot tell whether you made two of them; the teacher reads for that. Help: 5.6.3 (Class and instance)",
+      "description": "A class you declared yourself: any name, any purpose, capitalised like every class you have written since 5.4. The checker cannot tell whether you made two of them; the teacher reads for that. Help: 7.1.3 (Class and instance)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bclass\\s+[A-Z][\\w$]*\\s*(?:extends\\s+[\\w$.]+\\s*)?\\{",

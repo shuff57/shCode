@@ -1,11 +1,11 @@
 {
   "id": "5-3-1-slides",
-  "title": "5.6.1 Slides: Object-Oriented Programming",
+  "title": "7.1.1 Slides: Object-Oriented Programming",
   "description": "Classes and Objects slides: `this`, and procedural vs OOP. Placeholder until the deck is rebuilt from bookSHelf.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.6 Classes and Objects via moSHion",
+  "unit": "7.1 Classes and Objects via moSHion",
   "week": 12,
   "preview": "slides",
   "slos": [

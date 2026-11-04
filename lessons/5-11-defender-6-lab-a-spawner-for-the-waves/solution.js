@@ -1,4 +1,4 @@
-// Defender, Part C: the same game, with classes (5.11 reference).
+// Defender, Part C: the same game, with classes (7.6 reference).
 
 const BASE_Y = 370;   // anything that falls below this line has reached the base
 

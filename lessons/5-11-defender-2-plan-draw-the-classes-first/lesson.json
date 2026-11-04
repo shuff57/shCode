@@ -1,11 +1,11 @@
 {
   "id": "5-11-defender-2-plan-draw-the-classes-first",
-  "title": "5.11.2 Plan: Draw the classes first",
+  "title": "7.6.2 Plan: Draw the classes first",
   "description": "Before any code: say what Bullet, Enemy and Spawner each remember and can do, one job that moves into a class, and which class fails the checklist's first question. AI-graded with hints.",
   "type": "assignment",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.11 Project: Defender, Part C",
+  "unit": "7.6 Project: Defender, Part C",
   "preview": "assignment",
   "week": 15,
   "slos": [
@@ -20,7 +20,7 @@
     "rubricTitle": "Plan the classes: AI-graded rubric",
     "model": "glm-5.3-flash:cloud",
     "contextDocs": [],
-    "prompt": "Everything you need is on this page and in 5.11.1 (Reading: Count the cost): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to rebuild Defender with three classes: Bullet, Enemy and Spawner. Before you move any code, plan them.\n\n1. For at least two of the three classes, name one thing each one remembers.\n\n2. For at least two of them, name one thing each one can do or answer.\n\n3. Name one job that leaves draw() or a Part B function and moves into a class.\n\n4. Which class answers \"no\" to the checklist's first question, \"more than one of this thing?\", and why might it still be a class?",
+    "prompt": "Everything you need is on this page and in 7.6.1 (Reading: Count the cost): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to rebuild Defender with three classes: Bullet, Enemy and Spawner. Before you move any code, plan them.\n\n1. For at least two of the three classes, name one thing each one remembers.\n\n2. For at least two of them, name one thing each one can do or answer.\n\n3. Name one job that leaves draw() or a Part B function and moves into a class.\n\n4. Which class answers \"no\" to the checklist's first question, \"more than one of this thing?\", and why might it still be a class?",
     "rubric": [
       {
         "id": "remember",

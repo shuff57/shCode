@@ -99,7 +99,7 @@ Same behavior. One array instead of four. Each enemy carries its own data, so de
 
 ## Step 3: Which would you rather extend?
 
-Think through these before your 5.7.20 written reflection: no answer key:
+Think through these before your 7.2.20 written reflection: no answer key:
 
 1. You want to add an `element` property to each enemy (fire, ice, lightning). In Step 1, how many arrays do you touch? In Step 2, how many lines inside the class do you touch?
 2. In Step 1, deleting enemy at index 3 means four aligned operations. What happens if you forget one? In Step 2, what is the equivalent operation?

@@ -1,11 +1,11 @@
 {
   "id": "8-1-4-lab-drill-a-hole",
-  "title": "8.1.4 Lab: Drill a Hole",
+  "title": "9.1.4 Lab: Drill a Hole",
   "description": "Pick a face and drill a hole through it with the Hole tool. Auto-graded.",
   "type": "assignment",
   "estimateMins": 10,
   "category": "Unit 3: reSHape: Solid Modelling",
-  "unit": "8.1 Solid Shapes",
+  "unit": "9.1 Solid Shapes",
   "preview": "reshape",
   "mode": "visual",
   "slos": [

@@ -10,7 +10,7 @@ By the end of this reading you should be able to answer:
 - Why can a sketch stay silent until the player clicks or presses a key?
 - Where in the code does a `.play()` go?
 
-**A sound is a file the sketch downloads.** You met this in 5.11.9: `loadSound(path)` starts downloading a sound file and hands you back a **Sound** at once. Keep it in a variable, the way you keep a sprite. The course's two everyday sound files are these, and the path is typed exactly, quotes included:
+**A sound is a file the sketch downloads.** You met this in 7.6.9: `loadSound(path)` starts downloading a sound file and hands you back a **Sound** at once. Keep it in a variable, the way you keep a sprite. The course's two everyday sound files are these, and the path is typed exactly, quotes included:
 
 | Path | What it is |
 | --- | --- |
@@ -61,7 +61,7 @@ function setup() {
 
 - Straight in `draw()`. It runs 60 times a second, so the sound would start 60 times a second.
 - Under `kb.pressing(...)`. That is true on every frame the key is held (5.1.13). A sound for a key goes under `kb.presses(...)`, which is true only on the frame the key goes down (6.3.3).
-- Under an `overlaps()` that stays true. `overlaps()` is true on every frame two sprites touch (5.9.5). The sound plays once only if the same `if` also moves one of them away, the way a game moves a coin that has been collected.
+- Under an `overlaps()` that stays true. `overlaps()` is true on every frame two sprites touch (7.4.5). The sound plays once only if the same `if` also moves one of them away, the way a game moves a coin that has been collected.
 
 **What comes next.** The worked example (6.11.2) is a sound board to try all of this on. The labs then add sound to a small game, Star catch, one idea at a time.
 

@@ -1,11 +1,11 @@
 {
   "id": "5-11-defender-3-example-finished-in-one-place",
-  "title": "5.11.3 Worked Example: Finished in one place",
+  "title": "7.6.3 Worked Example: Finished in one place",
   "description": "An Enemy class and the two-line reap: objects only change their state, and once a frame the scene removes finished ones from the screen, then from the list. Break it two ways and watch the ghosts.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.11 Project: Defender, Part C",
+  "unit": "7.6 Project: Defender, Part C",
   "preview": "example",
   "week": 15,
   "slos": [

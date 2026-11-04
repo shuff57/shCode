@@ -1,11 +1,11 @@
 {
   "id": "5-5-1-reading-three-places",
-  "title": "5.8.1 Reading: Three places a variable can live",
+  "title": "7.3.1 Reading: Three places a variable can live",
   "description": "A method can reach a global, a property on this, or a local it declares itself. Only the property survives the call. Extends 3.2.24's local-versus-global with the third place, and says why a parameter dies too.",
   "type": "lesson",
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.8 Inside a Class",
+  "unit": "7.3 Inside a Class",
   "preview": "reading",
   "week": 14,
   "slos": [

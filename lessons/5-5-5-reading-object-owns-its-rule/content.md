@@ -1,6 +1,6 @@
 ## Who may change a property?
 
-**Read before `5.8.6 Worked Example: The number anyone can set`.** About 5 minutes.
+**Read before `7.3.6 Worked Example: The number anyone can set`.** About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -16,7 +16,7 @@ enemy.hp = "lots";       // runs too. Now hp is a string.
 enemy.constructor = 7;   // runs. This one is a genuinely bad idea.
 ```
 
-5.7.21 (Reading: Encapsulation) named **encapsulation** as a word for exactly this: keeping an object's data and the rules about that data in the same place. This reading is the same idea, with a real failure you can watch.
+7.2.21 (Reading: Encapsulation) named **encapsulation** as a word for exactly this: keeping an object's data and the rules about that data in the same place. This reading is the same idea, with a real failure you can watch.
 
 **Try it:**
 
@@ -65,6 +65,6 @@ The property is still there and still open, and nothing in this course will stop
 | Term | Meaning |
 | --- | --- |
 | **open property** | Reachable from anywhere that holds the object; JavaScript enforces no protection |
-| **encapsulation** | Keeping data and the rules about that data together, inside the class (named in 5.7.21) |
+| **encapsulation** | Keeping data and the rules about that data together, inside the class (named in 7.2.21) |
 | **method that owns a rule** | A method other code calls instead of doing the rule itself, e.g. `takeHit(n)` |
 | **invariant** | Something that must stay true about an object, e.g. "health is never below zero" |

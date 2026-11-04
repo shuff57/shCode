@@ -1,11 +1,11 @@
 {
   "id": "5-10-defender-9-quiz-enemies-and-waves",
-  "title": "5.10.9 Check: Enemies and waves",
+  "title": "7.5.9 Check: Enemies and waves",
   "description": "Six multiple-choice questions on parallel arrays, the nested hit loop and its break, waves that wait for a clear field, and what one more enemy fact costs. Checked instantly.",
   "type": "assignment",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.10 Project: Defender, Part B",
+  "unit": "7.5 Project: Defender, Part B",
   "preview": "quiz",
   "week": 15,
   "slos": [
@@ -20,7 +20,7 @@
     "questions": [
       {
         "id": "q1-index",
-        "source": "5.10.1",
+        "source": "7.5.1",
         "question": "`enemies[2]`, `enemyHp[2]` and `enemyWorth[2]`: what do they have in common?",
         "options": [
           "They are the same number",
@@ -36,7 +36,7 @@
       },
       {
         "id": "q2-tests",
-        "source": "5.10.4",
+        "source": "7.5.4",
         "question": "5 shots and 4 enemies are alive. At most how many overlap tests does `hitEnemies()` make this frame?",
         "options": [
           "9",
@@ -52,7 +52,7 @@
       },
       {
         "id": "q3-break",
-        "source": "5.10.4",
+        "source": "7.5.4",
         "question": "Why does the inner loop `break` right after a shot hits?",
         "options": [
           "To end the round once every enemy has been shot",
@@ -68,7 +68,7 @@
       },
       {
         "id": "q4-clear",
-        "source": "5.10.6",
+        "source": "7.5.6",
         "question": "Why does `nextWave()` start with `if (enemies.length > 0) return;`?",
         "options": [
           "The pause only counts while the field is clear, so waves cannot pile up",
@@ -84,7 +84,7 @@
       },
       {
         "id": "q5-drift",
-        "source": "5.10.8",
+        "source": "7.5.8",
         "question": "The landing code splices `enemies` and `enemyWorth` but not `enemyHp`. What do you see?",
         "options": [
           "Nothing changes, because `enemyHp` is only read when a shot hits",
@@ -100,7 +100,7 @@
       },
       {
         "id": "q6-cost",
-        "source": "5.10.1 and 5.10.8",
+        "source": "7.5.1 and 7.5.8",
         "question": "You want each enemy to have a shield value too. In this Part B code, what has to change?",
         "options": [
           "One line in `spawnEnemy`, which pushes the shield onto `enemyHp` beside the hp",

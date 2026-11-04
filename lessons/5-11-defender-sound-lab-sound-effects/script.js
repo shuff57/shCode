@@ -1,4 +1,4 @@
-// 5.11.9 Lab: Sound effects. The game below is 5.11.6's; it makes no sound yet.
+// 7.6.9 Lab: Sound effects. The game below is 7.6.6's; it makes no sound yet.
 
 const BASE_Y = 370;   // anything that falls below this line has reached the base
 

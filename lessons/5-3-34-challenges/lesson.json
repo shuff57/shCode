@@ -1,11 +1,11 @@
 {
   "id": "5-3-34-challenges",
-  "title": "5.7.22 Challenges",
+  "title": "7.2.22 Challenges",
   "description": "Pick one (or more) OOP stretch challenges: extend your Enemy class, write a Player class, or try subclassing with `extends`. Auto-graded.",
   "type": "challenge",
   "estimateMins": 30,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.7 Writing Your Own Classes",
+  "unit": "7.2 Writing Your Own Classes",
   "preview": "moshion",
   "week": 13,
   "slos": [
@@ -18,7 +18,7 @@
       "title": "Define a class",
       "instructions": "Declare at least one class using the `class` keyword.",
       "hints": [
-        "Re-read 5.6.3 Reading for the `class Name { ... }` shape."
+        "Re-read 7.1.3 Reading for the `class Name { ... }` shape."
       ]
     },
     {
@@ -26,7 +26,7 @@
       "title": "Instantiate the class",
       "instructions": "Build an instance with `new ClassName(...)` and store it in a variable.",
       "hints": [
-        "5.6.7 Worked Example shows `new Sprite(...)`: the same pattern applies to your own class."
+        "7.1.7 Worked Example shows `new Sprite(...)`: the same pattern applies to your own class."
       ]
     },
     {
@@ -34,16 +34,16 @@
       "title": "Write a constructor",
       "instructions": "Give the class a `constructor(...)` that stores its arguments on `this`.",
       "hints": [
-        "5.6.3 Reading walks through the three parts of a class: constructor, `this`, and methods."
+        "7.1.3 Reading walks through the three parts of a class: constructor, `this`, and methods."
       ]
     },
     {
       "id": "s4",
       "title": "Use one OOP feature",
-      "instructions": "Pick one of the challenges below and build it using at least one of: `this.<property>` access, `extends` another class, or a `super(...)` call.\n\n**Challenge 1: isAlive (easy).** Write `class Enemy` whose constructor stores `x`, `y` and `hp` on `this`, with an `isAlive()` method that returns `this.hp > 0`. Build one with `new Enemy(...)` and check `enemy.isAlive()` in `draw()`.\n\n**Challenge 2: a Player class (medium).** Write `class Player` whose constructor makes a sprite and stores it on `this.sprite`. Give it a `move(dir)` method that sets `this.sprite.vel.x` (negative for `'left'`, positive for `'right'`) and a `jump()` method that sets `this.sprite.vel.y` to a negative number. Build one with `new Player(200, 200)` and call `player.move('left')` or `player.jump()` from `draw()`.\n\n**Challenge 3: a PowerUp subclass (hard).** Write `class Collectible` whose constructor stores `x`, `y`, `value` and `color` on `this`. Then write `class PowerUp extends Collectible` (the `extends` from 5.7.21): its constructor takes the same four arguments and must call `super(x, y, value, color);` first, which runs the parent's constructor, before it touches `this`. Add a `boost()` method that returns `this.value * 2`, and build one with `new PowerUp(100, 100, 10, 'gold')`.",
+      "instructions": "Pick one of the challenges below and build it using at least one of: `this.<property>` access, `extends` another class, or a `super(...)` call.\n\n**Challenge 1: isAlive (easy).** Write `class Enemy` whose constructor stores `x`, `y` and `hp` on `this`, with an `isAlive()` method that returns `this.hp > 0`. Build one with `new Enemy(...)` and check `enemy.isAlive()` in `draw()`.\n\n**Challenge 2: a Player class (medium).** Write `class Player` whose constructor makes a sprite and stores it on `this.sprite`. Give it a `move(dir)` method that sets `this.sprite.vel.x` (negative for `'left'`, positive for `'right'`) and a `jump()` method that sets `this.sprite.vel.y` to a negative number. Build one with `new Player(200, 200)` and call `player.move('left')` or `player.jump()` from `draw()`.\n\n**Challenge 3: a PowerUp subclass (hard).** Write `class Collectible` whose constructor stores `x`, `y`, `value` and `color` on `this`. Then write `class PowerUp extends Collectible` (the `extends` from 7.2.21): its constructor takes the same four arguments and must call `super(x, y, value, color);` first, which runs the parent's constructor, before it touches `this`. Add a `boost()` method that returns `this.value * 2`, and build one with `new PowerUp(100, 100, 10, 'gold')`.",
       "hints": [
         "All three challenges pass the check with `this.` alone; `extends` and `super(` count too.",
-        "5.7.11 (Worked Example: Write an Enemy class (integration)) builds a class with a constructor, `this.sprite` and methods: the same shape works for every challenge."
+        "7.2.11 (Worked Example: Write an Enemy class (integration)) builds a class with a constructor, `this.sprite` and methods: the same shape works for every challenge."
       ]
     }
   ],
@@ -51,7 +51,7 @@
     {
       "id": "r1",
       "title": "Define at least one class",
-      "description": "script.js contains at least one class definition. Help: 5.6.3 (Class and instance)",
+      "description": "script.js contains at least one class definition. Help: 7.1.3 (Class and instance)",
       "type": "regex",
       "file": "script.js",
       "pattern": "class\\s+\\w+",
@@ -62,7 +62,7 @@
     {
       "id": "r2",
       "title": "Instantiates a class of your own",
-      "description": "Builds an object from a class the student defined: new Canvas() and new Sprite() are boilerplate and do not count. Help: 5.6.4 (The new operator)",
+      "description": "Builds an object from a class the student defined: new Canvas() and new Sprite() are boilerplate and do not count. Help: 7.1.4 (The new operator)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+(?!Canvas\\b|Sprite\\b|Group\\b)[A-Z]\\w*\\s*\\(",
@@ -73,7 +73,7 @@
     {
       "id": "r3",
       "title": "Write a constructor",
-      "description": "At least one class has a constructor method. Help: 5.6.5 (constructor and its parameters)",
+      "description": "At least one class has a constructor method. Help: 7.1.5 (constructor and its parameters)",
       "type": "regex",
       "file": "script.js",
       "pattern": "constructor\\s*\\(",
@@ -84,7 +84,7 @@
     {
       "id": "r4",
       "title": "Use one OOP feature",
-      "description": "Your class uses at least one of: `this.<property>`, `extends`, or `super(`. Help: 5.7.21 (Encapsulation, inheritance, polymorphism)",
+      "description": "Your class uses at least one of: `this.<property>`, `extends`, or `super(`. Help: 7.2.21 (Encapsulation, inheritance, polymorphism)",
       "type": "regex",
       "file": "script.js",
       "pattern": "this\\.\\w+|extends\\s+\\w+|super\\s*\\(",
@@ -101,30 +101,30 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.22 Challenges\". The task they were given: Pick one (or more) object-oriented challenge: (1) an Enemy class whose constructor stores x, y and hp on this, with an isAlive() method that returns whether this.hp is above 0, checked in draw(); (2) a Player class whose constructor makes a sprite and stores it on this.sprite, with a move(dir) method that sets this.sprite.vel.x and a jump() method that sets this.sprite.vel.y to a negative number, called from draw(); or (3) a Collectible class that stores x, y, value and color on this, and a PowerUp class that extends it, whose constructor calls super(...) with the same four arguments first, with a boost() method that returns double the value. Four things are checked: a class is defined, it has a constructor, an object is built from it with new, and it uses this.<property>, extends or super(...). You cannot run their code: read it and judge what it WOULD do when the sketch runs. class Name { ... } defines a class; constructor(...) runs once when new Name(...) builds an object, and this is that object. new Canvas(...), new Sprite(...) and new Group(...) build moSHion's own classes, not the student's. In a class that extends another, super(...) must run before the constructor touches this. y grows downward, so a negative vel.y moves up. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Judge the four criteria on whichever classes the student wrote: any class name, any of the three challenges, or a class of their own design all count. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.2.22 Challenges\". The task they were given: Pick one (or more) object-oriented challenge: (1) an Enemy class whose constructor stores x, y and hp on this, with an isAlive() method that returns whether this.hp is above 0, checked in draw(); (2) a Player class whose constructor makes a sprite and stores it on this.sprite, with a move(dir) method that sets this.sprite.vel.x and a jump() method that sets this.sprite.vel.y to a negative number, called from draw(); or (3) a Collectible class that stores x, y, value and color on this, and a PowerUp class that extends it, whose constructor calls super(...) with the same four arguments first, with a boost() method that returns double the value. Four things are checked: a class is defined, it has a constructor, an object is built from it with new, and it uses this.<property>, extends or super(...). You cannot run their code: read it and judge what it WOULD do when the sketch runs. class Name { ... } defines a class; constructor(...) runs once when new Name(...) builds an object, and this is that object. new Canvas(...), new Sprite(...) and new Group(...) build moSHion's own classes, not the student's. In a class that extends another, super(...) must run before the constructor touches this. y grows downward, so a negative vel.y moves up. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Judge the four criteria on whichever classes the student wrote: any class name, any of the three challenges, or a class of their own design all count. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
     "rubric": [
       {
         "id": "r1",
         "title": "Define at least one class",
-        "description": "The file defines at least one class of the student's own with the class keyword. Missing: no class. Help: 5.6.3 (Class and instance)",
+        "description": "The file defines at least one class of the student's own with the class keyword. Missing: no class. Help: 7.1.3 (Class and instance)",
         "points": 1
       },
       {
         "id": "r2",
         "title": "Instantiates a class of your own",
-        "description": "An object is built with new from a class the student defined (not Canvas, Sprite or Group). Storing it in a variable is what step 2 asks. Missing: only moSHion's own classes are built. Help: 5.6.4 (The new operator)",
+        "description": "An object is built with new from a class the student defined (not Canvas, Sprite or Group). Storing it in a variable is what step 2 asks. Missing: only moSHion's own classes are built. Help: 7.1.4 (The new operator)",
         "points": 1
       },
       {
         "id": "r3",
         "title": "Write a constructor",
-        "description": "At least one of the student's classes has a constructor(...). Storing its arguments on this is what step 3 asks. Missing: no constructor. Help: 5.6.5 (constructor and its parameters)",
+        "description": "At least one of the student's classes has a constructor(...). Storing its arguments on this is what step 3 asks. Missing: no constructor. Help: 7.1.5 (constructor and its parameters)",
         "points": 1
       },
       {
         "id": "r4",
         "title": "Use one OOP feature",
-        "description": "One of the student's classes uses at least one of: a this.<property> read or write, extends another class, or a super(...) call. Missing: none of these. Help: 5.7.21 (Encapsulation, inheritance, polymorphism)",
+        "description": "One of the student's classes uses at least one of: a this.<property> read or write, extends another class, or a super(...) call. Missing: none of these. Help: 7.2.21 (Encapsulation, inheritance, polymorphism)",
         "points": 1
       }
     ]

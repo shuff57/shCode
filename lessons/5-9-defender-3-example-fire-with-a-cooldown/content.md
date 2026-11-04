@@ -1,6 +1,6 @@
 ## Fire with a cooldown
 
-**Read before `5.9.4 Lab: Fly and fire`.** About 8 minutes.
+**Read before `7.4.4 Lab: Fly and fire`.** About 8 minutes.
 
 Click the canvas first, so the sketch hears your keys, then hold Space. The ship fires, but only when `cooldown` has counted down to 0, and every shot sets it back to `COOLDOWN`. The two numbers at the top show the countdown and how many shots have gone.
 

@@ -1,11 +1,11 @@
 {
   "id": "5-3-33-reading-oop-vocab",
-  "title": "5.7.21 Reading: Encapsulation, inheritance, polymorphism (vocabulary only)",
-  "description": "Name the three OOP pillars you'll encounter in downstream courses: no implementation required this week. Read at the close of 5.7.",
+  "title": "7.2.21 Reading: Encapsulation, inheritance, polymorphism (vocabulary only)",
+  "description": "Name the three OOP pillars you'll encounter in downstream courses: no implementation required this week. Read at the close of 7.2.",
   "type": "lesson",
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.7 Writing Your Own Classes",
+  "unit": "7.2 Writing Your Own Classes",
   "preview": "reading",
   "week": 13,
   "slos": [

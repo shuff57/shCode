@@ -1,11 +1,11 @@
 {
   "id": "5-3-27-lab-loop-instances",
-  "title": "5.7.14 Lab: Loop over an array of instances",
+  "title": "7.2.14 Lab: Loop over an array of instances",
   "description": "Write a `for...of` loop in `draw()` that calls `.render()` on each enemy: dispatching a method to every element in the array with one loop.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.7 Writing Your Own Classes",
+  "unit": "7.2 Writing Your Own Classes",
   "preview": "moshion",
   "week": 13,
   "slos": [
@@ -39,7 +39,7 @@
     {
       "id": "r2",
       "title": "Method called on loop variable",
-      "description": "Inside the loop body, call a method on the loop variable (e.g. `e.render()`). Help: 3.3.5 (Looping Over Arrays) and 5.7.1 (Methods: functions that live on a class)",
+      "description": "Inside the loop body, call a method on the loop variable (e.g. `e.render()`). Help: 3.3.5 (Looping Over Arrays) and 7.2.1 (Methods: functions that live on a class)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -58,7 +58,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.14 Lab: Loop over an array of instances\". The task they were given: An Enemy class is given and setup() pushes five enemies into enemies. In draw(), write a for...of loop over enemies and call .render() on the loop variable, so all five hp labels appear. You cannot run their code: read it and judge what it WOULD do when the sketch runs. for (let e of enemies) visits each item in turn, with e holding the current enemy. An index loop with enemies[i], and enemies.forEach(...), visit them too. render() is a method of each Enemy, not of the array, so calling it on enemies itself would fail. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Five separate render calls on enemies[0] to enemies[4] call the method but are not a loop. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.2.14 Lab: Loop over an array of instances\". The task they were given: An Enemy class is given and setup() pushes five enemies into enemies. In draw(), write a for...of loop over enemies and call .render() on the loop variable, so all five hp labels appear. You cannot run their code: read it and judge what it WOULD do when the sketch runs. for (let e of enemies) visits each item in turn, with e holding the current enemy. An index loop with enemies[i], and enemies.forEach(...), visit them too. render() is a method of each Enemy, not of the array, so calling it on enemies itself would fail. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Five separate render calls on enemies[0] to enemies[4] call the method but are not a loop. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
     "rubric": [
       {
         "id": "r1",
@@ -69,7 +69,7 @@
       {
         "id": "r2",
         "title": "Method called on loop variable",
-        "description": "Inside draw() (or a function it calls), render() is called on an enemy: on the loop variable, on enemies[i], or on the forEach item. Missing: render is called on the array itself, called with no object in front, or never called. Help: 3.3.5 (Looping Over Arrays) and 5.7.1 (Methods: functions that live on a class)",
+        "description": "Inside draw() (or a function it calls), render() is called on an enemy: on the loop variable, on enemies[i], or on the forEach item. Missing: render is called on the array itself, called with no object in front, or never called. Help: 3.3.5 (Looping Over Arrays) and 7.2.1 (Methods: functions that live on a class)",
         "points": 1
       }
     ]

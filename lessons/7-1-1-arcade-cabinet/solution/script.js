@@ -1,4 +1,4 @@
-// 7.1.1 Arcade Cabinet: Q2 Synthesis (reference solution).
+// 8.1.1 Arcade Cabinet: Q2 Synthesis (reference solution).
 //
 // SALVAGE RUN. Crates fall from a wrecked freighter; you fly the collector
 // underneath and catch them. Catch a crate, score it. Miss three and the run

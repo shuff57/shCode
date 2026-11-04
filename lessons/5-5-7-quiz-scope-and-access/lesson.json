@@ -1,11 +1,11 @@
 {
   "id": "5-5-7-quiz-scope-and-access",
-  "title": "5.8.7 Check: Scope and access",
+  "title": "7.3.7 Check: Scope and access",
   "description": "Six multiple-choice questions on where a variable lives, why a local cannot be shared between methods, and what a method that owns a rule buys you. Checked instantly.",
   "type": "assignment",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.8 Inside a Class",
+  "unit": "7.3 Inside a Class",
   "preview": "quiz",
   "week": 14,
   "slos": [
@@ -26,7 +26,7 @@
     "questions": [
       {
         "id": "q1-what-survives",
-        "source": "5.8.1",
+        "source": "7.3.1",
         "question": "A method declares `let step = 1;`, uses it, and returns. Which of these is still there afterwards?",
         "options": [
           "`step`, because it was declared with `let`",
@@ -42,7 +42,7 @@
       },
       {
         "id": "q2-other-method",
-        "source": "5.8.1",
+        "source": "7.3.1",
         "question": "What happens when this runs?",
         "code": "class Score {\n  constructor() {\n    this.points = 0;\n  }\n\n  add() {\n    let step = 3;\n    this.points += step;\n  }\n\n  undo() {\n    this.points -= step;\n  }\n}\n\nconst s = new Score();\ns.add();\ns.undo();",
         "options": [
@@ -59,7 +59,7 @@
       },
       {
         "id": "q3-parameter-is-local",
-        "source": "5.8.1",
+        "source": "7.3.1",
         "question": "A method changes its parameter inside its body. What does the caller see?",
         "code": "class Counter {\n  constructor() {\n    this.n = 0;\n  }\n\n  addBy(n) {\n    n = n + 100;\n    this.n += n;\n  }\n}\n\nlet amount = 1;\nconst c = new Counter();\nc.addBy(amount);\nconsole.log(amount);",
         "options": [
@@ -76,7 +76,7 @@
       },
       {
         "id": "q4-two-locals",
-        "source": "5.8.4",
+        "source": "7.3.4",
         "question": "Two methods each declare `let step = 3;`. What is true?",
         "options": [
           "They are the same variable, so changing one changes the other",
@@ -92,7 +92,7 @@
       },
       {
         "id": "q5-why-a-method",
-        "source": "5.8.5",
+        "source": "7.3.5",
         "question": "Why write `e.takeHit(4)` instead of `e.hp = e.hp - 4` in `draw()`?",
         "options": [
           "The method runs faster than the subtraction",
@@ -108,7 +108,7 @@
       },
       {
         "id": "q6-negative-health",
-        "source": "5.8.6",
+        "source": "7.3.6",
         "question": "In the worked example, which version can leave `hp` at `-2`?",
         "options": [
           "The version where `draw()` does `e.hp = e.hp - 4`",

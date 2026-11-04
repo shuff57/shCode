@@ -1,6 +1,6 @@
 ## Every shot against every enemy
 
-**Read before `5.10.5 Lab: Shoot them down`.** About 10 minutes.
+**Read before `7.5.5 Lab: Shoot them down`.** About 10 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -21,11 +21,11 @@ for (let i = bullets.length - 1; i >= 0; i--) {      // pick a shot
 }
 ```
 
-With 5 shots and 4 enemies on the screen, that is 5 times 4 = **20 overlap tests** in one frame. `overlaps()` is the same test 5.9.5 used on the drone: do these two boxes touch this frame?
+With 5 shots and 4 enemies on the screen, that is 5 times 4 = **20 overlap tests** in one frame. `overlaps()` is the same test 7.4.5 used on the drone: do these two boxes touch this frame?
 
 **Both loops run backwards, because both can splice.** A hit splices the shot out of `bullets`, and a kill splices the enemy out of all three enemy arrays. You met the reason in 5.4.5: a splice moves every later item down one place, and counting down means the items still to visit are never moved. Here it is true twice, once for each loop.
 
-**Stop testing a shot that is gone.** When a shot hits, it is deleted and spliced out straight away, so it cannot score again on the next frame (5.9.5). But the inner loop is still running, and its next turn reads `bullets[i]` again. After the splice, `bullets[i]` is a **different shot** that gets tested a second time, or, if that was the only shot, it is `undefined`. So the inner loop must stop at once:
+**Stop testing a shot that is gone.** When a shot hits, it is deleted and spliced out straight away, so it cannot score again on the next frame (7.4.5). But the inner loop is still running, and its next turn reads `bullets[i]` again. After the splice, `bullets[i]` is a **different shot** that gets tested a second time, or, if that was the only shot, it is `undefined`. So the inner loop must stop at once:
 
 ```js
 break;   // this shot is gone: stop testing it against the others

@@ -1,4 +1,4 @@
-// 5.8.4 Lab: Share one number between two methods (reference solution).
+// 7.3.4 Lab: Share one number between two methods (reference solution).
 
 class Score {
   constructor() {

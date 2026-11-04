@@ -1,4 +1,4 @@
-// Defender, Part A: ship, shots and one drone (5.9 reference).
+// Defender, Part A: ship, shots and one drone (7.4 reference).
 
 const BASE_Y = 370;   // anything that falls below this line has reached the base
 

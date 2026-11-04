@@ -1,11 +1,11 @@
 {
   "id": "5-3-22-lab-mutate-sprite-prop",
-  "title": "5.7.9 Lab: Mutate this.sprite.x from a method",
+  "title": "7.2.9 Lab: Mutate this.sprite.x from a method",
   "description": "Write `Mover.moveRight(dx)` which adds `dx` to `this.sprite.x`, reaching through composition to move the wrapped sprite.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.7 Writing Your Own Classes",
+  "unit": "7.2 Writing Your Own Classes",
   "preview": "moshion",
   "week": 13,
   "slos": [
@@ -26,7 +26,7 @@
     {
       "id": "r1",
       "title": "moveRight(dx) mutates this.sprite.x",
-      "description": "Write a `moveRight(dx)` method that adds `dx` to `this.sprite.x` using `+=`. Help: 5.7.8 (Why this.sprite, not extends Sprite)",
+      "description": "Write a `moveRight(dx)` method that adds `dx` to `this.sprite.x` using `+=`. Help: 7.2.8 (Why this.sprite, not extends Sprite)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bmoveRight\\s*\\(\\s*(\\w+)\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\s*\\.\\s*sprite\\s*\\.\\s*(?:pos\\s*\\.\\s*|position\\s*\\.\\s*)?x\\s*(?:\\+=\\s*\\(?\\s*\\1\\b|=\\s*\\(?\\s*this\\s*\\.\\s*sprite\\s*\\.\\s*(?:pos\\s*\\.\\s*|position\\s*\\.\\s*)?x\\s*\\+\\s*\\(?\\s*\\1\\b|=\\s*\\(?\\s*\\1\\s*\\+\\s*this\\s*\\.\\s*sprite\\s*\\.\\s*(?:pos\\s*\\.\\s*|position\\s*\\.\\s*)?x)",
@@ -44,12 +44,12 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.9 Lab: Mutate this.sprite.x from a method\". The task they were given: A Mover class wraps a sprite: its constructor stores this.sprite = new Sprite(x, y, 30, 30). Inside the class body, write a moveRight(dx) method that adds dx to this.sprite.x. The driver calls m.moveRight(2) on every frame the right arrow is held. You cannot run their code: read it and judge what it WOULD do when the sketch runs. this.sprite is the moSHion sprite the Mover owns; this.sprite.x is its horizontal position, and x grows to the right. this.sprite.pos.x is the same number. kb.pressing('right') is true on every frame the key is held, so the method runs once per frame while it is held. The driver calls m.moveRight(...), so the method must be named moveRight. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. +=, this.sprite.x = this.sprite.x + the parameter, and the pos.x spelling all count, whatever the parameter is called. Changing this.x changes a property of the Mover, not of its sprite, so nothing moves. Setting the sprite's vel.x gives it a speed that keeps it sliding after the key is released, which is a different idea from moving its position by dx. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.2.9 Lab: Mutate this.sprite.x from a method\". The task they were given: A Mover class wraps a sprite: its constructor stores this.sprite = new Sprite(x, y, 30, 30). Inside the class body, write a moveRight(dx) method that adds dx to this.sprite.x. The driver calls m.moveRight(2) on every frame the right arrow is held. You cannot run their code: read it and judge what it WOULD do when the sketch runs. this.sprite is the moSHion sprite the Mover owns; this.sprite.x is its horizontal position, and x grows to the right. this.sprite.pos.x is the same number. kb.pressing('right') is true on every frame the key is held, so the method runs once per frame while it is held. The driver calls m.moveRight(...), so the method must be named moveRight. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. +=, this.sprite.x = this.sprite.x + the parameter, and the pos.x spelling all count, whatever the parameter is called. Changing this.x changes a property of the Mover, not of its sprite, so nothing moves. Setting the sprite's vel.x gives it a speed that keeps it sliding after the key is released, which is a different idea from moving its position by dx. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
     "rubric": [
       {
         "id": "r1",
         "title": "moveRight(dx) mutates this.sprite.x",
-        "description": "Inside the Mover class there is a moveRight method with one parameter whose body adds that parameter to this.sprite.x. Partial: it adds a fixed number instead of the parameter, or sets the sprite's speed instead of its position. Missing: no moveRight method inside the class, or it changes something other than the sprite's x. Help: 5.7.8 (Why this.sprite, not extends Sprite)",
+        "description": "Inside the Mover class there is a moveRight method with one parameter whose body adds that parameter to this.sprite.x. Partial: it adds a fixed number instead of the parameter, or sets the sprite's speed instead of its position. Missing: no moveRight method inside the class, or it changes something other than the sprite's x. Help: 7.2.8 (Why this.sprite, not extends Sprite)",
         "points": 1
       }
     ]

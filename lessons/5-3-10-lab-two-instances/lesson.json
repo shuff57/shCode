@@ -1,11 +1,11 @@
 {
   "id": "5-3-10-lab-two-instances",
-  "title": "5.6.11 Lab: Two sprites, two property values",
+  "title": "7.1.11 Lab: Two sprites, two property values",
   "description": "Instantiate b1 and b2 from the same class with different colors, then mutate only b1 to confirm each instance's state is independent.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.6 Classes and Objects via moSHion",
+  "unit": "7.1 Classes and Objects via moSHion",
   "preview": "moshion",
   "week": 12,
   "slos": [
@@ -34,7 +34,7 @@
     {
       "id": "r1",
       "title": "Two distinct new Box(...) calls",
-      "description": "Create `b1` and `b2` with separate `new Box(...)` calls: each gets its own color argument. Help: 5.6.3 (Class and instance)",
+      "description": "Create `b1` and `b2` with separate `new Box(...)` calls: each gets its own color argument. Help: 7.1.3 (Class and instance)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Box\\s*\\([\\s\\S]*?new\\s+Box\\s*\\(",
@@ -46,7 +46,7 @@
     {
       "id": "r2",
       "title": "Only b1.color is reassigned",
-      "description": "Assign a new value to `b1.color` (not `b2.color`) to demonstrate independent instance state. Help: 5.6.3 (Class and instance)",
+      "description": "Assign a new value to `b1.color` (not `b2.color`) to demonstrate independent instance state. Help: 7.1.3 (Class and instance)",
       "type": "regex",
       "file": "script.js",
       "pattern": "^(?![\\s\\S]*\\bb2\\s*\\.\\s*color\\s*=(?!=))[\\s\\S]*\\bb1\\s*\\.\\s*color\\s*=(?!=)",
@@ -64,18 +64,18 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.6.11 Lab: Two sprites, two property values\". The task they were given: A Box class takes a colour: new Box(c) stores it in this.color. In setup(), create b1 = new Box('red') and b2 = new Box('blue'). In draw(), press space to change b1.color only, and watch b2 stay blue. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Every new Box(...) call makes a separate object with its own color, so changing b1.color does not touch b2. kb.presses('space') is true on the frame the space bar goes down. draw() already paints both boxes once b1 and b2 exist. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Different colours in the two calls are what step 1 asks. Setting b1 to a brand-new Box replaces the whole object instead of writing its property. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.1.11 Lab: Two sprites, two property values\". The task they were given: A Box class takes a colour: new Box(c) stores it in this.color. In setup(), create b1 = new Box('red') and b2 = new Box('blue'). In draw(), press space to change b1.color only, and watch b2 stay blue. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Every new Box(...) call makes a separate object with its own color, so changing b1.color does not touch b2. kb.presses('space') is true on the frame the space bar goes down. draw() already paints both boxes once b1 and b2 exist. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Different colours in the two calls are what step 1 asks. Setting b1 to a brand-new Box replaces the whole object instead of writing its property. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
     "rubric": [
       {
         "id": "r1",
         "title": "Two distinct new Box(...) calls",
-        "description": "b1 and b2 each come from their own new Box(...) call, each given a colour (different colours are what step 1 asks). Missing: only one Box is made, or b2 is set to b1 (the same object). Help: 5.6.3 (Class and instance)",
+        "description": "b1 and b2 each come from their own new Box(...) call, each given a colour (different colours are what step 1 asks). Missing: only one Box is made, or b2 is set to b1 (the same object). Help: 7.1.3 (Class and instance)",
         "points": 1
       },
       {
         "id": "r2",
         "title": "Only b1.color is reassigned",
-        "description": "The code assigns a new value to b1.color with =, and nothing anywhere assigns b2.color. Doing it on a space-bar press is what step 2 asks. Partial: b1 is replaced with a new Box instead of its color being written. Missing: b2.color is assigned too, or b1.color never changes. Help: 5.6.3 (Class and instance)",
+        "description": "The code assigns a new value to b1.color with =, and nothing anywhere assigns b2.color. Doing it on a space-bar press is what step 2 asks. Partial: b1 is replaced with a new Box instead of its color being written. Missing: b2.color is assigned too, or b1.color never changes. Help: 7.1.3 (Class and instance)",
         "points": 1
       }
     ]

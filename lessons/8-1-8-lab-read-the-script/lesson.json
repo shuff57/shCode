@@ -1,11 +1,11 @@
 {
   "id": "8-1-8-lab-read-the-script",
-  "title": "8.1.8 Lab: Read the Script",
+  "title": "9.1.8 Lab: Read the Script",
   "description": "Find the number that controls the hole in the script, and change it. Auto-graded.",
   "type": "assignment",
   "estimateMins": 10,
   "category": "Unit 3: reSHape: Solid Modelling",
-  "unit": "8.1 Solid Shapes",
+  "unit": "9.1 Solid Shapes",
   "preview": "reshape",
   "mode": "code",
   "slos": [

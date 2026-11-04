@@ -1,4 +1,4 @@
-// 5.11.9 Lab: Sound effects (reference solution: a zap for every shot, a boom for
+// 7.6.9 Lab: Sound effects (reference solution: a zap for every shot, a boom for
 // every enemy a shot finishes, and M to mute).
 
 const BASE_Y = 370;   // anything that falls below this line has reached the base

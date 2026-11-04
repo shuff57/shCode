@@ -1,6 +1,6 @@
 ## Count the cost
 
-**Read before `5.11.2 Plan: Draw the classes first`.** About 10 minutes.
+**Read before `7.6.2 Plan: Draw the classes first`.** About 10 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -12,7 +12,7 @@ By the end of this reading you should be able to answer:
 
 ## Three numbers from Part B
 
-Open your finished Part B game, the one from 5.10.7 (Lab: Waves), and count. In the reference version:
+Open your finished Part B game, the one from 7.5.7 (Lab: Waves), and count. In the reference version:
 
 | What | How many | Where |
 | --- | --- | --- |
@@ -20,11 +20,11 @@ Open your finished Part B game, the one from 5.10.7 (Lab: Waves), and count. In 
 | lines that name `enemyHp` or `enemyWorth` | **13** | the `let` line, `spawnEnemy()`, both removals, the hit, `startRound()` |
 | copies of "remove one enemy" | **2** | the landing in `moveEnemies()` and the kill in `hitEnemies()` |
 
-Each copy of the removal is the same four lines: `delete()` the sprite, then splice `enemies`, `enemyHp` and `enemyWorth` at the same index. In 5.10.8 (Debugging: The enemy that would not die) one of those copies was missing a single `enemyHp.splice`, and from then on every later enemy read somebody else's hp: a crimson "1" took three shots. Nothing in the code said the three arrays belonged together except an agreement that every line had to keep.
+Each copy of the removal is the same four lines: `delete()` the sprite, then splice `enemies`, `enemyHp` and `enemyWorth` at the same index. In 7.5.8 (Debugging: The enemy that would not die) one of those copies was missing a single `enemyHp.splice`, and from then on every later enemy read somebody else's hp: a crimson "1" took three shots. Nothing in the code said the three arrays belonged together except an agreement that every line had to keep.
 
 ## The checklist, honestly
 
-5.7.18 (Reading: When to reach for OOP (3-question checklist)) asks three questions. Here they are for the three things this module turns into classes:
+7.2.18 (Reading: When to reach for OOP (3-question checklist)) asks three questions. Here they are for the three things this module turns into classes:
 
 | Thing | More than one? | Its own state? | Its own behaviour tied to that state? | Verdict |
 | --- | --- | --- | --- | --- |
@@ -32,18 +32,18 @@ Each copy of the removal is the same four lines: `delete()` the sprite, then spl
 | an enemy | yes, a whole wave | yes: hp, worth, speed | yes: it falls, it takes a hit, it answers whether it is still alive | `Enemy` is a class |
 | the spawner | **no, there is only one** | yes: which wave it is, the pause | yes: it counts the pause down, it builds the next wave | fails question 1 |
 
-`Spawner` answers **no** to the first question, and the checklist would call that a reason not to write a class. It is a class anyway, for one reason you have already met. Its facts change together: the wave number, the pause before the next wave, and the speed that follows from the wave. In Part B a restart had to set back `wave`, `wavePause` and `fallSpeed` on three separate lines, and a forgotten line is exactly the kind of bug 5.10.8 was. With a class, a restart is one line that cannot forget a piece:
+`Spawner` answers **no** to the first question, and the checklist would call that a reason not to write a class. It is a class anyway, for one reason you have already met. Its facts change together: the wave number, the pause before the next wave, and the speed that follows from the wave. In Part B a restart had to set back `wave`, `wavePause` and `fallSpeed` on three separate lines, and a forgotten line is exactly the kind of bug 7.5.8 was. With a class, a restart is one line that cannot forget a piece:
 
 ```js
 spawner = new Spawner();   // a fresh wave 0 and a fresh pause, together
 Enemy.spawned = 0;
 ```
 
-The second line is there because of something 5.8.14 (Reading: One value shared by every instance) showed: a `static` value such as `Enemy.spawned` belongs to the class itself, not to any one enemy and not to a round. Making new enemies never resets it. If each round should count from zero, the restart has to say so.
+The second line is there because of something 7.3.14 (Reading: One value shared by every instance) showed: a `static` value such as `Enemy.spawned` belongs to the class itself, not to any one enemy and not to a round. Making new enemies never resets it. If each round should count from zero, the restart has to say so.
 
 ## Where each fact will live
 
-The same "where it lives" table as 5.8.17 (Worked Example: The wave spawner), for the whole game:
+The same "where it lives" table as 7.3.17 (Worked Example: The wave spawner), for the whole game:
 
 | Job | Owner |
 | --- | --- |

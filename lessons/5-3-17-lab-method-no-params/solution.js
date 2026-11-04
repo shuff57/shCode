@@ -1,4 +1,4 @@
-// 5.7.3 Lab: Method with no params (reference solution).
+// 7.2.3 Lab: Method with no params (reference solution).
 
 class Counter {
   constructor() {

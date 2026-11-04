@@ -1,4 +1,4 @@
-// 7.1.1 Arcade Cabinet: Q2 Synthesis
+// 8.1.1 Arcade Cabinet: Q2 Synthesis
 //
 // This is the last thing you build this semester, and it is yours. There is no
 // starter game below and no steps to fill in, because the game is not a thing

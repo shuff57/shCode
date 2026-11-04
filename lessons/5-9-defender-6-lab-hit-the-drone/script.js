@@ -1,4 +1,4 @@
-// 5.9.6 Lab: Hit the drone.
+// 7.4.6 Lab: Hit the drone.
 
 const BASE_Y = 370;   // anything that falls below this line has reached the base
 
@@ -60,7 +60,7 @@ function resetDrone() {
 }
 
 // The drone falls; when it reaches the base it starts again at the top.
-// (5.9.7 makes reaching the base cost something.)
+// (7.4.7 makes reaching the base cost something.)
 function moveDrone() {
   drone.y += 1.5;
   if (drone.y > BASE_Y) resetDrone();
@@ -75,7 +75,7 @@ function hitDrone() {
   }
 }
 
-// Puts back everything a round owns. setup() uses it; 5.9.7 gives it to the R key too.
+// Puts back everything a round owns. setup() uses it; 7.4.7 gives it to the R key too.
 function startRound() {
   for (const b of bullets) b.delete();
   bullets = [];

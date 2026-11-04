@@ -1,4 +1,4 @@
-// 5.7.4 Lab: Method with parameters.
+// 7.2.4 Lab: Method with parameters.
 
 class Counter {
   constructor() {

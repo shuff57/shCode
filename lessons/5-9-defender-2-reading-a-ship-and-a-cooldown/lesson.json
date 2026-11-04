@@ -1,11 +1,11 @@
 {
   "id": "5-9-defender-2-reading-a-ship-and-a-cooldown",
-  "title": "5.9.2 Reading: A ship, and a timer you start yourself",
+  "title": "7.4.2 Reading: A ship, and a timer you start yourself",
   "description": "Two small ideas carry Part A: two ifs keep the ship on the canvas, and a cooldown you start yourself spaces out the shots. Also why moving everything by hand inside if (playing) makes game over free.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.9 Project: Defender, Part A",
+  "unit": "7.4 Project: Defender, Part A",
   "preview": "reading",
   "week": 14,
   "slos": [

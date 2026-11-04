@@ -1,11 +1,11 @@
 {
   "id": "5-5-20-quiz-unit-5-objects",
-  "title": "5.8.20 Unit 5 Check: classes, objects and methods",
+  "title": "7.3.20 Unit 5 Check: classes, objects and methods",
   "description": "Eight multiple-choice questions closing Unit 5: class versus instance, the constructor, this, method syntax, separate state on two instances, arrays of instances, where a variable lives, and what a class variable is. Checked instantly.",
   "type": "assignment",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.8 Inside a Class",
+  "unit": "7.3 Inside a Class",
   "preview": "quiz",
   "week": 14,
   "slos": [
@@ -26,7 +26,7 @@
     "questions": [
       {
         "id": "q1-new-makes-one",
-        "source": "5.6.4",
+        "source": "7.1.4",
         "question": "You call `new Sprite(100, 100, 40, 40)` three times. What do you have afterwards?",
         "options": [
           "One sprite that has been moved twice",
@@ -42,7 +42,7 @@
       },
       {
         "id": "q2-constructor-job",
-        "source": "5.6.5",
+        "source": "7.1.5",
         "question": "What is a constructor for?",
         "options": [
           "It destroys the object when it is no longer needed",
@@ -58,7 +58,7 @@
       },
       {
         "id": "q3-this-is-the-receiver",
-        "source": "5.6.13",
+        "source": "7.1.13",
         "question": "Inside `enemy.takeHit(1)`, what does `this` mean?",
         "options": [
           "The class `Enemy`",
@@ -74,7 +74,7 @@
       },
       {
         "id": "q4-method-syntax",
-        "source": "5.7.1",
+        "source": "7.2.1",
         "question": "Which line declares a method correctly inside a class body?",
         "options": [
           "`function tick() { this.n += 1; }`",
@@ -90,7 +90,7 @@
       },
       {
         "id": "q5-separate-state",
-        "source": "5.7.11",
+        "source": "7.2.11",
         "question": "Two enemies are built with `new Enemy(100, 100)`. You put one of them through `takeHit(3)`. What is the other one's health?",
         "options": [
           "Three lower, because they share the same `hp`",
@@ -106,7 +106,7 @@
       },
       {
         "id": "q6-loop-over-instances",
-        "source": "5.7.14",
+        "source": "7.2.14",
         "question": "You have `enemies`, an array of `Enemy` instances. What does a loop over it give you that three named variables did not?",
         "options": [
           "It makes each enemy run faster",
@@ -122,7 +122,7 @@
       },
       {
         "id": "q7-where-does-it-live",
-        "source": "5.8.1",
+        "source": "7.3.1",
         "question": "A method declares `let step = 3;` and uses it. What happens on the next call to the same method?",
         "options": [
           "`step` is still 3, and any changes made to it are still there",
@@ -138,7 +138,7 @@
       },
       {
         "id": "q8-class-variable",
-        "source": "5.8.14",
+        "source": "7.3.14",
         "question": "`class Enemy { static spawned = 0; }` and two enemies exist. Which expression counts how many enemies have ever been built?",
         "options": [
           "`enemy.spawned`, which reads one enemy's own property",

@@ -1,11 +1,11 @@
 {
   "id": "5-10-defender-1-reading-many-enemies-parallel-arrays",
-  "title": "5.10.1 Reading: Many enemies, kept in parallel arrays",
+  "title": "7.5.1 Reading: Many enemies, kept in parallel arrays",
   "description": "From one drone to many enemies. Each enemy's hp and worth sit in two more arrays beside the sprites, on purpose, and every push and every splice has to happen to all three.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.10 Project: Defender, Part B",
+  "unit": "7.5 Project: Defender, Part B",
   "preview": "reading",
   "week": 15,
   "slos": [

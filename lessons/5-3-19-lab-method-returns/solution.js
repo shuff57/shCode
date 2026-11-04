@@ -1,4 +1,4 @@
-// 5.7.5 Lab: Method that returns a value (reference solution).
+// 7.2.5 Lab: Method that returns a value (reference solution).
 
 class Counter {
   constructor() {

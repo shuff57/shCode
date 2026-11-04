@@ -1,6 +1,6 @@
 ## Finished in one place
 
-**Read before `5.11.4 Lab: Enemy takes over`.** About 10 minutes.
+**Read before `7.6.4 Lab: Enemy takes over`.** About 10 minutes.
 
 By the end of this example you should be able to answer:
 
@@ -15,7 +15,7 @@ By the end of this example you should be able to answer:
 
 These are the same two places Flappy's pipes left from, the screen and the array, now written once instead of in every loop. It also means nothing can remove the same enemy twice: a finished enemy is removed on the one frame it is filtered out, and the next frame it is not in the list to be found again.
 
-The enemy below is the shape you will finish in the lab: `takeHit` and `isAlive` from 5.8.8 and 5.8.9, a `land()` that uses the enemy up, and a `remove()` that deletes its sprite. Two numbers are on screen. `allSprites` is moSHion's own list of every sprite that exists, so `allSprites.length` counts what is really on the canvas.
+The enemy below is the shape you will finish in the lab: `takeHit` and `isAlive` from 7.3.8 and 7.3.9, a `land()` that uses the enemy up, and a `remove()` that deletes its sprite. Two numbers are on screen. `allSprites` is moSHion's own list of every sprite that exists, so `allSprites.length` counts what is really on the canvas.
 
 ```js live
 // Finished in one place: the enemy changes its own state; the scene removes
@@ -90,6 +90,6 @@ function drawTop() {
 
 **Try this:**
 
-1. Delete the three lines of the `remove()` loop and run it. "Sprites on screen" climbs past "in the list": finished enemies are gone from the list but still on screen, frozen ghosts that nothing moves any more, as the dead enemies stayed on screen in 5.8.13 (Lab: Reap the dead with filter).
+1. Delete the three lines of the `remove()` loop and run it. "Sprites on screen" climbs past "in the list": finished enemies are gone from the list but still on screen, frozen ghosts that nothing moves any more, as the dead enemies stayed on screen in 7.3.13 (Lab: Reap the dead with filter).
 2. Put the loop back, then swap the two parts so the `filter` line runs first. The same ghosts appear: the finished enemies are dropped from the list before the loop that would remove their sprites can find them. Screen first, then the list.
 3. Put it back the right way round and press Space again and again. Nothing is spliced anywhere, yet the list never holds a finished enemy for more than one frame.

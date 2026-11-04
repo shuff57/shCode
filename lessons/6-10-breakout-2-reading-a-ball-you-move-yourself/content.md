@@ -10,7 +10,7 @@ By the end of this reading you should be able to answer:
 - Why does the paddle bounce the ball only while it is coming down?
 - How does the paddle steer the ball?
 
-**The ball is moved by your code.** Like the drone and the shots in Defender (5.9.5), the ball has `collider = 'none'`: nothing pushes it, nothing slows it down, and gravity leaves it alone. Two variables hold its speed in pixels per frame. `vx` is the speed across: plus is right, minus is left. `vy` is the speed down: plus is down and minus is up, because y grows downward on the canvas (5.1.15). Every frame the ball takes one step:
+**The ball is moved by your code.** Like the drone and the shots in Defender (7.4.5), the ball has `collider = 'none'`: nothing pushes it, nothing slows it down, and gravity leaves it alone. Two variables hold its speed in pixels per frame. `vx` is the speed across: plus is right, minus is left. `vy` is the speed down: plus is down and minus is up, because y grows downward on the canvas (5.1.15). Every frame the ball takes one step:
 
 ```js
 ball.x += vx;
@@ -33,7 +33,7 @@ Test against 0 and 400 instead and half of the ball goes into the wall before it
 
 **The bottom is open.** There is no fourth wall. A ball whose y is more than `400 + R` has gone right past the bottom edge, and the game serves a new one: `serve()` puts the ball back above the paddle with its starting speed.
 
-**The paddle.** The paddle is a `'static'` sprite, like Defender's ship (5.9.5): it never falls and nothing pushes it, and your code moves it. A variable `control` says how the player steers, `'mouse'` or `'keys'`:
+**The paddle.** The paddle is a `'static'` sprite, like Defender's ship (7.4.5): it never falls and nothing pushes it, and your code moves it. A variable `control` says how the player steers, `'mouse'` or `'keys'`:
 
 - with the mouse: `paddle.x = mouse.x;` every frame (6.7.3), so the paddle sits under the pointer;
 - with the keys: `if (kb.pressing('left')) paddle.x -= 6;`, and the same with `'right'` and `+= 6` (5.1.13).
@@ -45,7 +45,7 @@ if (paddle.x < PADDLE_W / 2) paddle.x = PADDLE_W / 2;
 if (paddle.x > 400 - PADDLE_W / 2) paddle.x = 400 - PADDLE_W / 2;
 ```
 
-**Off the paddle, only while coming down.** `ball.overlaps(paddle)` is true on every frame the two touch, not only the first (5.9.5). If the paddle slides into the ball from the side, they can touch for several frames in a row, and flipping `vy` on every one of them sends the ball up, down, up: it shivers along the paddle. So the bounce happens only while the ball is falling, `vy > 0`. Inside the `if`, the first line flips `vy`; the second sets `vx` from where the ball landed on the paddle, which aims it ("The paddle steers", below):
+**Off the paddle, only while coming down.** `ball.overlaps(paddle)` is true on every frame the two touch, not only the first (7.4.5). If the paddle slides into the ball from the side, they can touch for several frames in a row, and flipping `vy` on every one of them sends the ball up, down, up: it shivers along the paddle. So the bounce happens only while the ball is falling, `vy > 0`. Inside the `if`, the first line flips `vy`; the second sets `vx` from where the ball landed on the paddle, which aims it ("The paddle steers", below):
 
 ```js
 if (ball.overlaps(paddle) && vy > 0) {

@@ -1,4 +1,4 @@
-// 5.11.4 Lab: Enemy takes over (reference solution).
+// 7.6.4 Lab: Enemy takes over (reference solution).
 
 const BASE_Y = 370;   // anything that falls below this line has reached the base
 

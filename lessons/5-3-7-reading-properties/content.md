@@ -1,6 +1,6 @@
 ## Properties: data on `this`
 
-**Read before `5.6.9 Lab: Read a property`.** About 4 minutes.
+**Read before `7.1.9 Lab: Read a property`.** About 4 minutes.
 
 By the end of this reading you should be able to answer:
 

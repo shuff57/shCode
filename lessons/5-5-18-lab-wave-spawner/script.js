@@ -1,4 +1,4 @@
-// 5.8.18 Lab: Build a wave.
+// 7.3.18 Lab: Build a wave.
 
 class Enemy {
   static spawned = 0;

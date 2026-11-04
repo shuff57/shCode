@@ -1,11 +1,11 @@
 {
   "id": "5-3-13-lab-build-sprite",
-  "title": "5.6.14 Your Turn: Build a Sprite",
-  "description": "Low-stakes autograded practice. Instantiate the Sprite class twice (rectangle form and circle form), set properties on each instance, and give one sprite a stroke. Bridges the 5.6.7 / 5.6.13 worked examples and the 5.7.11 Enemy class worked example.",
+  "title": "7.1.14 Your Turn: Build a Sprite",
+  "description": "Low-stakes autograded practice. Instantiate the Sprite class twice (rectangle form and circle form), set properties on each instance, and give one sprite a stroke. Bridges the 7.1.7 / 7.1.13 worked examples and the 7.2.11 Enemy class worked example.",
   "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.6 Classes and Objects via moSHion",
+  "unit": "7.1 Classes and Objects via moSHion",
   "preview": "moshion",
   "week": 12,
   "slos": [
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Create the canvas",
-      "instructions": "In `setup()`, create a canvas. `Canvas` is a class, and `new Canvas(...)` stamps out an instance: the same constructor-call pattern you saw in 5.6.7.",
+      "instructions": "In `setup()`, create a canvas. `Canvas` is a class, and `new Canvas(...)` stamps out an instance: the same constructor-call pattern you saw in 7.1.7.",
       "hints": [
         "Open the moSHion docs drawer on the right and find the Canvas section."
       ]
@@ -84,7 +84,7 @@
     {
       "id": "r4",
       "title": "Property set on an instance",
-      "description": "At least one `.color` assignment on a sprite instance. Help: 5.6.3 (Class and instance)",
+      "description": "At least one `.color` assignment on a sprite instance. Help: 7.1.3 (Class and instance)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.color\\s*=",
@@ -112,7 +112,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.6.14 Your Turn: Build a Sprite\". The task they were given: Starting from an empty setup(): create a canvas with new Canvas(width, height); store a rectangle sprite made with the 4-argument form new Sprite(x, y, width, height) in a variable and set its .color; store a circle sprite made with the 3-argument form new Sprite(x, y, diameter) and give it its own .color; then give one of the two sprites a .stroke and a .strokeWeight. You cannot run their code: read it and judge what it WOULD do when the sketch runs. new Sprite(x, y, w, h) makes a rectangle; new Sprite(x, y, d), with one size, makes a circle d pixels across. A fifth argument such as 'static' only sets the body type, so it is still the rectangle form. sprite.stroke is the outline colour and sprite.strokeWeight its thickness in pixels. A plain stroke(...) or strokeWeight(...) call is a drawing setting, not a property of a sprite. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Any numbers, expressions (such as width / 2) or variables work as arguments. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.1.14 Your Turn: Build a Sprite\". The task they were given: Starting from an empty setup(): create a canvas with new Canvas(width, height); store a rectangle sprite made with the 4-argument form new Sprite(x, y, width, height) in a variable and set its .color; store a circle sprite made with the 3-argument form new Sprite(x, y, diameter) and give it its own .color; then give one of the two sprites a .stroke and a .strokeWeight. You cannot run their code: read it and judge what it WOULD do when the sketch runs. new Sprite(x, y, w, h) makes a rectangle; new Sprite(x, y, d), with one size, makes a circle d pixels across. A fifth argument such as 'static' only sets the body type, so it is still the rectangle form. sprite.stroke is the outline colour and sprite.strokeWeight its thickness in pixels. A plain stroke(...) or strokeWeight(...) call is a drawing setting, not a property of a sprite. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Any numbers, expressions (such as width / 2) or variables work as arguments. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
     "rubric": [
       {
         "id": "r1",
@@ -135,7 +135,7 @@
       {
         "id": "r4",
         "title": "Property set on an instance",
-        "description": "At least one sprite's .color is assigned with =. Missing: no .color is set on a sprite. Help: 5.6.3 (Class and instance)",
+        "description": "At least one sprite's .color is assigned with =. Missing: no .color is set on a sprite. Help: 7.1.3 (Class and instance)",
         "points": 1
       },
       {

@@ -1,11 +1,11 @@
 {
   "id": "5-3-36-lab-write-constructor",
-  "title": "5.6.16 Your Turn: Fill in a Constructor",
-  "description": "Low-stakes autograded practice. The class shell is given; you write the constructor body that stores three arguments on this, then build two instances with different values. Follows 5.6.15 (Worked Example: Sprite Showcase) and comes before the Enemy class in 5.7.11.",
+  "title": "7.1.16 Your Turn: Fill in a Constructor",
+  "description": "Low-stakes autograded practice. The class shell is given; you write the constructor body that stores three arguments on this, then build two instances with different values. Follows 7.1.15 (Worked Example: Sprite Showcase) and comes before the Enemy class in 7.2.11.",
   "type": "lesson",
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.6 Classes and Objects via moSHion",
+  "unit": "7.1 Classes and Objects via moSHion",
   "preview": "moshion",
   "week": 12,
   "slos": [
@@ -18,7 +18,7 @@
       "title": "Store x",
       "instructions": "The `Message` class is already written, but its constructor body is empty, so nothing is stored. Inside the constructor, store the `x` argument on this instance as a property named `x`. Nothing will appear on the canvas yet; that is expected.",
       "hints": [
-        "Reread 5.6.5 (Reading: constructor and its parameters). The line that stores an argument starts with `this.` and the property name.",
+        "Reread 7.1.5 (Reading: constructor and its parameters). The line that stores an argument starts with `this.` and the property name.",
         "The property name goes after the dot and the argument goes on the right of the equals sign."
       ]
     },
@@ -43,7 +43,7 @@
       "title": "Build two messages",
       "instructions": "In `setup()`, build two `Message` instances with `new`, and store them in `first` and `second`. Give each one different values so the two words appear in different places. Run it: both words should now show on the canvas.",
       "hints": [
-        "Reread 5.6.6 (Worked Example: The parts of a class). Arguments go in the same order as the constructor's parameters: x, then y, then words.",
+        "Reread 7.1.6 (Worked Example: The parts of a class). Arguments go in the same order as the constructor's parameters: x, then y, then words.",
         "The words go in quotes, like `'hello'`."
       ]
     }
@@ -52,7 +52,7 @@
     {
       "id": "r1",
       "title": "Constructor stores x",
-      "description": "The constructor stores the x argument on this as a property named x. Help: 5.6.5 (Reading: constructor and its parameters)",
+      "description": "The constructor stores the x argument on this as a property named x. Help: 7.1.5 (Reading: constructor and its parameters)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bconstructor\\s*\\([^)]{0,120}?\\b(\\w+)\\b[^)]{0,120}\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.x\\s*=\\s*\\(?\\s*\\1\\b",
@@ -63,7 +63,7 @@
     {
       "id": "r2",
       "title": "Constructor stores y",
-      "description": "The constructor stores the y argument on this as a property named y. Help: 5.6.5 (Reading: constructor and its parameters)",
+      "description": "The constructor stores the y argument on this as a property named y. Help: 7.1.5 (Reading: constructor and its parameters)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bconstructor\\s*\\([^)]{0,120}?\\b(\\w+)\\b[^)]{0,120}\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.y\\s*=\\s*\\(?\\s*\\1\\b",
@@ -74,7 +74,7 @@
     {
       "id": "r3",
       "title": "Constructor stores words",
-      "description": "The constructor stores the words argument on this as a property named words. Help: 5.6.5 (Reading: constructor and its parameters)",
+      "description": "The constructor stores the words argument on this as a property named words. Help: 7.1.5 (Reading: constructor and its parameters)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bconstructor\\s*\\([^)]{0,120}?\\b(\\w+)\\b[^)]{0,120}\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.words\\s*=\\s*\\(?\\s*\\1\\b",
@@ -85,7 +85,7 @@
     {
       "id": "r4",
       "title": "Two instances built",
-      "description": "Builds at least two Message instances with new. Help: 5.6.6 (Worked Example: The parts of a class)",
+      "description": "Builds at least two Message instances with new. Help: 7.1.6 (Worked Example: The parts of a class)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Message\\s*\\([^)]+\\)[\\s\\S]*new\\s+Message\\s*\\([^)]+\\)",
@@ -96,7 +96,7 @@
     {
       "id": "r5",
       "title": "The two instances differ",
-      "description": "The two new Message calls are not given identical arguments. Help: 5.6.4 (Reading: The new operator)",
+      "description": "The two new Message calls are not given identical arguments. Help: 7.1.4 (Reading: The new operator)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Message\\s*\\(([^)]*)\\)[\\s\\S]*new\\s+Message\\s*\\((?!\\1\\))[^)]*\\)",
@@ -113,36 +113,36 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.6.16 Your Turn: Fill in a Constructor\". The task they were given: The Message class is given with constructor(x, y, words) and an empty body. Inside the constructor, store each argument on this instance: the x argument as a property named x, y as y, and words as words. Then, in setup(), build two Message instances with new, with different values, and store them in first and second; draw() already shows each one's words at its x and y. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Inside a constructor, this is the new object being built; this.x = x stores the argument x on it as a property named x. draw() reads first.words, first.x and first.y, so the property names must be x, y and words. The parameter names are the student's choice; what matters is that each property gets the matching argument. Arguments in new Message(...) go in the order x, y, words. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. A line that stores a fixed value (a number typed in) instead of the argument, or a local variable (let or const) instead of a property on this, does not store the argument. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.1.16 Your Turn: Fill in a Constructor\". The task they were given: The Message class is given with constructor(x, y, words) and an empty body. Inside the constructor, store each argument on this instance: the x argument as a property named x, y as y, and words as words. Then, in setup(), build two Message instances with new, with different values, and store them in first and second; draw() already shows each one's words at its x and y. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Inside a constructor, this is the new object being built; this.x = x stores the argument x on it as a property named x. draw() reads first.words, first.x and first.y, so the property names must be x, y and words. The parameter names are the student's choice; what matters is that each property gets the matching argument. Arguments in new Message(...) go in the order x, y, words. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. A line that stores a fixed value (a number typed in) instead of the argument, or a local variable (let or const) instead of a property on this, does not store the argument. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
     "rubric": [
       {
         "id": "r1",
         "title": "Constructor stores x",
-        "description": "Inside the constructor, the x argument (whatever that parameter is called) is stored on this as a property named x. Missing: no this.x line, or it is given a fixed value instead of the argument. Help: 5.6.5 (Reading: constructor and its parameters)",
+        "description": "Inside the constructor, the x argument (whatever that parameter is called) is stored on this as a property named x. Missing: no this.x line, or it is given a fixed value instead of the argument. Help: 7.1.5 (Reading: constructor and its parameters)",
         "points": 1
       },
       {
         "id": "r2",
         "title": "Constructor stores y",
-        "description": "Inside the constructor, the y argument (whatever that parameter is called) is stored on this as a property named y. Missing: no this.y line, or it is given a fixed value instead of the argument. Help: 5.6.5 (Reading: constructor and its parameters)",
+        "description": "Inside the constructor, the y argument (whatever that parameter is called) is stored on this as a property named y. Missing: no this.y line, or it is given a fixed value instead of the argument. Help: 7.1.5 (Reading: constructor and its parameters)",
         "points": 1
       },
       {
         "id": "r3",
         "title": "Constructor stores words",
-        "description": "Inside the constructor, the words argument (whatever that parameter is called) is stored on this as a property named words. Missing: no this.words line, or it is given a fixed value instead of the argument. Help: 5.6.5 (Reading: constructor and its parameters)",
+        "description": "Inside the constructor, the words argument (whatever that parameter is called) is stored on this as a property named words. Missing: no this.words line, or it is given a fixed value instead of the argument. Help: 7.1.5 (Reading: constructor and its parameters)",
         "points": 1
       },
       {
         "id": "r4",
         "title": "Two instances built",
-        "description": "At least two new Message(...) calls with arguments. Storing them in first and second is what step 4 asks, so that draw() can show them. Missing: fewer than two. Help: 5.6.6 (Worked Example: The parts of a class)",
+        "description": "At least two new Message(...) calls with arguments. Storing them in first and second is what step 4 asks, so that draw() can show them. Missing: fewer than two. Help: 7.1.6 (Worked Example: The parts of a class)",
         "points": 1
       },
       {
         "id": "r5",
         "title": "The two instances differ",
-        "description": "The two new Message(...) calls are not given exactly the same arguments: a different position or different words is enough. Missing: identical arguments. Help: 5.6.4 (Reading: The new operator)",
+        "description": "The two new Message(...) calls are not given exactly the same arguments: a different position or different words is enough. Missing: identical arguments. Help: 7.1.4 (Reading: The new operator)",
         "points": 1
       }
     ]
