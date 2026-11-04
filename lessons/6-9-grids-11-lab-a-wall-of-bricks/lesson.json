@@ -1,11 +1,11 @@
 {
   "id": "6-9-grids-11-lab-a-wall-of-bricks",
-  "title": "6.9.11 Lab: A wall of bricks",
+  "title": "6.14.11 Lab: A wall of bricks",
   "description": "A wall of 40 bricks kept as an array of arrays of 1s and 0s. The drawing, the mouse and the words are done. Build the wall with two loops, find the brick under a pixel (the wall starts 60 pixels down), and count the bricks left.",
   "type": "lesson",
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.9 Grids and Tile Maps",
+  "unit": "6.14 Grids and Tile Maps",
   "preview": "moshion",
   "week": 16,
   "slos": [
@@ -18,7 +18,7 @@
       "title": "Build the wall",
       "instructions": "The wall is `bricks[r][c]`: `1` for a brick and `0` for a gap. The starter keeps the sizes at the top (`BRICK_COLS` 8, `BRICK_ROWS` 5, each brick `BW` 50 wide and `BH` 20 tall) and the wall starts `TOP` (60) pixels down, leaving room above it for words. Besides `setup()`, `draw()` and `drawTop()`, the starter has `startGame()` (which builds the wall and sets `score` to 0), `drawBricks()` (finished: it draws a coloured `rect` for every 1 and nothing for a 0) and three functions that are empty or give back a stand-in: `makeBricks()` gives back an empty list, `hitAt(x, y)` gives back `false`, and `bricksLeft()` gives back 0. Right now the screen shows no wall and the words say `bricks left: 0`.\n\nStart with `makeBricks()`. It makes `b` for you. Make `BRICK_ROWS` rows: for each one make an empty array called `row`, push `BRICK_COLS` ones into it, then push the finished row onto `b`. Run it: a wall of five coloured rows of eight bricks appears, but the words still say 0 until step 3.",
       "hints": [
-        "Two loops again, like `makeGrid()` in 6.9.10, but each cell is a `1` instead of `false`: `row.push(1);`",
+        "Two loops again, like `makeGrid()` in 6.14.10, but each cell is a `1` instead of `false`: `row.push(1);`",
         "`b.push(row);` goes after the inner loop and inside the outer one."
       ]
     },
@@ -45,7 +45,7 @@
     {
       "id": "r1",
       "title": "The wall is built with two loops",
-      "description": "A row is made for each of BRICK_ROWS and filled with BRICK_COLS ones, then pushed onto b (two loops, for or while). Help: 6.9.10 (Lab: Light the grid)",
+      "description": "A row is made for each of BRICK_ROWS and filled with BRICK_COLS ones, then pushed onto b (two loops, for or while). Help: 6.14.10 (Lab: Light the grid)",
       "type": "inFunction",
       "file": "script.js",
       "function": "makeBricks",
@@ -58,7 +58,7 @@
     {
       "id": "r2",
       "title": "A hit pixel becomes a row and a column",
-      "description": "Divide by the brick size with floor. The wall starts TOP pixels down, so take TOP off y first (in the same line or on the line before). Help: 6.9.9 (Reading: A grid is data)",
+      "description": "Divide by the brick size with floor. The wall starts TOP pixels down, so take TOP off y first (in the same line or on the line before). Help: 6.14.9 (Reading: A grid is data)",
       "type": "inFunction",
       "file": "script.js",
       "function": "hitAt",
@@ -71,7 +71,7 @@
     {
       "id": "r3",
       "title": "A hit outside the wall does nothing",
-      "description": "The row and column are checked from both sides (not below 0, and under BRICK_ROWS and BRICK_COLS) before the cell is read; a row that is too big or negative is what stops the sketch. Help: 6.9.9 (Reading: A grid is data)",
+      "description": "The row and column are checked from both sides (not below 0, and under BRICK_ROWS and BRICK_COLS) before the cell is read; a row that is too big or negative is what stops the sketch. Help: 6.14.9 (Reading: A grid is data)",
       "type": "inFunction",
       "file": "script.js",
       "function": "hitAt",
@@ -84,7 +84,7 @@
     {
       "id": "r4",
       "title": "A hit removes the brick",
-      "description": "The cell goes from 1 to 0, and only when it holds a brick (test the cell in the if). Help: 6.9.9 (Reading: A grid is data)",
+      "description": "The cell goes from 1 to 0, and only when it holds a brick (test the cell in the if). Help: 6.14.9 (Reading: A grid is data)",
       "type": "inFunction",
       "file": "script.js",
       "function": "hitAt",
@@ -110,7 +110,7 @@
     {
       "id": "r6",
       "title": "bricksLeft counts the bricks",
-      "description": "Two loops (index or for...of), counting only the cells that hold a brick, and n goes up. Help: 6.9.10 (Lab: Light the grid)",
+      "description": "Two loops (index or for...of), counting only the cells that hold a brick, and n goes up. Help: 6.14.10 (Lab: Light the grid)",
       "type": "inFunction",
       "file": "script.js",
       "function": "bricksLeft",

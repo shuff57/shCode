@@ -1,4 +1,4 @@
-// 5.3.14 Lab: A chime on every bumper hit (reference solution).
+// 5.6.3 Lab: A chime on every bumper hit (reference solution).
 
 let ball, ground, score;
 let chime;   // the sound, loaded once in setup()

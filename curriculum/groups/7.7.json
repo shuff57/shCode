@@ -1,0 +1,16 @@
+{
+  "moduleId": "7.7",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
+  "lessons": [
+    {
+      "id": "defender-the-hit-loop",
+      "title": "The hit loop",
+      "objective": "Run every shot against every enemy safely.",
+      "screens": [
+        "5-10-defender-3-plan-the-hit-loop",
+        "5-10-defender-4-reading-every-shot-against-every-enemy",
+        "5-10-defender-5-lab-shoot-them-down"
+      ]
+    }
+  ]
+}

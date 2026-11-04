@@ -1,11 +1,11 @@
 {
   "id": "6-5-6-reading-getitem-string",
-  "title": "6.5.6 Reading: What getItem Gives Back",
+  "title": "6.10.6 Reading: What getItem Gives Back",
   "description": "A number you saved with storeItem comes back a number, unlike 3.8's localStorage. Text you saved comes back text: here's when Number() still matters, and the || 0 fallback for the first run.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.5 Save and Load",
+  "unit": "6.10 Save and Load",
   "preview": "reading",
   "week": 16,
   "slos": [

@@ -1,4 +1,4 @@
-// 6.3.10 A14.1 Car on a Ramp
+// 6.8.10 A14.1 Car on a Ramp
 // Open the Quest tab for the graded requirements; open the Docs tab for the moSHion API.
 
 let ground, ramp, chassis, leftWheel, rightWheel, leftJoint, rightJoint;

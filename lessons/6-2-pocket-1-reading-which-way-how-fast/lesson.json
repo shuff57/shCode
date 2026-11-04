@@ -1,0 +1,19 @@
+{
+  "id": "6-2-pocket-1-reading-which-way-how-fast",
+  "title": "6.2.1 Reading: Which way, how fast",
+  "description": "Direction is degrees, speed is pixels a frame, and a pull-back sets both when you let go.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.2 Pocket: which way, how fast",
+  "preview": "reading",
+  "week": 13,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

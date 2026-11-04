@@ -1,10 +1,10 @@
 ## Plan before you build
 
-Every project in this unit gets a plan first, as Snake did in 5.5.1. A plan is not code. It is a short list that says what the game is made of, so the first thing you type is the right thing.
+Every project in this unit gets a plan first, as Snake did in 5.13.1. A plan is not code. It is a short list that says what the game is made of, so the first thing you type is the right thing.
 
 **This module in one paragraph.** You will build a maze whose levels are rows of text: a blue square, gold coins, and a green exit that stays shut until every coin is gone, over three levels. Then you will keep a grid of lights as data, and finish with a wall of bricks you can click away. In the maze the picture comes from the map; in the grids the picture comes from an array of arrays.
 
-**What a plan lists.** Break the Coin Maze into parts, the way Flappy's pipes became a part of their own in 5.4.6 (Lab: Pipes that come and go). For each part ask: does the game have to *remember* something about it from frame to frame? If so, that is a variable, and the plan names it.
+**What a plan lists.** Break the Coin Maze into parts, the way Flappy's pipes became a part of their own in 5.11.3 (Lab: Pipes that come and go). For each part ask: does the game have to *remember* something about it from frame to frame? If so, that is a variable, and the plan names it.
 
 Write your response in the box below. Short sentences or a numbered list both work. Aim to cover:
 

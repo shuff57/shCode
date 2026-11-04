@@ -1,4 +1,4 @@
-// 6.9.14 Challenges: Make it yours (reference solution: two-hit bricks, points by row,
+// 6.14.14 Challenges: Make it yours (reference solution: two-hit bricks, points by row,
 // and a wall read from rows of text).
 // My rule: the top rows score more; without it every brick would be worth 10.
 

@@ -1,6 +1,6 @@
 ## A map is rows of text
 
-**Read before `6.9.3 Worked Example: A level from text`.** About 8 minutes.
+**Read before `6.14.3 Worked Example: A level from text`.** About 8 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -56,7 +56,7 @@ The Group's own size wins over the tile size, which is why the coins are small c
 
 **`x, y` is the centre of the first tile.** Like a sprite's `x` and `y`, the two numbers after `map` are a centre. Tiles are 40 wide, so the first tile fills pixels 0 to 40 and its centre is at 20, not 0. Pass `0, 0` and the whole level sits half a tile up and to the left, with its first row and column cut off by the edge of the canvas. For tiles that start in the corner of the canvas, use `TILE / 2, TILE / 2`.
 
-**`Tiles` gives back a Group.** The result holds every tile it made, so `level.length` counts them and **`level.delete()` removes the whole level in one call**. A tile that is deleted on its own, such as a coin the player picked up, leaves the group. You will use `level.delete()` in 6.9.8 to clear a level before building the next.
+**`Tiles` gives back a Group.** The result holds every tile it made, so `level.length` counts them and **`level.delete()` removes the whole level in one call**. A tile that is deleted on its own, such as a coin the player picked up, leaves the group. You will use `level.delete()` in 6.14.8 to clear a level before building the next.
 
 **Seen from above, nothing falls.** This maze is a top-down view, so gravity stays off. 5.2.6 set `world.gravity.y` to 10; here it is 0, where every world starts, and the setup writes it out so a reader can see that nothing falls:
 

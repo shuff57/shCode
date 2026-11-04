@@ -1,11 +1,11 @@
 {
   "id": "6-11-sound-5-lab-a-sound-that-varies",
-  "title": "6.11.5 Lab: A sound that varies",
+  "title": "6.15.5 Lab: A sound that varies",
   "description": "The same sound every time tires the ear. Give each catch a random pitch with .rate and random(), and give each miss one of three thuds picked at random from a list.",
   "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.11 Sound and Music",
+  "unit": "6.15 Sound and Music",
   "preview": "moshion",
   "week": 19,
   "slos": [
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "A catch that never sounds the same",
-      "instructions": "The starter is your 6.11.4 game. Catch a few stars and listen: the same chime, exactly the same, every time. Games vary a sound a little each time it plays so the ear does not tire of it, and `.rate` is the cheapest way, because it changes speed and pitch together (6.11.1). `random(min, max)` gives a different number between `min` and `max` every time it is asked (5.2.1).\n\nIn the catch block, on the line before `chime.play();`, give the chime a new random rate:\n\n```js\nchime.rate = random(0.8, 1.25);\n```\n\nThe line runs once for each catch and asks for a new number each time, so each chime is a little higher or lower than the last. Run it and catch a few.",
+      "instructions": "The starter is your 6.15.4 game. Catch a few stars and listen: the same chime, exactly the same, every time. Games vary a sound a little each time it plays so the ear does not tire of it, and `.rate` is the cheapest way, because it changes speed and pitch together (6.15.1). `random(min, max)` gives a different number between `min` and `max` every time it is asked (5.2.1).\n\nIn the catch block, on the line before `chime.play();`, give the chime a new random rate:\n\n```js\nchime.rate = random(0.8, 1.25);\n```\n\nThe line runs once for each catch and asks for a new number each time, so each chime is a little higher or lower than the last. Run it and catch a few.",
       "hints": [
         "The rate line goes just before `chime.play();`, inside the catch block, so it runs once for each catch.",
         "In setup() it would be asked only once, and every chime would sound the same again."
@@ -64,5 +64,6 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
-  }
+  },
+  "carryFrom": "6-11-sound-4-lab-music-volume-and-a-mute-key"
 }

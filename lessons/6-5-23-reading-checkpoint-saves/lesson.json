@@ -1,11 +1,11 @@
 {
   "id": "6-5-23-reading-checkpoint-saves",
-  "title": "6.5.24 Reading: Checkpoint Saves: Save on Milestones",
+  "title": "6.10.24 Reading: Checkpoint Saves: Save on Milestones",
   "description": "An auto-save fires when something important happens: reaching a checkpoint, finishing a level, hitting a score milestone.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.5 Save and Load",
+  "unit": "6.10 Save and Load",
   "preview": "reading",
   "week": 16,
   "slos": [

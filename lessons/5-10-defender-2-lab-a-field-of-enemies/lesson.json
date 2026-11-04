@@ -1,11 +1,11 @@
 {
   "id": "5-10-defender-2-lab-a-field-of-enemies",
-  "title": "5.10.2 Lab: A field of enemies",
+  "title": "7.6.2 Lab: A field of enemies",
   "description": "The drone is gone and enemies arrive on a beat, but nothing builds or moves them. Write spawnEnemy with one push per array, and the loop that makes enemies fall, land and leave all three arrays.",
   "type": "lesson",
   "estimateMins": 18,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.10 Project: Defender, Part B",
+  "unit": "7.6 Defender: many enemies",
   "preview": "moshion",
   "week": 15,
   "slos": [
@@ -15,9 +15,9 @@
     {
       "id": "s1",
       "title": "Build an enemy",
-      "instructions": "Part A's drone is gone. `spawnOnBeat()` is finished and already called in `draw()`: every 60 frames it asks `spawnEnemy(x, y, hp)` for one enemy, and about one in four is a tough one with 3 hp. Shots fly straight through enemies for now; 5.10.5 makes them hit. Fill in `spawnEnemy`: build a 30 by 30 sprite at `(x, y)` with collider `'none'`, colour it `'orange'` when `hp` is more than 1 and `'crimson'` when it is not, write `String(hp)` on it with `.text`, then push the sprite onto `enemies`, `hp` onto `enemyHp` and `hp * 10` onto `enemyWorth`. Nothing shows yet when you run it: each enemy is built just above the top, and nothing moves it.",
+      "instructions": "Part A's drone is gone. `spawnOnBeat()` is finished and already called in `draw()`: every 60 frames it asks `spawnEnemy(x, y, hp)` for one enemy, and about one in four is a tough one with 3 hp. Shots fly straight through enemies for now; 7.7.3 makes them hit. Fill in `spawnEnemy`: build a 30 by 30 sprite at `(x, y)` with collider `'none'`, colour it `'orange'` when `hp` is more than 1 and `'crimson'` when it is not, write `String(hp)` on it with `.text`, then push the sprite onto `enemies`, `hp` onto `enemyHp` and `hp * 10` onto `enemyWorth`. Nothing shows yet when you run it: each enemy is built just above the top, and nothing moves it.",
       "hints": [
-        "`e.color = hp > 1 ? 'orange' : 'crimson';` picks the colour in one line, as 5.10.1 showed.",
+        "`e.color = hp > 1 ? 'orange' : 'crimson';` picks the colour in one line, as 7.6.1 showed.",
         "Three pushes, one per array, so index j is the same enemy in all three: `enemies.push(e);`, then the same for `enemyHp` and `enemyWorth`."
       ]
     },
@@ -55,7 +55,7 @@
     {
       "id": "r2",
       "title": "One push per array",
-      "description": "spawnEnemy pushes onto enemies, enemyHp and enemyWorth, so index j is the same enemy in all three. Help: 5.10.1 (Reading: Many enemies, kept in parallel arrays)",
+      "description": "spawnEnemy pushes onto enemies, enemyHp and enemyWorth, so index j is the same enemy in all three. Help: 7.6.1 (Reading: Many enemies, kept in parallel arrays)",
       "type": "inFunction",
       "function": "spawnEnemy",
       "file": "script.js",
@@ -68,7 +68,7 @@
     {
       "id": "r3",
       "title": "Enemies fall",
-      "description": "moveEnemies moves each enemy down by adding to its y. Help: 5.10.1 (Reading: Many enemies, kept in parallel arrays)",
+      "description": "moveEnemies moves each enemy down by adding to its y. Help: 7.6.1 (Reading: Many enemies, kept in parallel arrays)",
       "type": "inFunction",
       "function": "moveEnemies",
       "file": "script.js",
@@ -81,7 +81,7 @@
     {
       "id": "r4",
       "title": "A landing costs the base 1",
-      "description": "Inside an if that tests an enemy's y against BASE_Y, baseHp goes down by 1. Help: 5.9.7 (Lab: Hold the base, and start again)",
+      "description": "Inside an if that tests an enemy's y against BASE_Y, baseHp goes down by 1. Help: 7.5.3 (Lab: Hold the base, and start again)",
       "type": "inFunction",
       "function": "moveEnemies",
       "file": "script.js",
@@ -94,7 +94,7 @@
     {
       "id": "r5",
       "title": "A landed enemy leaves the screen and all three arrays",
-      "description": "Inside the landing if, next to baseHp going down, the sprite is deleted and index j is spliced out of enemies, enemyHp and enemyWorth (or a removeEnemy helper that does it is called there). Help: 5.10.1 (Reading: Many enemies, kept in parallel arrays)",
+      "description": "Inside the landing if, next to baseHp going down, the sprite is deleted and index j is spliced out of enemies, enemyHp and enemyWorth (or a removeEnemy helper that does it is called there). Help: 7.6.1 (Reading: Many enemies, kept in parallel arrays)",
       "type": "inFunction",
       "function": [
         "moveEnemies",
@@ -116,7 +116,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.10.2 Lab: A field of enemies\". The task they were given: spawnOnBeat() already asks spawnEnemy(x, y, hp) for an enemy every 60 frames. Fill in spawnEnemy: build a 30 by 30 sprite at (x, y) with collider 'none', coloured orange when hp is more than 1 and crimson otherwise, with its hp written on it as text, then push the sprite onto enemies, hp onto enemyHp and hp * 10 onto enemyWorth. Then, in moveEnemies(), loop over enemies from the end to the start: move each one down by fallSpeed, and when one's y is more than BASE_Y, take 1 from baseHp, delete its sprite and splice index j out of all three arrays. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. The enemies live in three parallel arrays, enemies (the sprites), enemyHp and enemyWorth: index j in all three is the same enemy, so every push and every splice has to happen to all three at the same index, or every later enemy reads a neighbour's numbers. A helper such as removeEnemy(j) that deletes the sprite and splices all three counts wherever it is called, as if its lines were written there. A sprite's collider can be set with .collider = 'none' or by passing 'none' as the last argument to new Sprite, the way the starter passes 'static' for the base. A 'none' sprite passes through other sprites and does not fall by itself, but a vel still moves it. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (spawnEnemy, moveEnemies) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's spawnEnemy() and the loop in moveEnemies() are only STEP comments: missing on every criterion. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.6.2 Lab: A field of enemies\". The task they were given: spawnOnBeat() already asks spawnEnemy(x, y, hp) for an enemy every 60 frames. Fill in spawnEnemy: build a 30 by 30 sprite at (x, y) with collider 'none', coloured orange when hp is more than 1 and crimson otherwise, with its hp written on it as text, then push the sprite onto enemies, hp onto enemyHp and hp * 10 onto enemyWorth. Then, in moveEnemies(), loop over enemies from the end to the start: move each one down by fallSpeed, and when one's y is more than BASE_Y, take 1 from baseHp, delete its sprite and splice index j out of all three arrays. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. The enemies live in three parallel arrays, enemies (the sprites), enemyHp and enemyWorth: index j in all three is the same enemy, so every push and every splice has to happen to all three at the same index, or every later enemy reads a neighbour's numbers. A helper such as removeEnemy(j) that deletes the sprite and splices all three counts wherever it is called, as if its lines were written there. A sprite's collider can be set with .collider = 'none' or by passing 'none' as the last argument to new Sprite, the way the starter passes 'static' for the base. A 'none' sprite passes through other sprites and does not fall by itself, but a vel still moves it. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (spawnEnemy, moveEnemies) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's spawnEnemy() and the loop in moveEnemies() are only STEP comments: missing on every criterion. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
     "rubric": [
       {
         "id": "r1",

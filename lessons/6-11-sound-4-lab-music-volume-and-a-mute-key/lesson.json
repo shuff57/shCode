@@ -1,11 +1,11 @@
 {
   "id": "6-11-sound-4-lab-music-volume-and-a-mute-key",
-  "title": "6.11.4 Lab: Music, volume and a mute key",
+  "title": "6.15.4 Lab: Music, volume and a mute key",
   "description": "A tune loops under Star catch, quieter than the effects. The up and down keys step its volume between 0 and 10, and M turns every sound off and on again.",
   "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.11 Sound and Music",
+  "unit": "6.15 Sound and Music",
   "preview": "moshion",
   "week": 19,
   "slos": [
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "A tune under the game",
-      "instructions": "The starter is Star catch from 6.11.3, with its chime and thud. It also has `let music;` and `let level = 4;`, the tune's volume as a whole number from 0 to 10. A whole number is easy to show and to step up and down, and `level / 10` turns it into the `0` to `1` that `.volume` uses: 4 becomes 0.4.\n\nIn `setup()`, after the two sound effects, load the tune, set its volume, and start it looping:\n\n```js\nmusic = loadSound('/moshion/assets/music.wav');\nmusic.volume = level / 10;   // 4 tenths: under the effects\nmusic.loop();\n```\n\n`loop()` plays the tune over and over until `stop()`. It is the one call that waits for the file: asked for before the file has arrived, it is remembered and starts when the file lands, so `setup()` is a fine place for it (6.11.1). Run it. The tune starts once the sketch has had your first click or key, or straight away if your click on Run already counted. The words at the top already said `music: 4 of 10` before you started, because `level` was 4 all along; now the tune really plays at that level.",
+      "instructions": "The starter is Star catch from 6.15.3, with its chime and thud. It also has `let music;` and `let level = 4;`, the tune's volume as a whole number from 0 to 10. A whole number is easy to show and to step up and down, and `level / 10` turns it into the `0` to `1` that `.volume` uses: 4 becomes 0.4.\n\nIn `setup()`, after the two sound effects, load the tune, set its volume, and start it looping:\n\n```js\nmusic = loadSound('/moshion/assets/music.wav');\nmusic.volume = level / 10;   // 4 tenths: under the effects\nmusic.loop();\n```\n\n`loop()` plays the tune over and over until `stop()`. It is the one call that waits for the file: asked for before the file has arrived, it is remembered and starts when the file lands, so `setup()` is a fine place for it (6.15.1). Run it. The tune starts once the sketch has had your first click or key, or straight away if your click on Run already counted. The words at the top already said `music: 4 of 10` before you started, because `level` was 4 all along; now the tune really plays at that level.",
       "hints": [
         "`music.loop();` goes after the volume line, inside setup().",
         "No tune? Click the game: a browser plays nothing until the player has clicked or pressed a key."
@@ -25,7 +25,7 @@
     {
       "id": "s2",
       "title": "Up and down change the volume",
-      "instructions": "`draw()` now calls `soundKeys()` every frame, and it is empty. In it, when the up arrow is pressed and `level` is below 10, add 1 to `level` and set the tune's volume from it again. When the down arrow is pressed and `level` is above 0, take 1 away and set the volume the same way:\n\n```js\nif (kb.presses('up') && level < 10) {\n  level += 1;\n  music.volume = level / 10;\n}\n```\n\nand the same with `'down'`, `level > 0` and `level -= 1`. Use `kb.presses`, not `kb.pressing`: `presses` is true only on the frame the key goes down (6.3.3), so one press is one step, where `pressing` would step 60 times a second while the key is held. The `&& level < 10` stops the number at 10, where the tune is as loud as it gets. Run it, click the canvas, and press up and down: the words count between 0 and 10, and the tune follows.",
+      "instructions": "`draw()` now calls `soundKeys()` every frame, and it is empty. In it, when the up arrow is pressed and `level` is below 10, add 1 to `level` and set the tune's volume from it again. When the down arrow is pressed and `level` is above 0, take 1 away and set the volume the same way:\n\n```js\nif (kb.presses('up') && level < 10) {\n  level += 1;\n  music.volume = level / 10;\n}\n```\n\nand the same with `'down'`, `level > 0` and `level -= 1`. Use `kb.presses`, not `kb.pressing`: `presses` is true only on the frame the key goes down (6.8.3), so one press is one step, where `pressing` would step 60 times a second while the key is held. The `&& level < 10` stops the number at 10, where the tune is as loud as it gets. Run it, click the canvas, and press up and down: the words count between 0 and 10, and the tune follows.",
       "hints": [
         "Two `if`s, one for `'up'` and one for `'down'`, each with two lines inside.",
         "`level` on its own changes nothing you can hear. `music.volume = level / 10;` is the line that does."
@@ -34,7 +34,7 @@
     {
       "id": "s3",
       "title": "M turns everything off",
-      "instructions": "`masterVolume(0)` silences every sound at once, the chime and the thud as well as the tune, without changing any sound's own volume. `masterVolume(1)` brings them all back, and `masterVolume()` with nothing in the brackets tells you the level it is at now (6.11.1). Under the volume keys in `soundKeys()`, make M flip it:\n\n```js\nif (kb.presses('m')) {\n  if (masterVolume() > 0) masterVolume(0);\n  else masterVolume(1);\n}\n```\n\nRun it and press M: silence, and the words say `sound: off`. Press M again: everything comes back at the level it was.",
+      "instructions": "`masterVolume(0)` silences every sound at once, the chime and the thud as well as the tune, without changing any sound's own volume. `masterVolume(1)` brings them all back, and `masterVolume()` with nothing in the brackets tells you the level it is at now (6.15.1). Under the volume keys in `soundKeys()`, make M flip it:\n\n```js\nif (kb.presses('m')) {\n  if (masterVolume() > 0) masterVolume(0);\n  else masterVolume(1);\n}\n```\n\nRun it and press M: silence, and the words say `sound: off`. Press M again: everything comes back at the level it was.",
       "hints": [
         "`masterVolume()` with empty brackets reads the level; with a number in them, it sets it.",
         "`music.volume = 0` would mute only the tune and leave the chime and the thud playing. `masterVolume` turns off everything."
@@ -45,7 +45,7 @@
     {
       "id": "r1",
       "title": "The tune loops",
-      "description": "A sound's .loop() is called, in setup() or anywhere: loop() keeps one copy going, so calling it again is safe. Help: 6.11.1 (Reading: Sound in a sketch)",
+      "description": "A sound's .loop() is called, in setup() or anywhere: loop() keeps one copy going, so calling it again is safe. Help: 6.15.1 (Reading: Sound in a sketch)",
       "hint": "In setup(), after loading the tune and setting its volume: music.loop();",
       "file": "script.js",
       "flags": "",
@@ -58,7 +58,7 @@
     {
       "id": "r2",
       "title": "The tune starts quieter than the effects",
-      "description": "In setup(), a sound's .volume is set below 1: level / 10, 0.4, or any number under 1. Help: 6.11.1 (Reading: Sound in a sketch)",
+      "description": "In setup(), a sound's .volume is set below 1: level / 10, 0.4, or any number under 1. Help: 6.15.1 (Reading: Sound in a sketch)",
       "hint": "music.volume = level / 10; in setup(), before music.loop();",
       "file": "script.js",
       "flags": "",
@@ -93,7 +93,7 @@
     {
       "id": "r3",
       "title": "Up and down change the volume",
-      "description": "Under kb.presses (one step for each press), one key raises the level (or the volume) and another lowers it, and the volume is set from the level again after each step (a volume line that runs only once, in setup(), does not follow the keys). Any variable name works. Help: 6.3.3 (Reading: moSHion docs: Input edges)",
+      "description": "Under kb.presses (one step for each press), one key raises the level (or the volume) and another lowers it, and the volume is set from the level again after each step (a volume line that runs only once, in setup(), does not follow the keys). Any variable name works. Help: 6.8.3 (Reading: moSHion docs: Input edges)",
       "hint": "if (kb.presses('up') && level < 10) { level += 1; music.volume = level / 10; }, and the same for 'down'.",
       "file": "script.js",
       "flags": "",
@@ -106,7 +106,7 @@
     {
       "id": "r4",
       "title": "M turns every sound off and on",
-      "description": "Under a kb.presses test, masterVolume(...) is set (or a mute variable is flipped), and the code can do both: turn every sound off (masterVolume(0)) and bring it back (masterVolume given something other than 0). Help: 6.11.1 (Reading: Sound in a sketch)",
+      "description": "Under a kb.presses test, masterVolume(...) is set (or a mute variable is flipped), and the code can do both: turn every sound off (masterVolume(0)) and bring it back (masterVolume given something other than 0). Help: 6.15.1 (Reading: Sound in a sketch)",
       "hint": "if (kb.presses('m')) { if (masterVolume() > 0) masterVolume(0); else masterVolume(1); }",
       "file": "script.js",
       "flags": "",

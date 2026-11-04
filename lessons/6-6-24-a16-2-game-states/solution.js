@@ -1,4 +1,4 @@
-// 6.6.26 A16.2 Game States (reference solution).
+// 6.11.26 A16.2 Game States (reference solution).
 // switch(state) over title / play / pause / gameover, with save on transition
 // and Continue restoring the saved state.
 

@@ -1,0 +1,18 @@
+{
+  "moduleId": "7.12",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
+  "lessons": [
+    {
+      "id": "breakout-plan-ball-and-paddle",
+      "title": "Plan, the ball and the paddle",
+      "objective": "Plan Breakout, move the ball yourself, bounce it off a paddle.",
+      "screens": [
+        "6-10-breakout-1-plan-break-breakout-into-parts",
+        "6-10-breakout-2-reading-a-ball-you-move-yourself",
+        "6-10-breakout-3-example-a-ball-in-a-box",
+        "6-10-breakout-4-lab-the-paddle",
+        "6-10-breakout-5-lab-bounce"
+      ]
+    }
+  ]
+}

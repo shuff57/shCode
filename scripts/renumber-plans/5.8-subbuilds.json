@@ -1,0 +1,16 @@
+{
+  "modules": {
+    "5.8": [
+      {
+        "folder": "5-3-pinball-polish-4-reading-four-physics-knobs"
+      },
+      {
+        "folder": "5-8-pinball-sub-two-masses",
+        "new": true
+      },
+      {
+        "folder": "5-3-pinball-polish-5-lab-nudge-the-table"
+      }
+    ]
+  }
+}

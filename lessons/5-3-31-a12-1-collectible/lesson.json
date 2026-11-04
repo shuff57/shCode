@@ -1,11 +1,11 @@
 {
   "id": "5-3-31-a12-1-collectible",
-  "title": "5.7.19 Collectible Class",
+  "title": "7.2.19 Collectible Class",
   "description": "Write a Collectible class, instantiate at least 5, and detect overlap with the player. SLO-2 lab: the class is the point. Auto-graded.",
   "type": "assignment",
   "estimateMins": 45,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.7 Writing Your Own Classes",
+  "unit": "7.2 Writing Your Own Classes",
   "preview": "moshion",
   "week": 13,
   "slos": [
@@ -18,7 +18,7 @@
       "title": "Fill in the Collectible constructor",
       "instructions": "The class shell is already in the editor: `class Collectible` with an empty `constructor(x, y, value, color)` and an empty `collect()`. Fill in the constructor: store the data on `this` and create `this.sprite = new Sprite(...)`.",
       "hints": [
-        "Re-read 5.7.11 Worked Example: the `Enemy` constructor follows the same `this.x = x` / `this.sprite = new Sprite(...)` pattern."
+        "Re-read 7.2.11 Worked Example: the `Enemy` constructor follows the same `this.x = x` / `this.sprite = new Sprite(...)` pattern."
       ]
     },
     {
@@ -51,7 +51,7 @@
     {
       "id": "r1",
       "title": "Constructor stores state on the object",
-      "description": "The constructor body assigns at least one argument onto this: the class shell is provided, so this checks the part the student writes. Help: 5.6.5 (constructor and its parameters)",
+      "description": "The constructor body assigns at least one argument onto this: the class shell is provided, so this checks the part the student writes. Help: 7.1.5 (constructor and its parameters)",
       "type": "regex",
       "file": "script.js",
       "pattern": "constructor\\s*\\([^)]*\\)\\s*\\{[\\s\\S]*?this\\.\\w+\\s*=",
@@ -73,7 +73,7 @@
     {
       "id": "r3",
       "title": "collect() method does work",
-      "description": "A collect() method that deletes the sprite (via this.sprite.delete() or sprite.remove()) AND then returns something, with the delete before the return so it runs. Help: 5.7.10 (Lab: Cleanup with this.sprite.delete())",
+      "description": "A collect() method that deletes the sprite (via this.sprite.delete() or sprite.remove()) AND then returns something, with the delete before the return so it runs. Help: 7.2.10 (Lab: Cleanup with this.sprite.delete())",
       "type": "regex",
       "file": "script.js",
       "pattern": "collect\\s*\\(\\s*\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\}|\\{)*?(?:this\\.sprite\\.(?:delete|remove)|\\.remove)\\s*\\(\\s*\\)(?:[^{}]|\\{[^{}]*\\}|\\})*?\\breturn\\b",
@@ -84,7 +84,7 @@
     {
       "id": "r4",
       "title": "At least one instance",
-      "description": "At least one Collectible is instantiated. Help: 5.6.4 (The new operator)",
+      "description": "At least one Collectible is instantiated. Help: 7.1.4 (The new operator)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Collectible\\s*\\(",
@@ -113,12 +113,12 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.19 Collectible Class\". The task they were given: The Collectible class shell is given: constructor(x, y, value, color) and collect(), both empty. Fill in the constructor: store the data on this (at least the value) and create this.sprite = new Sprite(...) in the given colour. Write collect() so it deletes the sprite and returns this.value. In setup(), push at least five new Collectible(...) into collectibles at different positions, with different values and colours. In draw(), go through collectibles; when player.overlaps(c.sprite) is true, call c.collect(), add what it returns to totalScore, and remove that item from the array. You cannot run their code: read it and judge what it WOULD do when the sketch runs. player.overlaps(other) is true on every frame the two touch, and it takes a sprite, so it is given c.sprite (the Collectible's own sprite), not the Collectible object. sprite.delete() (or remove()) takes a sprite off the screen. Code after a return never runs, so in collect() the delete must come before the return. Removing items from an array while looping forward skips the next item; looping backwards, or over a copy, avoids that. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Wrong ideas to catch: a return placed before the delete (the delete never runs); overlaps given the Collectible itself instead of its sprite; a collect() that returns nothing. Any parameter names, any sprite size or shape, and a for, for...of or backwards loop all count. colliding(...) also detects the touch and counts for the overlap criterion. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.2.19 Collectible Class\". The task they were given: The Collectible class shell is given: constructor(x, y, value, color) and collect(), both empty. Fill in the constructor: store the data on this (at least the value) and create this.sprite = new Sprite(...) in the given colour. Write collect() so it deletes the sprite and returns this.value. In setup(), push at least five new Collectible(...) into collectibles at different positions, with different values and colours. In draw(), go through collectibles; when player.overlaps(c.sprite) is true, call c.collect(), add what it returns to totalScore, and remove that item from the array. You cannot run their code: read it and judge what it WOULD do when the sketch runs. player.overlaps(other) is true on every frame the two touch, and it takes a sprite, so it is given c.sprite (the Collectible's own sprite), not the Collectible object. sprite.delete() (or remove()) takes a sprite off the screen. Code after a return never runs, so in collect() the delete must come before the return. Removing items from an array while looping forward skips the next item; looping backwards, or over a copy, avoids that. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Wrong ideas to catch: a return placed before the delete (the delete never runs); overlaps given the Collectible itself instead of its sprite; a collect() that returns nothing. Any parameter names, any sprite size or shape, and a for, for...of or backwards loop all count. colliding(...) also detects the touch and counts for the overlap criterion. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
     "rubric": [
       {
         "id": "r1",
         "title": "Constructor stores state on the object",
-        "description": "The constructor body stores at least one of its arguments on this (the value, x, y or the colour). Missing: nothing is stored on this. Help: 5.6.5 (constructor and its parameters)",
+        "description": "The constructor body stores at least one of its arguments on this (the value, x, y or the colour). Missing: nothing is stored on this. Help: 7.1.5 (constructor and its parameters)",
         "points": 1
       },
       {
@@ -130,13 +130,13 @@
       {
         "id": "r3",
         "title": "collect() method does work",
-        "description": "collect() deletes this.sprite (delete() or remove()) and returns a value (this.value is what step 2 asks), with the delete placed where it actually runs, before the return. Partial: only one of the two, or a delete that sits after the return and never runs. Missing: collect() is still empty. Help: 5.7.10 (Lab: Cleanup with this.sprite.delete())",
+        "description": "collect() deletes this.sprite (delete() or remove()) and returns a value (this.value is what step 2 asks), with the delete placed where it actually runs, before the return. Partial: only one of the two, or a delete that sits after the return and never runs. Missing: collect() is still empty. Help: 7.2.10 (Lab: Cleanup with this.sprite.delete())",
         "points": 1
       },
       {
         "id": "r4",
         "title": "At least one instance",
-        "description": "At least one new Collectible(...) is built. Five or more, pushed into collectibles, is what step 3 asks and is welcome. Missing: no Collectible is ever built. Help: 5.6.4 (The new operator)",
+        "description": "At least one new Collectible(...) is built. Five or more, pushed into collectibles, is what step 3 asks and is welcome. Missing: no Collectible is ever built. Help: 7.1.4 (The new operator)",
         "points": 1
       },
       {

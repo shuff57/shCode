@@ -1,4 +1,4 @@
-// 5.8.16 Lab: Count your spawns.
+// 7.3.16 Lab: Count your spawns.
 
 // STEP 1: give the class a shared counter named `spawned` that belongs to
 //   the class itself, not to any one enemy. It starts at 0.

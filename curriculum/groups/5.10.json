@@ -1,42 +1,17 @@
 {
   "moduleId": "5.10",
-  "source": "Not a book section. The one-game-across-modules shape follows CodeHS's project modules in Introduction to Game Design and AP CSA's class units. Structure only: no CodeHS text, problems or code is copied.",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
   "lessons": [
     {
-      "id": "many-enemies",
-      "title": "Many enemies, in parallel arrays",
-      "objective": "Students will be able to keep several facts about each enemy in parallel arrays and keep them in step on every push and every splice.",
+      "id": "flappy-the-flap",
+      "title": "The flap",
+      "objective": "Turn gravity on and reverse a fall with one tap.",
       "screens": [
-        "5-10-defender-1-reading-many-enemies-parallel-arrays",
-        "5-10-defender-2-lab-a-field-of-enemies"
-      ]
-    },
-    {
-      "id": "the-hit-loop",
-      "title": "The hit loop",
-      "objective": "Students will be able to test every shot against every enemy with a nested loop that runs backwards, splices safely and breaks after a hit.",
-      "screens": [
-        "5-10-defender-3-plan-the-hit-loop",
-        "5-10-defender-4-reading-every-shot-against-every-enemy",
-        "5-10-defender-5-lab-shoot-them-down"
-      ]
-    },
-    {
-      "id": "waves",
-      "title": "Waves with a pause",
-      "objective": "Students will be able to bring enemies in waves that start only on a clear field, after a countdown.",
-      "screens": [
-        "5-10-defender-6-example-waves-with-a-pause",
-        "5-10-defender-7-lab-waves"
-      ]
-    },
-    {
-      "id": "the-cost",
-      "title": "What parallel arrays cost",
-      "objective": "Students will be able to find a drift bug in parallel arrays and say how many places change to give every enemy one more fact.",
-      "screens": [
-        "5-10-defender-8-debugging-the-enemy-that-would-not-die",
-        "5-10-defender-9-quiz-enemies-and-waves"
+        "5-4-flappy-plan-sketch-the-game",
+        "5-4-flappy-1-reading-gravity-and-the-flap",
+        "5-4-flappy-2-example-the-bird-that-flaps",
+        "5-10-flappy-sub-gravity-and-a-tap",
+        "5-4-flappy-3-lab-make-it-flap"
       ]
     }
   ]

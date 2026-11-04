@@ -1,11 +1,20 @@
 {
   "id": "5-3-pinball-polish-4-reading-four-physics-knobs",
+<<<<<<< HEAD
   "title": "5.3.18 Reading: Four knobs: mass, gravityScale, rotationLock, debug",
   "description": "Four knobs that belong to one sprite. A heavier body moves less under the same push, but falls at the same speed. gravityScale is a sprite's own share of gravity (0 floats, 0.5 drifts). rotationLock = true stops a body from turning. debug = true draws the collider, the body moSHion really uses, for finding bugs. Read before 5.3.19 Lab: Nudge the table.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.3 Project: Pinball",
+=======
+  "title": "5.8.1 Reading: Four knobs: mass, gravityScale, rotationLock, debug",
+  "description": "Four knobs that belong to one sprite. A heavier body moves less under the same push, but falls at the same speed. gravityScale is a sprite's own share of gravity (0 floats, 0.5 drifts). rotationLock = true stops a body from turning. debug = true draws the collider, the body moSHion really uses, for finding bugs. Read before 5.8.3 Lab: Nudge the table.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.8 Pinball: physics knobs",
+>>>>>>> codehs-inspiration
   "preview": "reading",
   "week": 11,
   "slos": [

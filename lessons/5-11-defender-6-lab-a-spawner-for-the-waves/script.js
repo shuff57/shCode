@@ -1,4 +1,4 @@
-// 5.11.6 Lab: A Spawner for the waves. Spawner is new; nothing uses it yet.
+// 7.10.2 Lab: A Spawner for the waves. Spawner is new; nothing uses it yet.
 
 const BASE_Y = 370;   // anything that falls below this line has reached the base
 

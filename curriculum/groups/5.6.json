@@ -1,42 +1,16 @@
 {
   "moduleId": "5.6",
-  "source": "Seams follow CodeHS AP CSA (Cortado) Unit 1 lessons 1.12-1.14 and Unit 3 lessons 3.3-3.9 (objects, anatomy of a class, constructors, methods, this). Structure only: no CodeHS text, problems or code is copied.",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
   "lessons": [
     {
-      "id": "class-and-instance",
-      "title": "Class and instance",
-      "objective": "Students will be able to explain the difference between a class and an instance, say what new does, and name the four parts of a class: its name, constructor, parameters and properties.",
+      "id": "pinball-a-sound-on-a-hit",
+      "title": "A sound on a hit",
+      "objective": "Load a sound once and play it where the hit happens.",
       "screens": [
-        "5-3-1-slides",
-        "5-3-2-video-new-sprite",
-        "5-3-3-reading-classes",
-        "5-3-4-reading-new-operator",
-        "5-3-5-reading-constructor",
-        "5-3-35-example-class-anatomy"
-      ]
-    },
-    {
-      "id": "properties",
-      "title": "Properties",
-      "objective": "Students will be able to ask a running sketch which class an object came from, read and change a property on one instance, and show that two instances keep separate values.",
-      "screens": [
-        "5-3-6-example-devtools-reveal",
-        "5-3-7-reading-properties",
-        "5-3-8-lab-read-property",
-        "5-3-9-lab-write-property",
-        "5-3-10-lab-two-instances"
-      ]
-    },
-    {
-      "id": "this-and-constructors",
-      "title": "this and your first constructor",
-      "objective": "Students will be able to read this as the variable on the left of the dot, build sprites with both constructor forms, and write a constructor that stores its arguments on this.",
-      "screens": [
-        "5-3-11-reading-this-noun",
-        "5-3-12-example-this-pronoun",
-        "5-3-13-lab-build-sprite",
-        "5-3-14-moshion-sprite-showcase",
-        "5-3-36-lab-write-constructor"
+        "5-3-pinball-sound-1-reading-a-sound-on-a-hit",
+        "5-6-pinball-sub-one-sound",
+        "5-3-pinball-sound-2-lab-a-chime-on-every-hit",
+        "5-6-pinball-debug-sound-every-frame"
       ]
     }
   ]

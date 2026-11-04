@@ -1,17 +1,18 @@
 {
   "moduleId": "5.3",
-  "source": "Not a book section. The four-part shape of a game (goal, score, loss, restart) follows CodeHS's project modules in Introduction to Game Design, where each project is built in setup/mechanics/challenge steps. Structure only: no CodeHS text, problems or code is copied.",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
   "lessons": [
     {
-      "id": "from-scene-to-game",
-      "title": "Plan, and from scene to game",
-      "objective": "Students will be able to plan a game as parts and remembered values, name the four things that turn a physics scene into a game, and build a table with a goal on it.",
+      "id": "pinball-the-table",
+      "title": "Plan, and the table",
+      "objective": "Plan the table and build the first playable scene: a ball, a goal to hit, and walls.",
       "screens": [
         "5-3-pinball-plan-sketch-the-game",
         "5-3-pinball-1-reading-from-scene-to-game",
         "5-3-pinball-2-example-the-table-and-the-goal",
         "5-3-pinball-3-lab-build-the-table"
       ]
+<<<<<<< HEAD
     },
     {
       "id": "scoring-an-event",
@@ -78,6 +79,8 @@
         "5-3-pinball-polish-6-playtest-and-polish",
         "5-3-pinball-polish-7-challenges-polish-it-your-way"
       ]
+=======
+>>>>>>> codehs-inspiration
     }
   ]
 }

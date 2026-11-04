@@ -1,4 +1,4 @@
-// Defender, Part B: enemies and waves, the procedural way (5.10 reference).
+// Defender, Part B: enemies and waves, the procedural way (7.5 reference).
 
 const BASE_Y = 370;   // anything that falls below this line has reached the base
 

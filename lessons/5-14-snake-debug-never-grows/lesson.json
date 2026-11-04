@@ -1,0 +1,64 @@
+{
+  "id": "5-14-snake-debug-never-grows",
+  "title": "5.14.4 Debugging: The snake that never grows",
+  "description": "Two planted bugs. The snake moves and leaves no body behind, and when it does grow the tail pops off immediately.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.14 Snake: grow",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The head steps across the grid alone: the body array is never added to."
+    },
+    {
+      "id": "s2",
+      "title": "Bug 1: the old cell is never kept",
+      "instructions": "Before moving, `body.unshift({ x: headX, y: headY })`."
+    },
+    {
+      "id": "s3",
+      "title": "Bug 2: the tail is dropped every step",
+      "instructions": "`body.pop()` runs unconditionally, so the snake can never be longer than one. Only pop when it should NOT grow (or when it is longer than the target length)."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The old cell is kept",
+      "description": "The head's previous cell is added to the body array each step. Help: 5.14.1 (Reading: A body that grows)",
+      "hint": "body.unshift({ x: headX, y: headY });",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:unshift|push)\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "The tail is not always dropped",
+      "description": "pop() (or an equivalent) is not unconditional; growth is possible. Help: 5.14.1 (Reading: A body that grows)",
+      "hint": "if (!growing) body.pop();",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bif\\s*\\([^)]{0,80}\\)\\s*\\{?\\s*[^;}]{0,120}?\\.\\s*pop\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

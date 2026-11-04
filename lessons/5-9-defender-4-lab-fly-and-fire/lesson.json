@@ -1,11 +1,11 @@
 {
   "id": "5-9-defender-4-lab-fly-and-fire",
-  "title": "5.9.4 Lab: Fly and fire",
+  "title": "7.4.4 Lab: Fly and fire",
   "description": "The ship slides off the canvas and Space does nothing. Keep the ship on the canvas with two ifs, fire on a cooldown, and delete the shots that leave the top.",
   "type": "lesson",
   "estimateMins": 18,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.9 Project: Defender, Part A",
+  "unit": "7.4 Defender: the ship, and shots",
   "preview": "moshion",
   "week": 14,
   "slos": [
@@ -26,14 +26,14 @@
       "title": "Fire on a cooldown",
       "instructions": "In `fire()`, first count `cooldown` down: take 1 off it while it is above 0. Then, when Space is held **and** `cooldown` is 0, build a shot: a 6 by 14 sprite at `(ship.x, ship.y - 18)` with `collider = 'none'` (so it passes through things, as in 5.2.17) and the colour `'yellow'`. Push it onto `bullets`, then set `cooldown` to 12 so the next shot has to wait 12 frames. Hold Space: the shots should come about five a second, evenly spaced.",
       "hints": [
-        "`if (cooldown > 0) cooldown -= 1;` is the countdown, from 5.9.2. Leave out the `if` and `cooldown` runs on below 0, so `cooldown === 0` is never true again and the ship cannot fire.",
-        "`if (kb.pressing('space') && cooldown === 0) { ... }` is the test, from 5.9.3. The sprite, the push and `cooldown = 12;` all go inside its braces."
+        "`if (cooldown > 0) cooldown -= 1;` is the countdown, from 7.4.2. Leave out the `if` and `cooldown` runs on below 0, so `cooldown === 0` is never true again and the ship cannot fire.",
+        "`if (kb.pressing('space') && cooldown === 0) { ... }` is the test, from 7.4.3. The sprite, the push and `cooldown = 12;` all go inside its braces."
       ]
     },
     {
       "id": "s3",
       "title": "Shots that leave are deleted",
-      "instructions": "Every shot climbs 8 pixels a frame and never stops. In the loop in `moveBullets()`, a shot whose `y` is less than -20 has left the top: delete it and splice it out of `bullets`, as Flappy did with its pipes in 5.4.6. The loop runs from the end of the array to the start because a splice moves every later shot down one place; going backwards, none is skipped. Hold Space and watch 'shots alive' at the top: it should stay at 4 or fewer. If it keeps climbing, shots are not being removed.",
+      "instructions": "Every shot climbs 8 pixels a frame and never stops. In the loop in `moveBullets()`, a shot whose `y` is less than -20 has left the top: delete it and splice it out of `bullets`, as Flappy did with its pipes in 5.11.3. The loop runs from the end of the array to the start because a splice moves every later shot down one place; going backwards, none is skipped. Hold Space and watch 'shots alive' at the top: it should stay at 4 or fewer. If it keeps climbing, shots are not being removed.",
       "hints": [
         "`bullets[i].delete();` takes the shot off the screen and `bullets.splice(i, 1);` takes it out of the array. You need both.",
         "Both lines go inside `if (bullets[i].y < -20) { ... }`."
@@ -44,7 +44,7 @@
     {
       "id": "r1",
       "title": "The ship stays on the canvas",
-      "description": "Two ifs in moveShip() put the ship back when it passes either side: x no smaller than 20 and no bigger than 380. Help: 5.9.2 (Reading: A ship, and a timer you start yourself)",
+      "description": "Two ifs in moveShip() put the ship back when it passes either side: x no smaller than 20 and no bigger than 380. Help: 7.4.2 (Reading: A ship, and a timer you start yourself)",
       "type": "inFunction",
       "function": [
         "moveShip",
@@ -60,7 +60,7 @@
     {
       "id": "r2",
       "title": "The cooldown counts down",
-      "description": "fire() takes 1 off cooldown on every frame it is above 0, and never below 0: a countdown that runs past 0 never reaches 0 again, so the ship could not fire. Help: 5.9.2 (Reading: A ship, and a timer you start yourself)",
+      "description": "fire() takes 1 off cooldown on every frame it is above 0, and never below 0: a countdown that runs past 0 never reaches 0 again, so the ship could not fire. Help: 7.4.2 (Reading: A ship, and a timer you start yourself)",
       "type": "inFunction",
       "function": [
         "fire",
@@ -76,7 +76,7 @@
     {
       "id": "r3",
       "title": "A shot is made only when Space is held and the cooldown is 0",
-      "description": "The shot is pushed onto bullets inside an if that asks both, joined with &&: Space is held, and cooldown is 0. Help: 5.9.3 (Worked Example: Fire with a cooldown)",
+      "description": "The shot is pushed onto bullets inside an if that asks both, joined with &&: Space is held, and cooldown is 0. Help: 7.4.3 (Worked Example: Fire with a cooldown)",
       "type": "inFunction",
       "function": [
         "fire",
@@ -91,7 +91,7 @@
     {
       "id": "r4",
       "title": "Firing sets the cooldown again",
-      "description": "Next to the push, cooldown is set back to 12 (any number above 0), so the next shot has to wait. Help: 5.9.3 (Worked Example: Fire with a cooldown)",
+      "description": "Next to the push, cooldown is set back to 12 (any number above 0), so the next shot has to wait. Help: 7.4.3 (Worked Example: Fire with a cooldown)",
       "type": "inFunction",
       "function": [
         "fire",
@@ -107,7 +107,7 @@
     {
       "id": "r5",
       "title": "Shots that leave the top are deleted and spliced out",
-      "description": "Inside an if that asks whether a shot's y is above the top, the shot is deleted from the screen and spliced out of bullets. Help: 5.4.6 (Lab: Pipes that come and go)",
+      "description": "Inside an if that asks whether a shot's y is above the top, the shot is deleted from the screen and spliced out of bullets. Help: 5.11.3 (Lab: Pipes that come and go)",
       "type": "inFunction",
       "function": "moveBullets",
       "file": "script.js",
@@ -126,7 +126,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.9.4 Lab: Fly and fire\". The task they were given: Three functions to finish. In moveShip(), after the two lines that move the ship, add two ifs so ship.x never goes below 20 or above 380. In fire(), first count cooldown down by 1 while it is above 0; then, when Space is held AND cooldown is 0, build a 6 by 14 yellow shot with collider 'none' just above the ship, push it onto bullets, and set cooldown to 12. In moveBullets(), inside the loop that already runs from the end of bullets to the start, a shot whose y is less than -20 has left the top: delete its sprite and splice it out of bullets. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. A shot that climbs has a y that gets smaller, and leaves the top once y is below 0. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (moveShip, fire, moveBullets) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's moveShip(), fire() and moveBullets() bodies have only STEP comments where the work goes: missing on every criterion. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.4.4 Lab: Fly and fire\". The task they were given: Three functions to finish. In moveShip(), after the two lines that move the ship, add two ifs so ship.x never goes below 20 or above 380. In fire(), first count cooldown down by 1 while it is above 0; then, when Space is held AND cooldown is 0, build a 6 by 14 yellow shot with collider 'none' just above the ship, push it onto bullets, and set cooldown to 12. In moveBullets(), inside the loop that already runs from the end of bullets to the start, a shot whose y is less than -20 has left the top: delete its sprite and splice it out of bullets. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. A shot that climbs has a y that gets smaller, and leaves the top once y is below 0. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (moveShip, fire, moveBullets) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's moveShip(), fire() and moveBullets() bodies have only STEP comments where the work goes: missing on every criterion. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
     "rubric": [
       {
         "id": "r1",

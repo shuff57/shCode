@@ -1,6 +1,6 @@
 ## Sound effects
 
-About 15 minutes. The game in `script.js` is your 5.11.6 game, and it plays exactly as before. This lab adds one new thing, sound, and puts it inside methods you have already written: a zap every time a shot is fired, and a boom every time a shot finishes an enemy. The Steps tab teaches the same things one step at a time; this file has them all in one place.
+About 15 minutes. The game in `script.js` is your 7.10.2 game, and it plays exactly as before. This lab adds one new thing, sound, and puts it inside methods you have already written: a zap every time a shot is fired, and a boom every time a shot finishes an enemy. The Steps tab teaches the same things one step at a time; this file has them all in one place.
 
 ### A sound is an object you load
 

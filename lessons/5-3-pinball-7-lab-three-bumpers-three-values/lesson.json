@@ -1,11 +1,11 @@
 {
   "id": "5-3-pinball-7-lab-three-bumpers-three-values",
-  "title": "5.3.8 Lab: Three bumpers, three values",
+  "title": "5.4.5 Lab: Three bumpers, three values",
   "description": "Three bumpers, worth 1, 5 and 10. The starter scores only the first, on every frame. Loop over all of them and let each bumper remember its own last frame, so every bumper scores once per hit and for its own value.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.3 Project: Pinball",
+  "unit": "5.4 Pinball: score once",
   "preview": "moshion",
   "week": 11,
   "slos": [
@@ -25,7 +25,7 @@
     {
       "id": "s2",
       "title": "Loop instead of naming one",
-      "instructions": "Replace the single `bumpers[0]` check with a loop over every bumper in the array. Inside the loop, apply the same edge check you wrote in 5.3.7, but on the bumper's own `wasTouching`. `colliding()` gives a number (0 when nothing is touching), not `true` or `false`. So to ask \"was it NOT touching?\", put a `!` in front of the memory instead of comparing it to `false`.",
+      "instructions": "Replace the single `bumpers[0]` check with a loop over every bumper in the array. Inside the loop, apply the same edge check you wrote in 5.4.4, but on the bumper's own `wasTouching`. `colliding()` gives a number (0 when nothing is touching), not `true` or `false`. So to ask \"was it NOT touching?\", put a `!` in front of the memory instead of comparing it to `false`.",
       "hints": [
         "`for (const b of bumpers) { ... }` visits each bumper in turn; the loop shape is the one from 3.3.5. A counting loop, `for (let i = 0; i < bumpers.length; i++)`, works too: then the bumper is `bumpers[i]`.",
         "Inside the loop the check reads `touching && !b.wasTouching`."
@@ -56,7 +56,7 @@
     {
       "id": "r2",
       "title": "Each bumper remembers its own last frame",
-      "description": "The bumper's own `wasTouching` is updated on every frame, so every bumper can be hit once per contact. Help: 5.3.5 (Reading: A collision is not an event)",
+      "description": "The bumper's own `wasTouching` is updated on every frame, so every bumper can be hit once per contact. Help: 5.4.1 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
       "pattern": "[\\w$\\]]\\.wasTouching\\s*=\\s*(?:\\(\\s*)?(?!false\\b|true\\b)\\w+|[\\w$\\]]\\.\\w+\\s*=\\s*\\(?\\s*[\\w$.]+\\.colliding\\s*\\(|\\b(?:const|let|var)\\s+(\\w+)\\s*=\\s*\\(?\\s*[\\w$.]+\\.colliding\\s*\\([^;]*;[\\s\\S]{0,400}?[\\w$\\]]\\.\\w+\\s*=\\s*\\(?\\s*\\1\\s*\\)?\\s*[;\\n}]|\\bif\\s*\\([^{};]*\\)\\s*\\{?\\s*[\\w$.\\[\\]]+?\\.(\\w+)\\s*=\\s*(true|false)\\b[^{}]*?\\}?\\s*else\\s*\\{?\\s*[\\w$.\\[\\]]+?\\.\\2\\s*=\\s*(?!\\3\\b)(?:true|false)\\b",
@@ -67,7 +67,7 @@
     {
       "id": "r3",
       "title": "The bumper's own worth is added only when contact starts",
-      "description": "Different bumpers are worth different amounts, because the score uses each bumper's own `worth`, added only when the touch starts. `colliding()` gives a number (0 when not touching), so to ask \"was it NOT touching?\", put a `!` in front of the memory instead of comparing it to `false`. Help: 5.3.5 (Reading: A collision is not an event)",
+      "description": "Different bumpers are worth different amounts, because the score uses each bumper's own `worth`, added only when the touch starts. `colliding()` gives a number (0 when not touching), so to ask \"was it NOT touching?\", put a `!` in front of the memory instead of comparing it to `false`. Help: 5.4.1 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?<![!=]==\\s*(?:true|false)\\b[^{};]{0,200})\\.(?!worth\\b)(?<m38>[A-Za-z_$][\\w$]*)\\b(?!\\s*\\()(?:(?![!=]==\\s*(?:true|false)\\b)[^{};]){0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?(?:\\{(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?)?|(?:if\\s*\\([^{};]{0,200}?\\)\\s*)?)score\\s*(?:\\+=\\s*(?:\\(\\s*)?\\w+(?:\\[\\s*\\w+\\s*\\])?\\.worth|=\\s*(?:\\(\\s*)?(?:score\\s*\\+\\s*(?:\\(\\s*)?\\w+(?:\\[\\s*\\w+\\s*\\])?\\.worth|\\w+(?:\\[\\s*\\w+\\s*\\])?\\.worth(?:\\s*\\))?\\s*\\+\\s*score\\b))(?=[\\s\\S]{0,4000}?[\\w$\\]]\\.\\k<m38>\\s*=(?![=>])\\s*[A-Za-z_$(!])",
@@ -84,7 +84,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.8 Lab: Three bumpers, three values\". The task they were given: Three bumpers in the array bumpers carry worth values of 1, 5 and 10. The starter scores only bumpers[0], and on every frame. In setup(), give each bumper its own wasTouching of false. In draw(), replace the single check with a loop over every bumper in the array; inside the loop, use the same edge check as 5.3.7 but on the bumper's own wasTouching, add that bumper's worth to the score only when its touch starts, and update its wasTouching on every frame. One drop should read 1, then 6, then 16. What the starter file already had: two walls, the three bumpers (each with its own worth) pushed into bumpers, a ground, a ball that rolls, score starting at 0, the R reset, and in draw() one if that adds 1 to the score whenever the ball is colliding with bumpers[0]. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: A sprite is an object, so code can store its own values on it, such as b.worth or b.wasTouching. for (const b of bumpers), a counting for loop up to bumpers.length, and bumpers.forEach(...) all visit every item. ball.colliding(b) gives 0 while they are apart and a count of frames while they touch; a memory holding that number holds 0 after the first frame, so testing it with === false is never true, while ! works. If the student turned the answer into true or false first (for example with > 0), === false works. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.4.5 Lab: Three bumpers, three values\". The task they were given: Three bumpers in the array bumpers carry worth values of 1, 5 and 10. The starter scores only bumpers[0], and on every frame. In setup(), give each bumper its own wasTouching of false. In draw(), replace the single check with a loop over every bumper in the array; inside the loop, use the same edge check as 5.4.4 but on the bumper's own wasTouching, add that bumper's worth to the score only when its touch starts, and update its wasTouching on every frame. One drop should read 1, then 6, then 16. What the starter file already had: two walls, the three bumpers (each with its own worth) pushed into bumpers, a ground, a ball that rolls, score starting at 0, the R reset, and in draw() one if that adds 1 to the score whenever the ball is colliding with bumpers[0]. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: A sprite is an object, so code can store its own values on it, such as b.worth or b.wasTouching. for (const b of bumpers), a counting for loop up to bumpers.length, and bumpers.forEach(...) all visit every item. ball.colliding(b) gives 0 while they are apart and a count of frames while they touch; a memory holding that number holds 0 after the first frame, so testing it with === false is never true, while ! works. If the student turned the answer into true or false first (for example with > 0), === false works. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
     "rubric": [
       {
         "id": "r1",
@@ -95,13 +95,13 @@
       {
         "id": "r2",
         "title": "Each bumper remembers its own last frame",
-        "description": "Each bumper's own memory (its wasTouching, or any name) is given this frame's touch answer for that bumper on every frame, inside the loop, so every bumper can be hit once per contact. An if/else that sets it to true while touching and false when not also counts, and so does a separate list holding one memory per bumper. One shared memory for all three bumpers is not met, because each bumper overwrites the others. Help: 5.3.5 (Reading: A collision is not an event)",
+        "description": "Each bumper's own memory (its wasTouching, or any name) is given this frame's touch answer for that bumper on every frame, inside the loop, so every bumper can be hit once per contact. An if/else that sets it to true while touching and false when not also counts, and so does a separate list holding one memory per bumper. One shared memory for all three bumpers is not met, because each bumper overwrites the others. Help: 5.4.1 (Reading: A collision is not an event)",
         "points": 1
       },
       {
         "id": "r3",
         "title": "The bumper's own worth is added only when contact starts",
-        "description": "The score adds the bumper's own worth (not always 1), inside an if that is only true on the frame that bumper's touch starts: touching now and not touching last frame, by that bumper's own memory. Not met: adding the worth on every touching frame, or a memory test written as === false while the memory holds colliding()'s number, which is never true. Help: 5.3.5 (Reading: A collision is not an event)",
+        "description": "The score adds the bumper's own worth (not always 1), inside an if that is only true on the frame that bumper's touch starts: touching now and not touching last frame, by that bumper's own memory. Not met: adding the worth on every touching frame, or a memory test written as === false while the memory holds colliding()'s number, which is never true. Help: 5.4.1 (Reading: A collision is not an event)",
         "points": 1
       }
     ]

@@ -1,4 +1,4 @@
-// 5.5.4 Lab: Steer it.
+// 5.13.5 Lab: Steer it.
 
 const CELL = 20;
 let head, dx, dy, playing;
@@ -36,7 +36,7 @@ function draw() {
 }
 
 // drawTop() runs after the sprites are drawn, so the block can never cover
-// its words (the same trick as the Flappy labs, from 5.4.5).
+// its words (the same trick as the Flappy labs, from 5.11.1).
 function drawTop() {
   fill('white');
   textSize(14);

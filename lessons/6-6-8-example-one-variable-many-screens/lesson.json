@@ -1,11 +1,11 @@
 {
   "id": "6-6-8-example-one-variable-many-screens",
-  "title": "6.6.8 Worked Example: One Variable, Many Screens",
+  "title": "6.11.8 Worked Example: One Variable, Many Screens",
   "description": "Build three distinct screens: red, green, blue backgrounds with different text: all controlled by one state variable with switch.",
   "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.6 Game State Machines",
+  "unit": "6.11 Game State Machines",
   "preview": "example",
   "week": 17,
   "slos": [

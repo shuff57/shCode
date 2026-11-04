@@ -1,0 +1,17 @@
+{
+  "moduleId": "7.5",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
+  "lessons": [
+    {
+      "id": "defender-hits-and-a-round",
+      "title": "Hits, and a round",
+      "objective": "Detect a shot hit and hold a round.",
+      "screens": [
+        "5-9-defender-5-reading-did-the-shot-hit",
+        "5-9-defender-6-lab-hit-the-drone",
+        "5-9-defender-7-lab-hold-the-base",
+        "5-9-defender-8-quiz-ship-and-shots"
+      ]
+    }
+  ]
+}

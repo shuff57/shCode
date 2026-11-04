@@ -1,6 +1,6 @@
 ## Did the shot hit?
 
-**Read before `5.9.6 Lab: Hit the drone`.** About 8 minutes.
+**Read before `7.5.2 Lab: Hit the drone`.** About 8 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -19,7 +19,7 @@ if (bullets[i].overlaps(drone)) {
 }
 ```
 
-It is level-triggered, like `colliding()` in 5.3.5: true on *every* frame the two touch, not only on the first. A shot climbs 8 pixels a frame and the drone falls 1.5, so a shot that passed straight through the drone would be touching it for about four frames.
+It is level-triggered, like `colliding()` in 5.4.1: true on *every* frame the two touch, not only on the first. A shot climbs 8 pixels a frame and the drone falls 1.5, so a shot that passed straight through the drone would be touching it for about four frames.
 
 **Why not `colliding()`?** `colliding()` reports a physical contact: two solid bodies pressing against each other. A sprite with `collider = 'none'` has no body to press with, which is exactly why the shots fly through things. So `bullets[i].colliding(drone)` is never true, however squarely the shot lands. `overlaps()` does not ask the physics at all. It compares the two sprites' boxes, whatever their collider, so it sees a pass-through shot touch a pass-through drone.
 
@@ -29,7 +29,7 @@ It is level-triggered, like `colliding()` in 5.3.5: true on *every* frame the tw
 | with `collider = 'none'` | never true | true while they overlap |
 | true on | every frame of contact | every frame of overlap |
 
-**The shot leaves on the frame it hits.** Because `overlaps()` stays true for several frames, a hit that only adds to the score would add on every one of them: one shot, four points. So the frame a shot hits is the frame it goes, from both places, as in 5.4.6: `delete()` takes it off the screen and `splice` takes it out of the array. On the next frame there is no shot left to overlap anything.
+**The shot leaves on the frame it hits.** Because `overlaps()` stays true for several frames, a hit that only adds to the score would add on every one of them: one shot, four points. So the frame a shot hits is the frame it goes, from both places, as in 5.11.3: `delete()` takes it off the screen and `splice` takes it out of the array. On the next frame there is no shot left to overlap anything.
 
 ```js
 for (let i = bullets.length - 1; i >= 0; i--) {
@@ -53,7 +53,7 @@ function resetDrone() {
 
 The same function puts it back when it reaches the base without being hit, and when a new round starts.
 
-**Backwards, again.** The hit loop splices, so it runs from the end of `bullets` to the start for the reason 5.4.5 gave: a splice moves every later shot down one place, and counting upwards the loop would skip the shot that slid into the gap. Counting downwards, the shots still to be visited never move.
+**Backwards, again.** The hit loop splices, so it runs from the end of `bullets` to the start for the reason 5.11.1 gave: a splice moves every later shot down one place, and counting upwards the loop would skip the shot that slid into the gap. Counting downwards, the shots still to be visited never move.
 
 **Try it.** Move with the arrow keys and hold Space under the drone.
 

@@ -1,11 +1,11 @@
 {
   "id": "8-1-2-lab-your-first-box",
-  "title": "8.1.2 Lab: Your First Box",
+  "title": "9.1.2 Lab: Your First Box",
   "description": "Add your first box in reSHape and set its size in the Dimensions panel. Auto-graded.",
   "type": "assignment",
   "estimateMins": 10,
   "category": "Unit 3: reSHape: Solid Modelling",
-  "unit": "8.1 Solid Shapes",
+  "unit": "9.1 Solid Shapes",
   "preview": "reshape",
   "mode": "visual",
   "slos": [

@@ -1,11 +1,11 @@
 {
   "id": "6-10-breakout-6-lab-a-wall-from-text",
-  "title": "6.10.6 Lab: A wall from text",
-  "description": "The wall comes back from 6.9.11, written as rows of text this time. Build it from the text, draw it from the data, and let the ball's centre break bricks.",
+  "title": "7.13.1 Lab: A wall from text",
+  "description": "The wall comes back from 6.14.11, written as rows of text this time. Build it from the text, draw it from the data, and let the ball's centre break bricks.",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.10 Breakout",
+  "unit": "7.13 Breakout: bricks and edges",
   "preview": "moshion",
   "week": 18,
   "slos": [
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Build the wall from text",
-      "instructions": "The starter has the paddle and the bouncing ball from 6.10.5, `score` in the corner, and the brick sizes from 6.9.11: each brick `BW` (50) wide and `BH` (20) tall, the wall `TOP` (60) pixels down, and one colour per row in `ROW_COLORS`. The shape of the wall is written as rows of text in `WALL`, like a map in 6.9.2: `'#'` is a brick and `'.'` is a gap, and `BRICK_ROWS` and `BRICK_COLS` are `WALL.length` and `WALL[0].length`. `hitAt(x, y)` is your function from 6.9.11, finished: it finds the brick under a pixel, takes it out, adds 10 to `score` and gives back `true`. Three functions are left: `makeBricks()` gives back an empty list, and `drawBricks()` and `hitBricks()` are empty.\n\nIn `makeBricks()`, build `bricks[r][c]` from the text, the way you built a grid in 6.9.10 and read a map in 6.9.5. For each of `BRICK_ROWS` rows make an empty `row`. For each of `BRICK_COLS` columns, push `1` when `WALL[r][c]` is `'#'` and `0` when it is not. Then push the row onto `b`. Nothing shows yet: the wall is only data until step 2 draws it.",
+      "instructions": "The starter has the paddle and the bouncing ball from 7.12.5, `score` in the corner, and the brick sizes from 6.14.11: each brick `BW` (50) wide and `BH` (20) tall, the wall `TOP` (60) pixels down, and one colour per row in `ROW_COLORS`. The shape of the wall is written as rows of text in `WALL`, like a map in 6.14.2: `'#'` is a brick and `'.'` is a gap, and `BRICK_ROWS` and `BRICK_COLS` are `WALL.length` and `WALL[0].length`. `hitAt(x, y)` is your function from 6.14.11, finished: it finds the brick under a pixel, takes it out, adds 10 to `score` and gives back `true`. Three functions are left: `makeBricks()` gives back an empty list, and `drawBricks()` and `hitBricks()` are empty.\n\nIn `makeBricks()`, build `bricks[r][c]` from the text, the way you built a grid in 6.14.10 and read a map in 6.14.5. For each of `BRICK_ROWS` rows make an empty `row`. For each of `BRICK_COLS` columns, push `1` when `WALL[r][c]` is `'#'` and `0` when it is not. Then push the row onto `b`. Nothing shows yet: the wall is only data until step 2 draws it.",
       "hints": [
         "Inside the inner loop: `if (WALL[r][c] === '#') row.push(1);` then `else row.push(0);`.",
         "`b.push(row);` goes after the inner loop and inside the outer one."
@@ -25,9 +25,9 @@
     {
       "id": "s2",
       "title": "Draw it from the data",
-      "instructions": "In `drawBricks()`, two loops visit every cell of `bricks`. Where the cell is `1`, set `fill(ROW_COLORS[r])` and draw `rect(c * BW, TOP + r * BH, BW, BH)`. A `rect`'s x and y are its top-left corner (6.9.9), and the wall starts `TOP` pixels down. Run it: five coloured rows appear, with a gap wherever `WALL` has a `'.'`. The ball still flies straight through them.",
+      "instructions": "In `drawBricks()`, two loops visit every cell of `bricks`. Where the cell is `1`, set `fill(ROW_COLORS[r])` and draw `rect(c * BW, TOP + r * BH, BW, BH)`. A `rect`'s x and y are its top-left corner (6.14.9), and the wall starts `TOP` pixels down. Run it: five coloured rows appear, with a gap wherever `WALL` has a `'.'`. The ball still flies straight through them.",
       "hints": [
-        "Loop over `bricks.length` and `bricks[r].length`, like `drawGrid()` in 6.9.10.",
+        "Loop over `bricks.length` and `bricks[r].length`, like `drawGrid()` in 6.14.10.",
         "`if (bricks[r][c] === 1) { fill(ROW_COLORS[r]); rect(...); }`"
       ]
     },
@@ -36,7 +36,7 @@
       "title": "The ball breaks a brick",
       "instructions": "`draw()` calls `hitBricks()` every frame. In it, ask `hitAt` about the ball's centre, and flip `vy` when it says `true`: `if (hitAt(ball.x, ball.y)) vy = -vy;`. `hitAt` takes the brick out, and flipping `vy` sends the ball back the way it came. Run it and play a while. It works, mostly. Watch closely as a brick breaks: the ball is already half inside it. And watch a ball that passes close beside a brick: it can slide through the corner without breaking it. The next reading is about why.",
       "hints": [
-        "The ball asks the same `hitAt` your mouse clicks used in 6.9.11.",
+        "The ball asks the same `hitAt` your mouse clicks used in 6.14.11.",
         "`hitAt` gives back `true` only when it took a brick out, so the flip happens once per brick."
       ]
     }
@@ -45,7 +45,7 @@
     {
       "id": "r1",
       "title": "The wall is built from WALL with two loops",
-      "description": "A row is made for each row of WALL, filled from its letters, and pushed onto b (two loops: for, while or forEach). Help: 6.9.10 (Lab: Light the grid)",
+      "description": "A row is made for each row of WALL, filled from its letters, and pushed onto b (two loops: for, while or forEach). Help: 6.14.10 (Lab: Light the grid)",
       "type": "inFunction",
       "file": "script.js",
       "function": "makeBricks",
@@ -58,7 +58,7 @@
     {
       "id": "r2",
       "title": "A # becomes 1, anything else 0",
-      "description": "Each letter is compared with '#': a brick is pushed as 1 and a gap as 0. Help: 6.9.5 (Reading: Reading a map as data)",
+      "description": "Each letter is compared with '#': a brick is pushed as 1 and a gap as 0. Help: 6.14.5 (Reading: Reading a map as data)",
       "type": "inFunction",
       "file": "script.js",
       "function": "makeBricks",
@@ -71,7 +71,7 @@
     {
       "id": "r3",
       "title": "The wall is drawn from the data",
-      "description": "Two loops visit every cell; a brick gets its row's fill and a rect. Help: 6.9.9 (Reading: A grid is data)",
+      "description": "Two loops visit every cell; a brick gets its row's fill and a rect. Help: 6.14.9 (Reading: A grid is data)",
       "type": "inFunction",
       "file": "script.js",
       "function": "drawBricks",
@@ -84,7 +84,7 @@
     {
       "id": "r4",
       "title": "Each brick sits at its row and column",
-      "description": "The rect starts at c * BW across and TOP + r * BH down, and is BW by BH. Help: 6.9.9 (Reading: A grid is data)",
+      "description": "The rect starts at c * BW across and TOP + r * BH down, and is BW by BH. Help: 6.14.9 (Reading: A grid is data)",
       "type": "inFunction",
       "file": "script.js",
       "function": "drawBricks",
@@ -97,7 +97,7 @@
     {
       "id": "r5",
       "title": "The ball's centre breaks a brick",
-      "description": "hitBricks asks hitAt about the ball, and flips vy when it says true. Help: 6.9.11 (Lab: A wall of bricks)",
+      "description": "hitBricks asks hitAt about the ball, and flips vy when it says true. Help: 6.14.11 (Lab: A wall of bricks)",
       "type": "inFunction",
       "file": "script.js",
       "function": "hitBricks",

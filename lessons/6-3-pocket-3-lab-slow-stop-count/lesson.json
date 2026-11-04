@@ -1,0 +1,110 @@
+{
+  "id": "6-3-pocket-3-lab-slow-stop-count",
+  "title": "6.3.3 Lab: Slow it, stop it, count it",
+  "description": "The table, drag, the stop rule, and a shot counter: you can only shoot from rest.",
+  "type": "lesson",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.3 Pocket: slow to a stop",
+  "preview": "moshion",
+  "week": 13,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "Shots work, but the ball never stops and the counter is missing."
+    },
+    {
+      "id": "s2",
+      "title": "Drag and stop",
+      "instructions": "Add `cue.drag` and the stop rule from the sub-build."
+    },
+    {
+      "id": "s3",
+      "title": "Shoot only from rest",
+      "instructions": "Put the release shot inside the stopped test, or add `&& cue.speed === 0`. Add `shots += 1` in the same branch."
+    },
+    {
+      "id": "s4",
+      "title": "Count in words",
+      "instructions": "Show the word Shots and the number on screen.",
+      "hints": [
+        "A counter that climbs without a shot means it is outside the release branch."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The ball slows",
+      "description": "Drag is set on the ball. Help: 6.3.1 (Reading: Rolling to a stop)",
+      "hint": "cue.drag = 0.02;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*drag\\s*=\\s*[\\d.]",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "Stopped is a threshold",
+      "description": "Speed under a small number becomes 0 (or a flag). Help: 6.3.1 (Reading: Rolling to a stop)",
+      "hint": "if (cue.speed < 0.2) cue.speed = 0;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*speed\\s*<\\s*[\\d.]+",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "One shot, one count",
+      "description": "The shot count goes up in the release branch, not every frame. Help: 6.3.1 (Reading: Rolling to a stop)",
+      "hint": "shots += 1;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "mouse\\s*\\.\\s*released\\s*\\([^)]*\\)[\\s\\S]{0,300}?(?:shots?|strokes?)\\s*(?:\\+\\+|\\+=)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Slow it, stop it, count it\". The task: give the ball drag and a stop threshold, let the player shoot only when it is at rest, and count one shot per release. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Drag and stop",
+        "description": "Both are present, with the stop as a threshold.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Shoot from rest",
+        "description": "The release shot is gated by the stopped test.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "One count per shot",
+        "description": "The counter increments in the release branch.",
+        "points": 1
+      }
+    ]
+  }
+}

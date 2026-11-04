@@ -1,0 +1,22 @@
+{
+  "modules": {
+    "5.4": [
+      {
+        "folder": "5-3-pinball-4-reading-a-collision-is-not-an-event"
+      },
+      {
+        "folder": "5-3-pinball-5-example-the-score-that-climbs"
+      },
+      {
+        "folder": "5-4-pinball-sub-score-once",
+        "new": true
+      },
+      {
+        "folder": "5-3-pinball-6-lab-score-one-point-per-touch"
+      },
+      {
+        "folder": "5-3-pinball-7-lab-three-bumpers-three-values"
+      }
+    ]
+  }
+}

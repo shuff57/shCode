@@ -1,4 +1,4 @@
-// 6.5.26 A16.1 Save System (reference solution).
+// 6.10.26 A16.1 Save System (reference solution).
 // Three save slots + auto-save on goal + Continue from title screen.
 
 let player, score = 0, level = 1;

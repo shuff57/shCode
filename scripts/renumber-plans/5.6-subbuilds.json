@@ -1,0 +1,16 @@
+{
+  "modules": {
+    "5.6": [
+      {
+        "folder": "5-3-pinball-sound-1-reading-a-sound-on-a-hit"
+      },
+      {
+        "folder": "5-6-pinball-sub-one-sound",
+        "new": true
+      },
+      {
+        "folder": "5-3-pinball-sound-2-lab-a-chime-on-every-hit"
+      }
+    ]
+  }
+}

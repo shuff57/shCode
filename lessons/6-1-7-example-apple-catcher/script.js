@@ -1,4 +1,4 @@
-// 6.2.2 Worked Example: Apple Catcher
+// 6.7.2 Worked Example: Apple Catcher
 // catch falling apples with a basket; demonstrates the overlaps(group, callback) idiom.
 
 let basket, apples, score = 0;

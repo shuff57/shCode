@@ -1,4 +1,4 @@
-// 5.3.10 Lab: Lose, and start again.
+// 5.5.3 Lab: Lose, and start again.
 
 let ball, bumper, ground, goal, score, wasTouching;
 

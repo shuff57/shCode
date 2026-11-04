@@ -1,11 +1,11 @@
 {
   "id": "5-10-defender-8-debugging-the-enemy-that-would-not-die",
-  "title": "5.10.8 Debugging: The enemy that would not die",
+  "title": "7.8.3 Debugging: The enemy that would not die",
   "description": "The finished Part B game with one line missing. After a landing, a crimson 1 takes three shots and an orange 3 dies in one. Make it happen, find the line, fix it.",
   "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.10 Project: Defender, Part B",
+  "unit": "7.8 Defender: waves and the cost",
   "preview": "moshion",
   "week": 15,
   "slos": [
@@ -25,7 +25,7 @@
     {
       "id": "s2",
       "title": "Find it",
-      "instructions": "The bug only shows after a landing, and the hit loop it shows up in is correct. Two pieces of code remove an enemy: the landing in `moveEnemies()` and the kill in `hitEnemies()`. Put them side by side and compare them line by line, with 5.10.1's rule in mind: every splice happens to all three arrays.",
+      "instructions": "The bug only shows after a landing, and the hit loop it shows up in is correct. Two pieces of code remove an enemy: the landing in `moveEnemies()` and the kill in `hitEnemies()`. Put them side by side and compare them line by line, with 7.6.1's rule in mind: every splice happens to all three arrays.",
       "hints": [
         "Count the `splice` lines in each of the two places.",
         "To watch the arrays drift, add `text('lengths: ' + enemies.length + ' ' + enemyHp.length + ' ' + enemyWorth.length, 12, 50);` to `drawTop()`."
@@ -52,7 +52,7 @@
     {
       "id": "r1",
       "title": "A landed enemy leaves all three arrays",
-      "description": "The landing in moveEnemies splices enemies, enemyHp and enemyWorth at the same index j, together (or calls a removeEnemy helper that does). Help: 5.10.1 (Reading: Many enemies, kept in parallel arrays)",
+      "description": "The landing in moveEnemies splices enemies, enemyHp and enemyWorth at the same index j, together (or calls a removeEnemy helper that does). Help: 7.6.1 (Reading: Many enemies, kept in parallel arrays)",
       "type": "inFunction",
       "function": [
         "moveEnemies",
@@ -68,7 +68,7 @@
     {
       "id": "r2",
       "title": "A shot-down enemy leaves all three arrays",
-      "description": "The kill in hitEnemies (or a removeEnemy helper it calls) splices enemies, enemyHp and enemyWorth. Help: 5.10.4 (Reading: Every shot against every enemy)",
+      "description": "The kill in hitEnemies (or a removeEnemy helper it calls) splices enemies, enemyHp and enemyWorth. Help: 7.7.2 (Reading: Every shot against every enemy)",
       "type": "inFunction",
       "function": [
         "hitEnemies",
@@ -90,7 +90,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.10.8 Debugging: The enemy that would not die\". The task they were given: The editor holds the finished Part B game with one line missing. After an enemy lands on the base, the labels in the next wave are wrong: a crimson 1 takes three shots and an orange 3 dies in one, and nothing crashes. The two places that remove an enemy, the landing in moveEnemies() and the kill in hitEnemies(), must each splice all three parallel arrays at the same index. Find the missing line and add it. Optionally, move the removal lines into function removeEnemy(j) and call it from both places. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. The enemies live in three parallel arrays, enemies (the sprites), enemyHp and enemyWorth: index j in all three is the same enemy, so every push and every splice has to happen to all three at the same index, or every later enemy reads a neighbour's numbers. A helper such as removeEnemy(j) that deletes the sprite and splices all three counts wherever it is called, as if its lines were written there. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (moveEnemies, hitEnemies) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. Check each of the three array names in each of the two removal places. As the starter comes, the landing splices only two of the three arrays: that is the bug, so the landing criterion is NOT met until all three are spliced there. In a not-met note, say which function the problem is in and that one of the three arrays is not spliced there, but do not name which array: finding it is the exercise. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.8.3 Debugging: The enemy that would not die\". The task they were given: The editor holds the finished Part B game with one line missing. After an enemy lands on the base, the labels in the next wave are wrong: a crimson 1 takes three shots and an orange 3 dies in one, and nothing crashes. The two places that remove an enemy, the landing in moveEnemies() and the kill in hitEnemies(), must each splice all three parallel arrays at the same index. Find the missing line and add it. Optionally, move the removal lines into function removeEnemy(j) and call it from both places. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. The enemies live in three parallel arrays, enemies (the sprites), enemyHp and enemyWorth: index j in all three is the same enemy, so every push and every splice has to happen to all three at the same index, or every later enemy reads a neighbour's numbers. A helper such as removeEnemy(j) that deletes the sprite and splices all three counts wherever it is called, as if its lines were written there. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (moveEnemies, hitEnemies) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. Check each of the three array names in each of the two removal places. As the starter comes, the landing splices only two of the three arrays: that is the bug, so the landing criterion is NOT met until all three are spliced there. In a not-met note, say which function the problem is in and that one of the three arrays is not spliced there, but do not name which array: finding it is the exercise. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
     "rubric": [
       {
         "id": "r1",
@@ -105,5 +105,6 @@
         "points": 1
       }
     ]
-  }
+  },
+  "carryFrom": "5-10-defender-7-lab-waves"
 }

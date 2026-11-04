@@ -1,6 +1,6 @@
 ## Methods: functions that live on a class
 
-**Read before `5.7.3 Lab: Method with no params`.** About 4 minutes.
+**Read before `7.2.3 Lab: Method with no params`.** About 4 minutes.
 
 By the end of this reading you should be able to answer:
 

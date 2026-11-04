@@ -1,11 +1,11 @@
 {
   "id": "5-4-flappy-2-example-the-bird-that-flaps",
-  "title": "5.4.3 Worked Example: The bird that flaps",
+  "title": "5.10.3 Worked Example: The bird that flaps",
   "description": "A bird, gravity and one flap on the space bar, with a ceiling and a floor. Change the two numbers and feel how each one alters the game.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.4 Project: Flappy",
+  "unit": "5.10 Flappy: the flap",
   "preview": "example",
   "week": 12,
   "slos": [

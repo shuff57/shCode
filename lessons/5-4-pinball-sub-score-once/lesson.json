@@ -1,0 +1,93 @@
+{
+  "id": "5-4-pinball-sub-score-once",
+  "title": "5.4.3 Sub-build: Score once",
+  "description": "One ball, one bumper, one score. Build the smallest thing that scores once per hit, before you put the same idea into your table.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.4 Pinball: score once",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it first",
+      "instructions": "The ball falls onto the bumper and bounces away. The score stays at 0. Nothing here is a game yet: it is one sprite, one bumper and a number."
+    },
+    {
+      "id": "s2",
+      "title": "Remember the frame before",
+      "instructions": "In `draw()`, store this frame's answer in a variable: `const touching = ball.colliding(bumper) > 0;`. Then keep the previous answer in a second variable that starts `false`, and add 1 to the score only when `touching` is true and the remembered one is false. At the end of `draw()`, give the memory this frame's answer.",
+      "hints": [
+        "`colliding()` answers with a number: 0 apart, more than 0 while touching. Comparing with `> 0` turns it into true or false.",
+        "If the score climbs every frame, the score line is outside the `if`, or the memory is never updated."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Prove it is once",
+      "instructions": "Run it. The ball lands, bounces, lands again: the score should go up by 1 per landing, not 60 per second. Change the ball's `y` in `setup()` and watch it count again."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "This frame is stored",
+      "description": "A variable holds this frame's collision answer (const/let/var = ... colliding(...) or overlaps(...)), so the same answer is used twice. Help: 5.4.1 (Reading: A collision is not an event)",
+      "hint": "const touching = ball.colliding(bumper) > 0;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:const|let|var)\\s+[A-Za-z_$][\\w$]*\\s*=\\s*[^;\\n]{0,100}?\\b(?:colliding|overlaps)\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "Score changes on the edge",
+      "description": "The score is added to inside an `if` that tests the stored answer and the frame before (`if (touching && !wasTouching)` or equivalent). Help: 5.4.1 (Reading: A collision is not an event)",
+      "hint": "if (touching && !wasTouching) { score += 1; }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bif\\s*\\([^)]{0,120}&&\\s*![^)]{0,80}\\)\\s*\\{?[^}]{0,400}?\\bscore\\s*(?:\\+\\+|\\+=)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a short moSHion sketch for \"Sub-build: Score once\". The task: store this frame's collision answer in a variable, remember the previous frame in another variable that starts false, add 1 to the score only when the answer is true and the memory is false, and update the memory every frame. This is a sub-build: a small isolated program whose only job is this one mechanic, so judge the mechanic itself and not style. Accept any variable names, helper functions, arrow functions, ternaries and semicolons. A line that only exists in a comment or a string does not count. moSHion facts: colliding(b) is 0 while apart and counts frames while touching, so an if on it alone is true every frame of a touch; a stored \"last frame\" value makes it true once. .life = n counts down one per frame and deletes the sprite at 0. A sprite with collider 'none' is passed through and has its gravity off. loadSound(path) in setup() and sound.play() where the event happens; a browser will not play sound before the student's first click or key. Write short, plain notes for a 14-year-old, name the student's own line when something is missing, and never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "The answer is stored",
+        "description": "This frame's collision answer is in a variable (colliding() > 0, overlaps(), or a comparison), not asked twice.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The score fires on the edge only",
+        "description": "Adding to the score happens under an if that tests the stored answer AND the memory being false, so a held touch counts once.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The memory is updated every frame",
+        "description": "The previous-frame variable is given this frame's answer on every frame, outside the score branch, so the next touch can fire again.",
+        "points": 1
+      }
+    ]
+  }
+}

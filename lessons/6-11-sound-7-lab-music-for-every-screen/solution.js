@@ -1,4 +1,4 @@
-// 6.11.7 Lab: Music for every screen (reference solution).
+// 6.15.7 Lab: Music for every screen (reference solution).
 // Star catch with screens: Enter plays, 10 catches win, 3 misses lose, R goes back to the title.
 
 let basket, star;
@@ -6,7 +6,7 @@ let speed = 3;     // pixels the star falls each frame
 let score = 0;     // stars caught
 let misses = 0;    // stars that fell past the basket
 let state;         // the screen: 'title', 'play', 'won' or 'lost'
-let chime, thuds;  // the sound effects from 6.11.5
+let chime, thuds;  // the sound effects from 6.15.5
 let music;         // one tune for every screen
 
 function setup() {

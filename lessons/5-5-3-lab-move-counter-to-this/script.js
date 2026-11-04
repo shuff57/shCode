@@ -1,4 +1,4 @@
-// 5.8.3 Lab: Move the counter onto this.
+// 7.3.3 Lab: Move the counter onto this.
 
 class Counter {
   constructor() {

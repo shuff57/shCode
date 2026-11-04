@@ -1,11 +1,11 @@
 {
   "id": "7-1-2-q2-reflection",
-  "title": "7.1.2 Q2 Reflection",
+  "title": "8.1.2 Q2 Reflection",
   "description": "Reflect on the game you shipped and the process that got it there. AI-graded with hints.",
   "type": "assignment",
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "7.1 Arcade Cabinet (Q2 Synthesis)",
+  "unit": "8.1 Arcade Cabinet: Q2 Synthesis",
   "preview": "assignment",
   "week": 18,
   "slos": [

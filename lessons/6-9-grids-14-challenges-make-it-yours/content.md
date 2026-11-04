@@ -9,6 +9,6 @@ Make the top rows worth more. In `hitAt`, change `score += 10` so a hit in row `
 Some bricks take two hits. Let a cell hold 2 as well as 1 and 0: build row 0 with 2s, make a hit lower the cell by 1 instead of setting it to 0, draw a 2 in `'silver'`, and change the three places that test `=== 1` (`drawBricks`, `hitAt`, `bricksLeft`) to `> 0` so a brick that is still 1 still counts.
 
 **Challenge 3: a wall from text (hard).**
-Write the wall as rows of text in `SHAPE`: `#` is a brick, `2` a two-hit brick, `.` a gap. Make `makeBricks()` read it with `SHAPE[r][c]` (the same two-index read as a map in 6.9.5), and set `BRICK_ROWS` and `BRICK_COLS` from it. The `2` bricks are invisible and uncounted until you also make challenge 2's `> 0` changes.
+Write the wall as rows of text in `SHAPE`: `#` is a brick, `2` a two-hit brick, `.` a gap. Make `makeBricks()` read it with `SHAPE[r][c]` (the same two-index read as a map in 6.14.5), and set `BRICK_ROWS` and `BRICK_COLS` from it. The `2` bricks are invisible and uncounted until you also make challenge 2's `> 0` changes.
 
 Whatever you pick, press R afterwards and check the wall comes back whole.

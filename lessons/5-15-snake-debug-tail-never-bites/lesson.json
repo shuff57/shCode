@@ -1,0 +1,64 @@
+{
+  "id": "5-15-snake-debug-tail-never-bites",
+  "title": "5.15.4 Debugging: The tail that never bites",
+  "description": "Two planted bugs. The snake runs over its own body and keeps going. The search is there, but it asks the wrong question.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.15 Snake: search",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The snake crosses its own body and nothing happens."
+    },
+    {
+      "id": "s2",
+      "title": "Bug 1: only the first segment is tested",
+      "instructions": "The check looks at `body[0]` instead of looping over every segment."
+    },
+    {
+      "id": "s3",
+      "title": "Bug 2: it tests where the head is, not where it is going",
+      "instructions": "Compare against `nextX`/`nextY`, the cell the head is about to enter. Testing the current cell can never be true, because the head is not in the body yet."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Every segment is tested",
+      "description": "A loop over the body checks each segment. Help: 5.15.1 (Reading: Searching the array)",
+      "hint": "for (const seg of body) { ... }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bfor\\s*\\([^)]{0,60}\\bof\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "The next cell is tested",
+      "description": "The comparison uses the cell the head is about to enter. Help: 5.15.1 (Reading: Searching the array)",
+      "hint": "seg.x === nextX && seg.y === nextY",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bseg\\s*\\.\\s*x\\s*===\\s*nextX|\\bnextX\\s*===\\s*seg\\s*\\.\\s*x",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

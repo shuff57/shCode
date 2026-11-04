@@ -1,6 +1,6 @@
 ## A sound on a hit
 
-**Read before `5.3.14 Lab: A chime on every bumper hit`.** About 8 minutes.
+**Read before `5.6.3 Lab: A chime on every bumper hit`.** About 8 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -25,7 +25,7 @@ Write it as `chime = loadSound(...)`, with no `let` in front, the way `player = 
 
 **`.volume` sets how loud.** It runs from `0` (silent) to `1` (full, which is where every sound starts). You set it the way you set a sprite's `color`: `chime.volume = 0.5;` is half as loud. moSHion keeps it between 0 and 1 for you.
 
-**Where `.play()` goes: the hit, not the touch.** This is 5.3.5 again, now for your ears. `colliding()` is true on every frame the ball touches a bumper, so a `.play()` under `if (ball.colliding(bumper))` starts a new chime about 60 times a second for as long as they touch: a buzz, not a ding. A `.play()` straight in `draw()` buzzes all the time. The chime goes where the score goes: inside the `if` that is true only on the frame a touch **starts**, `touching && !wasTouching` (5.3.7). Then each hit gives exactly one chime.
+**Where `.play()` goes: the hit, not the touch.** This is 5.4.1 again, now for your ears. `colliding()` is true on every frame the ball touches a bumper, so a `.play()` under `if (ball.colliding(bumper))` starts a new chime about 60 times a second for as long as they touch: a buzz, not a ding. A `.play()` straight in `draw()` buzzes all the time. The chime goes where the score goes: inside the `if` that is true only on the frame a touch **starts**, `touching && !wasTouching` (5.4.4). Then each hit gives exactly one chime.
 
 **The browser's rule: click first.** Most browsers will not let a web page make a sound until the person using it has clicked on it or pressed a key on it, so the page knows someone is there. moSHion switches sound on the first time you click the game or press a key in it; you write nothing for that. Whether your click on **Run** already counts depends on the browser. So if a sketch is silent at first: click the game, make the event happen again (here, press R to drop the ball again), and listen. Still nothing? Check the path, then check that the browser tab and your speakers are not muted.
 
@@ -72,7 +72,7 @@ function draw() {
 }
 ```
 
-**What you'll hear:** a chime each time the ball lands on the bar. Because it is bouncy, it lands, bounces and lands again, and each landing is a new touch, so each one chimes (the same reason each bounce scored in 5.3.6). Then it rolls off the low end and the table goes quiet until you press R.
+**What you'll hear:** a chime each time the ball lands on the bar. Because it is bouncy, it lands, bounces and lands again, and each landing is a new touch, so each one chimes (the same reason each bounce scored in 5.4.2). Then it rolls off the low end and the table goes quiet until you press R.
 
 **Try this:** change `chime.volume = 0.5;` to `0.1`, then to `1`, and run each one. Then change `ball.bounciness = 0.6;` to `0` and run it: the ball lands once and rolls, so each drop gives one chime.
 

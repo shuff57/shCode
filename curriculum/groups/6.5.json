@@ -1,0 +1,16 @@
+{
+  "moduleId": "6.5",
+  "source": "Pocket chain module, one day.",
+  "lessons": [
+    {
+      "id": "playtest-and-extend",
+      "title": "Playtest and extend",
+      "objective": "Play it, find one surprise, link it to a line, change one thing.",
+      "screens": [
+        "6-5-pocket-1-playtest-and-reflect",
+        "6-5-pocket-2-quiz-pocket-check",
+        "6-5-pocket-3-challenges-make-it-yours"
+      ]
+    }
+  ]
+}

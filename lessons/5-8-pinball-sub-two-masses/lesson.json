@@ -1,0 +1,97 @@
+{
+  "id": "5-8-pinball-sub-two-masses",
+  "title": "5.8.2 Sub-build: Two balls, two masses",
+  "description": "The same push on two balls, one heavy and one light. Build it small, then feel the difference before you tune your table.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.8 Pinball: physics knobs",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it first",
+      "instructions": "Both balls sit still. Nothing pushes them and they have the same mass, so nothing tells them apart."
+    },
+    {
+      "id": "s2",
+      "title": "Give them different masses",
+      "instructions": "Set `heavy.mass = 4;` and `light.mass = 0.5;` in `setup()`. Mass is how hard a thing is to push: the same force moves the light one much further.",
+      "hints": [
+        "Set mass after the sprite exists, in `setup()`, not before.",
+        "A `static` sprite has no mass and ignores the setting."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Push both the same",
+      "instructions": "In `draw()`, on `kb.presses('p')`, apply the same force to both: `heavy.applyForce(6, 0); light.applyForce(6, 0);`. Run it and press P: the light ball should shoot away and the heavy one barely move.",
+      "hints": [
+        "If they move the same, the masses were set to the same value, or one ball is still `static`.",
+        "Try `gravityScale` on one ball too: 0.5 makes it float, 2 makes it sink faster."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Two different masses",
+      "description": "Both balls get a mass, and the numbers differ. Help: 5.8.1 (Reading: Four knobs: mass, gravityScale, rotationLock, debug)",
+      "hint": "heavy.mass = 4; light.mass = 0.5;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*mass\\s*=\\s*[\\d.]",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "The same push reaches both",
+      "description": "applyForce (or a velocity set) is called on both balls, so the comparison is fair. Help: 5.8.1 (Reading: Four knobs: mass, gravityScale, rotationLock, debug)",
+      "hint": "heavy.applyForce(6, 0); light.applyForce(6, 0);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "applyForce\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a short moSHion sketch for \"Sub-build: Two balls, two masses\". The task: give two balls different masses in setup() and apply the same force to both on a key press, so the difference in mass is what makes them move differently. This is a sub-build: a small isolated program whose only job is this one mechanic, so judge the mechanic itself and not style. Accept any variable names, helper functions, arrow functions, ternaries and semicolons. A line that only exists in a comment or a string does not count. moSHion facts: colliding(b) is 0 while apart and counts frames while touching, so an if on it alone is true every frame of a touch; a stored \"last frame\" value makes it true once. .life = n counts down one per frame and deletes the sprite at 0. A sprite with collider 'none' is passed through and has its gravity off. loadSound(path) in setup() and sound.play() where the event happens; a browser will not play sound before the student's first click or key. Write short, plain notes for a 14-year-old, name the student's own line when something is missing, and never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Different masses",
+        "description": "Two sprites get .mass with different values, set after they exist.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "One fair push",
+        "description": "The same applyForce is called on both (or the same force number), so mass is the only variable.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "It can be felt",
+        "description": "The masses differ enough to see (roughly 0.5 against 4), and neither sprite is static.",
+        "points": 1
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "moduleId": "7.4",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
+  "lessons": [
+    {
+      "id": "defender-the-ship-and-shots",
+      "title": "The ship, and shots",
+      "objective": "Build the ship, a cooldown and the shots list.",
+      "screens": [
+        "5-9-defender-1-plan-break-defender-into-parts",
+        "5-9-defender-2-reading-a-ship-and-a-cooldown",
+        "5-9-defender-3-example-fire-with-a-cooldown",
+        "5-9-defender-4-lab-fly-and-fire"
+      ]
+    }
+  ]
+}

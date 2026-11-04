@@ -1,11 +1,11 @@
 {
   "id": "6-5-2-video-memory",
-  "title": "6.5.2 Video: Memory: What Stays, What Disappears",
+  "title": "6.10.2 Video: Memory: What Stays, What Disappears",
   "description": "A game resets to zero on refresh. Variables live in RAM: gone when the tab closes. Saved data lives on disk, still there tomorrow. This short video contrasts both so you understand what persistence actually means.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.5 Save and Load",
+  "unit": "6.10 Save and Load",
   "preview": "video",
   "week": 16,
   "slos": [

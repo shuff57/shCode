@@ -1,11 +1,11 @@
 {
   "id": "6-11-sound-1-reading-sound-in-a-sketch",
-  "title": "6.11.1 Reading: Sound in a sketch",
+  "title": "6.15.1 Reading: Sound in a sketch",
   "description": "A sound is a file the sketch downloads: load it once in setup(), play it on an event. play() starts a copy, loop() keeps one going, .volume, .rate and masterVolume() set how it sounds, and a browser may make no sound until the player clicks or presses a key.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.11 Sound and Music",
+  "unit": "6.15 Sound and Music",
   "preview": "reading",
   "week": 19,
   "slos": [

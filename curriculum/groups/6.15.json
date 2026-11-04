@@ -1,0 +1,44 @@
+{
+  "moduleId": "6.15",
+  "source": "Not a book section. The topic follows CodeHS Introduction to Game Design 4.6 and the book's chapter 6.10 (sound and music in games). Structure only: no CodeHS text, problems or code is copied.",
+  "lessons": [
+    {
+      "id": "sound-in-a-sketch",
+      "title": "Sound in a sketch",
+      "objective": "Students will be able to load a sound once, play it with play() or loop(), set its volume and rate, and explain why a browser may stay silent until the player clicks or presses a key.",
+      "screens": [
+        "6-11-sound-1-reading-sound-in-a-sketch",
+        "6-11-sound-2-example-a-sound-board"
+      ]
+    },
+    {
+      "id": "sound-on-events",
+      "title": "Sounds on events, music and variety",
+      "objective": "Students will be able to play a sound where its event happens once, loop a tune under a game with a volume and a mute key, and vary a sound with a random rate or a random pick from a list.",
+      "screens": [
+        "6-11-sound-3-lab-a-sound-on-an-event",
+        "6-11-sound-4-lab-music-volume-and-a-mute-key",
+        "6-11-sound-5-lab-a-sound-that-varies"
+      ]
+    },
+    {
+      "id": "music-and-settings",
+      "title": "Music that follows the game, and settings that remember",
+      "objective": "Students will be able to change a game's music in the one function every change of screen goes through, and save and load sound settings so a saved 0 is kept.",
+      "screens": [
+        "6-11-sound-6-reading-music-that-follows-the-game",
+        "6-11-sound-7-lab-music-for-every-screen",
+        "6-11-sound-8-lab-a-settings-screen-that-remembers"
+      ]
+    },
+    {
+      "id": "check-and-extend",
+      "title": "Check, and make it yours",
+      "objective": "Students will be able to explain play against loop, the browser's sound rule and a saved 0, and extend their game with a sound rule of their own.",
+      "screens": [
+        "6-11-sound-9-quiz-sound-and-music",
+        "6-11-sound-10-challenges-make-it-yours"
+      ]
+    }
+  ]
+}

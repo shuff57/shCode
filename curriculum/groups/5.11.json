@@ -1,36 +1,16 @@
 {
   "moduleId": "5.11",
-  "source": "Not a book section. The one-game-across-modules shape follows CodeHS's project modules in Introduction to Game Design and AP CSA's class units. Structure only: no CodeHS text, problems or code is copied.",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
   "lessons": [
     {
-      "id": "design",
-      "title": "Count the cost, and draw the classes",
-      "objective": "Students will be able to count what parallel arrays cost in their own code, run the three-question checklist on bullet, enemy and spawner, and plan what each class remembers and does.",
+      "id": "flappy-the-world-scrolls",
+      "title": "A world that scrolls",
+      "objective": "Make pipes on a timer and remove them from the screen and from the list.",
       "screens": [
-        "5-11-defender-1-reading-count-the-cost",
-        "5-11-defender-2-plan-draw-the-classes-first"
-      ]
-    },
-    {
-      "id": "refactor",
-      "title": "Refactor: Enemy, Bullet and Spawner",
-      "objective": "Students will be able to move a working game's rules into Enemy, Bullet and Spawner classes without changing what it does, remove finished objects in one place, and reset a class variable on restart.",
-      "screens": [
-        "5-11-defender-3-example-finished-in-one-place",
-        "5-11-defender-4-lab-enemy-takes-over",
-        "5-11-defender-5-lab-bullet",
-        "5-11-defender-6-lab-a-spawner-for-the-waves"
-      ]
-    },
-    {
-      "id": "close",
-      "title": "Playtest, check, add sound, and make it yours",
-      "objective": "Students will be able to playtest the rebuilt game, link what they saw to a class, compare the class version with the procedural one, play sound effects from inside the classes' own methods, and extend it with a rule of their own.",
-      "screens": [
-        "5-11-defender-7-playtest-and-reflect",
-        "5-11-defender-8-quiz-defender-with-classes",
-        "5-11-defender-sound-lab-sound-effects",
-        "5-11-defender-9-challenges-make-it-yours"
+        "5-4-flappy-4-reading-a-world-that-scrolls",
+        "5-11-flappy-sub-spawn-and-recycle",
+        "5-4-flappy-5-lab-pipes-that-come-and-go",
+        "5-11-flappy-debug-pipes-never-leave"
       ]
     }
   ]

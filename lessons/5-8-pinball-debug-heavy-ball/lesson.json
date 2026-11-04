@@ -1,0 +1,64 @@
+{
+  "id": "5-8-pinball-debug-heavy-ball",
+  "title": "5.8.4 Debugging: The heavy ball that flies",
+  "description": "Two planted bugs. The \"heavy\" ball shoots away and the light one barely moves. The labels are right; the physics is reversed.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.8 Pinball: physics knobs",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it and press P",
+      "instructions": "The ball marked heavy moves furthest, which is backwards: more mass means harder to push."
+    },
+    {
+      "id": "s2",
+      "title": "Bug 1: the masses are swapped",
+      "instructions": "`heavy.mass` is 0.5 and `light.mass` is 4. Swap them."
+    },
+    {
+      "id": "s3",
+      "title": "Bug 2: only one ball is pushed",
+      "instructions": "`applyForce` is called on `heavy` twice and never on `light`, so the comparison is not a comparison. Push both with the same force."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Both masses are set",
+      "description": "Both balls get a mass, and the heavier one has the larger number. Help: 5.8.1 (Reading: Four knobs: mass, gravityScale, rotationLock, debug)",
+      "hint": "heavy.mass = 4; light.mass = 0.5;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*mass\\s*=\\s*[\\d.]",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "Both are pushed",
+      "description": "The same applyForce reaches both balls. Help: 5.8.1 (Reading: Four knobs)",
+      "hint": "light.applyForce(6, 0);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\blight\\s*\\.\\s*applyForce\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

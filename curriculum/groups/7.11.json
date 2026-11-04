@@ -1,0 +1,17 @@
+{
+  "moduleId": "7.11",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
+  "lessons": [
+    {
+      "id": "defender-c-close",
+      "title": "Playtest, check, challenges",
+      "objective": "Playtest, check and extend Defender.",
+      "screens": [
+        "5-11-defender-7-playtest-and-reflect",
+        "5-11-defender-8-quiz-defender-with-classes",
+        "5-11-defender-sound-lab-sound-effects",
+        "5-11-defender-9-challenges-make-it-yours"
+      ]
+    }
+  ]
+}

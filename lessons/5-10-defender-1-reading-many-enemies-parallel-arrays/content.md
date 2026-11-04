@@ -1,6 +1,6 @@
 ## Many enemies, kept in parallel arrays
 
-**Read before `5.10.2 Lab: A field of enemies`.** About 8 minutes.
+**Read before `7.6.2 Lab: A field of enemies`.** About 8 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -8,7 +8,7 @@ By the end of this reading you should be able to answer:
 - What has to happen to all three arrays when an enemy arrives, and when it leaves?
 - Why is the falling speed one number and not a fourth array?
 
-**Built the old way, on purpose.** You already know a class would hold this better (5.7.15 Reading: Parallel Arrays vs Classes). This module builds it the way you would have before classes, on purpose, so that 5.11 has something real to fix. Keep a tally as you go: every time you type the same kind of line once for each of three arrays, make a mark.
+**Built the old way, on purpose.** You already know a class would hold this better (7.2.15 Reading: Parallel Arrays vs Classes). This module builds it the way you would have before classes, on purpose, so that 7.6 has something real to fix. Keep a tally as you go: every time you type the same kind of line once for each of three arrays, make a mark.
 
 **From one drone to many enemies.** Part A had one drone in one variable; a hit sent it back to the top. Now there are many enemies on the screen at once, and each one knows two things a sprite does not: how many more hits it can take (its **hp**) and how many points it is worth when it is shot down (its **worth**). A crimson enemy has 1 hp and is worth 10. An orange one is tough: 3 hp, worth 30.
 
@@ -36,7 +36,7 @@ function spawnEnemy(x, y, hp) {
 
 - `collider = 'none'` makes it a pass-through sprite, like the goal in 5.2.17 and the drone in Part A, so shots and enemies never shove each other.
 - `hp > 1 ? 'orange' : 'crimson'` is the conditional operator (`test ? this : that`): orange when the enemy has more than 1 hp, crimson when it does not.
-- `String(hp)` turns the number into text (`3` becomes `'3'`), and `e.text = ...` writes that text on the enemy, the same way 5.8.8 put a number on a sprite.
+- `String(hp)` turns the number into text (`3` becomes `'3'`), and `e.text = ...` writes that text on the enemy, the same way 7.3.8 put a number on a sprite.
 - Then **three pushes**, one per array: the sprite, its hp, and its worth (10 points per hp).
 
 **The index is the only glue.** After three calls, the arrays look like this:
@@ -58,7 +58,7 @@ enemyHp.splice(j, 1);       // at the same index
 enemyWorth.splice(j, 1);
 ```
 
-**Falling, by hand.** Enemies fall the way the drone did in Part A (`drone.y += 1.5`): a loop adds to each one's `y` on every frame, inside `if (playing)`. The loop runs backwards, as `moveBullets()` does, because a removal splices (5.4.5). One whose `y` is more than `BASE_Y` has reached the base, which costs the base 1 hp, exactly as the drone did in 5.9.7.
+**Falling, by hand.** Enemies fall the way the drone did in Part A (`drone.y += 1.5`): a loop adds to each one's `y` on every frame, inside `if (playing)`. The loop runs backwards, as `moveBullets()` does, because a removal splices (5.11.1). One whose `y` is more than `BASE_Y` has reached the base, which costs the base 1 hp, exactly as the drone did in 7.5.3.
 
 ```js
 enemies[j].y += fallSpeed;
@@ -66,7 +66,7 @@ enemies[j].y += fallSpeed;
 
 **One number, not a fourth array.** Every enemy falls at the same speed, so `fallSpeed` is one variable, not an array. Only a fact that can be different for each enemy needs an array of its own.
 
-**Why the rule matters.** 5.7.15 showed what one forgotten `splice` does: the arrays fall out of step, and from that index on every enemy reads another enemy's numbers.
+**Why the rule matters.** 7.2.15 showed what one forgotten `splice` does: the arrays fall out of step, and from that index on every enemy reads another enemy's numbers.
 
 ---
 

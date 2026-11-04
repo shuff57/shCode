@@ -1,11 +1,11 @@
 {
   "id": "6-10-breakout-9-lab-win-or-lose",
-  "title": "6.10.9 Lab: Win or lose",
+  "title": "7.14.1 Lab: Win or lose",
   "description": "Three balls to clear the wall. Count the bricks left, take a life for every ball that falls out, and end the game when the wall is cleared or the balls run out.",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.10 Breakout",
+  "unit": "7.14 Breakout: the game",
   "preview": "moshion",
   "week": 18,
   "slos": [
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Count the bricks",
-      "instructions": "The starter is the game from 6.10.8 with three new things. `lives` starts at 3. `state` is `'play'` while the game runs, the state variable of 6.6.7: the starter's `draw()` only moves the paddle and the ball while `state` is `'play'`, and once it is anything else, pressing R calls `startGame()` for a new wall, a new score and three new lives. The lost-ball test has moved into a new function, `checkEnd()`, still as `if (ball.y > 400 + R) serve();`. The words at the top show the score, the bricks left and the lives, and they say `You cleared the wall!` when `state` is `'won'` and `Out of balls.` when it is `'lost'`.\n\n`bricksLeft()` gives back 0 for now. Make it count: two loops over `bricks`, adding 1 to `n` for every cell that is `1`, as in 6.9.11. The words should read `bricks left: 36` and go down as bricks break.",
+      "instructions": "The starter is the game from 7.13.3 with three new things. `lives` starts at 3. `state` is `'play'` while the game runs, the state variable of 6.11.7: the starter's `draw()` only moves the paddle and the ball while `state` is `'play'`, and once it is anything else, pressing R calls `startGame()` for a new wall, a new score and three new lives. The lost-ball test has moved into a new function, `checkEnd()`, still as `if (ball.y > 400 + R) serve();`. The words at the top show the score, the bricks left and the lives, and they say `You cleared the wall!` when `state` is `'won'` and `Out of balls.` when it is `'lost'`.\n\n`bricksLeft()` gives back 0 for now. Make it count: two loops over `bricks`, adding 1 to `n` for every cell that is `1`, as in 6.14.11. The words should read `bricks left: 36` and go down as bricks break.",
       "hints": [
         "The same two loops as `drawBricks()`, with `if (bricks[r][c] === 1) n += 1;` inside.",
         "`n` starts at 0 and is given back at the end for you."
@@ -34,7 +34,7 @@
     {
       "id": "s3",
       "title": "Clear the wall to win",
-      "instructions": "Still in `checkEnd()`, under the lost-ball test: when `bricksLeft()` is 0, set `state` to `'won'`, a change of state driven by a condition, as in 6.6.17. Clear the wall (it takes a while) and the screen says `You cleared the wall! Press R`. To test it faster, change most of the `'#'` in `WALL` to `'.'` so only two or three bricks are left, then put them back.",
+      "instructions": "Still in `checkEnd()`, under the lost-ball test: when `bricksLeft()` is 0, set `state` to `'won'`, a change of state driven by a condition, as in 6.11.17. Clear the wall (it takes a while) and the screen says `You cleared the wall! Press R`. To test it faster, change most of the `'#'` in `WALL` to `'.'` so only two or three bricks are left, then put them back.",
       "hints": [
         "`if (bricksLeft() === 0) state = 'won';`",
         "`draw()` reads `state` on the next frame: once it is not `'play'`, nothing moves."
@@ -45,7 +45,7 @@
     {
       "id": "r1",
       "title": "bricksLeft counts the bricks",
-      "description": "Two loops (index or for...of), counting only the cells that hold a brick, and the counter it gives back (n, or any name) goes up. Help: 6.9.11 (Lab: A wall of bricks)",
+      "description": "Two loops (index or for...of), counting only the cells that hold a brick, and the counter it gives back (n, or any name) goes up. Help: 6.14.11 (Lab: A wall of bricks)",
       "type": "inFunction",
       "file": "script.js",
       "function": "bricksLeft",
@@ -58,7 +58,7 @@
     {
       "id": "r2",
       "title": "A lost ball costs a life",
-      "description": "When the ball falls out, lives goes down by 1; at 0 the state becomes 'lost', otherwise the ball is served again. Help: 6.6.7 (Reading: moSHion docs: The state Variable)",
+      "description": "When the ball falls out, lives goes down by 1; at 0 the state becomes 'lost', otherwise the ball is served again. Help: 6.11.7 (Reading: moSHion docs: The state Variable)",
       "type": "inFunction",
       "file": "script.js",
       "function": [
@@ -82,7 +82,7 @@
     {
       "id": "r3",
       "title": "A cleared wall wins",
-      "description": "When bricksLeft() is 0, the state becomes 'won'. Help: 6.6.17 (Reading: moSHion docs: Condition-Driven Transitions)",
+      "description": "When bricksLeft() is 0, the state becomes 'won'. Help: 6.11.17 (Reading: moSHion docs: Condition-Driven Transitions)",
       "type": "inFunction",
       "file": "script.js",
       "function": "checkEnd",

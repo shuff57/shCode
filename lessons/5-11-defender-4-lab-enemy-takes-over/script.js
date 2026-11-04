@@ -1,4 +1,4 @@
-// 5.11.4 Lab: Enemy takes over. The game below is Part B's; the Enemy class is
+// 7.9.4 Lab: Enemy takes over. The game below is Part B's; the Enemy class is
 // new and nothing uses it yet.
 
 const BASE_Y = 370;   // anything that falls below this line has reached the base
@@ -20,7 +20,7 @@ class Enemy {
   }
 
   // STEP 1: takeHit(n) lowers hp by n, never below 0, and shows the new hp on
-  //   the sprite. isAlive() answers true while hp is above 0. (5.8.8, 5.8.9)
+  //   the sprite. isAlive() answers true while hp is above 0. (7.3.8, 7.3.9)
   takeHit(n) {
   }
 

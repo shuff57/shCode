@@ -1,0 +1,16 @@
+{
+  "modules": {
+    "5.15": [
+      {
+        "folder": "5-5-snake-7-reading-searching-the-array"
+      },
+      {
+        "folder": "5-15-snake-sub-own-tail",
+        "new": true
+      },
+      {
+        "folder": "5-5-snake-8-lab-dont-bite-yourself"
+      }
+    ]
+  }
+}

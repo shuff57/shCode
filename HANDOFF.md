@@ -1,4 +1,202 @@
-# 2026-11-03 (latest): the 8-bit sound mixer, and sounds saved by name
+# 2026-11-04 (latest): the Pinball polish arc is live; release 6 shipped; batch 2 is next
+
+**Where things are.** `cs-3d` is `ff22d426` on origin and **live** (the site answers
+200, the manifest lists 861 lessons). `codehs-inspiration` is ahead of
+`origin/codehs-inspiration` and not pushed; it now carries the unit repartition
+(below) on top of release 6's work. The release worktree
+`shCode-release` (branch `release-ch5`) sits on the release commit. The 8-bit sound
+entry below was written before any of it was deployed; the sound work went live as
+part of this release, not on its own.
+
+**What release 6 carried.**
+
+| Commit | What |
+| --- | --- |
+| `194c83dd` | the Pinball polish arc, 5.3.15-5.3.21 (7 screens, 92 min, appended) |
+| `e1004619` + `de0e89a0` | the lens fix round and its regenerated grader config |
+| `b5db3722` | the Check note admits a failed Run; run-error text wraps instead of clipping |
+| `c044b36e` | a moSHion Run brings the whole preview split into view |
+| `b42267dc` | the earlier merge into `cs-3d` that nobody had deployed: the sound session, 6.9 Grids (14), 6.10 Breakout (13), 6.11 Sound (10) |
+
+The generated-only commits were **regenerated on the release tree, not
+cherry-picked**; picking them would have written stale manifests over `cs-3d`'s.
+The four code commits picked cleanly onto the merge.
+
+**The arc.** 5.3.15 Reading, `.text`/`.textColor`/`.textSize`/`.life` and why `.life`
+was on 5.3.8's list. 5.3.16 Worked Example, a "+5" popup in the hit's edge check
+beside the same popup under `if (touching)`. 5.3.17 Lab, label each bumper with its
+worth, pop the points. 5.3.18 Reading, `mass`, `gravityScale`, `rotationLock`,
+`debug`, four live blocks. 5.3.19 Lab, nudge with `applyForce` under `kb.pressing`.
+5.3.20 Playtest and polish (AI-graded, 0 points). 5.3.21 Challenges, a fade with
+`.opacity`, a tilt rule, a heavier ball from round 2. Nothing was renumbered: no
+existing number, folder, Help pointer or D1 key moved.
+
+**The lock that had to be written first.** Production had no `class_open_dates` rows
+for 6.9, 6.10 or 6.11 and those modules have **no code-level lock**, so deploying
+would have opened 37 lessons to students mid-semester. Three `module` rows were
+written for class `abac569d-2579-4b4f-82ca-e5ca2466ff23` with `open_at`
+`1814425200000` (2027-07-01, Pacific, the same date 5.2-5.11 carry) through
+`scripts/d1.mjs execute shcode-commits --remote`, read back, and only then deployed.
+**To open those modules, change those rows, not the code.** The Cloudflare tools
+were disconnected the whole time; the `d1.mjs` wrapper is what worked.
+
+**Three lens walks, one fix round.** Each lens walked 5.3.15-5.3.21 with real
+keystrokes in the editor and the real `gradeWithTests`, plus the references played
+in the harness; reports are `codehs-review/loop/walk-5.3-polish-{beginner,moderate,advanced}.md`.
+
+- **The quit point (beginner).** 5.3.21 challenge 3 said "a `round` variable";
+  `let round = 1;` throws *Identifier 'round' has already been declared* because
+  `round()` is the engine's, the error calls it a typo, and Check turned the card
+  green anyway so the student ships a sketch that cannot run. It is `roundNumber`
+  now, the step says why, and `level` is accepted too.
+- **The one wrong idea (advanced).** 5.3.17 r2 passed any `if (A && !B)` holding a
+  `new Sprite(`, so a popup built on every frame scored 3/3 — the lab's own named
+  wrong idea. The card now wants the `if` to be about the hit; `if (score >= 0 &&
+  !over)`, `kb.presses('r') && !done` and `if (true) { if (!done) }` are refused.
+- **Honest shapes accepted.** A worth routed through a variable; `touching === 1`,
+  `colliding(b) == 1`, and `colliding(b) > 0` combined with `wasTouching === false`;
+  a direction set under `kb.pressing` then one `applyForce(dir)`; `ball.debug =
+  SHOW`; a fade through a variable or under an `if` on life; a countdown budget;
+  `ball.mass = 3` inside `nextRound()`; score multipliers and bonuses.
+- **Text.** 5.3.17 step 4 now says R does not reset the score, so the sequence is
+  17, 22, 32 (the harness confirms `0 1 6 16 17 22 32`); the 5.3.18 zero-gravity
+  ball is labelled `'0'`; `.opacity` is taught in 5.3.15 so 5.3.21's Help pointer
+  lands.
+- **Left alone, per the standing lax policy.** An uncalled helper, `applyForce(0,0)`,
+  a mass of 0 (a harmless no-op, the engine ignores it), `frameCount;` passing
+  5.3.21's single card, and a 20-character playtest sentence. Do not spend a round
+  closing these.
+
+**The preview was never clipped.** The builder's first job was to scale the canvas
+to fit; it found the runner already scales (437.9x418 in a 578x418 pane, 356x340
+with the Steps drawer open). What cut the table was the **page**: at 1280x720 the
+preview split starts ~376 px down, so the ground and low bumper sat below the fold.
+`c044b36e` scrolls `#split` into view on Run (`block: 'nearest'`, instant under
+reduced motion, a scroll margin that clears the fixed progress bar). **This changes
+every moSHion lab**: a Run now moves the page under the reader whenever the split
+sits below the fold. Watch for it in the next round.
+
+**Traps this stretch cost a cycle on.**
+
+- **`.text = 0` draws nothing.** It is falsy. Write `'0'`. A student labelling a
+  bumper worth 0 hits the same wall.
+- **A name that shadows an engine global is silent until Run.** `round` is `round()`;
+  the lesson's own prose handed out the name, the error said "typo", and Check stayed
+  green. When a step introduces a variable, check the name against the engine first.
+- **Dev has no AI grader.** `/api/grade-written` answers 404 locally, so Check falls
+  back to the pattern check ("The grader isn't responding right now"). Every lens
+  finding above measures the regex cards, **not** production's AI path.
+- **`npm test` has a real flake.** `test-lesson-sync` ties when two history saves
+  land in the same millisecond and a random id decides the order: three reruns gave
+  one failure, two passes, on code our diff does not touch. Rerun before believing it.
+
+**Verified, and not.** Gates all pass except the 10 known help-pointer mismatches,
+and `cs-3d`'s merged state was gated *before* our commits so a failure there could
+not hide behind ours. `npm test` ended in a real exit 0. The 14 new live blocks and
+every reference ran 600 frames clean on `cs-3d`'s engine (the one the release
+actually ships, not this branch's). Tolerance cases: 919 of 919, worst pattern time
+13.7 ms on 5000-character adversarial input.
+
+**Not verified: the live walk with a throwaway student.** It was the next thing on
+the list and release 6 went out without it. It owes: AI Check on a polish lab, the
+Run scroll, a Pinball lab at 1280x720, and 6.9-6.11 staying locked. The Cloudflare
+tools are gone, so it has to read and write production through `scripts/d1.mjs` and
+remove its own test rows that way. Nothing visual was checked by eye at any size
+by the session that shipped it, only by the builder's screenshots.
+
+**Next: batch 2.** 5.4.12-5.4.17 from `codehs-review/DEEPEN-GAMES.md` §3.2 and the
+batch table in §8 — timers with names (`every`/`after`), pipes on a timer, edges,
+a bird with real art. Six lessons, extra files `curriculum/groups/5.4.json` and
+`curriculum/modules/5.4_flappy.md`; it depends on batch 1 only through 5.4.16
+citing 5.3.18. Same loop as this batch: build, gates, three lens walks, one fix
+round, regenerate, release. Batch 3 is 5.4.18-5.4.20 plus 5.5.12-5.5.14.
+
+**Before batch 2: carry the student's work forward.** Today every lab re-seeds from
+its authored starter, and for most labs that starter is an *earlier lab's reference*
+(5.3.17's starter is 5.3.14's solution line for line, apart from a new header). The game carries forward; the student's game
+does not, so a 21-screen build asks them to rebuild their own file every week.
+`codehs-review/CARRY-FORWARD-SPEC.md` specifies the fix: an explicit `carryFrom` per
+lab plus a gate, an offer strip on open ("Bring my work forward"), and a provenance
+commit. It also forces an authoring rule (`DEEPEN-GAMES` §0 rule 8: name the shape,
+never the starter's `// STEP` comment) and a text-only fix to six shipped labs. One
+day of work. Authoring batch 2 before it lands would add six lessons that carrying
+later breaks.
+
+**Decisions taken 2026-11-04 (do not re-litigate).** Defender stays at 5.9-5.11 with
+the classes block — chapter 6 has no OOP module and Parts A/B are procedural; the
+"firing arrives first in Cannon" rewrite waits for the repartition and only if a lens
+says the repetition reads as wasted time; the Part B → Part C "gap" question is moot
+because A/B do not move. Reasoning is in `DEEPEN-GAMES.md` §10. (Those numbers are
+now 7.4-7.6 after the repartition below.)
+
+**Build-your-own at the end of every unit.** Units 5, 6 and 7 each get one 0-point
+capstone lesson — **5.7** after Pocket, **6.14** after Climb, **7.7** after Defender —
+with a five-item requirement list drawn only from that unit, and one rule: the game
+may not be a rebuild of a course game, only a new idea or a named combination of two.
+`codehs-review/BUILD-YOUR-OWN.md` holds the three lists. 8.1 remains the graded
+eleven-item synthesis; these are the rehearsals. The pitch is AI-checked, because
+"is this a clone" is not a regex.
+
+**Sub-builds before the game.** Every day-sized group that teaches a mechanic gets a
+10-12 minute **sub-build** first — a blank-canvas lab with its own starter where the
+student writes the mechanic alone — then the apply lab in the game. `SUB-BUILDS.md`
+lists them per game (about 25, ~4.5 contact hours). The submodule is the existing
+lesson group, promoted to a schedulable scope (`moduleId:groupId`) with a due chip,
+a progress count and an anchor; splitting a game into its own module is not needed
+until one passes ~1.5 weeks (today the biggest is Pinball at 1.2).
+
+**The unit repartition landed (2026-11-04).** Units are now **5 functional games basics,
+6 functional games advanced, 7 objects and classes**. Old 5.6-5.8 became **7.1-7.3**, the
+Defender capstone 5.9-5.11 became **7.4-7.6**, old 7.1 Arcade Cabinet became **8.1**, and
+old 8.1 Solid Shapes became **9.1**. 98 lessons retitled and 798 citations rewritten in
+260 files; **no folder moved**, so progress, drafts, submissions and lesson-scoped date
+rows are untouched. Module docs and group files moved with their numbers. The move is
+`scripts/repartition-units.mjs` plus `scripts/renumber-plans/unit-repartition.json`
+(`renumber-module.mjs` refuses cross-module moves, which is why the new tool exists); it
+runs in two modes so a doc's `book §5.6` or a table's lesson position is left alone.
+Gates: lesson-numbers, groups, citations, slot-map, concept-order, book-refs,
+prompt-pointers, assignment-codes, solution-leak, docs-prose, starters, live-blocks (491),
+reachable, title-order and the tolerance gate all pass; help-pointer-titles still reports
+the same **10** known mismatches. The full `npm test` was not run.
+
+**The locks were written before any deploy.** `class_open_dates` now carries module rows
+for 7.1-7.6, 8.1 and 9.1 at 2027-07-01, alongside the stale 5.6-5.11 rows. **Deploy the
+repartition and then delete the stale 5.6-5.11 rows**, in that order: they are the only
+thing keeping the old numbers meaningful, and new code with no row for 7.2-7.6 would open
+the whole objects block to students.
+
+**Curated pass still owed:** `curriculum-plan.md` and `curriculum/BOOK-TO-MODULE.md` both
+carry a dated note at the top and still show old module numbers in their tables; their
+`§5.3`-style references are **book sections** and must not be renumbered. Do that pass by
+hand, not with the tool.
+
+
+**Restructure progress, 2026-11-04 (evening).** Unit 5 is built as its day-module chain:
+5.1, 5.2, Pinball 5.3-5.9, Flappy 5.10-5.12, Snake 5.13-5.16, and the 5.17 capstone, with
+**11 sub-builds** authored (5 Pinball, 3 Flappy, 3 Snake). Units 6-7 are restructured but
+their new games are not authored yet: Defender is 7.4-7.12 (9 day-modules), Breakout moved
+to 7.13-7.17, and the unit 6 concepts now sit at 6.6-6.15 with 6.1-6.5 reserved for Pocket.
+Every lesson's `unit` field follows its module doc title.
+
+**Still to author:** Pocket 6.1-6.5 (17 lessons), Sling 6.16-6.21 (17), Climb 6.22-6.27 (18,
+optional), the unit 6 capstone 6.28, Breakout's OOP arc 7.18-7.20, and the unit 7 capstone
+7.21. The Pinball chain has carry-forward links; the new games need `carryFrom` derived after
+authoring (`node scripts/derive-carry-chain.mjs --write --units 6,7`).
+
+**Tooling added this stretch:** `scripts/split-module.mjs` (one module -> many, with docs,
+groups and citations), `scripts/derive-carry-chain.mjs`, `scripts/check-carry-chain.mjs`,
+`scripts/test-carry-forward.mjs`, and the carry-forward strip (lib/carry-forward.ts,
+lib/store.ts action, components/CarryForwardBanner.tsx). The carry walk in a browser is
+still unverified.
+
+**Left in the tree.** The three walk reports (untracked until this commit),
+`.gauntlet/occt-checks.json` carrying an uncommitted 2026-11-02 bump from an
+earlier gauntlet run, and `design/logo-marks/` untracked and not from this stretch.
+The scratchpad worktree under `/tmp/claude-1000/...` is prunable.
+
+---
+
+# 2026-11-03: the 8-bit sound mixer, and sounds saved by name
 
 **Branch `codehs-inspiration`.** `/sound` is now a tool page beside `/textures`:
 a multi-channel mixer that builds sound effects from jsfxr presets and music

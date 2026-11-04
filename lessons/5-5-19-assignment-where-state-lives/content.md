@@ -1,6 +1,6 @@
 # Where the state lives
 
-Three numbers in the wave spawner (5.8.17), and one question about each:
+Three numbers in the wave spawner (7.3.17), and one question about each:
 
 1. **The list of enemies still on the field.**
 2. **One enemy's health.**

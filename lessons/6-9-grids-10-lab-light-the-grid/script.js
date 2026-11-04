@@ -1,4 +1,4 @@
-// 6.9.10 Lab: Light the grid.
+// 6.14.10 Lab: Light the grid.
 
 const COLS = 8;
 const ROWS = 8;

@@ -1,4 +1,4 @@
-// 5.7.12 Lab: Three Enemies in three variables.
+// 7.2.12 Lab: Three Enemies in three variables.
 
 class Enemy {
   constructor(x, y, hp) {

@@ -1,11 +1,11 @@
 {
   "id": "6-9-grids-12-playtest-and-reflect",
-  "title": "6.9.12 Playtest and reflect: Coin Maze and bricks",
+  "title": "6.14.12 Playtest and reflect: Coin Maze and bricks",
   "description": "Play your finished Coin Maze to the end and clear your brick wall, try to break each, find one surprise, link it to your code and choose one change. AI-graded with hints.",
   "type": "assignment",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.9 Grids and Tile Maps",
+  "unit": "6.14 Grids and Tile Maps",
   "preview": "assignment",
   "week": 16,
   "slos": [
@@ -20,7 +20,7 @@
     "rubricTitle": "Playtest Coin Maze and bricks: AI-graded rubric",
     "model": "glm-5.3-flash:cloud",
     "contextDocs": [],
-    "prompt": "Everything you need is in 6.9.1 (Plan: Break the Coin Maze into parts) and 6.9.8 (Lab: The next level): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished Coin Maze to the end at least once, and clear your brick wall once. Try to break each one: reach the goal before the coins, or click outside the wall. Then answer:\n\n1. How many times did you play, and how did it go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which part of your code do you think that comes from?\n\n4. What is one rule or number you would change, and what would it do to the game?",
+    "prompt": "Everything you need is in 6.14.1 (Plan: Break the Coin Maze into parts) and 6.14.8 (Lab: The next level): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished Coin Maze to the end at least once, and clear your brick wall once. Try to break each one: reach the goal before the coins, or click outside the wall. Then answer:\n\n1. How many times did you play, and how did it go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which part of your code do you think that comes from?\n\n4. What is one rule or number you would change, and what would it do to the game?",
     "rubric": [
       {
         "id": "played",

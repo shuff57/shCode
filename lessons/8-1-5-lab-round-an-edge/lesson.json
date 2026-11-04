@@ -1,11 +1,11 @@
 {
   "id": "8-1-5-lab-round-an-edge",
-  "title": "8.1.5 Lab: Round an Edge",
+  "title": "9.1.5 Lab: Round an Edge",
   "description": "Pick a single edge and smooth it with the Round tool. Auto-graded.",
   "type": "assignment",
   "estimateMins": 10,
   "category": "Unit 3: reSHape: Solid Modelling",
-  "unit": "8.1 Solid Shapes",
+  "unit": "9.1 Solid Shapes",
   "preview": "reshape",
   "mode": "visual",
   "slos": [

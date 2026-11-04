@@ -1,11 +1,11 @@
 {
   "id": "5-5-4-lab-locals-are-private",
-  "title": "5.8.4 Lab: Share one number between two methods",
+  "title": "7.3.4 Lab: Share one number between two methods",
   "description": "`add()` declares its own `let step = 3`; `undo()` types the 3 again. A local in one method is invisible to the next, so the two numbers can drift. Put the step on `this` in the constructor and both methods use it.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.8 Inside a Class",
+  "unit": "7.3 Inside a Class",
   "preview": "moshion",
   "week": 14,
   "slos": [
@@ -42,7 +42,7 @@
     {
       "id": "r1",
       "title": "The step is stored on this",
-      "description": "The constructor stores the step as a property, so both methods can read the same number. Help: 5.8.1 (Reading: Three places a variable can live)",
+      "description": "The constructor stores the step as a property, so both methods can read the same number. Help: 7.3.1 (Reading: Three places a variable can live)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bthis\\.step\\s*=(?!=)",
@@ -54,7 +54,7 @@
     {
       "id": "r2",
       "title": "add() uses this.step",
-      "description": "`add()` adds the stored step rather than a local of its own. Help: 5.8.1 (Reading: Three places a variable can live)",
+      "description": "`add()` adds the stored step rather than a local of its own. Help: 7.3.1 (Reading: Three places a variable can live)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\badd\\s*\\(\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:this\\.points\\s*(?:\\+=\\s*\\(?\\s*this\\.step\\b|=\\s*\\(?\\s*this\\.points\\s*\\+\\s*\\(?\\s*this\\.step\\b|=\\s*\\(?\\s*this\\.step\\s*\\+\\s*this\\.points\\b)|\\b(?:let|const|var)\\s+([\\w$]+)\\s*=\\s*\\(?\\s*this\\.step\\s*\\)?\\s*;(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.points\\s*(?:\\+=\\s*\\(?\\s*\\1\\b|=\\s*\\(?\\s*this\\.points\\s*\\+\\s*\\(?\\s*\\1\\b|=\\s*\\(?\\s*\\1\\s*\\+\\s*this\\.points\\b))",
@@ -66,7 +66,7 @@
     {
       "id": "r3",
       "title": "undo() uses the same this.step",
-      "description": "`undo()` subtracts the stored step, so the two methods cannot drift apart. Help: 5.8.1 (Reading: Three places a variable can live)",
+      "description": "`undo()` subtracts the stored step, so the two methods cannot drift apart. Help: 7.3.1 (Reading: Three places a variable can live)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bundo\\s*\\(\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:this\\.points\\s*(?:-=\\s*\\(?\\s*this\\.step\\b|=\\s*\\(?\\s*this\\.points\\s*-\\s*\\(?\\s*this\\.step\\b)|\\b(?:let|const|var)\\s+([\\w$]+)\\s*=\\s*\\(?\\s*this\\.step\\s*\\)?\\s*;(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?this\\.points\\s*(?:-=\\s*\\(?\\s*\\1\\b|=\\s*\\(?\\s*this\\.points\\s*-\\s*\\(?\\s*\\1\\b))",
@@ -84,7 +84,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.8.4 Lab: Share one number between two methods\". The task they were given: add() keeps its own local step of 3 and undo() types the 3 again, so the two numbers could drift apart. Store the step once as a property on this in the constructor, then make add() raise this.points by that property and undo() lower it by the same property, so pressing A three times and U once comes back by exactly one step. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. kb.presses('a') calls s.add() once per press and kb.presses('u') calls s.undo() once per press. A local made with let inside one method cannot be seen by any other method; a property set on this in the constructor can be read by every method of the class. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (add, undo) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter itself is not met on any criterion: its add() uses a local and its undo() uses a typed 3. The property may have another name than step, as long as add() and undo() read the same property. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.3.4 Lab: Share one number between two methods\". The task they were given: add() keeps its own local step of 3 and undo() types the 3 again, so the two numbers could drift apart. Store the step once as a property on this in the constructor, then make add() raise this.points by that property and undo() lower it by the same property, so pressing A three times and U once comes back by exactly one step. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. kb.presses('a') calls s.add() once per press and kb.presses('u') calls s.undo() once per press. A local made with let inside one method cannot be seen by any other method; a property set on this in the constructor can be read by every method of the class. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (add, undo) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter itself is not met on any criterion: its add() uses a local and its undo() uses a typed 3. The property may have another name than step, as long as add() and undo() read the same property. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
     "rubric": [
       {
         "id": "r1",

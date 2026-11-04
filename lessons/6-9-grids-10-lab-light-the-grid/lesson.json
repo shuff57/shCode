@@ -1,11 +1,11 @@
 {
   "id": "6-9-grids-10-lab-light-the-grid",
-  "title": "6.9.10 Lab: Light the grid",
+  "title": "6.14.10 Lab: Light the grid",
   "description": "An 8 by 8 grid of lights kept as data. The starter has the canvas, the draw loop and the words, and every function you need is there but empty. Build the grid, draw it from the data, flip a cell on a click, and count the lit cells.",
   "type": "lesson",
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.9 Grids and Tile Maps",
+  "unit": "6.14 Grids and Tile Maps",
   "preview": "moshion",
   "week": 16,
   "slos": [
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Build the grid",
-      "instructions": "The grid is `grid[r][c]`: `true` when that cell is lit. `COLS` (8), `ROWS` (8), `CELL` (50) and `TOP` (40, how far down the grid starts, because the words live in the strip above it) are at the top of the starter, and `setup()` already calls `makeGrid()` and keeps what it gives back in `grid`. Besides `setup()`, `draw()` and `drawTop()`, the starter has four functions, and each is empty or gives back a stand-in until you write it: `makeGrid()` gives back an empty list, `drawGrid()` and `clickCell()` do nothing, and `countLit()` gives back 0. Right now the screen is blank and the words say `lit: 0 of 64`.\n\nStart with `makeGrid()`. It makes `g` for you. Make `ROWS` rows: for each one make an empty array called `row`, push `COLS` values of `false` into it (every light starts off), then push the finished row onto `g`. The whole row goes onto `g` as one item, as in 6.9.9. Nothing shows yet; the next step draws it.",
+      "instructions": "The grid is `grid[r][c]`: `true` when that cell is lit. `COLS` (8), `ROWS` (8), `CELL` (50) and `TOP` (40, how far down the grid starts, because the words live in the strip above it) are at the top of the starter, and `setup()` already calls `makeGrid()` and keeps what it gives back in `grid`. Besides `setup()`, `draw()` and `drawTop()`, the starter has four functions, and each is empty or gives back a stand-in until you write it: `makeGrid()` gives back an empty list, `drawGrid()` and `clickCell()` do nothing, and `countLit()` gives back 0. Right now the screen is blank and the words say `lit: 0 of 64`.\n\nStart with `makeGrid()`. It makes `g` for you. Make `ROWS` rows: for each one make an empty array called `row`, push `COLS` values of `false` into it (every light starts off), then push the finished row onto `g`. The whole row goes onto `g` as one item, as in 6.14.9. Nothing shows yet; the next step draws it.",
       "hints": [
         "Two loops, one inside the other: the outer makes a row, the inner fills it. `row.push(false);`",
         "`g.push(row);` goes after the inner loop, inside the outer one."
@@ -25,7 +25,7 @@
     {
       "id": "s2",
       "title": "Draw it from the data",
-      "instructions": "In `drawGrid()`, visit every cell with two loops (use `grid.length` and `grid[r].length` as the limits). Before each cell, set `fill`: `'gold'` for a lit cell and `'#334'` for an off cell, chosen by what `grid[r][c]` holds. Then draw the cell with `rect(c * CELL, TOP + r * CELL, CELL, CELL)`. A `rect`'s x and y is its top-left corner, so the cell in column `c` starts at `c * CELL`, and the row starts `TOP` lower, as in 6.9.9. One difference from 6.9.9: its live grid held 1s and 0s and asked `=== 1`, but this grid holds `true` and `false`. Test the cell on its own, because `true === 1` is `false` and a cell tested that way would never light. Run it: an 8 by 8 board of dark squares appears under the words, with thin black lines between them. Nothing is lit yet, because every cell is `false`.",
+      "instructions": "In `drawGrid()`, visit every cell with two loops (use `grid.length` and `grid[r].length` as the limits). Before each cell, set `fill`: `'gold'` for a lit cell and `'#334'` for an off cell, chosen by what `grid[r][c]` holds. Then draw the cell with `rect(c * CELL, TOP + r * CELL, CELL, CELL)`. A `rect`'s x and y is its top-left corner, so the cell in column `c` starts at `c * CELL`, and the row starts `TOP` lower, as in 6.14.9. One difference from 6.14.9: its live grid held 1s and 0s and asked `=== 1`, but this grid holds `true` and `false`. Test the cell on its own, because `true === 1` is `false` and a cell tested that way would never light. Run it: an 8 by 8 board of dark squares appears under the words, with thin black lines between them. Nothing is lit yet, because every cell is `false`.",
       "hints": [
         "`fill(grid[r][c] ? 'gold' : '#334');` or an `if`/`else` that calls `fill` in each branch.",
         "Row `r` goes with y, column `c` goes with x: `rect(c * CELL, TOP + r * CELL, CELL, CELL);`"
@@ -34,7 +34,7 @@
     {
       "id": "s3",
       "title": "A click flips a cell",
-      "instructions": "`draw()` already calls `clickCell(mouse.x, mouse.y)` on every click. In `clickCell(x, y)`, turn the pixels into a column and a row: `c` is `floor(x / CELL)` and `r` is `floor((y - TOP) / CELL)` (take `TOP` off first, as in 6.9.9). Then, IF that row and column are on the grid, flip the cell: `grid[r][c] = !grid[r][c];`. The canvas is 440 tall, but the grid is only 400 of it. The strip above the grid is where the words live, and a click there gives row -1, which does not exist: `grid[-1]` is `undefined`, and reading a cell of it stops the sketch. So check `r >= 0 && r < ROWS && c >= 0 && c < COLS` first, with the row tests ahead of anything that reads `grid[r]`. Run it: click a few squares to light them, click one again to turn it off, and click in the strip above the grid to check that nothing happens and nothing breaks.",
+      "instructions": "`draw()` already calls `clickCell(mouse.x, mouse.y)` on every click. In `clickCell(x, y)`, turn the pixels into a column and a row: `c` is `floor(x / CELL)` and `r` is `floor((y - TOP) / CELL)` (take `TOP` off first, as in 6.14.9). Then, IF that row and column are on the grid, flip the cell: `grid[r][c] = !grid[r][c];`. The canvas is 440 tall, but the grid is only 400 of it. The strip above the grid is where the words live, and a click there gives row -1, which does not exist: `grid[-1]` is `undefined`, and reading a cell of it stops the sketch. So check `r >= 0 && r < ROWS && c >= 0 && c < COLS` first, with the row tests ahead of anything that reads `grid[r]`. Run it: click a few squares to light them, click one again to turn it off, and click in the strip above the grid to check that nothing happens and nothing breaks.",
       "hints": [
         "The test and the flip go together: `if (r >= 0 && r < ROWS && c >= 0 && c < COLS) { ... }`",
         "The flip is one line, and `!` turns `true` into `false` and `false` into `true`."
@@ -54,7 +54,7 @@
     {
       "id": "r1",
       "title": "The grid is built with two loops",
-      "description": "A row is made for each of ROWS, filled with COLS false values, and pushed onto g (two loops, for or while). Help: 6.9.9 (Reading: A grid is data)",
+      "description": "A row is made for each of ROWS, filled with COLS false values, and pushed onto g (two loops, for or while). Help: 6.14.9 (Reading: A grid is data)",
       "type": "inFunction",
       "file": "script.js",
       "function": "makeGrid",
@@ -67,7 +67,7 @@
     {
       "id": "r2",
       "title": "The picture is drawn from the grid",
-      "description": "Two loops visit every cell; the colour comes from grid[r][c] on its own (the cells are true and false, so not === 1); each cell is a rect. Help: 6.9.9 (Reading: A grid is data)",
+      "description": "Two loops visit every cell; the colour comes from grid[r][c] on its own (the cells are true and false, so not === 1); each cell is a rect. Help: 6.14.9 (Reading: A grid is data)",
       "type": "inFunction",
       "file": "script.js",
       "function": "drawGrid",
@@ -80,7 +80,7 @@
     {
       "id": "r3",
       "title": "A click becomes a row and a column with floor",
-      "description": "floor(x / CELL) is the column and floor(y / CELL) is the row. The grid starts TOP pixels down, so take TOP off y first (in the same line or on the line before). Help: 6.9.9 (Reading: A grid is data)",
+      "description": "floor(x / CELL) is the column and floor(y / CELL) is the row. The grid starts TOP pixels down, so take TOP off y first (in the same line or on the line before). Help: 6.14.9 (Reading: A grid is data)",
       "type": "inFunction",
       "file": "script.js",
       "function": "clickCell",
@@ -93,7 +93,7 @@
     {
       "id": "r4",
       "title": "A click outside the grid does nothing",
-      "description": "The row and column are checked from both sides (not below 0, and under ROWS and COLS) before the cell is read, so a click in the strip above the grid does nothing. Help: 6.9.9 (Reading: A grid is data)",
+      "description": "The row and column are checked from both sides (not below 0, and under ROWS and COLS) before the cell is read, so a click in the strip above the grid does nothing. Help: 6.14.9 (Reading: A grid is data)",
       "type": "inFunction",
       "file": "script.js",
       "function": "clickCell",
@@ -106,7 +106,7 @@
     {
       "id": "r5",
       "title": "The click flips the cell",
-      "description": "A lit cell goes dark and a dark cell lights: the new value is worked out from the old one. Help: 6.9.9 (Reading: A grid is data)",
+      "description": "A lit cell goes dark and a dark cell lights: the new value is worked out from the old one. Help: 6.14.9 (Reading: A grid is data)",
       "type": "inFunction",
       "file": "script.js",
       "function": "clickCell",
@@ -119,7 +119,7 @@
     {
       "id": "r6",
       "title": "countLit counts the lit cells",
-      "description": "Two loops, and a count that goes up only for a lit cell. Help: 6.9.9 (Reading: A grid is data)",
+      "description": "Two loops, and a count that goes up only for a lit cell. Help: 6.14.9 (Reading: A grid is data)",
       "type": "inFunction",
       "file": "script.js",
       "function": "countLit",

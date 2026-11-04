@@ -1,34 +1,16 @@
 {
   "moduleId": "5.9",
-  "source": "Not a book section. The one-game-across-modules shape follows CodeHS's project modules in Introduction to Game Design and AP CSA's class units. Structure only: no CodeHS text, problems or code is copied.",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
   "lessons": [
     {
-      "id": "ship-and-shots",
-      "title": "Plan, a ship, and shots on a cooldown",
-      "objective": "Students will be able to plan a game as parts and remembered values, keep a sprite on the canvas with two ifs, and rate-limit firing with a cooldown they start themselves.",
+      "id": "pinball-playtest-and-finish",
+      "title": "Playtest and finish",
+      "objective": "Play the game, find one surprise in the code, and change one thing.",
       "screens": [
-        "5-9-defender-1-plan-break-defender-into-parts",
-        "5-9-defender-2-reading-a-ship-and-a-cooldown",
-        "5-9-defender-3-example-fire-with-a-cooldown",
-        "5-9-defender-4-lab-fly-and-fire"
-      ]
-    },
-    {
-      "id": "hits",
-      "title": "Did the shot hit?",
-      "objective": "Students will be able to test two pass-through sprites with overlaps(), and remove a shot from the screen and the array on the frame it hits.",
-      "screens": [
-        "5-9-defender-5-reading-did-the-shot-hit",
-        "5-9-defender-6-lab-hit-the-drone"
-      ]
-    },
-    {
-      "id": "a-round",
-      "title": "A round: hp, game over and restart",
-      "objective": "Students will be able to give the base hp that a landing costs, end the round at 0, and start a new round that puts back everything the round owns.",
-      "screens": [
-        "5-9-defender-7-lab-hold-the-base",
-        "5-9-defender-8-quiz-ship-and-shots"
+        "5-3-pinball-playtest-and-reflect",
+        "5-3-pinball-10-challenges-make-it-yours",
+        "5-3-pinball-polish-6-playtest-and-polish",
+        "5-3-pinball-polish-7-challenges-polish-it-your-way"
       ]
     }
   ]

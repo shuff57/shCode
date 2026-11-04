@@ -1,0 +1,22 @@
+{
+  "modules": {
+    "5.13": [
+      {
+        "folder": "5-5-snake-1-plan-break-snake-into-parts"
+      },
+      {
+        "folder": "5-5-snake-2-reading-a-world-on-a-grid"
+      },
+      {
+        "folder": "5-5-snake-3-example-a-block-that-walks-the-grid"
+      },
+      {
+        "folder": "5-13-snake-sub-step-on-a-grid",
+        "new": true
+      },
+      {
+        "folder": "5-5-snake-4-lab-steer-it"
+      }
+    ]
+  }
+}

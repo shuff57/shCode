@@ -1,11 +1,11 @@
 {
   "id": "6-3-10-a14-2-car-ramp",
-  "title": "6.3.10 Car on a Ramp",
+  "title": "6.8.10 Car on a Ramp",
   "description": "Build a two-wheeled car using HingeJoints and drive it up a ramp with WASD. The harder of the two A14 options.",
   "type": "assignment",
   "estimateMins": 45,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.3 Physics Applications",
+  "unit": "6.8 Physics Applications",
   "preview": "moshion",
   "week": 15,
   "slos": [
@@ -17,7 +17,7 @@
       "title": "Ground + ramp",
       "instructions": "Two static sprites: a flat ground and a tilted ramp. Set the ramp's .rotation in degrees to tilt it (moSHion rotation is in degrees, not radians).",
       "hints": [
-        "The Sprite docs chapter (right drawer → Docs tab) covers static colliders.",
+        "The Sprite docs chapter (right drawer \u2192 Docs tab) covers static colliders.",
         "ramp.rotation = -20 tilts up to the right; positive values tilt the other way."
       ]
     },
@@ -34,9 +34,9 @@
     {
       "id": "s3",
       "title": "Join the wheels with HingeJoint",
-      "instructions": "new HingeJoint(leftWheel, chassis) and again for the right wheel. A HingeJoint pins two sprites at one point and lets them turn around it, like 6.3.8's pendulum. The pin goes where the FIRST sprite is, so name the wheel first: the pin lands at the wheel's centre, and the wheel can turn on it like an axle while staying fixed to the chassis.",
+      "instructions": "new HingeJoint(leftWheel, chassis) and again for the right wheel. A HingeJoint pins two sprites at one point and lets them turn around it, like 6.8.8's pendulum. The pin goes where the FIRST sprite is, so name the wheel first: the pin lands at the wheel's centre, and the wheel can turn on it like an axle while staying fixed to the chassis.",
       "hints": [
-        "6.3.8 (Worked Example: Swinging Pendulum) uses new HingeJoint(anchor, rod): the rod turns around the anchor, the first sprite.",
+        "6.8.8 (Worked Example: Swinging Pendulum) uses new HingeJoint(anchor, rod): the rod turns around the anchor, the first sprite.",
         "Wheel first, chassis second. With the chassis first, the pin sits in the middle of the chassis and the wheel swings around it like the pendulum's rod instead of turning in place."
       ]
     },
@@ -54,7 +54,7 @@
     {
       "id": "r1",
       "title": "Uses HingeJoint",
-      "description": "Join a wheel to the chassis with at least one new HingeJoint(...). A WheelJoint, from the Joints chapter of the docs drawer, also counts. Help: 6.3.8 (Worked Example: Swinging Pendulum)",
+      "description": "Join a wheel to the chassis with at least one new HingeJoint(...). A WheelJoint, from the Joints chapter of the docs drawer, also counts. Help: 6.8.8 (Worked Example: Swinging Pendulum)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+(?:Hinge|Wheel)Joint\\s*\\(",

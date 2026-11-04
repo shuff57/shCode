@@ -1,6 +1,6 @@
 ## A world on a grid
 
-**Read before `5.5.3 Worked Example: A block that walks the grid`.** About 7 minutes.
+**Read before `5.13.3 Worked Example: A block that walks the grid`.** About 7 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -22,7 +22,7 @@ function cellToPixel(n) {
 
 Adding half a cell puts the *centre* of the sprite in the centre of the cell, because a sprite's `x` and `y` are its centre. Column 3 lands at `3 * 20 + 10 = 70`.
 
-**Store the cell on the sprite.** A sprite is an object, so you can give it your own properties, the same way the bumpers carried a `worth` in 5.3.8:
+**Store the cell on the sprite.** A sprite is an object, so you can give it your own properties, the same way the bumpers carried a `worth` in 5.4.5:
 
 ```js
 const s = new Sprite(cellToPixel(3), cellToPixel(5), CELL - 2, CELL - 2, 'static');
@@ -34,7 +34,7 @@ The sprite is made 2 pixels smaller than the cell, so a thin gap shows between n
 
 **Pick a name moSHion does not already use.** Every sprite already has some properties, and storing your own value under one of their names does not make a new property: it changes the sprite. `s.life = 3` deletes the sprite three frames later, `speed` and `direction` change how it moves, `mass` changes how heavy it is, and `color` and `text` change how it looks. Other names a sprite already has: `x`, `y`, `w`, `h`, `d`, `rotation`, `scale`, `visible`, `layer` and `shape`. Words like `col`, `row`, `worth`, `points` and `wasTouching` are free, so use names like those.
 
-**Move on a beat.** If the snake moved every frame it would cross the canvas in under a second. Instead the game moves it only once every few frames, using the beat from 5.4.5:
+**Move on a beat.** If the snake moved every frame it would cross the canvas in under a second. Instead the game moves it only once every few frames, using the beat from 5.11.1:
 
 ```js
 if (frameCount % 8 === 0) {
@@ -50,7 +50,7 @@ Change the 8 and the whole game speeds up or slows down. A smaller number is a f
 const col = floor(random(20));
 ```
 
-**Words go on top, as in Flappy.** The snake's cells are sprites, and moSHion draws the sprites after `draw()` has finished, so a score written in `draw()` would disappear under the snake whenever it crosses the top of the grid. The Snake labs write their words in `drawTop()`, the function from 5.4.5 that runs after the sprites are drawn:
+**Words go on top, as in Flappy.** The snake's cells are sprites, and moSHion draws the sprites after `draw()` has finished, so a score written in `draw()` would disappear under the snake whenever it crosses the top of the grid. The Snake labs write their words in `drawTop()`, the function from 5.11.1 that runs after the sprites are drawn:
 
 ```js
 function drawTop() {

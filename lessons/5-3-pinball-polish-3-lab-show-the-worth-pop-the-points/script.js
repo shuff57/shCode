@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 // 5.3.17 Lab: Show the worth, pop the points.
 // Your table from 5.3.14: three bumpers, a score and a chime. Now make it
+=======
+// 5.7.4 Lab: Show the worth, pop the points.
+// Your table from 5.6.3: three bumpers, a score and a chime. Now make it
+>>>>>>> codehs-inspiration
 // show what each bumper is worth, and pop the points on every hit.
 
 let ball, ground, score;

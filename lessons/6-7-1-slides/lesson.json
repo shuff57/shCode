@@ -1,11 +1,11 @@
 {
   "id": "6-7-1-slides",
-  "title": "6.7.1 Slides: Advanced Mechanics: One Last Toolkit",
-  "description": "Advanced Input opening slides: the input ideas you need before the capstone: mouse position, click vs. held, dragging, and two-player key schemes. Joints and the slingshot pattern follow in Unit 6.8. Placeholder until the deck is rebuilt from bookSHelf.",
+  "title": "6.12.1 Slides: Advanced Mechanics: One Last Toolkit",
+  "description": "Advanced Input opening slides: the input ideas you need before the capstone: mouse position, click vs. held, dragging, and two-player key schemes. Joints and the slingshot pattern follow in Unit 6.13. Placeholder until the deck is rebuilt from bookSHelf.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.7 Advanced Input",
+  "unit": "6.12 Advanced Input",
   "week": 17,
   "preview": "slides",
   "slos": [

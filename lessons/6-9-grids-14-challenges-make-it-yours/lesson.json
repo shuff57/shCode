@@ -1,11 +1,11 @@
 {
   "id": "6-9-grids-14-challenges-make-it-yours",
-  "title": "6.9.14 Challenges: Make it yours",
+  "title": "6.14.14 Challenges: Make it yours",
   "description": "The brick wall is complete. Change one rule of your own: points by row, two-hit bricks, or a wall read from rows of text. Pick one; add an idea of your own on top if you like.",
   "type": "lesson",
   "estimateMins": 30,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.9 Grids and Tile Maps",
+  "unit": "6.14 Grids and Tile Maps",
   "preview": "moshion",
   "week": 16,
   "slos": [
@@ -17,7 +17,7 @@
     {
       "id": "s1",
       "title": "Pick a rule and change it",
-      "instructions": "Choose one of these three challenges. The check turns green when any one of them is in your code, so one is enough. An idea of your own is welcome on top of it. Start from the finished wall in the editor.\n\n**Challenge 1: points by row (easy).** Make the top rows worth more. In `hitAt`, change `score += 10` so a hit in row `r` scores `(BRICK_ROWS - r) * 10`. The top row (row 0) is then worth 50 and the bottom row 10.\n\n**Challenge 2: two-hit bricks (medium).** Some bricks take two hits. Let a cell hold 2 as well as 1 and 0. Build row 0 with 2s. Make a hit lower the cell by 1 (`bricks[r][c] -= 1;`) instead of setting it to 0. Draw a 2 in `'silver'`. Change the three places that test `=== 1` to `> 0` (`drawBricks`, `hitAt` and `bricksLeft`), so a brick that is down to 1 still counts, still draws and can still be hit. Miss `bricksLeft` and the words count 32 bricks on a screen of 40.\n\n**Challenge 3: a wall from text (hard).** Write the wall as rows of text in a list called `SHAPE`: `'#'` is a brick, `'2'` is a two-hit brick and `'.'` is a gap, and every row must be the same length. Make `makeBricks()` read it with `SHAPE[r][c]` (the same two-index read as a map in 6.9.5), pushing 1, 2 or 0, and set `BRICK_ROWS` and `BRICK_COLS` from it (`SHAPE.length` and `SHAPE[0].length`). `ROW_COLORS` has five colours, so keep the wall at five rows. Careful: `drawBricks`, `hitAt` and `bricksLeft` only look at cells that are `=== 1`, so the `'2'` bricks stay invisible and uncounted until you also make challenge 2's `=== 1` to `> 0` changes.",
+      "instructions": "Choose one of these three challenges. The check turns green when any one of them is in your code, so one is enough. An idea of your own is welcome on top of it. Start from the finished wall in the editor.\n\n**Challenge 1: points by row (easy).** Make the top rows worth more. In `hitAt`, change `score += 10` so a hit in row `r` scores `(BRICK_ROWS - r) * 10`. The top row (row 0) is then worth 50 and the bottom row 10.\n\n**Challenge 2: two-hit bricks (medium).** Some bricks take two hits. Let a cell hold 2 as well as 1 and 0. Build row 0 with 2s. Make a hit lower the cell by 1 (`bricks[r][c] -= 1;`) instead of setting it to 0. Draw a 2 in `'silver'`. Change the three places that test `=== 1` to `> 0` (`drawBricks`, `hitAt` and `bricksLeft`), so a brick that is down to 1 still counts, still draws and can still be hit. Miss `bricksLeft` and the words count 32 bricks on a screen of 40.\n\n**Challenge 3: a wall from text (hard).** Write the wall as rows of text in a list called `SHAPE`: `'#'` is a brick, `'2'` is a two-hit brick and `'.'` is a gap, and every row must be the same length. Make `makeBricks()` read it with `SHAPE[r][c]` (the same two-index read as a map in 6.14.5), pushing 1, 2 or 0, and set `BRICK_ROWS` and `BRICK_COLS` from it (`SHAPE.length` and `SHAPE[0].length`). `ROW_COLORS` has five colours, so keep the wall at five rows. Careful: `drawBricks`, `hitAt` and `bricksLeft` only look at cells that are `=== 1`, so the `'2'` bricks stay invisible and uncounted until you also make challenge 2's `=== 1` to `> 0` changes.",
       "hints": [
         "Whatever you pick, press R afterwards and check the wall comes back whole.",
         "Challenge 2 needs the 2 to be drawn too: `fill(bricks[r][c] === 2 ? 'silver' : ROW_COLORS[r]);`"
@@ -36,7 +36,7 @@
     {
       "id": "r1",
       "title": "You changed one rule of the wall",
-      "description": "Any one challenge turns this green: two-hit bricks, points by row (or any other score rule), or a wall read from text. Help: 6.9.11 (Lab: A wall of bricks)",
+      "description": "Any one challenge turns this green: two-hit bricks, points by row (or any other score rule), or a wall read from text. Help: 6.14.11 (Lab: A wall of bricks)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bbricks\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*(?:-=\\s*1\\b|--|=\\s*1\\b|=\\s*bricks\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*-\\s*1\\b)|\\bbricks\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*=(?!=)(?!\\s*bricks\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*;)\\s*[^;]*(?:\\?|\\bbricks\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\])|\\bscore\\s*(?:\\+=|=\\s*score\\s*\\+)(?!\\s*10\\s*(?:[;})]|$))|\\bSHAPE\\s*\\[\\s*[\\w$]+\\s*\\]\\s*(?:\\[|\\.(?:charAt|substring|slice|split|at)\\s*\\()|\\bof\\s+SHAPE\\b|=\\s*SHAPE\\s*\\[\\s*[\\w$]+\\s*\\]\\s*;",
@@ -62,5 +62,6 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
-  }
+  },
+  "carryFrom": "6-9-grids-11-lab-a-wall-of-bricks"
 }

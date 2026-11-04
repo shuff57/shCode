@@ -1,10 +1,10 @@
 {
   "id": "6-9-grids-6-lab-find-the-start",
-  "title": "6.9.6 Lab: Find the start",
+  "title": "6.14.6 Lab: Find the start",
   "description": "The maze is built, but the player always stands at a fixed spot in the corridor instead of on the P in the map. Scan the map for the P, turn its row and column into pixels, put the player there, and write the way back from pixels to a tile.",
   "type": "lesson",
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.9 Grids and Tile Maps",
+  "unit": "6.14 Grids and Tile Maps",
   "estimateMins": 20,
   "preview": "moshion",
   "week": 16,
@@ -16,9 +16,9 @@
     {
       "id": "s1",
       "title": "Scan for P",
-      "instructions": "The starter has the maze from 6.9.4, the player standing at a fixed spot (220, 60) in the top corridor, and an empty `findStart(map)` that gives back the top-left tile for now. Write the scan inside `findStart(map)`, above the last line. Use two loops, one inside the other: `r` over the rows (`map.length`) and, inside it, `c` over the letters of that row (`map[r].length`). When `map[r][c]` is `'P'`, `return` an object `{ x, y }` holding the pixel centre of that tile: the centre of column `c` is `c * TILE + TILE / 2`, and the centre of row `r` is `r * TILE + TILE / 2`, as in 6.9.5. To join the two pieces of 6.9.5: the coin counter's `if (map[r][c] === 'c') { ... }` sat inside both loops, and `return { x: 60, y: 60 }` handed back two numbers. Here the `if` asks about `'P'`, and the braces hold a `return` of an object whose two 60s are replaced by the pixel formulas. Nothing changes on screen until step 2 uses it.",
+      "instructions": "The starter has the maze from 6.14.4, the player standing at a fixed spot (220, 60) in the top corridor, and an empty `findStart(map)` that gives back the top-left tile for now. Write the scan inside `findStart(map)`, above the last line. Use two loops, one inside the other: `r` over the rows (`map.length`) and, inside it, `c` over the letters of that row (`map[r].length`). When `map[r][c]` is `'P'`, `return` an object `{ x, y }` holding the pixel centre of that tile: the centre of column `c` is `c * TILE + TILE / 2`, and the centre of row `r` is `r * TILE + TILE / 2`, as in 6.14.5. To join the two pieces of 6.14.5: the coin counter's `if (map[r][c] === 'c') { ... }` sat inside both loops, and `return { x: 60, y: 60 }` handed back two numbers. Here the `if` asks about `'P'`, and the braces hold a `return` of an object whose two 60s are replaced by the pixel formulas. Nothing changes on screen until step 2 uses it.",
       "hints": [
-        "The scan is `for (let r = 0; r < map.length; r++) { for (let c = 0; c < map[r].length; c++) { ... } }`, the nested loops of 6.9.5.",
+        "The scan is `for (let r = 0; r < map.length; r++) { for (let c = 0; c < map[r].length; c++) { ... } }`, the nested loops of 6.14.5.",
         "`if (map[r][c] === 'P') { return { x: c * TILE + TILE / 2, y: r * TILE + TILE / 2 }; }` goes inside the inner loop. The `x` comes from the column and the `y` from the row."
       ]
     },
@@ -45,7 +45,7 @@
     {
       "id": "r1",
       "title": "findStart looks at every letter of every row",
-      "description": "Two loops, one inside the other: rows, then the letters of each row. Help: 6.9.5 (Reading: Reading a map as data)",
+      "description": "Two loops, one inside the other: rows, then the letters of each row. Help: 6.14.5 (Reading: Reading a map as data)",
       "type": "inFunction",
       "function": "findStart",
       "file": "script.js",
@@ -58,7 +58,7 @@
     {
       "id": "r2",
       "title": "It looks for the letter P",
-      "description": "The scan stops at the tile that holds P. Help: 6.9.5 (Reading: Reading a map as data)",
+      "description": "The scan stops at the tile that holds P. Help: 6.14.5 (Reading: Reading a map as data)",
       "type": "inFunction",
       "function": "findStart",
       "file": "script.js",
@@ -71,7 +71,7 @@
     {
       "id": "r3",
       "title": "Row and column become pixels",
-      "description": "A tile centre is its column (or row) times TILE, plus half a tile. Writing it out, or calling the cellToPixel helper from 5.5.2, both count. Help: 6.9.5 (Reading: Reading a map as data)",
+      "description": "A tile centre is its column (or row) times TILE, plus half a tile. Writing it out, or calling the cellToPixel helper from 5.13.2, both count. Help: 6.14.5 (Reading: Reading a map as data)",
       "type": "inFunction",
       "function": "findStart",
       "file": "script.js",
@@ -84,7 +84,7 @@
     {
       "id": "r4",
       "title": "The player is put on the start",
-      "description": "setup asks findStart for the start and moves the player there. Help: 6.9.5 (Reading: Reading a map as data)",
+      "description": "setup asks findStart for the start and moves the player there. Help: 6.14.5 (Reading: Reading a map as data)",
       "type": "inFunction",
       "function": "setup",
       "file": "script.js",
@@ -97,7 +97,7 @@
     {
       "id": "r5",
       "title": "tileAt turns pixels into a row and a column with floor",
-      "description": "floor(x / TILE) is the column, floor(y / TILE) is the row, and the answer is map[row][col]. Help: 6.9.5 (Reading: Reading a map as data)",
+      "description": "floor(x / TILE) is the column, floor(y / TILE) is the row, and the answer is map[row][col]. Help: 6.14.5 (Reading: Reading a map as data)",
       "type": "inFunction",
       "function": "tileAt",
       "file": "script.js",

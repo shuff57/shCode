@@ -1,4 +1,4 @@
-// 5.10.8 Debugging: The enemy that would not die (starter, with the planted bug).
+// 7.8.3 Debugging: The enemy that would not die (starter, with the planted bug).
 
 const BASE_Y = 370;   // anything that falls below this line has reached the base
 

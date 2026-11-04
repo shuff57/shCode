@@ -1,0 +1,110 @@
+{
+  "id": "5-7-pinball-sub-float-and-die",
+  "title": "5.7.3 Sub-build: A word that floats and dies",
+  "description": "Click and a small word pops up, floats, and removes itself. Build the popup alone, before it goes on a bumper.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.7 Pinball: labels and popups",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it first",
+      "instructions": "Click the canvas: nothing appears. The canvas is empty on purpose."
+    },
+    {
+      "id": "s2",
+      "title": "Make one on a click",
+      "instructions": "On `mouse.presses()`, make a small sprite at the pointer with `collider = 'none'`, give it `.text = '+5'`, a colour, and a small upward `vel.y`.",
+      "hints": [
+        "`collider = 'none'` lets anything pass through it and switches its gravity off, so it floats instead of falling.",
+        "`mouse.presses()` is true on one frame per click; `pressing()` is true while held."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Give it a lifetime",
+      "instructions": "Add `pop.life = 40;` on the line after it is made. It counts down one per frame and moSHion deletes the sprite at 0.",
+      "hints": [
+        "If popups pile up at the bottom, they have no `.life` or the `.life` is on another sprite.",
+        "30 is half a second, 60 is a second."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A sprite is made on the click",
+      "description": "A new Sprite is made inside a mouse test, not every frame. Help: 5.7.2 (Worked Example: A \"+5\" that floats away)",
+      "hint": "if (mouse.presses()) { const pop = new Sprite(mouse.x, mouse.y, 28); }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "mouse\\s*\\.\\s*press(?:es|ing)\\s*\\([^)]*\\)[\\s\\S]{0,300}?new\\s+Sprite\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "It wears words",
+      "description": "The new sprite gets .text, so it shows a word or a number. Help: 5.7.1 (Reading: Words on a sprite, and sprites that run out)",
+      "hint": "pop.text = '+5';",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*text\\s*=\\s*[^;\\n]{1,60}",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "It removes itself",
+      "description": "The sprite gets a .life above 0. Help: 5.7.1 (Reading: Words on a sprite, and sprites that run out)",
+      "hint": "pop.life = 40;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b[A-Za-z_$][\\w$]*\\s*\\.\\s*life\\s*=\\s*(?:[1-9]|\\d{2,})",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a short moSHion sketch for \"Sub-build: A word that floats and dies\". The task: on a mouse press make a small sprite at the pointer with collider 'none', give it .text with a short word or number, a colour and a small upward vel.y, and give it a .life above 0 so it removes itself. This is a sub-build: a small isolated program whose only job is this one mechanic, so judge the mechanic itself and not style. Accept any variable names, helper functions, arrow functions, ternaries and semicolons. A line that only exists in a comment or a string does not count. moSHion facts: colliding(b) is 0 while apart and counts frames while touching, so an if on it alone is true every frame of a touch; a stored \"last frame\" value makes it true once. .life = n counts down one per frame and deletes the sprite at 0. A sprite with collider 'none' is passed through and has its gravity off. loadSound(path) in setup() and sound.play() where the event happens; a browser will not play sound before the student's first click or key. Write short, plain notes for a 14-year-old, name the student's own line when something is missing, and never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "One per click",
+        "description": "The sprite is made inside a mouse test (presses, or pressing gated), not every frame.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "It floats",
+        "description": "collider = 'none' and a negative vel.y, or a position raised every frame.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "It dies",
+        "description": "A .life above 0, or a countdown that deletes it.",
+        "points": 1
+      }
+    ]
+  }
+}

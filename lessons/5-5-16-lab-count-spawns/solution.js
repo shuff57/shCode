@@ -1,4 +1,4 @@
-// 5.8.16 Lab: Count your spawns (reference solution).
+// 7.3.16 Lab: Count your spawns (reference solution).
 
 class Enemy {
   static spawned = 0;

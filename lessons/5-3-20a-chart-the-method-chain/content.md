@@ -21,7 +21,7 @@ Two of those steps are jobs that other methods already do: **`die`** removes the
 
 Here is the same plan as a flow chart. You do not draw it, you **read** it: follow the arrows and match each box to one of the five steps.
 
-```flow readonly caption="Figure 5.4.6: takeDamage. The die call sits on one branch, and both branches reach flashRed."
+```flow readonly caption="Figure 5.11.2: takeDamage. The die call sits on one branch, and both branches reach flashRed."
 flowchart TD
   A([takeDamage amount starts]) --> B[health = health - amount]
   B --> C{health <= 0}

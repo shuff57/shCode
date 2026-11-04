@@ -1,11 +1,11 @@
 {
   "id": "5-5-12-lab-write-hit",
-  "title": "5.8.12 Lab: Write hit(other)",
+  "title": "7.3.12 Lab: Write hit(other)",
   "description": "The enemy already knows how to take a hit; the player is missing its half of the exchange. Write `hit(other)` so the receiver's power is applied to the object passed in.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.8 Inside a Class",
+  "unit": "7.3 Inside a Class",
   "preview": "moshion",
   "week": 14,
   "slos": [
@@ -18,7 +18,7 @@
       "title": "Write the player's half",
       "instructions": "Inside `Player`, write a `hit(other)` method. It takes one argument — another object — and asks that object to take damage. The amount is the player's own `this.power`. Press Space: the enemy's health should fall by 2 each time.",
       "hints": [
-        "Reread 5.8.11 (Worked Example: player.hit(enemy)). The method body is the one line `other.takeHit(this.power);`.",
+        "Reread 7.3.11 (Worked Example: player.hit(enemy)). The method body is the one line `other.takeHit(this.power);`.",
         "`other` is the name of the parameter in your own method. Whatever you called it, use that name before the dot."
       ]
     }
@@ -27,7 +27,7 @@
     {
       "id": "r1",
       "title": "hit(other) asks the argument to take the hit",
-      "description": "The method calls `takeHit` on the object it was handed, not on `this`. Help: 5.8.11 (Worked Example: player.hit(enemy))",
+      "description": "The method calls `takeHit` on the object it was handed, not on `this`. Help: 7.3.11 (Worked Example: player.hit(enemy))",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bhit\\s*\\(\\s*(\\w+)\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?\\b\\1\\s*\\.\\s*takeHit\\s*\\(",
@@ -39,7 +39,7 @@
     {
       "id": "r2",
       "title": "The damage is the player's own power",
-      "description": "The amount passed along comes from `this.power`, so one player can hit harder than another. Help: 5.8.11 (Worked Example: player.hit(enemy))",
+      "description": "The amount passed along comes from `this.power`, so one player can hit harder than another. Help: 7.3.11 (Worked Example: player.hit(enemy))",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bhit\\s*\\(\\s*(\\w+)\\s*\\)\\s*\\{(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?(?:\\b\\1\\s*\\.\\s*takeHit\\s*\\([^)]*this\\.power|\\b(?:const|let|var)\\s+(\\w+)\\s*=\\s*this\\.power\\s*;(?:(?!\\b(?!(?:if|while|for|switch|catch|function|return)\\b)[A-Za-z_$][\\w$]*\\s*\\([^()]*\\)\\s*\\{)[\\s\\S])*?\\b\\1\\s*\\.\\s*takeHit\\s*\\(\\s*\\2\\b)",
@@ -57,7 +57,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.8.12 Lab: Write hit(other)\". The task they were given: The Enemy class already has takeHit(n). Inside the Player class, write a method hit(other) that takes one argument, another object, and asks THAT object to take damage equal to the player's own this.power. Space calls p.hit(e), so the enemy's hp should fall by 2 on each press. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. A parameter is the name a method uses for whatever object was handed in: p.hit(e) hands the enemy in, so inside hit the parameter IS that enemy. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (hit, takeHit) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's Player has no hit method, which is missing on both criteria. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.3.12 Lab: Write hit(other)\". The task they were given: The Enemy class already has takeHit(n). Inside the Player class, write a method hit(other) that takes one argument, another object, and asks THAT object to take damage equal to the player's own this.power. Space calls p.hit(e), so the enemy's hp should fall by 2 on each press. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. A parameter is the name a method uses for whatever object was handed in: p.hit(e) hands the enemy in, so inside hit the parameter IS that enemy. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (hit, takeHit) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's Player has no hit method, which is missing on both criteria. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
     "rubric": [
       {
         "id": "r1",

@@ -1,11 +1,11 @@
 {
   "id": "6-1-1-slides",
-  "title": "6.1.1 Slides: Groups and Overlaps",
+  "title": "6.6.1 Slides: Groups and Overlaps",
   "description": "Groups and Overlaps slides: overlap detection, safe despawn, edge-triggered input, and ground-gated jumping. Placeholder until the deck is rebuilt from bookSHelf.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.1 Groups and Overlaps",
+  "unit": "6.6 Groups",
   "week": 15,
   "preview": "slides",
   "slos": [

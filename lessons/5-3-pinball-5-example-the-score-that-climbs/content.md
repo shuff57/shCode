@@ -1,6 +1,6 @@
 ## The score that climbs by itself
 
-**Read after `5.3.5 Reading: A collision is not an event`.**
+**Read after `5.4.1 Reading: A collision is not an event`.**
 
 **Goal:** see the same game counted two ways — the wrong way and the right one — and learn to tell them apart by watching the number.
 

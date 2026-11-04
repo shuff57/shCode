@@ -1,0 +1,96 @@
+{
+  "id": "5-13-snake-sub-step-on-a-grid",
+  "title": "5.13.4 Sub-build: Step on a grid",
+  "description": "A square jumps one cell at a time, on a beat. Build the step before there is a snake.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.13 Snake: grid and steering",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it first",
+      "instructions": "The square moves smoothly off the screen. A snake does not move smoothly: it steps."
+    },
+    {
+      "id": "s2",
+      "title": "Give it a beat",
+      "instructions": "In `setup()`, run a function every 12 frames with `every(12, () => { ... })`. Inside it, move the block exactly one cell: `x += CELL;` where `CELL` is a constant such as 20.",
+      "hints": [
+        "A smaller number is a faster snake: 8 is quick, 20 is slow.",
+        "Move by a whole cell, never by 1 pixel."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Turn at the edges",
+      "instructions": "When the block reaches the right edge, send it back to the left: `if (x > width - CELL) x = 0;`.",
+      "hints": [
+        "Keep the position on the grid: start at a multiple of CELL."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "It steps on a beat",
+      "description": "A timer (every or after) moves the block, not draw() every frame. Help: 5.2.1 (Reading: Random numbers and timers)",
+      "hint": "every(12, () => { x += CELL; });",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bevery\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "One whole cell",
+      "description": "The move changes x by a cell-sized step (a constant, or 20/24/25). Help: 5.13.3 (Worked Example: A block that walks the grid)",
+      "hint": "x += CELL;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bx\\s*[+-]=\\s*(?:[A-Z_]{2,}|\\d{2,})",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a short moSHion sketch for \"Sub-build: Step on a grid\". The task: move a block exactly one cell on a timer created in setup(), by adding a cell-sized constant to x, and keep it on the canvas. This is a sub-build: a small isolated program whose only job is this one mechanic. Accept any names, helpers, arrow functions and ternaries. A line only in a comment or string does not count. Use short, plain notes for a 14-year-old, name their own line when something is missing, never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A beat, made once",
+        "description": "every() is called in setup() (or on an event), not inside draw().",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "A whole cell",
+        "description": "x changes by a cell-sized step, not by 1 or by velocity.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "It stays on the canvas",
+        "description": "There is an edge rule (wrap or turn), so the block cannot walk off and disappear.",
+        "points": 1
+      }
+    ]
+  }
+}

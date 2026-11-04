@@ -1,0 +1,15 @@
+{
+  "moduleId": "7.10",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
+  "lessons": [
+    {
+      "id": "defender-c-a-spawner",
+      "title": "A spawner for the waves",
+      "objective": "Give the bullets and the waves their own classes, finished in one place.",
+      "screens": [
+        "5-11-defender-5-lab-bullet",
+        "5-11-defender-6-lab-a-spawner-for-the-waves"
+      ]
+    }
+  ]
+}

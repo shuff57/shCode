@@ -1,11 +1,11 @@
 {
   "id": "6-11-sound-7-lab-music-for-every-screen",
-  "title": "6.11.7 Lab: Music for every screen",
+  "title": "6.15.7 Lab: Music for every screen",
   "description": "Star catch has a title, the game, a win and a loss, and every change of screen goes through goTo(next). Make goTo change the music: stop what was playing, loop the tune on the title and in the game, and play it once for a win or a loss.",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.11 Sound and Music",
+  "unit": "6.15 Sound and Music",
   "preview": "moshion",
   "week": 19,
   "slos": [
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Stop the music first",
-      "instructions": "The starter is Star catch with screens, using the state variable of 6.6.7: `state` is `'title'`, `'play'`, `'won'` or `'lost'`. Enter on the title starts a game; 10 catches win; 3 misses lose; R on an end screen goes back to the title. Every change of screen goes through one function, `goTo(next)`, and so far it only does `state = next;`. `setup()` loads one tune, `music`, and ends with `goTo('title')`. Run it and play a game to the end: no music anywhere. That is this lab.\n\nMusic changes when the screen changes, so it belongs in `goTo`, not in `draw()` (6.11.6). First, at the top of `goTo`, stop whatever is playing with `music.stop();`. Without it two things go wrong: `loop()` while the tune is already looping does nothing, and `play()` starts a second copy on top of the first.",
+      "instructions": "The starter is Star catch with screens, using the state variable of 6.11.7: `state` is `'title'`, `'play'`, `'won'` or `'lost'`. Enter on the title starts a game; 10 catches win; 3 misses lose; R on an end screen goes back to the title. Every change of screen goes through one function, `goTo(next)`, and so far it only does `state = next;`. `setup()` loads one tune, `music`, and ends with `goTo('title')`. Run it and play a game to the end: no music anywhere. That is this lab.\n\nMusic changes when the screen changes, so it belongs in `goTo`, not in `draw()` (6.15.6). First, at the top of `goTo`, stop whatever is playing with `music.stop();`. Without it two things go wrong: `loop()` while the tune is already looping does nothing, and `play()` starts a second copy on top of the first.",
       "hints": [
         "`music.stop();` is the first line inside `goTo(next)`, above `state = next;`."
       ]
@@ -44,7 +44,7 @@
     {
       "id": "r1",
       "title": "A new screen stops the old music",
-      "description": "Inside goTo(next), a sound's .stop() runs, so the last screen's music cannot carry on under the next one. Help: 6.11.6 (Reading: Music that follows the game)",
+      "description": "Inside goTo(next), a sound's .stop() runs, so the last screen's music cannot carry on under the next one. Help: 6.15.6 (Reading: Music that follows the game)",
       "hint": "music.stop(); as the first line of goTo(next).",
       "file": "script.js",
       "flags": "",
@@ -87,7 +87,7 @@
     {
       "id": "r2",
       "title": "The title and the game loop the tune",
-      "description": "Inside goTo(next), .loop() runs under an if (or a case) on the screen being entered: one for the title and one for the game, or one if that asks for both. Help: 6.11.6 (Reading: Music that follows the game)",
+      "description": "Inside goTo(next), .loop() runs under an if (or a case) on the screen being entered: one for the title and one for the game, or one if that asks for both. Help: 6.15.6 (Reading: Music that follows the game)",
       "hint": "if (next === 'title') { music.rate = 0.8; music.loop(); }, and the same for 'play' with rate 1.",
       "file": "script.js",
       "flags": "",
@@ -130,7 +130,7 @@
     {
       "id": "r3",
       "title": "A win and a loss play it once",
-      "description": "Inside goTo(next), .play() runs under an if (or a case) on the screen being entered: one for a win and one for a loss, or one if that asks for both. Help: 6.11.6 (Reading: Music that follows the game)",
+      "description": "Inside goTo(next), .play() runs under an if (or a case) on the screen being entered: one for a win and one for a loss, or one if that asks for both. Help: 6.15.6 (Reading: Music that follows the game)",
       "hint": "if (next === 'won') { music.rate = 1.25; music.play(); }, and the same for 'lost' with rate 0.6.",
       "file": "script.js",
       "flags": "",

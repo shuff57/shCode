@@ -1,11 +1,11 @@
 {
   "id": "6-10-breakout-10-lab-pick-a-mode",
-  "title": "6.10.10 Lab: Pick a mode",
+  "title": "7.14.2 Lab: Pick a mode",
   "description": "A title screen that waits for a key: 1 plays with the mouse, 2 with the arrow keys. Write the choices, read the key, and send R back to the title. With a note on prompt().",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.10 Breakout",
+  "unit": "7.14 Breakout: the game",
   "preview": "moshion",
   "week": 18,
   "slos": [
@@ -16,16 +16,16 @@
     {
       "id": "s1",
       "title": "The title words",
-      "instructions": "The starter is your finished game from 6.10.9 with one more state, `'title'`. `state` starts as `'title'`, and while it is, `draw()` calls `pickMode()` and moves nothing. `pickMode()` is empty, so right now the game waits on the title forever. This is the title screen of 6.6.11, and the way out of it is a key, as in 6.6.16.\n\nIn `drawTop()`, when `state` is `'title'`, write the name of the game and the two choices: `Press 1 to play with the mouse` and `Press 2 to play with the arrow keys`. Put them under the wall, between y 200 and 280, so they do not cover the bricks (the ball waits at y 300). Start the long lines near the left edge, at an x of about 30: at `textSize(16)`, `Press 2 to play with the arrow keys` is about 340 pixels wide, so `text('Press 2 to play with the arrow keys', 30, 265)` fits and an x of 100 cuts it off at the right. Run it: the words show, and nothing moves yet.",
+      "instructions": "The starter is your finished game from 7.14.1 with one more state, `'title'`. `state` starts as `'title'`, and while it is, `draw()` calls `pickMode()` and moves nothing. `pickMode()` is empty, so right now the game waits on the title forever. This is the title screen of 6.11.11, and the way out of it is a key, as in 6.11.16.\n\nIn `drawTop()`, when `state` is `'title'`, write the name of the game and the two choices: `Press 1 to play with the mouse` and `Press 2 to play with the arrow keys`. Put them under the wall, between y 200 and 280, so they do not cover the bricks (the ball waits at y 300). Start the long lines near the left edge, at an x of about 30: at `textSize(16)`, `Press 2 to play with the arrow keys` is about 340 pixels wide, so `text('Press 2 to play with the arrow keys', 30, 265)` fits and an x of 100 cuts it off at the right. Run it: the words show, and nothing moves yet.",
       "hints": [
-        "`if (state === 'title') { ... }` with two or three `text(...)` lines inside, as in 6.6.11.",
+        "`if (state === 'title') { ... }` with two or three `text(...)` lines inside, as in 6.11.11.",
         "`textSize(28)` before the name makes it bigger; set it back to 16 for the two lines."
       ]
     },
     {
       "id": "s2",
       "title": "A key picks the mode",
-      "instructions": "In `pickMode()`: when `kb.presses('1')` is true, set `control` to `'mouse'` and `state` to `'play'`; when `kb.presses('2')` is true, set `control` to `'keys'` and `state` to `'play'`. A number key's name is its digit in quotes, `'1'`, the same way `'r'` names the R key. Use `kb.presses`, not `kb.pressing`: one press is one choice (6.3.3). Run it, click the canvas so the sketch hears your keys (5.1.13), and press 1: the game starts with the mouse. Press Stop, then Run again, click the canvas and press 2: the arrow keys steer the paddle.\n\n**A note on prompt().** You could ask with `prompt('Press 1 for the mouse or 2 for the keys')` instead; the sketch allows it. It gives back what was typed as text, a string, which is why 3.1.9 wrapped it in `Number(prompt(...))`. So you compare with `'1'`, not `1`. But a prompt freezes the whole game until it is answered, it looks like the browser and not like your game, and a mistyped answer leaves you with nothing to start. A title screen keeps the game running and shows the choice in your game's own style, which is why games use one. The check accepts either; if you try a prompt, put it in `pickMode()` in place of the two key tests.",
+      "instructions": "In `pickMode()`: when `kb.presses('1')` is true, set `control` to `'mouse'` and `state` to `'play'`; when `kb.presses('2')` is true, set `control` to `'keys'` and `state` to `'play'`. A number key's name is its digit in quotes, `'1'`, the same way `'r'` names the R key. Use `kb.presses`, not `kb.pressing`: one press is one choice (6.8.3). Run it, click the canvas so the sketch hears your keys (5.1.13), and press 1: the game starts with the mouse. Press Stop, then Run again, click the canvas and press 2: the arrow keys steer the paddle.\n\n**A note on prompt().** You could ask with `prompt('Press 1 for the mouse or 2 for the keys')` instead; the sketch allows it. It gives back what was typed as text, a string, which is why 3.1.9 wrapped it in `Number(prompt(...))`. So you compare with `'1'`, not `1`. But a prompt freezes the whole game until it is answered, it looks like the browser and not like your game, and a mistyped answer leaves you with nothing to start. A title screen keeps the game running and shows the choice in your game's own style, which is why games use one. The check accepts either; if you try a prompt, put it in `pickMode()` in place of the two key tests.",
       "hints": [
         "`if (kb.presses('1')) { control = 'mouse'; state = 'play'; }`",
         "The second `if` is the same with `'2'` and `'keys'`."
@@ -45,7 +45,7 @@
     {
       "id": "r1",
       "title": "The title screen says what to press",
-      "description": "While state is 'title', the name of the game and the two choices are written on the screen. Help: 6.6.11 (Worked Example: Title Screen with Start Button)",
+      "description": "While state is 'title', the name of the game and the two choices are written on the screen. Help: 6.11.11 (Worked Example: Title Screen with Start Button)",
       "type": "inFunction",
       "file": "script.js",
       "function": [
@@ -66,7 +66,7 @@
     {
       "id": "r2",
       "title": "A key picks the mode",
-      "description": "Key 1 sets control to 'mouse' and key 2 sets it to 'keys', and each one sets state to 'play'. Help: 6.6.16 (Worked Example: Keyboard-Driven State Changes)",
+      "description": "Key 1 sets control to 'mouse' and key 2 sets it to 'keys', and each one sets state to 'play'. Help: 6.11.16 (Worked Example: Keyboard-Driven State Changes)",
       "type": "inFunction",
       "file": "script.js",
       "function": "pickMode",
@@ -79,7 +79,7 @@
     {
       "id": "r3",
       "title": "R goes back to the title",
-      "description": "After the game ends, R starts a new game and sets state to 'title'. Help: 6.6.16 (Worked Example: Keyboard-Driven State Changes)",
+      "description": "After the game ends, R starts a new game and sets state to 'title'. Help: 6.11.16 (Worked Example: Keyboard-Driven State Changes)",
       "type": "inFunction",
       "file": "script.js",
       "function": [
@@ -97,5 +97,6 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
-  }
+  },
+  "carryFrom": "6-10-breakout-9-lab-win-or-lose"
 }

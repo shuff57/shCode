@@ -1,0 +1,112 @@
+{
+  "modules": [
+    {
+      "from": "7.4",
+      "id": "7.4",
+      "slug": "defender-the-ship-and-shots",
+      "title": "Defender: the ship, and shots",
+      "group": "The ship, and shots",
+      "lessons": [
+        "5-9-defender-1-plan-break-defender-into-parts",
+        "5-9-defender-2-reading-a-ship-and-a-cooldown",
+        "5-9-defender-3-example-fire-with-a-cooldown",
+        "5-9-defender-4-lab-fly-and-fire"
+      ]
+    },
+    {
+      "from": "7.4",
+      "id": "7.5",
+      "slug": "defender-hits-and-a-round",
+      "title": "Defender: hits, and a round",
+      "group": "Hits, and a round",
+      "lessons": [
+        "5-9-defender-5-reading-did-the-shot-hit",
+        "5-9-defender-6-lab-hit-the-drone",
+        "5-9-defender-7-lab-hold-the-base",
+        "5-9-defender-8-quiz-ship-and-shots"
+      ]
+    },
+    {
+      "from": "7.5",
+      "id": "7.6",
+      "slug": "defender-many-enemies",
+      "title": "Defender: many enemies",
+      "group": "Many enemies",
+      "lessons": [
+        "5-10-defender-1-reading-many-enemies-parallel-arrays",
+        "5-10-defender-2-lab-a-field-of-enemies"
+      ]
+    },
+    {
+      "from": "7.5",
+      "id": "7.7",
+      "slug": "defender-the-hit-loop",
+      "title": "Defender: the hit loop",
+      "group": "The hit loop",
+      "lessons": [
+        "5-10-defender-3-plan-the-hit-loop",
+        "5-10-defender-4-reading-every-shot-against-every-enemy",
+        "5-10-defender-5-lab-shoot-them-down"
+      ]
+    },
+    {
+      "from": "7.5",
+      "id": "7.8",
+      "slug": "defender-waves-and-the-cost",
+      "title": "Defender: waves and the cost",
+      "group": "Waves, and the cost",
+      "lessons": [
+        "5-10-defender-6-example-waves-with-a-pause",
+        "5-10-defender-7-lab-waves",
+        "5-10-defender-8-debugging-the-enemy-that-would-not-die",
+        "5-10-defender-9-quiz-enemies-and-waves"
+      ]
+    },
+    {
+      "from": "7.6",
+      "id": "7.9",
+      "slug": "defender-c-design",
+      "title": "Defender C: design",
+      "group": "Count the cost, draw the classes",
+      "lessons": [
+        "5-11-defender-1-reading-count-the-cost",
+        "5-11-defender-2-plan-draw-the-classes-first"
+      ]
+    },
+    {
+      "from": "7.6",
+      "id": "7.10",
+      "slug": "defender-c-the-classes",
+      "title": "Defender C: the classes",
+      "group": "The classes",
+      "lessons": [
+        "5-11-defender-3-example-finished-in-one-place",
+        "5-11-defender-4-lab-enemy-takes-over"
+      ]
+    },
+    {
+      "from": "7.6",
+      "id": "7.11",
+      "slug": "defender-c-a-spawner",
+      "title": "Defender C: a spawner",
+      "group": "A spawner for the waves",
+      "lessons": [
+        "5-11-defender-5-lab-bullet",
+        "5-11-defender-6-lab-a-spawner-for-the-waves"
+      ]
+    },
+    {
+      "from": "7.6",
+      "id": "7.12",
+      "slug": "defender-c-close",
+      "title": "Defender C: playtest and check",
+      "group": "Playtest, check, challenges",
+      "lessons": [
+        "5-11-defender-7-playtest-and-reflect",
+        "5-11-defender-8-quiz-defender-with-classes",
+        "5-11-defender-sound-lab-sound-effects",
+        "5-11-defender-9-challenges-make-it-yours"
+      ]
+    }
+  ]
+}

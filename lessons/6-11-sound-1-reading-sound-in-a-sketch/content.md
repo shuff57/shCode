@@ -1,6 +1,6 @@
 ## Sound in a sketch
 
-**Read before `6.11.3 Lab: A sound on an event`.** About 10 minutes.
+**Read before `6.15.3 Lab: A sound on an event`.** About 10 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -10,7 +10,7 @@ By the end of this reading you should be able to answer:
 - Why can a sketch stay silent until the player clicks or presses a key?
 - Where in the code does a `.play()` go?
 
-**A sound is a file the sketch downloads.** You met this in 5.11.9: `loadSound(path)` starts downloading a sound file and hands you back a **Sound** at once. Keep it in a variable, the way you keep a sprite. The course's two everyday sound files are these, and the path is typed exactly, quotes included:
+**A sound is a file the sketch downloads.** You met this in 7.11.3: `loadSound(path)` starts downloading a sound file and hands you back a **Sound** at once. Keep it in a variable, the way you keep a sprite. The course's two everyday sound files are these, and the path is typed exactly, quotes included:
 
 | Path | What it is |
 | --- | --- |
@@ -44,7 +44,7 @@ function setup() {
 
 **`play()` is one copy; `loop()` keeps going.** `chime.play();` plays the sound once, from the start. Every call starts a fresh copy, so two quick calls give two chimes that overlap. `music.loop();` plays the sound and starts it again each time it ends, until `music.stop();`. A sound has only one looping copy: `loop()` while it is already looping does nothing, so calling it again is safe.
 
-`loop()` is also the one call that waits for the file. Asked for before the file has arrived, it is remembered, and the sound starts when the file lands. That is why `music.loop()` can sit in `setup()`. `.playing` is `true` while any copy of the sound is going, and `.loaded` is `true` once the file has arrived and can play (`false` until then); the sound board in 6.11.2 shows both on the screen.
+`loop()` is also the one call that waits for the file. Asked for before the file has arrived, it is remembered, and the sound starts when the file lands. That is why `music.loop()` can sit in `setup()`. `.playing` is `true` while any copy of the sound is going, and `.loaded` is `true` once the file has arrived and can play (`false` until then); the sound board in 6.15.2 shows both on the screen.
 
 **Three settings.** A Sound has properties you set the way you set a sprite's `color`:
 
@@ -60,10 +60,10 @@ function setup() {
 **Where a `.play()` goes.** Put it in the one place where its event happens **exactly once**: inside the `if` that finds the event, on the frame it happens. Three places that look right and are not:
 
 - Straight in `draw()`. It runs 60 times a second, so the sound would start 60 times a second.
-- Under `kb.pressing(...)`. That is true on every frame the key is held (5.1.13). A sound for a key goes under `kb.presses(...)`, which is true only on the frame the key goes down (6.3.3).
-- Under an `overlaps()` that stays true. `overlaps()` is true on every frame two sprites touch (5.9.5). The sound plays once only if the same `if` also moves one of them away, the way a game moves a coin that has been collected.
+- Under `kb.pressing(...)`. That is true on every frame the key is held (5.1.13). A sound for a key goes under `kb.presses(...)`, which is true only on the frame the key goes down (6.8.3).
+- Under an `overlaps()` that stays true. `overlaps()` is true on every frame two sprites touch (7.5.1). The sound plays once only if the same `if` also moves one of them away, the way a game moves a coin that has been collected.
 
-**What comes next.** The worked example (6.11.2) is a sound board to try all of this on. The labs then add sound to a small game, Star catch, one idea at a time.
+**What comes next.** The worked example (6.15.2) is a sound board to try all of this on. The labs then add sound to a small game, Star catch, one idea at a time.
 
 ---
 

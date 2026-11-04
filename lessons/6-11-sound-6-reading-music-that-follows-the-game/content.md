@@ -1,6 +1,6 @@
 ## Music that follows the game
 
-**Read before `6.11.7 Lab: Music for every screen`.** About 10 minutes.
+**Read before `6.15.7 Lab: Music for every screen`.** About 10 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -10,9 +10,9 @@ By the end of this reading you should be able to answer:
 - When is a sound setting saved, and when is it loaded?
 - Why is `getItem('soundLevel') || 5` the wrong way to load a volume?
 
-**One variable owns the screen.** A game with a title screen, the game itself and two end screens keeps the one it is on in one variable, `state` (6.6.7): `'title'`, `'play'`, `'won'` or `'lost'`. Each screen has its own music: a calm tune on the title, a livelier one while you play, a short bright one for a win and a slow one for a loss.
+**One variable owns the screen.** A game with a title screen, the game itself and two end screens keeps the one it is on in one variable, `state` (6.11.7): `'title'`, `'play'`, `'won'` or `'lost'`. Each screen has its own music: a calm tune on the title, a livelier one while you play, a short bright one for a win and a slow one for a loss.
 
-**Change the music when the screen changes, once.** The music for a screen does not belong in `draw()`, which runs 60 times a second. It belongs to the moment the screen changes, and that moment needs one home. 6.6.24 saved the game in the place where the state changes; here every change of screen goes through one function, `goTo(next)`, and that function changes the music too:
+**Change the music when the screen changes, once.** The music for a screen does not belong in `draw()`, which runs 60 times a second. It belongs to the moment the screen changes, and that moment needs one home. 6.11.24 saved the game in the place where the state changes; here every change of screen goes through one function, `goTo(next)`, and that function changes the music too:
 
 ```js
 function goTo(next) {
@@ -30,7 +30,7 @@ Every place that used to say `state = 'play'` says `goTo('play')` instead, so no
 
 **Why stop first.** Two things go wrong if the old music is not stopped. `loop()` while the sound is already looping does nothing, so the title's loop would carry on into the game. And `play()` starts a new copy every time, so a win's tune would play on top of the game's. `stop()` stops every copy of that sound, so each new screen starts from silence.
 
-**One tune, four moods.** The course has one tune, and `.rate` changes its speed and its pitch together (6.11.1). Set the rate, then start it:
+**One tune, four moods.** The course has one tune, and `.rate` changes its speed and its pitch together (6.15.1). Set the rate, then start it:
 
 | Screen | Rate | Started with |
 | --- | --- | --- |
@@ -47,12 +47,12 @@ A real game would load a different file for each screen. The shape of `goTo` sta
 masterVolume(muted ? 0 : level / 10);
 ```
 
-That is the `? :` from chapter 2: when `muted` is true the level is 0, and otherwise it is `level` tenths of full. A player who turns the sound down expects it to stay down next time, and that is 6.5's save and load:
+That is the `? :` from chapter 2: when `muted` is true the level is 0, and otherwise it is `level` tenths of full. A player who turns the sound down expects it to stay down next time, and that is 6.10's save and load:
 
-- **Save when a setting changes** (6.5.3): right after the level or the mute changes, `storeItem('soundLevel', level);` and `storeItem('soundMuted', muted);`.
-- **Load once, at the start**: `getItem('soundLevel')` gives back exactly what was saved, a number for a number and `true` or `false` for `muted`, or `null` when nothing was ever saved (6.5.5, 6.5.6).
+- **Save when a setting changes** (6.10.3): right after the level or the mute changes, `storeItem('soundLevel', level);` and `storeItem('soundMuted', muted);`.
+- **Load once, at the start**: `getItem('soundLevel')` gives back exactly what was saved, a number for a number and `true` or `false` for `muted`, or `null` when nothing was ever saved (6.10.5, 6.10.6).
 
-**The `|| 5` trap.** 6.5.6 loaded a high score with `getItem('highScore') || 0`. For a volume that would be a bug. `||` picks its right side whenever the left side counts as false, and `0` counts as false just like `null`. A player who saved a level of 0 would come back to 5. Ask about `null` itself instead:
+**The `|| 5` trap.** 6.10.6 loaded a high score with `getItem('highScore') || 0`. For a volume that would be a bug. `||` picks its right side whenever the left side counts as false, and `0` counts as false just like `null`. A player who saved a level of 0 would come back to 5. Ask about `null` itself instead:
 
 ```js
 const savedLevel = getItem('soundLevel');

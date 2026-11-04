@@ -1,11 +1,11 @@
 {
   "id": "6-6-1-slides",
-  "title": "6.6.1 Slides: One Game, Many Screens",
+  "title": "6.11.1 Slides: One Game, Many Screens",
   "description": "Game State Machines opening slides: title screen, gameplay, pause, game over. Every screen is a state. One variable controls which screen is active. Placeholder until the deck is rebuilt from bookSHelf.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.6 Game State Machines",
+  "unit": "6.11 Game State Machines",
   "week": 17,
   "preview": "slides",
   "slos": [

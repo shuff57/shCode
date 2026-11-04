@@ -1,11 +1,19 @@
 {
   "id": "5-3-pinball-polish-2-example-a-plus-that-floats-away",
+<<<<<<< HEAD
   "title": "5.3.16 Worked Example: A \"+5\" that floats away",
+=======
+  "title": "5.7.2 Worked Example: A \"+5\" that floats away",
+>>>>>>> codehs-inspiration
   "description": "A two-bumper table where each bumper wears its worth, and each hit makes one small gold popup that floats up and removes itself with .life. Then the same popup made under if (touching), which piles up into a gold smear: the popup goes where the score goes.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
+<<<<<<< HEAD
   "unit": "5.3 Project: Pinball",
+=======
+  "unit": "5.7 Pinball: labels and popups",
+>>>>>>> codehs-inspiration
   "preview": "example",
   "week": 11,
   "slos": [

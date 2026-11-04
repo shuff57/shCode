@@ -1,11 +1,11 @@
 {
   "id": "5-9-defender-7-lab-hold-the-base",
-  "title": "5.9.7 Lab: Hold the base, and start again",
+  "title": "7.5.3 Lab: Hold the base, and start again",
   "description": "The drone can land as often as it likes. Give the base 3 hp, take 1 for every landing, end the round at 0, write Game over on top, and let R start a new round.",
   "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.9 Project: Defender, Part A",
+  "unit": "7.5 Defender: hits, and a round",
   "preview": "moshion",
   "week": 14,
   "slos": [
@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Three hp a round",
-      "instructions": "The top right says `base: undefined`, and runs off the edge of the canvas: nothing gives `baseHp` a value. In `startRound()`, set `baseHp` to 3, next to `score = 0;`. `startRound()` puts back everything a round owns, as in 5.5.6, and the base's hp is one of those things. Run it: the top right should read `base: 3`.",
+      "instructions": "The top right says `base: undefined`, and runs off the edge of the canvas: nothing gives `baseHp` a value. In `startRound()`, set `baseHp` to 3, next to `score = 0;`. `startRound()` puts back everything a round owns, as in 5.14.3, and the base's hp is one of those things. Run it: the top right should read `base: 3`.",
       "hints": [
         "`baseHp = 3;` goes inside `startRound()`, not in `setup()`, so that R will give the hp back too."
       ]
@@ -43,7 +43,7 @@
     {
       "id": "r1",
       "title": "Every round starts with base hp",
-      "description": "startRound() gives baseHp its starting value (3), so R gives the base its hp back. Help: 5.4.8 (Lab: Crash, and start again)",
+      "description": "startRound() gives baseHp its starting value (3), so R gives the base its hp back. Help: 5.12.3 (Lab: Crash, and start again)",
       "type": "inFunction",
       "function": "startRound",
       "file": "script.js",
@@ -56,7 +56,7 @@
     {
       "id": "r2",
       "title": "Reaching the base costs 1",
-      "description": "When the drone reaches the base, baseHp goes down by 1, inside the if that sees the landing (the way score goes up by 1 inside the if that sees a hit). Help: 5.9.6 (Lab: Hit the drone)",
+      "description": "When the drone reaches the base, baseHp goes down by 1, inside the if that sees the landing (the way score goes up by 1 inside the if that sees a hit). Help: 7.5.2 (Lab: Hit the drone)",
       "type": "inFunction",
       "function": [
         "moveDrone",
@@ -72,7 +72,7 @@
     {
       "id": "r3",
       "title": "At 0 the round ends",
-      "description": "An if on baseHp reaching 0 sets playing to false. Help: 5.3.9 (Reading: The state of the game)",
+      "description": "An if on baseHp reaching 0 sets playing to false. Help: 5.5.1 (Reading: The state of the game)",
       "type": "regex",
       "file": "script.js",
       "pattern": "if\\s*\\((?=[^{};]{0,200}(?:\\bbaseHp\\s*(?:\\)\\s*)?(?:<=\\s*0\\b|===?\\s*0\\b|<\\s*1\\b)|\\b0\\s*(?:>=|===?)\\s*(?:\\(\\s*)?baseHp\\b|\\b1\\s*>\\s*(?:\\(\\s*)?baseHp\\b|!\\s*(?:\\(\\s*)?baseHp\\b))[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^;{}]{0,200}?)\\bplaying\\s*=(?!=)\\s*false\\b|\\bplaying\\s*=(?!=)\\s*(?:\\(\\s*)?(?:baseHp\\s*(?:\\)\\s*)?(?:>\\s*0|>=\\s*1|!==?\\s*0)|0\\s*<\\s*baseHp)|(?:const|let|var)\\s+(\\w+)\\s*=(?![=>])(?=[^;]{0,200}(?:\\bbaseHp\\s*(?:\\)\\s*)?(?:<=\\s*0\\b|===?\\s*0\\b|<\\s*1\\b)|\\b0\\s*(?:>=|===?)\\s*(?:\\(\\s*)?baseHp\\b|\\b1\\s*>\\s*(?:\\(\\s*)?baseHp\\b|!\\s*(?:\\(\\s*)?baseHp\\b))[^;]{0,200}?[;\\n][\\s\\S]{0,300}?if\\s*\\((?=[^{};]{0,200}(?<![\\w$.])\\1\\b)[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?|[^;{}]{0,200}?)\\bplaying\\s*=(?!=)\\s*false\\b",
@@ -84,7 +84,7 @@
     {
       "id": "r4",
       "title": "Game over is written in drawTop when the round is over",
-      "description": "In drawTop(), an if on !playing writes Game over (and press R) on top of the sprites. Help: 5.4.5 (Reading: A world that scrolls)",
+      "description": "In drawTop(), an if on !playing writes Game over (and press R) on top of the sprites. Help: 5.11.1 (Reading: A world that scrolls)",
       "type": "inFunction",
       "function": "drawTop",
       "file": "script.js",
@@ -97,7 +97,7 @@
     {
       "id": "r5",
       "title": "R starts a new round",
-      "description": "In draw(), outside if (playing), pressing R calls startRound() (directly, or through a function of your own that calls it), so it works after Game over too. Help: 5.4.8 (Lab: Crash, and start again)",
+      "description": "In draw(), outside if (playing), pressing R calls startRound() (directly, or through a function of your own that calls it), so it works after Game over too. Help: 5.12.3 (Lab: Crash, and start again)",
       "type": "regex",
       "file": "script.js",
       "pattern": "^(?![\\s\\S]*?if\\s*\\(\\s*(?:\\(\\s*)?playing\\s*(?:\\)\\s*)?(?:===?\\s*true\\s*)?\\)\\s*\\{(?:[^{}]|\\{[^{}]*\\})*?kb\\s*\\.\\s*(?:presses|pressing)\\s*\\(\\s*['\"\\x60][rR]['\"\\x60]\\s*\\))(?:[\\s\\S]*?kb\\s*\\.\\s*(?:presses|pressing)\\s*\\(\\s*['\"\\x60][rR]['\"\\x60]\\s*\\)[\\s\\S]{0,80}?startRound\\s*\\(\\s*\\)|(?=[\\s\\S]*?kb\\s*\\.\\s*(?:presses|pressing)\\s*\\(\\s*['\"\\x60][rR]['\"\\x60]\\s*\\)[^;{}]{0,80}?\\)\\s*\\{?\\s*([A-Za-z_$][\\w$]*)\\s*\\(\\s*\\))[\\s\\S]*?\\bfunction\\s+\\1\\s*\\([^)]*\\)\\s*\\{[^{}]{0,300}?\\bstartRound\\s*\\(\\s*\\))",
@@ -114,7 +114,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.9.7 Lab: Hold the base, and start again\". The task they were given: The drone can land as often as it likes. In startRound(), give baseHp 3 at the start of every round. In moveDrone(), inside the if that sees the drone reach the base, take 1 off baseHp, and when baseHp is 0 or less set playing to false. In drawTop(), when the round is over (not playing), write Game over and press R to play again in the middle of the screen. In draw(), after the whole if (playing) { ... } block, start a new round when R is pressed. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. startRound() is called by setup() and should also be called by the R key, so whatever it sets comes back on a restart. Everything that moves is inside if (playing) in draw(), so playing = false stops the game, and any key check written inside that block can never run once the round is over. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (startRound, moveDrone, drawTop, resetDrone) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter has only STEP comments where each piece goes: missing on every criterion. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.5.3 Lab: Hold the base, and start again\". The task they were given: The drone can land as often as it likes. In startRound(), give baseHp 3 at the start of every round. In moveDrone(), inside the if that sees the drone reach the base, take 1 off baseHp, and when baseHp is 0 or less set playing to false. In drawTop(), when the round is over (not playing), write Game over and press R to play again in the middle of the screen. In draw(), after the whole if (playing) { ... } block, start a new round when R is pressed. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. startRound() is called by setup() and should also be called by the R key, so whatever it sets comes back on a restart. Everything that moves is inside if (playing) in draw(), so playing = false stops the game, and any key check written inside that block can never run once the round is over. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (startRound, moveDrone, drawTop, resetDrone) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter has only STEP comments where each piece goes: missing on every criterion. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
     "rubric": [
       {
         "id": "r1",
@@ -147,5 +147,6 @@
         "points": 1
       }
     ]
-  }
+  },
+  "carryFrom": "5-9-defender-6-lab-hit-the-drone"
 }

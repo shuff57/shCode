@@ -1,4 +1,4 @@
-// 6.11.5 Lab: A sound that varies (reference solution).
+// 6.15.5 Lab: A sound that varies (reference solution).
 // Star catch: the arrow keys move the basket. Catch the falling star.
 
 let basket, star;

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 // 5.3.17 Lab: Show the worth, pop the points (reference solution).
+=======
+// 5.7.4 Lab: Show the worth, pop the points (reference solution).
+>>>>>>> codehs-inspiration
 
 let ball, ground, score;
 let chime;   // the sound, loaded once in setup()

@@ -1,0 +1,104 @@
+{
+  "id": "6-5-pocket-2-quiz-pocket-check",
+  "title": "6.5.2 Check: the Pocket game",
+  "description": "Five multiple-choice questions on the pointer, direction and speed, drag and the stop rule, and a pocket you roll over. Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.5 Pocket: playtest and extend",
+  "preview": "assignment",
+  "week": 13,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-release",
+        "question": "Which one is true on exactly one frame?",
+        "options": [
+          "mouse.pressing()",
+          "mouse.presses()",
+          "mouse.x",
+          "mouse.y"
+        ],
+        "answer": 1,
+        "explanation": "presses() is true on the frame of the press; pressing() is true every frame it is held.",
+        "sourceIds": [
+          "6-1-pocket-2-reading-the-pointer"
+        ],
+        "source": "6.1.2"
+      },
+      {
+        "id": "q2-direction",
+        "question": "On screen, which way does a sprite with direction 90 move?",
+        "options": [
+          "right",
+          "left",
+          "up",
+          "down"
+        ],
+        "answer": 3,
+        "explanation": "0 is right, 90 is down on screen, 180 is left, 270 is up.",
+        "sourceIds": [
+          "6-2-pocket-1-reading-which-way-how-fast"
+        ],
+        "source": "6.2.1"
+      },
+      {
+        "id": "q3-pull",
+        "question": "You pull away from the ball and let go. Which direction sends the ball away from the pointer?",
+        "options": [
+          "angleTo(pointer)",
+          "angleTo(pointer) + 180",
+          "90",
+          "0"
+        ],
+        "answer": 1,
+        "explanation": "The shot goes opposite the pull, so add 180 degrees.",
+        "sourceIds": [
+          "6-2-pocket-1-reading-which-way-how-fast"
+        ],
+        "source": "6.2.1"
+      },
+      {
+        "id": "q4-stop",
+        "question": "Why does `cue.speed === 0` never become true while drag is on?",
+        "options": [
+          "Drag sets it to 1",
+          "Drag slows it every frame but never to exactly zero",
+          "speed is a whole number",
+          "speed is read-only"
+        ],
+        "answer": 1,
+        "explanation": "Drag multiplies the speed down each frame, so it approaches zero without reaching it. Test against a small number instead.",
+        "sourceIds": [
+          "6-3-pocket-1-reading-rolling-to-a-stop"
+        ],
+        "source": "6.3.1"
+      },
+      {
+        "id": "q5-overlap",
+        "question": "A ball overlaps a pocket. How often is `overlaps()` true while they overlap?",
+        "options": [
+          "once",
+          "every frame they overlap",
+          "only when moving",
+          "never"
+        ],
+        "answer": 1,
+        "explanation": "overlaps() is level-triggered, so the drop needs a guard to happen once.",
+        "sourceIds": [
+          "6-4-pocket-1-reading-a-pocket-you-roll-over"
+        ],
+        "source": "6.4.1"
+      }
+    ]
+  }
+}

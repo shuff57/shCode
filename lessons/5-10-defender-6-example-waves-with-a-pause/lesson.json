@@ -1,11 +1,11 @@
 {
   "id": "5-10-defender-6-example-waves-with-a-pause",
-  "title": "5.10.6 Worked Example: Waves with a pause",
+  "title": "7.8.1 Worked Example: Waves with a pause",
   "description": "Enemies come in waves: a new wave only when the field is clear, after a countdown. Delete the clear-field check and watch the waves pile up.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.10 Project: Defender, Part B",
+  "unit": "7.8 Defender: waves and the cost",
   "preview": "example",
   "week": 15,
   "slos": [

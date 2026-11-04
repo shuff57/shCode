@@ -1,5 +1,13 @@
 # Book → Module: turning a written book chapter into shCode modules
 
+> **Renumbered 2026-11-04 (unit repartition).** The objects block left unit 5: the old
+> 5.6-5.8 are now **7.1-7.3**, the Defender capstone 5.9-5.11 is now **7.4-7.6**, the old
+> 7.1 Arcade Cabinet is now **8.1**, and 8.1 Solid Shapes is now **9.1**. Unit 5 is the
+> functional games basics, unit 6 the advanced games, unit 7 objects and classes. Book
+> section numbers (§5.3, §6.8) are untouched and are not module numbers; where this file
+> still shows a module number in the old order, the mapping is
+> `scripts/renumber-plans/unit-repartition.json`.
+
 The bookSHelf textbook and shCode are two repos with one curriculum between them.
 This doc is the join. It says what to do when a chapter of the book is written (or
 rewritten) and the matching shCode unit needs to be built (or resynced).

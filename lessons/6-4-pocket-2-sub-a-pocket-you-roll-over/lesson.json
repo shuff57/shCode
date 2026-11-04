@@ -1,0 +1,93 @@
+{
+  "id": "6-4-pocket-2-sub-a-pocket-you-roll-over",
+  "title": "6.4.2 Sub-build: A pocket you roll over",
+  "description": "A ball, a hole, and the speed test. No table, no rules yet.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.4 Pocket: the pocket",
+  "preview": "moshion",
+  "week": 13,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The ball slides across the hole and bounces off it: the hole is solid."
+    },
+    {
+      "id": "s2",
+      "title": "Make it pass-through",
+      "instructions": "Set `pocket.collider = 'none';` in `setup()`. Now the ball rolls over it."
+    },
+    {
+      "id": "s3",
+      "title": "Drop only a slow ball",
+      "instructions": "When `ball.overlaps(pocket)` and `ball.speed < 1`, stop the ball, put it in the hole, and set a flag so it only happens once.",
+      "hints": [
+        "`overlaps()` is true every frame; without a guard the drop runs 60 times a second.",
+        "The speed test is what lets a hard shot roll over."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The pocket is pass-through",
+      "description": "The pocket sprite has collider = 'none'. Help: 6.4.1 (Reading: A pocket you roll over)",
+      "hint": "pocket.collider = 'none';",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "collider\\s*=\\s*['\"]none['\"]",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": false
+    },
+    {
+      "id": "r2",
+      "title": "A slow ball drops, once",
+      "description": "Overlap plus a speed test, guarded so it happens once. Help: 6.4.1 (Reading: A pocket you roll over)",
+      "hint": "if (ball.overlaps(pocket) && ball.speed < 1) { ... }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "overlaps\\s*\\([^)]*\\)[\\s\\S]{0,120}?\\.\\s*speed\\s*<",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: A pocket you roll over\". The task: make a pass-through pocket and drop the ball only when it overlaps it slowly, guarded so it happens once. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Pass-through",
+        "description": "The pocket has collider none.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Slow only",
+        "description": "The drop requires a speed under a small number.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Once",
+        "description": "A flag, a moved ball or a delete stops it repeating every frame.",
+        "points": 1
+      }
+    ]
+  }
+}

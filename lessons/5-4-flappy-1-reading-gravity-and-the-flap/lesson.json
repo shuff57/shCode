@@ -1,11 +1,11 @@
 {
   "id": "5-4-flappy-1-reading-gravity-and-the-flap",
-  "title": "5.4.2 Reading: Gravity and the flap",
+  "title": "5.10.2 Reading: Gravity and the flap",
   "description": "A flapping bird is gravity that never stops plus one sudden change to the bird's speed. Shows why the flap sets the speed rather than pushing, and why the key must be an edge.",
   "type": "lesson",
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.4 Project: Flappy",
+  "unit": "5.10 Flappy: the flap",
   "preview": "reading",
   "week": 12,
   "slos": [

@@ -77,3 +77,13 @@ export async function navigateToNextLesson(currentId: string): Promise<boolean> 
   window.location.href = next ? lessonHref(next) : '/';
   return true;
 }
+
+/**
+ * The display title of a lesson folder id, from the cached manifest. Used by
+ * CarryForwardBanner to name the source lesson ("Your 5.3.14 table is saved").
+ * Returns null when the id is unknown or the manifest cannot be read.
+ */
+export async function getLessonTitle(id: string): Promise<string | null> {
+  const lessons = await loadLessons();
+  return lessons.find((l) => l.id === id)?.title ?? null;
+}

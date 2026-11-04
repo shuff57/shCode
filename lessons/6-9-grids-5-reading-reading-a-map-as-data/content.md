@@ -1,6 +1,6 @@
 ## Reading a map as data
 
-**Read before `6.9.6 Lab: Find the start`.** About 12 minutes.
+**Read before `6.14.6 Lab: Find the start`.** About 12 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -8,7 +8,7 @@ By the end of this reading you should be able to answer:
 - How do you turn a row and column into the pixel centre of a tile, and a pixel back into a row and column?
 - Why must you check the row and column exist before reading `map[r][c]`?
 
-**One map, two uses.** In 6.9.2 `Tiles` turned the map into sprites. But the map is also just an array of strings, so your own code can read it as data, for things `Tiles` cannot do. The first one is finding where the player starts.
+**One map, two uses.** In 6.14.2 `Tiles` turned the map into sprites. But the map is also just an array of strings, so your own code can read it as data, for things `Tiles` cannot do. The first one is finding where the player starts.
 
 **Scan it with two loops.** To look at every letter, loop over the rows with `r`, and inside that loop over the letters of the row with `c`. This is the nested loop from 2.4.24: the inner loop finishes for every step of the outer one. Test `map[r][c]` inside. For example, to count the coins:
 
@@ -39,7 +39,7 @@ player.x = start.x;
 
 Decide what to hand back when the letter is missing: the lab returns the centre of the top-left tile.
 
-**Cells to pixels.** The map speaks in rows and columns. Sprites speak in pixels. The centre of column `c` is `c * TILE + TILE / 2`: column 3 of 40-pixel tiles starts at 120 and its centre is half a tile further, 140. The row works the same way with `r`. This is the same rule as 5.5.2's `cellToPixel`, now applied to a map you did not place yourself.
+**Cells to pixels.** The map speaks in rows and columns. Sprites speak in pixels. The centre of column `c` is `c * TILE + TILE / 2`: column 3 of 40-pixel tiles starts at 120 and its centre is half a tile further, 140. The row works the same way with `r`. This is the same rule as 5.13.2's `cellToPixel`, now applied to a map you did not place yourself.
 
 **Pixels back to a cell.** Going the other way, the column is `floor(x / TILE)` and the row is `floor(y / TILE)`. With `x = 150` and `TILE = 40`, `150 / 40` is 3.75, and `floor` cuts off the 0.75 and leaves 3, the tile the pixel is inside. `round` would say 4, which is the next tile along. Use `floor`.
 
@@ -55,7 +55,7 @@ if (r >= 0 && r < map.length && c >= 0 && c < map[r].length) {
 
 `&&` stops at the first test that is false, so the row tests come before anything reads `map[r]`.
 
-**A string cannot be changed letter by letter.** `map[1][2] = 'x'` does nothing, and nothing warns you. The map is text you can read but not edit. To change a grid while the game runs you need an array of arrays, which is 6.9.9.
+**A string cannot be changed letter by letter.** `map[1][2] = 'x'` does nothing, and nothing warns you. The map is text you can read but not edit. To change a grid while the game runs you need an array of arrays, which is 6.14.9.
 
 **A game with several levels keeps a list of maps.** `levels[0]` is a whole map, `levels[1][3][2]` is one letter of the second level, and `levels.length` is how many levels there are. The last lab of the maze uses exactly this.
 

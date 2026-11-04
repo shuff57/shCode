@@ -1,11 +1,11 @@
 {
   "id": "8-1-4-lab-drill-a-hole",
-  "title": "8.1.4 Lab: Drill a Hole",
+  "title": "9.1.4 Lab: Drill a Hole",
   "description": "Pick a face and drill a hole through it with the Hole tool. Auto-graded.",
   "type": "assignment",
   "estimateMins": 10,
   "category": "Unit 3: reSHape: Solid Modelling",
-  "unit": "8.1 Solid Shapes",
+  "unit": "9.1 Solid Shapes",
   "preview": "reshape",
   "mode": "visual",
   "slos": [
@@ -38,8 +38,18 @@
       "description": "The box has a hole 12 mm across, drilled through the top face.",
       "type": "model",
       "expect": [
-        { "kind": "box", "size": [40, 40, 20] },
-        { "kind": "hole", "diameter": 12 }
+        {
+          "kind": "box",
+          "size": [
+            40,
+            40,
+            20
+          ]
+        },
+        {
+          "kind": "hole",
+          "diameter": 12
+        }
       ],
       "hint": "Click the top face, then press Hole. Check that the diameter field reads 12.",
       "points": 0

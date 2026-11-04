@@ -1,11 +1,11 @@
 {
   "id": "5-4-flappy-4-reading-a-world-that-scrolls",
-  "title": "5.4.5 Reading: A world that scrolls",
+  "title": "5.11.1 Reading: A world that scrolls",
   "description": "The bird never moves sideways. The pipes do. Shows how to build obstacles on a timer, keep them in an array, and remove the ones that have left the screen.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.4 Project: Flappy",
+  "unit": "5.11 Flappy: the world scrolls",
   "preview": "reading",
   "week": 12,
   "slos": [

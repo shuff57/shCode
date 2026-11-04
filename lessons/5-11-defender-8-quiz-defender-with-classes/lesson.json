@@ -1,11 +1,11 @@
 {
   "id": "5-11-defender-8-quiz-defender-with-classes",
-  "title": "5.11.8 Check: Defender with classes",
+  "title": "7.11.2 Check: Defender with classes",
   "description": "Seven multiple-choice questions on where things live after the refactor: hp on the enemy, a hit loop with no splices, what filter does not do, a parameter that is another object, static, the checklist, and the cost of a new fact. Checked instantly.",
   "type": "assignment",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.11 Project: Defender, Part C",
+  "unit": "7.11 Defender C: playtest and check",
   "preview": "quiz",
   "week": 15,
   "slos": [
@@ -21,8 +21,8 @@
     "questions": [
       {
         "id": "q1-hp",
-        "source": "5.11.4",
-        "question": "After 5.11.4, where does an enemy's hp live?",
+        "source": "7.9.4",
+        "question": "After 7.9.4, where does an enemy's hp live?",
         "options": [
           "In `enemyHp`, at the enemy's index",
           "On its own Enemy object, as `this.hp`",
@@ -37,7 +37,7 @@
       },
       {
         "id": "q2-nosplice",
-        "source": "5.11.3 and 5.11.5",
+        "source": "7.9.3 and 7.10.1",
         "question": "Why does `hitEnemies()` no longer splice anything?",
         "options": [
           "`splice` is not allowed on an array of objects, only on numbers and sprites",
@@ -54,7 +54,7 @@
       },
       {
         "id": "q3-filter",
-        "source": "5.11.3",
+        "source": "7.9.3",
         "question": "What does `enemies = enemies.filter((e) => e.isAlive());` NOT do by itself?",
         "options": [
           "Keep the enemies that are still alive in the list",
@@ -70,7 +70,7 @@
       },
       {
         "id": "q4-param",
-        "source": "5.11.5",
+        "source": "7.10.1",
         "question": "In `b.hits(e)`, what is `e`?",
         "options": [
           "A number: the index of the enemy in `enemies`",
@@ -79,14 +79,14 @@
           "Another object, an Enemy, handed to the bullet's method"
         ],
         "answer": 3,
-        "explanation": "The parameter is another object, as in 5.8.12's `hit(other)`. Inside `hits(enemy)` the bullet reads `enemy.sprite` and asks `enemy.isAlive()`.",
+        "explanation": "The parameter is another object, as in 7.3.12's `hit(other)`. Inside `hits(enemy)` the bullet reads `enemy.sprite` and asks `enemy.isAlive()`.",
         "sourceIds": [
           "5-11-defender-5-lab-bullet"
         ]
       },
       {
         "id": "q5-static",
-        "source": "5.11.6",
+        "source": "7.10.2",
         "question": "Why is `spawned` declared `static`?",
         "options": [
           "It is a fact about all enemies, so it belongs to the class (`Enemy.spawned`), not to one enemy",
@@ -102,7 +102,7 @@
       },
       {
         "id": "q6-checklist",
-        "source": "5.11.1",
+        "source": "7.9.1",
         "question": "Which class answers \"no\" to the checklist's first question, \"more than one of this thing?\"",
         "options": [
           "Enemy",
@@ -118,7 +118,7 @@
       },
       {
         "id": "q7-shield",
-        "source": "5.11.1",
+        "source": "7.9.1",
         "question": "Each enemy needs a shield value. In Part C, where does the change go?",
         "options": [
           "In the Enemy constructor, and the one place that uses it",

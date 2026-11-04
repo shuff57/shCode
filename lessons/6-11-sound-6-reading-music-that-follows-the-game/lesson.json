@@ -1,11 +1,11 @@
 {
   "id": "6-11-sound-6-reading-music-that-follows-the-game",
-  "title": "6.11.6 Reading: Music that follows the game",
+  "title": "6.15.6 Reading: Music that follows the game",
   "description": "Music changes when the screen changes, once, in the one function every change of screen goes through: stop the old music, then start the new screen's. One tune gives four moods with .rate. Sound settings are saved when they change and loaded at the start, with !== null so a saved 0 is kept.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.11 Sound and Music",
+  "unit": "6.15 Sound and Music",
   "preview": "reading",
   "week": 19,
   "slos": [

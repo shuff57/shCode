@@ -1,4 +1,4 @@
-// 5.9.4 Lab: Fly and fire (reference solution).
+// 7.4.4 Lab: Fly and fire (reference solution).
 
 const BASE_Y = 370;   // anything that falls below this line has reached the base
 
@@ -49,7 +49,7 @@ function moveBullets() {
   }
 }
 
-// Puts back everything a round owns. setup() uses it; 5.9.7 gives it to the R key too.
+// Puts back everything a round owns. setup() uses it; 7.5.3 gives it to the R key too.
 function startRound() {
   for (const b of bullets) b.delete();
   bullets = [];

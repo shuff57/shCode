@@ -1,0 +1,19 @@
+{
+  "id": "6-5-pocket-3-challenges-make-it-yours",
+  "title": "6.5.3 Challenges: Make it yours",
+  "description": "Three extensions: a second pocket, a sand patch that slows the ball, and a scratch that costs a shot.",
+  "type": "lesson",
+  "estimateMins": 25,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.5 Pocket: playtest and extend",
+  "preview": "reading",
+  "week": 13,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

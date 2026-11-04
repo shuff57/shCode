@@ -1,11 +1,11 @@
 {
   "id": "6-5-16-reading-removeitem-clearstorage",
-  "title": "6.5.16 Reading: moSHion docs: removeItem and clearStorage",
+  "title": "6.10.16 Reading: moSHion docs: removeItem and clearStorage",
   "description": "removeItem(key) deletes one saved key. clearStorage() wipes everything. When and how to use each.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.5 Save and Load",
+  "unit": "6.10 Save and Load",
   "preview": "reading",
   "week": 16,
   "slos": [

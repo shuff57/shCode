@@ -1,4 +1,4 @@
-// 6.4.19 Challenges (reference solution).
+// 6.9.19 Challenges (reference solution).
 //
 // Demonstrates Challenge 1 (parallax clouds), Challenge 2 (flip the player
 // to face the way they are walking) and Challenge 3 (vertical camera

@@ -1,4 +1,4 @@
-// 5.6.16 Your Turn: Fill in a Constructor (reference solution).
+// 7.1.16 Your Turn: Fill in a Constructor (reference solution).
 
 class Message {
   constructor(x, y, words) {

@@ -1,11 +1,11 @@
 {
   "id": "5-5-snake-10-quiz-snake-check",
-  "title": "5.5.10 Check: the Snake game",
+  "title": "5.16.2 Check: the Snake game",
   "description": "Six multiple-choice questions on the grid, the beat, steering without turning back, moving and growing with unshift and pop, and searching the snake. Checked instantly.",
   "type": "assignment",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.5 Project: Snake",
+  "unit": "5.16 Snake: playtest and extend",
   "preview": "quiz",
   "week": 12,
   "slos": [
@@ -20,7 +20,7 @@
     "questions": [
       {
         "id": "q1-cell",
-        "source": "5.5.2",
+        "source": "5.13.2",
         "question": "A cell is 20 pixels wide. Which pixel x puts the centre of a sprite in the middle of column 3?",
         "options": [
           "60",
@@ -36,7 +36,7 @@
       },
       {
         "id": "q2-beat",
-        "source": "5.5.2",
+        "source": "5.13.2",
         "question": "What does changing `frameCount % 8` to `frameCount % 4` do to the snake?",
         "options": [
           "It moves twice as often, so it is faster",
@@ -52,7 +52,7 @@
       },
       {
         "id": "q3-noreverse",
-        "source": "5.5.4",
+        "source": "5.13.5",
         "question": "Why do the up and down keys only work when `dy === 0`?",
         "options": [
           "To stop the snake from turning back into itself",
@@ -68,7 +68,7 @@
       },
       {
         "id": "q4-move",
-        "source": "5.5.5",
+        "source": "5.14.1",
         "question": "How does the whole snake move one step?",
         "options": [
           "Every cell is moved one place forward",
@@ -84,7 +84,7 @@
       },
       {
         "id": "q5-grow",
-        "source": "5.5.5",
+        "source": "5.14.1",
         "question": "What makes the snake one cell longer when it eats?",
         "options": [
           "An extra `push` at the back",
@@ -100,7 +100,7 @@
       },
       {
         "id": "q6-return",
-        "source": "5.5.7",
+        "source": "5.15.1",
         "question": "In `isBody`, why does `return false` sit after the loop and not inside it?",
         "options": [
           "Inside the loop it would end the function after checking only the first segment",

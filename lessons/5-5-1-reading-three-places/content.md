@@ -1,6 +1,6 @@
 ## Three places a variable can live
 
-**Read before `5.8.2 Worked Example: The counter that resets`.** About 5 minutes.
+**Read before `7.3.2 Worked Example: The counter that resets`.** About 5 minutes.
 
 By the end of this reading you should be able to answer:
 

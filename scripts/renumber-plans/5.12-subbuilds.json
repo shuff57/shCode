@@ -1,0 +1,25 @@
+{
+  "modules": {
+    "5.12": [
+      {
+        "folder": "5-12-flappy-sub-score-once",
+        "new": true
+      },
+      {
+        "folder": "5-4-flappy-6-lab-score-a-gap"
+      },
+      {
+        "folder": "5-4-flappy-7-lab-crash-and-start-again"
+      },
+      {
+        "folder": "5-4-flappy-playtest-and-reflect"
+      },
+      {
+        "folder": "5-4-flappy-8-quiz-flappy-check"
+      },
+      {
+        "folder": "5-4-flappy-9-challenges-make-it-yours"
+      }
+    ]
+  }
+}

@@ -1,10 +1,10 @@
 {
   "id": "5-3-12-example-this-pronoun",
-  "title": "5.6.13 Worked Example: this is a pronoun",
+  "title": "7.1.13 Worked Example: this is a pronoun",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.6 Classes and Objects via moSHion",
+  "unit": "7.1 Classes and Instances",
   "preview": "example",
   "week": 12,
   "slos": [

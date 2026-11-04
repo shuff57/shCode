@@ -1,11 +1,11 @@
 {
   "id": "6-11-sound-9-quiz-sound-and-music",
-  "title": "6.11.9 Check: Sound and music",
+  "title": "6.15.9 Check: Sound and music",
   "description": "Eight multiple-choice questions on the browser's rule, loading once, play and loop, rate, a random pick, stopping the music on a new screen, and a saved 0. Checked instantly.",
   "type": "assignment",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.11 Sound and Music",
+  "unit": "6.15 Sound and Music",
   "preview": "quiz",
   "week": 19,
   "slos": [
@@ -21,7 +21,7 @@
     "questions": [
       {
         "id": "q1-browser",
-        "source": "6.11.1",
+        "source": "6.15.1",
         "question": "A sketch calls `music.loop()` in `setup()`. In a fresh tab the tune stays silent until the player clicks the game, and then it starts. Why?",
         "options": [
           "`loop()` always waits for a click on the canvas before it starts to play",
@@ -37,7 +37,7 @@
       },
       {
         "id": "q2-load",
-        "source": "6.11.1",
+        "source": "6.15.1",
         "question": "Why is `loadSound` called once in `setup()` and not in `draw()`?",
         "options": [
           "`draw()` would start a new download every frame; a sound plays only once its file has arrived",
@@ -53,7 +53,7 @@
       },
       {
         "id": "q3-pressing",
-        "source": "6.11.2",
+        "source": "6.15.2",
         "question": "The code says `if (kb.pressing('3')) chime.play();` and the player holds 3 down for one second. What do they hear?",
         "options": [
           "One chime, on the frame the key went down",
@@ -69,7 +69,7 @@
       },
       {
         "id": "q4-loop",
-        "source": "6.11.1 and 6.11.2",
+        "source": "6.15.1 and 6.15.2",
         "question": "`music.loop()` runs in `draw()`, every frame. What does the player hear?",
         "options": [
           "Sixty copies of the tune a second, piling up",
@@ -86,7 +86,7 @@
       },
       {
         "id": "q5-rate",
-        "source": "6.11.1",
+        "source": "6.15.1",
         "question": "The thud is set up with `thud.rate = 0.5;` before `thud.play();`. Compared with a rate of 1, how does it sound?",
         "options": [
           "The same note, only half as loud",
@@ -102,7 +102,7 @@
       },
       {
         "id": "q6-pick",
-        "source": "6.11.5",
+        "source": "6.15.5",
         "question": "`thuds` is a list of three sounds. Which line plays one of them, picked at random?",
         "options": [
           "`thuds[random(3)].play();`",
@@ -118,7 +118,7 @@
       },
       {
         "id": "q7-stop",
-        "source": "6.11.6",
+        "source": "6.15.6",
         "question": "In `goTo(next)`, why does `music.stop()` come before the new screen's tune starts?",
         "options": [
           "The old copy would carry on: `loop()` while looping does nothing, and `play()` adds a copy",
@@ -134,7 +134,7 @@
       },
       {
         "id": "q8-null",
-        "source": "6.11.6 and 6.11.8",
+        "source": "6.15.6 and 6.15.8",
         "question": "A player turned the level down to 0, and it was saved. Next time the game starts, `level = getItem('soundLevel') || 5;` runs. What is `level`?",
         "options": [
           "0, the level that was saved",

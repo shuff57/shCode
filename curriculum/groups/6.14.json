@@ -1,0 +1,62 @@
+{
+  "moduleId": "6.14",
+  "source": "Not a book section. The plan, build and playtest shape follows CodeHS's project modules in Introduction to Game Design; the tile-map and grid-of-bricks ideas follow Video Game Design in JavaScript's tile and Breakout ladders. Structure only: no CodeHS text, problems or code is copied.",
+  "lessons": [
+    {
+      "id": "plan-and-maps",
+      "title": "Plan, and a map is rows of text",
+      "objective": "Students will be able to plan a game as parts and remembered values, and read a level written as rows of text.",
+      "screens": [
+        "6-9-grids-1-plan-break-the-coin-maze-into-parts",
+        "6-9-grids-2-reading-a-map-is-rows-of-text",
+        "6-9-grids-3-example-a-level-from-text"
+      ]
+    },
+    {
+      "id": "build-the-level",
+      "title": "Build the level",
+      "objective": "Students will be able to set Group defaults and build a level from a map with Tiles and a legend.",
+      "screens": [
+        "6-9-grids-4-lab-build-the-maze"
+      ]
+    },
+    {
+      "id": "the-map-as-data",
+      "title": "The map as data",
+      "objective": "Students will be able to scan a map for a letter, and convert between a row and column and pixels.",
+      "screens": [
+        "6-9-grids-5-reading-reading-a-map-as-data",
+        "6-9-grids-6-lab-find-the-start"
+      ]
+    },
+    {
+      "id": "the-game",
+      "title": "Coins, the goal and the levels",
+      "objective": "Students will be able to pick up coins, open a goal only when none are left, and load the next level from a list of maps.",
+      "screens": [
+        "6-9-grids-7-lab-coins-and-the-goal",
+        "6-9-grids-8-lab-the-next-level"
+      ]
+    },
+    {
+      "id": "a-grid-is-data",
+      "title": "A grid is data",
+      "objective": "Students will be able to build, draw, click and count an array of arrays, with the picture drawn from the data.",
+      "screens": [
+        "6-9-grids-9-reading-a-grid-is-data",
+        "6-9-grids-10-lab-light-the-grid",
+        "6-9-grids-11-lab-a-wall-of-bricks"
+      ]
+    },
+    {
+      "id": "playtest-and-extend",
+      "title": "Playtest, check, and make it yours",
+      "objective": "Students will be able to playtest their own work, link what they saw to their code, and extend it with a rule of their own.",
+      "screens": [
+        "6-9-grids-12-playtest-and-reflect",
+        "6-9-grids-13-quiz-grids-and-tile-maps",
+        "6-9-grids-14-challenges-make-it-yours"
+      ]
+    }
+  ]
+}

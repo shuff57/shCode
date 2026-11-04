@@ -1,11 +1,11 @@
 {
   "id": "5-4-flappy-6-lab-score-a-gap",
-  "title": "5.4.7 Lab: Score a gap",
-  "description": "A pipe the bird has flown past is worth a point, once. The starter shows a score that never moves. Give every pipe a flag that remembers it has been counted, the same idea as 5.3.7 with a different trigger.",
+  "title": "5.12.2 Lab: Score a gap",
+  "description": "A pipe the bird has flown past is worth a point, once. The starter shows a score that never moves. Give every pipe a flag that remembers it has been counted, the same idea as 5.4.4 with a different trigger.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.4 Project: Flappy",
+  "unit": "5.12 Flappy: crash, and finish",
   "preview": "moshion",
   "week": 12,
   "slos": [
@@ -17,14 +17,14 @@
       "title": "Notice the bird got past",
       "instructions": "In `draw()`, loop over the pipes. A pipe has been passed when its `x` is less than the bird's `x`. The score is already on screen, starting at 0: `drawTop()` at the bottom of the starter shows it on top of the pipes.",
       "hints": [
-        "`for (const p of pipes) { ... }` visits each pipe; the pipes are already built, with a `passed` property that starts `false`. The index loop from 5.4.6 works too, with `pipes[i]` in place of `p`.",
+        "`for (const p of pipes) { ... }` visits each pipe; the pipes are already built, with a `passed` property that starts `false`. The index loop from 5.11.3 works too, with `pipes[i]` in place of `p`.",
         "`if (p.x < bird.x && !p.passed) { ... }`"
       ]
     },
     {
       "id": "s2",
       "title": "Count each pipe once",
-      "instructions": "Inside that test, add one to the score and set `p.passed = true`. Without the flag, the test is true on every frame after the bird passes, and the score races like the ball did in 5.3.5.",
+      "instructions": "Inside that test, add one to the score and set `p.passed = true`. Without the flag, the test is true on every frame after the bird passes, and the score races like the ball did in 5.4.1.",
       "hints": [
         "`score += 1;` then `p.passed = true;`",
         "Run it: the score should rise by exactly one as each pipe slides behind the bird."
@@ -35,7 +35,7 @@
     {
       "id": "r1",
       "title": "Every pipe is checked",
-      "description": "A loop looks at each pipe in the array (a for...of loop, an index loop or forEach) and compares it with the bird inside the loop. Help: 5.3.8 (Lab: Three bumpers, three values)",
+      "description": "A loop looks at each pipe in the array (a for...of loop, an index loop or forEach) and compares it with the bird inside the loop. Help: 5.4.5 (Lab: Three bumpers, three values)",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\([^)]*\\bpipes\\b[^)]*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}|\\{)*?|[^{};]*?)bird\\.(?:pos\\.)?x\\b|\\bpipes\\s*\\.\\s*forEach\\s*\\([^{};]*(?:\\{(?:[^{}]|\\{[^{}]*\\}|\\{)*?)?bird\\.(?:pos\\.)?x\\b",
@@ -46,7 +46,7 @@
     {
       "id": "r2",
       "title": "A pipe is passed when it is behind the bird",
-      "description": "The pipe's x is compared with the bird's x and the pipe's own flag. Help: 5.3.5 (Reading: A collision is not an event)",
+      "description": "The pipe's x is compared with the bird's x and the pipe's own flag. Help: 5.4.1 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:\\w+(?:\\[\\w+\\])?\\.x\\s*<=?\\s*bird\\.x|bird\\.x\\s*>=?\\s*\\w+(?:\\[\\w+\\])?\\.x)(?:\\s*\\)){0,3}\\s*(?:&&|\\{\\s*if\\s*\\()\\s*(?:\\(\\s*){0,3}(?:!\\s*(?:\\(\\s*)?\\w+(?:\\s*\\))?(?:\\[\\w+\\])?\\.passed\\b|\\w+(?:\\[\\w+\\])?\\.passed\\s*===?\\s*false\\b)|(?:!\\s*(?:\\(\\s*)?\\w+(?:\\s*\\))?(?:\\[\\w+\\])?\\.passed\\b|\\w+(?:\\[\\w+\\])?\\.passed\\s*===?\\s*false\\b)(?:\\s*\\)){0,3}\\s*(?:&&|\\{\\s*if\\s*\\()\\s*(?:\\(\\s*){0,3}(?:\\w+(?:\\[\\w+\\])?\\.x\\s*<=?\\s*bird\\.x|bird\\.x\\s*>=?\\s*\\w+(?:\\[\\w+\\])?\\.x)|(?:const|let|var)\\s+(\\w+)\\s*=\\s*\\(?\\s*(?:\\w+(?:\\[\\w+\\])?\\.x\\s*<=?\\s*bird\\.x|bird\\.x\\s*>=?\\s*\\w+(?:\\[\\w+\\])?\\.x)[^;{}]*;?[\\s\\S]{0,300}?\\bif\\s*\\(\\s*(?:\\(\\s*){0,3}(?:\\1(?:\\s*===?\\s*true)?\\b(?:\\s*\\)){0,3}\\s*(?:&&|\\)\\s*\\{\\s*if\\s*\\()\\s*(?:\\(\\s*){0,3}(?:!\\s*(?:\\(\\s*)?\\w+(?:\\s*\\))?(?:\\[\\w+\\])?\\.passed\\b|\\w+(?:\\[\\w+\\])?\\.passed\\s*===?\\s*false\\b)|(?:!\\s*(?:\\(\\s*)?\\w+(?:\\s*\\))?(?:\\[\\w+\\])?\\.passed\\b|\\w+(?:\\[\\w+\\])?\\.passed\\s*===?\\s*false\\b)(?:\\s*\\)){0,3}\\s*(?:&&|\\)\\s*\\{\\s*if\\s*\\()\\s*(?:\\(\\s*){0,3}\\1(?:\\s*===?\\s*true)?\\b)",
@@ -57,7 +57,7 @@
     {
       "id": "r3",
       "title": "Each pipe is counted once",
-      "description": "The score goes up and the pipe is flagged in the same step. Help: 5.3.5 (Reading: A collision is not an event)",
+      "description": "The score goes up and the pipe is flagged in the same step. Help: 5.4.1 (Reading: A collision is not an event)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bif\\s*\\((?=[^{};]{0,200}\\.passed\\b)[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?|[^{};]{0,200}?)(?:(?:score\\s*(?:\\+=\\s*1\\b|\\+\\+|=\\s*score\\s*\\+\\s*1\\b)|\\+\\+\\s*score)[^{}]{0,60}?\\w+(?:\\[\\w+\\])?\\.passed\\s*=\\s*true|\\w+(?:\\[\\w+\\])?\\.passed\\s*=\\s*true[^{}]{0,60}?(?:score\\s*(?:\\+=\\s*1\\b|\\+\\+|=\\s*score\\s*\\+\\s*1\\b)|\\+\\+\\s*score))",
@@ -74,24 +74,24 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.4.7 Lab: Score a gap\". The task they were given: Pipes already arrive, slide left and are cleaned up, and every pipe starts with passed set to false. In draw(), loop over the pipes; a pipe has been passed when its x is less than the bird's x and it has not been counted yet (!p.passed). Inside that test, add 1 to score and set that pipe's passed to true, so each pipe is counted once. You cannot run their code: read it and judge what it WOULD do when the sketch runs. The starter holds bird.x at 100 on every frame and the pipes move left, so a pipe's x drops below the bird's x once the bird is past it. draw() runs every frame, so a test with no flag stays true on every frame after the bird passes and the score races. A for...of loop, an index loop (pipes[i] in place of p) and pipes.forEach(...) all visit every pipe. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. The starter's backwards loop that deletes old pipes compares nothing with the bird; it counts for the first criterion only if the student puts the passing test inside it. A single flag shared by all the pipes (on the bird, or one global) counts only the first pipe ever. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.12.2 Lab: Score a gap\". The task they were given: Pipes already arrive, slide left and are cleaned up, and every pipe starts with passed set to false. In draw(), loop over the pipes; a pipe has been passed when its x is less than the bird's x and it has not been counted yet (!p.passed). Inside that test, add 1 to score and set that pipe's passed to true, so each pipe is counted once. You cannot run their code: read it and judge what it WOULD do when the sketch runs. The starter holds bird.x at 100 on every frame and the pipes move left, so a pipe's x drops below the bird's x once the bird is past it. draw() runs every frame, so a test with no flag stays true on every frame after the bird passes and the score races. A for...of loop, an index loop (pipes[i] in place of p) and pipes.forEach(...) all visit every pipe. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. The starter's backwards loop that deletes old pipes compares nothing with the bird; it counts for the first criterion only if the student puts the passing test inside it. A single flag shared by all the pipes (on the bird, or one global) counts only the first pipe ever. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
     "rubric": [
       {
         "id": "r1",
         "title": "Every pipe is checked",
-        "description": "A loop that visits each pipe in pipes (for...of, an index loop, or forEach) and compares that pipe's position with the bird inside it. Adding the test to the existing delete loop is fine. Missing: no loop compares anything with the bird. Help: 5.3.8 (Lab: Three bumpers, three values)",
+        "description": "A loop that visits each pipe in pipes (for...of, an index loop, or forEach) and compares that pipe's position with the bird inside it. Adding the test to the existing delete loop is fine. Missing: no loop compares anything with the bird. Help: 5.4.5 (Lab: Three bumpers, three values)",
         "points": 1
       },
       {
         "id": "r2",
         "title": "A pipe is passed when it is behind the bird",
-        "description": "One test (an && or an if inside an if) asks both that the pipe's x is less than the bird's x (bird.x > p.x, <=, or the pipe's x plus some width also count; so does the number 100, since the starter holds the bird at x = 100) and that this pipe has not been counted yet (!p.passed, p.passed === false, or a flag of the student's own on the pipe). Partial: only one of the two halves, or a flag that is not kept per pipe. Help: 5.3.5 (Reading: A collision is not an event)",
+        "description": "One test (an && or an if inside an if) asks both that the pipe's x is less than the bird's x (bird.x > p.x, <=, or the pipe's x plus some width also count; so does the number 100, since the starter holds the bird at x = 100) and that this pipe has not been counted yet (!p.passed, p.passed === false, or a flag of the student's own on the pipe). Partial: only one of the two halves, or a flag that is not kept per pipe. Help: 5.4.1 (Reading: A collision is not an event)",
         "points": 1
       },
       {
         "id": "r3",
         "title": "Each pipe is counted once",
-        "description": "Inside the test that reads the pipe's flag, the score goes up by one (score += 1, score++ or score = score + 1) and the same pipe's flag is set to true, in either order. Missing: the score goes up but the flag is never set (the score races), or the two happen in different places. Help: 5.3.5 (Reading: A collision is not an event)",
+        "description": "Inside the test that reads the pipe's flag, the score goes up by one (score += 1, score++ or score = score + 1) and the same pipe's flag is set to true, in either order. Missing: the score goes up but the flag is never set (the score races), or the two happen in different places. Help: 5.4.1 (Reading: A collision is not an event)",
         "points": 1
       }
     ]

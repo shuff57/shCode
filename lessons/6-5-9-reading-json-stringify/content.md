@@ -1,6 +1,6 @@
 ## JSON.stringify: packing objects into strings
 
-**Read before the 6.5.10 parsing lesson.** About 5 minutes.
+**Read before the 6.10.10 parsing lesson.** About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -8,7 +8,7 @@ By the end of this reading you should be able to answer:
 - Why does this unit pack an object with it before calling `storeItem`?
 - What does the resulting string look like?
 
-You already know `storeItem('key', value)`, and from 6.5.6 that it writes a value down as JSON so a number comes back a number. It would take a whole object the same way. This unit still packs the object into JSON text yourself, with `JSON.stringify`, for two reasons: you can see exactly what goes into the save slot, and the same code works anywhere that stores text only, like the browser's `localStorage` from 3.8.15. `JSON.stringify` is the tool every JavaScript program uses for that job.
+You already know `storeItem('key', value)`, and from 6.10.6 that it writes a value down as JSON so a number comes back a number. It would take a whole object the same way. This unit still packs the object into JSON text yourself, with `JSON.stringify`, for two reasons: you can see exactly what goes into the save slot, and the same code works anywhere that stores text only, like the browser's `localStorage` from 3.8.15. `JSON.stringify` is the tool every JavaScript program uses for that job.
 
 **What you'll learn from it:**
 
@@ -49,7 +49,7 @@ function draw() {
 
 Notice the JSON string has double quotes around every key name. That's how JSON always looks: keys and strings get double quotes, numbers don't.
 
-**The rule this unit follows:** pack with `JSON.stringify` on the way in, and unpack with `JSON.parse` on the way out (the next reading, 6.5.10). `storeItem` saves the packed text, and `getItem` hands the same text back.
+**The rule this unit follows:** pack with `JSON.stringify` on the way in, and unpack with `JSON.parse` on the way out (the next reading, 6.10.10). `storeItem` saves the packed text, and `getItem` hands the same text back.
 
 ---
 

@@ -1,8 +1,8 @@
 ## Waves with a pause
 
-**Read before `5.10.7 Lab: Waves`.** About 8 minutes.
+**Read before `7.8.2 Lab: Waves`.** About 8 minutes.
 
-So far Defender's enemies arrive on a beat, one every 60 frames, whether or not the last ones are gone. A wave game works differently: a group arrives together, and the next group comes only when the field is clear, after a short breather. 5.8.17 built that check (`enemies.length === 0` before a new group). This example adds the breather.
+So far Defender's enemies arrive on a beat, one every 60 frames, whether or not the last ones are gone. A wave game works differently: a group arrives together, and the next group comes only when the field is clear, after a short breather. 7.3.17 built that check (`enemies.length === 0` before a new group). This example adds the breather.
 
 Watch the three numbers at the top.
 
@@ -29,7 +29,7 @@ function spawnWave() {
 
 function nextWave() {
   if (enemies.length > 0) return;   // the field is not clear yet
-  wavePause -= 1;                   // the same countdown as the cooldown in 5.9
+  wavePause -= 1;                   // the same countdown as the cooldown in 7.4
   if (wavePause <= 0) {
     spawnWave();
     wavePause = 90;
@@ -69,6 +69,6 @@ function drawTop() {
 
 **Try this:**
 
-1. Delete the line `if (enemies.length > 0) return;`. Now a new wave comes every 90 frames whether or not the field is clear, and `on the field` keeps climbing: 5.8.17's conveyor belt again.
+1. Delete the line `if (enemies.length > 0) return;`. Now a new wave comes every 90 frames whether or not the field is clear, and `on the field` keeps climbing: 7.3.17's conveyor belt again.
 2. Put the line back and change `wave + 2` to `wave * 2`. The waves grow twice as fast: 2, 4, 6.
 3. Change `wavePause = 90;` to `wavePause = 10;`. The next wave comes almost the moment the field is clear.

@@ -1,11 +1,11 @@
 {
   "id": "6-1-11-a13-1-asteroid-field",
-  "title": "6.2.6 Asteroid Field",
+  "title": "6.7.6 Asteroid Field",
   "description": "Combine Groups, overlap detection, and safe despawn into a playable asteroid scene. WASD steers the ship; an overlap with any asteroid ends the game.",
   "type": "assignment",
   "estimateMins": 60,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.2 Overlaps and Collisions",
+  "unit": "6.7 Overlaps and Collisions",
   "preview": "moshion",
   "week": 15,
   "slos": [
@@ -18,7 +18,7 @@
       "title": "Set up the scene",
       "instructions": "Create a canvas, a player ship sprite, and an asteroids Group. Pick any visual style.",
       "hints": [
-        "The Groups docs chapter (right drawer → Docs tab) covers Group creation and defaults."
+        "The Groups docs chapter (right drawer \u2192 Docs tab) covers Group creation and defaults."
       ]
     },
     {
@@ -34,7 +34,7 @@
       "title": "Spawn at least 10 asteroids with varied velocity",
       "instructions": "Either spawn a batch in setup() with a for loop, or drip-spawn in draw() using frameCount % N === 0. Each asteroid gets its own vel.x / vel.y.",
       "hints": [
-        "Math.random() * range gives you variety. The Apple Catcher example (6.2.2) shows the timed-spawn idiom."
+        "Math.random() * range gives you variety. The Apple Catcher example (6.7.2) shows the timed-spawn idiom."
       ]
     },
     {
@@ -50,7 +50,7 @@
       "title": "Safe despawn for off-screen asteroids",
       "instructions": "If asteroids leave the canvas, remove them. Iterate backwards or iterate a copy ([...asteroids]) to avoid the iterate-then-remove bug.",
       "hints": [
-        "The Safe Despawn worked example (6.2.5) demonstrates both safe patterns."
+        "The Safe Despawn worked example (6.7.5) demonstrates both safe patterns."
       ]
     }
   ],
@@ -58,7 +58,7 @@
     {
       "id": "r1",
       "title": "Asteroid Group exists",
-      "description": "Create at least one Group with new Group(). Help: 6.1.3 (moSHion docs: Groups)",
+      "description": "Create at least one Group with new Group(). Help: 6.6.3 (moSHion docs: Groups)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Group\\s*\\(",
@@ -89,7 +89,7 @@
     {
       "id": "r4",
       "title": "Overlap detection",
-      "description": "Use .overlaps() to detect a hit. Help: 6.2.1 (overlaps() boolean vs callback)",
+      "description": "Use .overlaps() to detect a hit. Help: 6.7.1 (overlaps() boolean vs callback)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.overlaps\\s*\\(",
@@ -99,7 +99,7 @@
     {
       "id": "r5",
       "title": "Safe despawn loop",
-      "description": "Iterate backwards (i = length - 1) OR iterate a copy ([...group], Array.from, .slice()) OR use group.cull(). Help: 6.1.4 (Iterating a Group)",
+      "description": "Iterate backwards (i = length - 1) OR iterate a copy ([...group], Array.from, .slice()) OR use group.cull(). Help: 6.6.4 (Iterating a Group)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?:for\\s*\\(\\s*let\\s+\\w+\\s*=[^;]*\\.length\\s*-\\s*1)|(?:for\\s*\\(\\s*(?:(?:let|const|var)\\s+)?\\w+\\s+of\\s+\\[\\.\\.\\.\\w+\\])|(?:\\[\\.\\.\\.\\w+\\]\\.(forEach|map|some|filter))|\\[\\.\\.\\.\\w+\\]|Array\\.from\\s*\\(|\\.slice\\s*\\(\\s*\\)|\\.cull\\s*\\(",

@@ -1,11 +1,11 @@
 {
   "id": "6-6-5-example-switch-three-cases",
-  "title": "6.6.5 Worked Example: switch with Three Cases",
+  "title": "6.11.5 Worked Example: switch with Three Cases",
   "description": "A plain switch with three cases that each draw different text. Not a game yet, just getting comfortable with the syntax.",
   "type": "lesson",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.6 Game State Machines",
+  "unit": "6.11 Game State Machines",
   "preview": "example",
   "week": 17,
   "slos": [

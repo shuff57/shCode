@@ -1,4 +1,4 @@
-// 6.10.13 Challenges: Make it yours (reference solution: all three challenges).
+// 7.15.3 Challenges: Make it yours (reference solution: all three challenges).
 // My rules: key 3 plays with one life, the top row takes two hits, and a second wall
 // comes after the first. Without them there is one wall and every brick breaks at once.
 
@@ -150,7 +150,7 @@ function drawBricks() {
   }
 }
 
-// Your hitAt from 6.9.11: when a brick is at pixel (x, y), take it out and say true.
+// Your hitAt from 6.14.11: when a brick is at pixel (x, y), take it out and say true.
 function hitAt(x, y) {
   const c = floor(x / BW);
   const r = floor((y - TOP) / BH);

@@ -1,4 +1,4 @@
-// 6.9.11 Lab: A wall of bricks (reference solution: Brick wall, final).
+// 6.14.11 Lab: A wall of bricks (reference solution: Brick wall, final).
 
 const BRICK_COLS = 8;
 const BRICK_ROWS = 5;

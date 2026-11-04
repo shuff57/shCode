@@ -145,6 +145,11 @@ Option C pays to throw away Flappy for no coverage that A cannot get.
 4. Pinball+ before the 5.3.11 playtest (moves 5.3.11-14 displayed numbers) or appended after 5.3.14?
 5. Retitle Defender C's prerequisite for the gap, or move the Part B reflection forward?
 
+**Answered 2026-11-04:** moot under the adopted plan (`DEEPEN-GAMES.md` §10): Defender A/B
+stay behind the classes, so no gap opens. If this option (A or C) is ever revived, retitle
+C's prerequisite to "after 5.8 Inside a Class, your Part B game" and leave the Part B
+reflection where it is.
+
 ## 4. What each option does to students, due dates and locks
 
 From CLAUDE.md: progress and drafts key on the folder name; due dates, open dates and solution releases key on

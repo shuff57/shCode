@@ -1,0 +1,15 @@
+{
+  "moduleId": "7.6",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
+  "lessons": [
+    {
+      "id": "defender-many-enemies",
+      "title": "Many enemies",
+      "objective": "Keep many enemies in parallel arrays.",
+      "screens": [
+        "5-10-defender-1-reading-many-enemies-parallel-arrays",
+        "5-10-defender-2-lab-a-field-of-enemies"
+      ]
+    }
+  ]
+}

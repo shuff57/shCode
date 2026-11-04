@@ -1,4 +1,4 @@
-// 5.8.12 Lab: Write hit(other).
+// 7.3.12 Lab: Write hit(other).
 
 class Enemy {
   constructor(x, y) {

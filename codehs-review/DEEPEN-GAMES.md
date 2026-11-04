@@ -42,6 +42,13 @@ and 5.9-5.10 title, labs 5.3.8, 5.4.8 and 5.5.4, the 5.3.11 and 5.5.9 closes, th
    lists and the untouched starter become REJECT cases.
 7. **Closes.** Plans and playtests are AI-graded, 0 points, and copy the very-generous criterion wording of 5.3.11
    and 5.5.1/5.5.9 word for word apart from the game's name and the lessons cited (section 5).
+8. **Name the shape, never the starter's comment.** "In `setup()`, where the STEP 1 comment is" stops being true as
+   soon as a student carries their own work forward (`CARRY-FORWARD-SPEC.md`), so say "in `setup()`, below each
+   bumper's `worth` line". Where a name may reasonably differ, one sentence covers it: "if you brought your 5.3.14
+   work forward, your bumpers may be called something else."
+9. **Each day-sized group opens with a sub-build when the mechanic can stand alone.** One 10-12 minute lab on a
+   blank canvas, its own starter, cards that name the mechanic and not the game; the apply lab that follows starts
+   from the game in progress. `SUB-BUILDS.md` lists which groups get one and what it builds.
 
 ---
 
@@ -234,7 +241,29 @@ change the collider (no).
 
 ---
 
-## 4. The new games: 5.12 Mini Golf, 5.13 Cannon, 5.14 Jumper
+## 4. The new games: 5.12 Pocket, 5.13 Sling, 5.14 Climb
+
+**Themes decided 2026-11-04. The tables below still carry the old CodeHS-shaped names and folder prefixes; they are
+rewritten in phase 0, before any of these lessons is built.**
+
+- **5.12 Mini Golf -> Pocket**, an eight-ball pool table. Same mechanics, same 14 lessons, same rows (aim, pull-back
+  power, `.drag` and stop, pocket as a pass-through target, `new Walls()` rails, shots against par).
+- **5.13 Cannon -> Sling**, a catapult siege. **Angry Birds is the reference**: a few shots, an arc, a wall of blocks
+  that comes down. The block change is real: blocks are bodies (`mass`, `bounciness`, no `rotationLock`), so the wall
+  topples, which is the payoff for 5.3.18. The arm turns to the aim with `rotateTo`, so the cannon's lesson survives.
+  Aim and pull-back are not re-taught; 5.12 owns them.
+- **5.14 Jumper -> Climb**, an endless vertical climber. **Doodle Jump is the reference**: platforms spawn above and
+  recycle below (Flappy's loop; moSHion has no `camera.follow`), the score is height, falling ends the round, and there
+  is no door. The hunter is **our addition**, because Doodle Jump has no chase and row 3 would otherwise lose its home.
+- **IP rule: clone the mechanic, never the expression.** No borrowed title, character, logo, sound or level layout on a
+  student page; the reference is named in the module doc only. Our own pixel art throughout.
+
+**Numbering after the 2026-11-04 repartition.** Units are now 5 functional games basics, 6 functional games advanced,
+7 objects and classes (old 5.6-5.11 are 7.1-7.6; Arcade Cabinet is 8.1; Solid Shapes is 9.1). Unit 5 ends at 5.5, so
+**Pocket is 5.6**. Sling and Climb are **provisionally 6.12 and 6.13**; that is a placeholder, not a decision: when each
+is built it is placed where the concepts it needs are taught, and `scripts/repartition-units.mjs` moves it in one
+command. The lesson tables below still say 5.12-5.14 and are rewritten in phase 0.
+
 
 Each follows the five-step close (PLACEMENT #4): an AI-graded plan, build steps with the concept injected where it is
 needed, one **Debugging:** screen (the 5.10.8 kind) or one pseudocode plan before the hardest step (the 5.10.3 kind), an
@@ -538,6 +567,10 @@ starter not), `check-solution-leak`, `test-grader-tolerance`, and the moSHion ha
 with no input and with the scripted input the lab expects (a run error locks Submit). Stop the dev server before
 `npm test` (memory note).
 
+**Each unit also ends with a "build your own" capstone**, one lesson, 0 points, checked only against its own unit:
+5.7 after Pocket, 6.14 after Climb, 7.7 after Defender. They ship inside the unit's last batch and are specified in
+`BUILD-YOUR-OWN.md`; 8.1 stays the graded, eleven-item synthesis.
+
 ---
 
 ## 9. Risks
@@ -607,3 +640,43 @@ with no input and with the scripted input the lab expects (a run error locks Sub
    reflow the weeks once, at the repartition.*
 5. **A saved best score in Chapter 5?** PLACEMENT puts saving in 6.5 (6.5.3), so this spec defers it. *Recommended:
    defer; no `storeItem()` in Chapter 5.*
+
+### Answered 2026-11-04: the Defender questions
+
+Asked because Defender Part C is the OOP half of a capstone whose Parts A and B are
+procedural, so it looks like it belongs with the classes' own unit and with chapter 6.
+
+**Defender stays at 5.9-5.11, immediately after the classes block. It does not move to
+chapter 6, and the capstone is not split.** Reasons, in the order they decide it:
+
+1. **Chapter 6 has no OOP module to move it into.** 6.1-6.11 are groups, collisions,
+   physics, camera, saves, state machines, input, joints, grids, Breakout and sound. The
+   object block is 5.6-5.8, and 5.11's own post-requisite is "ready for 6.1, where a
+   `Group` does the list-keeping". Moving C past 6.1 would mean rewriting it to use groups,
+   not moving it.
+2. **Parts A and B are not OOP** (verified: no `class`, `this.` or `Group` in any `5-9-*`
+   or `5-10-*` file), so moving "Defender" moves a procedural game into the OOP unit. Move
+   only C and you split one capstone across two units; C's starter is B's final.
+3. **The refactor is the lesson.** Part C is "your own working game, cleaned up with
+   classes, same numbers, same behaviour". That argument needs the student's own A and B
+   directly behind it, which is where they already are.
+
+The only place this is genuinely open is the **unit-level repartition** (unit 5 functional
+/ unit 6 OOP use / unit 7 writing classes), which is not started. If that ever makes an
+"OOP use" unit, Defender's three parts are decided together there, by title and citation,
+not by a one-module move now.
+
+**Owner question 3 (firing arrives first in Cannon): change nothing in Defender now.**
+Checked, not assumed: 5.9.2, 5.9.5 and 5.10.4 carry no "this is the first time" claim and
+each teaches its own shape while citing 5.3.5 and 5.4.5, so a student who met Cannon first
+reads them as repetition, never as a lie. The "recap that cites 5.13" rewrite is therefore
+optional polish at the repartition, to be done only if a lens walk says the repetition
+reads as wasted time. It must not be done before 5.13 exists, because a Help pointer may
+only cite a built lesson.
+
+**`GAMES-FOR-BASICS` question 5 (retitle Part C's prerequisite for the gap, or move the
+Part B reflection forward): moot under this plan.** The gap only opens if Defender A/B move
+in front of the classes (Option A or C there), which they do not. Keep it dormant: if that
+option is ever revived, retitle C's prerequisite to "after 5.8 Inside a Class, your Part B
+game" and **leave the Part B reflection where it is**, because it reflects on code the
+student wrote just before it.

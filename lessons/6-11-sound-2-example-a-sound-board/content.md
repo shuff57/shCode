@@ -1,6 +1,6 @@
 ## A sound board
 
-**Read before `6.11.3 Lab: A sound on an event`.** About 10 minutes.
+**Read before `6.15.3 Lab: A sound on an event`.** About 10 minutes.
 
 Everything from the last reading in one sketch: one chime at four speeds, and a tune you can start and stop. Press Run, then click the canvas: that click gives the sketch your keys, and it is also what lets the browser make sound.
 
@@ -41,7 +41,7 @@ function drawTop() {
 }
 ```
 
-**What you'll see:** five lines of words: two that name the keys, then three that report on the sounds. `chime loaded` (the `.loaded` from 6.11.1) turns `true` a moment after Run, once the file has arrived. Press 1, 2, 3 and 4: the same chime four times, from low and slow to high and quick. Press T: `tune playing: true`, and the tune loops under everything until you press X.
+**What you'll see:** five lines of words: two that name the keys, then three that report on the sounds. `chime loaded` (the `.loaded` from 6.15.1) turns `true` a moment after Run, once the file has arrived. Press 1, 2, 3 and 4: the same chime four times, from low and slow to high and quick. Press T: `tune playing: true`, and the tune loops under everything until you press X.
 
 **Try this:**
 
@@ -53,4 +53,4 @@ function drawTop() {
 
 **What each Try found.** Try 1: `rate` gives you many sounds from one file. Try 2: a sound for a key goes under `kb.presses`, never `kb.pressing`. Try 3: `play()` adds a copy each time; `loop()` keeps one. Try 4: `loop()` waits for the file, and the browser waits for the player. Try 5: the mixer saves a sound by name, and `loadSound('zap')` finds it without a path.
 
-The labs start next: 6.11.3 adds a chime and a thud to a small game, each played where its event happens once.
+The labs start next: 6.15.3 adds a chime and a thud to a small game, each played where its event happens once.

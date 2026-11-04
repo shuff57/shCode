@@ -39,6 +39,8 @@ import GradeReportView from './GradeReport';
 import TeacherPushBanner from './TeacherPushBanner';
 import { useCloudWorkspace } from '../lib/lesson-sync';
 import { addLocalSnapshot } from '../lib/local-history';
+import CrossDeviceSyncBanner from './CrossDeviceSyncBanner';
+import CarryForwardBanner from './CarryForwardBanner';
 import DocsDrawer from './DocsDrawer';
 import TextureEditor from './TextureEditor';
 import SoundMixer from './SoundMixer';
@@ -1120,6 +1122,7 @@ export default function LessonWorkspace({
   return (
     <>
       <TeacherPushBanner />
+      <CarryForwardBanner lesson={lesson} />
       <TabbedRightDrawer
         storageKey="shCode:drawer"
         tabs={[

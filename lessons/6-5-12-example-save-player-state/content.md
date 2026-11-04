@@ -1,4 +1,4 @@
-# 6.5.12 Worked Example: Save Full Player State
+# 6.10.12 Worked Example: Save Full Player State
 
 Teacher-led walkthrough for saving a complete game state with `storeItem` + `JSON.stringify`.
 
@@ -212,6 +212,6 @@ Press S. The green "Game saved!" appears for about 2 seconds (120 frames at 60 f
 ## Key takeaways
 
 - The save object is a plain JS object with keys for everything worth remembering.
-- `JSON.stringify` packs the object into JSON text before `storeItem` saves it, the rule this unit follows from 6.5.9, so you can see exactly what is in the slot.
+- `JSON.stringify` packs the object into JSON text before `storeItem` saves it, the rule this unit follows from 6.10.9, so you can see exactly what is in the slot.
 - Save on a deliberate trigger (key press), not every frame: that would hammer storage.
 - A timed confirmation message gives the player feedback without cluttering the screen.

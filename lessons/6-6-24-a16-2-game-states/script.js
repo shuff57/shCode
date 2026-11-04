@@ -1,4 +1,4 @@
-// 6.6.26 A16.2 Game States: State machine with persistence
+// 6.11.26 A16.2 Game States: State machine with persistence
 
 let state;
 

@@ -1,4 +1,4 @@
-// 5.8.9 Lab: Give the class its own isAlive().
+// 7.3.9 Lab: Give the class its own isAlive().
 
 class Enemy {
   constructor(x, y) {

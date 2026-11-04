@@ -1,4 +1,4 @@
-// 6.9.7 Lab: Coins and the goal (reference solution).
+// 6.14.7 Lab: Coins and the goal (reference solution).
 
 const TILE = 40;   // one tile is 40 by 40 pixels
 

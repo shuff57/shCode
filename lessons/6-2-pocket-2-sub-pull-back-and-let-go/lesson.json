@@ -1,0 +1,96 @@
+{
+  "id": "6-2-pocket-2-sub-pull-back-and-let-go",
+  "title": "6.2.2 Sub-build: Pull back and let go",
+  "description": "One ball, one pull, one release. Set direction and speed at the moment the button comes up.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.2 Pocket: which way, how fast",
+  "preview": "moshion",
+  "week": 13,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The ball sits still. Letting go of the button does nothing."
+    },
+    {
+      "id": "s2",
+      "title": "Set the shot on release",
+      "instructions": "Inside `if (mouse.released())`, set the direction away from the pointer and the speed from the pull: `cue.direction = cue.angleTo(mouse.x, mouse.y) + 180;` and `cue.speed = min(dist(...), 120) / 12;`.",
+      "hints": [
+        "Set direction first, then speed: speed uses the direction.",
+        "Without the +180 the ball goes toward the pointer, which is a design choice, not an error."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Feel the power",
+      "instructions": "Pull a little and let go, then pull a lot: the second shot should be faster, but not endless.",
+      "hints": [
+        "If every shot is the same, the speed is a fixed number."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The shot is on release",
+      "description": "The direction/speed are set inside a mouse.released() test. Help: 6.1.2 (Reading: The pointer: press, hold, let go)",
+      "hint": "if (mouse.released()) { ... }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "mouse\\s*\\.\\s*released\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "Power comes from the pull, capped",
+      "description": "The speed uses dist/angleTo and is capped with min or constrain. Help: 6.2.1 (Reading: Which way, how fast)",
+      "hint": "cue.speed = min(dist(cue.x, cue.y, mouse.x, mouse.y), 120) / 12;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bmin\\s*\\(|\\bconstrain\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: Pull back and let go\". The task: set the ball's direction away from the pointer and its speed from the pull distance, capped, inside a mouse.released() test. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "On release",
+        "description": "The shot is set when the button comes up, not while it is down.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Direction and speed",
+        "description": "Both are set; direction uses angleTo and speed uses the distance.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A ceiling",
+        "description": "min/constrain caps the power.",
+        "points": 1
+      }
+    ]
+  }
+}

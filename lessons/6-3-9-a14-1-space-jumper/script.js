@@ -1,4 +1,4 @@
-// 6.3.9 A14.1 Space Jumper
+// 6.8.9 A14.1 Space Jumper
 // Open the Quest tab for the graded requirements; open the Docs tab for the moSHion API.
 
 let player, ground, goal;

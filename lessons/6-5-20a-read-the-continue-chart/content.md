@@ -11,7 +11,7 @@ Nothing to draw here. Read this one and answer the questions: reading charts is 
 
 This is the title screen deciding whether to offer **Continue**.
 
-```flow readonly caption="Figure 6.5.1: the title screen's save check. Two players, two different paths through the same shapes."
+```flow readonly caption="Figure 6.10.1: the title screen's save check. Two players, two different paths through the same shapes."
 flowchart TD
   A([Title screen loads]) --> B[read "save" from storage]
   B --> C{did we get anything back}

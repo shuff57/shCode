@@ -1,11 +1,11 @@
 {
   "id": "6-4-18-a15-1-platformer",
-  "title": "6.4.18 Side-Scrolling Platformer",
+  "title": "6.9.18 Side-Scrolling Platformer",
   "description": "Combine animated sprites, a camera that follows the player, three or more platforms, working jump mechanics, and a visible end goal into a playable side-scroller. Auto-graded.",
   "type": "assignment",
   "estimateMins": 90,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.4 Animated Sprites and Camera",
+  "unit": "6.9 Animated Sprites and Camera",
   "preview": "moshion",
   "week": 16,
   "slos": [
@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Create the player with an initial visual",
-      "instructions": "In setup(), create the player sprite. Give it an initial visual: either addAni('idle', ...) or sprite.image = '🧍'.",
+      "instructions": "In setup(), create the player sprite. Give it an initial visual: either addAni('idle', ...) or sprite.image = '\ud83e\uddcd'.",
       "hints": [
         "Open the moSHion docs drawer and find the Visual / image section. Single emoji strings work as zero-asset placeholders."
       ]
@@ -65,7 +65,7 @@
       "title": "Camera follows the player",
       "instructions": "In draw(), assign camera.x from player.x every frame so the canvas tracks the player. The hard follow line is fine; lerp smoothing is a stretch.",
       "hints": [
-        "See the camera examples 6.4.16 and 6.4.17 if you're stuck."
+        "See the camera examples 6.9.16 and 6.9.17 if you're stuck."
       ]
     },
     {
@@ -81,7 +81,7 @@
     {
       "id": "r1",
       "title": "Two or more animation states",
-      "description": "Either two addAni registrations, OR two assignments to sprite.image with different values. Help: 6.4.3 (moSHion docs: Animation)",
+      "description": "Either two addAni registrations, OR two assignments to sprite.image with different values. Help: 6.9.3 (moSHion docs: Animation)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.addAni\\s*\\([^)]+\\)[\\s\\S]*\\.addAni\\s*\\(|\\.(image|img)\\s*=\\s*[^;\\n]+[\\s\\S]*\\.(image|img)\\s*=",
@@ -91,7 +91,7 @@
     {
       "id": "r2",
       "title": "Camera follows the player",
-      "description": "Inside draw(), assign camera.x from a sprite's x (or use lerp with both). Help: 6.4.11 (moSHion docs: Camera)",
+      "description": "Inside draw(), assign camera.x from a sprite's x (or use lerp with both). Help: 6.9.11 (moSHion docs: Camera)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -112,7 +112,7 @@
     {
       "id": "r4",
       "title": "Working ground-gated jump",
-      "description": "Inside draw(), gate kb.presses(jump key) on .colliding(...) inside a single condition (e.g. `kb.presses('w') && player.colliding(allSprites)`) so the player can only jump when touching ground or a platform. Help: 6.3.6 (Colliding + Ground Detection)",
+      "description": "Inside draw(), gate kb.presses(jump key) on .colliding(...) inside a single condition (e.g. `kb.presses('w') && player.colliding(allSprites)`) so the player can only jump when touching ground or a platform. Help: 6.8.6 (Colliding + Ground Detection)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -123,7 +123,7 @@
     {
       "id": "r5",
       "title": "Goal detection + win message",
-      "description": "Inside draw(), call .overlaps(goal) and follow it with a text(...) call (within ~400 characters) so the win message is what the overlap triggers. Help: 6.2.3 (moSHion docs: Collisions + Overlaps)",
+      "description": "Inside draw(), call .overlaps(goal) and follow it with a text(...) call (within ~400 characters) so the win message is what the overlap triggers. Help: 6.7.3 (moSHion docs: Collisions + Overlaps)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

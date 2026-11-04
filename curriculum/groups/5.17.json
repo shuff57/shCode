@@ -1,0 +1,14 @@
+{
+  "moduleId": "5.17",
+  "source": "The unit 5 capstone. One 0-point project lesson checked against five capability cards.",
+  "lessons": [
+    {
+      "id": "build-your-own",
+      "title": "Build your own",
+      "objective": "Students design and build a small game of their own that uses the unit's mechanics and is not a rebuild of a game the course provided.",
+      "screens": [
+        "5-17-build-your-own"
+      ]
+    }
+  ]
+}

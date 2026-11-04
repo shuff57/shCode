@@ -1,6 +1,6 @@
 ## Smooth Follow with lerp
 
-**Read before attempting `6.4.17 Worked Example: Smooth Camera with lerp`.**
+**Read before attempting `6.9.17 Worked Example: Smooth Camera with lerp`.**
 
 **What you'll learn from it:**
 

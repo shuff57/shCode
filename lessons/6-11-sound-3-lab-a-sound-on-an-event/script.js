@@ -1,4 +1,4 @@
-// 6.11.3 Lab: A sound on an event.
+// 6.15.3 Lab: A sound on an event.
 // Star catch: the arrow keys move the basket. Catch the falling star.
 
 let basket, star;

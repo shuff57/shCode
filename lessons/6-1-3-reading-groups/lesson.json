@@ -1,11 +1,11 @@
 {
   "id": "6-1-3-reading-groups",
-  "title": "6.1.3 Reading: moSHion docs: Groups",
-  "description": "moshion docs chapter on Groups. Read before `6.1.5 Groups Sandbox`.",
+  "title": "6.6.3 Reading: moSHion docs: Groups",
+  "description": "moshion docs chapter on Groups. Read before `6.6.5 Groups Sandbox`.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.1 Groups and Overlaps",
+  "unit": "6.6 Groups",
   "preview": "reading",
   "week": 15,
   "slos": [

@@ -1,4 +1,4 @@
-// 5.8.18 Lab: Build a wave (reference solution).
+// 7.3.18 Lab: Build a wave (reference solution).
 
 class Enemy {
   static spawned = 0;

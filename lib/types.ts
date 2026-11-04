@@ -305,6 +305,11 @@ export interface Lesson {
    *  remembered, so Reset restores the pair's own starter rather than the first
    *  problem's. See lib/starter-variants.ts. */
   starterVariants?: StarterVariant[];
+  /** The folder id of the lesson whose saved work a student may bring into this
+   *  one — the previous lab in a game's chain. The strip offers it on open;
+   *  carrying writes a provenance commit. See lib/carry-forward.ts and
+   *  CARRY-FORWARD-SPEC.md. Absent on readings and on the first lab of a chain. */
+  carryFrom?: string;
   /** Flowchart assignment. See lib/diagram-types.ts. */
   diagram?: DiagramConfig;
   /** Multiple-choice module quiz. Graded in the browser — see components/QuizView.tsx. */

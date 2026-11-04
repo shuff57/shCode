@@ -1,11 +1,11 @@
 {
   "id": "6-10-breakout-11-playtest-and-reflect",
-  "title": "6.10.11 Playtest and reflect: Breakout",
+  "title": "7.15.1 Playtest and reflect: Breakout",
   "description": "Play your finished Breakout with the mouse and with the keys, try to break it, find one surprise, link it to your code and choose one change. AI-graded with hints.",
   "type": "assignment",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.10 Breakout",
+  "unit": "7.15 Breakout: playtest and extend",
   "preview": "assignment",
   "week": 18,
   "slos": [
@@ -20,7 +20,7 @@
     "rubricTitle": "Playtest Breakout: AI-graded rubric",
     "model": "glm-5.3-flash:cloud",
     "contextDocs": [],
-    "prompt": "Everything you need is in 6.10.1 (Plan: Break Breakout into parts) and 6.10.10 (Lab: Pick a mode): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished Breakout at least twice, once with the mouse and once with the arrow keys. Try to break it: catch the ball on the very ends of the paddle, slide the paddle into the ball from the side, let the ball fall out on purpose. Then answer:\n\n1. How many times did you play, and how did it go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which part of your code do you think that comes from?\n\n4. What is one rule or number you would change, and what would it do to the game?",
+    "prompt": "Everything you need is in 7.12.1 (Plan: Break Breakout into parts) and 7.14.2 (Lab: Pick a mode): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished Breakout at least twice, once with the mouse and once with the arrow keys. Try to break it: catch the ball on the very ends of the paddle, slide the paddle into the ball from the side, let the ball fall out on purpose. Then answer:\n\n1. How many times did you play, and how did it go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which part of your code do you think that comes from?\n\n4. What is one rule or number you would change, and what would it do to the game?",
     "rubric": [
       {
         "id": "played",

@@ -1,0 +1,97 @@
+{
+  "id": "5-5-pinball-sub-end-and-start",
+  "title": "5.5.2 Sub-build: End and start again",
+  "description": "A ball falls into a pit, the round ends after three seconds, and R starts it again. Build the smallest version of losing, before you put it into your table.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.5 Pinball: lose and start again",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it first",
+      "instructions": "The ball drops through the gap and keeps going. Nothing ends, and R does nothing."
+    },
+    {
+      "id": "s2",
+      "title": "End the round",
+      "instructions": "Add a variable that says whether the round is still running. When the ball is below the canvas, set it to false. In `draw()`, only move and draw the game while it is true, and show \"Game over\" when it is false.",
+      "hints": [
+        "`ball.y > height` is the usual pit test; `height` is the canvas height.",
+        "Do not delete the ball: the round ends, the game is still on screen."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Start again with R",
+      "instructions": "On `kb.presses('r')`, put the ball back where it started, stop it moving, reset the score and set the round back to running.",
+      "hints": [
+        "Put the restart in its own `if`, not inside the game-over branch, so it works from either state.",
+        "Set `ball.vel.x` and `ball.vel.y` to 0 as well as `ball.x` and `ball.y`, or it keeps its old speed."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A round can be over",
+      "description": "A variable (lost / gameOver / playing) is set when the ball falls below the canvas, and the game checks it before moving or drawing. Help: 5.5.1 (Reading: The state of the game)",
+      "hint": "if (ball.y > height) { playing = false; }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:ball|player|sprite)\\s*\\.\\s*y\\s*>\\s*(?:height|\\d+)[^;]{0,40};?[\\s\\S]{0,200}?\\b(?:playing|lost|gameOver|over)\\s*=\\s*false",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "R puts the round back",
+      "description": "R sets the ball back to its start and the game back to running. Help: 5.5.1 (Reading: The state of the game)",
+      "hint": "if (kb.presses('r')) { ball.x = 200; ball.y = 60; ball.vel.x = 0; ball.vel.y = 0; playing = true; }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "kb\\s*\\.\\s*presses?\\s*\\(\\s*['\"]r['\"]\\s*\\)[\\s\\S]{0,400}?\\b(?:playing|lost|gameOver|over)\\s*=\\s*true",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": false
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a short moSHion sketch for \"Sub-build: End and start again\". The task: end the round when the ball falls below the canvas (a flag), keep the game on screen and show Game over, and let R put the ball back at its start with no velocity and set the round running again. This is a sub-build: a small isolated program whose only job is this one mechanic, so judge the mechanic itself and not style. Accept any variable names, helper functions, arrow functions, ternaries and semicolons. A line that only exists in a comment or a string does not count. moSHion facts: colliding(b) is 0 while apart and counts frames while touching, so an if on it alone is true every frame of a touch; a stored \"last frame\" value makes it true once. .life = n counts down one per frame and deletes the sprite at 0. A sprite with collider 'none' is passed through and has its gravity off. loadSound(path) in setup() and sound.play() where the event happens; a browser will not play sound before the student's first click or key. Write short, plain notes for a 14-year-old, name the student's own line when something is missing, and never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "The round ends",
+        "description": "A flag is set when the ball leaves the bottom of the canvas, and the game stops moving or scoring when it is set.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "R restarts",
+        "description": "R resets the ball's position and velocity and sets the round back to running; the score is reset too.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Nothing disappears",
+        "description": "The ball and bumper stay on screen when the round ends; only the game stops.",
+        "points": 1
+      }
+    ]
+  }
+}

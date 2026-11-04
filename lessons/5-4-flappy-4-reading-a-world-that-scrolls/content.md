@@ -1,6 +1,6 @@
 ## A world that scrolls
 
-**Read before `5.4.6 Lab: Pipes that come and go`.** About 8 minutes.
+**Read before `5.11.3 Lab: Pipes that come and go`.** About 8 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -32,7 +32,7 @@ if (frameCount % 90 === 0) {
 }
 ```
 
-**Keep every pipe in an array.** There will be many pipes alive at once, so each one is added to an array when it is built, the way the bumpers were in 5.3.8. The array is how the game finds them again.
+**Keep every pipe in an array.** There will be many pipes alive at once, so each one is added to an array when it is built, the way the bumpers were in 5.4.5. The array is how the game finds them again.
 
 ```js
 pipes.push(makePipe());

@@ -1,11 +1,11 @@
 {
   "id": "8-1-10-lab-sketch-and-pull",
-  "title": "8.1.10 Lab: Sketch and Pull",
+  "title": "9.1.10 Lab: Sketch and Pull",
   "description": "Draw a flat rectangle, then pull it up into a solid 10 mm tall. Auto-graded.",
   "type": "assignment",
   "estimateMins": 10,
   "category": "Unit 3: reSHape: Solid Modelling",
-  "unit": "8.1 Solid Shapes",
+  "unit": "9.1 Solid Shapes",
   "preview": "reshape",
   "mode": "visual",
   "slos": [
