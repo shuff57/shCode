@@ -62,5 +62,6 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
-  }
+  },
+  "carryFrom": "6-9-grids-11-lab-a-wall-of-bricks"
 }

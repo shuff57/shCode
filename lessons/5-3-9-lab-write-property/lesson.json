@@ -73,5 +73,6 @@
         "points": 1
       }
     ]
-  }
+  },
+  "carryFrom": "5-3-8-lab-read-property"
 }

@@ -64,5 +64,6 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
-  }
+  },
+  "carryFrom": "6-11-sound-4-lab-music-volume-and-a-mute-key"
 }

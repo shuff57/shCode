@@ -104,5 +104,6 @@
         "points": 1
       }
     ]
-  }
+  },
+  "carryFrom": "5-5-snake-6-lab-grow-and-eat"
 }

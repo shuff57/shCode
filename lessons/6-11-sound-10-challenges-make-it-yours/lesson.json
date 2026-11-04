@@ -63,5 +63,6 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
-  }
+  },
+  "carryFrom": "6-11-sound-8-lab-a-settings-screen-that-remembers"
 }

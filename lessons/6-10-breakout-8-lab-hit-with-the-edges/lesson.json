@@ -64,5 +64,6 @@
     "totalPoints": 0,
     "passingScore": 0,
     "allowLateSubmit": true
-  }
+  },
+  "carryFrom": "6-10-breakout-6-lab-a-wall-from-text"
 }
