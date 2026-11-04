@@ -42,6 +42,10 @@ and 5.9-5.10 title, labs 5.3.8, 5.4.8 and 5.5.4, the 5.3.11 and 5.5.9 closes, th
    lists and the untouched starter become REJECT cases.
 7. **Closes.** Plans and playtests are AI-graded, 0 points, and copy the very-generous criterion wording of 5.3.11
    and 5.5.1/5.5.9 word for word apart from the game's name and the lessons cited (section 5).
+8. **Name the shape, never the starter's comment.** "In `setup()`, where the STEP 1 comment is" stops being true as
+   soon as a student carries their own work forward (`CARRY-FORWARD-SPEC.md`), so say "in `setup()`, below each
+   bumper's `worth` line". Where a name may reasonably differ, one sentence covers it: "if you brought your 5.3.14
+   work forward, your bumpers may be called something else."
 
 ---
 
@@ -607,3 +611,43 @@ with no input and with the scripted input the lab expects (a run error locks Sub
    reflow the weeks once, at the repartition.*
 5. **A saved best score in Chapter 5?** PLACEMENT puts saving in 6.5 (6.5.3), so this spec defers it. *Recommended:
    defer; no `storeItem()` in Chapter 5.*
+
+### Answered 2026-11-04: the Defender questions
+
+Asked because Defender Part C is the OOP half of a capstone whose Parts A and B are
+procedural, so it looks like it belongs with the classes' own unit and with chapter 6.
+
+**Defender stays at 5.9-5.11, immediately after the classes block. It does not move to
+chapter 6, and the capstone is not split.** Reasons, in the order they decide it:
+
+1. **Chapter 6 has no OOP module to move it into.** 6.1-6.11 are groups, collisions,
+   physics, camera, saves, state machines, input, joints, grids, Breakout and sound. The
+   object block is 5.6-5.8, and 5.11's own post-requisite is "ready for 6.1, where a
+   `Group` does the list-keeping". Moving C past 6.1 would mean rewriting it to use groups,
+   not moving it.
+2. **Parts A and B are not OOP** (verified: no `class`, `this.` or `Group` in any `5-9-*`
+   or `5-10-*` file), so moving "Defender" moves a procedural game into the OOP unit. Move
+   only C and you split one capstone across two units; C's starter is B's final.
+3. **The refactor is the lesson.** Part C is "your own working game, cleaned up with
+   classes, same numbers, same behaviour". That argument needs the student's own A and B
+   directly behind it, which is where they already are.
+
+The only place this is genuinely open is the **unit-level repartition** (unit 5 functional
+/ unit 6 OOP use / unit 7 writing classes), which is not started. If that ever makes an
+"OOP use" unit, Defender's three parts are decided together there, by title and citation,
+not by a one-module move now.
+
+**Owner question 3 (firing arrives first in Cannon): change nothing in Defender now.**
+Checked, not assumed: 5.9.2, 5.9.5 and 5.10.4 carry no "this is the first time" claim and
+each teaches its own shape while citing 5.3.5 and 5.4.5, so a student who met Cannon first
+reads them as repetition, never as a lie. The "recap that cites 5.13" rewrite is therefore
+optional polish at the repartition, to be done only if a lens walk says the repetition
+reads as wasted time. It must not be done before 5.13 exists, because a Help pointer may
+only cite a built lesson.
+
+**`GAMES-FOR-BASICS` question 5 (retitle Part C's prerequisite for the gap, or move the
+Part B reflection forward): moot under this plan.** The gap only opens if Defender A/B move
+in front of the classes (Option A or C there), which they do not. Keep it dormant: if that
+option is ever revived, retitle C's prerequisite to "after 5.8 Inside a Class, your Part B
+game" and **leave the Part B reflection where it is**, because it reflects on code the
+student wrote just before it.

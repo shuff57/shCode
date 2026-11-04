@@ -110,6 +110,23 @@ a bird with real art. Six lessons, extra files `curriculum/groups/5.4.json` and
 citing 5.3.18. Same loop as this batch: build, gates, three lens walks, one fix
 round, regenerate, release. Batch 3 is 5.4.18-5.4.20 plus 5.5.12-5.5.14.
 
+**Before batch 2: carry the student's work forward.** Today every lab re-seeds from
+its authored starter, and for most labs that starter is an *earlier lab's reference*
+(5.3.17's starter is 5.3.14's solution line for line, apart from a new header). The game carries forward; the student's game
+does not, so a 21-screen build asks them to rebuild their own file every week.
+`codehs-review/CARRY-FORWARD-SPEC.md` specifies the fix: an explicit `carryFrom` per
+lab plus a gate, an offer strip on open ("Bring my work forward"), and a provenance
+commit. It also forces an authoring rule (`DEEPEN-GAMES` §0 rule 8: name the shape,
+never the starter's `// STEP` comment) and a text-only fix to six shipped labs. One
+day of work. Authoring batch 2 before it lands would add six lessons that carrying
+later breaks.
+
+**Decisions taken 2026-11-04 (do not re-litigate).** Defender stays at 5.9-5.11 with
+the classes block — chapter 6 has no OOP module and Parts A/B are procedural; the
+"firing arrives first in Cannon" rewrite waits for the repartition and only if a lens
+says the repetition reads as wasted time; the Part B → Part C "gap" question is moot
+because A/B do not move. Reasoning is in `DEEPEN-GAMES.md` §10.
+
 **Left in the tree.** The three walk reports (untracked until this commit),
 `.gauntlet/occt-checks.json` carrying an uncommitted 2026-11-02 bump from an
 earlier gauntlet run, and `design/logo-marks/` untracked and not from this stretch.
