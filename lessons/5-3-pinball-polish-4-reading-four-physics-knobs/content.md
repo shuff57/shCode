@@ -97,7 +97,7 @@ function setup() {
   c = new Sprite(300, 50, 40);
   c.color = 'tomato';
   c.gravityScale = 0;
-  c.text = c.gravityScale;
+  c.text = '0';   // a plain 0 would show nothing (5.3.15)
 }
 
 function draw() {
@@ -190,12 +190,12 @@ function draw() {
 }
 ```
 
-**What you'll see:** the ball falls and stops halfway down, on nothing. Press D: a green outline appears around the ball, the ground, and a shelf in the middle that was there all along, painted `'#222'`, the same colour as the background. The ball is sitting on it. `!ball.debug` is "the opposite of what it is now", so each press of D flips debug on or off.
+**What you'll see:** the ball falls and stops halfway down, on nothing. Press D: a thin green ring appears on the edge of the ball, a green box round the ground, and a green box round a shelf in the middle that was there all along, painted `'#222'`, the same colour as the background. The ball is sitting on it. `!ball.debug` is "the opposite of what it is now", so each press of D flips debug on or off.
 
 **Try this:**
 
 1. In the mass sketch, change both 4s on the red ball to `0.25` (`heavy.mass = 0.25;` and its label, `heavy.text = 0.25;`) and hold the right arrow. Now the red ball is the light one and wins the race.
-2. In the gravity sketch, change `c.gravityScale = 0;` to `c.gravityScale = -0.2;`. A negative share pulls the other way: the red ball rises slowly and floats off the top.
+2. In the gravity sketch, change `c.gravityScale = 0;` to `c.gravityScale = -0.2;` and its label to `c.text = '-0.2';`. A negative share pulls the other way: the red ball rises slowly and floats off the top.
 3. In the box sketch, add `free.rotationLock = true;` under `free.text = 'free';`. Now neither box can tip, and both sit on their points.
 
 ---

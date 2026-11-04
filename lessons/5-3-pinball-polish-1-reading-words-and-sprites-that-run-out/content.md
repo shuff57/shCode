@@ -17,12 +17,14 @@ By the end of this reading you should be able to answer:
 box.text = 5;
 ```
 
-`.text` takes words in quotes (`'BONUS'`) or a number (`5`), and moSHion writes it in the middle of the sprite. The words move with the sprite, so you never work out where to draw them. Two more properties set how they look:
+`.text` takes words in quotes (`'BONUS'`) or a number (`5`), and moSHion writes it in the middle of the sprite. One catch: a plain `0` shows nothing at all, because moSHion reads 0 as "no words". To show a zero, write it in quotes: `box.text = '0';`. The words move with the sprite, so you never work out where to draw them. Two more properties set how they look:
 
 - `.textColor` is the colour of the words. It takes the same kind of colour as `.color`, such as `'black'`. It starts as `'white'`.
 - `.textSize` is how tall the letters are, in pixels, like `textSize()` in 5.1.21. It starts at `16`.
 
 The words always stay upright, even when the sprite turns.
+
+One more property changes how the whole sprite looks: `.opacity` runs from `1` (solid, where every sprite starts) down to `0` (invisible), and it fades the sprite's colour and its words together. `box.opacity = 0.5;` is half see-through. (A fourth number in `fill()` does nothing in moSHion, so `.opacity` is the way to fade a sprite.)
 
 **Try it:** a box that spins (the `rotationSpeed` from 5.1.22) wearing the number 5, and a gold ball wearing a black word.
 
@@ -104,4 +106,5 @@ function draw() {
 | **`.text`** | Words or a number written in the middle of a sprite. They move with it and stay upright. |
 | **`.textColor`** | The colour of a sprite's words. Starts as `'white'`. |
 | **`.textSize`** | How tall a sprite's letters are, in pixels. Starts at `16`. |
+| **`.opacity`** | How solid a sprite is, from `1` (solid) to `0` (invisible). Fades its colour and words together. |
 | **`.life`** | Frames left before moSHion deletes the sprite. `60` is about one second. |
