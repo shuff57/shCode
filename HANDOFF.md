@@ -189,6 +189,37 @@ groups and citations), `scripts/derive-carry-chain.mjs`, `scripts/check-carry-ch
 lib/store.ts action, components/CarryForwardBanner.tsx). The carry walk in a browser is
 still unverified.
 
+
+**Release 7 is live (2026-11-04).** `cs-3d` is `5ad92787` on origin and deployed; the site
+answers 200 and the manifest lists **896 lessons across 74 modules**. What shipped:
+
+- Unit 5 as day-modules with **11 sub-builds** (Pinball 5.3-5.9, Flappy 5.10-5.12, Snake
+  5.13-5.16) and the 5.17 **build-your-own** capstone.
+- **Pocket 6.1-6.5** (17 lessons, its own quiz and challenges).
+- Unit 6's concepts renumbered to 6.6-6.15; **Defender 7.4-7.11** (9 day-modules) and
+  **Breakout 7.12-7.15** moved into unit 7.
+- Arcade Cabinet is 8.1 and Solid Shapes is 9.1.
+
+**Locks.** 46 module rows cover 5.2-5.17, 6.1-6.15 and 7.1-7.15 at 2027-07-01 (5.1 was left
+as it was). The class sees everything locked until then, which is what the site shows.
+
+**Merge hazards worth remembering.** `cs-3d` had drifted from `codehs-inspiration` (lesson-sync:
+`lib/lesson-sync.ts`, migrations 0037/0038, 30 tests) and release 6 had cherry-picked the 5.3
+polish arc, so the merge conflicted on the same lessons. Resolution: our lesson tree won, the
+cs-3d features were kept, and three artefacts were repaired by hand — seven 5.3 polish
+`lesson.json` files came across with conflict markers, an old `5.3_pinball.md` was resurrected
+and had to be deleted, and `components/LessonWorkspace.tsx` imported `CrossDeviceSyncBanner`,
+which lesson-sync replaced, so that import is gone **on cs-3d only**. The `test` script is a
+union of both branches' chains.
+
+**Fixed by the release gates.** 16 lessons carried an AI rubric criterion whose id matched no
+requirement card (its verdict could never be shown); two debugging cards refused a cosmetic
+pair of parentheses; the Pocket quiz had `preview: 'assignment'` instead of `'quiz'`.
+
+**Still to build, unchanged:** Sling 6.16-6.21, Climb 6.22-6.27 (optional arc), 6.28 capstone,
+Breakout's OOP arc and the unit 7 capstone. Carry-forward is wired but its browser walk is still
+unverified, and `carryFrom` should be re-derived for the new games after they exist.
+
 **Left in the tree.** The three walk reports (untracked until this commit),
 `.gauntlet/occt-checks.json` carrying an uncommitted 2026-11-02 bump from an
 earlier gauntlet run, and `design/logo-marks/` untracked and not from this stretch.
