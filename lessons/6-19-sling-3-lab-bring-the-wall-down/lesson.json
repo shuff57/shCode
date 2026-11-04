@@ -1,0 +1,87 @@
+{
+  "id": "6-19-sling-3-lab-bring-the-wall-down",
+  "title": "6.19.3 Lab: Bring the wall down",
+  "description": "A wall of blocks, each with its own hit count. Knock them out one shot at a time.",
+  "type": "lesson",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.19 Sling: hits and a budget",
+  "preview": "moshion",
+  "week": 16,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The wall stands. Stones pass through it."
+    },
+    {
+      "id": "s2",
+      "title": "Add the hit loop",
+      "instructions": "Every shot against every block, one hit off the block, the shot removed on the frame it hits."
+    },
+    {
+      "id": "s3",
+      "title": "Clear the spent",
+      "instructions": "Remove a block at 0 from the screen and from `blocks`, in a backwards loop.",
+      "hints": [
+        "Show `blocks.length` to watch it fall.",
+        "A stone that keeps hitting the same block means the shot is not removed."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A hit takes one off",
+      "description": "The block's count is decremented under an overlap test. Help: 6.19.1 (Reading: Blocks that fall)",
+      "hint": "b.hits -= 1;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*hits\\s*(?:-=|--)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "The shot leaves",
+      "description": "The shot is deleted and spliced on the hit. Help: 6.19.1 (Reading: Blocks that fall)",
+      "hint": "shots[j].delete(); shots.splice(j, 1);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*delete\\s*\\(\\s*\\)[\\s\\S]{0,120}?\\.\\s*splice\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Bring the wall down\". The task: put a wall of blocks with per-block hit counts against the shots, remove the shot on the hit, and sweep spent blocks out of both places. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Per-block budget",
+        "description": "Each block has its own count.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "One hit per shot",
+        "description": "The shot leaves when it hits.",
+        "points": 1
+      }
+    ]
+  }
+}

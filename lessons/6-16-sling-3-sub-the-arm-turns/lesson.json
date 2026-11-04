@@ -1,0 +1,91 @@
+{
+  "id": "6-16-sling-3-sub-the-arm-turns",
+  "title": "6.16.3 Sub-build: The arm turns",
+  "description": "One bar, one pointer, one angle. Aim before there is a wall.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.16 Sling: plan and the arm",
+  "preview": "moshion",
+  "week": 16,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The bar sits flat. Moving the pointer does nothing."
+    },
+    {
+      "id": "s2",
+      "title": "Turn it toward the pointer",
+      "instructions": "In `draw()`, set `arm.rotation = arm.angleTo(mouse.x, mouse.y);`. The bar should point at the pointer like a hand on a clock.",
+      "hints": [
+        "`angleTo` returns degrees, the same unit `.rotation` uses.",
+        "A bar is drawn from its centre, so it rotates about the middle."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Keep it out of the ground",
+      "instructions": "Clamp the angle with `constrain(angle, -170, -10)` so the arm cannot point straight down.",
+      "hints": [
+        "Up is -90 on screen.",
+        "Without the clamp the arm points into the ground and the shot goes nowhere useful."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The arm follows the pointer",
+      "description": "The rotation comes from angleTo the pointer. Help: 6.16.2 (Reading: An arm that turns to the aim)",
+      "hint": "arm.rotation = arm.angleTo(mouse.x, mouse.y);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "rotation\\s*=\\s*[^;\\n]{0,60}angleTo\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "It stays out of the ground",
+      "description": "The angle is limited with constrain, min/max or an if. Help: 6.16.2 (Reading: An arm that turns to the aim)",
+      "hint": "constrain(arm.angleTo(mouse.x, mouse.y), -170, -10)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bconstrain\\s*\\(|\\bmin\\s*\\(|\\bmax\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: The arm turns\". The task: turn the arm toward the pointer every frame with angleTo and keep the angle within limits so it cannot point into the ground. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Follows the pointer",
+        "description": "rotation comes from angleTo(mouse).",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Limited",
+        "description": "A clamp keeps it above the ground.",
+        "points": 1
+      }
+    ]
+  }
+}

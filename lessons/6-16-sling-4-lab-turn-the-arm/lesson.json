@@ -1,0 +1,82 @@
+{
+  "id": "6-16-sling-4-lab-turn-the-arm",
+  "title": "6.16.4 Lab: Turn the arm",
+  "description": "A catapult on a base, aiming at the pointer. This is the first half of the game.",
+  "type": "lesson",
+  "estimateMins": 12,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.16 Sling: plan and the arm",
+  "preview": "moshion",
+  "week": 16,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The catapult sits on its base. The arm does not move."
+    },
+    {
+      "id": "s2",
+      "title": "Aim it",
+      "instructions": "Add the pointer tracking and the clamp from the sub-build. The arm should sweep after the pointer and stop before the ground.",
+      "hints": [
+        "Use `rotateTo(mouse.x, mouse.y, 4)` instead of setting rotation if you want a heavy swing.",
+        "Both work; the cards accept either."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The arm follows the pointer",
+      "description": "Rotation from angleTo, or rotateTo toward the pointer. Help: 6.16.2 (Reading: An arm that turns to the aim)",
+      "hint": "arm.rotateTo(mouse.x, mouse.y, 4);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "angleTo\\s*\\(|rotateTo\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "Limited",
+      "description": "A clamp or rotateTo keeps it out of the ground. Help: 6.16.2 (Reading: An arm that turns to the aim)",
+      "hint": "constrain(..., -170, -10)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bconstrain\\s*\\(|\\bmin\\s*\\(|\\bmax\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Turn the arm\". The task: aim the catapult arm at the pointer with angleTo or rotateTo, limited so it cannot point into the ground. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Aims at the pointer",
+        "description": "angleTo or rotateTo toward the mouse.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Limited",
+        "description": "Clamped above the ground.",
+        "points": 1
+      }
+    ]
+  }
+}

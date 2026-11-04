@@ -1,0 +1,16 @@
+{
+  "moduleId": "6.21",
+  "source": "Sling chain module, one day.",
+  "lessons": [
+    {
+      "id": "sling-playtest-and-extend",
+      "title": "playtest and extend",
+      "objective": "Play it, find one surprise, link it to a line, change one thing.",
+      "screens": [
+        "6-21-sling-1-playtest-and-reflect",
+        "6-21-sling-2-quiz-sling-check",
+        "6-21-sling-3-challenges-make-it-yours"
+      ]
+    }
+  ]
+}

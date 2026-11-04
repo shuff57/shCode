@@ -1,0 +1,90 @@
+{
+  "id": "6-19-sling-2-sub-hits-and-a-budget",
+  "title": "6.19.2 Sub-build: Hits and a budget",
+  "description": "One shot, one block, two hits. Take one off per shot and let the shot leave.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.19 Sling: hits and a budget",
+  "preview": "moshion",
+  "week": 16,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The stone passes through the block: nothing is tested."
+    },
+    {
+      "id": "s2",
+      "title": "One hit, one shot",
+      "instructions": "When a shot overlaps a block, take one from `block.hits`, then delete and splice the shot in the same branch.",
+      "hints": [
+        "`overlaps()` is true every frame while they touch; deleting the shot is what makes it count once.",
+        "`break` out of the block loop after a hit."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Remove a spent block",
+      "instructions": "When `block.hits` is 0 or less, delete the block and take it out of `blocks`.",
+      "hints": [
+        "Do not use `.life` for the count: it deletes the block when it reaches 0 frames, not hits."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A hit takes one off",
+      "description": "The block's own count is decremented under an overlap test. Help: 6.19.1 (Reading: Blocks that fall)",
+      "hint": "block.hits -= 1;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*hits\\s*(?:-=|--)|\\.\\s*hits\\s*=\\s*[^;\\n]{0,30}-",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "The shot leaves on the hit",
+      "description": "The shot is deleted and spliced in the same branch. Help: 6.19.1 (Reading: Blocks that fall)",
+      "hint": "shot.delete(); shots.splice(j, 1);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*delete\\s*\\(\\s*\\)[\\s\\S]{0,120}?\\.\\s*splice\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: Hits and a budget\". The task: test every shot against every block; on a hit take one from that block's own hit count and delete and splice the shot, then remove a block whose count reaches 0. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Per-block count",
+        "description": "The block's own number is decremented, not a global.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "One hit per shot",
+        "description": "The shot leaves in the same branch, so it cannot count twice.",
+        "points": 1
+      }
+    ]
+  }
+}

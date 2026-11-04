@@ -1,0 +1,19 @@
+{
+  "id": "6-19-sling-1-reading-blocks-and-a-budget",
+  "title": "6.19.1 Reading: Blocks that fall, and a hit budget",
+  "description": "A block keeps its own hit count; a shot leaves on the frame it hits, so it counts once.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.19 Sling: hits and a budget",
+  "preview": "reading",
+  "week": 16,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

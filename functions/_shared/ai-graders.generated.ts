@@ -9879,6 +9879,150 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "model": "glm-5.3-flash:cloud",
     "contextDocs": []
   },
+  "6-16-sling-3-sub-the-arm-turns": {
+    "lessonTitle": "6.16.3 Sub-build: The arm turns",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: The arm turns\". The task: turn the arm toward the pointer every frame with angleTo and keep the angle within limits so it cannot point into the ground. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Follows the pointer",
+        "description": "rotation comes from angleTo(mouse).",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Limited",
+        "description": "A clamp keeps it above the ground.",
+        "points": 1
+      }
+    ]
+  },
+  "6-16-sling-4-lab-turn-the-arm": {
+    "lessonTitle": "6.16.4 Lab: Turn the arm",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Turn the arm\". The task: aim the catapult arm at the pointer with angleTo or rotateTo, limited so it cannot point into the ground. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Aims at the pointer",
+        "description": "angleTo or rotateTo toward the mouse.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Limited",
+        "description": "Clamped above the ground.",
+        "points": 1
+      }
+    ]
+  },
+  "6-17-sling-2-sub-launch-and-arc": {
+    "lessonTitle": "6.17.2 Sub-build: Launch and arc",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: Launch and arc\". The task: make a shot on mouse.released(), at the arm, with direction from the arm rotation and a speed, and keep it in an array. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "One per release",
+        "description": "The shot is made inside the release test.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Direction from the arm",
+        "description": "The shot leaves along the arm, not at a fixed angle.",
+        "points": 1
+      }
+    ]
+  },
+  "6-17-sling-4-lab-launch": {
+    "lessonTitle": "6.17.4 Lab: Launch!",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Launch!\". The task: fire a stone on release along the arm with a speed, and keep every stone in an array. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "One shot per release",
+        "description": "Made inside the release test.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Along the arm",
+        "description": "Direction follows the arm.",
+        "points": 1
+      }
+    ]
+  },
+  "6-18-sling-2-sub-out-and-gone": {
+    "lessonTitle": "6.18.2 Sub-build: Out and gone",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: Out and gone\". The task: in a backwards loop, remove off-screen shots from the screen (delete) and from the array (splice). Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Both removals",
+        "description": "delete and splice together.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Backwards",
+        "description": "The loop starts at the end.",
+        "points": 1
+      }
+    ]
+  },
+  "6-18-sling-3-lab-shots-that-leave": {
+    "lessonTitle": "6.18.3 Lab: Shots that leave",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Shots that leave\". The task: fire on release and sweep spent shots out of both the screen and the array, looping backwards. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Fires",
+        "description": "A shot on release along the arm.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Sweeps",
+        "description": "delete and splice, backwards.",
+        "points": 1
+      }
+    ]
+  },
+  "6-19-sling-2-sub-hits-and-a-budget": {
+    "lessonTitle": "6.19.2 Sub-build: Hits and a budget",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: Hits and a budget\". The task: test every shot against every block; on a hit take one from that block's own hit count and delete and splice the shot, then remove a block whose count reaches 0. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Per-block count",
+        "description": "The block's own number is decremented, not a global.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "One hit per shot",
+        "description": "The shot leaves in the same branch, so it cannot count twice.",
+        "points": 1
+      }
+    ]
+  },
+  "6-19-sling-3-lab-bring-the-wall-down": {
+    "lessonTitle": "6.19.3 Lab: Bring the wall down",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Bring the wall down\". The task: put a wall of blocks with per-block hit counts against the shots, remove the shot on the hit, and sweep spent blocks out of both places. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Per-block budget",
+        "description": "Each block has its own count.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "One hit per shot",
+        "description": "The shot leaves when it hits.",
+        "points": 1
+      }
+    ]
+  },
   "6-2-pocket-2-sub-pull-back-and-let-go": {
     "lessonTitle": "6.2.2 Sub-build: Pull back and let go",
     "prompt": "The student wrote a moSHion sketch for \"Sub-build: Pull back and let go\". The task: set the ball's direction away from the pointer and its speed from the pull distance, capped, inside a mouse.released() test. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
@@ -9911,6 +10055,42 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "id": "r2",
         "title": "Direction away",
         "description": "The direction is the angle to the pointer plus 180 (or the equivalent).",
+        "points": 1
+      }
+    ]
+  },
+  "6-20-sling-1-lab-five-shots": {
+    "lessonTitle": "6.20.1 Lab: Five shots, win or lose",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Five shots, win or lose\". The task: give the player five shots, spend one per launch, win when the blocks are gone, lose when the shots are gone and none are flying, and let R start the round again. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A budget",
+        "description": "A shot count that decrements on fire and stops at 0.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Both endings",
+        "description": "Win on no blocks; lose on no shots and none in the air.",
+        "points": 1
+      }
+    ]
+  },
+  "6-20-sling-2-debug-wall-falls-on-its-own": {
+    "lessonTitle": "6.20.2 Debugging: The wall that falls on its own",
+    "prompt": "The student wrote a moSHion sketch for \"Debugging: The wall that falls on its own\". The task: stabilise the block stack so it does not fall on its own, and clear spent shots before deciding win or lose. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Stable wall",
+        "description": "Bottom row static or rotationLock.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Order",
+        "description": "The sweep comes before the end check.",
         "points": 1
       }
     ]

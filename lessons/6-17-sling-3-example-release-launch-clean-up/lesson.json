@@ -1,0 +1,19 @@
+{
+  "id": "6-17-sling-3-example-release-launch-clean-up",
+  "title": "6.17.3 Worked Example: Release, launch, clean up",
+  "description": "The launch with the sweep already in it: three shots, then the list stays empty as they leave.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.17 Sling: launch",
+  "preview": "example",
+  "week": 16,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
