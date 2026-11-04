@@ -46,6 +46,9 @@ and 5.9-5.10 title, labs 5.3.8, 5.4.8 and 5.5.4, the 5.3.11 and 5.5.9 closes, th
    soon as a student carries their own work forward (`CARRY-FORWARD-SPEC.md`), so say "in `setup()`, below each
    bumper's `worth` line". Where a name may reasonably differ, one sentence covers it: "if you brought your 5.3.14
    work forward, your bumpers may be called something else."
+9. **Each day-sized group opens with a sub-build when the mechanic can stand alone.** One 10-12 minute lab on a
+   blank canvas, its own starter, cards that name the mechanic and not the game; the apply lab that follows starts
+   from the game in progress. `SUB-BUILDS.md` lists which groups get one and what it builds.
 
 ---
 

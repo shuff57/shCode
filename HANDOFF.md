@@ -137,6 +137,14 @@ may not be a rebuild of a course game, only a new idea or a named combination of
 eleven-item synthesis; these are the rehearsals. The pitch is AI-checked, because
 "is this a clone" is not a regex.
 
+**Sub-builds before the game.** Every day-sized group that teaches a mechanic gets a
+10-12 minute **sub-build** first — a blank-canvas lab with its own starter where the
+student writes the mechanic alone — then the apply lab in the game. `SUB-BUILDS.md`
+lists them per game (about 25, ~4.5 contact hours). The submodule is the existing
+lesson group, promoted to a schedulable scope (`moduleId:groupId`) with a due chip,
+a progress count and an anchor; splitting a game into its own module is not needed
+until one passes ~1.5 weeks (today the biggest is Pinball at 1.2).
+
 **The unit repartition landed (2026-11-04).** Units are now **5 functional games basics,
 6 functional games advanced, 7 objects and classes**. Old 5.6-5.8 became **7.1-7.3**, the
 Defender capstone 5.9-5.11 became **7.4-7.6**, old 7.1 Arcade Cabinet became **8.1**, and
