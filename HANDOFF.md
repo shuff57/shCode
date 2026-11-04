@@ -170,6 +170,25 @@ carry a dated note at the top and still show old module numbers in their tables;
 `§5.3`-style references are **book sections** and must not be renumbered. Do that pass by
 hand, not with the tool.
 
+
+**Restructure progress, 2026-11-04 (evening).** Unit 5 is built as its day-module chain:
+5.1, 5.2, Pinball 5.3-5.9, Flappy 5.10-5.12, Snake 5.13-5.16, and the 5.17 capstone, with
+**11 sub-builds** authored (5 Pinball, 3 Flappy, 3 Snake). Units 6-7 are restructured but
+their new games are not authored yet: Defender is 7.4-7.12 (9 day-modules), Breakout moved
+to 7.13-7.17, and the unit 6 concepts now sit at 6.6-6.15 with 6.1-6.5 reserved for Pocket.
+Every lesson's `unit` field follows its module doc title.
+
+**Still to author:** Pocket 6.1-6.5 (17 lessons), Sling 6.16-6.21 (17), Climb 6.22-6.27 (18,
+optional), the unit 6 capstone 6.28, Breakout's OOP arc 7.18-7.20, and the unit 7 capstone
+7.21. The Pinball chain has carry-forward links; the new games need `carryFrom` derived after
+authoring (`node scripts/derive-carry-chain.mjs --write --units 6,7`).
+
+**Tooling added this stretch:** `scripts/split-module.mjs` (one module -> many, with docs,
+groups and citations), `scripts/derive-carry-chain.mjs`, `scripts/check-carry-chain.mjs`,
+`scripts/test-carry-forward.mjs`, and the carry-forward strip (lib/carry-forward.ts,
+lib/store.ts action, components/CarryForwardBanner.tsx). The carry walk in a browser is
+still unverified.
+
 **Left in the tree.** The three walk reports (untracked until this commit),
 `.gauntlet/occt-checks.json` carrying an uncommitted 2026-11-02 bump from an
 earlier gauntlet run, and `design/logo-marks/` untracked and not from this stretch.
