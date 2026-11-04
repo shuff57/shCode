@@ -1,8 +1,9 @@
 # 2026-11-04 (latest): the Pinball polish arc is live; release 6 shipped; batch 2 is next
 
 **Where things are.** `cs-3d` is `ff22d426` on origin and **live** (the site answers
-200, the manifest lists 861 lessons). `codehs-inspiration` is `c044b36e`, **six
-commits ahead of `origin/codehs-inspiration`** and not pushed. The release worktree
+200, the manifest lists 861 lessons). `codehs-inspiration` is ahead of
+`origin/codehs-inspiration` and not pushed; it now carries the unit repartition
+(below) on top of release 6's work. The release worktree
 `shCode-release` (branch `release-ch5`) sits on the release commit. The 8-bit sound
 entry below was written before any of it was deployed; the sound work went live as
 part of this release, not on its own.
@@ -126,6 +127,31 @@ the classes block — chapter 6 has no OOP module and Parts A/B are procedural; 
 "firing arrives first in Cannon" rewrite waits for the repartition and only if a lens
 says the repetition reads as wasted time; the Part B → Part C "gap" question is moot
 because A/B do not move. Reasoning is in `DEEPEN-GAMES.md` §10.
+
+**The unit repartition landed (2026-11-04).** Units are now **5 functional games basics,
+6 functional games advanced, 7 objects and classes**. Old 5.6-5.8 became **7.1-7.3**, the
+Defender capstone 5.9-5.11 became **7.4-7.6**, old 7.1 Arcade Cabinet became **8.1**, and
+old 8.1 Solid Shapes became **9.1**. 98 lessons retitled and 798 citations rewritten in
+260 files; **no folder moved**, so progress, drafts, submissions and lesson-scoped date
+rows are untouched. Module docs and group files moved with their numbers. The move is
+`scripts/repartition-units.mjs` plus `scripts/renumber-plans/unit-repartition.json`
+(`renumber-module.mjs` refuses cross-module moves, which is why the new tool exists); it
+runs in two modes so a doc's `book §5.6` or a table's lesson position is left alone.
+Gates: lesson-numbers, groups, citations, slot-map, concept-order, book-refs,
+prompt-pointers, assignment-codes, solution-leak, docs-prose, starters, live-blocks (491),
+reachable, title-order and the tolerance gate all pass; help-pointer-titles still reports
+the same **10** known mismatches. The full `npm test` was not run.
+
+**The locks were written before any deploy.** `class_open_dates` now carries module rows
+for 7.1-7.6, 8.1 and 9.1 at 2027-07-01, alongside the stale 5.6-5.11 rows. **Deploy the
+repartition and then delete the stale 5.6-5.11 rows**, in that order: they are the only
+thing keeping the old numbers meaningful, and new code with no row for 7.2-7.6 would open
+the whole objects block to students.
+
+**Curated pass still owed:** `curriculum-plan.md` and `curriculum/BOOK-TO-MODULE.md` both
+carry a dated note at the top and still show old module numbers in their tables; their
+`§5.3`-style references are **book sections** and must not be renumbered. Do that pass by
+hand, not with the tool.
 
 **Left in the tree.** The three walk reports (untracked until this commit),
 `.gauntlet/occt-checks.json` carrying an uncommitted 2026-11-02 bump from an

@@ -1,4 +1,11 @@
 > **Note, 2026-10-26:** every drawn-flowchart lab, gate and PA design part in this plan has since become a typed pseudocode plan (ids, assignment codes and credit unchanged). Read "chart", "draw" and "Check my diagram" below as written plans; the module docs under `curriculum/modules/` describe what ships.
+>
+> **Renumbered 2026-11-04 (unit repartition):** old 5.6-5.8 are now **7.1-7.3**, the Defender
+> capstone 5.9-5.11 is now **7.4-7.6**, old 7.1 Arcade Cabinet is **8.1** and old 8.1 Solid
+> Shapes is **9.1**. Unit 5 is functional game basics, 6 advanced games, 7 objects and
+> classes. This file is a long-range plan and still shows some pre-move module numbers, and
+> its `§7.1`-style references are **book sections**, not modules — do not renumber those.
+> Mapping: `scripts/renumber-plans/unit-repartition.json`.
 
 # CSCI 4 — Introduction to Programming Concepts and Methodologies
 ## Curriculum Plan: JavaScript + moSHion + JSCAD 3D Modeling

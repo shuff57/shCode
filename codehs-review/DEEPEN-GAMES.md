@@ -255,6 +255,12 @@ rewritten in phase 0, before any of these lessons is built.**
 - **IP rule: clone the mechanic, never the expression.** No borrowed title, character, logo, sound or level layout on a
   student page; the reference is named in the module doc only. Our own pixel art throughout.
 
+**Numbering after the 2026-11-04 repartition.** Units are now 5 functional games basics, 6 functional games advanced,
+7 objects and classes (old 5.6-5.11 are 7.1-7.6; Arcade Cabinet is 8.1; Solid Shapes is 9.1). Unit 5 ends at 5.5, so
+**Pocket is 5.6**. Sling and Climb are **provisionally 6.12 and 6.13**; that is a placeholder, not a decision: when each
+is built it is placed where the concepts it needs are taught, and `scripts/repartition-units.mjs` moves it in one
+command. The lesson tables below still say 5.12-5.14 and are rewritten in phase 0.
+
 
 Each follows the five-step close (PLACEMENT #4): an AI-graded plan, build steps with the concept injected where it is
 needed, one **Debugging:** screen (the 5.10.8 kind) or one pseudocode plan before the hardest step (the 5.10.3 kind), an
