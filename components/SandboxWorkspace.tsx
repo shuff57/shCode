@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { ChevronDown, ChevronUp, Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen, RotateCcw } from 'lucide-react';
+import { ChevronDown, ChevronUp, CloudUpload, History, Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen, RotateCcw } from 'lucide-react';
 import { useLessonStore } from '../lib/store';
 import { saveProgress } from '../lib/version-control';
 import CodeEditor from './CodeEditor';
@@ -13,6 +13,9 @@ import AiHelpPanel from './AiHelpPanel';
 import TextureEditor from './TextureEditor';
 import SoundMixer from './SoundMixer';
 import DocsDrawer from './DocsDrawer';
+import HistoryPanel from './HistoryPanel';
+import { addLocalSnapshot } from '../lib/local-history';
+import { useCloudWorkspace } from '../lib/lesson-sync';
 import { RUN_TIMEOUT_MS, errorWithLocation, runStudentCode } from '../lib/js-runner-source';
 import {
   NO_TEACHER_MODES,
@@ -92,6 +95,12 @@ export default function SandboxWorkspace() {
   const [modeId, setModeId] = useState<SandboxModeId>('moshion');
   const mode = useMemo(() => getMode(modeId), [modeId]);
   const lesson = useMemo(() => sandboxLesson(mode), [mode]);
+
+  // The same save surface a lesson has: a deliberate cloud Save, and a History
+  // panel that restores a snapshot. Every sandbox mode is its own lesson id, so
+  // the four modes keep independent histories.
+  const cloud = useCloudWorkspace(lesson, true);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   const isFlow = mode.preview === 'diagram';
   const chart = useMemo(() => (isFlow ? parseChart(fileContents[mode.file]) : null), [isFlow, fileContents, mode.file]);
@@ -522,6 +531,42 @@ export default function SandboxWorkspace() {
   // against -- and the program-type tabs join them too, but only on the
   // Code side; Build hides them the same way it always has (no room, and no
   // reason to switch program type mid-model).
+  const saveChips = (
+    <>
+      <button style={chipStyle} onClick={() => setHistoryOpen(true)} title="Restore an earlier save">
+        <History size={12} />
+        History
+      </button>
+      <button
+        style={chipStyle}
+        onClick={() => {
+          // Keep a copy on this device even if the cloud save fails.
+          addLocalSnapshot(lesson.id, useLessonStore.getState().fileContents, 'Saved on this device');
+          void cloud.save();
+        }}
+        disabled={cloud.saving}
+        title="Save this sandbox to the cloud so you can open it on another device."
+      >
+        <CloudUpload size={12} />
+        {cloud.saving ? 'Saving…' : 'Save'}
+      </button>
+      {cloud.note && (
+        <span
+          role="status"
+          aria-live="polite"
+          style={{
+            color: cloud.note.kind === 'error' ? '#ff5555' : '#50fa7b',
+            fontSize: 12,
+            alignSelf: 'center',
+          }}
+        >
+          {cloud.note.kind === 'error' ? '✗ ' : '✓ '}
+          {cloud.note.text}
+        </span>
+      )}
+    </>
+  );
+
   const reshapeToolbarExtra = isReshape ? (
     <>
       {!reshapeIsBuild && (
@@ -552,6 +597,7 @@ export default function SandboxWorkspace() {
         {full ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
         {full ? 'Exit full screen' : 'Full screen'}
       </button>
+      {saveChips}
     </>
   ) : null;
 
@@ -613,6 +659,7 @@ export default function SandboxWorkspace() {
                 {full ? 'Exit full screen' : 'Full screen'}
               </button>
             )}
+            {saveChips}
             {!isFlow && <span className="run-hint">Ctrl+Enter</span>}
           </div>
         )}
@@ -868,6 +915,17 @@ export default function SandboxWorkspace() {
         .sandbox-shell.is-console-hidden .sandbox-console-wrap { display: none; }
         .sandbox-shell.is-console-hidden .sandbox-console-toggle { bottom: 12px; top: auto; }
       `}</style>
+
+      <HistoryPanel
+        isOpen={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        lessonId={lesson.id}
+        onRestore={() => {
+          // reSHape hydrates its model only at mount; bump the key so the
+          // restored snapshot is what the studio builds from.
+          setReshapeResetKey((k) => k + 1);
+        }}
+      />
     </>
   );
 }

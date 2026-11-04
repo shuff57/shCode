@@ -75,13 +75,13 @@ check('another student sees no sandbox history', (await other.json()).commits, [
 const otherMode = await h.onRequestGet(getCtx('sandbox-js'));
 check('modes have separate histories', (await otherMode.json()).commits, []);
 
-// The client half: the sandbox must use the lesson commit/history components
-// and the same cross-device banner, not a bespoke save path.
+// The client half: the sandbox uses the same cloud workspace hook and History
+// panel a lesson does, not a bespoke save path.
 const workspace = readFileSync(join(root, 'components', 'SandboxWorkspace.tsx'), 'utf8');
-check('sandbox renders CommitDialog', workspace.includes('<CommitDialog'), true);
+check('sandbox uses the lesson cloud-save hook', workspace.includes('useCloudWorkspace(lesson'), true);
 check('sandbox renders HistoryPanel', workspace.includes('<HistoryPanel'), true);
-check('sandbox renders CrossDeviceSyncBanner', workspace.includes('<CrossDeviceSyncBanner'), true);
-check('sandbox commits through the lesson store', workspace.includes('commitChanges(message)'), true);
+check('sandbox saves through the hook', workspace.includes('cloud.save()'), true);
+check('sandbox passes the lesson id to history', workspace.includes('lessonId={lesson.id}'), true);
 check('history restore remounts a reSHape model', workspace.includes('onRestore={() =>'), true);
 
 const modes = readFileSync(join(root, 'lib', 'sandbox-modes.ts'), 'utf8');
