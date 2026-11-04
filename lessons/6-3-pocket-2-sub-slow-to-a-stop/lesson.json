@@ -81,12 +81,6 @@
         "title": "A threshold, not zero",
         "description": "The stop test compares speed with a small number, then sets it to 0 or sets a flag.",
         "points": 1
-      },
-      {
-        "id": "r3",
-        "title": "It can be seen",
-        "description": "The speed or a stopped/rolling word is shown, so the change is visible.",
-        "points": 1
       }
     ]
   }

@@ -81,12 +81,6 @@
         "title": "Slow only",
         "description": "The drop requires a speed under a small number.",
         "points": 1
-      },
-      {
-        "id": "r3",
-        "title": "Once",
-        "description": "A flag, a moved ball or a delete stops it repeating every frame.",
-        "points": 1
       }
     ]
   }

@@ -85,12 +85,6 @@
         "title": "R restarts",
         "description": "R resets the ball's position and velocity and sets the round back to running; the score is reset too.",
         "points": 1
-      },
-      {
-        "id": "r3",
-        "title": "Nothing disappears",
-        "description": "The ball and bumper stay on screen when the round ends; only the game stops.",
-        "points": 1
       }
     ]
   }

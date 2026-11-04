@@ -80,12 +80,6 @@
         "title": "It is a shot, not a cursor",
         "description": "The line starts at the ball, not at the pointer.",
         "points": 1
-      },
-      {
-        "id": "r3",
-        "title": "Pull shown",
-        "description": "The distance is displayed.",
-        "points": 1
       }
     ]
   }

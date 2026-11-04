@@ -81,12 +81,6 @@
         "title": "Played on the event",
         "description": "play() is called under a key test (presses or pressing), so it fires on the event and not every frame.",
         "points": 1
-      },
-      {
-        "id": "r3",
-        "title": "It can actually be heard",
-        "description": "The path is a real asset (/moshion/assets/coin.wav or a saved name), so no silent failure.",
-        "points": 1
       }
     ]
   }

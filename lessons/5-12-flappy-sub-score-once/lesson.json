@@ -84,12 +84,6 @@
         "title": "One point per pipe",
         "description": "A flag on the pipe is checked before scoring and set after, so each pipe scores once.",
         "points": 1
-      },
-      {
-        "id": "r3",
-        "title": "Inside the loop",
-        "description": "The check runs for every pipe in the array, not once for the first.",
-        "points": 1
       }
     ]
   }

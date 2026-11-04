@@ -84,12 +84,6 @@
         "title": "Direction away",
         "description": "The direction is the angle to the pointer plus 180 (or the equivalent).",
         "points": 1
-      },
-      {
-        "id": "r3",
-        "title": "Capped power",
-        "description": "min/constrain caps the pull.",
-        "points": 1
       }
     ]
   }

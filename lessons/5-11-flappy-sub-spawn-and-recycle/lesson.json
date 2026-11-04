@@ -85,12 +85,6 @@
         "title": "They move",
         "description": "Each pipe gets a negative vel.x (or x is decreased every frame).",
         "points": 1
-      },
-      {
-        "id": "r3",
-        "title": "Two removals",
-        "description": "An off-screen pipe is deleted AND spliced from the array, in a backwards loop.",
-        "points": 1
       }
     ]
   }
