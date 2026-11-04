@@ -564,6 +564,10 @@ starter not), `check-solution-leak`, `test-grader-tolerance`, and the moSHion ha
 with no input and with the scripted input the lab expects (a run error locks Submit). Stop the dev server before
 `npm test` (memory note).
 
+**Each unit also ends with a "build your own" capstone**, one lesson, 0 points, checked only against its own unit:
+5.7 after Pocket, 6.14 after Climb, 7.7 after Defender. They ship inside the unit's last batch and are specified in
+`BUILD-YOUR-OWN.md`; 8.1 stays the graded, eleven-item synthesis.
+
 ---
 
 ## 9. Risks

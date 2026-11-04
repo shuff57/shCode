@@ -126,7 +126,16 @@ later breaks.
 the classes block — chapter 6 has no OOP module and Parts A/B are procedural; the
 "firing arrives first in Cannon" rewrite waits for the repartition and only if a lens
 says the repetition reads as wasted time; the Part B → Part C "gap" question is moot
-because A/B do not move. Reasoning is in `DEEPEN-GAMES.md` §10.
+because A/B do not move. Reasoning is in `DEEPEN-GAMES.md` §10. (Those numbers are
+now 7.4-7.6 after the repartition below.)
+
+**Build-your-own at the end of every unit.** Units 5, 6 and 7 each get one 0-point
+capstone lesson — **5.7** after Pocket, **6.14** after Climb, **7.7** after Defender —
+with a five-item requirement list drawn only from that unit, and one rule: the game
+may not be a rebuild of a course game, only a new idea or a named combination of two.
+`codehs-review/BUILD-YOUR-OWN.md` holds the three lists. 8.1 remains the graded
+eleven-item synthesis; these are the rehearsals. The pitch is AI-checked, because
+"is this a clone" is not a regex.
 
 **The unit repartition landed (2026-11-04).** Units are now **5 functional games basics,
 6 functional games advanced, 7 objects and classes**. Old 5.6-5.8 became **7.1-7.3**, the
