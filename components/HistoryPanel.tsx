@@ -20,9 +20,15 @@ function findFileByPath(nodes: FileNode[], target: string): FileNode | null {
 interface HistoryPanelProps {
   isOpen: boolean;
   onClose: () => void;
+  /**
+   * Called after either Restore succeeds. The sandbox uses it to remount
+   * ReshapeStudio, which hydrates its model from `value` only at mount; a
+   * lesson leaves it unset and keeps its existing behaviour.
+   */
+  onRestore?: () => void;
 }
 
-export default function HistoryPanel({ isOpen, onClose }: HistoryPanelProps) {
+export default function HistoryPanel({ isOpen, onClose, onRestore }: HistoryPanelProps) {
   const [tab, setTab] = useState<'file' | 'project'>('file');
   const [selectedCommit, setSelectedCommit] = useState<Commit | null>(null);
   const [selectedVersion, setSelectedVersion] = useState<Version | null>(null);
@@ -158,6 +164,7 @@ export default function HistoryPanel({ isOpen, onClose }: HistoryPanelProps) {
                     onClick={() => {
                       if (currentFileId) {
                         restoreVersion(currentFileId, selectedVersion);
+                        onRestore?.();
                         onClose();
                       }
                     }}
@@ -183,6 +190,7 @@ export default function HistoryPanel({ isOpen, onClose }: HistoryPanelProps) {
                     className="btn-primary btn-sm"
                     onClick={() => {
                       restoreCommit(selectedCommit.id);
+                      onRestore?.();
                       onClose();
                     }}
                   >

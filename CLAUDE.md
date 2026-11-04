@@ -346,6 +346,12 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   for a route that wants to enforce it server-side; nothing calls it yet.
 - `lesson-drafts` doubles as diagram storage (the serialized `DiagramDoc`);
   there is no diagram-specific table.
+- **The standalone `/sandbox` uses the lesson commit/history path**, not a
+  cloud-save table of its own. Each mode is its own lesson id
+  (`sandbox-js`, `sandbox-moshion`, `sandbox-reshape`, `sandbox-flow`), so
+  Commit posts to `/api/commits` and History restores from it; the ids are
+  absent from `lessons-manifest.json`, so `isLessonAccessible` fails open.
+  localStorage remains the offline draft, exactly as in a lesson.
 - Teacher pushes to a student's pool stamp `authored_by_email = session.email`
   server-side; clients cannot set it. Legacy NULLs coerce to `student_email`.
 - **CODY** (Code. Optimizer. Development. Yielder.) is the student-facing name of the `/api/ai-help` tutor. On Workers AI (the `AI` binding) students have no per-student cap and get `X-RateLimit-Unlimited: 1`; the UI hides the "helps left" line. The per-student per-unit quota below applies only on the Ollama fallback. The global ceiling counts both.

@@ -2,10 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { ChevronDown, ChevronUp, Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen, RotateCcw } from 'lucide-react';
+import { ChevronDown, ChevronUp, History, Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen, RotateCcw, Save } from 'lucide-react';
 import { useLessonStore } from '../lib/store';
 import { saveProgress } from '../lib/version-control';
 import CodeEditor from './CodeEditor';
+import CommitDialog from './CommitDialog';
+import CrossDeviceSyncBanner from './CrossDeviceSyncBanner';
+import HistoryPanel from './HistoryPanel';
 import MoshionPreview from './MoshionPreview';
 import Console from './Console';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
@@ -88,10 +91,22 @@ export default function SandboxWorkspace() {
   const fileContents = useLessonStore((s) => s.fileContents);
   const updateFile = useLessonStore((s) => s.updateFile);
   const resetLesson = useLessonStore((s) => s.resetLesson);
+  const commitChanges = useLessonStore((s) => s.commitChanges);
+  const getDirtyCount = useLessonStore((s) => s.getDirtyCount);
+  // Subscribed so the Commit count clears when a commit lands; the count
+  // itself is derived from the store's last-committed snapshot.
+  const commits = useLessonStore((s) => s.commits);
 
   const [modeId, setModeId] = useState<SandboxModeId>('moshion');
   const mode = useMemo(() => getMode(modeId), [modeId]);
   const lesson = useMemo(() => sandboxLesson(mode), [mode]);
+
+  // Same cloud-save surface as a lesson: Commit writes a snapshot through
+  // /api/commits, History restores one, and the sync banner offers work
+  // committed on another device. Each sandbox mode is its own lesson id, so
+  // the four modes get four independent commit histories.
+  const [commitOpen, setCommitOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   const isFlow = mode.preview === 'diagram';
   const chart = useMemo(() => (isFlow ? parseChart(fileContents[mode.file]) : null), [isFlow, fileContents, mode.file]);
@@ -286,6 +301,24 @@ export default function SandboxWorkspace() {
       if (mode.preview === 'reshape') setReshapeResetKey((k) => k + 1);
     }
   }
+
+  // LessonWorkspace's handler, verbatim in spirit: a 401 means the student
+  // is signed out, which is the one failure worth explaining rather than
+  // showing a raw status.
+  const handleCommit = async (message: string) => {
+    try {
+      await commitChanges(message);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg.startsWith('401')) {
+        alert('Please sign in to save your work. Reload the page to sign in, then try again.');
+      } else {
+        alert(`Commit failed: ${msg}`);
+      }
+    }
+  };
+
+  const dirtyCount = getDirtyCount();
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -540,6 +573,22 @@ export default function SandboxWorkspace() {
         </div>
       )}
       {lockNote && <span className="sandbox-lock">{lockNote}</span>}
+      <button
+        style={chipStyle}
+        onClick={() => setCommitOpen(true)}
+        title="Save a snapshot of this sandbox to your account"
+      >
+        <Save size={12} />
+        Commit{dirtyCount > 0 ? ` (${dirtyCount})` : ''}
+      </button>
+      <button
+        style={chipStyle}
+        onClick={() => setHistoryOpen(true)}
+        title={commits.length > 0 ? 'Restore a snapshot saved to your account' : 'No snapshots saved yet'}
+      >
+        <History size={12} />
+        History
+      </button>
       <button style={chipStyle} onClick={reset}>
         <RotateCcw size={12} />
         Reset
@@ -557,6 +606,9 @@ export default function SandboxWorkspace() {
 
   return (
     <>
+      {/* Keyed by mode so a dismissal in one sandbox does not hide a newer
+          commit waiting in another. */}
+      <CrossDeviceSyncBanner key={lesson.id} />
       <TabbedRightDrawer storageKey="shCode:sandbox-drawer" tabs={drawerTabs} />
       <div
         className={
@@ -599,6 +651,22 @@ export default function SandboxWorkspace() {
                 ■ Stop
               </button>
             )}
+            <button
+              style={chipStyle}
+              onClick={() => setCommitOpen(true)}
+              title="Save a snapshot of this sandbox to your account"
+            >
+              <Save size={12} />
+              Commit{dirtyCount > 0 ? ` (${dirtyCount})` : ''}
+            </button>
+            <button
+              style={chipStyle}
+              onClick={() => setHistoryOpen(true)}
+              title={commits.length > 0 ? 'Restore a snapshot saved to your account' : 'No snapshots saved yet'}
+            >
+              <History size={12} />
+              History
+            </button>
             <button style={chipStyle} onClick={reset}>
               <RotateCcw size={12} />
               Reset
@@ -868,6 +936,23 @@ export default function SandboxWorkspace() {
         .sandbox-shell.is-console-hidden .sandbox-console-wrap { display: none; }
         .sandbox-shell.is-console-hidden .sandbox-console-toggle { bottom: 12px; top: auto; }
       `}</style>
+
+      <CommitDialog
+        isOpen={commitOpen}
+        onClose={() => setCommitOpen(false)}
+        onCommit={handleCommit}
+        dirtyCount={dirtyCount}
+      />
+      <HistoryPanel
+        isOpen={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        // ReshapeStudio only reads `value` at mount, so a restored commit
+        // needs a fresh instance to put the old model back on screen. Code
+        // and chart modes resync from `fileContents` on their own.
+        onRestore={() => {
+          if (mode.preview === 'reshape') setReshapeResetKey((k) => k + 1);
+        }}
+      />
     </>
   );
 }
