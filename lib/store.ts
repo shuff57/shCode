@@ -14,6 +14,7 @@ import {
 } from './version-control';
 import { listCommits, createCommit as apiCreateCommit } from './commits-api';
 import { rememberedStarter, starterFile } from './starter-variants';
+import { carryMessage, mergeCarriedFiles } from './carry-forward';
 
 interface UIState {
   sidebarOpen: boolean;
@@ -50,6 +51,12 @@ interface LessonState {
   initVC: (fileContents: Record<string, string>) => void;
   markDirty: (fileId: string) => void;
   commitChanges: (message: string) => Promise<boolean>;
+  /**
+   * Bring the source lesson's saved work into this one and record a provenance
+   * commit. Reads the source's newest server commit, falls back to its offline
+   * draft. Returns false when there is nothing to carry.
+   */
+  carryForward: (sourceId: string, sourceTitle: string) => Promise<boolean>;
   restoreCommit: (commitId: string) => void;
   restoreVersion: (fileId: string, version: Version) => void;
   getFileHistory: (fileId: string) => Version[];
@@ -280,6 +287,54 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       }));
       throw err;
     }
+  },
+
+  carryForward: async (sourceId, sourceTitle) => {
+    const state = get();
+    const lesson = state.lesson;
+    if (!lesson) return false;
+
+    // Newest server commit first; the offline draft is the fallback so a
+    // student who worked without a connection is not offered nothing.
+    let carried: Record<string, string> | null = null;
+    try {
+      const commits = await listCommits(sourceId);
+      if (commits.length > 0) carried = commits[0].fileContentsSnapshot;
+    } catch {
+      /* unauthenticated or offline: try the draft */
+    }
+    if (!carried) {
+      const draft = loadProgress(sourceId);
+      if (draft) carried = draft.fileContents;
+    }
+    if (!carried) return false;
+
+    const merged = mergeCarriedFiles(state.fileContents, carried);
+    const commit = createCommit(carryMessage(sourceTitle), Object.keys(merged), merged);
+
+    set({
+      fileContents: merged,
+      lastCommittedFileContents: { ...merged },
+      commits: [commit, ...state.commits],
+      dirtyFileIds: new Set(),
+    });
+
+    // Remember it locally at once, so a refresh before the POST lands keeps the
+    // carried work. The POST only makes it part of the server-side history.
+    saveProgress(lesson.id, {
+      fileContents: merged,
+      commits: get().commits,
+      lastCommittedFileContents: { ...merged },
+      completedSteps: [],
+    });
+
+    try {
+      const stored = await apiCreateCommit(lesson.id, commit);
+      set((s) => ({ commits: s.commits.map((c) => (c.id === commit.id ? stored : c)) }));
+    } catch {
+      /* carried work is in place; provenance stays local until the next commit */
+    }
+    return true;
   },
 
   restoreCommit: (commitId) => {
