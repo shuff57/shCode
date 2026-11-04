@@ -1,4 +1,123 @@
-# 2026-11-03 (latest): the 8-bit sound mixer, and sounds saved by name
+# 2026-11-04 (latest): the Pinball polish arc is live; release 6 shipped; batch 2 is next
+
+**Where things are.** `cs-3d` is `ff22d426` on origin and **live** (the site answers
+200, the manifest lists 861 lessons). `codehs-inspiration` is `c044b36e`, **six
+commits ahead of `origin/codehs-inspiration`** and not pushed. The release worktree
+`shCode-release` (branch `release-ch5`) sits on the release commit. The 8-bit sound
+entry below was written before any of it was deployed; the sound work went live as
+part of this release, not on its own.
+
+**What release 6 carried.**
+
+| Commit | What |
+| --- | --- |
+| `194c83dd` | the Pinball polish arc, 5.3.15-5.3.21 (7 screens, 92 min, appended) |
+| `e1004619` + `de0e89a0` | the lens fix round and its regenerated grader config |
+| `b5db3722` | the Check note admits a failed Run; run-error text wraps instead of clipping |
+| `c044b36e` | a moSHion Run brings the whole preview split into view |
+| `b42267dc` | the earlier merge into `cs-3d` that nobody had deployed: the sound session, 6.9 Grids (14), 6.10 Breakout (13), 6.11 Sound (10) |
+
+The generated-only commits were **regenerated on the release tree, not
+cherry-picked**; picking them would have written stale manifests over `cs-3d`'s.
+The four code commits picked cleanly onto the merge.
+
+**The arc.** 5.3.15 Reading, `.text`/`.textColor`/`.textSize`/`.life` and why `.life`
+was on 5.3.8's list. 5.3.16 Worked Example, a "+5" popup in the hit's edge check
+beside the same popup under `if (touching)`. 5.3.17 Lab, label each bumper with its
+worth, pop the points. 5.3.18 Reading, `mass`, `gravityScale`, `rotationLock`,
+`debug`, four live blocks. 5.3.19 Lab, nudge with `applyForce` under `kb.pressing`.
+5.3.20 Playtest and polish (AI-graded, 0 points). 5.3.21 Challenges, a fade with
+`.opacity`, a tilt rule, a heavier ball from round 2. Nothing was renumbered: no
+existing number, folder, Help pointer or D1 key moved.
+
+**The lock that had to be written first.** Production had no `class_open_dates` rows
+for 6.9, 6.10 or 6.11 and those modules have **no code-level lock**, so deploying
+would have opened 37 lessons to students mid-semester. Three `module` rows were
+written for class `abac569d-2579-4b4f-82ca-e5ca2466ff23` with `open_at`
+`1814425200000` (2027-07-01, Pacific, the same date 5.2-5.11 carry) through
+`scripts/d1.mjs execute shcode-commits --remote`, read back, and only then deployed.
+**To open those modules, change those rows, not the code.** The Cloudflare tools
+were disconnected the whole time; the `d1.mjs` wrapper is what worked.
+
+**Three lens walks, one fix round.** Each lens walked 5.3.15-5.3.21 with real
+keystrokes in the editor and the real `gradeWithTests`, plus the references played
+in the harness; reports are `codehs-review/loop/walk-5.3-polish-{beginner,moderate,advanced}.md`.
+
+- **The quit point (beginner).** 5.3.21 challenge 3 said "a `round` variable";
+  `let round = 1;` throws *Identifier 'round' has already been declared* because
+  `round()` is the engine's, the error calls it a typo, and Check turned the card
+  green anyway so the student ships a sketch that cannot run. It is `roundNumber`
+  now, the step says why, and `level` is accepted too.
+- **The one wrong idea (advanced).** 5.3.17 r2 passed any `if (A && !B)` holding a
+  `new Sprite(`, so a popup built on every frame scored 3/3 — the lab's own named
+  wrong idea. The card now wants the `if` to be about the hit; `if (score >= 0 &&
+  !over)`, `kb.presses('r') && !done` and `if (true) { if (!done) }` are refused.
+- **Honest shapes accepted.** A worth routed through a variable; `touching === 1`,
+  `colliding(b) == 1`, and `colliding(b) > 0` combined with `wasTouching === false`;
+  a direction set under `kb.pressing` then one `applyForce(dir)`; `ball.debug =
+  SHOW`; a fade through a variable or under an `if` on life; a countdown budget;
+  `ball.mass = 3` inside `nextRound()`; score multipliers and bonuses.
+- **Text.** 5.3.17 step 4 now says R does not reset the score, so the sequence is
+  17, 22, 32 (the harness confirms `0 1 6 16 17 22 32`); the 5.3.18 zero-gravity
+  ball is labelled `'0'`; `.opacity` is taught in 5.3.15 so 5.3.21's Help pointer
+  lands.
+- **Left alone, per the standing lax policy.** An uncalled helper, `applyForce(0,0)`,
+  a mass of 0 (a harmless no-op, the engine ignores it), `frameCount;` passing
+  5.3.21's single card, and a 20-character playtest sentence. Do not spend a round
+  closing these.
+
+**The preview was never clipped.** The builder's first job was to scale the canvas
+to fit; it found the runner already scales (437.9x418 in a 578x418 pane, 356x340
+with the Steps drawer open). What cut the table was the **page**: at 1280x720 the
+preview split starts ~376 px down, so the ground and low bumper sat below the fold.
+`c044b36e` scrolls `#split` into view on Run (`block: 'nearest'`, instant under
+reduced motion, a scroll margin that clears the fixed progress bar). **This changes
+every moSHion lab**: a Run now moves the page under the reader whenever the split
+sits below the fold. Watch for it in the next round.
+
+**Traps this stretch cost a cycle on.**
+
+- **`.text = 0` draws nothing.** It is falsy. Write `'0'`. A student labelling a
+  bumper worth 0 hits the same wall.
+- **A name that shadows an engine global is silent until Run.** `round` is `round()`;
+  the lesson's own prose handed out the name, the error said "typo", and Check stayed
+  green. When a step introduces a variable, check the name against the engine first.
+- **Dev has no AI grader.** `/api/grade-written` answers 404 locally, so Check falls
+  back to the pattern check ("The grader isn't responding right now"). Every lens
+  finding above measures the regex cards, **not** production's AI path.
+- **`npm test` has a real flake.** `test-lesson-sync` ties when two history saves
+  land in the same millisecond and a random id decides the order: three reruns gave
+  one failure, two passes, on code our diff does not touch. Rerun before believing it.
+
+**Verified, and not.** Gates all pass except the 10 known help-pointer mismatches,
+and `cs-3d`'s merged state was gated *before* our commits so a failure there could
+not hide behind ours. `npm test` ended in a real exit 0. The 14 new live blocks and
+every reference ran 600 frames clean on `cs-3d`'s engine (the one the release
+actually ships, not this branch's). Tolerance cases: 919 of 919, worst pattern time
+13.7 ms on 5000-character adversarial input.
+
+**Not verified: the live walk with a throwaway student.** It was the next thing on
+the list and release 6 went out without it. It owes: AI Check on a polish lab, the
+Run scroll, a Pinball lab at 1280x720, and 6.9-6.11 staying locked. The Cloudflare
+tools are gone, so it has to read and write production through `scripts/d1.mjs` and
+remove its own test rows that way. Nothing visual was checked by eye at any size
+by the session that shipped it, only by the builder's screenshots.
+
+**Next: batch 2.** 5.4.12-5.4.17 from `codehs-review/DEEPEN-GAMES.md` §3.2 and the
+batch table in §8 — timers with names (`every`/`after`), pipes on a timer, edges,
+a bird with real art. Six lessons, extra files `curriculum/groups/5.4.json` and
+`curriculum/modules/5.4_flappy.md`; it depends on batch 1 only through 5.4.16
+citing 5.3.18. Same loop as this batch: build, gates, three lens walks, one fix
+round, regenerate, release. Batch 3 is 5.4.18-5.4.20 plus 5.5.12-5.5.14.
+
+**Left in the tree.** The three walk reports (untracked until this commit),
+`.gauntlet/occt-checks.json` carrying an uncommitted 2026-11-02 bump from an
+earlier gauntlet run, and `design/logo-marks/` untracked and not from this stretch.
+The scratchpad worktree under `/tmp/claude-1000/...` is prunable.
+
+---
+
+# 2026-11-03: the 8-bit sound mixer, and sounds saved by name
 
 **Branch `codehs-inspiration`.** `/sound` is now a tool page beside `/textures`:
 a multi-channel mixer that builds sound effects from jsfxr presets and music
