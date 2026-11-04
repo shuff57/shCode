@@ -36,7 +36,7 @@
       "hint": "if (playing) { score += 1; }",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bif\\s*\\(\\s*(?:playing|lost|gameOver)\\s*\\)",
+      "pattern": "\\bif\\s*\\(\\s*\\(*\\s*(?:playing|lost|gameOver)\\s*\\)*\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending",
