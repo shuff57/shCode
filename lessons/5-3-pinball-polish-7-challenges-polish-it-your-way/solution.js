@@ -9,7 +9,7 @@ let bumpers = [];
 let pops = [];        // Challenge 1: every popup, so draw() can fade it
 let nudges = 0;       // Challenge 2: nudges in this 120-frame window
 let tilted = false;
-let round = 1;        // Challenge 3: which round this is
+let roundNumber = 1;  // Challenge 3: which round this is (not 'round': moSHion uses that name)
 
 function setup() {
   new Canvas(440, 420);
@@ -69,7 +69,7 @@ function draw() {
   textSize(22);
   text('score: ' + score, 280, 58);
   textSize(14);
-  text('round: ' + round, 280, 80);
+  text('round: ' + roundNumber, 280, 80);
 
   for (const b of bumpers) {
     const touching = ball.colliding(b);
@@ -115,8 +115,8 @@ function draw() {
     tilted = false;
     nudges = 0;
     // Challenge 3: the next round, and a heavier ball from round 2
-    round += 1;
-    if (round >= 2) ball.mass = 3;
+    roundNumber += 1;
+    if (roundNumber >= 2) ball.mass = 3;
     ball.x = 80;
     ball.y = 40;
     ball.vel.x = 0;

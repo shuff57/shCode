@@ -24,7 +24,7 @@
     {
       "id": "s2",
       "title": "Choose the ball's weight",
-      "instructions": "A heavier body moves less under the same push (5.3.18). In `setup()`, after the ball is made, where the STEP 2 comment is, add:\n\n```js\nball.mass = 1;\n```\n\nRun it and hold an arrow again: now it is a nudge. Then try `0.4`, `1` and `4`. Mass does not change how the ball falls or rolls down the bumpers, so a drop still scores 16. It changes only what the nudge does.",
+      "instructions": "A heavier body moves less under the same push (5.3.18). In `setup()`, after the ball is made, where the STEP 2 comment is, add:\n\n```js\nball.mass = 1;\n```\n\nRun it and hold an arrow again: now it is a nudge. Then try `0.4`, `1` and `4`. Mass does not change how the ball falls or rolls down the bumpers, so each drop still adds 16 to the score. It changes only what the nudge does.",
       "hints": [
         "ball.mass = ... goes after ball = new Sprite(...), or there is no ball yet to give a weight to.",
         "At 4 the ball hardly moves when you push. At 0.4 it flies. Somewhere in between feels like a nudge."
@@ -33,7 +33,7 @@
     {
       "id": "s3",
       "title": "See the ball's body",
-      "instructions": "In `setup()`, where the STEP 3 comment is, add `ball.debug = true;` (5.3.18). A green outline now shows the body moSHion uses for the ball. Here it matches the blue circle exactly, which is what you want. If a ball ever seems to stop on nothing or pass through a wall, this is the first thing to switch on.\n\nYou can leave it on, or flip it with a key in `draw()`: `if (kb.presses('d')) ball.debug = !ball.debug;`.",
+      "instructions": "In `setup()`, where the STEP 3 comment is, add `ball.debug = true;` (5.3.18). A thin green ring now runs round the edge of the ball: the body moSHion uses for it. It is easy to miss on a blue ball, so look closely, or put `.debug` on a bumper too, where the green box is easy to see. Here the body matches the picture exactly, which is what you want. If a ball ever seems to stop on nothing or pass through a wall, this is the first thing to switch on.\n\nYou can leave it on, or flip it with a key in `draw()`: `if (kb.presses('d')) ball.debug = !ball.debug;`.",
       "hints": [
         "Put it on the bumpers too if you like: b1.debug = true; and so on."
       ]
@@ -51,11 +51,11 @@
     {
       "id": "r1",
       "title": "A held key pushes the ball",
-      "description": "applyForce(...) on the ball (or any sprite) runs inside an if that reads kb.pressing(...): any key, two keys, braces, or a helper that if calls. Changing vel.x does not count: velocity ignores mass, so the weight in step 2 would change nothing. Help: 5.2.13 (Reading: Forces vs Velocity)",
+      "description": "applyForce(...) on the ball (or any sprite) runs inside an if that reads kb.pressing(...): any key, two keys, braces, or a helper that if calls; or the keys set a direction and one applyForce(...) uses it. Changing vel.x does not count: velocity ignores mass, so the weight in step 2 would change nothing. Help: 5.2.13 (Reading: Forces vs Velocity)",
       "hint": "In draw(), write if (kb.pressing('right')) ball.applyForce(5, 0); and the same for 'left' with -5.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:\\bif\\s*\\((?=[^{};]{0,300}\\bkb\\s*\\.\\s*pressing\\s*\\()(?:[^{};()]|\\((?:[^{};()]|\\([^{};()]{0,200}\\)){0,200}\\)){0,300}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?|[^;{}]{0,300}?)[\\w$\\])]\\s*\\??\\.\\s*applyForce\\s*\\()|(?:\\bif\\s*\\((?=[^{};]{0,300}\\bkb\\s*\\.\\s*pressing\\s*\\()(?:[^{};()]|\\((?:[^{};()]|\\([^{};()]{0,200}\\)){0,200}\\)){0,300}\\)\\s*(?:\\{(?:(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?[^\\w$.{}])?|(?:[^;{}]{0,300}?[^\\w$.;{}])?)(?!(?:if|for|while|switch|return|function|catch|typeof|new|else|do)\\b)(?<kh>[A-Za-z_$][\\w$]*)\\s*\\((?=[\\s\\S]{0,3000}?\\bfunction\\s+\\k<kh>\\s*\\([^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?[\\w$\\])]\\s*\\??\\.\\s*applyForce\\s*\\())|(?:\\bfunction\\s+(?<kk>[A-Za-z_$][\\w$]*)\\s*\\([^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?[\\w$\\])]\\s*\\??\\.\\s*applyForce\\s*\\([\\s\\S]{0,3000}?\\bif\\s*\\((?=[^{};]{0,300}\\bkb\\s*\\.\\s*pressing\\s*\\()(?:[^{};()]|\\((?:[^{};()]|\\([^{};()]{0,200}\\)){0,200}\\)){0,300}\\)\\s*(?:\\{(?:(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?[^\\w$.{}])?|(?:[^;{}]{0,300}?[^\\w$.;{}])?)\\k<kk>\\s*\\()|(?:\\b(?:(?:const|let|var)\\s+)?(?<kv>[A-Za-z_$][\\w$]*)\\s*=(?![=>])[^;\\n]{0,200}?\\bkb\\s*\\.\\s*pressing\\s*\\([\\s\\S]{0,600}?\\bif\\s*\\((?=[^{};]{0,300}\\b\\k<kv>\\b)[^{};]{0,300}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?|[^;{}]{0,300}?)[\\w$\\])]\\s*\\??\\.\\s*applyForce\\s*\\()|(?:\\.\\s*applyForce\\s*\\([^;]{0,200}?\\bkb\\s*\\.\\s*pressing\\s*\\()",
+      "pattern": "(?:\\bif\\s*\\((?=[^{};]{0,300}\\bkb\\s*\\.\\s*pressing\\s*\\()(?:[^{};()]|\\((?:[^{};()]|\\([^{};()]{0,200}\\)){0,200}\\)){0,300}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?|[^;{}]{0,300}?)[\\w$\\])]\\s*\\??\\.\\s*applyForce\\s*\\()|(?:\\bif\\s*\\((?=[^{};]{0,300}\\bkb\\s*\\.\\s*pressing\\s*\\()(?:[^{};()]|\\((?:[^{};()]|\\([^{};()]{0,200}\\)){0,200}\\)){0,300}\\)\\s*(?:\\{(?:(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?[^\\w$.{}])?|(?:[^;{}]{0,300}?[^\\w$.;{}])?)(?!(?:if|for|while|switch|return|function|catch|typeof|new|else|do)\\b)(?<kh>[A-Za-z_$][\\w$]*)\\s*\\((?=[\\s\\S]{0,3000}?\\bfunction\\s+\\k<kh>\\s*\\([^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?[\\w$\\])]\\s*\\??\\.\\s*applyForce\\s*\\())|(?:\\bfunction\\s+(?<kk>[A-Za-z_$][\\w$]*)\\s*\\([^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?[\\w$\\])]\\s*\\??\\.\\s*applyForce\\s*\\([\\s\\S]{0,3000}?\\bif\\s*\\((?=[^{};]{0,300}\\bkb\\s*\\.\\s*pressing\\s*\\()(?:[^{};()]|\\((?:[^{};()]|\\([^{};()]{0,200}\\)){0,200}\\)){0,300}\\)\\s*(?:\\{(?:(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?[^\\w$.{}])?|(?:[^;{}]{0,300}?[^\\w$.;{}])?)\\k<kk>\\s*\\()|(?:\\b(?:(?:const|let|var)\\s+)?(?<kv>[A-Za-z_$][\\w$]*)\\s*=(?![=>])[^;\\n]{0,200}?\\bkb\\s*\\.\\s*pressing\\s*\\([\\s\\S]{0,600}?\\bif\\s*\\((?=[^{};]{0,300}\\b\\k<kv>\\b)[^{};]{0,300}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?|[^;{}]{0,300}?)[\\w$\\])]\\s*\\??\\.\\s*applyForce\\s*\\()|(?:\\.\\s*applyForce\\s*\\([^;]{0,200}?\\bkb\\s*\\.\\s*pressing\\s*\\()|(?:\\bif\\s*\\((?=[^{};]{0,300}\\bkb\\s*\\.\\s*pressing\\s*\\()(?:[^{};()]|\\((?:[^{};()]|\\([^{};()]{0,200}\\)){0,200}\\)){0,300}\\)\\s*(?:\\{[^{}]{0,300}?[\\s;{]|\\{?\\s*)(?<d>[A-Za-z_$][\\w$]*)\\s*[-+]?=(?!=)[^;\\n]{0,100}[;\\n][\\s\\S]{0,1500}?[\\w$\\])]\\s*\\??\\.\\s*applyForce\\s*\\([^;]{0,200}?\\b\\k<d>\\b)",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -77,11 +77,11 @@
     {
       "id": "r3",
       "title": "The collider outline is on",
-      "description": "A sprite's .debug is set to true, or a key flips it with !. Help: 5.3.18 (Reading: Four knobs: mass, gravityScale, rotationLock, debug)",
+      "description": "A sprite's .debug is set to true (or to a variable that holds true), or a key flips it with !. Help: 5.3.18 (Reading: Four knobs: mass, gravityScale, rotationLock, debug)",
       "hint": "In setup(), write ball.debug = true;",
       "type": "regex",
       "file": "script.js",
-      "pattern": "[\\w$\\])]\\s*\\.\\s*debug\\s*=(?!=)\\s*(?:true\\b|!|1\\b|kb\\s*\\.)",
+      "pattern": "[\\w$\\])]\\s*\\.\\s*debug\\s*=(?!=)\\s*(?:!|1\\b|(?!(?:false|null|undefined)\\b)[A-Za-z_$])",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -101,7 +101,7 @@
       {
         "id": "r1",
         "title": "A held key pushes the ball",
-        "description": "applyForce(...) on the ball (or another sprite) runs only while a key is held: inside an if on kb.pressing(...), any key or keys, braces or not, or in a helper that if calls. Not met: no applyForce, applyForce that runs every frame with no key, applyForce only under kb.presses (one frame), or the push done by changing vel.x instead. Help: 5.2.13 (Reading: Forces vs Velocity)",
+        "description": "applyForce(...) on the ball (or another sprite) runs only while a key is held: inside an if on kb.pressing(...), any key or keys, braces or not, or in a helper that if calls; the keys setting a direction variable that one applyForce(...) then uses also counts. Not met: no applyForce, applyForce that runs every frame with no key, applyForce only under kb.presses (one frame), or the push done by changing vel.x instead. Help: 5.2.13 (Reading: Forces vs Velocity)",
         "points": 1
       },
       {
@@ -113,7 +113,7 @@
       {
         "id": "r3",
         "title": "The collider outline is on",
-        "description": "A sprite's .debug is set to true, or a key flips it (for example ball.debug = !ball.debug under kb.presses). Not met: no debug, debug only set to false, or only in a comment. Help: 5.3.18 (Reading: Four knobs: mass, gravityScale, rotationLock, debug)",
+        "description": "A sprite's .debug is set to true (or to a variable that holds true), or a key flips it (for example ball.debug = !ball.debug under kb.presses). Not met: no debug, debug only set to false, or only in a comment. Help: 5.3.18 (Reading: Four knobs: mass, gravityScale, rotationLock, debug)",
         "points": 1
       }
     ]
