@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-// 5.3.19 Lab: Nudge the table.
-// Your table from 5.3.17. Now let the player nudge the ball, give the ball
-=======
 // 5.8.3 Lab: Nudge the table.
 // Your table from 5.7.4. Now let the player nudge the ball, give the ball
->>>>>>> codehs-inspiration
 // a weight, and see the body moSHion uses for it.
 
 let ball, ground, score;

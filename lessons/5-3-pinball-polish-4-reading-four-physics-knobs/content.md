@@ -1,10 +1,6 @@
 ## Four knobs: mass, gravityScale, rotationLock, debug
 
-<<<<<<< HEAD
-**Read before `5.3.19 Lab: Nudge the table`.** About 10 minutes.
-=======
 **Read before `5.8.3 Lab: Nudge the table`.** About 10 minutes.
->>>>>>> codehs-inspiration
 
 In 5.2 you set the knobs every sprite shares with the whole world: gravity (5.2.6), bounciness and friction (5.2.11). This reading adds four knobs that belong to **one sprite** at a time. You set each one like `.color`: once, on the sprite that needs it, usually in `setup()`.
 
@@ -23,11 +19,7 @@ ball.mass = 4;
 
 A push from `applyForce` (5.2.13) moves a heavy body less than a light one: four times the mass, a quarter of the speed. The same push can be a gentle nudge for a heavy ball and a launch for a light one. What mass does **not** change is falling: gravity pulls a heavy ball and a light ball down at the same speed. So on your pinball table a new mass leaves the drop the same and changes only what a push does. (You may also see `.density` in the docs: it is the same idea measured per pixel of size, and setting `.mass` changes it for you. This course uses `.mass`.)
 
-<<<<<<< HEAD
-**Try it:** two balls of the same size, one with mass 1 and one with mass 4 (each wears its mass as a label, 5.3.15). Holding the right arrow gives both exactly the same push. There is no gravity in this one, so they stay put until pushed.
-=======
 **Try it:** two balls of the same size, one with mass 1 and one with mass 4 (each wears its mass as a label, 5.7.1). Holding the right arrow gives both exactly the same push. There is no gravity in this one, so they stay put until pushed.
->>>>>>> codehs-inspiration
 
 ```js live
 let light, heavy, wall;
@@ -77,11 +69,7 @@ function draw() {
 leaf.gravityScale = 0.5;
 ```
 
-<<<<<<< HEAD
-You have already seen a `0` without knowing it: when a sprite's collider is `'none'`, moSHion sets its gravity share to 0 for you. That is why the popup in 5.3.16 floated.
-=======
 You have already seen a `0` without knowing it: when a sprite's collider is `'none'`, moSHion sets its gravity share to 0 for you. That is why the popup in 5.7.2 floated.
->>>>>>> codehs-inspiration
 
 **Try it:** three balls let go together. Press Run again to watch it again.
 
@@ -109,11 +97,7 @@ function setup() {
   c = new Sprite(300, 50, 40);
   c.color = 'tomato';
   c.gravityScale = 0;
-<<<<<<< HEAD
-  c.text = '0';   // a plain 0 would show nothing (5.3.15)
-=======
   c.text = '0';   // a plain 0 would show nothing (5.7.1)
->>>>>>> codehs-inspiration
 }
 
 function draw() {

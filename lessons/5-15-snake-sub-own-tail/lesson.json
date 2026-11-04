@@ -84,12 +84,6 @@
         "title": "Every segment",
         "description": "A loop checks all body segments, not just the first.",
         "points": 1
-      },
-      {
-        "id": "r3",
-        "title": "The round ends",
-        "description": "A flag stops the stepping and the game shows that it is over.",
-        "points": 1
       }
     ]
   }

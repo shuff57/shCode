@@ -84,12 +84,6 @@
         "title": "Grow by one",
         "description": "Adding a segment is unshift/push of a new cell; the tail is not dropped when growing.",
         "points": 1
-      },
-      {
-        "id": "r3",
-        "title": "Drawn by a loop",
-        "description": "Every segment is drawn from the array, not one hard-coded square.",
-        "points": 1
       }
     ]
   }

@@ -84,12 +84,6 @@
         "title": "Direction and speed",
         "description": "Both are set; direction uses angleTo and speed uses the distance.",
         "points": 1
-      },
-      {
-        "id": "r3",
-        "title": "A ceiling",
-        "description": "min/constrain caps the power.",
-        "points": 1
       }
     ]
   }

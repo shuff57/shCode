@@ -85,12 +85,6 @@
         "title": "One fair push",
         "description": "The same applyForce is called on both (or the same force number), so mass is the only variable.",
         "points": 1
-      },
-      {
-        "id": "r3",
-        "title": "It can be felt",
-        "description": "The masses differ enough to see (roughly 0.5 against 4), and neither sprite is static.",
-        "points": 1
       }
     ]
   }

@@ -1,20 +1,11 @@
 {
   "id": "5-3-pinball-polish-3-lab-show-the-worth-pop-the-points",
-<<<<<<< HEAD
-  "title": "5.3.17 Lab: Show the worth, pop the points",
-  "description": "Your table from 5.3.14 scores and chimes, but a player cannot see what a bumper is worth or what a hit just gave them. Write each bumper's worth on it, and make a small \"+5\" pop up on every hit, float away and remove itself.",
-  "type": "lesson",
-  "estimateMins": 12,
-  "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "5.3 Project: Pinball",
-=======
   "title": "5.7.4 Lab: Show the worth, pop the points",
   "description": "Your table from 5.6.3 scores and chimes, but a player cannot see what a bumper is worth or what a hit just gave them. Write each bumper's worth on it, and make a small \"+5\" pop up on every hit, float away and remove itself.",
   "type": "lesson",
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.7 Pinball: labels and popups",
->>>>>>> codehs-inspiration
   "preview": "moshion",
   "week": 11,
   "slos": [
@@ -24,11 +15,7 @@
     {
       "id": "s1",
       "title": "Write each bumper's worth on it",
-<<<<<<< HEAD
-      "instructions": "Run the starter first. It is your table from 5.3.14: three bumpers worth 1, 5 and 10, a score and a chime. Nothing on the table says what a bumper is worth.\n\nA sprite can wear words with `.text` (5.3.15), and each bumper already keeps its own `worth`. So write that number on it. In `setup()`, where the STEP 1 comment is, add one line per bumper:\n\n```js\nb1.text = b1.worth;\nb2.text = b2.worth;\nb3.text = b3.worth;\n```\n\nRun it: each bumper now shows 1, 5 or 10 in its middle. The words start white. `.textColor` and `.textSize` change their colour and size, if you want to.",
-=======
       "instructions": "Run the starter first. It is your table from 5.6.3: three bumpers worth 1, 5 and 10, a score and a chime. Nothing on the table says what a bumper is worth.\n\nA sprite can wear words with `.text` (5.7.1), and each bumper already keeps its own `worth`. So write that number on it. In `setup()`, where the STEP 1 comment is, add one line per bumper:\n\n```js\nb1.text = b1.worth;\nb2.text = b2.worth;\nb3.text = b3.worth;\n```\n\nRun it: each bumper now shows 1, 5 or 10 in its middle. The words start white. `.textColor` and `.textSize` change their colour and size, if you want to.",
->>>>>>> codehs-inspiration
       "hints": [
         "A loop works too, after the bumpers.push line: for (const b of bumpers) b.text = b.worth;",
         "A label that shows nothing usually means the line runs before that bumper's worth is set. Keep it below the worth line."
@@ -37,11 +24,7 @@
     {
       "id": "s2",
       "title": "Make a popup on every hit",
-<<<<<<< HEAD
-      "instructions": "Find the `if (touching && !b.wasTouching) { ... }` block in `draw()`. It adds the bumper's worth and plays the chime, and it is true on one frame per hit (5.3.7). The popup goes in that same block, where the STEP 2 comment is, so each hit makes exactly one:\n\n```js\nconst pop = new Sprite(b.x, b.y - 24, 28);\npop.collider = 'none';\npop.color = 'gold';\npop.text = '+' + b.worth;\npop.textColor = 'black';\npop.vel.y = -1;\n```\n\nThat makes a small gold circle just above the bumper that was hit, wearing `+1`, `+5` or `+10`. `collider = 'none'` lets the ball pass through it, and moSHion switches its gravity off, so `vel.y = -1` floats it up one pixel a frame (5.3.16).\n\nNot under `if (touching)` or `if (ball.colliding(b))` on its own: those are true on every frame of a touch, so a new popup would pile on every frame. Not in `setup()` either: that makes one popup when the game starts, and never again.",
-=======
       "instructions": "Find the `if (touching && !b.wasTouching) { ... }` block in `draw()`. It adds the bumper's worth and plays the chime, and it is true on one frame per hit (5.4.4). The popup goes in that same block, where the STEP 2 comment is, so each hit makes exactly one:\n\n```js\nconst pop = new Sprite(b.x, b.y - 24, 28);\npop.collider = 'none';\npop.color = 'gold';\npop.text = '+' + b.worth;\npop.textColor = 'black';\npop.vel.y = -1;\n```\n\nThat makes a small gold circle just above the bumper that was hit, wearing `+1`, `+5` or `+10`. `collider = 'none'` lets the ball pass through it, and moSHion switches its gravity off, so `vel.y = -1` floats it up one pixel a frame (5.7.2).\n\nNot under `if (touching)` or `if (ball.colliding(b))` on its own: those are true on every frame of a touch, so a new popup would pile on every frame. Not in `setup()` either: that makes one popup when the game starts, and never again.",
->>>>>>> codehs-inspiration
       "hints": [
         "All six lines go between the { and } of if (touching && !b.wasTouching), below chime.play();.",
         "A tall column of gold circles means the popup is being made on every frame of a touch, not once per hit."
@@ -50,11 +33,7 @@
     {
       "id": "s3",
       "title": "Let the popup remove itself",
-<<<<<<< HEAD
-      "instructions": "Run it and watch the popups: they float up off the top of the canvas, and every one of them stays in the game for ever. Give each popup a `.life` (5.3.15), on the next line inside the same block:\n\n```js\npop.life = 40;\n```\n\nNow each one is deleted 40 frames after it was made, about two-thirds of a second. Put the `.life` on the popup only: `ball.life` would delete the ball, and `b.life` would delete the bumper. That is the do-not-use list from 5.3.8.",
-=======
       "instructions": "Run it and watch the popups: they float up off the top of the canvas, and every one of them stays in the game for ever. Give each popup a `.life` (5.7.1), on the next line inside the same block:\n\n```js\npop.life = 40;\n```\n\nNow each one is deleted 40 frames after it was made, about two-thirds of a second. Put the `.life` on the popup only: `ball.life` would delete the ball, and `b.life` would delete the bumper. That is the do-not-use list from 5.4.5.",
->>>>>>> codehs-inspiration
       "hints": [
         "30 is half a second and 60 is a whole second. Any number above 0 works.",
         "If the ball or a bumper vanishes, the .life went on the wrong sprite."
@@ -73,11 +52,7 @@
     {
       "id": "r1",
       "title": "Each bumper shows its worth",
-<<<<<<< HEAD
-      "description": "Each bumper wears its worth: its .text is set from its own worth (in setup() or in the loop, straight or through a variable; joined, in a template string or with String() all count), or set to a number, or text(...) draws the worth every frame. The popup's text alone does not count. Help: 5.3.15 (Reading: Words on a sprite, and sprites that run out)",
-=======
       "description": "Each bumper wears its worth: its .text is set from its own worth (in setup() or in the loop, straight or through a variable; joined, in a template string or with String() all count), or set to a number, or text(...) draws the worth every frame. The popup's text alone does not count. Help: 5.7.1 (Reading: Words on a sprite, and sprites that run out)",
->>>>>>> codehs-inspiration
       "hint": "In setup(), below each bumper's worth line, write b1.text = b1.worth; and the same for b2 and b3.",
       "type": "inFunction",
       "file": "script.js",
@@ -105,11 +80,7 @@
     {
       "id": "r2",
       "title": "A popup is made only when a hit starts",
-<<<<<<< HEAD
-      "description": "A new Sprite(...) is made inside the if that is true only on the frame a touch starts (touching && !b.wasTouching, the one that adds the worth; touching === 1 also works), in an if nested inside it, or in a helper that if calls. The if has to be about the hit: an if on something else, such as the score, makes a popup on every frame. Not under if (touching) or colliding() alone, not straight in draw(), and not in setup(). Help: 5.3.16 (Worked Example: A \"+5\" that floats away)",
-=======
       "description": "A new Sprite(...) is made inside the if that is true only on the frame a touch starts (touching && !b.wasTouching, the one that adds the worth; touching === 1 also works), in an if nested inside it, or in a helper that if calls. The if has to be about the hit: an if on something else, such as the score, makes a popup on every frame. Not under if (touching) or colliding() alone, not straight in draw(), and not in setup(). Help: 5.7.2 (Worked Example: A \"+5\" that floats away)",
->>>>>>> codehs-inspiration
       "hint": "Make the popup between the { and } of if (touching && !b.wasTouching), next to score += b.worth;.",
       "type": "regex",
       "file": "script.js",
@@ -122,11 +93,7 @@
     {
       "id": "r3",
       "title": "The popup removes itself",
-<<<<<<< HEAD
-      "description": "The sprite made in draw() for the popup gets a .life above 0 (a number or a variable), or a countdown of your own that ends in .delete(). A .life on the ball or a bumper does not count: it deletes them. Help: 5.3.15 (Reading: Words on a sprite, and sprites that run out)",
-=======
       "description": "The sprite made in draw() for the popup gets a .life above 0 (a number or a variable), or a countdown of your own that ends in .delete(). A .life on the ball or a bumper does not count: it deletes them. Help: 5.7.1 (Reading: Words on a sprite, and sprites that run out)",
->>>>>>> codehs-inspiration
       "hint": "On the line after the popup is made, give it a .life above 0, using the popup's own name: pop.life = 40;",
       "type": "inFunction",
       "file": "script.js",
@@ -150,47 +117,27 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-<<<<<<< HEAD
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.17 Lab: Show the worth, pop the points\". The task they were given: The starter is their pinball table from 5.3.14: three bumpers in the array bumpers, worth 1, 5 and 10, scored in a loop with an edge check (touching now and not touching last frame, by each bumper's own wasTouching), with a chime played in that same if. (1) Write each bumper's worth on it with .text, for example b1.text = b1.worth; in setup() for each bumper, or a loop. (2) Inside the if that adds the worth, make a small popup sprite near the bumper, with collider 'none', a colour, .text set to '+' joined with the worth, and a small upward vel.y. (3) Give the popup a .life above 0 so it removes itself. What the starter file already had: walls, the three bumpers with worth and wasTouching, a ground, a ball that rolls, the score and its edge-checked loop in draw(), the chime loaded in setup() and played on each hit, and an R key that drops the ball again. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine, and so is moving the rules into update(). Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count, and the starter's STEP comments are never the student's work. moSHion facts that matter here: a sprite's .text writes words or a number in its middle, moving with it; .textColor and .textSize are optional. .life = n counts down one per frame and deletes the sprite at 0, so .life on the ball or on a bumper deletes that ball or bumper, and .life = 0 or a negative number never removes the popup. A sprite whose collider is 'none' is passed through by everything and has its gravity switched off, so a small negative vel.y floats it up. ball.colliding(b) is 0 while apart and a count of frames while touching, so an if on it alone (or on touching alone) is true on every frame of a touch and would make about 60 popups a second; the if that adds the worth is true only on the frame a touch starts. touching === 1 is also true only on a touch's first frame. A memory tested with === false while it holds colliding()'s number is never true, but if touching was turned into true or false first (colliding(b) > 0), === false works. An if that is not about the hit at all (for example on the score, or on a flag of the student's own) makes a popup on every frame. A popup made in setup() is made once, when the game starts, never on a hit. text(b.worth, x, y) drawn every frame in draw() also shows a worth, though sprites are drawn over it. A helper function that the hit's if calls counts as making the popup in that if. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
-=======
     "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.4 Lab: Show the worth, pop the points\". The task they were given: The starter is their pinball table from 5.6.3: three bumpers in the array bumpers, worth 1, 5 and 10, scored in a loop with an edge check (touching now and not touching last frame, by each bumper's own wasTouching), with a chime played in that same if. (1) Write each bumper's worth on it with .text, for example b1.text = b1.worth; in setup() for each bumper, or a loop. (2) Inside the if that adds the worth, make a small popup sprite near the bumper, with collider 'none', a colour, .text set to '+' joined with the worth, and a small upward vel.y. (3) Give the popup a .life above 0 so it removes itself. What the starter file already had: walls, the three bumpers with worth and wasTouching, a ground, a ball that rolls, the score and its edge-checked loop in draw(), the chime loaded in setup() and played on each hit, and an R key that drops the ball again. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine, and so is moving the rules into update(). Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count, and the starter's STEP comments are never the student's work. moSHion facts that matter here: a sprite's .text writes words or a number in its middle, moving with it; .textColor and .textSize are optional. .life = n counts down one per frame and deletes the sprite at 0, so .life on the ball or on a bumper deletes that ball or bumper, and .life = 0 or a negative number never removes the popup. A sprite whose collider is 'none' is passed through by everything and has its gravity switched off, so a small negative vel.y floats it up. ball.colliding(b) is 0 while apart and a count of frames while touching, so an if on it alone (or on touching alone) is true on every frame of a touch and would make about 60 popups a second; the if that adds the worth is true only on the frame a touch starts. touching === 1 is also true only on a touch's first frame. A memory tested with === false while it holds colliding()'s number is never true, but if touching was turned into true or false first (colliding(b) > 0), === false works. An if that is not about the hit at all (for example on the score, or on a flag of the student's own) makes a popup on every frame. A popup made in setup() is made once, when the game starts, never on a hit. text(b.worth, x, y) drawn every frame in draw() also shows a worth, though sprites are drawn over it. A helper function that the hit's if calls counts as making the popup in that if. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
->>>>>>> codehs-inspiration
     "rubric": [
       {
         "id": "r1",
         "title": "Each bumper shows its worth",
-<<<<<<< HEAD
-        "description": "Each bumper shows what it is worth: its .text is set from its own worth (b1.text = b1.worth, or the same in a loop over the bumpers, in setup() or every frame, straight or through a variable; joining with a string, a template string or String() all count), or each bumper's .text is set to its number, or text(...) draws each bumper's worth every frame. Not met: no label on the bumpers, or the only .text is the popup's. Help: 5.3.15 (Reading: Words on a sprite, and sprites that run out)",
-=======
         "description": "Each bumper shows what it is worth: its .text is set from its own worth (b1.text = b1.worth, or the same in a loop over the bumpers, in setup() or every frame, straight or through a variable; joining with a string, a template string or String() all count), or each bumper's .text is set to its number, or text(...) draws each bumper's worth every frame. Not met: no label on the bumpers, or the only .text is the popup's. Help: 5.7.1 (Reading: Words on a sprite, and sprites that run out)",
->>>>>>> codehs-inspiration
         "points": 1
       },
       {
         "id": "r2",
         "title": "A popup is made only when a hit starts",
-<<<<<<< HEAD
-        "description": "A new sprite (the popup) is made only on the frame a bumper hit starts: inside the if that tests touching now and not touching last frame (the one that adds the worth), in an if nested inside it, or in a helper that if calls. Above or below the score line both count. Not met: the popup made under an if that is not about the hit (for example score >= 0 && !over), straight in draw() or in the loop outside that if, under an if on colliding() or touching alone, in that if's else, under a key press, or only in setup(). Help: 5.3.16 (Worked Example: A \"+5\" that floats away)",
-=======
         "description": "A new sprite (the popup) is made only on the frame a bumper hit starts: inside the if that tests touching now and not touching last frame (the one that adds the worth), in an if nested inside it, or in a helper that if calls. Above or below the score line both count. Not met: the popup made under an if that is not about the hit (for example score >= 0 && !over), straight in draw() or in the loop outside that if, under an if on colliding() or touching alone, in that if's else, under a key press, or only in setup(). Help: 5.7.2 (Worked Example: A \"+5\" that floats away)",
->>>>>>> codehs-inspiration
         "points": 1
       },
       {
         "id": "r3",
         "title": "The popup removes itself",
-<<<<<<< HEAD
-        "description": "The popup sprite gets a .life above 0 (any number or variable), so moSHion deletes it a little later; a countdown of the student's own that ends in .delete() also counts. Not met: no .life on the popup, a .life of 0 or below, or .life put on the ball or a bumper instead (that deletes the ball or the bumper). Help: 5.3.15 (Reading: Words on a sprite, and sprites that run out)",
-        "points": 1
-      }
-    ]
-  }
-=======
         "description": "The popup sprite gets a .life above 0 (any number or variable), so moSHion deletes it a little later; a countdown of the student's own that ends in .delete() also counts. Not met: no .life on the popup, a .life of 0 or below, or .life put on the ball or a bumper instead (that deletes the ball or the bumper). Help: 5.7.1 (Reading: Words on a sprite, and sprites that run out)",
         "points": 1
       }
     ]
   },
   "carryFrom": "5-3-pinball-sound-2-lab-a-chime-on-every-hit"
->>>>>>> codehs-inspiration
 }

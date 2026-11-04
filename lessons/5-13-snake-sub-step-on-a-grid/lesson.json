@@ -84,12 +84,6 @@
         "title": "A whole cell",
         "description": "x changes by a cell-sized step, not by 1 or by velocity.",
         "points": 1
-      },
-      {
-        "id": "r3",
-        "title": "It stays on the canvas",
-        "description": "There is an edge rule (wrap or turn), so the block cannot walk off and disappear.",
-        "points": 1
       }
     ]
   }

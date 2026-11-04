@@ -85,12 +85,6 @@
         "title": "The tap is an impulse",
         "description": "The key press sets vel.y to a negative number (or applies an upward force); it does not set y directly.",
         "points": 1
-      },
-      {
-        "id": "r3",
-        "title": "One press, one flap",
-        "description": "The key test uses presses (or a gated pressing), so holding the key does not hold the bird up.",
-        "points": 1
       }
     ]
   }

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-// 5.3.21 Challenges: Polish it your way (reference: all three).
-=======
 // 5.9.4 Challenges: Polish it your way (reference: all three).
->>>>>>> codehs-inspiration
 // My polish: popups fade out, shaking the table more than 3 times in 120 frames
 // tilts it and loses the ball, and from round 2 the ball is heavier. Without the
 // tilt a player could hold the arrows and never lose a ball.

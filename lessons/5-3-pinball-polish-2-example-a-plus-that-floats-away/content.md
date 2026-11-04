@@ -1,20 +1,12 @@
 ## A "+5" that floats away
 
-<<<<<<< HEAD
-**Read after `5.3.15 Reading: Words on a sprite, and sprites that run out`.** About 10 minutes.
-=======
 **Read after `5.7.1 Reading: Words on a sprite, and sprites that run out`.** About 10 minutes.
->>>>>>> codehs-inspiration
 
 **Goal:** on a two-bumper table, label each bumper with what it is worth, and make a little "+5" pop up on each hit, float upward and disappear by itself. Then see the same popup in the wrong place, so you can recognise that bug when it happens to you.
 
 ## Step 1: Label each bumper with its worth
 
-<<<<<<< HEAD
-Each bumper already keeps its own `worth`, the way the bumpers in 5.3.8 did. One more line per bumper in `setup()` writes that number on it:
-=======
 Each bumper already keeps its own `worth`, the way the bumpers in 5.4.5 did. One more line per bumper in `setup()` writes that number on it:
->>>>>>> codehs-inspiration
 
 ```js
 b1.worth = 2;
@@ -99,11 +91,7 @@ function draw() {
 
 **What you'll see:** the ball rolls down the bumper marked 2, and a gold "+2" pops up above it and drifts upward. Then the ball lands on the bumper marked 5 and a "+5" pops up. Each popup is gone a moment later. The score reads 2, then 7.
 
-<<<<<<< HEAD
-The popup is eight lines, and every one of them is inside the `if (touching && !b.wasTouching)` block, next to `score += b.worth;`. That `if` is true on one frame per hit (5.3.7), so each hit makes exactly one popup. Line by line:
-=======
 The popup is eight lines, and every one of them is inside the `if (touching && !b.wasTouching)` block, next to `score += b.worth;`. That `if` is true on one frame per hit (5.4.4), so each hit makes exactly one popup. Line by line:
->>>>>>> codehs-inspiration
 
 - `const pop = new Sprite(b.x, b.y - 24, 28);` makes a small circle 24 pixels above the middle of the bumper that was hit. It is a `const` inside the `if` because nothing outside this block ever needs to name it again: once it is made, it moves and removes itself.
 - `pop.collider = 'none';` lets the ball pass straight through it (5.2.16). moSHion also switches gravity off for a sprite whose collider is `'none'`, so it floats instead of falling.
@@ -185,19 +173,11 @@ function draw() {
 }
 ```
 
-<<<<<<< HEAD
-**What you'll see:** the score is still right, 2 and then 7, but the popups pile up into a gold column above each bumper for as long as the ball touches it: a new one on every frame, each one pixel above the one before, so you cannot read a single "+2" in it. `if (touching)` is true on every frame of a touch, so it makes a new popup about 60 times a second. That is the climbing score from 5.3.6 again, in a different costume. `.life` still removes every one of them, so the column goes away once the ball leaves, but a player sees a smear, not a "+2". The fix is the one you already know: the popup goes where the score goes.
-
-## Step 4: The popup wears the `.life`, nothing else does
-
-`pop.life = 40;` is set on the new popup, and only on it. The same line on the ball, `ball.life = 40;`, would delete the ball 40 frames after its first hit, and on a bumper, `b.life = 40;`, it would delete the bumper. That is the do-not-use warning from 5.3.8: on a sprite, `life` is a countdown to being deleted, never a value of your own.
-=======
 **What you'll see:** the score is still right, 2 and then 7, but the popups pile up into a gold column above each bumper for as long as the ball touches it: a new one on every frame, each one pixel above the one before, so you cannot read a single "+2" in it. `if (touching)` is true on every frame of a touch, so it makes a new popup about 60 times a second. That is the climbing score from 5.4.2 again, in a different costume. `.life` still removes every one of them, so the column goes away once the ball leaves, but a player sees a smear, not a "+2". The fix is the one you already know: the popup goes where the score goes.
 
 ## Step 4: The popup wears the `.life`, nothing else does
 
 `pop.life = 40;` is set on the new popup, and only on it. The same line on the ball, `ball.life = 40;`, would delete the ball 40 frames after its first hit, and on a bumper, `b.life = 40;`, it would delete the bumper. That is the do-not-use warning from 5.4.5: on a sprite, `life` is a countdown to being deleted, never a value of your own.
->>>>>>> codehs-inspiration
 
 ## Key takeaways
 

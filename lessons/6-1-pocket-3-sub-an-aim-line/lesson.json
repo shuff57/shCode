@@ -85,12 +85,6 @@
         "title": "From the ball to the pointer",
         "description": "The line uses the ball's x/y and mouse.x/mouse.y, in either order.",
         "points": 1
-      },
-      {
-        "id": "r3",
-        "title": "The pull is visible",
-        "description": "A distance is shown, rounded or not.",
-        "points": 1
       }
     ]
   }

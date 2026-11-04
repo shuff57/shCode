@@ -81,12 +81,6 @@
         "title": "The score fires on the edge only",
         "description": "Adding to the score happens under an if that tests the stored answer AND the memory being false, so a held touch counts once.",
         "points": 1
-      },
-      {
-        "id": "r3",
-        "title": "The memory is updated every frame",
-        "description": "The previous-frame variable is given this frame's answer on every frame, outside the score branch, so the next touch can fire again.",
-        "points": 1
       }
     ]
   }
