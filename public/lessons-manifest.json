@@ -7190,6 +7190,19 @@
       "scoreKind": null
     },
     {
+      "id": "5-17-build-your-own",
+      "title": "5.17.1 Build your own: a small game",
+      "unit": "5.17 Build your own",
+      "preview": "moshion",
+      "type": "project",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "5-2-1-slides",
       "title": "5.2.5 Slides: Physics Feel",
       "unit": "5.2 Physics Feel",
@@ -8023,7 +8036,7 @@
     },
     {
       "id": "5-3-pinball-6-lab-score-one-point-per-touch",
-      "title": "5.4.3 Lab: Score one point per touch",
+      "title": "5.4.4 Lab: Score one point per touch",
       "unit": "5.4 Pinball: score once",
       "preview": "moshion",
       "type": "lesson",
@@ -8036,7 +8049,7 @@
     },
     {
       "id": "5-3-pinball-7-lab-three-bumpers-three-values",
-      "title": "5.4.4 Lab: Three bumpers, three values",
+      "title": "5.4.5 Lab: Three bumpers, three values",
       "unit": "5.4 Pinball: score once",
       "preview": "moshion",
       "type": "lesson",
@@ -8062,7 +8075,7 @@
     },
     {
       "id": "5-3-pinball-9-lab-lose-and-start-again",
-      "title": "5.5.2 Lab: Lose, and start again",
+      "title": "5.5.3 Lab: Lose, and start again",
       "unit": "5.5 Pinball: lose and start again",
       "preview": "moshion",
       "type": "lesson",
@@ -8127,7 +8140,7 @@
     },
     {
       "id": "5-3-pinball-polish-3-lab-show-the-worth-pop-the-points",
-      "title": "5.7.3 Lab: Show the worth, pop the points",
+      "title": "5.7.4 Lab: Show the worth, pop the points",
       "unit": "5.7 Pinball: labels and popups",
       "preview": "moshion",
       "type": "lesson",
@@ -8153,7 +8166,7 @@
     },
     {
       "id": "5-3-pinball-polish-5-lab-nudge-the-table",
-      "title": "5.8.2 Lab: Nudge the table",
+      "title": "5.8.3 Lab: Nudge the table",
       "unit": "5.8 Pinball: physics knobs",
       "preview": "moshion",
       "type": "lesson",
@@ -8205,7 +8218,7 @@
     },
     {
       "id": "5-3-pinball-sound-2-lab-a-chime-on-every-hit",
-      "title": "5.6.2 Lab: A chime on every bumper hit",
+      "title": "5.6.3 Lab: A chime on every bumper hit",
       "unit": "5.6 Pinball: a sound on a hit",
       "preview": "moshion",
       "type": "lesson",
@@ -8356,6 +8369,19 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": 4,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-4-pinball-sub-score-once",
+      "title": "5.4.3 Sub-build: Score once",
+      "unit": "5.4 Pinball: score once",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
     },
@@ -8620,6 +8646,19 @@
       "scoreKind": null
     },
     {
+      "id": "5-5-pinball-sub-end-and-start",
+      "title": "5.5.2 Sub-build: End and start again",
+      "unit": "5.5 Pinball: lose and start again",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "5-5-snake-1-plan-break-snake-into-parts",
       "title": "5.13.1 Plan: Break Snake into parts",
       "unit": "5.13 Snake: grid and steering",
@@ -8759,6 +8798,45 @@
       "week": 12,
       "assignmentCode": null,
       "maxScore": 4,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-6-pinball-sub-one-sound",
+      "title": "5.6.2 Sub-build: One key, one sound",
+      "unit": "5.6 Pinball: a sound on a hit",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-7-pinball-sub-float-and-die",
+      "title": "5.7.3 Sub-build: A word that floats and dies",
+      "unit": "5.7 Pinball: labels and popups",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-8-pinball-sub-two-masses",
+      "title": "5.8.2 Sub-build: Two balls, two masses",
+      "unit": "5.8 Pinball: physics knobs",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
     },

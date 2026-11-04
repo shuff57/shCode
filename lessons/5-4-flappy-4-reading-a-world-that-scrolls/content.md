@@ -32,7 +32,7 @@ if (frameCount % 90 === 0) {
 }
 ```
 
-**Keep every pipe in an array.** There will be many pipes alive at once, so each one is added to an array when it is built, the way the bumpers were in 5.4.4. The array is how the game finds them again.
+**Keep every pipe in an array.** There will be many pipes alive at once, so each one is added to an array when it is built, the way the bumpers were in 5.4.5. The array is how the game finds them again.
 
 ```js
 pipes.push(makePipe());

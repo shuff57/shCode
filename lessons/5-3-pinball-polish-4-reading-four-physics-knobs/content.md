@@ -1,6 +1,6 @@
 ## Four knobs: mass, gravityScale, rotationLock, debug
 
-**Read before `5.8.2 Lab: Nudge the table`.** About 10 minutes.
+**Read before `5.8.3 Lab: Nudge the table`.** About 10 minutes.
 
 In 5.2 you set the knobs every sprite shares with the whole world: gravity (5.2.6), bounciness and friction (5.2.11). This reading adds four knobs that belong to **one sprite** at a time. You set each one like `.color`: once, on the sprite that needs it, usually in `setup()`.
 

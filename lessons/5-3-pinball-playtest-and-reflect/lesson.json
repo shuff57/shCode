@@ -19,7 +19,7 @@
     "rubricTitle": "Playtest Pinball: AI-graded rubric",
     "model": "glm-5.3-flash:cloud",
     "contextDocs": [],
-    "prompt": "Everything you need is in 5.3.1 (Plan: Sketch your pinball game) and 5.5.2 (Lab: Lose, and start again): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished pinball game at least three times, trying to lose in different ways. Then answer:\n\n1. How many rounds did you play, and how did they go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which part of your code do you think that comes from?\n\n4. What is one rule or number you would change, and what would it do to the game?",
+    "prompt": "Everything you need is in 5.3.1 (Plan: Sketch your pinball game) and 5.5.3 (Lab: Lose, and start again): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished pinball game at least three times, trying to lose in different ways. Then answer:\n\n1. How many rounds did you play, and how did they go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which part of your code do you think that comes from?\n\n4. What is one rule or number you would change, and what would it do to the game?",
     "rubric": [
       {
         "id": "played",

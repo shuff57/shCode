@@ -22,7 +22,7 @@ function cellToPixel(n) {
 
 Adding half a cell puts the *centre* of the sprite in the centre of the cell, because a sprite's `x` and `y` are its centre. Column 3 lands at `3 * 20 + 10 = 70`.
 
-**Store the cell on the sprite.** A sprite is an object, so you can give it your own properties, the same way the bumpers carried a `worth` in 5.4.4:
+**Store the cell on the sprite.** A sprite is an object, so you can give it your own properties, the same way the bumpers carried a `worth` in 5.4.5:
 
 ```js
 const s = new Sprite(cellToPixel(3), cellToPixel(5), CELL - 2, CELL - 2, 'static');

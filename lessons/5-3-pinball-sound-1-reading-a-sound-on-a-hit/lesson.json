@@ -1,7 +1,7 @@
 {
   "id": "5-3-pinball-sound-1-reading-a-sound-on-a-hit",
   "title": "5.6.1 Reading: A sound on a hit",
-  "description": "loadSound() downloads a sound once, in setup(); .play() plays one copy and .volume sets how loud. The chime goes where the score goes, inside the edge check, so a hit gives one ding and not a buzz. Most browsers stay silent until the first click or key press on the game. Read before 5.6.2 Lab: A chime on every bumper hit.",
+  "description": "loadSound() downloads a sound once, in setup(); .play() plays one copy and .volume sets how loud. The chime goes where the score goes, inside the edge check, so a hit gives one ding and not a buzz. Most browsers stay silent until the first click or key press on the game. Read before 5.6.3 Lab: A chime on every bumper hit.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",

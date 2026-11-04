@@ -6,7 +6,7 @@
 
 ## Step 1: Label each bumper with its worth
 
-Each bumper already keeps its own `worth`, the way the bumpers in 5.4.4 did. One more line per bumper in `setup()` writes that number on it:
+Each bumper already keeps its own `worth`, the way the bumpers in 5.4.5 did. One more line per bumper in `setup()` writes that number on it:
 
 ```js
 b1.worth = 2;
@@ -91,7 +91,7 @@ function draw() {
 
 **What you'll see:** the ball rolls down the bumper marked 2, and a gold "+2" pops up above it and drifts upward. Then the ball lands on the bumper marked 5 and a "+5" pops up. Each popup is gone a moment later. The score reads 2, then 7.
 
-The popup is eight lines, and every one of them is inside the `if (touching && !b.wasTouching)` block, next to `score += b.worth;`. That `if` is true on one frame per hit (5.4.3), so each hit makes exactly one popup. Line by line:
+The popup is eight lines, and every one of them is inside the `if (touching && !b.wasTouching)` block, next to `score += b.worth;`. That `if` is true on one frame per hit (5.4.4), so each hit makes exactly one popup. Line by line:
 
 - `const pop = new Sprite(b.x, b.y - 24, 28);` makes a small circle 24 pixels above the middle of the bumper that was hit. It is a `const` inside the `if` because nothing outside this block ever needs to name it again: once it is made, it moves and removes itself.
 - `pop.collider = 'none';` lets the ball pass straight through it (5.2.16). moSHion also switches gravity off for a sprite whose collider is `'none'`, so it floats instead of falling.
@@ -177,7 +177,7 @@ function draw() {
 
 ## Step 4: The popup wears the `.life`, nothing else does
 
-`pop.life = 40;` is set on the new popup, and only on it. The same line on the ball, `ball.life = 40;`, would delete the ball 40 frames after its first hit, and on a bumper, `b.life = 40;`, it would delete the bumper. That is the do-not-use warning from 5.4.4: on a sprite, `life` is a countdown to being deleted, never a value of your own.
+`pop.life = 40;` is set on the new popup, and only on it. The same line on the ball, `ball.life = 40;`, would delete the ball 40 frames after its first hit, and on a bumper, `b.life = 40;`, it would delete the bumper. That is the do-not-use warning from 5.4.5: on a sprite, `life` is a countdown to being deleted, never a value of your own.
 
 ## Key takeaways
 

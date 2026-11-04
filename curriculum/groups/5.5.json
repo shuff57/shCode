@@ -8,6 +8,7 @@
       "objective": "Students can losing and restarting and see it run.",
       "screens": [
         "5-3-pinball-8-reading-the-state-of-the-game",
+        "5-5-pinball-sub-end-and-start",
         "5-3-pinball-9-lab-lose-and-start-again"
       ]
     }

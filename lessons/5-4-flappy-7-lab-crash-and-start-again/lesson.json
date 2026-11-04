@@ -33,10 +33,10 @@
     {
       "id": "s3",
       "title": "Play only while playing",
-      "instructions": "Freezing stops what is already on the screen, but the code that makes new things still runs every frame: new pipes keep arriving on the beat, the space bar still flaps, and the score can still go up. Wrap the play code in `draw()` (the flap, the edge check, the new pipes on the beat, and both pipe loops) in `if (playing) { ... }`, the same shape as 5.5.2. Then draw 'Game over' in `drawTop()`, the function at the bottom of the starter that already shows the score: it runs after the pipes are drawn, so a frozen pipe cannot cover the words. Run it and crash: no new pipe should appear and the score should stay where it was.",
+      "instructions": "Freezing stops what is already on the screen, but the code that makes new things still runs every frame: new pipes keep arriving on the beat, the space bar still flaps, and the score can still go up. Wrap the play code in `draw()` (the flap, the edge check, the new pipes on the beat, and both pipe loops) in `if (playing) { ... }`, the same shape as 5.5.3. Then draw 'Game over' in `drawTop()`, the function at the bottom of the starter that already shows the score: it runs after the pipes are drawn, so a frozen pipe cannot cover the words. Run it and crash: no new pipe should appear and the score should stay where it was.",
       "hints": [
         "`if (playing) { ...all of the play code... }` in `draw()`.",
-        "In `drawTop()`: `if (!playing) { text('Game over', 130, 190); }`. The `!` reads as \"not\", as in `!wasTouching` from 5.4.3. An `else` after `if (playing)` in `draw()` works too, but there a pipe can sit on top of the words."
+        "In `drawTop()`: `if (!playing) { text('Game over', 130, 190); }`. The `!` reads as \"not\", as in `!wasTouching` from 5.4.4. An `else` after `if (playing)` in `draw()` works too, but there a pipe can sit on top of the words."
       ]
     },
     {

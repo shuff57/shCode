@@ -8,7 +8,7 @@ By the end of this reading you should be able to answer:
 
 - How does a sprite carry its own words, and how do you change their colour and size?
 - What does `.life = 60` do to a sprite?
-- Why was `life` on the list of names not to use in 5.4.4?
+- Why was `life` on the list of names not to use in 5.4.5?
 - When is it fine to make a sprite in `draw()`?
 
 **A sprite can wear words.** In 5.1.21 you drew words on the canvas with `text()`. A sprite can also carry its own words, written in its middle, with `.text`:
@@ -61,9 +61,9 @@ spark.life = 60;   // gone about one second from now
 
 `.life = 30` is half a second, and `.life = 120` is two seconds. You set it once, and the sprite cleans itself up. You never write the `.delete()` yourself.
 
-**This is why `life` was on the do-not-use list.** In 5.4.4 you stored your own values on each bumper, `worth` and `wasTouching`, and the step warned you to keep away from names a sprite already has. `life` is one of them. If you had stored a bumper's three lives as `b.life = 3`, you would not have made a new value at all: you would have told moSHion to delete that bumper three frames later, and it would vanish before you saw it.
+**This is why `life` was on the do-not-use list.** In 5.4.5 you stored your own values on each bumper, `worth` and `wasTouching`, and the step warned you to keep away from names a sprite already has. `life` is one of them. If you had stored a bumper's three lives as `b.life = 3`, you would not have made a new value at all: you would have told moSHion to delete that bumper three frames later, and it would vanish before you saw it.
 
-**When is it fine to make a sprite in `draw()`?** In 5.1 the bug was a `new Sprite(...)` straight inside `draw()`: it made a new sprite on every frame, 60 a second. A sprite made inside an `if` that is true on **one frame only** is different. A key press (`kb.presses`) or the frame a hit starts (`touching && !wasTouching`, 5.4.3) makes exactly one sprite each time it happens. Give that sprite a `.life`, and it goes away by itself, so they never pile up.
+**When is it fine to make a sprite in `draw()`?** In 5.1 the bug was a `new Sprite(...)` straight inside `draw()`: it made a new sprite on every frame, 60 a second. A sprite made inside an `if` that is true on **one frame only** is different. A key press (`kb.presses`) or the frame a hit starts (`touching && !wasTouching`, 5.4.4) makes exactly one sprite each time it happens. Give that sprite a `.life`, and it goes away by itself, so they never pile up.
 
 **Try it:** each press of the space bar makes one orange spark at a random spot (`random` from 5.2.1). Each one lives for 60 frames, about one second.
 
@@ -95,7 +95,7 @@ function draw() {
 
 1. In the second sketch, change `spark.life = 60;` to `spark.life = 180;` and press the space bar a few times. Each spark now stays about three seconds.
 2. Change `kb.presses(' ')` to `kb.pressing(' ')` and hold the space bar down. Now it is true on every frame you hold it, so a new spark appears every frame, 60 a second. `.life` still cleans them up, but this is the made-every-frame bug from 5.1 again. Change it back.
-3. In the first sketch, add `box.life = 3;` on the line after `box.rotationSpeed = 1;` and run it. The box is gone before you can see it. That is the do-not-use warning from 5.4.4.
+3. In the first sketch, add `box.life = 3;` on the line after `box.rotationSpeed = 1;` and run it. The box is gone before you can see it. That is the do-not-use warning from 5.4.5.
 
 ---
 

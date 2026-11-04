@@ -1,0 +1,19 @@
+{
+  "modules": {
+    "5.7": [
+      {
+        "folder": "5-3-pinball-polish-1-reading-words-and-sprites-that-run-out"
+      },
+      {
+        "folder": "5-3-pinball-polish-2-example-a-plus-that-floats-away"
+      },
+      {
+        "folder": "5-7-pinball-sub-float-and-die",
+        "new": true
+      },
+      {
+        "folder": "5-3-pinball-polish-3-lab-show-the-worth-pop-the-points"
+      }
+    ]
+  }
+}

@@ -3,7 +3,7 @@
 Your game is complete: a table, a goal, a score that counts events, an end, and a restart. Now change one rule of your own choosing. Pick any one of these, or several, or invent your own.
 
 **Challenge 1 — a second goal (easy).**
-Add a second goal worth more than the first, and call it anything you like. Give each goal its own value, the same way the bumpers in 5.4.4 each had a `worth`, and give the new goal its own remembered last frame, just as each bumper had its own `wasTouching`. Watch a drop first and put the new goal where the ball really goes, or it will never be hit.
+Add a second goal worth more than the first, and call it anything you like. Give each goal its own value, the same way the bumpers in 5.4.5 each had a `worth`, and give the new goal its own remembered last frame, just as each bumper had its own `wasTouching`. Watch a drop first and put the new goal where the ball really goes, or it will never be hit.
 
 **Challenge 2 — a bumper that slides (medium).**
 Add a short bumper that slides left and right. Keep it `'static'`, so gravity leaves it alone, and move it yourself: in `draw()`, change its `x` a little every frame, then turn it round when it reaches an edge by flipping the sign of the step. Put it where the ball really goes. Watch a drop: after the ball bounces off the ground it flies back to the left in a high arc, towards the drain. This slider sweeps back and forth across that arc.

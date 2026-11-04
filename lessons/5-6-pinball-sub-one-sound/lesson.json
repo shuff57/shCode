@@ -1,0 +1,93 @@
+{
+  "id": "5-6-pinball-sub-one-sound",
+  "title": "5.6.2 Sub-build: One key, one sound",
+  "description": "A key press plays one sound. Load it once, play it where the event happens, and hear the difference between once and every frame.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.6 Pinball: a sound on a hit",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it first",
+      "instructions": "Press Space. The circle flashes but there is no sound: nothing is loaded and nothing plays."
+    },
+    {
+      "id": "s2",
+      "title": "Load it once",
+      "instructions": "In `setup()`, load the sound once and keep it in a variable: `const blip = loadSound('/moshion/assets/coin.wav');`. It loads asynchronously, so a browser will not play it before the page has had a click or a key press."
+    },
+    {
+      "id": "s3",
+      "title": "Play it on the key",
+      "instructions": "Inside an `if (kb.presses('space'))`, call `blip.play()`. Use `presses`, not `pressing`, so holding the key does not machine-gun the sound.",
+      "hints": [
+        "Run it, then click the canvas once and press Space. A browser blocks sound until the student interacts.",
+        "A sound on every frame means the play call is outside the key test."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Loaded once",
+      "description": "The sound is loaded in setup() and kept in a variable, not loaded inside draw(). Help: 5.6.1 (Reading: A sound on a hit)",
+      "hint": "const blip = loadSound('/moshion/assets/coin.wav');",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bloadSound\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "Played on the key",
+      "description": "Play is called inside a key test (presses or pressing), not every frame. Help: 5.6.1 (Reading: A sound on a hit)",
+      "hint": "if (kb.presses('space')) { blip.play(); }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "kb\\s*\\.\\s*press(?:es|ing)\\s*\\([^)]{0,40}\\)[\\s\\S]{0,200}?\\.play\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a short moSHion sketch for \"Sub-build: One key, one sound\". The task: load one sound once in setup(), keep it in a variable, and play it inside a key test so it fires once per press rather than every frame. This is a sub-build: a small isolated program whose only job is this one mechanic, so judge the mechanic itself and not style. Accept any variable names, helper functions, arrow functions, ternaries and semicolons. A line that only exists in a comment or a string does not count. moSHion facts: colliding(b) is 0 while apart and counts frames while touching, so an if on it alone is true every frame of a touch; a stored \"last frame\" value makes it true once. .life = n counts down one per frame and deletes the sprite at 0. A sprite with collider 'none' is passed through and has its gravity off. loadSound(path) in setup() and sound.play() where the event happens; a browser will not play sound before the student's first click or key. Write short, plain notes for a 14-year-old, name the student's own line when something is missing, and never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "One load",
+        "description": "loadSound is called once, in setup() (or on the first event), not inside draw().",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Played on the event",
+        "description": "play() is called under a key test (presses or pressing), so it fires on the event and not every frame.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "It can actually be heard",
+        "description": "The path is a real asset (/moshion/assets/coin.wav or a saved name), so no silent failure.",
+        "points": 1
+      }
+    ]
+  }
+}

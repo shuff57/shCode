@@ -1,5 +1,5 @@
-// 5.8.2 Lab: Nudge the table.
-// Your table from 5.7.3. Now let the player nudge the ball, give the ball
+// 5.8.3 Lab: Nudge the table.
+// Your table from 5.7.4. Now let the player nudge the ball, give the ball
 // a weight, and see the body moSHion uses for it.
 
 let ball, ground, score;

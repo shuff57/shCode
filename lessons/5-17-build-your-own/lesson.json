@@ -1,0 +1,123 @@
+{
+  "id": "5-17-build-your-own",
+  "title": "5.17.1 Build your own: a small game",
+  "description": "Your game, not ours. Five things it must do, drawn from everything in this unit, and one rule: it cannot be one of the four games you already built.",
+  "type": "project",
+  "estimateMins": 60,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.17 Build your own",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Pitch it in README.md",
+      "instructions": "Before any code, write two sentences in README.md: what the player does, and what winning and losing mean. Then say which game you are NOT rebuilding. If you combine two of Pinball, Flappy, Snake and Pocket, name both and say what the combination changes. \"Snake but with a gun\" is not a combination; \"Snake's grid and Pocket's aim, where you aim the snake\" is.",
+      "hints": [
+        "A game you can finish saying in two sentences is the right size.",
+        "If your idea is \"Pinball with a different colour\", change the idea, not the colour."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Build the smallest thing that runs",
+      "instructions": "A canvas and a sprite you can move. Run it before adding the next thing: a game you can play is easier to grow than a game you are still assembling.",
+      "hints": [
+        "`kb.pressing` for a held key, `mouse.x` for the pointer."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Make it a game",
+      "instructions": "Add the four things every game in this unit has: something to hit or avoid that scores once per event, a way to lose, R to start again, and a label that shows the score. Keep three of one sprite in an array and read it in a loop.",
+      "hints": [
+        "Score once per event means the edge check from 5.4: the answer this frame and the answer last frame.",
+        "Put the restart in its own if, so it works from either state."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Check it against the five requirements",
+      "instructions": "Every card below must be green. None of them names a particular game: they check that the idea is there, however you wrote it. A class of your own is allowed but earns nothing here.",
+      "hints": [
+        "A card that will not go green usually means the line is outside the if that owns it.",
+        "If you cannot make one card green, write down why in README.md and ask."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A sprite the player moves",
+      "description": "Keyboard or mouse input moves a sprite: kb.pressing/presses setting x, vel or y, or the pointer. Help: 5.1.18 (Keyboard Movement)",
+      "hint": "if (kb.pressing('right')) player.vel.x = 3;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bkb\\s*\\.\\s*press(?:es|ing)\\s*\\(|\\bmouse\\s*\\.\\s*press(?:es|ing)\\s*\\(|\\bmouse\\s*\\.\\s*x",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "A score that changes once per event",
+      "description": "The score changes under an edge test (a stored answer and the frame before), not under a level collision or every frame. Help: 5.4.1 (Reading: A collision is not an event)",
+      "hint": "if (touching && !wasTouching) { score += 1; }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bif\\s*\\([^)]{0,120}&&\\s*![^)]{0,80}\\)\\s*\\{?[^}]{0,400}?\\bscore\\s*(?:\\+\\+|\\+=)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "A way to lose, and R",
+      "description": "A lost/gameOver/playing flag is set when the round ends, and R puts the game back and resets the score. Help: 5.5.1 (Reading: The state of the game)",
+      "hint": "if (kb.presses('r')) { score = 0; playing = true; }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "kb\\s*\\.\\s*presses?\\s*\\(\\s*['\"]r['\"]",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r4",
+      "title": "Three of one sprite in an array",
+      "description": "At least three sprites of one kind are pushed into an array and the array is read in a loop. Help: 5.4.5 (Lab: Three bumpers, three values)",
+      "hint": "for (const c of coins) { ... }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.push\\s*\\(|\\bnew\\s+Group\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r5",
+      "title": "A label, and something that expires",
+      "description": "A sprite wears words with .text (or text() draws a label), and one sprite removes itself with a .life above 0. Help: 5.7.1 (Reading: Words on a sprite, and sprites that run out)",
+      "hint": "pop.life = 40;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.text\\s*=|\\btext\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

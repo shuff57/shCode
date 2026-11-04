@@ -1,7 +1,7 @@
 {
   "id": "5-3-pinball-polish-1-reading-words-and-sprites-that-run-out",
   "title": "5.7.1 Reading: Words on a sprite, and sprites that run out",
-  "description": "A sprite can wear its own words with .text, coloured by .textColor and sized by .textSize; they move with it and stay upright. .life = 60 deletes a sprite about one second later, which is why life was on 5.4.4's list of names not to use. A sprite made on one frame only, such as the frame a hit starts, is fine in draw(). Read before 5.7.2 Worked Example: A \"+5\" that floats away.",
+  "description": "A sprite can wear its own words with .text, coloured by .textColor and sized by .textSize; they move with it and stay upright. .life = 60 deletes a sprite about one second later, which is why life was on 5.4.5's list of names not to use. A sprite made on one frame only, such as the frame a hit starts, is fine in draw(). Read before 5.7.2 Worked Example: A \"+5\" that floats away.",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",

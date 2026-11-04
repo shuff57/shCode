@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Pick a rule and change it",
-      "instructions": "Choose one of these three challenges, or more than one, or invent a rule of your own. Read the whole challenge before you start typing: each one asks you to change something the game already does, not to add a new screen.\n\n**Challenge 1: a second goal (easy).** Add a second goal worth more than the first. Give each goal its own value, the way each bumper in 5.4.4 had a `worth`, and give the new goal its own remembered last frame, like each bumper's `wasTouching`. Watch a drop first and put it where the ball really goes.\n\n**Challenge 2: a bumper that slides (medium).** Add a short `'static'` bumper and move it yourself: in `draw()`, inside `if (playing)`, change its `x` a little every frame, and flip the sign of the step when it reaches an edge. Put it where the ball really goes: a slider the ball never reaches changes nothing.\n\n```js\n// next to the other variables:\nlet slider;\nlet slideStep = 2;\n\n// in setup():\nslider = new Sprite(160, 250, 60, 12, 'static');\nslider.color = 'purple';\n\n// in draw(), inside if (playing):\nslider.x += slideStep;\nif (slider.x > 190 || slider.x < 130) slideStep = -slideStep;\n```\n\n**Challenge 3: your best score (hard).** A restart wipes the score, which is right, but the best score should survive it. Keep a second variable that is *not* reset when R is pressed, update it when the score beats it, and show it beside the current score.",
+      "instructions": "Choose one of these three challenges, or more than one, or invent a rule of your own. Read the whole challenge before you start typing: each one asks you to change something the game already does, not to add a new screen.\n\n**Challenge 1: a second goal (easy).** Add a second goal worth more than the first. Give each goal its own value, the way each bumper in 5.4.5 had a `worth`, and give the new goal its own remembered last frame, like each bumper's `wasTouching`. Watch a drop first and put it where the ball really goes.\n\n**Challenge 2: a bumper that slides (medium).** Add a short `'static'` bumper and move it yourself: in `draw()`, inside `if (playing)`, change its `x` a little every frame, and flip the sign of the step when it reaches an edge. Put it where the ball really goes: a slider the ball never reaches changes nothing.\n\n```js\n// next to the other variables:\nlet slider;\nlet slideStep = 2;\n\n// in setup():\nslider = new Sprite(160, 250, 60, 12, 'static');\nslider.color = 'purple';\n\n// in draw(), inside if (playing):\nslider.x += slideStep;\nif (slider.x > 190 || slider.x < 130) slideStep = -slideStep;\n```\n\n**Challenge 3: your best score (hard).** A restart wipes the score, which is right, but the best score should survive it. Keep a second variable that is *not* reset when R is pressed, update it when the score beats it, and show it beside the current score.",
       "hints": [
         "Whatever you pick, press R afterwards and check the game still starts cleanly."
       ]
@@ -34,7 +34,7 @@
     {
       "id": "r1",
       "title": "Your game has a rule of your own",
-      "description": "Any one challenge counts, or a rule you invented: a second thing that scores, something on the table that moves, a best score kept across restarts, or a score worth something other than 1. Help: 5.4.4 (Lab: Three bumpers, three values)",
+      "description": "Any one challenge counts, or a rule you invented: a second thing that scores, something on the table that moves, a best score kept across restarts, or a score worth something other than 1. Help: 5.4.5 (Lab: Three bumpers, three values)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.colliding\\s*\\(\\s*(?!goal\\s*\\))[\\w.\\[\\]]+\\s*\\)|\\b\\w+\\.[xy]\\s*(?:\\+=|-=|\\+\\+|--)|(?:\\+\\+|--)\\s*\\w+\\.[xy]\\b|\\b(\\w+)\\.x\\s*=\\s*\\1\\.x\\s*[+-]|\\.vel\\.[xy]\\s*=\\s*-?(?:[1-9]|0?\\.\\d*[1-9])|if\\s*\\(\\s*score\\s*>=?\\s*\\w+|if\\s*\\(\\s*\\w+\\s*<=?\\s*score\\b|\\bmax\\s*\\([^)]*\\bscore\\b|score\\s*\\+=\\s*(?!1\\b)[\\w.]+|score\\s*=\\s*score\\s*\\+\\s*(?!1\\b)[\\w.]+|\\bframeCount\\b",
@@ -56,7 +56,7 @@
       {
         "id": "r1",
         "title": "Your game has a rule of your own",
-        "description": "The student's code adds at least one rule the starter did not have, and it would really run: a second thing that scores, something on the table that moves on its own, a best score kept across restarts, a score worth something other than 1, or a rule they invented (a timer, a speed change, a bonus, and so on). A change only to how things look, such as a colour or the words on screen, is not a new rule. Help: 5.4.4 (Lab: Three bumpers, three values)",
+        "description": "The student's code adds at least one rule the starter did not have, and it would really run: a second thing that scores, something on the table that moves on its own, a best score kept across restarts, a score worth something other than 1, or a rule they invented (a timer, a speed change, a bonus, and so on). A change only to how things look, such as a colour or the words on screen, is not a new rule. Help: 5.4.5 (Lab: Three bumpers, three values)",
         "points": 1
       }
     ]

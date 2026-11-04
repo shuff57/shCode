@@ -1,6 +1,6 @@
 ## The state of the game
 
-**Read before `5.5.2 Lab: Lose, and start again`.** About 5 minutes.
+**Read before `5.5.3 Lab: Lose, and start again`.** About 5 minutes.
 
 By the end of this reading you should be able to answer:
 

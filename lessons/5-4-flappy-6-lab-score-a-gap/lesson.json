@@ -1,7 +1,7 @@
 {
   "id": "5-4-flappy-6-lab-score-a-gap",
   "title": "5.12.1 Lab: Score a gap",
-  "description": "A pipe the bird has flown past is worth a point, once. The starter shows a score that never moves. Give every pipe a flag that remembers it has been counted, the same idea as 5.4.3 with a different trigger.",
+  "description": "A pipe the bird has flown past is worth a point, once. The starter shows a score that never moves. Give every pipe a flag that remembers it has been counted, the same idea as 5.4.4 with a different trigger.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -35,7 +35,7 @@
     {
       "id": "r1",
       "title": "Every pipe is checked",
-      "description": "A loop looks at each pipe in the array (a for...of loop, an index loop or forEach) and compares it with the bird inside the loop. Help: 5.4.4 (Lab: Three bumpers, three values)",
+      "description": "A loop looks at each pipe in the array (a for...of loop, an index loop or forEach) and compares it with the bird inside the loop. Help: 5.4.5 (Lab: Three bumpers, three values)",
       "type": "regex",
       "file": "script.js",
       "pattern": "for\\s*\\([^)]*\\bpipes\\b[^)]*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\}|\\{)*?|[^{};]*?)bird\\.(?:pos\\.)?x\\b|\\bpipes\\s*\\.\\s*forEach\\s*\\([^{};]*(?:\\{(?:[^{}]|\\{[^{}]*\\}|\\{)*?)?bird\\.(?:pos\\.)?x\\b",
@@ -79,7 +79,7 @@
       {
         "id": "r1",
         "title": "Every pipe is checked",
-        "description": "A loop that visits each pipe in pipes (for...of, an index loop, or forEach) and compares that pipe's position with the bird inside it. Adding the test to the existing delete loop is fine. Missing: no loop compares anything with the bird. Help: 5.4.4 (Lab: Three bumpers, three values)",
+        "description": "A loop that visits each pipe in pipes (for...of, an index loop, or forEach) and compares that pipe's position with the bird inside it. Adding the test to the existing delete loop is fine. Missing: no loop compares anything with the bird. Help: 5.4.5 (Lab: Three bumpers, three values)",
         "points": 1
       },
       {
