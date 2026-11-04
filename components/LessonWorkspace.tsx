@@ -379,6 +379,25 @@ export default function LessonWorkspace({
   const isMoshionRef = useRef(isMoshionMode);
   isMoshionRef.current = isMoshionMode;
 
+  // A moSHion Run puts the table in the preview pane, and that pane starts about
+  // 376px down the page (header, title, toolbar and the how-to line sit above
+  // it), so at 1280x720 the bottom third of a 440x420 canvas -- the ground, the
+  // low bumper -- is below the fold. The canvas already scales to fit the PANE
+  // (public/moshion/runner.html); it is the viewport that clips it. So a Run
+  // brings the whole split into view. `nearest` leaves the page alone when the
+  // pane is already visible, and the split's scroll margin (below) keeps it
+  // clear of the fixed progress bar.
+  useEffect(() => {
+    if (!isMoshionMode || runKey === 0) return;
+    const id = requestAnimationFrame(() => {
+      const el = document.getElementById('split');
+      if (!el) return;
+      const calm = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      el.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: calm ? 'auto' : 'smooth' });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [isMoshionMode, runKey]);
+
   // reSHape lessons: ReshapeStudio hydrates its own model from script.js on
   // mount and reports every built doc back through onDocChange. Grading has
   // to follow that doc, not a Run button (a Build-only lesson has none), so
@@ -1528,7 +1547,11 @@ export default function LessonWorkspace({
               )}
             </div>
           )}
-          <div className="editor-preview-container" id="split">
+          <div
+            className="editor-preview-container"
+            id="split"
+            style={{ scrollMarginBottom: 56 }}
+          >
             {isTextMode ? (
               // A text lesson has no output pane: the editor takes the whole
               // width, and Grade is the only action.
