@@ -1,0 +1,64 @@
+{
+  "id": "5-6-pinball-debug-sound-every-frame",
+  "title": "5.6.4 Debugging: The sound on every frame",
+  "description": "Two planted bugs. Press Space once and the sound stutters; then it stops working after a reload. Find both.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.6 Pinball: a sound on a hit",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "Click the canvas and hold Space: the sound repeats as fast as the frames run."
+    },
+    {
+      "id": "s2",
+      "title": "Bug 1: the play call is outside the key test",
+      "instructions": "Move `blip.play()` inside `if (kb.presses('space'))`, and use `presses` rather than `pressing`."
+    },
+    {
+      "id": "s3",
+      "title": "Bug 2: the load is inside draw()",
+      "instructions": "The sound is loaded in `draw()`, once per frame. Move `loadSound(...)` into `setup()` so it loads once."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Played inside the key test",
+      "description": "play() is inside a key test, not in draw() on its own. Help: 5.6.1 (Reading: A sound on a hit)",
+      "hint": "if (kb.presses('space')) { blip.play(); }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "kb\\s*\\.\\s*press(?:es|ing)\\s*\\([^)]{0,40}\\)\\s*\\)?\\s*\\{\\s*[^}]{0,120}?\\.play\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "Loaded once",
+      "description": "loadSound is called once, in setup(), not inside draw(). Help: 5.6.1 (Reading: A sound on a hit)",
+      "hint": "blip = loadSound('/moshion/assets/coin.wav');",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "function\\s+setup\\s*\\([^)]*\\)\\s*\\{[\\s\\S]{0,500}?loadSound\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

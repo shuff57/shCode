@@ -1,6 +1,6 @@
 ## Finished in one place
 
-**Read before `7.10.2 Lab: Enemy takes over`.** About 10 minutes.
+**Read before `7.9.4 Lab: Enemy takes over`.** About 10 minutes.
 
 By the end of this example you should be able to answer:
 

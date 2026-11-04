@@ -1,4 +1,4 @@
-// 7.14.1 Lab: The paddle.
+// 7.12.4 Lab: The paddle.
 
 const PADDLE_W = 80;    // the paddle is 80 pixels wide
 

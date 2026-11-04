@@ -1,11 +1,11 @@
 {
   "id": "6-10-breakout-1-plan-break-breakout-into-parts",
-  "title": "7.13.1 Plan: Break Breakout into parts",
+  "title": "7.12.1 Plan: Break Breakout into parts",
   "description": "Before any code: list the parts of Breakout, what the game must remember between frames, what to build first and what looks hard. AI-graded with hints.",
   "type": "assignment",
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "7.13 Breakout: plan and the ball",
+  "unit": "7.12 Breakout: plan, ball and paddle",
   "preview": "assignment",
   "week": 18,
   "slos": [

@@ -1,0 +1,96 @@
+{
+  "modules": [
+    {
+      "from": [
+        "7.9",
+        "7.10"
+      ],
+      "id": "7.9",
+      "slug": "defender-c-design-and-the-classes",
+      "title": "Defender C: design and the classes",
+      "group": "Count the cost, then the classes",
+      "lessons": [
+        "5-11-defender-1-reading-count-the-cost",
+        "5-11-defender-2-plan-draw-the-classes-first",
+        "5-11-defender-3-example-finished-in-one-place",
+        "5-11-defender-4-lab-enemy-takes-over"
+      ]
+    },
+    {
+      "from": "7.11",
+      "id": "7.10",
+      "slug": "defender-c-a-spawner",
+      "title": "Defender C: a spawner",
+      "group": "A spawner for the waves",
+      "lessons": [
+        "5-11-defender-5-lab-bullet",
+        "5-11-defender-6-lab-a-spawner-for-the-waves"
+      ]
+    },
+    {
+      "from": "7.12",
+      "id": "7.11",
+      "slug": "defender-c-close",
+      "title": "Defender C: playtest and check",
+      "group": "Playtest, check, challenges",
+      "lessons": [
+        "5-11-defender-7-playtest-and-reflect",
+        "5-11-defender-8-quiz-defender-with-classes",
+        "5-11-defender-sound-lab-sound-effects",
+        "5-11-defender-9-challenges-make-it-yours"
+      ]
+    },
+    {
+      "from": [
+        "7.13",
+        "7.14"
+      ],
+      "id": "7.12",
+      "slug": "breakout-plan-ball-and-paddle",
+      "title": "Breakout: plan, ball and paddle",
+      "group": "Plan, the ball and the paddle",
+      "lessons": [
+        "6-10-breakout-1-plan-break-breakout-into-parts",
+        "6-10-breakout-2-reading-a-ball-you-move-yourself",
+        "6-10-breakout-3-example-a-ball-in-a-box",
+        "6-10-breakout-4-lab-the-paddle",
+        "6-10-breakout-5-lab-bounce"
+      ]
+    },
+    {
+      "from": "7.15",
+      "id": "7.13",
+      "slug": "breakout-bricks-and-edges",
+      "title": "Breakout: bricks and edges",
+      "group": "Bricks and edges",
+      "lessons": [
+        "6-10-breakout-6-lab-a-wall-from-text",
+        "6-10-breakout-7-reading-the-ball-has-edges",
+        "6-10-breakout-8-lab-hit-with-the-edges"
+      ]
+    },
+    {
+      "from": "7.16",
+      "id": "7.14",
+      "slug": "breakout-the-game",
+      "title": "Breakout: the game",
+      "group": "The game",
+      "lessons": [
+        "6-10-breakout-9-lab-win-or-lose",
+        "6-10-breakout-10-lab-pick-a-mode"
+      ]
+    },
+    {
+      "from": "7.17",
+      "id": "7.15",
+      "slug": "breakout-playtest-and-extend",
+      "title": "Breakout: playtest and extend",
+      "group": "Playtest and extend",
+      "lessons": [
+        "6-10-breakout-11-playtest-and-reflect",
+        "6-10-breakout-12-quiz-breakout",
+        "6-10-breakout-13-challenges-make-it-yours"
+      ]
+    }
+  ]
+}

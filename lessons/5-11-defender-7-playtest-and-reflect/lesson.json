@@ -1,11 +1,11 @@
 {
   "id": "5-11-defender-7-playtest-and-reflect",
-  "title": "7.12.1 Playtest and reflect: Defender",
+  "title": "7.11.1 Playtest and reflect: Defender",
   "description": "Play your finished Defender at least three times and lose in three different ways, find one surprise, link it to a class or function, and compare one change with Part B. AI-graded with hints.",
   "type": "assignment",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "7.12 Defender C: playtest and check",
+  "unit": "7.11 Defender C: playtest and check",
   "preview": "assignment",
   "week": 15,
   "slos": [
@@ -20,7 +20,7 @@
     "rubricTitle": "Playtest Defender: AI-graded rubric",
     "model": "glm-5.3-flash:cloud",
     "contextDocs": [],
-    "prompt": "Everything you need is in 7.4.1 (Plan: Break Defender into parts) and 7.11.2 (Lab: A Spawner for the waves): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished Defender at least three times, and lose in three different ways: let a wave through on purpose, get overrun in a late wave, and press R in the middle of a wave. Then answer:\n\n1. How many rounds did you play, and how did they go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which class or function do you think that comes from?\n\n4. What is one change that is easier, or harder, in Part C than it was in Part B, and why?",
+    "prompt": "Everything you need is in 7.4.1 (Plan: Break Defender into parts) and 7.10.2 (Lab: A Spawner for the waves): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished Defender at least three times, and lose in three different ways: let a wave through on purpose, get overrun in a late wave, and press R in the middle of a wave. Then answer:\n\n1. How many rounds did you play, and how did they go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which class or function do you think that comes from?\n\n4. What is one change that is easier, or harder, in Part C than it was in Part B, and why?",
     "rubric": [
       {
         "id": "played",

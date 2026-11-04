@@ -1,4 +1,4 @@
-// 7.16.1 Lab: Win or lose (reference solution).
+// 7.14.1 Lab: Win or lose (reference solution).
 
 const WALL = [          // the wall, as rows of text: # is a brick, . is a gap
   '########',

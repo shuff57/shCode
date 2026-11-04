@@ -10,7 +10,7 @@ By the end of this reading you should be able to answer:
 - Why can a sketch stay silent until the player clicks or presses a key?
 - Where in the code does a `.play()` go?
 
-**A sound is a file the sketch downloads.** You met this in 7.12.3: `loadSound(path)` starts downloading a sound file and hands you back a **Sound** at once. Keep it in a variable, the way you keep a sprite. The course's two everyday sound files are these, and the path is typed exactly, quotes included:
+**A sound is a file the sketch downloads.** You met this in 7.11.3: `loadSound(path)` starts downloading a sound file and hands you back a **Sound** at once. Keep it in a variable, the way you keep a sprite. The course's two everyday sound files are these, and the path is typed exactly, quotes included:
 
 | Path | What it is |
 | --- | --- |

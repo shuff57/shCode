@@ -3,14 +3,15 @@
   "source": "Split from the module it belonged to; one lesson per day-module.",
   "lessons": [
     {
-      "id": "defender-c-close",
-      "title": "Playtest, check, challenges",
-      "objective": "Playtest, check and extend Defender.",
+      "id": "breakout-plan-ball-and-paddle",
+      "title": "Plan, the ball and the paddle",
+      "objective": "Plan Breakout, move the ball yourself, bounce it off a paddle.",
       "screens": [
-        "5-11-defender-7-playtest-and-reflect",
-        "5-11-defender-8-quiz-defender-with-classes",
-        "5-11-defender-sound-lab-sound-effects",
-        "5-11-defender-9-challenges-make-it-yours"
+        "6-10-breakout-1-plan-break-breakout-into-parts",
+        "6-10-breakout-2-reading-a-ball-you-move-yourself",
+        "6-10-breakout-3-example-a-ball-in-a-box",
+        "6-10-breakout-4-lab-the-paddle",
+        "6-10-breakout-5-lab-bounce"
       ]
     }
   ]

@@ -1,11 +1,11 @@
 {
   "id": "6-10-breakout-6-lab-a-wall-from-text",
-  "title": "7.15.1 Lab: A wall from text",
+  "title": "7.13.1 Lab: A wall from text",
   "description": "The wall comes back from 6.14.11, written as rows of text this time. Build it from the text, draw it from the data, and let the ball's centre break bricks.",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "7.15 Breakout: bricks and edges",
+  "unit": "7.13 Breakout: bricks and edges",
   "preview": "moshion",
   "week": 18,
   "slos": [
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Build the wall from text",
-      "instructions": "The starter has the paddle and the bouncing ball from 7.14.2, `score` in the corner, and the brick sizes from 6.14.11: each brick `BW` (50) wide and `BH` (20) tall, the wall `TOP` (60) pixels down, and one colour per row in `ROW_COLORS`. The shape of the wall is written as rows of text in `WALL`, like a map in 6.14.2: `'#'` is a brick and `'.'` is a gap, and `BRICK_ROWS` and `BRICK_COLS` are `WALL.length` and `WALL[0].length`. `hitAt(x, y)` is your function from 6.14.11, finished: it finds the brick under a pixel, takes it out, adds 10 to `score` and gives back `true`. Three functions are left: `makeBricks()` gives back an empty list, and `drawBricks()` and `hitBricks()` are empty.\n\nIn `makeBricks()`, build `bricks[r][c]` from the text, the way you built a grid in 6.14.10 and read a map in 6.14.5. For each of `BRICK_ROWS` rows make an empty `row`. For each of `BRICK_COLS` columns, push `1` when `WALL[r][c]` is `'#'` and `0` when it is not. Then push the row onto `b`. Nothing shows yet: the wall is only data until step 2 draws it.",
+      "instructions": "The starter has the paddle and the bouncing ball from 7.12.5, `score` in the corner, and the brick sizes from 6.14.11: each brick `BW` (50) wide and `BH` (20) tall, the wall `TOP` (60) pixels down, and one colour per row in `ROW_COLORS`. The shape of the wall is written as rows of text in `WALL`, like a map in 6.14.2: `'#'` is a brick and `'.'` is a gap, and `BRICK_ROWS` and `BRICK_COLS` are `WALL.length` and `WALL[0].length`. `hitAt(x, y)` is your function from 6.14.11, finished: it finds the brick under a pixel, takes it out, adds 10 to `score` and gives back `true`. Three functions are left: `makeBricks()` gives back an empty list, and `drawBricks()` and `hitBricks()` are empty.\n\nIn `makeBricks()`, build `bricks[r][c]` from the text, the way you built a grid in 6.14.10 and read a map in 6.14.5. For each of `BRICK_ROWS` rows make an empty `row`. For each of `BRICK_COLS` columns, push `1` when `WALL[r][c]` is `'#'` and `0` when it is not. Then push the row onto `b`. Nothing shows yet: the wall is only data until step 2 draws it.",
       "hints": [
         "Inside the inner loop: `if (WALL[r][c] === '#') row.push(1);` then `else row.push(0);`.",
         "`b.push(row);` goes after the inner loop and inside the outer one."

@@ -1,4 +1,4 @@
-// 7.16.2 Lab: Pick a mode (reference solution: Breakout, finished).
+// 7.14.2 Lab: Pick a mode (reference solution: Breakout, finished).
 
 const WALL = [          // the wall, as rows of text: # is a brick, . is a gap
   '########',

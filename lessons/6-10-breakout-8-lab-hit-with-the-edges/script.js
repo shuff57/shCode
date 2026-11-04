@@ -1,4 +1,4 @@
-// 7.15.3 Lab: Hit with the edges.
+// 7.13.3 Lab: Hit with the edges.
 
 const WALL = [          // the wall, as rows of text: # is a brick, . is a gap
   '########',

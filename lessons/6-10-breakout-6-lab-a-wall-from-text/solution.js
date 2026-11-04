@@ -1,4 +1,4 @@
-// 7.15.1 Lab: A wall from text (reference solution).
+// 7.13.1 Lab: A wall from text (reference solution).
 
 const WALL = [          // the wall, as rows of text: # is a brick, . is a gap
   '########',

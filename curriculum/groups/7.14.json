@@ -3,12 +3,12 @@
   "source": "Split from the module it belonged to; one lesson per day-module.",
   "lessons": [
     {
-      "id": "breakout-paddle-and-bounce",
-      "title": "Paddle and bounce",
-      "objective": "Bounce the ball off a paddle.",
+      "id": "breakout-the-game",
+      "title": "The game",
+      "objective": "Win or lose, and pick a mode.",
       "screens": [
-        "6-10-breakout-4-lab-the-paddle",
-        "6-10-breakout-5-lab-bounce"
+        "6-10-breakout-9-lab-win-or-lose",
+        "6-10-breakout-10-lab-pick-a-mode"
       ]
     }
   ]

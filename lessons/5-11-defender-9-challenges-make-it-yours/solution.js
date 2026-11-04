@@ -1,4 +1,4 @@
-// 7.12.4 Challenges: Make it yours (reference solution: a best score, a boss wave,
+// 7.11.4 Challenges: Make it yours (reference solution: a best score, a boss wave,
 // and a Ship class that owns its own cooldown).
 
 const BASE_Y = 370;   // anything that falls below this line has reached the base

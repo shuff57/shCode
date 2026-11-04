@@ -3,12 +3,14 @@
   "source": "Split from the module it belonged to; one lesson per day-module.",
   "lessons": [
     {
-      "id": "defender-c-a-spawner",
-      "title": "A spawner for the waves",
-      "objective": "Give the waves a spawner class, and finish every removal in one place.",
+      "id": "defender-c-close",
+      "title": "Playtest, check, challenges",
+      "objective": "Playtest, check and extend Defender.",
       "screens": [
-        "5-11-defender-5-lab-bullet",
-        "5-11-defender-6-lab-a-spawner-for-the-waves"
+        "5-11-defender-7-playtest-and-reflect",
+        "5-11-defender-8-quiz-defender-with-classes",
+        "5-11-defender-sound-lab-sound-effects",
+        "5-11-defender-9-challenges-make-it-yours"
       ]
     }
   ]

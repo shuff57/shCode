@@ -1,4 +1,4 @@
-// 7.17.3 Challenges: Make it yours (reference solution: all three challenges).
+// 7.15.3 Challenges: Make it yours (reference solution: all three challenges).
 // My rules: key 3 plays with one life, the top row takes two hits, and a second wall
 // comes after the first. Without them there is one wall and every brick breaks at once.
 

@@ -1,0 +1,64 @@
+{
+  "id": "5-5-pinball-debug-round-never-ends",
+  "title": "5.5.4 Debugging: The round that never ends",
+  "description": "Two planted bugs. The ball falls into the pit, the word Game over appears, and the ball keeps falling anyway. Find both.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.5 Pinball: lose and start again",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The ball drops into the pit and never comes back. Game over shows, but the ball is still moving off the bottom of the screen: the flag is set and nothing reads it."
+    },
+    {
+      "id": "s2",
+      "title": "Bug 1: the flag is set but never read",
+      "instructions": "The `if (playing)` guard is missing from the movement/score branch. Wrap the part that only belongs to a live round in `if (playing) { ... }`."
+    },
+    {
+      "id": "s3",
+      "title": "Bug 2: R does not set the flag back",
+      "instructions": "R puts the ball back but leaves `playing` false, so the next round is over before it starts. Set `playing = true` in the R branch."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The round is guarded",
+      "description": "The live-round work sits inside an if on the playing/lost flag, so it stops when the round is over. Help: 5.5.1 (Reading: The state of the game)",
+      "hint": "if (playing) { score += 1; }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bif\\s*\\(\\s*(?:playing|lost|gameOver)\\s*\\)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "R sets the flag back",
+      "description": "The R branch sets the round running again, as well as moving the ball. Help: 5.5.1 (Reading: The state of the game)",
+      "hint": "if (kb.presses('r')) { ... playing = true; }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "kb\\s*\\.\\s*presses?\\s*\\(\\s*['\"]r['\"]\\s*\\)[\\s\\S]{0,400}?\\b(?:playing|lost|gameOver)\\s*=\\s*true",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": false
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

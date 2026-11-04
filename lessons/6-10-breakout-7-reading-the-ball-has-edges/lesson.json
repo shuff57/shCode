@@ -1,11 +1,11 @@
 {
   "id": "6-10-breakout-7-reading-the-ball-has-edges",
-  "title": "7.15.2 Reading: The ball has edges",
+  "title": "7.13.2 Reading: The ball has edges",
   "description": "Testing only the ball's centre lets it sink into a brick and slide past one it only scrapes. Test the four points on its edge instead, and flip vy for a brick above or below, vx for a brick beside it.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "7.15 Breakout: bricks and edges",
+  "unit": "7.13 Breakout: bricks and edges",
   "preview": "reading",
   "week": 18,
   "slos": [

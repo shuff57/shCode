@@ -1,6 +1,6 @@
 ## The ball has edges
 
-**Read before `7.15.3 Lab: Hit with the edges`.** About 10 minutes.
+**Read before `7.13.3 Lab: Hit with the edges`.** About 10 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -9,7 +9,7 @@ By the end of this reading you should be able to answer:
 - Which four points does the edge test ask about, and how is each one worked out?
 - Why does a hit at the top or bottom flip `vy`, and a hit at the side flip `vx`?
 
-**What the centre test asks.** In 7.15.1 the ball asked `hitAt(ball.x, ball.y)`: is there a brick under this one pixel, the middle of the ball? The ball is 12 pixels across, so its outside is `R` (6) pixels from that middle in every direction. Two things go wrong because of it.
+**What the centre test asks.** In 7.13.1 the ball asked `hitAt(ball.x, ball.y)`: is there a brick under this one pixel, the middle of the ball? The ball is 12 pixels across, so its outside is `R` (6) pixels from that middle in every direction. Two things go wrong because of it.
 
 **It sinks in.** A ball going up reaches a brick with its top first. Its centre gets there `R` pixels later, so by the time `hitAt` says yes, half of the ball is already inside the brick. It does bounce, but late, and you can see it.
 
@@ -26,7 +26,7 @@ By the end of this reading you should be able to answer:
 
 y grows downward, so the top of the ball is `ball.y - R`. Ask `hitAt` about each one. It is the same `hitAt` as before: it does not know or care what the pixel belongs to. Only the pixel you hand it changes.
 
-**Which way to bounce.** A brick hit by the top or bottom point is above or below the ball, so the ball must turn back up-and-down: flip `vy`. A brick hit by the left or right point is beside it, so the ball must turn back across: flip `vx`, exactly as at the canvas walls in 7.14.2.
+**Which way to bounce.** A brick hit by the top or bottom point is above or below the ball, so the ball must turn back up-and-down: flip `vy`. A brick hit by the left or right point is beside it, so the ball must turn back across: flip `vx`, exactly as at the canvas walls in 7.12.5.
 
 ```js
 if (hitAt(ball.x, ball.y - R) || hitAt(ball.x, ball.y + R)) vy = -vy;

@@ -1,11 +1,11 @@
 {
   "id": "6-10-breakout-9-lab-win-or-lose",
-  "title": "7.16.1 Lab: Win or lose",
+  "title": "7.14.1 Lab: Win or lose",
   "description": "Three balls to clear the wall. Count the bricks left, take a life for every ball that falls out, and end the game when the wall is cleared or the balls run out.",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "7.16 Breakout: the game",
+  "unit": "7.14 Breakout: the game",
   "preview": "moshion",
   "week": 18,
   "slos": [
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Count the bricks",
-      "instructions": "The starter is the game from 7.15.3 with three new things. `lives` starts at 3. `state` is `'play'` while the game runs, the state variable of 6.11.7: the starter's `draw()` only moves the paddle and the ball while `state` is `'play'`, and once it is anything else, pressing R calls `startGame()` for a new wall, a new score and three new lives. The lost-ball test has moved into a new function, `checkEnd()`, still as `if (ball.y > 400 + R) serve();`. The words at the top show the score, the bricks left and the lives, and they say `You cleared the wall!` when `state` is `'won'` and `Out of balls.` when it is `'lost'`.\n\n`bricksLeft()` gives back 0 for now. Make it count: two loops over `bricks`, adding 1 to `n` for every cell that is `1`, as in 6.14.11. The words should read `bricks left: 36` and go down as bricks break.",
+      "instructions": "The starter is the game from 7.13.3 with three new things. `lives` starts at 3. `state` is `'play'` while the game runs, the state variable of 6.11.7: the starter's `draw()` only moves the paddle and the ball while `state` is `'play'`, and once it is anything else, pressing R calls `startGame()` for a new wall, a new score and three new lives. The lost-ball test has moved into a new function, `checkEnd()`, still as `if (ball.y > 400 + R) serve();`. The words at the top show the score, the bricks left and the lives, and they say `You cleared the wall!` when `state` is `'won'` and `Out of balls.` when it is `'lost'`.\n\n`bricksLeft()` gives back 0 for now. Make it count: two loops over `bricks`, adding 1 to `n` for every cell that is `1`, as in 6.14.11. The words should read `bricks left: 36` and go down as bricks break.",
       "hints": [
         "The same two loops as `drawBricks()`, with `if (bricks[r][c] === 1) n += 1;` inside.",
         "`n` starts at 0 and is given back at the end for you."

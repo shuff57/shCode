@@ -1,4 +1,4 @@
-// 7.17.3 Challenges: Make it yours. Pick one rule and change it.
+// 7.15.3 Challenges: Make it yours. Pick one rule and change it.
 
 const WALL = [          // the wall, as rows of text: # is a brick, . is a gap
   '########',

@@ -1,11 +1,11 @@
 {
   "id": "6-10-breakout-10-lab-pick-a-mode",
-  "title": "7.16.2 Lab: Pick a mode",
+  "title": "7.14.2 Lab: Pick a mode",
   "description": "A title screen that waits for a key: 1 plays with the mouse, 2 with the arrow keys. Write the choices, read the key, and send R back to the title. With a note on prompt().",
   "type": "lesson",
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "7.16 Breakout: the game",
+  "unit": "7.14 Breakout: the game",
   "preview": "moshion",
   "week": 18,
   "slos": [
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "The title words",
-      "instructions": "The starter is your finished game from 7.16.1 with one more state, `'title'`. `state` starts as `'title'`, and while it is, `draw()` calls `pickMode()` and moves nothing. `pickMode()` is empty, so right now the game waits on the title forever. This is the title screen of 6.11.11, and the way out of it is a key, as in 6.11.16.\n\nIn `drawTop()`, when `state` is `'title'`, write the name of the game and the two choices: `Press 1 to play with the mouse` and `Press 2 to play with the arrow keys`. Put them under the wall, between y 200 and 280, so they do not cover the bricks (the ball waits at y 300). Start the long lines near the left edge, at an x of about 30: at `textSize(16)`, `Press 2 to play with the arrow keys` is about 340 pixels wide, so `text('Press 2 to play with the arrow keys', 30, 265)` fits and an x of 100 cuts it off at the right. Run it: the words show, and nothing moves yet.",
+      "instructions": "The starter is your finished game from 7.14.1 with one more state, `'title'`. `state` starts as `'title'`, and while it is, `draw()` calls `pickMode()` and moves nothing. `pickMode()` is empty, so right now the game waits on the title forever. This is the title screen of 6.11.11, and the way out of it is a key, as in 6.11.16.\n\nIn `drawTop()`, when `state` is `'title'`, write the name of the game and the two choices: `Press 1 to play with the mouse` and `Press 2 to play with the arrow keys`. Put them under the wall, between y 200 and 280, so they do not cover the bricks (the ball waits at y 300). Start the long lines near the left edge, at an x of about 30: at `textSize(16)`, `Press 2 to play with the arrow keys` is about 340 pixels wide, so `text('Press 2 to play with the arrow keys', 30, 265)` fits and an x of 100 cuts it off at the right. Run it: the words show, and nothing moves yet.",
       "hints": [
         "`if (state === 'title') { ... }` with two or three `text(...)` lines inside, as in 6.11.11.",
         "`textSize(28)` before the name makes it bigger; set it back to 16 for the two lines."

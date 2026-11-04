@@ -9,7 +9,8 @@
       "screens": [
         "5-4-flappy-4-reading-a-world-that-scrolls",
         "5-11-flappy-sub-spawn-and-recycle",
-        "5-4-flappy-5-lab-pipes-that-come-and-go"
+        "5-4-flappy-5-lab-pipes-that-come-and-go",
+        "5-11-flappy-debug-pipes-never-leave"
       ]
     }
   ]

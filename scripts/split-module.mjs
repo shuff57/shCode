@@ -43,9 +43,11 @@ const plan = JSON.parse(fs.readFileSync(path.resolve(root, args[planArg + 1]), '
 // reuse the old number (5.5 -> 5.5), so scanning later would pick up the new file.
 const sourceDocs = new Map();
 for (const mod of plan.modules) {
-  if (!mod.from || sourceDocs.has(mod.from)) continue;
-  const hit = fs.readdirSync(modulesDir).find((x) => x.startsWith(`${mod.from}_`) && x.endsWith('.md'));
-  if (hit) sourceDocs.set(mod.from, hit);
+  for (const from of (Array.isArray(mod.from) ? mod.from : [mod.from])) {
+    if (!from || sourceDocs.has(from)) continue;
+    const hit = fs.readdirSync(modulesDir).find((x) => x.startsWith(`${from}_`) && x.endsWith('.md'));
+    if (hit) sourceDocs.set(from, hit);
+  }
 }
 const fail = (m) => { console.error(`[split-module] ERROR ${m}`); process.exit(1); };
 
@@ -85,7 +87,8 @@ for (const mod of plan.modules) {
 }
 
 // every lesson of a module named in `from` must be assigned
-const froms = new Set(newModules.map((m) => m.from));
+const fromList = (m) => (Array.isArray(m.from) ? m.from : [m.from]);
+const froms = new Set(newModules.flatMap((m) => fromList(m)));
 for (const [folder, lesson] of lessons) {
   if (froms.has(lesson.module) && !assigned.has(folder)) {
     fail(`${folder} is in module ${lesson.module} but is not in the plan`);
@@ -165,16 +168,18 @@ if (!DRY) {
 // -------------------------------------------------------- 5. docs and groups
 const firstFromSource = new Set();
 function docText(mod, screens) {
-  const old = plan.modules.find((m) => m.from === mod.from && !firstFromSource.has(m.from) && m === mod);
-  const from = mod.from;
+  const sources = Array.isArray(mod.from) ? mod.from : [mod.from];
   let appended = '';
-  if (old && sourceDocs.has(from)) {
-    const raw = fs.readFileSync(path.join(modulesDir, sourceDocs.get(from)), 'utf8');
-    const body = raw.replace(/^---[\s\S]*?\n---\n/, '').trim();
-    appended = `\n\n---\n\n## Notes from the module this was split out of (old ${from})\n\n` +
-      `> Everything below describes the old ${from}. Screens were renumbered; folders did not move.\n\n` +
-      body + '\n';
-    firstFromSource.add(from);
+  if (!sources.some((f) => firstFromSource.has(f))) {
+    for (const from of sources) {
+      if (firstFromSource.has(from) || !sourceDocs.has(from)) continue;
+      const raw = fs.readFileSync(path.join(modulesDir, sourceDocs.get(from)), 'utf8');
+      const body = raw.replace(/^---[\s\S]*?\n---\n/, '').trim();
+      appended += `\n\n---\n\n## Notes from the module this was split out of (old ${from})\n\n` +
+        `> Everything below describes the old ${from}. Screens were renumbered; folders did not move.\n\n` +
+        body + '\n';
+      firstFromSource.add(from);
+    }
   }
   const table = screens.map((s, i) => `| ${mod.id}.${i + 1} | \`${s}\` |`).join('\n');
   return `---

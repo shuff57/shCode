@@ -1,6 +1,6 @@
 ## A ball you move yourself
 
-**Read before `7.14.1 Lab: The paddle`.** About 10 minutes.
+**Read before `7.12.4 Lab: The paddle`.** About 10 minutes.
 
 By the end of this reading you should be able to answer:
 

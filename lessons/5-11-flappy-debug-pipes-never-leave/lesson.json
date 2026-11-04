@@ -1,0 +1,64 @@
+{
+  "id": "5-11-flappy-debug-pipes-never-leave",
+  "title": "5.11.4 Debugging: The pipes that never leave",
+  "description": "Two planted bugs. Pipes vanish from the screen and the list grows for ever; then splicing skips every other pipe.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.11 Flappy: the world scrolls",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "Watch the list count in the console: it only goes up. Pipes are deleted but never spliced out of the array."
+    },
+    {
+      "id": "s2",
+      "title": "Bug 1: delete without splice",
+      "instructions": "Add `pipes.splice(i, 1)` next to `delete()` in the same branch."
+    },
+    {
+      "id": "s3",
+      "title": "Bug 2: the loop runs forwards",
+      "instructions": "A splice moves every later pipe down one place, so a forward loop skips the next one. Loop from the end: `for (let i = pipes.length - 1; i >= 0; i--)`."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Gone from the list too",
+      "description": "An off-screen pipe is deleted and spliced in the same branch. Help: 5.11.1 (Reading: A world that scrolls)",
+      "hint": "pipes[i].delete(); pipes.splice(i, 1);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*delete\\s*\\(\\s*\\)[\\s\\S]{0,120}?\\.\\s*splice\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "The loop runs backwards",
+      "description": "The sweep starts at the end of the array. Help: 5.4.5 (Reading: A world that scrolls)",
+      "hint": "for (let i = pipes.length - 1; i >= 0; i--)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\(\\s*let\\s+i\\s*=\\s*[\\w.]+\\s*\\.\\s*length\\s*-\\s*1\\s*;\\s*i\\s*>=\\s*0",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
