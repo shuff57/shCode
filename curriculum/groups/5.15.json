@@ -5,7 +5,7 @@
     {
       "id": "snake-search",
       "title": "Searching the body",
-      "objective": "Students can searching the body and see it run.",
+      "objective": "Search the body and end the round when the snake meets itself.",
       "screens": [
         "5-5-snake-7-reading-searching-the-array",
         "5-15-snake-sub-own-tail",

@@ -5,7 +5,7 @@
     {
       "id": "snake-grow",
       "title": "A body that grows",
-      "objective": "Students can a body that grows and see it run.",
+      "objective": "Keep the body in an array and grow it by one.",
       "screens": [
         "5-5-snake-5-reading-a-body-that-grows",
         "5-14-snake-sub-one-longer-snake",

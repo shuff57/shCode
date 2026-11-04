@@ -5,7 +5,7 @@
     {
       "id": "pinball-lose-and-start-again",
       "title": "Losing and restarting",
-      "objective": "Students can losing and restarting and see it run.",
+      "objective": "Hold the game's state in a variable so losing ends the round and R starts it again.",
       "screens": [
         "5-3-pinball-8-reading-the-state-of-the-game",
         "5-5-pinball-sub-end-and-start",

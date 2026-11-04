@@ -5,7 +5,7 @@
     {
       "id": "pinball-a-sound-on-a-hit",
       "title": "A sound on a hit",
-      "objective": "Students can a sound on a hit and see it run.",
+      "objective": "Load a sound once and play it where the hit happens.",
       "screens": [
         "5-3-pinball-sound-1-reading-a-sound-on-a-hit",
         "5-6-pinball-sub-one-sound",

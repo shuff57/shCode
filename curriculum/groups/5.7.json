@@ -5,7 +5,7 @@
     {
       "id": "pinball-labels-and-popups",
       "title": "Labels and popups",
-      "objective": "Students can labels and popups and see it run.",
+      "objective": "Label a sprite with its worth and make a popup that floats and removes itself.",
       "screens": [
         "5-3-pinball-polish-1-reading-words-and-sprites-that-run-out",
         "5-3-pinball-polish-2-example-a-plus-that-floats-away",

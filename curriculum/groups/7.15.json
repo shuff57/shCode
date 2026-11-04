@@ -5,7 +5,7 @@
     {
       "id": "breakout-bricks-and-edges",
       "title": "Bricks and edges",
-      "objective": "Students can bricks and edges and see it run.",
+      "objective": "Lay out bricks and hit them with the edges.",
       "screens": [
         "6-10-breakout-6-lab-a-wall-from-text",
         "6-10-breakout-7-reading-the-ball-has-edges",

@@ -5,7 +5,7 @@
     {
       "id": "defender-c-close",
       "title": "Playtest, check, challenges",
-      "objective": "Students can playtest, check, challenges and see it run.",
+      "objective": "Playtest, check and extend Defender.",
       "screens": [
         "5-11-defender-7-playtest-and-reflect",
         "5-11-defender-8-quiz-defender-with-classes",

@@ -5,7 +5,7 @@
     {
       "id": "pinball-playtest-and-finish",
       "title": "Playtest and finish",
-      "objective": "Students can playtest and finish and see it run.",
+      "objective": "Play the game, find one surprise in the code, and change one thing.",
       "screens": [
         "5-3-pinball-playtest-and-reflect",
         "5-3-pinball-10-challenges-make-it-yours",

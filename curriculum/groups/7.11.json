@@ -5,7 +5,7 @@
     {
       "id": "defender-c-a-spawner",
       "title": "A spawner for the waves",
-      "objective": "Students can a spawner for the waves and see it run.",
+      "objective": "Give the waves a spawner class, and finish every removal in one place.",
       "screens": [
         "5-11-defender-5-lab-bullet",
         "5-11-defender-6-lab-a-spawner-for-the-waves"

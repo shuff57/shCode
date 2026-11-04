@@ -5,7 +5,7 @@
     {
       "id": "pinball-the-table",
       "title": "Plan, and the table",
-      "objective": "Students can plan, and the table and see it run.",
+      "objective": "Plan the table and build the first playable scene: a ball, a goal to hit, and walls.",
       "screens": [
         "5-3-pinball-plan-sketch-the-game",
         "5-3-pinball-1-reading-from-scene-to-game",

@@ -5,7 +5,7 @@
     {
       "id": "pinball-physics-knobs",
       "title": "Physics knobs",
-      "objective": "Students can physics knobs and see it run.",
+      "objective": "Tune mass, gravityScale, rotationLock and debug, and say what each one changes.",
       "screens": [
         "5-3-pinball-polish-4-reading-four-physics-knobs",
         "5-8-pinball-sub-two-masses",

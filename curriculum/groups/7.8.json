@@ -5,7 +5,7 @@
     {
       "id": "defender-waves-and-the-cost",
       "title": "Waves, and the cost",
-      "objective": "Students can waves, and the cost and see it run.",
+      "objective": "Spawn waves with a pause and find the drift bug.",
       "screens": [
         "5-10-defender-6-example-waves-with-a-pause",
         "5-10-defender-7-lab-waves",

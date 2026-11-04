@@ -5,7 +5,7 @@
     {
       "id": "flappy-the-flap",
       "title": "The flap",
-      "objective": "Students can the flap and see it run.",
+      "objective": "Turn gravity on and reverse a fall with one tap.",
       "screens": [
         "5-4-flappy-plan-sketch-the-game",
         "5-4-flappy-1-reading-gravity-and-the-flap",

@@ -5,7 +5,7 @@
     {
       "id": "flappy-the-world-scrolls",
       "title": "A world that scrolls",
-      "objective": "Students can a world that scrolls and see it run.",
+      "objective": "Make pipes on a timer and remove them from the screen and from the list.",
       "screens": [
         "5-4-flappy-4-reading-a-world-that-scrolls",
         "5-11-flappy-sub-spawn-and-recycle",

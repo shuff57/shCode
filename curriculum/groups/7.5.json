@@ -5,7 +5,7 @@
     {
       "id": "defender-hits-and-a-round",
       "title": "Hits, and a round",
-      "objective": "Students can hits, and a round and see it run.",
+      "objective": "Detect a shot hit and hold a round.",
       "screens": [
         "5-9-defender-5-reading-did-the-shot-hit",
         "5-9-defender-6-lab-hit-the-drone",

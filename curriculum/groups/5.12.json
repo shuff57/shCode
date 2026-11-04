@@ -5,7 +5,7 @@
     {
       "id": "flappy-crash-and-finish",
       "title": "Crash, and finish",
-      "objective": "Students can crash, and finish and see it run.",
+      "objective": "Count a gap once, end the round on a crash, and restart cleanly.",
       "screens": [
         "5-12-flappy-sub-score-once",
         "5-4-flappy-6-lab-score-a-gap",

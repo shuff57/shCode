@@ -5,7 +5,7 @@
     {
       "id": "breakout-paddle-and-bounce",
       "title": "Paddle and bounce",
-      "objective": "Students can paddle and bounce and see it run.",
+      "objective": "Bounce the ball off a paddle.",
       "screens": [
         "6-10-breakout-4-lab-the-paddle",
         "6-10-breakout-5-lab-bounce"

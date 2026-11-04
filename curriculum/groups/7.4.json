@@ -5,7 +5,7 @@
     {
       "id": "defender-the-ship-and-shots",
       "title": "The ship, and shots",
-      "objective": "Students can the ship, and shots and see it run.",
+      "objective": "Build the ship, a cooldown and the shots list.",
       "screens": [
         "5-9-defender-1-plan-break-defender-into-parts",
         "5-9-defender-2-reading-a-ship-and-a-cooldown",

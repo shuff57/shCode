@@ -5,7 +5,7 @@
     {
       "id": "pinball-score-once",
       "title": "Scoring an event",
-      "objective": "Students can scoring an event and see it run.",
+      "objective": "Score a hit exactly once by remembering the frame before.",
       "screens": [
         "5-3-pinball-4-reading-a-collision-is-not-an-event",
         "5-3-pinball-5-example-the-score-that-climbs",
