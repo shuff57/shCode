@@ -1,0 +1,121 @@
+{
+  "id": "5-3-pinball-polish-5-lab-nudge-the-table",
+  "title": "5.3.19 Lab: Nudge the table",
+  "description": "Pinball players nudge the table to save a ball. Let a held arrow key push the ball with applyForce, choose the ball's mass so that push is a nudge and not a launch, and switch on debug to see the body moSHion uses for the ball.",
+  "type": "lesson",
+  "estimateMins": 12,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.3 Project: Pinball",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "A held key pushes the ball",
+      "instructions": "Run the starter first: it is your table from 5.3.17, with labels and popups. Now let the player nudge the ball while it rolls.\n\n`applyForce` (5.2.13) pushes a sprite and adds to the way it is already moving. It pushes only on the frames it runs, so it goes under `kb.pressing` (5.1.13), which is true on every frame a key is held. In `draw()`, where the STEP 1 comment is, add:\n\n```js\nif (kb.pressing('left')) ball.applyForce(-5, 0);\nif (kb.pressing('right')) ball.applyForce(5, 0);\n```\n\nRun it, click the game, press R and hold an arrow while the ball rolls. With the ball's own weight, about 0.4, the push throws it across the table.\n\nUse `applyForce`, not `ball.vel.x += ...`: changing the velocity ignores the ball's mass (5.2.13), so step 2 would change nothing.",
+      "hints": [
+        "kb.presses is true for one frame only, so a push under it lasts one frame and you barely see it. Use kb.pressing.",
+        "Any keys work, and so do braces: if (kb.pressing('right')) { ball.applyForce(5, 0); }"
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Choose the ball's weight",
+      "instructions": "A heavier body moves less under the same push (5.3.18). In `setup()`, after the ball is made, where the STEP 2 comment is, add:\n\n```js\nball.mass = 1;\n```\n\nRun it and hold an arrow again: now it is a nudge. Then try `0.4`, `1` and `4`. Mass does not change how the ball falls or rolls down the bumpers, so a drop still scores 16. It changes only what the nudge does.",
+      "hints": [
+        "ball.mass = ... goes after ball = new Sprite(...), or there is no ball yet to give a weight to.",
+        "At 4 the ball hardly moves when you push. At 0.4 it flies. Somewhere in between feels like a nudge."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "See the ball's body",
+      "instructions": "In `setup()`, where the STEP 3 comment is, add `ball.debug = true;` (5.3.18). A green outline now shows the body moSHion uses for the ball. Here it matches the blue circle exactly, which is what you want. If a ball ever seems to stop on nothing or pass through a wall, this is the first thing to switch on.\n\nYou can leave it on, or flip it with a key in `draw()`: `if (kb.presses('d')) ball.debug = !ball.debug;`.",
+      "hints": [
+        "Put it on the bumpers too if you like: b1.debug = true; and so on."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Say which mass felt right",
+      "instructions": "Play a few drops with the mass you chose. Then, at the very top of `script.js`, write one `//` comment saying which mass felt right for a nudge, and why. For example: `// mass 1: the nudge saves a ball without throwing it off the table.` No card checks this one. It is for you and your teacher.",
+      "hints": [
+        "A comment never runs, so it cannot break the game."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A held key pushes the ball",
+      "description": "applyForce(...) on the ball (or any sprite) runs inside an if that reads kb.pressing(...): any key, two keys, braces, or a helper that if calls. Changing vel.x does not count: velocity ignores mass, so the weight in step 2 would change nothing. Help: 5.2.13 (Reading: Forces vs Velocity)",
+      "hint": "In draw(), write if (kb.pressing('right')) ball.applyForce(5, 0); and the same for 'left' with -5.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:\\bif\\s*\\((?=[^{};]{0,300}\\bkb\\s*\\.\\s*pressing\\s*\\()(?:[^{};()]|\\((?:[^{};()]|\\([^{};()]{0,200}\\)){0,200}\\)){0,300}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?|[^;{}]{0,300}?)[\\w$\\])]\\s*\\??\\.\\s*applyForce\\s*\\()|(?:\\bif\\s*\\((?=[^{};]{0,300}\\bkb\\s*\\.\\s*pressing\\s*\\()(?:[^{};()]|\\((?:[^{};()]|\\([^{};()]{0,200}\\)){0,200}\\)){0,300}\\)\\s*(?:\\{(?:(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?[^\\w$.{}])?|(?:[^;{}]{0,300}?[^\\w$.;{}])?)(?!(?:if|for|while|switch|return|function|catch|typeof|new|else|do)\\b)(?<kh>[A-Za-z_$][\\w$]*)\\s*\\((?=[\\s\\S]{0,3000}?\\bfunction\\s+\\k<kh>\\s*\\([^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?[\\w$\\])]\\s*\\??\\.\\s*applyForce\\s*\\())|(?:\\bfunction\\s+(?<kk>[A-Za-z_$][\\w$]*)\\s*\\([^)]*\\)\\s*\\{(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?[\\w$\\])]\\s*\\??\\.\\s*applyForce\\s*\\([\\s\\S]{0,3000}?\\bif\\s*\\((?=[^{};]{0,300}\\bkb\\s*\\.\\s*pressing\\s*\\()(?:[^{};()]|\\((?:[^{};()]|\\([^{};()]{0,200}\\)){0,200}\\)){0,300}\\)\\s*(?:\\{(?:(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?[^\\w$.{}])?|(?:[^;{}]{0,300}?[^\\w$.;{}])?)\\k<kk>\\s*\\()|(?:\\b(?:(?:const|let|var)\\s+)?(?<kv>[A-Za-z_$][\\w$]*)\\s*=(?![=>])[^;\\n]{0,200}?\\bkb\\s*\\.\\s*pressing\\s*\\([\\s\\S]{0,600}?\\bif\\s*\\((?=[^{};]{0,300}\\b\\k<kv>\\b)[^{};]{0,300}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]{0,1500}\\}){0,1500}?|[^;{}]{0,300}?)[\\w$\\])]\\s*\\??\\.\\s*applyForce\\s*\\()|(?:\\.\\s*applyForce\\s*\\([^;]{0,200}?\\bkb\\s*\\.\\s*pressing\\s*\\()",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "The ball's weight is set",
+      "description": "A sprite's .mass (or .density) is set to a number or a variable. Help: 5.3.18 (Reading: Four knobs: mass, gravityScale, rotationLock, debug)",
+      "hint": "In setup(), after the ball is made, write ball.mass = 1; then try other numbers.",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "[\\w$\\])]\\s*\\.\\s*(?:mass|density)\\s*=(?!=)\\s*[^\\s;]",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "The collider outline is on",
+      "description": "A sprite's .debug is set to true, or a key flips it with !. Help: 5.3.18 (Reading: Four knobs: mass, gravityScale, rotationLock, debug)",
+      "hint": "In setup(), write ball.debug = true;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "[\\w$\\])]\\s*\\.\\s*debug\\s*=(?!=)\\s*(?:true\\b|!|1\\b|kb\\s*\\.)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.19 Lab: Nudge the table\". The task they were given: The starter is their pinball table from 5.3.17: three bumpers labelled with their worth, scored once per hit with a chime and a popup that removes itself. (1) In draw(), push the ball with applyForce while an arrow key is held, under kb.pressing, for example if (kb.pressing('right')) ball.applyForce(5, 0); and the same with -5 for left. (2) In setup(), set the ball's mass, for example ball.mass = 1;, and try other numbers. (3) Switch on the collider outline with ball.debug = true; (a key that flips it is also fine). (4) A // comment at the top saying which mass felt right; no criterion checks that comment. What the starter file already had: everything from 5.3.17 (walls, labelled bumpers, popups with .life, the chime, the score, an R key), and no push, no mass and no debug. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine, and so is moving the rules into update(). Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count, and the starter's STEP comments are never the student's work. moSHion facts that matter here: applyForce(fx, fy) pushes a sprite only on the frames it runs and adds to how it already moves; a heavier mass makes the same force move it less. kb.pressing is true on every frame a key is held; kb.presses is true on one frame only, so a push under it lasts one frame. Setting vel.x (or vel.x += ...) ignores mass, so it is not a push for this lab. .mass reads and sets how heavy a sprite is (a 22-pixel ball starts at about 0.4); .density is another way to set the same thing. Mass does not change how fast a body falls. .debug = true draws the sprite's collider outline in green and changes nothing about how the game plays. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A held key pushes the ball",
+        "description": "applyForce(...) on the ball (or another sprite) runs only while a key is held: inside an if on kb.pressing(...), any key or keys, braces or not, or in a helper that if calls. Not met: no applyForce, applyForce that runs every frame with no key, applyForce only under kb.presses (one frame), or the push done by changing vel.x instead. Help: 5.2.13 (Reading: Forces vs Velocity)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The ball's weight is set",
+        "description": "A sprite's .mass (or .density) is set to a number or a variable, anywhere that runs (setup() is where the step puts it). Not met: no mass or density set, or only in a comment. Help: 5.3.18 (Reading: Four knobs: mass, gravityScale, rotationLock, debug)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The collider outline is on",
+        "description": "A sprite's .debug is set to true, or a key flips it (for example ball.debug = !ball.debug under kb.presses). Not met: no debug, debug only set to false, or only in a comment. Help: 5.3.18 (Reading: Four knobs: mass, gravityScale, rotationLock, debug)",
+        "points": 1
+      }
+    ]
+  }
+}

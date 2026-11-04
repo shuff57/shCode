@@ -1883,6 +1883,179 @@ for (const id of Object.values(L)) {
   }
 }
 
+// ---------------------------------------------------------------- 5.3.17, 5.3.19, 5.3.21 (Pinball polish)
+//
+// Appended 2026-11-03 (codehs-review/DEEPEN-GAMES.md section 3.1). Lax: every honest shape of a
+// label, a popup, a nudge, a mass and debug passes, wherever it sits (setup(), the loop, update(), a
+// helper). Each card is tied to its place, so what it refuses is the version that does not work or
+// does not do the job: a popup made on every frame of a touch (a stream) or once in setup(), a
+// .life on the ball or a bumper (it deletes them), a push made by changing vel.x (it ignores mass),
+// a push under kb.presses (one frame), and a fade or a mass that never changes. No pattern uses
+// lookbehind; each stays under ~10 ms on 5000-character adversarial input.
+{
+  const run = (id, list) => {
+    for (const [name, req, files] of list) {
+      if (req === 'pass') accept(id, name, files);
+      else reject(id, name, req, files);
+    }
+  };
+  const swap = (f, a, b) => ({ 'script.js': f['script.js'].split(a).join(b) });
+
+  // 5.3.17 Lab: Show the worth, pop the points
+  {
+    const id = '5-3-pinball-polish-3-lab-show-the-worth-pop-the-points';
+    const S = solutionFiles(id);
+    const lab = (n) => '  b' + n + '.text = b' + n + '.worth;' + nl;
+    const noLabels = (f) => edit(edit(edit(f, lab(1), ''), lab(2), ''), lab(3), '');
+    const push = '  bumpers.push(b1, b2, b3);';
+    const popLines = "      const pop = new Sprite(b.x, b.y - 24, 28);" + nl + "      pop.collider = 'none';" + nl + "      pop.color = 'gold';" + nl + "      pop.text = '+' + b.worth;" + nl + "      pop.textColor = 'black';" + nl + '      pop.textSize = 13;' + nl + '      pop.vel.y = -1;' + nl + '      pop.life = 40;' + nl;
+    const popBlock = nl + '      // the popup: made once, on the frame the hit starts' + nl + popLines;
+    const noPop = edit(S, popBlock, '');
+    const mem = '    b.wasTouching = touching;';
+    const hitOpen = '    if (touching && !b.wasTouching) {';
+    const afterChime = '      chime.play();' + nl;
+    const indent = (s, by) => s.split(nl).map((l) => (l ? by + l : l)).join(nl);
+    const helper = 'function popAt(b) {' + nl + indent(popLines.replace(/^ {6}/gm, ''), '  ') + '}' + nl;
+    const lifeOn = (who) => edit(S, '      pop.life = 40;', '      ' + who + '.life = 40;');
+    run(id, [
+      ['reference', 'pass', S],
+      ['untouched starter', 'r1', starterFiles(id)],
+      // r1: the labels
+      ['labels by a loop in setup()', 'pass', edit(noLabels(S), push, push + nl + '  for (const b of bumpers) b.text = b.worth;')],
+      ['labels set every frame in the loop', 'pass', edit(noLabels(S), mem, mem + nl + '    b.text = b.worth;')],
+      ['label joined to words', 'pass', edit(S, lab(1), "  b1.text = 'worth ' + b1.worth;" + nl)],
+      ['label in a template string', 'pass', edit(S, lab(1), '  b1.text = ' + BT + '${b1.worth}' + BT + ';' + nl)],
+      ['label with String()', 'pass', edit(S, lab(1), '  b1.text = String(b1.worth);' + nl)],
+      ['labels as plain numbers', 'pass', edit(edit(edit(S, lab(1), '  b1.text = 1;' + nl), lab(2), '  b2.text = 5;' + nl), lab(3), '  b3.text = 10;' + nl)],
+      ['labels as numbers in quotes', 'pass', edit(edit(edit(S, lab(1), "  b1.text = '1';" + nl), lab(2), "  b2.text = '5';" + nl), lab(3), "  b3.text = '10';" + nl)],
+      ['labels with a colour and a size', 'pass', edit(S, lab(1), lab(1) + "  b1.textColor = 'black';" + nl + '  b1.textSize = 12;' + nl)],
+      ['text() draws each worth every frame', 'pass', edit(noLabels(S), mem, mem + nl + '    text(b.worth, b.x, b.y - 20);')],
+      ['labels in a counting loop', 'pass', edit(noLabels(S), push, push + nl + '  for (let i = 0; i < bumpers.length; i++) {' + nl + '    bumpers[i].text = bumpers[i].worth;' + nl + '  }')],
+      ['no labels: only the popup wears words', 'r1', noLabels(S)],
+      ['only the ball wears a word', 'r1', edit(noLabels(S), "  ball.bounciness = 0;", "  ball.bounciness = 0;" + nl + "  ball.text = 'ball';")],
+      ['labels only in a comment', 'r1', edit(noLabels(S), push, push + nl + '  // b1.text = b1.worth;')],
+      // r2: the popup on the hit
+      ['popup above the score line', 'pass', edit(noPop, hitOpen + nl, hitOpen + nl + popLines)],
+      ['popup in a helper written below draw()', 'pass', { 'script.js': edit(S, popBlock, nl + '      popAt(b);' + nl)['script.js'] + nl + helper }],
+      ['popup in a helper written above draw()', 'pass', edit(edit(S, popBlock, nl + '      popAt(b);' + nl), 'function draw() {', helper + nl + 'function draw() {')],
+      ['popup with another name and let', 'pass', { 'script.js': S['script.js'].replace('const pop =', 'let plus =').replace(/\bpop\./g, 'plus.') }],
+      ['popup made at the ball', 'pass', edit(S, 'new Sprite(b.x, b.y - 24, 28)', 'new Sprite(ball.x, ball.y - 20, 28)')],
+      ['nested: touching, then not before', 'pass', edit(S, hitOpen, '    if (touching) if (!b.wasTouching) {')],
+      ['nested with braces', 'pass', edit(edit(S, hitOpen, '    if (touching) {' + nl + '    if (!b.wasTouching) {'), '      pop.life = 40;' + nl + '    }', '      pop.life = 40;' + nl + '    }' + nl + '    }')],
+      ['the hit in a variable first', 'pass', edit(S, hitOpen, '    const isHit = touching && !b.wasTouching;' + nl + '    if (isHit) {')],
+      ['memory tested with == false', 'pass', edit(S, '!b.wasTouching', 'b.wasTouching == false')],
+      ['clarifying parentheses', 'pass', edit(S, hitOpen, '    if ((touching) && !(b.wasTouching)) {')],
+      ['brace on its own line', 'pass', edit(S, hitOpen, '    if (touching && !b.wasTouching)' + nl + '    {')],
+      ['double quotes everywhere', 'pass', { 'script.js': S['script.js'].replace(/'/g, '"') }],
+      ['the loop moved into update()', 'pass', (() => {
+        const src = S['script.js'];
+        const from = src.indexOf('  for (const b of bumpers) {');
+        const to = src.indexOf(mem + nl + '  }' + nl) + (mem + nl + '  }' + nl).length;
+        const loop = src.slice(from, to);
+        return { 'script.js': src.replace(loop, '') + nl + 'function update() {' + nl + loop + '}' + nl };
+      })()],
+      ['popup made on every frame of a touch', 'r2', edit(noPop, mem, '    if (touching) {' + nl + popLines + '    }' + nl + mem)],
+      ['popup under colliding() alone', 'r2', edit(noPop, mem, '    if (ball.colliding(b)) {' + nl + popLines + '    }' + nl + mem)],
+      ['popup straight in draw()', 'r2', edit(noPop, "  if (kb.presses('r')) {", popLines.replace(/b\.(x|y|worth)/g, '20') + "  if (kb.presses('r')) {")],
+      ['popup in the else', 'r2', edit(noPop, mem, mem.replace(mem, '    if (touching && !b.wasTouching) {} else {' + nl + popLines + '    }' + nl + mem))],
+      ['popup under the R key', 'r2', edit(noPop, "  if (kb.presses('r')) {", "  if (kb.presses('r')) {" + nl + popLines.replace(/b\.(x|y|worth)/g, '20'))],
+      ['popup made once in setup()', 'r2', edit(noPop, '  score = 0;', popLines.replace(/b\.(x|y|worth)/g, '20') + '  score = 0;')],
+      ['popup only in a comment', 'r2', edit(S, '      const pop = new Sprite(', '      // const pop = new Sprite(')],
+      ['memory tested with === false (never true)', 'r2', edit(S, '!b.wasTouching', 'b.wasTouching === false')],
+      ['if (!b.wasTouching) alone (every frame apart)', 'r2', edit(noPop, mem, '    if (!b.wasTouching) {' + nl + popLines + '    }' + nl + mem)],
+      ['popup under ||', 'r2', edit(noPop, mem, '    if (touching || !b.wasTouching) {' + nl + popLines + '    }' + nl + mem)],
+      // r3: the popup removes itself
+      ['life from a constant', 'pass', edit(edit(S, '      pop.life = 40;', '      pop.life = POP_LIFE;'), 'let bumpers = [];', 'let bumpers = [];' + nl + 'const POP_LIFE = 40;')],
+      ['life of half a second', 'pass', edit(S, '      pop.life = 40;', '      pop.life = 30;')],
+      ['a countdown of their own that ends in delete()', 'pass', edit(edit(edit(S, '      pop.life = 40;', '      pop.timer = 40;' + nl + '      pops.push(pop);'), 'let bumpers = [];', 'let bumpers = [];' + nl + 'let pops = [];'), "  if (kb.presses('r')) {", '  for (const p of pops) {' + nl + '    p.timer -= 1;' + nl + '    if (p.timer <= 0) p.delete();' + nl + '  }' + nl + nl + "  if (kb.presses('r')) {")],
+      ['no life at all', 'r3', edit(S, '      pop.life = 40;' + nl, '')],
+      ['life on the ball', 'r3', lifeOn('ball')],
+      ['life on the bumper', 'r3', lifeOn('b')],
+      ['life of 0', 'r3', edit(S, 'pop.life = 40', 'pop.life = 0')],
+      ['life of -1 (never runs out)', 'r3', edit(S, 'pop.life = 40', 'pop.life = -1')],
+      ['life only in a comment', 'r3', edit(S, '      pop.life = 40;', '      // pop.life = 40;')],
+      ['popup with its life made once in setup()', 'r3', edit(noPop, '  score = 0;', popLines.replace(/b\.(x|y|worth)/g, '20') + '  score = 0;')],
+    ]);
+  }
+
+  // 5.3.19 Lab: Nudge the table
+  {
+    const id = '5-3-pinball-polish-5-lab-nudge-the-table';
+    const S = solutionFiles(id);
+    const nudge = "  if (kb.pressing('left')) ball.applyForce(-5, 0);" + nl + "  if (kb.pressing('right')) ball.applyForce(5, 0);";
+    const n = (to) => edit(S, nudge, to);
+    const mass = '  ball.mass = 1;';
+    const dbg = '  ball.debug = true;';
+    run(id, [
+      ['reference', 'pass', S],
+      ['untouched starter', 'r1', starterFiles(id)],
+      // r1: a held key pushes the ball
+      ['braces', 'pass', n("  if (kb.pressing('left')) {" + nl + '    ball.applyForce(-5, 0);' + nl + "  } else if (kb.pressing('right')) {" + nl + '    ball.applyForce(5, 0);' + nl + '  }')],
+      ['one key only', 'pass', n("  if (kb.pressing('right')) ball.applyForce(5, 0);")],
+      ['a and d', 'pass', swap(swap(S, "kb.pressing('left')", "kb.pressing('a')"), "kb.pressing('right')", "kb.pressing('d')")],
+      ['a force from a constant', 'pass', edit(n("  if (kb.pressing('left')) ball.applyForce(-PUSH, 0);" + nl + "  if (kb.pressing('right')) ball.applyForce(PUSH, 0);"), 'let bumpers = [];', 'let bumpers = [];' + nl + 'const PUSH = 5;')],
+      ['the key read into a variable first', 'pass', n("  const left = kb.pressing('left');" + nl + "  const right = kb.pressing('right');" + nl + '  if (left) ball.applyForce(-5, 0);' + nl + '  if (right) ball.applyForce(5, 0);')],
+      ['the key inside the force, as a ternary', 'pass', n("  ball.applyForce(kb.pressing('right') ? 5 : kb.pressing('left') ? -5 : 0, 0);")],
+      ['a helper with the keys inside', 'pass', { 'script.js': n('  nudge();')['script.js'] + nl + 'function nudge() {' + nl + nudge + nl + '}' + nl }],
+      ['a helper called from the key branch', 'pass', { 'script.js': n("  if (kb.pressing('left')) push(-5);" + nl + "  if (kb.pressing('right')) push(5);")['script.js'] + nl + 'function push(f) {' + nl + '  ball.applyForce(f, 0);' + nl + '}' + nl }],
+      ['pushes in update()', 'pass', { 'script.js': n('')['script.js'] + nl + 'function update() {' + nl + nudge + nl + '}' + nl }],
+      ['both keys in one if with ||', 'pass', n("  if (kb.pressing('left') || kb.pressing('right')) ball.applyForce(kb.pressing('left') ? -5 : 5, 0);")],
+      ['clarifying parentheses', 'pass', swap(S, "if (kb.pressing('left'))", "if ((kb.pressing('left')))")],
+      ['double quotes everywhere', 'pass', { 'script.js': S['script.js'].replace(/'/g, '"') }],
+      ['the push changes vel.x instead', 'r1', n("  if (kb.pressing('left')) ball.vel.x -= 0.3;" + nl + "  if (kb.pressing('right')) ball.vel.x += 0.3;")],
+      ['a force on every frame, no key', 'r1', n('  ball.applyForce(5, 0);')],
+      ['a push under kb.presses (one frame)', 'r1', swap(S, 'kb.pressing(', 'kb.presses(')],
+      ['the push only in a comment', 'r1', n("  // if (kb.pressing('right')) ball.applyForce(5, 0);")],
+      ['the push only in a string', 'r1', n("  const note = \"if (kb.pressing('right')) ball.applyForce(5, 0)\";")],
+      // r2: the weight
+      ['a decimal mass', 'pass', edit(S, mass, '  ball.mass = 0.8;')],
+      ['a mass from a constant', 'pass', edit(edit(S, mass, '  ball.mass = BALL_MASS;'), 'let bumpers = [];', 'let bumpers = [];' + nl + 'const BALL_MASS = 2;')],
+      ['density instead of mass', 'pass', edit(S, mass, '  ball.density = 3;')],
+      ['the mass set again on R', 'pass', edit(edit(S, mass + nl, ''), "  if (kb.presses('r')) {", "  if (kb.presses('r')) {" + nl + '    ball.mass = 2;')],
+      ['no mass', 'r2', edit(S, mass + nl, '')],
+      ['mass only in a comment', 'r2', edit(S, mass, '  // ball.mass = 1;')],
+      ['mass compared, not set', 'r2', edit(S, mass, '  if (ball.mass == 1) score = 0;')],
+      // r3: debug
+      ['debug flipped by a key', 'pass', edit(edit(S, dbg + nl, ''), "  if (kb.presses('r')) {", "  if (kb.presses('d')) ball.debug = !ball.debug;" + nl + "  if (kb.presses('r')) {")],
+      ['debug on a bumper instead', 'pass', edit(edit(S, dbg + nl, ''), '  b1.text = b1.worth;', '  b1.text = b1.worth;' + nl + '  b1.debug = true;')],
+      ['debug on every bumper in a loop', 'pass', edit(edit(S, dbg + nl, ''), '  bumpers.push(b1, b2, b3);', '  bumpers.push(b1, b2, b3);' + nl + '  for (const b of bumpers) b.debug = true;')],
+      ['no debug', 'r3', edit(S, dbg + nl, '')],
+      ['debug set to false', 'r3', edit(S, dbg, '  ball.debug = false;')],
+      ['debug only in a comment', 'r3', edit(S, dbg, '  // ball.debug = true;')],
+      ['debug only in a string', 'r3', edit(S, dbg, "  const tip = 'ball.debug = true';")],
+    ]);
+  }
+
+  // 5.3.21 Challenges: Polish it your way (one card, any challenge)
+  {
+    const id = '5-3-pinball-polish-7-challenges-polish-it-your-way';
+    const S = solutionFiles(id);
+    const T = starterFiles(id);
+    const popEnd = '      pop.life = 40;';
+    const rKey = "  if (kb.presses('r')) {";
+    const top = 'let bumpers = [];';
+    const fade = (line) => edit(edit(edit(T, top, top + nl + 'let pops = [];'), popEnd, popEnd + nl + '      pops.push(pop);'), rKey, '  for (const p of pops) {' + nl + '    ' + line + nl + '  }' + nl + nl + rKey);
+    run(id, [
+      ['reference: all three', 'pass', S],
+      ['untouched starter', 'r1', T],
+      ['fade from life', 'pass', fade('p.opacity = p.life / 40;')],
+      ['fade by a step each frame', 'pass', fade('p.opacity -= 0.025;')],
+      ['fade by a multiplier', 'pass', fade('p.opacity *= 0.9;')],
+      ['tilt with a frameCount window', 'pass', edit(edit(T, top, top + nl + 'let nudges = 0;'), rKey, "  if (kb.presses('left') || kb.presses('right')) nudges += 1;" + nl + '  if (frameCount % 120 === 0) nudges = 0;' + nl + '  if (nudges > 3) ball.y = 500;' + nl + rKey)],
+      ['tilt counted on a key, reset by R', 'pass', edit(edit(edit(T, top, top + nl + 'let nudges = 0;'), rKey, "  if (kb.presses('left')) {" + nl + '    nudges++;' + nl + '  }' + nl + rKey), rKey, rKey + nl + '    nudges = 0;')],
+      ['heavier from round 2, in the R key', 'pass', edit(edit(T, top, top + nl + 'let round = 1;'), rKey, rKey + nl + '    round = round + 1;' + nl + '    if (round >= 2) ball.mass = 3;')],
+      ['mass worked out from the round', 'pass', edit(edit(T, top, top + nl + 'let round = 1;'), rKey, rKey + nl + '    round += 1;' + nl + '    ball.mass = round;')],
+      ['own idea: gravityScale', 'pass', edit(T, '  ball.mass = 1;', '  ball.mass = 1;' + nl + '  ball.gravityScale = 0.7;')],
+      ['own idea: rotationLock', 'pass', edit(T, '  ball.mass = 1;', '  ball.mass = 1;' + nl + '  ball.rotationLock = true;')],
+      ['popup opacity set once (no fade)', 'r1', edit(T, popEnd, popEnd + nl + '      pop.opacity = 0.5;')],
+      ['only a colour changed', 'r1', edit(T, "pop.color = 'gold';", "pop.color = 'orange';")],
+      ['the mass changed once, in setup()', 'r1', edit(T, '  ball.mass = 1;', '  ball.mass = 3;')],
+      ['the rule only in a comment', 'r1', { 'script.js': '// My polish: the popups fade with opacity and frameCount.' + nl + T['script.js'] }],
+      ['frameCount only in a string', 'r1', edit(T, "text('click the game, then press R to drop the ball', 20, 26);", "text('frameCount', 20, 26);")],
+    ]);
+  }
+}
+
 // ---------------------------------------------------------------- run
 try {
   execFileSync(
