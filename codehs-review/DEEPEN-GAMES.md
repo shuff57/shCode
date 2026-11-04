@@ -238,7 +238,23 @@ change the collider (no).
 
 ---
 
-## 4. The new games: 5.12 Mini Golf, 5.13 Cannon, 5.14 Jumper
+## 4. The new games: 5.12 Pocket, 5.13 Sling, 5.14 Climb
+
+**Themes decided 2026-11-04. The tables below still carry the old CodeHS-shaped names and folder prefixes; they are
+rewritten in phase 0, before any of these lessons is built.**
+
+- **5.12 Mini Golf -> Pocket**, an eight-ball pool table. Same mechanics, same 14 lessons, same rows (aim, pull-back
+  power, `.drag` and stop, pocket as a pass-through target, `new Walls()` rails, shots against par).
+- **5.13 Cannon -> Sling**, a catapult siege. **Angry Birds is the reference**: a few shots, an arc, a wall of blocks
+  that comes down. The block change is real: blocks are bodies (`mass`, `bounciness`, no `rotationLock`), so the wall
+  topples, which is the payoff for 5.3.18. The arm turns to the aim with `rotateTo`, so the cannon's lesson survives.
+  Aim and pull-back are not re-taught; 5.12 owns them.
+- **5.14 Jumper -> Climb**, an endless vertical climber. **Doodle Jump is the reference**: platforms spawn above and
+  recycle below (Flappy's loop; moSHion has no `camera.follow`), the score is height, falling ends the round, and there
+  is no door. The hunter is **our addition**, because Doodle Jump has no chase and row 3 would otherwise lose its home.
+- **IP rule: clone the mechanic, never the expression.** No borrowed title, character, logo, sound or level layout on a
+  student page; the reference is named in the module doc only. Our own pixel art throughout.
+
 
 Each follows the five-step close (PLACEMENT #4): an AI-graded plan, build steps with the concept injected where it is
 needed, one **Debugging:** screen (the 5.10.8 kind) or one pseudocode plan before the hardest step (the 5.10.3 kind), an
