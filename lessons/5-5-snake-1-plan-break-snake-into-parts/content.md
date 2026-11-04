@@ -4,7 +4,7 @@ Every game in this unit gets a plan first. A plan is not code. It is a short lis
 
 **Snake, in one paragraph.** A snake of green cells moves one cell at a time on a grid, in a straight line. The arrow keys turn it. A red cell of food sits somewhere on the grid; when the snake's head reaches it, the score goes up by one and the snake gets one cell longer. The round ends if the snake leaves the grid or runs into its own body. Pressing R starts again.
 
-**What a plan lists.** Break it into parts, as Flappy did in 5.11.2 (Lab: Pipes that come and go), where the pipes became a part of their own, kept in their own array, separate from the bird. For each part ask: does the game have to *remember* something about it from frame to frame? If so, that is a variable, and the plan names it.
+**What a plan lists.** Break it into parts, as Flappy did in 5.11.3 (Lab: Pipes that come and go), where the pipes became a part of their own, kept in their own array, separate from the bird. For each part ask: does the game have to *remember* something about it from frame to frame? If so, that is a variable, and the plan names it.
 
 Write your response in the box below. Short sentences or a numbered list both work. Aim to cover:
 

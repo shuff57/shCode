@@ -1,6 +1,6 @@
 ## A body that grows
 
-**Read before `5.14.2 Lab: Grow and eat`.** About 8 minutes.
+**Read before `5.14.3 Lab: Grow and eat`.** About 8 minutes.
 
 By the end of this reading you should be able to answer:
 

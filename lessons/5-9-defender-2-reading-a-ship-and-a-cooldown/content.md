@@ -64,7 +64,7 @@ function draw() {
 }
 ```
 
-When the round ends, `playing` becomes `false` and every line that moves something stops running, so nothing needs freezing. Compare 5.12.2 (Lab: Crash, and start again): the bird fell under gravity and the pipes slid by their own `vel.x`, so a crash also had to set gravity to 0 and every pipe's speed to 0. Moving by hand costs one line per thing, and buys a game over that is a single `playing = false`.
+When the round ends, `playing` becomes `false` and every line that moves something stops running, so nothing needs freezing. Compare 5.12.3 (Lab: Crash, and start again): the bird fell under gravity and the pipes slid by their own `vel.x`, so a crash also had to set gravity to 0 and every pipe's speed to 0. Moving by hand costs one line per thing, and buys a game over that is a single `playing = false`.
 
 ---
 

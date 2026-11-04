@@ -29,7 +29,7 @@ It is level-triggered, like `colliding()` in 5.4.1: true on *every* frame the tw
 | with `collider = 'none'` | never true | true while they overlap |
 | true on | every frame of contact | every frame of overlap |
 
-**The shot leaves on the frame it hits.** Because `overlaps()` stays true for several frames, a hit that only adds to the score would add on every one of them: one shot, four points. So the frame a shot hits is the frame it goes, from both places, as in 5.11.2: `delete()` takes it off the screen and `splice` takes it out of the array. On the next frame there is no shot left to overlap anything.
+**The shot leaves on the frame it hits.** Because `overlaps()` stays true for several frames, a hit that only adds to the score would add on every one of them: one shot, four points. So the frame a shot hits is the frame it goes, from both places, as in 5.11.3: `delete()` takes it off the screen and `splice` takes it out of the array. On the next frame there is no shot left to overlap anything.
 
 ```js
 for (let i = bullets.length - 1; i >= 0; i--) {

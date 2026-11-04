@@ -1,0 +1,96 @@
+{
+  "id": "5-14-snake-sub-one-longer-snake",
+  "title": "5.14.2 Sub-build: One longer snake",
+  "description": "A head in an array, and a body that follows it. Grow it by one, then eat something.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.14 Snake: grow",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it first",
+      "instructions": "The head steps across the screen alone. There is no body."
+    },
+    {
+      "id": "s2",
+      "title": "Keep the path",
+      "instructions": "Put the head in an array. On every step, push the head's previous position to the front of the body array (or to the end, whichever your loop expects), then move the head.",
+      "hints": [
+        "`body.unshift({ x, y })` puts a new segment at the front.",
+        "The array is the snake: the head is just the first segment."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Draw the body",
+      "instructions": "Loop over the body array and draw one square per segment with `rect(seg.x, seg.y, CELL, CELL)`. Growing is adding one more segment instead of dropping the last.",
+      "hints": [
+        "A body that never grows means you are replacing the last segment instead of keeping it."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A body in an array",
+      "description": "Segments are kept in an array and added to as the snake moves. Help: 5.14.1 (Reading: A body that grows)",
+      "hint": "body.unshift({ x, y });",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:unshift|push)\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "Drawn in a loop",
+      "description": "The body array is read in a loop to draw the segments. Help: 5.14.1 (Reading: A body that grows)",
+      "hint": "for (const seg of body) rect(seg.x, seg.y, CELL, CELL);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bfor\\s*\\([^)]{0,60}(?:of|in|;)[\\s\\S]{0,160}?\\brect\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a short moSHion sketch for \"Sub-build: One longer snake\". The task: keep the snake's body in an array, add the head's previous cell to it on every step, and draw every segment with a loop. This is a sub-build: a small isolated program whose only job is this one mechanic. Accept any names, helpers, arrow functions and ternaries. A line only in a comment or string does not count. Use short, plain notes for a 14-year-old, name their own line when something is missing, never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Body in an array",
+        "description": "Segments live in an array that grows as the snake moves.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Grow by one",
+        "description": "Adding a segment is unshift/push of a new cell; the tail is not dropped when growing.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Drawn by a loop",
+        "description": "Every segment is drawn from the array, not one hard-coded square.",
+        "points": 1
+      }
+    ]
+  }
+}

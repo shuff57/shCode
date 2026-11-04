@@ -1,4 +1,4 @@
-// 5.13.4 Lab: Steer it.
+// 5.13.5 Lab: Steer it.
 
 const CELL = 20;
 let head, dx, dy, playing;

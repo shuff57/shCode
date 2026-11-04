@@ -1,4 +1,4 @@
-// 5.10.4 Lab: Make it flap (reference solution).
+// 5.10.5 Lab: Make it flap (reference solution).
 
 let bird;
 

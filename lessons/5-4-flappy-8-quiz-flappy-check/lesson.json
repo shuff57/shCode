@@ -1,6 +1,6 @@
 {
   "id": "5-4-flappy-8-quiz-flappy-check",
-  "title": "5.12.4 Check: the flapping game",
+  "title": "5.12.5 Check: the flapping game",
   "description": "Eight multiple-choice questions on gravity and the flap, the scrolling world, timed spawning, removing what has left, scoring a pass once, and what a restart puts back. Checked instantly.",
   "type": "assignment",
   "estimateMins": 10,
@@ -100,7 +100,7 @@
       },
       {
         "id": "q6-two-things",
-        "source": "5.11.2",
+        "source": "5.11.3",
         "question": "A pipe has slid off the left edge. What must happen to it?",
         "options": [
           "Its sprite is deleted and it is spliced out of the array",
@@ -116,7 +116,7 @@
       },
       {
         "id": "q7-passed",
-        "source": "5.12.1",
+        "source": "5.12.2",
         "question": "What is the `passed` flag on each pipe for?",
         "options": [
           "It makes the pipe move",
@@ -132,7 +132,7 @@
       },
       {
         "id": "q8-restart",
-        "source": "5.12.2",
+        "source": "5.12.3",
         "question": "What must a restart put back in this game, besides the bird and the score?",
         "options": [
           "Only the flag",

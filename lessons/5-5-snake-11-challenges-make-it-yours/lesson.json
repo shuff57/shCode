@@ -34,7 +34,7 @@
     {
       "id": "r1",
       "title": "Your rule is in the code",
-      "description": "One of the three challenges is there: a beat that gets shorter, a best score kept across rounds, or a turn stored in turnX and turnY for the next step. Help: 5.13.2 (Reading: A world on a grid) and 5.13.4 (Lab: Steer it)",
+      "description": "One of the three challenges is there: a beat that gets shorter, a best score kept across rounds, or a turn stored in turnX and turnY for the next step. Help: 5.13.2 (Reading: A world on a grid) and 5.13.5 (Lab: Steer it)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bbeat\\s*(?:-=|--|=\\s*(?:\\(\\s*)?(?:(?:Math\\.)?max\\s*\\(|beat\\s*-))|--\\s*beat\\b|if\\s*\\(\\s*(?:\\(\\s*){0,2}(?:score(?:\\s*\\))?\\s*>=?\\s*(?:\\(\\s*)?best|best(?:\\s*\\))?\\s*<=?\\s*(?:\\(\\s*)?score)\\b(?:\\s*\\)){1,3}|\\bbest\\s*=\\s*(?:\\(\\s*)?(?:Math\\.)?max\\s*\\(|\\bturnX\\s*=|if\\s*\\(\\s*(?:\\(\\s*){0,2}score(?:\\s*\\))?\\s*>=?\\s*(?:\\(\\s*)?([a-z_$][\\w$]*)(?:\\s*\\)){1,3}\\s*\\{?\\s*\\1\\s*=\\s*score\\b|if\\s*\\(\\s*(?:\\(\\s*){0,2}([a-z_$][\\w$]*)(?:\\s*\\))?\\s*<=?\\s*(?:\\(\\s*)?score(?:\\s*\\)){1,3}\\s*\\{?\\s*\\2\\s*=\\s*score\\b|\\b([a-z_$][\\w$]*)\\s*=\\s*(?:\\(\\s*)?(?:Math\\.)?max\\s*\\(\\s*(?:\\3\\s*,\\s*score|score\\s*,\\s*\\3)\\b",
@@ -56,7 +56,7 @@
       {
         "id": "r1",
         "title": "Your rule is in the code",
-        "description": "At least one of: (1) the beat lives in a variable that can change, is used in the frameCount % test, and gets smaller when the snake eats (a floor with max(...) or an if is what the challenge asks and is welcome); (2) a best score that startRound() does not reset, updated when the score beats it, where showing it is what the challenge asks and is welcome; (3) turns stored in their own variables (turnX and turnY, or other names) when a key is pressed, and copied into dx and dy at the start of step(). Missing: none of these is there, or the change would stop the sketch (subtracting from a const). Help: 5.13.2 (Reading: A world on a grid) and 5.13.4 (Lab: Steer it)",
+        "description": "At least one of: (1) the beat lives in a variable that can change, is used in the frameCount % test, and gets smaller when the snake eats (a floor with max(...) or an if is what the challenge asks and is welcome); (2) a best score that startRound() does not reset, updated when the score beats it, where showing it is what the challenge asks and is welcome; (3) turns stored in their own variables (turnX and turnY, or other names) when a key is pressed, and copied into dx and dy at the start of step(). Missing: none of these is there, or the change would stop the sketch (subtracting from a const). Help: 5.13.2 (Reading: A world on a grid) and 5.13.5 (Lab: Steer it)",
         "points": 1
       }
     ]

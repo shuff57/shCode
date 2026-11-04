@@ -1,0 +1,96 @@
+{
+  "id": "5-15-snake-sub-own-tail",
+  "title": "5.15.2 Sub-build: Am I in my own tail?",
+  "description": "A body that follows you will eventually meet you. Ask the question every step, before you move.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.15 Snake: search",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it first",
+      "instructions": "The snake crosses its own body and nothing happens. The lose rule is missing."
+    },
+    {
+      "id": "s2",
+      "title": "Ask the question",
+      "instructions": "Before moving, loop over the body and compare each segment with the cell the head is about to enter: `if (seg.x === nextX && seg.y === nextY) { ... }`.",
+      "hints": [
+        "Compare cells with `===`, not overlaps: both are integers on the grid.",
+        "Check the target cell, not where the head is now."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Set the flag",
+      "instructions": "Inside that `if`, set a `lost` flag and stop stepping. In `draw()`, show \"Game over\" when `lost` is true.",
+      "hints": [
+        "Do not delete the snake: the round ends, the game stays on screen."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A loop over the body",
+      "description": "Every segment is tested against the head's next cell. Help: 5.15.1 (Reading: Searching the array)",
+      "hint": "for (const seg of body) { if (seg.x === nextX && seg.y === nextY) ... }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bfor\\s*\\([^)]{0,60}\\bof\\b[\\s\\S]{0,250}?===",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "The round ends",
+      "description": "A lost/over flag is set when the head meets the body. Help: 5.15.1 (Reading: Searching the array)",
+      "hint": "lost = true;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:lost|gameOver|over|playing)\\s*=\\s*(?:true|false)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a short moSHion sketch for \"Sub-build: Am I in my own tail?\". The task: before the snake moves, loop over the body and compare each segment with the cell the head is about to enter, and set a lost flag when they match. This is a sub-build: a small isolated program whose only job is this one mechanic. Accept any names, helpers, arrow functions and ternaries. A line only in a comment or string does not count. Use short, plain notes for a 14-year-old, name their own line when something is missing, never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "The next cell is tested",
+        "description": "The comparison is against the cell the head is about to move into, not the current one.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Every segment",
+        "description": "A loop checks all body segments, not just the first.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The round ends",
+        "description": "A flag stops the stepping and the game shows that it is over.",
+        "points": 1
+      }
+    ]
+  }
+}

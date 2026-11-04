@@ -1,6 +1,6 @@
 ## A block that walks the grid
 
-**Read before `5.13.4 Lab: Steer it`.** About 8 minutes.
+**Read before `5.13.5 Lab: Steer it`.** About 8 minutes.
 
 The block keeps its column and row, moves them on a beat, and only then turns them into pixels.
 

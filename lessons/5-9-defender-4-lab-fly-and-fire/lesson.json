@@ -33,7 +33,7 @@
     {
       "id": "s3",
       "title": "Shots that leave are deleted",
-      "instructions": "Every shot climbs 8 pixels a frame and never stops. In the loop in `moveBullets()`, a shot whose `y` is less than -20 has left the top: delete it and splice it out of `bullets`, as Flappy did with its pipes in 5.11.2. The loop runs from the end of the array to the start because a splice moves every later shot down one place; going backwards, none is skipped. Hold Space and watch 'shots alive' at the top: it should stay at 4 or fewer. If it keeps climbing, shots are not being removed.",
+      "instructions": "Every shot climbs 8 pixels a frame and never stops. In the loop in `moveBullets()`, a shot whose `y` is less than -20 has left the top: delete it and splice it out of `bullets`, as Flappy did with its pipes in 5.11.3. The loop runs from the end of the array to the start because a splice moves every later shot down one place; going backwards, none is skipped. Hold Space and watch 'shots alive' at the top: it should stay at 4 or fewer. If it keeps climbing, shots are not being removed.",
       "hints": [
         "`bullets[i].delete();` takes the shot off the screen and `bullets.splice(i, 1);` takes it out of the array. You need both.",
         "Both lines go inside `if (bullets[i].y < -20) { ... }`."
@@ -107,7 +107,7 @@
     {
       "id": "r5",
       "title": "Shots that leave the top are deleted and spliced out",
-      "description": "Inside an if that asks whether a shot's y is above the top, the shot is deleted from the screen and spliced out of bullets. Help: 5.11.2 (Lab: Pipes that come and go)",
+      "description": "Inside an if that asks whether a shot's y is above the top, the shot is deleted from the screen and spliced out of bullets. Help: 5.11.3 (Lab: Pipes that come and go)",
       "type": "inFunction",
       "function": "moveBullets",
       "file": "script.js",

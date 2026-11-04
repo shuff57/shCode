@@ -1,4 +1,4 @@
-// 5.11.2 Lab: Pipes that come and go.
+// 5.11.3 Lab: Pipes that come and go.
 
 let bird, pipes;
 

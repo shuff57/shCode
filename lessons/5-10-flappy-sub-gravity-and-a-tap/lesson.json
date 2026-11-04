@@ -1,0 +1,97 @@
+{
+  "id": "5-10-flappy-sub-gravity-and-a-tap",
+  "title": "5.10.4 Sub-build: Gravity and a tap",
+  "description": "A bird falls. One tap sends it back up. Build that alone, before there are pipes.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.10 Flappy: the flap",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it first",
+      "instructions": "The bird falls and lands on the ground. Nothing stops it and no key does anything."
+    },
+    {
+      "id": "s2",
+      "title": "Turn gravity on",
+      "instructions": "In `setup()`, set `world.gravity.y = 10;`. Run it: the bird falls faster and faster, because gravity adds speed every frame.",
+      "hints": [
+        "Gravity is a number on the world, not on the sprite.",
+        "Zero gravity means nothing falls; that is the default."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Tap to flap",
+      "instructions": "On `kb.presses('space')`, set `bird.vel.y = -5;`. A negative `vel.y` is up on screen, so each tap replaces the fall with a climb.",
+      "hints": [
+        "Use `presses`, not `pressing`: holding Space should not be a rocket.",
+        "Try -4, -6 and -8 and describe how each feels."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Gravity is on",
+      "description": "The world has gravity above 0, so sprites fall. Help: 5.2.1 (Reading: Gravity and the world)",
+      "hint": "world.gravity.y = 10;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "world\\s*\\.\\s*gravity\\s*\\.\\s*y\\s*=\\s*[1-9]",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "A tap goes up",
+      "description": "A key press sets a negative vel.y, so the bird climbs. Help: 5.4.4 (Lab: Make it flap)",
+      "hint": "if (kb.presses('space')) bird.vel.y = -5;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "kb\\s*\\.\\s*presses?\\s*\\([^)]{0,40}\\)[\\s\\S]{0,160}?\\bvel\\s*\\.\\s*y\\s*=\\s*-",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a short moSHion sketch for \"Sub-build: Gravity and a tap\". The task: turn gravity on in setup() and set the bird's vel.y to a negative number on a key press, so one tap reverses a fall. This is a sub-build: a small isolated program whose only job is this one mechanic. Accept any names, helpers, arrow functions and ternaries. A line only in a comment or string does not count. Use short, plain notes for a 14-year-old, name their own line when something is missing, never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Gravity is on",
+        "description": "world.gravity.y is set above 0 in setup().",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The tap is an impulse",
+        "description": "The key press sets vel.y to a negative number (or applies an upward force); it does not set y directly.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "One press, one flap",
+        "description": "The key test uses presses (or a gated pressing), so holding the key does not hold the bird up.",
+        "points": 1
+      }
+    ]
+  }
+}

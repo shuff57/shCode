@@ -8,6 +8,7 @@
       "objective": "Students can searching the body and see it run.",
       "screens": [
         "5-5-snake-7-reading-searching-the-array",
+        "5-15-snake-sub-own-tail",
         "5-5-snake-8-lab-dont-bite-yourself"
       ]
     }

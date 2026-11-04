@@ -1,0 +1,97 @@
+{
+  "id": "5-11-flappy-sub-spawn-and-recycle",
+  "title": "5.11.2 Sub-build: Spawn and recycle",
+  "description": "A pipe comes from the right, crosses, and is gone. Then two, then many, and none of them pile up.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.11 Flappy: the world scrolls",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it first",
+      "instructions": "One pipe sits on the right and never moves. Nothing spawns and nothing is cleaned up."
+    },
+    {
+      "id": "s2",
+      "title": "Spawn on a timer",
+      "instructions": "Every 90 frames, make a pipe at the right edge with a negative `vel.x`, and push it into an array. `every(90, () => { ... })` runs the function every 90 frames.",
+      "hints": [
+        "Make the timer once, in `setup()`, never inside `draw()`.",
+        "A pipe made every frame is 60 pipes a second."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Recycle what leaves",
+      "instructions": "In `draw()`, loop from the end of the array: when a pipe is off the left edge, `delete()` it and `splice(i, 1)` it out of the array. Both, not one.",
+      "hints": [
+        "A deleted sprite stays in the array with `.removed` true until you splice it.",
+        "Loop backwards: splicing moves every later pipe down one place."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Made on a timer",
+      "description": "A timer (every/after, or frameCount %) creates pipes, not draw() every frame. Help: 5.2.1 (Reading: Random numbers and timers)",
+      "hint": "every(90, () => { ... });",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:every|after)\\s*\\(|\\bframeCount\\s*%",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "Gone from screen and list",
+      "description": "An off-screen pipe is deleted and spliced out of the array. Help: 5.11.1 (Reading: A world that scrolls)",
+      "hint": "if (p.x < -40) { p.delete(); pipes.splice(i, 1); }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*delete\\s*\\(\\s*\\)[\\s\\S]{0,120}?\\.\\s*splice\\s*\\(|\\.\\s*splice\\s*\\([\\s\\S]{0,120}?\\.\\s*delete\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a short moSHion sketch for \"Sub-build: Spawn and recycle\". The task: create pipes on a timer (every or after), push each into an array with a negative vel.x, and remove off-screen pipes from both the screen (delete) and the array (splice), looping backwards. This is a sub-build: a small isolated program whose only job is this one mechanic. Accept any names, helpers, arrow functions and ternaries. A line only in a comment or string does not count. Use short, plain notes for a 14-year-old, name their own line when something is missing, never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Spawned by a timer",
+        "description": "Pipes are made by every()/after() or a frameCount beat, set up once, not inside draw() unconditionally.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "They move",
+        "description": "Each pipe gets a negative vel.x (or x is decreased every frame).",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Two removals",
+        "description": "An off-screen pipe is deleted AND spliced from the array, in a backwards loop.",
+        "points": 1
+      }
+    ]
+  }
+}

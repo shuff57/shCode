@@ -1,0 +1,96 @@
+{
+  "id": "5-12-flappy-sub-score-once",
+  "title": "5.12.1 Sub-build: Score once per pipe",
+  "description": "A pipe crosses the bird. Count it once, however many frames the bird is beside it.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.12 Flappy: crash, and finish",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it first",
+      "instructions": "Pipes cross. The score stays at 0: nothing counts them."
+    },
+    {
+      "id": "s2",
+      "title": "Remember it was counted",
+      "instructions": "On every pipe, keep a flag that starts false. When the bird's x passes the pipe's x and the flag is still false, add 1 and set the flag to true.",
+      "hints": [
+        "A flag on the pipe itself is enough: `p.passed`.",
+        "Compare positions (`bird.x > p.x`), not touching: the bird is beside a pipe for many frames."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Prove it counts once",
+      "instructions": "Run it. Each pipe should add exactly 1, not one per frame while the bird is beside it.",
+      "hints": [
+        "A score that climbs by 60 a second means the flag is missing or never set."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The pass is detected",
+      "description": "The bird's x is compared with a pipe's x, in a loop over the pipes. Help: 5.11.3 (Lab: Pipes that come and go)",
+      "hint": "if (bird.x > p.x && !p.passed) score += 1;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bif\\s*\\([^)]{0,120}(?:bird|player)\\s*\\.\\s*x[^)]{0,80}\\)[\\s\\S]{0,200}?\\bscore\\s*(?:\\+\\+|\\+=)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "Counted once",
+      "description": "A per-pipe flag is set after counting, so the same pipe cannot score twice. Help: 5.11.3 (Lab: Pipes that come and go)",
+      "hint": "p.passed = true;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*(?:passed|scored|counted)\\s*=\\s*(?:true|false)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a short moSHion sketch for \"Sub-build: Score once per pipe\". The task: in a loop over the pipes, compare the bird's x with each pipe's x, add 1 to the score only when the pipe has not been counted, and mark that pipe as counted. This is a sub-build: a small isolated program whose only job is this one mechanic. Accept any names, helpers, arrow functions and ternaries. A line only in a comment or string does not count. Use short, plain notes for a 14-year-old, name their own line when something is missing, never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Position, not touching",
+        "description": "The pass is detected by comparing x positions, not by a collision.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "One point per pipe",
+        "description": "A flag on the pipe is checked before scoring and set after, so each pipe scores once.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Inside the loop",
+        "description": "The check runs for every pipe in the array, not once for the first.",
+        "points": 1
+      }
+    ]
+  }
+}

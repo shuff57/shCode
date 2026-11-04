@@ -1,9 +1,9 @@
-// 5.14.2 Lab: Grow and eat (reference solution).
+// 5.14.3 Lab: Grow and eat (reference solution).
 
 const CELL = 20;
 let segments, food, dx, dy, score, playing;
 
-// New since 5.13.4: the snake is an array, segments, with the head at
+// New since 5.13.5: the snake is an array, segments, with the head at
 // segments[0]. Every function below is finished except step(), and step()
 // is where all of your work goes.
 
@@ -33,7 +33,7 @@ function makeFood() {
   return f;
 }
 
-// One move of the snake, run on the beat. It does the job 5.13.4 did on each
+// One move of the snake, run on the beat. It does the job 5.13.5 did on each
 // beat inside draw() (work out the next cell, stop at a wall), now in a
 // function of its own.
 function step() {

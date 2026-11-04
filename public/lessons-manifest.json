@@ -7060,6 +7060,19 @@
       "scoreKind": "quiz"
     },
     {
+      "id": "5-10-flappy-sub-gravity-and-a-tap",
+      "title": "5.10.4 Sub-build: Gravity and a tap",
+      "unit": "5.10 Flappy: the flap",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "5-11-defender-1-reading-count-the-cost",
       "title": "7.6.1 Reading: Count the cost",
       "unit": "7.6 Project: Defender, Part C",
@@ -7184,6 +7197,71 @@
       "type": "lesson",
       "category": "Unit 2: moSHion: Applied Game Development",
       "week": 15,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-11-flappy-sub-spawn-and-recycle",
+      "title": "5.11.2 Sub-build: Spawn and recycle",
+      "unit": "5.11 Flappy: the world scrolls",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-12-flappy-sub-score-once",
+      "title": "5.12.1 Sub-build: Score once per pipe",
+      "unit": "5.12 Flappy: crash, and finish",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-13-snake-sub-step-on-a-grid",
+      "title": "5.13.4 Sub-build: Step on a grid",
+      "unit": "5.13 Snake: grid and steering",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-14-snake-sub-one-longer-snake",
+      "title": "5.14.2 Sub-build: One longer snake",
+      "unit": "5.14 Snake: grow",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-15-snake-sub-own-tail",
+      "title": "5.15.2 Sub-build: Am I in my own tail?",
+      "unit": "5.15 Snake: search",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
       "assignmentCode": null,
       "maxScore": null,
       "maxSubmissions": null,
@@ -8257,7 +8335,7 @@
     },
     {
       "id": "5-4-flappy-3-lab-make-it-flap",
-      "title": "5.10.4 Lab: Make it flap",
+      "title": "5.10.5 Lab: Make it flap",
       "unit": "5.10 Flappy: the flap",
       "preview": "moshion",
       "type": "lesson",
@@ -8283,7 +8361,7 @@
     },
     {
       "id": "5-4-flappy-5-lab-pipes-that-come-and-go",
-      "title": "5.11.2 Lab: Pipes that come and go",
+      "title": "5.11.3 Lab: Pipes that come and go",
       "unit": "5.11 Flappy: the world scrolls",
       "preview": "moshion",
       "type": "lesson",
@@ -8296,7 +8374,7 @@
     },
     {
       "id": "5-4-flappy-6-lab-score-a-gap",
-      "title": "5.12.1 Lab: Score a gap",
+      "title": "5.12.2 Lab: Score a gap",
       "unit": "5.12 Flappy: crash, and finish",
       "preview": "moshion",
       "type": "lesson",
@@ -8309,7 +8387,7 @@
     },
     {
       "id": "5-4-flappy-7-lab-crash-and-start-again",
-      "title": "5.12.2 Lab: Crash, and start again",
+      "title": "5.12.3 Lab: Crash, and start again",
       "unit": "5.12 Flappy: crash, and finish",
       "preview": "moshion",
       "type": "lesson",
@@ -8322,7 +8400,7 @@
     },
     {
       "id": "5-4-flappy-8-quiz-flappy-check",
-      "title": "5.12.4 Check: the flapping game",
+      "title": "5.12.5 Check: the flapping game",
       "unit": "5.12 Flappy: crash, and finish",
       "preview": "quiz",
       "type": "assignment",
@@ -8335,7 +8413,7 @@
     },
     {
       "id": "5-4-flappy-9-challenges-make-it-yours",
-      "title": "5.12.5 Challenges: Make it yours",
+      "title": "5.12.6 Challenges: Make it yours",
       "unit": "5.12 Flappy: crash, and finish",
       "preview": "moshion",
       "type": "lesson",
@@ -8361,7 +8439,7 @@
     },
     {
       "id": "5-4-flappy-playtest-and-reflect",
-      "title": "5.12.3 Playtest and reflect: Flappy",
+      "title": "5.12.4 Playtest and reflect: Flappy",
       "unit": "5.12 Flappy: crash, and finish",
       "preview": "assignment",
       "type": "assignment",
@@ -8725,7 +8803,7 @@
     },
     {
       "id": "5-5-snake-4-lab-steer-it",
-      "title": "5.13.4 Lab: Steer it",
+      "title": "5.13.5 Lab: Steer it",
       "unit": "5.13 Snake: grid and steering",
       "preview": "moshion",
       "type": "lesson",
@@ -8751,7 +8829,7 @@
     },
     {
       "id": "5-5-snake-6-lab-grow-and-eat",
-      "title": "5.14.2 Lab: Grow and eat",
+      "title": "5.14.3 Lab: Grow and eat",
       "unit": "5.14 Snake: grow",
       "preview": "moshion",
       "type": "lesson",
@@ -8777,7 +8855,7 @@
     },
     {
       "id": "5-5-snake-8-lab-dont-bite-yourself",
-      "title": "5.15.2 Lab: Don't bite yourself",
+      "title": "5.15.3 Lab: Don't bite yourself",
       "unit": "5.15 Snake: search",
       "preview": "moshion",
       "type": "lesson",

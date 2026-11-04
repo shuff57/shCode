@@ -1,6 +1,6 @@
 ## A world that scrolls
 
-**Read before `5.11.2 Lab: Pipes that come and go`.** About 8 minutes.
+**Read before `5.11.3 Lab: Pipes that come and go`.** About 8 minutes.
 
 By the end of this reading you should be able to answer:
 

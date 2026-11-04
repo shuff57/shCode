@@ -1,4 +1,4 @@
-// 5.12.1 Lab: Score a gap.
+// 5.12.2 Lab: Score a gap.
 
 let bird, pipes, score;
 

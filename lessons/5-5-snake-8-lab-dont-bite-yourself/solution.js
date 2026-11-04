@@ -1,4 +1,4 @@
-// 5.15.2 Lab: Don't bite yourself (reference solution).
+// 5.15.3 Lab: Don't bite yourself (reference solution).
 
 const CELL = 20;
 let segments, food, dx, dy, score, playing;

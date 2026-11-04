@@ -1,0 +1,16 @@
+{
+  "modules": {
+    "5.14": [
+      {
+        "folder": "5-5-snake-5-reading-a-body-that-grows"
+      },
+      {
+        "folder": "5-14-snake-sub-one-longer-snake",
+        "new": true
+      },
+      {
+        "folder": "5-5-snake-6-lab-grow-and-eat"
+      }
+    ]
+  }
+}

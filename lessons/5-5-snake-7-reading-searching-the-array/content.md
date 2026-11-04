@@ -1,6 +1,6 @@
 ## Searching the array
 
-**Read before `5.15.2 Lab: Don't bite yourself`.** About 7 minutes.
+**Read before `5.15.3 Lab: Don't bite yourself`.** About 7 minutes.
 
 By the end of this reading you should be able to answer:
 
