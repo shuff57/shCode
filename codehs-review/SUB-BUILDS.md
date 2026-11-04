@@ -37,7 +37,7 @@ appears above the bumper").
 
 ## The sub-builds, by game
 
-### 5.3 Pinball — 8 submodules, 4 new sub-builds
+### 5.3 Pinball — 8 submodules, 5 new sub-builds
 
 | Group (submodule) | Sub-build | Apply lab it feeds |
 | --- | --- | --- |
@@ -103,7 +103,7 @@ it in one command.
 
 ## Effect on the build plan
 
-- **One new lesson per group that needs a sub-build**, about 25 across the six games, each
+- **One new lesson per group that needs a sub-build**, 23 across the six games, each
   10-12 minutes. That adds ~4.5 contact hours to the games block, and it is the cheapest
   hour in the course: it is where the mechanic is actually learned.
 - Inserting a sub-build mid-module renumbers that module's later lessons; `renumber-module.mjs`
