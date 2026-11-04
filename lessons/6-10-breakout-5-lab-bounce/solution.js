@@ -1,4 +1,4 @@
-// 6.10.5 Lab: Bounce (reference solution).
+// 7.14.2 Lab: Bounce (reference solution).
 
 const R = 6;            // the ball's radius: half of its 12-pixel width
 const PADDLE_W = 80;    // the paddle is 80 pixels wide

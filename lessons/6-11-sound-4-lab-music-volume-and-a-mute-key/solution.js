@@ -1,11 +1,11 @@
-// 6.11.4 Lab: Music, volume and a mute key (reference solution).
+// 6.15.4 Lab: Music, volume and a mute key (reference solution).
 // Star catch: the arrow keys move the basket. Catch the falling star.
 
 let basket, star;
 let speed = 3;     // pixels the star falls each frame
 let score = 0;     // stars caught
 let misses = 0;    // stars that fell past the basket
-let chime, thud;   // the two sound effects from 6.11.3
+let chime, thud;   // the two sound effects from 6.15.3
 let music;         // the tune under the game
 let level = 4;     // how loud the tune is, a whole number from 0 to 10
 

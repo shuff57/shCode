@@ -49,7 +49,7 @@ function moveBullets() {
   }
 }
 
-// Puts back everything a round owns. setup() uses it; 7.4.7 gives it to the R key too.
+// Puts back everything a round owns. setup() uses it; 7.5.3 gives it to the R key too.
 function startRound() {
   for (const b of bullets) b.delete();
   bullets = [];

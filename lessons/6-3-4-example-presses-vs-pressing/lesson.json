@@ -1,10 +1,10 @@
 {
   "id": "6-3-4-example-presses-vs-pressing",
-  "title": "6.3.4 Worked Example: Edge-triggered Input",
+  "title": "6.8.4 Worked Example: Edge-triggered Input",
   "type": "lesson",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.3 Physics Applications",
+  "unit": "6.8 Physics Applications",
   "preview": "example",
   "week": 15,
   "slos": [

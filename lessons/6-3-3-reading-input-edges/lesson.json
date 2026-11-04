@@ -1,11 +1,11 @@
 {
   "id": "6-3-3-reading-input-edges",
-  "title": "6.3.3 Reading: moSHion docs: Input edges",
-  "description": "moshion docs chapter on input: `kb.pressing` (level-triggered) vs `kb.presses` (edge-triggered). Read before `6.3.4 Edge-triggered Input`.",
+  "title": "6.8.3 Reading: moSHion docs: Input edges",
+  "description": "moshion docs chapter on input: `kb.pressing` (level-triggered) vs `kb.presses` (edge-triggered). Read before `6.8.4 Edge-triggered Input`.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.3 Physics Applications",
+  "unit": "6.8 Physics Applications",
   "preview": "reading",
   "week": 15,
   "slos": [

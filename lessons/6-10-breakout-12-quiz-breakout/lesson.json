@@ -1,11 +1,11 @@
 {
   "id": "6-10-breakout-12-quiz-breakout",
-  "title": "6.10.12 Check: Breakout",
+  "title": "7.17.2 Check: Breakout",
   "description": "Eight multiple-choice questions on flipping a speed, the radius, the paddle bounce, steering, the ball's edges and prompt(). Checked instantly.",
   "type": "assignment",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.10 Breakout",
+  "unit": "7.17 Breakout: playtest and extend",
   "preview": "quiz",
   "week": 18,
   "slos": [
@@ -21,7 +21,7 @@
     "questions": [
       {
         "id": "q1-flip",
-        "source": "6.10.2",
+        "source": "7.13.2",
         "question": "The ball reaches the right wall moving across at `vx = 3`, and the code runs `vx = -vx`. What happens next?",
         "options": [
           "It stops dead, because -3 and 3 add up to 0",
@@ -37,7 +37,7 @@
       },
       {
         "id": "q2-radius",
-        "source": "6.10.2",
+        "source": "7.13.2",
         "question": "The ball is 12 pixels wide, so `R` is 6. Why does the left-wall test use `ball.x < R` and not `ball.x < 0`?",
         "options": [
           "`ball.x` is the centre, so the ball's side reaches the wall at 6",
@@ -53,7 +53,7 @@
       },
       {
         "id": "q3-down",
-        "source": "6.10.2",
+        "source": "7.13.2",
         "question": "Why is the paddle bounce written `if (ball.overlaps(paddle) && vy > 0)`?",
         "options": [
           "`overlaps()` is only ever true while the ball is falling, never going up",
@@ -69,7 +69,7 @@
       },
       {
         "id": "q4-steer",
-        "source": "6.10.3",
+        "source": "7.13.3",
         "question": "The paddle is at x = 200 and the ball lands on it at x = 230. With `vx = (ball.x - paddle.x) / 10`, how does the ball leave?",
         "options": [
           "To the left, with vx = -3",
@@ -85,7 +85,7 @@
       },
       {
         "id": "q5-top",
-        "source": "6.10.7",
+        "source": "7.15.2",
         "question": "`R` is 6 and the ball is at (100, 170), moving up toward the wall. Which call asks about the point at the very top of the ball?",
         "options": [
           "`hitAt(100, 176)`",
@@ -101,7 +101,7 @@
       },
       {
         "id": "q6-side",
-        "source": "6.10.7",
+        "source": "7.15.2",
         "question": "`hitAt(ball.x - R, ball.y)` breaks a brick. Which speed should flip, and why?",
         "options": [
           "`vy`, because every brick the ball hits sends it straight back down",
@@ -117,7 +117,7 @@
       },
       {
         "id": "q7-centre",
-        "source": "6.10.7",
+        "source": "7.15.2",
         "question": "The ball only asks `hitAt(ball.x, ball.y)`. What goes wrong?",
         "options": [
           "It sinks into a brick before turning, and can miss one it scrapes",
@@ -133,7 +133,7 @@
       },
       {
         "id": "q8-prompt",
-        "source": "6.10.10",
+        "source": "7.16.2",
         "question": "A player is asked `prompt('Press 1 for the mouse or 2 for the keys')` and types 1. What does `prompt` give back?",
         "options": [
           "The number 1, ready to compare with `=== 1`",

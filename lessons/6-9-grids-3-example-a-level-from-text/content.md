@@ -1,6 +1,6 @@
 ## A level from text
 
-**Read before `6.9.4 Lab: Build the maze`.** About 10 minutes.
+**Read before `6.14.4 Lab: Build the maze`.** About 10 minutes.
 
 This level is six rows of text. Press Run, walk the blue square with the arrow keys, and pick up the coins.
 

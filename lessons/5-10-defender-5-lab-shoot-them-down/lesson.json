@@ -1,11 +1,11 @@
 {
   "id": "5-10-defender-5-lab-shoot-them-down",
-  "title": "7.5.5 Lab: Shoot them down",
+  "title": "7.7.3 Lab: Shoot them down",
   "description": "Shots fly straight through the enemies. Write hitEnemies: every shot against every enemy, a hit that removes the shot and takes 1 hp, and an enemy at 0 hp that scores its worth and leaves all three arrays.",
   "type": "lesson",
   "estimateMins": 18,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "7.5 Project: Defender, Part B",
+  "unit": "7.7 Defender: the hit loop",
   "preview": "moshion",
   "week": 15,
   "slos": [
@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Every shot against every enemy",
-      "instructions": "Shots fly through enemies because nothing tests them. All your work is in `hitEnemies()`, which `draw()` already calls. Write a loop over `bullets` from the end to the start, and inside it a loop over `enemies` from the end to the start, as 7.5.4 showed. When `bullets[i]` overlaps `enemies[j]`, delete the shot, splice it out of `bullets`, and `break`: that shot is gone, so it must not be tested against the other enemies. Run it: a shot that reaches an enemy should vanish.",
+      "instructions": "Shots fly through enemies because nothing tests them. All your work is in `hitEnemies()`, which `draw()` already calls. Write a loop over `bullets` from the end to the start, and inside it a loop over `enemies` from the end to the start, as 7.7.2 showed. When `bullets[i]` overlaps `enemies[j]`, delete the shot, splice it out of `bullets`, and `break`: that shot is gone, so it must not be tested against the other enemies. Run it: a shot that reaches an enemy should vanish.",
       "hints": [
         "Two backwards loops, one inside the other: `for (let i = bullets.length - 1; i >= 0; i--)` outside, and the same shape with `j` and `enemies` inside.",
         "`break` goes last inside the overlap `if`, after everything the hit does."
@@ -44,7 +44,7 @@
     {
       "id": "r1",
       "title": "Every shot is tested against every enemy",
-      "description": "hitEnemies has a loop over bullets and, inside it, a loop over enemies (either way round), and tests them with overlaps. Help: 7.5.4 (Reading: Every shot against every enemy)",
+      "description": "hitEnemies has a loop over bullets and, inside it, a loop over enemies (either way round), and tests them with overlaps. Help: 7.7.2 (Reading: Every shot against every enemy)",
       "type": "inFunction",
       "function": "hitEnemies",
       "file": "script.js",
@@ -57,7 +57,7 @@
     {
       "id": "r2",
       "title": "A hit removes the shot",
-      "description": "The shot that hit is deleted from the screen and spliced out of bullets. Help: 7.5.4 (Reading: Every shot against every enemy)",
+      "description": "The shot that hit is deleted from the screen and spliced out of bullets. Help: 7.7.2 (Reading: Every shot against every enemy)",
       "type": "inFunction",
       "function": "hitEnemies",
       "file": "script.js",
@@ -70,7 +70,7 @@
     {
       "id": "r3",
       "title": "A hit takes 1 hp",
-      "description": "Inside the if that sees the overlap, and before its break, enemyHp[j] goes down by 1 (a line after the break never runs). Help: 7.5.4 (Reading: Every shot against every enemy)",
+      "description": "Inside the if that sees the overlap, and before its break, enemyHp[j] goes down by 1 (a line after the break never runs). Help: 7.7.2 (Reading: Every shot against every enemy)",
       "type": "inFunction",
       "function": "hitEnemies",
       "file": "script.js",
@@ -83,7 +83,7 @@
     {
       "id": "r4",
       "title": "At 0 hp the enemy scores its worth and leaves all three arrays",
-      "description": "When enemyHp[j] reaches 0, score goes up by enemyWorth[j] BEFORE the splices (after them, index j is a different enemy) and before the break, then index j is spliced out of enemies, enemyHp and enemyWorth (in hitEnemies, or in a removeEnemy helper it calls). Help: 7.5.4 (Reading: Every shot against every enemy)",
+      "description": "When enemyHp[j] reaches 0, score goes up by enemyWorth[j] BEFORE the splices (after them, index j is a different enemy) and before the break, then index j is spliced out of enemies, enemyHp and enemyWorth (in hitEnemies, or in a removeEnemy helper it calls). Help: 7.7.2 (Reading: Every shot against every enemy)",
       "type": "inFunction",
       "function": [
         "hitEnemies",
@@ -118,7 +118,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.5.5 Lab: Shoot them down\". The task they were given: Shots fly straight through the enemies. All the work is in hitEnemies(), which draw() already calls. Loop over bullets from the end to the start and, inside it, over enemies from the end to the start. When bullets[i] overlaps enemies[j]: delete the shot and splice it out of bullets; take 1 from enemyHp[j] and show the new number on the enemy; if that leaves enemyHp[j] at 0 or less, add enemyWorth[j] to score, delete the enemy's sprite and splice index j out of all three arrays; and end with break, because that shot is gone. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. The enemies live in three parallel arrays, enemies (the sprites), enemyHp and enemyWorth: index j in all three is the same enemy, so every push and every splice has to happen to all three at the same index, or every later enemy reads a neighbour's numbers. A helper such as removeEnemy(j) that deletes the sprite and splices all three counts wherever it is called, as if its lines were written there. A splice moves every later item down one place, so after bullets.splice(i, 1) the index i names a different shot or nothing, and after the three enemy arrays are spliced at j, enemyWorth[j] belongs to a different enemy. break leaves only the innermost loop; a line after it inside the same block never runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (hitEnemies) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's hitEnemies() is only STEP comments: missing on every criterion. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.7.3 Lab: Shoot them down\". The task they were given: Shots fly straight through the enemies. All the work is in hitEnemies(), which draw() already calls. Loop over bullets from the end to the start and, inside it, over enemies from the end to the start. When bullets[i] overlaps enemies[j]: delete the shot and splice it out of bullets; take 1 from enemyHp[j] and show the new number on the enemy; if that leaves enemyHp[j] at 0 or less, add enemyWorth[j] to score, delete the enemy's sprite and splice index j out of all three arrays; and end with break, because that shot is gone. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. The enemies live in three parallel arrays, enemies (the sprites), enemyHp and enemyWorth: index j in all three is the same enemy, so every push and every splice has to happen to all three at the same index, or every later enemy reads a neighbour's numbers. A helper such as removeEnemy(j) that deletes the sprite and splices all three counts wherever it is called, as if its lines were written there. A splice moves every later item down one place, so after bullets.splice(i, 1) the index i names a different shot or nothing, and after the three enemy arrays are spliced at j, enemyWorth[j] belongs to a different enemy. break leaves only the innermost loop; a line after it inside the same block never runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (hitEnemies) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's hitEnemies() is only STEP comments: missing on every criterion. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
     "rubric": [
       {
         "id": "r1",

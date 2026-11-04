@@ -1,4 +1,4 @@
-// 7.6.5 Lab: Bullet, and a hit that takes an enemy. Bullet is new; nothing uses it yet.
+// 7.11.1 Lab: Bullet, and a hit that takes an enemy. Bullet is new; nothing uses it yet.
 
 const BASE_Y = 370;   // anything that falls below this line has reached the base
 

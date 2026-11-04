@@ -2,11 +2,11 @@
 
 Something is wrong with this game, and it is not in the part you are looking at.
 
-The editor holds the finished Part B game from 7.5.7, with **one line missing**. It runs, it never crashes, and most of the time it plays fine. A player sent in this report:
+The editor holds the finished Part B game from 7.8.2, with **one line missing**. It runs, it never crashes, and most of the time it plays fine. A player sent in this report:
 
 > "In wave 2 there was a red enemy with a 1 on it. It took three shots, and when I hit it the number went UP to 2. Then an orange 3 died in one shot. It doesn't happen every game."
 
-**Why it hides.** A bug in parallel arrays rarely shows where it lives. The arrays only agree because every push and every splice happens to all three at the same index (7.5.1). Miss one splice and nothing breaks on that frame: one array is simply one item longer than the others, and from that index on, every enemy reads a neighbour's numbers. The wrong number shows up later, somewhere else, often in code that is perfectly correct. That is why "it doesn't happen every game": the drift needs the one piece of code that is wrong to run first.
+**Why it hides.** A bug in parallel arrays rarely shows where it lives. The arrays only agree because every push and every splice happens to all three at the same index (7.6.1). Miss one splice and nothing breaks on that frame: one array is simply one item longer than the others, and from that index on, every enemy reads a neighbour's numbers. The wrong number shows up later, somewhere else, often in code that is perfectly correct. That is why "it doesn't happen every game": the drift needs the one piece of code that is wrong to run first.
 
 **How to hunt it.** The lab's first three steps follow the order every bug hunt does:
 

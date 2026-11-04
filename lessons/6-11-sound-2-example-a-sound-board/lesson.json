@@ -1,11 +1,11 @@
 {
   "id": "6-11-sound-2-example-a-sound-board",
-  "title": "6.11.2 Worked Example: A sound board",
+  "title": "6.15.2 Worked Example: A sound board",
   "description": "One chime at four speeds on the keys 1 to 4, and a tune that T loops and X stops. Hold a key with kb.pressing, press T three times, and start the tune in setup() to see what each line does.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.11 Sound and Music",
+  "unit": "6.15 Sound and Music",
   "preview": "example",
   "week": 19,
   "slos": [

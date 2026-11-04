@@ -1,11 +1,11 @@
 {
   "id": "6-4-3-reading-animation",
-  "title": "6.4.3 Reading: moSHion docs: Animation",
-  "description": "moshion docs chapter on Animation. Read before `6.4.9 Animated Sprites Sandbox`.",
+  "title": "6.9.3 Reading: moSHion docs: Animation",
+  "description": "moshion docs chapter on Animation. Read before `6.9.9 Animated Sprites Sandbox`.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.4 Animated Sprites and Camera",
+  "unit": "6.9 Animated Sprites and Camera",
   "preview": "reading",
   "week": 16,
   "slos": [

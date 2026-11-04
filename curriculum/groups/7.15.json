@@ -1,0 +1,16 @@
+{
+  "moduleId": "7.15",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
+  "lessons": [
+    {
+      "id": "breakout-bricks-and-edges",
+      "title": "Bricks and edges",
+      "objective": "Students can bricks and edges and see it run.",
+      "screens": [
+        "6-10-breakout-6-lab-a-wall-from-text",
+        "6-10-breakout-7-reading-the-ball-has-edges",
+        "6-10-breakout-8-lab-hit-with-the-edges"
+      ]
+    }
+  ]
+}

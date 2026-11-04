@@ -1,4 +1,4 @@
-// 6.3.10 A14.1 Car on a Ramp (reference solution).
+// 6.8.10 A14.1 Car on a Ramp (reference solution).
 // Two-wheeled chassis joined by HingeJoints; A and D drive the chassis.
 
 let ground, ramp, chassis, leftWheel, rightWheel;
@@ -33,7 +33,7 @@ function setup() {
   ramp.friction = 1;
 
   // Wheel first: the hinge pins at the FIRST sprite, so each pin sits at
-  // the wheel's own centre, like an axle (6.3.8).
+  // the wheel's own centre, like an axle (6.8.8).
   new HingeJoint(leftWheel, chassis);
   new HingeJoint(rightWheel, chassis);
 }

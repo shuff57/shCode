@@ -1,4 +1,4 @@
-// 6.9.8 Lab: The next level.
+// 6.14.8 Lab: The next level.
 
 const TILE = 40;   // one tile is 40 by 40 pixels
 

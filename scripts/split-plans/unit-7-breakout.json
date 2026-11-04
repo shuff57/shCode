@@ -1,0 +1,62 @@
+{
+  "modules": [
+    {
+      "from": "6.10",
+      "id": "7.13",
+      "slug": "breakout-plan-and-the-ball",
+      "title": "Breakout: plan and the ball",
+      "group": "Plan, and the ball",
+      "lessons": [
+        "6-10-breakout-1-plan-break-breakout-into-parts",
+        "6-10-breakout-2-reading-a-ball-you-move-yourself",
+        "6-10-breakout-3-example-a-ball-in-a-box"
+      ]
+    },
+    {
+      "from": "6.10",
+      "id": "7.14",
+      "slug": "breakout-paddle-and-bounce",
+      "title": "Breakout: paddle and bounce",
+      "group": "Paddle and bounce",
+      "lessons": [
+        "6-10-breakout-4-lab-the-paddle",
+        "6-10-breakout-5-lab-bounce"
+      ]
+    },
+    {
+      "from": "6.10",
+      "id": "7.15",
+      "slug": "breakout-bricks-and-edges",
+      "title": "Breakout: bricks and edges",
+      "group": "Bricks and edges",
+      "lessons": [
+        "6-10-breakout-6-lab-a-wall-from-text",
+        "6-10-breakout-7-reading-the-ball-has-edges",
+        "6-10-breakout-8-lab-hit-with-the-edges"
+      ]
+    },
+    {
+      "from": "6.10",
+      "id": "7.16",
+      "slug": "breakout-the-game",
+      "title": "Breakout: the game",
+      "group": "The game",
+      "lessons": [
+        "6-10-breakout-9-lab-win-or-lose",
+        "6-10-breakout-10-lab-pick-a-mode"
+      ]
+    },
+    {
+      "from": "6.10",
+      "id": "7.17",
+      "slug": "breakout-playtest-and-extend",
+      "title": "Breakout: playtest and extend",
+      "group": "Playtest and extend",
+      "lessons": [
+        "6-10-breakout-11-playtest-and-reflect",
+        "6-10-breakout-12-quiz-breakout",
+        "6-10-breakout-13-challenges-make-it-yours"
+      ]
+    }
+  ]
+}

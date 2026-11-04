@@ -1,11 +1,11 @@
 {
   "id": "6-5-7-example-load-highscore",
-  "title": "6.5.7 Worked Example: Load and Display a High Score",
+  "title": "6.10.7 Worked Example: Load and Display a High Score",
   "description": "Read your saved high score on startup, coerce it with Number(), display it next to the current score, and update it when the player beats their record.",
   "type": "lesson",
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.5 Save and Load",
+  "unit": "6.10 Save and Load",
   "preview": "example",
   "week": 16,
   "slos": [

@@ -1,10 +1,10 @@
 {
   "id": "6-9-grids-7-lab-coins-and-the-goal",
-  "title": "6.9.7 Lab: Coins and the goal",
+  "title": "6.14.7 Lab: Coins and the goal",
   "description": "The player walks the maze but the coins do nothing and the goal never opens. Pick up each coin when the player touches it, count it in the score, and let the goal win only when no coin is left.",
   "type": "lesson",
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.9 Grids and Tile Maps",
+  "unit": "6.14 Grids and Tile Maps",
   "estimateMins": 20,
   "preview": "moshion",
   "week": 16,
@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Pick up the coins",
-      "instructions": "The starter has the whole maze, the player on its P, a `score` that starts at 0, and a `won` flag. In `collect()`, use the callback form of `overlaps` from 6.2.3: `player.overlaps(coins, (p, coin) => { ... });`. Inside the braces, delete that coin with `coin.delete();` and add 1 to the score with `score += 1;`. Run it: walk over a coin, it should vanish, `coins left` should drop by 1 and `score` should go up by 1.",
+      "instructions": "The starter has the whole maze, the player on its P, a `score` that starts at 0, and a `won` flag. In `collect()`, use the callback form of `overlaps` from 6.7.3: `player.overlaps(coins, (p, coin) => { ... });`. Inside the braces, delete that coin with `coin.delete();` and add 1 to the score with `score += 1;`. Run it: walk over a coin, it should vanish, `coins left` should drop by 1 and `score` should go up by 1.",
       "hints": [
         "`player.overlaps(coins, (p, coin) => { ... });` runs the braces once for each coin the player is touching. `coin` is that one coin.",
         "Inside the braces: `coin.delete();` and `score += 1;`."
@@ -36,7 +36,7 @@
     {
       "id": "r1",
       "title": "Walking over a coin picks it up",
-      "description": "When the player overlaps a coin, that coin is deleted. Help: 6.2.3 (Reading: moSHion docs: Collisions + Overlaps)",
+      "description": "When the player overlaps a coin, that coin is deleted. Help: 6.7.3 (Reading: moSHion docs: Collisions + Overlaps)",
       "type": "inFunction",
       "function": "collect",
       "file": "script.js",
@@ -49,7 +49,7 @@
     {
       "id": "r2",
       "title": "Each coin adds to the score",
-      "description": "Picking up a coin raises score. Help: 6.2.2 (Worked Example: Apple Catcher)",
+      "description": "Picking up a coin raises score. Help: 6.7.2 (Worked Example: Apple Catcher)",
       "type": "inFunction",
       "function": "collect",
       "file": "script.js",
@@ -62,7 +62,7 @@
     {
       "id": "r3",
       "title": "The goal only counts when no coins are left",
-      "description": "checkGoal asks both: no coins left AND the player is on the goal. Help: 6.9.5 (Reading: Reading a map as data), where && joins tests and stops at the first false one",
+      "description": "checkGoal asks both: no coins left AND the player is on the goal. Help: 6.14.5 (Reading: Reading a map as data), where && joins tests and stops at the first false one",
       "type": "inFunction",
       "function": "checkGoal",
       "file": "script.js",

@@ -1,6 +1,6 @@
 ## Reading back a saved value
 
-**Read before attempting `6.5.7 Worked Example: Load and Display a High Score`.**
+**Read before attempting `6.10.7 Worked Example: Load and Display a High Score`.**
 
 Once your game has saved data with `storeItem`, you need a way to read it back. `getItem(key)` retrieves the value stored under the key name you gave it earlier.
 
@@ -31,7 +31,7 @@ function draw() {
 - **The value you saved, as the same type.** Save a number and you get a number back; save text and you get text back; save `true` and you get `true` back.
 - `null` if the key has never been saved.
 
-That is different from the browser's own `localStorage` in 3.8.15, which gave back text whatever you saved. moSHion's `storeItem` writes your value down in a form that remembers its type, and `getItem` reads it back that way. What to do with that `null`, and the one case where you still get text, is the next reading (6.5.6).
+That is different from the browser's own `localStorage` in 3.8.15, which gave back text whatever you saved. moSHion's `storeItem` writes your value down in a form that remembers its type, and `getItem` reads it back that way. What to do with that `null`, and the one case where you still get text, is the next reading (6.10.6).
 
 ---
 

@@ -1,11 +1,11 @@
 {
   "id": "6-5-26-challenges",
-  "title": "6.5.27 Challenges: Extended Save Features",
+  "title": "6.10.27 Challenges: Extended Save Features",
   "description": "Extend your save system: save file previews (show slot contents before loading), save timestamps, multiple profiles, or a 'delete all saves' with double-confirmation.",
   "type": "challenge",
   "estimateMins": 30,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.5 Save and Load",
+  "unit": "6.10 Save and Load",
   "preview": "moshion",
   "week": 16,
   "slos": [
@@ -44,7 +44,7 @@
     {
       "id": "r1",
       "title": "Canvas exists",
-      "description": "A canvas is created when the sketch starts. Help: 6.5.3 (storeItem: Save Game Data)",
+      "description": "A canvas is created when the sketch starts. Help: 6.10.3 (storeItem: Save Game Data)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Canvas\\s*\\(",
@@ -54,7 +54,7 @@
     {
       "id": "r2",
       "title": "storeItem used",
-      "description": "storeItem is called to save data to localStorage. Help: 6.5.3 (storeItem: Save Game Data)",
+      "description": "storeItem is called to save data to localStorage. Help: 6.10.3 (storeItem: Save Game Data)",
       "type": "regex",
       "file": "script.js",
       "pattern": "storeItem\\s*\\(",
@@ -64,7 +64,7 @@
     {
       "id": "r3",
       "title": "getItem used",
-      "description": "getItem is called to read data from localStorage. Help: 6.5.3 (storeItem: Save Game Data)",
+      "description": "getItem is called to read data from localStorage. Help: 6.10.3 (storeItem: Save Game Data)",
       "type": "regex",
       "file": "script.js",
       "pattern": "getItem\\s*\\(",

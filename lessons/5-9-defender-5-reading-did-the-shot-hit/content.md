@@ -1,6 +1,6 @@
 ## Did the shot hit?
 
-**Read before `7.4.6 Lab: Hit the drone`.** About 8 minutes.
+**Read before `7.5.2 Lab: Hit the drone`.** About 8 minutes.
 
 By the end of this reading you should be able to answer:
 

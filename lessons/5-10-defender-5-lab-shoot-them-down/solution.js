@@ -1,4 +1,4 @@
-// 7.5.5 Lab: Shoot them down (reference solution).
+// 7.7.3 Lab: Shoot them down (reference solution).
 
 const BASE_Y = 370;   // anything that falls below this line has reached the base
 
@@ -67,7 +67,7 @@ function spawnEnemy(x, y, hp) {
 }
 
 // Every 60 frames one enemy arrives at a random spot above the top.
-// About one in four is a tough one with 3 hp. (7.5.7 replaces this with waves.)
+// About one in four is a tough one with 3 hp. (7.8.2 replaces this with waves.)
 function spawnOnBeat() {
   if (frameCount % 60 === 0) {
     const hp = floor(random(4)) === 0 ? 3 : 1;

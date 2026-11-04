@@ -38,7 +38,14 @@
       "description": "The box's width was changed from 40 to 60. Depth and height are unchanged.",
       "type": "model",
       "expect": [
-        { "kind": "box", "size": [60, 40, 20] }
+        {
+          "kind": "box",
+          "size": [
+            60,
+            40,
+            20
+          ]
+        }
       ],
       "hint": "Click \"Box 1\" in the timeline, then change width to 60 in the Dimensions panel.",
       "points": 0

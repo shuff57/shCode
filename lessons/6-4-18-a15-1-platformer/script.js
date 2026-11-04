@@ -1,4 +1,4 @@
-// 6.4.18 A15.1 Side-Scrolling Platformer
+// 6.9.18 A15.1 Side-Scrolling Platformer
 // Open the Quest tab for the graded requirements; open the Docs tab for the moSHion API.
 
 let player, goal;

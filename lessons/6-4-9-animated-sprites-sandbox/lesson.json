@@ -1,11 +1,11 @@
 {
   "id": "6-4-9-animated-sprites-sandbox",
-  "title": "6.4.9 Animated Sprites Sandbox",
+  "title": "6.9.9 Animated Sprites Sandbox",
   "description": "Drive a sprite's visual from input state: the same swap pattern used by addAni / changeAni, with sprite.image swapping as the asset-free placeholder. Idle when standing, run when moving, jump when 'w' is held.",
   "type": "lesson",
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.4 Animated Sprites and Camera",
+  "unit": "6.9 Animated Sprites and Camera",
   "preview": "moshion",
   "week": 16,
   "slos": [
@@ -59,7 +59,7 @@
     {
       "id": "r2",
       "title": "Two or more visual states",
-      "description": "Either register multiple animations with addAni, OR assign sprite.image to at least two different values across the file. Help: 6.4.3 (moSHion docs: Animation)",
+      "description": "Either register multiple animations with addAni, OR assign sprite.image to at least two different values across the file. Help: 6.9.3 (moSHion docs: Animation)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.addAni\\s*\\([^)]+\\)[\\s\\S]*\\.addAni\\s*\\(|\\.(image|img)\\s*=\\s*[^;\\n]+[\\s\\S]*\\.(image|img)\\s*=",

@@ -1,11 +1,11 @@
 {
   "id": "5-10-defender-7-lab-waves",
-  "title": "7.5.7 Lab: Waves",
+  "title": "7.8.2 Lab: Waves",
   "description": "Enemies stop arriving on a beat and come in waves instead: each wave only after the field is clear and a pause has run out, each one bigger and faster. Write nextWave and spawnWave, and start every round at wave 0.",
   "type": "lesson",
   "estimateMins": 18,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "7.5 Project: Defender, Part B",
+  "unit": "7.8 Defender: waves and the cost",
   "preview": "moshion",
   "week": 15,
   "slos": [
@@ -24,7 +24,7 @@
     {
       "id": "s2",
       "title": "Count down on a clear field",
-      "instructions": "In `nextWave()`, return straight away while any enemies are left. Otherwise count `wavePause` down by 1, and when it reaches 0 call `spawnWave()` and set `wavePause` back to 90. This is 7.5.6's `nextWave()`, word for word.",
+      "instructions": "In `nextWave()`, return straight away while any enemies are left. Otherwise count `wavePause` down by 1, and when it reaches 0 call `spawnWave()` and set `wavePause` back to 90. This is 7.8.1's `nextWave()`, word for word.",
       "hints": [
         "`if (enemies.length > 0) return;` is the first line.",
         "The countdown is Part A's cooldown under another name: take 1 off every frame, and act at 0."
@@ -44,7 +44,7 @@
     {
       "id": "r1",
       "title": "Every round starts at wave 0 with a pause",
-      "description": "startRound sets wave to 0 and gives wavePause a number of frames (a number, or a named constant). Help: 7.5.6 (Worked Example: Waves with a pause)",
+      "description": "startRound sets wave to 0 and gives wavePause a number of frames (a number, or a named constant). Help: 7.8.1 (Worked Example: Waves with a pause)",
       "type": "inFunction",
       "function": "startRound",
       "file": "script.js",
@@ -57,7 +57,7 @@
     {
       "id": "r2",
       "title": "The pause counts down only on a clear field",
-      "description": "nextWave counts wavePause down by 1 only on a clear field: it returns while any enemies are left, as 7.5.6 does (or, as in 7.3.18, starts a wave only when the field is clear on a frameCount beat). Help: 7.5.6 (Worked Example: Waves with a pause)",
+      "description": "nextWave counts wavePause down by 1 only on a clear field: it returns while any enemies are left, as 7.8.1 does (or, as in 7.3.18, starts a wave only when the field is clear on a frameCount beat). Help: 7.8.1 (Worked Example: Waves with a pause)",
       "type": "inFunction",
       "function": [
         "nextWave",
@@ -73,7 +73,7 @@
     {
       "id": "r3",
       "title": "At 0 the next wave comes and the pause starts again",
-      "description": "When wavePause reaches 0, nextWave calls spawnWave() and sets wavePause back to a number above 0 (or a named constant). Help: 7.5.6 (Worked Example: Waves with a pause)",
+      "description": "When wavePause reaches 0, nextWave calls spawnWave() and sets wavePause back to a number above 0 (or a named constant). Help: 7.8.1 (Worked Example: Waves with a pause)",
       "type": "inFunction",
       "function": [
         "nextWave",
@@ -89,7 +89,7 @@
     {
       "id": "r4",
       "title": "A wave adds 1 to the wave number and builds its enemies in a loop",
-      "description": "spawnWave adds 1 to wave and calls spawnEnemy inside a loop. Help: 7.5.6 (Worked Example: Waves with a pause)",
+      "description": "spawnWave adds 1 to wave and calls spawnEnemy inside a loop. Help: 7.8.1 (Worked Example: Waves with a pause)",
       "type": "inFunction",
       "function": "spawnWave",
       "file": "script.js",
@@ -108,7 +108,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.5.7 Lab: Waves\". The task they were given: Enemies now come in waves. In startRound(), set wave to 0 and wavePause to 60. In nextWave(), return straight away while any enemies are left; otherwise count wavePause down by 1, and when it reaches 0 call spawnWave() and set wavePause back to 90. In spawnWave(), add 1 to wave, make each wave fall a little faster than the last, and loop wave + 2 times, building each enemy with spawnEnemy(...), every third one a tough one with 3 hp. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. The enemies live in three parallel arrays, enemies (the sprites), enemyHp and enemyWorth: index j in all three is the same enemy, so every push and every splice has to happen to all three at the same index, or every later enemy reads a neighbour's numbers. A helper such as removeEnemy(j) that deletes the sprite and splices all three counts wherever it is called, as if its lines were written there. startRound() runs from setup() and from the R key, so it is the one place a round's numbers start again. draw() calls nextWave() every frame while playing. return inside a function ends that function for this frame. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (startRound, nextWave, spawnWave, spawnEnemy) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's three places are only STEP comments: missing on every criterion. The exact numbers for speed, hp, positions and wave size are asked by the steps but are not criteria. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.8.2 Lab: Waves\". The task they were given: Enemies now come in waves. In startRound(), set wave to 0 and wavePause to 60. In nextWave(), return straight away while any enemies are left; otherwise count wavePause down by 1, and when it reaches 0 call spawnWave() and set wavePause back to 90. In spawnWave(), add 1 to wave, make each wave fall a little faster than the last, and loop wave + 2 times, building each enemy with spawnEnemy(...), every third one a tough one with 3 hp. You cannot run their code: read it and judge what it WOULD do when the sketch runs. moSHion facts that matter here: setup() runs once; draw() runs about 60 times a second, and so does every function it calls. kb.presses('space') is true only on the one frame a key goes down; kb.pressing('space') is true on every frame it is held. y grows downward. In this game draw() calls the game's own functions every frame, inside if (playing) { ... }. sprite.delete() (its other name is remove()) takes a sprite off the screen, and array.splice(i, 1) takes it out of the array; a shot or enemy that is gone has to leave both the screen and the array. A loop that runs from the end of an array to the start never skips an item when one is spliced out. overlaps() asks whether two sprites touch right now and changes nothing; it works for sprites with collider 'none', and colliding() never sees such a sprite. drawTop() runs after the sprites are drawn, so its words sit on top; text drawn in draw() lands underneath the sprites. The enemies live in three parallel arrays, enemies (the sprites), enemyHp and enemyWorth: index j in all three is the same enemy, so every push and every splice has to happen to all three at the same index, or every later enemy reads a neighbour's numbers. A helper such as removeEnemy(j) that deletes the sprite and splices all three counts wherever it is called, as if its lines were written there. startRound() runs from setup() and from the R key, so it is the one place a round's numbers start again. draw() calls nextWave() every frame while playing. return inside a function ends that function for this frame. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable, parameter and helper-function names, template strings, arrow functions, a ternary or an if/else chain, x++ or x += 1 or x = x + 1, semicolons, spacing, quotes and order are all fine. Names that other code in the program already calls (startRound, nextWave, spawnWave, spawnEnemy) must keep those names, because a renamed one is never called. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, and the STEP comments the starter came with are not the student's work. The starter's three places are only STEP comments: missing on every criterion. The exact numbers for speed, hp, positions and wave size are asked by the steps but are not criteria. Write each note for THIS student's own code, for a 14-year-old reader: short sentences, plain words. In a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise.",
     "rubric": [
       {
         "id": "r1",

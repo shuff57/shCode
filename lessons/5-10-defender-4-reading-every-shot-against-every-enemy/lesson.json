@@ -1,11 +1,11 @@
 {
   "id": "5-10-defender-4-reading-every-shot-against-every-enemy",
-  "title": "7.5.4 Reading: Every shot against every enemy",
+  "title": "7.7.2 Reading: Every shot against every enemy",
   "description": "The hit check as a loop inside a loop: why both loops run backwards, why the inner one breaks straight after a hit, and what a kill removes from all three arrays.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "7.5 Project: Defender, Part B",
+  "unit": "7.7 Defender: the hit loop",
   "preview": "reading",
   "week": 15,
   "slos": [

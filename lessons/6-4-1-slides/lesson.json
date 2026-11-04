@@ -1,11 +1,11 @@
 {
   "id": "6-4-1-slides",
-  "title": "6.4.1 Slides: Animation & Camera",
+  "title": "6.9.1 Slides: Animation & Camera",
   "description": "Animated Sprites and Camera slides: `addAni` / `changeAni`, camera follow, smoothing with `lerp`, and `layer` for render order. Placeholder until the deck is rebuilt from bookSHelf.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.4 Animated Sprites and Camera",
+  "unit": "6.9 Animated Sprites and Camera",
   "week": 16,
   "preview": "slides",
   "slos": [

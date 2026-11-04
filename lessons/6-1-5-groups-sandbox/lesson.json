@@ -1,11 +1,11 @@
 {
   "id": "6-1-5-groups-sandbox",
-  "title": "6.1.5 Groups Sandbox",
+  "title": "6.6.5 Groups Sandbox",
   "description": "Groups let you treat many sprites as one. Create, configure, spawn into, and clean up a Group.",
   "type": "lesson",
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.1 Groups and Overlaps",
+  "unit": "6.6 Groups",
   "preview": "moshion",
   "week": 15,
   "slos": [
@@ -50,7 +50,7 @@
     {
       "id": "r1",
       "title": "Create a Group",
-      "description": "Use new Group(). Help: 6.1.3 (moSHion docs: Groups)",
+      "description": "Use new Group(). Help: 6.6.3 (moSHion docs: Groups)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+Group\\s*\\(",
@@ -60,7 +60,7 @@
     {
       "id": "r2",
       "title": "Spawn into the Group",
-      "description": "Use groupName.Sprite(...) to spawn a sprite in the group. Help: 6.1.3 (moSHion docs: Groups)",
+      "description": "Use groupName.Sprite(...) to spawn a sprite in the group. Help: 6.6.3 (moSHion docs: Groups)",
       "type": "regex",
       "file": "script.js",
       "pattern": "new\\s+\\w+\\.Sprite\\s*\\(",
@@ -70,7 +70,7 @@
     {
       "id": "r3",
       "title": "Group default",
-      "description": "Set a property on the Group itself (e.g. .color, .diameter). Help: 6.1.3 (moSHion docs: Groups)",
+      "description": "Set a property on the Group itself (e.g. .color, .diameter). Help: 6.6.3 (moSHion docs: Groups)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\w+\\.(color|diameter|width|height)\\s*=",
@@ -80,7 +80,7 @@
     {
       "id": "r4",
       "title": "Despawn offscreen sprites",
-      "description": "Call .delete() (or group.remove()) somewhere in draw(). Help: 6.1.4 (Iterating a Group)",
+      "description": "Call .delete() (or group.remove()) somewhere in draw(). Help: 6.6.4 (Iterating a Group)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

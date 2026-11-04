@@ -1,5 +1,5 @@
 {
-  "moduleId": "6.9",
+  "moduleId": "6.14",
   "source": "Not a book section. The plan, build and playtest shape follows CodeHS's project modules in Introduction to Game Design; the tile-map and grid-of-bricks ideas follow Video Game Design in JavaScript's tile and Breakout ladders. Structure only: no CodeHS text, problems or code is copied.",
   "lessons": [
     {

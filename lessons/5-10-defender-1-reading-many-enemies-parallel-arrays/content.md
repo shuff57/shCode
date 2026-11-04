@@ -1,6 +1,6 @@
 ## Many enemies, kept in parallel arrays
 
-**Read before `7.5.2 Lab: A field of enemies`.** About 8 minutes.
+**Read before `7.6.2 Lab: A field of enemies`.** About 8 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -58,7 +58,7 @@ enemyHp.splice(j, 1);       // at the same index
 enemyWorth.splice(j, 1);
 ```
 
-**Falling, by hand.** Enemies fall the way the drone did in Part A (`drone.y += 1.5`): a loop adds to each one's `y` on every frame, inside `if (playing)`. The loop runs backwards, as `moveBullets()` does, because a removal splices (5.11.1). One whose `y` is more than `BASE_Y` has reached the base, which costs the base 1 hp, exactly as the drone did in 7.4.7.
+**Falling, by hand.** Enemies fall the way the drone did in Part A (`drone.y += 1.5`): a loop adds to each one's `y` on every frame, inside `if (playing)`. The loop runs backwards, as `moveBullets()` does, because a removal splices (5.11.1). One whose `y` is more than `BASE_Y` has reached the base, which costs the base 1 hp, exactly as the drone did in 7.5.3.
 
 ```js
 enemies[j].y += fallSpeed;

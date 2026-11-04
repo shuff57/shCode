@@ -1,6 +1,6 @@
 ## A saved number comes back a number
 
-**Read before attempting `6.5.7 Worked Example: Load and Display a High Score`.**
+**Read before attempting `6.10.7 Worked Example: Load and Display a High Score`.**
 
 In 3.8.15 the browser's own `localStorage` gave back text whatever you saved: save `1200`, read back `"1200"`, add `1` and get `"12001"`. moSHion's `storeItem` and `getItem` do not do that. `storeItem` writes your value down as JSON, the text format you met in 3.8.4, which remembers whether a value was a number, text, or `true`/`false`. `getItem` turns it back. Save the number `250` and `getItem` gives you the number `250`.
 

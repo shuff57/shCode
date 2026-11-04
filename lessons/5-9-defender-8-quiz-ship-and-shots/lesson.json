@@ -1,11 +1,11 @@
 {
   "id": "5-9-defender-8-quiz-ship-and-shots",
-  "title": "7.4.8 Check: Ship and shots",
+  "title": "7.5.4 Check: Ship and shots",
   "description": "Six multiple-choice questions on keeping the ship on the canvas, the cooldown, removing shots, overlaps() and the playing gate. Checked instantly.",
   "type": "assignment",
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "7.4 Project: Defender, Part A",
+  "unit": "7.5 Defender: hits, and a round",
   "preview": "quiz",
   "week": 14,
   "slos": [
@@ -84,7 +84,7 @@
       },
       {
         "id": "q5-once",
-        "source": "7.4.5",
+        "source": "7.5.1",
         "question": "`overlaps()` is true on every frame a shot touches the drone. Why does one shot score only 1?",
         "options": [
           "`overlaps()` is not true again until the shot has stopped touching",
@@ -100,7 +100,7 @@
       },
       {
         "id": "q6-freeze",
-        "source": "7.4.7",
+        "source": "7.5.3",
         "question": "When `baseHp` reaches 0 the code sets `playing = false` and nothing else. Why does everything stop moving?",
         "options": [
           "The base deletes every sprite on the canvas when its hp runs out",

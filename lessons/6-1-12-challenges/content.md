@@ -9,7 +9,7 @@ let lives = 3;
 let rocks;
 
 function setup() {
-  // ...basket + apples Groups as in 6.2.2...
+  // ...basket + apples Groups as in 6.7.2...
   rocks = new Group();
   rocks.color = 'gray';
   rocks.diameter = 20;

@@ -1,11 +1,11 @@
 {
   "id": "6-4-5-reading-change-ani",
-  "title": "6.4.5 Reading: changeAni(name)",
-  "description": "How sprite.changeAni(name) swaps the active animation between previously registered names. Read before 6.4.8 (Worked Example).",
+  "title": "6.9.5 Reading: changeAni(name)",
+  "description": "How sprite.changeAni(name) swaps the active animation between previously registered names. Read before 6.9.8 (Worked Example).",
   "type": "lesson",
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.4 Animated Sprites and Camera",
+  "unit": "6.9 Animated Sprites and Camera",
   "preview": "reading",
   "week": 16,
   "slos": [

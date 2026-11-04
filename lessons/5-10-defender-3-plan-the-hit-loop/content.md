@@ -1,8 +1,8 @@
 ## Plan the hit loop
 
-7.4.6 tested every shot against one drone. Now there are many enemies. Before any code, write the steps for one frame in plain words or pseudocode.
+7.5.2 tested every shot against one drone. Now there are many enemies. Before any code, write the steps for one frame in plain words or pseudocode.
 
-**What you already have.** In 7.4.6 one loop went through `bullets`, and each shot was asked one question: does it overlap the drone? Since 7.5.2 the enemies live in three arrays side by side: `enemies` (the sprites), `enemyHp` and `enemyWorth`. An enemy can take more than one hit: an orange one has 3 hp.
+**What you already have.** In 7.5.2 one loop went through `bullets`, and each shot was asked one question: does it overlap the drone? Since 7.6.2 the enemies live in three arrays side by side: `enemies` (the sprites), `enemyHp` and `enemyWorth`. An enemy can take more than one hit: an orange one has 3 hp.
 
 **What changes.** One drone was one question per shot. Many enemies means every shot has to be asked about every enemy. You have written that kind of job in plain English before, in Chapter 2's nested-loops plan, *Plain English to Pseudocode: Nested Loops*: one loop that picks something, and inside it a second loop that goes through everything else. Think about one shot meeting one enemy, then ask what has to happen when they overlap.
 

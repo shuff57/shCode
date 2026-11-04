@@ -1,11 +1,11 @@
 {
   "id": "6-4-19-challenges",
-  "title": "6.4.19 Challenges",
+  "title": "6.9.19 Challenges",
   "description": "Pick one (or more) Animation & Camera stretches: parallax background, mirror the sprite when it walks left, or add vertical camera follow. Auto-graded.",
   "type": "challenge",
   "estimateMins": 30,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.4 Animated Sprites and Camera",
+  "unit": "6.9 Animated Sprites and Camera",
   "preview": "moshion",
   "week": 16,
   "slos": [
@@ -18,7 +18,7 @@
       "title": "Set up a player and at least one platform",
       "instructions": "You need somewhere to start: a canvas, a player sprite, and at least one static platform. Anything beyond that is up to the challenge you pick.",
       "hints": [
-        "Re-read 6.4.11 Reading for the camera follow pattern."
+        "Re-read 6.9.11 Reading for the camera follow pattern."
       ]
     },
     {
@@ -26,7 +26,7 @@
       "title": "Make the camera follow",
       "instructions": "Inside draw(), assign camera.x from the player's x so the level can scroll.",
       "hints": [
-        "See 6.4.16 Worked Example: Camera Follow if you need a refresher."
+        "See 6.9.16 Worked Example: Camera Follow if you need a refresher."
       ]
     },
     {
@@ -70,7 +70,7 @@
     {
       "id": "r3",
       "title": "Camera follows something",
-      "description": "Inside draw(), assign camera.x or camera.y in a way that depends on a sprite's position (or uses lerp). Help: 6.4.11 (moSHion docs: Camera)",
+      "description": "Inside draw(), assign camera.x or camera.y in a way that depends on a sprite's position (or uses lerp). Help: 6.9.11 (moSHion docs: Camera)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",

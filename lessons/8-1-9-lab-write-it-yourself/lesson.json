@@ -46,8 +46,18 @@
       "description": "A box 30 mm wide, 30 mm deep, and 10 mm tall, with a hole 5 mm across drilled through it.",
       "type": "model",
       "expect": [
-        { "kind": "box", "size": [30, 30, 10] },
-        { "kind": "hole", "diameter": 5 }
+        {
+          "kind": "box",
+          "size": [
+            30,
+            30,
+            10
+          ]
+        },
+        {
+          "kind": "hole",
+          "diameter": 5
+        }
       ],
       "hint": "const b = box(30, 30, 10), then hole(b, { across: 5 }).",
       "points": 0

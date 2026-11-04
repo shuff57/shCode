@@ -1,11 +1,11 @@
 {
   "id": "6-9-grids-13-quiz-grids-and-tile-maps",
-  "title": "6.9.13 Check: Grids and tile maps",
+  "title": "6.14.13 Check: Grids and tile maps",
   "description": "Seven multiple-choice questions on rows and columns, pixels and cells, the offset, bounds and level.delete(). Checked instantly.",
   "type": "assignment",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.9 Grids and Tile Maps",
+  "unit": "6.14 Grids and Tile Maps",
   "preview": "quiz",
   "week": 16,
   "slos": [
@@ -21,7 +21,7 @@
     "questions": [
       {
         "id": "q1-letter",
-        "source": "6.9.2",
+        "source": "6.14.2",
         "question": "`map` is an array of strings, one string per row. What does `map[2][5]` give you?",
         "options": [
           "The whole of row 2",
@@ -37,7 +37,7 @@
       },
       {
         "id": "q2-data",
-        "source": "6.9.9",
+        "source": "6.14.9",
         "question": "A lit cell must go dark when it is clicked. What do you change?",
         "options": [
           "The colour of the rectangle that is on screen",
@@ -53,7 +53,7 @@
       },
       {
         "id": "q3-forward",
-        "source": "6.9.5",
+        "source": "6.14.5",
         "question": "`TILE` is 40. Which pixel x is the centre of column 3?",
         "options": [
           "120",
@@ -69,7 +69,7 @@
       },
       {
         "id": "q4-back",
-        "source": "6.9.5",
+        "source": "6.14.5",
         "question": "`TILE` is 40 and the mouse is at x = 150. Which column is it over, and how do you get it?",
         "options": [
           "Column 4, from `round(150 / 40)`",
@@ -85,7 +85,7 @@
       },
       {
         "id": "q5-offset",
-        "source": "6.9.11",
+        "source": "6.14.11",
         "question": "The wall starts `TOP` = 60 pixels down and each brick is `BH` = 20 tall. A click lands at y = 100. Which row is that?",
         "options": [
           "Row 2",
@@ -101,7 +101,7 @@
       },
       {
         "id": "q6-bounds",
-        "source": "6.9.10",
+        "source": "6.14.10",
         "question": "The grid has 8 rows (0 to 7) and a words strip above it. A click lands in the strip, so `floor((y - TOP) / CELL)` is -1. What happens if the code goes straight to `grid[r][c] = ...`?",
         "options": [
           "`grid[-1]` is `undefined`, but the line is skipped quietly and the sketch carries on",
@@ -117,7 +117,7 @@
       },
       {
         "id": "q7-delete",
-        "source": "6.9.8",
+        "source": "6.14.8",
         "question": "Why does `loadLevel(n)` call `level.delete()` before it builds the next level with `Tiles`?",
         "options": [
           "It puts the player back on the P of the old level",

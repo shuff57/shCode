@@ -1,4 +1,4 @@
-// 6.3.8 Worked Example: Swinging Pendulum
+// 6.8.8 Worked Example: Swinging Pendulum
 
 let anchor, rod, joint;
 

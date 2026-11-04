@@ -1,4 +1,4 @@
-// 6.5.26 A16.1 Save System: Build save/load with 3+ slots
+// 6.10.26 A16.1 Save System: Build save/load with 3+ slots
 
 function setup() {
   // STEP 1: Create a canvas, a player, and a way to earn points

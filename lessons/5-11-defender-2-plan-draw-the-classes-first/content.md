@@ -2,7 +2,7 @@
 
 A refactor gets a plan too, and this one is a drawing in words. Before any code moves, decide what each class remembers and what it can do, so that every line you move in the labs already has a place to go.
 
-**The three classes.** 7.6.1 (Reading: Count the cost) named them and ran the checklist on them:
+**The three classes.** 7.9.1 (Reading: Count the cost) named them and ran the checklist on them:
 
 - **`Bullet`**: one shot from the ship.
 - **`Enemy`**: one falling enemy, crimson or orange.

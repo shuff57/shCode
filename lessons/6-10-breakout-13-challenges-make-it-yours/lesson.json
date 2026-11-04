@@ -1,11 +1,11 @@
 {
   "id": "6-10-breakout-13-challenges-make-it-yours",
-  "title": "6.10.13 Challenges: Make it yours",
+  "title": "7.17.3 Challenges: Make it yours",
   "description": "Your Breakout is complete. Change one rule of your own: a third mode, bricks that take two hits, or a second wall. Pick one; add an idea of your own on top if you like.",
   "type": "lesson",
   "estimateMins": 30,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.10 Breakout",
+  "unit": "7.17 Breakout: playtest and extend",
   "preview": "moshion",
   "week": 18,
   "slos": [
@@ -17,7 +17,7 @@
     {
       "id": "s1",
       "title": "Pick a rule and change it",
-      "instructions": "Choose one of these three challenges. The check turns green when any one of them is in your code, so one is enough. An idea of your own is welcome on top of it. Start from the finished game in the editor.\n\n**Challenge 1: a third mode (easy).** Add a choice to the title screen: in `drawTop()`, under the two `Press` lines, `text('Press 3 for one ball, with the mouse', 27, 290);`. In `pickMode()`, when `kb.presses('3')` is true, set `control` to `'mouse'`, set `lives` to 1 and set `state` to `'play'`. `startGame()` already set `lives` to 3, so this overwrites it for this game only.\n\n**Challenge 2: two-hit bricks (medium).** Some bricks take two hits, as in 6.9.14. Write `'2'` in `WALL` where a two-hit brick goes (try the whole top row). In `makeBricks()`, push 2 for a `'2'`. In `hitAt`, lower the cell by 1 (`bricks[r][c] -= 1;`) instead of setting it to 0. In `drawBricks()`, fill a 2 with `'silver'`. Then change the three places that test `=== 1` (`drawBricks`, `hitAt` and `bricksLeft`) to `> 0`, so a brick that is down to 1 still draws, can still be hit and still counts.\n\n**Challenge 3: a second wall (hard).** When the first wall is cleared, a second one comes, the way 6.9.8 loaded the next level. Turn `WALL` into a list of walls, `WALLS`, each one five rows of eight letters, and keep `BRICK_ROWS` and `BRICK_COLS` from `WALLS[0]`. Add `let wallNum;`, set it to 0 in `startGame()` above the line `bricks = makeBricks();` (`makeBricks()` reads `wallNum`, so it has to be set first), and make `makeBricks()` read `WALLS[wallNum]`. In `checkEnd()`, when no bricks are left, add 1 to `wallNum`: if that was the last wall, the state becomes `'won'`; otherwise build the next wall with `bricks = makeBricks();` and `serve()`.",
+      "instructions": "Choose one of these three challenges. The check turns green when any one of them is in your code, so one is enough. An idea of your own is welcome on top of it. Start from the finished game in the editor.\n\n**Challenge 1: a third mode (easy).** Add a choice to the title screen: in `drawTop()`, under the two `Press` lines, `text('Press 3 for one ball, with the mouse', 27, 290);`. In `pickMode()`, when `kb.presses('3')` is true, set `control` to `'mouse'`, set `lives` to 1 and set `state` to `'play'`. `startGame()` already set `lives` to 3, so this overwrites it for this game only.\n\n**Challenge 2: two-hit bricks (medium).** Some bricks take two hits, as in 6.14.14. Write `'2'` in `WALL` where a two-hit brick goes (try the whole top row). In `makeBricks()`, push 2 for a `'2'`. In `hitAt`, lower the cell by 1 (`bricks[r][c] -= 1;`) instead of setting it to 0. In `drawBricks()`, fill a 2 with `'silver'`. Then change the three places that test `=== 1` (`drawBricks`, `hitAt` and `bricksLeft`) to `> 0`, so a brick that is down to 1 still draws, can still be hit and still counts.\n\n**Challenge 3: a second wall (hard).** When the first wall is cleared, a second one comes, the way 6.14.8 loaded the next level. Turn `WALL` into a list of walls, `WALLS`, each one five rows of eight letters, and keep `BRICK_ROWS` and `BRICK_COLS` from `WALLS[0]`. Add `let wallNum;`, set it to 0 in `startGame()` above the line `bricks = makeBricks();` (`makeBricks()` reads `wallNum`, so it has to be set first), and make `makeBricks()` read `WALLS[wallNum]`. In `checkEnd()`, when no bricks are left, add 1 to `wallNum`: if that was the last wall, the state becomes `'won'`; otherwise build the next wall with `bricks = makeBricks();` and `serve()`.",
       "hints": [
         "Whatever you pick, play it to the end and press R (click the canvas first so the sketch hears your keys): check the game comes back whole.",
         "Challenge 2 needs the 2 drawn too: `fill(bricks[r][c] === 2 ? 'silver' : ROW_COLORS[r]);`"
@@ -36,7 +36,7 @@
     {
       "id": "r1",
       "title": "You changed one rule of the game",
-      "description": "Any one challenge turns this green: a third mode, two-hit bricks or a second wall (or a rule of your own, such as a faster serve in serve(), more or fewer lives, a narrower paddle or a different score). Help: 6.10.10 (Lab: Pick a mode)",
+      "description": "Any one challenge turns this green: a third mode, two-hit bricks or a second wall (or a rule of your own, such as a faster serve in serve(), more or fewer lives, a narrower paddle or a different score). Help: 7.16.2 (Lab: Pick a mode)",
       "type": "regex",
       "file": "script.js",
       "pattern": "^(?=(?:[\\s\\S]*?\\bkb\\s*\\.\\s*(?:presses|pressed|released)\\s*\\(){4})|\\bbricks\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*(?:-=\\s*1\\b|--|=(?!=)\\s*bricks\\s*\\[[^\\]]+\\]\\s*\\[[^\\]]+\\]\\s*-\\s*1\\b)|\\.\\s*push\\s*\\(\\s*2\\s*\\)|\\bWALLS\\s*\\[\\s*[A-Za-z_$]|\\b(?:wallNum|levelNum|level|wall)\\s*(?:\\+=\\s*1\\b|\\+\\+)|\\+\\+\\s*(?:wallNum|levelNum|level|wall)\\b|\\bv[xy]\\s*(?:\\*=\\s*-?\\s*\\(?\\s*(?:\\d*\\.\\d+|[2-9]\\d*)|=(?!=)\\s*-?\\s*\\(?\\s*-?\\s*v[xy]\\s*\\)?\\s*\\*\\s*-?\\s*\\(?\\s*(?:\\d*\\.\\d+|[2-9]\\d*))|\\bscore\\s*(?:\\+=|=\\s*score\\s*\\+)(?!\\s*10\\s*(?:[;})\\n]|$))|\\blives\\s*=(?!=)\\s*(?!3\\b)\\d+|\\bPADDLE_W\\s*=\\s*(?!80\\b)\\d+|\\bvx\\s*=(?!=)\\s*\\(?\\s*-?\\s*(?!3(?![\\d.]))(?:\\d+(?:\\.\\d+)?|\\.\\d+)|\\bvy\\s*=(?!=)\\s*\\(?\\s*-?\\s*(?!4(?![\\d.]))(?:\\d+(?:\\.\\d+)?|\\.\\d+)",

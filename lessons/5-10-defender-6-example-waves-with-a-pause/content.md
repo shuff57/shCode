@@ -1,6 +1,6 @@
 ## Waves with a pause
 
-**Read before `7.5.7 Lab: Waves`.** About 8 minutes.
+**Read before `7.8.2 Lab: Waves`.** About 8 minutes.
 
 So far Defender's enemies arrive on a beat, one every 60 frames, whether or not the last ones are gone. A wave game works differently: a group arrives together, and the next group comes only when the field is clear, after a short breather. 7.3.17 built that check (`enemies.length === 0` before a new group). This example adds the breather.
 

@@ -4,7 +4,7 @@
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "7.1 Classes and Objects via moSHion",
+  "unit": "7.1 Classes and Instances",
   "preview": "example",
   "week": 12,
   "slos": [

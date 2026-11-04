@@ -1,4 +1,4 @@
-// 7.6.4 Lab: Enemy takes over. The game below is Part B's; the Enemy class is
+// 7.10.2 Lab: Enemy takes over. The game below is Part B's; the Enemy class is
 // new and nothing uses it yet.
 
 const BASE_Y = 370;   // anything that falls below this line has reached the base

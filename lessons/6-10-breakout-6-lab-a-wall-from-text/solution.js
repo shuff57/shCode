@@ -1,4 +1,4 @@
-// 6.10.6 Lab: A wall from text (reference solution).
+// 7.15.1 Lab: A wall from text (reference solution).
 
 const WALL = [          // the wall, as rows of text: # is a brick, . is a gap
   '########',
@@ -101,7 +101,7 @@ function drawBricks() {
   }
 }
 
-// Your hitAt from 6.9.11: when a brick is at pixel (x, y), take it out and say true.
+// Your hitAt from 6.14.11: when a brick is at pixel (x, y), take it out and say true.
 function hitAt(x, y) {
   const c = floor(x / BW);
   const r = floor((y - TOP) / BH);

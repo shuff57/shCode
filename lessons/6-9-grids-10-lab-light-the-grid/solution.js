@@ -1,4 +1,4 @@
-// 6.9.10 Lab: Light the grid (reference solution).
+// 6.14.10 Lab: Light the grid (reference solution).
 
 const COLS = 8;
 const ROWS = 8;

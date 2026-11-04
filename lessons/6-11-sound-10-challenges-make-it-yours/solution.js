@@ -1,4 +1,4 @@
-// 6.11.10 Challenges: Make it yours (reference solution: all three challenges).
+// 6.15.10 Challenges: Make it yours (reference solution: all three challenges).
 // Each catch in a row is a step higher and comes from where the star was; without the streak every chime would sound alike.
 
 let basket, star;
@@ -6,7 +6,7 @@ let speed = 3;     // pixels the star falls each frame
 let score = 0;     // stars caught
 let misses = 0;    // stars that fell past the basket
 let state;         // the screen: 'title', 'settings', 'play', 'won' or 'lost'
-let chime, thuds;  // the sound effects from 6.11.5
+let chime, thuds;  // the sound effects from 6.15.5
 let music;         // one tune for every screen
 let level = 5;     // how loud everything is, a whole number from 0 to 10
 let muted = false; // true turns every sound off

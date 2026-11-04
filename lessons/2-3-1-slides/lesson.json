@@ -5,7 +5,7 @@
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
-  "unit": "2.3 The switch Statement",
+  "unit": "2.3 The Switch Statement",
   "sourceRef": "book 2.3: section banner",
   "preview": "slides",
   "slidesUrl": "/slides/2.3_the_switch_statement.paper.html",

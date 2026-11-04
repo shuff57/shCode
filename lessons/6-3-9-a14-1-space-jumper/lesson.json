@@ -1,11 +1,11 @@
 {
   "id": "6-3-9-a14-1-space-jumper",
-  "title": "6.3.9 Space Jumper",
+  "title": "6.8.9 Space Jumper",
   "description": "Build a one-sprite platformer: WASD moves, space jumps, but only when touching the ground.",
   "type": "assignment",
   "estimateMins": 40,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.3 Physics Applications",
+  "unit": "6.8 Physics Applications",
   "preview": "moshion",
   "week": 15,
   "slos": [
@@ -92,7 +92,7 @@
     {
       "id": "r5",
       "title": "Edge-triggered jump",
-      "description": "Use kb.presses for the jump (not kb.pressing). The key can be 'space' (or ' '), 'w' or 'up'. Help: 6.3.3 (moSHion docs: Input edges)",
+      "description": "Use kb.presses for the jump (not kb.pressing). The key can be 'space' (or ' '), 'w' or 'up'. Help: 6.8.3 (moSHion docs: Input edges)",
       "type": "inFunction",
       "function": "draw",
       "file": "script.js",
@@ -103,7 +103,7 @@
     {
       "id": "r6",
       "title": "Ground-gated jump",
-      "description": "Use .colliding() to gate the jump. Help: 6.3.6 (Colliding + Ground Detection)",
+      "description": "Use .colliding() to gate the jump. Help: 6.8.6 (Colliding + Ground Detection)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.colliding\\s*\\(",
@@ -113,7 +113,7 @@
     {
       "id": "r7",
       "title": "Win condition via overlap",
-      "description": "Use .overlaps() somewhere: typically the goal-sprite check. Help: 6.2.3 (moSHion docs: Collisions + Overlaps)",
+      "description": "Use .overlaps() somewhere: typically the goal-sprite check. Help: 6.7.3 (moSHion docs: Collisions + Overlaps)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.overlaps\\s*\\(",

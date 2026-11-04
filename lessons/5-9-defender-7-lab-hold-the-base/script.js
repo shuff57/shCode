@@ -1,4 +1,4 @@
-// 7.4.7 Lab: Hold the base, and start again.
+// 7.5.3 Lab: Hold the base, and start again.
 
 const BASE_Y = 370;   // anything that falls below this line has reached the base
 

@@ -1,4 +1,4 @@
-// 6.9.14 Challenges: Make it yours. Pick one rule and change it.
+// 6.14.14 Challenges: Make it yours. Pick one rule and change it.
 
 const BRICK_COLS = 8;
 const BRICK_ROWS = 5;

@@ -38,8 +38,18 @@
       "description": "The box has a hole 12 mm across, drilled through the top face.",
       "type": "model",
       "expect": [
-        { "kind": "box", "size": [40, 40, 20] },
-        { "kind": "hole", "diameter": 12 }
+        {
+          "kind": "box",
+          "size": [
+            40,
+            40,
+            20
+          ]
+        },
+        {
+          "kind": "hole",
+          "diameter": 12
+        }
       ],
       "hint": "Click the top face, then press Hole. Check that the diameter field reads 12.",
       "points": 0

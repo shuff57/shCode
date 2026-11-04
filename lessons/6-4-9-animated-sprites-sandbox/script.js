@@ -1,4 +1,4 @@
-// 6.4.9 Animated Sprites Sandbox: swap a sprite's visual when its state changes.
+// 6.9.9 Animated Sprites Sandbox: swap a sprite's visual when its state changes.
 // (The canonical form is addAni('idle', ...) + changeAni('run') with art assets.
 //  Here we use sprite.image swapping with emoji placeholders: same pattern,
 //  no asset hosting required.)

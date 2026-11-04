@@ -1,6 +1,6 @@
 ## A ball in a box
 
-**Read before `6.10.4 Lab: The paddle`.** About 10 minutes.
+**Read before `7.14.1 Lab: The paddle`.** About 10 minutes.
 
 Everything from the last reading, in one sketch. Press Run and move the mouse over the canvas to move the paddle. Keep the ball in play.
 

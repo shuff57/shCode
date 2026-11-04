@@ -1,0 +1,15 @@
+{
+  "moduleId": "7.9",
+  "source": "Split from the module it belonged to; one lesson per day-module.",
+  "lessons": [
+    {
+      "id": "defender-c-design",
+      "title": "Count the cost, draw the classes",
+      "objective": "Students can count the cost, draw the classes and see it run.",
+      "screens": [
+        "5-11-defender-1-reading-count-the-cost",
+        "5-11-defender-2-plan-draw-the-classes-first"
+      ]
+    }
+  ]
+}

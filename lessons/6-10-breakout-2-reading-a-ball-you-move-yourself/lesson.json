@@ -1,11 +1,11 @@
 {
   "id": "6-10-breakout-2-reading-a-ball-you-move-yourself",
-  "title": "6.10.2 Reading: A ball you move yourself",
+  "title": "7.13.2 Reading: A ball you move yourself",
   "description": "The ball is moved by your code: two speeds, vx and vy, and a bounce is a flipped sign. The walls are R away from the centre, the paddle follows the mouse or the keys, and where the ball lands on the paddle steers it.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.10 Breakout",
+  "unit": "7.13 Breakout: plan and the ball",
   "preview": "reading",
   "week": 18,
   "slos": [

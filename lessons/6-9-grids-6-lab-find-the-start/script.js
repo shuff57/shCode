@@ -1,4 +1,4 @@
-// 6.9.6 Lab: Find the start.
+// 6.14.6 Lab: Find the start.
 
 const TILE = 40;   // one tile is 40 by 40 pixels
 

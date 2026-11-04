@@ -1,10 +1,10 @@
 {
   "id": "6-1-4-example-iterate-group",
-  "title": "6.1.4 Worked Example: Iterating a Group",
+  "title": "6.6.4 Worked Example: Iterating a Group",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.1 Groups and Overlaps",
+  "unit": "6.6 Groups",
   "preview": "example",
   "week": 15,
   "slos": [

@@ -1,11 +1,11 @@
 {
   "id": "6-6-2-video-state-machines",
-  "title": "6.6.2 Video: State Machines in Games",
+  "title": "6.11.2 Video: State Machines in Games",
   "description": "Every game has states: title → play → game over → title. A state machine is just a variable that remembers which screen you're on.",
   "type": "lesson",
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.6 Game State Machines",
+  "unit": "6.11 Game State Machines",
   "preview": "video",
   "week": 17,
   "slos": [

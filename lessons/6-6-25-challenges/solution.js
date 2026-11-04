@@ -1,4 +1,4 @@
-// 6.6.27 Challenges: Extended State Features (reference solution).
+// 6.11.27 Challenges: Extended State Features (reference solution).
 //
 // The challenge this one takes: add a PAUSE state that remembers where it
 // came from, so unpausing returns you to play rather than to the title. That

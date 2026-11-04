@@ -1,11 +1,11 @@
 {
   "id": "6-6-3-reading-switch-syntax",
-  "title": "6.6.3 Reading: MDN: The switch Statement",
+  "title": "6.11.3 Reading: MDN: The switch Statement",
   "description": "switch is like if/else but cleaner when checking one variable against many values. Syntax: switch(variable) { case VALUE: ... break; }",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.6 Game State Machines",
+  "unit": "6.11 Game State Machines",
   "preview": "reading",
   "week": 17,
   "slos": [

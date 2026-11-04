@@ -1,6 +1,6 @@
 ## The ball has edges
 
-**Read before `6.10.8 Lab: Hit with the edges`.** About 10 minutes.
+**Read before `7.15.3 Lab: Hit with the edges`.** About 10 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -9,7 +9,7 @@ By the end of this reading you should be able to answer:
 - Which four points does the edge test ask about, and how is each one worked out?
 - Why does a hit at the top or bottom flip `vy`, and a hit at the side flip `vx`?
 
-**What the centre test asks.** In 6.10.6 the ball asked `hitAt(ball.x, ball.y)`: is there a brick under this one pixel, the middle of the ball? The ball is 12 pixels across, so its outside is `R` (6) pixels from that middle in every direction. Two things go wrong because of it.
+**What the centre test asks.** In 7.15.1 the ball asked `hitAt(ball.x, ball.y)`: is there a brick under this one pixel, the middle of the ball? The ball is 12 pixels across, so its outside is `R` (6) pixels from that middle in every direction. Two things go wrong because of it.
 
 **It sinks in.** A ball going up reaches a brick with its top first. Its centre gets there `R` pixels later, so by the time `hitAt` says yes, half of the ball is already inside the brick. It does bounce, but late, and you can see it.
 
@@ -26,14 +26,14 @@ By the end of this reading you should be able to answer:
 
 y grows downward, so the top of the ball is `ball.y - R`. Ask `hitAt` about each one. It is the same `hitAt` as before: it does not know or care what the pixel belongs to. Only the pixel you hand it changes.
 
-**Which way to bounce.** A brick hit by the top or bottom point is above or below the ball, so the ball must turn back up-and-down: flip `vy`. A brick hit by the left or right point is beside it, so the ball must turn back across: flip `vx`, exactly as at the canvas walls in 6.10.5.
+**Which way to bounce.** A brick hit by the top or bottom point is above or below the ball, so the ball must turn back up-and-down: flip `vy`. A brick hit by the left or right point is beside it, so the ball must turn back across: flip `vx`, exactly as at the canvas walls in 7.14.2.
 
 ```js
 if (hitAt(ball.x, ball.y - R) || hitAt(ball.x, ball.y + R)) vy = -vy;
 if (hitAt(ball.x - R, ball.y) || hitAt(ball.x + R, ball.y)) vx = -vx;
 ```
 
-`||` reads left to right and stops at the first part that is true, the way `&&` stopped at the first part that was false in 6.9.9. So when the top point breaks a brick, the bottom point is not asked on that frame: one hit, one flip. A ball that meets two bricks at once, one above it and one beside it, breaks both, flips both speeds and heads back the way it came.
+`||` reads left to right and stops at the first part that is true, the way `&&` stopped at the first part that was false in 6.14.9. So when the top point breaks a brick, the bottom point is not asked on that frame: one hit, one flip. A ball that meets two bricks at once, one above it and one beside it, breaks both, flips both speeds and heads back the way it came.
 
 **Four points are enough here.** A brick's corner can poke in between the top point and the right point, where no point is tested. But the ball moves at most about 5 pixels a frame and a brick is 20 tall and 50 wide, so if the ball keeps going, the next frame's points are inside the brick. A corner that only grazes the ball between two points overlaps it by less than two pixels, which nobody can see.
 

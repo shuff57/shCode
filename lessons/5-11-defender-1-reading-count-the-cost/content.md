@@ -1,6 +1,6 @@
 ## Count the cost
 
-**Read before `7.6.2 Plan: Draw the classes first`.** About 10 minutes.
+**Read before `7.9.2 Plan: Draw the classes first`.** About 10 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -12,7 +12,7 @@ By the end of this reading you should be able to answer:
 
 ## Three numbers from Part B
 
-Open your finished Part B game, the one from 7.5.7 (Lab: Waves), and count. In the reference version:
+Open your finished Part B game, the one from 7.8.2 (Lab: Waves), and count. In the reference version:
 
 | What | How many | Where |
 | --- | --- | --- |
@@ -20,7 +20,7 @@ Open your finished Part B game, the one from 7.5.7 (Lab: Waves), and count. In t
 | lines that name `enemyHp` or `enemyWorth` | **13** | the `let` line, `spawnEnemy()`, both removals, the hit, `startRound()` |
 | copies of "remove one enemy" | **2** | the landing in `moveEnemies()` and the kill in `hitEnemies()` |
 
-Each copy of the removal is the same four lines: `delete()` the sprite, then splice `enemies`, `enemyHp` and `enemyWorth` at the same index. In 7.5.8 (Debugging: The enemy that would not die) one of those copies was missing a single `enemyHp.splice`, and from then on every later enemy read somebody else's hp: a crimson "1" took three shots. Nothing in the code said the three arrays belonged together except an agreement that every line had to keep.
+Each copy of the removal is the same four lines: `delete()` the sprite, then splice `enemies`, `enemyHp` and `enemyWorth` at the same index. In 7.8.3 (Debugging: The enemy that would not die) one of those copies was missing a single `enemyHp.splice`, and from then on every later enemy read somebody else's hp: a crimson "1" took three shots. Nothing in the code said the three arrays belonged together except an agreement that every line had to keep.
 
 ## The checklist, honestly
 
@@ -32,7 +32,7 @@ Each copy of the removal is the same four lines: `delete()` the sprite, then spl
 | an enemy | yes, a whole wave | yes: hp, worth, speed | yes: it falls, it takes a hit, it answers whether it is still alive | `Enemy` is a class |
 | the spawner | **no, there is only one** | yes: which wave it is, the pause | yes: it counts the pause down, it builds the next wave | fails question 1 |
 
-`Spawner` answers **no** to the first question, and the checklist would call that a reason not to write a class. It is a class anyway, for one reason you have already met. Its facts change together: the wave number, the pause before the next wave, and the speed that follows from the wave. In Part B a restart had to set back `wave`, `wavePause` and `fallSpeed` on three separate lines, and a forgotten line is exactly the kind of bug 7.5.8 was. With a class, a restart is one line that cannot forget a piece:
+`Spawner` answers **no** to the first question, and the checklist would call that a reason not to write a class. It is a class anyway, for one reason you have already met. Its facts change together: the wave number, the pause before the next wave, and the speed that follows from the wave. In Part B a restart had to set back `wave`, `wavePause` and `fallSpeed` on three separate lines, and a forgotten line is exactly the kind of bug 7.8.3 was. With a class, a restart is one line that cannot forget a piece:
 
 ```js
 spawner = new Spawner();   // a fresh wave 0 and a fresh pause, together

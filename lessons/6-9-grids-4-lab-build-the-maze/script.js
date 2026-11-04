@@ -1,4 +1,4 @@
-// 6.9.4 Lab: Build the maze.
+// 6.14.4 Lab: Build the maze.
 
 const TILE = 40;   // one tile is 40 by 40 pixels
 

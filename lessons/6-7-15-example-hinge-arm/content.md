@@ -1,4 +1,4 @@
-**Goal:** See how a static pivot + a dynamic arm + a `HingeJoint` produces a clock-hand that falls under gravity. This example composes the `HingeJoint` reading from 6.8.4.
+**Goal:** See how a static pivot + a dynamic arm + a `HingeJoint` produces a clock-hand that falls under gravity. This example composes the `HingeJoint` reading from 6.13.4.
 
 ## Step 1: Hit Run
 

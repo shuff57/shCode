@@ -2,7 +2,7 @@
 
 ## Step 1: Trigger the win state
 
-Start with a play state where the player collects items to reach a goal. When they reach the target, switch to `'win'`. The win screen shows a congratulatory message and the final score. In this example the player glides toward the mouse: `mouseX` and `mouseY` are the mouse's x and y position (`mouse.x` and `mouse.y` are taught properly in 6.7).
+Start with a play state where the player collects items to reach a goal. When they reach the target, switch to `'win'`. The win screen shows a congratulatory message and the final score. In this example the player glides toward the mouse: `mouseX` and `mouseY` are the mouse's x and y position (`mouse.x` and `mouse.y` are taught properly in 6.12).
 
 ```js live
 let state, score, goal, player, item;

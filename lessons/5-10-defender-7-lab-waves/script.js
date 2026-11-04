@@ -1,4 +1,4 @@
-// 7.5.7 Lab: Waves.
+// 7.8.2 Lab: Waves.
 
 const BASE_Y = 370;   // anything that falls below this line has reached the base
 

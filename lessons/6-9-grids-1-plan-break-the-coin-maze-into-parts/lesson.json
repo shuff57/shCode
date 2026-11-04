@@ -1,11 +1,11 @@
 {
   "id": "6-9-grids-1-plan-break-the-coin-maze-into-parts",
-  "title": "6.9.1 Plan: Break the Coin Maze into parts",
+  "title": "6.14.1 Plan: Break the Coin Maze into parts",
   "description": "Before any code: list the parts of the Coin Maze, what the game must remember between frames, what to build first and what looks hard. AI-graded with hints.",
   "type": "assignment",
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
-  "unit": "6.9 Grids and Tile Maps",
+  "unit": "6.14 Grids and Tile Maps",
   "preview": "assignment",
   "week": 16,
   "slos": [

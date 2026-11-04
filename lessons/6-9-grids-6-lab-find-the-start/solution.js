@@ -1,4 +1,4 @@
-// 6.9.6 Lab: Find the start (reference solution).
+// 6.14.6 Lab: Find the start (reference solution).
 
 const TILE = 40;   // one tile is 40 by 40 pixels
 

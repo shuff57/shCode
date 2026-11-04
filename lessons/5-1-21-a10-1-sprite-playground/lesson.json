@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Create a canvas and two sprites",
-      "instructions": "Make a canvas (any size between 300\u00d7300 and 800\u00d7600) and two sprites: one `player` (controllable) and one `mover` (moves on its own).",
+      "instructions": "Make a canvas (any size between 300×300 and 800×600) and two sprites: one `player` (controllable) and one `mover` (moves on its own).",
       "hints": []
     },
     {
