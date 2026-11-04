@@ -36,7 +36,7 @@
       "hint": "if (kb.presses('space')) { blip.play(); }",
       "type": "regex",
       "file": "script.js",
-      "pattern": "kb\\s*\\.\\s*press(?:es|ing)\\s*\\([^)]{0,40}\\)\\s*\\)?\\s*\\{\\s*[^}]{0,120}?\\.play\\s*\\(",
+      "pattern": "kb\\s*\\.\\s*press(?:es|ing)\\s*\\(\\s*[^)]{0,40}\\)\\s*\\)*\\s*\\{[\\s\\S]{0,160}?\\.play\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending",
