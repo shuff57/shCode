@@ -1,0 +1,15 @@
+{
+  "moduleId": "6.20",
+  "source": "Sling chain module, one day.",
+  "lessons": [
+    {
+      "id": "sling-five-shots",
+      "title": "five shots",
+      "objective": "A budget is the whole tension: win when the wall is down, lose when the shots are gone.",
+      "screens": [
+        "6-20-sling-1-lab-five-shots",
+        "6-20-sling-2-debug-wall-falls-on-its-own"
+      ]
+    }
+  ]
+}

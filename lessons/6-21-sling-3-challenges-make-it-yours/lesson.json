@@ -1,0 +1,19 @@
+{
+  "id": "6-21-sling-3-challenges-make-it-yours",
+  "title": "6.21.3 Challenges: Make it yours",
+  "description": "Three extensions: wind, a second stone after a pause, and a stone block that needs three hits.",
+  "type": "lesson",
+  "estimateMins": 25,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.21 Sling: playtest and extend",
+  "preview": "reading",
+  "week": 16,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

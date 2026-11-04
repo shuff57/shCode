@@ -1,0 +1,17 @@
+{
+  "moduleId": "6.17",
+  "source": "Sling chain module, one day.",
+  "lessons": [
+    {
+      "id": "sling-launch",
+      "title": "launch",
+      "objective": "A shot is a sprite you make on release, sent at a speed and left to gravity.",
+      "screens": [
+        "6-17-sling-1-reading-launching-on-release",
+        "6-17-sling-2-sub-launch-and-arc",
+        "6-17-sling-3-example-release-launch-clean-up",
+        "6-17-sling-4-lab-launch"
+      ]
+    }
+  ]
+}

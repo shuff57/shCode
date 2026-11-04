@@ -1,0 +1,17 @@
+{
+  "moduleId": "6.16",
+  "source": "Sling chain module, one day.",
+  "lessons": [
+    {
+      "id": "sling-plan-and-the-arm",
+      "title": "plan and the arm",
+      "objective": "A catapult aims by turning about its pivot, and the arm follows the pointer within limits.",
+      "screens": [
+        "6-16-sling-1-plan-break-sling-into-parts",
+        "6-16-sling-2-reading-an-arm-that-turns",
+        "6-16-sling-3-sub-the-arm-turns",
+        "6-16-sling-4-lab-turn-the-arm"
+      ]
+    }
+  ]
+}

@@ -92,3 +92,11 @@ it as a URL; a path or a data: URI still bypasses the store. The 8-bit palette
 2. Run `node --import ./scripts/register-ts.mjs scripts/check-moshion-textures.mjs`
    and `node --import ./scripts/register-ts.mjs scripts/test-moshion.mjs`.
 3. Update the commit, dates and lists in this file.
+
+## Local additions (not upstream)
+
+- **`extras.js`** — `rgba(r, g, b, a)` and `randomColor(a)` / `randomColor(minA, maxA)`, the
+  colour helpers documented under Canvas → "A colour with alpha". It is loaded after
+  `moshion.js` by `runner.html` and by `scripts/moshion-harness.mjs`, so a sketch behaves the
+  same headless. It is shCode's file, not the engine's: it is absent from an upstream sync and
+  must be re-checked after one. Tests: `scripts/test-moshion-extras.mjs`.

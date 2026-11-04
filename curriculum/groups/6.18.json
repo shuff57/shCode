@@ -1,0 +1,16 @@
+{
+  "moduleId": "6.18",
+  "source": "Sling chain module, one day.",
+  "lessons": [
+    {
+      "id": "sling-out-and-gone",
+      "title": "out and gone",
+      "objective": "Every sprite you make needs a way out of the screen AND out of the list.",
+      "screens": [
+        "6-18-sling-1-reading-out-and-gone",
+        "6-18-sling-2-sub-out-and-gone",
+        "6-18-sling-3-lab-shots-that-leave"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "id": "6-17-sling-4-lab-launch",
+  "title": "6.17.4 Lab: Launch!",
+  "description": "The catapult fires: aim with the arm, release to launch, and watch the arc.",
+  "type": "lesson",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.17 Sling: launch",
+  "preview": "moshion",
+  "week": 16,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The arm aims and nothing fires."
+    },
+    {
+      "id": "s2",
+      "title": "Fire",
+      "instructions": "Add the release launch from the sub-build: a stone at the arm, direction from the arm, a speed, pushed into `shots`."
+    },
+    {
+      "id": "s3",
+      "title": "Watch the arc",
+      "instructions": "Aim high and fire: the stone should climb, slow, and come down further away than a flat shot.",
+      "hints": [
+        "Gravity bends the path; the speed sets how far.",
+        "A stone that goes straight is in zero gravity."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Fired on release",
+      "description": "A new sprite is made inside mouse.released() and pushed into the array. Help: 6.17.1 (Reading: Launching on release)",
+      "hint": "if (mouse.released()) { ... }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "mouse\\s*\\.\\s*released\\s*\\([^)]*\\)[\\s\\S]{0,300}?new\\s+Sprite\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "Along the arm",
+      "description": "Direction comes from the arm rotation, with a speed. Help: 6.17.1 (Reading: Launching on release)",
+      "hint": "shot.direction = arm.rotation; shot.speed = 9;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*direction\\s*=|rotateTo\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Launch!\". The task: fire a stone on release along the arm with a speed, and keep every stone in an array. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "One shot per release",
+        "description": "Made inside the release test.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Along the arm",
+        "description": "Direction follows the arm.",
+        "points": 1
+      }
+    ]
+  }
+}

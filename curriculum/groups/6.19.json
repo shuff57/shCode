@@ -1,0 +1,16 @@
+{
+  "moduleId": "6.19",
+  "source": "Sling chain module, one day.",
+  "lessons": [
+    {
+      "id": "sling-hits-and-a-budget",
+      "title": "hits and a budget",
+      "objective": "A block with its own hit count, and a shot that leaves on the frame it hits.",
+      "screens": [
+        "6-19-sling-1-reading-blocks-and-a-budget",
+        "6-19-sling-2-sub-hits-and-a-budget",
+        "6-19-sling-3-lab-bring-the-wall-down"
+      ]
+    }
+  ]
+}

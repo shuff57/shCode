@@ -1,0 +1,87 @@
+{
+  "id": "6-18-sling-2-sub-out-and-gone",
+  "title": "6.18.2 Sub-build: Out and gone",
+  "description": "One stone, one list, one sweep. Remove what leaves the screen from both places.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.18 Sling: out and gone",
+  "preview": "moshion",
+  "week": 16,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "One stone flies off the right edge and the list keeps counting up."
+    },
+    {
+      "id": "s2",
+      "title": "Sweep it",
+      "instructions": "Loop from the end of `shots`: when a stone is off the screen, `delete()` it and `splice(i, 1)`.",
+      "hints": [
+        "Both calls, in the same branch.",
+        "Loop backwards: `for (let i = shots.length - 1; i >= 0; i--)`."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Check the count",
+      "instructions": "Show `shots.length` on screen: it should fall to 0 after the stone leaves, not climb for ever."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Two removals",
+      "description": "A spent shot is deleted and spliced in the same branch. Help: 6.18.1 (Reading: Out and gone)",
+      "hint": "s.delete(); shots.splice(i, 1);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*delete\\s*\\(\\s*\\)[\\s\\S]{0,120}?\\.\\s*splice\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "Backwards",
+      "description": "The sweep runs from the end of the array. Help: 6.18.1 (Reading: Out and gone)",
+      "hint": "for (let i = shots.length - 1; i >= 0; i--)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\(\\s*let\\s+i\\s*=\\s*[\\w.]+\\s*\\.\\s*length\\s*-\\s*1\\s*;\\s*i\\s*>=\\s*0",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: Out and gone\". The task: in a backwards loop, remove off-screen shots from the screen (delete) and from the array (splice). Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Both removals",
+        "description": "delete and splice together.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Backwards",
+        "description": "The loop starts at the end.",
+        "points": 1
+      }
+    ]
+  }
+}

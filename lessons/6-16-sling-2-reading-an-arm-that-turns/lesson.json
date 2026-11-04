@@ -1,0 +1,19 @@
+{
+  "id": "6-16-sling-2-reading-an-arm-that-turns",
+  "title": "6.16.2 Reading: An arm that turns to the aim",
+  "description": "A catapult aims by rotating about its pivot; angleTo gives the angle and rotateTo turns at a speed.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.16 Sling: plan and the arm",
+  "preview": "reading",
+  "week": 16,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

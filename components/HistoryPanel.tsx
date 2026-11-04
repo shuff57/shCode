@@ -24,6 +24,9 @@ interface HistoryPanelProps {
   isOpen: boolean;
   onClose: () => void;
   lessonId: string;
+  /** Called after a restore lands. The sandbox remounts its studio, which only
+   *  hydrates from the file at mount; a lesson leaves it unset. */
+  onRestore?: () => void;
 }
 
 type Tab = 'device' | 'cloud';
@@ -151,7 +154,7 @@ const badgeStyle: React.CSSProperties = {
   fontWeight: 500,
 };
 
-export default function HistoryPanel({ isOpen, onClose, lessonId }: HistoryPanelProps) {
+export default function HistoryPanel({ isOpen, onClose, lessonId, onRestore }: HistoryPanelProps) {
   const [tab, setTab] = useState<Tab>('device');
   const [device, setDevice] = useState<LocalSnapshot[]>([]);
   const [deviceSel, setDeviceSel] = useState<LocalSnapshot | null>(null);
@@ -322,6 +325,7 @@ export default function HistoryPanel({ isOpen, onClose, lessonId }: HistoryPanel
 
     // This device only: the editor change is the whole action.
     if (!toCloud) {
+      onRestore?.();
       onClose();
       return;
     }
@@ -332,8 +336,10 @@ export default function HistoryPanel({ isOpen, onClose, lessonId }: HistoryPanel
     setRestoring(false);
     if (result === 'error') {
       setRestoreNote('Restored on this device, but could not save it for other devices. Press Save to try again.');
+      onRestore?.();
       return;
     }
+    onRestore?.();
     onClose();
   };
 

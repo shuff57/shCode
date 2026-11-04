@@ -1,0 +1,86 @@
+{
+  "id": "6-20-sling-2-debug-wall-falls-on-its-own",
+  "title": "6.20.2 Debugging: The wall that falls on its own",
+  "description": "Two planted bugs. The wall collapses before the first shot, and the last stone never counts.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.20 Sling: five shots",
+  "preview": "moshion",
+  "week": 16,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The wall is on the ground and it topples before you fire."
+    },
+    {
+      "id": "s2",
+      "title": "Bug 1: the stack is unstable",
+      "instructions": "The bottom block is dynamic with no support, so gravity pulls the stack over. Make the bottom row `static`, or give every block `rotationLock = true`."
+    },
+    {
+      "id": "s3",
+      "title": "Bug 2: the last stone is ignored",
+      "instructions": "The win and lose check runs before the sweep clears the last stone, so \"out of shots\" waits a frame too long. Move the sweep above the check.",
+      "hints": [
+        "The order in `draw()` is the bug: cleanup, then decide."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The stack holds",
+      "description": "The bottom row is static, or blocks have rotationLock. Help: 6.19.1 (Reading: Blocks that fall)",
+      "hint": "b.collider = 'static';",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "collider\\s*=\\s*['\"]static['\"]|rotationLock\\s*=\\s*true",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": false
+    },
+    {
+      "id": "r2",
+      "title": "Cleanup before the check",
+      "description": "The shot sweep runs before the win/lose test. Help: 6.20.1 (Lab: Five shots, win or lose)",
+      "hint": "// sweep, then if (shotsLeft === 0 && shots.length === 0)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "splice\\s*\\([\\s\\S]{0,400}?shotsLeft\\s*===\\s*0",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Debugging: The wall that falls on its own\". The task: stabilise the block stack so it does not fall on its own, and clear spent shots before deciding win or lose. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Stable wall",
+        "description": "Bottom row static or rotationLock.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Order",
+        "description": "The sweep comes before the end check.",
+        "points": 1
+      }
+    ]
+  }
+}

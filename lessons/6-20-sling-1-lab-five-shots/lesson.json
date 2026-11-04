@@ -1,0 +1,95 @@
+{
+  "id": "6-20-sling-1-lab-five-shots",
+  "title": "6.20.1 Lab: Five shots, win or lose",
+  "description": "A budget of five stones: win when the wall is down, lose when the stones are gone.",
+  "type": "lesson",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.20 Sling: five shots",
+  "preview": "moshion",
+  "week": 16,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The wall can be knocked down, but there is no budget and no end."
+    },
+    {
+      "id": "s2",
+      "title": "Spend a shot",
+      "instructions": "Keep `shotsLeft`, start at 5, and take one off in the release branch. Guard the fire so it cannot go below 0.",
+      "hints": [
+        "Decrement in the same branch that makes the stone.",
+        "A guard around the fire, or a `return` in a `fire()` helper."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Win and lose",
+      "instructions": "Win when `blocks.length === 0`. Lose when `shotsLeft === 0` and no stones are flying. Show the result in the middle.",
+      "hints": [
+        "\"No stones flying\" is `shots.length === 0`; without it you lose while a stone is about to land."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "R starts again",
+      "instructions": "R rebuilds the wall, empties the shots and resets the count. Put the rebuild in a `startRound()` so R and setup share it."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A shot is spent",
+      "description": "The count goes down in the fire branch. Help: 6.19.1 (Reading: Blocks that fall, and a hit budget)",
+      "hint": "shotsLeft -= 1;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:shotsLeft|shots)\\s*-=|\\b(?:shotsLeft)\\s*--",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "Win and lose",
+      "description": "Win on no blocks, lose on no shots left and none flying. Help: 6.19.1 (Reading: Blocks that fall, and a hit budget)",
+      "hint": "if (blocks.length === 0) won = true;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "blocks\\s*\\.\\s*length\\s*===\\s*0|shotsLeft\\s*===\\s*0",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Five shots, win or lose\". The task: give the player five shots, spend one per launch, win when the blocks are gone, lose when the shots are gone and none are flying, and let R start the round again. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A budget",
+        "description": "A shot count that decrements on fire and stops at 0.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Both endings",
+        "description": "Win on no blocks; lose on no shots and none in the air.",
+        "points": 1
+      }
+    ]
+  }
+}

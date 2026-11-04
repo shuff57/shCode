@@ -1,0 +1,19 @@
+{
+  "id": "6-17-sling-1-reading-launching-on-release",
+  "title": "6.17.1 Reading: Launching on release",
+  "description": "A shot is a sprite you make on release, given a direction and a speed, and kept in a list.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.17 Sling: launch",
+  "preview": "reading",
+  "week": 16,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

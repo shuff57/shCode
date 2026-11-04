@@ -1,0 +1,19 @@
+{
+  "id": "6-21-sling-1-playtest-and-reflect",
+  "title": "6.21.1 Playtest and reflect: Sling",
+  "description": "Play your game at least three times, find one thing that surprised you, link it to your code and choose one change.",
+  "type": "assignment",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.21 Sling: playtest and extend",
+  "preview": "assignment",
+  "week": 16,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

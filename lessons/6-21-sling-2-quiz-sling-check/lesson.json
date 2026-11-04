@@ -1,0 +1,104 @@
+{
+  "id": "6-21-sling-2-quiz-sling-check",
+  "title": "6.21.2 Check: the Sling game",
+  "description": "Five multiple-choice questions on the arm, the launch, the sweep, the hit budget and the ending. Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.21 Sling: playtest and extend",
+  "preview": "quiz",
+  "week": 16,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "quiz": {
+    "passPercent": 70,
+    "questions": [
+      {
+        "id": "q1-angle",
+        "question": "On screen, which way does rotation -90 point?",
+        "options": [
+          "right",
+          "up",
+          "down",
+          "left"
+        ],
+        "answer": 1,
+        "explanation": "Up is -90 on screen: 0 is right, 90 is down.",
+        "sourceIds": [
+          "6-16-sling-2-reading-an-arm-that-turns"
+        ],
+        "source": "6.16.2"
+      },
+      {
+        "id": "q2-release",
+        "question": "Why is a shot made on mouse.released() rather than presses()?",
+        "options": [
+          "Releases are faster",
+          "The pull is complete when the button comes up",
+          "presses() does not exist",
+          "It costs less"
+        ],
+        "answer": 1,
+        "explanation": "The aim and power are only known once the player lets go.",
+        "sourceIds": [
+          "6-17-sling-1-reading-launching-on-release"
+        ],
+        "source": "6.17.1"
+      },
+      {
+        "id": "q3-direction",
+        "question": "A shot gets direction = arm.rotation. Which way does it leave?",
+        "options": [
+          "Straight up",
+          "Along the arm",
+          "Always right",
+          "Opposite the arm"
+        ],
+        "answer": 1,
+        "explanation": "Rotation and direction are the same unit and the same sense.",
+        "sourceIds": [
+          "6-17-sling-1-reading-launching-on-release"
+        ],
+        "source": "6.17.1"
+      },
+      {
+        "id": "q4-sweep",
+        "question": "A shot is off-screen but its entry is still in the array. What is missing?",
+        "options": [
+          "delete()",
+          "splice()",
+          "a new Sprite",
+          "gravity"
+        ],
+        "answer": 1,
+        "explanation": "delete() removes the sprite; splice() removes the array entry. You need both.",
+        "sourceIds": [
+          "6-18-sling-1-reading-out-and-gone"
+        ],
+        "source": "6.18.1"
+      },
+      {
+        "id": "q5-once",
+        "question": "Why does a shot count one hit even though overlaps() is true for several frames?",
+        "options": [
+          "overlaps() is false after one frame",
+          "The shot is deleted on the frame it hits",
+          "The block has .life",
+          "The loop breaks"
+        ],
+        "answer": 1,
+        "explanation": "Removing the shot is what makes the hit single.",
+        "sourceIds": [
+          "6-19-sling-1-reading-blocks-and-a-budget"
+        ],
+        "source": "6.19.1"
+      }
+    ]
+  }
+}

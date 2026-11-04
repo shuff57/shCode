@@ -1,0 +1,86 @@
+{
+  "id": "6-18-sling-3-lab-shots-that-leave",
+  "title": "6.18.3 Lab: Shots that leave",
+  "description": "The catapult fires and the list cleans itself up, however many stones you launch.",
+  "type": "lesson",
+  "estimateMins": 12,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.18 Sling: out and gone",
+  "preview": "moshion",
+  "week": 16,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The catapult works. Fire ten stones and the count climbs for ever."
+    },
+    {
+      "id": "s2",
+      "title": "Add the sweep",
+      "instructions": "Add the backwards delete-and-splice from the sub-build."
+    },
+    {
+      "id": "s3",
+      "title": "Prove it",
+      "instructions": "Fire ten stones, wait: the count should fall back to 0 each time.",
+      "hints": [
+        "A count that plateaus but never falls means the splice is missing."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Both removals",
+      "description": "delete and splice in the same branch. Help: 6.18.1 (Reading: Out and gone)",
+      "hint": "s.delete(); shots.splice(i, 1);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*delete\\s*\\(\\s*\\)[\\s\\S]{0,120}?\\.\\s*splice\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "Backwards",
+      "description": "The loop runs from the end. Help: 6.18.1 (Reading: Out and gone)",
+      "hint": "for (let i = shots.length - 1; i >= 0; i--)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "for\\s*\\(\\s*let\\s+i\\s*=\\s*[\\w.]+\\s*\\.\\s*length\\s*-\\s*1",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Shots that leave\". The task: fire on release and sweep spent shots out of both the screen and the array, looping backwards. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Fires",
+        "description": "A shot on release along the arm.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Sweeps",
+        "description": "delete and splice, backwards.",
+        "points": 1
+      }
+    ]
+  }
+}

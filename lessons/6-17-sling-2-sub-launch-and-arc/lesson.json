@@ -1,0 +1,90 @@
+{
+  "id": "6-17-sling-2-sub-launch-and-arc",
+  "title": "6.17.2 Sub-build: Launch and arc",
+  "description": "One arm, one stone, one arc. Launch on release and watch gravity bend the shot.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.17 Sling: launch",
+  "preview": "moshion",
+  "week": 16,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The arm aims. Clicking does nothing: no stone is made."
+    },
+    {
+      "id": "s2",
+      "title": "Launch on release",
+      "instructions": "Inside `if (mouse.released())`, make a stone at the arm, set `direction = arm.rotation` and `speed = 9`, and push it into `shots`.",
+      "hints": [
+        "`direction` and `speed` are the two numbers the arm already knows.",
+        "Gravity is on, so the stone arcs by itself."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Only one per click",
+      "instructions": "Run it and click once: one stone. If you get a stream, the make is outside the release test.",
+      "hints": [
+        "`mouse.presses()` fires on the way down; `released()` on the way up. Either is one frame."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Made on release, kept",
+      "description": "A new Sprite is made inside mouse.released() and pushed into an array. Help: 6.17.1 (Reading: Launching on release)",
+      "hint": "shots.push(new Sprite(arm.x, arm.y, 18));",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "mouse\\s*\\.\\s*released\\s*\\([^)]*\\)[\\s\\S]{0,300}?new\\s+Sprite\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "Sent along the arm",
+      "description": "The shot gets direction (and speed), not a random push. Help: 6.17.1 (Reading: Launching on release)",
+      "hint": "shot.direction = arm.rotation;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*direction\\s*=\\s*[^;\\n]{0,60}rotation|\\.\\s*speed\\s*=",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: Launch and arc\". The task: make a shot on mouse.released(), at the arm, with direction from the arm rotation and a speed, and keep it in an array. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "One per release",
+        "description": "The shot is made inside the release test.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Direction from the arm",
+        "description": "The shot leaves along the arm, not at a fixed angle.",
+        "points": 1
+      }
+    ]
+  }
+}
