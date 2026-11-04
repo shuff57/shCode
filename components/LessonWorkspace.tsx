@@ -39,7 +39,6 @@ import GradeReportView from './GradeReport';
 import TeacherPushBanner from './TeacherPushBanner';
 import { useCloudWorkspace } from '../lib/lesson-sync';
 import { addLocalSnapshot } from '../lib/local-history';
-import CrossDeviceSyncBanner from './CrossDeviceSyncBanner';
 import CarryForwardBanner from './CarryForwardBanner';
 import DocsDrawer from './DocsDrawer';
 import TextureEditor from './TextureEditor';
