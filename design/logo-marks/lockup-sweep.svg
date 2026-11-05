@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="lks lock" viewBox="0 0 162 48" role="img" aria-label="shCode">
+  <title>shCode</title>
+  <style>
+    .lks .mbk { transform: translate(24px,24px) scale(.82) translate(-24px,-24px); }
+    .lks .mbs { fill:none; stroke:var(--mark,#5baafd); stroke-width:6; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:69.83; stroke-dashoffset:0; animation:lks-draw 5.6s linear infinite both; }
+    .lks .mbd { fill:var(--accent,#50fa7b); animation:lks-dot 5.6s linear infinite both; }
+    @keyframes lks-draw {
+      6.00%{stroke-dashoffset:69.83}, 7.81%{stroke-dashoffset:67.04}, 9.57%{stroke-dashoffset:64.24}, 11.25%{stroke-dashoffset:61.45}, 12.81%{stroke-dashoffset:58.66}, 14.23%{stroke-dashoffset:55.86}, 15.48%{stroke-dashoffset:53.07}, 16.55%{stroke-dashoffset:50.28}, 17.46%{stroke-dashoffset:47.48}, 18.21%{stroke-dashoffset:44.69}, 18.82%{stroke-dashoffset:41.90}, 19.34%{stroke-dashoffset:39.11}, 19.79%{stroke-dashoffset:36.31}, 20.21%{stroke-dashoffset:33.52}, 20.66%{stroke-dashoffset:30.73}, 21.18%{stroke-dashoffset:27.93}, 21.79%{stroke-dashoffset:25.14}, 22.54%{stroke-dashoffset:22.35}, 23.45%{stroke-dashoffset:19.55}, 24.52%{stroke-dashoffset:16.76}, 25.77%{stroke-dashoffset:13.97}, 27.19%{stroke-dashoffset:11.17}, 28.75%{stroke-dashoffset:8.38}, 30.43%{stroke-dashoffset:5.59}, 32.19%{stroke-dashoffset:2.79}, 34.00%{stroke-dashoffset:0.00}
+      34%,88%{stroke-dashoffset:0} 94%,100%{stroke-dashoffset:69.83}
+    }
+    @keyframes lks-dot {
+      0%,5%{transform:translate(33px,15px) scale(1);opacity:0} 6%{transform:translate(33px,15px) scale(1);opacity:1}
+      6.00%{transform:translate(33.00px,15.00px) scale(1)}, 7.81%{transform:translate(31.77px,12.59px) scale(1)}, 9.57%{transform:translate(29.31px,11.32px) scale(1)}, 11.25%{transform:translate(26.57px,10.77px) scale(1)}, 12.81%{transform:translate(23.78px,10.70px) scale(1)}, 14.23%{transform:translate(21.02px,11.07px) scale(1)}, 15.48%{transform:translate(18.38px,11.96px) scale(1)}, 16.55%{transform:translate(16.13px,13.59px) scale(1)}, 17.46%{transform:translate(15.02px,16.10px) scale(1)}, 18.21%{transform:translate(15.78px,18.71px) scale(1)}, 18.82%{transform:translate(17.86px,20.56px) scale(1)}, 19.34%{transform:translate(20.30px,21.91px) scale(1)}, 19.79%{transform:translate(22.85px,23.06px) scale(1)}, 20.21%{transform:translate(25.41px,24.17px) scale(1)}, 20.66%{transform:translate(27.93px,25.37px) scale(1)}, 21.18%{transform:translate(30.33px,26.80px) scale(1)}, 21.79%{transform:translate(32.31px,28.75px) scale(1)}, 22.54%{transform:translate(32.98px,31.40px) scale(1)}, 23.45%{transform:translate(31.87px,33.91px) scale(1)}, 24.52%{transform:translate(29.62px,35.54px) scale(1)}, 25.77%{transform:translate(26.98px,36.43px) scale(1)}, 27.19%{transform:translate(24.22px,36.80px) scale(1)}, 28.75%{transform:translate(21.43px,36.73px) scale(1)}, 30.43%{transform:translate(18.69px,36.18px) scale(1)}, 32.19%{transform:translate(16.23px,34.91px) scale(1)}, 34.00%{transform:translate(15.00px,32.50px) scale(1)}
+      36%{translate(15.00px,32.50px) scale(1.4)} 39%,88%{translate(15.00px,32.50px) scale(1);opacity:1}
+      94%,100%{transform:translate(33px,15px) scale(1);opacity:0}
+    }
+    .lks .wm path { fill: var(--word, #ececec); }
+    .lks .wm path.lt-c { fill: var(--mark, #5baafd); }
+    .lks .cr { fill: var(--accent, #50fa7b); }
+    @keyframes lks-l0 { 0%,40.00%{opacity:0} 41.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lks .n0 { animation: lks-l0 5.6s linear infinite both; }
+    @keyframes lks-l1 { 0%,42.00%{opacity:0} 43.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lks .n1 { animation: lks-l1 5.6s linear infinite both; }
+    @keyframes lks-l2 { 0%,44.00%{opacity:0} 45.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lks .n2 { animation: lks-l2 5.6s linear infinite both; }
+    @keyframes lks-l3 { 0%,46.00%{opacity:0} 47.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lks .n3 { animation: lks-l3 5.6s linear infinite both; }
+    @keyframes lks-l4 { 0%,48.00%{opacity:0} 49.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lks .n4 { animation: lks-l4 5.6s linear infinite both; }
+    @keyframes lks-l5 { 0%,50.00%{opacity:0} 51.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lks .n5 { animation: lks-l5 5.6s linear infinite both; }
+    @keyframes lks-cr {
+      0%,37.00% { opacity:0; transform: translate(50.00px,0); }
+      39.00% { opacity:1; transform: translate(50.00px,0); }
+      40.00% { transform: translate(50.00px,0); }
+      41.00% { transform: translate(66.86px,0); }
+      42.00% { transform: translate(66.86px,0); }
+      43.00% { transform: translate(83.71px,0); }
+      44.00% { transform: translate(83.71px,0); }
+      45.00% { transform: translate(100.57px,0); }
+      46.00% { transform: translate(100.57px,0); }
+      47.00% { transform: translate(117.43px,0); }
+      48.00% { transform: translate(117.43px,0); }
+      49.00% { transform: translate(134.29px,0); }
+      50.00% { transform: translate(134.29px,0); }
+      51.00% { transform: translate(151.14px,0); }
+      86% { transform: translate(151.14px,0); opacity:1; }
+      92%,100% { transform: translate(151.14px,0); opacity:0; }
+    }
+    .lks .cr { transform: translate(151.14px,0); animation: lks-cr 5.6s linear infinite both; }
+    @media (prefers-reduced-motion: reduce) { .lks * { animation: none !important; } }
+  </style>
+  <rect class="cr" x="0" y="11" width="3.2" height="24" rx="1.6"/>
+  <g class="wm">
+    <path class="lt n0" transform="translate(50.00,34.0) scale(0.0136719,-0.0136719)" d="M609 -29Q420 -29 190 41V297Q387 184 585 184Q791 184 791 306Q791 360 742.0 393.0Q693 426 575 451L494 469Q172 541 172 800Q172 966 291.5 1056.5Q411 1147 638 1147Q726 1147 812.5 1132.0Q899 1117 991 1085V829Q903 884 822.5 909.0Q742 934 657 934Q557 934 503.0 905.0Q449 876 449 827Q449 782 499.5 749.5Q550 717 663 691L758 668Q918 630 992.5 546.0Q1067 462 1067 324Q1067 -29 609 -29Z"/>
+    <path class="lt n1" transform="translate(66.86,34.0) scale(0.0136719,-0.0136719)" d="M172 1556H463V952Q494 1046 569.5 1096.5Q645 1147 753 1147Q909 1147 990.0 1040.0Q1071 933 1071 727V0H780V682Q780 799 746.0 853.0Q712 907 642 907Q556 907 509.5 836.0Q463 765 463 641V0H172Z"/>
+    <path class="lt lt-c n2" transform="translate(83.71,34.0) scale(0.0136719,-0.0136719)" d="M759 -29Q460 -29 300 170Q141 370 141 745Q141 1122 300 1321Q460 1520 759 1520Q846 1520 924 1502Q1002 1484 1070 1448V1120Q1025 1162 989.5 1185.5Q954 1209 922 1223Q884 1240 847.5 1247.5Q811 1255 774 1255Q614 1255 531 1127Q448 996 448 745Q448 493 531 365Q614 236 774 236Q851 236 923 269Q958 285 992.5 308.5Q1027 332 1070 371V43Q1000 7 923 -11Q846 -29 759 -29Z"/>
+    <path class="lt n3" transform="translate(100.57,34.0) scale(0.0136719,-0.0136719)" d="M616 -29Q457 -29 340.5 42.5Q224 114 161.0 246.0Q98 378 98 558Q98 738 161.5 870.5Q225 1003 342.5 1075.0Q460 1147 621 1147Q780 1147 895.0 1076.5Q1010 1006 1072.5 875.0Q1135 744 1135 564Q1135 381 1071.5 248.0Q1008 115 892.0 43.0Q776 -29 616 -29ZM617 209Q720 209 781.0 303.5Q842 398 842 559Q842 721 781.0 815.0Q720 909 617 909Q513 909 452.0 814.5Q391 720 391 559Q391 398 452.0 303.5Q513 209 617 209Z"/>
+    <path class="lt n4" transform="translate(117.43,34.0) scale(0.0136719,-0.0136719)" d="M493 -29Q304 -29 197.0 127.5Q90 284 90 558Q90 835 198.0 991.0Q306 1147 495 1147Q683 1147 791 961V1556H1083V0H820L791 166Q698 -29 493 -29ZM586 211Q679 211 735.0 305.5Q791 400 791 557Q791 714 734.5 808.5Q678 903 583 903Q490 903 436.5 811.5Q383 720 383 563Q383 402 438.5 306.5Q494 211 586 211Z"/>
+    <path class="lt n5" transform="translate(134.29,34.0) scale(0.0136719,-0.0136719)" d="M672 -29Q383 -29 232.5 120.5Q82 270 82 553Q82 732 144.0 865.5Q206 999 329.5 1073.0Q453 1147 639 1147Q792 1147 904.0 1076.0Q1016 1005 1077.5 878.5Q1139 752 1139 584V465H380Q380 203 686 203Q887 203 1092 324V55Q888 -29 672 -29ZM844 685Q844 801 787.0 860.5Q730 920 624 920Q516 920 455.0 859.0Q394 798 383 685Z"/>
+  </g>
+  <g class="mbk">
+    <path class="mbs" d="M33 15 C33 9 15 9 15 16.5 C15 23 33 24 33 31 C33 38.5 15 38.5 15 32.5"/>
+    <circle class="mbd" cx="0" cy="0" r="5.5"/>
+  </g>
+</svg>

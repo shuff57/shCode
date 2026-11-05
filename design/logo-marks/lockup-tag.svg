@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="lkt lock" viewBox="0 0 168 48" role="img" aria-label="shCode">
+  <title>shCode</title>
+  <style>
+    .lkt .mbr { fill:none; stroke:var(--mark,#5baafd); stroke-width:5; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:38.5; stroke-dashoffset:0; animation:lkt-draw 5s cubic-bezier(.22,1,.36,1) infinite both; }
+    .lkt .mbr-r { animation-delay:.15s; }
+    @keyframes lkt-draw { 0%{stroke-dashoffset:38.5} 11%{stroke-dashoffset:0} 92%{stroke-dashoffset:0} 99%,100%{stroke-dashoffset:38.5} }
+    .lkt .wm path { fill: var(--word, #ececec); }
+    .lkt .wm path.lt-c { fill: var(--mark, #5baafd); }
+    .lkt .cr { fill: var(--accent, #50fa7b); }
+    @keyframes lkt-l0 { 0%,19.00%{opacity:0} 20.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lkt .n0 { animation: lkt-l0 5.0s linear infinite both; }
+    @keyframes lkt-l1 { 0%,21.00%{opacity:0} 22.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lkt .n1 { animation: lkt-l1 5.0s linear infinite both; }
+    @keyframes lkt-l2 { 0%,23.00%{opacity:0} 24.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lkt .n2 { animation: lkt-l2 5.0s linear infinite both; }
+    @keyframes lkt-l3 { 0%,25.00%{opacity:0} 26.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lkt .n3 { animation: lkt-l3 5.0s linear infinite both; }
+    @keyframes lkt-l4 { 0%,27.00%{opacity:0} 28.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lkt .n4 { animation: lkt-l4 5.0s linear infinite both; }
+    @keyframes lkt-l5 { 0%,29.00%{opacity:0} 30.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lkt .n5 { animation: lkt-l5 5.0s linear infinite both; }
+    @keyframes lkt-cr {
+      0%,14.00% { opacity:0; transform: translate(30.00px,0); }
+      17.00% { opacity:1; transform: translate(30.00px,0); }
+      19.00% { transform: translate(30.00px,0); }
+      20.00% { transform: translate(46.86px,0); }
+      21.00% { transform: translate(46.86px,0); }
+      22.00% { transform: translate(63.71px,0); }
+      23.00% { transform: translate(63.71px,0); }
+      24.00% { transform: translate(80.57px,0); }
+      25.00% { transform: translate(80.57px,0); }
+      26.00% { transform: translate(97.43px,0); }
+      27.00% { transform: translate(97.43px,0); }
+      28.00% { transform: translate(114.29px,0); }
+      29.00% { transform: translate(114.29px,0); }
+      30.00% { transform: translate(131.14px,0); }
+      86% { transform: translate(131.14px,0); opacity:1; }
+      92%,100% { transform: translate(131.14px,0); opacity:0; }
+    }
+    .lkt .cr { transform: translate(131.14px,0); animation: lkt-cr 5.0s linear infinite both; }
+    @media (prefers-reduced-motion: reduce) { .lkt * { animation: none !important; } }
+  </style>
+  <rect class="cr" x="0" y="13" width="7" height="21" rx="2"/>
+  <g class="wm">
+    <path class="lt n0" transform="translate(30.00,34.0) scale(0.0136719,-0.0136719)" d="M609 -29Q420 -29 190 41V297Q387 184 585 184Q791 184 791 306Q791 360 742.0 393.0Q693 426 575 451L494 469Q172 541 172 800Q172 966 291.5 1056.5Q411 1147 638 1147Q726 1147 812.5 1132.0Q899 1117 991 1085V829Q903 884 822.5 909.0Q742 934 657 934Q557 934 503.0 905.0Q449 876 449 827Q449 782 499.5 749.5Q550 717 663 691L758 668Q918 630 992.5 546.0Q1067 462 1067 324Q1067 -29 609 -29Z"/>
+    <path class="lt n1" transform="translate(46.86,34.0) scale(0.0136719,-0.0136719)" d="M172 1556H463V952Q494 1046 569.5 1096.5Q645 1147 753 1147Q909 1147 990.0 1040.0Q1071 933 1071 727V0H780V682Q780 799 746.0 853.0Q712 907 642 907Q556 907 509.5 836.0Q463 765 463 641V0H172Z"/>
+    <path class="lt lt-c n2" transform="translate(63.71,34.0) scale(0.0136719,-0.0136719)" d="M759 -29Q460 -29 300 170Q141 370 141 745Q141 1122 300 1321Q460 1520 759 1520Q846 1520 924 1502Q1002 1484 1070 1448V1120Q1025 1162 989.5 1185.5Q954 1209 922 1223Q884 1240 847.5 1247.5Q811 1255 774 1255Q614 1255 531 1127Q448 996 448 745Q448 493 531 365Q614 236 774 236Q851 236 923 269Q958 285 992.5 308.5Q1027 332 1070 371V43Q1000 7 923 -11Q846 -29 759 -29Z"/>
+    <path class="lt n3" transform="translate(80.57,34.0) scale(0.0136719,-0.0136719)" d="M616 -29Q457 -29 340.5 42.5Q224 114 161.0 246.0Q98 378 98 558Q98 738 161.5 870.5Q225 1003 342.5 1075.0Q460 1147 621 1147Q780 1147 895.0 1076.5Q1010 1006 1072.5 875.0Q1135 744 1135 564Q1135 381 1071.5 248.0Q1008 115 892.0 43.0Q776 -29 616 -29ZM617 209Q720 209 781.0 303.5Q842 398 842 559Q842 721 781.0 815.0Q720 909 617 909Q513 909 452.0 814.5Q391 720 391 559Q391 398 452.0 303.5Q513 209 617 209Z"/>
+    <path class="lt n4" transform="translate(97.43,34.0) scale(0.0136719,-0.0136719)" d="M493 -29Q304 -29 197.0 127.5Q90 284 90 558Q90 835 198.0 991.0Q306 1147 495 1147Q683 1147 791 961V1556H1083V0H820L791 166Q698 -29 493 -29ZM586 211Q679 211 735.0 305.5Q791 400 791 557Q791 714 734.5 808.5Q678 903 583 903Q490 903 436.5 811.5Q383 720 383 563Q383 402 438.5 306.5Q494 211 586 211Z"/>
+    <path class="lt n5" transform="translate(114.29,34.0) scale(0.0136719,-0.0136719)" d="M672 -29Q383 -29 232.5 120.5Q82 270 82 553Q82 732 144.0 865.5Q206 999 329.5 1073.0Q453 1147 639 1147Q792 1147 904.0 1076.0Q1016 1005 1077.5 878.5Q1139 752 1139 584V465H380Q380 203 686 203Q887 203 1092 324V55Q888 -29 672 -29ZM844 685Q844 801 787.0 860.5Q730 920 624 920Q516 920 455.0 859.0Q394 798 383 685Z"/>
+  </g>
+  <path class="mbr" d="M20 9 L8 24 L20 39"/>
+  <path class="mbr mbr-r" d="M148 9 L160 24 L148 39"/>
+</svg>

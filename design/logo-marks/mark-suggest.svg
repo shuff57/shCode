@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="mk-suggest" viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="shCode">
+  <title>shCode — Suggest</title>
+  <style>
+    .mk-suggest .win {
+      fill: none;
+      stroke: var(--mark, #5baafd);
+      stroke-width: 3.5;
+      stroke-linejoin: round;
+      stroke-dasharray: 100;
+      stroke-dashoffset: 0;
+      animation: sg-win 5.2s ease-out infinite both;
+    }
+    .mk-suggest .chrome {
+      fill: none;
+      stroke: var(--mark, #5baafd);
+      stroke-width: 1.5;
+      opacity: .45;
+      animation: sg-chrome 5.2s linear infinite both;
+    }
+    .mk-suggest .dot {
+      fill: var(--mark, #5baafd);
+      opacity: .55;
+      animation: sg-chrome 5.2s linear infinite both;
+    }
+    .mk-suggest .caret {
+      fill: var(--accent, #50fa7b);
+      transform-box: view-box;
+      transform-origin: 0 0;
+      transform: translate(37px, 0);
+      animation: sg-caret 5.2s linear infinite both;
+    }
+    .mk-suggest .typed {
+      fill: var(--mark, #5baafd);
+      transform-box: fill-box;
+      transform-origin: left center;
+      transform: scaleX(1);
+      animation: sg-typed 5.2s ease-out infinite both;
+    }
+    .mk-suggest .ghost {
+      fill: var(--word, #ececec);
+      opacity: 1;
+      animation: sg-ghost 5.2s linear infinite both;
+    }
+    @keyframes sg-win {
+      0%        { stroke-dashoffset: 100; }
+      10%, 90%  { stroke-dashoffset: 0; }
+      97%, 100% { stroke-dashoffset: 100; }
+    }
+    @keyframes sg-chrome {
+      0%, 6%    { opacity: 0; }
+      10%, 90%  { opacity: .45; }
+      96%, 100% { opacity: 0; }
+    }
+    @keyframes sg-caret {
+      0%, 8%    { opacity: 0; transform: translate(16px, 0); }
+      9%        { opacity: 1; transform: translate(16px, 0); }
+      14%       { transform: translate(16px, 0); }
+      16%       { transform: translate(27.5px, 0); }
+      38%       { transform: translate(27.5px, 0); }
+      41%       { transform: translate(37px, 0); }
+      44%       { opacity: 1; }
+      47%       { opacity: .1; }
+      50%       { opacity: 1; }
+      53%       { opacity: .1; }
+      56%, 90%  { opacity: 1; }
+      96%, 100% { opacity: 0; transform: translate(37px, 0); }
+    }
+    @keyframes sg-typed {
+      0%, 11%   { transform: scaleX(0); }
+      16%, 90%  { transform: scaleX(1); }
+      96%, 100% { transform: scaleX(0); }
+    }
+    @keyframes sg-ghost {
+      0%, 20%   { opacity: 0; }
+      24%       { opacity: .3; }
+      38%       { opacity: .3; }
+      41%, 90%  { opacity: 1; }
+      96%, 100% { opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .mk-suggest * { animation: none !important; }
+    }
+  </style>
+  <path class="win" pathLength="100" d="M12 8 H36 A8 8 0 0 1 44 16 V32 A8 8 0 0 1 36 40 H12 A8 8 0 0 1 4 32 V16 A8 8 0 0 1 12 8 Z"/>
+  <path class="chrome" d="M4 17 H44"/>
+  <circle class="dot" cx="11" cy="12" r="1.4"/><circle class="dot" cx="17" cy="12" r="1.4"/><circle class="dot" cx="23" cy="12" r="1.4"/>
+  <rect class="caret" x="0" y="21.5" width="3.2" height="13" rx="1.6"/>
+  <rect class="typed" x="16" y="25.5" width="11" height="4" rx="2"/>
+  <rect class="ghost" x="30" y="25.5" width="7" height="4" rx="2"/>
+</svg>

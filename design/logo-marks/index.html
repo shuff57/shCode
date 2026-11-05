@@ -1,0 +1,1070 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>shCode Motion Marks</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+  :root{
+    color-scheme: dark;
+    --bg:#252525;
+    --panel:#1e1e1e;
+    --sunken:#1a1a1a;
+    --line:#343434;
+    --line-soft:#2c2c2c;
+    --fg:#cccccc;
+    --fg-strong:#f2f2f2;
+    --muted:#8393c4;
+    --brand:#5baafd;
+    --accent:#50fa7b;
+    --brand-ink:#2f7fd0;
+    --accent-ink:#1f9e4b;
+    --word:#ececec;
+    --word-ink:#141414;
+
+    --mono:'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    --sans:'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+    --step-0:15px;
+    --step-2:clamp(19px,2.2vw,22px);
+    --step-3:clamp(30px,5.2vw,46px);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:var(--sans);
+    font-size:var(--step-0);
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:1060px;
+    margin:0 auto;
+    padding-block:clamp(32px,6vw,64px) 72px;
+    padding-left:max(16px, env(safe-area-inset-left, 0px));
+    padding-right:max(16px, env(safe-area-inset-right, 0px));
+    display:flex;
+    flex-direction:column;
+    gap:clamp(32px,5vw,56px);
+  }
+
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin:0 0 14px;
+  }
+  h1{
+    font-family:var(--mono);
+    font-weight:700;
+    font-size:var(--step-3);
+    line-height:1.08;
+    letter-spacing:-.025em;
+    color:var(--fg-strong);
+    margin:0 0 18px;
+    text-wrap:balance;
+  }
+  .lede{margin:0;max-width:60ch;color:var(--fg);}
+  .lede + .lede{margin-top:12px;}
+
+  .now{
+    display:flex;align-items:center;gap:14px;margin-top:26px;
+    padding:12px 14px;border:1px solid var(--line-soft);border-radius:8px;
+    background:var(--panel);font-family:var(--mono);font-size:12.5px;
+    color:var(--muted);line-height:1.4;
+  }
+  .now svg{flex:none;}
+  .now b{color:var(--fg);font-weight:500;}
+
+  .toolbar{
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);
+    padding-block:12px;
+  }
+  .toolbar-note{font-family:var(--mono);font-size:12px;color:var(--muted);margin-left:auto;}
+  .btn{
+    font-family:var(--mono);font-size:12px;font-weight:500;color:var(--fg);
+    background:var(--sunken);border:1px solid var(--line);border-radius:6px;
+    padding:7px 13px;cursor:pointer;
+    transition:border-color .15s ease, color .15s ease, background-color .15s ease;
+  }
+  .btn:hover{border-color:#4a4a4a;color:var(--fg-strong);}
+  .btn:focus-visible{outline:2px solid var(--brand);outline-offset:2px;}
+  .btn[aria-pressed="true"]{border-color:var(--brand);color:var(--brand);background:#1d2733;}
+
+  .opt{display:flex;flex-direction:column;gap:20px;}
+  .opt-head{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;}
+  .letter{
+    font-family:var(--mono);font-size:12px;font-weight:700;color:var(--bg);
+    background:var(--fg-strong);width:22px;height:22px;border-radius:4px;
+    display:grid;place-items:center;flex:none;transform:translateY(-2px);
+  }
+  .opt-head h2{
+    font-family:var(--mono);font-size:var(--step-2);font-weight:500;
+    letter-spacing:-.01em;color:var(--fg-strong);margin:0;
+  }
+  .tagline{font-size:15px;color:var(--muted);margin:0;}
+
+  .opt-body{
+    display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);
+    gap:24px;align-items:start;
+  }
+  @media (max-width:760px){ .opt-body{grid-template-columns:minmax(0,1fr);} }
+
+  .stage{
+    position:relative;background:var(--panel);border:1px solid var(--line-soft);
+    border-radius:10px;min-height:230px;display:grid;place-items:center;
+    overflow:hidden;padding:30px 22px;
+  }
+  .stage > svg{
+    height:clamp(84px,13vw,118px);width:auto;max-width:100%;display:block;
+  }
+  .stage-replay{position:absolute;top:10px;right:10px;}
+  .stage-replay .btn{padding:5px 10px;font-size:11px;}
+
+  .probe{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
+  .probe-box{
+    flex:1 1 150px;min-width:0;background:var(--panel);
+    border:1px solid var(--line-soft);border-radius:8px;padding:12px;
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .probe-label{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--muted);
+  }
+  .probe-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  @media (max-width:620px){ .probe-box{flex:1 1 100%;} }
+
+  .ladder{display:flex;align-items:flex-end;gap:14px;}
+  .slot{display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .slot-label{font-family:var(--mono);font-size:10px;color:var(--muted);}
+
+  .lightground{
+    background:#ffffff;border-radius:6px;padding:12px;display:grid;place-items:center;
+    --mark:var(--brand-ink);--accent:var(--accent-ink);--word:var(--word-ink);
+  }
+  .lightground svg{height:clamp(46px,9vw,62px);width:auto;max-width:100%;}
+
+  .spec{margin:0;display:flex;flex-direction:column;gap:2px;}
+  .spec dt{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--muted);padding-top:12px;
+  }
+  .spec dt:first-child{padding-top:0;}
+  .spec dd{margin:0;font-size:14.5px;line-height:1.55;}
+  .spec code{font-family:var(--mono);font-size:12.5px;color:var(--brand);}
+
+  details{border:1px solid var(--line-soft);border-radius:8px;background:var(--panel);}
+  summary{
+    cursor:pointer;padding:11px 14px;font-family:var(--mono);font-size:12px;
+    color:var(--muted);list-style:none;display:flex;align-items:center;gap:10px;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"+";color:var(--brand);font-weight:700;width:1ch;}
+  details[open] summary::before{content:"−";}
+  summary:focus-visible{outline:2px solid var(--brand);outline-offset:-2px;}
+  .src{margin:0;padding:0 14px 14px;overflow-x:auto;}
+  .src pre{
+    margin:0;font-family:var(--mono);font-size:11.5px;line-height:1.6;
+    color:#b9b9b9;tab-size:2;
+  }
+  .src-bar{display:flex;justify-content:flex-end;padding:0 14px 8px;}
+
+  .verdict{
+    border:1px solid var(--line-soft);border-left:2px solid var(--brand);
+    border-radius:8px;background:var(--panel);padding:clamp(18px,3vw,26px);
+    display:flex;flex-direction:column;gap:14px;
+  }
+  .verdict h2{
+    font-family:var(--mono);font-size:var(--step-2);font-weight:500;
+    margin:0;color:var(--fg-strong);
+  }
+  .verdict p{margin:0;max-width:66ch;}
+  .verdict strong{color:var(--fg-strong);font-weight:600;}
+
+  .swatches{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;}
+  .sw{
+    display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11.5px;
+    color:var(--muted);border:1px solid var(--line-soft);border-radius:6px;padding:6px 10px 6px 6px;
+  }
+  .sw i{width:18px;height:18px;border-radius:4px;display:block;border:1px solid rgba(255,255,255,.14);}
+
+  .still *{animation:none !important;}
+  .paused svg *{animation-play-state:paused !important;}
+
+  @media (prefers-reduced-motion: reduce){
+    svg *{animation:none !important;}
+  }
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Identity study · motion</p>
+    <h1>Four marks for shCode</h1>
+    <p class="lede">Four motion studies for the name. A, B and C type the wordmark straight onto the background; D came from the editor animation already in hand, where the name is finished by autocomplete. The letters are real outlines taken from Hack Bold, converted to paths, so the SVGs carry no font dependency.</p>
+    <p class="lede">Each is one SVG with CSS motion inside it: no JavaScript, no animation library, a still frame that holds on its own, and nothing moving when the reader has asked for reduced motion.</p>
+
+    <div class="now">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+        <rect width="24" height="24" rx="5" fill="#2a2a2a"/>
+        <g fill="none" stroke="#5baafd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/>
+          <path d="M14 2v5a1 1 0 0 0 1 1h5"/>
+          <path d="M10 12.5 8 15l2 2.5"/>
+          <path d="m14 12.5 2 2.5-2 2.5"/>
+        </g>
+      </svg>
+      <span><b>In the app today:</b> a document with <b>&lt;/&gt;</b> inside it. Option A is the one that keeps that recognition.</span>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <button class="btn" id="pause" type="button" aria-pressed="false">Pause motion</button>
+    <span class="toolbar-note">Every mark also stops on its own under <code style="font-family:var(--mono);font-size:11.5px">prefers-reduced-motion</code>.</span>
+  </div>
+
+  <!-- A ---------------------------------------------------------------- -->
+  <section class="opt" data-opt="tag">
+    <div class="opt-head">
+      <span class="letter">A</span>
+      <h2>Tag</h2>
+      <p class="tagline">The name inside a pair of brackets.</p>
+    </div>
+
+    <div class="opt-body">
+      <div>
+        <div class="stage" data-lockup="tag">
+          <button class="btn stage-replay" type="button" data-replay>Replay</button>
+          <svg xmlns="http://www.w3.org/2000/svg" class="lkt lock" viewBox="0 0 168 48" role="img" aria-label="shCode">
+  <title>shCode</title>
+  <style>
+    .lkt .mbr { fill:none; stroke:var(--mark,#5baafd); stroke-width:5; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:38.5; stroke-dashoffset:0; animation:lkt-draw 5s cubic-bezier(.22,1,.36,1) infinite both; }
+    .lkt .mbr-r { animation-delay:.15s; }
+    @keyframes lkt-draw { 0%{stroke-dashoffset:38.5} 11%{stroke-dashoffset:0} 92%{stroke-dashoffset:0} 99%,100%{stroke-dashoffset:38.5} }
+    .lkt .wm path { fill: var(--word, #ececec); }
+    .lkt .wm path.lt-c { fill: var(--mark, #5baafd); }
+    .lkt .cr { fill: var(--accent, #50fa7b); }
+    @keyframes lkt-l0 { 0%,19.00%{opacity:0} 20.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lkt .n0 { animation: lkt-l0 5.0s linear infinite both; }
+    @keyframes lkt-l1 { 0%,21.00%{opacity:0} 22.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lkt .n1 { animation: lkt-l1 5.0s linear infinite both; }
+    @keyframes lkt-l2 { 0%,23.00%{opacity:0} 24.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lkt .n2 { animation: lkt-l2 5.0s linear infinite both; }
+    @keyframes lkt-l3 { 0%,25.00%{opacity:0} 26.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lkt .n3 { animation: lkt-l3 5.0s linear infinite both; }
+    @keyframes lkt-l4 { 0%,27.00%{opacity:0} 28.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lkt .n4 { animation: lkt-l4 5.0s linear infinite both; }
+    @keyframes lkt-l5 { 0%,29.00%{opacity:0} 30.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lkt .n5 { animation: lkt-l5 5.0s linear infinite both; }
+    @keyframes lkt-cr {
+      0%,14.00% { opacity:0; transform: translate(30.00px,0); }
+      17.00% { opacity:1; transform: translate(30.00px,0); }
+      19.00% { transform: translate(30.00px,0); }
+      20.00% { transform: translate(46.86px,0); }
+      21.00% { transform: translate(46.86px,0); }
+      22.00% { transform: translate(63.71px,0); }
+      23.00% { transform: translate(63.71px,0); }
+      24.00% { transform: translate(80.57px,0); }
+      25.00% { transform: translate(80.57px,0); }
+      26.00% { transform: translate(97.43px,0); }
+      27.00% { transform: translate(97.43px,0); }
+      28.00% { transform: translate(114.29px,0); }
+      29.00% { transform: translate(114.29px,0); }
+      30.00% { transform: translate(131.14px,0); }
+      86% { transform: translate(131.14px,0); opacity:1; }
+      92%,100% { transform: translate(131.14px,0); opacity:0; }
+    }
+    .lkt .cr { transform: translate(131.14px,0); animation: lkt-cr 5.0s linear infinite both; }
+    @media (prefers-reduced-motion: reduce) { .lkt * { animation: none !important; } }
+  </style>
+  <rect class="cr" x="0" y="13" width="7" height="21" rx="2"/>
+  <g class="wm">
+    <path class="lt n0" transform="translate(30.00,34.0) scale(0.0136719,-0.0136719)" d="M609 -29Q420 -29 190 41V297Q387 184 585 184Q791 184 791 306Q791 360 742.0 393.0Q693 426 575 451L494 469Q172 541 172 800Q172 966 291.5 1056.5Q411 1147 638 1147Q726 1147 812.5 1132.0Q899 1117 991 1085V829Q903 884 822.5 909.0Q742 934 657 934Q557 934 503.0 905.0Q449 876 449 827Q449 782 499.5 749.5Q550 717 663 691L758 668Q918 630 992.5 546.0Q1067 462 1067 324Q1067 -29 609 -29Z"/>
+    <path class="lt n1" transform="translate(46.86,34.0) scale(0.0136719,-0.0136719)" d="M172 1556H463V952Q494 1046 569.5 1096.5Q645 1147 753 1147Q909 1147 990.0 1040.0Q1071 933 1071 727V0H780V682Q780 799 746.0 853.0Q712 907 642 907Q556 907 509.5 836.0Q463 765 463 641V0H172Z"/>
+    <path class="lt lt-c n2" transform="translate(63.71,34.0) scale(0.0136719,-0.0136719)" d="M759 -29Q460 -29 300 170Q141 370 141 745Q141 1122 300 1321Q460 1520 759 1520Q846 1520 924 1502Q1002 1484 1070 1448V1120Q1025 1162 989.5 1185.5Q954 1209 922 1223Q884 1240 847.5 1247.5Q811 1255 774 1255Q614 1255 531 1127Q448 996 448 745Q448 493 531 365Q614 236 774 236Q851 236 923 269Q958 285 992.5 308.5Q1027 332 1070 371V43Q1000 7 923 -11Q846 -29 759 -29Z"/>
+    <path class="lt n3" transform="translate(80.57,34.0) scale(0.0136719,-0.0136719)" d="M616 -29Q457 -29 340.5 42.5Q224 114 161.0 246.0Q98 378 98 558Q98 738 161.5 870.5Q225 1003 342.5 1075.0Q460 1147 621 1147Q780 1147 895.0 1076.5Q1010 1006 1072.5 875.0Q1135 744 1135 564Q1135 381 1071.5 248.0Q1008 115 892.0 43.0Q776 -29 616 -29ZM617 209Q720 209 781.0 303.5Q842 398 842 559Q842 721 781.0 815.0Q720 909 617 909Q513 909 452.0 814.5Q391 720 391 559Q391 398 452.0 303.5Q513 209 617 209Z"/>
+    <path class="lt n4" transform="translate(97.43,34.0) scale(0.0136719,-0.0136719)" d="M493 -29Q304 -29 197.0 127.5Q90 284 90 558Q90 835 198.0 991.0Q306 1147 495 1147Q683 1147 791 961V1556H1083V0H820L791 166Q698 -29 493 -29ZM586 211Q679 211 735.0 305.5Q791 400 791 557Q791 714 734.5 808.5Q678 903 583 903Q490 903 436.5 811.5Q383 720 383 563Q383 402 438.5 306.5Q494 211 586 211Z"/>
+    <path class="lt n5" transform="translate(114.29,34.0) scale(0.0136719,-0.0136719)" d="M672 -29Q383 -29 232.5 120.5Q82 270 82 553Q82 732 144.0 865.5Q206 999 329.5 1073.0Q453 1147 639 1147Q792 1147 904.0 1076.0Q1016 1005 1077.5 878.5Q1139 752 1139 584V465H380Q380 203 686 203Q887 203 1092 324V55Q888 -29 672 -29ZM844 685Q844 801 787.0 860.5Q730 920 624 920Q516 920 455.0 859.0Q394 798 383 685Z"/>
+  </g>
+  <path class="mbr" d="M20 9 L8 24 L20 39"/>
+  <path class="mbr mbr-r" d="M148 9 L160 24 L148 39"/>
+</svg>
+        </div>
+
+        <div class="probe">
+          <div class="probe-box">
+            <span class="probe-label">Mark alone</span>
+            <div class="probe-row">
+              <span data-clones="mark:tag" data-size="34" data-label="false"></span>
+              <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">favicon</span>
+            </div>
+          </div>
+          <div class="probe-box">
+            <span class="probe-label">Scale</span>
+            <div class="ladder" data-clones="mark:tag" data-sizes="16,24,32,48"></div>
+          </div>
+          <div class="probe-box">
+            <span class="probe-label">On white</span>
+            <span data-clones="lockup:tag" data-label="false" class="lightground"></span>
+          </div>
+        </div>
+      </div>
+
+      <dl class="spec">
+        <dt>The idea</dt>
+        <dd>The wordmark sits inside the brackets, so <code>sh</code> reads as an element and the whole name is a tag. The green block that sits between the brackets in the favicon is the same block that types the letters.</dd>
+        <dt>What moves</dt>
+        <dd>Both brackets draw in from their tips, 140&nbsp;ms apart. The block pops, then steps right one character at a time as <code>shCode</code> types in behind it.</dd>
+        <dt>Loop</dt>
+        <dd>5&nbsp;s. The mark assembles in the first second; the wordmark is typed by 1.5&nbsp;s and stays put for the rest.</dd>
+        <dt>Still frame</dt>
+        <dd>Brackets whole, <code>shCode</code> complete, block resting after the final e.</dd>
+        <dt>At 16&nbsp;px</dt>
+        <dd>The brackets close into a diamond and the block still reads in the middle. The bracket meaning is lost; the shape is not.</dd>
+      </dl>
+    </div>
+
+    <details>
+      <summary>SVG source</summary>
+      <div class="src-bar"><button class="btn" type="button" data-copy>Copy SVG</button></div>
+      <div class="src"><pre data-source></pre></div>
+    </details>
+
+    <div hidden data-mark="tag"><svg xmlns="http://www.w3.org/2000/svg" class="mk-tag" viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="shCode">
+  <title>shCode — Tag</title>
+  <style>
+    .mk-tag .tg-br {
+      fill: none;
+      stroke: var(--mark, #5baafd);
+      stroke-width: 4.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 25;
+      stroke-dashoffset: 0;
+      animation: tg-draw 4.6s cubic-bezier(.22, 1, .36, 1) infinite both;
+    }
+    .mk-tag .tg-br-r { animation-delay: .14s; }
+    .mk-tag .tg-blk {
+      fill: var(--accent, #50fa7b);
+      transform-box: view-box;
+      transform-origin: 24px 24px;
+      animation: tg-block 4.6s cubic-bezier(.22, 1, .36, 1) infinite both;
+    }
+    @keyframes tg-draw {
+      0%     { stroke-dashoffset: 25; }
+      13%    { stroke-dashoffset: 0; }
+      88%    { stroke-dashoffset: 0; }
+      95%    { stroke-dashoffset: 25; }
+      100%   { stroke-dashoffset: 25; }
+    }
+    @keyframes tg-block {
+      0%, 16%  { opacity: 0; transform: scale(.2); }
+      22%      { opacity: 1; transform: scale(1.18); }
+      27%, 70% { opacity: 1; transform: scale(1); }
+      73%      { opacity: .2; }
+      76%, 90% { opacity: 1; transform: scale(1); }
+      95%, 100%{ opacity: 0; transform: scale(.2); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .mk-tag * { animation: none !important; }
+    }
+  </style>
+  <path class="tg-br" d="M19 14 L11.5 24 L19 34"/>
+  <path class="tg-br tg-br-r" d="M29 14 L36.5 24 L29 34"/>
+  <rect class="tg-blk" x="21" y="19" width="6" height="10" rx="2"/>
+</svg>
+</div>
+  </section>
+
+  <!-- B ---------------------------------------------------------------- -->
+  <section class="opt" data-opt="cursor">
+    <div class="opt-head">
+      <span class="letter">B</span>
+      <h2>Typeline</h2>
+      <p class="tagline">Nothing but the word, being typed.</p>
+    </div>
+
+    <div class="opt-body">
+      <div>
+        <div class="stage" data-lockup="cursor">
+          <button class="btn stage-replay" type="button" data-replay>Replay</button>
+          <svg xmlns="http://www.w3.org/2000/svg" class="lkc lock" viewBox="0 0 118 48" role="img" aria-label="shCode">
+  <title>shCode</title>
+  <style>
+
+    .lkc .wm path { fill: var(--word, #ececec); }
+    .lkc .wm path.lt-c { fill: var(--mark, #5baafd); }
+    .lkc .cr { fill: var(--accent, #50fa7b); }
+    @keyframes lkc-l0 { 0%,7.00%{opacity:0} 8.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lkc .n0 { animation: lkc-l0 4.6s linear infinite both; }
+    @keyframes lkc-l1 { 0%,9.60%{opacity:0} 11.00%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lkc .n1 { animation: lkc-l1 4.6s linear infinite both; }
+    @keyframes lkc-l2 { 0%,12.20%{opacity:0} 13.60%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lkc .n2 { animation: lkc-l2 4.6s linear infinite both; }
+    @keyframes lkc-l3 { 0%,14.80%{opacity:0} 16.20%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lkc .n3 { animation: lkc-l3 4.6s linear infinite both; }
+    @keyframes lkc-l4 { 0%,17.40%{opacity:0} 18.80%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lkc .n4 { animation: lkc-l4 4.6s linear infinite both; }
+    @keyframes lkc-l5 { 0%,20.00%{opacity:0} 21.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lkc .n5 { animation: lkc-l5 4.6s linear infinite both; }
+    @keyframes lkc-cr {
+      0%,2.00% { opacity:0; transform: translate(6.00px,0); }
+      5.00% { opacity:1; transform: translate(6.00px,0); }
+      7.00% { transform: translate(6.00px,0); }
+      8.00% { transform: translate(22.86px,0); }
+      9.60% { transform: translate(22.86px,0); }
+      10.60% { transform: translate(39.71px,0); }
+      12.20% { transform: translate(39.71px,0); }
+      13.20% { transform: translate(56.57px,0); }
+      14.80% { transform: translate(56.57px,0); }
+      15.80% { transform: translate(73.43px,0); }
+      17.40% { transform: translate(73.43px,0); }
+      18.40% { transform: translate(90.29px,0); }
+      20.00% { transform: translate(90.29px,0); }
+      21.00% { transform: translate(107.14px,0); }
+      86% { transform: translate(107.14px,0); opacity:1; }
+      92%,100% { transform: translate(107.14px,0); opacity:0; }
+    }
+    .lkc .cr { transform: translate(107.14px,0); animation: lkc-cr 4.6s linear infinite both; }
+    @media (prefers-reduced-motion: reduce) { .lkc * { animation: none !important; } }
+  </style>
+  <rect class="cr" x="0" y="11" width="3.2" height="24" rx="1.6"/>
+  <g class="wm">
+    <path class="lt n0" transform="translate(6.00,34.0) scale(0.0136719,-0.0136719)" d="M609 -29Q420 -29 190 41V297Q387 184 585 184Q791 184 791 306Q791 360 742.0 393.0Q693 426 575 451L494 469Q172 541 172 800Q172 966 291.5 1056.5Q411 1147 638 1147Q726 1147 812.5 1132.0Q899 1117 991 1085V829Q903 884 822.5 909.0Q742 934 657 934Q557 934 503.0 905.0Q449 876 449 827Q449 782 499.5 749.5Q550 717 663 691L758 668Q918 630 992.5 546.0Q1067 462 1067 324Q1067 -29 609 -29Z"/>
+    <path class="lt n1" transform="translate(22.86,34.0) scale(0.0136719,-0.0136719)" d="M172 1556H463V952Q494 1046 569.5 1096.5Q645 1147 753 1147Q909 1147 990.0 1040.0Q1071 933 1071 727V0H780V682Q780 799 746.0 853.0Q712 907 642 907Q556 907 509.5 836.0Q463 765 463 641V0H172Z"/>
+    <path class="lt lt-c n2" transform="translate(39.71,34.0) scale(0.0136719,-0.0136719)" d="M759 -29Q460 -29 300 170Q141 370 141 745Q141 1122 300 1321Q460 1520 759 1520Q846 1520 924 1502Q1002 1484 1070 1448V1120Q1025 1162 989.5 1185.5Q954 1209 922 1223Q884 1240 847.5 1247.5Q811 1255 774 1255Q614 1255 531 1127Q448 996 448 745Q448 493 531 365Q614 236 774 236Q851 236 923 269Q958 285 992.5 308.5Q1027 332 1070 371V43Q1000 7 923 -11Q846 -29 759 -29Z"/>
+    <path class="lt n3" transform="translate(56.57,34.0) scale(0.0136719,-0.0136719)" d="M616 -29Q457 -29 340.5 42.5Q224 114 161.0 246.0Q98 378 98 558Q98 738 161.5 870.5Q225 1003 342.5 1075.0Q460 1147 621 1147Q780 1147 895.0 1076.5Q1010 1006 1072.5 875.0Q1135 744 1135 564Q1135 381 1071.5 248.0Q1008 115 892.0 43.0Q776 -29 616 -29ZM617 209Q720 209 781.0 303.5Q842 398 842 559Q842 721 781.0 815.0Q720 909 617 909Q513 909 452.0 814.5Q391 720 391 559Q391 398 452.0 303.5Q513 209 617 209Z"/>
+    <path class="lt n4" transform="translate(73.43,34.0) scale(0.0136719,-0.0136719)" d="M493 -29Q304 -29 197.0 127.5Q90 284 90 558Q90 835 198.0 991.0Q306 1147 495 1147Q683 1147 791 961V1556H1083V0H820L791 166Q698 -29 493 -29ZM586 211Q679 211 735.0 305.5Q791 400 791 557Q791 714 734.5 808.5Q678 903 583 903Q490 903 436.5 811.5Q383 720 383 563Q383 402 438.5 306.5Q494 211 586 211Z"/>
+    <path class="lt n5" transform="translate(90.29,34.0) scale(0.0136719,-0.0136719)" d="M672 -29Q383 -29 232.5 120.5Q82 270 82 553Q82 732 144.0 865.5Q206 999 329.5 1073.0Q453 1147 639 1147Q792 1147 904.0 1076.0Q1016 1005 1077.5 878.5Q1139 752 1139 584V465H380Q380 203 686 203Q887 203 1092 324V55Q888 -29 672 -29ZM844 685Q844 801 787.0 860.5Q730 920 624 920Q516 920 455.0 859.0Q394 798 383 685Z"/>
+  </g>
+
+</svg>
+        </div>
+
+        <div class="probe">
+          <div class="probe-box">
+            <span class="probe-label">Mark alone</span>
+            <div class="probe-row">
+              <span data-clones="mark:cursor" data-size="34" data-label="false"></span>
+              <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">favicon</span>
+            </div>
+          </div>
+          <div class="probe-box">
+            <span class="probe-label">Scale</span>
+            <div class="ladder" data-clones="mark:cursor" data-sizes="16,24,32,48"></div>
+          </div>
+          <div class="probe-box">
+            <span class="probe-label">On white</span>
+            <span data-clones="lockup:cursor" data-label="false" class="lightground"></span>
+          </div>
+        </div>
+      </div>
+
+      <dl class="spec">
+        <dt>The idea</dt>
+        <dd>No separate mark in the wordmark: the type is the logo, and the only drawing is the caret. It is the most literal reading of the name, and the least decorated.</dd>
+        <dt>What moves</dt>
+        <dd>The caret arrives, advances one character at a time, and each letter appears at its slot. It blinks at the end of the word, then the line clears.</dd>
+        <dt>Loop</dt>
+        <dd>4.6&nbsp;s. The word is complete after 0.9&nbsp;s and holds for the rest.</dd>
+        <dt>Still frame</dt>
+        <dd><code>shCode</code> complete, caret resting after the final e.</dd>
+        <dt>At 16&nbsp;px</dt>
+        <dd>The letters are long gone at that size, so the favicon is a separate object: a rule with a green caret. It could belong to any editor, which is the cost of a wordmark-led mark.</dd>
+      </dl>
+    </div>
+
+    <details>
+      <summary>SVG source</summary>
+      <div class="src-bar"><button class="btn" type="button" data-copy>Copy SVG</button></div>
+      <div class="src"><pre data-source></pre></div>
+    </details>
+
+    <div hidden data-mark="cursor"><svg xmlns="http://www.w3.org/2000/svg" class="mk-cursor" viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="shCode">
+  <title>shCode — Cursor</title>
+  <style>
+    .mk-cursor .cu-line {
+      fill: var(--mark, #5baafd);
+      transform-box: view-box;
+      transform-origin: 10px 23px;
+      animation: cu-line 4.8s linear infinite both;
+    }
+    .mk-cursor .cu-caret {
+      fill: var(--accent, #50fa7b);
+      transform-box: view-box;
+      transform-origin: 0 0;
+      animation: cu-caret 4.8s linear infinite both;
+    }
+    @keyframes cu-line {
+      0%, 5%      { transform: scaleX(.15); opacity: 0; }
+      8%, 18%     { transform: scaleX(.15); opacity: 1; }
+      19%, 30%    { transform: scaleX(.45); }
+      31%, 40%    { transform: scaleX(.72); }
+      41%, 88%    { transform: scaleX(1); opacity: 1; }
+      94%, 100%   { transform: scaleX(1); opacity: 0; }
+    }
+    @keyframes cu-caret {
+      0%, 5%      { transform: translate(-17px, 0); opacity: 0; }
+      8%          { transform: translate(-17px, 0); opacity: 1; }
+      11%         { opacity: .15; }
+      14%, 18%    { transform: translate(-17px, 0); opacity: 1; }
+      19%, 30%    { transform: translate(-11px, 0); }
+      31%, 40%    { transform: translate(-5.6px, 0); }
+      41%, 88%    { transform: translate(0, 0); opacity: 1; }
+      94%, 100%   { transform: translate(0, 0); opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .mk-cursor * { animation: none !important; }
+    }
+  </style>
+  <rect class="cu-line" x="10" y="20" width="20" height="6" rx="3"/>
+  <rect class="cu-caret" x="32" y="12" width="5" height="22" rx="2"/>
+</svg>
+</div>
+  </section>
+
+  <!-- C ---------------------------------------------------------------- -->
+  <section class="opt" data-opt="sweep">
+    <div class="opt-head">
+      <span class="letter">C</span>
+      <h2>Sweep</h2>
+      <p class="tagline">The s, drawn first, then the rest typed.</p>
+    </div>
+
+    <div class="opt-body">
+      <div>
+        <div class="stage" data-lockup="sweep">
+          <button class="btn stage-replay" type="button" data-replay>Replay</button>
+          <svg xmlns="http://www.w3.org/2000/svg" class="lks lock" viewBox="0 0 162 48" role="img" aria-label="shCode">
+  <title>shCode</title>
+  <style>
+    .lks .mbk { transform: translate(24px,24px) scale(.82) translate(-24px,-24px); }
+    .lks .mbs { fill:none; stroke:var(--mark,#5baafd); stroke-width:6; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:69.83; stroke-dashoffset:0; animation:lks-draw 5.6s linear infinite both; }
+    .lks .mbd { fill:var(--accent,#50fa7b); animation:lks-dot 5.6s linear infinite both; }
+    @keyframes lks-draw {
+      6.00%{stroke-dashoffset:69.83}, 7.81%{stroke-dashoffset:67.04}, 9.57%{stroke-dashoffset:64.24}, 11.25%{stroke-dashoffset:61.45}, 12.81%{stroke-dashoffset:58.66}, 14.23%{stroke-dashoffset:55.86}, 15.48%{stroke-dashoffset:53.07}, 16.55%{stroke-dashoffset:50.28}, 17.46%{stroke-dashoffset:47.48}, 18.21%{stroke-dashoffset:44.69}, 18.82%{stroke-dashoffset:41.90}, 19.34%{stroke-dashoffset:39.11}, 19.79%{stroke-dashoffset:36.31}, 20.21%{stroke-dashoffset:33.52}, 20.66%{stroke-dashoffset:30.73}, 21.18%{stroke-dashoffset:27.93}, 21.79%{stroke-dashoffset:25.14}, 22.54%{stroke-dashoffset:22.35}, 23.45%{stroke-dashoffset:19.55}, 24.52%{stroke-dashoffset:16.76}, 25.77%{stroke-dashoffset:13.97}, 27.19%{stroke-dashoffset:11.17}, 28.75%{stroke-dashoffset:8.38}, 30.43%{stroke-dashoffset:5.59}, 32.19%{stroke-dashoffset:2.79}, 34.00%{stroke-dashoffset:0.00}
+      34%,88%{stroke-dashoffset:0} 94%,100%{stroke-dashoffset:69.83}
+    }
+    @keyframes lks-dot {
+      0%,5%{transform:translate(33px,15px) scale(1);opacity:0} 6%{transform:translate(33px,15px) scale(1);opacity:1}
+      6.00%{transform:translate(33.00px,15.00px) scale(1)}, 7.81%{transform:translate(31.77px,12.59px) scale(1)}, 9.57%{transform:translate(29.31px,11.32px) scale(1)}, 11.25%{transform:translate(26.57px,10.77px) scale(1)}, 12.81%{transform:translate(23.78px,10.70px) scale(1)}, 14.23%{transform:translate(21.02px,11.07px) scale(1)}, 15.48%{transform:translate(18.38px,11.96px) scale(1)}, 16.55%{transform:translate(16.13px,13.59px) scale(1)}, 17.46%{transform:translate(15.02px,16.10px) scale(1)}, 18.21%{transform:translate(15.78px,18.71px) scale(1)}, 18.82%{transform:translate(17.86px,20.56px) scale(1)}, 19.34%{transform:translate(20.30px,21.91px) scale(1)}, 19.79%{transform:translate(22.85px,23.06px) scale(1)}, 20.21%{transform:translate(25.41px,24.17px) scale(1)}, 20.66%{transform:translate(27.93px,25.37px) scale(1)}, 21.18%{transform:translate(30.33px,26.80px) scale(1)}, 21.79%{transform:translate(32.31px,28.75px) scale(1)}, 22.54%{transform:translate(32.98px,31.40px) scale(1)}, 23.45%{transform:translate(31.87px,33.91px) scale(1)}, 24.52%{transform:translate(29.62px,35.54px) scale(1)}, 25.77%{transform:translate(26.98px,36.43px) scale(1)}, 27.19%{transform:translate(24.22px,36.80px) scale(1)}, 28.75%{transform:translate(21.43px,36.73px) scale(1)}, 30.43%{transform:translate(18.69px,36.18px) scale(1)}, 32.19%{transform:translate(16.23px,34.91px) scale(1)}, 34.00%{transform:translate(15.00px,32.50px) scale(1)}
+      36%{translate(15.00px,32.50px) scale(1.4)} 39%,88%{translate(15.00px,32.50px) scale(1);opacity:1}
+      94%,100%{transform:translate(33px,15px) scale(1);opacity:0}
+    }
+    .lks .wm path { fill: var(--word, #ececec); }
+    .lks .wm path.lt-c { fill: var(--mark, #5baafd); }
+    .lks .cr { fill: var(--accent, #50fa7b); }
+    @keyframes lks-l0 { 0%,40.00%{opacity:0} 41.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lks .n0 { animation: lks-l0 5.6s linear infinite both; }
+    @keyframes lks-l1 { 0%,42.00%{opacity:0} 43.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lks .n1 { animation: lks-l1 5.6s linear infinite both; }
+    @keyframes lks-l2 { 0%,44.00%{opacity:0} 45.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lks .n2 { animation: lks-l2 5.6s linear infinite both; }
+    @keyframes lks-l3 { 0%,46.00%{opacity:0} 47.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lks .n3 { animation: lks-l3 5.6s linear infinite both; }
+    @keyframes lks-l4 { 0%,48.00%{opacity:0} 49.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lks .n4 { animation: lks-l4 5.6s linear infinite both; }
+    @keyframes lks-l5 { 0%,50.00%{opacity:0} 51.40%{opacity:1} 86%{opacity:1} 92%,100%{opacity:0} }
+    .lks .n5 { animation: lks-l5 5.6s linear infinite both; }
+    @keyframes lks-cr {
+      0%,37.00% { opacity:0; transform: translate(50.00px,0); }
+      39.00% { opacity:1; transform: translate(50.00px,0); }
+      40.00% { transform: translate(50.00px,0); }
+      41.00% { transform: translate(66.86px,0); }
+      42.00% { transform: translate(66.86px,0); }
+      43.00% { transform: translate(83.71px,0); }
+      44.00% { transform: translate(83.71px,0); }
+      45.00% { transform: translate(100.57px,0); }
+      46.00% { transform: translate(100.57px,0); }
+      47.00% { transform: translate(117.43px,0); }
+      48.00% { transform: translate(117.43px,0); }
+      49.00% { transform: translate(134.29px,0); }
+      50.00% { transform: translate(134.29px,0); }
+      51.00% { transform: translate(151.14px,0); }
+      86% { transform: translate(151.14px,0); opacity:1; }
+      92%,100% { transform: translate(151.14px,0); opacity:0; }
+    }
+    .lks .cr { transform: translate(151.14px,0); animation: lks-cr 5.6s linear infinite both; }
+    @media (prefers-reduced-motion: reduce) { .lks * { animation: none !important; } }
+  </style>
+  <rect class="cr" x="0" y="11" width="3.2" height="24" rx="1.6"/>
+  <g class="wm">
+    <path class="lt n0" transform="translate(50.00,34.0) scale(0.0136719,-0.0136719)" d="M609 -29Q420 -29 190 41V297Q387 184 585 184Q791 184 791 306Q791 360 742.0 393.0Q693 426 575 451L494 469Q172 541 172 800Q172 966 291.5 1056.5Q411 1147 638 1147Q726 1147 812.5 1132.0Q899 1117 991 1085V829Q903 884 822.5 909.0Q742 934 657 934Q557 934 503.0 905.0Q449 876 449 827Q449 782 499.5 749.5Q550 717 663 691L758 668Q918 630 992.5 546.0Q1067 462 1067 324Q1067 -29 609 -29Z"/>
+    <path class="lt n1" transform="translate(66.86,34.0) scale(0.0136719,-0.0136719)" d="M172 1556H463V952Q494 1046 569.5 1096.5Q645 1147 753 1147Q909 1147 990.0 1040.0Q1071 933 1071 727V0H780V682Q780 799 746.0 853.0Q712 907 642 907Q556 907 509.5 836.0Q463 765 463 641V0H172Z"/>
+    <path class="lt lt-c n2" transform="translate(83.71,34.0) scale(0.0136719,-0.0136719)" d="M759 -29Q460 -29 300 170Q141 370 141 745Q141 1122 300 1321Q460 1520 759 1520Q846 1520 924 1502Q1002 1484 1070 1448V1120Q1025 1162 989.5 1185.5Q954 1209 922 1223Q884 1240 847.5 1247.5Q811 1255 774 1255Q614 1255 531 1127Q448 996 448 745Q448 493 531 365Q614 236 774 236Q851 236 923 269Q958 285 992.5 308.5Q1027 332 1070 371V43Q1000 7 923 -11Q846 -29 759 -29Z"/>
+    <path class="lt n3" transform="translate(100.57,34.0) scale(0.0136719,-0.0136719)" d="M616 -29Q457 -29 340.5 42.5Q224 114 161.0 246.0Q98 378 98 558Q98 738 161.5 870.5Q225 1003 342.5 1075.0Q460 1147 621 1147Q780 1147 895.0 1076.5Q1010 1006 1072.5 875.0Q1135 744 1135 564Q1135 381 1071.5 248.0Q1008 115 892.0 43.0Q776 -29 616 -29ZM617 209Q720 209 781.0 303.5Q842 398 842 559Q842 721 781.0 815.0Q720 909 617 909Q513 909 452.0 814.5Q391 720 391 559Q391 398 452.0 303.5Q513 209 617 209Z"/>
+    <path class="lt n4" transform="translate(117.43,34.0) scale(0.0136719,-0.0136719)" d="M493 -29Q304 -29 197.0 127.5Q90 284 90 558Q90 835 198.0 991.0Q306 1147 495 1147Q683 1147 791 961V1556H1083V0H820L791 166Q698 -29 493 -29ZM586 211Q679 211 735.0 305.5Q791 400 791 557Q791 714 734.5 808.5Q678 903 583 903Q490 903 436.5 811.5Q383 720 383 563Q383 402 438.5 306.5Q494 211 586 211Z"/>
+    <path class="lt n5" transform="translate(134.29,34.0) scale(0.0136719,-0.0136719)" d="M672 -29Q383 -29 232.5 120.5Q82 270 82 553Q82 732 144.0 865.5Q206 999 329.5 1073.0Q453 1147 639 1147Q792 1147 904.0 1076.0Q1016 1005 1077.5 878.5Q1139 752 1139 584V465H380Q380 203 686 203Q887 203 1092 324V55Q888 -29 672 -29ZM844 685Q844 801 787.0 860.5Q730 920 624 920Q516 920 455.0 859.0Q394 798 383 685Z"/>
+  </g>
+  <g class="mbk">
+    <path class="mbs" d="M33 15 C33 9 15 9 15 16.5 C15 23 33 24 33 31 C33 38.5 15 38.5 15 32.5"/>
+    <circle class="mbd" cx="0" cy="0" r="5.5"/>
+  </g>
+</svg>
+        </div>
+
+        <div class="probe">
+          <div class="probe-box">
+            <span class="probe-label">Mark alone</span>
+            <div class="probe-row">
+              <span data-clones="mark:sweep" data-size="34" data-label="false"></span>
+              <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">favicon</span>
+            </div>
+          </div>
+          <div class="probe-box">
+            <span class="probe-label">Scale</span>
+            <div class="ladder" data-clones="mark:sweep" data-sizes="16,24,32,48"></div>
+          </div>
+          <div class="probe-box">
+            <span class="probe-label">On white</span>
+            <span data-clones="lockup:sweep" data-label="false" class="lightground"></span>
+          </div>
+        </div>
+      </div>
+
+      <dl class="spec">
+        <dt>The idea</dt>
+        <dd>The s is drawn by a pen dot before any type appears, then the wordmark types itself in behind it. Motion first, letters second, which is the order the course teaches them in.</dd>
+        <dt>What moves</dt>
+        <dd>The pen travels the curve with the stroke trailing behind it and pulses once where it lands. The caret then steps through <code>shCode</code> one letter at a time.</dd>
+        <dt>Loop</dt>
+        <dd>5.6&nbsp;s. The draw takes 1.6&nbsp;s, the typing half a second, and the rest is stillness.</dd>
+        <dt>Still frame</dt>
+        <dd>The s drawn, <code>shCode</code> complete, pen resting at the foot of the s.</dd>
+        <dt>At 16&nbsp;px</dt>
+        <dd>A clean S with a bright foot. The only one of the four that could not be another coding app&rsquo;s.</dd>
+      </dl>
+    </div>
+
+    <details>
+      <summary>SVG source</summary>
+      <div class="src-bar"><button class="btn" type="button" data-copy>Copy SVG</button></div>
+      <div class="src"><pre data-source></pre></div>
+    </details>
+
+    <div hidden data-mark="sweep"><svg xmlns="http://www.w3.org/2000/svg" class="mk-sweep" viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="shCode">
+  <title>shCode — Sweep</title>
+  <style>
+    .mk-sweep .sw-path {
+      fill: none;
+      stroke: var(--mark, #5baafd);
+      stroke-width: 6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 69.83;
+      stroke-dashoffset: 0;
+      animation: sw-draw 5.2s linear infinite both;
+    }
+    .mk-sweep .sw-dot {
+      fill: var(--accent, #50fa7b);
+      transform-box: view-box;
+      transform-origin: 0 0;
+      transform: translate(15px, 32.5px);
+      animation: sw-dot 5.2s linear infinite both;
+    }
+    @keyframes sw-draw {
+      0%, 8% { stroke-dashoffset: 69.83; }
+      10.84% { stroke-dashoffset: 67.04; }
+      13.61% { stroke-dashoffset: 64.24; }
+      16.25% { stroke-dashoffset: 61.45; }
+      18.71% { stroke-dashoffset: 58.66; }
+      20.93% { stroke-dashoffset: 55.86; }
+      22.89% { stroke-dashoffset: 53.07; }
+      24.58% { stroke-dashoffset: 50.28; }
+      26.01% { stroke-dashoffset: 47.48; }
+      27.19% { stroke-dashoffset: 44.69; }
+      28.15% { stroke-dashoffset: 41.90; }
+      28.96% { stroke-dashoffset: 39.11; }
+      29.66% { stroke-dashoffset: 36.31; }
+      30.34% { stroke-dashoffset: 33.52; }
+      31.04% { stroke-dashoffset: 30.73; }
+      31.85% { stroke-dashoffset: 27.93; }
+      32.81% { stroke-dashoffset: 25.14; }
+      33.99% { stroke-dashoffset: 22.35; }
+      35.42% { stroke-dashoffset: 19.55; }
+      37.11% { stroke-dashoffset: 16.76; }
+      39.07% { stroke-dashoffset: 13.97; }
+      41.29% { stroke-dashoffset: 11.17; }
+      43.75% { stroke-dashoffset: 8.38; }
+      46.39% { stroke-dashoffset: 5.59; }
+      49.16% { stroke-dashoffset: 2.79; }
+      52%, 84% { stroke-dashoffset: 0; }
+      92%, 100% { stroke-dashoffset: 69.83; }
+    }
+    @keyframes sw-dot {
+      0%, 7% { transform: translate(33px, 15px) scale(1); opacity: 0; }
+      8% { transform: translate(33px, 15px) scale(1); opacity: 1; }
+      10.84% { transform: translate(31.77px, 12.59px) scale(1); }
+      13.61% { transform: translate(29.31px, 11.32px) scale(1); }
+      16.25% { transform: translate(26.57px, 10.77px) scale(1); }
+      18.71% { transform: translate(23.78px, 10.70px) scale(1); }
+      20.93% { transform: translate(21.02px, 11.07px) scale(1); }
+      22.89% { transform: translate(18.38px, 11.96px) scale(1); }
+      24.58% { transform: translate(16.13px, 13.59px) scale(1); }
+      26.01% { transform: translate(15.02px, 16.10px) scale(1); }
+      27.19% { transform: translate(15.78px, 18.71px) scale(1); }
+      28.15% { transform: translate(17.86px, 20.56px) scale(1); }
+      28.96% { transform: translate(20.30px, 21.91px) scale(1); }
+      29.66% { transform: translate(22.85px, 23.06px) scale(1); }
+      30.34% { transform: translate(25.41px, 24.17px) scale(1); }
+      31.04% { transform: translate(27.93px, 25.37px) scale(1); }
+      31.85% { transform: translate(30.33px, 26.80px) scale(1); }
+      32.81% { transform: translate(32.31px, 28.75px) scale(1); }
+      33.99% { transform: translate(32.98px, 31.40px) scale(1); }
+      35.42% { transform: translate(31.87px, 33.91px) scale(1); }
+      37.11% { transform: translate(29.62px, 35.54px) scale(1); }
+      39.07% { transform: translate(26.98px, 36.43px) scale(1); }
+      41.29% { transform: translate(24.22px, 36.80px) scale(1); }
+      43.75% { transform: translate(21.43px, 36.73px) scale(1); }
+      46.39% { transform: translate(18.69px, 36.18px) scale(1); }
+      49.16% { transform: translate(16.23px, 34.91px) scale(1); }
+      52%, 55% { transform: translate(15px, 32.5px) scale(1); }
+      57% { transform: translate(15px, 32.5px) scale(1.4); }
+      61% { transform: translate(15px, 32.5px) scale(1); }
+      84%, 92% { transform: translate(15px, 32.5px) scale(1); opacity: 1; }
+      100% { transform: translate(33px, 15px) scale(1); opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .mk-sweep * { animation: none !important; }
+    }
+  </style>
+  <path class="sw-path" d="M33 15 C33 9 15 9 15 16.5 C15 23 33 24 33 31 C33 38.5 15 38.5 15 32.5"/>
+  <circle class="sw-dot" cx="0" cy="0" r="5.5"/>
+</svg>
+</div>
+  </section>
+
+  <!-- D ---------------------------------------------------------------- -->
+  <section class="opt" data-opt="suggest">
+    <div class="opt-head">
+      <span class="letter">D</span>
+      <h2>Suggest</h2>
+      <p class="tagline">The editor finishes the name for you.</p>
+    </div>
+
+    <div class="opt-body">
+      <div>
+        <div class="stage" data-lockup="suggest">
+          <button class="btn stage-replay" type="button" data-replay>Replay</button>
+          <svg xmlns="http://www.w3.org/2000/svg" class="sug lock" viewBox="0 0 180 66" role="img" aria-label="shCode">
+  <title>shCode</title>
+  <style>
+    .sug .win { fill:none; stroke:var(--mark,#5baafd); stroke-width:2.2; stroke-linejoin:round; opacity:.82; stroke-dasharray:100; stroke-dashoffset:0; animation:sug-win 6.0s ease-out infinite both; }
+    .sug .chrome { fill:none; stroke:var(--mark,#5baafd); stroke-width:1.5; opacity:.45; animation:sug-chrome 6.0s linear infinite both; }
+    .sug .dot { fill:var(--mark,#5baafd); opacity:.55; animation:sug-chrome 6.0s linear infinite both; }
+    .sug .wm path { fill:var(--word,#ececec); opacity:1; }
+    .sug .wm path.lt-typed { fill:var(--mark,#5baafd); }
+    .sug .cr { fill:var(--accent,#50fa7b); }
+    .sug .key { opacity:0; animation:sug-key 6.0s ease-out infinite both; }
+    @keyframes sug-win { 0%{stroke-dashoffset:100} 7%{stroke-dashoffset:0} 90%{stroke-dashoffset:0} 96%,100%{stroke-dashoffset:100} }
+    @keyframes sug-chrome { 0%,4%{opacity:0} 8%{opacity:.34} 90%{opacity:.34} 96%,100%{opacity:0} }
+    @keyframes sug-key { 0%,14%{opacity:0;transform:translateY(-3px)} 18%{opacity:1;transform:translateY(0)} 32%{opacity:1;transform:translateY(0)} 34%,100%{opacity:0;transform:translateY(0)} }
+    @keyframes sug-l0 { 0%,6.00%{opacity:0} 7.20%{opacity:1} 90%{opacity:1} 96%,100%{opacity:0} }
+    .sug .n0 { animation: sug-l0 6.0s linear infinite both; }
+    @keyframes sug-l1 { 0%,9.00%{opacity:0} 10.20%{opacity:1} 90%{opacity:1} 96%,100%{opacity:0} }
+    .sug .n1 { animation: sug-l1 6.0s linear infinite both; }
+    @keyframes sug-l2 { 0%,14%{opacity:0} 16%{opacity:.28} 34.00%{opacity:.28} 34.80%{opacity:1} 90%{opacity:1} 96%,100%{opacity:0} }
+    .sug .n2 { animation: sug-l2 6.0s linear infinite both; }
+    @keyframes sug-l3 { 0%,14%{opacity:0} 16%{opacity:.28} 34.60%{opacity:.28} 35.40%{opacity:1} 90%{opacity:1} 96%,100%{opacity:0} }
+    .sug .n3 { animation: sug-l3 6.0s linear infinite both; }
+    @keyframes sug-l4 { 0%,14%{opacity:0} 16%{opacity:.28} 35.20%{opacity:.28} 36.00%{opacity:1} 90%{opacity:1} 96%,100%{opacity:0} }
+    .sug .n4 { animation: sug-l4 6.0s linear infinite both; }
+    @keyframes sug-l5 { 0%,14%{opacity:0} 16%{opacity:.28} 35.80%{opacity:.28} 36.60%{opacity:1} 90%{opacity:1} 96%,100%{opacity:0} }
+    .sug .n5 { animation: sug-l5 6.0s linear infinite both; }
+    @keyframes sug-cr {
+      0%,5% { opacity:0; transform: translate(34.00px,0); }
+      5.5% { opacity:1; transform: translate(34.00px,0); }
+      6.5% { transform: translate(50.86px,0); }
+      9% { transform: translate(50.86px,0); }
+      10% { transform: translate(67.71px,0); }
+      33% { transform: translate(67.71px,0); }
+      34.5% { transform: translate(135.14px,0); }
+      38% { opacity:1; }
+      39.5% { opacity:.1; }
+      41% { opacity:1; }
+      42.5% { opacity:.1; }
+      44% { opacity:1; }
+      90% { opacity:1; }
+      96%,100% { opacity:0; transform: translate(135.14px,0); }
+    }
+    .sug .cr { opacity:1; transform: translate(135.14px,0);
+                animation: sug-cr 6.0s linear infinite both; }
+    @media (prefers-reduced-motion: reduce) { .sug * { animation: none !important; } }
+  </style>
+  <path class="win" pathLength="100" d="M11.5 1.5 H168.5 A10 10 0 0 1 178.5 11.5 V54.5 A10 10 0 0 1 168.5 64.5 H11.5 A10 10 0 0 1 1.5 54.5 V11.5 A10 10 0 0 1 11.5 1.5 Z"/>
+  <path class="chrome" d="M1.5 18.5 H178.5"/>
+  <circle class="dot" cx="12" cy="10" r="2"/><circle class="dot" cx="20" cy="10" r="2"/><circle class="dot" cx="28" cy="10" r="2"/>
+  <rect class="cr" x="0" y="22" width="3.2" height="24" rx="1.6"/>
+  <g class="key">
+    <rect x="61.71" y="51" width="19" height="12" rx="3.5" fill="none" stroke="var(--mark,#5baafd)" stroke-width="1.3" opacity=".8"/>
+    <path d="M66.71 57 H75.21 M72.21 54 L75.21 57 L72.21 60" fill="none" stroke="var(--mark,#5baafd)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g class="wm">
+    <path class="lt lt-typed n0" transform="translate(34.00,44.0) scale(0.0136719,-0.0136719)" d="M609 -29Q420 -29 190 41V297Q387 184 585 184Q791 184 791 306Q791 360 742.0 393.0Q693 426 575 451L494 469Q172 541 172 800Q172 966 291.5 1056.5Q411 1147 638 1147Q726 1147 812.5 1132.0Q899 1117 991 1085V829Q903 884 822.5 909.0Q742 934 657 934Q557 934 503.0 905.0Q449 876 449 827Q449 782 499.5 749.5Q550 717 663 691L758 668Q918 630 992.5 546.0Q1067 462 1067 324Q1067 -29 609 -29Z"/>
+    <path class="lt lt-typed n1" transform="translate(50.86,44.0) scale(0.0136719,-0.0136719)" d="M172 1556H463V952Q494 1046 569.5 1096.5Q645 1147 753 1147Q909 1147 990.0 1040.0Q1071 933 1071 727V0H780V682Q780 799 746.0 853.0Q712 907 642 907Q556 907 509.5 836.0Q463 765 463 641V0H172Z"/>
+    <path class="lt lt-c n2" transform="translate(67.71,44.0) scale(0.0136719,-0.0136719)" d="M759 -29Q460 -29 300 170Q141 370 141 745Q141 1122 300 1321Q460 1520 759 1520Q846 1520 924 1502Q1002 1484 1070 1448V1120Q1025 1162 989.5 1185.5Q954 1209 922 1223Q884 1240 847.5 1247.5Q811 1255 774 1255Q614 1255 531 1127Q448 996 448 745Q448 493 531 365Q614 236 774 236Q851 236 923 269Q958 285 992.5 308.5Q1027 332 1070 371V43Q1000 7 923 -11Q846 -29 759 -29Z"/>
+    <path class="lt n3" transform="translate(84.57,44.0) scale(0.0136719,-0.0136719)" d="M616 -29Q457 -29 340.5 42.5Q224 114 161.0 246.0Q98 378 98 558Q98 738 161.5 870.5Q225 1003 342.5 1075.0Q460 1147 621 1147Q780 1147 895.0 1076.5Q1010 1006 1072.5 875.0Q1135 744 1135 564Q1135 381 1071.5 248.0Q1008 115 892.0 43.0Q776 -29 616 -29ZM617 209Q720 209 781.0 303.5Q842 398 842 559Q842 721 781.0 815.0Q720 909 617 909Q513 909 452.0 814.5Q391 720 391 559Q391 398 452.0 303.5Q513 209 617 209Z"/>
+    <path class="lt n4" transform="translate(101.43,44.0) scale(0.0136719,-0.0136719)" d="M493 -29Q304 -29 197.0 127.5Q90 284 90 558Q90 835 198.0 991.0Q306 1147 495 1147Q683 1147 791 961V1556H1083V0H820L791 166Q698 -29 493 -29ZM586 211Q679 211 735.0 305.5Q791 400 791 557Q791 714 734.5 808.5Q678 903 583 903Q490 903 436.5 811.5Q383 720 383 563Q383 402 438.5 306.5Q494 211 586 211Z"/>
+    <path class="lt n5" transform="translate(118.29,44.0) scale(0.0136719,-0.0136719)" d="M672 -29Q383 -29 232.5 120.5Q82 270 82 553Q82 732 144.0 865.5Q206 999 329.5 1073.0Q453 1147 639 1147Q792 1147 904.0 1076.0Q1016 1005 1077.5 878.5Q1139 752 1139 584V465H380Q380 203 686 203Q887 203 1092 324V55Q888 -29 672 -29ZM844 685Q844 801 787.0 860.5Q730 920 624 920Q516 920 455.0 859.0Q394 798 383 685Z"/>
+  </g>
+</svg>
+        </div>
+
+        <div class="probe">
+          <div class="probe-box">
+            <span class="probe-label">Mark alone</span>
+            <div class="probe-row">
+              <span data-clones="mark:suggest" data-size="34" data-label="false"></span>
+              <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">favicon</span>
+            </div>
+          </div>
+          <div class="probe-box">
+            <span class="probe-label">Scale</span>
+            <div class="ladder" data-clones="mark:suggest" data-sizes="16,24,32,48"></div>
+          </div>
+          <div class="probe-box">
+            <span class="probe-label">On white</span>
+            <span data-clones="lockup:suggest" data-label="false" class="lightground"></span>
+          </div>
+        </div>
+      </div>
+
+      <dl class="spec">
+        <dt>The idea</dt>
+        <dd>Start from the editor animation already in hand: <code>shCode</code> lives on line 1 of a code window and is finished the way an editor finishes a name. You type <code>sh</code>, the rest arrives as a dimmed suggestion, a return key appears under the caret, and accepting it sets <code>Code</code> solid.</dd>
+        <dt>What moves</dt>
+        <dd>The window draws itself, then the caret types <code>s</code> and <code>h</code> in brand blue. <code>Code</code> ghosts in at 28% opacity, the badge slides up, and on accept the four letters snap to white, the caret jumps to the end and blinks. The chrome never moves after it is drawn.</dd>
+        <dt>Loop</dt>
+        <dd>6&nbsp;s. The name is complete by 2.1&nbsp;s and holds for the rest of the cycle.</dd>
+        <dt>Still frame</dt>
+        <dd>The window, <code>shCode</code> complete &mdash; <code>sh</code> blue, <code>Code</code> white &mdash; caret resting after the final e. The return badge is gone.</dd>
+        <dt>At 16&nbsp;px</dt>
+        <dd>The window and the green caret survive; the ghost detail does not. It is the only option whose mark is also a picture of the app.</dd>
+      </dl>
+    </div>
+
+    <details>
+      <summary>SVG source</summary>
+      <div class="src-bar"><button class="btn" type="button" data-copy>Copy SVG</button></div>
+      <div class="src"><pre data-source></pre></div>
+    </details>
+
+    <div hidden data-mark="suggest"><svg xmlns="http://www.w3.org/2000/svg" class="mk-suggest" viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="shCode">
+  <title>shCode — Suggest</title>
+  <style>
+    .mk-suggest .win {
+      fill: none;
+      stroke: var(--mark, #5baafd);
+      stroke-width: 3.5;
+      stroke-linejoin: round;
+      stroke-dasharray: 100;
+      stroke-dashoffset: 0;
+      animation: sg-win 5.2s ease-out infinite both;
+    }
+    .mk-suggest .chrome {
+      fill: none;
+      stroke: var(--mark, #5baafd);
+      stroke-width: 1.5;
+      opacity: .45;
+      animation: sg-chrome 5.2s linear infinite both;
+    }
+    .mk-suggest .dot {
+      fill: var(--mark, #5baafd);
+      opacity: .55;
+      animation: sg-chrome 5.2s linear infinite both;
+    }
+    .mk-suggest .caret {
+      fill: var(--accent, #50fa7b);
+      transform-box: view-box;
+      transform-origin: 0 0;
+      transform: translate(37px, 0);
+      animation: sg-caret 5.2s linear infinite both;
+    }
+    .mk-suggest .typed {
+      fill: var(--mark, #5baafd);
+      transform-box: fill-box;
+      transform-origin: left center;
+      transform: scaleX(1);
+      animation: sg-typed 5.2s ease-out infinite both;
+    }
+    .mk-suggest .ghost {
+      fill: var(--word, #ececec);
+      opacity: 1;
+      animation: sg-ghost 5.2s linear infinite both;
+    }
+    @keyframes sg-win {
+      0%        { stroke-dashoffset: 100; }
+      10%, 90%  { stroke-dashoffset: 0; }
+      97%, 100% { stroke-dashoffset: 100; }
+    }
+    @keyframes sg-chrome {
+      0%, 6%    { opacity: 0; }
+      10%, 90%  { opacity: .45; }
+      96%, 100% { opacity: 0; }
+    }
+    @keyframes sg-caret {
+      0%, 8%    { opacity: 0; transform: translate(16px, 0); }
+      9%        { opacity: 1; transform: translate(16px, 0); }
+      14%       { transform: translate(16px, 0); }
+      16%       { transform: translate(27.5px, 0); }
+      38%       { transform: translate(27.5px, 0); }
+      41%       { transform: translate(37px, 0); }
+      44%       { opacity: 1; }
+      47%       { opacity: .1; }
+      50%       { opacity: 1; }
+      53%       { opacity: .1; }
+      56%, 90%  { opacity: 1; }
+      96%, 100% { opacity: 0; transform: translate(37px, 0); }
+    }
+    @keyframes sg-typed {
+      0%, 11%   { transform: scaleX(0); }
+      16%, 90%  { transform: scaleX(1); }
+      96%, 100% { transform: scaleX(0); }
+    }
+    @keyframes sg-ghost {
+      0%, 20%   { opacity: 0; }
+      24%       { opacity: .3; }
+      38%       { opacity: .3; }
+      41%, 90%  { opacity: 1; }
+      96%, 100% { opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .mk-suggest * { animation: none !important; }
+    }
+  </style>
+  <path class="win" pathLength="100" d="M12 8 H36 A8 8 0 0 1 44 16 V32 A8 8 0 0 1 36 40 H12 A8 8 0 0 1 4 32 V16 A8 8 0 0 1 12 8 Z"/>
+  <path class="chrome" d="M4 17 H44"/>
+  <circle class="dot" cx="11" cy="12" r="1.4"/><circle class="dot" cx="17" cy="12" r="1.4"/><circle class="dot" cx="23" cy="12" r="1.4"/>
+  <rect class="caret" x="0" y="21.5" width="3.2" height="13" rx="1.6"/>
+  <rect class="typed" x="16" y="25.5" width="11" height="4" rx="2"/>
+  <rect class="ghost" x="30" y="25.5" width="7" height="4" rx="2"/>
+</svg>
+</div>
+  </section>
+
+  <section class="verdict">
+    <h2>What I would ship</h2>
+    <p><strong>D, Suggest.</strong> It is the only option that shows the name being finished rather than typed, and the only mark that is also a picture of the app. It is the closest translation of the animation you brought, and the window gives the lockup somewhere to sit on a lesson header or a sign-in screen. The trade is arithmetic: the frame takes vertical space, so the word is smaller at the same height.</p>
+    <p><strong>C, Sweep</strong> still has the strongest favicon, and A is still the conservative pick that keeps continuity with the icon in the app today. B is the purist version and the cheapest to build. If the editor is the identity, ship D and use the window mark alone in the tab strip.</p>
+    <p>The two colours do fixed jobs. Blue is the app&rsquo;s <code style="font-family:var(--mono);font-size:13px;color:var(--brand)">#5baafd</code>, and it is the mark, the capital C, and the typed <code style="font-family:var(--mono);font-size:13px;color:var(--brand)">sh</code> in D. Green is the colour the app already uses to mean advance, and it is only ever on the caret.</p>
+    <div class="swatches">
+      <span class="sw"><i style="background:#5baafd"></i>mark · dark ground</span>
+      <span class="sw"><i style="background:#2f7fd0"></i>mark · on white</span>
+      <span class="sw"><i style="background:#e8e8e8"></i>wordmark</span>
+      <span class="sw"><i style="background:#50fa7b"></i>caret · dark</span>
+      <span class="sw"><i style="background:#1f9e4b"></i>caret · on white</span>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  var marks = {};
+  var lockups = {};
+
+  document.querySelectorAll('[data-mark]').forEach(function (box) {
+    var svg = box.querySelector('svg');
+    if (svg) marks[box.getAttribute('data-mark')] = svg;
+  });
+  document.querySelectorAll('.stage[data-lockup]').forEach(function (stage) {
+    lockups[stage.getAttribute('data-lockup')] = stage.querySelector('svg');
+  });
+
+  document.querySelectorAll('[data-clones]').forEach(function (box) {
+    var parts = box.getAttribute('data-clones').split(':');
+    var tpl = parts[0] === 'lockup' ? lockups[parts[1]] : marks[parts[1]];
+    if (!tpl) return;
+
+    var sizes = (box.getAttribute('data-sizes') || box.getAttribute('data-size') || '48').split(',');
+    var showLabel = box.getAttribute('data-label') !== 'false';
+
+    sizes.forEach(function (raw) {
+      var size = parseInt(raw, 10) || 48;
+      var svg = tpl.cloneNode(true);
+      svg.classList.add('still');
+      // Clones are still frames: they show the resting state, which is what a
+      // size or ground test is about. Colours come from the wrapper's custom
+      // properties, so the white ground needs no second artwork.
+      if (showLabel) svg.setAttribute('width', size);
+      if (showLabel) svg.setAttribute('height', size);
+
+      if (!showLabel) { box.appendChild(svg); return; }
+
+      var slot = document.createElement('span');
+      slot.className = 'slot';
+      slot.appendChild(svg);
+      var label = document.createElement('span');
+      label.className = 'slot-label';
+      label.textContent = size + 'px';
+      slot.appendChild(label);
+      box.appendChild(slot);
+    });
+  });
+
+  function replay(svg) {
+    if (!svg) return;
+    var nodes = Array.prototype.slice.call(svg.querySelectorAll('*'));
+    nodes.forEach(function (n) { n.style.animation = 'none'; });
+    void svg.getBoundingClientRect();
+    nodes.forEach(function (n) { n.style.animation = ''; });
+  }
+
+  document.querySelectorAll('[data-replay]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      replay(btn.closest('.stage').querySelector('svg'));
+    });
+  });
+
+  var pause = document.getElementById('pause');
+  pause.addEventListener('click', function () {
+    var on = document.documentElement.classList.toggle('paused');
+    pause.setAttribute('aria-pressed', String(on));
+    pause.textContent = on ? 'Resume motion' : 'Pause motion';
+  });
+
+  // The source shown is the artwork actually rendered, so it cannot drift.
+  document.querySelectorAll('.opt').forEach(function (opt) {
+    var target = opt.querySelector('[data-source]');
+    var svg = opt.querySelector('.stage svg');
+    if (target && svg) target.textContent = svg.outerHTML.trim();
+  });
+
+  document.querySelectorAll('[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var text = btn.closest('details').querySelector('[data-source]').textContent;
+      var old = btn.textContent;
+      var say = function (word) {
+        btn.textContent = word;
+        setTimeout(function () { btn.textContent = old; }, 1400);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { say('Copied'); }, function () { select(text); });
+      } else {
+        select(text);
+      }
+      function select() {
+        var pre = btn.closest('details').querySelector('[data-source]');
+        var range = document.createRange();
+        range.selectNodeContents(pre);
+        var sel = window.getSelection();
+        if (!sel) return;
+        sel.removeAllRanges();
+        sel.addRange(range);
+        say('Selected');
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>

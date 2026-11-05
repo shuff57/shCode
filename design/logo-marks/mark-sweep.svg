@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="mk-sweep" viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="shCode">
+  <title>shCode — Sweep</title>
+  <style>
+    .mk-sweep .sw-path {
+      fill: none;
+      stroke: var(--mark, #5baafd);
+      stroke-width: 6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 69.83;
+      stroke-dashoffset: 0;
+      animation: sw-draw 5.2s linear infinite both;
+    }
+    .mk-sweep .sw-dot {
+      fill: var(--accent, #50fa7b);
+      transform-box: view-box;
+      transform-origin: 0 0;
+      transform: translate(15px, 32.5px);
+      animation: sw-dot 5.2s linear infinite both;
+    }
+    @keyframes sw-draw {
+      0%, 8% { stroke-dashoffset: 69.83; }
+      10.84% { stroke-dashoffset: 67.04; }
+      13.61% { stroke-dashoffset: 64.24; }
+      16.25% { stroke-dashoffset: 61.45; }
+      18.71% { stroke-dashoffset: 58.66; }
+      20.93% { stroke-dashoffset: 55.86; }
+      22.89% { stroke-dashoffset: 53.07; }
+      24.58% { stroke-dashoffset: 50.28; }
+      26.01% { stroke-dashoffset: 47.48; }
+      27.19% { stroke-dashoffset: 44.69; }
+      28.15% { stroke-dashoffset: 41.90; }
+      28.96% { stroke-dashoffset: 39.11; }
+      29.66% { stroke-dashoffset: 36.31; }
+      30.34% { stroke-dashoffset: 33.52; }
+      31.04% { stroke-dashoffset: 30.73; }
+      31.85% { stroke-dashoffset: 27.93; }
+      32.81% { stroke-dashoffset: 25.14; }
+      33.99% { stroke-dashoffset: 22.35; }
+      35.42% { stroke-dashoffset: 19.55; }
+      37.11% { stroke-dashoffset: 16.76; }
+      39.07% { stroke-dashoffset: 13.97; }
+      41.29% { stroke-dashoffset: 11.17; }
+      43.75% { stroke-dashoffset: 8.38; }
+      46.39% { stroke-dashoffset: 5.59; }
+      49.16% { stroke-dashoffset: 2.79; }
+      52%, 84% { stroke-dashoffset: 0; }
+      92%, 100% { stroke-dashoffset: 69.83; }
+    }
+    @keyframes sw-dot {
+      0%, 7% { transform: translate(33px, 15px) scale(1); opacity: 0; }
+      8% { transform: translate(33px, 15px) scale(1); opacity: 1; }
+      10.84% { transform: translate(31.77px, 12.59px) scale(1); }
+      13.61% { transform: translate(29.31px, 11.32px) scale(1); }
+      16.25% { transform: translate(26.57px, 10.77px) scale(1); }
+      18.71% { transform: translate(23.78px, 10.70px) scale(1); }
+      20.93% { transform: translate(21.02px, 11.07px) scale(1); }
+      22.89% { transform: translate(18.38px, 11.96px) scale(1); }
+      24.58% { transform: translate(16.13px, 13.59px) scale(1); }
+      26.01% { transform: translate(15.02px, 16.10px) scale(1); }
+      27.19% { transform: translate(15.78px, 18.71px) scale(1); }
+      28.15% { transform: translate(17.86px, 20.56px) scale(1); }
+      28.96% { transform: translate(20.30px, 21.91px) scale(1); }
+      29.66% { transform: translate(22.85px, 23.06px) scale(1); }
+      30.34% { transform: translate(25.41px, 24.17px) scale(1); }
+      31.04% { transform: translate(27.93px, 25.37px) scale(1); }
+      31.85% { transform: translate(30.33px, 26.80px) scale(1); }
+      32.81% { transform: translate(32.31px, 28.75px) scale(1); }
+      33.99% { transform: translate(32.98px, 31.40px) scale(1); }
+      35.42% { transform: translate(31.87px, 33.91px) scale(1); }
+      37.11% { transform: translate(29.62px, 35.54px) scale(1); }
+      39.07% { transform: translate(26.98px, 36.43px) scale(1); }
+      41.29% { transform: translate(24.22px, 36.80px) scale(1); }
+      43.75% { transform: translate(21.43px, 36.73px) scale(1); }
+      46.39% { transform: translate(18.69px, 36.18px) scale(1); }
+      49.16% { transform: translate(16.23px, 34.91px) scale(1); }
+      52%, 55% { transform: translate(15px, 32.5px) scale(1); }
+      57% { transform: translate(15px, 32.5px) scale(1.4); }
+      61% { transform: translate(15px, 32.5px) scale(1); }
+      84%, 92% { transform: translate(15px, 32.5px) scale(1); opacity: 1; }
+      100% { transform: translate(33px, 15px) scale(1); opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .mk-sweep * { animation: none !important; }
+    }
+  </style>
+  <path class="sw-path" d="M33 15 C33 9 15 9 15 16.5 C15 23 33 24 33 31 C33 38.5 15 38.5 15 32.5"/>
+  <circle class="sw-dot" cx="0" cy="0" r="5.5"/>
+</svg>

@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="sug lock" viewBox="0 0 180 66" role="img" aria-label="shCode">
+  <title>shCode</title>
+  <style>
+    .sug .win { fill:none; stroke:var(--mark,#5baafd); stroke-width:2.2; stroke-linejoin:round; opacity:.82; stroke-dasharray:100; stroke-dashoffset:0; animation:sug-win 6.0s ease-out infinite both; }
+    .sug .chrome { fill:none; stroke:var(--mark,#5baafd); stroke-width:1.5; opacity:.45; animation:sug-chrome 6.0s linear infinite both; }
+    .sug .dot { fill:var(--mark,#5baafd); opacity:.55; animation:sug-chrome 6.0s linear infinite both; }
+    .sug .wm path { fill:var(--word,#ececec); opacity:1; }
+    .sug .wm path.lt-typed { fill:var(--mark,#5baafd); }
+    .sug .cr { fill:var(--accent,#50fa7b); }
+    .sug .key { opacity:0; animation:sug-key 6.0s ease-out infinite both; }
+    @keyframes sug-win { 0%{stroke-dashoffset:100} 7%{stroke-dashoffset:0} 90%{stroke-dashoffset:0} 96%,100%{stroke-dashoffset:100} }
+    @keyframes sug-chrome { 0%,4%{opacity:0} 8%{opacity:.34} 90%{opacity:.34} 96%,100%{opacity:0} }
+    @keyframes sug-key { 0%,14%{opacity:0;transform:translateY(-3px)} 18%{opacity:1;transform:translateY(0)} 32%{opacity:1;transform:translateY(0)} 34%,100%{opacity:0;transform:translateY(0)} }
+    @keyframes sug-l0 { 0%,6.00%{opacity:0} 7.20%{opacity:1} 90%{opacity:1} 96%,100%{opacity:0} }
+    .sug .n0 { animation: sug-l0 6.0s linear infinite both; }
+    @keyframes sug-l1 { 0%,9.00%{opacity:0} 10.20%{opacity:1} 90%{opacity:1} 96%,100%{opacity:0} }
+    .sug .n1 { animation: sug-l1 6.0s linear infinite both; }
+    @keyframes sug-l2 { 0%,14%{opacity:0} 16%{opacity:.28} 34.00%{opacity:.28} 34.80%{opacity:1} 90%{opacity:1} 96%,100%{opacity:0} }
+    .sug .n2 { animation: sug-l2 6.0s linear infinite both; }
+    @keyframes sug-l3 { 0%,14%{opacity:0} 16%{opacity:.28} 34.60%{opacity:.28} 35.40%{opacity:1} 90%{opacity:1} 96%,100%{opacity:0} }
+    .sug .n3 { animation: sug-l3 6.0s linear infinite both; }
+    @keyframes sug-l4 { 0%,14%{opacity:0} 16%{opacity:.28} 35.20%{opacity:.28} 36.00%{opacity:1} 90%{opacity:1} 96%,100%{opacity:0} }
+    .sug .n4 { animation: sug-l4 6.0s linear infinite both; }
+    @keyframes sug-l5 { 0%,14%{opacity:0} 16%{opacity:.28} 35.80%{opacity:.28} 36.60%{opacity:1} 90%{opacity:1} 96%,100%{opacity:0} }
+    .sug .n5 { animation: sug-l5 6.0s linear infinite both; }
+    @keyframes sug-cr {
+      0%,5% { opacity:0; transform: translate(34.00px,0); }
+      5.5% { opacity:1; transform: translate(34.00px,0); }
+      6.5% { transform: translate(50.86px,0); }
+      9% { transform: translate(50.86px,0); }
+      10% { transform: translate(67.71px,0); }
+      33% { transform: translate(67.71px,0); }
+      34.5% { transform: translate(135.14px,0); }
+      38% { opacity:1; }
+      39.5% { opacity:.1; }
+      41% { opacity:1; }
+      42.5% { opacity:.1; }
+      44% { opacity:1; }
+      90% { opacity:1; }
+      96%,100% { opacity:0; transform: translate(135.14px,0); }
+    }
+    .sug .cr { opacity:1; transform: translate(135.14px,0);
+                animation: sug-cr 6.0s linear infinite both; }
+    @media (prefers-reduced-motion: reduce) { .sug * { animation: none !important; } }
+  </style>
+  <path class="win" pathLength="100" d="M11.5 1.5 H168.5 A10 10 0 0 1 178.5 11.5 V54.5 A10 10 0 0 1 168.5 64.5 H11.5 A10 10 0 0 1 1.5 54.5 V11.5 A10 10 0 0 1 11.5 1.5 Z"/>
+  <path class="chrome" d="M1.5 18.5 H178.5"/>
+  <circle class="dot" cx="12" cy="10" r="2"/><circle class="dot" cx="20" cy="10" r="2"/><circle class="dot" cx="28" cy="10" r="2"/>
+  <rect class="cr" x="0" y="22" width="3.2" height="24" rx="1.6"/>
+  <g class="key">
+    <rect x="61.71" y="51" width="19" height="12" rx="3.5" fill="none" stroke="var(--mark,#5baafd)" stroke-width="1.3" opacity=".8"/>
+    <path d="M66.71 57 H75.21 M72.21 54 L75.21 57 L72.21 60" fill="none" stroke="var(--mark,#5baafd)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g class="wm">
+    <path class="lt lt-typed n0" transform="translate(34.00,44.0) scale(0.0136719,-0.0136719)" d="M609 -29Q420 -29 190 41V297Q387 184 585 184Q791 184 791 306Q791 360 742.0 393.0Q693 426 575 451L494 469Q172 541 172 800Q172 966 291.5 1056.5Q411 1147 638 1147Q726 1147 812.5 1132.0Q899 1117 991 1085V829Q903 884 822.5 909.0Q742 934 657 934Q557 934 503.0 905.0Q449 876 449 827Q449 782 499.5 749.5Q550 717 663 691L758 668Q918 630 992.5 546.0Q1067 462 1067 324Q1067 -29 609 -29Z"/>
+    <path class="lt lt-typed n1" transform="translate(50.86,44.0) scale(0.0136719,-0.0136719)" d="M172 1556H463V952Q494 1046 569.5 1096.5Q645 1147 753 1147Q909 1147 990.0 1040.0Q1071 933 1071 727V0H780V682Q780 799 746.0 853.0Q712 907 642 907Q556 907 509.5 836.0Q463 765 463 641V0H172Z"/>
+    <path class="lt lt-c n2" transform="translate(67.71,44.0) scale(0.0136719,-0.0136719)" d="M759 -29Q460 -29 300 170Q141 370 141 745Q141 1122 300 1321Q460 1520 759 1520Q846 1520 924 1502Q1002 1484 1070 1448V1120Q1025 1162 989.5 1185.5Q954 1209 922 1223Q884 1240 847.5 1247.5Q811 1255 774 1255Q614 1255 531 1127Q448 996 448 745Q448 493 531 365Q614 236 774 236Q851 236 923 269Q958 285 992.5 308.5Q1027 332 1070 371V43Q1000 7 923 -11Q846 -29 759 -29Z"/>
+    <path class="lt n3" transform="translate(84.57,44.0) scale(0.0136719,-0.0136719)" d="M616 -29Q457 -29 340.5 42.5Q224 114 161.0 246.0Q98 378 98 558Q98 738 161.5 870.5Q225 1003 342.5 1075.0Q460 1147 621 1147Q780 1147 895.0 1076.5Q1010 1006 1072.5 875.0Q1135 744 1135 564Q1135 381 1071.5 248.0Q1008 115 892.0 43.0Q776 -29 616 -29ZM617 209Q720 209 781.0 303.5Q842 398 842 559Q842 721 781.0 815.0Q720 909 617 909Q513 909 452.0 814.5Q391 720 391 559Q391 398 452.0 303.5Q513 209 617 209Z"/>
+    <path class="lt n4" transform="translate(101.43,44.0) scale(0.0136719,-0.0136719)" d="M493 -29Q304 -29 197.0 127.5Q90 284 90 558Q90 835 198.0 991.0Q306 1147 495 1147Q683 1147 791 961V1556H1083V0H820L791 166Q698 -29 493 -29ZM586 211Q679 211 735.0 305.5Q791 400 791 557Q791 714 734.5 808.5Q678 903 583 903Q490 903 436.5 811.5Q383 720 383 563Q383 402 438.5 306.5Q494 211 586 211Z"/>
+    <path class="lt n5" transform="translate(118.29,44.0) scale(0.0136719,-0.0136719)" d="M672 -29Q383 -29 232.5 120.5Q82 270 82 553Q82 732 144.0 865.5Q206 999 329.5 1073.0Q453 1147 639 1147Q792 1147 904.0 1076.0Q1016 1005 1077.5 878.5Q1139 752 1139 584V465H380Q380 203 686 203Q887 203 1092 324V55Q888 -29 672 -29ZM844 685Q844 801 787.0 860.5Q730 920 624 920Q516 920 455.0 859.0Q394 798 383 685Z"/>
+  </g>
+</svg>
