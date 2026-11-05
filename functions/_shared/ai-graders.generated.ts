@@ -10138,7 +10138,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ]
   },
   "6-4-pocket-2-sub-a-pocket-you-roll-over": {
-    "lessonTitle": "6.4.2 Sub-build: A pocket you roll over",
+    "lessonTitle": "6.4.3 Sub-build: A pocket you roll over",
     "prompt": "The student wrote a moSHion sketch for \"Sub-build: A pocket you roll over\". The task: make a pass-through pocket and drop the ball only when it overlaps it slowly, guarded so it happens once. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
     "rubric": [
       {
@@ -10156,7 +10156,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ]
   },
   "6-4-pocket-3-lab-sink-it": {
-    "lessonTitle": "6.4.3 Lab: Sink it",
+    "lessonTitle": "6.4.4 Lab: Sink it",
     "prompt": "The student wrote a moSHion sketch for \"Lab: Sink it\". The task: make the pocket pass-through, drop a slow ball into it once, and show a word when it is sunk. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
     "rubric": [
       {
