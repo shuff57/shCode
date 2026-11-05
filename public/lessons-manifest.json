@@ -10323,8 +10323,21 @@
       "scoreKind": null
     },
     {
+      "id": "6-4-pocket-0-reading-overlaps",
+      "title": "6.4.1 Reading: Overlaps: a question, not a collision",
+      "unit": "6.4 Pocket: the pocket",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 13,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "6-4-pocket-1-reading-a-pocket-you-roll-over",
-      "title": "6.4.1 Reading: A pocket you roll over",
+      "title": "6.4.2 Reading: A pocket you roll over",
       "unit": "6.4 Pocket: the pocket",
       "preview": "reading",
       "type": "lesson",
@@ -10337,7 +10350,7 @@
     },
     {
       "id": "6-4-pocket-2-sub-a-pocket-you-roll-over",
-      "title": "6.4.2 Sub-build: A pocket you roll over",
+      "title": "6.4.3 Sub-build: A pocket you roll over",
       "unit": "6.4 Pocket: the pocket",
       "preview": "moshion",
       "type": "lesson",
@@ -10350,7 +10363,7 @@
     },
     {
       "id": "6-4-pocket-3-lab-sink-it",
-      "title": "6.4.3 Lab: Sink it",
+      "title": "6.4.4 Lab: Sink it",
       "unit": "6.4 Pocket: the pocket",
       "preview": "moshion",
       "type": "lesson",

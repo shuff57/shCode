@@ -1,4 +1,4 @@
-// 6.4.3 Lab: Sink it (reference solution).
+// 6.4.4 Lab: Sink it (reference solution).
 let cue, pocket, sunk = false;
 
 function setup() {

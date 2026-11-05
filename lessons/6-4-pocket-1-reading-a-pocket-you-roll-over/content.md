@@ -1,5 +1,8 @@
 ## A pocket is not a wall
 
+**Read after `6.4.1 Reading: Overlaps: a question, not a collision`.** That lesson
+covers the `overlaps()` rule; this one points it at a pocket.
+
 A pocket drawn as a normal sprite is solid: the ball bounces off it. A pocket has to be
 something the ball **rolls over**:
 

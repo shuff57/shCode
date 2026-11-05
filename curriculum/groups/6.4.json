@@ -3,10 +3,11 @@
   "source": "Pocket chain module, one day.",
   "lessons": [
     {
-      "id": "the-pocket",
-      "title": "The pocket",
-      "objective": "A pocket is a target you roll over, not into: pass-through, and only a slow ball drops.",
+      "id": "overlaps-and-the-pocket",
+      "title": "Overlaps, and the pocket",
+      "objective": "Ask `overlaps()` without pushing anything, then make a pocket a pass-through target that only a slow ball drops into.",
       "screens": [
+        "6-4-pocket-0-reading-overlaps",
         "6-4-pocket-1-reading-a-pocket-you-roll-over",
         "6-4-pocket-2-sub-a-pocket-you-roll-over",
         "6-4-pocket-3-lab-sink-it"

@@ -1,6 +1,6 @@
 {
   "id": "6-4-pocket-3-lab-sink-it",
-  "title": "6.4.3 Lab: Sink it",
+  "title": "6.4.4 Lab: Sink it",
   "description": "The table with a pocket: a slow ball drops, a fast one rolls over, and the game says what happened.",
   "type": "lesson",
   "estimateMins": 15,
@@ -35,7 +35,7 @@
     {
       "id": "r1",
       "title": "The pocket is pass-through",
-      "description": "The pocket has collider none. Help: 6.4.1 (Reading: A pocket you roll over)",
+      "description": "The pocket has collider none. Help: 6.4.1 (Reading: Overlaps: a question, not a collision)",
       "hint": "pocket.collider = 'none';",
       "type": "regex",
       "file": "script.js",
@@ -48,7 +48,7 @@
     {
       "id": "r2",
       "title": "Slow drop, guarded",
-      "description": "Overlap plus speed test, once. Help: 6.4.1 (Reading: A pocket you roll over)",
+      "description": "Overlap plus speed test, once. Help: 6.4.1 (Overlaps) and 6.4.2 (A pocket you roll over)",
       "hint": "if (ball.overlaps(pocket) && ball.speed < 1 && !sunk)",
       "type": "regex",
       "file": "script.js",

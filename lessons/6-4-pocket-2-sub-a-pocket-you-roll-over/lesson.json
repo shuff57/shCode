@@ -1,6 +1,6 @@
 {
   "id": "6-4-pocket-2-sub-a-pocket-you-roll-over",
-  "title": "6.4.2 Sub-build: A pocket you roll over",
+  "title": "6.4.3 Sub-build: A pocket you roll over",
   "description": "A ball, a hole, and the speed test. No table, no rules yet.",
   "type": "lesson",
   "estimateMins": 10,
@@ -36,7 +36,7 @@
     {
       "id": "r1",
       "title": "The pocket is pass-through",
-      "description": "The pocket sprite has collider = 'none'. Help: 6.4.1 (Reading: A pocket you roll over)",
+      "description": "The pocket sprite has collider = 'none'. Help: 6.4.1 (Reading: Overlaps: a question, not a collision)",
       "hint": "pocket.collider = 'none';",
       "type": "regex",
       "file": "script.js",
@@ -49,7 +49,7 @@
     {
       "id": "r2",
       "title": "A slow ball drops, once",
-      "description": "Overlap plus a speed test, guarded so it happens once. Help: 6.4.1 (Reading: A pocket you roll over)",
+      "description": "Overlap plus a speed test, guarded so it happens once. Help: 6.4.1 (Overlaps) and 6.4.2 (A pocket you roll over)",
       "hint": "if (ball.overlaps(pocket) && ball.speed < 1) { ... }",
       "type": "regex",
       "file": "script.js",

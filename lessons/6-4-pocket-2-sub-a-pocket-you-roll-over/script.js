@@ -1,4 +1,4 @@
-// 6.4.2 Sub-build: A pocket you roll over.
+// 6.4.3 Sub-build: A pocket you roll over.
 let ball, pocket, sunk = false;
 
 function setup() {
