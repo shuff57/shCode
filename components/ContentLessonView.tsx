@@ -165,8 +165,7 @@ export default function ContentLessonView({ lesson }: Props) {
         <p style={{ color: '#888', marginTop: 0 }}>{withInlineCode(lesson.description)}</p>
       ) : null}
 
-      {preview === 'video' ? (
-        meta.videoUrl && meta.videoUrl.trim() ? (
+      {meta.videoUrl && meta.videoUrl.trim() ? (
           <div style={{ aspectRatio: '16 / 9', marginTop: 16, borderRadius: 8, overflow: 'hidden', background: '#000' }}>
             {/* A YouTube link still gets an iframe. A direct file gets a real
                 <video>, because an mp4 dropped into an iframe renders the
@@ -201,15 +200,14 @@ export default function ContentLessonView({ lesson }: Props) {
               />
             )}
           </div>
-        ) : (
+        ) : preview === 'video' ? (
           <div style={{ marginTop: 16, padding: 20, background: '#282a36', borderRadius: 8, border: '1px dashed #555', color: '#aaa' }}>
             <strong style={{ color: '#ff79c6' }}>No video URL set yet.</strong>
             <p style={{ margin: '8px 0 0', fontSize: 14 }}>
               {meta.videoFallback ?? "Teacher will paste a YouTube URL into this lesson's lesson.json (videoUrl field) when ready."}
             </p>
           </div>
-        )
-      ) : null}
+        ) : null}
 
       {preview === 'slides' ? (
         slidesUrl && deckReady === true ? (

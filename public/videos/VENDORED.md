@@ -8,6 +8,14 @@ A lesson plays one with `"videoUrl": "/videos/<name>/index.html"` (dev serves no
 | --- | --- | --- | --- |
 | `5-1-2/` | 5.1.2 Your first moSHion sketch | 2:39 | sandbox Edge TTS (en-US-AndrewMultilingualNeural, -10%), not the cloned voice |
 | `5-1-12/` | 5.1.12 The Frame Loop Explained | 2:40 | same voice and rate |
+| `5-2-gravity/` | 5.2.6 Reading: Gravity | ~2:29 | same voice and rate |
+| `5-2-jump/` | 5.2.9 Reading: Ground-Gated Actions | ~2:19 | same voice and rate |
+
+The two 5.2 explainers are not separate lessons: they are attached to the reading they teach with
+`"videoUrl": "/videos/<name>/index.html"`, and `ContentLessonView` renders the player above the reading's
+markdown whenever a lesson has a `videoUrl` (previously only `preview: "video"` did). That keeps one
+explainer per main idea without renumbering the module.
+
 
 Re-copy the bookSHelf `site/` folder over the matching folder to update. Do not hand-edit.
 

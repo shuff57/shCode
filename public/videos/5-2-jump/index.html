@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gravity</title>
+<link rel="stylesheet" href="lib/engine.css">
+<link rel="expect" href="#bar" blocking="render">
+</head>
+<body>
+<!-- moshion-5.2-gravity: the concept explainer for shCode 5.2.6 "Reading: Gravity". One play-through, no stops.
+     Shell only: content is beats.js. lib/ is this sandbox's own COPY of the moshion-5.1.12 lib (theme from lib/tokens.js).
+     Serve: python3 -m http.server 8840 -d site
+     charHome: SH's sprite top-left in stage px (bottom-left corner, above the caption bar); charZ 2.8 = 196 x 252 px, as in 5.1.2. -->
+<script>window.PM = { type: 'explainer', charZ: 2.8, charHome: [36, 522] };</script>
+<script src="lib/load.js"></script>
+<script src="audio/en/timings.js"></script>
+<script src="beats.js"></script>
+</body>
+</html>
