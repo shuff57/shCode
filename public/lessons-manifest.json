@@ -8074,6 +8074,19 @@
       "scoreKind": null
     },
     {
+      "id": "5-3-pinball-0-reading-play-the-finished-game",
+      "title": "5.3.0 Reading: Play the finished game",
+      "unit": "5.3 Pinball: the table",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "5-3-pinball-1-reading-from-scene-to-game",
       "title": "5.3.2 Reading: From scene to game",
       "unit": "5.3 Pinball: the table",
