@@ -1,0 +1,6 @@
+/* moshion-5.1.2-style fonts: Inter (UI, captions; OFL, copied from bookSHelf studio/src/renderer/fonts) and JetBrains Mono
+   (code; OFL, copied from the im1-2.2 lib). Both are bundled so every machine and every screenshot draws the same glyphs. */
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 400; font-display: swap; src: url(inter-latin-400.woff2) format('woff2'); }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 500; font-display: swap; src: url(inter-latin-500.woff2) format('woff2'); }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 600; font-display: swap; src: url(inter-latin-600.woff2) format('woff2'); }
+@font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400 700; font-display: swap; src: url(jetbrainsmono_v24_tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yK-0a7197f9.woff2) format('woff2'); }
