@@ -1387,7 +1387,7 @@ for (const id of Object.values(L)) {
     ]);
   }
 
-  // 5.2.17 r3
+  // 5.2.23 r3
   {
     const id = '5-2-11-lab-reaching-the-goal'; const S = sol(id);
     run(id, [
@@ -1397,7 +1397,7 @@ for (const id of Object.values(L)) {
     ]);
   }
 
-  // 5.2.10 r3
+  // 5.2.13 r3
   {
     const id = '5-2-5-lab-add-a-jump'; const S = sol(id);
     const head = "  if (kb.presses(' ') && player.colliding(ground)) {";
@@ -1412,7 +1412,7 @@ for (const id of Object.values(L)) {
     ]);
   }
 
-  // 5.2.3 r3
+  // 5.2.4 r3
   {
     const id = '5-2-random-3-lab-random-spot-and-colour'; const S = sol(id);
     const line = 'roll = floor(random(1, 7));';
@@ -1433,7 +1433,7 @@ for (const id of Object.values(L)) {
     ]);
   }
 
-  // 5.2.4 r2
+  // 5.2.5 r2
   {
     const id = '5-2-random-4-lab-beat-and-one-shot'; const S = sol(id);
     const line = '    on = !on;';
@@ -1749,7 +1749,7 @@ for (const id of Object.values(L)) {
     ]);
   }
 
-  // 5.2.12 r1
+  // 5.2.16 r1
   {
     const id = 'moshion-bounce'; const S = sol(id);
     const plain = { 'script.js': S['script.js'].replace(/, 'static'\);/g, ');').replace("  top.color = '#445';", "  top.collider = 'static';" + nl + "  bottom.collider = 'static';" + nl + "  leftWall.collider = 'static';" + nl + "  rightWall.collider = 'static';" + nl + "  top.color = '#445';") };
@@ -1761,7 +1761,7 @@ for (const id of Object.values(L)) {
   }
 }
 
-// ---------------------------------------------------------------- 5.2.22 (update) and 5.3.14 (sound)
+// ---------------------------------------------------------------- 5.2.29 (update) and 5.3.14 (sound)
 //
 // Two labs appended on 2026-11-02 so 5.1-5.5 teach update() and a first sound.
 // Lax on purpose: every shape the course taught for the move, the jump, the load
@@ -1777,7 +1777,7 @@ for (const id of Object.values(L)) {
     }
   };
 
-  // 5.2.22 Lab: Rules in update(), picture in draw()
+  // 5.2.29 Lab: Rules in update(), picture in draw()
   {
     const id = '5-2-update-2-lab-rules-in-update';
     const S = solutionFiles(id);
@@ -1867,7 +1867,7 @@ for (const id of Object.values(L)) {
       ['a helper written below draw()', 'pass', helperBelow],
       ['a helper written above draw()', 'pass', helperAbove],
       ['optional chaining', 'pass', edit(S, 'chime.play();', 'chime?.play();')],
-      ['the loop moved into update() (5.2.21)', 'pass', { 'script.js': src.replace(loop, '') + nl + 'function update() {' + nl + loop + '}' + nl }],
+      ['the loop moved into update() (5.2.28)', 'pass', { 'script.js': src.replace(loop, '') + nl + 'function update() {' + nl + loop + '}' + nl }],
       ['play straight in draw()', 'r2', edit(edit(S, hit, noPlay), "  background('#222');", "  background('#222');" + nl + '  chime.play();')],
       ['play in the loop, after the if', 'r2', edit(edit(S, hit, noPlay), mem, mem + nl + '    chime.play();')],
       ['play under if (touching) alone', 'r2', edit(S, hit, noPlay + nl + '    if (touching) chime.play();')],

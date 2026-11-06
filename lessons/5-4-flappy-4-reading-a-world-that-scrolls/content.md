@@ -24,7 +24,7 @@ bird.x = 100;     // the bird's x never changes
 bird.vel.x = 0;   // and nothing gives it a sideways speed
 ```
 
-**New pipes on a timer.** `frameCount` counts frames since the game started, as 5.2.1 showed. The remainder operator `%` turns it into a repeating beat:
+**New pipes on a timer.** `frameCount` counts frames since the game started, as 5.2.2 showed. The remainder operator `%` turns it into a repeating beat:
 
 ```js
 if (frameCount % 90 === 0) {

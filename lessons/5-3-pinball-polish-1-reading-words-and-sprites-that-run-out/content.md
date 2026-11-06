@@ -53,7 +53,7 @@ function draw() {
 
 **What you'll see:** the brown box turns slowly, and the 5 on it stays upright. The gold ball says BONUS in small black letters.
 
-**A sprite can run out.** Set `.life` to a number and the sprite counts down by one every frame. When it reaches 0, moSHion deletes it, the same as calling `.delete()` on it (5.2.15). `draw()` runs about 60 times a second, so:
+**A sprite can run out.** Set `.life` to a number and the sprite counts down by one every frame. When it reaches 0, moSHion deletes it, the same as calling `.delete()` on it (5.2.21). `draw()` runs about 60 times a second, so:
 
 ```js
 spark.life = 60;   // gone about one second from now
@@ -65,7 +65,7 @@ spark.life = 60;   // gone about one second from now
 
 **When is it fine to make a sprite in `draw()`?** In 5.1 the bug was a `new Sprite(...)` straight inside `draw()`: it made a new sprite on every frame, 60 a second. A sprite made inside an `if` that is true on **one frame only** is different. A key press (`kb.presses`) or the frame a hit starts (`touching && !wasTouching`, 5.4.4) makes exactly one sprite each time it happens. Give that sprite a `.life`, and it goes away by itself, so they never pile up.
 
-**Try it:** each press of the space bar makes one orange spark at a random spot (`random` from 5.2.1). Each one lives for 60 frames, about one second.
+**Try it:** each press of the space bar makes one orange spark at a random spot (`random` from 5.2.2). Each one lives for 60 frames, about one second.
 
 ```js live
 function setup() {
@@ -80,7 +80,7 @@ function draw() {
 
   if (kb.presses(' ')) {
     const spark = new Sprite(random(40, 360), random(70, 210), 30);
-    spark.collider = 'none';   // nothing bumps into it (5.2.16)
+    spark.collider = 'none';   // nothing bumps into it (5.2.22)
     spark.color = 'orange';
     spark.text = 'hi';
     spark.textColor = 'black';

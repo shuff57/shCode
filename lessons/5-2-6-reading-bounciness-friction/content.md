@@ -1,6 +1,6 @@
 ## Bounciness and Friction
 
-**Read before `5.2.12 Bouncy Ball`.**
+**Read before `5.2.16 Bouncy Ball`.**
 
 **What you'll learn from it:**
 

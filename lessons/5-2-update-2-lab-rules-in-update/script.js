@@ -1,5 +1,5 @@
-// 5.2.22 Lab: Rules in update(), picture in draw().
-// The jump scene from 5.2.10, with everything in draw(). Split it in two.
+// 5.2.29 Lab: Rules in update(), picture in draw().
+// The jump scene from 5.2.13, with everything in draw(). Split it in two.
 
 let player, ground;
 

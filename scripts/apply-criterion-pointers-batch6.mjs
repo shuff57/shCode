@@ -19,10 +19,10 @@ const POINTERS = {
   '1-1-11-name-that-umbrella': { target: '1.1.10', note: 'Umbrella Activities' },
 
   // --- 6.3.9 Space Jumper: gravity, then the module's own input material --
-  '6-3-9-a14-1-space-jumper': { target: '5.2.6', note: 'Gravity' },
+  '6-3-9-a14-1-space-jumper': { target: '5.2.8', note: 'Gravity' },
 
   // --- 6.3.10 Car on a Ramp: same gravity reading -------------------------
-  '6-3-10-a14-2-car-ramp': { target: '5.2.6', note: 'Gravity' },
+  '6-3-10-a14-2-car-ramp': { target: '5.2.8', note: 'Gravity' },
 };
 
 // Per-CRITERION overrides. Key is "<folder>\u0000<title substring>"; longest

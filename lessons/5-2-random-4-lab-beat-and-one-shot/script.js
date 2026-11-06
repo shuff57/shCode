@@ -1,4 +1,4 @@
-// 5.2.4 Lab: A beat and a one-shot.
+// 5.2.5 Lab: A beat and a one-shot.
 
 let lamp;
 let on = false;
@@ -6,7 +6,7 @@ let message = '';
 
 function setup() {
   new Canvas(400, 300);
-  world.gravity.y = 0; // no falling: sprites stay where they are put (gravity is 5.2.6)
+  world.gravity.y = 0; // no falling: sprites stay where they are put (gravity is 5.2.8)
 
   lamp = new Sprite(200, 160, 100, 100);
   lamp.color = 'gray';

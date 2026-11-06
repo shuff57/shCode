@@ -58,7 +58,7 @@ The Group's own size wins over the tile size, which is why the coins are small c
 
 **`Tiles` gives back a Group.** The result holds every tile it made, so `level.length` counts them and **`level.delete()` removes the whole level in one call**. A tile that is deleted on its own, such as a coin the player picked up, leaves the group. You will use `level.delete()` in 6.14.8 to clear a level before building the next.
 
-**Seen from above, nothing falls.** This maze is a top-down view, so gravity stays off. 5.2.6 set `world.gravity.y` to 10; here it is 0, where every world starts, and the setup writes it out so a reader can see that nothing falls:
+**Seen from above, nothing falls.** This maze is a top-down view, so gravity stays off. 5.2.8 set `world.gravity.y` to 10; here it is 0, where every world starts, and the setup writes it out so a reader can see that nothing falls:
 
 ```js
 world.gravity.y = 0;

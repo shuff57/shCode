@@ -1,0 +1,22 @@
+{
+  "id": "5-2-video-random",
+  "title": "5.2.1 Video: Random Numbers and Timers",
+  "description": "random(6) gives a decimal, floor makes it whole, and frameCount with % makes a beat. A 3-minute walkthrough of the next reading.",
+  "type": "lesson",
+  "estimateMins": 3,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.2 Physics Feel",
+  "preview": "video",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "videoUrl": "/videos/5-2-random/index.html",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

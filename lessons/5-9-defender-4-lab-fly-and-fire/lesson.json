@@ -24,7 +24,7 @@
     {
       "id": "s2",
       "title": "Fire on a cooldown",
-      "instructions": "In `fire()`, first count `cooldown` down: take 1 off it while it is above 0. Then, when Space is held **and** `cooldown` is 0, build a shot: a 6 by 14 sprite at `(ship.x, ship.y - 18)` with `collider = 'none'` (so it passes through things, as in 5.2.17) and the colour `'yellow'`. Push it onto `bullets`, then set `cooldown` to 12 so the next shot has to wait 12 frames. Hold Space: the shots should come about five a second, evenly spaced.",
+      "instructions": "In `fire()`, first count `cooldown` down: take 1 off it while it is above 0. Then, when Space is held **and** `cooldown` is 0, build a shot: a 6 by 14 sprite at `(ship.x, ship.y - 18)` with `collider = 'none'` (so it passes through things, as in 5.2.23) and the colour `'yellow'`. Push it onto `bullets`, then set `cooldown` to 12 so the next shot has to wait 12 frames. Hold Space: the shots should come about five a second, evenly spaced.",
       "hints": [
         "`if (cooldown > 0) cooldown -= 1;` is the countdown, from 7.4.2. Leave out the `if` and `cooldown` runs on below 0, so `cooldown === 0` is never true again and the ship cannot fire.",
         "`if (kb.pressing('space') && cooldown === 0) { ... }` is the test, from 7.4.3. The sprite, the push and `cooldown = 12;` all go inside its braces."

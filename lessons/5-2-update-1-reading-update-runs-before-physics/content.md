@@ -1,6 +1,6 @@
 ## `update()` runs before physics
 
-**Read before `5.2.22 Lab: Rules in update(), picture in draw()`.** About 8 minutes.
+**Read before `5.2.29 Lab: Rules in update(), picture in draw()`.** About 8 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -41,9 +41,9 @@ function draw() {
 }
 ```
 
-**What you'll see:** six lines, in this order: `frame 1: update`, `frame 1: draw`, `frame 2: update`, `frame 2: draw`, `frame 3: update`, `frame 3: draw`. Both run on every frame, and `update()` always comes first. (`frameCount` is the frame number from 5.2.1.)
+**What you'll see:** six lines, in this order: `frame 1: update`, `frame 1: draw`, `frame 2: update`, `frame 2: draw`, `frame 3: update`, `frame 3: draw`. Both run on every frame, and `update()` always comes first. (`frameCount` is the frame number from 5.2.2.)
 
-**Try it: the jump scene, split in two.** This is the jump from 5.2.10. The keys, the movement and the jump now live in `update()`; `draw()` keeps only the picture.
+**Try it: the jump scene, split in two.** This is the jump from 5.2.13. The keys, the movement and the jump now live in `update()`; `draw()` keeps only the picture.
 
 ```js live
 let player, ground;
@@ -79,12 +79,12 @@ function draw() {
 }
 ```
 
-Click the canvas first so it hears your keys (5.1.13). It plays exactly like the 5.2.10 version. Nothing new happens on the screen: the same lines simply moved to the function that runs before physics.
+Click the canvas first so it hears your keys (5.1.13). It plays exactly like the 5.2.13 version. Nothing new happens on the screen: the same lines simply moved to the function that runs before physics.
 
 **Four things that stay true:**
 
 - **`background()` stays in `draw()`.** `update()` runs before `draw()`, so the `background()` at the top of `draw()` paints over anything `update()` drew.
-- **`kb.presses()` works the same in both.** A key that goes down is "pressed" for that whole frame, and `update()` and `draw()` both run in it, so either one sees the press once (5.2.9).
+- **`kb.presses()` works the same in both.** A key that goes down is "pressed" for that whole frame, and `update()` and `draw()` both run in it, so either one sees the press once (5.2.12).
 - **The variables at the top are shared.** `player` is made with `let` at the top and set in `setup()`, so `update()` can reach it, exactly as `draw()` always could (5.1.8).
 - **Spell it exactly.** moSHion finds the function by its name: `update`, all lower case, written `function update() { ... }` like `setup` and `draw`. `Update` or `updates` is just a function nobody calls, and it never runs.
 

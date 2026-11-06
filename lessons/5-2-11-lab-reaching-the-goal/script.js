@@ -1,4 +1,4 @@
-// 5.2.17 Lab: Reaching the Goal: a single-fire win check with delete().
+// 5.2.23 Lab: Reaching the Goal: a single-fire win check with delete().
 // Move with a and d, jump with the space bar while standing on the ground.
 
 let player, ground, goal, leftWall, rightWall;
@@ -45,7 +45,7 @@ function draw() {
 
   // STEP 2: Inside it, work out the distance from the player to the goal:
   //         dx = player.x - goal.x, dy = player.y - goal.y, then the
-  //         square root of dx * dx + dy * dy (as in 5.2.16).
+  //         square root of dx * dx + dy * dy (as in 5.2.22).
 
   // STEP 3: Still inside it, when the distance is less than 25, log a win
   //         message, call goal.delete(), and set goal to null so the check

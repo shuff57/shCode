@@ -1,0 +1,22 @@
+{
+  "id": "5-2-video-forces",
+  "title": "5.2.17 Video: Forces vs Velocity Explained",
+  "description": "Setting .vel overwrites motion, applyForce adds to it, and mass changes how far a force moves a sprite. A 2-and-a-half-minute walkthrough of the next reading.",
+  "type": "lesson",
+  "estimateMins": 3,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.2 Physics Feel",
+  "preview": "video",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "videoUrl": "/videos/5-2-forces/index.html",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

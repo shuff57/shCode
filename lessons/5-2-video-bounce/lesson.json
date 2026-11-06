@@ -1,0 +1,22 @@
+{
+  "id": "5-2-video-bounce",
+  "title": "5.2.14 Video: Bounciness and Friction Explained",
+  "description": "Bounciness from 0 to 1, friction as a slide distance, and how two sprites combine them. A 3-minute walkthrough of the next reading.",
+  "type": "lesson",
+  "estimateMins": 3,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.2 Physics Feel",
+  "preview": "video",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "videoUrl": "/videos/5-2-bounce/index.html",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

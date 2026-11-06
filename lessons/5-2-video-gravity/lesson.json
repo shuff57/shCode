@@ -1,0 +1,22 @@
+{
+  "id": "5-2-video-gravity",
+  "title": "5.2.7 Video: Gravity Explained",
+  "description": "Why nothing fell in 5.1: world.gravity.y, and dynamic versus static sprites. A 2-and-a-half-minute walkthrough of the next reading.",
+  "type": "lesson",
+  "estimateMins": 3,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.2 Physics Feel",
+  "preview": "video",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "videoUrl": "/videos/5-2-gravity/index.html",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

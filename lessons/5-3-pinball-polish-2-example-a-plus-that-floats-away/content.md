@@ -94,7 +94,7 @@ function draw() {
 The popup is eight lines, and every one of them is inside the `if (touching && !b.wasTouching)` block, next to `score += b.worth;`. That `if` is true on one frame per hit (5.4.4), so each hit makes exactly one popup. Line by line:
 
 - `const pop = new Sprite(b.x, b.y - 24, 28);` makes a small circle 24 pixels above the middle of the bumper that was hit. It is a `const` inside the `if` because nothing outside this block ever needs to name it again: once it is made, it moves and removes itself.
-- `pop.collider = 'none';` lets the ball pass straight through it (5.2.16). moSHion also switches gravity off for a sprite whose collider is `'none'`, so it floats instead of falling.
+- `pop.collider = 'none';` lets the ball pass straight through it (5.2.22). moSHion also switches gravity off for a sprite whose collider is `'none'`, so it floats instead of falling.
 - `pop.text = '+' + b.worth;` joins the `+` sign to the bumper's worth, the same `+` as `'score: ' + score`, so it reads `+2` or `+5`. `.textColor` and `.textSize` make it black and a little smaller, to fit the circle.
 - `pop.vel.y = -1;` moves it 1 pixel up on every frame (`vel` is from 5.1.15; a negative `y` is up).
 - `pop.life = 40;` deletes it 40 frames later, after it has risen 40 pixels, about two-thirds of a second.

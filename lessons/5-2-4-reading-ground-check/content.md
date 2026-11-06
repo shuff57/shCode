@@ -1,6 +1,6 @@
 ## Ground-Gated Actions
 
-**Read before `5.2.10 Lab: Add a Jump`.**
+**Read before `5.2.13 Lab: Add a Jump`.**
 
 **What you'll learn from it:**
 

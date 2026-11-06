@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "A catch that never sounds the same",
-      "instructions": "The starter is your 6.15.4 game. Catch a few stars and listen: the same chime, exactly the same, every time. Games vary a sound a little each time it plays so the ear does not tire of it, and `.rate` is the cheapest way, because it changes speed and pitch together (6.15.1). `random(min, max)` gives a different number between `min` and `max` every time it is asked (5.2.1).\n\nIn the catch block, on the line before `chime.play();`, give the chime a new random rate:\n\n```js\nchime.rate = random(0.8, 1.25);\n```\n\nThe line runs once for each catch and asks for a new number each time, so each chime is a little higher or lower than the last. Run it and catch a few.",
+      "instructions": "The starter is your 6.15.4 game. Catch a few stars and listen: the same chime, exactly the same, every time. Games vary a sound a little each time it plays so the ear does not tire of it, and `.rate` is the cheapest way, because it changes speed and pitch together (6.15.1). `random(min, max)` gives a different number between `min` and `max` every time it is asked (5.2.2).\n\nIn the catch block, on the line before `chime.play();`, give the chime a new random rate:\n\n```js\nchime.rate = random(0.8, 1.25);\n```\n\nThe line runs once for each catch and asks for a new number each time, so each chime is a little higher or lower than the last. Run it and catch a few.",
       "hints": [
         "The rate line goes just before `chime.play();`, inside the catch block, so it runs once for each catch.",
         "In setup() it would be asked only once, and every chime would sound the same again."
@@ -25,7 +25,7 @@
     {
       "id": "s2",
       "title": "A miss picked from a list",
-      "instructions": "The other way to vary a sound is to have several and pick one. The course has two sound files, so the three here are the coin file at three speeds; with more files you would load a different file into each. Three changes, each where a STEP 2 line is. Make all three before you press Run: until the third is done, the miss block still says `thud.play();` when there is no `thud` any more, and the first miss stops the game with a red error that names `thud`.\n\n1. At the top, `let chime, thud;` becomes `let chime, thuds;`.\n2. In `setup()`, the two `thud` lines become a list of three sounds, each given its own rate:\n\n```js\nthuds = [\n  loadSound('/moshion/assets/coin.wav'),\n  loadSound('/moshion/assets/coin.wav'),\n  loadSound('/moshion/assets/coin.wav'),\n];\nthuds[0].rate = 0.4;\nthuds[1].rate = 0.5;\nthuds[2].rate = 0.6;\n```\n\n3. In the miss block, `thud.play();` becomes a random pick from the list, the way 5.2.1 picked a random colour:\n\n```js\nconst pick = floor(random(thuds.length));\nthuds[pick].play();\n```\n\n`thuds.length` is 3, so `floor(random(3))` is 0, 1 or 2: exactly the three positions. Run it and miss a few on purpose.",
+      "instructions": "The other way to vary a sound is to have several and pick one. The course has two sound files, so the three here are the coin file at three speeds; with more files you would load a different file into each. Three changes, each where a STEP 2 line is. Make all three before you press Run: until the third is done, the miss block still says `thud.play();` when there is no `thud` any more, and the first miss stops the game with a red error that names `thud`.\n\n1. At the top, `let chime, thud;` becomes `let chime, thuds;`.\n2. In `setup()`, the two `thud` lines become a list of three sounds, each given its own rate:\n\n```js\nthuds = [\n  loadSound('/moshion/assets/coin.wav'),\n  loadSound('/moshion/assets/coin.wav'),\n  loadSound('/moshion/assets/coin.wav'),\n];\nthuds[0].rate = 0.4;\nthuds[1].rate = 0.5;\nthuds[2].rate = 0.6;\n```\n\n3. In the miss block, `thud.play();` becomes a random pick from the list, the way 5.2.2 picked a random colour:\n\n```js\nconst pick = floor(random(thuds.length));\nthuds[pick].play();\n```\n\n`thuds.length` is 3, so `floor(random(3))` is 0, 1 or 2: exactly the three positions. Run it and miss a few on purpose.",
       "hints": [
         "`random(3)` alone gives a decimal like 1.7, and `thuds[1.7]` is not a position. `floor` makes it a whole number.",
         "The pick goes inside the miss block, so a new one is made for each miss."
@@ -36,7 +36,7 @@
     {
       "id": "r1",
       "title": "Each catch has a random pitch",
-      "description": "A sound's .rate is set from random(...) (straight away, or from a variable that holds the random number) right before (or right after) its .play(), in the same block, so every play asks for a new pitch. Help: 5.2.1 (Reading: Random numbers and timers)",
+      "description": "A sound's .rate is set from random(...) (straight away, or from a variable that holds the random number) right before (or right after) its .play(), in the same block, so every play asks for a new pitch. Help: 5.2.2 (Reading: Random numbers and timers)",
       "hint": "chime.rate = random(0.8, 1.25); on the line before chime.play();",
       "file": "script.js",
       "flags": "",
@@ -49,7 +49,7 @@
     {
       "id": "r2",
       "title": "A miss plays one of several sounds",
-      "description": "Several sounds sit in a list, and an if block plays the one at a random position, a whole number made with floor and random as in 5.2.1. One line or two, and any names, all work. Help: 5.2.1 (Reading: Random numbers and timers)",
+      "description": "Several sounds sit in a list, and an if block plays the one at a random position, a whole number made with floor and random as in 5.2.2. One line or two, and any names, all work. Help: 5.2.2 (Reading: Random numbers and timers)",
       "hint": "const pick = floor(random(thuds.length)); then thuds[pick].play(); inside the miss block.",
       "file": "script.js",
       "flags": "",

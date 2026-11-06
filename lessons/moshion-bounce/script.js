@@ -1,10 +1,10 @@
-// 5.2.12 Bouncy Ball: build a closed box and drop a ball in it.
+// 5.2.16 Bouncy Ball: build a closed box and drop a ball in it.
 
 let ball;
 
 function setup() {
   new Canvas(400, 400);
-  world.gravity.y = 10; // gravity pulls down the screen (5.2.6)
+  world.gravity.y = 10; // gravity pulls down the screen (5.2.8)
 
   // STEP 1: Build four static walls: top, bottom, left and right, so the
   //         ball cannot escape. Each is a long thin static sprite; give

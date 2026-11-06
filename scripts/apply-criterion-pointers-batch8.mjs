@@ -22,11 +22,11 @@ const POINTERS = {
   '3-6-16-lab-capstone': { target: '3.6.10', note: 'Defensive Copying: [...] and {...}' },
 
   // --- 5.2 module: ground gating, forces, cleanup ------------------------
-  '5-2-5-lab-add-a-jump': { target: '5.2.9', note: 'Ground-Gated Actions' },
-  'moshion-bounce': { target: '5.2.11', note: 'Bounciness and Friction' },
-  '5-2-9-lab-wind-zone': { target: '5.2.13', note: 'Forces vs Velocity' },
-  '5-2-11-lab-reaching-the-goal': { target: '5.2.15', note: 'Cleanup and Delete' },
-  '5-2-13-a5-2-1-pinball-scene': { target: '5.2.11', note: 'Bounciness and Friction' },
+  '5-2-5-lab-add-a-jump': { target: '5.2.12', note: 'Ground-Gated Actions' },
+  'moshion-bounce': { target: '5.2.15', note: 'Bounciness and Friction' },
+  '5-2-9-lab-wind-zone': { target: '5.2.18', note: 'Forces vs Velocity' },
+  '5-2-11-lab-reaching-the-goal': { target: '5.2.21', note: 'Cleanup and Delete' },
+  '5-2-13-a5-2-1-pinball-scene': { target: '5.2.15', note: 'Bounciness and Friction' },
   '5-2-15-challenges': { target: '5.1.5', note: 'Canvas: new Canvas(w, h)' },
 
   // --- 5.4 module: methods on a class ------------------------------------
@@ -35,7 +35,7 @@ const POINTERS = {
   '5-3-19-lab-method-returns': { target: '5.4.1', note: 'Methods: functions that live on a class' },
   '5-3-20-lab-method-calls-method': { target: '5.4.1', note: 'Methods: functions that live on a class' },
   '5-3-22-lab-mutate-sprite-prop': { target: '5.4.7', note: 'Why this.sprite, not extends Sprite' },
-  '5-3-23-lab-cleanup': { target: '5.2.15', note: 'Cleanup and Delete' },
+  '5-3-23-lab-cleanup': { target: '5.2.21', note: 'Cleanup and Delete' },
   '5-3-25-lab-three-vars': { target: '5.3.3', note: 'Class and instance' },
   '5-3-26-lab-array-of-instances': { target: '5.4.1', note: 'Methods: functions that live on a class' },
   '5-3-27-lab-loop-instances': { target: '5.4.1', note: 'Methods: functions that live on a class' },
@@ -71,13 +71,13 @@ const PER_CRITERION = {
     { target: '3.6.9', note: 'Side Effects and Copies' },
 
   '5-2-5-lab-add-a-jump\u0000Launch the player upward':
-    { target: '5.2.6', note: 'Gravity' },
+    { target: '5.2.8', note: 'Gravity' },
   '5-2-5-lab-add-a-jump\u0000Combine both checks with &&':
     { target: '2.1.29', note: 'Logical Operators: && || !' },
   '5-2-9-lab-wind-zone\u0000Only apply the force inside a zone':
     { target: '2.1.3', note: 'If / Else if / Else' },
   '5-2-13-a5-2-1-pinball-scene\u0000Turn on gravity':
-    { target: '5.2.6', note: 'Gravity' },
+    { target: '5.2.8', note: 'Gravity' },
   '5-2-15-challenges\u0000Build a scene with two goals':
     { target: '5.1.6', note: 'Sprite: new Sprite(x, y, w, h) + .color' },
 

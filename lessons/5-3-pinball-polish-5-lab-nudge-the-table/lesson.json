@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "A held key pushes the ball",
-      "instructions": "Run the starter first: it is your table from 5.7.4, with labels and popups. Now let the player nudge the ball while it rolls.\n\n`applyForce` (5.2.13) pushes a sprite and adds to the way it is already moving. It pushes only on the frames it runs, so it goes under `kb.pressing` (5.1.13), which is true on every frame a key is held. In `draw()`, where the STEP 1 comment is, add:\n\n```js\nif (kb.pressing('left')) ball.applyForce(-5, 0);\nif (kb.pressing('right')) ball.applyForce(5, 0);\n```\n\nRun it, click the game, press R and hold an arrow while the ball rolls. With the ball's own weight, about 0.4, the push throws it across the table.\n\nUse `applyForce`, not `ball.vel.x += ...`: changing the velocity ignores the ball's mass (5.2.13), so step 2 would change nothing.",
+      "instructions": "Run the starter first: it is your table from 5.7.4, with labels and popups. Now let the player nudge the ball while it rolls.\n\n`applyForce` (5.2.18) pushes a sprite and adds to the way it is already moving. It pushes only on the frames it runs, so it goes under `kb.pressing` (5.1.13), which is true on every frame a key is held. In `draw()`, where the STEP 1 comment is, add:\n\n```js\nif (kb.pressing('left')) ball.applyForce(-5, 0);\nif (kb.pressing('right')) ball.applyForce(5, 0);\n```\n\nRun it, click the game, press R and hold an arrow while the ball rolls. With the ball's own weight, about 0.4, the push throws it across the table.\n\nUse `applyForce`, not `ball.vel.x += ...`: changing the velocity ignores the ball's mass (5.2.18), so step 2 would change nothing.",
       "hints": [
         "kb.presses is true for one frame only, so a push under it lasts one frame and you barely see it. Use kb.pressing.",
         "Any keys work, and so do braces: if (kb.pressing('right')) { ball.applyForce(5, 0); }"
@@ -51,7 +51,7 @@
     {
       "id": "r1",
       "title": "A held key pushes the ball",
-      "description": "applyForce(...) on the ball (or any sprite) runs inside an if that reads kb.pressing(...): any key, two keys, braces, or a helper that if calls; or the keys set a direction and one applyForce(...) uses it. Changing vel.x does not count: velocity ignores mass, so the weight in step 2 would change nothing. Help: 5.2.13 (Reading: Forces vs Velocity)",
+      "description": "applyForce(...) on the ball (or any sprite) runs inside an if that reads kb.pressing(...): any key, two keys, braces, or a helper that if calls; or the keys set a direction and one applyForce(...) uses it. Changing vel.x does not count: velocity ignores mass, so the weight in step 2 would change nothing. Help: 5.2.18 (Reading: Forces vs Velocity)",
       "hint": "In draw(), write if (kb.pressing('right')) ball.applyForce(5, 0); and the same for 'left' with -5.",
       "type": "regex",
       "file": "script.js",
@@ -101,7 +101,7 @@
       {
         "id": "r1",
         "title": "A held key pushes the ball",
-        "description": "applyForce(...) on the ball (or another sprite) runs only while a key is held: inside an if on kb.pressing(...), any key or keys, braces or not, or in a helper that if calls; the keys setting a direction variable that one applyForce(...) then uses also counts. Not met: no applyForce, applyForce that runs every frame with no key, applyForce only under kb.presses (one frame), or the push done by changing vel.x instead. Help: 5.2.13 (Reading: Forces vs Velocity)",
+        "description": "applyForce(...) on the ball (or another sprite) runs only while a key is held: inside an if on kb.pressing(...), any key or keys, braces or not, or in a helper that if calls; the keys setting a direction variable that one applyForce(...) then uses also counts. Not met: no applyForce, applyForce that runs every frame with no key, applyForce only under kb.presses (one frame), or the push done by changing vel.x instead. Help: 5.2.18 (Reading: Forces vs Velocity)",
         "points": 1
       },
       {

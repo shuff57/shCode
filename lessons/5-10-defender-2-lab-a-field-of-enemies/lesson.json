@@ -43,7 +43,7 @@
     {
       "id": "r1",
       "title": "spawnEnemy builds a pass-through sprite",
-      "description": "spawnEnemy makes a new sprite and sets its collider to 'none', so shots and enemies pass through each other. Help: 5.2.17 (Lab: Reaching the Goal)",
+      "description": "spawnEnemy makes a new sprite and sets its collider to 'none', so shots and enemies pass through each other. Help: 5.2.23 (Lab: Reaching the Goal)",
       "type": "inFunction",
       "function": "spawnEnemy",
       "file": "script.js",

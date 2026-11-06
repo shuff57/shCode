@@ -42,7 +42,7 @@ for (let i = bullets.length - 1; i >= 0; i--) {
 }
 ```
 
-**The drone goes back to the top.** A hit drone does not vanish; it is sent back above the top of the screen at a random `x`, using `random(a, b)` from 5.2.1, and falls again:
+**The drone goes back to the top.** A hit drone does not vanish; it is sent back above the top of the screen at a random `x`, using `random(a, b)` from 5.2.2, and falls again:
 
 ```js
 function resetDrone() {

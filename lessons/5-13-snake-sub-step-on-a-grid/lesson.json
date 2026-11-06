@@ -39,7 +39,7 @@
     {
       "id": "r1",
       "title": "It steps on a beat",
-      "description": "A timer (every or after) moves the block, not draw() every frame. Help: 5.2.1 (Reading: Random numbers and timers)",
+      "description": "A timer (every or after) moves the block, not draw() every frame. Help: 5.2.2 (Reading: Random numbers and timers)",
       "hint": "every(12, () => { x += CELL; });",
       "type": "regex",
       "file": "script.js",

@@ -1,6 +1,6 @@
 {
   "id": "5-2-5-lab-add-a-jump",
-  "title": "5.2.10 Lab: Add a Jump",
+  "title": "5.2.13 Lab: Add a Jump",
   "description": "Gate a jump on a key press and a ground check. Auto-graded.",
   "type": "lesson",
   "estimateMins": 20,
@@ -36,7 +36,7 @@
     {
       "id": "r2",
       "title": "Check that the player is on the ground",
-      "description": "Somewhere in the sketch, the player is checked against another sprite with .colliding(...). Help: 5.2.9 (Ground-Gated Actions)",
+      "description": "Somewhere in the sketch, the player is checked against another sprite with .colliding(...). Help: 5.2.12 (Ground-Gated Actions)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.colliding\\s*\\(",
@@ -77,7 +77,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.10 Lab: Add a Jump\". The task they were given: In draw(), make the player jump: when the jump key is pressed (an edge-triggered check that fires once per press) AND the player is touching the ground, set the player's vertical velocity to a negative number so it launches upward. What the starter file already had: gravity at 10, a player moved with a and d, a static ground, and a comment where the jump goes. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: kb.presses(key) is true only on the one frame a key goes down (edge-triggered); kb.pressing(key) is true on every frame it is held. ' ' and 'space' both name the space bar, and any key is fine for the jump. a.colliding(b) is truthy while the two sprites touch (0 while they are apart, a count of frames while they touch), and either sprite can ask about the other. y grows downward, so a negative vel.y moves up. && is true only when both sides are true. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.13 Lab: Add a Jump\". The task they were given: In draw(), make the player jump: when the jump key is pressed (an edge-triggered check that fires once per press) AND the player is touching the ground, set the player's vertical velocity to a negative number so it launches upward. What the starter file already had: gravity at 10, a player moved with a and d, a static ground, and a comment where the jump goes. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: kb.presses(key) is true only on the one frame a key goes down (edge-triggered); kb.pressing(key) is true on every frame it is held. ' ' and 'space' both name the space bar, and any key is fine for the jump. a.colliding(b) is truthy while the two sprites touch (0 while they are apart, a count of frames while they touch), and either sprite can ask about the other. y grows downward, so a negative vel.y moves up. && is true only when both sides are true. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
     "rubric": [
       {
         "id": "r1",
@@ -88,7 +88,7 @@
       {
         "id": "r2",
         "title": "Check that the player is on the ground",
-        "description": "The player is checked against the ground with .colliding(...), asked either way round (the player about the ground, or the ground about the player). Any other honest test that is only true while the player stands on the ground also counts. Help: 5.2.9 (Ground-Gated Actions)",
+        "description": "The player is checked against the ground with .colliding(...), asked either way round (the player about the ground, or the ground about the player). Any other honest test that is only true while the player stands on the ground also counts. Help: 5.2.12 (Ground-Gated Actions)",
         "points": 1
       },
       {

@@ -1,0 +1,22 @@
+{
+  "id": "5-2-video-delete",
+  "title": "5.2.20 Video: Delete and Hide Explained",
+  "description": "a.delete() versus b.visible = false: what stops, what keeps running, and when to use which. A 2-minute walkthrough of the next reading.",
+  "type": "lesson",
+  "estimateMins": 3,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.2 Physics Feel",
+  "preview": "video",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "videoUrl": "/videos/5-2-delete/index.html",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

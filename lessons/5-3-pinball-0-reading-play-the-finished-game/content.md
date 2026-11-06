@@ -4,10 +4,10 @@
 
 By the end of this you should be able to answer:
 
-- What does a finished pinball game have that your 5.2.18 scene does not?
+- What does a finished pinball game have that your 5.2.24 scene does not?
 - Which of those parts do you build in the next seven modules (5.3 to 5.9)?
 
-In 5.2.18 you built a pinball scene: gravity, things to bounce off, a bouncy ball. The next seven modules turn that scene into a game. Before you start, play the game you are building towards.
+In 5.2.24 you built a pinball scene: gravity, things to bounce off, a bouncy ball. The next seven modules turn that scene into a game. Before you start, play the game you are building towards.
 
 **Try it:** click the game once so it hears your keys, then press ENTER.
 

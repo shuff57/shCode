@@ -1,7 +1,7 @@
 {
   "id": "5-2-2-reading-gravity",
-  "title": "5.2.6 Reading: Gravity",
-  "description": "world.gravity.y and dynamic vs static sprites, with a 2-and-a-half-minute explainer. Read before 5.2.8 Lab: Tune Gravity.",
+  "title": "5.2.8 Reading: Gravity",
+  "description": "world.gravity.y and dynamic vs static sprites. Read before 5.2.10 Lab: Tune Gravity.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -13,7 +13,6 @@
   ],
   "externalLink": "/docs/moshion",
   "externalLinkLabel": "Open the in-app moSHion docs",
-  "videoUrl": "/videos/5-2-gravity/index.html",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

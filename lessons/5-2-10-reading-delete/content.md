@@ -1,6 +1,6 @@
 ## Cleanup and Delete
 
-**Read before `5.2.16 Worked Example: The Finished Scene`.**
+**Read before `5.2.22 Worked Example: The Finished Scene`.**
 
 **What you'll learn from it:**
 
