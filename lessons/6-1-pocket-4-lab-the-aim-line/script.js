@@ -5,10 +5,9 @@ function setup() {
   new Canvas(400, 400);
   world.gravity.y = 0;
   cue = new Sprite(200, 200, 22);
-  cue.collider = 'none';
+  cue.collider = 'dynamic';
   cue.color = 'white';
-  const wall = new Walls();
-  wall.color = 'brown';
+  // STEP: the four rails, after the canvas.
 }
 
 function draw() {

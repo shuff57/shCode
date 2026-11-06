@@ -37,7 +37,11 @@
     {
       "id": "s4",
       "title": "R starts again",
-      "instructions": "R rebuilds the wall, empties the shots and resets the count. Put the rebuild in a `startRound()` so R and setup share it."
+      "instructions": "Call `startRound()` on R. Read it first: it deletes every old block and stone, empties both arrays, rebuilds the wall and resets the count, so R and setup share one reset. If a reset only adds, the second round starts with two walls.",
+      "hints": [
+        "`if (kb.presses('r')) startRound();`",
+        "A reset that pushes without clearing doubles the wall. Clear first, then rebuild."
+      ]
     }
   ],
   "requirements": [
@@ -76,7 +80,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch for \"Lab: Five shots, win or lose\". The task: give the player five shots, spend one per launch, win when the blocks are gone, lose when the shots are gone and none are flying, and let R start the round again. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Five shots, win or lose\". The task: give the player five shots, spend one per launch, win when the blocks are gone, lose when the shots are gone and none are flying, and let R call startRound() so the round starts clean. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. A reset that pushes new blocks without deleting the old ones, or without emptying shots, is not a clean restart. Short, plain notes for a 14-year-old; never write corrected code.",
     "rubric": [
       {
         "id": "r1",
@@ -88,6 +92,12 @@
         "id": "r2",
         "title": "Both endings",
         "description": "Win on no blocks; lose on no shots and none in the air.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A clean restart",
+        "description": "R calls startRound(), which clears the old blocks and shots before it rebuilds.",
         "points": 1
       }
     ]

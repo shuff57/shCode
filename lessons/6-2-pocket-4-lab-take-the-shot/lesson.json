@@ -15,7 +15,10 @@
     {
       "id": "s1",
       "title": "Run it",
-      "instructions": "The table and the rails are there. The ball does not move."
+      "instructions": "The table and the rails are there. The ball does not move.",
+      "hints": [
+        "The rails are the `walls` object you built in 6.1.4: four static edges in one line, just outside the canvas."
+      ]
     },
     {
       "id": "s2",

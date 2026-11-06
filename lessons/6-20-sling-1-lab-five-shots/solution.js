@@ -14,6 +14,10 @@ function setup() {
 }
 
 function startRound() {
+  for (const b of blocks) b.delete();
+  for (const s of shots) s.delete();
+  blocks = [];
+  shots = [];
   for (let i = 0; i < 3; i++) {
     const b = new Sprite(300, 250 - i * 44, 44, 40);
     b.color = 'saddlebrown';

@@ -5,11 +5,10 @@ function setup() {
   new Canvas(400, 400);
   world.gravity.y = 0;
   cue = new Sprite(200, 200, 22);
-  cue.collider = 'none';
+  cue.collider = 'dynamic';
   cue.color = 'white';
-  const wall = new Walls();
-  wall.color = 'brown';
-  cue.drag = 0.02;
+  const walls = new Walls();
+  cue.drag = 1;
 }
 
 function draw() {

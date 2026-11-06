@@ -9,7 +9,7 @@ function setup() {
   cue.color = 'white';
   cue.speed = 6;
   cue.direction = 20;
-  cue.drag = 0.02;
+  cue.drag = 1;
 }
 
 function draw() {

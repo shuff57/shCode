@@ -1,7 +1,7 @@
 {
   "id": "5-17-build-your-own",
   "title": "5.17.1 Build your own: a small game",
-  "description": "Your game, not ours. Five things it must do, drawn from everything in this unit, and one rule: it cannot be one of the four games you already built.",
+  "description": "Your game, not ours. Five things it must do, drawn from everything in this unit, and one rule: it cannot be one of the three games you already built.",
   "type": "project",
   "estimateMins": 60,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Pitch it in README.md",
-      "instructions": "Before any code, write two sentences in README.md: what the player does, and what winning and losing mean. Then say which game you are NOT rebuilding. If you combine two of Pinball, Flappy, Snake and Pocket, name both and say what the combination changes. \"Snake but with a gun\" is not a combination; \"Snake's grid and Pocket's aim, where you aim the snake\" is.",
+      "instructions": "Before any code, write two sentences in README.md: what the player does, and what winning and losing mean. Then say which game you are NOT rebuilding. If you combine two of Pinball, Flappy and Snake, name both and say what the combination changes. \"Snake but with a gun\" is not a combination; \"Pinball's bumpers and Snake's grid, where the snake scores by hitting bumpers\" is.",
       "hints": [
         "A game you can finish saying in two sentences is the right size.",
         "If your idea is \"Pinball with a different colour\", change the idea, not the colour."
@@ -95,7 +95,7 @@
       "hint": "for (const c of coins) { ... }",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.push\\s*\\(|\\bnew\\s+Group\\s*\\(",
+      "pattern": "(?=[\\s\\S]*\\.push\\s*\\()(?=[\\s\\S]*\\b(?:for|while|forEach)\\b)|\\bnew\\s+Group\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending",

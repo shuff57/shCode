@@ -20,18 +20,19 @@ grid and Sling's aim, where the snake must be aimed" is.
 
 ---
 
-## 5.7 Build your own: a small game, four mechanics
+## 5.17 Build your own: a small game, five mechanics
 
-**After 5.6 Pocket. Last lesson of Unit 5. About 60 minutes, mostly build time. 0 points.**
+**After 5.16 Snake. Last lesson of Unit 5. About 60 minutes, mostly build time. 0 points.**
 
 Unit 5 owns movement, physics feel, the edge check, arrays, score, lose and restart, words on
-a sprite, `.life`, pointer aim, direction and speed, drag and stop, and pass-through targets.
+a sprite, `.life`, sound, and the physics knobs. Pointer aim, direction and speed, drag and
+stop, and pass-through targets are Pocket's (6.1-6.4), so they do not belong on this card.
 No classes and no groups yet, and the cards say so.
 
 | # | Requirement | Checked as |
 | --- | --- | --- |
 | r1 | A sprite the player moves, by keys or by the pointer | `kb.pressing`/`kb.presses` or `mouse` controlling `x`/`y`/`vel`, in `update()` or `draw()` |
-| r2 | Something to touch or avoid that scores **once per event** | a score change inside an edge check (`wasTouching`), a delete, or a flag — not under a level `colliding()`/`overlaps()` alone |
+| r2 | Something to touch or avoid that scores **once per event** | a score change inside an edge check (`wasTouching`), a delete, or a flag — not under a level `colliding()` alone |
 | r3 | A way to lose, and R starts again with the score back to 0 | a lost flag or state plus an `R` handler that resets the score, not only the sprites |
 | r4 | At least three of one kind of sprite kept in an array, and swept | a `push` into an array and a loop that deletes *and* splices (or filters) what is finished |
 | r5 | A label on screen, and one sprite that removes itself | `.text` on a sprite or `text()` in `drawTop()`, and a `.life` above 0 on a sprite that should expire |
@@ -41,30 +42,31 @@ it with functions and arrays, and a card must never fail a student for knowing m
 unit taught.
 
 **AI-checked, not regex:** the README pitch. Two criteria — (a) it names the game's idea in
-two sentences and its win and lose conditions; (b) it is not one of the four games built in
+two sentences and its win and lose conditions; (b) it is not one of the three games built in
 this unit, or, if it combines two, it names both and says what the combination changes.
 
-## 6.14 Build your own: a bigger game, three states
+## 6.28 Build your own: a bigger game, three states
 
-**After 6.13 Climb (provisional number). Last lesson of Unit 6. About 75 minutes. 0 points.**
+**After 6.27 Climb. Last lesson of Unit 6. About 75 minutes. 0 points.**
 
 Unit 6 owns groups, overlaps and collisions, physics tuning, camera and animation, saving,
-state machines, advanced input, joints, grids, Breakout, sound, Sling and Climb. A class of
-the student's own is allowed but earns nothing; the objects block is the next unit.
+state machines, advanced input, joints, grids, sound, Sling and Climb. Breakout moved to
+unit 7 (7.13-7.17), so it is not a unit 6 capability. A class of the student's own is allowed
+but earns nothing; the objects block is the next unit.
 
 | # | Requirement | Checked as |
 | --- | --- | --- |
-| r1 | A Group of sprites, created and emptied as the game runs | `new Group()`, `group.add`/`group.delete` (or `removeAll`), not an array alone |
+| r1 | A Group of sprites, created and emptied as the game runs | `new Group()` with `new group.Sprite()` (or `group.add`), and `group.delete()` / `deleteAll()`, not an array alone |
 | r2 | Three states and a way between them | a state variable set to three named values (`title`, `play`, `over` or the student's own), each changing what runs |
 | r3 | Something that survives closing the tab | `storeItem`/`getItem` (or the engine's save) for a best score or a setting, read at start |
 | r4 | Sound on one event, with a key that mutes it | `loadSound` + `.play()` in the branch where the event happens, and a mute flag the key flips |
 | r5 | **One of:** a camera that scrolls, an animated sprite, a grid level, or a joint | whichever the student picks, used for something the game needs, not decoration |
-| r6 | A timer that does something visible | `every()` or `after()` starting, spawning, or ending something |
+| r6 | A timer that does something visible | `every()` starting, spawning, or ending something; `after()` also counts once 6.21 has introduced it |
 
 **AI-checked:** the pitch, with the same two criteria as 5.7 plus (c) it names which of r5 it
 chose and why that one.
 
-## 7.7 Build your own: one game, in objects
+## 7.21 Build your own: one game, in objects
 
 **After 7.6 Defender, Part C. Last lesson of Unit 7. About 75 minutes. 0 points.**
 
@@ -99,13 +101,13 @@ and nothing pins a title, a sprite name or a file layout — the same rule 8.1 f
 
 | Unit | Lesson | After | Count |
 | --- | --- | --- | --- |
-| 5 | **5.7** Build your own | 5.6 Pocket | 1 |
-| 6 | **6.14** Build your own | 6.13 Climb (provisional) | 1 |
-| 7 | **7.7** Build your own | 7.6 Defender, Part C | 1 |
+| 5 | **5.17** Build your own | 5.16 Snake | 1 |
+| 6 | **6.28** Build your own | 6.27 Climb | 1 |
+| 7 | **7.21** Build your own | 7.6 Defender, Part C | 1 |
 
 Three lessons, about 3.5 contact hours in total, no new modules, no renumbering. They ship
-inside their unit's last batch: 5.7 with Pocket (B6), 6.14 with Climb (B10), 7.7 with the
-objects block (a new batch after B10, before the integration round).
+inside their unit's last batch: 5.17 with Snake, 6.28 with Climb, 7.21 with the objects block
+(a new batch after B10, before the integration round).
 
 **Open for the owner:** whether the pitch is AI-checked (my recommendation, because "is this
 a clone" is a judgement a regex cannot make) or read by the teacher.

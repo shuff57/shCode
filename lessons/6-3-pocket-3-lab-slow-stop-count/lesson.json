@@ -41,7 +41,7 @@
       "id": "r1",
       "title": "The ball slows",
       "description": "Drag is set on the ball. Help: 6.3.1 (Reading: Rolling to a stop)",
-      "hint": "cue.drag = 0.02;",
+      "hint": "cue.drag = 1;",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.\\s*drag\\s*=\\s*[\\d.]",

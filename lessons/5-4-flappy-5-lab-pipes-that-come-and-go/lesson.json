@@ -18,6 +18,7 @@
       "instructions": "The function `makePipe()` is given: it builds one pair and returns the top pipe. In `draw()`, call it every 90 frames and put the result in the `pipes` array. Run it: pipes should keep arriving from the right. The bird can touch a pipe and nothing happens yet; 5.12.3 makes that end the round.",
       "hints": [
         "`frameCount % 90 === 0` is true once every 90 frames.",
+        "`every(90, () => { pipes.push(makePipe()); });` from 5.11.2 is the same beat with a name. Either counts.",
         "`pipes.push(makePipe());`"
       ]
     },
@@ -43,10 +44,10 @@
     {
       "id": "r1",
       "title": "A pair is built on a repeating beat",
-      "description": "A remainder test on the frame count builds a pair at a steady rate. Help: 5.11.1 (Reading: A world that scrolls)",
+      "description": "A remainder test on the frame count, or an `every(90, ...)` timer, builds a pair at a steady rate. Help: 5.11.1 (Reading: A world that scrolls)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "frameCount\\s*%\\s*\\w+\\s*\\)?\\s*===?\\s*0",
+      "pattern": "frameCount\\s*%\\s*\\w+\\s*\\)?\\s*===?\\s*0|\\bevery\\s*\\(\\s*\\d+",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -54,10 +55,10 @@
     {
       "id": "r2",
       "title": "Every pair goes into the array",
-      "description": "The pair is built and pushed inside the beat's if, so a pair arrives once per beat, not every frame. Help: 5.11.1 (Reading: A world that scrolls)",
+      "description": "The pair is built and pushed inside the beat's if (or inside the `every()` callback), so a pair arrives once per beat, not every frame. Help: 5.11.1 (Reading: A world that scrolls)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bif\\s*\\((?=[^{};]{0,200}?frameCount\\s*%\\s*\\w+\\s*\\)?\\s*===?\\s*0)[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?|[^{};]{0,200}?)(?:pipes\\.push\\s*\\(|(?:const|let|var)\\s+(\\w+)\\s*=\\s*makePipe\\s*\\(\\s*\\)\\s*;?\\s*pipes\\.push\\s*\\(\\s*\\1\\s*\\))|(?:const|let|var)\\s+(\\w+)\\s*=\\s*\\(?\\s*frameCount\\s*%\\s*\\w+\\s*\\)?\\s*===?\\s*0[^;{}\\n]{0,200}[;\\n][\\s\\S]{0,300}?\\bif\\s*\\((?=[^{};]{0,200}(?<![\\w$.])(?<!!\\s*(?:\\(\\s*){0,3})\\2\\b(?!\\s*(?:===?\\s*false|!==?)))[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?|[^{};]{0,200}?)(?:pipes\\.push\\s*\\(|(?:const|let|var)\\s+(\\w+)\\s*=\\s*makePipe\\s*\\(\\s*\\)\\s*;?\\s*pipes\\.push\\s*\\(\\s*\\3\\s*\\))",
+      "pattern": "\\bif\\s*\\((?=[^{};]{0,200}?frameCount\\s*%\\s*\\w+\\s*\\)?\\s*===?\\s*0)[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?|[^{};]{0,200}?)(?:pipes\\.push\\s*\\(|(?:const|let|var)\\s+(\\w+)\\s*=\\s*makePipe\\s*\\(\\s*\\)\\s*;?\\s*pipes\\.push\\s*\\(\\s*\\1\\s*\\))|(?:const|let|var)\\s+(\\w+)\\s*=\\s*\\(?\\s*frameCount\\s*%\\s*\\w+\\s*\\)?\\s*===?\\s*0[^;{}\\n]{0,200}[;\\n][\\s\\S]{0,300}?\\bif\\s*\\((?=[^{};]{0,200}(?<![\\w$.])(?<!!\\s*(?:\\(\\s*){0,3})\\2\\b(?!\\s*(?:===?\\s*false|!==?)))[^{};]{0,200}\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?(?:\\{(?:[^{}]|\\{[^{}]*\\})*?)?|[^{};]{0,200}?)(?:pipes\\.push\\s*\\(|(?:const|let|var)\\s+(\\w+)\\s*=\\s*makePipe\\s*\\(\\s*\\)\\s*;?\\s*pipes\\.push\\s*\\(\\s*\\3\\s*\\))|\\bevery\\s*\\(\\s*\\d+\\s*,\\s*(?:\\(\\s*\\)\\s*=>|function\\s*\\(\\s*\\)\\s*)\\s*\\{?[\\s\\S]{0,200}?pipes\\s*\\.\\s*push\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -82,18 +83,18 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.11.3 Lab: Pipes that come and go\". The task they were given: makePipe() is given: it builds one pair of pipes just off the right edge, moving left, and returns the top pipe (the bottom one is stored as its mate). In draw(), call it on a repeating beat (every 90 frames) and push the result into the pipes array; the starter builds only one pair, on frame 1. Then loop over pipes from the end to the start and, when a pipe's x is less than -30, delete its mate and the pipe and splice it out of the array. Finally show pipes.length in drawTop(). You cannot run their code: read it and judge what it WOULD do when the sketch runs. draw() runs every frame and frameCount counts the frames, so frameCount % 90 === 0 is true once every 90 frames, while frameCount === 1 is true only once. sprite.delete() (or its twin sprite.remove()) takes a sprite off the screen and out of the physics world; pipes.splice(i, 1) only takes it out of the array. The pipes move left, so a pipe that has left the screen has a small or negative x. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Wrong ideas to catch: keeping the starter's frameCount === 1 test (one pair, never again); a push that runs every frame, outside the beat; a test that deletes pipes still on the screen (x greater than something). Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.11.3 Lab: Pipes that come and go\". The task they were given: makePipe() is given: it builds one pair of pipes just off the right edge, moving left, and returns the top pipe (the bottom one is stored as its mate). In draw(), call it on a repeating beat (every 90 frames, as frameCount % 90 === 0 or as every(90, ...)) and push the result into the pipes array; the starter builds only one pair, on frame 1. Then loop over pipes from the end to the start and, when a pipe's x is less than -30, delete its mate and the pipe and splice it out of the array. Finally show pipes.length in drawTop(). You cannot run their code: read it and judge what it WOULD do when the sketch runs. draw() runs every frame and frameCount counts the frames, so frameCount % 90 === 0 is true once every 90 frames, while frameCount === 1 is true only once. sprite.delete() (or its twin sprite.remove()) takes a sprite off the screen and out of the physics world; pipes.splice(i, 1) only takes it out of the array. The pipes move left, so a pipe that has left the screen has a small or negative x. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Wrong ideas to catch: keeping the starter's frameCount === 1 test (one pair, never again); a push that runs every frame, outside the beat; a test that deletes pipes still on the screen (x greater than something). Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
     "rubric": [
       {
         "id": "r1",
         "title": "A pair is built on a repeating beat",
-        "description": "A test that comes true again and again at a steady rate: frameCount % N === 0 or == 0 for any N, or a frame counter of the student's own that counts up and is reset each time it fires. Missing: only the starter's frameCount === 1, which is true once. Help: 5.11.1 (Reading: A world that scrolls)",
+        "description": "A test that comes true again and again at a steady rate: frameCount % N === 0 or == 0 for any N, an every(N, ...) timer, or a frame counter of the student's own that counts up and is reset each time it fires. Missing: only the starter's frameCount === 1, which is true once. Help: 5.11.1 (Reading: A world that scrolls)",
         "points": 1
       },
       {
         "id": "r2",
         "title": "Every pair goes into the array",
-        "description": "Inside that beat's if (or an if that reads a variable holding the beat test), a new pair is made with makePipe() and pushed into pipes, in one line or stored in a variable first. Missing: no push, or a push that runs on every frame outside the beat. Help: 5.11.1 (Reading: A world that scrolls)",
+        "description": "Inside that beat's if (or an if that reads a variable holding the beat test, or the every() callback), a new pair is made with makePipe() and pushed into pipes, in one line or stored in a variable first. Missing: no push, or a push that runs on every frame outside the beat. Help: 5.11.1 (Reading: A world that scrolls)",
         "points": 1
       },
       {
