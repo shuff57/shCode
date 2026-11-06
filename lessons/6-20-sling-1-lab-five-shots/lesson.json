@@ -70,6 +70,18 @@
       "points": 0,
       "status": "pending",
       "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "A clean restart",
+      "description": "R calls `startRound()`, which clears the old blocks and shots before it rebuilds. Help: 6.19.1 (Reading: Blocks that fall, and a hit budget)",
+      "hint": "if (kb.presses('r')) startRound();",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "kb\\.presses\\s*\\(\\s*['\"]r['\"]\\s*\\)[^;]*?startRound\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
     }
   ],
   "grading": {
