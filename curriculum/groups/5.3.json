@@ -4,9 +4,10 @@
   "lessons": [
     {
       "id": "pinball-the-table",
-      "title": "Plan, and the table",
-      "objective": "Plan the table and build it in small steps: a bouncy ball, walls and a ground, a tilted bumper, and a goal to hit.",
+      "title": "Play it, plan it, and the table",
+      "objective": "Play the finished game first, then plan the table and build it in small steps: a bouncy ball, walls and a ground, a tilted bumper, and a goal to hit.",
       "screens": [
+        "5-3-pinball-0-reading-play-the-finished-game",
         "5-3-pinball-plan-sketch-the-game",
         "5-3-pinball-1-reading-from-scene-to-game",
         "5-3-pinball-2-example-the-table-and-the-goal",
