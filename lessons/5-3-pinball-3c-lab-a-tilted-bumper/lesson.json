@@ -1,0 +1,86 @@
+{
+  "id": "5-3-pinball-3c-lab-a-tilted-bumper",
+  "title": "5.3.6 Lab: A tilted bumper",
+  "description": "Put a tilted bumper under the ball so it rolls to the right. Your walls and ground carry forward.",
+  "type": "lesson",
+  "estimateMins": 6,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.3 Pinball: the table",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "A bumper you can name",
+      "instructions": "Build a wide, thin bumper and store it in `bumper` (the starter already declares it). It must not fall. Put it under where the ball starts, a little to the right, so the ball lands on its left half. Give it a colour. If you brought your 5.3.5 work forward, put it above the ground's lines.",
+      "hints": [
+        "`bumper = new Sprite(140, 115, 200, 14, 'static');` then `bumper.color = 'sienna';`"
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Tilt it",
+      "instructions": "A flat bumper just bounces the ball back up. Set the bumper's `rotation` so it slopes down to the right: the ball will roll off it that way. The number is in degrees; a small one is enough.",
+      "hints": [
+        "`bumper.rotation = 14;`"
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Run it",
+      "instructions": "Run it. The ball lands on the bumper, rolls down the slope to the right and drops toward the ground. Watch where it goes: the next lab puts a goal on that path."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "The bumper has a name and stays put",
+      "description": "A static sprite is stored in `bumper`, so it does not fall and the code can ask about it later. Help: 5.3.3 (Worked Example: The table and the goal)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bbumper\\s*=\\s*new\\s+Sprite\\s*\\([^)]*['\\\"]static['\\\"]|\\bbumper\\.collider\\s*=\\s*['\\\"]static['\\\"]",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "The bumper is tilted",
+      "description": "The bumper's `rotation` is set to a number that is not 0, so the ball leaves at an angle. Help: 5.3.3 (Worked Example: The table and the goal)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bbumper\\.rotation\\s*=\\s*(?:\\(\\s*)?[-+]?\\s*(?:\\d*\\.\\d*[1-9]\\d*|[1-9]\\d*|[A-Za-z_$])",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.6 Lab: A tilted bumper\". The task they were given: In setup(), build a wide, thin static bumper stored in `bumper`, under and a little to the right of the ball's start, and tilt it by setting its rotation to a number that is not 0. What the starter file already had: the previous labs' work: gravity on, a bouncy ball at (70, 60), two static walls and a static ground stored in `ground`. There is no bumper yet, so the starter meets none of the criteria. The student may have brought their own work forward from the lab before, so the file can have more than the starter lists; judge what is in the file. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: world.gravity.y starts at 0, so nothing falls until a sketch sets it; a positive value pulls down the screen because y grows downward. A sprite made with 'static' as its last argument (or given .collider = 'static') never moves or falls. new Sprite(x, y, d) with one size number makes a circle; new Sprite(x, y, w, h) makes a rectangle. rotation is in degrees. bounciness runs from 0 (a thud) to 1. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "The bumper has a name and stays put",
+        "description": "A static sprite is stored in `bumper`, so it does not fall and the code can ask about it later. Help: 5.3.3 (Worked Example: The table and the goal)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The bumper is tilted",
+        "description": "The bumper's `rotation` is set to a number that is not 0, so the ball leaves at an angle. Help: 5.3.3 (Worked Example: The table and the goal)",
+        "points": 1
+      }
+    ]
+  },
+  "carryFrom": "5-3-pinball-3b-lab-walls-and-a-ground"
+}

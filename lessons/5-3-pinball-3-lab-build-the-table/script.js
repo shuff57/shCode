@@ -1,19 +1,33 @@
-// 5.3.4 Lab: Build the table.
+// 5.3.7 Lab: Put a goal on the table.
 
-let ball, goal, score;
+let ball, bumper, ground, goal, score;
 
 function setup() {
   new Canvas(400, 400);
+  world.gravity.y = 10;
 
-  // STEP 1: turn gravity on, so the ball falls.
+  // two walls keep the ball on the table
+  const leftWall = new Sprite(5, 200, 10, 400, 'static');
+  leftWall.color = 'gray';
+  const rightWall = new Sprite(395, 200, 10, 400, 'static');
+  rightWall.color = 'gray';
 
-  // STEP 2: build at least three static obstacles for the ball to bounce off.
-  //   Give each one a name, like bumper, so the code can reach it later.
+  bumper = new Sprite(140, 115, 200, 14, 'static');
+  bumper.color = 'sienna';
+  bumper.rotation = 14;
 
-  // STEP 3: build a ball that falls, and make it genuinely bouncy.
-  //   Start it at (70, 60): that is where the R key below puts it back.
+  // the ground stops short of the left wall: that gap is the drain
+  ground = new Sprite(250, 385, 280, 20, 'static');
+  ground.color = 'gray';
 
-  // STEP 4: build a gold goal block somewhere the ball really goes.
+  // STEP 1: run it and watch where the ball rolls after the bumper.
+
+  // STEP 2: build a gold goal block there, stored in goal.
+  //   Give it the same body type as the bumper, and the same tilt.
+
+  ball = new Sprite(70, 60, 24);
+  ball.color = 'deepskyblue';
+  ball.bounciness = 0.75;
 
   score = 0;
 }

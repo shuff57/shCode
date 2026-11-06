@@ -1,0 +1,102 @@
+{
+  "id": "5-3-pinball-3a-lab-drop-a-bouncy-ball",
+  "title": "5.3.4 Lab: Drop a bouncy ball",
+  "description": "Turn gravity on and drop a bouncy ball. It has nothing to land on yet; the next lab builds the walls and the ground.",
+  "type": "lesson",
+  "estimateMins": 6,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.3 Pinball: the table",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Turn gravity on",
+      "instructions": "In `setup()`, turn gravity on so things fall. Nothing falls until you do: gravity starts at 0.",
+      "hints": [
+        "Reread 5.2.6 (Reading: Gravity). The line starts with `world.gravity`."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "A ball worth watching",
+      "instructions": "Build the ball and store it in `ball` (the starter already declares it, along with the other names this table will use). Give `new Sprite` the position and then **one** size number instead of a width and a height, and you get a circle that many pixels across (5.3.2 shows it). Start it at (70, 60), where the R key puts it back. Give it a colour and a `bounciness` above 0.5, or it will thud and stop.",
+      "hints": [
+        "`ball = new Sprite(70, 60, 24);` then `ball.bounciness = 0.75;` — 5.2.11 explains what the number means."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Run it",
+      "instructions": "Run it. The ball falls and keeps falling, right off the bottom: there is nothing to land on yet. Press R to drop it again. The next lab builds the table it will land on."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Gravity is on",
+      "description": "`setup()` turns gravity on with a positive number, so things fall down the screen. Help: 5.2.6 (Reading: Gravity)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "world\\.gravity\\.y\\s*=\\s*(?:\\(\\s*)?\\+?\\s*(?:[1-9]|0?\\.\\d*[1-9])|\\b([A-Za-z_$][\\w$]*)\\s*=\\s*(?:\\(\\s*)?\\+?\\s*(?:[1-9]|0?\\.\\d*[1-9])[^;\\n]*[;\\n][\\s\\S]*?world\\.gravity\\.y\\s*=\\s*(?:\\(\\s*)?\\1\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "There is a ball",
+      "description": "A sprite is stored in `ball`, built with `new Sprite`. Help: 5.3.2 (Reading: From scene to game)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bball\\s*=\\s*new\\s+Sprite\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r3",
+      "title": "The ball is genuinely bouncy",
+      "description": "The ball's `bounciness` is set above 0.5, so it keeps most of its speed. Help: 5.2.11 (Reading: Bounciness and Friction)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "bounciness\\s*=\\s*(?:\\(\\s*)?(?:0?\\.[5-9]|[1-9])|\\b([A-Za-z_$][\\w$]*)\\s*=\\s*(?:\\(\\s*)?(?:0?\\.[5-9]|[1-9])[^;\\n]*[;\\n][\\s\\S]*?bounciness\\s*=\\s*(?:\\(\\s*)?\\1\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.4 Lab: Drop a bouncy ball\". The task they were given: In setup(), turn gravity on so things fall, then build the ball as a circle (one size number) starting at (70, 60), with a colour and a bounciness above 0.5. There is no table yet, so the ball falling off the bottom is correct. What the starter file already had: a 400 by 400 canvas, `let ball, bumper, ground, goal, score;`, score set to 0, and a draw() that shows the score and puts the ball back at (70, 60) when R is pressed. There is no gravity and no ball yet, so the starter meets none of the criteria. The student may have brought their own work forward from the lab before, so the file can have more than the starter lists; judge what is in the file. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: world.gravity.y starts at 0, so nothing falls until a sketch sets it; a positive value pulls down the screen because y grows downward. A sprite made with 'static' as its last argument (or given .collider = 'static') never moves or falls. new Sprite(x, y, d) with one size number makes a circle; new Sprite(x, y, w, h) makes a rectangle. rotation is in degrees. bounciness runs from 0 (a thud) to 1. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Gravity is on",
+        "description": "`setup()` turns gravity on with a positive number, so things fall down the screen. Help: 5.2.6 (Reading: Gravity)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "There is a ball",
+        "description": "A sprite is stored in `ball`, built with `new Sprite`. Help: 5.3.2 (Reading: From scene to game)",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The ball is genuinely bouncy",
+        "description": "The ball's `bounciness` is set above 0.5, so it keeps most of its speed. Help: 5.2.11 (Reading: Bounciness and Friction)",
+        "points": 1
+      }
+    ]
+  }
+}

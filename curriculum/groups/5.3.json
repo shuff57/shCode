@@ -5,11 +5,14 @@
     {
       "id": "pinball-the-table",
       "title": "Plan, and the table",
-      "objective": "Plan the table and build the first playable scene: a ball, a goal to hit, and walls.",
+      "objective": "Plan the table and build it in small steps: a bouncy ball, walls and a ground, a tilted bumper, and a goal to hit.",
       "screens": [
         "5-3-pinball-plan-sketch-the-game",
         "5-3-pinball-1-reading-from-scene-to-game",
         "5-3-pinball-2-example-the-table-and-the-goal",
+        "5-3-pinball-3a-lab-drop-a-bouncy-ball",
+        "5-3-pinball-3b-lab-walls-and-a-ground",
+        "5-3-pinball-3c-lab-a-tilted-bumper",
         "5-3-pinball-3-lab-build-the-table"
       ]
     }
