@@ -1,4 +1,4 @@
-**Read before `5.2.17 Lab: Reaching the Goal`.**
+**Read before `5.2.23 Lab: Reaching the Goal`.**
 
 **Goal:** See every concept from this module combined into one scene: gravity, a ground-gated jump, bounciness and friction, a wind zone, walls, and a single-fire win condition.
 

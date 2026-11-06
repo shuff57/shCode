@@ -1,6 +1,6 @@
 {
   "id": "5-2-9-lab-wind-zone",
-  "title": "5.2.14 Lab: Wind Zone",
+  "title": "5.2.19 Lab: Wind Zone",
   "description": "Push the player with applyForce inside a conditional zone. Auto-graded.",
   "type": "lesson",
   "estimateMins": 20,
@@ -25,7 +25,7 @@
     {
       "id": "r1",
       "title": "Use applyForce on the player",
-      "description": "The player is pushed with .applyForce(fx, fy) somewhere in the sketch. Help: 5.2.13 (Forces vs Velocity)",
+      "description": "The player is pushed with .applyForce(fx, fy) somewhere in the sketch. Help: 5.2.18 (Forces vs Velocity)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.applyForce\\s*\\(",
@@ -48,7 +48,7 @@
     {
       "id": "r3",
       "title": "The wind pushes up",
-      "description": "The force's second number (fy) is negative, so the wind pushes the player up against gravity: applyForce(0, -3). Help: 5.2.13 (Forces vs Velocity)",
+      "description": "The force's second number (fy) is negative, so the wind pushes the player up against gravity: applyForce(0, -3). Help: 5.2.18 (Forces vs Velocity)",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.applyForce\\s*\\(\\s*[^,()]*,\\s*-\\s*[\\w.(]|\\b([A-Za-z_$][\\w$]*)\\s*=\\s*-\\s*[\\d.][^;\\n]*[;\\n][\\s\\S]*?\\.applyForce\\s*\\(\\s*[^,()]*,\\s*\\1\\s*\\)",
@@ -65,12 +65,12 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.14 Lab: Wind Zone\". The task they were given: In draw(), add a wind zone: when the player's y position is above the zone line (the starter's comment uses y less than 200), call applyForce on the player with an upward force (a negative second number), so it pushes back against gravity instead of overriding the fall. What the starter file already had: gravity at 10, a player moved with a and d that jumps with the space bar from the ground, a static ground and two static side walls. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: sprite.applyForce(fx, fy) gives the sprite a push on each frame it is called, adding to what gravity and its velocity are already doing, while setting vel replaces the speed outright. y grows downward, so a negative fy pushes up, and 'above the line' means a smaller y. Gravity is 10 here. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.19 Lab: Wind Zone\". The task they were given: In draw(), add a wind zone: when the player's y position is above the zone line (the starter's comment uses y less than 200), call applyForce on the player with an upward force (a negative second number), so it pushes back against gravity instead of overriding the fall. What the starter file already had: gravity at 10, a player moved with a and d that jumps with the space bar from the ground, a static ground and two static side walls. The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: sprite.applyForce(fx, fy) gives the sprite a push on each frame it is called, adding to what gravity and its velocity are already doing, while setting vel replaces the speed outright. y grows downward, so a negative fy pushes up, and 'above the line' means a smaller y. Gravity is 10 here. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
     "rubric": [
       {
         "id": "r1",
         "title": "Use applyForce on the player",
-        "description": "The player is pushed with .applyForce(...) somewhere the sketch runs. Help: 5.2.13 (Forces vs Velocity)",
+        "description": "The player is pushed with .applyForce(...) somewhere the sketch runs. Help: 5.2.18 (Forces vs Velocity)",
         "points": 1
       },
       {
@@ -82,7 +82,7 @@
       {
         "id": "r3",
         "title": "The wind pushes up",
-        "description": "The force's second number (fy) is negative, straight in the call or through a variable holding a negative number, so the wind pushes up against gravity. Any size counts. A positive fy pushes down along with gravity, which is the opposite, so it is not met. Help: 5.2.13 (Forces vs Velocity)",
+        "description": "The force's second number (fy) is negative, straight in the call or through a variable holding a negative number, so the wind pushes up against gravity. Any size counts. A positive fy pushes down along with gravity, which is the opposite, so it is not met. Help: 5.2.18 (Forces vs Velocity)",
         "points": 1
       }
     ]

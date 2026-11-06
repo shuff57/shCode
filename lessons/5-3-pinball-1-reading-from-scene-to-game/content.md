@@ -7,7 +7,7 @@ By the end of this reading you should be able to answer:
 - What is the difference between a scene and a game?
 - What four things does this module add to the scene you already built?
 
-In 5.2.18 you built a scene: gravity, static obstacles, a bouncy ball, and a key that puts the ball back at the top. Run it and it looks like pinball. Nothing is at stake, though — the ball falls, bounces, and nothing counts.
+In 5.2.24 you built a scene: gravity, static obstacles, a bouncy ball, and a key that puts the ball back at the top. Run it and it looks like pinball. Nothing is at stake, though — the ball falls, bounces, and nothing counts.
 
 A game adds four things on top of a scene:
 
@@ -63,9 +63,9 @@ function draw() {
 }
 ```
 
-**What you'll see:** the ball drops onto the bumper and rolls down it, flies off the end into the right wall, bounces across the ground, and falls out through the gap at the bottom left. That gap is the **drain**. Press R and it starts again. This is the same kind of scene you built in 5.2.18, with two walls and a drain added — and there is still no goal, no score, nothing happens when the ball drains, and no reason to press R except to watch it fall again.
+**What you'll see:** the ball drops onto the bumper and rolls down it, flies off the end into the right wall, bounces across the ground, and falls out through the gap at the bottom left. That gap is the **drain**. Press R and it starts again. This is the same kind of scene you built in 5.2.24, with two walls and a drain added — and there is still no goal, no score, nothing happens when the ball drains, and no reason to press R except to watch it fall again.
 
-**Two things in that code to notice.** `new Sprite(70, 60, 24)` has **one** size number instead of a width and a height. One number makes a circle that many pixels across, so this ball is a circle 24 pixels wide, the same kind of ball you made in 5.2.12 Bouncy Ball. And the gray strip along the bottom is called `ground`, not `floor`: `floor()` is the rounding function from 5.2.1 (Reading: Random numbers and timers), and a variable named `floor` would hide it, so `floor(random(1, 7))` would stop working.
+**Two things in that code to notice.** `new Sprite(70, 60, 24)` has **one** size number instead of a width and a height. One number makes a circle that many pixels across, so this ball is a circle 24 pixels wide, the same kind of ball you made in 5.2.16 Bouncy Ball. And the gray strip along the bottom is called `ground`, not `floor`: `floor()` is the rounding function from 5.2.2 (Reading: Random numbers and timers), and a variable named `floor` would hide it, so `floor(random(1, 7))` would stop working.
 
 **Try this:** watch one drop all the way to the drain, then look at what is missing. If you wanted to tell a friend how well you just did, what number would you show them? That number does not exist yet. 5.3.3 adds it.
 

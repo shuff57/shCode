@@ -31,7 +31,7 @@ bird.vel.y -= 4;      // the bird leaves at 4 faster than before
 
 If the bird is falling hard, `-= 4` only slows the fall. `= -4` always gives the same flap, which is what a player's thumb expects.
 
-**Why `presses`.** 5.2.9 told the difference between a key being held and a key just going down. A held key with `kb.pressing` would reset the speed on every frame, so the bird would climb at one steady speed for as long as the key is held and never fall. `kb.presses` fires once when the key goes down, so one tap is one flap.
+**Why `presses`.** 5.2.12 told the difference between a key being held and a key just going down. A held key with `kb.pressing` would reset the speed on every frame, so the bird would climb at one steady speed for as long as the key is held and never fall. `kb.presses` fires once when the key goes down, so one tap is one flap.
 
 | | Fires | Flappy feel |
 | --- | --- | --- |

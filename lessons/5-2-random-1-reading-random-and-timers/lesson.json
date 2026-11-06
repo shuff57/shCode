@@ -1,6 +1,6 @@
 {
   "id": "5-2-random-1-reading-random-and-timers",
-  "title": "5.2.1 Reading: Random numbers and timers",
+  "title": "5.2.2 Reading: Random numbers and timers",
   "description": "random(max) and random(min, max), floor for whole numbers, and timers made of frames: a repeating beat, a one-shot, and the mistake that stops a one-shot from ever running.",
   "type": "lesson",
   "estimateMins": 10,
@@ -13,7 +13,6 @@
   ],
   "externalLink": "/docs/moshion",
   "externalLinkLabel": "Open the in-app moSHion docs",
-  "videoUrl": "/videos/5-2-random/index.html",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

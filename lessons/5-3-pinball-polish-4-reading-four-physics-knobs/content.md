@@ -2,7 +2,7 @@
 
 **Read before `5.8.3 Lab: Nudge the table`.** About 10 minutes.
 
-In 5.2 you set the knobs every sprite shares with the whole world: gravity (5.2.6), bounciness and friction (5.2.11). This reading adds four knobs that belong to **one sprite** at a time. You set each one like `.color`: once, on the sprite that needs it, usually in `setup()`.
+In 5.2 you set the knobs every sprite shares with the whole world: gravity (5.2.8), bounciness and friction (5.2.15). This reading adds four knobs that belong to **one sprite** at a time. You set each one like `.color`: once, on the sprite that needs it, usually in `setup()`.
 
 By the end of this reading you should be able to answer:
 
@@ -17,7 +17,7 @@ By the end of this reading you should be able to answer:
 ball.mass = 4;
 ```
 
-A push from `applyForce` (5.2.13) moves a heavy body less than a light one: four times the mass, a quarter of the speed. The same push can be a gentle nudge for a heavy ball and a launch for a light one. What mass does **not** change is falling: gravity pulls a heavy ball and a light ball down at the same speed. So on your pinball table a new mass leaves the drop the same and changes only what a push does. (You may also see `.density` in the docs: it is the same idea measured per pixel of size, and setting `.mass` changes it for you. This course uses `.mass`.)
+A push from `applyForce` (5.2.18) moves a heavy body less than a light one: four times the mass, a quarter of the speed. The same push can be a gentle nudge for a heavy ball and a launch for a light one. What mass does **not** change is falling: gravity pulls a heavy ball and a light ball down at the same speed. So on your pinball table a new mass leaves the drop the same and changes only what a push does. (You may also see `.density` in the docs: it is the same idea measured per pixel of size, and setting `.mass` changes it for you. This course uses `.mass`.)
 
 **Try it:** two balls of the same size, one with mass 1 and one with mass 4 (each wears its mass as a label, 5.7.1). Holding the right arrow gives both exactly the same push. There is no gravity in this one, so they stay put until pushed.
 

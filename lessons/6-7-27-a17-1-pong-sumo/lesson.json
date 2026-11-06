@@ -106,7 +106,7 @@
     {
       "id": "r4",
       "title": "Top-down arena: no gravity",
-      "description": "world.gravity.y stays 0 so the sprites glide instead of falling: world.gravity.y = 0 in setup() passes, and so does never turning gravity on. Help: 5.2.6 (Gravity)",
+      "description": "world.gravity.y stays 0 so the sprites glide instead of falling: world.gravity.y = 0 in setup() passes, and so does never turning gravity on. Help: 5.2.8 (Gravity)",
       "type": "regex",
       "file": "script.js",
       "pattern": "world\\.gravity\\.y\\s*=\\s*0(?:\\.0*)?(?![.\\d])|^(?![\\s\\S]*world\\s*\\.\\s*gravity(?:\\s*\\.\\s*y)?\\s*=(?!=))",

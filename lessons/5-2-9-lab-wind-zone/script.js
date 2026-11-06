@@ -1,4 +1,4 @@
-// 5.2.14 Lab: Wind Zone: push the player with applyForce inside a zone.
+// 5.2.19 Lab: Wind Zone: push the player with applyForce inside a zone.
 
 let player, ground, leftWall, rightWall;
 

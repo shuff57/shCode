@@ -1,5 +1,5 @@
-// 5.2.20 Challenges: Optional Stretch: a second goal and a two-goal finish.
-// This is the one-goal scene from 5.2.17. Run it first: touch the gold goal
+// 5.2.26 Challenges: Optional Stretch: a second goal and a two-goal finish.
+// This is the one-goal scene from 5.2.23. Run it first: touch the gold goal
 // and the console prints the win line once.
 // Move with a and d, jump with the space bar while standing on the ground.
 

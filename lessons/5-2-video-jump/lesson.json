@@ -1,0 +1,22 @@
+{
+  "id": "5-2-video-jump",
+  "title": "5.2.11 Video: The Jump Explained",
+  "description": "kb.presses versus kb.pressing, colliding(ground), and the two bugs a jump can have. A 2-minute walkthrough of the next reading.",
+  "type": "lesson",
+  "estimateMins": 3,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.2 Physics Feel",
+  "preview": "video",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "videoUrl": "/videos/5-2-jump/index.html",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

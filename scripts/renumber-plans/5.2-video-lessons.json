@@ -1,0 +1,125 @@
+{
+  "_comment": "Each 5.2 Papermorph explainer becomes its own Video lesson placed right before the reading it explains (owner decision 2026-11-06). Folders never change.",
+  "modules": {
+    "5.2": [
+      {
+        "folder": "5-2-video-random",
+        "new": true,
+        "type": "video",
+        "notes": "Papermorph explainer, was embedded in the reading below"
+      },
+      {
+        "folder": "5-2-random-1-reading-random-and-timers"
+      },
+      {
+        "folder": "5-2-random-2-example-sparkles"
+      },
+      {
+        "folder": "5-2-random-3-lab-random-spot-and-colour"
+      },
+      {
+        "folder": "5-2-random-4-lab-beat-and-one-shot"
+      },
+      {
+        "folder": "5-2-1-slides"
+      },
+      {
+        "folder": "5-2-video-gravity",
+        "new": true,
+        "type": "video",
+        "notes": "Papermorph explainer, was embedded in the reading below"
+      },
+      {
+        "folder": "5-2-2-reading-gravity"
+      },
+      {
+        "folder": "moshion-gravity"
+      },
+      {
+        "folder": "5-2-3-lab-tune-gravity"
+      },
+      {
+        "folder": "5-2-video-jump",
+        "new": true,
+        "type": "video",
+        "notes": "Papermorph explainer, was embedded in the reading below"
+      },
+      {
+        "folder": "5-2-4-reading-ground-check"
+      },
+      {
+        "folder": "5-2-5-lab-add-a-jump"
+      },
+      {
+        "folder": "5-2-video-bounce",
+        "new": true,
+        "type": "video",
+        "notes": "Papermorph explainer, was embedded in the reading below"
+      },
+      {
+        "folder": "5-2-6-reading-bounciness-friction"
+      },
+      {
+        "folder": "moshion-bounce"
+      },
+      {
+        "folder": "5-2-video-forces",
+        "new": true,
+        "type": "video",
+        "notes": "Papermorph explainer, was embedded in the reading below"
+      },
+      {
+        "folder": "5-2-8-reading-forces-vs-velocity"
+      },
+      {
+        "folder": "5-2-9-lab-wind-zone"
+      },
+      {
+        "folder": "5-2-video-delete",
+        "new": true,
+        "type": "video",
+        "notes": "Papermorph explainer, was embedded in the reading below"
+      },
+      {
+        "folder": "5-2-10-reading-delete"
+      },
+      {
+        "folder": "5-2-12-example-finished-scene"
+      },
+      {
+        "folder": "5-2-11-lab-reaching-the-goal"
+      },
+      {
+        "folder": "5-2-13-a5-2-1-pinball-scene"
+      },
+      {
+        "folder": "5-2-14-a5-2-2-vel-vs-applyforce"
+      },
+      {
+        "folder": "5-2-15-challenges"
+      },
+      {
+        "folder": "5-2-video-update",
+        "new": true,
+        "type": "video",
+        "notes": "Papermorph explainer, was embedded in the reading below"
+      },
+      {
+        "folder": "5-2-update-1-reading-update-runs-before-physics"
+      },
+      {
+        "folder": "5-2-update-2-lab-rules-in-update"
+      }
+    ]
+  },
+  "alsoRewrite": [
+    "curriculum/modules/*.md",
+    "curriculum-plan.md",
+    "curriculum/BOOK-TO-MODULE.md",
+    "scripts/apply-criterion-pointers-*.mjs",
+    "scripts/test-grader-tolerance.mjs",
+    "scripts/test-runtime-labs.mjs",
+    "scripts/test-diagram-chart-lessons.mjs",
+    "scripts/verify-a11y-keyboard-chart.py"
+  ]
+}

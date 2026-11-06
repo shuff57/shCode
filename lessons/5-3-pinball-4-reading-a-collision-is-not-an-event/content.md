@@ -18,7 +18,7 @@ function draw() {
 }
 ```
 
-You have met this before, with keys. 5.2.9 drew the distinction, and it has two names. **Level-triggered** means true on every frame the thing is still going on, like a key that is held down. **Edge-triggered** means true only on the one frame it starts, like the moment the key goes down.
+You have met this before, with keys. 5.2.12 drew the distinction, and it has two names. **Level-triggered** means true on every frame the thing is still going on, like a key that is held down. **Edge-triggered** means true only on the one frame it starts, like the moment the key goes down.
 
 | | Fires | |
 | --- | --- | --- |

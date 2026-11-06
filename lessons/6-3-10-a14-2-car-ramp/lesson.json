@@ -24,7 +24,7 @@
     {
       "id": "s2",
       "title": "Chassis + wheels",
-      "instructions": "Chassis: one dynamic rectangle. Two wheels: dynamic sprites with a `diameter` so they're circular. Then give both wheels, the ground and the ramp a `.friction` of 1. Every sprite starts at friction 0, which is ice, and two touching sprites grip with a mix of both values (5.2.11), so a grippy wheel on icy ground still slides.",
+      "instructions": "Chassis: one dynamic rectangle. Two wheels: dynamic sprites with a `diameter` so they're circular. Then give both wheels, the ground and the ramp a `.friction` of 1. Every sprite starts at friction 0, which is ice, and two touching sprites grip with a mix of both values (5.2.15), so a grippy wheel on icy ground still slides.",
       "hints": [
         "Place the wheels slightly below the chassis corners so the joints have room.",
         "The Physics docs chapter explains dynamic vs static bodies.",
@@ -64,7 +64,7 @@
     {
       "id": "r2",
       "title": "Static geometry exists",
-      "description": "Create at least one 'static' sprite (ground or ramp). Help: 5.2.11 (Bounciness and Friction)",
+      "description": "Create at least one 'static' sprite (ground or ramp). Help: 5.2.15 (Bounciness and Friction)",
       "type": "regex",
       "file": "script.js",
       "pattern": "collider\\s*=\\s*['\"]static['\"]|new\\s+Sprite\\s*\\([^)]*['\"]static['\"]",
@@ -84,7 +84,7 @@
     {
       "id": "r4",
       "title": "Gravity enabled",
-      "description": "Assign a positive value to world.gravity.y. Help: 5.2.6 (Gravity)",
+      "description": "Assign a positive value to world.gravity.y. Help: 5.2.8 (Gravity)",
       "type": "regex",
       "file": "script.js",
       "pattern": "world\\.gravity\\.y\\s*=\\s*[1-9]",

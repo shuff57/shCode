@@ -1,4 +1,4 @@
-// 5.2.22 Lab: Rules in update(), picture in draw() (reference solution).
+// 5.2.29 Lab: Rules in update(), picture in draw() (reference solution).
 
 let player, ground;
 

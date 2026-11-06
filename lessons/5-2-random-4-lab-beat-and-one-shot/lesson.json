@@ -1,6 +1,6 @@
 {
   "id": "5-2-random-4-lab-beat-and-one-shot",
-  "title": "5.2.4 Lab: A beat and a one-shot",
+  "title": "5.2.5 Lab: A beat and a one-shot",
   "description": "Blink a lamp every 30 frames, show a message once at frame 300, and repair a halfway check that sits inside another condition and never runs.",
   "type": "lesson",
   "estimateMins": 10,
@@ -44,7 +44,7 @@
     {
       "id": "r1",
       "title": "A repeating beat",
-      "description": "The code tests frameCount % N === 0 to act every N frames. Help: 5.2.1 (Reading: Random numbers and timers)",
+      "description": "The code tests frameCount % N === 0 to act every N frames. Help: 5.2.2 (Reading: Random numbers and timers)",
       "hint": "frameCount % 30 === 0 is true on every 30th frame.",
       "type": "regex",
       "file": "script.js",
@@ -56,7 +56,7 @@
     {
       "id": "r2",
       "title": "The beat flips the lamp",
-      "description": "Inside the beat, on is flipped to the opposite: with on = !on, a ternary, or an if/else that sets it to false when it is true and to true when it is false. Help: 5.2.1 (Reading: Random numbers and timers)",
+      "description": "Inside the beat, on is flipped to the opposite: with on = !on, a ternary, or an if/else that sets it to false when it is true and to true when it is false. Help: 5.2.2 (Reading: Random numbers and timers)",
       "hint": "Inside the if, write on = !on; so it flips each beat.",
       "type": "regex",
       "file": "script.js",
@@ -68,7 +68,7 @@
     {
       "id": "r3",
       "title": "A one-shot at frame 300",
-      "description": "The code tests frameCount === 300, which is true on one frame only. Help: 5.2.1 (Reading: Random numbers and timers)",
+      "description": "The code tests frameCount === 300, which is true on one frame only. Help: 5.2.2 (Reading: Random numbers and timers)",
       "hint": "Use === so it is true on one frame: frameCount === 300.",
       "type": "regex",
       "file": "script.js",
@@ -80,7 +80,7 @@
     {
       "id": "r4",
       "title": "The one-shot sets the message",
-      "description": "When frame 300 arrives, message is set to the words. Help: 5.2.2 (Worked Example: Sparkles on a beat)",
+      "description": "When frame 300 arrives, message is set to the words. Help: 5.2.3 (Worked Example: Sparkles on a beat)",
       "hint": "Inside the frameCount === 300 block, assign message = 'Time is up!'.",
       "type": "regex",
       "file": "script.js",
@@ -92,7 +92,7 @@
     {
       "id": "r5",
       "title": "The frame 70 check is not inside another condition",
-      "description": "The frameCount === 70 test stands on its own, not wrapped in if (on) or joined to it with &&. Help: 5.2.1 (Reading: Random numbers and timers)",
+      "description": "The frameCount === 70 test stands on its own, not wrapped in if (on) or joined to it with &&. Help: 5.2.2 (Reading: Random numbers and timers)",
       "hint": "A timer test hidden inside an if is only looked at when that if is true. Move it outside.",
       "type": "regex",
       "file": "script.js",
@@ -110,36 +110,36 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.4 Lab: A beat and a one-shot\". The task they were given: In draw(): (1) a beat: every 30 frames, flip the variable on between true and false, so the lamp, which the starter already colours gold when on is true and gray when it is false, blinks twice a second; (2) a one-shot: when frameCount reaches 300, set message to 'Time is up!' and log it with console.log, once, not on every frame; (3) repair the 'Almost!' check at the bottom, which should log on frame 70 but sits inside if (on) and so never runs: the frame-70 test must not be inside another condition. What the starter file already had: the lamp sprite, on starting false, message starting empty, text that shows the frame number and the message, the if (on) block that colours the lamp, and at the bottom the frame-70 check wrapped inside if (on). The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: draw() runs on every frame, about 60 times a second, and frameCount counts the frames. frameCount % 30 === 0 is true once every 30 frames. frameCount === 300 is true on exactly one frame, while frameCount >= 300 or > 300 stays true on every frame after it, so on its own it repeats. ! turns true into false and false into true. A test written inside another if is only looked at on frames when the outer if is true. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.5 Lab: A beat and a one-shot\". The task they were given: In draw(): (1) a beat: every 30 frames, flip the variable on between true and false, so the lamp, which the starter already colours gold when on is true and gray when it is false, blinks twice a second; (2) a one-shot: when frameCount reaches 300, set message to 'Time is up!' and log it with console.log, once, not on every frame; (3) repair the 'Almost!' check at the bottom, which should log on frame 70 but sits inside if (on) and so never runs: the frame-70 test must not be inside another condition. What the starter file already had: the lamp sprite, on starting false, message starting empty, text that shows the frame number and the message, the if (on) block that colours the lamp, and at the bottom the frame-70 check wrapped inside if (on). The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: draw() runs on every frame, about 60 times a second, and frameCount counts the frames. frameCount % 30 === 0 is true once every 30 frames. frameCount === 300 is true on exactly one frame, while frameCount >= 300 or > 300 stays true on every frame after it, so on its own it repeats. ! turns true into false and false into true. A test written inside another if is only looked at on frames when the outer if is true. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
     "rubric": [
       {
         "id": "r1",
         "title": "A repeating beat",
-        "description": "The code tests frameCount % N against 0 (with === or ==) to act every N frames. Any N counts; the lab uses 30. Help: 5.2.1 (Reading: Random numbers and timers)",
+        "description": "The code tests frameCount % N against 0 (with === or ==) to act every N frames. Any N counts; the lab uses 30. Help: 5.2.2 (Reading: Random numbers and timers)",
         "points": 1
       },
       {
         "id": "r2",
         "title": "The beat flips the lamp",
-        "description": "Inside the beat's if, on is switched so it keeps alternating between true and false: on = !on, an if/else that sets it to the opposite, or a ternary. Setting on to true only, and never back to false, turns the lamp on and leaves it on, so that is not met. Help: 5.2.1 (Reading: Random numbers and timers)",
+        "description": "Inside the beat's if, on is switched so it keeps alternating between true and false: on = !on, an if/else that sets it to the opposite, or a ternary. Setting on to true only, and never back to false, turns the lamp on and leaves it on, so that is not met. Help: 5.2.2 (Reading: Random numbers and timers)",
         "points": 1
       },
       {
         "id": "r3",
         "title": "A one-shot at frame 300",
-        "description": "The code tests frameCount === 300 (or == 300, or against 5 * 60, or against a variable holding 300), which is true on one frame only. A test with >= or > on its own would act on every frame after 300, so it is not met unless something else stops it from repeating. Help: 5.2.1 (Reading: Random numbers and timers)",
+        "description": "The code tests frameCount === 300 (or == 300, or against 5 * 60, or against a variable holding 300), which is true on one frame only. A test with >= or > on its own would act on every frame after 300, so it is not met unless something else stops it from repeating. Help: 5.2.2 (Reading: Random numbers and timers)",
         "points": 1
       },
       {
         "id": "r4",
         "title": "The one-shot sets the message",
-        "description": "Inside that frame-300 one-shot, message is set to the words (the lab uses 'Time is up!'; any wording counts). Logging it with console.log is part of the step but not of this card. Help: 5.2.2 (Worked Example: Sparkles on a beat)",
+        "description": "Inside that frame-300 one-shot, message is set to the words (the lab uses 'Time is up!'; any wording counts). Logging it with console.log is part of the step but not of this card. Help: 5.2.3 (Worked Example: Sparkles on a beat)",
         "points": 1
       },
       {
         "id": "r5",
         "title": "The frame 70 check is not inside another condition",
-        "description": "The frameCount === 70 test that logs 'Almost!' still exists and stands on its own: not inside if (on), not joined to on with && or ||, and not inside the beat's block or any other if, so it really runs on frame 70. Deleting the check is not a fix. The starter's version, wrapped in if (on), is not met yet. Help: 5.2.1 (Reading: Random numbers and timers)",
+        "description": "The frameCount === 70 test that logs 'Almost!' still exists and stands on its own: not inside if (on), not joined to on with && or ||, and not inside the beat's block or any other if, so it really runs on frame 70. Deleting the check is not a fix. The starter's version, wrapped in if (on), is not met yet. Help: 5.2.2 (Reading: Random numbers and timers)",
         "points": 1
       }
     ]

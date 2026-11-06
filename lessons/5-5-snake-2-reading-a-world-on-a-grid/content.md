@@ -44,7 +44,7 @@ if (frameCount % 8 === 0) {
 
 Change the 8 and the whole game speeds up or slows down. A smaller number is a faster snake.
 
-**Random cells.** The food needs a random cell. `random(20)` gives a number from 0 up to, but not including, 20, with decimals, as 5.2.1 showed. `floor` cuts off the decimals, so `floor(random(20))` is a whole column from 0 to 19:
+**Random cells.** The food needs a random cell. `random(20)` gives a number from 0 up to, but not including, 20, with decimals, as 5.2.2 showed. `floor` cuts off the decimals, so `floor(random(20))` is a whole column from 0 to 19:
 
 ```js
 const col = floor(random(20));

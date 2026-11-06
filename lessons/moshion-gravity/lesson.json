@@ -1,7 +1,7 @@
 {
   "id": "moshion-gravity",
-  "title": "5.2.7 Worked Example: Falling Block",
-  "description": "A dynamic block falls under gravity and lands on the static ground. Read the example, then experiment. Follows 5.2.6 (Reading: Gravity).",
+  "title": "5.2.9 Worked Example: Falling Block",
+  "description": "A dynamic block falls under gravity and lands on the static ground. Read the example, then experiment. Follows 5.2.8 (Reading: Gravity).",
   "type": "example",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -49,7 +49,7 @@
     {
       "id": "r1",
       "title": "You changed the gravity",
-      "description": "End with `world.gravity.y` set to a number other than 10 (step 2 uses 20). Help: 5.2.6 (Reading: Gravity)",
+      "description": "End with `world.gravity.y` set to a number other than 10 (step 2 uses 20). Help: 5.2.8 (Reading: Gravity)",
       "type": "regex",
       "file": "script.js",
       "pattern": "world\\.gravity\\.y\\s*=\\s*(?!\\(?\\s*10(?:\\.0*)?\\s*\\)?\\s*(?:;|\\r?\\n|$))[-\\d(.]",
@@ -66,12 +66,12 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.7 Worked Example: Falling Block\". The task they were given: A worked example: a block falls under gravity and lands on a static ground. The student changes world.gravity.y from 10 to 0 (the block floats), then to 20 (it falls faster) and leaves it at 20, then removes 'static' from the ground to watch both fall, and adds a second falling block in another colour. Only the gravity change is checked. What the starter file already had: world.gravity.y set to 10 in setup(), an orange block and a gray static ground. With gravity still at 10 the criterion is not met. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: world.gravity.y sets how hard things are pulled: a positive number pulls down the screen because y grows downward, and 0 means no pull. Only the line that really runs counts; a value written only in a comment changes nothing. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.9 Worked Example: Falling Block\". The task they were given: A worked example: a block falls under gravity and lands on a static ground. The student changes world.gravity.y from 10 to 0 (the block floats), then to 20 (it falls faster) and leaves it at 20, then removes 'static' from the ground to watch both fall, and adds a second falling block in another colour. Only the gravity change is checked. What the starter file already had: world.gravity.y set to 10 in setup(), an orange block and a gray static ground. With gravity still at 10 the criterion is not met. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: world.gravity.y sets how hard things are pulled: a positive number pulls down the screen because y grows downward, and 0 means no pull. Only the line that really runs counts; a value written only in a comment changes nothing. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
     "rubric": [
       {
         "id": "r1",
         "title": "You changed the gravity",
-        "description": "The world.gravity.y line that runs ends with a value other than 10. Step 2 ends at 20, but 0, a negative number or any other value also shows the student changed it, so it counts. Gravity set back to 10, or a new value written only in a comment, is not met. Help: 5.2.6 (Reading: Gravity)",
+        "description": "The world.gravity.y line that runs ends with a value other than 10. Step 2 ends at 20, but 0, a negative number or any other value also shows the student changed it, so it counts. Gravity set back to 10, or a new value written only in a comment, is not met. Help: 5.2.8 (Reading: Gravity)",
         "points": 1
       }
     ]

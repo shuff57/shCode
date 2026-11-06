@@ -1,6 +1,6 @@
 ## Sparkles on a beat
 
-**Read before `5.2.3 Lab: A random spot and colour`.** About 7 minutes.
+**Read before `5.2.4 Lab: A random spot and colour`.** About 7 minutes.
 
 Run it and watch for five seconds. A new square appears at a random place, in a random colour, twice every second. At the five-second mark a message appears, one time.
 
@@ -38,7 +38,7 @@ function draw() {
 
 **How it works, line by line.**
 
-- `world.gravity.y = 0;` keeps off the pull that makes sprites fall. It is already `0` when a sketch starts, so the line changes nothing: it is there so a reader can see that nothing will fall. That is all you need to know about it today; gravity gets its own reading in 5.2.6. With it at `0`, each square stays where it appears.
+- `world.gravity.y = 0;` keeps off the pull that makes sprites fall. It is already `0` when a sketch starts, so the line changes nothing: it is there so a reader can see that nothing will fall. That is all you need to know about it today; gravity gets its own reading in 5.2.8. With it at `0`, each square stays where it appears.
 - `frameCount % 30 === 0` is the beat. It is true on frames 30, 60, 90 and so on, so `new Sprite(...)` runs twice a second. In 5.1.8 a `new Sprite` inside `draw()` was a bug, because it ran 60 times a second by accident. Here it sits inside the beat, so it runs only when the beat says so.
 - `random(20, 380)` is a decimal between 20 and 380 for the x position, and `random(70, 280)` is one for y, which keeps the squares below the text. The squares are 20 wide, so a margin of 20 keeps each one fully on the canvas.
 - `floor(random(colors.length))` is a whole number from `0` to `4`: a position in the list. `colors[...]` reads the colour sitting there.

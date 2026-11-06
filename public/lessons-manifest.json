@@ -7321,7 +7321,7 @@
     },
     {
       "id": "5-2-1-slides",
-      "title": "5.2.5 Slides: Physics Feel",
+      "title": "5.2.6 Slides: Physics Feel",
       "unit": "5.2 Physics Feel",
       "preview": "slides",
       "type": "lesson",
@@ -7334,7 +7334,7 @@
     },
     {
       "id": "5-2-10-reading-delete",
-      "title": "5.2.15 Reading: Cleanup and Delete",
+      "title": "5.2.21 Reading: Cleanup and Delete",
       "unit": "5.2 Physics Feel",
       "preview": "reading",
       "type": "lesson",
@@ -7347,7 +7347,7 @@
     },
     {
       "id": "5-2-11-lab-reaching-the-goal",
-      "title": "5.2.17 Lab: Reaching the Goal",
+      "title": "5.2.23 Lab: Reaching the Goal",
       "unit": "5.2 Physics Feel",
       "preview": "moshion",
       "type": "lesson",
@@ -7360,7 +7360,7 @@
     },
     {
       "id": "5-2-12-example-finished-scene",
-      "title": "5.2.16 Worked Example: The Finished Scene",
+      "title": "5.2.22 Worked Example: The Finished Scene",
       "unit": "5.2 Physics Feel",
       "preview": "example",
       "type": "lesson",
@@ -7373,7 +7373,7 @@
     },
     {
       "id": "5-2-13-a5-2-1-pinball-scene",
-      "title": "5.2.18 Pinball Scene",
+      "title": "5.2.24 Pinball Scene",
       "unit": "5.2 Physics Feel",
       "preview": "moshion",
       "type": "assignment",
@@ -7386,7 +7386,7 @@
     },
     {
       "id": "5-2-14-a5-2-2-vel-vs-applyforce",
-      "title": "5.2.19 Vel vs applyForce",
+      "title": "5.2.25 Vel vs applyForce",
       "unit": "5.2 Physics Feel",
       "preview": "assignment",
       "type": "assignment",
@@ -7399,7 +7399,7 @@
     },
     {
       "id": "5-2-15-challenges",
-      "title": "5.2.20 Challenges: Optional Stretch",
+      "title": "5.2.26 Challenges: Optional Stretch",
       "unit": "5.2 Physics Feel",
       "preview": "moshion",
       "type": "challenge",
@@ -7412,7 +7412,7 @@
     },
     {
       "id": "5-2-2-reading-gravity",
-      "title": "5.2.6 Reading: Gravity",
+      "title": "5.2.8 Reading: Gravity",
       "unit": "5.2 Physics Feel",
       "preview": "reading",
       "type": "lesson",
@@ -7425,7 +7425,7 @@
     },
     {
       "id": "5-2-3-lab-tune-gravity",
-      "title": "5.2.8 Lab: Tune Gravity",
+      "title": "5.2.10 Lab: Tune Gravity",
       "unit": "5.2 Physics Feel",
       "preview": "moshion",
       "type": "lesson",
@@ -7438,7 +7438,7 @@
     },
     {
       "id": "5-2-4-reading-ground-check",
-      "title": "5.2.9 Reading: Ground-Gated Actions",
+      "title": "5.2.12 Reading: Ground-Gated Actions",
       "unit": "5.2 Physics Feel",
       "preview": "reading",
       "type": "lesson",
@@ -7451,7 +7451,7 @@
     },
     {
       "id": "5-2-5-lab-add-a-jump",
-      "title": "5.2.10 Lab: Add a Jump",
+      "title": "5.2.13 Lab: Add a Jump",
       "unit": "5.2 Physics Feel",
       "preview": "moshion",
       "type": "lesson",
@@ -7464,7 +7464,7 @@
     },
     {
       "id": "5-2-6-reading-bounciness-friction",
-      "title": "5.2.11 Reading: Bounciness and Friction",
+      "title": "5.2.15 Reading: Bounciness and Friction",
       "unit": "5.2 Physics Feel",
       "preview": "reading",
       "type": "lesson",
@@ -7477,7 +7477,7 @@
     },
     {
       "id": "5-2-8-reading-forces-vs-velocity",
-      "title": "5.2.13 Reading: Forces vs Velocity",
+      "title": "5.2.18 Reading: Forces vs Velocity",
       "unit": "5.2 Physics Feel",
       "preview": "reading",
       "type": "lesson",
@@ -7490,7 +7490,7 @@
     },
     {
       "id": "5-2-9-lab-wind-zone",
-      "title": "5.2.14 Lab: Wind Zone",
+      "title": "5.2.19 Lab: Wind Zone",
       "unit": "5.2 Physics Feel",
       "preview": "moshion",
       "type": "lesson",
@@ -7503,7 +7503,7 @@
     },
     {
       "id": "5-2-random-1-reading-random-and-timers",
-      "title": "5.2.1 Reading: Random numbers and timers",
+      "title": "5.2.2 Reading: Random numbers and timers",
       "unit": "5.2 Physics Feel",
       "preview": "reading",
       "type": "lesson",
@@ -7516,7 +7516,7 @@
     },
     {
       "id": "5-2-random-2-example-sparkles",
-      "title": "5.2.2 Worked Example: Sparkles on a beat",
+      "title": "5.2.3 Worked Example: Sparkles on a beat",
       "unit": "5.2 Physics Feel",
       "preview": "example",
       "type": "lesson",
@@ -7529,7 +7529,7 @@
     },
     {
       "id": "5-2-random-3-lab-random-spot-and-colour",
-      "title": "5.2.3 Lab: A random spot and colour",
+      "title": "5.2.4 Lab: A random spot and colour",
       "unit": "5.2 Physics Feel",
       "preview": "moshion",
       "type": "lesson",
@@ -7542,7 +7542,7 @@
     },
     {
       "id": "5-2-random-4-lab-beat-and-one-shot",
-      "title": "5.2.4 Lab: A beat and a one-shot",
+      "title": "5.2.5 Lab: A beat and a one-shot",
       "unit": "5.2 Physics Feel",
       "preview": "moshion",
       "type": "lesson",
@@ -7555,7 +7555,7 @@
     },
     {
       "id": "5-2-update-1-reading-update-runs-before-physics",
-      "title": "5.2.21 Reading: update() runs before physics",
+      "title": "5.2.28 Reading: update() runs before physics",
       "unit": "5.2 Physics Feel",
       "preview": "reading",
       "type": "lesson",
@@ -7568,9 +7568,100 @@
     },
     {
       "id": "5-2-update-2-lab-rules-in-update",
-      "title": "5.2.22 Lab: Rules in update(), picture in draw()",
+      "title": "5.2.29 Lab: Rules in update(), picture in draw()",
       "unit": "5.2 Physics Feel",
       "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-2-video-bounce",
+      "title": "5.2.14 Video: Bounciness and Friction Explained",
+      "unit": "5.2 Physics Feel",
+      "preview": "video",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-2-video-delete",
+      "title": "5.2.20 Video: Delete and Hide Explained",
+      "unit": "5.2 Physics Feel",
+      "preview": "video",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-2-video-forces",
+      "title": "5.2.17 Video: Forces vs Velocity Explained",
+      "unit": "5.2 Physics Feel",
+      "preview": "video",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-2-video-gravity",
+      "title": "5.2.7 Video: Gravity Explained",
+      "unit": "5.2 Physics Feel",
+      "preview": "video",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-2-video-jump",
+      "title": "5.2.11 Video: The Jump Explained",
+      "unit": "5.2 Physics Feel",
+      "preview": "video",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-2-video-random",
+      "title": "5.2.1 Video: Random Numbers and Timers",
+      "unit": "5.2 Physics Feel",
+      "preview": "video",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-2-video-update",
+      "title": "5.2.27 Video: update() Runs Before Physics",
+      "unit": "5.2 Physics Feel",
+      "preview": "video",
       "type": "lesson",
       "category": "Unit 2: moSHion: Applied Game Development",
       "week": 11,
@@ -11936,7 +12027,7 @@
     },
     {
       "id": "moshion-bounce",
-      "title": "5.2.12 Bouncy Ball",
+      "title": "5.2.16 Bouncy Ball",
       "unit": "5.2 Physics Feel",
       "preview": "moshion",
       "type": "lesson",
@@ -11949,7 +12040,7 @@
     },
     {
       "id": "moshion-gravity",
-      "title": "5.2.7 Worked Example: Falling Block",
+      "title": "5.2.9 Worked Example: Falling Block",
       "unit": "5.2 Physics Feel",
       "preview": "moshion",
       "type": "example",

@@ -39,7 +39,7 @@ if (kb.pressing('space') && cooldown === 0) {
 
 Read it frame by frame. A shot is fired and `cooldown` becomes 12. On the next frames it counts 11, 10, 9 ... and the `if` stays shut even though Space is held. On the frame it reaches 0 the next shot fires and it goes back to 12. So a cooldown of 12 means one shot every 12 frames at most: **at most 5 shots a second** (60 / 12). Let go of Space and the count still runs down to 0 and waits there, so the first shot after a pause comes the moment you press.
 
-**A cooldown is not a beat.** You met the beat in 5.2.1: `frameCount % 12 === 0` is true on every 12th frame. Both give a 12-frame gap, but they start counting at different times:
+**A cooldown is not a beat.** You met the beat in 5.2.2: `frameCount % 12 === 0` is true on every 12th frame. Both give a 12-frame gap, but they start counting at different times:
 
 | | A beat: `frameCount % 12 === 0` | A cooldown: `cooldown = 12` |
 | --- | --- | --- |

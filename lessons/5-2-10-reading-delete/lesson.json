@@ -1,7 +1,7 @@
 {
   "id": "5-2-10-reading-delete",
-  "title": "5.2.15 Reading: Cleanup and Delete",
-  "description": "delete() vs .visible. Read before 5.2.16 Worked Example: The Finished Scene.",
+  "title": "5.2.21 Reading: Cleanup and Delete",
+  "description": "delete() vs .visible. Read before 5.2.22 Worked Example: The Finished Scene.",
   "type": "lesson",
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -13,7 +13,6 @@
   ],
   "externalLink": "/docs/moshion",
   "externalLinkLabel": "Open the in-app moSHion docs",
-  "videoUrl": "/videos/5-2-delete/index.html",
   "contentFile": "content.md",
   "steps": [],
   "requirements": [],

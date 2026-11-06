@@ -1,6 +1,6 @@
 ## Random numbers and timers
 
-**Read before `5.2.2 Worked Example: Sparkles on a beat`.** About 10 minutes.
+**Read before `5.2.3 Worked Example: Sparkles on a beat`.** About 10 minutes.
 
 By the end of this reading you should be able to answer:
 

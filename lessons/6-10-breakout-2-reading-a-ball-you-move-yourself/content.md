@@ -17,7 +17,7 @@ ball.x += vx;
 ball.y += vy;
 ```
 
-Why not let physics bounce it, with the `bounciness` of 5.2.11? Because the bricks will not be sprites at all: they are data, a list of rows (6.14.9), so there would be nothing for a physics ball to bounce off. And the paddle steers the ball by setting its speed, which is simplest when the speed is two numbers your own code owns.
+Why not let physics bounce it, with the `bounciness` of 5.2.15? Because the bricks will not be sprites at all: they are data, a list of rows (6.14.9), so there would be nothing for a physics ball to bounce off. And the paddle steers the ball by setting its speed, which is simplest when the speed is two numbers your own code owns.
 
 **A bounce is a flipped sign.** When the ball reaches the right wall it has to go left at the same speed. `vx = -vx` turns `3` into `-3`. At the left wall the same line turns `-3` back into `3`. The top flips `vy` the same way. The speed never changes, only its direction.
 

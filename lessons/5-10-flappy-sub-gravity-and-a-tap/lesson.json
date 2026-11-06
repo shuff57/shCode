@@ -40,7 +40,7 @@
     {
       "id": "r1",
       "title": "Gravity is on",
-      "description": "The world has gravity above 0, so sprites fall. Help: 5.2.6 (Reading: Gravity)",
+      "description": "The world has gravity above 0, so sprites fall. Help: 5.2.8 (Reading: Gravity)",
       "hint": "world.gravity.y = 10;",
       "type": "regex",
       "file": "script.js",

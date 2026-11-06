@@ -1,7 +1,7 @@
 {
   "id": "5-2-update-2-lab-rules-in-update",
-  "title": "5.2.22 Lab: Rules in update(), picture in draw()",
-  "description": "The jump scene from 5.2.10 does everything in draw(). Split it in two: move the keys, the movement and the jump into update(), which moSHion runs before the physics step, and leave draw() with only the picture.",
+  "title": "5.2.29 Lab: Rules in update(), picture in draw()",
+  "description": "The jump scene from 5.2.13 does everything in draw(). Split it in two: move the keys, the movement and the jump into update(), which moSHion runs before the physics step, and leave draw() with only the picture.",
   "type": "lesson",
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -15,10 +15,10 @@
     {
       "id": "s1",
       "title": "Add an empty update()",
-      "instructions": "Run the starter first. It is the jump scene from 5.2.10, and everything happens in `draw()`. Click the canvas so it hears your keys (5.1.13): a and d move, space jumps.\n\nmoSHion runs one more function on every frame, if you write it: `update()`. Each frame goes in this order: your `update()`, then the physics step (gravity, velocity and collisions move the sprites), then your `draw()`, then moSHion paints the sprites. You never call `update()` yourself, the same as `setup()` and `draw()`.\n\nBelow `setup()`, where the STEP 1 comment is, add an empty one:\n\n```js\nfunction update() {\n}\n```\n\nRun it. Nothing changes, because it is empty. Spell it exactly, all lower case: moSHion finds it by its name, so `Update` would never run.",
+      "instructions": "Run the starter first. It is the jump scene from 5.2.13, and everything happens in `draw()`. Click the canvas so it hears your keys (5.1.13): a and d move, space jumps.\n\nmoSHion runs one more function on every frame, if you write it: `update()`. Each frame goes in this order: your `update()`, then the physics step (gravity, velocity and collisions move the sprites), then your `draw()`, then moSHion paints the sprites. You never call `update()` yourself, the same as `setup()` and `draw()`.\n\nBelow `setup()`, where the STEP 1 comment is, add an empty one:\n\n```js\nfunction update() {\n}\n```\n\nRun it. Nothing changes, because it is empty. Spell it exactly, all lower case: moSHion finds it by its name, so `Update` would never run.",
       "hints": [
         "It goes outside every other function: after the closing } of setup() and before function draw().",
-        "The reading 5.2.21 shows the whole frame order, with a console demo."
+        "The reading 5.2.28 shows the whole frame order, with a console demo."
       ]
     },
     {
@@ -33,10 +33,10 @@
     {
       "id": "s3",
       "title": "Move the jump into update()",
-      "instructions": "Cut the whole jump block under the STEP 3 comment, from `if (kb.presses(' ')` down to its closing `}`, out of `draw()`, and paste it inside `update()`, below the movement lines. Run it, click the canvas and press space: the player still jumps once per press, and only from the ground.\n\n`kb.presses()` is true for the whole frame in which the key goes down, and `update()` runs in that frame, so it sees the press once, just as `draw()` did (5.2.9).",
+      "instructions": "Cut the whole jump block under the STEP 3 comment, from `if (kb.presses(' ')` down to its closing `}`, out of `draw()`, and paste it inside `update()`, below the movement lines. Run it, click the canvas and press space: the player still jumps once per press, and only from the ground.\n\n`kb.presses()` is true for the whole frame in which the key goes down, and `update()` runs in that frame, so it sees the press once, just as `draw()` did (5.2.12).",
       "hints": [
         "Take the closing } with it, or the braces stop matching and the sketch shows an error.",
-        "Keep both checks joined with &&, as in 5.2.10: the key press AND the ground."
+        "Keep both checks joined with &&, as in 5.2.13: the key press AND the ground."
       ]
     },
     {
@@ -52,7 +52,7 @@
     {
       "id": "r1",
       "title": "The sketch has an update() function",
-      "description": "The sketch defines function update() { ... }, spelled all lower case, on its own and not inside setup() or draw(). moSHion runs it on every frame, before the physics step. Help: 5.2.21 (Reading: update() runs before physics)",
+      "description": "The sketch defines function update() { ... }, spelled all lower case, on its own and not inside setup() or draw(). moSHion runs it on every frame, before the physics step. Help: 5.2.28 (Reading: update() runs before physics)",
       "hint": "Write function update() { } below setup(), after setup()'s closing }, not inside it. Spell update all in lower case.",
       "type": "regex",
       "file": "script.js",
@@ -65,7 +65,7 @@
     {
       "id": "r2",
       "title": "The keys move the player in update()",
-      "description": "Inside update(), a kb.pressing(...) test moves the player: its vel.x is set, or its x is changed. Any keys count. Help: 5.2.21 (Reading: update() runs before physics)",
+      "description": "Inside update(), a kb.pressing(...) test moves the player: its vel.x is set, or its x is changed. Any keys count. Help: 5.2.28 (Reading: update() runs before physics)",
       "hint": "Cut the if / else if / else that reads a and d out of draw() and paste it inside update()'s braces.",
       "type": "inFunction",
       "function": "update",
@@ -79,7 +79,7 @@
     {
       "id": "r3",
       "title": "The jump is in update()",
-      "description": "Inside update(), the jump waits for both a key press, kb.presses(...), and the ground, .colliding(...), joined with && (or one if inside the other), as in 5.2.10. Help: 5.2.21 (Reading: update() runs before physics)",
+      "description": "Inside update(), the jump waits for both a key press, kb.presses(...), and the ground, .colliding(...), joined with && (or one if inside the other), as in 5.2.13. Help: 5.2.28 (Reading: update() runs before physics)",
       "hint": "Cut the whole if (kb.presses(' ') && ...) { ... } block, closing } included, out of draw() and paste it inside update().",
       "type": "inFunction",
       "function": "update",
@@ -92,7 +92,7 @@
     {
       "id": "r4",
       "title": "draw() keeps only the picture",
-      "description": "draw() still calls background(), and no key test (kb.pressing or kb.presses) is left in it: the rules now live in update(). Help: 5.2.21 (Reading: update() runs before physics)",
+      "description": "draw() still calls background(), and no key test (kb.pressing or kb.presses) is left in it: the rules now live in update(). Help: 5.2.28 (Reading: update() runs before physics)",
       "hint": "Keep background('#222') at the top of draw(), and delete any kb. line still left in draw(): update() has it now.",
       "type": "inFunction",
       "function": "draw",
@@ -112,30 +112,30 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.22 Lab: Rules in update(), picture in draw()\". The task they were given: The starter is a jump scene that does everything in draw(). Add a function named update (all lower case) outside the other functions. Move the a/d movement (an if / else if / else that sets the player's horizontal velocity from kb.pressing) out of draw() and into update(). Move the jump (a kb.presses test joined with && to a colliding test against the ground, which sets a negative vertical velocity) out of draw() and into update() too. Leave draw() with only the picture: background(), fill(), textSize() and text(), and no key tests. What the starter file already had: gravity at 10, a player and a static ground made in setup(), and a draw() that paints the background, writes one line of words, moves the player with a and d, and makes it jump from the ground on space. It has no update() function, and its draw() still reads keys, so the starter meets none of the criteria.You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: moSHion calls a top-level function declared as function update() { ... } on every frame, before the physics step; then it runs draw(); then it paints the sprites. It finds the function by its exact name, so Update, updates, or an update function written inside another function is never called. A const or let holding an arrow function named update is not found either, because moSHion looks for a function declaration on the page. update() may take one parameter (the frame's length in seconds) or none. A velocity set in update() moves the sprite in the same frame; set in draw() it waits one frame, which nobody can see, so both work in play. kb.presses(key) is true only on the frame a key goes down, and update() and draw() both run in that frame. a.colliding(b) is 0 while apart and a count of frames while touching, either sprite can ask, and y grows downward, so a negative vel.y goes up. A helper function that update() calls counts as being in update(); the same helper called only from draw() does not. Anything drawn in update() is painted over by a background() at the top of draw(). Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.29 Lab: Rules in update(), picture in draw()\". The task they were given: The starter is a jump scene that does everything in draw(). Add a function named update (all lower case) outside the other functions. Move the a/d movement (an if / else if / else that sets the player's horizontal velocity from kb.pressing) out of draw() and into update(). Move the jump (a kb.presses test joined with && to a colliding test against the ground, which sets a negative vertical velocity) out of draw() and into update() too. Leave draw() with only the picture: background(), fill(), textSize() and text(), and no key tests. What the starter file already had: gravity at 10, a player and a static ground made in setup(), and a draw() that paints the background, writes one line of words, moves the player with a and d, and makes it jump from the ground on space. It has no update() function, and its draw() still reads keys, so the starter meets none of the criteria.You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: moSHion calls a top-level function declared as function update() { ... } on every frame, before the physics step; then it runs draw(); then it paints the sprites. It finds the function by its exact name, so Update, updates, or an update function written inside another function is never called. A const or let holding an arrow function named update is not found either, because moSHion looks for a function declaration on the page. update() may take one parameter (the frame's length in seconds) or none. A velocity set in update() moves the sprite in the same frame; set in draw() it waits one frame, which nobody can see, so both work in play. kb.presses(key) is true only on the frame a key goes down, and update() and draw() both run in that frame. a.colliding(b) is 0 while apart and a count of frames while touching, either sprite can ask, and y grows downward, so a negative vel.y goes up. A helper function that update() calls counts as being in update(); the same helper called only from draw() does not. Anything drawn in update() is painted over by a background() at the top of draw(). Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
     "rubric": [
       {
         "id": "r1",
         "title": "The sketch has an update() function",
-        "description": "A top-level function declared as function update() { ... } (spelled all lower case, with or without one parameter) exists, so moSHion runs it every frame. An empty one counts for this card. Not met: a different spelling, or update written inside another function's braces. Help: 5.2.21 (Reading: update() runs before physics)",
+        "description": "A top-level function declared as function update() { ... } (spelled all lower case, with or without one parameter) exists, so moSHion runs it every frame. An empty one counts for this card. Not met: a different spelling, or update written inside another function's braces. Help: 5.2.28 (Reading: update() runs before physics)",
         "points": 1
       },
       {
         "id": "r2",
         "title": "The keys move the player in update()",
-        "description": "Inside update() (or in a helper that update() calls), a key test with kb.pressing(...) changes how the player moves sideways: its vel.x is set, its x is changed, or a force is applied. Any keys and any speeds count, and so does a ternary. A copy of the same lines left in draw() as well does not stop this card; r4 is the card about draw(). Not met: the movement only in draw(). Help: 5.2.21 (Reading: update() runs before physics)",
+        "description": "Inside update() (or in a helper that update() calls), a key test with kb.pressing(...) changes how the player moves sideways: its vel.x is set, its x is changed, or a force is applied. Any keys and any speeds count, and so does a ternary. A copy of the same lines left in draw() as well does not stop this card; r4 is the card about draw(). Not met: the movement only in draw(). Help: 5.2.28 (Reading: update() runs before physics)",
         "points": 1
       },
       {
         "id": "r3",
         "title": "The jump is in update()",
-        "description": "Inside update() (or in a helper that update() calls), the player jumps only when a key press, kb.presses(...), and a ground check, .colliding(...), are both true: joined with && in one if, or one if nested inside the other. Any jump key counts, and the jump sets a negative vel.y. Not met: the jump only in draw(), the two checks joined with ||, or a jump on kb.pressing alone. Help: 5.2.21 (Reading: update() runs before physics)",
+        "description": "Inside update() (or in a helper that update() calls), the player jumps only when a key press, kb.presses(...), and a ground check, .colliding(...), are both true: joined with && in one if, or one if nested inside the other. Any jump key counts, and the jump sets a negative vel.y. Not met: the jump only in draw(), the two checks joined with ||, or a jump on kb.pressing alone. Help: 5.2.28 (Reading: update() runs before physics)",
         "points": 1
       },
       {
         "id": "r4",
         "title": "draw() keeps only the picture",
-        "description": "draw() still paints the background with background(), and no key test (kb.pressing or kb.presses) is left in draw(), because the rules now live in update(). Words, fill and text size in draw() are the picture and are fine. Not met: a leftover copy of the key or jump lines still in draw(), or background() moved out of draw(). Help: 5.2.21 (Reading: update() runs before physics)",
+        "description": "draw() still paints the background with background(), and no key test (kb.pressing or kb.presses) is left in draw(), because the rules now live in update(). Words, fill and text size in draw() are the picture and are fine. Not met: a leftover copy of the key or jump lines still in draw(), or background() moved out of draw(). Help: 5.2.28 (Reading: update() runs before physics)",
         "points": 1
       }
     ]
