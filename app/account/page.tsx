@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getCurrentUser, updateName, CurrentUser } from '../../lib/auth';
+import AppearanceSettings from '../../components/AppearanceSettings';
 
 const S = {
   page: {
@@ -14,7 +15,7 @@ const S = {
   } as React.CSSProperties,
 
   card: {
-    maxWidth: 440,
+    maxWidth: 560,
     margin: '0 auto',
     background: 'var(--c-deep)',
     border: '1px solid var(--c-line)',
@@ -94,7 +95,7 @@ export default function AccountPage() {
   if (!loaded) {
     return (
       <div style={S.page}>
-        <div style={{ maxWidth: 440, margin: '0 auto', color: 'var(--c-comment)' }}>Loading…</div>
+        <div style={{ maxWidth: 560, margin: '0 auto', color: 'var(--c-comment)' }}>Loading…</div>
       </div>
     );
   }
@@ -102,7 +103,7 @@ export default function AccountPage() {
   if (!user) {
     return (
       <div style={S.page}>
-        <div style={{ maxWidth: 440, margin: '0 auto' }}>
+        <div style={{ maxWidth: 560, margin: '0 auto' }}>
           <p>
             You need to sign in first. <Link href="/" style={{ color: 'var(--c-cyan)' }}>Go home</Link>
           </p>
@@ -160,6 +161,8 @@ export default function AccountPage() {
           </button>
         </form>
       </div>
+
+      <AppearanceSettings />
     </div>
   );
 }

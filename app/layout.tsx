@@ -5,6 +5,8 @@ import { AnnouncementBanner } from '../components/AnnouncementBanner';
 import ReportIssueButton from '../components/ReportIssueButton';
 import StaleBuildGuard from '../components/StaleBuildGuard';
 import LibrarySync from '../components/LibrarySync';
+import PrefsSync from '../components/PrefsSync';
+import { PREFS_BOOT_SCRIPT } from '../lib/prefs';
 import { ReactNode } from 'react';
 
 export const metadata = {
@@ -16,17 +18,18 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* The chosen theme (#73) is applied before first paint, so a light theme never
+        {/* The chosen theme, accent and font (#73, #77) are applied before first paint, so a light theme never
             flashes dark. The account's choice is cached here by lib/prefs.ts. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: "try{var t=localStorage.getItem('shcode.theme');if(t&&t!=='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}",
+            __html: PREFS_BOOT_SCRIPT,
           }}
         />
       </head>
       <body>
         <StaleBuildGuard />
         <LibrarySync />
+        <PrefsSync />
         <AnnouncementBanner />
         <Header />
         {children}

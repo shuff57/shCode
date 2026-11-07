@@ -570,6 +570,10 @@ app.prepare().catch((err) => {
       const out = await handler({ request, env: { DB: libDb, UPLOADS }, params: req.params, data: { email, role: DEV_ROLE } });
       res.status(out.status).type('application/json').send(await out.text());
     };
+    // Appearance settings (functions/api/prefs.ts), same in-memory database.
+    const prefsRoute = await import('./functions/api/prefs.ts');
+    server.get('/api/prefs', libRoute(prefsRoute.onRequestGet));
+    server.put('/api/prefs', express.json(), libRoute(prefsRoute.onRequestPut));
     server.get('/api/library', libRoute(libList.onRequestGet));
     server.get('/api/library/shared', libRoute(shareList.onRequestGet));
     server.get('/api/library/shared/:id', libRoute(shareOne.onRequestGet));

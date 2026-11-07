@@ -1,5 +1,6 @@
 import LessonSearchFilter from '../components/LessonSearchFilter';
 import LegalLinks from '../components/LegalLinks';
+import HomeBackdrop from '../components/HomeBackdrop';
 import { loadLessons } from '../lib/lessons';
 import { listUnits } from '../lib/curriculum';
 import type { Lesson } from '../lib/types';
@@ -93,6 +94,7 @@ export default async function HomePage() {
 
   return (
     <div className="p-4">
+      <HomeBackdrop />
       <LessonSearchFilter units={units} lessons={lessons.map(forCards)} />
 
       <footer className="flex items-center justify-between w-2/3 mx-auto mt-8 pt-4 border-t border-border text-sm opacity-70">

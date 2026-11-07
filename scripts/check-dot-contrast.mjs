@@ -50,10 +50,47 @@ if (!block) {
   process.exit(1);
 }
 
-const colors = [...new Set(block[1].match(/#[0-9a-fA-F]{6}/g) ?? [])];
-if (colors.length === 0) {
-  console.error(`FAIL  ${FILE}: stateColor holds no hex literals to measure.`);
+// Since the theme work (#73) the chain names CSS variables, so each one is
+// resolved in EVERY theme -- dark from :root in app/globals.css, the rest from
+// the generated app/themes.css -- and measured against that theme's strip
+// (--c-deep2, the footer's background). A bare hex literal is still measured
+// as-is in every theme.
+const globalsCss = readFileSync(resolve(root, 'app/globals.css'), 'utf8');
+const themesCss = readFileSync(resolve(root, 'app/themes.css'), 'utf8');
+function varsOf(css) {
+  const out = {};
+  for (const m of css.matchAll(/--([\w-]+):\s*([^;]+);/g)) out[m[1]] = m[2].trim();
+  return out;
+}
+const rootBlock = globalsCss.match(/:root\s*\{[\s\S]*?\n\}/g)?.join('\n') ?? '';
+const darkVars = varsOf(rootBlock);
+const themes = { dark: darkVars };
+for (const m of themesCss.matchAll(/html\[data-theme="(\w+)"\]\s*\{([\s\S]*?)\n\}/g)) {
+  themes[m[1]] = { ...darkVars, ...varsOf(m[2]) };
+}
+function resolveColor(value, vars, depth = 0) {
+  const v = value.trim();
+  if (/^#[0-9a-fA-F]{6}$/.test(v)) return v.toLowerCase();
+  const ref = v.match(/^var\(--([\w-]+)\)$/);
+  if (ref && depth < 5 && vars[ref[1]]) return resolveColor(vars[ref[1]], vars, depth + 1);
+  return null;
+}
+const tokens = [...new Set(block[1].match(/#[0-9a-fA-F]{6}|var\(--[\w-]+\)/g) ?? [])];
+if (tokens.length === 0) {
+  console.error(`FAIL  ${FILE}: stateColor holds no colours to measure.`);
   process.exit(1);
+}
+const colors = [];
+for (const [theme, vars] of Object.entries(themes)) {
+  const strip = resolveColor('var(--c-deep2)', vars) ?? STRIP_BG;
+  for (const t of tokens) {
+    const hex = resolveColor(t, vars);
+    if (!hex) {
+      console.error(`FAIL  ${FILE}: cannot resolve ${t} in the ${theme} theme.`);
+      process.exit(1);
+    }
+    colors.push({ theme, token: t, hex, strip });
+  }
 }
 
 // Opacity would undo everything measured here, so refuse it on the segment.
@@ -70,13 +107,12 @@ const clipped = segStyle && /backgroundClip/.test(segStyle[0]);
 const shorthand = segStyle && /\bbackground:\s/.test(segStyle[0]);
 
 const failures = [];
-for (const color of colors) {
-  const ratio = contrast(color, STRIP_BG);
+for (const { theme, token, hex, strip } of colors) {
+  const ratio = contrast(hex, strip);
   const ok = ratio >= MIN_RATIO;
-  if (!ok) failures.push({ color, ratio });
-  console.log(`${ok ? 'ok  ' : 'FAIL'}  ${color} on ${STRIP_BG}  ${ratio.toFixed(2)}:1`);
+  if (!ok) failures.push({ color: `${theme} ${token}`, ratio });
+  console.log(`${ok ? 'ok  ' : 'FAIL'}  ${theme.padEnd(6)} ${token} ${hex} on ${strip}  ${ratio.toFixed(2)}:1`);
 }
-
 if (dimmed) {
   failures.push({ color: 'segStyle.opacity', ratio: 0 });
   console.log('FAIL  segStyle sets opacity — that lowers every ratio above.');
@@ -96,4 +132,4 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`\nAll ${colors.length} segment colours clear ${MIN_RATIO.toFixed(1)}:1 on ${STRIP_BG}.`);
+console.log(`\nAll ${tokens.length} segment colours clear ${MIN_RATIO.toFixed(1)}:1 on the strip in all ${Object.keys(themes).length} themes.`);

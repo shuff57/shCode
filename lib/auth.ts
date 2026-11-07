@@ -152,6 +152,8 @@ export async function logout(): Promise<void> {
   if (email) {
     try { await (await import('./library-sync')).clearSyncedLibrary(email); } catch { /* best effort */ }
   }
+  // And this account's Appearance settings: the next person starts from the default look.
+  try { (await import('./prefs')).clearLocalPrefs(); } catch { /* best effort */ }
   await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' });
   invalidateCurrentUser();
 }

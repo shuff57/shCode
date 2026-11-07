@@ -41,6 +41,11 @@ export default function PrivacyPage() {
           Signing out removes the copies that are already in your account from that browser.
         </li>
         <li>
+          <strong>Appearance settings:</strong> the theme, accent colour, font and home page background you pick on My
+          account, kept with your account so they follow you to other computers. A background image you upload is stored
+          with your other uploaded images. Signing out returns that browser to the default look.
+        </li>
+        <li>
           <strong>AI help (CODY):</strong> when you ask for help, your question and the relevant lesson or code are sent to an AI
           provider to write a hint. Questions that appear to contain personal details such as an email address, phone number
           or card number are blocked before anything is sent. We keep only a count of how many help requests each student
