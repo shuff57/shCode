@@ -79,6 +79,9 @@ chose and why that one.
 
 ## 7.21 Build your own: one game, in objects
 
+> **Numbering, 2026-11-07:** 7.16-7.21 are the Quest RPG (`QUEST-SPEC.md`), so this capstone
+> takes the next free number when it is built.
+
 **After 7.6 Defender, Part C. Last lesson of Unit 7. About 75 minutes. 0 points.**
 
 Unit 7 owns classes, properties, constructors, methods, `this`, arrays of instances, statics
