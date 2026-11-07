@@ -11209,6 +11209,86 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "model": "glm-5.3-flash:cloud",
     "contextDocs": []
   },
+  "7-16-quest-1-plan-break-quest-into-parts": {
+    "lessonTitle": "7.16.1 Plan: Break Quest into parts",
+    "prompt": "Everything you need is on this page: go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to build Quest, a turn-based battle. Before you write any code, plan it.\n\n1. List at least four separate parts of the game, things it has or does.\n\n2. Which two or more things does the game have to remember from one frame to the next?\n\n3. Which part would you build first, so something runs today, and why?\n\n4. Which part are you unsure how to build, and what makes it hard?",
+    "rubric": [
+      {
+        "id": "parts",
+        "title": "Four or more parts of the game are named",
+        "description": "The student names about four parts of Quest in their own words, such as the hero, the enemies, hp and the hp bars, attacking, guarding, potions, taking turns, the enemy choosing, levelling up, the next enemy, winning or losing, playing online. Credit any list, however loose, short or oddly worded; a list of fewer than four still gets full credit if it clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Quest or a turn-based battle at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "remember",
+        "title": "Says what the game must remember between frames",
+        "description": "The student names at least two things the game has to remember from one frame to the next, for example each fighter's hp, whose turn it is, how many potions are left, whether someone is guarding, which enemy they are on, or whether the game is over. Any sensible item, or any gesture at remembering something, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Quest or a turn-based battle at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "first",
+        "title": "Picks a first thing to build and gives a reason",
+        "description": "The student says which part they would build first and gives any reason at all, or just a hunch. Any answer that mentions a part to start with earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Quest or a turn-based battle at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "unsure",
+        "title": "Names one part they are unsure how to build",
+        "description": "The student names a part they do not yet know how to do, such as making the enemy wait its turn, guarding, the enemy choosing what to do, moving on to the next enemy, or playing on two computers, in a few words or less. Any honest answer counts, even a vague one. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Quest or a turn-based battle at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
+  "7-16-quest-3-sub-an-object-that-draws-itself": {
+    "lessonTitle": "7.16.3 Sub-build: An object that draws itself",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: An object that draws itself\". The task: give the Bar class a draw(x, y) method that draws a grey bar 200 wide and, on top of it, a bar in this.color whose width is 200 * this.value / this.max, with the numbers beside it; then call health.draw(...) and magic.draw(...) from draw() so each bar draws itself. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A draw method",
+        "description": "The class draws its own bar.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Scaled",
+        "description": "The width follows value / max.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Both drawn",
+        "description": "Each bar draws itself.",
+        "points": 1
+      }
+    ]
+  },
+  "7-16-quest-4-lab-two-fighters": {
+    "lessonTitle": "7.16.4 Lab: Two fighters",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Two fighters\". The task: fill in the Fighter class's draw(x, y) method so a fighter draws itself: a circle in its colour (grey once it is not alive), its name, and an hp bar made of a grey rect 120 wide with a rect on top that is 120 * this.hp / this.maxHp wide; then draw fighters[0] and fighters[1] from draw(). Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A draw method",
+        "description": "A fighter draws itself.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The hp bar",
+        "description": "The bar follows hp / maxHp.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Both drawn",
+        "description": "Hero and enemy both appear.",
+        "points": 1
+      }
+    ]
+  },
   "moshion-bounce": {
     "lessonTitle": "5.2.16 Bouncy Ball",
     "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.16 Bouncy Ball\". The task they were given: Build a closed box with a ball in it: make four long thin static walls (top, bottom, left, right), make the ball as a dynamic sprite with one size number so it is a circle, store it in ball and colour it, make it bouncy (near the top of the 0 to 1 range), give it a friction value (the steps try 0 and then 5), and give it a sideways starting speed. What the starter file already had: `let ball;`, a 400 by 400 canvas, gravity turned on (world.gravity.y = 10), background painted in draw(), and four step comments in setup(). The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: A sprite made with 'static' as its last argument never moves or falls; one made without it is dynamic, so gravity and collisions move it. A sprite's body type can also be set afterwards with .collider = 'static'. new Sprite(x, y, d) with one size number makes a circle that many pixels across. bounciness runs from 0 (sticks) to 1 (gives back all its energy). friction is drag along a surface; 0 slides freely. world.gravity.y starts at 0 until a sketch sets it. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",

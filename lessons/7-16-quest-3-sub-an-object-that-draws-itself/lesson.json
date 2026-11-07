@@ -1,0 +1,115 @@
+{
+  "id": "7-16-quest-3-sub-an-object-that-draws-itself",
+  "title": "7.16.3 Sub-build: An object that draws itself",
+  "description": "A Bar class with a draw(x, y) method: a grey bar, and on top of it a coloured bar scaled by value / max. Two bars from one class, each drawing itself.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "7.16 Quest: plan and the fighters",
+  "preview": "moshion",
+  "week": 19,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The canvas is empty. `setup()` makes two bars, `health` (30 out of 30) and `magic` (4 out of 10), but nothing draws them yet."
+    },
+    {
+      "id": "s2",
+      "title": "A draw method",
+      "instructions": "Inside the class, below the constructor, write a method: `draw(x, y) { ... }`. Inside it, `fill('#333');` and `rect(x, y, 200, 16);`. Then in the sketch's `draw()`, after `background(...)`, ask each bar to draw itself: `health.draw(20, 40);` and `magic.draw(20, 80);`. Run: two grey bars.",
+      "hints": [
+        "A method is written inside the class with no word `function` in front of it, like `isAlive()` in the reading.",
+        "`health.draw(20, 40)` runs the method with `this` as `health`; `magic.draw(20, 80)` runs the same method with `this` as `magic`."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "How full",
+      "instructions": "In the method, below the grey rect, fill with the bar's own colour, `fill(this.color);`, and draw the full part on top: `rect(x, y, 200 * this.value / this.max, 16);`. Run: the green bar is full, and the blue one is less than half.",
+      "hints": [
+        "4 out of 10 is 0.4 of the bar, and 200 * 0.4 is 80 pixels.",
+        "The grey rect is drawn first, so the coloured one sits on top of it."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "The numbers",
+      "instructions": "At the end of the method, `text(this.value + '/' + this.max, x + 210, y + 13, 14, 'white');`. Run: 30/30 and 4/10 beside the bars. In `setup()`, change `magic.value = 4;` to `magic.value = 9;` and Run again: the blue bar grows, and the words follow it. Nothing in `draw()` had to change."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A draw method in the class",
+      "description": "The class has a method that draws its bar with rect. Help: 7.16.2 (Reading: One class, many fighters)",
+      "hint": "draw(x, y) { fill('#333'); rect(x, y, 200, 16); ... }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?<!\\bfunction\\s{1,9})(?<![\\w$.])(?:draw|show|render|paint|display)[\\w$]*\\s*\\([^)]*\\)\\s*\\{(?:(?!\\bfunction\\b)[^}]){0,400}?\\b(?:circle|rect|ellipse|square)\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "The bar is scaled by value / max",
+      "description": "The coloured bar's width is the whole width times this.value / this.max. Help: 7.16.2 (Reading: One class, many fighters)",
+      "hint": "rect(x, y, 200 * this.value / this.max, 16);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:rect|square)\\s*\\([^;]*?(?:\\/\\s*\\(?\\s*(?:this\\s*\\.\\s*)?[\\w$]*[Mm][Aa][Xx][\\w$]*\\b(?!\\s*\\()|\\bmap\\s*\\()|\\b(?:const|let|var)\\s+([\\w$]+)\\s*=[^;]*?(?:\\/\\s*\\(?\\s*(?:this\\s*\\.\\s*)?[\\w$]*[Mm][Aa][Xx][\\w$]*\\b(?!\\s*\\()|\\bmap\\s*\\()[^;]*;(?:(?!\\bfunction\\b)[\\s\\S]){0,300}?\\b(?:rect|square)\\s*\\([^;]*\\b\\1\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "Each bar draws itself",
+      "description": "Both bars are drawn, each by calling its own draw method. Help: 7.16.2 (Reading: One class, many fighters)",
+      "hint": "health.draw(20, 40);  magic.draw(20, 80);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\[\\s*0\\s*\\]\\s*\\.\\s*(?:draw|show|render|paint|display)[\\w$]*\\s*\\([\\s\\S]*?\\[\\s*1\\s*\\]\\s*\\.\\s*(?:draw|show|render|paint|display)[\\w$]*\\s*\\(|\\[\\s*1\\s*\\]\\s*\\.\\s*(?:draw|show|render|paint|display)[\\w$]*\\s*\\([\\s\\S]*?\\[\\s*0\\s*\\]\\s*\\.\\s*(?:draw|show|render|paint|display)[\\w$]*\\s*\\(|\\b(?!this\\b)([A-Za-z_$][\\w$]*)\\s*\\.\\s*(?:draw|show|render|paint|display)[\\w$]*\\s*\\([\\s\\S]*?(?<![\\w$.])(?!this\\b|\\1\\b)[A-Za-z_$][\\w$]*\\s*\\.\\s*(?:draw|show|render|paint|display)[\\w$]*\\s*\\(|\\b(?:for|while)\\s*\\([^)]*\\)\\s*\\{?\\s*[^;{}]*?\\.\\s*(?:draw|show|render|paint|display)[\\w$]*\\s*\\(|\\.\\s*forEach\\s*\\([^;]*?\\.\\s*(?:draw|show|render|paint|display)[\\w$]*\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: An object that draws itself\". The task: give the Bar class a draw(x, y) method that draws a grey bar 200 wide and, on top of it, a bar in this.color whose width is 200 * this.value / this.max, with the numbers beside it; then call health.draw(...) and magic.draw(...) from draw() so each bar draws itself. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A draw method",
+        "description": "The class draws its own bar.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Scaled",
+        "description": "The width follows value / max.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Both drawn",
+        "description": "Each bar draws itself.",
+        "points": 1
+      }
+    ]
+  }
+}

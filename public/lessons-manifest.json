@@ -12377,6 +12377,58 @@
       "scoreKind": null
     },
     {
+      "id": "7-16-quest-1-plan-break-quest-into-parts",
+      "title": "7.16.1 Plan: Break Quest into parts",
+      "unit": "7.16 Quest: plan and the fighters",
+      "preview": "assignment",
+      "type": "assignment",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 19,
+      "assignmentCode": null,
+      "maxScore": 4,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "7-16-quest-2-reading-one-class-many-fighters",
+      "title": "7.16.2 Reading: One class, many fighters",
+      "unit": "7.16 Quest: plan and the fighters",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 19,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "7-16-quest-3-sub-an-object-that-draws-itself",
+      "title": "7.16.3 Sub-build: An object that draws itself",
+      "unit": "7.16 Quest: plan and the fighters",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 19,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "7-16-quest-4-lab-two-fighters",
+      "title": "7.16.4 Lab: Two fighters",
+      "unit": "7.16 Quest: plan and the fighters",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 19,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "8-1-1-reading-a-part-is-a-list-of-steps",
       "title": "9.1.1 Reading: A Part Is a List of Steps",
       "unit": "9.1 Solid Shapes",

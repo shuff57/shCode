@@ -1,0 +1,118 @@
+{
+  "id": "7-16-quest-4-lab-two-fighters",
+  "title": "7.16.4 Lab: Two fighters",
+  "description": "Fill in the Fighter class's draw(x, y): a body, a name and an hp bar scaled by hp / maxHp. The hero and the goblin are already made; each one draws itself.",
+  "type": "lesson",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "7.16 Quest: plan and the fighters",
+  "preview": "moshion",
+  "week": 19,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The top says `Hero vs Goblin`: both fighters are made, in `newGame()`, and each has a name. But the class's `draw(x, y)` method is empty and nothing calls it, so nothing else shows."
+    },
+    {
+      "id": "s2",
+      "title": "A body and a name",
+      "instructions": "Inside the class's `draw(x, y)` method, draw the body: `fill(this.isAlive() ? this.color : '#555');` and `circle(x, y, 70);`, then the name under it: `text(this.name, x - 40, y + 60, 16, 'white');`. In the sketch's `draw()`, after `background(...)`, draw both fighters: `fighters[0].draw(130, 150);` and `fighters[1].draw(350, 150);`. Run: a gold hero on the left and an orange goblin on the right.",
+      "hints": [
+        "There are two things called draw: the sketch's `function draw()`, which runs every frame, and the class's `draw(x, y)` method, which draws one fighter. The method's lines go inside the class.",
+        "`fighters[0]` is you and `fighters[1]` the one you face."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "The hp bar",
+      "instructions": "In the method, below the name, the grey bar: `fill('#333');` and `rect(x - 60, y + 70, 120, 10);`. On top of it, the full part, green or red: `fill(this.hp > this.maxHp / 3 ? 'limegreen' : 'tomato');` and `rect(x - 60, y + 70, 120 * this.hp / this.maxHp, 10);`. Last, the numbers: `text(this.hp + '/' + this.maxHp, x - 60, y + 98, 12, '#ccc');`. Run: two full green bars, 30/30 and 24/24.",
+      "hints": [
+        "`this.hp / this.maxHp` is a share from 0 to 1, so the full part is never wider than the grey bar.",
+        "`x - 60` starts a 120-pixel bar 60 pixels left of the centre, so it sits right under the circle."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Try a hurt goblin",
+      "instructions": "To see the bar work, in `newGame()`, on the line below `fighters = [...]`, add `fighters[1].hp = 6;` and Run: the goblin's bar is a quarter full, red, and says 6/24. Change it to `0`: the goblin turns grey and its bar is empty. Then delete the line, so the fight starts at full health.",
+      "hints": [
+        "6 out of 24 is a quarter, and a quarter is less than a third, so the bar turns red."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A draw method in the class",
+      "description": "The Fighter class has a method that draws the fighter with circle or rect. Help: 7.16.2 (Reading: One class, many fighters)",
+      "hint": "draw(x, y) { fill(...); circle(x, y, 70); ... }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?<!\\bfunction\\s{1,9})(?<![\\w$.])(?:draw|show|render|paint|display)[\\w$]*\\s*\\([^)]*\\)\\s*\\{(?:(?!\\bfunction\\b)[^}]){0,400}?\\b(?:circle|rect|ellipse|square)\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "An hp bar scaled by hp / maxHp",
+      "description": "The full part of the bar is the whole width times this.hp / this.maxHp. Help: 7.16.2 (Reading: One class, many fighters)",
+      "hint": "rect(x - 60, y + 70, 120 * this.hp / this.maxHp, 10);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:rect|square)\\s*\\([^;]*?(?:\\/\\s*\\(?\\s*(?:this\\s*\\.\\s*)?[\\w$]*[Mm][Aa][Xx][\\w$]*\\b(?!\\s*\\()|\\bmap\\s*\\()|\\b(?:const|let|var)\\s+([\\w$]+)\\s*=[^;]*?(?:\\/\\s*\\(?\\s*(?:this\\s*\\.\\s*)?[\\w$]*[Mm][Aa][Xx][\\w$]*\\b(?!\\s*\\()|\\bmap\\s*\\()[^;]*;(?:(?!\\bfunction\\b)[\\s\\S]){0,300}?\\b(?:rect|square)\\s*\\([^;]*\\b\\1\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "Both fighters drawn",
+      "description": "The hero and the enemy each draw themselves every frame. Help: 7.16.2 (Reading: One class, many fighters)",
+      "hint": "fighters[0].draw(130, 150);  fighters[1].draw(350, 150);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\[\\s*0\\s*\\]\\s*\\.\\s*(?:draw|show|render|paint|display)[\\w$]*\\s*\\([\\s\\S]*?\\[\\s*1\\s*\\]\\s*\\.\\s*(?:draw|show|render|paint|display)[\\w$]*\\s*\\(|\\[\\s*1\\s*\\]\\s*\\.\\s*(?:draw|show|render|paint|display)[\\w$]*\\s*\\([\\s\\S]*?\\[\\s*0\\s*\\]\\s*\\.\\s*(?:draw|show|render|paint|display)[\\w$]*\\s*\\(|\\b(?!this\\b)([A-Za-z_$][\\w$]*)\\s*\\.\\s*(?:draw|show|render|paint|display)[\\w$]*\\s*\\([\\s\\S]*?(?<![\\w$.])(?!this\\b|\\1\\b)[A-Za-z_$][\\w$]*\\s*\\.\\s*(?:draw|show|render|paint|display)[\\w$]*\\s*\\(|\\b(?:for|while)\\s*\\([^)]*\\)\\s*\\{?\\s*[^;{}]*?\\.\\s*(?:draw|show|render|paint|display)[\\w$]*\\s*\\(|\\.\\s*forEach\\s*\\([^;]*?\\.\\s*(?:draw|show|render|paint|display)[\\w$]*\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Two fighters\". The task: fill in the Fighter class's draw(x, y) method so a fighter draws itself: a circle in its colour (grey once it is not alive), its name, and an hp bar made of a grey rect 120 wide with a rect on top that is 120 * this.hp / this.maxHp wide; then draw fighters[0] and fighters[1] from draw(). Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A draw method",
+        "description": "A fighter draws itself.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The hp bar",
+        "description": "The bar follows hp / maxHp.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Both drawn",
+        "description": "Hero and enemy both appear.",
+        "points": 1
+      }
+    ]
+  }
+}

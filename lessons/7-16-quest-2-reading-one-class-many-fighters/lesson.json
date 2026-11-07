@@ -1,0 +1,19 @@
+{
+  "id": "7-16-quest-2-reading-one-class-many-fighters",
+  "title": "7.16.2 Reading: One class, many fighters",
+  "description": "One Fighter class with a constructor, isAlive() and a draw(x, y) method; an hp bar is a rect scaled by hp / maxHp; two fighters in one list, fighters[0] you and fighters[1] the one you face.",
+  "type": "lesson",
+  "estimateMins": 12,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "7.16 Quest: plan and the fighters",
+  "preview": "reading",
+  "week": 19,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
