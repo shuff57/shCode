@@ -33,6 +33,11 @@ one before; the scaled-down board was clicked in a real browser (clicks land on 
 `rules-check.mjs <file>` runs 12 rule checks (crown, king backward, crown ends a chain, win by
 capture, win by block, five illegal moves, junk input) and passes on `d-kings.js` and `e-online.js`.
 
+**Changed while building (2026-11-07).** `sb5-online.js`'s top strip printed `Room ...   error   seat
+null` before a room existed and never showed `online.error`, the defect the Trail walks found in
+6.25.2. It now shows the error (cut to fit 320 px), the code and seat only while `waiting` or `ready`,
+and `Room: <status>` otherwise. No lab stage was touched, so `rules-check.mjs` is unchanged (12 PASS).
+
 | File | Is the solution of |
 | --- | --- |
 | `sb1-pattern.js` | 6.27.3 Sub-build: A checkered board |

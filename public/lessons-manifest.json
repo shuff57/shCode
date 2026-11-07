@@ -10635,6 +10635,45 @@
       "scoreKind": null
     },
     {
+      "id": "6-31-checkers-1-reading-the-same-rule-check-on-both-computers",
+      "title": "6.31.1 Reading: The same rule check, on both computers",
+      "unit": "6.31 Checkers: play online",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 18,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "6-31-checkers-2-sub-send-a-click",
+      "title": "6.31.2 Sub-build: Send a click",
+      "unit": "6.31 Checkers: play online",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 18,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "6-31-checkers-3-lab-checkers-online",
+      "title": "6.31.3 Lab: Checkers online",
+      "unit": "6.31 Checkers: play online",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 18,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "6-4-1-slides",
       "title": "6.9.1 Slides: Animation & Camera",
       "unit": "6.9 Animated Sprites and Camera",

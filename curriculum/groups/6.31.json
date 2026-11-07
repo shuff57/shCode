@@ -1,0 +1,16 @@
+{
+  "moduleId": "6.31",
+  "source": "Checkers chain module, one day.",
+  "lessons": [
+    {
+      "id": "checkers-play-online",
+      "title": "play online",
+      "objective": "A move is four numbers, sent on a click and applied in onMove only when the same rule check agrees, so both boards stay the same.",
+      "screens": [
+        "6-31-checkers-1-reading-the-same-rule-check-on-both-computers",
+        "6-31-checkers-2-sub-send-a-click",
+        "6-31-checkers-3-lab-checkers-online"
+      ]
+    }
+  ]
+}

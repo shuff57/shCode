@@ -1,0 +1,19 @@
+{
+  "id": "6-31-checkers-1-reading-the-same-rule-check-on-both-computers",
+  "title": "6.31.1 Reading: The same rule check, on both computers",
+  "description": "What is new over 6.25.1: a move is four numbers, a click sends it instead of moving, onMove runs isLegal before doMove so a bad move is ignored on both computers, and the host plays red.",
+  "type": "lesson",
+  "estimateMins": 8,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.31 Checkers: play online",
+  "preview": "reading",
+  "week": 18,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

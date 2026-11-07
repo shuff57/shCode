@@ -10803,6 +10803,60 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
+  "6-31-checkers-2-sub-send-a-click": {
+    "lessonTitle": "6.31.2 Sub-build: Send a click",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: Send a click\". The task: set up online.onMove once in setup() so every move that arrives is added to marks with its seat, join when JOIN has a code, host on H, and on a click (once the room is ready) send the clicked row and column with online.send instead of marking it straight away. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Receives",
+        "description": "onMove adds every arriving move.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Sends",
+        "description": "A click is sent, not drawn.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A room",
+        "description": "H hosts, or JOIN joins.",
+        "points": 1
+      }
+    ]
+  },
+  "6-31-checkers-3-lab-checkers-online": {
+    "lessonTitle": "6.31.3 Lab: Checkers online",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Checkers online\". The task: make checkers playable across two computers: set up online.onMove once to run doMove for each arriving move only when the seat that sent it is the seat whose turn it is (the host, seat 0, plays red), nobody has won, and isLegal agrees; host on H with a fresh game, or join from a JOIN code; on a click, send the move (from row, from column, to row, to column) with online.send instead of making it when online; let only the player whose seat matches the turn click; and keep offline play working when online.status is 'off'. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Sends moves",
+        "description": "Online, a click sends the move.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Applies in onMove",
+        "description": "doMove runs for each move that arrives.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Checks first",
+        "description": "The seat and isLegal are checked before moving.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Offline play",
+        "description": "With status 'off', the game still plays on one computer.",
+        "points": 1
+      }
+    ]
+  },
   "6-4-pocket-2-sub-a-pocket-you-roll-over": {
     "lessonTitle": "6.4.3 Sub-build: A pocket you roll over",
     "prompt": "The student wrote a moSHion sketch for \"Sub-build: A pocket you roll over\". The task: make a pass-through pocket and drop the ball only when it overlaps it slowly, guarded so it happens once. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",

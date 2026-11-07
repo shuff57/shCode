@@ -1,0 +1,154 @@
+{
+  "id": "6-31-checkers-3-lab-checkers-online",
+  "title": "6.31.3 Lab: Checkers online",
+  "description": "Your checkers plays a classmate on another computer: a click sends four numbers, every move is checked by the same rule function and applied in onMove, and only the player whose turn it is may click.",
+  "type": "lesson",
+  "estimateMins": 25,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.31 Checkers: play online",
+  "preview": "moshion",
+  "week": 18,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "This is your game from 6.30.3. It plays on one computer; H does nothing yet."
+    },
+    {
+      "id": "s2",
+      "title": "A room and a listener",
+      "instructions": "At the top, add `const JOIN = '';`. At the end of `setup()`, apply every move that arrives: `online.onMove((m, seat) => { doMove(m.fr, m.fc, m.tr, m.tc); });`, then `if (JOIN !== '') online.join(JOIN);`. In `draw()`, H hosts with a fresh board: `if (kb.presses('h') && (online.status === 'off' || online.status === 'closed')) { newGame(); online.host(); }`.",
+      "hints": [
+        "Without `newGame()`, moves you made alone before pressing H stay on your board, while your classmate starts from the first move, and the two boards never match.",
+        "The next step checks each move before `doMove` runs it."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Send the move, do not make it",
+      "instructions": "Below `clickAt`, write `play(fr, fc, tr, tc)` from the reading: when `online.status === 'off'`, `doMove(fr, fc, tr, tc);`, otherwise `online.send({ fr: fr, fc: fc, tr: tr, tc: tc });`. In `clickAt`, the last line now calls `play(picked.r, picked.c, r, c)` instead of `doMove(...)`.",
+      "hints": [
+        "Online, a move made where you click AND in `onMove` would happen twice on your screen."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Check every move that arrives",
+      "instructions": "Above `draw()`, add `function seatOf(t) { return t === 'r' ? 0 : 1; }`: the host plays red. Make `onMove` check before it moves anything: `if (seat === seatOf(turn) && winner === '' && isLegal(m.fr, m.fc, m.tr, m.tc)) doMove(m.fr, m.fc, m.tr, m.tc);`. A move from the wrong seat, or one that breaks a rule, is now ignored on both computers.",
+      "hints": [
+        "`isLegal` is the same rule check a click asks. Nothing new was needed to check a move from another computer."
+      ]
+    },
+    {
+      "id": "s5",
+      "title": "Only your seat clicks",
+      "instructions": "Below `seatOf`, write `myTurn()`: offline it is always true; online it is true only when `online.status === 'ready'` and `online.seat === seatOf(turn)`. Clicks count only when `myTurn()` is true too: `if (mouse.presses() && winner === '' && myTurn())`. R starts again only offline: add `&& online.status === 'off'` to the R test. Online, the win message says `' Run again and host a new room to play again'` instead of `' Press R to play again'`.",
+      "hints": [
+        "Seat 0 is the host and plays red; seat 1 is the classmate and plays black."
+      ]
+    },
+    {
+      "id": "s6",
+      "title": "Show the room, then play",
+      "instructions": "In `drawTop()`, below the message, add one line for each status: `'off'`, `text('H: host online', 340, 22, 14, '#8393c4')`; `'waiting'`, `'Room ' + online.code + ': waiting'`; `'ready'`, `'Online, you are ' + (online.seat === 0 ? 'Red' : 'Black')`; `'closed'`, `'Room closed: H for a new one'`; and `'error'`, `('' + online.error).slice(0, 60)` at size 12. Put the room lines at y 42 so they sit under the message. Then host in one tab, join from a second tab (or a classmate's computer), and play a whole game.",
+      "hints": [
+        "You must be signed in and in a class to play online.",
+        "The canvas is 480 pixels wide: keep each line short, and start the long ones near the left edge."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A click sends four numbers",
+      "description": "Online, a move is sent with online.send instead of being made on the spot. Help: 6.31.1 (Reading: The same rule check, on both computers)",
+      "hint": "online.send({ fr: fr, fc: fc, tr: tr, tc: tc });",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bonline\\s*\\.\\s*send\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "doMove runs in onMove",
+      "description": "Every move that arrives runs doMove, on both computers. Help: 6.31.1 (Reading: The same rule check, on both computers)",
+      "hint": "online.onMove((m, seat) => { ... doMove(m.fr, m.fc, m.tr, m.tc); });",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bonline\\s*\\.\\s*onMove\\s*\\((?:(?!\\bfunction\\b)[\\s\\S]){0,400}?\\b(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(|\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\)[\\s\\S]*?\\bfunction\\s+\\1\\s*\\([^)]*\\)\\s*\\{(?:(?!\\bfunction\\b)[\\s\\S]){0,400}?\\b(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "It checks the seat and the rules",
+      "description": "Before onMove makes a move, it checks that the seat is the one whose turn it is and asks isLegal. Help: 6.31.1 (Reading: The same rule check, on both computers)",
+      "hint": "if (seat === seatOf(turn) && winner === '' && isLegal(m.fr, m.fc, m.tr, m.tc)) ...",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*(?:function\\s*)?\\(\\s*[\\w$]+\\s*,\\s*([\\w$]+)\\s*\\)\\s*(?:=>)?(?=(?:(?!\\bfunction\\b)[\\s\\S]){0,400}?\\b(?:isLegal|moveKind)\\s*\\()(?=(?:(?!\\bfunction\\b)[\\s\\S]){0,400}?(?:\\b\\1\\s*[!=]==?|[!=]==?\\s*\\1\\b|[\\w$]+\\s*\\(\\s*\\1\\s*\\)))|\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\)[\\s\\S]*?\\bfunction\\s+\\2\\s*\\(\\s*[\\w$]+\\s*,\\s*([\\w$]+)\\s*\\)\\s*\\{(?=(?:(?!\\bfunction\\b)[\\s\\S]){0,400}?\\b(?:isLegal|moveKind)\\s*\\()(?=(?:(?!\\bfunction\\b)[\\s\\S]){0,400}?(?:\\b\\3\\s*[!=]==?|[!=]==?\\s*\\3\\b|[\\w$]+\\s*\\(\\s*\\3\\s*\\)))",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r4",
+      "title": "Offline still works",
+      "description": "A check on online.status picks: send the move online, or make it straight away offline. Help: 6.31.1 (Reading: The same rule check, on both computers)",
+      "hint": "if (online.status === 'off') doMove(fr, fc, tr, tc); else online.send({ ... });",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bonline\\s*\\.\\s*status\\s*[!=]==?\\s*['\"`][^'\"`\\n]*['\"`][\\s)]*\\{?\\s*(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(|\\bonline\\s*\\.\\s*status\\s*[!=]==?\\s*['\"`][^'\"`\\n]*['\"`][\\s)]*\\{?\\s*online\\s*\\.\\s*send\\s*\\([^;]*\\)\\s*;?\\s*\\}?\\s*else\\s*\\{?\\s*(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(|\\bonline\\s*\\.\\s*status\\s*[!=]==?\\s*['\"`][^'\"`\\n]*['\"`]\\s*\\?\\s*(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(|\\bonline\\s*\\.\\s*status\\s*[!=]==?\\s*['\"`][^'\"`\\n]*['\"`]\\s*\\?\\s*online\\s*\\.\\s*send\\s*\\([^:]*:\\s*(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Checkers online\". The task: make checkers playable across two computers: set up online.onMove once to run doMove for each arriving move only when the seat that sent it is the seat whose turn it is (the host, seat 0, plays red), nobody has won, and isLegal agrees; host on H with a fresh game, or join from a JOIN code; on a click, send the move (from row, from column, to row, to column) with online.send instead of making it when online; let only the player whose seat matches the turn click; and keep offline play working when online.status is 'off'. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Sends moves",
+        "description": "Online, a click sends the move.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Applies in onMove",
+        "description": "doMove runs for each move that arrives.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Checks first",
+        "description": "The seat and isLegal are checked before moving.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Offline play",
+        "description": "With status 'off', the game still plays on one computer.",
+        "points": 1
+      }
+    ]
+  },
+  "carryFrom": "6-30-checkers-3-lab-kings-and-the-win"
+}

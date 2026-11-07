@@ -1,0 +1,117 @@
+{
+  "id": "6-31-checkers-2-sub-send-a-click",
+  "title": "6.31.2 Sub-build: Send a click",
+  "description": "H hosts, JOIN joins, and a click sends the square you clicked: every click, yours too, arrives in onMove and is marked on both computers.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.31 Checkers: play online",
+  "preview": "moshion",
+  "week": 18,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The top says Press H to host. H and clicks do nothing yet. (Before you host or join, `online.code` and `online.seat` hold nothing, so the top shows the hint instead of them.)"
+    },
+    {
+      "id": "s2",
+      "title": "Listen for moves",
+      "instructions": "In `setup()`, set up `online.onMove((m, seat) => { marks.push({ r: m.r, c: m.c, seat: seat }); });`. Below it, join a room when there is a code: `if (JOIN !== '') online.join(JOIN);`.",
+      "hints": [
+        "`onMove` goes in `setup()`: it is set once, and then runs for every move."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Host, and send a click",
+      "instructions": "In `draw()`, `if (kb.presses('h') && online.status === 'off') online.host();`. Then, `if (mouse.presses() && online.status === 'ready') { ... }`: inside it, turn the click into `c` and `r` as in 6.28.1 (this board is `TOP` pixels down), and if the square is on the board, `online.send({ r: r, c: c });`. Run, press H, and read the room code at the top.",
+      "hints": [
+        "Sending before the room is `'ready'` stops with an error that says so.",
+        "The mark is drawn from `marks`, not where you clicked: it only appears once the move comes back."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Try it with two tabs",
+      "instructions": "Open this lesson in a second browser tab. Put the code in `JOIN` there and Run. Both tabs now say `ready`. Click a square in either one: the mark appears in both, red for the host's clicks and black for the other seat's.",
+      "hints": [
+        "You must be signed in and in a class. A seat is your account in one tab, so each tab gets its own seat."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Moves are received",
+      "description": "online.onMove is given a function that runs for every move. Help: 6.31.1 (Reading: The same rule check, on both computers)",
+      "hint": "online.onMove((m, seat) => { ... });",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*(?:\\(?\\s*[\\w$\\s,]*\\)?\\s*=>|function\\b|[A-Za-z_$][\\w$]*\\s*\\))",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "A click is sent",
+      "description": "online.send sends the clicked square. Help: 6.31.1 (Reading: The same rule check, on both computers)",
+      "hint": "online.send({ r: r, c: c });",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bonline\\s*\\.\\s*send\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "Host or join",
+      "description": "The sketch hosts a room or joins one. Help: 6.31.1 (Reading: The same rule check, on both computers)",
+      "hint": "online.host();",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bonline\\s*\\.\\s*(?:host|join)\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: Send a click\". The task: set up online.onMove once in setup() so every move that arrives is added to marks with its seat, join when JOIN has a code, host on H, and on a click (once the room is ready) send the clicked row and column with online.send instead of marking it straight away. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Receives",
+        "description": "onMove adds every arriving move.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Sends",
+        "description": "A click is sent, not drawn.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A room",
+        "description": "H hosts, or JOIN joins.",
+        "points": 1
+      }
+    ]
+  }
+}

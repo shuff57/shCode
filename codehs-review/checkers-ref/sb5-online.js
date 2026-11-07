@@ -39,5 +39,7 @@ function draw() {
 
 function drawTop() {
   if (online.status === 'off') text('Press H to host, or put a code in JOIN and Run', 10, 26, 12, 'white');
-  else text('Room ' + (online.code || '...') + '   ' + online.status + '   seat ' + online.seat, 10, 26, 14, 'white');
+  else if (online.status === 'error') text(('' + online.error).slice(0, 44), 10, 26, 12, 'tomato');
+  else if (online.status === 'waiting' || online.status === 'ready') text('Room ' + online.code + '   ' + online.status + '   seat ' + online.seat, 10, 26, 14, 'white');
+  else text('Room: ' + online.status, 10, 26, 14, 'white');
 }
