@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { EditorView, keymap, lineNumbers, highlightActiveLine, highlightActiveLineGutter } from '@codemirror/view';
 import { EditorState } from '@codemirror/state';
-import { javascript, javascriptLanguage } from '@codemirror/lang-javascript';
+import { javascript } from '@codemirror/lang-javascript';
 import { defaultKeymap, indentWithTab, history, historyKeymap } from '@codemirror/commands';
 import { bracketMatching, indentOnInput, HighlightStyle, syntaxHighlighting, foldGutter, foldKeymap } from '@codemirror/language';
 import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
@@ -153,25 +153,12 @@ function makeExtensions(
   ];
 
   if (language === 'javascript') {
+    // `{` auto-closes like ( [ and quotes (lang-javascript's own languageData). It was excluded
+    // from 2026-09-13 to #72 (2026-11-06): Enter after `{` puts the `}` on its own line, so a
+    // student who also types their own `}` later gets a stray one, because closeBrackets only
+    // types over a `}` on the cursor's own line. Students asked for it back; the stray brace is
+    // the known cost.
     exts.push(javascript());
-    // Exclude `{`/`}` from auto-close (lang-javascript's own languageData
-    // normally lists it -- see node_modules/@codemirror/lang-javascript's
-    // `languageData.closeBrackets.brackets`). closeBrackets()'s "type over
-    // the bracket I just inserted" check only matches when the cursor sits
-    // on the SAME LINE as that inserted `}` (its internal bracketState
-    // field drops the marker the moment the selection moves to another
-    // line). But `indentWithTab`/Enter's own smart-split ALWAYS pushes an
-    // auto-closed `}` onto its own new line the instant you press Enter
-    // after `{` -- so for every multi-line block a student writes by hand
-    // (which is every `if`/function/loop body in this course), the real
-    // `}` they type later lands on a different line than the orphaned
-    // auto-inserted one, the skip-over never fires, and both survive:
-    // confirmed to leave one stray `}` per block, every time, at realistic
-    // typing speed. (), [], quotes keep auto-close -- those are opened and
-    // closed within one line/expression, where the same-line check holds.
-    exts.push(javascriptLanguage.data.of({
-      closeBrackets: { brackets: ['(', '[', "'", '"', '`'] },
-    }));
   }
 
   // #52: a student's own switch, loop or function can be folded to one line (the arrow in the
