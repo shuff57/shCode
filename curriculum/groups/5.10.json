@@ -4,9 +4,10 @@
   "lessons": [
     {
       "id": "flappy-the-flap",
-      "title": "The flap",
+      "title": "Play it, plan it, and the flap",
       "objective": "Turn gravity on and reverse a fall with one tap.",
       "screens": [
+        "5-4-flappy-0-reading-play-the-finished-game",
         "5-4-flappy-plan-sketch-the-game",
         "5-4-flappy-1-reading-gravity-and-the-flap",
         "5-4-flappy-2-example-the-bird-that-flaps",

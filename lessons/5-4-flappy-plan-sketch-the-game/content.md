@@ -1,6 +1,6 @@
 ## Plan before you build
 
-Every game in this unit gets a plan first. A plan is not code. It is a short list that says what the game is made of, so the first thing you type is the right thing.
+Every game in this unit gets a plan first. A plan is not code. It is a short list that says what the game is made of, so the first thing you type is the right thing. (5.10.0 let you play the finished game; if you are short of ideas, play it again.)
 
 **Flappy, in one paragraph.** A bird sits at the left of the screen and is always falling. A key tap makes it jump up a little. Pipes with a gap in them slide in from the right, and the bird has to fly through the gaps. Each pipe it gets past adds one to the score. Touching a pipe ends the round, and a key starts it again.
 
