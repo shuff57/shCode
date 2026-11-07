@@ -12468,6 +12468,45 @@
       "scoreKind": null
     },
     {
+      "id": "7-18-quest-1-reading-three-actions-a-flag-and-a-count",
+      "title": "7.18.1 Reading: Three actions, a flag and a count",
+      "unit": "7.18 Quest: choices",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 19,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "7-18-quest-2-sub-a-flag-and-a-count-inside-an-object",
+      "title": "7.18.2 Sub-build: A flag and a count inside an object",
+      "unit": "7.18 Quest: choices",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 19,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "7-18-quest-3-lab-attack-guard-or-potion",
+      "title": "7.18.3 Lab: Attack, guard or potion",
+      "unit": "7.18 Quest: choices",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 19,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "8-1-1-reading-a-part-is-a-list-of-steps",
       "title": "9.1.1 Reading: A Part Is a List of Steps",
       "unit": "9.1 Solid Shapes",

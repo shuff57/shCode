@@ -1,0 +1,19 @@
+{
+  "id": "7-18-quest-1-reading-three-actions-a-flag-and-a-count",
+  "title": "7.18.1 Reading: Three actions, a flag and a count",
+  "description": "A guarding flag halves the next hit with floor(n / 2) and is cleared by it; a potions count heals with min(hp + 12, maxHp) and runs out; one act(t, a, roll) does all three actions, picked with 1, 2 and 3, and the enemy chooses with a simple rule.",
+  "type": "lesson",
+  "estimateMins": 12,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "7.18 Quest: choices",
+  "preview": "reading",
+  "week": 19,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

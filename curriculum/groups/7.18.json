@@ -1,0 +1,16 @@
+{
+  "moduleId": "7.18",
+  "source": "Quest chain module, one day.",
+  "lessons": [
+    {
+      "id": "quest-choices",
+      "title": "choices",
+      "objective": "An object can keep a flag and a count: guarding halves the next hit and is cleared by it, potions heal with min(hp + 12, maxHp) until they run out, and one act(t, a, roll) does all three actions for both sides.",
+      "screens": [
+        "7-18-quest-1-reading-three-actions-a-flag-and-a-count",
+        "7-18-quest-2-sub-a-flag-and-a-count-inside-an-object",
+        "7-18-quest-3-lab-attack-guard-or-potion"
+      ]
+    }
+  ]
+}

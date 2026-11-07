@@ -11349,6 +11349,60 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
+  "7-18-quest-2-sub-a-flag-and-a-count-inside-an-object": {
+    "lessonTitle": "7.18.2 Sub-build: A flag and a count inside an object",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: A flag and a count inside an object\". The task: give the Knight guard(), which turns this.guarding on, make takeHit halve the hit with floor(n / 2) while guarding and then turn the flag off, and write heal(), which returns 0 with no potions left and otherwise uses one up and gives up to 12 hp back with min(this.hp + 12, this.maxHp), returning the hp gained; key 2 guards and key 3 drinks. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Guard",
+        "description": "The next hit is halved, then the guard ends.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Potion",
+        "description": "Heals up to max and uses one up.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Keys",
+        "description": "2 guards and 3 drinks.",
+        "points": 1
+      }
+    ]
+  },
+  "7-18-quest-3-lab-attack-guard-or-potion": {
+    "lessonTitle": "7.18.3 Lab: Attack, guard or potion",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Attack, guard or potion\". The task: add a guarding flag that halves the next hit with floor(n / 2) in takeHit and is then cleared, a potions count (a new constructor value, so every new Fighter call gains it) and heal(), which gives up to 12 hp back capped at maxHp and uses one up, doing nothing when none are left; one act(t, a, roll) does action 1 attack, 2 guard or 3 potion; keys 1, 2 and 3 pick the action on your turn; and the enemy chooses, drinking when it is low and has a potion and guarding some of the time. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Guard",
+        "description": "The next hit is halved.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Potion",
+        "description": "Heals, capped, and uses one up.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Keys",
+        "description": "1, 2 and 3 pick the action.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Enemy choice",
+        "description": "The enemy does not always attack.",
+        "points": 1
+      }
+    ]
+  },
   "moshion-bounce": {
     "lessonTitle": "5.2.16 Bouncy Ball",
     "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.16 Bouncy Ball\". The task they were given: Build a closed box with a ball in it: make four long thin static walls (top, bottom, left, right), make the ball as a dynamic sprite with one size number so it is a circle, store it in ball and colour it, make it bouncy (near the top of the 0 to 1 range), give it a friction value (the steps try 0 and then 5), and give it a sideways starting speed. What the starter file already had: `let ball;`, a 400 by 400 canvas, gravity turned on (world.gravity.y = 10), background painted in draw(), and four step comments in setup(). The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: A sprite made with 'static' as its last argument never moves or falls; one made without it is dynamic, so gravity and collisions move it. A sprite's body type can also be set afterwards with .collider = 'static'. new Sprite(x, y, d) with one size number makes a circle that many pixels across. bounciness runs from 0 (sticks) to 1 (gives back all its energy). friction is drag along a surface; 0 slides freely. world.gravity.y starts at 0 until a sketch sets it. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",

@@ -1,0 +1,111 @@
+{
+  "id": "7-18-quest-2-sub-a-flag-and-a-count-inside-an-object",
+  "title": "7.18.2 Sub-build: A flag and a count inside an object",
+  "description": "A Knight keeps a guarding flag, cleared by the next hit, which halves that hit with floor(n / 2), and a potions count that heals with min(hp + 12, maxHp) until it runs out.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "7.18 Quest: choices",
+  "preview": "moshion",
+  "week": 19,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The top says `hp 30/30   potions 2`. Press 1 a few times: each press takes a hit of 6. Keys 2 and 3 do nothing yet."
+    },
+    {
+      "id": "s2",
+      "title": "Guard",
+      "instructions": "Inside the class, below `takeHit`, write `guard() { this.guarding = true; }`. At the top of `takeHit`, before the line that takes the hp: `if (this.guarding) n = floor(n / 2);` and then `this.guarding = false;`. In `draw()`, below the line for key 1: `if (kb.presses('2')) { k.guard(); note = 'Guarding'; }`. Run: press 2 and the top says GUARDING; press 1 and it takes only 3, and the next press of 1 takes 6 again.",
+      "hints": [
+        "Halve first, while the flag is still on, then turn it off.",
+        "`floor(6 / 2)` is 3. Try a hit of 7 in the key-1 line: half of 7, rounded down, is 3."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Drink a potion",
+      "instructions": "Below `guard()`, write `heal()` from the reading: if `this.potions === 0`, `return 0;`. Otherwise `this.potions -= 1;`, `const before = this.hp;`, `this.hp = min(this.hp + 12, this.maxHp);` and `return this.hp - before;`. In `draw()`: `if (kb.presses('3')) note = 'Potion: +' + k.heal();`. Run: take a few hits, then press 3 twice. A third press gives +0, because the potions are gone.",
+      "hints": [
+        "At 30 out of 30, a potion gives +0: `min` never lets hp go above `maxHp`.",
+        "`heal` returns how much it really gave, so the note can say it."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Guard halves the next hit",
+      "description": "While the flag is on, takeHit halves the hit (rounded down) and then turns the flag off; guard turns it on. Help: 7.18.1 (Reading: Three actions, a flag and a count)",
+      "hint": "if (this.guarding) n = floor(n / 2);  this.guarding = false;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*?\\bthis\\s*\\.\\s*([\\w$]+)\\b[^;{]{0,80}?(?:\\b(?:Math\\s*\\.\\s*)?(?:floor|trunc|round|ceil|int)\\s*\\(\\s*[\\w$]+\\s*(?:\\/\\s*2|\\*\\s*0?\\.5)\\s*\\)|\\b[\\w$]+\\s*\\/=\\s*2\\b|\\b([\\w$]+)\\s*=\\s*\\2\\s*(?:\\/\\s*2|\\*\\s*0?\\.5)\\b|\\b[\\w$]+\\s*>>=?\\s*1\\b)[^}]{0,200}?\\bthis\\s*\\.\\s*\\1\\s*=\\s*false\\b)(?=[\\s\\S]*?\\bthis\\s*\\.\\s*\\1\\s*=\\s*true\\b)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "A potion heals, capped, and uses one up",
+      "description": "heal gives hp back but never above maxHp, takes one potion off the count, and does nothing when none are left. Help: 7.18.1 (Reading: Three actions, a flag and a count)",
+      "hint": "if (this.potions === 0) return 0;  this.potions -= 1;  this.hp = min(this.hp + 12, this.maxHp);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*?(?:\\b(?:Math\\s*\\.\\s*)?min\\s*\\(\\s*(?:this\\s*\\.\\s*[\\w$]+\\s*\\+[^,;]*,\\s*this\\s*\\.\\s*[\\w$]+|this\\s*\\.\\s*[\\w$]+\\s*,\\s*this\\s*\\.\\s*[\\w$]+\\s*\\+)|\\bif\\s*\\(+\\s*this\\s*\\.\\s*([\\w$]+)\\s*\\)*\\s*>=?\\s*\\(*\\s*this\\s*\\.\\s*([\\w$]+)\\s*\\)+\\s*\\{?\\s*this\\s*\\.\\s*\\1\\s*=\\s*this\\s*\\.\\s*\\2\\b))(?=[\\s\\S]*?\\bthis\\s*\\.\\s*([\\w$]+)\\s*(?:-=\\s*1\\b|--|=\\s*this\\s*\\.\\s*\\3\\s*-\\s*1\\b))(?=[\\s\\S]*?(?:\\bthis\\s*\\.\\s*\\3\\s*\\)*\\s*(?:===?\\s*0\\b|<=\\s*0\\b|<\\s*1\\b|>\\s*0\\b|>=\\s*1\\b|!==?\\s*0\\b)|!\\s*\\(*\\s*this\\s*\\.\\s*\\3\\b|\\bif\\s*\\(+\\s*this\\s*\\.\\s*\\3\\s*\\)))",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "2 guards and 3 drinks",
+      "description": "Key 2 calls the guard and key 3 the potion. Help: 7.18.1 (Reading: Three actions, a flag and a count)",
+      "hint": "if (kb.presses('2')) { k.guard(); ... }  if (kb.presses('3')) ... k.heal();",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*?\\bkb\\s*\\.\\s*(?:presses|pressed)\\s*\\(\\s*['\\\"`]2['\\\"`]\\s*\\)[^;]{0,80}?(?:\\.\\s*[\\w$]+\\s*\\(|(?<![=!<>])=\\s*[\\w$]|[\\w$]+\\s*\\())(?=[\\s\\S]*?\\bkb\\s*\\.\\s*(?:presses|pressed)\\s*\\(\\s*['\\\"`]3['\\\"`]\\s*\\)[^;]{0,80}?(?:\\.\\s*[\\w$]+\\s*\\(|(?<![=!<>])=\\s*[\\w$]|[\\w$]+\\s*\\())",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true,
+      "keepShortStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: A flag and a count inside an object\". The task: give the Knight guard(), which turns this.guarding on, make takeHit halve the hit with floor(n / 2) while guarding and then turn the flag off, and write heal(), which returns 0 with no potions left and otherwise uses one up and gives up to 12 hp back with min(this.hp + 12, this.maxHp), returning the hp gained; key 2 guards and key 3 drinks. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Guard",
+        "description": "The next hit is halved, then the guard ends.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Potion",
+        "description": "Heals up to max and uses one up.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Keys",
+        "description": "2 guards and 3 drinks.",
+        "points": 1
+      }
+    ]
+  }
+}
