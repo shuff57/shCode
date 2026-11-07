@@ -51,7 +51,7 @@
     {
       "id": "s6",
       "title": "Show the room, then play",
-      "instructions": "In `drawTop()`, show the room code while `online.status === 'waiting'`, `'Online, you are ' + players[online.seat].name` when it is `'ready'`, `'The room closed: H hosts a new one'` when it is `'closed'`, and a hint that H hosts when it is `'off'`. When it is `'error'`, show `online.error` cut short so it fits above the board, `('' + online.error).slice(0, 80)`, at size 12. Then host in one tab, join from a second tab (or a classmate's computer), and race.",
+      "instructions": "In `drawTop()`, show the room code while `online.status === 'waiting'`, `'Online, you are ' + players[online.seat].name` when it is `'ready'`, `'Room closed: H for a new one'` when it is `'closed'`, and a hint that H hosts when it is `'off'`. When it is `'error'`, show `online.error` cut short so it fits above the board, `('' + online.error).slice(0, 80)`, at size 12. Then host in one tab, join from a second tab (or a classmate's computer), and race.",
       "hints": [
         "You must be signed in and in a class to play online.",
         "The room closes when the host runs the sketch again or leaves the page."

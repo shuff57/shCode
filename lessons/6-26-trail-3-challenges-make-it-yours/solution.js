@@ -142,8 +142,8 @@ function drawTop() {
     return;
   }
   if (winner === -1) text(p.name + "'s turn", 10, 48, 16, p.color);
-  if (online.status === 'waiting') text('Room ' + online.code + ': waiting for a classmate', 260, 48, 14, 'gold');
+  if (online.status === 'waiting') text('Room ' + online.code + ': waiting', 360, 48, 14, 'gold');
   if (online.status === 'ready') text('Online, you are ' + players[online.seat].name, 300, 48, 14, 'gold');
-  if (online.status === 'closed') text('The room closed: H hosts a new one', 300, 48, 14, 'gold');
+  if (online.status === 'closed') text('Room closed: H for a new one', 300, 48, 14, 'gold');
   if (online.status === 'off') text('H: host online', 420, 48, 14, '#8393c4');
 }
