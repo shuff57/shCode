@@ -23,8 +23,10 @@ A player with no legal move (no pieces, or all blocked) loses. Forced capture is
 (it is a challenge).
 
 Online: the host is red (seat 0). A click sends `{ fr, fc, tr, tc }`; `doMove` runs in `onMove`
-only when `seat` is the turn's seat, there is no winner, and `isLegal(...)` agrees, so a broken or
-out-of-turn move is ignored on both computers. H calls `newGame()` then `online.host()`.
+only when `goodMove(m)` (four whole numbers on the board, `floor(r) === r` as in 6.25.1), `seat` is
+the turn's seat, there is no winner, and `isLegal(...)` agrees, so a broken or out-of-turn move is
+ignored on both computers and never throws. H calls `newGame()` then `online.host()`. To play again
+online both players Run again and only one hosts; the other joins the new code.
 
 ## Reference code: `codehs-review/checkers-ref/`
 
@@ -32,6 +34,9 @@ Every file runs clean in `scripts/moshion-harness.mjs`; each lab stage is a stri
 one before; the scaled-down board was clicked in a real browser (clicks land on the right squares).
 `rules-check.mjs <file>` runs 12 rule checks (crown, king backward, crown ends a chain, win by
 capture, win by block, five illegal moves, junk input) and passes on `d-kings.js` and `e-online.js`.
+With an online stage it adds 14 more through the sketch's own `onMove` handler (string numbers,
+null, undefined, 3.5, missing fields, negative, huge, Infinity, a bare number, true; a good jump
+applies; the wrong seat is ignored): 26 PASS on `e-online.js`.
 
 **Changed while building (2026-11-07).** `sb5-online.js`'s top strip printed `Room ...   error   seat
 null` before a room existed and never showed `online.error`, the defect the Trail walks found in
@@ -85,7 +90,8 @@ and `Room: <status>` otherwise. No lab stage was touched, so `rules-check.mjs` i
   (`hasAnyMove` asks `moveKind` about every piece), which covers "no pieces left".
 - **6.30.3** Lab cards: crowned on the far row; a king can move back; a check for no moves; a winner
   and R to play again.
-- **6.31.1** Only what is new over 6.25.1: a move is four numbers; run `isLegal` in `onMove` too (the
+- **6.31.1** Only what is new over 6.25.1: a move is four numbers, and a move must be four whole
+  numbers on the board, anything else is ignored (`goodMove`); run `isLegal` in `onMove` too (the
   same rule function guards both computers, so a bad move is ignored everywhere); the host is red.
 - **6.31.3** Lab cards: a click sends four numbers; `doMove` runs in `onMove`; it checks the seat and
   `isLegal`; offline still works.
@@ -105,3 +111,10 @@ and `Room: <status>` otherwise. No lab stage was touched, so `rules-check.mjs` i
 - Cards are lax (any correct phrasing; see `scripts/test-grader-tolerance.mjs`'s Trail block, and add
   a Checkers block the same way, pinned with real alternatives: other names, `Math.abs`, a ternary,
   `!==` forms, nested ifs, a `switch`).
+
+**Changed in the online fix pass (2026-11-07).** `e-online.js` trusted the TYPES of an arriving
+move: `{fr:4,fc:3,tr:'2',tc:5}` moved the piece and then threw before the capture (string concat in
+`(fr + tr) / 2`), and a `null` move or `tr: 3.5` threw on the receiving page. It now asks
+`goodMove(m)` first. The waiting line shows `Room code: <code>` at size 18 on its own (also in
+`sb5-online.js`), the online win text is `' Run again to play again'` (the old one ran past 480 px),
+and the closed line says one player hosts and the other joins the new code.

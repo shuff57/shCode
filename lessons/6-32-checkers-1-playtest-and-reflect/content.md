@@ -12,6 +12,27 @@ of a chain. Play a game until somebody cannot move. Online, click when it is not
 press R. Watch for anything that looks odd: a piece that will not move when it should, a jump
 that does not take the piece, a king that cannot go back, two boards that do not match.
 
+**How to set up a test position.** A double jump or a crowning in the middle of a chain is hard
+to reach by playing, so build the position yourself in `makeBoard` (6.27.4). Just above
+`return g;`, empty the board and put down only the pieces you need:
+
+```js
+  // TEST POSITION: delete these lines when you are done
+  for (let r = 0; r < N; r++) {
+    for (let c = 0; c < N; c++) g[r][c] = '';
+  }
+  g[6][1] = 'r';   // red, ready to jump twice
+  g[5][2] = 'b';
+  g[3][4] = 'b';
+  g[0][7] = 'b';   // one more black piece, so the game goes on
+```
+
+Run, and red can jump from row 6 to row 4 and on to row 2. For a crowning in the middle of a
+chain, put these three lines in place of the four `g[...]` lines above:
+`g[2][1] = 'r';`, `g[1][2] = 'b';` and `g[1][4] = 'b';`. Red jumps onto row 0 and is crowned; the new
+king could jump again, but crowning ends the turn, so it is Black's turn. When you are done,
+delete the test lines so the game starts from the full board again.
+
 **Then think backwards.** When something looks odd, ask which part of your code could cause it:
 `makeBoard`, `clickAt`, `moveKind`, `isLegal`, `doMove`, `canJumpFrom`, `crown`, `hasAnyMove`,
 `play` or `onMove`. Naming the function is the first step of fixing it, even when you are not

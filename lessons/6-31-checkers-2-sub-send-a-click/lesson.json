@@ -51,7 +51,7 @@
       "hint": "online.onMove((m, seat) => { ... });",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*(?:\\(?\\s*[\\w$\\s,]*\\)?\\s*=>|function\\b|[A-Za-z_$][\\w$]*\\s*\\))",
+      "pattern": "\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*(?:(?:async\\s*)?\\((?:[^()]|\\([^()]*\\))*\\)\\s*=>|(?:async\\s*)?[A-Za-z_$][\\w$]*\\s*=>|function\\b|[A-Za-z_$][\\w$]*\\s*\\))",
       "flags": "",
       "points": 0,
       "status": "pending",

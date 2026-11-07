@@ -31,22 +31,36 @@ function play(fr, fc, tr, tc) {
 ```
 
 **Check the move again when it arrives.** In Trail, `onMove` checked that a roll was a whole
-number from 1 to 6. Checkers already has a function that knows every rule: `isLegal`. Use the
+number from 1 to 6. A checkers move has two checks. First, **a move must be four whole numbers on
+the board; anything else is ignored.** A move comes from another computer, so it could hold a word
+like `'2'`, a half like `3.5`, or nothing at all, and the rule functions only work on real squares.
+The same `floor(r) === r` test from 6.25.1 does it:
+
+```js
+function goodMove(m) {
+  if (m === null || m === undefined) return false;
+  return isSquare(m.fr, m.fc) && isSquare(m.tr, m.tc);
+}
+function isSquare(r, c) { return floor(r) === r && floor(c) === c && onBoard(r, c); }
+```
+
+`floor('2') === '2'` is false, because the word `'2'` is not the number 2, so a word is ignored.
+Second, the rules. Checkers already has a function that knows every rule: `isLegal`. Use the
 same one in `onMove`, so the same rule check guards both computers.
 
 ```js
 online.onMove((m, seat) => {
-  if (seat === seatOf(turn) && winner === '' && isLegal(m.fr, m.fc, m.tr, m.tc)) {
+  if (goodMove(m) && seat === seatOf(turn) && winner === '' && isLegal(m.fr, m.fc, m.tr, m.tc)) {
     doMove(m.fr, m.fc, m.tr, m.tc);
   }
 });
 ```
 
-A move from the wrong seat, a move after the game is over, or a move that breaks a rule (a step
-backward, a square off the board, numbers that make no sense) is ignored. Both computers run this
-check on the same list of moves, so both ignore the same bad ones, and the boards stay the same.
-This is the payoff of putting every rule in one function on day two: nothing new had to be
-written to keep an online game honest.
+A move that is not four whole numbers on the board, a move from the wrong seat, a move after the
+game is over, or a move that breaks a rule (a step backward, a jump over your own piece) is
+ignored. Both computers run this check on the same list of moves, so both ignore the same bad
+ones, and the boards stay the same. This is the payoff of putting every rule in one function on
+day two: only the four-numbers check is new; the rules themselves needed nothing new.
 
 **The host is red.** Seats are numbers and turns are letters, so one helper turns a colour into
 its seat: the host, seat 0, plays red, and the classmate who joins, seat 1, plays black.
@@ -60,5 +74,7 @@ Only the seat whose turn it is may click: offline, anyone may; online, only when
 
 **Starting and ending.** H hosts with a fresh board, `newGame()` and then `online.host()`, as in
 6.25.1. R starts again only on one computer (`online.status === 'off'`), because one board cannot
-restart alone; online, the win message says to run again and host a new room. Keep the words in
-the strip short enough to fit the 480 pixels of the canvas.
+restart alone; online, the win message says "Run again to play again". To play again online, both
+players stop and Run again, then only ONE of you presses H, and the other puts the NEW code in
+`JOIN` and runs again. If both press H, you are in two different rooms, each waiting for the
+other. Keep the words in the strip short enough to fit the 480 pixels of the canvas.

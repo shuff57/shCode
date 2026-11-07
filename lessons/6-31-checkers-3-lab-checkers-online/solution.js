@@ -21,7 +21,7 @@ function setup() {
   new Canvas(N * CELL, TOP + N * CELL);
   newGame();
   online.onMove((m, seat) => {
-    if (seat === seatOf(turn) && winner === '' && isLegal(m.fr, m.fc, m.tr, m.tc)) {
+    if (goodMove(m) && seat === seatOf(turn) && winner === '' && isLegal(m.fr, m.fc, m.tr, m.tc)) {
       doMove(m.fr, m.fc, m.tr, m.tc);
     }
   });
@@ -126,7 +126,7 @@ function doMove(fr, fc, tr, tc) {
   message = nameOf(turn) + "'s turn";
   if (!hasAnyMove()) {
     winner = turn === 'r' ? 'b' : 'r';
-    message = nameOf(winner) + ' wins!' + (online.status === 'off' ? ' Press R to play again' : ' Run again and host a new room to play again');
+    message = nameOf(winner) + ' wins!' + (online.status === 'off' ? ' Press R to play again' : ' Run again to play again');
   }
 }
 
@@ -139,6 +139,14 @@ function crown(r, c) {
 }
 
 function seatOf(t) { return t === 'r' ? 0 : 1; }       // the host plays red
+
+// A move from another computer must be four whole numbers on the board.
+// Anything else (a word, a half, nothing at all) makes no sense: it is ignored.
+function goodMove(m) {
+  if (m === null || m === undefined) return false;
+  return isSquare(m.fr, m.fc) && isSquare(m.tr, m.tc);
+}
+function isSquare(r, c) { return floor(r) === r && floor(c) === c && onBoard(r, c); }
 
 function myTurn() {
   if (online.status === 'off') return true;
@@ -209,8 +217,11 @@ function drawPieces() {
 function drawTop() {
   text(message, 10, 22, 16, 'white');
   if (online.status === 'off') text('H: host online', 340, 22, 14, '#8393c4');
-  if (online.status === 'waiting') text('Room ' + online.code + ': waiting', 300, 42, 14, 'gold');
+  if (online.status === 'waiting') {
+    text('Room code: ' + online.code, 10, 45, 18, 'gold');
+    text('waiting for a classmate', 250, 45, 14, '#8393c4');
+  }
   if (online.status === 'ready') text('Online, you are ' + (online.seat === 0 ? 'Red' : 'Black'), 300, 42, 14, 'gold');
-  if (online.status === 'closed') text('Room closed: H for a new one', 250, 42, 14, 'gold');
+  if (online.status === 'closed') text('Room closed: one hosts (H), one joins the new code', 10, 42, 14, 'gold');
   if (online.status === 'error') text(('' + online.error).slice(0, 60), 10, 42, 12, 'tomato');
 }

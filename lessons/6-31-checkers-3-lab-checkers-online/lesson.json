@@ -15,7 +15,10 @@
     {
       "id": "s1",
       "title": "Run it",
-      "instructions": "This is your game from 6.30.3. It plays on one computer; H does nothing yet."
+      "instructions": "This is your game from 6.30.3. It plays on one computer; H does nothing yet.",
+      "hints": [
+        "If you brought your 6.30.3 work forward, your names may differ; keep yours. Where a step quotes a line, change the line of yours that does the same job."
+      ]
     },
     {
       "id": "s2",
@@ -37,15 +40,16 @@
     {
       "id": "s4",
       "title": "Check every move that arrives",
-      "instructions": "Above `draw()`, add `function seatOf(t) { return t === 'r' ? 0 : 1; }`: the host plays red. Make `onMove` check before it moves anything: `if (seat === seatOf(turn) && winner === '' && isLegal(m.fr, m.fc, m.tr, m.tc)) doMove(m.fr, m.fc, m.tr, m.tc);`. A move from the wrong seat, or one that breaks a rule, is now ignored on both computers.",
+      "instructions": "Above `draw()`, add `function seatOf(t) { return t === 'r' ? 0 : 1; }`: the host plays red. A move from another computer could be anything, so below `seatOf` add a check that it is four whole numbers on the board, the way 6.25.1 checked a roll with `floor(r) === r`:\n\n```js\nfunction goodMove(m) {\n  if (m === null || m === undefined) return false;\n  return isSquare(m.fr, m.fc) && isSquare(m.tr, m.tc);\n}\nfunction isSquare(r, c) { return floor(r) === r && floor(c) === c && onBoard(r, c); }\n```\n\nThen make `onMove` check before it moves anything: `if (goodMove(m) && seat === seatOf(turn) && winner === '' && isLegal(m.fr, m.fc, m.tr, m.tc)) doMove(m.fr, m.fc, m.tr, m.tc);`. A move that is not four whole numbers, a move from the wrong seat, or one that breaks a rule is now ignored on both computers.",
       "hints": [
-        "`isLegal` is the same rule check a click asks. Nothing new was needed to check a move from another computer."
+        "`isLegal` is the same rule check a click asks. Nothing new was needed to check the rules of a move from another computer.",
+        "Why `goodMove` too? A word like `'2'` is not the number 2: `floor('2') === '2'` is false, so it is ignored. Without the check, a move like that would break the board, or stop the sketch, on both computers."
       ]
     },
     {
       "id": "s5",
       "title": "Only your seat clicks",
-      "instructions": "Below `seatOf`, write `myTurn()`: offline it is always true; online it is true only when `online.status === 'ready'` and `online.seat === seatOf(turn)`. Clicks count only when `myTurn()` is true too: `if (mouse.presses() && winner === '' && myTurn())`. R starts again only offline: add `&& online.status === 'off'` to the R test. Online, the win message says `' Run again and host a new room to play again'` instead of `' Press R to play again'`.",
+      "instructions": "Below `seatOf`, write `myTurn()`: offline it is always true; online it is true only when `online.status === 'ready'` and `online.seat === seatOf(turn)`. Clicks count only when `myTurn()` is true too: `if (mouse.presses() && winner === '' && myTurn())`. R starts again only offline: add `&& online.status === 'off'` to the R test.\n\nThe win message is in `doMove`, in the `if (!hasAnyMove())` block: `message = nameOf(winner) + ' wins! Press R to play again';`. Online, R does nothing, so the end of that line must depend on `online.status`:\n\n```js\nmessage = nameOf(winner) + ' wins!' + (online.status === 'off' ? ' Press R to play again' : ' Run again to play again');\n```\n\nOffline it still says Press R; online it says Run again.",
       "hints": [
         "Seat 0 is the host and plays red; seat 1 is the classmate and plays black."
       ]
@@ -53,10 +57,11 @@
     {
       "id": "s6",
       "title": "Show the room, then play",
-      "instructions": "In `drawTop()`, below the message, add one line for each status: `'off'`, `text('H: host online', 340, 22, 14, '#8393c4')`; `'waiting'`, `'Room ' + online.code + ': waiting'`; `'ready'`, `'Online, you are ' + (online.seat === 0 ? 'Red' : 'Black')`; `'closed'`, `'Room closed: H for a new one'`; and `'error'`, `('' + online.error).slice(0, 60)` at size 12. Put the room lines at y 42 so they sit under the message. Then host in one tab, join from a second tab (or a classmate's computer), and play a whole game.",
+      "instructions": "In `drawTop()`, below the message, add one line for each status: `'off'`, `text('H: host online', 340, 22, 14, '#8393c4')`; `'waiting'`, the code big enough to read and type, on its own: `text('Room code: ' + online.code, 10, 45, 18, 'gold')`, and beside it `text('waiting for a classmate', 250, 45, 14, '#8393c4')`; `'ready'`, `'Online, you are ' + (online.seat === 0 ? 'Red' : 'Black')` at x 300; `'closed'`, `'Room closed: one hosts (H), one joins the new code'` at x 10; and `'error'`, `('' + online.error).slice(0, 60)` at size 12. Put the room lines at y 42 (the code at y 45) so they sit under the message. Then host in one tab, join from a second tab (or a classmate's computer), and play a whole game.\n\n**To play again online:** stop and Run again in both tabs. Only ONE player presses H; the other puts the NEW code in `JOIN` and runs again. If both press H, you are in two different rooms.",
       "hints": [
         "You must be signed in and in a class to play online.",
-        "The canvas is 480 pixels wide: keep each line short, and start the long ones near the left edge."
+        "The canvas is 480 pixels wide: keep each line short, and start the long ones near the left edge.",
+        "A room code is new every time someone hosts, so last game's code never works again."
       ]
     }
   ],
@@ -81,7 +86,7 @@
       "hint": "online.onMove((m, seat) => { ... doMove(m.fr, m.fc, m.tr, m.tc); });",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bonline\\s*\\.\\s*onMove\\s*\\((?:(?!\\bfunction\\b)[\\s\\S]){0,400}?\\b(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(|\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\)[\\s\\S]*?\\bfunction\\s+\\1\\s*\\([^)]*\\)\\s*\\{(?:(?!\\bfunction\\b)[\\s\\S]){0,400}?\\b(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(",
+      "pattern": "\\bonline\\s*\\.\\s*onMove\\s*\\((?:(?!\\bfunction\\b)[\\s\\S]){0,400}?\\b(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(|\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\)[\\s\\S]*?(?:\\bfunction\\s+\\1\\s*\\([^)]*\\)\\s*\\{|\\b(?:const|let|var)\\s+\\1\\s*=)(?:(?!\\bfunction\\b)[\\s\\S]){0,400}?\\b(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(|(?:\\bfunction\\s+([A-Za-z_$][\\w$]*)\\s*\\([^)]*\\)\\s*\\{|\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*(?:async\\s*)?(?:function\\b|\\())(?=(?:(?!\\bfunction\\b)[\\s\\S]){0,400}?\\b(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\()[\\s\\S]*?\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*(?:\\2|\\3)\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -94,7 +99,7 @@
       "hint": "if (seat === seatOf(turn) && winner === '' && isLegal(m.fr, m.fc, m.tr, m.tc)) ...",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*(?:function\\s*)?\\(\\s*[\\w$]+\\s*,\\s*([\\w$]+)\\s*\\)\\s*(?:=>)?(?=(?:(?!\\bfunction\\b)[\\s\\S]){0,400}?\\b(?:isLegal|moveKind)\\s*\\()(?=(?:(?!\\bfunction\\b)[\\s\\S]){0,400}?(?:\\b\\1\\s*[!=]==?|[!=]==?\\s*\\1\\b|[\\w$]+\\s*\\(\\s*\\1\\s*\\)))|\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\)[\\s\\S]*?\\bfunction\\s+\\2\\s*\\(\\s*[\\w$]+\\s*,\\s*([\\w$]+)\\s*\\)\\s*\\{(?=(?:(?!\\bfunction\\b)[\\s\\S]){0,400}?\\b(?:isLegal|moveKind)\\s*\\()(?=(?:(?!\\bfunction\\b)[\\s\\S]){0,400}?(?:\\b\\3\\s*[!=]==?|[!=]==?\\s*\\3\\b|[\\w$]+\\s*\\(\\s*\\3\\s*\\)))",
+      "pattern": "\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*(?:async\\s*)?(?:function\\s*(?:[A-Za-z_$][\\w$]*)?\\s*)?\\(\\s*(?:[\\w$]+|\\{[^{}()]*\\})\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*(?:=>)?\\s*\\{?(?=(?:(?!\\bfunction\\b)[\\s\\S]){0,400}?\\b(?:isLegal|moveKind)\\s*\\()(?=(?:(?!\\bfunction\\b)[\\s\\S]){0,400}?(?:\\b\\1\\s*[!=]==?|[!=]==?\\s*\\1\\b|[\\w$]+\\s*\\(\\s*\\1\\s*\\)))|\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\)[\\s\\S]*?(?:\\bfunction\\s+\\2\\s*|\\b(?:const|let|var)\\s+\\2\\s*=\\s*(?:async\\s*)?(?:function\\s*(?:[A-Za-z_$][\\w$]*)?\\s*)?)\\(\\s*(?:[\\w$]+|\\{[^{}()]*\\})\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*(?:=>)?\\s*\\{?(?=(?:(?!\\bfunction\\b)[\\s\\S]){0,400}?\\b(?:isLegal|moveKind)\\s*\\()(?=(?:(?!\\bfunction\\b)[\\s\\S]){0,400}?(?:\\b\\3\\s*[!=]==?|[!=]==?\\s*\\3\\b|[\\w$]+\\s*\\(\\s*\\3\\s*\\)))|(?:\\bfunction\\s+([A-Za-z_$][\\w$]*)\\s*|\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*(?:async\\s*)?(?:function\\s*(?:[A-Za-z_$][\\w$]*)?\\s*)?)\\(\\s*(?:[\\w$]+|\\{[^{}()]*\\})\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*(?:=>)?\\s*\\{?(?=(?:(?!\\bfunction\\b)[\\s\\S]){0,400}?\\b(?:isLegal|moveKind)\\s*\\()(?=(?:(?!\\bfunction\\b)[\\s\\S]){0,400}?(?:\\b\\6\\s*[!=]==?|[!=]==?\\s*\\6\\b|[\\w$]+\\s*\\(\\s*\\6\\s*\\)))[\\s\\S]*?\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*(?:\\4|\\5)\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -107,7 +112,7 @@
       "hint": "if (online.status === 'off') doMove(fr, fc, tr, tc); else online.send({ ... });",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bonline\\s*\\.\\s*status\\s*[!=]==?\\s*['\"`][^'\"`\\n]*['\"`][\\s)]*\\{?\\s*(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(|\\bonline\\s*\\.\\s*status\\s*[!=]==?\\s*['\"`][^'\"`\\n]*['\"`][\\s)]*\\{?\\s*online\\s*\\.\\s*send\\s*\\([^;]*\\)\\s*;?\\s*\\}?\\s*else\\s*\\{?\\s*(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(|\\bonline\\s*\\.\\s*status\\s*[!=]==?\\s*['\"`][^'\"`\\n]*['\"`]\\s*\\?\\s*(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(|\\bonline\\s*\\.\\s*status\\s*[!=]==?\\s*['\"`][^'\"`\\n]*['\"`]\\s*\\?\\s*online\\s*\\.\\s*send\\s*\\([^:]*:\\s*(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(",
+      "pattern": "(?:\\bonline\\s*\\.\\s*(?:status|code|seat)\\s*[!=]==?\\s*(?:['\"`][^'\"`\\n]*['\"`]|null\\b|undefined\\b)|(?:['\"`][^'\"`\\n]*['\"`]|\\bnull\\b)\\s*[!=]==?\\s*online\\s*\\.\\s*(?:status|code|seat)\\b|!\\s*online\\s*\\.\\s*code\\b)[^;{}]*?\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?\\b(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(|\\b(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(|(?:\\{(?:[^{}]|\\{[^{}]*\\})*\\}|(?:[^;{}]|\\{[^{}]*\\})*;)\\s*(?:else\\s*\\{?(?:[^{}]|\\{[^{}]*\\})*?)?\\b(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\()|(?:\\bonline\\s*\\.\\s*(?:status|code|seat)\\s*[!=]==?\\s*(?:['\"`][^'\"`\\n]*['\"`]|null\\b|undefined\\b)|(?:['\"`][^'\"`\\n]*['\"`]|\\bnull\\b)\\s*[!=]==?\\s*online\\s*\\.\\s*(?:status|code|seat)\\b|!\\s*online\\s*\\.\\s*code\\b)\\s*\\?\\s*\\b(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(|(?:\\bonline\\s*\\.\\s*(?:status|code|seat)\\s*[!=]==?\\s*(?:['\"`][^'\"`\\n]*['\"`]|null\\b|undefined\\b)|(?:['\"`][^'\"`\\n]*['\"`]|\\bnull\\b)\\s*[!=]==?\\s*online\\s*\\.\\s*(?:status|code|seat)\\b|!\\s*online\\s*\\.\\s*code\\b)\\s*\\?\\s*online\\s*\\.\\s*send\\s*\\([^:]*:\\s*\\b(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(|\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*\\(?\\s*(?:\\bonline\\s*\\.\\s*(?:status|code|seat)\\s*[!=]==?\\s*(?:['\"`][^'\"`\\n]*['\"`]|null\\b|undefined\\b)|(?:['\"`][^'\"`\\n]*['\"`]|\\bnull\\b)\\s*[!=]==?\\s*online\\s*\\.\\s*(?:status|code|seat)\\b|!\\s*online\\s*\\.\\s*code\\b)[\\s\\S]*?\\bif\\s*\\(\\s*!?\\s*\\1\\s*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?\\b(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(|\\b(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(|(?:\\{(?:[^{}]|\\{[^{}]*\\})*\\}|(?:[^;{}]|\\{[^{}]*\\})*;)\\s*(?:else\\s*\\{?(?:[^{}]|\\{[^{}]*\\})*?)?\\b(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\()|(?:\\bfunction\\s+([A-Za-z_$][\\w$]*)\\s*\\(\\s*\\)\\s*\\{\\s*return|\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*\\(\\s*\\)\\s*=>\\s*\\{?\\s*(?:return)?)\\s*\\(?\\s*(?:\\bonline\\s*\\.\\s*(?:status|code|seat)\\s*[!=]==?\\s*(?:['\"`][^'\"`\\n]*['\"`]|null\\b|undefined\\b)|(?:['\"`][^'\"`\\n]*['\"`]|\\bnull\\b)\\s*[!=]==?\\s*online\\s*\\.\\s*(?:status|code|seat)\\b|!\\s*online\\s*\\.\\s*code\\b)[\\s\\S]*?\\bif\\s*\\(\\s*!?\\s*(?:\\2|\\3)\\s*\\(\\s*\\)\\s*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?\\b(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(|\\b(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(|(?:\\{(?:[^{}]|\\{[^{}]*\\})*\\}|(?:[^;{}]|\\{[^{}]*\\})*;)\\s*(?:else\\s*\\{?(?:[^{}]|\\{[^{}]*\\})*?)?\\b(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\()|\\bif\\s*\\(\\s*!?\\s*([A-Za-z_$][\\w$]*)\\s*\\(\\s*\\)\\s*\\)\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*?\\b(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(|\\b(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\(|(?:\\{(?:[^{}]|\\{[^{}]*\\})*\\}|(?:[^;{}]|\\{[^{}]*\\})*;)\\s*(?:else\\s*\\{?(?:[^{}]|\\{[^{}]*\\})*?)?\\b(?:doMove|[\\w$]*[Mm]ove[\\w$]*)\\s*\\()[\\s\\S]*?(?:\\bfunction\\s+\\4\\s*\\(\\s*\\)\\s*\\{\\s*return|\\b(?:const|let|var)\\s+\\4\\s*=\\s*\\(\\s*\\)\\s*=>\\s*\\{?\\s*(?:return)?)\\s*\\(?\\s*(?:\\bonline\\s*\\.\\s*(?:status|code|seat)\\s*[!=]==?\\s*(?:['\"`][^'\"`\\n]*['\"`]|null\\b|undefined\\b)|(?:['\"`][^'\"`\\n]*['\"`]|\\bnull\\b)\\s*[!=]==?\\s*online\\s*\\.\\s*(?:status|code|seat)\\b|!\\s*online\\s*\\.\\s*code\\b)",
       "flags": "",
       "points": 0,
       "status": "pending",
