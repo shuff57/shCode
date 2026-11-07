@@ -10674,6 +10674,45 @@
       "scoreKind": null
     },
     {
+      "id": "6-32-checkers-1-playtest-and-reflect",
+      "title": "6.32.1 Playtest and reflect: Checkers",
+      "unit": "6.32 Checkers: playtest and extend",
+      "preview": "assignment",
+      "type": "assignment",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 18,
+      "assignmentCode": null,
+      "maxScore": 4,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "6-32-checkers-2-quiz-checkers-check",
+      "title": "6.32.2 Check: the Checkers game",
+      "unit": "6.32 Checkers: playtest and extend",
+      "preview": "quiz",
+      "type": "assignment",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 18,
+      "assignmentCode": null,
+      "maxScore": 5,
+      "maxSubmissions": null,
+      "scoreKind": "quiz"
+    },
+    {
+      "id": "6-32-checkers-3-challenges-make-it-yours",
+      "title": "6.32.3 Challenges: Make it yours",
+      "unit": "6.32 Checkers: playtest and extend",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 18,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "6-4-1-slides",
       "title": "6.9.1 Slides: Animation & Camera",
       "unit": "6.9 Animated Sprites and Camera",

@@ -1,0 +1,47 @@
+{
+  "id": "6-32-checkers-3-challenges-make-it-yours",
+  "title": "6.32.3 Challenges: Make it yours",
+  "description": "Your checkers is complete. Change one rule of your own: show the legal squares, a draw after 40 quiet moves, or jumps you must take. Pick one; add an idea of your own on top if you like.",
+  "type": "lesson",
+  "estimateMins": 25,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.32 Checkers: playtest and extend",
+  "preview": "moshion",
+  "week": 18,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Pick a rule and change it",
+      "instructions": "Choose one of these three challenges. The check turns green when any one of them is in your code, so one is enough. An idea of your own is welcome on top of it. Start from your finished game in the editor.\n\n**Challenge 1: show the legal squares (easy).** In `drawBoard()`, inside the `if (picked !== null)` block, after the gold square, write two loops over every row `r` and column `c`. Inside them, `if (isLegal(picked.r, picked.c, r, c)) { fill('rgba(124, 252, 0, 0.6)'); circle(c * CELL + CELL / 2, TOP + r * CELL + CELL / 2, 18); }`. Pick a piece up: a green dot sits on every square it may move to, and during a chain only the jumps light up.\n\n**Challenge 2: a draw after 40 quiet moves (medium).** Add `let quiet = 0;` at the top and `quiet = 0;` in `newGame()`. In `doMove`, right after `const kind = moveKind(fr, fc, tr, tc);`, count: `if (kind === 'jump') quiet = 0; else quiet += 1;`. At the very end of `doMove`, `if (winner === '' && quiet >= 40) { winner = 'draw'; message = 'A draw: 40 moves without a jump'; }`. A `winner` that is not `''` stops the clicks, and R (offline) starts a new game. To test it quickly, try `quiet >= 4` first, then put back 40.\n\n**Challenge 3: jumps you must take (hard).** Below `canJumpFrom`, write `anyJump()`: two loops over the board, and `if (colorOf(grid[r][c]) === turn && canJumpFrom(r, c)) return true;` inside them; after the loops, `return false;`. In `isLegal`, after `if (kind === '') return false;`, add `if (kind === 'step' && anyJump()) return false;`. Now a step is refused whenever a jump is waiting, on both computers, because `onMove` asks `isLegal` too.",
+      "hints": [
+        "Whatever you pick, play a whole game afterwards and press R at the end.",
+        "Challenge 1 changes no rule: the dots ask the same `isLegal` the click asks, so they are always right."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "You changed one rule of the game",
+      "description": "Any one challenge turns this green: dots on the legal squares, a draw after 40 quiet moves, or jumps a player must take. Help: 6.28.1 (Reading: From a click to a square, and one rule function)",
+      "hint": "if (isLegal(picked.r, picked.c, r, c)) { fill(...); circle(...); }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:isLegal|moveKind)\\s*\\([^;{]*?\\)[\\s)]*(?:[!=]==?\\s*(['\"`])[^'\"`]*\\1[\\s)]*)?(?:&&[^;{]*?)?\\{?\\s*(?:fill|circle|rect|square|stroke|ellipse|text)\\s*\\(|(?<![=!<>])=\\s*(?:isLegal|moveKind)\\s*\\((?:(?!\\bfunction\\b)[\\s\\S]){0,150}?\\b(?:fill|circle|rect|square|ellipse)\\s*\\(|(?:>=?|[!=]==?)\\s*(?:40|39)\\b|\\b(?:40|39)\\s*(?:<=?|[!=]==?)|\\b(?:const|let)\\s+[\\w$]+\\s*=\\s*(?:40|39)\\b|\\b(?:for|while)\\s*\\([^)]*<=?\\s*(?:N|8|7|[\\w$]+\\s*\\.\\s*length)\\b[^)]*\\)(?:(?!\\bfunction\\b)[\\s\\S]){0,300}?\\bcanJumpFrom\\s*\\(|\\bfunction\\s+isLegal\\b(?:(?!\\bfunction\\b)[\\s\\S]){0,400}?\\b(?!canJumpFrom\\b)[\\w$]*[Jj]ump[\\w$]*\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "carryFrom": "6-31-checkers-3-lab-checkers-online"
+}

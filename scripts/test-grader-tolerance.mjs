@@ -2204,6 +2204,126 @@ for (const id of Object.values(L)) {
   reject(T.yours, 'a new letter only inside a long string', 'r1', plus(T.yours, 'const note = "kind === ' + AP + 'B' + AP + '";'));
 }
 
+// ---------------------------------------------------------------- 6.27-6.32 (Checkers)
+//
+// The second board game (2026-11-07), built with the Trail walks' lessons in from the
+// start. Each accept below is a correct answer in another shape: other names, Math.abs,
+// a ternary, a !== form, nested ifs, a switch, a helper function. The rejects are the
+// smuggles: a letter or a number that only appears inside a long string, and an online
+// handler that makes every move without asking the rules first.
+{
+  const K = {
+    sb1: '6-27-checkers-3-sub-a-checkered-board', board: '6-27-checkers-4-lab-set-up-the-board',
+    pick: '6-28-checkers-2-sub-pick-up-and-put-down', step: '6-28-checkers-3-lab-pick-a-piece-and-step',
+    sb3: '6-29-checkers-2-sub-jump-and-take', jump: '6-29-checkers-3-lab-jumps-and-jumping-again',
+    crown: '6-30-checkers-2-sub-crown-a-king', kings: '6-30-checkers-3-lab-kings-and-the-win',
+    sb5: '6-31-checkers-2-sub-send-a-click', online: '6-31-checkers-3-lab-checkers-online',
+    yours: '6-32-checkers-3-challenges-make-it-yours',
+  };
+  const swap = (id, ...pairs) => {
+    let code = solutionFiles(id)['script.js'];
+    for (let k = 0; k < pairs.length; k += 2) {
+      if (!code.includes(pairs[k])) throw new Error(`Checkers case for ${id}: ${JSON.stringify(pairs[k])} is not in the reference`);
+      code = code.split(pairs[k]).join(pairs[k + 1]);
+    }
+    return { 'script.js': code };
+  };
+  const plus = (id, extra) => ({ 'script.js': starterFiles(id)['script.js'] + nl + extra + nl });
+  for (const id of Object.values(K)) {
+    accept(id, 'reference solution', solutionFiles(id));
+    reject(id, 'untouched starter', null, starterFiles(id));
+  }
+
+  const shade = "fill((r + c) % 2 === 1 ? '#7a5a40' : '#ead9b6');";
+  accept(K.sb1, '% 2 !== 0', swap(K.sb1, '% 2 === 1', '% 2 !== 0'));
+  accept(K.sb1, 'if / else instead of a ternary', swap(K.sb1, shade, "if ((r + c) % 2 === 1) fill('#7a5a40');" + nl + "      else fill('#ead9b6');"));
+  accept(K.sb1, 'the test kept in a variable', swap(K.sb1, shade, 'const dark = (r + c) % 2 === 1;' + nl + "      fill(dark ? '#7a5a40' : '#ead9b6');"));
+  accept(K.sb1, 'a while loop inside the for', swap(K.sb1, '    for (let c = 0; c < N; c++) {', '    let c = 0;' + nl + '    while (c < N) {', '      rect(c * CELL, r * CELL, CELL, CELL);', '      rect(c * CELL, r * CELL, CELL, CELL);' + nl + '      c++;'));
+
+  const black = "      if ((r + c) % 2 === 1 && r < 3) p = 'b';";
+  const red = "      if ((r + c) % 2 === 1 && r > 4) p = 'r';";
+  accept(K.board, 'nested ifs', swap(K.board, black + nl + red, "      if ((r + c) % 2 === 1) {" + nl + "        if (r < 3) p = 'b';" + nl + "        if (r > 4) p = 'r';" + nl + '      }'));
+  accept(K.board, 'r <= 2 and r >= 5', swap(K.board, 'r < 3)', 'r <= 2)', 'r > 4)', 'r >= 5)'));
+  accept(K.board, 'a ternary chain', swap(K.board, black + nl + red, "      if ((r + c) % 2 === 1) p = r < 3 ? 'b' : r > 4 ? 'r' : '';"));
+  accept(K.board, '% 2 !== 0, the rows tested first', swap(K.board, black + nl + red, "      if (r < 3 && (r + c) % 2 !== 0) p = 'b';" + nl + "      if (r > 4 && (r + c) % 2 !== 0) p = 'r';"));
+  accept(K.board, 'an isDark helper', swap(K.board, black + nl + red, "      if (isDark(r, c) && r < 3) p = 'b';" + nl + "      if (isDark(r, c) && r >= N - 3) p = 'r';",
+    'function colorOf(p)', 'function isDark(r, c) { return (r + c) % 2 === 1; }' + nl + 'function colorOf(p)'));
+  accept(K.board, 'row numbers one by one', swap(K.board, 'r < 3)', '(r === 0 || r === 1 || r === 2))'));
+  reject(K.board, 'pieces on every square of their rows', 'r1', swap(K.board, black + nl + red, "      if (r < 3) p = 'b';" + nl + "      if (r > 4) p = 'r';"));
+  reject(K.board, "the 'b' only inside a long string", 'r2', plus(K.board, 'const note = "(r + c) % 2 === 1 && r < 3 ' + AP + 'b' + AP + '";'));
+
+  accept(K.pick, 'Math.floor and Math.abs', swap(K.pick, 'floor(mouse.x', 'Math.floor(mouse.x', 'floor(mouse.y', 'Math.floor(mouse.y', 'abs(r - tr)', 'Math.abs(r - tr)', 'abs(c - tc)', 'Math.abs(c - tc)'));
+  accept(K.pick, 'one row up or down, written out', swap(K.pick, 'abs(r - tr) === 1 && abs(c - tc) === 1', '(r === tr - 1 || r === tr + 1) && (c === tc - 1 || c === tc + 1)'));
+  accept(K.pick, 'a square of the difference', swap(K.pick, 'abs(r - tr) === 1 && abs(c - tc) === 1', '(r - tr) * (r - tr) === 1 && (c - tc) * (c - tc) === 1'));
+
+  accept(K.step, 'Math.floor and Math.abs', swap(K.step, 'floor(', 'Math.floor(', 'abs(', 'Math.abs('));
+  accept(K.step, 'forward as two ifs', swap(K.step, "  const ahead = turn === 'r' ? dr < 0 : dr > 0;" + nl + "  if (!ahead) return '';",
+    "  if (turn === 'r' && dr > 0) return '';" + nl + "  if (turn === 'b' && dr < 0) return '';"));
+  accept(K.step, 'forward as a direction number', swap(K.step, "  const ahead = turn === 'r' ? dr < 0 : dr > 0;" + nl + "  if (!ahead) return '';",
+    "  const dir = turn === 'r' ? -1 : 1;" + nl + "  if (dr !== dir && dr !== 2 * dir) return '';"));
+  accept(K.step, 'the turn passes with if / else', swap(K.step, "  turn = turn === 'r' ? 'b' : 'r';", "  if (turn === 'r') turn = 'b';" + nl + "  else turn = 'r';"));
+  accept(K.step, 'the turn passes in a switch', swap(K.step, "  turn = turn === 'r' ? 'b' : 'r';", '  switch (turn) {' + nl + "    case 'r': turn = 'b'; break;" + nl + '    default: turn = ' + BT + 'r' + BT + ';' + nl + '  }'));
+  accept(K.step, 'the turn passes through a helper', swap(K.step, "  turn = turn === 'r' ? 'b' : 'r';", '  turn = other(turn);', 'function onBoard', "function other(t) { return t === 'r' ? 'b' : 'r'; }" + nl + 'function onBoard'));
+  accept(K.step, 'turn === colorOf(p), object shorthand', swap(K.step, "  if (p !== '' && colorOf(p) === turn) {" + nl + '    picked = { r: r, c: c };', "  if (p !== '' && turn === colorOf(p)) {" + nl + '    picked = { r, c };'));
+  accept(K.step, 'a player called side', swap(K.step, 'turn', 'side'));
+
+  accept(K.sb3, 'Math.abs and the halfway written as start plus half', swap(K.sb3, 'abs(r - picked.r)', 'Math.abs(r - picked.r)', 'abs(c - picked.c)', 'Math.abs(c - picked.c)',
+    'const mr = (r + picked.r) / 2;', 'const mr = picked.r + (r - picked.r) / 2;'));
+  accept(K.sb3, "'b' === the halfway square", swap(K.sb3, "if (grid[mr][mc] === 'b')", "if ('b' === grid[mr][mc])"));
+  accept(K.sb3, 'two rows up, written out', swap(K.sb3, 'abs(r - picked.r) === 2', 'r === picked.r - 2'));
+  reject(K.sb3, "'b' only inside a long string", 'r2', plus(K.sb3, 'const note = "(r + picked.r) / 2 === ' + AP + 'b' + AP + '";'));
+
+  accept(K.jump, 'the halfway square from the sum of the ends', swap(K.jump, 'const mid = grid[fr + dr / 2][fc + dc / 2];', 'const mid = grid[(fr + tr) / 2][(fc + tc) / 2];'));
+  accept(K.jump, 'the other colour by name', swap(K.jump, "if (mid !== '' && colorOf(mid) !== turn) return 'jump';", "if (colorOf(mid) === (turn === 'r' ? 'b' : 'r')) return 'jump';"));
+  accept(K.jump, 'the halfway square kept in two names', swap(K.jump, "  if (kind === 'jump') grid[(fr + tr) / 2][(fc + tc) / 2] = '';",
+    '  const mr = (fr + tr) / 2;' + nl + '  const mc = (fc + tc) / 2;' + nl + "  if (kind === 'jump') grid[mr][mc] = '';"));
+  accept(K.jump, 'a chain flag called again', swap(K.jump, 'chain', 'again'));
+  accept(K.jump, 'Math.abs', swap(K.jump, 'abs(', 'Math.abs('));
+
+  accept(K.crown, 'a ternary crown', swap(K.crown, "      if (pr === 0) piece = 'R';", "      piece = pr === 0 ? 'R' : piece;"));
+  accept(K.crown, 'toUpperCase', swap(K.crown, "      if (pr === 0) piece = 'R';", '      if (pr === 0) piece = piece.toUpperCase();'));
+  accept(K.crown, 'the king test first', swap(K.crown, "(up || (down && piece === 'R'))", "(up || (piece === 'R' && down))"));
+  reject(K.crown, 'a king that still only steps up', 'r2', swap(K.crown, "(up || (down && piece === 'R'))", 'up'));
+  accept(K.crown, 'a king as its own else if', swap(K.crown, "abs(c - pc) === 1 && (up || (down && piece === 'R'))) {", "abs(c - pc) === 1 && up || picked && piece === 'R' && abs(r - pr) === 1 && abs(c - pc) === 1) {"));
+
+  accept(K.kings, 'toUpperCase to crown, the row tested first', swap(K.kings, "  if (p === 'r' && r === 0) { grid[r][c] = 'R'; return true; }", "  if (r === 0 && p === 'r') { grid[r][c] = p.toUpperCase(); return true; }"));
+  accept(K.kings, 'the king test written out', swap(K.kings, "  if (!ahead && !isKing(p)) return '';", "  if (!ahead && p !== 'R' && p !== 'B') return '';"));
+  accept(K.kings, 'a king flag first', swap(K.kings, "  if (!ahead && !isKing(p)) return '';", "  const king = isKing(p);" + nl + "  if (!king && !ahead) return '';"));
+  accept(K.kings, 'no move found with isLegal', swap(K.kings, "if (moveKind(r, c, r + d, c + d) !== '' || moveKind(r, c, r + d, c - d) !== '') return true;", 'if (isLegal(r, c, r + d, c + d) || isLegal(r, c, r + d, c - d)) return true;'));
+  accept(K.kings, 'R tested after the winner', swap(K.kings, "  if (kb.presses('r') && winner !== '') newGame();", "  if (winner !== '' && kb.presses('r')) newGame();"));
+  accept(K.kings, 'R in its own if', swap(K.kings, "  if (kb.presses('r') && winner !== '') newGame();", "  if (kb.presses('r')) {" + nl + "    if (winner !== '') newGame();" + nl + '  }'));
+  reject(K.kings, "the crown only inside a long string", 'r1', plus(K.kings, 'const note = "r === 0 = ' + AP + 'R' + AP + '";'));
+
+  accept(K.sb5, 'onMove given a named function', swap(K.sb5, '  online.onMove((m, seat) => {' + nl + '    marks.push({ r: m.r, c: m.c, seat: seat });' + nl + '  });', '  online.onMove(gotMove);',
+    'function draw() {', 'function gotMove(m, seat) {' + nl + '  marks.push({ r: m.r, c: m.c, seat: seat });' + nl + '}' + nl + nl + 'function draw() {'));
+
+  const handler = "  online.onMove((m, seat) => {" + nl + "    if (seat === seatOf(turn) && winner === '' && isLegal(m.fr, m.fc, m.tr, m.tc)) {" + nl + '      doMove(m.fr, m.fc, m.tr, m.tc);' + nl + '    }' + nl + '  });';
+  accept(K.online, 'the seat named who, tested second', swap(K.online, handler, "  online.onMove((m, who) => {" + nl + "    if (isLegal(m.fr, m.fc, m.tr, m.tc) && seatOf(turn) === who && winner === '') doMove(m.fr, m.fc, m.tr, m.tc);" + nl + '  });'));
+  accept(K.online, 'early returns in the handler', swap(K.online, handler, '  online.onMove((m, seat) => {' + nl + '    if (seat !== seatOf(turn)) return;' + nl + '    if (!isLegal(m.fr, m.fc, m.tr, m.tc)) return;' + nl + '    doMove(m.fr, m.fc, m.tr, m.tc);' + nl + '  });'));
+  accept(K.online, 'the handler as a named function', swap(K.online, handler, '  online.onMove(arrived);', 'function seatOf(t)', "function arrived(m, seat) {" + nl + "  if (seat === seatOf(turn) && winner === '' && isLegal(m.fr, m.fc, m.tr, m.tc)) doMove(m.fr, m.fc, m.tr, m.tc);" + nl + '}' + nl + nl + 'function seatOf(t)'));
+  accept(K.online, "send when 'ready', otherwise move", swap(K.online,
+    "  if (online.status === 'off') doMove(fr, fc, tr, tc);" + nl + '  else online.send({ fr: fr, fc: fc, tr: tr, tc: tc });',
+    "  if (online.status === 'ready') online.send({ fr, fc, tr, tc });" + nl + '  else doMove(fr, fc, tr, tc);'));
+  reject(K.online, 'every move made without asking the rules', 'r3', swap(K.online, handler, '  online.onMove((m, seat) => doMove(m.fr, m.fc, m.tr, m.tc));'));
+  reject(K.online, "only the H line tests status 'off'", 'r4', plus(K.online,
+    'function draw2() {' + nl + "  if (kb.presses('h') && online.status === 'off') { newGame(); online.host(); }" + nl + '}'));
+
+  const dots = [
+    '    // Challenge 1: a dot on every square the picked piece may move to.', '    for (let r = 0; r < N; r++) {', '      for (let c = 0; c < N; c++) {',
+    '        if (isLegal(picked.r, picked.c, r, c)) {', "          fill('rgba(124, 252, 0, 0.6)');", '          circle(c * CELL + CELL / 2, TOP + r * CELL + CELL / 2, 18);',
+    '        }', '      }', '    }'].join(nl) + nl;
+  accept(K.yours, 'the legal test kept in a variable', swap(K.yours, "        if (isLegal(picked.r, picked.c, r, c)) {", '        const ok = isLegal(picked.r, picked.c, r, c);' + nl + '        if (ok) {'));
+  accept(K.yours, 'a draw after 40 quiet moves', swap(K.yours, dots, '', 'let message = ' + AP + AP + ';', 'let message = ' + AP + AP + ';' + nl + 'let quiet = 0;',
+    '  const kind = moveKind(fr, fc, tr, tc);' + nl + '  grid[tr][tc]', '  const kind = moveKind(fr, fc, tr, tc);' + nl + "  if (kind === 'jump') quiet = 0; else quiet += 1;" + nl + "  if (quiet >= 40) winner = 'draw';" + nl + '  grid[tr][tc]'));
+  accept(K.yours, 'jumps you must take', swap(K.yours, dots, '', 'function canJumpFrom(r, c) {',
+    'function anyJump() {' + nl + '  for (let r = 0; r < N; r++) {' + nl + '    for (let c = 0; c < N; c++) {' + nl + '      if (colorOf(grid[r][c]) === turn && canJumpFrom(r, c)) return true;' + nl + '    }' + nl + '  }' + nl + '  return false;' + nl + '}' + nl + nl + 'function canJumpFrom(r, c) {',
+    "  if (kind === '') return false;", "  if (kind === '') return false;" + nl + "  if (kind === 'step' && anyJump()) return false;"));
+  accept(K.yours, 'jumps you must take, asked through a helper', swap(K.yours, dots, '', "  if (kind === '') return false;", "  if (kind === '') return false;" + nl + "  if (kind !== 'jump' && mustJump()) return false;",
+    'function canJumpFrom(r, c) {', 'function mustJump() {' + nl + '  let found = false;' + nl + '  grid.forEach((row, r) => row.forEach((p, c) => { if (colorOf(p) === turn && canJumpFrom(r, c)) found = true; }));' + nl + '  return found;' + nl + '}' + nl + nl + 'function canJumpFrom(r, c) {'));
+  reject(K.yours, 'a 40 only inside a string', 'r1', plus(K.yours, 'const note = "quiet >= 40";'));
+  reject(K.yours, 'the dots only in a comment', 'r1', plus(K.yours, '// if (isLegal(picked.r, picked.c, r, c)) { fill(0); }'));
+}
+
 // ---------------------------------------------------------------- run
 try {
   execFileSync(

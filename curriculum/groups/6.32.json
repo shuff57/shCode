@@ -1,0 +1,16 @@
+{
+  "moduleId": "6.32",
+  "source": "Checkers chain module, one day.",
+  "lessons": [
+    {
+      "id": "checkers-playtest-and-extend",
+      "title": "playtest and extend",
+      "objective": "Play it, find one surprise, link it to a function, change one rule.",
+      "screens": [
+        "6-32-checkers-1-playtest-and-reflect",
+        "6-32-checkers-2-quiz-checkers-check",
+        "6-32-checkers-3-challenges-make-it-yours"
+      ]
+    }
+  ]
+}
