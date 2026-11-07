@@ -11505,6 +11505,38 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
+  "7-21-quest-1-playtest-and-reflect": {
+    "lessonTitle": "7.21.1 Playtest and reflect: Quest",
+    "prompt": "Everything you need is in 7.16.1 (Plan: Break Quest into parts) and 7.20.3 (Lab: Duel a classmate): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished Quest at least three times: the whole run of enemies at least once, and a duel online with a classmate or a second tab if you can. Try to break it: guard twice in a row, drink a potion at full hp or with none left, lose on purpose and press R, press a key when it is not your turn. Then answer:\n\n1. How many times did you play, and how did it go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which method, function or part of your code do you think that comes from?\n\n4. What is one rule you would change or add, and what would it do to the game?",
+    "rubric": [
+      {
+        "id": "played",
+        "title": "Says how many times they played and how it went",
+        "description": "The student says they played, or gives any detail of a game (who won, which enemy beat them, guarding or potions, a level up, a duel online or alone, a way it went wrong). Any mention of playing earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Quest game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "bug",
+        "title": "Names one thing that surprised or broke",
+        "description": "The student names anything that surprised them, felt wrong or did not work as expected, however small. If they found nothing, saying so or naming something they tried earns full credit too. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Quest game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "cause",
+        "title": "Says which method, function or part of the code that touches",
+        "description": "The student connects what they saw to some part of the game or its code, such as the Fighter class, takeHit, attack, guard, heal, levelUp, draw, newGame, choose, act, enemyTurn, fightOver, goodMove or onMove, even loosely or wrongly. Any guess at a cause earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Quest game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "change",
+        "title": "Names one rule they would change and what it would do",
+        "description": "The student names one rule, number or feature they would change or add, and says anything about what it would do. Any change, in any words, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Quest game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
   "moshion-bounce": {
     "lessonTitle": "5.2.16 Bouncy Ball",
     "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.16 Bouncy Ball\". The task they were given: Build a closed box with a ball in it: make four long thin static walls (top, bottom, left, right), make the ball as a dynamic sprite with one size number so it is a circle, store it in ball and colour it, make it bouncy (near the top of the 0 to 1 range), give it a friction value (the steps try 0 and then 5), and give it a sideways starting speed. What the starter file already had: `let ball;`, a 400 by 400 canvas, gravity turned on (world.gravity.y = 10), background painted in draw(), and four step comments in setup(). The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: A sprite made with 'static' as its last argument never moves or falls; one made without it is dynamic, so gravity and collisions move it. A sprite's body type can also be set afterwards with .collider = 'static'. new Sprite(x, y, d) with one size number makes a circle that many pixels across. bounciness runs from 0 (sticks) to 1 (gives back all its energy). friction is drag along a surface; 0 slides freely. world.gravity.y starts at 0 until a sketch sets it. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",

@@ -12585,6 +12585,45 @@
       "scoreKind": null
     },
     {
+      "id": "7-21-quest-1-playtest-and-reflect",
+      "title": "7.21.1 Playtest and reflect: Quest",
+      "unit": "7.21 Quest: playtest and extend",
+      "preview": "assignment",
+      "type": "assignment",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 19,
+      "assignmentCode": null,
+      "maxScore": 4,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "7-21-quest-2-quiz-quest-check",
+      "title": "7.21.2 Check: the Quest game",
+      "unit": "7.21 Quest: playtest and extend",
+      "preview": "quiz",
+      "type": "assignment",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 19,
+      "assignmentCode": null,
+      "maxScore": 5,
+      "maxSubmissions": null,
+      "scoreKind": "quiz"
+    },
+    {
+      "id": "7-21-quest-3-challenges-make-it-yours",
+      "title": "7.21.3 Challenges: Make it yours",
+      "unit": "7.21 Quest: playtest and extend",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 19,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "8-1-1-reading-a-part-is-a-list-of-steps",
       "title": "9.1.1 Reading: A Part Is a List of Steps",
       "unit": "9.1 Solid Shapes",

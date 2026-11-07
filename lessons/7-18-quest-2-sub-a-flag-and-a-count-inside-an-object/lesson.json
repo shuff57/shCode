@@ -44,7 +44,7 @@
       "hint": "if (this.guarding) n = floor(n / 2);  this.guarding = false;",
       "type": "regex",
       "file": "script.js",
-      "pattern": "^(?=[\\s\\S]*?\\bthis\\s*\\.\\s*([\\w$]+)\\b[^;{]{0,80}?(?:\\b(?:Math\\s*\\.\\s*)?(?:floor|trunc|round|ceil|int)\\s*\\(\\s*[\\w$]+\\s*(?:\\/\\s*2|\\*\\s*0?\\.5)\\s*\\)|\\b[\\w$]+\\s*\\/=\\s*2\\b|\\b([\\w$]+)\\s*=\\s*\\2\\s*(?:\\/\\s*2|\\*\\s*0?\\.5)\\b|\\b[\\w$]+\\s*>>=?\\s*1\\b)[^}]{0,200}?\\bthis\\s*\\.\\s*\\1\\s*=\\s*false\\b)(?=[\\s\\S]*?\\bthis\\s*\\.\\s*\\1\\s*=\\s*true\\b)",
+      "pattern": "^(?=[\\s\\S]*?\\bthis\\s*\\.\\s*([\\w$]+)\\b[^;}]{0,80}?(?:\\b(?:Math\\s*\\.\\s*)?(?:floor|trunc|round|ceil|int)\\s*\\(\\s*[\\w$]+\\s*(?:\\/\\s*2|\\*\\s*0?\\.5)\\s*\\)|\\b[\\w$]+\\s*\\/=\\s*2\\b|\\b([\\w$]+)\\s*=\\s*\\2\\s*(?:\\/\\s*2|\\*\\s*0?\\.5)\\b|\\b[\\w$]+\\s*>>=?\\s*1\\b)[^}]{0,200}?\\bthis\\s*\\.\\s*\\1\\s*=\\s*false\\b)(?=[\\s\\S]*?\\bthis\\s*\\.\\s*\\1\\s*=\\s*true\\b)",
       "flags": "",
       "points": 0,
       "status": "pending",

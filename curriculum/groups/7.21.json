@@ -1,0 +1,16 @@
+{
+  "moduleId": "7.21",
+  "source": "Quest chain module, one day.",
+  "lessons": [
+    {
+      "id": "quest-playtest-and-extend",
+      "title": "playtest and extend",
+      "objective": "Play it, find one surprise, link it to a method or function, change one thing.",
+      "screens": [
+        "7-21-quest-1-playtest-and-reflect",
+        "7-21-quest-2-quiz-quest-check",
+        "7-21-quest-3-challenges-make-it-yours"
+      ]
+    }
+  ]
+}

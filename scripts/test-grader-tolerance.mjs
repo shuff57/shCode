@@ -2437,6 +2437,184 @@ for (const id of Object.values(L)) {
   reject(K.yours, 'a 6.31.3 handler with isLegal first (carried)', 'r1', sfix(K.yours, "if (goodMove(m) && seat === seatOf(turn) && winner === '' && isLegal(m.fr, m.fc, m.tr, m.tc)) {", "if (isLegal(m.fr, m.fc, m.tr, m.tc) && seatOf(turn) === seat && goodMove(m)) {"));
 }
 
+// ---------------------------------------------------------------- 7.16-7.21 (Quest)
+//
+// The turn-based RPG (2026-11-07), one Fighter class and composition, built with the Trail and
+// Checkers walks' lessons in from the start. Each accept below is a correct answer in another
+// shape: other names, Math.max / Math.floor, the floor written as an if, the bar width kept in a
+// variable or made with map(), a loop or forEach to draw, a ternary or % 2 for the turn, a named
+// function handed to after(), early returns in onMove. The rejects are the things that do nothing:
+// a method defined but never called, a hit that skips takeHit, a flag that is never cleared, a
+// count that is never spent, after() handed a call instead of a function, an online handler that
+// acts without checking the seat or the move, and letters or numbers only in a string or comment.
+{
+  const Q = {
+    sb1: '7-16-quest-3-sub-an-object-that-draws-itself', fighters: '7-16-quest-4-lab-two-fighters',
+    sb2: '7-17-quest-2-sub-one-object-hits-another', blows: '7-17-quest-3-lab-trade-blows',
+    sb3: '7-18-quest-2-sub-a-flag-and-a-count-inside-an-object', actions: '7-18-quest-3-lab-attack-guard-or-potion',
+    sb4: '7-19-quest-2-sub-a-list-of-kinds-becomes-a-list-of-objects', run: '7-19-quest-3-lab-a-run-of-enemies',
+    sb5: '7-20-quest-2-sub-send-an-action', duel: '7-20-quest-3-lab-duel-a-classmate',
+    yours: '7-21-quest-3-challenges-make-it-yours',
+  };
+  const swap = (id, ...pairs) => {
+    let code = solutionFiles(id)['script.js'];
+    for (let k = 0; k < pairs.length; k += 2) {
+      if (!code.includes(pairs[k])) throw new Error(`Quest case for ${id}: ${JSON.stringify(pairs[k])} is not in the reference`);
+      code = code.split(pairs[k]).join(pairs[k + 1]);
+    }
+    return { 'script.js': code };
+  };
+  const sfix = (id, ...pairs) => {
+    let code = starterFiles(id)['script.js'];
+    for (let k = 0; k < pairs.length; k += 2) {
+      if (!code.includes(pairs[k])) throw new Error(`Quest case for ${id}: ${JSON.stringify(pairs[k])} is not in the starter`);
+      code = code.split(pairs[k]).join(pairs[k + 1]);
+    }
+    return { 'script.js': code };
+  };
+  const plus = (id, extra) => ({ 'script.js': starterFiles(id)['script.js'] + nl + extra + nl });
+  for (const id of Object.values(Q)) {
+    accept(id, 'reference solution', solutionFiles(id));
+    reject(id, 'untouched starter', null, starterFiles(id));
+  }
+
+  // ---- 7.16.3 / 7.16.4: a method that draws, a bar scaled by hp / maxHp, both drawn
+  const bar = '    rect(x, y, 200 * this.value / this.max, 16);';
+  accept(Q.sb1, 'value * 200 / max', swap(Q.sb1, bar, '    rect(x, y, this.value * 200 / this.max, 16);'));
+  accept(Q.sb1, 'the width kept in a variable', swap(Q.sb1, bar, '    const w = 200 * this.value / this.max;' + nl + '    rect(x, y, w, 16);'));
+  accept(Q.sb1, 'the width made with map()', swap(Q.sb1, bar, '    rect(x, y, map(this.value, 0, this.max, 0, 200), 16);'));
+  accept(Q.sb1, 'the method called show', swap(Q.sb1, '  draw(x, y) {', '  show(x, y) {', 'health.draw(', 'health.show(', 'magic.draw(', 'magic.show('));
+  accept(Q.sb1, 'both drawn with forEach', swap(Q.sb1, '  health.draw(20, 40);' + nl + '  magic.draw(20, 80);', '  [health, magic].forEach((b, i) => b.draw(20, 40 + i * 40));'));
+  reject(Q.sb1, 'a share worked out but never used for the width', 'r2', swap(Q.sb1, bar, '    const share = this.value / this.max;' + nl + '    rect(x, y, 200, 16);'));
+  reject(Q.sb1, 'only one bar drawn', 'r3', swap(Q.sb1, '  magic.draw(20, 80);' + nl, ''));
+  reject(Q.sb1, 'the draw method only in a comment', 'r1', plus(Q.sb1, '// draw(x, y) { rect(x, y, 200, 16); }'));
+  const hpBar = '    rect(x - 60, y + 70, 120 * this.hp / this.maxHp, 10);';
+  accept(Q.fighters, 'hp * 120 / maxHp', swap(Q.fighters, hpBar, '    rect(x - 60, y + 70, this.hp * 120 / this.maxHp, 10);'));
+  accept(Q.fighters, '(hp / maxHp) * 120', swap(Q.fighters, hpBar, '    rect(x - 60, y + 70, (this.hp / this.maxHp) * 120, 10);'));
+  accept(Q.fighters, 'Math.max-free share in a let', swap(Q.fighters, hpBar, '    let full = this.hp / this.maxHp;' + nl + '    rect(x - 60, y + 70, 120 * full, 10);'));
+  accept(Q.fighters, 'both drawn in a for loop', swap(Q.fighters, '  fighters[0].draw(130, 150);' + nl + '  fighters[1].draw(350, 150);', '  for (let i = 0; i < fighters.length; i++) fighters[i].draw(130 + i * 220, 150);'));
+  accept(Q.fighters, 'both drawn with for...of', swap(Q.fighters, '  fighters[0].draw(130, 150);' + nl + '  fighters[1].draw(350, 150);', '  let x = 130;' + nl + '  for (const f of fighters) {' + nl + '    f.draw(x, 150);' + nl + '    x += 220;' + nl + '  }'));
+  accept(Q.fighters, 'the enemy drawn first', swap(Q.fighters, '  fighters[0].draw(130, 150);' + nl + '  fighters[1].draw(350, 150);', '  fighters[1].draw(350, 150);' + nl + '  fighters[0].draw(130, 150);'));
+  reject(Q.fighters, 'the bar never shrinks', 'r2', swap(Q.fighters, hpBar, '    rect(x - 60, y + 70, 120, 10);'));
+  reject(Q.fighters, 'hp / maxHp only in the numbers text', 'r2', swap(Q.fighters, hpBar, '    rect(x - 60, y + 70, 120, 10);' + nl + '    text(this.hp / this.maxHp, x, y, 12, ' + AP + 'white' + AP + ');'));
+  reject(Q.fighters, 'only the hero drawn', 'r3', swap(Q.fighters, '  fighters[1].draw(350, 150);' + nl, ''));
+
+  // ---- 7.17.2 / 7.17.3: the floor, a hit through takeHit, the turn, after(), the end and R
+  const floorLine = '    this.hp = max(this.hp - n, 0);';
+  accept(Q.sb2, 'the floor as an if', swap(Q.sb2, floorLine, '    this.hp -= n;' + nl + '    if (this.hp < 0) this.hp = 0;'));
+  accept(Q.sb2, 'Math.max(0, ...)', swap(Q.sb2, floorLine, '    this.hp = Math.max(0, this.hp - n);'));
+  accept(Q.sb2, 'the method called strike(target)', swap(Q.sb2, '  hit(other) {' + nl + '    other.takeHit(this.power);', '  strike(target) {' + nl + '    target.takeHit(this.power);', '.hit(', '.strike('));
+  accept(Q.sb2, 'after() handed a named function', swap(Q.sb2, "    after(45, () => {" + nl + '      if (right.isAlive()) {' + nl + '        right.hit(left);' + nl + "        note = 'Right hits back';" + nl + '      }' + nl + '    });', '    after(45, hitBack);',
+    'function drawTop() {', 'function hitBack() {' + nl + '  if (right.isAlive()) {' + nl + '    right.hit(left);' + nl + "    note = 'Right hits back';" + nl + '  }' + nl + '}' + nl + nl + 'function drawTop() {'));
+  reject(Q.sb2, 'no floor at all', 'r1', swap(Q.sb2, floorLine, '    this.hp -= n;'));
+  reject(Q.sb2, 'hit changes the other hp itself', 'r2', swap(Q.sb2, '    other.takeHit(this.power);', '    other.hp -= this.power;'));
+  reject(Q.sb2, 'hit written but never called', 'r2', swap(Q.sb2, '    left.hit(right);', '    right.takeHit(4);', '        right.hit(left);', '        left.takeHit(3);'));
+  reject(Q.sb2, 'after() handed a call, not a function', 'r3', swap(Q.sb2, "    after(45, () => {" + nl + '      if (right.isAlive()) {' + nl + '        right.hit(left);' + nl + "        note = 'Right hits back';" + nl + '      }' + nl + '    });', '    after(45, right.hit(left));'));
+  reject(Q.sb2, 'after() handed an empty function', 'r3', swap(Q.sb2, "    after(45, () => {" + nl + '      if (right.isAlive()) {' + nl + '        right.hit(left);' + nl + "        note = 'Right hits back';" + nl + '      }' + nl + '    });', '    after(45, () => {});'));
+
+  accept(Q.blows, 'turn = (turn + 1) % 2', swap(Q.blows, '  turn = 1 - turn;', '  turn = (turn + 1) % 2;'));
+  accept(Q.blows, 'turn = turn === 0 ? 1 : 0', swap(Q.blows, '  turn = 1 - turn;', '  turn = turn === 0 ? 1 : 0;'));
+  accept(Q.blows, 'the turn passes with if / else', swap(Q.blows, '  turn = 1 - turn;', '  if (turn === 0) turn = 1;' + nl + '  else turn = 0;'));
+  accept(Q.blows, 'after(45, () => enemyTurn())', swap(Q.blows, 'after(45, enemyTurn)', 'after(45, () => enemyTurn())'));
+  accept(Q.blows, 'R tested second', swap(Q.blows, "  if (kb.presses('r') && over) newGame();", "  if (over && kb.presses('r')) newGame();"));
+  accept(Q.blows, 'the end tested with hp <= 0', swap(Q.blows, '  if (!them.isAlive()) {', '  if (them.hp <= 0) {'));
+  accept(Q.blows, 'the end sets the flag right there', swap(Q.blows, '  if (!them.isAlive()) {' + nl + '    fightOver(t);', '  if (!them.isAlive()) {' + nl + '    over = true;' + nl + '    fightOver(t);'));
+  accept(Q.blows, 'attack called strike', swap(Q.blows, '  attack(target, roll) {', '  strike(target, roll) {', 'me.attack(them, roll)', 'me.strike(them, roll)'));
+  accept(Q.blows, 'the floor as an if', swap(Q.blows, floorLine, '    this.hp -= n;' + nl + '    if (this.hp <= 0) {' + nl + '      this.hp = 0;' + nl + '    }'));
+  reject(Q.blows, 'attack skips takeHit', 'r2', swap(Q.blows, '    return target.takeHit(this.power + roll);', '    target.hp -= this.power + roll;' + nl + '    return this.power + roll;'));
+  reject(Q.blows, 'the turn never passes', 'r3', swap(Q.blows, '  turn = 1 - turn;' + nl, ''));
+  reject(Q.blows, 'after() handed a call', 'r4', swap(Q.blows, 'after(45, enemyTurn)', 'after(45, enemyTurn())'));
+  reject(Q.blows, 'nothing ever ends the fight', 'r5', swap(Q.blows, '    fightOver(t);' + nl + '    return;', '    return;'));
+  reject(Q.blows, "an 'r' only in a string", 'r5', swap(Q.blows, "  if (kb.presses('r') && over) newGame();", '  const help = "kb.presses(' + AP + 'r' + AP + ') newGame()";'));
+
+  // ---- 7.18.2 / 7.18.3: the guard flag, the potion count, keys 1-3, the enemy's choice
+  const halve = '    if (this.guarding) n = floor(n / 2);';
+  accept(Q.sb3, 'halved with a ternary', swap(Q.sb3, halve, '    n = this.guarding ? floor(n / 2) : n;'));
+  accept(Q.sb3, 'Math.floor, cleared inside braces', swap(Q.sb3, halve + nl + '    this.guarding = false;', '    if (this.guarding) {' + nl + '      n = Math.floor(n / 2);' + nl + '      this.guarding = false;' + nl + '    }'));
+  accept(Q.sb3, 'the cap written as an if', swap(Q.sb3, '    this.hp = min(this.hp + 12, this.maxHp);', '    this.hp += 12;' + nl + '    if (this.hp > this.maxHp) this.hp = this.maxHp;'));
+  accept(Q.sb3, 'potions-- and a > 0 test', swap(Q.sb3, '    if (this.potions === 0) return 0;' + nl + '    this.potions -= 1;', '    if (!(this.potions > 0)) return 0;' + nl + '    this.potions--;'));
+  accept(Q.sb3, 'Math.min the other way round', swap(Q.sb3, '    this.hp = min(this.hp + 12, this.maxHp);', '    this.hp = Math.min(this.maxHp, this.hp + 12);'));
+  reject(Q.sb3, 'the guard never ends', 'r1', swap(Q.sb3, halve + nl + '    this.guarding = false;', halve));
+  reject(Q.sb3, 'guard() never turns the flag on', 'r1', swap(Q.sb3, '    this.guarding = true;', '    this.hp = this.hp;'));
+  reject(Q.sb3, 'a potion with no cap', 'r2', swap(Q.sb3, '    this.hp = min(this.hp + 12, this.maxHp);', '    this.hp += 12;'));
+  reject(Q.sb3, 'a potion that never runs out', 'r2', swap(Q.sb3, '    this.potions -= 1;' + nl, ''));
+  reject(Q.sb3, 'keys 2 and 3 only in a string', 'r3', plus(Q.sb3, 'const help = "kb.presses(' + AP + '2' + AP + ') k.guard() kb.presses(' + AP + '3' + AP + ') k.heal()";'));
+
+  const keys = "    if (kb.presses('1')) a = 1;" + nl + "    if (kb.presses('2')) a = 2;" + nl + "    if (kb.presses('3')) a = 3;";
+  accept(Q.actions, 'keys as an else-if chain calling choose', swap(Q.actions, keys, "    if (kb.presses('1')) choose(1);" + nl + "    else if (kb.presses('2')) choose(2);" + nl + "    else if (kb.presses('3')) choose(3);"));
+  accept(Q.actions, 'the enemy guards on floor(random(0, 4)) === 0', swap(Q.actions, '  else if (random() < 0.25) a = 2;', '  else if (floor(random(0, 4)) === 0) a = 2;'));
+  accept(Q.actions, 'the enemy calls guard and heal itself', swap(Q.actions, '  if (e.hp < e.maxHp / 3 && e.potions > 0) a = 3;' + nl + '  else if (random() < 0.25) a = 2;' + nl + '  act(1, a, floor(random(0, 4)));', '  if (e.potions > 0 && e.hp < 8) act(1, 3, 0);' + nl + '  else act(1, 1, floor(random(0, 4)));'));
+  accept(Q.actions, 'the guard cleared at the end of takeHit', swap(Q.actions, halve + nl + '    this.guarding = false;' + nl + '    this.hp = max(this.hp - n, 0);', halve + nl + '    this.hp = max(this.hp - n, 0);' + nl + '    this.guarding = false;'));
+  reject(Q.actions, 'only keys 1 and 2', 'r3', swap(Q.actions, nl + "    if (kb.presses('3')) a = 3;", ''));
+  reject(Q.actions, 'the enemy only ever attacks', 'r4', swap(Q.actions, '  if (e.hp < e.maxHp / 3 && e.potions > 0) a = 3;' + nl + '  else if (random() < 0.25) a = 2;' + nl, ''));
+  reject(Q.actions, 'a potion with no cap', 'r2', swap(Q.actions, '    this.hp = min(this.hp + 12, this.maxHp);', '    this.hp = this.hp + 12;'));
+
+  // ---- 7.19.2 / 7.19.3: map (or a loop), next, levelUp, the last win
+  accept(Q.sb4, 'a loop that pushes', swap(Q.sb4, '  monsters = KINDS.map((k) => new Monster(k.name, k.hp));', '  monsters = [];' + nl + '  for (let i = 0; i < KINDS.length; i++) {' + nl + '    monsters.push(new Monster(KINDS[i].name, KINDS[i].hp));' + nl + '  }'));
+  accept(Q.sb4, 'forEach that pushes', swap(Q.sb4, '  monsters = KINDS.map((k) => new Monster(k.name, k.hp));', '  monsters = [];' + nl + '  KINDS.forEach((k) => monsters.push(new Monster(k.name, k.hp)));'));
+  accept(Q.sb4, 'map with a function', swap(Q.sb4, '  monsters = KINDS.map((k) => new Monster(k.name, k.hp));', '  monsters = KINDS.map(function (k) { return new Monster(k.name, k.hp); });'));
+  accept(Q.sb4, 'next with min()', swap(Q.sb4, "  if (kb.presses('n') && which < monsters.length - 1) which += 1;", "  if (kb.presses('n')) which = min(which + 1, monsters.length - 1);"));
+  accept(Q.sb4, 'next with a nested if and ++', swap(Q.sb4, "  if (kb.presses('n') && which < monsters.length - 1) which += 1;", "  if (kb.presses('n')) {" + nl + '    if (which < monsters.length - 1) which++;' + nl + '  }'));
+  reject(Q.sb4, 'map that keeps the plain kinds', 'r1', swap(Q.sb4, '  monsters = KINDS.map((k) => new Monster(k.name, k.hp));', '  monsters = KINDS.map((k) => k);'));
+  reject(Q.sb4, 'N runs off the end of the list', 'r2', swap(Q.sb4, "  if (kb.presses('n') && which < monsters.length - 1) which += 1;", "  if (kb.presses('n')) which += 1;"));
+
+  const mapLine = '  enemies = KINDS.map((k) => new Fighter(k.name, k.hp, k.power, k.potions, k.color));';
+  accept(Q.run, 'enemies from a loop', swap(Q.run, mapLine, '  enemies = [];' + nl + '  for (const k of KINDS) enemies.push(new Fighter(k.name, k.hp, k.power, k.potions, k.color));'));
+  accept(Q.run, 'which++', swap(Q.run, '  which += 1;' + nl + '  fighters[0].levelUp();', '  which++;' + nl + '  fighters[0].levelUp();'));
+  accept(Q.run, 'the next one taken with enemies[which + 1]', swap(Q.run, '  which += 1;' + nl + '  fighters[0].levelUp();' + nl + '  fighters[1] = enemies[which];', '  fighters[0].levelUp();' + nl + '  fighters[1] = enemies[which + 1];' + nl + '  which = which + 1;'));
+  accept(Q.run, 'levelUp written long-hand', swap(Q.run, '    this.maxHp += 5;', '    this.maxHp = this.maxHp + 5;', '    this.power += 1;', '    this.power = this.power + 1;'));
+  accept(Q.run, 'the last one tested with which + 1 === length', swap(Q.run, '  if (which === enemies.length - 1) {', '  if (which + 1 === enemies.length) {'));
+  accept(Q.run, 'the last one tested with >=', swap(Q.run, '  if (which === enemies.length - 1) {', '  if (which >= enemies.length - 1) {'));
+  reject(Q.run, 'levelUp written but never called', 'r3', swap(Q.run, '  fighters[0].levelUp();' + nl, ''));
+  reject(Q.run, 'levelUp that only heals', 'r3', swap(Q.run, '    this.maxHp += 5;' + nl, '', '    this.power += 1;' + nl, ''));
+  reject(Q.run, 'the next enemy never comes', 'r2', swap(Q.run, '  fighters[1] = enemies[which];' + nl, ''));
+  reject(Q.run, 'no last fight: the run never ends in a win', 'r4', swap(Q.run, "  if (which === enemies.length - 1) {" + nl + '    over = true;' + nl + "    message = 'You beat them all! Press R to play again';" + nl + '    return;' + nl + '  }' + nl, ''));
+
+  // ---- 7.20.2 / 7.20.3: send, act in onMove, the seat and goodMove, offline still works
+  const sbH = '  online.onMove((m, seat) => {' + nl + "    if ([1, 2, 3].includes(m.act)) got.push('seat ' + seat + ': ' + NAMES[m.act]);" + nl + '  });';
+  accept(Q.sb5, 'onMove given a named function', swap(Q.sb5, sbH, '  online.onMove(gotMove);', 'function draw() {', 'function gotMove(m, seat) {' + nl + "  got.push('seat ' + seat + ': ' + NAMES[m.act]);" + nl + '}' + nl + nl + 'function draw() {'));
+  accept(Q.sb5, 'a function expression', swap(Q.sb5, sbH, '  online.onMove(function (m, seat) {' + nl + "    got.push('seat ' + seat);" + nl + '  });'));
+  reject(Q.sb5, 'onMove only in a comment', 'r1', plus(Q.sb5, '// online.onMove((m, seat) => {});'));
+
+  const handler = '  online.onMove((m, seat) => {' + nl + '    if (duel && !over && seat === turn && goodMove(m)) act(turn, m.act, m.roll);' + nl + '  });';
+  const send = '  if (duel) online.send({ act: a, roll: roll });' + nl + '  else act(turn, a, roll);';
+  accept(Q.duel, 'early returns in the handler', swap(Q.duel, handler, '  online.onMove((m, seat) => {' + nl + '    if (!duel || over) return;' + nl + '    if (seat !== turn) return;' + nl + '    if (!goodMove(m)) return;' + nl + '    act(turn, m.act, m.roll);' + nl + '  });'));
+  accept(Q.duel, 'the handler as a named function below', swap(Q.duel, handler, '  online.onMove(arrived);', 'function goodMove(m) {', 'function arrived(m, who) {' + nl + '  if (duel && !over && who === turn && goodMove(m)) act(turn, m.act, m.roll);' + nl + '}' + nl + nl + 'function goodMove(m) {'));
+  accept(Q.duel, 'a const arrow handler above setup', swap(Q.duel, handler, '  online.onMove(arrived);', 'function setup() {', 'const arrived = (m, seat) => {' + nl + '  if (duel && !over && goodMove(m) && turn === seat) act(turn, m.act, m.roll);' + nl + '};' + nl + nl + 'function setup() {'));
+  accept(Q.duel, 'the move checked inline with includes', swap(Q.duel, handler, '  online.onMove((m, seat) => {' + nl + '    if (seat === turn && m !== null && [1, 2, 3].includes(m.act) && [0, 1, 2, 3].includes(m.roll)) act(turn, m.act, m.roll);' + nl + '  });'));
+  accept(Q.duel, "send when 'ready', otherwise act", swap(Q.duel, send, "  if (online.status === 'ready') online.send({ act: a, roll });" + nl + '  else act(turn, a, roll);'));
+  accept(Q.duel, 'act first, then else send', swap(Q.duel, send, '  if (!duel) act(turn, a, roll);' + nl + '  else online.send({ act: a, roll: roll });'));
+  accept(Q.duel, 'a ternary', swap(Q.duel, send, '  duel ? online.send({ act: a, roll: roll }) : act(turn, a, roll);'));
+  accept(Q.duel, 'an early return after sending', swap(Q.duel, send, '  if (duel) {' + nl + '    online.send({ act: a, roll: roll });' + nl + '    return;' + nl + '  }' + nl + '  act(turn, a, roll);'));
+  reject(Q.duel, 'every move acted on without a check', 'r3', swap(Q.duel, handler, '  online.onMove((m, seat) => act(turn, m.act, m.roll));'));
+  reject(Q.duel, 'the seat checked but not the move', 'r3', swap(Q.duel, handler, '  online.onMove((m, seat) => {' + nl + '    if (duel && !over && seat === turn) act(turn, m.act, m.roll);' + nl + '  });'));
+  reject(Q.duel, 'a named handler that never checks', 'r3', swap(Q.duel, handler, '  online.onMove(arrived);', 'function goodMove(m) {', 'function arrived(m, seat) { act(turn, m.act, m.roll); }' + nl + nl + 'function goodMove(m) {'));
+  reject(Q.duel, 'a handler that only writes a message', 'r2', swap(Q.duel, handler, '  online.onMove((m, seat) => {' + nl + "    message = 'got a move';" + nl + '  });'));
+  reject(Q.duel, 'choose always sends', 'r4', swap(Q.duel, send, '  online.send({ act: a, roll: roll });'));
+
+  // ---- 7.21.3: any one challenge
+  const ogre = "  { name: 'Ogre', hp: 36, power: 7, potions: 1, color: 'mediumpurple' }," + nl;
+  accept(Q.yours, 'a fourth kind only', sfix(Q.yours, ogre, ogre + "  { name: 'Wyrm', hp: 50, power: 9, potions: 2, color: 'teal' }," + nl));
+  accept(Q.yours, 'a fourth kind pushed onto KINDS', plus(Q.yours, "KINDS.push({ name: 'Wyrm', hp: 50, power: 9, potions: 2, color: 'teal' });"));
+  const k3 = "    if (kb.presses('3')) a = 3;" + nl;
+  const cool = (test, tick) => sfix(Q.yours, 'let duel = false;', 'let duel = false;' + nl + 'let cooldown = 0;',
+    k3, k3 + "    if (" + test + ') a = 4;' + nl,
+    '  const them = fighters[1 - t];' + nl, '  const them = fighters[1 - t];' + nl + '  ' + tick + nl +
+    "  if (a === 4) { message = me.name + ' power-hits for ' + me.attack(them, me.power + roll); cooldown = 3; }" + nl);
+  accept(Q.yours, 'a cooldown, === 0', cool("kb.presses('4') && cooldown === 0", 'if (t === 0 && cooldown > 0) cooldown -= 1;'));
+  accept(Q.yours, 'a cooldown tested first, <= 0, cooldown--', cool("cooldown <= 0 && kb.presses('4')", 'if (t === 0 && cooldown > 0) cooldown--;'));
+  accept(Q.yours, 'a cooldown counted down with max()', cool("kb.presses('4') && cooldown < 1", 'if (t === 0) cooldown = max(cooldown - 1, 0);'));
+  const shop = (test, spend) => sfix(Q.yours, 'let duel = false;', 'let duel = false;' + nl + 'let gold = 0;',
+    '  which += 1;' + nl + '  fighters[0].levelUp();', '  gold += 10;' + nl + '  which += 1;' + nl + '  fighters[0].levelUp();',
+    k3, k3 + '    if (' + test + ') { ' + spend + ' fighters[0].potions += 1; }' + nl);
+  accept(Q.yours, 'a shop, gold >= 10', shop("kb.presses('5') && gold >= 10", 'gold -= 10;'));
+  accept(Q.yours, 'a shop with a PRICE constant', { 'script.js': shop("kb.presses('5') && gold >= PRICE", 'gold -= PRICE;')['script.js'].replace('let gold = 0;', 'let gold = 0;' + nl + 'const PRICE = 10;') });
+  reject(Q.yours, 'a fourth kind only in a comment', 'r1', sfix(Q.yours, ogre, ogre + "  // { name: 'Wyrm', hp: 50, power: 9, potions: 2, color: 'teal' }," + nl));
+  reject(Q.yours, 'key 4 only in a string', 'r1', plus(Q.yours, 'const help = "kb.presses(' + AP + '4' + AP + ') && cooldown === 0; cooldown -= 1";'));
+  reject(Q.yours, 'a cooldown that never counts down', 'r1', cool("kb.presses('4') && cooldown === 0", ''));
+  reject(Q.yours, 'gold earned but never spent', 'r1', sfix(Q.yours, 'let duel = false;', 'let duel = false;' + nl + 'let gold = 0;', '  which += 1;' + nl + '  fighters[0].levelUp();', '  gold += 10;' + nl + '  which += 1;' + nl + '  fighters[0].levelUp();'));
+}
+
 // ---------------------------------------------------------------- run
 try {
   execFileSync(

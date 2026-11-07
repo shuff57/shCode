@@ -113,7 +113,7 @@
       "hint": "if (duel) online.send({ act: a, roll: roll }); else act(turn, a, roll);",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bif\\s*\\(+[^;{]*?\\)+\\s*\\{?\\s*online\\s*\\.\\s*send\\s*\\([^;]*;\\s*\\}?\\s*else\\b\\s*\\{?\\s*(?!online\\b)[\\w$.]+\\s*\\(|\\bif\\s*\\(+[^;{]*?\\)+\\s*\\{?\\s*(?!online\\b)[\\w$.]+\\s*\\([^;]*;\\s*\\}?\\s*else\\b\\s*\\{?\\s*online\\s*\\.\\s*send\\s*\\(|\\?\\s*online\\s*\\.\\s*send\\s*\\([^:;]*:\\s*(?!online\\b)[\\w$.]+\\s*\\(|\\?\\s*(?!online\\b)[\\w$.]+\\s*\\([^:;]*\\)\\s*:\\s*online\\s*\\.\\s*send\\s*\\(|\\bif\\s*\\(+[^;{]*?\\)+\\s*\\{\\s*online\\s*\\.\\s*send\\s*\\([^;]*;\\s*return\\b[^}]*\\}\\s*(?!online\\b)[\\w$.]+\\s*\\(|\\bif\\s*\\(+[^;{]*?\\)+\\s*\\{\\s*(?!online\\b)[\\w$.]+\\s*\\([^;]*;\\s*return\\b[^}]*\\}\\s*online\\s*\\.\\s*send\\s*\\(",
+      "pattern": "\\bif\\s*\\(+[^;{]*?\\)+\\s*\\{?\\s*online\\s*\\.\\s*send\\s*\\([^;]*;\\s*\\}?\\s*else\\b\\s*\\{?\\s*(?!online\\b)[\\w$.]+\\s*\\(|\\bif\\s*\\(+[^;{]*?\\)+\\s*\\{?\\s*(?!online\\b)[\\w$.]+\\s*\\([^;]*;\\s*\\}?\\s*else\\b\\s*\\{?\\s*online\\s*\\.\\s*send\\s*\\(|\\?\\s*online\\s*\\.\\s*send\\s*\\((?:[^:;{}]|\\{[^{}]*\\})*:\\s*(?!online\\b)[\\w$.]+\\s*\\(|\\?\\s*(?!online\\b)[\\w$.]+\\s*\\([^:;]*\\)\\s*:\\s*online\\s*\\.\\s*send\\s*\\(|\\bif\\s*\\(+[^;{]*?\\)+\\s*\\{\\s*online\\s*\\.\\s*send\\s*\\([^;]*;\\s*return\\b[^}]*\\}\\s*(?!online\\b)[\\w$.]+\\s*\\(|\\bif\\s*\\(+[^;{]*?\\)+\\s*\\{\\s*(?!online\\b)[\\w$.]+\\s*\\([^;]*;\\s*return\\b[^}]*\\}\\s*online\\s*\\.\\s*send\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending",

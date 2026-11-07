@@ -1,0 +1,49 @@
+{
+  "id": "7-21-quest-3-challenges-make-it-yours",
+  "title": "7.21.3 Challenges: Make it yours",
+  "description": "Your Quest is complete. Change one thing of your own: a fourth enemy kind, a special move with a cooldown, or a shop that spends gold. Pick one; add an idea of your own on top if you like.",
+  "type": "lesson",
+  "estimateMins": 25,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "7.21 Quest: playtest and extend",
+  "preview": "moshion",
+  "week": 19,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Pick a challenge and build it",
+      "instructions": "Choose one of these three challenges. The check turns green when any one of them is in your code, so one is enough. An idea of your own is welcome on top of it. Start from your finished game in the editor.\n\n**Challenge 1: a fourth enemy (easy).** In `KINDS`, after the Ogre's line, add a fourth kind: `{ name: 'Dragon', hp: 44, power: 8, potions: 2, color: 'crimson' },`. Run and play: there are four fights now, and the strip says `Fight 1 of 4`. Then give it something new: in `fightOver`, below the line `message = 'Level up! Next: ' + fighters[1].name + '. Your turn';`, add `if (which === enemies.length - 1) message = 'Level up! Final fight: ' + fighters[1].name + '. Your turn';`. To reach it quickly, set every kind's `hp` to `1` for one Run, then put the numbers back.\n\n**Challenge 2: a special move with a cooldown (medium).** Below `let duel = false;`, add `let cooldown = 0;`, and in `newGame()`, `cooldown = 0;`. In `draw()`'s key block, below the line for key 3: `if (kb.presses('4') && cooldown === 0) a = 4;`. In `act`, right after `const them = fighters[1 - t];`, count your turns down: `if (t === 0 && cooldown > 0) cooldown -= 1;`. Below the line for action 3, the power hit: `if (a === 4) { message = me.name + ' power-hits ' + them.name + ' for ' + me.attack(them, me.power + roll); cooldown = 3; }`. In `drawTop()`, show it under the message: `if (!duel) text(cooldown === 0 ? '4: power hit ready' : '4: power hit in ' + cooldown, 300, 46, 12, 'gold');`. A power hit does twice your power, plus the roll.\n\n**Challenge 3: a shop that spends gold (hard).** Below `let duel = false;`, add `let gold = 0;`, and in `newGame()`, `gold = 0;`. In `fightOver`, on the line before `which += 1;`, earn it: `gold += 10;`. In `draw()`'s key block, below the line for key 3, the shop: `if (kb.presses('5') && gold >= 10) { gold -= 10; fighters[0].potions += 1; message = 'You buy a potion. Your turn'; }`. Buying does not use up your turn. In `drawTop()`: `if (!duel) text('gold ' + gold + '   5: buy a potion (10)', 300, 46, 12, 'gold');`.",
+      "hints": [
+        "Whatever you pick, play the whole run afterwards, lose once, and press R.",
+        "Challenge 1 changes no rule: `enemies.length` already counts the new kind, so the run grows by itself.",
+        "Online, nothing changes: `goodMove` still only lets actions 1 to 3 through, so the duel stays fair."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "You changed one thing about the game",
+      "description": "Any one challenge turns this green: a fourth kind in the list, a special move on key 4 that waits on a cooldown, or gold that buys something only when there is enough. Help: 7.19.1 (Reading: Kinds as data, map, and levelling up)",
+      "hint": "{ name: 'Dragon', hp: 44, power: 8, potions: 2, color: 'crimson' },",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:const|let|var)\\s+[\\w$]+\\s*=\\s*\\[\\s*(?:\\{[^{}]*\\}\\s*,\\s*){3,}\\{[^{}]*\\}|\\b[\\w$]+\\s*\\.\\s*push\\s*\\(\\s*(?:\\{[^{}]*\\bhp\\s*:|new\\s+[A-Z][\\w$]*\\s*\\(\\s*['\\\"`])|^(?=[\\s\\S]*?\\bkb\\s*\\.\\s*(?:presses|pressed)\\s*\\(\\s*['\\\"`]4['\\\"`]\\s*\\)[^;]{0,80}?&&\\s*\\(*\\s*([A-Za-z_$][\\w$]*)\\s*\\)*\\s*(?:===?\\s*0\\b|<=\\s*0\\b|<\\s*1\\b))(?=[\\s\\S]*?(?:\\b\\1\\s*(?:-=\\s*1\\b|--)|--\\s*\\1\\b|\\b\\1\\s*=\\s*(?:Math\\s*\\.\\s*)?max\\s*\\(\\s*\\1\\s*-\\s*1\\b|\\b\\1\\s*=\\s*\\1\\s*-\\s*1\\b))|^(?=[\\s\\S]*?\\b([A-Za-z_$][\\w$]*)\\s*\\)*\\s*(?:===?\\s*0\\b|<=\\s*0\\b|<\\s*1\\b)\\s*\\)*\\s*&&\\s*\\bkb\\s*\\.\\s*(?:presses|pressed)\\s*\\(\\s*['\\\"`]4['\\\"`]\\s*\\))(?=[\\s\\S]*?(?:\\b\\2\\s*(?:-=\\s*1\\b|--)|--\\s*\\2\\b|\\b\\2\\s*=\\s*(?:Math\\s*\\.\\s*)?max\\s*\\(\\s*\\2\\s*-\\s*1\\b|\\b\\2\\s*=\\s*\\2\\s*-\\s*1\\b))|^(?=[\\s\\S]*?\\bkb\\s*\\.\\s*(?:presses|pressed)\\s*\\(\\s*['\\\"`]4['\\\"`]\\s*\\)\\s*\\)+\\s*\\{?\\s*if\\s*\\(+\\s*([A-Za-z_$][\\w$]*)\\s*\\)*\\s*(?:===?\\s*0\\b|<=\\s*0\\b|<\\s*1\\b))(?=[\\s\\S]*?(?:\\b\\3\\s*(?:-=\\s*1\\b|--)|--\\s*\\3\\b|\\b\\3\\s*=\\s*(?:Math\\s*\\.\\s*)?max\\s*\\(\\s*\\3\\s*-\\s*1\\b|\\b\\3\\s*=\\s*\\3\\s*-\\s*1\\b))|^(?=[\\s\\S]*?\\b([A-Za-z_$][\\w$]*)\\s*\\)*\\s*>=?\\s*\\(*\\s*(?:\\d+|[A-Za-z_$][\\w$]*)\\b[^;{]*\\)?\\s*\\{?[^}]{0,160}?\\b\\4\\s*-=)(?=[\\s\\S]*?\\b\\4\\s*\\+=)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true,
+      "keepShortStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "carryFrom": "7-20-quest-3-lab-duel-a-classmate"
+}

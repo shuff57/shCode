@@ -1,0 +1,105 @@
+{
+  "id": "7-21-quest-2-quiz-quest-check",
+  "title": "7.21.2 Check: the Quest game",
+  "description": "Five multiple-choice questions on the hp bar, after(), guarding, making enemies from KINDS in newGame, and why the sender rolls in a duel. Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "7.21 Quest: playtest and extend",
+  "preview": "quiz",
+  "week": 19,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "quiz": {
+    "passPercent": 70,
+    "shuffle": true,
+    "questions": [
+      {
+        "id": "q1-bar",
+        "question": "A fighter has maxHp 30 and hp 10. Its full bar is 120 pixels wide. How wide is the rect drawn by rect(x - 60, y + 70, 120 * this.hp / this.maxHp, 10)?",
+        "options": [
+          "10 pixels",
+          "40 pixels",
+          "120 pixels",
+          "30 pixels"
+        ],
+        "answer": 1,
+        "explanation": "10 / 30 is one part in three, and 120 / 3 is 40.",
+        "sourceIds": [
+          "7-16-quest-2-reading-one-class-many-fighters"
+        ],
+        "source": "7.16.2"
+      },
+      {
+        "id": "q2-after",
+        "question": "Why does the lab write after(45, enemyTurn) and not after(45, enemyTurn())?",
+        "options": [
+          "enemyTurn() would run the enemy's turn now, not 45 frames later",
+          "The brackets would make the enemy wait twice as long before it acts",
+          "after only works with functions that are written inside a class",
+          "Without the brackets the enemy would act on your turn as well"
+        ],
+        "answer": 0,
+        "explanation": "With brackets, enemyTurn runs right now and after is handed its answer. Without them, after is handed the function itself, to run later.",
+        "sourceIds": [
+          "7-17-quest-1-reading-a-method-that-hits-another-object-and-after"
+        ],
+        "source": "7.17.1"
+      },
+      {
+        "id": "q3-guard",
+        "question": "The hero is guarding. The goblin hits for 7, and on its next turn hits for 7 again. How much hp does the hero lose in all?",
+        "options": [
+          "3 hp, as the guard covers both hits",
+          "14 hp",
+          "10 hp",
+          "7 hp"
+        ],
+        "answer": 2,
+        "explanation": "The hit taken while guarding is halved, floor(7 / 2) is 3, and that hit ends the guard. The next one does the full 7: 3 + 7 is 10.",
+        "sourceIds": [
+          "7-18-quest-1-reading-three-actions-a-flag-and-a-count"
+        ],
+        "source": "7.18.1"
+      },
+      {
+        "id": "q4-map",
+        "question": "Why is enemies = KINDS.map(...) in newGame() instead of in setup()?",
+        "options": [
+          "So that map runs once each frame and keeps the enemies moving",
+          "So R brings back fresh enemies with full hp",
+          "Because KINDS can only be read from inside a function called newGame",
+          "So that the hero levels up each time a new game is started"
+        ],
+        "answer": 1,
+        "explanation": "newGame() runs again when you press R, so map makes new Fighters from KINDS, all at full hp. KINDS itself is never changed.",
+        "sourceIds": [
+          "7-19-quest-1-reading-kinds-as-data-map-and-levelling-up"
+        ],
+        "source": "7.19.1"
+      },
+      {
+        "id": "q5-roll",
+        "question": "In a duel, why does the player who chooses roll the 0 to 3 and send it with the action?",
+        "options": [
+          "So the other computer does not have to wait as long for the move",
+          "So a player can pick their own roll and always hit for the most",
+          "So both computers use the same roll and the hp bars agree",
+          "Because online.send can only carry numbers that came from random()"
+        ],
+        "answer": 2,
+        "explanation": "If each computer rolled when the move arrived, they could roll different numbers. One roll, sent with the action, gives both the same fight.",
+        "sourceIds": [
+          "7-20-quest-1-reading-same-battle-a-classmate-takes-the-other-turn"
+        ],
+        "source": "7.20.1"
+      }
+    ]
+  }
+}
