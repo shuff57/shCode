@@ -1,0 +1,16 @@
+{
+  "moduleId": "6.30",
+  "source": "Checkers chain module, one day.",
+  "lessons": [
+    {
+      "id": "checkers-kings-and-the-win",
+      "title": "kings and the win",
+      "objective": "A piece on the far row is crowned and moves both ways, crowning ends the turn, and a player with no move loses.",
+      "screens": [
+        "6-30-checkers-1-reading-kings-and-a-player-with-no-move",
+        "6-30-checkers-2-sub-crown-a-king",
+        "6-30-checkers-3-lab-kings-and-the-win"
+      ]
+    }
+  ]
+}

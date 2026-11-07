@@ -10755,6 +10755,54 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
+  "6-30-checkers-2-sub-crown-a-king": {
+    "lessonTitle": "6.30.2 Sub-build: Crown a king",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: Crown a king\". The task: when the piece lands on row 0 it becomes 'R', a king (drawn with a K); a plain piece only steps up, and a king may also step down one row. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Crowned",
+        "description": "Row 0 turns the piece into 'R'.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Back down",
+        "description": "Only a king may step down.",
+        "points": 1
+      }
+    ]
+  },
+  "6-30-checkers-3-lab-kings-and-the-win": {
+    "lessonTitle": "6.30.3 Lab: Kings, and the win",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Kings, and the win\". The task: crown a piece that lands on its far row ('r' on row 0 becomes 'R', 'b' on the last row becomes 'B'); make colorOf use toLowerCase so a king still belongs to its colour; let a king move backward; end a chain when a piece is crowned; after the turn passes, a player with no legal move (hasAnyMove asks moveKind about every square) loses, clicks stop, and R starts a new game. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Crowned",
+        "description": "A piece on the far row becomes a king.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Both ways",
+        "description": "A king may move backward.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "No move",
+        "description": "The game checks whether the player has any move.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Play again",
+        "description": "Someone wins, and R starts again.",
+        "points": 1
+      }
+    ]
+  },
   "6-4-pocket-2-sub-a-pocket-you-roll-over": {
     "lessonTitle": "6.4.3 Sub-build: A pocket you roll over",
     "prompt": "The student wrote a moSHion sketch for \"Sub-build: A pocket you roll over\". The task: make a pass-through pocket and drop the ball only when it overlaps it slowly, guarded so it happens once. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",

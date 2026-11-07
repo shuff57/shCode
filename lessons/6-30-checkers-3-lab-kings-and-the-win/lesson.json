@@ -1,0 +1,146 @@
+{
+  "id": "6-30-checkers-3-lab-kings-and-the-win",
+  "title": "6.30.3 Lab: Kings, and the win",
+  "description": "Pieces are crowned on the far row and kings move both ways; crowning ends a chain; a player with no move left loses, and R plays again.",
+  "type": "lesson",
+  "estimateMins": 25,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.30 Checkers: kings and the win",
+  "preview": "moshion",
+  "week": 18,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "This is your game from 6.29.3: steps, jumps and chains. A piece that reaches the far side just stops there, and the game never ends."
+    },
+    {
+      "id": "s2",
+      "title": "Kings are letters too",
+      "instructions": "Change `colorOf` to `function colorOf(p) { return p.toLowerCase(); }` and add `function isKing(p) { return p === 'R' || p === 'B'; }` below it. In `drawPieces`, after the two circles, `if (isKing(p)) text('K', x - 6, y + 7, 20, 'gold');`. Run: nothing looks different yet, because no piece is a king.",
+      "hints": [
+        "`''.toLowerCase()` is `''`, so an empty square still has no colour."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Crown on the far row",
+      "instructions": "Write `crown(r, c)` from the reading, below `doMove`. In `doMove`, after the jumped piece is taken, add `const crowned = crown(tr, tc);` and change the chain test to `if (kind === 'jump' && !crowned && canJumpFrom(tr, tc))`. Run and get a red piece to row 0: it shows a gold K.",
+      "hints": [
+        "Crown after the piece has moved: `crown` reads the letter at the landing square.",
+        "A crowned piece stops its chain: `!crowned` makes the turn pass."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "A king moves back",
+      "instructions": "In `moveKind`, change `if (!ahead) return '';` to `if (!ahead && !isKing(p)) return '';`. Run: a king steps and jumps backward; a plain piece still cannot."
+    },
+    {
+      "id": "s5",
+      "title": "No move, no game",
+      "instructions": "Add `let winner = '';` at the top and `winner = '';` in `newGame()`. Write `hasAnyMove()` from the reading. At the end of `doMove`, after the turn passes: `if (!hasAnyMove()) { winner = turn === 'r' ? 'b' : 'r'; message = nameOf(winner) + ' wins! Press R to play again'; }`. In `draw()`, clicks only count while nobody has won, `if (mouse.presses() && winner === '') clickAt(mouse.x, mouse.y);`, and `if (kb.presses('r') && winner !== '') newGame();`.",
+      "hints": [
+        "Ask after the turn has passed: the player who has no move is the one whose turn it now is.",
+        "To test it fast, change `r < 3` in `makeBoard` to `r < 1` so black starts with only 4 pieces. Put it back after."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Crowned on the far row",
+      "description": "A red piece on row 0 becomes 'R', and a black piece on the last row becomes 'B'. Help: 6.30.1 (Reading: Kings, and a player with no move)",
+      "hint": "if (p === 'r' && r === 0) grid[r][c] = 'R';",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:\\b[\\w$]+\\s*===?\\s*(?:0|7|N\\s*-\\s*1|[\\w$]+\\s*\\.\\s*length\\s*-\\s*1)\\b|\\b(?:0|7)\\s*===?\\s*[\\w$]+|<=?\\s*0\\b|>=?\\s*(?:7|N\\s*-\\s*1)\\b)[^;]{0,120}?(?:(?<![=!<>])=\\s*|\\?\\s*)['\"`][RB]['\"`]|\\.\\s*toUpperCase\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true,
+      "keepShortStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "A king can move back",
+      "description": "The forward-only rule does not hold a king back: a king may move both ways. Help: 6.30.1 (Reading: Kings, and a player with no move)",
+      "hint": "if (!ahead && !isKing(p)) return '';",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:[!=]==?\\s*['\"`][RB]['\"`]|['\"`][RB]['\"`]\\s*[!=]==?|\\bcase\\s+['\"`][RB]['\"`]|\\b[\\w$]*[Kk]ing[\\w$]*\\b|\\.\\s*toUpperCase\\s*\\(\\s*\\)\\s*[!=]==?|[!=]==?\\s*[\\w$.\\[\\]]+\\s*\\.\\s*toUpperCase\\s*\\()[^;]{0,120}?(?:\\b[\\w$]*(?:ahead|forward|fwd|dir|back)\\w*|\\bd[ry]\\b\\s*[<>]|[<>]\\s*0\\b)|(?:\\b[\\w$]*(?:ahead|forward|fwd|dir|back)\\w*|\\bd[ry]\\b\\s*[<>]|[<>]\\s*0\\b)[^;]{0,120}?(?:[!=]==?\\s*['\"`][RB]['\"`]|['\"`][RB]['\"`]\\s*[!=]==?|\\bcase\\s+['\"`][RB]['\"`]|\\b[\\w$]*[Kk]ing[\\w$]*\\b|\\.\\s*toUpperCase\\s*\\(\\s*\\)\\s*[!=]==?|[!=]==?\\s*[\\w$.\\[\\]]+\\s*\\.\\s*toUpperCase\\s*\\()|\\b(?![\\w$]*(?:turn|player|side)\\b)[\\w$]+(?:\\s*\\[[^\\]]*\\])*\\s*===?\\s*['\"`][rb]['\"`]\\s*&&\\s*\\(?\\s*[\\w$]+\\s*[<>]",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true,
+      "keepShortStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "A check for no moves",
+      "description": "A function asks about every square of the board whether the player whose turn it is has any move left. Help: 6.30.1 (Reading: Kings, and a player with no move)",
+      "hint": "function hasAnyMove() { for (...) { for (...) { if (moveKind(...) !== '') return true; } } return false; }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:for|while)\\s*\\([^)]*<=?\\s*(?:N|8|7|[\\w$]+\\s*\\.\\s*length)\\b[^)]*\\)(?:(?!\\bfunction\\b)[\\s\\S]){0,300}?\\b(?:moveKind|isLegal|canJumpFrom|[\\w$]*(?:[Mm]ove|[Ss]tep|[Jj]ump)[\\w$]*)\\s*\\(|\\bcount[\\w$]*\\s*\\([^)]*\\)\\s*(?:===?\\s*0\\b|<\\s*1\\b)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r4",
+      "title": "A winner, and R to play again",
+      "description": "Once someone has won, R starts a new game. Help: 6.30.1 (Reading: Kings, and a player with no move)",
+      "hint": "if (kb.presses('r') && winner !== '') newGame();",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bkb\\s*\\.\\s*press(?:es|ed)?\\s*\\(\\s*['\"`][rR]['\"`]\\s*\\)[^;]{0,120}?\\b[\\w$]*(?:[Nn]ew[Gg]ame|reset|[Rr]estart|start|[Ss]etup)[\\w$]*\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true,
+      "keepShortStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Kings, and the win\". The task: crown a piece that lands on its far row ('r' on row 0 becomes 'R', 'b' on the last row becomes 'B'); make colorOf use toLowerCase so a king still belongs to its colour; let a king move backward; end a chain when a piece is crowned; after the turn passes, a player with no legal move (hasAnyMove asks moveKind about every square) loses, clicks stop, and R starts a new game. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Crowned",
+        "description": "A piece on the far row becomes a king.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Both ways",
+        "description": "A king may move backward.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "No move",
+        "description": "The game checks whether the player has any move.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Play again",
+        "description": "Someone wins, and R starts again.",
+        "points": 1
+      }
+    ]
+  },
+  "carryFrom": "6-29-checkers-3-lab-jumps-and-jumping-again"
+}

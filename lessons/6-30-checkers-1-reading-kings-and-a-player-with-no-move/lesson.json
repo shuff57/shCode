@@ -1,0 +1,19 @@
+{
+  "id": "6-30-checkers-1-reading-kings-and-a-player-with-no-move",
+  "title": "6.30.1 Reading: Kings, and a player with no move",
+  "description": "A piece on the far row is crowned ('r' becomes 'R'); toLowerCase keeps a king on its colour; a king may move backward; crowning ends the turn; a player with no move at all loses.",
+  "type": "lesson",
+  "estimateMins": 12,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.30 Checkers: kings and the win",
+  "preview": "reading",
+  "week": 18,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

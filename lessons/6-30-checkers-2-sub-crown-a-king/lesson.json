@@ -1,0 +1,91 @@
+{
+  "id": "6-30-checkers-2-sub-crown-a-king",
+  "title": "6.30.2 Sub-build: Crown a king",
+  "description": "One red piece steps up the board; on the top row it becomes a king, 'R', which may also step back down.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.30 Checkers: kings and the win",
+  "preview": "moshion",
+  "week": 18,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "Click the red piece, then a square one up and one across: it steps up the board. On the top row it is stuck, because it may only step up."
+    },
+    {
+      "id": "s2",
+      "title": "Crown it",
+      "instructions": "Where the piece has just moved (after `picked = false;`), add `if (pr === 0) piece = 'R';`. At the very end of `draw()`, show the crown: `if (piece === 'R') text('K', pc * CELL + CELL / 2 - 6, pr * CELL + CELL / 2 + 7, 20, 'gold');`. Run and step to the top: a gold K appears.",
+      "hints": [
+        "Row 0 is the top row: red moves up, so that is its far side."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "A king steps down too",
+      "instructions": "Below `const up = r === pr - 1;`, add `const down = r === pr + 1;`. In the `else if`, change `up` to `(up || (down && piece === 'R'))`. Run: a plain piece still only goes up, and the king steps down as well.",
+      "hints": [
+        "The brackets matter: \"up, or (down and a king)\"."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Crowned on the top row",
+      "description": "A piece that reaches row 0 becomes 'R'. Help: 6.30.1 (Reading: Kings, and a player with no move)",
+      "hint": "if (pr === 0) piece = 'R';",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:===?\\s*0\\b|\\b0\\s*===?|<=?\\s*0\\b|<\\s*1\\b)[^;]{0,80}?(?:(?<![=!<>])=\\s*|\\?\\s*)['\"`][R]['\"`]|\\.\\s*toUpperCase\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true,
+      "keepShortStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "A king may step back",
+      "description": "A king, and only a king, may also move down a row. Help: 6.30.1 (Reading: Kings, and a player with no move)",
+      "hint": "(up || (down && piece === 'R'))",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:\\+\\s*1\\b|\\bdown\\w*|\\bback\\w*|\\babs\\s*\\()[^;]{0,120}?(?:(?:[!=]==?\\s*['\"`][RB]['\"`]|['\"`][RB]['\"`]\\s*[!=]==?|\\bcase\\s+['\"`][RB]['\"`]|\\b[\\w$]*[Kk]ing[\\w$]*\\b|\\.\\s*toUpperCase\\s*\\(\\s*\\)\\s*[!=]==?|[!=]==?\\s*[\\w$.\\[\\]]+\\s*\\.\\s*toUpperCase\\s*\\()|!==?\\s*['\"`][r]['\"`])|(?:[!=]==?\\s*['\"`][RB]['\"`]|['\"`][RB]['\"`]\\s*[!=]==?|\\bcase\\s+['\"`][RB]['\"`]|\\b[\\w$]*[Kk]ing[\\w$]*\\b|\\.\\s*toUpperCase\\s*\\(\\s*\\)\\s*[!=]==?|[!=]==?\\s*[\\w$.\\[\\]]+\\s*\\.\\s*toUpperCase\\s*\\()[^;]{0,120}?(?:\\+\\s*1\\b|\\bdown\\w*|\\bback\\w*|\\babs\\s*\\()",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true,
+      "keepShortStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: Crown a king\". The task: when the piece lands on row 0 it becomes 'R', a king (drawn with a K); a plain piece only steps up, and a king may also step down one row. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Crowned",
+        "description": "Row 0 turns the piece into 'R'.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Back down",
+        "description": "Only a king may step down.",
+        "points": 1
+      }
+    ]
+  }
+}
