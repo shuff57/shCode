@@ -85,7 +85,9 @@ function hasAnyMove() {
 a blocked move, so the loop finds a move only if the player really has one. A player with no
 pieces left has no move either, so the same test covers "all taken" without counting anything.
 
-At the end of `doMove`, after the turn has passed, ask it about the new player:
+At the very end of `doMove`, below the line that says whose turn it is (`message = nameOf(turn) + "'s turn";`),
+ask it about the new player. Below that line, not above it: the win message has to be the last
+thing written into `message`, or the turn message writes over it.
 
 ```js
 if (!hasAnyMove()) {

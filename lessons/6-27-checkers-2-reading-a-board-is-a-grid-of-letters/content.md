@@ -45,7 +45,7 @@ when `(r + c) % 2 === 1`**: `%` is the remainder (6.23.1), and an odd number lea
 divide it by 2.
 
 Drawing the board is two loops and one `rect` per square. `rect(x, y, w, h)` starts at the
-top-left corner (6.14.9), so column `c` starts at `c * CELL`. The `? :`, as in 6.14.9's grid, picks the colour:
+top-left corner (6.14.9), so column `c` starts at `c * CELL` and row `r` at `r * CELL`. The `? :`, as in 6.14.9's grid, picks the colour:
 
 ```js
 for (let r = 0; r < N; r++) {
@@ -57,6 +57,8 @@ for (let r = 0; r < N; r++) {
 ```
 
 `noStroke()` (6.1.2) first takes away the thin outline, so the squares meet edge to edge.
+This board starts at the very top of the canvas, which is how the sub-build (6.27.3) draws it.
+The lab's board sits lower, below a strip for words; that comes in a moment.
 
 ## Which rows get which letter
 
@@ -92,8 +94,9 @@ circle(c * CELL + CELL / 2, TOP + r * CELL + CELL / 2, CELL * 0.68);
 a piece's letter IS its colour. On day four a king's letter will be different, and only
 `colorOf` will have to change.
 
-The board also sits `TOP` pixels down, below a strip for words, so every row is drawn at
-`TOP + r * CELL` (6.14.9). Counting pieces is 6.14.9's counting shape: two loops, start at 0,
+In the lab the board sits `TOP` pixels down, below a strip for words, so every row is drawn at
+`TOP + r * CELL` (6.14.9): the lab's `drawBoard` has `rect(c * CELL, TOP + r * CELL, CELL, CELL)`,
+the sub-build's square with `TOP +` added. Counting pieces is 6.14.9's counting shape: two loops, start at 0,
 add 1 for every cell of that colour. The words go in `drawTop()`.
 
 **Change the grid, not the picture.** To put a piece somewhere, you never draw it there: you

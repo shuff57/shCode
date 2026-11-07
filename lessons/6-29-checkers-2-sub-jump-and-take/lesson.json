@@ -31,7 +31,7 @@
       "instructions": "Inside those braces, find the halfway square: `const mr = (r + picked.r) / 2;` and `const mc = (c + picked.c) / 2;`. Then, only `if (grid[mr][mc] === 'b')`: empty it with `grid[mr][mc] = '';`, put red on the new square with `grid[r][c] = 'r';`, empty red's old square with `grid[picked.r][picked.c] = '';`, and set `picked = null;`. Run: pick red up, click the square two up and two to the right, and black is gone.",
       "hints": [
         "From row 3 to row 1, the square in between is row (3 + 1) / 2, which is 2.",
-        "Click two squares up and to the LEFT instead: that is off the board, so the click never lands there."
+        "Why only up and to the right? Red starts in column 0, the left edge. Two columns to the left would be column -2, and there is no column -2 on the board."
       ]
     }
   ],

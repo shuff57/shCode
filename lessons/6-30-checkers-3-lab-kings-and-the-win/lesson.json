@@ -28,24 +28,29 @@
     {
       "id": "s3",
       "title": "Crown on the far row",
-      "instructions": "Write `crown(r, c)` from the reading, below `doMove`. In `doMove`, after the jumped piece is taken, add `const crowned = crown(tr, tc);` and change the chain test to `if (kind === 'jump' && !crowned && canJumpFrom(tr, tc))`. Run and get a red piece to row 0: it shows a gold K.",
+      "instructions": "Write `crown(r, c)` from the reading, below `doMove`. In `doMove`, after the jumped piece is taken, add `const crowned = crown(tr, tc);`. Then find the test that keeps the turn after a jump (in the starter, `if (kind === 'jump' && canJumpFrom(tr, tc))`) and add `!crowned` to it, so a piece that was just crowned never jumps on: `if (kind === 'jump' && !crowned && canJumpFrom(tr, tc))`. Run and get a red piece to row 0: it shows a gold K.",
       "hints": [
         "Crown after the piece has moved: `crown` reads the letter at the landing square.",
-        "A crowned piece stops its chain: `!crowned` makes the turn pass."
+        "A crowned piece stops its chain: `!crowned` makes the turn pass.",
+        "If you brought your 6.29.3 work forward, your chain test may look different (for example `const again = ...`). Whatever its shape, add `!crowned` to the test that keeps the turn."
       ]
     },
     {
       "id": "s4",
       "title": "A king moves back",
-      "instructions": "In `moveKind`, change `if (!ahead) return '';` to `if (!ahead && !isKing(p)) return '';`. Run: a king steps and jumps backward; a plain piece still cannot."
+      "instructions": "In `moveKind`, find the line that refuses a move backward (in the starter, `if (!ahead) return '';`) and let a king through it: `if (!ahead && !isKing(p)) return '';`. Run: a king steps and jumps backward; a plain piece still cannot.",
+      "hints": [
+        "If you brought your 6.29.3 work forward, your forward test may look different (for example one `if` per colour). Whatever its shape, add `&& !isKing(p)` so a king is not turned back."
+      ]
     },
     {
       "id": "s5",
       "title": "No move, no game",
-      "instructions": "Add `let winner = '';` at the top and `winner = '';` in `newGame()`. Write `hasAnyMove()` from the reading. At the end of `doMove`, after the turn passes: `if (!hasAnyMove()) { winner = turn === 'r' ? 'b' : 'r'; message = nameOf(winner) + ' wins! Press R to play again'; }`. In `draw()`, clicks only count while nobody has won, `if (mouse.presses() && winner === '') clickAt(mouse.x, mouse.y);`, and `if (kb.presses('r') && winner !== '') newGame();`.",
+      "instructions": "Add `let winner = '';` at the top and `winner = '';` in `newGame()`. Write `hasAnyMove()` from the reading. At the very end of `doMove`, below the line that says whose turn it is (`message = nameOf(turn) + \"'s turn\";`): `if (!hasAnyMove()) { winner = turn === 'r' ? 'b' : 'r'; message = nameOf(winner) + ' wins! Press R to play again'; }`. In `draw()`, clicks only count while nobody has won, `if (mouse.presses() && winner === '') clickAt(mouse.x, mouse.y);`, and `if (kb.presses('r') && winner !== '') newGame();`.",
       "hints": [
         "Ask after the turn has passed: the player who has no move is the one whose turn it now is.",
-        "To test it fast, change `r < 3` in `makeBoard` to `r < 1` so black starts with only 4 pieces. Put it back after."
+        "Below the turn message, not above it: otherwise the turn message writes over the win message and the top still says whose turn it is.",
+        "To test it fast, in `makeBoard` change `r < 3` to `r < 0` so black starts with no pieces, and add `g[4][1] = 'b';` just before `return g;`: one black piece, right in front of red. Jump it with the red piece on row 5, column 0, and red wins. Put both back after."
       ]
     }
   ],
@@ -57,7 +62,7 @@
       "hint": "if (p === 'r' && r === 0) grid[r][c] = 'R';",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:\\b[\\w$]+\\s*===?\\s*(?:0|7|N\\s*-\\s*1|[\\w$]+\\s*\\.\\s*length\\s*-\\s*1)\\b|\\b(?:0|7)\\s*===?\\s*[\\w$]+|<=?\\s*0\\b|>=?\\s*(?:7|N\\s*-\\s*1)\\b)[^;]{0,120}?(?:(?<![=!<>])=\\s*|\\?\\s*)['\"`][RB]['\"`]|\\.\\s*toUpperCase\\s*\\(",
+      "pattern": "(?:\\b[\\w$]+\\s*===?\\s*(?:0|7|N\\s*-\\s*1|[\\w$]+\\s*\\.\\s*length\\s*-\\s*1)\\b|\\b(?:0|7)\\s*===?\\s*[\\w$]+|<=?\\s*0\\b|>=?\\s*(?:7|N\\s*-\\s*1)\\b)[^;]{0,120}?(?:(?<![=!<>])=\\s*|\\?\\s*)(?:['\"`][RB]['\"`]|[\\w$.\\[\\]]+\\s*\\.\\s*toUpperCase\\s*\\()|(?<![=!<>])=\\s*[\\w$.\\[\\]]+\\s*\\.\\s*toUpperCase\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -71,7 +76,7 @@
       "hint": "if (!ahead && !isKing(p)) return '';",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:[!=]==?\\s*['\"`][RB]['\"`]|['\"`][RB]['\"`]\\s*[!=]==?|\\bcase\\s+['\"`][RB]['\"`]|\\b[\\w$]*[Kk]ing[\\w$]*\\b|\\.\\s*toUpperCase\\s*\\(\\s*\\)\\s*[!=]==?|[!=]==?\\s*[\\w$.\\[\\]]+\\s*\\.\\s*toUpperCase\\s*\\()[^;]{0,120}?(?:\\b[\\w$]*(?:ahead|forward|fwd|dir|back)\\w*|\\bd[ry]\\b\\s*[<>]|[<>]\\s*0\\b)|(?:\\b[\\w$]*(?:ahead|forward|fwd|dir|back)\\w*|\\bd[ry]\\b\\s*[<>]|[<>]\\s*0\\b)[^;]{0,120}?(?:[!=]==?\\s*['\"`][RB]['\"`]|['\"`][RB]['\"`]\\s*[!=]==?|\\bcase\\s+['\"`][RB]['\"`]|\\b[\\w$]*[Kk]ing[\\w$]*\\b|\\.\\s*toUpperCase\\s*\\(\\s*\\)\\s*[!=]==?|[!=]==?\\s*[\\w$.\\[\\]]+\\s*\\.\\s*toUpperCase\\s*\\()|\\b(?![\\w$]*(?:turn|player|side)\\b)[\\w$]+(?:\\s*\\[[^\\]]*\\])*\\s*===?\\s*['\"`][rb]['\"`]\\s*&&\\s*\\(?\\s*[\\w$]+\\s*[<>]",
+      "pattern": "(?:[!=]==?\\s*['\"`][RB]['\"`]|['\"`][RB]['\"`]\\s*[!=]==?|\\bcase\\s+['\"`][RB]['\"`]|\\b[\\w$]*(?:[Kk]ing|[Cc]rown)[\\w$]*\\b|\\.\\s*to(?:Upper|Lower)Case\\s*\\(\\s*\\)\\s*[!=]==?|[!=]==?\\s*[\\w$.\\[\\]]+\\s*\\.\\s*to(?:Upper|Lower)Case\\s*\\()[^;]{0,120}?(?:\\b[\\w$]*(?:ahead|forward|fwd|dir|back)\\w*|\\bd[ry]\\b\\s*[<>]|[<>]\\s*0\\b)|(?:\\b[\\w$]*(?:ahead|forward|fwd|dir|back)\\w*|\\bd[ry]\\b\\s*[<>]|[<>]\\s*0\\b)[^;]{0,120}?(?:[!=]==?\\s*['\"`][RB]['\"`]|['\"`][RB]['\"`]\\s*[!=]==?|\\bcase\\s+['\"`][RB]['\"`]|\\b[\\w$]*(?:[Kk]ing|[Cc]rown)[\\w$]*\\b|\\.\\s*to(?:Upper|Lower)Case\\s*\\(\\s*\\)\\s*[!=]==?|[!=]==?\\s*[\\w$.\\[\\]]+\\s*\\.\\s*to(?:Upper|Lower)Case\\s*\\()|\\b(?![\\w$]*(?:turn|player|side)\\b)[\\w$]+(?:\\s*\\[[^\\]]*\\])*\\s*===?\\s*['\"`][rb]['\"`]\\s*&&\\s*\\(?\\s*[\\w$]+\\s*[<>]",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -85,7 +90,7 @@
       "hint": "function hasAnyMove() { for (...) { for (...) { if (moveKind(...) !== '') return true; } } return false; }",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\b(?:for|while)\\s*\\([^)]*<=?\\s*(?:N|8|7|[\\w$]+\\s*\\.\\s*length)\\b[^)]*\\)(?:(?!\\bfunction\\b)[\\s\\S]){0,300}?\\b(?:moveKind|isLegal|canJumpFrom|[\\w$]*(?:[Mm]ove|[Ss]tep|[Jj]ump)[\\w$]*)\\s*\\(|\\bcount[\\w$]*\\s*\\([^)]*\\)\\s*(?:===?\\s*0\\b|<\\s*1\\b)",
+      "pattern": "\\b(?:for|while)\\s*\\([^)]*<=?\\s*(?:N|8|7|[\\w$]+\\s*\\.\\s*length)\\b[^)]*\\)(?:(?!\\bfunction\\b)[\\s\\S]){0,300}?\\b(?:moveKind|isLegal|canJumpFrom|[\\w$]*(?:[Mm]ove|[Ss]tep|[Jj]ump)[\\w$]*)\\s*\\(|\\bfor\\s*\\(\\s*(?:const|let|var)\\s+[^;)]*\\bof\\s+(?!\\[)[^)]*\\)(?:(?!\\bfunction\\b)[\\s\\S]){0,300}?\\b(?:moveKind|isLegal|canJumpFrom|[\\w$]*(?:[Mm]ove|[Ss]tep|[Jj]ump)[\\w$]*)\\s*\\(|\\.\\s*(?:some|every|forEach|find\\w*|filter|map|reduce)\\s*\\((?:(?!\\bfunction\\b)[\\s\\S]){0,300}?\\b(?:moveKind|isLegal|canJumpFrom|[\\w$]*(?:[Mm]ove|[Ss]tep|[Jj]ump)[\\w$]*)\\s*\\(|\\bcount[\\w$]*\\s*\\([^)]*\\)\\s*(?:===?\\s*0\\b|<\\s*1\\b)|\\bfunction\\s+([\\w$]+)\\s*\\([^)]*\\)\\s*\\{(?:(?!\\bfunction\\b)[\\s\\S]){0,300}?\\b(?:moveKind|isLegal|canJumpFrom)\\s*\\([\\s\\S]*?\\b(?:for|while)\\s*\\([^)]*<=?\\s*(?:N|8|7|[\\w$]+\\s*\\.\\s*length)\\b[^)]*\\)(?:(?!\\bfunction\\b)[\\s\\S]){0,300}?\\b\\1\\s*\\(|\\b(?:for|while)\\s*\\([^)]*<=?\\s*(?:N|8|7|[\\w$]+\\s*\\.\\s*length)\\b[^)]*\\)(?:(?!\\bfunction\\b)[\\s\\S]){0,300}?\\b([\\w$]+)\\s*\\([\\s\\S]*?\\bfunction\\s+\\2\\s*\\([^)]*\\)\\s*\\{(?:(?!\\bfunction\\b)[\\s\\S]){0,300}?\\b(?:moveKind|isLegal|canJumpFrom)\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -94,11 +99,11 @@
     {
       "id": "r4",
       "title": "A winner, and R to play again",
-      "description": "Once someone has won, R starts a new game. Help: 6.30.1 (Reading: Kings, and a player with no move)",
-      "hint": "if (kb.presses('r') && winner !== '') newGame();",
+      "description": "When the player whose turn it is has no move left, the other player is the winner; once someone has won, R starts a new game. Help: 6.30.1 (Reading: Kings, and a player with no move)",
+      "hint": "if (!hasAnyMove()) winner = turn === 'r' ? 'b' : 'r';   and   if (kb.presses('r') && winner !== '') newGame();",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bkb\\s*\\.\\s*press(?:es|ed)?\\s*\\(\\s*['\"`][rR]['\"`]\\s*\\)[^;]{0,120}?\\b[\\w$]*(?:[Nn]ew[Gg]ame|reset|[Rr]estart|start|[Ss]etup)[\\w$]*\\s*\\(",
+      "pattern": "^(?=[\\s\\S]*?\\b[\\w$]*(?:[Ww]inner|[Ww]on|[Oo]ver|[Ee]nded|[Ff]inished|[Dd]one)[\\w$]*\\s*(?<![=!<>])=(?!=)\\s*(?!['\"`]['\"`]|false\\b|null\\b|undefined\\b)[^\\s;])[\\s\\S]*?\\bkb\\s*\\.\\s*press(?:es|ed)?\\s*\\(\\s*['\"`][rR]['\"`]\\s*\\)[^;]{0,120}?\\b[\\w$]*(?:[Nn]ew[Gg]ame|reset|[Rr]estart|start|[Ss]etup)[\\w$]*\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending",

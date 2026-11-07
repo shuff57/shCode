@@ -70,7 +70,7 @@
       "hint": "rect(c * CELL, r * CELL, CELL, CELL);",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\b(?:rect|square)\\s*\\([^;]*\\*[^;]*\\*",
+      "pattern": "\\b(?:rect|square)\\s*\\([^;]*\\*[^;]*\\*|\\b([\\w$]+)\\s*=\\s*[^;]*?[\\w$)]\\s*\\*\\s*[\\w$(][^;]*;(?:(?!\\bfunction\\b)[\\s\\S]){0,200}?\\b(?:rect|square)\\s*\\([^;]*?\\b\\1\\b",
       "flags": "",
       "points": 0,
       "status": "pending",

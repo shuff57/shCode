@@ -40,7 +40,7 @@
       "instructions": "Add `let chain = false;` at the top and `chain = false;` in `newGame()`. Write `canJumpFrom(r, c)` from the reading, below `isLegal`. In `doMove`, after the jumped piece is taken: `if (kind === 'jump' && canJumpFrom(tr, tc)) { picked = { r: tr, c: tc }; chain = true; message = nameOf(turn) + ' jumps again!'; return; }`, then `chain = false;` on the line before the turn passes.",
       "hints": [
         "`return` leaves `doMove` before the turn passes, so the same player goes again.",
-        "Set up two black pieces in a row with a gap between them to see a double jump."
+        "To see a double jump, add two lines in `makeBoard`, just before `return g;`: `g[4][1] = 'b';` puts a black piece in front of red, and `g[1][4] = '';` empties a square behind the black row. Red's piece on row 5, column 0 can now jump twice in one turn: over row 4, then over row 2. Take both lines out when you are done."
       ]
     },
     {
@@ -97,7 +97,7 @@
       "hint": "if (kind === 'jump' && canJumpFrom(tr, tc)) { chain = true; return; }",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?<![=!<>])=\\s*true\\b(?:(?!\\bfunction\\b)[\\s\\S]){0,200}?\\breturn\\b|\\bif\\s*\\(\\s*!\\s*[\\w$]*[Jj]ump[\\w$]*\\s*\\(|\\b[\\w$]+\\s*=\\s*[\\w$]*[Jj]ump[\\w$]*\\s*\\([^)]*\\)(?:(?!\\bfunction\\b)[\\s\\S]){0,200}?\\breturn\\b|\\bif\\s*\\([^)]*\\b[\\w$]*[Jj]ump[\\w$]*\\s*\\([^)]*\\)[^)]*\\)\\s*\\{?[^}]*\\breturn\\b",
+      "pattern": "\\bif\\s*\\([^;{]*\\b[\\w$]*[Jj]ump[\\w$]*\\s*\\([^;{]*\\)(?:(?!\\bfunction\\b)[\\s\\S]){0,250}?(?<![=!<>])=\\s*true\\b|\\bif\\s*\\(\\s*!\\s*[\\w$]*[Jj]ump[\\w$]*\\s*\\(|\\b[\\w$]+\\s*=\\s*[\\w$]*[Jj]ump[\\w$]*\\s*\\([^)]*\\)(?:(?!\\bfunction\\b)[\\s\\S]){0,200}?\\breturn\\b|\\bif\\s*\\([^)]*\\b[\\w$]*[Jj]ump[\\w$]*\\s*\\([^)]*\\)[^)]*\\)\\s*\\{?[^}]*\\breturn\\b|\\b([\\w$]+)\\s*=\\s*[^;]*\\b[\\w$]*[Jj]ump[\\w$]*\\s*\\([^;]*;(?:(?!\\bfunction\\b)[\\s\\S]){0,200}?\\bif\\s*\\(\\s*!?\\s*\\1\\b",
       "flags": "",
       "points": 0,
       "status": "pending",

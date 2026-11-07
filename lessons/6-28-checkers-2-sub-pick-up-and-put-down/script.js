@@ -4,7 +4,7 @@
 
 const N = 4;
 const CELL = 80;
-let tr = 3, tc = 0;       // the token's row and column
+let pr = 3, pc = 0;       // the token's row and column
 let picked = false;
 
 function setup() {
@@ -25,8 +25,8 @@ function draw() {
   }
   if (picked) {
     fill('rgba(255, 215, 0, 0.45)');
-    rect(tc * CELL, tr * CELL, CELL, CELL);
+    rect(pc * CELL, pr * CELL, CELL, CELL);
   }
   fill('tomato');
-  circle(tc * CELL + CELL / 2, tr * CELL + CELL / 2, CELL * 0.6);
+  circle(pc * CELL + CELL / 2, pr * CELL + CELL / 2, CELL * 0.6);
 }

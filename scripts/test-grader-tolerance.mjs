@@ -2239,6 +2239,8 @@ for (const id of Object.values(L)) {
   accept(K.sb1, 'if / else instead of a ternary', swap(K.sb1, shade, "if ((r + c) % 2 === 1) fill('#7a5a40');" + nl + "      else fill('#ead9b6');"));
   accept(K.sb1, 'the test kept in a variable', swap(K.sb1, shade, 'const dark = (r + c) % 2 === 1;' + nl + "      fill(dark ? '#7a5a40' : '#ead9b6');"));
   accept(K.sb1, 'a while loop inside the for', swap(K.sb1, '    for (let c = 0; c < N; c++) {', '    let c = 0;' + nl + '    while (c < N) {', '      rect(c * CELL, r * CELL, CELL, CELL);', '      rect(c * CELL, r * CELL, CELL, CELL);' + nl + '      c++;'));
+  accept(K.sb1, 'the corner kept in x and y first', swap(K.sb1, '      rect(c * CELL, r * CELL, CELL, CELL);', '      const x = c * CELL;' + nl + '      const y = r * CELL;' + nl + '      rect(x, y, CELL, CELL);'));
+  accept(K.sb1, 'only x kept in a name', swap(K.sb1, '      rect(c * CELL, r * CELL, CELL, CELL);', '      const x = c * CELL;' + nl + '      rect(x, r * CELL, CELL, CELL);'));
 
   const black = "      if ((r + c) % 2 === 1 && r < 3) p = 'b';";
   const red = "      if ((r + c) % 2 === 1 && r > 4) p = 'r';";
@@ -2251,10 +2253,21 @@ for (const id of Object.values(L)) {
   accept(K.board, 'row numbers one by one', swap(K.board, 'r < 3)', '(r === 0 || r === 1 || r === 2))'));
   reject(K.board, 'pieces on every square of their rows', 'r1', swap(K.board, black + nl + red, "      if (r < 3) p = 'b';" + nl + "      if (r > 4) p = 'r';"));
   reject(K.board, "the 'b' only inside a long string", 'r2', plus(K.board, 'const note = "(r + c) % 2 === 1 && r < 3 ' + AP + 'b' + AP + '";'));
+  accept(K.board, 'one push with a ternary', swap(K.board, black + nl + red + nl + '      row.push(p);', "      row.push((r + c) % 2 === 1 ? (r < 3 ? 'b' : r > 4 ? 'r' : '') : '');"));
+  accept(K.board, 'a pieceAt helper that returns the letter', swap(K.board, black + nl + red, '      p = pieceAt(r, c);',
+    'function colorOf(p)', "function pieceAt(r, c) {" + nl + "  if ((r + c) % 2 === 0) return '';" + nl + "  if (r < 3) return 'b';" + nl + "  if (r > 4) return 'r';" + nl + "  return '';" + nl + '}' + nl + nl + 'function colorOf(p)'));
+  accept(K.board, 'switch (true)', swap(K.board, black + nl + red, '      switch (true) {' + nl + "        case (r + c) % 2 === 1 && r < 3: p = 'b'; break;" + nl + "        case (r + c) % 2 === 1 && r > 4: p = 'r'; break;" + nl + '      }'));
+  accept(K.board, 'a ROWS constant for the three rows', swap(K.board, 'const TOP = 50;', 'const TOP = 50;' + nl + 'const ROWS = 3;',
+    black + nl + red, "      if ((r + c) % 2 === 1 && r < ROWS) p = 'b';" + nl + "      if ((r + c) % 2 === 1 && r >= N - ROWS) p = 'r';"));
+  // A letter after a comma in an unrelated call is not a placed piece.
+  const commas = "console.log((0 + 1) % 2, 0 < 3, 'b', 5 > 4, 'r');";
+  reject(K.board, 'letters after commas in a console.log (dark test)', 'r1', plus(K.board, commas));
+  reject(K.board, 'letters after commas in a console.log (black)', 'r2', plus(K.board, commas));
+  reject(K.board, 'letters after commas in a console.log (red)', 'r3', plus(K.board, commas));
 
-  accept(K.pick, 'Math.floor and Math.abs', swap(K.pick, 'floor(mouse.x', 'Math.floor(mouse.x', 'floor(mouse.y', 'Math.floor(mouse.y', 'abs(r - tr)', 'Math.abs(r - tr)', 'abs(c - tc)', 'Math.abs(c - tc)'));
-  accept(K.pick, 'one row up or down, written out', swap(K.pick, 'abs(r - tr) === 1 && abs(c - tc) === 1', '(r === tr - 1 || r === tr + 1) && (c === tc - 1 || c === tc + 1)'));
-  accept(K.pick, 'a square of the difference', swap(K.pick, 'abs(r - tr) === 1 && abs(c - tc) === 1', '(r - tr) * (r - tr) === 1 && (c - tc) * (c - tc) === 1'));
+  accept(K.pick, 'Math.floor and Math.abs', swap(K.pick, 'floor(mouse.x', 'Math.floor(mouse.x', 'floor(mouse.y', 'Math.floor(mouse.y', 'abs(r - pr)', 'Math.abs(r - pr)', 'abs(c - pc)', 'Math.abs(c - pc)'));
+  accept(K.pick, 'one row up or down, written out', swap(K.pick, 'abs(r - pr) === 1 && abs(c - pc) === 1', '(r === pr - 1 || r === pr + 1) && (c === pc - 1 || c === pc + 1)'));
+  accept(K.pick, 'a square of the difference', swap(K.pick, 'abs(r - pr) === 1 && abs(c - pc) === 1', '(r - pr) * (r - pr) === 1 && (c - pc) * (c - pc) === 1'));
 
   accept(K.step, 'Math.floor and Math.abs', swap(K.step, 'floor(', 'Math.floor(', 'abs(', 'Math.abs('));
   accept(K.step, 'forward as two ifs', swap(K.step, "  const ahead = turn === 'r' ? dr < 0 : dr > 0;" + nl + "  if (!ahead) return '';",
@@ -2266,6 +2279,18 @@ for (const id of Object.values(L)) {
   accept(K.step, 'the turn passes through a helper', swap(K.step, "  turn = turn === 'r' ? 'b' : 'r';", '  turn = other(turn);', 'function onBoard', "function other(t) { return t === 'r' ? 'b' : 'r'; }" + nl + 'function onBoard'));
   accept(K.step, 'turn === colorOf(p), object shorthand', swap(K.step, "  if (p !== '' && colorOf(p) === turn) {" + nl + '    picked = { r: r, c: c };', "  if (p !== '' && turn === colorOf(p)) {" + nl + '    picked = { r, c };'));
   accept(K.step, 'a player called side', swap(K.step, 'turn', 'side'));
+  accept(K.step, 'a player called current', swap(K.step, 'turn', 'current'));
+  accept(K.step, 'picked set by a ternary', swap(K.step, "  if (p !== '' && colorOf(p) === turn) {" + nl + '    picked = { r: r, c: c };' + nl + '    return;' + nl + '  }',
+    "  if (p !== '') {" + nl + '    picked = colorOf(p) === turn ? { r, c } : picked;' + nl + '    if (colorOf(p) === turn) return;' + nl + '  }'));
+  const ahead = "  const ahead = turn === 'r' ? dr < 0 : dr > 0;" + nl + "  if (!ahead) return '';";
+  accept(K.step, 'forward from a lookup object', swap(K.step, ahead, '  const dir = { r: -1, b: 1 }[turn];' + nl + "  if (Math.sign(dr) !== dir) return '';"));
+  accept(K.step, 'forward with dir = -1 for red', swap(K.step, ahead, '  let dir = 1;' + nl + "  if (colorOf(p) === 'r') dir = -1;" + nl + "  if (dr !== dir) return '';"));
+  accept(K.step, 'RED and BLACK constants', swap(K.step, "let turn = 'r';", "const RED = 'r';" + nl + "const BLACK = 'b';" + nl + 'let turn = RED;',
+    "  const ahead = turn === 'r' ? dr < 0 : dr > 0;", '  const ahead = turn === RED ? dr < 0 : dr > 0;',
+    "  turn = turn === 'r' ? 'b' : 'r';", '  turn = turn === RED ? BLACK : RED;'));
+  accept(K.step, 'the turn passes through nextTurn()', swap(K.step, "  turn = turn === 'r' ? 'b' : 'r';", '  turn = nextTurn();', 'function onBoard', "function nextTurn() { return turn === 'r' ? 'b' : 'r'; }" + nl + 'function onBoard'));
+  accept(K.step, 'the turn passes through a lookup object', swap(K.step, "let turn = 'r';", "let turn = 'r';" + nl + "const NEXT = { r: 'b', b: 'r' };", "  turn = turn === 'r' ? 'b' : 'r';", '  turn = NEXT[turn];'));
+  accept(K.step, 'the turn passes through an inline lookup', swap(K.step, "  turn = turn === 'r' ? 'b' : 'r';", "  turn = { r: 'b', b: 'r' }[turn];"));
 
   accept(K.sb3, 'Math.abs and the halfway written as start plus half', swap(K.sb3, 'abs(r - picked.r)', 'Math.abs(r - picked.r)', 'abs(c - picked.c)', 'Math.abs(c - picked.c)',
     'const mr = (r + picked.r) / 2;', 'const mr = picked.r + (r - picked.r) / 2;'));
@@ -2279,11 +2304,20 @@ for (const id of Object.values(L)) {
     '  const mr = (fr + tr) / 2;' + nl + '  const mc = (fc + tc) / 2;' + nl + "  if (kind === 'jump') grid[mr][mc] = '';"));
   accept(K.jump, 'a chain flag called again', swap(K.jump, 'chain', 'again'));
   accept(K.jump, 'Math.abs', swap(K.jump, 'abs(', 'Math.abs('));
+  const chainIf = "  if (kind === 'jump' && canJumpFrom(tr, tc)) {" + nl + '    picked = { r: tr, c: tc };' + nl + '    chain = true;' + nl + "    message = nameOf(turn) + ' jumps again!';" + nl + '    return;' + nl + '  }' + nl +
+    '  picked = null;' + nl + '  chain = false;' + nl + "  turn = turn === 'r' ? 'b' : 'r';" + nl + '  message = nameOf(turn) + "' + AP + 's turn";';
+  const passTurn = '    picked = null;' + nl + "    turn = turn === 'r' ? 'b' : 'r';" + nl + '    message = nameOf(turn) + "' + AP + 's turn";';
+  accept(K.jump, 'the chain as if / else, no early return', swap(K.jump, chainIf, "  if (kind === 'jump' && canJumpFrom(tr, tc)) {" + nl + '    picked = { r: tr, c: tc };' + nl + '    chain = true;' + nl + "    message = nameOf(turn) + ' jumps again!';" + nl + '  } else {' + nl + '    chain = false;' + nl + passTurn + nl + '  }'));
+  accept(K.jump, 'chain = the test, then if (!chain)', swap(K.jump, chainIf, "  chain = kind === 'jump' && canJumpFrom(tr, tc);" + nl + '  if (chain) {' + nl + '    picked = { r: tr, c: tc };' + nl + "    message = nameOf(turn) + ' jumps again!';" + nl + '  }' + nl + '  if (!chain) {' + nl + passTurn + nl + '  }'));
+  accept(K.jump, 'the flag set in a nested if with an else', swap(K.jump, chainIf, '  chain = false;' + nl + "  if (kind === 'jump') {" + nl + '    if (canJumpFrom(tr, tc)) {' + nl + '      chain = true;' + nl + '      picked = { r: tr, c: tc };' + nl + "      message = nameOf(turn) + ' jumps again!';" + nl + '    } else {' + nl + '      chain = false;' + nl + '    }' + nl + '  }' + nl + '  if (!chain) {' + nl + passTurn + nl + '  }'));
+  accept(K.jump, 'const again = the test; if (again) return', swap(K.jump, "  if (kind === 'jump' && canJumpFrom(tr, tc)) {", "  const again = kind === 'jump' && canJumpFrom(tr, tc);" + nl + '  if (again) {'));
+  reject(K.jump, 'a jump always keeps the turn, never asking canJumpFrom', 'r4', swap(K.jump, "  if (kind === 'jump' && canJumpFrom(tr, tc)) {", "  if (kind === 'jump') {"));
 
   accept(K.crown, 'a ternary crown', swap(K.crown, "      if (pr === 0) piece = 'R';", "      piece = pr === 0 ? 'R' : piece;"));
   accept(K.crown, 'toUpperCase', swap(K.crown, "      if (pr === 0) piece = 'R';", '      if (pr === 0) piece = piece.toUpperCase();'));
   accept(K.crown, 'the king test first', swap(K.crown, "(up || (down && piece === 'R'))", "(up || (piece === 'R' && down))"));
   reject(K.crown, 'a king that still only steps up', 'r2', swap(K.crown, "(up || (down && piece === 'R'))", 'up'));
+  reject(K.crown, 'toUpperCase only on a message', 'r1', plus(K.crown, "let note = 'crowned';" + nl + 'function hud() { text(note.toUpperCase(), 10, 20, 16, ' + AP + 'white' + AP + '); }'));
   accept(K.crown, 'a king as its own else if', swap(K.crown, "abs(c - pc) === 1 && (up || (down && piece === 'R'))) {", "abs(c - pc) === 1 && up || picked && piece === 'R' && abs(r - pr) === 1 && abs(c - pc) === 1) {"));
 
   accept(K.kings, 'toUpperCase to crown, the row tested first', swap(K.kings, "  if (p === 'r' && r === 0) { grid[r][c] = 'R'; return true; }", "  if (r === 0 && p === 'r') { grid[r][c] = p.toUpperCase(); return true; }"));
@@ -2293,11 +2327,29 @@ for (const id of Object.values(L)) {
   accept(K.kings, 'R tested after the winner', swap(K.kings, "  if (kb.presses('r') && winner !== '') newGame();", "  if (winner !== '' && kb.presses('r')) newGame();"));
   accept(K.kings, 'R in its own if', swap(K.kings, "  if (kb.presses('r') && winner !== '') newGame();", "  if (kb.presses('r')) {" + nl + "    if (winner !== '') newGame();" + nl + '  }'));
   reject(K.kings, "the crown only inside a long string", 'r1', plus(K.kings, 'const note = "r === 0 = ' + AP + 'R' + AP + '";'));
+  reject(K.kings, 'toUpperCase only on a message', 'r1', plus(K.kings, 'function shout() { text(message.toUpperCase(), 10, 40, 16, ' + AP + 'white' + AP + '); }'));
+  accept(K.kings, 'a king is a letter that is not lowercase', swap(K.kings, "  if (!ahead && !isKing(p)) return '';", "  if (!ahead && p === p.toLowerCase()) return '';"));
+  accept(K.kings, 'a crowned flag', swap(K.kings, "  if (!ahead && !isKing(p)) return '';", "  const crowned = p === 'R' || p === 'B';" + nl + "  if (!ahead && !crowned) return '';"));
+  const anyMove = '  for (let r = 0; r < N; r++) {' + nl + '    for (let c = 0; c < N; c++) {' + nl + '      for (const d of [-2, -1, 1, 2]) {' + nl +
+    "        if (moveKind(r, c, r + d, c + d) !== '' || moveKind(r, c, r + d, c - d) !== '') return true;" + nl + '      }' + nl + '    }' + nl + '  }' + nl + '  return false;';
+  const fromHere = "[-2, -1, 1, 2].some((d) => moveKind(r, c, r + d, c + d) !== '' || moveKind(r, c, r + d, c - d) !== '')";
+  accept(K.kings, 'hasAnyMove with .some()', swap(K.kings, anyMove, '  return grid.some((row, r) => row.some((p, c) => ' + fromHere + '));'));
+  accept(K.kings, 'hasAnyMove with for...of over the rows', swap(K.kings, anyMove, '  let r = 0;' + nl + '  for (const row of grid) {' + nl + '    for (let c = 0; c < row.length; c++) {' + nl + '      if (' + fromHere + ') return true;' + nl + '    }' + nl + '    r += 1;' + nl + '  }' + nl + '  return false;'));
+  accept(K.kings, 'hasAnyMove with the inner loop in a helper', swap(K.kings, anyMove, '  for (let r = 0; r < N; r++) {' + nl + '    if (rowCanGo(r)) return true;' + nl + '  }' + nl + '  return false;' + nl + '}' + nl + nl +
+    'function rowCanGo(r) {' + nl + '  for (let c = 0; c < N; c++) {' + nl + '    if (' + fromHere + ') return true;' + nl + '  }' + nl + '  return false;'));
+  const winBlock = '  if (!hasAnyMove()) {' + nl + "    winner = turn === 'r' ? 'b' : 'r';" + nl + "    message = nameOf(winner) + ' wins! Press R to play again';" + nl + '  }' + nl;
+  accept(K.kings, 'winner = other(turn)', swap(K.kings, "    winner = turn === 'r' ? 'b' : 'r';", '    winner = other(turn);', 'function onBoard', "function other(t) { return t === 'r' ? 'b' : 'r'; }" + nl + 'function onBoard'));
+  accept(K.kings, 'a gameOver flag instead of a winner letter', swap(K.kings, "let winner = '';", "let winner = '';" + nl + 'let gameOver = false;',
+    "  winner = '';", "  winner = '';" + nl + '  gameOver = false;',
+    "    winner = turn === 'r' ? 'b' : 'r';" + nl + "    message = nameOf(winner)", '    gameOver = true;' + nl + "    message = nameOf(turn === 'r' ? 'b' : 'r')",
+    "mouse.presses() && winner === ''", 'mouse.presses() && !gameOver', "kb.presses('r') && winner !== ''", "kb.presses('r') && gameOver"));
+  reject(K.kings, 'no winner is ever declared', 'r4', swap(K.kings, winBlock, ''));
+  reject(K.kings, 'R starts a new game, and no winner is ever declared', 'r4', swap(K.kings, winBlock, '', "  if (kb.presses('r') && winner !== '') newGame();", "  if (kb.presses('r')) newGame();"));
 
   accept(K.sb5, 'onMove given a named function', swap(K.sb5, '  online.onMove((m, seat) => {' + nl + '    marks.push({ r: m.r, c: m.c, seat: seat });' + nl + '  });', '  online.onMove(gotMove);',
     'function draw() {', 'function gotMove(m, seat) {' + nl + '  marks.push({ r: m.r, c: m.c, seat: seat });' + nl + '}' + nl + nl + 'function draw() {'));
 
-  const handler = "  online.onMove((m, seat) => {" + nl + "    if (seat === seatOf(turn) && winner === '' && isLegal(m.fr, m.fc, m.tr, m.tc)) {" + nl + '      doMove(m.fr, m.fc, m.tr, m.tc);' + nl + '    }' + nl + '  });';
+  const handler = "  online.onMove((m, seat) => {" + nl + "    if (goodMove(m) && seat === seatOf(turn) && winner === '' && isLegal(m.fr, m.fc, m.tr, m.tc)) {" + nl + '      doMove(m.fr, m.fc, m.tr, m.tc);' + nl + '    }' + nl + '  });';
   accept(K.online, 'the seat named who, tested second', swap(K.online, handler, "  online.onMove((m, who) => {" + nl + "    if (isLegal(m.fr, m.fc, m.tr, m.tc) && seatOf(turn) === who && winner === '') doMove(m.fr, m.fc, m.tr, m.tc);" + nl + '  });'));
   accept(K.online, 'early returns in the handler', swap(K.online, handler, '  online.onMove((m, seat) => {' + nl + '    if (seat !== seatOf(turn)) return;' + nl + '    if (!isLegal(m.fr, m.fc, m.tr, m.tc)) return;' + nl + '    doMove(m.fr, m.fc, m.tr, m.tc);' + nl + '  });'));
   accept(K.online, 'the handler as a named function', swap(K.online, handler, '  online.onMove(arrived);', 'function seatOf(t)', "function arrived(m, seat) {" + nl + "  if (seat === seatOf(turn) && winner === '' && isLegal(m.fr, m.fc, m.tr, m.tc)) doMove(m.fr, m.fc, m.tr, m.tc);" + nl + '}' + nl + nl + 'function seatOf(t)'));
@@ -2322,6 +2374,67 @@ for (const id of Object.values(L)) {
     'function canJumpFrom(r, c) {', 'function mustJump() {' + nl + '  let found = false;' + nl + '  grid.forEach((row, r) => row.forEach((p, c) => { if (colorOf(p) === turn && canJumpFrom(r, c)) found = true; }));' + nl + '  return found;' + nl + '}' + nl + nl + 'function canJumpFrom(r, c) {'));
   reject(K.yours, 'a 40 only inside a string', 'r1', plus(K.yours, 'const note = "quiet >= 40";'));
   reject(K.yours, 'the dots only in a comment', 'r1', plus(K.yours, '// if (isLegal(picked.r, picked.c, r, c)) { fill(0); }'));
+  // 6.31-6.32 cases pinned by the 6.31/6.32 fix pass (2026-11-07).
+  const sfix = (id, from, to) => {
+    const s = starterFiles(id)['script.js'];
+    if (!s.includes(from)) throw new Error(`Checkers case for ${id}: ${JSON.stringify(from)} is not in the starter`);
+    return { 'script.js': s.replace(from, to) };
+  };
+  // ---- 6.31.2 r1
+  const sbH = '  online.onMove((m, seat) => {' + nl + '    marks.push({ r: m.r, c: m.c, seat: seat });' + nl + '  });';
+  accept(K.sb5, 'destructured ({ r, c }, seat)', swap(K.sb5, sbH, '  online.onMove(({ r, c }, seat) => {' + nl + '    marks.push({ r, c, seat });' + nl + '  });'));  // card r1
+  accept(K.sb5, 'one parameter, no parentheses', swap(K.sb5, sbH, '  online.onMove(m => marks.push({ r: m.r, c: m.c, seat: 0 }));'));  // card r1
+  accept(K.sb5, 'a function expression', swap(K.sb5, sbH, '  online.onMove(function (m, seat) {' + nl + '    marks.push({ r: m.r, c: m.c, seat: seat });' + nl + '  });'));  // card r1
+  reject(K.sb5, 'onMove only in a comment', 'r1', plus(K.sb5, '// online.onMove((m, seat) => {});'));
+
+  // ---- 6.31.3
+  const playLine = "  if (online.status === 'off') doMove(fr, fc, tr, tc);" + nl + '  else online.send({ fr: fr, fc: fc, tr: tr, tc: tc });   // applied in onMove, on both computers';
+  accept(K.online, 'destructured ({ fr, fc, tr, tc }, seat)', swap(K.online, handler, "  online.onMove(({ fr, fc, tr, tc }, seat) => {" + nl + "    if (seat === seatOf(turn) && winner === '' && isLegal(fr, fc, tr, tc)) doMove(fr, fc, tr, tc);" + nl + '  });'));
+  accept(K.online, 'named function declared above setup', swap(K.online, handler, '  online.onMove(arrived);', 'function setup() {', "function arrived(m, seat) {" + nl + "  if (seat === seatOf(turn) && winner === '' && isLegal(m.fr, m.fc, m.tr, m.tc)) doMove(m.fr, m.fc, m.tr, m.tc);" + nl + '}' + nl + nl + 'function setup() {'));
+  accept(K.online, 'const arrow handler declared below', swap(K.online, handler, '  online.onMove(arrived);', 'function seatOf(t)', "const arrived = (m, seat) => {" + nl + "  if (seat === seatOf(turn) && winner === '' && isLegal(m.fr, m.fc, m.tr, m.tc)) doMove(m.fr, m.fc, m.tr, m.tc);" + nl + '};' + nl + nl + 'function seatOf(t)'));
+  accept(K.online, 'const arrow handler declared above setup', swap(K.online, handler, '  online.onMove(arrived);', 'function setup() {', "const arrived = (m, seat) => {" + nl + "  if (seat === seatOf(turn) && winner === '' && isLegal(m.fr, m.fc, m.tr, m.tc)) doMove(m.fr, m.fc, m.tr, m.tc);" + nl + '};' + nl + nl + 'function setup() {'));
+  accept(K.online, 'const destructured handler, no braces', swap(K.online, handler, '  online.onMove(arrived);', 'function seatOf(t)', "const arrived = ({ fr, fc, tr, tc }, who) => seatOf(turn) === who && isLegal(fr, fc, tr, tc) && doMove(fr, fc, tr, tc);" + nl + nl + 'function seatOf(t)'));
+  accept(K.online, 'the old handler without goodMove', swap(K.online, handler, "  online.onMove((m, seat) => {" + nl + "    if (seat === seatOf(turn) && winner === '' && isLegal(m.fr, m.fc, m.tr, m.tc)) {" + nl + '      doMove(m.fr, m.fc, m.tr, m.tc);' + nl + '    }' + nl + '  });'));
+  accept(K.online, 'early returns in the handler', swap(K.online, handler, '  online.onMove((m, seat) => {' + nl + '    if (!goodMove(m)) return;' + nl + '    if (seat !== seatOf(turn)) return;' + nl + '    if (!isLegal(m.fr, m.fc, m.tr, m.tc)) return;' + nl + '    doMove(m.fr, m.fc, m.tr, m.tc);' + nl + '  });'));
+  reject(K.online, 'named handler that never checks', 'r3', swap(K.online, handler, '  online.onMove(arrived);', 'function seatOf(t)', 'function arrived(m, seat) { doMove(m.fr, m.fc, m.tr, m.tc); }' + nl + 'function seatOf(t)'));
+  reject(K.online, 'const handler that never checks', 'r3', swap(K.online, handler, '  online.onMove(arrived);', 'function seatOf(t)', 'const arrived = (m, seat) => doMove(m.fr, m.fc, m.tr, m.tc);' + nl + 'function seatOf(t)'));
+
+  accept(K.online, 'early return in play()', swap(K.online, playLine, "  if (online.status !== 'off') {" + nl + '    online.send({ fr: fr, fc: fc, tr: tr, tc: tc });' + nl + '    return;' + nl + '  }' + nl + '  doMove(fr, fc, tr, tc);'));  // card r4
+  accept(K.online, 'const solo = status off', swap(K.online, playLine, "  const solo = online.status === 'off';" + nl + '  if (solo) doMove(fr, fc, tr, tc);' + nl + '  else online.send({ fr, fc, tr, tc });'));  // card r4
+  accept(K.online, 'if (!solo) send, else move', swap(K.online, playLine, "  const solo = online.status === 'off';" + nl + '  if (!solo) online.send({ fr, fc, tr, tc });' + nl + '  else doMove(fr, fc, tr, tc);'));  // card r4
+  accept(K.online, 'online.code === null', swap(K.online, playLine, '  if (online.code === null) doMove(fr, fc, tr, tc);' + nl + '  else online.send({ fr: fr, fc: fc, tr: tr, tc: tc });'));  // card r4
+  accept(K.online, 'an extra line before doMove', swap(K.online, playLine, "  if (online.status === 'off') {" + nl + '    picked = null;' + nl + '    doMove(fr, fc, tr, tc);' + nl + '  } else {' + nl + '    online.send({ fr: fr, fc: fc, tr: tr, tc: tc });' + nl + '  }'));  // card r4
+  accept(K.online, 'an isOffline() helper below', swap(K.online, playLine, '  if (isOffline()) doMove(fr, fc, tr, tc);' + nl + '  else online.send({ fr: fr, fc: fc, tr: tr, tc: tc });', 'function drawBoard() {', "function isOffline() {" + nl + "  return online.status === 'off';" + nl + '}' + nl + nl + 'function drawBoard() {'));  // card r4
+  accept(K.online, 'an isOffline arrow above', swap(K.online, playLine, '  if (isOffline()) doMove(fr, fc, tr, tc);' + nl + '  else online.send({ fr: fr, fc: fc, tr: tr, tc: tc });', 'function setup() {', "const isOffline = () => online.status === 'off';" + nl + nl + 'function setup() {'));  // card r4
+  accept(K.online, 'a ternary', swap(K.online, playLine, "  online.status === 'off' ? doMove(fr, fc, tr, tc) : online.send({ fr, fc, tr, tc });"));  // card r4
+  accept(K.online, 'send braced, move in braced else', swap(K.online, playLine, "  if (online.status !== 'off') {" + nl + '    online.send({ fr, fc, tr, tc });' + nl + '  } else {' + nl + '    doMove(fr, fc, tr, tc);' + nl + '  }'));  // card r4
+  reject(K.online, "the H line, the R line and myTurn, but play always sends", 'r4', swap(K.online, playLine, '  online.send({ fr: fr, fc: fc, tr: tr, tc: tc });'));
+  reject(K.online, "isOffline helper written but never asked", 'r4', swap(K.online, playLine, '  online.send({ fr: fr, fc: fc, tr: tr, tc: tc });', 'function drawBoard() {', "function isOffline() {" + nl + "  return online.status === 'off';" + nl + '}' + nl + nl + 'function drawBoard() {'));
+
+  // ---- 6.32.3 (dots, above, is the Challenge 1 block of the reference)
+  const noDots = (...pairs) => swap(K.yours, dots, '', ...pairs);
+  const draw40 = (cmp, decl = '') => noDots("let message = '';", "let message = '';" + nl + 'let quiet = 0;' + decl,
+    '  const kind = moveKind(fr, fc, tr, tc);' + nl + '  grid[tr][tc]', '  const kind = moveKind(fr, fc, tr, tc);' + nl + "  if (kind === 'jump') quiet = 0; else quiet += 1;" + nl + '  if (' + cmp + ") winner = 'draw';" + nl + '  grid[tr][tc]');
+  accept(K.yours, 'quiet > 39', draw40('quiet > 39'));
+  accept(K.yours, 'const LIMIT = 40; quiet >= LIMIT', draw40('quiet >= LIMIT', nl + 'const LIMIT = 40;'));
+  accept(K.yours, 'a draw limit of 50, literal', draw40('quiet >= 50'));
+  accept(K.yours, 'a draw limit of 50 in a constant', draw40('quiet >= DRAW_AT', nl + 'const DRAW_AT = 50;'));
+  accept(K.yours, 'LIMIT <= quiet', draw40('LIMIT <= quiet', nl + 'const LIMIT = 40;'));
+  accept(K.yours, 'quiet++ and quiet === 50', noDots("let message = '';", "let message = '';" + nl + 'let quiet = 0;', '  const kind = moveKind(fr, fc, tr, tc);' + nl + '  grid[tr][tc]', '  const kind = moveKind(fr, fc, tr, tc);' + nl + "  if (kind === 'jump') quiet = 0;" + nl + '  else quiet++;' + nl + "  if (quiet === 50) winner = 'draw';" + nl + '  grid[tr][tc]'));
+  accept(K.yours, 'a legalSquares() helper returning a list', noDots('function drawPieces() {',
+    'function legalSquares(fr, fc) {' + nl + '  const list = [];' + nl + '  for (let r = 0; r < N; r++) {' + nl + '    for (let c = 0; c < N; c++) {' + nl + '      if (isLegal(fr, fc, r, c)) list.push({ r: r, c: c });' + nl + '    }' + nl + '  }' + nl + '  return list;' + nl + '}' + nl + nl + 'function drawPieces() {',
+    '    rect(picked.c * CELL, TOP + picked.r * CELL, CELL, CELL);' + nl, '    rect(picked.c * CELL, TOP + picked.r * CELL, CELL, CELL);' + nl + '    for (const s of legalSquares(picked.r, picked.c)) circle(s.c * CELL + CELL / 2, TOP + s.r * CELL + CELL / 2, 18);' + nl));
+  const dotIf = '        if (isLegal(picked.r, picked.c, r, c)) {' + nl + "          fill('rgba(124, 252, 0, 0.6)');" + nl + '          circle(c * CELL + CELL / 2, TOP + r * CELL + CELL / 2, 18);' + nl + '        }';
+  accept(K.yours, 'if (!isLegal(...)) continue;', swap(K.yours, dotIf,
+    '        if (!isLegal(picked.r, picked.c, r, c)) continue;' + nl + "        fill('rgba(124, 252, 0, 0.6)');" + nl + '        circle(c * CELL + CELL / 2, TOP + r * CELL + CELL / 2, 18);'));
+  accept(K.yours, 'isLegal(...) && dot(r, c)', swap(K.yours, dotIf,
+    '        isLegal(picked.r, picked.c, r, c) && dot(r, c);', 'function drawPieces() {', 'function dot(r, c) {' + nl + "  fill('rgba(124, 252, 0, 0.6)');" + nl + '  circle(c * CELL + CELL / 2, TOP + r * CELL + CELL / 2, 18);' + nl + '}' + nl + nl + 'function drawPieces() {'));
+  reject(K.yours, 'const TOP = 40 alone', 'r1', sfix(K.yours, 'const TOP = 50;', 'const TOP = 40;'));
+  reject(K.yours, 'const CELL = 40 alone', 'r1', sfix(K.yours, 'const CELL = 60;', 'const CELL = 40;'));
+  reject(K.yours, 'let x = 40 alone', 'r1', plus(K.yours, 'let x = 40;'));
+  reject(K.yours, 'a constant compared only in a comment', 'r1', plus(K.yours, 'const LIMIT = 40;' + nl + '// if (quiet >= LIMIT) winner = 1;'));
+  reject(K.yours, 'a guard against clicks above the board (y < TOP)', 'r1', sfix(K.yours, '  if (!onBoard(r, c)) return;', '  if (y < TOP || y >= TOP + N * CELL) return;' + nl + '  if (!onBoard(r, c)) return;'));
+  reject(K.yours, 'a 6.31.3 handler with isLegal first (carried)', 'r1', sfix(K.yours, "if (goodMove(m) && seat === seatOf(turn) && winner === '' && isLegal(m.fr, m.fc, m.tr, m.tc)) {", "if (isLegal(m.fr, m.fc, m.tr, m.tc) && seatOf(turn) === seat && goodMove(m)) {"));
 }
 
 // ---------------------------------------------------------------- run
