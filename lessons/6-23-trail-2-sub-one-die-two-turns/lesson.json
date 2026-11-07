@@ -1,0 +1,90 @@
+{
+  "id": "6-23-trail-2-sub-one-die-two-turns",
+  "title": "6.23.2 Sub-build: One die, two turns",
+  "description": "One die, two names, one turn index. Roll and pass before there is a board.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.23 Trail: roll and take turns",
+  "preview": "moshion",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "It says Red's turn and the last roll is 0. SPACE does nothing yet."
+    },
+    {
+      "id": "s2",
+      "title": "Roll the die",
+      "instructions": "Inside `if (kb.presses('space'))`, set `roll = floor(random(1, 7));`. Press SPACE a few times: every number from 1 to 6 turns up, and never a 0 or a 7.",
+      "hints": [
+        "`random(1, 7)` never reaches 7, so `floor` gives 1 to 6."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Pass the turn",
+      "instructions": "On the line after the roll, pass the turn: `turn = (turn + 1) % 2;`. Each SPACE should now switch between Red and Blue.",
+      "hints": [
+        "`%` is the remainder: `2 % 2` is 0, so after Blue it is Red again.",
+        "Put it inside the same `if`, or the turn flips every frame."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A roll from 1 to 6",
+      "description": "A whole number from 1 to 6, as floor(random(1, 7)) gives. Help: 6.23.1 (Reading: A die, and whose turn it is)",
+      "hint": "roll = floor(random(1, 7));",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\brandom\\s*\\(\\s*1\\s*,\\s*7\\s*\\)|\\brandom\\s*\\(\\s*6\\s*\\)[\\s)]*\\+\\s*1\\b|\\brandom\\s*\\(\\s*\\)\\s*\\*\\s*6[\\s)]*\\+\\s*1\\b|\\b1\\s*\\+\\s*(?:Math\\s*\\.\\s*)?floor\\s*\\(\\s*(?:Math\\s*\\.\\s*)?random\\s*\\(|\\bceil\\s*\\(\\s*(?:Math\\s*\\.\\s*)?random\\s*\\(\\s*(?:6\\b|\\)\\s*\\*\\s*6)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "The turn passes",
+      "description": "The turn moves to the other player, with % or another way that goes back to 0. Help: 6.23.1 (Reading: A die, and whose turn it is)",
+      "hint": "turn = (turn + 1) % 2;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b([\\w$]+)\\s*=\\s*\\(\\s*\\1\\s*\\+\\s*1\\s*\\)\\s*%|\\b([\\w$]+)\\s*%=|\\b([\\w$]+)\\s*=\\s*1\\s*-\\s*\\3\\b|\\b([\\w$]+)\\s*=\\s*\\(?\\s*\\4\\s*===?\\s*0\\s*\\)?\\s*\\?\\s*1\\s*:\\s*0|\\b([\\w$]+)\\s*=\\s*\\(?\\s*\\5\\s*===?\\s*1\\s*\\)?\\s*\\?\\s*0\\s*:\\s*1|\\bif\\s*\\(+\\s*([\\w$]+)\\s*(?:>=\\s*(?:[\\w$]+\\s*\\.\\s*length|2)|>\\s*1|===?\\s*(?:[\\w$]+\\s*\\.\\s*length|2))[\\s)]*\\{?\\s*\\6\\s*=\\s*0\\b|\\bif\\s*\\(+\\s*([\\w$]+)\\s*===?\\s*0[\\s)]*\\{?\\s*\\7\\s*=\\s*1\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: One die, two turns\". The task: on SPACE, roll a whole number from 1 to 6 and pass the turn to the other player so it goes back to the first after the last. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A fair die",
+        "description": "A whole number from 1 to 6.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The turn passes",
+        "description": "Each roll moves the turn on and wraps back to 0.",
+        "points": 1
+      }
+    ]
+  }
+}

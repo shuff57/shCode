@@ -1,0 +1,19 @@
+{
+  "id": "6-23-trail-1-reading-a-die-and-whose-turn-it-is",
+  "title": "6.23.1 Reading: A die, and whose turn it is",
+  "description": "A die is floor(random(1, 7)); players are a list of objects; turn is an index passed on with %; one function does a whole turn, and min keeps a token on the board.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.23 Trail: roll and take turns",
+  "preview": "reading",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

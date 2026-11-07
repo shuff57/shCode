@@ -10141,6 +10141,45 @@
       "scoreKind": null
     },
     {
+      "id": "6-23-trail-1-reading-a-die-and-whose-turn-it-is",
+      "title": "6.23.1 Reading: A die, and whose turn it is",
+      "unit": "6.23 Trail: roll and take turns",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 17,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "6-23-trail-2-sub-one-die-two-turns",
+      "title": "6.23.2 Sub-build: One die, two turns",
+      "unit": "6.23 Trail: roll and take turns",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 17,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "6-23-trail-3-lab-take-turns-to-the-finish",
+      "title": "6.23.3 Lab: Take turns to the finish",
+      "unit": "6.23 Trail: roll and take turns",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 17,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "6-3-1-slides",
       "title": "6.8.1 Slides: Physics Applications",
       "unit": "6.8 Physics Applications",

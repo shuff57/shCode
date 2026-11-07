@@ -10197,6 +10197,60 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
+  "6-23-trail-2-sub-one-die-two-turns": {
+    "lessonTitle": "6.23.2 Sub-build: One die, two turns",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: One die, two turns\". The task: on SPACE, roll a whole number from 1 to 6 and pass the turn to the other player so it goes back to the first after the last. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A fair die",
+        "description": "A whole number from 1 to 6.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The turn passes",
+        "description": "Each roll moves the turn on and wraps back to 0.",
+        "points": 1
+      }
+    ]
+  },
+  "6-23-trail-3-lab-take-turns-to-the-finish": {
+    "lessonTitle": "6.23.3 Lab: Take turns to the finish",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Take turns to the finish\". The task: turn the one-token board into a race for two: a list of player objects, a die from 1 to 6, a takeTurn that moves the player whose turn it is without going past the last square, a winner on the last square, the turn passed to the next player, and R to start again. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A fair die",
+        "description": "A whole number from 1 to 6.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Players in a list",
+        "description": "Each player is an object with its own square.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Turns pass",
+        "description": "The turn moves on and wraps back to the first player.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Stays on the board",
+        "description": "A big roll stops on the last square.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "A winner",
+        "description": "Reaching the last square ends the game.",
+        "points": 1
+      }
+    ]
+  },
   "6-3-pocket-2-sub-slow-to-a-stop": {
     "lessonTitle": "6.3.2 Sub-build: Slow to a stop",
     "prompt": "The student wrote a moSHion sketch for \"Sub-build: Slow to a stop\". The task: give the ball drag and call it stopped when its speed falls under a small number, setting the speed to 0. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",

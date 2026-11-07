@@ -1,0 +1,16 @@
+{
+  "moduleId": "6.23",
+  "source": "Trail chain module, one day.",
+  "lessons": [
+    {
+      "id": "trail-roll-and-take-turns",
+      "title": "roll and take turns",
+      "objective": "A die is a random whole number, the players are a list, and the turn is an index passed on with %.",
+      "screens": [
+        "6-23-trail-1-reading-a-die-and-whose-turn-it-is",
+        "6-23-trail-2-sub-one-die-two-turns",
+        "6-23-trail-3-lab-take-turns-to-the-finish"
+      ]
+    }
+  ]
+}

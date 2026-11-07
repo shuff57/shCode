@@ -1,0 +1,159 @@
+{
+  "id": "6-23-trail-3-lab-take-turns-to-the-finish",
+  "title": "6.23.3 Lab: Take turns to the finish",
+  "description": "Two players, one die: roll, move, pass the turn, and stop on the last square to win.",
+  "type": "lesson",
+  "estimateMins": 20,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.23 Trail: roll and take turns",
+  "preview": "moshion",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "This is your board from 6.22.4. One token steps one square for each SPACE."
+    },
+    {
+      "id": "s2",
+      "title": "Two players",
+      "instructions": "Add `let players;`, `let turn = 0;`, `let message = 'Press SPACE to roll';` and `let winner = -1;` at the top. Write `newGame()`: it fills `players` with two objects like `{ name: 'Red', color: 'tomato', at: 0 }`, and sets `turn` to 0, `winner` to -1 and the message back. Call it at the end of `setup()`.",
+      "hints": [
+        "If you brought your 6.22.4 work forward, your names may differ; keep yours.",
+        "A colour can be any name the canvas knows: `'tomato'`, `'dodgerblue'`, `'gold'`."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Draw the players",
+      "instructions": "Take out the one tomato token and the `at` variable. Write `drawPlayers()`, which loops over `players` and draws each one's circle on `path[players[p].at]`, moved sideways by `p * 20`. Call it in `draw()` after `drawBoard()`. In `drawTop()`, show `message` and whose turn it is: `players[turn].name + \"'s turn\"`."
+    },
+    {
+      "id": "s4",
+      "title": "Roll and take a turn",
+      "instructions": "Write `takeTurn(r)` from the reading: move `players[turn]` by `r` with `min(p.at + r, last)`, set the message, stop with a winner on the last square, and otherwise pass the turn with `%`. In `draw()`, SPACE calls `takeTurn(floor(random(1, 7)))` while `winner === -1`.",
+      "hints": [
+        "Without `min`, a big roll near the end sends the token off the board, and `path[33]` does not exist.",
+        "Pass the turn in its own `nextTurn()`: day three adds to it."
+      ]
+    },
+    {
+      "id": "s5",
+      "title": "R starts again",
+      "instructions": "In `draw()`, `if (kb.presses('r') && winner !== -1) newGame();`. Play a whole game to the finish, then press R."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A roll from 1 to 6",
+      "description": "The die gives a whole number from 1 to 6. Help: 6.23.1 (Reading: A die, and whose turn it is)",
+      "hint": "takeTurn(floor(random(1, 7)));",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\brandom\\s*\\(\\s*1\\s*,\\s*7\\s*\\)|\\brandom\\s*\\(\\s*6\\s*\\)[\\s)]*\\+\\s*1\\b|\\brandom\\s*\\(\\s*\\)\\s*\\*\\s*6[\\s)]*\\+\\s*1\\b|\\b1\\s*\\+\\s*(?:Math\\s*\\.\\s*)?floor\\s*\\(\\s*(?:Math\\s*\\.\\s*)?random\\s*\\(|\\bceil\\s*\\(\\s*(?:Math\\s*\\.\\s*)?random\\s*\\(\\s*(?:6\\b|\\)\\s*\\*\\s*6)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "A list of players",
+      "description": "The players are a list of objects, each with its own square. Help: 6.23.1 (Reading: A die, and whose turn it is)",
+      "hint": "players = [{ name: 'Red', color: 'tomato', at: 0 }, ...];",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\[\\s*\\{[^}]*\\b(?:at|name|color)\\s*:|\\.\\s*push\\s*\\(\\s*\\{[^}]*\\b(?:at|name)\\s*:",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "The turn passes",
+      "description": "The turn moves to the next player and wraps back to 0, with % players.length or another way. Help: 6.23.1 (Reading: A die, and whose turn it is)",
+      "hint": "turn = (turn + 1) % players.length;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b([\\w$]+)\\s*=\\s*\\(\\s*\\1\\s*\\+\\s*1\\s*\\)\\s*%|\\b([\\w$]+)\\s*%=|\\b([\\w$]+)\\s*=\\s*1\\s*-\\s*\\3\\b|\\b([\\w$]+)\\s*=\\s*\\(?\\s*\\4\\s*===?\\s*0\\s*\\)?\\s*\\?\\s*1\\s*:\\s*0|\\b([\\w$]+)\\s*=\\s*\\(?\\s*\\5\\s*===?\\s*1\\s*\\)?\\s*\\?\\s*0\\s*:\\s*1|\\bif\\s*\\(+\\s*([\\w$]+)\\s*(?:>=\\s*(?:[\\w$]+\\s*\\.\\s*length|2)|>\\s*1|===?\\s*(?:[\\w$]+\\s*\\.\\s*length|2))[\\s)]*\\{?\\s*\\6\\s*=\\s*0\\b|\\bif\\s*\\(+\\s*([\\w$]+)\\s*===?\\s*0[\\s)]*\\{?\\s*\\7\\s*=\\s*1\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r4",
+      "title": "Never past the last square",
+      "description": "A roll near the end stops on the last square, with min or a check. Help: 6.23.1 (Reading: A die, and whose turn it is)",
+      "hint": "p.at = min(p.at + r, last);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bmin\\s*\\(|\\bconstrain\\s*\\(|\\bif\\s*\\(+[^)]*\\.\\s*at\\s*>=?[^)]*\\)[\\s{]*[\\w$.\\[\\]]*\\.\\s*at\\s*=",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r5",
+      "title": "A winner on the last square",
+      "description": "Reaching the last square ends the game with a winner. Help: 6.23.1 (Reading: A die, and whose turn it is)",
+      "hint": "if (p.at === last) { winner = turn; ... }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*at\\s*(?:===?|>=)\\s*\\(?\\s*(?:last\\b|path\\s*\\.\\s*length\\s*-\\s*1|[\\w$]+)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Take turns to the finish\". The task: turn the one-token board into a race for two: a list of player objects, a die from 1 to 6, a takeTurn that moves the player whose turn it is without going past the last square, a winner on the last square, the turn passed to the next player, and R to start again. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A fair die",
+        "description": "A whole number from 1 to 6.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Players in a list",
+        "description": "Each player is an object with its own square.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Turns pass",
+        "description": "The turn moves on and wraps back to the first player.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Stays on the board",
+        "description": "A big roll stops on the last square.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "A winner",
+        "description": "Reaching the last square ends the game.",
+        "points": 1
+      }
+    ]
+  },
+  "carryFrom": "6-22-trail-4-lab-lay-the-trail"
+}
