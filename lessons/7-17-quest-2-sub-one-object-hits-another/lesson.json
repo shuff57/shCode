@@ -1,0 +1,118 @@
+{
+  "id": "7-17-quest-2-sub-one-object-hits-another",
+  "title": "7.17.2 Sub-build: One object hits another",
+  "description": "Press 1: one dummy's hit(other) makes the other take a hit, never below 0, and after(45, ...) lets the other one hit back a moment later.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "7.17 Quest: trade blows",
+  "preview": "moshion",
+  "week": 19,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The top says `Left: 20    Right: 20` and `Press 1`. Pressing 1 does nothing yet."
+    },
+    {
+      "id": "s2",
+      "title": "Two methods",
+      "instructions": "Inside the class, below `isAlive()`, write `takeHit(n) { this.hp = max(this.hp - n, 0); }`. Below it, `hit(other) { other.takeHit(this.power); }`. Nothing calls them yet, so Run looks the same.",
+      "hints": [
+        "In `hit(other)`, `this` is the dummy that hits and `other` is the one handed in.",
+        "`max(this.hp - n, 0)` is the bigger of the two numbers, so hp stops at 0."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Press 1 to hit",
+      "instructions": "In `draw()`, below `background(...)`: `if (kb.presses('1') && left.isAlive() && right.isAlive()) { left.hit(right); note = 'Left hits Right'; }`. Run and press 1 a few times: Right goes 16, 12, 8, 4, 0, and stops at 0 instead of going below it.",
+      "hints": [
+        "Click the canvas first, so the keys go to the sketch."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Hit back, a moment later",
+      "instructions": "Inside that same `if`, below `note = 'Left hits Right';`, add `after(45, () => { if (right.isAlive()) { right.hit(left); note = 'Right hits back'; } });`. Run and press 1: Right drops at once, and about a second later Left drops by 3.",
+      "hints": [
+        "`after(45, ...)` runs the function 45 frames later. `draw()` keeps running in the meantime.",
+        "Right checks it is still alive before it hits back: a dummy at 0 hp does not hit."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "hp never below 0",
+      "description": "takeHit takes the hit off hp with a floor at 0, using max or a test. Help: 7.17.1 (Reading: A method that hits another object, and after())",
+      "hint": "takeHit(n) { this.hp = max(this.hp - n, 0); }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:Math\\s*\\.\\s*)?max\\s*\\(\\s*(?:this\\s*\\.\\s*[\\w$]+\\s*-[^,;]*,\\s*0\\s*\\)|0\\s*,\\s*this\\s*\\.\\s*[\\w$]+\\s*-)|\\bthis\\s*\\.\\s*([\\w$]+)\\s*\\)*\\s*<=?\\s*\\(*\\s*0\\s*\\)+\\s*\\{?\\s*this\\s*\\.\\s*\\1\\s*=\\s*0\\b|\\bthis\\s*\\.\\s*([\\w$]+)\\s*=\\s*\\(?\\s*this\\s*\\.\\s*\\2\\s*-\\s*[\\w$]+\\s*\\)?\\s*<=?\\s*0\\s*\\?\\s*0\\b|\\bthis\\s*\\.\\s*([\\w$]+)\\s*=\\s*\\(?\\s*this\\s*\\.\\s*\\3\\s*>=?\\s*([\\w$]+)\\s*\\)?\\s*\\?\\s*this\\s*\\.\\s*\\3\\s*-\\s*\\4\\s*:\\s*0\\b|\\bif\\s*\\(+\\s*this\\s*\\.\\s*([\\w$]+)\\s*-\\s*[\\w$]+\\s*\\)*\\s*<=?\\s*\\(*\\s*0\\s*\\)+\\s*\\{?\\s*this\\s*\\.\\s*\\5\\s*=\\s*0\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "One object hits another",
+      "description": "A method is handed the other dummy and makes it take the hit through its own takeHit, and the sketch calls that method. Help: 7.17.1 (Reading: A method that hits another object, and after())",
+      "hint": "hit(other) { other.takeHit(this.power); }  and  left.hit(right);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b([A-Za-z_$][\\w$]*)\\s*\\(\\s*([A-Za-z_$][\\w$]*)[^)]*\\)\\s*\\{(?:(?!\\bfunction\\b)[^}]){0,300}?\\b\\2\\s*\\.\\s*[\\w$]*(?:[Hh]it|[Hh]urt|[Dd]amage)[\\w$]*\\s*\\([\\s\\S]*?\\.\\s*\\1\\s*\\(\\s*[\\w$]",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "The hit back comes after a pause",
+      "description": "after is given a number of frames and a function to run later. Help: 7.17.1 (Reading: A method that hits another object, and after())",
+      "hint": "after(45, () => { ... right.hit(left); ... });",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bafter\\s*\\(\\s*[\\w$.]+\\s*,\\s*(?:(?:async\\s*)?\\([^()]*\\)\\s*=>\\s*(?!\\{\\s*\\})\\S|[A-Za-z_$][\\w$]*\\s*=>\\s*(?!\\{\\s*\\})\\S|function\\s*[\\w$]*\\s*\\([^)]*\\)\\s*\\{\\s*(?!\\})\\S|[A-Za-z_$][\\w$]*\\s*\\))",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: One object hits another\". The task: give the Dummy class takeHit(n), which lowers hp by n but never below 0, and hit(other), which makes the other dummy take a hit of this one's power through its takeHit; when 1 is pressed and both are alive, left hits right, and after(45, ...) makes right hit back a moment later if it is still alive. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Floor at 0",
+        "description": "hp never goes below 0.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Hit another",
+        "description": "One object makes another take a hit.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A pause",
+        "description": "The hit back waits with after.",
+        "points": 1
+      }
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "7-17-quest-1-reading-a-method-that-hits-another-object-and-after",
+  "title": "7.17.1 Reading: A method that hits another object, and after()",
+  "description": "attack(target, roll) hits through the target's takeHit, which keeps hp at 0 or more and returns the damage; turn = 1 - turn passes the turn; after(45, enemyTurn) gives the enemy its turn a moment later.",
+  "type": "lesson",
+  "estimateMins": 12,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "7.17 Quest: trade blows",
+  "preview": "reading",
+  "week": 19,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

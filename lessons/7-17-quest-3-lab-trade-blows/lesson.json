@@ -1,0 +1,177 @@
+{
+  "id": "7-17-quest-3-lab-trade-blows",
+  "title": "7.17.3 Lab: Trade blows",
+  "description": "Your hero and the goblin take turns: 1 attacks through the target's takeHit, the turn passes, the enemy hits back after a pause, and the battle ends with a win or a loss and R to play again.",
+  "type": "lesson",
+  "estimateMins": 25,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "7.17 Quest: trade blows",
+  "preview": "moshion",
+  "week": 19,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "This is your game from 7.16.4: two fighters with full hp bars. Nothing happens yet when you press a key.",
+      "hints": [
+        "If you brought your 7.16.4 work forward, your names may differ; keep yours. Where a step quotes a line, change the line of yours that does the same job."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Take a hit, and attack",
+      "instructions": "In the class, below `isAlive()`, write `takeHit(n)`: `this.hp = max(this.hp - n, 0);` and then `return n;`. Below it, `attack(target, roll)`, one line: `return target.takeHit(this.power + roll);`. Nothing calls them yet, so Run looks the same.",
+      "hints": [
+        "`attack` never changes `target.hp` itself: it asks the target to take the hit, and the target's `takeHit` keeps the floor at 0."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Whose turn, and a message",
+      "instructions": "Below `let fighters;`, add `let turn = 0;`, `let message = '';` and `let over = false;`. In `setup()`, on the line before `newGame();`, add `randomSeed(Date.now());`. In `newGame()`, below the line that makes the fighters, set `turn = 0;`, `over = false;` and `message = 'Your turn: press 1 to attack';`. In `drawTop()`, show the message instead of the names: `text(message, 10, 24, 15, 'white');`. Run: the top says Your turn: press 1 to attack.",
+      "hints": [
+        "`turn` is 0 or 1, so `fighters[turn]` is the fighter whose turn it is."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Your attack",
+      "instructions": "Below the sketch's `draw()`, write `fightOver(winner)` from the reading: `over = true;`, then a message for a win (`winner === 0`) or a loss. Below it, write `attackTurn(t, roll)` from the reading: `const me = fighters[t];`, `const them = fighters[1 - t];`, the message line with `me.attack(them, roll)`, then `if (!them.isAlive()) { fightOver(t); return; }`, and last `turn = 1 - turn;`. In `draw()`, below `background(...)`, add `if (!over && turn === 0 && kb.presses('1')) attackTurn(0, floor(random(0, 4)));`. Run and press 1: the goblin loses 3 to 6 hp and the top says by how much. Press 1 again: nothing, because now it is the goblin's turn, and the goblin does not act yet.",
+      "hints": [
+        "`floor(random(0, 4))` is a roll of 0, 1, 2 or 3.",
+        "Write `fightOver` before you use it: `attackTurn` calls it the moment a fighter has no hp left."
+      ]
+    },
+    {
+      "id": "s5",
+      "title": "The enemy's turn",
+      "instructions": "Below `attackTurn`, write `enemyTurn()`: `if (over || turn !== 1) return;` and then `attackTurn(1, floor(random(0, 4)));`. In `attackTurn`, below `turn = 1 - turn;`, add `if (turn === 1) after(45, enemyTurn);`. Run and play: you hit, the goblin hits back a moment later, and then it is your turn again.",
+      "hints": [
+        "`after(45, enemyTurn)` has no `()` after `enemyTurn`: you hand `after` the function, to run later.",
+        "Pressing 1 while the goblin is waiting does nothing, because `turn` is 1 until the goblin has hit."
+      ]
+    },
+    {
+      "id": "s6",
+      "title": "Win, lose, and R",
+      "instructions": "In `draw()`, below the line for key 1, add `if (kb.presses('r') && over) newGame();`. Play until someone wins. To reach the end fast, in `newGame()`, on the line below the one that makes the fighters, add `fighters[1].hp = 3;`: one hit wins. Then try `fighters[0].hp = 1;` instead, and lose. Press R each time. Delete the test line when you are done.",
+      "hints": [
+        "A test line goes BELOW the line that makes the fighters: above it, the new fighters would be made after your change and undo it."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "takeHit never below 0",
+      "description": "takeHit lowers hp by the hit but never below 0. Help: 7.3.8 (Lab: takeHit with a floor at zero) and 7.17.1 (Reading: A method that hits another object, and after())",
+      "hint": "this.hp = max(this.hp - n, 0);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:Math\\s*\\.\\s*)?max\\s*\\(\\s*(?:this\\s*\\.\\s*[\\w$]+\\s*-[^,;]*,\\s*0\\s*\\)|0\\s*,\\s*this\\s*\\.\\s*[\\w$]+\\s*-)|\\bthis\\s*\\.\\s*([\\w$]+)\\s*\\)*\\s*<=?\\s*\\(*\\s*0\\s*\\)+\\s*\\{?\\s*this\\s*\\.\\s*\\1\\s*=\\s*0\\b|\\bthis\\s*\\.\\s*([\\w$]+)\\s*=\\s*\\(?\\s*this\\s*\\.\\s*\\2\\s*-\\s*[\\w$]+\\s*\\)?\\s*<=?\\s*0\\s*\\?\\s*0\\b|\\bthis\\s*\\.\\s*([\\w$]+)\\s*=\\s*\\(?\\s*this\\s*\\.\\s*\\3\\s*>=?\\s*([\\w$]+)\\s*\\)?\\s*\\?\\s*this\\s*\\.\\s*\\3\\s*-\\s*\\4\\s*:\\s*0\\b|\\bif\\s*\\(+\\s*this\\s*\\.\\s*([\\w$]+)\\s*-\\s*[\\w$]+\\s*\\)*\\s*<=?\\s*\\(*\\s*0\\s*\\)+\\s*\\{?\\s*this\\s*\\.\\s*\\5\\s*=\\s*0\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "attack goes through the target's takeHit",
+      "description": "attack is handed the target and makes it take the hit through its own takeHit, and the game calls attack. Help: 7.17.1 (Reading: A method that hits another object, and after())",
+      "hint": "attack(target, roll) { return target.takeHit(this.power + roll); }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b([A-Za-z_$][\\w$]*)\\s*\\(\\s*([A-Za-z_$][\\w$]*)[^)]*\\)\\s*\\{(?:(?!\\bfunction\\b)[^}]){0,300}?\\b\\2\\s*\\.\\s*[\\w$]*(?:[Hh]it|[Hh]urt|[Dd]amage)[\\w$]*\\s*\\([\\s\\S]*?\\.\\s*\\1\\s*\\(\\s*[\\w$]",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "The turn passes",
+      "description": "After a hit, the turn goes to the other fighter: 0 to 1, 1 to 0. Help: 7.17.1 (Reading: A method that hits another object, and after())",
+      "hint": "turn = 1 - turn;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b([\\w$]+)\\s*=\\s*1\\s*-\\s*\\1\\b|\\b([\\w$]+)\\s*=\\s*\\(\\s*\\2\\s*\\+\\s*1\\s*\\)\\s*%\\s*(?:2\\b|[\\w$]+\\s*\\.\\s*length\\b)|\\b([\\w$]+)\\s*=\\s*\\(*\\s*\\3\\s*\\)*\\s*[!=]==?\\s*\\(*\\s*[01]\\s*\\)*\\s*\\?\\s*[01]\\s*:\\s*[01]\\b|\\bif\\s*\\(+\\s*([\\w$]+)\\s*\\)*\\s*[!=]==?\\s*\\(*\\s*[01]\\s*\\)+\\s*\\{?\\s*\\4\\s*=\\s*[01]\\b|\\b([\\w$]+)\\s*\\^=\\s*1\\b|\\b([\\w$]+)\\s*=\\s*\\6\\s*\\^\\s*1\\b|\\b[\\w$]+\\s*%=\\s*(?:2\\b|[\\w$]+\\s*\\.\\s*length\\b)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r4",
+      "title": "The enemy acts after a pause",
+      "description": "The enemy's turn is handed to after, to run a moment later. Help: 7.17.1 (Reading: A method that hits another object, and after())",
+      "hint": "if (turn === 1) after(45, enemyTurn);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bafter\\s*\\(\\s*[\\w$.]+\\s*,\\s*(?:(?:async\\s*)?\\([^()]*\\)\\s*=>\\s*(?!\\{\\s*\\})\\S|[A-Za-z_$][\\w$]*\\s*=>\\s*(?!\\{\\s*\\})\\S|function\\s*[\\w$]*\\s*\\([^)]*\\)\\s*\\{\\s*(?!\\})\\S|[A-Za-z_$][\\w$]*\\s*\\))",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r5",
+      "title": "A win or a loss ends it, and R restarts",
+      "description": "When a fighter has no hp left the battle is over, and once it is over R starts a new game. Help: 7.17.1 (Reading: A method that hits another object, and after())",
+      "hint": "if (!them.isAlive()) { fightOver(t); return; }   and   if (kb.presses('r') && over) newGame();",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*?(?:!\\s*\\(*\\s*[\\w$.\\[\\]\\s-]+?\\s*\\.\\s*isAlive\\s*\\)*\\s*\\(\\s*\\)|\\.\\s*isAlive\\s*\\(\\s*\\)\\s*===?\\s*false\\b|\\.\\s*hp\\s*(?:<=\\s*0|===?\\s*0|<\\s*1)\\b)[^;{}]*\\)\\s*\\{?[^;}]{0,40}?(?:\\b[\\w$]+\\s*=\\s*true\\b|\\b[\\w$]*(?:[Oo]ver|[Ee]nd|[Ww]in|[Ll]os|[Dd]one|[Ff]inish)[\\w$]*\\s*\\())(?=[\\s\\S]*?\\bkb\\s*\\.\\s*(?:presses|pressed|pressing|released)\\s*\\(\\s*['\\\"`][rR]['\\\"`]\\s*\\)[^;]{0,120}?\\b(?:newGame|reset|restart|start|setup|init)[\\w$]*\\s*\\()",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true,
+      "keepShortStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Trade blows\". The task: give Fighter takeHit(n), which lowers hp but never below 0 and returns the damage, and attack(target, roll), which hits the target through its takeHit for power plus roll; keep turn (0 or 1), a message and an over flag; on your turn 1 attacks with a roll of 0 to 3, the turn passes with turn = 1 - turn (or another correct way), and the enemy's turn comes after(45, enemyTurn); when a fighter has no hp left the battle is over with a win or loss message, and R starts a new game. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Floor at 0",
+        "description": "hp never goes below 0.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Through takeHit",
+        "description": "An attack goes through the target's takeHit.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Turns pass",
+        "description": "The turn goes back and forth.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "A pause",
+        "description": "The enemy acts a moment later.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "The end",
+        "description": "A win or loss ends it, and R restarts.",
+        "points": 1
+      }
+    ]
+  },
+  "carryFrom": "7-16-quest-4-lab-two-fighters"
+}

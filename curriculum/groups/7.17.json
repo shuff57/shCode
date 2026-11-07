@@ -1,0 +1,16 @@
+{
+  "moduleId": "7.17",
+  "source": "Quest chain module, one day.",
+  "lessons": [
+    {
+      "id": "quest-trade-blows",
+      "title": "trade blows",
+      "objective": "A method can change another object: attack(target, roll) hits through the target's own takeHit, which keeps hp at 0 or more; turn = 1 - turn passes the turn, and after(45, enemyTurn) gives the enemy its turn a moment later.",
+      "screens": [
+        "7-17-quest-1-reading-a-method-that-hits-another-object-and-after",
+        "7-17-quest-2-sub-one-object-hits-another",
+        "7-17-quest-3-lab-trade-blows"
+      ]
+    }
+  ]
+}

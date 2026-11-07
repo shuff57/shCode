@@ -12429,6 +12429,45 @@
       "scoreKind": null
     },
     {
+      "id": "7-17-quest-1-reading-a-method-that-hits-another-object-and-after",
+      "title": "7.17.1 Reading: A method that hits another object, and after()",
+      "unit": "7.17 Quest: trade blows",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 19,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "7-17-quest-2-sub-one-object-hits-another",
+      "title": "7.17.2 Sub-build: One object hits another",
+      "unit": "7.17 Quest: trade blows",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 19,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "7-17-quest-3-lab-trade-blows",
+      "title": "7.17.3 Lab: Trade blows",
+      "unit": "7.17 Quest: trade blows",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 19,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "8-1-1-reading-a-part-is-a-list-of-steps",
       "title": "9.1.1 Reading: A Part Is a List of Steps",
       "unit": "9.1 Solid Shapes",
