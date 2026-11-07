@@ -26,6 +26,7 @@ import {
   listSavedSounds,
   saveSound,
   type SavedSound,
+  LIBRARY_UPDATED,
 } from '../lib/moshion-storage';
 import { MUSIC_LOOPS } from '../lib/sound/loops';
 import { PALETTE, SFX_PRESETS } from '../lib/sound/presets';
@@ -267,7 +268,11 @@ export default function SoundMixer() {
   useEffect(() => {
     setMounted(true);
     setSaved(listSavedSounds());
+    // The library sync can bring sounds down from another device while this is open.
+    const onSynced = () => setSaved(listSavedSounds());
+    window.addEventListener(LIBRARY_UPDATED, onSynced);
     return () => {
+      window.removeEventListener(LIBRARY_UPDATED, onSynced);
       for (const s of sourcesRef.current) {
         try { s.stop(); } catch { /* already ended */ }
       }

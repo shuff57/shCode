@@ -3,6 +3,7 @@ import Header from '../components/Header';
 import { AnnouncementBanner } from '../components/AnnouncementBanner';
 import ReportIssueButton from '../components/ReportIssueButton';
 import StaleBuildGuard from '../components/StaleBuildGuard';
+import LibrarySync from '../components/LibrarySync';
 import { ReactNode } from 'react';
 
 export const metadata = {
@@ -15,6 +16,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <body>
         <StaleBuildGuard />
+        <LibrarySync />
         <AnnouncementBanner />
         <Header />
         {children}

@@ -145,6 +145,13 @@ export function login(email: string, password: string): Promise<CurrentUser> {
 }
 
 export async function logout(): Promise<void> {
+  // Take this account's synced textures and sounds off the browser first, so the
+  // next person on a shared computer does not see them (unsynced work stays).
+  // Loaded on demand: the sync is browser-only and nothing else here needs it.
+  const email = cache?.email;
+  if (email) {
+    try { await (await import('./library-sync')).clearSyncedLibrary(email); } catch { /* best effort */ }
+  }
   await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' });
   invalidateCurrentUser();
 }

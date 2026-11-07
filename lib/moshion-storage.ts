@@ -1,6 +1,6 @@
 'use client';
 
-import { RefObject, useEffect } from 'react';
+import { type RefObject, useEffect } from 'react';
 
 // Saves for moSHion sketches.
 //
@@ -57,22 +57,29 @@ const SNDMETA_PREFIX = 'sndmeta:';
 const MAX_SOUND_VALUE_BYTES = 256 * 1024;
 const MAX_SOUND_TOTAL_BYTES = 2 * 1024 * 1024;
 
+// Saved textures get a budget of their own (1 MB, the same as an account's
+// library allows), so a full set of textures can sync down without crowding
+// out sketch saves, and sketch saves can never push out a texture.
+const MAX_TEXTURE_TOTAL_BYTES = 1024 * 1024;
+
 type Store = Record<string, string>;
 
-function storeBytes(store: Store): { draft: number; sound: number } {
+function storeBytes(store: Store): { draft: number; sound: number; texture: number } {
   let draft = 0;
   let sound = 0;
+  let texture = 0;
   for (const [key, value] of Object.entries(store)) {
     const bytes = key.length + value.length;
     if (key.startsWith(SOUND_PREFIX)) sound += bytes;
+    else if (key.startsWith('texture:') || key.startsWith('texmeta:')) texture += bytes;
     else draft += bytes;
   }
-  return { draft, sound };
+  return { draft, sound, texture };
 }
 
 function withinCaps(store: Store): boolean {
-  const { draft, sound } = storeBytes(store);
-  return draft <= MAX_TOTAL_BYTES && sound <= MAX_SOUND_TOTAL_BYTES;
+  const { draft, sound, texture } = storeBytes(store);
+  return draft <= MAX_TOTAL_BYTES && sound <= MAX_SOUND_TOTAL_BYTES && texture <= MAX_TEXTURE_TOTAL_BYTES;
 }
 
 function readStore(): Store {
@@ -86,13 +93,51 @@ function readStore(): Store {
   }
 }
 
-function writeStore(store: Store): void {
+function writeStore(store: Store): boolean {
   try {
-    if (!withinCaps(store)) return;
+    if (!withinCaps(store)) return false;
     window.localStorage.setItem(KEY, JSON.stringify(store));
+    return true;
   } catch {
     /* quota, private mode -- the sketch keeps its in-frame copy either way */
+    return false;
   }
+}
+
+// A save or delete made here tells the library sync (lib/library-sync.ts) to
+// push it to the account. An event rather than an import keeps this file free
+// of the sync's network code.
+export const LIBRARY_LOCAL_CHANGE = 'moshion-library-local-change';
+/** Fired by the sync after it changed this browser's copies (downloads, deletes). */
+export const LIBRARY_UPDATED = 'moshion-library-updated';
+function localChanged(): void {
+  try { window.dispatchEvent(new Event(LIBRARY_LOCAL_CHANGE)); } catch { /* no window */ }
+}
+
+// Deletes the student MADE (the editor's or the mixer's Delete), kept until the
+// sync has removed them from the account. Only these reach the account: an
+// item that is merely missing here -- a sketch called clearStorage(), or the
+// browser dropped its storage -- is downloaded again instead of deleted
+// everywhere.
+const LOCAL_DELETES_KEY = 'moshion.library.deleted.v1';
+export function readLocalDeletes(): string[] {
+  try {
+    const v = JSON.parse(window.localStorage.getItem(LOCAL_DELETES_KEY) || '[]');
+    return Array.isArray(v) ? v.filter((x) => typeof x === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+export function writeLocalDeletes(keys: string[]): void {
+  try {
+    if (keys.length) window.localStorage.setItem(LOCAL_DELETES_KEY, JSON.stringify([...new Set(keys)]));
+    else window.localStorage.removeItem(LOCAL_DELETES_KEY);
+  } catch { /* private mode */ }
+}
+function markDeleted(kind: 'texture' | 'sound', name: string, deleted: boolean): void {
+  const key = `${kind}:${name}`;
+  const cur = readLocalDeletes().filter((k) => k !== key);
+  writeLocalDeletes(deleted ? [...cur, key] : cur);
 }
 
 // ---- saved textures -------------------------------------------------------
@@ -222,6 +267,8 @@ export function saveTexture(
     return 'Saved textures are full. Delete one before saving another.';
   }
   writeStore(next);
+  markDeleted('texture', name, false);
+  localChanged();
   return null;
 }
 
@@ -230,6 +277,8 @@ export function deleteSavedTexture(name: string): void {
   delete store[TEXTURE_PREFIX + name];
   delete store[TEXMETA_PREFIX + name];
   writeStore(store);
+  markDeleted('texture', name, true);
+  localChanged();
 }
 
 // ---- saved sounds ---------------------------------------------------------
@@ -354,6 +403,8 @@ export function saveSound(name: string, dataUri: string, meta: SoundMeta): strin
     return 'Saved sounds are full. Delete one before saving another.';
   }
   writeStore(next);
+  markDeleted('sound', name, false);
+  localChanged();
   return null;
 }
 
@@ -362,6 +413,70 @@ export function deleteSavedSound(name: string): void {
   delete store[SOUND_PREFIX + name];
   delete store[SNDMETA_PREFIX + name];
   writeStore(store);
+  markDeleted('sound', name, true);
+  localChanged();
+}
+
+// ---- the library sync's view of the store ---------------------------------
+//
+// lib/library-sync.ts sees each saved texture or sound as one item: its data
+// URI plus the raw meta string beside it (texmeta:/sndmeta:), carried opaquely
+// so a round trip through the account changes nothing.
+
+export type LibraryKind = 'texture' | 'sound';
+export interface LocalLibraryItem {
+  kind: LibraryKind;
+  name: string;
+  dataUri: string;
+  meta: string | null;
+}
+const PREFIX: Record<LibraryKind, [string, string]> = {
+  texture: [TEXTURE_PREFIX, TEXMETA_PREFIX],
+  sound: [SOUND_PREFIX, SNDMETA_PREFIX],
+};
+
+export function localLibraryItems(): LocalLibraryItem[] {
+  const store = readStore();
+  const out: LocalLibraryItem[] = [];
+  for (const kind of ['texture', 'sound'] as const) {
+    const [p, mp] = PREFIX[kind];
+    for (const key of Object.keys(store)) {
+      if (!key.startsWith(p)) continue;
+      let dataUri: unknown;
+      try { dataUri = JSON.parse(store[key]); } catch { continue; }
+      if (typeof dataUri !== 'string' || !dataUri.startsWith('data:')) continue;
+      const name = key.slice(p.length);
+      out.push({ kind, name, dataUri, meta: store[mp + name] ?? null });
+    }
+  }
+  return out;
+}
+
+/**
+ * Apply a batch of library changes to this browser in one write. Returns false
+ * (and changes nothing) when the result would not fit this browser's budgets.
+ */
+export function applyLibraryChanges(changes: {
+  put?: LocalLibraryItem[];
+  remove?: { kind: LibraryKind; name: string }[];
+}): boolean {
+  const store = readStore();
+  for (const r of changes.remove ?? []) {
+    const [p, mp] = PREFIX[r.kind];
+    delete store[p + r.name];
+    delete store[mp + r.name];
+  }
+  for (const it of changes.put ?? []) {
+    const [p, mp] = PREFIX[it.kind];
+    store[p + it.name] = JSON.stringify(it.dataUri);
+    if (it.meta == null) delete store[mp + it.name];
+    else store[mp + it.name] = it.meta;
+  }
+  const ok = writeStore(store);
+  if (ok) {
+    try { window.dispatchEvent(new Event(LIBRARY_UPDATED)); } catch { /* no window */ }
+  }
+  return ok;
 }
 
 /**

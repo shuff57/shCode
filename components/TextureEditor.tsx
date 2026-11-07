@@ -34,6 +34,7 @@ import {
   saveTexture,
   deleteSavedTexture,
   SavedTexture,
+  LIBRARY_UPDATED,
 } from '../lib/moshion-storage';
 
 interface CatalogEntry { file: string; w: number; h: number; group: string }
@@ -175,7 +176,13 @@ export default function TextureEditor() {
     return () => { alive = false; };
   }, []);
 
-  useEffect(() => { setSaved(listSavedTextures()); }, []);
+  useEffect(() => {
+    setSaved(listSavedTextures());
+    // The library sync can bring textures down from another device while this is open.
+    const onSynced = () => setSaved(listSavedTextures());
+    window.addEventListener(LIBRARY_UPDATED, onSynced);
+    return () => window.removeEventListener(LIBRARY_UPDATED, onSynced);
+  }, []);
   const refreshSaved = useCallback(() => setSaved(listSavedTextures()), []);
 
   // ---- history -----------------------------------------------------------
