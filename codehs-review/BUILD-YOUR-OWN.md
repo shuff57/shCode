@@ -20,6 +20,14 @@ grid and Sling's aim, where the snake must be aimed" is.
 
 ---
 
+## Idea lists
+
+Each capstone's first step ends with a short "Stuck for an idea?" list (5.17 has one). A student
+asked for a roguelike (issue report #79, 2026-11-04), so every list carries one, sized to its unit:
+5.17 a tiny dungeon run (rooms, random enemies, one life, R is a fresh run); 6.28 the same with a
+grid level, a saved best run and title/play/over states; 7.21 an Enemy class with a few kinds,
+rooms made of instances, and items that change the player. Never name a commercial game.
+
 ## 5.17 Build your own: a small game, five mechanics
 
 **After 5.16 Snake. Last lesson of Unit 5. About 60 minutes, mostly build time. 0 points.**
