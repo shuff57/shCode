@@ -99,8 +99,14 @@
       },
       {
         "id": "r2",
-        "title": "It is a shot, not a cursor",
-        "description": "The line starts at the ball, not at the pointer.",
+        "title": "The pull is shown",
+        "description": "The distance from the ball to the pointer is shown on screen while aiming (text(), or a label the sketch draws).",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "The table has rails",
+        "description": "new Walls() is called in setup(), after new Canvas(), so the four rails exist. A call only in a comment or string does not count.",
         "points": 1
       }
     ]
