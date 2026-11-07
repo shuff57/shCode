@@ -24,6 +24,7 @@ import { AttemptBanner, PseudocodePanel } from './AttemptCap';
 import { useRepairLoop } from '../lib/use-attempt-cap';
 import CodeMirrorPane from './CodeMirrorPane';
 import dynamic from 'next/dynamic';
+import { withAlpha } from '../lib/color-alpha';
 
 // The editor engine is a few hundred kB; only the parts that set `formatting` download it.
 const RichAnswerEditor = dynamic(() => import('./RichAnswerEditor'), {
@@ -805,7 +806,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
                     padding: 12,
                     background: 'var(--c-bg)',
                     borderRadius: 6,
-                    border: '1px solid ' + color + '55',
+                    border: '1px solid ' + withAlpha(color, '55'),
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>

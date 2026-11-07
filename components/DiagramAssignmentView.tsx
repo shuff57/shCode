@@ -50,6 +50,7 @@ import GraderPicker, { useGraderChoice } from './GraderPicker';
 import { checkDiagram, allPassed, type CheckResult } from '../lib/diagram-check';
 import { describeDiagram, fromMermaid } from '../lib/diagram-mermaid';
 import { DEFAULT_RULES, emptyDiagram, type DiagramConfig, type DiagramDoc } from '../lib/diagram-types';
+import { withAlpha } from '../lib/color-alpha';
 
 const STORAGE_PREFIX = 'shCode:diagram:';
 
@@ -739,7 +740,7 @@ export default function DiagramAssignmentView({
                     padding: 12,
                     background: 'var(--c-bg)',
                     borderRadius: 6,
-                    border: '1px solid ' + color + '55',
+                    border: '1px solid ' + withAlpha(color, '55'),
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>

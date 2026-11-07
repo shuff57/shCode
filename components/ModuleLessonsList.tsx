@@ -13,6 +13,7 @@ import DueDateChip from './DueDateChip';
 import { useCountedLessons } from '../lib/lesson-counted';
 import LessonAccessChip from './LessonAccessChip';
 import { moduleSummaryForClass, ownDate, resolveForClass, useTeacherDue } from '../lib/due-dates-edit';
+import { withAlpha } from '../lib/color-alpha';
 
 interface LessonItem {
   id: string;
@@ -168,8 +169,8 @@ export default function ModuleLessonsList({
                 gap: 6,
                 fontSize: 11,
                 color: badge.color,
-                background: badge.color + '22',
-                border: '1px solid ' + badge.color + '55',
+                background: withAlpha(badge.color, '22'),
+                border: '1px solid ' + withAlpha(badge.color, '55'),
                 borderRadius: 999,
                 padding: '3px 10px',
                 textTransform: 'uppercase',
@@ -212,8 +213,8 @@ export default function ModuleLessonsList({
                 style={{
                   fontSize: 11,
                   color: stripeColor,
-                  background: stripeColor + '22',
-                  border: '1px solid ' + stripeColor + '55',
+                  background: withAlpha(stripeColor, '22'),
+                  border: '1px solid ' + withAlpha(stripeColor, '55'),
                   borderRadius: 999,
                   padding: '2px 8px',
                   fontWeight: 600,

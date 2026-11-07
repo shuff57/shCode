@@ -8,6 +8,7 @@
 
 import { Circle, CircleCheck, CircleX, Lightbulb, Sparkles } from 'lucide-react';
 import { isPassingGrade } from '../lib/grade-pass';
+import { withAlpha } from '../lib/color-alpha';
 
 export interface AiCriterion {
   id: string;
@@ -72,7 +73,7 @@ export default function AiGradeResultPanel({ title, titles, result, grading, sta
               const color = c.verdict === 'met' ? '#50fa7b' : c.verdict === 'partial' ? '#f1fa8c' : '#ff5555';
               const Icon = c.verdict === 'met' ? CircleCheck : c.verdict === 'partial' ? Circle : CircleX;
               return (
-                <div key={c.id || i} style={{ padding: 12, background: 'var(--c-bg)', borderRadius: 6, border: '1px solid ' + color + '55' }}>
+                <div key={c.id || i} style={{ padding: 12, background: 'var(--c-bg)', borderRadius: 6, border: '1px solid ' + withAlpha(color, '55') }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                     <Icon size={18} color={color} />
                     <strong style={{ color: 'var(--c-fg)' }}>{titles[c.id] || c.id}</strong>

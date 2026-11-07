@@ -48,6 +48,7 @@ import {
   DUPLICATE_ARROW_NOTICE,
 } from '../../lib/diagram-layout';
 import { edgeTypes } from './EditableEdge';
+import { withAlpha } from '../../lib/color-alpha';
 
 // ---- doc <-> react-flow ----
 
@@ -959,7 +960,7 @@ function Canvas({
                 gap: 7,
                 padding: '5px 11px',
                 background: 'var(--c-deep2)',
-                border: `1px solid ${SHAPE_COLORS[shape].stroke}66`,
+                border: `1px solid ${withAlpha(SHAPE_COLORS[shape].stroke, '66')}`,
                 borderRadius: 6,
                 color: 'var(--c-fg)',
                 fontSize: 12.5,

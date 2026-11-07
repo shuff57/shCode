@@ -15,6 +15,7 @@ import HeaderLessonNav from './HeaderLessonNav';
 import { withInlineCode } from './InlineCode';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import DocsDrawer from './DocsDrawer';
+import { withAlpha } from '../lib/color-alpha';
 
 interface Props {
   lesson: Lesson;
@@ -145,13 +146,13 @@ export default function ContentLessonView({ lesson }: Props) {
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
-            background: badge.color + '22',
+            background: withAlpha(badge.color, '22'),
             color: badge.color,
             padding: '4px 10px',
             borderRadius: 999,
             fontSize: 12,
             fontWeight: 600,
-            border: '1px solid ' + badge.color + '55',
+            border: '1px solid ' + withAlpha(badge.color, '55'),
           }}
         >
           <badge.Icon size={13} strokeWidth={2.25} />

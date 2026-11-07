@@ -12,6 +12,7 @@ import DueDateChip from './DueDateChip';
 import { useCountedLessons } from '../lib/lesson-counted';
 import LessonAccessChip from './LessonAccessChip';
 import { ownDate, ownOpenDate, resolveForClass, useTeacherDue } from '../lib/due-dates-edit';
+import { withAlpha } from '../lib/color-alpha';
 
 const typeBadgeColors: Record<string, string> = {
   lesson: '#5baafd',
@@ -73,13 +74,13 @@ export default function LessonCard({ lesson, lockedForStudent = false }: Props) 
               display: 'inline-flex',
               alignItems: 'center',
               gap: 6,
-              background: pBadge.color + '22',
+              background: withAlpha(pBadge.color, '22'),
               color: pBadge.color,
               padding: '2px 8px',
               borderRadius: 4,
               fontSize: 11,
               fontWeight: 600,
-              border: '1px solid ' + pBadge.color + '55',
+              border: '1px solid ' + withAlpha(pBadge.color, '55'),
               textTransform: 'uppercase',
               letterSpacing: '0.04em',
             }}
