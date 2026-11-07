@@ -1,0 +1,105 @@
+{
+  "id": "6-26-trail-2-quiz-trail-check",
+  "title": "6.26.2 Check: the Trail game",
+  "description": "Five multiple-choice questions on the snaking path, passing the turn, min, onMove and the waiting flag. Checked instantly.",
+  "type": "assignment",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.26 Trail: playtest and extend",
+  "preview": "quiz",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "quiz": {
+    "passPercent": 70,
+    "shuffle": true,
+    "questions": [
+      {
+        "id": "q1-snake",
+        "question": "COLS is 10. Square 13 is in row 1, an odd row, so its column is counted from the right with COLS - 1 - c. Which column is it drawn in?",
+        "options": [
+          "3",
+          "6",
+          "7",
+          "13"
+        ],
+        "answer": 1,
+        "explanation": "13 % 10 is 3, and on an odd row the column becomes 10 - 1 - 3, which is 6.",
+        "sourceIds": [
+          "6-22-trail-2-reading-a-path-is-a-list-of-squares"
+        ],
+        "source": "6.22.2"
+      },
+      {
+        "id": "q2-turn",
+        "question": "There are 2 players and turn is 1. What is (turn + 1) % players.length?",
+        "options": [
+          "2",
+          "1",
+          "0",
+          "3"
+        ],
+        "answer": 2,
+        "explanation": "2 % 2 is 0: after Blue, the turn goes back to Red, at index 0.",
+        "sourceIds": [
+          "6-23-trail-1-reading-a-die-and-whose-turn-it-is"
+        ],
+        "source": "6.23.1"
+      },
+      {
+        "id": "q3-min",
+        "question": "The finish is square 30. Red is on square 28 and rolls 5. Why does takeTurn move Red with min(p.at + 5, 30)?",
+        "options": [
+          "So the roll counts for less",
+          "So Red stops on square 30 instead of square 33, which is not on the board",
+          "So Red moves back to the start",
+          "So the next player rolls a smaller number"
+        ],
+        "answer": 1,
+        "explanation": "min gives the smaller of the two numbers, so a token can never pass the finish.",
+        "sourceIds": [
+          "6-23-trail-1-reading-a-die-and-whose-turn-it-is"
+        ],
+        "source": "6.23.1"
+      },
+      {
+        "id": "q4-onmove",
+        "question": "Online, why does the player who rolls send the roll instead of moving their own token?",
+        "options": [
+          "Sending is faster than moving",
+          "The other computer cannot draw tokens",
+          "Every move, your own too, comes back through onMove in one order, so both computers apply the same moves in the same order",
+          "online.send moves the token by itself"
+        ],
+        "answer": 2,
+        "explanation": "Moving tokens only in onMove means both boards run the same list of moves, so they stay the same.",
+        "sourceIds": [
+          "6-25-trail-1-reading-one-list-of-moves-two-computers"
+        ],
+        "source": "6.25.1"
+      },
+      {
+        "id": "q5-wait",
+        "question": "Blue lands on a W and the code sets Blue's waiting to true. What happens next?",
+        "options": [
+          "When the turn passes to Blue, Blue's turn is skipped once and the flag is set back to false",
+          "Blue moves back 3 squares",
+          "Blue never plays again",
+          "The game ends"
+        ],
+        "answer": 0,
+        "explanation": "nextTurn sees the flag, clears it, and passes the turn once more. Clearing it is what keeps the wait to one turn.",
+        "sourceIds": [
+          "6-24-trail-1-reading-the-square-decides"
+        ],
+        "source": "6.24.1"
+      }
+    ]
+  }
+}

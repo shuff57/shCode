@@ -1,0 +1,16 @@
+{
+  "moduleId": "6.26",
+  "source": "Trail chain module, one day.",
+  "lessons": [
+    {
+      "id": "trail-playtest-and-extend",
+      "title": "playtest and extend",
+      "objective": "Play it, find one surprise, link it to a line, change one rule.",
+      "screens": [
+        "6-26-trail-1-playtest-and-reflect",
+        "6-26-trail-2-quiz-trail-check",
+        "6-26-trail-3-challenges-make-it-yours"
+      ]
+    }
+  ]
+}

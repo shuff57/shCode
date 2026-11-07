@@ -1,0 +1,55 @@
+{
+  "id": "6-26-trail-1-playtest-and-reflect",
+  "title": "6.26.1 Playtest and reflect: Trail",
+  "description": "Play your Trail at least three times, once online if you can, find one thing that surprised you, link it to a line of your code and choose one change. AI-graded with hints.",
+  "type": "assignment",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.26 Trail: playtest and extend",
+  "preview": "assignment",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "aiGrader": {
+    "rubricTitle": "Playtest Trail: AI-graded rubric",
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": [],
+    "prompt": "Everything you need is in 6.22.1 (Plan: Break Trail into parts) and 6.25.3 (Lab: Trail online): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished Trail at least three times, once online with a classmate or a second tab if you can. Try to break it: land on every letter, roll near the end, press keys when it is not your turn. Then answer:\n\n1. How many times did you play, and how did it go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which line or part of your code do you think that comes from?\n\n4. What is one rule or number you would change, and what would it do to the game?",
+    "rubric": [
+      {
+        "id": "played",
+        "title": "Says how many times they played and how it went",
+        "description": "The student says they played, or gives any detail of a game (who won, a square landed on, playing online or on one computer, a way it went wrong). Any mention of playing earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Trail game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "bug",
+        "title": "Names one thing that surprised or broke",
+        "description": "The student names anything that surprised them, felt wrong or did not work as expected, however small. If they found nothing, saying so or naming something they tried earns full credit too. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Trail game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "cause",
+        "title": "Says which line or part of the code that touches",
+        "description": "The student connects what they saw to some part of the game or its code, such as makePath, the die, takeTurn, nextTurn, a letter's if, the waiting flag, min or max, online.send or onMove, even loosely or wrongly. Any guess at a cause earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Trail game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "change",
+        "title": "Names one rule they would change and what it would do",
+        "description": "The student names one rule, number or feature they would change or add, and says anything about what it would do. Any change, in any words, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Trail game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ]
+  },
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

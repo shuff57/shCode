@@ -1,0 +1,47 @@
+{
+  "id": "6-26-trail-3-challenges-make-it-yours",
+  "title": "6.26.3 Challenges: Make it yours",
+  "description": "Your Trail is complete. Change one rule of your own: three players, a token that hops one square at a time, or a new letter. Pick one; add an idea of your own on top if you like.",
+  "type": "lesson",
+  "estimateMins": 25,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.26 Trail: playtest and extend",
+  "preview": "moshion",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Pick a rule and change it",
+      "instructions": "Choose one of these three challenges. The check turns green when any one of them is in your code, so one is enough. An idea of your own is welcome on top of it. Start from your finished game in the editor.\n\n**Challenge 1: three players (easy).** Add a third object to `players` in `newGame()`, for example `{ name: 'Green', color: 'limegreen', at: 0, waiting: false }`. The turn already passes with `% players.length`, so nothing else has to change on one computer. Make `drawPlayers()` shift each token by `p * 16` so three fit on a square. Online, host a room for three with `online.host(3)`.\n\n**Challenge 2: a token that hops (medium).** Make the token walk its roll one square at a time instead of jumping there. In `takeTurn`, do not add the roll to `p.at`: keep it in a variable, `hops = r`. In `draw()`, every 10 frames (`frameCount % 10 === 0`) while `hops > 0`, move the player one square, `p.at += 1`, and take one off `hops`; stop at the last square. When `hops` reaches 0, do the rest of the turn: the letter, the win and the pass. Block SPACE while `hops > 0`.\n\n**Challenge 3: a new letter (hard to place, easy to code).** Invent a square of your own, such as `B` for \"back to the start\". Put the letter in `TRACK`, give it a colour in `COLORS`, and add its `if` to `takeTurn`: `if (kind === 'B') { p.at = 0; message += ', back to the start'; }`. Place it where a J or an S can never land on it (6.24.1): not 3 after a J or 3 before an S.",
+      "hints": [
+        "Whatever you pick, play a whole game afterwards and press R at the end.",
+        "A new letter needs all three: a letter in `TRACK`, a colour in `COLORS` and an `if` in `takeTurn`."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "You changed one rule of the game",
+      "description": "Any one challenge turns this green: a third player, a token that hops one square at a time, or a new letter with its own if. Help: 6.24.1 (Reading: The square decides)",
+      "hint": "if (kind === 'B') { p.at = 0; }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\{\\s*name\\s*:[^}]*\\}[\\s\\S]{0,300}?\\{\\s*name\\s*:[^}]*\\}[\\s\\S]{0,300}?\\{\\s*name\\s*:|\\bonline\\s*\\.\\s*host\\s*\\(\\s*[34]\\s*\\)|\\.\\s*at\\s*(?:\\+=\\s*1\\b|\\+\\+)|\\.\\s*at\\s*=\\s*[^;\\n]*?\\.\\s*at\\s*\\+\\s*1\\b(?!\\s*[\\d.])|===?\\s*[\\'\"](?![JSWF.][\\'\"])[A-Z][\\'\"]|\\bcase\\s+[\\'\"](?![JSWF.][\\'\"])[A-Z][\\'\"]",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": false
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "carryFrom": "6-25-trail-3-lab-trail-online"
+}

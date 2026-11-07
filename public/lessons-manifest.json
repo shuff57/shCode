@@ -10258,6 +10258,45 @@
       "scoreKind": null
     },
     {
+      "id": "6-26-trail-1-playtest-and-reflect",
+      "title": "6.26.1 Playtest and reflect: Trail",
+      "unit": "6.26 Trail: playtest and extend",
+      "preview": "assignment",
+      "type": "assignment",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 17,
+      "assignmentCode": null,
+      "maxScore": 4,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "6-26-trail-2-quiz-trail-check",
+      "title": "6.26.2 Check: the Trail game",
+      "unit": "6.26 Trail: playtest and extend",
+      "preview": "quiz",
+      "type": "assignment",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 17,
+      "assignmentCode": null,
+      "maxScore": 5,
+      "maxSubmissions": null,
+      "scoreKind": "quiz"
+    },
+    {
+      "id": "6-26-trail-3-challenges-make-it-yours",
+      "title": "6.26.3 Challenges: Make it yours",
+      "unit": "6.26 Trail: playtest and extend",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 17,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "6-3-1-slides",
       "title": "6.8.1 Slides: Physics Applications",
       "unit": "6.8 Physics Applications",
