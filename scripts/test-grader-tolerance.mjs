@@ -1532,6 +1532,13 @@ for (const id of Object.values(L)) {
       R('negative: the ball rises', 'r1', w('world.gravity.y = -10;')),
       R('negative through a variable', 'r1', w('const G = -10;' + nl + '  world.gravity.y = G;')),
       R('zero', 'r1', w('world.gravity.y = 0;')),
+      // #86: in math coordinates y grows up, so falling is a NEGATIVE gravity (5.1.25 teaches the mode).
+      A('math origin, negative', w("world.origin = 'math';" + nl + '  world.gravity.y = -10;')),
+      A('math origin, negative decimal', w('world.origin = "math";' + nl + '  world.gravity.y = -9.8;')),
+      A('math origin, negative through a variable', w("world.origin = 'math';" + nl + '  const G = -10;' + nl + '  world.gravity.y = G;')),
+      R('math origin, positive: the ball rises', 'r1', w("world.origin = 'math';" + nl + '  world.gravity.y = 10;')),
+      R('math origin, positive through a variable', 'r1', w("world.origin = 'math';" + nl + '  const G = 10;' + nl + '  world.gravity.y = G;')),
+      A('math origin only in a comment, positive', w("// world.origin = 'math';" + nl + '  world.gravity.y = 10;')),
     ]);
   }
 
