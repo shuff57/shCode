@@ -164,6 +164,41 @@ export const SEMANTIC_CHECKS = [
     },
   },
   {
+    name: 'losing focus releases a held key and button (no keyup ever arrives)',
+    area: 'input',
+    // shCode #78: hold 'a', click the editor, and the keyup went to the parent page.
+    // 'a' (and its 'left' twin) stayed held forever, so an if/else-if chain was stuck on
+    // that branch and no other key seemed to work.
+    run({ createSandbox }) {
+      const box = createSandbox();
+      box.run(`
+        seen = { a: false, left: false, mouse: false, released: 0, d: false };
+        function setup(){ new Canvas(200,200); }
+        function draw(){
+          seen.a = kb.pressing('a'); seen.left = kb.pressing('left'); seen.mouse = mouse.pressing();
+          if (kb.released('a')) seen.released++;
+          if (kb.pressing('a')) {} else if (kb.pressing('d')) seen.d = true;
+        }
+      `);
+      if (box.errors.length) return `sketch threw: ${box.errors[0].message}`;
+      box.pump(2);
+      box.input.keyDown('a');
+      box.input.mouseDown();
+      box.pump(3);
+      const s = box.sandbox.seen;
+      if (!s.a || !s.left || !s.mouse) return 'the key and button did not register before the blur';
+      box.input.blur();
+      box.pump(3);
+      if (s.a || s.left) return "kb.pressing('a') / 'left' still true after the sketch lost focus";
+      if (s.mouse) return 'mouse.pressing() still true after the sketch lost focus';
+      if (s.released !== 1) return `kb.released('a') fired on ${s.released} frames after the blur, expected exactly 1`;
+      box.input.keyDown('d');
+      box.pump(2);
+      if (!s.d) return "a later 'd' never reached its else-if branch";
+      return true;
+    },
+  },
+  {
     name: 'mouse.presses() is true for exactly one frame per click',
     area: 'input',
     run({ createSandbox }) {

@@ -378,6 +378,8 @@ export function createSandbox({ width = 800, height = 600 } = {}) {
     mouseMove: (x, y) => dispatch('canvas', 'mousemove', { clientX: x, clientY: y }),
     mouseDown: () => dispatch('canvas', 'mousedown', {}),
     mouseUp: () => dispatch('window', 'mouseup', {}),
+    // Focus leaves the sketch (a click on the editor, Alt-Tab): no keyup/mouseup follows.
+    blur: () => dispatch('window', 'blur', {}),
   };
 
   return {

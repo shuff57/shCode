@@ -54,6 +54,12 @@ it as a URL; a path or a data: URI still bypasses the store. The 8-bit palette
   after every copy. The two sound comment blocks also name the shCode mixer and
   `/moshion/assets/` here where the repo says "host page" and `/assets/`; the
   code is identical.
+- `moshion.js`, **not yet upstream (2026-11-06)**: a `window` `blur` listener
+  after the `mouseup` one releases every held key and mouse button (shCode
+  issue #78: a key held while focus left the sketch never got its keyup and
+  stayed pressed for good). Port it to `../moshion` and this bullet goes away;
+  until then a resync must re-apply it. Gate: the "losing focus releases a held
+  key" check in `scripts/moshion-checks.mjs` (and `blur()` in the harness).
 
 ## Kept as shCode's own (do not overwrite from the repo)
 
