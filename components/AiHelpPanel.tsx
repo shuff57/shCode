@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import AiAnswer from './AiAnswer';
+import CodyAvatar, { CODY_CAPTION, codyState } from './CodyAvatar';
 import { checkPromptSafety } from '../lib/pii-guard-client';
 import { useLessonStore } from '../lib/store';
 import type { Lesson } from '../lib/types';
@@ -143,8 +144,16 @@ export default function AiHelpPanel({ lesson }: Props) {
     if (q) ask(q);
   };
 
+  const cody = codyState({ busy: streaming || checking, hasAnswer: !!response.trim() });
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, gap: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <CodyAvatar state={cody} />
+        {/* The drawer's own title already says CODY; this line says what CODY is doing. */}
+        <div role="status" style={{ color: '#8393c4', fontSize: 12.5 }}>{CODY_CAPTION[cody]}</div>
+      </div>
+
       {lastError ? (
         <div
           style={{

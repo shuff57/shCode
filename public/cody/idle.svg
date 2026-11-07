@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <!-- CODY placeholder, idle: three dots breathing slowly. Our own design (shCode #88);
+       the student's PNGs replace these in components/CodyAvatar.tsx. -->
+  <style>
+    .dot { transform-box: fill-box; transform-origin: center; animation: breathe 2.4s ease-in-out infinite; }
+    .d2 { animation-delay: .3s; } .d3 { animation-delay: .6s; }
+    .lamp { animation: glow 3.2s ease-in-out infinite; }
+    @keyframes breathe { 0%, 100% { opacity: .45; transform: scale(.85); } 50% { opacity: 1; transform: scale(1); } }
+    @keyframes glow { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .dot, .lamp { animation: none; opacity: 1; transform: none; } }
+  </style>
+  <line x1="24" y1="9" x2="24" y2="4.5" stroke="#bd93f9" stroke-width="2" stroke-linecap="round"/>
+  <circle class="lamp" cx="24" cy="3.5" r="2.5" fill="#ff79c6"/>
+  <rect x="4" y="9" width="40" height="32" rx="12" fill="#282a36" stroke="#bd93f9" stroke-width="2"/>
+  <circle class="dot d1" cx="15" cy="25" r="3.5" fill="#8be9fd"/>
+  <circle class="dot d2" cx="24" cy="25" r="3.5" fill="#8be9fd"/>
+  <circle class="dot d3" cx="33" cy="25" r="3.5" fill="#8be9fd"/>
+</svg>

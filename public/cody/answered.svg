@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <!-- CODY placeholder, answered: two dots become eyes and the third becomes a smile.
+       Our own design (shCode #88). Plays once, then rests. -->
+  <style>
+    .face { transform-box: fill-box; transform-origin: center; animation: pop .32s cubic-bezier(.2,.9,.3,1.2) both; }
+    .smile { stroke-dasharray: 20; stroke-dashoffset: 20; animation: draw .45s .12s ease-out forwards; }
+    .eye { transform-box: fill-box; transform-origin: center; animation: blink 4s 1.5s ease-in-out infinite; }
+    @keyframes pop { from { transform: scale(.9); } to { transform: scale(1); } }
+    @keyframes draw { to { stroke-dashoffset: 0; } }
+    @keyframes blink { 0%, 94%, 100% { transform: scaleY(1); } 97% { transform: scaleY(.15); } }
+    @media (prefers-reduced-motion: reduce) { .face, .eye { animation: none; } .smile { animation: none; stroke-dashoffset: 0; } }
+  </style>
+  <line x1="24" y1="9" x2="24" y2="4.5" stroke="#bd93f9" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="24" cy="3.5" r="2.5" fill="#50fa7b"/>
+  <g class="face">
+    <rect x="4" y="9" width="40" height="32" rx="12" fill="#282a36" stroke="#bd93f9" stroke-width="2"/>
+    <circle class="eye" cx="17" cy="22" r="3.5" fill="#50fa7b"/>
+    <circle class="eye" cx="31" cy="22" r="3.5" fill="#50fa7b"/>
+    <path class="smile" d="M17 30 Q24 36 31 30" fill="none" stroke="#50fa7b" stroke-width="3" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <!-- CODY placeholder, thinking: the dots hop in a wave while the answer streams in.
+       Our own design (shCode #88). -->
+  <style>
+    .dot { transform-box: fill-box; transform-origin: center; animation: hop 1s cubic-bezier(.45,0,.55,1) infinite; }
+    .d2 { animation-delay: .15s; } .d3 { animation-delay: .3s; }
+    .lamp { animation: blink .5s steps(2, jump-none) infinite alternate; }
+    @keyframes hop { 0%, 60%, 100% { transform: translateY(0); opacity: .6; } 30% { transform: translateY(-5px); opacity: 1; } }
+    @keyframes blink { from { opacity: .35; } to { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { .dot, .lamp { animation: none; opacity: 1; transform: none; } }
+  </style>
+  <line x1="24" y1="9" x2="24" y2="4.5" stroke="#bd93f9" stroke-width="2" stroke-linecap="round"/>
+  <circle class="lamp" cx="24" cy="3.5" r="2.5" fill="#ffb86c"/>
+  <rect x="4" y="9" width="40" height="32" rx="12" fill="#282a36" stroke="#bd93f9" stroke-width="2"/>
+  <circle class="dot d1" cx="15" cy="27" r="3.5" fill="#f1fa8c"/>
+  <circle class="dot d2" cx="24" cy="27" r="3.5" fill="#f1fa8c"/>
+  <circle class="dot d3" cx="33" cy="27" r="3.5" fill="#f1fa8c"/>
+</svg>
