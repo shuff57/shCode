@@ -354,7 +354,7 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   `isLessonAccessible` fails open. localStorage remains the offline draft.
 - Teacher pushes to a student's pool stamp `authored_by_email = session.email`
   server-side; clients cannot set it. Legacy NULLs coerce to `student_email`.
-- **CODY** (Code. Optimizer. Development. Yielder.) is the student-facing name of the `/api/ai-help` tutor. On Workers AI (the `AI` binding) students have no per-student cap and get `X-RateLimit-Unlimited: 1`; the UI hides the "helps left" line. The per-student per-unit quota below applies only on the Ollama fallback. The global ceiling counts both.
+- **CODY** (Code. Optimizer. Development. Yielder.) is the student-facing name of the `/api/ai-help` tutor. In the free sandbox (`lessonId` `sandbox-js|moshion|reshape`, code mode only) it answers directly with code blocks up to 15 lines but never writes the whole program (#83, `isSandboxHelp` in `functions/api/ai-help.ts`); code that carries `// STEP` comments, a `// 5.3.4`-style lesson header or "reference solution" is pasted course work and gets the hint-only rules, decided server-side because the lesson id is client-supplied. On Workers AI (the `AI` binding) students have no per-student cap and get `X-RateLimit-Unlimited: 1`; the UI hides the "helps left" line. The per-student per-unit quota below applies only on the Ollama fallback. The global ceiling counts both.
 - `POST /api/ai-help` streams `text/plain` from Workers AI (`lib/workers-ai.ts`), trims code blocks to <=3 lines, and
   is quota'd per student **per unit** per UTC day (`AI_HELP_DAILY_LIMIT`). The
   unit in the bucket key is resolved SERVER-SIDE from
