@@ -1,0 +1,19 @@
+{
+  "id": "6-22-trail-2-reading-a-path-is-a-list-of-squares",
+  "title": "6.22.2 Reading: A path is a list of squares",
+  "description": "A board is a list of squares in walking order; the track is one line of text, and each square's row, column and centre come from its index.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.22 Trail: plan and the path",
+  "preview": "reading",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

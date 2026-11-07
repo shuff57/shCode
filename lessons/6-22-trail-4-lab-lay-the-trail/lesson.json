@@ -1,0 +1,110 @@
+{
+  "id": "6-22-trail-4-lab-lay-the-trail",
+  "title": "6.22.4 Lab: Lay the trail",
+  "description": "The whole board from one line of text: rows that snake back and forth, and a token that steps along them to prove the order.",
+  "type": "lesson",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.22 Trail: plan and the path",
+  "preview": "moshion",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The board is empty and the top says `Square 0 of -1`. `makePath` hands back an empty list, so there are no squares to draw or stand on."
+    },
+    {
+      "id": "s2",
+      "title": "One square per letter",
+      "instructions": "In `makePath`, loop `i` from 0 up to `track.length`. For each one, work out the row `r = floor(i / COLS)` and the column `c = i % COLS`, then push `{ x: c * SIZE + SIZE / 2, y: TOP + r * SIZE + SIZE / 2, kind: track[i] }` onto `squares`. Run: four rows of squares appear.",
+      "hints": [
+        "Make `c` a `let`: the next step changes it.",
+        "The y has `TOP` added so the board sits below the words."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Snake the odd rows",
+      "instructions": "Press SPACE to step the token along. At the end of the first row it jumps back to the left edge. Turn every odd row around: `if (r % 2 === 1) c = COLS - 1 - c;`, before the push. Now square 10 sits right below square 9 and the token walks one long winding path.",
+      "hints": [
+        "`r % 2 === 1` is true on rows 1 and 3.",
+        "Count the colours: each letter of `TRACK` is one square, so a J, S, W or F shows where its letter is."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A loop over the track",
+      "description": "makePath loops over every letter of the track. Help: 6.22.2 (Reading: A path is a list of squares)",
+      "hint": "for (let i = 0; i < track.length; i++) { ... }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bfor\\s*\\([^)]*\\btrack\\b|\\btrack\\s*\\.\\s*(?:forEach|split)\\s*\\(",
+      "flags": "i",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "An odd row is turned around",
+      "description": "On an odd row the column is counted from the other side, so the path snakes. Help: 6.22.2 (Reading: A path is a list of squares)",
+      "hint": "if (r % 2 === 1) c = COLS - 1 - c;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bCOLS\\s*-\\s*1\\s*-|\\(\\s*COLS\\s*-\\s*1\\s*\\)\\s*-|\\bCOLS\\s*-\\s*\\(\\s*[\\w$]+\\s*\\+\\s*1\\s*\\)|\\bCOLS\\s*-\\s*[\\w$]+\\s*-\\s*1\\b|\\b9\\s*-\\s*[A-Za-z_$]|\\.\\s*reverse\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "Each square keeps x, y and kind",
+      "description": "Each square pushed onto the list has an x, a y and its letter as kind. Help: 6.22.2 (Reading: A path is a list of squares)",
+      "hint": "squares.push({ x: c * SIZE + SIZE / 2, y: TOP + r * SIZE + SIZE / 2, kind: track[i] });",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*push\\s*\\(\\s*\\{(?=[^}]*\\bx\\b)(?=[^}]*\\by\\b)(?=[^}]*\\bkind\\b)|\\{(?=[^}]*\\bx\\s*:)(?=[^}]*\\by\\s*:)(?=[^}]*\\bkind\\b)[^}]*\\}[\\s\\S]{0,200}?\\.\\s*push\\s*\\(|\\[\\s*[\\w$]+\\s*\\]\\s*=\\s*\\{(?=[^}]*\\bx\\b)(?=[^}]*\\by\\b)(?=[^}]*\\bkind\\b)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Lay the trail\". The task: fill in makePath so it loops over the track text, works out each square's row and column from its index, turns odd rows around so the path snakes, and pushes { x, y, kind } for every square. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "One square per letter",
+        "description": "The loop runs over the whole track.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The path snakes",
+        "description": "Odd rows run the other way.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "x, y and kind",
+        "description": "Each square keeps its centre and its letter.",
+        "points": 1
+      }
+    ]
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "id": "6-22-trail-3-sub-a-path-from-a-list",
+  "title": "6.22.3 Sub-build: A path from a list",
+  "description": "Six squares in a list, one loop, one number on each. The picture is drawn from the data.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.22 Trail: plan and the path",
+  "preview": "moshion",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The canvas is empty. The six squares are in the list `path`, but nothing draws them yet."
+    },
+    {
+      "id": "s2",
+      "title": "Draw every square",
+      "instructions": "In `draw()`, write a `for` loop over `path`. Inside it, `fill` a colour and draw `rect(path[i].x - 30, path[i].y - 30, 60, 60, 6)`. Six boxes should appear in a U shape.",
+      "hints": [
+        "`rect` starts at the top-left corner, so the box is moved half its size (30) up and left from the centre.",
+        "Loop to `path.length`, not to 6, so the loop always matches the list."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Number them",
+      "instructions": "In the same loop, write the square's number on it: `text(String(i), path[i].x - 5, path[i].y + 6, 16, 'white')`. The numbers run 0 to 5 around the U.",
+      "hints": [
+        "Change one `{ x, y }` in the list and Run again: the picture follows the data."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A loop over the path",
+      "description": "A loop visits every square in `path`. Help: 6.22.2 (Reading: A path is a list of squares)",
+      "hint": "for (let i = 0; i < path.length; i++) { ... }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bfor\\s*\\([^)]*\\bpath\\b|\\bpath\\s*\\.\\s*forEach\\s*\\(|\\bfor\\s*\\([^)]*\\)[\\s\\S]{0,200}?\\bpath\\s*\\[|\\bwhile\\s*\\([^)]*\\bpath\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "A box at each square",
+      "description": "A rect is drawn at each square's x and y. Help: 6.22.2 (Reading: A path is a list of squares)",
+      "hint": "rect(path[i].x - 30, path[i].y - 30, 60, 60, 6);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\brect\\s*\\([^;]*\\bx\\b[^;]*\\by\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "Each square shows its number",
+      "description": "The loop writes the square's number with text(). Help: 6.22.2 (Reading: A path is a list of squares)",
+      "hint": "text(String(i), path[i].x - 5, path[i].y + 6, 16, 'white');",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\btext\\s*\\(\\s*(?:[A-Za-z_$(]|[\\'\"`][^\\'\"`]*[\\'\"`]\\s*\\+|`[^`]*\\$\\{)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: A path from a list\". The task: loop over a list of six { x, y } squares, draw a box at each one from its x and y, and write each square's number on it. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A loop over the list",
+        "description": "Every square in path is visited.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Drawn from the data",
+        "description": "The box is placed from path[i].x and path[i].y.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Numbered",
+        "description": "Each square shows its index.",
+        "points": 1
+      }
+    ]
+  }
+}

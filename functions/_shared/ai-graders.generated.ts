@@ -10149,6 +10149,54 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
+  "6-22-trail-3-sub-a-path-from-a-list": {
+    "lessonTitle": "6.22.3 Sub-build: A path from a list",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: A path from a list\". The task: loop over a list of six { x, y } squares, draw a box at each one from its x and y, and write each square's number on it. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A loop over the list",
+        "description": "Every square in path is visited.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Drawn from the data",
+        "description": "The box is placed from path[i].x and path[i].y.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Numbered",
+        "description": "Each square shows its index.",
+        "points": 1
+      }
+    ]
+  },
+  "6-22-trail-4-lab-lay-the-trail": {
+    "lessonTitle": "6.22.4 Lab: Lay the trail",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Lay the trail\". The task: fill in makePath so it loops over the track text, works out each square's row and column from its index, turns odd rows around so the path snakes, and pushes { x, y, kind } for every square. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "One square per letter",
+        "description": "The loop runs over the whole track.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The path snakes",
+        "description": "Odd rows run the other way.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "x, y and kind",
+        "description": "Each square keeps its centre and its letter.",
+        "points": 1
+      }
+    ]
+  },
   "6-3-pocket-2-sub-slow-to-a-stop": {
     "lessonTitle": "6.3.2 Sub-build: Slow to a stop",
     "prompt": "The student wrote a moSHion sketch for \"Sub-build: Slow to a stop\". The task: give the ball drag and call it stopped when its speed falls under a small number, setting the speed to 0. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",

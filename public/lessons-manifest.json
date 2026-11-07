@@ -10089,6 +10089,58 @@
       "scoreKind": null
     },
     {
+      "id": "6-22-trail-1-plan-break-trail-into-parts",
+      "title": "6.22.1 Plan: Break Trail into parts",
+      "unit": "6.22 Trail: plan and the path",
+      "preview": "assignment",
+      "type": "assignment",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 17,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "6-22-trail-2-reading-a-path-is-a-list-of-squares",
+      "title": "6.22.2 Reading: A path is a list of squares",
+      "unit": "6.22 Trail: plan and the path",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 17,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "6-22-trail-3-sub-a-path-from-a-list",
+      "title": "6.22.3 Sub-build: A path from a list",
+      "unit": "6.22 Trail: plan and the path",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 17,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "6-22-trail-4-lab-lay-the-trail",
+      "title": "6.22.4 Lab: Lay the trail",
+      "unit": "6.22 Trail: plan and the path",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 17,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "6-3-1-slides",
       "title": "6.8.1 Slides: Physics Applications",
       "unit": "6.8 Physics Applications",
