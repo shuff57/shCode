@@ -19,7 +19,7 @@
 // Every colour comes from lib/tokens.js. Helper names are ms* (from the 5.1.2/5.1.12 explainers) or gr* (new). Lib globals
 // (frame, label, draw, tick, dot, move, rect, X, NEG, ...) must not be shadowed.
 'use strict';
-const CHAPTER = { number: 1, type: 'explainer', title: 'Gravity', kicker: 'moSHion · 5.2.6',
+const CHAPTER = { number: 1, type: 'explainer', title: 'Gravity', kicker: 'moSHion · Physics Feel',
   meta: 'Under 3 minutes, with sound and captions. One play-through, no questions.', minutes: 3, language: 'en', coverGo: 'Play' };
 
 // ---- layout (stage px, 1600x900; y >= 780 is the caption bar's, the bottom-left corner (x < 232, y > 522) is the character's) ----
@@ -230,7 +230,7 @@ const BEATS = [
   ['hello', 'Nothing falls', (m, D) => {
     const p = panel(0);
     S.title = G(p);
-    show(msText(S.title, 'moSHion · 5.2.6', { x: 70, y: 74, size: 22, fill: COL.purple, weight: 600, o: 0 }), m('still', -.1), .4);
+    show(msText(S.title, 'moSHion · Physics Feel', { x: 70, y: 74, size: 22, fill: COL.purple, weight: 600, o: 0 }), m('still', -.1), .4);
     const tt = msText(S.title, 'Gravity', { x: 70, y: 124, size: 46, fill: COL.text, weight: 600, o: 0 });
     tw(tt, { o: 1, y: 124 }, m('still'), .5, out); put(tt, { y: 136 });
     S.code = grCode(p, m('still'));
@@ -423,8 +423,8 @@ const BEATS = [
     row([['world.gravity.y', SX.ident, 500, MONO], ['   one number for the whole world', COL.text, 500]], 210, m('sum', -.05), 38);
     row([['0', ST.y, 600, MONO], [' floats     ', COL.muted], ['10', ST.y, 600, MONO], [' falls     ', COL.muted], ['-5', ST.y, 600, MONO], [' pulls up', COL.muted]], 292, m('zero', -.05), 36);
     show(msText(p, 'UP NEXT', { x: 800, y: 440, size: 22, fill: COL.purple, weight: 600, anchor: 'middle', o: 0 }), m('next', -.05), .35);
-    row([['5.2.8 Lab: Tune Gravity', COL.text]], 512, m('next', .15), 52);
-    row([['change the number, and watch what the ball does', COL.muted]], 580, m('next', 1.1), 30, 500);
+    row([['The reading: Gravity', COL.text]], 512, m('next', .15), 52);
+    row([['then change the number, and watch the ball', COL.muted]], 580, m('next', 1.1), 30, 500);
     msHold(Math.max(D, m('bye', 1.8)) + .1);
   }],
 ].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));

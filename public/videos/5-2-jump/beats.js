@@ -20,7 +20,7 @@
 // Every colour comes from lib/tokens.js. Helper names are ms* (from the 5.1.2/5.1.12 explainers) or jp* (new). Lib
 // globals (frame, label, draw, tick, dot, move, rect, X, NEG, ...) must not be shadowed.
 'use strict';
-const CHAPTER = { number: 1, type: 'explainer', title: 'The jump', kicker: 'moSHion · 5.2.10',
+const CHAPTER = { number: 1, type: 'explainer', title: 'The jump', kicker: 'moSHion · Physics Feel',
   meta: 'Under 3 minutes, with sound and captions. One play-through, no questions.', minutes: 3, language: 'en', coverGo: 'Play' };
 
 // ---- layout (stage px, 1600x900; y >= 780 is the caption bar's, the bottom-left corner (x < 232, y > 522) is the character's) ----
@@ -231,7 +231,7 @@ const BEATS = [
   ['hello', 'It has never jumped', (m, D) => {
     const p = panel(0);
     S.title = G(p);
-    show(msText(S.title, 'moSHion · 5.2.10', { x: 70, y: 74, size: 22, fill: COL.purple, weight: 600, o: 0 }), m('move', -.1), .4);
+    show(msText(S.title, 'moSHion · Physics Feel', { x: 70, y: 74, size: 22, fill: COL.purple, weight: 600, o: 0 }), m('move', -.1), .4);
     const tt = msText(S.title, 'The jump', { x: 70, y: 124, size: 46, fill: COL.text, weight: 600, o: 0 });
     tw(tt, { o: 1, y: 124 }, m('move'), .5, out); put(tt, { y: 136 });
     S.code = grCode(p, m('move'));
@@ -410,8 +410,8 @@ const BEATS = [
     row([['kb.presses', SX.ident, 500, MONO], ['   fires once per press', COL.text, 500]], 210, m('sum', -.05), 38);
     row([['colliding', SX.ident, 500, MONO], ['   asks if the player touches the ground', COL.text, 500]], 292, m('ground', -.05), 36);
     show(msText(p, 'UP NEXT', { x: 800, y: 440, size: 22, fill: COL.purple, weight: 600, anchor: 'middle', o: 0 }), m('next', -.05), .35);
-    row([['5.2.11 Bounciness and Friction', COL.text]], 512, m('next', .15), 46);
-    row([['two dials that change how the game feels', COL.muted]], 580, m('next', 1.1), 30, 500);
+    row([['The reading: Ground-Gated Actions', COL.text]], 512, m('next', .15), 46);
+    row([['then add a jump of your own', COL.muted]], 580, m('next', 1.1), 30, 500);
     msHold(Math.max(D, m('bye', 1.8)) + .1);
   }],
 ].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));

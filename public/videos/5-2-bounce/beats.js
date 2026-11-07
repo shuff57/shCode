@@ -29,7 +29,7 @@
 // Every colour comes from lib/tokens.js. Helper names are bf*; lib globals (frame, label, draw, tick, dot, move, rect, X,
 // NEG, ...) are not shadowed.
 'use strict';
-const CHAPTER = { number: 1, type: 'explainer', title: 'Bounciness and Friction, Explained', kicker: 'moSHion · 5.2.11',
+const CHAPTER = { number: 1, type: 'explainer', title: 'Bounciness and Friction, Explained', kicker: 'moSHion · Physics Feel',
   meta: 'Two and a half minutes, with sound and captions.', minutes: 3, language: 'en', coverGo: 'Play' };
 
 // ---- layout (stage px, 1600x900; y >= 780 is the caption bar's, the bottom-left corner (x < 232, y > 522) is SH's) ----
@@ -601,8 +601,8 @@ const BEATS = [
     row([['friction', COL.text, 600], ['  0 is ice, a higher number stops a slide sooner', COL.muted, 500]], 314, m('fr', -.05), 34);
     hide(cl1, m('bn', -.35), .2); hide(cl2, m('fr', -.35), .2);
     show(bfText(p, 'UP NEXT', { x: 800, y: 440, size: 22, fill: COL.purple, weight: 600, anchor: 'middle', o: 0 }), m('next', -.05), .35);
-    row([['5.2.12 Bouncy Ball', COL.text]], 512, m('next', .15), 52);
-    row([['a bouncy ball of your own', COL.muted]], 580, m('next', 1.1), 30, 500);
+    row([['The reading: Bounciness and Friction', COL.text]], 512, m('next', .15), 44);
+    row([['then a bouncy ball of your own', COL.muted]], 580, m('next', 1.1), 30, 500);
     bfHold(D + .1);   // ears round: the old 1.8 s hold after "See you there!" was length with no picture in it
   }],
 ].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));

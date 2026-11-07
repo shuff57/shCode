@@ -736,85 +736,97 @@ window.TIMINGS = {
   ]
  },
  "close": {
-  "dur": 15.888,
+  "dur": 16.392,
   "marks": {
-   "both": 0.111,
-   "bn": 3.097,
-   "fr": 7.514,
-   "next": 10.194,
-   "bye": 14.903
+   "both": 0.097,
+   "bn": 3.236,
+   "fr": 8.014,
+   "next": 10.75,
+   "bye": 15.389
   },
   "cues": [
    [
-    0.111,
+    0.097,
     "Both numbers sit on every sprite."
    ],
    [
-    3.097,
+    3.236,
     "For bounciness, zero sticks and one keeps full speed."
    ],
    [
-    7.514,
+    8.014,
     "For friction, zero is ice."
    ],
    [
-    10.194,
-    "Next, in 5.2.12, you build a bouncy ball of your own."
+    10.75,
+    "Up next, the reading,"
    ],
    [
-    14.903,
+    13.0,
+    "then you build a bouncy ball of your own."
+   ],
+   [
+    15.389,
     "See you there!"
    ]
   ],
   "caps": [
    [
-    0.111,
+    0.097,
     "Both numbers sit on every sprite."
    ],
    [
-    3.097,
+    3.236,
     "For bounciness, zero sticks and one keeps full speed."
    ],
    [
-    7.514,
+    8.014,
     "For friction, zero is ice."
    ],
    [
-    10.194,
-    "Next, in 5.2.12, you build a bouncy ball of your own."
+    10.75,
+    "Up next, the reading,"
    ],
    [
-    14.903,
+    13.0,
+    "then you build a bouncy ball of your own."
+   ],
+   [
+    15.389,
     "See you there!"
    ]
   ],
   "capsNarrow": [
    [
-    0.111,
+    0.097,
     "Both numbers sit on every sprite."
    ],
    [
-    3.097,
+    3.236,
     "For bounciness,"
    ],
    [
-    4.083,
+    4.542,
     "zero sticks and one keeps full speed."
    ],
    [
-    7.514,
+    8.014,
     "For friction, zero is ice."
    ],
    [
-    10.194,
-    "Next, in 5.2.12,"
+    10.75,
+    "Up next, the reading,"
    ],
    [
-    12.764,
-    "you build a bouncy ball of your own."
+    13.0,
+    "then you build a bouncy"
    ],
    [
-    14.903,
+    14.181,
+    "ball of your own."
+   ],
+   [
+    15.389,
     "See you there!"
    ]
   ]

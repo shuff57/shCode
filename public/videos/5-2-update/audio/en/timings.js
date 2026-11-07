@@ -561,17 +561,17 @@ window.TIMINGS = {
   ]
  },
  "halves": {
-  "dur": 30.864,
+  "dur": 29.952,
   "marks": {
    "rules": 0.111,
-   "picture": 5.0,
-   "jump": 8.903,
-   "play": 13.861,
-   "d": 16.319,
-   "space": 19.333,
-   "land": 22.25,
-   "nothing": 24.417,
-   "moved": 26.5
+   "picture": 4.694,
+   "jump": 8.736,
+   "play": 12.639,
+   "d": 14.972,
+   "space": 17.833,
+   "land": 20.861,
+   "nothing": 23.236,
+   "moved": 25.472
   },
   "cues": [
    [
@@ -579,43 +579,43 @@ window.TIMINGS = {
     "So put the rules in update():"
    ],
    [
-    2.028,
+    1.986,
     "the keys, the movement, the jump."
    ],
    [
-    5.0,
+    4.694,
     "Put the picture in draw(): the background and the words."
    ],
    [
-    8.903,
-    "Here is the jump scene from 5.2.10, split in two."
+    8.736,
+    "Here is the jump scene from the jump lab, split in two."
    ],
    [
-    13.861,
+    12.639,
     "It plays exactly like before."
    ],
    [
-    16.319,
+    14.972,
     "Hold d, and the player slides right."
    ],
    [
-    19.333,
+    17.833,
     "Press space on the ground, and it jumps."
    ],
    [
-    22.25,
+    20.861,
     "It falls back down and lands."
    ],
    [
-    24.417,
+    23.236,
     "Nothing new happens on the screen."
    ],
    [
-    26.5,
+    25.472,
     "The same lines are now in the function"
    ],
    [
-    28.653,
+    27.556,
     "that runs before physics."
    ]
   ],
@@ -625,43 +625,43 @@ window.TIMINGS = {
     "So put the rules in update():"
    ],
    [
-    2.028,
+    1.986,
     "the keys, the movement, the jump."
    ],
    [
-    5.0,
+    4.694,
     "Put the picture in draw(): the background and the words."
    ],
    [
-    8.903,
-    "Here is the jump scene from 5.2.10, split in two."
+    8.736,
+    "Here is the jump scene from the jump lab, split in two."
    ],
    [
-    13.861,
+    12.639,
     "It plays exactly like before."
    ],
    [
-    16.319,
+    14.972,
     "Hold d, and the player slides right."
    ],
    [
-    19.333,
+    17.833,
     "Press space on the ground, and it jumps."
    ],
    [
-    22.25,
+    20.861,
     "It falls back down and lands."
    ],
    [
-    24.417,
+    23.236,
     "Nothing new happens on the screen."
    ],
    [
-    26.5,
+    25.472,
     "The same lines are now in the function"
    ],
    [
-    28.653,
+    27.556,
     "that runs before physics."
    ]
   ],
@@ -671,148 +671,160 @@ window.TIMINGS = {
     "So put the rules in update():"
    ],
    [
-    2.028,
+    1.986,
     "the keys, the movement, the jump."
    ],
    [
-    5.0,
+    4.694,
     "Put the picture in draw():"
    ],
    [
-    6.653,
+    6.375,
     "the background and the words."
    ],
    [
-    8.903,
-    "Here is the jump scene from 5.2.10,"
+    8.736,
+    "Here is the jump scene from"
    ],
    [
-    12.417,
-    "split in two."
+    10.111,
+    "the jump lab, split in two."
    ],
    [
-    13.861,
+    12.639,
     "It plays exactly like before."
    ],
    [
-    16.319,
+    14.972,
     "Hold d, and the player slides right."
    ],
    [
-    19.333,
+    17.833,
     "Press space on the ground,"
    ],
    [
-    20.917,
+    19.472,
     "and it jumps."
    ],
    [
-    22.25,
+    20.861,
     "It falls back down and lands."
    ],
    [
-    24.417,
+    23.236,
     "Nothing new happens on the screen."
    ],
    [
-    26.5,
+    25.472,
     "The same lines are now in the function"
    ],
    [
-    28.653,
+    27.556,
     "that runs before physics."
    ]
   ]
  },
  "close": {
-  "dur": 14.424,
+  "dur": 13.464,
   "marks": {
-   "sum": 0.083,
-   "pic": 1.931,
-   "first": 3.639,
-   "whole": 6.625,
-   "next": 8.167,
-   "bye": 13.431
+   "sum": 0.097,
+   "pic": 2.069,
+   "first": 3.722,
+   "whole": 6.694,
+   "next": 8.264,
+   "bye": 12.5
   },
   "cues": [
    [
-    0.083,
+    0.097,
     "Rules inside update()."
    ],
    [
-    1.931,
+    2.069,
     "Picture inside draw()."
    ],
    [
-    3.639,
+    3.722,
     "Update runs first, before physics."
    ],
    [
-    6.625,
+    6.694,
     "That is the whole idea."
    ],
    [
-    8.167,
-    "Up next, 5.2.22: a lab that puts the rules in update()."
+    8.264,
+    "Up next, the reading,"
    ],
    [
-    13.431,
+    9.833,
+    "then a lab that puts the rules in update()."
+   ],
+   [
+    12.5,
     "See you there!"
    ]
   ],
   "caps": [
    [
-    0.083,
+    0.097,
     "Rules inside update()."
    ],
    [
-    1.931,
+    2.069,
     "Picture inside draw()."
    ],
    [
-    3.639,
+    3.722,
     "Update runs first, before physics."
    ],
    [
-    6.625,
+    6.694,
     "That is the whole idea."
    ],
    [
-    8.167,
-    "Up next, 5.2.22: a lab that puts the rules in update()."
+    8.264,
+    "Up next, the reading,"
    ],
    [
-    13.431,
+    9.833,
+    "then a lab that puts the rules in update()."
+   ],
+   [
+    12.5,
     "See you there!"
    ]
   ],
   "capsNarrow": [
    [
-    0.083,
+    0.097,
     "Rules inside update()."
    ],
    [
-    1.931,
+    2.069,
     "Picture inside draw()."
    ],
    [
-    3.639,
+    3.722,
     "Update runs first, before physics."
    ],
    [
-    6.625,
+    6.694,
     "That is the whole idea."
    ],
    [
-    8.167,
-    "Up next, 5.2.22:"
+    8.264,
+    "Up next, the reading,"
    ],
    [
-    10.958,
-    "a lab that puts the rules in update()."
+    9.833,
+    "then a lab that puts"
    ],
    [
-    13.431,
+    10.875,
+    "the rules in update()."
+   ],
+   [
+    12.5,
     "See you there!"
    ]
   ]

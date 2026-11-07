@@ -29,7 +29,7 @@
 // Every colour comes from lib/tokens.js. Helper names are dl* (the spec's prefix). Lib globals (frame, label, draw,
 // tick, dot, move, rect, X, NEG, ...) must not be shadowed.
 'use strict';
-const CHAPTER = { number: 1, type: 'explainer', title: 'Delete and Hide, Explained', kicker: 'moSHion · 5.2.15',
+const CHAPTER = { number: 1, type: 'explainer', title: 'Delete and Hide, Explained', kicker: 'moSHion · Physics Feel',
   meta: 'Under 2 minutes, with sound and captions. One play-through, no questions.', minutes: 2, language: 'en', coverGo: 'Play' };
 
 // ---- layout (stage px, 1600x900; y >= 780 is the caption bar's, the bottom-left corner (x < 232, y > 522) is the character's) ----
@@ -234,7 +234,7 @@ const BEATS = [
   ['hello', 'Two ways', (m, D) => {
     const p = panel(0), ST = STG(), H = D + .1;
     const K = S.title = G(p);
-    show(dlText(K, 'moSHion · 5.2.15', { x: 70, y: 74, size: 22, fill: COL.purple, weight: 600, o: 0 }), m('hi', -.1), .4);
+    show(dlText(K, 'moSHion · Physics Feel', { x: 70, y: 74, size: 22, fill: COL.purple, weight: 600, o: 0 }), m('hi', -.1), .4);
     const tt = dlText(K, 'Delete and Hide, Explained', { x: 70, y: 124, size: 46, fill: COL.text, weight: 600, o: 0 });
     tw(tt, { o: 1, y: 124 }, m('hi'), .5, out); put(tt, { y: 136 });
     // the reading's two sprites, before any code: one column each, so the two ways can be named under them
@@ -453,8 +453,8 @@ const BEATS = [
     row([['delete()', SX.fn, 500, MONO], ['   gone for good', COL.text, 500]], 230, m('sum', -.05), 38);
     row([['visible = false', SX.ident, 500, MONO], ['   hidden only', COL.text, 500]], 312, m('sum', .6), 38);
     show(dlText(p, 'UP NEXT', { x: 800, y: 440, size: 22, fill: COL.purple, weight: 600, anchor: 'middle', o: 0 }), m('next', -.05), .35);
-    row([['5.2.16 Worked Example: The Finished Scene', COL.text]], 512, m('next', .15), 44);
-    row([['the whole scene, with everything you have built', COL.muted]], 580, m('next', 1.1), 30, 500);
+    row([['The reading: Cleanup and Delete', COL.text]], 512, m('next', .15), 46);
+    row([['then the whole scene, with everything you built', COL.muted]], 580, m('next', 1.1), 30, 500);
     dlHold(Math.max(D, m('bye', 1.8)) + .1);
   }],
 ].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));

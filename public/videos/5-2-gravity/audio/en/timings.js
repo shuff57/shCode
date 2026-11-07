@@ -736,15 +736,15 @@ window.TIMINGS = {
   ]
  },
  "close": {
-  "dur": 15.528,
+  "dur": 14.832,
   "marks": {
    "sum": 0.111,
-   "zero": 3.431,
-   "ten": 5.0,
-   "neg": 6.319,
-   "any": 7.875,
-   "next": 10.181,
-   "bye": 14.528
+   "zero": 3.486,
+   "ten": 5.028,
+   "neg": 6.306,
+   "any": 7.847,
+   "next": 10.167,
+   "bye": 13.847
   },
   "cues": [
    [
@@ -752,27 +752,27 @@ window.TIMINGS = {
     "Gravity is one number for the whole world."
    ],
    [
-    3.431,
+    3.486,
     "Zero floats."
    ],
    [
-    5.0,
+    5.028,
     "Ten falls."
    ],
    [
-    6.319,
+    6.306,
     "Negative pulls up."
    ],
    [
-    7.875,
+    7.847,
     "You can set it to any number you like."
    ],
    [
-    10.181,
-    "Next, in 5.2.8, you'll tune it yourself."
+    10.167,
+    "Up next, the reading, then you'll tune it yourself."
    ],
    [
-    14.528,
+    13.847,
     "See you there!"
    ]
   ],
@@ -782,27 +782,27 @@ window.TIMINGS = {
     "Gravity is one number for the whole world."
    ],
    [
-    3.431,
+    3.486,
     "Zero floats."
    ],
    [
-    5.0,
+    5.028,
     "Ten falls."
    ],
    [
-    6.319,
+    6.306,
     "Negative pulls up."
    ],
    [
-    7.875,
+    7.847,
     "You can set it to any number you like."
    ],
    [
-    10.181,
-    "Next, in 5.2.8, you'll tune it yourself."
+    10.167,
+    "Up next, the reading, then you'll tune it yourself."
    ],
    [
-    14.528,
+    13.847,
     "See you there!"
    ]
   ],
@@ -812,35 +812,35 @@ window.TIMINGS = {
     "Gravity is one number"
    ],
    [
-    2.0,
+    1.986,
     "for the whole world."
    ],
    [
-    3.431,
+    3.486,
     "Zero floats."
    ],
    [
-    5.0,
+    5.028,
     "Ten falls."
    ],
    [
-    6.319,
+    6.306,
     "Negative pulls up."
    ],
    [
-    7.875,
+    7.847,
     "You can set it to any number you like."
    ],
    [
-    10.181,
-    "Next, in 5.2.8,"
+    10.167,
+    "Up next, the reading,"
    ],
    [
-    12.917,
-    "you'll tune it yourself."
+    12.125,
+    "then you'll tune it yourself."
    ],
    [
-    14.528,
+    13.847,
     "See you there!"
    ]
   ]
