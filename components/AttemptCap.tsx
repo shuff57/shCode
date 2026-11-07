@@ -42,7 +42,7 @@ export function AttemptBanner({ max, used, loading, note }: BannerProps) {
         padding: '10px 14px',
         border: '1px solid var(--c-cyan)',
         borderRadius: 6,
-        background: 'rgba(139,233,253,0.08)',
+        background: 'color-mix(in srgb, var(--c-cyan) 8.0%, transparent)',
         color: 'var(--c-fg)',
         fontSize: 14,
         lineHeight: 1.5,
@@ -93,7 +93,7 @@ export function SolutionWait({ wait, onRefresh }: { wait: RevealWait; onRefresh?
     <section
       data-testid="solution-wait"
       role="status"
-      style={{ margin: '18px 0', padding: '12px 16px', border: '1px solid var(--c-purple)', borderRadius: 6, background: 'rgba(189,147,249,0.08)', color: 'var(--c-fg)', fontSize: 14, lineHeight: 1.5 }}
+      style={{ margin: '18px 0', padding: '12px 16px', border: '1px solid var(--c-purple)', borderRadius: 6, background: 'color-mix(in srgb, var(--c-purple) 8.0%, transparent)', color: 'var(--c-fg)', fontSize: 14, lineHeight: 1.5 }}
     >
       {message}
       {onRefresh ? (
@@ -178,7 +178,7 @@ export function PseudocodePanel({ lessonId, show }: { lessonId: string; show: bo
   return (
     <section
       data-testid="pseudocode-panel"
-      style={{ margin: '18px 0', padding: '14px 16px', border: '1px solid var(--c-green)', borderRadius: 6, background: 'rgba(80,250,123,0.06)' }}
+      style={{ margin: '18px 0', padding: '14px 16px', border: '1px solid var(--c-green)', borderRadius: 6, background: 'color-mix(in srgb, var(--c-green) 6.0%, transparent)' }}
     >
       <h3 style={{ margin: '0 0 8px', fontSize: 16, color: 'var(--c-green)' }}>How this is solved</h3>
       <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'inherit', fontSize: 14, lineHeight: 1.6, color: 'var(--c-fg)' }}>{text}</pre>

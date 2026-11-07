@@ -314,7 +314,7 @@ export default function LiveCodeBlock({
           border-radius: 4px;
           margin: 16px 0;
           background: var(--card);
-          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
           overflow: hidden;
         }
         .livecodeblock-label {

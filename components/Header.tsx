@@ -5,7 +5,7 @@ import HeaderLessonNav from './HeaderLessonNav';
 
 export default function Header() {
   return (
-    <header className="bg-gray-800 text-white">
+    <header style={{ background: 'var(--header-bg)', color: 'var(--header-fg)' }}>
       <div className="flex items-center justify-between p-4">
         <Link href="/" className="font-bold">shCode</Link>
         <nav className="flex items-center gap-4 flex-wrap justify-end">

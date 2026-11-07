@@ -241,7 +241,7 @@ export default function CalendarPopover({
         background: C.bg,
         border: `1px solid ${C.border}`,
         borderRadius: 8,
-        boxShadow: '0 8px 24px rgba(0,0,0,0.45)',
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.45)',
         padding: 10,
         zIndex: 1000,
         fontSize: 13,

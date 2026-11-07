@@ -81,7 +81,7 @@ export default function NavDropdown({
             background: 'var(--c-bg)',
             border: '1px solid var(--c-line)',
             borderRadius: 6,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.45)',
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.45)',
             padding: 6,
             zIndex: 1000,
             ...panelStyle,

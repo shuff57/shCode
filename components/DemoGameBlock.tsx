@@ -126,7 +126,7 @@ export default function DemoGameBlock({ code, blockId, size = DEFAULT_SIZE, labe
           background: var(--x-000000);
           border: 1px solid var(--border);
           border-radius: 4px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
           overflow: hidden;
         }
         .demogame-stage .reshape-frame {

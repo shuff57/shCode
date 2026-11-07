@@ -325,7 +325,7 @@ export default function ContentLessonView({ lesson }: Props) {
         .content-prose pre { background: var(--c-bg); padding: 12px; border-radius: 6px; overflow-x: auto; max-width: 100%; box-sizing: border-box; -webkit-overflow-scrolling: touch; }
         .content-prose pre code { background: transparent; padding: 0; color: var(--c-fg); }
         .content-prose a { color: var(--c-cyan); }
-        .content-prose blockquote { border-left: 3px solid var(--c-purple); margin: 12px 0; padding: 4px 14px; color: var(--x-cccccc); background: rgba(189,147,249,0.08); }
+        .content-prose blockquote { border-left: 3px solid var(--c-purple); margin: 12px 0; padding: 4px 14px; color: var(--x-cccccc); background: color-mix(in srgb, var(--c-purple) 8.0%, transparent); }
         .content-prose hr { border: none; border-top: 1px solid var(--x-333333); margin: 20px 0; }
         .content-prose ul, .content-prose ol { padding-left: 24px; }
         @media (max-width: 720px) { .content-prose table { display: block; overflow-x: auto; max-width: 100%; } }

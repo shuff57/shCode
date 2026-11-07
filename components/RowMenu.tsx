@@ -96,7 +96,7 @@ export function RowMenu({ items, label = 'More actions', buttonText = 'More', di
           role="menu"
           aria-label={label}
           onKeyDown={onMenuKey}
-          style={{ position: 'fixed', top: pos.top, right: pos.right, zIndex: 1500, background: 'var(--c-deep)', border: '1px solid var(--c-line)', borderRadius: 6, padding: 4, minWidth: 190, boxShadow: '0 4px 16px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column' }}
+          style={{ position: 'fixed', top: pos.top, right: pos.right, zIndex: 1500, background: 'var(--c-deep)', border: '1px solid var(--c-line)', borderRadius: 6, padding: 4, minWidth: 190, boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5)', display: 'flex', flexDirection: 'column' }}
         >
           {items.map((it) => (
             <button

@@ -160,7 +160,7 @@ function MiniBar({ pct }: { pct: number }) {
         display: 'inline-block',
         width: 80,
         height: 6,
-        background: 'rgba(255,255,255,0.1)',
+        background: 'color-mix(in srgb, var(--x-ffffff) 10.0%, transparent)',
         borderRadius: 3,
         overflow: 'hidden',
         flexShrink: 0,
@@ -266,12 +266,12 @@ const CAT_SHORT: Record<GradeCategory, string> = {
 
 /** The background behind a lesson cell: the state at a glance, with the number or mark in front of it. */
 function cellTint(cell: GradebookCell | undefined, graded: boolean, pct: number): string | undefined {
-  if (cell?.pending) return 'rgba(255,184,108,0.18)'; // handed in, needs you
-  if (cell?.state === 'completed') return pct >= 70 ? 'rgba(80,250,123,0.11)' : 'rgba(241,250,140,0.10)';
+  if (cell?.pending) return 'color-mix(in srgb, var(--c-orange) 18.0%, transparent)'; // handed in, needs you
+  if (cell?.state === 'completed') return pct >= 70 ? 'color-mix(in srgb, var(--c-green) 11.0%, transparent)' : 'color-mix(in srgb, var(--c-yellow) 10.0%, transparent)';
   if (cell?.state === 'started' || (cell && cell.submitted_score !== null)) {
-    return cell.late && graded ? 'rgba(255,85,85,0.16)' : 'rgba(241,250,140,0.07)';
+    return cell.late && graded ? 'color-mix(in srgb, var(--c-red) 16.0%, transparent)' : 'color-mix(in srgb, var(--c-yellow) 7.0%, transparent)';
   }
-  if (cell?.late && graded) return 'rgba(255,85,85,0.16)'; // missing: past due, not started
+  if (cell?.late && graded) return 'color-mix(in srgb, var(--c-red) 16.0%, transparent)'; // missing: past due, not started
   return undefined;
 }
 
@@ -783,7 +783,7 @@ function StudentDrawer({
   const overlayStyle: React.CSSProperties = {
     position: 'fixed',
     inset: 0,
-    background: 'rgba(0,0,0,0.5)',
+    background: 'rgba(0, 0, 0, 0.5)',
     zIndex: 999,
   };
 
@@ -809,7 +809,7 @@ function StudentDrawer({
     if (state === 'completed' && practice) {
       // Same rule as the grid and the student's page (practiceDisplay): finished, but it does not count.
       return (
-        <span style={{ background: 'rgba(80,250,123,0.15)', color: 'var(--c-dim)', border: '1px solid var(--c-line)', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 700, flexShrink: 0 }} title="Finished. This lesson is practice and does not count toward the grade.">
+        <span style={{ background: 'color-mix(in srgb, var(--c-green) 15.0%, transparent)', color: 'var(--c-dim)', border: '1px solid var(--c-line)', borderRadius: 4, padding: '2px 8px', fontSize: 11, fontWeight: 700, flexShrink: 0 }} title="Finished. This lesson is practice and does not count toward the grade.">
           Done {'\u00b7'} practice (not graded)
         </span>
       );
@@ -987,7 +987,7 @@ function StudentDrawer({
                         </span>
                         {stateBadge(ls?.state, !!sub, !!detail.grading?.missingIds?.includes(lesson.id), practice)}
                         {sub && showLateBadge(!!meta && !practice && lessonGradeCategory({ title: meta.title, preview: meta.preview, scoreKind: meta.scoreKind, assignmentCode: meta.assignmentCode }) !== null, submissionWasLate(sub.submitted_at, sub.due_at_submit)) && (
-                          <span style={{ background: 'rgba(255,85,85,0.18)', color: 'var(--c-red)', border: '1px solid var(--c-red)', borderRadius: 4, padding: '1px 7px', fontSize: 11, fontWeight: 700, flexShrink: 0 }} title={`Handed in after the due date (${sub.due_at_submit ? formatDue(sub.due_at_submit) : ''})`}>
+                          <span style={{ background: 'color-mix(in srgb, var(--c-red) 18.0%, transparent)', color: 'var(--c-red)', border: '1px solid var(--c-red)', borderRadius: 4, padding: '1px 7px', fontSize: 11, fontWeight: 700, flexShrink: 0 }} title={`Handed in after the due date (${sub.due_at_submit ? formatDue(sub.due_at_submit) : ''})`}>
                             Late
                           </span>
                         )}
@@ -1622,11 +1622,11 @@ function GradebookView({
       {/* Legend: the number is the percent for the lesson; the background is the state. */}
       <div style={{ marginBottom: 8, fontSize: 12, color: 'var(--x-a9b7e0)', display: 'flex', flexWrap: 'wrap', gap: '4px 16px', alignItems: 'center' }}>
         {([
-          ['rgba(80,250,123,0.25)', 'var(--c-green)', '92', 'done, 70% or more'],
-          ['rgba(241,250,140,0.22)', 'var(--c-yellow)', '55', 'done, under 70%'],
-          ['rgba(241,250,140,0.14)', 'var(--c-yellow)', '○', 'started'],
-          ['rgba(255,184,108,0.30)', 'var(--c-orange)', '⋯', 'handed in, AI grading failed: needs you'],
-          ['rgba(255,85,85,0.28)', 'var(--c-red)', '–', 'missing: past due, not started'],
+          ['color-mix(in srgb, var(--c-green) 25.0%, transparent)', 'var(--c-green)', '92', 'done, 70% or more'],
+          ['color-mix(in srgb, var(--c-yellow) 22.0%, transparent)', 'var(--c-yellow)', '55', 'done, under 70%'],
+          ['color-mix(in srgb, var(--c-yellow) 14.0%, transparent)', 'var(--c-yellow)', '○', 'started'],
+          ['color-mix(in srgb, var(--c-orange) 30.0%, transparent)', 'var(--c-orange)', '⋯', 'handed in, AI grading failed: needs you'],
+          ['color-mix(in srgb, var(--c-red) 28.0%, transparent)', 'var(--c-red)', '–', 'missing: past due, not started'],
         ] as const).map(([bg, fg, mark, words]) => (
           <span key={words} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <span aria-hidden="true" style={{ background: bg, color: fg, fontFamily: 'monospace', fontWeight: 700, minWidth: 26, textAlign: 'center', borderRadius: 3, padding: '1px 4px' }}>{mark}</span>
@@ -1870,7 +1870,7 @@ function GradebookView({
                         width: CAT_W, minWidth: CAT_W, maxWidth: CAT_W, padding: '6px 4px', textAlign: 'center',
                         borderBottom: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)',
                         fontSize: 12, fontWeight: 700,
-                        background: 'rgba(98,114,164,0.10)',
+                        background: 'color-mix(in srgb, var(--c-comment) 10.0%, transparent)',
                         color: v === undefined ? 'var(--c-dim)' : pctColor(v),
                       }}
                       title={v === undefined ? `${CATEGORY_LABEL[c]}: nothing counted yet` : `${CATEGORY_LABEL[c]}: ${v}%`}

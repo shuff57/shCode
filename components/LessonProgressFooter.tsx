@@ -166,7 +166,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
         alignItems: 'center',
         gap: 12,
         color: 'var(--c-fg)',
-        boxShadow: '0 -4px 12px rgba(0,0,0,0.35)',
+        boxShadow: '0 -4px 12px rgba(0, 0, 0, 0.35)',
         fontSize: 12,
       }}
     >
@@ -375,7 +375,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
                 fontSize: 12,
                 borderRadius: 4,
                 padding: '4px 8px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.35)',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.35)',
                 zIndex: 950,
               }}
             >

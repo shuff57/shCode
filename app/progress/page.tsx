@@ -159,8 +159,8 @@ export default function ProgressPage() {
                     <span style={{
                       fontSize: 12,
                       color: 'var(--c-green)',
-                      background: 'rgba(80,250,123,0.12)',
-                      border: '1px solid rgba(80,250,123,0.3)',
+                      background: 'color-mix(in srgb, var(--c-green) 12.0%, transparent)',
+                      border: '1px solid color-mix(in srgb, var(--c-green) 30.0%, transparent)',
                       borderRadius: 999,
                       padding: '2px 10px',
                       fontWeight: 600,
@@ -189,8 +189,8 @@ export default function ProgressPage() {
                   <span style={{
                     fontSize: 12,
                     color: 'var(--x-94a3b8)',
-                    background: 'rgba(148,163,184,0.12)',
-                    border: '1px solid rgba(148,163,184,0.3)',
+                    background: 'color-mix(in srgb, var(--x-94a3b8) 12.0%, transparent)',
+                    border: '1px solid color-mix(in srgb, var(--x-94a3b8) 30.0%, transparent)',
                     borderRadius: 999,
                     padding: '2px 10px',
                     fontWeight: 600,
@@ -292,7 +292,7 @@ const progressBarInner: React.CSSProperties = {
 const unitBarOuter: React.CSSProperties = {
   width: '100%',
   height: 6,
-  background: 'rgba(68,71,90,0.6)',
+  background: 'color-mix(in srgb, var(--c-line) 60.0%, transparent)',
   borderRadius: 999,
   overflow: 'hidden',
 };
@@ -309,5 +309,5 @@ const listItemStyle: React.CSSProperties = {
   alignItems: 'center',
   gap: 12,
   padding: '8px 0',
-  borderBottom: '1px solid rgba(68,71,90,0.4)',
+  borderBottom: '1px solid color-mix(in srgb, var(--c-line) 40.0%, transparent)',
 };

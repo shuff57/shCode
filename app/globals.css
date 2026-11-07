@@ -9,6 +9,9 @@
   --muted: #2a2a2a;
   --text: #cccccc;
   --brand: #5baafd;
+  /* The site header bar (components/Header.tsx). */
+  --header-bg: #1f2937;
+  --header-fg: #ffffff;
 }
 
 /* ---- theme colours (Phase 5) ------------------------------------------
@@ -119,6 +122,17 @@
   --x-fbfbe6: #fbfbe6;
   --x-fdeaf6: #fdeaf6;
   --x-fdf0e2: #fdf0e2;
+  --x-0a1726: #0a1726;
+  --x-15803d: #15803d;
+  --x-16a34a: #16a34a;
+  --x-1e1e1e: #1e1e1e;
+  --x-2d2d2d: #2d2d2d;
+  --x-36333a: #36333a;
+  --x-374151: #374151;
+  --x-3b82f6: #3b82f6;
+  --x-4b5563: #4b5563;
+  --x-d65093: #d65093;
+  --x-ef4444: #ef4444;
 }
 
 
@@ -184,7 +198,7 @@ a.lesson-progress-seg:hover {
 }
 
 a.lesson-progress-seg:focus-visible {
-  outline: 2px solid #8be9fd;
+  outline: 2px solid var(--c-cyan);
   outline-offset: 2px;
 }
 
@@ -210,8 +224,8 @@ body:has(.lesson-progress-footer) .issue-fab {
 }
 
 code {
-  background-color: #2d2d2d;
-  color: #d65093;
+  background-color: var(--x-2d2d2d);
+  color: var(--x-d65093);
   padding: 3px 6px;
   border-radius: 4px;
   font-family: 'Courier New', monospace;
@@ -337,7 +351,7 @@ code {
   padding: 20px;
   border-radius: 4px;
   border: 1px solid var(--border);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   position: relative;
 }
 .requirement h3 {
@@ -351,7 +365,7 @@ details.editor-card {
   border: 1px solid var(--border);
   border-radius: 4px;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Summary (header) with custom arrow */
@@ -441,8 +455,8 @@ details.editor-card > summary:hover::before {
 }
 
 .btn-run {
-  background: #22c55e;
-  color: #fff;
+  background: var(--x-22c55e);
+  color: var(--x-ffffff);
   border: none;
   padding: 8px 20px;
   border-radius: 4px;
@@ -454,11 +468,11 @@ details.editor-card > summary:hover::before {
 }
 
 .btn-run:hover {
-  background: #16a34a;
+  background: var(--x-16a34a);
 }
 
 .btn-run:active {
-  background: #15803d;
+  background: var(--x-15803d);
 }
 
 .run-hint {
@@ -485,7 +499,7 @@ details.editor-card > summary:hover::before {
   font-family: 'Consolas', 'Courier New', monospace;
   font-size: 0.9rem;
   color: var(--text);
-  background: #1e1e1e;
+  background: var(--x-1e1e1e);
   white-space: pre-wrap;
 }
 
@@ -494,15 +508,15 @@ details.editor-card > summary:hover::before {
 }
 
 .run-output .log-error {
-  color: #f87171;
+  color: var(--x-f87171);
 }
 
 .run-output .log-warn {
-  color: #fbbf24;
+  color: var(--x-fbbf24);
 }
 
 .run-output .console-empty {
-  color: #666;
+  color: var(--x-666666);
   font-style: italic;
 }
 
@@ -514,7 +528,7 @@ details.editor-card > summary:hover::before {
   background-color: var(--card);
   border: 1px solid var(--border);
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   height: 420px;
   overflow: hidden;
 }
@@ -557,11 +571,11 @@ details.editor-card > summary:hover::before {
   width: 100%;
   height: 100%;
   border: none;
-  background: #fff;
+  background: var(--x-ffffff);
 }
 
 #preview.reshape-frame {
-  background: #36333a;
+  background: var(--x-36333a);
 }
 
 .reshape-empty {
@@ -570,8 +584,8 @@ details.editor-card > summary:hover::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #36333a;
-  color: #888;
+  background: var(--x-36333a);
+  color: var(--x-888888);
   font-size: 14px;
   text-align: center;
   padding: 20px;
@@ -606,7 +620,7 @@ details.editor-card > summary:hover::before {
 
 /* Requirement status overlays */
 .requirement.pass {
-  border-left: 4px solid #16a34a;
+  border-left: 4px solid var(--x-16a34a);
 }
 
 /* Console styles */
@@ -666,15 +680,15 @@ details.console > summary::-webkit-details-marker { display: none; }
 }
 
 .log-error {
-  color: #dc2626;
+  color: var(--x-dc2626);
 }
 
 .log-warn {
-  color: #f59e0b;
+  color: var(--x-f59e0b);
 }
 
 .requirement.fail {
-  border-left: 4px solid #dc2626;
+  border-left: 4px solid var(--x-dc2626);
 }
 
 /* Title and Passed / Not yet badge share one flex row: the title takes the
@@ -849,9 +863,9 @@ details.console > summary::-webkit-details-marker { display: none; }
   font-size: 0.7rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  background: rgba(255, 184, 108, 0.15);
-  color: #ffb86c;
-  border: 1px solid rgba(255, 184, 108, 0.4);
+  background: color-mix(in srgb, var(--c-orange) 15.0%, transparent);
+  color: var(--c-orange);
+  border: 1px solid color-mix(in srgb, var(--c-orange) 40.0%, transparent);
   padding: 0.15rem 0.5rem;
   border-radius: 4px;
 }
@@ -883,7 +897,7 @@ details.console > summary::-webkit-details-marker { display: none; }
 }
 
 .solution-dialog-status.error {
-  color: #ff5555;
+  color: var(--c-red);
   opacity: 1;
 }
 
@@ -1029,13 +1043,13 @@ details.console > summary::-webkit-details-marker { display: none; }
 }
 
 .assignment-status.in-progress {
-  background: #f59e0b33;
-  color: #f59e0b;
+  background: color-mix(in srgb, var(--x-f59e0b) 20.0%, transparent);
+  color: var(--x-f59e0b);
 }
 
 .assignment-status.submitted {
-  background: #10b98133;
-  color: #10b981;
+  background: color-mix(in srgb, var(--x-10b981) 20.0%, transparent);
+  color: var(--x-10b981);
 }
 
 /* Issue #26: names the still-red requirements next to a disabled Submit
@@ -1043,7 +1057,7 @@ details.console > summary::-webkit-details-marker { display: none; }
    tooltip so a long list doesn't blow out the header row. */
 .assignment-unmet-hint {
   font-size: 0.75rem;
-  color: #f59e0b;
+  color: var(--x-f59e0b);
   max-width: 320px;
   min-width: 0;
 }
@@ -1058,12 +1072,12 @@ details.console > summary::-webkit-details-marker { display: none; }
 
 /* ---- Submit Dialog Extras ---- */
 .submit-warning {
-  background: #f59e0b22;
-  border: 1px solid #f59e0b;
+  background: color-mix(in srgb, var(--x-f59e0b) 13.3333%, transparent);
+  border: 1px solid var(--x-f59e0b);
   border-radius: 4px;
   padding: 0.5rem;
   font-size: 0.85rem;
-  color: #f59e0b;
+  color: var(--x-f59e0b);
 }
 
 .submit-breakdown {
@@ -1089,11 +1103,11 @@ details.console > summary::-webkit-details-marker { display: none; }
 }
 
 .submit-results li.pass {
-  color: #16a34a;
+  color: var(--x-16a34a);
 }
 
 .submit-results li.fail {
-  color: #dc2626;
+  color: var(--x-dc2626);
 }
 
 /* ---- Grade Report ---- */
@@ -1118,11 +1132,11 @@ details.console > summary::-webkit-details-marker { display: none; }
 }
 
 .grade-score.pass {
-  color: #16a34a;
+  color: var(--x-16a34a);
 }
 
 .grade-score.fail {
-  color: #dc2626;
+  color: var(--x-dc2626);
 }
 
 .grade-label {
@@ -1216,8 +1230,8 @@ details.console > summary::-webkit-details-marker { display: none; }
 .step-commit-badge {
   display: inline-block;
   font-size: 0.7rem;
-  background: #f59e0b33;
-  color: #f59e0b;
+  background: color-mix(in srgb, var(--x-f59e0b) 20.0%, transparent);
+  color: var(--x-f59e0b);
   padding: 1px 6px;
   border-radius: 3px;
   margin-left: 4px;
@@ -1269,7 +1283,7 @@ details.console > summary::-webkit-details-marker { display: none; }
 }
 .docs-tab.is-active {
   opacity: 1;
-  border-bottom-color: #22c55e;
+  border-bottom-color: var(--x-22c55e);
   font-weight: 600;
 }
 .docs-status {
@@ -1278,7 +1292,7 @@ details.console > summary::-webkit-details-marker { display: none; }
   opacity: 0.7;
 }
 .docs-error {
-  color: #ef4444;
+  color: var(--x-ef4444);
   opacity: 1;
 }
 .docs-markdown {
@@ -1299,7 +1313,7 @@ details.console > summary::-webkit-details-marker { display: none; }
 .docs-markdown ul,
 .docs-markdown ol { margin: 0 0 1em; padding-left: 1.5em; }
 .docs-markdown li { margin-bottom: 0.25em; }
-.docs-markdown a { color: #3b82f6; text-decoration: underline; }
+.docs-markdown a { color: var(--x-3b82f6); text-decoration: underline; }
 .docs-markdown code {
   font-family: 'Consolas', 'Courier New', monospace;
   font-size: 0.9em;
@@ -1612,7 +1626,7 @@ details.console > summary::-webkit-details-marker { display: none; }
   line-height: 1.4;
 }
 .docs-search-mark {
-  background: rgba(255, 184, 108, 0.35);
+  background: color-mix(in srgb, var(--c-orange) 35.0%, transparent);
   color: inherit;
   padding: 0 2px;
   border-radius: 2px;
@@ -1656,8 +1670,8 @@ details.console > summary::-webkit-details-marker { display: none; }
   position: relative;
   margin: 20px 0 28px;
   padding: 16px 18px;
-  background: #282a36;
-  color: #f8f8f2;
+  background: var(--c-bg);
+  color: var(--c-fg);
   border: 1px solid var(--border);
   border-radius: 4px;
   font-family: 'Fira Code', 'Consolas', 'Courier New', monospace;
@@ -1673,7 +1687,7 @@ details.console > summary::-webkit-details-marker { display: none; }
   top: 6px;
   right: 10px;
   font-size: 0.65rem;
-  color: #6272a4;
+  color: var(--c-comment);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -1726,7 +1740,7 @@ details.console > summary::-webkit-details-marker { display: none; }
 }
 .docs-sandbox-run {
   background: var(--brand);
-  color: #0a1726;
+  color: var(--x-0a1726);
   border: 0;
   padding: 4px 12px;
   border-radius: 3px;
@@ -1755,7 +1769,7 @@ details.console > summary::-webkit-details-marker { display: none; }
 }
 .docs-sandbox-editor {
   height: 360px;
-  background: #282a36;
+  background: var(--c-bg);
   overflow: hidden;
 }
 .docs-sandbox-editor .cm-editor { height: 100%; }
@@ -1773,7 +1787,7 @@ details.console > summary::-webkit-details-marker { display: none; }
   display: flex;
   align-items: stretch;
   justify-content: stretch;
-  background: #111;
+  background: var(--x-111111);
 }
 .docs-sandbox-preview-body .reshape-frame,
 .docs-sandbox-preview-body iframe {
@@ -1874,10 +1888,10 @@ details.console > summary::-webkit-details-marker { display: none; }
   align-items: center;
   gap: 8px;
   padding: 4px 10px;
-  color: #cbd5e1;
+  color: var(--x-cbd5e1);
   text-decoration: none;
   font-size: 0.85rem;
-  border: 1px solid #374151;
+  border: 1px solid var(--x-374151);
   border-radius: 4px;
   background: transparent;
   min-width: 0;
@@ -1885,9 +1899,9 @@ details.console > summary::-webkit-details-marker { display: none; }
   transition: background-color 120ms, border-color 120ms, color 120ms;
 }
 .hdr-lesson-link:hover {
-  background: #1f2937;
-  border-color: #4b5563;
-  color: #f8f8f2;
+  background: var(--x-1f2937);
+  border-color: var(--x-4b5563);
+  color: var(--c-fg);
 }
 .hdr-lesson-link-right {
   justify-content: flex-end;
@@ -1967,11 +1981,11 @@ details.console > summary::-webkit-details-marker { display: none; }
     transform: none !important;
     flex-direction: row !important; justify-content: center;
     gap: 6px !important; padding: 4px 8px;
-    background: #21222c; border-top: 1px solid #44475a;
+    background: var(--c-deep2); border-top: 1px solid var(--c-line);
   }
   .shd-tab {
     writing-mode: horizontal-tb !important;
-    border: 1px solid #44475a !important; border-bottom: none !important;
+    border: 1px solid var(--c-line) !important; border-bottom: none !important;
     border-radius: 6px 6px 0 0 !important;
     padding: 6px 12px !important; min-height: 32px;
   }

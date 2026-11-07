@@ -193,7 +193,7 @@ function Toast({ message, onDone }: { message: string; onDone: () => void }) {
         fontSize: 14,
         padding: '12px 20px',
         borderRadius: 8,
-        boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5)',
       }}
     >
       {message}

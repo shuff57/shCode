@@ -37,9 +37,9 @@ export default function GradeReport({ report, commitCount, onReopen, allowReopen
         {report.results.map((r) => (
           <div key={r.id} className={`grade-result ${r.status}`}>
             {r.status === 'passed' ? (
-              <CircleCheck className="text-green-500" size={16} />
+              <CircleCheck style={{ color: 'var(--c-green)' }} size={16} />
             ) : (
-              <CircleX className="text-red-500" size={16} />
+              <CircleX style={{ color: 'var(--c-red)' }} size={16} />
             )}
             {isNoPoints ? (
               <>

@@ -778,7 +778,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
                 marginBottom: 12,
                 padding: 12,
                 borderLeft: '3px solid var(--c-purple)',
-                background: 'rgba(189,147,249,0.08)',
+                background: 'color-mix(in srgb, var(--c-purple) 8.0%, transparent)',
                 borderRadius: 4,
                 color: 'var(--c-fg)',
                 fontStyle: 'italic',

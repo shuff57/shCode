@@ -191,8 +191,8 @@ export default function ModuleLessonsList({
                 style={{
                   fontSize: 11,
                   color: 'var(--muted-fg, var(--x-94a3b8))',
-                  background: 'rgba(148,163,184,0.15)',
-                  border: '1px solid rgba(148,163,184,0.35)',
+                  background: 'color-mix(in srgb, var(--x-94a3b8) 15.0%, transparent)',
+                  border: '1px solid color-mix(in srgb, var(--x-94a3b8) 35.0%, transparent)',
                   borderRadius: 999,
                   padding: '2px 8px',
                   fontWeight: 600,

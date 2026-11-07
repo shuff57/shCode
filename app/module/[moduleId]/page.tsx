@@ -68,7 +68,7 @@ export default async function ModulePage({
         .prose pre { background: var(--muted); padding: 12px; border-radius: 6px; overflow-x: auto; }
         .prose pre code { background: transparent; padding: 0; color: var(--text); }
         .prose a { color: var(--brand); }
-        .prose blockquote { border-left: 3px solid var(--c-purple); margin: 12px 0; padding: 4px 14px; color: var(--text); opacity: 0.85; background: rgba(189,147,249,0.08); }
+        .prose blockquote { border-left: 3px solid var(--c-purple); margin: 12px 0; padding: 4px 14px; color: var(--text); opacity: 0.85; background: color-mix(in srgb, var(--c-purple) 8.0%, transparent); }
       `}</style>
     </main>
   );

@@ -105,7 +105,7 @@ function ShapeNode({ id, data, selected }: NodeProps) {
           borderTop: `1px dashed ${stroke}`,
           borderBottom: `1px dashed ${stroke}`,
           borderRadius: 3,
-          background: 'rgba(98,114,164,0.10)',
+          background: 'color-mix(in srgb, var(--c-comment) 10.0%, transparent)',
         }}
       />
     ) : clip !== undefined ? (
@@ -213,7 +213,7 @@ function ShapeNode({ id, data, selected }: NodeProps) {
             style={{
               width: '100%',
               height: shape === 'comment' ? undefined : '100%',
-              background: 'rgba(0,0,0,0.35)',
+              background: 'rgba(0, 0, 0, 0.35)',
               border: `1px dashed ${colors.stroke}`,
               borderRadius: 4,
               color: colors.text,

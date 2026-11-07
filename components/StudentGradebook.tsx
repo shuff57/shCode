@@ -466,7 +466,7 @@ const theadRowStyle: React.CSSProperties = {
   letterSpacing: 0.4,
 };
 
-const rowStyle: React.CSSProperties = { borderTop: '1px solid rgba(68,71,90,0.4)' };
+const rowStyle: React.CSSProperties = { borderTop: '1px solid color-mix(in srgb, var(--c-line) 40.0%, transparent)' };
 
 const thStyle: React.CSSProperties = { padding: '4px 10px 8px 0', fontWeight: 600 };
 
@@ -504,8 +504,8 @@ const toggleStyle: React.CSSProperties = {
 };
 
 const feedbackBoxStyle: React.CSSProperties = {
-  background: 'rgba(189,147,249,0.08)',
-  border: '1px solid rgba(189,147,249,0.35)',
+  background: 'color-mix(in srgb, var(--c-purple) 8.0%, transparent)',
+  border: '1px solid color-mix(in srgb, var(--c-purple) 35.0%, transparent)',
   borderRadius: 6,
   padding: '10px 14px',
   fontSize: 14,
@@ -551,7 +551,7 @@ const tabIdle: React.CSSProperties = {
 
 const tabActive: React.CSSProperties = {
   ...tabIdle,
-  background: 'rgba(189,147,249,0.15)',
+  background: 'color-mix(in srgb, var(--c-purple) 15.0%, transparent)',
   borderColor: 'var(--c-purple)',
   color: 'var(--c-purple)',
 };

@@ -69,12 +69,12 @@ export default function KeyboardShortcutModal({ isOpen, onClose }: KeyboardShort
             {shortcuts.map((s) => (
               <tr
                 key={s.keys}
-                style={{ borderBottom: '1px solid rgba(68,71,90,0.4)' }}
+                style={{ borderBottom: '1px solid color-mix(in srgb, var(--c-line) 40.0%, transparent)' }}
               >
                 <td style={{ padding: '10px 12px 10px 0' }}>
                   <kbd
                     style={{
-                      background: 'rgba(68,71,90,0.4)',
+                      background: 'color-mix(in srgb, var(--c-line) 40.0%, transparent)',
                       border: '1px solid var(--c-line)',
                       borderRadius: 4,
                       padding: '3px 8px',
@@ -95,7 +95,7 @@ export default function KeyboardShortcutModal({ isOpen, onClose }: KeyboardShort
       </div>
       <style>{`
         .shortcut-dialog::backdrop {
-          background: rgba(0,0,0,0.55);
+          background: rgba(0, 0, 0, 0.55);
         }
       `}</style>
     </dialog>

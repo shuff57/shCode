@@ -114,7 +114,7 @@ export default function LessonAccessGate({
         borderRadius: 10,
         textAlign: 'center',
         color: 'var(--c-fg)',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)',
       }}
     >
       <div style={{ fontSize: 48, marginBottom: '0.75rem' }} aria-hidden>
@@ -187,7 +187,7 @@ export default function LessonAccessGate({
               } else if (isCurrent) {
                 indicator = '🔒';
                 color = 'var(--c-fg)';
-                bg = 'rgba(189, 147, 249, 0.1)';
+                bg = 'color-mix(in srgb, var(--c-purple) 10.0%, transparent)';
               } else if (isPriorIncomplete) {
                 indicator = '○';
                 color = 'var(--c-yellow)';
@@ -289,7 +289,7 @@ function NotYetPanel({ openAt, moduleId }: { openAt: number | null; moduleId: st
         borderRadius: 10,
         textAlign: 'center',
         color: 'var(--c-fg)',
-        boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)',
       }}
     >
       <div style={{ fontSize: 48, marginBottom: '0.75rem' }} aria-hidden>

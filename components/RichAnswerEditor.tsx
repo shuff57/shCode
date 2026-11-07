@@ -226,7 +226,7 @@ export default function RichAnswerEditor({ value, onChange, textSize, placeholde
         .rae .rae-doc th, .rae .rae-doc td { border: 1px solid ${BORDER}; padding: 6px 10px; vertical-align: top; text-align: left; min-width: 3em; }
         .rae .rae-doc th { background: var(--c-deep2); color: ${ACCENT}; font-weight: 600; }
         .rae .rae-doc td p, .rae .rae-doc th p { margin: 0; }
-        .rae .rae-doc .selectedCell { background: rgba(189, 147, 249, 0.2); }
+        .rae .rae-doc .selectedCell { background: color-mix(in srgb, var(--c-purple) 20.0%, transparent); }
       `}</style>
     </div>
   );

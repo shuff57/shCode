@@ -117,7 +117,7 @@ export default function ImageLibrary({ onClose, onPick }: Props) {
     <div
       onClick={onClose}
       style={{
-        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
+        position: 'fixed', inset: 0, background: 'rgba(0, 0, 0, 0.6)',
         display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
       }}
     >

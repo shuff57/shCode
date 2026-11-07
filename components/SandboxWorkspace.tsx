@@ -888,7 +888,7 @@ export default function SandboxWorkspace() {
           background: var(--card);
           border: 1px solid var(--x-565a70);
           border-radius: 6px;
-          box-shadow: 0 12px 36px rgba(0,0,0,0.6);
+          box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
           overflow: hidden;
         }
         .sandbox-shell.is-editor-hidden #editorPane { display: none; }
@@ -903,7 +903,7 @@ export default function SandboxWorkspace() {
           padding: 5px 10px;
           font-size: 12px;
           color: var(--x-d3d5e3);
-          background: rgba(40, 42, 54, 0.92);
+          background: color-mix(in srgb, var(--c-bg) 92.0%, transparent);
           border: 1px solid var(--x-565a70);
           border-radius: 4px;
           cursor: pointer;
@@ -921,7 +921,7 @@ export default function SandboxWorkspace() {
           padding: 5px 10px;
           font-size: 12px;
           color: var(--x-d3d5e3);
-          background: rgba(40, 42, 54, 0.92);
+          background: color-mix(in srgb, var(--c-bg) 92.0%, transparent);
           border: 1px solid var(--x-565a70);
           border-radius: 4px;
           cursor: pointer;
@@ -939,7 +939,7 @@ export default function SandboxWorkspace() {
           min-height: 0;
           resize: none;
           border: 1px solid var(--x-565a70);
-          box-shadow: 0 -8px 32px rgba(0,0,0,0.45);
+          box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.45);
         }
         .sandbox-shell.is-console-hidden .sandbox-console-wrap { display: none; }
         .sandbox-shell.is-console-hidden .sandbox-console-toggle { bottom: 12px; top: auto; }

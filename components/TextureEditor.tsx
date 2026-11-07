@@ -764,7 +764,7 @@ export default function TextureEditor() {
                       title="Delete this frame"
                       aria-label="delete frame"
                       style={{
-                        background: 'rgba(0,0,0,0.72)', border: 'none', color: 'var(--x-e8607a)',
+                        background: 'rgba(0, 0, 0, 0.72)', border: 'none', color: 'var(--x-e8607a)',
                         cursor: 'pointer', fontSize: 9, lineHeight: 1, padding: '2px 3px', borderRadius: 3,
                       }}
                     >
@@ -775,7 +775,7 @@ export default function TextureEditor() {
                       title="Duplicate this frame (Ctrl+D)"
                       aria-label="duplicate frame"
                       style={{
-                        background: 'rgba(0,0,0,0.72)', border: 'none', color: 'var(--text)',
+                        background: 'rgba(0, 0, 0, 0.72)', border: 'none', color: 'var(--text)',
                         cursor: 'pointer', fontSize: 9, lineHeight: 1, padding: '2px 3px', borderRadius: 3,
                       }}
                     >
@@ -956,7 +956,7 @@ export default function TextureEditor() {
                     width: cell, height: cell,
                     background: c || (ghost || 'transparent'),
                     opacity: !c && ghost ? 0.22 : 1,
-                    boxShadow: cell >= 8 ? 'inset 0 0 0 0.5px rgba(255,255,255,0.06)' : undefined,
+                    boxShadow: cell >= 8 ? 'inset 0 0 0 0.5px color-mix(in srgb, var(--x-ffffff) 6.0%, transparent)' : undefined,
                   }}
                 />
               );
@@ -1154,7 +1154,7 @@ export default function TextureEditor() {
                     {t.frames > 1 && (
                       <span style={{
                         position: 'absolute', right: 2, bottom: 1, fontSize: 9,
-                        background: 'rgba(0,0,0,0.7)', borderRadius: 3, padding: '0 3px',
+                        background: 'rgba(0, 0, 0, 0.7)', borderRadius: 3, padding: '0 3px',
                       }}>
                         {t.frames}f
                       </span>

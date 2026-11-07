@@ -12,7 +12,7 @@ function Highlighted({ result }: { result: DocSearchResult }) {
   return (
     <>
       {before}
-      <mark style={{ background: 'rgba(255, 184, 108, 0.35)', color: 'inherit', padding: '0 2px', borderRadius: 2 }}>
+      <mark style={{ background: 'color-mix(in srgb, var(--c-orange) 35.0%, transparent)', color: 'inherit', padding: '0 2px', borderRadius: 2 }}>
         {hit}
       </mark>
       {after}

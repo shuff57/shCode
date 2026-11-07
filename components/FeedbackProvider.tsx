@@ -117,7 +117,7 @@ function ToastStack({ toasts, onDismiss }: { toasts: ToastItem[]; onDismiss: (id
             key={t.id}
             // Errors interrupt (assertive); everything else waits its turn (polite).
             role={t.kind === 'error' ? 'alert' : 'status'}
-            style={{ pointerEvents: 'auto', background: C.card, color: C.text, border: `1px solid ${color}`, borderLeft: `4px solid ${color}`, borderRadius: 6, padding: '10px 14px', fontSize: 13, maxWidth: 560, display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.4)' }}
+            style={{ pointerEvents: 'auto', background: C.card, color: C.text, border: `1px solid ${color}`, borderLeft: `4px solid ${color}`, borderRadius: 6, padding: '10px 14px', fontSize: 13, maxWidth: 560, display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)' }}
           >
             <span style={{ flex: 1, minWidth: 0, overflowWrap: 'anywhere' }}>{t.message}</span>
             {t.action && (
@@ -179,7 +179,7 @@ function ConfirmDialog({ options, onAnswer }: { options: ConfirmOptions; onAnswe
   const accent = danger ? C.err : C.accent;
   return (
     <div
-      style={{ position: 'fixed', inset: 0, zIndex: 2100, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+      style={{ position: 'fixed', inset: 0, zIndex: 2100, background: 'rgba(0, 0, 0, 0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
       onMouseDown={(e) => { if (e.target === e.currentTarget) onAnswer(false); }}
     >
       <div

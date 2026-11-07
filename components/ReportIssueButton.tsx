@@ -405,7 +405,7 @@ export default function ReportIssueButton() {
           place-items: center;
           padding: 0;
           cursor: pointer;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
           transition: border-color 120ms, color 120ms, bottom 220ms ease;
         }
         .issue-fab:hover { border-color: var(--brand); color: var(--brand); }
@@ -418,7 +418,7 @@ export default function ReportIssueButton() {
           color: var(--text);
           width: min(420px, 92vw);
         }
-        .issue-dialog::backdrop { background: rgba(0,0,0,0.5); }
+        .issue-dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
         .issue-form { padding: 18px; }
         .issue-form h3 { margin: 0 0 12px; font-size: 16px; }
         .issue-done {
@@ -485,7 +485,7 @@ export default function ReportIssueButton() {
 
         .issue-error {
           padding: 8px; margin-bottom: 10px; font-size: 13px;
-          background: rgba(220,38,38,0.12); color: var(--x-f87171);
+          background: color-mix(in srgb, var(--x-dc2626) 12.0%, transparent); color: var(--x-f87171);
           border: 1px solid var(--x-dc2626); border-radius: 4px;
         }
         .issue-note { margin: 0 0 14px; font-size: 11px; opacity: 0.5; }

@@ -227,7 +227,7 @@ export default function LessonAccessChip({ classId, lessonId, lessonTitle, kind 
               background: C.bg,
               border: `1px solid ${C.border}`,
               borderRadius: 8,
-              boxShadow: '0 8px 24px rgba(0,0,0,0.45)',
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.45)',
               zIndex: 1000,
               fontSize: 13,
               color: C.text,

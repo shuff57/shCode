@@ -36,20 +36,20 @@ function makeBadge(Icon: any, label: string, color: string): PreviewBadge {
 }
 
 const PREVIEW_BADGES: Record<string, PreviewBadge> = {
-  reading:    makeBadge(BookOpen,     'Reading',        '#8be9fd'),
-  video:      makeBadge(Film,         'Video',          '#ff79c6'),
-  example:    makeBadge(Lightbulb,    'Worked Example', '#ffb86c'),
-  challenge:  makeBadge(Star,         'Challenge',      '#f1fa8c'),
-  assignment: makeBadge(PenSquare,    'Assignment',     '#50fa7b'),
-  slides:     makeBadge(Presentation, 'Slides',         '#bd93f9'),
-  moshion:     makeBadge(Play,         'moSHion Lesson',  '#ff79c6'),
-  console:    makeBadge(Terminal,     'Console',        '#50fa7b'),
-  html:       makeBadge(Globe,        'HTML',           '#8be9fd'),
-  diagram:    makeBadge(Workflow,     'Flowchart',      '#f1fa8c'),
-  quiz:       makeBadge(ListChecks,   'Quiz',           '#f1fa8c'),
+  reading:    makeBadge(BookOpen,     'Reading',        'var(--c-cyan)'),
+  video:      makeBadge(Film,         'Video',          'var(--c-pink)'),
+  example:    makeBadge(Lightbulb,    'Worked Example', 'var(--c-orange)'),
+  challenge:  makeBadge(Star,         'Challenge',      'var(--c-yellow)'),
+  assignment: makeBadge(PenSquare,    'Assignment',     'var(--c-green)'),
+  slides:     makeBadge(Presentation, 'Slides',         'var(--c-purple)'),
+  moshion:     makeBadge(Play,         'moSHion Lesson',  'var(--c-pink)'),
+  console:    makeBadge(Terminal,     'Console',        'var(--c-green)'),
+  html:       makeBadge(Globe,        'HTML',           'var(--c-cyan)'),
+  diagram:    makeBadge(Workflow,     'Flowchart',      'var(--c-yellow)'),
+  quiz:       makeBadge(ListChecks,   'Quiz',           'var(--c-yellow)'),
 };
 
-const FALLBACK_BADGE: PreviewBadge = makeBadge(FileText, 'Content', '#888888');
+const FALLBACK_BADGE: PreviewBadge = makeBadge(FileText, 'Content', 'var(--x-888888)');
 
 export function badgeFor(preview: string | undefined): PreviewBadge {
   if (!preview) return FALLBACK_BADGE;

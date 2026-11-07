@@ -230,7 +230,7 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
             display: 'inline-block',
             width: 80,
             height: 6,
-            background: 'rgba(255,255,255,0.1)',
+            background: 'color-mix(in srgb, var(--x-ffffff) 10.0%, transparent)',
             borderRadius: 3,
             overflow: 'hidden',
           }}
@@ -271,7 +271,7 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
             style={{
               position: 'fixed',
               inset: 0,
-              background: 'rgba(0,0,0,0.55)',
+              background: 'rgba(0, 0, 0, 0.55)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -293,7 +293,7 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
                 background: 'var(--c-bg)',
                 border: '1px solid var(--c-line)',
                 borderRadius: 10,
-                boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
+                boxShadow: '0 16px 48px rgba(0, 0, 0, 0.6)',
                 fontSize: 13,
                 color: 'var(--c-fg)',
                 fontFamily: 'inherit',

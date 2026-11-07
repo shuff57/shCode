@@ -84,7 +84,7 @@ export default function StaleBuildGuard() {
         padding: '12px 16px',
         fontSize: '0.85rem',
         maxWidth: 280,
-        boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
       }}
     >
       <div style={{ marginBottom: 8 }}>This page didn&apos;t load correctly.</div>

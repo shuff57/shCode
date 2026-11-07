@@ -45,8 +45,8 @@ const MUTED = 'var(--c-dim)';
 const BORDER = 'var(--c-line)';
 const TEXT = 'var(--c-fg)';
 const ACCENT = 'var(--c-purple)';
-const ADD = 'rgba(80,250,123,0.16)';
-const DEL = 'rgba(255,85,85,0.16)';
+const ADD = 'color-mix(in srgb, var(--c-green) 16.0%, transparent)';
+const DEL = 'color-mix(in srgb, var(--c-red) 16.0%, transparent)';
 const MONO = "'Fira Code', 'Consolas', 'Courier New', monospace";
 
 function fmtTime(ts: number): string {
@@ -349,7 +349,7 @@ export default function HistoryPanel({ isOpen, onClose, lessonId, onRestore }: H
         position: 'fixed',
         inset: 0,
         zIndex: 1000,
-        background: 'rgba(0,0,0,0.6)',
+        background: 'rgba(0, 0, 0, 0.6)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -370,7 +370,7 @@ export default function HistoryPanel({ isOpen, onClose, lessonId, onRestore }: H
           flexDirection: 'column',
           overflow: 'hidden',
           color: TEXT,
-          boxShadow: '0 18px 60px rgba(0,0,0,0.45)',
+          boxShadow: '0 18px 60px rgba(0, 0, 0, 0.45)',
         }}
       >
         {/* Header */}

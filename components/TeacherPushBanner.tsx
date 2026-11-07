@@ -48,7 +48,7 @@ function TeacherPushModal({ unseenCommits, currentFiles, onAdopt, onClose }: Mod
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'rgba(0,0,0,0.55)',
+        background: 'rgba(0, 0, 0, 0.55)',
       }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
@@ -299,7 +299,7 @@ export default function TeacherPushBanner() {
             onClick={() => setModalOpen(true)}
             style={{
               background: 'none',
-              border: '1px solid rgba(0,0,0,0.25)',
+              border: '1px solid rgba(0, 0, 0, 0.25)',
               borderRadius: 4,
               padding: '2px 10px',
               cursor: 'pointer',

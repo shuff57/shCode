@@ -106,7 +106,7 @@ export default function CarryForwardBanner({ lesson }: { lesson: Lesson }) {
         border: '1px solid var(--border)',
         borderLeft: '4px solid var(--x-0ea5e9)',
         borderRadius: 8,
-        background: 'rgba(14,165,233,0.08)',
+        background: 'color-mix(in srgb, var(--x-0ea5e9) 8.0%, transparent)',
         fontSize: 13,
       }}
     >

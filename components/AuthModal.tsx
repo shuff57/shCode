@@ -280,7 +280,7 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
           color: var(--c-fg);
           width: min(420px, 92vw);
         }
-        .auth-dialog::backdrop { background: rgba(0,0,0,0.5); }
+        .auth-dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
         .auth-form { padding: 20px; }
       `}</style>
     </dialog>

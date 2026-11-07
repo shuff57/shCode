@@ -128,7 +128,7 @@ export default function LessonModeControl({ classId, lessons }: Props) {
         .lmc-sub { color: var(--c-comment); font-size: 0.78rem; line-height: 1.45; }
         .lmc-error {
           margin: 0 0 8px; padding: 6px 8px; font-size: 12px;
-          color: var(--c-red); background: rgba(255, 85, 85, 0.1);
+          color: var(--c-red); background: color-mix(in srgb, var(--c-red) 10.0%, transparent);
           border-left: 2px solid var(--c-red);
         }
         .lmc-sep {

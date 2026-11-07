@@ -417,9 +417,9 @@ export default function QuizView({ lessonId, config }: Props) {
                       borderRadius: 4,
                       cursor: 'pointer',
                       background: markAsAnswer
-                        ? 'rgba(80, 250, 123, 0.12)'
+                        ? 'color-mix(in srgb, var(--c-green) 12.0%, transparent)'
                         : markAsMistake
-                          ? 'rgba(255, 85, 85, 0.12)'
+                          ? 'color-mix(in srgb, var(--c-red) 12.0%, transparent)'
                           : selected
                             ? 'var(--c-line)'
                             : 'transparent',

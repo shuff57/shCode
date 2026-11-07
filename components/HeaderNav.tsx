@@ -53,9 +53,9 @@ export default function HeaderNav() {
 
   return (
     <>
-      <Link href="/" className="text-white">Lessons</Link>
+      <Link href="/" style={{ color: 'var(--header-fg)' }}>Lessons</Link>
 
-      <NavDropdown label="Learn" triggerStyle={{ color: 'var(--x-ffffff)', fontSize: 15 }}>
+      <NavDropdown label="Learn" triggerStyle={{ color: 'var(--header-fg)', fontSize: 15 }}>
         <Link href="/sandbox" style={itemStyle}>Sandbox</Link>
         {/* The pixel editor behind `sprite.texture`. Linked here rather than
             only from the docs: a page nothing navigates to is the failure
@@ -74,7 +74,7 @@ export default function HeaderNav() {
       </NavDropdown>
 
       {isStaff && (
-        <NavDropdown label="Teach" triggerStyle={{ color: 'var(--x-ffffff)', fontSize: 15 }}>
+        <NavDropdown label="Teach" triggerStyle={{ color: 'var(--header-fg)', fontSize: 15 }}>
           <Link href="/teacher" style={itemStyle}>Classes</Link>
           <Link href="/teacher/issues" style={itemStyle}>Issues</Link>
           {user?.role === 'admin' && (
@@ -86,7 +86,7 @@ export default function HeaderNav() {
       {/* Top-level shortcut into the same gradebook DetailView tab reaches via
           Teach -> Classes -> pick a class -> Gradebook tab. Staff only. */}
       {isStaff && (
-        <Link href="/teacher?view=gradebook" className="text-white">Gradebook</Link>
+        <Link href="/teacher?view=gradebook" style={{ color: 'var(--header-fg)' }}>Gradebook</Link>
       )}
 
       {/* Students only get two extra links — not worth a dropdown for two.
@@ -95,14 +95,14 @@ export default function HeaderNav() {
           this link the only way in is the one-off link shown after filing a
           report, which is not visibility. */}
       {loaded && user?.role === 'student' && (
-        <Link href="/issues" className="text-white">Issues</Link>
+        <Link href="/issues" style={{ color: 'var(--header-fg)' }}>Issues</Link>
       )}
       {/* The student's own gradebook. Until 2026-09-02 /progress was linked
           from NOWHERE in the app — the score table, the due dates and the
           teacher's override comments all rendered on a page reachable only by
           typing the URL. scripts/check-reachable.mjs now holds that open. */}
       {loaded && user?.role === 'student' && (
-        <Link href="/progress" className="text-white">Gradebook</Link>
+        <Link href="/progress" style={{ color: 'var(--header-fg)' }}>Gradebook</Link>
       )}
 
       {loaded && user?.role === 'student' && hasEnrollments === false && (
