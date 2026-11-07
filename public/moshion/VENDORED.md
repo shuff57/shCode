@@ -101,7 +101,9 @@ it as a URL; a path or a data: URI still bypasses the store. The 8-bit palette
 1. Copy the files in the first two lists from the new commit, then re-apply
    the `/moshion/textures/` line in `moshion.js`. The WAV palette now matches
    `f259b22`; copy it or leave it, the files are identical.
-2. Run `node --import ./scripts/register-ts.mjs scripts/check-moshion-textures.mjs`
+2. Run `node scripts/generate-moshion-completions.mjs` (the editor's autocomplete is built
+   from `docs/moshion.d.ts`; `test-editor-completions.mjs` fails while it is stale), then
+   `node --import ./scripts/register-ts.mjs scripts/check-moshion-textures.mjs`
    and `node --import ./scripts/register-ts.mjs scripts/test-moshion.mjs`.
 3. Update the commit, dates and lists in this file.
 

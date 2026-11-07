@@ -8,6 +8,7 @@ import { defaultKeymap, indentWithTab } from '@codemirror/commands';
 import { bracketMatching, indentOnInput, HighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { tags as t } from '@lezer/highlight';
+import { jsAutocomplete } from '../../../../lib/editor-completions';
 import MoshionPreview from '../../../../components/MoshionPreview';
 import ReshapeScriptPreview from '../../../../components/ReshapeScriptPreview';
 
@@ -81,6 +82,7 @@ export default function DocsSandbox({
           closeBrackets(),
           indentOnInput(),
           javascript(),
+          jsAutocomplete(), // #80, same suggestions as every other editor
           syntaxHighlighting(highlight),
           keymap.of([...closeBracketsKeymap, ...defaultKeymap, indentWithTab]),
           theme,

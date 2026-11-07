@@ -8,6 +8,7 @@ import { defaultKeymap, indentWithTab, history, historyKeymap } from '@codemirro
 import { bracketMatching, indentOnInput, HighlightStyle, syntaxHighlighting, foldGutter, foldKeymap } from '@codemirror/language';
 import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { highlightSelectionMatches } from '@codemirror/search';
+import { jsAutocomplete } from '../lib/editor-completions';
 import { tags as t } from '@lezer/highlight';
 
 // Dracula palette — port of the CodeMirror 5 dracula theme used in public/moshion/editor.html.
@@ -166,6 +167,9 @@ function makeExtensions(
   // read-only samples, and an arrow on every block there is noise.
   if (language === 'javascript' && !readOnly) {
     exts.push(foldGutter({ openText: '\u25BE', closedText: '\u25B8' }), keymap.of(foldKeymap));
+    // #80: suggestions for the moSHion API, JavaScript built-ins and the student's own
+    // names (lib/editor-completions.ts). Tab still indents; Enter or a click takes one.
+    exts.push(jsAutocomplete());
   }
 
   if (readOnly) {
