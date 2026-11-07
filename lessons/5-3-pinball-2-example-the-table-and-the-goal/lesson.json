@@ -1,6 +1,6 @@
 {
   "id": "5-3-pinball-2-example-the-table-and-the-goal",
-  "title": "5.3.3 Worked Example: The table and the goal",
+  "title": "5.3.5 Worked Example: The table and the goal",
   "description": "Names the table's sprites, adds a gold goal bar on the ball's path, then shows the score that jumps by 33 when the ball rolls across it once — deliberately, because 5.4.1 explains why.",
   "type": "lesson",
   "estimateMins": 12,

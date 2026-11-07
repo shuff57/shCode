@@ -1,6 +1,6 @@
 ## Play the finished game
 
-**Read before `5.3.1 Plan: Sketch your pinball game`.** About 5 minutes. There is nothing to write here: you play.
+**Read before `5.3.3 Plan: Sketch your pinball game`.** About 5 minutes. There is nothing to write here: you play.
 
 By the end of this you should be able to answer:
 
@@ -380,7 +380,7 @@ Three parts are **not** built in this unit, and that is fine:
 
 The three-balls counter and the launch lane are extras: nothing in the unit asks you to write them, but the pieces to try them are all in 5.3 to 5.9.
 
-**Try this next:** look at the table above and think about the game you just played. In 5.3.1 you will be asked to list at least four parts of a pinball game. You have just seen more than that.
+**Try this next:** look at the table above and think about the game you just played. In 5.3.3 you will be asked to list at least four parts of a pinball game. You have just seen more than that.
 
 ---
 

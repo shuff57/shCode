@@ -1,0 +1,87 @@
+{
+  "id": "5-3-pinball-3b-lab-walls-and-a-ground",
+  "title": "5.3.7 Lab: Walls and a ground",
+  "description": "Build two walls and a ground with a gap for the ball to drain through. Your ball from the last lab carries forward.",
+  "type": "lesson",
+  "estimateMins": 6,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.3 Pinball: the table",
+  "preview": "moshion",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Two walls",
+      "instructions": "In `setup()`, above the ball's lines, build two tall walls, one at each side of the canvas. A wall must not fall, so give each one the body type that ignores gravity. If you brought your 5.3.6 work forward, your ball is already there; the walls go above it.",
+      "hints": [
+        "`new Sprite(x, y, w, h, 'static')` is a body type, not a fifth size — 5.2.8.",
+        "A wall is tall and thin: about 10 wide and as tall as the canvas. Put one near x = 5 and one near x = 395."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "A ground with a gap",
+      "instructions": "Build a ground along the bottom and store it in `ground` (the starter already declares it). Make it a bit shorter than the canvas and push it to the right, so there is a gap at the bottom left: the drain. Do not name it `floor`: that would hide the `floor()` function from 5.2.2, as 5.3.4 explains.",
+      "hints": [
+        "`ground = new Sprite(250, 385, 280, 20, 'static');` — 280 wide and centred on x = 250, so it runs from 110 to 390 and leaves the left side open."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Run it",
+      "instructions": "Run it. The ball now has walls beside it, but it falls straight down through the gap and out of the drain. Press R. The next lab puts something in its way."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Three things stay put",
+      "description": "Three or more sprites are built with the static body type, so they do not fall. Help: 5.2.8 (Reading: Gravity)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "['\"]static['\"][\\s\\S]*['\"]static['\"][\\s\\S]*['\"]static['\"]",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    },
+    {
+      "id": "r2",
+      "title": "The ground has a name",
+      "description": "A static sprite is stored in `ground`, so the code can ask about it later. Help: 5.3.5 (Worked Example: The table and the goal)",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bground\\s*=\\s*new\\s+Sprite\\s*\\([^)]*['\\\"]static['\\\"]|\\bground\\.collider\\s*=\\s*['\\\"]static['\\\"]",
+      "flags": "",
+      "points": 0,
+      "status": "pending"
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.7 Lab: Walls and a ground\". The task they were given: In setup(), build two tall static walls, one at each side, and a static ground along the bottom stored in `ground`, short enough to leave a gap (the drain) at the bottom left. The ball may still fall through the gap: that is correct for this lab. What the starter file already had: the previous lab's work: a 400 by 400 canvas, `let ball, bumper, ground, goal, score;`, gravity turned on and a bouncy ball at (70, 60). There are no walls and no ground yet, so the starter meets none of the criteria. The student may have brought their own work forward from the lab before, so the file can have more than the starter lists; judge what is in the file. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: world.gravity.y starts at 0, so nothing falls until a sketch sets it; a positive value pulls down the screen because y grows downward. A sprite made with 'static' as its last argument (or given .collider = 'static') never moves or falls. new Sprite(x, y, d) with one size number makes a circle; new Sprite(x, y, w, h) makes a rectangle. rotation is in degrees. bounciness runs from 0 (a thud) to 1. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Three things stay put",
+        "description": "Three or more sprites are built with the static body type, so they do not fall. Help: 5.2.8 (Reading: Gravity)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The ground has a name",
+        "description": "A static sprite is stored in `ground`, so the code can ask about it later. Help: 5.3.5 (Worked Example: The table and the goal)",
+        "points": 1
+      }
+    ]
+  },
+  "carryFrom": "5-3-pinball-3a-lab-drop-a-bouncy-ball"
+}

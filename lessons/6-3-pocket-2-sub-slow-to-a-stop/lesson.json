@@ -20,7 +20,7 @@
     {
       "id": "s2",
       "title": "Add drag",
-      "instructions": "In `setup()`, set `cue.drag = 0.02;`. Run it: the ball slows, but never stops exactly."
+      "instructions": "In `setup()`, set `cue.drag = 1;`. Run it: the ball slows, but never stops exactly."
     },
     {
       "id": "s3",
@@ -37,7 +37,7 @@
       "id": "r1",
       "title": "Drag is set",
       "description": "The ball has a drag above 0. Help: 6.3.1 (Reading: Rolling to a stop)",
-      "hint": "cue.drag = 0.02;",
+      "hint": "cue.drag = 1;",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\.\\s*drag\\s*=\\s*[\\d.]",

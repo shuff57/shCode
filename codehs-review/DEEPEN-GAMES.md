@@ -1,5 +1,10 @@
 # Deepen the games: grow Pinball, Flappy and Snake, add Mini Golf, Cannon and Jumper
 
+> **Status: superseded for Flappy and Snake.** The built arcs are 5.10-5.12 and 5.13-5.16
+> (`LAYOUT-2026-11.md`); the 5.4.x and 5.14.x lessons described below were never built. Its
+> `moveTowards`, `.texture` and `after()` list is not the current prerequisite list. The one
+> prerequisite the current Climb outline still needs is `addSensor` (`SUB-BUILDS.md`).
+
 Build spec, drafted 2026-11-03 on `codehs-inspiration`. Nothing is built and no lesson is edited by this file.
 
 **Owner decisions it follows.** (a) 5.3 Pinball, 5.4 Flappy and 5.5 Snake grow inside their own modules. (b) New games

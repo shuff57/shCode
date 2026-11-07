@@ -1,6 +1,6 @@
 {
   "id": "5-3-pinball-plan-sketch-the-game",
-  "title": "5.3.1 Plan: Sketch your pinball game",
+  "title": "5.3.3 Plan: Sketch your pinball game",
   "description": "Before any code: list the parts of your pinball game, what it must remember, what to build first and what looks hard. AI-graded with hints.",
   "type": "assignment",
   "estimateMins": 12,

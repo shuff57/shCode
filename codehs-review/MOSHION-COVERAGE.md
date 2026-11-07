@@ -160,7 +160,7 @@ The full list of the 72 BASIC entries not taught in 5.1-5.5:
 | .textSize (sprite) | no | never | yes |
 | .density | no | never | yes |
 | .mass | no | never | yes |
-| .drag (air resistance) | no | never | yes |
+| .drag (air resistance) | no | 6.3.1 | yes |
 | .gravityScale | no | never | no |
 | .overlaps() | no | 5.9.5 (reading) | yes |
 | .collides() | no | never | no |
@@ -534,7 +534,7 @@ row (`.colour`/`.fill`, `.hw`/`.halfWidth`, and so on).
 | .density | Sprite: physics | BASIC | DOCS-ONLY | - | - | yes |  |
 | .mass | Sprite: physics | BASIC | DOCS-ONLY | - | - | yes |  |
 | .resetMass() / .centerOfMass | Sprite: physics | ADVANCED | ABSENT | - | - | no |  |
-| .drag (air resistance) | Sprite: physics | BASIC | DOCS-ONLY | - | - | yes |  |
+| .drag (air resistance) | Sprite: physics | BASIC | TAUGHT | taught 6.3.1 `6-3-pocket-1-reading-rolling-to-a-stop`; first used 6.3.2 `6-3-pocket-2-sub-slow-to-a-stop` [instr,solution] | 6.3, 6.4, 6.5 | yes |  |
 | .rollingResistance | Sprite: physics | ADVANCED | ABSENT | - | - | no |  |
 | .gravityScale | Sprite: physics | BASIC | ABSENT | - | - | no |  |
 | .applyForce() | Sprite: physics | BASIC | TAUGHT | taught 5.2.13 `5-2-8-reading-forces-vs-velocity` (reading); first used 5.2.14 `5-2-9-lab-wind-zone` [solution] | 5.2, 6.8 | yes |  |

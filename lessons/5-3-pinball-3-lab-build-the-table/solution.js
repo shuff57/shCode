@@ -1,4 +1,4 @@
-// 5.3.4 Lab: Build the table (reference solution).
+// 5.3.9 Lab: Put a goal on the table (reference solution).
 
 let ball, bumper, ground, goal, score;
 

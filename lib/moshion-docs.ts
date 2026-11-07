@@ -916,6 +916,39 @@ function draw() {
 }`,
       },
       {
+        title: 'Drag (slowing down)',
+        body: `.drag slows a sprite down on its own, with no wall or floor to rub against. It is the knob for a ball on a table seen from above, where gravity is 0 and nothing else would ever stop it. 0 means no slowing at all.
+
+The number is a rate per SECOND, not per frame. At .drag = 1 a moving sprite keeps about a third of its speed after one second and nearly none after four. At .drag = 0.02 it keeps almost all of it: the sprite crosses the canvas and hits a wall long before it slows. A few landmarks: 0.02 is nearly frictionless, 1 is a pool table, 6 is sand or thick carpet.
+
+.drag slows a sprite but never stops it exactly, because it only ever removes a share of what is left. To make a sprite really stop, check .speed each frame and set it to 0 once it is small enough.
+
+.friction is a different knob: it only acts while two sprites touch. .drag works everywhere, all the time.`,
+        code: `function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+
+  const slick = new Sprite(40, 130, 24);
+  slick.color = 'lightblue';
+  slick.drag = 0.02;
+  slick.vel.x = 6;
+
+  const table = new Sprite(40, 200, 24);
+  table.color = 'lightgreen';
+  table.drag = 1;
+  table.vel.x = 6;
+
+  const sand = new Sprite(40, 270, 24);
+  sand.color = 'khaki';
+  sand.drag = 6;
+  sand.vel.x = 6;
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
+      {
         title: 'Applying forces',
         body: `sprite.applyForce(fx, fy) pushes a sprite with a force in newtons — the physics engine's own force unit, not pixels. Pass the x and y components as two separate numbers. Call it every frame for continuous thrust, or once for a shove.
 

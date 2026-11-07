@@ -15,6 +15,7 @@ A lesson plays one with `"videoUrl": "/videos/<name>/index.html"` (dev serves no
 | `5-2-bounce/` | 5.2.14 Video: Bounciness and Friction Explained | ~2:43 | same voice and rate |
 | `5-2-random/` | 5.2.1 Video: Random Numbers and Timers | ~2:43 | same voice and rate |
 | `5-2-delete/` | 5.2.20 Video: Delete and Hide Explained | ~2:08 | same voice and rate |
+| `5-3-table/` | 5.3.2 Video: The Pinball Table, Explained (overview of the whole module: the table built in stages) | ~2:25 | same voice and rate |
 
 The last five (`5-2-forces` through `5-2-delete`, built 2026-11-06 in bookSHelf `_workspace/papermorph-trials/moshion-5.2-*`
 and reviewed by independent eyes and ears passes) sync labels to the spoken word through `audio/en/words.js`

@@ -31,11 +31,11 @@ const POINTERS = {
   // Every criterion there is listed explicitly instead.
 
   // --- 5.3.8 / 5.3.9: property read/write on an instance ------------------
-  '5-3-8-lab-read-property': { target: '5.3.3', note: 'Class and instance' },
-  '5-3-9-lab-write-property': { target: '5.3.3', note: 'Class and instance' },
+  '5-3-8-lab-read-property': { target: '5.3.5', note: 'Class and instance' },
+  '5-3-9-lab-write-property': { target: '5.3.5', note: 'Class and instance' },
 
   // --- 5.3.10: two instances, one property changed ------------------------
-  '5-3-10-lab-two-instances': { target: '5.3.3', note: 'Class and instance' },
+  '5-3-10-lab-two-instances': { target: '5.3.5', note: 'Class and instance' },
 
   // --- 5.3.13: sprites are created, not declared -------------------------
   '5-3-13-lab-build-sprite': { target: '5.1.5', note: 'Canvas: new Canvas(w, h)' },
@@ -100,13 +100,13 @@ const PER_CRITERION = {
   '5-3-9-lab-write-property\u0000Detect a key press':
     { target: '5.1.18', note: 'Keyboard Movement' },
   '5-3-10-lab-two-instances\u0000Only b1.color is reassigned':
-    { target: '5.3.3', note: 'Class and instance' },
+    { target: '5.3.5', note: 'Class and instance' },
   '5-3-13-lab-build-sprite\u0000Rectangle sprite (4-arg form)':
     { target: '5.1.5', note: 'Canvas: new Canvas(w, h)' },
   '5-3-13-lab-build-sprite\u0000Circle sprite (3-arg form)':
     { target: '5.1.5', note: 'Canvas: new Canvas(w, h)' },
   '5-3-13-lab-build-sprite\u0000Property set on an instance':
-    { target: '5.3.3', note: 'Class and instance' },
+    { target: '5.3.5', note: 'Class and instance' },
 
   // --- 6.5 save system: JSON is a module 3.8 topic -----------------------
   '6-5-25-a16-1-save-system\u0000getItem used':

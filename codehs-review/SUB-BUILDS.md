@@ -68,14 +68,19 @@ the bug the loop prevents.
 `mouse.released()`, power capped. **Slow to a stop:** `.drag`, "stopped" as speed under a
 number, `new Walls()` rails. **A pocket you roll over:** `'none'` + `overlaps()` once.
 
-### 5.7 Sling (catapult) — 5 submodules, 4 sub-builds
+### 6.16-6.21 Sling (catapult) — 6 submodules, 4 sub-builds
 
 **An arm that turns:** `rotateTo` and `constrain` about the aim. **Launch:** a sprite made on
 release, `direction`/`speed`, gravity arc. **Out and gone:** off-screen and `.life`, plus the
 sweep. **Hits and a budget:** every shot against every block, one hit per shot, a block that
 leaves.
 
-### 5.8 (or 6.x) Climb (Doodle Jump) — 5 submodules, 4 sub-builds
+### 6.22-6.27 Climb (Doodle Jump) — 6 submodules, 4 sub-builds
+
+**Teaching that has to come first:** `addSensor` is taught nowhere in units 1-7. 6.22 must
+introduce it on its own screen before the first lab: `feet = player.addSensor(0, h/2 + 2, w - 4, 4)`,
+then `feet.overlaps(p)` for each platform. `colliding(ground)` alone is not enough - it is also
+true against a wall or a platform's underside, so the player climbs walls.
 
 **A platform and a foot:** `addSensor`, `overlaps` per platform, grounded reset each frame.
 **Spawn and recycle:** platforms made above, moved down, deleted below. **Coins you climb

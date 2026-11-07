@@ -8744,31 +8744,73 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ]
   },
   "5-3-pinball-3-lab-build-the-table": {
-    "lessonTitle": "5.3.4 Lab: Build the table",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.4 Lab: Build the table\". The task they were given: Build the pinball table in setup(): turn gravity on so the ball falls; build at least three static obstacles that do not fall, storing at least one in a named variable; build the ball as a circle (one size number) starting at (70, 60), with a colour and a bounciness above 0.5; and add a gold block with the same static body type, stored in goal, where the ball really goes. The score is drawn but does not change yet. What the starter file already had: a 400 by 400 canvas, `let ball, goal, score;`, score set to 0, and a draw() that shows the score and puts the ball back at (70, 60) when R is pressed. There is no gravity, no obstacle, no ball and no goal yet, so the starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: world.gravity.y starts at 0, so nothing falls until a sketch sets it; a positive value pulls down the screen because y grows downward. A sprite made with 'static' as its last argument (or given .collider = 'static') never moves or falls. new Sprite(x, y, d) with one size number makes a circle. bounciness runs from 0 (a thud) to 1. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "lessonTitle": "5.3.9 Lab: Put a goal on the table",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.9 Lab: Put a goal on the table\". The task they were given: In setup(), add a gold block with the same static body type as the bumper, stored in `goal`, where the ball really goes. The score is drawn but does not change yet. What the starter file already had: the previous labs' work: gravity on, two static walls, a tilted static bumper stored in `bumper`, a static ground stored in `ground` and a bouncy ball at (70, 60). There is no goal yet, so the starter meets none of the criteria. The student may have brought their own work forward from the lab before, so the file can have more than the starter lists; judge what is in the file. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: world.gravity.y starts at 0, so nothing falls until a sketch sets it; a positive value pulls down the screen because y grows downward. A sprite made with 'static' as its last argument (or given .collider = 'static') never moves or falls. new Sprite(x, y, d) with one size number makes a circle; new Sprite(x, y, w, h) makes a rectangle. rotation is in degrees. bounciness runs from 0 (a thud) to 1. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "A goal is on the table",
+        "description": "A static sprite is stored as the goal, in a colour the player can see. Help: 5.3.5 (Worked Example: The table and the goal)",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-pinball-3a-lab-drop-a-bouncy-ball": {
+    "lessonTitle": "5.3.6 Lab: Drop a bouncy ball",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.6 Lab: Drop a bouncy ball\". The task they were given: In setup(), turn gravity on so things fall, then build the ball as a circle (one size number) starting at (70, 60), with a colour and a bounciness above 0.5. There is no table yet, so the ball falling off the bottom is correct. What the starter file already had: a 400 by 400 canvas, `let ball, bumper, ground, goal, score;`, score set to 0, and a draw() that shows the score and puts the ball back at (70, 60) when R is pressed. There is no gravity and no ball yet, so the starter meets none of the criteria. The student may have brought their own work forward from the lab before, so the file can have more than the starter lists; judge what is in the file. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: world.gravity.y starts at 0, so nothing falls until a sketch sets it; a positive value pulls down the screen because y grows downward. A sprite made with 'static' as its last argument (or given .collider = 'static') never moves or falls. new Sprite(x, y, d) with one size number makes a circle; new Sprite(x, y, w, h) makes a rectangle. rotation is in degrees. bounciness runs from 0 (a thud) to 1. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
     "rubric": [
       {
         "id": "r1",
         "title": "Gravity is on",
-        "description": "world.gravity.y is set to a positive number (directly or through a variable), so the ball falls down the screen. 0 is not on. A negative number would send the ball up the screen, the opposite of falling, so it is not met. Help: 5.2.6 (Reading: Gravity)",
+        "description": "`setup()` turns gravity on with a positive number, so things fall down the screen. Help: 5.2.8 (Reading: Gravity)",
         "points": 1
       },
       {
         "id": "r2",
-        "title": "At least three obstacles stay put",
-        "description": "Three or more sprites are static (made with 'static', or given .collider = 'static'), so they do not fall. Walls, a ground, bumpers and ramps all count, in any shapes, sizes and places. Help: 5.2.6 (Reading: Gravity)",
+        "title": "There is a ball",
+        "description": "A sprite is stored in `ball`, built with `new Sprite`. Help: 5.3.4 (Reading: From scene to game)",
         "points": 1
       },
       {
         "id": "r3",
         "title": "The ball is genuinely bouncy",
-        "description": "The ball's bounciness is set to 0.5 or more (directly or through a variable), so it keeps most of its speed. A value under 0.5 is not met yet. Help: 5.2.11 (Reading: Bounciness and Friction)",
+        "description": "The ball's `bounciness` is set above 0.5, so it keeps most of its speed. Help: 5.2.15 (Reading: Bounciness and Friction)",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-pinball-3b-lab-walls-and-a-ground": {
+    "lessonTitle": "5.3.7 Lab: Walls and a ground",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.7 Lab: Walls and a ground\". The task they were given: In setup(), build two tall static walls, one at each side, and a static ground along the bottom stored in `ground`, short enough to leave a gap (the drain) at the bottom left. The ball may still fall through the gap: that is correct for this lab. What the starter file already had: the previous lab's work: a 400 by 400 canvas, `let ball, bumper, ground, goal, score;`, gravity turned on and a bouncy ball at (70, 60). There are no walls and no ground yet, so the starter meets none of the criteria. The student may have brought their own work forward from the lab before, so the file can have more than the starter lists; judge what is in the file. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: world.gravity.y starts at 0, so nothing falls until a sketch sets it; a positive value pulls down the screen because y grows downward. A sprite made with 'static' as its last argument (or given .collider = 'static') never moves or falls. new Sprite(x, y, d) with one size number makes a circle; new Sprite(x, y, w, h) makes a rectangle. rotation is in degrees. bounciness runs from 0 (a thud) to 1. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Three things stay put",
+        "description": "Three or more sprites are built with the static body type, so they do not fall. Help: 5.2.8 (Reading: Gravity)",
         "points": 1
       },
       {
-        "id": "r4",
-        "title": "A goal is on the table",
-        "description": "A static sprite (made with 'static', or given .collider = 'static') is stored in goal, in a colour the player can see: gold is what the step asks, but any visible colour counts, and so does leaving the default colour. A goal that is not static would fall with gravity, so it is not met yet. Help: 5.3.3 (Worked Example: The table and the goal)",
+        "id": "r2",
+        "title": "The ground has a name",
+        "description": "A static sprite is stored in `ground`, so the code can ask about it later. Help: 5.3.5 (Worked Example: The table and the goal)",
+        "points": 1
+      }
+    ]
+  },
+  "5-3-pinball-3c-lab-a-tilted-bumper": {
+    "lessonTitle": "5.3.8 Lab: A tilted bumper",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.8 Lab: A tilted bumper\". The task they were given: In setup(), build a wide, thin static bumper stored in `bumper`, under and a little to the right of the ball's start, and tilt it by setting its rotation to a number that is not 0. What the starter file already had: the previous labs' work: gravity on, a bouncy ball at (70, 60), two static walls and a static ground stored in `ground`. There is no bumper yet, so the starter meets none of the criteria. The student may have brought their own work forward from the lab before, so the file can have more than the starter lists; judge what is in the file. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: world.gravity.y starts at 0, so nothing falls until a sketch sets it; a positive value pulls down the screen because y grows downward. A sprite made with 'static' as its last argument (or given .collider = 'static') never moves or falls. new Sprite(x, y, d) with one size number makes a circle; new Sprite(x, y, w, h) makes a rectangle. rotation is in degrees. bounciness runs from 0 (a thud) to 1. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "The bumper has a name and stays put",
+        "description": "A static sprite is stored in `bumper`, so it does not fall and the code can ask about it later. Help: 5.3.5 (Worked Example: The table and the goal)",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "The bumper is tilted",
+        "description": "The bumper's `rotation` is set to a number that is not 0, so the ball leaves at an angle. Help: 5.3.5 (Worked Example: The table and the goal)",
         "points": 1
       }
     ]
@@ -8852,7 +8894,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     ]
   },
   "5-3-pinball-plan-sketch-the-game": {
-    "lessonTitle": "5.3.1 Plan: Sketch your pinball game",
+    "lessonTitle": "5.3.3 Plan: Sketch your pinball game",
     "prompt": "Everything you need is on this page and in 5.2.24 (Pinball Scene): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to turn your pinball scene into a pinball game. Before you write any code, plan it.\n\n1. List at least four separate parts of the game, things it has or does.\n\n2. Which two or more things does the game have to remember from one moment to the next?\n\n3. Which part would you build first, and why?\n\n4. Which part are you unsure how to build, and what makes it hard?",
     "rubric": [
       {
@@ -8885,7 +8927,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
   },
   "5-3-pinball-playtest-and-reflect": {
     "lessonTitle": "5.9.1 Playtest and reflect: Pinball",
-    "prompt": "Everything you need is in 5.3.1 (Plan: Sketch your pinball game) and 5.5.3 (Lab: Lose, and start again): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished pinball game at least three times, trying to lose in different ways. Then answer:\n\n1. How many rounds did you play, and how did they go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which part of your code do you think that comes from?\n\n4. What is one rule or number you would change, and what would it do to the game?",
+    "prompt": "Everything you need is in 5.3.3 (Plan: Sketch your pinball game) and 5.5.3 (Lab: Lose, and start again): go back and reread them if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished pinball game at least three times, trying to lose in different ways. Then answer:\n\n1. How many rounds did you play, and how did they go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which part of your code do you think that comes from?\n\n4. What is one rule or number you would change, and what would it do to the game?",
     "rubric": [
       {
         "id": "played",
@@ -9051,18 +9093,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
   },
   "5-4-flappy-5-lab-pipes-that-come-and-go": {
     "lessonTitle": "5.11.3 Lab: Pipes that come and go",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.11.3 Lab: Pipes that come and go\". The task they were given: makePipe() is given: it builds one pair of pipes just off the right edge, moving left, and returns the top pipe (the bottom one is stored as its mate). In draw(), call it on a repeating beat (every 90 frames) and push the result into the pipes array; the starter builds only one pair, on frame 1. Then loop over pipes from the end to the start and, when a pipe's x is less than -30, delete its mate and the pipe and splice it out of the array. Finally show pipes.length in drawTop(). You cannot run their code: read it and judge what it WOULD do when the sketch runs. draw() runs every frame and frameCount counts the frames, so frameCount % 90 === 0 is true once every 90 frames, while frameCount === 1 is true only once. sprite.delete() (or its twin sprite.remove()) takes a sprite off the screen and out of the physics world; pipes.splice(i, 1) only takes it out of the array. The pipes move left, so a pipe that has left the screen has a small or negative x. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Wrong ideas to catch: keeping the starter's frameCount === 1 test (one pair, never again); a push that runs every frame, outside the beat; a test that deletes pipes still on the screen (x greater than something). Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.11.3 Lab: Pipes that come and go\". The task they were given: makePipe() is given: it builds one pair of pipes just off the right edge, moving left, and returns the top pipe (the bottom one is stored as its mate). In draw(), call it on a repeating beat (every 90 frames, as frameCount % 90 === 0 or as every(90, ...)) and push the result into the pipes array; the starter builds only one pair, on frame 1. Then loop over pipes from the end to the start and, when a pipe's x is less than -30, delete its mate and the pipe and splice it out of the array. Finally show pipes.length in drawTop(). You cannot run their code: read it and judge what it WOULD do when the sketch runs. draw() runs every frame and frameCount counts the frames, so frameCount % 90 === 0 is true once every 90 frames, while frameCount === 1 is true only once. sprite.delete() (or its twin sprite.remove()) takes a sprite off the screen and out of the physics world; pipes.splice(i, 1) only takes it out of the array. The pipes move left, so a pipe that has left the screen has a small or negative x. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, template strings, arrow functions, ternaries or if-chains, semicolons, spacing, quotes, order and helper functions of their own are all fine; only a name the starter's own code already calls or reads has to keep that name. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or a string never runs, so the starter's STEP comments are never the student's work. Wrong ideas to catch: keeping the starter's frameCount === 1 test (one pair, never again); a push that runs every frame, outside the beat; a test that deletes pipes still on the screen (x greater than something). Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old beginner: short sentences and everyday words.",
     "rubric": [
       {
         "id": "r1",
         "title": "A pair is built on a repeating beat",
-        "description": "A test that comes true again and again at a steady rate: frameCount % N === 0 or == 0 for any N, or a frame counter of the student's own that counts up and is reset each time it fires. Missing: only the starter's frameCount === 1, which is true once. Help: 5.11.1 (Reading: A world that scrolls)",
+        "description": "A test that comes true again and again at a steady rate: frameCount % N === 0 or == 0 for any N, an every(N, ...) timer, or a frame counter of the student's own that counts up and is reset each time it fires. Missing: only the starter's frameCount === 1, which is true once. Help: 5.11.1 (Reading: A world that scrolls)",
         "points": 1
       },
       {
         "id": "r2",
         "title": "Every pair goes into the array",
-        "description": "Inside that beat's if (or an if that reads a variable holding the beat test), a new pair is made with makePipe() and pushed into pipes, in one line or stored in a variable first. Missing: no push, or a push that runs on every frame outside the beat. Help: 5.11.1 (Reading: A world that scrolls)",
+        "description": "Inside that beat's if (or an if that reads a variable holding the beat test, or the every() callback), a new pair is made with makePipe() and pushed into pipes, in one line or stored in a variable first. Missing: no push, or a push that runs on every frame outside the beat. Help: 5.11.1 (Reading: A world that scrolls)",
         "points": 1
       },
       {
@@ -9799,7 +9841,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
   },
   "6-1-pocket-4-lab-the-aim-line": {
     "lessonTitle": "6.1.4 Lab: The aim line on the table",
-    "prompt": "The student wrote a moSHion sketch for \"Lab: The aim line on the table\". The task: draw an aim line from the cue ball to the pointer while the mouse is held, on a table with rails, and show the pull distance. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: The aim line on the table\". The task: add the table's rails with new Walls() after new Canvas(), draw an aim line from the cue ball to the pointer while the mouse is held, and show the pull distance. The cue ball is solid (collider 'dynamic'), so the rails can stop it; a 'none' ball passes through them. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
     "rubric": [
       {
         "id": "r1",
@@ -10061,7 +10103,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
   },
   "6-20-sling-1-lab-five-shots": {
     "lessonTitle": "6.20.1 Lab: Five shots, win or lose",
-    "prompt": "The student wrote a moSHion sketch for \"Lab: Five shots, win or lose\". The task: give the player five shots, spend one per launch, win when the blocks are gone, lose when the shots are gone and none are flying, and let R start the round again. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Five shots, win or lose\". The task: give the player five shots, spend one per launch, win when the blocks are gone, lose when the shots are gone and none are flying, and let R call startRound() so the round starts clean. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. A reset that pushes new blocks without deleting the old ones, or without emptying shots, is not a clean restart. Short, plain notes for a 14-year-old; never write corrected code.",
     "rubric": [
       {
         "id": "r1",
@@ -10073,6 +10115,12 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "id": "r2",
         "title": "Both endings",
         "description": "Win on no blocks; lose on no shots and none in the air.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "A clean restart",
+        "description": "R calls startRound(), which clears the old blocks and shots before it rebuilds.",
         "points": 1
       }
     ]

@@ -1,0 +1,22 @@
+{
+  "id": "5-3-video-table",
+  "title": "5.3.2 Video: The Pinball Table, Explained",
+  "description": "How the pinball table is built, one stage at a time, and what each lesson in this module adds. A 2-and-a-half-minute walkthrough of the module.",
+  "type": "lesson",
+  "estimateMins": 3,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "5.3 Pinball: the table",
+  "preview": "video",
+  "week": 11,
+  "slos": [
+    "SLO-3"
+  ],
+  "videoUrl": "/videos/5-3-table/index.html",
+  "steps": [],
+  "requirements": [],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

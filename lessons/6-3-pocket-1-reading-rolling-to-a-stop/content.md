@@ -3,10 +3,14 @@
 On a table seen from above there is no ground to rub against, so `.drag` bleeds the speed:
 
 ```js
-cue.drag = 0.02;
+cue.drag = 1;
 ```
 
-Drag is applied every frame, so the ball slows a little each frame and never quite reaches zero.
+The number is how hard the felt pulls. Drag is applied every frame, so the ball loses a slice of
+its speed each frame and never quite reaches zero: at `1` it keeps about a third of its speed
+after a second, so a soft shot is down to a crawl in two or three. A bigger number is a shorter
+roll (sand, not felt); `0.02` is so nearly frictionless that the ball would cross the whole table
+and still be moving.
 
 ## "Stopped" is a threshold
 
@@ -24,5 +28,7 @@ release branch.
 
 ## The rails
 
-`new Walls()` makes four edges in one line, after `new Canvas()`, and `walls.left` and the
-other three names let you change them.
+The rails you built in 6.1.4 are still the edge of the table: `new Walls()` makes four static
+sprites just outside the canvas, and `walls.left`, `walls.right`, `walls.top` and
+`walls.bottom` name them. The ball is solid, so the rails can stop it; drag is what slows it
+down before it gets there.

@@ -3,7 +3,7 @@
   "title": "6.1.4 Lab: The aim line on the table",
   "description": "Put the aim line on a table with rails, so the line is the shot you are about to take.",
   "type": "lesson",
-  "estimateMins": 12,
+  "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.1 Pocket: plan and the aim line",
   "preview": "moshion",
@@ -15,15 +15,24 @@
     {
       "id": "s1",
       "title": "Run it",
-      "instructions": "The cue ball sits on the table and the rails hold it. There is no line."
+      "instructions": "A cue ball on a green table. It does not move, nothing holds it on the table, and there is no line."
     },
     {
       "id": "s2",
+      "title": "The rails",
+      "instructions": "In `setup()`, after `new Canvas()`, add `const walls = new Walls();`. That one line builds the table's four rails: four static sprites just outside the edges of the canvas, so nothing can roll off the table. They sit off screen, which is why you never see them and there is no colour to pick. The four also have names - `walls.left`, `walls.right`, `walls.top`, `walls.bottom` - so `cue.colliding(walls)` asks \"touching any edge?\" and `cue.colliding(walls.bottom)` asks \"on the floor?\": the `colliding()` from 5.9.5, pointed at one rail instead of a sprite. The ball is `collider = 'dynamic'`, so it is solid and the rails have something to stop; a `'none'` ball passes straight through them. Run it: nothing looks different, because the ball is not moving. 6.2.4 shoots it and the rails catch it.",
+      "hints": [
+        "`new Walls()` has to come after `new Canvas(400, 400)`: it reads the canvas size to place the four edges.",
+        "There is nothing to see on screen. The rails sit just outside the canvas, so they never appear."
+      ]
+    },
+    {
+      "id": "s3",
       "title": "The line, on a table",
       "instructions": "Add the same held-pointer line as the sub-build, from the cue ball to the pointer. Keep it inside `if (mouse.pressing())`."
     },
     {
-      "id": "s3",
+      "id": "s4",
       "title": "Check it reads as a shot",
       "instructions": "Pull toward a rail and away from it: the line should always start at the cue ball and end under the pointer.",
       "hints": [
@@ -57,6 +66,19 @@
       "points": 0,
       "status": "pending",
       "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "The table has rails",
+      "description": "`new Walls()` is called in `setup()`, after `new Canvas()`, so the four rails exist.",
+      "hint": "const walls = new Walls();",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bnew\\s+Walls\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
     }
   ],
   "grading": {
@@ -67,7 +89,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch for \"Lab: The aim line on the table\". The task: draw an aim line from the cue ball to the pointer while the mouse is held, on a table with rails, and show the pull distance. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: The aim line on the table\". The task: add the table's rails with new Walls() after new Canvas(), draw an aim line from the cue ball to the pointer while the mouse is held, and show the pull distance. The cue ball is solid (collider 'dynamic'), so the rails can stop it; a 'none' ball passes through them. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
     "rubric": [
       {
         "id": "r1",
