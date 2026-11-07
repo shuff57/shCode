@@ -371,6 +371,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "info": ""
  },
  {
+  "label": "online",
+  "type": "variable",
+  "detail": "Online",
+  "info": "Play with a classmate on another computer: host(), join(code), send(move), onMove(fn)."
+ },
+ {
   "label": "PI",
   "type": "constant",
   "detail": "number",
@@ -2558,6 +2564,74 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "detail": "(): void",
    "info": ""
   }
+ ],
+ "Online": [
+  {
+   "label": "host",
+   "type": "method",
+   "detail": "(players?)",
+   "info": "Start a room for 2 (or up to 4) players. online.code becomes its 6-letter code."
+  },
+  {
+   "label": "join",
+   "type": "method",
+   "detail": "(code)",
+   "info": "Join a classmate's room with their 6-letter code."
+  },
+  {
+   "label": "send",
+   "type": "method",
+   "detail": "(move)",
+   "info": "Send a move: numbers, true/false and short words."
+  },
+  {
+   "label": "onMove",
+   "type": "method",
+   "detail": "(fn)",
+   "info": "fn(move, seat) runs for every move, yours too, in the same order on every computer."
+  },
+  {
+   "label": "leave",
+   "type": "method",
+   "detail": "()",
+   "info": "Leave the room. The host leaving closes it."
+  },
+  {
+   "label": "status",
+   "type": "property",
+   "detail": "string",
+   "info": "'off', 'connecting', 'waiting', 'ready', 'closed' or 'error'."
+  },
+  {
+   "label": "code",
+   "type": "property",
+   "detail": "string",
+   "info": "The room's 6-letter code."
+  },
+  {
+   "label": "seat",
+   "type": "property",
+   "detail": "number",
+   "info": "Your seat: 0 is the host, then 1, 2, 3."
+  },
+  {
+   "label": "seats",
+   "type": "property",
+   "detail": "number",
+   "info": "How many players the room is for."
+  },
+  {
+   "label": "players",
+   "type": "property",
+   "detail": "{seat, name, left}[]",
+   "info": "Who is in the room."
+  },
+  {
+   "label": "error",
+   "type": "property",
+   "detail": "string",
+   "info": "The last problem, in words."
+  }
  ]
 };
 
@@ -2567,5 +2641,6 @@ export const MOSHION_TYPE_OF: Record<string, string> = {
  "camera": "Camera",
  "kb": "Kb",
  "mouse": "Mouse",
- "allSprites": "Group"
+ "allSprites": "Group",
+ "online": "Online"
 };

@@ -41,6 +41,11 @@ export default function PrivacyPage() {
           Signing out removes the copies that are already in your account from that browser.
         </li>
         <li>
+          <strong>Online games:</strong> when your sketch hosts or joins a game room, the room keeps who is in it and the
+          moves sent (numbers and short words only, never messages) for three hours, and the other players see your first
+          name and last initial. Only classmates, people who share a class with the host, can join.
+        </li>
+        <li>
           <strong>Appearance settings:</strong> the theme, accent colour, font and home page background you pick on My
           account, kept with your account so they follow you to other computers. A background image you upload is stored
           with your other uploaded images. Signing out returns that browser to the default look.

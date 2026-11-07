@@ -2,6 +2,7 @@
 
 import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { useMoshionStorage } from '../lib/moshion-storage';
+import { useMoshionOnline } from '../lib/moshion-online';
 
 // Base64-url-safe encoder for UTF-8 strings.
 export function encodeCode(code: string): string {
@@ -26,6 +27,7 @@ const MoshionPreview = forwardRef<HTMLIFrameElement, Props>(function MoshionPrev
   const innerRef = useRef<HTMLIFrameElement | null>(null);
   useImperativeHandle(ref, () => innerRef.current as HTMLIFrameElement, [runKey]);
   useMoshionStorage(innerRef);
+  useMoshionOnline(innerRef);
 
   if (runKey === 0 || !code.trim()) {
     return (

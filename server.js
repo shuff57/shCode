@@ -570,6 +570,18 @@ app.prepare().catch((err) => {
       const out = await handler({ request, env: { DB: libDb, UPLOADS }, params: req.params, data: { email, role: DEV_ROLE } });
       res.status(out.status).type('application/json').send(await out.text());
     };
+    // Online game rooms (functions/api/rooms/*): two `dev_student` cookies are
+    // two classmates in "Dev class", so two browser sessions can play each other.
+    const roomCreate = await import('./functions/api/rooms/index.ts');
+    const roomPoll = await import('./functions/api/rooms/[code]/index.ts');
+    const roomJoin = await import('./functions/api/rooms/[code]/join.ts');
+    const roomSend = await import('./functions/api/rooms/[code]/send.ts');
+    const roomLeave = await import('./functions/api/rooms/[code]/leave.ts');
+    server.post('/api/rooms', express.json(), libRoute(roomCreate.onRequestPost));
+    server.get('/api/rooms/:code', libRoute(roomPoll.onRequestGet));
+    server.post('/api/rooms/:code/join', express.json(), libRoute(roomJoin.onRequestPost));
+    server.post('/api/rooms/:code/send', express.json(), libRoute(roomSend.onRequestPost));
+    server.post('/api/rooms/:code/leave', express.json(), libRoute(roomLeave.onRequestPost));
     // Appearance settings (functions/api/prefs.ts), same in-memory database.
     const prefsRoute = await import('./functions/api/prefs.ts');
     server.get('/api/prefs', libRoute(prefsRoute.onRequestGet));

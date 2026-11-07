@@ -513,6 +513,21 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   (`components/PrefsSync.tsx`) and clears it on sign-out. UI: `components/AppearanceSettings.tsx` on `/account`; the
   home background is `components/HomeBackdrop.tsx`. Tests: `scripts/test-prefs.mjs`.
 
+### Online game rooms (Phase 6, board games)
+- A sketch plays a classmate on another computer through `online` (`public/moshion/extras.js`, NOT the vendored
+  engine): `host(players?)`, `join(code)`, `send(move)`, `onMove(fn(move, seat))`, `leave()`, plus `status`, `code`,
+  `seat`, `players`, `error`. The sandboxed iframe cannot reach the API, so `lib/moshion-online.ts`
+  (`useMoshionOnline`, mounted in `MoshionPreview`) calls `/api/rooms*` as the student and polls about once a second.
+  Every move, the sender's included, comes back through the poll in seq order, so both boards apply one list in one
+  order; each sketch run has its own id, so a rerun drops the old room's updates.
+- Rules in `functions/_shared/rooms.ts` (migration 0041 `game_rooms`, `game_room_players`, `game_room_events`):
+  **classmates only** (joiner shares a live class with the host, as student or teacher; a stranger's 404 is the
+  same as a missing code), **game data only** (`checkGameData`: numbers, booleans, strings of at most 20 characters,
+  1 KB, so it cannot be a chat; decided by the course owner 2026-11-07), 2-4 seats, 3-hour rooms, 30 moves per 10 s
+  per player, 3 open rooms per host, the host leaving closes the room. Names are first name + last initial.
+  Routes: `POST /api/rooms`, `GET /api/rooms/[code]?after=N`, `POST .../join|send|leave`. Tests:
+  `scripts/test-rooms.mjs`. In dev, two `dev_student` cookies are two classmates.
+
 ## Build + deploy
 
 ```bash
