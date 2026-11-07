@@ -34,8 +34,8 @@ interface Payload {
   truncated?: boolean;
 }
 
-const MUTED = '#8393c4';
-const BORDER = '#44475a';
+const MUTED = 'var(--c-dim)';
+const BORDER = 'var(--c-line)';
 
 const box: React.CSSProperties = { minWidth: 0, overflowWrap: 'anywhere' };
 

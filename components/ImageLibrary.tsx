@@ -13,14 +13,14 @@ import {
 
 // Inline styles using the Dracula palette, matching AuthButton / teacher page.
 const C = {
-  bg: '#282a36',
-  panel: '#21222c',
-  line: '#44475a',
-  text: '#f8f8f2',
-  dim: '#6272a4',
-  accent: '#bd93f9',
-  green: '#50fa7b',
-  red: '#ff5555',
+  bg: 'var(--c-bg)',
+  panel: 'var(--c-deep2)',
+  line: 'var(--c-line)',
+  text: 'var(--c-fg)',
+  dim: 'var(--c-comment)',
+  accent: 'var(--c-purple)',
+  green: 'var(--c-green)',
+  red: 'var(--c-red)',
 };
 
 interface Props {

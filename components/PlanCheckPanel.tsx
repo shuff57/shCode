@@ -15,7 +15,7 @@
 
 import { checkPlanGaps, GAP_PASS, PLAN_GAPS, PLAN_LESSONS } from '../lib/plan-check';
 
-const COLOR: Record<string, string> = { met: '#50fa7b', partial: '#f1fa8c', missing: '#ff5555' };
+const COLOR: Record<string, string> = { met: 'var(--c-green)', partial: 'var(--c-yellow)', missing: 'var(--c-red)' };
 const LABEL: Record<string, string> = { met: 'met', partial: 'partly', missing: 'missing' };
 
 export default function PlanCheckPanel({ lessonId, response }: { lessonId: string; response: string }) {

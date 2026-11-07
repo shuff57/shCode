@@ -63,7 +63,7 @@ export default function IssueVoteControl({ reportId, vote, onChange, onError }: 
         aria-pressed={vote.myVote === 1}
         disabled={busy}
         onClick={() => void cast(1)}
-        style={voteButtonStyle(vote.myVote === 1, '#50fa7b', busy)}
+        style={voteButtonStyle(vote.myVote === 1, 'var(--c-green)', busy)}
       >
         <ThumbsUp size={14} aria-hidden="true" />
       </button>
@@ -79,7 +79,7 @@ export default function IssueVoteControl({ reportId, vote, onChange, onError }: 
         aria-pressed={vote.myVote === -1}
         disabled={busy}
         onClick={() => void cast(-1)}
-        style={voteButtonStyle(vote.myVote === -1, '#ff5555', busy)}
+        style={voteButtonStyle(vote.myVote === -1, 'var(--c-red)', busy)}
       >
         <ThumbsDown size={14} aria-hidden="true" />
       </button>

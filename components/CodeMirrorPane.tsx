@@ -13,21 +13,21 @@ import { tags as t } from '@lezer/highlight';
 
 // Dracula palette — port of the CodeMirror 5 dracula theme used in public/moshion/editor.html.
 const dracula = {
-  bg: '#282a36',
-  fg: '#f8f8f2',
-  gutter: '#282a36',
-  gutterFg: '#6272a4',
-  activeLine: '#44475a55',
-  selection: '#44475a',
-  cursor: '#f8f8f0',
-  comment: '#6272a4',
-  cyan: '#8be9fd',
-  green: '#50fa7b',
-  orange: '#ffb86c',
-  pink: '#ff79c6',
-  purple: '#bd93f9',
-  red: '#ff5555',
-  yellow: '#f1fa8c',
+  bg: 'var(--c-bg)',
+  fg: 'var(--c-fg)',
+  gutter: 'var(--c-bg)',
+  gutterFg: 'var(--c-comment)',
+  activeLine: 'color-mix(in srgb, var(--c-line) 33.3333%, transparent)',
+  selection: 'var(--c-line)',
+  cursor: 'var(--x-f8f8f0)',
+  comment: 'var(--c-comment)',
+  cyan: 'var(--c-cyan)',
+  green: 'var(--c-green)',
+  orange: 'var(--c-orange)',
+  pink: 'var(--c-pink)',
+  purple: 'var(--c-purple)',
+  red: 'var(--c-red)',
+  yellow: 'var(--c-yellow)',
 };
 
 const draculaHighlight = HighlightStyle.define([

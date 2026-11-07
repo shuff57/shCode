@@ -209,14 +209,14 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
           // the two stay a full step apart in lightness. Do not dim either
           // back down. scripts/check-dot-contrast.mjs reads this chain.
           const stateColor = isCurrent
-            ? '#ff79c6'
+            ? 'var(--c-pink)'
             : isDone
-            ? '#50fa7b'
+            ? 'var(--c-green)'
             : isStarted
-            ? '#f1fa8c'
+            ? 'var(--c-yellow)'
             : isLocked
-            ? '#6272a4'
-            : '#7b88b8';
+            ? 'var(--c-comment)'
+            : 'var(--x-7b88b8)';
           // The current lesson is the only one that changes height. Colour
           // alone would not survive a colour-blind reader scanning for "where
           // am I", and height is the one channel nothing else here uses.

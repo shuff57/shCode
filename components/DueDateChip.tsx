@@ -45,15 +45,15 @@ import {
 } from '../lib/due-dates-core';
 
 const C = {
-  dim: '#6272a4',
-  text: '#f8f8f2',
-  late: '#ff5555',
-  today: '#f1fa8c',
-  set: '#8be9fd',
-  open: '#bd93f9',
+  dim: 'var(--c-comment)',
+  text: 'var(--c-fg)',
+  late: 'var(--c-red)',
+  today: 'var(--c-yellow)',
+  set: 'var(--c-cyan)',
+  open: 'var(--c-purple)',
   border: 'var(--c-line)',
-  bg: '#282a36',
-  raised: '#343746',
+  bg: 'var(--c-bg)',
+  raised: 'var(--x-343746)',
 };
 
 function colorFor(dueAt: number): string {

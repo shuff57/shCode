@@ -28,13 +28,13 @@ import { createPortal } from 'react-dom';
 import { UserCheck, Clock } from 'lucide-react';
 
 const C = {
-  dim: '#6272a4',
-  text: '#f8f8f2',
-  accent: '#50fa7b',
-  late: '#f1fa8c',
+  dim: 'var(--c-comment)',
+  text: 'var(--c-fg)',
+  accent: 'var(--c-green)',
+  late: 'var(--c-yellow)',
   border: 'var(--c-line)',
-  bg: '#282a36',
-  raised: '#343746',
+  bg: 'var(--c-bg)',
+  raised: 'var(--x-343746)',
 };
 
 interface RosterStudent {

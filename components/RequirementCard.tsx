@@ -18,7 +18,7 @@ export default function RequirementCard({
   if (req.status === 'failed') classes.push('fail');
 
   const borderColor =
-    req.status === 'passed' ? '#50fa7b' : req.status === 'failed' ? '#ff5555' : '#44475a';
+    req.status === 'passed' ? 'var(--c-green)' : req.status === 'failed' ? 'var(--c-red)' : 'var(--c-line)';
 
   const status =
     req.status === 'passed'

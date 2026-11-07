@@ -147,7 +147,7 @@ function submissionScoreLabel(sub: { score: number | null; possible: number | nu
 }
 
 function pctColor(pct: number): string {
-  return pct >= 100 ? '#50fa7b' : pct > 0 ? '#f1fa8c' : '#8393c4';
+  return pct >= 100 ? 'var(--c-green)' : pct > 0 ? 'var(--c-yellow)' : 'var(--c-dim)';
 }
 
 /** The 80x6 bar from UnitProgressBadge, reused so the roster and the
@@ -246,13 +246,13 @@ interface GridGrade {
 
 /** Header stripe and total-column tint per grade category. None of these is a state colour (green, yellow, red, orange). */
 const CAT_COLOR: Record<GradeCategory, string> = {
-  lab: '#8be9fd',
-  group: '#69d2c3',
-  chapterTest: '#6c9ef8',
-  finalExam: '#e0c3fc',
-  q1: '#d4a373',
-  q2: '#d4a373',
-  q4: '#d4a373',
+  lab: 'var(--c-cyan)',
+  group: 'var(--x-69d2c3)',
+  chapterTest: 'var(--x-6c9ef8)',
+  finalExam: 'var(--x-e0c3fc)',
+  q1: 'var(--x-d4a373)',
+  q2: 'var(--x-d4a373)',
+  q4: 'var(--x-d4a373)',
 };
 const CAT_SHORT: Record<GradeCategory, string> = {
   lab: 'Labs',
@@ -1382,8 +1382,8 @@ function GradebookView({
   }
 
   // Sticky background must be solid so content doesn't bleed through.
-  const stickyBg = '#1e1f29';
-  const headerBg = '#282a36';
+  const stickyBg = 'var(--c-deep)';
+  const headerBg = 'var(--c-bg)';
 
   // Wide enough for a horizontal header: a wrapped title, "N pts" and the due date.
   const CELL_W = 92;
@@ -1555,7 +1555,7 @@ function GradebookView({
     >
       {/* Toolbar */}
       <div style={{ marginBottom: 12, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px 10px' }}>
-        <button style={S.btn('#8be9fd')} onClick={handleDownloadCsv}>
+        <button style={S.btn('var(--c-cyan)')} onClick={handleDownloadCsv}>
           Download lessons shown (CSV)
         </button>
         <span style={{ fontSize: 12, color: 'var(--c-dim)' }}>
@@ -1605,7 +1605,7 @@ function GradebookView({
             matrix's own right edge, whatever the counts above widen to. */}
         <button
           style={{
-            ...S.btn(fullScreen ? '#ff79c6' : 'transparent'),
+            ...S.btn(fullScreen ? 'var(--c-pink)' : 'transparent'),
             marginLeft: 'auto',
             // S.btn hardcodes color:#282a36 for its dark-text-on-bright-fill
             // case. With a transparent fill that is black on near-black, so
@@ -1622,11 +1622,11 @@ function GradebookView({
       {/* Legend: the number is the percent for the lesson; the background is the state. */}
       <div style={{ marginBottom: 8, fontSize: 12, color: 'var(--x-a9b7e0)', display: 'flex', flexWrap: 'wrap', gap: '4px 16px', alignItems: 'center' }}>
         {([
-          ['rgba(80,250,123,0.25)', '#50fa7b', '92', 'done, 70% or more'],
-          ['rgba(241,250,140,0.22)', '#f1fa8c', '55', 'done, under 70%'],
-          ['rgba(241,250,140,0.14)', '#f1fa8c', '○', 'started'],
-          ['rgba(255,184,108,0.30)', '#ffb86c', '⋯', 'handed in, AI grading failed: needs you'],
-          ['rgba(255,85,85,0.28)', '#ff5555', '–', 'missing: past due, not started'],
+          ['rgba(80,250,123,0.25)', 'var(--c-green)', '92', 'done, 70% or more'],
+          ['rgba(241,250,140,0.22)', 'var(--c-yellow)', '55', 'done, under 70%'],
+          ['rgba(241,250,140,0.14)', 'var(--c-yellow)', '○', 'started'],
+          ['rgba(255,184,108,0.30)', 'var(--c-orange)', '⋯', 'handed in, AI grading failed: needs you'],
+          ['rgba(255,85,85,0.28)', 'var(--c-red)', '–', 'missing: past due, not started'],
         ] as const).map(([bg, fg, mark, words]) => (
           <span key={words} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <span aria-hidden="true" style={{ background: bg, color: fg, fontFamily: 'monospace', fontWeight: 700, minWidth: 26, textAlign: 'center', borderRadius: 3, padding: '1px 4px' }}>{mark}</span>
@@ -1843,7 +1843,7 @@ function GradebookView({
                 {/* Grade so far */}
                 {(() => {
                   const g = grades.get(student.email);
-                  const bg = i % 2 === 0 ? '#1e1f29' : '#252636';
+                  const bg = i % 2 === 0 ? 'var(--c-deep)' : 'var(--x-252636)';
                   return (
                     <td
                       style={{
@@ -2064,7 +2064,7 @@ function ListView() {
                 </div>
               </div>
               <button
-                style={S.btn('#8be9fd')}
+                style={S.btn('var(--c-cyan)')}
                 onClick={() => router.push(`/teacher?class=${c.id}`)}
               >
                 Open →
@@ -2087,7 +2087,7 @@ function ListView() {
           <button
             type="submit"
             disabled={creating || !newName.trim()}
-            style={creating || !newName.trim() ? S.btnDisabled : S.btn('#bd93f9')}
+            style={creating || !newName.trim() ? S.btnDisabled : S.btn('var(--c-purple)')}
           >
             {creating ? 'Creating…' : 'Create class'}
           </button>
@@ -2388,7 +2388,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
     return (
       <div>
         <button
-          style={{ ...S.btn('#6272a4'), color: 'var(--c-fg)', marginBottom: 16 }}
+          style={{ ...S.btn('var(--c-comment)'), color: 'var(--c-fg)', marginBottom: 16 }}
           onClick={() => router.push('/teacher')}
         >
           ← Back to list
@@ -2431,14 +2431,14 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               <button
-                style={archiving ? S.btnDisabled : S.btn(isArchived ? '#50fa7b' : '#f1fa8c')}
+                style={archiving ? S.btnDisabled : S.btn(isArchived ? 'var(--c-green)' : 'var(--c-yellow)')}
                 disabled={archiving}
                 onClick={() => { void handleArchiveToggle(); }}
               >
                 {archiving ? '…' : isArchived ? 'Unarchive' : 'Archive'}
               </button>
               <button
-                style={deleting ? S.btnDisabled : { ...S.btn('#ff5555'), color: 'var(--c-fg)' }}
+                style={deleting ? S.btnDisabled : { ...S.btn('var(--c-red)'), color: 'var(--c-fg)' }}
                 disabled={deleting}
                 onClick={() => { void handleDelete(); }}
               >
@@ -2543,7 +2543,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             <h2 style={{ ...S.h2, marginBottom: 0 }}>Roster ({roster.length})</h2>
             <button
               type="button"
-              style={roster.length === 0 || progressMap.size === 0 ? S.btnDisabled : S.btn('#8be9fd')}
+              style={roster.length === 0 || progressMap.size === 0 ? S.btnDisabled : S.btn('var(--c-cyan)')}
               disabled={roster.length === 0 || progressMap.size === 0}
               title="One row per student: the grade so far, how many graded lessons are done and past due, and a column per grade category. Ready to copy into a spreadsheet or the grade book."
               onClick={() => {
@@ -2631,7 +2631,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                       </div>
                       <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                         <button
-                          style={S.btn('#8be9fd')}
+                          style={S.btn('var(--c-cyan)')}
                           onClick={() => { setDrawerLesson(null); setDrawerEmail(row.student_email); }}
                         >
                           Open
@@ -2663,7 +2663,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             <button
               type="submit"
               disabled={enrolling || !enrollEmail.trim()}
-              style={enrolling || !enrollEmail.trim() ? S.btnDisabled : S.btn('#50fa7b')}
+              style={enrolling || !enrollEmail.trim() ? S.btnDisabled : S.btn('var(--c-green)')}
             >
               {enrolling ? 'Adding…' : 'Add student'}
             </button>
@@ -2735,7 +2735,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             <span style={S.code}>{currentCode}</span>
             {isOwner ? (
               <button
-                style={regenerating ? S.btnDisabled : S.btn('#ff79c6')}
+                style={regenerating ? S.btnDisabled : S.btn('var(--c-pink)')}
                 disabled={regenerating}
                 onClick={() => { void handleRegenCode(); }}
               >
@@ -2773,7 +2773,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                       style={
                         removingCoTeacher === ct.teacher_email
                           ? S.btnDisabled
-                          : { ...S.btn('#ff5555'), color: 'var(--c-fg)' }
+                          : { ...S.btn('var(--c-red)'), color: 'var(--c-fg)' }
                       }
                       disabled={removingCoTeacher === ct.teacher_email}
                       onClick={() => { void handleRemoveCoTeacher(ct.teacher_email); }}
@@ -2798,7 +2798,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
               <button
                 type="submit"
                 disabled={addingCoTeacher || !coTeacherEmail.trim()}
-                style={addingCoTeacher || !coTeacherEmail.trim() ? S.btnDisabled : S.btn('#bd93f9')}
+                style={addingCoTeacher || !coTeacherEmail.trim() ? S.btnDisabled : S.btn('var(--c-purple)')}
               >
                 {addingCoTeacher ? 'Adding…' : 'Add co-teacher'}
               </button>

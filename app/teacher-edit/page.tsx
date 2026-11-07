@@ -140,7 +140,7 @@ const S = {
     }) as React.CSSProperties,
 };
 
-function badge(label: string, color: string, textColor = '#282a36') {
+function badge(label: string, color: string, textColor = 'var(--c-bg)') {
   return (
     <span
       style={{
@@ -528,10 +528,10 @@ function TeacherEditInner() {
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                      {isTeacher && badge('You (teacher)', '#50fa7b')}
-                      {!isTeacher && isStudent && badge('Student', '#8be9fd')}
+                      {isTeacher && badge('You (teacher)', 'var(--c-green)')}
+                      {!isTeacher && isStudent && badge('Student', 'var(--c-cyan)')}
                       {!isTeacher && !isStudent && c.authoredByEmail &&
-                        badge(c.authoredByEmail, '#ff79c6', '#282a36')}
+                        badge(c.authoredByEmail, 'var(--c-pink)', 'var(--c-bg)')}
                     </div>
                     <div style={{ fontSize: 12, color: 'var(--c-fg)', lineHeight: 1.4 }}>
                       {c.message}
@@ -825,7 +825,7 @@ function TeacherEditInner() {
                 placeholder="Commit message"
               />
               <button
-                style={canPush ? S.btn('#bd93f9') : S.btnDisabled}
+                style={canPush ? S.btn('var(--c-purple)') : S.btnDisabled}
                 disabled={!canPush}
                 onClick={() => { void handlePush(); }}
               >

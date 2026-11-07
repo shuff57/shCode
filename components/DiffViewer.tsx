@@ -17,22 +17,22 @@ interface DiffViewerProps {
 
 // ---- Colors (Dracula) ----
 const C = {
-  bg: '#282a36',
-  fg: '#f8f8f2',
-  muted: '#6272a4',
+  bg: 'var(--c-bg)',
+  fg: 'var(--c-fg)',
+  muted: 'var(--c-comment)',
   border: 'var(--c-line)',
   addBg: 'rgba(80,250,123,0.18)',
-  addBar: '#50fa7b',
+  addBar: 'var(--c-green)',
   delBg: 'rgba(255,85,85,0.18)',
-  delBar: '#ff5555',
-  gutter: '#21222c',
-  keyword: '#ff79c6',
-  string: '#f1fa8c',
-  number: '#bd93f9',
-  comment: '#6272a4',
-  func: '#50fa7b',
-  type: '#8be9fd',
-  punct: '#f8f8f2',
+  delBar: 'var(--c-red)',
+  gutter: 'var(--c-deep2)',
+  keyword: 'var(--c-pink)',
+  string: 'var(--c-yellow)',
+  number: 'var(--c-purple)',
+  comment: 'var(--c-comment)',
+  func: 'var(--c-green)',
+  type: 'var(--c-cyan)',
+  punct: 'var(--c-fg)',
 };
 
 // Tiny JS tokenizer. Order matters in the alternation: comments and

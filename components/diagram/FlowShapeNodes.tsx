@@ -24,14 +24,14 @@ interface ShapeNodeData extends Record<string, unknown> {
 }
 
 const PALETTE: Record<FlowShape, { fill: string; stroke: string; text: string }> = {
-  terminal: { fill: 'var(--x-2f3b4d)', stroke: 'var(--c-cyan)', text: '#e8f7fb' },
-  process: { fill: 'var(--x-343746)', stroke: 'var(--c-purple)', text: '#f2ecff' },
-  decision: { fill: 'var(--x-3d3a2c)', stroke: 'var(--c-yellow)', text: '#fbfbe6' },
-  io: { fill: 'var(--x-33403a)', stroke: 'var(--c-green)', text: '#e6fbec' },
-  subroutine: { fill: 'var(--x-3f3628)', stroke: 'var(--c-orange)', text: '#fdf0e2' },
-  preparation: { fill: 'var(--x-3d2d38)', stroke: 'var(--x-ff92d0)', text: '#fdeaf6' },
-  connector: { fill: 'var(--x-2c3145)', stroke: 'var(--x-7d8bb5)', text: '#dfe4f2' },
-  comment: { fill: 'transparent', stroke: 'var(--c-comment)', text: '#aeb7d0' },
+  terminal: { fill: 'var(--x-2f3b4d)', stroke: 'var(--c-cyan)', text: 'var(--x-e8f7fb)' },
+  process: { fill: 'var(--x-343746)', stroke: 'var(--c-purple)', text: 'var(--x-f2ecff)' },
+  decision: { fill: 'var(--x-3d3a2c)', stroke: 'var(--c-yellow)', text: 'var(--x-fbfbe6)' },
+  io: { fill: 'var(--x-33403a)', stroke: 'var(--c-green)', text: 'var(--x-e6fbec)' },
+  subroutine: { fill: 'var(--x-3f3628)', stroke: 'var(--c-orange)', text: 'var(--x-fdf0e2)' },
+  preparation: { fill: 'var(--x-3d2d38)', stroke: 'var(--x-ff92d0)', text: 'var(--x-fdeaf6)' },
+  connector: { fill: 'var(--x-2c3145)', stroke: 'var(--x-7d8bb5)', text: 'var(--x-dfe4f2)' },
+  comment: { fill: 'transparent', stroke: 'var(--c-comment)', text: 'var(--x-aeb7d0)' },
 };
 
 const SIZE: Record<FlowShape, { w: number; h: number }> = {
@@ -89,7 +89,7 @@ function ShapeNode({ id, data, selected }: NodeProps) {
   const colors = PALETTE[shape];
   const { w, h } = SIZE[shape];
   const clip = CLIP[shape];
-  const stroke = d.flagged ? '#ff5555' : colors.stroke;
+  const stroke = d.flagged ? 'var(--c-red)' : colors.stroke;
 
   // Layered clip-path fakes a border: the outer layer is the stroke colour,
   // the inner layer is inset by BORDER and carries the fill.
@@ -160,7 +160,7 @@ function ShapeNode({ id, data, selected }: NodeProps) {
         width: w,
         height: shape === 'comment' ? 'auto' : h,
         minHeight: shape === 'comment' ? h : undefined,
-        filter: selected ? 'drop-shadow(0 0 0 2px #ff79c6)' : undefined,
+        filter: selected ? 'drop-shadow(0 0 0 2px var(--c-pink))' : undefined,
         outline: selected && clip === undefined ? '2px solid var(--c-pink)' : undefined,
         outlineOffset: 2,
         borderRadius: cornerRadius(shape),

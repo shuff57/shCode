@@ -78,12 +78,12 @@ const STATUS_LABEL: Record<CellStatus, string> = {
 };
 
 const STATUS_COLOR: Record<CellStatus, string> = {
-  pending: '#f1fa8c',
-  done: '#50fa7b',
-  'done-late': '#ffb86c',
-  started: '#8be9fd',
-  missing: '#ff5555',
-  'not-started': '#94a3b8',
+  pending: 'var(--c-yellow)',
+  done: 'var(--c-green)',
+  'done-late': 'var(--c-orange)',
+  started: 'var(--c-cyan)',
+  missing: 'var(--c-red)',
+  'not-started': 'var(--x-94a3b8)',
 };
 
 /** Score text for one cell.
@@ -296,7 +296,7 @@ export default function StudentGradebook({ lessons }: Props) {
                   : tried
                     ? left > 0 ? `Tried \u00b7 ${left} ${left === 1 ? 'try' : 'tries'} left` : 'Tried \u00b7 no tries left'
                     : practice ? practice.statusLabel : STATUS_LABEL[status];
-                const statusColor = opens ? '#94a3b8' : tried ? '#bd93f9' : STATUS_COLOR[status];
+                const statusColor = opens ? 'var(--x-94a3b8)' : tried ? 'var(--c-purple)' : STATUS_COLOR[status];
                 const bestText = tried
                   ? cell.score != null && lesson.maxScore
                     ? `best ${Math.round(cell.score * 100) / 100}/${lesson.maxScore}`

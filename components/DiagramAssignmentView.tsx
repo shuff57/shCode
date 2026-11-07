@@ -238,9 +238,9 @@ export default function DiagramAssignmentView({
             }}
           >
             {c.passed ? (
-              <CircleCheck size={17} color="#50fa7b" style={{ flex: '0 0 auto', marginTop: 1 }} />
+              <CircleCheck size={17} color="var(--c-green)" style={{ flex: '0 0 auto', marginTop: 1 }} />
             ) : (
-              <CircleX size={17} color="#ff5555" style={{ flex: '0 0 auto', marginTop: 1 }} />
+              <CircleX size={17} color="var(--c-red)" style={{ flex: '0 0 auto', marginTop: 1 }} />
             )}
             <div>
               <strong style={{ color: 'var(--c-fg)', fontSize: 13.5 }}>{c.title}</strong>
@@ -730,7 +730,7 @@ export default function DiagramAssignmentView({
             {result.criteria.map((c, i) => {
               const label = config.aiGrader?.rubric.find((r) => r.id === c.id);
               const color =
-                c.verdict === 'met' ? '#50fa7b' : c.verdict === 'partial' ? '#f1fa8c' : '#ff5555';
+                c.verdict === 'met' ? 'var(--c-green)' : c.verdict === 'partial' ? 'var(--c-yellow)' : 'var(--c-red)';
               const Icon =
                 c.verdict === 'met' ? CircleCheck : c.verdict === 'partial' ? Circle : CircleX;
               return (

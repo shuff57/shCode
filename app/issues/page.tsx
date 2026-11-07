@@ -69,16 +69,16 @@ const S = {
 };
 
 const KIND_COLOR: Record<string, string> = {
-  bug: '#f87171',
-  quirk: '#fbbf24',
-  enhancement: '#22c55e',
+  bug: 'var(--x-f87171)',
+  quirk: 'var(--x-fbbf24)',
+  enhancement: 'var(--x-22c55e)',
 };
 
 const STATUS_COLOR: Record<string, string> = {
-  open: '#f87171',
-  'in-progress': '#5baafd',
-  fixed: '#22c55e',
-  deferred: '#999',
+  open: 'var(--x-f87171)',
+  'in-progress': 'var(--brand)',
+  fixed: 'var(--x-22c55e)',
+  deferred: 'var(--x-999999)',
 };
 
 const STATUS_LABEL: Record<string, string> = {

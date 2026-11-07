@@ -22,14 +22,14 @@ import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const C = {
-  bg: '#282a36',
-  raised: '#343746',
+  bg: 'var(--c-bg)',
+  raised: 'var(--x-343746)',
   border: 'var(--c-line)',
-  text: '#f8f8f2',
-  dim: '#6272a4',
-  accent: '#8be9fd',
-  today: '#f1fa8c',
-  late: '#ff5555',
+  text: 'var(--c-fg)',
+  dim: 'var(--c-comment)',
+  accent: 'var(--c-cyan)',
+  today: 'var(--c-yellow)',
+  late: 'var(--c-red)',
 };
 
 const WEEKDAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];

@@ -41,9 +41,9 @@ const KINDS: { value: IssueKind; label: string; hint: string }[] = [
 ];
 
 const KIND_COLOR: Record<IssueKind, string> = {
-  bug: '#f87171',
-  quirk: '#fbbf24',
-  enhancement: '#22c55e',
+  bug: 'var(--x-f87171)',
+  quirk: 'var(--x-fbbf24)',
+  enhancement: 'var(--x-22c55e)',
 };
 
 const PLACEHOLDER: Record<IssueKind, { title: string; body: string }> = {

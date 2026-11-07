@@ -15,16 +15,16 @@ import { ownDate, ownOpenDate, resolveForClass, useTeacherDue } from '../lib/due
 import { withAlpha } from '../lib/color-alpha';
 
 const typeBadgeColors: Record<string, string> = {
-  lesson: '#5baafd',
-  assignment: '#f59e0b',
-  project: '#10b981',
-  example: '#a78bfa',
+  lesson: 'var(--brand)',
+  assignment: 'var(--x-f59e0b)',
+  project: 'var(--x-10b981)',
+  example: 'var(--x-a78bfa)',
 };
 
 // Right-edge stripe colors signal per-lesson progress state.
 const stateStripeColors: Record<string, string> = {
-  completed: '#50fa7b',
-  started: '#f1fa8c',
+  completed: 'var(--c-green)',
+  started: 'var(--c-yellow)',
 };
 
 interface Props {

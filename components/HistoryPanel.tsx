@@ -41,10 +41,10 @@ interface CloudSave extends CloudMeta {
   files: FileMap;
 }
 
-const MUTED = '#8393c4';
-const BORDER = '#44475a';
-const TEXT = '#f8f8f2';
-const ACCENT = '#bd93f9';
+const MUTED = 'var(--c-dim)';
+const BORDER = 'var(--c-line)';
+const TEXT = 'var(--c-fg)';
+const ACCENT = 'var(--c-purple)';
 const ADD = 'rgba(80,250,123,0.16)';
 const DEL = 'rgba(255,85,85,0.16)';
 const MONO = "'Fira Code', 'Consolas', 'Courier New', monospace";

@@ -25,8 +25,8 @@ interface LessonItem {
 }
 
 const stateStripeColors: Record<string, string> = {
-  completed: '#50fa7b',
-  started: '#f1fa8c',
+  completed: 'var(--c-green)',
+  started: 'var(--c-yellow)',
 };
 
 const stateLabels: Record<string, string> = {

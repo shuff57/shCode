@@ -20,11 +20,11 @@ interface WeightRow {
 
 const C = {
   border: 'var(--c-line)',
-  dim: '#8393c4',
-  text: '#f8f8f2',
-  input: '#282a36',
-  accent: '#8be9fd',
-  warn: '#ffb86c',
+  dim: 'var(--c-dim)',
+  text: 'var(--c-fg)',
+  input: 'var(--c-bg)',
+  accent: 'var(--c-cyan)',
+  warn: 'var(--c-orange)',
 };
 
 async function fetchWeights(classId: string): Promise<WeightRow[]> {

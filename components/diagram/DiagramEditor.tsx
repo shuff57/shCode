@@ -1147,7 +1147,7 @@ function Canvas({
           proOptions={{ hideAttribution: false }}
           defaultEdgeOptions={EDGE_BASE}
         >
-          <Background variant={BackgroundVariant.Dots} gap={22} size={1} color="#3b3d4d" />
+          <Background variant={BackgroundVariant.Dots} gap={22} size={1} color="var(--x-3b3d4d)" />
           {/* A figure keeps zoom in/out/fit and gains a fullscreen button, so a
               wide diagram can use the whole screen. The page keeps its own
               scroll: wheel does not zoom a figure (pinch and Ctrl+wheel do). */}

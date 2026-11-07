@@ -70,7 +70,7 @@ export default function AiGradeResultPanel({ title, titles, result, grading, sta
           ) : null}
           <div style={{ display: 'grid', gap: 10 }}>
             {result.criteria.map((c, i) => {
-              const color = c.verdict === 'met' ? '#50fa7b' : c.verdict === 'partial' ? '#f1fa8c' : '#ff5555';
+              const color = c.verdict === 'met' ? 'var(--c-green)' : c.verdict === 'partial' ? 'var(--c-yellow)' : 'var(--c-red)';
               const Icon = c.verdict === 'met' ? CircleCheck : c.verdict === 'partial' ? Circle : CircleX;
               return (
                 <div key={c.id || i} style={{ padding: 12, background: 'var(--c-bg)', borderRadius: 6, border: '1px solid ' + withAlpha(color, '55') }}>

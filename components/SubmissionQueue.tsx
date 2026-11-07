@@ -707,9 +707,9 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                     style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '2px 0', color: 'var(--c-fg)' }}
                   >
                     {c.passed ? (
-                      <CircleCheck size={13} color="#50fa7b" style={{ flex: '0 0 auto' }} />
+                      <CircleCheck size={13} color="var(--c-green)" style={{ flex: '0 0 auto' }} />
                     ) : (
-                      <CircleX size={13} color="#ff5555" style={{ flex: '0 0 auto' }} />
+                      <CircleX size={13} color="var(--c-red)" style={{ flex: '0 0 auto' }} />
                     )}
                     <span>{c.title}</span>
                   </div>

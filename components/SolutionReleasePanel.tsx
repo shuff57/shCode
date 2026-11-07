@@ -61,13 +61,13 @@ type Entry =
 
 const C = {
   border: 'var(--c-line)',
-  dim: '#8393c4',
-  text: '#f8f8f2',
-  input: '#282a36',
-  accent: '#8be9fd',
-  ok: '#50fa7b',
-  warn: '#ffb86c',
-  held: '#ff79c6',
+  dim: 'var(--c-dim)',
+  text: 'var(--c-fg)',
+  input: 'var(--c-bg)',
+  accent: 'var(--c-cyan)',
+  ok: 'var(--c-green)',
+  warn: 'var(--c-orange)',
+  held: 'var(--c-pink)',
 };
 
 const field: React.CSSProperties = {

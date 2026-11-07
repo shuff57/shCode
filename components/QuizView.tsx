@@ -312,7 +312,7 @@ export default function QuizView({ lessonId, config }: Props) {
             gap: 8,
           }}
         >
-          <ListChecks size={18} color="#f1fa8c" />
+          <ListChecks size={18} color="var(--c-yellow)" />
           Check your understanding
         </h2>
         {summative && (
@@ -458,9 +458,9 @@ export default function QuizView({ lessonId, config }: Props) {
                 }}
               >
                 {isCorrect ? (
-                  <CircleCheck size={16} color="#50fa7b" style={{ flexShrink: 0, marginTop: 2 }} />
+                  <CircleCheck size={16} color="var(--c-green)" style={{ flexShrink: 0, marginTop: 2 }} />
                 ) : (
-                  <CircleX size={16} color="#ff5555" style={{ flexShrink: 0, marginTop: 2 }} />
+                  <CircleX size={16} color="var(--c-red)" style={{ flexShrink: 0, marginTop: 2 }} />
                 )}
                 <span>
                   {withInlineCode((rv ? rv.explanation : q.explanation) ?? '')}
@@ -524,7 +524,7 @@ export default function QuizView({ lessonId, config }: Props) {
 
         {!allAnswered ? (
           <span style={{ color: 'var(--x-888888)', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Circle size={14} color="#6272a4" />
+            <Circle size={14} color="var(--c-comment)" />
             {answeredCount} of {questions.length} answered
           </span>
         ) : null}

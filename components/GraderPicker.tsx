@@ -99,7 +99,7 @@ export default function GraderPicker({ graders, value, onChange, disabled, cloud
         htmlFor="grader-picker"
         style={{ fontSize: 13, color: 'var(--x-aaaaaa)', display: 'inline-flex', alignItems: 'center', gap: 6 }}
       >
-        <Icon size={14} color="#6272a4" />
+        <Icon size={14} color="var(--c-comment)" />
         Graded by
       </label>
       <select

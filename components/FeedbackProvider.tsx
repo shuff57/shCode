@@ -58,7 +58,7 @@ interface ToastItem extends ToastOptions {
   message: string;
 }
 
-const C = { bg: '#282a36', card: '#1e1f29', border: 'var(--c-line)', text: '#f8f8f2', dim: '#a9b7e0', ok: '#50fa7b', err: '#ff5555', info: '#8be9fd', accent: '#bd93f9' };
+const C = { bg: 'var(--c-bg)', card: 'var(--c-deep)', border: 'var(--c-line)', text: 'var(--c-fg)', dim: 'var(--x-a9b7e0)', ok: 'var(--c-green)', err: 'var(--c-red)', info: 'var(--c-cyan)', accent: 'var(--c-purple)' };
 
 export function FeedbackProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);

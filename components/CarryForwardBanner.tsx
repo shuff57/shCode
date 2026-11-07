@@ -110,7 +110,7 @@ export default function CarryForwardBanner({ lesson }: { lesson: Lesson }) {
         fontSize: 13,
       }}
     >
-      <ArrowDownToLine size={16} color="#0ea5e9" />
+      <ArrowDownToLine size={16} color="var(--x-0ea5e9)" />
       <span style={{ flex: '1 1 320px', minWidth: 220 }}>
         <strong>Your {label} is saved.</strong> Start this lab from your own code, or
         from the starter.

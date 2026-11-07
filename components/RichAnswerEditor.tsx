@@ -34,10 +34,10 @@ interface Props {
   disabled?: boolean;
 }
 
-const BORDER = '#44475a';
-const INK = '#f8f8f2';
-const ACCENT = '#bd93f9';
-const MUTED = '#8393c4';
+const BORDER = 'var(--c-line)';
+const INK = 'var(--c-fg)';
+const ACCENT = 'var(--c-purple)';
+const MUTED = 'var(--c-dim)';
 
 function Btn({
   label,

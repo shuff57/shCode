@@ -476,7 +476,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
   return (
     <section style={{ marginTop: 36, paddingTop: 20, borderTop: '2px solid var(--c-line)' }}>
       <h2 style={{ fontSize: 20, marginBottom: 6, color: 'var(--c-fg)', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <Sparkles size={18} color="#bd93f9" />
+        <Sparkles size={18} color="var(--c-purple)" />
         {config.rubricTitle ?? 'Written response — AI-graded'}
       </h2>
       <p style={{ color: 'var(--x-888888)', fontSize: 13, margin: '0 0 12px' }}>
@@ -792,9 +792,9 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
             {result.criteria.map((c, i) => {
               const label = config.rubric.find((r) => r.id === c.id);
               const color =
-                c.verdict === 'met'     ? '#50fa7b'
-              : c.verdict === 'partial' ? '#f1fa8c'
-                                        : '#ff5555';
+                c.verdict === 'met'     ? 'var(--c-green)'
+              : c.verdict === 'partial' ? 'var(--c-yellow)'
+                                        : 'var(--c-red)';
               const Icon =
                 c.verdict === 'met'     ? CircleCheck
               : c.verdict === 'partial' ? Circle

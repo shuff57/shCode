@@ -182,19 +182,19 @@ export default function LessonAccessGate({
 
               if (isComplete) {
                 indicator = '✓';
-                color = '#50fa7b';
+                color = 'var(--c-green)';
                 bg = 'transparent';
               } else if (isCurrent) {
                 indicator = '🔒';
-                color = '#f8f8f2';
+                color = 'var(--c-fg)';
                 bg = 'rgba(189, 147, 249, 0.1)';
               } else if (isPriorIncomplete) {
                 indicator = '○';
-                color = '#f1fa8c';
+                color = 'var(--c-yellow)';
                 bg = 'transparent';
               } else {
                 indicator = '·';
-                color = '#6272a4';
+                color = 'var(--c-comment)';
                 bg = 'transparent';
               }
 

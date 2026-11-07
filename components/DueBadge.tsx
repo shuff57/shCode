@@ -142,7 +142,7 @@ export function ModuleDueBadge({
 
   if (kind === 'single' && dueAt !== null) {
     const status = dueStatus(dueAt, null, Date.now());
-    const color = status === 'late' ? '#ff5555' : status === 'today' ? '#f1fa8c' : '#6272a4';
+    const color = status === 'late' ? 'var(--c-red)' : status === 'today' ? 'var(--c-yellow)' : 'var(--c-comment)';
     return (
       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color, fontSize, whiteSpace: 'nowrap' }}>
         <CalendarClock size={fontSize} strokeWidth={2} />

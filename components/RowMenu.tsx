@@ -112,9 +112,9 @@ export function RowMenu({ items, label = 'More actions', buttonText = 'More', di
                 it.onSelect();
               }}
               style={{ textAlign: 'left', background: 'none', border: 'none', borderRadius: 4, padding: '8px 10px', fontSize: 13, color: it.danger ? 'var(--x-ff6e6e)' : 'var(--c-fg)', cursor: it.disabled ? 'not-allowed' : 'pointer', opacity: it.disabled ? 0.5 : 1 }}
-              onMouseEnter={(e) => { if (!it.disabled) e.currentTarget.style.background = '#2f3142'; }}
+              onMouseEnter={(e) => { if (!it.disabled) e.currentTarget.style.background = 'var(--x-2f3142)'; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; }}
-              onFocus={(e) => { e.currentTarget.style.background = '#2f3142'; }}
+              onFocus={(e) => { e.currentTarget.style.background = 'var(--x-2f3142)'; }}
               onBlur={(e) => { e.currentTarget.style.background = 'none'; }}
             >
               {it.label}
