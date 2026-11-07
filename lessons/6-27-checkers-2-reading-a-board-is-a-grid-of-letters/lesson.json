@@ -1,0 +1,19 @@
+{
+  "id": "6-27-checkers-2-reading-a-board-is-a-grid-of-letters",
+  "title": "6.27.2 Reading: A board is a grid of letters",
+  "description": "A checkers board is a grid of letters built with two loops; a square is dark when (r + c) % 2 === 1; black fills the top three rows and red the bottom three; the picture is drawn from the grid.",
+  "type": "lesson",
+  "estimateMins": 12,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.27 Checkers: plan and the board",
+  "preview": "reading",
+  "week": 18,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

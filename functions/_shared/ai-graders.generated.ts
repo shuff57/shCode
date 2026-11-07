@@ -10519,6 +10519,86 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "model": "glm-5.3-flash:cloud",
     "contextDocs": []
   },
+  "6-27-checkers-1-plan-break-checkers-into-parts": {
+    "lessonTitle": "6.27.1 Plan: Break checkers into parts",
+    "prompt": "Everything you need is on this page: go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to build checkers. Before you write any code, plan it.\n\n1. List at least four separate parts of the game, things it has or does.\n\n2. Which two or more things does the game have to remember from one frame to the next?\n\n3. Which part would you build first, so something runs today, and why?\n\n4. Which part are you unsure how to build, and what makes it hard?",
+    "rubric": [
+      {
+        "id": "parts",
+        "title": "Four or more parts of the game are named",
+        "description": "The student names about four parts of checkers in their own words, such as the board of squares, the pieces, picking a piece up, moving, jumping and taking, kings, taking turns, winning, playing online. Credit any list, however loose, short or oddly worded; a list of fewer than four still gets full credit if it clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about checkers at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "remember",
+        "title": "Says what the game must remember between frames",
+        "description": "The student names at least two things the game has to remember from one frame to the next, for example where every piece is, whose turn it is, which piece is picked up, which pieces are kings, or whether someone has won. Any sensible item, or any gesture at remembering something, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about checkers at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "first",
+        "title": "Picks a first thing to build and gives a reason",
+        "description": "The student says which part they would build first and gives any reason at all, or just a hunch. Any answer that mentions a part to start with earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about checkers at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "unsure",
+        "title": "Names one part they are unsure how to build",
+        "description": "The student names a part they do not yet know how to do, such as jumping twice in a row, kings, knowing when nobody can move, or playing on two computers, in a few words or less. Any honest answer counts, even a vague one. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about checkers at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
+  "6-27-checkers-3-sub-a-checkered-board": {
+    "lessonTitle": "6.27.3 Sub-build: A checkered board",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: A checkered board\". The task: draw an 8 by 8 checkered board with two loops, one inside the other, picking a dark colour when the row plus the column is odd ((r + c) % 2 === 1, or another correct test) and drawing one rect per square from its column and row times the cell size. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Two loops",
+        "description": "Every row and every column is visited.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Light and dark",
+        "description": "The colour comes from a test with % 2.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "One square each",
+        "description": "Each square is placed from its row and column.",
+        "points": 1
+      }
+    ]
+  },
+  "6-27-checkers-4-lab-set-up-the-board": {
+    "lessonTitle": "6.27.4 Lab: Set up the board",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Set up the board\". The task: fill in makeBoard so a dark square ((r + c) % 2 === 1, or another correct test) holds 'b' on rows 0 to 2 and 'r' on rows 5 to 7, and every other square stays ''. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Dark squares only",
+        "description": "Pieces go only where the row plus the column is odd.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Black on top",
+        "description": "The top three rows get black.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Red below",
+        "description": "The bottom three rows get red.",
+        "points": 1
+      }
+    ]
+  },
   "6-3-pocket-2-sub-slow-to-a-stop": {
     "lessonTitle": "6.3.2 Sub-build: Slow to a stop",
     "prompt": "The student wrote a moSHion sketch for \"Sub-build: Slow to a stop\". The task: give the ball drag and call it stopped when its speed falls under a small number, setting the speed to 0. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",

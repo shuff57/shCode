@@ -1,0 +1,118 @@
+{
+  "id": "6-27-checkers-4-lab-set-up-the-board",
+  "title": "6.27.4 Lab: Set up the board",
+  "description": "Fill the empty grid: black on the dark squares of the top three rows, red on the bottom three. The drawing is already there, so the board appears as the letters do.",
+  "type": "lesson",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.27 Checkers: plan and the board",
+  "preview": "moshion",
+  "week": 18,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The board is drawn, but there are no pieces, and the top says `Checkers: 0 red, 0 black`. `makeBoard` builds 8 rows of 8 cells and every cell is `''`, so there is nothing to draw."
+    },
+    {
+      "id": "s2",
+      "title": "Black on the top rows",
+      "instructions": "In `makeBoard`, on the line before `row.push(p)`, put a black piece on every dark square of rows 0, 1 and 2: `if ((r + c) % 2 === 1 && r < 3) p = 'b';`. Run: twelve black pieces, and the top says `0 red, 12 black`.",
+      "hints": [
+        "`(r + c) % 2 === 1` is a dark square; `r < 3` is rows 0, 1 and 2.",
+        "The line goes before `row.push(p)`: once `p` is pushed, changing it changes nothing in the row."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Red on the bottom rows",
+      "instructions": "Below it, the same for red on rows 5, 6 and 7: `if ((r + c) % 2 === 1 && r > 4) p = 'r';`. Run: `12 red, 12 black`, with two empty rows in the middle.",
+      "hints": [
+        "`r > 4` is true on rows 5, 6 and 7. `r >= 5` says the same.",
+        "Count the pieces in one row: 4. Three rows of 4 is 12."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Read the grid",
+      "instructions": "Nothing to type here. In `drawPieces`, find where a cell's letter picks the circle's colour, and in `countPieces`, how the count is made. Change `r < 3` to `r < 2` and Run: black has 8 pieces, and the count follows the grid. Put it back to `r < 3`."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A dark-square test with % 2",
+      "description": "A piece is placed only on a dark square, tested with % 2 on the row plus the column. Help: 6.27.2 (Reading: A board is a grid of letters)",
+      "hint": "if ((r + c) % 2 === 1 && r < 3) p = 'b';",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "%\\s*2\\b(?:(?!\\bfunction\\b)[\\s\\S]){0,200}?(?:=|\\?|:|\\(|,|return)\\s*['\"`][rb]['\"`]|\\bfunction\\s+([\\w$]+)\\s*\\([^)]*\\)\\s*\\{[^}]*%\\s*2\\b[\\s\\S]*?\\b\\1\\s*\\([^)]*\\)[^;]{0,120}?(?:=|\\?|:|\\(|,)\\s*['\"`][rb]['\"`]|\\b([\\w$]+)\\s*\\([^)]*\\)[^;]{0,120}?(?:=|\\?|:|\\(|,)\\s*['\"`][rb]['\"`][\\s\\S]*?\\bfunction\\s+\\2\\s*\\([^)]*\\)\\s*\\{[^}]*%\\s*2\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true,
+      "keepShortStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "Black on the top rows",
+      "description": "Black pieces ('b') go on the top three rows, rows 0, 1 and 2. Help: 6.27.2 (Reading: A board is a grid of letters)",
+      "hint": "if ((r + c) % 2 === 1 && r < 3) p = 'b';",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:\\b[\\w$]+\\s*<\\s*3\\b|\\b[\\w$]+\\s*<=\\s*2\\b|\\b3\\s*>\\s*[\\w$]+|\\b2\\s*>=\\s*[\\w$]+|\\b(?:r|row|y|[\\w$]*[Rr]ow[\\w$]*)\\s*===?\\s*[012]\\b)[^;]{0,120}?(?:=|\\?|:|\\(|,|return)\\s*['\"`][b]['\"`]",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true,
+      "keepShortStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "Red on the bottom rows",
+      "description": "Red pieces ('r') go on the bottom three rows, rows 5, 6 and 7. Help: 6.27.2 (Reading: A board is a grid of letters)",
+      "hint": "if ((r + c) % 2 === 1 && r > 4) p = 'r';",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:\\b[\\w$]+\\s*>\\s*4\\b|\\b[\\w$]+\\s*>=\\s*5\\b|\\b4\\s*<\\s*[\\w$]+|\\b5\\s*<=\\s*[\\w$]+|\\b[\\w$]+\\s*>=?\\s*(?:N|[\\w$]+\\s*\\.\\s*length)\\s*-\\s*[34]\\b|\\b(?:r|row|y|[\\w$]*[Rr]ow[\\w$]*)\\s*===?\\s*[567]\\b)[^;]{0,120}?(?:=|\\?|:|\\(|,|return)\\s*['\"`][r]['\"`]",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true,
+      "keepShortStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Set up the board\". The task: fill in makeBoard so a dark square ((r + c) % 2 === 1, or another correct test) holds 'b' on rows 0 to 2 and 'r' on rows 5 to 7, and every other square stays ''. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Dark squares only",
+        "description": "Pieces go only where the row plus the column is odd.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Black on top",
+        "description": "The top three rows get black.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Red below",
+        "description": "The bottom three rows get red.",
+        "points": 1
+      }
+    ]
+  }
+}

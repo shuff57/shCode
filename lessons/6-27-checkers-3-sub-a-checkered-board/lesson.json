@@ -1,0 +1,110 @@
+{
+  "id": "6-27-checkers-3-sub-a-checkered-board",
+  "title": "6.27.3 Sub-build: A checkered board",
+  "description": "Two loops, one test with %, one rect per square: the light and dark board drawn from row and column numbers.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.27 Checkers: plan and the board",
+  "preview": "moshion",
+  "week": 18,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The canvas is empty. `draw()` takes the outline away with `noStroke()`, but nothing draws a square yet."
+    },
+    {
+      "id": "s2",
+      "title": "Every square",
+      "instructions": "In `draw()`, write two loops, one inside the other: `for (let r = 0; r < N; r++)` and inside it `for (let c = 0; c < N; c++)`. Inside both, `fill('#ead9b6')` and draw `rect(c * CELL, r * CELL, CELL, CELL)`. Run: the canvas fills with 64 light squares that meet edge to edge, so it looks like one big square.",
+      "hints": [
+        "`r` is the row and goes down the screen, so it sets y; `c` is the column and sets x.",
+        "Loop to `N`, not to 8, so the loops always match the board."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Dark when odd",
+      "instructions": "Change the `fill` so it picks the colour: `fill((r + c) % 2 === 1 ? '#7a5a40' : '#ead9b6');`. Run: a checkered board, with a light square in the top-left corner.",
+      "hints": [
+        "Square (0, 0) adds to 0, which is even: light. Square (0, 1) adds to 1: dark.",
+        "Try `=== 0` instead of `=== 1` and the colours swap."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Two loops, one inside the other",
+      "description": "One loop visits the rows and a second loop inside it visits the columns. Help: 6.27.2 (Reading: A board is a grid of letters)",
+      "hint": "for (let r = 0; r < N; r++) { for (let c = 0; c < N; c++) { ... } }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:for|while)\\s*\\([^)]*\\)\\s*\\{?\\s*(?:(?:const|let|var)\\s+[\\w$]+\\s*=[^;]*;\\s*)?(?:for|while)\\s*\\(|\\.\\s*forEach\\s*\\([\\s\\S]{0,200}?\\.\\s*forEach\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "A test with % 2",
+      "description": "The colour is picked by a test on the row plus the column with % 2. Help: 6.27.2 (Reading: A board is a grid of letters)",
+      "hint": "fill((r + c) % 2 === 1 ? '#7a5a40' : '#ead9b6');",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "%\\s*2\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "A square at each row and column",
+      "description": "Each square is a rect placed from its column and row times the cell size. Help: 6.27.2 (Reading: A board is a grid of letters)",
+      "hint": "rect(c * CELL, r * CELL, CELL, CELL);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:rect|square)\\s*\\([^;]*\\*[^;]*\\*",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: A checkered board\". The task: draw an 8 by 8 checkered board with two loops, one inside the other, picking a dark colour when the row plus the column is odd ((r + c) % 2 === 1, or another correct test) and drawing one rect per square from its column and row times the cell size. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Two loops",
+        "description": "Every row and every column is visited.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Light and dark",
+        "description": "The colour comes from a test with % 2.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "One square each",
+        "description": "Each square is placed from its row and column.",
+        "points": 1
+      }
+    ]
+  }
+}

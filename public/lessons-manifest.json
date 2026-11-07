@@ -10297,6 +10297,58 @@
       "scoreKind": null
     },
     {
+      "id": "6-27-checkers-1-plan-break-checkers-into-parts",
+      "title": "6.27.1 Plan: Break checkers into parts",
+      "unit": "6.27 Checkers: plan and the board",
+      "preview": "assignment",
+      "type": "assignment",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 18,
+      "assignmentCode": null,
+      "maxScore": 4,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "6-27-checkers-2-reading-a-board-is-a-grid-of-letters",
+      "title": "6.27.2 Reading: A board is a grid of letters",
+      "unit": "6.27 Checkers: plan and the board",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 18,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "6-27-checkers-3-sub-a-checkered-board",
+      "title": "6.27.3 Sub-build: A checkered board",
+      "unit": "6.27 Checkers: plan and the board",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 18,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "6-27-checkers-4-lab-set-up-the-board",
+      "title": "6.27.4 Lab: Set up the board",
+      "unit": "6.27 Checkers: plan and the board",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 18,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "6-3-1-slides",
       "title": "6.8.1 Slides: Physics Applications",
       "unit": "6.8 Physics Applications",
