@@ -1,0 +1,110 @@
+{
+  "id": "6-28-checkers-2-sub-pick-up-and-put-down",
+  "title": "6.28.2 Sub-build: Pick up and put down",
+  "description": "One token on a small board: a click becomes a row and a column, a click on the token picks it up, and a click one square diagonally away puts it down there.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.28 Checkers: pick up and move",
+  "preview": "moshion",
+  "week": 18,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "A red token sits in the bottom-left corner. Clicking does nothing yet: the `if (mouse.presses())` block is empty."
+    },
+    {
+      "id": "s2",
+      "title": "Where was the click?",
+      "instructions": "Inside `if (mouse.presses())`, turn the click into a square: `const c = floor(mouse.x / CELL);` and `const r = floor(mouse.y / CELL);`. Then pick the token up when the click is on it: `if (r === tr && c === tc) picked = true;`. Run and click the token: its square lights up gold.",
+      "hints": [
+        "This board starts at the top of the canvas, so there is no `TOP` to take off.",
+        "`tr` and `tc` are the token's row and column."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Put it down",
+      "instructions": "Add an `else if` to that test: `else if (picked && abs(r - tr) === 1 && abs(c - tc) === 1) { tr = r; tc = c; picked = false; }`. Run: pick the token up and click a square one step diagonally away. It moves there and the light goes out. A click two squares away, or straight up, does nothing.",
+      "hints": [
+        "`abs` drops the minus sign, so one test covers all four diagonal neighbours.",
+        "This token may go backward too. In the lab, `moveKind` adds the rule that a piece only goes forward."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A click becomes a row and a column",
+      "description": "The click position is divided by the square size and cut down with floor. Help: 6.28.1 (Reading: From a click to a square, and one rule function)",
+      "hint": "const c = floor(mouse.x / CELL);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:Math\\s*\\.\\s*)?(?:floor|trunc|int)\\s*\\([^;\\n]*\\/",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "A click on the token picks it up",
+      "description": "Clicking the token marks it as picked up. Help: 6.28.1 (Reading: From a click to a square, and one rule function)",
+      "hint": "if (r === tr && c === tc) picked = true;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?<![=!<>])=\\s*true\\b|(?<![=!<>])=\\s*\\{\\s*(?:r|row)\\s*:|\\b([\\w$]+)\\s*=\\s*!\\s*\\1\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "One square diagonally",
+      "description": "The token moves only to a square one row and one column away, tested with abs or another way. Help: 6.28.1 (Reading: From a click to a square, and one rule function)",
+      "hint": "abs(r - tr) === 1 && abs(c - tc) === 1",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:Math\\s*\\.\\s*)?abs\\s*\\(|\\)\\s*\\*\\s*\\([^)]*\\)\\s*[!=]==?\\s*1\\b|[!=]==?\\s*-\\s*1\\b|\\*\\s*[\\w$.]+\\s*[!=]==?\\s*1\\b|[!=]==?\\s*[\\w$.]+\\s*[-+]\\s*1\\b[^;]{0,80}?[!=]==?\\s*[\\w$.]+\\s*[-+]\\s*1\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: Pick up and put down\". The task: on a click, turn mouse.x and mouse.y into a row and a column with floor, pick the token up when the click is on it, and when it is picked up move it to a clicked square one row and one column away (abs, or another correct test). Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Click to square",
+        "description": "The click becomes a row and a column.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Pick up",
+        "description": "A click on the token picks it up.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "One diagonal",
+        "description": "It moves only one square diagonally.",
+        "points": 1
+      }
+    ]
+  }
+}

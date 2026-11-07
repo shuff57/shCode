@@ -1,0 +1,16 @@
+{
+  "moduleId": "6.28",
+  "source": "Checkers chain module, one day.",
+  "lessons": [
+    {
+      "id": "checkers-pick-up-and-move",
+      "title": "pick up and move",
+      "objective": "A click becomes a square, picking up is remembering { r, c }, and every rule of a move lives in one function the click only asks.",
+      "screens": [
+        "6-28-checkers-1-reading-from-a-click-to-a-square",
+        "6-28-checkers-2-sub-pick-up-and-put-down",
+        "6-28-checkers-3-lab-pick-a-piece-and-step"
+      ]
+    }
+  ]
+}

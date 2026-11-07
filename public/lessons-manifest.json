@@ -10349,6 +10349,45 @@
       "scoreKind": null
     },
     {
+      "id": "6-28-checkers-1-reading-from-a-click-to-a-square",
+      "title": "6.28.1 Reading: From a click to a square, and one rule function",
+      "unit": "6.28 Checkers: pick up and move",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 18,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "6-28-checkers-2-sub-pick-up-and-put-down",
+      "title": "6.28.2 Sub-build: Pick up and put down",
+      "unit": "6.28 Checkers: pick up and move",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 18,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "6-28-checkers-3-lab-pick-a-piece-and-step",
+      "title": "6.28.3 Lab: Pick a piece and step",
+      "unit": "6.28 Checkers: pick up and move",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 18,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "6-3-1-slides",
       "title": "6.8.1 Slides: Physics Applications",
       "unit": "6.8 Physics Applications",

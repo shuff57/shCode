@@ -1,0 +1,169 @@
+{
+  "id": "6-28-checkers-3-lab-pick-a-piece-and-step",
+  "title": "6.28.3 Lab: Pick a piece and step",
+  "description": "Red and black take turns: click one of your pieces to pick it up, click a square one step diagonally forward to move it, and every rule lives in moveKind.",
+  "type": "lesson",
+  "estimateMins": 25,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.28 Checkers: pick up and move",
+  "preview": "moshion",
+  "week": 18,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "This is your board from 6.27.4. The pieces are there, but a click does nothing."
+    },
+    {
+      "id": "s2",
+      "title": "Whose turn, and what is picked",
+      "instructions": "Below `let grid;`, add `let turn = 'r';`, `let picked = null;` and `let message = '';`. In `newGame()`, after `grid = makeBoard();`, set `turn = 'r';`, `picked = null;` and `message = \"Red's turn: click a piece\";`. Below `colorOf`, add the two helpers from the reading: `function nameOf(t) { return t === 'r' ? 'Red' : 'Black'; }` and `onBoard(r, c)`. In `drawTop()`, show the message instead of the count: `text(message, 10, 22, 16, 'white');`.",
+      "hints": [
+        "If you brought your 6.27.4 work forward, your names may differ; keep yours.",
+        "You can leave `countPieces` in: nothing calls it now, and day four can use it."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Pick up your own piece",
+      "instructions": "Write `clickAt(x, y)` above `drawPieces`: `const c = floor(x / CELL);`, `const r = floor((y - TOP) / CELL);`, then `if (!onBoard(r, c)) return;` and `const p = grid[r][c];`. If `p !== '' && colorOf(p) === turn`, set `picked = { r: r, c: c };` and `return;`. In `draw()`, before `drawBoard();`, add `if (mouse.presses()) clickAt(mouse.x, mouse.y);`. At the end of `drawBoard()`, light the picked square: `if (picked !== null) { fill('rgba(255, 215, 0, 0.45)'); rect(picked.c * CELL, TOP + picked.r * CELL, CELL, CELL); }`. Run: click a red piece and it lights; a black one does not.",
+      "hints": [
+        "Take `TOP` off `y` before dividing, or every click lands one row too low.",
+        "`onBoard` comes first: a click in the strip at the top is row -1, and `grid[-1]` does not exist."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "One rule function",
+      "instructions": "Below `onBoard`, write `moveKind(fr, fc, tr, tc)` from the reading: off the board, not your piece, or not onto an empty square answers `''`; then `const dr = tr - fr;`, `const dc = tc - fc;`, not diagonal answers `''`, not forward answers `''` (`const ahead = turn === 'r' ? dr < 0 : dr > 0;`), and `abs(dr) === 1` answers `'step'`; anything else answers `''`. Then `function isLegal(fr, fc, tr, tc) { return moveKind(fr, fc, tr, tc) !== ''; }`.",
+      "hints": [
+        "Red moves up the screen, so its row number gets smaller: `dr < 0`.",
+        "Nothing calls these yet, so Run looks the same. The next step uses them."
+      ]
+    },
+    {
+      "id": "s5",
+      "title": "Move, and pass the turn",
+      "instructions": "Write `doMove(fr, fc, tr, tc)` from the reading: copy the letter to the new square, empty the old one, set `picked = null;`, pass the turn with `turn = turn === 'r' ? 'b' : 'r';` and set `message = nameOf(turn) + \"'s turn\";`. At the end of `clickAt`, `if (picked !== null && isLegal(picked.r, picked.c, r, c)) doMove(picked.r, picked.c, r, c);`. Run and play a few moves each: red, then black, then red.",
+      "hints": [
+        "Try a step backward, a step sideways and a step onto another piece: none of them moves.",
+        "Clicking a different piece of your own picks that one up instead."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A click becomes a row and a column",
+      "description": "The click is turned into a row and a column with floor, taking the strip at the top off first. Help: 6.28.1 (Reading: From a click to a square, and one rule function)",
+      "hint": "const r = floor((y - TOP) / CELL);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:Math\\s*\\.\\s*)?(?:floor|trunc|int)\\s*\\([^;\\n]*\\/",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "You pick up your own piece",
+      "description": "A click on a piece whose colour matches the turn remembers it as the picked piece. Help: 6.28.1 (Reading: From a click to a square, and one rule function)",
+      "hint": "if (p !== '' && colorOf(p) === turn) picked = { r: r, c: c };",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:[!=]==?\\s*[\\w$]*(?:turn|player|side|who)[\\w$]*\\b|\\b[\\w$]*(?:turn|player|side|who)[\\w$]*\\s*[!=]==?)[\\s\\S]{0,200}?(?<![=!<>])=\\s*[\\{\\[]",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "One square diagonally",
+      "description": "A step is one row and one column away, tested with abs or another way. Help: 6.28.1 (Reading: From a click to a square, and one rule function)",
+      "hint": "if (abs(dr) === 1) return 'step';",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:Math\\s*\\.\\s*)?abs\\s*\\(|\\)\\s*\\*\\s*\\([^)]*\\)\\s*[!=]==?\\s*1\\b|[!=]==?\\s*-\\s*1\\b|\\*\\s*[\\w$.]+\\s*[!=]==?\\s*1\\b|[!=]==?\\s*[\\w$.]+\\s*[-+]\\s*1\\b[^;]{0,80}?[!=]==?\\s*[\\w$.]+\\s*[-+]\\s*1\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r4",
+      "title": "Forward only, by colour",
+      "description": "Red moves up the screen and black moves down: the direction depends on whose turn it is. Help: 6.28.1 (Reading: From a click to a square, and one rule function)",
+      "hint": "const ahead = turn === 'r' ? dr < 0 : dr > 0;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:[!=]==?\\s*['\"`][rbRB]['\"`]|['\"`][rbRB]['\"`]\\s*[!=]==?|\\bcase\\s+['\"`][rbRB]['\"`]\\s*:|\\b[\\w$]*(?:turn|player|side|who)[\\w$]*\\s*[!=]==?\\s*[01]\\b)[^;}]{0,80}?(?:[<>]=?\\s*-?\\s*[\\w$]|[!=]==?\\s*-\\s*1\\b|\\?\\s*-\\s*1\\b|[!=]==?\\s*[\\w$.]+\\s*[-+]\\s*1\\b)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true,
+      "keepShortStrings": true
+    },
+    {
+      "id": "r5",
+      "title": "The turn passes",
+      "description": "After a move, the turn goes to the other player: red to black, black to red. Help: 6.28.1 (Reading: From a click to a square, and one rule function)",
+      "hint": "turn = turn === 'r' ? 'b' : 'r';",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b([\\w$]+)\\s*=\\s*\\(?\\s*\\1\\s*[!=]==?\\s*['\"`][rbRB]['\"`]\\s*\\)?\\s*\\?\\s*['\"`][rbRB]['\"`]|\\bif\\s*\\(\\s*([\\w$]+)\\s*[!=]==?\\s*['\"`][rbRB]['\"`]\\s*\\)\\s*\\{?\\s*\\2\\s*=\\s*['\"`][rbRB]['\"`]|\\bcase\\s+['\"`][rbRB]['\"`]\\s*:\\s*([\\w$]+)\\s*=\\s*['\"`][rbRB]['\"`]|\\b(turn|[\\w$]*[Tt]urn)\\s*=\\s*[\\w$]+\\s*\\(\\s*\\4\\s*\\)|\\b([\\w$]+)\\s*=\\s*\\(\\s*\\5\\s*\\+\\s*1\\s*\\)\\s*%|\\b([\\w$]+)\\s*=\\s*1\\s*-\\s*\\6\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true,
+      "keepShortStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Pick a piece and step\". The task: turn a click into a row and a column with floor (taking TOP off y), pick up a piece whose colour matches the turn, and write one rule function, moveKind, that answers 'step' only for a move one square diagonally forward (up for red, down for black) onto an empty square; isLegal asks it, and doMove moves the letter, clears the picked piece and passes the turn. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Click to square",
+        "description": "The click becomes a row and a column.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Your own piece",
+        "description": "Only a piece of the colour whose turn it is is picked up.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "One diagonal",
+        "description": "A step is one row and one column.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Forward only",
+        "description": "Red goes up and black goes down.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Turns pass",
+        "description": "After a move it is the other colour's turn.",
+        "points": 1
+      }
+    ]
+  },
+  "carryFrom": "6-27-checkers-4-lab-set-up-the-board"
+}

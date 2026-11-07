@@ -10599,6 +10599,66 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
+  "6-28-checkers-2-sub-pick-up-and-put-down": {
+    "lessonTitle": "6.28.2 Sub-build: Pick up and put down",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: Pick up and put down\". The task: on a click, turn mouse.x and mouse.y into a row and a column with floor, pick the token up when the click is on it, and when it is picked up move it to a clicked square one row and one column away (abs, or another correct test). Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Click to square",
+        "description": "The click becomes a row and a column.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Pick up",
+        "description": "A click on the token picks it up.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "One diagonal",
+        "description": "It moves only one square diagonally.",
+        "points": 1
+      }
+    ]
+  },
+  "6-28-checkers-3-lab-pick-a-piece-and-step": {
+    "lessonTitle": "6.28.3 Lab: Pick a piece and step",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Pick a piece and step\". The task: turn a click into a row and a column with floor (taking TOP off y), pick up a piece whose colour matches the turn, and write one rule function, moveKind, that answers 'step' only for a move one square diagonally forward (up for red, down for black) onto an empty square; isLegal asks it, and doMove moves the letter, clears the picked piece and passes the turn. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Click to square",
+        "description": "The click becomes a row and a column.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Your own piece",
+        "description": "Only a piece of the colour whose turn it is is picked up.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "One diagonal",
+        "description": "A step is one row and one column.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Forward only",
+        "description": "Red goes up and black goes down.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Turns pass",
+        "description": "After a move it is the other colour's turn.",
+        "points": 1
+      }
+    ]
+  },
   "6-3-pocket-2-sub-slow-to-a-stop": {
     "lessonTitle": "6.3.2 Sub-build: Slow to a stop",
     "prompt": "The student wrote a moSHion sketch for \"Sub-build: Slow to a stop\". The task: give the ball drag and call it stopped when its speed falls under a small number, setting the speed to 0. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
