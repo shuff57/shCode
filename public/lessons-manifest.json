@@ -12546,6 +12546,45 @@
       "scoreKind": null
     },
     {
+      "id": "7-20-quest-1-reading-same-battle-a-classmate-takes-the-other-turn",
+      "title": "7.20.1 Reading: Same battle, a classmate takes the other turn",
+      "unit": "7.20 Quest: duel online",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 19,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "7-20-quest-2-sub-send-an-action",
+      "title": "7.20.2 Sub-build: Send an action",
+      "unit": "7.20 Quest: duel online",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 19,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "7-20-quest-3-lab-duel-a-classmate",
+      "title": "7.20.3 Lab: Duel a classmate",
+      "unit": "7.20 Quest: duel online",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 19,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "8-1-1-reading-a-part-is-a-list-of-steps",
       "title": "9.1.1 Reading: A Part Is a List of Steps",
       "unit": "9.1 Solid Shapes",

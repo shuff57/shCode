@@ -1,0 +1,160 @@
+{
+  "id": "7-20-quest-3-lab-duel-a-classmate",
+  "title": "7.20.3 Lab: Duel a classmate",
+  "description": "H hosts a duel, Red against Blue, with a classmate on another computer: a choice sends { act, roll }, act runs in onMove only for the seat whose turn it is and only for a good move, and the campaign still plays offline.",
+  "type": "lesson",
+  "estimateMins": 25,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "7.20 Quest: duel online",
+  "preview": "moshion",
+  "week": 19,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "This is your game from 7.19.3. It plays on one computer; H does nothing yet.",
+      "hints": [
+        "If you brought your 7.19.3 work forward, your names may differ; keep yours. Where a step quotes a line, change the line of yours that does the same job."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "A duel flag, and Red against Blue",
+      "instructions": "At the top, below the comment lines, add `const JOIN = '';`. Below `let over = false;`, add `let duel = false;`. In `newGame()`, put the three lines that make the enemies and the fighters inside the `else` of an `if (duel)`: `if (duel) { fighters = [new Fighter('Red', 30, 3, 2, 'tomato'), new Fighter('Blue', 30, 3, 2, 'dodgerblue')]; } else { ...your three lines... }`. Change the first message to `message = duel ? 'Red goes first: 1 attack, 2 guard, 3 potion' : 'Your turn: 1 attack, 2 guard, 3 potion';`. Run: the campaign plays as before, because `duel` is false.",
+      "hints": [
+        "Red and Blue get the same numbers, so the duel is a fair fight."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "A room and a listener",
+      "instructions": "At the end of `setup()`, apply every move that arrives: `online.onMove((m, seat) => { if (duel && !over) act(turn, m.act, m.roll); });`. Below it, join a room when there is a code: `if (JOIN !== '') { duel = true; newGame(); online.join(JOIN); }`. In `draw()`, below `background(...)`, H hosts a duel: `if (kb.presses('h') && !duel && online.status === 'off') { duel = true; newGame(); online.host(); }`.",
+      "hints": [
+        "Without `newGame()`, the hurt hero from your campaign would be in the duel on your computer, while your classmate's starts fresh, and the two would never match.",
+        "The next steps send the moves, and check each one before `act` runs it."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Send the move, do not make it",
+      "instructions": "In `choose(a)`, roll first, then send or act: `const roll = floor(random(0, 4));`, then `if (duel) online.send({ act: a, roll: roll });` and `else act(turn, a, roll);`. In `act`, the computer enemy only plays when this is not a duel: change `if (turn === 1) after(45, enemyTurn);` to `if (!duel && turn === 1) after(45, enemyTurn);`. At the very top of `fightOver(winner)`: `if (duel) { over = true; message = fighters[winner].name + ' wins the duel! Run again to play again'; return; }`.",
+      "hints": [
+        "The sender rolls, once, and sends the roll: then both computers use the same roll, and the hp bars agree.",
+        "Online, an action done where you press the key AND in `onMove` would happen twice on your screen."
+      ]
+    },
+    {
+      "id": "s5",
+      "title": "Check every move that arrives",
+      "instructions": "Below `newGame()`, add the check from the reading: `function goodMove(m) { return m !== null && typeof m === 'object' && [1, 2, 3].includes(m.act) && [0, 1, 2, 3].includes(m.roll); }`. Below it, `myTurn()`: `if (!duel) return turn === 0;` and then `return online.status === 'ready' && online.seat === turn;`. Make `onMove` check before it acts: `if (duel && !over && seat === turn && goodMove(m)) act(turn, m.act, m.roll);`. In `draw()`, the key block starts with `if (!over && myTurn())` instead of `if (!over && turn === 0)`, and R only works offline: add `&& !duel` to the R test.",
+      "hints": [
+        "Seat 0 is the host and plays Red, `fighters[0]`; seat 1 is the classmate and plays Blue.",
+        "A move like `{ act: '1', roll: 0 }` holds the word '1', not the number 1, so `goodMove` ignores it on both computers."
+      ]
+    },
+    {
+      "id": "s6",
+      "title": "Show the room, then duel",
+      "instructions": "In `drawTop()`, the Fight line is only for the campaign: `if (!duel) text('Fight ' + (which + 1) + ' of ' + enemies.length + '    H: duel a classmate', 10, 46, 12, '#8393c4');`. Below it, one line for each status of a duel: `'waiting'`, the code big enough to read and type, `text('Room code: ' + online.code, 10, 50, 18, 'gold')`; `'ready'`, `text('Online duel: you are ' + fighters[online.seat].name + '. Turn: ' + fighters[turn].name, 10, 46, 12, 'gold')`; `'closed'`, `'Room closed: one hosts (H), one joins the new code'` at size 12; and `'error'`, `('' + online.error).slice(0, 60)` at size 12 in `'tomato'`. Each one starts `if (duel && online.status === 'waiting')` and so on. Then host in one tab, join from a second tab (or a classmate's computer), and duel.\n\n**To duel again:** stop and Run again in both tabs. Only ONE player presses H; the other puts the NEW code in `JOIN` and runs again. If both press H, you are in two different rooms.",
+      "hints": [
+        "You must be signed in and in a class to play online.",
+        "The canvas is 480 pixels wide: keep each line short, and start them near the left edge.",
+        "Press a key when it is not your turn: nothing happens, on either computer."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A choice sends the action and its roll",
+      "description": "In a duel, the action and its roll are sent with online.send instead of being done on the spot. Help: 7.20.1 (Reading: Same battle, a classmate takes the other turn)",
+      "hint": "online.send({ act: a, roll: roll });",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bonline\\s*\\.\\s*send\\s*\\(\\s*(?:\\{[^}]*,[^}]*\\}|[A-Za-z_$][\\w$]*\\s*\\))",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "act runs in onMove",
+      "description": "Every move that arrives runs act, on both computers. Help: 7.20.1 (Reading: Same battle, a classmate takes the other turn)",
+      "hint": "online.onMove((m, seat) => { ... act(turn, m.act, m.roll); });",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*(?:async\\s*)?(?:function\\s*[\\w$]*\\s*)?(?:\\([^()]*\\)|[A-Za-z_$][\\w$]*)\\s*(?:=>)?\\s*(?:\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?|(?!\\{)[^;]*?)\\b(?:act|[\\w$]*(?:[Aa]ct|[Mm]ove|[Tt]urn|[Pp]lay)[\\w$]*)\\s*\\(|^(?=[\\s\\S]*?\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\))[\\s\\S]*?(?:\\bfunction\\s+\\1\\s*|\\b(?:const|let|var)\\s+\\1\\s*=\\s*(?:async\\s*)?(?:function\\s*[\\w$]*\\s*)?)(?:\\([^()]*\\)|[A-Za-z_$][\\w$]*)\\s*(?:=>)?\\s*(?:\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?|(?!\\{)[^;]*?)\\b(?:act|[\\w$]*(?:[Aa]ct|[Mm]ove|[Tt]urn|[Pp]lay)[\\w$]*)\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "It checks the seat and the move",
+      "description": "Before onMove acts, it checks that the seat that sent the move is the seat whose turn it is, and that the move is good. Help: 7.20.1 (Reading: Same battle, a classmate takes the other turn)",
+      "hint": "if (duel && !over && seat === turn && goodMove(m)) act(turn, m.act, m.roll);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*(?:async\\s*)?(?:function\\s*[\\w$]*\\s*)?\\(\\s*(?:[\\w$]+|\\{[^{}()]*\\})\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*(?:=>)?\\s*(?=(?:\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?|(?!\\{)[^;]*?)(?:\\b\\1\\s*\\)*\\s*[!=]==?|[!=]==?\\s*\\(*\\s*\\1\\b|[\\w$]+\\s*\\(\\s*\\1\\s*\\)))(?=(?:\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?|(?!\\{)[^;]*?)(?:\\b[\\w$]*(?:[Gg]ood|[Vv]alid|[Oo]k|OK|[Ll]egal|[Cc]heck|[Ss]afe|[Ss]ane)[\\w$]*\\s*\\(|\\.\\s*includes\\s*\\(|\\bact\\s*\\)*\\s*(?:[<>]=?|[!=]==?)\\s*\\(*\\s*[0-4]\\b|\\b(?:Math\\s*\\.\\s*)?floor\\s*\\(|\\bNumber\\s*\\.\\s*isInteger\\s*\\(|\\btypeof\\b))|^(?=[\\s\\S]*?\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\))[\\s\\S]*?(?:\\bfunction\\s+\\2\\s*|\\b(?:const|let|var)\\s+\\2\\s*=\\s*(?:async\\s*)?(?:function\\s*[\\w$]*\\s*)?)\\(\\s*(?:[\\w$]+|\\{[^{}()]*\\})\\s*,\\s*([A-Za-z_$][\\w$]*)\\s*\\)\\s*(?:=>)?\\s*(?=(?:\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?|(?!\\{)[^;]*?)(?:\\b\\3\\s*\\)*\\s*[!=]==?|[!=]==?\\s*\\(*\\s*\\3\\b|[\\w$]+\\s*\\(\\s*\\3\\s*\\)))(?=(?:\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*?|(?!\\{)[^;]*?)(?:\\b[\\w$]*(?:[Gg]ood|[Vv]alid|[Oo]k|OK|[Ll]egal|[Cc]heck|[Ss]afe|[Ss]ane)[\\w$]*\\s*\\(|\\.\\s*includes\\s*\\(|\\bact\\s*\\)*\\s*(?:[<>]=?|[!=]==?)\\s*\\(*\\s*[0-4]\\b|\\b(?:Math\\s*\\.\\s*)?floor\\s*\\(|\\bNumber\\s*\\.\\s*isInteger\\s*\\(|\\btypeof\\b))",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r4",
+      "title": "The campaign still works offline",
+      "description": "One test picks: in a duel the move is sent; otherwise it is done straight away. Help: 7.20.1 (Reading: Same battle, a classmate takes the other turn)",
+      "hint": "if (duel) online.send({ act: a, roll: roll }); else act(turn, a, roll);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bif\\s*\\(+[^;{]*?\\)+\\s*\\{?\\s*online\\s*\\.\\s*send\\s*\\([^;]*;\\s*\\}?\\s*else\\b\\s*\\{?\\s*(?!online\\b)[\\w$.]+\\s*\\(|\\bif\\s*\\(+[^;{]*?\\)+\\s*\\{?\\s*(?!online\\b)[\\w$.]+\\s*\\([^;]*;\\s*\\}?\\s*else\\b\\s*\\{?\\s*online\\s*\\.\\s*send\\s*\\(|\\?\\s*online\\s*\\.\\s*send\\s*\\([^:;]*:\\s*(?!online\\b)[\\w$.]+\\s*\\(|\\?\\s*(?!online\\b)[\\w$.]+\\s*\\([^:;]*\\)\\s*:\\s*online\\s*\\.\\s*send\\s*\\(|\\bif\\s*\\(+[^;{]*?\\)+\\s*\\{\\s*online\\s*\\.\\s*send\\s*\\([^;]*;\\s*return\\b[^}]*\\}\\s*(?!online\\b)[\\w$.]+\\s*\\(|\\bif\\s*\\(+[^;{]*?\\)+\\s*\\{\\s*(?!online\\b)[\\w$.]+\\s*\\([^;]*;\\s*return\\b[^}]*\\}\\s*online\\s*\\.\\s*send\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Duel a classmate\". The task: make Quest playable as a duel across two computers: a duel flag; newGame makes Red against Blue in a duel and the run of enemies otherwise; set up online.onMove once to run act for each arriving move only in a duel, while it is not over, when the seat that sent it is the seat whose turn it is and goodMove says the action is 1 to 3 and the roll 0 to 3 (whole numbers); host on H, or join from a JOIN code; on a choice, roll once and send { act, roll } with online.send in a duel instead of acting; let only the seat whose turn it is choose; the computer enemy and R only offline; and keep the campaign working offline. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Send",
+        "description": "A choice sends the action and roll.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "onMove",
+        "description": "act runs in onMove.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Checks",
+        "description": "Wrong seat or a bad move is ignored.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Offline",
+        "description": "The campaign still plays alone.",
+        "points": 1
+      }
+    ]
+  },
+  "carryFrom": "7-19-quest-3-lab-a-run-of-enemies"
+}

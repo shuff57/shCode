@@ -1,0 +1,16 @@
+{
+  "moduleId": "7.20",
+  "source": "Quest chain module, one day.",
+  "lessons": [
+    {
+      "id": "quest-duel-online",
+      "title": "duel online",
+      "objective": "A duel uses the same act: a choice sends { act, roll } (the sender rolls, so both computers use the same roll), and onMove runs act only for the seat whose turn it is and only when goodMove says both are whole numbers in range.",
+      "screens": [
+        "7-20-quest-1-reading-same-battle-a-classmate-takes-the-other-turn",
+        "7-20-quest-2-sub-send-an-action",
+        "7-20-quest-3-lab-duel-a-classmate"
+      ]
+    }
+  ]
+}

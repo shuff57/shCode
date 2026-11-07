@@ -11451,6 +11451,60 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
+  "7-20-quest-2-sub-send-an-action": {
+    "lessonTitle": "7.20.2 Sub-build: Send an action",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: Send an action\". The task: set up online.onMove once in setup() so each arriving action (1, 2 or 3) is added to got with the seat that sent it; join when JOIN has a code; host on H while the status is 'off'; once the room is 'ready', keys 1, 2 and 3 send { act: 1 }, { act: 2 } or { act: 3 } with online.send. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "onMove",
+        "description": "Every action that arrives is listed.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "send",
+        "description": "A key sends its action.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "host or join",
+        "description": "The sketch opens or joins a room.",
+        "points": 1
+      }
+    ]
+  },
+  "7-20-quest-3-lab-duel-a-classmate": {
+    "lessonTitle": "7.20.3 Lab: Duel a classmate",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Duel a classmate\". The task: make Quest playable as a duel across two computers: a duel flag; newGame makes Red against Blue in a duel and the run of enemies otherwise; set up online.onMove once to run act for each arriving move only in a duel, while it is not over, when the seat that sent it is the seat whose turn it is and goodMove says the action is 1 to 3 and the roll 0 to 3 (whole numbers); host on H, or join from a JOIN code; on a choice, roll once and send { act, roll } with online.send in a duel instead of acting; let only the seat whose turn it is choose; the computer enemy and R only offline; and keep the campaign working offline. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Send",
+        "description": "A choice sends the action and roll.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "onMove",
+        "description": "act runs in onMove.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Checks",
+        "description": "Wrong seat or a bad move is ignored.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Offline",
+        "description": "The campaign still plays alone.",
+        "points": 1
+      }
+    ]
+  },
   "moshion-bounce": {
     "lessonTitle": "5.2.16 Bouncy Ball",
     "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.16 Bouncy Ball\". The task they were given: Build a closed box with a ball in it: make four long thin static walls (top, bottom, left, right), make the ball as a dynamic sprite with one size number so it is a circle, store it in ball and colour it, make it bouncy (near the top of the 0 to 1 range), give it a friction value (the steps try 0 and then 5), and give it a sideways starting speed. What the starter file already had: `let ball;`, a 400 by 400 canvas, gravity turned on (world.gravity.y = 10), background painted in draw(), and four step comments in setup(). The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: A sprite made with 'static' as its last argument never moves or falls; one made without it is dynamic, so gravity and collisions move it. A sprite's body type can also be set afterwards with .collider = 'static'. new Sprite(x, y, d) with one size number makes a circle that many pixels across. bounciness runs from 0 (sticks) to 1 (gives back all its energy). friction is drag along a surface; 0 slides freely. world.gravity.y starts at 0 until a sketch sets it. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",

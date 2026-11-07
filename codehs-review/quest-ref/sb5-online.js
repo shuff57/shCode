@@ -29,5 +29,6 @@ function drawTop() {
   if (online.status === 'waiting') text('Room code: ' + online.code, 10, 28, 18, 'gold');
   if (online.status === 'ready') text('Ready: you are seat ' + online.seat, 10, 24, 14, 'gold');
   if (online.status === 'error') text(('' + online.error).slice(0, 50), 10, 24, 12, 'tomato');
+  if (online.status === 'connecting' || online.status === 'closed') text('Room: ' + online.status, 10, 24, 14, 'white');
   for (let i = 0; i < got.length && i < 6; i++) text(got[got.length - 1 - i], 10, 60 + i * 20, 14, 'white');
 }

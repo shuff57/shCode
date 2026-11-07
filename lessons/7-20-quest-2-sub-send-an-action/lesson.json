@@ -1,0 +1,118 @@
+{
+  "id": "7-20-quest-2-sub-send-an-action",
+  "title": "7.20.2 Sub-build: Send an action",
+  "description": "H hosts, JOIN joins, and 1, 2 or 3 sends that action: every action, yours too, arrives in onMove and is listed on both computers with the seat that sent it.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "7.20 Quest: duel online",
+  "preview": "moshion",
+  "week": 19,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The top says Press H to host. H and the number keys do nothing yet. (Before you host or join, `online.code` and `online.seat` hold nothing, so the top shows the hint instead of them.)"
+    },
+    {
+      "id": "s2",
+      "title": "Listen for actions",
+      "instructions": "In `setup()`, set up `online.onMove((m, seat) => { if ([1, 2, 3].includes(m.act)) got.push('seat ' + seat + ': ' + NAMES[m.act]); });`. Below it, join a room when there is a code: `if (JOIN !== '') online.join(JOIN);`.",
+      "hints": [
+        "`onMove` goes in `setup()`: it is set once, and then runs for every move.",
+        "`[1, 2, 3].includes(m.act)` skips a move that is not one of the three actions, so `NAMES[m.act]` always has a word."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Host, and send",
+      "instructions": "In `draw()`, below `background(...)`: `if (kb.presses('h') && online.status === 'off') online.host();`. Then, once the room is ready, send the key you press: `if (online.status === 'ready') { if (kb.presses('1')) online.send({ act: 1 }); if (kb.presses('2')) online.send({ act: 2 }); if (kb.presses('3')) online.send({ act: 3 }); }`. Run, press H, and read the room code at the top.",
+      "hints": [
+        "Sending before the room is `'ready'` stops with an error that says so.",
+        "The list is made from `got`, not from the key you pressed: an action appears only once it has come back."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Try it with two tabs",
+      "instructions": "Open this lesson in a second browser tab. Put the code in `JOIN` there and Run. Both tabs now say Ready. Press 1, 2 or 3 in either one: the action appears in both lists, with seat 0 for the host and seat 1 for the other tab.",
+      "hints": [
+        "You must be signed in and in a class. A seat is your account in one tab, so each tab gets its own seat."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Actions are received",
+      "description": "online.onMove is given a function that runs for every move. Help: 7.20.1 (Reading: Same battle, a classmate takes the other turn)",
+      "hint": "online.onMove((m, seat) => { ... });",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*(?:(?:async\\s*)?\\((?:[^()]|\\([^()]*\\))*\\)\\s*=>|(?:async\\s*)?[A-Za-z_$][\\w$]*\\s*=>|function\\b|[A-Za-z_$][\\w$]*\\s*\\))",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "An action is sent",
+      "description": "online.send sends the action of the key you pressed. Help: 7.20.1 (Reading: Same battle, a classmate takes the other turn)",
+      "hint": "online.send({ act: 1 });",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bonline\\s*\\.\\s*send\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "Host or join",
+      "description": "The sketch hosts a room or joins one. Help: 7.20.1 (Reading: Same battle, a classmate takes the other turn)",
+      "hint": "online.host();",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bonline\\s*\\.\\s*(?:host|join)\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: Send an action\". The task: set up online.onMove once in setup() so each arriving action (1, 2 or 3) is added to got with the seat that sent it; join when JOIN has a code; host on H while the status is 'off'; once the room is 'ready', keys 1, 2 and 3 send { act: 1 }, { act: 2 } or { act: 3 } with online.send. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "onMove",
+        "description": "Every action that arrives is listed.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "send",
+        "description": "A key sends its action.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "host or join",
+        "description": "The sketch opens or joins a room.",
+        "points": 1
+      }
+    ]
+  }
+}

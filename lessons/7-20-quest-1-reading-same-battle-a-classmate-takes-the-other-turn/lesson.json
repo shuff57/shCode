@@ -1,0 +1,19 @@
+{
+  "id": "7-20-quest-1-reading-same-battle-a-classmate-takes-the-other-turn",
+  "title": "7.20.1 Reading: Same battle, a classmate takes the other turn",
+  "description": "Only what is new over 6.25.1 and 6.31.1: a duel uses the same act; a move is { act, roll } and the sender rolls, so both computers use the same roll; goodMove checks both are whole numbers in range; only the seat whose turn it is may act.",
+  "type": "lesson",
+  "estimateMins": 8,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "7.20 Quest: duel online",
+  "preview": "reading",
+  "week": 19,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

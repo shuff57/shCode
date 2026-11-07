@@ -60,6 +60,10 @@ turn it was: the duel's first message is now `Red goes first: ...` and the ready
 `Online duel: you are Red. Turn: Blue`. `rules-check.mjs` still passes 9/9 on `e-online.js` and
 `balance.mjs` still gives 14/40 (attack) and 36/40 (smart): no number moved.
 
+`sb5-online.js` showed nothing at all at the top while `connecting` or after `closed` (the 6.25.2
+walk's blank strip); it now shows `Room: connecting` / `Room: closed`, as Checkers' `sb5-online.js`
+does. A lab stage was not touched by that.
+
 | File | Is the solution of |
 | --- | --- |
 | `sb1-bar.js` | 7.16.3 Sub-build: An object that draws itself |
