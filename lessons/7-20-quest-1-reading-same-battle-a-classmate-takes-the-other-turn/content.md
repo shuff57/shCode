@@ -58,7 +58,8 @@ function goodMove(m) {
 
 `m !== null` comes first, because `m.act` on a move that is `null` would stop the sketch. Then
 `typeof m === 'object'` makes sure the move is an object at all, not a number or a word (`typeof`
-gives the name of a value's type as a word, 1.2.23). Only then are `m.act` and `m.roll` read. The
+gives the name of a value's type as a word: `typeof 4` is `'number'`, `typeof 'hi'` is `'string'`,
+and `typeof { act: 1 }` is `'object'`). Only then are `m.act` and `m.roll` read. The
 handler acts only for the seat whose turn it is, while the duel is on:
 
 ```js
