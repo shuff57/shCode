@@ -11351,7 +11351,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
   },
   "7-18-quest-2-sub-a-flag-and-a-count-inside-an-object": {
     "lessonTitle": "7.18.2 Sub-build: A flag and a count inside an object",
-    "prompt": "The student wrote a moSHion sketch for \"Sub-build: A flag and a count inside an object\". The task: give the Knight guard(), which turns this.guarding on, make takeHit halve the hit with floor(n / 2) while guarding and then turn the flag off, and write heal(), which returns 0 with no potions left and otherwise uses one up and gives up to 12 hp back with min(this.hp + 12, this.maxHp), returning the hp gained; key 2 guards and key 3 drinks. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: A flag and a count inside an object\". The task: give the Knight a potions value in its constructor (new Knight(2)), guard(), which turns this.guarding on, make takeHit halve the hit with floor(n / 2) while guarding and then turn the flag off, and write heal(), which returns 0 with no potions left and otherwise uses one up and gives up to 12 hp back with min(this.hp + 12, this.maxHp), returning the hp gained; key 2 guards and key 3 drinks. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
     "rubric": [
       {
         "id": "r1",
@@ -11375,7 +11375,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
   },
   "7-18-quest-3-lab-attack-guard-or-potion": {
     "lessonTitle": "7.18.3 Lab: Attack, guard or potion",
-    "prompt": "The student wrote a moSHion sketch for \"Lab: Attack, guard or potion\". The task: add a guarding flag that halves the next hit with floor(n / 2) in takeHit and is then cleared, a potions count (a new constructor value, so every new Fighter call gains it) and heal(), which gives up to 12 hp back capped at maxHp and uses one up, doing nothing when none are left; one act(t, a, roll) does action 1 attack, 2 guard or 3 potion; keys 1, 2 and 3 pick the action on your turn; and the enemy chooses, drinking when it is low and has a potion and guarding some of the time. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Attack, guard or potion\". The task: add a guarding flag that halves the next hit with floor(n / 2) in takeHit and is then cleared, a potions count (a new constructor value, so every new Fighter call is handed five values: name, maxHp, power, potions, color) and heal(), which gives up to 12 hp back capped at maxHp and uses one up, doing nothing when none are left; one act(t, a, roll) does action 1 attack, 2 guard or 3 potion; keys 1, 2 and 3 pick the action on your turn; and the enemy chooses, drinking when it is low and has a potion and guarding some of the time. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
     "rubric": [
       {
         "id": "r1",
@@ -11399,6 +11399,12 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "id": "r4",
         "title": "Enemy choice",
         "description": "The enemy does not always attack.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Five values",
+        "description": "Every new Fighter gets its potions, in fourth place.",
         "points": 1
       }
     ]
