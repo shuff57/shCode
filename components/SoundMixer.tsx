@@ -39,6 +39,7 @@ import {
 } from '../lib/sound/params';
 import { renderMusic, renderSfxDef, type Rendered } from '../lib/sound/render';
 import { CLIP_EXTENSION, clipName, prepareClip, type ClipType } from '../lib/sound-import';
+import LibrarySyncNote from './LibrarySyncNote';
 import { matchRecording } from '../lib/sound/match';
 import type { SfxrParams } from '../lib/sound/vendor/jsfxr/sfxr.mjs';
 
@@ -677,7 +678,7 @@ export default function SoundMixer() {
           the stereo field, and hear the channels together. Each effect has a <strong style={{ color: 'var(--text)' }}>Tweak</strong> panel
           for its own waveform, pitch and envelope, and a <strong style={{ color: 'var(--text)' }}>Mic</strong> panel that
           fits those knobs to a sound you make with your mouth. Save one and a moSHion sketch can play it with{' '}
-          <code>loadSound(&apos;name&apos;)</code>. Everything stays in this browser.
+          <code>loadSound(&apos;name&apos;)</code>. Saved sounds sync to your account when you are signed in, so they reach your other devices.
         </p>
       </header>
 
@@ -1042,6 +1043,7 @@ zap.play();`}</pre>
             }}
           />
         </div>
+        <LibrarySyncNote what="sounds" />
         {saved.length === 0 ? (
           <p style={{ fontSize: 13, color: '#8393c4', margin: 0 }}>
             Nothing saved yet. Give a channel a name and press <strong>Save</strong>, or import a clip.

@@ -9,7 +9,7 @@ export default function PrivacyPage() {
   return (
     <main className="legal-page">
       <h1>Privacy Policy</h1>
-      <p className="legal-updated">Last updated: October 26, 2026</p>
+      <p className="legal-updated">Last updated: November 7, 2026</p>
 
       <p>
         <strong>Short version:</strong> shCode collects the minimum needed to run accounts, classes and grading, does not
@@ -32,6 +32,11 @@ export default function PrivacyPage() {
         <li>
           <strong>Uploads:</strong> images you upload for your projects. Each has a long, unguessable link, and anyone who
           has the link can open it, so do not upload anything personal.
+        </li>
+        <li>
+          <strong>Saved textures and sounds:</strong> the pixel art you save in the texture editor and the sounds you save
+          or import in the sound mixer, kept with your account so they reach your other devices. Only you can open them.
+          Signing out removes the copies that are already in your account from that browser.
         </li>
         <li>
           <strong>AI help (CODY):</strong> when you ask for help, your question and the relevant lesson or code are sent to an AI

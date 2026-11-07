@@ -477,6 +477,24 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   `scripts/test-uploads.mjs` covers the sniffer against renamed HTML, SVG,
   polyglots and near-miss signatures; it runs in `npm test`.
 
+### Texture and sound library (synced)
+- Saved textures (texture editor) and sounds (mixer, including imported MP3/WAV/OGG clips, #85) still live
+  in the browser store `moshion.store.v1` that the preview bridge hands sketches (`lib/moshion-storage.ts`).
+  A signed-in student's copy also lives in their account: migration 0039 `library_items`, bytes in R2
+  (`UPLOADS`, `library/<id>`), **never public** (owner-only routes; a sketch gets data URIs via the bridge).
+- Routes: `GET|PUT /api/library`, `GET|DELETE /api/library/[id]`. Type from the bytes (textures
+  PNG/JPEG/GIF/WebP, sounds WAV/MP3/OGG). Caps per kind: texture 64 KB each / 1 MB, sound 256 KB each /
+  2 MB, 200 items. A save or delete against a version another device changed is 409 + the current item.
+  A delete leaves a tombstone row so other devices learn of it. Tests: `scripts/test-library.mjs`.
+- `lib/library-sync.ts` merges three copies (this browser, the account, and the per-account BASE in
+  `moshion.library.base.v1`): changed on both keeps both (`hero`, `hero_2`). **A delete reaches the account
+  only when the student pressed Delete** (`moshion.library.deleted.v1`); an item a sketch wiped with
+  `clearStorage()` is downloaded again. Mounted once in the root layout (`components/LibrarySync.tsx`);
+  `logout()` removes synced copies from the browser and leaves unsynced ones. Tests:
+  `scripts/test-library-sync.mjs`. The dev server serves `/api/library` from the real handlers over an
+  in-memory SQLite, so two browser sessions can act as two devices.
+- `library_shares` (same migration) is for share-with-class; nothing reads it yet.
+
 ## Build + deploy
 
 ```bash

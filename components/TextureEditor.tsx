@@ -24,11 +24,13 @@
 //
 //   editor (app origin) --write--> moshion.store.v1 --bridge--> sketch
 //
-// No API route, no R2, no upload quota, nothing new to authorize. The art
-// never leaves the student's browser, which is also why it is not shared
-// between machines -- a real limit, stated in the UI rather than hidden.
+// The editor itself needs no API route. A signed-in student's saved textures
+// then sync to their account library (lib/library-sync.ts, mounted in the
+// root layout), which is how they reach the student's other devices; signed
+// out, they stay in this browser only.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import LibrarySyncNote from './LibrarySyncNote';
 import {
   listSavedTextures,
   saveTexture,
@@ -1122,6 +1124,7 @@ export default function TextureEditor() {
             </div>
             <button style={btn()} onClick={() => setShowLibrary(false)}>Close</button>
           </div>
+          <LibrarySyncNote what="textures" />
           {saved.length === 0 && <div style={{ fontSize: 11, opacity: 0.5, marginBottom: 12 }}>Nothing saved yet.</div>}
           {saved.length > 0 && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, marginBottom: 14 }}>
