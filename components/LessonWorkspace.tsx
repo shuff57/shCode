@@ -9,7 +9,7 @@ import { saveProgress, normalizeEol } from '../lib/version-control';
 import { seedPlan } from '../lib/plan-seed';
 import { recordSubmission, saveDraft, streamGrade } from '../lib/written-grader-store';
 import { classifyGradeFailure, gradeFailureMessage } from '../lib/grade-error';
-import { aiCheckText, aiNoteForRun, applyAiVerdicts, canSubmitMoshion, fallbackRunner, moshionRunNeed, moshionRunStep, moshionSubmitWords, NO_MOSHION_RUN, reportFromRequirements, runLetsSubmit, verdictsFromCriteria, type AiVerdicts, type MoshionRun } from '../lib/ai-check';
+import { aiCheckText, aiNoteForRun, applyAiVerdicts, canSubmitMoshion, fallbackRunner, moshionRunNeed, moshionRunStep, moshionSubmitWords, NO_MOSHION_RUN, reportFromRequirements, runLetsSubmit, staleAiNote, verdictsFromCriteria, type AiVerdicts, type MoshionRun } from '../lib/ai-check';
 import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
 import GradeQuotaNote from './GradeQuotaNote';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
@@ -908,8 +908,8 @@ export default function LessonWorkspace({
     return report;
   }, [lesson, files, latestModelDoc, latestRefusals]);
 
-  // The AI's marks describe the text it read. Change a word and they are stale: drop them and let
-  // the regex check own the cards again.
+  // The AI's marks describe the text it read. Change a word and they are stale: drop them and leave
+  // the cards ungraded until the next Check (the note keeps the advice, see staleAiNote).
   const aiCheckedText = aiText(files);
   useEffect(() => {
     const ai = aiVerdictsRef.current;
@@ -917,7 +917,9 @@ export default function LessonWorkspace({
     if (!aiCheck || (!ai && fb === null) || ai?.text === aiCheckedText || fb === aiCheckedText) return;
     aiVerdictsRef.current = null;
     aiFallbackRef.current = null;
-    setAiCheckNote(null);
+    // #68: the advice outlives the edit (summary, hints, each red card's note), labelled as from
+    // the last Check. The marks do not: Submit records the cards as shown.
+    setAiCheckNote((prev) => staleAiNote(prev, ai?.verdicts ?? null, lesson.requirements));
     // The AI is this lab's grader. Editing drops the marks and leaves the
     // cards ungraded until the student presses Grade again.
     setRequirements(lesson.requirements);

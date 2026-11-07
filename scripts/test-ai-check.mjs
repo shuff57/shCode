@@ -209,6 +209,22 @@ for (const id of readdirSync(path.join(root, 'lessons'))) {
   check(aiNoteForRun(ok, { allGreen: false, runErrored: true }) === ok.text, 'red cards: AI note unchanged');
   check(aiNoteForRun({ kind: 'error', text: 'x' }, { allGreen: true, runErrored: true }) === 'x', 'error note unchanged');
 }
+{
+  // #68: an edit resets the cards but keeps the advice, labelled as from the last Check.
+  const { staleAiNote, STALE_NOTE_PREFIX } = aiCheckLib;
+  const reqs = [{ id: 'r1', title: 'Loop over the cart' }, { id: 'r2', title: 'Print each cost' }, { id: 'r3', title: 'Destructure' }];
+  const verdicts = { r1: { passed: true, feedback: 'Good loop.' }, r2: { passed: false, feedback: 'Multiply price by quantity.' }, r3: { passed: false, feedback: '' } };
+  const note = { kind: 'ok', text: 'Close. (1 of 3 green. Open Quest for the notes.)', hints: ['Look at step 4.'] };
+  const s = staleAiNote(note, verdicts, reqs);
+  check(s && s.text === `${STALE_NOTE_PREFIX} ${note.text}`, 'stale note keeps the summary, labelled');
+  check(s && s.hints[0] === 'Look at step 4.', 'stale note keeps the AI hints');
+  check(s && s.hints.includes('Print each cost: Multiply price by quantity.'), "stale note carries a red card's note");
+  check(s && !s.hints.some((h) => h.startsWith('Loop over the cart')), 'a green card adds nothing');
+  check(s && s.hints.length === 2, 'a red card with no note adds nothing');
+  check(staleAiNote(null, verdicts, reqs) === null, 'no note stays no note');
+  check(staleAiNote({ kind: 'error', text: 'The grader is down.' }, null, reqs) === null, 'an outage note (pattern-check fallback) is dropped as before');
+  check(staleAiNote(note, null, reqs) === null, 'no AI verdicts: nothing to keep');
+}
 check(labs >= 1, 'at least one lesson carries aiCheck');
 
 console.log(failures ? `[test-ai-check] ${failures} FAILED of ${n}` : `[test-ai-check] ${n}/${n} checks passed`);

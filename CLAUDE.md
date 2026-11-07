@@ -642,8 +642,8 @@ deliberately NOT `aiGrader`: that field makes a lesson a scored written part in 
 and attempt caps. `generate-ai-graders.mjs` collects `aiCheck` into the same server-side config, so the
 rubric and prompt are read by lesson id and the route's quota applies (shared with the tutor, 30 a day).
 The prompt and rubric text do ship to the browser (nothing redacts a formative lab); that is fine for a
-0-point practice check. Editing the file clears the AI's marks and the regex check owns the cards again.
-Submit records the cards as shown. Tests: `scripts/test-ai-check.mjs`.
+0-point practice check. Editing the file clears the AI's marks.
+Submit records the cards as shown, which is why an edit resets them; the summary, the hints and each red card's note stay as a note labelled "From your last Check" (`staleAiNote`, #68). Tests: `scripts/test-ai-check.mjs`.
 
 ## AI grader
 

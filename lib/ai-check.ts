@@ -189,6 +189,25 @@ export function aiNoteForRun(note: { kind: 'ok' | 'error'; text: string } | null
   return note.kind === 'ok' && s.allGreen && s.runErrored ? GREEN_BUT_RUN_ERROR : note.text;
 }
 
+/**
+ * The Check note once the student has edited the text it read (#68). The cards go back to
+ * ungraded, because Submit records them as shown and the marks describe the old text. The ADVICE
+ * stays, labelled as from the last Check: the summary, the AI's hints, and each card that was not
+ * green with its note ("Title: what to fix"), since those notes lived on the cards being reset.
+ */
+export const STALE_NOTE_PREFIX = 'From your last Check (you have edited since, so the cards are reset; press Check again to update them):';
+export function staleAiNote(
+  note: { kind: 'ok' | 'error'; text: string; hints?: string[] } | null,
+  verdicts: AiVerdicts | null,
+  reqs: { id: string; title: string }[],
+): { kind: 'ok'; text: string; hints: string[] } | null {
+  if (!note || note.kind !== 'ok' || !verdicts) return null;
+  const cardNotes = reqs
+    .filter((r) => verdicts[r.id] && !verdicts[r.id].passed && verdicts[r.id].feedback)
+    .map((r) => `${r.title}: ${verdicts[r.id].feedback}`);
+  return { kind: 'ok', text: `${STALE_NOTE_PREFIX} ${note.text}`, hints: [...(note.hints ?? []), ...cardNotes] };
+}
+
 /** Only a clear "met" turns a card green. "partial" and "missing" stay red, with the AI's note. */
 export function verdictsFromCriteria(criteria: AiCheckCriterion[], knownIds: string[]): AiVerdicts {
   const known = new Set(knownIds);
