@@ -186,7 +186,7 @@ async function recordHistory(
             AND id NOT IN (
               SELECT id FROM lesson_sync_history
                WHERE student_email = ? AND lesson_id = ?
-               ORDER BY created_at DESC, id DESC
+               ORDER BY created_at DESC, revision DESC, id DESC
                LIMIT ?
             )`,
       ).bind(studentEmail, lessonId, studentEmail, lessonId, HISTORY_LIMIT),

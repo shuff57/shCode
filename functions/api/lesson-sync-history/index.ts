@@ -57,7 +57,7 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async (cont
   const result = await env.DB.prepare(
     `SELECT id, revision, created_at FROM lesson_sync_history
       WHERE student_email = ? AND lesson_id = ?
-      ORDER BY created_at DESC, id DESC
+      ORDER BY created_at DESC, revision DESC, id DESC
       LIMIT 50`,
   )
     .bind(data.email, lessonId)
