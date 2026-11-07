@@ -2652,7 +2652,7 @@ for (const id of Object.values(L)) {
   // ---- 7.20.2 / 7.20.3: send, act in onMove, the seat and goodMove, offline still works
   const sbH = '  online.onMove((m, seat) => {' + nl + "    if ([1, 2, 3].includes(m.act)) got.push('seat ' + seat + ': ' + NAMES[m.act]);" + nl + '  });';
   accept(Q.sb5, 'onMove given a named function', swap(Q.sb5, sbH, '  online.onMove(gotMove);', 'function draw() {', 'function gotMove(m, seat) {' + nl + "  got.push('seat ' + seat + ': ' + NAMES[m.act]);" + nl + '}' + nl + nl + 'function draw() {'));
-  accept(Q.sb5, 'a function expression', swap(Q.sb5, sbH, '  online.onMove(function (m, seat) {' + nl + "    got.push('seat ' + seat);" + nl + '  });'));
+  // 'a function expression' moved to the fix-pass block below: it now has to read the move (7.20.2 r1).
   reject(Q.sb5, 'onMove only in a comment', 'r1', plus(Q.sb5, '// online.onMove((m, seat) => {});'));
 
   const handler = '  online.onMove((m, seat) => {' + nl + '    if (duel && !over && seat === turn && goodMove(m)) act(turn, m.act, m.roll);' + nl + '  });';
@@ -2692,6 +2692,161 @@ for (const id of Object.values(L)) {
   reject(Q.yours, 'key 4 only in a string', 'r1', plus(Q.yours, 'const help = "kb.presses(' + AP + '4' + AP + ') && cooldown === 0; cooldown -= 1";'));
   reject(Q.yours, 'a cooldown that never counts down', 'r1', cool("kb.presses('4') && cooldown === 0", ''));
   reject(Q.yours, 'gold earned but never spent', 'r1', sfix(Q.yours, 'let duel = false;', 'let duel = false;' + nl + 'let gold = 0;', '  which += 1;' + nl + '  fighters[0].levelUp();', '  gold += 10;' + nl + '  which += 1;' + nl + '  fighters[0].levelUp();'));
+}
+
+// Quest 7.20/7.21 fix pass (2026-11-07): the handler must use the move, the send sits under a key,
+// r3 needs a seat test and a roll check, 7.21.3's new kind must reach the enemies.
+// 7.20.2 / 7.20.3 / 7.21.3 cases for the Quest block of scripts/test-grader-tolerance.mjs (fix pass 2).
+// Same helpers as that block: swap (on the reference), sfix (on the starter), plus (appended to the starter).
+// Lines marked EXISTING are already in the tolerance file; everything else is new.
+{
+  const Q = {
+    sb5: '7-20-quest-2-sub-send-an-action', duel: '7-20-quest-3-lab-duel-a-classmate',
+    yours: '7-21-quest-3-challenges-make-it-yours',
+  };
+  const swap = (id, ...pairs) => {
+    let code = solutionFiles(id)['script.js'];
+    for (let k = 0; k < pairs.length; k += 2) {
+      if (!code.includes(pairs[k])) throw new Error(`Quest case for ${id}: ${JSON.stringify(pairs[k])} is not in the reference`);
+      code = code.split(pairs[k]).join(pairs[k + 1]);
+    }
+    return { 'script.js': code };
+  };
+  const sfix = (id, ...pairs) => {
+    let code = starterFiles(id)['script.js'];
+    for (let k = 0; k < pairs.length; k += 2) {
+      if (!code.includes(pairs[k])) throw new Error(`Quest case for ${id}: ${JSON.stringify(pairs[k])} is not in the starter`);
+      code = code.split(pairs[k]).join(pairs[k + 1]);
+    }
+    return { 'script.js': code };
+  };
+  const plus = (id, extra) => ({ 'script.js': starterFiles(id)['script.js'] + nl + extra + nl });
+  for (const id of Object.values(Q)) {
+    accept(id, 'reference solution', solutionFiles(id));          // EXISTING
+    reject(id, 'untouched starter', null, starterFiles(id));       // EXISTING
+  }
+
+  // ---- 7.20.2: the handler uses the move; the send sits under a key test
+  const sbH = '  online.onMove((m, seat) => {' + nl + "    if ([1, 2, 3].includes(m.act)) got.push('seat ' + seat + ': ' + NAMES[m.act]);" + nl + '  });';
+  const sbSend = "  if (online.status === 'ready') {" + nl + "    if (kb.presses('1')) online.send({ act: 1 });" + nl + "    if (kb.presses('2')) online.send({ act: 2 });" + nl + "    if (kb.presses('3')) online.send({ act: 3 });" + nl + '  }';
+  accept(Q.sb5, 'onMove given a named function', swap(Q.sb5, sbH, '  online.onMove(gotMove);', 'function draw() {', 'function gotMove(m, seat) {' + nl + "  got.push('seat ' + seat + ': ' + NAMES[m.act]);" + nl + '}' + nl + nl + 'function draw() {'));  // EXISTING
+  // CHANGED: the EXISTING case of this name pushed only 'seat ' + seat, which no longer passes r1 (it never reads the move).
+  accept(Q.sb5, 'a function expression', swap(Q.sb5, sbH, '  online.onMove(function (m, seat) {' + nl + "    got.push('seat ' + seat + ': ' + NAMES[m.act]);" + nl + '  });'));
+  reject(Q.sb5, 'onMove only in a comment', 'r1', plus(Q.sb5, '// online.onMove((m, seat) => {});'));  // EXISTING
+  accept(Q.sb5, 'one parameter, no parentheses', swap(Q.sb5, sbH, "  online.onMove(m => got.push('an action: ' + NAMES[m.act]));"));
+  accept(Q.sb5, 'destructured ({ act }, seat)', swap(Q.sb5, sbH, '  online.onMove(({ act }, seat) => {' + nl + "    got.push('seat ' + seat + ': ' + NAMES[act]);" + nl + '  });'));
+  accept(Q.sb5, 'a const arrow handler above setup', swap(Q.sb5, sbH, '  online.onMove(gotMove);', 'function setup() {', 'const gotMove = (move, who) => {' + nl + "  got.push('seat ' + who + ': ' + NAMES[move.act]);" + nl + '};' + nl + nl + 'function setup() {'));
+  accept(Q.sb5, 'keys with else if and braces', swap(Q.sb5, sbSend, "  if (online.status === 'ready') {" + nl + "    if (kb.presses('1')) {" + nl + '      online.send({ act: 1 });' + nl + "    } else if (kb.presses('2')) {" + nl + '      online.send({ act: 2 });' + nl + "    } else if (kb.presses('3')) {" + nl + '      online.send({ act: 3 });' + nl + '    }' + nl + '  }'));
+  accept(Q.sb5, 'a key kept in a variable, then sent', swap(Q.sb5, sbSend, '  let a = 0;' + nl + "  if (kb.presses('1')) a = 1;" + nl + "  if (kb.presses('2')) a = 2;" + nl + "  if (kb.presses('3')) a = 3;" + nl + "  if (a !== 0 && online.status === 'ready') online.send({ act: a });"));
+  accept(Q.sb5, 'the key and the room tested together', swap(Q.sb5, sbSend, "  if (kb.presses('1') && online.status === 'ready') online.send({ act: 1 });" + nl + "  if (kb.presses('2') && online.status === 'ready') online.send({ act: 2 });" + nl + "  if (kb.presses('3') && online.status === 'ready') online.send({ act: 3 });"));
+  accept(Q.sb5, 'a loop over the three keys', swap(Q.sb5, sbSend, "  if (online.status === 'ready') {" + nl + '    for (let k = 1; k <= 3; k++) if (kb.presses(' + AP + AP + ' + k)) online.send({ act: k });' + nl + '  }'));
+  reject(Q.sb5, 'an empty handler, a bare send, a host', 'r1', sfix(Q.sb5, '  // STEP: every action that arrives goes into got, with the seat that sent it.', '  online.onMove(() => {});' + nl + '  online.send(1);' + nl + '  online.host();'));
+  reject(Q.sb5, 'a bare send in setup, not under a key', 'r2', sfix(Q.sb5, '  // STEP: every action that arrives goes into got, with the seat that sent it.', "  online.onMove((m) => got.push('x' + m));" + nl + '  online.send(1);' + nl + '  online.host();'));
+  reject(Q.sb5, 'a send on the line after a key test with no braces', 'r2', sfix(Q.sb5, '  // STEP: H hosts a room. Once the room is ready, 1, 2 and 3 send that action.', "  if (kb.presses('h')) online.host();" + nl + '  online.send({ act: 1 });'));
+  reject(Q.sb5, 'the old function-expression case: only the seat listed', 'r1', swap(Q.sb5, sbH, '  online.onMove(function (m, seat) {' + nl + "    got.push('seat ' + seat);" + nl + '  });'));
+  reject(Q.sb5, 'a handler that ignores the move', 'r1', swap(Q.sb5, sbH, "  online.onMove((m, seat) => got.push('something came'));"));
+
+  // ---- 7.20.3
+  const handler = '  online.onMove((m, seat) => {' + nl + '    if (duel && !over && seat === turn && goodMove(m)) act(turn, m.act, m.roll);' + nl + '  });';
+  const send = '  if (duel) online.send({ act: a, roll: roll });' + nl + '  else act(turn, a, roll);';
+  const goodFn = 'function goodMove(m) {';
+  const goodBody = '  return m !== null && typeof m === ' + AP + 'object' + AP + ' &&' + nl + '    [1, 2, 3].includes(m.act) && [0, 1, 2, 3].includes(m.roll);';
+  const H = (lines) => swap(Q.duel, handler, '  online.onMove((m, seat) => {' + nl + lines.map((l) => '    ' + l).join(nl) + nl + '  });');
+  // EXISTING accepts
+  accept(Q.duel, 'early returns in the handler', H(['if (!duel || over) return;', 'if (seat !== turn) return;', 'if (!goodMove(m)) return;', 'act(turn, m.act, m.roll);']));
+  accept(Q.duel, 'the handler as a named function below', swap(Q.duel, handler, '  online.onMove(arrived);', goodFn, 'function arrived(m, who) {' + nl + '  if (duel && !over && who === turn && goodMove(m)) act(turn, m.act, m.roll);' + nl + '}' + nl + nl + goodFn));
+  accept(Q.duel, 'a const arrow handler above setup', swap(Q.duel, handler, '  online.onMove(arrived);', 'function setup() {', 'const arrived = (m, seat) => {' + nl + '  if (duel && !over && goodMove(m) && turn === seat) act(turn, m.act, m.roll);' + nl + '};' + nl + nl + 'function setup() {'));
+  accept(Q.duel, 'the move checked inline with includes', H(['if (seat === turn && m !== null && [1, 2, 3].includes(m.act) && [0, 1, 2, 3].includes(m.roll)) act(turn, m.act, m.roll);']));
+  accept(Q.duel, "send when 'ready', otherwise act", swap(Q.duel, send, "  if (online.status === 'ready') online.send({ act: a, roll });" + nl + '  else act(turn, a, roll);'));
+  accept(Q.duel, 'act first, then else send', swap(Q.duel, send, '  if (!duel) act(turn, a, roll);' + nl + '  else online.send({ act: a, roll: roll });'));
+  accept(Q.duel, 'a ternary', swap(Q.duel, send, '  duel ? online.send({ act: a, roll: roll }) : act(turn, a, roll);'));
+  accept(Q.duel, 'an early return after sending', swap(Q.duel, send, '  if (duel) {' + nl + '    online.send({ act: a, roll: roll });' + nl + '    return;' + nl + '  }' + nl + '  act(turn, a, roll);'));
+  // new accepts: guard forms, helpers, validators by any name
+  accept(Q.duel, 'one combined guard clause', H(['if (!duel || over || seat !== turn || !goodMove(m)) return;', 'act(turn, m.act, m.roll);']));
+  accept(Q.duel, 'nested ifs', H(['if (seat === turn) {', '  if (goodMove(m)) {', '    act(turn, m.act, m.roll);', '  }', '}']));
+  accept(Q.duel, 'the turn on the left: turn === seat', H(['if (duel && turn === seat && goodMove(m)) act(turn, m.act, m.roll);']));
+  accept(Q.duel, 'a wrapper that hands both to receive()', swap(Q.duel, handler, '  online.onMove((m, seat) => receive(m, seat));', goodFn, 'function receive(m, seat) {' + nl + '  if (duel && !over && seat === turn && goodMove(m)) act(turn, m.act, m.roll);' + nl + '}' + nl + nl + goodFn));
+  accept(Q.duel, 'a wrapper with braces, helper above setup', swap(Q.duel, handler, '  online.onMove((move, who) => {' + nl + '    handle(move, who);' + nl + '  });', 'function setup() {', 'function handle(move, who) {' + nl + '  if (who !== turn) return;' + nl + '  if (!goodMove(move)) return;' + nl + '  act(turn, move.act, move.roll);' + nl + '}' + nl + nl + 'function setup() {'));
+  for (const v of ['legit', 'fair', 'isMove', 'allowed', 'proper']) {
+    accept(Q.duel, 'a validator named ' + v, swap(Q.duel, 'goodMove(m)) act', v + '(m)) act', goodFn, 'function ' + v + '(m) {'));
+  }
+  accept(Q.duel, 'a validator defined above setup, as a const arrow', swap(Q.duel, 'goodMove(m)) act', 'fair(m)) act', goodFn + nl + goodBody + nl + '}', '', 'function setup() {', 'const fair = (x) => x !== null && [1, 2, 3].includes(x.act) && x.roll >= 0 && x.roll <= 3 && x.roll === floor(x.roll);' + nl + nl + 'function setup() {'));
+  accept(Q.duel, 'the roll checked inline with comparisons', H(['if (seat !== turn || m === null) return;', 'if (m.roll < 0 || m.roll > 3) return;', 'act(turn, m.act, m.roll);']));
+  accept(Q.duel, 'a validator with a different parameter name', swap(Q.duel, goodFn + nl + goodBody, 'function goodMove(move) {' + nl + '  if (move === null || typeof move !== ' + AP + 'object' + AP + ') return false;' + nl + '  return [1, 2, 3].includes(move.act) && [0, 1, 2, 3].includes(move.roll);'));
+  accept(Q.duel, 'a list [a, roll] sent and read by place', swap(Q.duel, send, '  if (duel) online.send([a, roll]);' + nl + '  else act(turn, a, roll);', handler, '  online.onMove((m, seat) => {' + nl + '    if (duel && !over && seat === turn && Array.isArray(m) && [1, 2, 3].includes(m[0]) && [0, 1, 2, 3].includes(m[1])) act(turn, m[0], m[1]);' + nl + '  });'));
+  accept(Q.duel, 'a message set before the send, in braces', swap(Q.duel, send, '  if (duel) {' + nl + "    message = 'Sent...';" + nl + '    online.send({ act: a, roll: roll });' + nl + '  } else {' + nl + '    act(turn, a, roll);' + nl + '  }'));
+  accept(Q.duel, 'if (duel) return online.send(...); act(...)', swap(Q.duel, send, '  if (duel) return online.send({ act: a, roll: roll });' + nl + '  act(turn, a, roll);'));
+  accept(Q.duel, 'else with braces and a message first', swap(Q.duel, send, '  if (duel) {' + nl + '    online.send({ act: a, roll: roll });' + nl + '  } else {' + nl + "    message = '';" + nl + '    act(turn, a, roll);' + nl + '  }'));
+  accept(Q.duel, 'an expression handler: seat === turn && goodMove(m) && act(...)', swap(Q.duel, handler, '  online.onMove((m, seat) => seat === turn && goodMove(m) && act(turn, m.act, m.roll));'));
+  accept(Q.duel, 'seat == turn', H(['if (duel && !over && seat == turn && goodMove(m)) act(turn, m.act, m.roll);']));
+  accept(Q.duel, 'a guard clause around both: if (!(seat === turn && goodMove(m))) return;', H(['if (!(seat === turn && goodMove(m))) return;', 'act(turn, m.act, m.roll);']));
+  accept(Q.duel, 'a validator with a destructured parameter', swap(Q.duel, goodFn + nl + goodBody, 'function goodMove({ act, roll }) {' + nl + '  return [1, 2, 3].includes(act) && [0, 1, 2, 3].includes(roll);'));
+  accept(Q.duel, 'the roll checked with Number.isInteger and a range', swap(Q.duel, goodBody, '  return m !== null && [1, 2, 3].includes(m.act) && Number.isInteger(m.roll) && m.roll >= 0 && m.roll <= 3;'));
+  // EXISTING rejects
+  reject(Q.duel, 'every move acted on without a check', 'r3', swap(Q.duel, handler, '  online.onMove((m, seat) => act(turn, m.act, m.roll));'));
+  reject(Q.duel, 'the seat checked but not the move', 'r3', H(['if (duel && !over && seat === turn) act(turn, m.act, m.roll);']));
+  reject(Q.duel, 'a named handler that never checks', 'r3', swap(Q.duel, handler, '  online.onMove(arrived);', goodFn, 'function arrived(m, seat) { act(turn, m.act, m.roll); }' + nl + nl + goodFn));
+  reject(Q.duel, 'a handler that only writes a message', 'r2', H(["message = 'got a move';"]));
+  reject(Q.duel, 'choose always sends', 'r4', swap(Q.duel, send, '  online.send({ act: a, roll: roll });'));
+  // new rejects: the four cheats from the advanced walk, and their neighbours
+  reject(Q.duel, 'if (typeof m) act(...)', 'r3', H(['if (typeof m) act(turn, m.act, m.roll);']));
+  reject(Q.duel, 'a goodMove that returns true', 'r3', swap(Q.duel, goodBody, '  return true;'));
+  reject(Q.duel, 'seat !== 5 && goodMove(m)', 'r3', H(['if (seat !== 5 && goodMove(m)) act(turn, m.act, m.roll);']));
+  reject(Q.duel, 'only the act checked: seat === turn && [1,2,3].includes(m.act)', 'r3', H(['if (seat === turn && [1, 2, 3].includes(m.act)) act(turn, m.act, m.roll);']));
+  reject(Q.duel, 'only the act checked, through goodMove', 'r3', swap(Q.duel, goodBody, '  return m !== null && [1, 2, 3].includes(m.act);'));
+  reject(Q.duel, 'the seat compared with online.seat', 'r3', H(['if (online.seat === turn && goodMove(m)) act(turn, m.act, m.roll);']));
+  reject(Q.duel, 'the checks after the act', 'r3', H(['act(turn, m.act, m.roll);', "if (seat === turn && goodMove(m)) message = 'ok';"]));
+  reject(Q.duel, 'goodMove called on something else', 'r3', H(['if (seat === turn && goodMove(turn)) act(turn, m.act, m.roll);']));
+  reject(Q.duel, 'a wrapper whose helper never checks', 'r3', swap(Q.duel, handler, '  online.onMove((m, seat) => receive(m, seat));', goodFn, 'function receive(m, seat) {' + nl + '  act(turn, m.act, m.roll);' + nl + '}' + nl + nl + goodFn));
+  reject(Q.duel, 'a list sent, but the handler reads m.act', 'r1', swap(Q.duel, send, '  if (duel) online.send([a, roll]);' + nl + '  else act(turn, a, roll);'));
+  reject(Q.duel, 'a list of one', 'r1', swap(Q.duel, send, '  if (duel) online.send([a]);' + nl + '  else act(turn, a, roll);'));
+  reject(Q.duel, 'send in a duel, nothing offline', 'r4', swap(Q.duel, send, '  if (duel) online.send({ act: a, roll: roll });'));
+
+  // ---- 7.21.3
+  const ogre = "  { name: 'Ogre', hp: 36, power: 7, potions: 1, color: 'mediumpurple' }," + nl;
+  const dragon = "{ name: 'Wyrm', hp: 50, power: 9, potions: 2, color: 'teal' }";
+  // EXISTING
+  accept(Q.yours, 'a fourth kind only', sfix(Q.yours, ogre, ogre + '  ' + dragon + ',' + nl));
+  accept(Q.yours, 'a fourth kind pushed onto KINDS', plus(Q.yours, 'KINDS.push(' + dragon + ');'));
+  const k3 = "    if (kb.presses('3')) a = 3;" + nl;
+  const cool = (test, tick, set = 'cooldown = 3;') => sfix(Q.yours, 'let duel = false;', 'let duel = false;' + nl + 'let cooldown = 0;',
+    k3, k3 + '    if (' + test + ') a = 4;' + nl,
+    '  const them = fighters[1 - t];' + nl, '  const them = fighters[1 - t];' + nl + '  ' + tick + nl +
+    "  if (a === 4) { message = me.name + ' power-hits for ' + me.attack(them, me.power + roll); " + set + ' }' + nl);
+  accept(Q.yours, 'a cooldown, === 0', cool("kb.presses('4') && cooldown === 0", 'if (t === 0 && cooldown > 0) cooldown -= 1;'));
+  accept(Q.yours, 'a cooldown tested first, <= 0, cooldown--', cool("cooldown <= 0 && kb.presses('4')", 'if (t === 0 && cooldown > 0) cooldown--;'));
+  accept(Q.yours, 'a cooldown counted down with max()', cool("kb.presses('4') && cooldown < 1", 'if (t === 0) cooldown = max(cooldown - 1, 0);'));
+  const shop = (test, spend) => sfix(Q.yours, 'let duel = false;', 'let duel = false;' + nl + 'let gold = 0;',
+    '  which += 1;' + nl + '  fighters[0].levelUp();', '  gold += 10;' + nl + '  which += 1;' + nl + '  fighters[0].levelUp();',
+    k3, k3 + '    if (' + test + ') { ' + spend + ' fighters[0].potions += 1; }' + nl);
+  accept(Q.yours, 'a shop, gold >= 10', shop("kb.presses('5') && gold >= 10", 'gold -= 10;'));
+  accept(Q.yours, 'a shop with a PRICE constant', { 'script.js': shop("kb.presses('5') && gold >= PRICE", 'gold -= PRICE;')['script.js'].replace('let gold = 0;', 'let gold = 0;' + nl + 'const PRICE = 10;') });
+  reject(Q.yours, 'a fourth kind only in a comment', 'r1', sfix(Q.yours, ogre, ogre + '  // ' + dragon + ',' + nl));
+  reject(Q.yours, 'key 4 only in a string', 'r1', plus(Q.yours, 'const help = "kb.presses(' + AP + '4' + AP + ') && cooldown === 0; cooldown -= 1";'));
+  reject(Q.yours, 'a cooldown that never counts down', 'r1', cool("kb.presses('4') && cooldown === 0", ''));
+  reject(Q.yours, 'gold earned but never spent', 'r1', sfix(Q.yours, 'let duel = false;', 'let duel = false;' + nl + 'let gold = 0;', '  which += 1;' + nl + '  fighters[0].levelUp();', '  gold += 10;' + nl + '  which += 1;' + nl + '  fighters[0].levelUp();'));
+  // new accepts
+  accept(Q.yours, 'const DRAGON = {...}; KINDS.push(DRAGON)', plus(Q.yours, 'const DRAGON = ' + dragon + ';' + nl + 'KINDS.push(DRAGON);'));
+  accept(Q.yours, 'KINDS.concat([...]) used for the enemies', sfix(Q.yours, '  enemies = KINDS.map(', '  enemies = KINDS.concat([' + dragon + ']).map('));
+  accept(Q.yours, '[...KINDS, {...}] kept in a list that is used', sfix(Q.yours, '  enemies = KINDS.map(', '  const ALL = [...KINDS, ' + dragon + '];' + nl + '  enemies = ALL.map('));
+  accept(Q.yours, 'the fourth kind first in the list', sfix(Q.yours, "  { name: 'Slime',", '  ' + dragon + ',' + nl + "  { name: 'Slime',"));
+  accept(Q.yours, 'a new Fighter pushed onto enemies', sfix(Q.yours, '    which = 0;', "    enemies.push(new Fighter('Dragon', 44, 8, 2, 'crimson'));" + nl + '    which = 0;'));
+  accept(Q.yours, 'a cooldown kept on the Fighter (fighters[0].special)', sfix(Q.yours,
+    '    this.guarding = false;' + nl + '  }', '    this.guarding = false;' + nl + '    this.special = 0;' + nl + '  }',
+    k3, k3 + "    if (kb.presses('4') && fighters[0].special === 0) a = 4;" + nl,
+    '  const them = fighters[1 - t];' + nl, '  const them = fighters[1 - t];' + nl + '  if (me.special > 0) me.special -= 1;' + nl +
+    "  if (a === 4) { message = me.name + ' power-hits for ' + me.attack(them, me.power + roll); me.special = 3; }" + nl));
+  accept(Q.yours, 'a shop: coins > 9', sfix(Q.yours, 'let duel = false;', 'let duel = false;' + nl + 'let coins = 0;',
+    '  which += 1;' + nl + '  fighters[0].levelUp();', '  coins += 10;' + nl + '  which += 1;' + nl + '  fighters[0].levelUp();',
+    k3, k3 + "    if (kb.presses('5') && coins > 9) { coins -= 10; fighters[0].potions += 1; }" + nl));
+  accept(Q.yours, 'a cooldown set with a COOLDOWN constant', { 'script.js': cool("kb.presses('4') && cooldown === 0", 'if (t === 0 && cooldown > 0) cooldown -= 1;', 'cooldown = COOLDOWN;')['script.js'].replace('let cooldown = 0;', 'let cooldown = 0;' + nl + 'const COOLDOWN = 3;') });
+  // new rejects (the advanced walk)
+  reject(Q.yours, 'an inert list of four empty objects', 'r1', plus(Q.yours, 'const x = [{}, {}, {}, {}];'));
+  reject(Q.yours, 'a push onto a list nothing uses', 'r1', plus(Q.yours, 'let z = [];' + nl + 'z.push({ hp: 1 });'));
+  reject(Q.yours, 'a real-looking push onto a list nothing uses', 'r1', plus(Q.yours, 'let z = [];' + nl + 'z.push(' + dragon + ');'));
+  reject(Q.yours, 'a fourth kind with hp 1 and power 0', 'r1', sfix(Q.yours, ogre, ogre + "  { name: 'Wyrm', hp: 1, power: 0, potions: 0, color: 'teal' }," + nl));
+  reject(Q.yours, 'four real kinds in a list nothing uses', 'r1', plus(Q.yours, 'const SPARE = [' + dragon + ', ' + dragon + ', ' + dragon + ', ' + dragon + '];'));
+  reject(Q.yours, 'a key-4 cooldown never set above 0', 'r1', cool("kb.presses('4') && cooldown === 0", 'if (t === 0 && cooldown > 0) cooldown -= 1;', ''));
 }
 
 // ---------------------------------------------------------------- run
