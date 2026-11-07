@@ -12507,6 +12507,45 @@
       "scoreKind": null
     },
     {
+      "id": "7-19-quest-1-reading-kinds-as-data-map-and-levelling-up",
+      "title": "7.19.1 Reading: Kinds as data, map, and levelling up",
+      "unit": "7.19 Quest: a run of enemies",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 19,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "7-19-quest-2-sub-a-list-of-kinds-becomes-a-list-of-objects",
+      "title": "7.19.2 Sub-build: A list of kinds becomes a list of objects",
+      "unit": "7.19 Quest: a run of enemies",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 19,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "7-19-quest-3-lab-a-run-of-enemies",
+      "title": "7.19.3 Lab: A run of enemies",
+      "unit": "7.19 Quest: a run of enemies",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 19,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "8-1-1-reading-a-part-is-a-list-of-steps",
       "title": "9.1.1 Reading: A Part Is a List of Steps",
       "unit": "9.1 Solid Shapes",

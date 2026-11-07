@@ -1,0 +1,19 @@
+{
+  "id": "7-19-quest-1-reading-kinds-as-data-map-and-levelling-up",
+  "title": "7.19.1 Reading: Kinds as data, map, and levelling up",
+  "description": "A kind of enemy is a plain object in a list, KINDS; map turns the list into Fighters; which says which one you face and moving on points fighters[1] at the next; levelUp() changes the hero's own state; the last win ends the game.",
+  "type": "lesson",
+  "estimateMins": 12,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "7.19 Quest: a run of enemies",
+  "preview": "reading",
+  "week": 19,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

@@ -11403,6 +11403,54 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
+  "7-19-quest-2-sub-a-list-of-kinds-becomes-a-list-of-objects": {
+    "lessonTitle": "7.19.2 Sub-build: A list of kinds becomes a list of objects",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: A list of kinds becomes a list of objects\". The task: turn every plain { name, hp } kind in KINDS into a new Monster with KINDS.map (or a loop that pushes), in place of the one Monster made by hand, and let N add 1 to which, stopping at the last monster. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "map",
+        "description": "Every kind becomes a Monster.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Next",
+        "description": "N moves on and stops at the last.",
+        "points": 1
+      }
+    ]
+  },
+  "7-19-quest-3-lab-a-run-of-enemies": {
+    "lessonTitle": "7.19.3 Lab: A run of enemies",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: A run of enemies\". The task: keep the enemy kinds as plain data in KINDS and turn them into Fighters with map (or a loop) in newGame; track which enemy you face; write levelUp() so the hero gains max hp, full hp, power and potions; after a win, unless it was the last enemy, add 1 to which, level the hero up and make the next enemy the one you face; beating the last enemy ends the game with a win. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "From KINDS",
+        "description": "Enemies are made from the data.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Next enemy",
+        "description": "A win brings the next one.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Level up",
+        "description": "Max hp and power go up.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The last win",
+        "description": "Beating the last one wins.",
+        "points": 1
+      }
+    ]
+  },
   "moshion-bounce": {
     "lessonTitle": "5.2.16 Bouncy Ball",
     "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.16 Bouncy Ball\". The task they were given: Build a closed box with a ball in it: make four long thin static walls (top, bottom, left, right), make the ball as a dynamic sprite with one size number so it is a circle, store it in ball and colour it, make it bouncy (near the top of the 0 to 1 range), give it a friction value (the steps try 0 and then 5), and give it a sideways starting speed. What the starter file already had: `let ball;`, a 400 by 400 canvas, gravity turned on (world.gravity.y = 10), background painted in draw(), and four step comments in setup(). The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: A sprite made with 'static' as its last argument never moves or falls; one made without it is dynamic, so gravity and collisions move it. A sprite's body type can also be set afterwards with .collider = 'static'. new Sprite(x, y, d) with one size number makes a circle that many pixels across. bounciness runs from 0 (sticks) to 1 (gives back all its energy). friction is drag along a surface; 0 slides freely. world.gravity.y starts at 0 until a sketch sets it. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",

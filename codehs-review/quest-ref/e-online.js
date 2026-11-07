@@ -111,7 +111,7 @@ function newGame() {
   }
   turn = 0;
   over = false;
-  message = 'Your turn: 1 attack, 2 guard, 3 potion';
+  message = duel ? 'Red goes first: 1 attack, 2 guard, 3 potion' : 'Your turn: 1 attack, 2 guard, 3 potion';
 }
 
 // A move from the other computer: an action 1-3 and a roll 0-3, whole numbers.
@@ -189,12 +189,12 @@ function fightOver(winner) {
     message = 'The ' + fighters[1].name + ' beat you. Press R to try again';
     return;
   }
-  which += 1;
-  if (which === enemies.length) {
+  if (which === enemies.length - 1) {
     over = true;
     message = 'You beat them all! Press R to play again';
     return;
   }
+  which += 1;
   fighters[0].levelUp();
   fighters[1] = enemies[which];
   turn = 0;
@@ -205,7 +205,7 @@ function drawTop() {
   text(message, 10, 24, 15, 'white');
   if (!duel) text('Fight ' + (which + 1) + ' of ' + enemies.length + '    H: duel a classmate', 10, 46, 12, '#8393c4');
   if (duel && online.status === 'waiting') text('Room code: ' + online.code, 10, 50, 18, 'gold');
-  if (duel && online.status === 'ready') text('Online duel: you are ' + fighters[online.seat].name, 10, 46, 12, 'gold');
+  if (duel && online.status === 'ready') text('Online duel: you are ' + fighters[online.seat].name + '. Turn: ' + fighters[turn].name, 10, 46, 12, 'gold');
   if (duel && online.status === 'closed') text('Room closed: one hosts (H), one joins the new code', 10, 46, 12, 'gold');
   if (duel && online.status === 'error') text(('' + online.error).slice(0, 60), 10, 46, 12, 'tomato');
 }

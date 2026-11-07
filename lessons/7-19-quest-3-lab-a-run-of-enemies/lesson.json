@@ -1,0 +1,157 @@
+{
+  "id": "7-19-quest-3-lab-a-run-of-enemies",
+  "title": "7.19.3 Lab: A run of enemies",
+  "description": "Your hero fights a run of enemies made from KINDS with map: beating one levels you up and brings the next, and beating the last one wins.",
+  "type": "lesson",
+  "estimateMins": 25,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "7.19 Quest: a run of enemies",
+  "preview": "moshion",
+  "week": 19,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "This is your game from 7.18.3: one goblin, and the game ends when it falls.",
+      "hints": [
+        "If you brought your 7.18.3 work forward, your names may differ; keep yours. Where a step quotes a line, change the line of yours that does the same job."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Kinds as data",
+      "instructions": "Above the class, add the list of kinds from the reading: `const KINDS = [ ... ];` with the Slime (`hp: 14, power: 3, potions: 0, color: 'limegreen'`), the Goblin (`hp: 24, power: 5, potions: 1, color: 'orange'`) and the Ogre (`hp: 36, power: 7, potions: 1, color: 'mediumpurple'`), each as `{ name: 'Slime', hp: 14, power: 3, potions: 0, color: 'limegreen' },`. Run: nothing changes yet, because nothing uses `KINDS`.",
+      "hints": [
+        "`KINDS` holds plain objects, not Fighters: they are only numbers and words."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Enemies from the kinds",
+      "instructions": "Below `let turn = 0;`, add `let enemies;` and `let which = 0;`. In `newGame()`, replace the line that makes the fighters with three lines: `enemies = KINDS.map((k) => new Fighter(k.name, k.hp, k.power, k.potions, k.color));`, then `which = 0;`, then `fighters = [new Fighter('Hero', 30, 3, 2, 'gold'), enemies[0]];`. Run: you face a Slime now. Beat it: the game still ends there.",
+      "hints": [
+        "`k` is one kind, so `k.hp` is that kind's hp.",
+        "This goes in `newGame()`, not `setup()`, so R brings back fresh enemies with full hp."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Level up",
+      "instructions": "In the class, below `heal()`, write `levelUp()` from the reading: `this.maxHp += 5;`, `this.hp = this.maxHp;`, `this.power += 1;` and `this.potions = 2;`. Nothing calls it yet.",
+      "hints": [
+        "Raise `maxHp` first, then set `hp` to it, so you start the next fight full."
+      ]
+    },
+    {
+      "id": "s5",
+      "title": "The next enemy",
+      "instructions": "Replace the inside of `fightOver(winner)` with the three cases from the reading. A loss stays as it was: `if (winner === 1) { over = true; message = 'The ' + fighters[1].name + ' beat you. Press R to try again'; return; }`. Then the last enemy: `if (which === enemies.length - 1) { over = true; message = 'You beat them all! Press R to play again'; return; }`. Otherwise: `which += 1;`, `fighters[0].levelUp();`, `fighters[1] = enemies[which];`, `turn = 0;` and `message = 'Level up! Next: ' + fighters[1].name + '. Your turn';`. In `drawTop()`, below the message line, add `text('Fight ' + (which + 1) + ' of ' + enemies.length, 10, 46, 12, '#8393c4');`. Run: beat the Slime and the Goblin steps up, while you level up to 35 hp.",
+      "hints": [
+        "Ask about the last enemy BEFORE `which += 1`, while `which` is still the one you just beat.",
+        "`turn = 0;` gives you the first move against the new enemy."
+      ]
+    },
+    {
+      "id": "s6",
+      "title": "Play the whole run",
+      "instructions": "Play to the Ogre. It is hard if you only attack: guard and drink at the right moments. To test the end quickly, change each kind's `hp` in `KINDS` to `1` and Run: three hits win the game, and R starts again from the Slime. Then put the real numbers back (14, 24 and 36).",
+      "hints": [
+        "A kind's numbers are data: changing a number in `KINDS` changes the game, and no other line has to move."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Enemies made from KINDS",
+      "description": "Every kind in KINDS becomes a new Fighter, with map or a loop. Help: 7.19.1 (Reading: Kinds as data, map, and levelling up)",
+      "hint": "enemies = KINDS.map((k) => new Fighter(k.name, k.hp, k.power, k.potions, k.color));",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*map\\s*\\(\\s*(?:\\(\\s*[\\w$]+(?:\\s*,\\s*[\\w$]+)?\\s*\\)\\s*=>|[\\w$]+\\s*=>|function\\b)\\s*\\{?[^;]{0,40}?\\bnew\\s+[A-Z][\\w$]*\\s*\\(|\\.\\s*map\\s*\\(\\s*\\(\\s*\\{[^}]*\\}\\s*\\)\\s*=>\\s*\\{?[^;]{0,40}?\\bnew\\s+[A-Z][\\w$]*\\s*\\(|\\b(?:for|while)\\s*\\([^)]*\\)(?:(?!\\bfunction\\b)[\\s\\S]){0,250}?\\.\\s*push\\s*\\(\\s*new\\s+[A-Z][\\w$]*\\s*\\(|\\.\\s*forEach\\s*\\((?:(?!\\bfunction\\b)[\\s\\S]){0,200}?\\.\\s*push\\s*\\(\\s*new\\s+[A-Z][\\w$]*\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "Beating one brings the next",
+      "description": "After a win, which goes up by 1 and the enemy you face becomes the next one in the list. Help: 7.19.1 (Reading: Kinds as data, map, and levelling up)",
+      "hint": "which += 1;  fighters[1] = enemies[which];",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b([\\w$]+)\\s*(?:\\+=\\s*1\\b|\\+\\+)(?:(?!\\bfunction\\b)[\\s\\S]){0,300}?(?<![=!<>])=\\s*[\\w$.]+\\s*\\[\\s*\\1\\s*\\]|\\+\\+\\s*([\\w$]+)(?:(?!\\bfunction\\b)[\\s\\S]){0,300}?(?<![=!<>])=\\s*[\\w$.]+\\s*\\[\\s*\\2\\s*\\]|(?<![=!<>])=\\s*[\\w$.]+\\s*\\[\\s*(?:\\+\\+\\s*[\\w$]+|([\\w$]+)\\s*\\+\\s*1)\\s*\\]",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "levelUp raises max hp and power",
+      "description": "A method raises this fighter's own max hp and power, and the game calls it after a win. Help: 7.19.1 (Reading: Kinds as data, map, and levelling up)",
+      "hint": "levelUp() { this.maxHp += 5; this.hp = this.maxHp; this.power += 1; this.potions = 2; }  and  fighters[0].levelUp();",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?<!\\bfunction\\s{1,9})\\b([A-Za-z_$][\\w$]*)\\s*\\([^)]*\\)\\s*\\{(?=(?:(?!\\bfunction\\b)[^}]){0,400}?\\bthis\\s*\\.\\s*([\\w$]*[Mm]ax[\\w$]*)\\s*(?:\\+=|\\+\\+|=\\s*this\\s*\\.\\s*\\2\\s*\\+))(?=(?:(?!\\bfunction\\b)[^}]){0,400}?\\bthis\\s*\\.\\s*(?![\\w$]*[Mm]ax)(?!hp\\b)([\\w$]+)\\s*(?:\\+=|\\+\\+|=\\s*this\\s*\\.\\s*\\3\\s*\\+))[\\s\\S]*?\\.\\s*\\1\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r4",
+      "title": "Beating the last one wins",
+      "description": "When the enemy you beat is the last one in the list, the game is over and you have won. Help: 7.19.1 (Reading: Kinds as data, map, and levelling up)",
+      "hint": "if (which === enemies.length - 1) { over = true; ... }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:\\b[\\w$]+\\s*(?:\\+\\s*1\\s*)?\\)*\\s*(?:===?|>=|>)\\s*\\(*\\s*[\\w$.]+\\s*\\.\\s*length\\b(?:\\s*-\\s*1)?|\\b[\\w$.]+\\s*\\.\\s*length\\b(?:\\s*-\\s*1)?\\s*\\)*\\s*(?:===?|<=|<)\\s*\\(*\\s*[\\w$]+|!\\s*\\(*\\s*[\\w$]+\\s*\\[\\s*[\\w$]+\\s*\\]|\\b[\\w$]+\\s*\\[\\s*[\\w$]+\\s*\\]\\s*===?\\s*undefined\\b)[^;{]*\\)?\\s*\\{?[^;}]{0,80}?(?:\\b[\\w$]+\\s*=\\s*true\\b|\\b[\\w$]*(?:[Ww]in|[Oo]ver|[Ee]nd|[Dd]one|[Ff]inish)[\\w$]*\\s*\\()",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: A run of enemies\". The task: keep the enemy kinds as plain data in KINDS and turn them into Fighters with map (or a loop) in newGame; track which enemy you face; write levelUp() so the hero gains max hp, full hp, power and potions; after a win, unless it was the last enemy, add 1 to which, level the hero up and make the next enemy the one you face; beating the last enemy ends the game with a win. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "From KINDS",
+        "description": "Enemies are made from the data.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Next enemy",
+        "description": "A win brings the next one.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Level up",
+        "description": "Max hp and power go up.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The last win",
+        "description": "Beating the last one wins.",
+        "points": 1
+      }
+    ]
+  },
+  "carryFrom": "7-18-quest-3-lab-attack-guard-or-potion"
+}

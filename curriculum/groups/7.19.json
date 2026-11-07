@@ -1,0 +1,16 @@
+{
+  "moduleId": "7.19",
+  "source": "Quest chain module, one day.",
+  "lessons": [
+    {
+      "id": "quest-a-run-of-enemies",
+      "title": "a run of enemies",
+      "objective": "A kind of enemy is data: map turns a list of plain kinds into Fighters, which says which one you face, levelUp() changes the hero's own state, and only the last win ends the game.",
+      "screens": [
+        "7-19-quest-1-reading-kinds-as-data-map-and-levelling-up",
+        "7-19-quest-2-sub-a-list-of-kinds-becomes-a-list-of-objects",
+        "7-19-quest-3-lab-a-run-of-enemies"
+      ]
+    }
+  ]
+}

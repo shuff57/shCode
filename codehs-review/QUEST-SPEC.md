@@ -51,6 +51,15 @@ All run clean in `scripts/moshion-harness.mjs`; each lab stage is a strict exten
 `rules-check.mjs <file>` passes 9/9 on e-online (2 on B, 6 on C, 7 on D); a two-tab online duel was
 checked in a real browser (boards identical, out-of-turn key ignored).
 
+**Changed while building (2026-11-07).** `d-campaign.js` (and `e-online.js` the same way) showed
+`Fight 4 of 3` under "You beat them all!": `fightOver` added 1 to `which` before asking whether the
+enemy just beaten was the last. It now asks `which === enemies.length - 1` first and only then moves
+on, so the strip reads `Fight 3 of 3` at the win; the 7.19.1 reading teaches that order. In
+`e-online.js`, a duel's first message said "Your turn" on both computers and nothing ever said whose
+turn it was: the duel's first message is now `Red goes first: ...` and the ready line reads
+`Online duel: you are Red. Turn: Blue`. `rules-check.mjs` still passes 9/9 on `e-online.js` and
+`balance.mjs` still gives 14/40 (attack) and 36/40 (smart): no number moved.
+
 | File | Is the solution of |
 | --- | --- |
 | `sb1-bar.js` | 7.16.3 Sub-build: An object that draws itself |

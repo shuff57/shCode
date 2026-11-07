@@ -149,12 +149,12 @@ function fightOver(winner) {
     message = 'The ' + fighters[1].name + ' beat you. Press R to try again';
     return;
   }
-  which += 1;
-  if (which === enemies.length) {
+  if (which === enemies.length - 1) {
     over = true;
     message = 'You beat them all! Press R to play again';
     return;
   }
+  which += 1;
   fighters[0].levelUp();
   fighters[1] = enemies[which];
   turn = 0;

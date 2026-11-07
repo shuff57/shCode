@@ -1,0 +1,91 @@
+{
+  "id": "7-19-quest-2-sub-a-list-of-kinds-becomes-a-list-of-objects",
+  "title": "7.19.2 Sub-build: A list of kinds becomes a list of objects",
+  "description": "KINDS is a list of plain { name, hp } objects; map turns it into a list of Monsters, and N moves which one you are looking at, stopping at the last.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "7.19 Quest: a run of enemies",
+  "preview": "moshion",
+  "week": 19,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The top says `Monster 1 of 1: Bat (6 hp)`. There are three kinds in `KINDS`, but `setup()` makes only one monster, by hand. N does nothing yet."
+    },
+    {
+      "id": "s2",
+      "title": "One monster per kind",
+      "instructions": "In `setup()`, replace the line `monsters = [new Monster('Bat', 6)];` with `monsters = KINDS.map((k) => new Monster(k.name, k.hp));`. Run: `Monster 1 of 3`.",
+      "hints": [
+        "`map` calls the function once for each kind, `k`, and collects each new Monster into a new list (3.7.2).",
+        "A loop that pushes a `new Monster(...)` for every kind does the same job."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Next",
+      "instructions": "In `draw()`, below `background(...)`: `if (kb.presses('n') && which < monsters.length - 1) which += 1;`. Run and press N: the Wolf, then the Troll, and then it stays on the Troll. Add a fourth kind to `KINDS`, such as `{ name: 'Dragon', hp: 60 },`, and Run: `of 4`, with no other change.",
+      "hints": [
+        "The last monster is `monsters.length - 1`: a list of 3 is numbered 0, 1 and 2."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A list of kinds becomes a list of objects",
+      "description": "Every kind in KINDS becomes a new Monster, with map or a loop. Help: 7.19.1 (Reading: Kinds as data, map, and levelling up)",
+      "hint": "monsters = KINDS.map((k) => new Monster(k.name, k.hp));",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\.\\s*map\\s*\\(\\s*(?:\\(\\s*[\\w$]+(?:\\s*,\\s*[\\w$]+)?\\s*\\)\\s*=>|[\\w$]+\\s*=>|function\\b)\\s*\\{?[^;]{0,40}?\\bnew\\s+[A-Z][\\w$]*\\s*\\(|\\.\\s*map\\s*\\(\\s*\\(\\s*\\{[^}]*\\}\\s*\\)\\s*=>\\s*\\{?[^;]{0,40}?\\bnew\\s+[A-Z][\\w$]*\\s*\\(|\\b(?:for|while)\\s*\\([^)]*\\)(?:(?!\\bfunction\\b)[\\s\\S]){0,250}?\\.\\s*push\\s*\\(\\s*new\\s+[A-Z][\\w$]*\\s*\\(|\\.\\s*forEach\\s*\\((?:(?!\\bfunction\\b)[\\s\\S]){0,200}?\\.\\s*push\\s*\\(\\s*new\\s+[A-Z][\\w$]*\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "N moves to the next one",
+      "description": "N adds 1 to which, and stops at the last monster in the list. Help: 7.19.1 (Reading: Kinds as data, map, and levelling up)",
+      "hint": "if (kb.presses('n') && which < monsters.length - 1) which += 1;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bkb\\s*\\.\\s*(?:presses|pressed)\\s*\\(\\s*['\\\"`][nN]['\\\"`]\\s*\\)[^;]{0,120}?\\.\\s*length\\b[^;]{0,60}?(?:\\+=\\s*1\\b|\\+\\+|=\\s*[\\w$]+\\s*\\+\\s*1\\b)|\\bkb\\s*\\.\\s*(?:presses|pressed)\\s*\\(\\s*['\\\"`][nN]['\\\"`]\\s*\\)[^;]{0,60}?(?:\\+=\\s*1\\b|\\+\\+|=\\s*[\\w$]+\\s*\\+\\s*1\\b)(?:(?!\\bfunction\\b)[\\s\\S]){0,120}?(?:\\.\\s*length\\b|\\bmin\\s*\\()|\\bkb\\s*\\.\\s*(?:presses|pressed)\\s*\\(\\s*['\\\"`][nN]['\\\"`]\\s*\\)[^;]{0,60}?(?<![=!<>])=\\s*(?:Math\\s*\\.\\s*)?min\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true,
+      "keepShortStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: A list of kinds becomes a list of objects\". The task: turn every plain { name, hp } kind in KINDS into a new Monster with KINDS.map (or a loop that pushes), in place of the one Monster made by hand, and let N add 1 to which, stopping at the last monster. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "map",
+        "description": "Every kind becomes a Monster.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Next",
+        "description": "N moves on and stops at the last.",
+        "points": 1
+      }
+    ]
+  }
+}
