@@ -5,6 +5,7 @@ import { marked } from 'marked';
 import DOMPurify from 'isomorphic-dompurify';
 import LiveCodeBlock from './LiveCodeBlock';
 import DiagramBlock from './DiagramBlock';
+import DemoGameBlock from './DemoGameBlock';
 
 // Fence accepts an optional id for persistent storage, an optional `console`
 // flag that adds a DevTools-style REPL panel under the (moshion canvas)
@@ -26,6 +27,13 @@ import DiagramBlock from './DiagramBlock';
 //
 // When id is omitted, we derive one by hashing the initial code so
 // edits persist across reloads without the author having to name it.
+//
+// `demo` turns a canvas block into a finished game the student can only PLAY: no editor, no
+// Reset, just the canvas with a Play button and a Restart (components/DemoGameBlock.tsx). Add
+// `size=WxH` for the play area (a tall pinball table would be squeezed into the editor's 360px
+// square otherwise):
+//
+//     ```js live demo size=420x680 id=pinball-finished-game
 //
 // A second fence renders a flowchart. The body is Mermaid (the subset in
 // lib/diagram-mermaid.ts), parsed and auto-laid-out into the same drag-and-drop
@@ -50,6 +58,9 @@ interface LiveChunk {
   id: string;
   showConsole: boolean;
   plain: boolean;
+  /** A play-only game: the code is not shown. */
+  demo: boolean;
+  demoSize?: { w: number; h: number };
 }
 
 interface FlowChunk {
@@ -107,11 +118,18 @@ function parseChunks(src: string): Chunk[] {
     let showConsole = false;
     let plain = false;
     let readOnly = false;
+    let demo = false;
+    let demoSize: { w: number; h: number } | undefined;
     let height: number | undefined;
     for (const tok of tokens) {
       if (tok === 'console') showConsole = true;
       else if (tok === 'plain') plain = true;
       else if (tok === 'readonly' || tok === 'read-only') readOnly = true;
+      else if (tok === 'demo') demo = true;
+      else if (tok.startsWith('size=')) {
+        const m = /^size=(\d{2,4})x(\d{2,4})$/.exec(tok);
+        if (m) demoSize = { w: Number(m[1]), h: Number(m[2]) };
+      }
       else if (tok.startsWith('id=')) authorId = tok.slice(3);
       else if (tok.startsWith('height=')) {
         const n = Number(tok.slice(7));
@@ -130,7 +148,7 @@ function parseChunks(src: string): Chunk[] {
         height,
       });
     } else {
-      chunks.push({ kind: 'live', body, id, showConsole, plain });
+      chunks.push({ kind: 'live', body, id, showConsole, plain, demo: demo && !plain, demoSize });
     }
     lastIndex = start + match[0].length;
     liveIndex++;
@@ -175,6 +193,16 @@ export default function MarkdownWithLiveBlocks({ src, lessonId }: Props) {
               readOnly={chunk.readOnly}
               caption={chunk.caption}
               height={chunk.height}
+            />
+          );
+        }
+        if (chunk.demo) {
+          return (
+            <DemoGameBlock
+              key={`${chunk.id}-${i}`}
+              code={chunk.body}
+              blockId={chunk.id}
+              size={chunk.demoSize}
             />
           );
         }

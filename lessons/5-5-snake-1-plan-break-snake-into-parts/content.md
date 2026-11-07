@@ -1,6 +1,6 @@
 ## Plan before you build
 
-Every game in this unit gets a plan first. A plan is not code. It is a short list that says what the game is made of, so the first thing you type is the right thing.
+Every game in this unit gets a plan first. A plan is not code. It is a short list that says what the game is made of, so the first thing you type is the right thing. (5.13.0 let you play the finished game; if you are short of ideas, play it again.)
 
 **Snake, in one paragraph.** A snake of green cells moves one cell at a time on a grid, in a straight line. The arrow keys turn it. A red cell of food sits somewhere on the grid; when the snake's head reaches it, the score goes up by one and the snake gets one cell longer. The round ends if the snake leaves the grid or runs into its own body. Pressing R starts again.
 

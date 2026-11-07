@@ -8503,6 +8503,19 @@
       "scoreKind": null
     },
     {
+      "id": "5-4-flappy-0-reading-play-the-finished-game",
+      "title": "5.10.0 Reading: Play the finished game",
+      "unit": "5.10 Flappy: the flap",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 12,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "5-4-flappy-1-reading-gravity-and-the-flap",
       "title": "5.10.2 Reading: Gravity and the flap",
       "unit": "5.10 Flappy: the flap",
@@ -8939,6 +8952,19 @@
       "type": "lesson",
       "category": "Unit 2: moSHion: Applied Game Development",
       "week": 11,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "5-5-snake-0-reading-play-the-finished-game",
+      "title": "5.13.0 Reading: Play the finished game",
+      "unit": "5.13 Snake: grid and steering",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 12,
       "assignmentCode": null,
       "maxScore": null,
       "maxSubmissions": null,

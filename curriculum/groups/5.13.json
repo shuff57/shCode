@@ -4,9 +4,10 @@
   "lessons": [
     {
       "id": "snake-grid-and-steering",
-      "title": "Plan, and steering on a grid",
+      "title": "Play it, plan it, and steering on a grid",
       "objective": "Move on a grid, one cell per beat, and steer.",
       "screens": [
+        "5-5-snake-0-reading-play-the-finished-game",
         "5-5-snake-1-plan-break-snake-into-parts",
         "5-5-snake-2-reading-a-world-on-a-grid",
         "5-5-snake-3-example-a-block-that-walks-the-grid",

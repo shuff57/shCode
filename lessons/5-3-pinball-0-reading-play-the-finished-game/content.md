@@ -7,11 +7,11 @@ By the end of this you should be able to answer:
 - What does a finished pinball game have that your 5.2.24 scene does not?
 - Which of those parts do you build in the next seven modules (5.3 to 5.9)?
 
-In 5.2.24 you built a pinball scene: gravity, things to bounce off, a bouncy ball. The next seven modules turn that scene into a game. Before you start, play the game you are building towards.
+In 5.2.24 you built a pinball scene: gravity, things to bounce off, a bouncy ball. The next seven modules turn that scene into a game. Before you start, play the game you are building towards. The code is hidden on purpose: you are not expected to read it yet.
 
-**Try it:** click the game once so it hears your keys, then press ENTER.
+**Try it:** press **Play**, then press ENTER to start. The keys are in the table below the game.
 
-```js live id=pinball-finished-game
+```js live demo size=440x680 id=pinball-finished-game
 // PINBALL: the finished game. Play it first; you build the pieces one at a time.
 //
 //   hold SPACE, let go     launch the ball (the red bar is the power)
@@ -348,7 +348,15 @@ function drawTitle() {
 }
 ```
 
-**What you'll see:** a tall table with five pink bumpers and two blue kickers, two yellow flippers at the bottom, and a long lane on the right where the ball waits. Each key does what the comment at the top says.
+| Key | What it does |
+| --- | --- |
+| **SPACE** (hold, then let go) | launches the ball: the red bar is the power |
+| **LEFT** or **Z** | left flipper |
+| **RIGHT** or **M** | right flipper |
+| **UP** | nudges the table |
+| **ENTER** | starts the game, and plays again after GAME OVER |
+
+**What you'll see:** a tall table with five pink bumpers and two blue kickers, two yellow flippers at the bottom, and a long lane on the right where the ball waits.
 
 **Try this, in order:**
 

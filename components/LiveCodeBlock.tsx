@@ -125,7 +125,7 @@ function runPlainCode(code: string, done: (logs: PlainLogEntry[]) => void): () =
 }
 
 /** Window event a live block's sketch Run sends; every other block stops its own sketch on it. */
-const LIVE_SKETCH_RUN = 'shcode:live-sketch-run';
+export const LIVE_SKETCH_RUN = 'shcode:live-sketch-run';
 
 function storageKeyFor(lessonId: string | undefined, blockId: string | undefined): string | null {
   if (!lessonId || !blockId) return null;
