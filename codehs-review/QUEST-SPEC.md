@@ -48,7 +48,7 @@ drinking a potion below 35% hp wins 36/40. The choices matter. Keep these number
 
 All run clean in `scripts/moshion-harness.mjs`; each lab stage is a strict extension of the one before
 (the hero's constructor gains `potions` in 7.18, the one signature change, called out in its steps);
-`rules-check.mjs <file>` passes 9/9 on e-online (2 on B, 6 on C, 7 on D); a two-tab online duel was
+`rules-check.mjs <file>` passes 13/13 on e-online (2 on B, 6 on C, 7 on D); a two-tab online duel was
 checked in a real browser (boards identical, out-of-turn key ignored).
 
 **Changed while building (2026-11-07).** `d-campaign.js` (and `e-online.js` the same way) showed
@@ -63,6 +63,25 @@ turn it was: the duel's first message is now `Red goes first: ...` and the ready
 `sb5-online.js` showed nothing at all at the top while `connecting` or after `closed` (the 6.25.2
 walk's blank strip); it now shows `Room: connecting` / `Room: closed`, as Checkers' `sb5-online.js`
 does. A lab stage was not touched by that.
+
+**Changed in the online fix pass (2026-11-07, three student-lens walks).** After a win the ready
+line still read `Turn: X` under the winner, and the win message said "Run again to play again",
+which read like a key: the turn line is now hidden once `over`, the win message is just
+`Red wins the duel!`, and a ready-and-over line says `Play again: Stop, Run. One hosts (H), one joins
+the new code`. A hacked `host(3)` gave a third seat and `fighters[online.seat].name` threw for
+seat 2: the turn line is guarded by `online.seat < 2` and a seat above 1 reads `You are watching`.
+The missing `connecting` line is in. A guest who reruns with the old `JOIN` replays the finished duel
+(the room keeps every move); the reading and 7.20.3's last step say only a new code starts a new
+duel, and both 7.20.3 and 7.21.3 (a new first step) say to set `JOIN` back to `''`, because a
+guest's carried `JOIN` opened 7.21.3 on the dead duel. `rules-check.mjs` adds junk moves (roll 99,
+roll '2', act 0, no act, undefined, a number, a word, a list), a check that junk leaves the duel
+untouched, and drawTop for seats 0-2 in play and after a win and for every room status (the old
+`e-online.js` fails the seat-2 case). 7.20.3 r3 now needs the seat compared with whose turn it is
+(not a number, not `online.seat`) AND a check that covers the roll (a validator of any name that is
+called with the move and whose body tests the roll, or an inline roll test), both before the act;
+a handler may be inline, named, or a wrapper that hands both to a helper. The 7.20.3 steps 5-6 are
+now four steps that each end in a Run. Quiz q5 now says the sender chooses the roll and goodMove
+stops one outside 0 to 3.
 
 | File | Is the solution of |
 | --- | --- |
@@ -111,8 +130,8 @@ does. A lab stage was not touched by that.
   raises max hp and power; beating the last one wins.
 - **7.20.1** Only what is new: a duel uses the same `act`; the move is `{ act, roll }` (the sender rolls,
   so both computers use the same roll); `goodMove` checks both are whole numbers in range; seat === turn.
-- **7.20.3** Lab cards: a choice sends `{ act, roll }`; `act` runs in onMove; it checks seat and goodMove;
-  the campaign still works offline.
+- **7.20.3** Lab cards: a choice sends `{ act, roll }`; `act` runs in onMove; it checks the seat against
+  the turn and a roll check (goodMove) before acting; the campaign still works offline.
 
 ## Lessons from the Trail and Checkers walks: build them in from the start
 

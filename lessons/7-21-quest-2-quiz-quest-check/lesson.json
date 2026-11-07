@@ -86,15 +86,15 @@
       },
       {
         "id": "q5-roll",
-        "question": "In a duel, why does the player who chooses roll the 0 to 3 and send it with the action?",
+        "question": "In a duel, the player who chooses rolls the 0 to 3 and sends it with the action. Which of these is true?",
         "options": [
-          "So the other computer does not have to wait as long for the move",
-          "So a player can pick their own roll and always hit for the most",
-          "So both computers use the same roll and the hp bars agree",
-          "Because online.send can only carry numbers that came from random()"
+          "The other computer rolls again when the move arrives, so the sent roll is not used",
+          "Both computers use the sent roll, and a roll outside 0 to 3 is ignored",
+          "Nobody can pick their own roll, because online.send only carries numbers from random()",
+          "Each computer keeps its own roll, so the two hp bars can be a little different"
         ],
-        "answer": 2,
-        "explanation": "If each computer rolled when the move arrived, they could roll different numbers. One roll, sent with the action, gives both the same fight.",
+        "answer": 1,
+        "explanation": "The sender rolls once and sends the roll, so both computers run act with the same numbers and the hp bars agree. The sender's sketch chooses the roll, so a changed sketch could send any roll it likes, but goodMove ignores one outside 0 to 3 on both computers.",
         "sourceIds": [
           "7-20-quest-1-reading-same-battle-a-classmate-takes-the-other-turn"
         ],

@@ -11,7 +11,9 @@ onMove**. Your own move comes back to you too. This page is only what is new for
 **A duel, not a campaign.** Online, there is no computer enemy: two heroes face each other, Red
 (the host, seat 0, `fighters[0]`) and Blue (the classmate who joins, seat 1, `fighters[1]`). Both
 start fresh, with the same numbers, so it is a fair fight. A flag, `duel`, says which game this is,
-and `newGame()` makes one or the other:
+and `newGame()` makes one or the other. Trail and Checkers asked `online.status === 'off'` to know
+whether they were online, because they played the same game either way. Quest needs its own flag:
+the campaign and the duel are different games, so the sketch must remember which one it is playing.
 
 ```js
 if (duel) {
@@ -54,8 +56,10 @@ function goodMove(m) {
 }
 ```
 
-`typeof m === 'object'` comes first, because `m.act` on a move that is `null` would stop
-the sketch. Then the handler only acts for the seat whose turn it is, while the duel is on:
+`m !== null` comes first, because `m.act` on a move that is `null` would stop the sketch. Then
+`typeof m === 'object'` makes sure the move is an object at all, not a number or a word (`typeof`
+gives the name of a value's type as a word, 1.2.23). Only then are `m.act` and `m.roll` read. The
+handler acts only for the seat whose turn it is, while the duel is on:
 
 ```js
 online.onMove((m, seat) => {
@@ -73,6 +77,8 @@ classmate's, and it arrives through `onMove`.
 
 **Starting and ending.** H hosts a duel: `duel = true;`, `newGame();`, `online.host();`, as in
 6.25.1. A JOIN code does the same in `setup()` with `online.join(JOIN)`. R starts again only
-offline; in a duel the win message says `Run again to play again`, and to duel again ONE player
-presses H and the other puts the NEW code in `JOIN`. Show the room code big, at size 18, so it is
-easy to read and type, and keep every line inside the 480 pixels of the canvas.
+offline. When a duel is won, the turn line goes away and the top says how to play again: press
+Stop, then Run, in both tabs; ONE player presses H and the other puts the NEW code in `JOIN`. Only a
+new code starts a new duel: Run with the old code and you join the old room, where every move is
+played again and the finished duel comes back. Show the room code big, at size 18, so it is easy to
+read and type, and keep every line inside the 480 pixels of the canvas.

@@ -29,7 +29,7 @@ class Fighter {
   }
 
   // Lose n hp (half, rounded down, while guarding), never below 0.
-  // Returns the damage really taken.
+  // Returns n: the hit after any guard.
   takeHit(n) {
     if (this.guarding) n = floor(n / 2);
     this.guarding = false;
@@ -183,7 +183,7 @@ function enemyTurn() {
 function fightOver(winner) {
   if (duel) {
     over = true;
-    message = fighters[winner].name + ' wins the duel! Run again to play again';
+    message = fighters[winner].name + ' wins the duel!';
     return;
   }
   if (winner === 1) {
@@ -209,7 +209,10 @@ function drawTop() {
   text(message, 10, 24, 15, 'white');
   if (!duel) text('Fight ' + (which + 1) + ' of ' + enemies.length + '    H: duel a classmate', 10, 46, 12, '#8393c4');
   if (duel && online.status === 'waiting') text('Room code: ' + online.code, 10, 50, 18, 'gold');
-  if (duel && online.status === 'ready') text('Online duel: you are ' + fighters[online.seat].name + '. Turn: ' + fighters[turn].name, 10, 46, 12, 'gold');
+  if (duel && online.status === 'connecting') text('Connecting to the room...', 10, 46, 12, 'gold');
+  if (duel && online.status === 'ready' && !over && online.seat < 2) text('Online duel: you are ' + fighters[online.seat].name + '. Turn: ' + fighters[turn].name, 10, 46, 12, 'gold');
+  if (duel && online.status === 'ready' && !over && online.seat > 1) text('You are watching. Turn: ' + fighters[turn].name, 10, 46, 12, 'gold');
+  if (duel && online.status === 'ready' && over) text('Play again: Stop, Run. One hosts (H), one joins the new code', 10, 46, 12, 'gold');
   if (duel && online.status === 'closed') text('Room closed: one hosts (H), one joins the new code', 10, 46, 12, 'gold');
   if (duel && online.status === 'error') text(('' + online.error).slice(0, 60), 10, 46, 12, 'tomato');
 }
