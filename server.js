@@ -527,6 +527,37 @@ app.prepare().catch((err) => {
   server.post('/api/lesson-submissions', express.json({ limit: '1mb' }), runRoute(submissionsPost));
   server.get('/api/quiz-reveal', runRoute(quizRevealGet));
   server.get('/api/attempt-reveal', runRoute(attemptRevealGet));
+  // The texture and sound library (functions/api/library/*): the REAL handlers
+  // over an in-memory SQLite with every migration applied and an in-memory R2,
+  // so the library sync (components/LibrarySync.tsx) runs end to end in dev.
+  // Two browser contexts sharing a `dev_student` cookie are two devices of one
+  // student; held for the life of this server process.
+  {
+    const { makeD1 } = await import('./scripts/_d1-sqlite.mjs');
+    const libList = await import('./functions/api/library/index.ts');
+    const libOne = await import('./functions/api/library/[id].ts');
+    const libDb = makeD1();
+    const libR2 = new Map();
+    const UPLOADS = {
+      async put(k, v) { libR2.set(k, String(v)); },
+      async get(k) { return libR2.has(k) ? { text: async () => libR2.get(k) } : null; },
+      async delete(k) { libR2.delete(k); },
+    };
+    const libRoute = (handler) => async (req, res) => {
+      const email = devIdentity(req);
+      const request = new Request(`http://localhost${req.originalUrl}`, {
+        method: req.method,
+        headers: { 'content-type': 'application/json' },
+        body: req.method === 'GET' || req.method === 'DELETE' ? undefined : JSON.stringify(req.body ?? {}),
+      });
+      const out = await handler({ request, env: { DB: libDb, UPLOADS }, params: req.params, data: { email, role: DEV_ROLE } });
+      res.status(out.status).type('application/json').send(await out.text());
+    };
+    server.get('/api/library', libRoute(libList.onRequestGet));
+    server.put('/api/library', express.json({ limit: '1mb' }), libRoute(libList.onRequestPut));
+    server.get('/api/library/:id', libRoute(libOne.onRequestGet));
+    server.delete('/api/library/:id', libRoute(libOne.onRequestDelete));
+  }
   // The student gradebook on /progress. The real route is
   // functions/api/my-gradebook.ts, reading lesson_state + lesson_submissions
   // out of D1, which this server does not have. Without a stub the page shows
