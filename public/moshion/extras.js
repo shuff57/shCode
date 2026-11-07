@@ -89,7 +89,7 @@
 //   online.host()          start a room; online.code becomes its 6-letter code
 //   online.host(3)         a room for 3 players (2 to 4)
 //   online.join('K7QX2M')  join a classmate's room with their code
-//   online.send(move)      send a move: numbers, true/false, short words
+//   online.send(move)      send a move: numbers, true/false, one-word labels
 //   online.onMove(fn)      fn(move, seat) runs for EVERY move, yours included,
 //                          in the same order on every computer
 //   online.leave()
@@ -210,7 +210,12 @@
         var ev = events[i];
         if (ev.seq <= lastSeq) continue; // never apply a move twice
         lastSeq = ev.seq;
-        for (var j = 0; j < moveFns.length; j++) moveFns[j](ev.data, ev.seat);
+        for (var j = 0; j < moveFns.length; j++) {
+          // One handler that throws must not drop the moves after it (both
+          // boards would then miss them). Report it the normal way, later.
+          try { moveFns[j](ev.data, ev.seat); }
+          catch (err) { setTimeout(function (x) { return function () { throw x; }; }(err), 0); }
+        }
       }
     });
     try { window.parent.postMessage({ source: 'preview-online', run: run, op: 'hello' }, '*'); } catch (e) { /* host gone */ }

@@ -8,6 +8,8 @@ export const MAX_SEATS = 4;
 export const MAX_OPEN_ROOMS_PER_HOST = 3;
 export const MAX_EVENT_BYTES = 1024;
 export const MAX_STRING = 20;
+/** All the words in one move together: room for a few labels, not for a sentence. */
+export const MAX_TEXT_PER_MOVE = 24;
 export const MAX_EVENTS_PER_ROOM = 3000;
 /** A player may send at most this many events in RATE_WINDOW_MS. */
 export const RATE_LIMIT = 30;
@@ -41,16 +43,20 @@ export function normalizeCode(raw: unknown): string | null {
 }
 
 /**
- * Game data only. A value is null, a boolean, a finite number, a string of at
- * most MAX_STRING characters, or an array / object of those (object keys are
+ * Game data only. A value is null, a boolean, a finite number, a one-word
+ * string (no spaces) of at most MAX_STRING characters, or an array / object of
+ * those, with at most MAX_TEXT_PER_MOVE characters of words in the whole move (object keys are
  * identifiers), nested at most 4 deep, MAX_EVENT_BYTES as JSON. Returns the
  * reason in the course's words, or null when it is fine.
  */
 export function checkGameData(v: unknown): string | null {
+  let text = 0;
   function walk(x: unknown, depth: number): string | null {
     if (x === null || typeof x === 'boolean') return null;
     if (typeof x === 'number') return Number.isFinite(x) ? null : 'Numbers must be ordinary numbers.';
     if (typeof x === 'string') {
+      if (/\s/.test(x)) return 'A word in a move cannot have spaces: a move is game data (numbers, true/false, one-word labels), not a message.';
+      text += x.length;
       return x.length <= MAX_STRING ? null : `Words in a move can be at most ${MAX_STRING} letters. Send numbers, true/false and short words.`;
     }
     if (depth >= 4) return 'A move can be nested at most 4 levels deep.';
@@ -73,6 +79,7 @@ export function checkGameData(v: unknown): string | null {
   }
   const e = walk(v, 0);
   if (e) return e;
+  if (text > MAX_TEXT_PER_MOVE) return `A move can hold at most ${MAX_TEXT_PER_MOVE} letters of words in all. Send numbers for the game, not messages.`;
   const size = new TextEncoder().encode(JSON.stringify(v)).length;
   if (size > MAX_EVENT_BYTES) return `A move can be at most ${MAX_EVENT_BYTES} bytes; this one is ${size}.`;
   return null;

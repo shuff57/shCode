@@ -70,6 +70,22 @@ export function useMoshionOnline(ref: RefObject<HTMLIFrameElement | null>): void
       try { ref.current?.contentWindow?.postMessage({ ...msg, run }, '*'); } catch { /* frame gone */ }
     };
 
+    // The room this run HOSTS: when the run ends (a rerun, leaving the page)
+    // it is left, which closes it, so a classmate's board says "closed"
+    // instead of waiting for a host who is gone. A joiner's rerun keeps its
+    // seat and rejoins, so a joined room is only left when the page goes.
+    let hosted: string | null = null;
+    let joined: string | null = null;
+    function leaveRoom(c: string | null) {
+      if (!c) return;
+      try {
+        void fetch(`/api/rooms/${c}/leave`, {
+          method: 'POST', credentials: 'same-origin', keepalive: true,
+          headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ device }),
+        }).catch(() => {});
+      } catch { /* page going */ }
+    }
+
     function stop() {
       session++;
       code = null;
@@ -114,6 +130,7 @@ export function useMoshionOnline(ref: RefObject<HTMLIFrameElement | null>): void
         const r = await api('POST', '/api/rooms', { game: d.game, seats: d.seats, device });
         if (r.status !== 201) return { ok: false, error: errorOf(r) };
         code = String(r.body.code);
+        hosted = code;
         void poll();
         return { ok: true, result: r.body };
       }
@@ -123,6 +140,7 @@ export function useMoshionOnline(ref: RefObject<HTMLIFrameElement | null>): void
         const r = await api('POST', `/api/rooms/${encodeURIComponent(want)}/join`, { device });
         if (r.status !== 200) return { ok: false, error: errorOf(r) };
         code = String(r.body.code);
+        joined = code;
         void poll();
         return { ok: true, result: r.body };
       }
@@ -135,6 +153,8 @@ export function useMoshionOnline(ref: RefObject<HTMLIFrameElement | null>): void
       }
       if (op === 'leave') {
         const was = code;
+        if (was === hosted) hosted = null;
+        if (was === joined) joined = null;
         stop();
         if (was) await api('POST', `/api/rooms/${was}/leave`, { device }).catch(() => {});
         return { ok: true };
@@ -151,7 +171,12 @@ export function useMoshionOnline(ref: RefObject<HTMLIFrameElement | null>): void
       // Every run of the sketch has its own id (extras.js says hello as it
       // loads). A new run starts from nothing: stop polling the old room,
       // without leaving it, so a rerun that joins again keeps its seat.
-      if (d.run !== run) { stop(); run = typeof d.run === 'string' ? d.run : null; }
+      if (d.run !== run) {
+        stop();
+        leaveRoom(hosted);
+        hosted = null;
+        run = typeof d.run === 'string' ? d.run : null;
+      }
       if (d.op === 'hello') return;
       const id = d.id;
       handle(d.op, d)
@@ -159,10 +184,14 @@ export function useMoshionOnline(ref: RefObject<HTMLIFrameElement | null>): void
         .then((reply) => post({ source: 'preview-online-reply', id, ...reply }));
     }
 
+    const onHide = () => { leaveRoom(hosted); leaveRoom(joined); hosted = joined = null; };
     window.addEventListener('message', onMessage);
+    window.addEventListener('pagehide', onHide);
     return () => {
       window.removeEventListener('message', onMessage);
+      window.removeEventListener('pagehide', onHide);
       stop();
+      onHide();
     };
   }, [ref]);
 }

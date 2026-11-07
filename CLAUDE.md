@@ -523,7 +523,7 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
 - Rules in `functions/_shared/rooms.ts` (migration 0041 `game_rooms`, `game_room_players`, `game_room_events`):
   **classmates only** (joiner shares a live class with the host, as student or teacher; a stranger's 404 is the
   same as a missing code), **game data only** (`checkGameData`: numbers, booleans, strings of at most 20 characters,
-  1 KB, so it cannot be a chat; decided by the course owner 2026-11-07), 2-4 seats, 3-hour rooms, 30 moves per 10 s
+  no spaces, at most 24 letters of words per move, 1 KB, so it cannot be a chat; decided by the course owner 2026-11-07), 2-4 seats, 3-hour rooms, 30 moves per 10 s
   per player, 3 open rooms per host, the host leaving closes the room. Names are first name + last initial.
   A seat is an account in one browser TAB (`device`, a random id per tab in sessionStorage): a rerun in the same tab
   keeps the seat, a second tab of the same account takes the next one, so a student can test two-player play alone.
