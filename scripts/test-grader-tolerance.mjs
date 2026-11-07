@@ -1085,6 +1085,13 @@ for (const id of Object.values(L)) {
       R('set to 0 after the ifs, so it never moves (r5)', 'r5', edit(S, keys, four + nl + '  player.vel.x = 0;' + nl + '  player.vel.y = 0;')),
       R('text() only in setup() (r7)', 'r7', edit(edit(S, "  text('WASD to move the blue sprite', 12, 24);", ''), "mover.color = 'orange';", "mover.color = 'orange';" + nl + "  text('hi', 10, 10);")),
       R('keys read only in setup() (r3)', 'r3', edit(edit(S, keys, ''), "mover.color = 'orange';", "mover.color = 'orange';" + nl + "  if (kb.pressing('a')) player.vel.x = -4;")),
+      // #75: with no semicolons, r6 read the line after a key line as part of that key
+      // expression, so the mover below it was taken for the sprite the keys drive.
+      A('key subtraction, no semicolons, mover on the next line', { 'script.js': edit(S, keys, "  player.vel.x = (kb.pressing('d') - kb.pressing('a')) * 4" + nl + "  player.vel.y = (kb.pressing('s') - kb.pressing('w')) * 4")['script.js'].replace(line, '  mover.x = 80 + Math.sin(frameCount * 0.05) * 60') }),
+      A('if/else keys, no semicolons, mover on the next line', { 'script.js': S['script.js'].replace(/;\n/g, '\n') }),
+      A('braced keys, no semicolons, unindented mover', { 'script.js': edit(S, keys, braced)['script.js'].replace(/;\n/g, '\n').replace(line.replace(';', ''), line.trim().replace(';', '')) }),
+      R('no semicolons: a key nudges the mover on the next line', 'r6', { 'script.js': w("  if (kb.pressing('m'))" + nl + '    mover.x += 2;')['script.js'].replace(/;\n/g, '\n') }),
+      R('no semicolons: the mover speed comes from the keys over two lines', 'r6', { 'script.js': w("  mover.vel.x = (kb.pressing('l') -" + nl + "    kb.pressing('j')) * 3")['script.js'].replace(/;\n/g, '\n') }),
     ]);
   }
 
