@@ -75,6 +75,28 @@ interface Snapshot { frames: Frame[]; index: number; w: number; h: number }
 
 const blank = (w: number, h: number): Frame => Array(w * h).fill(TRANSPARENT);
 
+// Copy / paste a frame (#81). The copied frame is kept in sessionStorage, so it
+// survives opening another texture: copy a pose out of one animation, load the
+// next, paste it in. A frame of another size is fitted the way resize() fits
+// one -- anchored top-left, keeping what fits.
+const FRAME_CLIPBOARD = 'shcode.texture.frameClipboard';
+interface CopiedFrame { w: number; h: number; cells: Frame }
+export function fitFrame(src: CopiedFrame, w: number, h: number): Frame {
+  if (src.w === w && src.h === h) return src.cells.slice();
+  const out = blank(w, h);
+  for (let y = 0; y < Math.min(h, src.h); y++) {
+    for (let x = 0; x < Math.min(w, src.w); x++) out[y * w + x] = src.cells[y * src.w + x];
+  }
+  return out;
+}
+function readCopiedFrame(): CopiedFrame | null {
+  try {
+    const v = JSON.parse(window.sessionStorage.getItem(FRAME_CLIPBOARD) || 'null');
+    if (v && Number.isInteger(v.w) && Number.isInteger(v.h) && Array.isArray(v.cells) && v.cells.length === v.w * v.h) return v;
+  } catch { /* nothing copied, or private mode */ }
+  return null;
+}
+
 export default function TextureEditor() {
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [saved, setSaved] = useState<SavedTexture[]>([]);
@@ -224,6 +246,10 @@ export default function TextureEditor() {
     });
   }, [frames, index, w, h, restore]);
 
+  // The keydown handler is registered once; it reaches the frame actions through
+  // this ref so it always uses the current frames and index.
+  const frameOpsRef = useRef({ copy: () => {}, paste: () => {}, duplicate: () => {} });
+
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const t = e.target as HTMLElement | null;
@@ -232,6 +258,13 @@ export default function TextureEditor() {
       if (e.ctrlKey || e.metaKey) {
         if (k === 'z' && !e.shiftKey) { e.preventDefault(); undo(); }
         else if (k === 'y' || (k === 'z' && e.shiftKey)) { e.preventDefault(); redo(); }
+        else if ((k === 'c' || k === 'v' || k === 'd') && !window.getSelection()?.toString()) {
+          // Selected page text keeps its normal copy; otherwise these act on frames.
+          e.preventDefault();
+          if (k === 'c') frameOpsRef.current.copy();
+          else if (k === 'v') frameOpsRef.current.paste();
+          else frameOpsRef.current.duplicate();
+        }
         return;
       }
       // Unmodified single keys, the way every pixel editor does it. Listed in
@@ -289,6 +322,35 @@ export default function TextureEditor() {
 
   // ---- frames ------------------------------------------------------------
 
+  const [copiedFrame, setCopiedFrame] = useState<CopiedFrame | null>(null);
+  useEffect(() => { setCopiedFrame(readCopiedFrame()); }, []);
+
+  function copyFrame() {
+    const c: CopiedFrame = { w, h, cells: frames[index].slice() };
+    try { window.sessionStorage.setItem(FRAME_CLIPBOARD, JSON.stringify(c)); } catch { /* still works for this page */ }
+    setCopiedFrame(c);
+    setMessage({ text: `Copied frame ${index + 1}. Paste puts it after the frame you are on, in this texture or another.`, bad: false });
+  }
+
+  function pasteFrame() {
+    const c = copiedFrame ?? readCopiedFrame();
+    if (!c) { setMessage({ text: 'Copy a frame first.', bad: true }); return; }
+    commit(snapshot());
+    const cells = fitFrame(c, w, h);
+    setFrames((fs) => {
+      const next = fs.slice();
+      next.splice(index + 1, 0, cells);
+      return next;
+    });
+    setIndex((i) => i + 1);
+    setMessage({
+      text: c.w === w && c.h === h
+        ? `Pasted as frame ${index + 2}.`
+        : `Pasted as frame ${index + 2}. It was ${c.w}x${c.h}, so it was fitted to ${w}x${h} from the top-left corner.`,
+      bad: false,
+    });
+  }
+
   function addFrame(copy: boolean) {
     commit(snapshot());
     setFrames((fs) => {
@@ -298,6 +360,8 @@ export default function TextureEditor() {
     });
     setIndex((i) => i + 1);
   }
+
+  frameOpsRef.current = { copy: copyFrame, paste: pasteFrame, duplicate: () => addFrame(true) };
 
   function removeFrame() {
     if (frames.length <= 1) { setMessage({ text: 'A texture needs at least one frame.', bad: true }); return; }
@@ -704,7 +768,7 @@ export default function TextureEditor() {
                     </button>
                     <button
                       onClick={() => addFrame(true)}
-                      title="Duplicate this frame"
+                      title="Duplicate this frame (Ctrl+D)"
                       aria-label="duplicate frame"
                       style={{
                         background: 'rgba(0,0,0,0.72)', border: 'none', color: 'var(--text)',
@@ -740,6 +804,13 @@ export default function TextureEditor() {
               )}
             </div>
           ))}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 3, alignSelf: 'center' }}>
+            <button style={{ ...btn(), padding: '2px 7px', fontSize: 11 }}
+              onClick={copyFrame} title="Copy this frame (Ctrl+C)">Copy</button>
+            <button style={{ ...btn(false, !copiedFrame), padding: '2px 7px', fontSize: 11 }}
+              onClick={pasteFrame} disabled={!copiedFrame}
+              title={copiedFrame ? 'Paste the copied frame after this one (Ctrl+V)' : 'Copy a frame first'}>Paste</button>
+          </div>
           {frames.length > 1 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 3, alignSelf: 'center' }}>
               <button style={{ ...btn(false, index === 0), padding: '2px 7px' }}
@@ -898,6 +969,8 @@ export default function TextureEditor() {
               {[
                 ['Ctrl+Z', 'undo'],
                 ['Ctrl+Y  /  Ctrl+Shift+Z', 'redo'],
+                ['Ctrl+C  /  Ctrl+V', 'copy / paste a frame'],
+                ['Ctrl+D', 'duplicate this frame'],
                 ['B', 'draw'], ['E', 'erase'], ['G', 'fill'],
                 ['I', 'pick colour'], ['V', 'move'],
                 ['[  ]', 'zoom out / in'],
