@@ -42,12 +42,13 @@ export interface LibraryRow {
   hash: string;
   updated_at: number;
   deleted_at: number | null;
+  shared?: number;
 }
 
 export function itemJson(r: LibraryRow) {
   return {
     id: r.id, kind: r.kind, name: r.name, bytes: r.bytes, mime: r.mime, meta: r.meta,
-    hash: r.hash, updatedAt: r.updated_at, deletedAt: r.deleted_at,
+    hash: r.hash, updatedAt: r.updated_at, deletedAt: r.deleted_at, shared: !!r.shared,
   };
 }
 
@@ -55,7 +56,8 @@ const MAX_BODY = 512 * 1024;
 
 export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ env, data }: Ctx) => {
   const res = await env.DB.prepare(
-    `SELECT id, kind, name, bytes, mime, meta, hash, updated_at, deleted_at
+    `SELECT id, kind, name, bytes, mime, meta, hash, updated_at, deleted_at,
+            EXISTS (SELECT 1 FROM library_shares s WHERE s.item_id = library_items.id) AS shared
        FROM library_items WHERE owner_email = ? ORDER BY kind, name`,
   ).bind(data.email).all<LibraryRow>();
   const rows = res.results ?? [];
