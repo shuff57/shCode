@@ -38,6 +38,7 @@ import {
   paramsFromPreset,
 } from '../lib/sound/params';
 import { renderMusic, renderSfxDef, type Rendered } from '../lib/sound/render';
+import { CLIP_EXTENSION, clipName, prepareClip, type ClipType } from '../lib/sound-import';
 import { matchRecording } from '../lib/sound/match';
 import type { SfxrParams } from '../lib/sound/vendor/jsfxr/sfxr.mjs';
 
@@ -135,9 +136,20 @@ const code: React.CSSProperties = {
   margin: '6px 0',
 };
 
+// An imported clip (#85) is saved with source 'import': it has no preset or
+// definition to reopen, so it plays and downloads but is not edited here.
+const IMPORTED = 'import';
+
 function sourceLabel(ch: { kind: Kind; source: string }): string {
+  if (ch.source === IMPORTED) return 'imported clip';
   if (ch.kind === 'music') return MUSIC_LOOPS.find((l) => l.id === ch.source)?.label ?? ch.source;
   return SFX_PRESETS.find((p) => p.preset === ch.source)?.label ?? ch.source;
+}
+
+/** The file extension a saved sound downloads with: what it IS, not always .wav. */
+function savedExt(dataUri: string): string {
+  const type = /^data:([^;,]+)/.exec(dataUri)?.[1] as ClipType | undefined;
+  return (type && CLIP_EXTENSION[type]) || 'wav';
 }
 
 function renderedFor(ch: Channel): Rendered {
@@ -587,6 +599,30 @@ export default function SoundMixer() {
     });
   }, []);
 
+  const importInputRef = useRef<HTMLInputElement | null>(null);
+  const importClip = useCallback(async (file: File) => {
+    const result = prepareClip(new Uint8Array(await file.arrayBuffer()));
+    if (!result.ok) {
+      setMessage({ text: result.error, bad: true });
+      return;
+    }
+    const taken = new Set(listSavedSounds().map((s) => s.name));
+    const suggested = clipName(file.name, taken);
+    const typed = typeof window !== 'undefined'
+      ? window.prompt('Name this sound. A sketch plays it with loadSound(\'name\').', suggested)
+      : suggested;
+    if (typed === null) return; // cancelled
+    const name = typed.trim();
+    if (taken.has(name) && !window.confirm(`Replace the saved sound "${name}"?`)) return;
+    const error = saveSound(name, result.dataUri, { kind: 'sfx', source: IMPORTED });
+    if (error) {
+      setMessage({ text: error, bad: true });
+      return;
+    }
+    setSaved(listSavedSounds());
+    setMessage({ text: `Imported "${name}". A sketch now plays it with loadSound('${name}').`, bad: false });
+  }, []);
+
   const removeSaved = useCallback((name: string) => {
     if (typeof window !== 'undefined' && !window.confirm(`Delete the saved sound "${name}"?`)) return;
     deleteSavedSound(name);
@@ -985,12 +1021,30 @@ zap.play();`}</pre>
       </section>
 
       <section style={card}>
-        <h2 style={{ fontSize: 16, margin: '0 0 6px' }}>
-          Saved in this browser {saved.length ? `(${saved.length})` : ''}
-        </h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
+          <h2 style={{ fontSize: 16, margin: 0 }}>
+            Your saved sounds {saved.length ? `(${saved.length})` : ''}
+          </h2>
+          <span style={{ flex: 1 }} />
+          <button style={btn} onClick={() => importInputRef.current?.click()}>
+            Import a clip (MP3, WAV, OGG)
+          </button>
+          <input
+            ref={importInputRef}
+            type="file"
+            accept=".mp3,.wav,.ogg,audio/mpeg,audio/wav,audio/ogg"
+            style={{ display: 'none' }}
+            aria-label="Choose a sound file to import"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              e.target.value = ''; // the same file can be chosen again
+              if (f) void importClip(f);
+            }}
+          />
+        </div>
         {saved.length === 0 ? (
           <p style={{ fontSize: 13, color: '#8393c4', margin: 0 }}>
-            Nothing saved yet. Give a channel a name and press <strong>Save</strong>.
+            Nothing saved yet. Give a channel a name and press <strong>Save</strong>, or import a clip.
           </p>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -1017,19 +1071,21 @@ zap.play();`}</pre>
                 >
                   ▶
                 </button>
-                <button style={btn} onClick={() => editSaved(s)} aria-label={`Edit ${s.name}`}>
-                  Edit
-                </button>
+                {s.source !== IMPORTED && (
+                  <button style={btn} onClick={() => editSaved(s)} aria-label={`Edit ${s.name}`}>
+                    Edit
+                  </button>
+                )}
                 <button style={btn} onClick={() => copy(`let ${s.name} = loadSound('${s.name}');`)}>
                   Copy code
                 </button>
                 <a
                   style={{ ...btn, textDecoration: 'none' }}
                   href={s.dataUri}
-                  download={`${s.name}.wav`}
-                  aria-label={`Download ${s.name} as a WAV`}
+                  download={`${s.name}.${savedExt(s.dataUri)}`}
+                  aria-label={`Download ${s.name} as a ${savedExt(s.dataUri).toUpperCase()}`}
                 >
-                  .wav
+                  .{savedExt(s.dataUri)}
                 </a>
                 <button style={btn} onClick={() => removeSaved(s.name)}>Delete</button>
               </div>
