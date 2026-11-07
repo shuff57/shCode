@@ -3,9 +3,9 @@
 | | |
 | --- | --- |
 | Source repo | `shuff57/moshion` (local checkout `../moshion`) |
-| Commit | `f3e13780d147066e2e6adc95e050e642aeb3c768` (`f3e1378`), branch `main` (= `origin/main`) |
+| Commit | `b1a2575352b6e7eee50e68afa374c2401b2165e0` (`b1a2575`), branch `main` (= `origin/main`) |
 | Commit date | 2026-11-06 |
-| Vendored | 2026-11-03 (the `f259b22` sound sync on top of `d8068bb`); `f3e1378` (2026-11-06) is the #78 focus fix, already in this copy |
+| Vendored | 2026-11-06 (`b1a2575`: `sprite.clone()` and `world.maxSpeed`, on top of `f3e1378` and the `f259b22` sound sync) |
 
 `main` now carries both the default-gravity-0 change (`91f7e6b`, vendored
 2026-11-01) and the math coordinates work on top of it (`4b36bef` engine,
@@ -33,7 +33,16 @@ the console, errors, audio log and every sprite's position at frames 60 and
 A later sync, 2026-11-03 (`f259b22`), adds the sound work. `f3e1378` (2026-11-06)
 adds one `window` `blur` listener that releases every held key and mouse button
 (shCode issue #78); its gates are upstream `tests/focus.spec.mjs` and the "losing
-focus releases a held key" check in `scripts/moshion-checks.mjs`. `loadSound('name')`
+focus releases a held key" check in `scripts/moshion-checks.mjs`.
+
+`b1a2575` (2026-11-06) adds `sprite.clone()` (shCode #87: looks and physics,
+starts still, same groups) and `world.maxSpeed` (shCode #84: planck's per-step
+cap in px/frame, default still 60, one console warning naming it when a speed
+is set past it). Gates: upstream `tests/clone-maxspeed.spec.mjs` and the two
+checks of the same names in `scripts/moshion-checks.mjs`. The two docs pages
+("Copying a sprite: clone()", "The speed cap: world.maxSpeed") are added by
+hand to `lib/moshion-docs.ts`, whose "Gravity and velocity" page now points at
+the cap instead of calling it fixed. `loadSound('name')`
 looks a bare code-safe name up in the store under `sound:<name>` before using
 it as a URL; a path or a data: URI still bypasses the store. The 8-bit palette
 (`coin`, `music`, and the effect/menu cues) is upstream now too.

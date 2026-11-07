@@ -199,6 +199,72 @@ export const SEMANTIC_CHECKS = [
     },
   },
   {
+    name: 'sprite.clone() copies looks and physics, starts still, and joins the same groups',
+    area: 'sprite',
+    // shCode #87. Upstream spec: ../moshion tests/clone-maxspeed.spec.mjs.
+    run({ createSandbox }) {
+      const box = createSandbox();
+      box.run(`
+        out = {};
+        function setup(){
+          new Canvas(400,300); world.gravity.y = 0;
+          pipes = new Group();
+          pipe = new pipes.Sprite(100, 100, 30, 120);
+          pipe.color = 'green'; pipe.stroke = 'white'; pipe.strokeWeight = 3;
+          pipe.collider = 'static'; pipe.rotation = 30; pipe.bounciness = 0.5;
+          copy = pipe.clone(); copy.x = 300;
+          mover = new Sprite(50, 250, 20, 20); mover.vel.x = 3;
+          moverCopy = mover.clone(); moverCopy.y = 150;
+        }
+        function draw(){}
+      `);
+      if (box.errors.length) return `sketch threw: ${box.errors[0].message}`;
+      box.pump(3);
+      const { pipe, copy, pipes, mover, moverCopy } = box.sandbox;
+      if (copy.w !== 30 || copy.h !== 120 || copy.shape !== 'rect') return `size/shape not copied: ${copy.w}x${copy.h} ${copy.shape}`;
+      if (copy.color !== 'green' || copy.stroke !== 'white' || copy.strokeWeight !== 3) return 'colour or outline not copied';
+      if (copy.collider !== 'static' || copy.bounciness !== 0.5) return `physics not copied: ${copy.collider} ${copy.bounciness}`;
+      if (Math.round(copy.rotation) !== 30) return `rotation not copied: ${copy.rotation}`;
+      if (!pipes.includes(copy) || pipes.length !== 2) return 'the clone did not join the group';
+      if (Math.round(pipe.x) !== 100) return 'moving the clone moved the original';
+      if (Math.abs(moverCopy.vel.x) > 1e-9) return `the clone did not start still: vel.x ${moverCopy.vel.x}`;
+      if (!(mover.vel.x > 0)) return 'cloning stopped the original';
+      copy.delete();
+      if (pipes.length !== 1 || !pipes.includes(pipe)) return 'deleting the clone touched the original';
+      return true;
+    },
+  },
+  {
+    name: 'world.maxSpeed: 60 by default, opt-in to raise, one warning naming it',
+    area: 'physics',
+    // shCode #84. The cap is planck's global maxTranslation; a fresh sketch must start at 60
+    // even after another sketch raised it.
+    run({ createSandbox }) {
+      const raise = createSandbox();
+      raise.run(`function setup(){ new Canvas(200,200); world.maxSpeed = 300; } function draw(){}`);
+      raise.pump(1);
+      const box = createSandbox();
+      box.run(`
+        function setup(){ new Canvas(800,200); world.gravity.y = 0; a = new Sprite(20, 50, 10, 10); a.vel.x = 150; a.vel.x = 200; }
+        function draw(){}
+      `);
+      if (box.errors.length) return `sketch threw: ${box.errors[0].message}`;
+      box.pump(3);
+      const { a, world } = box.sandbox;
+      if (world.maxSpeed !== 60) return `a fresh sketch starts at ${world.maxSpeed}, not 60`;
+      if (Math.abs(a.vel.x - 60) > 0.5) return `speed 200 did not settle to 60: ${a.vel.x}`;
+      const warns = box.consoleLines.filter((l) => l.type === 'warn' && l.text.includes('world.maxSpeed'));
+      if (warns.length !== 1) return `expected one warning naming world.maxSpeed, got ${warns.length}`;
+      box.run(`world.maxSpeed = 200; b = new Sprite(20, 150, 10, 10); b.vel.x = 150;`);
+      box.pump(3);
+      if (Math.abs(box.sandbox.b.vel.x - 150) > 0.5) return `with the cap at 200 a speed of 150 became ${box.sandbox.b.vel.x}`;
+      let threw = false;
+      try { box.run(`world.maxSpeed = 0;`); } catch { threw = true; }
+      if (!threw && !box.errors.length) return 'world.maxSpeed = 0 was accepted';
+      return true;
+    },
+  },
+  {
     name: 'mouse.presses() is true for exactly one frame per click',
     area: 'input',
     run({ createSandbox }) {

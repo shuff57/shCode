@@ -806,7 +806,7 @@ Each sprite has a .vel vector with .x and .y components, measured in pixels per 
 
 Assigning vel every frame is fine for player controls — you're telling the engine exactly what you want.
 
-There's a top speed. The physics engine won't let a sprite move faster than about 60 pixels per frame, no matter how high you set vel.x — it just quietly caps there. That's a safety limit so fast sprites can't tunnel through walls in a single frame. If a sprite feels stuck at the same speed no matter what number you try, this is why — it's not a bug.`,
+There's a top speed. No sprite moves faster than world.maxSpeed pixels per frame, which starts at 60. Set vel.x higher and the sprite settles to 60 on the next frame, and the console says so once. That's a safety limit so fast sprites can't skip through things in a single frame. The next page shows how to raise it, and what it costs.`,
         code: `let player, ground;
 
 function setup() {
@@ -825,6 +825,27 @@ function update() {
   if (kb.presses(' ') && player.colliding(ground)) {
     player.vel.y = -8;
   }
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
+      {
+        title: 'The speed cap: world.maxSpeed',
+        body: `No sprite moves faster than world.maxSpeed pixels per frame. It starts at 60. Set vel.x = 150 and the sprite settles to 60 on the next frame, and the console says so once, naming world.maxSpeed.
+
+The cap is there for a reason. A sprite that moves a long way in one frame can skip clean past a thin sprite between two frames without the two ever touching: a fast bullet can fly through an enemy. A moving solid (dynamic) sprite still stops at a static wall, because the physics engine checks that case between frames. A kinematic sprite, or one with collider = 'none', does not get that check.
+
+To go faster, raise the cap in setup(), before you set the speed. Keep it as low as your game allows, and make thin targets a little thicker if a fast sprite misses them.`,
+        code: `let ball;
+
+function setup() {
+  new Canvas(600, 200);
+  world.maxSpeed = 120;   // pixels per frame; the default is 60
+  ball = new Sprite(30, 100, 20);
+  ball.vel.x = 100;       // over 60, allowed because of the line above
+  new Sprite(590, 100, 20, 200, 'static');
 }
 
 function draw() {
@@ -1190,6 +1211,32 @@ function setup() {
 
 function draw() {
   background('#112');
+}`,
+      },
+      {
+        title: 'Copying a sprite: clone()',
+        body: `sprite.clone() makes a new sprite that looks and behaves like one you already set up: the same size and shape, colour and outline, picture, texture or animation, layer, rotation, and the same physics settings (collider, bounciness, friction, density, drag). It also joins every group the original is in, so a check like player.colliding(pipes) sees the copy too.
+
+The copy is made in the same spot and starts still. Move it straight away, in the same function: two solid sprites on top of each other push apart on the next frame. It does not copy motion, life, joints, or properties you made up yourself, like hp or points. Set those on the copy.
+
+clone() is for "one more like that one". For many sprites that share settings from the start, a group's factory (new pipes.Sprite(...)) is still the tidier tool.`,
+        code: `let pipes, upper, lower;
+
+function setup() {
+  new Canvas(400, 400);
+  pipes = new Group();
+  upper = new pipes.Sprite(300, 60, 50, 120, 'kinematic');
+  upper.color = 'green';
+  upper.stroke = 'darkgreen';
+  upper.strokeWeight = 3;
+
+  lower = upper.clone();   // same size, colour, outline, collider, groups
+  lower.y = 340;           // move it before the next frame
+}
+
+function draw() {
+  background('skyblue');
+  text(pipes.length + ' pipes', 10, 20);
 }`,
       },
       {
