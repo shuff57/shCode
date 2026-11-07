@@ -10305,6 +10305,60 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
+  "6-25-trail-2-sub-send-and-receive-one-number": {
+    "lessonTitle": "6.25.2 Sub-build: Send and receive one number",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: Send and receive one number\". The task: set up online.onMove once to record every move that arrives, host a room on a key or join one from a code, and send a small move like { n: number } when the room is ready. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Receives moves",
+        "description": "onMove is set up with a function.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Sends a move",
+        "description": "online.send is called with a small move.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "In a room",
+        "description": "The sketch hosts or joins.",
+        "points": 1
+      }
+    ]
+  },
+  "6-25-trail-3-lab-trail-online": {
+    "lessonTitle": "6.25.3 Lab: Trail online",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Trail online\". The task: make the race playable across two computers: set up online.onMove once to call takeTurn with the roll in every move, host on a key or join from a JOIN code, send the roll with online.send instead of applying it when online, let only the player whose seat equals turn roll, and keep offline play working when online.status is off. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Sends rolls",
+        "description": "Online, the roll is sent, not applied.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Applies in onMove",
+        "description": "takeTurn runs for each move that arrives.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Seat and turn",
+        "description": "Only the seat whose turn it is may roll.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Offline play",
+        "description": "With status off, the game still plays on one computer.",
+        "points": 1
+      }
+    ]
+  },
   "6-3-pocket-2-sub-slow-to-a-stop": {
     "lessonTitle": "6.3.2 Sub-build: Slow to a stop",
     "prompt": "The student wrote a moSHion sketch for \"Sub-build: Slow to a stop\". The task: give the ball drag and call it stopped when its speed falls under a small number, setting the speed to 0. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",

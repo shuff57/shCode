@@ -1,0 +1,116 @@
+{
+  "id": "6-25-trail-2-sub-send-and-receive-one-number",
+  "title": "6.25.2 Sub-build: Send and receive one number",
+  "description": "Two tabs, one room, one number at a time. Every number sent, yours too, arrives in the same order on both.",
+  "type": "lesson",
+  "estimateMins": 12,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.25 Trail: play online",
+  "preview": "moshion",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "The top says `Status: off`. H and SPACE do nothing yet."
+    },
+    {
+      "id": "s2",
+      "title": "Listen for moves",
+      "instructions": "In `setup()`, set up `online.onMove((move, seat) => { got.push(seat + ':' + move.n); });`. Below it, join a room when there is a code: `if (JOIN !== '') online.join(JOIN);`.",
+      "hints": [
+        "`onMove` goes in `setup()`: it is set once, and then runs for every move."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Host and send",
+      "instructions": "In `draw()`, `if (kb.presses('h') && online.status === 'off') online.host();`, and `if (kb.presses('space') && online.status === 'ready') online.send({ n: floor(random(1, 100)) });`. Run, press H, and read the room code at the top.",
+      "hints": [
+        "Sending before the room is `'ready'` stops with an error that says so."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Try it with two tabs",
+      "instructions": "Open this lesson in a second browser tab. Put the code in `JOIN` there and Run. Both tabs now say `ready`. Press SPACE in either one: the same list of numbers grows in both, in the same order, and your own numbers arrive too.",
+      "hints": [
+        "You must be signed in and in a class. A seat is your account in one tab, so each tab gets its own seat."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Moves are received",
+      "description": "online.onMove is given a function that runs for every move. Help: 6.25.1 (Reading: One list of moves, two computers)",
+      "hint": "online.onMove((move, seat) => { got.push(seat + ':' + move.n); });",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*(?:\\(?\\s*[\\w$\\s,]*\\)?\\s*=>|function\\b|[A-Za-z_$][\\w$]*\\s*\\))",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "A move is sent",
+      "description": "online.send sends a move. Help: 6.25.1 (Reading: One list of moves, two computers)",
+      "hint": "online.send({ n: floor(random(1, 100)) });",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bonline\\s*\\.\\s*send\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "Host or join",
+      "description": "The sketch hosts a room or joins one. Help: 6.25.1 (Reading: One list of moves, two computers)",
+      "hint": "if (kb.presses('h') && online.status === 'off') online.host();",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bonline\\s*\\.\\s*(?:host|join)\\s*\\(",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: Send and receive one number\". The task: set up online.onMove once to record every move that arrives, host a room on a key or join one from a code, and send a small move like { n: number } when the room is ready. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Receives moves",
+        "description": "onMove is set up with a function.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Sends a move",
+        "description": "online.send is called with a small move.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "In a room",
+        "description": "The sketch hosts or joins.",
+        "points": 1
+      }
+    ]
+  }
+}

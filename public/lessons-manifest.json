@@ -10219,6 +10219,45 @@
       "scoreKind": null
     },
     {
+      "id": "6-25-trail-1-reading-one-list-of-moves-two-computers",
+      "title": "6.25.1 Reading: One list of moves, two computers",
+      "unit": "6.25 Trail: play online",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 17,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "6-25-trail-2-sub-send-and-receive-one-number",
+      "title": "6.25.2 Sub-build: Send and receive one number",
+      "unit": "6.25 Trail: play online",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 17,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "6-25-trail-3-lab-trail-online",
+      "title": "6.25.3 Lab: Trail online",
+      "unit": "6.25 Trail: play online",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 17,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "6-3-1-slides",
       "title": "6.8.1 Slides: Physics Applications",
       "unit": "6.8 Physics Applications",

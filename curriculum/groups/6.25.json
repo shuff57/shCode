@@ -1,0 +1,16 @@
+{
+  "moduleId": "6.25",
+  "source": "Trail chain module, one day.",
+  "lessons": [
+    {
+      "id": "trail-play-online",
+      "title": "play online",
+      "objective": "One list of moves, applied in the same order on every computer, keeps two boards the same: send, then apply in onMove.",
+      "screens": [
+        "6-25-trail-1-reading-one-list-of-moves-two-computers",
+        "6-25-trail-2-sub-send-and-receive-one-number",
+        "6-25-trail-3-lab-trail-online"
+      ]
+    }
+  ]
+}
