@@ -1,6 +1,6 @@
 {
   "id": "5-3-pinball-1-reading-from-scene-to-game",
-  "title": "5.3.2 Reading: From scene to game",
+  "title": "5.3.4 Reading: From scene to game",
   "description": "The scene you built in 5.2.24 is not yet a game. Names the four things that turn one into the other — a goal, a score, a way to lose, a way to start again — and shows the scene with none of them.",
   "type": "lesson",
   "estimateMins": 6,

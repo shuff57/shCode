@@ -1,4 +1,4 @@
-// 5.3.6 Lab: A tilted bumper (reference solution).
+// 5.3.8 Lab: A tilted bumper (reference solution).
 
 let ball, bumper, ground, goal, score;
 

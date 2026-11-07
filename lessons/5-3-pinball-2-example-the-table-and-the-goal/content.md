@@ -1,12 +1,12 @@
 ## The table and the goal
 
-**Read after `5.3.2 Reading: From scene to game`.**
+**Read after `5.3.4 Reading: From scene to game`.**
 
 **Goal:** give the scene a target and a number that goes up when the ball reaches it.
 
 ## Step 1: The table, with bumpers you can name
 
-The table from 5.3.2. The bumper and the ground are held in variables, so the code can ask about them later. The two walls are never asked about, so they stay inside `setup()`.
+The table from 5.3.4. The bumper and the ground are held in variables, so the code can ask about them later. The two walls are never asked about, so they stay inside `setup()`.
 
 ```js live
 let ball, bumper, ground, goal;
@@ -43,7 +43,7 @@ function draw() {
 }
 ```
 
-**What you'll see:** exactly the scene from 5.3.2. Nothing new is visible — `bumper` and `ground` are the same sprites, now held in variables so the code can reach them.
+**What you'll see:** exactly the scene from 5.3.4. Nothing new is visible — `bumper` and `ground` are the same sprites, now held in variables so the code can reach them.
 
 ## Step 2: A target on the ball's path
 

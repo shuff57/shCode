@@ -1,6 +1,6 @@
 {
   "id": "5-3-pinball-3-lab-build-the-table",
-  "title": "5.3.7 Lab: Put a goal on the table",
+  "title": "5.3.9 Lab: Put a goal on the table",
   "description": "Put a gold goal where the ball really goes. The score is drawn but does not change yet — counting is the next lesson. Your table carries forward.",
   "type": "lesson",
   "estimateMins": 5,
@@ -23,7 +23,7 @@
       "instructions": "Add a gold block with the same body type as the bumper and store it in `goal` (the starter already declares it). Put it where the ball really goes: run the sketch, watch the ball's path, and place the gold on it. Nothing happens when they touch yet; the next lesson is about counting the touch.",
       "hints": [
         "It is one more `new Sprite(..., 'static')`, stored as `goal = ...`, with `goal.color = 'gold';`.",
-        "If the ball never touches the gold, move the gold onto the ball's path. 5.3.3 Step 2 puts a gold bar at the low end of a tilted bumper, tilted the same way, so the ball rolls straight onto it."
+        "If the ball never touches the gold, move the gold onto the ball's path. 5.3.5 Step 2 puts a gold bar at the low end of a tilted bumper, tilted the same way, so the ball rolls straight onto it."
       ]
     }
   ],
@@ -31,7 +31,7 @@
     {
       "id": "r1",
       "title": "A goal is on the table",
-      "description": "A static sprite is stored as the goal, in a colour the player can see. Help: 5.3.3 (Worked Example: The table and the goal)",
+      "description": "A static sprite is stored as the goal, in a colour the player can see. Help: 5.3.5 (Worked Example: The table and the goal)",
       "type": "regex",
       "file": "script.js",
       "pattern": "goal\\s*=\\s*new\\s+Sprite\\s*\\([^)]*['\"]static['\"]|goal\\.collider\\s*=\\s*['\"]static['\"]",
@@ -48,12 +48,12 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.7 Lab: Put a goal on the table\". The task they were given: In setup(), add a gold block with the same static body type as the bumper, stored in `goal`, where the ball really goes. The score is drawn but does not change yet. What the starter file already had: the previous labs' work: gravity on, two static walls, a tilted static bumper stored in `bumper`, a static ground stored in `ground` and a bouncy ball at (70, 60). There is no goal yet, so the starter meets none of the criteria. The student may have brought their own work forward from the lab before, so the file can have more than the starter lists; judge what is in the file. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: world.gravity.y starts at 0, so nothing falls until a sketch sets it; a positive value pulls down the screen because y grows downward. A sprite made with 'static' as its last argument (or given .collider = 'static') never moves or falls. new Sprite(x, y, d) with one size number makes a circle; new Sprite(x, y, w, h) makes a rectangle. rotation is in degrees. bounciness runs from 0 (a thud) to 1. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
+    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.9 Lab: Put a goal on the table\". The task they were given: In setup(), add a gold block with the same static body type as the bumper, stored in `goal`, where the ball really goes. The score is drawn but does not change yet. What the starter file already had: the previous labs' work: gravity on, two static walls, a tilted static bumper stored in `bumper`, a static ground stored in `ground` and a bouncy ball at (70, 60). There is no goal yet, so the starter meets none of the criteria. The student may have brought their own work forward from the lab before, so the file can have more than the starter lists; judge what is in the file. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: world.gravity.y starts at 0, so nothing falls until a sketch sets it; a positive value pulls down the screen because y grows downward. A sprite made with 'static' as its last argument (or given .collider = 'static') never moves or falls. new Sprite(x, y, d) with one size number makes a circle; new Sprite(x, y, w, h) makes a rectangle. rotation is in degrees. bounciness runs from 0 (a thud) to 1. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
     "rubric": [
       {
         "id": "r1",
         "title": "A goal is on the table",
-        "description": "A static sprite is stored as the goal, in a colour the player can see. Help: 5.3.3 (Worked Example: The table and the goal)",
+        "description": "A static sprite is stored as the goal, in a colour the player can see. Help: 5.3.5 (Worked Example: The table and the goal)",
         "points": 1
       }
     ]

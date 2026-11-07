@@ -36,7 +36,7 @@ const POINTERS = {
   '5-3-20-lab-method-calls-method': { target: '5.4.1', note: 'Methods: functions that live on a class' },
   '5-3-22-lab-mutate-sprite-prop': { target: '5.4.7', note: 'Why this.sprite, not extends Sprite' },
   '5-3-23-lab-cleanup': { target: '5.2.21', note: 'Cleanup and Delete' },
-  '5-3-25-lab-three-vars': { target: '5.3.3', note: 'Class and instance' },
+  '5-3-25-lab-three-vars': { target: '5.3.5', note: 'Class and instance' },
   '5-3-26-lab-array-of-instances': { target: '5.4.1', note: 'Methods: functions that live on a class' },
   '5-3-27-lab-loop-instances': { target: '5.4.1', note: 'Methods: functions that live on a class' },
   '5-3-31-a12-1-collectible': { target: '5.4.17', note: 'When to reach for OOP' },

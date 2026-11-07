@@ -1,6 +1,6 @@
 ## From scene to game
 
-**Read before `5.3.3 Worked Example: The table and the goal`.** About 5 minutes.
+**Read before `5.3.5 Worked Example: The table and the goal`.** About 5 minutes.
 
 By the end of this reading you should be able to answer:
 
@@ -67,7 +67,7 @@ function draw() {
 
 **Two things in that code to notice.** `new Sprite(70, 60, 24)` has **one** size number instead of a width and a height. One number makes a circle that many pixels across, so this ball is a circle 24 pixels wide, the same kind of ball you made in 5.2.16 Bouncy Ball. And the gray strip along the bottom is called `ground`, not `floor`: `floor()` is the rounding function from 5.2.2 (Reading: Random numbers and timers), and a variable named `floor` would hide it, so `floor(random(1, 7))` would stop working.
 
-**Try this:** watch one drop all the way to the drain, then look at what is missing. If you wanted to tell a friend how well you just did, what number would you show them? That number does not exist yet. 5.3.3 adds it.
+**Try this:** watch one drop all the way to the drain, then look at what is missing. If you wanted to tell a friend how well you just did, what number would you show them? That number does not exist yet. 5.3.5 adds it.
 
 ---
 

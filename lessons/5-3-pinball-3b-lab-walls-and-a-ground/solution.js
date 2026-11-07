@@ -1,4 +1,4 @@
-// 5.3.5 Lab: Walls and a ground (reference solution).
+// 5.3.7 Lab: Walls and a ground (reference solution).
 
 let ball, bumper, ground, goal, score;
 

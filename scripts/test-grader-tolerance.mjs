@@ -1514,9 +1514,9 @@ for (const id of Object.values(L)) {
     ]);
   }
 
-  // 5.3.4 r1
+  // 5.3.6 r1 (gravity is on: the lab that drops the ball; the old four-step lab moved here when 5.3 was split)
   {
-    const id = '5-3-pinball-3-lab-build-the-table'; const S = sol(id);
+    const id = '5-3-pinball-3a-lab-drop-a-bouncy-ball'; const S = sol(id);
     const w = (to) => edit(S, 'world.gravity.y = 10;', to);
     run(id, [
       A('reference', S),

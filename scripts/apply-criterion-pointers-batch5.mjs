@@ -73,7 +73,7 @@ const PER_CRITERION = {
 
   // --- 7.1.1 Arcade Cabinet: the Q2 capstone checklist --------------------
   '7-1-1-arcade-cabinet\u0000A class of your own':
-    { target: '5.3.3', note: 'Class and instance' },
+    { target: '5.3.5', note: 'Class and instance' },
   '7-1-1-arcade-cabinet\u0000A Group':
     { target: '6.1.3', note: 'moSHion docs: Groups' },
   '7-1-1-arcade-cabinet\u0000An overlap or collision':

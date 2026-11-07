@@ -1,4 +1,4 @@
-// 5.3.6 Lab: A tilted bumper.
+// 5.3.8 Lab: A tilted bumper.
 
 let ball, bumper, ground, goal, score;
 

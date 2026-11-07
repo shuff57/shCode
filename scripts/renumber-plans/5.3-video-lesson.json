@@ -1,0 +1,26 @@
+{
+  "_comment": "The 5.3 Papermorph overview becomes the second lesson of 5.3, right after the play-only demo (owner decision 2026-11-06); the old 5.3.1-5.3.7 move to 5.3.3-5.3.9 and the module counts from 5.3.1. Folders never change.",
+  "modules": {
+    "5.3": [
+      { "folder": "5-3-pinball-0-reading-play-the-finished-game" },
+      { "folder": "5-3-video-table", "new": true, "type": "video", "notes": "Papermorph overview of the module" },
+      { "folder": "5-3-pinball-plan-sketch-the-game" },
+      { "folder": "5-3-pinball-1-reading-from-scene-to-game" },
+      { "folder": "5-3-pinball-2-example-the-table-and-the-goal" },
+      { "folder": "5-3-pinball-3a-lab-drop-a-bouncy-ball" },
+      { "folder": "5-3-pinball-3b-lab-walls-and-a-ground" },
+      { "folder": "5-3-pinball-3c-lab-a-tilted-bumper" },
+      { "folder": "5-3-pinball-3-lab-build-the-table" }
+    ]
+  },
+  "alsoRewrite": [
+    "curriculum/modules/*.md",
+    "curriculum-plan.md",
+    "curriculum/BOOK-TO-MODULE.md",
+    "scripts/apply-criterion-pointers-*.mjs",
+    "scripts/test-grader-tolerance.mjs",
+    "scripts/test-runtime-labs.mjs",
+    "scripts/test-diagram-chart-lessons.mjs",
+    "scripts/verify-a11y-keyboard-chart.py"
+  ]
+}

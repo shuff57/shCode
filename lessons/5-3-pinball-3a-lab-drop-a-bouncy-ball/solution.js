@@ -1,4 +1,4 @@
-// 5.3.4 Lab: Drop a bouncy ball (reference solution).
+// 5.3.6 Lab: Drop a bouncy ball (reference solution).
 
 let ball, bumper, ground, goal, score;
 

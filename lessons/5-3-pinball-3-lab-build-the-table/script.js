@@ -1,4 +1,4 @@
-// 5.3.7 Lab: Put a goal on the table.
+// 5.3.9 Lab: Put a goal on the table.
 
 let ball, bumper, ground, goal, score;
 
