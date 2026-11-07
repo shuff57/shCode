@@ -1480,6 +1480,8 @@ Key names are lowercase strings: 'left', 'right', 'up', 'down', 'a', 'w', 'enter
 
 'left', 'right', 'up' and 'down' answer for the arrow key OR its WASD twin, so kb.pressing('left') is true whether the player pressed the left arrow or 'a'. You get both control schemes without writing either one twice.
 
+Two players on one keyboard need the opposite: W must move only one of them. Name the arrow itself and it answers for the arrow only: 'arrowUp', 'arrowDown', 'arrowLeft' and 'arrowRight' for one player, 'w', 'a', 's' and 'd' for the other.
+
 There are shorthand properties too: kb.space, kb.enter, kb.shift, kb.arrowUp and friends give the same number kb.pressing() would.
 
 Arrow keys and space bar are automatically prevented from scrolling the page.`,
