@@ -3,9 +3,9 @@
 | | |
 | --- | --- |
 | Source repo | `shuff57/moshion` (local checkout `../moshion`) |
-| Commit | `f259b22ce679eaa778d400293b4a7301d1e46270` (`f259b22`), branch `main` (= `origin/main`) |
-| Commit date | 2026-11-03 |
-| Vendored | 2026-11-03 (the `f259b22` sound sync on top of `d8068bb`) |
+| Commit | `f3e13780d147066e2e6adc95e050e642aeb3c768` (`f3e1378`), branch `main` (= `origin/main`) |
+| Commit date | 2026-11-06 |
+| Vendored | 2026-11-03 (the `f259b22` sound sync on top of `d8068bb`); `f3e1378` (2026-11-06) is the #78 focus fix, already in this copy |
 
 `main` now carries both the default-gravity-0 change (`91f7e6b`, vendored
 2026-11-01) and the math coordinates work on top of it (`4b36bef` engine,
@@ -30,7 +30,10 @@ the console, errors, audio log and every sprite's position at frames 60 and
 180 matched for every sketch. Gravity's own audit is in
 `codehs-review/loop/gravity-default-audit.md`.
 
-A later sync, 2026-11-03 (`f259b22`), adds the sound work. `loadSound('name')`
+A later sync, 2026-11-03 (`f259b22`), adds the sound work. `f3e1378` (2026-11-06)
+adds one `window` `blur` listener that releases every held key and mouse button
+(shCode issue #78); its gates are upstream `tests/focus.spec.mjs` and the "losing
+focus releases a held key" check in `scripts/moshion-checks.mjs`. `loadSound('name')`
 looks a bare code-safe name up in the store under `sound:<name>` before using
 it as a URL; a path or a data: URI still bypasses the store. The 8-bit palette
 (`coin`, `music`, and the effect/menu cues) is upstream now too.
@@ -54,12 +57,6 @@ it as a URL; a path or a data: URI still bypasses the store. The 8-bit palette
   after every copy. The two sound comment blocks also name the shCode mixer and
   `/moshion/assets/` here where the repo says "host page" and `/assets/`; the
   code is identical.
-- `moshion.js`, **not yet upstream (2026-11-06)**: a `window` `blur` listener
-  after the `mouseup` one releases every held key and mouse button (shCode
-  issue #78: a key held while focus left the sketch never got its keyup and
-  stayed pressed for good). Port it to `../moshion` and this bullet goes away;
-  until then a resync must re-apply it. Gate: the "losing focus releases a held
-  key" check in `scripts/moshion-checks.mjs` (and `blur()` in the harness).
 
 ## Kept as shCode's own (do not overwrite from the repo)
 
