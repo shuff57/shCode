@@ -10659,6 +10659,60 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
+  "6-29-checkers-2-sub-jump-and-take": {
+    "lessonTitle": "6.29.2 Sub-build: Jump and take",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: Jump and take\". The task: with red picked up, a click on an empty square two rows and two columns away is a jump when the halfway square ((r1 + r2) / 2, (c1 + c2) / 2) holds 'b': that square is emptied and red moves to the new square. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Two away",
+        "description": "The jump lands two squares diagonally.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Over black",
+        "description": "The halfway square must hold black.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Taken",
+        "description": "The jumped piece is removed from the grid.",
+        "points": 1
+      }
+    ]
+  },
+  "6-29-checkers-3-lab-jumps-and-jumping-again": {
+    "lessonTitle": "6.29.3 Lab: Jumps, and jumping again",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Jumps, and jumping again\". The task: teach moveKind a second answer: 'jump' for two squares diagonally over a piece of the other colour (found halfway between the ends) onto an empty square; doMove asks moveKind before moving and empties the halfway square on a jump; after a jump, if the piece can jump again (canJumpFrom), the same player keeps the turn with that piece only and only a jump (chain), and otherwise the turn passes. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Two away",
+        "description": "A jump lands two squares diagonally.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Over an enemy",
+        "description": "The halfway square holds the other colour.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Taken",
+        "description": "The jumped piece leaves the grid.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Jump again",
+        "description": "A piece that can jump again keeps the turn.",
+        "points": 1
+      }
+    ]
+  },
   "6-3-pocket-2-sub-slow-to-a-stop": {
     "lessonTitle": "6.3.2 Sub-build: Slow to a stop",
     "prompt": "The student wrote a moSHion sketch for \"Sub-build: Slow to a stop\". The task: give the ball drag and call it stopped when its speed falls under a small number, setting the speed to 0. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",

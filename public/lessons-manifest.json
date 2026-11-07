@@ -10388,6 +10388,45 @@
       "scoreKind": null
     },
     {
+      "id": "6-29-checkers-1-reading-jumping-over-and-jumping-again",
+      "title": "6.29.1 Reading: Jumping over, and jumping again",
+      "unit": "6.29 Checkers: jumps",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 18,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "6-29-checkers-2-sub-jump-and-take",
+      "title": "6.29.2 Sub-build: Jump and take",
+      "unit": "6.29 Checkers: jumps",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 18,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "6-29-checkers-3-lab-jumps-and-jumping-again",
+      "title": "6.29.3 Lab: Jumps, and jumping again",
+      "unit": "6.29 Checkers: jumps",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 18,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "6-3-1-slides",
       "title": "6.8.1 Slides: Physics Applications",
       "unit": "6.8 Physics Applications",

@@ -1,0 +1,16 @@
+{
+  "moduleId": "6.29",
+  "source": "Checkers chain module, one day.",
+  "lessons": [
+    {
+      "id": "checkers-jumps",
+      "title": "jumps",
+      "objective": "A jump is two squares over the other colour, the halfway square is emptied, and a piece that can jump again keeps the turn.",
+      "screens": [
+        "6-29-checkers-1-reading-jumping-over-and-jumping-again",
+        "6-29-checkers-2-sub-jump-and-take",
+        "6-29-checkers-3-lab-jumps-and-jumping-again"
+      ]
+    }
+  ]
+}

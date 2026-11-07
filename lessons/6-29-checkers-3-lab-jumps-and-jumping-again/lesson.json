@@ -1,0 +1,144 @@
+{
+  "id": "6-29-checkers-3-lab-jumps-and-jumping-again",
+  "title": "6.29.3 Lab: Jumps, and jumping again",
+  "description": "moveKind learns a second answer, jump; doMove takes the jumped piece; and a piece that can jump again keeps the turn until it cannot.",
+  "type": "lesson",
+  "estimateMins": 25,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.29 Checkers: jumps",
+  "preview": "moshion",
+  "week": 18,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "This is your game from 6.28.3. Pieces step and the turn passes, but a piece next to an enemy cannot jump it."
+    },
+    {
+      "id": "s2",
+      "title": "A jump is a second answer",
+      "instructions": "In `moveKind`, below `if (abs(dr) === 1) return 'step';`, add: `if (abs(dr) === 2) { const mid = grid[fr + dr / 2][fc + dc / 2]; if (mid !== '' && colorOf(mid) !== turn) return 'jump'; }`. Run and set up a jump (step a red piece next to a black one, with an empty square behind it). The jump moves, but the black piece stays: the next step takes it.",
+      "hints": [
+        "`dr` is -2 or 2 here, so `dr / 2` is -1 or 1: one row toward the landing square.",
+        "If you brought your 6.28.3 work forward, your step test may look different; put the jump below it."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Take the piece",
+      "instructions": "Make the first line of `doMove` `const kind = moveKind(fr, fc, tr, tc);`, before anything moves. After the two lines that move the letter, add `if (kind === 'jump') grid[(fr + tr) / 2][(fc + tc) / 2] = '';`. Run: a jump now takes the piece it jumps over.",
+      "hints": [
+        "Ask `moveKind` before the piece moves. Afterwards the starting square is empty and the answer would be `''`."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Jump again",
+      "instructions": "Add `let chain = false;` at the top and `chain = false;` in `newGame()`. Write `canJumpFrom(r, c)` from the reading, below `isLegal`. In `doMove`, after the jumped piece is taken: `if (kind === 'jump' && canJumpFrom(tr, tc)) { picked = { r: tr, c: tc }; chain = true; message = nameOf(turn) + ' jumps again!'; return; }`, then `chain = false;` on the line before the turn passes.",
+      "hints": [
+        "`return` leaves `doMove` before the turn passes, so the same player goes again.",
+        "Set up two black pieces in a row with a gap between them to see a double jump."
+      ]
+    },
+    {
+      "id": "s5",
+      "title": "Only that piece, only a jump",
+      "instructions": "Change `isLegal` to the reading's version: `const kind = moveKind(fr, fc, tr, tc);`, `if (kind === '') return false;`, `if (chain) return kind === 'jump' && fr === picked.r && fc === picked.c;`, `return true;`. In `clickAt`, the test that picks a piece up becomes `if (!chain && p !== '' && colorOf(p) === turn)`. Run: in the middle of a chain, clicking another piece or a step does nothing."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Two squares diagonally",
+      "description": "A jump is two rows and two columns away, tested with abs or another way. Help: 6.29.1 (Reading: Jumping over, and jumping again)",
+      "hint": "if (abs(dr) === 2) { ... }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:Math\\s*\\.\\s*)?abs\\s*\\([^)]*\\)\\s*(?:===?|>=?)\\s*2\\b|\\b2\\s*===?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(|[!=]==?\\s*-\\s*2\\b|\\*\\s*[\\w$.]+\\s*===?\\s*4\\b|[!=]==?\\s*[\\w$.]+\\s*[-+]\\s*2\\b|\\bcase\\s+-?\\s*2\\s*:",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "The middle square is the other colour",
+      "description": "The halfway square must hold a piece of the other colour. Help: 6.29.1 (Reading: Jumping over, and jumping again)",
+      "hint": "if (mid !== '' && colorOf(mid) !== turn) return 'jump';",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:\\(\\s*[\\w$.]+\\s*[+-]\\s*[\\w$.]+\\s*\\)\\s*\\/\\s*2\\b|\\b(?!CELL\\b)[A-Za-z_$][\\w$.]*\\s*\\/\\s*2\\b|\\bsign\\s*\\()(?:(?!\\bfunction\\b)[\\s\\S]){0,250}?(?:!==?\\s*[\\w$]*(?:turn|player|side|me|mine|my)\\w*\\b|\\b[\\w$]*(?:turn|player|side)\\w*\\s*!==?|[!=]==?\\s*['\"`][rbRB]['\"`]|['\"`][rbRB]['\"`]\\s*[!=]==?|[!=]==?\\s*[\\w$]*(?:enemy|other|opp|them|foe)\\w*|\\bcase\\s+['\"`][rbRB]['\"`])",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true,
+      "keepShortStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "The jumped piece is taken",
+      "description": "After a jump, the halfway square is emptied. Help: 6.29.1 (Reading: Jumping over, and jumping again)",
+      "hint": "if (kind === 'jump') grid[(fr + tr) / 2][(fc + tc) / 2] = '';",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\[[^\\]\\[;]*\\/\\s*2[^\\]\\[;]*\\]\\s*\\[[^\\];]*\\]\\s*=\\s*(['\"`])\\1|\\b([\\w$]+)\\s*=\\s*[^;]*(?:\\/\\s*2\\b|\\bsign\\s*\\()[\\s\\S]*?\\[\\s*\\2\\s*\\]\\s*\\[[^\\];]*\\]\\s*=\\s*(['\"`])\\3|\\b([\\w$]+)\\s*=\\s*\\{[^}]*\\/\\s*2[\\s\\S]*?\\[\\s*\\4\\s*\\.\\s*[\\w$]+\\s*\\]\\s*\\[[^\\];]*\\]\\s*=\\s*(['\"`])\\5",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r4",
+      "title": "A chain keeps the turn",
+      "description": "After a jump, a piece that can jump again keeps the turn instead of passing it. Help: 6.29.1 (Reading: Jumping over, and jumping again)",
+      "hint": "if (kind === 'jump' && canJumpFrom(tr, tc)) { chain = true; return; }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?<![=!<>])=\\s*true\\b(?:(?!\\bfunction\\b)[\\s\\S]){0,200}?\\breturn\\b|\\bif\\s*\\(\\s*!\\s*[\\w$]*[Jj]ump[\\w$]*\\s*\\(|\\b[\\w$]+\\s*=\\s*[\\w$]*[Jj]ump[\\w$]*\\s*\\([^)]*\\)(?:(?!\\bfunction\\b)[\\s\\S]){0,200}?\\breturn\\b|\\bif\\s*\\([^)]*\\b[\\w$]*[Jj]ump[\\w$]*\\s*\\([^)]*\\)[^)]*\\)\\s*\\{?[^}]*\\breturn\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Jumps, and jumping again\". The task: teach moveKind a second answer: 'jump' for two squares diagonally over a piece of the other colour (found halfway between the ends) onto an empty square; doMove asks moveKind before moving and empties the halfway square on a jump; after a jump, if the piece can jump again (canJumpFrom), the same player keeps the turn with that piece only and only a jump (chain), and otherwise the turn passes. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Two away",
+        "description": "A jump lands two squares diagonally.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Over an enemy",
+        "description": "The halfway square holds the other colour.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Taken",
+        "description": "The jumped piece leaves the grid.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "Jump again",
+        "description": "A piece that can jump again keeps the turn.",
+        "points": 1
+      }
+    ]
+  },
+  "carryFrom": "6-28-checkers-3-lab-pick-a-piece-and-step"
+}

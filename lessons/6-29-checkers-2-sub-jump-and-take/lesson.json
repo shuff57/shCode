@@ -1,0 +1,110 @@
+{
+  "id": "6-29-checkers-2-sub-jump-and-take",
+  "title": "6.29.2 Sub-build: Jump and take",
+  "description": "Red jumps black: two squares diagonally, over the halfway square, and the piece jumped over is gone.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.29 Checkers: jumps",
+  "preview": "moshion",
+  "week": 18,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "Red sits in the corner with black one square up and to the right. Clicking red picks it up (into `picked`), but nothing can move yet."
+    },
+    {
+      "id": "s2",
+      "title": "Two squares away",
+      "instructions": "After the `if` that picks red up, add `else if (picked && grid[r][c] === '' && abs(r - picked.r) === 2 && abs(c - picked.c) === 2) { }`: a click on an empty square two rows and two columns away. Leave the braces empty for now.",
+      "hints": [
+        "`picked` is `null` until red is clicked, and `null` counts as false, so `picked &&` stops the test before `picked.r` is read."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Over black, and take it",
+      "instructions": "Inside those braces, find the halfway square: `const mr = (r + picked.r) / 2;` and `const mc = (c + picked.c) / 2;`. Then, only `if (grid[mr][mc] === 'b')`: empty it with `grid[mr][mc] = '';`, put red on the new square with `grid[r][c] = 'r';`, empty red's old square with `grid[picked.r][picked.c] = '';`, and set `picked = null;`. Run: pick red up, click the square two up and two to the right, and black is gone.",
+      "hints": [
+        "From row 3 to row 1, the square in between is row (3 + 1) / 2, which is 2.",
+        "Click two squares up and to the LEFT instead: that is off the board, so the click never lands there."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Two squares diagonally",
+      "description": "A jump lands two rows and two columns away, tested with abs or another way. Help: 6.29.1 (Reading: Jumping over, and jumping again)",
+      "hint": "abs(r - picked.r) === 2 && abs(c - picked.c) === 2",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\b(?:Math\\s*\\.\\s*)?abs\\s*\\([^)]*\\)\\s*(?:===?|>=?)\\s*2\\b|\\b2\\s*===?\\s*(?:Math\\s*\\.\\s*)?abs\\s*\\(|[!=]==?\\s*-\\s*2\\b|\\*\\s*[\\w$.]+\\s*===?\\s*4\\b|[!=]==?\\s*[\\w$.]+\\s*[-+]\\s*2\\b|\\bcase\\s+-?\\s*2\\s*:",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "Black is on the halfway square",
+      "description": "The square halfway between the two ends is worked out, and it must hold black. Help: 6.29.1 (Reading: Jumping over, and jumping again)",
+      "hint": "const mr = (r + picked.r) / 2; ... if (grid[mr][mc] === 'b')",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "(?:\\(\\s*[\\w$.]+\\s*[+-]\\s*[\\w$.]+\\s*\\)\\s*\\/\\s*2\\b|\\b(?!CELL\\b)[A-Za-z_$][\\w$.]*\\s*\\/\\s*2\\b|\\bsign\\s*\\()(?:(?!\\bfunction\\b)[\\s\\S]){0,250}?(?:[!=]==?\\s*['\"`][bB]['\"`]|['\"`][bB]['\"`]\\s*[!=]==?|\\bcase\\s+['\"`][bB]['\"`])",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true,
+      "keepShortStrings": true
+    },
+    {
+      "id": "r3",
+      "title": "The jumped piece is taken",
+      "description": "The halfway square is emptied, so black leaves the board. Help: 6.29.1 (Reading: Jumping over, and jumping again)",
+      "hint": "grid[mr][mc] = '';",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\[[^\\]\\[;]*\\/\\s*2[^\\]\\[;]*\\]\\s*\\[[^\\];]*\\]\\s*=\\s*(['\"`])\\1|\\b([\\w$]+)\\s*=\\s*[^;]*(?:\\/\\s*2\\b|\\bsign\\s*\\()[\\s\\S]*?\\[\\s*\\2\\s*\\]\\s*\\[[^\\];]*\\]\\s*=\\s*(['\"`])\\3|\\b([\\w$]+)\\s*=\\s*\\{[^}]*\\/\\s*2[\\s\\S]*?\\[\\s*\\4\\s*\\.\\s*[\\w$]+\\s*\\]\\s*\\[[^\\];]*\\]\\s*=\\s*(['\"`])\\5",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: Jump and take\". The task: with red picked up, a click on an empty square two rows and two columns away is a jump when the halfway square ((r1 + r2) / 2, (c1 + c2) / 2) holds 'b': that square is emptied and red moves to the new square. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Two away",
+        "description": "The jump lands two squares diagonally.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "Over black",
+        "description": "The halfway square must hold black.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "Taken",
+        "description": "The jumped piece is removed from the grid.",
+        "points": 1
+      }
+    ]
+  }
+}
