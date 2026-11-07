@@ -35,6 +35,7 @@ export interface ServerItem {
   name: string;
   hash: string;
   deletedAt: number | null;
+  shared?: boolean;
 }
 export interface BaseEntry {
   id: string;
@@ -198,6 +199,8 @@ export async function runSync(email: string): Promise<SyncResult> {
     return finish(result);
   }
 
+  syncEmail = email;
+  serverIndex = new Map(serverItems.filter((s) => s.deletedAt == null).map((s) => [itemKey(s.kind, s.name), s]));
   const localItems = localLibraryItems();
   const byKey = new Map(localItems.map((l) => [itemKey(l.kind, l.name), l]));
   const hashed = await Promise.all(localItems.map(async (l) => ({ kind: l.kind, name: l.name, hash: await itemHash(l.dataUri, l.meta) })));
@@ -296,6 +299,7 @@ export async function runSync(email: string): Promise<SyncResult> {
       const body = (await res.json().catch(() => ({}))) as { item?: { id: string; hash: string }; error?: string };
       if (res.ok && body.item) {
         base[key] = { id: body.item.id, hash: body.item.hash };
+        serverIndex.set(key, { ...(body.item as ServerItem), shared: serverIndex.get(key)?.shared ?? false });
         result.uploaded++;
       } else if (res.status !== 409) {
         // 409: changed on another device meanwhile; the next sync keeps both.
@@ -308,6 +312,42 @@ export async function runSync(email: string): Promise<SyncResult> {
   writeLocalDeletes([...deletes]);
   result.ok = result.problems.length === 0;
   return finish(result);
+}
+
+// ---- share with my class ---------------------------------------------------
+
+let syncEmail: string | null = null;
+let serverIndex = new Map<string, ServerItem & { shared?: boolean }>();
+export const LIBRARY_SHARES_CHANGED = 'moshion-library-shares-changed';
+
+/** The account copy of a saved item, once synced: its id and whether it is shared. */
+export function accountItem(kind: LibraryKind, name: string): { id: string; shared: boolean } | null {
+  const s = serverIndex.get(itemKey(kind, name));
+  return s ? { id: s.id, shared: !!s.shared } : null;
+}
+export function signedInForSync(): boolean {
+  return syncEmail !== null;
+}
+
+/** Share or unshare one synced item with the student's classes. Returns an error sentence or null. */
+export async function setShared(kind: LibraryKind, name: string, share: boolean): Promise<string | null> {
+  const s = serverIndex.get(itemKey(kind, name));
+  if (!s) return 'Wait a moment: this is still syncing to your account.';
+  try {
+    const res = await fetch(`/api/library/${s.id}/share`, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ share }),
+    });
+    const body = (await res.json().catch(() => ({}))) as { error?: string };
+    if (!res.ok) return body.error ?? `Could not ${share ? 'share' : 'unshare'} it (${res.status}).`;
+    serverIndex.set(itemKey(kind, name), { ...s, shared: share });
+    try { window.dispatchEvent(new Event(LIBRARY_SHARES_CHANGED)); } catch { /* no window */ }
+    return null;
+  } catch {
+    return 'Offline: try again when you are connected.';
+  }
 }
 
 let lastResult: SyncResult | null = null;

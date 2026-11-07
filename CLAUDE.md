@@ -493,7 +493,13 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   `logout()` removes synced copies from the browser and leaves unsynced ones. Tests:
   `scripts/test-library-sync.mjs`. The dev server serves `/api/library` from the real handlers over an
   in-memory SQLite, so two browser sessions can act as two devices.
-- `library_shares` (same migration) is for share-with-class; nothing reads it yet.
+- Share with class (#81): `POST /api/library/[id]/share {share}` puts one of the owner's items in every class they
+  are in now (`library_shares`); `GET /api/library/shared` and `/shared/[id]` are the class library (classmates see
+  it at once as first name + last initial, never the email; hidden items only for the class's teachers);
+  `GET|POST /api/classes/[id]/library-shares` hide / unhide / remove (owner, co-teacher, admin). Re-sharing does not
+  undo a hide; deleting the item unshares it. UI: `ShareToggle`, `ClassLibrary` (Copy to mine), and
+  `ClassLibraryModeration` on the class page's Students tab. Tests: `scripts/test-library-share.mjs`. In dev every
+  `dev_student` identity is enrolled in one "Dev class".
 
 ## Build + deploy
 

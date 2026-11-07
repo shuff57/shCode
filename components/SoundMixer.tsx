@@ -40,6 +40,8 @@ import {
 import { renderMusic, renderSfxDef, type Rendered } from '../lib/sound/render';
 import { CLIP_EXTENSION, clipName, prepareClip, type ClipType } from '../lib/sound-import';
 import LibrarySyncNote from './LibrarySyncNote';
+import ShareToggle from './ShareToggle';
+import ClassLibrary from './ClassLibrary';
 import { matchRecording } from '../lib/sound/match';
 import type { SfxrParams } from '../lib/sound/vendor/jsfxr/sfxr.mjs';
 
@@ -1089,11 +1091,13 @@ zap.play();`}</pre>
                 >
                   .{savedExt(s.dataUri)}
                 </a>
+                <ShareToggle kind="sound" name={s.name} onMessage={(text, bad) => setMessage({ text, bad })} />
                 <button style={btn} onClick={() => removeSaved(s.name)}>Delete</button>
               </div>
             ))}
           </div>
         )}
+        <ClassLibrary kind="sound" onCopied={() => setSaved(listSavedSounds())} onMessage={(text, bad) => setMessage({ text, bad })} />
       </section>
 
       <section style={{ ...card, color: '#8393c4', fontSize: 12 }}>

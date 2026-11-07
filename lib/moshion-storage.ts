@@ -435,6 +435,24 @@ const PREFIX: Record<LibraryKind, [string, string]> = {
   sound: [SOUND_PREFIX, SNDMETA_PREFIX],
 };
 
+/**
+ * Put one item into this browser's library as if the student had saved it
+ * (Copy to mine from the class library): it syncs up to their own account.
+ * Returns false when it would not fit.
+ */
+export function addToLibrary(item: LocalLibraryItem): boolean {
+  const store = readStore();
+  const [p, mp] = PREFIX[item.kind];
+  store[p + item.name] = JSON.stringify(item.dataUri);
+  if (item.meta == null) delete store[mp + item.name];
+  else store[mp + item.name] = item.meta;
+  if (!writeStore(store)) return false;
+  markDeleted(item.kind, item.name, false);
+  localChanged();
+  try { window.dispatchEvent(new Event(LIBRARY_UPDATED)); } catch { /* no window */ }
+  return true;
+}
+
 export function localLibraryItems(): LocalLibraryItem[] {
   const store = readStore();
   const out: LocalLibraryItem[] = [];

@@ -31,6 +31,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import LibrarySyncNote from './LibrarySyncNote';
+import ShareToggle from './ShareToggle';
+import ClassLibrary from './ClassLibrary';
 import {
   listSavedTextures,
   saveTexture,
@@ -1165,10 +1167,13 @@ export default function TextureEditor() {
                   >
                     delete
                   </button>
+                  <div><ShareToggle kind="texture" name={t.name} compact onMessage={(text, bad) => setMessage({ text, bad })} /></div>
                 </div>
               ))}
             </div>
           )}
+
+          <ClassLibrary kind="texture" onCopied={refreshSaved} onMessage={(text, bad) => setMessage({ text, bad })} />
 
           <div style={label}>Start from a built-in</div>
           <div style={{ fontSize: 10, opacity: 0.45, marginBottom: 9 }}>

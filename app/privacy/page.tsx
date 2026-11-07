@@ -35,7 +35,9 @@ export default function PrivacyPage() {
         </li>
         <li>
           <strong>Saved textures and sounds:</strong> the pixel art you save in the texture editor and the sounds you save
-          or import in the sound mixer, kept with your account so they reach your other devices. Only you can open them.
+          or import in the sound mixer, kept with your account so they reach your other devices. Only you can open them,
+          unless you press &ldquo;Share with class&rdquo; on one: then classmates and teachers in your classes can see and copy
+          it, shown with your first name and last initial. A teacher can hide or remove a shared item; your own copy stays.
           Signing out removes the copies that are already in your account from that browser.
         </li>
         <li>

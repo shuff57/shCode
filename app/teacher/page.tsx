@@ -15,6 +15,7 @@ import SolutionReleasePanel from '../../components/SolutionReleasePanel';
 import { moduleOptions, selectGradebookLessons } from '../../lib/gradebook-view';
 import { describeGrade, opensInCodeEditor, showLateBadge, stillFailingRequirements, submissionWasLate, verdictWord, type RequirementEventRow } from '../../lib/teacher-drawer';
 import MostMissedPanel from '../../components/MostMissedPanel';
+import ClassLibraryModeration from '../../components/ClassLibraryModeration';
 import PastDuePanel from '../../components/PastDuePanel';
 import { formatDue, schoolDateString } from '../../lib/due-dates-core';
 import { lessonHref } from '../../lib/lesson-href';
@@ -2673,6 +2674,11 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         <div style={S.card}>
           <h2 style={S.h2}>Bulk enroll</h2>
           <BulkEnrollmentForm classId={classId} onDone={() => { void loadDetail(); }} />
+        </div>
+        {/* Textures and sounds students shared with this class (#81) */}
+        <div style={S.card}>
+          <h2 style={S.h2}>Shared textures and sounds</h2>
+          <ClassLibraryModeration classId={classId} />
         </div>
         </div>
       )}

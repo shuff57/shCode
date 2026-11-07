@@ -543,8 +543,25 @@ app.prepare().catch((err) => {
       async get(k) { return libR2.has(k) ? { text: async () => libR2.get(k) } : null; },
       async delete(k) { libR2.delete(k); },
     };
+    // Share-with-class needs a class: every dev identity is a student of "Dev class"
+    // (DEV_ROLE=teacher makes it a co-teacher instead), so two `dev_student`
+    // cookies are two classmates.
+    const shareList = await import('./functions/api/library/shared/index.ts');
+    const shareOne = await import('./functions/api/library/shared/[id].ts');
+    const shareToggle = await import('./functions/api/library/[id]/share.ts');
+    const moderate = await import('./functions/api/classes/[id]/library-shares/index.ts');
+    libDb.sqlite.prepare(`INSERT OR IGNORE INTO classes (id, name, code, owner_email, school_year, created_at) VALUES ('devclass', 'Dev class', 'DEVDEV', 'owner@dev.local', '2026-2027', 0)`).run();
+    const ensureMember = (email) => {
+      if (DEV_ROLE === 'student') {
+        libDb.sqlite.prepare(`INSERT OR IGNORE INTO enrollments (class_id, student_email, enrolled_at, expires_at) VALUES ('devclass', ?, 0, 4102444800000)`).run(email);
+        libDb.sqlite.prepare(`INSERT OR IGNORE INTO students (email, password_hash, created_at, role, first_name, last_name) VALUES (?, 'x', 0, 'student', ?, 'Dev')`).run(email, email.split('@')[0]);
+      } else {
+        libDb.sqlite.prepare(`INSERT OR IGNORE INTO class_teachers (class_id, teacher_email, added_at) VALUES ('devclass', ?, 0)`).run(email);
+      }
+    };
     const libRoute = (handler) => async (req, res) => {
       const email = devIdentity(req);
+      ensureMember(email);
       const request = new Request(`http://localhost${req.originalUrl}`, {
         method: req.method,
         headers: { 'content-type': 'application/json' },
@@ -554,6 +571,11 @@ app.prepare().catch((err) => {
       res.status(out.status).type('application/json').send(await out.text());
     };
     server.get('/api/library', libRoute(libList.onRequestGet));
+    server.get('/api/library/shared', libRoute(shareList.onRequestGet));
+    server.get('/api/library/shared/:id', libRoute(shareOne.onRequestGet));
+    server.post('/api/library/:id/share', express.json(), libRoute(shareToggle.onRequestPost));
+    server.get('/api/classes/:id/library-shares', libRoute(moderate.onRequestGet));
+    server.post('/api/classes/:id/library-shares', express.json(), libRoute(moderate.onRequestPost));
     server.put('/api/library', express.json({ limit: '1mb' }), libRoute(libList.onRequestPut));
     server.get('/api/library/:id', libRoute(libOne.onRequestGet));
     server.delete('/api/library/:id', libRoute(libOne.onRequestDelete));
