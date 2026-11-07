@@ -1,0 +1,135 @@
+{
+  "id": "6-24-trail-3-lab-jump-slide-and-wait",
+  "title": "6.24.3 Lab: Jump, slide and wait",
+  "description": "The letters on the board come alive: J jumps ahead 3, S slides back 3, and W makes a player miss a turn.",
+  "type": "lesson",
+  "estimateMins": 15,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.24 Trail: squares that do something",
+  "preview": "moshion",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "This is your race from 6.23.3. The coloured squares do nothing yet, and they show no letter."
+    },
+    {
+      "id": "s2",
+      "title": "Show the letters",
+      "instructions": "In `drawBoard()`, after each square's `rect`, write its letter on it when it is not a plain `.`: `if (s.kind !== '.') text(s.kind, s.x - 5, s.y + 6, 16, 'white');`."
+    },
+    {
+      "id": "s3",
+      "title": "Jump and slide",
+      "instructions": "In `takeTurn`, after the move, read `const kind = path[p.at].kind;`. On a `'J'`, `p.at = min(p.at + 3, last)`; on an `'S'`, `p.at = max(p.at - 3, 0)`. Add to the message so the players can see what happened: `message += ', jumped ahead 3';`.",
+      "hints": [
+        "Check the win AFTER the letters: a J near the end can carry a token onto the last square.",
+        "If you brought your 6.23.3 work forward, your player variable may not be called `p`; use yours."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Wait a turn",
+      "instructions": "Give every player `waiting: false` in `newGame()`. On a `'W'`, set `p.waiting = true`. In `nextTurn()`, after the turn passes, if `players[turn].waiting` is true, set it back to false and pass the turn once more.",
+      "hints": [
+        "Forget to clear the flag and that player never plays again.",
+        "Play until someone lands on square 12 or 24, and watch the other player roll twice in a row."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "J jumps ahead 3",
+      "description": "Landing on a J moves the player 3 squares on. Help: 6.24.1 (Reading: The square decides)",
+      "hint": "if (kind === 'J') p.at = min(p.at + 3, last);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "[\\'\"]J[\\'\"][\\s\\S]{0,150}?(?:\\+\\s*3\\b|\\+=\\s*3\\b|\\+\\s*[A-Z_]{2,}\\b)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": false
+    },
+    {
+      "id": "r2",
+      "title": "S slides back 3",
+      "description": "Landing on an S moves the player 3 squares back, never below 0. Help: 6.24.1 (Reading: The square decides)",
+      "hint": "if (kind === 'S') p.at = max(p.at - 3, 0);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "[\\'\"]S[\\'\"][\\s\\S]{0,150}?(?:-\\s*3\\b|-=\\s*3\\b|-\\s*[A-Z_]{2,}\\b)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": false
+    },
+    {
+      "id": "r3",
+      "title": "W sets a flag",
+      "description": "Landing on a W marks the player as waiting. Help: 6.24.1 (Reading: The square decides)",
+      "hint": "if (kind === 'W') p.waiting = true;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "[\\'\"]W[\\'\"][\\s\\S]{0,150}?(?:=\\s*(?:true|1)\\b|\\+=\\s*1\\b|\\+\\+)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": false
+    },
+    {
+      "id": "r4",
+      "title": "A waiting player is skipped once",
+      "description": "When the turn passes to a waiting player, the flag is cleared and the turn passes again. Help: 6.24.1 (Reading: The square decides)",
+      "hint": "if (players[turn].waiting) { players[turn].waiting = false; turn = (turn + 1) % players.length; }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\bif\\s*\\(+[^)]*?\\.\\s*([\\w$]+)[\\s)]*(?:(?:===?\\s*true|>\\s*0)[\\s)]*)?\\{?[\\s\\S]{0,200}?\\.\\s*\\1\\s*(?:=\\s*(?:false|0)\\b|-=\\s*1\\b|--)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Jump, slide and wait\". The task: after each move, read the letter of the square the player landed on: J moves them 3 ahead (not past the end), S moves them 3 back (not below 0), and W sets a waiting flag; when the turn passes to a waiting player, clear the flag and pass the turn again. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "J jumps",
+        "description": "J moves 3 squares on.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "S slides",
+        "description": "S moves 3 squares back.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "W flags",
+        "description": "W marks the player as waiting.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The wait is used up",
+        "description": "A waiting player is skipped once and the flag is cleared.",
+        "points": 1
+      }
+    ]
+  },
+  "carryFrom": "6-23-trail-3-lab-take-turns-to-the-finish"
+}

@@ -10180,6 +10180,45 @@
       "scoreKind": null
     },
     {
+      "id": "6-24-trail-1-reading-the-square-decides",
+      "title": "6.24.1 Reading: The square decides",
+      "unit": "6.24 Trail: squares that do something",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 17,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "6-24-trail-2-sub-a-square-that-does-something",
+      "title": "6.24.2 Sub-build: A square that does something",
+      "unit": "6.24 Trail: squares that do something",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 17,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "6-24-trail-3-lab-jump-slide-and-wait",
+      "title": "6.24.3 Lab: Jump, slide and wait",
+      "unit": "6.24 Trail: squares that do something",
+      "preview": "moshion",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 17,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "6-3-1-slides",
       "title": "6.8.1 Slides: Physics Applications",
       "unit": "6.8 Physics Applications",

@@ -1,0 +1,16 @@
+{
+  "moduleId": "6.24",
+  "source": "Trail chain module, one day.",
+  "lessons": [
+    {
+      "id": "trail-squares-that-do-something",
+      "title": "squares that do something",
+      "objective": "After the move, the letter of the square decides what happens, and a wait is a flag checked when the turn passes.",
+      "screens": [
+        "6-24-trail-1-reading-the-square-decides",
+        "6-24-trail-2-sub-a-square-that-does-something",
+        "6-24-trail-3-lab-jump-slide-and-wait"
+      ]
+    }
+  ]
+}

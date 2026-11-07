@@ -1,0 +1,108 @@
+{
+  "id": "6-24-trail-2-sub-a-square-that-does-something",
+  "title": "6.24.2 Sub-build: A square that does something",
+  "description": "Six squares, two letters, one token. After each step, the letter under the token decides what happens.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.24 Trail: squares that do something",
+  "preview": "moshion",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Run it",
+      "instructions": "SPACE steps the token one square at a time, and the J and the S do nothing."
+    },
+    {
+      "id": "s2",
+      "title": "Jump on a J",
+      "instructions": "After `at += 1`, read the letter under the token: `ROW[at]`. If it is `'J'`, move ahead 2 with `at = min(at + 2, ROW.length - 1)` and set `note` to say so. From square 0, one SPACE should land on the J and carry on to square 3.",
+      "hints": [
+        "`ROW[at]` is the letter the token is standing on, like `path[p.at].kind` in the reading."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Slide on an S",
+      "instructions": "If the letter is `'S'`, send the token back to the start: `at = 0`. Step onto square 4 and watch it go back.",
+      "hints": [
+        "`else if` makes it clear that only one letter can match."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "Reads the letter under the token",
+      "description": "The code reads the letter at the token's square. Help: 6.24.1 (Reading: The square decides)",
+      "hint": "if (ROW[at] === 'J') { ... }",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "\\[\\s*\\(?\\s*at\\s*\\)?\\s*\\]|\\.\\s*charAt\\s*\\(\\s*at\\b",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r2",
+      "title": "J moves ahead",
+      "description": "Landing on a J moves the token forward. Help: 6.24.1 (Reading: The square decides)",
+      "hint": "at = min(at + 2, ROW.length - 1);",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "[\\'\"]J[\\'\"][\\s\\S]{0,150}?\\bat\\s*(?:\\+=|=\\s*(?:min\\s*\\(\\s*)?\\(?\\s*at\\s*\\+)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": false
+    },
+    {
+      "id": "r3",
+      "title": "S moves back",
+      "description": "Landing on an S moves the token back. Help: 6.24.1 (Reading: The square decides)",
+      "hint": "at = 0;",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "[\\'\"]S[\\'\"][\\s\\S]{0,150}?\\bat\\s*(?:-=|=\\s*(?:0\\b|(?:max\\s*\\(\\s*)?\\(?\\s*at\\s*-))",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": false
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "aiCheck": {
+    "file": "script.js",
+    "rubricTitle": "What the AI read in your code",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: A square that does something\". The task: after each step, read the letter of the square under the token; on J move ahead 2 (staying on the row), on S go back to the start. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Reads the square",
+        "description": "The letter at the token is checked after the step.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "J goes ahead",
+        "description": "Landing on J moves forward.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "S goes back",
+        "description": "Landing on S moves back.",
+        "points": 1
+      }
+    ]
+  }
+}

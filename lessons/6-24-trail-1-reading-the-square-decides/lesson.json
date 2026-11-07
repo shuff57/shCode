@@ -1,0 +1,19 @@
+{
+  "id": "6-24-trail-1-reading-the-square-decides",
+  "title": "6.24.1 Reading: The square decides",
+  "description": "After the move, read the letter of the square you landed on and let an if per letter decide: jump ahead, slide back, or wait a turn with a flag.",
+  "type": "lesson",
+  "estimateMins": 10,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.24 Trail: squares that do something",
+  "preview": "reading",
+  "week": 17,
+  "slos": [
+    "SLO-3"
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

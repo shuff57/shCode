@@ -10251,6 +10251,60 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
+  "6-24-trail-2-sub-a-square-that-does-something": {
+    "lessonTitle": "6.24.2 Sub-build: A square that does something",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: A square that does something\". The task: after each step, read the letter of the square under the token; on J move ahead 2 (staying on the row), on S go back to the start. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "Reads the square",
+        "description": "The letter at the token is checked after the step.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "J goes ahead",
+        "description": "Landing on J moves forward.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "S goes back",
+        "description": "Landing on S moves back.",
+        "points": 1
+      }
+    ]
+  },
+  "6-24-trail-3-lab-jump-slide-and-wait": {
+    "lessonTitle": "6.24.3 Lab: Jump, slide and wait",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Jump, slide and wait\". The task: after each move, read the letter of the square the player landed on: J moves them 3 ahead (not past the end), S moves them 3 back (not below 0), and W sets a waiting flag; when the turn passes to a waiting player, clear the flag and pass the turn again. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "rubric": [
+      {
+        "id": "r1",
+        "title": "J jumps",
+        "description": "J moves 3 squares on.",
+        "points": 1
+      },
+      {
+        "id": "r2",
+        "title": "S slides",
+        "description": "S moves 3 squares back.",
+        "points": 1
+      },
+      {
+        "id": "r3",
+        "title": "W flags",
+        "description": "W marks the player as waiting.",
+        "points": 1
+      },
+      {
+        "id": "r4",
+        "title": "The wait is used up",
+        "description": "A waiting player is skipped once and the flag is cleared.",
+        "points": 1
+      }
+    ]
+  },
   "6-3-pocket-2-sub-slow-to-a-stop": {
     "lessonTitle": "6.3.2 Sub-build: Slow to a stop",
     "prompt": "The student wrote a moSHion sketch for \"Sub-build: Slow to a stop\". The task: give the ball drag and call it stopped when its speed falls under a small number, setting the speed to 0. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
