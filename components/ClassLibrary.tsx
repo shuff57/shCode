@@ -20,10 +20,14 @@ interface SharedItem {
   hidden: boolean;
 }
 
-export default function ClassLibrary({ kind, onCopied, onMessage }: {
+export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, title }: {
   kind: LibraryKind;
   onCopied?: () => void;
   onMessage?: (text: string, bad: boolean) => void;
+  /** How many items loaded (null: signed out or unreachable), for a panel's empty state. */
+  onLoaded?: (count: number | null) => void;
+  /** Heading instead of "From your class (N)". */
+  title?: string;
 }) {
   const [items, setItems] = useState<SharedItem[] | null>(null);
   const [art, setArt] = useState<Record<string, { dataUri: string; meta: string | null }>>({});
@@ -31,11 +35,16 @@ export default function ClassLibrary({ kind, onCopied, onMessage }: {
   const load = useCallback(async () => {
     try {
       const res = await fetch(`/api/library/shared?kind=${kind}`, { credentials: 'same-origin' });
-      if (!res.ok) { setItems(null); return; }
-      setItems(((await res.json()) as { items: SharedItem[] }).items);
+      if (!res.ok) { setItems(null); onLoaded?.(null); return; }
+      const list = ((await res.json()) as { items: SharedItem[] }).items;
+      setItems(list);
+      onLoaded?.(list.length);
     } catch {
       setItems(null);
+      onLoaded?.(null);
     }
+    // onLoaded is a callback from the parent; reloading on its identity would loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [kind]);
   useEffect(() => {
     void load();
@@ -81,7 +90,7 @@ export default function ClassLibrary({ kind, onCopied, onMessage }: {
   return (
     <div style={{ marginTop: 12 }}>
       <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--c-dim)', marginBottom: 6 }}>
-        From your class ({items.length})
+        {title ?? 'From your class'} ({items.length})
       </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         {items.map((it) => (

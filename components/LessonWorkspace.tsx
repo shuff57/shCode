@@ -43,6 +43,7 @@ import CarryForwardBanner from './CarryForwardBanner';
 import DocsDrawer from './DocsDrawer';
 import TextureEditor from './TextureEditor';
 import SoundMixer from './SoundMixer';
+import ClassLibraryPanel from './ClassLibraryPanel';
 import AiHelpPanel from './AiHelpPanel';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import SolutionPanel from './SolutionPanel';
@@ -1199,6 +1200,18 @@ export default function LessonWorkspace({
                       rel="noopener noreferrer"
                       className="btn-secondary btn-sm"
                     >
+                      Full page ↗
+                    </a>
+                  ),
+                },
+                // What classmates shared (#81), with Copy to mine.
+                {
+                  key: 'class',
+                  label: 'Class',
+                  color: 'var(--c-yellow)',
+                  content: <ClassLibraryPanel />,
+                  headerExtra: (
+                    <a href="/library" target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
                       Full page ↗
                     </a>
                   ),

@@ -16,6 +16,7 @@ import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import AiHelpPanel from './AiHelpPanel';
 import TextureEditor from './TextureEditor';
 import SoundMixer from './SoundMixer';
+import ClassLibraryPanel from './ClassLibraryPanel';
 import DocsDrawer from './DocsDrawer';
 import { RUN_TIMEOUT_MS, errorWithLocation, runStudentCode } from '../lib/js-runner-source';
 import {
@@ -490,6 +491,18 @@ export default function SandboxWorkspace() {
           content: <SoundMixer />,
           headerExtra: (
             <a href="/sound" target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
+              Full page ↗
+            </a>
+          ),
+        } as DrawerTab,
+        // What classmates shared (#81), with Copy to mine.
+        {
+          key: 'class',
+          label: 'Class',
+          color: 'var(--c-yellow)',
+          content: <ClassLibraryPanel />,
+          headerExtra: (
+            <a href="/library" target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
               Full page ↗
             </a>
           ),
