@@ -4,7 +4,7 @@
 // host closes their oldest. Rooms a day past expiry are swept here.
 
 import {
-  GAME_RE, MAX_OPEN_ROOMS_PER_HOST, MAX_SEATS, ROOM_TTL_MS, json, liveClassIds, newRoomCode,
+  GAME_RE, MAX_OPEN_ROOMS_PER_HOST, MAX_SEATS, ROOM_TTL_MS, deviceOf, json, liveClassIds, newRoomCode,
 } from '../../_shared/rooms';
 
 interface Env { DB: D1Database }
@@ -12,7 +12,7 @@ type SessionData = { email: string; role: 'admin' | 'teacher' | 'student' };
 type Ctx = EventContext<Env, string, SessionData>;
 
 export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ env, data, request }: Ctx) => {
-  let body: { game?: unknown; seats?: unknown };
+  let body: { game?: unknown; seats?: unknown; device?: unknown };
   try { body = await request.json(); } catch { return json({ error: 'Invalid JSON body' }, 400); }
   const game = String(body?.game ?? 'game').toLowerCase();
   if (!GAME_RE.test(game)) return json({ error: 'The game name can use lowercase letters, digits and dashes (up to 24).' }, 400);
@@ -51,7 +51,8 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ e
         env.DB.prepare(
           'INSERT INTO game_rooms (code, game, host_email, seats, created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?)',
         ).bind(code, game, data.email, seats, now, now + ROOM_TTL_MS),
-        env.DB.prepare('INSERT INTO game_room_players (code, seat, email, joined_at) VALUES (?, 0, ?, ?)').bind(code, data.email, now),
+        env.DB.prepare('INSERT INTO game_room_players (code, seat, email, device, joined_at) VALUES (?, 0, ?, ?, ?)')
+          .bind(code, data.email, deviceOf(body?.device), now),
       ]);
       return json({ code, seat: 0, seats, game, expiresAt: now + ROOM_TTL_MS }, 201);
     } catch (e) {

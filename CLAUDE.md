@@ -525,6 +525,8 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   same as a missing code), **game data only** (`checkGameData`: numbers, booleans, strings of at most 20 characters,
   1 KB, so it cannot be a chat; decided by the course owner 2026-11-07), 2-4 seats, 3-hour rooms, 30 moves per 10 s
   per player, 3 open rooms per host, the host leaving closes the room. Names are first name + last initial.
+  A seat is an account in one browser TAB (`device`, a random id per tab in sessionStorage): a rerun in the same tab
+  keeps the seat, a second tab of the same account takes the next one, so a student can test two-player play alone.
   Routes: `POST /api/rooms`, `GET /api/rooms/[code]?after=N`, `POST .../join|send|leave`. Tests:
   `scripts/test-rooms.mjs`. In dev, two `dev_student` cookies are two classmates.
 

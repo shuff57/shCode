@@ -18,6 +18,13 @@ const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 export const CODE_RE = /^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{6}$/;
 export const GAME_RE = /^[a-z0-9][a-z0-9-]{0,23}$/;
 const KEY_RE = /^[A-Za-z_][A-Za-z0-9_]{0,19}$/;
+const DEVICE_RE = /^[a-z0-9]{8,32}$/;
+
+/** The browser tab a request comes from ('' when it does not say). */
+export function deviceOf(raw: unknown): string {
+  const d = String(raw ?? '');
+  return DEVICE_RE.test(d) ? d : '';
+}
 
 export type Role = 'admin' | 'teacher' | 'student';
 
@@ -104,11 +111,11 @@ export function roomState(room: RoomRow, playerCount: number, now = Date.now()):
   return playerCount >= room.seats ? 'ready' : 'waiting';
 }
 
-export interface PlayerRow { seat: number; email: string; left_at: number | null; first_name: string | null; last_name: string | null }
+export interface PlayerRow { seat: number; email: string; device: string; left_at: number | null; first_name: string | null; last_name: string | null }
 
 export async function roomPlayers(db: D1Database, code: string): Promise<PlayerRow[]> {
   const r = await db.prepare(
-    `SELECT p.seat, p.email, p.left_at, s.first_name, s.last_name
+    `SELECT p.seat, p.email, p.device, p.left_at, s.first_name, s.last_name
        FROM game_room_players p LEFT JOIN students s ON s.email = p.email
       WHERE p.code = ? ORDER BY p.seat`,
   ).bind(code).all<PlayerRow>();

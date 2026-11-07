@@ -151,6 +151,33 @@ check('closed room refuses moves 410', r.status === 410, r);
 r = await joinRoom(CY, code);
 check('closed room refuses joins 410', r.status === 410, r);
 
+// ---- one student, two tabs (a seat is an account in a tab) ----
+{
+  const tabA = 'aaaaaaaa1111', tabB = 'bbbbbbbb2222';
+  const hostT = (u, dev) => call(create, 'onRequestPost', u, 'POST', '/api/rooms', {}, { game: 'race', seats: 2, device: dev });
+  const joinT = (u, c, dev) => call(joinR, 'onRequestPost', u, 'POST', `/api/rooms/${c}/join`, { code: c }, { device: dev });
+  const sendT = (u, c, dev, d) => call(sendR, 'onRequestPost', u, 'POST', `/api/rooms/${c}/send`, { code: c }, { data: d, device: dev });
+  const pollT = (u, c, dev) => call(pollR, 'onRequestGet', u, 'GET', `/api/rooms/${c}?after=0&device=${dev}`, { code: c });
+  let t = await hostT(CY, tabA);
+  const c3 = t.body.code;
+  t = await joinT(CY, c3, tabA);
+  check('same tab rejoins its own seat 0', t.status === 200 && t.body.seat === 0, t);
+  t = await joinT(CY, c3, tabB);
+  check('second tab of the same account takes seat 1', t.status === 200 && t.body.seat === 1, t);
+  t = await sendT(CY, c3, tabB, { n: 7 });
+  check('second tab sends as seat 1', t.status === 200, t);
+  t = await pollT(CY, c3, tabA);
+  check('first tab sees seat 1 move, room ready', t.body.state === 'ready' && t.body.mySeat === 0 && t.body.events[0].seat === 1, t.body);
+  t = await sendT(BO, c3, tabB, { n: 1 });
+  check("a classmate cannot send as someone else's tab", t.status === 404, t);
+  t = await call(leaveR, 'onRequestPost', CY, 'POST', `/api/rooms/${c3}/leave`, { code: c3 }, { device: tabB });
+  t = await pollT(CY, c3, tabA);
+  check('guest tab leaving does not close the room', t.body.state === 'waiting', t.body);
+  t = await call(leaveR, 'onRequestPost', CY, 'POST', `/api/rooms/${c3}/leave`, { code: c3 }, { device: tabA });
+  t = await pollT(CY, c3, tabA);
+  check('host tab leaving closes it', t.body.state === 'closed', t.body);
+}
+
 // ---- open-room cap and sweep ----
 for (let i = 0; i < 4; i++) await host(BO);
 const openRooms = db.sqlite.prepare(`SELECT COUNT(*) AS n FROM game_rooms WHERE host_email = 'bo@s.test' AND closed_at IS NULL`).get().n;

@@ -3,7 +3,7 @@
 // Answers { seq }. Rate limited per player; a room holds MAX_EVENTS_PER_ROOM.
 
 import {
-  MAX_EVENTS_PER_ROOM, RATE_LIMIT, RATE_WINDOW_MS, checkGameData, getRoom, json, normalizeCode,
+  MAX_EVENTS_PER_ROOM, RATE_LIMIT, RATE_WINDOW_MS, checkGameData, deviceOf, getRoom, json, normalizeCode,
 } from '../../../_shared/rooms';
 
 interface Env { DB: D1Database }
@@ -15,7 +15,7 @@ export const onRequestPost: PagesFunction<Env, 'code', SessionData> = async ({ e
   if (!code) return json({ error: 'A room code is 6 letters and digits.' }, 400);
   const text = await request.text();
   if (text.length > 4096) return json({ error: 'That move is too big.' }, 413);
-  let body: { data?: unknown };
+  let body: { data?: unknown; device?: unknown };
   try { body = JSON.parse(text); } catch { return json({ error: 'Invalid JSON body' }, 400); }
   if (!body || !('data' in body)) return json({ error: 'Nothing to send.' }, 400);
   const problem = checkGameData(body.data);
@@ -24,8 +24,8 @@ export const onRequestPost: PagesFunction<Env, 'code', SessionData> = async ({ e
   const now = Date.now();
   const room = await getRoom(env.DB, code);
   const me = room
-    ? await env.DB.prepare('SELECT seat, left_at FROM game_room_players WHERE code = ? AND email = ?')
-        .bind(code, data.email).first<{ seat: number; left_at: number | null }>()
+    ? await env.DB.prepare('SELECT seat, left_at FROM game_room_players WHERE code = ? AND email = ? AND device = ?')
+        .bind(code, data.email, deviceOf(body.device)).first<{ seat: number; left_at: number | null }>()
     : null;
   if (!room || !me || me.left_at) return json({ error: 'You are not in that room.' }, 404);
   if (room.closed_at || room.expires_at <= now) return json({ error: 'That room has closed.' }, 410);

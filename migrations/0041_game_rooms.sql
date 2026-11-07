@@ -28,10 +28,15 @@ CREATE TABLE IF NOT EXISTS game_room_players (
   code       TEXT    NOT NULL,
   seat       INTEGER NOT NULL,
   email      TEXT    NOT NULL,
+  -- One browser tab (lib/moshion-online.ts keeps a random id per tab in
+  -- sessionStorage). A seat belongs to an account in a tab: rerunning the
+  -- sketch keeps it, and a second tab takes the next seat, so a student can
+  -- test a two-player game alone.
+  device     TEXT    NOT NULL DEFAULT '',
   joined_at  INTEGER NOT NULL,
   left_at    INTEGER,
   PRIMARY KEY (code, seat),
-  UNIQUE (code, email)
+  UNIQUE (code, email, device)
 );
 
 CREATE TABLE IF NOT EXISTS game_room_events (

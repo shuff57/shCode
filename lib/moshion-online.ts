@@ -20,6 +20,21 @@
 import { useEffect, type RefObject } from 'react';
 
 const POLL_MS = 1000;
+const DEVICE_KEY = 'shcode.online.device';
+
+/** A random id for this browser tab: a seat is an account in one tab (functions/api/rooms). */
+function deviceId(): string {
+  try {
+    let d = sessionStorage.getItem(DEVICE_KEY);
+    if (!d || !/^[a-z0-9]{8,32}$/.test(d)) {
+      d = Array.from(crypto.getRandomValues(new Uint8Array(12)), (n) => (n % 36).toString(36)).join('');
+      sessionStorage.setItem(DEVICE_KEY, d);
+    }
+    return d;
+  } catch {
+    return '';
+  }
+}
 const POLL_HIDDEN_MS = 4000;
 
 type Reply = { ok: true; result?: unknown } | { ok: false; error: string };
@@ -49,6 +64,7 @@ export function useMoshionOnline(ref: RefObject<HTMLIFrameElement | null>): void
     let polling = false;
     let session = 0; // bumps on every host/join/leave/rerun, so a stale poll is dropped
     let run: string | null = null; // the sketch run being served
+    const device = deviceId();
 
     const post = (msg: Record<string, unknown>) => {
       try { ref.current?.contentWindow?.postMessage({ ...msg, run }, '*'); } catch { /* frame gone */ }
@@ -72,7 +88,7 @@ export function useMoshionOnline(ref: RefObject<HTMLIFrameElement | null>): void
       polling = true;
       const mine = session;
       try {
-        const r = await api('GET', `/api/rooms/${code}?after=${after}`);
+        const r = await api('GET', `/api/rooms/${code}?after=${after}&device=${device}`);
         if (mine !== session) return;
         if (r.status !== 200) {
           post({ source: 'preview-online-update', code, state: r.status === 404 || r.status === 410 ? 'closed' : 'error', error: errorOf(r), events: [] });
@@ -95,7 +111,7 @@ export function useMoshionOnline(ref: RefObject<HTMLIFrameElement | null>): void
     async function handle(op: string, d: Record<string, unknown>): Promise<Reply> {
       if (op === 'host') {
         stop();
-        const r = await api('POST', '/api/rooms', { game: d.game, seats: d.seats });
+        const r = await api('POST', '/api/rooms', { game: d.game, seats: d.seats, device });
         if (r.status !== 201) return { ok: false, error: errorOf(r) };
         code = String(r.body.code);
         void poll();
@@ -104,7 +120,7 @@ export function useMoshionOnline(ref: RefObject<HTMLIFrameElement | null>): void
       if (op === 'join') {
         stop();
         const want = String(d.code ?? '').toUpperCase().replace(/[\s-]/g, '');
-        const r = await api('POST', `/api/rooms/${encodeURIComponent(want)}/join`);
+        const r = await api('POST', `/api/rooms/${encodeURIComponent(want)}/join`, { device });
         if (r.status !== 200) return { ok: false, error: errorOf(r) };
         code = String(r.body.code);
         void poll();
@@ -112,7 +128,7 @@ export function useMoshionOnline(ref: RefObject<HTMLIFrameElement | null>): void
       }
       if (op === 'send') {
         if (!code) return { ok: false, error: 'Not in a room yet: call online.host() or online.join(code) first.' };
-        const r = await api('POST', `/api/rooms/${code}/send`, { data: d.data });
+        const r = await api('POST', `/api/rooms/${code}/send`, { data: d.data, device });
         if (r.status !== 200) return { ok: false, error: errorOf(r) };
         if (!polling) { if (timer) clearTimeout(timer); void poll(); }
         return { ok: true, result: r.body };
@@ -120,7 +136,7 @@ export function useMoshionOnline(ref: RefObject<HTMLIFrameElement | null>): void
       if (op === 'leave') {
         const was = code;
         stop();
-        if (was) await api('POST', `/api/rooms/${was}/leave`).catch(() => {});
+        if (was) await api('POST', `/api/rooms/${was}/leave`, { device }).catch(() => {});
         return { ok: true };
       }
       return { ok: false, error: `Unknown online request "${op}".` };
