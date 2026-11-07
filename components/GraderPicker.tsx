@@ -97,7 +97,7 @@ export default function GraderPicker({ graders, value, onChange, disabled, cloud
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
       <label
         htmlFor="grader-picker"
-        style={{ fontSize: 13, color: '#aaa', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+        style={{ fontSize: 13, color: 'var(--x-aaaaaa)', display: 'inline-flex', alignItems: 'center', gap: 6 }}
       >
         <Icon size={14} color="#6272a4" />
         Graded by
@@ -108,9 +108,9 @@ export default function GraderPicker({ graders, value, onChange, disabled, cloud
         disabled={disabled}
         onChange={(e) => onChange(e.target.value as GraderId)}
         style={{
-          background: '#282a36',
-          color: '#f8f8f2',
-          border: '1px solid #44475a',
+          background: 'var(--c-bg)',
+          color: 'var(--c-fg)',
+          border: '1px solid var(--c-line)',
           borderRadius: 6,
           padding: '6px 10px',
           fontSize: 13,
@@ -130,7 +130,7 @@ export default function GraderPicker({ graders, value, onChange, disabled, cloud
         ))}
       </select>
       {selected?.description ? (
-        <span style={{ color: '#6272a4', fontSize: 12 }}>{selected.description}</span>
+        <span style={{ color: 'var(--c-comment)', fontSize: 12 }}>{selected.description}</span>
       ) : null}
     </div>
   );

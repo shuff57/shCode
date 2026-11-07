@@ -165,8 +165,8 @@ export default function DiagramHintPanel({ lessonId, lessonTitle, unit, task, do
       style={{
         marginTop: 16,
         padding: '12px 14px',
-        background: '#282a36',
-        border: '1px solid #ffb86c55',
+        background: 'var(--c-bg)',
+        border: '1px solid color-mix(in srgb, var(--c-orange) 33.3333%, transparent)',
         borderRadius: 6,
       }}
     >
@@ -175,7 +175,7 @@ export default function DiagramHintPanel({ lessonId, lessonTitle, unit, task, do
           display: 'flex',
           alignItems: 'center',
           gap: 6,
-          color: '#ffb86c',
+          color: 'var(--c-orange)',
           fontWeight: 600,
           fontSize: 13.5,
           marginBottom: 4,
@@ -190,7 +190,7 @@ export default function DiagramHintPanel({ lessonId, lessonTitle, unit, task, do
             marginLeft: 'auto',
             background: 'transparent',
             border: 'none',
-            color: '#6272a4',
+            color: 'var(--c-comment)',
             cursor: 'pointer',
             fontSize: 12,
           }}
@@ -199,12 +199,12 @@ export default function DiagramHintPanel({ lessonId, lessonTitle, unit, task, do
         </button>
       </div>
 
-      <p style={{ margin: '0 0 10px', color: '#8892b0', fontSize: 12.5, lineHeight: 1.5 }}>
+      <p style={{ margin: '0 0 10px', color: 'var(--x-8892b0)', fontSize: 12.5, lineHeight: 1.5 }}>
         This nudges you toward the right shape. It will not draw the chart for you.
       </p>
 
       {!authed ? (
-        <p style={{ margin: 0, color: '#ffb86c', fontSize: 12.5 }}>Sign in to ask for a hint.</p>
+        <p style={{ margin: 0, color: 'var(--c-orange)', fontSize: 12.5 }}>Sign in to ask for a hint.</p>
       ) : (
         <>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 10 }}>
@@ -251,9 +251,9 @@ export default function DiagramHintPanel({ lessonId, lessonTitle, unit, task, do
             rows={2}
             style={{
               width: '100%',
-              background: '#1e1f29',
-              color: '#f8f8f2',
-              border: '1px solid #44475a',
+              background: 'var(--c-deep)',
+              color: 'var(--c-fg)',
+              border: '1px solid var(--c-line)',
               borderRadius: 4,
               padding: '6px 8px',
               fontSize: 12.5,
@@ -279,9 +279,9 @@ export default function DiagramHintPanel({ lessonId, lessonTitle, unit, task, do
             <div
               style={{
                 marginTop: 10,
-                background: '#4a2a2a',
-                border: '1px solid #ff5555',
-                color: '#ffd6d6',
+                background: 'var(--x-4a2a2a)',
+                border: '1px solid var(--c-red)',
+                color: 'var(--x-ffd6d6)',
                 padding: '6px 8px',
                 borderRadius: 4,
                 fontSize: 12.5,
@@ -296,7 +296,7 @@ export default function DiagramHintPanel({ lessonId, lessonTitle, unit, task, do
               style={{
                 marginTop: 6,
                 fontSize: 11,
-                color: quota.remaining <= 2 ? '#ffb86c' : '#6272a4',
+                color: quota.remaining <= 2 ? 'var(--c-orange)' : 'var(--c-comment)',
                 textAlign: 'right',
               }}
             >
@@ -325,11 +325,11 @@ function hintButton(disabled: boolean): React.CSSProperties {
   return {
     padding: '8px 14px',
     borderRadius: 6,
-    border: '1px solid #ffb86c',
+    border: '1px solid var(--c-orange)',
     fontWeight: 600,
     cursor: disabled ? 'not-allowed' : 'pointer',
     background: 'transparent',
-    color: '#ffb86c',
+    color: 'var(--c-orange)',
     opacity: disabled ? 0.6 : 1,
     display: 'inline-flex',
     alignItems: 'center',
@@ -343,8 +343,8 @@ function smallButton(disabled: boolean): React.CSSProperties {
     display: 'inline-flex',
     alignItems: 'center',
     gap: 5,
-    background: disabled ? '#44475a' : '#ffb86c',
-    color: disabled ? '#6272a4' : '#282a36',
+    background: disabled ? 'var(--c-line)' : 'var(--c-orange)',
+    color: disabled ? 'var(--c-comment)' : 'var(--c-bg)',
     border: 'none',
     borderRadius: 4,
     padding: '6px 12px',
@@ -359,8 +359,8 @@ const stopButton: React.CSSProperties = {
   alignItems: 'center',
   gap: 5,
   background: 'transparent',
-  color: '#ff5555',
-  border: '1px solid #ff5555',
+  color: 'var(--c-red)',
+  border: '1px solid var(--c-red)',
   borderRadius: 4,
   padding: '6px 10px',
   fontSize: 12.5,

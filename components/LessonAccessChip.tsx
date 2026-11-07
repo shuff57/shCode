@@ -32,7 +32,7 @@ const C = {
   text: '#f8f8f2',
   accent: '#50fa7b',
   late: '#f1fa8c',
-  border: '#44475a',
+  border: 'var(--c-line)',
   bg: '#282a36',
   raised: '#343746',
 };
@@ -243,7 +243,7 @@ export default function LessonAccessChip({ classId, lessonId, lessonTitle, kind 
             </div>
             <div style={{ overflowY: 'auto', padding: '4px 0' }}>
               {loading && <div style={{ padding: '10px 12px', color: C.dim }}>Loading…</div>}
-              {error && <div style={{ padding: '10px 12px', color: '#ff5555' }}>{error}</div>}
+              {error && <div style={{ padding: '10px 12px', color: 'var(--c-red)' }}>{error}</div>}
               {!loading && roster !== null && roster.length === 0 && (
                 <div style={{ padding: '10px 12px', color: C.dim }}>No students enrolled.</div>
               )}

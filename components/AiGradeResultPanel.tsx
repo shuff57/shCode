@@ -46,24 +46,24 @@ export default function AiGradeResultPanel({ title, titles, result, grading, sta
   return (
     <section data-testid="ai-grade-panel" style={{ margin: '18px 0' }}>
       {grading ? (
-        <p role="status" style={{ color: '#bd93f9', fontSize: 14 }}>
+        <p role="status" style={{ color: 'var(--c-purple)', fontSize: 14 }}>
           Grading your file{stage ? ` (${stage})` : ''}. This takes a few seconds.
         </p>
       ) : null}
       {error ? (
-        <div style={{ padding: 12, background: '#4a2a2a', border: '1px solid #ff5555', borderRadius: 6, color: '#ffd6d6', fontSize: 13 }}>
-          <strong style={{ color: '#ff5555' }}>Could not grade</strong>
+        <div style={{ padding: 12, background: 'var(--x-4a2a2a)', border: '1px solid var(--c-red)', borderRadius: 6, color: 'var(--x-ffd6d6)', fontSize: 13 }}>
+          <strong style={{ color: 'var(--c-red)' }}>Could not grade</strong>
           <p style={{ margin: '4px 0 0' }}>{error} That did not use up a try.</p>
         </div>
       ) : null}
       {result ? (
         <div>
-          <h3 style={{ fontSize: 14, color: '#bd93f9', margin: '0 0 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <h3 style={{ fontSize: 14, color: 'var(--c-purple)', margin: '0 0 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
             <Sparkles size={16} />
             {title}
           </h3>
           {result.summary ? (
-            <div style={{ marginBottom: 12, padding: 12, borderLeft: '3px solid #bd93f9', background: 'rgba(189,147,249,0.08)', borderRadius: 4, color: '#f8f8f2', fontStyle: 'italic' }}>
+            <div style={{ marginBottom: 12, padding: 12, borderLeft: '3px solid var(--c-purple)', background: 'rgba(189,147,249,0.08)', borderRadius: 4, color: 'var(--c-fg)', fontStyle: 'italic' }}>
               {result.summary}
             </div>
           ) : null}
@@ -72,29 +72,29 @@ export default function AiGradeResultPanel({ title, titles, result, grading, sta
               const color = c.verdict === 'met' ? '#50fa7b' : c.verdict === 'partial' ? '#f1fa8c' : '#ff5555';
               const Icon = c.verdict === 'met' ? CircleCheck : c.verdict === 'partial' ? Circle : CircleX;
               return (
-                <div key={c.id || i} style={{ padding: 12, background: '#282a36', borderRadius: 6, border: '1px solid ' + color + '55' }}>
+                <div key={c.id || i} style={{ padding: 12, background: 'var(--c-bg)', borderRadius: 6, border: '1px solid ' + color + '55' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                     <Icon size={18} color={color} />
-                    <strong style={{ color: '#f8f8f2' }}>{titles[c.id] || c.id}</strong>
+                    <strong style={{ color: 'var(--c-fg)' }}>{titles[c.id] || c.id}</strong>
                     <span style={{ marginLeft: 'auto', color, fontWeight: 600, fontSize: 13 }}>
                       {result.totalPossible === 0 ? c.verdict : `${c.earned} / ${c.max} pts`}
                     </span>
                   </div>
-                  {c.feedback ? <p style={{ margin: '4px 0 0 26px', color: '#ccc', fontSize: 13, lineHeight: 1.5 }}>{c.feedback}</p> : null}
+                  {c.feedback ? <p style={{ margin: '4px 0 0 26px', color: 'var(--x-cccccc)', fontSize: 13, lineHeight: 1.5 }}>{c.feedback}</p> : null}
                 </div>
               );
             })}
           </div>
           {result.totalPossible > 0 ? (
             <>
-              <p style={{ marginTop: 10, color: '#f8f8f2', fontSize: 14 }}>
+              <p style={{ marginTop: 10, color: 'var(--c-fg)', fontSize: 14 }}>
                 This try: {result.totalEarned} of {result.totalPossible}.
               </p>
               {requiredMissed(result) && (
                 // A scored part normally says nothing about passing, but one with a
                 // required criterion can be over the points bar and still fail. Say
                 // which line is holding it, or the score reads as good enough.
-                <p role="status" style={{ marginTop: 6, color: '#ffb86c', fontSize: 14 }}>
+                <p role="status" style={{ marginTop: 6, color: 'var(--c-orange)', fontSize: 14 }}>
                   Not passing yet — this part cannot pass unless{' '}
                   {result.criteria
                     .filter((c) => c.required && c.verdict !== 'met')
@@ -108,19 +108,19 @@ export default function AiGradeResultPanel({ title, titles, result, grading, sta
             // A zero-point rubric has no score to raise. Saying nothing here left
             // students submitting the same plan over and over -- one class sent 25
             // identical tries after already passing. Say plainly what the result means.
-            <p style={{ marginTop: 10, color: isPassingGrade(result) ? '#50fa7b' : '#ffb86c', fontSize: 14 }}>
+            <p style={{ marginTop: 10, color: isPassingGrade(result) ? 'var(--c-green)' : 'var(--c-orange)', fontSize: 14 }}>
               {isPassingGrade(result)
                 ? "You've passed — this part is marked pass or fail, so there is no score to raise. Move on whenever you're ready."
                 : 'Not passing yet — use the feedback above, then submit again.'}
             </p>
           )}
           {result.hints?.length > 0 ? (
-            <div style={{ marginTop: 14, padding: 12, background: '#282a36', borderRadius: 6, border: '1px solid #ffb86c55' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, color: '#ffb86c', fontWeight: 600 }}>
+            <div style={{ marginTop: 14, padding: 12, background: 'var(--c-bg)', borderRadius: 6, border: '1px solid color-mix(in srgb, var(--c-orange) 33.3333%, transparent)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, color: 'var(--c-orange)', fontWeight: 600 }}>
                 <Lightbulb size={16} />
                 Hints
               </div>
-              <ul style={{ margin: 0, paddingLeft: 22, color: '#ccc', fontSize: 13, lineHeight: 1.6 }}>
+              <ul style={{ margin: 0, paddingLeft: 22, color: 'var(--x-cccccc)', fontSize: 13, lineHeight: 1.6 }}>
                 {result.hints.map((h, i) => (
                   <li key={i}>{h}</li>
                 ))}

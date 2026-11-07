@@ -115,9 +115,9 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           style={{
-            background: '#282a36',
-            color: '#f8f8f2',
-            borderColor: '#44475a',
+            background: 'var(--c-bg)',
+            color: 'var(--c-fg)',
+            borderColor: 'var(--c-line)',
             borderRadius: 6,
             padding: '6px 12px',
             fontSize: 14,

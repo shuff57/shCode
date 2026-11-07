@@ -320,7 +320,7 @@ export default function StudentGradebook({ lessons }: Props) {
                           >
                             {open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                             <span>{lesson.title}</span>
-                            <MessageSquare size={13} style={{ color: '#bd93f9', flexShrink: 0 }} />
+                            <MessageSquare size={13} style={{ color: 'var(--c-purple)', flexShrink: 0 }} />
                           </button>
                         ) : (
                           <a href={lessonHref(lesson)} style={{ fontWeight: 500, color: 'inherit' }}>
@@ -332,13 +332,13 @@ export default function StudentGradebook({ lessons }: Props) {
                             href={lessonHref(lesson)}
                             aria-label={`Open ${lesson.title}`}
                             title="Open lesson"
-                            style={{ marginLeft: 6, color: '#8393c4', fontSize: 12 }}
+                            style={{ marginLeft: 6, color: 'var(--c-dim)', fontSize: 12 }}
                           >
                             Open
                           </a>
                         )}
                         {practice && (
-                          <span style={{ ...chipStyle, borderColor: 'transparent', color: '#8393c4' }} title="This lesson is practice. It does not count toward your grade.">
+                          <span style={{ ...chipStyle, borderColor: 'transparent', color: 'var(--c-dim)' }} title="This lesson is practice. It does not count toward your grade.">
                             <span className="gb-practice-full">{practice.tag}</span>
                             <span className="gb-practice-short" aria-hidden="true">Practice</span>
                           </span>
@@ -354,7 +354,7 @@ export default function StudentGradebook({ lessons }: Props) {
                       </td>
                       <td style={{ ...tdStyle, opacity: dueSoon ? 1 : 0.65 }}>
                         {due ? formatDue(due) : '—'}
-                        {dueSoon && <span style={{ ...chipStyle, color: '#ffb86c', borderColor: '#ffb86c' }}>due soon</span>}
+                        {dueSoon && <span style={{ ...chipStyle, color: 'var(--c-orange)', borderColor: 'var(--c-orange)' }}>due soon</span>}
                       </td>
                       <td style={tdStyle}>
                         <span style={{ ...badgeStyle, color: statusColor, borderColor: statusColor }}>
@@ -370,7 +370,7 @@ export default function StudentGradebook({ lessons }: Props) {
                         )}
                         {cell.teacherReviewedAt != null && (
                           <div
-                            style={{ color: '#bd93f9', fontSize: 11 }}
+                            style={{ color: 'var(--c-purple)', fontSize: 11 }}
                             title="Your teacher reviewed this work and may have changed the score"
                           >
                             teacher-adjusted
@@ -411,8 +411,8 @@ export default function StudentGradebook({ lessons }: Props) {
 }
 
 const cardStyle: React.CSSProperties = {
-  background: '#1e1f29',
-  border: '1px solid #44475a',
+  background: 'var(--c-deep)',
+  border: '1px solid var(--c-line)',
   borderRadius: 8,
   padding: '20px 24px',
   marginBottom: 20,
@@ -421,7 +421,7 @@ const cardStyle: React.CSSProperties = {
 
 const headingStyle: React.CSSProperties = {
   margin: '0 0 14px 0',
-  borderBottom: '1px solid #44475a',
+  borderBottom: '1px solid var(--c-line)',
   paddingBottom: 8,
 };
 
@@ -430,7 +430,7 @@ const toolbarStyle: React.CSSProperties = {
   alignItems: 'center',
   gap: 10,
   flexWrap: 'wrap',
-  borderBottom: '1px solid #44475a',
+  borderBottom: '1px solid var(--c-line)',
   paddingBottom: 10,
   marginBottom: 14,
 };
@@ -524,8 +524,8 @@ const chipStyle: React.CSSProperties = {
   marginLeft: 8,
   padding: '1px 7px',
   borderRadius: 10,
-  border: '1px solid #6272a4',
-  color: '#a9b7e0',
+  border: '1px solid var(--c-comment)',
+  color: 'var(--x-a9b7e0)',
   fontSize: 11,
   whiteSpace: 'nowrap',
 };
@@ -540,9 +540,9 @@ const legendStyle: React.CSSProperties = {
 
 const tabIdle: React.CSSProperties = {
   background: 'none',
-  border: '1px solid #44475a',
+  border: '1px solid var(--c-line)',
   borderRadius: 999,
-  color: '#94a3b8',
+  color: 'var(--x-94a3b8)',
   fontSize: 12,
   fontWeight: 600,
   padding: '4px 12px',
@@ -552,6 +552,6 @@ const tabIdle: React.CSSProperties = {
 const tabActive: React.CSSProperties = {
   ...tabIdle,
   background: 'rgba(189,147,249,0.15)',
-  borderColor: '#bd93f9',
-  color: '#bd93f9',
+  borderColor: 'var(--c-purple)',
+  color: 'var(--c-purple)',
 };

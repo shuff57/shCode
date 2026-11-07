@@ -60,7 +60,7 @@ type Entry =
   | { scope: 'module' | 'lesson'; scopeId: string; date: string | null; time?: string | null };
 
 const C = {
-  border: '#44475a',
+  border: 'var(--c-line)',
   dim: '#8393c4',
   text: '#f8f8f2',
   input: '#282a36',
@@ -233,7 +233,7 @@ export default function SolutionReleasePanel({ classId }: { classId: string }) {
       }));
   }, [data, titleOf]);
 
-  if (!data) return error ? <p style={{ color: '#ff5555', fontSize: 13 }}>{error}</p> : <p style={{ color: C.dim }}>Loading…</p>;
+  if (!data) return error ? <p style={{ color: 'var(--c-red)', fontSize: 13 }}>{error}</p> : <p style={{ color: C.dim }}>Loading…</p>;
 
   const rows: ReleaseRow[] = data.releases.map((r) => ({ scope: r.scope, scopeId: r.scopeId, releaseAt: r.releaseAt }));
   const hasRow = (scope: 'module' | 'lesson', scopeId: string) => rows.some((r) => r.scope === scope && r.scopeId === scopeId);
@@ -257,7 +257,7 @@ export default function SolutionReleasePanel({ classId }: { classId: string }) {
       <p style={{ color: C.dim, fontSize: 13, margin: '0 0 14px 0' }}>
         Releasing a whole test releases each of its parts; a single part can still be held back or given its own time.
       </p>
-      {error && <p style={{ color: '#ff5555', fontSize: 13, marginBottom: 12 }}>{error}</p>}
+      {error && <p style={{ color: 'var(--c-red)', fontSize: 13, marginBottom: 12 }}>{error}</p>}
       {saving && <p style={{ color: C.dim, fontSize: 12, marginBottom: 12 }}>Saving…</p>}
       {modules.length === 0 && <p style={{ color: C.dim }}>No parts with a solution yet.</p>}
 

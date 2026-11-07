@@ -151,25 +151,25 @@ export default function AiHelpPanel({ lesson }: Props) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <CodyAvatar state={cody} />
         {/* The drawer's own title already says CODY; this line says what CODY is doing. */}
-        <div role="status" style={{ color: '#8393c4', fontSize: 12.5 }}>{CODY_CAPTION[cody]}</div>
+        <div role="status" style={{ color: 'var(--c-dim)', fontSize: 12.5 }}>{CODY_CAPTION[cody]}</div>
       </div>
 
       {lastError ? (
         <div
           style={{
-            background: '#2a1d1d',
-            border: '1px solid #ff5555',
+            background: 'var(--x-2a1d1d)',
+            border: '1px solid var(--c-red)',
             borderRadius: 4,
             padding: '8px 10px',
             fontSize: 12.5,
             lineHeight: 1.4,
           }}
         >
-          <div style={{ color: '#ff5555', fontWeight: 600, marginBottom: 2 }}>
+          <div style={{ color: 'var(--c-red)', fontWeight: 600, marginBottom: 2 }}>
             {lastError.name}: {lastError.message}
           </div>
           {lastError.file && lastError.line ? (
-            <div style={{ color: '#8be9fd', fontFamily: 'monospace', fontSize: 11.5 }}>
+            <div style={{ color: 'var(--c-cyan)', fontFamily: 'monospace', fontSize: 11.5 }}>
               {lastError.file}:{lastError.line}
               {lastError.col ? `:${lastError.col}` : ''}
             </div>
@@ -179,8 +179,8 @@ export default function AiHelpPanel({ lesson }: Props) {
               style={{
                 margin: '4px 0 0',
                 padding: '4px 6px',
-                background: '#282a36',
-                color: '#f8f8f2',
+                background: 'var(--c-bg)',
+                color: 'var(--c-fg)',
                 borderRadius: 3,
                 fontFamily: 'monospace',
                 fontSize: 11.5,
@@ -193,7 +193,7 @@ export default function AiHelpPanel({ lesson }: Props) {
           ) : null}
         </div>
       ) : (
-        <div style={{ color: '#6272a4', fontSize: 12.5, fontStyle: 'italic' }}>
+        <div style={{ color: 'var(--c-comment)', fontSize: 12.5, fontStyle: 'italic' }}>
           No runtime errors yet. Ask CODY anything below — it sees your current code and the moSHion docs.
         </div>
       )}
@@ -222,7 +222,7 @@ export default function AiHelpPanel({ lesson }: Props) {
             fontSize: 11,
             textTransform: 'uppercase',
             letterSpacing: '0.06em',
-            color: '#6272a4',
+            color: 'var(--c-comment)',
             display: 'block',
             marginBottom: 4,
           }}
@@ -237,9 +237,9 @@ export default function AiHelpPanel({ lesson }: Props) {
           rows={3}
           style={{
             width: '100%',
-            background: '#282a36',
-            color: '#f8f8f2',
-            border: '1px solid #44475a',
+            background: 'var(--c-bg)',
+            color: 'var(--c-fg)',
+            border: '1px solid var(--c-line)',
             borderRadius: 4,
             padding: '6px 8px',
             fontSize: 12.5,
@@ -262,9 +262,9 @@ export default function AiHelpPanel({ lesson }: Props) {
       {error ? (
         <div
           style={{
-            background: '#2a1d1d',
-            border: '1px solid #ff5555',
-            color: '#ff5555',
+            background: 'var(--x-2a1d1d)',
+            border: '1px solid var(--c-red)',
+            color: 'var(--c-red)',
             padding: '6px 8px',
             borderRadius: 4,
             fontSize: 12.5,
@@ -278,7 +278,7 @@ export default function AiHelpPanel({ lesson }: Props) {
         <div
           style={{
             fontSize: 11,
-            color: quota.remaining <= 2 ? '#ffb86c' : '#6272a4',
+            color: quota.remaining <= 2 ? 'var(--c-orange)' : 'var(--c-comment)',
             textAlign: 'right',
           }}
         >
@@ -297,8 +297,8 @@ function btnPrimary(disabled: boolean): React.CSSProperties {
     display: 'inline-flex',
     alignItems: 'center',
     gap: 5,
-    background: disabled ? '#44475a' : '#bd93f9',
-    color: disabled ? '#6272a4' : '#282a36',
+    background: disabled ? 'var(--c-line)' : 'var(--c-purple)',
+    color: disabled ? 'var(--c-comment)' : 'var(--c-bg)',
     border: 'none',
     borderRadius: 4,
     padding: '6px 12px',
@@ -313,8 +313,8 @@ const btnSecondary: React.CSSProperties = {
   alignItems: 'center',
   gap: 5,
   background: 'transparent',
-  color: '#ff5555',
-  border: '1px solid #ff5555',
+  color: 'var(--c-red)',
+  border: '1px solid var(--c-red)',
   borderRadius: 4,
   padding: '6px 10px',
   fontSize: 12.5,

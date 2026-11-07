@@ -86,7 +86,7 @@ export function RowMenu({ items, label = 'More actions', buttonText = 'More', di
         aria-label={label}
         onClick={() => (open ? setOpen(false) : openMenu())}
         onKeyDown={(e) => { if (e.key === 'ArrowDown' && !open) { e.preventDefault(); openMenu(); } }}
-        style={{ background: 'none', border: '1px solid #6272a4', borderRadius: 4, color: '#a9b7e0', fontSize: 12, cursor: disabled ? 'not-allowed' : 'pointer', padding: '3px 8px', flexShrink: 0, opacity: disabled ? 0.5 : 1 }}
+        style={{ background: 'none', border: '1px solid var(--c-comment)', borderRadius: 4, color: 'var(--x-a9b7e0)', fontSize: 12, cursor: disabled ? 'not-allowed' : 'pointer', padding: '3px 8px', flexShrink: 0, opacity: disabled ? 0.5 : 1 }}
       >
         {buttonText} <span aria-hidden="true">▾</span>
       </button>
@@ -96,7 +96,7 @@ export function RowMenu({ items, label = 'More actions', buttonText = 'More', di
           role="menu"
           aria-label={label}
           onKeyDown={onMenuKey}
-          style={{ position: 'fixed', top: pos.top, right: pos.right, zIndex: 1500, background: '#1e1f29', border: '1px solid #44475a', borderRadius: 6, padding: 4, minWidth: 190, boxShadow: '0 4px 16px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column' }}
+          style={{ position: 'fixed', top: pos.top, right: pos.right, zIndex: 1500, background: 'var(--c-deep)', border: '1px solid var(--c-line)', borderRadius: 6, padding: 4, minWidth: 190, boxShadow: '0 4px 16px rgba(0,0,0,0.5)', display: 'flex', flexDirection: 'column' }}
         >
           {items.map((it) => (
             <button
@@ -111,7 +111,7 @@ export function RowMenu({ items, label = 'More actions', buttonText = 'More', di
                 btnRef.current?.focus();
                 it.onSelect();
               }}
-              style={{ textAlign: 'left', background: 'none', border: 'none', borderRadius: 4, padding: '8px 10px', fontSize: 13, color: it.danger ? '#ff6e6e' : '#f8f8f2', cursor: it.disabled ? 'not-allowed' : 'pointer', opacity: it.disabled ? 0.5 : 1 }}
+              style={{ textAlign: 'left', background: 'none', border: 'none', borderRadius: 4, padding: '8px 10px', fontSize: 13, color: it.danger ? 'var(--x-ff6e6e)' : 'var(--c-fg)', cursor: it.disabled ? 'not-allowed' : 'pointer', opacity: it.disabled ? 0.5 : 1 }}
               onMouseEnter={(e) => { if (!it.disabled) e.currentTarget.style.background = '#2f3142'; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; }}
               onFocus={(e) => { e.currentTarget.style.background = '#2f3142'; }}

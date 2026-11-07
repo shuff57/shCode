@@ -109,7 +109,7 @@ export default function MostMissedPanel({ classId, onOpenStudent }: { classId: s
         onClick={toggle}
         aria-expanded={open}
         aria-controls="most-missed-body"
-        style={{ background: 'transparent', border: `1px solid ${BORDER}`, color: '#f8f8f2', borderRadius: 6, padding: '8px 12px', cursor: 'pointer', fontSize: 14, maxWidth: '100%' }}
+        style={{ background: 'transparent', border: `1px solid ${BORDER}`, color: 'var(--c-fg)', borderRadius: 6, padding: '8px 12px', cursor: 'pointer', fontSize: 14, maxWidth: '100%' }}
       >
         {open ? 'Hide most missed' : 'Show most missed'}
       </button>
@@ -131,8 +131,8 @@ export default function MostMissedPanel({ classId, onOpenStudent }: { classId: s
                 return (
                   <li key={key} style={{ border: `1px solid ${BORDER}`, borderRadius: 8, padding: 12, ...box }}>
                     <div style={{ color: MUTED, fontSize: 13, ...box }}>{lessonTitle[t.lessonId] ?? t.lessonId}</div>
-                    <div style={{ color: '#f8f8f2', fontWeight: 600, margin: '2px 0 6px', ...box }}>{reqTitle[key] ?? t.reqId}</div>
-                    <div style={{ color: '#f8f8f2', fontSize: 14, ...box }}>
+                    <div style={{ color: 'var(--c-fg)', fontWeight: 600, margin: '2px 0 6px', ...box }}>{reqTitle[key] ?? t.reqId}</div>
+                    <div style={{ color: 'var(--c-fg)', fontSize: 14, ...box }}>
                       {plural(t.studentsFailed, 'student', 'students')} stumbled, {plural(t.totalFails, 'miss', 'misses')} in all
                       {t.studentsNotPast > 0 ? `, ${t.studentsNotPast} still failing` : ', all have passed it since'}.
                     </div>
@@ -140,7 +140,7 @@ export default function MostMissedPanel({ classId, onOpenStudent }: { classId: s
                       type="button"
                       onClick={() => flip(key)}
                       aria-expanded={isOpen}
-                      style={{ marginTop: 8, background: 'transparent', border: 'none', color: '#8be9fd', cursor: 'pointer', padding: 0, fontSize: 14, textDecoration: 'underline' }}
+                      style={{ marginTop: 8, background: 'transparent', border: 'none', color: 'var(--c-cyan)', cursor: 'pointer', padding: 0, fontSize: 14, textDecoration: 'underline' }}
                     >
                       {isOpen ? 'Hide students' : 'Show students'}
                     </button>
@@ -153,15 +153,15 @@ export default function MostMissedPanel({ classId, onOpenStudent }: { classId: s
                                 type="button"
                                 onClick={() => onOpenStudent(r.studentEmail)}
                                 title={`Open ${who(r)}'s progress`}
-                                style={{ background: 'transparent', border: 'none', color: '#8be9fd', cursor: 'pointer', padding: 0, fontSize: 14, textDecoration: 'underline', textAlign: 'left', ...box }}
+                                style={{ background: 'transparent', border: 'none', color: 'var(--c-cyan)', cursor: 'pointer', padding: 0, fontSize: 14, textDecoration: 'underline', textAlign: 'left', ...box }}
                               >
                                 {who(r)}
                               </button>
                             ) : (
-                              <span style={{ color: '#f8f8f2', ...box }}>{who(r)}</span>
+                              <span style={{ color: 'var(--c-fg)', ...box }}>{who(r)}</span>
                             )}
                             <span style={{ color: MUTED }}>{plural(r.fails, 'miss', 'misses')}</span>
-                            <span style={{ color: r.firstPassAt === null ? '#ffb86c' : '#50fa7b' }}>
+                            <span style={{ color: r.firstPassAt === null ? 'var(--c-orange)' : 'var(--c-green)' }}>
                               {r.firstPassAt === null ? 'still failing' : 'passed since'}
                             </span>
                           </li>

@@ -49,10 +49,10 @@ export default function CompletionPanel({ lessonId, lessonType, description }: P
       style={{
         marginTop: 40,
         paddingTop: 20,
-        borderTop: '2px solid #44475a',
+        borderTop: '2px solid var(--c-line)',
       }}
     >
-      <h2 style={{ fontSize: 20, marginBottom: 12, color: '#f8f8f2' }}>
+      <h2 style={{ fontSize: 20, marginBottom: 12, color: 'var(--c-fg)' }}>
         Mark complete to continue
       </h2>
       <div
@@ -61,7 +61,7 @@ export default function CompletionPanel({ lessonId, lessonType, description }: P
           alignItems: 'center',
           justifyContent: 'space-between',
           marginBottom: 12,
-          color: '#aaa',
+          color: 'var(--x-aaaaaa)',
           fontSize: 14,
         }}
         aria-live="polite"
@@ -78,8 +78,8 @@ export default function CompletionPanel({ lessonId, lessonType, description }: P
             fontWeight: 600,
             cursor: snap.authed ? 'pointer' : 'not-allowed',
             opacity: snap.authed ? 1 : 0.5,
-            background: complete ? '#44475a' : '#50fa7b',
-            color: complete ? '#f8f8f2' : '#282a36',
+            background: complete ? 'var(--c-line)' : 'var(--c-green)',
+            color: complete ? 'var(--c-fg)' : 'var(--c-bg)',
           }}
         >
           {complete ? '↺ Undo complete' : '✓ Mark as complete'}
@@ -91,19 +91,19 @@ export default function CompletionPanel({ lessonId, lessonType, description }: P
         style={{
           padding: 16,
           borderRadius: 8,
-          background: '#282a36',
-          border: complete ? '1px solid #50fa7b55' : '1px solid #44475a',
+          background: 'var(--c-bg)',
+          border: complete ? '1px solid color-mix(in srgb, var(--c-green) 33.3333%, transparent)' : '1px solid var(--c-line)',
         }}
       >
-        <h3 style={{ fontSize: 18, color: '#f8f8f2', marginTop: 0, marginBottom: 4 }}>{title}</h3>
-        <p style={{ fontSize: 14, color: '#aaa', marginTop: 0, marginBottom: 8 }}>{fullDescription}</p>
+        <h3 style={{ fontSize: 18, color: 'var(--c-fg)', marginTop: 0, marginBottom: 4 }}>{title}</h3>
+        <p style={{ fontSize: 14, color: 'var(--x-aaaaaa)', marginTop: 0, marginBottom: 8 }}>{fullDescription}</p>
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: 8,
             fontSize: 13,
-            color: complete ? '#50fa7b' : '#6272a4',
+            color: complete ? 'var(--c-green)' : 'var(--c-comment)',
           }}
         >
           {complete ? (

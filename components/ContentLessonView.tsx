@@ -119,18 +119,18 @@ export default function ContentLessonView({ lesson }: Props) {
           {
             key: 'docs',
             label: 'Docs',
-            color: '#bd93f9',
+            color: 'var(--c-purple)',
             content: <DocsDrawer defaultSetId="js" storageKey="shCode:lesson-docs" />,
           },
         ]}
       />
-      <main style={{ maxWidth: 960, width: '100%', boxSizing: 'border-box', margin: '0 auto', padding: '24px 20px 80px', color: '#f8f8f2' }}>
-      <nav style={{ marginBottom: 12, fontSize: 13, color: '#888' }}>
-        <Link href="/" style={{ color: '#8be9fd' }}>Home</Link>
+      <main style={{ maxWidth: 960, width: '100%', boxSizing: 'border-box', margin: '0 auto', padding: '24px 20px 80px', color: 'var(--c-fg)' }}>
+      <nav style={{ marginBottom: 12, fontSize: 13, color: 'var(--x-888888)' }}>
+        <Link href="/" style={{ color: 'var(--c-cyan)' }}>Home</Link>
         {lesson.unit ? (
           <>
             <span style={{ margin: '0 8px' }}>›</span>
-            <Link href={`/module/${lesson.unit.split(' ')[0]}`} prefetch={false} style={{ color: '#8be9fd' }}>
+            <Link href={`/module/${lesson.unit.split(' ')[0]}`} prefetch={false} style={{ color: 'var(--c-cyan)' }}>
               {lesson.unit}
             </Link>
           </>
@@ -157,16 +157,16 @@ export default function ContentLessonView({ lesson }: Props) {
           <badge.Icon size={13} strokeWidth={2.25} />
           {badge.label}
         </span>
-        <span style={{ color: '#888', fontSize: 13 }}>~{lesson.estimateMins ?? '?'} min</span>
+        <span style={{ color: 'var(--x-888888)', fontSize: 13 }}>~{lesson.estimateMins ?? '?'} min</span>
       </div>
 
       <h1 style={{ margin: '4px 0 6px' }}>{lesson.title}</h1>
       {lesson.description ? (
-        <p style={{ color: '#888', marginTop: 0 }}>{withInlineCode(lesson.description)}</p>
+        <p style={{ color: 'var(--x-888888)', marginTop: 0 }}>{withInlineCode(lesson.description)}</p>
       ) : null}
 
       {meta.videoUrl && meta.videoUrl.trim() ? (
-          <div style={{ aspectRatio: '16 / 9', marginTop: 16, borderRadius: 8, overflow: 'hidden', background: '#000' }}>
+          <div style={{ aspectRatio: '16 / 9', marginTop: 16, borderRadius: 8, overflow: 'hidden', background: 'var(--x-000000)' }}>
             {/* A YouTube link still gets an iframe. A direct file gets a real
                 <video>, because an mp4 dropped into an iframe renders the
                 browser's bare player and shows NO captions — a soft mov_text
@@ -201,8 +201,8 @@ export default function ContentLessonView({ lesson }: Props) {
             )}
           </div>
         ) : preview === 'video' ? (
-          <div style={{ marginTop: 16, padding: 20, background: '#282a36', borderRadius: 8, border: '1px dashed #555', color: '#aaa' }}>
-            <strong style={{ color: '#ff79c6' }}>No video URL set yet.</strong>
+          <div style={{ marginTop: 16, padding: 20, background: 'var(--c-bg)', borderRadius: 8, border: '1px dashed var(--x-555555)', color: 'var(--x-aaaaaa)' }}>
+            <strong style={{ color: 'var(--c-pink)' }}>No video URL set yet.</strong>
             <p style={{ margin: '8px 0 0', fontSize: 14 }}>
               {meta.videoFallback ?? "Teacher will paste a YouTube URL into this lesson's lesson.json (videoUrl field) when ready."}
             </p>
@@ -219,8 +219,8 @@ export default function ContentLessonView({ lesson }: Props) {
                 rel="noopener noreferrer"
                 style={{
                   display: 'inline-block',
-                  background: '#50fa7b',
-                  color: '#282a36',
+                  background: 'var(--c-green)',
+                  color: 'var(--c-bg)',
                   fontWeight: 700,
                   fontSize: 15,
                   padding: '10px 18px',
@@ -230,14 +230,14 @@ export default function ContentLessonView({ lesson }: Props) {
               >
                 Open in new tab →
               </a>
-              <span style={{ color: '#8393c4', fontSize: 13 }}>Full screen, editable code blocks</span>
+              <span style={{ color: 'var(--c-dim)', fontSize: 13 }}>Full screen, editable code blocks</span>
             </div>
             {deckBlank ? (
-              <p role="status" style={{ margin: '0 0 8px', color: '#f1fa8c', fontSize: 14 }}>
+              <p role="status" style={{ margin: '0 0 8px', color: 'var(--c-yellow)', fontSize: 14 }}>
                 Slides blank? Open them in a new tab.
               </p>
             ) : null}
-            <div style={{ aspectRatio: '16 / 9', borderRadius: 8, overflow: 'hidden', background: '#000', border: '1px solid #44475a' }}>
+            <div style={{ aspectRatio: '16 / 9', borderRadius: 8, overflow: 'hidden', background: 'var(--x-000000)', border: '1px solid var(--c-line)' }}>
               <iframe
                 ref={frameRef}
                 title={`Slides: ${lesson.title}`}
@@ -249,12 +249,12 @@ export default function ContentLessonView({ lesson }: Props) {
             </div>
           </div>
         ) : slidesUrl && deckReady === null ? (
-          <div style={{ marginTop: 16, padding: 20, background: '#282a36', borderRadius: 8, border: '1px solid #44475a', color: '#6272a4' }}>
+          <div style={{ marginTop: 16, padding: 20, background: 'var(--c-bg)', borderRadius: 8, border: '1px solid var(--c-line)', color: 'var(--c-comment)' }}>
             Loading slides…
           </div>
         ) : (
-          <div style={{ marginTop: 16, padding: 20, background: '#282a36', borderRadius: 8, border: '1px dashed #555', color: '#aaa' }}>
-            <strong style={{ color: '#bd93f9' }}>These slides aren&apos;t published yet.</strong>
+          <div style={{ marginTop: 16, padding: 20, background: 'var(--c-bg)', borderRadius: 8, border: '1px dashed var(--x-555555)', color: 'var(--x-aaaaaa)' }}>
+            <strong style={{ color: 'var(--c-purple)' }}>These slides aren&apos;t published yet.</strong>
             <p style={{ margin: '8px 0 0', fontSize: 14, lineHeight: 1.55 }}>
               Nothing is missing on your end — your teacher hasn&apos;t built this deck yet. Everything
               you need for this unit is in the lessons that follow, so mark this complete and carry on.
@@ -265,7 +265,7 @@ export default function ContentLessonView({ lesson }: Props) {
 
       {meta.externalLink ? (
         <p style={{ margin: '16px 0' }}>
-          <a href={meta.externalLink} target="_blank" rel="noopener noreferrer" style={{ color: '#50fa7b', textDecoration: 'none' }}>
+          <a href={meta.externalLink} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--c-green)', textDecoration: 'none' }}>
             → {meta.externalLinkLabel ?? meta.externalLink}
           </a>
         </p>
@@ -314,18 +314,18 @@ export default function ContentLessonView({ lesson }: Props) {
 
       <style>{`
         .content-prose h1 { font-size: 1.4em; margin-top: 28px; }
-        .content-prose h2 { margin-top: 24px; color: #f8f8f2; border-bottom: 1px solid #333; padding-bottom: 4px; }
-        .content-prose h3 { margin-top: 18px; color: #bd93f9; }
+        .content-prose h2 { margin-top: 24px; color: var(--c-fg); border-bottom: 1px solid var(--x-333333); padding-bottom: 4px; }
+        .content-prose h3 { margin-top: 18px; color: var(--c-purple); }
         .content-prose table { border-collapse: collapse; margin: 12px 0; width: 100%; }
-        .content-prose th, .content-prose td { border: 1px solid #444; padding: 6px 10px; vertical-align: top; }
-        .content-prose th { background: #44475a; }
-        .content-prose code { background: #282a36; padding: 1px 5px; border-radius: 3px; color: #ffb86c; }
+        .content-prose th, .content-prose td { border: 1px solid var(--x-444444); padding: 6px 10px; vertical-align: top; }
+        .content-prose th { background: var(--c-line); }
+        .content-prose code { background: var(--c-bg); padding: 1px 5px; border-radius: 3px; color: var(--c-orange); }
         .content-prose { min-width: 0; max-width: 100%; }
-        .content-prose pre { background: #282a36; padding: 12px; border-radius: 6px; overflow-x: auto; max-width: 100%; box-sizing: border-box; -webkit-overflow-scrolling: touch; }
-        .content-prose pre code { background: transparent; padding: 0; color: #f8f8f2; }
-        .content-prose a { color: #8be9fd; }
-        .content-prose blockquote { border-left: 3px solid #bd93f9; margin: 12px 0; padding: 4px 14px; color: #ccc; background: rgba(189,147,249,0.08); }
-        .content-prose hr { border: none; border-top: 1px solid #333; margin: 20px 0; }
+        .content-prose pre { background: var(--c-bg); padding: 12px; border-radius: 6px; overflow-x: auto; max-width: 100%; box-sizing: border-box; -webkit-overflow-scrolling: touch; }
+        .content-prose pre code { background: transparent; padding: 0; color: var(--c-fg); }
+        .content-prose a { color: var(--c-cyan); }
+        .content-prose blockquote { border-left: 3px solid var(--c-purple); margin: 12px 0; padding: 4px 14px; color: var(--x-cccccc); background: rgba(189,147,249,0.08); }
+        .content-prose hr { border: none; border-top: 1px solid var(--x-333333); margin: 20px 0; }
         .content-prose ul, .content-prose ol { padding-left: 24px; }
         @media (max-width: 720px) { .content-prose table { display: block; overflow-x: auto; max-width: 100%; } }
       `}</style>

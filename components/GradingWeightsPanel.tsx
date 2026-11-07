@@ -19,7 +19,7 @@ interface WeightRow {
 }
 
 const C = {
-  border: '#44475a',
+  border: 'var(--c-line)',
   dim: '#8393c4',
   text: '#f8f8f2',
   input: '#282a36',
@@ -78,7 +78,7 @@ export default function GradingWeightsPanel({ classId }: { classId: string }) {
   }
 
   if (error && !rows) {
-    return <div style={{ fontSize: 13, color: '#ff5555' }}>{error}</div>;
+    return <div style={{ fontSize: 13, color: 'var(--c-red)' }}>{error}</div>;
   }
   if (!rows) {
     return <div style={{ fontSize: 13, color: C.dim }}>Loading…</div>;
@@ -152,7 +152,7 @@ export default function GradingWeightsPanel({ classId }: { classId: string }) {
         {total !== 100 ? " — doesn't add up to 100, but nothing stops you saving it that way" : ''}
       </div>
       {saving && <div style={{ fontSize: 12, color: C.dim, marginTop: 4 }}>Saving…</div>}
-      {error && <div style={{ fontSize: 12, color: '#ff5555', marginTop: 4 }}>{error}</div>}
+      {error && <div style={{ fontSize: 12, color: 'var(--c-red)', marginTop: 4 }}>{error}</div>}
     </div>
   );
 }

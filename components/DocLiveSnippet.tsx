@@ -96,7 +96,7 @@ export default function DocLiveSnippet({ initialCode, fileKey }: Props) {
   };
 
   const paneStyle = {
-    border: '1px solid #44475a',
+    border: '1px solid var(--c-line)',
     borderRadius: 4,
     overflow: 'hidden',
   };
@@ -106,27 +106,27 @@ export default function DocLiveSnippet({ initialCode, fileKey }: Props) {
       <div style={{ ...paneStyle, height: 180 }}>
         <CodeMirrorPane value={code} onChange={setCode} fileKey={fileKey} />
       </div>
-      <div style={{ ...paneStyle, background: '#111', minHeight: 90, maxHeight: 220, overflowY: 'auto' }}>
+      <div style={{ ...paneStyle, background: 'var(--x-111111)', minHeight: 90, maxHeight: 220, overflowY: 'auto' }}>
         {!hasRun ? (
           <div
             style={{
               display: 'grid',
               placeItems: 'center',
-              color: '#6272a4',
+              color: 'var(--c-comment)',
               fontSize: '0.8rem',
               padding: 8,
               textAlign: 'center',
               minHeight: 90,
             }}
           >
-            Click <strong style={{ color: '#50fa7b', margin: '0 4px' }}>Run</strong> to see the output
+            Click <strong style={{ color: 'var(--c-green)', margin: '0 4px' }}>Run</strong> to see the output
           </div>
         ) : logs.length === 0 ? (
           <div
             style={{
               display: 'grid',
               placeItems: 'center',
-              color: '#6272a4',
+              color: 'var(--c-comment)',
               fontSize: '0.8rem',
               padding: 8,
               minHeight: 90,
@@ -140,7 +140,7 @@ export default function DocLiveSnippet({ initialCode, fileKey }: Props) {
               <div
                 key={i}
                 style={{
-                  color: log.type === 'error' ? '#ff5555' : log.type === 'warn' ? '#ffb86c' : '#f8f8f2',
+                  color: log.type === 'error' ? 'var(--c-red)' : log.type === 'warn' ? 'var(--c-orange)' : 'var(--c-fg)',
                   whiteSpace: 'pre-wrap',
                   wordBreak: 'break-word',
                 }}
@@ -160,8 +160,8 @@ export default function DocLiveSnippet({ initialCode, fileKey }: Props) {
             display: 'inline-flex',
             alignItems: 'center',
             gap: 4,
-            background: '#50fa7b',
-            color: '#21222c',
+            background: 'var(--c-green)',
+            color: 'var(--c-deep2)',
             border: 'none',
             borderRadius: 4,
             padding: '4px 10px',
@@ -182,8 +182,8 @@ export default function DocLiveSnippet({ initialCode, fileKey }: Props) {
             alignItems: 'center',
             gap: 4,
             background: 'transparent',
-            color: dirty || hasRun ? '#bd93f9' : '#6272a4',
-            border: '1px solid #44475a',
+            color: dirty || hasRun ? 'var(--c-purple)' : 'var(--c-comment)',
+            border: '1px solid var(--c-line)',
             borderRadius: 4,
             padding: '4px 10px',
             fontSize: '0.75rem',

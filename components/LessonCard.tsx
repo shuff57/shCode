@@ -149,7 +149,7 @@ export default function LessonCard({ lesson, lockedForStudent = false }: Props) 
           <span
             style={{
               fontSize: 11,
-              color: 'var(--muted-fg, #94a3b8)',
+              color: 'var(--muted-fg, var(--x-94a3b8))',
               background: 'rgba(148,163,184,0.15)',
               border: '1px solid rgba(148,163,184,0.35)',
               borderRadius: 999,

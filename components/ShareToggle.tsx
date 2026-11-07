@@ -52,11 +52,11 @@ export default function ShareToggle({ kind, name, onMessage, compact = false }: 
         );
       }}
       style={compact
-        ? { fontSize: 10, background: 'none', border: 'none', padding: 0, cursor: item ? 'pointer' : 'default', color: shared ? '#50fa7b' : '#8be9fd' }
+        ? { fontSize: 10, background: 'none', border: 'none', padding: 0, cursor: item ? 'pointer' : 'default', color: shared ? 'var(--c-green)' : 'var(--c-cyan)' }
         : {
           fontSize: 12, padding: '4px 8px', borderRadius: 4, cursor: item ? 'pointer' : 'default',
-          background: shared ? '#50fa7b22' : 'transparent', color: shared ? '#50fa7b' : '#8be9fd',
-          border: `1px solid ${shared ? '#50fa7b88' : '#44475a'}`,
+          background: shared ? 'color-mix(in srgb, var(--c-green) 13.3333%, transparent)' : 'transparent', color: shared ? 'var(--c-green)' : 'var(--c-cyan)',
+          border: `1px solid ${shared ? 'color-mix(in srgb, var(--c-green) 53.3333%, transparent)' : 'var(--c-line)'}`,
         }}
     >
       {label}

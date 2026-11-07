@@ -78,7 +78,7 @@ const S = {
   danger: {
     background: 'none',
     border: 'none',
-    color: '#f87171',
+    color: 'var(--x-f87171)',
     fontSize: 13,
     cursor: 'pointer',
     padding: 0,
@@ -424,7 +424,7 @@ function IssuesPageInner() {
   if (!user || user.role === 'student') {
     return (
       <div style={S.page}>
-        <p style={{ color: '#dc2626', fontSize: 16, marginBottom: 16 }}>Staff access required.</p>
+        <p style={{ color: 'var(--x-dc2626)', fontSize: 16, marginBottom: 16 }}>Staff access required.</p>
         <Link href="/" style={{ color: 'var(--brand)', fontSize: 14 }}>← Home</Link>
       </div>
     );
@@ -563,12 +563,12 @@ function IssuesPageInner() {
           Refresh
         </button>
 
-        {copied && <span style={{ fontSize: 13, color: '#22c55e' }}>{copied}</span>}
+        {copied && <span style={{ fontSize: 13, color: 'var(--x-22c55e)' }}>{copied}</span>}
       </div>
 
       {loading && <div style={{ color: 'var(--text)', opacity: 0.55 }}>Loading reports…</div>}
-      {loadError && <div style={{ color: '#dc2626', fontSize: 14 }}>{loadError}</div>}
-      {voteError && <div style={{ color: '#dc2626', fontSize: 14, marginBottom: 12 }}>{voteError}</div>}
+      {loadError && <div style={{ color: 'var(--x-dc2626)', fontSize: 14 }}>{loadError}</div>}
+      {voteError && <div style={{ color: 'var(--x-dc2626)', fontSize: 14, marginBottom: 12 }}>{voteError}</div>}
 
       {!loading && !loadError && visible.length === 0 && (
         <p style={{ color: 'var(--text)', opacity: 0.55, fontSize: 14 }}>
@@ -823,7 +823,7 @@ function IssuesPageInner() {
                       {noteBusy.has(r.id) ? 'Saving…' : 'Save reply'}
                     </button>
                     {noteErrors[r.id] && (
-                      <span style={{ color: '#dc2626', fontSize: 12 }}>{noteErrors[r.id]}</span>
+                      <span style={{ color: 'var(--x-dc2626)', fontSize: 12 }}>{noteErrors[r.id]}</span>
                     )}
                   </div>
                 </div>

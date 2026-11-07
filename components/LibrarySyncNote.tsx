@@ -18,7 +18,7 @@ export default function LibrarySyncNote({ what }: { what: 'textures' | 'sounds' 
   if (!r) return null;
   const renamed = r.renamed.filter((x) => (what === 'textures' ? x.kind === 'texture' : x.kind === 'sound'));
   return (
-    <div role="status" style={{ fontSize: 12, color: r.problems.length ? '#ffb86c' : '#8393c4', marginTop: 6 }}>
+    <div role="status" style={{ fontSize: 12, color: r.problems.length ? 'var(--c-orange)' : 'var(--c-dim)', marginTop: 6 }}>
       {r.problems.length
         ? r.problems.join(' ')
         : `Your saved ${what} are synced to your account.`}

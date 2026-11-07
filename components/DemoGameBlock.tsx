@@ -123,7 +123,7 @@ export default function DemoGameBlock({ code, blockId, size = DEFAULT_SIZE, labe
           position: relative;
           width: 100%;
           margin: 0 auto;
-          background: #000;
+          background: var(--x-000000);
           border: 1px solid var(--border);
           border-radius: 4px;
           box-shadow: 0 2px 4px rgba(0,0,0,0.2);
@@ -155,7 +155,7 @@ export default function DemoGameBlock({ code, blockId, size = DEFAULT_SIZE, labe
           transform: scale(1.06);
         }
         .demogame-start:focus-visible {
-          outline: 2px solid #22c55e;
+          outline: 2px solid var(--x-22c55e);
           outline-offset: -4px;
         }
         .demogame-start-icon {
@@ -164,8 +164,8 @@ export default function DemoGameBlock({ code, blockId, size = DEFAULT_SIZE, labe
           width: 72px;
           height: 72px;
           border-radius: 50%;
-          background: #22c55e;
-          color: #0b0b0b;
+          background: var(--x-22c55e);
+          color: var(--x-0b0b0b);
           transition: transform 120ms ease-out;
         }
         .demogame-start-label {
@@ -174,7 +174,7 @@ export default function DemoGameBlock({ code, blockId, size = DEFAULT_SIZE, labe
         }
         .demogame-start-hint {
           font-size: 13px;
-          color: #8393c4;
+          color: var(--c-dim);
         }
         .demogame-toolbar {
           display: flex;
@@ -184,7 +184,7 @@ export default function DemoGameBlock({ code, blockId, size = DEFAULT_SIZE, labe
         }
         .demogame-note {
           font-size: 12px;
-          color: #8393c4;
+          color: var(--c-dim);
         }
         @media (prefers-reduced-motion: reduce) {
           .demogame-start-icon { transition: none; }

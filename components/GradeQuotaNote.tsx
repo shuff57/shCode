@@ -30,7 +30,7 @@ export default function GradeQuotaNote() {
   return (
     <div
       role="status"
-      style={{ fontSize: 12, color: low ? '#ffb86c' : '#8393c4', margin: '0 0 8px' }}
+      style={{ fontSize: 12, color: low ? 'var(--c-orange)' : 'var(--c-dim)', margin: '0 0 8px' }}
     >
       Grades today: {quota.used} of {quota.limit} used
       {quota.remaining === 0

@@ -142,7 +142,7 @@ export default function ProgressPage() {
       <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
         {/* Recently completed */}
         <div style={{ ...cardStyle, flex: '1 1 340px', minWidth: 280 }}>
-          <h3 style={{ margin: '0 0 14px 0', borderBottom: '1px solid #44475a', paddingBottom: 8 }}>
+          <h3 style={{ margin: '0 0 14px 0', borderBottom: '1px solid var(--c-line)', paddingBottom: 8 }}>
             Recently Completed
           </h3>
           {recentlyCompleted.length === 0 ? (
@@ -158,7 +158,7 @@ export default function ProgressPage() {
                     <span style={{ flex: 1, fontWeight: 500 }}>{l.title}</span>
                     <span style={{
                       fontSize: 12,
-                      color: '#50fa7b',
+                      color: 'var(--c-green)',
                       background: 'rgba(80,250,123,0.12)',
                       border: '1px solid rgba(80,250,123,0.3)',
                       borderRadius: 999,
@@ -176,7 +176,7 @@ export default function ProgressPage() {
 
         {/* Upcoming */}
         <div style={{ ...cardStyle, flex: '1 1 340px', minWidth: 280 }}>
-          <h3 style={{ margin: '0 0 14px 0', borderBottom: '1px solid #44475a', paddingBottom: 8 }}>
+          <h3 style={{ margin: '0 0 14px 0', borderBottom: '1px solid var(--c-line)', paddingBottom: 8 }}>
             Up Next
           </h3>
           {nextLocked.length === 0 ? (
@@ -188,7 +188,7 @@ export default function ProgressPage() {
                   <span style={{ flex: 1, fontWeight: 500 }}>{l.title}</span>
                   <span style={{
                     fontSize: 12,
-                    color: '#94a3b8',
+                    color: 'var(--x-94a3b8)',
                     background: 'rgba(148,163,184,0.12)',
                     border: '1px solid rgba(148,163,184,0.3)',
                     borderRadius: 999,
@@ -206,7 +206,7 @@ export default function ProgressPage() {
 
       {/* Per-unit breakdown */}
       <div style={cardStyle}>
-        <h3 style={{ margin: '0 0 14px 0', borderBottom: '1px solid #44475a', paddingBottom: 8 }}>
+        <h3 style={{ margin: '0 0 14px 0', borderBottom: '1px solid var(--c-line)', paddingBottom: 8 }}>
           By Unit
         </h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -262,13 +262,13 @@ const navStyle: React.CSSProperties = {
 };
 
 const linkStyle: React.CSSProperties = {
-  color: '#5baafd',
+  color: 'var(--brand)',
   textDecoration: 'none',
 };
 
 const cardStyle: React.CSSProperties = {
-  background: '#1e1f29',
-  border: '1px solid #44475a',
+  background: 'var(--c-deep)',
+  border: '1px solid var(--c-line)',
   borderRadius: 8,
   padding: '20px 24px',
   marginBottom: 20,
@@ -277,14 +277,14 @@ const cardStyle: React.CSSProperties = {
 const progressBarOuter: React.CSSProperties = {
   width: '100%',
   height: 10,
-  background: '#44475a',
+  background: 'var(--c-line)',
   borderRadius: 999,
   overflow: 'hidden',
 };
 
 const progressBarInner: React.CSSProperties = {
   height: '100%',
-  background: '#50fa7b',
+  background: 'var(--c-green)',
   borderRadius: 999,
   transition: 'width 0.3s ease',
 };
@@ -299,7 +299,7 @@ const unitBarOuter: React.CSSProperties = {
 
 const unitBarInner: React.CSSProperties = {
   height: '100%',
-  background: '#bd93f9',
+  background: 'var(--c-purple)',
   borderRadius: 999,
   transition: 'width 0.3s ease',
 };

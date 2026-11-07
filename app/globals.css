@@ -11,6 +11,95 @@
   --brand: #5baafd;
 }
 
+/* ---- theme colours (Phase 5) ------------------------------------------
+   Every colour a component paints goes through a variable, so a theme is a
+   block that redefines them (html[data-theme=...]). These are the dark
+   (Dracula) values the site has always used; changing nothing here changes
+   nothing on screen. --c-* are the palette by role; --x-<hex> are the
+   one-off colours, each kept exact here and mapped to the nearest palette
+   role by the other themes. */
+:root{
+  --c-bg: #282a36;
+  --c-line: #44475a;
+  --c-fg: #f8f8f2;
+  --c-comment: #6272a4;
+  --c-dim: #8393c4;
+  --c-red: #ff5555;
+  --c-purple: #bd93f9;
+  --c-green: #50fa7b;
+  --c-cyan: #8be9fd;
+  --c-orange: #ffb86c;
+  --c-yellow: #f1fa8c;
+  --c-pink: #ff79c6;
+  --c-deep: #1e1f29;
+  --c-deep2: #21222c;
+  --x-000000: #000000;
+  --x-0b0b0b: #0b0b0b;
+  --x-0b1220: #0b1220;
+  --x-0d1b2a: #0d1b2a;
+  --x-0ea5e9: #0ea5e9;
+  --x-111111: #111111;
+  --x-151515: #151515;
+  --x-1a1a1a: #1a1a1a;
+  --x-1a1b23: #1a1b23;
+  --x-1f2937: #1f2937;
+  --x-1f3a2a: #1f3a2a;
+  --x-202020: #202020;
+  --x-22c55e: #22c55e;
+  --x-252636: #252636;
+  --x-2a1d1d: #2a1d1d;
+  --x-2a2a2a: #2a2a2a;
+  --x-2c3145: #2c3145;
+  --x-2d2e3d: #2d2e3d;
+  --x-2f3b4d: #2f3b4d;
+  --x-333333: #333333;
+  --x-33403a: #33403a;
+  --x-343746: #343746;
+  --x-3a1f26: #3a1f26;
+  --x-3a2f1a: #3a2f1a;
+  --x-3a3d4d: #3a3d4d;
+  --x-3d2d38: #3d2d38;
+  --x-3d3a2c: #3d3a2c;
+  --x-3f3628: #3f3628;
+  --x-444444: #444444;
+  --x-4a2a2a: #4a2a2a;
+  --x-4b5163: #4b5163;
+  --x-555555: #555555;
+  --x-565a70: #565a70;
+  --x-666666: #666666;
+  --x-7d8bb5: #7d8bb5;
+  --x-7ec850: #7ec850;
+  --x-888888: #888888;
+  --x-8892b0: #8892b0;
+  --x-8b8fa3: #8b8fa3;
+  --x-8b93a7: #8b93a7;
+  --x-8bd17c: #8bd17c;
+  --x-94a3b8: #94a3b8;
+  --x-9aa3b8: #9aa3b8;
+  --x-a8b1d8: #a8b1d8;
+  --x-a9aecb: #a9aecb;
+  --x-a9b7e0: #a9b7e0;
+  --x-aaaaaa: #aaaaaa;
+  --x-bbbbbb: #bbbbbb;
+  --x-bdbdce: #bdbdce;
+  --x-c6f7d6: #c6f7d6;
+  --x-c8cde0: #c8cde0;
+  --x-cbd5e1: #cbd5e1;
+  --x-cccccc: #cccccc;
+  --x-d3d5e3: #d3d5e3;
+  --x-dc2626: #dc2626;
+  --x-e0e2ee: #e0e2ee;
+  --x-e8607a: #e8607a;
+  --x-f87171: #f87171;
+  --x-ff6e6e: #ff6e6e;
+  --x-ff7b72: #ff7b72;
+  --x-ff7b7b: #ff7b7b;
+  --x-ff92d0: #ff92d0;
+  --x-ffb8b8: #ffb8b8;
+  --x-ffd6d6: #ffd6d6;
+  --x-ffffff: #ffffff;
+}
+
 
 /* Base */
 body {

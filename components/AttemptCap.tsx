@@ -40,16 +40,16 @@ export function AttemptBanner({ max, used, loading, note }: BannerProps) {
       style={{
         margin: '0 0 14px',
         padding: '10px 14px',
-        border: '1px solid #8be9fd',
+        border: '1px solid var(--c-cyan)',
         borderRadius: 6,
         background: 'rgba(139,233,253,0.08)',
-        color: '#f8f8f2',
+        color: 'var(--c-fg)',
         fontSize: 14,
         lineHeight: 1.5,
       }}
     >
       {text}
-      {note ? <div style={{ marginTop: 4, color: '#bd93f9' }}>{note}</div> : null}
+      {note ? <div style={{ marginTop: 4, color: 'var(--c-purple)' }}>{note}</div> : null}
     </div>
   );
 }
@@ -93,19 +93,19 @@ export function SolutionWait({ wait, onRefresh }: { wait: RevealWait; onRefresh?
     <section
       data-testid="solution-wait"
       role="status"
-      style={{ margin: '18px 0', padding: '12px 16px', border: '1px solid #bd93f9', borderRadius: 6, background: 'rgba(189,147,249,0.08)', color: '#f8f8f2', fontSize: 14, lineHeight: 1.5 }}
+      style={{ margin: '18px 0', padding: '12px 16px', border: '1px solid var(--c-purple)', borderRadius: 6, background: 'rgba(189,147,249,0.08)', color: 'var(--c-fg)', fontSize: 14, lineHeight: 1.5 }}
     >
       {message}
       {onRefresh ? (
         <button
           type="button"
           onClick={() => { setChecked(true); onRefresh(); }}
-          style={{ marginLeft: 12, background: 'none', border: '1px solid #44475a', borderRadius: 4, color: '#8be9fd', cursor: 'pointer', fontSize: 13, padding: '2px 8px' }}
+          style={{ marginLeft: 12, background: 'none', border: '1px solid var(--c-line)', borderRadius: 4, color: 'var(--c-cyan)', cursor: 'pointer', fontSize: 13, padding: '2px 8px' }}
         >
           Check again
         </button>
       ) : null}
-      {checked ? <span style={{ marginLeft: 10, color: '#8be9fd', fontSize: 13 }}>Checked just now: not released yet.</span> : null}
+      {checked ? <span style={{ marginLeft: 10, color: 'var(--c-cyan)', fontSize: 13 }}>Checked just now: not released yet.</span> : null}
     </section>
   );
 }
@@ -178,10 +178,10 @@ export function PseudocodePanel({ lessonId, show }: { lessonId: string; show: bo
   return (
     <section
       data-testid="pseudocode-panel"
-      style={{ margin: '18px 0', padding: '14px 16px', border: '1px solid #50fa7b', borderRadius: 6, background: 'rgba(80,250,123,0.06)' }}
+      style={{ margin: '18px 0', padding: '14px 16px', border: '1px solid var(--c-green)', borderRadius: 6, background: 'rgba(80,250,123,0.06)' }}
     >
-      <h3 style={{ margin: '0 0 8px', fontSize: 16, color: '#50fa7b' }}>How this is solved</h3>
-      <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'inherit', fontSize: 14, lineHeight: 1.6, color: '#f8f8f2' }}>{text}</pre>
+      <h3 style={{ margin: '0 0 8px', fontSize: 16, color: 'var(--c-green)' }}>How this is solved</h3>
+      <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'inherit', fontSize: 14, lineHeight: 1.6, color: 'var(--c-fg)' }}>{text}</pre>
     </section>
   );
 }

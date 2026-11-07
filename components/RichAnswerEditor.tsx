@@ -73,8 +73,8 @@ function Btn({
         padding: '0 8px',
         borderRadius: 6,
         border: `1px solid ${active ? ACCENT : BORDER}`,
-        background: active ? ACCENT : '#282a36',
-        color: active ? '#282a36' : disabled ? '#6272a4' : INK,
+        background: active ? ACCENT : 'var(--c-bg)',
+        color: active ? 'var(--c-bg)' : disabled ? 'var(--c-comment)' : INK,
         cursor: disabled ? 'not-allowed' : 'pointer',
         fontSize: 13,
         fontWeight: 600,
@@ -139,16 +139,16 @@ export default function RichAnswerEditor({ value, onChange, textSize, placeholde
   });
 
   if (!editor) {
-    return <div style={{ minHeight: 260, background: '#282a36', border: `1px solid ${BORDER}`, borderRadius: 8 }} />;
+    return <div style={{ minHeight: 260, background: 'var(--c-bg)', border: `1px solid ${BORDER}`, borderRadius: 8 }} />;
   }
   const run = () => editor.chain().focus();
 
   return (
-    <div className="rae" style={{ border: `1px solid ${BORDER}`, borderRadius: 8, background: '#282a36', overflow: 'hidden' }}>
+    <div className="rae" style={{ border: `1px solid ${BORDER}`, borderRadius: 8, background: 'var(--c-bg)', overflow: 'hidden' }}>
       <div
         role="toolbar"
         aria-label="Formatting"
-        style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center', padding: 8, borderBottom: `1px solid ${BORDER}`, background: '#21222c' }}
+        style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center', padding: 8, borderBottom: `1px solid ${BORDER}`, background: 'var(--c-deep2)' }}
       >
         <Btn label="Heading" active={s?.heading} disabled={disabled} onClick={() => run().toggleHeading({ level: 2 }).run()}>
           <Heading2 size={16} strokeWidth={2} />
@@ -220,11 +220,11 @@ export default function RichAnswerEditor({ value, onChange, textSize, placeholde
         .rae .rae-doc ul ul { list-style: circle; }
         .rae .rae-doc li p { margin: 0; }
         .rae .rae-doc strong { font-weight: 700; }
-        .rae .rae-doc em { color: #f1fa8c; }
-        .rae .rae-doc code { background: #1e1f29; color: #50fa7b; padding: 1px 4px; border-radius: 3px; font-family: 'Fira Code', Consolas, monospace; font-size: 0.9em; }
+        .rae .rae-doc em { color: var(--c-yellow); }
+        .rae .rae-doc code { background: var(--c-deep); color: var(--c-green); padding: 1px 4px; border-radius: 3px; font-family: 'Fira Code', Consolas, monospace; font-size: 0.9em; }
         .rae .rae-doc table { border-collapse: collapse; margin: 6px 0 12px; width: 100%; table-layout: fixed; }
         .rae .rae-doc th, .rae .rae-doc td { border: 1px solid ${BORDER}; padding: 6px 10px; vertical-align: top; text-align: left; min-width: 3em; }
-        .rae .rae-doc th { background: #21222c; color: ${ACCENT}; font-weight: 600; }
+        .rae .rae-doc th { background: var(--c-deep2); color: ${ACCENT}; font-weight: 600; }
         .rae .rae-doc td p, .rae .rae-doc th p { margin: 0; }
         .rae .rae-doc .selectedCell { background: rgba(189, 147, 249, 0.2); }
       `}</style>

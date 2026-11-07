@@ -125,14 +125,14 @@ export default function LessonModeControl({ classId, lessons }: Props) {
         }
         .lmc-head { display: flex; flex-direction: column; gap: 3px; margin-bottom: 10px; }
         .lmc-head strong { color: var(--text); font-size: 0.95rem; }
-        .lmc-sub { color: #6272a4; font-size: 0.78rem; line-height: 1.45; }
+        .lmc-sub { color: var(--c-comment); font-size: 0.78rem; line-height: 1.45; }
         .lmc-error {
           margin: 0 0 8px; padding: 6px 8px; font-size: 12px;
-          color: #ff5555; background: rgba(255, 85, 85, 0.1);
-          border-left: 2px solid #ff5555;
+          color: var(--c-red); background: rgba(255, 85, 85, 0.1);
+          border-left: 2px solid var(--c-red);
         }
         .lmc-sep {
-          color: #6272a4; font-size: 0.72rem; text-transform: uppercase;
+          color: var(--c-comment); font-size: 0.72rem; text-transform: uppercase;
           letter-spacing: 0.08em; margin: 12px 0 6px;
           border-top: 1px solid var(--border); padding-top: 8px;
         }
@@ -147,11 +147,11 @@ export default function LessonModeControl({ classId, lessons }: Props) {
         .lmc-choices { display: inline-flex; flex-wrap: wrap; gap: 4px; max-width: 100%; }
         .lmc-choices button {
           padding: 3px 9px; font-size: 12px; cursor: pointer;
-          background: transparent; color: #6272a4;
-          border: 1px solid #44475a; border-radius: 3px;
+          background: transparent; color: var(--c-comment);
+          border: 1px solid var(--c-line); border-radius: 3px;
         }
         .lmc-choices button:hover:not(:disabled) { color: var(--text); }
-        .lmc-choices button.on { background: #bd93f9; color: #282a36; border-color: #bd93f9; }
+        .lmc-choices button.on { background: var(--c-purple); color: var(--c-bg); border-color: var(--c-purple); }
         .lmc-choices button:disabled { opacity: 0.5; cursor: wait; }
       `}</style>
     </div>

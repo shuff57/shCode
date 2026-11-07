@@ -8,13 +8,13 @@ export default function EditorPlaceholder({ height = 480 }: { height?: number })
     <div
       style={{
         height,
-        border: '1px solid #44475a',
+        border: '1px solid var(--c-line)',
         borderRadius: 10,
-        background: '#21222c',
+        background: 'var(--c-deep2)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: '#6272a4',
+        color: 'var(--c-comment)',
         fontSize: 13,
       }}
     >

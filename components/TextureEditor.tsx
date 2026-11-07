@@ -633,7 +633,7 @@ export default function TextureEditor() {
   };
   const btn = (active = false, disabled = false): React.CSSProperties => ({
     background: active ? 'var(--brand)' : 'var(--muted)',
-    color: active ? '#0d1b2a' : 'var(--text)',
+    color: active ? 'var(--x-0d1b2a)' : 'var(--text)',
     border: '1px solid var(--border)', borderRadius: 6,
     padding: '5px 9px', fontSize: 12,
     cursor: disabled ? 'default' : 'pointer',
@@ -646,11 +646,11 @@ export default function TextureEditor() {
   };
   const checker = {
     backgroundImage:
-      'linear-gradient(45deg,#2a2a2a 25%,transparent 25%,transparent 75%,#2a2a2a 75%),' +
-      'linear-gradient(45deg,#2a2a2a 25%,transparent 25%,transparent 75%,#2a2a2a 75%)',
+      'linear-gradient(45deg,var(--x-2a2a2a) 25%,transparent 25%,transparent 75%,var(--x-2a2a2a) 75%),' +
+      'linear-gradient(45deg,var(--x-2a2a2a) 25%,transparent 25%,transparent 75%,var(--x-2a2a2a) 75%)',
     backgroundSize: '10px 10px',
     backgroundPosition: '0 0, 5px 5px',
-    backgroundColor: '#202020',
+    backgroundColor: 'var(--x-202020)',
   };
 
 
@@ -750,7 +750,7 @@ export default function TextureEditor() {
                   onClick={() => { setPlaying(false); setIndex(i); }}
                   title={`Frame ${i + 1}`}
                   style={{
-                    padding: 2, cursor: 'pointer', borderRadius: 5, background: '#202020',
+                    padding: 2, cursor: 'pointer', borderRadius: 5, background: 'var(--x-202020)',
                     border: i === index ? '2px solid var(--brand)' : '1px solid var(--border)',
                     display: 'block',
                   }}
@@ -764,7 +764,7 @@ export default function TextureEditor() {
                       title="Delete this frame"
                       aria-label="delete frame"
                       style={{
-                        background: 'rgba(0,0,0,0.72)', border: 'none', color: '#e8607a',
+                        background: 'rgba(0,0,0,0.72)', border: 'none', color: 'var(--x-e8607a)',
                         cursor: 'pointer', fontSize: 9, lineHeight: 1, padding: '2px 3px', borderRadius: 3,
                       }}
                     >
@@ -1105,7 +1105,7 @@ export default function TextureEditor() {
         {message && (
           <span style={{
             fontSize: 12, lineHeight: 1.4, marginLeft: 4,
-            color: message.bad ? '#e8607a' : '#7ec850',
+            color: message.bad ? 'var(--x-e8607a)' : 'var(--x-7ec850)',
           }}>
             {message.text}
           </span>
@@ -1137,7 +1137,7 @@ export default function TextureEditor() {
                     title={`Edit ${t.name}${t.frames > 1 ? ` (${t.frames} frames)` : ''}`}
                     style={{
                       width: 54, height: 54, padding: 2, cursor: 'pointer',
-                      background: '#202020', border: '1px solid var(--border)', borderRadius: 6,
+                      background: 'var(--x-202020)', border: '1px solid var(--border)', borderRadius: 6,
                       position: 'relative', overflow: 'hidden',
                     }}
                   >
@@ -1163,7 +1163,7 @@ export default function TextureEditor() {
                   <div style={{ fontSize: 10, marginTop: 2, wordBreak: 'break-all' }}>{t.name}</div>
                   <button
                     onClick={() => handleDelete(t.name)}
-                    style={{ fontSize: 10, background: 'none', border: 'none', color: '#e8607a', cursor: 'pointer', padding: 0 }}
+                    style={{ fontSize: 10, background: 'none', border: 'none', color: 'var(--x-e8607a)', cursor: 'pointer', padding: 0 }}
                   >
                     delete
                   </button>
@@ -1190,7 +1190,7 @@ export default function TextureEditor() {
                     title={n}
                     style={{
                       width: 36, height: 36, padding: 2, cursor: 'pointer',
-                      background: '#202020', border: '1px solid var(--border)', borderRadius: 5,
+                      background: 'var(--x-202020)', border: '1px solid var(--border)', borderRadius: 5,
                     }}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}

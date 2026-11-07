@@ -47,27 +47,27 @@ interface RowState {
 const S = {
   page: {
     minHeight: '100vh',
-    background: '#282a36',
-    color: '#f8f8f2',
+    background: 'var(--c-bg)',
+    color: 'var(--c-fg)',
     padding: '32px 24px',
     fontFamily: 'inherit',
   } as React.CSSProperties,
 
-  h1: { fontSize: 28, fontWeight: 700, marginBottom: 24, color: '#f8f8f2' } as React.CSSProperties,
+  h1: { fontSize: 28, fontWeight: 700, marginBottom: 24, color: 'var(--c-fg)' } as React.CSSProperties,
 
   card: {
-    background: '#1e1f29',
-    border: '1px solid #44475a',
+    background: 'var(--c-deep)',
+    border: '1px solid var(--c-line)',
     borderRadius: 8,
     padding: 20,
     marginBottom: 16,
   } as React.CSSProperties,
 
   input: {
-    background: '#282a36',
-    border: '1px solid #44475a',
+    background: 'var(--c-bg)',
+    border: '1px solid var(--c-line)',
     borderRadius: 4,
-    color: '#f8f8f2',
+    color: 'var(--c-fg)',
     padding: '7px 12px',
     fontSize: 14,
     outline: 'none',
@@ -75,10 +75,10 @@ const S = {
   } as React.CSSProperties,
 
   select: {
-    background: '#282a36',
-    border: '1px solid #44475a',
+    background: 'var(--c-bg)',
+    border: '1px solid var(--c-line)',
     borderRadius: 4,
-    color: '#f8f8f2',
+    color: 'var(--c-fg)',
     padding: '5px 8px',
     fontSize: 13,
     cursor: 'pointer',
@@ -89,19 +89,19 @@ const S = {
   th: {
     textAlign: 'left' as const,
     padding: '8px 12px',
-    borderBottom: '1px solid #44475a',
-    color: '#6272a4',
+    borderBottom: '1px solid var(--c-line)',
+    color: 'var(--c-comment)',
     fontWeight: 600,
     fontSize: 12,
     textTransform: 'uppercase' as const,
   },
   td: {
     padding: '8px 12px',
-    borderBottom: '1px solid #44475a22',
+    borderBottom: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)',
     verticalAlign: 'middle' as const,
   },
 
-  error: { color: '#ff5555', fontSize: 12, marginTop: 4 } as React.CSSProperties,
+  error: { color: 'var(--c-red)', fontSize: 12, marginTop: 4 } as React.CSSProperties,
 };
 
 // ---------------------------------------------------------------------------
@@ -258,14 +258,14 @@ function AdminUsersInner() {
   // ---------------------------------------------------------------------------
 
   if (!authChecked) {
-    return <div style={{ ...S.page, color: '#6272a4' }}>Loading…</div>;
+    return <div style={{ ...S.page, color: 'var(--c-comment)' }}>Loading…</div>;
   }
 
   if (!currentUser || currentUser.role !== 'admin') {
     return (
       <div style={S.page}>
-        <p style={{ color: '#ff5555', fontSize: 16, marginBottom: 16 }}>Admin access required.</p>
-        <Link href="/" style={{ color: '#8be9fd', fontSize: 14 }}>
+        <p style={{ color: 'var(--c-red)', fontSize: 16, marginBottom: 16 }}>Admin access required.</p>
+        <Link href="/" style={{ color: 'var(--c-cyan)', fontSize: 14 }}>
           ← Home
         </Link>
       </div>
@@ -289,7 +289,7 @@ function AdminUsersInner() {
 
       {/* Class switcher + search */}
       <div style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-        <label style={{ fontSize: 13, color: '#6272a4' }} htmlFor="admin-class-scope">
+        <label style={{ fontSize: 13, color: 'var(--c-comment)' }} htmlFor="admin-class-scope">
           Class
         </label>
         <select
@@ -318,13 +318,13 @@ function AdminUsersInner() {
           aria-label="Filter users by email"
         />
 
-        <span style={{ fontSize: 13, color: '#6272a4' }}>
+        <span style={{ fontSize: 13, color: 'var(--c-comment)' }}>
           {search ? `${filtered.length} of ${users.length}` : `${studentCount} students · ${staffCount} staff`}
         </span>
       </div>
 
       {scope !== 'all' && (
-        <p style={{ fontSize: 13, color: '#6272a4', margin: '-8px 0 20px' }}>
+        <p style={{ fontSize: 13, color: 'var(--c-comment)', margin: '-8px 0 20px' }}>
           Students with no current enrollment are hidden. Teachers and admins always show.{' '}
           <button
             type="button"
@@ -332,7 +332,7 @@ function AdminUsersInner() {
             style={{
               background: 'none',
               border: 'none',
-              color: '#8be9fd',
+              color: 'var(--c-cyan)',
               cursor: 'pointer',
               padding: 0,
               font: 'inherit',
@@ -345,11 +345,11 @@ function AdminUsersInner() {
       )}
 
       {/* States */}
-      {loading && <div style={{ color: '#6272a4' }}>Loading users…</div>}
-      {loadError && <div style={{ color: '#ff5555', fontSize: 14 }}>{loadError}</div>}
+      {loading && <div style={{ color: 'var(--c-comment)' }}>Loading users…</div>}
+      {loadError && <div style={{ color: 'var(--c-red)', fontSize: 14 }}>{loadError}</div>}
 
       {!loading && !loadError && users.length === 0 && (
-        <p style={{ color: '#6272a4', fontSize: 14 }}>
+        <p style={{ color: 'var(--c-comment)', fontSize: 14 }}>
           {scope === 'all'
             ? 'No accounts found.'
             : 'Nobody is enrolled here yet. Students appear once they join with the class code.'}
@@ -377,10 +377,10 @@ function AdminUsersInner() {
                 return (
                   <tr key={u.email}>
                     {/* Email */}
-                    <td style={{ ...S.td, fontFamily: 'monospace', color: '#8be9fd' }}>
+                    <td style={{ ...S.td, fontFamily: 'monospace', color: 'var(--c-cyan)' }}>
                       {fullName(u.first_name, u.last_name) || u.email}
                       {fullName(u.first_name, u.last_name) && (
-                        <div style={{ fontSize: 11, color: '#6272a4' }}>{u.email}</div>
+                        <div style={{ fontSize: 11, color: 'var(--c-comment)' }}>{u.email}</div>
                       )}
                     </td>
 
@@ -407,7 +407,7 @@ function AdminUsersInner() {
                         {/* Spinner */}
                         {rs.saving && (
                           <span
-                            style={{ color: '#6272a4', fontSize: 13, animation: 'none' }}
+                            style={{ color: 'var(--c-comment)', fontSize: 13, animation: 'none' }}
                             aria-label="Saving…"
                           >
                             …
@@ -419,29 +419,29 @@ function AdminUsersInner() {
                     </td>
 
                     {/* Created */}
-                    <td style={{ ...S.td, color: '#6272a4', fontSize: 13 }}>
+                    <td style={{ ...S.td, color: 'var(--c-comment)', fontSize: 13 }}>
                       {fmtDate(u.created_at)}
                     </td>
 
                     {/* Active classes this student is currently in */}
-                    <td style={{ ...S.td, color: u.active_classes ? '#f8f8f2' : '#6272a4', fontSize: 13 }}>
+                    <td style={{ ...S.td, color: u.active_classes ? 'var(--c-fg)' : 'var(--c-comment)', fontSize: 13 }}>
                       {u.active_classes || (u.role === 'student' ? 'none' : '—')}
                     </td>
 
                     {/* Classes owned */}
-                    <td style={{ ...S.td, textAlign: 'center' as const, color: '#f8f8f2' }}>
+                    <td style={{ ...S.td, textAlign: 'center' as const, color: 'var(--c-fg)' }}>
                       {u.classes_owned}
                     </td>
 
                     {/* Active enrollments */}
-                    <td style={{ ...S.td, textAlign: 'center' as const, color: '#f8f8f2' }}>
+                    <td style={{ ...S.td, textAlign: 'center' as const, color: 'var(--c-fg)' }}>
                       {u.active_enrollments}
                     </td>
 
                     {/* Saved indicator */}
                     <td style={{ ...S.td, textAlign: 'center' as const }}>
                       {rs.savedOk && (
-                        <span style={{ color: '#50fa7b', fontWeight: 700, fontSize: 16 }}>
+                        <span style={{ color: 'var(--c-green)', fontWeight: 700, fontSize: 16 }}>
                           ✓
                         </span>
                       )}
@@ -463,7 +463,7 @@ function AdminUsersInner() {
 
 export default function AdminUsersPage() {
   return (
-    <Suspense fallback={<div style={{ ...S.page, color: '#6272a4' }}>Loading…</div>}>
+    <Suspense fallback={<div style={{ ...S.page, color: 'var(--c-comment)' }}>Loading…</div>}>
       <AdminUsersInner />
     </Suspense>
   );

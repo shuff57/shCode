@@ -22,10 +22,10 @@ export default function RequirementCard({
 
   const status =
     req.status === 'passed'
-      ? { text: 'Passed', icon: '\u2713', color: '#50fa7b' }
+      ? { text: 'Passed', icon: '\u2713', color: 'var(--c-green)' }
       : req.status === 'failed'
-        ? { text: 'Not yet', icon: '\u2717', color: '#ff7b7b' }
-        : { text: '', icon: '', color: '#8393c4' };
+        ? { text: 'Not yet', icon: '\u2717', color: 'var(--x-ff7b7b)' }
+        : { text: '', icon: '', color: 'var(--c-dim)' };
 
   return (
     <div

@@ -103,7 +103,7 @@ const darkTheme = EditorView.theme({
     borderLeftColor: dracula.cursor,
   },
   '.cm-matchingBracket': {
-    backgroundColor: '#44475a',
+    backgroundColor: 'var(--c-line)',
     outline: `1px solid ${dracula.purple}`,
   },
   // Issue #22: a student saw a ghosted, offset second copy of the editor's

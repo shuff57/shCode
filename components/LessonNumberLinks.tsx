@@ -66,7 +66,7 @@ export default function LessonNumberLinks({
             target="_blank"
             rel="noopener noreferrer"
             title="Open this lesson in a new tab"
-            style={{ color: '#8be9fd', textDecoration: 'underline' }}
+            style={{ color: 'var(--c-cyan)', textDecoration: 'underline' }}
           >
             {part.text}
           </a>

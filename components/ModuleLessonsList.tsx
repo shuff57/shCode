@@ -189,7 +189,7 @@ export default function ModuleLessonsList({
               <span
                 style={{
                   fontSize: 11,
-                  color: 'var(--muted-fg, #94a3b8)',
+                  color: 'var(--muted-fg, var(--x-94a3b8))',
                   background: 'rgba(148,163,184,0.15)',
                   border: '1px solid rgba(148,163,184,0.35)',
                   borderRadius: 999,
@@ -295,18 +295,18 @@ export default function ModuleLessonsList({
                     fontWeight: 700,
                     letterSpacing: '0.08em',
                     textTransform: 'uppercase',
-                    color: '#bd93f9',
+                    color: 'var(--c-purple)',
                   }}
                 >
                   Lesson {heading.index} of {groups?.length}
                 </span>
                 <span style={{ fontWeight: 650, fontSize: 15 }}>{heading.group.title}</span>
-                <span style={{ fontSize: 12, color: '#8393c4' }}>
+                <span style={{ fontSize: 12, color: 'var(--c-dim)' }}>
                   {heading.group.screens.length} screen{heading.group.screens.length === 1 ? '' : 's'}
                   {minutes > 0 ? ` · ~${minutes} min` : ''}
                 </span>
               </div>
-              <p style={{ margin: '4px 0 0', fontSize: 13, color: '#8393c4', lineHeight: 1.45 }}>
+              <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--c-dim)', lineHeight: 1.45 }}>
                 {heading.group.objective}
               </p>
             </li>

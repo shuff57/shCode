@@ -28,7 +28,7 @@ import dynamic from 'next/dynamic';
 // The editor engine is a few hundred kB; only the parts that set `formatting` download it.
 const RichAnswerEditor = dynamic(() => import('./RichAnswerEditor'), {
   ssr: false,
-  loading: () => <div style={{ minHeight: 260, background: '#282a36', border: '1px solid #44475a', borderRadius: 8 }} />,
+  loading: () => <div style={{ minHeight: 260, background: 'var(--c-bg)', border: '1px solid var(--c-line)', borderRadius: 8 }} />,
 });
 
 interface AiRubricItem {
@@ -473,12 +473,12 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
   if (!loaded) return null;
 
   return (
-    <section style={{ marginTop: 36, paddingTop: 20, borderTop: '2px solid #44475a' }}>
-      <h2 style={{ fontSize: 20, marginBottom: 6, color: '#f8f8f2', display: 'flex', alignItems: 'center', gap: 8 }}>
+    <section style={{ marginTop: 36, paddingTop: 20, borderTop: '2px solid var(--c-line)' }}>
+      <h2 style={{ fontSize: 20, marginBottom: 6, color: 'var(--c-fg)', display: 'flex', alignItems: 'center', gap: 8 }}>
         <Sparkles size={18} color="#bd93f9" />
         {config.rubricTitle ?? 'Written response — AI-graded'}
       </h2>
-      <p style={{ color: '#888', fontSize: 13, margin: '0 0 12px' }}>
+      <p style={{ color: 'var(--x-888888)', fontSize: 13, margin: '0 0 12px' }}>
         {codeInput
           ? 'Write your answer as JavaScript. There is no Run button, so read it through the way the computer would before you submit.'
           : 'Answer in your own everyday words — you are graded on having the right idea, not on exact wording, spelling or length. The AI grader checks each criterion and points you back at the lesson to reread if something is missing.' +
@@ -490,9 +490,9 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
       {prompt.trim() ? (
         <div
           style={{
-            background: '#282a36',
-            border: '1px solid #44475a',
-            borderLeft: '4px solid #bd93f9',
+            background: 'var(--c-bg)',
+            border: '1px solid var(--c-line)',
+            borderLeft: '4px solid var(--c-purple)',
             borderRadius: 6,
             padding: '14px 16px',
             margin: '0 0 16px',
@@ -503,7 +503,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
               fontSize: 12,
               letterSpacing: 0.6,
               textTransform: 'uppercase',
-              color: '#bd93f9',
+              color: 'var(--c-purple)',
               fontWeight: 600,
               marginBottom: 8,
             }}
@@ -512,7 +512,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
           </div>
           <div
             style={{
-              color: '#f8f8f2',
+              color: 'var(--c-fg)',
               fontSize: 15,
               lineHeight: 1.65,
               whiteSpace: 'pre-wrap',
@@ -529,7 +529,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
       {afterPrompt ? <div style={{ margin: '0 0 16px' }}>{afterPrompt}</div> : null}
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-        <label style={{ fontSize: 13, color: '#aaa' }}>{codeInput ? 'Your program (JavaScript)' : 'Your response'}</label>
+        <label style={{ fontSize: 13, color: 'var(--x-aaaaaa)' }}>{codeInput ? 'Your program (JavaScript)' : 'Your response'}</label>
         <SolutionPanel
           lessonId={lessonId}
           onInsert={(files) => {
@@ -547,7 +547,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
         <div
           role="group"
           aria-label="Your program (JavaScript)"
-          style={{ height: 420, background: '#282a36', border: '1px solid #44475a', borderRadius: 6, overflow: 'hidden' }}
+          style={{ height: 420, background: 'var(--c-bg)', border: '1px solid var(--c-line)', borderRadius: 6, overflow: 'hidden' }}
         >
           <CodeMirrorPane value={response} onChange={setResponse} fileKey={lessonId} language="javascript" />
         </div>
@@ -555,8 +555,8 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
         formatting ? (
           <>
             <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end', marginBottom: 6 }}>
-              <button type="button" title="Smaller text" aria-label="Smaller text" onClick={() => changeSize(-1)} disabled={textSize <= 12} style={{ padding: '2px 10px', borderRadius: 6, border: '1px solid #44475a', background: '#282a36', color: '#f8f8f2', fontSize: 12, fontWeight: 600, opacity: textSize <= 12 ? 0.5 : 1 }}>A−</button>
-              <button type="button" title="Larger text" aria-label="Larger text" onClick={() => changeSize(1)} disabled={textSize >= 22} style={{ padding: '2px 10px', borderRadius: 6, border: '1px solid #44475a', background: '#282a36', color: '#f8f8f2', fontSize: 16, fontWeight: 600, opacity: textSize >= 22 ? 0.5 : 1 }}>A+</button>
+              <button type="button" title="Smaller text" aria-label="Smaller text" onClick={() => changeSize(-1)} disabled={textSize <= 12} style={{ padding: '2px 10px', borderRadius: 6, border: '1px solid var(--c-line)', background: 'var(--c-bg)', color: 'var(--c-fg)', fontSize: 12, fontWeight: 600, opacity: textSize <= 12 ? 0.5 : 1 }}>A−</button>
+              <button type="button" title="Larger text" aria-label="Larger text" onClick={() => changeSize(1)} disabled={textSize >= 22} style={{ padding: '2px 10px', borderRadius: 6, border: '1px solid var(--c-line)', background: 'var(--c-bg)', color: 'var(--c-fg)', fontSize: 16, fontWeight: 600, opacity: textSize >= 22 ? 0.5 : 1 }}>A+</button>
             </div>
             <RichAnswerEditor
               value={response}
@@ -585,9 +585,9 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
           rows={10}
           style={{
             width: '100%',
-            background: '#282a36',
-            color: '#f8f8f2',
-            border: '1px solid #44475a',
+            background: 'var(--c-bg)',
+            color: 'var(--c-fg)',
+            border: '1px solid var(--c-line)',
             borderRadius: 6,
             padding: 12,
             fontSize: formatting ? textSize : 14,
@@ -609,8 +609,8 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
             border: 'none',
             fontWeight: 600,
             cursor: loading ? 'wait' : response.trim().length < 20 ? 'not-allowed' : 'pointer',
-            background: loading ? '#44475a' : response.trim().length < 20 ? '#333' : '#bd93f9',
-            color: '#282a36',
+            background: loading ? 'var(--c-line)' : response.trim().length < 20 ? 'var(--x-333333)' : 'var(--c-purple)',
+            color: 'var(--c-bg)',
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
@@ -647,11 +647,11 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
           style={{
             padding: '8px 14px',
             borderRadius: 6,
-            border: '1px solid #44475a',
+            border: '1px solid var(--c-line)',
             fontWeight: 600,
             cursor: !progress.authed ? 'not-allowed' : saveStatus === 'saving' ? 'wait' : 'pointer',
             background: 'transparent',
-            color: !progress.authed ? '#6272a4' : '#f8f8f2',
+            color: !progress.authed ? 'var(--c-comment)' : 'var(--c-fg)',
             opacity: !progress.authed ? 0.6 : 1,
             display: 'inline-flex',
             alignItems: 'center',
@@ -662,15 +662,15 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
           {saveStatus === 'saving' ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
           {saveStatus === 'saved' ? 'Saved ✓' : saveStatus === 'error' ? 'Save failed' : 'Save draft'}
         </button>
-        <span style={{ color: '#666', fontSize: 12 }}>
+        <span style={{ color: 'var(--x-666666)', fontSize: 12 }}>
           {response.trim().length} chars{codeInput ? '' : ` · ${response.trim().split(/\s+/).filter(Boolean).length} words`}
         </span>
         {maxSubmissions === null ? null : !attemptsKnown ? (
-          <span style={{ color: '#ffb86c', fontSize: 12 }}>
+          <span style={{ color: 'var(--c-orange)', fontSize: 12 }}>
             {loaded ? 'Couldn\u2019t check your attempts — reload to try again' : 'Checking your attempts…'}
           </span>
         ) : (
-          <span style={{ color: capReached ? '#ffb86c' : '#666', fontSize: 12 }}>
+          <span style={{ color: capReached ? 'var(--c-orange)' : 'var(--x-666666)', fontSize: 12 }}>
             {capReached
               ? 'No attempts left — your best one counts'
               : `${maxSubmissions - attempts} of ${maxSubmissions} attempts left`}
@@ -698,14 +698,14 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
           style={{
             marginTop: 12,
             padding: 12,
-            background: offline ? '#282a36' : '#4a2a2a',
-            border: '1px solid ' + (offline ? '#6272a4' : '#ff5555'),
+            background: offline ? 'var(--c-bg)' : 'var(--x-4a2a2a)',
+            border: '1px solid ' + (offline ? 'var(--c-comment)' : 'var(--c-red)'),
             borderRadius: 6,
-            color: offline ? '#aaa' : '#ffd6d6',
+            color: offline ? 'var(--x-aaaaaa)' : 'var(--x-ffd6d6)',
             fontSize: 13,
           }}
         >
-          <strong style={{ color: offline ? '#bd93f9' : '#ff5555' }}>
+          <strong style={{ color: offline ? 'var(--c-purple)' : 'var(--c-red)' }}>
             {offline ? 'AI grader offline' : 'Error'}
           </strong>
           <p style={{ margin: '4px 0 0' }}>{error}</p>
@@ -717,15 +717,15 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
           style={{
             marginTop: 16,
             padding: '12px 14px',
-            background: '#282a36',
-            border: '1px solid #50fa7b',
+            background: 'var(--c-bg)',
+            border: '1px solid var(--c-green)',
             borderRadius: 6,
-            color: '#f8f8f2',
+            color: 'var(--c-fg)',
             fontSize: 13,
             lineHeight: 1.6,
           }}
         >
-          <strong style={{ color: '#50fa7b' }}>Submitted.</strong> Your answer is with your
+          <strong style={{ color: 'var(--c-green)' }}>Submitted.</strong> Your answer is with your
           teacher. Nothing is marked here and this one does not reopen — that is what makes
           it a test rather than a practice run.
         </div>
@@ -741,9 +741,9 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
         return (
         <div style={{ marginTop: 20 }}>
           {resultIsBest ? (
-            <div style={{ marginBottom: 8, color: '#8be9fd', fontSize: 13 }}>This is your best try, the one that counts.</div>
+            <div style={{ marginBottom: 8, color: 'var(--c-cyan)', fontSize: 13 }}>This is your best try, the one that counts.</div>
           ) : maxSubmissions !== null ? (
-            <div style={{ marginBottom: 8, color: '#8be9fd', fontSize: 13 }}>This is your latest try. Your best try is the one that counts.</div>
+            <div style={{ marginBottom: 8, color: 'var(--c-cyan)', fontSize: 13 }}>This is your latest try. Your best try is the one that counts.</div>
           ) : null}
           <div
             style={{
@@ -751,12 +751,12 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
               alignItems: 'center',
               justifyContent: 'space-between',
               marginBottom: 12,
-              color: '#aaa',
+              color: 'var(--x-aaaaaa)',
               fontSize: 14,
             }}
           >
             <span>
-              <strong style={{ color: '#f8f8f2', fontSize: 16 }}>
+              <strong style={{ color: 'var(--c-fg)', fontSize: 16 }}>
                 {passFail
                   ? `${Math.round(earnedCriteria * 10) / 10} / ${result.criteria.length} criteria (partly met counts half)`
                   : `${result.totalEarned} / ${result.totalPossible}`}
@@ -776,10 +776,10 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
               style={{
                 marginBottom: 12,
                 padding: 12,
-                borderLeft: '3px solid #bd93f9',
+                borderLeft: '3px solid var(--c-purple)',
                 background: 'rgba(189,147,249,0.08)',
                 borderRadius: 4,
-                color: '#f8f8f2',
+                color: 'var(--c-fg)',
                 fontStyle: 'italic',
               }}
             >
@@ -803,14 +803,14 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
                   key={c.id || i}
                   style={{
                     padding: 12,
-                    background: '#282a36',
+                    background: 'var(--c-bg)',
                     borderRadius: 6,
                     border: '1px solid ' + color + '55',
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                     <Icon size={18} color={color} />
-                    <strong style={{ color: '#f8f8f2' }}>{label?.title || c.id}</strong>
+                    <strong style={{ color: 'var(--c-fg)' }}>{label?.title || c.id}</strong>
                     <span style={{ marginLeft: 'auto', color, fontWeight: 600, fontSize: 13 }}>
                       {passFail
                         ? c.verdict === 'met' ? 'met' : c.verdict === 'partial' ? 'partial' : 'missing'
@@ -818,7 +818,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
                     </span>
                   </div>
                   {c.feedback && (
-                    <p style={{ margin: '4px 0 0 26px', color: '#ccc', fontSize: 13, lineHeight: 1.5 }}>
+                    <p style={{ margin: '4px 0 0 26px', color: 'var(--x-cccccc)', fontSize: 13, lineHeight: 1.5 }}>
                       {c.feedback}
                     </p>
                   )}
@@ -837,8 +837,8 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
                   border: 'none',
                   fontWeight: 600,
                   cursor: 'pointer',
-                  background: '#50fa7b',
-                  color: '#282a36',
+                  background: 'var(--c-green)',
+                  color: 'var(--c-bg)',
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 6,
@@ -846,7 +846,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
               >
                 Continue to next lesson →
               </button>
-              <p style={{ margin: '8px 0 0', color: '#888', fontSize: 12 }}>
+              <p style={{ margin: '8px 0 0', color: 'var(--x-888888)', fontSize: 12 }}>
                 {/* A zero-point rubric (3.9.1, 3.9.3) has no score to raise, so
                     "keep revising to push your score higher" is an invitation to
                     resubmit the same plan. Students did: one class submitted 25
@@ -861,12 +861,12 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
           )}
 
           {result.hints && result.hints.length > 0 && (
-            <div style={{ marginTop: 14, padding: 12, background: '#282a36', borderRadius: 6, border: '1px solid #ffb86c55' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, color: '#ffb86c', fontWeight: 600 }}>
+            <div style={{ marginTop: 14, padding: 12, background: 'var(--c-bg)', borderRadius: 6, border: '1px solid color-mix(in srgb, var(--c-orange) 33.3333%, transparent)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6, color: 'var(--c-orange)', fontWeight: 600 }}>
                 <Lightbulb size={16} />
                 Hints
               </div>
-              <ul style={{ margin: 0, paddingLeft: 22, color: '#ccc', fontSize: 13, lineHeight: 1.6 }}>
+              <ul style={{ margin: 0, paddingLeft: 22, color: 'var(--x-cccccc)', fontSize: 13, lineHeight: 1.6 }}>
                 {result.hints.map((h, i) => <li key={i}>{h}</li>)}
               </ul>
             </div>

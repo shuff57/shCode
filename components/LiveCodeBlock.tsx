@@ -341,7 +341,7 @@ export default function LiveCodeBlock({
         .livecodeblock-preview {
           width: 100%;
           height: var(--lcb-preview-side);
-          background: #000;
+          background: var(--x-000000);
           position: relative;
         }
         .livecodeblock-preview .reshape-frame,

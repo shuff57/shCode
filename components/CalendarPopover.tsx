@@ -24,7 +24,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 const C = {
   bg: '#282a36',
   raised: '#343746',
-  border: '#44475a',
+  border: 'var(--c-line)',
   text: '#f8f8f2',
   dim: '#6272a4',
   accent: '#8be9fd',

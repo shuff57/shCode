@@ -40,20 +40,20 @@ export default function Error({ error }: { error: Error & { digest?: string } })
         justifyContent: 'center',
         minHeight: '50vh',
         gap: 16,
-        color: '#f8f8f2',
+        color: 'var(--c-fg)',
         textAlign: 'center',
         padding: 24,
       }}
     >
       <p>Something went wrong loading this page.</p>
       {status === 'real-error' && error?.message ? (
-        <p style={{ color: '#6272a4', fontSize: '0.85rem', maxWidth: 480 }}>{error.message}</p>
+        <p style={{ color: 'var(--c-comment)', fontSize: '0.85rem', maxWidth: 480 }}>{error.message}</p>
       ) : null}
       <button
         onClick={() => window.location.reload()}
         style={{
-          background: '#bd93f9',
-          color: '#282a36',
+          background: 'var(--c-purple)',
+          color: 'var(--c-bg)',
           border: 'none',
           borderRadius: 4,
           padding: '8px 16px',

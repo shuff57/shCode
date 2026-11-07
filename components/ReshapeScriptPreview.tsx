@@ -94,12 +94,12 @@ export default function ReshapeScriptPreview({ code, runKey }: Props) {
             right: 0,
             bottom: 0,
             padding: '8px 12px',
-            background: '#282a36',
-            color: '#f1fa8c',
+            background: 'var(--c-bg)',
+            color: 'var(--c-yellow)',
             fontFamily: "'Fira Code', Consolas, monospace",
             fontSize: '0.75rem',
             whiteSpace: 'pre-wrap',
-            borderTop: '1px solid #44475a',
+            borderTop: '1px solid var(--c-line)',
           }}
         >
           {refusals.join('\n')}
@@ -113,12 +113,12 @@ export default function ReshapeScriptPreview({ code, runKey }: Props) {
             right: 0,
             bottom: 0,
             padding: '8px 12px',
-            background: '#282a36',
-            color: '#ff5555',
+            background: 'var(--c-bg)',
+            color: 'var(--c-red)',
             fontFamily: "'Fira Code', Consolas, monospace",
             fontSize: '0.75rem',
             whiteSpace: 'pre-wrap',
-            borderTop: '1px solid #44475a',
+            borderTop: '1px solid var(--c-line)',
           }}
         >
           {error.line ? `Line ${error.line}: ${error.message}` : error.message}

@@ -116,7 +116,7 @@ const activeBtn: React.CSSProperties = {
   borderColor: 'var(--brand)',
   // Dark text on the light brand blue. White on #5baafd is only ~2.5:1, which
   // fails the contrast bar this app uses for every other control.
-  color: '#0b1220',
+  color: 'var(--x-0b1220)',
 };
 const field: React.CSSProperties = {
   background: 'var(--muted)',
@@ -129,7 +129,7 @@ const field: React.CSSProperties = {
   minWidth: 0,
 };
 const code: React.CSSProperties = {
-  background: '#151515',
+  background: 'var(--x-151515)',
   border: '1px solid var(--border)',
   borderRadius: 6,
   padding: '8px 10px',
@@ -238,7 +238,7 @@ function Slider({
 }) {
   return (
     <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, minWidth: 0 }}>
-      <span style={{ color: '#8393c4', minWidth: 48 }}>{label}</span>
+      <span style={{ color: 'var(--c-dim)', minWidth: 48 }}>{label}</span>
       <input
         type="range"
         min={min}
@@ -246,7 +246,7 @@ function Slider({
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        style={{ flex: 1, minWidth: 60, accentColor: '#5baafd' }}
+        style={{ flex: 1, minWidth: 60, accentColor: 'var(--brand)' }}
         aria-label={label}
       />
       <span style={{ minWidth: 38, textAlign: 'right' }}>{display}</span>
@@ -675,7 +675,7 @@ export default function SoundMixer() {
     <div style={{ maxWidth: 980, margin: '0 auto', paddingBottom: 40 }}>
       <header style={{ marginBottom: 14 }}>
         <h1 style={{ fontSize: 22, margin: '0 0 6px' }}>8-bit sound mixer</h1>
-        <p style={{ margin: 0, color: '#8393c4', fontSize: 14 }}>
+        <p style={{ margin: 0, color: 'var(--c-dim)', fontSize: 14 }}>
           Build a little palette for a game: choose a chip sound, set its level, speed and place in
           the stereo field, and hear the channels together. Each effect has a <strong style={{ color: 'var(--text)' }}>Tweak</strong> panel
           for its own waveform, pitch and envelope, and a <strong style={{ color: 'var(--text)' }}>Mic</strong> panel that
@@ -709,7 +709,7 @@ export default function SoundMixer() {
           style={{
             ...card,
             margin: '0 0 10px',
-            color: message.bad ? '#ff7b72' : '#8bd17c',
+            color: message.bad ? 'var(--x-ff7b72)' : 'var(--x-8bd17c)',
             fontSize: 13,
           }}
         >
@@ -733,7 +733,7 @@ export default function SoundMixer() {
                 onFocus={() => setSelected(ch.id)}
                 style={{ ...field, width: 140 }}
               />
-              <span style={{ fontSize: 12, color: '#8393c4', minWidth: 70 }}>
+              <span style={{ fontSize: 12, color: 'var(--c-dim)', minWidth: 70 }}>
                 {ch.kind === 'music' ? 'music' : 'effect'}
               </span>
               <select
@@ -818,7 +818,7 @@ export default function SoundMixer() {
 
             {ch.source === 'random' && (
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 6 }}>
-                <span style={{ fontSize: 12, color: '#8393c4' }}>
+                <span style={{ fontSize: 12, color: 'var(--c-dim)' }}>
                   {SFX_PRESETS.find((p) => p.preset === 'random')?.blurb}
                 </span>
                 <button
@@ -881,13 +881,13 @@ export default function SoundMixer() {
                   >
                     {recording ? '■ Stop listening' : micBusy ? 'Matching…' : '● Record'}
                   </button>
-                  <span style={{ fontSize: 12, color: '#8393c4', flex: '1 1 240px' }}>
+                  <span style={{ fontSize: 12, color: 'var(--c-dim)', flex: '1 1 240px' }}>
                     Make a short sound with your mouth, up to 3 seconds. The mixer fits the Tweak
                     knobs to it.
                   </span>
                 </div>
                 {micStatus && (
-                  <p role="status" style={{ margin: '6px 0 0', fontSize: 12, color: '#8393c4' }}>
+                  <p role="status" style={{ margin: '6px 0 0', fontSize: 12, color: 'var(--c-dim)' }}>
                     {micStatus}
                   </p>
                 )}
@@ -896,7 +896,7 @@ export default function SoundMixer() {
                     Heard: <strong>{micNotes.join(', ')}</strong>
                   </p>
                 )}
-                <p style={{ margin: '4px 0 0', fontSize: 11, color: '#8393c4' }}>
+                <p style={{ margin: '4px 0 0', fontSize: 11, color: 'var(--c-dim)' }}>
                   Nothing is uploaded. The listening and matching happen in this browser.
                 </p>
               </div>
@@ -910,7 +910,7 @@ export default function SoundMixer() {
                 <div
                   style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginBottom: 8 }}
                 >
-                  <span style={{ fontSize: 12, color: '#8393c4' }}>wave</span>
+                  <span style={{ fontSize: 12, color: 'var(--c-dim)' }}>wave</span>
                   {WAVE_SHAPES.map((w) => {
                     const on = Math.floor(Number(ch.def.wave_type) || 0) === w.value;
                     return (
@@ -950,7 +950,7 @@ export default function SoundMixer() {
                         fontSize: 10,
                         letterSpacing: 0.8,
                         textTransform: 'uppercase',
-                        color: '#8393c4',
+                        color: 'var(--c-dim)',
                         marginBottom: 3,
                       }}
                     >
@@ -982,7 +982,7 @@ export default function SoundMixer() {
                   </div>
                 ))}
 
-                <p style={{ margin: 0, fontSize: 11, color: '#8393c4' }}>
+                <p style={{ margin: 0, fontSize: 11, color: 'var(--c-dim)' }}>
                   The preset is a starting point. These controls change the sound itself; the
                   volume, rate and pan sliders change the mix.
                 </p>
@@ -996,7 +996,7 @@ export default function SoundMixer() {
 
       <section style={card}>
         <h2 style={{ fontSize: 16, margin: '0 0 6px' }}>How this reaches a sketch</h2>
-        <p style={{ fontSize: 13, color: '#8393c4', margin: '0 0 6px' }}>
+        <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: '0 0 6px' }}>
           <strong>Save</strong> writes the sound into this browser under its name. A sketch on this
           site then loads it by name, exactly like a file:
         </p>
@@ -1005,7 +1005,7 @@ zap.volume = 0.8;
 zap.rate = 1;
 zap.pan = 0;
 zap.play();`}</pre>
-        <p style={{ fontSize: 13, color: '#8393c4', margin: '0 0 6px' }}>
+        <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: '0 0 6px' }}>
           A saved sound wins over a built-in file with the same name. The course palette is also
           available by path, so a game can use it without saving anything:
         </p>
@@ -1047,7 +1047,7 @@ zap.play();`}</pre>
         </div>
         <LibrarySyncNote what="sounds" />
         {saved.length === 0 ? (
-          <p style={{ fontSize: 13, color: '#8393c4', margin: 0 }}>
+          <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: 0 }}>
             Nothing saved yet. Give a channel a name and press <strong>Save</strong>, or import a clip.
           </p>
         ) : (
@@ -1058,7 +1058,7 @@ zap.play();`}</pre>
                 style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}
               >
                 <code style={{ fontSize: 13 }}>{s.name}</code>
-                <span style={{ fontSize: 12, color: '#8393c4' }}>
+                <span style={{ fontSize: 12, color: 'var(--c-dim)' }}>
                   {s.kind === 'music' ? 'music' : 'effect'}, {Math.round(s.bytes / 1024)} KB,{' '}
                   {sourceLabel(s)}
                 </span>
@@ -1100,7 +1100,7 @@ zap.play();`}</pre>
         <ClassLibrary kind="sound" onCopied={() => setSaved(listSavedSounds())} onMessage={(text, bad) => setMessage({ text, bad })} />
       </section>
 
-      <section style={{ ...card, color: '#8393c4', fontSize: 12 }}>
+      <section style={{ ...card, color: 'var(--c-dim)', fontSize: 12 }}>
         <p style={{ margin: '0 0 6px' }}>
           <strong style={{ color: 'var(--text)' }}>Tweak edits the sound; the sliders edit the mix.</strong>{' '}
           The Tweak panel sets the effect's own waveform, pitch, envelope and character. The three

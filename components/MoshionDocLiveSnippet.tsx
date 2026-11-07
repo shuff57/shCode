@@ -39,7 +39,7 @@ export default function MoshionDocLiveSnippet({ initialCode, fileKey }: Props) {
   const paneStyle = {
     width: '100%',
     aspectRatio: '1 / 1',
-    border: '1px solid #44475a',
+    border: '1px solid var(--c-line)',
     borderRadius: 4,
     overflow: 'hidden',
     position: 'relative' as const,
@@ -50,7 +50,7 @@ export default function MoshionDocLiveSnippet({ initialCode, fileKey }: Props) {
       <div style={paneStyle}>
         <CodeMirrorPane value={code} onChange={setCode} fileKey={fileKey} />
       </div>
-      <div style={{ ...paneStyle, background: '#111' }}>
+      <div style={{ ...paneStyle, background: 'var(--x-111111)' }}>
         {runKey === 0 ? (
           <div
             style={{
@@ -58,13 +58,13 @@ export default function MoshionDocLiveSnippet({ initialCode, fileKey }: Props) {
               inset: 0,
               display: 'grid',
               placeItems: 'center',
-              color: '#6272a4',
+              color: 'var(--c-comment)',
               fontSize: '0.8rem',
               padding: 8,
               textAlign: 'center',
             }}
           >
-            Click <strong style={{ color: '#50fa7b', margin: '0 4px' }}>Run</strong> to preview
+            Click <strong style={{ color: 'var(--c-green)', margin: '0 4px' }}>Run</strong> to preview
           </div>
         ) : (
           <iframe
@@ -87,8 +87,8 @@ export default function MoshionDocLiveSnippet({ initialCode, fileKey }: Props) {
             display: 'inline-flex',
             alignItems: 'center',
             gap: 4,
-            background: '#50fa7b',
-            color: '#21222c',
+            background: 'var(--c-green)',
+            color: 'var(--c-deep2)',
             border: 'none',
             borderRadius: 4,
             padding: '4px 10px',
@@ -108,8 +108,8 @@ export default function MoshionDocLiveSnippet({ initialCode, fileKey }: Props) {
             alignItems: 'center',
             gap: 4,
             background: 'transparent',
-            color: dirty || runKey > 0 ? '#bd93f9' : '#6272a4',
-            border: '1px solid #44475a',
+            color: dirty || runKey > 0 ? 'var(--c-purple)' : 'var(--c-comment)',
+            border: '1px solid var(--c-line)',
             borderRadius: 4,
             padding: '4px 10px',
             fontSize: '0.75rem',

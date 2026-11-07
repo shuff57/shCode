@@ -51,7 +51,7 @@ const C = {
   today: '#f1fa8c',
   set: '#8be9fd',
   open: '#bd93f9',
-  border: '#44475a',
+  border: 'var(--c-line)',
   bg: '#282a36',
   raised: '#343746',
 };

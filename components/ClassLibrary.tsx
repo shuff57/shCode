@@ -80,18 +80,18 @@ export default function ClassLibrary({ kind, onCopied, onMessage }: {
 
   return (
     <div style={{ marginTop: 12 }}>
-      <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#8393c4', marginBottom: 6 }}>
+      <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--c-dim)', marginBottom: 6 }}>
         From your class ({items.length})
       </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         {items.map((it) => (
           <div key={it.id} style={{
             width: kind === 'texture' ? 92 : 'auto', padding: 6, borderRadius: 6,
-            border: `1px solid ${it.hidden ? '#ffb86c88' : '#44475a'}`, background: '#21222c',
+            border: `1px solid ${it.hidden ? 'color-mix(in srgb, var(--c-orange) 53.3333%, transparent)' : 'var(--c-line)'}`, background: 'var(--c-deep2)',
             display: 'flex', flexDirection: kind === 'texture' ? 'column' : 'row', alignItems: 'center', gap: 6,
           }}>
             {kind === 'texture' ? (
-              <div style={{ width: 48, height: 48, overflow: 'hidden', background: '#202020', borderRadius: 4 }}>
+              <div style={{ width: 48, height: 48, overflow: 'hidden', background: 'var(--x-202020)', borderRadius: 4 }}>
                 {art[it.id] && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={art[it.id].dataUri} alt={it.name}
@@ -102,16 +102,16 @@ export default function ClassLibrary({ kind, onCopied, onMessage }: {
               <button type="button" aria-label={`Play ${it.name}`} onClick={async () => {
                 const c = await fetchArt(it.id);
                 if (c) new Audio(c.dataUri).play().catch(() => {});
-              }} style={{ background: 'transparent', color: '#f8f8f2', border: '1px solid #44475a', borderRadius: 4, cursor: 'pointer', padding: '2px 8px' }}>▶</button>
+              }} style={{ background: 'transparent', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4, cursor: 'pointer', padding: '2px 8px' }}>▶</button>
             )}
             <div style={{ fontSize: 11, textAlign: kind === 'texture' ? 'center' : 'left', wordBreak: 'break-all' }}>
               <code>{it.name}</code>
-              <div style={{ color: '#8393c4' }}>{it.mine ? 'yours' : it.owner}{it.hidden ? ' · hidden by teacher' : ''}</div>
+              <div style={{ color: 'var(--c-dim)' }}>{it.mine ? 'yours' : it.owner}{it.hidden ? ' · hidden by teacher' : ''}</div>
             </div>
             {!it.mine && (
               <button type="button" onClick={() => void copy(it)} style={{
                 fontSize: 11, padding: '2px 6px', borderRadius: 4, cursor: 'pointer',
-                background: 'transparent', color: '#8be9fd', border: '1px solid #44475a',
+                background: 'transparent', color: 'var(--c-cyan)', border: '1px solid var(--c-line)',
               }}>Copy to mine</button>
             )}
           </div>

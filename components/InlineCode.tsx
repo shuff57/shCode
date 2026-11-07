@@ -13,12 +13,12 @@ export function withInlineCode(text: string) {
       <code
         key={i}
         style={{
-          background: '#21222c',
-          border: '1px solid #44475a',
+          background: 'var(--c-deep2)',
+          border: '1px solid var(--c-line)',
           borderRadius: 3,
           padding: '1px 5px',
           fontSize: '0.92em',
-          color: '#f1fa8c',
+          color: 'var(--c-yellow)',
         }}
       >
         {part}

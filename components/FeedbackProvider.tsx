@@ -58,7 +58,7 @@ interface ToastItem extends ToastOptions {
   message: string;
 }
 
-const C = { bg: '#282a36', card: '#1e1f29', border: '#44475a', text: '#f8f8f2', dim: '#a9b7e0', ok: '#50fa7b', err: '#ff5555', info: '#8be9fd', accent: '#bd93f9' };
+const C = { bg: '#282a36', card: '#1e1f29', border: 'var(--c-line)', text: '#f8f8f2', dim: '#a9b7e0', ok: '#50fa7b', err: '#ff5555', info: '#8be9fd', accent: '#bd93f9' };
 
 export function FeedbackProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
@@ -224,7 +224,7 @@ function ConfirmDialog({ options, onAnswer }: { options: ConfirmOptions; onAnswe
             type="button"
             disabled={!ready}
             onClick={() => onAnswer(true)}
-            style={{ background: ready ? accent : C.border, color: danger && ready ? C.text : '#282a36', border: 'none', borderRadius: 4, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: ready ? 'pointer' : 'not-allowed', opacity: ready ? 1 : 0.6 }}
+            style={{ background: ready ? accent : C.border, color: danger && ready ? C.text : 'var(--c-bg)', border: 'none', borderRadius: 4, padding: '8px 16px', fontSize: 13, fontWeight: 700, cursor: ready ? 'pointer' : 'not-allowed', opacity: ready ? 1 : 0.6 }}
           >
             {confirmLabel}
           </button>

@@ -228,9 +228,9 @@ export default function DiagramAssignmentView({
             tabIndex={withIds ? -1 : undefined}
             style={{
               padding: '9px 12px',
-              background: '#282a36',
+              background: 'var(--c-bg)',
               borderRadius: 6,
-              border: '1px solid ' + (c.passed ? '#50fa7b44' : '#ff555577'),
+              border: '1px solid ' + (c.passed ? 'color-mix(in srgb, var(--c-green) 26.6667%, transparent)' : 'color-mix(in srgb, var(--c-red) 46.6667%, transparent)'),
               display: 'flex',
               gap: 9,
               alignItems: 'flex-start',
@@ -242,8 +242,8 @@ export default function DiagramAssignmentView({
               <CircleX size={17} color="#ff5555" style={{ flex: '0 0 auto', marginTop: 1 }} />
             )}
             <div>
-              <strong style={{ color: '#f8f8f2', fontSize: 13.5 }}>{c.title}</strong>
-              <p style={{ margin: '2px 0 0', color: '#bbb', fontSize: 12.5, lineHeight: 1.5 }}>
+              <strong style={{ color: 'var(--c-fg)', fontSize: 13.5 }}>{c.title}</strong>
+              <p style={{ margin: '2px 0 0', color: 'var(--x-bbbbbb)', fontSize: 12.5, lineHeight: 1.5 }}>
                 {c.detail}
               </p>
             </div>
@@ -410,7 +410,7 @@ export default function DiagramAssignmentView({
   return (
     <section style={{ marginTop: 28 }}>
       {promptText && !fallbackPrompt ? (
-        <p style={{ color: '#ccc', fontSize: 14, lineHeight: 1.6, margin: '0 0 14px' }}>
+        <p style={{ color: 'var(--x-cccccc)', fontSize: 14, lineHeight: 1.6, margin: '0 0 14px' }}>
           {promptText}
         </p>
       ) : null}
@@ -438,7 +438,7 @@ export default function DiagramAssignmentView({
             content: checks ? (
               renderChecks(checks, false)
             ) : (
-              <p style={{ color: '#a9aecb', margin: 0 }}>
+              <p style={{ color: 'var(--x-a9aecb)', margin: 0 }}>
                 Press <strong>Check my diagram</strong> to see which rules your chart meets.
               </p>
             ),
@@ -451,11 +451,11 @@ export default function DiagramAssignmentView({
             style={{
               padding: '7px 14px',
               borderRadius: 6,
-              border: '1px solid #8be9fd',
+              border: '1px solid var(--c-cyan)',
               fontWeight: 600,
               cursor: 'pointer',
               background: 'transparent',
-              color: '#8be9fd',
+              color: 'var(--c-cyan)',
               display: 'inline-flex',
               alignItems: 'center',
               gap: 6,
@@ -484,11 +484,11 @@ export default function DiagramAssignmentView({
           style={{
             padding: '8px 15px',
             borderRadius: 6,
-            border: '1px solid #8be9fd',
+            border: '1px solid var(--c-cyan)',
             fontWeight: 600,
             cursor: 'pointer',
             background: 'transparent',
-            color: '#8be9fd',
+            color: 'var(--c-cyan)',
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
@@ -528,9 +528,9 @@ export default function DiagramAssignmentView({
             border: 'none',
             fontWeight: 600,
             cursor: grading ? 'wait' : doc.nodes.length === 0 ? 'not-allowed' : 'pointer',
-            background: grading ? '#44475a' : doc.nodes.length === 0 ? '#333' : '#bd93f9',
+            background: grading ? 'var(--c-line)' : doc.nodes.length === 0 ? 'var(--x-333333)' : 'var(--c-purple)',
             opacity: liveBlocked && !grading ? 0.75 : 1,
-            color: '#282a36',
+            color: 'var(--c-bg)',
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
@@ -560,11 +560,11 @@ export default function DiagramAssignmentView({
           style={{
             padding: '8px 14px',
             borderRadius: 6,
-            border: '1px solid #44475a',
+            border: '1px solid var(--c-line)',
             fontWeight: 600,
             cursor: !progress.authed ? 'not-allowed' : 'pointer',
             background: 'transparent',
-            color: !progress.authed ? '#6272a4' : '#f8f8f2',
+            color: !progress.authed ? 'var(--c-comment)' : 'var(--c-fg)',
             opacity: !progress.authed ? 0.6 : 1,
             display: 'inline-flex',
             alignItems: 'center',
@@ -576,13 +576,13 @@ export default function DiagramAssignmentView({
           {saveStatus === 'saved' ? 'Saved ✓' : saveStatus === 'error' ? 'Save failed' : 'Save draft'}
         </button>
 
-        <span style={{ color: '#666', fontSize: 12 }}>
+        <span style={{ color: 'var(--x-666666)', fontSize: 12 }}>
           {doc.nodes.length} shapes · {doc.edges.length} arrows
         </span>
       </div>
 
       {/* Always mounted so a screen reader hears the text when it appears. */}
-      <div role="status" aria-live="polite" style={{ marginTop: blockedMsg ? 8 : 0, color: '#ffb86c', fontSize: 13, lineHeight: 1.5 }}>
+      <div role="status" aria-live="polite" style={{ marginTop: blockedMsg ? 8 : 0, color: 'var(--c-orange)', fontSize: 13, lineHeight: 1.5 }}>
         {blockedMsg}
       </div>
 
@@ -619,24 +619,24 @@ export default function DiagramAssignmentView({
 
       {checks && (
         <div style={{ marginTop: 16 }}>
-          <h3 style={{ fontSize: 14, color: '#8be9fd', margin: '0 0 8px', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <h3 style={{ fontSize: 14, color: 'var(--c-cyan)', margin: '0 0 8px', display: 'flex', alignItems: 'center', gap: 6 }}>
             <ListChecks size={16} />
             Flowchart structure — {checks.filter((c) => c.passed).length} / {checks.length} checks passed
           </h3>
           {summative && failedCount > 0 && (
-            <p style={{ margin: '0 0 8px', color: '#ffb86c', fontSize: 12.5, lineHeight: 1.5 }}>
+            <p style={{ margin: '0 0 8px', color: 'var(--c-orange)', fontSize: 12.5, lineHeight: 1.5 }}>
               This is a test, so you can hand the chart in like this. It unlocks the
               next part and your teacher marks it — come back if you have time.
             </p>
           )}
           {renderChecks(checks, true)}
           {structureOk && config.aiGrader && !summative ? (
-            <p style={{ color: '#8393c4', fontSize: 12.5, marginTop: 8 }}>
+            <p style={{ color: 'var(--c-dim)', fontSize: 12.5, marginTop: 8 }}>
               Order and wording are checked when you submit.
             </p>
           ) : null}
           {!structureOk && (
-            <p style={{ color: '#ffb86c', fontSize: 12.5, marginTop: 8 }}>
+            <p style={{ color: 'var(--c-orange)', fontSize: 12.5, marginTop: 8 }}>
               Shapes with a problem are outlined in red on the canvas.{' '}
               {/* Most diagram lessons have no aiGrader — the checks ARE the grade. Promising
                   an AI grader on those is a lie the student finds out about on submit. */}
@@ -653,14 +653,14 @@ export default function DiagramAssignmentView({
           style={{
             marginTop: 14,
             padding: 12,
-            background: offline ? '#282a36' : '#4a2a2a',
-            border: '1px solid ' + (offline ? '#6272a4' : '#ff5555'),
+            background: offline ? 'var(--c-bg)' : 'var(--x-4a2a2a)',
+            border: '1px solid ' + (offline ? 'var(--c-comment)' : 'var(--c-red)'),
             borderRadius: 6,
-            color: offline ? '#aaa' : '#ffd6d6',
+            color: offline ? 'var(--x-aaaaaa)' : 'var(--x-ffd6d6)',
             fontSize: 13,
           }}
         >
-          <strong style={{ color: offline ? '#bd93f9' : '#ff5555' }}>
+          <strong style={{ color: offline ? 'var(--c-purple)' : 'var(--c-red)' }}>
             {offline ? 'AI grader offline' : 'Error'}
           </strong>
           <p style={{ margin: '4px 0 0' }}>{error}</p>
@@ -673,7 +673,7 @@ export default function DiagramAssignmentView({
             marginTop: 16,
             padding: 12,
             borderRadius: 6,
-            border: '1px solid #50fa7b55',
+            border: '1px solid color-mix(in srgb, var(--c-green) 33.3333%, transparent)',
             background: 'rgba(80,250,123,0.06)',
             display: 'flex',
             alignItems: 'center',
@@ -681,7 +681,7 @@ export default function DiagramAssignmentView({
             flexWrap: 'wrap',
           }}
         >
-          <span style={{ color: '#f8f8f2', fontSize: 13.5, flex: '1 1 240px' }}>
+          <span style={{ color: 'var(--c-fg)', fontSize: 13.5, flex: '1 1 240px' }}>
             {result
               ? 'This part is complete. Read your feedback below, then move on when you are ready.'
               : 'All checks passed and this part is complete.'}
@@ -694,8 +694,8 @@ export default function DiagramAssignmentView({
               border: 'none',
               fontWeight: 600,
               cursor: 'pointer',
-              background: '#50fa7b',
-              color: '#282a36',
+              background: 'var(--c-green)',
+              color: 'var(--c-bg)',
             }}
           >
             Next lesson →
@@ -705,7 +705,7 @@ export default function DiagramAssignmentView({
 
       {result && (
         <div style={{ marginTop: 20 }}>
-          <h3 style={{ fontSize: 14, color: '#bd93f9', margin: '0 0 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <h3 style={{ fontSize: 14, color: 'var(--c-purple)', margin: '0 0 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
             <Sparkles size={16} />
             {config.aiGrader?.rubricTitle ?? 'Your grade and feedback'}
           </h3>
@@ -714,10 +714,10 @@ export default function DiagramAssignmentView({
               style={{
                 marginBottom: 12,
                 padding: 12,
-                borderLeft: '3px solid #bd93f9',
+                borderLeft: '3px solid var(--c-purple)',
                 background: 'rgba(189,147,249,0.08)',
                 borderRadius: 4,
-                color: '#f8f8f2',
+                color: 'var(--c-fg)',
                 fontStyle: 'italic',
                 whiteSpace: 'pre-line',
               }}
@@ -737,16 +737,16 @@ export default function DiagramAssignmentView({
                   key={c.id || i}
                   style={{
                     padding: 12,
-                    background: '#282a36',
+                    background: 'var(--c-bg)',
                     borderRadius: 6,
                     border: '1px solid ' + color + '55',
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                     <Icon size={18} color={color} />
-                    <strong style={{ color: '#f8f8f2' }}>{label?.title || c.id}</strong>
+                    <strong style={{ color: 'var(--c-fg)' }}>{label?.title || c.id}</strong>
                     {c.source ? (
-                      <span style={{ fontSize: 11, color: '#8393c4', border: '1px solid #44475a', borderRadius: 10, padding: '1px 7px' }}>
+                      <span style={{ fontSize: 11, color: 'var(--c-dim)', border: '1px solid var(--c-line)', borderRadius: 10, padding: '1px 7px' }}>
                         {c.source === 'rules' ? 'Checked by rules' : 'AI feedback'}
                       </span>
                     ) : null}
@@ -755,7 +755,7 @@ export default function DiagramAssignmentView({
                     </span>
                   </div>
                   {c.feedback && (
-                    <p style={{ margin: '4px 0 0 26px', color: '#ccc', fontSize: 13, lineHeight: 1.5 }}>
+                    <p style={{ margin: '4px 0 0 26px', color: 'var(--x-cccccc)', fontSize: 13, lineHeight: 1.5 }}>
                       {c.feedback}
                     </p>
                   )}
@@ -768,9 +768,9 @@ export default function DiagramAssignmentView({
               style={{
                 marginTop: 14,
                 padding: 12,
-                background: '#282a36',
+                background: 'var(--c-bg)',
                 borderRadius: 6,
-                border: '1px solid #ffb86c55',
+                border: '1px solid color-mix(in srgb, var(--c-orange) 33.3333%, transparent)',
               }}
             >
               <div
@@ -779,14 +779,14 @@ export default function DiagramAssignmentView({
                   alignItems: 'center',
                   gap: 6,
                   marginBottom: 6,
-                  color: '#ffb86c',
+                  color: 'var(--c-orange)',
                   fontWeight: 600,
                 }}
               >
                 <Lightbulb size={16} />
                 Hints
               </div>
-              <ul style={{ margin: 0, paddingLeft: 22, color: '#ccc', fontSize: 13, lineHeight: 1.6 }}>
+              <ul style={{ margin: 0, paddingLeft: 22, color: 'var(--x-cccccc)', fontSize: 13, lineHeight: 1.6 }}>
                 {result.hints.map((h, i) => (
                   <li key={i}>{h}</li>
                 ))}

@@ -25,9 +25,9 @@ export default function DueClassPicker() {
         disabled={due.saving}
         onChange={(e) => void selectClass(e.target.value)}
         style={{
-          background: '#282a36',
-          color: '#f8f8f2',
-          border: '1px solid #44475a',
+          background: 'var(--c-bg)',
+          color: 'var(--c-fg)',
+          border: '1px solid var(--c-line)',
           borderRadius: 6,
           fontSize: 13,
           padding: '5px 8px',
@@ -41,7 +41,7 @@ export default function DueClassPicker() {
           </option>
         ))}
       </select>
-      {due.error && <span style={{ color: '#ff5555' }}>{due.error}</span>}
+      {due.error && <span style={{ color: 'var(--c-red)' }}>{due.error}</span>}
     </span>
   );
 }

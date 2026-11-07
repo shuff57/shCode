@@ -73,11 +73,11 @@ export default function JoinClassPage() {
       <div style={styles.outer}>
         <div style={styles.card}>
           <h1 style={styles.heading}>Join a Class</h1>
-          <p style={{ color: '#f8f8f2', opacity: 0.75, marginBottom: 16 }}>
+          <p style={{ color: 'var(--c-fg)', opacity: 0.75, marginBottom: 16 }}>
             You need to be signed in to join a class.
           </p>
-          <p style={{ color: '#6272a4', fontSize: 13 }}>
-            Use the <strong style={{ color: '#8be9fd' }}>Sign in</strong> button in the header to
+          <p style={{ color: 'var(--c-comment)', fontSize: 13 }}>
+            Use the <strong style={{ color: 'var(--c-cyan)' }}>Sign in</strong> button in the header to
             continue.
           </p>
         </div>
@@ -90,7 +90,7 @@ export default function JoinClassPage() {
       <div style={styles.outer}>
         <div style={styles.card}>
           <h1 style={styles.heading}>Join a Class</h1>
-          <p style={{ color: '#f8f8f2', opacity: 0.75, marginBottom: 16 }}>
+          <p style={{ color: 'var(--c-fg)', opacity: 0.75, marginBottom: 16 }}>
             Teachers don&apos;t join classes — go to{' '}
             <a href="/teacher" style={styles.link}>
               /teacher
@@ -106,7 +106,7 @@ export default function JoinClassPage() {
     <div style={styles.outer}>
       <div style={styles.card}>
         <h1 style={styles.heading}>Join a Class</h1>
-        <p style={{ color: '#6272a4', fontSize: 13, marginBottom: 24 }}>
+        <p style={{ color: 'var(--c-comment)', fontSize: 13, marginBottom: 24 }}>
           Enter the 6-character code your teacher gave you.
         </p>
 
@@ -126,10 +126,10 @@ export default function JoinClassPage() {
               textTransform: 'uppercase',
               textAlign: 'center',
               padding: '14px 16px',
-              background: '#44475a',
-              border: '1px solid #6272a4',
+              background: 'var(--c-line)',
+              border: '1px solid var(--c-comment)',
               borderRadius: 6,
-              color: '#f8f8f2',
+              color: 'var(--c-fg)',
               outline: 'none',
               width: '100%',
               boxSizing: 'border-box',
@@ -142,8 +142,8 @@ export default function JoinClassPage() {
             type="submit"
             disabled={code.length !== 6 || loading || !!success}
             style={{
-              background: code.length === 6 && !loading && !success ? '#bd93f9' : '#44475a',
-              color: code.length === 6 && !loading && !success ? '#282a36' : '#6272a4',
+              background: code.length === 6 && !loading && !success ? 'var(--c-purple)' : 'var(--c-line)',
+              color: code.length === 6 && !loading && !success ? 'var(--c-bg)' : 'var(--c-comment)',
               border: 'none',
               padding: '12px 0',
               borderRadius: 6,
@@ -161,7 +161,7 @@ export default function JoinClassPage() {
           <p
             style={{
               marginTop: 20,
-              color: '#50fa7b',
+              color: 'var(--c-green)',
               fontWeight: 600,
               fontSize: 15,
               textAlign: 'center',
@@ -174,7 +174,7 @@ export default function JoinClassPage() {
         {error === 'not-signed-in' && (
           <p style={{ ...styles.errorBox }}>
             You&apos;re not signed in. Use the{' '}
-            <strong style={{ color: '#8be9fd' }}>Sign in</strong> button in the header.
+            <strong style={{ color: 'var(--c-cyan)' }}>Sign in</strong> button in the header.
           </p>
         )}
 
@@ -199,7 +199,7 @@ export default function JoinClassPage() {
 const styles = {
   outer: {
     minHeight: '100vh',
-    background: '#282a36',
+    background: 'var(--c-bg)',
     display: 'flex',
     alignItems: 'flex-start',
     justifyContent: 'center',
@@ -213,19 +213,19 @@ const styles = {
     maxWidth: 440,
   } as React.CSSProperties,
   heading: {
-    color: '#f8f8f2',
+    color: 'var(--c-fg)',
     fontSize: 26,
     fontWeight: 700,
     marginBottom: 8,
     marginTop: 0,
   } as React.CSSProperties,
   link: {
-    color: '#8be9fd',
+    color: 'var(--c-cyan)',
     textDecoration: 'underline',
   } as React.CSSProperties,
   errorBox: {
     marginTop: 16,
-    color: '#ff5555',
+    color: 'var(--c-red)',
     fontSize: 14,
     lineHeight: 1.5,
     background: 'rgba(255,85,85,0.1)',

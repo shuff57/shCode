@@ -158,14 +158,14 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
         left: 0,
         right: 0,
         bottom: 0,
-        background: '#21222c',
-        borderTop: '1px solid #44475a',
+        background: 'var(--c-deep2)',
+        borderTop: '1px solid var(--c-line)',
         padding: '8px 16px',
         zIndex: 50,
         display: 'flex',
         alignItems: 'center',
         gap: 12,
-        color: '#f8f8f2',
+        color: 'var(--c-fg)',
         boxShadow: '0 -4px 12px rgba(0,0,0,0.35)',
         fontSize: 12,
       }}
@@ -174,7 +174,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
         href={`/module/${moduleId}`}
         prefetch={false}
         style={{
-          color: '#8be9fd',
+          color: 'var(--c-cyan)',
           textDecoration: 'none',
           fontWeight: 600,
           minWidth: 80,
@@ -185,7 +185,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
       {/* Dropped below 720px (see globals.css): at phone width this and the
           segments were competing for the same ~70px, and the tally on the
           right already says how many lessons the module has. */}
-      <span className="lesson-progress-count" style={{ color: '#6272a4', minWidth: 96 }}>
+      <span className="lesson-progress-count" style={{ color: 'var(--c-comment)', minWidth: 96 }}>
         {idx >= 0 ? `Lesson ${idx + 1} of ${lessons.length}` : `${lessons.length} lessons`}
       </span>
       {/* Segments, not dots. A dot is a fixed 14px, so 31 of them plus the
@@ -369,9 +369,9 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
                 whiteSpace: 'normal',
                 maxWidth: 'min(60vw, 520px)',
                 lineHeight: 1.35,
-                background: '#282a36',
-                border: '1px solid #44475a',
-                color: '#f8f8f2',
+                background: 'var(--c-bg)',
+                border: '1px solid var(--c-line)',
+                color: 'var(--c-fg)',
                 fontSize: 12,
                 borderRadius: 4,
                 padding: '4px 8px',
@@ -385,11 +385,11 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
           )}
       </div>
       {snap.loaded && !snap.authed ? (
-        <span style={{ color: '#6272a4' }}>
-          <span style={{ color: '#8be9fd' }}>Sign in</span> to save progress
+        <span style={{ color: 'var(--c-comment)' }}>
+          <span style={{ color: 'var(--c-cyan)' }}>Sign in</span> to save progress
         </span>
       ) : (
-        <span style={{ color: '#6272a4', minWidth: 68, textAlign: 'right' }}>
+        <span style={{ color: 'var(--c-comment)', minWidth: 68, textAlign: 'right' }}>
           {done}/{lessons.length} · {pct}%
         </span>
       )}

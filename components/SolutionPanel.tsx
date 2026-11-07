@@ -162,7 +162,7 @@ export default function SolutionPanel({ lessonId, onInsert, readOnly }: Solution
                 gap: 8,
                 margin: '2px 0 10px',
                 fontSize: 13,
-                color: '#f8f8f2',
+                color: 'var(--c-fg)',
               }}
             >
               <span>Problem</span>
@@ -173,9 +173,9 @@ export default function SolutionPanel({ lessonId, onInsert, readOnly }: Solution
                 style={{
                   padding: '4px 8px',
                   borderRadius: 6,
-                  border: '1px solid #44475a',
-                  background: '#282a36',
-                  color: '#f8f8f2',
+                  border: '1px solid var(--c-line)',
+                  background: 'var(--c-bg)',
+                  color: 'var(--c-fg)',
                   fontSize: 13,
                 }}
               >

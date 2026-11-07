@@ -60,15 +60,15 @@ export default async function ModulePage({
 
       <style>{`
         .prose h2 { margin-top: 28px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
-        .prose h3 { margin-top: 20px; color: #bd93f9; }
+        .prose h3 { margin-top: 20px; color: var(--c-purple); }
         .prose table { border-collapse: collapse; margin: 12px 0; }
         .prose th, .prose td { border: 1px solid var(--border); padding: 6px 10px; }
         .prose th { background: var(--muted); }
-        .prose code { background: var(--muted); padding: 1px 5px; border-radius: 3px; color: #ffb86c; }
+        .prose code { background: var(--muted); padding: 1px 5px; border-radius: 3px; color: var(--c-orange); }
         .prose pre { background: var(--muted); padding: 12px; border-radius: 6px; overflow-x: auto; }
         .prose pre code { background: transparent; padding: 0; color: var(--text); }
         .prose a { color: var(--brand); }
-        .prose blockquote { border-left: 3px solid #bd93f9; margin: 12px 0; padding: 4px 14px; color: var(--text); opacity: 0.85; background: rgba(189,147,249,0.08); }
+        .prose blockquote { border-left: 3px solid var(--c-purple); margin: 12px 0; padding: 4px 14px; color: var(--text); opacity: 0.85; background: rgba(189,147,249,0.08); }
       `}</style>
     </main>
   );

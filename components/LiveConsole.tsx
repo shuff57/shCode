@@ -238,12 +238,12 @@ export default function LiveConsole({ iframeRef, resetKey }: Props) {
         }
         .liveconsole-text { flex: 1 1 auto; }
         .liveconsole-input .liveconsole-text,
-        .liveconsole-input { color: #8be9fd; }
-        .liveconsole-result .liveconsole-text { color: #f1fa8c; }
-        .liveconsole-result-err .liveconsole-text { color: #ff5555; }
-        .liveconsole-error .liveconsole-text { color: #ff5555; }
-        .liveconsole-warn .liveconsole-text { color: #ffb86c; }
-        .liveconsole-info .liveconsole-text { color: #8be9fd; }
+        .liveconsole-input { color: var(--c-cyan); }
+        .liveconsole-result .liveconsole-text { color: var(--c-yellow); }
+        .liveconsole-result-err .liveconsole-text { color: var(--c-red); }
+        .liveconsole-error .liveconsole-text { color: var(--c-red); }
+        .liveconsole-warn .liveconsole-text { color: var(--c-orange); }
+        .liveconsole-info .liveconsole-text { color: var(--c-cyan); }
         .liveconsole-input-row {
           display: flex;
           align-items: center;
@@ -270,11 +270,11 @@ export default function LiveConsole({ iframeRef, resetKey }: Props) {
           flex-direction: column;
           gap: 2px;
           padding: 4px 0 4px 6px;
-          border-left: 2px solid #ff5555;
+          border-left: 2px solid var(--c-red);
           margin: 2px 0;
         }
         .liveconsole-error-line { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
-        .liveconsole-error-name { color: #ff5555; font-weight: 600; }
+        .liveconsole-error-name { color: var(--c-red); font-weight: 600; }
         .liveconsole-error-loc { color: var(--brand); font-size: 11.5px; padding-left: 22px; }
         .liveconsole-error-snippet {
           display: block;

@@ -77,9 +77,9 @@ export default function StaleBuildGuard() {
         bottom: 16,
         right: 16,
         zIndex: 9999,
-        background: '#282a36',
-        border: '2px solid #ff5555',
-        color: '#f8f8f2',
+        background: 'var(--c-bg)',
+        border: '2px solid var(--c-red)',
+        color: 'var(--c-fg)',
         borderRadius: 8,
         padding: '12px 16px',
         fontSize: '0.85rem',
@@ -91,8 +91,8 @@ export default function StaleBuildGuard() {
       <button
         onClick={() => window.location.reload()}
         style={{
-          background: '#bd93f9',
-          color: '#282a36',
+          background: 'var(--c-purple)',
+          color: 'var(--c-bg)',
           border: 'none',
           borderRadius: 4,
           padding: '6px 12px',

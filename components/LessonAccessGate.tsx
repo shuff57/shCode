@@ -90,7 +90,7 @@ export default function LessonAccessGate({
         style={{
           padding: '4rem 2rem',
           textAlign: 'center',
-          color: '#6272a4',
+          color: 'var(--c-comment)',
           fontSize: '0.95rem',
         }}
       >
@@ -109,11 +109,11 @@ export default function LessonAccessGate({
         padding: '2.5rem',
         maxWidth: 560,
         margin: '4rem auto',
-        background: '#21222c',
-        border: '1px solid #44475a',
+        background: 'var(--c-deep2)',
+        border: '1px solid var(--c-line)',
         borderRadius: 10,
         textAlign: 'center',
-        color: '#f8f8f2',
+        color: 'var(--c-fg)',
         boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
       }}
     >
@@ -123,12 +123,12 @@ export default function LessonAccessGate({
       <h1 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '0.5rem' }}>
         Lesson locked
       </h1>
-      <p style={{ color: '#bdbdce', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+      <p style={{ color: 'var(--x-bdbdce)', marginBottom: '1.25rem', lineHeight: 1.5 }}>
         Finish the prior lessons in this module to unlock this one.
         {!snap.authed && (
           <>
             {' '}
-            <span style={{ color: '#8be9fd' }}>Sign in</span> to track your progress.
+            <span style={{ color: 'var(--c-cyan)' }}>Sign in</span> to track your progress.
           </>
         )}
       </p>
@@ -151,7 +151,7 @@ export default function LessonAccessGate({
             style={{
               textAlign: 'left',
               marginBottom: '1.75rem',
-              border: '1px solid #44475a',
+              border: '1px solid var(--c-line)',
               borderRadius: 6,
               overflow: 'hidden',
             }}
@@ -160,10 +160,10 @@ export default function LessonAccessGate({
             <div
               style={{
                 padding: '0.55rem 1rem',
-                background: '#282a36',
-                borderBottom: '1px solid #44475a',
+                background: 'var(--c-bg)',
+                borderBottom: '1px solid var(--c-line)',
                 fontSize: '0.78rem',
-                color: '#8be9fd',
+                color: 'var(--c-cyan)',
                 fontWeight: 600,
               }}
             >
@@ -208,7 +208,7 @@ export default function LessonAccessGate({
                     gap: '0.6rem',
                     padding: '0.45rem 1rem',
                     background: bg,
-                    borderBottom: i < total - 1 ? '1px solid #2d2e3d' : 'none',
+                    borderBottom: i < total - 1 ? '1px solid var(--x-2d2e3d)' : 'none',
                     fontSize: '0.85rem',
                     color,
                   }}
@@ -245,8 +245,8 @@ export default function LessonAccessGate({
           style={{
             display: 'inline-block',
             padding: '0.6rem 1.2rem',
-            background: '#bd93f9',
-            color: '#282a36',
+            background: 'var(--c-purple)',
+            color: 'var(--c-bg)',
             borderRadius: 4,
             textDecoration: 'none',
             fontWeight: 600,
@@ -260,8 +260,8 @@ export default function LessonAccessGate({
           style={{
             display: 'inline-block',
             padding: '0.6rem 1.2rem',
-            background: '#bd93f9',
-            color: '#282a36',
+            background: 'var(--c-purple)',
+            color: 'var(--c-bg)',
             borderRadius: 4,
             textDecoration: 'none',
             fontWeight: 600,
@@ -284,11 +284,11 @@ function NotYetPanel({ openAt, moduleId }: { openAt: number | null; moduleId: st
         padding: '2.5rem',
         maxWidth: 520,
         margin: '4rem auto',
-        background: '#21222c',
-        border: '1px solid #44475a',
+        background: 'var(--c-deep2)',
+        border: '1px solid var(--c-line)',
         borderRadius: 10,
         textAlign: 'center',
-        color: '#f8f8f2',
+        color: 'var(--c-fg)',
         boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
       }}
     >
@@ -298,27 +298,27 @@ function NotYetPanel({ openAt, moduleId }: { openAt: number | null; moduleId: st
       <h1 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '0.5rem' }}>
         Not available yet
       </h1>
-      <p style={{ color: '#bdbdce', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+      <p style={{ color: 'var(--x-bdbdce)', marginBottom: '1.25rem', lineHeight: 1.5 }}>
         Your teacher set this lesson to open later.
       </p>
 
       {openAt !== null && (
         <div
           style={{
-            border: '1px solid #44475a',
+            border: '1px solid var(--c-line)',
             borderRadius: 6,
             padding: '0.9rem 1rem',
             marginBottom: '1.75rem',
-            background: '#282a36',
+            background: 'var(--c-bg)',
           }}
         >
-          <div style={{ fontSize: '0.75rem', color: '#6272a4', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--c-comment)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             Opens
           </div>
-          <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#bd93f9', marginTop: 4 }}>
+          <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--c-purple)', marginTop: 4 }}>
             {formatDue(openAt)}
           </div>
-          <div style={{ fontSize: '0.95rem', color: '#f8f8f2' }}>{formatTime(openAt)}</div>
+          <div style={{ fontSize: '0.95rem', color: 'var(--c-fg)' }}>{formatTime(openAt)}</div>
           {/* The page unlocks itself when the moment arrives — useLessonAvailability
               re-renders on a 30s clock — so nobody has to be told to refresh. */}
         </div>
@@ -330,8 +330,8 @@ function NotYetPanel({ openAt, moduleId }: { openAt: number | null; moduleId: st
         style={{
           display: 'inline-block',
           padding: '0.6rem 1.2rem',
-          background: '#bd93f9',
-          color: '#282a36',
+          background: 'var(--c-purple)',
+          color: 'var(--c-bg)',
           borderRadius: 4,
           textDecoration: 'none',
           fontWeight: 600,

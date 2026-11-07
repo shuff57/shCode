@@ -63,17 +63,17 @@ export default function ClassLibraryModeration({ classId }: { classId: string })
     await load();
   };
 
-  if (error) return <p style={{ color: '#ff5555', fontSize: 13 }}>{error}</p>;
-  if (!rows) return <p style={{ color: '#8393c4', fontSize: 13 }}>Loading…</p>;
+  if (error) return <p style={{ color: 'var(--c-red)', fontSize: 13 }}>{error}</p>;
+  if (!rows) return <p style={{ color: 'var(--c-dim)', fontSize: 13 }}>Loading…</p>;
   if (!rows.length) {
-    return <p style={{ color: '#8393c4', fontSize: 13, margin: 0 }}>Nothing shared yet. When a student presses &ldquo;Share with class&rdquo; on a texture or sound, it shows up here and in every classmate&rsquo;s library at once.</p>;
+    return <p style={{ color: 'var(--c-dim)', fontSize: 13, margin: 0 }}>Nothing shared yet. When a student presses &ldquo;Share with class&rdquo; on a texture or sound, it shows up here and in every classmate&rsquo;s library at once.</p>;
   }
-  const btn = { fontSize: 12, padding: '3px 8px', borderRadius: 4, cursor: 'pointer', background: 'transparent', color: '#8be9fd', border: '1px solid #44475a' } as const;
+  const btn = { fontSize: 12, padding: '3px 8px', borderRadius: 4, cursor: 'pointer', background: 'transparent', color: 'var(--c-cyan)', border: '1px solid var(--c-line)' } as const;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
       {rows.map((r) => (
         <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', opacity: r.hidden ? 0.7 : 1 }}>
-          <div style={{ width: 36, height: 36, background: '#202020', borderRadius: 4, overflow: 'hidden', flex: 'none', display: 'grid', placeItems: 'center' }}>
+          <div style={{ width: 36, height: 36, background: 'var(--x-202020)', borderRadius: 4, overflow: 'hidden', flex: 'none', display: 'grid', placeItems: 'center' }}>
             {r.kind === 'texture'
               ? art[r.id] && (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -85,14 +85,14 @@ export default function ClassLibraryModeration({ classId }: { classId: string })
               )}
           </div>
           <div style={{ fontSize: 13, minWidth: 160 }}>
-            <code>{r.name}</code> <span style={{ color: '#8393c4' }}>({r.kind}) by {r.owner}</span>
-            {r.hidden && <span style={{ color: '#ffb86c' }}> · hidden from students</span>}
+            <code>{r.name}</code> <span style={{ color: 'var(--c-dim)' }}>({r.kind}) by {r.owner}</span>
+            {r.hidden && <span style={{ color: 'var(--c-orange)' }}> · hidden from students</span>}
           </div>
           <span style={{ flex: 1 }} />
           {r.hidden
             ? <button type="button" style={btn} onClick={() => void act(r, 'unhide')}>Show again</button>
             : <button type="button" style={btn} onClick={() => void act(r, 'hide')}>Hide</button>}
-          <button type="button" style={{ ...btn, color: '#ff5555' }} onClick={() => void act(r, 'remove')}>Remove</button>
+          <button type="button" style={{ ...btn, color: 'var(--c-red)' }} onClick={() => void act(r, 'remove')}>Remove</button>
         </div>
       ))}
     </div>

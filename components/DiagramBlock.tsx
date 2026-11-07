@@ -98,7 +98,7 @@ export default function DiagramBlock({
       {caption ? (
         <figcaption
           style={{
-            color: '#8b93a7',
+            color: 'var(--x-8b93a7)',
             fontSize: 12.5,
             fontStyle: 'italic',
             textAlign: 'center',
@@ -112,7 +112,7 @@ export default function DiagramBlock({
       {!readOnly && !caption ? (
         <figcaption
           style={{
-            color: '#6272a4',
+            color: 'var(--c-comment)',
             fontSize: 12,
             marginTop: 6,
             display: 'flex',

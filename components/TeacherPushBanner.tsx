@@ -54,8 +54,8 @@ function TeacherPushModal({ unseenCommits, currentFiles, onAdopt, onClose }: Mod
     >
       <div
         style={{
-          background: 'var(--bg, #282a36)',
-          border: '1px solid var(--border, #44475a)',
+          background: 'var(--bg, var(--c-bg))',
+          border: '1px solid var(--border, var(--c-line))',
           borderRadius: 8,
           width: 'min(92vw, 860px)',
           maxHeight: '85vh',
@@ -68,17 +68,17 @@ function TeacherPushModal({ unseenCommits, currentFiles, onAdopt, onClose }: Mod
         <div
           style={{
             padding: '12px 16px',
-            borderBottom: '1px solid var(--border, #44475a)',
+            borderBottom: '1px solid var(--border, var(--c-line))',
             display: 'flex',
             alignItems: 'flex-start',
             gap: 8,
           }}
         >
           <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 600, fontSize: '1rem', color: '#f8f8f2' }}>
+            <div style={{ fontWeight: 600, fontSize: '1rem', color: 'var(--c-fg)' }}>
               Teacher&#39;s edit — {commit.message}
             </div>
-            <div style={{ fontSize: '0.78rem', color: '#888', marginTop: 2 }}>
+            <div style={{ fontSize: '0.78rem', color: 'var(--x-888888)', marginTop: 2 }}>
               {commit.authoredByEmail} &middot; {formatTs(commit.timestamp)}
             </div>
           </div>
@@ -94,7 +94,7 @@ function TeacherPushModal({ unseenCommits, currentFiles, onAdopt, onClose }: Mod
               >
                 &#8592;
               </button>
-              <span style={{ fontSize: '0.8rem', color: '#aaa', whiteSpace: 'nowrap' }}>
+              <span style={{ fontSize: '0.8rem', color: 'var(--x-aaaaaa)', whiteSpace: 'nowrap' }}>
                 {index + 1} of {total}
               </span>
               <button
@@ -111,7 +111,7 @@ function TeacherPushModal({ unseenCommits, currentFiles, onAdopt, onClose }: Mod
           <button
             aria-label="Close"
             onClick={onClose}
-            style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: '1.2rem', lineHeight: 1, padding: 0 }}
+            style={{ background: 'none', border: 'none', color: 'var(--x-888888)', cursor: 'pointer', fontSize: '1.2rem', lineHeight: 1, padding: 0 }}
           >
             &times;
           </button>
@@ -120,16 +120,16 @@ function TeacherPushModal({ unseenCommits, currentFiles, onAdopt, onClose }: Mod
         {/* Diff area */}
         <div style={{ flex: 1, overflowY: 'auto', padding: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
           {fileNames.length === 0 && (
-            <p style={{ color: '#888', fontSize: '0.9rem' }}>No file changes in this commit.</p>
+            <p style={{ color: 'var(--x-888888)', fontSize: '0.9rem' }}>No file changes in this commit.</p>
           )}
           {fileNames.map((fname) => (
-            <div key={fname} style={{ border: '1px solid var(--border, #44475a)', borderRadius: 6, overflow: 'hidden' }}>
+            <div key={fname} style={{ border: '1px solid var(--border, var(--c-line))', borderRadius: 6, overflow: 'hidden' }}>
               <div
                 style={{
                   padding: '4px 10px',
-                  background: 'var(--muted, #44475a)',
+                  background: 'var(--muted, var(--c-line))',
                   fontSize: '0.78rem',
-                  color: '#ccc',
+                  color: 'var(--x-cccccc)',
                   fontFamily: 'monospace',
                 }}
               >
@@ -149,7 +149,7 @@ function TeacherPushModal({ unseenCommits, currentFiles, onAdopt, onClose }: Mod
         <div
           style={{
             padding: '10px 16px',
-            borderTop: '1px solid var(--border, #44475a)',
+            borderTop: '1px solid var(--border, var(--c-line))',
             display: 'flex',
             justifyContent: 'flex-end',
             gap: 8,
@@ -158,8 +158,8 @@ function TeacherPushModal({ unseenCommits, currentFiles, onAdopt, onClose }: Mod
           <button
             onClick={onClose}
             style={{
-              background: '#6272a4',
-              color: '#f8f8f2',
+              background: 'var(--c-comment)',
+              color: 'var(--c-fg)',
               border: 'none',
               borderRadius: 5,
               padding: '7px 18px',
@@ -172,8 +172,8 @@ function TeacherPushModal({ unseenCommits, currentFiles, onAdopt, onClose }: Mod
           <button
             onClick={() => onAdopt(commit)}
             style={{
-              background: '#bd93f9',
-              color: '#282a36',
+              background: 'var(--c-purple)',
+              color: 'var(--c-bg)',
               border: 'none',
               borderRadius: 5,
               padding: '7px 18px',
@@ -193,8 +193,8 @@ function TeacherPushModal({ unseenCommits, currentFiles, onAdopt, onClose }: Mod
 function navBtnStyle(disabled: boolean): React.CSSProperties {
   return {
     background: 'none',
-    border: '1px solid #44475a',
-    color: disabled ? '#555' : '#f8f8f2',
+    border: '1px solid var(--c-line)',
+    color: disabled ? 'var(--x-555555)' : 'var(--c-fg)',
     borderRadius: 4,
     padding: '2px 8px',
     cursor: disabled ? 'default' : 'pointer',
@@ -280,8 +280,8 @@ export default function TeacherPushBanner() {
         role="status"
         aria-live="polite"
         style={{
-          background: '#f1fa8c',
-          color: '#1a1a1a',
+          background: 'var(--c-yellow)',
+          color: 'var(--x-1a1a1a)',
           padding: '6px 14px',
           display: 'flex',
           alignItems: 'center',
@@ -305,7 +305,7 @@ export default function TeacherPushBanner() {
               cursor: 'pointer',
               fontWeight: 600,
               fontSize: '0.85rem',
-              color: '#1a1a1a',
+              color: 'var(--x-1a1a1a)',
             }}
           >
             Review &#8594;
@@ -319,7 +319,7 @@ export default function TeacherPushBanner() {
               cursor: 'pointer',
               fontSize: '1.1rem',
               lineHeight: 1,
-              color: '#555',
+              color: 'var(--x-555555)',
               padding: '0 2px',
             }}
           >

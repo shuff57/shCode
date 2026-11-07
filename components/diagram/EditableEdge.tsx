@@ -87,10 +87,10 @@ function EditableEdge({
                 size={8}
                 style={{
                   width: 76,
-                  background: '#21222c',
-                  border: '1px dashed #ff79c6',
+                  background: 'var(--c-deep2)',
+                  border: '1px dashed var(--c-pink)',
                   borderRadius: 4,
-                  color: '#f8f8f2',
+                  color: 'var(--c-fg)',
                   fontSize: 12,
                   fontWeight: 600,
                   fontFamily: 'system-ui, sans-serif',
@@ -108,10 +108,10 @@ function EditableEdge({
                 title="Double-click to label this arrow"
                 style={{
                   display: 'inline-block',
-                  background: '#282a36',
-                  border: `1px solid ${selected ? '#ff79c6' : '#44475a'}`,
+                  background: 'var(--c-bg)',
+                  border: `1px solid ${selected ? 'var(--c-pink)' : 'var(--c-line)'}`,
                   borderRadius: 4,
-                  color: text.trim() ? '#f8f8f2' : '#6272a4',
+                  color: text.trim() ? 'var(--c-fg)' : 'var(--c-comment)',
                   fontSize: 12,
                   fontWeight: 600,
                   fontFamily: 'system-ui, sans-serif',
@@ -140,9 +140,9 @@ function EditableEdge({
                       }}
                       onMouseDown={(e) => e.stopPropagation()}
                       style={{
-                        background: on ? '#ff79c6' : '#21222c',
-                        color: on ? '#282a36' : '#f8f8f2',
-                        border: '1px solid #44475a',
+                        background: on ? 'var(--c-pink)' : 'var(--c-deep2)',
+                        color: on ? 'var(--c-bg)' : 'var(--c-fg)',
+                        border: '1px solid var(--c-line)',
                         borderRadius: 4,
                         fontSize: 11,
                         fontWeight: 700,

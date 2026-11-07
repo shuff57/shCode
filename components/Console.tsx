@@ -175,30 +175,30 @@ export default function Console({ resetKey }: { resetKey: string }) {
         .log-error-rich {
           display: block;
           padding: 4px 0;
-          border-left: 2px solid #ff5555;
+          border-left: 2px solid var(--c-red);
           padding-left: 8px;
           margin: 2px 0;
         }
         .log-error-line { display: flex; gap: 6px; align-items: baseline; flex-wrap: wrap; }
-        .log-error-name { color: #ff5555; font-weight: 600; }
+        .log-error-name { color: var(--c-red); font-weight: 600; }
         .log-error-loc {
           display: inline-block;
           margin-top: 2px;
           background: transparent;
           border: none;
-          color: #8be9fd;
+          color: var(--c-cyan);
           font: inherit;
           padding: 0;
           cursor: pointer;
           text-decoration: underline dotted;
         }
-        .log-error-loc:hover { color: #50fa7b; }
+        .log-error-loc:hover { color: var(--c-green); }
         .log-error-snippet {
           display: block;
           margin-top: 4px;
           padding: 4px 6px;
-          background: #282a36;
-          color: #f8f8f2;
+          background: var(--c-bg);
+          color: var(--c-fg);
           border-radius: 3px;
           font-family: 'Fira Code', Consolas, monospace;
           /* Issue #21: Fira Code's default ligatures render >=, !=, => etc.

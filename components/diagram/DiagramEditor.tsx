@@ -92,7 +92,7 @@ function flowToDoc(nodes: Node[], edges: Edge[]): DiagramDoc {
 
 const EDGE_BASE = {
   type: 'editable' as const,
-  markerEnd: { type: MarkerType.ArrowClosed, color: '#9aa3b8', width: 20, height: 20 },
+  markerEnd: { type: MarkerType.ArrowClosed, color: 'var(--x-9aa3b8)', width: 20, height: 20 },
 };
 
 /** How near a shape an arrow may pass before it counts as running through it. */
@@ -221,7 +221,7 @@ function styleEdge(e: Edge, selectedId: string | null, splice: string | null): E
     ...e,
     ...EDGE_BASE,
     style: {
-      stroke: isSplice ? '#50fa7b' : active ? '#ff79c6' : '#9aa3b8',
+      stroke: isSplice ? 'var(--c-green)' : active ? 'var(--c-pink)' : 'var(--x-9aa3b8)',
       strokeWidth: isSplice ? 4 : active ? 3 : 2,
       strokeDasharray: isSplice ? '7 4' : undefined,
     },
@@ -857,10 +857,10 @@ function Canvas({
       onKeyDownCapture={onWrapKeyDownCapture}
       className={readOnly ? 'shcode-flow shcode-flow-static' : 'shcode-flow'}
       style={{
-        border: '1px solid #44475a',
+        border: '1px solid var(--c-line)',
         borderRadius: 10,
         overflow: 'hidden',
-        background: '#21222c',
+        background: 'var(--c-deep2)',
       }}
     >
       {/* A figure is not a canvas: hide the connection dots so a printed-page
@@ -871,22 +871,22 @@ function Canvas({
       <style>{`
         .shcode-flow-static .react-flow__handle { opacity: 0 !important; }
         .shcode-flow .react-flow__controls-button {
-          background: #282a36;
-          border-bottom: 1px solid #44475a;
-          fill: #c8cde0;
-          color: #c8cde0;
+          background: var(--c-bg);
+          border-bottom: 1px solid var(--c-line);
+          fill: var(--x-c8cde0);
+          color: var(--x-c8cde0);
         }
-        .shcode-flow .react-flow__controls-button:hover { background: #3a3d4d; }
+        .shcode-flow .react-flow__controls-button:hover { background: var(--x-3a3d4d); }
         .shcode-flow .react-flow__attribution { background: transparent; font-size: 10px; }
-        .shcode-flow .react-flow__attribution a { color: #4b5163; }
+        .shcode-flow .react-flow__attribution a { color: var(--x-4b5163); }
         /* React Flow's reconnect anchors are transparent by default, which
            makes re-pointing an arrow undiscoverable. Show them as grab dots
            whenever the arrow is hovered or selected. */
         .shcode-flow .react-flow__edgeupdater { cursor: grab; fill: transparent; }
         .shcode-flow .react-flow__edge:hover .react-flow__edgeupdater,
         .shcode-flow .react-flow__edge.selected .react-flow__edgeupdater {
-          fill: #ff79c6;
-          stroke: #21222c;
+          fill: var(--c-pink);
+          stroke: var(--c-deep2);
           stroke-width: 2;
         }
         .shcode-flow:fullscreen {
@@ -916,11 +916,11 @@ function Canvas({
           min-height: 0;
           display: flex;
           flex-direction: column;
-          background: #282a36;
-          border-left: 1px solid #bd93f9;
+          background: var(--c-bg);
+          border-left: 1px solid var(--c-purple);
           box-shadow: -4px 0 14px rgba(0, 0, 0, 0.45);
         }
-        .shcode-flow-drawer .drawer-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 10px 12px; font-size: 13px; line-height: 1.55; color: #e0e2ee; }
+        .shcode-flow-drawer .drawer-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 10px 12px; font-size: 13px; line-height: 1.55; color: var(--x-e0e2ee); }
       `}</style>
 
       {!readOnly && (
@@ -931,12 +931,12 @@ function Canvas({
             gap: 8,
             flexWrap: 'wrap',
             padding: '8px 10px',
-            background: '#282a36',
-            borderBottom: '1px solid #44475a',
+            background: 'var(--c-bg)',
+            borderBottom: '1px solid var(--c-line)',
             flex: '0 0 auto',
           }}
         >
-          <span style={{ fontSize: 12, color: '#8b93a7', marginRight: 2 }}>Add:</span>
+          <span style={{ fontSize: 12, color: 'var(--x-8b93a7)', marginRight: 2 }}>Add:</span>
           <span role="status" aria-live="polite" className="sr-only">
             {announce}
           </span>
@@ -958,10 +958,10 @@ function Canvas({
                 alignItems: 'center',
                 gap: 7,
                 padding: '5px 11px',
-                background: '#21222c',
+                background: 'var(--c-deep2)',
                 border: `1px solid ${SHAPE_COLORS[shape].stroke}66`,
                 borderRadius: 6,
-                color: '#f8f8f2',
+                color: 'var(--c-fg)',
                 fontSize: 12.5,
                 fontWeight: 600,
                 cursor: 'grab',
@@ -978,9 +978,9 @@ function Canvas({
             style={{
               padding: '5px 10px',
               background: 'transparent',
-              border: '1px dashed #44475a',
+              border: '1px dashed var(--c-line)',
               borderRadius: 6,
-              color: '#8b93a7',
+              color: 'var(--x-8b93a7)',
               fontSize: 12,
               fontWeight: 600,
               cursor: 'pointer',
@@ -1016,9 +1016,9 @@ function Canvas({
                 style={{
                   padding: '4px 10px',
                   borderRadius: 6,
-                  border: '1px solid #bd93f9',
-                  background: drawerOpen ? '#44475a' : 'transparent',
-                  color: '#f8f8f2',
+                  border: '1px solid var(--c-purple)',
+                  background: drawerOpen ? 'var(--c-line)' : 'transparent',
+                  color: 'var(--c-fg)',
                   cursor: 'pointer',
                   fontSize: 12.5,
                 }}
@@ -1043,9 +1043,9 @@ function Canvas({
             gap: 10,
             alignItems: 'flex-start',
             padding: '8px 12px',
-            background: '#44475a',
-            borderBottom: '1px solid #6272a4',
-            color: '#f8f8f2',
+            background: 'var(--c-line)',
+            borderBottom: '1px solid var(--c-comment)',
+            color: 'var(--c-fg)',
             fontSize: 12.5,
             lineHeight: 1.4,
           }}
@@ -1055,7 +1055,7 @@ function Canvas({
             type="button"
             onClick={() => setNotice('')}
             aria-label="Dismiss message"
-            style={{ background: 'none', border: 0, color: '#f8f8f2', cursor: 'pointer', fontSize: 14 }}
+            style={{ background: 'none', border: 0, color: 'var(--c-fg)', cursor: 'pointer', fontSize: 14 }}
           >
             ×
           </button>
@@ -1065,7 +1065,7 @@ function Canvas({
       <div className="shcode-flow-stage">
       <div
         className="shcode-flow-canvas"
-        style={{ height, background: '#21222c' }}
+        style={{ height, background: 'var(--c-deep2)' }}
         onDragOver={(ev) => {
           if (readOnly) return;
           ev.preventDefault();
@@ -1174,7 +1174,7 @@ function Canvas({
         const active = drawerTabs.find((t) => t.key === drawerTab) ?? drawerTabs[0];
         return (
           <div className="shcode-flow-drawer" role="complementary" aria-label="Task and checks">
-            <div role="tablist" style={{ display: 'flex', borderBottom: '1px solid #44475a', flex: '0 0 auto' }}>
+            <div role="tablist" style={{ display: 'flex', borderBottom: '1px solid var(--c-line)', flex: '0 0 auto' }}>
               {drawerTabs.map((t) => (
                 <button
                   key={t.key}
@@ -1187,8 +1187,8 @@ function Canvas({
                     padding: '8px 10px',
                     background: 'transparent',
                     border: 0,
-                    borderBottom: '2px solid ' + (t.key === active.key ? '#f1fa8c' : 'transparent'),
-                    color: t.key === active.key ? '#f1fa8c' : '#a9aecb',
+                    borderBottom: '2px solid ' + (t.key === active.key ? 'var(--c-yellow)' : 'transparent'),
+                    color: t.key === active.key ? 'var(--c-yellow)' : 'var(--x-a9aecb)',
                     cursor: 'pointer',
                     fontSize: 13,
                     fontWeight: 600,
@@ -1200,7 +1200,7 @@ function Canvas({
             </div>
             <div className="drawer-body" role="tabpanel">{active.content}</div>
             {drawerFooter ? (
-              <div style={{ flex: '0 0 auto', padding: '8px 12px', borderTop: '1px solid #44475a' }}>{drawerFooter}</div>
+              <div style={{ flex: '0 0 auto', padding: '8px 12px', borderTop: '1px solid var(--c-line)' }}>{drawerFooter}</div>
             ) : null}
           </div>
         );
@@ -1215,15 +1215,15 @@ function Canvas({
             gap: 10,
             flexWrap: 'wrap',
             padding: '9px 10px',
-            background: '#282a36',
-            borderTop: '1px solid #44475a',
+            background: 'var(--c-bg)',
+            borderTop: '1px solid var(--c-line)',
             minHeight: 44,
             flex: '0 0 auto',
           }}
         >
           {selectedNode ? (
             <>
-              <span style={{ fontSize: 12, color: '#8b93a7' }}>Shape text</span>
+              <span style={{ fontSize: 12, color: 'var(--x-8b93a7)' }}>Shape text</span>
               <input
                 ref={labelInput}
                 value={String((selectedNode.data as any).label ?? '')}
@@ -1251,7 +1251,7 @@ function Canvas({
                   </option>
                 ))}
               </select>
-              <label style={{ fontSize: 12, color: '#8b93a7' }} htmlFor="flow-connect-to">
+              <label style={{ fontSize: 12, color: 'var(--x-8b93a7)' }} htmlFor="flow-connect-to">
                 Arrow to
               </label>
               <select
@@ -1281,10 +1281,10 @@ function Canvas({
                 title="Draw an arrow from the selected shape to the chosen one"
                 style={{
                   padding: '6px 12px',
-                  background: '#21222c',
-                  border: '1px solid #44475a',
+                  background: 'var(--c-deep2)',
+                  border: '1px solid var(--c-line)',
                   borderRadius: 6,
-                  color: '#f8f8f2',
+                  color: 'var(--c-fg)',
                   fontSize: 12.5,
                   fontWeight: 600,
                   cursor: connectTo ? 'pointer' : 'not-allowed',
@@ -1296,7 +1296,7 @@ function Canvas({
             </>
           ) : selectedEdge ? (
             <>
-              <span style={{ fontSize: 12, color: '#8b93a7' }}>Arrow label</span>
+              <span style={{ fontSize: 12, color: 'var(--x-8b93a7)' }}>Arrow label</span>
               <input
                 value={String(selectedEdge.label ?? '')}
                 onChange={(ev) => setEdgeLabel(selectedEdge.id, ev.target.value)}
@@ -1317,10 +1317,10 @@ function Canvas({
                       onClick={() => pickEdgeLabel(selectedEdge.id, answer)}
                       style={{
                         padding: '6px 12px',
-                        background: on ? '#ff79c6' : '#21222c',
-                        border: '1px solid #44475a',
+                        background: on ? 'var(--c-pink)' : 'var(--c-deep2)',
+                        border: '1px solid var(--c-line)',
                         borderRadius: 6,
-                        color: on ? '#282a36' : '#f8f8f2',
+                        color: on ? 'var(--c-bg)' : 'var(--c-fg)',
                         fontSize: 12.5,
                         fontWeight: 600,
                         cursor: 'pointer',
@@ -1332,7 +1332,7 @@ function Canvas({
                 })}
             </>
           ) : (
-            <span style={{ fontSize: 12.5, color: '#6272a4' }}>
+            <span style={{ fontSize: 12.5, color: 'var(--c-comment)' }}>
               Double-click a shape or an arrow to type on it. Drag from a shape&apos;s dot to draw
               an arrow, drag an arrow&apos;s end onto a different shape to re-point it, or drop a
               new shape onto an arrow to insert it mid-path.
@@ -1347,9 +1347,9 @@ function Canvas({
 const inputStyle = {
   flex: 1,
   minWidth: 180,
-  background: '#21222c',
-  color: '#f8f8f2',
-  border: '1px solid #44475a',
+  background: 'var(--c-deep2)',
+  color: 'var(--c-fg)',
+  border: '1px solid var(--c-line)',
   borderRadius: 6,
   padding: '6px 9px',
   fontSize: 13,
@@ -1380,10 +1380,10 @@ function IconButton({
         justifyContent: 'center',
         width: 30,
         height: 28,
-        background: '#21222c',
-        border: '1px solid #44475a',
+        background: 'var(--c-deep2)',
+        border: '1px solid var(--c-line)',
         borderRadius: 6,
-        color: disabled ? '#4b5163' : '#c8cde0',
+        color: disabled ? 'var(--x-4b5163)' : 'var(--x-c8cde0)',
         cursor: disabled ? 'not-allowed' : 'pointer',
       }}
     >
@@ -1467,13 +1467,13 @@ export default function DiagramEditor(props: Props) {
       <div
         style={{
           height: (props.height ?? 460) + (props.readOnly ? 0 : 90),
-          border: '1px solid #44475a',
+          border: '1px solid var(--c-line)',
           borderRadius: 10,
-          background: '#21222c',
+          background: 'var(--c-deep2)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#6272a4',
+          color: 'var(--c-comment)',
           fontSize: 13,
         }}
       >

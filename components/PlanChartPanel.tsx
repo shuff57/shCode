@@ -102,7 +102,7 @@ export default function PlanChartPanel({ planFrom, planFromLabel, onScaffold, st
   // rather than rendering an empty frame the student cannot explain.
   if (state === 'missing' || (!doc && text === null)) {
     return (
-      <div style={{ background: '#282a36', border: '1px solid #44475a', borderRadius: 6, padding: '10px 14px', marginBottom: 12, color: '#6272a4', fontSize: 13 }}>
+      <div style={{ background: 'var(--c-bg)', border: '1px solid var(--c-line)', borderRadius: 6, padding: '10px 14px', marginBottom: 12, color: 'var(--c-comment)', fontSize: 13 }}>
         Your plan from {label} could not be loaded. Open {label} in another tab
         to see it while you work.
       </div>
@@ -113,17 +113,17 @@ export default function PlanChartPanel({ planFrom, planFromLabel, onScaffold, st
     return (
       <div style={{ marginBottom: 12 }}>
         {stale && (
-          <div style={{ background: '#3a2f1a', border: '1px solid #ffb86c', borderRadius: 6, padding: '8px 12px', marginBottom: 8, color: '#ffb86c', fontSize: 13 }}>
+          <div style={{ background: 'var(--x-3a2f1a)', border: '1px solid var(--c-orange)', borderRadius: 6, padding: '8px 12px', marginBottom: 8, color: 'var(--c-orange)', fontSize: 13 }}>
             You changed this plan after starting Part 2. The plan here is your
             latest one; the pseudocode comments in the editor still describe the
             earlier version. Update the comments to match before you compare them.
           </div>
         )}
-        <div style={{ background: '#282a36', border: '1px solid #44475a', borderRadius: 6, padding: '10px 14px' }}>
-          <div style={{ color: '#8393c4', fontSize: 13, marginBottom: 6 }}>Your plan from {label}</div>
+        <div style={{ background: 'var(--c-bg)', border: '1px solid var(--c-line)', borderRadius: 6, padding: '10px 14px' }}>
+          <div style={{ color: 'var(--c-dim)', fontSize: 13, marginBottom: 6 }}>Your plan from {label}</div>
           <pre
             data-testid="plan-text"
-            style={{ margin: 0, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 13, color: '#f8f8f2', maxHeight: 320, overflow: 'auto' }}
+            style={{ margin: 0, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 13, color: 'var(--c-fg)', maxHeight: 320, overflow: 'auto' }}
           >{text}</pre>
         </div>
       </div>
@@ -135,7 +135,7 @@ export default function PlanChartPanel({ planFrom, planFromLabel, onScaffold, st
   return (
     <div style={{ marginBottom: 12 }}>
       {stale && (
-        <div style={{ background: '#3a2f1a', border: '1px solid #ffb86c', borderRadius: 6, padding: '8px 12px', marginBottom: 8, color: '#ffb86c', fontSize: 13 }}>
+        <div style={{ background: 'var(--x-3a2f1a)', border: '1px solid var(--c-orange)', borderRadius: 6, padding: '8px 12px', marginBottom: 8, color: 'var(--c-orange)', fontSize: 13 }}>
           You changed this chart after starting Part 2. The chart here is your
           latest one; the pseudocode comments in the editor still describe the
           earlier version. Update the comments to match before you compare them.

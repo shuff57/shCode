@@ -158,7 +158,7 @@ export default function ImageLibrary({ onClose, onPick }: Props) {
             onClick={() => fileInput.current?.click()}
             disabled={busy}
             style={{
-              background: C.accent, color: '#21222c', border: 'none', borderRadius: 6,
+              background: C.accent, color: 'var(--c-deep2)', border: 'none', borderRadius: 6,
               padding: '8px 14px', fontWeight: 600, cursor: busy ? 'wait' : 'pointer',
             }}
           >
@@ -189,7 +189,7 @@ export default function ImageLibrary({ onClose, onPick }: Props) {
         </div>
 
         {error && (
-          <div style={{ background: '#3a1f26', border: `1px solid ${C.red}`, color: '#ffb8b8',
+          <div style={{ background: 'var(--x-3a1f26)', border: `1px solid ${C.red}`, color: 'var(--x-ffb8b8)',
                         borderRadius: 6, padding: '8px 12px', fontSize: 13, marginBottom: 12 }}>
             {error}
           </div>
@@ -206,7 +206,7 @@ export default function ImageLibrary({ onClose, onPick }: Props) {
                 <div
                   style={{
                     height: 90, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: '#1a1b23', borderRadius: 4, overflow: 'hidden', marginBottom: 6,
+                    background: 'var(--x-1a1b23)', borderRadius: 4, overflow: 'hidden', marginBottom: 6,
                   }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}

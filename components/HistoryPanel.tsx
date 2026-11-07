@@ -98,14 +98,14 @@ function changeRows(original: string, modified: string): ChangeRow[] {
 }
 
 function rowStyle(kind: ChangeRow['kind']): React.CSSProperties {
-  if (kind === 'add') return { background: ADD, borderLeft: '3px solid #50fa7b' };
-  if (kind === 'del') return { background: DEL, borderLeft: '3px solid #ff5555' };
+  if (kind === 'add') return { background: ADD, borderLeft: '3px solid var(--c-green)' };
+  if (kind === 'del') return { background: DEL, borderLeft: '3px solid var(--c-red)' };
   return { borderLeft: '3px solid transparent' };
 }
 
 const tabStyle = (active: boolean): React.CSSProperties => ({
   background: active ? ACCENT : 'transparent',
-  color: active ? '#282a36' : MUTED,
+  color: active ? 'var(--c-bg)' : MUTED,
   border: 'none',
   borderRadius: 999,
   padding: '6px 14px',
@@ -123,7 +123,7 @@ const rowStyleBase = (active: boolean): React.CSSProperties => ({
   gap: 10,
   width: '100%',
   textAlign: 'left',
-  background: active ? '#44475a' : 'transparent',
+  background: active ? 'var(--c-line)' : 'transparent',
   border: 'none',
   borderLeft: `3px solid ${active ? ACCENT : 'transparent'}`,
   borderRadius: 0,
@@ -136,7 +136,7 @@ const avatarStyle: React.CSSProperties = {
   width: 28,
   height: 28,
   borderRadius: '50%',
-  background: '#6272a4',
+  background: 'var(--c-comment)',
   color: TEXT,
   display: 'grid',
   placeItems: 'center',
@@ -361,7 +361,7 @@ export default function HistoryPanel({ isOpen, onClose, lessonId, onRestore }: H
         aria-modal="true"
         aria-label="Version history"
         style={{
-          background: '#1e1f29',
+          background: 'var(--c-deep)',
           border: `1px solid ${BORDER}`,
           borderRadius: 10,
           width: 'min(96vw, 1160px)',
@@ -527,7 +527,7 @@ export default function HistoryPanel({ isOpen, onClose, lessonId, onRestore }: H
                     value={previewFile ?? ''}
                     onChange={(e) => setPreviewFile(e.target.value)}
                     style={{
-                      background: '#282a36',
+                      background: 'var(--c-bg)',
                       color: TEXT,
                       border: `1px solid ${BORDER}`,
                       borderRadius: 4,
@@ -548,7 +548,7 @@ export default function HistoryPanel({ isOpen, onClose, lessonId, onRestore }: H
                     flex: 1,
                     minHeight: 0,
                     overflow: 'auto',
-                    background: '#282a36',
+                    background: 'var(--c-bg)',
                     fontFamily: MONO,
                     fontSize: 13,
                     lineHeight: 1.6,
@@ -610,7 +610,7 @@ export default function HistoryPanel({ isOpen, onClose, lessonId, onRestore }: H
                     Highlight changes
                   </label>
                   {restoreNote && (
-                    <span style={{ color: '#ff5555', fontSize: 12, flex: '1 1 100%' }}>
+                    <span style={{ color: 'var(--c-red)', fontSize: 12, flex: '1 1 100%' }}>
                       {restoreNote}
                     </span>
                   )}
@@ -626,8 +626,8 @@ export default function HistoryPanel({ isOpen, onClose, lessonId, onRestore }: H
                       marginLeft: narrow ? 0 : 'auto',
                       width: narrow ? '100%' : undefined,
                       justifyContent: 'center',
-                      background: '#50fa7b',
-                      color: '#282a36',
+                      background: 'var(--c-green)',
+                      color: 'var(--c-bg)',
                       border: 'none',
                       borderRadius: 6,
                       padding: '8px 16px',
@@ -670,7 +670,7 @@ function GroupLabel({ label }: { label: string }) {
 function Empty({ text, hint, tone }: { text: string; hint?: string; tone?: 'error' }) {
   return (
     <div style={{ padding: '18px 14px' }}>
-      <div style={{ color: tone === 'error' ? '#ff5555' : MUTED, fontSize: 13 }}>{text}</div>
+      <div style={{ color: tone === 'error' ? 'var(--c-red)' : MUTED, fontSize: 13 }}>{text}</div>
       {hint && <div style={{ color: MUTED, fontSize: 12, marginTop: 4 }}>{hint}</div>}
     </div>
   );

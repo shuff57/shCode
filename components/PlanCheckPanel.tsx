@@ -29,8 +29,8 @@ export default function PlanCheckPanel({ lessonId, response }: { lessonId: strin
     <section
       aria-label="Deterministic plan check"
       style={{
-        background: '#282a36',
-        border: '1px dashed #6272a4',
+        background: 'var(--c-bg)',
+        border: '1px dashed var(--c-comment)',
         borderRadius: 6,
         padding: 12,
         display: 'flex',
@@ -39,8 +39,8 @@ export default function PlanCheckPanel({ lessonId, response }: { lessonId: strin
       }}
     >
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
-        <strong style={{ color: '#8be9fd', fontSize: '0.85rem' }}>Plan check</strong>
-        <span style={{ color: '#8393c4', fontSize: '0.78rem' }}>
+        <strong style={{ color: 'var(--c-cyan)', fontSize: '0.85rem' }}>Plan check</strong>
+        <span style={{ color: 'var(--c-dim)', fontSize: '0.78rem' }}>
           {met} of {result.criteria.length} jobs right{result.blanks ? ` · ${result.blanks} line${result.blanks === 1 ? '' : 's'} still empty` : ''} &middot;{' '}
           {result.passed
             ? `would pass (${GAP_PASS} needed)`
@@ -55,22 +55,22 @@ export default function PlanCheckPanel({ lessonId, response }: { lessonId: strin
           <span style={{ color: COLOR[c.verdict], fontWeight: 600, marginRight: 8 }}>
             {LABEL[c.verdict]}
           </span>
-          <span style={{ color: '#f8f8f2' }}>{c.title}</span>
+          <span style={{ color: 'var(--c-fg)' }}>{c.title}</span>
           {PLAN_GAPS.find((g) => g.id === c.id)?.required ? (
-            <span style={{ color: '#bd93f9', marginLeft: 8, fontSize: '0.74rem' }}>required</span>
+            <span style={{ color: 'var(--c-purple)', marginLeft: 8, fontSize: '0.74rem' }}>required</span>
           ) : null}
-          <div style={{ color: '#a8b1d8', marginLeft: 52 }}>{c.feedback}</div>
+          <div style={{ color: 'var(--x-a8b1d8)', marginLeft: 52 }}>{c.feedback}</div>
         </div>
       ))}
       {/* The grader normalises the text before reading it. Show that reading, so
           a disagreement can be checked instead of trusted. */}
       <details>
-        <summary style={{ color: '#8393c4', fontSize: '0.76rem', cursor: 'pointer' }}>
+        <summary style={{ color: 'var(--c-dim)', fontSize: '0.76rem', cursor: 'pointer' }}>
           How this plan was read
           {result.notes.length > 0 ? ` · ${result.notes.length} change${result.notes.length === 1 ? '' : 's'}` : ''}
         </summary>
         {result.notes.length > 0 ? (
-          <ul style={{ margin: '6px 0', paddingLeft: 18, color: '#a8b1d8', fontSize: '0.76rem', lineHeight: 1.45 }}>
+          <ul style={{ margin: '6px 0', paddingLeft: 18, color: 'var(--x-a8b1d8)', fontSize: '0.76rem', lineHeight: 1.45 }}>
             {result.notes.map((note, i) => (
               <li key={i}>{note}</li>
             ))}
@@ -80,10 +80,10 @@ export default function PlanCheckPanel({ lessonId, response }: { lessonId: strin
           style={{
             margin: 0,
             padding: 8,
-            background: '#21222c',
-            border: '1px solid #44475a',
+            background: 'var(--c-deep2)',
+            border: '1px solid var(--c-line)',
             borderRadius: 4,
-            color: '#f8f8f2',
+            color: 'var(--c-fg)',
             fontSize: '0.74rem',
             lineHeight: 1.4,
             overflowX: 'auto',

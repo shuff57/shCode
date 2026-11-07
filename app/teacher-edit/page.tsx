@@ -52,8 +52,8 @@ function defaultActiveFile(ids: string[]): string {
 const S = {
   page: {
     minHeight: '100vh',
-    background: '#282a36',
-    color: '#f8f8f2',
+    background: 'var(--c-bg)',
+    color: 'var(--c-fg)',
     padding: '0',
     fontFamily: 'inherit',
     display: 'flex',
@@ -61,8 +61,8 @@ const S = {
   } as React.CSSProperties,
 
   header: {
-    background: '#1e1f29',
-    borderBottom: '1px solid #44475a',
+    background: 'var(--c-deep)',
+    borderBottom: '1px solid var(--c-line)',
     padding: '14px 24px',
     display: 'flex',
     alignItems: 'center',
@@ -80,8 +80,8 @@ const S = {
   } as React.CSSProperties,
 
   card: {
-    background: '#1e1f29',
-    border: '1px solid #44475a',
+    background: 'var(--c-deep)',
+    border: '1px solid var(--c-line)',
     borderRadius: 8,
     padding: 16,
   } as React.CSSProperties,
@@ -89,7 +89,7 @@ const S = {
   btn: (color: string) =>
     ({
       background: color,
-      color: '#282a36',
+      color: 'var(--c-bg)',
       border: 'none',
       borderRadius: 4,
       padding: '7px 14px',
@@ -100,8 +100,8 @@ const S = {
     }) as React.CSSProperties,
 
   btnDisabled: {
-    background: '#44475a',
-    color: '#6272a4',
+    background: 'var(--c-line)',
+    color: 'var(--c-comment)',
     border: 'none',
     borderRadius: 4,
     padding: '7px 14px',
@@ -112,26 +112,26 @@ const S = {
   } as React.CSSProperties,
 
   input: {
-    background: '#282a36',
-    border: '1px solid #44475a',
+    background: 'var(--c-bg)',
+    border: '1px solid var(--c-line)',
     borderRadius: 4,
-    color: '#f8f8f2',
+    color: 'var(--c-fg)',
     padding: '7px 12px',
     fontSize: 14,
     outline: 'none',
     minWidth: 220,
   } as React.CSSProperties,
 
-  error: { color: '#ff5555', fontSize: 13, marginTop: 6 } as React.CSSProperties,
+  error: { color: 'var(--c-red)', fontSize: 13, marginTop: 6 } as React.CSSProperties,
 
   tab: (active: boolean) =>
     ({
       padding: '6px 14px',
       borderRadius: '4px 4px 0 0',
-      border: '1px solid ' + (active ? '#44475a' : 'transparent'),
-      borderBottom: active ? '1px solid #1e1f29' : '1px solid #44475a',
-      background: active ? '#1e1f29' : 'transparent',
-      color: active ? '#f8f8f2' : '#6272a4',
+      border: '1px solid ' + (active ? 'var(--c-line)' : 'transparent'),
+      borderBottom: active ? '1px solid var(--c-deep)' : '1px solid var(--c-line)',
+      background: active ? 'var(--c-deep)' : 'transparent',
+      color: active ? 'var(--c-fg)' : 'var(--c-comment)',
       cursor: 'pointer',
       fontSize: 13,
       fontFamily: 'monospace',
@@ -187,8 +187,8 @@ function Toast({ message, onDone }: { message: string; onDone: () => void }) {
         bottom: 24,
         right: 24,
         zIndex: 9999,
-        background: '#50fa7b',
-        color: '#282a36',
+        background: 'var(--c-green)',
+        color: 'var(--c-bg)',
         fontWeight: 700,
         fontSize: 14,
         padding: '12px 20px',
@@ -320,10 +320,10 @@ function TeacherEditInner() {
   if (!classId || !studentEmail || !lessonId) {
     return (
       <div style={{ ...S.page, padding: 32 }}>
-        <p style={{ color: '#ff5555', fontSize: 16, marginBottom: 16 }}>
+        <p style={{ color: 'var(--c-red)', fontSize: 16, marginBottom: 16 }}>
           Invalid URL — missing class, student, or lesson parameter.
         </p>
-        <a href="/teacher" style={{ color: '#8be9fd', fontSize: 14 }}>
+        <a href="/teacher" style={{ color: 'var(--c-cyan)', fontSize: 14 }}>
           ← Back to teacher dashboard
         </a>
       </div>
@@ -331,16 +331,16 @@ function TeacherEditInner() {
   }
 
   if (!authLoaded) {
-    return <div style={{ ...S.page, padding: 32, color: '#6272a4' }}>Checking auth…</div>;
+    return <div style={{ ...S.page, padding: 32, color: 'var(--c-comment)' }}>Checking auth…</div>;
   }
 
   if (!user || (user.role !== 'teacher' && user.role !== 'admin')) {
     return (
       <div style={{ ...S.page, padding: 32 }}>
-        <p style={{ color: '#ff5555', fontSize: 16, marginBottom: 16 }}>
+        <p style={{ color: 'var(--c-red)', fontSize: 16, marginBottom: 16 }}>
           Teacher or admin access required.
         </p>
-        <a href="/teacher" style={{ color: '#8be9fd', fontSize: 14 }}>
+        <a href="/teacher" style={{ color: 'var(--c-cyan)', fontSize: 14 }}>
           ← Sign in as a teacher
         </a>
       </div>
@@ -447,19 +447,19 @@ function TeacherEditInner() {
       {/* Header */}
       <div style={S.header}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <div style={{ fontSize: 16, fontWeight: 700, color: '#f8f8f2' }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--c-fg)' }}>
             Editing{' '}
-            <span style={{ color: '#8be9fd', fontFamily: 'monospace' }}>{studentEmail}</span>
+            <span style={{ color: 'var(--c-cyan)', fontFamily: 'monospace' }}>{studentEmail}</span>
             {'\'s code for lesson '}
-            <span style={{ color: '#bd93f9', fontFamily: 'monospace' }}>{lessonDisplay}</span>
+            <span style={{ color: 'var(--c-purple)', fontFamily: 'monospace' }}>{lessonDisplay}</span>
           </div>
-          <div style={{ fontSize: 12, color: '#6272a4' }}>
+          <div style={{ fontSize: 12, color: 'var(--c-comment)' }}>
             Class: {classId}
           </div>
         </div>
         <a
           href={`/teacher?class=${encodeURIComponent(classId)}`}
-          style={{ color: '#8be9fd', fontSize: 14, textDecoration: 'none' }}
+          style={{ color: 'var(--c-cyan)', fontSize: 14, textDecoration: 'none' }}
         >
           ← Back to class
         </a>
@@ -467,12 +467,12 @@ function TeacherEditInner() {
 
       {/* Loading / error states */}
       {loadingCommits && (
-        <div style={{ padding: 32, color: '#6272a4' }}>Loading student commits…</div>
+        <div style={{ padding: 32, color: 'var(--c-comment)' }}>Loading student commits…</div>
       )}
       {!loadingCommits && loadError && (
         <div style={{ padding: 32 }}>
           <p style={S.error}>{loadError}</p>
-          <a href={`/teacher?class=${encodeURIComponent(classId)}`} style={{ color: '#8be9fd', fontSize: 14 }}>
+          <a href={`/teacher?class=${encodeURIComponent(classId)}`} style={{ color: 'var(--c-cyan)', fontSize: 14 }}>
             ← Back to class
           </a>
         </div>
@@ -480,10 +480,10 @@ function TeacherEditInner() {
 
       {!loadingCommits && !loadError && !hasCommits && (
         <div style={{ padding: 32 }}>
-          <p style={{ color: '#f1fa8c', fontSize: 15, marginBottom: 12 }}>
+          <p style={{ color: 'var(--c-yellow)', fontSize: 15, marginBottom: 12 }}>
             Student hasn&apos;t saved any work yet on this lesson — cannot edit.
           </p>
-          <a href={`/teacher?class=${encodeURIComponent(classId)}`} style={{ color: '#8be9fd', fontSize: 14 }}>
+          <a href={`/teacher?class=${encodeURIComponent(classId)}`} style={{ color: 'var(--c-cyan)', fontSize: 14 }}>
             ← Back to class
           </a>
         </div>
@@ -496,14 +496,14 @@ function TeacherEditInner() {
             style={{
               width: 300,
               flexShrink: 0,
-              background: '#1e1f29',
-              borderRight: '1px solid #44475a',
+              background: 'var(--c-deep)',
+              borderRight: '1px solid var(--c-line)',
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
             }}
           >
-            <div style={{ padding: '12px 16px', borderBottom: '1px solid #44475a', fontSize: 12, fontWeight: 700, color: '#6272a4', textTransform: 'uppercase', letterSpacing: '0.06em', flexShrink: 0 }}>
+            <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--c-line)', fontSize: 12, fontWeight: 700, color: 'var(--c-comment)', textTransform: 'uppercase', letterSpacing: '0.06em', flexShrink: 0 }}>
               Commit history ({commits.length})
             </div>
             <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
@@ -516,9 +516,9 @@ function TeacherEditInner() {
                     onClick={() => loadCommitIntoEditor(c)}
                     style={{
                       width: '100%',
-                      background: i === 0 ? '#282a3688' : 'transparent',
+                      background: i === 0 ? 'color-mix(in srgb, var(--c-bg) 53.3333%, transparent)' : 'transparent',
                       border: 'none',
-                      borderBottom: '1px solid #44475a22',
+                      borderBottom: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)',
                       padding: '10px 16px',
                       textAlign: 'left',
                       cursor: 'pointer',
@@ -533,10 +533,10 @@ function TeacherEditInner() {
                       {!isTeacher && !isStudent && c.authoredByEmail &&
                         badge(c.authoredByEmail, '#ff79c6', '#282a36')}
                     </div>
-                    <div style={{ fontSize: 12, color: '#f8f8f2', lineHeight: 1.4 }}>
+                    <div style={{ fontSize: 12, color: 'var(--c-fg)', lineHeight: 1.4 }}>
                       {c.message}
                     </div>
-                    <div style={{ fontSize: 11, color: '#6272a4' }}>
+                    <div style={{ fontSize: 11, color: 'var(--c-comment)' }}>
                       {fmtTs(c.timestamp)}
                     </div>
                   </button>
@@ -554,8 +554,8 @@ function TeacherEditInner() {
                 alignItems: 'flex-end',
                 gap: 0,
                 padding: '8px 16px 0',
-                borderBottom: '1px solid #44475a',
-                background: '#282a36',
+                borderBottom: '1px solid var(--c-line)',
+                background: 'var(--c-bg)',
                 overflowX: 'auto',
                 flexShrink: 0,
               }}
@@ -577,7 +577,7 @@ function TeacherEditInner() {
                         width: 6,
                         height: 6,
                         borderRadius: '50%',
-                        background: '#ff79c6',
+                        background: 'var(--c-pink)',
                         marginLeft: 6,
                         verticalAlign: 'middle',
                       }}
@@ -594,8 +594,8 @@ function TeacherEditInner() {
                 alignItems: 'center',
                 gap: 0,
                 padding: '6px 16px',
-                background: '#282a36',
-                borderBottom: '1px solid #44475a',
+                background: 'var(--c-bg)',
+                borderBottom: '1px solid var(--c-line)',
                 flexShrink: 0,
               }}
             >
@@ -603,7 +603,7 @@ function TeacherEditInner() {
                 style={{
                   fontSize: 11,
                   fontWeight: 700,
-                  color: '#6272a4',
+                  color: 'var(--c-comment)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.06em',
                   marginRight: 10,
@@ -632,9 +632,9 @@ function TeacherEditInner() {
                       disabled={disabled}
                       style={{
                         padding: '5px 12px',
-                        border: '1px solid #44475a',
-                        background: active ? '#bd93f9' : 'transparent',
-                        color: active ? '#282a36' : disabled ? '#44475a' : '#6272a4',
+                        border: '1px solid var(--c-line)',
+                        background: active ? 'var(--c-purple)' : 'transparent',
+                        color: active ? 'var(--c-bg)' : disabled ? 'var(--c-line)' : 'var(--c-comment)',
                         fontWeight: active ? 700 : 400,
                         fontSize: 12,
                         cursor: disabled ? 'not-allowed' : 'pointer',
@@ -649,12 +649,12 @@ function TeacherEditInner() {
                 })}
               </div>
               {loadingSolution && (
-                <span style={{ marginLeft: 10, fontSize: 11, color: '#f1fa8c' }}>
+                <span style={{ marginLeft: 10, fontSize: 11, color: 'var(--c-yellow)' }}>
                   Loading solution...
                 </span>
               )}
               {solutionError && (
-                <span style={{ marginLeft: 10, fontSize: 11, color: '#ff5555' }}>
+                <span style={{ marginLeft: 10, fontSize: 11, color: 'var(--c-red)' }}>
                   {solutionError}
                 </span>
               )}
@@ -666,7 +666,7 @@ function TeacherEditInner() {
                 <div
                   style={{
                     height: '100%',
-                    border: '1px solid #44475a',
+                    border: '1px solid var(--c-line)',
                     borderRadius: 4,
                     overflow: 'hidden',
                   }}
@@ -684,7 +684,7 @@ function TeacherEditInner() {
                     height: '100%',
                     display: 'flex',
                     gap: 0,
-                    border: '1px solid #44475a',
+                    border: '1px solid var(--c-line)',
                     borderRadius: 4,
                     overflow: 'hidden',
                   }}
@@ -694,7 +694,7 @@ function TeacherEditInner() {
                     style={{
                       flex: 1,
                       minWidth: 0,
-                      borderRight: '1px solid #44475a',
+                      borderRight: '1px solid var(--c-line)',
                       display: 'flex',
                       flexDirection: 'column',
                     }}
@@ -706,9 +706,9 @@ function TeacherEditInner() {
                         fontWeight: 700,
                         textTransform: 'uppercase',
                         letterSpacing: '0.06em',
-                        color: '#6272a4',
-                        background: '#21222c',
-                        borderBottom: '1px solid #44475a',
+                        color: 'var(--c-comment)',
+                        background: 'var(--c-deep2)',
+                        borderBottom: '1px solid var(--c-line)',
                         flexShrink: 0,
                       }}
                     >
@@ -743,7 +743,7 @@ function TeacherEditInner() {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: '#6272a4',
+                          color: 'var(--c-comment)',
                           fontSize: 13,
                         }}
                       >
@@ -763,7 +763,7 @@ function TeacherEditInner() {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: '#6272a4',
+                          color: 'var(--c-comment)',
                           fontSize: 13,
                         }}
                       >
@@ -777,7 +777,7 @@ function TeacherEditInner() {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: '#ff5555',
+                          color: 'var(--c-red)',
                           fontSize: 13,
                           padding: 16,
                           textAlign: 'center',
@@ -793,7 +793,7 @@ function TeacherEditInner() {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: '#6272a4',
+                          color: 'var(--c-comment)',
                           fontSize: 13,
                         }}
                       >
@@ -809,8 +809,8 @@ function TeacherEditInner() {
             <div
               style={{
                 flexShrink: 0,
-                background: '#1e1f29',
-                borderTop: '1px solid #44475a',
+                background: 'var(--c-deep)',
+                borderTop: '1px solid var(--c-line)',
                 padding: '12px 16px',
                 display: 'flex',
                 alignItems: 'center',
@@ -853,8 +853,8 @@ export default function TeacherEditPage() {
         <div
           style={{
             minHeight: '100vh',
-            background: '#282a36',
-            color: '#6272a4',
+            background: 'var(--c-bg)',
+            color: 'var(--c-comment)',
             padding: 32,
           }}
         >

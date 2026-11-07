@@ -14,11 +14,11 @@ const roleBadgeStyle: React.CSSProperties = {
   fontWeight: 700,
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
-  color: '#282a36',
+  color: 'var(--c-bg)',
 };
 
 const menuItemStyle: React.CSSProperties = {
-  color: '#f8f8f2',
+  color: 'var(--c-fg)',
   textDecoration: 'none',
   fontSize: 13,
   padding: '6px 10px',
@@ -66,7 +66,7 @@ export default function AuthButton() {
           <span
             style={{
               ...roleBadgeStyle,
-              background: user.role === 'admin' ? '#bd93f9' : '#ffb86c',
+              background: user.role === 'admin' ? 'var(--c-purple)' : 'var(--c-orange)',
               margin: '0 10px 4px',
             }}
           >
@@ -103,8 +103,8 @@ export default function AuthButton() {
         type="button"
         onClick={() => setOpen(true)}
         style={{
-          background: '#50fa7b',
-          color: '#282a36',
+          background: 'var(--c-green)',
+          color: 'var(--c-bg)',
           border: 'none',
           padding: '6px 14px',
           borderRadius: 4,

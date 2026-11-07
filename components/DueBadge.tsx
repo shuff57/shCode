@@ -13,9 +13,9 @@ import { dueStatus, formatDue, formatDueTime, type DueStatus } from '../lib/due-
 import { showLateBadge } from '../lib/teacher-drawer';
 
 const STYLES: Record<Exclude<DueStatus, 'none' | 'done' | 'done-late'>, { color: string; prefix: string }> = {
-  upcoming: { color: '#6272a4', prefix: 'Due ' },
-  today:    { color: '#f1fa8c', prefix: 'Due today · ' },
-  late:     { color: '#ff5555', prefix: 'Late · was due ' },
+  upcoming: { color: 'var(--c-comment)', prefix: 'Due ' },
+  today:    { color: 'var(--c-yellow)', prefix: 'Due today · ' },
+  late:     { color: 'var(--c-red)', prefix: 'Late · was due ' },
 };
 
 export interface DueBadgeProps {
@@ -110,7 +110,7 @@ export function OpensBadge({
         display: 'inline-flex',
         alignItems: 'center',
         gap: 4,
-        color: '#bd93f9',
+        color: 'var(--c-purple)',
         fontSize,
         whiteSpace: 'nowrap',
         fontWeight: 600,
@@ -155,7 +155,7 @@ export function ModuleDueBadge({
   return (
     <span
       title={range ? `Lessons in this module are due between ${range}` : undefined}
-      style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#6272a4', fontSize, whiteSpace: 'nowrap' }}
+      style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--c-comment)', fontSize, whiteSpace: 'nowrap' }}
     >
       <CalendarClock size={fontSize} strokeWidth={2} />
       Mixed{range ? ` · ${range}` : ''}

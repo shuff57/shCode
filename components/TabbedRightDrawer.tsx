@@ -118,8 +118,8 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
           // to this var (0px when it isn't mounted at all, e.g. no module).
           bottom: 'var(--shd-footer-height, 0px)',
           width: `min(${width}px, 100vw)`,
-          background: '#21222c',
-          borderLeft: '1px solid #44475a',
+          background: 'var(--c-deep2)',
+          borderLeft: '1px solid var(--c-line)',
           display: 'flex',
           flexDirection: 'column',
           zIndex: 900,
@@ -152,11 +152,11 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
             alignItems: 'center',
             justifyContent: 'space-between',
             padding: '10px 14px',
-            borderBottom: '1px solid #44475a',
+            borderBottom: '1px solid var(--c-line)',
             flexShrink: 0,
           }}
         >
-          <span style={{ color: '#f8f8f2', fontWeight: 600, fontSize: '0.9rem', letterSpacing: '0.02em' }}>
+          <span style={{ color: 'var(--c-fg)', fontWeight: 600, fontSize: '0.9rem', letterSpacing: '0.02em' }}>
             {active?.label}
           </span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -173,7 +173,7 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
                 fontSize: '1.25rem',
                 lineHeight: 1,
                 padding: '2px 4px',
-                color: closeBtnHovered ? '#f8f8f2' : '#6272a4',
+                color: closeBtnHovered ? 'var(--c-fg)' : 'var(--c-comment)',
                 transition: 'color 0.15s',
               }}
             >
@@ -186,7 +186,7 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
             flex: 1,
             overflowY: 'auto',
             padding: '14px 16px',
-            color: '#f8f8f2',
+            color: 'var(--c-fg)',
             fontSize: '0.875rem',
             lineHeight: 1.5,
             display: 'flex',
@@ -222,11 +222,11 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
               className="shd-tab"
               onClick={() => setActiveKey(isActive ? null : t.key)}
               style={{
-                background: isActive ? '#282a36' : '#21222c',
-                border: '1px solid #44475a',
+                background: isActive ? 'var(--c-bg)' : 'var(--c-deep2)',
+                border: '1px solid var(--c-line)',
                 borderRight: 'none',
                 borderRadius: '6px 0 0 6px',
-                color: t.color ?? '#bd93f9',
+                color: t.color ?? 'var(--c-purple)',
                 writingMode: 'vertical-rl',
                 textOrientation: 'mixed',
                 padding: '12px 6px',

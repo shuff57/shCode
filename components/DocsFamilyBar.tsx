@@ -12,8 +12,8 @@ export default function DocsFamilyBar({ currentId }: { currentId: string }) {
         alignItems: 'center',
         gap: 6,
         padding: '8px 16px',
-        background: '#21222c',
-        borderBottom: '1px solid #44475a',
+        background: 'var(--c-deep2)',
+        borderBottom: '1px solid var(--c-line)',
         position: 'sticky',
         top: 0,
         zIndex: 10,
@@ -22,7 +22,7 @@ export default function DocsFamilyBar({ currentId }: { currentId: string }) {
       <Link
         href="/docs"
         style={{
-          color: '#6272a4',
+          color: 'var(--c-comment)',
           fontSize: 13,
           fontWeight: 600,
           textDecoration: 'none',
@@ -44,9 +44,9 @@ export default function DocsFamilyBar({ currentId }: { currentId: string }) {
               fontSize: 13,
               fontWeight: 600,
               textDecoration: 'none',
-              background: active ? '#bd93f9' : 'transparent',
-              color: active ? '#21222c' : '#bd93f9',
-              border: '1px solid #bd93f9',
+              background: active ? 'var(--c-purple)' : 'transparent',
+              color: active ? 'var(--c-deep2)' : 'var(--c-purple)',
+              border: '1px solid var(--c-purple)',
             }}
           >
             {m.label}

@@ -53,7 +53,7 @@ export default function CodeEditor({ plainText = false }: { plainText?: boolean 
   }, [fileContents, selectFile]);
 
   if (!currentFile) {
-    return <div style={{ padding: 16, color: '#888' }}>No file selected</div>;
+    return <div style={{ padding: 16, color: 'var(--x-888888)' }}>No file selected</div>;
   }
 
   return (
@@ -69,8 +69,8 @@ export default function CodeEditor({ plainText = false }: { plainText?: boolean 
             onClick={() => setLibraryOpen(true)}
             title="Your uploaded images"
             style={{
-              marginLeft: 'auto', background: 'none', border: '1px solid #44475a',
-              color: '#f8f8f2', borderRadius: 4, padding: '2px 8px',
+              marginLeft: 'auto', background: 'none', border: '1px solid var(--c-line)',
+              color: 'var(--c-fg)', borderRadius: 4, padding: '2px 8px',
               fontSize: 11, cursor: 'pointer',
             }}
           >

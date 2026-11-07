@@ -90,7 +90,7 @@ export default function IssueVoteControl({ reportId, vote, onChange, onError }: 
 function voteButtonStyle(active: boolean, color: string, busy: boolean): React.CSSProperties {
   return {
     background: active ? color : 'transparent',
-    color: active ? '#1a1a1a' : 'var(--text)',
+    color: active ? 'var(--x-1a1a1a)' : 'var(--text)',
     border: `1px solid ${active ? color : 'var(--border)'}`,
     borderRadius: 4,
     width: 26,

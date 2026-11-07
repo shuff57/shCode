@@ -111,8 +111,8 @@ export default function HeaderLessonNav() {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '6px 16px',
-        borderTop: '1px solid #1f2937',
-        color: '#cbd5e1',
+        borderTop: '1px solid var(--x-1f2937)',
+        color: 'var(--x-cbd5e1)',
         fontSize: '0.85rem',
       }}
     >

@@ -73,8 +73,8 @@ const chipStyle: React.CSSProperties = {
   padding: '6px 14px',
   borderRadius: 4,
   background: 'transparent',
-  color: '#6272a4',
-  border: '1px solid #44475a',
+  color: 'var(--c-comment)',
+  border: '1px solid var(--c-line)',
   cursor: 'pointer',
   fontSize: 13,
   display: 'inline-flex',
@@ -453,9 +453,9 @@ export default function SandboxWorkspace() {
     {
       key: 'flow-help',
       label: 'Help',
-      color: '#ffb86c',
+      color: 'var(--c-orange)',
       content: (
-        <div style={{ padding: 12, fontSize: 13, lineHeight: 1.6, color: '#e0e2ee' }}>
+        <div style={{ padding: 12, fontSize: 13, lineHeight: 1.6, color: 'var(--x-e0e2ee)' }}>
           <p style={{ marginTop: 0 }}>Draw any flowchart you like. Nothing here is checked or graded.</p>
           <ul style={{ paddingLeft: 18 }}>
             <li><strong>Oval</strong>: where the chart starts or ends.</li>
@@ -475,7 +475,7 @@ export default function SandboxWorkspace() {
       ? [{
           key: 'textures',
           label: 'Textures',
-          color: '#8be9fd',
+          color: 'var(--c-cyan)',
           content: <TextureEditor />,
           headerExtra: (
             <a href="/textures" target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
@@ -486,7 +486,7 @@ export default function SandboxWorkspace() {
         {
           key: 'sounds',
           label: 'Sounds',
-          color: '#50fa7b',
+          color: 'var(--c-green)',
           content: <SoundMixer />,
           headerExtra: (
             <a href="/sound" target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
@@ -498,13 +498,13 @@ export default function SandboxWorkspace() {
     {
       key: 'help',
       label: 'CODY',
-      color: '#ffb86c',
+      color: 'var(--c-orange)',
       content: <AiHelpPanel lesson={lesson} />,
     },
     {
       key: 'docs',
       label: 'Docs',
-      color: '#bd93f9',
+      color: 'var(--c-purple)',
       content: <DocsDrawer defaultSetId={mode.id} storageKey="shCode:sandbox-docs" />,
       headerExtra: mode.docsHref ? (
         <a
@@ -570,7 +570,7 @@ export default function SandboxWorkspace() {
           role="status"
           aria-live="polite"
           style={{
-            color: cloud.note.kind === 'error' ? '#ff5555' : '#50fa7b',
+            color: cloud.note.kind === 'error' ? 'var(--c-red)' : 'var(--c-green)',
             fontSize: 12,
             alignSelf: 'center',
             maxWidth: 240,
@@ -655,7 +655,7 @@ export default function SandboxWorkspace() {
             {isRunning && !isFlow && (
               <button
                 className="btn-secondary btn-sm"
-                style={{ color: '#ff5555', borderColor: '#ff5555' }}
+                style={{ color: 'var(--c-red)', borderColor: 'var(--c-red)' }}
                 onClick={stopRun}
               >
                 ■ Stop
@@ -790,11 +790,11 @@ export default function SandboxWorkspace() {
         }
         .sandbox-header { display: flex; align-items: baseline; gap: 12px; flex-shrink: 0; }
         .sandbox-title { margin: 0; font-size: 1.4rem; color: var(--text); }
-        .sandbox-subtitle { color: #6272a4; font-size: 0.85rem; }
+        .sandbox-subtitle { color: var(--c-comment); font-size: 0.85rem; }
         .sandbox-toolbar { margin-bottom: 0; flex-shrink: 0; }
         .sandbox-modes {
           display: inline-flex;
-          border: 1px solid #44475a;
+          border: 1px solid var(--c-line);
           border-radius: 4px;
           overflow: hidden;
           margin-right: 10px;
@@ -802,17 +802,17 @@ export default function SandboxWorkspace() {
         .sandbox-mode {
           padding: 6px 13px;
           background: transparent;
-          color: #6272a4;
+          color: var(--c-comment);
           border: 0;
-          border-right: 1px solid #44475a;
+          border-right: 1px solid var(--c-line);
           cursor: pointer;
           font-size: 13px;
         }
         .sandbox-mode:last-child { border-right: 0; }
         .sandbox-mode:hover { color: var(--text); }
-        .sandbox-mode.is-active { background: #44475a; color: #f8f8f2; }
+        .sandbox-mode.is-active { background: var(--c-line); color: var(--c-fg); }
         .sandbox-mode:disabled { opacity: 0.35; cursor: not-allowed; }
-        .sandbox-lock { color: #ffb86c; font-size: 12px; margin-right: 10px; }
+        .sandbox-lock { color: var(--c-orange); font-size: 12px; margin-right: 10px; }
         .sandbox-split.editor-preview-container {
           height: auto;
           flex: 1 1 auto;
@@ -873,7 +873,7 @@ export default function SandboxWorkspace() {
           min-width: 0;
           z-index: 40;
           background: var(--card);
-          border: 1px solid #565a70;
+          border: 1px solid var(--x-565a70);
           border-radius: 6px;
           box-shadow: 0 12px 36px rgba(0,0,0,0.6);
           overflow: hidden;
@@ -889,13 +889,13 @@ export default function SandboxWorkspace() {
           gap: 5px;
           padding: 5px 10px;
           font-size: 12px;
-          color: #d3d5e3;
+          color: var(--x-d3d5e3);
           background: rgba(40, 42, 54, 0.92);
-          border: 1px solid #565a70;
+          border: 1px solid var(--x-565a70);
           border-radius: 4px;
           cursor: pointer;
         }
-        .sandbox-editor-toggle:hover { background: #44475a; }
+        .sandbox-editor-toggle:hover { background: var(--c-line); }
         .sandbox-shell.is-editor-hidden .sandbox-editor-toggle { left: 12px; }
         .sandbox-console-toggle {
           position: absolute;
@@ -907,13 +907,13 @@ export default function SandboxWorkspace() {
           gap: 5px;
           padding: 5px 10px;
           font-size: 12px;
-          color: #d3d5e3;
+          color: var(--x-d3d5e3);
           background: rgba(40, 42, 54, 0.92);
-          border: 1px solid #565a70;
+          border: 1px solid var(--x-565a70);
           border-radius: 4px;
           cursor: pointer;
         }
-        .sandbox-console-toggle:hover { background: #44475a; }
+        .sandbox-console-toggle:hover { background: var(--c-line); }
         /* The console sits at the bottom edge and the toggle sits above its
            right corner, so it never covers a line of output. */
         .sandbox-shell.is-full .sandbox-console-wrap {
@@ -925,7 +925,7 @@ export default function SandboxWorkspace() {
           max-height: 42%;
           min-height: 0;
           resize: none;
-          border: 1px solid #565a70;
+          border: 1px solid var(--x-565a70);
           box-shadow: 0 -8px 32px rgba(0,0,0,0.45);
         }
         .sandbox-shell.is-console-hidden .sandbox-console-wrap { display: none; }

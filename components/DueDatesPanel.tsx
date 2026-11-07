@@ -90,7 +90,7 @@ const ENDPOINT: Record<Kind, string> = { open: 'open-dates', due: 'due-dates' };
 const OPEN_PAST_HINT = 'Already in the past — the lesson is open now';
 
 const C = {
-  border: '#44475a',
+  border: 'var(--c-line)',
   dim: '#8393c4',
   text: '#f8f8f2',
   input: '#282a36',
@@ -428,7 +428,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
       </p>
 
       {error && (
-        <p style={{ color: '#ff5555', fontSize: 13, marginBottom: 12 }}>{error}</p>
+        <p style={{ color: 'var(--c-red)', fontSize: 13, marginBottom: 12 }}>{error}</p>
       )}
       {saving && <p style={{ color: C.dim, fontSize: 12, marginBottom: 12 }}>Saving…</p>}
 

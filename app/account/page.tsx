@@ -7,8 +7,8 @@ import { getCurrentUser, updateName, CurrentUser } from '../../lib/auth';
 const S = {
   page: {
     minHeight: '100vh',
-    background: '#282a36',
-    color: '#f8f8f2',
+    background: 'var(--c-bg)',
+    color: 'var(--c-fg)',
     padding: '32px 24px',
     fontFamily: 'inherit',
   } as React.CSSProperties,
@@ -16,23 +16,23 @@ const S = {
   card: {
     maxWidth: 440,
     margin: '0 auto',
-    background: '#1e1f29',
-    border: '1px solid #44475a',
+    background: 'var(--c-deep)',
+    border: '1px solid var(--c-line)',
     borderRadius: 8,
     padding: 24,
   } as React.CSSProperties,
 
-  h1: { fontSize: 22, fontWeight: 700, marginBottom: 20, color: '#f8f8f2' } as React.CSSProperties,
+  h1: { fontSize: 22, fontWeight: 700, marginBottom: 20, color: 'var(--c-fg)' } as React.CSSProperties,
 
-  label: { display: 'block', fontSize: 13, marginBottom: 4, color: '#f8f8f2' } as React.CSSProperties,
+  label: { display: 'block', fontSize: 13, marginBottom: 4, color: 'var(--c-fg)' } as React.CSSProperties,
 
   input: {
     width: '100%',
     padding: 8,
     marginBottom: 16,
-    background: '#282a36',
-    color: '#f8f8f2',
-    border: '1px solid #44475a',
+    background: 'var(--c-bg)',
+    color: 'var(--c-fg)',
+    border: '1px solid var(--c-line)',
     borderRadius: 4,
     fontSize: 14,
     boxSizing: 'border-box' as const,
@@ -42,9 +42,9 @@ const S = {
     width: '100%',
     padding: 8,
     marginBottom: 16,
-    background: '#282a36',
-    color: '#6272a4',
-    border: '1px solid #44475a',
+    background: 'var(--c-bg)',
+    color: 'var(--c-comment)',
+    border: '1px solid var(--c-line)',
     borderRadius: 4,
     fontSize: 14,
     boxSizing: 'border-box' as const,
@@ -94,7 +94,7 @@ export default function AccountPage() {
   if (!loaded) {
     return (
       <div style={S.page}>
-        <div style={{ maxWidth: 440, margin: '0 auto', color: '#6272a4' }}>Loading…</div>
+        <div style={{ maxWidth: 440, margin: '0 auto', color: 'var(--c-comment)' }}>Loading…</div>
       </div>
     );
   }
@@ -104,7 +104,7 @@ export default function AccountPage() {
       <div style={S.page}>
         <div style={{ maxWidth: 440, margin: '0 auto' }}>
           <p>
-            You need to sign in first. <Link href="/" style={{ color: '#8be9fd' }}>Go home</Link>
+            You need to sign in first. <Link href="/" style={{ color: 'var(--c-cyan)' }}>Go home</Link>
           </p>
         </div>
       </div>
@@ -147,8 +147,8 @@ export default function AccountPage() {
                 marginBottom: 16,
                 borderRadius: 4,
                 fontSize: 13,
-                background: message.kind === 'ok' ? '#1f3a2a' : '#4a2a2a',
-                color: message.kind === 'ok' ? '#c6f7d6' : '#ffd6d6',
+                background: message.kind === 'ok' ? 'var(--x-1f3a2a)' : 'var(--x-4a2a2a)',
+                color: message.kind === 'ok' ? 'var(--x-c6f7d6)' : 'var(--x-ffd6d6)',
               }}
             >
               {message.text}

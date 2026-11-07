@@ -49,8 +49,8 @@ export default function AiAnswer({ text, streaming, placeholder, style }: Props)
         className="ai-help-response"
         style={{
           overflowY: 'auto',
-          background: '#282a36',
-          border: '1px solid #44475a',
+          background: 'var(--c-bg)',
+          border: '1px solid var(--c-line)',
           borderRadius: 4,
           padding: '8px 12px',
           fontSize: 13,
@@ -61,10 +61,10 @@ export default function AiAnswer({ text, streaming, placeholder, style }: Props)
         {text ? (
           <>
             <div dangerouslySetInnerHTML={{ __html: html }} />
-            {streaming ? <span style={{ color: '#bd93f9' }}>▍</span> : null}
+            {streaming ? <span style={{ color: 'var(--c-purple)' }}>▍</span> : null}
           </>
         ) : (
-          <span style={{ color: '#6272a4', fontStyle: 'italic' }}>
+          <span style={{ color: 'var(--c-comment)', fontStyle: 'italic' }}>
             {streaming ? 'Thinking…' : (placeholder ?? 'Answer will appear here.')}
           </span>
         )}
@@ -77,7 +77,7 @@ export default function AiAnswer({ text, streaming, placeholder, style }: Props)
         .ai-help-response h2,
         .ai-help-response h3,
         .ai-help-response h4 {
-          color: #bd93f9;
+          color: var(--c-purple);
           font-weight: 600;
           margin: 10px 0 4px;
           line-height: 1.3;
@@ -86,22 +86,22 @@ export default function AiAnswer({ text, streaming, placeholder, style }: Props)
         .ai-help-response h2 { font-size: 1em; }
         .ai-help-response h3,
         .ai-help-response h4 { font-size: 0.95em; }
-        .ai-help-response strong { color: #f8f8f2; font-weight: 600; }
-        .ai-help-response em { color: #f1fa8c; font-style: italic; }
+        .ai-help-response strong { color: var(--c-fg); font-weight: 600; }
+        .ai-help-response em { color: var(--c-yellow); font-style: italic; }
         .ai-help-response ul,
         .ai-help-response ol { margin: 0 0 8px; padding-left: 22px; }
         .ai-help-response li { margin: 2px 0; }
         .ai-help-response code {
-          background: #1e1f29;
-          color: #50fa7b;
+          background: var(--c-deep);
+          color: var(--c-green);
           padding: 1px 4px;
           border-radius: 3px;
           font-family: 'Fira Code', Consolas, monospace;
           font-size: 0.9em;
         }
         .ai-help-response pre {
-          background: #1e1f29;
-          border: 1px solid #44475a;
+          background: var(--c-deep);
+          border: 1px solid var(--c-line);
           border-radius: 4px;
           padding: 8px 10px;
           margin: 6px 0 10px;
@@ -109,22 +109,22 @@ export default function AiAnswer({ text, streaming, placeholder, style }: Props)
         }
         .ai-help-response pre code {
           background: transparent;
-          color: #f8f8f2;
+          color: var(--c-fg);
           padding: 0;
           font-size: 0.85em;
           line-height: 1.45;
         }
         .ai-help-response blockquote {
-          border-left: 3px solid #44475a;
+          border-left: 3px solid var(--c-line);
           margin: 6px 0;
           padding: 2px 10px;
-          color: #6272a4;
+          color: var(--c-comment);
         }
         .ai-help-response table { border-collapse: collapse; margin: 6px 0 10px; }
         .ai-help-response th,
-        .ai-help-response td { border: 1px solid #44475a; padding: 4px 10px; text-align: left; }
-        .ai-help-response th { color: #bd93f9; font-weight: 600; }
-        .ai-help-response a { color: #8be9fd; text-decoration: underline; }
+        .ai-help-response td { border: 1px solid var(--c-line); padding: 4px 10px; text-align: left; }
+        .ai-help-response th { color: var(--c-purple); font-weight: 600; }
+        .ai-help-response a { color: var(--c-cyan); text-decoration: underline; }
       `}</style>
     </>
   );

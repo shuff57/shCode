@@ -96,7 +96,7 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
     >
       <form onSubmit={submit} className="auth-form">
         <h3 style={{ marginTop: 0 }}>{mode === 'login' ? 'Sign in' : mode === 'terms' ? 'One more step' : 'Create account'}</h3>
-        <p style={{ color: '#888', fontSize: 13, marginTop: 0 }}>
+        <p style={{ color: 'var(--x-888888)', fontSize: 13, marginTop: 0 }}>
           {mode === 'login'
             ? 'Sign in to save your work and pick up on any device.'
             : mode === 'terms'
@@ -118,9 +118,9 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
             width: '100%',
             padding: 8,
             marginBottom: 12,
-            background: '#282a36',
-            color: '#f8f8f2',
-            border: '1px solid #44475a',
+            background: 'var(--c-bg)',
+            color: 'var(--c-fg)',
+            border: '1px solid var(--c-line)',
             borderRadius: 4,
             fontSize: 14,
           }}
@@ -131,7 +131,7 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
         {mode === 'signup' && (
           <>
             <label style={{ display: 'block', fontSize: 13, marginBottom: 4 }}>
-              First name <span style={{ color: '#6272a4' }}>(optional)</span>
+              First name <span style={{ color: 'var(--c-comment)' }}>(optional)</span>
             </label>
             <input
               type="text"
@@ -143,16 +143,16 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
                 width: '100%',
                 padding: 8,
                 marginBottom: 12,
-                background: '#282a36',
-                color: '#f8f8f2',
-                border: '1px solid #44475a',
+                background: 'var(--c-bg)',
+                color: 'var(--c-fg)',
+                border: '1px solid var(--c-line)',
                 borderRadius: 4,
                 fontSize: 14,
               }}
             />
 
             <label style={{ display: 'block', fontSize: 13, marginBottom: 4 }}>
-              Last name <span style={{ color: '#6272a4' }}>(optional)</span>
+              Last name <span style={{ color: 'var(--c-comment)' }}>(optional)</span>
             </label>
             <input
               type="text"
@@ -164,9 +164,9 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
                 width: '100%',
                 padding: 8,
                 marginBottom: 12,
-                background: '#282a36',
-                color: '#f8f8f2',
-                border: '1px solid #44475a',
+                background: 'var(--c-bg)',
+                color: 'var(--c-fg)',
+                border: '1px solid var(--c-line)',
                 borderRadius: 4,
                 fontSize: 14,
               }}
@@ -177,7 +177,7 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
         {mode !== 'terms' && (
           <>
         <label style={{ display: 'block', fontSize: 13, marginBottom: 4 }}>
-          Password {mode === 'signup' && <span style={{ color: '#6272a4' }}>(≥ 8 chars)</span>}
+          Password {mode === 'signup' && <span style={{ color: 'var(--c-comment)' }}>(≥ 8 chars)</span>}
         </label>
         <input
           type="password"
@@ -190,9 +190,9 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
             width: '100%',
             padding: 8,
             marginBottom: 12,
-            background: '#282a36',
-            color: '#f8f8f2',
-            border: '1px solid #44475a',
+            background: 'var(--c-bg)',
+            color: 'var(--c-fg)',
+            border: '1px solid var(--c-line)',
             borderRadius: 4,
             fontSize: 14,
           }}
@@ -220,9 +220,9 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
               />
               <span>
                 I have read and agree to the{' '}
-                <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: '#8be9fd' }}>Terms of Service</a>
+                <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--c-cyan)' }}>Terms of Service</a>
                 {' '}and{' '}
-                <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#8be9fd' }}>Privacy Policy</a>.
+                <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--c-cyan)' }}>Privacy Policy</a>.
               </span>
             </label>
           </div>
@@ -232,8 +232,8 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
           <div style={{
             padding: 8,
             marginBottom: 12,
-            background: '#4a2a2a',
-            color: '#ffd6d6',
+            background: 'var(--x-4a2a2a)',
+            color: 'var(--x-ffd6d6)',
             borderRadius: 4,
             fontSize: 13,
           }}>
@@ -260,7 +260,7 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
               marginLeft: 'auto',
               background: 'transparent',
               border: 'none',
-              color: '#8be9fd',
+              color: 'var(--c-cyan)',
               cursor: 'pointer',
               fontSize: 13,
               textDecoration: 'underline',
@@ -274,10 +274,10 @@ export default function AuthModal({ isOpen, onClose, onAuthenticated }: Props) {
       <style>{`
         .auth-dialog {
           padding: 0;
-          border: 1px solid #44475a;
+          border: 1px solid var(--c-line);
           border-radius: 8px;
-          background: #1e1f29;
-          color: #f8f8f2;
+          background: var(--c-deep);
+          color: var(--c-fg);
           width: min(420px, 92vw);
         }
         .auth-dialog::backdrop { background: rgba(0,0,0,0.5); }

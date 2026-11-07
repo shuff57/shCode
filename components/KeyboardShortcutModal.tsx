@@ -36,9 +36,9 @@ export default function KeyboardShortcutModal({ isOpen, onClose }: KeyboardShort
         if (e.target === dialogRef.current) onClose();
       }}
       style={{
-        background: '#1e1f29',
-        color: '#cccccc',
-        border: '1px solid #44475a',
+        background: 'var(--c-deep)',
+        color: 'var(--x-cccccc)',
+        border: '1px solid var(--c-line)',
         borderRadius: 8,
         padding: 0,
         maxWidth: 420,
@@ -53,7 +53,7 @@ export default function KeyboardShortcutModal({ isOpen, onClose }: KeyboardShort
             style={{
               background: 'none',
               border: 'none',
-              color: '#94a3b8',
+              color: 'var(--x-94a3b8)',
               cursor: 'pointer',
               fontSize: 18,
               padding: '2px 6px',
@@ -75,13 +75,13 @@ export default function KeyboardShortcutModal({ isOpen, onClose }: KeyboardShort
                   <kbd
                     style={{
                       background: 'rgba(68,71,90,0.4)',
-                      border: '1px solid #44475a',
+                      border: '1px solid var(--c-line)',
                       borderRadius: 4,
                       padding: '3px 8px',
                       fontSize: 12,
                       fontFamily: 'monospace',
                       fontWeight: 600,
-                      color: '#bd93f9',
+                      color: 'var(--c-purple)',
                     }}
                   >
                     {s.keys}

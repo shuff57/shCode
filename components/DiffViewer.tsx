@@ -20,7 +20,7 @@ const C = {
   bg: '#282a36',
   fg: '#f8f8f2',
   muted: '#6272a4',
-  border: '#44475a',
+  border: 'var(--c-line)',
   addBg: 'rgba(80,250,123,0.18)',
   addBar: '#50fa7b',
   delBg: 'rgba(255,85,85,0.18)',
@@ -134,7 +134,7 @@ function rowStyle(kind: Row['kind']): React.CSSProperties {
   switch (kind) {
     case 'add': return { background: C.addBg, borderLeft: `3px solid ${C.addBar}` };
     case 'del': return { background: C.delBg, borderLeft: `3px solid ${C.delBar}` };
-    case 'pad': return { background: '#1e1f29' };
+    case 'pad': return { background: 'var(--c-deep)' };
     default: return { borderLeft: '3px solid transparent' };
   }
 }

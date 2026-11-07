@@ -42,10 +42,10 @@ const sectionStyle: React.CSSProperties = {
 const summaryStyle: React.CSSProperties = {
   cursor: 'pointer',
   padding: '8px 12px',
-  background: '#282a36',
-  border: '1px solid #44475a',
+  background: 'var(--c-bg)',
+  border: '1px solid var(--c-line)',
   borderRadius: 4,
-  color: '#f8f8f2',
+  color: 'var(--c-fg)',
   fontWeight: 600,
   fontSize: '0.88rem',
   userSelect: 'none',
@@ -62,22 +62,22 @@ const listStyle: React.CSSProperties = {
 
 const itemStyle: React.CSSProperties = {
   padding: '6px 10px',
-  background: '#1e1f29',
-  border: '1px solid #44475a',
+  background: 'var(--c-deep)',
+  border: '1px solid var(--c-line)',
   borderRadius: 4,
   fontSize: '0.84rem',
-  color: '#f8f8f2',
+  color: 'var(--c-fg)',
   lineHeight: 1.45,
 };
 
 const clickableStyle: React.CSSProperties = {
-  color: '#8be9fd',
+  color: 'var(--c-cyan)',
   cursor: 'pointer',
   textDecoration: 'underline',
 };
 
 const mutedStyle: React.CSSProperties = {
-  color: '#8393c4',
+  color: 'var(--c-dim)',
   fontSize: '0.78rem',
 };
 
@@ -85,8 +85,8 @@ const mutedStyle: React.CSSProperties = {
 // the three places that talk about an ungraded attempt look like one thing.
 const awaitingSummaryStyle: React.CSSProperties = {
   ...summaryStyle,
-  borderColor: '#ffb86c',
-  color: '#ffb86c',
+  borderColor: 'var(--c-orange)',
+  color: 'var(--c-orange)',
 };
 
 // ---------------------------------------------------------------------------
@@ -130,7 +130,7 @@ export function NeedsAttentionPanel({ classId, lessonTitles, onOpenStudent, onOp
 
   if (loading) {
     return (
-      <div style={{ color: '#8393c4', fontStyle: 'italic', padding: 16, fontSize: '0.88rem' }}>
+      <div style={{ color: 'var(--c-dim)', fontStyle: 'italic', padding: 16, fontSize: '0.88rem' }}>
         Loading attention data...
       </div>
     );
@@ -138,7 +138,7 @@ export function NeedsAttentionPanel({ classId, lessonTitles, onOpenStudent, onOp
 
   if (error) {
     return (
-      <div style={{ color: '#ff5555', padding: 16, fontSize: '0.88rem' }}>
+      <div style={{ color: 'var(--c-red)', padding: 16, fontSize: '0.88rem' }}>
         Failed to load: {error}
       </div>
     );
@@ -156,7 +156,7 @@ export function NeedsAttentionPanel({ classId, lessonTitles, onOpenStudent, onOp
 
   if (!hasAny) {
     return (
-      <div style={{ color: '#50fa7b', padding: 16, fontSize: '0.88rem' }}>
+      <div style={{ color: 'var(--c-green)', padding: 16, fontSize: '0.88rem' }}>
         All students are on track.
       </div>
     );

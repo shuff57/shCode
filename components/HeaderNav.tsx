@@ -8,7 +8,7 @@ import NavDropdown from './NavDropdown';
 // Menu-item style shared by both dropdowns below — a real <Link>/<a>, not a
 // div with onClick, so it stays keyboard- and screen-reader-reachable.
 const itemStyle: React.CSSProperties = {
-  color: '#f8f8f2',
+  color: 'var(--c-fg)',
   textDecoration: 'none',
   fontSize: 13,
   padding: '6px 10px',
@@ -55,7 +55,7 @@ export default function HeaderNav() {
     <>
       <Link href="/" className="text-white">Lessons</Link>
 
-      <NavDropdown label="Learn" triggerStyle={{ color: '#fff', fontSize: 15 }}>
+      <NavDropdown label="Learn" triggerStyle={{ color: 'var(--x-ffffff)', fontSize: 15 }}>
         <Link href="/sandbox" style={itemStyle}>Sandbox</Link>
         {/* The pixel editor behind `sprite.texture`. Linked here rather than
             only from the docs: a page nothing navigates to is the failure
@@ -72,7 +72,7 @@ export default function HeaderNav() {
       </NavDropdown>
 
       {isStaff && (
-        <NavDropdown label="Teach" triggerStyle={{ color: '#fff', fontSize: 15 }}>
+        <NavDropdown label="Teach" triggerStyle={{ color: 'var(--x-ffffff)', fontSize: 15 }}>
           <Link href="/teacher" style={itemStyle}>Classes</Link>
           <Link href="/teacher/issues" style={itemStyle}>Issues</Link>
           {user?.role === 'admin' && (
@@ -107,8 +107,8 @@ export default function HeaderNav() {
         <Link
           href="/join-class"
           style={{
-            background: '#f1fa8c',
-            color: '#282a36',
+            background: 'var(--c-yellow)',
+            color: 'var(--c-bg)',
             padding: '4px 10px',
             borderRadius: 4,
             fontSize: 13,

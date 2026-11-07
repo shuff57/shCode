@@ -162,9 +162,9 @@ export function AnnouncementBanner() {
           role="status"
           aria-live="polite"
           style={{
-            background: '#282a36',
-            borderBottom: '2px solid #bd93f9',
-            color: '#f8f8f2',
+            background: 'var(--c-bg)',
+            borderBottom: '2px solid var(--c-purple)',
+            color: 'var(--c-fg)',
             padding: '10px 16px',
             display: 'flex',
             alignItems: 'flex-start',
@@ -175,14 +175,14 @@ export function AnnouncementBanner() {
         >
           <Pin
             size={16}
-            style={{ color: '#bd93f9', flexShrink: 0, marginTop: 1 }}
+            style={{ color: 'var(--c-purple)', flexShrink: 0, marginTop: 1 }}
           />
 
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
               {a.content}
             </div>
-            <div style={{ fontSize: '0.72rem', color: '#6272a4', marginTop: 4 }}>
+            <div style={{ fontSize: '0.72rem', color: 'var(--c-comment)', marginTop: 4 }}>
               {a.class_name} &middot; {a.author_email} &middot; {formatTs(a.created_at)}
             </div>
           </div>
@@ -193,7 +193,7 @@ export function AnnouncementBanner() {
             style={{
               background: 'none',
               border: 'none',
-              color: '#6272a4',
+              color: 'var(--c-comment)',
               cursor: 'pointer',
               padding: 2,
               flexShrink: 0,

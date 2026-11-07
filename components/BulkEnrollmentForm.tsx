@@ -83,8 +83,8 @@ export function BulkEnrollmentForm({ classId, onDone }: Props) {
   return (
     <div
       style={{
-        background: '#1e1f29',
-        border: '1px solid #44475a',
+        background: 'var(--c-deep)',
+        border: '1px solid var(--c-line)',
         borderRadius: 6,
         padding: 16,
         display: 'flex',
@@ -94,7 +94,7 @@ export function BulkEnrollmentForm({ classId, onDone }: Props) {
     >
       <label
         htmlFor="bulk-enroll-textarea"
-        style={{ color: '#f8f8f2', fontWeight: 600, fontSize: '0.9rem' }}
+        style={{ color: 'var(--c-fg)', fontWeight: 600, fontSize: '0.9rem' }}
       >
         Bulk Enroll Students
       </label>
@@ -108,9 +108,9 @@ export function BulkEnrollmentForm({ classId, onDone }: Props) {
         disabled={loading}
         style={{
           width: '100%',
-          background: '#282a36',
-          color: '#f8f8f2',
-          border: '1px solid #44475a',
+          background: 'var(--c-bg)',
+          color: 'var(--c-fg)',
+          border: '1px solid var(--c-line)',
           borderRadius: 4,
           padding: '10px 12px',
           fontSize: '0.85rem',
@@ -125,8 +125,8 @@ export function BulkEnrollmentForm({ classId, onDone }: Props) {
         disabled={loading}
         style={{
           alignSelf: 'flex-start',
-          background: '#50fa7b',
-          color: '#282a36',
+          background: 'var(--c-green)',
+          color: 'var(--c-bg)',
           border: 'none',
           borderRadius: 4,
           padding: '8px 20px',
@@ -140,38 +140,38 @@ export function BulkEnrollmentForm({ classId, onDone }: Props) {
       </button>
 
       {error && (
-        <div style={{ color: '#ff5555', fontSize: '0.85rem' }}>{error}</div>
+        <div style={{ color: 'var(--c-red)', fontSize: '0.85rem' }}>{error}</div>
       )}
 
       {result && (
         <div
           style={{
-            background: '#282a36',
-            border: '1px solid #44475a',
+            background: 'var(--c-bg)',
+            border: '1px solid var(--c-line)',
             borderRadius: 4,
             padding: 12,
             display: 'flex',
             flexDirection: 'column',
             gap: 4,
             fontSize: '0.85rem',
-            color: '#f8f8f2',
+            color: 'var(--c-fg)',
           }}
         >
           <div>
-            <span style={{ color: '#50fa7b', fontWeight: 600 }}>{result.enrolled}</span> enrolled
+            <span style={{ color: 'var(--c-green)', fontWeight: 600 }}>{result.enrolled}</span> enrolled
           </div>
           <div>
-            <span style={{ color: '#f1fa8c', fontWeight: 600 }}>{result.already_enrolled}</span> already enrolled
+            <span style={{ color: 'var(--c-yellow)', fontWeight: 600 }}>{result.already_enrolled}</span> already enrolled
           </div>
           <div>
-            <span style={{ color: '#ffb86c', fontWeight: 600 }}>{result.no_account}</span> no account found
+            <span style={{ color: 'var(--c-orange)', fontWeight: 600 }}>{result.no_account}</span> no account found
           </div>
           {result.errors.length > 0 && (
             <div style={{ marginTop: 4 }}>
-              <span style={{ color: '#ff5555', fontWeight: 600 }}>Errors:</span>
+              <span style={{ color: 'var(--c-red)', fontWeight: 600 }}>Errors:</span>
               <ul style={{ margin: '4px 0 0', paddingLeft: 20 }}>
                 {result.errors.map((e, i) => (
-                  <li key={i} style={{ color: '#ff5555' }}>{e}</li>
+                  <li key={i} style={{ color: 'var(--c-red)' }}>{e}</li>
                 ))}
               </ul>
             </div>

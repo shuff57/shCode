@@ -96,8 +96,8 @@ export default function DocsDrawer({
           top: -14,
           margin: '-14px -16px 12px',
           padding: '10px 16px',
-          background: '#21222c',
-          borderBottom: '1px solid #44475a',
+          background: 'var(--c-deep2)',
+          borderBottom: '1px solid var(--c-line)',
           zIndex: 2,
           flexShrink: 0,
         }}
@@ -111,9 +111,9 @@ export default function DocsDrawer({
               aria-pressed={s.id === setId}
               style={{
                 flex: 1,
-                background: s.id === setId ? '#bd93f9' : 'transparent',
-                color: s.id === setId ? '#21222c' : '#bd93f9',
-                border: '1px solid #bd93f9',
+                background: s.id === setId ? 'var(--c-purple)' : 'transparent',
+                color: s.id === setId ? 'var(--c-deep2)' : 'var(--c-purple)',
+                border: '1px solid var(--c-purple)',
                 borderRadius: 4,
                 padding: '4px 6px',
                 fontSize: '0.72rem',
@@ -133,9 +133,9 @@ export default function DocsDrawer({
           aria-label="Search documentation"
           style={{
             width: '100%',
-            background: '#282a36',
-            color: '#f8f8f2',
-            border: '1px solid #44475a',
+            background: 'var(--c-bg)',
+            color: 'var(--c-fg)',
+            border: '1px solid var(--c-line)',
             borderRadius: 4,
             padding: '6px 10px',
             fontSize: '0.85rem',
@@ -162,17 +162,17 @@ export default function DocsDrawer({
                   width: '100%',
                   textAlign: 'left',
                   background: 'transparent',
-                  border: '1px solid #44475a',
+                  border: '1px solid var(--c-line)',
                   borderRadius: 4,
                   padding: '8px 10px',
                   marginBottom: 6,
-                  color: '#f8f8f2',
+                  color: 'var(--c-fg)',
                   cursor: 'pointer',
                   font: 'inherit',
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
-                  <span style={{ color: '#bd93f9', fontWeight: 600, fontSize: '0.85rem' }}>{r.pageTitle}</span>
+                  <span style={{ color: 'var(--c-purple)', fontWeight: 600, fontSize: '0.85rem' }}>{r.pageTitle}</span>
                   <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em', opacity: 0.55 }}>
                     {r.sectionTitle}
                   </span>
@@ -193,9 +193,9 @@ export default function DocsDrawer({
               onChange={(e) => setActiveSlug(e.target.value)}
               style={{
                 width: '100%',
-                background: '#282a36',
-                color: '#f8f8f2',
-                border: '1px solid #44475a',
+                background: 'var(--c-bg)',
+                color: 'var(--c-fg)',
+                border: '1px solid var(--c-line)',
                 borderRadius: 4,
                 padding: '5px 8px',
                 fontSize: '0.85rem',
@@ -211,7 +211,7 @@ export default function DocsDrawer({
           </div>
           {activeSection && (
             <>
-              <h2 style={{ margin: '0 0 12px', fontSize: '1rem', color: '#f8f8f2', fontWeight: 600 }}>
+              <h2 style={{ margin: '0 0 12px', fontSize: '1rem', color: 'var(--c-fg)', fontWeight: 600 }}>
                 {activeSection.title}
               </h2>
               {activeSection.pages.map((page, pi) => (
@@ -220,7 +220,7 @@ export default function DocsDrawer({
                   id={`docsdrawer-page-${activeSection.slug}-${pi}`}
                   style={{ marginBottom: 24, scrollMarginTop: 70 }}
                 >
-                  <h3 style={{ margin: '0 0 6px', fontSize: '0.9rem', color: '#bd93f9', fontWeight: 600 }}>
+                  <h3 style={{ margin: '0 0 6px', fontSize: '0.9rem', color: 'var(--c-purple)', fontWeight: 600 }}>
                     {page.title}
                   </h3>
                   {page.body.split('\n\n').map((para, i) => (

@@ -424,7 +424,7 @@ export default function ReportIssueButton() {
         .issue-done {
           padding: 24px; text-align: center;
         }
-        .issue-done p { margin: 0 0 10px; font-weight: 700; color: #22c55e; }
+        .issue-done p { margin: 0 0 10px; font-weight: 700; color: var(--x-22c55e); }
         .issue-done-link { font-size: 13px; color: var(--brand); }
 
         .issue-kinds { display: flex; gap: 6px; margin-bottom: 14px; }
@@ -485,8 +485,8 @@ export default function ReportIssueButton() {
 
         .issue-error {
           padding: 8px; margin-bottom: 10px; font-size: 13px;
-          background: rgba(220,38,38,0.12); color: #f87171;
-          border: 1px solid #dc2626; border-radius: 4px;
+          background: rgba(220,38,38,0.12); color: var(--x-f87171);
+          border: 1px solid var(--x-dc2626); border-radius: 4px;
         }
         .issue-note { margin: 0 0 14px; font-size: 11px; opacity: 0.5; }
 
@@ -502,7 +502,7 @@ export default function ReportIssueButton() {
           border: 1px solid var(--border);
           color: var(--text);
         }
-        .issue-send { border: none; color: #1a1a1a; }
+        .issue-send { border: none; color: var(--x-1a1a1a); }
         .issue-send:disabled { opacity: 0.45; cursor: not-allowed; }
       `}</style>
     </>

@@ -1130,7 +1130,7 @@ export default function LessonWorkspace({
           {
             key: 'help',
             label: 'CODY',
-            color: '#ffb86c',
+            color: 'var(--c-orange)',
             content: <AiHelpPanel lesson={lesson} />,
           },
           // The Docs drawer is on every lesson. It defaults to the set the
@@ -1143,7 +1143,7 @@ export default function LessonWorkspace({
           {
             key: 'docs',
             label: 'Docs',
-            color: '#bd93f9',
+            color: 'var(--c-purple)',
             content: (
               <DocsDrawer
                 defaultSetId={isMoshionMode ? 'moshion' : 'js'}
@@ -1171,7 +1171,7 @@ export default function LessonWorkspace({
                 {
                   key: 'textures',
                   label: 'Textures',
-                  color: '#ff79c6',
+                  color: 'var(--c-pink)',
                   content: <TextureEditor />,
                   headerExtra: (
                     <a
@@ -1190,7 +1190,7 @@ export default function LessonWorkspace({
                 {
                   key: 'sounds',
                   label: 'Sounds',
-                  color: '#50fa7b',
+                  color: 'var(--c-green)',
                   content: <SoundMixer />,
                   headerExtra: (
                     <a
@@ -1215,7 +1215,7 @@ export default function LessonWorkspace({
                 {
                   key: 'steps',
                   label: 'Steps',
-                  color: '#f1fa8c',
+                  color: 'var(--c-yellow)',
                   content: <LessonSteps lesson={lesson} />,
                 },
               ] as DrawerTab[])
@@ -1223,10 +1223,10 @@ export default function LessonWorkspace({
           {
             key: 'quest',
             label: 'Quest',
-            color: '#50fa7b',
+            color: 'var(--c-green)',
             content:
               requirements.length === 0 ? (
-                <p style={{ color: '#6272a4' }}>No graded items for this lesson.</p>
+                <p style={{ color: 'var(--c-comment)' }}>No graded items for this lesson.</p>
               ) : (
                 <RequirementsSection requirements={requirements} />
               ),
@@ -1234,7 +1234,7 @@ export default function LessonWorkspace({
           {
             key: 'file',
             label: 'File',
-            color: '#8be9fd',
+            color: 'var(--c-cyan)',
             content: (
               <>
                 <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexShrink: 0 }}>
@@ -1345,7 +1345,7 @@ export default function LessonWorkspace({
                   isRunning && (isMoshionMode || isConsoleMode) ? (
                     <button
                       className="btn-run"
-                      style={{ background: '#ff5555', borderColor: '#ff5555' }}
+                      style={{ background: 'var(--c-red)', borderColor: 'var(--c-red)' }}
                       onClick={isMoshionMode ? stopRun : stopConsoleRun}
                     >
                       ■ Stop
@@ -1375,8 +1375,8 @@ export default function LessonWorkspace({
                     padding: '6px 14px',
                     borderRadius: 4,
                     background: 'transparent',
-                    color: '#6272a4',
-                    border: '1px solid #44475a',
+                    color: 'var(--c-comment)',
+                    border: '1px solid var(--c-line)',
                     cursor: 'pointer',
                     fontSize: 13,
                     display: 'inline-flex',
@@ -1414,7 +1414,7 @@ export default function LessonWorkspace({
                     role="status"
                     aria-live="polite"
                     style={{
-                      color: '#50fa7b',
+                      color: 'var(--c-green)',
                       fontSize: 13,
                       marginLeft: 8,
                       fontWeight: 500,
@@ -1428,7 +1428,7 @@ export default function LessonWorkspace({
                     role="status"
                     aria-live="polite"
                     style={{
-                      color: '#ffb86c',
+                      color: 'var(--c-orange)',
                       fontSize: 13,
                       marginLeft: 8,
                       fontWeight: 500,
@@ -1446,7 +1446,7 @@ export default function LessonWorkspace({
                 aria-live="polite"
                 title={runtimeError}
                 style={{
-                  color: '#ff5555',
+                  color: 'var(--c-red)',
                   fontSize: 13,
                   marginLeft: 8,
                   fontWeight: 500,
@@ -1504,7 +1504,7 @@ export default function LessonWorkspace({
                       role="status"
                       aria-live="polite"
                       style={{
-                        color: cloud.note.kind === 'error' ? '#ff5555' : '#50fa7b',
+                        color: cloud.note.kind === 'error' ? 'var(--c-red)' : 'var(--c-green)',
                         fontSize: 12,
                         alignSelf: 'center',
                         maxWidth: 230,
@@ -1533,7 +1533,7 @@ export default function LessonWorkspace({
             // The AI's read of the steps, directly under the Grade button and
             // above the textarea it graded.
             <div style={{ marginBottom: 8 }}>
-              <div role="status" aria-live="polite" style={{ fontSize: 14, color: '#8393c4' }}>
+              <div role="status" aria-live="polite" style={{ fontSize: 14, color: 'var(--c-dim)' }}>
                 {aiCheckNote
                   ? aiNoteForRun(aiCheckNote, { allGreen: allRequirementsPassed, runErrored: !!runtimeError })
                   : isTextMode
@@ -1543,7 +1543,7 @@ export default function LessonWorkspace({
                       : 'Run shows what your code does. Press Check to have the AI read it and mark the Quest cards, whatever shape you wrote it in. Submit turns on once they are green.'}
               </div>
               {aiCheckNote?.kind === 'ok' && aiCheckNote.hints && aiCheckNote.hints.length > 0 && (
-                <ul style={{ margin: '4px 0 0', paddingLeft: 20, fontSize: 14, color: '#8393c4' }}>
+                <ul style={{ margin: '4px 0 0', paddingLeft: 20, fontSize: 14, color: 'var(--c-dim)' }}>
                   {aiCheckNote.hints.map((h, i) => (
                     <li key={i}>{h}</li>
                   ))}

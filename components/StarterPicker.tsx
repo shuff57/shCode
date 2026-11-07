@@ -92,14 +92,14 @@ export default function StarterPicker({ lesson }: { lesson: Lesson }) {
         flexWrap: 'wrap',
         alignItems: 'center',
         gap: 6,
-        background: '#282a36',
-        border: '1px solid #44475a',
+        background: 'var(--c-bg)',
+        border: '1px solid var(--c-line)',
         borderRadius: 6,
         padding: '8px 12px',
         marginBottom: 12,
       }}
     >
-      <span style={{ color: '#8393c4', fontSize: 13, fontWeight: 600, marginRight: 4 }}>
+      <span style={{ color: 'var(--c-dim)', fontSize: 13, fontWeight: 600, marginRight: 4 }}>
         Your problem:
       </span>
       {variants.map((v) => {
@@ -114,9 +114,9 @@ export default function StarterPicker({ lesson }: { lesson: Lesson }) {
               padding: '4px 12px',
               minHeight: 30,
               borderRadius: 6,
-              border: `1px solid ${on ? '#bd93f9' : '#44475a'}`,
-              background: on ? '#bd93f9' : '#282a36',
-              color: on ? '#282a36' : '#f8f8f2',
+              border: `1px solid ${on ? 'var(--c-purple)' : 'var(--c-line)'}`,
+              background: on ? 'var(--c-purple)' : 'var(--c-bg)',
+              color: on ? 'var(--c-bg)' : 'var(--c-fg)',
               fontSize: 13,
               fontWeight: 600,
               cursor: on ? 'default' : 'pointer',
@@ -126,7 +126,7 @@ export default function StarterPicker({ lesson }: { lesson: Lesson }) {
           </button>
         );
       })}
-      <span role="status" aria-live="polite" style={{ color: '#50fa7b', fontSize: 13, marginLeft: 4 }}>
+      <span role="status" aria-live="polite" style={{ color: 'var(--c-green)', fontSize: 13, marginLeft: 4 }}>
         {note ?? ''}
       </span>
     </div>

@@ -78,9 +78,9 @@ export default function LabPlanChart({ lessonId, mermaid, caption, variants }: P
         const next = (e.currentTarget as HTMLDetailsElement).open;
         if (next !== open) toggle(next);
       }}
-      style={{ background: '#282a36', border: '1px solid #44475a', borderRadius: 6, padding: '8px 12px', marginBottom: 12 }}
+      style={{ background: 'var(--c-bg)', border: '1px solid var(--c-line)', borderRadius: 6, padding: '8px 12px', marginBottom: 12 }}
     >
-      <summary style={{ cursor: 'pointer', color: '#8be9fd', fontSize: 14, fontWeight: 600 }}>
+      <summary style={{ cursor: 'pointer', color: 'var(--c-cyan)', fontSize: 14, fontWeight: 600 }}>
         Flow Chart
       </summary>
       {open && variants && variants.length > 1 ? (
@@ -98,9 +98,9 @@ export default function LabPlanChart({ lessonId, mermaid, caption, variants }: P
                   padding: '4px 12px',
                   minHeight: 30,
                   borderRadius: 6,
-                  border: `1px solid ${on ? '#bd93f9' : '#44475a'}`,
-                  background: on ? '#bd93f9' : '#282a36',
-                  color: on ? '#282a36' : '#f8f8f2',
+                  border: `1px solid ${on ? 'var(--c-purple)' : 'var(--c-line)'}`,
+                  background: on ? 'var(--c-purple)' : 'var(--c-bg)',
+                  color: on ? 'var(--c-bg)' : 'var(--c-fg)',
                   fontSize: 13,
                   fontWeight: 600,
                   cursor: 'pointer',

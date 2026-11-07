@@ -201,9 +201,9 @@ export default function IssuesPage() {
       </div>
 
       {loading && <div style={{ opacity: 0.55 }}>Loading reports…</div>}
-      {loadError && <div style={{ color: '#dc2626', fontSize: 14 }}>{loadError}</div>}
-      {voteError && <div style={{ color: '#dc2626', fontSize: 14, marginBottom: 12 }}>{voteError}</div>}
-      {withdrawError && <div style={{ color: '#dc2626', fontSize: 14, marginBottom: 12 }}>{withdrawError}</div>}
+      {loadError && <div style={{ color: 'var(--x-dc2626)', fontSize: 14 }}>{loadError}</div>}
+      {voteError && <div style={{ color: 'var(--x-dc2626)', fontSize: 14, marginBottom: 12 }}>{voteError}</div>}
+      {withdrawError && <div style={{ color: 'var(--x-dc2626)', fontSize: 14, marginBottom: 12 }}>{withdrawError}</div>}
 
       {!loading && !loadError && reports.length === 0 && (
         <p style={{ opacity: 0.55, fontSize: 14 }}>

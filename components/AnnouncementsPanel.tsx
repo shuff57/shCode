@@ -142,7 +142,7 @@ export function AnnouncementsPanel({ classId }: Props) {
 
   if (loading) {
     return (
-      <div style={{ color: '#8393c4', fontStyle: 'italic', padding: 16, fontSize: '0.88rem' }}>
+      <div style={{ color: 'var(--c-dim)', fontStyle: 'italic', padding: 16, fontSize: '0.88rem' }}>
         Loading announcements...
       </div>
     );
@@ -150,7 +150,7 @@ export function AnnouncementsPanel({ classId }: Props) {
 
   if (error) {
     return (
-      <div style={{ color: '#ff5555', padding: 16, fontSize: '0.88rem' }}>
+      <div style={{ color: 'var(--c-red)', padding: 16, fontSize: '0.88rem' }}>
         Failed to load: {error}
       </div>
     );
@@ -162,8 +162,8 @@ export function AnnouncementsPanel({ classId }: Props) {
       <form
         onSubmit={handleCreate}
         style={{
-          background: '#1e1f29',
-          border: '1px solid #44475a',
+          background: 'var(--c-deep)',
+          border: '1px solid var(--c-line)',
           borderRadius: 6,
           padding: 14,
           display: 'flex',
@@ -171,7 +171,7 @@ export function AnnouncementsPanel({ classId }: Props) {
           gap: 10,
         }}
       >
-        <div style={{ fontWeight: 600, color: '#f8f8f2', fontSize: '0.9rem' }}>
+        <div style={{ fontWeight: 600, color: 'var(--c-fg)', fontSize: '0.9rem' }}>
           New Announcement
         </div>
 
@@ -183,9 +183,9 @@ export function AnnouncementsPanel({ classId }: Props) {
           disabled={submitting}
           style={{
             width: '100%',
-            background: '#282a36',
-            color: '#f8f8f2',
-            border: '1px solid #44475a',
+            background: 'var(--c-bg)',
+            color: 'var(--c-fg)',
+            border: '1px solid var(--c-line)',
             borderRadius: 4,
             padding: '10px 12px',
             fontSize: '0.85rem',
@@ -202,9 +202,9 @@ export function AnnouncementsPanel({ classId }: Props) {
             checked={pinned}
             onChange={(e) => setPinned(e.target.checked)}
             disabled={submitting}
-            style={{ accentColor: '#bd93f9' }}
+            style={{ accentColor: 'var(--c-purple)' }}
           />
-          <label htmlFor="announcement-pinned" style={{ fontSize: '0.84rem', color: '#f8f8f2', cursor: 'pointer' }}>
+          <label htmlFor="announcement-pinned" style={{ fontSize: '0.84rem', color: 'var(--c-fg)', cursor: 'pointer' }}>
             Pin this announcement
           </label>
         </div>
@@ -214,8 +214,8 @@ export function AnnouncementsPanel({ classId }: Props) {
             type="submit"
             disabled={submitting}
             style={{
-              background: '#50fa7b',
-              color: '#282a36',
+              background: 'var(--c-green)',
+              color: 'var(--c-bg)',
               border: 'none',
               borderRadius: 4,
               padding: '8px 20px',
@@ -229,14 +229,14 @@ export function AnnouncementsPanel({ classId }: Props) {
           </button>
 
           {createError && (
-            <span style={{ color: '#ff5555', fontSize: '0.84rem' }}>{createError}</span>
+            <span style={{ color: 'var(--c-red)', fontSize: '0.84rem' }}>{createError}</span>
           )}
         </div>
       </form>
 
       {/* Existing announcements */}
       {announcements.length === 0 ? (
-        <div style={{ color: '#8393c4', fontSize: '0.88rem', padding: 8 }}>
+        <div style={{ color: 'var(--c-dim)', fontSize: '0.88rem', padding: 8 }}>
           No announcements yet.
         </div>
       ) : (
@@ -244,8 +244,8 @@ export function AnnouncementsPanel({ classId }: Props) {
           <div
             key={a.id}
             style={{
-              background: '#1e1f29',
-              border: '1px solid #44475a',
+              background: 'var(--c-deep)',
+              border: '1px solid var(--c-line)',
               borderRadius: 6,
               padding: 12,
               display: 'flex',
@@ -261,8 +261,8 @@ export function AnnouncementsPanel({ classId }: Props) {
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: 3,
-                      background: '#bd93f9',
-                      color: '#282a36',
+                      background: 'var(--c-purple)',
+                      color: 'var(--c-bg)',
                       padding: '1px 8px',
                       borderRadius: 3,
                       fontSize: '0.72rem',
@@ -274,7 +274,7 @@ export function AnnouncementsPanel({ classId }: Props) {
                     Pinned
                   </span>
                 )}
-                <span style={{ fontSize: '0.78rem', color: '#8393c4' }}>
+                <span style={{ fontSize: '0.78rem', color: 'var(--c-dim)' }}>
                   {a.author_email} &middot; {formatTs(a.created_at)}
                 </span>
               </div>
@@ -285,7 +285,7 @@ export function AnnouncementsPanel({ classId }: Props) {
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#ff5555',
+                  color: 'var(--c-red)',
                   cursor: 'pointer',
                   padding: 2,
                   display: 'inline-flex',
@@ -298,7 +298,7 @@ export function AnnouncementsPanel({ classId }: Props) {
 
             <div
               style={{
-                color: '#f8f8f2',
+                color: 'var(--c-fg)',
                 fontSize: '0.85rem',
                 lineHeight: 1.5,
                 whiteSpace: 'pre-wrap',

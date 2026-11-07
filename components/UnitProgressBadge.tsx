@@ -92,14 +92,14 @@ function breakdownRows(
         ...base,
         detail: `${score}/${l.maxScore}`,
         pct,
-        color: pct >= 100 ? '#50fa7b' : pct > 0 ? '#f1fa8c' : '#ff5555',
+        color: pct >= 100 ? 'var(--c-green)' : pct > 0 ? 'var(--c-yellow)' : 'var(--c-red)',
       };
     }
     // Summative -- the key is stripped client-side, so no fraction comes back;
     // a completed test is sat, not failed for awaiting a mark.
-    if (state === 'completed') return { ...base, detail: 'submitted', pct: 100, color: '#50fa7b' };
-    if (state === 'started') return { ...base, detail: 'in progress', pct: null, color: '#f1fa8c' };
-    return { ...base, detail: 'not started', pct: null, color: '#6272a4' };
+    if (state === 'completed') return { ...base, detail: 'submitted', pct: 100, color: 'var(--c-green)' };
+    if (state === 'started') return { ...base, detail: 'in progress', pct: null, color: 'var(--c-yellow)' };
+    return { ...base, detail: 'not started', pct: null, color: 'var(--c-comment)' };
   }
 
   for (const category of GRADE_CATEGORIES) {
@@ -113,7 +113,7 @@ function breakdownRows(
       key: `cat-${category}`,
       text: `${CATEGORY_LABEL[category]} — ${weights[category]}% of grade`,
       pct: avg,
-      color: avg >= 100 ? '#50fa7b' : avg > 0 ? '#f1fa8c' : '#6272a4',
+      color: avg >= 100 ? 'var(--c-green)' : avg > 0 ? 'var(--c-yellow)' : 'var(--c-comment)',
       header: true,
     });
     for (const l of group) rows.push(lessonRow(l));
@@ -126,7 +126,7 @@ function breakdownRows(
       key: 'ungraded',
       text: `Readings and examples — not graded (${done}/${uncategorized.length} done)`,
       pct: null,
-      color: '#6272a4',
+      color: 'var(--c-comment)',
       header: true,
     });
     for (const l of uncategorized) rows.push(lessonRow(l));
@@ -178,8 +178,8 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
   if (!snap.loaded) return null;
   if (!snap.authed) {
     return (
-      <span style={{ fontSize: 12, color: '#6272a4', whiteSpace: 'nowrap' }}>
-        <span style={{ color: '#8be9fd' }}>Sign in</span> to track
+      <span style={{ fontSize: 12, color: 'var(--c-comment)', whiteSpace: 'nowrap' }}>
+        <span style={{ color: 'var(--c-cyan)' }}>Sign in</span> to track
       </span>
     );
   }
@@ -241,7 +241,7 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
                 position: 'absolute',
                 inset: 0,
                 width: `${Math.round(((done + started) / total) * 100)}%`,
-                background: '#f1fa8c55',
+                background: 'color-mix(in srgb, var(--c-yellow) 33.3333%, transparent)',
               }}
             />
           ) : null}
@@ -251,12 +251,12 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
               inset: 0,
               width: `${pct}%`,
               height: '100%',
-              background: allDone ? '#50fa7b' : '#8be9fd',
+              background: allDone ? 'var(--c-green)' : 'var(--c-cyan)',
               transition: 'width 200ms ease',
             }}
           />
         </span>
-        <span style={{ color: allDone ? '#50fa7b' : 'inherit', fontWeight: 600 }}>
+        <span style={{ color: allDone ? 'var(--c-green)' : 'inherit', fontWeight: 600 }}>
           {pct}%
         </span>
       </button>
@@ -290,12 +290,12 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
                 maxHeight: '85vh',
                 display: 'flex',
                 flexDirection: 'column',
-                background: '#282a36',
-                border: '1px solid #44475a',
+                background: 'var(--c-bg)',
+                border: '1px solid var(--c-line)',
                 borderRadius: 10,
                 boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
                 fontSize: 13,
-                color: '#f8f8f2',
+                color: 'var(--c-fg)',
                 fontFamily: 'inherit',
                 overflow: 'hidden',
               }}
@@ -305,7 +305,7 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
               <div
                 style={{
                   padding: '16px 20px',
-                  borderBottom: '1px solid #44475a',
+                  borderBottom: '1px solid var(--c-line)',
                   display: 'flex',
                   alignItems: 'baseline',
                   gap: 8,
@@ -326,7 +326,7 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
                     marginLeft: 'auto',
                     background: 'none',
                     border: 'none',
-                    color: '#6272a4',
+                    color: 'var(--c-comment)',
                     cursor: 'pointer',
                     fontSize: 20,
                     lineHeight: 1,
@@ -380,7 +380,7 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
                     >
                       {r.text}
                     </span>
-                    {r.detail && <span style={{ color: '#6272a4', flexShrink: 0 }}>{r.detail}</span>}
+                    {r.detail && <span style={{ color: 'var(--c-comment)', flexShrink: 0 }}>{r.detail}</span>}
                     {r.pct != null && (
                       <span style={{ color: r.color, fontWeight: 600, flexShrink: 0, width: 34, textAlign: 'right' }}>
                         {r.pct}%

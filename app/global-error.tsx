@@ -27,7 +27,7 @@ export default function GlobalError({ error }: { error: Error & { digest?: strin
 
   return (
     <html lang="en">
-      <body style={{ background: '#282a36', margin: 0 }}>
+      <body style={{ background: 'var(--c-bg)', margin: 0 }}>
         {status !== 'pending' ? (
           <div
             style={{
@@ -37,7 +37,7 @@ export default function GlobalError({ error }: { error: Error & { digest?: strin
               justifyContent: 'center',
               minHeight: '100vh',
               gap: 16,
-              color: '#f8f8f2',
+              color: 'var(--c-fg)',
               textAlign: 'center',
               padding: 24,
               fontFamily: 'system-ui, sans-serif',
@@ -45,13 +45,13 @@ export default function GlobalError({ error }: { error: Error & { digest?: strin
           >
             <p>Something went wrong loading shCode.</p>
             {status === 'real-error' && error?.message ? (
-              <p style={{ color: '#6272a4', fontSize: '0.85rem', maxWidth: 480 }}>{error.message}</p>
+              <p style={{ color: 'var(--c-comment)', fontSize: '0.85rem', maxWidth: 480 }}>{error.message}</p>
             ) : null}
             <button
               onClick={() => window.location.reload()}
               style={{
-                background: '#bd93f9',
-                color: '#282a36',
+                background: 'var(--c-purple)',
+                color: 'var(--c-bg)',
                 border: 'none',
                 borderRadius: 4,
                 padding: '8px 16px',

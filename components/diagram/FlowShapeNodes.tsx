@@ -24,14 +24,14 @@ interface ShapeNodeData extends Record<string, unknown> {
 }
 
 const PALETTE: Record<FlowShape, { fill: string; stroke: string; text: string }> = {
-  terminal: { fill: '#2f3b4d', stroke: '#8be9fd', text: '#e8f7fb' },
-  process: { fill: '#343746', stroke: '#bd93f9', text: '#f2ecff' },
-  decision: { fill: '#3d3a2c', stroke: '#f1fa8c', text: '#fbfbe6' },
-  io: { fill: '#33403a', stroke: '#50fa7b', text: '#e6fbec' },
-  subroutine: { fill: '#3f3628', stroke: '#ffb86c', text: '#fdf0e2' },
-  preparation: { fill: '#3d2d38', stroke: '#ff92d0', text: '#fdeaf6' },
-  connector: { fill: '#2c3145', stroke: '#7d8bb5', text: '#dfe4f2' },
-  comment: { fill: 'transparent', stroke: '#6272a4', text: '#aeb7d0' },
+  terminal: { fill: 'var(--x-2f3b4d)', stroke: 'var(--c-cyan)', text: '#e8f7fb' },
+  process: { fill: 'var(--x-343746)', stroke: 'var(--c-purple)', text: '#f2ecff' },
+  decision: { fill: 'var(--x-3d3a2c)', stroke: 'var(--c-yellow)', text: '#fbfbe6' },
+  io: { fill: 'var(--x-33403a)', stroke: 'var(--c-green)', text: '#e6fbec' },
+  subroutine: { fill: 'var(--x-3f3628)', stroke: 'var(--c-orange)', text: '#fdf0e2' },
+  preparation: { fill: 'var(--x-3d2d38)', stroke: 'var(--x-ff92d0)', text: '#fdeaf6' },
+  connector: { fill: 'var(--x-2c3145)', stroke: 'var(--x-7d8bb5)', text: '#dfe4f2' },
+  comment: { fill: 'transparent', stroke: 'var(--c-comment)', text: '#aeb7d0' },
 };
 
 const SIZE: Record<FlowShape, { w: number; h: number }> = {
@@ -77,7 +77,7 @@ function handleStyle(color: string) {
   return {
     width: 11,
     height: 11,
-    background: '#282a36',
+    background: 'var(--c-bg)',
     border: `2px solid ${color}`,
     borderRadius: 999,
   } as const;
@@ -161,7 +161,7 @@ function ShapeNode({ id, data, selected }: NodeProps) {
         height: shape === 'comment' ? 'auto' : h,
         minHeight: shape === 'comment' ? h : undefined,
         filter: selected ? 'drop-shadow(0 0 0 2px #ff79c6)' : undefined,
-        outline: selected && clip === undefined ? '2px solid #ff79c6' : undefined,
+        outline: selected && clip === undefined ? '2px solid var(--c-pink)' : undefined,
         outlineOffset: 2,
         borderRadius: cornerRadius(shape),
       }}
@@ -227,7 +227,7 @@ function ShapeNode({ id, data, selected }: NodeProps) {
         ) : d.label?.trim() ? (
           d.label
         ) : (
-          <span style={{ color: '#8b8fa3', fontStyle: 'italic' }}>double-click to label</span>
+          <span style={{ color: 'var(--x-8b8fa3)', fontStyle: 'italic' }}>double-click to label</span>
         )}
       </div>
 

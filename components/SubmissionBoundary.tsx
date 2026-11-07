@@ -29,11 +29,11 @@ export default class SubmissionBoundary extends Component<Props, { failed: boole
   render() {
     if (!this.state.failed) return this.props.children;
     return (
-      <div role="alert" style={{ color: '#f8f8f2', fontSize: '0.85rem', lineHeight: 1.5 }}>
-        <div style={{ color: '#ffb86c', fontWeight: 600, marginBottom: 4 }}>
+      <div role="alert" style={{ color: 'var(--c-fg)', fontSize: '0.85rem', lineHeight: 1.5 }}>
+        <div style={{ color: 'var(--c-orange)', fontWeight: 600, marginBottom: 4 }}>
           This submission could not be displayed. Its text is shown instead.
         </div>
-        <div style={{ whiteSpace: 'pre-wrap', maxHeight: 160, overflowY: 'auto', background: '#1e1f29', borderRadius: 4, padding: '6px 8px' }}>
+        <div style={{ whiteSpace: 'pre-wrap', maxHeight: 160, overflowY: 'auto', background: 'var(--c-deep)', borderRadius: 4, padding: '6px 8px' }}>
           {this.props.raw || '(no response)'}
         </div>
       </div>
