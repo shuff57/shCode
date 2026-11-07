@@ -29,12 +29,12 @@
     {
       "id": "s3",
       "title": "Draw the players",
-      "instructions": "Take out the one tomato token and the `at` variable. Write `drawPlayers()`, which loops over `players` and draws each one's circle on `path[players[p].at]`, moved sideways by `p * 20`. Call it in `draw()` after `drawBoard()`. In `drawTop()`, show `message` and whose turn it is: `players[turn].name + \"'s turn\"`."
+      "instructions": "Take out the one tomato token, the `at` variable, and the SPACE line that steps `at` (the next step writes a new SPACE line; leave that one in and SPACE stops the sketch with \"at is not defined\"). Write `drawPlayers()`, which loops over `players` and draws each one's circle on `path[players[p].at]`, moved sideways by `p * 20`. Call it in `draw()` after `drawBoard()`. In `drawTop()`, show `message` and whose turn it is: `players[turn].name + \"'s turn\"`."
     },
     {
       "id": "s4",
       "title": "Roll and take a turn",
-      "instructions": "Write `takeTurn(r)` from the reading: move `players[turn]` by `r` with `min(p.at + r, last)`, set the message, stop with a winner on the last square, and otherwise pass the turn with `%`. In `draw()`, SPACE calls `takeTurn(floor(random(1, 7)))` while `winner === -1`.",
+      "instructions": "Write `takeTurn(r)` from the reading: move `players[turn]` by `r` with `min(p.at + r, last)`, set the message, stop with a winner on the last square, and otherwise pass the turn with `%`. In `draw()`, SPACE calls `takeTurn(floor(random(1, 7)))` while `winner === -1`. In `setup()`, add `randomSeed(Date.now());` so each game rolls differently.",
       "hints": [
         "Without `min`, a big roll near the end sends the token off the board, and `path[33]` does not exist.",
         "Pass the turn in its own `nextTurn()`: day three adds to it."
@@ -54,7 +54,7 @@
       "hint": "takeTurn(floor(random(1, 7)));",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\brandom\\s*\\(\\s*1\\s*,\\s*7\\s*\\)|\\brandom\\s*\\(\\s*6\\s*\\)[\\s)]*\\+\\s*1\\b|\\brandom\\s*\\(\\s*\\)\\s*\\*\\s*6[\\s)]*\\+\\s*1\\b|\\b1\\s*\\+\\s*(?:Math\\s*\\.\\s*)?floor\\s*\\(\\s*(?:Math\\s*\\.\\s*)?random\\s*\\(|\\bceil\\s*\\(\\s*(?:Math\\s*\\.\\s*)?random\\s*\\(\\s*(?:6\\b|\\)\\s*\\*\\s*6)",
+      "pattern": "\\brandom\\s*\\(\\s*1\\s*,\\s*7\\s*\\)|\\brandom\\s*\\(\\s*6\\s*\\)[\\s)]*\\+\\s*1\\b|\\brandom\\s*\\(\\s*\\)\\s*\\*\\s*6[\\s)]*\\+\\s*1\\b|\\b1\\s*\\+\\s*(?:Math\\s*\\.\\s*)?floor\\s*\\(\\s*(?:Math\\s*\\.\\s*)?random\\s*\\(|\\bceil\\s*\\(\\s*(?:Math\\s*\\.\\s*)?random\\s*\\(\\s*(?:6\\b|\\)\\s*\\*\\s*6)|\\bround\\s*\\(\\s*random\\s*\\(\\s*1\\s*,\\s*6\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -80,7 +80,7 @@
       "hint": "turn = (turn + 1) % players.length;",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\b([\\w$]+)\\s*=\\s*\\(\\s*\\1\\s*\\+\\s*1\\s*\\)\\s*%|\\b([\\w$]+)\\s*%=|\\b([\\w$]+)\\s*=\\s*1\\s*-\\s*\\3\\b|\\b([\\w$]+)\\s*=\\s*\\(?\\s*\\4\\s*===?\\s*0\\s*\\)?\\s*\\?\\s*1\\s*:\\s*0|\\b([\\w$]+)\\s*=\\s*\\(?\\s*\\5\\s*===?\\s*1\\s*\\)?\\s*\\?\\s*0\\s*:\\s*1|\\bif\\s*\\(+\\s*([\\w$]+)\\s*(?:>=\\s*(?:[\\w$]+\\s*\\.\\s*length|2)|>\\s*1|===?\\s*(?:[\\w$]+\\s*\\.\\s*length|2))[\\s)]*\\{?\\s*\\6\\s*=\\s*0\\b|\\bif\\s*\\(+\\s*([\\w$]+)\\s*===?\\s*0[\\s)]*\\{?\\s*\\7\\s*=\\s*1\\b",
+      "pattern": "\\b([\\w$]+)\\s*=\\s*\\(\\s*\\1\\s*\\+\\s*1\\s*\\)\\s*%|\\b([\\w$]+)\\s*=\\s*\\(\\s*1\\s*\\+\\s*\\2\\s*\\)\\s*%|\\b([\\w$]+)\\s*=\\s*\\3\\s*%|\\b([\\w$]+)\\s*%=|\\b([\\w$]+)\\s*=\\s*1\\s*-\\s*\\5\\b|\\b([\\w$]+)\\s*=\\s*!\\s*\\6\\s*\\?\\s*1\\s*:\\s*0|\\b([\\w$]+)\\s*=\\s*\\(?\\s*\\7\\s*===?\\s*0\\s*\\)?\\s*\\?\\s*1\\s*:\\s*0|\\b([\\w$]+)\\s*=\\s*\\(?\\s*\\8\\s*===?\\s*1\\s*\\)?\\s*\\?\\s*0\\s*:\\s*1|\\b([\\w$]+)\\s*=\\s*\\(?\\s*\\9\\s*(?:===?\\s*[\\w$.]+\\s*-\\s*1|>=\\s*[\\w$.]+)\\s*\\)?\\s*\\?\\s*0\\s*:\\s*\\9\\s*\\+\\s*1|\\bif\\s*\\(+\\s*([\\w$]+)\\s*(?:>=\\s*(?:[\\w$]+\\s*\\.\\s*length|2)|>\\s*1|===?\\s*(?:[\\w$]+\\s*\\.\\s*length|2))[\\s)]*\\{?\\s*\\10\\s*=\\s*0\\b|\\bif\\s*\\(+\\s*([\\w$]+)\\s*===?\\s*0[\\s)]*\\{?\\s*\\11\\s*=\\s*1\\b",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -93,7 +93,7 @@
       "hint": "p.at = min(p.at + r, last);",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bmin\\s*\\(|\\bconstrain\\s*\\(|\\bif\\s*\\(+[^)]*\\.\\s*at\\s*>=?[^)]*\\)[\\s{]*[\\w$.\\[\\]]*\\.\\s*at\\s*=",
+      "pattern": "\\bmin\\s*\\(|\\bconstrain\\s*\\(|\\bif\\s*\\(+[^)]*\\.\\s*at\\s*>=?[^)]*\\)[\\s{]*[\\w$.\\[\\]]*\\.\\s*at\\s*=|\\.\\s*at\\s*=\\s*[^;\\n?]*>\\s*=?[^;\\n?]*\\?",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -106,7 +106,7 @@
       "hint": "if (p.at === last) { winner = turn; ... }",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.\\s*at\\s*(?:===?|>=)\\s*\\(?\\s*(?:last\\b|path\\s*\\.\\s*length\\s*-\\s*1|[\\w$]+)",
+      "pattern": "\\.\\s*at\\s*(?:===?|>=)\\s*\\(?\\s*(?:last\\b|path\\s*\\.\\s*length\\s*-\\s*1|[\\w$]+)|\\.\\s*[\\w$]+\\s*(?:===?|>=)\\s*\\(?\\s*(?:last\\b|path\\s*\\.\\s*length\\s*-\\s*1)",
       "flags": "",
       "points": 0,
       "status": "pending",

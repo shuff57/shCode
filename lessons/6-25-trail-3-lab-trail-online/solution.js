@@ -19,9 +19,14 @@ let winner = -1;          // -1 until someone reaches the end
 
 function setup() {
   new Canvas(COLS * SIZE, TOP + 4 * SIZE);
+  randomSeed(Date.now());   // a fresh start for the die on every Run
   path = makePath(TRACK);
   newGame();
-  online.onMove((move, seat) => takeTurn(move.roll));
+  online.onMove((move, seat) => {
+    // Every computer runs this for every move, so every computer ignores the same
+    // bad ones: a move from a seat whose turn it is not, or a roll that is no die.
+    if (seat === turn && winner === -1 && goodRoll(move.roll)) takeTurn(move.roll);
+  });
   if (JOIN !== '') online.join(JOIN);
 }
 
@@ -51,7 +56,10 @@ function makePath(track) {
 
 function draw() {
   background('#1b1d2a');
-  if (kb.presses('h') && online.status === 'off') online.host();
+  if (kb.presses('h') && (online.status === 'off' || online.status === 'closed')) {
+    newGame();          // a room starts from a fresh board, the same one the guest starts with
+    online.host();
+  }
   if (kb.presses('space') && winner === -1 && myTurn()) roll();
   if (kb.presses('r') && winner !== -1 && online.status === 'off') newGame();
   drawBoard();
@@ -63,6 +71,11 @@ function draw() {
 function myTurn() {
   if (online.status === 'off') return true;
   return online.status === 'ready' && online.seat === turn;
+}
+
+// A die roll is a whole number from 1 to 6. Anything else makes no sense.
+function goodRoll(r) {
+  return floor(r) === r && r >= 1 && r <= 6;
 }
 
 function roll() {
@@ -84,7 +97,7 @@ function takeTurn(r) {
   if (kind === 'W') { p.waiting = true; message += ', waits a turn'; }
   if (p.at === last) {
     winner = turn;
-    message = p.name + ' wins!' + (online.status === 'off' ? ' Press R to play again' : '');
+    message = p.name + ' wins!' + (online.status === 'off' ? ' Press R to play again' : ' Run again and host a new room to play again');
     return;
   }
   nextTurn();
@@ -120,10 +133,15 @@ function drawPlayers() {
 
 function drawTop() {
   const p = players[turn];
-  text(message, 10, 24, 18, 'white');
+  text(message, 10, 24, winner === -1 ? 18 : 14, 'white');
+  if (online.status === 'error') {
+    // cut short so the words stay in the strip above the board
+    text(('' + online.error).slice(0, 80), 10, 48, 12, 'tomato');
+    return;
+  }
   if (winner === -1) text(p.name + "'s turn", 10, 48, 16, p.color);
   if (online.status === 'waiting') text('Room ' + online.code + ': waiting for a classmate', 260, 48, 14, 'gold');
   if (online.status === 'ready') text('Online, you are ' + players[online.seat].name, 300, 48, 14, 'gold');
+  if (online.status === 'closed') text('The room closed: H hosts a new one', 300, 48, 14, 'gold');
   if (online.status === 'off') text('H: host online', 420, 48, 14, '#8393c4');
-  if (online.status === 'error') text(online.error, 10, TOP + 4 * SIZE - 8, 12, 'tomato');
 }

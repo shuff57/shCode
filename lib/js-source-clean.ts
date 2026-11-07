@@ -393,7 +393,12 @@ function slashStartsRegex(out: Brackets, regexEnd: number): boolean {
 // return ")` defined nothing, yet matched `function\\s+findMax\\s*\\(`.
 // OPT-IN per requirement (`ignoreStrings: true`): 49 other lessons match text
 // inside strings on purpose (printed output, asset paths, SQL-ish literals).
-export function blankStringContents(src: string): string {
+//
+// `keepUpTo` (default 0) keeps a literal whose whole content is at most that many
+// characters, so `kind === 'J'` still reads as a comparison with the letter J
+// while `"'J' at += 2"` is one long string and is blanked. Opt-in per requirement
+// (`keepShortStrings: true` keeps 1-character literals).
+export function blankStringContents(src: string, keepUpTo = 0): string {
   const out = new Brackets();
   let i = 0;
   const n = src.length;
@@ -419,11 +424,19 @@ export function blankStringContents(src: string): string {
         j++;
       }
       if (!closed) { out.add(c); i++; continue; } // mid-syntax-error: leave it code
+      if (j - i - 1 <= keepUpTo && !src.slice(i + 1, j).includes('\\')) { out.add(src.slice(i, j + 1)); i = j + 1; continue; }
       out.add(c + ' '.repeat(j - i - 1) + c);
       i = j + 1;
       continue;
     }
-    if (c === '`') { out.add(c); inTemplate = true; i++; continue; }
+    if (c === '`') {
+      // A short template with no `${` and no escape is kept whole, like a short quoted literal.
+      const end = src.indexOf('`', i + 1);
+      if (keepUpTo > 0 && end > i && end - i - 1 <= keepUpTo && !/[\\$\n]/.test(src.slice(i + 1, end))) {
+        out.add(src.slice(i, end + 1)); i = end + 1; continue;
+      }
+      out.add(c); inTemplate = true; i++; continue;
+    }
     // A regular-expression literal is text, not code: `const r = /a.push(.)/` calls nothing.
     // A '/' starts one when the last thing before it is an operator, an opening bracket, a
     // separator (a '/' after a division '/' too; a '+' or '-' only when it is not the second sign of ++ / --), or return/typeof; after an identifier, a number or ')' / ']' it is division.

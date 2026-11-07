@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "Run it",
-      "instructions": "The top says `Status: off`. H and SPACE do nothing yet."
+      "instructions": "The top says Press H to host. H and SPACE do nothing yet. (Before you host or join, `online.code` and `online.seat` hold nothing, so the top shows the hint instead of them.)"
     },
     {
       "id": "s2",

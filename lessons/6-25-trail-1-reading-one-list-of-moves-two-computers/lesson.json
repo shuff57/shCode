@@ -3,7 +3,7 @@
   "title": "6.25.1 Reading: One list of moves, two computers",
   "description": "online lets a sketch play a classmate on another computer: host or join a room, send a move, and apply every move, your own too, in onMove, so both boards stay the same.",
   "type": "lesson",
-  "estimateMins": 12,
+  "estimateMins": 14,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.25 Trail: play online",
   "preview": "reading",

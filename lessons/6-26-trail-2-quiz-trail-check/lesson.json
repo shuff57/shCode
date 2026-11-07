@@ -56,10 +56,10 @@
         "id": "q3-min",
         "question": "The finish is square 30. Red is on square 28 and rolls 5. Why does takeTurn move Red with min(p.at + 5, 30)?",
         "options": [
-          "So the roll counts for less",
-          "So Red stops on square 30 instead of square 33, which is not on the board",
-          "So Red moves back to the start",
-          "So the next player rolls a smaller number"
+          "To make the roll count for less than its full number",
+          "To stop Red on square 30, not on square 33 off the board",
+          "To send Red back to the start of the whole board",
+          "To give the next player a smaller roll on their turn"
         ],
         "answer": 1,
         "explanation": "min gives the smaller of the two numbers, so a token can never pass the finish.",
@@ -72,10 +72,10 @@
         "id": "q4-onmove",
         "question": "Online, why does the player who rolls send the roll instead of moving their own token?",
         "options": [
-          "Sending is faster than moving",
-          "The other computer cannot draw tokens",
-          "Every move, your own too, comes back through onMove in one order, so both computers apply the same moves in the same order",
-          "online.send moves the token by itself"
+          "Sending is faster than drawing the token on the screen",
+          "The other computer is not able to draw any tokens",
+          "Each move, yours too, comes back to both in one order",
+          "online.send moves the token on both computers by itself"
         ],
         "answer": 2,
         "explanation": "Moving tokens only in onMove means both boards run the same list of moves, so they stay the same.",
@@ -88,10 +88,10 @@
         "id": "q5-wait",
         "question": "Blue lands on a W and the code sets Blue's waiting to true. What happens next?",
         "options": [
-          "When the turn passes to Blue, Blue's turn is skipped once and the flag is set back to false",
-          "Blue moves back 3 squares",
-          "Blue never plays again",
-          "The game ends"
+          "Blue's next turn is skipped once, and the flag goes back to false",
+          "Blue moves back 3 squares, and then the turn passes on",
+          "Blue keeps on waiting, and never gets another turn",
+          "The game ends at once, and Blue is the one who wins it"
         ],
         "answer": 0,
         "explanation": "nextTurn sees the flag, clears it, and passes the turn once more. Clearing it is what keeps the wait to one turn.",

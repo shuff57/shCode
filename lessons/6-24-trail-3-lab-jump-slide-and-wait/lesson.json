@@ -49,11 +49,12 @@
       "hint": "if (kind === 'J') p.at = min(p.at + 3, last);",
       "type": "regex",
       "file": "script.js",
-      "pattern": "[\\'\"]J[\\'\"][\\s\\S]{0,150}?(?:\\+\\s*3\\b|\\+=\\s*3\\b|\\+\\s*[A-Z_]{2,}\\b)",
+      "pattern": "(?:===?\\s*['\"`]J['\"`]|['\"`]J['\"`]\\s*===?|\\bcase\\s+['\"`]J['\"`])[\\s\\S]{0,150}?(?:\\+\\s*3\\b|\\+=\\s*3\\b|\\b3\\s*\\+|\\+=?\\s*[A-Za-z_$][\\w$]*\\b)",
       "flags": "",
       "points": 0,
       "status": "pending",
-      "ignoreStrings": false
+      "ignoreStrings": true,
+      "keepShortStrings": true
     },
     {
       "id": "r2",
@@ -62,11 +63,12 @@
       "hint": "if (kind === 'S') p.at = max(p.at - 3, 0);",
       "type": "regex",
       "file": "script.js",
-      "pattern": "[\\'\"]S[\\'\"][\\s\\S]{0,150}?(?:-\\s*3\\b|-=\\s*3\\b|-\\s*[A-Z_]{2,}\\b)",
+      "pattern": "(?:===?\\s*['\"`]S['\"`]|['\"`]S['\"`]\\s*===?|\\bcase\\s+['\"`]S['\"`])[\\s\\S]{0,150}?(?:-\\s*3\\b|-=\\s*3\\b|-=?\\s*[A-Za-z_$][\\w$]*\\b)",
       "flags": "",
       "points": 0,
       "status": "pending",
-      "ignoreStrings": false
+      "ignoreStrings": true,
+      "keepShortStrings": true
     },
     {
       "id": "r3",
@@ -75,11 +77,12 @@
       "hint": "if (kind === 'W') p.waiting = true;",
       "type": "regex",
       "file": "script.js",
-      "pattern": "[\\'\"]W[\\'\"][\\s\\S]{0,150}?(?:=\\s*(?:true|1)\\b|\\+=\\s*1\\b|\\+\\+)",
+      "pattern": "(?:===?\\s*['\"`]W['\"`]|['\"`]W['\"`]\\s*===?|\\bcase\\s+['\"`]W['\"`])[\\s\\S]{0,150}?(?:=\\s*(?:true|1)\\b|\\+=\\s*1\\b|\\+\\+)",
       "flags": "",
       "points": 0,
       "status": "pending",
-      "ignoreStrings": false
+      "ignoreStrings": true,
+      "keepShortStrings": true
     },
     {
       "id": "r4",
@@ -88,7 +91,7 @@
       "hint": "if (players[turn].waiting) { players[turn].waiting = false; turn = (turn + 1) % players.length; }",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bif\\s*\\(+[^)]*?\\.\\s*([\\w$]+)[\\s)]*(?:(?:===?\\s*true|>\\s*0)[\\s)]*)?\\{?[\\s\\S]{0,200}?\\.\\s*\\1\\s*(?:=\\s*(?:false|0)\\b|-=\\s*1\\b|--)",
+      "pattern": "\\b(?:if|while)\\s*\\(+[^)]*?\\.\\s*([\\w$]+)[\\s)]*(?:(?:===?\\s*true|>\\s*0)[\\s)]*)?\\{?[\\s\\S]{0,200}?\\.\\s*\\1\\s*(?:=\\s*(?:false|0)\\b|-=\\s*1\\b|--)",
       "flags": "",
       "points": 0,
       "status": "pending",

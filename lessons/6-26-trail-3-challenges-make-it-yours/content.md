@@ -6,8 +6,9 @@ change one rule of your own choosing. The editor starts from your finished game.
 
 **Challenge 1: three players (easy).**
 Add a third player object in `newGame()`. The turn already passes with `% players.length`, so the
-game takes three turns in a row without any other change. Shift the tokens by `p * 16` so three
-fit on one square. Online, `online.host(3)` opens a room for three.
+game takes three turns in a row without any other change. Draw the tokens with `s.x - 16 + p * 16`
+and a diameter of 14 so three fit on one square. Online, `online.host(3)` (6.25.1) opens a room
+for three; testing it alone needs three tabs.
 
 **Challenge 2: a token that hops (medium).**
 Walk the roll one square at a time: keep the roll in `hops`, and every 10 frames

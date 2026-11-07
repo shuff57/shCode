@@ -20,7 +20,9 @@ function draw() {
 }
 
 function drawTop() {
-  text('Status: ' + online.status + '   Room: ' + online.code, 10, 24, 16, 'white');
-  text('You are seat ' + online.seat, 10, 48, 16, 'gold');
+  if (online.status === 'off') text('Press H to host, or put a code in JOIN and Run', 10, 24, 16, 'white');
+  else text('Status: ' + online.status + '   Room: ' + (online.code || '...'), 10, 24, 16, 'white');
+  if (online.status === 'waiting' || online.status === 'ready') text('You are seat ' + online.seat, 10, 48, 16, 'gold');
+  if (online.status === 'error') text(('' + online.error).slice(0, 60), 10, 180, 12, 'tomato');
   text(got.join('  '), 10, 90, 16, 'white');
 }

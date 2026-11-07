@@ -9821,6 +9821,38 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
+  "6-1-pocket-1-plan-break-pocket-into-parts": {
+    "lessonTitle": "6.1.1 Plan: Break Pocket into parts",
+    "prompt": "Everything you need is on this page: go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to build Pocket. Before you write any code, plan it.\n\n1. List at least four separate parts of the game, things it has or does.\n\n2. Which two or more things does the game have to remember from one frame to the next?\n\n3. Which part would you build first, so something runs today, and why?\n\n4. Which part are you unsure how to build, and what makes it hard?",
+    "rubric": [
+      {
+        "id": "parts",
+        "title": "Four or more parts of the game are named",
+        "description": "The student names about four parts of Pocket in their own words, such as the table, the cue ball, the aim line, pulling back and letting go, the pockets, counting shots. Credit any list, however loose, short or oddly worded; a list of fewer than four still gets full credit if it clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Pocket at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "remember",
+        "title": "Says what the game must remember between frames",
+        "description": "The student names at least two things the game has to remember from one frame to the next, for example where the ball is, how fast it is going, whether the pointer is held down, or how many shots have been taken. Any sensible item, or any gesture at remembering something, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Pocket at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "first",
+        "title": "Picks a first thing to build and gives a reason",
+        "description": "The student says which part they would build first and gives any reason at all, or just a hunch. Any answer that mentions a part to start with earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Pocket at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "unsure",
+        "title": "Names one part they are unsure how to build",
+        "description": "The student names a part they do not yet know how to do, such as the pull-back shot or making the ball slow to a stop, in a few words or less. Any honest answer counts, even a vague one. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Pocket at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
   "6-1-pocket-3-sub-an-aim-line": {
     "lessonTitle": "6.1.3 Sub-build: An aim line",
     "prompt": "The student wrote a moSHion sketch for \"Sub-build: An aim line\". The task: draw a line from the cue ball to the pointer inside a mouse.pressing() test, and show the pull distance as a rounded number. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
@@ -9921,6 +9953,38 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "id": "change",
         "title": "Names one rule they would change and what it would do",
         "description": "The student names one rule, number or feature to change or add, and anything about what it would do to the game. Any idea earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about their Breakout game at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
+  "6-16-sling-1-plan-break-sling-into-parts": {
+    "lessonTitle": "6.16.1 Plan: Break Sling into parts",
+    "prompt": "Everything you need is on this page: go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to build Sling. Before you write any code, plan it.\n\n1. List at least four separate parts of the game, things it has or does.\n\n2. Which two or more things does the game have to remember from one frame to the next?\n\n3. Which part would you build first, so something runs today, and why?\n\n4. Which part are you unsure how to build, and what makes it hard?",
+    "rubric": [
+      {
+        "id": "parts",
+        "title": "Four or more parts of the game are named",
+        "description": "The student names about four parts of Sling in their own words, such as the catapult and its arm, the wall of blocks, the shots, what a hit does, the budget of shots, winning and losing. Credit any list, however loose, short or oddly worded; a list of fewer than four still gets full credit if it clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Sling at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "remember",
+        "title": "Says what the game must remember between frames",
+        "description": "The student names at least two things the game has to remember from one frame to the next, for example the shots in the air, the blocks left, how many hits each block has, or how many shots are left. Any sensible item, or any gesture at remembering something, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Sling at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "first",
+        "title": "Picks a first thing to build and gives a reason",
+        "description": "The student says which part they would build first and gives any reason at all, or just a hunch. Any answer that mentions a part to start with earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Sling at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "unsure",
+        "title": "Names one part they are unsure how to build",
+        "description": "The student names a part they do not yet know how to do, such as launching along the arm or knocking a block out, in a few words or less. Any honest answer counts, even a vague one. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Sling at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
         "points": 0
       }
     ],
@@ -10149,6 +10213,70 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       }
     ]
   },
+  "6-21-sling-1-playtest-and-reflect": {
+    "lessonTitle": "6.21.1 Playtest and reflect: Sling",
+    "prompt": "Everything you need is in 6.20.1 (Lab: Five shots, win or lose): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished Sling at least three times and try to break it. Then answer:\n\n1. How many times did you play, and how did it go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which line or part of your code do you think that comes from?\n\n4. What is one rule or number you would change, and what would it do to the game?",
+    "rubric": [
+      {
+        "id": "played",
+        "title": "Says how many times they played and how it went",
+        "description": "The student says they played, or gives any detail of a game (a round won or lost, how many shots it took, a block that fell, a way it went wrong). Any mention of playing earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Sling at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "surprise",
+        "title": "Names one thing that surprised or broke",
+        "description": "The student names anything that surprised them, felt wrong or did not work as expected, however small. If they found nothing, saying so or naming something they tried earns full credit too. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Sling at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "cause",
+        "title": "Says which line or part of the code that touches",
+        "description": "The student connects what they saw to some part of the game or its code, such as the arm, the launch, the sweep, the hit loop, the shot budget or the restart, even loosely or wrongly. Any guess at a cause earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Sling at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "change",
+        "title": "Names one rule they would change and what it would do",
+        "description": "The student names one rule, number or feature they would change or add, and says anything about what it would do. Any change, in any words, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Sling at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
+  "6-22-trail-1-plan-break-trail-into-parts": {
+    "lessonTitle": "6.22.1 Plan: Break Trail into parts",
+    "prompt": "Everything you need is on this page: go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nYou are about to build Trail. Before you write any code, plan it.\n\n1. List at least four separate parts of the game, things it has or does.\n\n2. Which two or more things does the game have to remember from one frame to the next?\n\n3. Which part would you build first, so something runs today, and why?\n\n4. Which part are you unsure how to build, and what makes it hard?",
+    "rubric": [
+      {
+        "id": "parts",
+        "title": "Four or more parts of the game are named",
+        "description": "The student names about four parts of Trail in their own words, such as the board of squares, the tokens, the die, taking turns, the special squares, winning, playing online. Credit any list, however loose, short or oddly worded; a list of fewer than four still gets full credit if it clearly tries. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Trail at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "remember",
+        "title": "Says what the game must remember between frames",
+        "description": "The student names at least two things the game has to remember from one frame to the next, for example where each token is, whose turn it is, what the last roll was, or whether someone has won. Any sensible item, or any gesture at remembering something, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Trail at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "first",
+        "title": "Picks a first thing to build and gives a reason",
+        "description": "The student says which part they would build first and gives any reason at all, or just a hunch. Any answer that mentions a part to start with earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Trail at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "unsure",
+        "title": "Names one part they are unsure how to build",
+        "description": "The student names a part they do not yet know how to do, such as making the path wind back and forth or playing on two computers, in a few words or less. Any honest answer counts, even a vague one. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Trail at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
+  },
   "6-22-trail-3-sub-a-path-from-a-list": {
     "lessonTitle": "6.22.3 Sub-build: A path from a list",
     "prompt": "The student wrote a moSHion sketch for \"Sub-build: A path from a list\". The task: loop over a list of six { x, y } squares, draw a box at each one from its x and y, and write each square's number on it. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
@@ -10331,7 +10459,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
   },
   "6-25-trail-3-lab-trail-online": {
     "lessonTitle": "6.25.3 Lab: Trail online",
-    "prompt": "The student wrote a moSHion sketch for \"Lab: Trail online\". The task: make the race playable across two computers: set up online.onMove once to call takeTurn with the roll in every move, host on a key or join from a JOIN code, send the roll with online.send instead of applying it when online, let only the player whose seat equals turn roll, and keep offline play working when online.status is off. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Trail online\". The task: make the race playable across two computers: set up online.onMove once to call takeTurn with the roll in every move, ignoring a move from a seat whose turn it is not or a roll that is not a whole number from 1 to 6; host on a key with a fresh game, or join from a JOIN code; send the roll with online.send instead of applying it when online; let only the player whose seat equals turn roll; and keep offline play working when online.status is off. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
     "rubric": [
       {
         "id": "r1",
@@ -10474,6 +10602,38 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "points": 1
       }
     ]
+  },
+  "6-5-pocket-1-playtest-and-reflect": {
+    "lessonTitle": "6.5.1 Playtest and reflect: Pocket",
+    "prompt": "Everything you need is in 6.4.4 (Lab: Sink it): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished Pocket at least three times and try to break it. Then answer:\n\n1. How many times did you play, and how did it go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which line or part of your code do you think that comes from?\n\n4. What is one rule or number you would change, and what would it do to the game?",
+    "rubric": [
+      {
+        "id": "played",
+        "title": "Says how many times they played and how it went",
+        "description": "The student says they played, or gives any detail of a game (a shot that went in, a shot that missed, how many shots it took, a way it went wrong). Any mention of playing earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Pocket at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "surprise",
+        "title": "Names one thing that surprised or broke",
+        "description": "The student names anything that surprised them, felt wrong or did not work as expected, however small. If they found nothing, saying so or naming something they tried earns full credit too. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Pocket at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "cause",
+        "title": "Says which line or part of the code that touches",
+        "description": "The student connects what they saw to some part of the game or its code, such as the aim line, the pull-back, the speed, the drag, the stop rule or the pocket check, even loosely or wrongly. Any guess at a cause earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Pocket at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "change",
+        "title": "Names one rule they would change and what it would do",
+        "description": "The student names one rule, number or feature they would change or add, and says anything about what it would do. Any change, in any words, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Pocket at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ],
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": []
   },
   "6-6-13a-chart-the-state-machine": {
     "lessonTitle": "6.11.14 Plain English to Pseudocode: The Three-State Machine",

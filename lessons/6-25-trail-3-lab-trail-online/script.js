@@ -18,6 +18,7 @@ let winner = -1;          // -1 until someone reaches the end
 
 function setup() {
   new Canvas(COLS * SIZE, TOP + 4 * SIZE);
+  randomSeed(Date.now());   // a fresh start for the die on every Run
   path = makePath(TRACK);
   newGame();
   // STEP: apply every move in onMove; join a room if JOIN has a code.

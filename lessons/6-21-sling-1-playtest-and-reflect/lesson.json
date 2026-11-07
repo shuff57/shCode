@@ -1,7 +1,7 @@
 {
   "id": "6-21-sling-1-playtest-and-reflect",
   "title": "6.21.1 Playtest and reflect: Sling",
-  "description": "Play your game at least three times, find one thing that surprised you, link it to your code and choose one change.",
+  "description": "Play your Sling at least three times, find one thing that surprised you, link it to your code and choose one change. AI-graded with hints.",
   "type": "assignment",
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -11,6 +11,42 @@
   "slos": [
     "SLO-3"
   ],
+  "points": 0,
+  "contentFile": "content.md",
+  "steps": [],
+  "requirements": [],
+  "aiGrader": {
+    "rubricTitle": "Playtest Sling: AI-graded rubric",
+    "model": "glm-5.3-flash:cloud",
+    "contextDocs": [],
+    "prompt": "Everything you need is in 6.20.1 (Lab: Five shots, win or lose): go back and reread it if you get stuck. A few short sentences per answer is plenty, in your own everyday words.\n\nPlay your finished Sling at least three times and try to break it. Then answer:\n\n1. How many times did you play, and how did it go?\n\n2. What is one thing that surprised you or did not work as you expected?\n\n3. Which line or part of your code do you think that comes from?\n\n4. What is one rule or number you would change, and what would it do to the game?",
+    "rubric": [
+      {
+        "id": "played",
+        "title": "Says how many times they played and how it went",
+        "description": "The student says they played, or gives any detail of a game (a round won or lost, how many shots it took, a block that fell, a way it went wrong). Any mention of playing earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Sling at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "surprise",
+        "title": "Names one thing that surprised or broke",
+        "description": "The student names anything that surprised them, felt wrong or did not work as expected, however small. If they found nothing, saying so or naming something they tried earns full credit too. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Sling at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "cause",
+        "title": "Says which line or part of the code that touches",
+        "description": "The student connects what they saw to some part of the game or its code, such as the arm, the launch, the sweep, the hit loop, the shot budget or the restart, even loosely or wrongly. Any guess at a cause earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Sling at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      },
+      {
+        "id": "change",
+        "title": "Names one rule they would change and what it would do",
+        "description": "The student names one rule, number or feature they would change or add, and says anything about what it would do. Any change, in any words, earns full credit. Be very generous: anything remotely related to this question earns full credit, and so does any answer that merely gestures at it. Read the student's whole response, not only the line that answers this question: if anything anywhere in it touches this question, even indirectly, give full credit. Do not mark this criterion missing just because the student skipped this numbered question: when the response is about Sling at all, even if it only describes the game or says how they feel about it, mark this criterion met. Only a blank response, or one about something else entirely, is a miss.",
+        "points": 0
+      }
+    ]
+  },
   "grading": {
     "totalPoints": 0,
     "passingScore": 0,

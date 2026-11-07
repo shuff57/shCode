@@ -7,6 +7,7 @@ const NAMES = ['Red', 'Blue'];
 
 function setup() {
   new Canvas(300, 160);
+  randomSeed(Date.now());   // a fresh start for the die on every Run
 }
 
 function draw() {

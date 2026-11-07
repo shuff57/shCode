@@ -33,6 +33,14 @@
         "`%` is the remainder: `2 % 2` is 0, so after Blue it is Red again.",
         "Put it inside the same `if`, or the turn flips every frame."
       ]
+    },
+    {
+      "id": "s4",
+      "title": "A fresh start each Run",
+      "instructions": "Press Run three times and write down the first three rolls: they are the same every time. In `setup()`, add `randomSeed(Date.now());` and try again. Now each Run rolls differently.",
+      "hints": [
+        "`Date.now()` is the time in thousandths of a second, so it changes on every Run."
+      ]
     }
   ],
   "requirements": [
@@ -43,7 +51,7 @@
       "hint": "roll = floor(random(1, 7));",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\brandom\\s*\\(\\s*1\\s*,\\s*7\\s*\\)|\\brandom\\s*\\(\\s*6\\s*\\)[\\s)]*\\+\\s*1\\b|\\brandom\\s*\\(\\s*\\)\\s*\\*\\s*6[\\s)]*\\+\\s*1\\b|\\b1\\s*\\+\\s*(?:Math\\s*\\.\\s*)?floor\\s*\\(\\s*(?:Math\\s*\\.\\s*)?random\\s*\\(|\\bceil\\s*\\(\\s*(?:Math\\s*\\.\\s*)?random\\s*\\(\\s*(?:6\\b|\\)\\s*\\*\\s*6)",
+      "pattern": "\\brandom\\s*\\(\\s*1\\s*,\\s*7\\s*\\)|\\brandom\\s*\\(\\s*6\\s*\\)[\\s)]*\\+\\s*1\\b|\\brandom\\s*\\(\\s*\\)\\s*\\*\\s*6[\\s)]*\\+\\s*1\\b|\\b1\\s*\\+\\s*(?:Math\\s*\\.\\s*)?floor\\s*\\(\\s*(?:Math\\s*\\.\\s*)?random\\s*\\(|\\bceil\\s*\\(\\s*(?:Math\\s*\\.\\s*)?random\\s*\\(\\s*(?:6\\b|\\)\\s*\\*\\s*6)|\\bround\\s*\\(\\s*random\\s*\\(\\s*1\\s*,\\s*6\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -56,7 +64,7 @@
       "hint": "turn = (turn + 1) % 2;",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\b([\\w$]+)\\s*=\\s*\\(\\s*\\1\\s*\\+\\s*1\\s*\\)\\s*%|\\b([\\w$]+)\\s*%=|\\b([\\w$]+)\\s*=\\s*1\\s*-\\s*\\3\\b|\\b([\\w$]+)\\s*=\\s*\\(?\\s*\\4\\s*===?\\s*0\\s*\\)?\\s*\\?\\s*1\\s*:\\s*0|\\b([\\w$]+)\\s*=\\s*\\(?\\s*\\5\\s*===?\\s*1\\s*\\)?\\s*\\?\\s*0\\s*:\\s*1|\\bif\\s*\\(+\\s*([\\w$]+)\\s*(?:>=\\s*(?:[\\w$]+\\s*\\.\\s*length|2)|>\\s*1|===?\\s*(?:[\\w$]+\\s*\\.\\s*length|2))[\\s)]*\\{?\\s*\\6\\s*=\\s*0\\b|\\bif\\s*\\(+\\s*([\\w$]+)\\s*===?\\s*0[\\s)]*\\{?\\s*\\7\\s*=\\s*1\\b",
+      "pattern": "\\b([\\w$]+)\\s*=\\s*\\(\\s*\\1\\s*\\+\\s*1\\s*\\)\\s*%|\\b([\\w$]+)\\s*=\\s*\\(\\s*1\\s*\\+\\s*\\2\\s*\\)\\s*%|\\b([\\w$]+)\\s*=\\s*\\3\\s*%|\\b([\\w$]+)\\s*%=|\\b([\\w$]+)\\s*=\\s*1\\s*-\\s*\\5\\b|\\b([\\w$]+)\\s*=\\s*!\\s*\\6\\s*\\?\\s*1\\s*:\\s*0|\\b([\\w$]+)\\s*=\\s*\\(?\\s*\\7\\s*===?\\s*0\\s*\\)?\\s*\\?\\s*1\\s*:\\s*0|\\b([\\w$]+)\\s*=\\s*\\(?\\s*\\8\\s*===?\\s*1\\s*\\)?\\s*\\?\\s*0\\s*:\\s*1|\\b([\\w$]+)\\s*=\\s*\\(?\\s*\\9\\s*(?:===?\\s*[\\w$.]+\\s*-\\s*1|>=\\s*[\\w$.]+)\\s*\\)?\\s*\\?\\s*0\\s*:\\s*\\9\\s*\\+\\s*1|\\bif\\s*\\(+\\s*([\\w$]+)\\s*(?:>=\\s*(?:[\\w$]+\\s*\\.\\s*length|2)|>\\s*1|===?\\s*(?:[\\w$]+\\s*\\.\\s*length|2))[\\s)]*\\{?\\s*\\10\\s*=\\s*0\\b|\\bif\\s*\\(+\\s*([\\w$]+)\\s*===?\\s*0[\\s)]*\\{?\\s*\\11\\s*=\\s*1\\b",
       "flags": "",
       "points": 0,
       "status": "pending",

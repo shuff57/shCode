@@ -16,7 +16,7 @@
     {
       "id": "s1",
       "title": "Pick a rule and change it",
-      "instructions": "Choose one of these three challenges. The check turns green when any one of them is in your code, so one is enough. An idea of your own is welcome on top of it. Start from your finished game in the editor.\n\n**Challenge 1: three players (easy).** Add a third object to `players` in `newGame()`, for example `{ name: 'Green', color: 'limegreen', at: 0, waiting: false }`. The turn already passes with `% players.length`, so nothing else has to change on one computer. Make `drawPlayers()` shift each token by `p * 16` so three fit on a square. Online, host a room for three with `online.host(3)`.\n\n**Challenge 2: a token that hops (medium).** Make the token walk its roll one square at a time instead of jumping there. In `takeTurn`, do not add the roll to `p.at`: keep it in a variable, `hops = r`. In `draw()`, every 10 frames (`frameCount % 10 === 0`) while `hops > 0`, move the player one square, `p.at += 1`, and take one off `hops`; stop at the last square. When `hops` reaches 0, do the rest of the turn: the letter, the win and the pass. Block SPACE while `hops > 0`.\n\n**Challenge 3: a new letter (hard to place, easy to code).** Invent a square of your own, such as `B` for \"back to the start\". Put the letter in `TRACK`, give it a colour in `COLORS`, and add its `if` to `takeTurn`: `if (kind === 'B') { p.at = 0; message += ', back to the start'; }`. Place it where a J or an S can never land on it (6.24.1): not 3 after a J or 3 before an S.",
+      "instructions": "Choose one of these three challenges. The check turns green when any one of them is in your code, so one is enough. An idea of your own is welcome on top of it. Start from your finished game in the editor.\n\n**Challenge 1: three players (easy).** Add a third object to `players` in `newGame()`, for example `{ name: 'Green', color: 'limegreen', at: 0, waiting: false }`. The turn already passes with `% players.length`, so nothing else has to change on one computer. Three tokens 20 apart do not fit on a 56-pixel square, so in `drawPlayers()` change the circle to `circle(s.x - 16 + p * 16, s.y + 14, 14)`: a start of `- 16` instead of `- 10`, steps of 16, and a smaller token. Online, host a room for three with `online.host(3)` (6.25.1); testing it alone needs three tabs.\n\n**Challenge 2: a token that hops (medium).** Make the token walk its roll one square at a time instead of jumping there. In `takeTurn`, do not add the roll to `p.at`: keep it in a variable, `hops = r`. In `draw()`, every 10 frames (`frameCount % 10 === 0`) while `hops > 0`, move the player one square, `p.at += 1`, and take one off `hops`; stop at the last square. When `hops` reaches 0, do the rest of the turn: the letter, the win and the pass. Block SPACE while `hops > 0`.\n\n**Challenge 3: a new letter (hard to place, easy to code).** Invent a square of your own, such as `B` for \"back to the start\". Put the letter in `TRACK`, give it a colour in `COLORS`, and add its `if` to `takeTurn`: `if (kind === 'B') { p.at = 0; message += ', back to the start'; }`. Place it where a J or an S can never land on it (6.24.1): not 3 after a J or 3 before an S.",
       "hints": [
         "Whatever you pick, play a whole game afterwards and press R at the end.",
         "A new letter needs all three: a letter in `TRACK`, a colour in `COLORS` and an `if` in `takeTurn`."
@@ -31,11 +31,12 @@
       "hint": "if (kind === 'B') { p.at = 0; }",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\{\\s*name\\s*:[^}]*\\}[\\s\\S]{0,300}?\\{\\s*name\\s*:[^}]*\\}[\\s\\S]{0,300}?\\{\\s*name\\s*:|\\bonline\\s*\\.\\s*host\\s*\\(\\s*[34]\\s*\\)|\\.\\s*at\\s*(?:\\+=\\s*1\\b|\\+\\+)|\\.\\s*at\\s*=\\s*[^;\\n]*?\\.\\s*at\\s*\\+\\s*1\\b(?!\\s*[\\d.])|===?\\s*[\\'\"](?![JSWF.][\\'\"])[A-Z][\\'\"]|\\bcase\\s+[\\'\"](?![JSWF.][\\'\"])[A-Z][\\'\"]",
+      "pattern": "\\{\\s*name\\s*:[^}]*\\}[\\s\\S]{0,300}?\\{\\s*name\\s*:[^}]*\\}[\\s\\S]{0,300}?\\{\\s*name\\s*:|\\bonline\\s*\\.\\s*host\\s*\\(\\s*[34]\\s*\\)|\\.\\s*push\\s*\\(\\s*\\{[^}]*\\bname\\b|\\.\\s*map\\s*\\([\\s\\S]{0,160}?\\bname\\s*:|\\.\\s*at\\s*(?:\\+=\\s*1\\b|\\+\\+)|\\+\\+\\s*[\\w$.\\[\\]]*\\.\\s*at\\b|\\.\\s*at\\s*=\\s*[^;\\n]*?\\.\\s*at\\s*\\+\\s*1\\b(?!\\s*[\\d.])|\\.\\s*at\\s*=\\s*1\\s*\\+\\s*[\\w$.\\[\\]]*\\.\\s*at\\b|===?\\s*['\"`](?![JSWFjswf.]['\"`])[A-Za-z]['\"`]|['\"`](?![JSWFjswf.]['\"`])[A-Za-z]['\"`]\\s*===?|\\bcase\\s+['\"`](?![JSWFjswf.]['\"`])[A-Za-z]['\"`]",
       "flags": "",
       "points": 0,
       "status": "pending",
-      "ignoreStrings": false
+      "ignoreStrings": true,
+      "keepShortStrings": true
     }
   ],
   "grading": {

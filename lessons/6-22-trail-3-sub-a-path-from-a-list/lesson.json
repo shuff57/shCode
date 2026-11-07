@@ -20,7 +20,7 @@
     {
       "id": "s2",
       "title": "Draw every square",
-      "instructions": "In `draw()`, write a `for` loop over `path`. Inside it, `fill` a colour and draw `rect(path[i].x - 30, path[i].y - 30, 60, 60, 6)`. Six boxes should appear in a U shape.",
+      "instructions": "In `draw()`, write a `for` loop over `path`. Inside it, `fill` a colour and draw `rect(path[i].x - 30, path[i].y - 30, 60, 60, 6)`. Six boxes appear: three along the top and three along the bottom.",
       "hints": [
         "`rect` starts at the top-left corner, so the box is moved half its size (30) up and left from the centre.",
         "Loop to `path.length`, not to 6, so the loop always matches the list."
@@ -29,7 +29,7 @@
     {
       "id": "s3",
       "title": "Number them",
-      "instructions": "In the same loop, write the square's number on it: `text(String(i), path[i].x - 5, path[i].y + 6, 16, 'white')`. The numbers run 0 to 5 around the U.",
+      "instructions": "In the same loop, write the square's number on it: `text(String(i), path[i].x - 5, path[i].y + 6, 16, 'white')`. The numbers run 0, 1, 2 along the top, then 3, 4, 5 back along the bottom, right to left: one path that turns a corner.",
       "hints": [
         "Change one `{ x, y }` in the list and Run again: the picture follows the data."
       ]
@@ -39,7 +39,7 @@
     {
       "id": "r1",
       "title": "A loop over the path",
-      "description": "A loop visits every square in `path`. Help: 6.22.2 (Reading: A path is a list of squares)",
+      "description": "A loop visits every square in path. Help: 6.22.2 (Reading: A path is a list of squares)",
       "hint": "for (let i = 0; i < path.length; i++) { ... }",
       "type": "regex",
       "file": "script.js",
@@ -69,7 +69,7 @@
       "hint": "text(String(i), path[i].x - 5, path[i].y + 6, 16, 'white');",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\btext\\s*\\(\\s*(?:[A-Za-z_$(]|[\\'\"`][^\\'\"`]*[\\'\"`]\\s*\\+|`[^`]*\\$\\{)",
+      "pattern": "\\btext\\s*\\(\\s*(?:[A-Za-z_$(\\d]|[\\'\"`][^\\'\"`]*[\\'\"`]\\s*\\+|`[^`]*\\$\\{)",
       "flags": "",
       "points": 0,
       "status": "pending",

@@ -42,7 +42,7 @@
       "hint": "if (ROW[at] === 'J') { ... }",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\[\\s*\\(?\\s*at\\s*\\)?\\s*\\]|\\.\\s*charAt\\s*\\(\\s*at\\b",
+      "pattern": "\\[\\s*\\(?\\s*at\\s*\\)?\\s*\\]|\\.\\s*(?:charAt|substring|substr|slice|at)\\s*\\(\\s*at\\b",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -55,11 +55,12 @@
       "hint": "at = min(at + 2, ROW.length - 1);",
       "type": "regex",
       "file": "script.js",
-      "pattern": "[\\'\"]J[\\'\"][\\s\\S]{0,150}?\\bat\\s*(?:\\+=|=\\s*(?:min\\s*\\(\\s*)?\\(?\\s*at\\s*\\+)",
+      "pattern": "(?:===?\\s*['\"`]J['\"`]|['\"`]J['\"`]\\s*===?|\\bcase\\s+['\"`]J['\"`])[\\s\\S]{0,150}?(?:\\bat\\s*(?:\\+=|\\+\\+|=\\s*(?:min\\s*\\(\\s*)?\\(?\\s*(?:at\\s*\\+|\\d+\\s*\\+\\s*at\\b))|\\+\\+\\s*at\\b)",
       "flags": "",
       "points": 0,
       "status": "pending",
-      "ignoreStrings": false
+      "ignoreStrings": true,
+      "keepShortStrings": true
     },
     {
       "id": "r3",
@@ -68,11 +69,12 @@
       "hint": "at = 0;",
       "type": "regex",
       "file": "script.js",
-      "pattern": "[\\'\"]S[\\'\"][\\s\\S]{0,150}?\\bat\\s*(?:-=|=\\s*(?:0\\b|(?:max\\s*\\(\\s*)?\\(?\\s*at\\s*-))",
+      "pattern": "(?:===?\\s*['\"`]S['\"`]|['\"`]S['\"`]\\s*===?|\\bcase\\s+['\"`]S['\"`])[\\s\\S]{0,150}?(?:\\bat\\s*(?:-=|--|=\\s*(?:0\\b|(?:max\\s*\\(\\s*)?\\(?\\s*at\\s*-))|--\\s*at\\b)",
       "flags": "",
       "points": 0,
       "status": "pending",
-      "ignoreStrings": false
+      "ignoreStrings": true,
+      "keepShortStrings": true
     }
   ],
   "grading": {

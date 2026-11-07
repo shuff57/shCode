@@ -1,9 +1,9 @@
 {
   "id": "6-25-trail-3-lab-trail-online",
   "title": "6.25.3 Lab: Trail online",
-  "description": "Your Trail plays a classmate on another computer: rolls are sent, every roll is applied in onMove, and only the player whose turn it is may roll.",
+  "description": "Your Trail plays a classmate on another computer: rolls are sent, every roll is checked and applied in onMove, and only the player whose turn it is may roll.",
   "type": "lesson",
-  "estimateMins": 20,
+  "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.25 Trail: play online",
   "preview": "moshion",
@@ -20,30 +20,41 @@
     {
       "id": "s2",
       "title": "A room and a listener",
-      "instructions": "At the top, add `const JOIN = '';`. At the end of `setup()`, apply every move: `online.onMove((move, seat) => takeTurn(move.roll));`, then `if (JOIN !== '') online.join(JOIN);`. In `draw()`, `if (kb.presses('h') && online.status === 'off') online.host();`."
+      "instructions": "At the top, add `const JOIN = '';`. At the end of `setup()`, apply every move: `online.onMove((move, seat) => takeTurn(move.roll));`, then `if (JOIN !== '') online.join(JOIN);`. In `draw()`, H hosts with a fresh board: `if (kb.presses('h') && online.status === 'off') { newGame(); online.host(); }`.",
+      "hints": [
+        "Without `newGame()`, turns you played alone before pressing H stay on your board, while your classmate starts on square 0, and the two boards never match.",
+        "Add `|| online.status === 'closed'` to the H test if you want H to host again after a room ends."
+      ]
     },
     {
       "id": "s3",
       "title": "Send the roll, do not apply it",
-      "instructions": "In `roll()`, keep the die, then: if `online.status === 'off'`, call `takeTurn(r)` as before; otherwise `online.send({ roll: r })`. The roll comes back in `onMove` on both computers.",
+      "instructions": "Where SPACE rolls the die, keep the die in a variable `r`, then: if `online.status === 'off'`, call `takeTurn(r)` as before; otherwise `online.send({ roll: r })`. The roll comes back in `onMove` on both computers.",
       "hints": [
-        "Online, a roll applied in `roll()` AND in `onMove` moves the token twice on your screen."
+        "Online, a roll applied where SPACE is pressed AND in `onMove` moves the token twice on your screen.",
+        "If your SPACE line calls `takeTurn(floor(random(1, 7)))` directly, split it: `const r = floor(random(1, 7));` first, then the if."
       ]
     },
     {
       "id": "s4",
+      "title": "Ignore a move that makes no sense",
+      "instructions": "Make `onMove` check before it applies: only when `seat === turn`, `winner === -1` and `goodRoll(move.roll)`, where `goodRoll(r)` returns `floor(r) === r && r >= 1 && r <= 6`. A move from the wrong seat, or a roll of 100, is then ignored on every computer, and the boards still agree."
+    },
+    {
+      "id": "s5",
       "title": "Only your seat rolls",
-      "instructions": "Write `myTurn()`: offline it is always true; online it is true only when `online.status === 'ready'` and `online.seat === turn`. SPACE rolls only when `myTurn()` is true. Let R start a new game only when `online.status === 'off'`, so one computer cannot reset its board alone.",
+      "instructions": "Write `myTurn()`: offline it is always true; online it is true only when `online.status === 'ready'` and `online.seat === turn`. SPACE rolls only when `myTurn()` is true. Let R start a new game only when `online.status === 'off'`, so one computer cannot reset its board alone; online, the win message says `' Run again and host a new room to play again'` instead.",
       "hints": [
         "Seat 0 is the host and `players[0]`; seat 1 is the classmate and `players[1]`."
       ]
     },
     {
-      "id": "s5",
+      "id": "s6",
       "title": "Show the room, then play",
-      "instructions": "In `drawTop()`, show the room code while `online.status === 'waiting'`, `'Online, you are ' + players[online.seat].name` when it is `'ready'`, a hint that H hosts when it is `'off'`, and `online.error` when it is `'error'`. Then host in one tab, join from a second tab (or a classmate's computer), and race.",
+      "instructions": "In `drawTop()`, show the room code while `online.status === 'waiting'`, `'Online, you are ' + players[online.seat].name` when it is `'ready'`, `'The room closed: H hosts a new one'` when it is `'closed'`, and a hint that H hosts when it is `'off'`. When it is `'error'`, show `online.error` cut short so it fits above the board, `('' + online.error).slice(0, 80)`, at size 12. Then host in one tab, join from a second tab (or a classmate's computer), and race.",
       "hints": [
-        "You must be signed in and in a class to play online."
+        "You must be signed in and in a class to play online.",
+        "The room closes when the host runs the sketch again or leaves the page."
       ]
     }
   ],
@@ -68,7 +79,7 @@
       "hint": "online.onMove((move, seat) => takeTurn(move.roll));",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bonline\\s*\\.\\s*onMove\\s*\\([\\s\\S]{0,200}?\\btakeTurn\\s*\\(|\\bonline\\s*\\.\\s*onMove\\s*\\([^)]*?=>[\\s{]*[A-Za-z_$][\\w$]*\\s*\\(\\s*[\\w$]+\\s*\\.\\s*[\\w$]+|\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\)[\\s\\S]*?\\bfunction\\s+\\1\\s*\\([^)]*\\)\\s*\\{[^}]*\\btakeTurn\\s*\\(",
+      "pattern": "\\bonline\\s*\\.\\s*onMove\\s*\\([\\s\\S]{0,300}?\\btakeTurn\\s*\\(|\\bonline\\s*\\.\\s*onMove\\s*\\([^)]*?=>[\\s{]*[A-Za-z_$][\\w$]*\\s*\\(\\s*[\\w$]+\\s*\\.\\s*[\\w$]+|\\bonline\\s*\\.\\s*onMove\\s*\\(\\s*([A-Za-z_$][\\w$]*)\\s*\\)[\\s\\S]*?\\bfunction\\s+\\1\\s*\\([^)]*\\)\\s*\\{[\\s\\S]{0,300}?\\btakeTurn\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -81,7 +92,7 @@
       "hint": "return online.status === 'ready' && online.seat === turn;",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bonline\\s*\\.\\s*seat\\s*(?:===?|!==?)\\s*\\(?\\s*[\\w$]*turn\\b|\\bturn\\s*(?:===?|!==?)\\s*\\(?\\s*online\\s*\\.\\s*seat\\b",
+      "pattern": "\\bonline\\s*\\.\\s*seat\\s*(?:===?|!==?)\\s*\\(?\\s*[\\w$]*turn\\b|\\bturn\\s*(?:===?|!==?)\\s*\\(?\\s*online\\s*\\.\\s*seat\\b|\\b([\\w$]+)\\s*=\\s*online\\s*\\.\\s*seat\\b[\\s\\S]*?(?:\\b\\1\\s*(?:===?|!==?)\\s*turn\\b|\\bturn\\s*(?:===?|!==?)\\s*\\1\\b)",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -90,15 +101,15 @@
     {
       "id": "r4",
       "title": "Offline still works",
-      "description": "When online.status is 'off', the game plays on one computer as before. Help: 6.25.1 (Reading: One list of moves, two computers)",
-      "hint": "if (online.status === 'off') takeTurn(r);",
+      "description": "Where SPACE rolls, a check on online.status picks: send the roll online, or take the turn straight away offline. Help: 6.25.1 (Reading: One list of moves, two computers)",
+      "hint": "if (online.status === 'off') takeTurn(r); else online.send({ roll: r });",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bonline\\s*\\.\\s*status\\s*(?:===?|!==?)\\s*[\\'\"]off[\\'\"]|[\\'\"]off[\\'\"]\\s*(?:===?|!==?)\\s*online\\s*\\.\\s*status\\b",
+      "pattern": "\\bonline\\s*\\.\\s*status\\s*[!=]==?\\s*['\"`][^'\"`\\n]*['\"`][\\s)]*\\{?\\s*takeTurn\\s*\\(|\\bonline\\s*\\.\\s*status\\s*[!=]==?\\s*['\"`][^'\"`\\n]*['\"`][\\s)]*\\{?\\s*online\\s*\\.\\s*send\\s*\\([^;]*\\)\\s*;?\\s*\\}?\\s*else\\s*\\{?\\s*takeTurn\\s*\\(|\\bonline\\s*\\.\\s*status\\s*[!=]==?\\s*['\"`][^'\"`\\n]*['\"`]\\s*\\?\\s*takeTurn\\s*\\(|\\bonline\\s*\\.\\s*status\\s*[!=]==?\\s*['\"`][^'\"`\\n]*['\"`]\\s*\\?\\s*online\\s*\\.\\s*send\\s*\\([^:]*:\\s*takeTurn\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending",
-      "ignoreStrings": false
+      "ignoreStrings": true
     }
   ],
   "grading": {
@@ -109,7 +120,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch for \"Lab: Trail online\". The task: make the race playable across two computers: set up online.onMove once to call takeTurn with the roll in every move, host on a key or join from a JOIN code, send the roll with online.send instead of applying it when online, let only the player whose seat equals turn roll, and keep offline play working when online.status is off. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Trail online\". The task: make the race playable across two computers: set up online.onMove once to call takeTurn with the roll in every move, ignoring a move from a seat whose turn it is not or a roll that is not a whole number from 1 to 6; host on a key with a fresh game, or join from a JOIN code; send the roll with online.send instead of applying it when online; let only the player whose seat equals turn roll; and keep offline play working when online.status is off. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
     "rubric": [
       {
         "id": "r1",

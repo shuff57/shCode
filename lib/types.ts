@@ -100,6 +100,10 @@ export interface Requirement {
    *  cannot satisfy a "defines f" check. Off by default: many lessons match
    *  printed text on purpose. */
   ignoreStrings?: boolean;
+  /** With `ignoreStrings`, keep string literals of ONE character (`'J'`, `"S"`,
+   *  `` `W` ``) as written, so a card can ask for `kind === 'J'` while a longer
+   *  string that merely contains the text `'J'` still cannot satisfy it. */
+  keepShortStrings?: boolean;
   /** type: 'model' only. The features (and named fields on them) the
    *  student's ModelDoc must contain — see lib/model-check.ts. */
   expect?: ModelExpect[];

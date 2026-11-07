@@ -1,14 +1,23 @@
 ## Play it, then write
 
-Play your game three times. Each time, try something different: a hard shot, a soft shot, a
-shot that bounces off two rails.
+A playtest is playing your own work on purpose, to find out what it does, not to win. Play your game from 6.4.4 (Lab: Sink it) three times. Each time, try something different: a hard shot, a soft shot, a shot that bounces off two rails.
 
-Then answer four things in the box:
+Any honest answer counts. "The ball never stops" is a good surprise if you can point at the line that causes it.
 
-1. **Played.** What did you do, and how did it go?
-2. **Surprise.** One thing that surprised you.
-3. **Cause.** The line in your code that causes it.
-4. **Change.** One change you would make, and why.
+Write your response in the box below. Short sentences or a numbered list both work. Aim to cover:
 
-Any honest answer counts. "The ball never stops" is a good surprise if you can point at the
-line that causes it.
+1. How many times you played, and how it went.
+2. One thing that surprised you or did not work as you expected.
+3. Which line or part of your code you think that comes from.
+4. One rule or number you would change, and what it would do.
+
+---
+
+## Rubric
+
+| # | Criterion |
+|---|-----------|
+| 1 | Says how many times they played and how it went |
+| 2 | Names one thing that surprised or broke |
+| 3 | Says which line or part of the code that touches |
+| 4 | Names one rule they would change and what it would do |

@@ -46,7 +46,7 @@ function readableSource(req: Requirement, raw: string): string {
   if (req.stripComments === false) return raw;
   // `<!--` / `-->` / `#!` are comments only in JavaScript; a README plan line may start with an arrow `-->`.
   const code = stripJsComments(raw, !/\.(md|txt)$/i.test(req.file || ''));
-  return req.ignoreStrings ? blankStringContents(code) : code;
+  return req.ignoreStrings ? blankStringContents(code, req.keepShortStrings ? 1 : 0) : code;
 }
 
 // Return the body of `function <name>(...) { ... }` by balancing braces,

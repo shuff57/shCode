@@ -7,6 +7,18 @@
 as likely as the others. **Why 7?** The top number is never reached. `floor(random(1, 6))` can
 never roll a 6.
 
+**A fresh start on every Run.** In 5.2.2 you saw that moSHion's `random` starts over each time
+you press Run, so the first roll is the same every Run, and so is the second. That makes a bug
+easy to repeat, but a board game where every game rolls the same numbers is no game at all. So
+a board game starts the die from a different place each Run, once, in `setup()`:
+
+```js
+randomSeed(Date.now());
+```
+
+`Date.now()` is the time right now, counted in thousandths of a second, so it is different every
+time you press Run. `randomSeed` tells `random` where to start from.
+
 ## Players are a list
 
 Each player is an object that remembers its own name, colour and square:

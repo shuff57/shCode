@@ -2099,6 +2099,111 @@ for (const id of Object.values(L)) {
   }
 }
 
+// ---------------------------------------------------------------- 6.22-6.26 (Trail)
+//
+// Three student lenses walked the Trail chain in a browser (2026-11-07). Each accept
+// below is an answer a student actually wrote, or the shape a course screen modelled,
+// that an early card refused. The rejects are the smuggles that early cards let
+// through: a long string that merely CONTAINS `'J' at += 2` once scored the letter
+// cards. Those cards now keep 1-letter literals (`keepShortStrings`) and want the
+// letter in a comparison or a case.
+{
+  const T = {
+    sb1: '6-22-trail-3-sub-a-path-from-a-list', lay: '6-22-trail-4-lab-lay-the-trail',
+    die: '6-23-trail-2-sub-one-die-two-turns', turns: '6-23-trail-3-lab-take-turns-to-the-finish',
+    sq: '6-24-trail-2-sub-a-square-that-does-something', jsw: '6-24-trail-3-lab-jump-slide-and-wait',
+    sb4: '6-25-trail-2-sub-send-and-receive-one-number', online: '6-25-trail-3-lab-trail-online',
+    yours: '6-26-trail-3-challenges-make-it-yours',
+  };
+  // The reference with one exact piece swapped. A piece that is not there is a broken
+  // case, not a pass, so it throws.
+  const swap = (id, ...pairs) => {
+    let code = solutionFiles(id)['script.js'];
+    for (let k = 0; k < pairs.length; k += 2) {
+      if (!code.includes(pairs[k])) throw new Error(`Trail case for ${id}: ${JSON.stringify(pairs[k])} is not in the reference`);
+      code = code.split(pairs[k]).join(pairs[k + 1]);
+    }
+    return { 'script.js': code };
+  };
+  const plus = (id, extra) => ({ 'script.js': starterFiles(id)['script.js'] + nl + extra + nl });
+  for (const id of Object.values(T)) {
+    accept(id, 'reference solution', solutionFiles(id));
+    reject(id, 'untouched starter', null, starterFiles(id));
+  }
+
+  const draw = 'text(String(i), path[i].x - 5, path[i].y + 6, 16, ' + AP + 'white' + AP + ');';
+  accept(T.sb1, 'text(1 + i, ...)', swap(T.sb1, draw, 'text(1 + i, path[i].x - 5, path[i].y + 6, 16, ' + AP + 'white' + AP + ');'));
+  accept(T.sb1, 'a bare number in text()', swap(T.sb1, draw, 'text(i, path[i].x - 5, path[i].y + 6);'));
+
+  const body = [
+    '    const r = floor(i / COLS);', '    let c = i % COLS;', '    if (r % 2 === 1) c = COLS - 1 - c;',
+    '    squares.push({ x: c * SIZE + SIZE / 2, y: TOP + r * SIZE + SIZE / 2, kind: track[i] });',
+  ].join(nl);
+  const loop = '  for (let i = 0; i < track.length; i++) {' + nl + body + nl + '  }';
+  accept(T.lay, 'a while loop over the track', swap(T.lay, loop,
+    '  let i = 0;' + nl + '  while (i < track.length) {' + nl + body + nl + '    i++;' + nl + '  }'));
+  accept(T.lay, 'a hard-coded 31', swap(T.lay, 'i < track.length', 'i < 31'));
+  accept(T.lay, 'nested row and column loops, as 6.14.9 models', swap(T.lay, loop, [
+    '  for (let r = 0; r < 4; r++) {', '    for (let col = 0; col < COLS; col++) {', '      const i = r * COLS + col;',
+    '      if (i >= track.length) continue;', '      const c = r % 2 === 1 ? COLS - 1 - col : col;',
+    '      squares.push({ x: c * SIZE + SIZE / 2, y: TOP + r * SIZE + SIZE / 2, kind: track[i] });', '    }', '  }'].join(nl)));
+  accept(T.lay, 'fields set one at a time, then pushed', swap(T.lay,
+    '    squares.push({ x: c * SIZE + SIZE / 2, y: TOP + r * SIZE + SIZE / 2, kind: track[i] });',
+    ['    const sq = {};', '    sq.x = c * SIZE + SIZE / 2;', '    sq.y = TOP + r * SIZE + SIZE / 2;', '    sq.kind = track[i];', '    squares.push(sq);'].join(nl)));
+  accept(T.lay, 'squares[i] = { ... }', swap(T.lay, 'squares.push({ x: c * SIZE + SIZE / 2, y: TOP + r * SIZE + SIZE / 2, kind: track[i] });',
+    'squares[i] = { x: c * SIZE + SIZE / 2, y: TOP + r * SIZE + SIZE / 2, kind: track[i] };'));
+
+  const pass2 = 'turn = (turn + 1) % 2;';
+  accept(T.die, '(1 + turn) % 2', swap(T.die, pass2, 'turn = (1 + turn) % 2;'));
+  accept(T.die, '!turn ? 1 : 0', swap(T.die, pass2, 'turn = !turn ? 1 : 0;'));
+  accept(T.die, '1 - turn', swap(T.die, pass2, 'turn = 1 - turn;'));
+  accept(T.die, 'round(random(1, 6))', swap(T.die, 'floor(random(1, 7))', 'round(random(1, 6))'));
+  accept(T.die, 'Math.floor(Math.random() * 6) + 1', swap(T.die, 'floor(random(1, 7))', 'Math.floor(Math.random() * 6) + 1'));
+
+  const passN = 'turn = (turn + 1) % players.length;';
+  accept(T.turns, 'add one, then take the remainder', swap(T.turns, passN, 'turn = turn + 1;' + nl + '  turn = turn % players.length;'));
+  accept(T.turns, '(1 + turn) % players.length', swap(T.turns, passN, 'turn = (1 + turn) % players.length;'));
+  accept(T.turns, 'a ternary wrap', swap(T.turns, passN, 'turn = turn === players.length - 1 ? 0 : turn + 1;'));
+  accept(T.turns, 'a ternary clamp instead of min', swap(T.turns, 'p.at = min(p.at + r, last);', 'p.at = p.at + r > last ? last : p.at + r;'));
+  accept(T.turns, 'a player field called square', swap(T.turns, '.at', '.square', 'at: 0', 'square: 0'));
+
+  accept(T.sq, 'substring for the letter', swap(T.sq, "ROW[at] === 'J'", "ROW.substring(at, at + 1) === 'J'"));
+  accept(T.sq, 'two ++ for the jump', swap(T.sq, 'at = min(at + 2, ROW.length - 1);', 'at++; at++;'));
+  accept(T.sq, "'J' === ROW[at]", swap(T.sq, "ROW[at] === 'J'", "'J' === ROW[at]"));
+  accept(T.sq, 'a switch', swap(T.sq,
+    "    if (ROW[at] === 'J') { at = min(at + 2, ROW.length - 1); note = 'jumped ahead 2'; }" + nl +
+    "    else if (ROW[at] === 'S') { at = 0; note = 'back to the start'; }",
+    '    switch (ROW[at]) {' + nl + "      case 'J': at = min(at + 2, ROW.length - 1); break;" + nl + "      case " + BT + 'S' + BT + ': at = 0; break;' + nl + '    }'));
+  reject(T.sq, 'the J only inside a long string', 'r2', plus(T.sq, 'const cheat = "' + AP + 'J' + AP + ' at += 2  ' + AP + 'S' + AP + ' at = 0";'));
+  reject(T.sq, 'the S only inside a long string', 'r3', plus(T.sq, 'const cheat = "' + AP + 'J' + AP + ' at += 2  ' + AP + 'S' + AP + ' at = 0";'));
+
+  accept(T.jsw, 'a lowercase jump constant', swap(T.jsw, 'p.at = min(p.at + 3, last);', 'p.at = min(p.at + jump, last);', 'const COLORS', 'const jump = 3;' + nl + 'const COLORS'));
+  accept(T.jsw, '3 + p.at', swap(T.jsw, 'min(p.at + 3, last)', 'min(3 + p.at, last)'));
+  accept(T.jsw, 'while the next player is waiting', swap(T.jsw, '  if (players[turn].waiting) {', '  while (players[turn].waiting) {'));
+  accept(T.jsw, "'J' === kind", swap(T.jsw, "kind === 'J'", "'J' === kind"));
+  const cheat = 'const cheat = "kind === ' + AP + 'J' + AP + ' p.at + 3 ' + AP + 'S' + AP + ' - 3 ' + AP + 'W' + AP + ' = true";';
+  reject(T.jsw, 'J only inside a long string', 'r1', plus(T.jsw, cheat));
+  reject(T.jsw, 'S only inside a long string', 'r2', plus(T.jsw, cheat));
+  reject(T.jsw, 'W only inside a long string', 'r3', plus(T.jsw, cheat));
+
+  accept(T.online, 'the seat kept in a variable', swap(T.online, 'return online.status === ' + AP + 'ready' + AP + ' && online.seat === turn;',
+    'const me = online.seat;' + nl + '  return online.status === ' + AP + 'ready' + AP + ' && me === turn;'));
+  accept(T.online, "send when 'ready', otherwise take the turn", swap(T.online,
+    "  if (online.status === 'off') takeTurn(r);" + nl + '  else online.send({ roll: r });',
+    "  if (online.status === 'ready') online.send({ roll: r });" + nl + '  else takeTurn(r);'));
+  reject(T.online, "only the H line tests status 'off'", 'r4', plus(T.online,
+    'function draw2() {' + nl + "  if (kb.presses('h') && online.status === 'off') { newGame(); online.host(); }" + nl + '}'));
+
+  accept(T.yours, 'three players made in a loop', swap(T.yours, "const TRACK = '....J....S..W..J...B.S..W.J.S.F';", "const TRACK = '....J....S..W..J.....S..W.J.S.F';",
+    "  if (kind === 'B') { p.at = 0; message += ', back to the start'; }" + nl, '',
+    '  players = [' + nl + "    { name: 'Red', color: 'tomato', at: 0, waiting: false }," + nl + "    { name: 'Blue', color: 'dodgerblue', at: 0, waiting: false }," + nl + '  ];',
+    "  players = [];" + nl + "  const NAMES = ['Red', 'Blue', 'Green'];" + nl + '  for (let i = 0; i < 3; i++) players.push({ name: NAMES[i], color: COLORS.J, at: 0, waiting: false });'));
+  accept(T.yours, '++p.at in a hop', swap(T.yours, "  if (kind === 'B') { p.at = 0; message += ', back to the start'; }", '  if (hops > 0) ++p.at;'));
+  accept(T.yours, 'p.at = 1 + p.at in a hop', swap(T.yours, "  if (kind === 'B') { p.at = 0; message += ', back to the start'; }", '  if (hops > 0) p.at = 1 + p.at;'));
+  accept(T.yours, 'a lowercase letter', swap(T.yours, "kind === 'B'", "kind === 'b'"));
+  reject(T.yours, 'a new letter only inside a long string', 'r1', plus(T.yours, 'const note = "kind === ' + AP + 'B' + AP + '";'));
+}
+
 // ---------------------------------------------------------------- run
 try {
   execFileSync(
