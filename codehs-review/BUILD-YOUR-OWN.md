@@ -55,6 +55,9 @@ this unit, or, if it combines two, it names both and says what the combination c
 
 ## 6.28 Build your own: a bigger game, three states
 
+> **Numbering, 2026-11-07:** 6.22-6.26 are Trail and 6.27-6.32 Checkers (`TRAIL-SPEC.md`,
+> `CHECKERS-SPEC.md`), so Climb and this capstone take the next free numbers when they are built.
+
 **After 6.27 Climb. Last lesson of Unit 6. About 75 minutes. 0 points.**
 
 Unit 6 owns groups, overlaps and collisions, physics tuning, camera and animation, saving,
