@@ -39,25 +39,44 @@
     {
       "id": "s4",
       "title": "Your attack",
-      "instructions": "Below the sketch's `draw()`, write `fightOver(winner)` from the reading: `over = true;`, then a message for a win (`winner === 0`) or a loss. Below it, write `attackTurn(t, roll)` from the reading: `const me = fighters[t];`, `const them = fighters[1 - t];`, the message line with `me.attack(them, roll)`, then `if (!them.isAlive()) { fightOver(t); return; }`, and last `turn = 1 - turn;`. In `draw()`, below `background(...)`, add `if (!over && turn === 0 && kb.presses('1')) attackTurn(0, floor(random(0, 4)));`. Run and press 1: the goblin loses 3 to 6 hp and the top says by how much. Press 1 again: nothing, because now it is the goblin's turn, and the goblin does not act yet.",
+      "instructions": "Below the sketch's `draw()`, write a new function, `function attackTurn(t, roll) { }`, and put three lines inside its braces: `const me = fighters[t];`, `const them = fighters[1 - t];` and the message line from the reading, `message = me.name + ' hits ' + them.name + ' for ' + me.attack(them, roll);`. In `draw()`, below `background(...)`, add `if (!over && turn === 0 && kb.presses('1')) attackTurn(0, floor(random(0, 4)));`. Run and press 1 a few times: each press, the goblin loses 3 to 6 hp and the top says by how much. Keep pressing: its hp stops at 0.",
       "hints": [
+        "`t` is the number of the fighter whose turn it is, so `fighters[t]` is the attacker and `fighters[1 - t]` the other one: with `t` 0 that is `fighters[1]`, the goblin.",
         "`floor(random(0, 4))` is a roll of 0, 1, 2 or 3.",
-        "Write `fightOver` before you use it: `attackTurn` calls it the moment a fighter has no hp left."
+        "Click the canvas first, so the keys go to the sketch."
       ]
     },
     {
       "id": "s5",
+      "title": "Pass the turn",
+      "instructions": "In `attackTurn`, below the message line, add `turn = 1 - turn;`. Run and press 1: the goblin is hit. Press 1 again: nothing happens, because `turn` is now 1, the goblin's turn, and the goblin does not act yet.",
+      "hints": [
+        "`1 - turn` is the other number: `1 - 0` is 1 and `1 - 1` is 0.",
+        "The key-1 line in `draw()` asks for `turn === 0`, so on the goblin's turn your key does nothing."
+      ]
+    },
+    {
+      "id": "s6",
       "title": "The enemy's turn",
-      "instructions": "Below `attackTurn`, write `enemyTurn()`: `if (over || turn !== 1) return;` and then `attackTurn(1, floor(random(0, 4)));`. In `attackTurn`, below `turn = 1 - turn;`, add `if (turn === 1) after(45, enemyTurn);`. Run and play: you hit, the goblin hits back a moment later, and then it is your turn again.",
+      "instructions": "Below `attackTurn`, write `enemyTurn()`: `if (over || turn !== 1) return;` and then `attackTurn(1, floor(random(0, 4)));`. In `attackTurn`, below `turn = 1 - turn;`, add `if (turn === 1) after(45, enemyTurn);`. Run and play: you hit, the goblin hits back a moment later, and then it is your turn again. When someone reaches 0 the fight still goes on: the next step ends it.",
       "hints": [
         "`after(45, enemyTurn)` has no `()` after `enemyTurn`: you hand `after` the function, to run later.",
         "Pressing 1 while the goblin is waiting does nothing, because `turn` is 1 until the goblin has hit."
       ]
     },
     {
-      "id": "s6",
-      "title": "Win, lose, and R",
-      "instructions": "In `draw()`, below the line for key 1, add `if (kb.presses('r') && over) newGame();`. Play until someone wins. To reach the end fast, in `newGame()`, on the line below the one that makes the fighters, add `fighters[1].hp = 3;`: one hit wins. Then try `fighters[0].hp = 1;` instead, and lose. Press R each time. Delete the test line when you are done.",
+      "id": "s7",
+      "title": "The end of the fight",
+      "instructions": "Below `enemyTurn`, write `fightOver(winner)` from the reading: `over = true;`, then a message for a win (`winner === 0`) or a loss. Then in `attackTurn`, right below the message line and above `turn = 1 - turn;`, add `if (!them.isAlive()) { fightOver(t); return; }`. Run and play until someone has no hp left: the top says who won, and 1 does nothing any more.",
+      "hints": [
+        "`return` leaves `attackTurn` right there, so a fight that is over does not pass the turn or start the enemy's pause.",
+        "`t` is the fighter who just hit, so `fightOver(t)` names them the winner."
+      ]
+    },
+    {
+      "id": "s8",
+      "title": "R, and a quick test",
+      "instructions": "In `draw()`, below the line for key 1, add `if (kb.presses('r') && over) newGame();`. To reach the end fast, in `newGame()`, on the line below the one that makes the fighters, add `fighters[1].hp = 3;`: one hit wins. Run, win, and press R. Then try `fighters[0].hp = 1;` instead, and lose; press R. Delete the test line when you are done.",
       "hints": [
         "A test line goes BELOW the line that makes the fighters: above it, the new fighters would be made after your change and undo it."
       ]
@@ -71,7 +90,7 @@
       "hint": "this.hp = max(this.hp - n, 0);",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\b(?:Math\\s*\\.\\s*)?max\\s*\\(\\s*(?:this\\s*\\.\\s*[\\w$]+\\s*-[^,;]*,\\s*0\\s*\\)|0\\s*,\\s*this\\s*\\.\\s*[\\w$]+\\s*-)|\\bthis\\s*\\.\\s*([\\w$]+)\\s*\\)*\\s*<=?\\s*\\(*\\s*0\\s*\\)+\\s*\\{?\\s*this\\s*\\.\\s*\\1\\s*=\\s*0\\b|\\bthis\\s*\\.\\s*([\\w$]+)\\s*=\\s*\\(?\\s*this\\s*\\.\\s*\\2\\s*-\\s*[\\w$]+\\s*\\)?\\s*<=?\\s*0\\s*\\?\\s*0\\b|\\bthis\\s*\\.\\s*([\\w$]+)\\s*=\\s*\\(?\\s*this\\s*\\.\\s*\\3\\s*>=?\\s*([\\w$]+)\\s*\\)?\\s*\\?\\s*this\\s*\\.\\s*\\3\\s*-\\s*\\4\\s*:\\s*0\\b|\\bif\\s*\\(+\\s*this\\s*\\.\\s*([\\w$]+)\\s*-\\s*[\\w$]+\\s*\\)*\\s*<=?\\s*\\(*\\s*0\\s*\\)+\\s*\\{?\\s*this\\s*\\.\\s*\\5\\s*=\\s*0\\b",
+      "pattern": "\\b(?:Math\\s*\\.\\s*)?max\\s*\\(\\s*\\(*\\s*this\\s*\\.\\s*[\\w$]+\\s*-\\s*(?!\\(*\\s*0+\\s*\\)*\\s*[,)])[^,;]*,\\s*0\\s*\\)|\\b(?:Math\\s*\\.\\s*)?max\\s*\\(\\s*0\\s*,\\s*\\(*\\s*this\\s*\\.\\s*[\\w$]+\\s*-\\s*(?!\\(*\\s*0+\\s*\\)*\\s*[,)])|\\bthis\\s*\\.\\s*([\\w$]+)\\s*\\)*\\s*<=?\\s*\\(*\\s*0\\s*\\)+\\s*\\{?\\s*this\\s*\\.\\s*\\1\\s*=\\s*0\\b|\\bthis\\s*\\.\\s*([\\w$]+)\\s*=\\s*\\(?\\s*this\\s*\\.\\s*\\2\\s*-\\s*[A-Za-z_$][\\w$]*\\s*\\)?\\s*<=?\\s*0\\s*\\?\\s*0\\b|\\bthis\\s*\\.\\s*([\\w$]+)\\s*=\\s*\\(?\\s*this\\s*\\.\\s*\\3\\s*>=?\\s*([\\w$]+)\\s*\\)?\\s*\\?\\s*this\\s*\\.\\s*\\3\\s*-\\s*\\4\\s*:\\s*0\\b|\\bif\\s*\\(+\\s*this\\s*\\.\\s*([\\w$]+)\\s*-\\s*[A-Za-z_$][\\w$]*\\s*\\)*\\s*<=?\\s*\\(*\\s*0\\s*\\)+\\s*\\{?\\s*this\\s*\\.\\s*\\5\\s*=\\s*0\\b|\\bthis\\s*\\.\\s*([\\w$]+)\\s*(?:-=\\s*(?!\\(*\\s*0+\\s*\\)*\\s*[,)])|=\\s*this\\s*\\.\\s*\\6\\s*-\\s*(?!\\(*\\s*0+\\s*\\)*\\s*[,)]))[^}]{0,200}?\\bthis\\s*\\.\\s*\\6\\s*=\\s*(?:Math\\s*\\.\\s*)?max\\s*\\(\\s*(?:this\\s*\\.\\s*\\6\\s*,\\s*0|0\\s*,\\s*this\\s*\\.\\s*\\6)\\s*\\)|\\bif\\s*\\(+\\s*[\\w$.]+\\s*\\)*\\s*>=?\\s*\\(*\\s*this\\s*\\.\\s*([\\w$]+)\\s*\\)+\\s*\\{?\\s*this\\s*\\.\\s*\\7\\s*=\\s*0\\b(?:(?!\\bfunction\\b)[\\s\\S]){0,80}?\\bthis\\s*\\.\\s*\\7\\s*(?:-=\\s*(?!\\(*\\s*0+\\s*\\)*\\s*[,)])|=\\s*this\\s*\\.\\s*\\7\\s*-\\s*(?!\\(*\\s*0+\\s*\\)*\\s*[,)]))|\\bif\\s*\\(+\\s*this\\s*\\.\\s*([\\w$]+)\\s*\\)*\\s*<=?\\s*\\(*\\s*[A-Za-z_$][\\w$]*[\\w$.]*\\s*\\)+\\s*\\{?\\s*this\\s*\\.\\s*\\8\\s*=\\s*0\\b(?:(?!\\bfunction\\b)[\\s\\S]){0,80}?\\bthis\\s*\\.\\s*\\8\\s*(?:-=\\s*(?!\\(*\\s*0+\\s*\\)*\\s*[,)])|=\\s*this\\s*\\.\\s*\\8\\s*-\\s*(?!\\(*\\s*0+\\s*\\)*\\s*[,)]))|\\bthis\\s*\\.\\s*([\\w$]+)\\s*(?:-=|=\\s*this\\s*\\.\\s*\\9\\s*-)\\s*(?:Math\\s*\\.\\s*)?min\\s*\\(\\s*(?:[A-Za-z_$][\\w$]*[\\w$.]*\\s*,\\s*this\\s*\\.\\s*\\9|this\\s*\\.\\s*\\9\\s*,\\s*[A-Za-z_$][\\w$]*[\\w$.]*)\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -84,7 +103,7 @@
       "hint": "attack(target, roll) { return target.takeHit(this.power + roll); }",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\b([A-Za-z_$][\\w$]*)\\s*\\(\\s*([A-Za-z_$][\\w$]*)[^)]*\\)\\s*\\{(?:(?!\\bfunction\\b)[^}]){0,300}?\\b\\2\\s*\\.\\s*[\\w$]*(?:[Hh]it|[Hh]urt|[Dd]amage)[\\w$]*\\s*\\([\\s\\S]*?\\.\\s*\\1\\s*\\(\\s*[\\w$]",
+      "pattern": "\\b([A-Za-z_$][\\w$]*)\\s*\\(\\s*([A-Za-z_$][\\w$]*)[^)]*\\)\\s*\\{(?:(?!\\bfunction\\b)[^}]){0,300}?\\b\\2\\s*\\.\\s*(?!(?:isAlive|draw|show|name|hp)\\b)[A-Za-z_$][\\w$]*\\s*\\(\\s*(?!0*\\.?0*\\s*\\))[\\s\\S]*?\\.\\s*\\1\\s*\\(\\s*[\\w$]",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -97,7 +116,7 @@
       "hint": "turn = 1 - turn;",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\b([\\w$]+)\\s*=\\s*1\\s*-\\s*\\1\\b|\\b([\\w$]+)\\s*=\\s*\\(\\s*\\2\\s*\\+\\s*1\\s*\\)\\s*%\\s*(?:2\\b|[\\w$]+\\s*\\.\\s*length\\b)|\\b([\\w$]+)\\s*=\\s*\\(*\\s*\\3\\s*\\)*\\s*[!=]==?\\s*\\(*\\s*[01]\\s*\\)*\\s*\\?\\s*[01]\\s*:\\s*[01]\\b|\\bif\\s*\\(+\\s*([\\w$]+)\\s*\\)*\\s*[!=]==?\\s*\\(*\\s*[01]\\s*\\)+\\s*\\{?\\s*\\4\\s*=\\s*[01]\\b|\\b([\\w$]+)\\s*\\^=\\s*1\\b|\\b([\\w$]+)\\s*=\\s*\\6\\s*\\^\\s*1\\b|\\b[\\w$]+\\s*%=\\s*(?:2\\b|[\\w$]+\\s*\\.\\s*length\\b)",
+      "pattern": "\\b([\\w$]+)\\s*=\\s*1\\s*-\\s*\\1\\b|\\b([\\w$]+)\\s*=\\s*\\(\\s*\\2\\s*\\+\\s*1\\s*\\)\\s*%\\s*(?:2\\b|[\\w$]+\\s*\\.\\s*length\\b)|\\b([\\w$]+)\\s*=\\s*\\(*\\s*\\3\\s*\\)*\\s*[!=]==?\\s*\\(*\\s*[01]\\s*\\)*\\s*\\?\\s*[01]\\s*:\\s*[01]\\b|\\bif\\s*\\(+\\s*([\\w$]+)\\s*\\)*\\s*[!=]==?\\s*\\(*\\s*[01]\\s*\\)+\\s*\\{?\\s*\\4\\s*=\\s*[01]\\b|\\b([\\w$]+)\\s*\\^=\\s*1\\b|\\b([\\w$]+)\\s*=\\s*\\6\\s*\\^\\s*1\\b|\\b[\\w$]+\\s*%=\\s*(?:2\\b|[\\w$]+\\s*\\.\\s*length\\b)|(?<![\\w$.])[\\w$]+\\s*=\\s*\\(*\\s*1\\s*-\\s*[A-Za-z_$][\\w$]*\\s*\\)*(?!\\s*[.\\[(\\w$])|(?<![\\w$.])[\\w$]+\\s*=(?![=>])[^;?]{1,80}\\?\\s*\\(*\\s*(?:0\\s*\\)*\\s*:\\s*\\(*\\s*1|1\\s*\\)*\\s*:\\s*\\(*\\s*0)\\b",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -110,7 +129,7 @@
       "hint": "if (turn === 1) after(45, enemyTurn);",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\bafter\\s*\\(\\s*[\\w$.]+\\s*,\\s*(?:(?:async\\s*)?\\([^()]*\\)\\s*=>\\s*(?!\\{\\s*\\})\\S|[A-Za-z_$][\\w$]*\\s*=>\\s*(?!\\{\\s*\\})\\S|function\\s*[\\w$]*\\s*\\([^)]*\\)\\s*\\{\\s*(?!\\})\\S|[A-Za-z_$][\\w$]*\\s*\\))",
+      "pattern": "\\bafter\\s*\\(\\s*(?:[^,;()]|\\([^()]*\\))+?\\s*,\\s*(?:(?:async\\s*)?(?:\\([^()]*\\)|[A-Za-z_$][\\w$]*)\\s*=>\\s*(?:\\{(?:(?!\\bfunction\\b)[^}]){0,300}?(?:[\\w$]\\s*\\(|(?<![=!<>])=(?![=>])|\\+\\+|--)|(?!\\{)[^;{}\\n]{0,120}?(?:[\\w$]\\s*\\(|(?<![=!<>])=(?![=>])|\\+\\+|--))|function\\s*[\\w$]*\\s*\\([^)]*\\)\\s*\\{(?:(?!\\bfunction\\b)[^}]){0,300}?(?:[\\w$]\\s*\\(|(?<![=!<>])=(?![=>])|\\+\\+|--)|[A-Za-z_$][\\w$]*(?:\\s*\\.\\s*[A-Za-z_$][\\w$]*)*\\s*\\))",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -123,7 +142,7 @@
       "hint": "if (!them.isAlive()) { fightOver(t); return; }   and   if (kb.presses('r') && over) newGame();",
       "type": "regex",
       "file": "script.js",
-      "pattern": "^(?=[\\s\\S]*?(?:!\\s*\\(*\\s*[\\w$.\\[\\]\\s-]+?\\s*\\.\\s*isAlive\\s*\\)*\\s*\\(\\s*\\)|\\.\\s*isAlive\\s*\\(\\s*\\)\\s*===?\\s*false\\b|\\.\\s*hp\\s*(?:<=\\s*0|===?\\s*0|<\\s*1)\\b)[^;{}]*\\)\\s*\\{?[^;}]{0,40}?(?:\\b[\\w$]+\\s*=\\s*true\\b|\\b[\\w$]*(?:[Oo]ver|[Ee]nd|[Ww]in|[Ll]os|[Dd]one|[Ff]inish)[\\w$]*\\s*\\())(?=[\\s\\S]*?\\bkb\\s*\\.\\s*(?:presses|pressed|pressing|released)\\s*\\(\\s*['\\\"`][rR]['\\\"`]\\s*\\)[^;]{0,120}?\\b(?:newGame|reset|restart|start|setup|init)[\\w$]*\\s*\\()",
+      "pattern": "^(?=[\\s\\S]*?(?:(?:!\\s*\\(*\\s*[\\w$.\\[\\]\\s-]+?\\s*\\.\\s*[\\w$]*[Aa]live[\\w$]*\\s*\\)*\\s*\\(\\s*\\)|\\.\\s*[\\w$]*[Aa]live[\\w$]*\\s*\\(\\s*\\)\\s*\\)*\\s*===?\\s*false\\b|\\.\\s*hp\\s*\\)*\\s*(?:<=\\s*0|===?\\s*0|<\\s*1)\\b|!\\s*\\(*\\s*[\\w$.\\[\\]]+\\s*\\.\\s*hp\\b)[^;{}]*\\)\\s*\\{?[^;}]{0,40}?(?:\\b[\\w$]+\\s*=\\s*true\\b|(?<![\\w$.])(?!(?:if|for|while|switch|return|text|fill|print|console|kb|random|floor|after)\\b)[A-Za-z_$][\\w$]*\\s*\\()|\\bif\\s*\\(+\\s*(?:[\\w$.\\[\\]\\s-]+?\\.\\s*[\\w$]*[Aa]live[\\w$]*\\s*\\(\\s*\\)|[\\w$.\\[\\]]+\\s*\\.\\s*hp\\s*\\)*\\s*(?:>\\s*0|>=\\s*1)\\b)\\s*\\)+\\s*(?:\\{(?:[^{}]|\\{[^{}]*\\})*\\}|[^;{}]*;)\\s*else\\s*\\{?[^;}]{0,40}?(?:\\b[\\w$]+\\s*=\\s*true\\b|(?<![\\w$.])(?!(?:if|for|while|switch|return|text|fill|print|console|kb|random|floor|after)\\b)[A-Za-z_$][\\w$]*\\s*\\()|\\b(?:const|let|var)\\s+([\\w$]+)\\s*=\\s*\\(*\\s*(?:!\\s*\\(*\\s*[\\w$.\\[\\]\\s-]+?\\s*\\.\\s*[\\w$]*[Aa]live[\\w$]*\\s*\\)*\\s*\\(\\s*\\)|\\.\\s*[\\w$]*[Aa]live[\\w$]*\\s*\\(\\s*\\)\\s*\\)*\\s*===?\\s*false\\b|\\.\\s*hp\\s*\\)*\\s*(?:<=\\s*0|===?\\s*0|<\\s*1)\\b|!\\s*\\(*\\s*[\\w$.\\[\\]]+\\s*\\.\\s*hp\\b)[^;]*;(?:(?!\\bfunction\\b)[\\s\\S]){0,200}?\\bif\\s*\\(+\\s*\\1\\s*\\)+\\s*\\{?[^;}]{0,40}?(?:\\b[\\w$]+\\s*=\\s*true\\b|(?<![\\w$.])(?!(?:if|for|while|switch|return|text|fill|print|console|kb|random|floor|after)\\b)[A-Za-z_$][\\w$]*\\s*\\()|\\b(?:const|let|var)\\s+([\\w$]+)\\s*=\\s*\\(*\\s*(?:[\\w$.\\[\\]\\s-]+?\\.\\s*[\\w$]*[Aa]live[\\w$]*\\s*\\(\\s*\\)|[\\w$.\\[\\]]+\\s*\\.\\s*hp\\s*\\)*\\s*(?:>\\s*0|>=\\s*1)\\b)[^;]*;(?:(?!\\bfunction\\b)[\\s\\S]){0,200}?\\bif\\s*\\(+\\s*!\\s*\\2\\s*\\)+\\s*\\{?[^;}]{0,40}?(?:\\b[\\w$]+\\s*=\\s*true\\b|(?<![\\w$.])(?!(?:if|for|while|switch|return|text|fill|print|console|kb|random|floor|after)\\b)[A-Za-z_$][\\w$]*\\s*\\()|(?<![\\w$.])[\\w$]+\\s*=\\s*\\(*\\s*(?:!\\s*\\(*\\s*[\\w$.\\[\\]\\s-]+?\\.\\s*[\\w$]*[Aa]live[\\w$]*\\s*\\(\\s*\\)|[\\w$.\\[\\]]+\\s*\\.\\s*hp\\s*\\)*\\s*(?:<=\\s*0|===?\\s*0|<\\s*1)\\b)))(?=[\\s\\S]*?\\bkb\\s*\\.\\s*(?:presses|pressed|pressing|released)\\s*\\(\\s*['\"`][rR]['\"`]\\s*\\)(?:[^;{}]{0,60}\\{[^}]{0,150}?|[^;]{0,120}?)(?<![\\w$.])(?!(?:if|for|while|switch|return|text|fill|print|console|kb|random|floor|after)\\b)[A-Za-z_$][\\w$]*\\s*\\()",
       "flags": "",
       "points": 0,
       "status": "pending",

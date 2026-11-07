@@ -15,7 +15,7 @@ class Fighter {
     return this.hp > 0;
   }
 
-  // STEP: takeHit(n) loses n hp, never below 0, and returns the damage taken.
+  // STEP: takeHit(n) loses n hp, never below 0, and returns n, the size of the hit.
   // STEP: attack(target, roll) hits the target, through its takeHit, for this
   // fighter's power plus the roll.
 
@@ -52,7 +52,7 @@ function draw() {
   fighters[1].draw(350, 150);
 }
 
-// STEP: fightOver(winner), attackTurn(t, roll) and enemyTurn().
+// STEP: attackTurn(t, roll), enemyTurn() and fightOver(winner).
 
 function drawTop() {
   // STEP: show the message instead of the names.

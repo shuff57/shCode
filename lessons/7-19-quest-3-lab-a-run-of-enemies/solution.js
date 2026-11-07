@@ -24,7 +24,7 @@ class Fighter {
   }
 
   // Lose n hp (half, rounded down, while guarding), never below 0.
-  // Returns the damage really taken.
+  // Returns n: the hit after any guard.
   takeHit(n) {
     if (this.guarding) n = floor(n / 2);
     this.guarding = false;

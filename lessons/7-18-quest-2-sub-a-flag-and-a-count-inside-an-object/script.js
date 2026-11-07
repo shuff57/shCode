@@ -3,6 +3,7 @@
 // and 3 will drink a potion while any are left.
 
 class Knight {
+  // STEP: the constructor is handed how many potions this knight starts with.
   constructor() {
     this.hp = 30;
     this.maxHp = 30;

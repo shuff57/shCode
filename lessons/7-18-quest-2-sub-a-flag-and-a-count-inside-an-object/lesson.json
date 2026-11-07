@@ -19,6 +19,15 @@
     },
     {
       "id": "s2",
+      "title": "A count handed in",
+      "instructions": "The knight always starts with 2 potions, because the constructor says `this.potions = 2;`. Let the code that makes it say how many instead. Change `constructor() {` to `constructor(potions) {` and `this.potions = 2;` to `this.potions = potions;`. In `setup()`, hand the knight its count: `k = new Knight(2);`. Run: the top still says `potions 2`. Change it to `new Knight(5)` and Run: `potions 5`. Then put it back to `new Knight(2)`.",
+      "hints": [
+        "A value in the brackets of `new Knight(...)` lands in the constructor's parameter in the same place, as in 7.1.5.",
+        "If the top says `potions undefined`, the constructor takes a count but `new Knight()` hands it nothing."
+      ]
+    },
+    {
+      "id": "s3",
       "title": "Guard",
       "instructions": "Inside the class, below `takeHit`, write `guard() { this.guarding = true; }`. At the top of `takeHit`, before the line that takes the hp: `if (this.guarding) n = floor(n / 2);` and then `this.guarding = false;`. In `draw()`, below the line for key 1: `if (kb.presses('2')) { k.guard(); note = 'Guarding'; }`. Run: press 2 and the top says GUARDING; press 1 and it takes only 3, and the next press of 1 takes 6 again.",
       "hints": [
@@ -27,7 +36,7 @@
       ]
     },
     {
-      "id": "s3",
+      "id": "s4",
       "title": "Drink a potion",
       "instructions": "Below `guard()`, write `heal()` from the reading: if `this.potions === 0`, `return 0;`. Otherwise `this.potions -= 1;`, `const before = this.hp;`, `this.hp = min(this.hp + 12, this.maxHp);` and `return this.hp - before;`. In `draw()`: `if (kb.presses('3')) note = 'Potion: +' + k.heal();`. Run: take a few hits, then press 3 twice. A third press gives +0, because the potions are gone.",
       "hints": [
@@ -44,7 +53,7 @@
       "hint": "if (this.guarding) n = floor(n / 2);  this.guarding = false;",
       "type": "regex",
       "file": "script.js",
-      "pattern": "^(?=[\\s\\S]*?\\bthis\\s*\\.\\s*([\\w$]+)\\b[^;}]{0,80}?(?:\\b(?:Math\\s*\\.\\s*)?(?:floor|trunc|round|ceil|int)\\s*\\(\\s*[\\w$]+\\s*(?:\\/\\s*2|\\*\\s*0?\\.5)\\s*\\)|\\b[\\w$]+\\s*\\/=\\s*2\\b|\\b([\\w$]+)\\s*=\\s*\\2\\s*(?:\\/\\s*2|\\*\\s*0?\\.5)\\b|\\b[\\w$]+\\s*>>=?\\s*1\\b)[^}]{0,200}?\\bthis\\s*\\.\\s*\\1\\s*=\\s*false\\b)(?=[\\s\\S]*?\\bthis\\s*\\.\\s*\\1\\s*=\\s*true\\b)",
+      "pattern": "^(?:(?=[\\s\\S]*?\\bthis\\s*\\.\\s*([\\w$]+)\\b[^;}]{0,80}?(?:\\b(?:Math\\s*\\.\\s*)?(?:floor|trunc|round|ceil|int)\\s*\\(\\s*\\(*\\s*[\\w$]+\\s*\\)*\\s*(?:\\/\\s*2|\\*\\s*0?\\.5)\\s*\\)|\\b[\\w$]+\\s*\\/=\\s*2\\b|\\b([\\w$]+)\\s*=\\s*\\2\\s*(?:\\/\\s*2|\\*\\s*0?\\.5)\\b|\\b[\\w$]+\\s*>>=?\\s*1\\b)[^}]{0,200}?\\bthis\\s*\\.\\s*\\1\\s*=\\s*(?:false|0)\\b)|(?=[\\s\\S]*?\\b(?:const|let|var)\\s+([\\w$]+)\\s*=\\s*this\\s*\\.\\s*([\\w$]+)\\s*;[^}]{0,200}?\\bthis\\s*\\.\\s*\\4\\s*=\\s*(?:false|0)\\b[^}]{0,200}?\\b\\3\\b[^;}]{0,80}?(?:\\b(?:Math\\s*\\.\\s*)?(?:floor|trunc|round|ceil|int)\\s*\\(\\s*\\(*\\s*[\\w$]+\\s*\\)*\\s*(?:\\/\\s*2|\\*\\s*0?\\.5)\\s*\\)|\\b[\\w$]+\\s*\\/=\\s*2\\b|\\b([\\w$]+)\\s*=\\s*\\5\\s*(?:\\/\\s*2|\\*\\s*0?\\.5)\\b|\\b[\\w$]+\\s*>>=?\\s*1\\b)))(?=[\\s\\S]*?\\bthis\\s*\\.\\s*\\1\\4\\s*=\\s*(?:true|1)\\b)",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -57,7 +66,7 @@
       "hint": "if (this.potions === 0) return 0;  this.potions -= 1;  this.hp = min(this.hp + 12, this.maxHp);",
       "type": "regex",
       "file": "script.js",
-      "pattern": "^(?=[\\s\\S]*?(?:\\b(?:Math\\s*\\.\\s*)?min\\s*\\(\\s*(?:this\\s*\\.\\s*[\\w$]+\\s*\\+[^,;]*,\\s*this\\s*\\.\\s*[\\w$]+|this\\s*\\.\\s*[\\w$]+\\s*,\\s*this\\s*\\.\\s*[\\w$]+\\s*\\+)|\\bif\\s*\\(+\\s*this\\s*\\.\\s*([\\w$]+)\\s*\\)*\\s*>=?\\s*\\(*\\s*this\\s*\\.\\s*([\\w$]+)\\s*\\)+\\s*\\{?\\s*this\\s*\\.\\s*\\1\\s*=\\s*this\\s*\\.\\s*\\2\\b))(?=[\\s\\S]*?\\bthis\\s*\\.\\s*([\\w$]+)\\s*(?:-=\\s*1\\b|--|=\\s*this\\s*\\.\\s*\\3\\s*-\\s*1\\b))(?=[\\s\\S]*?(?:\\bthis\\s*\\.\\s*\\3\\s*\\)*\\s*(?:===?\\s*0\\b|<=\\s*0\\b|<\\s*1\\b|>\\s*0\\b|>=\\s*1\\b|!==?\\s*0\\b)|!\\s*\\(*\\s*this\\s*\\.\\s*\\3\\b|\\bif\\s*\\(+\\s*this\\s*\\.\\s*\\3\\s*\\)))",
+      "pattern": "^(?=[\\s\\S]*?(?:\\b(?:Math\\s*\\.\\s*)?min\\s*\\(\\s*(?:this\\s*\\.\\s*[\\w$]+\\s*\\+[^,;]*,\\s*this\\s*\\.\\s*[\\w$]+|this\\s*\\.\\s*[\\w$]+\\s*,\\s*this\\s*\\.\\s*[\\w$]+\\s*\\+|[\\w$.]+\\s*\\+\\s*this\\s*\\.\\s*[\\w$]+\\s*,\\s*this\\s*\\.\\s*[\\w$]+)|\\b(?:Math\\s*\\.\\s*)?min\\s*\\(\\s*(?:[\\w$.]+\\s*,\\s*this\\s*\\.\\s*[\\w$]+\\s*-\\s*this\\s*\\.\\s*[\\w$]+|this\\s*\\.\\s*[\\w$]+\\s*-\\s*this\\s*\\.\\s*[\\w$]+\\s*,\\s*[\\w$.]+)\\s*\\)|\\bconstrain\\s*\\(\\s*[^,;]*\\+[^,;]*,[^,;]*,\\s*this\\s*\\.\\s*[\\w$]+|\\bif\\s*\\(+\\s*this\\s*\\.\\s*([\\w$]+)\\s*\\)*\\s*>=?\\s*\\(*\\s*this\\s*\\.\\s*([\\w$]+)\\s*\\)+\\s*\\{?\\s*this\\s*\\.\\s*\\1\\s*=\\s*this\\s*\\.\\s*\\2\\b|\\bthis\\s*\\.\\s*([\\w$]+)\\s*=\\s*\\(*\\s*this\\s*\\.\\s*\\3\\s*\\+[^;?]*?>=?\\s*this\\s*\\.\\s*([\\w$]+)\\s*\\)*\\s*\\?\\s*this\\s*\\.\\s*\\4\\b|\\bthis\\s*\\.\\s*([\\w$]+)\\s*=\\s*\\(*\\s*this\\s*\\.\\s*\\5\\s*\\+[^;?]*?<=?\\s*this\\s*\\.\\s*([\\w$]+)\\s*\\)*\\s*\\?[^:;]*:\\s*this\\s*\\.\\s*\\6\\b))(?=[\\s\\S]*?(?:\\bthis\\s*\\.\\s*([\\w$]+)\\s*(?:-=\\s*1\\b|--|=\\s*this\\s*\\.\\s*\\7\\s*-\\s*1\\b)|--\\s*this\\s*\\.\\s*([\\w$]+)\\b))(?=[\\s\\S]*?(?:\\bthis\\s*\\.\\s*\\7\\8\\s*\\)*\\s*(?:===?\\s*0\\b|<=\\s*0\\b|<\\s*1\\b|>\\s*0\\b|>=\\s*1\\b|!==?\\s*0\\b)|!\\s*\\(*\\s*this\\s*\\.\\s*\\7\\8\\b|\\bif\\s*\\(+\\s*this\\s*\\.\\s*\\7\\8\\s*\\)))",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -86,7 +95,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch for \"Sub-build: A flag and a count inside an object\". The task: give the Knight guard(), which turns this.guarding on, make takeHit halve the hit with floor(n / 2) while guarding and then turn the flag off, and write heal(), which returns 0 with no potions left and otherwise uses one up and gives up to 12 hp back with min(this.hp + 12, this.maxHp), returning the hp gained; key 2 guards and key 3 drinks. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "prompt": "The student wrote a moSHion sketch for \"Sub-build: A flag and a count inside an object\". The task: give the Knight a potions value in its constructor (new Knight(2)), guard(), which turns this.guarding on, make takeHit halve the hit with floor(n / 2) while guarding and then turn the flag off, and write heal(), which returns 0 with no potions left and otherwise uses one up and gives up to 12 hp back with min(this.hp + 12, this.maxHp), returning the hp gained; key 2 guards and key 3 drinks. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
     "rubric": [
       {
         "id": "r1",

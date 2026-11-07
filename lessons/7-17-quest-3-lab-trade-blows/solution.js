@@ -14,7 +14,7 @@ class Fighter {
     return this.hp > 0;
   }
 
-  // Lose n hp, never below 0. Returns the damage taken.
+  // Lose n hp, never below 0. Returns n, the size of the hit.
   takeHit(n) {
     this.hp = max(this.hp - n, 0);
     return n;

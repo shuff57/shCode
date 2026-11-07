@@ -17,9 +17,10 @@ takeHit(n) {
 }
 ```
 
-Why `return n`? So whoever asked can say how hard the hit was. Today the answer is just `n`.
-On day three, guarding will make the real damage smaller, and only `takeHit` will know by how
-much, so it is the one that answers.
+Why `return n`? So whoever asked can say how hard the hit was. Today the answer is just `n`,
+the size of the hit it was handed. It is the size of the hit even when hp stops at 0: a hit of 7
+on a goblin with 3 hp left still says `for 7`. On day three, guarding will make the hit smaller,
+and only `takeHit` will know by how much, so it is the one that answers.
 
 **Hitting another fighter.** An attack is this fighter's `power` plus a small roll of luck:
 

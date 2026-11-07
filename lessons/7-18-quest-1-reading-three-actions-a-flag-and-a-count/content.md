@@ -32,7 +32,7 @@ takeHit(n) {
 
 `floor(n / 2)` is half, rounded down (5.2.2): a hit of 7 becomes 3, a hit of 6 becomes 3. Look
 at the order: halve first, while the flag still says so, then turn the flag off, then take the
-hp. And `return n` now pays off: `n` is the damage that was really taken, so the message says
+hp. And `return n` now pays off: `n` is the hit after the guard, so the message says
 `for 3`, not `for 7`. Nothing that calls `takeHit` had to change, because `attack` already hands
 back whatever `takeHit` answers.
 
@@ -76,10 +76,12 @@ and returns how much hp it really gave back, which is less than 12 near the top:
 
 The count goes on the fighter's line of numbers:
 `text(this.hp + '/' + this.maxHp + '  potions ' + this.potions, x - 60, y + 98, 12, '#ccc');`.
-The flag gets a gold ring around the body while it is on. `noFill()` draws only an outline;
-`stroke('gold')` and `strokeWeight(4)` set the outline's colour and thickness, like the
-`.stroke` and `.strokeWeight` of a sprite (7.1.15); `noStroke()` (6.1.2) takes the outline away
-again so nothing else is drawn with it:
+The flag gets a gold ring around the body while it is on. Three drawing functions are new
+here. `noFill()` means the next shapes have no fill, so a circle is only its outline.
+`stroke('gold')` sets the colour of the outline and `strokeWeight(4)` its thickness in pixels.
+In 7.1.15 (Worked Example: Sprite Showcase) a sprite had `.stroke` and `.strokeWeight`
+properties for the same two things; these functions do it for shapes drawn with `circle` and
+`rect`. `noStroke()` (6.1.2) takes the outline away again, so nothing else is drawn with it:
 
 ```js
 if (this.guarding) {

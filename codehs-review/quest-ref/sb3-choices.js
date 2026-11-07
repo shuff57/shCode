@@ -2,10 +2,10 @@
 // halved), 3 drinks a potion while any are left, 1 takes a hit of 6 to try it.
 
 class Knight {
-  constructor() {
+  constructor(potions) {
     this.hp = 30;
     this.maxHp = 30;
-    this.potions = 2;
+    this.potions = potions;
     this.guarding = false;
   }
 
@@ -34,7 +34,7 @@ let note = '1 take a hit, 2 guard, 3 potion';
 
 function setup() {
   new Canvas(400, 160);
-  k = new Knight();
+  k = new Knight(2);
 }
 
 function draw() {

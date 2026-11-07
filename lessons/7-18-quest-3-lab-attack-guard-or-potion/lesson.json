@@ -31,23 +31,31 @@
     {
       "id": "s3",
       "title": "Potions, and a new constructor value",
-      "instructions": "Change the constructor's first line to `constructor(name, maxHp, power, potions, color) {` and add `this.potions = potions;` below `this.color = color;`. **Every `new Fighter(...)` now needs the potions, in fourth place:** in `newGame()`, make the hero `new Fighter('Hero', 30, 3, 2, 'gold')` and the goblin `new Fighter('Goblin', 24, 5, 1, 'orange')` (the goblin hits harder now, power 5, because you can guard against it). Below `guard()`, write `heal()` from the reading. In the class's `draw`, add the potions to the numbers line: `text(this.hp + '/' + this.maxHp + '  potions ' + this.potions, x - 60, y + 98, 12, '#ccc');`. Run: `potions 2` under you and `potions 1` under the goblin.",
+      "instructions": "Change the constructor's first line to `constructor(name, maxHp, power, potions, color) {` and add `this.potions = potions;` below `this.color = color;`. **Every `new Fighter(...)` now needs the potions, in fourth place:** in `newGame()`, make the hero `new Fighter('Hero', 30, 3, 2, 'gold')` and the goblin `new Fighter('Goblin', 24, 5, 1, 'orange')` (the goblin hits harder now, power 5, because you can guard against it). Count your values in each one: name, maxHp, power, potions, color, five in all. Below `guard()`, write `heal()` from the reading. In the class's `draw`, add the potions to the numbers line: `text(this.hp + '/' + this.maxHp + '  potions ' + this.potions, x - 60, y + 98, 12, '#ccc');`. Run: `potions 2` under you and `potions 1` under the goblin.",
       "hints": [
-        "If a fighter is drawn black, or its line says `potions gold`, one `new Fighter(...)` still has the old four values.",
+        "If a fighter is drawn black, its line says `potions gold` (or `potions NaN` after a potion), one `new Fighter(...)` still has the old four values.",
         "The values are matched by place: name, maxHp, power, potions, color."
       ]
     },
     {
       "id": "s4",
-      "title": "One act for all three",
-      "instructions": "Turn `attackTurn(t, roll)` into `act(t, a, roll)`: change its first line to `function act(t, a, roll) {`, and change the message line into three lines, one per action: `if (a === 1) message = me.name + ' hits ' + them.name + ' for ' + me.attack(them, roll);`, `if (a === 2) { me.guard(); message = me.name + ' guards'; }` and `if (a === 3) message = me.name + ' drinks a potion: +' + me.heal();`. Leave the rest of it as it is. Then fix the two lines that still call `attackTurn`: in `draw()`, `attackTurn(0, floor(random(0, 4)))` becomes `act(0, 1, floor(random(0, 4)))`, and in `enemyTurn`, `attackTurn(1, floor(random(0, 4)))` becomes `act(1, 1, floor(random(0, 4)))`. Run: the game plays as before, now through `act`.",
+      "title": "attackTurn becomes act",
+      "instructions": "Change the first line of `attackTurn` to `function act(t, a, roll) {`. `a` will be the action: 1 attack, 2 guard, 3 potion. Then fix the two lines that still call `attackTurn`: in `draw()`, `attackTurn(0, floor(random(0, 4)))` becomes `act(0, 1, floor(random(0, 4)))`, and in `enemyTurn`, `attackTurn(1, floor(random(0, 4)))` becomes `act(1, 1, floor(random(0, 4)))`. Run: the game plays as before, now through `act`.",
       "hints": [
-        "The `1` in `act(0, 1, ...)` is the action: attack. The next step lets the keys pick it.",
+        "The `1` in `act(0, 1, ...)` is the action: attack.",
         "An error that says attackTurn is not defined means one call still uses the old name."
       ]
     },
     {
       "id": "s5",
+      "title": "Three actions",
+      "instructions": "In `act`, change the message line into three lines, one per action: `if (a === 1) message = me.name + ' hits ' + them.name + ' for ' + me.attack(them, roll);`, `if (a === 2) { me.guard(); message = me.name + ' guards'; }` and `if (a === 3) message = me.name + ' drinks a potion: +' + me.heal();`. Leave the rest of `act` as it is. Run: the game plays as before, because every call still asks for action 1. To try a guard now, in `draw()` change `act(0, 1, ...)` to `act(0, 2, ...)` and press 1: a gold ring appears, and the goblin's next hit is halved. The next step replaces that line anyway.",
+      "hints": [
+        "The roll is only used by an attack; guarding and drinking ignore it."
+      ]
+    },
+    {
+      "id": "s6",
       "title": "The keys pick the action",
       "instructions": "Below `act`, write `function choose(a) { act(turn, a, floor(random(0, 4))); }`. In `draw()`, replace the line for key 1 with: `if (!over && turn === 0) { let a = 0; if (kb.presses('1')) a = 1; if (kb.presses('2')) a = 2; if (kb.presses('3')) a = 3; if (a !== 0) choose(a); }`. In `newGame()`, the first message becomes `'Your turn: 1 attack, 2 guard, 3 potion'`. Run: press 2 and a gold ring appears; the goblin's next hit is halved. Take some hits, then press 3.",
       "hints": [
@@ -55,7 +63,7 @@
       ]
     },
     {
-      "id": "s6",
+      "id": "s7",
       "title": "The enemy chooses",
       "instructions": "In `enemyTurn`, below `if (over || turn !== 1) return;`, replace the `act(1, 1, ...)` line with the enemy's rule from the reading: `const e = fighters[1];`, `let a = 1;`, `if (e.hp < e.maxHp / 3 && e.potions > 0) a = 3;`, `else if (random() < 0.25) a = 2;` and then `act(1, a, floor(random(0, 4)));`. Run and play a few fights: sometimes the goblin guards. To see it drink, in `newGame()`, on the line below the one that makes the fighters, add `fighters[1].hp = 6;`, press 1 once, and watch its turn. Then delete the test line.",
       "hints": [
@@ -72,7 +80,7 @@
       "hint": "if (this.guarding) n = floor(n / 2);  this.guarding = false;",
       "type": "regex",
       "file": "script.js",
-      "pattern": "^(?=[\\s\\S]*?\\bthis\\s*\\.\\s*([\\w$]+)\\b[^;}]{0,80}?(?:\\b(?:Math\\s*\\.\\s*)?(?:floor|trunc|round|ceil|int)\\s*\\(\\s*[\\w$]+\\s*(?:\\/\\s*2|\\*\\s*0?\\.5)\\s*\\)|\\b[\\w$]+\\s*\\/=\\s*2\\b|\\b([\\w$]+)\\s*=\\s*\\2\\s*(?:\\/\\s*2|\\*\\s*0?\\.5)\\b|\\b[\\w$]+\\s*>>=?\\s*1\\b)[^}]{0,200}?\\bthis\\s*\\.\\s*\\1\\s*=\\s*false\\b)(?=[\\s\\S]*?\\bthis\\s*\\.\\s*\\1\\s*=\\s*true\\b)",
+      "pattern": "^(?:(?=[\\s\\S]*?\\bthis\\s*\\.\\s*([\\w$]+)\\b[^;}]{0,80}?(?:\\b(?:Math\\s*\\.\\s*)?(?:floor|trunc|round|ceil|int)\\s*\\(\\s*\\(*\\s*[\\w$]+\\s*\\)*\\s*(?:\\/\\s*2|\\*\\s*0?\\.5)\\s*\\)|\\b[\\w$]+\\s*\\/=\\s*2\\b|\\b([\\w$]+)\\s*=\\s*\\2\\s*(?:\\/\\s*2|\\*\\s*0?\\.5)\\b|\\b[\\w$]+\\s*>>=?\\s*1\\b)[^}]{0,200}?\\bthis\\s*\\.\\s*\\1\\s*=\\s*(?:false|0)\\b)|(?=[\\s\\S]*?\\b(?:const|let|var)\\s+([\\w$]+)\\s*=\\s*this\\s*\\.\\s*([\\w$]+)\\s*;[^}]{0,200}?\\bthis\\s*\\.\\s*\\4\\s*=\\s*(?:false|0)\\b[^}]{0,200}?\\b\\3\\b[^;}]{0,80}?(?:\\b(?:Math\\s*\\.\\s*)?(?:floor|trunc|round|ceil|int)\\s*\\(\\s*\\(*\\s*[\\w$]+\\s*\\)*\\s*(?:\\/\\s*2|\\*\\s*0?\\.5)\\s*\\)|\\b[\\w$]+\\s*\\/=\\s*2\\b|\\b([\\w$]+)\\s*=\\s*\\5\\s*(?:\\/\\s*2|\\*\\s*0?\\.5)\\b|\\b[\\w$]+\\s*>>=?\\s*1\\b)))(?=[\\s\\S]*?\\bthis\\s*\\.\\s*\\1\\4\\s*=\\s*(?:true|1)\\b)",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -85,7 +93,7 @@
       "hint": "this.hp = min(this.hp + 12, this.maxHp);  this.potions -= 1;",
       "type": "regex",
       "file": "script.js",
-      "pattern": "^(?=[\\s\\S]*?(?:\\b(?:Math\\s*\\.\\s*)?min\\s*\\(\\s*(?:this\\s*\\.\\s*[\\w$]+\\s*\\+[^,;]*,\\s*this\\s*\\.\\s*[\\w$]+|this\\s*\\.\\s*[\\w$]+\\s*,\\s*this\\s*\\.\\s*[\\w$]+\\s*\\+)|\\bif\\s*\\(+\\s*this\\s*\\.\\s*([\\w$]+)\\s*\\)*\\s*>=?\\s*\\(*\\s*this\\s*\\.\\s*([\\w$]+)\\s*\\)+\\s*\\{?\\s*this\\s*\\.\\s*\\1\\s*=\\s*this\\s*\\.\\s*\\2\\b))(?=[\\s\\S]*?\\bthis\\s*\\.\\s*([\\w$]+)\\s*(?:-=\\s*1\\b|--|=\\s*this\\s*\\.\\s*\\3\\s*-\\s*1\\b))(?=[\\s\\S]*?(?:\\bthis\\s*\\.\\s*\\3\\s*\\)*\\s*(?:===?\\s*0\\b|<=\\s*0\\b|<\\s*1\\b|>\\s*0\\b|>=\\s*1\\b|!==?\\s*0\\b)|!\\s*\\(*\\s*this\\s*\\.\\s*\\3\\b|\\bif\\s*\\(+\\s*this\\s*\\.\\s*\\3\\s*\\)))",
+      "pattern": "^(?=[\\s\\S]*?(?:\\b(?:Math\\s*\\.\\s*)?min\\s*\\(\\s*(?:this\\s*\\.\\s*[\\w$]+\\s*\\+[^,;]*,\\s*this\\s*\\.\\s*[\\w$]+|this\\s*\\.\\s*[\\w$]+\\s*,\\s*this\\s*\\.\\s*[\\w$]+\\s*\\+|[\\w$.]+\\s*\\+\\s*this\\s*\\.\\s*[\\w$]+\\s*,\\s*this\\s*\\.\\s*[\\w$]+)|\\b(?:Math\\s*\\.\\s*)?min\\s*\\(\\s*(?:[\\w$.]+\\s*,\\s*this\\s*\\.\\s*[\\w$]+\\s*-\\s*this\\s*\\.\\s*[\\w$]+|this\\s*\\.\\s*[\\w$]+\\s*-\\s*this\\s*\\.\\s*[\\w$]+\\s*,\\s*[\\w$.]+)\\s*\\)|\\bconstrain\\s*\\(\\s*[^,;]*\\+[^,;]*,[^,;]*,\\s*this\\s*\\.\\s*[\\w$]+|\\bif\\s*\\(+\\s*this\\s*\\.\\s*([\\w$]+)\\s*\\)*\\s*>=?\\s*\\(*\\s*this\\s*\\.\\s*([\\w$]+)\\s*\\)+\\s*\\{?\\s*this\\s*\\.\\s*\\1\\s*=\\s*this\\s*\\.\\s*\\2\\b|\\bthis\\s*\\.\\s*([\\w$]+)\\s*=\\s*\\(*\\s*this\\s*\\.\\s*\\3\\s*\\+[^;?]*?>=?\\s*this\\s*\\.\\s*([\\w$]+)\\s*\\)*\\s*\\?\\s*this\\s*\\.\\s*\\4\\b|\\bthis\\s*\\.\\s*([\\w$]+)\\s*=\\s*\\(*\\s*this\\s*\\.\\s*\\5\\s*\\+[^;?]*?<=?\\s*this\\s*\\.\\s*([\\w$]+)\\s*\\)*\\s*\\?[^:;]*:\\s*this\\s*\\.\\s*\\6\\b))(?=[\\s\\S]*?(?:\\bthis\\s*\\.\\s*([\\w$]+)\\s*(?:-=\\s*1\\b|--|=\\s*this\\s*\\.\\s*\\7\\s*-\\s*1\\b)|--\\s*this\\s*\\.\\s*([\\w$]+)\\b))(?=[\\s\\S]*?(?:\\bthis\\s*\\.\\s*\\7\\8\\s*\\)*\\s*(?:===?\\s*0\\b|<=\\s*0\\b|<\\s*1\\b|>\\s*0\\b|>=\\s*1\\b|!==?\\s*0\\b)|!\\s*\\(*\\s*this\\s*\\.\\s*\\7\\8\\b|\\bif\\s*\\(+\\s*this\\s*\\.\\s*\\7\\8\\s*\\)))",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -98,7 +106,7 @@
       "hint": "if (kb.presses('2')) a = 2;  if (kb.presses('3')) a = 3;",
       "type": "regex",
       "file": "script.js",
-      "pattern": "^(?=[\\s\\S]*?\\bkb\\s*\\.\\s*(?:presses|pressed)\\s*\\(\\s*['\\\"`]1['\\\"`]\\s*\\))(?=[\\s\\S]*?\\bkb\\s*\\.\\s*(?:presses|pressed)\\s*\\(\\s*['\\\"`]2['\\\"`]\\s*\\)[^;]{0,80}?(?:\\.\\s*[\\w$]+\\s*\\(|(?<![=!<>])=\\s*[\\w$]|[\\w$]+\\s*\\())(?=[\\s\\S]*?\\bkb\\s*\\.\\s*(?:presses|pressed)\\s*\\(\\s*['\\\"`]3['\\\"`]\\s*\\)[^;]{0,80}?(?:\\.\\s*[\\w$]+\\s*\\(|(?<![=!<>])=\\s*[\\w$]|[\\w$]+\\s*\\())",
+      "pattern": "^(?=[\\s\\S]*?\\bkb\\s*\\.\\s*(?:presses|pressed)\\s*\\(\\s*['\"`]1['\"`]\\s*\\))(?=[\\s\\S]*?\\bkb\\s*\\.\\s*(?:presses|pressed)\\s*\\(\\s*['\"`]2['\"`]\\s*\\)[^;]{0,80}?(?:\\.\\s*[\\w$]+\\s*\\(|(?<![=!<>])=\\s*[\\w$]|[\\w$]+\\s*\\(|\\?\\s*[\\w$]))(?=[\\s\\S]*?\\bkb\\s*\\.\\s*(?:presses|pressed)\\s*\\(\\s*['\"`]3['\"`]\\s*\\)[^;]{0,80}?(?:\\.\\s*[\\w$]+\\s*\\(|(?<![=!<>])=\\s*[\\w$]|[\\w$]+\\s*\\(|\\?\\s*[\\w$]))|\\bfor\\s*\\(\\s*(?:let|var)?\\s*([\\w$]+)\\s*=\\s*1\\s*;\\s*\\1\\s*(?:<=\\s*3|<\\s*4)\\s*;[^)]*\\)\\s*\\{?[^;{}]{0,40}?\\bkb\\s*\\.\\s*(?:presses|pressed)\\s*\\(\\s*(?:String\\s*\\(\\s*\\1\\s*\\)|\\1\\s*\\+\\s*(?:''|\"\"|``)|(?:''|\"\"|``)\\s*\\+\\s*\\1|\\1\\s*\\.\\s*toString\\s*\\(\\s*\\)|`\\$\\{\\s*\\1\\s*\\}`)\\s*\\)[^;]{0,60}?(?:(?<![=!<>])=\\s*[\\w$]|[\\w$]+\\s*\\()|\\bfor\\s*\\(\\s*(?:const|let|var)\\s+([\\w$]+)\\s+of\\s*\\[\\s*['\"`]1['\"`]\\s*,\\s*['\"`]2['\"`]\\s*,\\s*['\"`]3['\"`]\\s*\\]\\s*\\)\\s*\\{?[^;{}]{0,40}?\\bkb\\s*\\.\\s*(?:presses|pressed)\\s*\\(\\s*\\2\\s*\\)[^;]{0,60}?(?:(?<![=!<>])=\\s*[\\w$]|[\\w$]+\\s*\\()",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -112,7 +120,20 @@
       "hint": "if (e.hp < e.maxHp / 3 && e.potions > 0) a = 3;  else if (random() < 0.25) a = 2;",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:\\brandom\\s*\\([^()]*\\)\\s*\\)*\\s*(?:[<>]=?|[!=]==?)\\s*\\(*\\s*[\\d.]+|\\brandom\\s*\\(\\s*\\)\\s*\\*|\\.\\s*hp\\s*\\)*\\s*[<>]=?[^;{]*?|\\.\\s*potions\\s*\\)*\\s*(?:[<>]=?|[!=]==?)\\s*\\(*\\s*\\d)[^;{]{0,80}?\\)?\\s*\\{?\\s*(?:[\\w$]+\\s*=\\s*[23]\\b|[\\w$.\\[\\]]+\\s*\\.\\s*(?:guard|heal|drink|potion|block|defend)[\\w$]*\\s*\\(|\\b(?:act|choose|doAction|take[\\w$]*)\\s*\\(\\s*1\\s*,\\s*[23]\\b)",
+      "pattern": "(?:\\brandom\\s*\\([^()]*\\)\\s*\\)*\\s*(?:[<>]=?|[!=]==?)\\s*\\(*\\s*[\\d.]+|\\brandom\\s*\\(\\s*\\)\\s*\\*|\\.\\s*hp\\s*\\)*\\s*[<>]=?[^;{]*?|\\.\\s*potions\\s*\\)*\\s*(?:[<>]=?|[!=]==?)\\s*\\(*\\s*\\d)[^;{]{0,80}?\\)?\\s*\\{?\\s*(?:[\\w$]+\\s*=\\s*[23]\\b|[\\w$.\\[\\]]+\\s*\\.\\s*(?:guard|heal|drink|potion|block|defend)[\\w$]*\\s*\\(|\\b(?:act|choose|doAction|take[\\w$]*)\\s*\\(\\s*1\\s*,\\s*[23]\\b|\\?\\s*\\(*\\s*[23]\\b|\\breturn\\s+\\(*\\s*[23]\\b)",
+      "flags": "",
+      "points": 0,
+      "status": "pending",
+      "ignoreStrings": true
+    },
+    {
+      "id": "r5",
+      "title": "Every fighter gets five values",
+      "description": "Each new Fighter(...) is handed five values, in this order: name, maxHp, power, potions, color. Help: 7.18.1 (Reading: Three actions, a flag and a count)",
+      "hint": "new Fighter('Hero', 30, 3, 2, 'gold')",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "^(?=[\\s\\S]*?\\bclass\\s+([A-Za-z_$][\\w$]*))(?![\\s\\S]*?\\bnew\\s+\\1\\s*\\((?:[^,()]*(?:\\([^()]*\\)[^,()]*)*(?:,[^,()]*(?:\\([^()]*\\)[^,()]*)*){0,3})?\\))(?=[\\s\\S]*?\\bnew\\s+\\1\\s*\\([^,()]*(?:\\([^()]*\\)[^,()]*)*(?:,[^,()]*(?:\\([^()]*\\)[^,()]*)*){4})",
       "flags": "",
       "points": 0,
       "status": "pending",
@@ -127,7 +148,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a moSHion sketch for \"Lab: Attack, guard or potion\". The task: add a guarding flag that halves the next hit with floor(n / 2) in takeHit and is then cleared, a potions count (a new constructor value, so every new Fighter call gains it) and heal(), which gives up to 12 hp back capped at maxHp and uses one up, doing nothing when none are left; one act(t, a, roll) does action 1 attack, 2 guard or 3 potion; keys 1, 2 and 3 pick the action on your turn; and the enemy chooses, drinking when it is low and has a potion and guarding some of the time. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+    "prompt": "The student wrote a moSHion sketch for \"Lab: Attack, guard or potion\". The task: add a guarding flag that halves the next hit with floor(n / 2) in takeHit and is then cleared, a potions count (a new constructor value, so every new Fighter call is handed five values: name, maxHp, power, potions, color) and heal(), which gives up to 12 hp back capped at maxHp and uses one up, doing nothing when none are left; one act(t, a, roll) does action 1 attack, 2 guard or 3 potion; keys 1, 2 and 3 pick the action on your turn; and the enemy chooses, drinking when it is low and has a potion and guarding some of the time. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
     "rubric": [
       {
         "id": "r1",
@@ -151,6 +172,12 @@
         "id": "r4",
         "title": "Enemy choice",
         "description": "The enemy does not always attack.",
+        "points": 1
+      },
+      {
+        "id": "r5",
+        "title": "Five values",
+        "description": "Every new Fighter gets its potions, in fourth place.",
         "points": 1
       }
     ]
