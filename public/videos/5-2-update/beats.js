@@ -26,7 +26,7 @@
 // Every colour comes from lib/tokens.js. Helper names are up*; no lib global (frame, label, draw, tick, dot, move, rect, X,
 // NEG, T, G, path, show, hide, tw, prog, put, panel ...) is shadowed.
 'use strict';
-const CHAPTER = { number: 2, type: 'explainer', title: 'update() Runs Before Physics', kicker: 'moSHion · 5.2.21',
+const CHAPTER = { number: 2, type: 'explainer', title: 'update() Runs Before Physics', kicker: 'moSHion · Physics Feel',
   meta: 'About 2:30, with sound and captions. One play-through, no questions.', minutes: 3, language: 'en', coverGo: 'Play' };
 
 // Marks (m) exist only per sentence. A cue that belongs INSIDE a sentence is keyed to the word that says it, from the
@@ -293,7 +293,7 @@ const BEATS = [
   ['hello', 'A third function', (m, D) => {
     const p = panel(0), ST = STG(), SX = SXT();
     S.title = G(p);
-    S.kick = upText(S.title, 'moSHion · 5.2.21', { x: 70, y: 74, size: 22, fill: COL.purple, weight: 600, o: 0 });
+    S.kick = upText(S.title, 'moSHion · Physics Feel', { x: 70, y: 74, size: 22, fill: COL.purple, weight: 600, o: 0 });
     show(S.kick, m('hi', -.1), .4);
     const tt = S.titleT = upText(S.title, 'update() Runs Before Physics', { x: 70, y: 124, size: 46, fill: COL.text, weight: 600, o: 0 });
     tw(tt, { o: 1, y: 124 }, m('hi'), .5, out); put(tt, { y: 136 });
@@ -523,7 +523,7 @@ const BEATS = [
       put(S.player, { x: cvX(284), y: cvY(upJumpY(n)) });
     }, t0, t1 - t0, lin);
     // "It plays exactly like before" / "Nothing new happens on the screen."
-    const same = upText(p, 'the 5.2.10 scene, unchanged', { x: 1310, y: 706, size: 23, fill: COL.muted, weight: 500, anchor: 'middle', o: 0 });
+    const same = upText(p, 'the jump scene, unchanged', { x: 1310, y: 706, size: 23, fill: COL.muted, weight: 500, anchor: 'middle', o: 0 });
     show(same, m('play', .1), .35); hide(same, m('nothing', -.2), .3);
     // wrapped in two lines inside the pane's width (1060..1560), instead of one 539 px line from the panel border and past the pane
     S.movedNote = G(p, { o: 0 });
@@ -540,8 +540,8 @@ const BEATS = [
     row([['picture', COL.muted, 500], ['    ', COL.text], ['draw()', SX.fn, 400, MONO]], 292, m('pic', -.05), 40);
     row([['update() runs first, before physics', COL.text, 500]], 374, m('first', -.05), 34);
     show(upText(p, 'UP NEXT', { x: 800, y: 470, size: 22, fill: COL.purple, weight: 600, anchor: 'middle', o: 0 }), m('next', -.05), .35);
-    row([['5.2.22 Lab: Rules in update()', COL.text]], 540, m('next', .15), 46);
-    row([['put the rules in update(), and the picture in draw()', COL.muted]], 606, m('next', 1.1), 28, 500);
+    row([['The reading: update() runs before physics', COL.text]], 540, m('next', .15), 40);
+    row([['then put the rules in update(), the picture in draw()', COL.muted]], 606, m('next', 1.1), 28, 500);
     upHold(Math.max(D, m('bye', 1.8)) + .1);
   }],
 ].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));

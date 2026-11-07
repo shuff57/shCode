@@ -26,7 +26,7 @@
 // Every colour comes from lib/tokens.js. Helper names are fv* (new); lib globals (frame, label, draw, tick, dot, move,
 // rect, X, NEG, ...) are not shadowed.
 'use strict';
-const CHAPTER = { number: 1, type: 'explainer', title: 'Forces vs Velocity', kicker: 'moSHion · 5.2.13',
+const CHAPTER = { number: 1, type: 'explainer', title: 'Forces vs Velocity', kicker: 'moSHion · Physics Feel',
   meta: 'About 2 minutes 30 seconds, with sound and captions. One play-through, no questions.', minutes: 3, language: 'en', coverGo: 'Play' };
 
 // ---- layout (stage px, 1600x900; y >= 780 is the caption bar's, the bottom-left corner (x < 232, y > 522) is the character's) ----
@@ -294,7 +294,7 @@ const BEATS = [
   ['hello', 'Two ways to move', (m, D) => {
     const p = panel(0);
     S.title = G(p);
-    show(fvText(S.title, 'moSHion · 5.2.13', { x: 70, y: 74, size: 22, fill: COL.purple, weight: 600, o: 0 }), m('hi', -.1), .4);
+    show(fvText(S.title, 'moSHion · Physics Feel', { x: 70, y: 74, size: 22, fill: COL.purple, weight: 600, o: 0 }), m('hi', -.1), .4);
     const tt = fvText(S.title, 'Forces vs Velocity', { x: 70, y: 124, size: 46, fill: COL.text, weight: 600, o: 0 });
     tw(tt, { o: 1, y: 124 }, m('hi', .05), .5, out); put(tt, { y: 136 });
     S.code = fvCode(p, m('jump', .0));
@@ -582,8 +582,8 @@ const BEATS = [
     row([['player.applyForce(0, -3)', COL.purple, 600, MONO]], 440, m('both', .95), 36);
     row([['adds a push', COL.muted, 500]], 486, m('both', 1.15), 26);
     show(fvText(p, 'UP NEXT', { x: 800, y: 590, size: 22, fill: COL.purple, weight: 600, anchor: 'middle', o: 0 }), m('next', -.05), .35);
-    row([['5.2.14 Lab: Wind Zone', COL.text]], 650, m('next', .15), 50);
-    row([['a push that changes every frame', COL.muted, 500]], 704, m('next', 1.1), 28);
+    row([['The reading: Forces vs Velocity', COL.text]], 650, m('next', .15), 50);
+    row([['then a push that changes every frame', COL.muted, 500]], 704, m('next', 1.1), 28);
     fvHold(Math.max(D, m('bye', 1.8)) + .1);
   }],
 ].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));

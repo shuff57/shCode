@@ -683,13 +683,13 @@ window.TIMINGS = {
   ]
  },
  "close": {
-  "dur": 14.064,
+  "dur": 13.176,
   "marks": {
    "sum": 0.111,
    "ground": 3.389,
-   "rule": 5.125,
-   "next": 7.736,
-   "bye": 13.125
+   "rule": 5.278,
+   "next": 8.083,
+   "bye": 12.194
   },
   "cues": [
    [
@@ -701,19 +701,15 @@ window.TIMINGS = {
     "colliding checks the ground."
    ],
    [
-    5.125,
+    5.278,
     "Together they make the jump work."
    ],
    [
-    7.736,
-    "Next, in 5.2.11,"
+    8.083,
+    "Up next, the reading, then you add a jump yourself."
    ],
    [
-    10.431,
-    "you'll read about bounciness and friction."
-   ],
-   [
-    13.125,
+    12.194,
     "See you there!"
    ]
   ],
@@ -727,19 +723,15 @@ window.TIMINGS = {
     "colliding checks the ground."
    ],
    [
-    5.125,
+    5.278,
     "Together they make the jump work."
    ],
    [
-    7.736,
-    "Next, in 5.2.11,"
+    8.083,
+    "Up next, the reading, then you add a jump yourself."
    ],
    [
-    10.431,
-    "you'll read about bounciness and friction."
-   ],
-   [
-    13.125,
+    12.194,
     "See you there!"
    ]
   ],
@@ -753,23 +745,19 @@ window.TIMINGS = {
     "colliding checks the ground."
    ],
    [
-    5.125,
+    5.278,
     "Together they make the jump work."
    ],
    [
-    7.736,
-    "Next, in 5.2.11,"
+    8.083,
+    "Up next, the reading,"
    ],
    [
-    10.431,
-    "you'll read about"
+    10.306,
+    "then you add a jump yourself."
    ],
    [
-    11.292,
-    "bounciness and friction."
-   ],
-   [
-    13.125,
+    12.194,
     "See you there!"
    ]
   ]

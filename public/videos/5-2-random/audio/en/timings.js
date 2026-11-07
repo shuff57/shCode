@@ -732,14 +732,14 @@ window.TIMINGS = {
   ]
  },
  "close": {
-  "dur": 14.664,
+  "dur": 13.584,
   "marks": {
    "still": 0.111,
    "sum": 0.111,
-   "floor": 2.903,
-   "clock": 5.097,
-   "next": 8.903,
-   "bye": 13.931
+   "floor": 2.792,
+   "clock": 5.042,
+   "next": 9.056,
+   "bye": 12.625
   },
   "cues": [
    [
@@ -747,19 +747,19 @@ window.TIMINGS = {
     "Random gives a decimal below the top."
    ],
    [
-    2.903,
+    2.792,
     "Floor makes the number whole."
    ],
    [
-    5.097,
+    5.042,
     "frameCount is a clock: sixty frames a second."
    ],
    [
-    8.903,
-    "Up next, in 5.2.2: sparkles on a beat."
+    9.056,
+    "Up next, the reading, then sparkles on a beat."
    ],
    [
-    13.931,
+    12.625,
     "See you there!"
    ]
   ],
@@ -769,19 +769,19 @@ window.TIMINGS = {
     "Random gives a decimal below the top."
    ],
    [
-    2.903,
+    2.792,
     "Floor makes the number whole."
    ],
    [
-    5.097,
+    5.042,
     "frameCount is a clock: sixty frames a second."
    ],
    [
-    8.903,
-    "Up next, in 5.2.2: sparkles on a beat."
+    9.056,
+    "Up next, the reading, then sparkles on a beat."
    ],
    [
-    13.931,
+    12.625,
     "See you there!"
    ]
   ],
@@ -791,23 +791,27 @@ window.TIMINGS = {
     "Random gives a decimal below the top."
    ],
    [
-    2.903,
+    2.792,
     "Floor makes the number whole."
    ],
    [
-    5.097,
+    5.042,
     "frameCount is a clock:"
    ],
    [
-    7.0,
+    7.139,
     "sixty frames a second."
    ],
    [
-    8.903,
-    "Up next, in 5.2.2: sparkles on a beat."
+    9.056,
+    "Up next, the reading,"
    ],
    [
-    13.931,
+    10.75,
+    "then sparkles on a beat."
+   ],
+   [
+    12.625,
     "See you there!"
    ]
   ]

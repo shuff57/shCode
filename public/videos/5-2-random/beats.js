@@ -23,7 +23,7 @@
 // Every colour comes from lib/tokens.js. Helper names are rt* so nothing shadows a lib global (frame, label, draw, tick,
 // dot, move, rect, X, NEG, panel, show, hide, path, put, G, S ...).
 'use strict';
-const CHAPTER = { number: 1, type: 'explainer', title: 'Random Numbers and Timers, Explained', kicker: 'moSHion · 5.2.1',
+const CHAPTER = { number: 1, type: 'explainer', title: 'Random Numbers and Timers, Explained', kicker: 'moSHion · Physics Feel',
   meta: 'Under 3 minutes, with sound and captions. One play-through, no questions.', minutes: 3, language: 'en', coverGo: 'Play' };
 
 // ---- layout (stage px, 1600x900; y >= 780 is the caption bar's, x < 232 with y > 522 is the character's corner) ----
@@ -146,7 +146,7 @@ const BEATS = [
   ['hello', 'Two tools', (m, D) => {
     const p = panel(0);
     S.title = G(p);
-    show(rtText(S.title, 'moSHion · 5.2.1', { x: 70, y: 74, size: 22, fill: COL.purple, weight: 600, o: 0 }), m('still', -.1), .4);
+    show(rtText(S.title, 'moSHion · Physics Feel', { x: 70, y: 74, size: 22, fill: COL.purple, weight: 600, o: 0 }), m('still', -.1), .4);
     const t1 = rtText(S.title, 'Random Numbers', { x: 70, y: 190, size: 58, fill: COL.text, weight: 600, o: 0 });
     const t2 = rtText(S.title, 'and Timers, Explained', { x: 70, y: 254, size: 58, fill: COL.text, weight: 600, o: 0 });
     tw(t1, { o: 1, y: 190 }, m('still'), .5, out); put(t1, { y: 202 });
@@ -444,8 +444,8 @@ const BEATS = [
     row([['floor', COL.cyan, 500, MONO], ['  cuts it down to a whole number', COL.text, 500]], 296, m('floor', -.05), 38);
     row([['frameCount', COL.orange, 500, MONO], ['  is a clock: 60 frames = 1 second', COL.text, 500]], 372, m('clock', -.05), 38);
     show(rtText(p, 'UP NEXT', { x: 800, y: 470, size: 22, fill: COL.purple, weight: 600, anchor: 'middle', o: 0 }), m('next', -.05), .35);
-    row([['5.2.2 Sparkles on a Beat', COL.text]], 542, m('next', .15), 52);
-    row([['make something sparkle on every beat', COL.muted]], 606, m('next', 1.0), 30, 500);
+    row([['The reading: Random numbers and timers', COL.text]], 542, m('next', .15), 44);
+    row([['then sparkles on a beat', COL.muted]], 606, m('next', 1.0), 30, 500);
     rtHold(Math.max(D, m('bye', .9)));   // fix round (ears): end-card hold 1.8 -> 0.9 s (narration now sets the beat end)
   }],
 ].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));

@@ -719,11 +719,11 @@ window.TIMINGS = {
   ]
  },
  "close": {
-  "dur": 8.952,
+  "dur": 8.16,
   "marks": {
    "sum": 0.111,
-   "next": 3.069,
-   "bye": 7.931
+   "next": 3.111,
+   "bye": 7.194
   },
   "cues": [
    [
@@ -731,15 +731,15 @@ window.TIMINGS = {
     "Delete removes."
    ],
    [
-    1.708,
+    1.778,
     "Hide covers."
    ],
    [
-    3.069,
-    "Next is 5.2.16, where you build the finished scene."
+    3.111,
+    "Up next, the reading, then you build the finished scene."
    ],
    [
-    7.931,
+    7.194,
     "See you there!"
    ]
   ],
@@ -749,15 +749,15 @@ window.TIMINGS = {
     "Delete removes."
    ],
    [
-    1.708,
+    1.778,
     "Hide covers."
    ],
    [
-    3.069,
-    "Next is 5.2.16, where you build the finished scene."
+    3.111,
+    "Up next, the reading, then you build the finished scene."
    ],
    [
-    7.931,
+    7.194,
     "See you there!"
    ]
   ],
@@ -767,19 +767,19 @@ window.TIMINGS = {
     "Delete removes."
    ],
    [
-    1.708,
+    1.778,
     "Hide covers."
    ],
    [
-    3.069,
-    "Next is 5.2.16,"
+    3.111,
+    "Up next, the reading,"
    ],
    [
-    5.903,
-    "where you build the finished scene."
+    5.111,
+    "then you build the finished scene."
    ],
    [
-    7.931,
+    7.194,
     "See you there!"
    ]
   ]

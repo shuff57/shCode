@@ -1,12 +1,12 @@
 window.TIMINGS = {
  "hello": {
-  "dur": 18.84,
+  "dur": 17.496,
   "marks": {
    "hi": 0.125,
-   "jump": 0.889,
-   "second": 10.278,
-   "way": 12.472,
-   "this": 15.986
+   "jump": 0.875,
+   "second": 9.042,
+   "way": 11.236,
+   "this": 14.972
   },
   "cues": [
    [
@@ -14,23 +14,23 @@ window.TIMINGS = {
     "Hi!"
    ],
    [
-    0.889,
-    "In 5.2.10, the jump set the velocity directly,"
+    0.875,
+    "In the jump lab, the jump set the velocity directly,"
    ],
    [
-    5.722,
+    4.542,
     "with a line like player.vel.y = -3."
    ],
    [
-    10.278,
+    9.042,
     "That is one way to move a sprite."
    ],
    [
-    12.472,
+    11.236,
     "There is a second way, where you push instead of set."
    ],
    [
-    15.986,
+    14.972,
     "This video shows when to use which."
    ]
   ],
@@ -40,23 +40,23 @@ window.TIMINGS = {
     "Hi!"
    ],
    [
-    0.889,
-    "In 5.2.10, the jump set the velocity directly,"
+    0.875,
+    "In the jump lab, the jump set the velocity directly,"
    ],
    [
-    5.722,
+    4.542,
     "with a line like player.vel.y = -3."
    ],
    [
-    10.278,
+    9.042,
     "That is one way to move a sprite."
    ],
    [
-    12.472,
+    11.236,
     "There is a second way, where you push instead of set."
    ],
    [
-    15.986,
+    14.972,
     "This video shows when to use which."
    ]
   ],
@@ -66,31 +66,31 @@ window.TIMINGS = {
     "Hi!"
    ],
    [
-    0.889,
-    "In 5.2.10,"
+    0.875,
+    "In the jump lab,"
    ],
    [
-    3.139,
+    2.0,
     "the jump set the velocity directly,"
    ],
    [
-    5.722,
+    4.542,
     "with a line like player.vel.y = -3."
    ],
    [
-    10.278,
+    9.042,
     "That is one way to move a sprite."
    ],
    [
-    12.472,
+    11.236,
     "There is a second way,"
    ],
    [
-    13.972,
+    12.833,
     "where you push instead of set."
    ],
    [
-    15.986,
+    14.972,
     "This video shows when to use which."
    ]
   ]
@@ -686,11 +686,11 @@ window.TIMINGS = {
   ]
  },
  "close": {
-  "dur": 10.272,
+  "dur": 8.52,
   "marks": {
    "both": 0.111,
-   "next": 5.056,
-   "bye": 9.306
+   "next": 4.944,
+   "bye": 7.583
   },
   "cues": [
    [
@@ -698,15 +698,15 @@ window.TIMINGS = {
     "Two ways to move a sprite:"
    ],
    [
-    1.806,
+    1.778,
     "set the velocity, or push with a force."
    ],
    [
-    5.056,
-    "Up next, in 5.2.14, a wind zone."
+    4.944,
+    "Up next, the reading, then a wind zone."
    ],
    [
-    9.306,
+    7.583,
     "See you there!"
    ]
   ],
@@ -716,15 +716,15 @@ window.TIMINGS = {
     "Two ways to move a sprite:"
    ],
    [
-    1.806,
+    1.778,
     "set the velocity, or push with a force."
    ],
    [
-    5.056,
-    "Up next, in 5.2.14, a wind zone."
+    4.944,
+    "Up next, the reading, then a wind zone."
    ],
    [
-    9.306,
+    7.583,
     "See you there!"
    ]
   ],
@@ -734,19 +734,23 @@ window.TIMINGS = {
     "Two ways to move a sprite:"
    ],
    [
-    1.806,
+    1.778,
     "set the velocity,"
    ],
    [
-    3.292,
+    3.208,
     "or push with a force."
    ],
    [
-    5.056,
-    "Up next, in 5.2.14, a wind zone."
+    4.944,
+    "Up next, the reading,"
    ],
    [
-    9.306,
+    6.153,
+    "then a wind zone."
+   ],
+   [
+    7.583,
     "See you there!"
    ]
   ]
