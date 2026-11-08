@@ -540,6 +540,24 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   carry `MoshionPreview`'s `gameKey` (lesson id, `'sandbox'` by default, `'game-<id>'` for the Games library),
   fitted to 48 chars by `roomGameKey` in `lib/moshion-online.ts`. Tests: `scripts/test-moshion-multiplayer.mjs`.
 
+### Games library (Part B, migration 0042)
+A student publishes a moSHion sketch from the sandbox (`components/PublishGameButton.tsx`: title, share with my class,
+Update / Publish as a new game; which game the sandbox draft is published as lives in localStorage
+`shCode:sandbox-game`). Tables `library_games` (code <= 64 KB in UTF-8 bytes, `mode`/`players` read from
+`multiplayer('...', n)` by a regex that ignores comments, informational only, tombstone `deleted_at`, 30 live per
+account) and `library_game_shares`, same rules as `library_shares`: owner-only edit/delete, shared into the
+publisher's live classes (enrolled, plus taught for a teacher/admin), a class's teachers hide/unhide/remove, names as
+first name + last initial, never an email (the moderation list included). Routes: `GET|POST /api/games`,
+`GET|DELETE /api/games/[id]` (owner, or a classmate in a class it is shared to and not hidden; a teacher of the class
+gets a hidden one marked; else 404), `POST /api/games/[id]/share`, `GET /api/games/shared`,
+`GET|POST /api/classes/[id]/game-shares`. Rules in `lib/games-core.ts`, reads in `functions/_shared/games.ts`,
+browser calls and Remix in `lib/games-client.ts`. UI: Library -> Games (`components/GamesLibrary.tsx`),
+`/play?game=<id>` (`components/PlayGame.tsx`), class page Students tab "Shared games"
+(`components/ClassGamesModeration.tsx`). **A published game runs only in `MoshionPreview` on /play with
+`gameKey="game-<id>"`** (so the lobby lists only that game's rooms); nothing else may execute it. Remix writes the
+code into the `sandbox-moshion` draft, asks before replacing a draft that differs from the starter and keeps the old
+one as a History snapshot. Tests: `scripts/test-library-games.mjs`. Apply 0042 (`npm run d1:migrate`) before deploying.
+
 ## Build + deploy
 
 ```bash
