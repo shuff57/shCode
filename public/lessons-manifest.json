@@ -10089,6 +10089,19 @@
       "scoreKind": null
     },
     {
+      "id": "6-22-trail-0-reading-play-the-finished-game",
+      "title": "6.22.0 Reading: Play the finished game",
+      "unit": "6.22 Trail: plan and the path",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 17,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "6-22-trail-1-plan-break-trail-into-parts",
       "title": "6.22.1 Plan: Break Trail into parts",
       "unit": "6.22 Trail: plan and the path",
@@ -10291,6 +10304,19 @@
       "type": "lesson",
       "category": "Unit 2: moSHion: Applied Game Development",
       "week": 17,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "6-27-checkers-0-reading-play-the-finished-game",
+      "title": "6.27.0 Reading: Play the finished game",
+      "unit": "6.27 Checkers: plan and the board",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 18,
       "assignmentCode": null,
       "maxScore": null,
       "maxSubmissions": null,
@@ -12373,6 +12399,19 @@
       "week": 18,
       "assignmentCode": null,
       "maxScore": 3,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
+      "id": "7-16-quest-0-reading-play-the-finished-game",
+      "title": "7.16.0 Reading: Play the finished game",
+      "unit": "7.16 Quest: plan and the fighters",
+      "preview": "reading",
+      "type": "lesson",
+      "category": "Unit 2: moSHion: Applied Game Development",
+      "week": 19,
+      "assignmentCode": null,
+      "maxScore": null,
       "maxSubmissions": null,
       "scoreKind": null
     },

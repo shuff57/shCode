@@ -1,6 +1,6 @@
 ## Plan before you build
 
-Every game in this unit gets a plan first. A plan is not code. It is a short list that says what the game is made of, so the first thing you type is the right thing.
+Every game in this unit gets a plan first. A plan is not code. It is a short list that says what the game is made of, so the first thing you type is the right thing. (7.16.0 let you play the finished game; if you are short of ideas, play it again.)
 
 **Quest, in one paragraph.** Quest is a turn-based battle. Your hero stands on the left and an enemy on the right, each with a name, a number of hit points (hp) and a bar that shows how much is left. The two take turns. On your turn you press 1 to attack, 2 to guard (the next hit only does half) or 3 to drink a potion, which gives some hp back while you have potions left. Then the enemy takes its turn, a moment later, and chooses for itself. A fighter whose hp reaches 0 has lost. Beat one enemy and you level up and face the next, stronger one: a slime, then a goblin, then an ogre. Beat all three and you win. Over six days you will build all of it, and on day five you will duel a classmate on another computer.
 

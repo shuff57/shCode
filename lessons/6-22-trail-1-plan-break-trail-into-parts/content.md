@@ -1,6 +1,6 @@
 ## Plan before you build
 
-Every game in this unit gets a plan first. A plan is not code. It is a short list that says what the game is made of, so the first thing you type is the right thing.
+Every game in this unit gets a plan first. A plan is not code. It is a short list that says what the game is made of, so the first thing you type is the right thing. (6.22.0 let you play the finished game; if you are short of ideas, play it again.)
 
 **Trail, in one paragraph.** Trail is a race game for two players on one board. The board is a path of squares that winds back and forth across the screen. Each player has a token. On your turn you roll a die and move that many squares. Some squares do something when you land on them: one sends you ahead, one sends you back, one makes you miss a turn. The first token to reach the last square wins. Over five days you will build all of it, and on day four you will play it against a classmate on another computer.
 

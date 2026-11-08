@@ -7,6 +7,7 @@
       "title": "plan and the board",
       "objective": "A board is a grid of letters, built with two loops; a square is dark when (r + c) % 2 is 1, and each side fills its three rows.",
       "screens": [
+        "6-27-checkers-0-reading-play-the-finished-game",
         "6-27-checkers-1-plan-break-checkers-into-parts",
         "6-27-checkers-2-reading-a-board-is-a-grid-of-letters",
         "6-27-checkers-3-sub-a-checkered-board",

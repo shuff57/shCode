@@ -7,6 +7,7 @@
       "title": "plan and the fighters",
       "objective": "One class makes every fighter: a constructor stores its name, hp and power, isAlive() answers a question, and a draw(x, y) method draws the fighter and an hp bar scaled by hp / maxHp.",
       "screens": [
+        "7-16-quest-0-reading-play-the-finished-game",
         "7-16-quest-1-plan-break-quest-into-parts",
         "7-16-quest-2-reading-one-class-many-fighters",
         "7-16-quest-3-sub-an-object-that-draws-itself",

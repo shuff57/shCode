@@ -7,6 +7,7 @@
       "title": "plan and the path",
       "objective": "A board is a list of squares made from one line of text, and the rows snake back and forth.",
       "screens": [
+        "6-22-trail-0-reading-play-the-finished-game",
         "6-22-trail-1-plan-break-trail-into-parts",
         "6-22-trail-2-reading-a-path-is-a-list-of-squares",
         "6-22-trail-3-sub-a-path-from-a-list",

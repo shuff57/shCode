@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { Play, RotateCcw } from 'lucide-react';
 import MoshionPreview from './MoshionPreview';
@@ -28,9 +28,65 @@ interface Props {
 const DEFAULT_SIZE = { w: 440, h: 440 };
 
 // The runner takes the sketch in its URL (?code=base64), and a server answers 431 once the whole
-// request line passes ~16 KB. The student never reads this code, so the comments and blank lines
-// that make a long demo readable to its author are dropped before it is sent. Only whole-line
-// comments and a trailing `// ...` with no quote after it are touched, so a string is never cut.
+// request line passes ~16 KB. The student never reads this code, so it is packed before it is
+// sent: comments go, and so does every space and line break the code does not need. Strings are
+// copied untouched. A line break stays wherever leaving it out could change what the code means
+// (the end of a statement with no semicolon), and a space stays between two word characters and
+// in the few pairs that would merge into another token (`+ +`, `- -`, `/ /`, `/ *`, `* /`, `1 .x`).
+// The demos carry no regex literals; if packing ever produced code that does not parse, the
+// older comment-only slimming is used instead. Measured on the six demos: the packed sketch draws
+// exactly the same frames as the source under the same input (moshion-harness).
+const WORD = /[A-Za-z0-9_$#\u0080-\uffff]/;
+const JOIN_AFTER = '{;,([';
+
+function keepSpace(a: string, b: string): boolean {
+  if (WORD.test(a) && WORD.test(b)) return true;
+  if ((a === '+' || a === '-') && a === b) return true;
+  if (a === '/' && (b === '/' || b === '*')) return true;
+  if (a === '*' && b === '/') return true;
+  if (b === '.' && WORD.test(a)) return true;
+  if (a === '.' && /[0-9]/.test(b)) return true;
+  if (a === '<' && b === '!') return true;
+  if (a === '-' && b === '>') return true;
+  return false;
+}
+
+export function packForUrl(code: string): string {
+  let out = '';
+  let i = 0;
+  let space = false;
+  let newline = false;
+  const n = code.length;
+  while (i < n) {
+    const ch = code[i];
+    if (ch === ' ' || ch === '\t' || ch === '\r') { space = true; i++; continue; }
+    if (ch === '\n') { newline = true; i++; continue; }
+    if (ch === '/' && code[i + 1] === '/') { while (i < n && code[i] !== '\n') i++; continue; }
+    if (ch === '/' && code[i + 1] === '*') { const e = code.indexOf('*/', i + 2); i = e < 0 ? n : e + 2; space = true; continue; }
+    const prev = out[out.length - 1];
+    if (out && newline && !JOIN_AFTER.includes(prev)) out += '\n';
+    else if (out && (space || newline) && keepSpace(prev, ch)) out += ' ';
+    space = false;
+    newline = false;
+    if (ch === '"' || ch === "'" || ch === '`') {
+      let j = i + 1;
+      while (j < n && code[j] !== ch) { if (code[j] === '\\') j++; j++; }
+      out += code.slice(i, j + 1);
+      i = j + 1;
+      continue;
+    }
+    out += ch;
+    i++;
+  }
+  try {
+    new Function(out);
+  } catch (err) {
+    if (err instanceof SyntaxError) return slimForUrl(code);
+  }
+  return out;
+}
+
+// Comment-only slimming: whole-line comments and a trailing `// ...` with no quote after it.
 function slimForUrl(code: string): string {
   return code
     .split('\n')
@@ -41,6 +97,11 @@ function slimForUrl(code: string): string {
     .map((line) => line.replace(/\s+\/\/[^'"`]*$/, '').trimEnd())
     .join('\n');
 }
+
+// A sketch that calls multiplayer('versus' | 'coop') gets the lobby bar above its canvas
+// (components/MoshionLobby.tsx). In a fixed-shape stage that bar would squeeze the game, so an
+// online demo's stage grows by the bar's height instead and the canvas keeps its own shape.
+const ONLINE_RX = /\bmultiplayer\(\s*['"](versus|coop)['"]/;
 
 export default function DemoGameBlock({ code, blockId, size = DEFAULT_SIZE, label }: Props) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -77,25 +138,32 @@ export default function DemoGameBlock({ code, blockId, size = DEFAULT_SIZE, labe
 
   const playing = runKey > 0;
   const name = label ?? 'Game demo';
+  const online = ONLINE_RX.test(code);
+  const packed = useMemo(() => packForUrl(code), [code]);
 
   return (
     <div
       ref={rootRef}
-      className="demogame"
+      className={online ? 'demogame demogame-online' : 'demogame'}
       role="group"
       aria-label={name}
       data-block={blockId}
       style={
         {
           // Never wider than the canvas, and never so wide that its height outgrows the window:
-          // 150px is the fixed header and progress bar plus the Restart row.
-          maxWidth: `min(${size.w}px, max(240px, calc((100vh - 150px) * ${size.w / size.h})))`,
+          // 150px is the fixed header and progress bar plus the Restart row, and an online demo
+          // leaves another 110px for the lobby bar once it is in a room.
+          maxWidth: `min(${size.w}px, max(240px, calc((100vh - ${online ? 260 : 150}px) * ${size.w / size.h})))`,
         } as CSSProperties
       }
     >
-      <div className="demogame-stage" style={{ aspectRatio: `${size.w} / ${size.h}` }}>
+      <div
+        className="demogame-stage"
+        style={online && playing ? undefined : { aspectRatio: `${size.w} / ${size.h}` }}
+      >
         {playing ? (
-          <MoshionPreview ref={iframeRef} code={slimForUrl(code)} runKey={runKey} />
+          // A per-demo game key: the lobby's Open rooms lists only rooms made from this same demo.
+          <MoshionPreview ref={iframeRef} code={packed} runKey={runKey} gameKey={'demo-' + (blockId ?? 'game')} />
         ) : (
           <button type="button" className="demogame-start" onClick={play}>
             <span className="demogame-start-icon" aria-hidden="true">
@@ -185,6 +253,19 @@ export default function DemoGameBlock({ code, blockId, size = DEFAULT_SIZE, labe
         .demogame-note {
           font-size: 12px;
           color: var(--c-dim);
+        }
+        /* Online: the lobby bar sits above the canvas at its own height (scrolling past 240px)
+           and the canvas keeps the sketch's shape, instead of both sharing a fixed box. */
+        .demogame-online .demogame-stage .moshion-preview-wrap {
+          height: auto !important;
+        }
+        .demogame-online .demogame-stage [data-testid='moshion-lobby'] {
+          max-height: 240px !important;
+        }
+        .demogame-online .demogame-stage .reshape-frame {
+          flex: none !important;
+          height: auto !important;
+          aspect-ratio: ${size.w} / ${size.h};
         }
         @media (prefers-reduced-motion: reduce) {
           .demogame-start-icon { transition: none; }

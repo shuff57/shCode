@@ -1,6 +1,6 @@
 ## Plan before you build
 
-Every game in this unit gets a plan first. A plan is not code. It is a short list that says what the game is made of, so the first thing you type is the right thing.
+Every game in this unit gets a plan first. A plan is not code. It is a short list that says what the game is made of, so the first thing you type is the right thing. (6.27.0 let you play the finished game; if you are short of ideas, play it again.)
 
 **Checkers, in one paragraph.** Checkers is a game for two players on an 8 by 8 board of light and dark squares. Each player starts with twelve pieces on the dark squares: black along the top, red along the bottom. On your turn you move one of your pieces one square diagonally forward. If an enemy piece is right next to yours and the square behind it is empty, you can jump over it and take it off the board, and if that piece can jump again, it must keep going. A piece that reaches the far side becomes a king, which can move backward too. The player who has no move left, because their pieces are all gone or all stuck, loses. Over six days you will build all of it, and on day five you will play it against a classmate on another computer.
 

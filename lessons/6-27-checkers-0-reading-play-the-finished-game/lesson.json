@@ -1,0 +1,20 @@
+{
+  "id": "6-27-checkers-0-reading-play-the-finished-game",
+  "title": "6.27.0 Reading: Play the finished game",
+  "description": "Play the finished checkers game before you build any of it, on one computer or online with a classmate. Names the parts it is made of and the module where each one is built, and says plainly which parts come later.",
+  "type": "lesson",
+  "estimateMins": 5,
+  "category": "Unit 2: moSHion: Applied Game Development",
+  "unit": "6.27 Checkers: plan and the board",
+  "preview": "reading",
+  "week": 18,
+  "slos": [
+    "SLO-3"
+  ],
+  "contentFile": "content.md",
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}
