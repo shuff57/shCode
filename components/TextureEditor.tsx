@@ -33,6 +33,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import LibrarySyncNote from './LibrarySyncNote';
 import ShareToggle from './ShareToggle';
 import ClassLibrary from './ClassLibrary';
+import { editParam } from '../lib/remix';
 import {
   listSavedTextures,
   saveTexture,
@@ -479,6 +480,19 @@ export default function TextureEditor() {
     img.onerror = () => setMessage({ text: `Could not load ${label}.`, bad: true });
     img.src = src;
   }, [commit, snapshot]);
+
+  // Remix from the Library (lib/remix.ts): /textures/?edit=<name> opens that
+  // saved texture as soon as the editor loads.
+  const remixDone = useRef(false);
+  useEffect(() => {
+    if (remixDone.current) return;
+    const want = editParam();
+    if (!want) return;
+    const t = listSavedTextures().find((x) => x.name === want);
+    if (!t) return;
+    remixDone.current = true;
+    loadImage(t.dataUrl, t.name, t.frames, t.frameDelay, t.delays);
+  }, [loadImage]);
 
   // ---- painting ----------------------------------------------------------
 

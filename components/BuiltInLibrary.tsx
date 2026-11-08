@@ -3,9 +3,9 @@
 // "Built in" on the Library page and tab: every texture and sound that ships
 // with moSHion, so a student can find them without the docs. A built-in works
 // in any sketch straight away (`sprite.texture = 'sword'`,
-// `loadSound('/moshion/assets/dice.wav')`); Copy to mine makes an editable copy
-// in the student's own library (and so their account), where the Texture editor
-// or the Sound mixer can change it and Share can hand it to the class.
+// `loadSound('/moshion/assets/dice.wav')`); Remix makes an editable copy in the
+// student's own library (and so their account) and opens it in the Texture
+// editor or the Sound mixer (lib/remix.ts); Share can then hand it to the class.
 //
 // Textures come from public/moshion/textures/textures.json (made by
 // scripts/make-moshion-textures.py from a CC0 sheet); sounds from PALETTE in
@@ -15,6 +15,7 @@ import { useEffect, useState } from 'react';
 import { DESIGN_BASE, PALETTE } from '../lib/sound/presets';
 import { freshName } from '../lib/library-sync';
 import { listSavedSounds, listSavedTextures, saveSound, saveTexture } from '../lib/moshion-storage';
+import { openEditor, prepareTab } from '../lib/remix';
 
 interface TexEntry { file: string; w: number; h: number; group: string; frames?: number; frameDelay?: number }
 interface Catalog { base: string; textures: Record<string, TexEntry> }
@@ -56,27 +57,35 @@ export default function BuiltInLibrary({ onMessage }: { onMessage?: (text: strin
     );
   };
 
-  const copyTexture = async (name: string, t: TexEntry) => {
+  // Remix: a copy in your own library, opened in the Texture editor to change.
+  const remixTexture = async (name: string, t: TexEntry) => {
+    const tab = prepareTab();
     try {
       const taken = new Set(listSavedTextures().map((x) => x.name));
       const mine = taken.has(name) ? freshName(name, taken) : name;
       const dataUrl = await asDataUri((cat?.base ?? '/moshion/textures/') + t.file);
       const err = saveTexture(mine, dataUrl, t.frames && t.frames > 1 ? { frames: t.frames, frameDelay: t.frameDelay ?? 6 } : undefined);
-      onMessage?.(err ?? `Copied "${name}" into yours as "${mine}". Open it in the Texture editor to change it.`, !!err);
+      if (err) { tab?.close(); onMessage?.(err, true); return; }
+      openEditor('texture', mine, tab);
     } catch {
+      tab?.close();
       onMessage?.('Could not copy that texture. Try again.', true);
     }
   };
 
-  const copySound = async (p: (typeof PALETTE)[number]) => {
+  // Remix: a copy in your own library, opened in the Sound mixer to change.
+  const remixSound = async (p: (typeof PALETTE)[number]) => {
+    const tab = prepareTab();
     try {
       const taken = new Set(listSavedSounds().map((x) => x.name));
       const mine = taken.has(p.name) ? freshName(p.name, taken) : p.name;
       const dataUri = await asDataUri(p.file);
       const def = p.def ? { ...DESIGN_BASE, ...p.def } : undefined;
       const err = saveSound(mine, dataUri, { kind: p.kind, source: p.source, ...(def ? { def } : {}) });
-      onMessage?.(err ?? `Copied "${p.label}" into yours as "${mine}". Play it with loadSound('${mine}').`, !!err);
+      if (err) { tab?.close(); onMessage?.(err, true); return; }
+      openEditor('sound', mine, tab);
     } catch {
+      tab?.close();
       onMessage?.('Could not copy that sound. Try again.', true);
     }
   };
@@ -91,8 +100,8 @@ export default function BuiltInLibrary({ onMessage }: { onMessage?: (text: strin
       <h3 id="builtin-h" style={{ fontSize: 14, margin: '0 0 4px', color: 'var(--c-fg)' }}>Built in</h3>
       <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: '0 0 10px', lineHeight: 1.5 }}>
         These work in any sketch with no saving. <strong style={{ color: 'var(--c-fg)' }}>Copy code</strong> copies the
-        line that uses one; <strong style={{ color: 'var(--c-fg)' }}>Copy to mine</strong> makes your own copy you can change
-        and share.
+        line that uses one; <strong style={{ color: 'var(--c-fg)' }}>Remix</strong> makes your own copy and opens it in the
+        Texture editor or Sound mixer, so you can change it, save it and share it.
       </p>
 
       <details open>
@@ -120,8 +129,8 @@ export default function BuiltInLibrary({ onMessage }: { onMessage?: (text: strin
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: '100%' }}>
                     <button type="button" style={small} onClick={() => copyText(`sprite.texture = '${name}';`)}
                       aria-label={`Copy code for ${name}`}>Copy code</button>
-                    <button type="button" style={small} onClick={() => void copyTexture(name, t)}
-                      aria-label={`Copy ${name} to mine`}>Copy to mine</button>
+                    <button type="button" style={small} onClick={() => void remixTexture(name, t)}
+                      aria-label={`Remix ${name}`} title="Make your own copy and open it in the Texture editor">Remix</button>
                   </div>
                 </div>
               ))}
@@ -146,8 +155,8 @@ export default function BuiltInLibrary({ onMessage }: { onMessage?: (text: strin
               <span style={{ fontSize: 12 }}>{p.label}</span>
               <button type="button" style={small} onClick={() => copyText(`let ${p.name} = loadSound('${p.file}');`)}
                 aria-label={`Copy code for ${p.label}`}>Copy code</button>
-              <button type="button" style={small} onClick={() => void copySound(p)}
-                aria-label={`Copy ${p.label} to mine`}>Copy to mine</button>
+              <button type="button" style={small} onClick={() => void remixSound(p)}
+                aria-label={`Remix ${p.label}`} title="Make your own copy and open it in the Sound mixer">Remix</button>
             </div>
           ))}
         </div>

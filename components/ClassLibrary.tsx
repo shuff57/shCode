@@ -9,6 +9,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { freshName, LIBRARY_SHARES_CHANGED } from '../lib/library-sync';
 import { addToLibrary, localLibraryItems, type LibraryKind } from '../lib/moshion-storage';
+import { openEditor, prepareTab } from '../lib/remix';
 
 interface SharedItem {
   id: string;
@@ -69,16 +70,20 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
 
   if (!items || items.length === 0) return null;
 
-  const copy = async (it: SharedItem) => {
+  // Remix: Copy to mine, then open the copy in its editor (lib/remix.ts).
+  const copy = async (it: SharedItem, remix = false) => {
+    const tab = remix ? prepareTab() : null;
     const content = await fetchArt(it.id);
-    if (!content) { onMessage?.('That is no longer in the Library.', true); return; }
+    if (!content) { tab?.close(); onMessage?.('That is no longer in the Library.', true); return; }
     const taken = new Set(localLibraryItems().filter((l) => l.kind === kind).map((l) => l.name));
     const name = taken.has(it.name) ? freshName(it.name, taken) : it.name;
     if (!addToLibrary({ kind, name, dataUri: content.dataUri, meta: content.meta })) {
+      tab?.close();
       onMessage?.('Your library is full. Delete something you no longer need first.', true);
       return;
     }
     onCopied?.();
+    if (remix) { openEditor(kind, name, tab); return; }
     onMessage?.(
       kind === 'texture'
         ? `Copied "${it.name}" from ${it.owner} as "${name}". Use it with sprite.texture = '${name}'.`
@@ -118,10 +123,18 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
               <div style={{ color: 'var(--c-dim)' }}>{it.mine ? 'yours' : it.owner}{it.hidden ? ' · hidden by teacher' : ''}</div>
             </div>
             {!it.mine && (
-              <button type="button" onClick={() => void copy(it)} style={{
-                fontSize: 11, padding: '2px 6px', borderRadius: 4, cursor: 'pointer',
-                background: 'transparent', color: 'var(--c-cyan)', border: '1px solid var(--c-line)',
-              }}>Copy to mine</button>
+              <div style={{ display: 'flex', flexDirection: kind === 'texture' ? 'column' : 'row', gap: 4 }}>
+                <button type="button" onClick={() => void copy(it)} style={{
+                  fontSize: 11, padding: '2px 6px', borderRadius: 4, cursor: 'pointer', whiteSpace: 'nowrap',
+                  background: 'transparent', color: 'var(--c-cyan)', border: '1px solid var(--c-line)',
+                }}>Copy to mine</button>
+                <button type="button" onClick={() => void copy(it, true)} aria-label={`Remix ${it.name}`}
+                  title={kind === 'texture' ? 'Make your own copy and open it in the Texture editor' : 'Make your own copy and open it in the Sound mixer'}
+                  style={{
+                    fontSize: 11, padding: '2px 6px', borderRadius: 4, cursor: 'pointer', whiteSpace: 'nowrap',
+                    background: 'transparent', color: 'var(--c-cyan)', border: '1px solid var(--c-line)',
+                  }}>Remix</button>
+              </div>
             )}
           </div>
         ))}

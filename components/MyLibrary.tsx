@@ -8,9 +8,11 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import ShareToggle from './ShareToggle';
 import { LIBRARY_LOCAL_CHANGE, LIBRARY_UPDATED, listSavedSounds, listSavedTextures } from '../lib/moshion-storage';
 import { LIBRARY_SYNC_STATUS, signedInForSync } from '../lib/library-sync';
+import { editorUrl } from '../lib/remix';
 
 type Row = { kind: 'texture' | 'sound'; name: string; dataUri: string };
 
@@ -27,6 +29,9 @@ const tile: React.CSSProperties = {
 
 export default function MyLibrary({ onMessage }: { onMessage?: (text: string, bad: boolean) => void }) {
   const [rows, setRows] = useState<Row[] | null>(null);
+  // Edit leaves the page. From a lesson's Library tab it opens a new tab, so
+  // the lesson stays where it was; on the Library page it stays in this tab.
+  const away = !(usePathname() ?? '').startsWith('/library') ? { target: '_blank', rel: 'noopener noreferrer' } : {};
   const [, bump] = useState(0);
 
   useEffect(() => {
@@ -72,6 +77,7 @@ export default function MyLibrary({ onMessage }: { onMessage?: (text: string, ba
               </div>
               <code style={{ fontSize: 11, wordBreak: 'break-all', textAlign: 'center' }}>{t.name}</code>
               <ShareToggle kind="texture" name={t.name} onMessage={onMessage} />
+              <Link href={editorUrl('texture', t.name)} {...away} style={{ fontSize: 11, color: 'var(--c-cyan)' }}>Edit</Link>
             </div>
           ))}
         </div>
@@ -85,6 +91,7 @@ export default function MyLibrary({ onMessage }: { onMessage?: (text: string, ba
                 style={{ background: 'transparent', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4, cursor: 'pointer', padding: '2px 8px' }}>▶</button>
               <code style={{ fontSize: 11 }}>{s.name}</code>
               <ShareToggle kind="sound" name={s.name} onMessage={onMessage} />
+              <Link href={editorUrl('sound', s.name)} {...away} style={{ fontSize: 11, color: 'var(--c-cyan)' }}>Edit</Link>
             </div>
           ))}
         </div>

@@ -21,6 +21,7 @@
 // loadSound() resolves the name. No API route, no upload, no quota.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { editParam } from '../lib/remix';
 import {
   deleteSavedSound,
   listSavedSounds,
@@ -661,6 +662,19 @@ export default function SoundMixer() {
     if (s.kind === 'sfx') setTweakId(id);
     setMessage({ text: `Editing "${s.name}". Change it, then press Save again.`, bad: false });
   }, []);
+
+  // Remix from the Library (lib/remix.ts): /sound/?edit=<name> opens that saved
+  // sound as a channel as soon as the mixer loads.
+  const remixDone = useRef(false);
+  useEffect(() => {
+    if (remixDone.current) return;
+    const want = editParam();
+    if (!want) return;
+    const s = listSavedSounds().find((x) => x.name === want);
+    if (!s) return;
+    remixDone.current = true;
+    editSaved(s);
+  }, [editSaved]);
 
   const copy = useCallback(async (text: string) => {
     try {
