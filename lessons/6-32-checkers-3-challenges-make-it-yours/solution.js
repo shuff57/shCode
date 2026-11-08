@@ -9,7 +9,7 @@ const N = 8;              // 8 rows and 8 columns
 const CELL = 60;          // each square is 60 by 60 pixels
 const TOP = 50;           // the words live in the strip above the board
 
-const JOIN = '';          // a classmate's room code, e.g. 'K7QX2M'
+const JOIN = '';          // a classmate's room code, e.g. 'BHKE'
 
 let grid;                 // grid[r][c]: '' empty, 'r' red, 'b' black, 'R' and 'B' kings
 let turn = 'r';           // whose turn: 'r' or 'b'

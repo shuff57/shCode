@@ -3,7 +3,7 @@
 // send that action; every action, yours too, arrives in onMove in the same
 // order on both computers.
 
-const JOIN = '';          // the host's room code, e.g. 'K7QX2M'
+const JOIN = '';          // the host's room code, e.g. 'BHKE'
 const NAMES = ['', 'attack', 'guard', 'potion'];
 let got = [];             // every action that has arrived
 

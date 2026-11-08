@@ -7,7 +7,7 @@ const COLS = 10;          // squares per row; the path snakes back on each new r
 const SIZE = 56;          // each square is 56 by 56 pixels
 const TOP = 60;           // the words live in the strip above the board
 
-const JOIN = '';          // a classmate's room code, e.g. 'K7QX2M'
+const JOIN = '';          // a classmate's room code, e.g. 'BHKE'
 
 let path;                 // path[i] is { x, y, kind } for square i
 let players;              // players[p] is { name, color, at, waiting }

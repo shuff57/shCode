@@ -19,7 +19,7 @@ export const onRequestPost: PagesFunction<Env, 'code', SessionData> = async ({ e
   try { body = await request.json(); } catch { /* no body: device '' */ }
   const device = deviceOf(body?.device);
   const code = normalizeCode(params.code);
-  if (!code) return json({ error: 'A room code is 6 letters and digits.' }, 400);
+  if (!code) return json({ error: 'A room code is 4 pictures (4 letters, like BHKE).' }, 400);
   const now = Date.now();
   const room = await getRoom(env.DB, code);
   if (!room || !(await mayJoin(env.DB, room.host_email, data.email, data.role, now))) return json({ error: NOT_FOUND }, 404);

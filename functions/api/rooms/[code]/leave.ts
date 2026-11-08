@@ -13,7 +13,7 @@ export const onRequestPost: PagesFunction<Env, 'code', SessionData> = async ({ e
   try { body = await request.json(); } catch { /* no body */ }
   const device = deviceOf(body?.device);
   const code = normalizeCode(params.code);
-  if (!code) return json({ error: 'A room code is 6 letters and digits.' }, 400);
+  if (!code) return json({ error: 'A room code is 4 pictures (4 letters, like BHKE).' }, 400);
   const room = await getRoom(env.DB, code);
   if (!room) return json({ error: 'You are not in that room.' }, 404);
   const now = Date.now();

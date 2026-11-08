@@ -76,7 +76,7 @@
     {
       "id": "s8",
       "title": "Duel a classmate",
-      "instructions": "Host in one tab: press H and read the code. In a second tab (or on a classmate's computer), put that code in `JOIN`, for example `const JOIN = 'K7QX2M';`, and Run. Both tops now say Online duel. Play to a win.\n\n**To duel again:** press Stop, then Run, in both tabs. Only ONE player presses H; the other puts the NEW code in `JOIN` and runs again. If both press H, you are in two different rooms. Running again with the OLD code joins the old room and shows the finished duel again: only a new code starts a new duel.\n\n**When you are done:** set `JOIN` back to `''`. 7.21.3 starts from this code, and a code left in `JOIN` would join the old duel instead of starting the campaign.",
+      "instructions": "Host in one tab: press H and read the code. In a second tab (or on a classmate's computer), put that code in `JOIN`, for example `const JOIN = 'BHKE';`, and Run. Both tops now say Online duel. Play to a win.\n\n**To duel again:** press Stop, then Run, in both tabs. Only ONE player presses H; the other puts the NEW code in `JOIN` and runs again. If both press H, you are in two different rooms. Running again with the OLD code joins the old room and shows the finished duel again: only a new code starts a new duel.\n\n**When you are done:** set `JOIN` back to `''`. 7.21.3 starts from this code, and a code left in `JOIN` would join the old duel instead of starting the campaign.",
       "hints": [
         "You must be signed in and in a class to play online.",
         "Press a key when it is not your turn: nothing happens, on either computer."

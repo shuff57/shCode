@@ -527,8 +527,18 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   per player, 3 open rooms per host, the host leaving closes the room. Names are first name + last initial.
   A seat is an account in one browser TAB (`device`, a random id per tab in sessionStorage): a rerun in the same tab
   keeps the seat, a second tab of the same account takes the next one, so a student can test two-player play alone.
-  Routes: `POST /api/rooms`, `GET /api/rooms/[code]?after=N`, `POST .../join|send|leave`. Tests:
-  `scripts/test-rooms.mjs`. In dev, two `dev_student` cookies are two classmates.
+  Routes: `POST /api/rooms`, `GET /api/rooms?game=<key>` (the lobby's open rooms: classmates' hosts only, this game
+  key only, not full/closed/expired, names never emails), `GET /api/rooms/[code]?after=N`, `POST .../join|send|leave`.
+  Tests: `scripts/test-rooms.mjs`. In dev, two `dev_student` cookies are two classmates.
+- Room codes are **4 pictures** (2026-11-07): 4 letters from 16, one per built-in texture, listed once in
+  `lib/room-icons.ts` (server and page both import it; order = code, never reorder). An open room's code is never
+  reissued; a closed/expired one may be. Old 6-character codes are still accepted. The sketch gets
+  `online.codeIcons` from the page.
+- `multiplayer(mode, players)` (extras.js; spec `codehs-review/MULTIPLAYER-SPEC.md`): `'none' | 'local' | 'coop' |
+  'versus'`, 2-4 players; adds `game`, `players`, `turn`, `nextTurn()`, `myTurn()`, `seat` only when called and only
+  where the sketch has no name of its own. Online modes show `components/MoshionLobby.tsx` above the canvas; rooms
+  carry `MoshionPreview`'s `gameKey` (lesson id, `'sandbox'` by default, `'game-<id>'` for the Games library),
+  fitted to 48 chars by `roomGameKey` in `lib/moshion-online.ts`. Tests: `scripts/test-moshion-multiplayer.mjs`.
 
 ## Build + deploy
 

@@ -2,7 +2,7 @@
 // to join, put the host's code in JOIN and run. SPACE sends a random number;
 // every number sent, yours too, arrives in onMove in the same order.
 
-const JOIN = '';          // the host's room code, e.g. 'K7QX2M'
+const JOIN = '';          // the host's room code, e.g. 'BHKE'
 let got = [];             // every number that has arrived, in order
 
 function setup() {

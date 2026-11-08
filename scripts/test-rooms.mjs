@@ -11,7 +11,10 @@
 //      closes the room;
 //   4. polling returns moves in order after a seq, names as first name +
 //      last initial and never an email; only players can read a room;
-//   5. a player is rate limited.
+//   5. a player is rate limited;
+//   6. the open-rooms list (GET /api/rooms?game=): classmates' rooms only,
+//      this game key only, never a full / closed / expired room, no emails;
+//      a game key may be up to 48 characters of a-z, 0-9 and dashes.
 //
 // Run: node scripts/test-rooms.mjs
 
@@ -62,6 +65,7 @@ const host = (u, body = { game: 'race', seats: 2 }) => call(create, 'onRequestPo
 const joinRoom = (u, code) => call(joinR, 'onRequestPost', u, 'POST', `/api/rooms/${code}/join`, { code });
 const send = (u, code, data, raw) => call(sendR, 'onRequestPost', u, 'POST', `/api/rooms/${code}/send`, { code }, raw ?? { data });
 const poll = (u, code, after = 0) => call(pollR, 'onRequestGet', u, 'GET', `/api/rooms/${code}?after=${after}`, { code });
+const list = (u, game, device) => call(create, 'onRequestGet', u, 'GET', `/api/rooms?game=${encodeURIComponent(game)}${device ? `&device=${device}` : ''}`);
 const leave = (u, code) => call(leaveR, 'onRequestPost', u, 'POST', `/api/rooms/${code}/leave`, { code });
 
 // ---- checkGameData ----
@@ -79,7 +83,17 @@ check('data: Infinity refused', !ok(Infinity));
 check('data: too deep refused', !ok([[[[[1]]]]]));
 check('data: 65 items refused', !ok(new Array(65).fill(0)));
 check('data: over 1 KB refused', !ok(Array.from({ length: 60 }, () => 'abcdefghijklmnopqrst')));
-check('code: normalise typed code', shared.normalizeCode(' abc-23x ') === 'ABC23X' && shared.normalizeCode('ABC1IO') === null);
+check('code: an old 6-character code is still accepted', shared.normalizeCode(' abc-23x ') === 'ABC23X' && shared.normalizeCode('ABC1IO') === null);
+check('code: a picture code (4 of the 16 letters) as typed', shared.normalizeCode(' bh-ke ') === 'BHKE' && shared.normalizeCode('BHKT') === null && shared.normalizeCode('BHK') === null && shared.normalizeCode('BHKEA') === null);
+{
+  const icons = await import(join(root, 'lib/room-icons.ts'));
+  check('code: 16 pictures, 16 distinct letters', icons.ROOM_ICONS.length === 16 && new Set(icons.ROOM_ICONS).size === 16 && icons.ROOM_CODE_LETTERS.length === 16 && new Set(icons.ROOM_CODE_LETTERS).size === 16);
+  check('code: the agreed picture order', icons.ROOM_ICONS.join() === 'coin,star,heart,gem,key,slime,bee,bat,ghost,fish,frog,mushroom,cactus,crate,bomb,apple');
+  check('code: BHKE is star, bat, fish, key', JSON.stringify(icons.codeIcons('bhke')) === '["star","bat","fish","key"]' && icons.codeIcons('K7QX2M') === null);
+  let all = true;
+  for (let i = 0; i < 300; i++) { const c = shared.newRoomCode(); if (!/^[ABCDEFGHJKMNPQRS]{4}$/.test(c) || shared.normalizeCode(c) !== c) all = false; }
+  check('code: newRoomCode makes 4 letters from the 16', all);
+}
 
 // ---- hosting ----
 let r = await host(GUS);
@@ -89,7 +103,7 @@ check('bad game name 400', r.status === 400, r);
 r = await host(ANN, { game: 'race', seats: 9 });
 check('9 seats 400', r.status === 400, r);
 r = await host(ANN);
-check('host', r.status === 201 && shared.CODE_RE.test(r.body.code) && r.body.seat === 0, r);
+check('host', r.status === 201 && /^[ABCDEFGHJKMNPQRS]{4}$/.test(r.body.code) && r.body.seat === 0, r);
 const code = r.body.code;
 
 // ---- joining ----
@@ -179,6 +193,100 @@ check('closed room refuses joins 410', r.status === 410, r);
   t = await call(leaveR, 'onRequestPost', CY, 'POST', `/api/rooms/${c3}/leave`, { code: c3 }, { device: tabA });
   t = await pollT(CY, c3, tabA);
   check('host tab leaving closes it', t.body.state === 'closed', t.body);
+}
+
+// ---- the game key (widened to 48) ----
+{
+  const k48 = 'a' + '-b'.repeat(23) + 'c';   // 48 characters
+  let t = await host(DEE, { game: k48, seats: 2 });
+  check('48-character game key accepted', k48.length === 48 && t.status === 201 && t.body.game === k48, t);
+  await call(leaveR, 'onRequestPost', DEE, 'POST', `/api/rooms/${t.body.code}/leave`, { code: t.body.code });
+  t = await host(DEE, { game: k48 + 'd', seats: 2 });
+  check('49-character game key refused', t.status === 400 && /48/.test(t.body.error), t);
+  t = await host(DEE, { game: 'game_one', seats: 2 });
+  check('underscore in a game key refused', t.status === 400, t);
+  t = await host(DEE, { game: 'Game-7F3A', seats: 2 });
+  check('game key is lower-cased', t.status === 201 && t.body.game === 'game-7f3a', t);
+  await call(leaveR, 'onRequestPost', DEE, 'POST', `/api/rooms/${t.body.code}/leave`, { code: t.body.code });
+  t = await list(ANN, 'Bad Key!');
+  check('list: a bad key is 400', t.status === 400, t);
+}
+
+// ---- the open-rooms list ----
+{
+  const roomA = (await host(ANN, { game: 'lobby-a', seats: 2 })).body.code;       // listed
+  const roomD = (await host(DEE, { game: 'lobby-a', seats: 2 })).body.code;       // another class
+  const roomB = (await host(BO, { game: 'lobby-b', seats: 2 })).body.code;        // another game
+  const roomFull = (await host(CY, { game: 'lobby-a', seats: 2 })).body.code;     // full
+  await joinRoom(BO, roomFull);
+  const roomShut = (await host(ANN, { game: 'lobby-a', seats: 3 })).body.code;    // closed
+  await leave(ANN, roomShut);
+  const roomOld = (await host(TEACH, { game: 'lobby-a', seats: 2 })).body.code;   // expired
+  sql(`UPDATE game_rooms SET expires_at = ? WHERE code = ?`, Date.now() - 1, roomOld);
+  const roomC = (await host(TEACH, { game: 'lobby-c', seats: 3 })).body.code;     // 2 of 3
+  await joinRoom(BO, roomC);
+  const roomLeft = (await host(CY, { game: 'lobby-d', seats: 2 })).body.code;     // guest left: seat still theirs
+  await joinRoom(ANN, roomLeft);
+  await leave(ANN, roomLeft);
+
+  // BO's other tab: the tab that joined roomFull would see it (to rejoin), this one must not.
+  let t = await list(BO, 'lobby-a', 'cccccccc3333');
+  const codes = (x) => x.body.rooms.map((y) => y.code).sort().join();
+  check('list: a classmate sees only open, joinable rooms for this game', t.status === 200 && t.body.inClass === true && codes(t) === roomA, t.body);
+  check('list: host as first name + last initial, seats and players present', JSON.stringify(t.body.rooms[0]) === JSON.stringify({ code: roomA, host: 'Ann L.', seats: 2, present: 1, here: false }), t.body.rooms);
+  check('list: never an email', !JSON.stringify(t.body).includes('@'), t.body);
+  check('list: other class not shown, not full, not closed, not expired, not another game', ![roomD, roomB, roomFull, roomShut, roomOld].some((c) => JSON.stringify(t.body).includes(c)));
+  t = await list(BO, 'lobby-a');
+  check('list: the tab that holds a seat in a full room sees it, marked here', codes(t) === [roomA, roomFull].sort().join() && t.body.rooms.find((y) => y.code === roomFull).here === true, t.body);
+  t = await list(DEE, 'lobby-a');
+  check('list: the other class sees only its own room', codes(t) === roomD, t.body);
+  t = await list(BO, 'lobby-b');
+  check('list: the host sees their own open room (a second tab can join it)', codes(t) === roomB, t.body);
+  t = await list(ANN, 'lobby-c');
+  check("list: a teacher's room for the class, 2 of 3 here", t.body.rooms.length === 1 && t.body.rooms[0].code === roomC && t.body.rooms[0].present === 2 && t.body.rooms[0].seats === 3 && t.body.rooms[0].here === false, t.body);
+  t = await list(BO, 'lobby-c');
+  check('list: `here` marks a room this tab already sits in', t.body.rooms[0]?.here === true, t.body);
+  t = await list(BO, 'lobby-d');
+  check('list: a seat whose player left is still held (not listed as joinable)', t.body.rooms.length === 0, t.body);
+  t = await list(ANN, 'lobby-d');
+  check('list: ...but the player who left sees it, to rejoin', t.body.rooms.length === 1 && t.body.rooms[0].code === roomLeft && t.body.rooms[0].here === true && t.body.rooms[0].present === 1, t.body);
+  t = await list(TEACH, 'lobby-a');
+  check('list: a teacher of the class sees its students\' rooms', codes(t) === roomA, t.body);
+  t = await list(GUS, 'lobby-a');
+  check('list: no class -> inClass false, nothing listed', t.status === 200 && t.body.inClass === false && t.body.rooms.length === 0, t.body);
+  t = await list(EVE, 'lobby-a');
+  check('list: an expired enrollment sees nothing', t.body.inClass === false && t.body.rooms.length === 0, t.body);
+  t = await list(FAY, 'lobby-a');
+  check('list: an archived class sees nothing', t.body.inClass === false && t.body.rooms.length === 0, t.body);
+  t = await list(ANN, 'lobby-z');
+  check('list: a game with no rooms is empty', t.body.inClass === true && t.body.rooms.length === 0, t.body);
+}
+
+// ---- the code generator avoids an open room's code ----
+{
+  const now = Date.now();
+  sql(`INSERT INTO game_rooms (code, game, host_email, seats, created_at, expires_at) VALUES ('BHKE', 'race', 'ann@s.test', 2, ?, ?)`, now, now + 1e6);
+  sql(`INSERT INTO game_rooms (code, game, host_email, seats, created_at, expires_at, closed_at) VALUES ('DDDD', 'race', 'ann@s.test', 2, ?, ?, ?)`, now, now + 1e6, now);
+  sql(`INSERT INTO game_rooms (code, game, host_email, seats, created_at, expires_at) VALUES ('EEEE', 'race', 'ann@s.test', 2, 0, 1)`);
+  sql(`INSERT INTO game_room_players (code, seat, email, device, joined_at) VALUES ('DDDD', 0, 'ann@s.test', '', 0)`);
+  const seq = (...codes) => { let i = 0; return () => codes[Math.min(i++, codes.length - 1)]; };
+  let p = await shared.pickRoomCode(db, now, 5, seq('BHKE', 'BHKE', 'CCCC'));
+  check('generator: skips a code an open room holds', p && p.code === 'CCCC' && p.reuse === false, p);
+  p = await shared.pickRoomCode(db, now, 5, seq('BHKE', 'DDDD', 'BHKE'));
+  check('generator: reuses a closed room\'s code only when every try is taken', p && p.code === 'DDDD' && p.reuse === true, p);
+  p = await shared.pickRoomCode(db, now, 5, seq('EEEE'));
+  check('generator: an expired room\'s code may be reused', p && p.code === 'EEEE' && p.reuse === true, p);
+  p = await shared.pickRoomCode(db, now, 5, seq('BHKE'));
+  check('generator: never an open room\'s code (gives up instead)', p === null, p);
+  // End to end through POST /api/rooms: every random byte made 3 means every
+  // try is DDDD, a closed room's code, so the route must clear it and reuse it.
+  const real = crypto.getRandomValues.bind(crypto);
+  crypto.getRandomValues = (a) => { a.fill(3); return a; };
+  let h;
+  try { h = await host(BO, { game: 'race', seats: 2, device: 'dddddddd4444' }); } finally { crypto.getRandomValues = real; }
+  const rows = db.sqlite.prepare(`SELECT email, device FROM game_room_players WHERE code = 'DDDD'`).all();
+  const room = db.sqlite.prepare(`SELECT closed_at, host_email FROM game_rooms WHERE code = 'DDDD'`).get();
+  check('host: a closed room\'s code is reused with its old rows cleared', h.status === 201 && h.body.code === 'DDDD' && rows.length === 1 && rows[0].email === 'bo@s.test' && room.closed_at === null && room.host_email === 'bo@s.test', { h, rows, room });
 }
 
 // ---- open-room cap and sweep ----

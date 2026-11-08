@@ -11,7 +11,7 @@ type Ctx = EventContext<Env, 'code', SessionData>;
 
 export const onRequestGet: PagesFunction<Env, 'code', SessionData> = async ({ env, data, params, request }: Ctx) => {
   const code = normalizeCode(params.code);
-  if (!code) return json({ error: 'A room code is 6 letters and digits.' }, 400);
+  if (!code) return json({ error: 'A room code is 4 pictures (4 letters, like BHKE).' }, 400);
   const url = new URL(request.url);
   const device = deviceOf(url.searchParams.get('device'));
   const room = await getRoom(env.DB, code);

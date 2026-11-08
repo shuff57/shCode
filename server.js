@@ -577,6 +577,7 @@ app.prepare().catch((err) => {
     const roomJoin = await import('./functions/api/rooms/[code]/join.ts');
     const roomSend = await import('./functions/api/rooms/[code]/send.ts');
     const roomLeave = await import('./functions/api/rooms/[code]/leave.ts');
+    server.get('/api/rooms', libRoute(roomCreate.onRequestGet));
     server.post('/api/rooms', express.json(), libRoute(roomCreate.onRequestPost));
     server.get('/api/rooms/:code', libRoute(roomPoll.onRequestGet));
     server.post('/api/rooms/:code/join', express.json(), libRoute(roomJoin.onRequestPost));

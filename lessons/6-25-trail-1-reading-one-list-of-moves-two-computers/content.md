@@ -9,7 +9,7 @@ same.** moSHion's `online` carries the moves.
 
 | You write | What it does |
 | --- | --- |
-| `online.host()` | opens a room for 2; `online.code` becomes its 6-letter code |
+| `online.host()` | opens a room for 2; `online.code` becomes its room code (4 letters, like `'BHKE'`) |
 | `online.host(n)` | opens a room for n players (2 to 4); testing it alone needs n tabs |
 | `online.join(code)` | joins a classmate's room |
 | `online.send(move)` | sends a move, like `{ roll: 4 }` |
@@ -75,7 +75,7 @@ if (kb.presses('h') && online.status === 'off') {
 }
 ```
 
-Your classmate puts your code in a line at the top of their sketch, `const JOIN = 'K7QX2M';`, and
+Your classmate puts your code in a line at the top of their sketch, `const JOIN = 'BHKE';`, and
 runs it; `setup()` does `if (JOIN !== '') online.join(JOIN);`.
 
 A room ends when the host runs the sketch again or leaves the page: the classmate's

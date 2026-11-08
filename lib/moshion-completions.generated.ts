@@ -191,6 +191,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "info": ""
  },
  {
+  "label": "game",
+  "type": "variable",
+  "detail": "Game",
+  "info": "After multiplayer(): game.mode, game.players, game.ready, game.seat, game.turn."
+ },
+ {
   "label": "getItem",
   "type": "function",
   "detail": "(name: string): any",
@@ -347,6 +353,24 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "info": ""
  },
  {
+  "label": "multiplayer",
+  "type": "function",
+  "detail": "(mode, players?)",
+  "info": "Call once in setup(): 'none', 'local' (one keyboard), 'coop' or 'versus' (online, with a lobby), for 2-4 players."
+ },
+ {
+  "label": "myTurn",
+  "type": "function",
+  "detail": "()",
+  "info": "After multiplayer(): true when this computer may move ('local': always; 'versus': your seat's turn and the room is full)."
+ },
+ {
+  "label": "nextTurn",
+  "type": "function",
+  "detail": "()",
+  "info": "After multiplayer(): pass the turn to the next player. Online, call it inside online.onMove so every computer moves on together."
+ },
+ {
   "label": "nf",
   "type": "function",
   "detail": "(num: number, left?: number, right?: number): string",
@@ -381,6 +405,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "type": "constant",
   "detail": "number",
   "info": ""
+ },
+ {
+  "label": "players",
+  "type": "variable",
+  "detail": "number",
+  "info": "After multiplayer(): how many players, 2 to 4."
  },
  {
   "label": "pow",
@@ -447,6 +477,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "type": "function",
   "detail": "(name: string, dataUrl: string, anim?: { frames: number; frameDelay?: number; delays?: number[]; }): void",
   "info": "Save art under a name so `sprite.texture = name` finds it."
+ },
+ {
+  "label": "seat",
+  "type": "variable",
+  "detail": "number",
+  "info": "After multiplayer('versus' | 'coop'): your seat, 0 for the host, then 1, 2, 3."
  },
  {
   "label": "Sensor",
@@ -573,6 +609,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "type": "class",
   "detail": "class",
   "info": "Builds a level out of rows of text."
+ },
+ {
+  "label": "turn",
+  "type": "variable",
+  "detail": "number",
+  "info": "After multiplayer(): whose turn it is, 0 to players - 1."
  },
  {
   "label": "TWO_PI",
@@ -2565,18 +2607,62 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "info": ""
   }
  ],
+ "Game": [
+  {
+   "label": "mode",
+   "type": "property",
+   "detail": "string",
+   "info": "'none', 'local', 'coop' or 'versus'."
+  },
+  {
+   "label": "players",
+   "type": "property",
+   "detail": "number",
+   "info": "How many players."
+  },
+  {
+   "label": "ready",
+   "type": "property",
+   "detail": "boolean",
+   "info": "True once play can start: always for 'local', when the room is full online."
+  },
+  {
+   "label": "turn",
+   "type": "property",
+   "detail": "number",
+   "info": "Whose turn it is, 0 to players - 1."
+  },
+  {
+   "label": "seat",
+   "type": "property",
+   "detail": "number",
+   "info": "Your seat online (0 is the host); null otherwise."
+  },
+  {
+   "label": "code",
+   "type": "property",
+   "detail": "string",
+   "info": "The online room's code: 4 letters, shown in the lobby as 4 pictures."
+  },
+  {
+   "label": "status",
+   "type": "property",
+   "detail": "string",
+   "info": "Online: 'off', 'waiting', 'ready', 'closed' or 'error'."
+  }
+ ],
  "Online": [
   {
    "label": "host",
    "type": "method",
    "detail": "(players?)",
-   "info": "Start a room for 2 (or up to 4) players. online.code becomes its 6-letter code."
+   "info": "Start a room for 2 (or up to 4) players. online.code becomes its 4-letter room code."
   },
   {
    "label": "join",
    "type": "method",
    "detail": "(code)",
-   "info": "Join a classmate's room with their 6-letter code."
+   "info": "Join a classmate's room with their 4-letter room code."
   },
   {
    "label": "send",
@@ -2606,7 +2692,13 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "code",
    "type": "property",
    "detail": "string",
-   "info": "The room's 6-letter code."
+   "info": "The room's 4-letter code (4 pictures in the lobby)."
+  },
+  {
+   "label": "codeIcons",
+   "type": "property",
+   "detail": "string[]",
+   "info": "The room code as 4 picture names (Library textures), e.g. ['star', 'bat', 'fish', 'key']."
   },
   {
    "label": "seat",
@@ -2642,5 +2734,6 @@ export const MOSHION_TYPE_OF: Record<string, string> = {
  "kb": "Kb",
  "mouse": "Mouse",
  "allSprites": "Group",
- "online": "Online"
+ "online": "Online",
+ "game": "Game"
 };

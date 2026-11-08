@@ -2,6 +2,7 @@
 // and what may be sent through it lives here; the routes only call these.
 
 import { ownerLabel, studentClassIds, teacherClassIds } from './libraryShare';
+import { ROOM_CODE_LETTERS, randomRoomCode } from '../../lib/room-icons';
 
 export const ROOM_TTL_MS = 3 * 60 * 60 * 1000;
 export const MAX_SEATS = 4;
@@ -16,9 +17,25 @@ export const RATE_LIMIT = 30;
 export const RATE_WINDOW_MS = 10_000;
 export const POLL_PAGE = 200;
 
-const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-export const CODE_RE = /^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{6}$/;
-export const GAME_RE = /^[a-z0-9][a-z0-9-]{0,23}$/;
+/**
+ * A room code: 4 picture letters (lib/room-icons.ts, 16 letters, one per
+ * built-in texture) since 2026-11-07. The old 6-character codes are still
+ * accepted everywhere a code is read, so a room made before the change, or a
+ * `const JOIN = '...'` holding one, keeps working until it expires.
+ */
+export const CODE_RE = new RegExp(`^(?:[${ROOM_CODE_LETTERS}]{4}|[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{6})$`);
+export const PICTURE_CODE_RE = new RegExp(`^[${ROOM_CODE_LETTERS}]{4}$`);
+/**
+ * The game key a room is made with (`game_rooms.game`): the open-rooms list
+ * (GET /api/rooms?game=) shows only rooms with the caller's key, so a lobby
+ * never offers a room for a different game. Lesson pages use the lesson id,
+ * the sandbox 'sandbox', a published game 'game-<id>' (lib/moshion-online.ts
+ * `roomGameKey` fits a longer id into this), a sketch's own online.host() 'moshion'.
+ */
+export const GAME_MAX = 48;
+export const GAME_RE = /^[a-z0-9][a-z0-9-]{0,47}$/;
+/** How many open rooms GET /api/rooms?game= lists at most. */
+export const LIST_LIMIT = 30;
 const KEY_RE = /^[A-Za-z_][A-Za-z0-9_]{0,19}$/;
 const DEVICE_RE = /^[a-z0-9]{8,32}$/;
 
@@ -30,13 +47,33 @@ export function deviceOf(raw: unknown): string {
 
 export type Role = 'admin' | 'teacher' | 'student';
 
+/** A random 4-picture code. Use pickRoomCode() to get one no open room holds. */
 export function newRoomCode(): string {
-  const buf = new Uint8Array(6);
-  crypto.getRandomValues(buf);
-  return Array.from(buf, (n) => CODE_ALPHABET[n % CODE_ALPHABET.length]).join('');
+  return randomRoomCode();
 }
 
-/** A code as typed: upper-cased, spaces and dashes dropped. null if it cannot be one. */
+/**
+ * A code for a new room: never one an OPEN room holds (not closed, not
+ * expired). With 65,536 codes nearly every first try has never been used;
+ * when every try hits an existing row, a code whose room has closed or
+ * expired is reused (`reuse: true`), and the caller deletes that old room's
+ * rows before inserting so the primary key stays unique. null: no code found.
+ */
+export async function pickRoomCode(
+  db: D1Database, now = Date.now(), tries = 24, gen: () => string = newRoomCode,
+): Promise<{ code: string; reuse: boolean } | null> {
+  let spare: string | null = null;
+  for (let i = 0; i < tries; i++) {
+    const code = gen();
+    const row = await db.prepare('SELECT closed_at, expires_at FROM game_rooms WHERE code = ?').bind(code)
+      .first<{ closed_at: number | null; expires_at: number }>();
+    if (!row) return { code, reuse: false };
+    if (!spare && (row.closed_at || row.expires_at <= now)) spare = code;
+  }
+  return spare ? { code: spare, reuse: true } : null;
+}
+
+/** A code as typed: upper-cased, spaces and dashes dropped. 4 picture letters or an old 6-character code; null otherwise. */
 export function normalizeCode(raw: unknown): string | null {
   const c = String(raw ?? '').toUpperCase().replace(/[\s-]/g, '');
   return CODE_RE.test(c) ? c : null;

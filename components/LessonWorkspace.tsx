@@ -1638,7 +1638,7 @@ export default function LessonWorkspace({
                       </pre>
                     </>
                   ) : isMoshionMode ? (
-                    <MoshionPreview ref={labFrameRef} code={q5Code} runKey={runKey} />
+                    <MoshionPreview ref={labFrameRef} code={q5Code} runKey={runKey} gameKey={lesson.id} />
                   ) : (
                     <LivePreview srcDoc={srcDoc} />
                   )}

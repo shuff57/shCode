@@ -752,7 +752,7 @@ export default function SandboxWorkspace() {
                     </pre>
                   </>
                 ) : (
-                  <MoshionPreview code={code} runKey={runKey} />
+                  <MoshionPreview code={code} runKey={runKey} gameKey="sandbox" />
                 )}
               </div>
               <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>

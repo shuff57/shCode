@@ -6,7 +6,7 @@
 // or 3 to drink a potion. Beat an enemy and you level up before the next one.
 // Online: H hosts a duel with a classmate; to join, put the code in JOIN.
 
-const JOIN = '';          // a classmate's room code, e.g. 'K7QX2M'
+const JOIN = '';          // a classmate's room code, e.g. 'BHKE'
 
 const KINDS = [           // the enemies, in order, as data
   { name: 'Slime', hp: 14, power: 3, potions: 0, color: 'limegreen' },

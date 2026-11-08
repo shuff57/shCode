@@ -5,7 +5,7 @@
 const N = 4;
 const CELL = 80;
 const TOP = 40;
-const JOIN = '';          // the host's room code, e.g. 'K7QX2M'
+const JOIN = '';          // the host's room code, e.g. 'BHKE'
 let marks = [];           // every square that has arrived: { r, c, seat }
 
 function setup() {
