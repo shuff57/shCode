@@ -18,6 +18,7 @@ import TextureEditor from './TextureEditor';
 import SoundMixer from './SoundMixer';
 import ClassLibraryPanel from './ClassLibraryPanel';
 import DocsDrawer from './DocsDrawer';
+import PublishGameButton from './PublishGameButton';
 import { RUN_TIMEOUT_MS, errorWithLocation, runStudentCode } from '../lib/js-runner-source';
 import {
   NO_TEACHER_MODES,
@@ -31,6 +32,7 @@ import EditorPlaceholder from './diagram/EditorPlaceholder';
 import { emptyDiagram, type DiagramDoc } from '../lib/diagram-types';
 import {
   SANDBOX_MODES,
+  SANDBOX_MODE_KEY,
   getMode,
   sandboxLesson,
   type SandboxModeId,
@@ -61,7 +63,7 @@ function parseChart(text: string | undefined): DiagramDoc {
   return emptyDiagram();
 }
 
-const MODE_KEY = 'shCode:sandbox-mode';
+const MODE_KEY = SANDBOX_MODE_KEY;
 // Which side (Build/Code) reSHape opens on. Read once at page load and
 // handed to ReshapeStudio as `startSide` -- the studio owns the toggle
 // itself from then on (see its own file header), so this is a
@@ -264,6 +266,9 @@ export default function SandboxWorkspace() {
     );
     runRef.current = run;
   }, []);
+
+  // What Publish game sends: the editor's text now, not the last run.
+  const getScript = useCallback(() => useLessonStore.getState().fileContents['script.js'] || '', []);
 
   // js/moSHion only -- reSHape's Run lives inside ReshapeStudio now (it owns
   // its own script.js -> iframe handoff, see that component's file header).
@@ -675,6 +680,10 @@ export default function SandboxWorkspace() {
               </button>
             )}
             {renderCloudChips()}
+            {/* The Games library: publish this sketch so classmates can play and remix it. */}
+            {mode.preview === 'moshion' && lessonProgress.authed && (
+              <PublishGameButton getCode={getScript} />
+            )}
             <button style={chipStyle} onClick={reset}>
               <RotateCcw size={12} />
               Reset

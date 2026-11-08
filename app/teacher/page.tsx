@@ -16,6 +16,7 @@ import { moduleOptions, selectGradebookLessons } from '../../lib/gradebook-view'
 import { describeGrade, opensInCodeEditor, showLateBadge, stillFailingRequirements, submissionWasLate, verdictWord, type RequirementEventRow } from '../../lib/teacher-drawer';
 import MostMissedPanel from '../../components/MostMissedPanel';
 import ClassLibraryModeration from '../../components/ClassLibraryModeration';
+import ClassGamesModeration from '../../components/ClassGamesModeration';
 import PastDuePanel from '../../components/PastDuePanel';
 import { formatDue, schoolDateString } from '../../lib/due-dates-core';
 import { lessonHref } from '../../lib/lesson-href';
@@ -2679,6 +2680,11 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         <div style={S.card}>
           <h2 style={S.h2}>Shared textures and sounds</h2>
           <ClassLibraryModeration classId={classId} />
+        </div>
+        {/* Games students published from the moSHion sandbox and shared with this class */}
+        <div style={S.card}>
+          <h2 style={S.h2}>Shared games</h2>
+          <ClassGamesModeration classId={classId} />
         </div>
         </div>
       )}

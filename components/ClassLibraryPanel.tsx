@@ -1,7 +1,8 @@
 'use client';
 
 // The Library tab (and /library): your own saved textures and sounds, each with
-// Share with class, then everything shared into your classes, with Copy to mine.
+// Share with class, then everything shared into your classes, with Copy to mine,
+// then the Games section (GamesLibrary: Play and Remix).
 // The shared lists also sit inside the Textures and Sounds tabs; this is the one
 // place a student (or teacher) finds both without knowing where to look.
 
@@ -9,6 +10,7 @@ import { useState } from 'react';
 import ClassLibrary from './ClassLibrary';
 import MyLibrary from './MyLibrary';
 import BuiltInLibrary from './BuiltInLibrary';
+import GamesLibrary from './GamesLibrary';
 
 export default function ClassLibraryPanel() {
   const [counts, setCounts] = useState<{ texture?: number | null; sound?: number | null }>({});
@@ -21,7 +23,7 @@ export default function ClassLibraryPanel() {
     <div style={{ padding: '4px 2px', color: 'var(--c-fg)' }}>
       <h2 style={{ fontSize: 16, margin: '0 0 4px' }}>Library</h2>
       <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: '0 0 6px', lineHeight: 1.5 }}>
-        Your textures and sounds, the ones your class shared, and the ones built in. <strong style={{ color: 'var(--c-fg)' }}>Copy to mine</strong> saves
+        Your textures, sounds and games, the ones your class shared, and the ones built in. <strong style={{ color: 'var(--c-fg)' }}>Copy to mine</strong> saves
         a copy into your own, so <code>sprite.texture = &apos;name&apos;</code> or{' '}
         <code>loadSound(&apos;name&apos;)</code> works in your sketches.
       </p>
@@ -53,6 +55,7 @@ export default function ClassLibraryPanel() {
         onLoaded={(n) => setCounts((c) => ({ ...c, sound: n }))}
         onMessage={(text, bad) => setMessage({ text, bad })}
       />
+      <GamesLibrary />
       <BuiltInLibrary onMessage={(text, bad) => setMessage({ text, bad })} />
     </div>
   );

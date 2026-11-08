@@ -1,0 +1,54 @@
+// GET    /api/games/[id]  — one game with its code, to play or remix
+// DELETE /api/games/[id]  — delete one of your own games (a tombstone)
+//
+// GET answers the owner, or a classmate in a class the game is shared into and
+// not hidden; a teacher of that class also gets a hidden one, marked. Anything
+// else is 404, the same as an id that does not exist. The publisher shows as
+// first name + last initial, never an email. DELETE is owner only, keeps the
+// row with deleted_at set, and takes the game out of every class at once.
+
+import { json, ownerName, visibleGame, type SessionData } from '../../_shared/games';
+import { isGameId, modeLabel, type GameMode } from '../../../lib/games-core';
+
+interface Env {
+  DB: D1Database;
+}
+type Ctx = EventContext<Env, 'id', SessionData>;
+
+export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ params, env, data }: Ctx) => {
+  const id = String(params.id);
+  if (!isGameId(id)) return json({ error: 'Not found' }, 404);
+  const seen = await visibleGame(env.DB, data, id);
+  if (!seen) return json({ error: 'Not found' }, 404);
+  const { row } = seen;
+  let shared = false;
+  if (seen.mine) {
+    shared = !!(await env.DB.prepare(`SELECT 1 AS x FROM library_game_shares WHERE game_id = ? LIMIT 1`).bind(id).first());
+  }
+  return json({
+    game: {
+      id: row.id, title: row.title, code: row.code, mode: row.mode, players: row.players,
+      modeLabel: modeLabel(row.mode as GameMode, row.players),
+      owner: await ownerName(env.DB, row.owner_email), mine: seen.mine, hidden: seen.hidden,
+      ...(seen.mine ? { shared } : {}),
+      createdAt: row.created_at, updatedAt: row.updated_at,
+    },
+  });
+};
+
+export const onRequestDelete: PagesFunction<Env, 'id', SessionData> = async ({ params, env, data }: Ctx) => {
+  const id = String(params.id);
+  if (!isGameId(id)) return json({ error: 'Not found' }, 404);
+  const row = await env.DB.prepare(
+    `SELECT id FROM library_games WHERE id = ? AND owner_email = ? AND deleted_at IS NULL`,
+  ).bind(id, data.email).first<{ id: string }>();
+  if (!row) return json({ error: 'Not found' }, 404);
+  const now = Date.now();
+  await env.DB.batch([
+    env.DB.prepare(`UPDATE library_games SET deleted_at = ?, updated_at = ? WHERE id = ? AND owner_email = ?`)
+      .bind(now, now, id, data.email),
+    // A class must not keep a game its publisher deleted.
+    env.DB.prepare(`DELETE FROM library_game_shares WHERE game_id = ?`).bind(id),
+  ]);
+  return json({ ok: true, id, deletedAt: now });
+};

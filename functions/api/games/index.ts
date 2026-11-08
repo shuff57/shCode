@@ -1,0 +1,90 @@
+// GET  /api/games  — the caller's own published games (no code, newest first)
+// POST /api/games  { id?, title, code }  — publish a game, or update one of yours
+//
+// Publishing stores a moSHion sketch so classmates can play and remix it once
+// it is shared (POST /api/games/[id]/share). With an `id`, it updates that game
+// if the caller owns it; someone else's id and an id that does not exist both
+// answer 404, so ids cannot be probed. `mode` and `players` are read from the
+// code (multiplayer('versus', 2)), never taken from the body. The code only
+// ever runs inside the sandboxed moSHion iframe on /play. See
+// functions/_shared/games.ts for who sees what.
+
+import { json, type SessionData } from '../../_shared/games';
+import { GAME_CODE_MAX, GAME_MAX_PER_OWNER, checkCode, cleanTitle, declaredMode, isGameId } from '../../../lib/games-core';
+import { newUploadId } from '../../_shared/uploads';
+
+interface Env {
+  DB: D1Database;
+}
+type Ctx = EventContext<Env, string, SessionData>;
+
+// The code plus the title and JSON quoting. A body this large is refused unread.
+const MAX_BODY = GAME_CODE_MAX * 2 + 4096;
+
+interface MineRow {
+  id: string;
+  title: string;
+  mode: string;
+  players: number;
+  bytes: number;
+  created_at: number;
+  updated_at: number;
+  shared: number;
+}
+
+export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ env, data }: Ctx) => {
+  const r = await env.DB.prepare(
+    `SELECT id, title, mode, players, LENGTH(code) AS bytes, created_at, updated_at,
+            EXISTS (SELECT 1 FROM library_game_shares s WHERE s.game_id = library_games.id) AS shared
+       FROM library_games WHERE owner_email = ? AND deleted_at IS NULL
+      ORDER BY updated_at DESC`,
+  ).bind(data.email).all<MineRow>();
+  return json({
+    games: (r.results ?? []).map((g) => ({
+      id: g.id, title: g.title, mode: g.mode, players: g.players, bytes: g.bytes,
+      createdAt: g.created_at, updatedAt: g.updated_at, shared: !!g.shared,
+    })),
+    limits: { maxBytes: GAME_CODE_MAX, maxGames: GAME_MAX_PER_OWNER },
+  });
+};
+
+export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ request, env, data }: Ctx) => {
+  if (Number(request.headers.get('Content-Length') || 0) > MAX_BODY) {
+    return json({ error: `That is too large to publish; the most a game can be is ${GAME_CODE_MAX / 1024} KB of code.` }, 413);
+  }
+  let body: { id?: unknown; title?: unknown; code?: unknown };
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: 'Invalid JSON body' }, 400);
+  }
+  const t = cleanTitle(body.title);
+  if ('error' in t) return json({ error: t.error }, 400);
+  const c = checkCode(body.code);
+  if ('error' in c) return json({ error: c.error }, c.tooLarge ? 413 : 400);
+  const { mode, players } = declaredMode(c.code);
+  const now = Date.now();
+
+  if (body.id !== undefined && body.id !== null) {
+    if (!isGameId(body.id)) return json({ error: 'Not found' }, 404);
+    const res = await env.DB.prepare(
+      `UPDATE library_games SET title = ?, code = ?, mode = ?, players = ?, updated_at = ?
+        WHERE id = ? AND owner_email = ? AND deleted_at IS NULL`,
+    ).bind(t.title, c.code, mode, players, now, body.id, data.email).run();
+    if (!res.meta || res.meta.changes === 0) return json({ error: 'Not found' }, 404);
+    return json({ ok: true, created: false, game: { id: body.id, title: t.title, mode, players, updatedAt: now } });
+  }
+
+  const count = await env.DB.prepare(
+    `SELECT COUNT(*) AS n FROM library_games WHERE owner_email = ? AND deleted_at IS NULL`,
+  ).bind(data.email).first<{ n: number }>();
+  if ((count?.n ?? 0) >= GAME_MAX_PER_OWNER) {
+    return json({ error: `You have ${GAME_MAX_PER_OWNER} published games, the most you can have. Delete one in the Library to publish another.` }, 409);
+  }
+  const id = newUploadId();
+  await env.DB.prepare(
+    `INSERT INTO library_games (id, owner_email, title, code, mode, players, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+  ).bind(id, data.email, t.title, c.code, mode, players, now, now).run();
+  return json({ ok: true, created: true, game: { id, title: t.title, mode, players, updatedAt: now } }, 201);
+};

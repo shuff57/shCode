@@ -583,6 +583,22 @@ app.prepare().catch((err) => {
     server.post('/api/rooms/:code/join', express.json(), libRoute(roomJoin.onRequestPost));
     server.post('/api/rooms/:code/send', express.json(), libRoute(roomSend.onRequestPost));
     server.post('/api/rooms/:code/leave', express.json(), libRoute(roomLeave.onRequestPost));
+    // The Games library (functions/api/games/*): the real handlers on the same
+    // database, so one dev_student publishes from the sandbox and another plays
+    // it from Library -> Games. Static /api/games/shared before /api/games/:id.
+    const gamesMine = await import('./functions/api/games/index.ts');
+    const gamesOne = await import('./functions/api/games/[id].ts');
+    const gamesShare = await import('./functions/api/games/[id]/share.ts');
+    const gamesShared = await import('./functions/api/games/shared/index.ts');
+    const gamesModerate = await import('./functions/api/classes/[id]/game-shares/index.ts');
+    server.get('/api/games', libRoute(gamesMine.onRequestGet));
+    server.post('/api/games', express.json({ limit: '200kb' }), libRoute(gamesMine.onRequestPost));
+    server.get('/api/games/shared', libRoute(gamesShared.onRequestGet));
+    server.get('/api/games/:id', libRoute(gamesOne.onRequestGet));
+    server.delete('/api/games/:id', libRoute(gamesOne.onRequestDelete));
+    server.post('/api/games/:id/share', express.json(), libRoute(gamesShare.onRequestPost));
+    server.get('/api/classes/:id/game-shares', libRoute(gamesModerate.onRequestGet));
+    server.post('/api/classes/:id/game-shares', express.json(), libRoute(gamesModerate.onRequestPost));
     // Appearance settings (functions/api/prefs.ts), same in-memory database.
     const prefsRoute = await import('./functions/api/prefs.ts');
     server.get('/api/prefs', libRoute(prefsRoute.onRequestGet));

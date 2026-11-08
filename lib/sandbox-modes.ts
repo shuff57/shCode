@@ -124,3 +124,6 @@ export function sandboxLesson(mode: SandboxMode): Lesson {
     requirements: [],
   };
 }
+
+/** Which mode the sandbox opens on (SandboxWorkspace reads it at load; Remix sets it). */
+export const SANDBOX_MODE_KEY = 'shCode:sandbox-mode';
