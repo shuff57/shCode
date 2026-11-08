@@ -8,6 +8,7 @@
 import { useState } from 'react';
 import ClassLibrary from './ClassLibrary';
 import MyLibrary from './MyLibrary';
+import BuiltInLibrary from './BuiltInLibrary';
 
 export default function ClassLibraryPanel() {
   const [counts, setCounts] = useState<{ texture?: number | null; sound?: number | null }>({});
@@ -20,7 +21,7 @@ export default function ClassLibraryPanel() {
     <div style={{ padding: '4px 2px', color: 'var(--c-fg)' }}>
       <h2 style={{ fontSize: 16, margin: '0 0 4px' }}>Library</h2>
       <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: '0 0 6px', lineHeight: 1.5 }}>
-        Your textures and sounds, and the ones your class shared. <strong style={{ color: 'var(--c-fg)' }}>Copy to mine</strong> saves
+        Your textures and sounds, the ones your class shared, and the ones built in. <strong style={{ color: 'var(--c-fg)' }}>Copy to mine</strong> saves
         a copy into your own, so <code>sprite.texture = &apos;name&apos;</code> or{' '}
         <code>loadSound(&apos;name&apos;)</code> works in your sketches.
       </p>
@@ -52,6 +53,7 @@ export default function ClassLibraryPanel() {
         onLoaded={(n) => setCounts((c) => ({ ...c, sound: n }))}
         onMessage={(text, bad) => setMessage({ text, bad })}
       />
+      <BuiltInLibrary onMessage={(text, bad) => setMessage({ text, bad })} />
     </div>
   );
 }

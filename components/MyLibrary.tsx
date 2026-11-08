@@ -22,7 +22,7 @@ function readRows(): Row[] {
 
 const tile: React.CSSProperties = {
   padding: 8, borderRadius: 6, border: '1px solid var(--c-line)', background: 'var(--c-deep2)',
-  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, width: 150,
+  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, width: 170,
 };
 
 export default function MyLibrary({ onMessage }: { onMessage?: (text: string, bad: boolean) => void }) {

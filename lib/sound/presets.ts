@@ -31,9 +31,22 @@ export interface PaletteSound {
   file: string;
   label: string;
   kind: 'sfx' | 'music';
-  /** jsfxr preset for an sfx, or ZzFXM loop id for music. */
+  /** jsfxr preset for an sfx, or ZzFXM loop id for music; 'designed' when `def` is given. */
   source: string;
+  /**
+   * A hand-designed jsfxr effect: only the fields that differ from DESIGN_BASE.
+   * Rendered exactly (no random preset), so the file is the same every run.
+   */
+  def?: Record<string, number>;
 }
+
+/** jsfxr's own defaults, which every designed effect starts from. */
+export const DESIGN_BASE: Record<string, number | boolean> = {
+  oldParams: true, wave_type: 0, p_env_attack: 0, p_env_sustain: 0.3, p_env_punch: 0, p_env_decay: 0.4,
+  p_base_freq: 0.3, p_freq_limit: 0, p_freq_ramp: 0, p_freq_dramp: 0, p_vib_strength: 0, p_vib_speed: 0,
+  p_arp_mod: 0, p_arp_speed: 0, p_duty: 0, p_duty_ramp: 0, p_repeat_speed: 0, p_pha_offset: 0, p_pha_ramp: 0,
+  p_lpf_freq: 1, p_lpf_ramp: 0, p_lpf_resonance: 0, p_hpf_freq: 0, p_hpf_ramp: 0, sound_vol: 0.25, sample_size: 8,
+};
 
 /**
  * Every file scripts/make-moshion-sounds.mjs writes into
@@ -54,4 +67,25 @@ export const PALETTE: PaletteSound[] = [
   { name: 'title', file: '/moshion/assets/title.wav', label: 'Music: title', kind: 'music', source: 'title' },
   { name: 'win', file: '/moshion/assets/win.wav', label: 'Music: you won', kind: 'music', source: 'won' },
   { name: 'lose', file: '/moshion/assets/lose.wav', label: 'Music: you lost', kind: 'music', source: 'lost' },
+  // Designed 2026-11-07 for the board games and Quest (wave_type: 0 square, 1 saw, 2 sine, 3 noise).
+  { name: 'dice', file: '/moshion/assets/dice.wav', label: 'Dice roll', kind: 'sfx', source: 'designed',
+    def: { wave_type: 3, p_env_sustain: 0.32, p_env_decay: 0.38, p_base_freq: 0.55, p_repeat_speed: 0.7, p_lpf_freq: 0.75, p_hpf_freq: 0.12 } },
+  { name: 'step', file: '/moshion/assets/step.wav', label: 'Step', kind: 'sfx', source: 'designed',
+    def: { wave_type: 3, p_env_sustain: 0.08, p_env_decay: 0.16, p_base_freq: 0.2, p_lpf_freq: 0.45 } },
+  { name: 'sword', file: '/moshion/assets/sword.wav', label: 'Sword hit', kind: 'sfx', source: 'designed',
+    def: { wave_type: 3, p_env_sustain: 0.06, p_env_punch: 0.5, p_env_decay: 0.25, p_base_freq: 0.78, p_freq_ramp: -0.35, p_hpf_freq: 0.25 } },
+  { name: 'clang', file: '/moshion/assets/clang.wav', label: 'Shield clang', kind: 'sfx', source: 'designed',
+    def: { wave_type: 0, p_env_sustain: 0.05, p_env_punch: 0.6, p_env_decay: 0.35, p_base_freq: 0.62, p_vib_strength: 0.3, p_vib_speed: 0.7, p_duty: 0.15 } },
+  { name: 'potion', file: '/moshion/assets/potion.wav', label: 'Potion', kind: 'sfx', source: 'designed',
+    def: { wave_type: 2, p_env_sustain: 0.32, p_env_decay: 0.3, p_base_freq: 0.28, p_freq_ramp: 0.22, p_vib_strength: 0.5, p_vib_speed: 0.6, p_repeat_speed: 0.55 } },
+  { name: 'levelup', file: '/moshion/assets/levelup.wav', label: 'Level up', kind: 'sfx', source: 'designed',
+    def: { wave_type: 0, p_env_sustain: 0.35, p_env_decay: 0.3, p_base_freq: 0.35, p_arp_mod: 0.45, p_arp_speed: 0.55, p_duty: 0.4 } },
+  { name: 'crown', file: '/moshion/assets/crown.wav', label: 'Crown', kind: 'sfx', source: 'designed',
+    def: { wave_type: 2, p_env_sustain: 0.25, p_env_decay: 0.35, p_base_freq: 0.55, p_freq_ramp: 0.12, p_arp_mod: 0.3, p_arp_speed: 0.4, p_vib_strength: 0.1, p_vib_speed: 0.5 } },
+  { name: 'whoosh', file: '/moshion/assets/whoosh.wav', label: 'Whoosh', kind: 'sfx', source: 'designed',
+    def: { wave_type: 3, p_env_attack: 0.15, p_env_sustain: 0.15, p_env_decay: 0.2, p_base_freq: 0.4, p_freq_ramp: -0.2, p_lpf_freq: 0.35, p_lpf_ramp: 0.3 } },
+  { name: 'pop', file: '/moshion/assets/pop.wav', label: 'Pop', kind: 'sfx', source: 'designed',
+    def: { wave_type: 2, p_env_sustain: 0.07, p_env_decay: 0.16, p_base_freq: 0.35, p_freq_ramp: 0.5 } },
+  { name: 'door', file: '/moshion/assets/door.wav', label: 'Door', kind: 'sfx', source: 'designed',
+    def: { wave_type: 3, p_env_sustain: 0.15, p_env_decay: 0.4, p_base_freq: 0.12, p_lpf_freq: 0.3 } },
 ];

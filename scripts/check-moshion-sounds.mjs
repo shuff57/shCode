@@ -90,7 +90,10 @@ for (const entry of PALETTE) {
     note(`${assetDir}/${entry.name}.wav is missing (run scripts/make-moshion-sounds.mjs)`);
     continue;
   }
-  if (entry.kind === 'sfx' && !sfxNames.has(entry.source)) {
+  if (entry.kind === 'sfx' && entry.def && entry.source !== 'designed') {
+    note(`${entry.name}.wav has a designed def but source "${entry.source}" (should be 'designed')`);
+  }
+  if (entry.kind === 'sfx' && !entry.def && !sfxNames.has(entry.source)) {
     note(`${entry.name}.wav names preset "${entry.source}", which is not in SFX_PRESETS`);
   }
   if (entry.kind === 'music' && !loopNames.has(entry.source)) {
