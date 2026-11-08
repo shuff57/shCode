@@ -75,3 +75,15 @@ binding = "AI"
 name = "LIVE"
 class_name = "LiveRoom"
 script_name = "shcode-live"
+
+# Code together (REALTIME-SPEC.md Part 2, migration 0044): the LiveDoc Durable
+# Object in the same Worker (workers/live/, class LiveDoc, migration tag v2).
+# Deploy order: apply 0044 (npm run d1:migrate), deploy workers/live (adds
+# LiveDoc), THEN the site with this binding. Dashboard twin if production reads
+# it from there: Durable Object bindings -> variable "LIVE_DOC", namespace
+# shcode-live / LiveDoc. With it missing, POST /api/rooms {kind:'code'} and a
+# code room's GET /api/live/[code] answer 503 and nothing else changes.
+[[durable_objects.bindings]]
+name = "LIVE_DOC"
+class_name = "LiveDoc"
+script_name = "shcode-live"

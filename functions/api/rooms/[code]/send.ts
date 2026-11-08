@@ -3,7 +3,7 @@
 // Answers { seq }. Rate limited per player; a room holds MAX_EVENTS_PER_ROOM.
 
 import {
-  MAX_EVENTS_PER_ROOM, RATE_LIMIT, RATE_WINDOW_MS, checkGameData, deviceOf, getRoom, json, normalizeCode,
+  MAX_EVENTS_PER_ROOM, RATE_LIMIT, RATE_WINDOW_MS, WRONG_KIND, checkGameData, deviceOf, getRoom, json, normalizeCode, roomKind,
 } from '../../../_shared/rooms';
 
 interface Env { DB: D1Database }
@@ -29,6 +29,8 @@ export const onRequestPost: PagesFunction<Env, 'code', SessionData> = async ({ e
     : null;
   if (!room || !me || me.left_at) return json({ error: 'You are not in that room.' }, 404);
   if (room.closed_at || room.expires_at <= now) return json({ error: 'That room has closed.' }, 410);
+  // A Code together session carries a program, never moves.
+  if (roomKind(room) === 'code') return json({ error: WRONG_KIND.game }, 409);
   // A real-time room's moves go over its socket (GET /api/live/[code]) and are never stored.
   if (room.live === 1) return json({ error: 'That is a real-time room: its moves go over the live connection.' }, 409);
 

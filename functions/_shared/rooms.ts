@@ -102,7 +102,20 @@ export interface RoomRow {
   closed_at: number | null;
   /** 1 for a real-time room (migration 0043): it runs over GET /api/live/[code], not the poll. */
   live: number;
+  /** 'game', or 'code' for a Code together session (migration 0044; always live, its socket goes to LiveDoc). */
+  kind: string;
 }
+
+/** A room's kind as stored ('game' for every row before migration 0044). */
+export function roomKind(room: Pick<RoomRow, 'kind'>): 'game' | 'code' {
+  return room.kind === 'code' ? 'code' : 'game';
+}
+
+/** What a join or a socket says when a code room's code is used for a game, or the other way round. */
+export const WRONG_KIND = {
+  game: 'That code is for a Code together session, not a game room.',
+  code: 'That code is for a game room, not a Code together session.',
+} as const;
 
 export async function getRoom(db: D1Database, code: string): Promise<RoomRow | null> {
   return db.prepare('SELECT * FROM game_rooms WHERE code = ?').bind(code).first<RoomRow>();

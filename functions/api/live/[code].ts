@@ -12,12 +12,17 @@
 //
 // Fails CLOSED: with no LIVE binding (the site deployed before the Worker) it
 // answers 503 and touches nothing else.
+//
+// Code together (migration 0044): a room of kind 'code' goes to env.LIVE_DOC
+// (the LiveDoc class in the same Worker) with a DocTicket instead, and answers
+// 503 without that binding. Each Durable Object also refuses the other kind's
+// ticket, so a code room can never reach LiveRoom nor a game room LiveDoc.
 
-import { TICKET_HEADER, encodeTicket } from '../../../lib/live-protocol';
-import { LIVE_OFFLINE, authorizeLive } from '../../_shared/live';
+import { TICKET_HEADER, encodeDocTicket, encodeTicket } from '../../../lib/live-protocol';
+import { CODE_OFFLINE, LIVE_OFFLINE, authorizeLive } from '../../_shared/live';
 import { json } from '../../_shared/rooms';
 
-interface Env { DB: D1Database; LIVE?: DurableObjectNamespace }
+interface Env { DB: D1Database; LIVE?: DurableObjectNamespace; LIVE_DOC?: DurableObjectNamespace }
 type SessionData = { email: string; role: 'admin' | 'teacher' | 'student' };
 type Ctx = EventContext<Env, 'code', SessionData>;
 
@@ -30,18 +35,20 @@ export const onRequestGet: PagesFunction<Env, 'code', SessionData> = async ({ en
     try { host = new URL(origin).host; } catch { /* not a URL */ }
     if (host !== url.host) return json({ error: 'Wrong origin.' }, 403);
   }
-  if (!env.LIVE) return json({ error: LIVE_OFFLINE, offline: true }, 503);
+  if (!env.LIVE && !env.LIVE_DOC) return json({ error: LIVE_OFFLINE, offline: true }, 503);
 
   const auth = await authorizeLive(env.DB, data.email, data.role, params.code, url.searchParams.get('device'));
   if (!auth.ok) return json({ error: auth.error }, auth.status);
+  const ns = auth.kind === 'code' ? env.LIVE_DOC : env.LIVE;
+  if (!ns) return json({ error: auth.kind === 'code' ? CODE_OFFLINE : LIVE_OFFLINE, offline: true }, 503);
 
   if ((request.headers.get('Upgrade') ?? '').toLowerCase() !== 'websocket') {
-    return json({ ok: true, seat: auth.ticket.seat, seats: auth.ticket.seats });
+    return json({ ok: true, seat: auth.ticket.seat, seats: auth.ticket.seats, kind: auth.kind });
   }
   const headers = new Headers(request.headers);
   headers.delete('Cookie');
   headers.delete('Authorization');
-  headers.set(TICKET_HEADER, encodeTicket(auth.ticket));
-  const stub = env.LIVE.get(env.LIVE.idFromName(auth.roomKey));
+  headers.set(TICKET_HEADER, auth.kind === 'code' ? encodeDocTicket(auth.ticket) : encodeTicket(auth.ticket));
+  const stub = ns.get(ns.idFromName(auth.roomKey));
   return stub.fetch(new Request('https://live.internal/connect', { method: 'GET', headers }));
 };

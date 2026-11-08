@@ -10,5 +10,5 @@
     "isolatedModules": true,
     "types": ["@cloudflare/workers-types"]
   },
-  "include": ["src/**/*.ts", "test/**/*.ts", "../../lib/live-protocol.ts", "../../lib/game-data.ts"]
+  "include": ["src/**/*.ts", "test/**/*.ts", "../../lib/live-protocol.ts", "../../lib/live-doc-protocol.ts", "../../lib/game-data.ts"]
 }

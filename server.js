@@ -179,6 +179,15 @@ app.prepare().catch((err) => {
     const m = /(?:^|;\s*)dev_student=([^;]+)/.exec(req.headers.cookie || '');
     return m ? decodeURIComponent(m[1]) : DEV_EMAIL;
   };
+  // A `dev_role=student|teacher|admin` cookie gives that browser its own role on
+  // the routes over the shared in-memory database below (and /api/me), so one dev
+  // server can hold a teacher and students at once: e.g. `DEV_REAL_DB=1` (the
+  // seeded class page) with students carrying `dev_role=student` in the sandbox,
+  // and the teacher reading their Code together sessions. No cookie: DEV_ROLE.
+  const devRoleOf = (req) => {
+    const m = /(?:^|;\s*)dev_role=(student|teacher|admin)(?:;|$)/.exec(req.headers.cookie || '');
+    return m ? m[1] : DEV_ROLE;
+  };
   // DEV_REAL_DB=1: the real tries handlers over an in-memory SQLite with a fake AI grader
   // (scripts/dev-demo-api.mjs). Mounted before the stubs below, so these routes win.
   if (process.env.DEV_REAL_DB === '1') {
@@ -186,10 +195,10 @@ app.prepare().catch((err) => {
     mountDemoApi({ server, express, devIdentity, role: DEV_ROLE, root: process.cwd() });
   }
   server.get('/api/me', (req, res) => {
-    res.json({ email: devIdentity(req), role: DEV_ROLE });
+    res.json({ email: devIdentity(req), role: devRoleOf(req) });
   });
   server.post('/api/auth/login', (req, res) => {
-    res.json({ email: devIdentity(req), role: DEV_ROLE });
+    res.json({ email: devIdentity(req), role: devRoleOf(req) });
   });
   server.post('/api/auth/logout', (_req, res) => {
     res.json({ ok: true });
@@ -552,13 +561,17 @@ app.prepare().catch((err) => {
     const shareOne = await import('./functions/api/library/shared/[id].ts');
     const shareToggle = await import('./functions/api/library/[id]/share.ts');
     const moderate = await import('./functions/api/classes/[id]/library-shares/index.ts');
-    libDb.sqlite.prepare(`INSERT OR IGNORE INTO classes (id, name, code, owner_email, school_year, created_at) VALUES ('devclass', 'Dev class', 'DEVDEV', 'owner@dev.local', '2026-2027', 0)`).run();
-    const ensureMember = (email) => {
-      if (DEV_ROLE === 'student') {
-        libDb.sqlite.prepare(`INSERT OR IGNORE INTO enrollments (class_id, student_email, enrolled_at, expires_at) VALUES ('devclass', ?, 0, 4102444800000)`).run(email);
+    // With DEV_REAL_DB=1 the class page's seeded class is 'dev-class' (scripts/dev-demo-api.mjs), so this
+    // database uses the same id and a teacher's panels on that page (Code together sessions, shared
+    // games) see the same students.
+    const LIB_CLASS = process.env.DEV_REAL_DB === '1' ? 'dev-class' : 'devclass';
+    libDb.sqlite.prepare(`INSERT OR IGNORE INTO classes (id, name, code, owner_email, school_year, created_at) VALUES (?, 'Dev class', 'DEVDEV', 'owner@dev.local', '2026-2027', 0)`).run(LIB_CLASS);
+    const ensureMember = (email, role = DEV_ROLE) => {
+      if (role === 'student') {
+        libDb.sqlite.prepare(`INSERT OR IGNORE INTO enrollments (class_id, student_email, enrolled_at, expires_at) VALUES (?, ?, 0, 4102444800000)`).run(LIB_CLASS, email);
         libDb.sqlite.prepare(`INSERT OR IGNORE INTO students (email, password_hash, created_at, role, first_name, last_name) VALUES (?, 'x', 0, 'student', ?, 'Dev')`).run(email, email.split('@')[0]);
       } else {
-        libDb.sqlite.prepare(`INSERT OR IGNORE INTO class_teachers (class_id, teacher_email, added_at) VALUES ('devclass', ?, 0)`).run(email);
+        libDb.sqlite.prepare(`INSERT OR IGNORE INTO class_teachers (class_id, teacher_email, added_at) VALUES (?, ?, 0)`).run(LIB_CLASS, email);
       }
     };
     // Real-time rooms (GET /api/live/:code, workers/live/ in production): an
@@ -566,17 +579,18 @@ app.prepare().catch((err) => {
     // (scripts/dev-live.mjs), on this same database. The upgrade listener is
     // attached to the http server below.
     const { makeDevLive } = await import('./scripts/dev-live.mjs');
-    const devLive = makeDevLive({ db: libDb, identity: (req) => { const email = devIdentity(req); ensureMember(email); return { email, role: DEV_ROLE }; } });
+    const devLive = makeDevLive({ db: libDb, identity: (req) => { const email = devIdentity(req); const role = devRoleOf(req); ensureMember(email, role); return { email, role }; } });
     devLiveUpgrade = devLive.onUpgrade;
     const libRoute = (handler) => async (req, res) => {
       const email = devIdentity(req);
-      ensureMember(email);
+      const role = devRoleOf(req);
+      ensureMember(email, role);
       const request = new Request(`http://localhost${req.originalUrl}`, {
         method: req.method,
         headers: { 'content-type': 'application/json' },
         body: req.method === 'GET' || req.method === 'DELETE' ? undefined : JSON.stringify(req.body ?? {}),
       });
-      const out = await handler({ request, env: { DB: libDb, UPLOADS, LIVE: devLive.namespace }, params: req.params, data: { email, role: DEV_ROLE } });
+      const out = await handler({ request, env: { DB: libDb, UPLOADS, LIVE: devLive.namespace, LIVE_DOC: devLive.docNamespace }, params: req.params, data: { email, role } });
       res.status(out.status).type('application/json').send(await out.text());
     };
     // Online game rooms (functions/api/rooms/*): two `dev_student` cookies are
@@ -594,6 +608,10 @@ app.prepare().catch((err) => {
     server.post('/api/rooms/:code/leave', express.json(), libRoute(roomLeave.onRequestPost));
     const liveRoute = await import('./functions/api/live/[code].ts');
     server.get('/api/live/:code', libRoute(liveRoute.onRequestGet));
+    // Code together (code rooms go to the LiveDoc stand-in in scripts/dev-live.mjs):
+    // the class page's "Code together sessions" panel reads what it wrote.
+    const codeSessions = await import('./functions/api/classes/[id]/code-sessions/index.ts');
+    server.get('/api/classes/:id/code-sessions', libRoute(codeSessions.onRequestGet));
     // The Games library (functions/api/games/*): the real handlers on the same
     // database, so one dev_student publishes from the sandbox and another plays
     // it from Library -> Games. Static /api/games/shared before /api/games/:id.

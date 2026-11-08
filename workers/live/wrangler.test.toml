@@ -1,9 +1,10 @@
 # LOCAL TESTING ONLY: `npx wrangler dev -c wrangler.test.toml` (miniflare).
 # Never deploy this config. Its entry (test/gateway.ts) re-exports the real
-# LiveRoom and adds a gateway that plays the Pages Function's part (it mints a
-# ticket from the query string), so scripts/test-live-worker.mjs can open
-# sockets on the real Durable Object. Production uses wrangler.toml, whose
-# Worker has no gateway and no public URL.
+# LiveRoom and LiveDoc and adds a gateway that plays the Pages Function's part
+# (it mints a ticket from the query string), so scripts/test-live-worker.mjs can
+# open sockets on the real Durable Objects. Production uses wrangler.toml, whose
+# Worker has no gateway and no public URL. The D1 database here is a local
+# miniflare one (the gateway's /setup applies migrations 0041, 0043 and 0044 to it).
 name = "shcode-live-test"
 main = "test/gateway.ts"
 compatibility_date = "2025-04-01"
@@ -13,6 +14,24 @@ workers_dev = false
 name = "LIVE_ROOM"
 class_name = "LiveRoom"
 
+[[durable_objects.bindings]]
+name = "LIVE_DOC"
+class_name = "LiveDoc"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["LiveRoom"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["LiveDoc"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "shcode-live-test"
+database_id = "00000000-0000-4000-8000-000000000044"
+
+[[rules]]
+type = "Text"
+globs = ["**/*.sql"]
+fallthrough = true

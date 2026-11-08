@@ -1,19 +1,26 @@
 // GET /api/rooms?game=<key> -- the open rooms a lobby offers (see onRequestGet).
 //
-// POST /api/rooms -- { game, seats, live? } host a new online game room. Answers
+// POST /api/rooms -- { game, seats, live?, kind? } host a new online game room. Answers
 // { code, seat: 0 }. The host must be in a live class (as a student or a
 // teacher), since only classmates can join; a fourth open room by the same
 // host closes their oldest. Rooms a day past expiry are swept here.
+//
+// Code together (migration 0044): { kind: 'code', game: 'code-js' | 'code-moshion', seats }
+// makes a shared-program session instead. It is always live (its socket goes to
+// the LiveDoc Durable Object, env.LIVE_DOC) and is listed only by
+// GET ?kind=code; a game lobby never lists one.
 
 import {
-  GAME_MAX, GAME_RE, LIST_LIMIT, MAX_OPEN_ROOMS_PER_HOST, MAX_SEATS, ROOM_TTL_MS, deviceOf, json, liveClassIds, pickRoomCode,
+  GAME_MAX, GAME_RE, LIST_LIMIT, MAX_OPEN_ROOMS_PER_HOST, MAX_SEATS, ROOM_TTL_MS, deviceOf, json, liveClassIds, liveRoomKey, pickRoomCode,
 } from '../../_shared/rooms';
 import { ownerLabel } from '../../_shared/libraryShare';
-import { LIVE_OFFLINE } from '../../_shared/live';
+import { CODE_OFFLINE, LIVE_OFFLINE, tellLiveRoom } from '../../_shared/live';
+import { codeLangOf } from '../../../lib/live-protocol';
 
 // LIVE: the real-time rooms' Durable Object namespace (workers/live/). Absent,
-// a real-time room cannot be made (503), so nothing half-works.
-interface Env { DB: D1Database; LIVE?: DurableObjectNamespace }
+// a real-time room cannot be made (503), so nothing half-works. LIVE_DOC: the
+// Code together sessions' namespace, the same rule.
+interface Env { DB: D1Database; LIVE?: DurableObjectNamespace; LIVE_DOC?: DurableObjectNamespace }
 type SessionData = { email: string; role: 'admin' | 'teacher' | 'student' };
 type Ctx = EventContext<Env, string, SessionData>;
 
@@ -27,14 +34,18 @@ type Ctx = EventContext<Env, string, SessionData>;
  * already holds a seat (in the room, or left and free to rejoin: such a room
  * is listed for this tab even when every seat is held). `inClass: false` means the caller is in no live
  * class, so there is nothing to list and nothing they could host.
+ * `kind=code` lists Code together sessions (live, game 'code-js' | 'code-moshion') and nothing else;
+ * without it only game rooms are listed.
  */
 export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ env, data, request }: Ctx) => {
   const url = new URL(request.url);
   const game = String(url.searchParams.get('game') ?? '').toLowerCase();
   if (!GAME_RE.test(game)) return json({ error: `The game name can use lowercase letters, digits and dashes (up to ${GAME_MAX}).` }, 400);
   const device = deviceOf(url.searchParams.get('device'));
-  // A real-time sketch's lobby lists live rooms only, every other lobby polling rooms only.
-  const live = url.searchParams.get('live') === '1' ? 1 : 0;
+  const kind = url.searchParams.get('kind') === 'code' ? 'code' : 'game';
+  if (kind === 'code' && !codeLangOf(game)) return json({ error: 'A Code together list is for code-js or code-moshion.' }, 400);
+  // A real-time sketch's lobby lists live rooms only, every other lobby polling rooms only. A code room is always live.
+  const live = kind === 'code' || url.searchParams.get('live') === '1' ? 1 : 0;
   const now = Date.now();
   const mine = await liveClassIds(env.DB, data.email, now);
   if (mine.size === 0) return json({ inClass: false, rooms: [] });
@@ -45,9 +56,9 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ en
             (SELECT COUNT(*) FROM game_room_players p WHERE p.code = r.code) AS taken,
             (SELECT COUNT(*) FROM game_room_players p WHERE p.code = r.code AND p.email = ?3 AND p.device = ?4) AS here
        FROM game_rooms r LEFT JOIN students s ON s.email = r.host_email
-      WHERE r.game = ?1 AND r.closed_at IS NULL AND r.expires_at > ?2 AND r.live = ?5
+      WHERE r.game = ?1 AND r.closed_at IS NULL AND r.expires_at > ?2 AND r.live = ?5 AND r.kind = ?6
       ORDER BY r.created_at DESC LIMIT 200`,
-  ).bind(game, now, data.email, device, live).all<{
+  ).bind(game, now, data.email, device, live, kind).all<{
     code: string; seats: number; host_email: string; created_at: number;
     first_name: string | null; last_name: string | null; present: number; taken: number; here: number;
   }>();
@@ -72,7 +83,7 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ en
 };
 
 export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ env, data, request }: Ctx) => {
-  let body: { game?: unknown; seats?: unknown; device?: unknown; live?: unknown };
+  let body: { game?: unknown; seats?: unknown; device?: unknown; live?: unknown; kind?: unknown };
   try { body = await request.json(); } catch { return json({ error: 'Invalid JSON body' }, 400); }
   const game = String(body?.game ?? 'game').toLowerCase();
   if (!GAME_RE.test(game)) return json({ error: `The game name can use lowercase letters, digits and dashes (up to ${GAME_MAX}).` }, 400);
@@ -81,8 +92,16 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ e
     return json({ error: `A room has 2 to ${MAX_SEATS} players.` }, 400);
   }
 
-  const live = body?.live === true ? 1 : 0;
-  if (live && !env.LIVE) {
+  const kind = body?.kind === 'code' ? 'code' : 'game';
+  if (body?.kind !== undefined && body.kind !== 'code' && body.kind !== 'game') return json({ error: 'A room is a game or a code session.' }, 400);
+  if (kind === 'code' && !codeLangOf(game)) return json({ error: 'A Code together session is for code-js or code-moshion.' }, 400);
+  // A game key that names a code session is kept for code sessions.
+  if (kind === 'game' && codeLangOf(game)) return json({ error: 'That game name is kept for Code together.' }, 400);
+  const live = kind === 'code' || body?.live === true ? 1 : 0;
+  if (kind === 'code' && !env.LIVE_DOC) {
+    return json({ error: CODE_OFFLINE, offline: true }, 503);
+  }
+  if (kind === 'game' && live && !env.LIVE) {
     return json({ error: LIVE_OFFLINE, offline: true }, 503);
   }
 
@@ -104,10 +123,14 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ e
 
   // At most MAX_OPEN_ROOMS_PER_HOST open rooms each: close the oldest beyond that.
   const open = await env.DB.prepare(
-    'SELECT code FROM game_rooms WHERE host_email = ? AND closed_at IS NULL AND expires_at > ? ORDER BY created_at DESC',
-  ).bind(data.email, now).all<{ code: string }>();
+    'SELECT code, created_at, kind FROM game_rooms WHERE host_email = ? AND closed_at IS NULL AND expires_at > ? ORDER BY created_at DESC',
+  ).bind(data.email, now).all<{ code: string; created_at: number; kind: string }>();
   const extra = (open.results ?? []).slice(MAX_OPEN_ROOMS_PER_HOST - 1);
-  for (const r of extra) await env.DB.prepare('UPDATE game_rooms SET closed_at = ? WHERE code = ?').bind(now, r.code).run();
+  for (const r of extra) {
+    await env.DB.prepare('UPDATE game_rooms SET closed_at = ? WHERE code = ?').bind(now, r.code).run();
+    // A Code together session closed this way still keeps its text for teachers: tell its room.
+    if (r.kind === 'code') await tellLiveRoom(env.LIVE_DOC, liveRoomKey(r), { op: 'close' });
+  }
 
   for (let attempt = 0; attempt < 5; attempt++) {
     // A code no open room holds; a closed or expired room's code may be reused,
@@ -127,12 +150,12 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ e
       await env.DB.batch([
         ...clear,
         env.DB.prepare(
-          'INSERT INTO game_rooms (code, game, host_email, seats, created_at, expires_at, live) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        ).bind(code, game, data.email, seats, now, now + ROOM_TTL_MS, live),
+          'INSERT INTO game_rooms (code, game, host_email, seats, created_at, expires_at, live, kind) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        ).bind(code, game, data.email, seats, now, now + ROOM_TTL_MS, live, kind),
         env.DB.prepare('INSERT INTO game_room_players (code, seat, email, device, joined_at) VALUES (?, 0, ?, ?, ?)')
           .bind(code, data.email, deviceOf(body?.device), now),
       ]);
-      return json({ code, seat: 0, seats, game, live: live === 1, expiresAt: now + ROOM_TTL_MS }, 201);
+      return json({ code, seat: 0, seats, game, live: live === 1, kind, expiresAt: now + ROOM_TTL_MS }, 201);
     } catch (e) {
       if (!/UNIQUE|PRIMARY KEY|constraint/i.test(String(e))) throw e;
     }

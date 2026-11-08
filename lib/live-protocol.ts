@@ -100,12 +100,14 @@ export function encodeTicket(t: LiveTicket): string {
   return JSON.stringify({ code: t.code, seat: t.seat, seats: t.seats, name: t.name, expiresAt: t.expiresAt });
 }
 
-/** A ticket as the Function wrote it, or null for anything else. */
+/** A ticket as the Function wrote it, or null for anything else (a Code together ticket included). */
 export function decodeTicket(raw: string | null | undefined): LiveTicket | null {
   if (!raw || raw.length > 400) return null;
   let v: Record<string, unknown>;
   try { v = JSON.parse(raw); } catch { return null; }
   if (!v || typeof v !== 'object') return null;
+  // A game room's ticket has no kind; a code room's says so and belongs to LiveDoc, never here.
+  if (v.kind !== undefined && v.kind !== 'game') return null;
   const { code, seat, seats, name, expiresAt } = v;
   if (typeof code !== 'string' || !CODE_RE.test(code)) return null;
   if (!Number.isInteger(seats) || (seats as number) < 2 || (seats as number) > SEAT_MAX + 1) return null;
@@ -364,4 +366,64 @@ export class LiveRoomCore {
     if (v?.op === 'leave' && Number.isInteger(v.seat)) { this.leaveSeat(v.seat as number); return true; }
     return false;
   }
+}
+
+// ---- Code together (REALTIME-SPEC.md Part 2) --------------------------------
+// A code room is a row in game_rooms with kind 'code' (migration 0044), always
+// live. Its socket goes to the LiveDoc Durable Object (lib/live-doc-protocol.ts),
+// not to LiveRoom, with a DocTicket. The ticket carries the emails the LiveDoc
+// needs to keep the shared program for teachers (code_sessions); the Worker has
+// no public URL, so they never leave Cloudflare, and no email is ever sent to a
+// socket.
+
+/** The game key of a code room, per sandbox mode. Nothing else is a code room's key. */
+export const CODE_ROOM_GAMES = { js: 'code-js', moshion: 'code-moshion' } as const;
+export type CodeLang = keyof typeof CODE_ROOM_GAMES;
+
+/** The sandbox mode a code room's game key names, or null for any other key. */
+export function codeLangOf(game: unknown): CodeLang | null {
+  if (game === CODE_ROOM_GAMES.js) return 'js';
+  if (game === CODE_ROOM_GAMES.moshion) return 'moshion';
+  return null;
+}
+
+export interface DocTicket extends LiveTicket {
+  kind: 'code';
+  /** This socket's account (kept for teachers, never sent to a socket). */
+  email: string;
+  /** The host's account and its first name + last initial. */
+  host: string;
+  hostName: string;
+  lang: CodeLang;
+  /** The Durable Object's name (code + creation time) and the room's creation time. */
+  roomKey: string;
+  startedAt: number;
+}
+
+const EMAIL_MAX = 254;
+const ROOM_KEY_RE = /^[A-Z0-9]{4,6}-\d{1,16}$/;
+
+export function encodeDocTicket(t: DocTicket): string {
+  return JSON.stringify({
+    kind: 'code', code: t.code, seat: t.seat, seats: t.seats, name: t.name, expiresAt: t.expiresAt,
+    email: t.email, host: t.host, hostName: t.hostName, lang: t.lang, roomKey: t.roomKey, startedAt: t.startedAt,
+  });
+}
+
+/** A Code together ticket as the Function wrote it, or null for anything else (a game ticket included). */
+export function decodeDocTicket(raw: string | null | undefined): DocTicket | null {
+  if (!raw || raw.length > 1400) return null;
+  let v: Record<string, unknown>;
+  try { v = JSON.parse(raw); } catch { return null; }
+  if (!v || typeof v !== 'object' || v.kind !== 'code') return null;
+  const base = decodeTicket(JSON.stringify({ code: v.code, seat: v.seat, seats: v.seats, name: v.name, expiresAt: v.expiresAt }));
+  if (!base) return null;
+  const { email, host, hostName, lang, roomKey, startedAt } = v;
+  if (typeof email !== 'string' || !email || email.length > EMAIL_MAX) return null;
+  if (typeof host !== 'string' || !host || host.length > EMAIL_MAX) return null;
+  if (typeof hostName !== 'string' || hostName.length > 80) return null;
+  if (lang !== 'js' && lang !== 'moshion') return null;
+  if (typeof roomKey !== 'string' || !ROOM_KEY_RE.test(roomKey)) return null;
+  if (typeof startedAt !== 'number' || !Number.isFinite(startedAt)) return null;
+  return { ...base, kind: 'code', email, host, hostName, lang, roomKey, startedAt };
 }

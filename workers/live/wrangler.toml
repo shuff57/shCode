@@ -1,14 +1,21 @@
 # shcode-live: the real-time rooms (codehs-review/REALTIME-SPEC.md).
 #
-# One Durable Object class, LiveRoom, SQLite-backed (the only kind the Workers
+# Two Durable Object classes, both SQLite-backed (the only kind the Workers
 # Free plan allows) and using the WebSocket Hibernation API, so an idle room is
-# not billed. The Pages project binds it as LIVE (the repo's wrangler.toml,
-# [[durable_objects.bindings]] with script_name = "shcode-live"), and
-# functions/api/live/[code].ts is the ONLY way in: this Worker has no public URL
-# (workers_dev and preview_urls are off, no routes), and its own fetch handler
-# answers 404.
+# not billed:
+#   LiveRoom  real-time play (Part 1), bound to the Pages project as LIVE;
+#   LiveDoc   Code together, one shared sandbox program (Part 2), bound as LIVE_DOC.
+# The repo's wrangler.toml declares both ([[durable_objects.bindings]] with
+# script_name = "shcode-live"), and functions/api/live/[code].ts is the ONLY way
+# in: this Worker has no public URL (workers_dev and preview_urls are off, no
+# routes), and its own fetch handler answers 404.
 #
-# Deploy (the course owner decides when):   cd workers/live && npx wrangler deploy
+# LiveDoc keeps the shared program where a teacher can read it: it writes its
+# own text to D1 code_sessions (migration 0044) through the DB binding below,
+# the same database as the Pages project.
+#
+# Deploy (the course owner decides when; apply migration 0044 first):
+#   cd workers/live && npx wrangler deploy
 # Local check (deploys nothing):            npx wrangler dev -c wrangler.test.toml
 name = "shcode-live"
 main = "src/index.ts"
@@ -20,6 +27,20 @@ preview_urls = false
 name = "LIVE_ROOM"
 class_name = "LiveRoom"
 
+[[durable_objects.bindings]]
+name = "LIVE_DOC"
+class_name = "LiveDoc"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["LiveRoom"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["LiveDoc"]
+
+# The same database as the Pages project (the repo's wrangler.toml).
+[[d1_databases]]
+binding = "DB"
+database_name = "shcode-commits"
+database_id = "de53517f-5d1f-4d70-a1f9-13d463abb76f"

@@ -1,12 +1,13 @@
 // POST /api/rooms/[code]/leave -- a player leaves. The seat stays theirs (a
 // rejoin gets it back) but the others see them as gone. When the host leaves,
 // the room closes. A real-time room's Durable Object is told too (the seat's
-// socket is dropped; the host leaving closes every socket).
+// socket is dropped; the host leaving closes every socket): LiveRoom for a game
+// room, LiveDoc for a Code together session (which then keeps its text for teachers).
 
-import { deviceOf, getRoom, json, liveRoomKey, normalizeCode } from '../../../_shared/rooms';
+import { deviceOf, getRoom, json, liveRoomKey, normalizeCode, roomKind } from '../../../_shared/rooms';
 import { tellLiveRoom } from '../../../_shared/live';
 
-interface Env { DB: D1Database; LIVE?: DurableObjectNamespace }
+interface Env { DB: D1Database; LIVE?: DurableObjectNamespace; LIVE_DOC?: DurableObjectNamespace }
 type SessionData = { email: string; role: 'admin' | 'teacher' | 'student' };
 type Ctx = EventContext<Env, 'code', SessionData>;
 
@@ -28,11 +29,12 @@ export const onRequestPost: PagesFunction<Env, 'code', SessionData> = async ({ e
     await env.DB.prepare('UPDATE game_rooms SET closed_at = ? WHERE code = ?').bind(now, code).run();
   }
   if (room.live === 1 && (res.meta?.changes ?? 0) > 0) {
-    if (isHost) await tellLiveRoom(env.LIVE, liveRoomKey(room), { op: 'close' });
+    const ns = roomKind(room) === 'code' ? env.LIVE_DOC : env.LIVE;
+    if (isHost) await tellLiveRoom(ns, liveRoomKey(room), { op: 'close' });
     else {
       const me = await env.DB.prepare('SELECT seat FROM game_room_players WHERE code = ? AND email = ? AND device = ?')
         .bind(code, data.email, device).first<{ seat: number }>();
-      if (me) await tellLiveRoom(env.LIVE, liveRoomKey(room), { op: 'leave', seat: me.seat });
+      if (me) await tellLiveRoom(ns, liveRoomKey(room), { op: 'leave', seat: me.seat });
     }
   }
   return json({ left: (res.meta?.changes ?? 0) > 0 });

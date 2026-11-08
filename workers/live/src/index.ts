@@ -6,12 +6,17 @@
 // Function (functions/api/live/[code].ts) put on the upgrade, and are kept with
 // serializeAttachment so they survive the room hibernating. Nothing is written
 // to storage per message: moves and shared sprites are relayed, not kept.
+//
+// The same Worker also runs Code together's LiveDoc (src/live-doc.ts), bound to
+// the Pages project as LIVE_DOC.
 
 import { DurableObject } from 'cloudflare:workers';
 import {
   CONTROL_HEADER, LiveRoomCore, TICKET_HEADER, decodeTicket,
   type LiveAttachment, type LiveSocket,
 } from '../../../lib/live-protocol';
+
+export { LiveDoc } from './live-doc';
 
 export class LiveRoom extends DurableObject {
   private readonly core: LiveRoomCore;
@@ -79,7 +84,7 @@ export class LiveRoom extends DurableObject {
   }
 }
 
-// No HTTP surface: the Pages Function reaches LiveRoom through its binding.
+// No HTTP surface: the Pages Function reaches LiveRoom and LiveDoc through their bindings.
 export default {
   async fetch(): Promise<Response> {
     return new Response('Not found', { status: 404 });
