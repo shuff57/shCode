@@ -5,10 +5,12 @@
 // LiveDoc Durable Object) and returns ONE CodeMirror extension the sandbox's
 // editor adds through a Compartment (components/CodeMirrorPane.tsx `collab`):
 //
-//   - @codemirror/collab, installed only once the shared text is known (an
-//     inner Compartment, so a reset can take it out and put it back at a new
-//     version), plus the sync below that pushes `sendableUpdates` and applies
-//     incoming `updates` with `receiveUpdates`;
+//   - collab (lib/live-collab.ts: @codemirror/collab, changed so that two
+//     people typing at one spot each keep their run of typing in one piece),
+//     installed only once the shared text is known (an inner Compartment, so
+//     a reset can take it out and put it back at a new version), plus the sync
+//     below that pushes `sendableUpdates` and applies incoming `updates` with
+//     `receiveUpdates`;
 //   - the other people's cursors and selections, each in its seat's colour with
 //     a small name tag (relayed by the room, never stored);
 //   - a filter that keeps one change under the room's frame limit and the whole
@@ -30,11 +32,11 @@
 // jumped back a few seconds.").
 
 import {
-  ChangeSet, Compartment, EditorState, StateEffect, StateField, Transaction,
+  ChangeSet, Compartment, EditorState, Facet, StateEffect, StateField, Transaction,
   type ChangeDesc, type Extension, type Text, type TransactionSpec,
 } from '@codemirror/state';
 import { Decoration, EditorView, ViewPlugin, WidgetType, type DecorationSet, type ViewUpdate } from '@codemirror/view';
-import { collab, getSyncedVersion, receiveUpdates, sendableUpdates } from '@codemirror/collab';
+import { collab, getSyncedVersion, receiveUpdates, sendableUpdates, unmapChar } from './live-collab';
 import { MAX_DOC_FRAME, MAX_UPDATES_PER_PUSH, TOO_BIG, overDocCap, textOf } from './live-doc-protocol';
 import type { LivePlayer } from './live-protocol';
 
@@ -55,8 +57,18 @@ const MAX_CHANGE_JSON = MAX_DOC_FRAME - 512;
 export const PASTE_TOO_BIG = 'That paste is too big to share in one go. Paste it in smaller pieces.';
 export const REWOUND = 'The shared program jumped back a few seconds.';
 
-/** Each seat's colour (the course palette): seat 0 is the host. */
-export const SEAT_COLORS = ['var(--c-pink)', 'var(--c-cyan)', 'var(--c-green)', 'var(--c-orange)'] as const;
+/**
+ * Each seat's colour (the course palette): seat 0 is the host. A person's
+ * caret, selection, name tag and their dot in the Code together bar all wear
+ * it. Four hues far apart in every theme: cyan beside green was the closest
+ * pair (in Forest the two are nearly one mint), so the third and fourth seats
+ * are orange and purple. The name always shows too, so colour is never the
+ * only way to tell people apart. scripts/test-live-doc.mjs measures, in every
+ * theme, that the colours stay apart and the tag text reads on each.
+ */
+export const SEAT_COLORS = ['var(--c-pink)', 'var(--c-cyan)', 'var(--c-orange)', 'var(--c-purple)'] as const;
+/** The name tag's text, on the seat colour (at least 4.5:1 in every theme, measured in the test). */
+export const TAG_TEXT = 'var(--c-deep)';
 
 export function seatColor(seat: number): string {
   return SEAT_COLORS[((seat % SEAT_COLORS.length) + SEAT_COLORS.length) % SEAT_COLORS.length];
@@ -84,12 +96,18 @@ export interface DocSyncOptions {
   wantPush?: () => void;
   /** The room lost its last few seconds and this editor started again from the room's text. */
   onRewound?: () => void;
-  /** A cursor asked for while this editor's own typing was unconfirmed can be sent now. */
+  /** A cursor asked for while this editor's own typing was unconfirmed can be sent now, or someone's typing moved this caret. */
   wantCursor?: () => void;
   now?: () => number;
 }
 
 const quiet = [Transaction.addToHistory.of(false), Transaction.remote.of(true)];
+
+/** Who typed a character: this editor (`own`), another seat, or null (the starting program, or older than the history kept). */
+export type CharAuthor = { own: boolean; seat: number } | null;
+type AuthorOf = (state: EditorState, pos: number) => CharAuthor;
+/** How the presence field asks who typed a character (DocSync provides it with collab). */
+const charAuthor = Facet.define<AuthorOf, AuthorOf | null>({ combine: (v) => v[0] ?? null });
 
 export class DocSync {
   /** Holds collab() once the shared text is known; empty before. */
@@ -109,9 +127,11 @@ export class DocSync {
    * The room's accepted updates this editor applied, in order: `items[i]`
    * took the room's text from version `from + i` to `from + i + 1`. A cursor
    * is sent in the room's text at a version, and placed here by mapping it
-   * through what came after (see remoteCursor).
+   * through what came after (see remoteCursor). Each says whose it was
+   * (`seat`; `own`: this editor's; `typed`: false for the starting program),
+   * which is how a run of someone's typing is kept in one piece (see authorAt).
    */
-  private hist: { from: number; items: { desc: ChangeDesc; seat: number }[] } = { from: 0, items: [] };
+  private hist: { from: number; items: { desc: ChangeDesc; seat: number; own: boolean; typed: boolean }[] } = { from: 0, items: [] };
   /** Cursors sent at a version this editor has not reached yet, by seat. */
   private pending = new Map<number, CursorMessage>();
   /** cursor() was asked for while this editor had unconfirmed typing. */
@@ -197,15 +217,25 @@ export class DocSync {
     if (m.version > synced) { this.opts.send({ t: 'pull', version: synced }); return; }
     if (m.epoch) this.epoch = m.epoch; // a socket that outlived hibernation learns the new incarnation here
     const fresh = list.slice(synced - m.version);
+    let follow = false;
     if (fresh.length) {
       try {
         const parsed = fresh.map((u) => ChangeSet.fromJSON(u.changes));
+        // This caret sits right after someone else's text and they type on at
+        // it: it goes after their new text, so they carry on in one piece and
+        // this editor's next keystroke does not land inside their word. (Right
+        // after this editor's own text it stays in front, as CodeMirror does.)
+        const sel = ed.state.selection.main;
+        if (sel.empty) {
+          const who = this.localAuthor(ed.state, sel.head - 1);
+          follow = !!who && !who.own && fresh.some((u) => u.seat === who.seat && String(u.clientID) !== this.clientID);
+        }
         // Each update says whose it is, so that person's own cursor moves with
         // their typing (presenceField) instead of staying in front of it.
         ed.dispatch(receiveUpdates(ed.state, fresh.map((u, i) => ({
           changes: parsed[i], clientID: String(u.clientID),
           effects: Number.isInteger(u.seat) ? [typedBy.of(u.seat as number)] : undefined,
-        }))));
+        })), { ownChar: (pos) => this.authorAt(pos, synced)?.own === true, caretAfter: follow }));
         parsed.forEach((cs, i) => this.record(synced + i, cs, fresh[i]));
       } catch { this.askReset(); return; }
     }
@@ -213,18 +243,65 @@ export class DocSync {
     this.placePending();
     if (this.hasSendable()) this.opts.wantPush?.();
     else this.cursorNowSendable();
+    // The others see this caret where it went (their editors move it the same way, but a word costs nothing).
+    if (follow) this.opts.wantCursor?.();
   }
 
   /** Remember the room's update that took its text from `version` to the next. */
   private record(version: number, cs: ChangeSet, u: WireUpdate) {
     const h = this.hist;
     if (h.from + h.items.length !== version) { h.from = version; h.items = []; }
-    h.items.push({ desc: cs.desc, seat: Number.isInteger(u.seat) ? (u.seat as number) : -1 });
+    h.items.push({
+      desc: cs.desc,
+      seat: Number.isInteger(u.seat) ? (u.seat as number) : -1,
+      own: String(u.clientID) === this.clientID,
+      // The update at version 0 is the starting program (the host's seed), not anyone's typing.
+      typed: version > 0,
+    });
     if (h.items.length > KEEP_HISTORY) {
       const drop = h.items.length - KEEP_HISTORY;
       h.items.splice(0, drop);
       h.from += drop;
     }
+  }
+
+  /**
+   * Who typed the character at `pos` in the room's text at `version`, read
+   * from the room's accepted updates this editor remembers (each stamped with
+   * whose it was); null for the starting program or anything older.
+   *
+   * It keeps each person's run of typing in one piece, by one rule used in
+   * three places: an insert goes AFTER a caret, or after someone's own insert
+   * at the same spot, when the character just before that spot was typed by
+   * the person inserting (they are carrying on their own run); otherwise it
+   * goes in front, as CodeMirror does. The places are the rebase of this
+   * editor's unconfirmed typing (lib/live-collab.ts), this editor's caret
+   * (`follow` in updates), and the other people's carets (presenceField, place).
+   */
+  private authorAt(pos: number, version: number): CharAuthor {
+    const h = this.hist;
+    if (pos < 0 || version < h.from || version > h.from + h.items.length) return null;
+    let p = pos;
+    for (let i = version - h.from - 1; i >= 0; i--) {
+      p = unmapChar(h.items[i].desc, p);
+      if (p < 0) {
+        const it = h.items[i];
+        return it.typed && (it.own || it.seat >= 0) ? { own: it.own, seat: it.seat } : null;
+      }
+    }
+    return null;
+  }
+
+  /** Who typed the character at `pos` in this editor's text now (its own unconfirmed typing included). */
+  localAuthor(state: EditorState, pos: number): CharAuthor {
+    if (pos < 0) return null;
+    let p = pos;
+    const mine = sendableUpdates(state);
+    for (let k = mine.length - 1; k >= 0; k--) {
+      p = unmapChar(mine[k].changes, p);
+      if (p < 0) return { own: true, seat: -1 };
+    }
+    return this.authorAt(p, getSyncedVersion(state));
   }
 
   private cursorNowSendable() {
@@ -294,19 +371,40 @@ export class DocSync {
     const h = this.hist;
     const synced = getSyncedVersion(ed.state);
     if (typeof c.version === 'number' && c.version >= h.from && synced - h.from <= h.items.length) {
-      // That person's own later typing carries their caret with it; anyone
-      // else's insert at the same spot leaves it in front, as their editor does.
-      for (const it of h.items.slice(c.version - h.from, synced - h.from)) {
-        const assoc = it.seat === c.seat ? 1 : -1;
-        anchor = it.desc.mapPos(clampPos(anchor, it.desc.length), assoc);
-        head = it.desc.mapPos(clampPos(head, it.desc.length), assoc);
+      // That person's own later typing carries their caret with it, and so
+      // does typing that carries on the text just before their caret (their
+      // editor moves it the same way, see authorAt); anyone else's insert at
+      // the same spot leaves it in front, as their editor does.
+      for (let v = c.version; v < synced; v++) {
+        const it = h.items[v - h.from];
+        const len = it.desc.length;
+        const carries = it.seat === c.seat || (anchor === head && followsRun(this.authorAt(clampPos(head, len) - 1, v), it.own, it.seat));
+        const assoc = carries ? 1 : -1;
+        anchor = it.desc.mapPos(clampPos(anchor, len), assoc);
+        head = it.desc.mapPos(clampPos(head, len), assoc);
       }
-      for (const u of sendableUpdates(ed.state)) {
-        anchor = u.changes.mapPos(clampPos(anchor, u.changes.length), -1);
-        head = u.changes.mapPos(clampPos(head, u.changes.length), -1);
-      }
+      const mine = sendableUpdates(ed.state);
+      mine.forEach((u, k) => {
+        const len = u.changes.length;
+        // The text u applies to: the synced text plus this editor's earlier unconfirmed typing.
+        const who = anchor === head ? this.authorBefore(mine, k, clampPos(head, len) - 1, synced) : null;
+        const assoc = who?.own ? 1 : -1;
+        anchor = u.changes.mapPos(clampPos(anchor, len), assoc);
+        head = u.changes.mapPos(clampPos(head, len), assoc);
+      });
     }
     return { seat: c.seat, name: c.name, anchor, head };
+  }
+
+  /** Who typed the character at `pos` in the text mine[k] applies to (the synced text plus mine[0..k-1]). */
+  private authorBefore(mine: readonly { changes: ChangeSet }[], k: number, pos: number, synced: number): CharAuthor {
+    if (pos < 0) return null;
+    let p = pos;
+    for (let j = k - 1; j >= 0; j--) {
+      p = unmapChar(mine[j].changes, p);
+      if (p < 0) return { own: true, seat: -1 };
+    }
+    return this.authorAt(p, synced);
   }
 
   /** Start again from the room's text (too far behind, a refused change, or the room rewound). */
@@ -345,7 +443,10 @@ export class DocSync {
     if (ed.state.doc.toString() !== b.doc.toString()) {
       ed.dispatch({ changes: { from: 0, to: ed.state.doc.length, insert: b.doc }, annotations: quiet, filter: false });
     }
-    ed.dispatch({ effects: this.inner.reconfigure(collab({ startVersion: b.version, clientID: this.clientID })) });
+    ed.dispatch({ effects: this.inner.reconfigure([
+      collab({ startVersion: b.version, clientID: this.clientID }),
+      charAuthor.of((state, pos) => this.localAuthor(state, pos)),
+    ]) });
     this.installed = true;
     this.base = null;
     this.placePending();
@@ -415,6 +516,12 @@ class CaretWidget extends WidgetType {
   ignoreEvent() { return true; }
 }
 
+/** Does an insert by `own`/`seat` at a caret carry on the run of the character just before it (`who`)? */
+function followsRun(who: CharAuthor, own: boolean, seat: number): boolean {
+  if (!who) return false;
+  return own ? who.own : !who.own && who.seat === seat;
+}
+
 function clampPos(n: number, len: number): number {
   return Number.isFinite(n) ? Math.max(0, Math.min(len, Math.floor(n))) : 0;
 }
@@ -450,11 +557,19 @@ export const presenceField = StateField.define<{ cursors: RemoteCursor[]; deco: 
       const len = tr.startState.doc.length;
       const typists = new Set<number>();
       for (const e of tr.effects) if (e.is(typedBy)) typists.add(e.value);
+      const local = !tr.annotation(Transaction.remote);
+      const authorOf = tr.startState.facet(charAuthor);
       cursors = cursors.map((c) => {
-        // Someone's own typing at their caret puts the caret after it; anyone
-        // else's (this editor's included) leaves it in front, as it does for them.
-        const assoc = typists.has(c.seat) ? 1 : -1;
-        return { ...c, anchor: tr.changes.mapPos(clampPos(c.anchor, len), assoc), head: tr.changes.mapPos(clampPos(c.head, len), assoc) };
+        // Someone's own typing at their caret puts the caret after it, and so
+        // does typing that carries on the text just before their caret (their
+        // editor moves it the same way); anyone else's leaves it in front.
+        let assoc = typists.has(c.seat) ? 1 : -1;
+        const at = clampPos(c.head, len);
+        if (assoc < 0 && authorOf && c.anchor === c.head && tr.changes.mapPos(at, -1) !== tr.changes.mapPos(at, 1)) {
+          const who = authorOf(tr.startState, at - 1);
+          if (local ? !!who?.own : !!who && !who.own && typists.has(who.seat)) assoc = 1;
+        }
+        return { ...c, anchor: tr.changes.mapPos(clampPos(c.anchor, len), assoc), head: tr.changes.mapPos(at, assoc) };
       });
     }
     for (const e of tr.effects) {
@@ -482,7 +597,7 @@ const presenceTheme = EditorView.baseTheme({
     bottom: '100%',
     padding: '0 4px',
     borderRadius: '3px 3px 3px 0',
-    color: 'var(--c-deep)',
+    color: TAG_TEXT,
     fontFamily: 'system-ui, sans-serif',
     fontSize: '10px',
     fontWeight: '600',

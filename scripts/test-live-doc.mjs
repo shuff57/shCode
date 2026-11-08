@@ -76,6 +76,41 @@ check('game keys: code-js and code-moshion only', P.codeLangOf('code-js') === 'j
   check('presence: junk positions land at the start', st.field(presenceField).cursors[0].anchor === 0 && st.field(presenceField).cursors[0].head === 0);
 }
 
+// The four people's colours, in every theme: the name tag's text reads on its
+// tag (4.5:1, WCAG AA for text), and no two colours are close (OKLab distance;
+// the old cyan beside green measured 0.065 in Forest, nearly one mint).
+{
+  const { SEAT_COLORS, TAG_TEXT, seatColor } = await import(join(root, 'lib/live-doc.ts'));
+  const { readFileSync } = await import('node:fs');
+  const varsOf = (css) => { const o = {}; for (const m of css.matchAll(/--([\w-]+):\s*([^;]+);/g)) o[m[1]] = m[2].trim(); return o; };
+  const dark = varsOf(readFileSync(join(root, 'app/globals.css'), 'utf8').match(/:root\s*\{[\s\S]*?\n\}/g).join('\n'));
+  const themes = { dark };
+  for (const m of readFileSync(join(root, 'app/themes.css'), 'utf8').matchAll(/html\[data-theme="(\w+)"\]\s*\{([\s\S]*?)\n\}/g)) themes[m[1]] = { ...dark, ...varsOf(m[2]) };
+  const hexOf = (v, vars, d = 0) => { v = String(v).trim(); if (/^#[0-9a-f]{6}$/i.test(v)) return v.toLowerCase(); const r = v.match(/^var\(--([\w-]+)\)$/); return r && d < 5 && vars[r[1]] ? hexOf(vars[r[1]], vars, d + 1) : null; };
+  const lin = (h) => { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((e) => { const c = e / 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; }); };
+  const lum = (h) => { const [r, g, b] = lin(h); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+  const contrast = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+  const oklab = (h) => { const [r, g, b] = lin(h); const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b), m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b), s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b); return [0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s, 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s, 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s]; };
+  const low = [];
+  const near = [];
+  let worstText = 99;
+  let worstGap = 99;
+  for (const [name, vars] of Object.entries(themes)) {
+    const text = hexOf(TAG_TEXT, vars);
+    const hex = SEAT_COLORS.map((c) => hexOf(c, vars));
+    hex.forEach((h, i) => { const r = h && text ? contrast(h, text) : 0; worstText = Math.min(worstText, r); if (r < 4.5) low.push(`${name} seat ${i} ${h} on ${text} ${r.toFixed(2)}`); });
+    for (let i = 0; i < hex.length; i++) for (let j = i + 1; j < hex.length; j++) {
+      const [p, q] = [oklab(hex[i]), oklab(hex[j])];
+      const d = Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]);
+      worstGap = Math.min(worstGap, d);
+      if (d < 0.08) near.push(`${name} seats ${i}/${j} ${d.toFixed(3)}`);
+    }
+  }
+  check(`colours: four seats, each its own (${Object.keys(themes).length} themes)`, SEAT_COLORS.length === 4 && new Set(SEAT_COLORS).size === 4 && seatColor(5) === SEAT_COLORS[1] && Object.keys(themes).length >= 5, Object.keys(themes));
+  check(`colours: every name tag's text is at least 4.5:1 on its colour, in every theme (worst ${worstText.toFixed(2)})`, low.length === 0, low);
+  check(`colours: no two people's colours are close in any theme (worst OKLab distance ${worstGap.toFixed(3)})`, near.length === 0, near);
+}
+
 // ---- 2. LiveDocCore + two collab clients ----
 let clock = 1_000_000;
 const now = () => clock;
@@ -546,6 +581,153 @@ const SEED = 'let x = 1;\nfunction draw() {\n  clear();\n}\n';
   bo.reconnect(slept);
   bo.deliverIn();
   check('rewind: waking from a written state resets nobody', bo.rewound === 1 && bo.text() === slept.core.text());
+}
+
+{
+  // Two people typing at the SAME spot at the same moment. Found in a browser
+  // walk: Sam typed "let samX" and Ana typed "let anaY = 2;" on one empty line;
+  // the result was "le" + "let anaY = 2;" + "t samX". Sam's "le" was confirmed,
+  // Ana's insert was rebased to sit right after it (the end of Sam's run, where
+  // his caret was), and Sam's unconfirmed rest was then rebased over Ana's
+  // insert with the remote text first, so it landed after hers. Each person's
+  // continuous typing must stay in one piece: the other text goes before or
+  // after the whole run, never inside it.
+  const BASE = 'function draw() {\n  \n}\n';
+  const AT = BASE.indexOf('\n  \n') + 3;
+  const SAM = 'let samX', ANA = 'let anaY = 2;';
+  const typeRun = (c, text) => { for (const ch of text) c.typeAt(ch); };
+  const contiguous = (text, runs) => runs.every((r) => text.includes(r));
+  const pair = (seed) => {
+    const room = makeRoom();
+    const sam = client(room, ANN_T, { seed: seed ?? BASE, own: seed ?? BASE });
+    const ana = client(room, BO_T);
+    drain(room, [sam, ana]);
+    sam.edit({ selection: { anchor: AT } });
+    ana.edit({ selection: { anchor: AT } });
+    return { room, sam, ana };
+  };
+  {
+    // The walk, step by step.
+    const { room, sam, ana } = pair();
+    typeRun(sam, 'le');
+    sam.sync.push(); sam.deliverOut();
+    while (sam.deliverIn());
+    check('walk: Sam\'s first two letters are confirmed', !sam.sync.hasSendable() && room.core.text().includes('  le\n'), room.core.text());
+    typeRun(ana, ANA); // before she has heard of Sam's
+    ana.sync.push(); ana.deliverOut(); // stale: answered with Sam's "le"
+    typeRun(sam, SAM.slice(2)); // Sam carries on, unconfirmed
+    while (ana.deliverIn());
+    ana.sync.push(); ana.deliverOut(); // Ana's, rebased, is accepted
+    while (sam.deliverIn()); // ...and reaches Sam while his rest is unconfirmed
+    check('walk: drains to quiet', drain(room, [sam, ana]));
+    const text = room.core.text();
+    check('walk: both editors and the room hold the same text', sam.text() === ana.text() && ana.text() === text, [sam.text(), ana.text(), text]);
+    check('walk: Sam\'s "let samX" and Ana\'s "let anaY = 2;" each stay in one piece', contiguous(text, [SAM, ANA]), text.split('\n')[1]);
+    check('walk: each caret is still at the end of its own run', sam.head() === sam.text().indexOf(SAM) + SAM.length && ana.head() === ana.text().indexOf(ANA) + ANA.length, [sam.head(), ana.head(), sam.text().split('\n')[1]]);
+  }
+  // The same, every ordering: random keystrokes, pushes and deliveries.
+  const RUNS = [['let samX = 1;', 'let anaY = 22;'], ['circle(10, 20, 5);', 'rect(1, 2, 3, 4);'], ['xxxxxxxx', 'yyyyyyyy']];
+  let bad = null;
+  let n = 0;
+  for (let seed = 1; seed <= 400 && !bad; seed++) {
+    const rand = rng(seed * 7919);
+    const [a, b] = RUNS[seed % RUNS.length];
+    const { room, sam, ana } = pair();
+    const left = new Map([[sam, [...a]], [ana, [...b]]]);
+    for (let step = 0; step < 400 && [...left.values()].some((l) => l.length); step++) {
+      clock += 20;
+      const c = rand() < 0.5 ? sam : ana;
+      const r = rand();
+      if (r < 0.4) { const ch = left.get(c).shift(); if (ch !== undefined) c.typeAt(ch); }
+      else if (r < 0.6) c.sync.push();
+      else if (r < 0.8) c.deliverOut();
+      else c.deliverIn();
+    }
+    for (const [c, l] of left) for (const ch of l) c.typeAt(ch);
+    const quiet = drain(room, [sam, ana]);
+    const text = room.core.text();
+    n++;
+    if (!quiet || sam.text() !== text || ana.text() !== text || !contiguous(text, [a, b])) bad = { seed, quiet, line: text.split('\n')[1], sam: sam.text().split('\n')[1], ana: ana.text().split('\n')[1] };
+  }
+  check(`same spot, random timing (${n} seeds): texts identical and each person's run in one piece`, !bad, bad);
+  // The other way round: Sam clicks at the end of what Ana is still typing and
+  // types there too. Her run keeps going in one piece; his goes after it.
+  bad = null;
+  n = 0;
+  for (let seed = 1; seed <= 300 && !bad; seed++) {
+    const rand = rng(seed * 4241);
+    const { room, sam, ana } = pair();
+    typeRun(ana, 'let an');
+    drain(room, [sam, ana]);
+    sam.edit({ selection: { anchor: AT + 6 } });
+    const left = new Map([[ana, [...'aY = 2;']], [sam, [...'// sam']]]);
+    for (let step = 0; step < 300 && [...left.values()].some((l) => l.length); step++) {
+      clock += 20;
+      const c = rand() < 0.5 ? sam : ana;
+      const r = rand();
+      if (r < 0.4) { const ch = left.get(c).shift(); if (ch !== undefined) c.typeAt(ch); }
+      else if (r < 0.6) c.sync.push();
+      else if (r < 0.8) c.deliverOut();
+      else c.deliverIn();
+    }
+    for (const [c, l] of left) for (const ch of l) c.typeAt(ch);
+    const quiet = drain(room, [sam, ana]);
+    const text = room.core.text();
+    n++;
+    if (!quiet || sam.text() !== text || ana.text() !== text || !contiguous(text, [ANA, '// sam'])) bad = { seed, quiet, line: text.split('\n')[1] };
+  }
+  check(`joining the end of someone's line while they type (${n} seeds): their run stays in one piece`, !bad, bad);
+  {
+    // ...and while she types, his caret rides along at the end of her text, on
+    // his screen and as his tag on hers, without him sending anything new.
+    const { room, sam, ana } = pair();
+    typeRun(ana, 'let an');
+    drain(room, [sam, ana]);
+    sam.edit({ selection: { anchor: AT + 6 } });
+    sam.sendCursor();
+    drain(room, [sam, ana]);
+    const tagOk = [];
+    for (const ch of 'aY = 2;') {
+      ana.typeAt(ch);
+      tagOk.push(ana.sees(0)?.head === ana.head()); // before the room has it
+      ana.sync.push(); ana.deliverOut();
+      while (sam.deliverIn());
+      drain(room, [sam, ana]);
+    }
+    check('joining: his caret follows the end of her text as she types', sam.head() === AT + ANA.length && sam.text() === ana.text(), [sam.head(), AT + ANA.length]);
+    check('joining: on her screen his tag rides along at once, keystroke by keystroke', tagOk.every(Boolean) && ana.sees(0)?.head === ana.head(), tagOk);
+    typeRun(sam, ' // ok');
+    drain(room, [sam, ana]);
+    check('joining: what he types then goes after her whole run', room.core.text().includes(`${ANA} // ok`), room.core.text().split('\n')[1]);
+  }
+  // Three people at one spot.
+  const CY_T = docTicket({ seat: 2, name: 'Cy R.', email: 'cy@s.test', seats: 3 });
+  bad = null;
+  n = 0;
+  for (let seed = 1; seed <= 300 && !bad; seed++) {
+    const rand = rng(seed * 104729);
+    const room = makeRoom();
+    const ppl = [client(room, docTicket({ seats: 3 }), { seed: BASE, own: BASE }), client(room, docTicket({ seat: 1, name: 'Bo N.', email: 'bo@s.test', seats: 3 })), client(room, CY_T)];
+    drain(room, ppl);
+    for (const c of ppl) c.edit({ selection: { anchor: AT } });
+    const runs = ['let a1 = 1;', 'var b2 = 2;', 'const c3 = 3;'];
+    const left = new Map(ppl.map((c, i) => [c, [...runs[i]]]));
+    for (let step = 0; step < 600 && [...left.values()].some((l) => l.length); step++) {
+      clock += 20;
+      const c = ppl[Math.floor(rand() * 3)];
+      const r = rand();
+      if (r < 0.4) { const ch = left.get(c).shift(); if (ch !== undefined) c.typeAt(ch); }
+      else if (r < 0.6) c.sync.push();
+      else if (r < 0.8) c.deliverOut();
+      else c.deliverIn();
+    }
+    for (const [c, l] of left) for (const ch of l) c.typeAt(ch);
+    const quiet = drain(room, ppl);
+    const text = room.core.text();
+    n++;
+    if (!quiet || ppl.some((c) => c.text() !== text) || !contiguous(text, runs)) bad = { seed, quiet, line: text.split('\n')[1], each: ppl.map((c) => c.text().split('\n')[1]) };
+  }
+  check(`three at one spot, random timing (${n} seeds): texts identical and every run in one piece`, !bad, bad);
 }
 
 // ---- 3. the Pages routes on a real SQLite ----

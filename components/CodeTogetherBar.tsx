@@ -23,7 +23,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Extension } from '@codemirror/state';
 import { CODE_PLACEHOLDER, CodePictures, PickPicturesToggle, PicturePicker, lobbyStyles } from './MoshionLobby';
-import { LiveDocClient, type DocEnded, type DocStatus } from '../lib/live-doc';
+import { LiveDocClient, seatColor, type DocEnded, type DocStatus } from '../lib/live-doc';
 import { CODE_ROOM_GAMES, type CodeLang } from '../lib/live-protocol';
 import { deviceId } from '../lib/moshion-online';
 import { codeIcons } from '../lib/room-icons';
@@ -261,9 +261,12 @@ export default function CodeTogetherBar({ lang, getText, isUntouched, snapshot, 
   if (session) {
     const st = status;
     const players = st?.players ?? [];
-    const others = players.filter((p) => p.seat !== st?.seat).map((p) => p.name);
     const here = players.length || 1;
-    const names = [...others, 'you'].join(', ');
+    // Everyone here in seat order, each with the colour their caret wears in
+    // the editor; this tab's own entry says "you" (it is how the others see you).
+    const mySeat = st?.seat ?? -1;
+    const listed = players.some((p) => p.seat === mySeat) ? [...players] : [...players, { seat: mySeat, name: '', left: false }];
+    listed.sort((a, b) => a.seat - b.seat);
     const copy = async () => {
       try { await navigator.clipboard.writeText(session.code); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch { /* the code is on screen */ }
     };
@@ -281,8 +284,20 @@ export default function CodeTogetherBar({ lang, getText, isUntouched, snapshot, 
           <span data-testid="together-code" data-code={session.code}><CodePictures code={session.code} size={28} letters /></span>
           <button type="button" style={quiet} onClick={() => void copy()} aria-label={`Copy session code ${session.code}`}>{copied ? 'Copied' : 'Copy'}</button>
           <span style={dim} aria-hidden="true">·</span>
-          <span data-testid="together-people" aria-live="polite" style={{ minWidth: 0, overflowWrap: 'anywhere' }}>
-            {here} here: {names}
+          <span
+            data-testid="together-people"
+            aria-live="polite"
+            style={{ minWidth: 0, display: 'inline-flex', flexWrap: 'wrap', alignItems: 'center', columnGap: 10, rowGap: 2 }}
+          >
+            <span>{here} here:</span>
+            {listed.map((p) => (
+              <span key={p.seat} data-seat={p.seat} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, minWidth: 0, overflowWrap: 'anywhere' }}>
+                {p.seat >= 0 ? (
+                  <span aria-hidden="true" style={{ width: 9, height: 9, borderRadius: '50%', background: seatColor(p.seat), flex: 'none' }} />
+                ) : null}
+                {p.seat === mySeat ? (p.name ? `${p.name} (you)` : 'you') : p.name}
+              </span>
+            ))}
           </span>
           <span style={{ flex: 1 }} />
           <button type="button" style={quiet} onClick={leave}>Leave</button>
