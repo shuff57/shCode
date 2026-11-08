@@ -21,13 +21,24 @@
 //   { t: 'cursor', anchor, head }                     presence, relayed only, never stored
 //   { t: 'ping' }                                     -> { t: 'pong' }
 // Room -> client:
-//   { t: 'hello', code, seat, seats, players, version, doc, clientID, host }
+//   { t: 'hello', code, seat, seats, players, version, doc, clientID, host, epoch, since }
 //   { t: 'players', players }
-//   { t: 'updates', version, updates: [{ changes, clientID, seat }] }  the first applies at `version`
-//   { t: 'reset', doc, version }        start again from here (too old to catch up, or a refused push)
+//   { t: 'updates', version, epoch, updates: [{ changes, clientID, seat }] }  the first applies at `version`
+//   { t: 'reset', doc, version, epoch, why? }  start again from here (too old to catch up, a refused
+//                                       push, or why 'rewound': the client is AHEAD of the room)
 //   { t: 'cursor', seat, anchor, head }
 //   { t: 'error', error, code? }        code: 'rate' | 'too-big' | 'bad' (the socket stays open)
 //   { t: 'closed', why, reason, host }  why: 'host' | 'expired' | 'left' | 'closed'; then LIVE_CLOSED
+//
+// The room's own storage is written at most every PERSIST_EVERY_MS while
+// changes arrive (a pending timer; in the Durable Object it also keeps the
+// object from hibernating until the write lands) and at once on close and when
+// the last person leaves. If the object is evicted between writes it wakes a
+// few seconds behind its clients. Each incarnation has its own `epoch` and
+// `since` (the version it woke at): a client that pushes or pulls AHEAD of the
+// room is reset with why 'rewound', and a client that reconnects to a new
+// epoch holding more than `since` resets itself (lib/live-doc.ts), so nobody
+// rebuilds on updates the room no longer has.
 //
 // The shared program is free text, so unlike a game room it is KEPT where a
 // teacher can read it: the room writes its own text (never a client's copy) to
@@ -50,6 +61,8 @@ export const KEEP_UPDATES = 500;
 export const MAX_UPDATES_PER_PUSH = 100;
 /** Presence: at most this many cursor messages a second per socket (the rest are dropped quietly). */
 export const CURSOR_PER_SEC = 10;
+/** How often, at most, the room's own storage is written while changes arrive. */
+export const PERSIST_EVERY_MS = 2000;
 /** How often, at most, the text is written for teachers while it changes. */
 export const SAVE_EVERY_MS = 2 * 60 * 1000;
 /** Sessions older than this are deleted on the next write. */
@@ -108,9 +121,22 @@ export interface CodeSessionRow {
   closed_at: number | null;
 }
 
+/** A one-shot timer (setTimeout in the DO and dev; a fake in the tests). */
+export interface DocTimer {
+  set(fn: () => void, ms: number): unknown;
+  clear(handle: unknown): void;
+}
+
+const realTimer: DocTimer = {
+  set: (fn, ms) => setTimeout(fn, ms),
+  clear: (h) => clearTimeout(h as ReturnType<typeof setTimeout>),
+};
+
 export interface LiveDocOptions {
   sockets: () => DocSocket[];
   store: DocStore;
+  /** The timer behind the 2-second storage write (default setTimeout). */
+  timer?: DocTimer;
   /** Writes the session where teachers read it (writeCodeSession on D1). */
   write: (row: CodeSessionRow) => Promise<void>;
   /** Call flush() at this time (the DO arms its alarm, dev a timer). */
@@ -189,6 +215,11 @@ export class LiveDocCore {
   private dirty: boolean;
   private meta: SessionMeta | null;
   private flushAt = 0;
+  private readonly timer: DocTimer;
+  private persistTimer: unknown = null;
+  /** This incarnation of the room, and the version it woke at (see the header). */
+  readonly epoch: string;
+  readonly since: number;
   private readonly buckets = new WeakMap<DocSocket, Bucket>();
   private readonly cursorBuckets = new WeakMap<DocSocket, Bucket>();
   private readonly toldAt = new WeakMap<DocSocket, number>();
@@ -205,6 +236,9 @@ export class LiveDocCore {
     this.savedAt = s?.savedAt ?? 0;
     this.dirty = s?.dirty === true;
     this.meta = s?.meta ?? null;
+    this.timer = opts.timer ?? realTimer;
+    this.epoch = Math.random().toString(36).slice(2, 10);
+    this.since = this.version;
   }
 
   /** The text as the room holds it (tests, and the D1 row). */
@@ -217,11 +251,24 @@ export class LiveDocCore {
     while (this.writes.size) await Promise.all([...this.writes]);
   }
 
-  private persist() {
+  /** Write the room's own storage now (close, the last person leaving, a join). */
+  persistNow() {
+    if (this.persistTimer !== null) { this.timer.clear(this.persistTimer); this.persistTimer = null; }
     this.opts.store.save({
       doc: this.doc.toString(), version: this.version, participants: this.participants,
       closed: this.closed, savedAt: this.savedAt, dirty: this.dirty, meta: this.meta,
     });
+  }
+
+  /** Write it within PERSIST_EVERY_MS: many changes in a burst cost one row. */
+  private persistSoon() {
+    if (this.persistTimer !== null) return;
+    this.persistTimer = this.timer.set(() => { this.persistTimer = null; this.persistNow(); }, PERSIST_EVERY_MS);
+  }
+
+  /** A write to the room's storage is waiting (tests). */
+  get persistPending(): boolean {
+    return this.persistTimer !== null;
   }
 
   private open(except?: DocSocket): DocSocket[] {
@@ -251,8 +298,8 @@ export class LiveDocCore {
     this.broadcast({ t: 'players', players: this.players(gone) }, skip ?? gone);
   }
 
-  private reset(ws: DocSocket) {
-    LiveDocCore.say(ws, { t: 'reset', doc: this.doc.toString(), version: this.version });
+  private reset(ws: DocSocket, why?: 'rewound') {
+    LiveDocCore.say(ws, { t: 'reset', doc: this.doc.toString(), version: this.version, epoch: this.epoch, ...(why ? { why } : {}) });
   }
 
   private refuse(ws: DocSocket, error: string, code: 'too-big' | 'bad', reset = true) {
@@ -281,7 +328,7 @@ export class LiveDocCore {
       this.dirty = true;
       changed = true;
     }
-    if (changed) this.persist();
+    if (changed) this.persistNow();
     // One socket per seat: the same tab reconnecting replaces the old one.
     for (const other of this.open(ws)) {
       if (other.attachment()!.seat === ticket.seat) {
@@ -296,6 +343,7 @@ export class LiveDocCore {
     LiveDocCore.say(ws, {
       t: 'hello', code: ticket.code, seat: ticket.seat, seats: ticket.seats, players: this.players(),
       version: this.version, doc: this.doc.toString(), clientID: clientIdOf(ticket.seat), host: this.meta!.hostName,
+      epoch: this.epoch, since: this.since,
     });
     this.announce(ws);
   }
@@ -338,11 +386,17 @@ export class LiveDocCore {
     LiveDocCore.say(ws, { t: 'error', error: 'Unknown message.', code: 'bad' });
   }
 
-  /** Updates since `version` to one socket, or a reset when it is too far behind (or ahead). */
+  /**
+   * Updates since `version` to one socket, or a reset when it is too far
+   * behind. AHEAD of the room means the room lost its last few seconds
+   * (evicted between storage writes): the client starts again from the room's
+   * text, told why.
+   */
   private catchUp(ws: DocSocket, version: number) {
     const base = this.version - this.history.length;
-    if (version > this.version || version < base) { this.reset(ws); return; }
-    LiveDocCore.say(ws, { t: 'updates', version, updates: this.history.slice(version - base).map(wire) });
+    if (version > this.version) { this.reset(ws, 'rewound'); return; }
+    if (version < base) { this.reset(ws); return; }
+    LiveDocCore.say(ws, { t: 'updates', version, epoch: this.epoch, updates: this.history.slice(version - base).map(wire) });
   }
 
   private push(ws: DocSocket, a: DocTicket, version: unknown, updates: unknown) {
@@ -368,7 +422,7 @@ export class LiveDocCore {
     if (this.version !== 0 || this.doc.length !== 0) { this.refuse(ws, 'The shared program has already started.', 'bad'); return; }
     const doc = textOf(raw);
     if (overDocCap(doc)) { this.refuse(ws, 'Your program is over 64 KB, too long to share.', 'too-big'); return; }
-    if (doc.length === 0) { LiveDocCore.say(ws, { t: 'updates', version: 0, updates: [] }); return; }
+    if (doc.length === 0) { LiveDocCore.say(ws, { t: 'updates', version: 0, epoch: this.epoch, updates: [] }); return; }
     const changes = ChangeSet.of({ from: 0, insert: doc }, 0);
     this.commit(doc, [{ changes, json: changes.toJSON(), clientID: clientIdOf(0), seat: 0 }]);
   }
@@ -380,8 +434,8 @@ export class LiveDocCore {
     this.history.push(...accepted);
     if (this.history.length > KEEP_UPDATES) this.history.splice(0, this.history.length - KEEP_UPDATES);
     this.dirty = true;
-    this.persist();
-    this.broadcast({ t: 'updates', version: from, updates: accepted.map(wire) });
+    this.persistSoon();
+    this.broadcast({ t: 'updates', version: from, epoch: this.epoch, updates: accepted.map(wire) });
     this.maybeSave();
   }
 
@@ -399,7 +453,10 @@ export class LiveDocCore {
     const a = ws.attachment();
     if (!a) return;
     this.announce(undefined, ws);
-    if (this.open(ws).length === 0) this.writeNow(this.closed ? this.now() : null);
+    if (this.open(ws).length === 0) {
+      this.writeNow(this.closed ? this.now() : null);
+      this.persistNow();
+    }
   }
 
   /** A seat left the session (POST /api/rooms/<code>/leave): drop its socket. */
@@ -421,13 +478,15 @@ export class LiveDocCore {
       : 'This session has ended: sessions last 3 hours.';
     const first = !this.closed;
     this.closed = true;
-    if (first) this.persist();
     for (const s of this.opts.sockets()) {
       LiveDocCore.say(s, { t: 'closed', why, reason, host });
       try { s.close(LIVE_CLOSED, 'closed'); } catch { /* gone */ }
       try { s.attach(null); } catch { /* gone */ }
     }
-    if (first) this.writeNow(this.now());
+    if (first) {
+      this.writeNow(this.now());
+      this.persistNow();
+    }
   }
 
   /** A control request from the Function (leave.ts). */
@@ -473,9 +532,9 @@ export class LiveDocCore {
     this.savedAt = now;
     this.dirty = false;
     this.flushAt = 0; // a write pending for later is moot now; the next change schedules its own
-    this.persist();
+    this.persistSoon();
     const p: Promise<void> = this.opts.write(row)
-      .catch(() => { this.dirty = true; this.persist(); this.scheduleSave(); })
+      .catch(() => { this.dirty = true; this.persistSoon(); this.scheduleSave(); })
       .finally(() => { this.writes.delete(p); });
     this.writes.add(p);
   }
@@ -508,12 +567,13 @@ export async function writeCodeSession(db: D1Like, row: CodeSessionRow, now = Da
   ]);
 }
 
-/** A store that keeps the state in memory (the dev stand-in and the tests). */
-export function memoryDocStore(): DocStore & { state: DocStored | null } {
-  const s: DocStore & { state: DocStored | null } = {
+/** A store that keeps the state in memory (the dev stand-in and the tests); `saves` counts writes. */
+export function memoryDocStore(): DocStore & { state: DocStored | null; saves: number } {
+  const s: DocStore & { state: DocStored | null; saves: number } = {
     state: null,
+    saves: 0,
     load: () => (s.state ? JSON.parse(JSON.stringify(s.state)) : null),
-    save: (v) => { s.state = JSON.parse(JSON.stringify(v)); },
+    save: (v) => { s.state = JSON.parse(JSON.stringify(v)); s.saves++; },
   };
   return s;
 }

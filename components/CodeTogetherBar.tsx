@@ -277,6 +277,7 @@ export default function CodeTogetherBar({ lang, getText, snapshot, onCollab, onA
           <button type="button" style={quiet} onClick={leave}>Leave</button>
         </div>
         {line ? <div style={dim} aria-live="polite" data-testid="together-status">{line}</div> : null}
+        {st?.notice ? <div aria-live="polite" style={{ color: 'var(--c-orange)' }} data-testid="together-notice">{st.notice}</div> : null}
         <div style={{ ...dim, fontSize: '0.72rem' }}>{TEACHER_NOTE}</div>
         {st?.error ? <div role="alert" style={{ color: 'var(--c-red)' }}>{st.error}</div> : null}
       </div>

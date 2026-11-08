@@ -85,30 +85,47 @@ function rng(seed) {
   return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
 
-function makeRoom() {
+/** setTimeout on the test clock: run() fires what is due. */
+function fakeTimer() {
+  const pending = new Map();
+  let id = 0;
+  return {
+    pending,
+    set: (fn, ms) => { const h = ++id; pending.set(h, { fn, at: clock + ms }); return h; },
+    clear: (h) => { pending.delete(h); },
+    run() { for (const [h, t] of [...pending]) if (t.at <= clock) { pending.delete(h); t.fn(); } },
+  };
+}
+
+/** A room; `store` given = the same Durable Object waking (or rebuilt after an eviction). */
+function makeRoom(store = D.memoryDocStore()) {
   const socks = new Set();
-  const store = D.memoryDocStore();
   const rows = [];
   const scheduled = [];
+  const timer = fakeTimer();
   const core = new D.LiveDocCore({
-    sockets: () => [...socks], store, now,
+    sockets: () => [...socks], store, now, timer,
     write: async (row) => { rows.push(row); },
     schedule: (at) => scheduled.push(at),
   });
-  return { core, socks, store, rows, scheduled };
+  return { core, socks, store, rows, scheduled, timer };
 }
 
 /** One browser: a socket the core sees, and DocSync on a plain editor state (no DOM). */
 function client(room, ticket, { seed = null, own = 'my own code' } = {}) {
-  let att = null;
-  const c = { inbox: [], outbox: [], seen: [], seed, seeded: false, closedWith: null };
-  c.sock = {
-    send: (t) => { c.inbox.push(JSON.parse(t)); c.seen.push(t); },
-    close: (code) => { c.closedWith = code; room.socks.delete(c.sock); },
-    attachment: () => att,
-    attach: (a) => { att = a; },
+  const c = { inbox: [], outbox: [], seen: [], seed, seeded: false, closedWith: null, rewound: 0, room };
+  const socket = (r) => {
+    let att = null;
+    const sock = {
+      send: (t) => { c.inbox.push(JSON.parse(t)); c.seen.push(t); },
+      close: (code) => { c.closedWith = code; r.socks.delete(sock); },
+      attachment: () => att,
+      attach: (a) => { att = a; },
+    };
+    return sock;
   };
-  c.sync = new DocSync({ send: (m) => { c.outbox.push(JSON.stringify(m)); return true; }, now });
+  c.sock = socket(room);
+  c.sync = new DocSync({ send: (m) => { c.outbox.push(JSON.stringify(m)); return true; }, now, onRewound: () => { c.rewound++; } });
   c.ed = {
     state: EditorState.create({ doc: own, extensions: [c.sync.inner.of([])] }),
     dispatch(...specs) {
@@ -125,8 +142,18 @@ function client(room, ticket, { seed = null, own = 'my own code' } = {}) {
     else if (m.t === 'error' && m.code === 'rate') c.sync.released();
   };
   c.deliverIn = () => { const m = c.inbox.shift(); if (m) c.handle(m); return !!m; };
-  c.deliverOut = () => { const f = c.outbox.shift(); if (f) room.core.message(c.sock, f); return !!f; };
+  c.deliverOut = () => { const f = c.outbox.shift(); if (f) c.room.core.message(c.sock, f); return !!f; };
   c.edit = (spec) => { c.ed.dispatch(c.ed.state.update(spec)); };
+  /** The socket dropped and opened again, possibly on a rebuilt room: what was in flight is gone. */
+  c.reconnect = (r) => {
+    c.room = r;
+    c.inbox.length = 0;
+    c.outbox.length = 0;
+    c.closedWith = null;
+    c.sock = socket(r);
+    r.socks.add(c.sock);
+    r.core.accept(c.sock, ticket);
+  };
   room.socks.add(c.sock);
   room.core.accept(c.sock, ticket);
   return c;
@@ -303,7 +330,9 @@ const SEED = 'let x = 1;\nfunction draw() {\n  clear();\n}\n';
   check('save: the scheduled write keeps the room\'s own text', room.rows.length === nRows + 1 && room.rows.at(-1).text === room.core.text(), room.rows.length);
   check('save: participants are the accounts from the tickets', JSON.stringify(JSON.parse(room.rows.at(-1).participants)) === JSON.stringify(['ann@s.test', 'bo@s.test']));
 
-  // A woken room: the same store, no history.
+  // A woken room: the same store, no history (its pending storage write lands first).
+  clock += D.PERSIST_EVERY_MS;
+  room.timer.run();
   const room2 = { ...room, core: new D.LiveDocCore({ sockets: () => [...room.socks], store: room.store, now, write: async (r) => { room.rows.push(r); }, schedule: () => {} }) };
   check('wake: text and version come back from the room\'s storage', room2.core.text() === room.core.text() && room2.core.version === room.core.version);
   bo.inbox.length = 0;
@@ -350,6 +379,89 @@ const SEED = 'let x = 1;\nfunction draw() {\n  clear();\n}\n';
   r2.core.message(a.sock, '{"t":"ping"}');
   await r2.core.idle();
   check('a session that expires closes on the next frame and is kept', a.closedWith === P.LIVE_CLOSED && r2.rows.at(-1)?.closed_at !== null && r2.rows.at(-1)?.text === 'x');
+}
+
+{
+  // The room's own storage: at most one write per 2 seconds while changes
+  // arrive, at once on close and when the last person leaves.
+  const room = makeRoom();
+  const ann = client(room, ANN_T, { seed: 'let a = 1;\n', own: 'let a = 1;\n' });
+  const bo = client(room, BO_T);
+  drain(room, [ann, bo]);
+  clock += D.PERSIST_EVERY_MS; room.timer.run();
+  const saves = room.store.saves;
+  let pushes = 0;
+  for (let i = 0; i < 30; i++) {
+    clock += 50;
+    (i % 2 ? ann : bo).edit({ changes: { from: 0, insert: String(i % 10) } });
+    for (const c of [ann, bo]) { if (c.sync.push()) pushes++; c.deliverOut(); }
+    for (const c of [ann, bo]) while (c.deliverIn());
+    room.timer.run();
+  }
+  check(`persist: ${pushes} accepted pushes inside 2 s write nothing yet`, pushes >= 10 && room.store.saves === saves && room.core.persistPending, [pushes, room.store.saves - saves]);
+  clock += D.PERSIST_EVERY_MS;
+  room.timer.run();
+  check('persist: ...then exactly one write, holding the latest text', room.store.saves === saves + 1 && room.store.state.version === room.core.version && room.store.state.doc === room.core.text(), room.store.saves - saves);
+  ann.edit({ changes: { from: 0, insert: 'x' } });
+  drain(room, [ann, bo]);
+  const s2 = room.store.saves;
+  check('persist: a change after the write starts a new 2-second wait', room.core.persistPending && room.store.saves === s2);
+  room.core.control(JSON.stringify({ op: 'close' }));
+  check('persist: close writes at once, closed and up to date', room.store.saves > s2 && room.store.state.closed === true && room.store.state.doc === room.core.text() && !room.core.persistPending);
+  await room.core.idle();
+
+  const r2 = makeRoom();
+  const a2 = client(r2, ANN_T, { seed: 'x', own: 'x' });
+  drain(r2, [a2]);
+  a2.edit({ changes: { from: 1, insert: 'yz' } });
+  drain(r2, [a2]);
+  const s3 = r2.store.saves;
+  check('persist: a change waiting for its 2 seconds...', r2.core.persistPending && r2.store.state.doc !== r2.core.text());
+  r2.core.left(a2.sock); r2.socks.delete(a2.sock); a2.sock.attach(null);
+  check('persist: ...is written at once when the last person leaves', r2.store.saves > s3 && r2.store.state.doc === 'xyz' && !r2.core.persistPending);
+  await r2.core.idle();
+}
+{
+  // Evicted between storage writes: the room wakes a few seconds behind its clients.
+  const room = makeRoom();
+  const ann = client(room, ANN_T, { seed: 'let a = 1;\n', own: 'let a = 1;\n' });
+  const bo = client(room, BO_T);
+  drain(room, [ann, bo]);
+  clock += D.PERSIST_EVERY_MS; room.timer.run();
+  const kept = room.core.text();
+  const keptVersion = room.core.version;
+  for (let i = 0; i < 4; i++) { ann.edit({ changes: { from: 0, insert: `/*${i}*/` } }); drain(room, [ann, bo]); }
+  check('rewind: the last few changes are not in storage yet', room.core.version > keptVersion && room.store.state.version === keptVersion);
+  // Evicted: no flush. A new object rebuilds from storage; the old sockets are gone.
+  const woke = makeRoom(room.store);
+  check('rewind: the rebuilt room is behind', woke.core.version === keptVersion && woke.core.text() === kept);
+  const probe = { got: [], send(t) { this.got.push(JSON.parse(t)); }, close() {}, attachment: () => BO_T, attach() {} };
+  woke.core.message(probe, JSON.stringify({ t: 'push', version: keptVersion + 2, updates: [{ changes: [kept.length, [0, 'q']] }] }));
+  check('rewind: a push AHEAD of the room gets a reset to the room\'s text, why rewound', probe.got.at(-1)?.t === 'reset' && probe.got.at(-1).why === 'rewound' && probe.got.at(-1).doc === kept && probe.got.at(-1).version === keptVersion, probe.got.at(-1));
+  probe.got.length = 0;
+  woke.core.message(probe, JSON.stringify({ t: 'pull', version: keptVersion + 1 }));
+  check('rewind: a pull AHEAD of the room too', probe.got.at(-1)?.t === 'reset' && probe.got.at(-1).why === 'rewound');
+  // Ana had typing the room never got: it is in flight when the socket dies.
+  ann.edit({ changes: { from: 0, insert: 'LOST ' } });
+  // Bo reconnects first and starts again from the room's text, then types on.
+  bo.reconnect(woke);
+  bo.deliverIn();
+  check('rewind: the first one back starts again from the room\'s text and is told', bo.text() === kept && bo.rewound === 1, [bo.text(), bo.rewound]);
+  for (let i = 0; i < 8; i++) { bo.edit({ changes: { from: 0, insert: `b${i};` } }); drain(woke, [bo]); }
+  check('rewind: the room moves on past where Ana was', woke.core.version >= ann.sync.version, [woke.core.version, ann.sync.version]);
+  // Ana comes back to a new incarnation that woke behind her: she must not build on Bo's updates.
+  ann.reconnect(woke);
+  ann.deliverIn();
+  check('rewind: a client from the old incarnation, past where the room woke, resets', ann.rewound === 1 && ann.text() === woke.core.text(), [ann.rewound, ann.text().slice(0, 40), woke.core.text().slice(0, 40)]);
+  ann.edit({ changes: { from: 0, insert: 'A;' } });
+  bo.edit({ changes: { from: woke.core.text().length, insert: '//B' } });
+  check('rewind: both converge again', drain(woke, [ann, bo]) && ann.text() === bo.text() && bo.text() === woke.core.text(), [ann.text(), bo.text()]);
+  // A plain hibernation (written before it slept) resets nobody.
+  clock += D.PERSIST_EVERY_MS; woke.timer.run();
+  const slept = makeRoom(woke.store);
+  bo.reconnect(slept);
+  bo.deliverIn();
+  check('rewind: waking from a written state resets nobody', bo.rewound === 1 && bo.text() === slept.core.text());
 }
 
 // ---- 3. the Pages routes on a real SQLite ----

@@ -7,9 +7,13 @@
 // name and account arrive in the DocTicket the Pages Function
 // (functions/api/live/[code].ts) put on the upgrade and are kept with
 // serializeAttachment. The text and version are written to this object's own
-// SQLite on every accepted push, so a woken object rebuilds from them; the
-// text for teachers goes to D1 code_sessions through env.DB, written by this
-// object itself (never a client's copy).
+// SQLite at most every 2 seconds while changes arrive (LiveDocCore's timer, a
+// plain setTimeout here: while it is pending the object does not hibernate, so
+// the write lands first) and at once on close and when the last person leaves;
+// a woken object rebuilds from them, and one evicted between writes wakes a
+// few seconds behind and resets clients that are ahead. The text for teachers
+// goes to D1 code_sessions through env.DB, written by this object itself
+// (never a client's copy).
 //
 // One alarm does two jobs: the session's end (expiresAt) and the next write
 // for teachers (at most every 2 minutes while the text changes).

@@ -24,6 +24,10 @@
 // A dropped socket is reopened with backoff while the route still says yes;
 // typing carries on meanwhile and is shared on reconnect (the client pulls what
 // it missed from its own version, or is reset when the room has moved on too far).
+// A room that lost its last few seconds (evicted between its 2-second storage
+// writes, lib/live-doc-protocol.ts) wakes BEHIND its clients: a client then
+// starts again from the room's text and says so calmly ("The shared program
+// jumped back a few seconds.").
 
 import {
   ChangeSet, Compartment, EditorState, StateEffect, StateField, Transaction,
@@ -47,6 +51,7 @@ const LIVE_REPLACED = 4001;
 const MAX_CHANGE_JSON = MAX_DOC_FRAME - 512;
 
 export const PASTE_TOO_BIG = 'That paste is too big to share in one go. Paste it in smaller pieces.';
+export const REWOUND = 'The shared program jumped back a few seconds.';
 
 /** Each seat's colour (the course palette): seat 0 is the host. */
 export const SEAT_COLORS = ['var(--c-pink)', 'var(--c-cyan)', 'var(--c-green)', 'var(--c-orange)'] as const;
@@ -69,6 +74,8 @@ export interface DocSyncOptions {
   send: (msg: Record<string, unknown>) => boolean;
   /** There is something to push (the client debounces, a test pushes when it likes). */
   wantPush?: () => void;
+  /** The room lost its last few seconds and this editor started again from the room's text. */
+  onRewound?: () => void;
   now?: () => number;
 }
 
@@ -79,6 +86,8 @@ export class DocSync {
   readonly inner = new Compartment();
   clientID = '';
   installed = false;
+  /** The room incarnation this editor's version comes from (see lib/live-doc-protocol.ts). */
+  epoch = '';
   private readonly opts: DocSyncOptions;
   private readonly now: () => number;
   private ed: EditorLike | null = null;
@@ -111,9 +120,11 @@ export class DocSync {
    * text, given only on the host's first hello; it becomes the shared program
    * when the room is still empty.
    */
-  hello(m: { version: number; doc: string; clientID: string; seat: number }, seed?: string | null) {
+  hello(m: { version: number; doc: string; clientID: string; seat: number; epoch?: string; since?: number }, seed?: string | null) {
     this.clientID = String(m.clientID);
     this.inFlightAt = 0;
+    const was = this.epoch;
+    this.epoch = String(m.epoch ?? '');
     if (!this.installed) {
       this.base = { doc: textOf(String(m.doc ?? '')), version: Number(m.version) };
       if (seed && m.seat === 0 && m.version === 0 && !m.doc) {
@@ -125,18 +136,27 @@ export class DocSync {
       return;
     }
     const synced = this.version;
+    // A new incarnation of the room that woke at `since` does not have anything
+    // past it from the old one; nor does a room behind us. Its text wins.
+    const rewound = m.version < synced
+      || (!!was && !!m.epoch && m.epoch !== was && typeof m.since === 'number' && synced > m.since);
+    if (rewound) {
+      this.reset({ doc: m.doc, version: m.version, epoch: m.epoch });
+      this.opts.onRewound?.();
+      return;
+    }
     if (m.version === synced) { if (this.hasSendable()) this.opts.wantPush?.(); }
-    else if (m.version > synced) this.opts.send({ t: 'pull', version: synced });
-    else this.reset({ doc: m.doc, version: m.version }); // the room lost what we had: its text wins
+    else this.opts.send({ t: 'pull', version: synced });
   }
 
   /** Accepted updates, the first applying at `m.version`. */
-  updates(m: { version: number; updates: WireUpdate[] }) {
+  updates(m: { version: number; updates: WireUpdate[]; epoch?: string }) {
     const list = Array.isArray(m.updates) ? m.updates : [];
     if (!this.installed) {
       const b = this.base;
       if (!b) return;
       if (m.version > b.version) { this.opts.send({ t: 'pull', version: b.version }); return; }
+      if (m.epoch) this.epoch = m.epoch;
       try {
         for (const u of list.slice(b.version - m.version)) {
           b.doc = ChangeSet.fromJSON(u.changes).apply(b.doc);
@@ -151,6 +171,7 @@ export class DocSync {
     const ed = this.ed!;
     const synced = getSyncedVersion(ed.state);
     if (m.version > synced) { this.opts.send({ t: 'pull', version: synced }); return; }
+    if (m.epoch) this.epoch = m.epoch; // a socket that outlived hibernation learns the new incarnation here
     const fresh = list.slice(synced - m.version);
     if (fresh.length) {
       try {
@@ -161,8 +182,10 @@ export class DocSync {
     if (this.hasSendable()) this.opts.wantPush?.();
   }
 
-  /** Start again from the room's text (too far behind, or a refused change). */
-  reset(m: { doc: string; version: number }) {
+  /** Start again from the room's text (too far behind, a refused change, or the room rewound). */
+  reset(m: { doc: string; version: number; epoch?: string; why?: string }) {
+    if (m.epoch) this.epoch = m.epoch;
+    if (m.why === 'rewound') this.opts.onRewound?.();
     this.base = { doc: textOf(String(m.doc ?? '')), version: Number(m.version) };
     this.awaitingSeed = false;
     this.inFlightAt = 0;
@@ -355,6 +378,8 @@ export interface DocStatus {
   host: string;
   /** Something the room refused or could not do, in plain words. */
   error: string | null;
+  /** A calm word about something that happened on its own (the room jumped back). */
+  notice: string | null;
 }
 
 export interface DocEnded {
@@ -390,13 +415,14 @@ export class LiveDocClient {
   private pingTimer: ReturnType<typeof setInterval> | null = null;
   private watchdog: ReturnType<typeof setInterval> | null = null;
   private errorTimer: ReturnType<typeof setTimeout> | null = null;
+  private noticeTimer: ReturnType<typeof setTimeout> | null = null;
   private lastCursorAt = 0;
 
   constructor(opts: LiveDocClientOptions) {
     this.opts = opts;
     this.code = opts.code;
-    this.status = { phase: 'connecting', code: opts.code, seat: -1, seats: 0, players: [], host: '', error: null };
-    this.sync = new DocSync({ send: (m) => this.send(m), wantPush: () => this.schedulePush() });
+    this.status = { phase: 'connecting', code: opts.code, seat: -1, seats: 0, players: [], host: '', error: null, notice: null };
+    this.sync = new DocSync({ send: (m) => this.send(m), wantPush: () => this.schedulePush(), onRewound: () => this.calm(REWOUND) });
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const client = this;
     const plugin = ViewPlugin.define((view) => {
@@ -423,10 +449,10 @@ export class LiveDocClient {
   /** Stop for good (Leave, or the page going). Does not tell the server: the caller posts leave. */
   stop() {
     this.stopped = true;
-    for (const t of [this.retryTimer, this.pushTimer, this.cursorTimer, this.errorTimer]) if (t) clearTimeout(t);
+    for (const t of [this.retryTimer, this.pushTimer, this.cursorTimer, this.errorTimer, this.noticeTimer]) if (t) clearTimeout(t);
     if (this.pingTimer) clearInterval(this.pingTimer);
     if (this.watchdog) clearInterval(this.watchdog);
-    this.retryTimer = this.pushTimer = this.cursorTimer = this.errorTimer = null;
+    this.retryTimer = this.pushTimer = this.cursorTimer = this.errorTimer = this.noticeTimer = null;
     this.pingTimer = this.watchdog = null;
     const s = this.ws;
     this.ws = null;
@@ -443,6 +469,13 @@ export class LiveDocClient {
     if (this.errorTimer) clearTimeout(this.errorTimer);
     this.emit({ error: text });
     this.errorTimer = setTimeout(() => { this.errorTimer = null; this.emit({ error: null }); }, 6000);
+  }
+
+  /** A calm note (not an error) for a few seconds. */
+  private calm(text: string) {
+    if (this.noticeTimer) clearTimeout(this.noticeTimer);
+    this.emit({ notice: text });
+    this.noticeTimer = setTimeout(() => { this.noticeTimer = null; this.emit({ notice: null }); }, 8000);
   }
 
   private end(e: DocEnded) {

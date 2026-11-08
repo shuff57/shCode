@@ -581,7 +581,10 @@ is ever sent to a socket); each Durable Object refuses the other kind's ticket. 
 central authority, in ONE module, `lib/live-doc-protocol.ts` (`LiveDocCore`, shared by the DO and `scripts/dev-live.mjs`):
 updates stamped `s<seat>` by the room, stale pushes answered with the missed updates, past 500 kept updates a reset,
 seed only from seat 0 at version 0, 64 KB doc (UTF-8), 16 KB frame (a seed may be bigger), the 30/s bucket, cursors
-10/s relayed never stored. The browser half is `lib/live-doc.ts` (`DocSync` + presence cursors with name tags + a filter
+10/s relayed never stored. The room's own storage is written at most every 2 s while changes arrive (Workers Free
+counts DO rows written; a timer in the core, pending = no hibernation) and at once on close / last leave; a room
+evicted between writes wakes behind, and a client ahead of it (push/pull past its version, or a reconnect to a new
+`epoch` holding more than `since`) is reset to the room's text with "The shared program jumped back a few seconds." The browser half is `lib/live-doc.ts` (`DocSync` + presence cursors with name tags + a filter
 that refuses an oversized paste in plain words), added to `CodeMirrorPane` through its `collab` Compartment prop. **The
 text is kept for teachers:** the LiveDoc writes its own copy (never a client's) to D1 `code_sessions` through its own
 `DB` binding (`writeCodeSession`): at once on the first change, then at most every 2 minutes while it changes, on close
