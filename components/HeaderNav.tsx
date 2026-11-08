@@ -66,7 +66,7 @@ export default function HeaderNav() {
             a tool nobody finds. */}
         <Link href="/sound" style={itemStyle}>Sounds</Link>
         {/* What classmates shared (#81): textures and sounds, with Copy to mine. */}
-        <Link href="/library" style={itemStyle}>Class library</Link>
+        <Link href="/library" style={itemStyle}>Library</Link>
         {/* One Docs tab for the whole family — JavaScript, moSHion and reSHape
             each have a set inside, switched from the hub at /docs and from the
             family switcher on every docs page. */}

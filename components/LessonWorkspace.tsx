@@ -1204,10 +1204,10 @@ export default function LessonWorkspace({
                     </a>
                   ),
                 },
-                // What classmates shared (#81), with Copy to mine.
+                // The Library: your own saved art with Share, and what classmates shared (#81).
                 {
                   key: 'class',
-                  label: 'Class',
+                  label: 'Library',
                   color: 'var(--c-yellow)',
                   content: <ClassLibraryPanel />,
                   headerExtra: (

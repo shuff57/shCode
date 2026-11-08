@@ -137,5 +137,21 @@ const s2 = await call(lib.onRequestPut, SOLO, '/api/library', {}, 'PUT', { kind:
 r = await call(share.onRequestPost, SOLO, `/api/library/${s2.body.item.id}/share`, { id: s2.body.item.id }, 'POST', { share: true });
 check('a student in no class is told to join one first (409)', r.status === 409 && /Join a class/.test(r.body.error), r);
 
+// a teacher shares into the classes they teach (the Library is how a teacher hands
+// the class a texture or sound)
+sql(`INSERT INTO students (email, password_hash, created_at, role, first_name, last_name) VALUES ('t1@s.test', 'x', ?, 'teacher', 'Tess', 'Huff')`, now);
+const tItem = await call(lib.onRequestPut, T1, '/api/library', {}, 'PUT', { kind: 'texture', name: 'starter_tile', dataUri: PNG, meta: null });
+r = await call(share.onRequestPost, T1, `/api/library/${tItem.body.item.id}/share`, { id: tItem.body.item.id }, 'POST', { share: true });
+check('a teacher shares into the one class they teach', r.status === 200 && r.body.classes === 1, r);
+r = await call(shared.onRequestGet, BEN, '/api/library/shared?kind=texture');
+check("the teacher's share reaches a student of that class", r.body.items.some((i) => i.name === 'starter_tile' && i.owner === 'Tess H.'), r.body);
+r = await call(shared.onRequestGet, OUT, '/api/library/shared?kind=texture');
+check("but not a student of another teacher's class", !r.body.items.some((i) => i.name === 'starter_tile'), r.body);
+sql(`INSERT INTO students (email, password_hash, created_at, role) VALUES ('t9@s.test', 'x', ?, 'teacher')`, now);
+const T9 = { email: 't9@s.test', role: 'teacher' };
+const t9 = await call(lib.onRequestPut, T9, '/api/library', {}, 'PUT', { kind: 'texture', name: 'nothing', dataUri: PNG, meta: null });
+r = await call(share.onRequestPost, T9, `/api/library/${t9.body.item.id}/share`, { id: t9.body.item.id }, 'POST', { share: true });
+check('a teacher with no class is told to make one (409)', r.status === 409 && /Make a class/.test(r.body.error), r);
+
 console.log(`\ntest-library-share: ${passed} passed, ${failed} failed`);
 if (failed) process.exit(1);

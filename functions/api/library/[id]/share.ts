@@ -1,12 +1,14 @@
 // POST /api/library/[id]/share  { share: true | false }
 //
 // The owner shares one of their own textures or sounds with every class they
-// are in right now, or takes it back out. Sharing is opt-in per item. A share
+// are in right now, or takes it back out. A student shares into the classes
+// they are enrolled in; a teacher (or admin) also into the classes they teach,
+// so a teacher can hand the class a texture or sound to use. Sharing is opt-in per item. A share
 // a teacher hid stays hidden if the owner shares again; only the teacher can
 // unhide it. See functions/_shared/libraryShare.ts.
 
 import { isUploadId } from '../../../_shared/uploads';
-import { studentClassIds } from '../../../_shared/libraryShare';
+import { studentClassIds, teacherClassIds } from '../../../_shared/libraryShare';
 
 interface Env {
   DB: D1Database;
@@ -34,9 +36,15 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async ({ par
     await env.DB.prepare(`DELETE FROM library_shares WHERE item_id = ?`).bind(id).run();
     return json({ ok: true, shared: false, classes: 0 });
   }
-  const classes = await studentClassIds(env.DB, data.email);
+  const enrolled = await studentClassIds(env.DB, data.email);
+  const taught = data.role === 'student' ? [] : await teacherClassIds(env.DB, data.email);
+  const classes = [...new Set([...enrolled, ...taught])];
   if (!classes.length) {
-    return json({ error: 'Join a class first: sharing puts this in your class library.' }, 409);
+    return json({
+      error: data.role === 'student'
+        ? 'Join a class first: sharing puts this in your class' + "'" + 's Library.'
+        : 'Make a class first: sharing puts this in the Library of every class you teach.',
+    }, 409);
   }
   const now = Date.now();
   await env.DB.batch(classes.map((c) =>

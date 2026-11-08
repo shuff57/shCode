@@ -41,13 +41,13 @@ export default function ShareToggle({ kind, name, onMessage, compact = false }: 
       type="button"
       disabled={!item || busy}
       aria-pressed={shared}
-      title={!item ? 'Syncing to your account first…' : shared ? 'In your class library. Click to take it out.' : 'Put this in your class library so classmates can copy it.'}
+      title={!item ? 'Syncing to your account first…' : shared ? 'In your class' + "'" + 's Library. Click to take it out.' : 'Put this in your class' + "'" + 's Library so they can copy it.'}
       onClick={async () => {
         setBusy(true);
         const err = await setShared(kind, name, !shared);
         setBusy(false);
         onMessage?.(
-          err ?? (shared ? `"${name}" is no longer in your class library.` : `"${name}" is in your class library now. Classmates can copy it.`),
+          err ?? (shared ? `"${name}" is no longer shared with your class.` : `"${name}" is shared with your class now. They can copy it from the Library.`),
           !!err,
         );
       }}

@@ -1,6 +1,6 @@
 import ClassLibraryPanel from '../../components/ClassLibraryPanel';
 
-export const metadata = { title: 'Class library — shCode' };
+export const metadata = { title: 'Library — shCode' };
 
 export default function LibraryPage() {
   return (

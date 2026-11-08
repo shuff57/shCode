@@ -47,7 +47,7 @@ export default function ClassLibraryModeration({ classId }: { classId: string })
 
   const act = async (r: Row, action: 'hide' | 'unhide' | 'remove') => {
     if (action === 'remove' && !(await confirm({
-      title: `Remove "${r.name}" from the class library?`,
+      title: `Remove "${r.name}" from the class's Library?`,
       message: `Classmates will no longer see or copy it. ${r.owner}'s own copy stays in their account, and copies classmates already made stay theirs.`,
       confirmLabel: 'Remove',
       danger: true,
@@ -59,7 +59,7 @@ export default function ClassLibraryModeration({ classId }: { classId: string })
       body: JSON.stringify({ itemId: r.id, action }),
     });
     if (!res.ok) { toast(await errorText(res), { kind: 'error' }); return; }
-    toast(action === 'hide' ? `Hid "${r.name}" from students.` : action === 'unhide' ? `"${r.name}" is visible to students again.` : `Removed "${r.name}" from the class library.`);
+    toast(action === 'hide' ? `Hid "${r.name}" from students.` : action === 'unhide' ? `"${r.name}" is visible to students again.` : `Removed "${r.name}" from the class's Library.`);
     await load();
   };
 

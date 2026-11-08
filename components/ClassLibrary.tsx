@@ -71,7 +71,7 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
 
   const copy = async (it: SharedItem) => {
     const content = await fetchArt(it.id);
-    if (!content) { onMessage?.('That is no longer in your class library.', true); return; }
+    if (!content) { onMessage?.('That is no longer in the Library.', true); return; }
     const taken = new Set(localLibraryItems().filter((l) => l.kind === kind).map((l) => l.name));
     const name = taken.has(it.name) ? freshName(it.name, taken) : it.name;
     if (!addToLibrary({ kind, name, dataUri: content.dataUri, meta: content.meta })) {
