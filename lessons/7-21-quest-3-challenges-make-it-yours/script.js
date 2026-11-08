@@ -1,7 +1,7 @@
 // 7.21.3 Challenges: Make it yours.
 // Your finished Quest from 7.20.3. Change one thing of your own: a fourth
 // enemy kind, a special move with a cooldown, or a shop that spends gold.
-// Quest: a turn-based battle. Your hero fights a run of enemies, one at a
+// Quest is a turn-based battle. Your hero fights a run of enemies, one at a
 // time: on your turn press 1 to attack, 2 to guard (the next hit is halved)
 // or 3 to drink a potion. Beat an enemy and you level up before the next one.
 // Online: H hosts a duel with a classmate; to join, put the code in JOIN.
