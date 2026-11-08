@@ -566,6 +566,35 @@ cookie; no binding = 503, never a half-working room. Dev: `scripts/dev-live.mjs`
 `npx wrangler dev -c wrangler.test.toml` in workers/live/, local only). Deploy order: apply 0043, `wrangler deploy` in
 workers/live/, then the site (its wrangler.toml declares the `LIVE` binding with `script_name = "shcode-live"`).
 
+### Code together (migration 0044; not deployed yet)
+2-4 classmates edit ONE sandbox program at once (spec: `codehs-review/REALTIME-SPEC.md` Part 2). Sandbox only, the
+JavaScript and moSHion modes, never a lesson. The toolbar's **Code together** button (signed in and in a class, from
+`GET /api/rooms?kind=code`'s `inClass`) opens `components/CodeTogetherBar.tsx` above the editor (MoshionLobby's look,
+picture picker and code pictures): Start (2-4 people), join by code or from Open sessions; joining confirms, then keeps
+the joiner's code as a History snapshot; Leave, or the host ending it ("Sam R. ended the session. You kept a copy."),
+keeps the shared text as the student's own draft through the sandbox's Save path. While a session is on, Reset and the
+mode tabs are locked. A session is a `game_rooms` row with `kind = 'code'` (0044), always live, game `code-js` |
+`code-moshion`; game lobbies list kind 'game' only, `join` refuses the wrong kind (409) and the polling `send` refuses a
+code room. `GET /api/live/[code]` routes a code room to `LIVE_DOC` (the `LiveDoc` class, same `shcode-live` Worker,
+migration tag v2) with a `DocTicket` (it carries emails for the teacher copy; the Worker has no public URL and no email
+is ever sent to a socket); each Durable Object refuses the other kind's ticket. The algorithm is `@codemirror/collab`'s
+central authority, in ONE module, `lib/live-doc-protocol.ts` (`LiveDocCore`, shared by the DO and `scripts/dev-live.mjs`):
+updates stamped `s<seat>` by the room, stale pushes answered with the missed updates, past 500 kept updates a reset,
+seed only from seat 0 at version 0, 64 KB doc (UTF-8), 16 KB frame (a seed may be bigger), the 30/s bucket, cursors
+10/s relayed never stored. The browser half is `lib/live-doc.ts` (`DocSync` + presence cursors with name tags + a filter
+that refuses an oversized paste in plain words), added to `CodeMirrorPane` through its `collab` Compartment prop. **The
+text is kept for teachers:** the LiveDoc writes its own copy (never a client's) to D1 `code_sessions` through its own
+`DB` binding (`writeCodeSession`): at once on the first change, then at most every 2 minutes while it changes, on close
+and when the last person leaves; rows older than 30 days go on the next write. The class page's Students tab shows
+"Code together sessions" (`components/ClassCodeSessions.tsx`, `GET /api/classes/[id]/code-sessions`, owner, co-teacher
+or admin; host or any participant enrolled; `?id=` for the text). Dev: `DEV_REAL_DB=1 DEV_ROLE=teacher npm run dev`, two
+students with `dev_student=<name>; dev_role=student` cookies (server.js `devRoleOf`), the teacher with no cookie on
+`/teacher?class=dev-class&tab=students`. Tests: `scripts/test-live-doc.mjs` (npm test: convergence of two collab clients
+under random concurrent edits, kind routing, the teacher route), `scripts/test-live-worker.mjs` (LiveDoc case, local
+wrangler dev). Deploy order: apply 0044 (`npm run d1:migrate`), `cd workers/live && npx wrangler deploy` (adds LiveDoc,
+tag v2, D1 binding), then the site (the repo wrangler.toml now declares `LIVE_DOC`; do not deploy the site from this
+tree before the Worker has the class).
+
 ### Games library (Part B, migration 0042)
 A student publishes a moSHion sketch from the sandbox (`components/PublishGameButton.tsx`: title, share with my class,
 Update / Publish as a new game; which game the sandbox draft is published as lives in localStorage
