@@ -2129,6 +2129,175 @@ function draw() {
     ],
   },
   {
+    slug: 'multiplayer',
+    title: 'Multiplayer',
+    pages: [
+      {
+        title: 'One line: multiplayer()',
+        body: `multiplayer(mode, players) turns a one-player sketch into a game for 2 to 4 people. Call it once, in setup(). The mode is one of four words:
+
+'none' is one player, the same as not calling it at all.
+
+'local' is 2 to 4 players taking turns at ONE keyboard.
+
+'versus' is 2 to 4 players online, each on their own computer, taking turns against each other.
+
+'coop' is 2 to 4 players online on the SAME side, with no turns: anyone can act at any time.
+
+The second number is how many players, from 2 to 4 (2 if you leave it out). A mode it does not know, or a number outside 2 to 4, prints a message in the console and plays as one player.
+
+After the call your sketch has a few new names: players (how many), turn (whose turn it is, counting from 0), nextTurn() (pass the turn to the next player), myTurn() (is it my turn right now?) and, online, seat (which player YOU are, 0 for the player who hosted). There is also game, with game.mode, game.players and game.ready, for showing what is going on. If your sketch already has its own turn or nextTurn, multiplayer() leaves yours alone and says so in the console.`,
+        code: `function setup() {
+  new Canvas(400, 200);
+  multiplayer('local', 2);
+}
+
+function draw() {
+  background('#1b1d2a');
+  if (kb.presses('space')) nextTurn();
+}
+
+function drawTop() {
+  text(game.mode + ' game for ' + players + ' players', 10, 30, 16, 'white');
+  text('Player ' + (turn + 1) + ': press SPACE to pass the turn', 10, 60, 16, 'gold');
+}`,
+      },
+      {
+        title: 'Taking turns at one keyboard (local)',
+        body: `In a 'local' game everyone shares the keyboard, so myTurn() is always true and whoever is at the keys plays for whoever's turn it is. Your code does the move and then calls nextTurn().
+
+The example is race to 21: players take turns adding 1 or 2, and whoever makes the count reach 21 wins. Press 1 or 2. turn says whose turn it is; turn + 1 turns 0 and 1 into Player 1 and Player 2 for the screen.`,
+        code: `let count = 0;
+let winner = -1;
+
+function setup() {
+  new Canvas(400, 200);
+  multiplayer('local', 2);
+}
+
+function draw() {
+  background('#1b1d2a');
+  if (winner === -1) {
+    if (kb.presses('1')) add(1);
+    if (kb.presses('2')) add(2);
+  }
+}
+
+function add(n) {
+  count = min(count + n, 21);
+  if (count === 21) winner = turn;
+  else nextTurn();
+}
+
+function drawTop() {
+  text('Count: ' + count, 10, 40, 24, 'white');
+  if (winner === -1) text('Player ' + (turn + 1) + ': press 1 or 2', 10, 80, 16, 'gold');
+  else text('Player ' + (winner + 1) + ' reached 21 and wins!', 10, 80, 16, 'gold');
+}`,
+      },
+      {
+        title: 'Playing a classmate online (versus)',
+        body: `Change one word, 'local' to 'versus', and the same game is played by two computers. A bar appears above the game with three ways in: Host makes a room and shows its code as four pictures (like coin, bee, key, apple); Join lets a classmate click those four pictures in order; and Open rooms lists rooms your classmates are hosting for THIS game, so they can just press Join. The bar shows how many are here ("1 of 2 here") until the room is full.
+
+Two rules keep both screens the same:
+
+Send, then apply. On your turn you do not change count yourself: you send your move with online.send({ add: 1 }). Every move, yours too, comes back to every computer through online.onMove, in the same order, and THAT is where count changes and nextTurn() is called. Both computers run the same moves in the same order, so they always agree.
+
+Only the right player. myTurn() is true only when the room is full and it is your seat's turn. In onMove, check that the move came from the player whose turn it is (who === turn) and that it makes sense (1 or 2), and ignore it otherwise: then a wrong or broken move changes nothing anywhere.
+
+Rooms are for classmates only (someone who shares a class with you), and you must be signed in. To try it alone, open the same page in a second browser tab: each tab is a different player.`,
+        code: `let count = 0;
+let winner = -1;
+
+function setup() {
+  new Canvas(400, 200);
+  multiplayer('versus', 2);
+  online.onMove((move, who) => {
+    if (winner !== -1 || who !== turn) return;
+    if (move.add !== 1 && move.add !== 2) return;
+    count = min(count + move.add, 21);
+    if (count === 21) winner = turn;
+    else nextTurn();
+  });
+}
+
+function draw() {
+  background('#1b1d2a');
+  if (winner === -1 && myTurn()) {
+    if (kb.presses('1')) online.send({ add: 1 });
+    if (kb.presses('2')) online.send({ add: 2 });
+  }
+}
+
+function drawTop() {
+  text('Count: ' + count, 10, 40, 24, 'white');
+  if (!game.ready) text('Waiting for players: use the bar above', 10, 80, 14, '#8393c4');
+  else if (winner !== -1) text('Player ' + (winner + 1) + ' wins!', 10, 80, 16, 'gold');
+  else if (myTurn()) text('Your turn: press 1 or 2', 10, 80, 16, 'gold');
+  else text('Player ' + (turn + 1) + ' is thinking...', 10, 80, 16, '#8393c4');
+}`,
+      },
+      {
+        title: 'Playing on the same side (coop)',
+        body: `In a 'coop' game there are no turns: everyone is on the same team and can act whenever they like. myTurn() is true for everyone once the room is full. Moves still travel the same way, send then apply in onMove, so every computer sees the team's moves in one order.
+
+The example is a shared tank for up to 4 players. Each press of SPACE sends one pump; every pump from anyone fills the tank, and the team wins when it is full. seat tells each computer which player it is, so the screen can say "You are player 3".`,
+        code: `let water = 0;
+
+function setup() {
+  new Canvas(400, 200);
+  multiplayer('coop', 4);
+  online.onMove((move, who) => {
+    if (move.pump === 1 && water < 100) water = min(water + 5, 100);
+  });
+}
+
+function draw() {
+  background('#1b1d2a');
+  if (myTurn() && water < 100 && kb.presses('space')) online.send({ pump: 1 });
+  fill('#333');
+  rect(20, 100, 360, 40);
+  fill('dodgerblue');
+  rect(20, 100, 360 * water / 100, 40);
+}
+
+function drawTop() {
+  if (!game.ready) text('Waiting for the team: use the bar above', 10, 40, 14, '#8393c4');
+  else text('You are player ' + (seat + 1) + ' of ' + players + '. SPACE pumps!', 10, 40, 14, 'gold');
+  if (water === 100) text('Full! The team did it.', 10, 80, 18, 'limegreen');
+}`,
+      },
+      {
+        title: 'What online play is good for',
+        body: `Moves travel through the shCode server, which each computer checks about once a second (faster while everyone is in the room). Each player can send at most 30 moves every 10 seconds. That is plenty for turn-based and slower games: board games, card games, battles where each side picks an action, puzzles you solve together. It is NOT fast enough for real-time action where two players steer ships around the screen at the same moment, so do not send a move every frame: send one when something happens.
+
+A move is game data only: numbers, true or false, and short one-word labels (no spaces, at most 24 letters of words in one move). A sentence is refused on purpose, because a game room is not a chat.
+
+If the player who hosted runs their game again, the room closes and everyone else sees that it closed: one player hosts a new room and the others join it. A player who runs again with the room still open gets their seat back and catches up on every move.`,
+        code: `// Send a move when something HAPPENS (a key press), never every frame.
+let jumps = 0;
+
+function setup() {
+  new Canvas(400, 160);
+  multiplayer('coop', 2);
+  online.onMove((move, who) => {
+    if (move.jump === true) jumps += 1;
+  });
+}
+
+function draw() {
+  background('#1b1d2a');
+  if (myTurn() && kb.presses('space')) online.send({ jump: true });
+}
+
+function drawTop() {
+  text('Jumps by the team: ' + jumps, 10, 40, 18, 'white');
+  text('One move per press, not one per frame.', 10, 80, 14, '#8393c4');
+}`,
+      },
+    ],
+  },
+  {
     slug: 'patterns',
     title: 'Game Patterns',
     pages: [
