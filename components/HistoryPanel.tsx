@@ -198,6 +198,14 @@ export default function HistoryPanel({ isOpen, onClose, lessonId, onRestore }: H
     return () => mq.removeEventListener('change', update);
   }, []);
 
+  // Escape closes the dialog, like every other modal.
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isOpen, onClose]);
+
   const currentFile = useLessonStore((s) => s.currentFile);
   const fileContents = useLessonStore((s) => s.fileContents);
 

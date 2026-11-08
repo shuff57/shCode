@@ -349,7 +349,7 @@ export default function CodeTogetherBar({ lang, getText, isUntouched, snapshot, 
               {list.kind === 'loading' ? <span style={dim}>looking...</span> : null}
               {list.kind === 'error' ? <span style={dim}>{list.text}</span> : null}
               {list.kind === 'rooms' && list.rooms.length === 0 ? (
-                <span style={dim}>none yet. Start one, or wait for a classmate to.</span>
+                <span style={dim}>none yet. Start one, or wait for a classmate to start one.</span>
               ) : null}
             </div>
             {list.kind === 'rooms' && list.rooms.length > 0 ? (
