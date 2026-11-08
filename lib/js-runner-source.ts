@@ -32,6 +32,22 @@ export const RUN_TIMEOUT_MS = 3000;
 // the exact failure the Worker exists to prevent.
 export const RUN_MAX_LOGS = 1000;
 
+// The sandbox's opt-in (RunnerRequest.timers): once the script's own pass is
+// over, a program that still has setTimeout/setInterval waiting may keep
+// running this long. Lessons never ask for it, so a lab ends after its
+// synchronous pass exactly as before.
+export const TIMER_RUN_LIMIT_MS = 30000;
+
+// How often a timers-mode run says it is still free between callbacks. The
+// host stops it when RUN_TIMEOUT_MS pass without one (a callback stuck in a
+// loop), so a single callback gets nearly the script's own 3 seconds.
+const TIMER_HEARTBEAT_MS = 250;
+
+/** What the sandbox says when timers kept a program running to the limit. */
+export function timerLimitMessage(ms: number = TIMER_RUN_LIMIT_MS): string {
+  return `Stopped after ${Math.round(ms / 1000)} seconds. Timers keep a program running until they are cleared, or until you press Stop.`;
+}
+
 import { TEST_HARNESS_SOURCE, createTestSession, type TestJob, type TestRunResults } from './test-harness-source';
 
 // The Function constructor's preamble is exactly two lines (see the parse in
@@ -61,13 +77,19 @@ export interface RunnerRequest {
   /** Runtime test cases (lib/test-harness-source.ts): run after the script,
    *  from the runner's own closure, tagged with a nonce the script never sees. */
   tests?: { jobs: TestJob[]; nonce: string };
+  /** The sandbox's opt-in: wait for setTimeout/setInterval callbacks (see TIMER_RUN_LIMIT_MS). */
+  timers?: boolean;
 }
 
 // What a host gets back. `needs-input` is the prompt handshake; `attempt` is on
 // every message because a re-run re-prints what the last one printed, and the
 // host keeps only the newest attempt's lines.
 export interface RunnerMessage {
-  kind: 'log' | 'needs-input' | 'done' | 'error';
+  /** `waiting` (timers mode only, never passed to a caller): the script's own
+   *  pass is over and timers keep it running; repeated every TIMER_HEARTBEAT_MS
+   *  while the runner is free, which is how the host tells a slow timer from a
+   *  callback stuck in a loop. */
+  kind: 'log' | 'needs-input' | 'done' | 'error' | 'waiting';
   attempt?: number;
   type?: 'log' | 'warn' | 'error';
   message?: string;
@@ -83,7 +105,9 @@ export interface RunnerMessage {
  *  finished and one test case then ran too long; `tests` carries every result
  *  gathered up to that point, the case that hung marked as not finished. */
 export interface RunTimeout {
-  phase: 'run' | 'case';
+  /** 'timers' (timers mode only): nothing was stuck, timers kept the program
+   *  running for the whole TIMER_RUN_LIMIT_MS. */
+  phase: 'run' | 'case' | 'timers';
   tests?: TestRunResults;
 }
 
@@ -123,13 +147,24 @@ export function lineColOf(err: unknown): { line: number | null; col: number | nu
  * The 3-second kill timer is the caller's (each surface words its own message),
  * but it is NOT reset while a dialog is up: a modal blocks the page anyway, so
  * a student who walks away from a prompt lab comes back to the dialog waiting.
+ *
+ * `timers` is the standalone sandbox's opt-in, and nothing else passes it: the
+ * run then ends (`done`) only once the script's pass is over AND no
+ * setTimeout/setInterval is waiting, its callbacks' logs stream in as they
+ * happen, and an error inside one ends the run like any error. The script's
+ * own pass keeps the 3-second limit; after it, timers may keep the program
+ * running for `limitMs` (TIMER_RUN_LIMIT_MS) and then it is stopped with
+ * phase 'timers'. A callback that is itself stuck for 3 seconds is stopped
+ * with phase 'run', as a stuck script is. Without `timers` nothing here
+ * changes: a lab ends after its synchronous pass, and its pending timers die
+ * with the Worker, as they always have.
  */
 export function runStudentCode(
   code: string,
   onMessage: (m: RunnerMessage) => void,
   onTimeout: (info: RunTimeout) => void,
   onSuperseded: () => void,
-  opts?: { tests?: TestJob[] },
+  opts?: { tests?: TestJob[]; timers?: boolean | { limitMs?: number } },
 ): { kill: () => void } {
   const url = URL.createObjectURL(new Blob([RUNNER_SOURCE], { type: 'text/javascript' }));
   const worker = new Worker(url);
@@ -142,9 +177,15 @@ export function runStudentCode(
   const jobs = opts?.tests && opts.tests.length ? opts.tests : null;
   let session = jobs ? createTestSession(jobs) : null;
 
+  const timers = !!opts?.timers;
+  const timerLimit = (typeof opts?.timers === 'object' && opts.timers.limitMs) || TIMER_RUN_LIMIT_MS;
+  // Timers mode: set once the script's pass is over and only timers keep it running.
+  let deadline: ReturnType<typeof setTimeout> | undefined;
+
   let killer: ReturnType<typeof setTimeout>;
   const cleanup = () => {
     clearTimeout(killer);
+    clearTimeout(deadline);
     worker.terminate();
     URL.revokeObjectURL(url);
   };
@@ -171,6 +212,19 @@ export function runStudentCode(
       }
     }
     const d = e.data as RunnerMessage;
+    if (timers) {
+      // A pass a prompt() answer already replaced has nothing more to say.
+      if (d.attempt && d.attempt < attempt) return;
+      if (d.kind === 'waiting') {
+        if (deadline === undefined) {
+          deadline = setTimeout(() => { cleanup(); onTimeout({ phase: 'timers' }); }, timerLimit);
+        }
+        // The runner is free between callbacks and says so every TIMER_HEARTBEAT_MS;
+        // three seconds of silence means a callback is stuck, like a stuck script.
+        arm(RUN_TIMEOUT_MS);
+        return;
+      }
+    }
     // A newer attempt supersedes everything printed by the one before it.
     if (d.attempt && d.attempt !== attempt) {
       attempt = d.attempt;
@@ -188,7 +242,12 @@ export function runStudentCode(
       arm(RUN_TIMEOUT_MS);
       attempt += 1;
       if (jobs) session = createTestSession(jobs);
-      worker.postMessage({ code, answers: answers.slice(), attempt, tests: session?.payload } satisfies RunnerRequest);
+      if (timers) {
+        // The run starts over: its script pass gets the 3 seconds again, its timers the full limit.
+        clearTimeout(deadline);
+        deadline = undefined;
+      }
+      worker.postMessage({ code, answers: answers.slice(), attempt, tests: session?.payload, ...(timers ? { timers: true } : {}) } satisfies RunnerRequest);
       return;
     }
     // A log is not the end of the run. Only `done`, `error` and `needs-input`
@@ -206,7 +265,7 @@ export function runStudentCode(
     onMessage({ kind: 'error', message: e.message || 'Error', tests });
   };
 
-  worker.postMessage({ code, answers: [], attempt, tests: session?.payload } satisfies RunnerRequest);
+  worker.postMessage({ code, answers: [], attempt, tests: session?.payload, ...(timers ? { timers: true } : {}) } satisfies RunnerRequest);
   return { kill: cleanup };
 }
 
@@ -229,6 +288,96 @@ self.prompt = function (message) {
   }
   return answers.shift();
 };
+// ---- Timers: the sandbox's opt-in (RunnerRequest.timers), off for every lesson.
+// The real timer functions, taken before anything can replace them (absent in
+// a bare vm context, which some scripts/ harnesses run this source in).
+const __setTimeout = typeof setTimeout === 'function' ? setTimeout : null;
+const __clearTimeout = typeof clearTimeout === 'function' ? clearTimeout : null;
+const __setInterval = typeof setInterval === 'function' ? setInterval : null;
+const __clearInterval = typeof clearInterval === 'function' ? clearInterval : null;
+let __timersOn = false;
+// The student's timers still waiting: our id -> the real handle.
+const __timers = new Map();
+let __timerId = 0;
+// The script's own pass is over (timers mode only).
+let __passDone = false;
+// This pass has ended (done, error or a prompt() pause): nothing more may run or post.
+let __halted = false;
+let __heartbeat = null;
+let __settleTimer = null;
+function __stopTimers() {
+  __timers.forEach((t) => { if (t.repeat) __clearInterval(t.handle); else __clearTimeout(t.handle); });
+  __timers.clear();
+  if (__heartbeat !== null) { __clearInterval(__heartbeat); __heartbeat = null; }
+  if (__settleTimer !== null) { __clearTimeout(__settleTimer); __settleTimer = null; }
+}
+// After the script's pass and after every callback, one turn later (so promise
+// callbacks it queued run first): done if no timer is waiting, else say we are
+// waiting and keep saying so every TIMER_HEARTBEAT_MS while nothing is stuck.
+function __settle() {
+  if (__halted || !__passDone || __settleTimer !== null) return;
+  __settleTimer = __setTimeout(() => {
+    __settleTimer = null;
+    if (__halted) return;
+    if (__timers.size === 0) {
+      __halted = true;
+      __stopTimers();
+      self.postMessage({ kind: 'done', attempt });
+      return;
+    }
+    if (__heartbeat === null) {
+      self.postMessage({ kind: 'waiting', attempt });
+      __heartbeat = __setInterval(() => { if (!__halted) self.postMessage({ kind: 'waiting', attempt }); }, ${TIMER_HEARTBEAT_MS});
+    }
+  }, 0);
+}
+// An error or a prompt() inside a callback ends this pass the way it ends the script's.
+function __endPass(err) {
+  __halted = true;
+  __stopTimers();
+  if (err === NEEDS_INPUT) self.postMessage({ kind: 'needs-input', message: promptMessage, attempt });
+  else self.postMessage(__errorMessage(err, true, ''));
+}
+function __track(repeat) {
+  return function (fn, delay, ...args) {
+    const f = typeof fn === 'function' ? fn : new Function(String(fn));
+    const id = ++__timerId;
+    const run = () => {
+      if (__halted || !__timers.has(id)) return;
+      if (!repeat) __timers.delete(id);
+      try { f.apply(globalThis, args); } catch (err) { __endPass(err); return; }
+      __settle();
+    };
+    const handle = repeat ? __setInterval(run, delay) : __setTimeout(run, delay);
+    __timers.set(id, { handle, repeat });
+    return id;
+  };
+}
+function __untrack(id) {
+  const t = __timers.get(id);
+  if (!t) return;
+  if (t.repeat) __clearInterval(t.handle); else __clearTimeout(t.handle);
+  __timers.delete(id);
+  __settle();
+}
+let __timersInstalled = false;
+function __installTimers() {
+  if (__timersInstalled) return;
+  __timersInstalled = true;
+  globalThis.setTimeout = __track(false);
+  globalThis.setInterval = __track(true);
+  globalThis.clearTimeout = __untrack;
+  globalThis.clearInterval = __untrack;
+  // An async function that throws after an await rejects instead of throwing:
+  // report it like any error.
+  if (typeof self.addEventListener === 'function') {
+    self.addEventListener('unhandledrejection', (ev) => {
+      if (!__timersOn || __halted) return;
+      if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
+      __endPass(ev ? ev.reason : undefined);
+    });
+  }
+}
 const ser = (a) => {
   if (typeof a !== 'object' || a === null) return String(a);
   try { return JSON.stringify(a, null, 2); } catch (_) { return String(a); }
@@ -321,6 +470,44 @@ function locateSyntaxError(code, message) {
   }
   return null;
 }
+// The error message every console surface shows (see the catch below for why the line is found this way).
+function __errorMessage(err, compiled, codeText) {
+  // The Function constructor wraps student code in a synthesized
+  // "function anonymous(\\n) {\\n" preamble -- exactly two lines -- before
+  // the body starts, so a V8 stack frame's line maps back to the student's
+  // own source at LINE - 2 (issue #25).
+  //
+  // The innermost frame is where the throw happened. Its spelling varies by
+  // engine -- <anonymous>:3:18 in a browser Worker, at blob:...:3:18, at
+  // anonymous (file:///x:3:18) elsewhere -- so take the trailing line:col of
+  // the first frame that has one rather than matching one exact format, which
+  // is what kept a browser's line number from ever appearing.
+  let line = null;
+  let col = null;
+  const stack = (err && err.stack) || '';
+  const frame = String(stack).split('\\n').slice(1).find((l) => /:\\d+:\\d+/.test(l));
+  const m = frame && frame.match(/:(\\d+):(\\d+)\\)?\\s*$/);
+  if (m) {
+    const rawLine = parseInt(m[1], 10) - ${FUNCTION_PREAMBLE_LINES};
+    if (rawLine >= 1) { line = rawLine; col = parseInt(m[2], 10); }
+  }
+  // A SyntaxError thrown by the Function constructor is raised before any
+  // student line runs, so its stack holds only THIS runner's own frame: every
+  // compile error used to read "line 59, col 5" whatever the file said.
+  // The real position is not in the error, so it is found from the code.
+  if (!compiled && err && err.name === 'SyntaxError') {
+    line = locateSyntaxError(codeText, String(err.message));
+    col = null;
+  }
+  return {
+    kind: 'error',
+    attempt,
+    name: (err && err.name) || 'Error',
+    message: (err && err.message) || String(err),
+    line,
+    col,
+  };
+}
 self.onmessage = (e) => {
   // {code, answers, attempt} from a browser host; a bare string from the node
   // harnesses in scripts/, which have no dialog to raise.
@@ -331,6 +518,14 @@ self.onmessage = (e) => {
   attempt = req.attempt || 1;
   sent = 0;
   __scriptLines.length = 0;
+  // Timers mode: a prompt() answer re-runs the script in this same Worker, so
+  // the last pass's timers go first.
+  __timersOn = req.timers === true;
+  __stopTimers();
+  __halted = false;
+  __passDone = false;
+  if (__timersOn && __setTimeout) __installTimers();
+  else __timersOn = false;
   let compiled = false;
   let codeText = '';
   // Hoisted so the error path can still check a traced run (see below).
@@ -405,8 +600,19 @@ self.onmessage = (e) => {
     } else if (trace) {
       __traceKit.end(trace);
     }
+    if (__timersOn) {
+      // Not over yet if a timer is waiting: done comes from __settle.
+      __passDone = true;
+      __settle();
+      return;
+    }
     self.postMessage({ kind: 'done', attempt });
   } catch (err) {
+    if (__timersOn) {
+      // The pass ended here, so do the timers it already set.
+      __halted = true;
+      __stopTimers();
+    }
     if (trace) {
       // A traced run that threw: the jobs that perturb are checked on what ran
       // before the error (lib/test-harness-source.ts, EXECUTION TRACE, item 4).
@@ -429,41 +635,7 @@ self.onmessage = (e) => {
       self.postMessage({ kind: 'needs-input', message: promptMessage, attempt });
       return;
     }
-    // The Function constructor wraps student code in a synthesized
-    // "function anonymous(\\n) {\\n" preamble -- exactly two lines -- before
-    // the body starts, so a V8 stack frame's line maps back to the student's
-    // own source at LINE - 2 (issue #25).
-    //
-    // The innermost frame is where the throw happened. Its spelling varies by
-    // engine -- <anonymous>:3:18 in a browser Worker, at blob:...:3:18, at
-    // anonymous (file:///x:3:18) elsewhere -- so take the trailing line:col of
-    // the first frame that has one rather than matching one exact format, which
-    // is what kept a browser's line number from ever appearing.
-    let line = null;
-    let col = null;
-    const stack = (err && err.stack) || '';
-    const frame = String(stack).split('\\n').slice(1).find((l) => /:\\d+:\\d+/.test(l));
-    const m = frame && frame.match(/:(\\d+):(\\d+)\\)?\\s*$/);
-    if (m) {
-      const rawLine = parseInt(m[1], 10) - ${FUNCTION_PREAMBLE_LINES};
-      if (rawLine >= 1) { line = rawLine; col = parseInt(m[2], 10); }
-    }
-    // A SyntaxError thrown by the Function constructor is raised before any
-    // student line runs, so its stack holds only THIS runner's own frame: every
-    // compile error used to read "line 59, col 5" whatever the file said.
-    // The real position is not in the error, so it is found from the code.
-    if (!compiled && err && err.name === 'SyntaxError') {
-      line = locateSyntaxError(codeText, String(err.message));
-      col = null;
-    }
-    self.postMessage({
-      kind: 'error',
-      attempt,
-      name: (err && err.name) || 'Error',
-      message: (err && err.message) || String(err),
-      line,
-      col,
-    });
+    self.postMessage(__errorMessage(err, compiled, codeText));
   }
 };
 `;

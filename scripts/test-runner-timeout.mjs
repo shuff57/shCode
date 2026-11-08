@@ -161,5 +161,118 @@ console.log('console runner: terminates runaway code\n');
     'no diagnosis-free stop message beside the diagnosed one, or no summative guard');
 }
 
+// 7. Timers. The standalone sandbox opts in (`timers`) so setTimeout and
+// setInterval callbacks run and their output streams in; every lesson leaves
+// it off, so a lab still ends after its synchronous pass. This drives the REAL
+// host, runStudentCode, with a Worker stand-in that runs the same
+// RUNNER_SOURCE under worker_threads.
+{
+  const { runStudentCode, timerLimitMessage, TIMER_RUN_LIMIT_MS } = await import(path.join(root, 'lib', 'js-runner-source.ts'));
+  const VM_SHIM = `
+const { parentPort } = require('worker_threads');
+globalThis.self = globalThis;
+globalThis.postMessage = (v) => parentPort.postMessage(v);
+require('vm').runInThisContext(${JSON.stringify(runnerSource)});
+parentPort.on('message', (data) => globalThis.onmessage({ data }));
+`;
+  // A browser Worker as runStudentCode uses it: onmessage/onerror, postMessage,
+  // terminate() (after which nothing more is delivered).
+  globalThis.Worker = class {
+    constructor() {
+      this.onmessage = null;
+      this.onerror = null;
+      this.dead = false;
+      this.w = new Worker(VM_SHIM, { eval: true });
+      this.w.on('message', (data) => { if (!this.dead && this.onmessage) this.onmessage({ data }); });
+      this.w.on('error', (e) => { if (!this.dead && this.onerror) this.onerror({ message: e.message }); });
+    }
+    postMessage(m) { this.w.postMessage(m); }
+    terminate() { this.dead = true; void this.w.terminate(); }
+  };
+  const promptAnswers = [];
+  globalThis.window = { prompt: () => promptAnswers.shift() ?? '' };
+
+  /** One run through runStudentCode: what the sandbox would show, and how it ended. */
+  const host = (code, opts, { killAfter } = {}) => new Promise((resolve) => {
+    const t0 = Date.now();
+    const lines = [];
+    const at = [];
+    let superseded = 0;
+    let settled = false;
+    const end = (how, extra = {}) => {
+      if (settled) return;
+      settled = true;
+      // Anything that arrives after the end would be a bug: wait a moment and keep it.
+      const after = lines.length;
+      setTimeout(() => resolve({ how, lines, at, superseded, ms: Date.now() - t0, late: lines.slice(after), ...extra }), 250);
+    };
+    const run = runStudentCode(
+      code,
+      (d) => {
+        if (d.kind === 'log') { lines.push(d.message); at.push(Date.now() - t0); return; }
+        end(d.kind, { error: d.kind === 'error' ? d : null });
+      },
+      (info) => end('timeout', { phase: info.phase }),
+      () => { superseded++; lines.length = 0; at.length = 0; },
+      opts,
+    );
+    if (killAfter) setTimeout(() => { run.kill(); end('killed'); }, killAfter);
+  });
+
+  check('timers: the sandbox limit is 30 seconds', TIMER_RUN_LIMIT_MS === 30000, TIMER_RUN_LIMIT_MS);
+  {
+    const r = await host("console.log('first'); setTimeout(() => console.log('later'), 400);", { timers: true });
+    check('timers: setTimeout output arrives after the synchronous output', r.how === 'done' && r.lines.join('|') === 'first|later', JSON.stringify(r));
+    check('timers: ...as it happens, not batched at the end', r.at[0] < 300 && r.at[1] >= 380, JSON.stringify(r.at));
+    check('timers: the run ends once nothing is waiting', r.ms - 250 < 1000 && r.late.length === 0, `${r.ms}ms`);
+  }
+  {
+    const r = await host("let n = 0;\nconst id = setInterval(() => {\n  n++;\n  console.log('tick ' + n);\n  if (n === 3) clearInterval(id);\n}, 60);", { timers: true });
+    check('timers: a setInterval cleared after 3 ticks prints tick 1..3 and ends the run', r.how === 'done' && r.lines.join('|') === 'tick 1|tick 2|tick 3' && r.late.length === 0, JSON.stringify(r));
+  }
+  {
+    const r = await host("setInterval(() => console.log('x'), 100);", { timers: { limitMs: 900 } });
+    check('timers: an uncleared setInterval is stopped at the limit, as a timers stop', r.how === 'timeout' && r.phase === 'timers', JSON.stringify({ how: r.how, phase: r.phase }));
+    check('timers: ...at the limit, not before and not much after', r.ms - 250 >= 850 && r.ms - 250 < 1800, `${r.ms - 250}ms`);
+    check('timers: ...having printed until then, and nothing after', r.lines.length >= 5 && r.late.length === 0, `${r.lines.length} lines, ${r.late.length} late`);
+    const msg = timerLimitMessage();
+    check('timers: the stop message is about timers, in plain words, not the stuck-loop one',
+      /^Stopped after 30 seconds\./.test(msg) && /Timers keep a program running/.test(msg) && /Stop/.test(msg) && !/loop/i.test(msg), msg);
+    const sandbox = readFileSync(path.join(root, 'components', 'SandboxWorkspace.tsx'), 'utf8');
+    check('timers: the sandbox opts in and shows the timers message for a timers stop',
+      /\{\s*timers:\s*true\s*\}/.test(sandbox) && /info\.phase === 'timers'\s*\?\s*timerLimitMessage\(\)/.test(sandbox), 'see components/SandboxWorkspace.tsx runJs');
+  }
+  {
+    const r = await host("console.log('a');\nsetTimeout(() => {\n  undefinedFn();\n}, 50);", { timers: true });
+    check('timers: an error inside a callback is reported like any error, with its line',
+      r.how === 'error' && r.error?.name === 'ReferenceError' && /undefinedFn/.test(r.error?.message) && r.error?.line === 3 && r.lines.join('|') === 'a',
+      JSON.stringify(r.error));
+  }
+  {
+    const r = await host("setTimeout(() => { while (true) {} }, 20);", { timers: { limitMs: 20000 } });
+    check('timers: a callback stuck in a loop is stopped like a stuck script, not after the timers limit',
+      r.how === 'timeout' && r.phase === 'run' && r.ms - 250 < 5000, JSON.stringify({ how: r.how, phase: r.phase, ms: r.ms - 250 }));
+  }
+  {
+    promptAnswers.push('Ana');
+    const r = await host("console.log('start');\nsetTimeout(() => {\n  const n = prompt('Your name?');\n  console.log('hi ' + n);\n}, 50);", { timers: true });
+    check('timers: prompt() in a callback still re-runs with the answer', r.how === 'done' && r.superseded === 1 && r.lines.join('|') === 'start|hi Ana', JSON.stringify(r));
+  }
+  {
+    const r = await host("setInterval(() => console.log('x'), 50);", { timers: true }, { killAfter: 400 });
+    check('timers: Stop (kill) ends it at once and nothing more arrives', r.how === 'killed' && r.late.length === 0, JSON.stringify({ how: r.how, late: r.late.length }));
+  }
+  {
+    // A lesson's run: no opt-in. Unchanged: done right after the synchronous
+    // pass, the timer's output never arrives.
+    const r = await host("console.log('a'); setTimeout(() => console.log('b'), 100);", undefined);
+    check('lab mode (no opt-in): still ends after the synchronous pass', r.how === 'done' && r.lines.join('|') === 'a' && r.ms - 250 < 100, JSON.stringify({ how: r.how, lines: r.lines, ms: r.ms - 250 }));
+    await new Promise((res) => setTimeout(res, 150));
+    check('lab mode (no opt-in): a pending timer\'s output never shows', r.lines.join('|') === 'a' && r.late.length === 0, JSON.stringify(r.lines));
+    const s = await host('while (true) {}', {});
+    check('lab mode (no opt-in): a stuck script is still stopped as a run timeout', s.how === 'timeout' && s.phase === 'run', JSON.stringify({ how: s.how, phase: s.phase }));
+  }
+}
+
 console.log(`\n${failures === 0 ? 'ALL PASS' : `${failures} FAILED`}  (component timeout is ${TIMEOUT}ms, log cap ${MAX_LOGS})`);
 process.exit(failures === 0 ? 0 : 1);

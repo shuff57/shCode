@@ -21,7 +21,7 @@ import ClassLibraryPanel from './ClassLibraryPanel';
 import DocsDrawer from './DocsDrawer';
 import PublishGameButton from './PublishGameButton';
 import CodeTogetherBar, { useCodeTogetherAvailable } from './CodeTogetherBar';
-import { RUN_TIMEOUT_MS, errorWithLocation, runStudentCode } from '../lib/js-runner-source';
+import { RUN_TIMEOUT_MS, errorWithLocation, runStudentCode, timerLimitMessage } from '../lib/js-runner-source';
 import {
   NO_TEACHER_MODES,
   canUseBuild,
@@ -286,10 +286,13 @@ export default function SandboxWorkspace() {
         }
         ended();
       },
-      () => {
+      (info) => {
         collected.push({
           type: 'error',
-          message: `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped. That usually means a loop never reaches its stopping point — check that the value in the condition actually changes inside the loop.`,
+          // A program kept alive by its timers is not a stuck loop: say what it is.
+          message: info.phase === 'timers'
+            ? timerLimitMessage()
+            : `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped. That usually means a loop never reaches its stopping point — check that the value in the condition actually changes inside the loop.`,
         });
         setLogs([...collected]);
         ended();
@@ -297,6 +300,9 @@ export default function SandboxWorkspace() {
       () => {
         collected.length = 0;
       },
+      // The sandbox alone waits for setTimeout/setInterval: a lesson's run ends
+      // after its synchronous pass, so its grading never waits on a timer.
+      { timers: true },
     );
     runRef.current = run;
   }, []);
