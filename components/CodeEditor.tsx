@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import type { Extension } from '@codemirror/state';
 import { useLessonStore } from '../lib/store';
 import CodeMirrorPane from './CodeMirrorPane';
 import ImageLibrary from './ImageLibrary';
 
-export default function CodeEditor({ plainText = false }: { plainText?: boolean }) {
+/** `collab`: Code together's shared-editing extension (the sandbox only), handed to CodeMirrorPane. */
+export default function CodeEditor({ plainText = false, collab = null }: { plainText?: boolean; collab?: Extension | null }) {
   const [libraryOpen, setLibraryOpen] = useState(false);
   const currentFile = useLessonStore((s) => s.currentFile);
   const value = useLessonStore((s) => (currentFile ? s.fileContents[currentFile] : ''));
@@ -113,6 +115,7 @@ export default function CodeEditor({ plainText = false }: { plainText?: boolean 
               }
             }}
             fileKey={currentFile}
+            collab={collab}
           />
         )}
       </div>

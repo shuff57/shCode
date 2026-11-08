@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { ChevronDown, ChevronUp, CloudUpload, History, Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen, RotateCcw } from 'lucide-react';
+import { ChevronDown, ChevronUp, CloudUpload, History, Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen, RotateCcw, Users } from 'lucide-react';
+import type { Extension } from '@codemirror/state';
 import { useLessonStore } from '../lib/store';
 import { saveProgress } from '../lib/version-control';
 import { useCloudWorkspace } from '../lib/lesson-sync';
@@ -19,6 +20,7 @@ import SoundMixer from './SoundMixer';
 import ClassLibraryPanel from './ClassLibraryPanel';
 import DocsDrawer from './DocsDrawer';
 import PublishGameButton from './PublishGameButton';
+import CodeTogetherBar, { useCodeTogetherAvailable } from './CodeTogetherBar';
 import { RUN_TIMEOUT_MS, errorWithLocation, runStudentCode } from '../lib/js-runner-source';
 import {
   NO_TEACHER_MODES,
@@ -108,6 +110,27 @@ export default function SandboxWorkspace() {
   // independent cloud rows and histories.
   const cloud = useCloudWorkspace(lesson, lessonProgress.authed);
   const [historyOpen, setHistoryOpen] = useState(false);
+
+  // Code together (REALTIME-SPEC.md Part 2): the JavaScript and moSHion modes
+  // only, for a student signed in and in a class. While a session is on, the
+  // editor carries the shared-editing extension (lib/live-doc.ts) and Reset and
+  // the mode tabs are locked, so one click cannot wipe or swap everyone's program.
+  const togetherLang = modeId === 'js' || modeId === 'moshion' ? modeId : null;
+  const mayTogether = useCodeTogetherAvailable(togetherLang, lessonProgress.authed);
+  const [togetherOpen, setTogetherOpen] = useState(false);
+  const [together, setTogether] = useState(false);
+  const [collabExt, setCollabExt] = useState<Extension | null>(null);
+  const cloudRef = useRef(cloud);
+  cloudRef.current = cloud;
+  const togetherSnapshot = useCallback((label: string) => {
+    addLocalSnapshot(lesson.id, useLessonStore.getState().fileContents, label);
+  }, [lesson.id]);
+  // Leaving (or the host ending it) keeps the shared program as this student's
+  // own draft, through the same path as Save, so it reaches Cloud history too.
+  const keepTogetherCopy = useCallback(() => {
+    addLocalSnapshot(lesson.id, useLessonStore.getState().fileContents, 'Kept from Code together');
+    void cloudRef.current.save();
+  }, [lesson.id]);
 
   const isFlow = mode.preview === 'diagram';
   const chart = useMemo(() => (isFlow ? parseChart(fileContents[mode.file]) : null), [isFlow, fileContents, mode.file]);
@@ -223,7 +246,8 @@ export default function SandboxWorkspace() {
   }, [fileContents, lesson.id]);
 
   function chooseMode(next: SandboxModeId) {
-    if (next === modeId) return;
+    if (next === modeId || together) return;
+    setTogetherOpen(false);
     runRef.current?.kill();
     runRef.current = null;
     try { window.localStorage.setItem(MODE_KEY, next); } catch { /* private mode */ }
@@ -664,6 +688,8 @@ export default function SandboxWorkspace() {
                   aria-pressed={m.id === modeId}
                   className={m.id === modeId ? 'sandbox-mode is-active' : 'sandbox-mode'}
                   onClick={() => chooseMode(m.id)}
+                  disabled={together && m.id !== modeId}
+                  title={together && m.id !== modeId ? 'Leave Code together to switch' : undefined}
                 >
                   {m.label}
                 </button>
@@ -684,7 +710,24 @@ export default function SandboxWorkspace() {
             {mode.preview === 'moshion' && lessonProgress.authed && (
               <PublishGameButton getCode={getScript} />
             )}
-            <button style={chipStyle} onClick={reset}>
+            {togetherLang && mayTogether && (
+              <button
+                type="button"
+                style={togetherOpen || together ? { ...chipStyle, color: 'var(--c-fg)' } : chipStyle}
+                aria-pressed={togetherOpen || together}
+                onClick={() => { if (!together) setTogetherOpen((o) => !o); }}
+                title="Write one program with classmates at the same time"
+              >
+                <Users size={12} />
+                Code together
+              </button>
+            )}
+            <button
+              style={together ? { ...chipStyle, opacity: 0.45, cursor: 'not-allowed' } : chipStyle}
+              onClick={reset}
+              disabled={together}
+              title={together ? 'Leave Code together to reset' : undefined}
+            >
               <RotateCcw size={12} />
               Reset
             </button>
@@ -727,7 +770,21 @@ export default function SandboxWorkspace() {
           ) : (
             <>
               <div className="pane" id="editorPane">
-                <CodeEditor />
+                {togetherOpen && togetherLang && (
+                  <CodeTogetherBar
+                    key={togetherLang}
+                    lang={togetherLang}
+                    getText={getScript}
+                    snapshot={togetherSnapshot}
+                    onCollab={setCollabExt}
+                    onActive={setTogether}
+                    keepCopy={keepTogetherCopy}
+                    onClose={() => setTogetherOpen(false)}
+                  />
+                )}
+                <div style={{ flex: '1 1 auto', minHeight: 0 }}>
+                  <CodeEditor collab={collabExt} />
+                </div>
               </div>
               <div
                 className="divider"

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { EditorView, keymap, lineNumbers, highlightActiveLine, highlightActiveLineGutter } from '@codemirror/view';
-import { EditorState } from '@codemirror/state';
+import { Compartment, EditorState, type Extension } from '@codemirror/state';
 import { javascript } from '@codemirror/lang-javascript';
 import { defaultKeymap, indentWithTab, history, historyKeymap } from '@codemirror/commands';
 import { bracketMatching, indentOnInput, HighlightStyle, syntaxHighlighting, foldGutter, foldKeymap } from '@codemirror/language';
@@ -186,6 +186,12 @@ export interface CodeMirrorPaneProps {
   fileKey: string;
   language?: 'javascript' | 'plaintext';
   readOnly?: boolean;
+  /**
+   * Extra extensions switched on and off WITHOUT remounting the editor: Code
+   * together's shared-editing extension (lib/live-doc.ts). Added and removed
+   * through a Compartment, so the text, cursor and undo history stay put.
+   */
+  collab?: Extension | null;
 }
 
 export default function CodeMirrorPane({
@@ -194,9 +200,13 @@ export default function CodeMirrorPane({
   fileKey,
   language = 'javascript',
   readOnly = false,
+  collab = null,
 }: CodeMirrorPaneProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
+  const collabSlot = useRef(new Compartment());
+  const collabRef = useRef<Extension | null>(collab);
+  collabRef.current = collab;
 
   // Create or recreate editor when fileKey changes.
   useEffect(() => {
@@ -210,7 +220,7 @@ export default function CodeMirrorPane({
     const view = new EditorView({
       state: EditorState.create({
         doc: value,
-        extensions: makeExtensions(onChange, language, readOnly),
+        extensions: [makeExtensions(onChange, language, readOnly), collabSlot.current.of(collabRef.current ?? [])],
       }),
       parent: containerRef.current,
     });
@@ -237,6 +247,13 @@ export default function CodeMirrorPane({
       changes: { from: 0, to: view.state.doc.length, insert: next },
     });
   }, [value]);
+
+  // Code together on or off: swap the Compartment's contents in place.
+  useEffect(() => {
+    const view = viewRef.current;
+    if (!view) return;
+    view.dispatch({ effects: collabSlot.current.reconfigure(collab ?? []) });
+  }, [collab]);
 
   // Insert-at-cursor: the image library dispatches 'shcode:insert' with the
   // public path of a chosen upload. Goes through view.dispatch rather than

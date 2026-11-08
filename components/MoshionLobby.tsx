@@ -59,6 +59,8 @@ const quiet: React.CSSProperties = {
   fontWeight: 500,
 };
 const dim: React.CSSProperties = { color: 'var(--c-dim)' };
+/** The bar's look, shared with Code together's bar (components/CodeTogetherBar.tsx). */
+export const lobbyStyles = { bar, row, btn, quiet, dim };
 
 /** One picture of a room code. Decorative where its name is said beside it. */
 function Pic({ icon, size, label }: { icon: string; size: number; label?: string }) {
@@ -77,7 +79,7 @@ function Pic({ icon, size, label }: { icon: string; size: number; label?: string
 }
 
 /** A code as pictures in a row, with each letter small underneath (big = the host's view). */
-function CodePictures({ code, size, letters }: { code: string; size: number; letters: boolean }) {
+export function CodePictures({ code, size, letters }: { code: string; size: number; letters: boolean }) {
   const icons = codeIcons(code);
   if (!icons) {
     // An old 6-letter code (a room made before picture codes): letters only.
@@ -254,7 +256,7 @@ export default function MoshionLobby({ view, actions, gameKey, device }: {
  * picture's letter to the same code the text box holds, so typing and picking
  * are one code; Back takes the last one off, Clear empties it.
  */
-function PicturePicker({ typed, setTyped, busy }: { typed: string; setTyped: (v: string) => void; busy: boolean }) {
+export function PicturePicker({ typed, setTyped, busy }: { typed: string; setTyped: (v: string) => void; busy: boolean }) {
   const picked = Array.from(typed).map(iconForLetter);
   const isPictures = typed.length <= ROOM_CODE_LENGTH && picked.every((x) => x !== null);
   const full = isPictures && typed.length === ROOM_CODE_LENGTH;

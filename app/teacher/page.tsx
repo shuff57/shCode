@@ -17,6 +17,7 @@ import { describeGrade, opensInCodeEditor, showLateBadge, stillFailingRequiremen
 import MostMissedPanel from '../../components/MostMissedPanel';
 import ClassLibraryModeration from '../../components/ClassLibraryModeration';
 import ClassGamesModeration from '../../components/ClassGamesModeration';
+import ClassCodeSessions from '../../components/ClassCodeSessions';
 import PastDuePanel from '../../components/PastDuePanel';
 import { formatDue, schoolDateString } from '../../lib/due-dates-core';
 import { lessonHref } from '../../lib/lesson-href';
@@ -2685,6 +2686,11 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         <div style={S.card}>
           <h2 style={S.h2}>Shared games</h2>
           <ClassGamesModeration classId={classId} />
+        </div>
+        {/* Programs students wrote together in the sandbox (Code together); kept 30 days */}
+        <div style={S.card}>
+          <h2 style={S.h2}>Code together sessions</h2>
+          <ClassCodeSessions classId={classId} />
         </div>
         </div>
       )}

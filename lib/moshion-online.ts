@@ -103,8 +103,8 @@ export interface MoshionOnline {
 }
 const DEVICE_KEY = 'shcode.online.device';
 
-/** A random id for this browser tab: a seat is an account in one tab (functions/api/rooms). */
-function deviceId(): string {
+/** A random id for this browser tab: a seat is an account in one tab (functions/api/rooms). Code together uses the same one. */
+export function deviceId(): string {
   try {
     let d = sessionStorage.getItem(DEVICE_KEY);
     if (!d || !/^[a-z0-9]{8,32}$/.test(d)) {
