@@ -736,17 +736,29 @@ function draw() {
       },
       {
         title: 'Textures: named pixel art',
-        body: `sprite.texture = 'coin' picks art by NAME instead of by URL. moSHion ships a catalog of 40 pixel-art textures, so you can give a sprite a picture without finding, hosting, or spelling a file path.
+        body: `sprite.texture = 'coin' picks art by NAME instead of by URL. moSHion ships a catalog of 105 pixel-art textures, so you can give a sprite a picture without finding, hosting, or spelling a file path.
+
+94 are stills; 11 are animated sprite sheets that simply play when you assign the name (see below). The terrain, things, battle, numbers and candy groups are newer: ground to build levels from, flags and switches, swords and shields, the digits 0-9 for a score or a die, and candy.
 
 The names, by group —
 
-characters: player, playerBeige, playerBlue, playerPink, playerYellow
+characters: player, playerBlue, playerPink, playerYellow, playerBeige, runnerJump, playerWalk, playerBlueWalk, playerPinkWalk, playerYellowWalk, playerBeigeWalk, runner
 
-pickups: coin, coinBronze, coinSilver, gem, gemGreen, gemOrange, gemYellow, heart, heartHalf, key, keyBlue, keyGreen, keyOrange, star
+pickups: coin, coinSilver, coinBronze, star, heart, heartHalf, gem, gemGreen, gemYellow, gemOrange, key, keyGreen, keyBlue, keyOrange
 
-blocks: block, bomb, cactus, crate, crateX, door, exitSign, mushroom, mushroomBrown, torch
+blocks: crate, crateX, block, door, torch, bomb, mushroom, mushroomBrown, cactus, exitSign
 
-creatures: bat, bee, bird, fish, fishPink, ghost, ladybug, slime, slimeBlue, snail, worm
+creatures: slime, slimeBlue, bee, bat, ghost, fish, fishPink, bird, snail, ladybug, worm, frog, monster, batFly, beeFly, fishSwim, ladybugWalk, snailCrawl
+
+terrain: grass, sand, snow, stone, brick, brickTan, water, waterDeep, lava, lavaDeep, ice, spikes, tree, bush, rock
+
+things: flag, flagGreen, flagRed, flagBlue, sign, signArrow, lock, lockGreen, spring, lever, apple
+
+battle: sword, swordGold, shield, shieldSilver, shieldGold, blaster, burst, burstGreen, burstOrange, burstBlue
+
+numbers: num0, num1, num2, num3, num4, num5, num6, num7, num8, num9
+
+candy: candyOrange, candyGreen, candyYellow, swirl, swirlMint
 
 Call textureNames() to print the list from inside a sketch, and hasTexture('coin') to check one name. A name that does not exist warns in the console and suggests near matches rather than failing silently, so a typo tells you what it was.
 
@@ -1373,7 +1385,7 @@ function draw() {
         title: 'Sound',
         body: `loadSound('file.mp3') gives you a Sound. Call .play() for a one-off effect and .loop() for music that should keep going.
 
-moSHion ships a small 8-bit palette you can load straight away: '/moshion/assets/coin.wav' is a short chime, '/moshion/assets/music.wav' is a short tune, and jump.wav, hit.wav, laser.wav, powerup.wav, explode.wav, blip.wav, select.wav and tone.wav sit in the same folder. Type the path exactly as shown: a misspelled path shows no error, the sound just never plays.
+moSHion ships a small 8-bit palette you can load straight away: '/moshion/assets/coin.wav' is a short chime, '/moshion/assets/music.wav' is a short tune, and jump.wav, hit.wav, laser.wav, powerup.wav, explode.wav, blip.wav, select.wav and tone.wav sit in the same folder, with title.wav, win.wav and lose.wav for menus. For board and battle games there are dice.wav, step.wav, sword.wav, clang.wav, potion.wav, levelup.wav, crown.wav, whoosh.wav, pop.wav and door.wav. Every one is in the Library under Built in, where you can play it and copy the line that loads it. Type the path exactly as shown: a misspelled path shows no error, the sound just never plays.
 
 The sound mixer at /sound (also the Sounds tab beside a moSHion lesson's code) builds a sound from a chip preset and saves it in this browser. Load a saved sound by name instead of by path: let zap = loadSound('zap');. A saved name wins over a built-in file with the same name.
 

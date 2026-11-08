@@ -114,3 +114,10 @@ it as a URL; a path or a data: URI still bypasses the store. The 8-bit palette
   `moshion.js` by `runner.html` and by `scripts/moshion-harness.mjs`, so a sketch behaves the
   same headless. It is shCode's file, not the engine's: it is absent from an upstream sync and
   must be re-checked after one. Tests: `scripts/test-moshion-extras.mjs`.
+
+**Assets, 2026-11-07.** The texture catalog (105: terrain, things, battle,
+numbers and candy added) and the 10 designed board-game sounds were made here
+and pushed upstream as `shuff57/moshion` `ee992a9`, with the docs' Textures page
+and the README's sound list. The engine is unchanged (`moshion.js` still matches
+`b1a2575` apart from the two local lines: the `/moshion/textures/` base and the
+`/moshion/assets/` path in the saved-sound comments).
