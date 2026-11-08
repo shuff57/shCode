@@ -16,9 +16,9 @@ import { diffLines } from 'diff';
 import { useLessonStore } from '../lib/store';
 import { getCurrentUser } from '../lib/auth';
 import { restoreVersionToCloud } from '../lib/lesson-sync';
-import { listLocalHistory, type LocalSnapshot } from '../lib/local-history';
+import { TOGETHER_COPY, listLocalHistory, type LocalSnapshot } from '../lib/local-history';
 import type { FileMap } from '../lib/lesson-sync-merge';
-import { Cloud, HardDrive, RotateCcw, X } from 'lucide-react';
+import { Cloud, HardDrive, RotateCcw, Users, X } from 'lucide-react';
 
 interface HistoryPanelProps {
   isOpen: boolean;
@@ -145,6 +145,21 @@ const avatarStyle: React.CSSProperties = {
   flexShrink: 0,
 };
 
+/**
+ * Whose version it is: the student's initial, or a people icon for the copy
+ * Code together kept, which several classmates wrote.
+ */
+function Avatar({ initial, together }: { initial: string; together: boolean }) {
+  if (together) {
+    return (
+      <span style={avatarStyle} title="Written together in Code together">
+        <Users size={14} aria-hidden="true" />
+      </span>
+    );
+  }
+  return <span style={avatarStyle} aria-hidden="true">{initial}</span>;
+}
+
 const badgeStyle: React.CSSProperties = {
   display: 'inline-flex',
   alignItems: 'center',
@@ -190,7 +205,9 @@ export default function HistoryPanel({ isOpen, onClose, lessonId, onRestore }: H
     let live = true;
     getCurrentUser()
       .then((u) => {
-        const first = u?.email?.trim()?.[0];
+        // The first name's initial: an email can start with anything (a school
+        // id, "student-..."), which put an "S" on Ana's versions.
+        const first = u?.firstName?.trim()?.[0] ?? u?.email?.trim()?.[0];
         if (live && first) setInitial(first.toUpperCase());
       })
       .catch(() => { /* the avatar can stay "Y" */ });
@@ -444,7 +461,7 @@ export default function HistoryPanel({ isOpen, onClose, lessonId, onRestore }: H
                         style={rowStyleBase(deviceSel?.id === s.id)}
                         onClick={() => { setDeviceSel(s); setCloudSel(null); setRestoreNote(null); }}
                       >
-                        <span style={avatarStyle}>{initial}</span>
+                        <Avatar initial={initial} together={s.message === TOGETHER_COPY} />
                         <span style={{ flex: 1, minWidth: 0 }}>
                           <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                             <span style={{ fontWeight: 600, fontSize: 13 }}>{fmtTime(s.timestamp)}</span>
@@ -475,7 +492,7 @@ export default function HistoryPanel({ isOpen, onClose, lessonId, onRestore }: H
                       style={rowStyleBase(cloudSel?.id === s.id)}
                       onClick={() => void pickCloud(s)}
                     >
-                      <span style={avatarStyle}>{initial}</span>
+                      <Avatar initial={initial} together={false} />
                       <span style={{ flex: 1, minWidth: 0 }}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <span style={{ fontWeight: 600, fontSize: 13 }}>{fmtTime(s.timestamp)}</span>
@@ -512,7 +529,7 @@ export default function HistoryPanel({ isOpen, onClose, lessonId, onRestore }: H
                     flexShrink: 0,
                   }}
                 >
-                  <span style={avatarStyle}>{initial}</span>
+                  <Avatar initial={initial} together={tab === 'device' && deviceSel?.message === TOGETHER_COPY} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 13, fontWeight: 600 }}>
                       You

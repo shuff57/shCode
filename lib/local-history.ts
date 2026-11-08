@@ -78,6 +78,9 @@ export function listLocalHistory(lessonId: string): LocalSnapshot[] {
  * the newest snapshot is not a new version, so it returns null and stores
  * nothing.
  */
+/** The label of the copy Code together keeps when a session ends (History shows it as written together). */
+export const TOGETHER_COPY = 'Kept from Code together';
+
 export function addLocalSnapshot(
   lessonId: string,
   files: FileMap,

@@ -45,6 +45,8 @@ const WATCHDOG_MS = 2000;
 const RETRY_MS = 500;
 const RETRY_MAX_MS = 8000;
 const PING_MS = 25_000;
+/** Someone gone this long has left (a dropped socket that comes back sooner is not news). */
+const LEFT_GRACE_MS = 3000;
 const LIVE_CLOSED = 4000;
 const LIVE_REPLACED = 4001;
 /** One change's ChangeSet JSON, kept under the frame with room for the message around it. */
@@ -549,6 +551,8 @@ export class LiveDocClient {
   private watchdog: ReturnType<typeof setInterval> | null = null;
   private errorTimer: ReturnType<typeof setTimeout> | null = null;
   private noticeTimer: ReturnType<typeof setTimeout> | null = null;
+  /** People who just went, by seat: said once they have stayed gone (LEFT_GRACE_MS). */
+  private goneTimers = new Map<number, ReturnType<typeof setTimeout>>();
   private lastCursorAt = 0;
 
   constructor(opts: LiveDocClientOptions) {
@@ -586,6 +590,8 @@ export class LiveDocClient {
   stop() {
     this.stopped = true;
     for (const t of [this.retryTimer, this.pushTimer, this.cursorTimer, this.errorTimer, this.noticeTimer]) if (t) clearTimeout(t);
+    for (const t of this.goneTimers.values()) clearTimeout(t);
+    this.goneTimers.clear();
     if (this.pingTimer) clearInterval(this.pingTimer);
     if (this.watchdog) clearInterval(this.watchdog);
     this.retryTimer = this.pushTimer = this.cursorTimer = this.errorTimer = this.noticeTimer = null;
@@ -698,6 +704,7 @@ export class LiveDocClient {
       }
       case 'players': {
         const players = Array.isArray(m.players) ? (m.players as LivePlayer[]) : [];
+        this.noteLeavers(this.status.players, players);
         this.emit({ players });
         this.sync.keepCursors(new Set(players.map((p) => p.seat)));
         // A newcomer should see where everyone is.
@@ -731,6 +738,23 @@ export class LiveDocClient {
         return;
       }
       default:
+    }
+  }
+
+  /** "Ana P. left." for whoever went and did not come straight back. */
+  private noteLeavers(before: LivePlayer[], after: LivePlayer[]) {
+    const now = new Set(after.map((p) => p.seat));
+    for (const seat of now) {
+      const t = this.goneTimers.get(seat);
+      if (t) { clearTimeout(t); this.goneTimers.delete(seat); }
+    }
+    for (const p of before) {
+      if (now.has(p.seat) || p.seat === this.status.seat || this.goneTimers.has(p.seat)) continue;
+      const name = p.name || `Person ${p.seat + 1}`;
+      this.goneTimers.set(p.seat, setTimeout(() => {
+        this.goneTimers.delete(p.seat);
+        if (!this.stopped && !this.status.players.some((q) => q.seat === p.seat)) this.calm(`${name} left.`);
+      }, LEFT_GRACE_MS));
     }
   }
 
