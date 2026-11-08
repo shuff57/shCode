@@ -550,7 +550,7 @@ online demos keep a move log and rebuild from it when a full room starts; they s
 `turn` resetting to 0, which `extras.js` does on every lobby room message. Never use `.life` on a sprite for your own
 counter: the engine treats it as a lifetime.
 
-### Real-time rooms (migration 0043, workers/live/; NOT deployed yet)
+### Real-time rooms (migration 0043, workers/live/; deployed 2026-11-07)
 `multiplayer(mode, n, { realtime: true })` makes the lobby create/list LIVE rooms (`POST /api/rooms {live:true}`,
 `GET /api/rooms?game=&live=1`; `game_rooms.live`, 0043): same codes, seats, classmates-only rule. The page
 (`lib/moshion-online.ts`) opens a WebSocket to `GET /api/live/[code]?device=` instead of polling and relays to the
