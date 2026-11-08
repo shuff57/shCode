@@ -586,7 +586,7 @@ own typing is confirmed; the receiver maps it through every update since that ve
 (`DocSync.cursor()`/`remoteCursor()`; before this a tag sat 1-2 characters off after two people typed at once). The room's own storage is written at most every 2 s while changes arrive (Workers Free
 counts DO rows written; a timer in the core, pending = no hibernation) and at once on close / last leave; a room
 evicted between writes wakes behind, and a client ahead of it (push/pull past its version, or a reconnect to a new
-`epoch` holding more than `since`) is reset to the room's text with "The shared program jumped back a few seconds." The browser half is `lib/live-doc.ts` (`DocSync` + presence cursors with name tags + a filter
+`epoch` holding more than `since`) is reset to the room's text with "The shared program jumped back a few seconds." The browser runs `lib/live-collab.ts`, a copy of @codemirror/collab 6.1.1 (MIT) with one change: when two inserts land on the same spot, yours goes first if the character before it is one you typed, so each person's run of typing stays in one piece (every client applies the same rule, so texts still converge; `test-live-doc.mjs` stresses it). The rest of the browser half is `lib/live-doc.ts` (`DocSync` + presence cursors with name tags + a filter
 that refuses an oversized paste in plain words), added to `CodeMirrorPane` through its `collab` Compartment prop. **The
 text is kept for teachers:** the LiveDoc writes its own copy (never a client's) to D1 `code_sessions` through its own
 `DB` binding (`writeCodeSession`): at once on the first change, then at most every 2 minutes while it changes, on close
