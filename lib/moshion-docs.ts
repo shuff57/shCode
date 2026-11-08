@@ -2339,9 +2339,12 @@ function draw() {
 
 function drawTop() {
   if (!game.ready) text('Waiting for a player: use the bar above', 10, 24, 14, '#8393c4');
-  else text('You are player ' + (seat + 1) + '. Arrow keys move your square.', 10, 24, 14, 'white');
+  else {
+    text('You are player ' + (seat + 1) + '.', 10, 24, 14, 'white');
+    text('Arrow keys move your square.', 10, 44, 14, 'white');
+  }
   let other = online.peers[seat === 0 ? 1 : 0];
-  if (other && me.overlaps(other)) text('Touching!', 10, 48, 16, 'limegreen');
+  if (other && me.overlaps(other)) text('Touching!', 10, 68, 16, 'limegreen');
 }`,
       },
       {
@@ -2405,8 +2408,13 @@ function draw() {
 
 function drawTop() {
   if (!game.ready) text('Waiting for a player: use the bar above', 10, 24, 14, '#8393c4');
-  else if (online.isHost) text('You are the host: your computer runs the game.', 10, 24, 14, 'gold');
-  else text('The host runs the game. Your keys go to the host.', 10, 24, 14, 'white');
+  else if (online.isHost) {
+    text('You are the host:', 10, 24, 14, 'gold');
+    text('your computer runs the game.', 10, 44, 14, 'gold');
+  } else {
+    text('The host runs the game.', 10, 24, 14, 'white');
+    text('Your keys go to the host.', 10, 44, 14, 'white');
+  }
 }`,
       },
     ],
