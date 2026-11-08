@@ -540,6 +540,16 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   carry `MoshionPreview`'s `gameKey` (lesson id, `'sandbox'` by default, `'game-<id>'` for the Games library),
   fitted to 48 chars by `roomGameKey` in `lib/moshion-online.ts`. Tests: `scripts/test-moshion-multiplayer.mjs`.
 
+### Online demos (6.22.0, 6.27.0, 7.16.0)
+Play-only `demo` readings of Trail, Checkers and Quest: online through `multiplayer('versus', 2)` and the lobby bar, L
+plays both sides on one computer. `DemoGameBlock` passes `gameKey='demo-<fence id>'`, so Open rooms lists only that
+demo's rooms; an online demo's stage grows by the lobby bar. A demo's code goes into the runner URL through
+`packForUrl` (comments and unneeded whitespace removed, strings untouched, falls back to comment-only slimming if it
+fails to parse); keep a demo's packed base64 under ~13.5 KB, because a request line over ~16 KB gets a 431. The
+online demos keep a move log and rebuild from it when a full room starts; they spot a room change by the built-in
+`turn` resetting to 0, which `extras.js` does on every lobby room message. Never use `.life` on a sprite for your own
+counter: the engine treats it as a lifetime.
+
 ### Games library (Part B, migration 0042)
 A student publishes a moSHion sketch from the sandbox (`components/PublishGameButton.tsx`: title, share with my class,
 Update / Publish as a new game; which game the sandbox draft is published as lives in localStorage
