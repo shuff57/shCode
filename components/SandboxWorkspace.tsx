@@ -154,6 +154,20 @@ export default function SandboxWorkspace() {
   const [isRunning, setIsRunning] = useState(false);
   const [consoleResetKey, setConsoleResetKey] = useState(0);
   const [logs, setLogs] = useState<LogLine[]>([]);
+  // The output follows the newest line, unless the student has scrolled up to read.
+  const outputRef = useRef<HTMLPreElement | null>(null);
+  const outputPinned = useRef(true);
+  useEffect(() => {
+    const el = outputRef.current;
+    if (!el) return;
+    const onScroll = () => { outputPinned.current = el.scrollHeight - el.scrollTop - el.clientHeight < 24; };
+    el.addEventListener('scroll', onScroll);
+    return () => el.removeEventListener('scroll', onScroll);
+  });
+  useEffect(() => {
+    const el = outputRef.current;
+    if (el && outputPinned.current) el.scrollTop = el.scrollHeight;
+  }, [logs]);
 
   // reSHape's own load-time default side -- see BUILD_KEY's comment above.
   const [build, setBuild] = useState(true);
@@ -261,6 +275,7 @@ export default function SandboxWorkspace() {
 
   const runJs = useCallback((script: string) => {
     runRef.current?.kill();
+    outputPinned.current = true;
     const collected: LogLine[] = [];
     setLogs([]);
     setIsRunning(true);
@@ -823,6 +838,7 @@ export default function SandboxWorkspace() {
                   <>
                     <div className="output-header">Output</div>
                     <pre
+                        ref={outputRef}
                         className="console-output run-output"
                         role="log"
                         aria-live="polite"

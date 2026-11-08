@@ -526,6 +526,27 @@ function clampPos(n: number, len: number): number {
   return Number.isFinite(n) ? Math.max(0, Math.min(len, Math.floor(n))) : 0;
 }
 
+/**
+ * Where a caret's name tag sits: above the caret unless that would cover code
+ * on the line above, then below unless that would cover code on the line
+ * below; when both have code under it, above. The tag is about 0.8 of a code
+ * character per letter of the name, plus padding.
+ */
+export function tagGoesBelow(doc: Text, pos: number, name: string): boolean {
+  const line = doc.lineAt(pos);
+  const col = pos - line.from;
+  const span = Math.ceil(name.length * 0.8) + 2;
+  const covers = (n: number) => {
+    if (n < 1 || n > doc.lines) return false;
+    return doc.line(n).text.slice(col, col + span).trim() !== '';
+  };
+  if (line.number === 1) return true;          // nothing above: room underneath
+  if (!covers(line.number - 1)) return false;  // the line above is clear there
+  if (line.number < doc.lines && !covers(line.number + 1)) return true;
+  if (line.number === doc.lines) return true;  // the last line: nothing below to cover
+  return false;
+}
+
 function cursorDeco(cursors: RemoteCursor[], doc: Text): DecorationSet {
   const ranges = [];
   for (const c of cursors) {
@@ -538,8 +559,7 @@ function cursorDeco(cursors: RemoteCursor[], doc: Text): DecorationSet {
         attributes: { style: `background-color: color-mix(in srgb, ${color} 30%, transparent)` },
       }).range(Math.min(a, h), Math.max(a, h)));
     }
-    // On the first line the tag goes under the caret, where there is room.
-    ranges.push(Decoration.widget({ widget: new CaretWidget(color, c.name, doc.lineAt(h).number === 1), side: 1 }).range(h));
+    ranges.push(Decoration.widget({ widget: new CaretWidget(color, c.name, tagGoesBelow(doc, h, c.name)), side: 1 }).range(h));
   }
   return Decoration.set(ranges, true);
 }

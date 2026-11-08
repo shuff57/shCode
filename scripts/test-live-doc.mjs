@@ -31,7 +31,7 @@ const require = createRequire(import.meta.url);
 const { WebSocket } = require('next/dist/compiled/ws');
 const P = await import(join(root, 'lib/live-protocol.ts'));
 const D = await import(join(root, 'lib/live-doc-protocol.ts'));
-const { DocSync, presenceField, setCursors } = await import(join(root, 'lib/live-doc.ts'));
+const { DocSync, presenceField, setCursors, tagGoesBelow } = await import(join(root, 'lib/live-doc.ts'));
 const { makeDevLive } = await import(join(root, 'scripts/dev-live.mjs'));
 
 let passed = 0;
@@ -934,6 +934,19 @@ check('dev: a closed session refuses (410)', late.status === 410, late.status);
 for (const x of [A, B]) try { x.ws.terminate(); } catch { /* gone */ }
 dev.close();
 server.close();
+
+// A name tag never covers code when there is a clear side: above unless the line above
+// has code under it, then below unless the line below does.
+{
+  const { Text } = await import('@codemirror/state');
+  const doc = Text.of(['// Our program', 'let score = 0;', 'let samX = 1;let anaY = 2;', 'console.log(score);', '', 'x']);
+  const at = (line, col) => doc.line(line).from + col;
+  check('tag: first line goes below', tagGoesBelow(doc, at(1, 3), 'ana D.') === true);
+  check('tag: code above and clear below goes below', tagGoesBelow(doc, at(4, 12), 'ana D.') === true);
+  check('tag: clear above stays above', tagGoesBelow(doc, at(3, 18), 'ana D.') === false);
+  check('tag: code above and below stays above', tagGoesBelow(doc, at(3, 2), 'ana D.') === false);
+  check('tag: a blank line above stays above', tagGoesBelow(doc, at(6, 0), 'ana D.') === false);
+}
 
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);
