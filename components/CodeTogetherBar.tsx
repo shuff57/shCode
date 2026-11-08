@@ -13,23 +13,27 @@
 // editor through `onCollab`.
 //
 // Joining asks first and keeps the joiner's own code as a History snapshot
-// before the shared text replaces it. Leaving, or the host ending the session,
-// keeps the shared program as this student's own sandbox draft (`keepCopy`, the
-// sandbox's normal save path). Students are told the teacher can read it: the
+// before the shared text replaces it (no question when that code is still the
+// untouched starter, or empty: there is nothing to lose). Leaving, or the host
+// ending the session, keeps the shared program as this student's own sandbox
+// draft (`keepCopy`, the sandbox's normal save path). The host's Leave ends the
+// session for everyone, so it asks first; anyone else just leaves. Students are told the teacher can read it: the
 // session's text is kept for the class's teachers (code_sessions).
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Extension } from '@codemirror/state';
-import { CodePictures, PicturePicker, lobbyStyles } from './MoshionLobby';
+import { CODE_PLACEHOLDER, CodePictures, PickPicturesToggle, PicturePicker, lobbyStyles } from './MoshionLobby';
 import { LiveDocClient, type DocEnded, type DocStatus } from '../lib/live-doc';
 import { CODE_ROOM_GAMES, type CodeLang } from '../lib/live-protocol';
 import { deviceId } from '../lib/moshion-online';
 import { codeIcons } from '../lib/room-icons';
 
-const { bar, row, btn, quiet, dim } = lobbyStyles;
+const { bar, row, btn, quiet, dim, codeInput, listItem } = lobbyStyles;
 const LIST_MS = 3000;
 export const TEACHER_NOTE = 'Your teacher can see programs you write together.';
 const JOIN_CONFIRM = 'Your sandbox code will be swapped for the shared program. Your own code is kept in History.';
+export const HOST_LEAVE_CONFIRM = 'Leave and end the session for everyone? Everyone keeps a copy.';
+const LANG_NAME: Record<CodeLang, string> = { js: 'JavaScript', moshion: 'moSHion' };
 
 interface OpenSession { code: string; host: string; seats: number; present: number; here: boolean }
 type ListState =
@@ -96,6 +100,8 @@ export interface CodeTogetherBarProps {
   lang: CodeLang;
   /** The editor's text now: the host's starting program. */
   getText: () => string;
+  /** The editor still holds the mode's untouched starter (or nothing): joining loses nothing, so it does not ask. */
+  isUntouched: () => boolean;
   /** The current files, kept as a History snapshot before joining. */
   snapshot: (label: string) => void;
   /** The shared-editing extension for the editor, or null to give the editor back. */
@@ -110,12 +116,13 @@ export interface CodeTogetherBarProps {
 
 interface Session { code: string; hosting: boolean }
 
-export default function CodeTogetherBar({ lang, getText, snapshot, onCollab, onActive, keepCopy, onClose }: CodeTogetherBarProps) {
+export default function CodeTogetherBar({ lang, getText, isUntouched, snapshot, onCollab, onActive, keepCopy, onClose }: CodeTogetherBarProps) {
   const [device] = useState(() => (typeof window === 'undefined' ? '' : deviceId()));
   const [session, setSession] = useState<Session | null>(null);
   const [status, setStatus] = useState<DocStatus | null>(null);
   const [people, setPeople] = useState(2);
   const [typed, setTyped] = useState('');
+  const [picking, setPicking] = useState(false);
   const [list, setList] = useState<ListState>({ kind: 'loading' });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -125,8 +132,8 @@ export default function CodeTogetherBar({ lang, getText, snapshot, onCollab, onA
   const sessionRef = useRef<Session | null>(null);
   sessionRef.current = session;
   // The callbacks change identity with the sandbox's renders; the client holds the latest.
-  const cb = useRef({ getText, snapshot, onCollab, onActive, keepCopy });
-  cb.current = { getText, snapshot, onCollab, onActive, keepCopy };
+  const cb = useRef({ getText, isUntouched, snapshot, onCollab, onActive, keepCopy });
+  cb.current = { getText, isUntouched, snapshot, onCollab, onActive, keepCopy };
   const game = CODE_ROOM_GAMES[lang];
 
   // Open sessions for this mode, while not in one.
@@ -201,15 +208,17 @@ export default function CodeTogetherBar({ lang, getText, snapshot, onCollab, onA
     if (busy) return;
     const want = String(raw ?? '').toUpperCase().replace(/[\s-]/g, '');
     if (!codeIcons(want) && !/^[A-Z0-9]{6}$/.test(want)) { setError('A session code is 4 pictures (4 letters, like BHKE).'); return; }
-    if (!window.confirm(JOIN_CONFIRM)) return;
+    const untouched = cb.current.isUntouched();
+    if (!untouched && !window.confirm(JOIN_CONFIRM)) return;
     setBusy(true);
     setError(null);
     setNote(null);
     try {
       const r = await api('POST', `/api/rooms/${encodeURIComponent(want)}/join`, { device, kind: 'code' });
       if (r.status !== 200) { setError(errorOf(r)); setBusy(false); return; }
-      cb.current.snapshot('Before Code together');
+      if (!untouched) cb.current.snapshot('Before Code together');
       setTyped('');
+      setPicking(false);
       enter(String(r.body.code), false);
     } catch {
       setError('Could not reach the server. Check your connection and try again.');
@@ -220,6 +229,8 @@ export default function CodeTogetherBar({ lang, getText, snapshot, onCollab, onA
   function leave() {
     const s = sessionRef.current;
     if (!s) return;
+    // The host's leaving closes the session for everyone (leave.ts), so say so first.
+    if (s.hosting && !window.confirm(HOST_LEAVE_CONFIRM)) return;
     finish(s.hosting ? 'You ended the session. You kept a copy.' : 'You left the session. You kept a copy.');
     leaveRoom(s.code, device);
   }
@@ -324,39 +335,39 @@ export default function CodeTogetherBar({ lang, getText, snapshot, onCollab, onA
                 maxLength={6}
                 autoComplete="off"
                 spellCheck={false}
-                placeholder="BHKE"
-                style={{
-                  width: '6em', minWidth: 0, padding: '3px 6px', fontSize: '0.8rem',
-                  background: 'var(--c-bg)', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4,
-                  fontFamily: 'var(--font-mono, monospace)', letterSpacing: '0.08em',
-                }}
+                placeholder={CODE_PLACEHOLDER}
+                style={codeInput}
               />
               <button type="submit" style={quiet} disabled={busy || !typed.trim()}>Join</button>
             </form>
+            <PickPicturesToggle open={picking} setOpen={setPicking} controls="code-together-pictures" />
           </div>
-          <PicturePicker typed={typed} setTyped={setTyped} busy={busy} />
-          <div>
-            <div style={{ ...dim, marginBottom: 2 }}>Open sessions in your classes</div>
-            {list.kind === 'loading' ? <div style={dim}>Looking for sessions...</div> : null}
-            {list.kind === 'error' ? <div style={dim}>{list.text}</div> : null}
-            {list.kind === 'rooms' && list.rooms.length === 0 ? (
-              <div style={dim}>No open sessions yet. Start one, or wait for a classmate to.</div>
-            ) : null}
+          {picking ? <PicturePicker id="code-together-pictures" typed={typed} setTyped={setTyped} busy={busy} /> : null}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <div style={row}>
+              <span style={dim}>Open {LANG_NAME[lang]} sessions in your classes:</span>
+              {list.kind === 'loading' ? <span style={dim}>looking...</span> : null}
+              {list.kind === 'error' ? <span style={dim}>{list.text}</span> : null}
+              {list.kind === 'rooms' && list.rooms.length === 0 ? (
+                <span style={dim}>none yet. Start one, or wait for a classmate to.</span>
+              ) : null}
+            </div>
             {list.kind === 'rooms' && list.rooms.length > 0 ? (
               <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 4 }} data-testid="together-sessions">
                 {list.rooms.map((r) => (
-                  <li key={r.code} style={row}>
+                  <li key={r.code} style={listItem}>
                     <CodePictures code={r.code} size={22} letters={false} />
-                    <span style={{ minWidth: 0, overflowWrap: 'anywhere' }}>{r.host}</span>
+                    <span style={{ minWidth: 0, overflowWrap: 'anywhere' }}>{r.host}&apos;s {LANG_NAME[lang]} session</span>
                     <span style={dim}>{r.present} of {r.seats} here</span>
+                    <span style={{ flex: 1 }} />
                     <button
                       type="button"
                       style={quiet}
                       disabled={busy}
                       onClick={() => void join(r.code)}
-                      aria-label={`${r.here ? 'Rejoin' : 'Join'} ${r.host}'s session, ${r.present} of ${r.seats} here`}
+                      aria-label={`${r.here ? 'Rejoin' : 'Join'} ${r.host}'s ${LANG_NAME[lang]} session, ${r.present} of ${r.seats} here`}
                     >
-                      {r.here ? 'Rejoin' : 'Join'}
+                      {r.here ? 'Rejoin' : 'Join'} {r.host}
                     </button>
                   </li>
                 ))}

@@ -7,7 +7,7 @@ import type { Extension } from '@codemirror/state';
 import { useLessonStore } from '../lib/store';
 import { saveProgress } from '../lib/version-control';
 import { useCloudWorkspace } from '../lib/lesson-sync';
-import { addLocalSnapshot } from '../lib/local-history';
+import { TOGETHER_COPY, addLocalSnapshot } from '../lib/local-history';
 import { useLessonState } from '../lib/progress';
 import CodeEditor from './CodeEditor';
 import HistoryPanel from './HistoryPanel';
@@ -73,9 +73,10 @@ const MODE_KEY = SANDBOX_MODE_KEY;
 // currently on.
 const BUILD_KEY = 'shCode:sandbox-reshape-build';
 
-// The plain outlined chip the Reset and Full screen buttons both wear.
+// The plain outlined chip the Reset and Full screen buttons both wear. Snug
+// enough that the whole toolbar, Stop included, is one row at 1366 wide.
 const chipStyle: React.CSSProperties = {
-  padding: '6px 14px',
+  padding: '6px 10px',
   borderRadius: 4,
   background: 'transparent',
   color: 'var(--c-comment)',
@@ -128,7 +129,7 @@ export default function SandboxWorkspace() {
   // Leaving (or the host ending it) keeps the shared program as this student's
   // own draft, through the same path as Save, so it reaches Cloud history too.
   const keepTogetherCopy = useCallback(() => {
-    addLocalSnapshot(lesson.id, useLessonStore.getState().fileContents, 'Kept from Code together');
+    addLocalSnapshot(lesson.id, useLessonStore.getState().fileContents, TOGETHER_COPY);
     void cloudRef.current.save();
   }, [lesson.id]);
 
@@ -264,6 +265,13 @@ export default function SandboxWorkspace() {
     setLogs([]);
     setIsRunning(true);
 
+    // The run is over (finished, failed, or stopped for running too long): Stop goes away.
+    // Only this run's own end counts, never one a newer Run already replaced.
+    const ended = () => {
+      if (runRef.current !== run) return;
+      runRef.current = null;
+      setIsRunning(false);
+    };
     const run = runStudentCode(
       script,
       (d) => {
@@ -276,6 +284,7 @@ export default function SandboxWorkspace() {
           collected.push({ type: 'error', message: errorWithLocation(d.name, d.message, d.line, d.col) });
           setLogs([...collected]);
         }
+        ended();
       },
       () => {
         collected.push({
@@ -283,6 +292,7 @@ export default function SandboxWorkspace() {
           message: `Your code was still running after ${RUN_TIMEOUT_MS / 1000} seconds, so it was stopped. That usually means a loop never reaches its stopping point — check that the value in the condition actually changes inside the loop.`,
         });
         setLogs([...collected]);
+        ended();
       },
       () => {
         collected.length = 0;
@@ -293,6 +303,12 @@ export default function SandboxWorkspace() {
 
   // What Publish game sends: the editor's text now, not the last run.
   const getScript = useCallback(() => useLessonStore.getState().fileContents['script.js'] || '', []);
+  // Code together asks before swapping the editor's text, unless nothing would be lost.
+  const isUntouched = useCallback(() => {
+    const norm = (t: string) => t.replace(/\r\n/g, '\n').trim();
+    const now = norm(getScript());
+    return now === '' || now === norm(mode.starter);
+  }, [getScript, mode.starter]);
 
   // js/moSHion only -- reSHape's Run lives inside ReshapeStudio now (it owns
   // its own script.js -> iframe handoff, see that component's file header).
@@ -675,6 +691,8 @@ export default function SandboxWorkspace() {
           <div className="sandbox-header">
             <h1 className="sandbox-title">Sandbox</h1>
             <span className="sandbox-subtitle">{mode.blurb}</span>
+            {/* Up here rather than at the end of the toolbar, where it took a row of its own at 1366 wide. */}
+            {!isReshape && !isFlow && <span className="run-hint sandbox-run-hint">Ctrl+Enter to run</span>}
           </div>
         )}
 
@@ -695,7 +713,7 @@ export default function SandboxWorkspace() {
                 </button>
               ))}
             </div>
-            {!isFlow && <button className="btn-run" onClick={run}>▶ Run</button>}
+            {!isFlow && <button className="btn-run" onClick={run} title="Run (Ctrl+Enter)" aria-keyshortcuts="Control+Enter">▶ Run</button>}
             {isRunning && !isFlow && (
               <button
                 className="btn-secondary btn-sm"
@@ -741,7 +759,6 @@ export default function SandboxWorkspace() {
                 {full ? 'Exit full screen' : 'Full screen'}
               </button>
             )}
-                  {!isFlow && <span className="run-hint">Ctrl+Enter</span>}
           </div>
         )}
 
@@ -779,6 +796,7 @@ export default function SandboxWorkspace() {
                     onCollab={setCollabExt}
                     onActive={setTogether}
                     keepCopy={keepTogetherCopy}
+                    isUntouched={isUntouched}
                     onClose={() => setTogetherOpen(false)}
                   />
                 )}
@@ -868,15 +886,16 @@ export default function SandboxWorkspace() {
           margin-right: 28px;
         }
         .sandbox-header { display: flex; align-items: baseline; gap: 12px; flex-shrink: 0; }
+        .sandbox-run-hint { margin-left: auto; white-space: nowrap; }
         .sandbox-title { margin: 0; font-size: 1.4rem; color: var(--text); }
         .sandbox-subtitle { color: var(--c-comment); font-size: 0.85rem; }
-        .sandbox-toolbar { margin-bottom: 0; flex-shrink: 0; }
+        .sandbox-toolbar { margin-bottom: 0; flex-shrink: 0; gap: 8px; }
         .sandbox-modes {
           display: inline-flex;
           border: 1px solid var(--c-line);
           border-radius: 4px;
           overflow: hidden;
-          margin-right: 10px;
+          margin-right: 6px;
         }
         .sandbox-mode {
           padding: 6px 13px;
@@ -910,6 +929,16 @@ export default function SandboxWorkspace() {
           min-height: 120px;
           max-height: 60vh;
           resize: vertical;
+        }
+        /* A lobby bar above the canvas or the Code together bar above the
+           editor takes height from the row that holds them, so the console
+           (empty most of the time, and still resizable) gives some back. */
+        .sandbox-shell:has([data-testid='moshion-lobby'], [data-testid='code-together']) .sandbox-console-wrap {
+          height: 112px;
+          min-height: 72px;
+        }
+        .sandbox-shell:has([data-testid='moshion-lobby'], [data-testid='code-together']) .sandbox-console-wrap .console-empty {
+          padding: 4px;
         }
         .sandbox-console-body { flex: 1; min-height: 0; padding: 6px 8px; overflow: hidden; display: flex; }
         .sandbox-console-body .console-root {

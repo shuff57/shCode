@@ -28,8 +28,8 @@ const bar: React.CSSProperties = {
   flex: '0 0 auto',
   display: 'flex',
   flexDirection: 'column',
-  gap: 6,
-  padding: '8px 10px',
+  gap: 5,
+  padding: '6px 10px',
   background: 'var(--c-deep2)',
   borderBottom: '1px solid var(--c-line)',
   color: 'var(--c-fg)',
@@ -59,8 +59,23 @@ const quiet: React.CSSProperties = {
   fontWeight: 500,
 };
 const dim: React.CSSProperties = { color: 'var(--c-dim)' };
+/** The typed-code box: wide enough for its "4 letters" hint. */
+const codeInput: React.CSSProperties = {
+  width: '7.5em', minWidth: 0, padding: '3px 6px', fontSize: '0.8rem',
+  background: 'var(--c-bg)', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4,
+  fontFamily: 'var(--font-mono, monospace)', letterSpacing: '0.08em',
+};
+/** One open room or session in a list: a box of its own, so its Join is plainly its own. */
+const listItem: React.CSSProperties = {
+  ...row,
+  padding: '3px 4px 3px 8px',
+  border: '1px solid var(--c-line)',
+  borderRadius: 4,
+  background: 'var(--c-bg)',
+};
 /** The bar's look, shared with Code together's bar (components/CodeTogetherBar.tsx). */
-export const lobbyStyles = { bar, row, btn, quiet, dim };
+export const lobbyStyles = { bar, row, btn, quiet, dim, codeInput, listItem };
+export const CODE_PLACEHOLDER = '4 letters';
 
 /** One picture of a room code. Decorative where its name is said beside it. */
 function Pic({ icon, size, label }: { icon: string; size: number; label?: string }) {
@@ -108,6 +123,7 @@ export default function MoshionLobby({ view, actions, gameKey, device }: {
   device: string;
 }) {
   const [typed, setTyped] = useState('');
+  const [picking, setPicking] = useState(false);
   const [list, setList] = useState<ListState>({ kind: 'loading' });
   const [copied, setCopied] = useState(false);
   const inRoom = !!view.room;
@@ -154,7 +170,8 @@ export default function MoshionLobby({ view, actions, gameKey, device }: {
       <div style={bar} role="region" aria-label="Online game room" data-testid="moshion-lobby">
         <div style={row}>
           <span style={dim}>Room</span>
-          <span data-testid="lobby-code" data-code={r.code}><CodePictures code={r.code} size={48} letters /></span>
+          {/* Big while classmates still need to read it off the screen, small once everyone is in. */}
+          <span data-testid="lobby-code" data-code={r.code}><CodePictures code={r.code} size={r.state === 'ready' ? 28 : 48} letters /></span>
           <button type="button" style={quiet} onClick={() => void copy()} aria-label={`Copy room code ${r.code}`}>{copied ? 'Copied' : 'Copy'}</button>
           <span data-testid="lobby-status" aria-live="polite">
             {here} of {r.seats} here · you are player {r.seat + 1}
@@ -199,31 +216,31 @@ export default function MoshionLobby({ view, actions, gameKey, device }: {
                 maxLength={6}
                 autoComplete="off"
                 spellCheck={false}
-                placeholder="BHKE"
-                style={{
-                  width: '6em', minWidth: 0, padding: '3px 6px', fontSize: '0.8rem',
-                  background: 'var(--c-bg)', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4,
-                  fontFamily: 'var(--font-mono, monospace)', letterSpacing: '0.08em',
-                }}
+                placeholder={CODE_PLACEHOLDER}
+                style={codeInput}
               />
               <button type="submit" style={quiet} disabled={view.busy || !typed.trim()}>Join</button>
             </form>
+            <PickPicturesToggle open={picking} setOpen={setPicking} controls="moshion-lobby-pictures" />
           </div>
-          <PicturePicker typed={typed} setTyped={setTyped} busy={view.busy} />
-          <div>
-            <div style={{ ...dim, marginBottom: 2 }}>Open rooms for this game</div>
-            {list.kind === 'loading' ? <div style={dim}>Looking for rooms...</div> : null}
-            {list.kind === 'error' ? <div style={dim}>{list.text}</div> : null}
-            {list.kind === 'rooms' && list.rooms.length === 0 ? (
-              <div style={dim}>No open rooms yet. Host one, or wait for a classmate to.</div>
-            ) : null}
+          {picking ? <PicturePicker id="moshion-lobby-pictures" typed={typed} setTyped={setTyped} busy={view.busy} /> : null}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <div style={row}>
+              <span style={dim}>Open rooms for this game:</span>
+              {list.kind === 'loading' ? <span style={dim}>looking...</span> : null}
+              {list.kind === 'error' ? <span style={dim}>{list.text}</span> : null}
+              {list.kind === 'rooms' && list.rooms.length === 0 ? (
+                <span style={dim}>none yet. Host one, or wait for a classmate to.</span>
+              ) : null}
+            </div>
             {list.kind === 'rooms' && list.rooms.length > 0 ? (
               <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 4 }} data-testid="lobby-rooms">
                 {list.rooms.map((r) => (
-                  <li key={r.code} style={row}>
+                  <li key={r.code} style={listItem}>
                     <CodePictures code={r.code} size={22} letters={false} />
-                    <span style={{ minWidth: 0, overflowWrap: 'anywhere' }}>{r.host}</span>
+                    <span style={{ minWidth: 0, overflowWrap: 'anywhere' }}>{r.host}&apos;s room</span>
                     <span style={dim}>{r.present} of {r.seats} here</span>
+                    <span style={{ flex: 1 }} />
                     <button
                       type="button"
                       style={quiet}
@@ -231,7 +248,7 @@ export default function MoshionLobby({ view, actions, gameKey, device }: {
                       onClick={() => actions.join(r.code)}
                       aria-label={`${r.here ? 'Rejoin' : 'Join'} ${r.host}'s room, ${r.present} of ${r.seats} here`}
                     >
-                      {r.here ? 'Rejoin' : 'Join'}
+                      {r.here ? 'Rejoin' : 'Join'} {r.host}
                     </button>
                   </li>
                 ))}
@@ -251,12 +268,21 @@ export default function MoshionLobby({ view, actions, gameKey, device }: {
   );
 }
 
+/** Shows or hides the picture picker: most people type the 4 letters, so it stays folded until asked for. */
+export function PickPicturesToggle({ open, setOpen, controls }: { open: boolean; setOpen: (v: boolean) => void; controls: string }) {
+  return (
+    <button type="button" style={quiet} aria-expanded={open} aria-controls={controls} onClick={() => setOpen(!open)}>
+      {open ? 'Hide pictures' : 'Pick pictures'}
+    </button>
+  );
+}
+
 /**
  * Join by pictures: click the host's 4 pictures in order. Each click adds that
  * picture's letter to the same code the text box holds, so typing and picking
  * are one code; Back takes the last one off, Clear empties it.
  */
-export function PicturePicker({ typed, setTyped, busy }: { typed: string; setTyped: (v: string) => void; busy: boolean }) {
+export function PicturePicker({ id, typed, setTyped, busy }: { id?: string; typed: string; setTyped: (v: string) => void; busy: boolean }) {
   const picked = Array.from(typed).map(iconForLetter);
   const isPictures = typed.length <= ROOM_CODE_LENGTH && picked.every((x) => x !== null);
   const full = isPictures && typed.length === ROOM_CODE_LENGTH;
@@ -265,7 +291,7 @@ export function PicturePicker({ typed, setTyped, busy }: { typed: string; setTyp
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'var(--c-bg)',
   };
   return (
-    <div role="group" aria-label="Join with pictures" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+    <div id={id} role="group" aria-label="Join with pictures" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
       <div style={row}>
         <span style={dim}>Or pick the 4 pictures in order:</span>
         <span style={{ display: 'inline-flex', gap: 3 }} aria-live="polite" data-testid="lobby-picked">

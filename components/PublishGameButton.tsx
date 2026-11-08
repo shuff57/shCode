@@ -21,7 +21,7 @@ import {
 import { GAME_TITLE_MAX, checkCode, cleanTitle, declaredMode, modeLabel } from '../lib/games-core';
 
 const chip: React.CSSProperties = {
-  padding: '6px 14px',
+  padding: '6px 10px',
   borderRadius: 4,
   background: 'transparent',
   color: 'var(--c-comment)',
