@@ -31,7 +31,7 @@
 
 import {
   ChangeSet, Compartment, EditorState, StateEffect, StateField, Transaction,
-  type Extension, type Text, type TransactionSpec,
+  type ChangeDesc, type Extension, type Text, type TransactionSpec,
 } from '@codemirror/state';
 import { Decoration, EditorView, ViewPlugin, WidgetType, type DecorationSet, type ViewUpdate } from '@codemirror/view';
 import { collab, getSyncedVersion, receiveUpdates, sendableUpdates } from '@codemirror/collab';
@@ -67,7 +67,13 @@ export interface EditorLike {
   dispatch(...specs: (TransactionSpec | Transaction)[]): void;
 }
 
-interface WireUpdate { changes: unknown; clientID: string }
+interface WireUpdate { changes: unknown; clientID: string; seat?: number }
+
+/** Accepted updates this editor remembers, to place a cursor sent at an older version. */
+const KEEP_HISTORY = 500;
+
+/** A cursor as the room relays it: positions in the room's text at `version` (absent from an older client: as is). */
+export interface CursorMessage { seat: number; name: string; anchor: number; head: number; version?: number }
 
 export interface DocSyncOptions {
   /** Send a frame to the room; false when the socket is not open. */
@@ -76,6 +82,8 @@ export interface DocSyncOptions {
   wantPush?: () => void;
   /** The room lost its last few seconds and this editor started again from the room's text. */
   onRewound?: () => void;
+  /** A cursor asked for while this editor's own typing was unconfirmed can be sent now. */
+  wantCursor?: () => void;
   now?: () => number;
 }
 
@@ -95,6 +103,17 @@ export class DocSync {
   private base: { doc: Text; version: number } | null = null;
   private awaitingSeed = false;
   private inFlightAt = 0;
+  /**
+   * The room's accepted updates this editor applied, in order: `items[i]`
+   * took the room's text from version `from + i` to `from + i + 1`. A cursor
+   * is sent in the room's text at a version, and placed here by mapping it
+   * through what came after (see remoteCursor).
+   */
+  private hist: { from: number; items: { desc: ChangeDesc; seat: number }[] } = { from: 0, items: [] };
+  /** Cursors sent at a version this editor has not reached yet, by seat. */
+  private pending = new Map<number, CursorMessage>();
+  /** cursor() was asked for while this editor had unconfirmed typing. */
+  private cursorWanted = false;
 
   constructor(opts: DocSyncOptions) {
     this.opts = opts;
@@ -127,6 +146,7 @@ export class DocSync {
     this.epoch = String(m.epoch ?? '');
     if (!this.installed) {
       this.base = { doc: textOf(String(m.doc ?? '')), version: Number(m.version) };
+      this.hist = { from: this.base.version, items: [] };
       if (seed && m.seat === 0 && m.version === 0 && !m.doc) {
         this.awaitingSeed = true;
         this.opts.send({ t: 'seed', doc: seed });
@@ -159,7 +179,9 @@ export class DocSync {
       if (m.epoch) this.epoch = m.epoch;
       try {
         for (const u of list.slice(b.version - m.version)) {
-          b.doc = ChangeSet.fromJSON(u.changes).apply(b.doc);
+          const cs = ChangeSet.fromJSON(u.changes);
+          b.doc = cs.apply(b.doc);
+          this.record(b.version, cs, u);
           b.version++;
         }
       } catch { this.askReset(); return; }
@@ -175,11 +197,114 @@ export class DocSync {
     const fresh = list.slice(synced - m.version);
     if (fresh.length) {
       try {
-        ed.dispatch(receiveUpdates(ed.state, fresh.map((u) => ({ changes: ChangeSet.fromJSON(u.changes), clientID: String(u.clientID) }))));
+        const parsed = fresh.map((u) => ChangeSet.fromJSON(u.changes));
+        // Each update says whose it is, so that person's own cursor moves with
+        // their typing (presenceField) instead of staying in front of it.
+        ed.dispatch(receiveUpdates(ed.state, fresh.map((u, i) => ({
+          changes: parsed[i], clientID: String(u.clientID),
+          effects: Number.isInteger(u.seat) ? [typedBy.of(u.seat as number)] : undefined,
+        }))));
+        parsed.forEach((cs, i) => this.record(synced + i, cs, fresh[i]));
       } catch { this.askReset(); return; }
     }
     this.inFlightAt = 0;
+    this.placePending();
     if (this.hasSendable()) this.opts.wantPush?.();
+    else this.cursorNowSendable();
+  }
+
+  /** Remember the room's update that took its text from `version` to the next. */
+  private record(version: number, cs: ChangeSet, u: WireUpdate) {
+    const h = this.hist;
+    if (h.from + h.items.length !== version) { h.from = version; h.items = []; }
+    h.items.push({ desc: cs.desc, seat: Number.isInteger(u.seat) ? (u.seat as number) : -1 });
+    if (h.items.length > KEEP_HISTORY) {
+      const drop = h.items.length - KEEP_HISTORY;
+      h.items.splice(0, drop);
+      h.from += drop;
+    }
+  }
+
+  private cursorNowSendable() {
+    if (!this.cursorWanted || !this.installed || this.hasSendable()) return;
+    this.cursorWanted = false;
+    this.opts.wantCursor?.();
+  }
+
+  /**
+   * This editor's cursor for the others, in the room's text at the version it
+   * has synced to. While its own typing is unconfirmed its positions are in a
+   * text nobody else has yet, so it is not sent: it goes once the room has
+   * accepted that typing (wantCursor), which is what kept the other person's
+   * tag a character or two off after two people typed at once.
+   */
+  cursor(): { t: 'cursor'; anchor: number; head: number; version: number } | null {
+    const ed = this.ed;
+    if (!this.installed || !ed) { this.cursorWanted = true; return null; }
+    if (sendableUpdates(ed.state).length) { this.cursorWanted = true; return null; }
+    this.cursorWanted = false;
+    const { anchor, head } = ed.state.selection.main;
+    return { t: 'cursor', anchor, head, version: getSyncedVersion(ed.state) };
+  }
+
+  /**
+   * Another person's cursor. It was sent in the room's text at `version`; this
+   * editor maps it through every update it applied since then, and through its
+   * own unconfirmed typing, so it lands where that person's caret really is.
+   * A cursor from a version this editor has not reached waits until it has.
+   */
+  remoteCursor(c: CursorMessage) {
+    const ed = this.ed;
+    if (!this.installed || !ed) { this.pending.set(c.seat, c); return; }
+    if (typeof c.version === 'number' && c.version > getSyncedVersion(ed.state)) { this.pending.set(c.seat, c); return; }
+    this.pending.delete(c.seat);
+    const placed = this.place(c);
+    this.setCursorsWith((list) => [...list.filter((x) => x.seat !== c.seat), placed]);
+  }
+
+  /** Keep only these seats' cursors (someone left). */
+  keepCursors(seats: Set<number>) {
+    for (const s of [...this.pending.keys()]) if (!seats.has(s)) this.pending.delete(s);
+    this.setCursorsWith((list) => list.filter((c) => seats.has(c.seat)));
+  }
+
+  private setCursorsWith(fn: (list: RemoteCursor[]) => RemoteCursor[]) {
+    const ed = this.ed;
+    if (!ed) return;
+    let cur: RemoteCursor[] = [];
+    try { cur = ed.state.field(presenceField).cursors; } catch { return; }
+    ed.dispatch({ effects: setCursors.of(fn(cur)) });
+  }
+
+  private placePending() {
+    if (!this.pending.size || !this.installed || !this.ed) return;
+    const synced = getSyncedVersion(this.ed.state);
+    for (const c of [...this.pending.values()]) {
+      if (typeof c.version !== 'number' || c.version <= synced) this.remoteCursor(c);
+    }
+  }
+
+  /** A cursor's positions in this editor's text now. */
+  private place(c: CursorMessage): RemoteCursor {
+    const ed = this.ed!;
+    let anchor = Number(c.anchor);
+    let head = Number(c.head);
+    const h = this.hist;
+    const synced = getSyncedVersion(ed.state);
+    if (typeof c.version === 'number' && c.version >= h.from && synced - h.from <= h.items.length) {
+      // That person's own later typing carries their caret with it; anyone
+      // else's insert at the same spot leaves it in front, as their editor does.
+      for (const it of h.items.slice(c.version - h.from, synced - h.from)) {
+        const assoc = it.seat === c.seat ? 1 : -1;
+        anchor = it.desc.mapPos(clampPos(anchor, it.desc.length), assoc);
+        head = it.desc.mapPos(clampPos(head, it.desc.length), assoc);
+      }
+      for (const u of sendableUpdates(ed.state)) {
+        anchor = u.changes.mapPos(clampPos(anchor, u.changes.length), -1);
+        head = u.changes.mapPos(clampPos(head, u.changes.length), -1);
+      }
+    }
+    return { seat: c.seat, name: c.name, anchor, head };
   }
 
   /** Start again from the room's text (too far behind, a refused change, or the room rewound). */
@@ -187,6 +312,7 @@ export class DocSync {
     if (m.epoch) this.epoch = m.epoch;
     if (m.why === 'rewound') this.opts.onRewound?.();
     this.base = { doc: textOf(String(m.doc ?? '')), version: Number(m.version) };
+    this.hist = { from: this.base.version, items: [] };
     this.awaitingSeed = false;
     this.inFlightAt = 0;
     if (this.installed && this.ed) {
@@ -220,6 +346,8 @@ export class DocSync {
     ed.dispatch({ effects: this.inner.reconfigure(collab({ startVersion: b.version, clientID: this.clientID })) });
     this.installed = true;
     this.base = null;
+    this.placePending();
+    this.cursorNowSendable();
   }
 
   /** The room dropped a frame (rate limit): the next push may go at once. */
@@ -255,6 +383,8 @@ export interface RemoteCursor { seat: number; name: string; anchor: number; head
 
 /** Replace the other people's cursors (positions are clamped to this editor's text). Exported for the tests. */
 export const setCursors = StateEffect.define<RemoteCursor[]>();
+/** Rides on a shared update: whose typing it was (that seat's cursor moves along with it). */
+const typedBy = StateEffect.define<number>();
 
 class CaretWidget extends WidgetType {
   color: string;
@@ -316,11 +446,14 @@ export const presenceField = StateField.define<{ cursors: RemoteCursor[]; deco: 
     let cursors = v.cursors;
     if (tr.docChanged && cursors.length) {
       const len = tr.startState.doc.length;
-      cursors = cursors.map((c) => ({
-        ...c,
-        anchor: tr.changes.mapPos(clampPos(c.anchor, len)),
-        head: tr.changes.mapPos(clampPos(c.head, len)),
-      }));
+      const typists = new Set<number>();
+      for (const e of tr.effects) if (e.is(typedBy)) typists.add(e.value);
+      cursors = cursors.map((c) => {
+        // Someone's own typing at their caret puts the caret after it; anyone
+        // else's (this editor's included) leaves it in front, as it does for them.
+        const assoc = typists.has(c.seat) ? 1 : -1;
+        return { ...c, anchor: tr.changes.mapPos(clampPos(c.anchor, len), assoc), head: tr.changes.mapPos(clampPos(c.head, len), assoc) };
+      });
     }
     for (const e of tr.effects) {
       if (!e.is(setCursors)) continue;
@@ -422,7 +555,10 @@ export class LiveDocClient {
     this.opts = opts;
     this.code = opts.code;
     this.status = { phase: 'connecting', code: opts.code, seat: -1, seats: 0, players: [], host: '', error: null, notice: null };
-    this.sync = new DocSync({ send: (m) => this.send(m), wantPush: () => this.schedulePush(), onRewound: () => this.calm(REWOUND) });
+    this.sync = new DocSync({
+      send: (m) => this.send(m), wantPush: () => this.schedulePush(), onRewound: () => this.calm(REWOUND),
+      wantCursor: () => this.sendCursorSoon(),
+    });
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const client = this;
     const plugin = ViewPlugin.define((view) => {
@@ -563,8 +699,7 @@ export class LiveDocClient {
       case 'players': {
         const players = Array.isArray(m.players) ? (m.players as LivePlayer[]) : [];
         this.emit({ players });
-        const here = new Set(players.map((p) => p.seat));
-        this.setRemote((list) => list.filter((c) => here.has(c.seat)));
+        this.sync.keepCursors(new Set(players.map((p) => p.seat)));
         // A newcomer should see where everyone is.
         this.sendCursorSoon();
         return;
@@ -575,8 +710,10 @@ export class LiveDocClient {
         const seat = Number(m.seat);
         if (seat === this.status.seat || !Number.isInteger(seat)) return;
         const name = this.status.players.find((p) => p.seat === seat)?.name ?? `Person ${seat + 1}`;
-        const c: RemoteCursor = { seat, name, anchor: Number(m.anchor), head: Number(m.head) };
-        this.setRemote((list) => [...list.filter((x) => x.seat !== seat), c]);
+        this.sync.remoteCursor({
+          seat, name, anchor: Number(m.anchor), head: Number(m.head),
+          version: Number.isInteger(m.version) ? (m.version as number) : undefined,
+        });
         return;
       }
       case 'error': {
@@ -595,14 +732,6 @@ export class LiveDocClient {
       }
       default:
     }
-  }
-
-  private setRemote(fn: (list: RemoteCursor[]) => RemoteCursor[]) {
-    const v = this.view;
-    if (!v) return;
-    let cur: RemoteCursor[] = [];
-    try { cur = v.state.field(presenceField).cursors; } catch { return; }
-    v.dispatch({ effects: setCursors.of(fn(cur)) });
   }
 
   private attachView(view: EditorView) {
@@ -634,10 +763,10 @@ export class LiveDocClient {
     const wait = Math.max(0, CURSOR_MS - (Date.now() - this.lastCursorAt));
     this.cursorTimer = setTimeout(() => {
       this.cursorTimer = null;
-      const v = this.view;
-      if (!v || !this.sync.installed) return;
-      const { anchor, head } = v.state.selection.main;
-      if (this.send({ t: 'cursor', anchor, head })) this.lastCursorAt = Date.now();
+      if (!this.view) return;
+      // Null while this editor's own typing is unconfirmed: DocSync asks again once it is.
+      const msg = this.sync.cursor();
+      if (msg && this.send(msg)) this.lastCursorAt = Date.now();
     }, wait);
   }
 }

@@ -125,9 +125,12 @@ function client(room, ticket, { seed = null, own = 'my own code' } = {}) {
     return sock;
   };
   c.sock = socket(room);
-  c.sync = new DocSync({ send: (m) => { c.outbox.push(JSON.stringify(m)); return true; }, now, onRewound: () => { c.rewound++; } });
+  c.sync = new DocSync({
+    send: (m) => { c.outbox.push(JSON.stringify(m)); return true; }, now, onRewound: () => { c.rewound++; },
+    wantCursor: () => c.sendCursor(),
+  });
   c.ed = {
-    state: EditorState.create({ doc: own, extensions: [c.sync.inner.of([])] }),
+    state: EditorState.create({ doc: own, extensions: [c.sync.inner.of([]), presenceField] }),
     dispatch(...specs) {
       const tr = specs[0] instanceof Transaction ? specs[0] : this.state.update(...specs);
       this.state = tr.state;
@@ -140,7 +143,16 @@ function client(room, ticket, { seed = null, own = 'my own code' } = {}) {
     else if (m.t === 'updates') c.sync.updates(m);
     else if (m.t === 'reset') c.sync.reset(m);
     else if (m.t === 'error' && m.code === 'rate') c.sync.released();
+    else if (m.t === 'cursor') c.sync.remoteCursor({ seat: m.seat, name: `Seat ${m.seat}`, anchor: m.anchor, head: m.head, version: m.version });
   };
+  /** What the browser's cursor timer does: send this caret, or nothing while own typing is unconfirmed. */
+  c.sendCursor = () => { const m = c.sync.cursor(); if (m) c.outbox.push(JSON.stringify(m)); };
+  /** The old way: the caret as it is in this editor right now, no version. */
+  c.sendRawCursor = () => { const { anchor, head } = c.ed.state.selection.main; c.outbox.push(JSON.stringify({ t: 'cursor', anchor, head })); };
+  c.head = () => c.ed.state.selection.main.head;
+  c.sees = (seat) => c.ed.state.field(presenceField).cursors.find((x) => x.seat === seat);
+  /** Type at the caret, the caret moving along, as a keystroke does. */
+  c.typeAt = (text) => { const h = c.head(); c.edit({ changes: { from: h, insert: text }, selection: { anchor: h + text.length } }); };
   c.deliverIn = () => { const m = c.inbox.shift(); if (m) c.handle(m); return !!m; };
   c.deliverOut = () => { const f = c.outbox.shift(); if (f) c.room.core.message(c.sock, f); return !!f; };
   c.edit = (spec) => { c.ed.dispatch(c.ed.state.update(spec)); };
@@ -360,6 +372,70 @@ const SEED = 'let x = 1;\nfunction draw() {\n  clear();\n}\n';
   check('close: a closed session refuses a new socket', late.closedWith === P.LIVE_CLOSED && late.inbox[0]?.t === 'closed');
   check('no email ever reached a socket', ![...ann.seen, ...bo.seen, ...ann2.seen].some((t) => t.includes('@s.test')));
 }
+{
+  // Presence after two people type at once on the same line. Found in a
+  // browser walk: the other person's tag sat one or two characters off their
+  // real caret and stayed there until they moved. A caret was sent in the
+  // sender's own text, typing the room had not accepted yet included, and the
+  // receiver then moved it again when that typing arrived (or never moved it
+  // for its own unconfirmed typing). A cursor now carries the room version its
+  // positions are in, is sent only once the sender's typing is confirmed, and
+  // the receiver maps it through every update since that version.
+  const LINE = 'let speed = 1; // go\nfunction draw() {}\n';
+  const scenario = (raw, order, at) => {
+    const room = makeRoom();
+    const ann = client(room, ANN_T, { seed: LINE, own: LINE });
+    const bo = client(room, BO_T);
+    drain(room, [ann, bo]);
+    ann.edit({ selection: { anchor: at[0] } });
+    bo.edit({ selection: { anchor: at[1] } });
+    for (const c of [ann, bo]) raw ? c.sendRawCursor() : c.sendCursor();
+    drain(room, [ann, bo]);
+    const off = [];
+    const r = rng(order.length * 7 + at[0] * 31 + at[1]);
+    for (let round = 0; round < 6; round++) {
+      // Both type at their own caret at the same moment; each browser's cursor
+      // timer fires before its push goes (the push waits 60 ms, the first
+      // cursor does not).
+      ann.typeAt(round % 2 ? 'ab' : 'x');
+      bo.typeAt(round % 3 ? 'cd' : 'yz');
+      for (const c of [ann, bo]) raw ? c.sendRawCursor() : c.sendCursor();
+      const first = order[round % order.length] === 'a' ? [ann, bo] : [bo, ann];
+      for (const c of first) { c.deliverOut(); c.sync.push(); }
+      for (const c of first) c.deliverOut();
+      if (r() < 0.5) first[1].deliverIn();
+      drain(room, [ann, bo]);
+      clock += 1000;
+      off.push([ann.sees(1)?.head - bo.head(), bo.sees(0)?.head - ann.head()]);
+    }
+    return { off, same: ann.text() === bo.text() && bo.text() === room.core.text(), ann, bo };
+  };
+  const cases = [['ab', [4, 13]], ['ba', [4, 13]], ['ab', [13, 4]], ['ba', [13, 4]], ['aabb', [9, 9]], ['abba', [0, 20]]];
+  const control = scenario(true, 'ab', [4, 13]);
+  check('presence control: the old way (the caret as typed, no version) lands off the real caret', control.off.some(([x, y]) => x !== 0 || y !== 0), control.off);
+  for (const [order, at] of cases) {
+    const { off, same } = scenario(false, order, at);
+    check(`presence: after same-line typing at once (${order}, carets ${at}) each tag sits exactly on the other's caret`, same && off.every(([x, y]) => x === 0 && y === 0), off);
+  }
+  {
+    // While typing is unconfirmed nothing is sent; once the room accepts it the caret goes.
+    const room = makeRoom();
+    const ann = client(room, ANN_T, { seed: LINE, own: LINE });
+    const bo = client(room, BO_T);
+    drain(room, [ann, bo]);
+    ann.outbox.length = 0;
+    ann.typeAt('q');
+    check('presence: no cursor is sent while own typing is unconfirmed', ann.sync.cursor() === null);
+    ann.sync.push(); ann.deliverOut(); ann.deliverIn();
+    const sent = ann.outbox.map((f) => JSON.parse(f)).find((m) => m.t === 'cursor');
+    check('presence: it is sent once the room has accepted the typing, with the room version', sent && sent.version === room.core.version && sent.head === ann.head(), sent);
+    // A cursor from a version this editor has not reached waits for it.
+    bo.inbox.length = 0;
+    bo.sync.remoteCursor({ seat: 0, name: 'Ann L.', anchor: 1, head: 1, version: room.core.version + 5 });
+    check('presence: a cursor from ahead of this editor waits', bo.sees(0) === undefined || bo.sees(0).head !== 1);
+  }
+}
+
 {
   // Seed rules at the edge: a joiner first, an oversized seed, an expired ticket.
   const room = makeRoom();

@@ -18,7 +18,8 @@
 //   { t: 'push', version, updates: [{ changes }] }   changes = ChangeSet.toJSON()
 //   { t: 'pull', version }                            "send me what I missed"
 //   { t: 'seed', doc }                                the host's starting text (seat 0, empty doc at version 0)
-//   { t: 'cursor', anchor, head }                     presence, relayed only, never stored
+//   { t: 'cursor', anchor, head, version }            presence, relayed only, never stored; the positions
+//                                                     are in the room's text at `version` (lib/live-doc.ts)
 //   { t: 'ping' }                                     -> { t: 'pong' }
 // Room -> client:
 //   { t: 'hello', code, seat, seats, players, version, doc, clientID, host, epoch, since }
@@ -26,7 +27,7 @@
 //   { t: 'updates', version, epoch, updates: [{ changes, clientID, seat }] }  the first applies at `version`
 //   { t: 'reset', doc, version, epoch, why? }  start again from here (too old to catch up, a refused
 //                                       push, or why 'rewound': the client is AHEAD of the room)
-//   { t: 'cursor', seat, anchor, head }
+//   { t: 'cursor', seat, anchor, head, version? }
 //   { t: 'error', error, code? }        code: 'rate' | 'too-big' | 'bad' (the socket stays open)
 //   { t: 'closed', why, reason, host }  why: 'host' | 'expired' | 'left' | 'closed'; then LIVE_CLOSED
 //
@@ -382,7 +383,7 @@ export class LiveDocCore {
       return;
     }
     if (v.t === 'seed') { this.seed(ws, a, v.doc); return; }
-    if (v.t === 'cursor') { this.cursor(ws, a, v.anchor, v.head, now); return; }
+    if (v.t === 'cursor') { this.cursor(ws, a, v.anchor, v.head, v.version, now); return; }
     LiveDocCore.say(ws, { t: 'error', error: 'Unknown message.', code: 'bad' });
   }
 
@@ -439,13 +440,15 @@ export class LiveDocCore {
     this.maybeSave();
   }
 
-  private cursor(ws: DocSocket, a: DocTicket, anchor: unknown, head: unknown, now: number) {
+  private cursor(ws: DocSocket, a: DocTicket, anchor: unknown, head: unknown, version: unknown, now: number) {
     let b = this.cursorBuckets.get(ws);
     if (!b) { b = { tokens: CURSOR_PER_SEC, at: now }; this.cursorBuckets.set(ws, b); }
     if (!takeToken(b, now, CURSOR_PER_SEC, CURSOR_PER_SEC)) return; // presence: dropped quietly
     const ok = (n: unknown) => Number.isInteger(n) && (n as number) >= 0 && (n as number) <= MAX_DOC_BYTES;
     if (!ok(anchor) || !ok(head)) return;
-    this.broadcast({ t: 'cursor', seat: a.seat, anchor, head }, ws);
+    // The version the positions are in, so each editor can map them to its own text.
+    const at = Number.isInteger(version) && (version as number) >= 0 && (version as number) <= this.version ? version : undefined;
+    this.broadcast(at === undefined ? { t: 'cursor', seat: a.seat, anchor, head } : { t: 'cursor', seat: a.seat, anchor, head, version: at }, ws);
   }
 
   /** A socket closed (or errored). The last one out writes the session for teachers. */
