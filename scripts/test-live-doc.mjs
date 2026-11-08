@@ -31,7 +31,7 @@ const require = createRequire(import.meta.url);
 const { WebSocket } = require('next/dist/compiled/ws');
 const P = await import(join(root, 'lib/live-protocol.ts'));
 const D = await import(join(root, 'lib/live-doc-protocol.ts'));
-const { DocSync } = await import(join(root, 'lib/live-doc.ts'));
+const { DocSync, presenceField, setCursors } = await import(join(root, 'lib/live-doc.ts'));
 const { makeDevLive } = await import(join(root, 'scripts/dev-live.mjs'));
 
 let passed = 0;
@@ -60,6 +60,21 @@ check('ticket: LiveRoom refuses a code room\'s ticket', P.decodeTicket(P.encodeD
 check('ticket: LiveDoc refuses a game room\'s ticket', P.decodeDocTicket(P.encodeTicket({ code: 'BHKE', seat: 0, seats: 2, name: 'Ann L.', expiresAt: T_EXP })) === null);
 check('ticket: a bad language or room key is refused', P.decodeDocTicket(JSON.stringify(docTicket({ lang: 'python' }))) === null && P.decodeDocTicket(JSON.stringify(docTicket({ roomKey: 'x' }))) === null);
 check('game keys: code-js and code-moshion only', P.codeLangOf('code-js') === 'js' && P.codeLangOf('code-moshion') === 'moshion' && P.codeLangOf('sandbox') === null);
+
+// Presence in the editor: a cursor from someone whose text is ahead of ours
+// (typing we have not received yet) must not break the next change. Found in
+// the browser: an unclamped position made mapPos throw inside the state field,
+// which failed the shared update and then the reset.
+{
+  let st = EditorState.create({ doc: '0123456789', extensions: [presenceField] });
+  st = st.update({ effects: setCursors.of([{ seat: 1, name: 'Bo N.', anchor: 40, head: 50 }]) }).state;
+  check('presence: a cursor past the end is clamped as it is stored', st.field(presenceField).cursors[0].head === 10, st.field(presenceField).cursors[0]);
+  let threw = null;
+  try { st = st.update({ changes: { from: 2, to: 4, insert: 'abc' } }).state; } catch (e) { threw = e; }
+  check('presence: the next change still applies', !threw && st.doc.toString() === '01abc456789' && st.field(presenceField).cursors[0].head === 11, threw?.message);
+  st = st.update({ effects: setCursors.of([{ seat: 2, name: 'Cy R.', anchor: Number.NaN, head: -5 }]) }).state;
+  check('presence: junk positions land at the start', st.field(presenceField).cursors[0].anchor === 0 && st.field(presenceField).cursors[0].head === 0);
+}
 
 // ---- 2. LiveDocCore + two collab clients ----
 let clock = 1_000_000;

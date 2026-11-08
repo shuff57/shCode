@@ -230,7 +230,8 @@ export class DocSync {
 
 export interface RemoteCursor { seat: number; name: string; anchor: number; head: number }
 
-const setCursors = StateEffect.define<RemoteCursor[]>();
+/** Replace the other people's cursors (positions are clamped to this editor's text). Exported for the tests. */
+export const setCursors = StateEffect.define<RemoteCursor[]>();
 
 class CaretWidget extends WidgetType {
   color: string;
@@ -260,7 +261,7 @@ class CaretWidget extends WidgetType {
 }
 
 function clampPos(n: number, len: number): number {
-  return Math.max(0, Math.min(len, Math.floor(n)));
+  return Number.isFinite(n) ? Math.max(0, Math.min(len, Math.floor(n))) : 0;
 }
 
 function cursorDeco(cursors: RemoteCursor[], doc: Text): DecorationSet {
@@ -281,14 +282,28 @@ function cursorDeco(cursors: RemoteCursor[], doc: Text): DecorationSet {
   return Decoration.set(ranges, true);
 }
 
-const presenceField = StateField.define<{ cursors: RemoteCursor[]; deco: DecorationSet }>({
+// A cursor arrives in the sender's text, which may hold typing this editor has
+// not received yet, so its positions can run past the end here. They are
+// clamped as they are stored and before they are mapped: a position past the
+// end would make mapPos throw, and a throw in a state field fails the whole
+// transaction (the keystroke, or the shared update being applied).
+export const presenceField = StateField.define<{ cursors: RemoteCursor[]; deco: DecorationSet }>({
   create: () => ({ cursors: [], deco: Decoration.none }),
   update(v, tr) {
     let cursors = v.cursors;
     if (tr.docChanged && cursors.length) {
-      cursors = cursors.map((c) => ({ ...c, anchor: tr.changes.mapPos(c.anchor), head: tr.changes.mapPos(c.head) }));
+      const len = tr.startState.doc.length;
+      cursors = cursors.map((c) => ({
+        ...c,
+        anchor: tr.changes.mapPos(clampPos(c.anchor, len)),
+        head: tr.changes.mapPos(clampPos(c.head, len)),
+      }));
     }
-    for (const e of tr.effects) if (e.is(setCursors)) cursors = e.value;
+    for (const e of tr.effects) {
+      if (!e.is(setCursors)) continue;
+      const len = tr.state.doc.length;
+      cursors = e.value.map((c) => ({ ...c, anchor: clampPos(c.anchor, len), head: clampPos(c.head, len) }));
+    }
     if (cursors === v.cursors) return v;
     return { cursors, deco: cursorDeco(cursors, tr.state.doc) };
   },
