@@ -2849,6 +2849,33 @@ for (const id of Object.values(L)) {
   reject(Q.yours, 'a key-4 cooldown never set above 0', 'r1', cool("kb.presses('4') && cooldown === 0", 'if (t === 0 && cooldown > 0) cooldown -= 1;', ''));
 }
 
+// ---------------------------------------------------------------- 1.6.2 (issue report #18)
+// The comparison is stored in a variable, and its NAME is the student's: step 3 asks
+// for UPPER_SNAKE_CASE on the const limit just before, so a capitalised name for the
+// diamond is a natural (correct) choice and must not cost two cards.
+{
+  const id = '1-6-2-ch1-pa-build';
+  const sol = solutionFiles(id)['script.js'];
+  const ren = (from, to) => ({ ...solutionFiles(id), 'script.js': sol.split(from).join(to) });
+  accept(id, 'the comparison in UPPER_SNAKE_CASE', ren('meetsTheLimit', 'MEETS_THE_LIMIT'));
+  accept(id, 'the comparison with an underscore name', ren('meetsTheLimit', 'meets_the_limit'));
+  reject(id, 'no comparison stored at all', 'diamond-as-boolean',
+    ren('const meetsTheLimit = costPerSlice <= goodDealLimit;', 'const meetsTheLimit = true;'));
+}
+
+// ---------------------------------------------------------------- 2.3.30 (issue report #39)
+// Step 3 says "if its stopping statement were removed" and never says break, so the
+// fall-through comment counts in those words too; the step's own lines never do.
+{
+  const id = '2-3-29-a2-3-1-print-settings-advisor';
+  const sol = solutionFiles(id)['script.js'];
+  const note = '// If this break were removed, PLA' + AP + 's settings would print and then PETG' + AP + 's';
+  const reword = (line) => ({ ...solutionFiles(id), 'script.js': sol.split(note).join(line) });
+  if (!sol.includes(note)) throw new Error('2.3.30 case: the reference comment moved');
+  accept(id, 'the comment in the step' + AP + 's own words', reword('// Without its stopping statement, PLA' + AP + 's settings would print and then PETG' + AP + 's'));
+  accept(id, 'the comment says it falls through', reword('// Take the end off the PLA case and it falls into PETG, so both print:'));
+}
+
 // ---------------------------------------------------------------- run
 try {
   execFileSync(

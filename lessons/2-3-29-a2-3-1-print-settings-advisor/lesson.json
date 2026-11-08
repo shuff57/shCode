@@ -123,10 +123,10 @@
     {
       "id": "r10",
       "title": "fall-through comment written",
-      "description": "A comment explains what would print if a break were removed. Help: 2.3.3 (switch Statements)",
+      "description": "A comment explains what would print if a case's stopping statement (its break) were removed. Help: 2.3.3 (switch Statements)",
       "type": "regex",
       "file": "script.js",
-      "pattern": "//[^\\n]*\\bbreak\\b|/\\*[\\s\\S]*?\\bbreak\\b[\\s\\S]*?\\*/",
+      "pattern": "//(?![ \\t]*STEP\\b)(?! {4,})[^\\n]*\\b(?:break|stop|stopping|fall|falls|fell|falling|fallthrough|through|removed?|without)\\b|/\\*[\\s\\S]*?\\b(?:break|stop|stopping|fall|falls|fell|falling|fallthrough|through|removed?|without)\\b[\\s\\S]*?\\*/",
       "flags": "i",
       "points": 0,
       "stripComments": false

@@ -512,6 +512,25 @@ const __runTestJobs = (() => {
     return v;
   }
   const showWide = (v) => clip(show(v, 0), 90);
+  // Two long values that differ late (an array of records with one wrong field
+  // at the end) would both be clipped before the difference, and the student
+  // sees two identical starts. So when either is too long, both are shown from
+  // a little before the first character where they differ (issue report #67).
+  function showDiff(exp, val) {
+    const a = show(exp, 0);
+    const b = show(val, 0);
+    if (a.length <= 90 && b.length <= 90) return [a, b];
+    let i = 0;
+    while (i < a.length && i < b.length && a[i] === b[i]) i++;
+    // Start at the record or list item the difference is in, when that is near.
+    let start = 0;
+    if (i > 30) {
+      const open = Math.max(a.lastIndexOf('{', i), a.lastIndexOf('[', i));
+      start = open > 0 && i - open <= 60 ? open : i - 25;
+    }
+    const cut = (s) => (start > 0 ? '…' : '') + clip(s.slice(start), 90);
+    return [cut(a), cut(b)];
+  }
 
   // vars: {name: [1, value]} (found) or {name: [0]} (no such variable), read by
   // the lookup statement appended to the script. lines: what the script printed.
@@ -567,7 +586,8 @@ const __runTestJobs = (() => {
       if (hasOwn.call(e, 'expect')) {
         const exp = decode(e.expect);
         if (!eq(val, exp, job.tolerance, 0)) {
-          return bad(name + ' should end as ' + showWide(exp) + ' but is ' + showWide(val), hidden, typeof e.fail === 'string' ? e.fail : undefined);
+          const pair = showDiff(exp, val);
+          return bad(name + ' should end as ' + pair[0] + ' but is ' + pair[1], hidden, typeof e.fail === 'string' ? e.fail : undefined);
         }
       }
     }

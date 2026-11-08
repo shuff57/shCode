@@ -319,6 +319,13 @@ try {
     await expectFail('an array of the wrong length', 'let scores = [77, 85, 90];', final, /but is \[77, 85, 90\]$/);
     await expectFail('a string "77" is not 77', 'let scores = ["77", 85, 90, 64];', final, /but is \["77", 85, 90, 64\]$/);
     await expectFail('an object is not an array', 'let scores = {0: 77, 1: 85, 2: 90, 3: 64, length: 4};', final, /^scores should end as/);
+    // #67: two long values that differ late are shown from the record that differs,
+    // not both clipped before the difference.
+    const recs = V('recs', { variables: [{ name: 'players', expect: [
+      { name: 'Marisol', score: 92, group: 'A' }, { name: 'Dev', score: 78, group: 'B' }, { name: 'Priya', score: 85, group: 'A' }] }] });
+    await expectFail('a long mismatch shows the record that differs',
+      'const players = [{ name: "Marisol", score: 92, group: "A" }, { name: "Dev", score: 78, group: "B" }, { name: "Priya", score: 85, group: "C" }];',
+      recs, /should end as …\{name: "Priya", score: 85, group: "A"\}\] but is …\{name: "Priya", score: 85, group: "C"\}\]$/);
     // scalars, tolerance, nested, NaN tag, only the FIRST failing variable is named
     const two = V('two', { variables: [{ name: 'a', expect: 1 }, { name: 'b', expect: 2 }] });
     await expectFail('only the first failing variable is named', 'let a = 5; let b = 6;', two, /^a should end as 1 but is 5$/);
