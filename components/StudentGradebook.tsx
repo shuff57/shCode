@@ -209,11 +209,17 @@ export default function StudentGradebook({ lessons }: Props) {
         <h3 style={{ margin: '0 0 10px 0' }}>Your grade so far</h3>
         {grades.map((g) => (
           <div key={g.classId} style={{ marginBottom: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 28, fontWeight: 700 }}>{g.percent}%</span>
-              {g.missingCount > 0 && <a href="#missing-late-filter" style={{ color: '#f8f8f2', fontSize: 15, maxWidth: 440 }}><strong style={{ fontSize: 24 }}>{g.missingCount}</strong> graded lessons past due</a>}
-              <span style={{ opacity: 0.7 }}>{grades.length > 1 ? g.className : 'in your class'}</span>
+            <div style={{ display: 'flex', alignItems: 'stretch', gap: 16, flexWrap: 'wrap' }}>
+              <div style={{ minWidth: 140, paddingRight: 20, borderRight: '1px solid #44475a' }}>
+                <div style={{ color: '#8393c4', fontSize: 13, marginBottom: 4 }}>Grade so far</div>
+                <strong style={{ fontSize: 28 }}>{g.percent}%</strong>
+              </div>
+              {g.missingCount > 0 && <a href="#missing-late-filter" style={{ color: '#f8f8f2', textDecoration: 'none' }}>
+                <div style={{ color: '#8393c4', fontSize: 13, marginBottom: 4 }}>Past due</div>
+                <strong style={{ fontSize: 28 }}>{g.missingCount}</strong><span style={{ fontSize: 13 }}> graded lessons</span>
+              </a>}
             </div>
+            <div style={{ color: '#8393c4', fontSize: 12, marginTop: 8 }}>{grades.length > 1 ? g.className : 'In your class'}</div>
             <div style={{ color: '#8393c4', fontSize: 14, marginTop: 6 }}>
               Unfinished work past its due date counts as zero until you finish it; work not due yet is excluded.
             </div>

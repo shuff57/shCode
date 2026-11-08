@@ -9,7 +9,7 @@
 import { useEffect, useState } from 'react';
 import { fetchGradeQuota, GRADE_FINISHED, type GradeQuota } from '../lib/written-grader-store';
 
-export default function GradeQuotaNote() {
+export default function GradeQuotaNote({ compact = false }: { compact?: boolean }) {
   const [quota, setQuota] = useState<GradeQuota | null>(null);
 
   useEffect(() => {
@@ -30,14 +30,15 @@ export default function GradeQuotaNote() {
   return (
     <div
       role="status"
-      style={{ fontSize: 12, color: low ? '#ffb86c' : '#8393c4', margin: '0 0 8px', whiteSpace: 'normal', overflowWrap: 'anywhere', maxWidth: '100%' }}
+      title={compact ? "Grades used today. Practice runs and retries count. The count resets at midnight UTC (late afternoon here)." : undefined}
+      style={{ fontSize: 12, color: low ? '#ffb86c' : '#8393c4', margin: compact ? 0 : '0 0 8px', whiteSpace: 'normal', overflowWrap: 'anywhere', maxWidth: '100%' }}
     >
-      {quota.used} of {quota.limit} grades used today
+      {compact ? `Grades ${quota.used}/${quota.limit}` : `${quota.used} of ${quota.limit} grades used today`}
       {quota.remaining === 0
         ? ' — you are out for today. The count resets at midnight UTC (late afternoon here); tell your teacher if you need more.'
         : low
           ? ` — ${quota.remaining} left. The count resets at midnight UTC (late afternoon here).`
-          : '. Practice runs and retries count; the count resets at midnight UTC.'}
+          : compact ? '' : '. Practice runs and retries count; the count resets at midnight UTC.'}
     </div>
   );
 }

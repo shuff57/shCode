@@ -1385,7 +1385,8 @@ function GradebookView({
   const stickyBg = '#1e1f29';
   const headerBg = '#282a36';
 
-  // Wide enough for a horizontal header: a wrapped title, "N pts" and the due date.
+  // At 1440px the default columns use 390px + 6 × 140px = 1230px.
+  // The card has 1270px available, leaving six complete lesson columns visible.
   const CELL_W = 140;
   // Category total columns, between the grade and the first lesson.
   const CAT_W = showCategoryColumns ? 64 : 116;
@@ -1399,7 +1400,19 @@ function GradebookView({
 
   // Missing work has a distinct marker so its meaning does not depend on colour.
   function cellContent(cell: GradebookCell | undefined, maxScore?: number | null, graded = true): React.ReactNode {
-    const withLate = (c: GradebookCell | undefined, node: React.ReactNode) => <span style={{ color: c?.pending ? '#ffb86c' : c?.state === 'completed' ? '#50fa7b' : c?.late && graded ? '#ff5555' : c?.state === 'started' ? '#f1fa8c' : '#8393c4' }}>{node}</span>;
+    // Colour reflects the displayed mark's percentage; the stored mark and grading stay unchanged.
+    const scoreColor = (pct: number) => pct >= 90 ? '#50fa7b' : pct >= 70 ? '#8be9fd' : pct >= 50 ? '#ffb86c' : '#ff79c6';
+    const withLate = (c: GradebookCell | undefined, node: React.ReactNode) => {
+      const mark = c?.score ?? c?.submitted_score;
+      const possible = maxScore ?? c?.possible;
+      const pct = c?.state === 'completed'
+        ? lessonPercent(c.state, c.score, maxScore)
+        : mark != null ? (possible != null && possible > 0 ? mark * 100 / possible : mark) : null;
+      const color = c?.pending ? '#ffb86c' : graded && pct != null ? scoreColor(pct)
+        : c?.state === 'completed' ? '#50fa7b' : c?.late && graded ? '#ff5555'
+        : c?.state === 'started' ? '#f1fa8c' : '#8393c4';
+      return <span style={{ color }}>{node}</span>;
+    };
     // Checked before every other branch. A grader outage leaves the row
     // completed with a NULL score, which reads as a plain green tick, and it
     // leaves submitted_score NULL, which reads as the same "·" a student who
@@ -1620,12 +1633,18 @@ function GradebookView({
         </button>
       </div>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 16px', marginBottom: 8, fontSize: 13, color: '#8393c4' }}>
-        <span><span style={{ color: '#50fa7b' }}>■</span> Done · score %</span>
-        <span><strong style={{ color: '#ff5555' }}>!</strong> Past due · not started</span>
-        <span>· Not due yet / not started</span>
-        <span><span style={{ color: '#f1fa8c' }}>■</span> In progress</span>
-        <span><span style={{ color: '#ffb86c' }}>■</span> Needs grading</span>
+      <div aria-label="Gradebook legend" style={{ display: 'flex', flexWrap: 'nowrap', gap: 8, marginBottom: 12, overflowX: 'auto', paddingBottom: 4, fontSize: 12, color: '#f8f8f2' }}>
+        {[
+          { glyph: '100', label: 'done', color: '#50fa7b' },
+          { glyph: '!', label: 'past due', color: '#ff5555' },
+          { glyph: '·', label: 'not due yet', color: '#8393c4' },
+          { glyph: '…', label: 'in progress', color: '#f1fa8c' },
+          { glyph: '⋯', label: 'needs grading', color: '#ffb86c' },
+        ].map(({ glyph, label, color }) => (
+          <span key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexShrink: 0, whiteSpace: 'nowrap', padding: '5px 8px', border: '1px solid #44475a', borderRadius: 6, background: '#21222c' }}>
+            <span style={{ color, fontFamily: 'monospace', fontSize: 14, fontWeight: 700 }}>{glyph}</span>{label}
+          </span>
+        ))}
       </div>
 
       <div aria-live="polite" style={{ margin: '0 0 8px', padding: '4px 10px', borderRadius: 5, border: '1px solid #44475a', background: '#21222c', color: '#a9b7e0', fontSize: 12 }}>
@@ -1813,7 +1832,7 @@ function GradebookView({
             {visibleStudents.map((student, i) => (
               <tr
                 key={student.email}
-                style={{ background: i % 2 === 0 ? '#1e1f29' : '#252636' }}
+                style={{ height: 36, lineHeight: '20px', whiteSpace: 'nowrap', background: i % 2 === 0 ? '#1e1f29' : '#252636' }}
               >
                 {/* Sticky email cell */}
                 <td
@@ -1821,7 +1840,7 @@ function GradebookView({
                     position: 'sticky', left: 0, zIndex: 1,
                     background: i % 2 === 0 ? '#1e1f29' : '#252636',
                     width: EMAIL_W, minWidth: EMAIL_W,
-                    padding: '10px 10px',
+                    padding: '7px 10px',
                     borderBottom: '1px solid #44475a22', borderRight: '1px solid #44475a44',
                     fontFamily: 'monospace', fontSize: 14, color: '#8be9fd',
                     overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
@@ -1840,7 +1859,7 @@ function GradebookView({
                     <td
                       style={{
                         position: 'sticky', left: gradeLeft, zIndex: 1, background: bg,
-                        width: GRADE_W, minWidth: GRADE_W, padding: '10px 6px', textAlign: 'center',
+                        width: GRADE_W, minWidth: GRADE_W, padding: '7px 6px', textAlign: 'center',
                         borderBottom: '1px solid #44475a22', borderRight: '1px solid #44475a44',
                         fontSize: 14, fontWeight: 700,
                         color: !g || g.counted === 0 ? '#8393c4' : pctColor(g.pct),
@@ -1853,10 +1872,10 @@ function GradebookView({
                   );
                 })()}
                 {/* Category totals: the server's per-category percent, a dash where nothing in it counts yet */}
-                {!showCategoryColumns && shownCats.length > 0 && <td style={{ width: CAT_W, padding: '10px 8px', color: '#f8f8f2', fontSize: 12, background: 'rgba(189,147,249,0.06)', borderBottom: '1px solid #44475a22' }} title={shownCats.map(c => `${CATEGORY_LABEL[c]}: ${grades.get(student.email)?.cats[c] === undefined ? 'nothing counted yet' : `${grades.get(student.email)?.cats[c]}%`}`).join(' · ')}>
+                {!showCategoryColumns && shownCats.length > 0 && <td style={{ width: CAT_W, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '7px 8px', color: '#f8f8f2', fontSize: 12, background: 'rgba(189,147,249,0.06)', borderBottom: '1px solid #44475a22' }} title={shownCats.map(c => `${CATEGORY_LABEL[c]}: ${grades.get(student.email)?.cats[c] === undefined ? 'nothing counted yet' : `${grades.get(student.email)?.cats[c]}%`}`).join(' · ')}>
                   {(() => {
                     const c = shownCats.find(c => grades.get(student.email)?.cats[c] !== undefined);
-                    return c ? <><strong>{CAT_SHORT[c]} {grades.get(student.email)?.cats[c]}%</strong><div style={{ color: '#8393c4', marginTop: 3 }}>{shownCats.length - 1} more categories</div></> : <span style={{ color: '#8393c4' }}>Nothing counted</span>;
+                    return c ? <strong>{CAT_SHORT[c]} {grades.get(student.email)?.cats[c]}%</strong> : <span style={{ color: '#8393c4' }}>—</span>;
                   })()}
                 </td>}
                 {showCategoryColumns && shownCats.map((c) => {
@@ -1865,7 +1884,7 @@ function GradebookView({
                     <td
                       key={c}
                       style={{
-                        width: CAT_W, minWidth: CAT_W, maxWidth: CAT_W, padding: '10px 4px', textAlign: 'center',
+                        width: CAT_W, minWidth: CAT_W, maxWidth: CAT_W, padding: '7px 4px', textAlign: 'center',
                         borderBottom: '1px solid #44475a22', borderRight: '1px solid #44475a22',
                         fontSize: 14, fontWeight: 700,
                         background: 'rgba(98,114,164,0.10)',
@@ -1886,7 +1905,7 @@ function GradebookView({
                       key={lesson.id}
                       style={{
                         width: CELL_W, minWidth: CELL_W, maxWidth: CELL_W,
-                        padding: '12px 2px', fontSize: 14,
+                        padding: '7px 2px', fontSize: 14,
                         borderBottom: '1px solid #44475a22', borderRight: '1px solid #44475a22',
                         textAlign: 'center', verticalAlign: 'middle',
                         background: 'transparent',
@@ -2503,10 +2522,10 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
       </div>
 
       {activeTab === 'today' && (
-        <div role="tabpanel" id={`panel-today`} aria-labelledby={`tab-today`} style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
+        <div role="tabpanel" id={`panel-today`} aria-labelledby={`tab-today`} style={{ display: 'grid', gap: 24, gridTemplateColumns: 'minmax(0, 1fr)' }}>
         {/* Needs Attention view */}
-          <div style={{ ...S.card, padding: '10px 12px', marginBottom: 0 }}>
-            <h2 style={{ ...S.h2, fontSize: 13, marginBottom: 8 }}>Needs Attention</h2>
+          <div style={{ ...S.card, padding: compact ? 16 : 24, marginBottom: 0 }}>
+            <h2 style={{ ...S.h2, fontSize: 13, marginBottom: 16 }}>Needs Attention</h2>
             <NeedsAttentionPanel
               classId={classId}
               lessonTitles={lessonTitles}
@@ -2524,8 +2543,8 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             />
           </div>
         {/* Submission Review Queue */}
-        <div id="submission-review-queue" style={{ ...S.card, padding: compact ? 12 : 16, marginBottom: 0, scrollMarginTop: 100 }}>
-          <h2 style={{ ...S.h2, fontSize: 18, marginBottom: 10 }}>Submission Review Queue</h2>
+        <div id="submission-review-queue" style={{ ...S.card, padding: compact ? 16 : 24, marginBottom: 0, scrollMarginTop: 100 }}>
+          <h2 style={{ ...S.h2, fontSize: 18, marginBottom: 16 }}>Submission Review Queue</h2>
           <SubmissionQueue classId={classId} lessonTitles={lessonTitles} />
         </div>
         {/* Past due */}
@@ -2537,14 +2556,14 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
       )}
 
       {activeTab === 'students' && (
-        <div role="tabpanel" id={`panel-students`} aria-labelledby={`tab-students`} style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
+        <div role="tabpanel" id={`panel-students`} aria-labelledby={`tab-students`} style={{ display: 'grid', gap: 24, gridTemplateColumns: 'minmax(0, 1fr)' }}>
         {/* Roster view */}
-          <div style={{ ...S.card, padding: compact ? 14 : 20, marginBottom: 0 }}>
+          <div style={{ ...S.card, padding: compact ? 12 : 20, marginBottom: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 4 }}>
-            <h2 style={{ ...S.h2, marginBottom: 0 }}>Roster ({roster.length})</h2>
+            <h2 style={{ ...S.h2, fontSize: compact ? 18 : 20, lineHeight: '26px', marginBottom: 0 }}>Roster ({roster.length})</h2>
             <button
               type="button"
-              style={roster.length === 0 || progressMap.size === 0 ? S.btnDisabled : S.btn('#8be9fd')}
+              style={{ ...(roster.length === 0 || progressMap.size === 0 ? S.btnDisabled : S.btn('#8be9fd')), ...(compact ? { fontSize: 12, padding: '6px 10px', lineHeight: '18px' } : {}) }}
               disabled={roster.length === 0 || progressMap.size === 0}
               title="One row per student: the grade so far, how many graded lessons are done and past due, and a column per grade category. Ready to copy into a spreadsheet or the grade book."
               onClick={() => {
@@ -2571,8 +2590,11 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             {roster.length === 0 ? (
               <p style={{ color: '#8393c4', fontSize: 14 }}>No students enrolled yet.</p>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: compact ? 8 : 0 }}>
-                {!compact && <div style={{ display: 'grid', gridTemplateColumns: 'minmax(200px, 2fr) 170px 120px 90px 150px 100px', gap: 16, padding: '10px 12px 8px', color: '#f8f8f2', fontSize: 12, fontWeight: 600 }}><span>Student</span><span>Grade so far</span><span>Graded done</span><span>Past due</span><span>Last active</span><span /></div>}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: compact ? 6 : 0 }}>
+                {!compact && <div style={{ display: 'grid', gridTemplateColumns: 'minmax(180px, 2fr) 154px 112px 80px 150px 128px', gap: 16, padding: '10px 12px 8px', color: '#f8f8f2', fontSize: 12, fontWeight: 600 }}><span>Student</span><span>Grade so far</span><span>Graded done</span><span>Past due</span><span>Last active</span><span /></div>}
+                {/* Desktop: 18px name + 14px email + 10px padding + 1px border = 43px.
+                    Phone: 22px name/grade + 18px counts + 28px actions + 8px gaps
+                    + 16px padding + 1px border = 93px; counts and actions own full rows. */}
                 {roster.map((row) => {
                   const prog = progressMap.get(row.student_email);
                   // A stale or older response can lack weightedPercent; a NaN
@@ -2581,26 +2603,25 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                   return (
                     <div
                       key={row.student_email}
-                      style={{ background: '#282a36', borderRadius: compact ? 6 : 0, padding: compact ? '10px 12px' : '5px 12px', borderBottom: '1px solid #44475a', display: 'grid', gridTemplateColumns: compact ? 'minmax(0, 1fr) auto' : 'minmax(200px, 2fr) 170px 120px 90px 150px 100px', alignItems: 'center', gap: compact ? '7px 8px' : 16 }}
+                      style={{ background: '#282a36', borderRadius: compact ? 6 : 0, padding: compact ? '8px 10px' : '5px 12px', borderBottom: '1px solid #44475a', display: 'grid', gridTemplateColumns: compact ? 'minmax(0, 1fr) auto' : 'minmax(180px, 2fr) 154px 112px 80px 150px 128px', alignItems: 'center', minWidth: 0, minHeight: compact ? undefined : 43, boxSizing: 'border-box', gap: compact ? '4px 8px' : 16 }}
                     >
                       <div style={{ minWidth: 0 }} title={`Enrolled ${fmt(row.enrolled_at)} by ${row.enrolled_by ?? 'self'}`}>
-                        <div style={{ fontSize: 15, fontWeight: 600, color: '#f8f8f2', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fullName(prog?.firstName, prog?.lastName) ?? row.student_email}</div>
-                        {!compact && <div style={{ color: '#8393c4', fontSize: 11, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.student_email}</div>}
-                        {!compact && prog && <span style={{ display: 'inline-block', marginTop: 5, padding: '3px 7px', borderRadius: 4, fontSize: 12, fontWeight: 600, color: prog.gradedMissing ? '#ff5555' : prog.last_active ? '#50fa7b' : '#8393c4', background: prog.gradedMissing ? 'rgba(255,85,85,0.1)' : '#21222c' }}>{prog.gradedMissing ? `Behind · ${prog.gradedMissing} past due` : prog.last_active ? 'On track' : 'No activity yet'}</span>}
+                        <div style={{ fontSize: 15, lineHeight: compact ? '22px' : '18px', fontWeight: 600, color: '#f8f8f2', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fullName(prog?.firstName, prog?.lastName) ?? row.student_email}</div>
+                        {!compact && <div style={{ color: '#8393c4', fontSize: 11, lineHeight: '14px', marginTop: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.student_email}</div>}
                       </div>
-                      <div title="Grade so far, under this class's weights" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div title="Grade so far, under this class's weights" style={{ display: 'flex', alignItems: 'center', justifyContent: compact ? 'flex-end' : undefined, gap: 10, whiteSpace: 'nowrap', lineHeight: '22px' }}>
                         {!compact && <MiniBar pct={wp} />}
-                        {compact && <span style={{ color: '#8393c4', fontSize: 12 }}>grade</span>}
                         <strong style={{ color: prog?.gradedCounted ? pctColor(wp) : '#8393c4', fontSize: compact ? 16 : 15, fontVariantNumeric: 'tabular-nums' }}>{prog?.gradedCounted ? `${wp}%` : '—'}</strong>
                       </div>
-                      <div style={{ display: 'flex', gap: 8, fontSize: compact ? 13 : 14, color: compact ? '#8393c4' : '#f8f8f2', fontVariantNumeric: 'tabular-nums' }}>
+                      <div style={{ gridColumn: compact ? '1 / -1' : undefined, minWidth: 0, display: 'flex', flexWrap: 'wrap', gap: compact ? '0 6px' : 8, lineHeight: '18px', fontSize: compact ? 12 : 14, color: compact ? '#8393c4' : '#f8f8f2', fontVariantNumeric: 'tabular-nums' }}>
                         <span style={{ whiteSpace: 'nowrap' }}>{prog?.gradedDone ?? 0}/{prog?.gradedTotal ?? '—'}{compact && ' graded'}</span>
+                        {compact && <span aria-hidden="true">·</span>}
                         {compact && <span style={{ whiteSpace: 'nowrap', fontWeight: prog?.gradedMissing ? 700 : 400, color: prog?.gradedMissing ? '#ff5555' : '#8393c4' }}>{prog?.gradedMissing ?? 0} past due</span>}
                       </div>
-                      {!compact && <><strong style={{ fontSize: 15, fontVariantNumeric: 'tabular-nums', color: prog?.gradedMissing ? '#ff5555' : '#8393c4' }}>{prog?.gradedMissing || '—'}</strong><span style={{ fontSize: 13, color: '#f8f8f2' }}>{prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'}</span></>}
-                      <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
+                      {!compact && <><strong style={{ fontSize: 15, fontVariantNumeric: 'tabular-nums', color: prog?.gradedMissing ? '#ff5555' : '#8393c4' }}>{prog?.gradedMissing || '—'}</strong><span title={prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'} style={{ minWidth: 0, fontSize: 13, lineHeight: '18px', color: '#f8f8f2', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'}</span></>}
+                      <div style={{ gridColumn: compact ? '1 / -1' : undefined, minWidth: 0, display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'flex-end', alignItems: 'center' }}>
                         <button
-                          style={{ ...S.btn('#8be9fd'), padding: compact ? '4px 10px' : '7px 12px', fontSize: 12 }}
+                          style={{ ...S.btn('#8be9fd'), padding: '5px 10px', lineHeight: '18px', flexShrink: 0, fontSize: 12 }}
                           onClick={() => { setDrawerLesson(null); setDrawerEmail(row.student_email); }}
                         >
                           Open
@@ -2648,7 +2669,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
       )}
 
       {activeTab === 'gradebook' && (
-        <div role="tabpanel" id={`panel-gradebook`} aria-labelledby={`tab-gradebook`} style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
+        <div role="tabpanel" id={`panel-gradebook`} aria-labelledby={`tab-gradebook`} style={{ display: 'grid', gap: 24, gridTemplateColumns: 'minmax(0, 1fr)' }}>
         {/* Gradebook view */}
           <div style={{ ...S.card, padding: compact ? 16 : 24, marginBottom: 0 }}>
             <h2 style={{ ...S.h2, marginBottom: 16 }}>Gradebook</h2>
@@ -2667,7 +2688,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
       )}
 
       {activeTab === 'schedule' && (
-        <div role="tabpanel" id={`panel-schedule`} aria-labelledby={`tab-schedule`} style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
+        <div role="tabpanel" id={`panel-schedule`} aria-labelledby={`tab-schedule`} style={{ display: 'grid', gap: 24, gridTemplateColumns: 'minmax(0, 1fr)' }}>
         {/* Due dates */}
         <div style={S.card}>
           <h2 style={S.h2}>Due dates</h2>

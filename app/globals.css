@@ -2144,3 +2144,125 @@ body:has(.lesson-progress-footer) .editor-body { margin-top: 0; padding-top: 8px
   .mod-row-meta { grid-column: 2; grid-row: 2; font-size: 12px; }
   .home-module-summary .module-open-affordance { display: inline !important; width: auto !important; grid-column: auto; }
 }
+
+/* Tool clearance belongs to work surfaces, never the site chrome. */
+body { box-sizing: border-box; padding-right: 20px; }
+.content-lesson-main, .editor-card, .sandbox-shell { min-width: 0; }
+.content-lesson-main .content-prose { min-width: 0; overflow-wrap: anywhere; }
+.content-lesson-main pre { max-width: 100%; overflow-x: auto; }
+.content-lesson-main img, .content-lesson-main video { max-width: 100%; }
+.assignment-unmet-mobile, .quiz-guidance-toggle { display: none; }
+@media (min-width: 721px) {
+  body:has(.shd-tabstrip) .content-lesson-main {
+    width: calc(100% - 88px - var(--shd-tabbed, 0px)) !important;
+  }
+}
+@media (max-width: 720px) {
+  body, body:has(.shd-tabstrip) { padding-right: 10px; }
+  body:has(.shd-tabstrip) .content-lesson-main,
+  body:has(.shd-tabstrip) .assignment-header,
+  body:has(.shd-tabstrip) .editor-card,
+  body:has(.shd-tabstrip) .sandbox-shell { margin-right: 0; max-width: 100%; min-width: 0; }
+  .content-lesson-main { width: 100% !important; }
+  .content-lesson-title { flex-direction: row !important; gap: 4px 8px !important; }
+  .content-lesson-title h1 { flex: 0 0 100%; font-size: 22px !important; }
+  .student-quiz h2 { font-size: 17px !important; line-height: 1.3; }
+  .quiz-guidance { margin-bottom: 10px; }
+  .quiz-guidance p { margin-bottom: 0 !important; line-height: 1.4; }
+  .quiz-guidance:not(.is-expanded) p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .quiz-guidance-toggle { display: inline; color: #8be9fd; font-size: 12px; background: none; border: 0; padding: 0; cursor: pointer; }
+  .assignment-header-center { column-gap: 6px !important; row-gap: 3px !important; }
+  .assignment-score .score-bar { display: none; }
+  .assignment-score .score-text { font-size: 12px; }
+  .assignment-status { background: transparent; border: 0; padding: 0; font-size: 12px; text-transform: none; }
+  .assignment-status::before, .assignment-unmet-hint::before { content: '· '; color: #8393c4; }
+  .assignment-unmet-hint { font-size: 12px; }
+  .assignment-unmet-desktop { display: none; }
+  .assignment-unmet-mobile { display: inline; }
+  .assignment-quota { order: 10; }
+  .assignment-quota [role="status"] { margin-bottom: 0 !important; font-size: 11px !important; line-height: 1.35; }
+  .lab-task-strip { padding: 6px 10px !important; }
+  .task-disclosure { display: inline; }
+  .editor-body { padding: 6px !important; }
+  .run-toolbar { gap: 4px !important; margin-bottom: 6px; }
+  .run-toolbar button { padding: 4px 6px !important; font-size: 11px !important; }
+  .run-toolbar::after { display: none; }
+  .editor-card { scroll-margin-bottom: calc(72px + env(safe-area-inset-bottom)); }
+}
+@media (max-width: 720px) {
+  .assignment-quota [role="status"] { white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis; }
+}
+
+/* Labs: a readable task beside the work, with a single status row above it. */
+.lab-work-area { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 16px; min-width: 0; }
+.lab-task-card { font-family: system-ui, sans-serif; font-size: 14px; line-height: 1.5; }
+.lab-task-card .lesson-steps { margin: 0; padding-left: 20px; }
+.lab-task-card .lesson-step { margin: 0 0 14px; padding: 0; }
+.lab-task-card .lesson-step:last-child { margin-bottom: 0; }
+.lab-task-card .step-instructions { opacity: 1; font-size: 14px; line-height: 1.5; }
+.lab-task-card .step-instructions p { margin: 6px 0; }
+.lab-task-card .step-hints { color: #8393c4; margin-top: 6px; }
+.lab-task-toggle { display: none; }
+.lab-work-area .editor-body { margin: 0; padding: 10px; border: 1px solid #44475a; border-radius: 8px; }
+.lab-work-area .editor-card { min-width: 0; }
+.lab-assignment-header .assignment-header-center { flex-wrap: nowrap !important; gap: 12px; }
+.lab-assignment-header .assignment-quota { flex: 0 1 auto; order: 0; margin-left: auto; }
+.lab-assignment-header .assignment-quota:has([role="status"]) { display: block; }
+.lab-assignment-header .assignment-quota { display: none; }
+.lab-assignment-header .assignment-quota > div { display: flex; align-items: center; gap: 8px; }
+.lab-assignment-header .assignment-quota [role="status"] { font-size: 11px !important; }
+.lab-assignment-header .assignment-score { order: -3; }
+.lab-assignment-header .assignment-status { order: -2; }
+.lab-assignment-header .assignment-unmet-hint { order: -1; }
+.lab-assignment-header .score-bar { width: 64px; }
+.lab-assignment-header .assignment-header-left p { margin-top: 4px !important; font-size: 13px !important; line-height: 1.4 !important; }
+.lab-assignment-header { gap: 8px; }
+.mod-row-title { display: grid; grid-template-columns: 48px minmax(0, 1fr); column-gap: 8px; }
+@media (min-width: 721px) {
+  body:has(.shd-tabstrip) .lab-work-area { margin-right: calc(88px + var(--shd-tabbed, 0px)); }
+  body:has(.shd-tabstrip) .lab-work-area .editor-card { margin-right: 0; }
+  .lab-work-area .toolbar-submit { display: none; }
+  .lab-work-area .editor-preview-container:not(.sandbox-split) > #editorPane { min-width: 0; flex-basis: 58%; }
+  .lab-work-area #previewPane { min-width: 0; flex-basis: 42%; }
+  .lab-work-area .console-empty { min-width: 0; }
+}
+@media (max-width: 720px) {
+  .lab-work-area { display: flex; flex-direction: column; gap: 8px; }
+  .lab-task-card { width: 100%; box-sizing: border-box; padding: 10px 12px !important; }
+  .lab-task-card h2 { margin-bottom: 6px !important; font-size: 13px !important; }
+  .lab-task-content { max-height: 84px; overflow: hidden; }
+  .lab-task-card.is-expanded .lab-task-content { max-height: none; }
+  .lab-task-toggle { display: inline-block; }
+  .lab-task-card .lesson-step { margin-bottom: 8px; }
+  .lab-task-card .step-instructions { line-height: 1.5; }
+  .lab-work-area .editor-card { width: 100%; }
+  .lab-work-area .editor-body { margin: 0; }
+  .lab-work-area #editorPane { height: 360px; min-height: 240px; }
+  .lab-work-area #editor .cm-editor { font-size: 12px !important; }
+  .lab-work-area #editor .cm-line { line-height: 1.5; }
+  .lab-assignment-header .assignment-header-center { gap: 4px 7px !important; flex-wrap: wrap !important; }
+  .lab-assignment-header .assignment-quota:has([role="status"]) { display: block !important; margin-left: auto; }
+  .lab-assignment-header .assignment-quota [role="status"] { font-size: 10px !important; }
+  .lab-assignment-header .assignment-header-center > button { display: none; }
+  .lab-assignment-header .assignment-header-left p { display: none; }
+  .lab-work-area .run-toolbar { flex-wrap: wrap; }
+  .quiz-guidance p { display: block !important; -webkit-line-clamp: unset !important; overflow: visible !important; font-size: 13px !important; }
+  .mod-row-title { display: block; }
+  .mod-row-title .mod-row-num { font-size: 12px; margin-right: 5px; }
+  .content-lesson-main { padding-bottom: calc(88px + env(safe-area-inset-bottom)) !important; }
+  body:has(.content-lesson-main) .issue-fab { bottom: calc(12px + env(safe-area-inset-bottom)); right: 100px; width: 32px; height: 32px; }
+  body .shd-tabstrip.shd-docs-only .shd-tab { padding: 7px 14px !important; font-size: 12px !important; }
+}
+
+body:has(.lab-work-area) .lab-assignment-header { padding: 2px 0 8px; margin-bottom: 0; }
+body:has(.lab-work-area) { gap: 8px; }
+.lab-work-area .run-toolbar { gap: 8px; }
+.lab-work-area .run-hint { font-size: 11px; }
+
+.lab-work-area .ai-check-help { display: none; }
+@media (min-width: 721px) {
+  body:has(.lab-work-area) .site-header-row { padding: 8px 12px; }
+  body:has(.lab-work-area) .hdr-lesson-link { padding: 3px 8px; }
+  .lab-assignment-header .assignment-header-left p { display: none; }
+  .lab-assignment-header .assignment-header-center > button { padding: 4px 10px; }
+}

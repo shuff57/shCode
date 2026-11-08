@@ -437,7 +437,12 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
       {error && (
         <p style={{ color: '#ff5555', fontSize: 13, marginBottom: 12 }}>{error}</p>
       )}
-      {saving && <p style={{ color: C.dim, fontSize: 12, marginBottom: 12 }}>Saving…</p>}
+      <div role="status" aria-live="polite" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, margin: '0 0 16px', padding: '10px 12px', border: `1px solid ${C.border}`, borderRadius: 6, background: '#21222c', fontSize: 13 }}>
+        <span style={{ color: '#f8f8f2' }}>Changes save automatically</span>
+        <span style={{ color: saving ? '#8be9fd' : error ? '#ffb86c' : '#50fa7b', fontWeight: 600 }}>
+          · {saving ? 'Saving…' : error ? 'Could not save or load dates — see details above' : 'Saved'}
+        </span>
+      </div>
 
       {units.length === 0 && !loading && (
         <p style={{ color: C.dim }}>

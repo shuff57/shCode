@@ -453,7 +453,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
   ).length;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {/* The list below is the most recent graded work of every kind, so say that first and count what is
           listed; the orange note then counts only the rows the AI grader failed on. */}
       <div style={{ fontSize: '0.84rem', color: '#a9b7e0' }}>

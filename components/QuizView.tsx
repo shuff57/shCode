@@ -321,13 +321,13 @@ export default function QuizView({ lessonId, config }: Props) {
           </div>
         )}
       </div>
-      <p style={{ color: '#8393c4', fontSize: 13, margin: '0 0 20px' }}>
+      <div className="quiz-guidance is-expanded"><p style={{ color: '#8393c4', fontSize: 13, margin: '0 0 20px' }}>
         {capped
           ? `Answer all ${questions.length}. After each try you see your total, not which ones were wrong. Submit what you have if one has you stuck: the next part unlocks and you can come back and use your other tries.`
           : summative
           ? `Answer all ${questions.length}. Nothing is marked here — your teacher hands the score back. If one has you stuck, submit what you have and move on: the next part unlocks and you can come back to this one. Once all ${questions.length} are answered, submitting is final.`
           : `Pick the answer that fits best for each question. You need ${needed} of ${questions.length} right to move on, and you can change your answers and try again as many times as you like.`}
-      </p>
+      </p></div>
       <AttemptBanner
         max={cap.max}
         used={cap.used}

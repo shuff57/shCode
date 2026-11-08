@@ -31,6 +31,7 @@ import MoshionPreview from './MoshionPreview';
 import RequirementsSection from './RequirementsSection';
 import PlanChartPanel from './PlanChartPanel';
 import LessonSteps from './LessonSteps';
+import LabTaskCard from './LabTaskCard';
 import Console from './Console';
 import HistoryPanel from './HistoryPanel';
 import AssignmentHeader from './AssignmentHeader';
@@ -1271,7 +1272,8 @@ export default function LessonWorkspace({
       {showAssignmentHeader ? (
         <AssignmentHeader
           lesson={lesson}
-          attemptNote={<div style={{ width: '100%' }}>{capped ? <AttemptBanner max={cap.max} used={cap.used} loading={cap.loading} /> : null}<GradeQuotaNote /></div>}
+          compactLab={isConsoleMode || isMoshionMode}
+          attemptNote={<div style={{ width: '100%' }}>{capped ? <AttemptBanner max={cap.max} used={cap.used} loading={cap.loading} /> : null}<GradeQuotaNote compact={isConsoleMode || isMoshionMode} /></div>}
           score={headerScore}
           totalPossible={headerTotal}
           onSubmit={handleSubmit}
@@ -1279,7 +1281,7 @@ export default function LessonWorkspace({
           canSubmit={canSubmit}
           unitLabel={headerUnitLabel}
           showStatus={!isMoshionMode}
-          showSubmit={!isMoshionMode && !isConsoleMode}
+          showSubmit
           scoreAlign={isMoshionMode ? 'right' : 'center'}
           unmetTitles={unmetTitles}
           unmetNote={isMoshionMode ? moshionWords.note : aiCheck ? 'press Check to mark them' : undefined}
@@ -1306,11 +1308,14 @@ export default function LessonWorkspace({
       {lesson.starterVariants && lesson.starterVariants.length > 1 && (
         <StarterPicker lesson={lesson} />
       )}
+      <div className={(isConsoleMode || isMoshionMode) ? 'lab-work-area' : undefined}>
       {lesson.steps.length > 0 && (
-        <details className="lab-task-strip" style={{ padding: '8px 12px', margin: '4px 0 8px', border: '1px solid #44475a', borderRadius: 6, background: '#282a36' }}>
-          <summary style={{ cursor: 'pointer', fontSize: 13, color: '#8393c4' }}><strong style={{ color: '#8be9fd' }}>Your task</strong> · {lesson.steps[0].title} <span className="task-disclosure">· Show all steps</span></summary>
-          <LessonSteps lesson={lesson} />
-        </details>
+        (isConsoleMode || isMoshionMode) ? <LabTaskCard lesson={lesson} /> : (
+          <details className="lab-task-strip" style={{ padding: '8px 12px', margin: '4px 0 8px', border: '1px solid #44475a', borderRadius: 6, background: '#282a36' }}>
+            <summary style={{ cursor: 'pointer', fontSize: 13, color: '#8393c4' }}><strong style={{ color: '#8be9fd' }}>Your task</strong> · {lesson.steps[0].title} <span className="task-disclosure">· Show all steps</span></summary>
+            <LessonSteps lesson={lesson} />
+          </details>
+        )
       )}
       <div className="editor-card">
         <div className="editor-body">
@@ -1540,7 +1545,7 @@ export default function LessonWorkspace({
           {aiCheck && (
             // The AI's read of the steps, directly under the Grade button and
             // above the textarea it graded.
-            <div style={{ marginBottom: 6 }}>
+            <div className={!aiCheckNote ? 'ai-check-help' : undefined} style={{ marginBottom: 6 }}>
               <div role="status" aria-live="polite" style={{ fontSize: 12, color: '#8393c4' }}>
                 {aiCheckNote
                   ? aiNoteForRun(aiCheckNote, { allGreen: allRequirementsPassed, runErrored: !!runtimeError })
@@ -1655,6 +1660,7 @@ export default function LessonWorkspace({
             </details>
           )}
         </div>
+      </div>
       </div>
       {aiGraded ? (
         <AiGradeResultPanel

@@ -180,7 +180,7 @@ export default function ModuleLessonsList({
               <badge.Icon size={12} strokeWidth={2.25} />
               {badge.label}
             </span>
-            <span className="mod-row-title" style={{ fontWeight: 500 }}><span className="mod-row-num" style={{ color: '#8393c4', fontFamily: 'monospace', marginRight: 8 }}>{l.numberedId}</span>{l.displayTitle}</span>
+            <span className="mod-row-title" style={{ fontWeight: 500 }}><span className="mod-row-num" style={{ color: '#8393c4', fontFamily: 'monospace', fontVariantNumeric: 'tabular-nums' }}>{l.numberedId}</span>{' '}<span>{l.displayTitle}</span></span>
             <span className="mod-row-meta">
             {locked ? (
               <span

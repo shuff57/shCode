@@ -6,6 +6,7 @@ import { Send } from 'lucide-react';
 
 interface AssignmentHeaderProps {
   lesson: Lesson;
+  compactLab?: boolean;
   attemptNote?: ReactNode;
   score: number;
   totalPossible: number;
@@ -34,6 +35,7 @@ interface AssignmentHeaderProps {
 
 export default function AssignmentHeader({
   lesson,
+  compactLab = false,
   attemptNote,
   score,
   totalPossible,
@@ -73,7 +75,7 @@ export default function AssignmentHeader({
   const unmetHint =
     !submitted && !canSubmit && unmetTitles && unmetTitles.length > 0 ? (
       <div className="assignment-unmet-hint">
-        Still needed: {unmetTitles.length} {unmetTitles.length === 1 ? 'requirement' : 'requirements'} · press Check
+        <span className="assignment-unmet-desktop">Still needed: </span>{unmetTitles.length}<span className="assignment-unmet-mobile"> still needed</span><span className="assignment-unmet-desktop"> {unmetTitles.length === 1 ? 'requirement' : 'requirements'} · press Check</span>
       </div>
     ) : !submitted && !canSubmit && blockedNote ? (
       <div className="assignment-unmet-hint">{blockedNote}</div>
@@ -91,7 +93,7 @@ export default function AssignmentHeader({
   ) : null;
 
   return (
-    <div className="assignment-header">
+    <div className={`assignment-header ${compactLab ? 'lab-assignment-header' : ''}`}>
       <div className="assignment-header-left">
         <h1>{lesson.title}</h1>
         {lesson.description && <p style={{ margin: '8px 0 0', color: '#f8f8f2', fontSize: 15, lineHeight: 1.5, maxWidth: 680 }}>{lesson.description}</p>}
