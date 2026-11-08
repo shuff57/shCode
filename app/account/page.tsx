@@ -14,7 +14,7 @@ const S = {
   } as React.CSSProperties,
 
   card: {
-    maxWidth: 440,
+    maxWidth: 560,
     margin: '0 auto',
     background: '#1e1f29',
     border: '1px solid #44475a',
@@ -43,7 +43,7 @@ const S = {
     padding: 8,
     marginBottom: 16,
     background: '#282a36',
-    color: '#6272a4',
+    color: '#8393c4',
     border: '1px solid #44475a',
     borderRadius: 4,
     fontSize: 14,
@@ -114,8 +114,11 @@ export default function AccountPage() {
   return (
     <div style={S.page}>
       <div style={S.card}>
+        <Link href="/" style={{ color: '#8be9fd', fontSize: 13, textDecoration: 'none' }}>← Back to course</Link>
         <h1 style={S.h1}>My account</h1>
+        <p style={{ color: '#8393c4', marginTop: -14, marginBottom: 22 }}>Manage the name shown to your class.</p>
 
+        <h2 style={{ color: '#bd93f9', fontSize: 14, margin: '0 0 10px' }}>Profile</h2>
         <label style={S.label}>Email</label>
         <input type="text" value={user.email} readOnly style={S.inputReadonly} />
 

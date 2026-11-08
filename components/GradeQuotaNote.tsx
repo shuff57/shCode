@@ -30,9 +30,9 @@ export default function GradeQuotaNote() {
   return (
     <div
       role="status"
-      style={{ fontSize: 12, color: low ? '#ffb86c' : '#8393c4', margin: '0 0 8px' }}
+      style={{ fontSize: 12, color: low ? '#ffb86c' : '#8393c4', margin: '0 0 8px', whiteSpace: 'normal', overflowWrap: 'anywhere', maxWidth: '100%' }}
     >
-      Grades today: {quota.used} of {quota.limit} used
+      {quota.used} of {quota.limit} grades used today
       {quota.remaining === 0
         ? ' — you are out for today. The count resets at midnight UTC (late afternoon here); tell your teacher if you need more.'
         : low

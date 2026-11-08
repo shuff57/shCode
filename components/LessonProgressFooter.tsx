@@ -154,19 +154,17 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
       ref={footerRef}
       className="lesson-progress-footer"
       style={{
-        position: 'fixed',
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: '#21222c',
-        borderTop: '1px solid #44475a',
-        padding: '8px 16px',
+        position: 'relative',
+        flexShrink: 0,
+        background: '#191a23',
+        borderTop: '2px solid #6272a4',
+        padding: '10px 16px',
         zIndex: 50,
         display: 'flex',
         alignItems: 'center',
         gap: 12,
         color: '#f8f8f2',
-        boxShadow: '0 -4px 12px rgba(0,0,0,0.35)',
+        boxShadow: 'none',
         fontSize: 12,
       }}
     >
@@ -185,7 +183,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
       {/* Dropped below 720px (see globals.css): at phone width this and the
           segments were competing for the same ~70px, and the tally on the
           right already says how many lessons the module has. */}
-      <span className="lesson-progress-count" style={{ color: '#6272a4', minWidth: 96 }}>
+      <span className="lesson-progress-count" style={{ color: '#8393c4', minWidth: 96 }}>
         {idx >= 0 ? `Lesson ${idx + 1} of ${lessons.length}` : `${lessons.length} lessons`}
       </span>
       {/* Segments, not dots. A dot is a fixed 14px, so 31 of them plus the

@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { getCurrentUser, CurrentUser } from '../lib/auth';
 import NavDropdown from './NavDropdown';
+import AuthButton from './AuthButton';
 
 // Menu-item style shared by both dropdowns below — a real <Link>/<a>, not a
 // div with onClick, so it stays keyboard- and screen-reader-reachable.
@@ -20,6 +21,17 @@ export default function HeaderNav() {
   const [user, setUser] = useState<CurrentUser | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [hasEnrollments, setHasEnrollments] = useState<boolean | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const outside = (event: MouseEvent) => { if (!menuRef.current?.contains(event.target as Node)) setMenuOpen(false); };
+    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') setMenuOpen(false); };
+    document.addEventListener('mousedown', outside);
+    document.addEventListener('keydown', escape);
+    return () => { document.removeEventListener('mousedown', outside); document.removeEventListener('keydown', escape); };
+  }, [menuOpen]);
 
   useEffect(() => {
     getCurrentUser().then((u) => {
@@ -52,7 +64,12 @@ export default function HeaderNav() {
   const isStaff = loaded && (user?.role === 'teacher' || user?.role === 'admin');
 
   return (
-    <>
+    <div ref={menuRef} className="site-header-nav-wrap">
+      <button className="mobile-header-menu" type="button" aria-label="Open navigation menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(v => !v)} style={{ display: 'none', background: 'transparent', color: '#f8f8f2', border: '1px solid #6272a4', borderRadius: 4, padding: '6px 9px', fontSize: 18, lineHeight: 1, cursor: 'pointer' }}>
+        ☰
+      </button>
+      <Link className="mobile-join-link" href="/join-class" style={{ display: 'none', color: '#f1fa8c', fontSize: 12, whiteSpace: 'nowrap' }}>Join your class</Link>
+      <nav className={`desktop-header-links flex items-center gap-4 flex-wrap justify-end${menuOpen ? ' mobile-open' : ''}`}>
       <Link href="/" className="text-white">Lessons</Link>
 
       <NavDropdown label="Learn" triggerStyle={{ color: '#fff', fontSize: 15 }}>
@@ -118,6 +135,8 @@ export default function HeaderNav() {
           Join your class
         </Link>
       )}
-    </>
+        <AuthButton />
+      </nav>
+    </div>
   );
 }

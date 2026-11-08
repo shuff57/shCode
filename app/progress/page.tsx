@@ -96,14 +96,15 @@ export default function ProgressPage() {
   const nextLocked = pickUpNext(orderedLessons, progress.states, (l) => lessonGradeCategory(l) !== null);
 
   // Per-unit breakdown
-  const unitMap = new Map<string, { completed: number; total: number; category?: string }>();
+  const unitMap = new Map<string, { completed: number; started: number; total: number; category?: string }>();
   for (const l of manifest.lessons) {
     const unitName = l.unit || 'Other';
     if (!unitMap.has(unitName)) {
-      unitMap.set(unitName, { completed: 0, total: 0, category: l.category });
+      unitMap.set(unitName, { completed: 0, started: 0, total: 0, category: l.category });
     }
     const entry = unitMap.get(unitName)!;
     entry.total++;
+    if (progress.states[l.id] === 'started') entry.started++;
     if (progress.states[l.id] === 'completed') entry.completed++;
   }
   const unitEntries = Array.from(unitMap.entries()).sort((a, b) => a[0].localeCompare(b[0]));
@@ -116,23 +117,10 @@ export default function ProgressPage() {
         <span style={{ opacity: 0.6 }}>Progress</span>
       </nav>
 
-      {/* Summary card */}
-      <div style={cardStyle}>
-        <h2 style={{ margin: 0, marginBottom: 12 }}>Progress</h2>
-        <p style={{ fontSize: 18, fontWeight: 600, margin: '0 0 10px 0' }}>
-          {completedIds.length} of {totalLessons} lessons completed
-        </p>
-        <div style={progressBarOuter}>
-          <div
-            style={{
-              ...progressBarInner,
-              width: `${completionPct}%`,
-            }}
-          />
-        </div>
-        <p style={{ opacity: 0.5, fontSize: 13, marginTop: 8 }}>
-          {completionPct}% complete
-        </p>
+      <h1 style={{ fontSize: 28, fontWeight: 750, margin: '0 0 12px' }}>Your progress</h1>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 14, color: '#8393c4', fontSize: 14 }}>
+        <span><strong style={{ color: '#f8f8f2' }}>{completedIds.length}</strong> of {totalLessons} lessons done</span>
+        <a href="#missing-late-filter" style={{ color: '#8be9fd' }}>Review missing or late work →</a>
       </div>
 
       {/* Per-assignment gradebook — the student's own row of the same matrix
@@ -217,17 +205,17 @@ export default function ProgressPage() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, fontSize: 13 }}>
                   <span style={{ fontWeight: 600 }}>{unitName}</span>
                   <span style={{ opacity: 0.6 }}>
-                    {data.completed}/{data.total} ({pct}%)
+                    {data.completed === data.total ? '✓ Done' : data.completed + data.started === 0 ? 'Not started' : `${data.completed} of ${data.total}`} 
                   </span>
                 </div>
-                <div style={unitBarOuter}>
+                {data.completed + data.started > 0 && data.completed < data.total && <div style={unitBarOuter}>
                   <div
                     style={{
                       ...unitBarInner,
                       width: `${pct}%`,
                     }}
                   />
-                </div>
+                </div>}
               </div>
             );
           })}

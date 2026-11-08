@@ -88,15 +88,17 @@ export default function GradingWeightsPanel({ classId }: { classId: string }) {
 
   return (
     <div>
-      <p style={{ margin: '0 0 12px', fontSize: 12, color: C.dim, maxWidth: 480 }}>
-        How much each category counts toward this class&rsquo;s grade percentage on
-        the home page. A category with no graded lessons yet (e.g. Final Exams)
-        doesn&rsquo;t drag the percentage down &mdash; its weight is
-        redistributed across whatever categories do have lessons.
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, marginBottom: 10 }}>
+        <h2 style={{ fontSize: 20, fontWeight: 600, margin: 0 }}>Grading weights</h2>
+        <span style={{ fontSize: 12, color: C.dim }}>Total <strong style={{ color: C.text }}>{total}</strong></span>
+      </div>
+      <p style={{ maxWidth: 720, margin: '0 0 12px', fontSize: 12, lineHeight: 1.5, color: C.dim }}>
+        Each share is its weight divided by the total.<br />
+        Only categories with work count toward a student’s grade; empty categories drop out.
       </p>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 420 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '0 20px' }}>
         {rows.map((r) => (
-          <div key={r.category} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div key={r.category} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 50px 76px 36px', alignItems: 'center', gap: 6, padding: '7px 0', borderBottom: `1px solid ${C.border}` }}>
             <span style={{ flex: 1, fontSize: 13 }}>{CATEGORY_LABEL[r.category]}</span>
             <input
               type="number"
@@ -114,7 +116,7 @@ export default function GradingWeightsPanel({ classId }: { classId: string }) {
                 }
               }}
               style={{
-                width: 64,
+                width: 50, boxSizing: 'border-box',
                 background: C.input,
                 color: C.text,
                 border: `1px solid ${C.border}`,
@@ -123,9 +125,9 @@ export default function GradingWeightsPanel({ classId }: { classId: string }) {
                 fontSize: 13,
               }}
             />
-            <span style={{ fontSize: 13, color: C.dim, width: 10 }}>%</span>
+            <span title="Effective share when all categories have work" style={{ fontSize: 12, color: C.dim, textAlign: 'right', whiteSpace: 'nowrap' }}>{total > 0 ? `${(r.weight / total * 100).toFixed(1)}% share` : '—'}</span>
             {r.isDefault ? (
-              <span style={{ fontSize: 11, color: C.dim, width: 52 }}>default</span>
+              <span />
             ) : (
               <button
                 type="button"
@@ -137,7 +139,7 @@ export default function GradingWeightsPanel({ classId }: { classId: string }) {
                   cursor: 'pointer',
                   fontSize: 12,
                   padding: 0,
-                  width: 52,
+                  width: 36,
                   textAlign: 'left',
                 }}
               >
@@ -147,11 +149,7 @@ export default function GradingWeightsPanel({ classId }: { classId: string }) {
           </div>
         ))}
       </div>
-      <div style={{ marginTop: 10, fontSize: 12, color: total === 100 ? C.dim : C.warn }}>
-        Total: {total}%
-        {total !== 100 ? " — doesn't add up to 100, but nothing stops you saving it that way" : ''}
-      </div>
-      {saving && <div style={{ fontSize: 12, color: C.dim, marginTop: 4 }}>Saving…</div>}
+      <div role="status" style={{ fontSize: 12, color: C.dim, marginTop: 10 }}>{saving ? 'Saving…' : 'Saves automatically on blur'}</div>
       {error && <div style={{ fontSize: 12, color: '#ff5555', marginTop: 4 }}>{error}</div>}
     </div>
   );

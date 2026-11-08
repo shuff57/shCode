@@ -453,28 +453,13 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
   ).length;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       {/* The list below is the most recent graded work of every kind, so say that first and count what is
           listed; the orange note then counts only the rows the AI grader failed on. */}
       <div style={{ fontSize: '0.84rem', color: '#a9b7e0' }}>
         {submissions.length} recent submission{submissions.length === 1 ? '' : 's'}, {needsManual > 0 ? 'the ones needing a manual grade first, then ' : ''}newest first
         {needsManual > 0 ? '' : '. Every one has a score; override it below if you disagree'}.
       </div>
-      {needsManual > 0 && (
-        <div
-          style={{
-            background: '#ffb86c',
-            color: '#282a36',
-            borderRadius: 6,
-            padding: '10px 14px',
-            fontSize: '0.86rem',
-            fontWeight: 600,
-          }}
-        >
-          {needsManual} of the {submissions.length} {needsManual === 1 ? 'is' : 'are'} marked &ldquo;Needs manual grade&rdquo;: the AI grader could not score {needsManual === 1 ? 'it' : 'them'}.
-          Set a score by hand below. The students&apos; answers were saved.
-        </div>
-      )}
       {submissions.map((sub) => {
         // A flowchart submission nests its rubric under `ai`, so the plain
         // top-level reader returns null for it; fall through to the diagram
@@ -508,19 +493,19 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
               background: '#1e1f29',
               border: '1px solid #44475a',
               borderRadius: 6,
-              padding: 14,
+              padding: 12,
               display: 'flex',
               flexDirection: 'column',
-              gap: 8,
+              gap: 10,
             }}
           >
             {/* Header row */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
-              <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+              <div style={{ flex: '1 1 240px', minWidth: 0, overflowWrap: 'anywhere' }}>
                 <div style={{ fontWeight: 600, color: '#f8f8f2', fontSize: '0.9rem' }}>
                   {sub.student_email}
                 </div>
-                <div style={{ fontSize: '0.78rem', color: '#8393c4' }}>
+                <div style={{ fontSize: 13, color: '#8393c4', marginTop: 4, lineHeight: 1.5 }}>
                   {lessonLabel(sub.lesson_id, lessonTitles)} &middot; submitted {formatTs(sub.submitted_at)}
                 </div>
               </div>

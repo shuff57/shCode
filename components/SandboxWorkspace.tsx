@@ -72,8 +72,8 @@ const BUILD_KEY = 'shCode:sandbox-reshape-build';
 const chipStyle: React.CSSProperties = {
   padding: '6px 14px',
   borderRadius: 4,
-  background: 'transparent',
-  color: '#6272a4',
+  background: '#343746',
+  color: '#f8f8f2',
   border: '1px solid #44475a',
   cursor: 'pointer',
   fontSize: 13,
@@ -827,7 +827,7 @@ export default function SandboxWorkspace() {
           border-radius: 4px;
           overflow: hidden;
           flex: 0 0 auto;
-          height: 240px;
+          height: 120px;
           min-height: 120px;
           max-height: 60vh;
           resize: vertical;

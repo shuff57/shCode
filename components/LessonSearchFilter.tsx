@@ -2,6 +2,8 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { useLessonState } from '../lib/progress';
+import { lessonHref } from '../lib/lesson-href';
 import HomeModuleLessons from './HomeModuleLessons';
 import UnitProgressBadge from './UnitProgressBadge';
 import DueClassPicker from './DueClassPicker';
@@ -63,6 +65,8 @@ interface Props {
 }
 
 export default function LessonSearchFilter({ units, lessons }: Props) {
+  const progress = useLessonState();
+  const nextLesson = progress.loaded && progress.authed ? [...lessons].sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true })).find((l) => progress.states[l.id] !== 'completed') : undefined;
   const [query, setQuery] = useState('');
   // Due dates are per class, so every chip on this page reads one chosen
   // class. Renders nothing at all for a student.
@@ -106,7 +110,7 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
 
   return (
     <>
-      <div className="flex items-center justify-between gap-4 mb-4" id="titleRow">
+      <div className="flex items-center justify-between gap-4 mb-4" id="titleRow" style={{ maxWidth: 1120, margin: '0 auto 20px' }}>
         <h1 className="text-2xl font-bold">Choose a lesson</h1>
         <DueClassPicker />
         <input
@@ -133,6 +137,7 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
         </div>
       )}
 
+      {nextLesson && <Link href={lessonHref(nextLesson)} style={{ display: 'block', maxWidth: 1120, margin: '0 auto 20px', padding: '16px 20px', border: '1px solid #8be9fd55', borderRadius: 8, background: '#8be9fd0a', color: '#f8f8f2', textDecoration: 'none' }}><span style={{ display: 'block', color: '#8be9fd', fontSize: 12, fontWeight: 700, marginBottom: 6 }}>{progress.states[nextLesson.id] === 'started' ? 'Continue' : 'Next up'} →</span>{nextLesson.title}</Link>}
       {Array.from(groups.entries()).map(([top, group]) => {
         const visibleModules = trimmed
           ? group.modules.filter((m) => matchingModuleIds?.has(m.id))
@@ -156,16 +161,14 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
           <details
             key={top}
             open={!trimmed || visibleModules.length > 0}
-            className="bg-card border-border border rounded w-2/3 mx-auto mb-4 overflow-hidden"
+            style={{ maxWidth: 1120 }} className="home-chapter bg-card border-border border rounded w-full mx-auto mb-4 overflow-hidden"
           >
             <summary className="flex items-baseline gap-3 p-4 cursor-pointer hover:bg-muted transition list-none">
               <span className="text-2xl font-bold">Chapter {top}</span>
               {group.label && <span className="text-base opacity-80">{group.label}</span>}
               <span className="ml-auto flex items-center gap-4 text-sm opacity-80">
                 <UnitProgressBadge lessons={unitLessonRefs} label={`Chapter ${top}`} />
-                <span className="opacity-60">
-                  {visibleModules.length} module{visibleModules.length === 1 ? '' : 's'}
-                </span>
+
               </span>
             </summary>
             <div className="flex flex-col gap-3 p-4 border-t border-border">
@@ -187,10 +190,10 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
                     className="bg-muted rounded overflow-hidden"
                     open={!!trimmed}
                   >
-                    <summary className="flex items-baseline gap-3 p-3 cursor-pointer hover:bg-accent transition list-none">
+                    <summary className="home-module-summary flex items-baseline gap-3 p-3 cursor-pointer hover:bg-accent transition list-none">
                       <span className="font-bold">{u.id}</span>
                       <span className="text-base">{u.title}</span>
-                      <span className="ml-auto flex items-center gap-4 text-sm opacity-80">
+                      <span className="home-module-progress ml-auto flex items-center gap-4 text-sm">
                         <UnitProgressBadge lessons={moduleLessonRefs} label={`Module ${u.id}`} />
                         <ModuleDueChip
                           snap={teacherDue}
@@ -199,7 +202,7 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
                           unitId={u.category ?? null}
                         />
                       </span>
-                    </summary>
+                    <span className="module-open-affordance" aria-hidden="true">›</span></summary>
                     <div className="flex flex-col gap-3 p-3 border-t border-border bg-card">
                       {unitLessons.length === 0 ? (
                         <div className="text-sm opacity-60 italic px-1">

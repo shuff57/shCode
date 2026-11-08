@@ -19,6 +19,7 @@ interface Neighbor {
   id: string;
   title: string;
   type?: string | null;
+  preview?: string | null;
 }
 
 // Sorts siblings by the X.Y.Z numbered id parsed from the title, matching
@@ -47,7 +48,7 @@ function computeNeighbors(
     });
   const idx = peers.findIndex((l) => l.id === id);
   const toN = (l?: ManifestLesson): Neighbor | null =>
-    l ? { id: l.id, title: l.title, type: l.type } : null;
+    l ? { id: l.id, title: l.title, type: l.type, preview: l.preview } : null;
   return {
     prev: toN(idx > 0 ? peers[idx - 1] : undefined),
     next: toN(idx < peers.length - 1 ? peers[idx + 1] : undefined),
@@ -60,6 +61,12 @@ function computeNeighbors(
 function parseRoute(pathname: string): { id: string } | null {
   const m = pathname.match(/^\/(?:lesson|assignment)\/([^/]+)\/?$/);
   return m ? { id: m[1] } : null;
+}
+
+function shortLabel(n: Neighbor) {
+  const kind = n.preview ?? n.type ?? 'Lesson';
+  const labels: Record<string, string> = { reading: 'Reading', quiz: 'Quiz', video: 'Video', slides: 'Slides', example: 'Example', console: 'Lab', moshion: 'Lab' };
+  return `${parseNumberedId(n.title) ?? ''} ${labels[kind] ?? 'Lesson'}`.trim();
 }
 
 export default function HeaderLessonNav() {
@@ -110,6 +117,8 @@ export default function HeaderLessonNav() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
+        gap: 12,
+        minWidth: 0,
         padding: '6px 16px',
         borderTop: '1px solid #1f2937',
         color: '#cbd5e1',
@@ -119,7 +128,7 @@ export default function HeaderLessonNav() {
       {prev ? (
         <a className="hdr-lesson-link" href={lessonHref(prev)}>
           <span style={{ opacity: 0.7 }}>←</span>
-          <span style={titleStyle}>{prev.title}</span>
+          <span style={titleStyle}><span className="lesson-nav-full">{prev.title}</span><span className="lesson-nav-short">{shortLabel(prev)}</span></span>
         </a>
       ) : (
         <span />
@@ -138,7 +147,7 @@ export default function HeaderLessonNav() {
               gap: 6,
             }}
           >
-            <span style={titleStyle}>{next.title}</span>
+            <span style={titleStyle}><span className="lesson-nav-full">{next.title}</span><span className="lesson-nav-short">{shortLabel(next)}</span></span>
             <span style={{ opacity: 0.7 }} aria-hidden="true">🔒</span>
           </span>
         ) : (
@@ -146,7 +155,7 @@ export default function HeaderLessonNav() {
             className="hdr-lesson-link hdr-lesson-link-right"
             href={lessonHref(next)}
           >
-            <span style={titleStyle}>{next.title}</span>
+            <span style={titleStyle}><span className="lesson-nav-full">{next.title}</span><span className="lesson-nav-short">{shortLabel(next)}</span></span>
             <span style={{ opacity: 0.7 }}>→</span>
           </a>
         )

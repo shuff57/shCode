@@ -28,6 +28,7 @@ import { onRequestGet as quizRevealGet } from '../functions/api/quiz-reveal.ts';
 import { onRequestGet as myGradebookGet } from '../functions/api/my-gradebook.ts';
 import { ATTEMPT_CAPS } from '../functions/_shared/pa-pseudocode.generated.ts';
 import { COUNT_SINCE } from '../lib/attempt-cap.ts';
+import { DEFAULT_WEIGHTS } from '../lib/grading-weights.ts';
 import { onRequestGet as classesGet } from '../functions/api/classes/index.ts';
 import { onRequestGet as classDetailGet, onRequestPatch as classDetailPatch } from '../functions/api/classes/[id]/index.ts';
 import { onRequestGet as classGradebookGet } from '../functions/api/classes/[id]/gradebook.ts';
@@ -120,7 +121,7 @@ function seedClass(sql, root, teacherEmail) {
   const inMods = (mods) => graded.filter((l) => mods.includes(modOf(l.title)));
   const now = Date.now();
   const DAY = 86400000;
-  sql.run('UPDATE classes SET owner_email = ?, name = ? WHERE id = ?', [teacherEmail, 'Period 3 Intro Programming', CLASS_ID]);
+  sql.run('UPDATE classes SET owner_email = ?, name = ?, created_at = ? WHERE id = ?', [teacherEmail, 'Period 3 Intro Programming', now - 30 * DAY, CLASS_ID]);
   for (const [m, at] of [['1.1', now - 20 * DAY], ['1.2', now - 14 * DAY], ['1.3', now - 7 * DAY], ['1.4', now - 2 * DAY], ['1.5', now + 7 * DAY]]) {
     sql.run("INSERT INTO class_due_dates (class_id, scope, scope_id, due_at, set_by, set_at) VALUES (?, 'module', ?, ?, ?, 0)", [CLASS_ID, m, at, teacherEmail]);
   }
@@ -137,8 +138,8 @@ function seedClass(sql, root, teacherEmail) {
   const put = (email, l, state, completedAt, score) =>
     sql.run('INSERT OR REPLACE INTO lesson_state (student_email, lesson_id, state, started_at, completed_at, score) VALUES (?, ?, ?, ?, ?, ?)', [email, l.id, state, now - 30 * DAY, completedAt, score]);
   for (const [email, first, last, kind] of students) {
-    sql.run('INSERT OR IGNORE INTO students (email, password_hash, created_at, first_name, last_name) VALUES (?, ?, 0, ?, ?)', [email, 'x', first, last]);
-    sql.run('INSERT OR IGNORE INTO enrollments (class_id, student_email, enrolled_at, expires_at) VALUES (?, ?, 0, ?)', [CLASS_ID, email, FAR]);
+    sql.run('INSERT OR IGNORE INTO students (email, password_hash, created_at, first_name, last_name) VALUES (?, ?, ?, ?, ?)', [email, 'x', now - 30 * DAY, first, last]);
+    sql.run('INSERT OR IGNORE INTO enrollments (class_id, student_email, enrolled_at, expires_at) VALUES (?, ?, ?, ?)', [CLASS_ID, email, now - 30 * DAY, FAR]);
     const full = (l) => (l.maxScore ? l.maxScore : null);
     if (kind === 'all' || kind === 'waived') for (const l of inMods(kind === 'all' ? ['1.1', '1.2', '1.3', '1.4'] : ['1.1', '1.2', '1.3'])) put(email, l, 'completed', now - 25 * DAY, full(l));
     if (kind === 'early') for (const l of inMods(['1.1', '1.2'])) put(email, l, 'completed', now - 15 * DAY, full(l));
@@ -215,11 +216,12 @@ export function mountDemoApi({ server, express, devIdentity, role, root }) {
     import(path.resolve(process.env.DEV_SEED_MODULE)).then((m) => m.default(db.raw, { classId: CLASS_ID, teacherEmail: devIdentity({ headers: {} }), root }));
   }
   const enrolled = new Set();
+  const devSeededAt = Date.now();
   const ensure = (email) => {
     if (enrolled.has(email)) return;
     enrolled.add(email);
-    db.raw.run('INSERT OR IGNORE INTO students (email, password_hash, created_at) VALUES (?, ?, 0)', [email, 'x']);
-    db.raw.run('INSERT OR IGNORE INTO enrollments (class_id, student_email, enrolled_at, expires_at) VALUES (?, ?, 0, ?)', [CLASS_ID, email, FAR]);
+    db.raw.run('INSERT OR IGNORE INTO students (email, password_hash, created_at) VALUES (?, ?, ?)', [email, 'x', devSeededAt]);
+    db.raw.run('INSERT OR IGNORE INTO enrollments (class_id, student_email, enrolled_at, expires_at) VALUES (?, ?, ?, ?)', [CLASS_ID, email, devSeededAt, FAR]);
   };
 
   const route = (handler, paramNames = [], roleOverride) => async (req, res) => {
@@ -248,6 +250,18 @@ export function mountDemoApi({ server, express, devIdentity, role, root }) {
   const json = express.json({ limit: '1mb' });
 
   server.get('/api/lesson-state', route(stateIndexGet));
+  // Teacher grading weights for the seeded class; mirrors the default-weight
+  // response without needing a separate D1 route in dev.
+  server.get('/api/classes/:id/grading-weights', (_req, res) => {
+    const weights = Object.entries(DEFAULT_WEIGHTS).map(([category, weight]) => ({
+      category,
+      weight,
+      isDefault: true,
+      setBy: null,
+      setAt: null,
+    }));
+    res.json({ weights });
+  });
   server.post('/api/lesson-state/:lessonId', json, route(statePost, ['lessonId']));
   server.delete('/api/lesson-state/:lessonId', route(stateDelete, ['lessonId']));
   server.get('/api/lesson-submissions', route(submissionsGet));

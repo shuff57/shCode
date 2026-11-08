@@ -43,12 +43,19 @@ export default function CompletionPanel({ lessonId, lessonType, description }: P
   }
 
   if (!snap.loaded) return null;
+  if (complete) return (
+    <section aria-live="polite" style={{ marginTop: 20, padding: '16px 18px', border: '1px solid #50fa7b55', borderRadius: 8, background: '#50fa7b0a', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+      <CircleCheck size={20} color="#50fa7b" />
+      <span style={{ color: '#50fa7b', flex: 1 }}>Completed · next lesson unlocked</span>
+      <button onClick={toggle} disabled={!snap.authed} style={{ background: 'transparent', border: 0, color: '#8393c4', textDecoration: 'underline', cursor: 'pointer', padding: 6 }}>Undo</button>
+    </section>
+  );
 
   return (
     <section
       style={{
-        marginTop: 40,
-        paddingTop: 20,
+        marginTop: 20,
+        paddingTop: 14,
         borderTop: '2px solid #44475a',
       }}
     >
@@ -103,7 +110,7 @@ export default function CompletionPanel({ lessonId, lessonType, description }: P
             alignItems: 'center',
             gap: 8,
             fontSize: 13,
-            color: complete ? '#50fa7b' : '#6272a4',
+            color: complete ? '#50fa7b' : '#8393c4',
           }}
         >
           {complete ? (

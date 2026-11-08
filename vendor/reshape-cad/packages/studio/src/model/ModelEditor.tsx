@@ -2555,12 +2555,16 @@ export default function ModelEditor({
         .model-timeline .model-move button:hover:not(:disabled) { color: var(--text, var(--reshape-text)); background: var(--reshape-text-muted); }
         .model-timeline .model-move button:disabled { opacity: 0.25; cursor: default; }
         .model-timeline .model-empty {
-          flex: 0 0 auto;
+          flex: 1 1 220px;
+          min-width: 0;
+          max-width: 380px;
           align-self: center;
           padding: 0 10px;
           color: var(--reshape-text-muted);
           font-size: 12px;
           line-height: 1.5;
+          white-space: normal;
+          overflow-wrap: anywhere;
         }
         .model-empty { padding: 14px 10px; color: var(--reshape-text-muted); font-size: 12px; line-height: 1.6; }
         .model-row {
@@ -2627,6 +2631,9 @@ export default function ModelEditor({
           color: var(--reshape-text-muted); padding: 0 10px 4px;
         }
         .model-browser-empty { margin: 0; padding: 2px 10px; font-size: 12px; color: var(--reshape-text-muted); }
+        @media (max-width: 640px) {
+          .model-timeline .model-empty { max-width: calc(100vw - 70px); }
+        }
         .model-browser-row {
           display: block; width: 100%; text-align: left;
           background: transparent; border: none; color: var(--reshape-text);

@@ -255,12 +255,12 @@ const CAT_COLOR: Record<GradeCategory, string> = {
 };
 const CAT_SHORT: Record<GradeCategory, string> = {
   lab: 'Labs',
-  group: 'Group assessments',
-  chapterTest: 'Chapter tests',
-  finalExam: 'Final exams',
-  q1: 'Q1 synthesis',
-  q2: 'Q2 synthesis',
-  q4: 'Q4 synthesis',
+  group: 'Group',
+  chapterTest: 'Tests',
+  finalExam: 'Final',
+  q1: 'Q1',
+  q2: 'Q2',
+  q4: 'Q4',
 };
 
 /** The background behind a lesson cell: the state at a glance, with the number or mark in front of it. */
@@ -463,7 +463,7 @@ const S = {
     minHeight: '100vh',
     background: '#282a36',
     color: '#f8f8f2',
-    padding: '32px 24px',
+    padding: '24px clamp(16px, 3vw, 40px)',
     fontFamily: 'inherit',
   } as React.CSSProperties,
 
@@ -913,7 +913,7 @@ function StudentDrawer({
           )}
           {detail && unitGroups.map(({ unit, lessons }) => (
             <div key={unit} style={{ marginBottom: 24 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#bd93f9', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#bd93f9', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>
                 {unit}
               </div>
               <div>
@@ -1275,6 +1275,7 @@ function GradebookView({
   // Off by default: the grid is the graded lessons only (about a tenth of the columns). Readings, slides and
   // examples carry no grade, so they were 640 columns of dots between the ones a teacher came to read.
   const [showAll, setShowAll] = useState(false);
+  const [showCategoryColumns, setShowCategoryColumns] = useState(false);
   // One module's columns (its `unit` string), or null for every module.
   const [moduleFilter, setModuleFilter] = useState<string | null>(null);
   const [grades, setGrades] = useState<Map<string, GridGrade>>(new Map());
@@ -1385,10 +1386,10 @@ function GradebookView({
   const headerBg = '#282a36';
 
   // Wide enough for a horizontal header: a wrapped title, "N pts" and the due date.
-  const CELL_W = 92;
+  const CELL_W = 140;
   // Category total columns, between the grade and the first lesson.
-  const CAT_W = 84;
-  const EMAIL_W = narrow ? 110 : 220;
+  const CAT_W = showCategoryColumns ? 64 : 116;
+  const EMAIL_W = narrow ? 110 : 190;
   // Height of the unit header row. The per-lesson row sticks at this offset, so
   // the row has to BE this tall: a unit title that wrapped made it 100px and the
   // lesson row slid 67px up over it.
@@ -1396,19 +1397,9 @@ function GradebookView({
   // Frozen only on wide screens (see `narrow` above).
   const gradeLeft = narrow ? undefined : EMAIL_W;
 
-  // Late cells keep their normal glyph and gain a red underline, so scanning
-  // the matrix for red still works without a second symbol to learn.
-  function withLateBase(cell: GradebookCell | undefined, node: React.ReactNode, graded: boolean): React.ReactNode {
-    if (!cell?.late || !graded) return node;
-    return (
-      <span style={{ borderBottom: '2px solid #ff5555', paddingBottom: 1, display: 'inline-block' }}>
-        {node}
-      </span>
-    );
-  }
-
+  // Missing work has a distinct marker so its meaning does not depend on colour.
   function cellContent(cell: GradebookCell | undefined, maxScore?: number | null, graded = true): React.ReactNode {
-    const withLate = (c: GradebookCell | undefined, node: React.ReactNode) => withLateBase(c, node, graded);
+    const withLate = (c: GradebookCell | undefined, node: React.ReactNode) => <span style={{ color: c?.pending ? '#ffb86c' : c?.state === 'completed' ? '#50fa7b' : c?.late && graded ? '#ff5555' : c?.state === 'started' ? '#f1fa8c' : '#8393c4' }}>{node}</span>;
     // Checked before every other branch. A grader outage leaves the row
     // completed with a NULL score, which reads as a plain green tick, and it
     // leaves submitted_score NULL, which reads as the same "·" a student who
@@ -1417,14 +1408,14 @@ function GradebookView({
     if (cell?.pending) {
       return withLate(cell, (
         <span
-          style={{ color: '#ffb86c', fontFamily: 'monospace', fontWeight: 700, fontSize: 14 }}
+          style={{ color: 'inherit', fontFamily: 'monospace', fontWeight: 700, fontSize: 14 }}
         >
           ⋯
         </span>
       ));
     }
     if (!cell || (!cell.state && cell.submitted_score === null)) {
-      return withLate(cell, <span style={{ color: cell?.late && graded ? '#ff5555' : '#8393c4', fontFamily: 'monospace', fontSize: 14 }}>–</span>);
+      return withLate(cell, <span style={{ color: 'inherit', fontFamily: 'monospace', fontSize: 14, fontWeight: cell?.late && graded ? 700 : 400 }}>{cell?.late && graded ? '!' : '·'}</span>);
     }
     if (cell.state === 'completed') {
       // The PERCENT the grade is built from (lessonPercent, the function functions/_shared/grading.ts
@@ -1435,11 +1426,11 @@ function GradebookView({
       // Practice work (no grade category; only visible with "Show readings and slides") has no mark:
       // its 100 is a placeholder, so a check says "done" without implying a score.
       if (!graded) {
-        return withLate(cell, <span style={{ color: '#8393c4', fontFamily: 'monospace', fontWeight: 700, fontSize: 13 }}>✓</span>);
+        return withLate(cell, <span style={{ color: 'inherit', fontFamily: 'monospace', fontWeight: 700, fontSize: 13 }}>✓</span>);
       }
       // A number for every finished lesson, 100 included: the cell background carries the state.
       return withLate(cell, (
-        <span style={{ color: pct >= 70 ? '#50fa7b' : '#f1fa8c', fontFamily: 'monospace', fontWeight: 700, fontSize: 12 }}>
+        <span style={{ color: 'inherit', fontFamily: 'monospace', fontWeight: 700, fontSize: 14 }}>
           {pct}
         </span>
       ));
@@ -1453,22 +1444,22 @@ function GradebookView({
       const partial = cell.score ?? cell.submitted_score;
       if (partial !== null) {
         return withLate(cell, (
-          <span style={{ color: '#f1fa8c', fontFamily: 'monospace', fontWeight: 700, fontSize: 13 }}>
+          <span style={{ color: 'inherit', fontFamily: 'monospace', fontWeight: 700, fontSize: 13 }}>
             {partial}
           </span>
         ));
       }
-      return withLate(cell, <span style={{ color: '#f1fa8c', fontFamily: 'monospace', fontSize: 14 }}>○</span>);
+      return withLate(cell, <span style={{ color: 'inherit', fontFamily: 'monospace', fontSize: 14 }}>…</span>);
     }
     // Has submission data but no lesson_state (edge case)
     if (cell.submitted_score !== null) {
       return withLate(cell, (
-        <span style={{ color: '#8be9fd', fontFamily: 'monospace', fontSize: 12 }}>
-          s{cell.submitted_score}
+        <span style={{ color: 'inherit', fontFamily: 'monospace', fontSize: 14 }}>
+          {cell.submitted_score}
         </span>
       ));
     }
-    return withLate(cell, <span style={{ color: '#8393c4', fontFamily: 'monospace', fontSize: 14 }}>–</span>);
+    return withLate(cell, <span style={{ color: 'inherit', fontFamily: 'monospace', fontSize: 14, fontWeight: cell?.late && graded ? 700 : 400 }}>{cell?.late && graded ? '!' : '·'}</span>);
   }
 
   // Plain words for a cell, for the hover tip and for screen readers: what the student has done, the
@@ -1539,6 +1530,8 @@ function GradebookView({
   );
   const shownCats = GRADE_CATEGORIES.filter((c) => displayLessons.some((l) => catOf.get(l.id) === c));
 
+  const categoryColumnCount = shownCats.length ? (showCategoryColumns ? shownCats.length : 1) : 0;
+
   function handleDownloadCsv() {
     const csv = buildGradebookCsv(gbData!.students, displayLessons.map((l) => l.id), gbData!.dueDates, Object.fromEntries(displayLessons.map((l) => [l.id, l.title])));
     downloadCsv(csv, `gradebook-${className.replace(/\s+/g, '-')}.csv`);
@@ -1553,9 +1546,9 @@ function GradebookView({
       } : undefined}
     >
       {/* Toolbar */}
-      <div style={{ marginBottom: 12, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px 10px' }}>
+      <div style={{ marginBottom: 8, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px' }}>
         <button style={S.btn('#8be9fd')} onClick={handleDownloadCsv}>
-          Download lessons shown (CSV)
+          Export CSV
         </button>
         <span style={{ fontSize: 12, color: '#8393c4' }}>
           {visibleStudents.length === gbData.students.length
@@ -1569,13 +1562,13 @@ function GradebookView({
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Find a student"
           aria-label="Find a student by name or email"
-          style={{ background: '#1e1f29', color: '#f8f8f2', border: '1px solid #44475a', borderRadius: 4, padding: '4px 8px', fontSize: 12, width: 160 }}
+          style={{ background: '#1e1f29', color: '#f8f8f2', border: '1px solid #44475a', borderRadius: 4, height: 36, boxSizing: 'border-box', padding: '4px 8px', fontSize: 13, width: 150 }}
         />
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as 'name' | 'grade' | 'missing')}
           aria-label="Order students by"
-          style={{ background: '#1e1f29', color: '#f8f8f2', border: '1px solid #44475a', borderRadius: 4, padding: '4px 6px', fontSize: 12 }}
+          style={{ background: '#1e1f29', color: '#f8f8f2', border: '1px solid #44475a', borderRadius: 4, height: 36, padding: '4px 6px', fontSize: 13 }}
         >
           <option value="name">Order: name</option>
           <option value="grade">Order: lowest grade first</option>
@@ -1585,20 +1578,29 @@ function GradebookView({
           value={moduleSel ?? ''}
           onChange={(e) => setModuleFilter(e.target.value === '' ? null : e.target.value)}
           aria-label="Show one module's columns"
-          style={{ background: '#1e1f29', color: '#f8f8f2', border: '1px solid #44475a', borderRadius: 4, padding: '4px 6px', fontSize: 12, maxWidth: narrow ? '100%' : 280 }}
+          style={{ background: '#1e1f29', color: '#f8f8f2', border: '1px solid #44475a', borderRadius: 4, height: 36, padding: '4px 6px', fontSize: 13, maxWidth: narrow ? '100%' : 180 }}
         >
           <option value="">All modules</option>
           {moduleChoices.map((m) => (
             <option key={m.unit} value={m.unit}>{m.unit} ({m.counted} counted / {m.total})</option>
           ))}
         </select>
+        <details style={{ position: 'relative', fontSize: 13, color: '#f8f8f2' }}>
+          <summary style={{ cursor: 'pointer', padding: '9px 12px', border: '1px solid #44475a', borderRadius: 4 }}>Filters{showAll || problemsOnly ? ' •' : ''}</summary>
+          <div style={{ position: 'absolute', top: '100%', right: 0, zIndex: 30, background: '#21222c', border: '1px solid #44475a', borderRadius: 6, padding: 14, width: 260, display: 'grid', gap: 12 }}>
         <label style={{ fontSize: 12, color: '#f8f8f2', display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer' }} title="By default the grid shows only the lessons that count toward the grade. Tick this to add the ones that do not (readings, slides, examples, and any lab or chart with no grade category). They show a check mark, never a score.">
           <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
-          Also show lessons that do not count toward the grade{hiddenCount > 0 ? ` (${hiddenCount} hidden)` : ''}
+          Include ungraded lessons{hiddenCount > 0 ? ` (${hiddenCount} hidden)` : ''}
         </label>
         <label style={{ fontSize: 12, color: '#f8f8f2', display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
           <input type="checkbox" checked={problemsOnly} onChange={(e) => setProblemsOnly(e.target.checked)} />
-          Only students with missing or ungraded work
+          Missing or ungraded work
+        </label>
+          </div>
+        </details>
+        <label style={{ fontSize: 12, color: '#f8f8f2', display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+          <input type="checkbox" checked={showCategoryColumns} onChange={e => setShowCategoryColumns(e.target.checked)} />
+          Show category columns
         </label>
         {/* marginLeft:auto parks it on the right edge of the toolbar, above the
             matrix's own right edge, whatever the counts above widen to. */}
@@ -1618,24 +1620,16 @@ function GradebookView({
         </button>
       </div>
 
-      {/* Legend: the number is the percent for the lesson; the background is the state. */}
-      <div style={{ marginBottom: 8, fontSize: 12, color: '#a9b7e0', display: 'flex', flexWrap: 'wrap', gap: '4px 16px', alignItems: 'center' }}>
-        {([
-          ['rgba(80,250,123,0.25)', '#50fa7b', '92', 'done, 70% or more'],
-          ['rgba(241,250,140,0.22)', '#f1fa8c', '55', 'done, under 70%'],
-          ['rgba(241,250,140,0.14)', '#f1fa8c', '○', 'started'],
-          ['rgba(255,184,108,0.30)', '#ffb86c', '⋯', 'handed in, AI grading failed: needs you'],
-          ['rgba(255,85,85,0.28)', '#ff5555', '–', 'missing: past due, not started'],
-        ] as const).map(([bg, fg, mark, words]) => (
-          <span key={words} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-            <span aria-hidden="true" style={{ background: bg, color: fg, fontFamily: 'monospace', fontWeight: 700, minWidth: 26, textAlign: 'center', borderRadius: 3, padding: '1px 4px' }}>{mark}</span>
-            {words}
-          </span>
-        ))}
-        <span><span style={{ borderBottom: '2px solid #ff5555' }}>red underline</span> a graded lesson past due and not done, or done late (readings and slides are never marked)</span>
-        <span><span style={{ color: '#8393c4' }}>–</span> not started</span>
-        <span><strong style={{ color: '#ff5555' }}>(6)</strong> beside a grade: graded lessons past due and not done</span>
-        <span>Coloured bar on a header = grade category. Hover a cell for details. Click a student&apos;s name to open them.</span>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 16px', marginBottom: 8, fontSize: 13, color: '#8393c4' }}>
+        <span><span style={{ color: '#50fa7b' }}>■</span> Done · score %</span>
+        <span><strong style={{ color: '#ff5555' }}>!</strong> Past due · not started</span>
+        <span>· Not due yet / not started</span>
+        <span><span style={{ color: '#f1fa8c' }}>■</span> In progress</span>
+        <span><span style={{ color: '#ffb86c' }}>■</span> Needs grading</span>
+      </div>
+
+      <div aria-live="polite" style={{ margin: '0 0 8px', padding: '4px 10px', borderRadius: 5, border: '1px solid #44475a', background: '#21222c', color: '#a9b7e0', fontSize: 12 }}>
+        <strong style={{ color: '#8be9fd' }}>{displayLessons.length} more lessons →</strong> · Scroll to explore. Student names stay in view.
       </div>
 
       {/* Scrollable matrix */}
@@ -1647,17 +1641,22 @@ function GradebookView({
         before you scroll to it, freezes a box shorter than its contents, and
         slices the last student off while the window sits half empty.
       */}
+      <div style={{ position: 'relative', minHeight: 0, ...(fullScreen ? { display: 'flex', flex: 1 } : {}) }}>
+      <div aria-hidden="true" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 28, background: 'linear-gradient(to right, transparent, #8be9fd33)', borderRight: '3px solid #8be9fd88', zIndex: 5, pointerEvents: 'none' }} />
       <div
         style={{
+          width: '100%',
           overflow: 'auto',
           // In the overlay the box owns the window, so it takes the remaining
           // flex space instead of guessing at how much chrome sits above it.
           ...(fullScreen ? { flex: 1, minHeight: 0 } : { maxHeight: 'calc(100vh - 140px)' }),
           border: '1px solid #44475a',
           borderRadius: 6,
+          boxShadow: 'inset -18px 0 18px -14px #8be9fd',
+          background: 'linear-gradient(to left, #44475a, transparent 36px)',
         }}
       >
-        <table style={{ borderCollapse: 'collapse', fontSize: 12, tableLayout: 'fixed', minWidth: EMAIL_W + GRADE_W + CAT_W * shownCats.length + CELL_W * displayLessons.length }}>
+        <table style={{ borderCollapse: 'collapse', fontSize: 12, tableLayout: 'fixed', width: EMAIL_W + GRADE_W + CAT_W * categoryColumnCount + CELL_W * displayLessons.length, minWidth: EMAIL_W + GRADE_W + CAT_W * categoryColumnCount + CELL_W * displayLessons.length }}>
           {/* Unit-spanning header row */}
           <thead>
             <tr>
@@ -1666,7 +1665,7 @@ function GradebookView({
                   position: 'sticky', left: 0, top: 0, zIndex: 3,
                   width: EMAIL_W, minWidth: EMAIL_W,
                   height: HEAD1_H, boxSizing: 'border-box',
-                  background: headerBg, padding: '6px 10px',
+                  background: headerBg, padding: '10px 10px',
                   borderBottom: '1px solid #44475a', borderRight: '1px solid #44475a44',
                   textAlign: 'left', color: '#8393c4', fontSize: 11, fontWeight: 700,
                   textTransform: 'uppercase', letterSpacing: '0.06em',
@@ -1679,9 +1678,9 @@ function GradebookView({
                   position: 'sticky', left: gradeLeft, top: 0, zIndex: 3,
                   width: GRADE_W, minWidth: GRADE_W,
                   height: HEAD1_H, boxSizing: 'border-box',
-                  background: headerBg, padding: '6px 6px',
+                  background: headerBg, padding: '10px 6px',
                   borderBottom: '1px solid #44475a', borderRight: '1px solid #44475a44',
-                  textAlign: 'center', color: '#8393c4', fontSize: 11, fontWeight: 700,
+                  textAlign: 'center', color: '#8393c4', fontSize: 12, fontWeight: 700,
                   textTransform: 'uppercase', letterSpacing: '0.06em',
                 }}
                 title="Grade so far: work done plus work past its due date, under this class's weights. Lessons not due yet are left out."
@@ -1690,19 +1689,19 @@ function GradebookView({
               </th>
               {shownCats.length > 0 && (
                 <th
-                  colSpan={shownCats.length}
+                  colSpan={categoryColumnCount}
                   style={{
                     position: 'sticky', top: 0, zIndex: 2,
                     height: HEAD1_H, boxSizing: 'border-box',
                     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                    background: headerBg, padding: '6px 4px',
+                    background: headerBg, padding: '10px 4px',
                     borderBottom: '1px solid #44475a', borderRight: '1px solid #44475a44',
-                    textAlign: 'center', color: '#8393c4', fontSize: 11, fontWeight: 700,
+                    textAlign: 'center', color: '#8393c4', fontSize: 12, fontWeight: 700,
                     textTransform: 'uppercase', letterSpacing: '0.06em',
                   }}
                   title="Percent per grade category, from the same rule as the grade"
                 >
-                  Category totals
+                  {showCategoryColumns ? 'Category totals' : 'Categories'}
                 </th>
               )}
               {displaySpans.map(({ unit, count }) => (
@@ -1714,7 +1713,7 @@ function GradebookView({
                     position: 'sticky', top: 0, zIndex: 2,
                     height: HEAD1_H, boxSizing: 'border-box',
                     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                    background: headerBg, padding: '6px 4px',
+                    background: headerBg, padding: '10px 4px',
                     borderBottom: '1px solid #44475a', borderRight: '1px solid #44475a44',
                     textAlign: 'center', color: '#bd93f9', fontSize: 11, fontWeight: 700,
                     textTransform: 'uppercase', letterSpacing: '0.06em',
@@ -1743,35 +1742,33 @@ function GradebookView({
                   borderBottom: '2px solid #44475a', borderRight: '1px solid #44475a44',
                 }}
               />
-              {shownCats.map((c) => (
+              {!showCategoryColumns && shownCats.length > 0 && <th style={{ position: 'sticky', top: HEAD1_H, zIndex: 2, width: CAT_W, background: stickyBg, color: '#8393c4', fontSize: 12, borderBottom: '2px solid #44475a' }}>Summary</th>}
+              {showCategoryColumns && shownCats.map((c) => (
                 <th
                   key={c}
                   title={`${CATEGORY_LABEL[c]}: percent across this category's graded lessons`}
                   style={{
                     position: 'sticky', top: HEAD1_H, zIndex: 2,
                     width: CAT_W, minWidth: CAT_W, maxWidth: CAT_W,
-                    height: 104, verticalAlign: 'top', overflow: 'hidden',
+                    height: 76, verticalAlign: 'top', overflow: 'hidden',
                     background: stickyBg, padding: '8px 4px 6px',
                     borderTop: `3px solid ${CAT_COLOR[c]}`,
                     borderBottom: '2px solid #44475a', borderRight: '1px solid #44475a44',
-                    textAlign: 'center', color: CAT_COLOR[c], fontSize: 11, fontWeight: 700,
+                    textAlign: 'center', color: CAT_COLOR[c], fontSize: 12, fontWeight: 700,
                   }}
                 >
-                  {CAT_SHORT[c]}
-                  <div style={{ marginTop: 4, color: '#8393c4', fontSize: 10, fontWeight: 400 }}>total</div>
+                  <span style={{ whiteSpace: 'nowrap', fontSize: 13 }}>{CAT_SHORT[c]}</span>
                 </th>
               ))}
               {displayLessons.map((lesson) => (
                 <th
                   key={lesson.id}
-                  title={lesson.title}
+                  title={`${lesson.title}${lesson.maxScore ? ` · ${lesson.maxScore} pts` : ''}${gbData.dueDates?.[lesson.id] ? ` · Due ${formatDue(gbData.dueDates[lesson.id])}` : ''}`}
                   style={{
                     position: 'sticky', top: HEAD1_H, zIndex: 2,
                     width: CELL_W, minWidth: CELL_W, maxWidth: CELL_W,
-                    // `height` on a <th> is a MINIMUM, not a maximum, so the
-                    // title is clamped to three lines below; that clamp is
-                    // what keeps this row one height for every lesson.
-                    height: 104, verticalAlign: 'top', overflow: 'hidden',
+                    // Keep lesson numbers and two readable lines of title visible.
+                    height: 76, verticalAlign: 'top', overflow: 'hidden',
                     background: stickyBg, padding: '8px 4px 6px',
                     borderTop: `3px solid ${catOf.get(lesson.id) ? CAT_COLOR[catOf.get(lesson.id) as GradeCategory] : '#44475a'}`,
                     borderBottom: '2px solid #44475a', borderRight: '1px solid #44475a22',
@@ -1793,29 +1790,25 @@ function GradebookView({
                     style={{
                       color: 'inherit',
                       textDecoration: 'none',
-                      // Three lines, then an ellipsis; the full title stays in
-                      // the th's title= tooltip.
-                      display: '-webkit-box',
-                      WebkitLineClamp: 3,
-                      WebkitBoxOrient: 'vertical',
+                      // Full title stays available in the header tooltip.
+                      display: 'block',
+                      maxWidth: CELL_W - 8,
+                      whiteSpace: 'normal',
                       overflow: 'hidden',
                       lineHeight: 1.25,
-                      wordBreak: 'break-word',
+
                     }}
                   >
-                    {lesson.title}
+                    <strong style={{ display: 'block', fontSize: 13, whiteSpace: 'nowrap' }}>{lesson.title.match(/^\d+\.\d+\.\d+/)?.[0] ?? lesson.title}</strong>
+                    <span style={{ display: '-webkit-box', marginTop: 4, color: '#8393c4', fontSize: 12, fontWeight: 400, lineHeight: 1.35, WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'normal', overflowWrap: 'normal' }}>{lesson.title.replace(/^\d+\.\d+\.\d+\s*[:–—.-]?\s*/, '')}</span>
                   </a>
-                  <div style={{ marginTop: 4, color: '#a9b7e0', fontSize: 10, fontWeight: 400, lineHeight: 1.3 }}>
-                    {lesson.maxScore != null && lesson.maxScore > 0 && <div>{lesson.maxScore} pts</div>}
-                    {gbData.dueDates?.[lesson.id] ? <div>{formatDue(gbData.dueDates[lesson.id])}</div> : null}
-                  </div>
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
             {visibleStudents.length === 0 && (
-              <tr><td colSpan={displayLessons.length + shownCats.length + 2} style={{ padding: 16, color: '#8393c4' }}>No student matches. Clear the search or the filter above.</td></tr>
+              <tr><td colSpan={displayLessons.length + categoryColumnCount + 2} style={{ padding: 16, color: '#8393c4' }}>No student matches. Clear the search or the filter above.</td></tr>
             )}
             {visibleStudents.map((student, i) => (
               <tr
@@ -1828,9 +1821,9 @@ function GradebookView({
                     position: 'sticky', left: 0, zIndex: 1,
                     background: i % 2 === 0 ? '#1e1f29' : '#252636',
                     width: EMAIL_W, minWidth: EMAIL_W,
-                    padding: '6px 10px',
+                    padding: '10px 10px',
                     borderBottom: '1px solid #44475a22', borderRight: '1px solid #44475a44',
-                    fontFamily: 'monospace', fontSize: 12, color: '#8be9fd',
+                    fontFamily: 'monospace', fontSize: 14, color: '#8be9fd',
                     overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
                     cursor: 'pointer',
                   }}
@@ -1847,9 +1840,9 @@ function GradebookView({
                     <td
                       style={{
                         position: 'sticky', left: gradeLeft, zIndex: 1, background: bg,
-                        width: GRADE_W, minWidth: GRADE_W, padding: '6px 6px', textAlign: 'center',
+                        width: GRADE_W, minWidth: GRADE_W, padding: '10px 6px', textAlign: 'center',
                         borderBottom: '1px solid #44475a22', borderRight: '1px solid #44475a44',
-                        fontSize: 12, fontWeight: 700,
+                        fontSize: 14, fontWeight: 700,
                         color: !g || g.counted === 0 ? '#8393c4' : pctColor(g.pct),
                       }}
                       title={g ? (g.counted === 0 ? 'Nothing is due yet and nothing is done' : `Grade so far ${g.pct}%${g.missing > 0 ? `, ${g.missing} past due and not done` : ''}`) : 'Loading'}
@@ -1860,15 +1853,21 @@ function GradebookView({
                   );
                 })()}
                 {/* Category totals: the server's per-category percent, a dash where nothing in it counts yet */}
-                {shownCats.map((c) => {
+                {!showCategoryColumns && shownCats.length > 0 && <td style={{ width: CAT_W, padding: '10px 8px', color: '#f8f8f2', fontSize: 12, background: 'rgba(189,147,249,0.06)', borderBottom: '1px solid #44475a22' }} title={shownCats.map(c => `${CATEGORY_LABEL[c]}: ${grades.get(student.email)?.cats[c] === undefined ? 'nothing counted yet' : `${grades.get(student.email)?.cats[c]}%`}`).join(' · ')}>
+                  {(() => {
+                    const c = shownCats.find(c => grades.get(student.email)?.cats[c] !== undefined);
+                    return c ? <><strong>{CAT_SHORT[c]} {grades.get(student.email)?.cats[c]}%</strong><div style={{ color: '#8393c4', marginTop: 3 }}>{shownCats.length - 1} more categories</div></> : <span style={{ color: '#8393c4' }}>Nothing counted</span>;
+                  })()}
+                </td>}
+                {showCategoryColumns && shownCats.map((c) => {
                   const v = grades.get(student.email)?.cats[c];
                   return (
                     <td
                       key={c}
                       style={{
-                        width: CAT_W, minWidth: CAT_W, maxWidth: CAT_W, padding: '6px 4px', textAlign: 'center',
+                        width: CAT_W, minWidth: CAT_W, maxWidth: CAT_W, padding: '10px 4px', textAlign: 'center',
                         borderBottom: '1px solid #44475a22', borderRight: '1px solid #44475a22',
-                        fontSize: 12, fontWeight: 700,
+                        fontSize: 14, fontWeight: 700,
                         background: 'rgba(98,114,164,0.10)',
                         color: v === undefined ? '#8393c4' : pctColor(v),
                       }}
@@ -1887,10 +1886,10 @@ function GradebookView({
                       key={lesson.id}
                       style={{
                         width: CELL_W, minWidth: CELL_W, maxWidth: CELL_W,
-                        padding: '6px 2px',
+                        padding: '12px 2px', fontSize: 14,
                         borderBottom: '1px solid #44475a22', borderRight: '1px solid #44475a22',
                         textAlign: 'center', verticalAlign: 'middle',
-                        background: cellTint(cell, gradedIds.has(lesson.id), lessonPercent(cell?.state, cell?.score, lesson.maxScore)),
+                        background: 'transparent',
                         ...(isCodingLesson || cell ? { cursor: 'pointer' } : {}),
                       }}
                       title={cellTitle(cell, lesson.title, lesson.id, lesson.maxScore, gradedIds.has(lesson.id))}
@@ -1913,6 +1912,7 @@ function GradebookView({
             ))}
           </tbody>
         </table>
+      </div>
       </div>
     </div>
   );
@@ -1996,7 +1996,8 @@ function ListView() {
 
   return (
     <div>
-      <h1 style={S.h1}>My Classes</h1>
+      <h1 style={{ ...S.h1, marginBottom: 8 }}>My Classes</h1>
+      <p style={{ color: '#8393c4', margin: '0 0 24px', fontSize: 14 }}>Your classroom at a glance. Open a class to review work and support your students.</p>
 
       {/* Include archived toggle */}
       <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: '#8393c4', marginBottom: 20, cursor: 'pointer' }}>
@@ -2011,14 +2012,15 @@ function ListView() {
 
       {/* Class list */}
       {classes.length === 0 ? (
-        <p style={{ color: '#8393c4' }}>No classes yet. Create one above.</p>
+        <p style={{ color: '#8393c4' }}>No classes yet. Create your first class below.</p>
       ) : (
-        <div>
+        <div style={{ display: 'grid', gap: 16, maxWidth: 880 }}>
           {[...classes].sort((x, y) => Number(y.id === lastId) - Number(x.id === lastId)).map((c) => (
             <div
               key={c.id}
               style={{
                 ...S.card,
+                marginBottom: 0,
                 opacity: c.archived_at ? 0.6 : 1,
                 display: 'flex',
                 alignItems: 'center',
@@ -2028,8 +2030,9 @@ function ListView() {
               }}
             >
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-                  <span style={{ fontWeight: 600, fontSize: 16 }}>{c.name}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
+                  <span style={{ fontWeight: 600, fontSize: 22 }}>{c.name}</span>
+
                   {c.archived_at && <span style={S.badge(true)}>Archived</span>}
                   {c.id === lastId && <span style={{ fontSize: 11, color: '#8393c4' }}>last opened</span>}
                 </div>
@@ -2063,22 +2066,23 @@ function ListView() {
                 </div>
               </div>
               <button
-                style={S.btn('#8be9fd')}
+                style={{ ...S.btn('#8be9fd'), flexShrink: 0, marginLeft: 'auto' }}
                 onClick={() => router.push(`/teacher?class=${c.id}`)}
               >
-                Open →
+                {chips[c.id]?.toGrade > 0 ? 'Review work →' : 'Open class →'}
               </button>
             </div>
           ))}
         </div>
       )}
       {/* Create form */}
-      <div style={{ ...S.card, marginTop: 32 }}>
-        <h2 style={{ ...S.h2, marginBottom: 12 }}>Create a new class</h2>
-        <form onSubmit={(e) => { void handleCreate(e); }} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+      <div style={{ ...S.card, marginTop: 16, maxWidth: 880, padding: 18 }}>
+        <form onSubmit={(e) => { void handleCreate(e); }} style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+          <label htmlFor="new-class-name" style={{ fontSize: 14, fontWeight: 600 }}>Class name</label>
           <input
             style={S.input}
-            placeholder="Class name"
+            id="new-class-name"
+            placeholder="e.g. Introduction to coding"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             required
@@ -2120,6 +2124,14 @@ function parseTab(v: string | null): TabId | undefined {
 }
 
 function DetailView({ classId, initialTab }: { classId: string; initialTab?: TabId }) {
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 640px)');
+    const sync = () => setCompact(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
   const router = useRouter();
   const { confirm, toast } = useFeedback();
   const [detail, setDetail] = useState<ClassDetail | null>(null);
@@ -2227,7 +2239,6 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
     });
     return () => { cancelled = true; };
   }, [detail, classId]);
-  const behindCount = [...progressMap.values()].filter((p) => (p.gradedMissing ?? 0) > 0).length;
 
   async function handleRegenCode() {
     const ok = await confirm({
@@ -2404,22 +2415,22 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
     <div>
       {/* Back link */}
       <button
-        style={{ background: 'none', border: 'none', color: '#8be9fd', cursor: 'pointer', fontSize: 14, padding: 0, marginBottom: 24 }}
+        style={{ background: 'none', border: 'none', color: '#8be9fd', cursor: 'pointer', fontSize: 13, padding: 0, marginBottom: 8 }}
         onClick={() => router.push('/teacher')}
       >
         ← Back to list
       </button>
 
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginBottom: 28 }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-            <h1 style={{ ...S.h1, marginBottom: 0 }}>{cls.name}</h1>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: compact ? 'wrap' : 'nowrap', gap: 8, marginBottom: 8 }}>
+        <div style={{ minWidth: 0, flex: 1, flexBasis: compact ? '100%' : undefined }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4, minWidth: 0 }}>
+            <h1 style={{ ...S.h1, fontSize: compact ? 21 : 26, lineHeight: 1.2, margin: 0, overflowWrap: 'anywhere' }}>{cls.name}</h1>
             {isArchived && <span style={S.badge(true)}>Archived</span>}
           </div>
-          <div style={{ display: 'flex', gap: 20, color: '#8393c4', fontSize: 13, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: compact ? 8 : 14, color: '#8393c4', fontSize: 12, flexWrap: 'wrap' }}>
             {cls.school_year && <span>Year: {cls.school_year}</span>}
-            <span>Created: {fmt(cls.created_at)}</span>
+            {!compact && <span>Created: {fmt(cls.created_at)}</span>}
             <span title="Students join with this code. Regenerate it under Class settings.">Join code: <strong style={{ fontFamily: 'monospace', color: '#8be9fd', letterSpacing: '0.08em' }}>{currentCode}</strong></span>
             {cls.archived_at && <span>Archived: {fmt(cls.archived_at)}</span>}
           </div>
@@ -2428,22 +2439,10 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         {/* Owner-only actions */}
         {isOwner && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              <button
-                style={archiving ? S.btnDisabled : S.btn(isArchived ? '#50fa7b' : '#f1fa8c')}
-                disabled={archiving}
-                onClick={() => { void handleArchiveToggle(); }}
-              >
-                {archiving ? '…' : isArchived ? 'Unarchive' : 'Archive'}
-              </button>
-              <button
-                style={deleting ? S.btnDisabled : { ...S.btn('#ff5555'), color: '#f8f8f2' }}
-                disabled={deleting}
-                onClick={() => { void handleDelete(); }}
-              >
-                {deleting ? 'Deleting…' : 'Delete permanently'}
-              </button>
-            </div>
+            <RowMenu buttonText="Actions" label="Class actions" items={[
+              { label: isArchived ? 'Unarchive class' : 'Archive class…', disabled: archiving, onSelect: () => { void handleArchiveToggle(); } },
+              { label: 'Delete permanently…', danger: true, disabled: deleting, onSelect: () => { void handleDelete(); } },
+            ]} />
             {deleteError && <p style={S.error}>{deleteError}</p>}
             {actionError && <p style={S.error}>{actionError}</p>}
           </div>
@@ -2455,11 +2454,11 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
       <div
         role="tablist"
         aria-label="Class sections"
-        style={{ position: 'sticky', top: 0, zIndex: 20, background: '#282a36', padding: '10px 0', marginBottom: 16, display: 'flex', gap: 8, flexWrap: 'wrap', borderBottom: '1px solid #44475a' }}
+        style={{ position: 'sticky', top: 0, zIndex: 20, background: '#282a36', padding: '6px 0', marginBottom: 12, display: compact ? 'grid' : 'flex', gridTemplateColumns: compact ? 'repeat(3, minmax(0, 1fr))' : undefined, gap: compact ? 6 : 8, flexWrap: 'nowrap', overflowX: 'auto', borderBottom: '1px solid #44475a' }}
       >
         {TABS.map((t) => {
           const on = activeTab === t.id;
-          const badge = t.id === 'today' ? (awaitingCount ?? 0) : t.id === 'students' ? behindCount : 0;
+          const badge = t.id === 'today' ? (awaitingCount ?? 0) : t.id === 'students' ? roster.length : 0;
           return (
             <button
               key={t.id}
@@ -2481,16 +2480,19 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
               }}
               style={{
                 ...S.btn(on ? t.color : 'transparent'),
-                color: on ? '#282a36' : t.color,
-                border: `1px solid ${t.color}`,
-                borderRadius: 20,
+                background: on ? t.color : 'transparent',
+                color: on ? '#282a36' : '#8393c4',
+                fontWeight: on ? 700 : 500,
+                boxShadow: on ? `0 3px 0 ${t.color}` : 'none',
+                border: `1px solid ${on ? t.color : 'transparent'}`,
+                borderRadius: 6, flexShrink: 0, whiteSpace: 'nowrap', fontSize: compact ? 12 : 14, padding: compact ? '7px 7px' : '7px 16px',
               }}
             >
               {t.label}
               {badge > 0 && (
                 <span
-                  style={{ marginLeft: 8, background: on ? '#282a36' : t.color, color: on ? t.color : '#282a36', borderRadius: 10, padding: '0 7px', fontSize: 11, fontWeight: 700 }}
-                  title={t.id === 'today' ? `${badge} submission${badge === 1 ? '' : 's'} waiting for you to grade` : `${badge} student${badge === 1 ? '' : 's'} with work past due`}
+                  style={{ marginLeft: compact ? 4 : 8, background: on ? '#282a36' : t.color, color: on ? t.color : '#282a36', borderRadius: 10, padding: compact ? '0 4px' : '0 7px', fontSize: 11, fontWeight: 700 }}
+                  title={t.id === 'today' ? `${badge} submission${badge === 1 ? '' : 's'} waiting for you to grade` : `${badge} enrolled student${badge === 1 ? '' : 's'}`}
                 >
                   {badge}
                 </span>
@@ -2503,8 +2505,8 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
       {activeTab === 'today' && (
         <div role="tabpanel" id={`panel-today`} aria-labelledby={`tab-today`} style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
         {/* Needs Attention view */}
-          <div style={{ ...S.card, marginBottom: 28 }}>
-            <h2 style={{ ...S.h2, marginBottom: 16 }}>Needs Attention</h2>
+          <div style={{ ...S.card, padding: '10px 12px', marginBottom: 0 }}>
+            <h2 style={{ ...S.h2, fontSize: 13, marginBottom: 8 }}>Needs Attention</h2>
             <NeedsAttentionPanel
               classId={classId}
               lessonTitles={lessonTitles}
@@ -2522,12 +2524,12 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             />
           </div>
         {/* Submission Review Queue */}
-        <div style={S.card}>
-          <h2 style={S.h2}>Submission Review Queue</h2>
+        <div id="submission-review-queue" style={{ ...S.card, padding: compact ? 12 : 16, marginBottom: 0, scrollMarginTop: 100 }}>
+          <h2 style={{ ...S.h2, fontSize: 18, marginBottom: 10 }}>Submission Review Queue</h2>
           <SubmissionQueue classId={classId} lessonTitles={lessonTitles} />
         </div>
         {/* Past due */}
-        <div style={S.card}>
+        <div style={{ ...S.card, padding: compact ? 16 : 24, marginBottom: 0 }}>
           <h2 style={S.h2}>Past due</h2>
           <PastDuePanel classId={classId} />
         </div>
@@ -2537,7 +2539,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
       {activeTab === 'students' && (
         <div role="tabpanel" id={`panel-students`} aria-labelledby={`tab-students`} style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
         {/* Roster view */}
-          <div style={{ ...S.card, marginBottom: 28 }}>
+          <div style={{ ...S.card, padding: compact ? 14 : 20, marginBottom: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 4 }}>
             <h2 style={{ ...S.h2, marginBottom: 0 }}>Roster ({roster.length})</h2>
             <button
@@ -2569,7 +2571,8 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             {roster.length === 0 ? (
               <p style={{ color: '#8393c4', fontSize: 14 }}>No students enrolled yet.</p>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: compact ? 8 : 0 }}>
+                {!compact && <div style={{ display: 'grid', gridTemplateColumns: 'minmax(200px, 2fr) 170px 120px 90px 150px 100px', gap: 16, padding: '10px 12px 8px', color: '#f8f8f2', fontSize: 12, fontWeight: 600 }}><span>Student</span><span>Grade so far</span><span>Graded done</span><span>Past due</span><span>Last active</span><span /></div>}
                 {roster.map((row) => {
                   const prog = progressMap.get(row.student_email);
                   // A stale or older response can lack weightedPercent; a NaN
@@ -2578,59 +2581,26 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                   return (
                     <div
                       key={row.student_email}
-                      style={{ background: '#282a36', borderRadius: 6, padding: '12px 16px', border: '1px solid #44475a33', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}
+                      style={{ background: '#282a36', borderRadius: compact ? 6 : 0, padding: compact ? '10px 12px' : '5px 12px', borderBottom: '1px solid #44475a', display: 'grid', gridTemplateColumns: compact ? 'minmax(0, 1fr) auto' : 'minmax(200px, 2fr) 170px 120px 90px 150px 100px', alignItems: 'center', gap: compact ? '7px 8px' : 16 }}
                     >
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        {(() => {
-                          const nm = fullName(prog?.firstName, prog?.lastName);
-                          return (
-                            <div style={{ marginBottom: 4 }}>
-                              <span style={{ fontSize: 15, fontWeight: 600, color: '#f8f8f2' }}>{nm ?? row.student_email}</span>
-                              {nm && <span style={{ fontFamily: 'monospace', fontSize: 12, color: '#8393c4', marginLeft: 10 }}>{row.student_email}</span>}
-                            </div>
-                          );
-                        })()}
-                        <div style={{ display: 'flex', gap: 16, fontSize: 12, color: '#8393c4', flexWrap: 'wrap' }}>
-                          <span>
-                            Enrolled: {fmt(row.enrolled_at)} by {row.enrolled_by ?? 'self'}
-                          </span>
-                          {prog ? (
-                            <>
-                              <span
-                                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
-                                title={`Grade so far: ${wp}%. Counts work that is done plus work past its due date, under this class's weights. Lessons not due yet are left out.`}
-                              >
-                                <MiniBar pct={wp} />
-                                <span style={{ color: prog.gradedCounted === 0 ? '#8393c4' : pctColor(wp), fontWeight: 600 }}>
-                                  {prog.gradedCounted === 0 ? 'No grade yet' : `${wp}% so far`}
-                                </span>
-                              </span>
-                              {typeof prog.gradedTotal === 'number' && prog.gradedTotal > 0 && (
-                                <span title="Graded lessons this student has finished, out of every graded lesson in the course">
-                                  {prog.gradedDone ?? 0} of {prog.gradedTotal} graded lessons done
-                                </span>
-                              )}
-                              {(prog.gradedMissing ?? 0) > 0 && (
-                                <span style={{ color: '#ff5555' }} title="Past their due date and not done: each counts as a 0 in the grade so far">
-                                  {prog.gradedMissing} past due
-                                </span>
-                              )}
-                              <span style={{ color: '#50fa7b' }}>{prog.completed_count} completed</span>
-                              {prog.started_count > 0 && (
-                                <span style={{ color: '#f1fa8c' }}>{prog.started_count} started</span>
-                              )}
-                              {prog.last_active !== null && (
-                                <span>last active {fmtTs(prog.last_active)}</span>
-                              )}
-                            </>
-                          ) : (
-                            <span>No activity yet</span>
-                          )}
-                        </div>
+                      <div style={{ minWidth: 0 }} title={`Enrolled ${fmt(row.enrolled_at)} by ${row.enrolled_by ?? 'self'}`}>
+                        <div style={{ fontSize: 15, fontWeight: 600, color: '#f8f8f2', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fullName(prog?.firstName, prog?.lastName) ?? row.student_email}</div>
+                        {!compact && <div style={{ color: '#8393c4', fontSize: 11, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.student_email}</div>}
+                        {!compact && prog && <span style={{ display: 'inline-block', marginTop: 5, padding: '3px 7px', borderRadius: 4, fontSize: 12, fontWeight: 600, color: prog.gradedMissing ? '#ff5555' : prog.last_active ? '#50fa7b' : '#8393c4', background: prog.gradedMissing ? 'rgba(255,85,85,0.1)' : '#21222c' }}>{prog.gradedMissing ? `Behind · ${prog.gradedMissing} past due` : prog.last_active ? 'On track' : 'No activity yet'}</span>}
                       </div>
-                      <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                      <div title="Grade so far, under this class's weights" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        {!compact && <MiniBar pct={wp} />}
+                        {compact && <span style={{ color: '#8393c4', fontSize: 12 }}>grade</span>}
+                        <strong style={{ color: prog?.gradedCounted ? pctColor(wp) : '#8393c4', fontSize: compact ? 16 : 15, fontVariantNumeric: 'tabular-nums' }}>{prog?.gradedCounted ? `${wp}%` : '—'}</strong>
+                      </div>
+                      <div style={{ display: 'flex', gap: 8, fontSize: compact ? 13 : 14, color: compact ? '#8393c4' : '#f8f8f2', fontVariantNumeric: 'tabular-nums' }}>
+                        <span style={{ whiteSpace: 'nowrap' }}>{prog?.gradedDone ?? 0}/{prog?.gradedTotal ?? '—'}{compact && ' graded'}</span>
+                        {compact && <span style={{ whiteSpace: 'nowrap', fontWeight: prog?.gradedMissing ? 700 : 400, color: prog?.gradedMissing ? '#ff5555' : '#8393c4' }}>{prog?.gradedMissing ?? 0} past due</span>}
+                      </div>
+                      {!compact && <><strong style={{ fontSize: 15, fontVariantNumeric: 'tabular-nums', color: prog?.gradedMissing ? '#ff5555' : '#8393c4' }}>{prog?.gradedMissing || '—'}</strong><span style={{ fontSize: 13, color: '#f8f8f2' }}>{prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'}</span></>}
+                      <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
                         <button
-                          style={S.btn('#8be9fd')}
+                          style={{ ...S.btn('#8be9fd'), padding: compact ? '4px 10px' : '7px 12px', fontSize: 12 }}
                           onClick={() => { setDrawerLesson(null); setDrawerEmail(row.student_email); }}
                         >
                           Open
@@ -2680,7 +2650,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
       {activeTab === 'gradebook' && (
         <div role="tabpanel" id={`panel-gradebook`} aria-labelledby={`tab-gradebook`} style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
         {/* Gradebook view */}
-          <div style={{ ...S.card, marginBottom: 28 }}>
+          <div style={{ ...S.card, padding: compact ? 16 : 24, marginBottom: 0 }}>
             <h2 style={{ ...S.h2, marginBottom: 16 }}>Gradebook</h2>
             <GradebookView
               classId={classId}
@@ -2689,7 +2659,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
               onOpenStudent={(email, lessonId) => { setDrawerLesson(lessonId ?? null); setDrawerEmail(email); }}
             />
           </div>
-          <div style={{ ...S.card, marginBottom: 28 }}>
+          <div style={{ ...S.card, padding: compact ? 16 : 24, marginBottom: 0 }}>
             <h2 style={{ ...S.h2, marginBottom: 16 }}>Most missed</h2>
             <MostMissedPanel classId={classId} onOpenStudent={(email) => { setDrawerLesson(null); setDrawerEmail(email); }} />
           </div>
@@ -2721,15 +2691,20 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
       )}
 
       {activeTab === 'settings' && (
-        <div role="tabpanel" id={`panel-settings`} aria-labelledby={`tab-settings`} style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
+        <div role="tabpanel" id={`panel-settings`} aria-labelledby={`tab-settings`} style={{ display: 'grid', alignItems: 'start', gap: 20, gridTemplateColumns: compact ? 'minmax(0, 1fr)' : 'repeat(2, minmax(0, 1fr))' }}>
+        {/* Grading weights */}
+        <div style={{ ...S.card, marginBottom: 0, padding: compact ? 14 : 20 }}>
+          <GradingWeightsPanel classId={classId} />
+        </div>
+        <div style={{ display: 'grid', gap: 16, minWidth: 0 }}>
         {/* Code */}
-        <div style={{ ...S.card, marginBottom: 28 }}>
+        <div style={{ ...S.card, padding: compact ? 14 : 20, marginBottom: 0 }}>
           <div style={{ color: '#8393c4', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Join Code</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
             <span style={S.code}>{currentCode}</span>
             {isOwner ? (
               <button
-                style={regenerating ? S.btnDisabled : S.btn('#ff79c6')}
+                style={regenerating ? S.btnDisabled : { ...S.btn('transparent'), color: '#8393c4', border: '1px solid #44475a' }}
                 disabled={regenerating}
                 onClick={() => { void handleRegenCode(); }}
               >
@@ -2763,17 +2738,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                     </div>
                   </div>
                   {isOwner && (
-                    <button
-                      style={
-                        removingCoTeacher === ct.teacher_email
-                          ? S.btnDisabled
-                          : { ...S.btn('#ff5555'), color: '#f8f8f2' }
-                      }
-                      disabled={removingCoTeacher === ct.teacher_email}
-                      onClick={() => { void handleRemoveCoTeacher(ct.teacher_email); }}
-                    >
-                      {removingCoTeacher === ct.teacher_email ? '…' : 'Remove'}
-                    </button>
+                    <RowMenu label={`Actions for ${ct.teacher_email}`} disabled={removingCoTeacher === ct.teacher_email} items={[{ label: 'Remove co-teacher…', danger: true, onSelect: () => { void handleRemoveCoTeacher(ct.teacher_email); } }]} />
                   )}
                 </div>
               ))}
@@ -2800,10 +2765,6 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
           )}
           {coTeacherError && <p style={S.error}>{coTeacherError}</p>}
         </div>
-        {/* Grading weights */}
-        <div style={S.card}>
-          <h2 style={S.h2}>Grading weights</h2>
-          <GradingWeightsPanel classId={classId} />
         </div>
         {/* Announcements */}
         <div style={S.card}>

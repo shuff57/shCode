@@ -166,6 +166,7 @@ function DateTimeField({
   onClear,
   ariaSuffix,
   pastHint,
+  showLabel = true,
 }: {
   label: string;
   color: string;
@@ -175,6 +176,7 @@ function DateTimeField({
   ariaSuffix: string;
   /** Forwarded to the popover grid; set on available-after fields only. */
   pastHint?: string;
+  showLabel?: boolean;
 }) {
   const date = row?.date ?? '';
   const time = row?.time ?? '';
@@ -189,34 +191,10 @@ function DateTimeField({
   return (
     // flexWrap + maxWidth: at phone width the label, calendar, date, time and clear controls are wider than the
     // row, and a nowrap field pushed the page 23px past the screen.
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, flexWrap: 'wrap', maxWidth: '100%' }}>
-      <span style={{ fontSize: 11, color, textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
-        {label}
-      </span>
-      <button
-        ref={dateRef}
-        type="button"
-        title={`Open the ${label.toLowerCase()} calendar`}
-        aria-label={`Open the ${label.toLowerCase()} calendar for ${ariaSuffix}`}
-        aria-expanded={calOpen}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          setCalOpen((v) => !v);
-        }}
-        style={{
-          background: 'none',
-          border: `1px solid ${calOpen ? C.accent : C.border}`,
-          borderRadius: 4,
-          color: C.accent,
-          cursor: 'pointer',
-          display: 'inline-flex',
-          alignItems: 'center',
-          padding: 3,
-        }}
-      >
-        <Calendar size={13} strokeWidth={2} />
-      </button>
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', boxSizing: 'border-box', maxWidth: '100%', padding: '0 0 0 12px', borderLeft: `1px solid ${C.border}` }}>
+      {showLabel && <span style={{ fontSize: 13, color }}>{label}</span>}
+      <span style={{ position: 'relative', display: 'inline-flex' }}>
+      {!date && <span aria-hidden="true" style={{ position: 'absolute', left: 7, top: 1, bottom: 1, right: 26, display: 'flex', alignItems: 'center', background: C.input, color: C.dim, fontSize: 13, pointerEvents: 'none', zIndex: 1 }}>Not set</span>}
       <input
         type="date"
         value={date}
@@ -229,6 +207,32 @@ function DateTimeField({
         style={dateInput}
         aria-label={`${label} date for ${ariaSuffix}`}
       />
+      <button
+        ref={dateRef}
+        type="button"
+        title={`Open the ${label.toLowerCase()} calendar`}
+        aria-label={`Open the ${label.toLowerCase()} calendar for ${ariaSuffix}`}
+        aria-expanded={calOpen}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setCalOpen((v) => !v);
+        }}
+        style={{
+          background: C.input,
+          border: `1px solid ${calOpen ? C.accent : C.border}`,
+          borderRadius: 4,
+          color: C.accent,
+          cursor: 'pointer',
+          display: 'inline-flex',
+          alignItems: 'center',
+          padding: 3,
+          position: 'absolute', right: 2, top: 2, bottom: 2, zIndex: 2,
+        }}
+      >
+        <Calendar size={13} strokeWidth={2} />
+      </button>
+      </span>
       <input
         type="time"
         value={time}
@@ -414,18 +418,21 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
 
   return (
     <div>
-      <p style={{ color: C.dim, fontSize: 13, margin: '0 0 6px 0' }}>
+      <p style={{ color: C.dim, fontSize: 13, margin: '0 0 4px 0' }}>Set module dates for the whole group, or open a module to set individual lessons.</p>
+      <details style={{ color: C.dim, fontSize: 13, margin: '0 0 14px 0' }}>
+        <summary style={{ color: C.accent, cursor: 'pointer', marginBottom: 6 }}>How dates work</summary>
+        <div>
         A module&apos;s date applies to every lesson inside it. Give one lesson its own date and the
         module reads <strong>Mixed</strong>; clear that date and the lesson goes back to inheriting.
-      </p>
-      <p style={{ color: C.dim, fontSize: 13, margin: '0 0 14px 0' }}>
+        <br />
         <strong style={{ color: C.open }}>Available after</strong> is a lock: before it, students see the lesson
         greyed out with the date on it and cannot open it. Leave it blank and the lesson is available
         immediately, which is how all {lessons.length > 0 ? lessons.length : 'the'} lessons behave today.{' '}
         <strong>Due</strong> never locks — a past-due lesson still opens and still submits. Set a date
         and leave the time blank and Available after starts at midnight, Due lands at 11:59 PM. All times are
         school time.
-      </p>
+        </div>
+      </details>
 
       {error && (
         <p style={{ color: '#ff5555', fontSize: 13, marginBottom: 12 }}>{error}</p>
@@ -443,11 +450,14 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
       )}
 
       {units.map((unit) => (
-        <div key={unit.unitId} style={{ marginBottom: 22 }}>
+        <div key={unit.unitId} style={{ marginBottom: 16, overflowX: 'auto' }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: C.accent, marginBottom: 8 }}>
             {unit.unitId}
           </div>
 
+          <div style={{ display: 'grid', gridTemplateColumns: 'minmax(280px, 1fr) 370px 370px', gap: 12, minWidth: 1044, padding: '6px 0 8px', borderBottom: `1px solid ${C.border}`, color: C.dim, fontSize: 12, fontWeight: 600 }}>
+            <span>Module</span><span style={{ color: C.open }}>Available after · Date / time</span><span>Due · Date / time</span>
+          </div>
           {unit.modules.map((mod) => {
             const lessonIds = mod.lessons.map((l) => l.id);
             const dueSummary = moduleDueSummary(index.due, mod.moduleId, lessonIds, mod.unitId);
@@ -468,8 +478,8 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
             };
 
             return (
-              <div key={mod.moduleId} style={{ borderBottom: `1px solid ${C.border}`, padding: '8px 0' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+              <div key={mod.moduleId} style={{ borderBottom: `1px solid ${C.border}`, padding: '8px 0', minHeight: 46, boxSizing: 'border-box', minWidth: 1044 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(280px, 1fr) 370px 370px', alignItems: 'center', gap: 12 }}>
                   <button
                     type="button"
                     onClick={() => toggle(mod.moduleId)}
@@ -477,7 +487,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                     style={{
                       background: 'none', border: 'none', color: C.text, cursor: 'pointer',
                       display: 'inline-flex', alignItems: 'center', gap: 6, padding: 0,
-                      fontSize: 14, fontFamily: 'inherit', flex: '1 1 240px', textAlign: 'left',
+                      fontSize: 14, whiteSpace: 'nowrap', fontWeight: 600, fontFamily: 'inherit', flex: '1 1 240px', textAlign: 'left',
                     }}
                   >
                     {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
@@ -494,6 +504,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                     onWrite={(date, time) => { void write('open', [{ scope: 'module', scopeId: mod.moduleId, date, time }]); }}
                     ariaSuffix={`module ${mod.moduleId}`}
                     pastHint={OPEN_PAST_HINT}
+                    showLabel={false}
                   />
 
                   <DateTimeField
@@ -502,10 +513,11 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                     row={byKey.due.get(`module:${mod.moduleId}`)}
                     onWrite={(date, time) => { void write('due', [{ scope: 'module', scopeId: mod.moduleId, date, time }]); }}
                     ariaSuffix={`module ${mod.moduleId}`}
+                    showLabel={false}
                   />
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', margin: '6px 0 0 22px' }}>
+                <div style={{ display: isOpen || openSummary.kind === 'mixed' || dueSummary.kind === 'mixed' ? 'flex' : 'none', alignItems: 'center', gap: 12, flexWrap: 'wrap', margin: '6px 0 0 22px' }}>
                   {openSummary.kind !== 'none' && (
                     <span style={{ fontSize: 12, color: openSummary.kind === 'mixed' ? C.warn : C.open }}>
                       {openSummary.kind === 'mixed'
@@ -553,7 +565,10 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                 </div>
 
                 {isOpen && (
-                  <div style={{ margin: '10px 0 6px 22px' }}>
+                  <div style={{ margin: '10px 0 6px 22px', overflowX: 'auto' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(220px, 1fr) 350px 350px auto auto', gap: 10, minWidth: 1040, padding: '0 0 6px', borderBottom: `1px solid ${C.border}`, color: C.dim, fontSize: 12, fontWeight: 600 }}>
+                      <span>Lesson</span><span style={{ color: C.open }}>Available after</span><span>Due</span><span>Early access</span><span>Late access</span>
+                    </div>
                     {mod.lessons.map((lesson) => {
                       const openRow = byKey.open.get(`lesson:${lesson.id}`);
                       const dueRow = byKey.due.get(`lesson:${lesson.id}`);
@@ -563,7 +578,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                       return (
                         <div
                           key={lesson.id}
-                          style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '4px 0', flexWrap: 'wrap' }}
+                          style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 12, padding: '8px 0', borderBottom: `1px solid ${C.border}66` }}
                         >
                           <span
                             style={{
@@ -576,7 +591,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                             {lesson.counts && (
                               <span
                                 style={{
-                                  marginLeft: 8, padding: '1px 6px', fontSize: 11, whiteSpace: 'nowrap',
+                                  marginLeft: 8, padding: '1px 6px', fontSize: 12, whiteSpace: 'nowrap',
                                   color: C.text, border: `1px solid ${C.dim}`, borderRadius: 999,
                                 }}
                               >
@@ -608,6 +623,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                             onClear={() => { void write('open', [{ scope: 'lesson', scopeId: lesson.id, date: null }]); }}
                             ariaSuffix={fieldName}
                             pastHint={OPEN_PAST_HINT}
+                            showLabel={false}
                           />
 
                           <DateTimeField
@@ -617,6 +633,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                             onWrite={(date, time) => { void write('due', [{ scope: 'lesson', scopeId: lesson.id, date, time }]); }}
                             onClear={() => { void write('due', [{ scope: 'lesson', scopeId: lesson.id, date: null }]); }}
                             ariaSuffix={fieldName}
+                            showLabel={false}
                           />
 
                           <LessonAccessChip classId={classId} lessonId={lesson.id} lessonTitle={lesson.title} kind="early" />

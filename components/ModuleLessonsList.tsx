@@ -29,7 +29,7 @@ const stateStripeColors: Record<string, string> = {
 };
 
 const stateLabels: Record<string, string> = {
-  completed: 'Done',
+  completed: '✓ Done',
   started: 'In progress',
 };
 
@@ -151,7 +151,7 @@ export default function ModuleLessonsList({
         const rowStyle: React.CSSProperties = {
           padding: '10px 14px',
           borderLeft: '4px solid ' + badge.color,
-          borderRight: '4px solid ' + stripeColor,
+          borderRight: '2px solid ' + stripeColor,
           textDecoration: 'none',
           color: 'var(--text)',
           opacity: locked ? 0.5 : 1,
@@ -180,10 +180,7 @@ export default function ModuleLessonsList({
               <badge.Icon size={12} strokeWidth={2.25} />
               {badge.label}
             </span>
-            <span className="mod-row-num" style={{ opacity: 0.5, fontFamily: 'monospace' }}>
-              {l.numberedId}
-            </span>
-            <span className="mod-row-title" style={{ fontWeight: 500 }}>{l.displayTitle}</span>
+            <span className="mod-row-title" style={{ fontWeight: 500 }}><span className="mod-row-num" style={{ color: '#8393c4', fontFamily: 'monospace', marginRight: 8 }}>{l.numberedId}</span>{l.displayTitle}</span>
             <span className="mod-row-meta">
             {locked ? (
               <span

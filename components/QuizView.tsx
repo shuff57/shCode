@@ -300,7 +300,7 @@ export default function QuizView({ lessonId, config }: Props) {
   if (!questions.length) return null;
 
   return (
-    <section style={{ marginTop: 36, paddingTop: 20, borderTop: '2px solid #44475a' }}>
+    <section className="student-quiz" style={{ marginTop: 16, paddingTop: 12, borderTop: '2px solid #44475a' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
         <h2
           style={{
@@ -321,7 +321,7 @@ export default function QuizView({ lessonId, config }: Props) {
           </div>
         )}
       </div>
-      <p style={{ color: '#888', fontSize: 13, margin: '0 0 20px' }}>
+      <p style={{ color: '#8393c4', fontSize: 13, margin: '0 0 20px' }}>
         {capped
           ? `Answer all ${questions.length}. After each try you see your total, not which ones were wrong. Submit what you have if one has you stuck: the next part unlocks and you can come back and use your other tries.`
           : summative
@@ -357,8 +357,8 @@ export default function QuizView({ lessonId, config }: Props) {
               border: '1px solid #44475a',
               borderLeft: `4px solid ${isCorrect ? '#50fa7b' : isWrong ? '#ff5555' : '#44475a'}`,
               borderRadius: 6,
-              padding: '14px 16px',
-              marginBottom: 14,
+              padding: '12px 16px',
+              marginBottom: 10,
             }}
           >
             <div
@@ -394,7 +394,7 @@ export default function QuizView({ lessonId, config }: Props) {
               </pre>
             ) : null}
 
-            <div style={{ marginLeft: 30 }}>
+            <div style={{ marginLeft: 0 }}>
               {order.map((oi) => {
                 const opt = q.options[oi];
                 const selected = picked === oi;
@@ -412,7 +412,8 @@ export default function QuizView({ lessonId, config }: Props) {
                       display: 'flex',
                       gap: 10,
                       alignItems: 'flex-start',
-                      padding: '7px 10px',
+                      padding: '9px 12px',
+                      minHeight: 44,
                       marginBottom: 4,
                       borderRadius: 4,
                       cursor: 'pointer',
@@ -424,7 +425,7 @@ export default function QuizView({ lessonId, config }: Props) {
                             ? '#44475a'
                             : 'transparent',
                       color: '#f8f8f2',
-                      fontSize: 14,
+                      fontSize: 15,
                       lineHeight: 1.5,
                     }}
                   >
@@ -445,7 +446,7 @@ export default function QuizView({ lessonId, config }: Props) {
             {showMarks ? (
               <div
                 style={{
-                  marginLeft: 30,
+                  marginLeft: 0,
                   marginTop: 10,
                   paddingTop: 10,
                   borderTop: '1px solid #44475a',
@@ -504,7 +505,7 @@ export default function QuizView({ lessonId, config }: Props) {
             border: 'none',
             borderRadius: 6,
             padding: '10px 20px',
-            fontSize: 14,
+            fontSize: 15,
             fontWeight: 600,
             cursor: canSubmit ? 'pointer' : 'not-allowed',
           }}
@@ -523,7 +524,7 @@ export default function QuizView({ lessonId, config }: Props) {
         </button>
 
         {!allAnswered ? (
-          <span style={{ color: '#888', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{ color: '#8393c4', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
             <Circle size={14} color="#6272a4" />
             {answeredCount} of {questions.length} answered
           </span>
@@ -533,7 +534,7 @@ export default function QuizView({ lessonId, config }: Props) {
           <span
             style={{
               color: allAnswered ? '#50fa7b' : '#ffb86c',
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
@@ -555,7 +556,7 @@ export default function QuizView({ lessonId, config }: Props) {
           <span
             style={{
               color: passed ? '#50fa7b' : '#ffb86c',
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',

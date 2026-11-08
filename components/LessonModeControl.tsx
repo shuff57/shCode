@@ -84,6 +84,7 @@ export default function LessonModeControl({ classId, lessons }: Props) {
               disabled={busy === id}
               aria-pressed={current === c.value}
               title={c.hint}
+              style={{ fontSize: 12, ...(current === c.value ? {} : { color: '#8393c4' }) }}
               className={current === c.value ? 'on' : undefined}
               onClick={() => set(id, c.value)}
             >
@@ -99,7 +100,7 @@ export default function LessonModeControl({ classId, lessons }: Props) {
     <div className="lmc">
       <div className="lmc-head">
         <strong>Shape tools or code</strong>
-        <span className="lmc-sub">
+        <span className="lmc-sub" style={{ color: '#8393c4', fontSize: 13 }}>
           An assignment setting beats the class setting. Anything left on
           &ldquo;their choice&rdquo; lets the student decide.
         </span>
@@ -111,7 +112,7 @@ export default function LessonModeControl({ classId, lessons }: Props) {
 
       {lessons.length > 0 && (
         <>
-          <div className="lmc-sep">Per assignment</div>
+          <div className="lmc-sep" style={{ color: '#8393c4', fontSize: 12 }}>Per assignment</div>
           {lessons.map((l) => (
             <Row key={l.id} id={l.id} label={l.title} current={perLesson.get(l.id) ?? null} />
           ))}

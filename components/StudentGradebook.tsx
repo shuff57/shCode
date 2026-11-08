@@ -80,7 +80,7 @@ const STATUS_LABEL: Record<CellStatus, string> = {
 const STATUS_COLOR: Record<CellStatus, string> = {
   pending: '#f1fa8c',
   done: '#50fa7b',
-  'done-late': '#ffb86c',
+  'done-late': '#50fa7b',
   started: '#8be9fd',
   missing: '#ff5555',
   'not-started': '#94a3b8',
@@ -184,7 +184,8 @@ export default function StudentGradebook({ lessons }: Props) {
     .filter(({ lesson, status }) => {
       if (status !== 'missing' && status !== 'not-started') return true;
       return lessonGradeCategory({ title: lesson.title, preview: lesson.preview, scoreKind: lesson.scoreKind, assignmentCode: lesson.assignmentCode }) !== null;
-    });
+    })
+    .sort((a, b) => Number(b.status === 'missing') - Number(a.status === 'missing'));
 
   // "Missing or late" is what a student can still act on or should know about; "In progress" is
   // work they have started and not finished. They used to be one "Needs attention" list, which told
@@ -210,12 +211,11 @@ export default function StudentGradebook({ lessons }: Props) {
           <div key={g.classId} style={{ marginBottom: 12 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
               <span style={{ fontSize: 28, fontWeight: 700 }}>{g.percent}%</span>
+              {g.missingCount > 0 && <a href="#missing-late-filter" style={{ color: '#f8f8f2', fontSize: 15, maxWidth: 440 }}><strong style={{ fontSize: 24 }}>{g.missingCount}</strong> graded lessons past due</a>}
               <span style={{ opacity: 0.7 }}>{grades.length > 1 ? g.className : 'in your class'}</span>
             </div>
-            <div style={{ opacity: 0.6, fontSize: 13, marginTop: 2 }}>
-              Counts work that is done plus work past its due date. Lessons not due yet are left out.
-              {' '}{g.doneCount} of {g.gradedTotal} graded lessons done
-              {g.missingCount > 0 ? ` \u00b7 ${g.missingCount} past due and not done` : ''}.
+            <div style={{ color: '#8393c4', fontSize: 14, marginTop: 6 }}>
+              Unfinished work past its due date counts as zero until you finish it; work not due yet is excluded.
             </div>
           </div>
         ))}
@@ -242,6 +242,7 @@ export default function StudentGradebook({ lessons }: Props) {
         </button>
         <button
           type="button"
+          id="missing-late-filter"
           onClick={() => setFilter('attention')}
           style={filter === 'attention' ? tabActive : tabIdle}
         >
@@ -352,7 +353,7 @@ export default function StudentGradebook({ lessons }: Props) {
                           </span>
                         )}
                       </td>
-                      <td style={{ ...tdStyle, opacity: dueSoon ? 1 : 0.65 }}>
+                      <td style={{ ...tdStyle, color: '#b9c5e8' }}>
                         {due ? formatDue(due) : '—'}
                         {dueSoon && <span style={{ ...chipStyle, color: '#ffb86c', borderColor: '#ffb86c' }}>due soon</span>}
                       </td>
@@ -470,7 +471,7 @@ const rowStyle: React.CSSProperties = { borderTop: '1px solid rgba(68,71,90,0.4)
 
 const thStyle: React.CSSProperties = { padding: '4px 10px 8px 0', fontWeight: 600 };
 
-const tdStyle: React.CSSProperties = { padding: '9px 10px 9px 0', verticalAlign: 'top' };
+const tdStyle: React.CSSProperties = { padding: '6px 10px 6px 0', verticalAlign: 'top' };
 
 const scoreCellStyle: React.CSSProperties = {
   ...tdStyle,
