@@ -51,6 +51,8 @@ export default function ContentLessonView({ lesson }: Props) {
   const badge = badgeFor(preview);
   const contentMd = findContent(lesson);
   const meta = lesson as any;
+  // Sans body copy is for reading and worked-example prose only (climb 2 r1, council-narrowed).
+  const proseBody = !meta.quiz && !meta.diagram && !meta.aiGrader && preview !== 'video' && preview !== 'slides';
   // A writeup (the WrittenGrader branch below) draws its rubric AFTER the "What to answer"
   // box, not above it in file order. No rubric heading: everything renders as before.
   const rubricSplit = !meta.quiz && !meta.diagram && meta.aiGrader ? splitRubric(contentMd) : null;
@@ -296,7 +298,7 @@ export default function ContentLessonView({ lesson }: Props) {
       ) : null}
 
       {bodyMd ? (
-        <div className={lesson.type === 'example' ? 'compact-example' : undefined} style={{ marginTop: 12 }}>
+        <div className={[proseBody ? 'prose-copy' : '', lesson.type === 'example' ? 'compact-example' : '', preview === 'example' ? 'worked-example' : ''].filter(Boolean).join(' ') || undefined} style={{ marginTop: 12 }}>
           {meta.quiz ? <details className="quiz-intro"><summary style={{ cursor: 'pointer', color: '#8393c4', fontSize: 13 }}>Review lesson instructions</summary><MarkdownWithLiveBlocks src={bodyMd} lessonId={lesson.id} /></details> : <MarkdownWithLiveBlocks src={bodyMd} lessonId={lesson.id} />}
         </div>
       ) : null}
@@ -337,7 +339,6 @@ export default function ContentLessonView({ lesson }: Props) {
       </div>
 
       <style>{`
-        .compact-example .content-prose { font-size: 14px; line-height: 1.5; }
         .compact-example .content-prose em { font-style: normal; font-size: 12px; color: #8393c4; }
         .compact-example .content-prose p { margin: 8px 0; }
         .compact-example .content-prose h2 { font-size: 22px; font-weight: 700; line-height: 1.3; margin-top: 14px; margin-bottom: 8px; font-size: 19px; }
@@ -349,6 +350,7 @@ export default function ContentLessonView({ lesson }: Props) {
         .content-prose th { background: #44475a; }
         .content-prose code { background: #282a36; padding: 1px 5px; border-radius: 3px; color: #ffb86c; }
         .content-prose { min-width: 0; max-width: 72ch; line-height: 1.75; }
+        .prose-copy .content-prose { line-height: 1.6; }
         .content-prose p { margin: 0 0 1.25em; }
         .content-prose li { margin: 0.6em 0; }
         .content-prose pre { background: #282a36; padding: 12px; border-radius: 6px; overflow-x: auto; max-width: 100%; box-sizing: border-box; -webkit-overflow-scrolling: touch; }

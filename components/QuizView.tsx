@@ -373,7 +373,7 @@ export default function QuizView({ lessonId, config }: Props) {
               }}
             >
               <span style={{ color: '#6272a4', fontWeight: 600, minWidth: 22 }}>{qi + 1}.</span>
-              <span>{withInlineCode(q.question)}</span>
+              <span className="prose-copy">{withInlineCode(q.question)}</span>
             </div>
 
             {q.code ? (
@@ -407,6 +407,7 @@ export default function QuizView({ lessonId, config }: Props) {
                 const markAsMistake = showMarks && selected && oi !== answerIndex;
                 return (
                   <label
+                    className="prose-copy"
                     key={oi}
                     style={{
                       display: 'flex',
@@ -425,8 +426,6 @@ export default function QuizView({ lessonId, config }: Props) {
                             ? '#44475a'
                             : 'transparent',
                       color: '#f8f8f2',
-                      fontSize: 15,
-                      lineHeight: 1.5,
                     }}
                   >
                     <input

@@ -3,6 +3,8 @@
 @tailwind utilities;
 
 :root{
+  --font-prose: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: 'Courier', monospace;
   --bg: #252525;
   --card: #1e1e1e;
   --border: #333;
@@ -1976,7 +1978,6 @@ body:has(.lesson-progress-footer) .editor-body { margin-top: 0; padding-top: 8px
   body:has(.lesson-progress-footer) .assignment-header { gap: 6px; }
   body:has(.lesson-progress-footer) .assignment-header-left p { margin-top: 4px !important; font-size: 13px !important; line-height: 1.35 !important; }
   body:has(.lesson-progress-footer) .assignment-header-center { gap: 6px 10px; }
-  .content-lesson-main .content-prose { font-size: 14px !important; line-height: 1.5 !important; }
   .content-lesson-main .content-prose p { margin: 10px 0; }
   #titleRow:has(input) { flex-direction: column; align-items: stretch; gap: 10px; }
   #titleRow:has(input) h1 { font-size: 22px; white-space: nowrap; }
@@ -2003,7 +2004,8 @@ body:has(.lesson-progress-footer) .editor-body { margin-top: 0; padding-top: 8px
   .run-toolbar button { padding: 6px 8px; white-space: nowrap; }
   .student-quiz { margin-top: 8px !important; padding-top: 8px !important; }
   .student-quiz > p { margin-bottom: 10px !important; line-height: 1.4; }
-  .student-quiz label { padding: 6px 8px !important; margin-bottom: 2px !important; line-height: 1.35 !important; font-size: 14px !important; }
+  .student-quiz label { padding: 6px 8px !important; margin-bottom: 2px !important; }
+  .student-quiz label:not(.prose-copy) { line-height: 1.35; font-size: 14px; }
   .content-lesson-main:has(.student-quiz) > p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   body:has(.content-lesson-main) .shd-tabstrip { width: auto !important; align-self: flex-end; padding: 0 !important; margin-bottom: -6px; }
 }
@@ -2030,7 +2032,6 @@ body:has(.lesson-progress-footer) .editor-body { margin-top: 0; padding-top: 8px
 @media (max-width: 720px) {
   .assignment-quota { white-space: normal; overflow: visible; overflow-wrap: anywhere; }
   .lesson-breadcrumb-current { display: none; }
-  .content-lesson-main .content-prose { line-height: 1.7 !important; }
   .content-lesson-main .content-prose p { margin: 0 0 16px; }
   .content-lesson-main .content-prose li { margin: 10px 0; }
 }
@@ -2237,15 +2238,24 @@ body { box-sizing: border-box; padding-right: 20px; }
   .lab-task-card .step-instructions { line-height: 1.5; }
   .lab-work-area .editor-card { width: 100%; }
   .lab-work-area .editor-body { margin: 0; }
-  .lab-work-area #editorPane { height: 360px; min-height: 240px; }
+  /* Leave Output visible below the editor on the first phone screen. */
+  .lab-work-area #editorPane { height: clamp(240px, 38svh, 360px); min-height: 240px; }
   .lab-work-area #editor .cm-editor { font-size: 12px !important; }
-  .lab-work-area #editor .cm-line { line-height: 1.5; }
+  /* One source line per gutter number; long comments scroll horizontally.
+     Put line-height on the scroller so code and gutters share the metric. */
+  .lab-work-area #editor .cm-scroller { line-height: 1.5; }
+  .lab-work-area #editor .cm-content { white-space: pre; overflow-wrap: normal; }
+  .lab-work-area #editor .cm-line { padding-left: 6px; text-indent: 0; }
   .lab-assignment-header .assignment-header-center { gap: 4px 7px !important; flex-wrap: wrap !important; }
   .lab-assignment-header .assignment-quota:has([role="status"]) { display: block !important; margin-left: auto; }
   .lab-assignment-header .assignment-quota [role="status"] { font-size: 10px !important; }
   .lab-assignment-header .assignment-header-center > button { display: none; }
   .lab-assignment-header .assignment-header-left p { display: none; }
-  .lab-work-area .run-toolbar { flex-wrap: wrap; }
+  .lab-work-area .run-toolbar { flex-wrap: nowrap; overflow-x: auto; }
+  .lab-work-area .run-toolbar button { flex-shrink: 0; }
+  /* Keep the Save word (the action a first-time coder must find); History
+     drops to its glyph. Both buttons carry aria-label and title. */
+  .lab-work-area .run-toolbar .toolbar-history .toolbar-button-label { display: none; }
   .quiz-guidance p { display: block !important; -webkit-line-clamp: unset !important; overflow: visible !important; font-size: 13px !important; }
   .mod-row-title { display: block; }
   .mod-row-title .mod-row-num { font-size: 12px; margin-right: 5px; }
@@ -2265,4 +2275,83 @@ body:has(.lab-work-area) { gap: 8px; }
   body:has(.lab-work-area) .hdr-lesson-link { padding: 3px 8px; }
   .lab-assignment-header .assignment-header-left p { display: none; }
   .lab-assignment-header .assignment-header-center > button { padding: 4px 10px; }
+}
+
+/* Lift the desktop flag above the progress footer without shortening the rail. */
+@media (min-width: 721px) {
+  body:has(.lesson-progress-footer) .issue-fab {
+    right: 28px;
+    bottom: calc(var(--shd-footer-height, 36px) + 8px);
+  }
+}
+
+@media (max-width: 720px) {
+  /* Only lesson surfaces reserve space for the fixed tools. Keep the normal
+     document scrollport; the final text/answer can scroll clear of the dock. */
+  body:is(:has(.content-lesson-main), :has(.lab-work-area)) {
+    --lesson-tool-dock: calc(60px + env(safe-area-inset-bottom));
+    padding-bottom: calc(var(--lesson-tool-dock) + 16px) !important;
+    scroll-padding-bottom: calc(var(--lesson-tool-dock) + 16px);
+  }
+  .content-lesson-main {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom)) !important;
+  }
+  body:is(:has(.content-lesson-main), :has(.lab-work-area))::after {
+    content: '';
+    position: fixed;
+    inset: auto 0 0;
+    height: var(--lesson-tool-dock);
+    background: #21222c;
+    border-top: 1px solid #44475a;
+    z-index: 898;
+    pointer-events: none;
+  }
+  body:is(:has(.content-lesson-main), :has(.lab-work-area)) .issue-fab {
+    bottom: calc(13px + env(safe-area-inset-bottom));
+    right: 12px;
+    width: 34px;
+    height: 34px;
+  }
+  body:is(:has(.content-lesson-main), :has(.lab-work-area)) .shd-tabstrip,
+  body:is(:has(.content-lesson-main), :has(.lab-work-area)) .shd-tabstrip.shd-docs-only {
+    left: 0 !important;
+    right: 56px !important;
+    bottom: 0 !important;
+    width: calc(100% - 56px) !important;
+    height: var(--lesson-tool-dock);
+    align-items: center;
+    border: 0;
+    background: transparent;
+  }
+  body:is(:has(.content-lesson-main), :has(.lab-work-area)) .shd-tabstrip.shd-docs-only {
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom)) !important;
+    justify-content: flex-end;
+  }
+  body:is(:has(.content-lesson-main), :has(.lab-work-area)) .shd-tabstrip.shd-docs-only .shd-tab {
+    flex: 0 0 auto;
+  }
+  body:is(:has(.content-lesson-main), :has(.lab-work-area)) .shd-drawer {
+    bottom: var(--lesson-tool-dock) !important;
+  }
+}
+
+/* Reading lesson bodies and quiz questions/answers use sans. */
+.prose-copy {
+  font-family: var(--font-prose);
+  font-size: 16px;
+  line-height: 1.6;
+  max-width: 72ch;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+/* quiz questions and answer rows keep the card's full width (the hover/selected fill must reach the edge) */
+.student-quiz .prose-copy { max-width: none; }
+.prose-copy :is(h1, h2, h3, h4, h5, h6, nav, button, summary, table, pre, code, kbd, samp) {
+  font-family: var(--font-mono);
+}
+:is(.compact-example, .worked-example).prose-copy .content-prose em {
+  font-style: normal;
+}
+@media (max-width: 720px) {
+  .prose-copy { font-size: 15px; }
 }
