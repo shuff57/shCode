@@ -355,8 +355,8 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
  {
   "label": "multiplayer",
   "type": "function",
-  "detail": "(mode, players?)",
-  "info": "Call once in setup(): 'none', 'local' (one keyboard), 'coop' or 'versus' (online, with a lobby), for 2-4 players."
+  "detail": "(mode, players?, { realtime? })",
+  "info": "Call once in setup(): 'none', 'local' (one keyboard), 'coop' or 'versus' (online, with a lobby), for 2-4 players. { realtime: true }: a real-time room."
  },
  {
   "label": "myTurn",
@@ -2649,6 +2649,12 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "type": "property",
    "detail": "string",
    "info": "Online: 'off', 'waiting', 'ready', 'closed' or 'error'."
+  },
+  {
+   "label": "realtime",
+   "type": "property",
+   "detail": "boolean",
+   "info": "True when multiplayer() was called with { realtime: true }."
   }
  ],
  "Online": [
@@ -2723,6 +2729,42 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "type": "property",
    "detail": "string",
    "info": "The last problem, in words."
+  },
+  {
+   "label": "share",
+   "type": "method",
+   "detail": "(sprite)",
+   "info": "Real time: show this sprite on every other computer, smoothly. Only this computer moves it. Up to 8."
+  },
+  {
+   "label": "unshare",
+   "type": "method",
+   "detail": "(sprite?)",
+   "info": "Stop sharing this sprite (or every sprite you share)."
+  },
+  {
+   "label": "peers",
+   "type": "property",
+   "detail": "{ [seat]: Sprite }",
+   "info": "Real time: online.peers[seat] is the sprite that player shares, moved here automatically."
+  },
+  {
+   "label": "sharedBy",
+   "type": "method",
+   "detail": "(seat)",
+   "info": "Real time: every sprite that seat shares, in the order shared."
+  },
+  {
+   "label": "isHost",
+   "type": "property",
+   "detail": "boolean",
+   "info": "True on the host computer (seat 0). In a host-decides game the host moves the real sprites and shares them."
+  },
+  {
+   "label": "live",
+   "type": "property",
+   "detail": "boolean",
+   "info": "True while in a real-time room."
   }
  ]
 };

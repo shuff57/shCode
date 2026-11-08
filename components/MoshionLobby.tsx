@@ -5,6 +5,8 @@
 // Host makes a room for n players with this page's game key, Join takes a typed
 // code, and Open rooms lists classmates' rooms for THIS game (GET /api/rooms?game=),
 // refreshed every few seconds while the bar is showing and you are not in a room.
+// A real-time sketch (multiplayer(mode, n, { realtime: true })) makes and lists
+// live rooms only (`live=1`), every other sketch polling rooms only.
 // The room calls themselves live in lib/moshion-online.ts, which also tells the
 // sketch which room it is in.
 
@@ -107,6 +109,7 @@ export default function MoshionLobby({ view, actions, gameKey, device }: {
   const [list, setList] = useState<ListState>({ kind: 'loading' });
   const [copied, setCopied] = useState(false);
   const inRoom = !!view.room;
+  const realtime = view.realtime;
 
   // The open-rooms list, while not in a room.
   useEffect(() => {
@@ -115,7 +118,7 @@ export default function MoshionLobby({ view, actions, gameKey, device }: {
     let timer: ReturnType<typeof setTimeout> | null = null;
     async function load() {
       try {
-        const res = await fetch(`/api/rooms?game=${encodeURIComponent(gameKey)}&device=${encodeURIComponent(device)}`, { credentials: 'same-origin' });
+        const res = await fetch(`/api/rooms?game=${encodeURIComponent(gameKey)}&device=${encodeURIComponent(device)}${realtime ? '&live=1' : ''}`, { credentials: 'same-origin' });
         if (!live) return;
         if (res.status === 401) setList({ kind: 'signed-out' });
         else if (!res.ok) {
@@ -133,9 +136,9 @@ export default function MoshionLobby({ view, actions, gameKey, device }: {
     }
     void load();
     return () => { live = false; if (timer) clearTimeout(timer); };
-  }, [inRoom, gameKey, device]);
+  }, [inRoom, gameKey, device, realtime]);
 
-  const title = `${modeName(view.mode)} · ${view.players} players`;
+  const title = `${modeName(view.mode)} · ${view.players} players${view.realtime ? ' · real time' : ''}`;
   const blocked = !inRoom && (list.kind === 'signed-out' || list.kind === 'no-class');
 
   if (view.room) {
@@ -234,7 +237,9 @@ export default function MoshionLobby({ view, actions, gameKey, device }: {
             ) : null}
           </div>
           <div style={{ ...dim, fontSize: '0.72rem' }}>
-            Moves travel about once a second, so this suits turn-based and slower games.
+            {view.realtime
+              ? 'Real time: moves and shared sprites arrive in a few hundredths of a second.'
+              : 'Moves travel about once a second, so this suits turn-based and slower games.'}
           </div>
         </>
       )}

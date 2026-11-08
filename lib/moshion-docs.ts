@@ -2269,7 +2269,7 @@ function drawTop() {
       },
       {
         title: 'What online play is good for',
-        body: `Moves travel through the shCode server, which each computer checks about once a second (faster while everyone is in the room). Each player can send at most 30 moves every 10 seconds. That is plenty for turn-based and slower games: board games, card games, battles where each side picks an action, puzzles you solve together. It is NOT fast enough for real-time action where two players steer ships around the screen at the same moment, so do not send a move every frame: send one when something happens.
+        body: `Moves travel through the shCode server, which each computer checks about once a second (faster while everyone is in the room). Each player can send at most 30 moves every 10 seconds. That is plenty for turn-based and slower games: board games, card games, battles where each side picks an action, puzzles you solve together. It is NOT fast enough for real-time action where two players steer ships around the screen at the same moment, so do not send a move every frame: send one when something happens. (For a game where players move at the same time, see Real-time play, next.)
 
 A move is game data only: numbers, true or false, and short one-word labels (no spaces, at most 24 letters of words in one move). A sentence is refused on purpose, because a game room is not a chat.
 
@@ -2293,6 +2293,120 @@ function draw() {
 function drawTop() {
   text('Jumps by the team: ' + jumps, 10, 40, 18, 'white');
   text('One move per press, not one per frame.', 10, 80, 14, '#8393c4');
+}`,
+      },
+      {
+        title: 'Real-time play',
+        body: `Add a third piece to multiplayer() and the room becomes a real-time room: multiplayer('coop', 2, { realtime: true }). The lobby bar is the same (Host, Join, the four pictures, Open rooms), but moves now arrive in a few hundredths of a second instead of about once a second, and you get one new call:
+
+online.share(sprite) shows this sprite on every other computer. About 15 times a second your computer sends where the sprite is (x, y, rotation), its size and its colour. On the other computers a copy appears by itself and glides smoothly between those updates, so it does not jump. Only YOUR computer moves your sprite; the copies just follow it. Call it once, in setup(), after multiplayer().
+
+The copies of other players' sprites are in online.peers: online.peers[1] is the sprite player 2 (seat 1) shares, ready to draw or test. A copy has collider 'none', so it never pushes anything: ask overlaps() if you want to know when you touch it.
+
+In the example each player steers their own square with the arrow keys and sees the other square glide around. Try it alone with a second browser tab.
+
+What real time does NOT do, honestly:
+
+No physics is shared. Each computer runs its own physics; a shared sprite is a position, not a body. If two players bump, each screen works it out on its own and they can disagree.
+
+The owner decides. When something is hit, the computer that owns the thing that was hit decides what happened, and sends a move to say so (online.send). Everyone else believes that move.
+
+Lag is real. A copy is drawn about a tenth of a second behind, so it can glide smoothly. Over a slow network it can be further behind.
+
+The limits are the same as before: game data only in a move (numbers, true or false, short one-word labels), and at most 30 messages a second from each computer, sharing included. A sprite that has not moved is only sent once a second.`,
+        code: `let me;
+
+function setup() {
+  new Canvas(400, 300);
+  multiplayer('coop', 2, { realtime: true });
+  me = new Sprite(200, 150, 40, 40);
+  me.color = 'gold';
+  online.share(me);
+}
+
+function draw() {
+  background('#1b1d2a');
+  me.vel.x = 0;
+  me.vel.y = 0;
+  if (kb.pressing('left')) me.vel.x = -4;
+  if (kb.pressing('right')) me.vel.x = 4;
+  if (kb.pressing('up')) me.vel.y = -4;
+  if (kb.pressing('down')) me.vel.y = 4;
+  me.x = constrain(me.x, 20, 380);
+  me.y = constrain(me.y, 20, 280);
+  if (seat === 1) me.color = 'deepskyblue';
+}
+
+function drawTop() {
+  if (!game.ready) text('Waiting for a player: use the bar above', 10, 24, 14, '#8393c4');
+  else text('You are player ' + (seat + 1) + '. Arrow keys move your square.', 10, 24, 14, 'white');
+  let other = online.peers[seat === 0 ? 1 : 0];
+  if (other && me.overlaps(other)) text('Touching!', 10, 48, 16, 'limegreen');
+}`,
+      },
+      {
+        title: 'Real-time play: the host decides',
+        body: `Many online games work like a Minecraft server: one computer, the HOST, runs the real game, and everyone else sends what they are pressing and watches. Nobody can disagree, because there is only one world.
+
+online.isHost is true on the host's computer (the player who pressed Host, seat 0) and false everywhere else.
+
+Every player, the host too, sends their arrow keys as a move, but only when they CHANGE (pressing or letting go), never every frame: online.send({ dx: 1, dy: 0 }).
+
+Only the host listens to those moves. In online.onMove it remembers each seat's keys; every frame it moves the real sprites by those keys; and it shares every sprite with online.share(), so every screen shows the host's world.
+
+The others make no sprites of their own. The host's shared sprites appear on their screens by themselves; online.sharedBy(0) lists them, in the order the host shared them.
+
+Because the host decides everything, a collision, a score or a win only happens on the host's computer. To show it on everyone's screen, share a sprite that shows it, or send a move about it.`,
+        code: `let boxes = [];
+let keys = [];
+let sentKeys = '';
+
+function setup() {
+  new Canvas(400, 300);
+  multiplayer('coop', 2, { realtime: true });
+  online.onMove((move, who) => {
+    if (online.isHost) keys[who] = move;
+  });
+}
+
+function draw() {
+  background('#1b1d2a');
+  if (!game.ready) return;
+  // Everyone: send my keys when they change.
+  let dx = 0;
+  let dy = 0;
+  if (kb.pressing('left')) dx = -1;
+  if (kb.pressing('right')) dx = 1;
+  if (kb.pressing('up')) dy = -1;
+  if (kb.pressing('down')) dy = 1;
+  if (dx + ',' + dy !== sentKeys) {
+    sentKeys = dx + ',' + dy;
+    online.send({ dx: dx, dy: dy });
+  }
+  // The host: make the real sprites once, then move them by everyone's keys.
+  if (online.isHost) {
+    if (boxes.length === 0) {
+      for (let i = 0; i < players; i++) {
+        let box = new Sprite(100 + i * 200, 150, 40, 40);
+        box.color = i === 0 ? 'gold' : 'deepskyblue';
+        boxes.push(box);
+        online.share(box);
+      }
+    }
+    for (let i = 0; i < boxes.length; i++) {
+      let k = keys[i] || { dx: 0, dy: 0 };
+      boxes[i].vel.x = k.dx * 4;
+      boxes[i].vel.y = k.dy * 4;
+      boxes[i].x = constrain(boxes[i].x, 20, 380);
+      boxes[i].y = constrain(boxes[i].y, 20, 280);
+    }
+  }
+}
+
+function drawTop() {
+  if (!game.ready) text('Waiting for a player: use the bar above', 10, 24, 14, '#8393c4');
+  else if (online.isHost) text('You are the host: your computer runs the game.', 10, 24, 14, 'gold');
+  else text('The host runs the game. Your keys go to the host.', 10, 24, 14, 'white');
 }`,
       },
     ],

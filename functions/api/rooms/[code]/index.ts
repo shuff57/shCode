@@ -35,6 +35,7 @@ export const onRequestGet: PagesFunction<Env, 'code', SessionData> = async ({ en
     code,
     game: room.game,
     seats: room.seats,
+    live: room.live === 1,
     mySeat: me.seat,
     state: roomState(room, present),
     players: publicPlayers(players),

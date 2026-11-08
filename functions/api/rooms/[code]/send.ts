@@ -29,6 +29,8 @@ export const onRequestPost: PagesFunction<Env, 'code', SessionData> = async ({ e
     : null;
   if (!room || !me || me.left_at) return json({ error: 'You are not in that room.' }, 404);
   if (room.closed_at || room.expires_at <= now) return json({ error: 'That room has closed.' }, 410);
+  // A real-time room's moves go over its socket (GET /api/live/[code]) and are never stored.
+  if (room.live === 1) return json({ error: 'That is a real-time room: its moves go over the live connection.' }, 409);
 
   const counts = await env.DB.prepare(
     `SELECT COUNT(*) AS total, SUM(CASE WHEN seat = ? AND created_at > ? THEN 1 ELSE 0 END) AS recent

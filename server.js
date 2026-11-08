@@ -113,6 +113,8 @@ app.prepare().catch((err) => {
   console.error('[dev-stub-gate] app.prepare() failed to start a handler:', err.message);
 }).then(async () => {
   const server = express();
+  // Set by the dev stubs below: the real-time rooms' socket stand-in (scripts/dev-live.mjs).
+  let devLiveUpgrade = null;
 
   // ---- public/_headers, for the one prefix that cannot work without it ----
   //
@@ -559,6 +561,13 @@ app.prepare().catch((err) => {
         libDb.sqlite.prepare(`INSERT OR IGNORE INTO class_teachers (class_id, teacher_email, added_at) VALUES ('devclass', ?, 0)`).run(email);
       }
     };
+    // Real-time rooms (GET /api/live/:code, workers/live/ in production): an
+    // in-process stand-in over the same protocol and the same seat check
+    // (scripts/dev-live.mjs), on this same database. The upgrade listener is
+    // attached to the http server below.
+    const { makeDevLive } = await import('./scripts/dev-live.mjs');
+    const devLive = makeDevLive({ db: libDb, identity: (req) => { const email = devIdentity(req); ensureMember(email); return { email, role: DEV_ROLE }; } });
+    devLiveUpgrade = devLive.onUpgrade;
     const libRoute = (handler) => async (req, res) => {
       const email = devIdentity(req);
       ensureMember(email);
@@ -567,7 +576,7 @@ app.prepare().catch((err) => {
         headers: { 'content-type': 'application/json' },
         body: req.method === 'GET' || req.method === 'DELETE' ? undefined : JSON.stringify(req.body ?? {}),
       });
-      const out = await handler({ request, env: { DB: libDb, UPLOADS }, params: req.params, data: { email, role: DEV_ROLE } });
+      const out = await handler({ request, env: { DB: libDb, UPLOADS, LIVE: devLive.namespace }, params: req.params, data: { email, role: DEV_ROLE } });
       res.status(out.status).type('application/json').send(await out.text());
     };
     // Online game rooms (functions/api/rooms/*): two `dev_student` cookies are
@@ -583,6 +592,8 @@ app.prepare().catch((err) => {
     server.post('/api/rooms/:code/join', express.json(), libRoute(roomJoin.onRequestPost));
     server.post('/api/rooms/:code/send', express.json(), libRoute(roomSend.onRequestPost));
     server.post('/api/rooms/:code/leave', express.json(), libRoute(roomLeave.onRequestPost));
+    const liveRoute = await import('./functions/api/live/[code].ts');
+    server.get('/api/live/:code', libRoute(liveRoute.onRequestGet));
     // The Games library (functions/api/games/*): the real handlers on the same
     // database, so one dev_student publishes from the sandbox and another plays
     // it from Library -> Games. Static /api/games/shared before /api/games/:id.
@@ -948,4 +959,5 @@ app.prepare().catch((err) => {
   const httpServer = server.listen(port, () => {
     console.log(`> Ready on http://localhost:${httpServer.address().port}`);
   });
+  if (devLiveUpgrade) httpServer.on('upgrade', devLiveUpgrade);
 });

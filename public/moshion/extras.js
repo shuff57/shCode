@@ -103,6 +103,22 @@
 // Apply a move inside onMove, not where you send it: then both computers run
 // the same moves in the same order and the two boards cannot drift apart.
 //
+// Real time (multiplayer(mode, n, { realtime: true }); REALTIME-SPEC.md): the
+// page keeps a WebSocket to the room instead of polling, so moves arrive in a
+// few hundredths of a second, and:
+//   online.share(sprite)   send this sprite's x, y, rotation, size and colour
+//                          about 15 times a second (once a second while still);
+//                          up to 8 sprites. Only this computer moves it.
+//   online.unshare(sprite)
+//   online.peers[seat]     the first sprite that seat shares, made and moved
+//                          here automatically, smoothed between updates
+//                          (collider 'none': use overlaps() to touch it)
+//   online.sharedBy(seat)  every sprite that seat shares, in the order shared
+//   online.isHost          true on the host's computer (seat 0): in a
+//                          host-decides game the host applies everyone's
+//                          inputs, moves the real sprites and shares them
+//   online.live            true while in a real-time room
+//
 // The sketch's iframe cannot reach the server itself, so each request goes up
 // to the shCode page (lib/moshion-online.ts), which calls /api/rooms as the
 // signed-in student. Rooms are for classmates only and carry game data only
@@ -125,10 +141,14 @@
     seats: 0,
     players: [],
     error: null,
+    live: false,
+    peers: {},
     host: function (seats) {
       online.status = 'connecting';
       online.error = null;
-      ask('host', { game: 'moshion', seats: seats === undefined ? 2 : seats }, function (r) {
+      var body = { game: 'moshion', seats: seats === undefined ? 2 : seats };
+      if (mp.realtime) body.live = true;
+      ask('host', body, function (r) {
         lastSeq = 0;
         online.code = r.code;
         online.codeIcons = r.codeIcons || null;
@@ -167,9 +187,193 @@
         online.codeIcons = null;
         online.seat = null;
         online.players = [];
+        online.live = false;
+        removePeers();
       });
     },
+    share: function (sprite) {
+      if (!mp.realtime) {
+        if (!warnedShare) {
+          warnedShare = true;
+          fail("online.share() needs a real-time room: call multiplayer('coop', 2, { realtime: true }) in setup() first.");
+        }
+        return;
+      }
+      if (!sprite || typeof sprite !== 'object' || !('x' in sprite) || !('y' in sprite)) {
+        fail('online.share() needs a sprite: online.share(player)');
+        return;
+      }
+      for (var i = 0; i < mine.length; i++) if (mine[i].sprite === sprite) return;
+      if (mine.length >= MAX_SHARED) { fail('online.share(): you can share at most ' + MAX_SHARED + ' sprites.'); return; }
+      var used = {};
+      for (var j = 0; j < mine.length; j++) used[mine[j].id] = true;
+      var id = 0;
+      while (used[id]) id++;
+      mine.push({ sprite: sprite, id: id, last: '', at: 0 });
+      if (shareTimer === null && typeof setInterval === 'function') shareTimer = setInterval(shareTick, SHARE_MS);
+    },
+    unshare: function (sprite) {
+      for (var i = mine.length - 1; i >= 0; i--) {
+        if (sprite === undefined || mine[i].sprite === sprite) {
+          tell('unshare', { id: mine[i].id });
+          mine.splice(i, 1);
+        }
+      }
+    },
+    sharedBy: function (seat) {
+      var byId = peerSprites[seat];
+      var out = [];
+      if (!byId) return out;
+      var ids = Object.keys(byId).map(Number).sort(function (a, b) { return a - b; });
+      for (var i = 0; i < ids.length; i++) out.push(byId[ids[i]]);
+      return out;
+    },
   };
+  Object.defineProperty(online, 'isHost', { enumerable: true, get: function () { return online.seat === 0; } });
+
+  // ---- shared sprites (real-time rooms only) -------------------------------
+  var SHARE_MS = Math.round(1000 / 15);  // lib/live-protocol.ts SHARE_HZ
+  var KEEPALIVE_MS = 1000;               // a sprite that has not moved is sent once a second
+  var PEER_DELAY_MS = 100;               // peers are drawn this far in the past, between two updates
+  var MAX_SHARED = 8;
+  var COLOR_RE = /^(?:[a-z]{3,20}|#[0-9a-f]{3,8}|(?:rgba?|hsla?)\(\s*-?[\d.]+%?(?:\s*,\s*-?[\d.]+%?){2,3}\s*\))$/i;
+  var TEXTURE_RE = /^[A-Za-z0-9_-]{1,20}$/;
+  var mine = [];        // [{ sprite, id, last, at }]: what this computer shares
+  var shareTimer = null;
+  var peerSprites = {}; // seat -> { id -> sprite }: what the others share
+  var warnedShare = false;
+
+  function clock() { return typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now(); }
+  function r2(n) { n = Number(n); return isFinite(n) ? Math.round(n * 100) / 100 : 0; }
+
+  function tell(op, body) {
+    if (!hasHost) return;
+    var msg = { source: 'preview-online', run: run, op: op };
+    for (var k in body) if (Object.prototype.hasOwnProperty.call(body, k)) msg[k] = body[k];
+    try { window.parent.postMessage(msg, '*'); } catch (e) { /* host gone */ }
+  }
+
+  function snapshot(sp, id) {
+    var o = { id: id, x: r2(sp.x), y: r2(sp.y), r: r2(sp.rotation) };
+    if (sp.vel) { o.vx = r2(sp.vel.x); o.vy = r2(sp.vel.y); }
+    if (sp.shape === 'circle') o.d = Math.max(0, r2(sp.w)); else { o.w = Math.max(0, r2(sp.w)); o.h = Math.max(0, r2(sp.h)); }
+    if (typeof sp.color === 'string' && sp.color.length <= 40 && COLOR_RE.test(sp.color)) o.c = sp.color;
+    if (typeof sp.texture === 'string' && TEXTURE_RE.test(sp.texture)) o.tx = sp.texture;
+    o.v = sp.visible !== false;
+    return o;
+  }
+
+  function othersHere() {
+    var n = 0;
+    for (var i = 0; i < online.players.length; i++) if (!online.players[i].left && online.players[i].seat !== online.seat) n++;
+    return n;
+  }
+
+  function shareTick() {
+    // Nobody else to see it: send nothing (every message counts against the room's allowance).
+    if (!hasHost || !online.live || !online.code || online.status === 'closed' || online.status === 'error' || othersHere() === 0) return;
+    var t = clock();
+    var list = [];
+    for (var i = mine.length - 1; i >= 0; i--) {
+      var m = mine[i];
+      if (m.sprite._dead) { tell('unshare', { id: m.id }); mine.splice(i, 1); continue; }
+      var snap = snapshot(m.sprite, m.id);
+      var key = JSON.stringify(snap);
+      if (key !== m.last || t - m.at >= KEEPALIVE_MS) { m.last = key; m.at = t; list.push(snap); }
+    }
+    if (list.length) tell('share', { list: list });
+  }
+
+  function placePeer(p) {
+    var s = p._liveSamples;
+    if (!s || !s.length) return;
+    var t = clock() - PEER_DELAY_MS;
+    var last = s[s.length - 1];
+    var x, y, r;
+    if (t >= last.t) {
+      // Past the newest update: carry on along its velocity a little, then hold.
+      var frames = Math.min(t - last.t, 150) / (1000 / 60);
+      x = last.x + last.vx * frames;
+      y = last.y + last.vy * frames;
+      r = last.r;
+    } else if (t <= s[0].t) {
+      x = s[0].x; y = s[0].y; r = s[0].r;
+    } else {
+      var i = s.length - 2;
+      while (i > 0 && s[i].t > t) i--;
+      var a = s[i], b = s[i + 1];
+      var f = b.t > a.t ? (t - a.t) / (b.t - a.t) : 1;
+      x = a.x + (b.x - a.x) * f;
+      y = a.y + (b.y - a.y) * f;
+      var dr = ((b.r - a.r + 540) % 360) - 180; // the short way round
+      r = a.r + dr * f;
+    }
+    try {
+      p.x = x; p.y = y; p.rotation = r;
+      if (p.vel) { p.vel.x = 0; p.vel.y = 0; }
+    } catch (e) { /* deleted */ }
+  }
+
+  function makePeer(st) {
+    var p = st.d !== undefined ? new Sprite(st.x, st.y, st.d) : new Sprite(st.x, st.y, st.w === undefined ? 50 : st.w, st.h === undefined ? 50 : st.h);
+    p.collider = 'none';
+    p._liveSamples = [];
+    p.update = function () { placePeer(p); };
+    return p;
+  }
+
+  function lookPeer(p, st) {
+    if (st.c !== undefined && p.color !== st.c) p.color = st.c;
+    if (st.tx !== undefined && p.texture !== st.tx) { try { p.texture = st.tx; } catch (e) { /* unknown here */ } }
+    if (st.v !== undefined) p.visible = st.v;
+    if (st.d !== undefined) { if (p.w !== st.d) p.diameter = st.d; }
+    else if (st.w !== undefined && st.h !== undefined && (p.w !== st.w || p.h !== st.h)) { p.w = st.w; p.h = st.h; }
+  }
+
+  function refreshPeers() {
+    var out = {};
+    for (var seat in peerSprites) {
+      var list = online.sharedBy(Number(seat));
+      if (list.length) out[seat] = list[0];
+    }
+    online.peers = out;
+  }
+
+  function onShare(seat, list) {
+    if (typeof seat !== 'number' || seat === online.seat || typeof Sprite !== 'function' || !list || !list.length) return;
+    var byId = peerSprites[seat] || (peerSprites[seat] = {});
+    var t = clock();
+    for (var i = 0; i < list.length; i++) {
+      var st = list[i];
+      if (!st || typeof st.id !== 'number') continue;
+      var p = byId[st.id];
+      if (!p || p._dead) { p = makePeer(st); byId[st.id] = p; }
+      lookPeer(p, st);
+      var smp = p._liveSamples;
+      var prev = smp[smp.length - 1];
+      // After a still spell (one update a second), start the move from "just now", not a second ago.
+      if (prev && t - prev.t > SHARE_MS * 3) smp.push({ t: t - SHARE_MS, x: prev.x, y: prev.y, r: prev.r, vx: 0, vy: 0 });
+      smp.push({ t: t, x: st.x, y: st.y, r: st.r || 0, vx: st.vx || 0, vy: st.vy || 0 });
+      while (smp.length > 12) smp.shift();
+      if (smp.length === 1) placePeer(p);
+    }
+    refreshPeers();
+  }
+
+  /** Delete the sprites shared by one seat (or by every seat), or one of them. */
+  function removePeers(seat, id) {
+    for (var k in peerSprites) {
+      if (seat !== undefined && Number(k) !== seat) continue;
+      var byId = peerSprites[k];
+      for (var j in byId) {
+        if (id !== undefined && Number(j) !== id) continue;
+        try { byId[j].delete(); } catch (e) { /* gone */ }
+        delete byId[j];
+      }
+      if (!Object.keys(byId).length) delete peerSprites[k];
+    }
+    refreshPeers();
+  }
 
   function fail(msg) {
     online.error = msg;
@@ -211,6 +415,8 @@
         lastSeq = 0;
         mp.turn = 0;
         online.error = null;
+        online.live = d.live === true;
+        removePeers();
         if (d.code) {
           online.code = d.code;
           online.codeIcons = d.codeIcons || null;
@@ -226,11 +432,28 @@
         }
         return;
       }
+      if (d.source === 'preview-online-share' || d.source === 'preview-online-unshare') {
+        if (d.code !== online.code) return;
+        if (d.source === 'preview-online-share') onShare(d.seat, d.list);
+        else if (typeof d.seat === 'number') removePeers(d.seat, typeof d.id === 'number' ? d.id : undefined);
+        return;
+      }
       if (d.source !== 'preview-online-update' || d.code !== online.code) return;
-      if (d.players) online.players = d.players;
+      if (d.live === true) online.live = true;
+      // A real-time room counts moves from where it is now (moves made before you came are not replayed).
+      if (typeof d.seqBase === 'number') lastSeq = d.seqBase;
+      if (d.players) {
+        online.players = d.players;
+        if (online.live) {
+          var here = {};
+          for (var pi = 0; pi < d.players.length; pi++) if (!d.players[pi].left) here[d.players[pi].seat] = true;
+          for (var ps in peerSprites) if (!here[ps]) removePeers(Number(ps));
+        }
+      }
       if (typeof d.seat === 'number') online.seat = d.seat;
       if (typeof d.seats === 'number') { online.seats = d.seats; if (mp.online) mp.players = d.seats; }
       if (d.state) online.status = d.state;
+      if (d.state === 'closed') removePeers();
       if (d.error) online.error = d.error;
       var events = d.events || [];
       for (var i = 0; i < events.length; i++) {
@@ -269,10 +492,16 @@
   // while the room is full) and each player may send at most 30 moves every
   // 10 seconds. Fine for turn-based and slower games, not for real-time action.
   //
+  //   multiplayer('coop', 2, { realtime: true })
+  //
+  // makes the lobby use a REAL-TIME room instead (a WebSocket, moves in a few
+  // hundredths of a second, online.share() for sprites). Without the option
+  // nothing changes.
+  //
   // A sketch that never calls multiplayer() gets none of these names, so its
   // own `let turn` or `function nextTurn()` is untouched.
   var MODES = ['none', 'local', 'coop', 'versus'];
-  var mp = { called: false, mode: 'none', players: 1, turn: 0, online: false };
+  var mp = { called: false, mode: 'none', players: 1, turn: 0, online: false, realtime: false };
 
   function say(level, msg) {
     try { console[level](msg); } catch (e) { /* no console */ }
@@ -320,10 +549,11 @@
     turn: { enumerable: true, get: function () { return mp.turn; } },
     seat: { enumerable: true, get: function () { return mp.online ? online.seat : null; } },
     code: { enumerable: true, get: function () { return mp.online ? online.code : null; } },
+    realtime: { enumerable: true, get: function () { return mp.realtime; } },
     status: { enumerable: true, get: function () { return mp.online ? online.status : (mp.mode === 'none' ? 'off' : 'ready'); } },
   });
 
-  function multiplayer(mode, players) {
+  function multiplayer(mode, players, options) {
     if (mp.called) {
       say('error', 'multiplayer() can only be called once, in setup(). The first call (' + JSON.stringify(mp.mode) + ') stays.');
       return game;
@@ -347,6 +577,9 @@
     mp.players = n;
     mp.turn = 0;
     mp.online = m === 'versus' || m === 'coop';
+    var wantsRealtime = !!(options && typeof options === 'object' && options.realtime === true);
+    if (wantsRealtime && !mp.online) say('warn', "multiplayer(): { realtime: true } is for the online modes, 'coop' and 'versus'. Ignored for " + JSON.stringify(m) + '.');
+    mp.realtime = wantsRealtime && mp.online;
 
     provide('game', { value: game, writable: true });
     if (m !== 'none') {
@@ -359,7 +592,9 @@
       provide('seat', { get: function () { return online.seat; } });
       // The page shows the lobby bar; it puts this run in a room for us.
       if (hasHost) {
-        try { window.parent.postMessage({ source: 'preview-online', run: run, op: 'lobby', mode: m, players: n }, '*'); } catch (e) { /* host gone */ }
+        var lob = { source: 'preview-online', run: run, op: 'lobby', mode: m, players: n };
+        if (mp.realtime) lob.realtime = true;
+        try { window.parent.postMessage(lob, '*'); } catch (e) { /* host gone */ }
       }
     }
     return game;

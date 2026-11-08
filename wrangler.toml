@@ -63,3 +63,15 @@ binding = "AI"
 # paid provider (OPENROUTER_*) were both removed 2026-09-30 and have not come
 # back. If you are reading an older revision of this file or of CLAUDE.md and
 # it describes a picker, that text is history, not configuration.
+# Real-time rooms (codehs-review/REALTIME-SPEC.md): the LiveRoom Durable Object
+# lives in its own Worker, workers/live/ (name shcode-live). Deploy THAT first
+# (cd workers/live && npx wrangler deploy), then this binding can resolve; add
+# the same binding in the dashboard if production reads it from there:
+#   Pages project -> Settings -> Functions -> Durable Object bindings ->
+#   variable "LIVE", namespace shcode-live / LiveRoom.
+# With the binding missing, GET /api/live/[code] and POST /api/rooms {live:true}
+# answer 503 and nothing else changes (polling rooms do not use it).
+[[durable_objects.bindings]]
+name = "LIVE"
+class_name = "LiveRoom"
+script_name = "shcode-live"

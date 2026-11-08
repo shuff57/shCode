@@ -99,7 +99,7 @@ globals.push(
   { label: 'randomColor', type: 'function', detail: '(a?)', info: 'A random colour, optionally with alpha.' },
   { label: 'online', type: 'variable', detail: 'Online', info: 'Play with a classmate on another computer: host(), join(code), send(move), onMove(fn).' },
   // multiplayer() and what it adds (extras.js; codehs-review/MULTIPLAYER-SPEC.md).
-  { label: 'multiplayer', type: 'function', detail: "(mode, players?)", info: "Call once in setup(): 'none', 'local' (one keyboard), 'coop' or 'versus' (online, with a lobby), for 2-4 players." },
+  { label: 'multiplayer', type: 'function', detail: "(mode, players?, { realtime? })", info: "Call once in setup(): 'none', 'local' (one keyboard), 'coop' or 'versus' (online, with a lobby), for 2-4 players. { realtime: true }: a real-time room." },
   { label: 'game', type: 'variable', detail: 'Game', info: 'After multiplayer(): game.mode, game.players, game.ready, game.seat, game.turn.' },
   { label: 'myTurn', type: 'function', detail: '()', info: "After multiplayer(): true when this computer may move ('local': always; 'versus': your seat's turn and the room is full)." },
   { label: 'nextTurn', type: 'function', detail: '()', info: "After multiplayer(): pass the turn to the next player. Online, call it inside online.onMove so every computer moves on together." },
@@ -116,6 +116,7 @@ flat.Game = [
   { label: 'seat', type: 'property', detail: 'number', info: 'Your seat online (0 is the host); null otherwise.' },
   { label: 'code', type: 'property', detail: 'string', info: "The online room's code: 4 letters, shown in the lobby as 4 pictures." },
   { label: 'status', type: 'property', detail: 'string', info: "Online: 'off', 'waiting', 'ready', 'closed' or 'error'." },
+  { label: 'realtime', type: 'property', detail: 'boolean', info: "True when multiplayer() was called with { realtime: true }." },
 ];
 // online's members (extras.js), so `online.` completes like `world.`.
 flat.Online = [
@@ -131,6 +132,13 @@ flat.Online = [
   { label: 'seats', type: 'property', detail: 'number', info: 'How many players the room is for.' },
   { label: 'players', type: 'property', detail: '{seat, name, left}[]', info: 'Who is in the room.' },
   { label: 'error', type: 'property', detail: 'string', info: 'The last problem, in words.' },
+  // Real-time rooms (multiplayer(mode, n, { realtime: true }); codehs-review/REALTIME-SPEC.md).
+  { label: 'share', type: 'method', detail: '(sprite)', info: 'Real time: show this sprite on every other computer, smoothly. Only this computer moves it. Up to 8.' },
+  { label: 'unshare', type: 'method', detail: '(sprite?)', info: 'Stop sharing this sprite (or every sprite you share).' },
+  { label: 'peers', type: 'property', detail: '{ [seat]: Sprite }', info: 'Real time: online.peers[seat] is the sprite that player shares, moved here automatically.' },
+  { label: 'sharedBy', type: 'method', detail: '(seat)', info: 'Real time: every sprite that seat shares, in the order shared.' },
+  { label: 'isHost', type: 'property', detail: 'boolean', info: 'True on the host computer (seat 0). In a host-decides game the host moves the real sprites and shares them.' },
+  { label: 'live', type: 'property', detail: 'boolean', info: 'True while in a real-time room.' },
 ];
 globals.sort((a, b) => a.label.localeCompare(b.label));
 

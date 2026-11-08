@@ -30,7 +30,7 @@ export const onRequestPost: PagesFunction<Env, 'code', SessionData> = async ({ e
     const mine = players.find((p) => p.email === data.email && p.device === device);
     if (mine) {
       if (mine.left_at) await env.DB.prepare('UPDATE game_room_players SET left_at = NULL WHERE code = ? AND seat = ?').bind(code, mine.seat).run();
-      return json({ code, seat: mine.seat, seats: room.seats, game: room.game });
+      return json({ code, seat: mine.seat, seats: room.seats, game: room.game, live: room.live === 1 });
     }
     const taken = new Set(players.map((p) => p.seat));
     let seat = -1;
@@ -39,7 +39,7 @@ export const onRequestPost: PagesFunction<Env, 'code', SessionData> = async ({ e
     try {
       await env.DB.prepare('INSERT INTO game_room_players (code, seat, email, device, joined_at) VALUES (?, ?, ?, ?, ?)')
         .bind(code, seat, data.email, device, now).run();
-      return json({ code, seat, seats: room.seats, game: room.game });
+      return json({ code, seat, seats: room.seats, game: room.game, live: room.live === 1 });
     } catch (e) {
       if (!/UNIQUE|PRIMARY KEY|constraint/i.test(String(e))) throw e;
       // Someone took that seat at the same moment: look again.

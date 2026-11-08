@@ -7,10 +7,10 @@ import { ROOM_CODE_LETTERS, randomRoomCode } from '../../lib/room-icons';
 export const ROOM_TTL_MS = 3 * 60 * 60 * 1000;
 export const MAX_SEATS = 4;
 export const MAX_OPEN_ROOMS_PER_HOST = 3;
-export const MAX_EVENT_BYTES = 1024;
-export const MAX_STRING = 20;
-/** All the words in one move together: room for a few labels, not for a sentence. */
-export const MAX_TEXT_PER_MOVE = 24;
+// Game data only (checkGameData) lives in lib/game-data.ts, so the live room
+// (lib/live-protocol.ts, the Durable Object and the dev stand-in) checks a move
+// with exactly the rule the polling routes use.
+export { MAX_EVENT_BYTES, MAX_STRING, MAX_TEXT_PER_MOVE, checkGameData } from '../../lib/game-data';
 export const MAX_EVENTS_PER_ROOM = 3000;
 /** A player may send at most this many events in RATE_WINDOW_MS. */
 export const RATE_LIMIT = 30;
@@ -36,7 +36,6 @@ export const GAME_MAX = 48;
 export const GAME_RE = /^[a-z0-9][a-z0-9-]{0,47}$/;
 /** How many open rooms GET /api/rooms?game= lists at most. */
 export const LIST_LIMIT = 30;
-const KEY_RE = /^[A-Za-z_][A-Za-z0-9_]{0,19}$/;
 const DEVICE_RE = /^[a-z0-9]{8,32}$/;
 
 /** The browser tab a request comes from ('' when it does not say). */
@@ -79,49 +78,6 @@ export function normalizeCode(raw: unknown): string | null {
   return CODE_RE.test(c) ? c : null;
 }
 
-/**
- * Game data only. A value is null, a boolean, a finite number, a one-word
- * string (no spaces) of at most MAX_STRING characters, or an array / object of
- * those, with at most MAX_TEXT_PER_MOVE characters of words in the whole move (object keys are
- * identifiers), nested at most 4 deep, MAX_EVENT_BYTES as JSON. Returns the
- * reason in the course's words, or null when it is fine.
- */
-export function checkGameData(v: unknown): string | null {
-  let text = 0;
-  function walk(x: unknown, depth: number): string | null {
-    if (x === null || typeof x === 'boolean') return null;
-    if (typeof x === 'number') return Number.isFinite(x) ? null : 'Numbers must be ordinary numbers.';
-    if (typeof x === 'string') {
-      if (/\s/.test(x)) return 'A word in a move cannot have spaces: a move is game data (numbers, true/false, one-word labels), not a message.';
-      text += x.length;
-      return x.length <= MAX_STRING ? null : `Words in a move can be at most ${MAX_STRING} letters. Send numbers, true/false and short words.`;
-    }
-    if (depth >= 4) return 'A move can be nested at most 4 levels deep.';
-    if (Array.isArray(x)) {
-      if (x.length > 64) return 'A list in a move can hold at most 64 items.';
-      for (const y of x) { const e = walk(y, depth + 1); if (e) return e; }
-      return null;
-    }
-    if (typeof x === 'object') {
-      const keys = Object.keys(x as object);
-      if (keys.length > 32) return 'An object in a move can have at most 32 names.';
-      for (const k of keys) {
-        if (!KEY_RE.test(k)) return `"${k.slice(0, 20)}" cannot be a name in a move: use letters, digits and _ (up to 20).`;
-        const e = walk((x as Record<string, unknown>)[k], depth + 1);
-        if (e) return e;
-      }
-      return null;
-    }
-    return 'A move can only hold numbers, true/false, short words, lists and objects.';
-  }
-  const e = walk(v, 0);
-  if (e) return e;
-  if (text > MAX_TEXT_PER_MOVE) return `A move can hold at most ${MAX_TEXT_PER_MOVE} letters of words in all. Send numbers for the game, not messages.`;
-  const size = new TextEncoder().encode(JSON.stringify(v)).length;
-  if (size > MAX_EVENT_BYTES) return `A move can be at most ${MAX_EVENT_BYTES} bytes; this one is ${size}.`;
-  return null;
-}
-
 /** Every live class the person is in, as a student or a teacher. */
 export async function liveClassIds(db: D1Database, email: string, now = Date.now()): Promise<Set<string>> {
   const [s, t] = await Promise.all([studentClassIds(db, email, now), teacherClassIds(db, email)]);
@@ -144,6 +100,8 @@ export interface RoomRow {
   created_at: number;
   expires_at: number;
   closed_at: number | null;
+  /** 1 for a real-time room (migration 0043): it runs over GET /api/live/[code], not the poll. */
+  live: number;
 }
 
 export async function getRoom(db: D1Database, code: string): Promise<RoomRow | null> {
@@ -169,6 +127,11 @@ export async function roomPlayers(db: D1Database, code: string): Promise<PlayerR
 /** What a player sees of the others: seat and first name + last initial, never an email. */
 export function publicPlayers(rows: PlayerRow[]): { seat: number; name: string; left: boolean }[] {
   return rows.map((p) => ({ seat: p.seat, name: ownerLabel(p.first_name, p.last_name), left: p.left_at !== null }));
+}
+
+/** The Durable Object a live room runs in: one per room, and a reused code is a new room. */
+export function liveRoomKey(room: Pick<RoomRow, 'code' | 'created_at'>): string {
+  return `${room.code}-${room.created_at}`;
 }
 
 export function json(body: unknown, status = 200): Response {

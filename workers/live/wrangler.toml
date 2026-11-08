@@ -1,0 +1,25 @@
+# shcode-live: the real-time rooms (codehs-review/REALTIME-SPEC.md).
+#
+# One Durable Object class, LiveRoom, SQLite-backed (the only kind the Workers
+# Free plan allows) and using the WebSocket Hibernation API, so an idle room is
+# not billed. The Pages project binds it as LIVE (the repo's wrangler.toml,
+# [[durable_objects.bindings]] with script_name = "shcode-live"), and
+# functions/api/live/[code].ts is the ONLY way in: this Worker has no public URL
+# (workers_dev and preview_urls are off, no routes), and its own fetch handler
+# answers 404.
+#
+# Deploy (the course owner decides when):   cd workers/live && npx wrangler deploy
+# Local check (deploys nothing):            npx wrangler dev -c wrangler.test.toml
+name = "shcode-live"
+main = "src/index.ts"
+compatibility_date = "2025-04-01"
+workers_dev = false
+preview_urls = false
+
+[[durable_objects.bindings]]
+name = "LIVE_ROOM"
+class_name = "LiveRoom"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["LiveRoom"]

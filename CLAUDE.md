@@ -550,6 +550,22 @@ online demos keep a move log and rebuild from it when a full room starts; they s
 `turn` resetting to 0, which `extras.js` does on every lobby room message. Never use `.life` on a sprite for your own
 counter: the engine treats it as a lifetime.
 
+### Real-time rooms (migration 0043, workers/live/; NOT deployed yet)
+`multiplayer(mode, n, { realtime: true })` makes the lobby create/list LIVE rooms (`POST /api/rooms {live:true}`,
+`GET /api/rooms?game=&live=1`; `game_rooms.live`, 0043): same codes, seats, classmates-only rule. The page
+(`lib/moshion-online.ts`) opens a WebSocket to `GET /api/live/[code]?device=` instead of polling and relays to the
+iframe; `online.share(sprite)` sends up to 8 sprites at 15 Hz (once a second while still, nothing while alone), others
+get `online.peers[seat]` / `online.sharedBy(seat)` (collider 'none', drawn 100 ms behind and interpolated);
+`online.isHost` (seat 0) is the host-decides pattern the docs teach ("Real-time play" pages). The protocol and every
+room rule are ONE module, `lib/live-protocol.ts` (`LiveRoomCore`, `checkShared`, the 30/s burst-60 bucket); move data
+is `checkGameData`, now in `lib/game-data.ts`. Production: the `LiveRoom` Durable Object in `workers/live/` (own
+wrangler.toml, `shcode-live`, SQLite class, hibernation, no public URL), bound to Pages as `LIVE`; the route checks the
+seat in D1 (`functions/_shared/live.ts` `authorizeLive`) and forwards the upgrade with a ticket header, never the
+cookie; no binding = 503, never a half-working room. Dev: `scripts/dev-live.mjs` wraps the same core on Next's bundled
+`ws`. Tests: `scripts/test-live-room.mjs` (npm test), `scripts/test-live-worker.mjs` (against
+`npx wrangler dev -c wrangler.test.toml` in workers/live/, local only). Deploy order: apply 0043, `wrangler deploy` in
+workers/live/, then the site (its wrangler.toml declares the `LIVE` binding with `script_name = "shcode-live"`).
+
 ### Games library (Part B, migration 0042)
 A student publishes a moSHion sketch from the sandbox (`components/PublishGameButton.tsx`: title, share with my class,
 Update / Publish as a new game; which game the sandbox draft is published as lives in localStorage
