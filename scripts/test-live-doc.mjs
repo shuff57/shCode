@@ -312,6 +312,14 @@ const SEED = 'let x = 1;\nfunction draw() {\n  clear();\n}\n';
   bo.outbox.push(JSON.stringify({ t: 'cursor', anchor: -1, head: 'x' }));
   bo.deliverOut();
   clock += 2000;
+  ann.inbox.length = 0;
+  bo.outbox.push(JSON.stringify({ t: 'cursor', anchor: 3, head: 3, version: room.core.version }));
+  bo.outbox.push(JSON.stringify({ t: 'cursor', anchor: 4, head: 4, version: room.core.version + 1 }));
+  bo.deliverOut(); bo.deliverOut();
+  const relayed = ann.inbox.filter((m) => m.t === 'cursor');
+  check('presence: the version a cursor is in is relayed; one past the room\'s is not', relayed.length === 2 && relayed[0].version === room.core.version && !('version' in relayed[1]), relayed);
+  ann.inbox.length = 0;
+  clock += 2000;
 
   // Rate limit: a burst, then drops with ONE error a second.
   bo.inbox.length = 0;

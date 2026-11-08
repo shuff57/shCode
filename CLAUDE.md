@@ -581,7 +581,9 @@ is ever sent to a socket); each Durable Object refuses the other kind's ticket. 
 central authority, in ONE module, `lib/live-doc-protocol.ts` (`LiveDocCore`, shared by the DO and `scripts/dev-live.mjs`):
 updates stamped `s<seat>` by the room, stale pushes answered with the missed updates, past 500 kept updates a reset,
 seed only from seat 0 at version 0, 64 KB doc (UTF-8), 16 KB frame (a seed may be bigger), the 30/s bucket, cursors
-10/s relayed never stored. The room's own storage is written at most every 2 s while changes arrive (Workers Free
+10/s relayed never stored. A cursor carries the room `version` its positions are in and is sent only once the sender's
+own typing is confirmed; the receiver maps it through every update since that version and its own unconfirmed typing
+(`DocSync.cursor()`/`remoteCursor()`; before this a tag sat 1-2 characters off after two people typed at once). The room's own storage is written at most every 2 s while changes arrive (Workers Free
 counts DO rows written; a timer in the core, pending = no hibernation) and at once on close / last leave; a room
 evicted between writes wakes behind, and a client ahead of it (push/pull past its version, or a reconnect to a new
 `epoch` holding more than `since`) is reset to the room's text with "The shared program jumped back a few seconds." The browser half is `lib/live-doc.ts` (`DocSync` + presence cursors with name tags + a filter
