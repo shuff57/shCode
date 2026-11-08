@@ -21,7 +21,7 @@ import {
   type MyGame,
   type SharedGame,
 } from '../lib/games-client';
-import { modeLabel } from '../lib/games-core';
+import { modeLabel, type GameMode } from '../lib/games-core';
 
 const btn: React.CSSProperties = {
   fontSize: 12, padding: '4px 8px', borderRadius: 4, cursor: 'pointer', whiteSpace: 'nowrap',
@@ -34,6 +34,36 @@ const rowStyle: React.CSSProperties = {
   border: '1px solid var(--c-line)', borderRadius: 6, background: 'var(--c-deep2)',
 };
 const badge: React.CSSProperties = { fontSize: 11, color: 'var(--c-dim)', whiteSpace: 'nowrap' };
+
+// Built-in games (public/builtin-games.json, made from the lesson demos by
+// scripts/generate-builtin-games.mjs): PLAY ONLY, no Remix and no code, because
+// they are the games students build in Trail, Checkers and Quest.
+interface Builtin { id: string; title: string; blurb: string; mode: GameMode; players: number }
+function BuiltinGames() {
+  const [games, setGames] = useState<Builtin[] | null>(null);
+  useEffect(() => {
+    fetch('/builtin-games.json').then((r) => (r.ok ? r.json() : null))
+      .then((d: { games: Builtin[] } | null) => setGames(d?.games ?? []))
+      .catch(() => setGames([]));
+  }, []);
+  if (!games || games.length === 0) return null;
+  return (
+    <>
+      <h4 style={{ fontSize: 13, margin: '10px 0 6px' }}>Built in</h4>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {games.map((g) => (
+          <div key={g.id} style={rowStyle}>
+            <div style={{ minWidth: 140, flex: '1 1 160px' }}>
+              <div style={{ fontSize: 13, fontWeight: 600 }}>{g.title}</div>
+              <div style={{ ...badge, whiteSpace: 'normal' }}>{modeLabel(g.mode, g.players)} · {g.blurb}</div>
+            </div>
+            <a href={`/play/?builtin=${g.id}`} style={playBtn}>Play</a>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
 
 type Loaded<T> = { kind: 'loading' } | { kind: 'signed-out' } | { kind: 'error'; text: string } | { kind: 'ok'; games: T[] };
 
@@ -92,6 +122,7 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
       <section aria-labelledby="games-h" style={{ marginTop: 18 }}>
         <h3 id="games-h" style={{ fontSize: 14, margin: '0 0 4px' }}>Games</h3>
         <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: 0 }}>Sign in to publish games and play the ones your class made.</p>
+        <BuiltinGames />
       </section>
     );
   }
@@ -109,6 +140,7 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
           {note.text}
         </div>
       )}
+      <BuiltinGames />
       <h4 style={{ fontSize: 13, margin: '10px 0 6px' }}>Yours</h4>
       {mine.kind === 'loading' && <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: 0 }}>Loading…</p>}
       {mine.kind === 'error' && <p style={{ fontSize: 13, color: 'var(--c-red)', margin: 0 }}>{mine.text}</p>}
