@@ -366,7 +366,7 @@ function drawTop() {
   if (phase !== 'title' && winner === '') {
     textAlign('right');
     let who = nameOf(side) + "'s move";
-    if (phase === 'online' && game.ready) who = online.seat === seatOf(side) ? 'Your move (' + nameOf(side) + ')' : nameOf(side) + ' is thinking';
+    if (phase === 'online' && game.ready) who = online.seat === seatOf(side) ? 'Your move (' + nameOf(side) + ')' : 'Waiting for ' + nameOf(side);
     say(who, W - 10, 24, 16, side === 'r' ? '#ff8a7a' : '#d0d0d8', 240);
     textAlign('left');
   }
