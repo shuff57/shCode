@@ -54,6 +54,8 @@ export const HOST_LEAVE_CONFIRM = 'Leave and end the session for everyone? Every
 const LANG_NAME: Record<CodeLang, string> = { js: 'JavaScript', moshion: 'moSHion' };
 /** Whether the strip's details are open: 'open' | 'closed' (absent: never in a session in this browser). */
 const DETAILS_KEY = 'shCode:together-details';
+/** Below this the strip's label is for screen readers only. */
+const NARROW_PX = 520;
 
 interface OpenSession { code: string; host: string; seats: number; present: number; here: boolean }
 type ListState =
@@ -159,6 +161,10 @@ export default function CodeTogetherBar({
   const [note, setNote] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  // A narrow strip (full screen floats the editor at 420 px) drops the words
+  // "Coding together" from sight, so a note keeps its room.
+  const [narrow, setNarrow] = useState(false);
+  const stripRef = useRef<HTMLDivElement | null>(null);
   const clientRef = useRef<LiveDocClient | null>(null);
   const sessionRef = useRef<Session | null>(null);
   sessionRef.current = session;
@@ -202,6 +208,15 @@ export default function CodeTogetherBar({
     void load();
     return () => { live = false; if (timer) clearTimeout(timer); };
   }, [session, open, game, device]);
+
+  const inSession = !!session;
+  useEffect(() => {
+    const el = stripRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(() => setNarrow(el.clientWidth < NARROW_PX));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [inSession]);
 
   const here = session ? Math.max(1, status?.players.length ?? 0) : 0;
   useEffect(() => { cb.current.onHere?.(here); }, [here]);
@@ -382,6 +397,7 @@ export default function CodeTogetherBar({
       aria-live={wrap ? undefined : 'polite'}
       style={wrap
         ? { minWidth: 0, display: 'inline-flex', flexWrap: 'wrap', alignItems: 'center', columnGap: 10, rowGap: 2 }
+        // Gives up its room before the note beside it (S.stripRest).
         : { minWidth: 0, flex: '0 1 auto', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
     >
       <span className="sr-only">{here} here: </span>
@@ -410,6 +426,7 @@ export default function CodeTogetherBar({
 
   const strip = session ? (
     <div
+      ref={stripRef}
       style={{ ...bar, gap: 0, padding: 0, maxHeight: '45%' }}
       role="region"
       aria-label="Code together"
@@ -417,7 +434,7 @@ export default function CodeTogetherBar({
       data-expanded={expanded ? 'true' : 'false'}
     >
       <div style={S.stripRow}>
-        <strong style={{ whiteSpace: 'nowrap', flex: 'none' }}>Coding together</strong>
+        <strong style={S.stripLabel} className={narrow ? 'sr-only' : undefined}>Coding together</strong>
         <span data-testid="together-code" data-code={session.code} style={{ flex: 'none', display: 'inline-flex' }}>
           <CodePictures code={session.code} size={18} letters={false} />
         </span>
@@ -425,18 +442,20 @@ export default function CodeTogetherBar({
           {copied ? 'Copied' : 'Copy'}
         </button>
         <span style={{ ...dim, flex: 'none' }} aria-hidden="true">·</span>
-        {peopleList(false)}
-        {stripNote ? (
-          <span
-            data-testid={st?.error ? undefined : st?.notice ? 'together-notice' : 'together-status'}
-            role={st?.error ? 'alert' : 'status'}
-            title={st?.error || st?.notice || longLine || undefined}
-            style={{ ...S.stripNote, color: stripNote.color }}
-          >
-            {stripNote.text}
-          </span>
-        ) : null}
-        <span style={{ flex: '1 1 0', minWidth: 0 }} />
+        {/* The room left over: the people give theirs up first, then the note; the rest of the line never moves. */}
+        <span style={S.stripRest}>
+          {peopleList(false)}
+          {stripNote ? (
+            <span
+              data-testid={st?.error ? undefined : st?.notice ? 'together-notice' : 'together-status'}
+              role={st?.error ? 'alert' : 'status'}
+              title={st?.error || st?.notice || longLine || undefined}
+              style={{ ...S.stripNote, color: stripNote.color }}
+            >
+              {stripNote.text}
+            </span>
+          ) : null}
+        </span>
         <button type="button" style={S.small} onClick={leave}>Leave</button>
         <button
           type="button"
@@ -472,7 +491,7 @@ export default function CodeTogetherBar({
     // The session ended (Leave, the host, the host gone): said where it was, until dismissed.
     <div style={{ ...bar, gap: 0, padding: 0 }} data-testid="together-ended">
       <div style={S.stripRow}>
-        <span role="status" data-testid="together-note" style={{ ...S.stripNote, color: 'var(--c-orange)', flex: '0 1 auto', maxWidth: 'none' }} title={note}>
+        <span role="status" data-testid="together-note" style={{ ...S.stripNote, flex: '0 1 auto', color: 'var(--c-orange)' }} title={note}>
           {note}
         </span>
         <span style={{ flex: '1 1 0', minWidth: 0 }} />
@@ -607,9 +626,17 @@ const S = {
   small: {
     ...quiet, padding: '2px 8px', fontSize: 11, flex: 'none',
   } as React.CSSProperties,
-  /** The strip's note keeps its room (the people beside it give theirs up first). */
+  /** Gives way only on a line too narrow for even the fixed parts, so Leave and the chevron always stay on it. */
+  stripLabel: {
+    flex: '0 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+  } as React.CSSProperties,
+  /** The room between Copy and Leave (a zero basis: it takes what is left and never pushes anything out). */
+  stripRest: {
+    flex: '1 1 0', minWidth: 0, display: 'flex', alignItems: 'center', gap: 10, overflow: 'hidden',
+  } as React.CSSProperties,
+  /** The strip's note keeps its room (the people beside it shrink first), at most the whole of what is left. */
   stripNote: {
-    minWidth: 0, flex: '0 0 auto', maxWidth: '55%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+    minWidth: 0, flex: 'none', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
   } as React.CSSProperties,
   details: {
     display: 'flex', flexDirection: 'column', gap: 5, padding: '2px 10px 8px',
