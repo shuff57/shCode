@@ -2023,6 +2023,19 @@ function GradebookView({
 // List view
 // ---------------------------------------------------------------------------
 
+// Only the existing grading panel needs this flag; teacher containers use CSS.
+function useGradingWeightsDesktop() {
+  const [desktop, setDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const sync = () => setDesktop(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+  return desktop;
+}
+
 function ListView() {
   const router = useRouter();
   const [classes, setClasses] = useState<ClassSummary[]>([]);
@@ -2096,7 +2109,7 @@ function ListView() {
     );
 
   return (
-    <div>
+    <div className="teacher-frame">
       <h1 style={{ ...S.h1, marginBottom: 8 }}>My Classes</h1>
       <p style={{ color: 'var(--c-meta)', margin: '0 0 24px', fontSize: 14 }}>Your classroom at a glance. Open a class to review work and support your students.</p>
 
@@ -2115,7 +2128,7 @@ function ListView() {
       {classes.length === 0 ? (
         <p style={{ color: 'var(--c-meta)' }}>No classes yet. Create your first class below.</p>
       ) : (
-        <div style={{ display: 'grid', gap: 16, maxWidth: 880 }}>
+        <div className="teacher-class-grid" style={{ display: 'grid', gap: 16, maxWidth: 880 }}>
           {[...classes].sort((x, y) => Number(y.id === lastId) - Number(x.id === lastId)).map((c) => (
             <div
               key={c.id}
@@ -2177,7 +2190,7 @@ function ListView() {
         </div>
       )}
       {/* Create form */}
-      <div style={{ ...S.card, marginTop: 24, maxWidth: 880 }}>
+      <div className="teacher-create-card" style={{ ...S.card, marginTop: 24, maxWidth: 880 }}>
         <h2 style={S.h2}>Create class</h2>
         <form onSubmit={(e) => { void handleCreate(e); }} style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
           <label htmlFor="new-class-name" style={{ fontSize: 14, fontWeight: 600 }}>Class name</label>
@@ -2226,6 +2239,7 @@ function parseTab(v: string | null): TabId | undefined {
 }
 
 function DetailView({ classId, initialTab }: { classId: string; initialTab?: TabId }) {
+  const desktop = useGradingWeightsDesktop();
   const [compact, setCompact] = useState(false);
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 640px)');
@@ -2514,7 +2528,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
   const isArchived = !!cls.archived_at;
 
   return (
-    <div>
+    <div className={activeTab === 'gradebook' ? 'teacher-gradebook' : 'teacher-frame'}>
       {/* Back link */}
       <button
         style={{ background: 'none', border: 'none', color: 'var(--c-cyan)', cursor: 'pointer', fontSize: 13, padding: 0, marginBottom: 8 }}
@@ -2814,7 +2828,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         <div role="tabpanel" id={`panel-settings`} aria-labelledby={`tab-settings`} style={{ display: 'grid', alignItems: 'start', gap: 16, gridTemplateColumns: compact ? 'minmax(0, 1fr)' : 'repeat(2, minmax(0, 1fr))' }}>
         {/* Grading weights */}
         <div style={{ ...S.card, marginBottom: 0, padding: compact ? 16 : 20 }}>
-          <GradingWeightsPanel classId={classId} />
+          <GradingWeightsPanel classId={classId} desktop={desktop} />
         </div>
         <div style={{ display: 'grid', gap: 16, minWidth: 0 }}>
         {/* Code */}

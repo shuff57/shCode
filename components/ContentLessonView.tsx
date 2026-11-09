@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { type ReactNode, memo, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import type { Lesson } from '../lib/types';
 import { badgeFor } from '../lib/lesson-badges';
@@ -11,12 +11,19 @@ import DiagramAssignmentView from './DiagramAssignmentView';
 import { taskSections } from '../lib/diagram-task-sections';
 import { splitRubric } from '../lib/rubric-split';
 import QuizView from './QuizView';
-import MarkdownWithLiveBlocks from './MarkdownWithLiveBlocks';
+import MarkdownWithLiveBlocksContent from './MarkdownWithLiveBlocks';
 import HeaderLessonNav from './HeaderLessonNav';
 import { withInlineCode } from './InlineCode';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import DocsDrawer from './DocsDrawer';
 import { withAlpha } from '../lib/color-alpha';
+
+// Outline updates must not re-inject markdown HTML and discard heading IDs.
+const MarkdownWithLiveBlocks = memo(MarkdownWithLiveBlocksContent);
+
+function LessonPrimary({ wrap, children }: { wrap: boolean; children: ReactNode }) {
+  return wrap ? <div className="lesson-primary">{children}</div> : <>{children}</>;
+}
 
 interface Props {
   lesson: Lesson;
@@ -48,6 +55,8 @@ function isMediaFile(url: string): boolean {
 
 export default function ContentLessonView({ lesson }: Props) {
   const completionState = useLessonState();
+  const mainRef = useRef<HTMLElement | null>(null);
+  const [outline, setOutline] = useState<{ id: string; title: string; level: number }[]>([]);
   const preview = lesson.preview as string;
   const badge = badgeFor(preview);
   const contentMd = findContent(lesson);
@@ -59,7 +68,37 @@ export default function ContentLessonView({ lesson }: Props) {
   const rubricSplit = !meta.quiz && !meta.diagram && meta.aiGrader ? splitRubric(contentMd) : null;
   const writtenIntro = rubricSplit?.before.trim().split(/(?<=\.)\s+/);
   const bodyMd = writtenIntro ? writtenIntro.slice(0, 2).join(' ') : contentMd;
-  const writtenGuidance = writtenIntro?.slice(2).join(' ') ?? ''; 
+  const writtenGuidance = writtenIntro?.slice(2).join(' ') ?? '';
+  const readingLayout = !meta.quiz && !meta.diagram;
+  const focusedLayout = readingLayout && preview !== 'example';
+  const hasOutline = readingLayout && !meta.videoUrl && preview !== 'slides' && outline.length >= 2;
+
+  useEffect(() => {
+    const main = mainRef.current;
+    if (!main) return;
+    let nextId = 0;
+    const syncOutline = () => {
+      const headings = main.querySelectorAll<HTMLElement>('.content-prose h2, .content-prose h3');
+      const next = Array.from(headings).map((heading) => {
+        if (!heading.id) {
+          let id: string;
+          do { id = `lesson-heading-${nextId++}`; } while (document.getElementById(id));
+          heading.id = id;
+        }
+        return { id: heading.id, title: heading.textContent ?? '', level: Number(heading.tagName.slice(1)) };
+      });
+      setOutline((previous) => previous.length === next.length && previous.every((heading, index) =>
+        heading.id === next[index].id && heading.title === next[index].title && heading.level === next[index].level
+      ) ? previous : next);
+    };
+    // Live blocks can mount or replace prose after the markdown first renders.
+    const observer = new MutationObserver(syncOutline);
+    observer.observe(main, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['id', 'class'] });
+    syncOutline();
+    return () => {
+      observer.disconnect();
+    };
+  }, [bodyMd, lesson.id]);
 
   // A lesson can name a deck that hasn't been authored yet. Embedding that URL
   // blind puts a raw 404 page inside the lesson, which is a worse first
@@ -160,7 +199,7 @@ export default function ContentLessonView({ lesson }: Props) {
           },
         ]}
       />
-      <main className="content-lesson-main" style={{ maxWidth: 1080, width: '100%', boxSizing: 'border-box', margin: '0 auto', padding: '18px 20px 24px', color: 'var(--c-fg)' }}>
+      <main ref={mainRef} className="content-lesson-main page-frame" style={{ maxWidth: 1080, width: '100%', boxSizing: 'border-box', margin: '0 auto', padding: '18px 20px 24px', color: 'var(--c-fg)' }}>
       <nav style={{ marginBottom: 5, fontSize: 13, color: 'var(--c-meta)' }}>
         <Link href="/" style={{ color: 'var(--c-cyan)' }}>Home</Link>
         {lesson.unit ? (
@@ -202,12 +241,20 @@ export default function ContentLessonView({ lesson }: Props) {
           </a>
         ) : null}
       </div>
+      <div className={readingLayout ? `lesson-reading-grid${focusedLayout ? ' lesson-focused-grid' : ''}${hasOutline ? ' has-outline' : ''}` : 'lesson-content-flow'}>
+      {hasOutline && <aside className="lesson-overview" aria-label="Lesson overview">
+        <nav aria-label="On this page">
+          <h2>On this page</h2>
+          <ul>{outline.map((heading) => <li key={heading.id} className={heading.level === 3 ? 'outline-subheading' : undefined}><a href={`#${heading.id}`}>{heading.title}</a></li>)}</ul>
+        </nav>
+      </aside>}
+      <LessonPrimary wrap={focusedLayout}>
       {lesson.description && !meta.quiz ? (
-        <p style={{ color: 'var(--c-meta)', margin: '0 0 4px', fontSize: 14, lineHeight: 1.35 }}>{withInlineCode(lesson.description)}</p>
+        <p className="lesson-description" style={{ color: 'var(--c-meta)', margin: '0 0 4px', fontSize: 14, lineHeight: 1.35 }}>{withInlineCode(lesson.description)}</p>
       ) : null}
 
       {meta.videoUrl && meta.videoUrl.trim() ? (
-          <div style={{ aspectRatio: '16 / 9', width: 'min(100%, 680px)', margin: '16px auto 0', borderRadius: 8, overflow: 'hidden', background: 'var(--x-000000)' }}>
+          <div className="lesson-wide-media lesson-video-frame" style={{ aspectRatio: '16 / 9', width: 'min(100%, 680px)', margin: '16px auto 0', borderRadius: 8, overflow: 'hidden', background: 'var(--x-000000)' }}>
             {/* A YouTube link still gets an iframe. A direct file gets a real
                 <video>, because an mp4 dropped into an iframe renders the
                 browser's bare player and shows NO captions — a soft mov_text
@@ -252,7 +299,7 @@ export default function ContentLessonView({ lesson }: Props) {
 
       {preview === 'slides' ? (
         slidesUrl && deckReady === true ? (
-          <div style={{ marginTop: 4 }}>
+          <div className="lesson-wide-media" style={{ marginTop: 4 }}>
             {deckBlank ? (
               <p role="status" style={{ margin: '0 0 8px', color: 'var(--c-yellow)', fontSize: 14 }}>
                 Slides blank? Open them in a new tab.
@@ -291,7 +338,7 @@ export default function ContentLessonView({ lesson }: Props) {
       ) : null}
 
       {meta.externalLink ? (
-        <p style={{ margin: '16px 0' }}>
+        <p className="lesson-book-link" style={{ margin: '16px 0' }}>
           <a href={meta.externalLink} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--c-meta)', textDecoration: 'underline', fontSize: 14 }}>
             📖 {meta.externalLinkLabel ?? meta.externalLink}
           </a>
@@ -299,10 +346,13 @@ export default function ContentLessonView({ lesson }: Props) {
       ) : null}
 
       {bodyMd ? (
-        <div className={[proseBody ? 'prose-copy' : '', lesson.type === 'example' ? 'compact-example' : '', preview === 'example' ? 'worked-example' : ''].filter(Boolean).join(' ') || undefined} style={{ marginTop: 12 }}>
+        <div className={['lesson-reading-body', proseBody ? 'prose-copy' : '', lesson.type === 'example' ? 'compact-example' : '', preview === 'example' ? 'worked-example' : ''].filter(Boolean).join(' ') || undefined} style={{ marginTop: 12 }}>
           {meta.quiz ? <details className="quiz-intro"><summary style={{ cursor: 'pointer', color: 'var(--c-meta)', fontSize: 13 }}>Review lesson instructions</summary><MarkdownWithLiveBlocks src={bodyMd} lessonId={lesson.id} /></details> : <MarkdownWithLiveBlocks src={bodyMd} lessonId={lesson.id} />}
         </div>
       ) : null}
+
+      </LessonPrimary>
+      </div>
 
       {meta.quiz ? (
         <QuizView lessonId={lesson.id} config={meta.quiz} />

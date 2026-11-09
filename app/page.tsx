@@ -93,7 +93,7 @@ export default async function HomePage() {
     : allLessons;
 
   return (
-    <div className="p-4">
+    <div className="p-4 home-page page-frame">
       <HomeBackdrop />
       <LessonSearchFilter units={units} lessons={lessons.map(forCards)} />
 
