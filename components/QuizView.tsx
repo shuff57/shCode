@@ -352,6 +352,7 @@ export default function QuizView({ lessonId, config }: Props) {
         return (
           <div
             key={q.id}
+            className="quiz-question-card"
             style={{
               background: '#282a36',
               border: '1px solid #44475a',
@@ -394,7 +395,7 @@ export default function QuizView({ lessonId, config }: Props) {
               </pre>
             ) : null}
 
-            <div style={{ marginLeft: 0 }}>
+            <div className="quiz-options">
               {order.map((oi) => {
                 const opt = q.options[oi];
                 const selected = picked === oi;
@@ -407,26 +408,8 @@ export default function QuizView({ lessonId, config }: Props) {
                 const markAsMistake = showMarks && selected && oi !== answerIndex;
                 return (
                   <label
-                    className="prose-copy"
+                    className={`prose-copy quiz-option${selected ? ' is-selected' : ''}${markAsAnswer ? ' is-correct' : ''}${markAsMistake ? ' is-mistake' : ''}${locked ? ' is-locked' : ''}`}
                     key={oi}
-                    style={{
-                      display: 'flex',
-                      gap: 10,
-                      alignItems: 'flex-start',
-                      padding: '9px 12px',
-                      minHeight: 44,
-                      marginBottom: 4,
-                      borderRadius: 4,
-                      cursor: 'pointer',
-                      background: markAsAnswer
-                        ? 'rgba(80, 250, 123, 0.12)'
-                        : markAsMistake
-                          ? 'rgba(255, 85, 85, 0.12)'
-                          : selected
-                            ? '#44475a'
-                            : 'transparent',
-                      color: '#f8f8f2',
-                    }}
                   >
                     <input
                       type="radio"
@@ -434,7 +417,7 @@ export default function QuizView({ lessonId, config }: Props) {
                       checked={selected}
                       disabled={locked}
                       onChange={() => pick(q.id, oi)}
-                      style={{ marginTop: 3, accentColor: '#bd93f9' }}
+                      className="quiz-option-radio"
                     />
                     <span>{withInlineCode(opt)}</span>
                   </label>

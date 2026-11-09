@@ -2014,7 +2014,7 @@ body:has(.lesson-progress-footer) .editor-body { margin-top: 0; padding-top: 8px
   .run-toolbar button { padding: 6px 8px; white-space: nowrap; }
   .student-quiz { margin-top: 8px !important; padding-top: 8px !important; }
   .student-quiz > p { margin-bottom: 10px !important; line-height: 1.4; }
-  .student-quiz label { padding: 6px 8px !important; margin-bottom: 2px !important; }
+  .student-quiz label:not(.quiz-option) { padding: 6px 8px !important; margin-bottom: 2px !important; }
   .student-quiz label:not(.prose-copy) { line-height: 1.35; font-size: 14px; }
   .content-lesson-main:has(.student-quiz) > p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   body:has(.content-lesson-main) .shd-tabstrip { width: auto !important; align-self: flex-end; padding: 0 !important; margin-bottom: -6px; }
@@ -2484,3 +2484,67 @@ a.mod-row:hover { background: #343746; border-top-color: #6272a4; border-bottom-
 @media (max-width: 720px) {
   .mod-row-title { grid-column: 1 / 3; }
 }
+
+/* Quiz choices remain readable and identifiable after the inputs are locked. */
+.quiz-question-card { max-width: 760px; width: 100%; box-sizing: border-box; }
+/* intro, divider and cards share one right edge (judges: ragged band to the right of the cards) */
+.student-quiz { max-width: 760px; box-sizing: border-box; }
+.quiz-options { display: grid; gap: 8px; }
+.student-quiz .quiz-option {
+  display: flex; align-items: flex-start; gap: 12px; width: 100%; box-sizing: border-box;
+  min-height: 44px; padding: 10px 12px; border: 1px solid #44475a; border-radius: 8px;
+  color: #f8f8f2; cursor: pointer;
+}
+.quiz-option:not(.is-locked):hover { background: #343746; }
+.student-quiz .quiz-option.is-selected { border-color: #bd93f9; background: #bd93f914; }
+.student-quiz .quiz-option.is-correct { border-color: #50fa7b; background: #50fa7b1f; }
+.student-quiz .quiz-option.is-mistake { border-color: #ff5555; background: #ff55551f; }
+.quiz-option:has(input:focus-visible) { outline: 2px solid #8be9fd; outline-offset: 3px; }
+.quiz-option.is-locked { cursor: default; }
+.quiz-option-radio {
+  appearance: none; flex: 0 0 18px; width: 18px; height: 18px; margin: 3px 0 0;
+  border: 2px solid #b1bada; border-radius: 50%; background: #21222c;
+  display: grid; place-content: center; color: #bd93f9; opacity: 1; cursor: inherit;
+}
+.quiz-option-radio::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; transform: scale(0); }
+.quiz-option-radio:checked { border-color: currentColor; }
+.quiz-option-radio:checked::before { transform: scale(1); }
+.is-correct .quiz-option-radio { color: #50fa7b; border-color: #50fa7b; }
+.is-mistake .quiz-option-radio { color: #ff5555; border-color: #ff5555; }
+.quiz-option > span { min-width: 0; }
+
+.mod-row-details { display: contents; }
+@media (min-width: 721px) {
+  .mod-row-title { order: 1; }
+  .mod-row-meta { order: 2; }
+  .mod-row-chevron, .mod-row[aria-disabled]::after { order: 3; }
+}
+@media (max-width: 720px) {
+  :is(.content-lesson-main, .assignment-header-left) :is(h1, h2),
+  main:has(.mod-row) > div > h1 { text-wrap: balance; }
+  :is(.content-lesson-main, .assignment-header-left) h1,
+  main:has(.mod-row) > div > h1 {
+    font-size: 22px !important; line-height: 1.25 !important;
+  }
+  .mod-row-details {
+    grid-column: 1 / 3; grid-row: 2; display: flex; align-items: center;
+    flex-wrap: wrap; gap: 8px; min-width: 0;
+  }
+  .mod-row-details .mod-row-meta { display: contents; }
+  .mod-row-details .mod-row-badge { flex-shrink: 0; white-space: nowrap; }
+  .mod-row-details .mod-row-duration { order: 1; white-space: nowrap !important; }
+  .mod-row-details .mod-row-state {
+    order: 2; width: auto; flex: 0 0 auto; text-align: left; white-space: nowrap !important;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .mod-row-duration::before, .mod-row-state:has(> span)::before { content: '·'; color: #b1bada; }
+  .mod-row-duration::before { margin-right: 8px; }
+  .mod-row-meta > :not(.mod-row-duration):not(.mod-row-state) { order: 3; }
+  .mod-row-done {
+    background: none !important; border: 0 !important; padding: 0 !important;
+    text-transform: none !important; letter-spacing: normal !important;
+  }
+  .mod-row-chevron, .mod-row[aria-disabled]::after { align-self: center; }
+}
+
+/* Keep short inline expressions intact, with the full task column available. */

@@ -160,6 +160,8 @@ export default function ModuleLessonsList({
 
         const inner = (
           <>
+            <span className="mod-row-title" style={{ fontWeight: 500 }}><span className="mod-row-num" style={{ color: '#b1bada', fontFamily: 'monospace', fontVariantNumeric: 'tabular-nums' }}>{l.numberedId}</span>{' '}<span>{l.displayTitle}</span></span>
+            <span className="mod-row-details">
             <span
               className="mod-row-badge"
               style={{
@@ -180,7 +182,6 @@ export default function ModuleLessonsList({
               <badge.Icon size={12} strokeWidth={2.25} />
               {badge.label}
             </span>
-            <span className="mod-row-title" style={{ fontWeight: 500 }}><span className="mod-row-num" style={{ color: '#b1bada', fontFamily: 'monospace', fontVariantNumeric: 'tabular-nums' }}>{l.numberedId}</span>{' '}<span>{l.displayTitle}</span></span>
             <span className="mod-row-meta">
             <span className="mod-row-state">
             {locked ? (
@@ -207,6 +208,7 @@ export default function ModuleLessonsList({
               </span>
             ) : stateLabel ? (
               <span
+                className={lessonState === 'completed' ? 'mod-row-done' : undefined}
                 style={{
                   fontSize: 12,
                   color: stripeColor,
@@ -237,7 +239,7 @@ export default function ModuleLessonsList({
               ambiguous={availability.ambiguous}
             />
             {l.estimateMins ? (
-              <span style={{ color: '#b1bada', fontSize: 13 }}>~{l.estimateMins} min</span>
+              <span className="mod-row-duration" style={{ color: '#b1bada', fontSize: 13 }}>~{l.estimateMins} min</span>
             ) : null}
             <DueDateChip
               scope="lesson"
@@ -265,6 +267,7 @@ export default function ModuleLessonsList({
                 />
               </>
             )}
+            </span>
             </span>
             {!locked && <span className="mod-row-chevron" aria-hidden="true">›</span>}
           </>
