@@ -2372,7 +2372,7 @@ body { box-sizing: border-box; padding-right: 20px; }
 }
 
 /* Labs: a readable task beside the work, with a single status row above it. */
-.lab-work-area { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 16px; min-width: 0; }
+.lab-work-area { display: grid; grid-template-columns: clamp(320px, 26.4vw, 380px) minmax(0, 1fr); gap: 16px; min-width: 0; }
 .lab-task-card { font-family: system-ui, sans-serif; font-size: 14px; line-height: 1.5; }
 .lab-task-card .lesson-steps { margin: 0; padding-left: 20px; }
 .lab-task-card .lesson-step { margin: 0 0 14px; padding: 0; }
@@ -2400,8 +2400,8 @@ body { box-sizing: border-box; padding-right: 20px; }
   body:has(.shd-tabstrip) .lab-work-area { margin-right: calc(var(--shd-rail-width) + var(--shd-rail-gap) + var(--shd-tabbed, 0px)); }
   body:has(.shd-tabstrip) .lab-work-area .editor-card { margin-right: 0; }
   .lab-work-area .toolbar-submit { display: none; }
-  .lab-work-area .editor-preview-container:not(.sandbox-split) > #editorPane { min-width: 0; flex-basis: 58%; }
-  .lab-work-area #previewPane { min-width: 0; flex-basis: 42%; }
+  .lab-work-area .editor-preview-container:not(.sandbox-split) > #editorPane { min-width: min(480px, 64%); flex-basis: 64%; }  /* never starve the preview at medium widths or with a drawer open */
+  .lab-work-area #previewPane { min-width: 0; flex-basis: 36%; }
   .lab-work-area .console-empty { min-width: 0; }
 }
 @media (max-width: 720px) {
@@ -2715,3 +2715,37 @@ a.mod-row:hover { background: var(--x-343746); border-top-color: var(--c-comment
 }
 
 /* Keep short inline expressions intact, with the full task column available. */
+
+/* Lab tool states: accent identifies the open tool, quiet borders keep the rail readable. */
+.shd-tab {
+  /* keep each tool's own colour when closed (monochrome trap); the open tab adds the fill and accent border */
+  color: var(--shd-tab-accent, var(--c-purple));
+  background: var(--c-deep2);
+  border: 1px solid var(--c-line);
+  transition: background-color 120ms, border-color 120ms, color 120ms;
+}
+.shd-tab[aria-pressed="true"] {
+  color: var(--shd-tab-accent, var(--c-purple));
+  background: color-mix(in srgb, var(--shd-tab-accent, var(--c-purple)) 18%, var(--c-deep2));
+  border-color: var(--shd-tab-accent, var(--c-purple)) !important;
+}
+.shd-tab:hover {
+  color: var(--shd-tab-accent, var(--c-purple));
+  background: color-mix(in srgb, var(--shd-tab-accent, var(--c-purple)) 10%, var(--c-deep2));
+  border-color: var(--shd-tab-accent, var(--c-purple)) !important;
+}
+.shd-tab:focus-visible {
+  outline: 2px solid var(--shd-tab-accent, var(--c-purple));
+  outline-offset: -3px;
+}
+@media (max-width: 720px) {
+  /* Only console labs: preserve the canvas height in graphical labs. Auto height
+     follows rendered (including folded/wrapped) lines, then scrolls at the cap. */
+  .lab-work-area:has(.output-header) #previewPane { height: clamp(120px, 16svh, 160px); }
+  .lab-work-area:has(.output-header) #editorPane { height: auto; min-height: 180px; max-height: 45svh; }
+  .lab-work-area:has(.output-header) #editorPane > div { height: auto !important; }
+  .lab-work-area:has(.output-header) #editor { height: auto; flex: 0 1 auto !important; }
+  .lab-work-area:has(.output-header) #editor > div { height: auto !important; }
+  .lab-work-area:has(.output-header) #editor .cm-editor { height: auto; }
+  .lab-work-area:has(.output-header) #editor .cm-scroller { min-height: 140px; max-height: calc(45svh - 40px); }
+}

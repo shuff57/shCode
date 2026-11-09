@@ -1294,6 +1294,32 @@ function GradebookView({
   // One module's columns (its `unit` string), or null for every module.
   const [moduleFilter, setModuleFilter] = useState<string | null>(null);
   const [grades, setGrades] = useState<Map<string, GridGrade>>(new Map());
+  const CELL_W = 140;
+  const [gridElement, setGridElement] = useState<HTMLDivElement | null>(null);
+  const [gridScroll, setGridScroll] = useState({ left: false, right: false, more: 0 });
+
+  useEffect(() => {
+    if (!gridElement) return;
+    const sync = () => {
+      const remaining = gridElement.scrollWidth - gridElement.clientWidth - gridElement.scrollLeft;
+      const lessonCount = Number(gridElement.dataset.lessonCount ?? 0);
+      const next = {
+        left: gridElement.scrollLeft > 1,
+        right: remaining > 1,
+        more: Math.min(lessonCount, Math.max(0, Math.ceil((remaining - 1) / CELL_W))),
+      };
+      setGridScroll((prev) => prev.left === next.left && prev.right === next.right && prev.more === next.more ? prev : next);
+    };
+    sync();
+    gridElement.addEventListener('scroll', sync, { passive: true });
+    const observer = new ResizeObserver(sync);
+    observer.observe(gridElement);
+    if (gridElement.firstElementChild) observer.observe(gridElement.firstElementChild);
+    return () => {
+      gridElement.removeEventListener('scroll', sync);
+      observer.disconnect();
+    };
+  }, [gridElement]);
 
   // The grade so far beside each name: the same number the roster shows (one endpoint, one rule).
   useEffect(() => {
@@ -1402,14 +1428,13 @@ function GradebookView({
 
   // At 1440px the default columns use 390px + 6 × 140px = 1230px.
   // The card has 1270px available, leaving six complete lesson columns visible.
-  const CELL_W = 140;
   // Category total columns, between the grade and the first lesson.
   const CAT_W = showCategoryColumns ? 64 : 116;
   const EMAIL_W = narrow ? 110 : 190;
   // Height of the unit header row. The per-lesson row sticks at this offset, so
   // the row has to BE this tall: a unit title that wrapped made it 100px and the
   // lesson row slid 67px up over it.
-  const HEAD1_H = 33;
+  const HEAD1_H = 28;
   // Frozen only on wide screens (see `narrow` above).
   const gradeLeft = narrow ? undefined : EMAIL_W;
 
@@ -1658,8 +1683,26 @@ function GradebookView({
         ))}
       </div>
 
-      <div aria-live="polite" style={{ margin: '0 0 8px', padding: '4px 12px', borderRadius: 5, border: '1px solid var(--c-line)', background: 'var(--c-deep2)', color: 'var(--c-meta)', fontSize: 13 }}>
-        <strong style={{ color: 'var(--c-cyan)' }}>{displayLessons.length} more lessons →</strong> · Scroll to explore. Student names stay in view.
+      <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 8, color: 'var(--c-meta)', fontSize: 13 }}>
+        <button
+          type="button"
+          disabled={!gridScroll.left}
+          aria-label="Scroll back three lesson columns"
+          onClick={() => gridElement?.scrollBy({ left: -CELL_W * 3, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })}
+          style={{ height: 28, padding: '0 8px', borderRadius: 4, border: '1px solid var(--c-line)', background: 'var(--c-deep2)', color: 'var(--c-cyan)', fontSize: 13, opacity: gridScroll.left ? 1 : 0.5, cursor: gridScroll.left ? 'pointer' : 'not-allowed' }}
+        >
+          ← Back
+        </button>
+        <button
+          type="button"
+          disabled={!gridScroll.right}
+          aria-label={`Scroll forward three lesson columns, ${gridScroll.more} more lessons to the right`}
+          onClick={() => gridElement?.scrollBy({ left: CELL_W * 3, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })}
+          style={{ height: 28, padding: '0 12px', borderRadius: 4, border: '1px solid var(--c-cyan)', background: 'var(--c-deep2)', color: 'var(--c-cyan)', fontSize: 13, fontWeight: 700, opacity: gridScroll.right ? 1 : 0.5, cursor: gridScroll.right ? 'pointer' : 'not-allowed' }}
+        >
+          {gridScroll.right ? `${gridScroll.more} more lesson${gridScroll.more === 1 ? '' : 's'} →` : gridScroll.left ? 'End of lessons' : 'All lessons in view'}
+        </button>
+        <span aria-live="polite">{gridScroll.right ? `${gridScroll.more} more lesson${gridScroll.more === 1 ? '' : 's'} to the right.` : 'All lessons shown.'} Student names stay in view.</span>
       </div>
 
       {/* Scrollable matrix */}
@@ -1672,8 +1715,11 @@ function GradebookView({
         slices the last student off while the window sits half empty.
       */}
       <div style={{ position: 'relative', minHeight: 0, ...(fullScreen ? { display: 'flex', flex: 1 } : {}) }}>
-      <div aria-hidden="true" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 28, background: 'linear-gradient(to right, transparent, color-mix(in srgb, var(--c-cyan) 20%, transparent))', borderRight: '3px solid color-mix(in srgb, var(--c-cyan) 53.3333%, transparent)', zIndex: 5, pointerEvents: 'none' }} />
+      {gridScroll.left && <div aria-hidden="true" style={{ position: 'absolute', left: EMAIL_W + (narrow ? 0 : GRADE_W), top: 0, bottom: 0, width: 24, background: 'linear-gradient(to right, var(--c-bg), transparent)', borderLeft: '2px solid var(--c-cyan)', zIndex: 5, pointerEvents: 'none' }} />}
+      {gridScroll.right && <div aria-hidden="true" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 32, background: 'linear-gradient(to left, var(--c-bg), transparent)', borderRight: '2px solid var(--c-cyan)', zIndex: 5, pointerEvents: 'none' }} />}
       <div
+        ref={setGridElement}
+        data-lesson-count={displayLessons.length}
         style={{
           width: '100%',
           overflow: 'auto',
@@ -1682,21 +1728,26 @@ function GradebookView({
           ...(fullScreen ? { flex: 1, minHeight: 0 } : { maxHeight: 'calc(100vh - 140px)' }),
           border: '1px solid var(--c-line)',
           borderRadius: 6,
-          boxShadow: 'inset -18px 0 18px -14px var(--c-cyan)',
-          background: 'linear-gradient(to left, var(--c-line), transparent 36px)',
         }}
       >
         <table style={{ borderCollapse: 'collapse', fontSize: 12, tableLayout: 'fixed', width: EMAIL_W + GRADE_W + CAT_W * categoryColumnCount + CELL_W * displayLessons.length, minWidth: EMAIL_W + GRADE_W + CAT_W * categoryColumnCount + CELL_W * displayLessons.length }}>
+          <colgroup>
+            <col style={{ width: EMAIL_W }} />
+            <col style={{ width: GRADE_W }} />
+            {Array.from({ length: categoryColumnCount }, (_, i) => <col key={`category-${i}`} style={{ width: CAT_W }} />)}
+            {displayLessons.map((lesson) => <col key={lesson.id} style={{ width: CELL_W }} />)}
+          </colgroup>
           {/* Unit-spanning header row */}
           <thead>
             <tr>
               <th
+                rowSpan={2}
                 style={{
                   position: 'sticky', left: 0, top: 0, zIndex: 3,
                   width: EMAIL_W, minWidth: EMAIL_W,
-                  height: HEAD1_H, boxSizing: 'border-box',
+                  boxSizing: 'border-box',
                   background: headerBg, padding: '8px 12px',
-                  borderBottom: '1px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
+                  borderBottom: '2px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
                   textAlign: 'left', color: 'var(--c-meta)', fontSize: 13, fontWeight: 700,
                   textTransform: 'uppercase', letterSpacing: '0.06em',
                 }}
@@ -1704,12 +1755,13 @@ function GradebookView({
                 Student
               </th>
               <th
+                rowSpan={2}
                 style={{
                   position: 'sticky', left: gradeLeft, top: 0, zIndex: 3,
                   width: GRADE_W, minWidth: GRADE_W,
-                  height: HEAD1_H, boxSizing: 'border-box',
+                  boxSizing: 'border-box',
                   background: headerBg, padding: '8px 8px',
-                  borderBottom: '1px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
+                  borderBottom: '2px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
                   textAlign: 'center', color: 'var(--c-meta)', fontSize: 13, fontWeight: 700,
                   textTransform: 'uppercase', letterSpacing: '0.06em',
                 }}
@@ -1724,14 +1776,14 @@ function GradebookView({
                     position: 'sticky', top: 0, zIndex: 2,
                     height: HEAD1_H, boxSizing: 'border-box',
                     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                    background: headerBg, padding: '8px 4px',
+                    background: headerBg, padding: '4px 4px',
                     borderBottom: '1px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
                     textAlign: 'center', color: 'var(--c-meta)', fontSize: 13, fontWeight: 700,
                     textTransform: 'uppercase', letterSpacing: '0.06em',
                   }}
                   title="Percent per grade category, from the same rule as the grade"
                 >
-                  {showCategoryColumns ? 'Category totals' : 'Categories'}
+                  Totals
                 </th>
               )}
               {displaySpans.map(({ unit, count }) => (
@@ -1743,7 +1795,7 @@ function GradebookView({
                     position: 'sticky', top: 0, zIndex: 2,
                     height: HEAD1_H, boxSizing: 'border-box',
                     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                    background: headerBg, padding: '8px 4px',
+                    background: headerBg, padding: '4px 4px',
                     borderBottom: '1px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
                     textAlign: 'center', color: 'var(--c-purple)', fontSize: 12, fontWeight: 700,
                     textTransform: 'uppercase', letterSpacing: '0.06em',
@@ -1756,22 +1808,6 @@ function GradebookView({
             </tr>
             {/* Per-lesson title row */}
             <tr>
-              <th
-                style={{
-                  position: 'sticky', left: 0, top: HEAD1_H, zIndex: 3,
-                  width: EMAIL_W, minWidth: EMAIL_W,
-                  background: stickyBg, padding: '4px 12px',
-                  borderBottom: '2px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
-                }}
-              />
-              <th
-                style={{
-                  position: 'sticky', left: gradeLeft, top: HEAD1_H, zIndex: 3,
-                  width: GRADE_W, minWidth: GRADE_W,
-                  background: stickyBg, padding: '4px 8px',
-                  borderBottom: '2px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
-                }}
-              />
               {!showCategoryColumns && shownCats.length > 0 && <th style={{ position: 'sticky', top: HEAD1_H, zIndex: 2, width: CAT_W, background: stickyBg, color: 'var(--c-meta)', fontSize: 13, borderBottom: '2px solid var(--c-line)' }}>Summary</th>}
               {showCategoryColumns && shownCats.map((c) => (
                 <th
@@ -1799,7 +1835,7 @@ function GradebookView({
                     width: CELL_W, minWidth: CELL_W, maxWidth: CELL_W,
                     // A separate number plus two title lines keeps assignments identifiable
                     // without widening the six-column desktop viewport.
-                    height: 80, verticalAlign: 'top', overflow: 'hidden',
+                    height: 76, boxSizing: 'border-box', verticalAlign: 'top', overflow: 'hidden',
                     background: stickyBg, padding: '8px 4px 8px',
                     borderTop: `3px solid ${catOf.get(lesson.id) ? CAT_COLOR[catOf.get(lesson.id) as GradeCategory] : 'var(--c-line)'}`,
                     borderBottom: '2px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)',
