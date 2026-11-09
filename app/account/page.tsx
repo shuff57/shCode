@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { LockKeyhole } from 'lucide-react';
 import { getCurrentUser, updateName, CurrentUser } from '../../lib/auth';
 
 const S = {
@@ -32,18 +33,6 @@ const S = {
     marginBottom: 16,
     background: '#282a36',
     color: '#f8f8f2',
-    border: '1px solid #44475a',
-    borderRadius: 4,
-    fontSize: 14,
-    boxSizing: 'border-box' as const,
-  } as React.CSSProperties,
-
-  inputReadonly: {
-    width: '100%',
-    padding: 8,
-    marginBottom: 16,
-    background: '#282a36',
-    color: '#8393c4',
     border: '1px solid #44475a',
     borderRadius: 4,
     fontSize: 14,
@@ -119,8 +108,16 @@ export default function AccountPage() {
         <p style={{ color: '#8393c4', marginTop: -14, marginBottom: 22 }}>Manage the name shown to your class.</p>
 
         <h2 style={{ color: '#bd93f9', fontSize: 14, margin: '0 0 10px' }}>Profile</h2>
-        <label style={S.label}>Email</label>
-        <input type="text" value={user.email} readOnly style={S.inputReadonly} />
+        <div style={{ marginBottom: 22 }}>
+          <div style={S.label}>Email</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#b1bada', fontSize: 14, overflowWrap: 'anywhere' }}>
+            <LockKeyhole size={14} aria-hidden="true" style={{ flexShrink: 0 }} />
+            <span>{user.email}</span>
+          </div>
+          <p style={{ margin: '6px 0 0', color: '#8393c4', fontSize: 12, lineHeight: 1.5 }}>
+            Your sign-in email can't be changed here.
+          </p>
+        </div>
 
         <form onSubmit={handleSave}>
           <label style={S.label}>First name</label>

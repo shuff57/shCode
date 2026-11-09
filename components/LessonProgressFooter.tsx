@@ -121,13 +121,31 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
     const el = footerRef.current;
     if (!el) return;
     const cssVar = '--shd-footer-height';
-    const publish = () => document.documentElement.style.setProperty(cssVar, `${el.offsetHeight}px`);
-    publish();
+    const clearanceVar = '--lesson-footer-clearance';
+    // The footer is in document flow: height alone cannot locate its top.
+    // Keep fixed desktop tools above its actual viewport position as it moves.
+    // One write per frame at most: a capture-phase scroll listener fires for every scroller.
+    let frame = 0;
+    const write = () => {
+      frame = 0;
+      const root = document.documentElement.style;
+      root.setProperty(cssVar, `${el.offsetHeight}px`);
+      root.setProperty(clearanceVar, `${Math.max(0, window.innerHeight - el.getBoundingClientRect().top)}px`);
+    };
+    const publish = () => { if (!frame) frame = requestAnimationFrame(write); };
+    write();
     const ro = new ResizeObserver(publish);
     ro.observe(el);
+    ro.observe(document.body);
+    window.addEventListener('resize', publish);
+    window.addEventListener('scroll', publish, { capture: true, passive: true });
     return () => {
+      if (frame) cancelAnimationFrame(frame);
       ro.disconnect();
+      window.removeEventListener('resize', publish);
+      window.removeEventListener('scroll', publish, true);
       document.documentElement.style.removeProperty(cssVar);
+      document.documentElement.style.removeProperty(clearanceVar);
     };
   }, []);
 

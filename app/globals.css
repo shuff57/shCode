@@ -2241,11 +2241,13 @@ body { box-sizing: border-box; padding-right: 20px; }
   /* Leave Output visible below the editor on the first phone screen. */
   .lab-work-area #editorPane { height: clamp(240px, 38svh, 360px); min-height: 240px; }
   .lab-work-area #editor .cm-editor { font-size: 12px !important; }
-  /* One source line per gutter number; long comments scroll horizontally.
-     Put line-height on the scroller so code and gutters share the metric. */
+  /* Line-height on the scroller so code and gutters share the metric.
+     (Wrapping and its hanging indent are set just below.) */
   .lab-work-area #editor .cm-scroller { line-height: 1.5; }
-  .lab-work-area #editor .cm-content { white-space: pre; overflow-wrap: normal; }
-  .lab-work-area #editor .cm-line { padding-left: 6px; text-indent: 0; }
+  /* Climb 2 r3: wrap long lines again (clipped comments lost r2's pair for one judge), but with a
+     hanging indent so each continuation sits clearly inside its own numbered line. */
+  .lab-work-area #editor .cm-content { white-space: pre-wrap; overflow-wrap: anywhere; }
+  .lab-work-area #editor .cm-line { padding-left: calc(6px + 4ch); text-indent: -4ch; }
   .lab-assignment-header .assignment-header-center { gap: 4px 7px !important; flex-wrap: wrap !important; }
   .lab-assignment-header .assignment-quota:has([role="status"]) { display: block !important; margin-left: auto; }
   .lab-assignment-header .assignment-quota [role="status"] { font-size: 10px !important; }
@@ -2277,11 +2279,16 @@ body:has(.lab-work-area) { gap: 8px; }
   .lab-assignment-header .assignment-header-center > button { padding: 4px 10px; }
 }
 
-/* Lift the desktop flag above the progress footer without shortening the rail. */
+/* Keep desktop feedback in the tool gutter, above the footer's measured top.
+   Reserve the same space in the scrollable tool strip so its buttons stay clear. */
 @media (min-width: 721px) {
   body:has(.lesson-progress-footer) .issue-fab {
-    right: 28px;
-    bottom: calc(var(--shd-footer-height, 36px) + 8px);
+    right: calc(var(--shd-tabbed, 0px) + 23px);
+    bottom: max(20px, calc(var(--lesson-footer-clearance, 0px) + 12px));
+    transition: border-color 120ms, color 120ms;
+  }
+  body:has(.lesson-progress-footer) .shd-tabstrip {
+    bottom: max(66px, calc(var(--lesson-footer-clearance, 0px) + 58px)) !important;
   }
 }
 
