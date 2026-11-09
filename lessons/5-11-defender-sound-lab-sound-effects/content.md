@@ -72,4 +72,4 @@ if (kb.presses('m')) {
 
 Put it in `draw()` next to the R line, outside `if (playing)`, so M still works on the game-over screen.
 
-The moSHion docs (`/docs/moshion`, the **Sound** section) say all of this too, with a few more settings to try once the lab is done.
+The [moSHion docs’ Sound section](/docs/moshion/groups?page=6) explains all of this too, with a few more settings to try once the lab is done.

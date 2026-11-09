@@ -212,7 +212,7 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
         </div>
       </div>
 
-      {/* Clustered vertical tab stack — slides with the drawer when open. */}
+      {/* Labels run along the desktop rail and move with the drawer. Phones use a horizontal dock. */}
       <div
         className={`shd-tabstrip${tabs.length === 1 && tabs[0].label === 'Docs' ? ' shd-docs-only' : ''}`}
         style={{
@@ -240,7 +240,7 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
               style={{
                 '--shd-tab-accent': t.color ?? 'var(--c-purple)',
                 borderRadius: '6px 0 0 6px',
-                writingMode: 'horizontal-tb',
+                writingMode: narrow ? 'horizontal-tb' : 'vertical-rl',
                 textOrientation: 'mixed',
                 padding: '9px 8px',
                 fontSize: '0.75rem',

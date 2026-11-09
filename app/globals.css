@@ -4,7 +4,7 @@
 
 :root{
   /* Desktop tool rail geometry (climb 2 r7): rail width, gutter from the viewport edge, gap to the content. */
-  --shd-rail-width: 80px;
+  --shd-rail-width: 40px;
   --shd-rail-gutter: 20px;
   --shd-rail-gap: 8px;
   /* Type scale and spacing rhythm (design pass, ui-hill-climb). */
@@ -2298,7 +2298,7 @@ body:has(.lesson-progress-footer) .editor-body { margin-top: 0; padding-top: 8px
   body:has(.shd-tabstrip) .content-lesson-main,
   body:has(.shd-tabstrip) .sandbox-shell { margin-right: calc(var(--shd-rail-width) + var(--shd-rail-gap) + var(--shd-tabbed, 0px)); }
   .shd-tabstrip { right: calc(var(--shd-rail-gutter) + var(--shd-tabbed, 0px)) !important; width: var(--shd-rail-width); box-sizing: border-box; overflow-x: hidden; }
-  .shd-tab { width: 100%; box-sizing: border-box; letter-spacing: 0 !important; white-space: nowrap; border-right: 1px solid var(--border) !important; border-radius: 6px !important; }
+  .shd-tab { writing-mode: vertical-rl !important; text-orientation: mixed; padding: 12px 9px !important; width: 100%; box-sizing: border-box; letter-spacing: 0 !important; white-space: nowrap; border-right: 1px solid var(--border) !important; border-radius: 6px !important; }
   .lesson-slides-frame { aspect-ratio: auto !important; height: min(52vw, calc(100dvh - 360px)); min-height: 260px; }
 }
 @media (max-width: 720px) {
@@ -2384,7 +2384,14 @@ body { box-sizing: border-box; padding-right: 20px; }
 .lab-task-card .step-instructions { opacity: 1; font-size: 14px; line-height: 1.5; }
 .lab-task-card .step-instructions p { margin: 6px 0; }
 .lab-task-card .step-hints { color: var(--c-meta); margin-top: 6px; }
-.lab-task-toggle { display: none; }
+.lab-task-heading { color: var(--c-cyan); font-size: 14px; font-weight: 700; cursor: pointer; }
+.lab-task-card[open] > .lab-task-heading { margin-bottom: 10px; }
+.lab-task-heading:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 4px; }
+@media (min-width: 721px) {
+  .lab-work-area:has(> .lab-task-card:not([open])) { grid-template-columns: 44px minmax(0, 1fr); }
+  .lab-task-card:not([open]) { padding: 12px !important; }
+  .lab-task-card:not([open]) > .lab-task-heading { writing-mode: vertical-rl; white-space: nowrap; }
+}
 .lab-work-area .editor-body { margin: 0; padding: 10px; border: 1px solid var(--c-line); border-radius: 8px; }
 .lab-work-area .editor-card { min-width: 0; }
 .lab-assignment-header .assignment-header-center { flex-wrap: nowrap !important; gap: 12px; }
@@ -2411,10 +2418,8 @@ body { box-sizing: border-box; padding-right: 20px; }
 @media (max-width: 720px) {
   .lab-work-area { display: flex; flex-direction: column; gap: 8px; }
   .lab-task-card { width: 100%; box-sizing: border-box; padding: 10px 12px !important; }
-  .lab-task-card h2 { margin-bottom: 6px !important; font-size: 13px !important; }
-  .lab-task-content { max-height: 84px; overflow: hidden; }
-  .lab-task-card.is-expanded .lab-task-content { max-height: none; }
-  .lab-task-toggle { display: inline-block; }
+  .lab-task-heading { font-size: 13px; }
+  .lab-task-card[open] > .lab-task-heading { margin-bottom: 6px; }
   .lab-task-card .lesson-step { margin-bottom: 8px; }
   .lab-task-card .step-instructions { line-height: 1.5; }
   .lab-work-area .editor-card { width: 100%; }
