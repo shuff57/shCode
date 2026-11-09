@@ -19,7 +19,9 @@
 //      join of the wrong kind is refused), the lists keep the kinds apart, the
 //      host leaving tells LiveDoc, GET /api/classes/[id]/code-sessions is for
 //      that class's teachers only;
-//   4. the dev stand-in (scripts/dev-live.mjs) end to end over real sockets.
+//   4. the dev stand-in (scripts/dev-live.mjs) end to end over real sockets;
+//   5. where a caret's name tag goes, on document lines and on the rows a
+//      wrapping editor shows (the row above can be the same line's code).
 //
 // Run: node scripts/test-live-doc.mjs
 
@@ -33,7 +35,7 @@ const require = createRequire(import.meta.url);
 const { WebSocket } = require('next/dist/compiled/ws');
 const P = await import(join(root, 'lib/live-protocol.ts'));
 const D = await import(join(root, 'lib/live-doc-protocol.ts'));
-const { DocSync, presenceField, setCursors, tagGoesBelow } = await import(join(root, 'lib/live-doc.ts'));
+const { DocSync, presenceField, setCursors, tagGoesBelow, tagGoesBelowRows, lineRows } = await import(join(root, 'lib/live-doc.ts'));
 const { makeDevLive } = await import(join(root, 'scripts/dev-live.mjs'));
 
 let passed = 0;
@@ -1044,6 +1046,30 @@ server.close();
   check('tag: clear above stays above', tagGoesBelow(doc, at(3, 18), 'ana D.') === false);
   check('tag: code above and below stays above', tagGoesBelow(doc, at(3, 2), 'ana D.') === false);
   check('tag: a blank line above stays above', tagGoesBelow(doc, at(6, 0), 'ana D.') === false);
+  check('tag: document lines are the rows when nothing wraps', JSON.stringify(lineRows(doc, at(3, 2))) === JSON.stringify({ at: { from: doc.line(3).from, to: doc.line(3).to }, above: { from: doc.line(2).from, to: doc.line(2).to }, below: { from: doc.line(4).from, to: doc.line(4).to } }));
+}
+// A line that wraps: the row above the caret can be the same line's first row, which is code.
+{
+  const { Text } = await import('@codemirror/state');
+  const LONG = 'let total = price * count + shipping + tax - discount + tip;';
+  const doc = Text.of(['', LONG, '', 'draw();']);
+  const W = 20; // the editor shows 20 characters a row
+  /** The rows around pos with every line cut into rows of W characters (what visualRows reads off a wrapping editor). */
+  const wrapRows = (pos) => {
+    const rowsOf = (l) => { const out = []; for (let f = l.from; f < l.to || out.length === 0; f += W) out.push({ from: f, to: Math.min(l.to, f + W) }); return out; };
+    const all = [];
+    for (let n = 1; n <= doc.lines; n++) all.push(...rowsOf(doc.line(n)));
+    const i = all.findIndex((r) => pos >= r.from && (pos < r.to || (pos === r.to && (r.to === doc.lineAt(pos).to))));
+    return { at: all[i], above: all[i - 1] ?? null, below: all[i + 1] ?? null };
+  };
+  const last = doc.line(2).from + 2 * W + 3; // the long line's third (last) row, 3 characters in
+  check("wrap: by document lines alone the tag went above (the blank line over the long one), over the line's own code", tagGoesBelow(doc, last, 'ana D.') === false);
+  check("wrap: on the rows as shown it goes below (the row above is the same line's code; a blank line is below)", tagGoesBelowRows(doc, last, 'ana D.', wrapRows(last)) === true);
+  const second = doc.line(2).from + W + 4; // the second row: the line's own code above and below
+  check('wrap: a middle row, code above and below: above, as before', tagGoesBelowRows(doc, second, 'ana D.', wrapRows(second)) === false);
+  const first = doc.line(2).from + 3; // the first row: a blank line above
+  check('wrap: the first row of a wrapped line with a blank line above stays above', tagGoesBelowRows(doc, first, 'ana D.', wrapRows(first)) === false);
+  check('wrap: a short row above (shorter than the caret\'s column) is clear', tagGoesBelowRows(doc, doc.line(4).from + 5, 'ana D.', lineRows(doc, doc.line(4).from + 5)) === false);
 }
 
 console.log(`\n${passed} passed, ${failed} failed`);

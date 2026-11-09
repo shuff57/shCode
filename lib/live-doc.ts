@@ -32,8 +32,8 @@
 // jumped back a few seconds.").
 
 import {
-  ChangeSet, Compartment, EditorState, Facet, StateEffect, StateField, Transaction,
-  type ChangeDesc, type Extension, type Text, type TransactionSpec,
+  ChangeSet, Compartment, EditorSelection, EditorState, Facet, StateEffect, StateField, Transaction,
+  type ChangeDesc, type Extension, type SelectionRange, type Text, type TransactionSpec,
 } from '@codemirror/state';
 import { Decoration, EditorView, ViewPlugin, WidgetType, type DecorationSet, type ViewUpdate } from '@codemirror/view';
 import { collab, getSyncedVersion, receiveUpdates, sendableUpdates, unmapChar } from './live-collab';
@@ -526,26 +526,103 @@ function clampPos(n: number, len: number): number {
   return Number.isFinite(n) ? Math.max(0, Math.min(len, Math.floor(n))) : 0;
 }
 
+/** One row as the editor shows it: the document range it holds (a whole line, or one piece of a wrapped line). */
+export interface TagRow { from: number; to: number }
+/** The caret's row and the rows just above and below it (null: there is none). */
+export interface TagRows { at: TagRow; above: TagRow | null; below: TagRow | null }
+
 /**
- * Where a caret's name tag sits: above the caret unless that would cover code
- * on the line above, then below unless that would cover code on the line
- * below; when both have code under it, above. The tag is about 0.8 of a code
- * character per letter of the name, plus padding.
+ * Where a caret's name tag sits, decided on the rows as they are SHOWN: above
+ * the caret unless that would cover code on the row above, then below unless
+ * that would cover code on the row below; when both have code under it, above.
+ * The tag is about 0.8 of a code character per letter of the name, plus
+ * padding, starting at the caret's column in its row. On a line that wraps,
+ * the row above can be the same line's first row: that is code too (deciding
+ * by the document lines alone put a tag over it).
  */
-export function tagGoesBelow(doc: Text, pos: number, name: string): boolean {
-  const line = doc.lineAt(pos);
-  const col = pos - line.from;
+export function tagGoesBelowRows(doc: Text, pos: number, name: string, rows: TagRows): boolean {
+  const col = Math.max(0, pos - rows.at.from);
   const span = Math.ceil(name.length * 0.8) + 2;
-  const covers = (n: number) => {
-    if (n < 1 || n > doc.lines) return false;
-    return doc.line(n).text.slice(col, col + span).trim() !== '';
+  const covers = (r: TagRow | null) => {
+    if (!r) return false;
+    const from = Math.min(r.to, r.from + col);
+    const to = Math.min(r.to, r.from + col + span);
+    return from < to && doc.sliceString(from, to).trim() !== '';
   };
-  if (line.number === 1) return true;          // nothing above: room underneath
-  if (!covers(line.number - 1)) return false;  // the line above is clear there
-  if (line.number < doc.lines && !covers(line.number + 1)) return true;
-  if (line.number === doc.lines) return true;  // the last line: nothing below to cover
-  return false;
+  if (!rows.above) return true;           // nothing above: room underneath
+  if (!covers(rows.above)) return false;  // the row above is clear there
+  if (!rows.below) return true;           // the last row: nothing below to cover
+  return !covers(rows.below);
 }
+
+/** The rows around `pos` when each document line is one row (an editor that does not wrap, or a line too short to). */
+export function lineRows(doc: Text, pos: number): TagRows {
+  const line = doc.lineAt(pos);
+  const row = (n: number): TagRow | null => {
+    if (n < 1 || n > doc.lines) return null;
+    const l = doc.line(n);
+    return { from: l.from, to: l.to };
+  };
+  return { at: { from: line.from, to: line.to }, above: row(line.number - 1), below: row(line.number + 1) };
+}
+
+/** The tag rule on document lines (what the decorations start with; tagPlacer corrects it where lines wrap). */
+export function tagGoesBelow(doc: Text, pos: number, name: string): boolean {
+  return tagGoesBelowRows(doc, pos, name, lineRows(doc, pos));
+}
+
+/**
+ * The rows around `pos` as this editor shows them: with line wrapping, one
+ * long line is several rows. Reads the layout, so only in a measure.
+ */
+export function visualRows(view: EditorView, pos: number): TagRows {
+  const rowOf = (c: SelectionRange): TagRow => ({
+    from: view.moveToLineBoundary(c, false, true).head,
+    to: view.moveToLineBoundary(c, true, true).head,
+  });
+  // Where a line wraps, one position is both the end of a row and the start of
+  // the next: `assoc` says which. The caret widget is drawn after its position
+  // (side 1), so it belongs to the row that starts there.
+  const at = rowOf(EditorSelection.cursor(pos, 1));
+  const up = view.moveVertically(EditorSelection.cursor(at.from, 1), false);
+  const down = view.moveVertically(EditorSelection.cursor(at.to, -1), true);
+  return { at, above: up.head < at.from ? rowOf(up) : null, below: down.head > at.to ? rowOf(down) : null };
+}
+
+/**
+ * In an editor that wraps long lines (the sandbox's does), the name tags are
+ * placed again on the rows as shown, once the layout is known: the
+ * decorations can only see document lines.
+ */
+const tagPlacer = ViewPlugin.fromClass(class {
+  view: EditorView;
+  constructor(view: EditorView) {
+    this.view = view;
+    this.schedule();
+  }
+  update(u: ViewUpdate) {
+    if (u.docChanged || u.geometryChanged || u.viewportChanged
+      || u.startState.field(presenceField, false) !== u.state.field(presenceField, false)) this.schedule();
+  }
+  schedule() {
+    this.view.requestMeasure({
+      key: this,
+      read: (view) => {
+        if (!view.lineWrapping) return null;
+        const out: { el: Element; below: boolean }[] = [];
+        for (const caret of Array.from(view.contentDOM.querySelectorAll('.cm-remote-caret'))) {
+          const tag = caret.querySelector('.cm-remote-tag');
+          if (!tag) continue;
+          let pos: number;
+          try { pos = view.posAtDOM(caret); } catch { continue; }
+          out.push({ el: tag, below: tagGoesBelowRows(view.state.doc, pos, tag.textContent ?? '', visualRows(view, pos)) });
+        }
+        return out;
+      },
+      write: (out) => { if (out) for (const o of out) o.el.classList.toggle('cm-remote-tag-below', o.below); },
+    });
+  }
+});
 
 function cursorDeco(cursors: RemoteCursor[], doc: Text): DecorationSet {
   const ranges = [];
@@ -714,7 +791,7 @@ export class LiveDocClient {
       if (overDocCap(tr.newDoc)) { client.note(TOO_BIG); return []; }
       return tr;
     });
-    this.extension = [this.sync.inner.of([]), presenceField, presenceTheme, limits, plugin];
+    this.extension = [this.sync.inner.of([]), presenceField, presenceTheme, tagPlacer, limits, plugin];
   }
 
   start() {
