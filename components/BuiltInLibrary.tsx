@@ -11,6 +11,7 @@
 // scripts/make-moshion-textures.py from a CC0 sheet); sounds from PALETTE in
 // lib/sound/presets.ts (rendered by scripts/make-moshion-sounds.mjs).
 
+import { SpriteThumb, SpriteViewer } from './SpriteThumb';
 import { useEffect, useState } from 'react';
 import { DESIGN_BASE, PALETTE } from '../lib/sound/presets';
 import { freshName } from '../lib/library-sync';
@@ -47,6 +48,8 @@ export default function BuiltInLibrary({ onMessage, kind }: {
   kind?: 'texture' | 'sound';
 }) {
   const [cat, setCat] = useState<Catalog | null>(null);
+  /** The picture open in the frames view, by name. */
+  const [viewing, setViewing] = useState<string | null>(null);
 
   useEffect(() => {
     if (kind === 'sound') return; // the sounds list is built into the bundle
@@ -102,6 +105,15 @@ export default function BuiltInLibrary({ onMessage, kind }: {
   }
 
   const texCount = cat ? Object.keys(cat.textures).length : null;
+  const viewed = viewing && cat ? cat.textures[viewing] : null;
+  const viewer = viewing && viewed ? (
+    <SpriteViewer name={viewing} src={(cat?.base ?? '/moshion/textures/') + viewed.file} frames={viewed.frames ?? 1}
+      frameDelay={viewed.frameDelay ?? 6} onClose={() => setViewing(null)}>
+      <button type="button" style={small} onClick={() => copyText(`sprite.texture = '${viewing}';`)}>Copy code</button>
+      <button type="button" style={small} onClick={() => void remixTexture(viewing, viewed)}
+        title="Make your own copy and open it in the Texture editor">Remix</button>
+    </SpriteViewer>
+  ) : null;
   const textureList = (
     <>
         {Object.entries(groups).map(([group, list]) => (
@@ -115,13 +127,19 @@ export default function BuiltInLibrary({ onMessage, kind }: {
                   width: 120, padding: 6, borderRadius: 6, border: '1px solid var(--c-line)', background: 'var(--c-deep2)',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
                 }}>
-                  <div style={{ width: 42, height: 42, overflow: 'hidden', borderRadius: 4, background: 'var(--x-202020)' }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={(cat?.base ?? '/moshion/textures/') + t.file} alt="" loading="lazy"
-                      width={Math.round((42 * t.w) / t.h)} height={42}
-                      style={{ height: 42, width: 'auto', maxWidth: 'none', imageRendering: 'pixelated', objectFit: 'cover', objectPosition: 'left' }} />
-                  </div>
-                  <code style={{ fontSize: 11 }}>{name}{t.frames && t.frames > 1 ? ' ▶' : ''}</code>
+                  <button type="button" className="sprite-open" onClick={() => setViewing(name)}
+                    aria-label={t.frames && t.frames > 1 ? `${name}: see its ${t.frames} frames` : `${name}: see it bigger`}
+                    title={t.frames && t.frames > 1 ? 'See each frame' : 'See it bigger'}
+                    style={{ background: 'var(--x-202020)' }}>
+                    <SpriteThumb src={(cat?.base ?? '/moshion/textures/') + t.file} frames={t.frames ?? 1} frameDelay={t.frameDelay ?? 6} size={42} />
+                  </button>
+                  <code style={{ fontSize: 11 }}>{name}</code>
+                  {t.frames && t.frames > 1 ? (
+                    <button type="button" onClick={() => setViewing(name)} aria-label={`See the ${t.frames} frames of ${name}`}
+                      style={{ background: 'none', border: 0, padding: 0, color: 'var(--c-cyan)', fontSize: 11, cursor: 'pointer' }}>
+                      {t.frames} frames
+                    </button>
+                  ) : null}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: '100%' }}>
                     <button type="button" style={small} onClick={() => copyText(`sprite.texture = '${name}';`)}
                       aria-label={`Copy code for ${name}`}>Copy code</button>
@@ -167,6 +185,7 @@ export default function BuiltInLibrary({ onMessage, kind }: {
           the {kind === 'texture' ? 'Texture editor' : 'Sound mixer'}, so you can change it, save it and share it.
         </p>
         {kind === 'texture' ? textureList : soundList}
+        {viewer}
       </section>
     );
   }
@@ -185,6 +204,7 @@ export default function BuiltInLibrary({ onMessage, kind }: {
           Textures ({texCount ?? '…'})
         </summary>
         {textureList}
+        {viewer}
       </details>
 
       <details open>

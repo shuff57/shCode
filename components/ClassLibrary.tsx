@@ -6,6 +6,7 @@
 // A teacher who opens the editor sees hidden items too, marked; hiding and
 // removing happen on the class page (ClassLibraryModeration).
 
+import { SpriteThumb, SpriteViewer, texMeta } from './SpriteThumb';
 import { useCallback, useEffect, useState } from 'react';
 import { freshName, LIBRARY_SHARES_CHANGED } from '../lib/library-sync';
 import { addToLibrary, localLibraryItems, type LibraryKind } from '../lib/moshion-storage';
@@ -37,6 +38,8 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
   const [items, setItems] = useState<SharedItem[] | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [art, setArt] = useState<Record<string, { dataUri: string; meta: string | null }>>({});
+  /** The picture open in the frames view, by item id. */
+  const [viewing, setViewing] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -132,13 +135,13 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
             display: 'flex', flexDirection: kind === 'texture' ? 'column' : 'row', alignItems: 'center', gap: 6,
           }}>
             {kind === 'texture' ? (
-              <div style={{ width: 48, height: 48, overflow: 'hidden', background: 'var(--x-202020)', borderRadius: 4 }}>
+              <button type="button" className="sprite-open" onClick={() => setViewing(it.id)} disabled={!art[it.id]}
+                aria-label={`${it.name}: see it bigger and its frames`} title="See each frame"
+                style={{ width: 48, height: 48, background: 'var(--x-202020)' }}>
                 {art[it.id] && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={art[it.id].dataUri} alt={it.name}
-                    style={{ height: 48, imageRendering: 'pixelated', objectFit: 'cover', objectPosition: 'left', maxWidth: 'none' }} />
+                  <SpriteThumb src={art[it.id].dataUri} {...texMeta(art[it.id].meta)} size={46} alt={it.name} />
                 )}
-              </div>
+              </button>
             ) : (
               <button type="button" aria-label={`Play ${it.name}`} onClick={async () => {
                 const c = await fetchArt(it.id);
@@ -147,6 +150,14 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
             )}
             <div style={{ fontSize: 11, textAlign: kind === 'texture' ? 'center' : 'left', wordBreak: 'break-all' }}>
               <code>{it.name}</code>
+              {kind === 'texture' && art[it.id] && texMeta(art[it.id].meta).frames > 1 ? (
+                <div>
+                  <button type="button" onClick={() => setViewing(it.id)} aria-label={`See the frames of ${it.name}`}
+                    style={{ background: 'none', border: 0, padding: 0, color: 'var(--c-cyan)', fontSize: 11, cursor: 'pointer' }}>
+                    {texMeta(art[it.id].meta).frames} frames
+                  </button>
+                </div>
+              ) : null}
               <div style={{ color: 'var(--c-dim)' }}>{it.mine ? 'yours' : it.owner}{it.hidden ? ' · hidden by teacher' : ''}</div>
             </div>
             {!it.mine && (
@@ -166,6 +177,22 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
           </div>
         ))}
       </div>
+      {(() => {
+        const it = viewing ? items.find((x) => x.id === viewing) : undefined;
+        const a = it ? art[it.id] : undefined;
+        if (!it || !a) return null;
+        return (
+          <SpriteViewer name={it.name} src={a.dataUri} {...texMeta(a.meta)} onClose={() => setViewing(null)}>
+            {!it.mine ? (
+              <>
+                <button type="button" className="btn-secondary btn-sm" onClick={() => void copy(it)}>Copy to mine</button>
+                <button type="button" className="btn-secondary btn-sm" onClick={() => void copy(it, true)}
+                  title="Make your own copy and open it in the Texture editor">Remix</button>
+              </>
+            ) : null}
+          </SpriteViewer>
+        );
+      })()}
     </Wrap>
   );
 }

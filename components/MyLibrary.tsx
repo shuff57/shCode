@@ -10,15 +10,16 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import ShareToggle from './ShareToggle';
+import { SpriteThumb, SpriteViewer } from './SpriteThumb';
 import { LIBRARY_LOCAL_CHANGE, LIBRARY_UPDATED, listSavedSounds, listSavedTextures } from '../lib/moshion-storage';
 import { LIBRARY_SYNC_STATUS, signedInForSync } from '../lib/library-sync';
 import { editorUrl } from '../lib/remix';
 import { sectionHeading, sectionNote } from './library-ui';
 
-type Row = { kind: 'texture' | 'sound'; name: string; dataUri: string };
+type Row = { kind: 'texture' | 'sound'; name: string; dataUri: string; frames?: number; frameDelay?: number };
 
 function readRows(): Row[] {
-  const tex = listSavedTextures().map((t) => ({ kind: 'texture' as const, name: t.name, dataUri: t.dataUrl }));
+  const tex = listSavedTextures().map((t) => ({ kind: 'texture' as const, name: t.name, dataUri: t.dataUrl, frames: t.frames, frameDelay: t.frameDelay }));
   const snd = listSavedSounds().map((s) => ({ kind: 'sound' as const, name: s.name, dataUri: s.dataUri }));
   return [...tex, ...snd];
 }
@@ -34,6 +35,8 @@ export default function MyLibrary({ onMessage, kind }: {
   kind?: 'texture' | 'sound';
 }) {
   const [rows, setRows] = useState<Row[] | null>(null);
+  /** The picture open in the frames view, by name. */
+  const [viewing, setViewing] = useState<string | null>(null);
   // Edit leaves the page. From a lesson's Library tab it opens a new tab, so
   // the lesson stays where it was; on the Library page it stays in this tab.
   const away = !(usePathname() ?? '').startsWith('/library') ? { target: '_blank', rel: 'noopener noreferrer' } : {};
@@ -57,6 +60,12 @@ export default function MyLibrary({ onMessage, kind }: {
   const textures = kind === 'sound' ? [] : rows.filter((r) => r.kind === 'texture');
   const sounds = kind === 'texture' ? [] : rows.filter((r) => r.kind === 'sound');
   const count = textures.length + sounds.length;
+  const viewed = viewing ? textures.find((t) => t.name === viewing) : undefined;
+  const viewer = viewed ? (
+    <SpriteViewer name={viewed.name} src={viewed.dataUri} frames={viewed.frames} frameDelay={viewed.frameDelay} onClose={() => setViewing(null)}>
+      <Link href={editorUrl('texture', viewed.name)} {...away} className="btn-secondary btn-sm">Edit</Link>
+    </SpriteViewer>
+  ) : null;
   const headingId = kind ? `mylib-${kind}-h` : 'mylib-h';
 
   return (
@@ -85,12 +94,18 @@ export default function MyLibrary({ onMessage, kind }: {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
           {textures.map((t) => (
             <div key={'t:' + t.name} style={tile}>
-              <div style={{ width: 48, height: 48, overflow: 'hidden', background: 'var(--x-202020)', borderRadius: 4 }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={t.dataUri} alt="" width={48} height={48}
-                  style={{ height: 48, width: 'auto', imageRendering: 'pixelated', objectFit: 'cover', objectPosition: 'left', maxWidth: 'none' }} />
-              </div>
+              <button type="button" className="sprite-open" onClick={() => setViewing(t.name)} style={{ background: 'var(--x-202020)' }}
+                aria-label={(t.frames ?? 1) > 1 ? `${t.name}: see its ${t.frames} frames` : `${t.name}: see it bigger`}
+                title={(t.frames ?? 1) > 1 ? 'See each frame' : 'See it bigger'}>
+                <SpriteThumb src={t.dataUri} frames={t.frames} frameDelay={t.frameDelay} size={48} />
+              </button>
               <code style={{ fontSize: 11, wordBreak: 'break-all', textAlign: 'center' }}>{t.name}</code>
+              {(t.frames ?? 1) > 1 ? (
+                <button type="button" onClick={() => setViewing(t.name)} aria-label={`See the ${t.frames} frames of ${t.name}`}
+                  style={{ background: 'none', border: 0, padding: 0, color: 'var(--c-cyan)', fontSize: 11, cursor: 'pointer' }}>
+                  {t.frames} frames
+                </button>
+              ) : null}
               <ShareToggle kind="texture" name={t.name} onMessage={onMessage} />
               <Link href={editorUrl('texture', t.name)} {...away} style={{ fontSize: 11, color: 'var(--c-cyan)' }}>Edit</Link>
             </div>
@@ -111,6 +126,7 @@ export default function MyLibrary({ onMessage, kind }: {
           ))}
         </div>
       )}
+      {viewer}
     </section>
   );
 }

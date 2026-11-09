@@ -2713,3 +2713,10 @@ a.mod-row:hover { background: var(--x-343746); border-top-color: var(--c-comment
 }
 
 /* Keep short inline expressions intact, with the full task column available. */
+
+/* Library pictures (components/SpriteThumb.tsx): an animation's frame strip loops in its card. */
+@keyframes sprite-strip { from { background-position-x: 0; } to { background-position-x: var(--strip-end); } }
+.sprite-thumb[data-anim] { animation: sprite-strip var(--strip-dur) steps(var(--strip-n)) infinite; }
+@media (prefers-reduced-motion: reduce) { .sprite-thumb[data-anim] { animation: none; } }
+.sprite-open { background: none; border: 1px solid transparent; border-radius: 4px; padding: 0; cursor: zoom-in; display: inline-flex; }
+.sprite-open:hover, .sprite-open:focus-visible { border-color: var(--c-cyan); }
