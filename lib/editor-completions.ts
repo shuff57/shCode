@@ -27,7 +27,7 @@ import {
   type CompletionResult,
 } from '@codemirror/autocomplete';
 import { javascriptLanguage, scopeCompletionSource } from '@codemirror/lang-javascript';
-import { syntaxTree } from '@codemirror/language';
+import { ensureSyntaxTree, syntaxTree } from '@codemirror/language';
 import { Prec, type Extension } from '@codemirror/state';
 import { insertNewlineAndIndent } from '@codemirror/commands';
 import { keymap } from '@codemirror/view';
@@ -67,7 +67,10 @@ const toCompletion = (c: MoshionCompletion, boost = 0): Completion => ({
 });
 
 function inSkippedNode(ctx: CompletionContext): boolean {
-  const node = syntaxTree(ctx.state).resolveInner(ctx.pos, -1);
+  // The parse up to the cursor, given a moment to finish: a tree cut short (a busy machine, a long file) does not
+  // know the cursor is inside a string yet, and offered every global there (seen under npm test's load).
+  const tree = ensureSyntaxTree(ctx.state, ctx.pos, 50) ?? syntaxTree(ctx.state);
+  const node = tree.resolveInner(ctx.pos, -1);
   return SKIP_NODES.has(node.name);
 }
 

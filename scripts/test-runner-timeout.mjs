@@ -264,9 +264,10 @@ parentPort.on('message', (data) => globalThis.onmessage({ data }));
   }
   {
     // A lesson's run: no opt-in. Unchanged: done right after the synchronous
-    // pass, the timer's output never arrives.
+    // pass, the timer's output never arrives. (The time bound only rules out waiting for the 30 s timers limit;
+    // 100 ms flaked at 117 under npm test's load, 2026-11-08.)
     const r = await host("console.log('a'); setTimeout(() => console.log('b'), 100);", undefined);
-    check('lab mode (no opt-in): still ends after the synchronous pass', r.how === 'done' && r.lines.join('|') === 'a' && r.ms - 250 < 100, JSON.stringify({ how: r.how, lines: r.lines, ms: r.ms - 250 }));
+    check('lab mode (no opt-in): still ends after the synchronous pass', r.how === 'done' && r.lines.join('|') === 'a' && r.ms - 250 < 400, JSON.stringify({ how: r.how, lines: r.lines, ms: r.ms - 250 }));
     await new Promise((res) => setTimeout(res, 150));
     check('lab mode (no opt-in): a pending timer\'s output never shows', r.lines.join('|') === 'a' && r.late.length === 0, JSON.stringify(r.lines));
     const s = await host('while (true) {}', {});
