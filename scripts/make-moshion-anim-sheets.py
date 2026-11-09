@@ -120,7 +120,7 @@ def heart_blink():
 
 def heart_lose():
     """Full heart flashes twice, then shows half. Plays on a loop like every
-    animation, so a game shows it for 6 frames x 6 ticks, then sets 'heartHalf'."""
+    animation, so a game shows it for 6 frames x 10 ticks, then sets 'heartHalf'."""
     h, half = load("heart"), load("heartHalf")
     flash = tint(h, WHITE, 0.75)
     return [h, flash, h, flash, half, half]
@@ -241,7 +241,7 @@ def star_twinkle():
 
 def boom():
     """A burst that grows from a spark and fades out. Plays on a loop like every
-    animation, so remove the sprite after one play (6 frames x 4 ticks)."""
+    animation, so remove the sprite after one play (6 frames x 6 ticks)."""
     b = load("burstOrange")
     return [
         scaled(b, 0.3, 0.3),

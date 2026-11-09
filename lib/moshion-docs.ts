@@ -762,7 +762,7 @@ candy: candyGreen, candyOrange, candyYellow, swirl, swirlMint
 
 Animated ones to try: coinSpin (and coinSilverSpin, coinBronzeSpin), starTwinkle, gemSparkle (and gemGreenSparkle, gemYellowSparkle, gemOrangeSparkle), heartBlink, playerJump (one per player colour, like playerBlueJump), flagWave (one per flag colour), torchFlicker and boom.
 
-Every animation loops. Two are made to play once: heartLose (a heart flashes, then shows half) and boom (an explosion that grows and fades). Show them for one loop, then change the picture or remove the sprite. heartLose shows 6 pictures for 6 frames each, so after(36, () => heart.texture = 'heartHalf'). boom shows 6 pictures for 4 frames each, so after(24, () => blast.remove()).
+Every animation loops. Two are made to play once: heartLose (a heart flashes, then shows half) and boom (an explosion that grows and fades). Show them for one loop, then change the picture or remove the sprite. heartLose shows 6 pictures for 10 frames each, so after(60, () => heart.texture = 'heartHalf'). boom shows 6 pictures for 6 frames each, so after(36, () => blast.remove()).
 
 Call textureNames() to print the list from inside a sketch, and hasTexture('coin') to check one name. A name that does not exist warns in the console and suggests near matches rather than failing silently, so a typo tells you what it was.
 

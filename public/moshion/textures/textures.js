@@ -810,7 +810,7 @@ window.MOSHION_TEXTURES = {
       "h": 21,
       "group": "pickups",
       "frames": 6,
-      "frameDelay": 5
+      "frameDelay": 9
     },
     "coinSilverSpin": {
       "file": "coinSilverSpin.png",
@@ -818,7 +818,7 @@ window.MOSHION_TEXTURES = {
       "h": 21,
       "group": "pickups",
       "frames": 6,
-      "frameDelay": 5
+      "frameDelay": 9
     },
     "coinBronzeSpin": {
       "file": "coinBronzeSpin.png",
@@ -826,7 +826,7 @@ window.MOSHION_TEXTURES = {
       "h": 21,
       "group": "pickups",
       "frames": 6,
-      "frameDelay": 5
+      "frameDelay": 9
     },
     "heartBlink": {
       "file": "heartBlink.png",
@@ -834,7 +834,7 @@ window.MOSHION_TEXTURES = {
       "h": 21,
       "group": "pickups",
       "frames": 2,
-      "frameDelay": 12
+      "frameDelay": 20
     },
     "heartLose": {
       "file": "heartLose.png",
@@ -842,7 +842,7 @@ window.MOSHION_TEXTURES = {
       "h": 21,
       "group": "pickups",
       "frames": 6,
-      "frameDelay": 6
+      "frameDelay": 10
     },
     "gemSparkle": {
       "file": "gemSparkle.png",
@@ -850,7 +850,7 @@ window.MOSHION_TEXTURES = {
       "h": 21,
       "group": "pickups",
       "frames": 8,
-      "frameDelay": 5
+      "frameDelay": 9
     },
     "gemGreenSparkle": {
       "file": "gemGreenSparkle.png",
@@ -858,7 +858,7 @@ window.MOSHION_TEXTURES = {
       "h": 21,
       "group": "pickups",
       "frames": 8,
-      "frameDelay": 5
+      "frameDelay": 9
     },
     "gemYellowSparkle": {
       "file": "gemYellowSparkle.png",
@@ -866,7 +866,7 @@ window.MOSHION_TEXTURES = {
       "h": 21,
       "group": "pickups",
       "frames": 8,
-      "frameDelay": 5
+      "frameDelay": 9
     },
     "gemOrangeSparkle": {
       "file": "gemOrangeSparkle.png",
@@ -874,7 +874,7 @@ window.MOSHION_TEXTURES = {
       "h": 21,
       "group": "pickups",
       "frames": 8,
-      "frameDelay": 5
+      "frameDelay": 9
     },
     "starTwinkle": {
       "file": "starTwinkle.png",
@@ -882,7 +882,7 @@ window.MOSHION_TEXTURES = {
       "h": 21,
       "group": "pickups",
       "frames": 6,
-      "frameDelay": 7
+      "frameDelay": 12
     },
     "playerJump": {
       "file": "playerJump.png",
@@ -890,7 +890,7 @@ window.MOSHION_TEXTURES = {
       "h": 21,
       "group": "characters",
       "frames": 6,
-      "frameDelay": 6
+      "frameDelay": 9
     },
     "playerBlueJump": {
       "file": "playerBlueJump.png",
@@ -898,7 +898,7 @@ window.MOSHION_TEXTURES = {
       "h": 21,
       "group": "characters",
       "frames": 6,
-      "frameDelay": 6
+      "frameDelay": 9
     },
     "playerPinkJump": {
       "file": "playerPinkJump.png",
@@ -906,7 +906,7 @@ window.MOSHION_TEXTURES = {
       "h": 21,
       "group": "characters",
       "frames": 6,
-      "frameDelay": 6
+      "frameDelay": 9
     },
     "playerYellowJump": {
       "file": "playerYellowJump.png",
@@ -914,7 +914,7 @@ window.MOSHION_TEXTURES = {
       "h": 21,
       "group": "characters",
       "frames": 6,
-      "frameDelay": 6
+      "frameDelay": 9
     },
     "playerBeigeJump": {
       "file": "playerBeigeJump.png",
@@ -922,7 +922,7 @@ window.MOSHION_TEXTURES = {
       "h": 21,
       "group": "characters",
       "frames": 6,
-      "frameDelay": 6
+      "frameDelay": 9
     },
     "flagWave": {
       "file": "flagWave.png",
@@ -930,7 +930,7 @@ window.MOSHION_TEXTURES = {
       "h": 21,
       "group": "things",
       "frames": 4,
-      "frameDelay": 8
+      "frameDelay": 12
     },
     "flagGreenWave": {
       "file": "flagGreenWave.png",
@@ -938,7 +938,7 @@ window.MOSHION_TEXTURES = {
       "h": 21,
       "group": "things",
       "frames": 4,
-      "frameDelay": 8
+      "frameDelay": 12
     },
     "flagRedWave": {
       "file": "flagRedWave.png",
@@ -946,7 +946,7 @@ window.MOSHION_TEXTURES = {
       "h": 21,
       "group": "things",
       "frames": 4,
-      "frameDelay": 8
+      "frameDelay": 12
     },
     "flagBlueWave": {
       "file": "flagBlueWave.png",
@@ -954,7 +954,7 @@ window.MOSHION_TEXTURES = {
       "h": 21,
       "group": "things",
       "frames": 4,
-      "frameDelay": 8
+      "frameDelay": 12
     },
     "torchFlicker": {
       "file": "torchFlicker.png",
@@ -962,7 +962,7 @@ window.MOSHION_TEXTURES = {
       "h": 21,
       "group": "blocks",
       "frames": 4,
-      "frameDelay": 7
+      "frameDelay": 11
     },
     "boom": {
       "file": "boom.png",
@@ -970,7 +970,7 @@ window.MOSHION_TEXTURES = {
       "h": 21,
       "group": "battle",
       "frames": 6,
-      "frameDelay": 4
+      "frameDelay": 6
     }
   }
 };
