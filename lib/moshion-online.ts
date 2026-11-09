@@ -39,6 +39,7 @@
 
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { codeIcons } from './room-icons';
+import { leaveOnUnload, leaveRoom as postLeave } from './room-leave';
 
 const POLL_MS = 1000;
 /**
@@ -193,13 +194,7 @@ export function useMoshionOnline(ref: RefObject<HTMLIFrameElement | null>, gameK
     let hosted: string | null = null;
     let joined: string | null = null;
     function leaveRoom(c: string | null) {
-      if (!c) return;
-      try {
-        void fetch(`/api/rooms/${c}/leave`, {
-          method: 'POST', credentials: 'same-origin', keepalive: true,
-          headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ device }),
-        }).catch(() => {});
-      } catch { /* page going */ }
+      if (c) void postLeave(c, device);
     }
 
     function closeLive() {
@@ -519,14 +514,22 @@ export function useMoshionOnline(ref: RefObject<HTMLIFrameElement | null>, gameK
         .then((reply) => post({ source: 'preview-online-reply', id, ...reply }));
     }
 
-    const onHide = () => { leaveRoom(hosted); leaveRoom(joined); hosted = joined = null; };
+    // The page going (the tab closing, a reload, another page): a beacon, which
+    // still gets out after the tab has gone (lib/room-leave.ts). A joiner's seat
+    // stays theirs in this tab, so Rejoin after a reload gives it back.
+    const onHide = () => {
+      for (const c of [hosted, joined]) if (c) leaveOnUnload(c, device);
+      hosted = joined = null;
+    };
+    // Unmounting with the page still here (another page in the app): an ordinary leave.
+    const onUnmount = () => { leaveRoom(hosted); leaveRoom(joined); hosted = joined = null; };
     window.addEventListener('message', onMessage);
     window.addEventListener('pagehide', onHide);
     return () => {
       window.removeEventListener('message', onMessage);
       window.removeEventListener('pagehide', onHide);
       stop();
-      onHide();
+      onUnmount();
       actionsRef.current = { host() {}, join() {}, leave() {} };
       setLobby(null);
     };

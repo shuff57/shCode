@@ -11,7 +11,9 @@
 //      the 64 KB cap and the frame limit; the rate limit; presence relayed and
 //      never stored; seat stamping; a woken room; code_sessions writes (first
 //      push, at most every 2 minutes, on close and when the last person
-//      leaves) and that no email ever reaches a socket;
+//      leaves) and that no email ever reaches a socket; the host-gone rule (a
+//      session whose host has had no socket for 60 s closes, D1 first, a
+//      reconnect within 60 s keeps it, a woken room still knows);
 //   3. the Pages routes on a real SQLite: kind routing (code rooms to
 //      LIVE_DOC, game rooms to LIVE; the polling send refuses a code room; a
 //      join of the wrong kind is refused), the lists keep the kinds apart, the
@@ -133,17 +135,18 @@ function fakeTimer() {
 }
 
 /** A room; `store` given = the same Durable Object waking (or rebuilt after an eviction). */
-function makeRoom(store = D.memoryDocStore()) {
-  const socks = new Set();
+function makeRoom(store = D.memoryDocStore(), socks = new Set()) {
   const rows = [];
   const scheduled = [];
+  const closedRows = [];
   const timer = fakeTimer();
   const core = new D.LiveDocCore({
     sockets: () => [...socks], store, now, timer,
     write: async (row) => { rows.push(row); },
     schedule: (at) => scheduled.push(at),
+    closeRow: async (room) => { closedRows.push({ ...room, at: clock }); },
   });
-  return { core, socks, store, rows, scheduled, timer };
+  return { core, socks, store, rows, scheduled, timer, closedRows };
 }
 
 /** One browser: a socket the core sees, and DocSync on a plain editor state (no DOM). */
@@ -730,6 +733,59 @@ const SEED = 'let x = 1;\nfunction draw() {\n  clear();\n}\n';
   check(`three at one spot, random timing (${n} seeds): texts identical and every run in one piece`, !bad, bad);
 }
 
+// The host-gone rule (HOST_GONE_MS in lib/live-protocol.ts): the host's tab went without a word.
+{
+  const room = makeRoom();
+  const ann = client(room, ANN_T, { seed: SEED, own: SEED });
+  const bo = client(room, BO_T);
+  drain(room, [ann, bo]);
+  const drop = (c) => { room.core.left(c.sock); c.sock.attach(null); room.socks.delete(c.sock); };
+  check('host-gone: nothing counts while the host is here', !room.store.state.hostGoneAt && room.scheduled.every((at) => at !== clock + P.HOST_GONE_MS));
+  drop(ann);
+  const left = clock;
+  check('host-gone: the host\'s socket going starts the clock (kept in the room\'s storage)', room.store.state.hostGoneAt === left, room.store.state.hostGoneAt);
+  check(`host-gone: a check is asked for ${P.HOST_GONE_MS / 1000} s later`, room.scheduled.includes(left + P.HOST_GONE_MS), room.scheduled);
+  clock = left + P.HOST_GONE_MS - 1000;
+  check('host-gone: 59 s on, the session stays open', room.core.checkHost() === false && !room.core.closed && bo.closedWith === null);
+  ann.reconnect(room);
+  ann.deliverIn();
+  check('host-gone: the host back within 60 s stops the clock', room.store.state.hostGoneAt === null && ann.sync.installed);
+  clock = left + P.HOST_GONE_MS + 5000;
+  check('host-gone: ...and the session stays open past the old deadline', room.core.checkHost() === false && !room.core.closed && room.closedRows.length === 0);
+  drain(room, [ann, bo]);
+  bo.edit({ changes: { from: 0, insert: '// ours\n' } });
+  drain(room, [ann, bo]);
+  drop(ann);
+  const left2 = clock;
+  // The object hibernated meanwhile: a new core over the same storage and sockets still knows.
+  const woke = makeRoom(room.store, room.socks);
+  check('host-gone: a woken session reads when the host went', room.store.state.hostGoneAt === left2);
+  clock = left2 + P.HOST_GONE_MS;
+  const toldBefore = bo.inbox.some((m) => m.t === 'closed');
+  check('host-gone: 60 s on, the session closes', woke.core.checkHost() === true && woke.core.closed);
+  check('host-gone: no socket is told before the D1 row is written', !toldBefore && !bo.inbox.some((m) => m.t === 'closed'));
+  await woke.core.idle();
+  check('host-gone: the D1 row is closed (named by code and end)', woke.closedRows.length === 1 && woke.closedRows[0].code === 'BHKE' && woke.closedRows[0].expiresAt === T_EXP, woke.closedRows);
+  const closedMsg = bo.inbox.find((m) => m.t === 'closed');
+  check('host-gone: everyone is told who went, in plain words', closedMsg?.why === 'host-gone' && closedMsg.reason === 'Ann L. left, so the session ended.' && bo.closedWith === P.LIVE_CLOSED, closedMsg);
+  const kept = woke.rows.at(-1);
+  check('host-gone: the program is kept for teachers, closed', kept && kept.closed_at === clock && kept.text.startsWith('// ours'), kept);
+  check('host-gone: the closed session is written down in its storage', woke.store.state.closed === true && woke.store.state.text === undefined && woke.store.state.doc.startsWith('// ours'));
+  check('host-gone: it closes once', woke.core.checkHost() === false && woke.closedRows.length === 1);
+}
+{
+  // A joiner on their own (the host's tab died before its socket opened) starts the clock too.
+  const room = makeRoom();
+  const bo = client(room, BO_T);
+  bo.deliverIn();
+  check('host-gone: a joiner alone starts the clock', room.store.state.hostGoneAt === clock && room.scheduled.includes(clock + P.HOST_GONE_MS));
+  const ann = client(room, ANN_T, { seed: SEED, own: SEED });
+  check('host-gone: the host arriving stops it', room.store.state.hostGoneAt === null);
+  clock += P.HOST_GONE_MS * 2;
+  check('host-gone: then no close', room.core.checkHost() === false && ann.closedWith === null);
+  check('host-gone: the host pressing Leave still ends it at once (control)', room.core.control(JSON.stringify({ op: 'close' })) && bo.closedWith === P.LIVE_CLOSED);
+}
+
 // ---- 3. the Pages routes on a real SQLite ----
 const out = join(root, '.tmp', 'live-doc-test');
 const liveR = compileHandler('api/live/[code].ts', join(out, 'live'));
@@ -934,6 +990,48 @@ check('dev: a closed session refuses (410)', late.status === 410, late.status);
 for (const x of [A, B]) try { x.ws.terminate(); } catch { /* gone */ }
 dev.close();
 server.close();
+
+// The host-gone rule on the dev stand-in: its timer is set, and the check closes the row in its database.
+{
+  let devClock = Date.now();
+  const dev2 = makeDevLive({ db, identity: (rq) => { const e = rq.headers['x-test-user']; return e ? { email: e, role: 'student' } : null; }, now: () => devClock });
+  const ENV2 = { DB: db, LIVE: dev2.namespace, LIVE_DOC: dev2.docNamespace };
+  const srv = createServer((_q, s) => { s.statusCode = 404; s.end(); });
+  srv.on('upgrade', dev2.onUpgrade);
+  await new Promise((ok) => srv.listen(0, '127.0.0.1', ok));
+  const p2 = srv.address().port;
+  r = await call(create, 'onRequestPost', ENV2, ANN, 'POST', '/api/rooms', {}, { kind: 'code', game: 'code-js', seats: 2, device: DEV_A });
+  const C2 = r.body.code;
+  await call(joinR, 'onRequestPost', ENV2, BO, 'POST', `/api/rooms/${C2}/join`, { code: C2 }, { device: DEV_B, kind: 'code' });
+  const sock = (email, device) => new Promise((resolve) => {
+    const ws = new WebSocket(`ws://127.0.0.1:${p2}/api/live/${C2}?device=${device}`, { headers: { 'x-test-user': email } });
+    const got = [];
+    ws.on('message', (d) => got.push(JSON.parse(String(d))));
+    ws.on('open', () => resolve({ ws, got }));
+    ws.on('error', () => resolve(null));
+  });
+  const HA = await sock('ann@s.test', DEV_A);
+  const HB = await sock('bo@s.test', DEV_B);
+  await new Promise((ok) => setTimeout(ok, 100));
+  const listed = async () => (await call(create, 'onRequestGet', ENV2, S('cy@s.test'), 'GET', `/api/rooms?game=code-js&kind=code&device=${DEV_A}`)).body.rooms;
+  const closedB = new Promise((ok) => HB.ws.on('close', (code) => ok(code)));
+  HA.ws.terminate(); // the host's tab died: no leave request at all
+  await new Promise((ok) => setTimeout(ok, 150));
+  const devDoc = [...dev2.docs.values()][0];
+  check('dev: the host\'s socket going sets the session\'s timer', !!devDoc?.flushTimer && devDoc.flushTimerAt <= devClock + P.HOST_GONE_MS, devDoc && devDoc.flushTimerAt);
+  devClock += P.HOST_GONE_MS;
+  devDoc.core.flush();
+  devDoc.core.checkHost();
+  await devDoc.core.idle();
+  const code2 = await Promise.race([closedB, new Promise((ok) => setTimeout(() => ok('timeout'), 2000))]);
+  check('dev: a minute on, the joiner is told the host left', code2 === P.LIVE_CLOSED && HB.got.some((m) => m.t === 'closed' && m.why === 'host-gone'), code2);
+  check('dev: ...the row is closed, so the session leaves the open list', db.sqlite.prepare('SELECT closed_at FROM game_rooms WHERE code = ?').get(C2).closed_at !== null && !(await listed()).some((x) => x.code === C2));
+  const keptRow = db.sqlite.prepare('SELECT closed_at FROM code_sessions WHERE code = ? ORDER BY updated_at DESC').get(C2);
+  check('dev: ...and the teachers\' copy says closed (not "still open")', keptRow && keptRow.closed_at !== null, keptRow);
+  for (const x of [HA, HB]) try { x.ws.terminate(); } catch { /* gone */ }
+  dev2.close();
+  srv.close();
+}
 
 // A name tag never covers code when there is a clear side: above unless the line above
 // has code under it, then below unless the line below does.

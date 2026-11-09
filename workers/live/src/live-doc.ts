@@ -15,11 +15,14 @@
 // goes to D1 code_sessions through env.DB, written by this object itself
 // (never a client's copy).
 //
-// One alarm does two jobs: the session's end (expiresAt) and the next write
-// for teachers (at most every 2 minutes while the text changes).
+// One alarm does three jobs: the session's end (expiresAt), the next write for
+// teachers (at most every 2 minutes while the text changes) and the host-gone
+// check: a session whose host has had no socket for HOST_GONE_MS (60 s) closes
+// itself (LiveDocCore.checkHost), game_rooms.closed_at in D1 first
+// (closeRoomRow, what leave.ts does), then every socket.
 
 import { DurableObject } from 'cloudflare:workers';
-import { CONTROL_HEADER, TICKET_HEADER, decodeDocTicket, type DocTicket } from '../../../lib/live-protocol';
+import { CONTROL_HEADER, TICKET_HEADER, closeRoomRow, decodeDocTicket, type DocTicket } from '../../../lib/live-protocol';
 import {
   LiveDocCore, writeCodeSession, type DocSocket, type DocStored,
 } from '../../../lib/live-doc-protocol';
@@ -30,6 +33,8 @@ export class LiveDoc extends DurableObject<Env> {
   private readonly core: LiveDocCore;
   private readonly wrapped = new WeakMap<WebSocket, DocSocket>();
   private expiresAt = 0;
+  /** Alarm changes still on their way to storage (awaited before each handler returns). */
+  private readonly arms = new Set<Promise<void>>();
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
@@ -53,18 +58,28 @@ export class LiveDoc extends DurableObject<Env> {
         },
       },
       write: (row) => writeCodeSession(this.env.DB, row),
-      schedule: (at) => { void this.arm(at); },
+      schedule: (at) => this.arm(at),
+      closeRow: (room) => closeRoomRow(this.env.DB, room.code, room.expiresAt, Date.now()),
     });
     // A client's keep-alive is answered without waking the object.
     this.ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair('{"t":"ping"}', '{"t":"pong"}'));
   }
 
   /** The alarm at the earlier of `at` and the session's end. */
-  private async arm(at: number): Promise<void> {
-    const end = this.expiresAt || at;
-    const want = Math.min(at, end);
-    const now = await this.ctx.storage.getAlarm();
-    if (now === null || want < now) await this.ctx.storage.setAlarm(want);
+  private arm(at: number) {
+    const p: Promise<void> = (async () => {
+      const end = this.expiresAt || at;
+      const want = Math.min(at, end);
+      const now = await this.ctx.storage.getAlarm();
+      if (now === null || want < now) await this.ctx.storage.setAlarm(want);
+    })().catch(() => { /* the session's end alarm still stands */ }).finally(() => { this.arms.delete(p); });
+    this.arms.add(p);
+  }
+
+  /** Wait for alarm changes and the writes (teachers' copy, a host-gone close) that have started. */
+  private async settle(): Promise<void> {
+    while (this.arms.size) await Promise.all([...this.arms]);
+    await this.core.idle();
   }
 
   private wrap(ws: WebSocket): DocSocket {
@@ -85,7 +100,7 @@ export class LiveDoc extends DurableObject<Env> {
     const control = request.headers.get(CONTROL_HEADER);
     if (control !== null) {
       const ok = this.core.control(control);
-      await this.core.idle();
+      await this.settle();
       return new Response(JSON.stringify({ ok }), { headers: { 'Content-Type': 'application/json' } });
     }
     if ((request.headers.get('Upgrade') ?? '').toLowerCase() !== 'websocket') return new Response('Expected a WebSocket', { status: 426 });
@@ -98,26 +113,27 @@ export class LiveDoc extends DurableObject<Env> {
     this.ctx.acceptWebSocket(server);
     this.expiresAt = ticket.expiresAt;
     this.core.accept(this.wrap(server), ticket);
-    await this.arm(ticket.expiresAt);
+    this.arm(ticket.expiresAt);
+    await this.settle();
     return new Response(null, { status: 101, webSocket: client });
   }
 
   async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
     this.core.message(this.wrap(ws), typeof message === 'string' ? message : null);
-    await this.core.idle();
+    await this.settle();
   }
 
   async webSocketClose(ws: WebSocket, code: number, reason: string): Promise<void> {
     this.core.left(this.wrap(ws));
     ws.serializeAttachment(null);
     try { ws.close(code === 1005 ? 1000 : code, reason); } catch { /* already closed */ }
-    await this.core.idle();
+    await this.settle();
   }
 
   async webSocketError(ws: WebSocket): Promise<void> {
     this.core.left(this.wrap(ws));
     ws.serializeAttachment(null);
-    await this.core.idle();
+    await this.settle();
   }
 
   async alarm(): Promise<void> {
@@ -125,10 +141,12 @@ export class LiveDoc extends DurableObject<Env> {
     if (this.expiresAt && now >= this.expiresAt - 1000) {
       this.core.closeRoom('expired');
     } else {
-      // Re-arm for the end first; a write that is not due yet arms an earlier one through arm().
+      // Re-arm for the end first; a write that is not due yet, or a host still
+      // being waited for, arms an earlier one through arm().
       if (this.expiresAt) await this.ctx.storage.setAlarm(this.expiresAt);
       this.core.flush();
+      this.core.checkHost();
     }
-    await this.core.idle();
+    await this.settle();
   }
 }

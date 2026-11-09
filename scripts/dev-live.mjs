@@ -14,12 +14,17 @@
 // its state in memory and the text for teachers written to code_sessions on
 // this same database by the same writeCodeSession.
 //
+// A room whose host has had no socket for HOST_GONE_MS (60 s) closes itself, as
+// in production: each core's checkHost() runs on a timer here (the Durable
+// Object's alarm there) and marks the row closed in this database through the
+// same closeRoomRow.
+//
 // The socket server is Next's own bundled copy of `ws` (next/dist/compiled/ws):
 // no new dependency. onUpgrade only touches /api/live/<code>; every other
 // upgrade (Next's dev HMR socket) is left alone.
 
 import { createRequire } from 'node:module';
-import { LiveRoomCore, CONTROL_HEADER } from '../lib/live-protocol.ts';
+import { LiveRoomCore, CONTROL_HEADER, closeRoomRow } from '../lib/live-protocol.ts';
 import { LiveDocCore, MAX_SEED_FRAME, memoryDocStore, writeCodeSession } from '../lib/live-doc-protocol.ts';
 import { authorizeLive } from '../functions/_shared/live.ts';
 
@@ -27,6 +32,17 @@ const require = createRequire(import.meta.url);
 const { WebSocketServer } = require('next/dist/compiled/ws');
 
 const PATH_RE = /^\/api\/live\/([^/?#]+)\/?$/;
+
+/** One timer per room that keeps the earliest time asked for (the Durable Object's single alarm, in dev). */
+function soonest(r, key, fire, now) {
+  return (at) => {
+    if (r[key] && r[`${key}At`] <= at) return;
+    if (r[key]) clearTimeout(r[key]);
+    r[`${key}At`] = at;
+    r[key] = setTimeout(() => { r[key] = null; r[`${key}At`] = 0; fire(); }, Math.max(0, Math.min(at - now(), 2 ** 31 - 1)));
+    r[key].unref?.();
+  };
+}
 
 export function makeDevLive({ db, identity, now = Date.now }) {
   const wss = new WebSocketServer({ noServer: true, maxPayload: 64 * 1024 });
@@ -41,16 +57,14 @@ export function makeDevLive({ db, identity, now = Date.now }) {
     let r = docs.get(key);
     if (!r) {
       const sockets = new Set();
-      r = { sockets, timer: null, flushTimer: null };
+      r = { sockets, timer: null, flushTimer: null, flushTimerAt: 0 };
       r.core = new LiveDocCore({
         sockets: () => [...sockets],
         store: memoryDocStore(),
         write: (row) => writeCodeSession(db, row, now()),
-        schedule: (at) => {
-          if (r.flushTimer) clearTimeout(r.flushTimer);
-          r.flushTimer = setTimeout(() => { r.flushTimer = null; r.core.flush(); }, Math.max(0, Math.min(at - now(), 2 ** 31 - 1)));
-          r.flushTimer.unref?.();
-        },
+        // The alarm's jobs: the next write for teachers and the host-gone check.
+        schedule: soonest(r, 'flushTimer', () => { r.core.flush(); r.core.checkHost(); }, now),
+        closeRow: (room) => closeRoomRow(db, room.code, room.expiresAt, now()),
         now,
       });
       docs.set(key, r);
@@ -62,7 +76,11 @@ export function makeDevLive({ db, identity, now = Date.now }) {
     let r = rooms.get(key);
     if (!r) {
       const sockets = new Set();
-      r = { sockets, core: new LiveRoomCore(() => [...sockets], now) };
+      r = { sockets, hostTimer: null, hostTimerAt: 0 };
+      r.core = new LiveRoomCore(() => [...sockets], now, {
+        schedule: soonest(r, 'hostTimer', () => r.core.checkHost(), now),
+        closeRow: (room) => closeRoomRow(db, room.code, room.expiresAt, now()),
+      });
       rooms.set(key, r);
     }
     return r;

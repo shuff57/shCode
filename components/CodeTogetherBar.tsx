@@ -26,6 +26,7 @@ import { CODE_PLACEHOLDER, CodePictures, PickPicturesToggle, PicturePicker, lobb
 import { LiveDocClient, seatColor, type DocEnded, type DocStatus } from '../lib/live-doc';
 import { CODE_ROOM_GAMES, type CodeLang } from '../lib/live-protocol';
 import { deviceId } from '../lib/moshion-online';
+import { leaveOnUnload, leaveRoom } from '../lib/room-leave';
 import { codeIcons } from '../lib/room-icons';
 
 const { bar, row, btn, quiet, dim, codeInput, listItem } = lobbyStyles;
@@ -57,15 +58,6 @@ async function api(method: string, path: string, body?: unknown): Promise<{ stat
 function errorOf(r: { status: number; body: Record<string, unknown> }): string {
   if (r.status === 401) return 'Sign in to code together.';
   return typeof r.body.error === 'string' ? r.body.error : `Code together failed (${r.status}).`;
-}
-
-function leaveRoom(code: string, device: string) {
-  try {
-    void fetch(`/api/rooms/${encodeURIComponent(code)}/leave`, {
-      method: 'POST', credentials: 'same-origin', keepalive: true,
-      headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ device }),
-    }).catch(() => {});
-  } catch { /* page going */ }
 }
 
 /**
@@ -232,7 +224,7 @@ export default function CodeTogetherBar({ lang, getText, isUntouched, snapshot, 
     // The host's leaving closes the session for everyone (leave.ts), so say so first.
     if (s.hosting && !window.confirm(HOST_LEAVE_CONFIRM)) return;
     finish(s.hosting ? 'You ended the session. You kept a copy.' : 'You left the session. You kept a copy.');
-    leaveRoom(s.code, device);
+    void leaveRoom(s.code, device);
   }
 
   // Closing the tab leaves the session (the host's leaving ends it); the
@@ -242,7 +234,7 @@ export default function CodeTogetherBar({ lang, getText, isUntouched, snapshot, 
       const s = sessionRef.current;
       if (!s) return;
       clientRef.current?.stop();
-      leaveRoom(s.code, device);
+      leaveOnUnload(s.code, device);
     };
     window.addEventListener('pagehide', onHide);
     return () => {
@@ -251,7 +243,7 @@ export default function CodeTogetherBar({ lang, getText, isUntouched, snapshot, 
       if (s) {
         clientRef.current?.stop();
         clientRef.current = null;
-        leaveRoom(s.code, device);
+        void leaveRoom(s.code, device);
         cb.current.onCollab(null);
         cb.current.onActive(false);
       }

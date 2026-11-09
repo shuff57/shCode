@@ -29,7 +29,8 @@
 //                                       push, or why 'rewound': the client is AHEAD of the room)
 //   { t: 'cursor', seat, anchor, head, version? }
 //   { t: 'error', error, code? }        code: 'rate' | 'too-big' | 'bad' (the socket stays open)
-//   { t: 'closed', why, reason, host }  why: 'host' | 'expired' | 'left' | 'closed'; then LIVE_CLOSED
+//   { t: 'closed', why, reason, host }  why: 'host' | 'host-gone' | 'expired' | 'left' | 'closed'; then LIVE_CLOSED
+//                                       ('host-gone': the host had no socket for HOST_GONE_MS, lib/live-protocol.ts)
 //
 // The room's own storage is written at most every PERSIST_EVERY_MS while
 // changes arrive (a pending timer; in the Durable Object it also keeps the
@@ -41,6 +42,10 @@
 // epoch holding more than `since` resets itself (lib/live-doc.ts), so nobody
 // rebuilds on updates the room no longer has.
 //
+// A session whose host has had no socket for HOST_GONE_MS (60 s) closes as if
+// the host had pressed Leave (checkHost; the same HostWatch rule as a game
+// room): D1 game_rooms.closed_at first (closeRow), then every socket.
+//
 // The shared program is free text, so unlike a game room it is KEPT where a
 // teacher can read it: the room writes its own text (never a client's copy) to
 // D1 `code_sessions` (writeCodeSession below) at most every SAVE_EVERY_MS while
@@ -48,7 +53,7 @@
 
 import { ChangeSet, Text } from '@codemirror/state';
 import {
-  LIVE_BAD_TICKET, LIVE_CLOSED, LIVE_REPLACED, newBucket, takeToken,
+  HostWatch, LIVE_BAD_TICKET, LIVE_CLOSED, LIVE_REPLACED, newBucket, takeToken,
   type Bucket, type CodeLang, type DocTicket, type LivePlayer,
 } from './live-protocol';
 
@@ -102,6 +107,8 @@ export interface DocStored {
   savedAt: number;
   dirty: boolean;
   meta: SessionMeta | null;
+  /** When the host's last socket went (null: the host is here, or never was). See HOST_GONE_MS in lib/live-protocol.ts. */
+  hostGoneAt?: number | null;
 }
 
 export interface DocStore {
@@ -140,8 +147,10 @@ export interface LiveDocOptions {
   timer?: DocTimer;
   /** Writes the session where teachers read it (writeCodeSession on D1). */
   write: (row: CodeSessionRow) => Promise<void>;
-  /** Call flush() at this time (the DO arms its alarm, dev a timer). */
+  /** Call flush() and checkHost() at this time (the DO arms its alarm, dev a timer). */
   schedule?: (at: number) => void;
+  /** Mark the session closed in D1 (closeRoomRow in lib/live-protocol.ts), when it closes because the host is gone. */
+  closeRow?: (room: { code: string; expiresAt: number }) => Promise<void>;
   now?: () => number;
 }
 
@@ -225,6 +234,9 @@ export class LiveDocCore {
   private readonly cursorBuckets = new WeakMap<DocSocket, Bucket>();
   private readonly toldAt = new WeakMap<DocSocket, number>();
   private readonly writes = new Set<Promise<void>>();
+  private readonly watch: HostWatch;
+  /** closeRoom has run (closed can be set a moment earlier, by checkHost). */
+  private shut: boolean;
 
   constructor(opts: LiveDocOptions) {
     this.opts = opts;
@@ -234,12 +246,19 @@ export class LiveDocCore {
     this.version = s?.version ?? 0;
     this.participants = Array.isArray(s?.participants) ? [...s!.participants] : [];
     this.closed = s?.closed === true;
+    this.shut = this.closed;
     this.savedAt = s?.savedAt ?? 0;
     this.dirty = s?.dirty === true;
     this.meta = s?.meta ?? null;
     this.timer = opts.timer ?? realTimer;
     this.epoch = Math.random().toString(36).slice(2, 10);
     this.since = this.version;
+    this.watch = new HostWatch({
+      now: this.now,
+      load: () => s?.hostGoneAt ?? null,
+      save: () => this.persistNow(),
+      schedule: opts.schedule,
+    });
   }
 
   /** The text as the room holds it (tests, and the D1 row). */
@@ -258,6 +277,8 @@ export class LiveDocCore {
     this.opts.store.save({
       doc: this.doc.toString(), version: this.version, participants: this.participants,
       closed: this.closed, savedAt: this.savedAt, dirty: this.dirty, meta: this.meta,
+      // Before the constructor has made it (the watch reads the stored value as it is made).
+      hostGoneAt: this.watch?.since ?? null,
     });
   }
 
@@ -347,6 +368,31 @@ export class LiveDocCore {
       epoch: this.epoch, since: this.since,
     });
     this.announce(ws);
+    // A joiner here before the host (or after the host went) starts the host-gone clock; the host stops it.
+    this.watch.seen(this.hostHere());
+  }
+
+  /** Seat 0 has an open socket (other than `except`, one that is closing). */
+  private hostHere(except?: DocSocket): boolean {
+    return this.open(except).some((s) => s.attachment()!.seat === 0);
+  }
+
+  /**
+   * The session's timer (HOST_GONE_MS after the host's last socket went, or
+   * earlier: the alarm also serves the writes for teachers and the end). The
+   * host still gone: the session is closed in D1 first, so a list loaded the
+   * moment the others hear of it no longer offers it, then everyone is told
+   * and the text is kept for teachers as closed. true when it closed.
+   */
+  checkHost(): boolean {
+    if (this.closed || !this.meta) return false;
+    if (!this.watch.due(this.hostHere())) return false;
+    this.closed = true; // no new socket meanwhile; closeRoom writes it down
+    const m = this.meta;
+    const row = this.opts.closeRow ? this.opts.closeRow({ code: m.code, expiresAt: m.expiresAt }).catch(() => { /* the room is shut anyway */ }) : Promise.resolve();
+    const p: Promise<void> = row.then(() => this.closeRoom('host-gone')).finally(() => { this.writes.delete(p); });
+    this.writes.add(p);
+    return true;
   }
 
   /** A frame from a socket. */
@@ -456,6 +502,7 @@ export class LiveDocCore {
     const a = ws.attachment();
     if (!a) return;
     this.announce(undefined, ws);
+    if (!this.closed) this.watch.seen(this.hostHere(ws));
     if (this.open(ws).length === 0) {
       this.writeNow(this.closed ? this.now() : null);
       this.persistNow();
@@ -473,13 +520,21 @@ export class LiveDocCore {
     }
   }
 
-  /** The host left or the session expired: tell everyone, close every socket, keep the text for teachers. */
-  closeRoom(why: 'host' | 'expired') {
+  /**
+   * The host left (why 'host'), went without a word for HOST_GONE_MS
+   * ('host-gone', see checkHost) or the session expired: tell everyone, close
+   * every socket, keep the text for teachers.
+   */
+  closeRoom(why: 'host' | 'expired' | 'host-gone') {
     const host = this.meta?.hostName ?? '';
     const reason = why === 'host'
       ? `${host || 'The host'} ended the session.`
-      : 'This session has ended: sessions last 3 hours.';
-    const first = !this.closed;
+      : why === 'host-gone'
+        ? `${host || 'The host'} left, so the session ended.`
+        : 'This session has ended: sessions last 3 hours.';
+    // checkHost marks the room closed before its D1 write; the sockets and the teachers' copy come after.
+    const first = !this.shut;
+    this.shut = true;
     this.closed = true;
     for (const s of this.opts.sockets()) {
       LiveDocCore.say(s, { t: 'closed', why, reason, host });

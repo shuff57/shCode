@@ -653,7 +653,8 @@ export interface DocStatus {
 }
 
 export interface DocEnded {
-  why: 'host' | 'expired' | 'left' | 'closed' | 'gone' | 'replaced';
+  /** 'host-gone': the host had no socket for a minute (lib/live-protocol.ts HOST_GONE_MS). */
+  why: 'host' | 'host-gone' | 'expired' | 'left' | 'closed' | 'gone' | 'replaced';
   host: string;
   reason: string;
 }
@@ -868,7 +869,7 @@ export class LiveDocClient {
         return;
       }
       case 'closed': {
-        const why = (['host', 'expired', 'left', 'closed'] as const).find((w) => w === m.why) ?? 'closed';
+        const why = (['host', 'host-gone', 'expired', 'left', 'closed'] as const).find((w) => w === m.why) ?? 'closed';
         this.end({ why, host: String(m.host ?? this.status.host), reason: String(m.reason ?? 'That session has ended.') });
         return;
       }

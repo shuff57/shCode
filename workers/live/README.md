@@ -7,6 +7,12 @@ The real-time rooms' Durable Objects. Spec: `codehs-review/REALTIME-SPEC.md`.
   rules: `lib/live-doc-protocol.ts`. It writes its own text to D1 `code_sessions` (migration 0044)
   through the `DB` binding, the same database as the Pages project.
 
+Both close a room whose host (seat 0) has had no socket for 60 s (`HOST_GONE_MS`, `HostWatch` in
+`lib/live-protocol.ts`): they mark `game_rooms.closed_at` in D1 through the `DB` binding
+(`closeRoomRow`, what the leave route does), then tell every socket. Each keeps when the host went in
+its own SQLite and checks on its alarm, so a hibernated room still knows. This needs the Worker
+redeployed (the Pages site alone does not carry it).
+
 Both are shared with the dev server's stand-in, `scripts/dev-live.mjs`. The only way in is the Pages
 Function `functions/api/live/[code].ts`, through the `LIVE` and `LIVE_DOC` bindings.
 

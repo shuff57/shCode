@@ -26,6 +26,10 @@
 //   { t: 'error', error }            a refused message (the socket stays open)
 //   { t: 'closed', reason }          then the socket closes with LIVE_CLOSED
 //
+// A room whose host has had no socket for HOST_GONE_MS (60 s) closes as if the
+// host had pressed Leave (LiveRoomCore.checkHost, HostWatch below): D1
+// game_rooms.closed_at first, then every socket.
+//
 // Every incoming frame costs one token from a per-socket bucket
 // (LIVE_RATE_PER_SEC, burst LIVE_BURST); an empty bucket drops the frame and
 // says so at most once a second.
@@ -198,6 +202,115 @@ export function takeToken(b: Bucket, now: number, rate = LIVE_RATE_PER_SEC, burs
   return true;
 }
 
+// ---- the host-gone rule (both live rooms) -----------------------------------
+
+/**
+ * A room whose host (seat 0) has had no socket for this long closes, as if the
+ * host had pressed Leave. It catches the tab that went without a word (closed
+ * while the leave beacon was lost, a crash, a lid shut, the network gone): a
+ * dead room must not stay listed and joinable. A host who comes back sooner (a
+ * dropped connection, the socket reopening) keeps the room. Both LiveRoomCore
+ * and LiveDocCore use HostWatch below, so the two kinds cannot disagree.
+ */
+export const HOST_GONE_MS = 60_000;
+
+export interface HostWatchOptions {
+  now: () => number;
+  /** When the host's last socket went, from the room's own storage (null: the host is here). */
+  load?: () => number | null;
+  /** Keep it in the room's own storage, so a room that hibernates still knows. */
+  save?: (since: number | null) => void;
+  /** Call the room's checkHost() at this time (the DO arms its alarm, dev a timer). */
+  schedule?: (at: number) => void;
+}
+
+/** How long the host has been gone. Holds no rule of its own beyond HOST_GONE_MS. */
+export class HostWatch {
+  /** When the host's last socket went; null while the host has a socket. */
+  since: number | null;
+  private readonly opts: HostWatchOptions;
+
+  constructor(opts: HostWatchOptions) {
+    this.opts = opts;
+    const s = opts.load?.();
+    this.since = typeof s === 'number' && Number.isFinite(s) ? s : null;
+  }
+
+  /** The time the room closes if the host stays away, or null. */
+  get deadline(): number | null {
+    return this.since === null ? null : this.since + HOST_GONE_MS;
+  }
+
+  /** Who has a socket changed: is the host (seat 0) one of them now? */
+  seen(hostHere: boolean) {
+    if (hostHere) {
+      if (this.since !== null) { this.since = null; this.opts.save?.(null); }
+      return;
+    }
+    if (this.since !== null) return; // already counting
+    this.since = this.opts.now();
+    this.opts.save?.(this.since);
+    this.opts.schedule?.(this.since + HOST_GONE_MS);
+  }
+
+  /**
+   * The check behind the room's timer: true when the host has been gone
+   * HOST_GONE_MS and the room should close. Still waiting, it asks to be
+   * called again at the deadline (one alarm serves several jobs, so it may
+   * be called early).
+   */
+  due(hostHere: boolean): boolean {
+    if (hostHere) { this.seen(true); return false; }
+    const at = this.deadline;
+    if (at === null) return false;
+    if (this.opts.now() >= at) return true;
+    this.opts.schedule?.(at);
+    return false;
+  }
+}
+
+/** The part of D1 closeRoomRow needs (the real binding, or the dev server's SQLite facade). */
+export interface D1Run {
+  prepare(sql: string): { bind(...args: unknown[]): { run(): Promise<unknown> } };
+}
+
+/**
+ * Mark a room closed in D1 (game_rooms.closed_at), as leave.ts does when the
+ * host leaves: the open lists, joins and the socket route then treat it as
+ * closed. The row is named by its code AND its end time, which only that room
+ * has (a reused code is a new row with a new end), and a closed_at already
+ * written stays.
+ */
+export async function closeRoomRow(db: D1Run, code: string, expiresAt: number, now: number): Promise<void> {
+  await db.prepare('UPDATE game_rooms SET closed_at = ? WHERE code = ? AND expires_at = ? AND closed_at IS NULL')
+    .bind(now, code, expiresAt).run();
+}
+
+/** What a game room keeps in its own storage (the Durable Object's SQLite; memory when none is given). */
+export interface RoomStored {
+  hostGoneAt: number | null;
+  code: string;
+  expiresAt: number;
+  closed: boolean;
+}
+
+export interface RoomStore {
+  load(): RoomStored | null;
+  save(s: RoomStored): void;
+}
+
+export interface LiveRoomOptions {
+  /** The room's own storage, for the host-gone clock and the room's code and end (survives hibernation). */
+  store?: RoomStore;
+  /** Call checkHost() at this time (the DO arms its alarm, dev a timer, a test its own clock). */
+  schedule?: (at: number) => void;
+  /** Mark the room closed in D1 (closeRoomRow), when it closes because the host is gone. */
+  closeRow?: (room: { code: string; expiresAt: number }) => Promise<void>;
+}
+
+/** What the others are told when a room closes because its host went. */
+export const HOST_GONE_ROOM = 'The host left, so the room closed.';
+
 /** A socket as the room sees it. The DO wraps a hibernatable WebSocket, dev wraps a `ws` socket. */
 export interface LiveSocket {
   send(text: string): void;
@@ -216,14 +329,70 @@ export interface LiveSocket {
 export class LiveRoomCore {
   private readonly sockets: () => LiveSocket[];
   private readonly now: () => number;
+  private readonly opts: LiveRoomOptions;
   private seq = -1;
   private readonly buckets = new WeakMap<LiveSocket, Bucket>();
   private readonly toldAt = new WeakMap<LiveSocket, number>();
-  closed = false;
+  /** The room's code and end, from the first ticket (or the room's own storage after hibernating). */
+  private info: { code: string; expiresAt: number } | null;
+  private readonly watch: HostWatch;
+  private readonly writes = new Set<Promise<void>>();
+  closed: boolean;
 
-  constructor(sockets: () => LiveSocket[], now: () => number = Date.now) {
+  constructor(sockets: () => LiveSocket[], now: () => number = Date.now, opts: LiveRoomOptions = {}) {
     this.sockets = sockets;
     this.now = now;
+    this.opts = opts;
+    const s = opts.store?.load() ?? null;
+    this.info = s && typeof s.code === 'string' && Number.isFinite(s.expiresAt) ? { code: s.code, expiresAt: s.expiresAt } : null;
+    this.closed = s?.closed === true;
+    this.watch = new HostWatch({
+      now,
+      load: () => s?.hostGoneAt ?? null,
+      save: () => this.persist(),
+      schedule: opts.schedule,
+    });
+  }
+
+  private persist() {
+    if (!this.opts.store || !this.info) return;
+    this.opts.store.save({ hostGoneAt: this.watch.since, code: this.info.code, expiresAt: this.info.expiresAt, closed: this.closed });
+  }
+
+  /** When the room ends: its ticket's expiresAt (0 when it has never seen one). */
+  expiresAt(): number {
+    if (this.info) return this.info.expiresAt;
+    let end = 0;
+    for (const s of this.sockets()) end = Math.max(end, s.attachment()?.expiresAt ?? 0);
+    return end;
+  }
+
+  /** Resolves when the D1 write a host-gone close started has finished. */
+  async idle(): Promise<void> {
+    while (this.writes.size) await Promise.all([...this.writes]);
+  }
+
+  /** Seat 0 has an open socket (other than `except`, one that is closing). */
+  private hostHere(except?: LiveSocket): boolean {
+    return this.open(except).some((s) => s.attachment()!.seat === 0);
+  }
+
+  /**
+   * The room's timer (HOST_GONE_MS after the host's last socket went, or
+   * earlier: the alarm also serves the room's end). The host still gone: the
+   * room is closed in D1 first, so a list loaded the moment the others hear
+   * of it no longer offers it, then every socket is told. true when it closed.
+   */
+  checkHost(): boolean {
+    if (this.closed) return false;
+    if (!this.watch.due(this.hostHere())) return false;
+    this.closed = true;
+    this.persist();
+    const info = this.info;
+    const row = info && this.opts.closeRow ? this.opts.closeRow(info).catch(() => { /* the room is shut anyway */ }) : Promise.resolve();
+    const p: Promise<void> = row.then(() => this.closeRoom(HOST_GONE_ROOM)).finally(() => { this.writes.delete(p); });
+    this.writes.add(p);
+    return true;
   }
 
   private open(except?: LiveSocket): LiveSocket[] {
@@ -287,9 +456,12 @@ export class LiveRoomCore {
     }
     ws.attach({ ...ticket, seq });
     this.buckets.set(ws, newBucket(now));
+    if (!this.info) { this.info = { code: ticket.code, expiresAt: ticket.expiresAt }; this.persist(); }
     const p = this.players();
     LiveRoomCore.say(ws, { t: 'hello', code: ticket.code, seat: ticket.seat, seats: ticket.seats, seq, players: p.players, state: p.state });
     this.announce(ws);
+    // A joiner here before the host (or after the host went) starts the host-gone clock; the host stops it.
+    this.watch.seen(this.hostHere());
   }
 
   /** A frame from a socket. */
@@ -334,6 +506,7 @@ export class LiveRoomCore {
     // Its shared sprites vanish from the other screens.
     this.broadcast({ t: 'unshare', seat: a.seat }, ws);
     this.announce(undefined, ws);
+    if (!this.closed) this.watch.seen(this.hostHere(ws));
   }
 
   /** A seat left the room (POST /api/rooms/<code>/leave): drop its socket. */
@@ -349,7 +522,9 @@ export class LiveRoomCore {
 
   /** The host left or the room expired: tell everyone and close every socket. */
   closeRoom(reason: string) {
+    const first = !this.closed;
     this.closed = true;
+    if (first) this.persist();
     for (const s of this.sockets()) {
       LiveRoomCore.say(s, { t: 'closed', reason });
       try { s.close(LIVE_CLOSED, 'closed'); } catch { /* gone */ }

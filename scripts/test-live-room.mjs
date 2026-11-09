@@ -12,7 +12,13 @@
 //      player's upgrade is forwarded with the ticket and without the cookie;
 //   4. the rooms routes: POST {live:true} needs the binding, the lobby lists
 //      live rooms only with live=1, the host leaving tells the room to close;
-//   5. the dev stand-in (scripts/dev-live.mjs) end to end over real sockets.
+//      the leave a closing tab sends (lib/room-leave.ts: a text/plain beacon)
+//      is accepted with the session and the device id;
+//   5. the dev stand-in (scripts/dev-live.mjs) end to end over real sockets;
+//   6. the host-gone rule (HOST_GONE_MS, on a fake clock): a room whose host has
+//      had no socket for 60 s closes, D1 first (closeRoomRow), then the sockets;
+//      a reconnect within 60 s keeps it; a woken room still knows; the same rule
+//      on the dev stand-in.
 //
 // Run: node scripts/test-live-room.mjs
 
@@ -71,9 +77,8 @@ check('ticket: junk refused', P.decodeTicket('{') === null && P.decodeTicket(nul
 }
 
 // ---- 2. LiveRoomCore with fake sockets ----
-function fakeRoom(now = () => clock) {
-  const socks = new Set();
-  const core = new P.LiveRoomCore(() => [...socks], now);
+function fakeRoom(now = () => clock, opts = {}, socks = new Set()) {
+  const core = new P.LiveRoomCore(() => [...socks], now, opts);
   const connect = (ticket) => {
     let att = null;
     const s = {
@@ -87,7 +92,9 @@ function fakeRoom(now = () => clock) {
     core.accept(s, ticket);
     return s;
   };
-  return { core, connect, socks };
+  /** The socket dropped (the tab closed): what the Durable Object's webSocketClose does. */
+  const drop = (s) => { core.left(s); s.attach(null); socks.delete(s); };
+  return { core, connect, socks, drop };
 }
 let clock = 1_000_000;
 const exp = clock + 3_600_000;
@@ -258,6 +265,49 @@ ns.calls.length = 0;
 await call(leaveR, 'onRequestPost', ENV, ANN, 'POST', `/api/rooms/${POLL_CODE}/leave`, { code: POLL_CODE }, { device: DEV_A });
 check('leave: a polling room never calls the binding', ns.calls.length === 0);
 
+// The leave a closing tab sends (lib/room-leave.ts): navigator.sendBeacon, a text/plain body.
+{
+  const RL = await import(join(root, 'lib/room-leave.ts'));
+  const sent = [];
+  const nav = { sendBeacon(url, body) { sent.push({ url, body, self: this }); return true; } };
+  const fetched = [];
+  const f = async (url, init) => { fetched.push({ url, init }); return {}; };
+  check('unload: a beacon to the leave route with this tab\'s device', RL.leaveOnUnload('BHKE', DEV_A, nav, f) === true
+    && sent.length === 1 && sent[0].url === '/api/rooms/BHKE/leave' && JSON.parse(sent[0].body).device === DEV_A && sent[0].self === nav && fetched.length === 0, sent);
+  const refusing = { sendBeacon() { return false; } };
+  check('unload: a refused beacon falls back to a keepalive fetch', RL.leaveOnUnload('BHKE', DEV_A, refusing, f) === false
+    && fetched.length === 1 && fetched[0].init.keepalive === true && JSON.parse(fetched[0].init.body).device === DEV_A, fetched);
+  const throwing = { sendBeacon() { throw new Error('no'); } };
+  check('unload: a beacon that throws falls back too', RL.leaveOnUnload('BHKE', DEV_A, throwing, f) === false && fetched.length === 2);
+  check('unload: no navigator at all still sends the fetch', RL.leaveOnUnload('BHKE', DEV_A, null, f) === false && fetched.length === 3);
+  let done = false;
+  await RL.leaveRoom('BHKE', DEV_A, async () => { throw new Error('offline'); }).then(() => { done = true; });
+  check('leaveRoom: resolves (never rejects) when the network is down', done);
+
+  // The route reads the beacon's text/plain body as JSON, with the session from the cookie.
+  r = await call(create, 'onRequestPost', ENV, ANN, 'POST', '/api/rooms', {}, { game: 'race', seats: 2, device: DEV_A, live: true });
+  const BEACON_CODE = r.body.code;
+  await call(joinR, 'onRequestPost', ENV, BO, 'POST', `/api/rooms/${BEACON_CODE}/join`, { code: BEACON_CODE }, { device: DEV_B });
+  const beacon = (user, device) => leaveR.onRequestPost({
+    env: ENV, data: user, params: { code: BEACON_CODE },
+    request: new Request(`https://shcode.test${RL.leaveUrl(BEACON_CODE)}`, {
+      method: 'POST', body: JSON.stringify({ device }), headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+    }),
+  }).then(async (res) => ({ status: res.status, body: await res.json() }));
+  r = await beacon(BO, DEV_B);
+  check('beacon: a joiner\'s text/plain leave is accepted (left, seat kept for a rejoin)', r.status === 200 && r.body.left === true
+    && db.sqlite.prepare('SELECT left_at FROM game_room_players WHERE code = ? AND seat = 1').get(BEACON_CODE).left_at !== null, r);
+  r = await call(joinR, 'onRequestPost', ENV, BO, 'POST', `/api/rooms/${BEACON_CODE}/join`, { code: BEACON_CODE }, { device: DEV_B });
+  check('beacon: a reload in the same tab gets its seat back (same device)', r.status === 200 && r.body.seat === 1, r);
+  ns.calls.length = 0;
+  r = await beacon(ANN, DEV_A);
+  const ctl = ns.calls[0]?.req.headers.get(P.CONTROL_HEADER);
+  check('beacon: the host\'s closing tab closes the room, in D1 and in the live room', r.status === 200
+    && db.sqlite.prepare('SELECT closed_at FROM game_rooms WHERE code = ?').get(BEACON_CODE).closed_at !== null && ctl && JSON.parse(ctl).op === 'close', [r, ctl]);
+  r = await beacon(BO, 'othertab0000');
+  check('beacon: another tab\'s device leaves nothing', r.status === 200 && r.body.left === false, r);
+}
+
 // ---- 5. the dev stand-in over real sockets ----
 const dev = makeDevLive({ db, identity: (rq) => { const e = rq.headers['x-test-user']; return e ? { email: e, role: 'student' } : null; } });
 const DEVENV = { DB: db, LIVE: dev.namespace };
@@ -323,6 +373,125 @@ check('dev: other upgrade paths (Next\'s HMR) are not touched', other === 'left 
 for (const x of [A, B]) try { x.ws.terminate(); } catch { /* gone */ }
 dev.close();
 server.close();
+
+// ---- 6. the host-gone rule on a fake clock ----
+{
+  const memStore = () => {
+    const st = { state: null, saves: 0 };
+    st.load = () => (st.state ? JSON.parse(JSON.stringify(st.state)) : null);
+    st.save = (v) => { st.state = JSON.parse(JSON.stringify(v)); st.saves++; };
+    return st;
+  };
+  const store = memStore();
+  const scheduled = [];
+  const rows = [];
+  const socks = new Set();
+  let joiner = null;
+  const opts = {
+    store,
+    schedule: (at) => scheduled.push(at),
+    // D1 first: when the row is written, the joiner must not have been told yet.
+    closeRow: async (room) => { rows.push({ ...room, toldFirst: !!joiner?.got.some((m) => m.t === 'closed') }); },
+  };
+  const end = clock + 3_600_000;
+  const { core, connect, drop } = fakeRoom(() => clock, opts, socks);
+  const host = connect({ code: 'HKGN', seat: 0, seats: 2, name: 'Ann L.', expiresAt: end });
+  joiner = connect({ code: 'HKGN', seat: 1, seats: 2, name: 'Bo N.', expiresAt: end });
+  check('host-gone: nothing counts while the host is here', store.state?.hostGoneAt === null && scheduled.length === 0, [store.state, scheduled]);
+  check('host-gone: the room keeps its code and end in its own storage', store.state?.code === 'HKGN' && store.state.expiresAt === end && core.expiresAt() === end, store.state);
+  drop(host);
+  const left = clock;
+  check('host-gone: the host\'s socket going starts the clock (kept in storage)', store.state.hostGoneAt === left, store.state);
+  check(`host-gone: a check is asked for ${P.HOST_GONE_MS / 1000} s later`, scheduled.at(-1) === left + P.HOST_GONE_MS, scheduled);
+  check('host-gone: the others see the host go', joiner.got.at(-1)?.t === 'players' && joiner.got.at(-1).players.length === 1);
+  clock = left + P.HOST_GONE_MS - 1000;
+  check('host-gone: 59 s on, the room stays open', core.checkHost() === false && !core.closed && joiner.closedWith === null);
+  check('host-gone: an early check asks again at the deadline', scheduled.at(-1) === left + P.HOST_GONE_MS);
+  // The host comes back within 60 s (a dropped connection, the socket reopening).
+  const host2 = connect({ code: 'HKGN', seat: 0, seats: 2, name: 'Ann L.', expiresAt: end });
+  check('host-gone: the host back within 60 s stops the clock', store.state.hostGoneAt === null && host2.got[0]?.t === 'hello', store.state);
+  clock = left + P.HOST_GONE_MS + 5000;
+  check('host-gone: ...and the room stays open past the old deadline', core.checkHost() === false && !core.closed && joiner.closedWith === null && rows.length === 0);
+  // The host goes again; a room that hibernated meanwhile (a new core over the same storage and sockets) still knows.
+  drop(host2);
+  const left2 = clock;
+  const woke = new P.LiveRoomCore(() => [...socks], () => clock, opts);
+  check('host-gone: a woken room reads when the host went', woke.expiresAt() === end && store.state.hostGoneAt === left2);
+  clock = left2 + P.HOST_GONE_MS;
+  check('host-gone: 60 s on, the room closes', woke.checkHost() === true && woke.closed);
+  await woke.idle();
+  check('host-gone: the D1 row is closed first (code and end name it)', rows.length === 1 && rows[0].code === 'HKGN' && rows[0].expiresAt === end && rows[0].toldFirst === false, rows);
+  check('host-gone: then every socket is told and closed', joiner.got.some((m) => m.t === 'closed' && m.reason === P.HOST_GONE_ROOM) && joiner.closedWith === P.LIVE_CLOSED, joiner.got.at(-1));
+  check('host-gone: the closed room says so in storage', store.state.closed === true);
+  const late = new P.LiveRoomCore(() => [], () => clock, opts);
+  check('host-gone: a room woken after it closed stays closed', late.closed === true && late.checkHost() === false);
+  check('host-gone: it closes once', woke.checkHost() === false && rows.length === 1);
+}
+{
+  // A joiner connected before the host (or with no host at all) starts the clock too.
+  const scheduled = [];
+  const { core, connect } = fakeRoom(() => clock, { schedule: (at) => scheduled.push(at) });
+  const end = clock + 3_600_000;
+  const bo = connect({ code: 'NOHS', seat: 1, seats: 2, name: 'Bo N.', expiresAt: end });
+  check('host-gone: a joiner alone starts the clock', scheduled.at(-1) === clock + P.HOST_GONE_MS);
+  connect({ code: 'NOHS', seat: 0, seats: 2, name: 'Ann L.', expiresAt: end });
+  clock += P.HOST_GONE_MS + 1;
+  check('host-gone: the host arriving stops it (no store: memory only)', core.checkHost() === false && bo.closedWith === null);
+  check('host-gone: the host pressing Leave still closes at once (control)', core.control(JSON.stringify({ op: 'close' })) && bo.closedWith === P.LIVE_CLOSED);
+}
+{
+  // closeRoomRow on a real SQLite: the row with this code AND end, once.
+  r = await call(create, 'onRequestPost', ENV, ANN, 'POST', '/api/rooms', {}, { game: 'race', seats: 2, device: DEV_A, live: true });
+  const C = r.body.code;
+  const rowOf = () => db.sqlite.prepare('SELECT closed_at, expires_at FROM game_rooms WHERE code = ?').get(C);
+  await P.closeRoomRow(db, C, rowOf().expires_at + 1, 123);
+  check('closeRoomRow: another room\'s end (a reused code) is left alone', rowOf().closed_at === null);
+  await P.closeRoomRow(db, C, rowOf().expires_at, 456);
+  check('closeRoomRow: marks the room closed', rowOf().closed_at === 456);
+  await P.closeRoomRow(db, C, rowOf().expires_at, 789);
+  check('closeRoomRow: a closed_at already written stays', rowOf().closed_at === 456);
+  const listedNow = (await call(create, 'onRequestGet', ENV, BO, 'GET', `/api/rooms?game=race&device=${DEV_B}&live=1`)).body.rooms.map((x) => x.code);
+  check('closeRoomRow: the open list no longer offers it', !listedNow.includes(C), listedNow);
+}
+{
+  // The same rule on the dev stand-in: its timer is set, and the check closes the row in its database.
+  let devClock = Date.now();
+  const dev2 = makeDevLive({ db, identity: (rq) => { const e = rq.headers['x-test-user']; return e ? { email: e, role: 'student' } : null; }, now: () => devClock });
+  const ENV2 = { DB: db, LIVE: dev2.namespace };
+  const srv = createServer((_q, s) => { s.statusCode = 404; s.end(); });
+  srv.on('upgrade', dev2.onUpgrade);
+  await new Promise((ok) => srv.listen(0, '127.0.0.1', ok));
+  const p2 = srv.address().port;
+  r = await call(create, 'onRequestPost', ENV2, ANN, 'POST', '/api/rooms', {}, { game: 'race', seats: 2, device: DEV_A, live: true });
+  const C2 = r.body.code;
+  await call(joinR, 'onRequestPost', ENV2, BO, 'POST', `/api/rooms/${C2}/join`, { code: C2 }, { device: DEV_B });
+  const sock = (email, device) => new Promise((resolve) => {
+    const ws = new WebSocket(`ws://127.0.0.1:${p2}/api/live/${C2}?device=${device}`, { headers: { 'x-test-user': email } });
+    const got = [];
+    ws.on('message', (d) => got.push(JSON.parse(String(d))));
+    ws.on('open', () => resolve({ ws, got }));
+    ws.on('error', () => resolve(null));
+  });
+  const HA = await sock('ann@s.test', DEV_A);
+  const HB = await sock('bo@s.test', DEV_B);
+  await new Promise((ok) => setTimeout(ok, 100));
+  const closedB = new Promise((ok) => HB.ws.on('close', (code) => ok(code)));
+  HA.ws.terminate(); // the host's tab died: no leave request at all
+  await new Promise((ok) => setTimeout(ok, 150));
+  const devRoom = [...dev2.rooms.values()][0];
+  check('dev: the host\'s socket going sets the room\'s timer', !!devRoom?.hostTimer && devRoom.hostTimerAt === devClock + P.HOST_GONE_MS, devRoom && devRoom.hostTimerAt);
+  devClock += P.HOST_GONE_MS;
+  devRoom.core.checkHost();
+  await devRoom.core.idle();
+  const code2 = await Promise.race([closedB, new Promise((ok) => setTimeout(() => ok('timeout'), 2000))]);
+  check('dev: a minute on, the joiner is told the room closed', code2 === P.LIVE_CLOSED && HB.got.some((m) => m.t === 'closed'), code2);
+  check('dev: ...and the row is closed in the dev database', db.sqlite.prepare('SELECT closed_at FROM game_rooms WHERE code = ?').get(C2).closed_at !== null);
+  const relist = (await call(create, 'onRequestGet', ENV2, S('cy@s.test'), 'GET', `/api/rooms?game=race&device=${DEV_A}&live=1`)).body.rooms.map((x) => x.code);
+  check('dev: the dead room is gone from the open list', !relist.includes(C2), relist);
+  for (const x of [HA, HB]) try { x.ws.terminate(); } catch { /* gone */ }
+  dev2.close();
+  srv.close();
+}
 
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);

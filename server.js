@@ -605,7 +605,8 @@ app.prepare().catch((err) => {
     server.get('/api/rooms/:code', libRoute(roomPoll.onRequestGet));
     server.post('/api/rooms/:code/join', express.json(), libRoute(roomJoin.onRequestPost));
     server.post('/api/rooms/:code/send', express.json(), libRoute(roomSend.onRequestPost));
-    server.post('/api/rooms/:code/leave', express.json(), libRoute(roomLeave.onRequestPost));
+    // A tab that is closing leaves with navigator.sendBeacon, whose body is text/plain (lib/room-leave.ts).
+    server.post('/api/rooms/:code/leave', express.json({ type: ['application/json', 'text/plain'] }), libRoute(roomLeave.onRequestPost));
     const liveRoute = await import('./functions/api/live/[code].ts');
     server.get('/api/live/:code', libRoute(liveRoute.onRequestGet));
     // Code together (code rooms go to the LiveDoc stand-in in scripts/dev-live.mjs):
