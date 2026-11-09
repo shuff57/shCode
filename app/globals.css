@@ -2785,3 +2785,21 @@ a.mod-row:hover { background: var(--x-343746); border-top-color: var(--c-comment
 .toolbar-utilities .toolbar-reset { position: relative; margin-right: 12px; }
 .toolbar-utilities .toolbar-reset::after { content: ''; position: absolute; right: -11px; top: 4px; bottom: 4px; width: 1px; background: var(--c-line); }
 .toolbar-utilities .toolbar-reset:hover { color: var(--c-red) !important; border-color: color-mix(in srgb, var(--c-red) 55%, transparent) !important; }
+
+/* Round 4: readable code and clearly secondary, full-contrast output hints. */
+.lab-work-area #editor .cm-editor { font-size: 14px !important; }
+.lab-work-area :is(.console-empty, .reshape-empty) {
+  color: var(--c-meta); font-size: 13px; opacity: 1; font-style: italic;
+}
+.lab-work-area .run-output .console-empty { color: var(--c-meta); opacity: 1; }
+@media (max-width: 720px) {
+  /* round 4 phone layout (task preview collapse, 200px editor) reverted: it pushed Output under the dock (lost 0-2) */
+  .lab-work-area #editor .cm-editor { font-size: 13px !important; }
+}
+
+/* Lab editor colours stay local; shared editors retain their existing palette. */
+.lab-work-area #editor :is(.cm-codeComment, .tok-comment, .cm-comment, .cm-taskCommentFold) {
+  color: var(--c-meta) !important;
+  font-style: italic !important;
+}
+.lab-work-area #editor :is(.cm-gutters, .cm-foldGutter .cm-gutterElement) { color: var(--c-meta); }

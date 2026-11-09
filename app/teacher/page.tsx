@@ -1296,19 +1296,28 @@ function GradebookView({
   const [grades, setGrades] = useState<Map<string, GridGrade>>(new Map());
   const CELL_W = 140;
   const [gridElement, setGridElement] = useState<HTMLDivElement | null>(null);
-  const [gridScroll, setGridScroll] = useState({ left: false, right: false, more: 0 });
+  const [gridScroll, setGridScroll] = useState({ left: false, right: false, more: 0, partialWidth: 0, rightInset: 0 });
 
   useEffect(() => {
     if (!gridElement) return;
     const sync = () => {
       const remaining = gridElement.scrollWidth - gridElement.clientWidth - gridElement.scrollLeft;
       const lessonCount = Number(gridElement.dataset.lessonCount ?? 0);
+      // Cover the entire last partial column, including during smooth scroll.
+      // Measuring actual columns also handles summaries, filters and scrollbars.
+      const edge = gridElement.getBoundingClientRect().left + gridElement.clientLeft + gridElement.clientWidth;
+      const partial = Array.from(gridElement.querySelectorAll('col')).find((col) => {
+        const rect = col.getBoundingClientRect();
+        return rect.left < edge - 0.01 && rect.right > edge + 0.01;
+      });
       const next = {
+        rightInset: gridElement.offsetWidth - gridElement.clientLeft - gridElement.clientWidth,
+        partialWidth: remaining > 1 && partial ? edge - partial.getBoundingClientRect().left : 0,
         left: gridElement.scrollLeft > 1,
         right: remaining > 1,
         more: Math.min(lessonCount, Math.max(0, Math.ceil((remaining - 1) / CELL_W))),
       };
-      setGridScroll((prev) => prev.left === next.left && prev.right === next.right && prev.more === next.more ? prev : next);
+      setGridScroll((prev) => prev.left === next.left && prev.right === next.right && prev.more === next.more && prev.partialWidth === next.partialWidth && prev.rightInset === next.rightInset ? prev : next);
     };
     sync();
     gridElement.addEventListener('scroll', sync, { passive: true });
@@ -1740,7 +1749,7 @@ function GradebookView({
       */}
       <div style={{ position: 'relative', minHeight: 0, ...(fullScreen ? { display: 'flex', flex: 1 } : {}) }}>
       {gridScroll.left && <div aria-hidden="true" style={{ position: 'absolute', left: EMAIL_W + (narrow ? 0 : GRADE_W), top: 0, bottom: 0, width: 24, background: 'linear-gradient(to right, var(--c-bg), transparent)', borderLeft: '2px solid var(--c-cyan)', zIndex: 5, pointerEvents: 'none' }} />}
-      {gridScroll.right && <div aria-hidden="true" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 32, background: 'linear-gradient(to left, var(--c-bg), transparent)', borderRight: '2px solid var(--c-cyan)', zIndex: 5, pointerEvents: 'none' }} />}
+      {gridScroll.right && <div aria-hidden="true" data-gradebook-edge style={{ position: 'absolute', right: gridScroll.rightInset, top: 0, bottom: 0, width: gridScroll.partialWidth || 2, background: gridScroll.partialWidth > 0 ? 'var(--c-bg)' : 'var(--c-cyan)', borderLeft: gridScroll.partialWidth > 0 ? '2px solid var(--c-cyan)' : undefined, boxSizing: 'border-box', zIndex: 5, pointerEvents: 'none' }} />}
       <div
         ref={setGridElement}
         data-lesson-count={displayLessons.length}

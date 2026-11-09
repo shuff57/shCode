@@ -33,7 +33,7 @@ const dracula = {
 };
 
 const draculaHighlight = HighlightStyle.define([
-  { tag: [t.comment, t.lineComment, t.blockComment, t.docComment], color: 'var(--x-a7b5df)', fontStyle: 'normal' },
+  { tag: [t.comment, t.lineComment, t.blockComment, t.docComment], class: 'cm-codeComment' },
   { tag: [t.keyword, t.operatorKeyword, t.modifier, t.controlKeyword], color: dracula.pink },
   { tag: [t.string, t.special(t.string), t.regexp], color: dracula.yellow },
   { tag: [t.number, t.bool, t.null, t.atom], color: dracula.purple },
@@ -62,6 +62,7 @@ const darkTheme = EditorView.theme({
     height: '100%',
     fontSize: '14px',
   },
+  '.cm-codeComment': { color: 'var(--x-a7b5df)', fontStyle: 'normal' },
   '.cm-content': {
     fontFamily: "'Fira Code', 'Consolas', 'Courier New', monospace",
     caretColor: dracula.cursor,
