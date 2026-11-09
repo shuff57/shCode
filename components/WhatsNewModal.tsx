@@ -139,10 +139,12 @@ export default function WhatsNewModal() {
     if (user) markSeen(was.entries.map((e) => e.id), user.email, local());
     setOpen(null);
     window.dispatchEvent(new Event(CHANGED_EVENT));
-    // Back to where the reader was: the opener if it is still on the page, else the account menu's button.
-    const target = was.returnTo && was.returnTo.isConnected && was.returnTo !== document.body
-      ? was.returnTo
-      : (document.querySelector('[data-account-menu] button') as HTMLElement | null);
+    // Back to where the reader was: the opener if it is still on the page, else (a menu item that has gone) the
+    // account menu's button. Opened by itself over a page nothing had focus on, focus is left to the page.
+    const from = was.returnTo && was.returnTo !== document.body ? was.returnTo : null;
+    const target = from && !from.isConnected
+      ? (document.querySelector('[data-account-menu] button') as HTMLElement | null)
+      : from;
     window.setTimeout(() => target?.focus?.(), 0);
   }, [user]);
 
