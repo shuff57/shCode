@@ -17,7 +17,7 @@ import { useFeedback } from './FeedbackProvider';
 const DiagramEditor = dynamic(() => import('./diagram/DiagramEditor'), {
   ssr: false,
   loading: () => (
-    <div style={{ height: 360, display: 'grid', placeItems: 'center', color: 'var(--c-dim)', fontSize: '0.82rem' }}>
+    <div style={{ height: 360, display: 'grid', placeItems: 'center', color: 'var(--c-meta)', fontSize: 13 }}>
       Loading diagram…
     </div>
   ),
@@ -275,10 +275,10 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
   return (
     <form
       onSubmit={handleOverride}
-      style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10 }}
+      style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--c-line)' }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <label htmlFor={`override-score-${submissionId}`} style={{ fontSize: '0.82rem', color: 'var(--c-fg)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <label htmlFor={`override-score-${submissionId}`} style={{ fontSize: 13, color: 'var(--c-fg)' }}>
           {unitTotal !== null
             ? `New mark (criteria met, out of ${unitTotal}):`
             : pointsMax !== null
@@ -297,23 +297,60 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
           onChange={(e) => setScore(e.target.value)}
           style={{
             width: 80,
+            height: 32,
+            boxSizing: 'border-box',
             background: 'var(--c-bg)',
             color: 'var(--c-fg)',
             border: '1px solid var(--c-line)',
             borderRadius: 4,
             padding: '4px 8px',
-            fontSize: '0.85rem',
+            fontSize: 14,
           }}
         />
+        <button
+          type="submit"
+          disabled={submitting}
+          style={{
+            background: 'var(--c-cyan)',
+            color: 'var(--c-bg)',
+            border: 'none',
+            borderRadius: 4,
+            padding: '4px 16px',
+            height: 32,
+            fontWeight: 700,
+            fontSize: 14,
+            cursor: submitting ? 'not-allowed' : 'pointer',
+            opacity: submitting ? 0.5 : 1,
+          }}
+        >
+          {submitting ? 'Saving…' : 'Save grade'}
+        </button>
+        {enforceMax && (
+        <button
+          type="button"
+          onClick={handleClear}
+          disabled={submitting}
+          title="Drop a 'use this as the score' choice you made earlier on this part"
+          style={{ background: 'none', border: '1px solid var(--c-line)', borderRadius: 4, color: 'var(--c-meta)', padding: '4px 12px', fontSize: 13, height: 32, opacity: submitting ? 0.5 : 1, cursor: submitting ? 'not-allowed' : 'pointer' }}
+        >
+          Clear my score choice
+        </button>
+        )}
+
+        {msg && (
+          <span style={{ fontSize: 13, color: msg.type === 'success' ? 'var(--c-green)' : 'var(--c-red)' }}>
+            {msg.text}
+          </span>
+        )}
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <label htmlFor={`override-feedback-${submissionId}`} style={{ fontSize: '0.82rem', color: 'var(--c-fg)' }}>
+        <label htmlFor={`override-feedback-${submissionId}`} style={{ fontSize: 13, color: 'var(--c-fg)' }}>
           Feedback (optional):
         </label>
         <textarea
           id={`override-feedback-${submissionId}`}
-          rows={3}
+          rows={2}
           value={feedback}
           onChange={(e) => setFeedback(e.target.value)}
           style={{
@@ -322,58 +359,23 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
             color: 'var(--c-fg)',
             border: '1px solid var(--c-line)',
             borderRadius: 4,
-            padding: '6px 10px',
-            fontSize: '0.85rem',
+            padding: '8px 12px',
+            fontSize: 14,
             fontFamily: 'inherit',
             resize: 'vertical',
+            minHeight: 64,
+            maxHeight: 120,
             boxSizing: 'border-box',
           }}
         />
       </div>
 
       {enforceMax && (
-        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: 'var(--c-dim)' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--c-meta)' }}>
           <input type="checkbox" checked={replaceBest} onChange={(e) => setReplaceBest(e.target.checked)} />
           Use this as the student&apos;s score even if it is lower than their best try (otherwise the higher one is kept on a part with a try limit). This stays until you change or clear it; the student&apos;s later tries do not undo it.
         </label>
       )}
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <button
-          type="submit"
-          disabled={submitting}
-          style={{
-            background: 'var(--c-purple)',
-            color: 'var(--c-bg)',
-            border: 'none',
-            borderRadius: 4,
-            padding: '6px 18px',
-            fontWeight: 700,
-            fontSize: '0.85rem',
-            cursor: submitting ? 'not-allowed' : 'pointer',
-            opacity: submitting ? 0.6 : 1,
-          }}
-        >
-          {submitting ? 'Overriding...' : 'Override grade'}
-        </button>
-        {enforceMax && (
-        <button
-          type="button"
-          onClick={handleClear}
-          disabled={submitting}
-          title="Drop a 'use this as the score' choice you made earlier on this part"
-          style={{ background: 'none', border: '1px solid var(--c-line)', borderRadius: 4, color: 'var(--c-dim)', padding: '5px 10px', fontSize: '0.78rem', cursor: submitting ? 'not-allowed' : 'pointer' }}
-        >
-          Clear my score choice
-        </button>
-        )}
-
-        {msg && (
-          <span style={{ fontSize: '0.82rem', color: msg.type === 'success' ? 'var(--c-green)' : 'var(--c-red)' }}>
-            {msg.text}
-          </span>
-        )}
-      </div>
     </form>
   );
 }
@@ -423,7 +425,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
 
   if (loading) {
     return (
-      <div style={{ color: 'var(--c-dim)', fontStyle: 'italic', padding: 16, fontSize: '0.88rem' }}>
+      <div style={{ color: 'var(--c-meta)', fontStyle: 'italic', padding: 16, fontSize: 14 }}>
         Loading submission queue...
       </div>
     );
@@ -431,7 +433,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
 
   if (error) {
     return (
-      <div style={{ color: 'var(--c-red)', padding: 16, fontSize: '0.88rem' }}>
+      <div style={{ color: 'var(--c-red)', padding: 16, fontSize: 14 }}>
         Failed to load: {error}
       </div>
     );
@@ -439,7 +441,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
 
   if (submissions.length === 0) {
     return (
-      <div style={{ color: 'var(--c-dim)', padding: 16, fontSize: '0.88rem' }}>
+      <div style={{ color: 'var(--c-meta)', padding: 16, fontSize: 14 }}>
         No submissions in the review queue.
       </div>
     );
@@ -453,28 +455,13 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
   ).length;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {/* The list below is the most recent graded work of every kind, so say that first and count what is
           listed; the orange note then counts only the rows the AI grader failed on. */}
-      <div style={{ fontSize: '0.84rem', color: 'var(--x-a9b7e0)' }}>
+      <div style={{ fontSize: 13, color: 'var(--c-meta)' }}>
         {submissions.length} recent submission{submissions.length === 1 ? '' : 's'}, {needsManual > 0 ? 'the ones needing a manual grade first, then ' : ''}newest first
         {needsManual > 0 ? '' : '. Every one has a score; override it below if you disagree'}.
       </div>
-      {needsManual > 0 && (
-        <div
-          style={{
-            background: 'var(--c-orange)',
-            color: 'var(--c-bg)',
-            borderRadius: 6,
-            padding: '10px 14px',
-            fontSize: '0.86rem',
-            fontWeight: 600,
-          }}
-        >
-          {needsManual} of the {submissions.length} {needsManual === 1 ? 'is' : 'are'} marked &ldquo;Needs manual grade&rdquo;: the AI grader could not score {needsManual === 1 ? 'it' : 'them'}.
-          Set a score by hand below. The students&apos; answers were saved.
-        </div>
-      )}
       {submissions.map((sub) => {
         // A flowchart submission nests its rubric under `ai`, so the plain
         // top-level reader returns null for it; fall through to the diagram
@@ -508,19 +495,20 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
               background: 'var(--c-deep)',
               border: '1px solid var(--c-line)',
               borderRadius: 6,
-              padding: 14,
+              padding: 'clamp(16px, 2vw, 20px)',
+              minWidth: 0,
               display: 'flex',
               flexDirection: 'column',
-              gap: 8,
+              gap: 12,
             }}
           >
             {/* Header row */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
-              <div>
-                <div style={{ fontWeight: 600, color: 'var(--c-fg)', fontSize: '0.9rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+              <div style={{ flex: '1 1 240px', minWidth: 0, overflowWrap: 'anywhere' }}>
+                <div style={{ fontWeight: 600, color: 'var(--c-fg)', fontSize: 14 }}>
                   {sub.student_email}
                 </div>
-                <div style={{ fontSize: '0.78rem', color: 'var(--c-dim)' }}>
+                <div style={{ fontSize: 13, color: 'var(--c-meta)', marginTop: 4, lineHeight: 1.5 }}>
                   {lessonLabel(sub.lesson_id, lessonTitles)} &middot; submitted {formatTs(sub.submitted_at)}
                 </div>
               </div>
@@ -528,9 +516,9 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                 style={{
                   background: failed ? 'var(--c-orange)' : 'var(--c-line)',
                   color: failed ? 'var(--c-bg)' : 'var(--c-fg)',
-                  padding: '3px 10px',
+                  padding: '4px 12px',
                   borderRadius: 4,
-                  fontSize: '0.82rem',
+                  fontSize: 13,
                   fontWeight: 600,
                 }}
               >
@@ -567,8 +555,8 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                   border: '1px solid var(--c-orange)',
                   borderLeft: '4px solid var(--c-orange)',
                   borderRadius: 4,
-                  padding: '8px 10px',
-                  fontSize: '0.8rem',
+                  padding: '8px 12px',
+                  fontSize: 13,
                   color: 'var(--c-fg)',
                   lineHeight: 1.5,
                 }}
@@ -576,7 +564,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                 The AI grader could not score this. The student&apos;s answer is below and is
                 safe — read it and set a score yourself.
                 {failed.error && (
-                  <div style={{ color: 'var(--c-dim)', marginTop: 4, fontFamily: 'monospace', fontSize: '0.75rem' }}>
+                  <div style={{ color: 'var(--c-meta)', marginTop: 4, fontFamily: 'monospace', fontSize: 12 }}>
                     {failed.error}
                     {failed.httpStatus ? ` (HTTP ${failed.httpStatus})` : ''}
                   </div>
@@ -592,10 +580,10 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                   border: '1px solid var(--c-line)',
                   borderRadius: 4,
                   padding: 10,
-                  fontSize: '0.82rem',
+                  fontSize: 13,
                 }}
               >
-                <div style={{ fontWeight: 600, color: 'var(--c-fg)', marginBottom: 6 }}>
+                <div style={{ fontWeight: 600, color: 'var(--c-fg)', marginBottom: 8 }}>
                   Criteria (total: {gradeData.totalEarned}/{gradeData.totalPossible})
                 </div>
                 {gradeData.criteria.map((c) => {
@@ -603,10 +591,10 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                   return (
                     <div
                       key={c.id}
-                      style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '2px 0', color: 'var(--c-fg)' }}
+                      style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '4px 0', color: 'var(--c-fg)' }}
                     >
                       <span>{c.title || c.id}</span>
-                      <span style={{ color: 'var(--c-dim)', flex: '0 0 auto' }}>
+                      <span style={{ color: 'var(--c-meta)', flex: '0 0 auto' }}>
                         {/* Every rubric is zero-point under green-to-advance, so
                             "3/0" says nothing — show the verdict instead. */}
                         {max ? `${c.earned ?? '?'}/${max}` : (c.verdict ?? '—')}
@@ -626,7 +614,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                 padding: 10,
               }}
             >
-              <div style={{ fontWeight: 600, color: 'var(--c-fg)', fontSize: '0.82rem', marginBottom: 4 }}>
+              <div style={{ fontWeight: 600, color: 'var(--c-fg)', fontSize: 13, marginBottom: 4 }}>
                 {diagram ? 'Student diagram' : 'Student response'}
               </div>
               <SubmissionBoundary raw={sub.response}>
@@ -641,7 +629,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                       // scroll-zoom into anything they need to read closely.
                       fitMinZoom={0.3}
                     />
-                    <div style={{ color: 'var(--c-dim)', fontSize: '0.76rem', marginTop: 5 }}>
+                    <div style={{ color: 'var(--c-meta)', fontSize: 13, marginTop: 5 }}>
                       {diagram.nodes.length} shapes · {diagram.edges.length} arrows · scroll to zoom,
                       drag to pan
                     </div>
@@ -649,18 +637,18 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                         copy, and the teacher must always be able to see what the model read. */}
                     {parseDiagramResponse(sub.response) === null && sub.response ? (
                       <div style={{ marginTop: 8 }}>
-                        <div style={{ color: 'var(--c-dim)', fontSize: '0.76rem', marginBottom: 3 }}>What the AI read</div>
+                        <div style={{ color: 'var(--c-meta)', fontSize: 13, marginBottom: 4 }}>What the AI read</div>
                         <div
                           style={{
                             color: 'var(--c-fg)',
-                            fontSize: '0.78rem',
+                            fontSize: 13,
                             lineHeight: 1.45,
                             whiteSpace: 'pre-wrap',
                             maxHeight: 160,
                             overflowY: 'auto',
                             background: 'var(--c-deep)',
                             borderRadius: 4,
-                            padding: '6px 8px',
+                            padding: '8px 8px',
                           }}
                         >
                           {sub.response}
@@ -672,7 +660,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                   <div
                     style={{
                       color: 'var(--c-fg)',
-                      fontSize: '0.85rem',
+                      fontSize: 14,
                       lineHeight: 1.5,
                       whiteSpace: 'pre-wrap',
                       maxHeight: 160,
@@ -685,6 +673,17 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
               </SubmissionBoundary>
             </div>
 
+            {/* Override form */}
+            <OverrideForm
+              classId={classId}
+              submissionId={sub.id}
+              unitTotal={unit?.total ?? null}
+              pointsMax={sub.limit?.unit === 'points' ? sub.limit.max : null}
+              enforceMax={sub.capped === true}
+              zeroPoint={!unit && sub.limit?.unit !== 'points' && sub.possible === 0 && !isQuizGrade(sub.grade_json)}
+              onOverride={handleOverride}
+            />
+
             {/* Structural checks — only a flowchart submission records these. */}
             {diagramGrade?.structural && diagramGrade.structural.length > 0 && (
               <div
@@ -693,10 +692,10 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                   border: '1px solid var(--c-line)',
                   borderRadius: 4,
                   padding: 10,
-                  fontSize: '0.82rem',
+                  fontSize: 13,
                 }}
               >
-                <div style={{ fontWeight: 600, color: 'var(--c-fg)', marginBottom: 6 }}>
+                <div style={{ fontWeight: 600, color: 'var(--c-fg)', marginBottom: 8 }}>
                   Flowchart structure (
                   {diagramGrade.structural.filter((c) => c.passed).length}/
                   {diagramGrade.structural.length} passed)
@@ -704,7 +703,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                 {diagramGrade.structural.map((c, i) => (
                   <div
                     key={c.id + i}
-                    style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '2px 0', color: 'var(--c-fg)' }}
+                    style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 0', color: 'var(--c-fg)' }}
                   >
                     {c.passed ? (
                       <CircleCheck size={13} color="var(--c-green)" style={{ flex: '0 0 auto' }} />
@@ -717,16 +716,6 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
               </div>
             )}
 
-            {/* Override form */}
-            <OverrideForm
-              classId={classId}
-              submissionId={sub.id}
-              unitTotal={unit?.total ?? null}
-              pointsMax={sub.limit?.unit === 'points' ? sub.limit.max : null}
-              enforceMax={sub.capped === true}
-              zeroPoint={!unit && sub.limit?.unit !== 'points' && sub.possible === 0 && !isQuizGrade(sub.grade_json)}
-              onOverride={handleOverride}
-            />
           </div>
         );
       })}

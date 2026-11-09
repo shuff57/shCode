@@ -80,7 +80,7 @@ const STATUS_LABEL: Record<CellStatus, string> = {
 const STATUS_COLOR: Record<CellStatus, string> = {
   pending: 'var(--c-yellow)',
   done: 'var(--c-green)',
-  'done-late': 'var(--c-orange)',
+  'done-late': 'var(--c-green)',
   started: 'var(--c-cyan)',
   missing: 'var(--c-red)',
   'not-started': 'var(--x-94a3b8)',
@@ -184,7 +184,8 @@ export default function StudentGradebook({ lessons }: Props) {
     .filter(({ lesson, status }) => {
       if (status !== 'missing' && status !== 'not-started') return true;
       return lessonGradeCategory({ title: lesson.title, preview: lesson.preview, scoreKind: lesson.scoreKind, assignmentCode: lesson.assignmentCode }) !== null;
-    });
+    })
+    .sort((a, b) => Number(b.status === 'missing') - Number(a.status === 'missing'));
 
   // "Missing or late" is what a student can still act on or should know about; "In progress" is
   // work they have started and not finished. They used to be one "Needs attention" list, which told
@@ -208,14 +209,19 @@ export default function StudentGradebook({ lessons }: Props) {
         <h3 style={{ margin: '0 0 10px 0' }}>Your grade so far</h3>
         {grades.map((g) => (
           <div key={g.classId} style={{ marginBottom: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
-              <span style={{ fontSize: 28, fontWeight: 700 }}>{g.percent}%</span>
-              <span style={{ opacity: 0.7 }}>{grades.length > 1 ? g.className : 'in your class'}</span>
+            <div style={{ display: 'flex', alignItems: 'stretch', gap: 16, flexWrap: 'wrap' }}>
+              <div style={{ minWidth: 140, paddingRight: 20, borderRight: '1px solid var(--c-line)' }}>
+                <div style={{ color: 'var(--c-meta)', fontSize: 13, marginBottom: 4 }}>Grade so far</div>
+                <strong style={{ fontSize: 28 }}>{g.percent}%</strong>
+              </div>
+              {g.missingCount > 0 && <a href="#missing-late-filter" style={{ color: 'var(--c-fg)', textDecoration: 'none' }}>
+                <div style={{ color: 'var(--c-meta)', fontSize: 13, marginBottom: 4 }}>Past due</div>
+                <strong style={{ fontSize: 28 }}>{g.missingCount}</strong><span style={{ fontSize: 13 }}> graded lessons</span>
+              </a>}
             </div>
-            <div style={{ opacity: 0.6, fontSize: 13, marginTop: 2 }}>
-              Counts work that is done plus work past its due date. Lessons not due yet are left out.
-              {' '}{g.doneCount} of {g.gradedTotal} graded lessons done
-              {g.missingCount > 0 ? ` \u00b7 ${g.missingCount} past due and not done` : ''}.
+            <div style={{ color: 'var(--c-meta)', fontSize: 13, marginTop: 8 }}>{grades.length > 1 ? g.className : 'In your class'}</div>
+            <div style={{ color: 'var(--c-meta)', fontSize: 14, marginTop: 6 }}>
+              Unfinished work past its due date counts as zero until you finish it; work not due yet is excluded.
             </div>
           </div>
         ))}
@@ -232,7 +238,7 @@ export default function StudentGradebook({ lessons }: Props) {
       </div>
     )}
     <div style={cardStyle}>
-      <div style={toolbarStyle}>
+      <div className="student-progress-toolbar" style={toolbarStyle}>
         {/* marginRight:auto, not flex:1 — flex:1 lets the heading shrink to
             nothing on a phone and its text then overlaps the filter pills
             instead of pushing them onto the next line. */}
@@ -242,6 +248,7 @@ export default function StudentGradebook({ lessons }: Props) {
         </button>
         <button
           type="button"
+          id="missing-late-filter"
           onClick={() => setFilter('attention')}
           style={filter === 'attention' ? tabActive : tabIdle}
         >
@@ -316,29 +323,30 @@ export default function StudentGradebook({ lessons }: Props) {
                             type="button"
                             onClick={() => setExpanded((p) => ({ ...p, [lesson.id]: !open }))}
                             aria-expanded={open}
+                            aria-label={`${open ? 'Hide' : 'Show'} feedback for ${lesson.title}`}
+                            title={`${open ? 'Hide' : 'Show'} feedback`}
                             style={toggleStyle}
                           >
                             {open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                            <span>{lesson.title}</span>
                             <MessageSquare size={13} style={{ color: 'var(--c-purple)', flexShrink: 0 }} />
                           </button>
                         ) : (
-                          <a href={lessonHref(lesson)} style={{ fontWeight: 500, color: 'inherit' }}>
+                          <a href={lessonHref(lesson)} className="progress-assignment-link" style={{ fontWeight: 500, color: 'var(--c-cyan)' }}>
                             {lesson.title}
                           </a>
                         )}
                         {hasFeedback && (
-                          <a
+                          <a className="progress-assignment-link"
                             href={lessonHref(lesson)}
                             aria-label={`Open ${lesson.title}`}
                             title="Open lesson"
-                            style={{ marginLeft: 6, color: 'var(--c-dim)', fontSize: 12 }}
+                            style={{ marginLeft: 8, color: 'var(--c-cyan)', fontSize: 14 }}
                           >
-                            Open
+                            {lesson.title}
                           </a>
                         )}
                         {practice && (
-                          <span style={{ ...chipStyle, borderColor: 'transparent', color: 'var(--c-dim)' }} title="This lesson is practice. It does not count toward your grade.">
+                          <span style={{ ...chipStyle, borderColor: 'transparent', color: 'var(--c-meta)' }} title="This lesson is practice. It does not count toward your grade.">
                             <span className="gb-practice-full">{practice.tag}</span>
                             <span className="gb-practice-short" aria-hidden="true">Practice</span>
                           </span>
@@ -352,7 +360,7 @@ export default function StudentGradebook({ lessons }: Props) {
                           </span>
                         )}
                       </td>
-                      <td style={{ ...tdStyle, opacity: dueSoon ? 1 : 0.65 }}>
+                      <td style={{ ...tdStyle, color: 'var(--x-b9c5e8)' }}>
                         {due ? formatDue(due) : '—'}
                         {dueSoon && <span style={{ ...chipStyle, color: 'var(--c-orange)', borderColor: 'var(--c-orange)' }}>due soon</span>}
                       </td>
@@ -364,13 +372,13 @@ export default function StudentGradebook({ lessons }: Props) {
                       <td style={scoreCellStyle}>
                         {bestText ?? score ?? '\u2014'}
                         {t && t.used > 0 && !tried && (
-                          <div style={{ opacity: 0.55, fontSize: 11 }}>
+                          <div style={{ color: 'var(--c-meta)', fontSize: 13 }}>
                             {t.used} of {t.cap} {t.cap === 1 ? 'try' : 'tries'} used
                           </div>
                         )}
                         {cell.teacherReviewedAt != null && (
                           <div
-                            style={{ color: 'var(--c-purple)', fontSize: 11 }}
+                            style={{ color: 'var(--c-purple)', fontSize: 12 }}
                             title="Your teacher reviewed this work and may have changed the score"
                           >
                             teacher-adjusted
@@ -435,7 +443,7 @@ const toolbarStyle: React.CSSProperties = {
   marginBottom: 14,
 };
 
-const mutedStyle: React.CSSProperties = { opacity: 0.5, fontSize: 14 };
+const mutedStyle: React.CSSProperties = { color: 'var(--c-meta)', fontSize: 14 };
 
 // `body` is display:flex in globals.css, so /progress's container is a flex
 // item with min-width:auto — it refuses to shrink below its content's
@@ -460,7 +468,7 @@ const tableStyle: React.CSSProperties = {
 
 const theadRowStyle: React.CSSProperties = {
   textAlign: 'left',
-  opacity: 0.55,
+  color: 'var(--c-meta)',
   fontSize: 12,
   textTransform: 'uppercase',
   letterSpacing: 0.4,
@@ -468,9 +476,9 @@ const theadRowStyle: React.CSSProperties = {
 
 const rowStyle: React.CSSProperties = { borderTop: '1px solid color-mix(in srgb, var(--c-line) 40.0%, transparent)' };
 
-const thStyle: React.CSSProperties = { padding: '4px 10px 8px 0', fontWeight: 600 };
+const thStyle: React.CSSProperties = { padding: '4px 10px 8px 0', fontSize: 13, fontWeight: 700, color: 'var(--c-fg)' };
 
-const tdStyle: React.CSSProperties = { padding: '9px 10px 9px 0', verticalAlign: 'top' };
+const tdStyle: React.CSSProperties = { padding: '6px 10px 6px 0', verticalAlign: 'top' };
 
 const scoreCellStyle: React.CSSProperties = {
   ...tdStyle,
@@ -490,11 +498,13 @@ const badgeStyle: React.CSSProperties = {
 };
 
 const toggleStyle: React.CSSProperties = {
-  display: 'flex',
+  display: 'inline-flex',
   alignItems: 'center',
-  gap: 6,
-  background: 'none',
-  border: 'none',
+  gap: 4,
+  background: 'var(--c-bg)',
+  border: '1px solid var(--c-line)',
+  borderRadius: 4,
+  minHeight: 28,
   color: 'inherit',
   font: 'inherit',
   fontWeight: 500,
@@ -516,7 +526,7 @@ const feedbackHeadStyle: React.CSSProperties = {
   alignItems: 'center',
   gap: 6,
   fontSize: 12,
-  opacity: 0.7,
+  color: 'var(--c-meta)',
   marginBottom: 6,
 };
 
@@ -526,12 +536,12 @@ const chipStyle: React.CSSProperties = {
   borderRadius: 10,
   border: '1px solid var(--c-comment)',
   color: 'var(--x-a9b7e0)',
-  fontSize: 11,
+  fontSize: 12,
   whiteSpace: 'nowrap',
 };
 
 const legendStyle: React.CSSProperties = {
-  opacity: 0.5,
+  color: 'var(--c-meta)',
   fontSize: 12,
   marginTop: 14,
   marginBottom: 0,

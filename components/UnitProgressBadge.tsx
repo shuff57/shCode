@@ -99,7 +99,7 @@ function breakdownRows(
     // a completed test is sat, not failed for awaiting a mark.
     if (state === 'completed') return { ...base, detail: 'submitted', pct: 100, color: 'var(--c-green)' };
     if (state === 'started') return { ...base, detail: 'in progress', pct: null, color: 'var(--c-yellow)' };
-    return { ...base, detail: 'not started', pct: null, color: 'var(--c-comment)' };
+    return { ...base, detail: 'not started', pct: null, color: 'var(--c-meta)' };
   }
 
   for (const category of GRADE_CATEGORIES) {
@@ -113,7 +113,7 @@ function breakdownRows(
       key: `cat-${category}`,
       text: `${CATEGORY_LABEL[category]} — ${weights[category]}% of grade`,
       pct: avg,
-      color: avg >= 100 ? 'var(--c-green)' : avg > 0 ? 'var(--c-yellow)' : 'var(--c-comment)',
+      color: avg >= 100 ? 'var(--c-green)' : avg > 0 ? 'var(--c-yellow)' : 'var(--c-dim)',
       header: true,
     });
     for (const l of group) rows.push(lessonRow(l));
@@ -126,7 +126,7 @@ function breakdownRows(
       key: 'ungraded',
       text: `Readings and examples — not graded (${done}/${uncategorized.length} done)`,
       pct: null,
-      color: 'var(--c-comment)',
+      color: 'var(--c-meta)',
       header: true,
     });
     for (const l of uncategorized) rows.push(lessonRow(l));
@@ -178,7 +178,7 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
   if (!snap.loaded) return null;
   if (!snap.authed) {
     return (
-      <span style={{ fontSize: 12, color: 'var(--c-comment)', whiteSpace: 'nowrap' }}>
+      <span style={{ fontSize: 13, color: 'var(--c-meta)', whiteSpace: 'nowrap' }}>
         <span style={{ color: 'var(--c-cyan)' }}>Sign in</span> to track
       </span>
     );
@@ -224,7 +224,7 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
           whiteSpace: 'nowrap',
         }}
       >
-        <span
+        {!label?.startsWith('Chapter') && <span
           style={{
             position: 'relative',
             display: 'inline-block',
@@ -249,15 +249,15 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
             style={{
               position: 'absolute',
               inset: 0,
-              width: `${pct}%`,
+              width: `${Math.round(done / total * 100)}%`,
               height: '100%',
               background: allDone ? 'var(--c-green)' : 'var(--c-cyan)',
               transition: 'width 200ms ease',
             }}
           />
-        </span>
+        </span>}
         <span style={{ color: allDone ? 'var(--c-green)' : 'inherit', fontWeight: 600 }}>
-          {pct}%
+          {`${done} of ${total} done`}
         </span>
       </button>
 
@@ -315,7 +315,7 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
                 <span style={{ fontWeight: 700, fontSize: 16 }}>
                   {label ? `${label}: ` : ''}{pct}% of grade
                 </span>
-                <span style={{ opacity: 0.6 }}>
+                <span style={{ color: 'var(--c-meta)' }}>
                   ({done}/{total} complete{started ? `, ${started} in progress` : ''})
                 </span>
                 <button
@@ -326,7 +326,7 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
                     marginLeft: 'auto',
                     background: 'none',
                     border: 'none',
-                    color: 'var(--c-comment)',
+                    color: 'var(--c-meta)',
                     cursor: 'pointer',
                     fontSize: 20,
                     lineHeight: 1,
@@ -380,7 +380,7 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
                     >
                       {r.text}
                     </span>
-                    {r.detail && <span style={{ color: 'var(--c-comment)', flexShrink: 0 }}>{r.detail}</span>}
+                    {r.detail && <span style={{ color: 'var(--c-meta)', flexShrink: 0 }}>{r.detail}</span>}
                     {r.pct != null && (
                       <span style={{ color: r.color, fontWeight: 600, flexShrink: 0, width: 34, textAlign: 'right' }}>
                         {r.pct}%

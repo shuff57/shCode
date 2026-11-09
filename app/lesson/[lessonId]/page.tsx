@@ -56,6 +56,10 @@ export default async function LessonPage({
         moduleId={moduleId}
         unitId={lesson.category ?? null}
       >
+        {mod && <div style={{ padding: '0 16px', color: 'var(--c-meta)', fontSize: 13 }}>
+          Module {moduleId} · Lesson {mod.lessons.findIndex((l) => l.id === lesson.id) + 1} of {mod.lessons.length}
+
+        </div>}
         {body}
       </LessonAccessGate>
       {footer}

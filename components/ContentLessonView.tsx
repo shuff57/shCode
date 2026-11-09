@@ -5,6 +5,7 @@ import Link from 'next/link';
 import type { Lesson } from '../lib/types';
 import { badgeFor } from '../lib/lesson-badges';
 import CompletionPanel from './CompletionPanel';
+import { useLessonState } from '../lib/progress';
 import WrittenGrader from './WrittenGrader';
 import DiagramAssignmentView from './DiagramAssignmentView';
 import { taskSections } from '../lib/diagram-task-sections';
@@ -46,14 +47,19 @@ function isMediaFile(url: string): boolean {
 }
 
 export default function ContentLessonView({ lesson }: Props) {
+  const completionState = useLessonState();
   const preview = lesson.preview as string;
   const badge = badgeFor(preview);
   const contentMd = findContent(lesson);
   const meta = lesson as any;
+  // Sans body copy is for reading and worked-example prose only (climb 2 r1, council-narrowed).
+  const proseBody = !meta.quiz && !meta.diagram && !meta.aiGrader && preview !== 'video' && preview !== 'slides';
   // A writeup (the WrittenGrader branch below) draws its rubric AFTER the "What to answer"
   // box, not above it in file order. No rubric heading: everything renders as before.
   const rubricSplit = !meta.quiz && !meta.diagram && meta.aiGrader ? splitRubric(contentMd) : null;
-  const bodyMd = rubricSplit ? rubricSplit.before : contentMd;
+  const writtenIntro = rubricSplit?.before.trim().split(/(?<=\.)\s+/);
+  const bodyMd = writtenIntro ? writtenIntro.slice(0, 2).join(' ') : contentMd;
+  const writtenGuidance = writtenIntro?.slice(2).join(' ') ?? ''; 
 
   // A lesson can name a deck that hasn't been authored yet. Embedding that URL
   // blind puts a raw 404 page inside the lesson, which is a worse first
@@ -82,7 +88,35 @@ export default function ContentLessonView({ lesson }: Props) {
   // one more look before we say anything.
   const frameRef = useRef<HTMLIFrameElement | null>(null);
   const [deckBlank, setDeckBlank] = useState(false);
+  const [deckLoaded, setDeckLoaded] = useState(false);
   const showFrame = !!slidesUrl && deckReady === true;
+  const [slidePosition, setSlidePosition] = useState<{ current: number; total: number } | null>(null);
+
+  useEffect(() => {
+    if (!deckLoaded || !showFrame) return;
+    const frame = frameRef.current;
+    const doc = frame?.contentDocument;
+    const win = frame?.contentWindow;
+    if (!doc || !win) return;
+    const sync = () => {
+      const total = doc.querySelectorAll('section.slide').length;
+      if (total) setSlidePosition({ current: Math.max(1, Math.min(total, parseInt(win.location.hash.slice(1), 10) || 1)), total });
+    };
+    sync();
+    win.addEventListener('hashchange', sync);
+    const observer = new MutationObserver(sync);
+    observer.observe(doc.body, { childList: true, subtree: true });
+    return () => { win.removeEventListener('hashchange', sync); observer.disconnect(); };
+  }, [deckLoaded, showFrame]);
+
+  const navigateSlide = (key: 'ArrowLeft' | 'ArrowRight') => {
+    const frame = frameRef.current;
+    const doc = frame?.contentDocument;
+    if (!frame || !doc) return;
+    frame.focus({ preventScroll: true });
+    doc.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
+  };
+
 
   const checkFrame = (final: boolean) => {
     const f = frameRef.current;
@@ -109,6 +143,7 @@ export default function ContentLessonView({ lesson }: Props) {
 
   useEffect(() => {
     setDeckBlank(false);
+    setDeckLoaded(false);
   }, [slidesUrl]);
 
 
@@ -125,8 +160,8 @@ export default function ContentLessonView({ lesson }: Props) {
           },
         ]}
       />
-      <main style={{ maxWidth: 960, width: '100%', boxSizing: 'border-box', margin: '0 auto', padding: '24px 20px 80px', color: 'var(--c-fg)' }}>
-      <nav style={{ marginBottom: 12, fontSize: 13, color: 'var(--x-888888)' }}>
+      <main className="content-lesson-main" style={{ maxWidth: 1080, width: '100%', boxSizing: 'border-box', margin: '0 auto', padding: '18px 20px 24px', color: 'var(--c-fg)' }}>
+      <nav style={{ marginBottom: 5, fontSize: 13, color: 'var(--c-meta)' }}>
         <Link href="/" style={{ color: 'var(--c-cyan)' }}>Home</Link>
         {lesson.unit ? (
           <>
@@ -136,11 +171,13 @@ export default function ContentLessonView({ lesson }: Props) {
             </Link>
           </>
         ) : null}
-        <span style={{ margin: '0 8px' }}>›</span>
-        <span>{lesson.title}</span>
+        <span className="lesson-breadcrumb-current" style={{ margin: '0 8px' }}>›</span>
+        <span className="lesson-breadcrumb-current">{lesson.title}</span>
       </nav>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+      <div className="content-lesson-title" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px 10px', marginBottom: 5 }}>
+        <h1 style={{ margin: 0, fontSize: 28, lineHeight: 1.2 }}>{lesson.title}</h1>
+        {(preview === "video" || preview === "slides") && <span style={{ color: completionState.states[lesson.id] === "completed" ? "var(--c-green)" : "var(--c-meta)", fontSize: 12 }}>{completionState.states[lesson.id] === "completed" ? "Done ✓" : "Not done yet · Mark complete below"}</span>}
         <span
           style={{
             display: 'inline-flex',
@@ -148,7 +185,7 @@ export default function ContentLessonView({ lesson }: Props) {
             gap: 6,
             background: withAlpha(badge.color, '22'),
             color: badge.color,
-            padding: '4px 10px',
+            padding: '2px 9px',
             borderRadius: 999,
             fontSize: 12,
             fontWeight: 600,
@@ -158,16 +195,19 @@ export default function ContentLessonView({ lesson }: Props) {
           <badge.Icon size={13} strokeWidth={2.25} />
           {badge.label}
         </span>
-        <span style={{ color: 'var(--x-888888)', fontSize: 13 }}>~{lesson.estimateMins ?? '?'} min</span>
+        <span style={{ color: 'var(--c-meta)', fontSize: 13 }}>~{lesson.estimateMins ?? '?'} min</span>
+        {preview === 'slides' && slidesUrl && deckReady === true ? (
+          <a href={slidesUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', background: 'var(--c-green)', color: 'var(--c-bg)', fontWeight: 700, fontSize: 13, padding: '4px 10px', borderRadius: 6, textDecoration: 'none' }}>
+            Open in new tab →
+          </a>
+        ) : null}
       </div>
-
-      <h1 style={{ margin: '4px 0 6px' }}>{lesson.title}</h1>
-      {lesson.description ? (
-        <p style={{ color: 'var(--x-888888)', marginTop: 0 }}>{withInlineCode(lesson.description)}</p>
+      {lesson.description && !meta.quiz ? (
+        <p style={{ color: 'var(--c-meta)', margin: '0 0 4px', fontSize: 14, lineHeight: 1.35 }}>{withInlineCode(lesson.description)}</p>
       ) : null}
 
       {meta.videoUrl && meta.videoUrl.trim() ? (
-          <div style={{ aspectRatio: '16 / 9', marginTop: 16, borderRadius: 8, overflow: 'hidden', background: 'var(--x-000000)' }}>
+          <div style={{ aspectRatio: '16 / 9', width: 'min(100%, 680px)', margin: '16px auto 0', borderRadius: 8, overflow: 'hidden', background: 'var(--x-000000)' }}>
             {/* A YouTube link still gets an iframe. A direct file gets a real
                 <video>, because an mp4 dropped into an iframe renders the
                 browser's bare player and shows NO captions — a soft mov_text
@@ -202,7 +242,7 @@ export default function ContentLessonView({ lesson }: Props) {
             )}
           </div>
         ) : preview === 'video' ? (
-          <div style={{ marginTop: 16, padding: 20, background: 'var(--c-bg)', borderRadius: 8, border: '1px dashed var(--x-555555)', color: 'var(--x-aaaaaa)' }}>
+          <div style={{ marginTop: 16, padding: 20, background: 'var(--c-bg)', borderRadius: 8, border: '1px dashed var(--x-555555)', color: 'var(--c-meta)' }}>
             <strong style={{ color: 'var(--c-pink)' }}>No video URL set yet.</strong>
             <p style={{ margin: '8px 0 0', fontSize: 14 }}>
               {meta.videoFallback ?? "Teacher will paste a YouTube URL into this lesson's lesson.json (videoUrl field) when ready."}
@@ -212,49 +252,35 @@ export default function ContentLessonView({ lesson }: Props) {
 
       {preview === 'slides' ? (
         slidesUrl && deckReady === true ? (
-          <div style={{ marginTop: 16 }}>
-            <div style={{ marginBottom: 8, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12 }}>
-              <a
-                href={slidesUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: 'inline-block',
-                  background: 'var(--c-green)',
-                  color: 'var(--c-bg)',
-                  fontWeight: 700,
-                  fontSize: 15,
-                  padding: '10px 18px',
-                  borderRadius: 8,
-                  textDecoration: 'none',
-                }}
-              >
-                Open in new tab →
-              </a>
-              <span style={{ color: 'var(--c-dim)', fontSize: 13 }}>Full screen, editable code blocks</span>
-            </div>
+          <div style={{ marginTop: 4 }}>
             {deckBlank ? (
               <p role="status" style={{ margin: '0 0 8px', color: 'var(--c-yellow)', fontSize: 14 }}>
                 Slides blank? Open them in a new tab.
               </p>
             ) : null}
-            <div style={{ aspectRatio: '16 / 9', borderRadius: 8, overflow: 'hidden', background: 'var(--x-000000)', border: '1px solid var(--c-line)' }}>
+            <div className="lesson-slides-frame" style={{ aspectRatio: '16 / 9', borderRadius: 8, overflow: 'hidden', position: 'relative', background: 'var(--c-bg)', border: '1px solid var(--c-line)' }}>
               <iframe
                 ref={frameRef}
                 title={`Slides: ${lesson.title}`}
-                onLoad={() => checkFrame(false)}
+                onLoad={() => { setDeckLoaded(true); checkFrame(false); }}
                 src={slidesUrl}
                 allow="autoplay; clipboard-write; fullscreen"
-                style={{ width: '100%', height: '100%', border: 0 }}
+                style={{ width: '100%', height: '100%', border: 0, position: 'relative', zIndex: 1, opacity: deckLoaded ? 1 : 0 }}
               />
+              {!deckLoaded && <div role="status" style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', color: 'var(--c-meta)' }}>Loading slides…</div>}
             </div>
+            <nav aria-label="Slide navigation" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 10 }}>
+              <button className="btn-secondary btn-sm" disabled={!deckLoaded || slidePosition?.current === 1} onClick={() => navigateSlide('ArrowLeft')}>‹ Previous</button>
+              <span aria-live="polite" style={{ color: 'var(--c-meta)', fontSize: 13 }}>{slidePosition ? `Slide ${slidePosition.current} of ${slidePosition.total}` : 'Slides'}</span>
+              <button className="btn-secondary btn-sm" disabled={!deckLoaded || (!!slidePosition && slidePosition.current >= slidePosition.total)} onClick={() => navigateSlide('ArrowRight')}>Next ›</button>
+            </nav>
           </div>
         ) : slidesUrl && deckReady === null ? (
-          <div style={{ marginTop: 16, padding: 20, background: 'var(--c-bg)', borderRadius: 8, border: '1px solid var(--c-line)', color: 'var(--c-comment)' }}>
+          <div style={{ marginTop: 16, padding: 20, background: 'var(--c-bg)', borderRadius: 8, border: '1px solid var(--c-line)', color: 'var(--c-meta)' }}>
             Loading slides…
           </div>
         ) : (
-          <div style={{ marginTop: 16, padding: 20, background: 'var(--c-bg)', borderRadius: 8, border: '1px dashed var(--x-555555)', color: 'var(--x-aaaaaa)' }}>
+          <div style={{ marginTop: 16, padding: 20, background: 'var(--c-bg)', borderRadius: 8, border: '1px dashed var(--x-555555)', color: 'var(--c-meta)' }}>
             <strong style={{ color: 'var(--c-purple)' }}>These slides aren&apos;t published yet.</strong>
             <p style={{ margin: '8px 0 0', fontSize: 14, lineHeight: 1.55 }}>
               Nothing is missing on your end — your teacher hasn&apos;t built this deck yet. Everything
@@ -266,15 +292,15 @@ export default function ContentLessonView({ lesson }: Props) {
 
       {meta.externalLink ? (
         <p style={{ margin: '16px 0' }}>
-          <a href={meta.externalLink} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--c-green)', textDecoration: 'none' }}>
-            → {meta.externalLinkLabel ?? meta.externalLink}
+          <a href={meta.externalLink} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--c-meta)', textDecoration: 'underline', fontSize: 14 }}>
+            📖 {meta.externalLinkLabel ?? meta.externalLink}
           </a>
         </p>
       ) : null}
 
       {bodyMd ? (
-        <div style={{ marginTop: 20 }}>
-          <MarkdownWithLiveBlocks src={bodyMd} lessonId={lesson.id} />
+        <div className={[proseBody ? 'prose-copy' : '', lesson.type === 'example' ? 'compact-example' : '', preview === 'example' ? 'worked-example' : ''].filter(Boolean).join(' ') || undefined} style={{ marginTop: 12 }}>
+          {meta.quiz ? <details className="quiz-intro"><summary style={{ cursor: 'pointer', color: 'var(--c-meta)', fontSize: 13 }}>Review lesson instructions</summary><MarkdownWithLiveBlocks src={bodyMd} lessonId={lesson.id} /></details> : <MarkdownWithLiveBlocks src={bodyMd} lessonId={lesson.id} />}
         </div>
       ) : null}
 
@@ -303,7 +329,7 @@ export default function ContentLessonView({ lesson }: Props) {
           // prompt IS the instructions and keeps rendering as before.
           prompt={meta.aiGrader.summative ? '' : (meta.aiGrader.prompt ?? contentMd.slice(0, 2000))}
           config={meta.aiGrader}
-          afterPrompt={rubricSplit ? <MarkdownWithLiveBlocks src={rubricSplit.rubric} lessonId={lesson.id} /> : undefined}
+          afterPrompt={rubricSplit ? <MarkdownWithLiveBlocks src={[writtenGuidance, rubricSplit.rubric].filter(Boolean).join('\n\n')} lessonId={lesson.id} /> : undefined}
         />
       ) : (
         <CompletionPanel lessonId={lesson.id} lessonType={preview} />
@@ -314,14 +340,20 @@ export default function ContentLessonView({ lesson }: Props) {
       </div>
 
       <style>{`
+        .compact-example .content-prose em { font-style: normal; font-size: 12px; color: var(--c-dim); }
+        .compact-example .content-prose p { margin: 8px 0; }
+        .compact-example .content-prose h2 { font-size: 22px; font-weight: 700; line-height: 1.3; margin-top: 14px; margin-bottom: 8px; font-size: 19px; }
         .content-prose h1 { font-size: 1.4em; margin-top: 28px; }
-        .content-prose h2 { margin-top: 24px; color: var(--c-fg); border-bottom: 1px solid var(--x-333333); padding-bottom: 4px; }
-        .content-prose h3 { margin-top: 18px; color: var(--c-purple); }
+        .content-prose h2 { font-size: 22px; font-weight: 700; line-height: 1.3; margin-top: 24px; color: var(--c-fg); border-bottom: 1px solid var(--x-333333); padding-bottom: 4px; }
+        .content-prose h3 { font-size: 18px; font-weight: 700; line-height: 1.35; margin-top: 18px; color: var(--c-purple); }
         .content-prose table { border-collapse: collapse; margin: 12px 0; width: 100%; }
         .content-prose th, .content-prose td { border: 1px solid var(--x-444444); padding: 6px 10px; vertical-align: top; }
         .content-prose th { background: var(--c-line); }
         .content-prose code { background: var(--c-bg); padding: 1px 5px; border-radius: 3px; color: var(--c-orange); }
-        .content-prose { min-width: 0; max-width: 100%; }
+        .content-prose { min-width: 0; max-width: 72ch; line-height: 1.75; }
+        .prose-copy .content-prose { line-height: 1.6; }
+        .content-prose p { margin: 0 0 1.25em; }
+        .content-prose li { margin: 0.6em 0; }
         .content-prose pre { background: var(--c-bg); padding: 12px; border-radius: 6px; overflow-x: auto; max-width: 100%; box-sizing: border-box; -webkit-overflow-scrolling: touch; }
         .content-prose pre code { background: transparent; padding: 0; color: var(--c-fg); }
         .content-prose a { color: var(--c-cyan); }

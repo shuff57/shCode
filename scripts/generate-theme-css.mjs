@@ -29,31 +29,34 @@ const OUT = join(root, 'app/themes.css');
 export const THEMES = {
   light: {
     label: 'Light', scheme: 'light',
-    c: { bg: '#fbfbf8', deep: '#eeeee8', deep2: '#f3f3ee', line: '#d4d4cc', fg: '#1d1f2b', comment: '#7a7f98', dim: '#4f5470',
+    c: { bg: '#fbfbf8', deep: '#eeeee8', deep2: '#f3f3ee', line: '#d4d4cc', fg: '#1d1f2b', comment: '#7a7f98', dim: '#4f5470', meta: '#3b3f54',
       red: '#b4232f', purple: '#6a3db8', green: '#1b6e33', cyan: '#0a6178', orange: '#a24e00', yellow: '#7a6000', pink: '#a3245f' },
     page: { bg: '#ecece6', card: '#fbfbf8', border: '#d4d4cc', muted: '#efefe9', text: '#26283a', brand: '#1d5fbf', 'header-bg': '#dde1ea', 'header-fg': '#1d1f2b' },
   },
   candy: {
     label: 'Candy', scheme: 'light',
-    c: { bg: '#fffafc', deep: '#ffe6f1', deep2: '#fff0f6', line: '#f2c4da', fg: '#3a1f45', comment: '#9a72aa', dim: '#6e4580',
+    c: { bg: '#fffafc', deep: '#ffe6f1', deep2: '#fff0f6', line: '#f2c4da', fg: '#3a1f45', comment: '#9a72aa', dim: '#6e4580', meta: '#593668',
       red: '#b8264f', purple: '#7b3fc4', green: '#1f7a4c', cyan: '#136f8a', orange: '#a94f12', yellow: '#7d6400', pink: '#b4246f' },
     page: { bg: '#ffeef6', card: '#fffafc', border: '#f2c4da', muted: '#ffe6f1', text: '#3a1f45', brand: '#b4246f', 'header-bg': '#ffd3e7', 'header-fg': '#3a1f45' },
   },
   retro: {
     label: 'Retro arcade', scheme: 'dark',
-    c: { bg: '#0c0c18', deep: '#06060d', deep2: '#090912', line: '#2c2c55', fg: '#eef2ff', comment: '#5a5fa0', dim: '#a3a9e0',
+    c: { bg: '#0c0c18', deep: '#06060d', deep2: '#090912', line: '#2c2c55', fg: '#eef2ff', comment: '#5a5fa0', dim: '#a3a9e0', meta: '#c1c6ec',
       red: '#ff4d6d', purple: '#c084fc', green: '#2bff9a', cyan: '#22d3ee', orange: '#ffa94d', yellow: '#fff27a', pink: '#ff6ec7' },
     page: { bg: '#05050b', card: '#0c0c18', border: '#2c2c55', muted: '#111124', text: '#e4e8ff', brand: '#22d3ee', 'header-bg': '#11112a', 'header-fg': '#22d3ee' },
   },
   forest: {
     label: 'Forest', scheme: 'dark',
-    c: { bg: '#18271f', deep: '#0f1a14', deep2: '#132019', line: '#2f4a3b', fg: '#f2ecd9', comment: '#6f8a72', dim: '#b9c6aa',
+    c: { bg: '#18271f', deep: '#0f1a14', deep2: '#132019', line: '#2f4a3b', fg: '#f2ecd9', comment: '#6f8a72', dim: '#b9c6aa', meta: '#d0d5bd',
       red: '#f08c74', purple: '#c3a3e8', green: '#9fd99a', cyan: '#8fd3c4', orange: '#ebb26b', yellow: '#ecdf94', pink: '#eaa8c0' },
     page: { bg: '#121d17', card: '#18271f', border: '#2f4a3b', muted: '#1c2d24', text: '#e6dfca', brand: '#9fd99a', 'header-bg': '#0d1611', 'header-fg': '#f2ecd9' },
   },
 };
 
-// The dark palette, to place each one-off colour by role.
+// The dark palette, to place each one-off colour by role. `meta` (secondary
+// text: dates, counts, captions; lighter than dim, dark value #b1bada in
+// globals.css) is set by every theme and checked as text above, but it is not a
+// role a one-off colour is mapped to, so it is not listed here.
 const DARK = {
   bg: '#282a36', deep: '#1e1f29', deep2: '#21222c', line: '#44475a', fg: '#f8f8f2', comment: '#6272a4', dim: '#8393c4',
   red: '#ff5555', purple: '#bd93f9', green: '#50fa7b', cyan: '#8be9fd', orange: '#ffb86c', yellow: '#f1fa8c', pink: '#ff79c6',
@@ -96,7 +99,7 @@ const oneOffs = [...new Set([...globals.matchAll(/--x-([0-9a-f]{6}):/g)].map((m)
 const problems = [];
 for (const [id, t] of Object.entries(THEMES)) {
   const surfaces = { bg: t.c.bg, deep: t.c.deep, deep2: t.c.deep2, card: t.page.card, page: t.page.bg };
-  const texts = { fg: t.c.fg, dim: t.c.dim, text: t.page.text, red: t.c.red, purple: t.c.purple, green: t.c.green, cyan: t.c.cyan, orange: t.c.orange, yellow: t.c.yellow, pink: t.c.pink, brand: t.page.brand };
+  const texts = { fg: t.c.fg, dim: t.c.dim, meta: t.c.meta, text: t.page.text, red: t.c.red, purple: t.c.purple, green: t.c.green, cyan: t.c.cyan, orange: t.c.orange, yellow: t.c.yellow, pink: t.c.pink, brand: t.page.brand };
   for (const [tn, tc] of Object.entries(texts)) {
     for (const [sn, sc] of Object.entries(surfaces)) {
       const r = contrast(tc, sc);

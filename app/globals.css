@@ -3,11 +3,27 @@
 @tailwind utilities;
 
 :root{
-  --bg: #252525;
-  --card: #1e1e1e;
-  --border: #333;
-  --muted: #2a2a2a;
-  --text: #cccccc;
+  /* Type scale and spacing rhythm (design pass, ui-hill-climb). */
+  --fs-h1: 28px;
+  --fs-h2: 18px;
+  --fs-sub: 13px;
+  --fs-body: 14px;
+  --fs-meta: 13px;
+  --fs-micro: 12px;
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  /* Reading text (.prose-copy, docs) is sans; --font-mono is the site's code face. */
+  --font-prose: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: 'Courier', monospace;
+  --bg: #282a36;
+  --card: #21222c;
+  --border: #44475a;
+  --muted: #343746;
+  --text: #f8f8f2;
   --brand: #5baafd;
   /* Text on --brand. White in dark (as it always was); themes.css picks per theme. */
   --on-brand: white;
@@ -29,6 +45,9 @@
   --c-fg: #f8f8f2;
   --c-comment: #6272a4;
   --c-dim: #8393c4;
+  /* Meta and secondary text (dates, counts, captions): lighter than --c-dim so it
+     reads at 12-13px. Text, so every theme holds it to 4.5:1. */
+  --c-meta: #b1bada;
   --c-red: #ff5555;
   --c-purple: #bd93f9;
   --c-green: #50fa7b;
@@ -135,6 +154,14 @@
   --x-4b5563: #4b5563;
   --x-d65093: #d65093;
   --x-ef4444: #ef4444;
+  --x-191a23: #191a23;
+  --x-302b42: #302b42;
+  --x-50546b: #50546b;
+  --x-79fc99: #79fc99;
+  --x-a7b5df: #a7b5df;
+  --x-a8c0ff: #a8c0ff;
+  --x-b2f1ff: #b2f1ff;
+  --x-b9c5e8: #b9c5e8;
 }
 
 
@@ -161,12 +188,6 @@ body {
   flex-direction: column;
   gap: 20px;
   width: 100%;
-}
-
-/* Reserve bottom space for the fixed LessonProgressFooter (~36px tall) so an
-   expanded console at the bottom of the editor card isn't covered by it. */
-body:has(.lesson-progress-footer) {
-  padding-bottom: 60px;
 }
 
 /* The progress rail's segments. Laid out here rather than inline because a
@@ -227,7 +248,48 @@ a.lesson-progress-seg:focus-visible {
    with a 16px gap. The pill transitions `bottom`, so this slides rather than
    jumps when navigating onto a lesson page. */
 body:has(.lesson-progress-footer) .issue-fab {
-  bottom: 52px;
+  bottom: calc(var(--shd-footer-height, 36px) + 16px);
+}
+
+@media (max-width: 600px) {
+  body { padding: 10px; padding-right: calc(10px + var(--shd-tabbed, 0px)); gap: 12px; }
+  body:has(.lesson-progress-footer) { padding-bottom: calc(var(--shd-footer-height, 36px) + 12px); }
+  .home-chapter { width: 100% !important; max-width: 100%; }
+  .site-header-row { padding: 8px !important; gap: 8px; }
+  .site-header-nav { flex-wrap: nowrap !important; gap: 8px !important; max-width: calc(100vw - 110px); white-space: nowrap; font-size: 12px; }
+  .mobile-header-menu { display: flex !important; }
+  .mobile-join-link { display: block !important; }
+  .desktop-header-links { display: none !important; position: absolute; top: 52px; right: 10px; z-index: 120; background: var(--c-bg); border: 1px solid var(--c-line); border-radius: 6px; padding: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.53); }
+  .desktop-header-links.mobile-open { display: flex !important; flex-direction: column; align-items: stretch; gap: 12px !important; }
+  .site-header-nav-wrap { position: relative; display: flex; align-items: center; gap: 8px; }
+  .hdr-lesson-link { flex: 1 1 0; min-width: 0; overflow: hidden; }
+  .hdr-lesson-link-right { justify-content: flex-end; }
+  .shd-tabstrip { top: 12px !important; right: 6px !important; transform: none !important; }
+  .shd-tab { padding: 7px 4px !important; font-size: 12px !important; }
+  .home-chapter > summary { flex-wrap: wrap; align-items: center !important; gap: 6px !important; padding: 10px !important; }
+  .home-chapter > summary > span:last-child { margin-left: 0 !important; }
+  .lesson-slides-frame { width: 100%; }
+}
+
+/* Teacher roster facts keep the same columns from student to student. On a
+   phone, the progress reading gets its own full-width line above the actions. */
+.roster-metrics { display: grid !important; flex: 1 1 100%; grid-template-columns: 190px 235px 100px 100px 80px 160px; align-items: center; }
+.roster-metric { box-sizing: border-box; white-space: nowrap; flex: 0 0 auto; }
+.roster-grade { grid-column: 1; }
+.roster-done { grid-column: 2; }
+.roster-due { grid-column: 3; }
+.roster-completed { grid-column: 4; }
+.roster-started { grid-column: 5; }
+.roster-active { grid-column: 6; }
+.roster-enrolled { grid-column: 1 / -1; }
+@media (max-width: 600px) {
+  .roster-card { align-items: flex-start !important; }
+  .roster-card > div:first-child { flex-basis: 100%; }
+  .roster-metrics { display: flex !important; flex-direction: column; align-items: flex-start; gap: 5px !important; }
+  .roster-metric { width: 100%; }
+  .roster-grade { width: 100%; }
+  .roster-grade .mini-bar { flex: 1; }
+  .roster-actions { width: 100%; justify-content: flex-start; }
 }
 
 code {
@@ -432,10 +494,7 @@ details.editor-card > summary:hover::before {
   align-items: center;
   gap: 12px;
   margin-bottom: 8px;
-  /* Wrap instead of squeezing. With a drawer open (1280 wide) the row had no
-     room once a run error added its status line: Stop became a two-line
-     block, "Commit (1)" broke in two and the status read "x Fix runtim...".
-     A row that does not fit now moves its right-hand group down a line. */
+  /* Phone layouts may wrap; desktop groups stay on one baseline below. */
   flex-wrap: wrap;
   row-gap: 8px;
 }
@@ -867,7 +926,7 @@ details.console > summary::-webkit-details-marker { display: none; }
 }
 
 .solution-dialog-badge {
-  font-size: 0.7rem;
+  font-size: 12px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   background: color-mix(in srgb, var(--c-orange) 15.0%, transparent);
@@ -1069,6 +1128,7 @@ details.console > summary::-webkit-details-marker { display: none; }
   min-width: 0;
 }
 .assignment-unmet-hint summary { cursor: pointer; }
+.assignment-unmet-hint summary { white-space: nowrap; font-size: 12px; }
 .assignment-unmet-hint ul { margin: 4px 0 0; padding-left: 18px; }
 .assignment-unmet-hint li { overflow-wrap: anywhere; }
 
@@ -1186,7 +1246,7 @@ details.console > summary::-webkit-details-marker { display: none; }
   display: inline-block;
   padding: 1px 8px;
   border-radius: 4px;
-  font-size: 0.7rem;
+  font-size: 12px;
   font-weight: 600;
   color: white;
   text-transform: uppercase;
@@ -1194,7 +1254,7 @@ details.console > summary::-webkit-details-marker { display: none; }
 }
 
 .lesson-week-badge {
-  font-size: 0.7rem;
+  font-size: 12px;
   color: var(--text);
   opacity: 0.6;
 }
@@ -1236,7 +1296,7 @@ details.console > summary::-webkit-details-marker { display: none; }
 
 .step-commit-badge {
   display: inline-block;
-  font-size: 0.7rem;
+  font-size: 12px;
   background: color-mix(in srgb, var(--x-f59e0b) 20.0%, transparent);
   color: var(--x-f59e0b);
   padding: 1px 6px;
@@ -1457,14 +1517,14 @@ details.console > summary::-webkit-details-marker { display: none; }
   font-size: 0.85rem;
 }
 .docs-sidebar-result-section {
-  font-size: 0.7rem;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   opacity: 0.55;
 }
 .docs-sidebar-title {
   font-weight: 700;
-  font-size: 0.7rem;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--text);
@@ -1554,6 +1614,20 @@ details.console > summary::-webkit-details-marker { display: none; }
   font-size: 0.95rem;
   outline: none;
 }
+.docs-main > .docs-main-search > input {
+  display: block;
+  box-sizing: border-box;
+  width: min(100%, 620px);
+  min-width: 0;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 0.95rem;
+}
+.docs-main > .docs-main-search > input:focus { border-color: var(--brand); outline: 2px solid color-mix(in srgb, var(--brand) 30%, transparent); }
 .docs-main-search-row input:focus {
   border-color: var(--brand);
 }
@@ -1562,7 +1636,7 @@ details.console > summary::-webkit-details-marker { display: none; }
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 0.7rem;
+  font-size: 12px;
   padding: 2px 6px;
   border: 1px solid var(--border);
   border-radius: 3px;
@@ -1622,7 +1696,7 @@ details.console > summary::-webkit-details-marker { display: none; }
   color: var(--brand);
 }
 .docs-main-search-result-section {
-  font-size: 0.65rem;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   opacity: 0.55;
@@ -1644,7 +1718,7 @@ details.console > summary::-webkit-details-marker { display: none; }
   gap: 10px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  font-size: 0.7rem;
+  font-size: 12px;
   color: var(--text);
   opacity: 0.55;
   font-weight: 700;
@@ -1655,7 +1729,7 @@ details.console > summary::-webkit-details-marker { display: none; }
   background: var(--muted);
   border: 1px solid var(--border);
   border-radius: 3px;
-  font-size: 0.65rem;
+  font-size: 12px;
   letter-spacing: 0.06em;
   opacity: 0.9;
 }
@@ -1693,8 +1767,8 @@ details.console > summary::-webkit-details-marker { display: none; }
   position: absolute;
   top: 6px;
   right: 10px;
-  font-size: 0.65rem;
-  color: var(--c-comment);
+  font-size: 12px;
+  color: var(--c-meta);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -1772,7 +1846,7 @@ details.console > summary::-webkit-details-marker { display: none; }
 .docs-sandbox-hint {
   margin-left: auto;
   opacity: 0.55;
-  font-size: 0.72rem;
+  font-size: 12px;
 }
 .docs-sandbox-editor {
   height: 360px;
@@ -1784,7 +1858,7 @@ details.console > summary::-webkit-details-marker { display: none; }
   padding: 6px 10px;
   background: var(--muted);
   border-bottom: 1px solid var(--border);
-  font-size: 0.72rem;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   opacity: 0.7;
@@ -1873,7 +1947,7 @@ details.console > summary::-webkit-details-marker { display: none; }
   overflow: hidden;
 }
 .lesson-nav-kicker {
-  font-size: 0.7rem;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   opacity: 0.55;
@@ -1970,6 +2044,14 @@ details.console > summary::-webkit-details-marker { display: none; }
    of a vertical strip floating over the editor, and the drawer overlays the
    page instead of padding it sideways. */
 @media (max-width: 720px) {
+  .content-lesson-main { padding: 12px 12px 20px !important; }
+  .content-lesson-title { align-items: flex-start !important; flex-direction: column; gap: 2px !important; }
+  .content-lesson-title h1 { font-size: 23px !important; line-height: 1.16 !important; }
+  .content-lesson-main > p { font-size: 13px !important; line-height: 1.3 !important; }
+  .lesson-progress-footer { padding: 5px 8px !important; }
+  body:has(.shd-tabstrip) { padding-bottom: calc(var(--shd-footer-height, 36px) + 44px) !important; }
+  .shd-tab { padding: 4px 9px !important; min-height: 28px; }
+  .shd-drawer { bottom: calc(var(--shd-footer-height, 0px) + 36px) !important; }
   .assignment-header { flex-direction: column; align-items: stretch; padding-right: 0; gap: 0.5rem; }
   .assignment-header-center { flex-wrap: wrap; }
   .assignment-header-right { flex-wrap: wrap; }
@@ -2003,6 +2085,12 @@ details.console > summary::-webkit-details-marker { display: none; }
   body:has(.shd-tabstrip) { padding-bottom: 110px; }
 }
 
+/* Code comments carry lesson instructions, so keep them readable as well as
+   visually distinct from executable code. */
+.cm-line .tok-comment, .cm-content .cm-comment { color: var(--x-a8c0ff) !important; font-style: normal !important; }
+.console-empty { min-width: 250px; white-space: normal; }
+.docs-main { max-width: 1040px !important; }
+
 /* Terms / Privacy / Contact pages and the links to them */
 .legal-links { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 0.9rem; }
 .legal-links a { color: inherit; text-decoration: underline; opacity: 0.85; }
@@ -2035,3 +2123,591 @@ details.console > summary::-webkit-details-marker { display: none; }
 [data-testid="whats-new-done"]:hover {
   opacity: 0.9;
 }
+
+/* Keep the task separate from grading controls in lab workspaces. */
+.assignment-header-left { flex: 1 1 520px; min-width: 0; }
+.assignment-header-center { flex: 0 1 330px; }
+@media (max-width: 720px) {
+  .assignment-header-left, .assignment-header-center { flex: auto; width: 100%; }
+  .assignment-header-center { justify-content: flex-start !important; }
+  .home-module-summary { flex-wrap: wrap; gap: 6px 10px; }
+  .home-module-summary > span:nth-child(2) { flex: 1; min-width: 0; }
+  .home-module-summary > span:last-child { width: 100%; margin-left: 0; padding-left: 0; }
+}
+
+/* Lesson progress belongs to the document, never over the student's work. */
+body:has(.lesson-progress-footer) { gap: 10px; padding-bottom: 20px !important; }
+body:has(.lesson-progress-footer) .assignment-header { margin-bottom: 0; padding-top: 6px; padding-bottom: 8px; gap: 10px; }
+body:has(.lesson-progress-footer) .editor-body { margin-top: 0; padding-top: 8px; }
+@media (max-width: 720px) {
+  body:has(.lesson-progress-footer) { padding-bottom: 12px !important; }
+  /* A flowing tool row replaces the second fixed row over the editor. */
+  body:has(.lesson-progress-footer) .shd-tabstrip {
+    position: static !important; width: 100%; flex-wrap: wrap;
+    padding: 4px 0; gap: 4px !important; border-radius: 6px;
+  }
+  body:has(.lesson-progress-footer) .shd-tab { padding: 4px 8px !important; min-height: 30px; border-radius: 4px !important; }
+  body:has(.lesson-progress-footer) .shd-drawer { bottom: 0 !important; }
+  body:has(.lesson-progress-footer) .assignment-header { gap: 6px; }
+  body:has(.lesson-progress-footer) .assignment-header-left p { margin-top: 4px !important; font-size: 13px !important; line-height: 1.35 !important; }
+  body:has(.lesson-progress-footer) .assignment-header-center { gap: 6px 10px; }
+  .content-lesson-main .content-prose p { margin: 10px 0; }
+  #titleRow:has(input) { flex-direction: column; align-items: stretch; gap: 10px; }
+  #titleRow:has(input) h1 { font-size: 22px; white-space: nowrap; }
+  #titleRow input { width: 100% !important; }
+  .home-chapter { margin-bottom: 10px !important; }
+  .home-chapter > summary > span:first-child { font-size: 20px; }
+  .home-chapter > summary > span:nth-child(2) { font-size: 13px; }
+  .home-chapter > div { padding: 8px !important; gap: 6px !important; }
+  .home-module-summary { padding: 8px !important; }
+}
+
+/* Student task controls follow the task, in normal document flow. */
+.assignment-header { flex-direction: column; align-items: stretch; }
+.assignment-header-left, .assignment-header-center { flex: none; width: 100%; }
+.assignment-header-center { justify-content: flex-start !important; }
+.assignment-quota { flex: 0 0 100%; color: var(--c-meta); font-size: 12px; }
+.assignment-quota:empty { display: none; }
+@media (max-width: 720px) {
+  .home-module-summary { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 3px 8px; padding: 7px 10px !important; }
+  .home-module-summary > .home-module-progress { grid-column: 2; width: auto; margin: 0; display: flex !important; color: var(--c-meta); opacity: 1; }
+  .run-toolbar { flex-wrap: nowrap; gap: 5px; overflow-x: auto; }
+  .run-toolbar > * { flex-shrink: 0; }
+  .run-toolbar .run-hint, .run-toolbar .toolbar-button-label { display: none; }
+  .run-toolbar button { padding: 6px 8px; white-space: nowrap; }
+  .student-quiz { margin-top: 8px !important; padding-top: 8px !important; }
+  .student-quiz > p { margin-bottom: 10px !important; line-height: 1.4; }
+  .student-quiz label:not(.quiz-option) { padding: 6px 8px !important; margin-bottom: 2px !important; }
+  .student-quiz label:not(.prose-copy) { line-height: 1.35; font-size: 14px; }
+  .content-lesson-main:has(.student-quiz) > p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  body:has(.content-lesson-main) .shd-tabstrip { width: auto !important; align-self: flex-end; padding: 0 !important; margin-bottom: -6px; }
+}
+
+/* Compact student lab controls retain explicit names for first-time coders. */
+@media (max-width: 720px) {
+  .run-toolbar .toolbar-button-label { display: inline; }
+  .run-toolbar button { padding: 5px 6px !important; font-size: 12px !important; gap: 4px !important; }
+  .run-toolbar > div { gap: 4px !important; }
+  .assignment-header-center { gap: 5px !important; }
+  .assignment-score { flex: 0 1 auto; gap: 5px; }
+  .assignment-score .score-bar { width: 48px; }
+  .assignment-status { font-size: 12px; padding: 3px 6px; }
+  .assignment-header-center .btn-sm { padding: 5px 8px; font-size: 12px; }
+  .assignment-quota { order: 5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .assignment-unmet-hint { order: 6; }
+  #editor .cm-editor { font-size: 12px !important; }
+  #editor .cm-line { padding-left: 16px; text-indent: -12px; }
+  #editor .cm-content { padding-top: 6px; }
+}
+
+/* Keep lesson status copy readable at narrow widths. */
+.assignment-quota { min-width: 0; max-width: 100%; }
+@media (max-width: 720px) {
+  .assignment-quota { white-space: normal; overflow: visible; overflow-wrap: anywhere; }
+  .lesson-breadcrumb-current { display: none; }
+  .content-lesson-main .content-prose p { margin: 0 0 16px; }
+  .content-lesson-main .content-prose li { margin: 10px 0; }
+}
+
+.lesson-nav-short { display: none; }
+@media (max-width: 720px) {
+  .lesson-nav-full { display: none; }
+  .lesson-nav-short { display: inline; }
+  .hdr-lesson-link { font-size: 12px; padding: 5px 7px; }
+}
+
+/* Compact lesson work surfaces: keep the first action beside its context. */
+.assignment-score { flex: 0 0 auto; }
+.assignment-unmet-hint { flex: 0 1 auto; max-width: 560px; font-size: 12px; }
+.assignment-unmet-hint summary { color: var(--c-meta); cursor: pointer; }
+.assignment-header-center { align-items: center; }
+.lab-task-strip summary { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lab-task-strip[open] summary { white-space: normal; }
+.livecodeblock-toolbar { border-bottom: 1px solid var(--c-line); }
+.home-module-summary { position: relative; padding-right: 32px !important; }
+.module-open-affordance { position: absolute; right: 12px; top: 10px; color: var(--c-purple); font-size: 24px; line-height: 1; }
+.home-module-summary:hover { background: var(--x-343746); }
+.home-module-summary:active { background: var(--c-line); }
+.home-module-summary:focus-visible { outline: 2px solid var(--c-purple); outline-offset: -2px; }
+@media (min-width: 721px) {
+  .shd-tabstrip { top: max(110px, 20vh) !important; bottom: max(20px, var(--shd-footer-height, 0px)) !important; transform: none !important; max-height: calc(100dvh - 160px); overflow-y: auto; }
+  .shd-tab { flex-shrink: 0; }
+}
+@media (max-width: 720px) {
+  body:has(.lesson-progress-footer) .shd-tabstrip { position: fixed !important; left: auto !important; right: 0 !important; top: auto !important; bottom: 12px !important; width: auto; max-width: 100vw; z-index: 901; }
+  .assignment-unmet-hint { flex: 0 1 auto; max-width: 100%; }
+  .lab-task-strip { margin-top: 0 !important; }
+  .lab-task-strip summary { font-size: 12px !important; }
+}
+
+/* Fixed tools have a matching document gutter, including when closed. */
+@media (min-width: 721px) {
+  body:has(.shd-tabstrip) { padding-right: calc(100px + var(--shd-tabbed, 0px)); }
+}
+@media (max-width: 720px) {
+  body:has(.shd-tabstrip), body:has(.lesson-progress-footer):has(.shd-tabstrip) {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important;
+    padding-right: 10px;
+  }
+  body .shd-tabstrip, body:has(.lesson-progress-footer) .shd-tabstrip,
+  body:has(.content-lesson-main) .shd-tabstrip {
+    position: fixed !important; left: 0 !important; right: 0 !important;
+    top: auto !important; bottom: 0 !important; transform: none !important;
+    width: 100% !important; max-width: 100% !important; box-sizing: border-box;
+    display: flex; flex-direction: row !important; flex-wrap: nowrap !important;
+    gap: 2px !important; margin: 0 !important;
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom)) !important;
+    background: var(--c-deep2); border-top: 1px solid var(--c-line);
+  }
+  body .shd-tabstrip .shd-tab {
+    flex: 1 1 0; min-width: 0; padding: 8px 1px !important;
+    font-size: 12px !important; letter-spacing: 0; border-radius: 4px !important;
+    border: 1px solid var(--c-line);
+  }
+  body:has(.lesson-progress-footer) .shd-drawer, body .shd-drawer {
+    bottom: calc(52px + env(safe-area-inset-bottom)) !important;
+  }
+  .lab-task-strip summary { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.5; }
+  .task-disclosure { display: block; }
+  .mod-row { display: grid; grid-template-columns: auto auto minmax(0, 1fr); gap: 5px 7px; }
+  .mod-row-badge { padding: 3px 5px !important; font-size: 12px !important; }
+  .mod-row-num { min-width: 0; font-size: 12px; }
+  .mod-row-title { order: initial; font-size: 13px; line-height: 1.35; }
+  .mod-row-meta { grid-column: 1 / -1; margin: 0; gap: 6px; }
+  .content-lesson-main .content-prose ul,
+  .content-lesson-main .content-prose ol { padding-left: 8px; margin-left: 0; list-style-position: inside; }
+  .content-lesson-main .content-prose blockquote { padding-left: 8px; margin-left: 0; }
+}
+
+/* Lab actions: Check is a deliberate next step, utilities stay quiet. */
+.run-toolbar .toolbar-check { background: var(--c-line); color: var(--c-fg); border: 1px solid var(--c-dim); font-weight: 700; padding: 7px 16px; }
+.run-toolbar .toolbar-check:disabled { opacity: .65; }
+.run-toolbar .toolbar-utilities > .btn-secondary { background: transparent; color: var(--c-meta); border: 1px solid var(--c-line); }
+@media (min-width: 721px) {
+  body:has(.shd-tabstrip) { padding-right: 20px; }
+  body:has(.shd-tabstrip) .assignment-header,
+  body:has(.shd-tabstrip) .editor-card,
+  body:has(.shd-tabstrip) .content-lesson-main,
+  body:has(.shd-tabstrip) .sandbox-shell { margin-right: calc(88px + var(--shd-tabbed, 0px)); }
+  .shd-tabstrip { right: var(--shd-tabbed, 0px) !important; width: 80px; box-sizing: border-box; overflow-x: hidden; }
+  .shd-tab { width: 100%; box-sizing: border-box; letter-spacing: 0 !important; }
+  .lesson-slides-frame { aspect-ratio: auto !important; height: min(52vw, calc(100dvh - 360px)); min-height: 260px; }
+}
+@media (max-width: 720px) {
+  .run-toolbar { display: flex; flex-wrap: wrap; overflow: visible; gap: 8px; }
+  .run-toolbar .toolbar-utilities { display: contents !important; }
+  .run-toolbar > *, .run-toolbar .toolbar-utilities > * { order: 2; }
+  .run-toolbar > .btn-run, .run-toolbar > .toolbar-check, .run-toolbar .toolbar-submit { order: 0; }
+  .run-toolbar .toolbar-submit { margin-left: auto !important; }
+  .run-toolbar::after { content: ''; order: 1; flex-basis: 100%; }
+  .run-toolbar button { font-size: 12px !important; padding: 7px 10px !important; }
+  .run-toolbar .toolbar-submit { font-size: 12px !important; }
+  body:has(.shd-tabstrip) .editor-card,
+  body:has(.shd-tabstrip) .sandbox-shell { margin-bottom: calc(64px + env(safe-area-inset-bottom)); }
+  body .shd-tabstrip.shd-docs-only,
+  body:has(.lesson-progress-footer) .shd-tabstrip.shd-docs-only,
+  body:has(.content-lesson-main) .shd-tabstrip.shd-docs-only {
+    left: auto !important; right: 12px !important; bottom: 12px !important;
+    width: auto !important; padding: 0 !important; border: 0; border-radius: 20px;
+  }
+  body .shd-tabstrip.shd-docs-only .shd-tab { padding: 9px 16px !important; font-size: 12px !important; border-radius: 20px !important; }
+  .mod-row { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; }
+  .mod-row-title { grid-column: 1 / -1; grid-row: 1; font-size: 15px; line-height: 1.45; }
+  .mod-row-num { font-size: 12px; }
+  .mod-row-badge { grid-column: 1; grid-row: 2; font-size: 12px !important; }
+  .mod-row-meta { grid-column: 2; grid-row: 2; font-size: 12px; }
+  .home-module-summary .module-open-affordance { display: inline !important; width: auto !important; grid-column: auto; }
+}
+
+/* Tool clearance belongs to work surfaces, never the site chrome. */
+body { box-sizing: border-box; padding-right: 20px; }
+.content-lesson-main, .editor-card, .sandbox-shell { min-width: 0; }
+.content-lesson-main .content-prose { min-width: 0; overflow-wrap: anywhere; }
+.content-lesson-main pre { max-width: 100%; overflow-x: auto; }
+.content-lesson-main img, .content-lesson-main video { max-width: 100%; }
+.assignment-unmet-mobile, .quiz-guidance-toggle { display: none; }
+@media (min-width: 721px) {
+  body:has(.shd-tabstrip) .content-lesson-main {
+    width: calc(100% - 88px - var(--shd-tabbed, 0px)) !important;
+  }
+}
+@media (max-width: 720px) {
+  body, body:has(.shd-tabstrip) { padding-right: 10px; }
+  body:has(.shd-tabstrip) .content-lesson-main,
+  body:has(.shd-tabstrip) .assignment-header,
+  body:has(.shd-tabstrip) .editor-card,
+  body:has(.shd-tabstrip) .sandbox-shell { margin-right: 0; max-width: 100%; min-width: 0; }
+  .content-lesson-main { width: 100% !important; }
+  .content-lesson-title { flex-direction: row !important; gap: 4px 8px !important; }
+  .content-lesson-title h1 { flex: 0 0 100%; font-size: 22px !important; }
+  .student-quiz h2 { font-size: 17px !important; line-height: 1.3; }
+  .quiz-guidance { margin-bottom: 10px; }
+  .quiz-guidance p { margin-bottom: 0 !important; line-height: 1.4; }
+  .quiz-guidance:not(.is-expanded) p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .quiz-guidance-toggle { display: inline; color: var(--c-cyan); font-size: 12px; background: none; border: 0; padding: 0; cursor: pointer; }
+  .assignment-header-center { column-gap: 6px !important; row-gap: 3px !important; }
+  .assignment-score .score-bar { display: none; }
+  .assignment-score .score-text { font-size: 12px; }
+  .assignment-status { background: transparent; border: 0; padding: 0; font-size: 12px; text-transform: none; }
+  .assignment-status::before, .assignment-unmet-hint::before { content: '· '; color: var(--c-meta); }
+  .assignment-unmet-hint { font-size: 12px; }
+  .assignment-unmet-desktop { display: none; }
+  .assignment-unmet-mobile { display: inline; }
+  .assignment-quota { order: 10; }
+  .assignment-quota [role="status"] { margin-bottom: 0 !important; font-size: 12px !important; line-height: 1.35; }
+  .lab-task-strip { padding: 6px 10px !important; }
+  .task-disclosure { display: inline; }
+  .editor-body { padding: 6px !important; }
+  .run-toolbar { gap: 4px !important; margin-bottom: 6px; }
+  .run-toolbar button { padding: 4px 6px !important; font-size: 12px !important; }
+  .run-toolbar::after { display: none; }
+  .editor-card { scroll-margin-bottom: calc(72px + env(safe-area-inset-bottom)); }
+}
+@media (max-width: 720px) {
+  .assignment-quota [role="status"] { white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis; }
+}
+
+/* Labs: a readable task beside the work, with a single status row above it. */
+.lab-work-area { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 16px; min-width: 0; }
+.lab-task-card { font-family: system-ui, sans-serif; font-size: 14px; line-height: 1.5; }
+.lab-task-card .lesson-steps { margin: 0; padding-left: 20px; }
+.lab-task-card .lesson-step { margin: 0 0 14px; padding: 0; }
+.lab-task-card .lesson-step:last-child { margin-bottom: 0; }
+.lab-task-card .step-instructions { opacity: 1; font-size: 14px; line-height: 1.5; }
+.lab-task-card .step-instructions p { margin: 6px 0; }
+.lab-task-card .step-hints { color: var(--c-meta); margin-top: 6px; }
+.lab-task-toggle { display: none; }
+.lab-work-area .editor-body { margin: 0; padding: 10px; border: 1px solid var(--c-line); border-radius: 8px; }
+.lab-work-area .editor-card { min-width: 0; }
+.lab-assignment-header .assignment-header-center { flex-wrap: nowrap !important; gap: 12px; }
+.lab-assignment-header .assignment-quota { flex: 0 1 auto; order: 0; margin-left: auto; }
+.lab-assignment-header .assignment-quota:has([role="status"]) { display: block; }
+.lab-assignment-header .assignment-quota { display: none; }
+.lab-assignment-header .assignment-quota > div { display: flex; align-items: center; gap: 8px; }
+.lab-assignment-header .assignment-quota [role="status"] { font-size: 12px !important; }
+.lab-assignment-header .assignment-score { order: -3; }
+.lab-assignment-header .assignment-status { order: -2; }
+.lab-assignment-header .assignment-unmet-hint { order: -1; }
+.lab-assignment-header .score-bar { width: 64px; }
+.lab-assignment-header .assignment-header-left p { margin-top: 4px !important; font-size: 13px !important; line-height: 1.4 !important; }
+.lab-assignment-header { gap: 8px; }
+.mod-row-title { display: grid; grid-template-columns: 48px minmax(0, 1fr); column-gap: 8px; }
+@media (min-width: 721px) {
+  body:has(.shd-tabstrip) .lab-work-area { margin-right: calc(88px + var(--shd-tabbed, 0px)); }
+  body:has(.shd-tabstrip) .lab-work-area .editor-card { margin-right: 0; }
+  .lab-work-area .toolbar-submit { display: none; }
+  .lab-work-area .editor-preview-container:not(.sandbox-split) > #editorPane { min-width: 0; flex-basis: 58%; }
+  .lab-work-area #previewPane { min-width: 0; flex-basis: 42%; }
+  .lab-work-area .console-empty { min-width: 0; }
+}
+@media (max-width: 720px) {
+  .lab-work-area { display: flex; flex-direction: column; gap: 8px; }
+  .lab-task-card { width: 100%; box-sizing: border-box; padding: 10px 12px !important; }
+  .lab-task-card h2 { margin-bottom: 6px !important; font-size: 13px !important; }
+  .lab-task-content { max-height: 84px; overflow: hidden; }
+  .lab-task-card.is-expanded .lab-task-content { max-height: none; }
+  .lab-task-toggle { display: inline-block; }
+  .lab-task-card .lesson-step { margin-bottom: 8px; }
+  .lab-task-card .step-instructions { line-height: 1.5; }
+  .lab-work-area .editor-card { width: 100%; }
+  .lab-work-area .editor-body { margin: 0; }
+  /* Leave Output visible below the editor on the first phone screen. */
+  .lab-work-area #editorPane { height: clamp(240px, 38svh, 360px); min-height: 240px; }
+  .lab-work-area #editor .cm-editor { font-size: 12px !important; }
+  /* Line-height on the scroller so code and gutters share the metric.
+     (Wrapping and its hanging indent are set just below.) */
+  .lab-work-area #editor .cm-scroller { line-height: 1.5; }
+  /* Climb 2 r3: wrap long lines again (clipped comments lost r2's pair for one judge), but with a
+     hanging indent so each continuation sits clearly inside its own numbered line. */
+  .lab-work-area #editor .cm-content { white-space: pre-wrap; overflow-wrap: anywhere; }
+  .lab-work-area #editor .cm-line { padding-left: calc(6px + 4ch); text-indent: -4ch; }
+  .lab-assignment-header .assignment-header-center { gap: 4px 7px !important; flex-wrap: wrap !important; }
+  .lab-assignment-header .assignment-quota:has([role="status"]) { display: block !important; margin-left: auto; }
+  .lab-assignment-header .assignment-quota [role="status"] { font-size: 12px !important; }
+  .lab-assignment-header .assignment-header-center > button { display: none; }
+  .lab-assignment-header .assignment-header-left p { display: none; }
+  .lab-work-area .run-toolbar { flex-wrap: nowrap; overflow-x: auto; }
+  .lab-work-area .run-toolbar button { flex-shrink: 0; }
+  /* Keep the Save word (the action a first-time coder must find); History
+     drops to its glyph. Both buttons carry aria-label and title. */
+  .lab-work-area .run-toolbar .toolbar-history .toolbar-button-label { display: none; }
+  .quiz-guidance p { display: block !important; -webkit-line-clamp: unset !important; overflow: visible !important; font-size: 13px !important; }
+  .mod-row-title { display: block; }
+  .mod-row-title .mod-row-num { font-size: 12px; margin-right: 5px; }
+  .content-lesson-main { padding-bottom: calc(88px + env(safe-area-inset-bottom)) !important; }
+  body:has(.content-lesson-main) .issue-fab { bottom: calc(12px + env(safe-area-inset-bottom)); right: 100px; width: 32px; height: 32px; }
+  body .shd-tabstrip.shd-docs-only .shd-tab { padding: 7px 14px !important; font-size: 12px !important; }
+}
+
+body:has(.lab-work-area) .lab-assignment-header { padding: 2px 0 8px; margin-bottom: 0; }
+body:has(.lab-work-area) { gap: 8px; }
+.lab-work-area .run-toolbar { gap: 8px; }
+.lab-work-area .run-hint { font-size: 12px; }
+
+.lab-work-area .ai-check-help { display: none; }
+@media (min-width: 721px) {
+  body:has(.lab-work-area) .site-header-row { padding: 8px 12px; }
+  body:has(.lab-work-area) .hdr-lesson-link { padding: 3px 8px; }
+  .lab-assignment-header .assignment-header-left p { display: none; }
+  .lab-assignment-header .assignment-header-center > button { padding: 4px 10px; }
+}
+
+/* Keep desktop feedback in the tool gutter, above the footer's measured top.
+   Reserve the same space in the scrollable tool strip so its buttons stay clear. */
+@media (min-width: 721px) {
+  body:has(.lesson-progress-footer) .issue-fab {
+    right: calc(var(--shd-tabbed, 0px) + 23px);
+    bottom: max(20px, calc(var(--lesson-footer-clearance, 0px) + 12px));
+    transition: border-color 120ms, color 120ms;
+  }
+  body:has(.lesson-progress-footer) .shd-tabstrip {
+    bottom: max(66px, calc(var(--lesson-footer-clearance, 0px) + 58px)) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  /* Only lesson surfaces reserve space for the fixed tools. Keep the normal
+     document scrollport; the final text/answer can scroll clear of the dock. */
+  body:is(:has(.content-lesson-main), :has(.lab-work-area)) {
+    --lesson-tool-dock: calc(60px + env(safe-area-inset-bottom));
+    padding-bottom: calc(var(--lesson-tool-dock) + 16px) !important;
+    scroll-padding-bottom: calc(var(--lesson-tool-dock) + 16px);
+  }
+  .content-lesson-main {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom)) !important;
+  }
+  body:is(:has(.content-lesson-main), :has(.lab-work-area))::after {
+    content: '';
+    position: fixed;
+    inset: auto 0 0;
+    height: var(--lesson-tool-dock);
+    background: var(--c-deep2);
+    border-top: 1px solid var(--c-line);
+    z-index: 898;
+    pointer-events: none;
+  }
+  body:is(:has(.content-lesson-main), :has(.lab-work-area)) .issue-fab {
+    bottom: calc(13px + env(safe-area-inset-bottom));
+    right: 12px;
+    width: 34px;
+    height: 34px;
+  }
+  body:is(:has(.content-lesson-main), :has(.lab-work-area)) .shd-tabstrip,
+  body:is(:has(.content-lesson-main), :has(.lab-work-area)) .shd-tabstrip.shd-docs-only {
+    left: 0 !important;
+    right: 56px !important;
+    bottom: 0 !important;
+    width: calc(100% - 56px) !important;
+    height: var(--lesson-tool-dock);
+    align-items: center;
+    border: 0;
+    background: transparent;
+  }
+  body:is(:has(.content-lesson-main), :has(.lab-work-area)) .shd-tabstrip.shd-docs-only {
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom)) !important;
+    justify-content: flex-end;
+  }
+  body:is(:has(.content-lesson-main), :has(.lab-work-area)) .shd-tabstrip.shd-docs-only .shd-tab {
+    flex: 0 0 auto;
+  }
+  body:is(:has(.content-lesson-main), :has(.lab-work-area)) .shd-drawer {
+    bottom: var(--lesson-tool-dock) !important;
+  }
+}
+
+/* Reading lesson bodies and quiz questions/answers use sans. */
+.prose-copy {
+  font-family: var(--font-prose);
+  font-size: 16px;
+  line-height: 1.6;
+  max-width: 72ch;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+/* quiz questions and answer rows keep the card's full width (the hover/selected fill must reach the edge) */
+.student-quiz .prose-copy { max-width: none; }
+.prose-copy :is(h1, h2, h3, h4, h5, h6, nav, button, summary, table, pre, code, kbd, samp) {
+  font-family: var(--font-mono);
+}
+:is(.compact-example, .worked-example).prose-copy .content-prose em {
+  font-style: normal;
+}
+@media (max-width: 720px) {
+  .prose-copy { font-size: 15px; }
+}
+
+/* Student design system: shared type, readable metadata and compact controls. */
+body { font-size: var(--fs-body); }
+h1 { font-size: var(--fs-h1); font-weight: 700; line-height: 1.25; }
+h2 { font-size: var(--fs-h2); font-weight: 700; line-height: 1.35; }
+/* chrome sub-headings only: lesson and docs prose keep their own h3 size */
+:where(h3, th):not(:where(.content-prose, .prose-copy, .docs-markdown, .markdown-body) *) { font-size: var(--fs-sub); font-weight: 700; }
+button, input, select, textarea { font-family: inherit; }
+/* no !important, and graded quiz radios/checkboxes are disabled to lock answers, not to look unavailable */
+:where(button, select, textarea, input:not([type=radio]):not([type=checkbox])):disabled { opacity: .5; cursor: not-allowed; }
+:is(button, a):focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 3px; }
+:is(.content-lesson-main, .assignment-header-left, .docs-hub, .docs-main) h1,
+#titleRow h1 { font-size: var(--fs-h1) !important; font-weight: 700; }
+:is(.student-quiz, .completion-panel, .lab-task-card) h2 { font-size: var(--fs-h2) !important; }
+:is(.run-hint, .console-empty, .run-output .console-empty, .docs-sidebar-empty,
+.docs-main-search-empty, .docs-sidebar-result-section, .docs-main-search-result-section,
+.docs-sandbox-hint, .docs-sandbox-preview-body .reshape-empty, .docs-breadcrumb,
+.docs-main-search-result-snippet, .lab-task-card .step-hints) {
+  color: var(--c-meta); font-size: var(--fs-meta); opacity: 1;
+}
+.console-empty { min-width: 0; }
+:is(.assignment-quota, .lab-assignment-header .assignment-quota) [role="status"] {
+  color: var(--c-meta); font-size: var(--fs-meta) !important;
+}
+:is(.assignment-unmet-hint, .assignment-quota, .mod-row-num) { color: var(--c-meta); font-size: var(--fs-meta); }
+:is(.run-toolbar button, .shd-tab, .mod-row-badge, .assignment-status) { font-size: var(--fs-micro) !important; }
+.home-continue-card {
+  max-width: 1120px; margin: 0 auto 24px; padding: 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  background: var(--c-bg); border: 1px solid color-mix(in srgb, var(--c-green) 40.0%, transparent); border-radius: 8px;
+}
+.home-continue-title { color: var(--c-fg); font-size: 18px; font-weight: 700; text-decoration: none; overflow-wrap: anywhere; }
+.home-continue-action {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 32px; padding: 4px 16px; flex-shrink: 0; white-space: nowrap;
+  background: var(--c-green); color: var(--c-deep2); font-size: 14px; font-weight: 700;
+  border: 1px solid var(--c-green); border-radius: 4px; text-decoration: none;
+}
+.home-continue-action:hover { background: var(--x-79fc99); }
+.header-lesson-nav { height: 32px; box-sizing: border-box; }
+.header-lesson-nav .hdr-lesson-link {
+  height: 28px; box-sizing: border-box; padding: 0 8px;
+  color: var(--c-meta); font-size: 13px; max-width: 48%;
+  border-color: var(--c-line); line-height: 1.25;
+}
+.docs-title { font-size: var(--fs-h1); }
+.docs-body { font-family: var(--font-prose); }
+.docs-body code { font-family: var(--font-mono); color: var(--c-orange); }
+.docs-topic-tile { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 14px; min-height: 48px; }
+.docs-topic-tile > span:last-child { flex-shrink: 0; }
+.docs-topic-tile:hover { border-color: var(--c-cyan) !important; background: var(--x-343746) !important; }
+.content-lesson-main nav[aria-label="Slide navigation"] button {
+  min-height: 32px; padding: 4px 12px; border: 1px solid var(--c-comment);
+  border-radius: 4px; background: var(--c-line); color: var(--c-fg); font-size: 14px;
+  font-weight: 600; cursor: pointer;
+}
+.content-lesson-main nav[aria-label="Slide navigation"] button:hover:not(:disabled) { border-color: var(--c-cyan); background: var(--x-50546b); }
+a.mod-row { transition: background-color 120ms, border-color 120ms; }
+a.mod-row:hover { background: var(--x-343746); border-top-color: var(--c-comment); border-bottom-color: var(--c-comment); }
+.mod-row-state { order: 10; width: 112px; flex: 0 0 112px; text-align: right; }
+.mod-row-meta { flex-wrap: nowrap; font-size: 13px; color: var(--c-meta); }
+.mod-row-chevron { flex: 0 0 12px; color: var(--c-cyan); font-size: 24px; line-height: 1; text-align: right; }
+.mod-row[aria-disabled]::after { content: ''; width: 12px; flex: 0 0 12px; }
+.progress-assignment-link { text-decoration: none; }
+.progress-assignment-link:hover { text-decoration: underline; color: var(--x-b2f1ff) !important; }
+@media (min-width: 721px) {
+  .run-toolbar { flex-wrap: nowrap; min-width: 0; gap: 8px; }
+  .run-toolbar button { white-space: nowrap; min-height: 32px; flex-shrink: 0; }
+  .run-toolbar > div { min-width: 0; }
+  .run-toolbar .run-hint { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mod-row { flex-wrap: nowrap; }
+  .mod-row-badge { min-width: 128px; }
+  .mod-row-title { flex: 1 1 240px; }
+}
+@media (max-width: 720px) {
+  .home-continue-card { padding: 16px; align-items: flex-start; flex-direction: column; }
+  .home-continue-action { align-self: flex-start; }
+  .docs-hub { padding: 24px 16px !important; }
+  .docs-hub > div { padding: 16px !important; }
+  .mod-row { grid-template-columns: auto minmax(0, 1fr) 12px; }
+  .mod-row-meta { flex-wrap: wrap; grid-column: 2; gap: 8px; justify-content: flex-end; }
+  .mod-row-state { width: 100%; flex-basis: 100%; }
+  .mod-row-chevron { grid-column: 3; grid-row: 1 / 3; }
+  .mod-row[aria-disabled]::after { grid-column: 3; grid-row: 1 / 3; }
+  .header-lesson-nav { gap: 8px !important; padding-inline: 8px !important; }
+  .header-lesson-nav .hdr-lesson-link { font-size: 12px; }
+  .lab-work-area .run-toolbar { gap: 4px; }
+  .lab-work-area .run-toolbar button { min-height: 28px; }
+}
+:is(.lesson-week-badge, .docs-sidebar-title, .docs-sidebar-pages a, .docs-page-pill) { opacity: 1; }
+.lesson-week-badge { color: var(--c-meta); font-size: 13px; }
+.docs-sidebar-title { font-size: 13px; font-weight: 700; }
+.docs-sidebar-pages li a { color: var(--c-cyan); font-size: 13px; }
+.docs-sidebar-section-title, .docs-sidebar-footer a { color: var(--c-cyan); opacity: 1; }
+.docs-sidebar-footer a { font-size: var(--fs-meta); }
+.docs-sidebar-pages li a.current { color: var(--c-fg); background: color-mix(in srgb, var(--c-purple) 30%, var(--c-bg)); }
+:is(.run-toolbar, .livecodeblock-toolbar, .doc-live-toolbar) .btn-run { background: var(--c-green); color: var(--c-deep2); }
+:is(.run-toolbar, .livecodeblock-toolbar, .doc-live-toolbar) .btn-run:hover { background: var(--x-79fc99); }
+@media (min-width: 721px) {
+  .run-toolbar { overflow-x: auto; }
+  .run-toolbar > [role="status"] { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .run-toolbar .toolbar-utilities { flex-shrink: 0; align-items: center; flex-wrap: nowrap; }
+  .student-progress-toolbar { flex-wrap: nowrap !important; }
+  .student-progress-toolbar button { min-height: 32px; white-space: nowrap; }
+}
+@media (max-width: 720px) {
+  #titleRow:has(input) h1 { white-space: normal; }
+}
+
+@media (max-width: 720px) {
+  .mod-row-title { grid-column: 1 / 3; }
+}
+
+/* Quiz choices remain readable and identifiable after the inputs are locked. */
+.quiz-question-card { max-width: 760px; width: 100%; box-sizing: border-box; }
+/* intro, divider and cards share one right edge (judges: ragged band to the right of the cards) */
+.student-quiz { max-width: 760px; box-sizing: border-box; }
+.quiz-options { display: grid; gap: 8px; }
+.student-quiz .quiz-option {
+  display: flex; align-items: flex-start; gap: 12px; width: 100%; box-sizing: border-box;
+  min-height: 44px; padding: 10px 12px; border: 1px solid var(--c-line); border-radius: 8px;
+  color: var(--c-fg); cursor: pointer;
+}
+.quiz-option:not(.is-locked):hover { background: var(--x-343746); }
+.student-quiz .quiz-option.is-selected { border-color: var(--c-purple); background: color-mix(in srgb, var(--c-purple) 7.8%, transparent); }
+.student-quiz .quiz-option.is-correct { border-color: var(--c-green); background: color-mix(in srgb, var(--c-green) 12.2%, transparent); }
+.student-quiz .quiz-option.is-mistake { border-color: var(--c-red); background: color-mix(in srgb, var(--c-red) 12.2%, transparent); }
+.quiz-option:has(input:focus-visible) { outline: 2px solid var(--c-cyan); outline-offset: 3px; }
+.quiz-option.is-locked { cursor: default; }
+.quiz-option-radio {
+  appearance: none; flex: 0 0 18px; width: 18px; height: 18px; margin: 3px 0 0;
+  border: 2px solid var(--c-meta); border-radius: 50%; background: var(--c-deep2);
+  display: grid; place-content: center; color: var(--c-purple); opacity: 1; cursor: inherit;
+}
+.quiz-option-radio::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; transform: scale(0); }
+.quiz-option-radio:checked { border-color: currentColor; }
+.quiz-option-radio:checked::before { transform: scale(1); }
+.is-correct .quiz-option-radio { color: var(--c-green); border-color: var(--c-green); }
+.is-mistake .quiz-option-radio { color: var(--c-red); border-color: var(--c-red); }
+.quiz-option > span { min-width: 0; }
+
+.mod-row-details { display: contents; }
+@media (min-width: 721px) {
+  .mod-row-title { order: 1; }
+  .mod-row-meta { order: 2; }
+  .mod-row-chevron, .mod-row[aria-disabled]::after { order: 3; }
+}
+@media (max-width: 720px) {
+  :is(.content-lesson-main, .assignment-header-left) :is(h1, h2),
+  main:has(.mod-row) > div > h1 { text-wrap: balance; }
+  :is(.content-lesson-main, .assignment-header-left) h1,
+  main:has(.mod-row) > div > h1 {
+    font-size: 22px !important; line-height: 1.25 !important;
+  }
+  .mod-row-details {
+    grid-column: 1 / 3; grid-row: 2; display: flex; align-items: center;
+    flex-wrap: wrap; gap: 8px; min-width: 0;
+  }
+  .mod-row-details .mod-row-meta { display: contents; }
+  .mod-row-details .mod-row-badge { flex-shrink: 0; white-space: nowrap; }
+  .mod-row-details .mod-row-duration { order: 1; white-space: nowrap !important; }
+  .mod-row-details .mod-row-state {
+    order: 2; width: auto; flex: 0 0 auto; text-align: left; white-space: nowrap !important;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .mod-row-duration::before, .mod-row-state:has(> span)::before { content: '·'; color: var(--c-meta); }
+  .mod-row-duration::before { margin-right: 8px; }
+  .mod-row-meta > :not(.mod-row-duration):not(.mod-row-state) { order: 3; }
+  .mod-row-done {
+    background: none !important; border: 0 !important; padding: 0 !important;
+    text-transform: none !important; letter-spacing: normal !important;
+  }
+  .mod-row-chevron, .mod-row[aria-disabled]::after { align-self: center; }
+}
+
+/* Keep short inline expressions intact, with the full task column available. */

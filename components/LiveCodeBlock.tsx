@@ -249,6 +249,14 @@ export default function LiveCodeBlock({
   return (
     <div className="livecodeblock">
       {label && <div className="livecodeblock-label">{label}</div>}
+      <div className="livecodeblock-toolbar">
+        <button type="button" className="btn-run" onClick={run} disabled={running}>
+          <Play size={13} strokeWidth={2.5} /> {running ? 'Running…' : 'Run'}
+        </button>
+        <button type="button" className="btn-secondary btn-sm" onClick={reset}>
+          <RotateCcw size={12} /> Reset
+        </button>
+      </div>
       <div
         className="livecodeblock-body"
         style={
@@ -297,14 +305,6 @@ export default function LiveCodeBlock({
         </div>
       </div>
       {showConsole && !plain && <LiveConsole iframeRef={iframeRef} resetKey={runKey} />}
-      <div className="livecodeblock-toolbar">
-        <button type="button" className="btn-run" onClick={run} disabled={running}>
-          <Play size={13} strokeWidth={2.5} /> {running ? 'Running…' : 'Run'}
-        </button>
-        <button type="button" className="btn-secondary btn-sm" onClick={reset}>
-          <RotateCcw size={12} /> Reset
-        </button>
-      </div>
       <style>{`
         /* Same chrome palette as the graded editor (.editor-card /
            .editor-body / .editor-file-toolbar in globals.css) so a live
@@ -386,6 +386,15 @@ export default function LiveCodeBlock({
             flex: 1 1 0;
             min-width: 0;
           }
+          /* Keep the action row for an embedded example on the first
+             desktop screen, above the fixed lesson progress strip. */
+          .livecodeblock-body { height: min(200px, var(--lcb-preview-side)); }
+          .livecodeblock-editor, .livecodeblock-preview { height: 100%; }
+        }
+
+        @media (max-width: 719px) {
+          .livecodeblock-editor { height: min(240px, var(--lcb-editor-h)); }
+          .livecodeblock-preview { height: min(160px, var(--lcb-preview-side)); }
         }
 
         .livecodeblock-toolbar {

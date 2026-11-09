@@ -70,17 +70,8 @@ export default function JsDocsClient({
   }
 
   return (
-    <div className="docs-layout">
+    <div className="docs-layout docs-js">
       <aside className="docs-sidebar">
-        <div className="docs-sidebar-search">
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search docs…"
-            aria-label="Search documentation"
-          />
-        </div>
         <div className="docs-sidebar-scroll">
           {isSearching ? (
             <div className="docs-sidebar-results">
@@ -154,8 +145,8 @@ export default function JsDocsClient({
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={searchPlaceholder}
-            aria-label="Search documentation"
+            placeholder="Search JavaScript docs…"
+            aria-label="Search JavaScript documentation"
           />
         </div>
 
@@ -168,7 +159,7 @@ export default function JsDocsClient({
           )}
         </header>
         <h1 className="docs-title">{page.title}</h1>
-        <div className="docs-body">
+        <div className="docs-body" style={{ maxWidth: '70ch' }}>
           {page.body.split(/\n\n+/).map((para, i) => (
             <p key={i}>
               {para.split('\n').map((line, j, arr) => (

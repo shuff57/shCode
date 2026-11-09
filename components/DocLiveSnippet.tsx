@@ -103,73 +103,13 @@ export default function DocLiveSnippet({ initialCode, fileKey }: Props) {
 
   return (
     <div style={{ margin: '8px 0 4px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <div style={{ ...paneStyle, height: 180 }}>
-        <CodeMirrorPane value={code} onChange={setCode} fileKey={fileKey} />
-      </div>
-      <div style={{ ...paneStyle, background: 'var(--x-111111)', minHeight: 90, maxHeight: 220, overflowY: 'auto' }}>
-        {!hasRun ? (
-          <div
-            style={{
-              display: 'grid',
-              placeItems: 'center',
-              color: 'var(--c-comment)',
-              fontSize: '0.8rem',
-              padding: 8,
-              textAlign: 'center',
-              minHeight: 90,
-            }}
-          >
-            Click <strong style={{ color: 'var(--c-green)', margin: '0 4px' }}>Run</strong> to see the output
-          </div>
-        ) : logs.length === 0 ? (
-          <div
-            style={{
-              display: 'grid',
-              placeItems: 'center',
-              color: 'var(--c-comment)',
-              fontSize: '0.8rem',
-              padding: 8,
-              minHeight: 90,
-            }}
-          >
-            (no output)
-          </div>
-        ) : (
-          <pre style={{ margin: 0, padding: '8px 10px', fontSize: '0.78rem', lineHeight: 1.5, fontFamily: "'Fira Code', Consolas, monospace" }}>
-            {logs.map((log, i) => (
-              <div
-                key={i}
-                style={{
-                  color: log.type === 'error' ? 'var(--c-red)' : log.type === 'warn' ? 'var(--c-orange)' : 'var(--c-fg)',
-                  whiteSpace: 'pre-wrap',
-                  wordBreak: 'break-word',
-                }}
-              >
-                {log.message}
-              </div>
-            ))}
-          </pre>
-        )}
-      </div>
-      <div style={{ display: 'flex', gap: 6 }}>
+      <div className="doc-live-toolbar" style={{ display: 'flex', gap: 8 }}>
         <button
           type="button"
+          className="btn-run"
           onClick={handleRun}
           disabled={running}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-            background: 'var(--c-green)',
-            color: 'var(--c-deep2)',
-            border: 'none',
-            borderRadius: 4,
-            padding: '4px 10px',
-            fontSize: '0.75rem',
-            fontWeight: 600,
-            cursor: running ? 'default' : 'pointer',
-            opacity: running ? 0.6 : 1,
-          }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 4, minHeight: 32, fontSize: 14 }}
         >
           <Play size={12} /> {running ? 'Running…' : 'Run'}
         </button>
@@ -194,6 +134,61 @@ export default function DocLiveSnippet({ initialCode, fileKey }: Props) {
           <RotateCcw size={12} /> Reset
         </button>
       </div>
+      <div style={{ ...paneStyle, height: 180 }}>
+        <CodeMirrorPane value={code} onChange={setCode} fileKey={fileKey} />
+      </div>
+      <div style={{ ...paneStyle, background: 'var(--x-111111)', minHeight: 90, maxHeight: 220, overflowY: 'auto' }}>
+        {!hasRun ? (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              whiteSpace: 'nowrap',
+              overflowX: 'auto',
+              color: 'var(--c-meta)',
+              fontSize: 13,
+              padding: 8,
+              textAlign: 'center',
+              minHeight: 90,
+            }}
+          >
+            <span>Click Run to see the output</span>
+          </div>
+        ) : logs.length === 0 ? (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              whiteSpace: 'nowrap',
+              overflowX: 'auto',
+              color: 'var(--c-meta)',
+              fontSize: 13,
+              padding: 8,
+              minHeight: 90,
+            }}
+          >
+            (no output)
+          </div>
+        ) : (
+          <pre style={{ margin: 0, padding: '8px 10px', fontSize: '0.78rem', lineHeight: 1.5, fontFamily: "'Fira Code', Consolas, monospace" }}>
+            {logs.map((log, i) => (
+              <div
+                key={i}
+                style={{
+                  color: log.type === 'error' ? 'var(--c-red)' : log.type === 'warn' ? 'var(--c-orange)' : 'var(--c-fg)',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                }}
+              >
+                {log.message}
+              </div>
+            ))}
+          </pre>
+        )}
+      </div>
+
     </div>
   );
 }

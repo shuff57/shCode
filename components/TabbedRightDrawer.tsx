@@ -173,7 +173,7 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
                 fontSize: '1.25rem',
                 lineHeight: 1,
                 padding: '2px 4px',
-                color: closeBtnHovered ? 'var(--c-fg)' : 'var(--c-comment)',
+                color: closeBtnHovered ? 'var(--c-fg)' : 'var(--c-dim)',
                 transition: 'color 0.15s',
               }}
             >
@@ -199,7 +199,7 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
 
       {/* Clustered vertical tab stack — slides with the drawer when open. */}
       <div
-        className="shd-tabstrip"
+        className={`shd-tabstrip${tabs.length === 1 && tabs[0].label === 'Docs' ? ' shd-docs-only' : ''}`}
         style={{
           position: 'fixed',
           right: 'var(--shd-tabbed, 0px)',
@@ -209,6 +209,7 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
           display: 'flex',
           flexDirection: 'column',
           gap: 4,
+          width: narrow ? undefined : 80,
           transition: 'right 0.22s ease',
         }}
       >
@@ -218,6 +219,7 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
             <button
               key={t.key}
               aria-label={`${t.label} tab`}
+              title={t.label}
               aria-pressed={isActive}
               className="shd-tab"
               onClick={() => setActiveKey(isActive ? null : t.key)}
@@ -227,9 +229,9 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
                 borderRight: 'none',
                 borderRadius: '6px 0 0 6px',
                 color: t.color ?? 'var(--c-purple)',
-                writingMode: 'vertical-rl',
+                writingMode: 'horizontal-tb',
                 textOrientation: 'mixed',
-                padding: '12px 6px',
+                padding: '9px 8px',
                 fontSize: '0.75rem',
                 fontWeight: 600,
                 cursor: 'pointer',

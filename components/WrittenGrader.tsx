@@ -474,63 +474,9 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
   if (!loaded) return null;
 
   return (
-    <section style={{ marginTop: 36, paddingTop: 20, borderTop: '2px solid var(--c-line)' }}>
-      <h2 style={{ fontSize: 20, marginBottom: 6, color: 'var(--c-fg)', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <Sparkles size={18} color="var(--c-purple)" />
-        {config.rubricTitle ?? 'Written response — AI-graded'}
-      </h2>
-      <p style={{ color: 'var(--x-888888)', fontSize: 13, margin: '0 0 12px' }}>
-        {codeInput
-          ? 'Write your answer as JavaScript. There is no Run button, so read it through the way the computer would before you submit.'
-          : 'Answer in your own everyday words — you are graded on having the right idea, not on exact wording, spelling or length. The AI grader checks each criterion and points you back at the lesson to reread if something is missing.' +
-            (maxSubmissions === null
-              ? ' You can revise and resubmit as many times as you want.'
-              : ` You get ${maxSubmissions} tries: revise and resubmit, and your best one counts.`)}
-      </p>
-
-      {prompt.trim() ? (
-        <div
-          style={{
-            background: 'var(--c-bg)',
-            border: '1px solid var(--c-line)',
-            borderLeft: '4px solid var(--c-purple)',
-            borderRadius: 6,
-            padding: '14px 16px',
-            margin: '0 0 16px',
-          }}
-        >
-          <div
-            style={{
-              fontSize: 12,
-              letterSpacing: 0.6,
-              textTransform: 'uppercase',
-              color: 'var(--c-purple)',
-              fontWeight: 600,
-              marginBottom: 8,
-            }}
-          >
-            What to answer
-          </div>
-          <div
-            style={{
-              color: 'var(--c-fg)',
-              fontSize: 15,
-              lineHeight: 1.65,
-              whiteSpace: 'pre-wrap',
-            }}
-          >
-            {/* The linkified text is rendered here and never sent anywhere: the
-                grader reads the prompt from public/ai-graders.json, not from the
-                browser, so no markup can leak into what the model sees. */}
-            <LessonNumberLinks text={prompt.trim()} hrefs={sourceHrefs} />
-          </div>
-        </div>
-      ) : null}
-
-      {afterPrompt ? <div style={{ margin: '0 0 16px' }}>{afterPrompt}</div> : null}
-
+    <section style={{ marginTop: 16, paddingTop: 14, borderTop: '2px solid var(--c-line)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-        <label style={{ fontSize: 13, color: 'var(--x-aaaaaa)' }}>{codeInput ? 'Your program (JavaScript)' : 'Your response'}</label>
+        <label style={{ fontSize: 13, color: 'var(--c-meta)' }}>{codeInput ? 'Your program (JavaScript)' : 'Your response'}</label>
         <SolutionPanel
           lessonId={lessonId}
           onInsert={(files) => {
@@ -583,7 +529,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
             });
           }}
           placeholder="Write your response here. Full sentences preferred."
-          rows={10}
+          rows={7}
           style={{
             width: '100%',
             background: 'var(--c-bg)',
@@ -610,8 +556,8 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
             border: 'none',
             fontWeight: 600,
             cursor: loading ? 'wait' : response.trim().length < 20 ? 'not-allowed' : 'pointer',
-            background: loading ? 'var(--c-line)' : response.trim().length < 20 ? 'var(--x-333333)' : 'var(--c-purple)',
-            color: 'var(--c-bg)',
+            background: loading ? 'var(--c-line)' : response.trim().length < 20 ? 'var(--c-line)' : 'var(--c-purple)',
+            color: response.trim().length < 20 || locked ? 'var(--c-dim)' : 'var(--c-bg)',
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
@@ -627,7 +573,9 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
               : oneShot
                 ? 'Submitting…'
                 : 'Grading…'
-            : oneShot
+            : response.trim().length < 20 && !locked
+              ? 'Write something to submit'
+              : oneShot
               ? locked
                 ? 'Submitted'
                 : 'Submit my answer'
@@ -663,7 +611,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
           {saveStatus === 'saving' ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
           {saveStatus === 'saved' ? 'Saved ✓' : saveStatus === 'error' ? 'Save failed' : 'Save draft'}
         </button>
-        <span style={{ color: 'var(--x-666666)', fontSize: 12 }}>
+        <span style={{ color: 'var(--c-meta)', fontSize: 13 }}>
           {response.trim().length} chars{codeInput ? '' : ` · ${response.trim().split(/\s+/).filter(Boolean).length} words`}
         </span>
         {maxSubmissions === null ? null : !attemptsKnown ? (
@@ -671,13 +619,33 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
             {loaded ? 'Couldn\u2019t check your attempts — reload to try again' : 'Checking your attempts…'}
           </span>
         ) : (
-          <span style={{ color: capReached ? 'var(--c-orange)' : 'var(--x-666666)', fontSize: 12 }}>
+          <span style={{ color: capReached ? 'var(--c-orange)' : 'var(--c-meta)', fontSize: 12 }}>
             {capReached
               ? 'No attempts left — your best one counts'
               : `${maxSubmissions - attempts} of ${maxSubmissions} attempts left`}
           </span>
         )}
       </div>
+
+      {prompt.trim() ? <details style={{ marginBottom: 10, border: '1px solid var(--c-line)', borderRadius: 6, padding: '8px 12px' }}>
+        <summary style={{ cursor: 'pointer', color: 'var(--c-purple)', fontSize: 13 }}>What to answer · task guidance</summary>
+              <h2 style={{ fontSize: 18, marginBottom: 6, color: 'var(--c-fg)', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <Sparkles size={18} color="var(--c-purple)" />
+        {config.rubricTitle ?? 'Written response — AI-graded'}
+      </h2>
+      <p style={{ color: 'var(--c-meta)', fontSize: 13, margin: '0 0 12px' }}>
+        {codeInput
+          ? 'Write your answer as JavaScript. There is no Run button, so read it through the way the computer would before you submit.'
+          : 'Answer in your own everyday words — you are graded on having the right idea, not on exact wording, spelling or length. The AI grader checks each criterion and points you back at the lesson to reread if something is missing.' +
+            (maxSubmissions === null
+              ? ' You can revise and resubmit as many times as you want.'
+              : ` You get ${maxSubmissions} tries: revise and resubmit, and your best one counts.`)}
+      </p>
+
+<div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.5, paddingTop: 10 }}><LessonNumberLinks text={prompt.trim()} hrefs={sourceHrefs} /></div>
+      </details> : null}
+
+      {afterPrompt ? <details style={{ margin: '0 0 16px', padding: '10px 14px', border: '1px solid var(--c-line)', borderRadius: 6 }}><summary style={{ cursor: 'pointer', color: 'var(--c-purple)', fontSize: 14 }}>See how this is graded</summary>{afterPrompt}</details> : null}
 
       {/* Its own row rather than squeezed in beside Submit: on a narrow screen
           the label, menu and description wrap, and wrapping them through the
@@ -752,7 +720,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
               alignItems: 'center',
               justifyContent: 'space-between',
               marginBottom: 12,
-              color: 'var(--x-aaaaaa)',
+              color: 'var(--c-meta)',
               fontSize: 14,
             }}
           >
@@ -847,7 +815,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
               >
                 Continue to next lesson →
               </button>
-              <p style={{ margin: '8px 0 0', color: 'var(--x-888888)', fontSize: 12 }}>
+              <p style={{ margin: '8px 0 0', color: 'var(--c-meta)', fontSize: 13 }}>
                 {/* A zero-point rubric (3.9.1, 3.9.3) has no score to raise, so
                     "keep revising to push your score higher" is an invitation to
                     resubmit the same plan. Students did: one class submitted 25

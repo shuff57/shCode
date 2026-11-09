@@ -16,11 +16,11 @@ const dracula = {
   bg: 'var(--c-bg)',
   fg: 'var(--c-fg)',
   gutter: 'var(--c-bg)',
-  gutterFg: 'var(--c-comment)',
+  gutterFg: 'var(--c-dim)',
   activeLine: 'color-mix(in srgb, var(--c-line) 33.3333%, transparent)',
   selection: 'var(--c-line)',
   cursor: 'var(--x-f8f8f0)',
-  comment: 'var(--c-comment)',
+  comment: 'var(--c-dim)',
   cyan: 'var(--c-cyan)',
   green: 'var(--c-green)',
   orange: 'var(--c-orange)',
@@ -31,7 +31,7 @@ const dracula = {
 };
 
 const draculaHighlight = HighlightStyle.define([
-  { tag: [t.comment, t.lineComment, t.blockComment, t.docComment], color: dracula.comment, fontStyle: 'italic' },
+  { tag: [t.comment, t.lineComment, t.blockComment, t.docComment], color: 'var(--x-a7b5df)', fontStyle: 'normal' },
   { tag: [t.keyword, t.operatorKeyword, t.modifier, t.controlKeyword], color: dracula.pink },
   { tag: [t.string, t.special(t.string), t.regexp], color: dracula.yellow },
   { tag: [t.number, t.bool, t.null, t.atom], color: dracula.purple },

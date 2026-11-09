@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { listModules, getModule } from '../../../lib/curriculum';
 import { notFound } from 'next/navigation';
 import ModuleLessonsList from '../../../components/ModuleLessonsList';
+import UnitProgressBadge from '../../../components/UnitProgressBadge';
 import ModuleTeacherPanel from '../../../components/ModuleTeacherPanel';
 
 export async function generateStaticParams() {
@@ -30,21 +31,21 @@ export default async function ModulePage({
       className="text-text"
       style={{ width: '100%', minWidth: 0, boxSizing: 'border-box', maxWidth: 960, margin: '0 auto', padding: '24px 20px 48px' }}
     >
-      <nav style={{ marginBottom: 16, fontSize: 13, opacity: 0.6 }}>
+      <nav style={{ marginBottom: 16, fontSize: 13, color: 'var(--c-meta)' }}>
         <Link href="/" style={{ color: 'var(--brand)' }}>Home</Link>
         <span style={{ margin: '0 8px' }}>›</span>
         <span>Module {summary.id}</span>
       </nav>
 
-      <h1 style={{ marginBottom: 4 }}>Module {summary.id} — {summary.title}</h1>
-      <p style={{ opacity: 0.6, marginTop: 0, marginBottom: 24 }}>
-        Quarter {summary.quarter ?? '?'} · Weeks {summary.weeks?.join('–') ?? '?'} · Environment: {summary.environment ?? '?'}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}><h1 style={{ margin: 0, fontSize: 28, lineHeight: 1.2, fontWeight: 700 }}>Module {summary.id} — {summary.title}</h1><UnitProgressBadge lessons={lessons.map(l => ({ id: l.id, title: l.displayTitle, type: l.type }))} /></div>
+      <p style={{ color: 'var(--c-meta)', fontSize: 13, marginTop: 0, marginBottom: 16, whiteSpace: 'normal' }}>
+        Quarter {summary.quarter ?? '?'} · Weeks {summary.weeks?.join('–') ?? '?'} · {summary.environment ?? '?'}
       </p>
 
       <section style={{ marginBottom: 32 }}>
         <h2
           className="border-border"
-          style={{ borderBottom: '1px solid', paddingBottom: 6 }}
+          style={{ borderBottom: '1px solid', paddingBottom: 10, fontSize: 18, fontWeight: 700, color: 'var(--c-fg)' }}
         >
           Lessons in this module
         </h2>

@@ -300,7 +300,7 @@ export default function QuizView({ lessonId, config }: Props) {
   if (!questions.length) return null;
 
   return (
-    <section style={{ marginTop: 36, paddingTop: 20, borderTop: '2px solid var(--c-line)' }}>
+    <section className="student-quiz" style={{ marginTop: 16, paddingTop: 12, borderTop: '2px solid var(--c-line)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
         <h2
           style={{
@@ -321,13 +321,13 @@ export default function QuizView({ lessonId, config }: Props) {
           </div>
         )}
       </div>
-      <p style={{ color: 'var(--x-888888)', fontSize: 13, margin: '0 0 20px' }}>
+      <div className="quiz-guidance is-expanded"><p style={{ color: 'var(--c-meta)', fontSize: 13, margin: '0 0 20px' }}>
         {capped
           ? `Answer all ${questions.length}. After each try you see your total, not which ones were wrong. Submit what you have if one has you stuck: the next part unlocks and you can come back and use your other tries.`
           : summative
           ? `Answer all ${questions.length}. Nothing is marked here — your teacher hands the score back. If one has you stuck, submit what you have and move on: the next part unlocks and you can come back to this one. Once all ${questions.length} are answered, submitting is final.`
           : `Pick the answer that fits best for each question. You need ${needed} of ${questions.length} right to move on, and you can change your answers and try again as many times as you like.`}
-      </p>
+      </p></div>
       <AttemptBanner
         max={cap.max}
         used={cap.used}
@@ -352,13 +352,14 @@ export default function QuizView({ lessonId, config }: Props) {
         return (
           <div
             key={q.id}
+            className="quiz-question-card"
             style={{
               background: 'var(--c-bg)',
               border: '1px solid var(--c-line)',
               borderLeft: `4px solid ${isCorrect ? 'var(--c-green)' : isWrong ? 'var(--c-red)' : 'var(--c-line)'}`,
               borderRadius: 6,
-              padding: '14px 16px',
-              marginBottom: 14,
+              padding: '12px 16px',
+              marginBottom: 10,
             }}
           >
             <div
@@ -372,8 +373,8 @@ export default function QuizView({ lessonId, config }: Props) {
                 marginBottom: q.code ? 10 : 12,
               }}
             >
-              <span style={{ color: 'var(--c-comment)', fontWeight: 600, minWidth: 22 }}>{qi + 1}.</span>
-              <span>{withInlineCode(q.question)}</span>
+              <span style={{ color: 'var(--c-meta)', fontWeight: 600, minWidth: 22 }}>{qi + 1}.</span>
+              <span className="prose-copy">{withInlineCode(q.question)}</span>
             </div>
 
             {q.code ? (
@@ -394,7 +395,7 @@ export default function QuizView({ lessonId, config }: Props) {
               </pre>
             ) : null}
 
-            <div style={{ marginLeft: 30 }}>
+            <div className="quiz-options">
               {order.map((oi) => {
                 const opt = q.options[oi];
                 const selected = picked === oi;
@@ -407,26 +408,8 @@ export default function QuizView({ lessonId, config }: Props) {
                 const markAsMistake = showMarks && selected && oi !== answerIndex;
                 return (
                   <label
+                    className={`prose-copy quiz-option${selected ? ' is-selected' : ''}${markAsAnswer ? ' is-correct' : ''}${markAsMistake ? ' is-mistake' : ''}${locked ? ' is-locked' : ''}`}
                     key={oi}
-                    style={{
-                      display: 'flex',
-                      gap: 10,
-                      alignItems: 'flex-start',
-                      padding: '7px 10px',
-                      marginBottom: 4,
-                      borderRadius: 4,
-                      cursor: 'pointer',
-                      background: markAsAnswer
-                        ? 'color-mix(in srgb, var(--c-green) 12.0%, transparent)'
-                        : markAsMistake
-                          ? 'color-mix(in srgb, var(--c-red) 12.0%, transparent)'
-                          : selected
-                            ? 'var(--c-line)'
-                            : 'transparent',
-                      color: 'var(--c-fg)',
-                      fontSize: 14,
-                      lineHeight: 1.5,
-                    }}
                   >
                     <input
                       type="radio"
@@ -434,7 +417,7 @@ export default function QuizView({ lessonId, config }: Props) {
                       checked={selected}
                       disabled={locked}
                       onChange={() => pick(q.id, oi)}
-                      style={{ marginTop: 3, accentColor: 'var(--c-purple)' }}
+                      className="quiz-option-radio"
                     />
                     <span>{withInlineCode(opt)}</span>
                   </label>
@@ -445,7 +428,7 @@ export default function QuizView({ lessonId, config }: Props) {
             {showMarks ? (
               <div
                 style={{
-                  marginLeft: 30,
+                  marginLeft: 0,
                   marginTop: 10,
                   paddingTop: 10,
                   borderTop: '1px solid var(--c-line)',
@@ -465,7 +448,7 @@ export default function QuizView({ lessonId, config }: Props) {
                 <span>
                   {withInlineCode((rv ? rv.explanation : q.explanation) ?? '')}
                   {!summative && q.source ? (
-                    <span style={{ color: 'var(--c-comment)' }}>
+                    <span style={{ color: 'var(--c-meta)' }}>
                       {' (reread '}
                       {sourceHintParts(q.source).map((part, pi) => {
                         const href = part.isNumber ? sourceHrefs[part.text] : undefined;
@@ -504,7 +487,7 @@ export default function QuizView({ lessonId, config }: Props) {
             border: 'none',
             borderRadius: 6,
             padding: '10px 20px',
-            fontSize: 14,
+            fontSize: 15,
             fontWeight: 600,
             cursor: canSubmit ? 'pointer' : 'not-allowed',
           }}
@@ -523,7 +506,7 @@ export default function QuizView({ lessonId, config }: Props) {
         </button>
 
         {!allAnswered ? (
-          <span style={{ color: 'var(--x-888888)', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{ color: 'var(--c-meta)', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
             <Circle size={14} color="var(--c-comment)" />
             {answeredCount} of {questions.length} answered
           </span>
@@ -533,7 +516,7 @@ export default function QuizView({ lessonId, config }: Props) {
           <span
             style={{
               color: allAnswered ? 'var(--c-green)' : 'var(--c-orange)',
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
@@ -555,7 +538,7 @@ export default function QuizView({ lessonId, config }: Props) {
           <span
             style={{
               color: passed ? 'var(--c-green)' : 'var(--c-orange)',
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',

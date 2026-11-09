@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { LockKeyhole } from 'lucide-react';
 import { getCurrentUser, updateName, CurrentUser } from '../../lib/auth';
 import AppearanceSettings from '../../components/AppearanceSettings';
 import { openWhatsNew } from '../../components/WhatsNewModal';
@@ -24,7 +25,7 @@ const S = {
     padding: 24,
   } as React.CSSProperties,
 
-  h1: { fontSize: 22, fontWeight: 700, marginBottom: 20, color: 'var(--c-fg)' } as React.CSSProperties,
+  h1: { fontSize: 28, fontWeight: 700, marginBottom: 20, color: 'var(--c-fg)' } as React.CSSProperties,
 
   label: { display: 'block', fontSize: 13, marginBottom: 4, color: 'var(--c-fg)' } as React.CSSProperties,
 
@@ -34,18 +35,6 @@ const S = {
     marginBottom: 16,
     background: 'var(--c-bg)',
     color: 'var(--c-fg)',
-    border: '1px solid var(--c-line)',
-    borderRadius: 4,
-    fontSize: 14,
-    boxSizing: 'border-box' as const,
-  } as React.CSSProperties,
-
-  inputReadonly: {
-    width: '100%',
-    padding: 8,
-    marginBottom: 16,
-    background: 'var(--c-bg)',
-    color: 'var(--c-comment)',
     border: '1px solid var(--c-line)',
     borderRadius: 4,
     fontSize: 14,
@@ -96,7 +85,7 @@ export default function AccountPage() {
   if (!loaded) {
     return (
       <div style={S.page}>
-        <div style={{ maxWidth: 560, margin: '0 auto', color: 'var(--c-comment)' }}>Loading…</div>
+        <div style={{ maxWidth: 560, margin: '0 auto', color: 'var(--c-meta)' }}>Loading…</div>
       </div>
     );
   }
@@ -116,10 +105,21 @@ export default function AccountPage() {
   return (
     <div style={S.page}>
       <div style={S.card}>
+        <Link href="/" style={{ color: 'var(--c-cyan)', fontSize: 13, textDecoration: 'none' }}>← Back to course</Link>
         <h1 style={S.h1}>My account</h1>
+        <p style={{ color: 'var(--c-meta)', marginTop: -14, marginBottom: 22 }}>Manage the name shown to your class.</p>
 
-        <label style={S.label}>Email</label>
-        <input type="text" value={user.email} readOnly style={S.inputReadonly} />
+        <h2 style={{ color: 'var(--c-fg)', fontSize: 18, margin: '0 0 12px' }}>Profile</h2>
+        <div style={{ marginBottom: 22 }}>
+          <div style={S.label}>Email</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--c-meta)', fontSize: 14, overflowWrap: 'anywhere' }}>
+            <LockKeyhole size={14} aria-hidden="true" style={{ flexShrink: 0 }} />
+            <span>{user.email}</span>
+          </div>
+          <p style={{ margin: '6px 0 0', color: 'var(--c-meta)', fontSize: 13, lineHeight: 1.5 }}>
+            Your sign-in email can't be changed here.
+          </p>
+        </div>
 
         <form onSubmit={handleSave}>
           <label style={S.label}>First name</label>

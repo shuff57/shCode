@@ -80,8 +80,8 @@ const BUILD_KEY = 'shCode:sandbox-reshape-build';
 const chipStyle: React.CSSProperties = {
   padding: '6px 10px',
   borderRadius: 4,
-  background: 'transparent',
-  color: 'var(--c-comment)',
+  background: 'var(--x-343746)',
+  color: 'var(--c-fg)',
   border: '1px solid var(--c-line)',
   cursor: 'pointer',
   fontSize: 13,
@@ -946,8 +946,8 @@ export default function SandboxWorkspace() {
         }
         .sandbox-header { display: flex; align-items: baseline; gap: 12px; flex-shrink: 0; }
         .sandbox-run-hint { margin-left: auto; white-space: nowrap; }
-        .sandbox-title { margin: 0; font-size: 1.4rem; color: var(--text); }
-        .sandbox-subtitle { color: var(--c-comment); font-size: 0.85rem; }
+        .sandbox-title { margin: 0; font-size: 28px; color: var(--text); }
+        .sandbox-subtitle { color: var(--c-meta); font-size: 0.85rem; }
         .sandbox-toolbar { margin-bottom: 0; flex-shrink: 0; gap: 8px; }
         .sandbox-modes {
           display: inline-flex;
@@ -959,7 +959,7 @@ export default function SandboxWorkspace() {
         .sandbox-mode {
           padding: 6px 13px;
           background: transparent;
-          color: var(--c-comment);
+          color: var(--c-meta);
           border: 0;
           border-right: 1px solid var(--c-line);
           cursor: pointer;
@@ -967,7 +967,7 @@ export default function SandboxWorkspace() {
         }
         .sandbox-mode:last-child { border-right: 0; }
         .sandbox-mode:hover { color: var(--text); }
-        .sandbox-mode.is-active { background: var(--c-line); color: var(--c-fg); }
+        .sandbox-mode.is-active { background: color-mix(in srgb, var(--c-purple) 30%, var(--c-bg)); color: var(--c-fg); }
         .sandbox-mode:disabled { opacity: 0.35; cursor: not-allowed; }
         /* A mode clicked while the page was still loading looks pressed at once
            (SANDBOX_EARLY_PICK_SCRIPT); the page switches to it as it starts. */
@@ -991,7 +991,7 @@ export default function SandboxWorkspace() {
           border-radius: 4px;
           overflow: hidden;
           flex: 0 0 auto;
-          height: 240px;
+          height: 120px;
           min-height: 120px;
           max-height: 60vh;
           resize: vertical;

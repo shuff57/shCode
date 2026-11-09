@@ -50,7 +50,7 @@ export default function ProgressPage() {
   if (user === undefined || !progress.loaded || !manifest) {
     return (
       <div style={containerStyle}>
-        <p style={{ opacity: 0.6 }}>Loading...</p>
+        <p style={{ color: 'var(--c-meta)' }}>Loading...</p>
       </div>
     );
   }
@@ -60,12 +60,12 @@ export default function ProgressPage() {
       <div style={containerStyle}>
         <nav style={navStyle}>
           <Link href="/" style={linkStyle}>Home</Link>
-          <span style={{ opacity: 0.4 }}>›</span>
-          <span style={{ opacity: 0.6 }}>Progress</span>
+          <span style={{ color: 'var(--c-meta)' }}>›</span>
+          <span style={{ color: 'var(--c-meta)' }}>Progress</span>
         </nav>
         <div style={cardStyle}>
           <h2 style={{ margin: 0 }}>Sign in to see your progress</h2>
-          <p style={{ opacity: 0.6, marginTop: 12 }}>Your lesson completion and scores will appear here once you sign in.</p>
+          <p style={{ color: 'var(--c-meta)', marginTop: 12 }}>Your lesson completion and scores will appear here once you sign in.</p>
         </div>
       </div>
     );
@@ -96,14 +96,15 @@ export default function ProgressPage() {
   const nextLocked = pickUpNext(orderedLessons, progress.states, (l) => lessonGradeCategory(l) !== null);
 
   // Per-unit breakdown
-  const unitMap = new Map<string, { completed: number; total: number; category?: string }>();
+  const unitMap = new Map<string, { completed: number; started: number; total: number; category?: string }>();
   for (const l of manifest.lessons) {
     const unitName = l.unit || 'Other';
     if (!unitMap.has(unitName)) {
-      unitMap.set(unitName, { completed: 0, total: 0, category: l.category });
+      unitMap.set(unitName, { completed: 0, started: 0, total: 0, category: l.category });
     }
     const entry = unitMap.get(unitName)!;
     entry.total++;
+    if (progress.states[l.id] === 'started') entry.started++;
     if (progress.states[l.id] === 'completed') entry.completed++;
   }
   const unitEntries = Array.from(unitMap.entries()).sort((a, b) => a[0].localeCompare(b[0]));
@@ -112,27 +113,14 @@ export default function ProgressPage() {
     <div style={containerStyle}>
       <nav style={navStyle}>
         <Link href="/" style={linkStyle}>Home</Link>
-        <span style={{ opacity: 0.4 }}>›</span>
-        <span style={{ opacity: 0.6 }}>Progress</span>
+        <span style={{ color: 'var(--c-meta)' }}>›</span>
+        <span style={{ color: 'var(--c-meta)' }}>Progress</span>
       </nav>
 
-      {/* Summary card */}
-      <div style={cardStyle}>
-        <h2 style={{ margin: 0, marginBottom: 12 }}>Progress</h2>
-        <p style={{ fontSize: 18, fontWeight: 600, margin: '0 0 10px 0' }}>
-          {completedIds.length} of {totalLessons} lessons completed
-        </p>
-        <div style={progressBarOuter}>
-          <div
-            style={{
-              ...progressBarInner,
-              width: `${completionPct}%`,
-            }}
-          />
-        </div>
-        <p style={{ opacity: 0.5, fontSize: 13, marginTop: 8 }}>
-          {completionPct}% complete
-        </p>
+      <h1 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 12px' }}>Your progress</h1>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 16, color: 'var(--c-meta)', fontSize: 14 }}>
+        <span><strong style={{ color: 'var(--c-fg)' }}>{completedIds.length}</strong> of {totalLessons} lessons done</span>
+        <a href="#missing-late-filter" style={{ color: 'var(--c-cyan)' }}>Review missing or late work →</a>
       </div>
 
       {/* Per-assignment gradebook — the student's own row of the same matrix
@@ -146,7 +134,7 @@ export default function ProgressPage() {
             Recently Completed
           </h3>
           {recentlyCompleted.length === 0 ? (
-            <p style={{ opacity: 0.5, fontSize: 14 }}>No lessons completed yet.</p>
+            <p style={{ color: 'var(--c-meta)', fontSize: 14 }}>No lessons completed yet.</p>
           ) : (
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {recentlyCompleted.map((l) => {
@@ -180,7 +168,7 @@ export default function ProgressPage() {
             Up Next
           </h3>
           {nextLocked.length === 0 ? (
-            <p style={{ opacity: 0.5, fontSize: 14 }}>All lessons started!</p>
+            <p style={{ color: 'var(--c-meta)', fontSize: 14 }}>All lessons started!</p>
           ) : (
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {nextLocked.map((l) => (
@@ -216,25 +204,25 @@ export default function ProgressPage() {
               <div key={unitName}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, fontSize: 13 }}>
                   <span style={{ fontWeight: 600 }}>{unitName}</span>
-                  <span style={{ opacity: 0.6 }}>
-                    {data.completed}/{data.total} ({pct}%)
+                  <span style={{ color: 'var(--c-meta)' }}>
+                    {data.completed === data.total ? '✓ Done' : data.completed + data.started === 0 ? 'Not started' : `${data.completed} of ${data.total}`} 
                   </span>
                 </div>
-                <div style={unitBarOuter}>
+                {data.completed + data.started > 0 && data.completed < data.total && <div style={unitBarOuter}>
                   <div
                     style={{
                       ...unitBarInner,
                       width: `${pct}%`,
                     }}
                   />
-                </div>
+                </div>}
               </div>
             );
           })}
         </div>
       </div>
 
-      <Link href="/" style={{ ...linkStyle, display: 'inline-block', marginTop: 8, opacity: 0.7 }}>
+      <Link href="/" style={{ ...linkStyle, display: 'inline-block', marginTop: 8 }}>
         Back to lessons
       </Link>
     </div>
@@ -255,7 +243,7 @@ const containerStyle: React.CSSProperties = {
 const navStyle: React.CSSProperties = {
   marginBottom: 20,
   fontSize: 13,
-  opacity: 0.6,
+  color: 'var(--c-meta)',
   display: 'flex',
   alignItems: 'center',
   gap: 8,
@@ -270,8 +258,8 @@ const cardStyle: React.CSSProperties = {
   background: 'var(--c-deep)',
   border: '1px solid var(--c-line)',
   borderRadius: 8,
-  padding: '20px 24px',
-  marginBottom: 20,
+  padding: 20,
+  marginBottom: 16,
 };
 
 const progressBarOuter: React.CSSProperties = {

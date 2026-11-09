@@ -43,16 +43,23 @@ export default function CompletionPanel({ lessonId, lessonType, description }: P
   }
 
   if (!snap.loaded) return null;
+  if (complete) return (
+    <section aria-live="polite" style={{ marginTop: 20, padding: '16px 18px', border: '1px solid color-mix(in srgb, var(--c-green) 33.3333%, transparent)', borderRadius: 8, background: 'color-mix(in srgb, var(--c-green) 3.9216%, transparent)', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+      <CircleCheck size={20} color="var(--c-green)" />
+      <span style={{ color: 'var(--c-green)', flex: 1 }}>Completed · next lesson unlocked</span>
+      <button onClick={toggle} disabled={!snap.authed} style={{ background: 'transparent', border: 0, color: 'var(--c-meta)', textDecoration: 'underline', cursor: 'pointer', padding: 6 }}>Undo</button>
+    </section>
+  );
 
   return (
     <section
       style={{
-        marginTop: 40,
-        paddingTop: 20,
+        marginTop: 20,
+        paddingTop: 14,
         borderTop: '2px solid var(--c-line)',
       }}
     >
-      <h2 style={{ fontSize: 20, marginBottom: 12, color: 'var(--c-fg)' }}>
+      <h2 style={{ fontSize: 18, marginBottom: 12, color: 'var(--c-fg)' }}>
         Mark complete to continue
       </h2>
       <div
@@ -61,7 +68,7 @@ export default function CompletionPanel({ lessonId, lessonType, description }: P
           alignItems: 'center',
           justifyContent: 'space-between',
           marginBottom: 12,
-          color: 'var(--x-aaaaaa)',
+          color: 'var(--c-meta)',
           fontSize: 14,
         }}
         aria-live="polite"
@@ -96,14 +103,14 @@ export default function CompletionPanel({ lessonId, lessonType, description }: P
         }}
       >
         <h3 style={{ fontSize: 18, color: 'var(--c-fg)', marginTop: 0, marginBottom: 4 }}>{title}</h3>
-        <p style={{ fontSize: 14, color: 'var(--x-aaaaaa)', marginTop: 0, marginBottom: 8 }}>{fullDescription}</p>
+        <p style={{ fontSize: 14, color: 'var(--c-meta)', marginTop: 0, marginBottom: 8 }}>{fullDescription}</p>
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: 8,
             fontSize: 13,
-            color: complete ? 'var(--c-green)' : 'var(--c-comment)',
+            color: complete ? 'var(--c-green)' : 'var(--c-dim)',
           }}
         >
           {complete ? (

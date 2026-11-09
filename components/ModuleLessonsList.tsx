@@ -30,7 +30,7 @@ const stateStripeColors: Record<string, string> = {
 };
 
 const stateLabels: Record<string, string> = {
-  completed: 'Done',
+  completed: '✓ Done',
   started: 'In progress',
 };
 
@@ -61,7 +61,7 @@ export default function ModuleLessonsList({
   const now = useNow();
 
   if (lessons.length === 0) {
-    return <p style={{ opacity: 0.6 }}>No lessons yet.</p>;
+    return <p style={{ color: 'var(--c-meta)' }}>No lessons yet.</p>;
   }
 
   const totalMins = lessons.reduce((sum, l) => sum + (l.estimateMins ?? 0), 0);
@@ -109,7 +109,7 @@ export default function ModuleLessonsList({
     <>
       {(durationLabel || moduleDue || teacherDue.canEdit) && (
         <p style={{ fontSize: 13, margin: '0 0 10px 0', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-          {durationLabel && <span style={{ opacity: 0.5 }}>Estimated: {durationLabel}</span>}
+          {durationLabel && <span style={{ color: 'var(--c-meta)' }}>Estimated: {durationLabel}</span>}
           {moduleDue && (
             <ModuleDueBadge
               kind={moduleDue.kind}
@@ -152,7 +152,7 @@ export default function ModuleLessonsList({
         const rowStyle: React.CSSProperties = {
           padding: '10px 14px',
           borderLeft: '4px solid ' + badge.color,
-          borderRight: '4px solid ' + stripeColor,
+          borderRight: '2px solid ' + stripeColor,
           textDecoration: 'none',
           color: 'var(--text)',
           opacity: locked ? 0.5 : 1,
@@ -161,13 +161,15 @@ export default function ModuleLessonsList({
 
         const inner = (
           <>
+            <span className="mod-row-title" style={{ fontWeight: 500 }}><span className="mod-row-num" style={{ color: 'var(--c-meta)', fontFamily: 'monospace', fontVariantNumeric: 'tabular-nums' }}>{l.numberedId}</span>{' '}<span>{l.displayTitle}</span></span>
+            <span className="mod-row-details">
             <span
               className="mod-row-badge"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 6,
-                fontSize: 11,
+                fontSize: 12,
                 color: badge.color,
                 background: withAlpha(badge.color, '22'),
                 border: '1px solid ' + withAlpha(badge.color, '55'),
@@ -181,15 +183,12 @@ export default function ModuleLessonsList({
               <badge.Icon size={12} strokeWidth={2.25} />
               {badge.label}
             </span>
-            <span className="mod-row-num" style={{ opacity: 0.5, fontFamily: 'monospace' }}>
-              {l.numberedId}
-            </span>
-            <span className="mod-row-title" style={{ fontWeight: 500 }}>{l.displayTitle}</span>
             <span className="mod-row-meta">
+            <span className="mod-row-state">
             {locked ? (
               <span
                 style={{
-                  fontSize: 11,
+                  fontSize: 12,
                   color: 'var(--muted-fg, var(--x-94a3b8))',
                   background: 'color-mix(in srgb, var(--x-94a3b8) 15.0%, transparent)',
                   border: '1px solid color-mix(in srgb, var(--x-94a3b8) 35.0%, transparent)',
@@ -210,8 +209,9 @@ export default function ModuleLessonsList({
               </span>
             ) : stateLabel ? (
               <span
+                className={lessonState === 'completed' ? 'mod-row-done' : undefined}
                 style={{
-                  fontSize: 11,
+                  fontSize: 12,
                   color: stripeColor,
                   background: withAlpha(stripeColor, '22'),
                   border: '1px solid ' + withAlpha(stripeColor, '55'),
@@ -225,6 +225,7 @@ export default function ModuleLessonsList({
                 {stateLabel}
               </span>
             ) : null}
+            </span>
             <DueBadge
               dueAt={lessonDue?.dueAt ?? null}
               completed={lessonState === 'completed'}
@@ -239,7 +240,7 @@ export default function ModuleLessonsList({
               ambiguous={availability.ambiguous}
             />
             {l.estimateMins ? (
-              <span style={{ opacity: 0.5, fontSize: 12 }}>~{l.estimateMins} min</span>
+              <span className="mod-row-duration" style={{ color: 'var(--c-meta)', fontSize: 13 }}>~{l.estimateMins} min</span>
             ) : null}
             <DueDateChip
               scope="lesson"
@@ -268,6 +269,8 @@ export default function ModuleLessonsList({
               </>
             )}
             </span>
+            </span>
+            {!locked && <span className="mod-row-chevron" aria-hidden="true">›</span>}
           </>
         );
 
@@ -292,7 +295,7 @@ export default function ModuleLessonsList({
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
                 <span
                   style={{
-                    fontSize: 11,
+                    fontSize: 12,
                     fontWeight: 700,
                     letterSpacing: '0.08em',
                     textTransform: 'uppercase',
@@ -302,12 +305,12 @@ export default function ModuleLessonsList({
                   Lesson {heading.index} of {groups?.length}
                 </span>
                 <span style={{ fontWeight: 650, fontSize: 15 }}>{heading.group.title}</span>
-                <span style={{ fontSize: 12, color: 'var(--c-dim)' }}>
+                <span style={{ fontSize: 13, color: 'var(--c-meta)' }}>
                   {heading.group.screens.length} screen{heading.group.screens.length === 1 ? '' : 's'}
                   {minutes > 0 ? ` · ~${minutes} min` : ''}
                 </span>
               </div>
-              <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--c-dim)', lineHeight: 1.45 }}>
+              <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--c-meta)', lineHeight: 1.45 }}>
                 {heading.group.objective}
               </p>
             </li>

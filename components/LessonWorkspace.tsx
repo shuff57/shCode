@@ -31,6 +31,7 @@ import MoshionPreview from './MoshionPreview';
 import RequirementsSection from './RequirementsSection';
 import PlanChartPanel from './PlanChartPanel';
 import LessonSteps from './LessonSteps';
+import LabTaskCard from './LabTaskCard';
 import Console from './Console';
 import HistoryPanel from './HistoryPanel';
 import AssignmentHeader from './AssignmentHeader';
@@ -1239,7 +1240,7 @@ export default function LessonWorkspace({
             color: 'var(--c-green)',
             content:
               requirements.length === 0 ? (
-                <p style={{ color: 'var(--c-comment)' }}>No graded items for this lesson.</p>
+                <p style={{ color: 'var(--c-meta)' }}>No graded items for this lesson.</p>
               ) : (
                 <RequirementsSection requirements={requirements} />
               ),
@@ -1284,6 +1285,8 @@ export default function LessonWorkspace({
       {showAssignmentHeader ? (
         <AssignmentHeader
           lesson={lesson}
+          compactLab={isConsoleMode || isMoshionMode}
+          attemptNote={<div style={{ width: '100%' }}>{capped ? <AttemptBanner max={cap.max} used={cap.used} loading={cap.loading} /> : null}<GradeQuotaNote compact={isConsoleMode || isMoshionMode} /></div>}
           score={headerScore}
           totalPossible={headerTotal}
           onSubmit={handleSubmit}
@@ -1291,7 +1294,7 @@ export default function LessonWorkspace({
           canSubmit={canSubmit}
           unitLabel={headerUnitLabel}
           showStatus={!isMoshionMode}
-          showSubmit={!isMoshionMode}
+          showSubmit
           scoreAlign={isMoshionMode ? 'right' : 'center'}
           unmetTitles={unmetTitles}
           unmetNote={isMoshionMode ? moshionWords.note : aiCheck ? 'press Check to mark them' : undefined}
@@ -1302,8 +1305,8 @@ export default function LessonWorkspace({
           <h1>{lesson.title}</h1>
         </div>
       )}
-      {capped ? <AttemptBanner max={cap.max} used={cap.used} loading={cap.loading} /> : null}
-      <GradeQuotaNote />
+      {!showAssignmentHeader && capped ? <AttemptBanner max={cap.max} used={cap.used} loading={cap.loading} /> : null}
+      {!showAssignmentHeader && <GradeQuotaNote />}
       {lesson.planFrom && (
         <PlanChartPanel
           planFrom={lesson.planFrom}
@@ -1317,6 +1320,15 @@ export default function LessonWorkspace({
       )}
       {lesson.starterVariants && lesson.starterVariants.length > 1 && (
         <StarterPicker lesson={lesson} />
+      )}
+      <div className={(isConsoleMode || isMoshionMode) ? 'lab-work-area' : undefined}>
+      {lesson.steps.length > 0 && (
+        (isConsoleMode || isMoshionMode) ? <LabTaskCard lesson={lesson} /> : (
+          <details className="lab-task-strip" style={{ padding: '8px 12px', margin: '4px 0 8px', border: '1px solid var(--c-line)', borderRadius: 6, background: 'var(--c-bg)' }}>
+            <summary style={{ cursor: 'pointer', fontSize: 13, color: 'var(--c-meta)' }}><strong style={{ color: 'var(--c-cyan)' }}>Your task</strong> · {lesson.steps[0].title} <span className="task-disclosure">· Show all steps</span></summary>
+            <LessonSteps lesson={lesson} />
+          </details>
+        )
       )}
       <div className="editor-card">
         <div className="editor-body">
@@ -1375,7 +1387,7 @@ export default function LessonWorkspace({
                 {aiCheck && !isTextMode && !isReshapeMode && (
                   // Run shows what the code prints; Check is the AI read that marks the Quest cards.
                   <button
-                    className="btn-run"
+                    className="btn-secondary btn-sm toolbar-check"
                     onClick={() => void runAiCheck()}
                     disabled={aiCheckBusy || (files[aiCheckFile] ?? '').trim().length < 20}
                     title="Have the AI read your code and mark the Quest cards green or red"
@@ -1388,7 +1400,7 @@ export default function LessonWorkspace({
                     padding: '6px 14px',
                     borderRadius: 4,
                     background: 'transparent',
-                    color: 'var(--c-comment)',
+                    color: 'var(--c-meta)',
                     border: '1px solid var(--c-line)',
                     cursor: 'pointer',
                     fontSize: 13,
@@ -1477,7 +1489,7 @@ export default function LessonWorkspace({
                   : '✗ Fix runtime error before submitting'}
               </span>
             )}
-            <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+            <div className="toolbar-utilities" style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
               <SolutionPanel
                 lessonId={lesson.id}
                 onInsert={(solutionFiles) => {
@@ -1490,8 +1502,8 @@ export default function LessonWorkspace({
                   setSolutionLoaded(true);
                 }}
               />
-              <button className="btn-secondary btn-sm" onClick={() => setHistoryOpen(true)}>
-                History
+              <button className="btn-secondary btn-sm toolbar-history" aria-label="History" title="History" onClick={() => setHistoryOpen(true)}>
+                <span aria-hidden="true">↶</span><span className="toolbar-button-label">History</span>
               </button>
               {lessonProgress.authed && !solutionLoaded && (
                 <>
@@ -1507,10 +1519,10 @@ export default function LessonWorkspace({
                       void cloud.save();
                     }}
                     disabled={cloud.saving}
-                    title="Save this lesson to the cloud so you can open it on another device."
+                    aria-label="Save to cloud" title="Save this lesson to the cloud so you can open it on another device."
                   >
                     <CloudUpload size={14} />
-                    {cloud.saving ? 'Saving…' : 'Save'}
+                    <span className="toolbar-button-label">{cloud.saving ? 'Saving…' : 'Save'}</span>
                   </button>
                   {cloud.note && (
                     <span
@@ -1529,9 +1541,10 @@ export default function LessonWorkspace({
                   )}
                 </>
               )}
-              {isMoshionMode && (
+              {(isMoshionMode || isConsoleMode) && (
                 <button
-                  className="btn-primary btn-sm"
+                  style={{ marginLeft: 'auto' }}
+                  className="btn-primary btn-sm toolbar-submit"
                   onClick={handleSubmit}
                   disabled={submitted || !canSubmit}
                   title={!canSubmit ? moshionWords.title : undefined}
@@ -1545,18 +1558,18 @@ export default function LessonWorkspace({
           {aiCheck && (
             // The AI's read of the steps, directly under the Grade button and
             // above the textarea it graded.
-            <div style={{ marginBottom: 8 }}>
-              <div role="status" aria-live="polite" style={{ fontSize: 14, color: 'var(--c-dim)' }}>
+            <div className={!aiCheckNote ? 'ai-check-help' : undefined} style={{ marginBottom: 6 }}>
+              <div role="status" aria-live="polite" style={{ fontSize: 13, color: 'var(--c-meta)' }}>
                 {aiCheckNote
                   ? aiNoteForRun(aiCheckNote, { allGreen: allRequirementsPassed, runErrored: !!runtimeError })
                   : isTextMode
                     ? 'Plain English is welcome. The AI marks the Quest cards from what your steps mean, not the exact words.'
                     : isMoshionMode
-                      ? 'Run shows what your code does. Press Check to have the AI read it and mark the Quest cards, whatever shape you wrote it in. Submit turns on once they are green and this code has run with no error.'
-                      : 'Run shows what your code does. Press Check to have the AI read it and mark the Quest cards, whatever shape you wrote it in. Submit turns on once they are green.'}
+                      ? 'Run to preview · Check to mark Quest · Submit when green and error-free.'
+                      : 'Run to preview · Check to mark Quest · Submit when green.'}
               </div>
               {aiCheckNote?.kind === 'ok' && aiCheckNote.hints && aiCheckNote.hints.length > 0 && (
-                <ul style={{ margin: '4px 0 0', paddingLeft: 20, fontSize: 14, color: 'var(--c-dim)' }}>
+                <ul style={{ margin: '4px 0 0', paddingLeft: 20, fontSize: 14, color: 'var(--c-meta)' }}>
                   {aiCheckNote.hints.map((h, i) => (
                     <li key={i}>{h}</li>
                   ))}
@@ -1660,6 +1673,7 @@ export default function LessonWorkspace({
             </details>
           )}
         </div>
+      </div>
       </div>
       {aiGraded ? (
         <AiGradeResultPanel

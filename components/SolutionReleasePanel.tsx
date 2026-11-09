@@ -61,7 +61,7 @@ type Entry =
 
 const C = {
   border: 'var(--c-line)',
-  dim: 'var(--c-dim)',
+  dim: 'var(--c-meta)',
   text: 'var(--c-fg)',
   input: 'var(--c-bg)',
   accent: 'var(--c-cyan)',
@@ -75,8 +75,10 @@ const field: React.CSSProperties = {
   color: C.text,
   border: `1px solid ${C.border}`,
   borderRadius: 4,
-  padding: '4px 6px',
-  fontSize: 13,
+  padding: '4px 8px',
+  fontSize: 14,
+  height: 32,
+  boxSizing: 'border-box',
   fontFamily: 'inherit',
   colorScheme: 'dark',
 };
@@ -87,9 +89,10 @@ const btn = (color: string, disabled = false): React.CSSProperties => ({
   borderRadius: 4,
   color,
   cursor: disabled ? 'not-allowed' : 'pointer',
-  fontSize: 13,
-  padding: '3px 10px',
-  opacity: disabled ? 0.45 : 1,
+  fontSize: 14,
+  height: 32,
+  padding: '4px 12px',
+  opacity: disabled ? 0.5 : 1,
 });
 
 function numericCompare(a: string, b: string): number {
@@ -249,16 +252,16 @@ export default function SolutionReleasePanel({ classId }: { classId: string }) {
 
   return (
     <div>
-      <p style={{ color: C.dim, fontSize: 13, margin: '0 0 6px 0' }}>
+      <p style={{ color: C.dim, fontSize: 13, margin: '0 0 8px 0' }}>
         A student sees how a part is solved only after they have used all their tries <strong>and</strong> you release it
         here. Nothing is released until you say so. Pick <strong>Release now</strong>, or a date and time and it opens by
         itself then. A date always needs a time (it starts at 3:00 PM, school time). All times are school time.
       </p>
-      <p style={{ color: C.dim, fontSize: 13, margin: '0 0 14px 0' }}>
+      <p style={{ color: C.dim, fontSize: 13, margin: '0 0 16px 0' }}>
         Releasing a whole test releases each of its parts; a single part can still be held back or given its own time.
       </p>
       {error && <p style={{ color: 'var(--c-red)', fontSize: 13, marginBottom: 12 }}>{error}</p>}
-      {saving && <p style={{ color: C.dim, fontSize: 12, marginBottom: 12 }}>Saving…</p>}
+      {saving && <p style={{ color: C.dim, fontSize: 13, marginBottom: 12 }}>Saving…</p>}
       {modules.length === 0 && <p style={{ color: C.dim }}>No parts with a solution yet.</p>}
 
       {modules.map(({ moduleId, parts }) => {
@@ -275,8 +278,8 @@ export default function SolutionReleasePanel({ classId }: { classId: string }) {
             ? { text: 'Some parts released', color: C.warn }
             : { text: modLook.text, color: modLook.color };
         return (
-          <div key={moduleId} style={{ border: `1px solid ${C.border}`, borderRadius: 6, marginBottom: 12, padding: '10px 12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+          <div key={moduleId} style={{ border: `1px solid ${C.border}`, borderRadius: 6, marginBottom: 12, padding: '12px 12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
               <button
                 type="button"
                 onClick={() => toggle(moduleId)}
@@ -314,7 +317,7 @@ export default function SolutionReleasePanel({ classId }: { classId: string }) {
             </div>
 
             {isOpen && (
-              <div style={{ marginTop: 10, display: 'grid', gap: 8 }}>
+              <div style={{ marginTop: 12, display: 'grid', gap: 8 }}>
                 {parts.map((p) => {
                   const own = rowOf('lesson', p.lessonId);
                   const at = resolveReleaseAt(rows, { lessonId: p.lessonId, moduleId, unitId: null });
@@ -328,17 +331,17 @@ export default function SolutionReleasePanel({ classId }: { classId: string }) {
                       : { scope: 'lesson', scopeId: p.lessonId, date: null };
                   return (
                     <div key={p.lessonId} style={{ borderTop: `1px solid ${C.border}`, paddingTop: 8 }}>
-                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
                         <span style={{ fontSize: 13, fontWeight: 600 }}>{titleOf(p.lessonId)}</span>
                         <span style={{ fontSize: 12, color: look.color }}>
                           {look.text}
                           {inherited ? ' (from the whole test)' : ''}
                         </span>
-                        <span style={{ fontSize: 12, color: C.dim }}>
+                        <span style={{ fontSize: 13, color: C.dim }}>
                           {p.usedAll} of {data.enrolled} students have used all {p.cap} tries
                         </span>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 6 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
                         <button
                           type="button"
                           disabled={saving}

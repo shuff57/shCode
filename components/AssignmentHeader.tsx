@@ -1,10 +1,13 @@
 'use client';
 
 import type { Lesson } from '../lib/types';
+import type { ReactNode } from 'react';
 import { Send } from 'lucide-react';
 
 interface AssignmentHeaderProps {
   lesson: Lesson;
+  compactLab?: boolean;
+  attemptNote?: ReactNode;
   score: number;
   totalPossible: number;
   onSubmit: () => void;
@@ -32,6 +35,8 @@ interface AssignmentHeaderProps {
 
 export default function AssignmentHeader({
   lesson,
+  compactLab = false,
+  attemptNote,
   score,
   totalPossible,
   onSubmit,
@@ -56,7 +61,7 @@ export default function AssignmentHeader({
         />
       </div>
       <span className="score-text">
-        {score}/{totalPossible}{unitLabel ? ` ${unitLabel}` : ''}
+        {score}/{totalPossible}{unitLabel ? ` ${unitLabel}` : ' done'}
       </span>
     </div>
   );
@@ -69,17 +74,9 @@ export default function AssignmentHeader({
 
   const unmetHint =
     !submitted && !canSubmit && unmetTitles && unmetTitles.length > 0 ? (
-      // One requirement per line, never joined with commas: a title can hold a
-      // comma of its own ("Save function stores by key, ..."), and a joined
-      // line then reads as more items than the "/N" counter says there are.
-      <details className="assignment-unmet-hint">
-        <summary>Still needed ({unmetTitles.length}){unmetNote ? ` · ${unmetNote}` : ''}</summary>
-        <ul>
-          {unmetTitles.map((t, i) => (
-            <li key={i}>{t}</li>
-          ))}
-        </ul>
-      </details>
+      <div className="assignment-unmet-hint">
+        <span className="assignment-unmet-desktop">Still needed: </span>{unmetTitles.length}<span className="assignment-unmet-mobile"> still needed</span><span className="assignment-unmet-desktop"> {unmetTitles.length === 1 ? 'requirement' : 'requirements'} · press Check</span>
+      </div>
     ) : !submitted && !canSubmit && blockedNote ? (
       <div className="assignment-unmet-hint">{blockedNote}</div>
     ) : null;
@@ -96,16 +93,16 @@ export default function AssignmentHeader({
   ) : null;
 
   return (
-    <div className="assignment-header">
+    <div className={`assignment-header ${compactLab ? 'lab-assignment-header' : ''}`}>
       <div className="assignment-header-left">
         <h1>{lesson.title}</h1>
+        {lesson.description && <p style={{ margin: '8px 0 0', color: 'var(--c-fg)', fontSize: 15, lineHeight: 1.5, maxWidth: 680 }}>{lesson.description}</p>}
       </div>
-      <div className="assignment-header-center">
+      <div className="assignment-header-center" style={{ flexWrap: 'wrap', justifyContent: 'flex-start' }}>
+        <div className="assignment-quota">{attemptNote}</div>
         {scoreAlign === 'center' && scoreBlock}
         {statusBadge}
         {unmetHint}
-      </div>
-      <div className="assignment-header-right">
         {scoreAlign === 'right' && scoreBlock}
         {submitButton}
       </div>
