@@ -132,12 +132,20 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
       </div>
 
       {!hasMatches && (
-        <div className="text-center py-12 text-sm opacity-60">
+        <div className="text-center py-12 text-sm text-[#b1bada]">
           No lessons match <strong>&ldquo;{query}&rdquo;</strong>
         </div>
       )}
 
-      {nextLesson && <Link href={lessonHref(nextLesson)} style={{ display: 'block', maxWidth: 1120, margin: '0 auto 20px', padding: '16px 20px', border: '1px solid #8be9fd55', borderRadius: 8, background: '#8be9fd0a', color: '#f8f8f2', textDecoration: 'none' }}><span style={{ display: 'block', color: '#8be9fd', fontSize: 12, fontWeight: 700, marginBottom: 6 }}>{progress.states[nextLesson.id] === 'started' ? 'Continue' : 'Next up'} →</span>{nextLesson.title}</Link>}
+      {nextLesson && (
+        <div className="home-continue-card">
+          <div style={{ minWidth: 0 }}>
+            <span style={{ display: 'block', color: '#b1bada', fontSize: 13, marginBottom: 4 }}>{progress.states[nextLesson.id] === 'started' ? 'Continue learning' : 'Next up'}</span>
+            <span className="home-continue-title">{nextLesson.title}</span>
+          </div>
+          <Link href={lessonHref(nextLesson)} className="home-continue-action">{progress.states[nextLesson.id] === 'started' ? 'Continue →' : 'Start →'}</Link>
+        </div>
+      )}
       {Array.from(groups.entries()).map(([top, group]) => {
         const visibleModules = trimmed
           ? group.modules.filter((m) => matchingModuleIds?.has(m.id))
@@ -205,7 +213,7 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
                     <span className="module-open-affordance" aria-hidden="true">›</span></summary>
                     <div className="flex flex-col gap-3 p-3 border-t border-border bg-card">
                       {unitLessons.length === 0 ? (
-                        <div className="text-sm opacity-60 italic px-1">
+                        <div className="text-sm text-[#b1bada] italic px-1">
                           No lessons authored yet.
                         </div>
                       ) : (
@@ -214,7 +222,7 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
                       <Link
                         href={`/module/${u.id}`}
                         prefetch={false}
-                        className="text-sm underline opacity-70 hover:opacity-100 self-start"
+                        className="text-sm underline text-[#b1bada] hover:opacity-100 self-start"
                       >
                         → View full module page
                       </Link>

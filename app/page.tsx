@@ -95,7 +95,7 @@ export default async function HomePage() {
     <div className="p-4">
       <LessonSearchFilter units={units} lessons={lessons.map(forCards)} />
 
-      <footer className="flex items-center justify-between w-2/3 mx-auto mt-8 pt-4 border-t border-border text-sm opacity-70">
+      <footer className="flex items-center justify-between w-2/3 mx-auto mt-8 pt-4 border-t border-border text-sm text-[#b1bada]">
         <span>© {new Date().getFullYear()} shCode</span>
         <LegalLinks />
         <span>LHD™</span>

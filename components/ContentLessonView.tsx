@@ -160,7 +160,7 @@ export default function ContentLessonView({ lesson }: Props) {
         ]}
       />
       <main className="content-lesson-main" style={{ maxWidth: 1080, width: '100%', boxSizing: 'border-box', margin: '0 auto', padding: '18px 20px 24px', color: '#f8f8f2' }}>
-      <nav style={{ marginBottom: 5, fontSize: 13, color: '#8393c4' }}>
+      <nav style={{ marginBottom: 5, fontSize: 13, color: '#b1bada' }}>
         <Link href="/" style={{ color: '#8be9fd' }}>Home</Link>
         {lesson.unit ? (
           <>
@@ -175,8 +175,8 @@ export default function ContentLessonView({ lesson }: Props) {
       </nav>
 
       <div className="content-lesson-title" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px 10px', marginBottom: 5 }}>
-        <h1 style={{ margin: 0, fontSize: 27, lineHeight: 1.2 }}>{lesson.title}</h1>
-        {(preview === "video" || preview === "slides") && <span style={{ color: completionState.states[lesson.id] === "completed" ? "#50fa7b" : "#8393c4", fontSize: 12 }}>{completionState.states[lesson.id] === "completed" ? "Done ✓" : "Not done yet · Mark complete below"}</span>}
+        <h1 style={{ margin: 0, fontSize: 28, lineHeight: 1.2 }}>{lesson.title}</h1>
+        {(preview === "video" || preview === "slides") && <span style={{ color: completionState.states[lesson.id] === "completed" ? "#50fa7b" : "#b1bada", fontSize: 12 }}>{completionState.states[lesson.id] === "completed" ? "Done ✓" : "Not done yet · Mark complete below"}</span>}
         <span
           style={{
             display: 'inline-flex',
@@ -194,7 +194,7 @@ export default function ContentLessonView({ lesson }: Props) {
           <badge.Icon size={13} strokeWidth={2.25} />
           {badge.label}
         </span>
-        <span style={{ color: '#8393c4', fontSize: 13 }}>~{lesson.estimateMins ?? '?'} min</span>
+        <span style={{ color: '#b1bada', fontSize: 13 }}>~{lesson.estimateMins ?? '?'} min</span>
         {preview === 'slides' && slidesUrl && deckReady === true ? (
           <a href={slidesUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', background: '#50fa7b', color: '#282a36', fontWeight: 700, fontSize: 13, padding: '4px 10px', borderRadius: 6, textDecoration: 'none' }}>
             Open in new tab →
@@ -202,7 +202,7 @@ export default function ContentLessonView({ lesson }: Props) {
         ) : null}
       </div>
       {lesson.description && !meta.quiz ? (
-        <p style={{ color: '#8393c4', margin: '0 0 4px', fontSize: 14, lineHeight: 1.35 }}>{withInlineCode(lesson.description)}</p>
+        <p style={{ color: '#b1bada', margin: '0 0 4px', fontSize: 14, lineHeight: 1.35 }}>{withInlineCode(lesson.description)}</p>
       ) : null}
 
       {meta.videoUrl && meta.videoUrl.trim() ? (
@@ -241,7 +241,7 @@ export default function ContentLessonView({ lesson }: Props) {
             )}
           </div>
         ) : preview === 'video' ? (
-          <div style={{ marginTop: 16, padding: 20, background: '#282a36', borderRadius: 8, border: '1px dashed #555', color: '#aaa' }}>
+          <div style={{ marginTop: 16, padding: 20, background: '#282a36', borderRadius: 8, border: '1px dashed #555', color: '#b1bada' }}>
             <strong style={{ color: '#ff79c6' }}>No video URL set yet.</strong>
             <p style={{ margin: '8px 0 0', fontSize: 14 }}>
               {meta.videoFallback ?? "Teacher will paste a YouTube URL into this lesson's lesson.json (videoUrl field) when ready."}
@@ -266,20 +266,20 @@ export default function ContentLessonView({ lesson }: Props) {
                 allow="autoplay; clipboard-write; fullscreen"
                 style={{ width: '100%', height: '100%', border: 0, position: 'relative', zIndex: 1, opacity: deckLoaded ? 1 : 0 }}
               />
-              {!deckLoaded && <div role="status" style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', color: '#8393c4' }}>Loading slides…</div>}
+              {!deckLoaded && <div role="status" style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', color: '#b1bada' }}>Loading slides…</div>}
             </div>
             <nav aria-label="Slide navigation" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 10 }}>
-              <button className="btn-secondary btn-sm" disabled={!deckLoaded} onClick={() => navigateSlide('ArrowLeft')}>‹ Previous</button>
-              <span aria-live="polite" style={{ color: '#8393c4', fontSize: 13 }}>{slidePosition ? `Slide ${slidePosition.current} of ${slidePosition.total}` : 'Slides'}</span>
-              <button className="btn-secondary btn-sm" disabled={!deckLoaded} onClick={() => navigateSlide('ArrowRight')}>Next ›</button>
+              <button className="btn-secondary btn-sm" disabled={!deckLoaded || slidePosition?.current === 1} onClick={() => navigateSlide('ArrowLeft')}>‹ Previous</button>
+              <span aria-live="polite" style={{ color: '#b1bada', fontSize: 13 }}>{slidePosition ? `Slide ${slidePosition.current} of ${slidePosition.total}` : 'Slides'}</span>
+              <button className="btn-secondary btn-sm" disabled={!deckLoaded || (!!slidePosition && slidePosition.current >= slidePosition.total)} onClick={() => navigateSlide('ArrowRight')}>Next ›</button>
             </nav>
           </div>
         ) : slidesUrl && deckReady === null ? (
-          <div style={{ marginTop: 16, padding: 20, background: '#282a36', borderRadius: 8, border: '1px solid #44475a', color: '#8393c4' }}>
+          <div style={{ marginTop: 16, padding: 20, background: '#282a36', borderRadius: 8, border: '1px solid #44475a', color: '#b1bada' }}>
             Loading slides…
           </div>
         ) : (
-          <div style={{ marginTop: 16, padding: 20, background: '#282a36', borderRadius: 8, border: '1px dashed #555', color: '#aaa' }}>
+          <div style={{ marginTop: 16, padding: 20, background: '#282a36', borderRadius: 8, border: '1px dashed #555', color: '#b1bada' }}>
             <strong style={{ color: '#bd93f9' }}>These slides aren&apos;t published yet.</strong>
             <p style={{ margin: '8px 0 0', fontSize: 14, lineHeight: 1.55 }}>
               Nothing is missing on your end — your teacher hasn&apos;t built this deck yet. Everything
@@ -291,7 +291,7 @@ export default function ContentLessonView({ lesson }: Props) {
 
       {meta.externalLink ? (
         <p style={{ margin: '16px 0' }}>
-          <a href={meta.externalLink} target="_blank" rel="noopener noreferrer" style={{ color: '#8393c4', textDecoration: 'underline', fontSize: 14 }}>
+          <a href={meta.externalLink} target="_blank" rel="noopener noreferrer" style={{ color: '#b1bada', textDecoration: 'underline', fontSize: 14 }}>
             📖 {meta.externalLinkLabel ?? meta.externalLink}
           </a>
         </p>
@@ -299,7 +299,7 @@ export default function ContentLessonView({ lesson }: Props) {
 
       {bodyMd ? (
         <div className={[proseBody ? 'prose-copy' : '', lesson.type === 'example' ? 'compact-example' : '', preview === 'example' ? 'worked-example' : ''].filter(Boolean).join(' ') || undefined} style={{ marginTop: 12 }}>
-          {meta.quiz ? <details className="quiz-intro"><summary style={{ cursor: 'pointer', color: '#8393c4', fontSize: 13 }}>Review lesson instructions</summary><MarkdownWithLiveBlocks src={bodyMd} lessonId={lesson.id} /></details> : <MarkdownWithLiveBlocks src={bodyMd} lessonId={lesson.id} />}
+          {meta.quiz ? <details className="quiz-intro"><summary style={{ cursor: 'pointer', color: '#b1bada', fontSize: 13 }}>Review lesson instructions</summary><MarkdownWithLiveBlocks src={bodyMd} lessonId={lesson.id} /></details> : <MarkdownWithLiveBlocks src={bodyMd} lessonId={lesson.id} />}
         </div>
       ) : null}
 

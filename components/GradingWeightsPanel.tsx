@@ -20,7 +20,7 @@ interface WeightRow {
 
 const C = {
   border: '#44475a',
-  dim: '#8393c4',
+  dim: '#b1bada',
   text: '#f8f8f2',
   input: '#282a36',
   accent: '#8be9fd',
@@ -88,20 +88,21 @@ export default function GradingWeightsPanel({ classId }: { classId: string }) {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, marginBottom: 10 }}>
-        <h2 style={{ fontSize: 20, fontWeight: 600, margin: 0 }}>Grading weights</h2>
-        <span style={{ fontSize: 12, color: C.dim }}>Total <strong style={{ color: C.text }}>{total}</strong></span>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, marginBottom: 12 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Grading weights</h2>
+        <span style={{ fontSize: 13, color: C.dim }}>Total <strong style={{ color: C.text }}>{total}</strong></span>
       </div>
-      <p style={{ maxWidth: 720, margin: '0 0 12px', fontSize: 12, lineHeight: 1.5, color: C.dim }}>
+      <p style={{ maxWidth: 720, margin: '0 0 12px', fontSize: 13, lineHeight: 1.5, color: C.dim }}>
         Each share is its weight divided by the total.<br />
         Only categories with work count toward a student’s grade; empty categories drop out.
       </p>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '0 20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '0 24px' }}>
         {rows.map((r) => (
-          <div key={r.category} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 50px 76px 36px', alignItems: 'center', gap: 6, padding: '7px 0', borderBottom: `1px solid ${C.border}` }}>
+          <div key={r.category} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 50px 88px 48px', alignItems: 'center', gap: 8, padding: '8px 0', borderBottom: `1px solid ${C.border}` }}>
             <span style={{ flex: 1, fontSize: 13 }}>{CATEGORY_LABEL[r.category]}</span>
             <input
               type="number"
+              aria-label={`${CATEGORY_LABEL[r.category]} weight`}
               min={0}
               max={100}
               value={r.weight}
@@ -116,16 +117,16 @@ export default function GradingWeightsPanel({ classId }: { classId: string }) {
                 }
               }}
               style={{
-                width: 50, boxSizing: 'border-box',
+                width: 50, height: 32, boxSizing: 'border-box',
                 background: C.input,
                 color: C.text,
                 border: `1px solid ${C.border}`,
                 borderRadius: 4,
-                padding: '4px 6px',
+                padding: '4px 8px',
                 fontSize: 13,
               }}
             />
-            <span title="Effective share when all categories have work" style={{ fontSize: 12, color: C.dim, textAlign: 'right', whiteSpace: 'nowrap' }}>{total > 0 ? `${(r.weight / total * 100).toFixed(1)}% share` : '—'}</span>
+            <span title="Effective share when all categories have work" style={{ fontSize: 13, color: C.dim, textAlign: 'right', whiteSpace: 'nowrap' }}>{total > 0 ? `${(r.weight / total * 100).toFixed(1)}% share` : '—'}</span>
             {r.isDefault ? (
               <span />
             ) : (
@@ -134,13 +135,15 @@ export default function GradingWeightsPanel({ classId }: { classId: string }) {
                 onClick={() => write(r.category, null)}
                 style={{
                   background: 'none',
-                  border: 'none',
+                  border: `1px solid ${C.border}`,
+                  borderRadius: 4,
+                  height: 32,
                   color: C.accent,
                   cursor: 'pointer',
-                  fontSize: 12,
+                  fontSize: 13,
                   padding: 0,
-                  width: 36,
-                  textAlign: 'left',
+                  width: 48,
+                  textAlign: 'center',
                 }}
               >
                 Reset
@@ -149,8 +152,8 @@ export default function GradingWeightsPanel({ classId }: { classId: string }) {
           </div>
         ))}
       </div>
-      <div role="status" style={{ fontSize: 12, color: C.dim, marginTop: 10 }}>{saving ? 'Saving…' : 'Saves automatically on blur'}</div>
-      {error && <div style={{ fontSize: 12, color: '#ff5555', marginTop: 4 }}>{error}</div>}
+      <div role="status" style={{ fontSize: 13, color: C.dim, marginTop: 12 }}>{saving ? 'Saving…' : 'Saves automatically on blur'}</div>
+      {error && <div style={{ fontSize: 13, color: '#ff5555', marginTop: 4 }}>{error}</div>}
     </div>
   );
 }

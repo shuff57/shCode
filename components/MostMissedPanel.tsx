@@ -34,7 +34,7 @@ interface Payload {
   truncated?: boolean;
 }
 
-const MUTED = '#8393c4';
+const MUTED = '#b1bada';
 const BORDER = '#44475a';
 
 const box: React.CSSProperties = { minWidth: 0, overflowWrap: 'anywhere' };
@@ -123,7 +123,7 @@ export default function MostMissedPanel({ classId, onOpenStudent }: { classId: s
             <p style={{ color: MUTED, margin: 0 }}>Nothing yet: this fills in as students run labs.</p>
           )}
           {!loading && data && data.topMissed.length > 0 && (
-            <ol style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: 10 }}>
+            <ol style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: 12 }}>
               {data.topMissed.map((t) => {
                 const key = `${t.lessonId}\u0000${t.reqId}`;
                 const isOpen = expanded.has(key);
@@ -131,7 +131,7 @@ export default function MostMissedPanel({ classId, onOpenStudent }: { classId: s
                 return (
                   <li key={key} style={{ border: `1px solid ${BORDER}`, borderRadius: 8, padding: 12, ...box }}>
                     <div style={{ color: MUTED, fontSize: 13, ...box }}>{lessonTitle[t.lessonId] ?? t.lessonId}</div>
-                    <div style={{ color: '#f8f8f2', fontWeight: 600, margin: '2px 0 6px', ...box }}>{reqTitle[key] ?? t.reqId}</div>
+                    <div style={{ color: '#f8f8f2', fontWeight: 600, margin: '4px 0 8px', ...box }}>{reqTitle[key] ?? t.reqId}</div>
                     <div style={{ color: '#f8f8f2', fontSize: 14, ...box }}>
                       {plural(t.studentsFailed, 'student', 'students')} stumbled, {plural(t.totalFails, 'miss', 'misses')} in all
                       {t.studentsNotPast > 0 ? `, ${t.studentsNotPast} still failing` : ', all have passed it since'}.
@@ -145,7 +145,7 @@ export default function MostMissedPanel({ classId, onOpenStudent }: { classId: s
                       {isOpen ? 'Hide students' : 'Show students'}
                     </button>
                     {isOpen && (
-                      <ul style={{ listStyle: 'none', margin: '8px 0 0', padding: 0, display: 'grid', gap: 6 }}>
+                      <ul style={{ listStyle: 'none', margin: '8px 0 0', padding: 0, display: 'grid', gap: 8 }}>
                         {students.map((r) => (
                           <li key={r.studentEmail} style={{ display: 'flex', flexWrap: 'wrap', gap: '2px 12px', fontSize: 14, ...box }}>
                             {onOpenStudent ? (

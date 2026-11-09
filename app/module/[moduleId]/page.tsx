@@ -31,21 +31,21 @@ export default async function ModulePage({
       className="text-text"
       style={{ width: '100%', minWidth: 0, boxSizing: 'border-box', maxWidth: 960, margin: '0 auto', padding: '24px 20px 48px' }}
     >
-      <nav style={{ marginBottom: 16, fontSize: 13, opacity: 0.6 }}>
+      <nav style={{ marginBottom: 16, fontSize: 13, color: '#b1bada' }}>
         <Link href="/" style={{ color: 'var(--brand)' }}>Home</Link>
         <span style={{ margin: '0 8px' }}>›</span>
         <span>Module {summary.id}</span>
       </nav>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}><h1 style={{ margin: 0, fontSize: 30, lineHeight: 1.2, fontWeight: 750 }}>Module {summary.id} — {summary.title}</h1><UnitProgressBadge lessons={lessons.map(l => ({ id: l.id, title: l.displayTitle, type: l.type }))} /></div>
-      <p style={{ color: '#8393c4', fontSize: 12, marginTop: 0, marginBottom: 16, whiteSpace: 'nowrap' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}><h1 style={{ margin: 0, fontSize: 28, lineHeight: 1.2, fontWeight: 700 }}>Module {summary.id} — {summary.title}</h1><UnitProgressBadge lessons={lessons.map(l => ({ id: l.id, title: l.displayTitle, type: l.type }))} /></div>
+      <p style={{ color: '#b1bada', fontSize: 13, marginTop: 0, marginBottom: 16, whiteSpace: 'normal' }}>
         Quarter {summary.quarter ?? '?'} · Weeks {summary.weeks?.join('–') ?? '?'} · {summary.environment ?? '?'}
       </p>
 
       <section style={{ marginBottom: 32 }}>
         <h2
           className="border-border"
-          style={{ borderBottom: '1px solid', paddingBottom: 10, fontSize: 15, fontWeight: 600, color: '#8393c4' }}
+          style={{ borderBottom: '1px solid', paddingBottom: 10, fontSize: 18, fontWeight: 700, color: '#f8f8f2' }}
         >
           Lessons in this module
         </h2>

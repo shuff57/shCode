@@ -201,7 +201,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
       {/* Dropped below 720px (see globals.css): at phone width this and the
           segments were competing for the same ~70px, and the tally on the
           right already says how many lessons the module has. */}
-      <span className="lesson-progress-count" style={{ color: '#8393c4', minWidth: 96 }}>
+      <span className="lesson-progress-count" style={{ color: '#b1bada', minWidth: 96 }}>
         {idx >= 0 ? `Lesson ${idx + 1} of ${lessons.length}` : `${lessons.length} lessons`}
       </span>
       {/* Segments, not dots. A dot is a fixed 14px, so 31 of them plus the
@@ -401,11 +401,11 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
           )}
       </div>
       {snap.loaded && !snap.authed ? (
-        <span style={{ color: '#6272a4' }}>
+        <span style={{ color: '#b1bada' }}>
           <span style={{ color: '#8be9fd' }}>Sign in</span> to save progress
         </span>
       ) : (
-        <span style={{ color: '#6272a4', minWidth: 68, textAlign: 'right' }}>
+        <span style={{ color: '#b1bada', minWidth: 68, textAlign: 'right' }}>
           {done}/{lessons.length} · {pct}%
         </span>
       )}

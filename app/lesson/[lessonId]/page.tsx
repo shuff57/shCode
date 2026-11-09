@@ -56,7 +56,7 @@ export default async function LessonPage({
         moduleId={moduleId}
         unitId={lesson.category ?? null}
       >
-        {mod && <div style={{ padding: '0 16px', color: '#8393c4', fontSize: 12 }}>
+        {mod && <div style={{ padding: '0 16px', color: '#b1bada', fontSize: 13 }}>
           Module {moduleId} · Lesson {mod.lessons.findIndex((l) => l.id === lesson.id) + 1} of {mod.lessons.length}
 
         </div>}

@@ -31,7 +31,7 @@ export default function GradeQuotaNote({ compact = false }: { compact?: boolean 
     <div
       role="status"
       title={compact ? "Grades used today. Practice runs and retries count. The count resets at midnight UTC (late afternoon here)." : undefined}
-      style={{ fontSize: 12, color: low ? '#ffb86c' : '#8393c4', margin: compact ? 0 : '0 0 8px', whiteSpace: 'normal', overflowWrap: 'anywhere', maxWidth: '100%' }}
+      style={{ fontSize: 13, color: low ? '#ffb86c' : '#b1bada', margin: compact ? 0 : '0 0 8px', whiteSpace: 'normal', overflowWrap: 'anywhere', maxWidth: '100%' }}
     >
       {compact ? `Grades ${quota.used}/${quota.limit}` : `${quota.used} of ${quota.limit} grades used today`}
       {quota.remaining === 0

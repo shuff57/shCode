@@ -113,13 +113,14 @@ export default function HeaderLessonNav() {
 
   return (
     <div
+      className="header-lesson-nav"
       style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: 12,
         minWidth: 0,
-        padding: '6px 16px',
+        padding: '2px 16px',
         borderTop: '1px solid #1f2937',
         color: '#cbd5e1',
         fontSize: '0.85rem',
@@ -127,7 +128,7 @@ export default function HeaderLessonNav() {
     >
       {prev ? (
         <a className="hdr-lesson-link" href={lessonHref(prev)}>
-          <span style={{ opacity: 0.7 }}>←</span>
+          <span style={{ color: '#b1bada' }}>←</span>
           <span style={titleStyle}><span className="lesson-nav-full">{prev.title}</span><span className="lesson-nav-short">{shortLabel(prev)}</span></span>
         </a>
       ) : (
@@ -140,7 +141,7 @@ export default function HeaderLessonNav() {
             title="Get a green on this lesson before moving forward"
             aria-disabled="true"
             style={{
-              opacity: 0.45,
+              color: '#b1bada',
               cursor: 'not-allowed',
               display: 'inline-flex',
               alignItems: 'center',
@@ -148,7 +149,7 @@ export default function HeaderLessonNav() {
             }}
           >
             <span style={titleStyle}><span className="lesson-nav-full">{next.title}</span><span className="lesson-nav-short">{shortLabel(next)}</span></span>
-            <span style={{ opacity: 0.7 }} aria-hidden="true">🔒</span>
+            <span style={{ color: '#b1bada' }} aria-hidden="true">🔒</span>
           </span>
         ) : (
           <a
@@ -156,7 +157,7 @@ export default function HeaderLessonNav() {
             href={lessonHref(next)}
           >
             <span style={titleStyle}><span className="lesson-nav-full">{next.title}</span><span className="lesson-nav-short">{shortLabel(next)}</span></span>
-            <span style={{ opacity: 0.7 }}>→</span>
+            <span style={{ color: '#b1bada' }}>→</span>
           </a>
         )
       ) : (

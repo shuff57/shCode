@@ -23,7 +23,7 @@ const S = {
     padding: 24,
   } as React.CSSProperties,
 
-  h1: { fontSize: 22, fontWeight: 700, marginBottom: 20, color: '#f8f8f2' } as React.CSSProperties,
+  h1: { fontSize: 28, fontWeight: 700, marginBottom: 20, color: '#f8f8f2' } as React.CSSProperties,
 
   label: { display: 'block', fontSize: 13, marginBottom: 4, color: '#f8f8f2' } as React.CSSProperties,
 
@@ -83,7 +83,7 @@ export default function AccountPage() {
   if (!loaded) {
     return (
       <div style={S.page}>
-        <div style={{ maxWidth: 440, margin: '0 auto', color: '#6272a4' }}>Loading…</div>
+        <div style={{ maxWidth: 440, margin: '0 auto', color: '#b1bada' }}>Loading…</div>
       </div>
     );
   }
@@ -105,16 +105,16 @@ export default function AccountPage() {
       <div style={S.card}>
         <Link href="/" style={{ color: '#8be9fd', fontSize: 13, textDecoration: 'none' }}>← Back to course</Link>
         <h1 style={S.h1}>My account</h1>
-        <p style={{ color: '#8393c4', marginTop: -14, marginBottom: 22 }}>Manage the name shown to your class.</p>
+        <p style={{ color: '#b1bada', marginTop: -14, marginBottom: 22 }}>Manage the name shown to your class.</p>
 
-        <h2 style={{ color: '#bd93f9', fontSize: 14, margin: '0 0 10px' }}>Profile</h2>
+        <h2 style={{ color: '#f8f8f2', fontSize: 18, margin: '0 0 12px' }}>Profile</h2>
         <div style={{ marginBottom: 22 }}>
           <div style={S.label}>Email</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#b1bada', fontSize: 14, overflowWrap: 'anywhere' }}>
             <LockKeyhole size={14} aria-hidden="true" style={{ flexShrink: 0 }} />
             <span>{user.email}</span>
           </div>
-          <p style={{ margin: '6px 0 0', color: '#8393c4', fontSize: 12, lineHeight: 1.5 }}>
+          <p style={{ margin: '6px 0 0', color: '#b1bada', fontSize: 13, lineHeight: 1.5 }}>
             Your sign-in email can't be changed here.
           </p>
         </div>

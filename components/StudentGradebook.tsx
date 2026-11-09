@@ -211,16 +211,16 @@ export default function StudentGradebook({ lessons }: Props) {
           <div key={g.classId} style={{ marginBottom: 12 }}>
             <div style={{ display: 'flex', alignItems: 'stretch', gap: 16, flexWrap: 'wrap' }}>
               <div style={{ minWidth: 140, paddingRight: 20, borderRight: '1px solid #44475a' }}>
-                <div style={{ color: '#8393c4', fontSize: 13, marginBottom: 4 }}>Grade so far</div>
+                <div style={{ color: '#b1bada', fontSize: 13, marginBottom: 4 }}>Grade so far</div>
                 <strong style={{ fontSize: 28 }}>{g.percent}%</strong>
               </div>
               {g.missingCount > 0 && <a href="#missing-late-filter" style={{ color: '#f8f8f2', textDecoration: 'none' }}>
-                <div style={{ color: '#8393c4', fontSize: 13, marginBottom: 4 }}>Past due</div>
+                <div style={{ color: '#b1bada', fontSize: 13, marginBottom: 4 }}>Past due</div>
                 <strong style={{ fontSize: 28 }}>{g.missingCount}</strong><span style={{ fontSize: 13 }}> graded lessons</span>
               </a>}
             </div>
-            <div style={{ color: '#8393c4', fontSize: 12, marginTop: 8 }}>{grades.length > 1 ? g.className : 'In your class'}</div>
-            <div style={{ color: '#8393c4', fontSize: 14, marginTop: 6 }}>
+            <div style={{ color: '#b1bada', fontSize: 13, marginTop: 8 }}>{grades.length > 1 ? g.className : 'In your class'}</div>
+            <div style={{ color: '#b1bada', fontSize: 14, marginTop: 6 }}>
               Unfinished work past its due date counts as zero until you finish it; work not due yet is excluded.
             </div>
           </div>
@@ -238,7 +238,7 @@ export default function StudentGradebook({ lessons }: Props) {
       </div>
     )}
     <div style={cardStyle}>
-      <div style={toolbarStyle}>
+      <div className="student-progress-toolbar" style={toolbarStyle}>
         {/* marginRight:auto, not flex:1 — flex:1 lets the heading shrink to
             nothing on a phone and its text then overlaps the filter pills
             instead of pushing them onto the next line. */}
@@ -323,29 +323,30 @@ export default function StudentGradebook({ lessons }: Props) {
                             type="button"
                             onClick={() => setExpanded((p) => ({ ...p, [lesson.id]: !open }))}
                             aria-expanded={open}
+                            aria-label={`${open ? 'Hide' : 'Show'} feedback for ${lesson.title}`}
+                            title={`${open ? 'Hide' : 'Show'} feedback`}
                             style={toggleStyle}
                           >
                             {open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                            <span>{lesson.title}</span>
                             <MessageSquare size={13} style={{ color: '#bd93f9', flexShrink: 0 }} />
                           </button>
                         ) : (
-                          <a href={lessonHref(lesson)} style={{ fontWeight: 500, color: 'inherit' }}>
+                          <a href={lessonHref(lesson)} className="progress-assignment-link" style={{ fontWeight: 500, color: '#8be9fd' }}>
                             {lesson.title}
                           </a>
                         )}
                         {hasFeedback && (
-                          <a
+                          <a className="progress-assignment-link"
                             href={lessonHref(lesson)}
                             aria-label={`Open ${lesson.title}`}
                             title="Open lesson"
-                            style={{ marginLeft: 6, color: '#8393c4', fontSize: 12 }}
+                            style={{ marginLeft: 8, color: '#8be9fd', fontSize: 14 }}
                           >
-                            Open
+                            {lesson.title}
                           </a>
                         )}
                         {practice && (
-                          <span style={{ ...chipStyle, borderColor: 'transparent', color: '#8393c4' }} title="This lesson is practice. It does not count toward your grade.">
+                          <span style={{ ...chipStyle, borderColor: 'transparent', color: '#b1bada' }} title="This lesson is practice. It does not count toward your grade.">
                             <span className="gb-practice-full">{practice.tag}</span>
                             <span className="gb-practice-short" aria-hidden="true">Practice</span>
                           </span>
@@ -371,13 +372,13 @@ export default function StudentGradebook({ lessons }: Props) {
                       <td style={scoreCellStyle}>
                         {bestText ?? score ?? '\u2014'}
                         {t && t.used > 0 && !tried && (
-                          <div style={{ opacity: 0.55, fontSize: 11 }}>
+                          <div style={{ color: '#b1bada', fontSize: 13 }}>
                             {t.used} of {t.cap} {t.cap === 1 ? 'try' : 'tries'} used
                           </div>
                         )}
                         {cell.teacherReviewedAt != null && (
                           <div
-                            style={{ color: '#bd93f9', fontSize: 11 }}
+                            style={{ color: '#bd93f9', fontSize: 12 }}
                             title="Your teacher reviewed this work and may have changed the score"
                           >
                             teacher-adjusted
@@ -442,7 +443,7 @@ const toolbarStyle: React.CSSProperties = {
   marginBottom: 14,
 };
 
-const mutedStyle: React.CSSProperties = { opacity: 0.5, fontSize: 14 };
+const mutedStyle: React.CSSProperties = { color: '#b1bada', fontSize: 14 };
 
 // `body` is display:flex in globals.css, so /progress's container is a flex
 // item with min-width:auto — it refuses to shrink below its content's
@@ -467,7 +468,7 @@ const tableStyle: React.CSSProperties = {
 
 const theadRowStyle: React.CSSProperties = {
   textAlign: 'left',
-  opacity: 0.55,
+  color: '#b1bada',
   fontSize: 12,
   textTransform: 'uppercase',
   letterSpacing: 0.4,
@@ -475,7 +476,7 @@ const theadRowStyle: React.CSSProperties = {
 
 const rowStyle: React.CSSProperties = { borderTop: '1px solid rgba(68,71,90,0.4)' };
 
-const thStyle: React.CSSProperties = { padding: '4px 10px 8px 0', fontWeight: 600 };
+const thStyle: React.CSSProperties = { padding: '4px 10px 8px 0', fontSize: 13, fontWeight: 700, color: '#f8f8f2' };
 
 const tdStyle: React.CSSProperties = { padding: '6px 10px 6px 0', verticalAlign: 'top' };
 
@@ -497,11 +498,13 @@ const badgeStyle: React.CSSProperties = {
 };
 
 const toggleStyle: React.CSSProperties = {
-  display: 'flex',
+  display: 'inline-flex',
   alignItems: 'center',
-  gap: 6,
-  background: 'none',
-  border: 'none',
+  gap: 4,
+  background: '#282a36',
+  border: '1px solid #44475a',
+  borderRadius: 4,
+  minHeight: 28,
   color: 'inherit',
   font: 'inherit',
   fontWeight: 500,
@@ -523,7 +526,7 @@ const feedbackHeadStyle: React.CSSProperties = {
   alignItems: 'center',
   gap: 6,
   fontSize: 12,
-  opacity: 0.7,
+  color: '#b1bada',
   marginBottom: 6,
 };
 
@@ -533,12 +536,12 @@ const chipStyle: React.CSSProperties = {
   borderRadius: 10,
   border: '1px solid #6272a4',
   color: '#a9b7e0',
-  fontSize: 11,
+  fontSize: 12,
   whiteSpace: 'nowrap',
 };
 
 const legendStyle: React.CSSProperties = {
-  opacity: 0.5,
+  color: '#b1bada',
   fontSize: 12,
   marginTop: 14,
   marginBottom: 0,

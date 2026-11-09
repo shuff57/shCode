@@ -60,7 +60,7 @@ export default function ModuleLessonsList({
   const now = useNow();
 
   if (lessons.length === 0) {
-    return <p style={{ opacity: 0.6 }}>No lessons yet.</p>;
+    return <p style={{ color: '#b1bada' }}>No lessons yet.</p>;
   }
 
   const totalMins = lessons.reduce((sum, l) => sum + (l.estimateMins ?? 0), 0);
@@ -108,7 +108,7 @@ export default function ModuleLessonsList({
     <>
       {(durationLabel || moduleDue || teacherDue.canEdit) && (
         <p style={{ fontSize: 13, margin: '0 0 10px 0', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-          {durationLabel && <span style={{ opacity: 0.5 }}>Estimated: {durationLabel}</span>}
+          {durationLabel && <span style={{ color: '#b1bada' }}>Estimated: {durationLabel}</span>}
           {moduleDue && (
             <ModuleDueBadge
               kind={moduleDue.kind}
@@ -166,7 +166,7 @@ export default function ModuleLessonsList({
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 6,
-                fontSize: 11,
+                fontSize: 12,
                 color: badge.color,
                 background: badge.color + '22',
                 border: '1px solid ' + badge.color + '55',
@@ -180,12 +180,13 @@ export default function ModuleLessonsList({
               <badge.Icon size={12} strokeWidth={2.25} />
               {badge.label}
             </span>
-            <span className="mod-row-title" style={{ fontWeight: 500 }}><span className="mod-row-num" style={{ color: '#8393c4', fontFamily: 'monospace', fontVariantNumeric: 'tabular-nums' }}>{l.numberedId}</span>{' '}<span>{l.displayTitle}</span></span>
+            <span className="mod-row-title" style={{ fontWeight: 500 }}><span className="mod-row-num" style={{ color: '#b1bada', fontFamily: 'monospace', fontVariantNumeric: 'tabular-nums' }}>{l.numberedId}</span>{' '}<span>{l.displayTitle}</span></span>
             <span className="mod-row-meta">
+            <span className="mod-row-state">
             {locked ? (
               <span
                 style={{
-                  fontSize: 11,
+                  fontSize: 12,
                   color: 'var(--muted-fg, #94a3b8)',
                   background: 'rgba(148,163,184,0.15)',
                   border: '1px solid rgba(148,163,184,0.35)',
@@ -207,7 +208,7 @@ export default function ModuleLessonsList({
             ) : stateLabel ? (
               <span
                 style={{
-                  fontSize: 11,
+                  fontSize: 12,
                   color: stripeColor,
                   background: stripeColor + '22',
                   border: '1px solid ' + stripeColor + '55',
@@ -221,6 +222,7 @@ export default function ModuleLessonsList({
                 {stateLabel}
               </span>
             ) : null}
+            </span>
             <DueBadge
               dueAt={lessonDue?.dueAt ?? null}
               completed={lessonState === 'completed'}
@@ -235,7 +237,7 @@ export default function ModuleLessonsList({
               ambiguous={availability.ambiguous}
             />
             {l.estimateMins ? (
-              <span style={{ opacity: 0.5, fontSize: 12 }}>~{l.estimateMins} min</span>
+              <span style={{ color: '#b1bada', fontSize: 13 }}>~{l.estimateMins} min</span>
             ) : null}
             <DueDateChip
               scope="lesson"
@@ -264,6 +266,7 @@ export default function ModuleLessonsList({
               </>
             )}
             </span>
+            {!locked && <span className="mod-row-chevron" aria-hidden="true">›</span>}
           </>
         );
 
@@ -288,7 +291,7 @@ export default function ModuleLessonsList({
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
                 <span
                   style={{
-                    fontSize: 11,
+                    fontSize: 12,
                     fontWeight: 700,
                     letterSpacing: '0.08em',
                     textTransform: 'uppercase',
@@ -298,12 +301,12 @@ export default function ModuleLessonsList({
                   Lesson {heading.index} of {groups?.length}
                 </span>
                 <span style={{ fontWeight: 650, fontSize: 15 }}>{heading.group.title}</span>
-                <span style={{ fontSize: 12, color: '#8393c4' }}>
+                <span style={{ fontSize: 13, color: '#b1bada' }}>
                   {heading.group.screens.length} screen{heading.group.screens.length === 1 ? '' : 's'}
                   {minutes > 0 ? ` · ~${minutes} min` : ''}
                 </span>
               </div>
-              <p style={{ margin: '4px 0 0', fontSize: 13, color: '#8393c4', lineHeight: 1.45 }}>
+              <p style={{ margin: '4px 0 0', fontSize: 13, color: '#b1bada', lineHeight: 1.45 }}>
                 {heading.group.objective}
               </p>
             </li>

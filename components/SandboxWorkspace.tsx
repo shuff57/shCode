@@ -789,8 +789,8 @@ export default function SandboxWorkspace() {
           margin-right: 28px;
         }
         .sandbox-header { display: flex; align-items: baseline; gap: 12px; flex-shrink: 0; }
-        .sandbox-title { margin: 0; font-size: 1.4rem; color: var(--text); }
-        .sandbox-subtitle { color: #6272a4; font-size: 0.85rem; }
+        .sandbox-title { margin: 0; font-size: 28px; color: var(--text); }
+        .sandbox-subtitle { color: #b1bada; font-size: 0.85rem; }
         .sandbox-toolbar { margin-bottom: 0; flex-shrink: 0; }
         .sandbox-modes {
           display: inline-flex;
@@ -802,7 +802,7 @@ export default function SandboxWorkspace() {
         .sandbox-mode {
           padding: 6px 13px;
           background: transparent;
-          color: #6272a4;
+          color: #b1bada;
           border: 0;
           border-right: 1px solid #44475a;
           cursor: pointer;
@@ -810,7 +810,7 @@ export default function SandboxWorkspace() {
         }
         .sandbox-mode:last-child { border-right: 0; }
         .sandbox-mode:hover { color: var(--text); }
-        .sandbox-mode.is-active { background: #44475a; color: #f8f8f2; }
+        .sandbox-mode.is-active { background: #5a4275; color: #f8f8f2; }
         .sandbox-mode:disabled { opacity: 0.35; cursor: not-allowed; }
         .sandbox-lock { color: #ffb86c; font-size: 12px; margin-right: 10px; }
         .sandbox-split.editor-preview-container {

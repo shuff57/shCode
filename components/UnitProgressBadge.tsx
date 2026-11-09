@@ -99,7 +99,7 @@ function breakdownRows(
     // a completed test is sat, not failed for awaiting a mark.
     if (state === 'completed') return { ...base, detail: 'submitted', pct: 100, color: '#50fa7b' };
     if (state === 'started') return { ...base, detail: 'in progress', pct: null, color: '#f1fa8c' };
-    return { ...base, detail: 'not started', pct: null, color: '#8393c4' };
+    return { ...base, detail: 'not started', pct: null, color: '#b1bada' };
   }
 
   for (const category of GRADE_CATEGORIES) {
@@ -126,7 +126,7 @@ function breakdownRows(
       key: 'ungraded',
       text: `Readings and examples — not graded (${done}/${uncategorized.length} done)`,
       pct: null,
-      color: '#8393c4',
+      color: '#b1bada',
       header: true,
     });
     for (const l of uncategorized) rows.push(lessonRow(l));
@@ -178,7 +178,7 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
   if (!snap.loaded) return null;
   if (!snap.authed) {
     return (
-      <span style={{ fontSize: 12, color: '#8393c4', whiteSpace: 'nowrap' }}>
+      <span style={{ fontSize: 13, color: '#b1bada', whiteSpace: 'nowrap' }}>
         <span style={{ color: '#8be9fd' }}>Sign in</span> to track
       </span>
     );
@@ -315,7 +315,7 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
                 <span style={{ fontWeight: 700, fontSize: 16 }}>
                   {label ? `${label}: ` : ''}{pct}% of grade
                 </span>
-                <span style={{ opacity: 0.6 }}>
+                <span style={{ color: '#b1bada' }}>
                   ({done}/{total} complete{started ? `, ${started} in progress` : ''})
                 </span>
                 <button
@@ -326,7 +326,7 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
                     marginLeft: 'auto',
                     background: 'none',
                     border: 'none',
-                    color: '#8393c4',
+                    color: '#b1bada',
                     cursor: 'pointer',
                     fontSize: 20,
                     lineHeight: 1,
@@ -380,7 +380,7 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
                     >
                       {r.text}
                     </span>
-                    {r.detail && <span style={{ color: '#8393c4', flexShrink: 0 }}>{r.detail}</span>}
+                    {r.detail && <span style={{ color: '#b1bada', flexShrink: 0 }}>{r.detail}</span>}
                     {r.pct != null && (
                       <span style={{ color: r.color, fontWeight: 600, flexShrink: 0, width: 34, textAlign: 'right' }}>
                         {r.pct}%

@@ -94,7 +94,7 @@ export function BulkEnrollmentForm({ classId, onDone }: Props) {
     >
       <label
         htmlFor="bulk-enroll-textarea"
-        style={{ color: '#f8f8f2', fontWeight: 600, fontSize: '0.9rem' }}
+        style={{ color: '#f8f8f2', fontWeight: 600, fontSize: 14 }}
       >
         Bulk Enroll Students
       </label>
@@ -112,8 +112,8 @@ export function BulkEnrollmentForm({ classId, onDone }: Props) {
           color: '#f8f8f2',
           border: '1px solid #44475a',
           borderRadius: 4,
-          padding: '10px 12px',
-          fontSize: '0.85rem',
+          padding: '12px 12px',
+          fontSize: 14,
           fontFamily: 'Courier, monospace',
           resize: 'vertical',
           boxSizing: 'border-box',
@@ -131,7 +131,7 @@ export function BulkEnrollmentForm({ classId, onDone }: Props) {
           borderRadius: 4,
           padding: '8px 20px',
           fontWeight: 700,
-          fontSize: '0.88rem',
+          fontSize: 14,
           cursor: loading ? 'not-allowed' : 'pointer',
           opacity: loading ? 0.6 : 1,
         }}
@@ -140,7 +140,7 @@ export function BulkEnrollmentForm({ classId, onDone }: Props) {
       </button>
 
       {error && (
-        <div style={{ color: '#ff5555', fontSize: '0.85rem' }}>{error}</div>
+        <div style={{ color: '#ff5555', fontSize: 14 }}>{error}</div>
       )}
 
       {result && (
@@ -153,7 +153,7 @@ export function BulkEnrollmentForm({ classId, onDone }: Props) {
             display: 'flex',
             flexDirection: 'column',
             gap: 4,
-            fontSize: '0.85rem',
+            fontSize: 14,
             color: '#f8f8f2',
           }}
         >

@@ -1227,7 +1227,7 @@ export default function LessonWorkspace({
             color: '#50fa7b',
             content:
               requirements.length === 0 ? (
-                <p style={{ color: '#6272a4' }}>No graded items for this lesson.</p>
+                <p style={{ color: '#b1bada' }}>No graded items for this lesson.</p>
               ) : (
                 <RequirementsSection requirements={requirements} />
               ),
@@ -1312,7 +1312,7 @@ export default function LessonWorkspace({
       {lesson.steps.length > 0 && (
         (isConsoleMode || isMoshionMode) ? <LabTaskCard lesson={lesson} /> : (
           <details className="lab-task-strip" style={{ padding: '8px 12px', margin: '4px 0 8px', border: '1px solid #44475a', borderRadius: 6, background: '#282a36' }}>
-            <summary style={{ cursor: 'pointer', fontSize: 13, color: '#8393c4' }}><strong style={{ color: '#8be9fd' }}>Your task</strong> · {lesson.steps[0].title} <span className="task-disclosure">· Show all steps</span></summary>
+            <summary style={{ cursor: 'pointer', fontSize: 13, color: '#b1bada' }}><strong style={{ color: '#8be9fd' }}>Your task</strong> · {lesson.steps[0].title} <span className="task-disclosure">· Show all steps</span></summary>
             <LessonSteps lesson={lesson} />
           </details>
         )
@@ -1387,7 +1387,7 @@ export default function LessonWorkspace({
                     padding: '6px 14px',
                     borderRadius: 4,
                     background: 'transparent',
-                    color: '#8393c4',
+                    color: '#b1bada',
                     border: '1px solid #44475a',
                     cursor: 'pointer',
                     fontSize: 13,
@@ -1546,7 +1546,7 @@ export default function LessonWorkspace({
             // The AI's read of the steps, directly under the Grade button and
             // above the textarea it graded.
             <div className={!aiCheckNote ? 'ai-check-help' : undefined} style={{ marginBottom: 6 }}>
-              <div role="status" aria-live="polite" style={{ fontSize: 12, color: '#8393c4' }}>
+              <div role="status" aria-live="polite" style={{ fontSize: 13, color: '#b1bada' }}>
                 {aiCheckNote
                   ? aiNoteForRun(aiCheckNote, { allGreen: allRequirementsPassed, runErrored: !!runtimeError })
                   : isTextMode
@@ -1556,7 +1556,7 @@ export default function LessonWorkspace({
                       : 'Run to preview · Check to mark Quest · Submit when green.'}
               </div>
               {aiCheckNote?.kind === 'ok' && aiCheckNote.hints && aiCheckNote.hints.length > 0 && (
-                <ul style={{ margin: '4px 0 0', paddingLeft: 20, fontSize: 14, color: '#8393c4' }}>
+                <ul style={{ margin: '4px 0 0', paddingLeft: 20, fontSize: 14, color: '#b1bada' }}>
                   {aiCheckNote.hints.map((h, i) => (
                     <li key={i}>{h}</li>
                   ))}

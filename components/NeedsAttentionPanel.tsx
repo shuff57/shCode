@@ -41,13 +41,13 @@ const sectionStyle: React.CSSProperties = {
 
 const summaryStyle: React.CSSProperties = {
   cursor: 'pointer',
-  padding: '6px 10px',
+  padding: '8px 12px',
   background: '#282a36',
   border: '1px solid #44475a',
   borderRadius: 16,
   color: '#f8f8f2',
   fontWeight: 600,
-  fontSize: '0.88rem',
+  fontSize: 14,
   userSelect: 'none',
 };
 
@@ -65,7 +65,7 @@ const itemStyle: React.CSSProperties = {
   background: '#1e1f29',
   border: '1px solid #44475a',
   borderRadius: 4,
-  fontSize: '0.84rem',
+  fontSize: 13,
   color: '#f8f8f2',
   lineHeight: 1.45,
 };
@@ -77,8 +77,8 @@ const clickableStyle: React.CSSProperties = {
 };
 
 const mutedStyle: React.CSSProperties = {
-  color: '#8393c4',
-  fontSize: '0.78rem',
+  color: '#b1bada',
+  fontSize: 13,
 };
 
 // Orange, matching the gradebook's "⋯" cell and the review queue's badge, so
@@ -132,7 +132,7 @@ export function NeedsAttentionPanel({ classId, lessonTitles, onOpenStudent, onOp
 
   if (loading) {
     return (
-      <div style={{ color: '#8393c4', fontStyle: 'italic', padding: 16, fontSize: '0.88rem' }}>
+      <div style={{ color: '#b1bada', fontStyle: 'italic', padding: 16, fontSize: 14 }}>
         Loading attention data...
       </div>
     );
@@ -140,7 +140,7 @@ export function NeedsAttentionPanel({ classId, lessonTitles, onOpenStudent, onOp
 
   if (error) {
     return (
-      <div style={{ color: '#ff5555', padding: 16, fontSize: '0.88rem' }}>
+      <div style={{ color: '#ff5555', padding: 16, fontSize: 14 }}>
         Failed to load: {error}
       </div>
     );
@@ -151,7 +151,7 @@ export function NeedsAttentionPanel({ classId, lessonTitles, onOpenStudent, onOp
   const awaiting = data.awaiting_grade ?? [];
   const shown = <T,>(key: string, items: T[]) => showAll[key] ? items : items.slice(0, 3);
   const moreButton = (key: string, count: number) => count > 3 && !showAll[key] ? (
-    <button type="button" onClick={() => setShowAll((prev) => ({ ...prev, [key]: true }))} style={{ alignSelf: 'flex-start', margin: '0 10px 8px', padding: '4px 8px', border: '1px solid #44475a', borderRadius: 4, background: '#282a36', color: '#8be9fd', cursor: 'pointer', font: 'inherit', fontSize: 12 }}>
+    <button type="button" onClick={() => setShowAll((prev) => ({ ...prev, [key]: true }))} style={{ alignSelf: 'flex-start', margin: '0 12px 8px', padding: '4px 8px', border: '1px solid #44475a', borderRadius: 4, background: '#282a36', color: '#8be9fd', cursor: 'pointer', font: 'inherit', fontSize: 12 }}>
       Show all {count}
     </button>
   ) : null;
@@ -164,7 +164,7 @@ export function NeedsAttentionPanel({ classId, lessonTitles, onOpenStudent, onOp
 
   if (!hasAny) {
     return (
-      <div style={{ color: '#50fa7b', padding: 16, fontSize: '0.88rem' }}>
+      <div style={{ color: '#50fa7b', padding: 16, fontSize: 14 }}>
         All students are on track.
       </div>
     );

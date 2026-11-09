@@ -47,7 +47,7 @@ export default function CompletionPanel({ lessonId, lessonType, description }: P
     <section aria-live="polite" style={{ marginTop: 20, padding: '16px 18px', border: '1px solid #50fa7b55', borderRadius: 8, background: '#50fa7b0a', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
       <CircleCheck size={20} color="#50fa7b" />
       <span style={{ color: '#50fa7b', flex: 1 }}>Completed · next lesson unlocked</span>
-      <button onClick={toggle} disabled={!snap.authed} style={{ background: 'transparent', border: 0, color: '#8393c4', textDecoration: 'underline', cursor: 'pointer', padding: 6 }}>Undo</button>
+      <button onClick={toggle} disabled={!snap.authed} style={{ background: 'transparent', border: 0, color: '#b1bada', textDecoration: 'underline', cursor: 'pointer', padding: 6 }}>Undo</button>
     </section>
   );
 
@@ -59,7 +59,7 @@ export default function CompletionPanel({ lessonId, lessonType, description }: P
         borderTop: '2px solid #44475a',
       }}
     >
-      <h2 style={{ fontSize: 20, marginBottom: 12, color: '#f8f8f2' }}>
+      <h2 style={{ fontSize: 18, marginBottom: 12, color: '#f8f8f2' }}>
         Mark complete to continue
       </h2>
       <div
@@ -68,7 +68,7 @@ export default function CompletionPanel({ lessonId, lessonType, description }: P
           alignItems: 'center',
           justifyContent: 'space-between',
           marginBottom: 12,
-          color: '#aaa',
+          color: '#b1bada',
           fontSize: 14,
         }}
         aria-live="polite"
@@ -103,7 +103,7 @@ export default function CompletionPanel({ lessonId, lessonType, description }: P
         }}
       >
         <h3 style={{ fontSize: 18, color: '#f8f8f2', marginTop: 0, marginBottom: 4 }}>{title}</h3>
-        <p style={{ fontSize: 14, color: '#aaa', marginTop: 0, marginBottom: 8 }}>{fullDescription}</p>
+        <p style={{ fontSize: 14, color: '#b1bada', marginTop: 0, marginBottom: 8 }}>{fullDescription}</p>
         <div
           style={{
             display: 'flex',

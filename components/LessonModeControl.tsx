@@ -75,7 +75,7 @@ export default function LessonModeControl({ classId, lessons }: Props) {
   function Row({ id, label, current }: { id: string; label: string; current: LessonMode | null }) {
     return (
       <div className="lmc-row">
-        <span className="lmc-label" title={id}>{label}</span>
+        <span className="lmc-label" style={{ fontSize: 14 }} title={id}>{label}</span>
         <span className="lmc-choices">
           {CHOICES.map((c) => (
             <button
@@ -84,7 +84,7 @@ export default function LessonModeControl({ classId, lessons }: Props) {
               disabled={busy === id}
               aria-pressed={current === c.value}
               title={c.hint}
-              style={{ fontSize: 12, ...(current === c.value ? {} : { color: '#8393c4' }) }}
+              style={{ fontSize: 14, height: 32, padding: '4px 8px', opacity: busy === id ? 0.5 : 1, cursor: busy === id ? 'not-allowed' : 'pointer', ...(current === c.value ? {} : { color: '#b1bada' }) }}
               className={current === c.value ? 'on' : undefined}
               onClick={() => set(id, c.value)}
             >
@@ -97,10 +97,10 @@ export default function LessonModeControl({ classId, lessons }: Props) {
   }
 
   return (
-    <div className="lmc">
+    <div className="lmc" style={{ padding: 'clamp(16px, 2vw, 20px)', marginBottom: 0 }}>
       <div className="lmc-head">
-        <strong>Shape tools or code</strong>
-        <span className="lmc-sub" style={{ color: '#8393c4', fontSize: 13 }}>
+        <strong style={{ fontSize: 18, fontWeight: 700 }}>Shape tools or code</strong>
+        <span className="lmc-sub" style={{ color: '#b1bada', fontSize: 13 }}>
           An assignment setting beats the class setting. Anything left on
           &ldquo;their choice&rdquo; lets the student decide.
         </span>
@@ -112,7 +112,7 @@ export default function LessonModeControl({ classId, lessons }: Props) {
 
       {lessons.length > 0 && (
         <>
-          <div className="lmc-sep" style={{ color: '#8393c4', fontSize: 12 }}>Per assignment</div>
+          <div className="lmc-sep" style={{ color: '#b1bada', fontSize: 13 }}>Per assignment</div>
           {lessons.map((l) => (
             <Row key={l.id} id={l.id} label={l.title} current={perLesson.get(l.id) ?? null} />
           ))}
@@ -126,14 +126,14 @@ export default function LessonModeControl({ classId, lessons }: Props) {
         }
         .lmc-head { display: flex; flex-direction: column; gap: 3px; margin-bottom: 10px; }
         .lmc-head strong { color: var(--text); font-size: 0.95rem; }
-        .lmc-sub { color: #6272a4; font-size: 0.78rem; line-height: 1.45; }
+        .lmc-sub { color: #b1bada; font-size: 0.78rem; line-height: 1.45; }
         .lmc-error {
           margin: 0 0 8px; padding: 6px 8px; font-size: 12px;
           color: #ff5555; background: rgba(255, 85, 85, 0.1);
           border-left: 2px solid #ff5555;
         }
         .lmc-sep {
-          color: #6272a4; font-size: 0.72rem; text-transform: uppercase;
+          color: #b1bada; font-size: 13px; text-transform: uppercase;
           letter-spacing: 0.08em; margin: 12px 0 6px;
           border-top: 1px solid var(--border); padding-top: 8px;
         }
@@ -148,7 +148,7 @@ export default function LessonModeControl({ classId, lessons }: Props) {
         .lmc-choices { display: inline-flex; flex-wrap: wrap; gap: 4px; max-width: 100%; }
         .lmc-choices button {
           padding: 3px 9px; font-size: 12px; cursor: pointer;
-          background: transparent; color: #6272a4;
+          background: transparent; color: #b1bada;
           border: 1px solid #44475a; border-radius: 3px;
         }
         .lmc-choices button:hover:not(:disabled) { color: var(--text); }

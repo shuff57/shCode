@@ -475,7 +475,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
   return (
     <section style={{ marginTop: 16, paddingTop: 14, borderTop: '2px solid #44475a' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-        <label style={{ fontSize: 13, color: '#aaa' }}>{codeInput ? 'Your program (JavaScript)' : 'Your response'}</label>
+        <label style={{ fontSize: 13, color: '#b1bada' }}>{codeInput ? 'Your program (JavaScript)' : 'Your response'}</label>
         <SolutionPanel
           lessonId={lessonId}
           onInsert={(files) => {
@@ -610,7 +610,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
           {saveStatus === 'saving' ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
           {saveStatus === 'saved' ? 'Saved ✓' : saveStatus === 'error' ? 'Save failed' : 'Save draft'}
         </button>
-        <span style={{ color: '#666', fontSize: 12 }}>
+        <span style={{ color: '#b1bada', fontSize: 13 }}>
           {response.trim().length} chars{codeInput ? '' : ` · ${response.trim().split(/\s+/).filter(Boolean).length} words`}
         </span>
         {maxSubmissions === null ? null : !attemptsKnown ? (
@@ -618,7 +618,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
             {loaded ? 'Couldn\u2019t check your attempts — reload to try again' : 'Checking your attempts…'}
           </span>
         ) : (
-          <span style={{ color: capReached ? '#ffb86c' : '#666', fontSize: 12 }}>
+          <span style={{ color: capReached ? '#ffb86c' : '#b1bada', fontSize: 12 }}>
             {capReached
               ? 'No attempts left — your best one counts'
               : `${maxSubmissions - attempts} of ${maxSubmissions} attempts left`}
@@ -628,11 +628,11 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
 
       {prompt.trim() ? <details style={{ marginBottom: 10, border: '1px solid #44475a', borderRadius: 6, padding: '8px 12px' }}>
         <summary style={{ cursor: 'pointer', color: '#bd93f9', fontSize: 13 }}>What to answer · task guidance</summary>
-              <h2 style={{ fontSize: 20, marginBottom: 6, color: '#f8f8f2', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <h2 style={{ fontSize: 18, marginBottom: 6, color: '#f8f8f2', display: 'flex', alignItems: 'center', gap: 8 }}>
         <Sparkles size={18} color="#bd93f9" />
         {config.rubricTitle ?? 'Written response — AI-graded'}
       </h2>
-      <p style={{ color: '#8393c4', fontSize: 13, margin: '0 0 12px' }}>
+      <p style={{ color: '#b1bada', fontSize: 13, margin: '0 0 12px' }}>
         {codeInput
           ? 'Write your answer as JavaScript. There is no Run button, so read it through the way the computer would before you submit.'
           : 'Answer in your own everyday words — you are graded on having the right idea, not on exact wording, spelling or length. The AI grader checks each criterion and points you back at the lesson to reread if something is missing.' +
@@ -719,7 +719,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
               alignItems: 'center',
               justifyContent: 'space-between',
               marginBottom: 12,
-              color: '#aaa',
+              color: '#b1bada',
               fontSize: 14,
             }}
           >
@@ -814,7 +814,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
               >
                 Continue to next lesson →
               </button>
-              <p style={{ margin: '8px 0 0', color: '#8393c4', fontSize: 12 }}>
+              <p style={{ margin: '8px 0 0', color: '#b1bada', fontSize: 13 }}>
                 {/* A zero-point rubric (3.9.1, 3.9.3) has no score to raise, so
                     "keep revising to push your score higher" is an invitation to
                     resubmit the same plan. Students did: one class submitted 25

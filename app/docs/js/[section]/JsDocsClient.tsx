@@ -70,7 +70,7 @@ export default function JsDocsClient({
   }
 
   return (
-    <div className="docs-layout">
+    <div className="docs-layout docs-js">
       <aside className="docs-sidebar">
         <div className="docs-sidebar-scroll">
           {isSearching ? (

@@ -30,7 +30,7 @@ interface PastDueData {
   warning?: string;
 }
 
-const C = { border: '#44475a', dim: '#8393c4', text: '#f8f8f2', late: '#ff5555', ok: '#50fa7b' };
+const C = { border: '#44475a', dim: '#b1bada', text: '#f8f8f2', late: '#ff5555', ok: '#50fa7b' };
 
 export default function PastDuePanel({ classId }: { classId: string }) {
   const [data, setData] = useState<PastDueData | null>(null);
@@ -83,13 +83,13 @@ export default function PastDuePanel({ classId }: { classId: string }) {
         <p style={{ color: C.ok, fontSize: 13, margin: 0 }}>Everyone is caught up.</p>
       ) : (
         behind.map((student) => (
-          <div key={student.email} style={{ borderBottom: `1px solid ${C.border}`, padding: '6px 0' }}>
+          <div key={student.email} style={{ borderBottom: `1px solid ${C.border}`, padding: '8px 0' }}>
             <button
               type="button"
               onClick={() => setOpen(open === student.email ? null : student.email)}
               style={{
                 background: 'none', border: 'none', color: C.text, cursor: 'pointer',
-                display: 'flex', alignItems: 'center', gap: 10, padding: 0, width: '100%',
+                display: 'flex', alignItems: 'center', gap: 12, padding: 0, width: '100%',
                 fontSize: 13, fontFamily: 'inherit', textAlign: 'left',
               }}
             >
@@ -102,12 +102,12 @@ export default function PastDuePanel({ classId }: { classId: string }) {
             {open === student.email && (
               <ul style={{ margin: '8px 0 8px 12px', padding: 0, listStyle: 'none' }}>
                 {student.lessons.map((lesson) => (
-                  <li key={lesson.lessonId} style={{ fontSize: 12, color: C.dim, padding: '2px 0' }}>
+                  <li key={lesson.lessonId} style={{ fontSize: 13, color: C.dim, padding: '4px 0' }}>
                     <span style={{ color: C.text }}>{lesson.title}</span> · was due {formatDue(lesson.dueAt)}
                   </li>
                 ))}
                 {student.truncated && (
-                  <li style={{ fontSize: 12, color: C.dim, padding: '2px 0' }}>
+                  <li style={{ fontSize: 13, color: C.dim, padding: '4px 0' }}>
                     … and {student.pastDue - student.lessons.length} more
                   </li>
                 )}

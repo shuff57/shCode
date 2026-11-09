@@ -321,7 +321,7 @@ export default function QuizView({ lessonId, config }: Props) {
           </div>
         )}
       </div>
-      <div className="quiz-guidance is-expanded"><p style={{ color: '#8393c4', fontSize: 13, margin: '0 0 20px' }}>
+      <div className="quiz-guidance is-expanded"><p style={{ color: '#b1bada', fontSize: 13, margin: '0 0 20px' }}>
         {capped
           ? `Answer all ${questions.length}. After each try you see your total, not which ones were wrong. Submit what you have if one has you stuck: the next part unlocks and you can come back and use your other tries.`
           : summative
@@ -372,7 +372,7 @@ export default function QuizView({ lessonId, config }: Props) {
                 marginBottom: q.code ? 10 : 12,
               }}
             >
-              <span style={{ color: '#6272a4', fontWeight: 600, minWidth: 22 }}>{qi + 1}.</span>
+              <span style={{ color: '#b1bada', fontWeight: 600, minWidth: 22 }}>{qi + 1}.</span>
               <span className="prose-copy">{withInlineCode(q.question)}</span>
             </div>
 
@@ -465,7 +465,7 @@ export default function QuizView({ lessonId, config }: Props) {
                 <span>
                   {withInlineCode((rv ? rv.explanation : q.explanation) ?? '')}
                   {!summative && q.source ? (
-                    <span style={{ color: '#6272a4' }}>
+                    <span style={{ color: '#b1bada' }}>
                       {' (reread '}
                       {sourceHintParts(q.source).map((part, pi) => {
                         const href = part.isNumber ? sourceHrefs[part.text] : undefined;
@@ -523,7 +523,7 @@ export default function QuizView({ lessonId, config }: Props) {
         </button>
 
         {!allAnswered ? (
-          <span style={{ color: '#8393c4', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{ color: '#b1bada', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
             <Circle size={14} color="#6272a4" />
             {answeredCount} of {questions.length} answered
           </span>
