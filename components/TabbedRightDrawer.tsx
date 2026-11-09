@@ -29,6 +29,8 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
   // the tab strip moves to a horizontal bar along the bottom edge.
   const [narrow, setNarrow] = useState(false);
   const widthRef = useRef(width);
+  // While the edge is dragged the tabs follow it at once; the slide is only for opening and closing.
+  const [dragging, setDragging] = useState(false);
   widthRef.current = width;
 
   const activeStorage = `${storageKey}:active`;
@@ -77,13 +79,24 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
 
   const onHandlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
+    setDragging(true);
+    document.documentElement.classList.add('shd-resizing');
     document.body.style.cursor = 'ew-resize';
     document.body.style.userSelect = 'none';
   }, []);
 
+  // Pointer events can come faster than the screen draws: one width per frame.
+  const pendingW = useRef<number | null>(null);
   const onHandlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     if (!(e.buttons & 1)) return;
-    setWidth(Math.max(MIN_W, Math.min(MAX_W, window.innerWidth - e.clientX)));
+    const first = pendingW.current === null;
+    pendingW.current = Math.max(MIN_W, Math.min(MAX_W, window.innerWidth - e.clientX));
+    if (first) {
+      requestAnimationFrame(() => {
+        if (pendingW.current !== null) setWidth(pendingW.current);
+        pendingW.current = null;
+      });
+    }
   }, []);
 
   const onHandlePointerUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
@@ -92,6 +105,8 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
     } catch {
       /* already released */
     }
+    setDragging(false);
+    document.documentElement.classList.remove('shd-resizing');
     document.body.style.cursor = '';
     document.body.style.userSelect = '';
     localStorage.setItem(widthStorage, String(widthRef.current));
@@ -210,7 +225,7 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
           flexDirection: 'column',
           gap: 4,
           width: narrow ? undefined : 80,
-          transition: 'right 0.22s ease',
+          transition: dragging ? 'none' : 'right 0.22s ease',
         }}
       >
         {tabs.map((t) => {

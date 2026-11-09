@@ -189,6 +189,8 @@ body {
   gap: 20px;
   width: 100%;
 }
+/* While the drawer's edge is dragged (TabbedRightDrawer), the page and the tabs follow it at once. */
+html.shd-resizing body, html.shd-resizing .shd-tabstrip { transition: none !important; }
 
 /* The progress rail's segments. Laid out here rather than inline because a
    hover affordance and a width breakpoint are both things inline styles
