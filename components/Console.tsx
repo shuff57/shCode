@@ -23,7 +23,13 @@ interface LogEntry {
 
 type ConsoleTab = 'all' | 'warn' | 'error';
 
-export default function Console({ resetKey }: { resetKey: string }) {
+export default function Console({ resetKey, reword }: {
+  resetKey: string;
+  /** Replaces a console line's text before it shows (e.g. /play explaining an unshared picture). */
+  reword?: (text: string) => string;
+}) {
+  const rewordRef = useRef(reword);
+  rewordRef.current = reword;
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [tab, setTab] = useState<ConsoleTab>('all');
   const scrollRef = useRef<HTMLPreElement>(null);
@@ -70,9 +76,10 @@ export default function Console({ resetKey }: { resetKey: string }) {
         return;
       }
 
+      const shown = rewordRef.current ? rewordRef.current(text) : text;
       setLogs((prev) => [
         ...prev,
-        { type: data.type, message: text, timestamp: time },
+        { type: data.type, message: shown, timestamp: time },
       ]);
     };
     window.addEventListener('message', handler);

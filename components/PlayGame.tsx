@@ -203,7 +203,15 @@ export default function PlayGame() {
       <div style={{ height: 120, marginTop: 8, border: '1px solid var(--c-line)', borderRadius: 6, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <div className="output-header">Console</div>
         <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
-          <Console resetKey={String(effectiveRunKey)} />
+          <Console
+            resetKey={String(effectiveRunKey)}
+            // The engine's "No texture named X" reads like a bug when X is the author's own picture they haven't shared.
+            reword={(text) => {
+              const m = /^No texture named "([^"]+)"/.exec(text);
+              if (!m || !assets?.missing.includes(m[1])) return text;
+              return `"${m[1]}" is one of ${g.owner}'s own pictures, and it isn't shared with the class, so it can't show here. Ask ${g.owner} to share it.`;
+            }}
+          />
         </div>
       </div>
       {showCode && canRemix && (
