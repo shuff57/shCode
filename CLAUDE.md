@@ -975,6 +975,28 @@ their output only by being skipped by name. `scripts/check-solution-leak.mjs`
 (in `prebuild` and `npm test`) measures that it stays out — if you add another
 private folder convention, teach that script about it too.
 
+## What's New (announcing a feature)
+
+A popup tells a returning student or teacher what changed since they last looked (`components/WhatsNewModal.tsx`,
+mounted once in `app/layout.tsx`). Entries are `lib/whats-new.ts`, newest first; the rules are `lib/whats-new-state.ts`.
+It opens by itself only when someone is signed in, on `/`, `/module/*`, `/sandbox` or `/library` (never a lesson, so
+never over a quiz or a timed part, never `/play`, never inside a frame), for unseen entries of their audience
+(`student` | `teacher` | `all`; an admin reads teacher news) shipped within 45 days, at most once per browser session
+per account. Seen-state is localStorage `shcode.whatsNew.seen:<hash of the email>`, so two students on one computer
+each see it once. Automated browsers (`navigator.webdriver`) never get it by themselves, so it cannot sit over a test's
+clicks; `?whats-new` forces it open. "What's new" in the account menu (a dot while recent news is unseen) and on
+`/account` lists every entry for the role.
+
+To announce a feature:
+1. Add a recipe under the entry's id in `scripts/whats-new/record.mjs` and record it against a FRESH dev server
+   (`PORT=3019 DEV_REAL_DB=1 DEV_ROLE=teacher npm run dev`, then `node scripts/whats-new/record.mjs <id>`). It writes
+   `public/whats-new/<id>.mp4` (silent H.264, 1280x720, 5-15 s, under 1.5 MB; two-person features side by side) and
+   `<id>.jpg`. A feature with nothing to watch can be `posterOnly`.
+2. Add the entry at the TOP of `WHATS_NEW` with that id and the real ship date (`git log --date=short`). Ids are never
+   reused or renamed (a renamed id pops up again for everyone). Words for a 14-year-old beginner; at most 3 steps;
+   promise nothing the code does not do; an `action` is an in-site page.
+3. `scripts/test-whats-new.mjs` (in `npm test`) checks the rules, the entries, and that every clip and poster exists.
+
 ## Conventions
 
 - Pages Functions: export `onRequestGet`/`onRequestPost`/`onRequestDelete`, use
