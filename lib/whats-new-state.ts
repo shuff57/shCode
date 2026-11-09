@@ -97,6 +97,8 @@ export function audienceOf(role: Role): 'student' | 'teacher' {
 /** Every entry this role may see, newest first (the list keeps the file's order). */
 export function entriesFor(entries: WhatsNewEntry[], role: Role): WhatsNewEntry[] {
   const mine = audienceOf(role);
+  // Teachers (and admins) also read the student news, so they know what their students just got.
+  if (mine === 'teacher') return entries.filter(Boolean);
   return entries.filter((e) => e && (e.audience === 'all' || e.audience === mine));
 }
 

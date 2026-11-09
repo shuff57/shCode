@@ -55,11 +55,11 @@ const ids = (list) => list.map((e) => e.id);
 check('a student auto-shows unseen student + all entries inside the window', () => {
   assert.deepEqual(ids(S.entriesToAutoShow(sample, new Set(), 'student', now, 45)), ['s-new', 'all-new']);
 });
-check('a teacher never auto-shows student news, and sees teacher + all', () => {
-  assert.deepEqual(ids(S.entriesToAutoShow(sample, new Set(), 'teacher', now, 45)), ['t-new', 'all-new']);
+check('a teacher also gets the student news, inside the window', () => {
+  assert.deepEqual(ids(S.entriesToAutoShow(sample, new Set(), 'teacher', now, 45)), ['s-new', 't-new', 'all-new']);
 });
-check('an admin reads teacher news', () => {
-  assert.deepEqual(ids(S.entriesFor(sample, 'admin')), ['t-new', 'all-new']);
+check('an admin reads everything, like a teacher', () => {
+  assert.deepEqual(ids(S.entriesFor(sample, 'admin')), ['s-new', 't-new', 'all-new', 's-old']);
 });
 check('a student never sees teacher news, even in the full list', () => {
   assert.deepEqual(ids(S.entriesFor(sample, 'student')), ['s-new', 'all-new', 's-old']);

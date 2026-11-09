@@ -981,7 +981,7 @@ A popup tells a returning student or teacher what changed since they last looked
 mounted once in `app/layout.tsx`). Entries are `lib/whats-new.ts`, newest first; the rules are `lib/whats-new-state.ts`.
 It opens by itself only when someone is signed in, on `/`, `/module/*`, `/sandbox` or `/library` (never a lesson, so
 never over a quiz or a timed part, never `/play`, never inside a frame), for unseen entries of their audience
-(`student` | `teacher` | `all`; an admin reads teacher news) shipped within 45 days, at most once per browser session
+(`student` | `teacher` | `all`; teachers and admins also see the student entries) shipped within 45 days, at most once per browser session
 per account. Seen-state is localStorage `shcode.whatsNew.seen:<hash of the email>`, so two students on one computer
 each see it once. Automated browsers (`navigator.webdriver`) never get it by themselves, so it cannot sit over a test's
 clicks; `?whats-new` forces it open. "What's new" in the account menu (a dot while recent news is unseen) and on
