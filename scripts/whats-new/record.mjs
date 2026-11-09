@@ -222,7 +222,7 @@ const TEACHER = { email: null, role: 'teacher', label: 'Teacher' };
 
 async function startCodeTogether(page, demo) {
   await (demo ? demo.click(page.getByRole('button', { name: 'Code together', exact: true })) : page.getByRole('button', { name: 'Code together', exact: true }).click());
-  const start = page.getByRole('region', { name: 'Code together' }).getByRole('button', { name: 'Start' });
+  const start = page.getByRole('dialog', { name: 'Code together' }).getByRole('button', { name: 'Start' });
   await (demo ? demo.click(start, { after: 900 }) : start.click());
   await page.locator('[data-testid=together-code][data-code]').waitFor({ timeout: 30000 });
 }

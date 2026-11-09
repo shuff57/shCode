@@ -113,13 +113,16 @@ export default function SandboxWorkspace() {
   const [historyOpen, setHistoryOpen] = useState(false);
 
   // Code together (REALTIME-SPEC.md Part 2): the JavaScript and moSHion modes
-  // only, for a student signed in and in a class. While a session is on, the
-  // editor carries the shared-editing extension (lib/live-doc.ts) and Reset and
-  // the mode tabs are locked, so one click cannot wipe or swap everyone's program.
+  // only, for a student signed in and in a class. The toolbar button opens its
+  // popup (start, join, open sessions; in a session, the code to share again);
+  // a session itself is one slim line above the editor. While a session is on,
+  // the editor carries the shared-editing extension (lib/live-doc.ts) and Reset
+  // and the mode tabs are locked, so one click cannot wipe or swap everyone's program.
   const togetherLang = modeId === 'js' || modeId === 'moshion' ? modeId : null;
   const mayTogether = useCodeTogetherAvailable(togetherLang, lessonProgress.authed);
   const [togetherOpen, setTogetherOpen] = useState(false);
   const [together, setTogether] = useState(false);
+  const [togetherHere, setTogetherHere] = useState(0);
   const [collabExt, setCollabExt] = useState<Extension | null>(null);
   const cloudRef = useRef(cloud);
   cloudRef.current = cloud;
@@ -749,16 +752,20 @@ export default function SandboxWorkspace() {
             {mode.preview === 'moshion' && lessonProgress.authed && (
               <PublishGameButton getCode={getScript} />
             )}
-            {togetherLang && mayTogether && (
+            {togetherLang && (mayTogether || together) && (
               <button
                 type="button"
-                style={togetherOpen || together ? { ...chipStyle, color: 'var(--c-fg)' } : chipStyle}
-                aria-pressed={togetherOpen || together}
-                onClick={() => { if (!together) setTogetherOpen((o) => !o); }}
-                title="Write one program with classmates at the same time"
+                style={together ? { ...chipStyle, color: 'var(--c-fg)', border: '1px solid var(--c-purple)' } : chipStyle}
+                aria-haspopup="dialog"
+                aria-expanded={togetherOpen}
+                onClick={() => setTogetherOpen(true)}
+                title={together ? 'Show the session code to share it again' : 'Write one program with classmates at the same time'}
+                data-testid="code-together-button"
               >
-                <Users size={12} />
-                Code together
+                <Users size={12} aria-hidden="true" />
+                {together ? (
+                  <>Coding together<span aria-hidden="true"> · </span>{togetherHere}<span className="sr-only"> here</span></>
+                ) : 'Code together'}
               </button>
             )}
             <button
@@ -808,7 +815,7 @@ export default function SandboxWorkspace() {
           ) : (
             <>
               <div className="pane" id="editorPane">
-                {togetherOpen && togetherLang && (
+                {togetherLang && (mayTogether || together) && (
                   <CodeTogetherBar
                     key={togetherLang}
                     lang={togetherLang}
@@ -816,9 +823,12 @@ export default function SandboxWorkspace() {
                     snapshot={togetherSnapshot}
                     onCollab={setCollabExt}
                     onActive={setTogether}
+                    onHere={setTogetherHere}
                     keepCopy={keepTogetherCopy}
                     isUntouched={isUntouched}
-                    onClose={() => setTogetherOpen(false)}
+                    open={togetherOpen}
+                    onOpenChange={setTogetherOpen}
+                    dialogHost={shellRef.current}
                   />
                 )}
                 <div style={{ flex: '1 1 auto', minHeight: 0 }}>
@@ -952,14 +962,15 @@ export default function SandboxWorkspace() {
           max-height: 60vh;
           resize: vertical;
         }
-        /* A lobby bar above the canvas or the Code together bar above the
-           editor takes height from the row that holds them, so the console
-           (empty most of the time, and still resizable) gives some back. */
-        .sandbox-shell:has([data-testid='moshion-lobby'], [data-testid='code-together']) .sandbox-console-wrap {
+        /* A lobby bar above the canvas, or Code together's details open above
+           the editor, takes height from the row that holds them, so the console
+           (empty most of the time, and still resizable) gives some back. The
+           slim Code together line alone does not need it. */
+        .sandbox-shell:has([data-testid='moshion-lobby'], [data-testid='code-together'][data-expanded='true']) .sandbox-console-wrap {
           height: 112px;
           min-height: 72px;
         }
-        .sandbox-shell:has([data-testid='moshion-lobby'], [data-testid='code-together']) .sandbox-console-wrap .console-empty {
+        .sandbox-shell:has([data-testid='moshion-lobby'], [data-testid='code-together'][data-expanded='true']) .sandbox-console-wrap .console-empty {
           padding: 4px;
         }
         .sandbox-console-body { flex: 1; min-height: 0; padding: 6px 8px; overflow: hidden; display: flex; }
