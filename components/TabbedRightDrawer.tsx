@@ -209,7 +209,6 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
           display: 'flex',
           flexDirection: 'column',
           gap: 4,
-          width: narrow ? undefined : 80,
           transition: 'right 0.22s ease',
         }}
       >
