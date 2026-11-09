@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef, useSyncExternalStore } from 'react';
 import dynamic from 'next/dynamic';
 import { ChevronDown, ChevronUp, CloudUpload, History, Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen, RotateCcw, Users } from 'lucide-react';
 import type { Extension } from '@codemirror/state';
@@ -33,10 +33,12 @@ import {
 import EditorPlaceholder from './diagram/EditorPlaceholder';
 import { emptyDiagram, type DiagramDoc } from '../lib/diagram-types';
 import {
+  SANDBOX_EARLY_PICK_SCRIPT,
   SANDBOX_MODES,
   SANDBOX_MODE_KEY,
   getMode,
   sandboxLesson,
+  takeEarlyPick,
   type SandboxModeId,
 } from '../lib/sandbox-modes';
 
@@ -91,6 +93,18 @@ const chipStyle: React.CSSProperties = {
 interface LogLine {
   type: string;
   message: string;
+}
+
+const noSubscribe = () => () => {};
+/**
+ * The early-click catcher (SANDBOX_EARLY_PICK_SCRIPT), in the page's HTML only:
+ * true while the server renders and while React hydrates that HTML, false in a
+ * page React builds itself (a visit from another page of the app), where the
+ * buttons work from the first moment and a script would never run anyway.
+ */
+function EarlyPickScript() {
+  const inServerHtml = useSyncExternalStore(noSubscribe, () => false, () => true);
+  return inServerHtml ? <script dangerouslySetInnerHTML={{ __html: SANDBOX_EARLY_PICK_SCRIPT }} /> : null;
 }
 
 export default function SandboxWorkspace() {
@@ -215,17 +229,27 @@ export default function SandboxWorkspace() {
 
   // Restore the last mode before the first paint that matters. Reading in an
   // effect rather than useState's initialiser keeps the server and client
-  // markup identical, which a static export needs.
+  // markup identical, which a static export needs. A mode button clicked
+  // before this ran (the page still loading) wins: SANDBOX_EARLY_PICK_SCRIPT
+  // kept that click, which would otherwise have done nothing.
   useEffect(() => {
+    const early = takeEarlyPick(window as Parameters<typeof takeEarlyPick>[0]);
+    if (early) setModeId(early);
     try {
       const saved = window.localStorage.getItem(MODE_KEY);
-      if (saved && SANDBOX_MODES.some((m) => m.id === saved)) {
+      if (!early && saved && SANDBOX_MODES.some((m) => m.id === saved)) {
         setModeId(saved as SandboxModeId);
       }
       const b = window.localStorage.getItem(BUILD_KEY);
       if (b === '0') setBuild(false);
     } catch { /* private mode */ }
   }, []);
+
+  // An early click's pressed look (html[data-sandbox-pick]) goes once the page shows that mode itself.
+  useEffect(() => {
+    const d = document.documentElement;
+    if (d.getAttribute('data-sandbox-pick') === modeId) d.removeAttribute('data-sandbox-pick');
+  }, [modeId]);
 
   // Each mode is its own lesson id, so the store keeps three independent
   // drafts and switching back finds your code where you left it.
@@ -675,6 +699,7 @@ export default function SandboxWorkspace() {
               type="button"
               aria-pressed={m.id === modeId}
               className={m.id === modeId ? 'sandbox-mode is-active' : 'sandbox-mode'}
+              data-sandbox-mode={m.id}
               onClick={() => chooseMode(m.id)}
             >
               {m.label}
@@ -701,6 +726,7 @@ export default function SandboxWorkspace() {
 
   return (
     <>
+      <EarlyPickScript />
       <TabbedRightDrawer storageKey="shCode:sandbox-drawer" tabs={drawerTabs} />
       <div
         className={
@@ -729,6 +755,7 @@ export default function SandboxWorkspace() {
                   type="button"
                   aria-pressed={m.id === modeId}
                   className={m.id === modeId ? 'sandbox-mode is-active' : 'sandbox-mode'}
+                  data-sandbox-mode={m.id}
                   onClick={() => chooseMode(m.id)}
                   disabled={together && m.id !== modeId}
                   title={together && m.id !== modeId ? 'Leave Code together to switch' : undefined}
@@ -942,6 +969,13 @@ export default function SandboxWorkspace() {
         .sandbox-mode:hover { color: var(--text); }
         .sandbox-mode.is-active { background: var(--c-line); color: var(--c-fg); }
         .sandbox-mode:disabled { opacity: 0.35; cursor: not-allowed; }
+        /* A mode clicked while the page was still loading looks pressed at once
+           (SANDBOX_EARLY_PICK_SCRIPT); the page switches to it as it starts. */
+        html[data-sandbox-pick] .sandbox-mode.is-active { background: transparent; color: var(--c-comment); }
+        ${SANDBOX_MODES.map((m) => `html[data-sandbox-pick='${m.id}'] .sandbox-mode[data-sandbox-mode='${m.id}']`).join(',\n        ')} {
+          background: var(--c-line);
+          color: var(--c-fg);
+        }
         .sandbox-lock { color: var(--c-orange); font-size: 12px; margin-right: 10px; }
         .sandbox-split.editor-preview-container {
           height: auto;

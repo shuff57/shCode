@@ -127,3 +127,30 @@ export function sandboxLesson(mode: SandboxMode): Lesson {
 
 /** Which mode the sandbox opens on (SandboxWorkspace reads it at load; Remix sets it). */
 export const SANDBOX_MODE_KEY = 'shCode:sandbox-mode';
+
+/**
+ * A click on a mode button before React has taken over the page did nothing:
+ * the toolbar is in the page's HTML from the start, but its buttons have no
+ * handler until the scripts have loaded and hydrated (seconds on a slow
+ * school laptop). This inline script, in that same HTML, runs at once and
+ * listens for such a click: it keeps the mode where the page reads it as it
+ * starts (SANDBOX_MODE_KEY in localStorage, and window.__shcodeSandboxPick for
+ * a browser that refuses storage), and marks <html data-sandbox-pick> so the
+ * button looks pressed straight away. Once the page has started
+ * (window.__shcodeSandboxReady) it does nothing. Rendered by SandboxWorkspace
+ * only in the server's HTML; scripts/test-sandbox-early-pick.mjs runs it.
+ */
+export const SANDBOX_EARLY_PICK_SCRIPT = `(function(){try{var w=window;if(w.__shcodeSandboxPick)return;w.__shcodeSandboxPick={};`
+  + `var ok=${JSON.stringify(SANDBOX_MODES.map((m) => m.id))};`
+  + `document.addEventListener('click',function(e){if(w.__shcodeSandboxReady)return;`
+  + `var t=e.target&&e.target.closest?e.target.closest('[data-sandbox-mode]'):null;if(!t||t.disabled)return;`
+  + `var m=t.getAttribute('data-sandbox-mode');if(ok.indexOf(m)<0)return;w.__shcodeSandboxPick.mode=m;`
+  + `try{localStorage.setItem(${JSON.stringify(SANDBOX_MODE_KEY)},m)}catch(_){}`
+  + `document.documentElement.setAttribute('data-sandbox-pick',m)},true)}catch(_){}})();`;
+
+/** The mode an early click picked (see SANDBOX_EARLY_PICK_SCRIPT), and from now on the page handles clicks itself. */
+export function takeEarlyPick(w: { __shcodeSandboxPick?: { mode?: string }; __shcodeSandboxReady?: boolean }): SandboxModeId | null {
+  w.__shcodeSandboxReady = true;
+  const m = w.__shcodeSandboxPick?.mode;
+  return SANDBOX_MODES.some((x) => x.id === m) ? (m as SandboxModeId) : null;
+}
