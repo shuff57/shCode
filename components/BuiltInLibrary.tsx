@@ -16,6 +16,7 @@ import { DESIGN_BASE, PALETTE } from '../lib/sound/presets';
 import { freshName } from '../lib/library-sync';
 import { listSavedSounds, listSavedTextures, saveSound, saveTexture } from '../lib/moshion-storage';
 import { openEditor, prepareTab } from '../lib/remix';
+import { sectionHeading, sectionNote, sectionStyle } from './library-ui';
 
 interface TexEntry { file: string; w: number; h: number; group: string; frames?: number; frameDelay?: number }
 interface Catalog { base: string; textures: Record<string, TexEntry> }
@@ -40,15 +41,20 @@ async function asDataUri(url: string): Promise<string> {
   });
 }
 
-export default function BuiltInLibrary({ onMessage }: { onMessage?: (text: string, bad: boolean) => void }) {
+export default function BuiltInLibrary({ onMessage, kind }: {
+  onMessage?: (text: string, bad: boolean) => void;
+  /** Only this kind, under a "Built in (N)" heading (the Library's Pictures and Sounds tabs). Both when left out. */
+  kind?: 'texture' | 'sound';
+}) {
   const [cat, setCat] = useState<Catalog | null>(null);
 
   useEffect(() => {
+    if (kind === 'sound') return; // the sounds list is built into the bundle
     fetch('/moshion/textures/textures.json')
       .then((r) => (r.ok ? r.json() : null))
       .then((c) => setCat(c))
       .catch(() => setCat(null));
-  }, []);
+  }, [kind]);
 
   const copyText = (text: string) => {
     navigator.clipboard?.writeText(text).then(
@@ -95,19 +101,9 @@ export default function BuiltInLibrary({ onMessage }: { onMessage?: (text: strin
     for (const [name, t] of Object.entries(cat.textures)) (groups[t.group] ??= []).push([name, t]);
   }
 
-  return (
-    <section aria-labelledby="builtin-h" style={{ marginTop: 18 }}>
-      <h3 id="builtin-h" style={{ fontSize: 14, margin: '0 0 4px', color: 'var(--c-fg)' }}>Built in</h3>
-      <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: '0 0 10px', lineHeight: 1.5 }}>
-        These work in any sketch with no saving. <strong style={{ color: 'var(--c-fg)' }}>Copy code</strong> copies the
-        line that uses one; <strong style={{ color: 'var(--c-fg)' }}>Remix</strong> makes your own copy and opens it in the
-        Texture editor or Sound mixer, so you can change it, save it and share it.
-      </p>
-
-      <details open>
-        <summary style={{ cursor: 'pointer', fontSize: 13, color: 'var(--c-fg)', margin: '6px 0' }}>
-          Textures ({cat ? Object.keys(cat.textures).length : '…'})
-        </summary>
+  const texCount = cat ? Object.keys(cat.textures).length : null;
+  const textureList = (
+    <>
         {Object.entries(groups).map(([group, list]) => (
           <div key={group} style={{ marginBottom: 10 }}>
             <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--c-dim)', margin: '6px 0' }}>
@@ -137,12 +133,9 @@ export default function BuiltInLibrary({ onMessage }: { onMessage?: (text: strin
             </div>
           </div>
         ))}
-      </details>
-
-      <details open>
-        <summary style={{ cursor: 'pointer', fontSize: 13, color: 'var(--c-fg)', margin: '10px 0 6px' }}>
-          Sounds ({PALETTE.length})
-        </summary>
+    </>
+  );
+  const soundList = (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           {PALETTE.map((p) => (
             <div key={p.name} style={{
@@ -160,6 +153,45 @@ export default function BuiltInLibrary({ onMessage }: { onMessage?: (text: strin
             </div>
           ))}
         </div>
+  );
+
+  if (kind) {
+    return (
+      <section aria-labelledby="builtin-h" style={sectionStyle}>
+        <h3 id="builtin-h" style={sectionHeading}>
+          Built in ({kind === 'texture' ? (texCount ?? '…') : PALETTE.length})
+        </h3>
+        <p style={sectionNote}>
+          These work in any sketch with no saving. <strong style={{ color: 'var(--c-fg)' }}>Copy code</strong> copies the
+          line that uses one; <strong style={{ color: 'var(--c-fg)' }}>Remix</strong> makes your own copy and opens it in
+          the {kind === 'texture' ? 'Texture editor' : 'Sound mixer'}, so you can change it, save it and share it.
+        </p>
+        {kind === 'texture' ? textureList : soundList}
+      </section>
+    );
+  }
+
+  return (
+    <section aria-labelledby="builtin-h" style={{ marginTop: 18 }}>
+      <h3 id="builtin-h" style={{ fontSize: 14, margin: '0 0 4px', color: 'var(--c-fg)' }}>Built in</h3>
+      <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: '0 0 10px', lineHeight: 1.5 }}>
+        These work in any sketch with no saving. <strong style={{ color: 'var(--c-fg)' }}>Copy code</strong> copies the
+        line that uses one; <strong style={{ color: 'var(--c-fg)' }}>Remix</strong> makes your own copy and opens it in the
+        Texture editor or Sound mixer, so you can change it, save it and share it.
+      </p>
+
+      <details open>
+        <summary style={{ cursor: 'pointer', fontSize: 13, color: 'var(--c-fg)', margin: '6px 0' }}>
+          Textures ({texCount ?? '…'})
+        </summary>
+        {textureList}
+      </details>
+
+      <details open>
+        <summary style={{ cursor: 'pointer', fontSize: 13, color: 'var(--c-fg)', margin: '10px 0 6px' }}>
+          Sounds ({PALETTE.length})
+        </summary>
+        {soundList}
       </details>
     </section>
   );

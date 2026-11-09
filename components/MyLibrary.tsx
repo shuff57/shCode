@@ -13,6 +13,7 @@ import ShareToggle from './ShareToggle';
 import { LIBRARY_LOCAL_CHANGE, LIBRARY_UPDATED, listSavedSounds, listSavedTextures } from '../lib/moshion-storage';
 import { LIBRARY_SYNC_STATUS, signedInForSync } from '../lib/library-sync';
 import { editorUrl } from '../lib/remix';
+import { sectionHeading, sectionNote } from './library-ui';
 
 type Row = { kind: 'texture' | 'sound'; name: string; dataUri: string };
 
@@ -27,7 +28,11 @@ const tile: React.CSSProperties = {
   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, width: 170,
 };
 
-export default function MyLibrary({ onMessage }: { onMessage?: (text: string, bad: boolean) => void }) {
+export default function MyLibrary({ onMessage, kind }: {
+  onMessage?: (text: string, bad: boolean) => void;
+  /** Only this kind, under a "Mine (N)" heading (the Library's Pictures and Sounds tabs). Both when left out. */
+  kind?: 'texture' | 'sound';
+}) {
   const [rows, setRows] = useState<Row[] | null>(null);
   // Edit leaves the page. From a lesson's Library tab it opens a new tab, so
   // the lesson stays where it was; on the Library page it stays in this tab.
@@ -49,21 +54,31 @@ export default function MyLibrary({ onMessage }: { onMessage?: (text: string, ba
   }, []);
 
   if (rows === null) return null;
-  const textures = rows.filter((r) => r.kind === 'texture');
-  const sounds = rows.filter((r) => r.kind === 'sound');
+  const textures = kind === 'sound' ? [] : rows.filter((r) => r.kind === 'texture');
+  const sounds = kind === 'texture' ? [] : rows.filter((r) => r.kind === 'sound');
+  const count = textures.length + sounds.length;
+  const headingId = kind ? `mylib-${kind}-h` : 'mylib-h';
 
   return (
-    <section aria-labelledby="mylib-h" style={{ marginTop: 8 }}>
-      <h3 id="mylib-h" style={{ fontSize: 14, margin: '0 0 4px', color: 'var(--c-fg)' }}>Yours ({rows.length})</h3>
-      <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: '0 0 10px', lineHeight: 1.5 }}>
+    <section aria-labelledby={headingId} style={{ marginTop: 8 }}>
+      <h3 id={headingId} style={sectionHeading}>{kind ? 'Mine' : 'Yours'} ({count})</h3>
+      <p style={sectionNote}>
         {signedInForSync()
           ? <>Press <strong style={{ color: 'var(--c-fg)' }}>Share with class</strong> on anything you want your class to use. Press it again to take it back.</>
           : <>Sign in to share these with your class.</>}
       </p>
-      {rows.length === 0 && (
+      {count === 0 && (
         <p style={{ fontSize: 13, color: 'var(--c-dim)', lineHeight: 1.5 }}>
-          Nothing saved yet. Make one in the <Link href="/textures" style={{ color: 'var(--c-cyan)' }}>Texture editor</Link> or
-          the <Link href="/sound" style={{ color: 'var(--c-cyan)' }}>Sound mixer</Link> and save it: it shows up here.
+          {kind === 'texture' ? (
+            <>No pictures saved yet. Make one in the <Link href="/textures" style={{ color: 'var(--c-cyan)' }}>Texture editor</Link> and
+              save it: it shows up here.</>
+          ) : kind === 'sound' ? (
+            <>No sounds saved yet. Make one in the <Link href="/sound" style={{ color: 'var(--c-cyan)' }}>Sound mixer</Link> and
+              save it: it shows up here.</>
+          ) : (
+            <>Nothing saved yet. Make one in the <Link href="/textures" style={{ color: 'var(--c-cyan)' }}>Texture editor</Link> or
+              the <Link href="/sound" style={{ color: 'var(--c-cyan)' }}>Sound mixer</Link> and save it: it shows up here.</>
+          )}
         </p>
       )}
       {textures.length > 0 && (

@@ -10,6 +10,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { freshName, LIBRARY_SHARES_CHANGED } from '../lib/library-sync';
 import { addToLibrary, localLibraryItems, type LibraryKind } from '../lib/moshion-storage';
 import { openEditor, prepareTab } from '../lib/remix';
+import { sectionHeading, sectionNote, sectionStyle } from './library-ui';
 
 interface SharedItem {
   id: string;
@@ -21,7 +22,7 @@ interface SharedItem {
   hidden: boolean;
 }
 
-export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, title }: {
+export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, title, section }: {
   kind: LibraryKind;
   onCopied?: () => void;
   onMessage?: (text: string, bad: boolean) => void;
@@ -29,19 +30,25 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
   onLoaded?: (count: number | null) => void;
   /** Heading instead of "From your class (N)". */
   title?: string;
+  /** Render as a Library tab section: a "<title> (N)" heading that stays even when
+   *  the list is empty or the student is signed out, with these words instead. */
+  section?: { empty: React.ReactNode; signedOut: React.ReactNode };
 }) {
   const [items, setItems] = useState<SharedItem[] | null>(null);
+  const [loaded, setLoaded] = useState(false);
   const [art, setArt] = useState<Record<string, { dataUri: string; meta: string | null }>>({});
 
   const load = useCallback(async () => {
     try {
       const res = await fetch(`/api/library/shared?kind=${kind}`, { credentials: 'same-origin' });
-      if (!res.ok) { setItems(null); onLoaded?.(null); return; }
+      if (!res.ok) { setItems(null); setLoaded(true); onLoaded?.(null); return; }
       const list = ((await res.json()) as { items: SharedItem[] }).items;
       setItems(list);
+      setLoaded(true);
       onLoaded?.(list.length);
     } catch {
       setItems(null);
+      setLoaded(true);
       onLoaded?.(null);
     }
     // onLoaded is a callback from the parent; reloading on its identity would loop.
@@ -68,6 +75,15 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
     for (const it of items) if (!art[it.id]) void fetchArt(it.id);
   }, [items, kind, art, fetchArt]);
 
+  const headingId = `classlib-${kind}-h`;
+  if (section && (!items || items.length === 0)) {
+    return (
+      <section aria-labelledby={headingId} style={sectionStyle}>
+        <h3 id={headingId} style={sectionHeading}>{title ?? 'From your class'} ({loaded ? 0 : '…'})</h3>
+        {loaded && <p style={sectionNote}>{items ? section.empty : section.signedOut}</p>}
+      </section>
+    );
+  }
   if (!items || items.length === 0) return null;
 
   // Remix: Copy to mine, then open the copy in its editor (lib/remix.ts).
@@ -92,11 +108,22 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
     );
   };
 
+  const Wrap = section ? 'section' : 'div';
   return (
-    <div style={{ marginTop: 12 }}>
-      <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--c-dim)', marginBottom: 6 }}>
-        {title ?? 'From your class'} ({items.length})
-      </div>
+    <Wrap aria-labelledby={section ? headingId : undefined} style={section ? sectionStyle : { marginTop: 12 }}>
+      {section ? (
+        <>
+          <h3 id={headingId} style={sectionHeading}>{title ?? 'From your class'} ({items.length})</h3>
+          <p style={sectionNote}>
+            <strong style={{ color: 'var(--c-fg)' }}>Copy to mine</strong> saves a copy into your own, so{' '}
+            {kind === 'texture' ? <code>sprite.texture = &apos;name&apos;</code> : <code>loadSound(&apos;name&apos;)</code>} works in your sketches.
+          </p>
+        </>
+      ) : (
+        <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--c-dim)', marginBottom: 6 }}>
+          {title ?? 'From your class'} ({items.length})
+        </div>
+      )}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         {items.map((it) => (
           <div key={it.id} style={{
@@ -139,6 +166,6 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
           </div>
         ))}
       </div>
-    </div>
+    </Wrap>
   );
 }

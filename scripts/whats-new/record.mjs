@@ -359,9 +359,10 @@ const timer = setInterval(() => {
       const share = p.getByRole('dialog', { name: 'Publish game' }).getByRole('checkbox');
       if ((await share.count()) && !(await share.isChecked())) await d.click(share, { after: 300 });
       await d.click(p.getByRole('dialog', { name: 'Publish game' }).getByRole('button', { name: /^Publish$/ }), { ms: 400, after: 900 });
-      await p.goto(new URL('/library/', p.url()).href, { waitUntil: 'networkidle' });
+      // The Library opens on its Games tab from a link (2026-11-09: Games / Pictures / Sounds tabs).
+      await p.goto(new URL('/library/?tab=games', p.url()).href, { waitUntil: 'networkidle' });
       await d.pause(300);
-      await d.scrollTo(p.getByRole('heading', { name: 'Games', exact: true }), 900);
+      await d.scrollTo(p.locator('a[href*="builtin=checkers"]'), 900);
       await d.pause(1100);
       await d.click(p.locator('a[href*="builtin=checkers"]'), { ms: 500, after: 200 });
       await p.waitForURL(/\/play/, { timeout: 30000 });

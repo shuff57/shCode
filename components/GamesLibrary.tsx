@@ -1,9 +1,9 @@
 'use client';
 
-// The Library's Games section (migration 0042): "Yours", the games you
+// The Library's Games tab (migration 0042): "My games", the games you
 // published from the moSHion sandbox, each with Play, Open in sandbox, Share
-// with class and Delete; and "Shared with your class", each with Play, Remix
-// and the publisher's name (first name + last initial). Remix copies the code
+// with class and Delete; "Class games", each with Play, Remix and the
+// publisher's name (first name + last initial); then the built-in games. Remix copies the code
 // into your own sandbox draft (lib/games-client.ts asks first if that would
 // replace work). A game only ever runs on /play, inside the sandboxed moSHion
 // iframe.
@@ -22,6 +22,7 @@ import {
   type SharedGame,
 } from '../lib/games-client';
 import { modeLabel, type GameMode } from '../lib/games-core';
+import { sectionHeading, sectionNote, sectionStyle } from './library-ui';
 
 const btn: React.CSSProperties = {
   fontSize: 12, padding: '4px 8px', borderRadius: 4, cursor: 'pointer', whiteSpace: 'nowrap',
@@ -46,11 +47,12 @@ function BuiltinGames() {
       .then((d: { games: Builtin[] } | null) => setGames(d?.games ?? []))
       .catch(() => setGames([]));
   }, []);
-  if (!games || games.length === 0) return null;
+  if (games && games.length === 0) return null;
   return (
-    <>
-      <h4 style={{ fontSize: 13, margin: '10px 0 6px' }}>Built in</h4>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+    <section aria-labelledby="games-builtin-h" style={sectionStyle}>
+      <h3 id="games-builtin-h" style={sectionHeading}>Built in ({games ? games.length : '…'})</h3>
+      <p style={sectionNote}>The games you build in the lessons, ready to play.</p>
+      {games && <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         {games.map((g) => (
           <div key={g.id} style={rowStyle}>
             <div style={{ minWidth: 140, flex: '1 1 160px' }}>
@@ -60,8 +62,8 @@ function BuiltinGames() {
             <a href={`/play/?builtin=${g.id}`} style={playBtn}>Play</a>
           </div>
         ))}
-      </div>
-    </>
+      </div>}
+    </section>
   );
 }
 
@@ -78,7 +80,7 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
   const load = useCallback(async () => {
     const [a, b] = await Promise.all([listMyGames(), listSharedGames()]);
     setMine(a.ok ? { kind: 'ok', games: a.value.games } : a.status === 401 ? { kind: 'signed-out' } : { kind: 'error', text: a.error });
-    // The class list leaves out your own games: they are already under "Yours".
+    // The class list leaves out your own games: they are already under "My games".
     setShared(b.ok ? { kind: 'ok', games: b.value.games.filter((g) => !g.mine) } : b.status === 401 ? { kind: 'signed-out' } : { kind: 'error', text: b.error });
   }, []);
   useEffect(() => {
@@ -119,18 +121,16 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
 
   if (mine.kind === 'signed-out') {
     return (
-      <section aria-labelledby="games-h" style={{ marginTop: 18 }}>
-        <h3 id="games-h" style={{ fontSize: 14, margin: '0 0 4px' }}>Games</h3>
-        <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: 0 }}>Sign in to publish games and play the ones your class made.</p>
+      <div style={{ marginTop: 8 }}>
+        <p style={{ ...sectionNote, margin: 0 }}>Sign in to publish games and play the ones your class made.</p>
         <BuiltinGames />
-      </section>
+      </div>
     );
   }
 
   return (
-    <section aria-labelledby="games-h" style={{ marginTop: 18 }}>
-      <h3 id="games-h" style={{ fontSize: 14, margin: '0 0 4px' }}>Games</h3>
-      <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: '0 0 8px', lineHeight: 1.5 }}>
+    <div style={{ marginTop: 8 }}>
+      <p style={{ ...sectionNote, margin: '0 0 8px' }}>
         Games made in the moSHion sandbox with <strong style={{ color: 'var(--c-fg)' }}>Publish game</strong>.{' '}
         <strong style={{ color: 'var(--c-fg)' }}>Remix</strong> copies a game&apos;s code into your own sandbox so you can change it.
       </p>
@@ -140,8 +140,8 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
           {note.text}
         </div>
       )}
-      <BuiltinGames />
-      <h4 style={{ fontSize: 13, margin: '10px 0 6px' }}>Yours</h4>
+      <section aria-labelledby="games-mine-h" style={{ marginTop: 8 }}>
+      <h3 id="games-mine-h" style={{ ...sectionHeading, margin: '0 0 6px' }}>My games ({mine.kind === 'ok' ? mine.games.length : '…'})</h3>
       {mine.kind === 'loading' && <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: 0 }}>Loading…</p>}
       {mine.kind === 'error' && <p style={{ fontSize: 13, color: 'var(--c-red)', margin: 0 }}>{mine.text}</p>}
       {mine.kind === 'ok' && !mine.games.length && (
@@ -177,7 +177,10 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
         </div>
       )}
 
-      <h4 style={{ fontSize: 13, margin: '14px 0 6px' }}>Shared with your class</h4>
+      </section>
+
+      <section aria-labelledby="games-class-h" style={sectionStyle}>
+      <h3 id="games-class-h" style={{ ...sectionHeading, margin: '0 0 6px' }}>Class games ({shared.kind === 'ok' ? shared.games.length : '…'})</h3>
       {shared.kind === 'loading' && <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: 0 }}>Loading…</p>}
       {shared.kind === 'error' && <p style={{ fontSize: 13, color: 'var(--c-red)', margin: 0 }}>{shared.text}</p>}
       {shared.kind === 'ok' && !shared.games.length && (
@@ -203,6 +206,9 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
           ))}
         </div>
       )}
-    </section>
+      </section>
+
+      <BuiltinGames />
+    </div>
   );
 }
