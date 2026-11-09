@@ -21,14 +21,20 @@ export interface RowMenuItem {
 
 export function RowMenu({ items, label = 'More actions', buttonText = 'More', disabled = false }: { items: RowMenuItem[]; label?: string; buttonText?: string; disabled?: boolean }) {
   const [open, setOpen] = useState(false);
-  const [pos, setPos] = useState<{ top: number; right: number } | null>(null);
+  const [pos, setPos] = useState<{ top?: number; bottom?: number; right: number } | null>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
   function openMenu() {
     const r = btnRef.current?.getBoundingClientRect();
     if (!r) return;
-    setPos({ top: Math.min(r.bottom + 4, window.innerHeight - 8), right: Math.max(8, window.innerWidth - r.right) });
+    const right = Math.max(8, window.innerWidth - r.right);
+    // About 44 px an item: a row near the bottom of the window opens its menu upward, so no item is off screen.
+    const need = items.length * 44 + 16;
+    const below = window.innerHeight - r.bottom;
+    setPos(below < need && r.top > below
+      ? { bottom: Math.max(8, window.innerHeight - r.top + 4), right }
+      : { top: Math.min(r.bottom + 4, window.innerHeight - 8), right });
     setOpen(true);
   }
 
@@ -96,7 +102,7 @@ export function RowMenu({ items, label = 'More actions', buttonText = 'More', di
           role="menu"
           aria-label={label}
           onKeyDown={onMenuKey}
-          style={{ position: 'fixed', top: pos.top, right: pos.right, zIndex: 1500, background: 'var(--c-deep)', border: '1px solid var(--c-line)', borderRadius: 6, padding: 4, minWidth: 190, boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5)', display: 'flex', flexDirection: 'column' }}
+          style={{ position: 'fixed', top: pos.top, bottom: pos.bottom, right: pos.right, maxHeight: 'calc(100vh - 16px)', overflowY: 'auto', zIndex: 1500, background: 'var(--c-deep)', border: '1px solid var(--c-line)', borderRadius: 6, padding: 4, minWidth: 190, boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5)', display: 'flex', flexDirection: 'column' }}
         >
           {items.map((it) => (
             <button

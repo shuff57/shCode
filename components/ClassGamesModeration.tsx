@@ -4,12 +4,16 @@
 // Games library, functions/api/classes/[id]/game-shares), with Play, Hide /
 // Show again and Remove, beside the texture and sound moderation. Hiding takes
 // a game out of students' view at once; removing takes it out of the class's
-// Games. Neither touches the student's own game.
+// Games. Neither touches the student's own game. Delete (in the row's menu,
+// POST /api/classes/[id]/game-delete) removes the game from the student's own
+// Library too; only for a student enrolled in this class (`canDelete`).
 
 import { useCallback, useEffect, useState } from 'react';
 import { errorText } from '../lib/http-error';
 import { playHref } from '../lib/games-client';
 import { useFeedback } from './FeedbackProvider';
+import { RowMenu } from './RowMenu';
+import { deleteGameConfirm } from '../lib/library-delete-words';
 
 interface Row {
   id: string;
@@ -18,6 +22,8 @@ interface Row {
   owner: string;
   sharedAt: number;
   hidden: boolean;
+  /** The publisher is a student enrolled in this class now, so a teacher may delete it outright. */
+  canDelete?: boolean;
 }
 
 export default function ClassGamesModeration({ classId }: { classId: string }) {
@@ -51,6 +57,19 @@ export default function ClassGamesModeration({ classId }: { classId: string }) {
     await load();
   };
 
+  const remove = async (r: Row) => {
+    if (!(await confirm({ ...deleteGameConfirm(r.owner, r.title), confirmLabel: 'Delete', danger: true }))) return;
+    const res = await fetch(`/api/classes/${encodeURIComponent(classId)}/game-delete`, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ gameId: r.id }),
+    });
+    if (!res.ok) { toast(await errorText(res), { kind: 'error' }); return; }
+    toast(`Deleted ${r.owner}'s game "${r.title}".`);
+    await load();
+  };
+
   if (error) return <p style={{ color: 'var(--c-red)', fontSize: 13 }}>{error}</p>;
   if (!rows) return <p style={{ color: 'var(--c-dim)', fontSize: 13 }}>Loading…</p>;
   if (!rows.length) {
@@ -71,6 +90,12 @@ export default function ClassGamesModeration({ classId }: { classId: string }) {
             ? <button type="button" style={btn} onClick={() => void act(r, 'unhide')}>Show again</button>
             : <button type="button" style={btn} onClick={() => void act(r, 'hide')}>Hide</button>}
           <button type="button" style={{ ...btn, color: 'var(--c-red)' }} onClick={() => void act(r, 'remove')}>Remove</button>
+          {r.canDelete && (
+            <RowMenu
+              label={`More actions for ${r.title}`}
+              items={[{ label: 'Delete…', danger: true, title: `Deletes it from ${r.owner}'s own Library too, on every computer.`, onSelect: () => { void remove(r); } }]}
+            />
+          )}
         </div>
       ))}
     </div>

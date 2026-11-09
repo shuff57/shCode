@@ -3,11 +3,13 @@
 //
 // Owner, co-teacher or admin only. Hide keeps the share but takes it out of
 // every student's view; remove takes it out of this class's library. Neither
-// touches the student's own copy, which stays in their account.
+// touches the student's own copy, which stays in their account. Deleting it
+// outright is POST /api/classes/[id]/library-delete (`canDelete` says where it applies).
 
 import { canManageClass } from '../../../../_shared/classAuth';
 import { ownerLabel, sharedInto } from '../../../../_shared/libraryShare';
 import { isUploadId } from '../../../../_shared/uploads';
+import { deletableOwners } from '../../../../_shared/libraryDelete';
 
 interface Env {
   DB: D1Database;
@@ -28,11 +30,13 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
   const refused = await allowed(env, data, classId);
   if (refused) return refused;
   const rows = await sharedInto(env.DB, [classId]);
+  // canDelete: the owner is a student enrolled in this class now (library-delete.ts allows exactly these).
+  const students = await deletableOwners(env.DB, classId);
   return json({
     items: rows.map((r) => ({
       id: r.id, kind: r.kind, name: r.name, bytes: r.bytes,
       owner: ownerLabel(r.first_name, r.last_name), ownerEmail: r.owner_email,
-      sharedAt: r.shared_at, hidden: r.hidden_at != null,
+      sharedAt: r.shared_at, hidden: r.hidden_at != null, canDelete: students.has(r.owner_email),
     })),
   });
 };

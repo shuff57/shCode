@@ -9,6 +9,7 @@
 import { canManageClass } from '../../../../_shared/classAuth';
 import { gamesSharedInto, json, type SessionData } from '../../../../_shared/games';
 import { ownerLabel } from '../../../../_shared/libraryShare';
+import { deletableOwners } from '../../../../_shared/libraryDelete';
 import { isGameId, modeLabel, type GameMode } from '../../../../../lib/games-core';
 
 interface Env {
@@ -29,12 +30,15 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
   const refused = await allowed(env, data, classId);
   if (refused) return refused;
   const rows = await gamesSharedInto(env.DB, [classId]);
+  // canDelete: the publisher is a student enrolled in this class now (game-delete.ts allows exactly these).
+  const students = await deletableOwners(env.DB, classId);
   return json({
     games: rows.map((r) => ({
       id: r.id, title: r.title, mode: r.mode, players: r.players,
       modeLabel: modeLabel(r.mode as GameMode, r.players), bytes: r.bytes,
       owner: ownerLabel(r.first_name, r.last_name),
       sharedAt: r.shared_at, updatedAt: r.updated_at, hidden: r.hidden_at != null,
+      canDelete: students.has(r.owner_email),
     })),
   });
 };

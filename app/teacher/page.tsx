@@ -17,6 +17,7 @@ import { describeGrade, opensInCodeEditor, showLateBadge, stillFailingRequiremen
 import MostMissedPanel from '../../components/MostMissedPanel';
 import ClassLibraryModeration from '../../components/ClassLibraryModeration';
 import ClassGamesModeration from '../../components/ClassGamesModeration';
+import { useClearStudentLibrary } from '../../components/ClearStudentLibrary';
 import ClassCodeSessions from '../../components/ClassCodeSessions';
 import PastDuePanel from '../../components/PastDuePanel';
 import { formatDue, schoolDateString } from '../../lib/due-dates-core';
@@ -2165,6 +2166,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
   }, []);
   const router = useRouter();
   const { confirm, toast } = useFeedback();
+  const clearLibrary = useClearStudentLibrary(classId);
   const [detail, setDetail] = useState<ClassDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
@@ -2642,7 +2644,10 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                         <RowMenu
                           label={`More actions for ${row.student_email}`}
                           disabled={removingEmail === row.student_email}
-                          items={[{ label: 'Remove from class…', danger: true, title: 'Takes them off this class roster. Their work is kept.', onSelect: () => { void handleRemove(row.student_email); } }]}
+                          items={[
+                            { label: 'Remove from class…', danger: true, title: 'Takes them off this class roster. Their work is kept.', onSelect: () => { void handleRemove(row.student_email); } },
+                            { label: 'Clear Library…', danger: true, title: 'Deletes every picture, sound, uploaded image and published game they have, on every computer.', onSelect: () => { void clearLibrary(row.student_email, prog?.firstName, prog?.lastName); } },
+                          ]}
                         />
                       </div>
                     </div>
