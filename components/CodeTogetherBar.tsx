@@ -11,14 +11,14 @@
 //     share again (big pictures with their letters), who is here. The editor
 //     keeps its full height while you choose. It is put in `dialogHost` (the
 //     sandbox shell, which is what goes full screen) so it shows there too.
-//   - the STRIP above the editor while in a session: one slim line (about the
-//     editor's file toolbar) with "Coding together", the code's pictures small,
-//     Copy, who is here with their colour dots, a short note when something
-//     happened ("Ana P. left.", offline), Leave, and a chevron that shows the
-//     details (the code big with letters for reading aloud, the teacher note,
-//     the notes in full). The details start open the first time and closed
-//     after that; a student's own choice is remembered in this browser.
-//     After a session ends, a slim line keeps the ending note until dismissed.
+//   - NOTHING above the editor while in a session (a strip there took the top
+//     of the editor, 2026-11-08). The code's pictures small and a colour dot
+//     per person go INSIDE the toolbar's button (`badgeHost`), which opens the
+//     popup again: the code big with letters, who is here by name, Copy and
+//     Leave. Something that happened ("Ana P. left.", offline, an error, the
+//     session ending) is a small toast in the editor's bottom-right corner:
+//     a passing notice goes by itself, a problem stays while it lasts, the
+//     ending note stays until dismissed.
 // The look is the moSHion lobby bar's (components/MoshionLobby.tsx, whose
 // picture picker and code pictures it reuses). A session is a room of kind
 // 'code' (POST /api/rooms, migration 0044); the shared editing itself is
@@ -35,7 +35,6 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronDown, ChevronUp } from 'lucide-react';
 import type { Extension } from '@codemirror/state';
 import { CODE_PLACEHOLDER, CodePictures, PickPicturesToggle, PicturePicker, lobbyStyles } from './MoshionLobby';
 import { LiveDocClient, seatColor, type DocEnded, type DocStatus } from '../lib/live-doc';
@@ -44,7 +43,7 @@ import { deviceId } from '../lib/moshion-online';
 import { leaveOnUnload, leaveRoom } from '../lib/room-leave';
 import { codeIcons } from '../lib/room-icons';
 
-const { bar, row, btn, quiet, dim, codeInput, listItem } = lobbyStyles;
+const { row, btn, quiet, dim, codeInput, listItem } = lobbyStyles;
 const LIST_MS = 3000;
 /** A Leave request this slow does not hold the open-sessions list up any longer. */
 const LEAVE_WAIT_MS = 4000;
@@ -52,10 +51,8 @@ export const TEACHER_NOTE = 'Your teacher can see programs you write together.';
 const JOIN_CONFIRM = 'Your sandbox code will be swapped for the shared program. Your own code is kept in History.';
 export const HOST_LEAVE_CONFIRM = 'Leave and end the session for everyone? Everyone keeps a copy.';
 const LANG_NAME: Record<CodeLang, string> = { js: 'JavaScript', moshion: 'moSHion' };
-/** Whether the strip's details are open: 'open' | 'closed' (absent: never in a session in this browser). */
-const DETAILS_KEY = 'shCode:together-details';
-/** Below this the strip's label is for screen readers only. */
-const NARROW_PX = 520;
+/** How long a passing notice ("Ana P. left.") stays in the corner. */
+const NOTICE_MS = 6000;
 
 interface OpenSession { code: string; host: string; seats: number; present: number; here: boolean }
 type ListState =
@@ -79,16 +76,6 @@ async function api(method: string, path: string, body?: unknown): Promise<{ stat
 function errorOf(r: { status: number; body: Record<string, unknown> }): string {
   if (r.status === 401) return 'Sign in to code together.';
   return typeof r.body.error === 'string' ? r.body.error : `Code together failed (${r.status}).`;
-}
-
-function readDetails(): 'open' | 'closed' | null {
-  try {
-    const v = window.localStorage.getItem(DETAILS_KEY);
-    return v === 'open' || v === 'closed' ? v : null;
-  } catch { return null; }
-}
-function writeDetails(v: 'open' | 'closed') {
-  try { window.localStorage.setItem(DETAILS_KEY, v); } catch { /* private mode: open the first time each visit */ }
 }
 
 /**
@@ -142,12 +129,14 @@ export interface CodeTogetherBarProps {
   onOpenChange: (open: boolean) => void;
   /** Where the popup is put: the sandbox shell, which is what goes full screen. */
   dialogHost?: HTMLElement | null;
+  /** Inside the toolbar's Code together button: the code's pictures and a dot per person go here in a session. */
+  badgeHost?: HTMLElement | null;
 }
 
 interface Session { code: string; hosting: boolean }
 
 export default function CodeTogetherBar({
-  lang, getText, isUntouched, snapshot, onCollab, onActive, onHere, keepCopy, open, onOpenChange, dialogHost,
+  lang, getText, isUntouched, snapshot, onCollab, onActive, onHere, keepCopy, open, onOpenChange, dialogHost, badgeHost,
 }: CodeTogetherBarProps) {
   const [device] = useState(() => (typeof window === 'undefined' ? '' : deviceId()));
   const [session, setSession] = useState<Session | null>(null);
@@ -160,11 +149,8 @@ export default function CodeTogetherBar({
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [expanded, setExpanded] = useState(false);
-  // A narrow strip (full screen floats the editor at 420 px) drops the words
-  // "Coding together" from sight, so a note keeps its room.
-  const [narrow, setNarrow] = useState(false);
-  const stripRef = useRef<HTMLDivElement | null>(null);
+  /** The passing notice still showing in the corner (it goes after NOTICE_MS). */
+  const [shownNotice, setShownNotice] = useState<string | null>(null);
   const clientRef = useRef<LiveDocClient | null>(null);
   const sessionRef = useRef<Session | null>(null);
   sessionRef.current = session;
@@ -179,7 +165,6 @@ export default function CodeTogetherBar({
   cb.current = { getText, isUntouched, snapshot, onCollab, onActive, keepCopy, onOpenChange, onHere };
   const game = CODE_ROOM_GAMES[lang];
   const uid = useId();
-  const detailsId = `${uid}-details`;
 
   // Open sessions for this mode, while the popup shows and this tab is not in one.
   useEffect(() => {
@@ -209,14 +194,13 @@ export default function CodeTogetherBar({
     return () => { live = false; if (timer) clearTimeout(timer); };
   }, [session, open, game, device]);
 
-  const inSession = !!session;
+  const notice = status?.notice ?? null;
   useEffect(() => {
-    const el = stripRef.current;
-    if (!el || typeof ResizeObserver === 'undefined') return;
-    const ro = new ResizeObserver(() => setNarrow(el.clientWidth < NARROW_PX));
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [inSession]);
+    setShownNotice(notice);
+    if (!notice) return;
+    const t = setTimeout(() => setShownNotice(null), NOTICE_MS);
+    return () => clearTimeout(t);
+  }, [notice]);
 
   const here = session ? Math.max(1, status?.players.length ?? 0) : 0;
   useEffect(() => { cb.current.onHere?.(here); }, [here]);
@@ -248,13 +232,10 @@ export default function CodeTogetherBar({
     setError(null);
     setNote(null);
     setBusy(false);
-    // The details start open the first time this browser is in a session, closed after that, or as the student left them.
-    const saved = readDetails();
-    setExpanded(saved === null ? true : saved === 'open');
-    if (saved === null) writeDetails('closed');
     cb.current.onActive(true);
     cb.current.onCollab(client.extension);
-    cb.current.onOpenChange(false);
+    // The host keeps the popup, which now shows the code big to read out; a joiner is straight into the editor.
+    if (!hosting) cb.current.onOpenChange(false);
     client.start();
   }, [device, finish]);
 
@@ -347,13 +328,6 @@ export default function CodeTogetherBar({
     try { await navigator.clipboard.writeText(s.code); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch { /* the code is on screen */ }
   };
 
-  const toggleDetails = () => {
-    setExpanded((was) => {
-      writeDetails(was ? 'closed' : 'open');
-      return !was;
-    });
-  };
-
   const close = useCallback(() => cb.current.onOpenChange(false), []);
 
   // ---- in a session ----------------------------------------------------------
@@ -379,126 +353,73 @@ export default function CodeTogetherBar({
         : 'Waiting for the others to come back.';
     }
   }
-  // What the strip's one line says after the people: a problem first, then something that happened, then the state.
-  const stripNote = st?.error
-    ? { text: st.error, color: 'var(--c-red)' }
-    : st?.notice
-      ? { text: st.notice, color: 'var(--c-orange)' }
-      : shortLine
-        ? { text: shortLine, color: 'var(--c-dim)' }
-        : null;
+  // The corner toast: a problem first (it stays while it lasts), then a passing notice, then the ending note.
+  const toast = st?.error
+    ? { text: st.error, color: 'var(--c-red)', role: 'alert' as const, testid: 'together-error', dismiss: false }
+    : session && st?.phase === 'reconnecting'
+      ? { text: longLine ?? 'Offline: reconnecting...', color: 'var(--c-orange)', role: 'status' as const, testid: 'together-status', dismiss: false }
+      : session && shownNotice
+        ? { text: shownNotice, color: 'var(--c-orange)', role: 'status' as const, testid: 'together-notice', dismiss: false }
+        : !session && note && !open
+          ? { text: note, color: 'var(--c-orange)', role: 'status' as const, testid: 'together-note', dismiss: true }
+          : null;
 
-  // Who is here, each with their colour dot. In the strip it is one line that
-  // ends in "..." when it runs out of room (the note beside it is kept whole);
-  // the popup and the details have room for everyone.
-  const peopleList = (wrap: boolean) => (
+  // Who is here, each with the colour their caret wears in the editor; this tab's own entry says "you".
+  const nameOf = (p: { seat: number; name: string }) => (p.seat === mySeat ? (p.name ? `${p.name} (you)` : 'you') : p.name);
+  const peopleList = () => (
     <span
-      data-testid={wrap ? undefined : 'together-people'}
-      aria-live={wrap ? undefined : 'polite'}
-      style={wrap
-        ? { minWidth: 0, display: 'inline-flex', flexWrap: 'wrap', alignItems: 'center', columnGap: 10, rowGap: 2 }
-        // Gives up its room before the note beside it (S.stripRest).
-        : { minWidth: 0, flex: '0 1 auto', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+      data-testid="together-people"
+      aria-live="polite"
+      style={{ minWidth: 0, display: 'inline-flex', flexWrap: 'wrap', alignItems: 'center', columnGap: 10, rowGap: 2 }}
     >
       <span className="sr-only">{here} here: </span>
-      {listed.map((p, i) => (
-        <span
-          key={p.seat}
-          data-seat={p.seat}
-          style={wrap
-            ? { display: 'inline-flex', alignItems: 'center', gap: 5, minWidth: 0, overflowWrap: 'anywhere' }
-            : { marginLeft: i ? 10 : 0 }}
-        >
+      {listed.map((p) => (
+        <span key={p.seat} data-seat={p.seat} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, minWidth: 0, overflowWrap: 'anywhere' }}>
           {p.seat >= 0 ? (
-            <span
-              aria-hidden="true"
-              style={{
-                display: 'inline-block', width: 9, height: 9, borderRadius: '50%', background: seatColor(p.seat), flex: 'none',
-                ...(wrap ? {} : { marginRight: 5, verticalAlign: 'middle', position: 'relative', top: -1 }),
-              }}
-            />
+            <span aria-hidden="true" style={{ display: 'inline-block', width: 9, height: 9, borderRadius: '50%', background: seatColor(p.seat), flex: 'none' }} />
           ) : null}
-          {p.seat === mySeat ? (p.name ? `${p.name} (you)` : 'you') : p.name}
+          {nameOf(p)}
         </span>
       ))}
     </span>
   );
 
-  const strip = session ? (
-    <div
-      ref={stripRef}
-      style={{ ...bar, gap: 0, padding: 0, maxHeight: '45%' }}
-      role="region"
-      aria-label="Code together"
-      data-testid="code-together"
-      data-expanded={expanded ? 'true' : 'false'}
-    >
-      <div style={S.stripRow}>
-        <strong style={S.stripLabel} className={narrow ? 'sr-only' : undefined}>Coding together</strong>
-        <span data-testid="together-code" data-code={session.code} style={{ flex: 'none', display: 'inline-flex' }}>
-          <CodePictures code={session.code} size={18} letters={false} />
-        </span>
-        <button type="button" style={S.small} onClick={() => void copy()} aria-label={`Copy session code ${session.code}`}>
-          {copied ? 'Copied' : 'Copy'}
-        </button>
-        <span style={{ ...dim, flex: 'none' }} aria-hidden="true">·</span>
-        {/* The room left over: the people give theirs up first, then the note; the rest of the line never moves. */}
-        <span style={S.stripRest}>
-          {peopleList(false)}
-          {stripNote ? (
-            <span
-              data-testid={st?.error ? undefined : st?.notice ? 'together-notice' : 'together-status'}
-              role={st?.error ? 'alert' : 'status'}
-              title={st?.error || st?.notice || longLine || undefined}
-              style={{ ...S.stripNote, color: stripNote.color }}
-            >
-              {stripNote.text}
-            </span>
-          ) : null}
-        </span>
-        <button type="button" style={S.small} onClick={leave}>Leave</button>
-        <button
-          type="button"
-          style={{ ...S.small, padding: '2px 4px', display: 'inline-flex', alignItems: 'center' }}
-          aria-expanded={expanded}
-          aria-controls={detailsId}
-          aria-label="Session details"
-          title={expanded ? 'Hide the details' : 'Show the code big, and the details'}
-          onClick={toggleDetails}
-        >
-          {expanded ? <ChevronUp size={14} aria-hidden="true" /> : <ChevronDown size={14} aria-hidden="true" />}
-        </button>
-      </div>
-      {expanded ? (
-        <div id={detailsId} style={S.details} data-testid="together-details">
-          <div style={row}>
-            <CodePictures code={session.code} size={28} letters />
-            <span style={dim}>
-              {session.hosting
-                ? 'Read the pictures out, or classmates can pick this session from Open sessions.'
-                : 'The session code: read the pictures out to bring someone in.'}
-            </span>
-          </div>
-          {/* The host's "waiting" sentence would only say again how to share the code (the line above). */}
-          {longLine && !(session.hosting && players.length <= 1 && st?.phase === 'live') ? <div style={dim}>{longLine}</div> : null}
-          {st?.notice ? <div style={{ color: 'var(--c-orange)' }}>{st.notice}</div> : null}
-          {st?.error ? <div style={{ color: 'var(--c-red)' }}>{st.error}</div> : null}
-          <div style={{ ...dim, fontSize: '0.72rem' }}>{TEACHER_NOTE}</div>
-        </div>
+  // In the toolbar button: the code's pictures small, then a dot per person (names in the tooltip and for screen readers).
+  // pointerEvents none: a click on a portal's content bubbles to THIS component in React, never to the button around it.
+  const badge = session ? (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, pointerEvents: 'none' }}>
+      <span className="sr-only">Coding together, code {session.code}, {here} here: {listed.map(nameOf).join(', ')}</span>
+      <span data-testid="together-code" data-code={session.code} aria-hidden="true" style={{ display: 'inline-flex' }}>
+        <CodePictures code={session.code} size={16} letters={false} />
+      </span>
+      <span aria-hidden="true" data-testid="together-dots" style={{ display: 'inline-flex', gap: 3 }}>
+        {listed.map((p) => (
+          <span key={p.seat} style={{ width: 8, height: 8, borderRadius: '50%', background: p.seat >= 0 ? seatColor(p.seat) : 'var(--c-dim)' }} />
+        ))}
+      </span>
+      {st?.phase === 'reconnecting' || !st || st.phase === 'connecting' ? (
+        <span aria-hidden="true" style={{ color: 'var(--c-orange)' }}>…</span>
       ) : null}
-    </div>
-  ) : note && !open ? (
-    // The session ended (Leave, the host, the host gone): said where it was, until dismissed.
-    <div style={{ ...bar, gap: 0, padding: 0 }} data-testid="together-ended">
-      <div style={S.stripRow}>
-        <span role="status" data-testid="together-note" style={{ ...S.stripNote, flex: '0 1 auto', color: 'var(--c-orange)' }} title={note}>
-          {note}
-        </span>
-        <span style={{ flex: '1 1 0', minWidth: 0 }} />
+    </span>
+  ) : null;
+
+  const toastEl = toast ? (
+    <div
+      role={toast.role}
+      data-testid={toast.testid}
+      style={{
+        position: 'absolute', right: 10, bottom: 10, zIndex: 20, maxWidth: 'min(360px, calc(100% - 20px))',
+        display: 'flex', alignItems: 'flex-start', gap: 8, padding: '6px 10px', borderRadius: 6,
+        background: 'var(--c-bg)', border: `1px solid ${toast.color}`, color: toast.color,
+        boxShadow: '0 4px 14px rgba(0, 0, 0, 0.35)', fontSize: 12, lineHeight: 1.35,
+      }}
+    >
+      <span style={{ minWidth: 0, overflowWrap: 'anywhere' }}>{toast.text}</span>
+      {toast.dismiss ? (
         <button type="button" style={S.small} onClick={() => setNote(null)} aria-label="Dismiss this note">
           <span aria-hidden="true">×</span>
         </button>
-      </div>
+      ) : null}
     </div>
   ) : null;
 
@@ -519,10 +440,15 @@ export default function CodeTogetherBar({
               {copied ? 'Copied' : 'Copy'}
             </button>
           </div>
-          <div style={row}>{peopleList(true)}</div>
+          <div style={row}>{peopleList()}</div>
           {longLine ? <div style={dim}>{longLine}</div> : null}
           {st?.notice ? <div style={{ color: 'var(--c-orange)' }}>{st.notice}</div> : null}
+          {st?.error ? <div style={{ color: 'var(--c-red)' }}>{st.error}</div> : null}
           <div style={{ ...dim, fontSize: '0.75rem' }}>{TEACHER_NOTE}</div>
+          <div style={{ ...row, justifyContent: 'flex-end' }}>
+            <button type="button" style={quiet} onClick={leave}>{session.hosting ? 'End session' : 'Leave'}</button>
+            <button type="button" style={btn} onClick={close}>Back to coding</button>
+          </div>
         </>
       ) : (
         <>
@@ -612,35 +538,15 @@ export default function CodeTogetherBar({
 
   return (
     <>
-      {strip}
+      {badge && badgeHost ? createPortal(badge, badgeHost) : null}
+      {toastEl}
       {dialog && typeof document !== 'undefined' ? createPortal(dialog, dialogHost ?? document.body) : null}
     </>
   );
 }
 
 const S = {
-  stripRow: {
-    display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flexWrap: 'nowrap',
-    padding: '4px 8px', minHeight: 30, boxSizing: 'border-box',
-  } as React.CSSProperties,
-  small: {
-    ...quiet, padding: '2px 8px', fontSize: 11, flex: 'none',
-  } as React.CSSProperties,
-  /** Gives way only on a line too narrow for even the fixed parts, so Leave and the chevron always stay on it. */
-  stripLabel: {
-    flex: '0 1 auto', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-  } as React.CSSProperties,
-  /** The room between Copy and Leave (a zero basis: it takes what is left and never pushes anything out). */
-  stripRest: {
-    flex: '1 1 0', minWidth: 0, display: 'flex', alignItems: 'center', gap: 10, overflow: 'hidden',
-  } as React.CSSProperties,
-  /** The strip's note keeps its room (the people beside it shrink first), at most the whole of what is left. */
-  stripNote: {
-    minWidth: 0, flex: 'none', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-  } as React.CSSProperties,
-  details: {
-    display: 'flex', flexDirection: 'column', gap: 5, padding: '2px 10px 8px',
-  } as React.CSSProperties,
+  small: { ...quiet, padding: '0 6px', fontSize: 12, flex: 'none' } as React.CSSProperties,
   backdrop: {
     position: 'fixed', inset: 0, zIndex: 1900, background: 'rgba(0, 0, 0, 0.6)',
     display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,

@@ -606,9 +606,12 @@ fallback; `lib/room-leave.ts`); a reload in the same tab still gets its seat bac
 room whose host seat has had no socket for 60 s: they set `game_rooms.closed_at` in D1 (the Worker's own `DB` binding),
 then tell the sockets. The rule is in `lib/live-protocol.ts` with an injectable clock (so a change there means
 redeploying `workers/live`). Polling (non-live) rooms only get the beacon. Code together's start/join/share controls
-are a modal (`CodeTogetherBar.tsx`); in a session the space above the editor is one slim line (code pictures, people,
-Copy, Leave, an expand toggle remembered per browser), and the toolbar button reads "Coding together · N" and reopens
-the popup. A mode button clicked before the sandbox hydrates is kept by a small inline script and applied on start.
+are a modal (`CodeTogetherBar.tsx`). In a session NOTHING sits above the editor: the code's pictures and a colour dot
+per person are drawn inside the toolbar's Code together button (a portal, `badgeHost`, with `pointerEvents: none` so
+the click reaches the button: React bubbles a portal's events to the component that rendered it, not the DOM parent),
+and the button reopens the popup (code big, names, Copy, Leave / End session). Notices (someone left, offline, an
+error, the session's end) are a small toast in the editor's bottom-right corner. After Start the host's popup stays
+open with the code to read out. A mode button clicked before the sandbox hydrates is kept by a small inline script and applied on start.
 
 ### Games library (Part B, migration 0042)
 A student publishes a moSHion sketch from the sandbox (`components/PublishGameButton.tsx`: title, share with my class,

@@ -137,6 +137,7 @@ export default function SandboxWorkspace() {
   const [togetherOpen, setTogetherOpen] = useState(false);
   const [together, setTogether] = useState(false);
   const [togetherHere, setTogetherHere] = useState(0);
+  const [togetherBadge, setTogetherBadge] = useState<HTMLSpanElement | null>(null);
   const [collabExt, setCollabExt] = useState<Extension | null>(null);
   const cloudRef = useRef(cloud);
   cloudRef.current = cloud;
@@ -786,13 +787,12 @@ export default function SandboxWorkspace() {
                 aria-haspopup="dialog"
                 aria-expanded={togetherOpen}
                 onClick={() => setTogetherOpen(true)}
-                title={together ? 'Show the session code to share it again' : 'Write one program with classmates at the same time'}
+                title={together ? `Coding together, ${togetherHere} here: the session code, who is here, and Leave` : 'Write one program with classmates at the same time'}
                 data-testid="code-together-button"
               >
                 <Users size={12} aria-hidden="true" />
-                {together ? (
-                  <>Coding together<span aria-hidden="true"> · </span>{togetherHere}<span className="sr-only"> here</span></>
-                ) : 'Code together'}
+                {/* In a session CodeTogetherBar puts the code's pictures and a dot per person in here (badgeHost). */}
+                {together ? <span ref={setTogetherBadge} style={{ display: 'inline-flex' }} /> : 'Code together'}
               </button>
             )}
             <button
@@ -856,6 +856,7 @@ export default function SandboxWorkspace() {
                     open={togetherOpen}
                     onOpenChange={setTogetherOpen}
                     dialogHost={shellRef.current}
+                    badgeHost={togetherBadge}
                   />
                 )}
                 <div style={{ flex: '1 1 auto', minHeight: 0 }}>

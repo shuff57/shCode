@@ -225,6 +225,9 @@ async function startCodeTogether(page, demo) {
   const start = page.getByRole('dialog', { name: 'Code together' }).getByRole('button', { name: 'Start' });
   await (demo ? demo.click(start, { after: 900 }) : start.click());
   await page.locator('[data-testid=together-code][data-code]').waitFor({ timeout: 30000 });
+  // The host's popup stays open with the code big to read out; back to the editor.
+  const back = page.getByRole('dialog', { name: 'Coding together' }).getByRole('button', { name: 'Back to coding' });
+  await (demo ? demo.click(back, { after: 1200 }) : back.click());
 }
 async function joinCodeTogether(page, demo) {
   await (demo ? demo.click(page.getByRole('button', { name: 'Code together', exact: true }), { after: 900 }) : page.getByRole('button', { name: 'Code together', exact: true }).click());

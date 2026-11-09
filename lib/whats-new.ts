@@ -56,7 +56,7 @@ export const WHATS_NEW: WhatsNewEntry[] = [
     steps: [
       'Open the Sandbox, pick JavaScript or moSHion, and press Code together.',
       "Press Start and tell your classmates your 4 pictures, or join a classmate's session from Open sessions.",
-      'Press Leave when you are done: you keep a copy. Your teacher can see programs you write together.',
+      'Your code and who is here show on the Code together button; click it to Leave when you are done. You keep a copy, and your teacher can see programs you write together.',
     ],
     media: {
       clip: '/whats-new/2026-11-code-together.mp4',
