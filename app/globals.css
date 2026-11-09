@@ -2432,9 +2432,6 @@ body { box-sizing: border-box; padding-right: 20px; }
   .lab-assignment-header .assignment-header-left p { display: none; }
   .lab-work-area .run-toolbar { flex-wrap: nowrap; overflow-x: auto; }
   .lab-work-area .run-toolbar button { flex-shrink: 0; }
-  /* Keep the Save word (the action a first-time coder must find); History
-     drops to its glyph. Both buttons carry aria-label and title. */
-  .lab-work-area .run-toolbar .toolbar-history .toolbar-button-label { display: none; }
   .quiz-guidance p { display: block !important; -webkit-line-clamp: unset !important; overflow: visible !important; font-size: 13px !important; }
   .mod-row-title { display: block; }
   .mod-row-title .mod-row-num { font-size: 12px; margin-right: 5px; }
@@ -2749,3 +2746,42 @@ a.mod-row:hover { background: var(--x-343746); border-top-color: var(--c-comment
   .lab-work-area:has(.output-header) #editor .cm-editor { height: auto; }
   .lab-work-area:has(.output-header) #editor .cm-scroller { min-height: 140px; max-height: calc(45svh - 40px); }
 }
+
+/* Console labs follow the rendered program, with a shared useful minimum.
+   Let long code/output scroll at the viewport cap; graphical previews keep
+   their existing canvas-sized split. */
+@media (min-width: 721px) {
+  .lab-work-area:has(.output-header) { align-items: start; }
+  .lab-work-area:has(.output-header) .editor-preview-container { height: auto; }
+  .lab-work-area:has(.output-header) .pane { height: auto; min-height: 320px; }
+  .lab-work-area:has(.output-header) #editorPane > div,
+  .lab-work-area:has(.output-header) #editor > div { height: auto !important; }
+  .lab-work-area:has(.output-header) #editor { height: auto; }
+  .lab-work-area:has(.output-header) #editor .cm-editor { height: auto; }
+  .lab-work-area:has(.output-header) #editor .cm-scroller { max-height: max(280px, calc(100svh - 400px)); }
+  .lab-work-area:has(.output-header) .run-output { height: auto; max-height: max(280px, calc(100svh - 400px)); }
+}
+
+@media (max-width: 720px) {
+  /* Primary actions first; labelled, equally touchable tools in their own row. */
+  .lab-work-area .run-toolbar { flex-wrap: wrap; overflow: visible; gap: 8px !important; }
+  .lab-work-area .run-toolbar button {
+    min-width: 40px; min-height: 40px; padding: 8px 12px !important;
+    font-size: 13px !important; justify-content: center;
+  }
+  .lab-work-area .run-toolbar > .btn-run { flex: 1 1 auto; }
+  .lab-work-area .toolbar-utilities {
+    display: flex !important; flex: 1 0 100%; margin-left: 0 !important; padding-top: 8px;
+    border-top: 1px solid var(--c-line); gap: 8px !important; flex-wrap: wrap;
+  }
+  .lab-work-area .toolbar-utilities > button { flex: 1 1 auto; }
+  .lab-work-area .run-toolbar .toolbar-history .toolbar-button-label { display: inline; }
+  .lab-work-area .run-toolbar button:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; }
+
+}
+
+/* Climb 3 r3: Reset (destructive) is set apart from History / Save (keep work) in the tools group:
+   a gap and a divider on desktop, and a red tone on hover. */
+.toolbar-utilities .toolbar-reset { position: relative; margin-right: 12px; }
+.toolbar-utilities .toolbar-reset::after { content: ''; position: absolute; right: -11px; top: 4px; bottom: 4px; width: 1px; background: var(--c-line); }
+.toolbar-utilities .toolbar-reset:hover { color: var(--c-red) !important; border-color: color-mix(in srgb, var(--c-red) 55%, transparent) !important; }

@@ -1438,7 +1438,43 @@ function GradebookView({
   // Frozen only on wide screens (see `narrow` above).
   const gradeLeft = narrow ? undefined : EMAIL_W;
 
-  // Missing work has a distinct marker so its meaning does not depend on colour.
+  type CellStatus = 'missing' | 'late' | 'grade' | 'started' | 'not-due';
+  const overdueFill = 'color-mix(in srgb, var(--c-red) 18%, transparent)';
+
+  // Presentation only: keep the existing score branches and pending-review priority.
+  function nonScoreStatus(cell: GradebookCell | undefined, graded: boolean): CellStatus | null {
+    if (cell?.pending) return 'grade';
+    if (!cell || (!cell.state && cell.submitted_score === null)) {
+      return cell?.late && graded ? 'missing' : 'not-due';
+    }
+    if (cell.state === 'completed') return null;
+    if (cell.state === 'started') {
+      if ((cell.score ?? cell.submitted_score) !== null) return null;
+      return cell.late && graded ? 'late' : 'started';
+    }
+    if (cell.submitted_score !== null) return null;
+    return cell.late && graded ? 'missing' : 'not-due';
+  }
+
+  function statusLabel(status: CellStatus, legend = false): React.ReactNode {
+    const overdue = status === 'missing' || status === 'late';
+    const label = { missing: 'Missing', late: 'Late', grade: 'Grade', started: 'Started', 'not-due': '—' }[status];
+    return (
+      <span style={{
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        whiteSpace: 'nowrap', boxSizing: 'border-box',
+        fontFamily: 'monospace', fontSize: 12, lineHeight: '20px',
+        fontWeight: overdue || status === 'grade' ? 700 : 600,
+        padding: status === 'not-due' ? 0 : '0 8px', borderRadius: 4,
+        color: overdue ? 'var(--c-red)' : status === 'grade' ? 'var(--c-orange)' : status === 'started' ? 'var(--c-yellow)' : 'var(--c-meta)',
+        background: overdue && legend ? overdueFill : status === 'grade' ? 'color-mix(in srgb, var(--c-orange) 12%, transparent)' : 'transparent',
+        border: status === 'grade' ? '1px solid color-mix(in srgb, var(--c-orange) 45%, transparent)' : status === 'started' ? '1px solid color-mix(in srgb, var(--c-yellow) 40%, transparent)' : '1px solid transparent',
+      }}>
+        {label}
+      </span>
+    );
+  }
+
   function cellContent(cell: GradebookCell | undefined, maxScore?: number | null, graded = true): React.ReactNode {
     // Colour reflects the displayed mark's percentage; the stored mark and grading stay unchanged.
     const scoreColor = (pct: number) => pct >= 90 ? 'var(--c-green)' : pct >= 70 ? 'var(--c-cyan)' : pct >= 50 ? 'var(--c-orange)' : 'var(--c-pink)';
@@ -1453,23 +1489,9 @@ function GradebookView({
         : c?.state === 'started' ? 'var(--c-yellow)' : 'var(--c-meta)';
       return <span style={{ color }}>{node}</span>;
     };
-    // Checked before every other branch. A grader outage leaves the row
-    // completed with a NULL score, which reads as a plain green tick, and it
-    // leaves submitted_score NULL, which reads as the same "·" a student who
-    // never opened the lesson gets. Either way the teacher is told nothing
-    // happened when in fact an answer is sitting in the review queue.
-    if (cell?.pending) {
-      return withLate(cell, (
-        <span
-          style={{ color: 'inherit', fontFamily: 'monospace', fontWeight: 700, fontSize: 14 }}
-        >
-          ⋯
-        </span>
-      ));
-    }
-    if (!cell || (!cell.state && cell.submitted_score === null)) {
-      return withLate(cell, <span style={{ color: 'inherit', fontFamily: 'monospace', fontSize: 14, fontWeight: cell?.late && graded ? 700 : 400 }}>{cell?.late && graded ? '!' : '·'}</span>);
-    }
+    const status = nonScoreStatus(cell, graded);
+    if (status) return statusLabel(status);
+    if (!cell) return null;
     if (cell.state === 'completed') {
       // The PERCENT the grade is built from (lessonPercent, the function functions/_shared/grading.ts
       // uses), not lesson_state.score, which is raw points in the part's own units. The raw number
@@ -1502,7 +1524,7 @@ function GradebookView({
           </span>
         ));
       }
-      return withLate(cell, <span style={{ color: 'inherit', fontFamily: 'monospace', fontSize: 14 }}>…</span>);
+      return statusLabel(cell.late && graded ? 'late' : 'started');
     }
     // Has submission data but no lesson_state (edge case)
     if (cell.submitted_score !== null) {
@@ -1512,7 +1534,7 @@ function GradebookView({
         </span>
       ));
     }
-    return withLate(cell, <span style={{ color: 'inherit', fontFamily: 'monospace', fontSize: 14, fontWeight: cell?.late && graded ? 700 : 400 }}>{cell?.late && graded ? '!' : '·'}</span>);
+    return statusLabel(cell.late && graded ? 'missing' : 'not-due');
   }
 
   // Plain words for a cell, for the hover tip and for screen readers: what the student has done, the
@@ -1670,15 +1692,17 @@ function GradebookView({
       </div>
 
       <div aria-label="Gradebook legend" style={{ display: 'flex', flexWrap: 'nowrap', gap: 16, marginBottom: 12, overflowX: 'auto', paddingBottom: 4, fontSize: 13, color: 'var(--c-meta)' }}>
-        {[
-          { glyph: '100', label: 'done', color: 'var(--c-green)' },
-          { glyph: '!', label: 'past due', color: 'var(--c-red)' },
-          { glyph: '·', label: 'not due yet', color: 'var(--c-meta)' },
-          { glyph: '…', label: 'in progress', color: 'var(--c-yellow)' },
-          { glyph: '⋯', label: 'needs grading', color: 'var(--c-orange)' },
-        ].map(({ glyph, label, color }) => (
-          <span key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0, whiteSpace: 'nowrap' }}>
-            <span style={{ color, fontFamily: 'monospace', fontSize: 14, fontWeight: 700 }}>{glyph}</span>{label}
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0, whiteSpace: 'nowrap' }}>
+          <span style={{ color: 'var(--c-green)', fontFamily: 'monospace', fontSize: 14, fontWeight: 700 }}>100</span>done
+        </span>
+        {([
+          { status: 'missing', label: 'past due' },
+          { status: 'grade', label: 'needs grading' },
+          { status: 'started', label: 'in progress' },
+          { status: 'not-due', label: 'not due yet' },
+        ] as const).map(({ status, label }) => (
+          <span key={status} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0, whiteSpace: 'nowrap' }}>
+            {statusLabel(status, true)}{label}
           </span>
         ))}
       </div>
@@ -1948,6 +1972,7 @@ function GradebookView({
                 {displayLessons.map((lesson) => {
                   const cell = student.cells[lesson.id];
                   const isCodingLesson = CODE_PREVIEWS.has(lesson.preview ?? '');
+                  const status = nonScoreStatus(cell, gradedIds.has(lesson.id));
                   return (
                     <td
                       key={lesson.id}
@@ -1956,7 +1981,7 @@ function GradebookView({
                         padding: '8px 4px', fontSize: 14,
                         borderBottom: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)',
                         textAlign: 'center', verticalAlign: 'middle',
-                        background: 'transparent',
+                        background: status === 'missing' || status === 'late' ? overdueFill : 'transparent',
                         ...(isCodingLesson || cell ? { cursor: 'pointer' } : {}),
                       }}
                       title={cellTitle(cell, lesson.title, lesson.id, lesson.maxScore, gradedIds.has(lesson.id))}
