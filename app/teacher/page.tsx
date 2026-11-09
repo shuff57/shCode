@@ -1695,7 +1695,7 @@ function GradebookView({
                   position: 'sticky', left: 0, top: 0, zIndex: 3,
                   width: EMAIL_W, minWidth: EMAIL_W,
                   height: HEAD1_H, boxSizing: 'border-box',
-                  background: headerBg, padding: '12px 12px',
+                  background: headerBg, padding: '8px 12px',
                   borderBottom: '1px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
                   textAlign: 'left', color: 'var(--c-meta)', fontSize: 13, fontWeight: 700,
                   textTransform: 'uppercase', letterSpacing: '0.06em',
@@ -1708,7 +1708,7 @@ function GradebookView({
                   position: 'sticky', left: gradeLeft, top: 0, zIndex: 3,
                   width: GRADE_W, minWidth: GRADE_W,
                   height: HEAD1_H, boxSizing: 'border-box',
-                  background: headerBg, padding: '12px 8px',
+                  background: headerBg, padding: '8px 8px',
                   borderBottom: '1px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
                   textAlign: 'center', color: 'var(--c-meta)', fontSize: 13, fontWeight: 700,
                   textTransform: 'uppercase', letterSpacing: '0.06em',
@@ -1724,7 +1724,7 @@ function GradebookView({
                     position: 'sticky', top: 0, zIndex: 2,
                     height: HEAD1_H, boxSizing: 'border-box',
                     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                    background: headerBg, padding: '12px 4px',
+                    background: headerBg, padding: '8px 4px',
                     borderBottom: '1px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
                     textAlign: 'center', color: 'var(--c-meta)', fontSize: 13, fontWeight: 700,
                     textTransform: 'uppercase', letterSpacing: '0.06em',
@@ -1743,7 +1743,7 @@ function GradebookView({
                     position: 'sticky', top: 0, zIndex: 2,
                     height: HEAD1_H, boxSizing: 'border-box',
                     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                    background: headerBg, padding: '12px 4px',
+                    background: headerBg, padding: '8px 4px',
                     borderBottom: '1px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
                     textAlign: 'center', color: 'var(--c-purple)', fontSize: 12, fontWeight: 700,
                     textTransform: 'uppercase', letterSpacing: '0.06em',
@@ -1797,13 +1797,14 @@ function GradebookView({
                   style={{
                     position: 'sticky', top: HEAD1_H, zIndex: 2,
                     width: CELL_W, minWidth: CELL_W, maxWidth: CELL_W,
-                    // Keep headers to two lines; the tooltip retains the full title.
-                    height: 56, verticalAlign: 'top', overflow: 'hidden',
+                    // A separate number plus two title lines keeps assignments identifiable
+                    // without widening the six-column desktop viewport.
+                    height: 80, verticalAlign: 'top', overflow: 'hidden',
                     background: stickyBg, padding: '8px 4px 8px',
                     borderTop: `3px solid ${catOf.get(lesson.id) ? CAT_COLOR[catOf.get(lesson.id) as GradeCategory] : 'var(--c-line)'}`,
                     borderBottom: '2px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)',
-                    textAlign: 'center', color: 'var(--c-purple)', fontSize: 12,
-                    fontWeight: 600,
+                    textAlign: 'left', color: 'var(--c-fg)', fontSize: 13,
+                    fontWeight: 700,
                   }}
                 >
                   {/*
@@ -1817,6 +1818,7 @@ function GradebookView({
                     href={lessonHref(lesson)}
                     target="_blank"
                     rel="noreferrer"
+                    title={lesson.title}
                     style={{
                       color: 'inherit',
                       textDecoration: 'none',
@@ -1826,11 +1828,10 @@ function GradebookView({
                       whiteSpace: 'normal',
                       overflow: 'hidden',
                       lineHeight: 1.25,
-
                     }}
                   >
-                    <strong style={{ display: 'block', fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{lesson.title.match(/^\d+\.\d+\.\d+/)?.[0] ?? lesson.title}</strong>
-                    <span style={{ display: 'block', marginTop: 4, color: 'var(--c-meta)', fontSize: 13, fontWeight: 400, lineHeight: 1.35, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{lesson.title.replace(/^\d+\.\d+\.\d+\s*[:–—.-]?\s*/, '')}</span>
+                    <strong style={{ display: 'block', color: 'var(--c-meta)', fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{lesson.title.match(/^\d+\.\d+\.\d+/)?.[0] ?? lesson.title}</strong>
+                    <span style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, height: 36, marginTop: 4, color: 'var(--c-purple)', fontSize: 13, fontWeight: 700, lineHeight: '18px', overflow: 'hidden', whiteSpace: 'normal', overflowWrap: 'anywhere' }}>{lesson.title.replace(/^\d+\.\d+\.\d+\s*[:–—.-]?\s*/, '')}</span>
                   </a>
                 </th>
               ))}

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import type { Lesson } from '../lib/types';
 import { flattenFiles } from '../lib/store';
 import LessonSteps from './LessonSteps';
+import { extractLabTaskScenario } from '../lib/lab-task-scenario';
 
 export default function LabTaskCard({ lesson }: { lesson: Lesson }) {
   const [expanded, setExpanded] = useState(false);
@@ -13,11 +14,7 @@ export default function LabTaskCard({ lesson }: { lesson: Lesson }) {
   const starter = lesson.preview === 'console'
     ? flattenFiles(lesson.files).find((file) => file.path === 'script.js')?.content ?? ''
     : '';
-  const scenario = starter.match(/\/\/\s*STEP\s+\d+:[^\n]*(?:\n\/\/[^\n]+)*/i)?.[0]
-    .replace(/^\/\/\s*/gm, '')
-    .replace(/^STEP\s+\d+:\s*/i, '')
-    .split(/Choose from:/i)[0]
-    .replace(/\s+/g, ' ').trim();
+  const scenario = extractLabTaskScenario(starter)?.scenario;
 
   return (
     <aside className={`lab-task-card ${expanded ? 'is-expanded' : ''}`} aria-label="Your task"

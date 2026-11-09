@@ -2,13 +2,15 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type { Extension } from '@codemirror/state';
-import { useLessonStore } from '../lib/store';
+import { flattenFiles, useLessonStore } from '../lib/store';
 import CodeMirrorPane from './CodeMirrorPane';
 import ImageLibrary from './ImageLibrary';
+import { extractLabTaskScenario } from '../lib/lab-task-scenario';
 
 /** `collab`: Code together's shared-editing extension (the sandbox only), handed to CodeMirrorPane. */
 export default function CodeEditor({ plainText = false, collab = null }: { plainText?: boolean; collab?: Extension | null }) {
   const [libraryOpen, setLibraryOpen] = useState(false);
+  const lesson = useLessonStore((s) => s.lesson);
   const currentFile = useLessonStore((s) => s.currentFile);
   const value = useLessonStore((s) => (currentFile ? s.fileContents[currentFile] : ''));
   const updateFile = useLessonStore((s) => s.updateFile);
@@ -114,8 +116,12 @@ export default function CodeEditor({ plainText = false, collab = null }: { plain
                 updateFile(fileRef.current, doc);
               }
             }}
+            key={lesson?.id ?? 'sandbox'}
             fileKey={currentFile}
             collab={collab}
+            taskComment={lesson?.preview === 'console' && currentFile === 'script.js'
+              ? extractLabTaskScenario(flattenFiles(lesson.files).find((file) => file.path === 'script.js')?.content ?? '')
+              : null}
           />
         )}
       </div>
