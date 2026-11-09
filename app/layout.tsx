@@ -6,6 +6,7 @@ import ReportIssueButton from '../components/ReportIssueButton';
 import StaleBuildGuard from '../components/StaleBuildGuard';
 import LibrarySync from '../components/LibrarySync';
 import PrefsSync from '../components/PrefsSync';
+import WhatsNewModal from '../components/WhatsNewModal';
 import { PREFS_BOOT_SCRIPT } from '../lib/prefs';
 import { ReactNode } from 'react';
 
@@ -34,6 +35,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Header />
         {children}
         <ReportIssueButton />
+        {/* What's New: opens by itself for unseen recent news on a few pages (lib/whats-new-state.ts). */}
+        <WhatsNewModal />
       </body>
     </html>
   );

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { getCurrentUser, logout, firstNameOrFallback, CurrentUser } from '../lib/auth';
 import AuthModal from './AuthModal';
 import NavDropdown from './NavDropdown';
+import { openWhatsNew, useWhatsNewUnseen } from './WhatsNewModal';
 
 const roleBadgeStyle: React.CSSProperties = {
   display: 'inline-block',
@@ -30,6 +31,7 @@ export default function AuthButton() {
   const [user, setUser] = useState<CurrentUser | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [open, setOpen] = useState(false);
+  const whatsNewUnseen = useWhatsNewUnseen();
 
   useEffect(() => {
     getCurrentUser()
@@ -57,6 +59,8 @@ export default function AuthButton() {
 
   if (user) {
     return (
+      // data-account-menu: What's New hands focus back to this menu's button when it closes.
+      <span data-account-menu style={{ display: 'inline-block' }}>
       <NavDropdown
         label={firstNameOrFallback(user)}
         align="right"
@@ -80,6 +84,37 @@ export default function AuthButton() {
         >
           My account
         </Link>
+        {/* Every What's New entry for this role (components/WhatsNewModal.tsx); the dot means recent news not seen yet. */}
+        <button
+          type="button"
+          onClick={(e) => {
+            const trigger = e.currentTarget.closest('[data-account-menu]')?.querySelector('button') as HTMLElement | null;
+            openWhatsNew(trigger);
+          }}
+          style={{
+            ...menuItemStyle,
+            background: 'transparent',
+            border: 'none',
+            textAlign: 'left',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+          }}
+          data-testid="whats-new-menu"
+        >
+          What&apos;s new
+          {whatsNewUnseen && (
+            <>
+              <span
+                aria-hidden="true"
+                data-testid="whats-new-dot"
+                style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--brand)', flexShrink: 0 }}
+              />
+              <span className="sr-only">(new updates)</span>
+            </>
+          )}
+        </button>
         <button
           type="button"
           onClick={handleLogout}
@@ -94,6 +129,7 @@ export default function AuthButton() {
           Sign out
         </button>
       </NavDropdown>
+      </span>
     );
   }
 

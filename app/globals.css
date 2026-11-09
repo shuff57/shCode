@@ -2020,3 +2020,18 @@ details.console > summary::-webkit-details-marker { display: none; }
    visually hidden inside its tile, so the tile shows keyboard focus. */
 .appearance-tile:has(input:focus-visible) { outline: 2px solid var(--brand); outline-offset: 2px; }
 .appearance-tile:hover { border-color: color-mix(in srgb, var(--brand) 60%, var(--c-line)); }
+
+/* What's New popup (components/WhatsNewModal.tsx): a visible ring for keyboard focus, and a hover on its rows. */
+.whats-new-focus:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+[data-testid="whats-new"] li > h3 > button:hover {
+  background: var(--c-deep2);
+}
+[data-testid="whats-new"] a.whats-new-focus:hover {
+  background: var(--c-deep2);
+}
+[data-testid="whats-new-done"]:hover {
+  opacity: 0.9;
+}
