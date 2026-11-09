@@ -630,6 +630,18 @@ browser calls and Remix in `lib/games-client.ts`. UI: Library -> Games (`compone
 `gameKey="game-<id>"`** (so the lobby lists only that game's rooms); nothing else may execute it. Remix writes the
 code into the `sandbox-moshion` draft, asks before replacing a draft that differs from the starter and keeps the old
 one as a History snapshot. Tests: `scripts/test-library-games.mjs`. Apply 0042 (`npm run d1:migrate`) before deploying.
+**A game's own pictures and sounds (2026-11-09).** A game stores only code; a sketch reads `texture:<name>` / sounds
+from the player's store, so the author's art must travel. The owner chose "warn and offer to share": the publish panel
+lists the author's saved items the code names (string literals, comments ignored: `usedItems` in `lib/games-core.ts`,
+built-in names excluded) as Shared / Not shared, with "Share them with my class". `GET /api/games/[id]/assets` (same
+404 rule as the game) returns the author's items that are used AND shared into a class the caller sees the game
+through (bytes from R2, no emails) plus `missing`; /play hands them to `MoshionPreview`'s `assets` prop, an OVERLAY on
+the store for that run only (`lib/moshion-storage.ts`: never written to the player's store, a sketch cannot overwrite
+or delete those keys; the game's item beats a same-named one of the player's), and names the missing ones ("Ask Sam R.
+to share them"). Tests: `scripts/test-game-assets.mjs`. server.js routes it for dev.
+**The Library is three tabs** (`components/ClassLibraryPanel.tsx`): Games (My games / Class games / Built in),
+Pictures and Sounds (Mine / Shared with my class / Built in), `?tab=games|pictures|sounds`, remembered in
+`shCode:library-tab`, Games when arriving from /play.
 
 ## Build + deploy
 

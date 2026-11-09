@@ -619,6 +619,7 @@ app.prepare().catch((err) => {
     const gamesMine = await import('./functions/api/games/index.ts');
     const gamesOne = await import('./functions/api/games/[id].ts');
     const gamesShare = await import('./functions/api/games/[id]/share.ts');
+    const gamesAssets = await import('./functions/api/games/[id]/assets.ts');
     const gamesShared = await import('./functions/api/games/shared/index.ts');
     const gamesModerate = await import('./functions/api/classes/[id]/game-shares/index.ts');
     server.get('/api/games', libRoute(gamesMine.onRequestGet));
@@ -627,6 +628,7 @@ app.prepare().catch((err) => {
     server.get('/api/games/:id', libRoute(gamesOne.onRequestGet));
     server.delete('/api/games/:id', libRoute(gamesOne.onRequestDelete));
     server.post('/api/games/:id/share', express.json(), libRoute(gamesShare.onRequestPost));
+    server.get('/api/games/:id/assets', libRoute(gamesAssets.onRequestGet));
     server.get('/api/classes/:id/game-shares', libRoute(gamesModerate.onRequestGet));
     server.post('/api/classes/:id/game-shares', express.json(), libRoute(gamesModerate.onRequestPost));
     // Appearance settings (functions/api/prefs.ts), same in-memory database.

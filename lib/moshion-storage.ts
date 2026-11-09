@@ -1,6 +1,7 @@
 'use client';
 
-import { type RefObject, useEffect } from 'react';
+import { type RefObject, useEffect, useRef } from 'react';
+import { mergeAssets, type GameAsset } from './game-assets';
 
 // Saves for moSHion sketches.
 //
@@ -504,7 +505,18 @@ export function applyLibraryChanges(changes: {
  * several previews on one page (a reading with four live blocks) do not each
  * reply to the others' requests.
  */
-export function useMoshionStorage(ref: RefObject<HTMLIFrameElement | null>): void {
+export function useMoshionStorage(
+  ref: RefObject<HTMLIFrameElement | null>,
+  overlay?: { assets?: readonly GameAsset[]; ownWins?: boolean },
+): void {
+  // A published game's own pictures and sounds (/play, lib/game-assets.ts),
+  // laid over the store this frame is handed at `init`. Read through a ref so
+  // a new array does not re-attach the listener. The keys the game supplied
+  // are locked: a sketch's save or delete of one is not persisted, so the
+  // game's art never lands in the player's own store or library.
+  const overlayRef = useRef(overlay);
+  overlayRef.current = overlay;
+  const lockedRef = useRef<Set<string>>(new Set());
   useEffect(() => {
     function onMessage(e: MessageEvent) {
       const frame = ref.current;
@@ -513,8 +525,11 @@ export function useMoshionStorage(ref: RefObject<HTMLIFrameElement | null>): voi
       if (!d || typeof d !== 'object') return;
 
       if (d.source === 'preview-storage-request') {
+        const o = overlayRef.current;
+        const merged = mergeAssets(readStore(), o?.assets, !!o?.ownWins);
+        lockedRef.current = merged.locked;
         frame.contentWindow.postMessage(
-          { source: 'preview-storage-init', data: readStore() },
+          { source: 'preview-storage-init', data: merged.store },
           '*'
         );
         return;
@@ -526,6 +541,7 @@ export function useMoshionStorage(ref: RefObject<HTMLIFrameElement | null>): voi
         return;
       }
       if (typeof d.key !== 'string') return;
+      if (lockedRef.current.has(d.key)) return;
       const store = readStore();
       if (d.op === 'remove') {
         delete store[d.key];

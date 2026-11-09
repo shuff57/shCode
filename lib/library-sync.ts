@@ -325,6 +325,10 @@ export function accountItem(kind: LibraryKind, name: string): { id: string; shar
   const s = serverIndex.get(itemKey(kind, name));
   return s ? { id: s.id, shared: !!s.shared } : null;
 }
+/** Every live item in the account copy, as of the last sync: kind, name, id and whether it is shared. */
+export function accountItems(): { kind: LibraryKind; name: string; id: string; shared: boolean }[] {
+  return [...serverIndex.values()].map((s) => ({ kind: s.kind, name: s.name, id: s.id, shared: !!s.shared }));
+}
 export function signedInForSync(): boolean {
   return syncEmail !== null;
 }

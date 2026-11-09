@@ -101,6 +101,24 @@ export async function visibleGame(db: D1Database, data: SessionData, id: string)
   return null;
 }
 
+/**
+ * The classes through which the caller sees a game they do not own: the game
+ * is shared into the class, the caller is in it now, and the share is not
+ * hidden (a teacher of that class, or an admin, also sees it through a hidden
+ * one, matching visibleGame). Empty for anyone visibleGame would refuse.
+ */
+export async function gameClassesFor(db: D1Database, data: SessionData, gameId: string): Promise<string[]> {
+  const { all, teaches } = await callerClasses(db, data);
+  if (!all.length) return [];
+  const marks = all.map(() => '?').join(',');
+  const shares = await db.prepare(
+    `SELECT class_id, hidden_at FROM library_game_shares WHERE game_id = ? AND class_id IN (${marks})`,
+  ).bind(gameId, ...all).all<{ class_id: string; hidden_at: number | null }>();
+  return (shares.results ?? [])
+    .filter((s) => s.hidden_at == null || teaches.has(s.class_id) || data.role === 'admin')
+    .map((s) => s.class_id);
+}
+
 export function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,

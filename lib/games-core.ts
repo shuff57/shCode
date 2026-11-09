@@ -76,3 +76,95 @@ export function modeLabel(mode: GameMode, players: number): string {
   const name = mode === 'versus' ? 'Versus' : mode === 'coop' ? 'Co-op' : 'Same keyboard';
   return `${name}, ${players} players`;
 }
+
+// ---- the student's own pictures and sounds a game uses -------------------
+//
+// A published game stores only its code. The pictures (textures) and sounds a
+// sketch loads by name -- `sprite.texture = 'hero'`, `loadSound('jump')` --
+// come from the player's own library, so a classmate sees the game's art only
+// when the publisher shares those items with the class. These rules decide
+// which items a game uses: the publish panel warns with them and
+// GET /api/games/[id]/assets serves them on /play. A name counts when it is a
+// whole string literal in the code (`'hero'`, or the explicit store key
+// `'texture:hero'` / `'sound:jump'`); comments do not count.
+
+/**
+ * Every string literal in `code`, as written between its quotes, with comments
+ * skipped. A template literal gives its plain text pieces (the parts outside
+ * `${...}`; the code inside is read as code, strings and all). A ' or " string
+ * ends at a line break, so a stray quote (one inside a regex literal, say)
+ * cannot swallow the rest of the file. An escape keeps the character after the
+ * backslash, which is all a name made of letters, digits and _ ever needs.
+ */
+export function stringLiterals(code: string): string[] {
+  const out: string[] = [];
+  // Brace depth of each open `${`, innermost last: a } at that depth ends the
+  // expression and returns to the template's text.
+  const tpl: number[] = [];
+  let depth = 0;
+  let i = 0;
+  const n = code.length;
+
+  const readTemplateText = () => {
+    // From just after ` or }, up to the closing ` or the next ${.
+    let s = '';
+    while (i < n) {
+      const c = code[i];
+      if (c === '\\') { s += code[i + 1] ?? ''; i += 2; continue; }
+      if (c === '`') { i++; out.push(s); return; }
+      if (c === '$' && code[i + 1] === '{') { i += 2; out.push(s); tpl.push(depth); depth++; return; }
+      s += c; i++;
+    }
+    out.push(s);
+  };
+
+  while (i < n) {
+    const c = code[i];
+    const d = code[i + 1];
+    if (c === '/' && d === '/') { while (i < n && code[i] !== '\n') i++; continue; }
+    if (c === '/' && d === '*') { const e = code.indexOf('*/', i + 2); i = e < 0 ? n : e + 2; continue; }
+    if (c === "'" || c === '"') {
+      i++;
+      let s = '';
+      while (i < n && code[i] !== c && code[i] !== '\n') {
+        if (code[i] === '\\') { s += code[i + 1] ?? ''; i += 2; continue; }
+        s += code[i]; i++;
+      }
+      if (code[i] === c) out.push(s);
+      i++;
+      continue;
+    }
+    if (c === '`') { i++; readTemplateText(); continue; }
+    if (c === '{') { depth++; i++; continue; }
+    if (c === '}') {
+      depth--;
+      i++;
+      if (tpl.length && depth === tpl[tpl.length - 1]) { tpl.pop(); readTemplateText(); }
+      continue;
+    }
+    i++;
+  }
+  return out;
+}
+
+export type AssetKind = 'texture' | 'sound';
+
+/** Does a code with these string literals use the saved item `kind`:`name`? */
+export function usesItem(literals: ReadonlySet<string>, kind: AssetKind, name: string): boolean {
+  return literals.has(name) || literals.has(`${kind}:${name}`);
+}
+
+/**
+ * The items `code` uses, in the order given. `builtinTextures` (the moSHion
+ * texture catalog's names) are left out of the textures: a classmate without
+ * the share still sees the built-in picture of that name, so the game is not
+ * missing anything.
+ */
+export function usedItems<T extends { kind: AssetKind; name: string }>(
+  code: string,
+  items: readonly T[],
+  builtinTextures: ReadonlySet<string> = new Set(),
+): T[] {
+  const lits = new Set(stringLiterals(code));
+  return items.filter((it) => usesItem(lits, it.kind, it.name) && !(it.kind === 'texture' && builtinTextures.has(it.name)));
+}

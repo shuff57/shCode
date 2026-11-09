@@ -21,6 +21,7 @@ import { addLocalSnapshot } from './local-history';
 import { SANDBOX_MODE_KEY, getMode } from './sandbox-modes';
 import { errorText } from './http-error';
 import type { GameMode } from './games-core';
+import type { GameAssetsResponse } from './game-assets';
 
 export const SANDBOX_GAME_KEY = 'shCode:sandbox-game';
 export const GAMES_CHANGED = 'shcode:games-changed';
@@ -114,6 +115,11 @@ export function listSharedGames() {
 
 export function getGame(id: string) {
   return call<{ game: FullGame }>(`/api/games/${encodeURIComponent(id)}`);
+}
+
+/** The publisher's pictures and sounds the game uses (see lib/game-assets.ts). */
+export function getGameAssets(id: string) {
+  return call<GameAssetsResponse>(`/api/games/${encodeURIComponent(id)}/assets`);
 }
 
 /**

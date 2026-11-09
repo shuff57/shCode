@@ -13,12 +13,19 @@
 // runner's URL and a request line over ~16 KB is refused. The code runs only inside that
 // sandboxed iframe (no allow-same-origin), exactly as any sketch does; nothing
 // here evaluates it.
+//
+// A published game's own pictures and sounds (saved textures and sounds it
+// loads by name) come from GET /api/games/[id]/assets and are laid over the
+// store the sketch sees for this run (lib/game-assets.ts); the preview waits
+// for that answer before it starts. Items the publisher has not shared with
+// the class are named in a note above the game.
 
 import { useEffect, useState } from 'react';
 import MoshionPreview from './MoshionPreview';
 import { packForUrl } from './DemoGameBlock';
 import Console from './Console';
-import { getGame, remixIntoSandbox, type FullGame } from '../lib/games-client';
+import { getGame, getGameAssets, remixIntoSandbox, type FullGame } from '../lib/games-client';
+import { builtinTextureNames, listWords, missingToShow, type GameAsset } from '../lib/game-assets';
 import { isGameId } from '../lib/games-core';
 
 type State =
@@ -43,6 +50,8 @@ export default function PlayGame() {
   const [runKey, setRunKey] = useState(0);
   const [showCode, setShowCode] = useState(false);
   const [note, setNote] = useState<string | null>(null);
+  // null while the game's pictures and sounds are still on their way.
+  const [assets, setAssets] = useState<{ list: GameAsset[]; missing: string[] } | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -68,6 +77,13 @@ export default function PlayGame() {
       if (r.ok) {
         setState({ kind: 'ok', game: r.value.game });
         document.title = `${r.value.game.title} — shCode`;
+        // Best effort: a failure plays the game with the player's own library,
+        // exactly as before this existed.
+        void Promise.all([getGameAssets(id), builtinTextureNames()]).then(([a, builtins]) => {
+          if (!live) return;
+          if (!a.ok) { setAssets({ list: [], missing: [] }); return; }
+          setAssets({ list: a.value.assets ?? [], missing: missingToShow(a.value.missingItems ?? [], builtins) });
+        });
       } else if (r.status === 404) setState({ kind: 'missing' });
       else if (r.status === 401) setState({ kind: 'signed-out' });
       else setState({ kind: 'error', text: r.error });
@@ -116,6 +132,9 @@ export default function PlayGame() {
   }
 
   const g = state.game;
+  // Hold the frame back until the assets answer, so its first store already
+  // has them (the frame reads its store once, before the sketch starts).
+  const effectiveRunKey = assets ? runKey : 0;
   return (
     <div style={wrap}>
       {back}
@@ -147,13 +166,25 @@ export default function PlayGame() {
         </div>
       </div>
       {note && <div role="status" style={{ fontSize: 12, color: 'var(--c-green)', margin: '0 0 6px' }}>{note}</div>}
+      {assets && assets.missing.length > 0 && (
+        <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: '0 0 6px' }}>
+          Some pictures or sounds in this game aren&apos;t shared, so they won&apos;t show: {listWords(assets.missing)}.
+          {g.mine ? '' : ` Ask ${g.owner} to share them.`}
+        </p>
+      )}
       <div style={{ height: 'max(360px, calc(100vh - 330px))', border: '1px solid var(--c-line)', borderRadius: 6, overflow: 'hidden', display: 'flex' }}>
-        <MoshionPreview code={packForUrl(g.code)} runKey={runKey} gameKey={'game-' + g.id} />
+        <MoshionPreview
+          code={packForUrl(g.code)}
+          runKey={effectiveRunKey}
+          gameKey={'game-' + g.id}
+          assets={assets?.list}
+          assetsOwnWins={g.mine}
+        />
       </div>
       <div style={{ height: 120, marginTop: 8, border: '1px solid var(--c-line)', borderRadius: 6, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <div className="output-header">Console</div>
         <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
-          <Console resetKey={String(runKey)} />
+          <Console resetKey={String(effectiveRunKey)} />
         </div>
       </div>
       {showCode && (

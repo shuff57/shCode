@@ -4,6 +4,7 @@ import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { useMoshionStorage } from '../lib/moshion-storage';
 import { useMoshionOnline } from '../lib/moshion-online';
 import MoshionLobby from './MoshionLobby';
+import type { GameAsset } from '../lib/game-assets';
 
 // Base64-url-safe encoder for UTF-8 strings.
 export function encodeCode(code: string): string {
@@ -24,10 +25,19 @@ interface Props {
    * server's rule (48 of a-z, 0-9, dash) by roomGameKey in lib/moshion-online.ts.
    */
   gameKey?: string;
+  /**
+   * A published game's own pictures and sounds (/play, from
+   * GET /api/games/[id]/assets), laid over the store the sketch sees for this
+   * run only and never saved into the player's library. The game's item wins
+   * over a same-named one of the player's, unless `assetsOwnWins` (the
+   * publisher playing their own game: their store on this computer wins).
+   */
+  assets?: readonly GameAsset[];
+  assetsOwnWins?: boolean;
 }
 
 const MoshionPreview = forwardRef<HTMLIFrameElement, Props>(function MoshionPreview(
-  { code, runKey, gameKey },
+  { code, runKey, gameKey, assets, assetsOwnWins },
   ref
 ) {
   // An internal ref as well as the forwarded one: the storage bridge has to
@@ -36,7 +46,7 @@ const MoshionPreview = forwardRef<HTMLIFrameElement, Props>(function MoshionPrev
   // the same node rather than replaced.
   const innerRef = useRef<HTMLIFrameElement | null>(null);
   useImperativeHandle(ref, () => innerRef.current as HTMLIFrameElement, [runKey]);
-  useMoshionStorage(innerRef);
+  useMoshionStorage(innerRef, { assets, ownWins: assetsOwnWins });
   const online = useMoshionOnline(innerRef, gameKey);
   const lobby = online.lobby;
 
