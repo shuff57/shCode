@@ -662,29 +662,20 @@ export default function SandboxWorkspace() {
         History
       </button>
       {lessonProgress.authed && (
-        <button
-          style={chipStyle}
-          onClick={saveToCloud}
-          disabled={cloud.saving}
-          title="Save this sandbox to the cloud so you can open it on another device."
-        >
-          <CloudUpload size={12} />
-          {cloud.saving ? 'Saving…' : 'Save'}
-        </button>
-      )}
-      {cloud.note && (
-        <span
-          role="status"
-          aria-live="polite"
-          style={{
-            color: cloud.note.kind === 'error' ? 'var(--c-red)' : 'var(--c-green)',
-            fontSize: 12,
-            alignSelf: 'center',
-            maxWidth: 240,
-          }}
-        >
-          {cloud.note.kind === 'error' ? '✗ ' : '✓ '}
-          {cloud.note.text}
+        // The note hangs below Save for a few seconds instead of sitting in the row and pushing every button along.
+        <span style={{ position: 'relative', display: 'inline-flex' }}>
+          <button
+            style={chipStyle}
+            onClick={saveToCloud}
+            disabled={cloud.saving}
+            title="Save this sandbox to the cloud so you can open it on another device."
+          >
+            <CloudUpload size={12} />
+            {cloud.saving ? 'Saving…' : 'Save'}
+          </button>
+          <span role="status" aria-live="polite" className="sandbox-save-note" data-kind={cloud.note?.kind ?? ''} hidden={!cloud.note}>
+            {cloud.note ? `${cloud.note.kind === 'error' ? '✗' : '✓'} ${cloud.note.text}` : null}
+          </span>
         </span>
       )}
     </>
@@ -775,45 +766,57 @@ export default function SandboxWorkspace() {
                 ■ Stop
               </button>
             )}
-            {renderCloudChips()}
-            {/* The Games library: publish this sketch so classmates can play and remix it. */}
-            {mode.preview === 'moshion' && lessonProgress.authed && (
-              <PublishGameButton getCode={getScript} />
-            )}
-            {togetherLang && (mayTogether || together) && (
-              <button
-                type="button"
-                style={together ? { ...chipStyle, color: 'var(--c-fg)', border: '1px solid var(--c-purple)' } : chipStyle}
-                aria-haspopup="dialog"
-                aria-expanded={togetherOpen}
-                onClick={() => setTogetherOpen(true)}
-                title={together ? `Coding together, ${togetherHere} here: the session code, who is here, and Leave` : 'Write one program with classmates at the same time'}
-                data-testid="code-together-button"
-              >
-                <Users size={12} aria-hidden="true" />
-                {/* In a session CodeTogetherBar puts the code's pictures and a dot per person in here (badgeHost). */}
-                {together ? <span ref={setTogetherBadge} style={{ display: 'inline-flex' }} /> : 'Code together'}
-              </button>
-            )}
-            <button
-              style={together ? { ...chipStyle, opacity: 0.45, cursor: 'not-allowed' } : chipStyle}
-              onClick={reset}
-              disabled={together}
-              title={together ? 'Leave Code together to reset' : undefined}
-            >
-              <RotateCcw size={12} />
-              Reset
-            </button>
-            {!isFlow && (
-              <button
-                style={chipStyle}
-                onClick={toggleFull}
-                title={full ? 'Leave full screen (Esc)' : 'Fill the screen with the preview'}
-              >
-                {full ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
-                {full ? 'Exit full screen' : 'Full screen'}
-              </button>
-            )}
+            {/* Grouped and pushed right: this program (History, Save, Reset), with classmates (Code together,
+                Publish game), then the view. Thin lines between the groups (.sandbox-tb-end). */}
+            <div className="sandbox-tb-end">
+              <div className="sandbox-tb-group" role="group" aria-label="This program">
+                {renderCloudChips()}
+                <button
+                  style={together ? { ...chipStyle, opacity: 0.45, cursor: 'not-allowed' } : chipStyle}
+                  onClick={reset}
+                  disabled={together}
+                  title={together ? 'Leave Code together to reset' : undefined}
+                >
+                  <RotateCcw size={12} />
+                  Reset
+                </button>
+              </div>
+              {((togetherLang && (mayTogether || together)) || (mode.preview === 'moshion' && lessonProgress.authed)) && (
+                <div className="sandbox-tb-group" role="group" aria-label="With classmates">
+                  {togetherLang && (mayTogether || together) && (
+                    <button
+                      type="button"
+                      style={together ? { ...chipStyle, color: 'var(--c-fg)', border: '1px solid var(--c-purple)' } : chipStyle}
+                      aria-haspopup="dialog"
+                      aria-expanded={togetherOpen}
+                      onClick={() => setTogetherOpen(true)}
+                      title={together ? `Coding together, ${togetherHere} here: the session code, who is here, and Leave` : 'Write one program with classmates at the same time'}
+                      data-testid="code-together-button"
+                    >
+                      <Users size={12} aria-hidden="true" />
+                      {/* In a session CodeTogetherBar puts the code's pictures and a dot per person in here (badgeHost). */}
+                      {together ? <span ref={setTogetherBadge} style={{ display: 'inline-flex' }} /> : 'Code together'}
+                    </button>
+                  )}
+                  {/* The Games library: publish this sketch so classmates can play and remix it. */}
+                  {mode.preview === 'moshion' && lessonProgress.authed && (
+                    <PublishGameButton getCode={getScript} />
+                  )}
+                </div>
+              )}
+              {!isFlow && (
+                <div className="sandbox-tb-group">
+                  <button
+                    style={chipStyle}
+                    onClick={toggleFull}
+                    title={full ? 'Leave full screen (Esc)' : 'Fill the screen with the preview'}
+                  >
+                    {full ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
+                    {full ? 'Exit full screen' : 'Full screen'}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
@@ -978,6 +981,29 @@ export default function SandboxWorkspace() {
           color: var(--c-fg);
         }
         .sandbox-lock { color: var(--c-orange); font-size: 12px; margin-right: 10px; }
+        /* Above the editor so the save note (and Publish game's panel) can hang over it. */
+        /* The global .run-toolbar scrolls sideways on desktop, which clipped the note and squeezed the buttons;
+           the sandbox's row wraps whole groups instead. */
+        .run-toolbar.sandbox-toolbar { position: relative; z-index: 5; overflow: visible; flex-wrap: wrap; row-gap: 8px; }
+        .run-toolbar.sandbox-toolbar > * { flex-shrink: 0; }
+        /* One block: on a narrow window it moves to its own line whole, right-aligned, instead of breaking mid-group. */
+        .sandbox-tb-end { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-wrap: nowrap; }
+        .sandbox-tb-end > * + * { border-left: 1px solid var(--c-line); padding-left: 10px; }
+        .sandbox-tb-group { display: flex; align-items: center; gap: 6px; }
+        .sandbox-save-note {
+          position: absolute; top: calc(100% + 6px); left: 0; z-index: 30; white-space: nowrap;
+          font-size: 12px; padding: 4px 8px; border-radius: 4px; background: var(--c-bg);
+          border: 1px solid currentColor; color: var(--c-green); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        .sandbox-save-note[data-kind='error'] { color: var(--c-red); }
+        .sandbox-save-note[hidden] { display: none; }
+        @media (max-width: 720px) {
+          .sandbox-tb-end { margin-left: 0; flex-basis: 100%; flex-wrap: wrap; row-gap: 6px; min-width: 0; }
+          .sandbox-tb-end > * + * { border-left: 0; padding-left: 0; }
+          .sandbox-tb-group { flex-wrap: wrap; }
+          .sandbox-header { flex-wrap: wrap; row-gap: 2px; }
+          .sandbox-run-hint { display: none; }
+        }
         .sandbox-split.editor-preview-container {
           height: auto;
           flex: 1 1 auto;
@@ -997,15 +1023,13 @@ export default function SandboxWorkspace() {
           max-height: 60vh;
           resize: vertical;
         }
-        /* A lobby bar above the canvas, or Code together's details open above
-           the editor, takes height from the row that holds them, so the console
-           (empty most of the time, and still resizable) gives some back. The
-           slim Code together line alone does not need it. */
-        .sandbox-shell:has([data-testid='moshion-lobby'], [data-testid='code-together'][data-expanded='true']) .sandbox-console-wrap {
+        /* A lobby bar above the canvas takes height from the row that holds it,
+           so the console (empty most of the time, and still resizable) gives some back. */
+        .sandbox-shell:has([data-testid='moshion-lobby']) .sandbox-console-wrap {
           height: 112px;
           min-height: 72px;
         }
-        .sandbox-shell:has([data-testid='moshion-lobby'], [data-testid='code-together'][data-expanded='true']) .sandbox-console-wrap .console-empty {
+        .sandbox-shell:has([data-testid='moshion-lobby']) .sandbox-console-wrap .console-empty {
           padding: 4px;
         }
         .sandbox-console-body { flex: 1; min-height: 0; padding: 6px 8px; overflow: hidden; display: flex; }
