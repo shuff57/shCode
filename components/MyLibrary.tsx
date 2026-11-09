@@ -5,16 +5,25 @@
 // their classes. Before this the only Share was a 10px link under each texture
 // in the Texture editor (after pressing Load) and a button in the Sound mixer,
 // and a teacher could not find it at all.
+//
+// Delete on every card is the editor's and the mixer's own delete
+// (deleteSavedTexture / deleteSavedSound): it marks the item in
+// moshion.library.deleted.v1, so the sync removes it from the account (which
+// unshares it) and the student's other computers drop it. The Pictures tab also
+// lists the student's uploaded images (UploadedImages).
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import ShareToggle from './ShareToggle';
+import RemixCredit from './RemixCredit';
 import { SpriteThumb, SpriteViewer } from './SpriteThumb';
-import { LIBRARY_LOCAL_CHANGE, LIBRARY_UPDATED, listSavedSounds, listSavedTextures } from '../lib/moshion-storage';
+import { LIBRARY_LOCAL_CHANGE, LIBRARY_UPDATED, deleteSavedSound, deleteSavedTexture, listSavedSounds, listSavedTextures } from '../lib/moshion-storage';
 import { LIBRARY_SYNC_STATUS, signedInForSync } from '../lib/library-sync';
 import { editorUrl } from '../lib/remix';
 import { sectionHeading, sectionNote } from './library-ui';
+import { FeedbackProvider, useFeedback } from './FeedbackProvider';
+import UploadedImages from './UploadedImages';
 
 type Row = { kind: 'texture' | 'sound'; name: string; dataUri: string; frames?: number; frameDelay?: number };
 
@@ -29,11 +38,22 @@ const tile: React.CSSProperties = {
   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, width: 170,
 };
 
-export default function MyLibrary({ onMessage, kind }: {
+const delBtn: React.CSSProperties = { background: 'none', border: 0, padding: 0, color: 'var(--c-red)', fontSize: 11, cursor: 'pointer' };
+
+type Props = {
   onMessage?: (text: string, bad: boolean) => void;
   /** Only this kind, under a "Mine (N)" heading (the Library's Pictures and Sounds tabs). Both when left out. */
   kind?: 'texture' | 'sound';
-}) {
+};
+
+// Its own FeedbackProvider: the Library page and the lesson/sandbox Library tab have none, and the
+// delete confirm should be the app's dialog (focus on Cancel), not the browser's.
+export default function MyLibrary(props: Props) {
+  return <FeedbackProvider><MyLibraryInner {...props} /></FeedbackProvider>;
+}
+
+function MyLibraryInner({ onMessage, kind }: Props) {
+  const { confirm } = useFeedback();
   const [rows, setRows] = useState<Row[] | null>(null);
   /** The picture open in the frames view, by name. */
   const [viewing, setViewing] = useState<string | null>(null);
@@ -56,6 +76,18 @@ export default function MyLibrary({ onMessage, kind }: {
     };
   }, []);
 
+  const remove = async (r: Row) => {
+    const plain = r.kind === 'texture'
+      ? 'Games that use it will show a plain box instead.'
+      : 'Games that use it will play no sound there instead.';
+    const where = signedInForSync() ? 'It leaves your Library on every computer you use.' : 'It leaves the Library on this computer.';
+    if (!(await confirm({ title: `Delete ${r.name}?`, message: `${where} ${plain}`, confirmLabel: 'Delete', danger: true }))) return;
+    if (r.kind === 'texture') deleteSavedTexture(r.name);
+    else deleteSavedSound(r.name);
+    if (viewing === r.name) setViewing(null);
+    onMessage?.(`Deleted ${r.name}.`, false);
+  };
+
   if (rows === null) return null;
   const textures = kind === 'sound' ? [] : rows.filter((r) => r.kind === 'texture');
   const sounds = kind === 'texture' ? [] : rows.filter((r) => r.kind === 'sound');
@@ -63,6 +95,7 @@ export default function MyLibrary({ onMessage, kind }: {
   const viewed = viewing ? textures.find((t) => t.name === viewing) : undefined;
   const viewer = viewed ? (
     <SpriteViewer name={viewed.name} src={viewed.dataUri} frames={viewed.frames} frameDelay={viewed.frameDelay} onClose={() => setViewing(null)}>
+      <RemixCredit item={{ kind: 'texture', name: viewed.name }} style={{ fontSize: 12, width: '100%', textAlign: 'left' }} />
       <Link href={editorUrl('texture', viewed.name)} {...away} className="btn-secondary btn-sm">Edit</Link>
     </SpriteViewer>
   ) : null;
@@ -106,8 +139,10 @@ export default function MyLibrary({ onMessage, kind }: {
                   {t.frames} frames
                 </button>
               ) : null}
+              <RemixCredit item={{ kind: 'texture', name: t.name }} style={{ fontSize: 11 }} />
               <ShareToggle kind="texture" name={t.name} onMessage={onMessage} />
               <Link href={editorUrl('texture', t.name)} {...away} style={{ fontSize: 11, color: 'var(--c-cyan)' }}>Edit</Link>
+              <button type="button" onClick={() => void remove(t)} aria-label={`Delete ${t.name}`} style={delBtn}>Delete</button>
             </div>
           ))}
         </div>
@@ -120,13 +155,16 @@ export default function MyLibrary({ onMessage, kind }: {
                 onClick={() => { new Audio(s.dataUri).play().catch(() => {}); }}
                 style={{ background: 'transparent', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4, cursor: 'pointer', padding: '2px 8px' }}>▶</button>
               <code style={{ fontSize: 11 }}>{s.name}</code>
+              <RemixCredit item={{ kind: 'sound', name: s.name }} style={{ fontSize: 11 }} />
               <ShareToggle kind="sound" name={s.name} onMessage={onMessage} />
               <Link href={editorUrl('sound', s.name)} {...away} style={{ fontSize: 11, color: 'var(--c-cyan)' }}>Edit</Link>
+              <button type="button" onClick={() => void remove(s)} aria-label={`Delete ${s.name}`} style={delBtn}>Delete</button>
             </div>
           ))}
         </div>
       )}
       {viewer}
+      {kind === 'texture' && signedInForSync() && <UploadedImages onMessage={onMessage} />}
     </section>
   );
 }

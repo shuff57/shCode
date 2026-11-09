@@ -14,6 +14,13 @@
 // (shCode:sandbox-game): re-publishing updates that game. Remixing someone
 // else's game clears it, so publishing a remix makes a new game of your own;
 // opening one of your own games sets it, so publishing again updates it.
+//
+// Sharing choices (lib/share-choice.ts, migration 0045): the record also keeps
+// `from`, where the sandbox code was remixed from (the original's id, title,
+// author and choice as /play showed them). Publishing a NEW game sends only
+// `from.id`; the server reads the credit from the original's own row. A "just
+// play" game is refused here with a plain sentence (and by the server on
+// publish), and a remix of a "keep remixes open" game can only be shared 'open'.
 
 import { useLessonStore } from './store';
 import { loadProgress, normalizeEol, saveProgress } from './version-control';
@@ -22,6 +29,7 @@ import { SANDBOX_MODE_KEY, getMode } from './sandbox-modes';
 import { errorText } from './http-error';
 import type { GameMode } from './games-core';
 import type { GameAssetsResponse } from './game-assets';
+import { canRemix, parseProvenance, provenanceOf, remixRefusal, type Provenance, type ShareChoice } from './share-choice';
 
 export const SANDBOX_GAME_KEY = 'shCode:sandbox-game';
 export const GAMES_CHANGED = 'shcode:games-changed';
@@ -36,6 +44,8 @@ export interface MyGame {
   createdAt: number;
   updatedAt: number;
   shared: boolean;
+  choice: ShareChoice;
+  remixedFrom: Provenance | null;
 }
 
 export interface SharedGame {
@@ -51,6 +61,8 @@ export interface SharedGame {
   sharedAt: number;
   updatedAt: number;
   hidden: boolean;
+  choice: ShareChoice;
+  remixedFrom: Provenance | null;
 }
 
 export interface FullGame {
@@ -65,6 +77,10 @@ export interface FullGame {
   hidden: boolean;
   shared?: boolean;
   updatedAt: number;
+  choice: ShareChoice;
+  /** False for someone else's "just play" game: no View code, no Remix. */
+  canRemix: boolean;
+  remixedFrom: Provenance | null;
 }
 
 export function playHref(id: string): string {
@@ -77,14 +93,20 @@ function announce() {
 
 // ---- the sandbox's published-as record ------------------------------------
 
-export interface SandboxGame { id: string | null; title: string }
+/**
+ * `from`: where the sandbox code was remixed from, or null for the student's
+ * own work. Kept after publishing, so "Publish as a new game" credits it too.
+ */
+export interface SandboxGame { id: string | null; title: string; from?: Provenance | null }
 
 export function readSandboxGame(): SandboxGame {
   try {
     const v = JSON.parse(localStorage.getItem(SANDBOX_GAME_KEY) || 'null');
-    if (v && typeof v.title === 'string') return { id: typeof v.id === 'string' ? v.id : null, title: v.title };
+    if (v && typeof v.title === 'string') {
+      return { id: typeof v.id === 'string' ? v.id : null, title: v.title, from: parseProvenance(v.from) };
+    }
   } catch { /* private mode or junk */ }
-  return { id: null, title: '' };
+  return { id: null, title: '', from: null };
 }
 
 export function writeSandboxGame(g: SandboxGame): void {
@@ -125,25 +147,38 @@ export function getGameAssets(id: string) {
 /**
  * Publish the code, updating `id` when given. An id this account does not own
  * (another student signed in on this browser, or the game was deleted) is
- * published as a new game rather than failing.
+ * published as a new game rather than failing, unless `retryAsNew: false`
+ * (the publish panel then asks the student first). `choice` is who may do
+ * what with it; `remixedFrom` the original game's id (only read for a new game).
  */
-export async function publishGame(title: string, code: string, id: string | null) {
-  const post = (body: Record<string, unknown>) => call<{ created: boolean; game: { id: string; title: string; mode: GameMode; players: number } }>('/api/games', {
+export async function publishGame(
+  title: string,
+  code: string,
+  id: string | null,
+  opts: { choice?: ShareChoice; remixedFrom?: string | null; retryAsNew?: boolean } = {},
+) {
+  const post = (body: Record<string, unknown>) => call<{
+    created: boolean;
+    game: { id: string; title: string; mode: GameMode; players: number; choice: ShareChoice; remixedFrom: Provenance | null };
+  }>('/api/games', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  let r = await post(id ? { id, title, code } : { title, code });
-  if (!r.ok && r.status === 404 && id) r = await post({ title, code });
+  const extra: Record<string, unknown> = {};
+  if (opts.choice) extra.choice = opts.choice;
+  if (opts.remixedFrom) extra.remixedFrom = opts.remixedFrom;
+  let r = await post(id ? { id, title, code, ...extra } : { title, code, ...extra });
+  if (!r.ok && r.status === 404 && id && opts.retryAsNew !== false) r = await post({ title, code, ...extra });
   if (r.ok) announce();
   return r;
 }
 
-export async function setGameShared(id: string, share: boolean) {
-  const r = await call<{ shared: boolean; classes: number }>(`/api/games/${encodeURIComponent(id)}/share`, {
+export async function setGameShared(id: string, share: boolean, choice?: ShareChoice) {
+  const r = await call<{ shared: boolean; classes: number; choice: ShareChoice }>(`/api/games/${encodeURIComponent(id)}/share`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ share }),
+    body: JSON.stringify(choice && share ? { share, choice } : { share }),
   });
   if (r.ok) announce();
   return r;
@@ -160,15 +195,34 @@ export async function deleteGame(id: string) {
 
 // ---- Remix -----------------------------------------------------------------
 
+/** What remixIntoSandbox needs to know about a game (FullGame has all of it). */
+export interface RemixSource {
+  id: string;
+  title: string;
+  code: string;
+  mine: boolean;
+  /** The publisher's name as shown (first name + last initial); for the credit. */
+  owner?: string;
+  choice?: ShareChoice;
+  remixedFrom?: Provenance | null;
+}
+
 /**
  * Put a game's code into this student's moSHion sandbox draft and open the
- * sandbox. Returns false when the student said no to replacing their draft.
+ * sandbox. Returns false when the student said no to replacing their draft, or
+ * when the game is someone else's "just play" game (`refused` gets the plain
+ * reason; the server would refuse to publish the remix anyway).
  * `ask` is the confirm (window.confirm by default).
  */
 export function remixIntoSandbox(
-  game: { id: string; title: string; code: string; mine: boolean },
+  game: RemixSource,
   ask: (message: string) => boolean = (m) => window.confirm(m),
+  refused: (message: string) => void = (m) => window.alert(m),
 ): boolean {
+  if (!game.mine && !canRemix(game.choice)) {
+    refused(remixRefusal('game', game.title, game.owner ?? 'Its maker'));
+    return false;
+  }
   const mode = getMode('moshion');
   const starter = normalizeEol(mode.starter);
   const code = normalizeEol(game.code);
@@ -198,7 +252,17 @@ export function remixIntoSandbox(
   // in-memory draft is written back on page hide, so update it too.
   if (live) store.updateFile('script.js', code);
 
-  writeSandboxGame(game.mine ? { id: game.id, title: game.title } : { id: null, title: remixTitle(game.title) });
+  // Your own game keeps the credit it already has; someone else's becomes the credit.
+  writeSandboxGame(game.mine
+    ? { id: game.id, title: game.title, from: game.remixedFrom ?? null }
+    : {
+      id: null,
+      title: remixTitle(game.title),
+      from: provenanceOf({
+        id: game.id, title: game.title, author: game.owner ?? 'A classmate',
+        choice: game.choice, provenance: game.remixedFrom ?? null,
+      }),
+    });
   try { localStorage.setItem(SANDBOX_MODE_KEY, 'moshion'); } catch { /* private mode */ }
   announce();
   if (!live) window.location.assign('/sandbox/');

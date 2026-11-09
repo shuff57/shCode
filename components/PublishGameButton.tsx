@@ -12,6 +12,15 @@
 // class (GET /api/games/[id]/assets serves the shared ones on /play). So the
 // panel lists the ones this code uses, says which are shared, and offers to
 // share the rest. It never blocks publishing.
+//
+// Sharing choices (lib/share-choice.ts): the panel asks who may do what with
+// the game (ShareChoicePicker), defaulting to the student's last choice. A
+// remix shows where it came from ("Remixed from Plane by Sam W.") and, when the
+// original asked that remixes stay open, the choice is locked to that.
+//
+// A game deleted since (by the student elsewhere, or by a teacher) answers 404:
+// the panel forgets it and offers "Publish as a new game" rather than quietly
+// making a new one.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Gamepad2 } from 'lucide-react';
@@ -28,6 +37,8 @@ import { GAME_TITLE_MAX, checkCode, cleanTitle, declaredMode, modeLabel, usedIte
 import { LIBRARY_SHARES_CHANGED, LIBRARY_SYNC_STATUS, accountItems, setShared } from '../lib/library-sync';
 import { LIBRARY_UPDATED, localLibraryItems, type LibraryKind } from '../lib/moshion-storage';
 import { builtinTextureNames, listWords } from '../lib/game-assets';
+import { CHOICE_TEXT, type Provenance, type ShareChoice } from '../lib/share-choice';
+import ShareChoicePicker, { RemixCreditLine, lockedChoice, useLastChoice } from './ShareChoicePicker';
 
 const chip: React.CSSProperties = {
   padding: '6px 10px',
@@ -50,7 +61,9 @@ const quiet: React.CSSProperties = {
   background: 'transparent', color: 'var(--c-fg)', border: '1px solid var(--c-line)',
 };
 
-interface Published { id: string; title: string; shared: boolean }
+interface Published { id: string; title: string; shared: boolean; choice: ShareChoice }
+
+const GONE_TEXT = 'That game was deleted. Publish it again as a new game?';
 
 /** One of the student's own items the code uses. `local` = only in this browser, not in the account yet. */
 interface UsedItem { kind: LibraryKind; name: string; state: 'shared' | 'not-shared' | 'local' }
@@ -89,22 +102,33 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
   const [used, setUsed] = useState<UsedItem[]>([]);
   const [sharingItems, setSharingItems] = useState(false);
   const [itemsNote, setItemsNote] = useState<{ text: string; bad: boolean } | null>(null);
+  const [lastChoice, rememberChoice] = useLastChoice('game');
+  const [choice, setChoice] = useState<ShareChoice>(lastChoice);
+  /** Where the sandbox code was remixed from (lib/games-client.ts SandboxGame.from). */
+  const [from, setFrom] = useState<Provenance | null>(null);
+  /** The game the sandbox was published as is gone (deleted, or a 404 on Update). */
+  const [gone, setGone] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
   // What the sandbox draft is published as, checked against the server (a
   // deleted game, or another account on this browser, reads as unpublished).
   const refresh = useCallback(async () => {
     const rec = readSandboxGame();
+    setFrom(rec.from ?? null);
     setTitle((t) => t || rec.title);
     if (!rec.id) { setPublished(null); setTitle(rec.title); return; }
     const r = await getGame(rec.id);
     if (r.ok && r.value.game.mine) {
-      setPublished({ id: rec.id, title: r.value.game.title, shared: !!r.value.game.shared });
-      setShare(!!r.value.game.shared);
-      setTitle(rec.title || r.value.game.title);
+      const g = r.value.game;
+      setPublished({ id: rec.id, title: g.title, shared: !!g.shared, choice: g.choice });
+      setShare(!!g.shared);
+      setChoice(lockedChoice(g.remixedFrom ?? rec.from, g.choice));
+      setTitle(rec.title || g.title);
+      setGone(false);
     } else if (!r.ok && r.status === 404) {
-      writeSandboxGame({ id: null, title: rec.title });
+      writeSandboxGame({ id: null, title: rec.title, from: rec.from ?? null });
       setPublished(null);
+      setGone(true);
     }
   }, []);
   useEffect(() => {
@@ -113,6 +137,11 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
     window.addEventListener(GAMES_CHANGED, on);
     return () => window.removeEventListener(GAMES_CHANGED, on);
   }, [refresh]);
+
+  // Not published yet: the student's last choice (or the one a remix is held to).
+  useEffect(() => {
+    if (!published) setChoice(lockedChoice(from, lastChoice));
+  }, [published, from, lastChoice]);
 
   useEffect(() => {
     if (!open) return;
@@ -167,23 +196,41 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
     const c = checkCode(getCode());
     if ('error' in c) { setNote({ text: c.error, bad: true }); return; }
     setBusy(true);
-    const r = await publishGame(t.title, c.code, asNew ? null : published?.id ?? null);
-    if (!r.ok) { setBusy(false); setNote({ text: r.error, bad: true }); return; }
+    const updating = asNew ? null : published?.id ?? null;
+    const r = await publishGame(t.title, c.code, updating, { choice, remixedFrom: from?.id ?? null, retryAsNew: false });
+    if (!r.ok) {
+      setBusy(false);
+      if (r.status === 404 && updating) {
+        // Deleted since this panel last looked (by you elsewhere, or by a teacher).
+        writeSandboxGame({ id: null, title: t.title, from });
+        setPublished(null);
+        setGone(true);
+        setNote({ text: GONE_TEXT, bad: true });
+        return;
+      }
+      setNote({ text: r.error, bad: true });
+      return;
+    }
     const id = r.value.game.id;
-    writeSandboxGame({ id, title: t.title });
+    const stored = r.value.game.choice ?? choice;
+    writeSandboxGame({ id, title: t.title, from });
+    rememberChoice(stored);
+    setGone(false);
     let shared = published && published.id === id ? published.shared : false;
     let shareNote = '';
     if (share !== shared) {
-      const s = await setGameShared(id, share);
+      const s = await setGameShared(id, share, stored);
       if (s.ok) shared = s.value.shared;
       else shareNote = ` It is not shared yet: ${s.error}`;
     }
     setBusy(false);
-    setPublished({ id, title: t.title, shared });
+    setPublished({ id, title: t.title, shared, choice: stored });
     setTitle(t.title);
     setNote({
       text: (r.value.created ? `Published "${t.title}".` : `Updated "${t.title}".`)
-        + (shared ? ' Your class can play and remix it from Library → Games.' : ' Only you can see it until you share it with your class.')
+        + (!shared ? ' Only you can see it until you share it with your class.'
+          : stored === 'play' ? ' Your class can play it from Library → Games.'
+          : ' Your class can play and remix it from Library → Games.')
         + shareNote,
       bad: !!shareNote,
     });
@@ -216,16 +263,20 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
           <h2 style={{ fontSize: 14, margin: '0 0 6px' }}>{published ? 'Update your game' : 'Publish this sketch as a game'}</h2>
           <p style={{ margin: '0 0 8px', color: 'var(--c-dim)' }}>
             Publishing saves this code as a game in your Library. Shared with your class, classmates
-            can <strong style={{ color: 'var(--c-fg)' }}>play</strong> it on its own page and{' '}
-            <strong style={{ color: 'var(--c-fg)' }}>remix</strong> it (copy the code into their own sandbox to change it).
+            can <strong style={{ color: 'var(--c-fg)' }}>play</strong> it on its own page, and you choose
+            whether they can also <strong style={{ color: 'var(--c-fg)' }}>remix</strong> it (copy the code into their own sandbox to change it).
             {published ? ' Publishing again replaces the code they get.' : ''}
           </p>
+          <RemixCreditLine from={from} style={{ fontSize: 12, margin: '0 0 8px' }} />
+          {gone && !published && (!note || note.text !== GONE_TEXT) && (
+            <p style={{ margin: '0 0 8px', color: 'var(--c-orange)' }}>{GONE_TEXT}</p>
+          )}
           {published && (
             <p style={{ margin: '0 0 8px' }}>
               Published as <strong>&ldquo;{published.title}&rdquo;</strong>
               {' · '}
               <span style={{ color: published.shared ? 'var(--c-green)' : 'var(--c-dim)' }}>
-                {published.shared ? 'shared with your class' : 'not shared'}
+                {published.shared ? `shared with your class (${CHOICE_TEXT.game[published.choice].short})` : 'not shared'}
               </span>
               {' · '}
               <a href={playHref(published.id)} style={{ color: 'var(--c-cyan)' }}>Play page</a>
@@ -252,6 +303,9 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
             <input type="checkbox" checked={share} onChange={(e) => setShare(e.target.checked)} />
             Share with my class
           </label>
+          {share && (
+            <ShareChoicePicker thing="game" value={choice} onChange={setChoice} from={from} idPrefix="publish-game" />
+          )}
           {used.length > 0 && (
             <div style={{ margin: '0 0 10px', padding: '8px 10px', border: '1px solid var(--c-line)', borderRadius: 4 }}>
               <p style={{ margin: '0 0 4px' }}>{usesSentence(used)}</p>
@@ -290,8 +344,8 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
             </div>
           )}
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <button type="button" style={{ ...primary, opacity: busy ? 0.6 : 1 }} disabled={busy} onClick={() => void go(false)}>
-              {busy ? 'Publishing…' : published ? 'Update game' : 'Publish'}
+            <button type="button" style={{ ...primary, opacity: busy ? 0.6 : 1 }} disabled={busy} onClick={() => void go(gone && !published)}>
+              {busy ? 'Publishing…' : published ? 'Update game' : gone ? 'Publish as a new game' : 'Publish'}
             </button>
             {published && (
               <button type="button" style={quiet} disabled={busy} onClick={() => void go(true)} title="Keep the old game and publish this as another one">

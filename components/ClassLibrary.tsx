@@ -5,12 +5,20 @@
 // their account). Renders nothing when signed out or when nothing is shared.
 // A teacher who opens the editor sees hidden items too, marked; hiding and
 // removing happen on the class page (ClassLibraryModeration).
+//
+// Sharing choices (lib/share-choice.ts): a "just use" item shows and plays here
+// (fetched with ?preview=1) but has no Copy to mine or Remix, and the server
+// refuses the copy (GET /api/library/shared/[id] answers 403). A copy records
+// where it came from (addToLibrary's `from`), which the sync sends to the
+// account so "Remixed from <name> by <who>" follows it to every device.
 
 import { SpriteThumb, SpriteViewer, texMeta } from './SpriteThumb';
 import { useCallback, useEffect, useState } from 'react';
 import { freshName, LIBRARY_SHARES_CHANGED } from '../lib/library-sync';
 import { addToLibrary, localLibraryItems, type LibraryKind } from '../lib/moshion-storage';
 import { openEditor, prepareTab } from '../lib/remix';
+import { CHOICE_TEXT, provenanceOf, type Provenance, type ShareChoice } from '../lib/share-choice';
+import { RemixCreditLine } from './ShareChoicePicker';
 import { sectionHeading, sectionNote, sectionStyle } from './library-ui';
 
 interface SharedItem {
@@ -21,6 +29,10 @@ interface SharedItem {
   mine: boolean;
   className: string;
   hidden: boolean;
+  choice?: ShareChoice;
+  /** False for a classmate's "just use" item: no Copy to mine, no Remix. */
+  canCopy?: boolean;
+  remixedFrom?: Provenance | null;
 }
 
 export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, title, section }: {
@@ -65,7 +77,8 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
 
   const fetchArt = useCallback(async (id: string) => {
     if (art[id]) return art[id];
-    const res = await fetch(`/api/library/shared/${id}`, { credentials: 'same-origin' });
+    // ?preview=1: a "just use" item is still shown and played here, never copied.
+    const res = await fetch(`/api/library/shared/${id}?preview=1`, { credentials: 'same-origin' });
     if (!res.ok) return null;
     const body = (await res.json()) as { dataUri: string; meta: string | null };
     setArt((a) => ({ ...a, [id]: body }));
@@ -92,11 +105,23 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
   // Remix: Copy to mine, then open the copy in its editor (lib/remix.ts).
   const copy = async (it: SharedItem, remix = false) => {
     const tab = remix ? prepareTab() : null;
-    const content = await fetchArt(it.id);
-    if (!content) { tab?.close(); onMessage?.('That is no longer in the Library.', true); return; }
+    // The copy path, not the preview: the server refuses a "just use" item here.
+    let content: { dataUri: string; meta: string | null } | null = null;
+    try {
+      const res = await fetch(`/api/library/shared/${it.id}`, { credentials: 'same-origin' });
+      const body = (await res.json().catch(() => ({}))) as { dataUri?: string; meta?: string | null; error?: string };
+      if (!res.ok) {
+        tab?.close();
+        onMessage?.(res.status === 403 && body.error ? body.error : 'That is no longer in the Library.', true);
+        return;
+      }
+      if (typeof body.dataUri === 'string') content = { dataUri: body.dataUri, meta: body.meta ?? null };
+    } catch { /* offline: said below */ }
+    if (!content) { tab?.close(); onMessage?.('Could not reach the server. Check your connection and try again.', true); return; }
     const taken = new Set(localLibraryItems().filter((l) => l.kind === kind).map((l) => l.name));
     const name = taken.has(it.name) ? freshName(it.name, taken) : it.name;
-    if (!addToLibrary({ kind, name, dataUri: content.dataUri, meta: content.meta })) {
+    const from = provenanceOf({ id: it.id, title: it.name, author: it.owner, choice: it.choice, provenance: it.remixedFrom ?? null });
+    if (!addToLibrary({ kind, name, dataUri: content.dataUri, meta: content.meta }, from)) {
       tab?.close();
       onMessage?.('Your library is full. Delete something you no longer need first.', true);
       return;
@@ -159,8 +184,12 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
                 </div>
               ) : null}
               <div style={{ color: 'var(--c-dim)' }}>{it.mine ? 'yours' : it.owner}{it.hidden ? ' · hidden by teacher' : ''}</div>
+              {!it.mine && it.canCopy === false && (
+                <div style={{ color: 'var(--c-dim)' }} title={CHOICE_TEXT.art.play.line}>{CHOICE_TEXT.art.play.short}</div>
+              )}
+              <RemixCreditLine from={it.remixedFrom} style={{ fontSize: 10 }} />
             </div>
-            {!it.mine && (
+            {!it.mine && it.canCopy !== false && (
               <div style={{ display: 'flex', flexDirection: kind === 'texture' ? 'column' : 'row', gap: 4 }}>
                 <button type="button" onClick={() => void copy(it)} style={{
                   fontSize: 11, padding: '2px 6px', borderRadius: 4, cursor: 'pointer', whiteSpace: 'nowrap',
@@ -183,7 +212,8 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
         if (!it || !a) return null;
         return (
           <SpriteViewer name={it.name} src={a.dataUri} {...texMeta(a.meta)} onClose={() => setViewing(null)}>
-            {!it.mine ? (
+            <RemixCreditLine from={it.remixedFrom} style={{ fontSize: 12 }} />
+            {!it.mine && it.canCopy !== false ? (
               <>
                 <button type="button" className="btn-secondary btn-sm" onClick={() => void copy(it)}>Copy to mine</button>
                 <button type="button" className="btn-secondary btn-sm" onClick={() => void copy(it, true)}

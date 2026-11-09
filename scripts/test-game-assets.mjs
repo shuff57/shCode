@@ -169,6 +169,12 @@ check('the play note leaves out a built-in picture name',
   eq(ga.missingToShow(r.body.missingItems, new Set(['player', 'coin'])), ['coinArt', 'jump', 'side']));
 check('listWords reads as a sentence', ga.listWords(['a']) === 'a' && ga.listWords(['a', 'b']) === 'a and b' && ga.listWords(['a', 'b', 'c']) === 'a, b, and c');
 
+// "Just use" (share_choice 'play', migration 0045) stops a copy, never the author's game.
+sql(`UPDATE library_items SET share_choice = 'play' WHERE owner_email = 'ana@s.test'`);
+r = await get(BEN, gid);
+check('just-use items are still served for the author\'s game', r.status === 200 && eq(names(r.body), ['sound:boom', 'texture:anim', 'texture:hero']), r.body.assets?.map((a) => a.name));
+sql(`UPDATE library_items SET share_choice = 'credit' WHERE owner_email = 'ana@s.test'`);
+
 // ---- the publisher ----------------------------------------------------------
 r = await get(ANA, gid);
 check('the publisher gets every used live item of their own, shared or not',

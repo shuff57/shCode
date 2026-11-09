@@ -15,10 +15,11 @@
 // ever returns an email: a publisher shows as first name + last initial.
 
 import { ownerLabel, studentClassIds, teacherClassIds } from './libraryShare';
+import { PROVENANCE_COLUMNS, type ProvenanceRow } from '../../lib/share-choice';
 
 export type SessionData = { email: string; role: 'admin' | 'teacher' | 'student' };
 
-export interface GameRow {
+export interface GameRow extends ProvenanceRow {
   id: string;
   owner_email: string;
   title: string;
@@ -27,9 +28,11 @@ export interface GameRow {
   players: number;
   created_at: number;
   updated_at: number;
+  /** Who may do what with it (migration 0045); read through choiceOf(). */
+  share_choice: string | null;
 }
 
-export interface SharedGameRow {
+export interface SharedGameRow extends ProvenanceRow {
   id: string;
   title: string;
   mode: string;
@@ -43,6 +46,7 @@ export interface SharedGameRow {
   shared_at: number;
   updated_at: number;
   hidden_at: number | null;
+  share_choice: string | null;
 }
 
 /** Every class the caller is in now: enrolled, plus taught for a teacher or admin. */
@@ -59,7 +63,7 @@ export async function gamesSharedInto(db: D1Database, classIds: string[]): Promi
   const r = await db.prepare(
     `SELECT g.id, g.title, g.mode, g.players, LENGTH(g.code) AS bytes, g.owner_email,
             st.first_name, st.last_name, s.class_id, c.name AS class_name, s.shared_at,
-            g.updated_at, s.hidden_at
+            g.updated_at, s.hidden_at, g.share_choice, ${PROVENANCE_COLUMNS.split(', ').map((c) => 'g.' + c).join(', ')}
        FROM library_game_shares s
        JOIN library_games g ON g.id = s.game_id AND g.deleted_at IS NULL
        JOIN classes c ON c.id = s.class_id
@@ -82,7 +86,7 @@ export async function ownerName(db: D1Database, email: string): Promise<string> 
  */
 export async function visibleGame(db: D1Database, data: SessionData, id: string): Promise<{ row: GameRow; mine: boolean; hidden: boolean } | null> {
   const row = await db.prepare(
-    `SELECT id, owner_email, title, code, mode, players, created_at, updated_at
+    `SELECT id, owner_email, title, code, mode, players, created_at, updated_at, share_choice, ${PROVENANCE_COLUMNS}
        FROM library_games WHERE id = ? AND deleted_at IS NULL`,
   ).bind(id).first<GameRow>();
   if (!row) return null;

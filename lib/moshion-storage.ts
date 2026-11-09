@@ -2,6 +2,7 @@
 
 import { type RefObject, useEffect, useRef } from 'react';
 import { mergeAssets, type GameAsset } from './game-assets';
+import { parseProvenance, type Provenance } from './share-choice';
 
 // Saves for moSHion sketches.
 //
@@ -139,6 +140,59 @@ function markDeleted(kind: 'texture' | 'sound', name: string, deleted: boolean):
   const key = `${kind}:${name}`;
   const cur = readLocalDeletes().filter((k) => k !== key);
   writeLocalDeletes(deleted ? [...cur, key] : cur);
+  // A deleted item's credit goes with it: a new item saved under the name is new work.
+  if (deleted) setLocalOrigin(kind, name, null);
+}
+
+// Where a copied picture or sound came from (Copy to mine / Remix in the class
+// library; lib/share-choice.ts), until the account has it. Kept OUTSIDE the
+// sketch store (moshion.store.v1) so a sketch can neither read nor change it,
+// and so the editors rewriting texmeta:/sndmeta: never lose it. The library
+// sync sends the original's id with the first upload (PUT /api/library
+// remixedFrom); from then on the account's copy of the credit is the one shown,
+// on every device.
+const ORIGIN_KEY = 'moshion.library.origin.v1';
+function readOrigins(): Record<string, unknown> {
+  try {
+    const v = JSON.parse(window.localStorage.getItem(ORIGIN_KEY) || '{}');
+    return v && typeof v === 'object' && !Array.isArray(v) ? v : {};
+  } catch {
+    return {};
+  }
+}
+function writeOrigins(all: Record<string, unknown>): void {
+  try {
+    if (Object.keys(all).length) window.localStorage.setItem(ORIGIN_KEY, JSON.stringify(all));
+    else window.localStorage.removeItem(ORIGIN_KEY);
+  } catch { /* private mode */ }
+}
+/** Where this browser's copy of `kind:name` was copied from, or null. */
+export function localOrigin(kind: 'texture' | 'sound', name: string): Provenance | null {
+  return parseProvenance(readOrigins()[`${kind}:${name}`]);
+}
+export function setLocalOrigin(kind: 'texture' | 'sound', name: string, from: Provenance | null): void {
+  const all = readOrigins();
+  const key = `${kind}:${name}`;
+  if (!from && !(key in all)) return;
+  if (from) all[key] = from;
+  else delete all[key];
+  writeOrigins(all);
+}
+/** Move a credit with a rename (the sync's "keep both" renames this browser's copy). */
+export function moveLocalOrigin(kind: 'texture' | 'sound', from: string, to: string): void {
+  const all = readOrigins();
+  const a = `${kind}:${from}`;
+  if (!(a in all)) return;
+  all[`${kind}:${to}`] = all[a];
+  delete all[a];
+  writeOrigins(all);
+}
+/** Drop credits for names this browser no longer holds (only `keep` stay). */
+export function pruneLocalOrigins(keep: Set<string>): void {
+  const all = readOrigins();
+  let changed = false;
+  for (const k of Object.keys(all)) if (!keep.has(k)) { delete all[k]; changed = true; }
+  if (changed) writeOrigins(all);
 }
 
 // ---- saved textures -------------------------------------------------------
@@ -439,9 +493,9 @@ const PREFIX: Record<LibraryKind, [string, string]> = {
 /**
  * Put one item into this browser's library as if the student had saved it
  * (Copy to mine from the class library): it syncs up to their own account.
- * Returns false when it would not fit.
+ * `from` is where it was copied from (the credit). Returns false when it would not fit.
  */
-export function addToLibrary(item: LocalLibraryItem): boolean {
+export function addToLibrary(item: LocalLibraryItem, from: Provenance | null = null): boolean {
   const store = readStore();
   const [p, mp] = PREFIX[item.kind];
   store[p + item.name] = JSON.stringify(item.dataUri);
@@ -449,6 +503,7 @@ export function addToLibrary(item: LocalLibraryItem): boolean {
   else store[mp + item.name] = item.meta;
   if (!writeStore(store)) return false;
   markDeleted(item.kind, item.name, false);
+  setLocalOrigin(item.kind, item.name, from);
   localChanged();
   try { window.dispatchEvent(new Event(LIBRARY_UPDATED)); } catch { /* no window */ }
   return true;

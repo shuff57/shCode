@@ -6,9 +6,15 @@
 // else is 404, the same as an id that does not exist. The publisher shows as
 // first name + last initial, never an email. DELETE is owner only, keeps the
 // row with deleted_at set, and takes the game out of every class at once.
+//
+// The code is returned to everyone who may play, even for a "just play" game
+// (it has to run in their browser). `canRemix` is false for a "just play" game
+// that is not the caller's, and the UI then hides View code and Remix; the
+// server refuses to publish a remix of it (POST /api/games).
 
 import { json, ownerName, visibleGame, type SessionData } from '../../_shared/games';
 import { isGameId, modeLabel, type GameMode } from '../../../lib/games-core';
+import { canRemix, choiceOf, provenanceFromRow } from '../../../lib/share-choice';
 
 interface Env {
   DB: D1Database;
@@ -31,6 +37,9 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
       modeLabel: modeLabel(row.mode as GameMode, row.players),
       owner: await ownerName(env.DB, row.owner_email), mine: seen.mine, hidden: seen.hidden,
       ...(seen.mine ? { shared } : {}),
+      choice: choiceOf(row.share_choice),
+      canRemix: seen.mine || canRemix(row.share_choice),
+      remixedFrom: provenanceFromRow(row),
       createdAt: row.created_at, updatedAt: row.updated_at,
     },
   });

@@ -72,6 +72,7 @@ r = await call(share.onRequestPost, ANA, `/api/library/${id}/share`, { id }, 'PO
 check('share must be a boolean', r.status === 400, r);
 r = await call(share.onRequestPost, ANA, `/api/library/${id}/share`, { id }, 'POST', { share: true });
 check('Ana shares it into her one class', r.status === 200 && r.body.classes === 1, r);
+check('sharing with no choice is "credit" (0045)', r.body.choice === 'credit', r);
 r = await call(lib.onRequestGet, ANA, '/api/library');
 check("Ana's own list marks it shared", r.body.items.find((i) => i.id === id)?.shared === true, r.body.items);
 

@@ -9,6 +9,7 @@
 import { callerClasses, gamesSharedInto, json, type SessionData } from '../../../_shared/games';
 import { ownerLabel } from '../../../_shared/libraryShare';
 import { modeLabel, type GameMode } from '../../../../lib/games-core';
+import { choiceOf, provenanceFromRow } from '../../../../lib/share-choice';
 
 interface Env {
   DB: D1Database;
@@ -32,6 +33,7 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ en
       mine: r.owner_email === data.email,
       classId: r.class_id, className: r.class_name,
       sharedAt: r.shared_at, updatedAt: r.updated_at, hidden: r.hidden_at != null,
+      choice: choiceOf(r.share_choice), remixedFrom: provenanceFromRow(r),
     });
   }
   return json({ games: [...seen.values()] });

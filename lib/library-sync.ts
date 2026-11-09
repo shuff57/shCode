@@ -23,11 +23,15 @@ import {
   LIBRARY_LOCAL_CHANGE,
   applyLibraryChanges,
   localLibraryItems,
+  localOrigin,
+  moveLocalOrigin,
+  pruneLocalOrigins,
   readLocalDeletes,
   writeLocalDeletes,
   type LibraryKind,
   type LocalLibraryItem,
 } from './moshion-storage';
+import { choiceOf, parseProvenance, type Provenance, type ShareChoice } from './share-choice';
 
 export interface ServerItem {
   id: string;
@@ -36,6 +40,10 @@ export interface ServerItem {
   hash: string;
   deletedAt: number | null;
   shared?: boolean;
+  /** Who may do what with it once shared (lib/share-choice.ts); 'credit' when missing. */
+  choice?: ShareChoice;
+  /** Where it was copied from, recorded by the server on its first upload. */
+  remixedFrom?: Provenance | null;
 }
 export interface BaseEntry {
   id: string;
@@ -222,6 +230,7 @@ export async function runSync(email: string): Promise<SyncResult> {
         if (!src) break;
         const moved = { ...src, name: a.to };
         byKey.set(itemKey(a.kind, a.to), moved);
+        moveLocalOrigin(a.kind, a.from, a.to);
         put.push(moved);
         remove.push({ kind: a.kind, name: a.from });
         result.renamed.push({ kind: a.kind, from: a.from, to: a.to });
@@ -294,7 +303,11 @@ export async function runSync(email: string): Promise<SyncResult> {
         method: 'PUT',
         credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kind: item.kind, name: item.name, dataUri: item.dataUri, meta: item.meta, baseHash }),
+        // The original's id only: the server reads the credit from the original's own row.
+        body: JSON.stringify({
+          kind: item.kind, name: item.name, dataUri: item.dataUri, meta: item.meta, baseHash,
+          ...(localOrigin(item.kind, item.name) ? { remixedFrom: localOrigin(item.kind, item.name)!.id } : {}),
+        }),
       });
       const body = (await res.json().catch(() => ({}))) as { item?: { id: string; hash: string }; error?: string };
       if (res.ok && body.item) {
@@ -310,6 +323,7 @@ export async function runSync(email: string): Promise<SyncResult> {
 
   writeBase(email, base);
   writeLocalDeletes([...deletes]);
+  pruneLocalOrigins(new Set(localLibraryItems().map((l) => itemKey(l.kind, l.name))));
   result.ok = result.problems.length === 0;
   return finish(result);
 }
@@ -320,21 +334,41 @@ let syncEmail: string | null = null;
 let serverIndex = new Map<string, ServerItem & { shared?: boolean }>();
 export const LIBRARY_SHARES_CHANGED = 'moshion-library-shares-changed';
 
-/** The account copy of a saved item, once synced: its id and whether it is shared. */
-export function accountItem(kind: LibraryKind, name: string): { id: string; shared: boolean } | null {
+export interface AccountItem {
+  id: string;
+  shared: boolean;
+  choice: ShareChoice;
+  remixedFrom: Provenance | null;
+}
+
+/** The account copy of a saved item, once synced: its id, whether it is shared, its choice and its credit. */
+export function accountItem(kind: LibraryKind, name: string): AccountItem | null {
   const s = serverIndex.get(itemKey(kind, name));
-  return s ? { id: s.id, shared: !!s.shared } : null;
+  return s ? { id: s.id, shared: !!s.shared, choice: choiceOf(s.choice), remixedFrom: parseProvenance(s.remixedFrom) } : null;
+}
+
+/**
+ * Where a saved picture or sound was copied from: the account's record once it
+ * has synced, this browser's until then. Null for the student's own work.
+ */
+export function remixCredit(kind: LibraryKind, name: string): Provenance | null {
+  const s = serverIndex.get(itemKey(kind, name));
+  if (s) return parseProvenance(s.remixedFrom) ?? localOrigin(kind, name);
+  return localOrigin(kind, name);
 }
 /** Every live item in the account copy, as of the last sync: kind, name, id and whether it is shared. */
-export function accountItems(): { kind: LibraryKind; name: string; id: string; shared: boolean }[] {
-  return [...serverIndex.values()].map((s) => ({ kind: s.kind, name: s.name, id: s.id, shared: !!s.shared }));
+export function accountItems(): { kind: LibraryKind; name: string; id: string; shared: boolean; choice: ShareChoice }[] {
+  return [...serverIndex.values()].map((s) => ({ kind: s.kind, name: s.name, id: s.id, shared: !!s.shared, choice: choiceOf(s.choice) }));
 }
 export function signedInForSync(): boolean {
   return syncEmail !== null;
 }
 
-/** Share or unshare one synced item with the student's classes. Returns an error sentence or null. */
-export async function setShared(kind: LibraryKind, name: string, share: boolean): Promise<string | null> {
+/**
+ * Share or unshare one synced item with the student's classes, with `choice`
+ * (who may do what with it) when sharing. Returns an error sentence or null.
+ */
+export async function setShared(kind: LibraryKind, name: string, share: boolean, choice?: ShareChoice): Promise<string | null> {
   const s = serverIndex.get(itemKey(kind, name));
   if (!s) return 'Wait a moment: this is still syncing to your account.';
   try {
@@ -342,11 +376,11 @@ export async function setShared(kind: LibraryKind, name: string, share: boolean)
       method: 'POST',
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ share }),
+      body: JSON.stringify(share && choice ? { share, choice } : { share }),
     });
-    const body = (await res.json().catch(() => ({}))) as { error?: string };
+    const body = (await res.json().catch(() => ({}))) as { error?: string; choice?: ShareChoice };
     if (!res.ok) return body.error ?? `Could not ${share ? 'share' : 'unshare'} it (${res.status}).`;
-    serverIndex.set(itemKey(kind, name), { ...s, shared: share });
+    serverIndex.set(itemKey(kind, name), { ...s, shared: share, choice: body.choice ?? s.choice });
     try { window.dispatchEvent(new Event(LIBRARY_SHARES_CHANGED)); } catch { /* no window */ }
     return null;
   } catch {
@@ -377,6 +411,7 @@ export async function clearSyncedLibrary(email: string): Promise<void> {
     if (b && b.hash === (await itemHash(l.dataUri, l.meta))) remove.push({ kind: l.kind, name: l.name });
   }
   if (remove.length) applyLibraryChanges({ remove });
+  pruneLocalOrigins(new Set(localLibraryItems().map((l) => itemKey(l.kind, l.name))));
   writeBase(email, null);
 }
 

@@ -7,6 +7,12 @@
 // into your own sandbox draft (lib/games-client.ts asks first if that would
 // replace work). A game only ever runs on /play, inside the sandboxed moSHion
 // iframe.
+//
+// Sharing choices (lib/share-choice.ts): Share with class opens a chooser
+// (ShareChoicePicker) under the row: who may do what with the game, defaulting
+// to the student's last choice, locked to "keep remixes open" for a remix of a
+// game that asked for that. A classmate's "just play" game has no Remix. A
+// remix shows "Remixed from <title> by <name>".
 
 import { useCallback, useEffect, useState } from 'react';
 import {
@@ -22,7 +28,9 @@ import {
   type SharedGame,
 } from '../lib/games-client';
 import { modeLabel, type GameMode } from '../lib/games-core';
+import { CHOICE_TEXT, canRemix, type ShareChoice } from '../lib/share-choice';
 import { sectionHeading, sectionNote, sectionStyle } from './library-ui';
+import ShareChoicePicker, { RemixCreditLine, lockedChoice, useLastChoice } from './ShareChoicePicker';
 
 const btn: React.CSSProperties = {
   fontSize: 12, padding: '4px 8px', borderRadius: 4, cursor: 'pointer', whiteSpace: 'nowrap',
@@ -76,6 +84,9 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
   // Shown in this section, where the button was pressed (the panel's own
   // message line sits at the top, out of view by the time you reach Games).
   const [note, setNote] = useState<{ text: string; bad: boolean } | null>(null);
+  /** The game whose sharing chooser is open, and the choice picked in it. */
+  const [choosing, setChoosing] = useState<{ id: string; choice: ShareChoice } | null>(null);
+  const [lastChoice, rememberChoice] = useLastChoice('game');
 
   const load = useCallback(async () => {
     const [a, b] = await Promise.all([listMyGames(), listSharedGames()]);
@@ -98,16 +109,31 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
     setBusy(null);
     if (!r.ok) { say(r.error, true); return; }
     const g = r.value.game;
-    const done = remixIntoSandbox({ id: g.id, title: g.title, code: g.code, mine: mineToo && g.mine });
+    const done = remixIntoSandbox(
+      { id: g.id, title: g.title, code: g.code, mine: mineToo && g.mine, owner: g.owner, choice: g.choice, remixedFrom: g.remixedFrom },
+      undefined,
+      (m) => say(m, true),
+    );
     if (done) say(`"${g.title}" is in your moSHion sandbox now. Press Run to play it, then change anything you like.`);
   }
 
-  async function toggleShare(g: MyGame) {
+  function openChooser(g: MyGame) {
+    if (choosing?.id === g.id) { setChoosing(null); return; }
+    setChoosing({ id: g.id, choice: lockedChoice(g.remixedFrom, g.shared ? g.choice : lastChoice) });
+  }
+
+  async function applyShare(g: MyGame, share: boolean) {
+    const choice = choosing?.id === g.id ? choosing.choice : g.choice;
     setBusy(g.id);
-    const r = await setGameShared(g.id, !g.shared);
+    const r = await setGameShared(g.id, share, share ? choice : undefined);
     setBusy(null);
     if (!r.ok) { say(r.error, true); return; }
-    say(r.value.shared ? `"${g.title}" is shared with your class. They can play and remix it.` : `"${g.title}" is no longer shared with your class.`);
+    setChoosing(null);
+    if (!r.value.shared) { say(`"${g.title}" is no longer shared with your class.`); return; }
+    rememberChoice(r.value.choice ?? choice);
+    say((r.value.choice ?? choice) === 'play'
+      ? `"${g.title}" is shared with your class. They can play it.`
+      : `"${g.title}" is shared with your class. They can play and remix it.`);
   }
 
   async function remove(g: MyGame) {
@@ -158,20 +184,39 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
                 <div style={{ fontSize: 13, fontWeight: 600 }}>{g.title}</div>
                 <div style={badge}>
                   {modeLabel(g.mode, g.players)}
-                  {g.shared ? <span style={{ color: 'var(--c-green)' }}> · shared with your class</span> : ' · only you'}
+                  {g.shared
+                    ? <span style={{ color: 'var(--c-green)' }}> · shared with your class ({CHOICE_TEXT.game[g.choice ?? 'credit'].short})</span>
+                    : ' · only you'}
                 </div>
+                <RemixCreditLine from={g.remixedFrom} />
               </div>
               <a href={playHref(g.id)} style={playBtn}>Play</a>
               <button type="button" style={btn} disabled={busy === g.id} onClick={() => void remix(g.id, true)}
                 title="Put this game's code in your moSHion sandbox; Publish game there updates it">
                 Open in sandbox
               </button>
-              <button type="button" style={g.shared ? { ...btn, color: 'var(--c-green)' } : btn} aria-pressed={g.shared}
-                disabled={busy === g.id} onClick={() => void toggleShare(g)}
-                title={g.shared ? 'In your class' + "'" + 's Games. Click to take it out.' : 'Put this in your class' + "'" + 's Games so they can play and remix it.'}>
+              <button type="button" style={g.shared ? { ...btn, color: 'var(--c-green)' } : btn}
+                aria-expanded={choosing?.id === g.id}
+                disabled={busy === g.id} onClick={() => openChooser(g)}
+                title={g.shared ? 'In your class' + "'" + 's Games. Click to change who can do what, or stop sharing.' : 'Put this in your class' + "'" + 's Games.'}>
                 {g.shared ? 'Shared with class ✓' : 'Share with class'}
               </button>
               <button type="button" style={{ ...btn, color: 'var(--c-red)' }} disabled={busy === g.id} onClick={() => void remove(g)}>Delete</button>
+              {choosing?.id === g.id && (
+                <div style={{ flex: '1 1 100%', minWidth: 0, marginTop: 4 }}>
+                  <ShareChoicePicker thing="game" value={choosing.choice} from={g.remixedFrom} idPrefix={`game-share-${g.id}`} compact
+                    onChange={(c) => setChoosing({ id: g.id, choice: c })} />
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    <button type="button" style={playBtn} disabled={busy === g.id} onClick={() => void applyShare(g, true)}>
+                      {g.shared ? 'Save' : 'Share with my class'}
+                    </button>
+                    {g.shared && (
+                      <button type="button" style={btn} disabled={busy === g.id} onClick={() => void applyShare(g, false)}>Stop sharing</button>
+                    )}
+                    <button type="button" style={btn} onClick={() => setChoosing(null)}>Cancel</button>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -193,15 +238,18 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
               <div style={{ minWidth: 140, flex: '1 1 160px' }}>
                 <div style={{ fontSize: 13, fontWeight: 600 }}>{g.title}</div>
                 <div style={badge}>
-                  by {g.owner} · {g.modeLabel}
+                  by {g.owner} · {g.modeLabel} · {CHOICE_TEXT.game[g.choice ?? 'credit'].short}
                   {g.hidden && <span style={{ color: 'var(--c-orange)' }}> · hidden from students</span>}
                 </div>
+                <RemixCreditLine from={g.remixedFrom} />
               </div>
               <a href={playHref(g.id)} style={playBtn}>Play</a>
-              <button type="button" style={btn} disabled={busy === g.id} onClick={() => void remix(g.id, false)}
-                title="Copy this game's code into your own moSHion sandbox">
-                Remix
-              </button>
+              {canRemix(g.choice) && (
+                <button type="button" style={btn} disabled={busy === g.id} onClick={() => void remix(g.id, false)}
+                  title="Copy this game's code into your own moSHion sandbox">
+                  Remix
+                </button>
+              )}
             </div>
           ))}
         </div>

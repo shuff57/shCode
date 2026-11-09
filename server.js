@@ -631,6 +631,14 @@ app.prepare().catch((err) => {
     server.get('/api/games/:id/assets', libRoute(gamesAssets.onRequestGet));
     server.get('/api/classes/:id/game-shares', libRoute(gamesModerate.onRequestGet));
     server.post('/api/classes/:id/game-shares', express.json(), libRoute(gamesModerate.onRequestPost));
+    // A teacher deleting a student's shared item or game, or clearing their whole Library
+    // (functions/_shared/libraryDelete.ts). Dev uploads live in the stub map below, not this database.
+    const libDelete = await import('./functions/api/classes/[id]/library-delete.ts');
+    const gameDelete = await import('./functions/api/classes/[id]/game-delete.ts');
+    const clearLibrary = await import('./functions/api/classes/[id]/clear-library.ts');
+    server.post('/api/classes/:id/library-delete', express.json(), libRoute(libDelete.onRequestPost));
+    server.post('/api/classes/:id/game-delete', express.json(), libRoute(gameDelete.onRequestPost));
+    server.post('/api/classes/:id/clear-library', express.json(), libRoute(clearLibrary.onRequestPost));
     // Appearance settings (functions/api/prefs.ts), same in-memory database.
     const prefsRoute = await import('./functions/api/prefs.ts');
     server.get('/api/prefs', libRoute(prefsRoute.onRequestGet));
@@ -817,8 +825,14 @@ app.prepare().catch((err) => {
     // Shaped like the real 32-hex CSPRNG id so isUploadId() would accept it.
     const id = devUploadSeq.toString(16).padStart(32, 'a');
     const type = req.headers['content-type'] || 'image/png';
-    devUploads.set(id, { buf: req.body, type });
+    devUploads.set(id, { buf: req.body, type, at: Date.now() });
     res.status(201).json({ id, url: '/uploads/' + id + '.png', filename: 'dev', contentType: type, bytes: req.body.length });
+  });
+
+  // The Library page's "Uploaded images" section lists these (components/UploadedImages.tsx).
+  server.get('/api/uploads', (_req, res) => {
+    const uploads = [...devUploads].map(([id, u]) => ({ id, filename: u.filename ?? 'dev', content_type: u.type, bytes: u.buf.length, created_at: u.at ?? 0, url: '/uploads/' + id + '.png' })).reverse();
+    res.json({ uploads, quota: { files: uploads.length, maxFiles: 40, bytes: uploads.reduce((n, u) => n + u.bytes, 0), maxBytes: 20 * 1024 * 1024 } });
   });
 
   server.delete('/api/uploads/:id', (req, res) => {

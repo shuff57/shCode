@@ -78,6 +78,7 @@ check('cleanTitle: 60 is fine, 61 is not', 'title' in core.cleanTitle('x'.repeat
 let r = await call(mine.onRequestPost, ANA, '/api/games', {}, 'POST', { title: 'Pong Duel', code: CODE });
 const id = r.body.game?.id;
 check('Ana publishes a game (201) with the declared mode', r.status === 201 && /^[0-9a-f]{32}$/.test(id) && r.body.game.mode === 'versus' && r.body.game.players === 2, r);
+check('a game published with no choice is "credit" and not a remix (0045)', r.body.game.choice === 'credit' && r.body.game.remixedFrom === null, r);
 r = await call(mine.onRequestPost, ANA, '/api/games', {}, 'POST', { title: 'Sneaky', code: CODE, mode: 'coop', players: 4 });
 check('mode and players come from the code, never the body', r.body.game?.mode === 'versus' && r.body.game?.players === 2, r);
 const id2 = r.body.game?.id;

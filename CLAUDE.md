@@ -639,6 +639,20 @@ through (bytes from R2, no emails) plus `missing`; /play hands them to `MoshionP
 the store for that run only (`lib/moshion-storage.ts`: never written to the player's store, a sketch cannot overwrite
 or delete those keys; the game's item beats a same-named one of the player's), and names the missing ones ("Ask Sam R.
 to share them"). Tests: `scripts/test-game-assets.mjs`. server.js routes it for dev.
+**Sharing choices and remix credit (migration 0045, 2026-11-09).** Sharing a game or a picture/sound asks who may do
+what, in plain words (teaching open source, no license names; owner's decision): 'play' "Just play"/"Just use" (no
+code view, Remix or Copy to mine; a request, not a lock, since code and bytes still reach the browser), 'credit' (default),
+'open' "remix it, give me credit, and keep remixes open" (a remix of it can only be shared as 'open'; the server refuses
+other choices with 400 + `lockedTo`), 'free'. `share_choice` and provenance (`remixed_from_*`, `origin_*`, first name +
+last initial, never an email) live on library_games and library_items (not the share rows: unsharing deletes those).
+The browser sends only the original's id; the server reads the credit from the original's row. Rules and wording:
+`lib/share-choice.ts`; UI `components/ShareChoicePicker.tsx`, `RemixCredit.tsx`. Tests: `scripts/test-share-choice.mjs`.
+**Deleting (2026-11-09).** Students: Delete on every Mine card (the editors' sync-aware delete) and an "Uploaded images"
+section (`components/UploadedImages.tsx`). Teachers (owner, co-teacher, admin), for students enrolled now: Delete in the
+moderation panels' RowMenu (`POST /api/classes/[id]/library-delete {itemId}`, `/game-delete {gameId}`: only items shared
+into that class) and "Clear Library..." in the student's row menu (`/clear-library {email}`, requireText; tombstones,
+shares, uploads and R2 objects; counts in the toast). Rules `functions/_shared/libraryDelete.ts`; tests
+`scripts/test-library-delete.mjs`. `RowMenu` opens upward when a row is near the window's bottom.
 **The Library is three tabs** (`components/ClassLibraryPanel.tsx`): Games (My games / Class games / Built in),
 Pictures and Sounds (Mine / Shared with my class / Built in), `?tab=games|pictures|sounds`, remembered in
 `shCode:library-tab`, Games when arriving from /play.

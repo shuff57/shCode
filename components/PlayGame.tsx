@@ -19,6 +19,11 @@
 // store the sketch sees for this run (lib/game-assets.ts); the preview waits
 // for that answer before it starts. Items the publisher has not shared with
 // the class are named in a note above the game.
+//
+// Sharing choices (lib/share-choice.ts): a classmate's "just play" game shows
+// no Remix and no View code (canRemix false; the code still reaches this page
+// so it can run, and the server refuses to publish a remix of it). A remix
+// says where it came from under the title ("Remixed from Plane by Sam W.").
 
 import { useEffect, useState } from 'react';
 import MoshionPreview from './MoshionPreview';
@@ -27,6 +32,8 @@ import Console from './Console';
 import { getGame, getGameAssets, remixIntoSandbox, type FullGame } from '../lib/games-client';
 import { builtinTextureNames, listWords, missingToShow, type GameAsset } from '../lib/game-assets';
 import { isGameId } from '../lib/games-core';
+import { CHOICE_TEXT } from '../lib/share-choice';
+import { RemixCreditLine } from './ShareChoicePicker';
 
 type State =
   | { kind: 'loading' }
@@ -135,6 +142,8 @@ export default function PlayGame() {
   // Hold the frame back until the assets answer, so its first store already
   // has them (the frame reads its store once, before the sketch starts).
   const effectiveRunKey = assets ? runKey : 0;
+  // A classmate's "just play" game: play only (the server says so; older answers mean yes).
+  const canRemix = g.mine || g.canRemix !== false;
   return (
     <div style={wrap}>
       {back}
@@ -142,27 +151,37 @@ export default function PlayGame() {
         <div style={{ flex: '1 1 260px', minWidth: 0 }}>
           <h1 style={{ fontSize: 22, margin: 0, overflowWrap: 'anywhere' }}>{g.title}</h1>
           <div style={{ fontSize: 13, color: 'var(--c-dim)' }}>
-            by {g.mine ? `${g.owner} (you)` : g.owner} · {g.modeLabel}
+            by {g.mine ? `${g.owner} (you)` : g.owner} · {g.modeLabel} · {CHOICE_TEXT.game[g.choice ?? 'credit'].short}
             {g.hidden && <span style={{ color: 'var(--c-orange)' }}> · hidden from students</span>}
           </div>
+          <RemixCreditLine from={g.remixedFrom} style={{ fontSize: 13 }} />
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button type="button" className="btn-run" onClick={() => setRunKey((k) => k + 1)}>
             {runKey === 0 ? '▶ Run' : '↻ Restart'}
           </button>
-          <button
-            type="button"
-            style={quiet}
-            title={g.mine ? 'Put this game in your moSHion sandbox; Publish game there updates it' : 'Copy this game into your own moSHion sandbox to change it'}
-            onClick={() => {
-              if (remixIntoSandbox({ id: g.id, title: g.title, code: g.code, mine: g.mine })) setNote('Opening your sandbox…');
-            }}
-          >
-            {g.mine ? 'Open in sandbox' : 'Remix'}
-          </button>
-          <button type="button" style={quiet} aria-expanded={showCode} onClick={() => setShowCode((s) => !s)}>
-            {showCode ? 'Hide code' : 'View code'}
-          </button>
+          {canRemix && (
+            <>
+              <button
+                type="button"
+                style={quiet}
+                title={g.mine ? 'Put this game in your moSHion sandbox; Publish game there updates it' : 'Copy this game into your own moSHion sandbox to change it'}
+                onClick={() => {
+                  const ok = remixIntoSandbox(
+                    { id: g.id, title: g.title, code: g.code, mine: g.mine, owner: g.owner, choice: g.choice, remixedFrom: g.remixedFrom },
+                    undefined,
+                    (m) => setNote(m),
+                  );
+                  if (ok) setNote('Opening your sandbox…');
+                }}
+              >
+                {g.mine ? 'Open in sandbox' : 'Remix'}
+              </button>
+              <button type="button" style={quiet} aria-expanded={showCode} onClick={() => setShowCode((s) => !s)}>
+                {showCode ? 'Hide code' : 'View code'}
+              </button>
+            </>
+          )}
         </div>
       </div>
       {note && <div role="status" style={{ fontSize: 12, color: 'var(--c-green)', margin: '0 0 6px' }}>{note}</div>}
@@ -187,7 +206,7 @@ export default function PlayGame() {
           <Console resetKey={String(effectiveRunKey)} />
         </div>
       </div>
-      {showCode && (
+      {showCode && canRemix && (
         <pre
           aria-label="Game code"
           style={{
