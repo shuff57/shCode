@@ -600,6 +600,16 @@ wrangler dev). Deploy order: apply 0044 (`npm run d1:migrate`), `cd workers/live
 tag v2, D1 binding), then the site (the repo wrangler.toml now declares `LIVE_DOC`; do not deploy the site from this
 tree before the Worker has the class).
 
+### Rooms close when the host's tab is gone; Code together is a popup (2026-11-08)
+On page hide, a game room or Code together tab leaves its seat with `navigator.sendBeacon` (fetch keepalive as the
+fallback; `lib/room-leave.ts`); a reload in the same tab still gets its seat back. Both Durable Objects also close a
+room whose host seat has had no socket for 60 s: they set `game_rooms.closed_at` in D1 (the Worker's own `DB` binding),
+then tell the sockets. The rule is in `lib/live-protocol.ts` with an injectable clock (so a change there means
+redeploying `workers/live`). Polling (non-live) rooms only get the beacon. Code together's start/join/share controls
+are a modal (`CodeTogetherBar.tsx`); in a session the space above the editor is one slim line (code pictures, people,
+Copy, Leave, an expand toggle remembered per browser), and the toolbar button reads "Coding together · N" and reopens
+the popup. A mode button clicked before the sandbox hydrates is kept by a small inline script and applied on start.
+
 ### Games library (Part B, migration 0042)
 A student publishes a moSHion sketch from the sandbox (`components/PublishGameButton.tsx`: title, share with my class,
 Update / Publish as a new game; which game the sandbox draft is published as lives in localStorage
