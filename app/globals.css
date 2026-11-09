@@ -3,6 +3,10 @@
 @tailwind utilities;
 
 :root{
+  /* Desktop tool rail geometry (climb 2 r7): rail width, gutter from the viewport edge, gap to the content. */
+  --shd-rail-width: 80px;
+  --shd-rail-gutter: 20px;
+  --shd-rail-gap: 8px;
   /* Type scale and spacing rhythm (design pass, ui-hill-climb). */
   --fs-h1: 28px;
   --fs-h2: 18px;
@@ -2049,7 +2053,9 @@ details.console > summary::-webkit-details-marker { display: none; }
   .content-lesson-main { padding: 12px 12px 20px !important; }
   .content-lesson-title { align-items: flex-start !important; flex-direction: column; gap: 2px !important; }
   .content-lesson-title h1 { font-size: 23px !important; line-height: 1.16 !important; }
-  .content-lesson-main > p { font-size: 13px !important; line-height: 1.3 !important; }
+  .content-lesson-main > p,
+  .content-lesson-main > :is(.lesson-reading-grid, .lesson-content-flow) > p,
+  .content-lesson-main .lesson-primary > p { font-size: 13px !important; line-height: 1.3 !important; }
   .lesson-progress-footer { padding: 5px 8px !important; }
   body:has(.shd-tabstrip) { padding-bottom: calc(var(--shd-footer-height, 36px) + 44px) !important; }
   .shd-tab { padding: 4px 9px !important; min-height: 28px; }
@@ -2290,9 +2296,9 @@ body:has(.lesson-progress-footer) .editor-body { margin-top: 0; padding-top: 8px
   body:has(.shd-tabstrip) .assignment-header,
   body:has(.shd-tabstrip) .editor-card,
   body:has(.shd-tabstrip) .content-lesson-main,
-  body:has(.shd-tabstrip) .sandbox-shell { margin-right: calc(88px + var(--shd-tabbed, 0px)); }
-  .shd-tabstrip { right: var(--shd-tabbed, 0px) !important; width: 80px; box-sizing: border-box; overflow-x: hidden; }
-  .shd-tab { width: 100%; box-sizing: border-box; letter-spacing: 0 !important; }
+  body:has(.shd-tabstrip) .sandbox-shell { margin-right: calc(var(--shd-rail-width) + var(--shd-rail-gap) + var(--shd-tabbed, 0px)); }
+  .shd-tabstrip { right: calc(var(--shd-rail-gutter) + var(--shd-tabbed, 0px)) !important; width: var(--shd-rail-width); box-sizing: border-box; overflow-x: hidden; }
+  .shd-tab { width: 100%; box-sizing: border-box; letter-spacing: 0 !important; white-space: nowrap; border-right: 1px solid var(--border) !important; border-radius: 6px !important; }
   .lesson-slides-frame { aspect-ratio: auto !important; height: min(52vw, calc(100dvh - 360px)); min-height: 260px; }
 }
 @media (max-width: 720px) {
@@ -2330,7 +2336,7 @@ body { box-sizing: border-box; padding-right: 20px; }
 .assignment-unmet-mobile, .quiz-guidance-toggle { display: none; }
 @media (min-width: 721px) {
   body:has(.shd-tabstrip) .content-lesson-main {
-    width: calc(100% - 88px - var(--shd-tabbed, 0px)) !important;
+    width: calc(100% - var(--shd-rail-width) - var(--shd-rail-gap) - var(--shd-tabbed, 0px)) !important;
   }
 }
 @media (max-width: 720px) {
@@ -2370,7 +2376,7 @@ body { box-sizing: border-box; padding-right: 20px; }
 }
 
 /* Labs: a readable task beside the work, with a single status row above it. */
-.lab-work-area { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 16px; min-width: 0; }
+.lab-work-area { display: grid; grid-template-columns: clamp(320px, 26.4vw, 380px) minmax(0, 1fr); gap: 16px; min-width: 0; }
 .lab-task-card { font-family: system-ui, sans-serif; font-size: 14px; line-height: 1.5; }
 .lab-task-card .lesson-steps { margin: 0; padding-left: 20px; }
 .lab-task-card .lesson-step { margin: 0 0 14px; padding: 0; }
@@ -2395,11 +2401,11 @@ body { box-sizing: border-box; padding-right: 20px; }
 .lab-assignment-header { gap: 8px; }
 .mod-row-title { display: grid; grid-template-columns: 48px minmax(0, 1fr); column-gap: 8px; }
 @media (min-width: 721px) {
-  body:has(.shd-tabstrip) .lab-work-area { margin-right: calc(88px + var(--shd-tabbed, 0px)); }
+  body:has(.shd-tabstrip) .lab-work-area { margin-right: calc(var(--shd-rail-width) + var(--shd-rail-gap) + var(--shd-tabbed, 0px)); }
   body:has(.shd-tabstrip) .lab-work-area .editor-card { margin-right: 0; }
   .lab-work-area .toolbar-submit { display: none; }
-  .lab-work-area .editor-preview-container:not(.sandbox-split) > #editorPane { min-width: 0; flex-basis: 58%; }
-  .lab-work-area #previewPane { min-width: 0; flex-basis: 42%; }
+  .lab-work-area .editor-preview-container:not(.sandbox-split) > #editorPane { min-width: min(480px, 64%); flex-basis: 64%; }  /* never starve the preview at medium widths or with a drawer open */
+  .lab-work-area #previewPane { min-width: 0; flex-basis: 36%; }
   .lab-work-area .console-empty { min-width: 0; }
 }
 @media (max-width: 720px) {
@@ -2430,9 +2436,6 @@ body { box-sizing: border-box; padding-right: 20px; }
   .lab-assignment-header .assignment-header-left p { display: none; }
   .lab-work-area .run-toolbar { flex-wrap: nowrap; overflow-x: auto; }
   .lab-work-area .run-toolbar button { flex-shrink: 0; }
-  /* Keep the Save word (the action a first-time coder must find); History
-     drops to its glyph. Both buttons carry aria-label and title. */
-  .lab-work-area .run-toolbar .toolbar-history .toolbar-button-label { display: none; }
   .quiz-guidance p { display: block !important; -webkit-line-clamp: unset !important; overflow: visible !important; font-size: 13px !important; }
   .mod-row-title { display: block; }
   .mod-row-title .mod-row-num { font-size: 12px; margin-right: 5px; }
@@ -2458,7 +2461,7 @@ body:has(.lab-work-area) { gap: 8px; }
    Reserve the same space in the scrollable tool strip so its buttons stay clear. */
 @media (min-width: 721px) {
   body:has(.lesson-progress-footer) .issue-fab {
-    right: calc(var(--shd-tabbed, 0px) + 23px);
+    right: calc(var(--shd-tabbed, 0px) + var(--shd-rail-gutter) + (var(--shd-rail-width) - 34px) / 2);
     bottom: max(20px, calc(var(--lesson-footer-clearance, 0px) + 12px));
     transition: border-color 120ms, color 120ms;
   }
@@ -2720,3 +2723,226 @@ a.mod-row:hover { background: var(--x-343746); border-top-color: var(--c-comment
 @media (prefers-reduced-motion: reduce) { .sprite-thumb[data-anim] { animation: none; } }
 .sprite-open { background: none; border: 1px solid transparent; border-radius: 4px; padding: 0; cursor: zoom-in; display: inline-flex; }
 .sprite-open:hover, .sprite-open:focus-visible { border-color: var(--c-cyan); }
+/* Lab tool states: accent identifies the open tool, quiet borders keep the rail readable. */
+.shd-tab {
+  /* keep each tool's own colour when closed (monochrome trap); the open tab adds the fill and accent border */
+  color: var(--shd-tab-accent, var(--c-purple));
+  background: var(--c-deep2);
+  border: 1px solid var(--c-line);
+  transition: background-color 120ms, border-color 120ms, color 120ms;
+}
+.shd-tab[aria-pressed="true"] {
+  color: var(--shd-tab-accent, var(--c-purple));
+  background: color-mix(in srgb, var(--shd-tab-accent, var(--c-purple)) 18%, var(--c-deep2));
+  border-color: var(--shd-tab-accent, var(--c-purple)) !important;
+}
+.shd-tab:hover {
+  color: var(--shd-tab-accent, var(--c-purple));
+  background: color-mix(in srgb, var(--shd-tab-accent, var(--c-purple)) 10%, var(--c-deep2));
+  border-color: var(--shd-tab-accent, var(--c-purple)) !important;
+}
+.shd-tab:focus-visible {
+  outline: 2px solid var(--shd-tab-accent, var(--c-purple));
+  outline-offset: -3px;
+}
+@media (max-width: 720px) {
+  /* Only console labs: preserve the canvas height in graphical labs. Auto height
+     follows rendered (including folded/wrapped) lines, then scrolls at the cap. */
+  .lab-work-area:has(.output-header) #previewPane { height: clamp(120px, 16svh, 160px); }
+  .lab-work-area:has(.output-header) #editorPane { height: auto; min-height: 180px; max-height: 45svh; }
+  .lab-work-area:has(.output-header) #editorPane > div { height: auto !important; }
+  .lab-work-area:has(.output-header) #editor { height: auto; flex: 0 1 auto !important; }
+  .lab-work-area:has(.output-header) #editor > div { height: auto !important; }
+  .lab-work-area:has(.output-header) #editor .cm-editor { height: auto; }
+  .lab-work-area:has(.output-header) #editor .cm-scroller { min-height: 140px; max-height: calc(45svh - 40px); }
+}
+
+/* Console labs follow the rendered program, with a shared useful minimum.
+   Let long code/output scroll at the viewport cap; graphical previews keep
+   their existing canvas-sized split. */
+@media (min-width: 721px) {
+  .lab-work-area:has(.output-header) { align-items: start; }
+  .lab-work-area:has(.output-header) .editor-preview-container { height: auto; }
+  .lab-work-area:has(.output-header) .pane { height: auto; min-height: 320px; }
+  .lab-work-area:has(.output-header) #editorPane > div,
+  .lab-work-area:has(.output-header) #editor > div { height: auto !important; }
+  .lab-work-area:has(.output-header) #editor { height: auto; }
+  .lab-work-area:has(.output-header) #editor .cm-editor { height: auto; }
+  .lab-work-area:has(.output-header) #editor .cm-scroller { max-height: max(280px, calc(100svh - 400px)); }
+  .lab-work-area:has(.output-header) .run-output { height: auto; max-height: max(280px, calc(100svh - 400px)); }
+}
+
+@media (max-width: 720px) {
+  /* Primary actions first; labelled, equally touchable tools in their own row. */
+  .lab-work-area .run-toolbar { flex-wrap: wrap; overflow: visible; gap: 8px !important; }
+  .lab-work-area .run-toolbar button {
+    min-width: 40px; min-height: 40px; padding: 8px 12px !important;
+    font-size: 13px !important; justify-content: center;
+  }
+  .lab-work-area .run-toolbar > .btn-run { flex: 1 1 auto; }
+  .lab-work-area .toolbar-utilities {
+    display: flex !important; flex: 1 0 100%; margin-left: 0 !important; padding-top: 8px;
+    border-top: 1px solid var(--c-line); gap: 8px !important; flex-wrap: wrap;
+  }
+  .lab-work-area .toolbar-utilities > button { flex: 1 1 auto; }
+  .lab-work-area .run-toolbar .toolbar-history .toolbar-button-label { display: inline; }
+  .lab-work-area .run-toolbar button:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; }
+
+}
+
+/* Climb 3 r3: Reset (destructive) is set apart from History / Save (keep work) in the tools group:
+   a gap and a divider on desktop, and a red tone on hover. */
+.toolbar-utilities .toolbar-reset { position: relative; margin-right: 12px; }
+.toolbar-utilities .toolbar-reset::after { content: ''; position: absolute; right: -11px; top: 4px; bottom: 4px; width: 1px; background: var(--c-line); }
+.toolbar-utilities .toolbar-reset:hover { color: var(--c-red) !important; border-color: color-mix(in srgb, var(--c-red) 55%, transparent) !important; }
+
+/* Round 4: readable code and clearly secondary, full-contrast output hints. */
+.lab-work-area #editor .cm-editor { font-size: 14px !important; }
+.lab-work-area :is(.console-empty, .reshape-empty) {
+  color: var(--c-meta); font-size: 13px; opacity: 1; font-style: italic;
+}
+.lab-work-area .run-output .console-empty { color: var(--c-meta); opacity: 1; }
+@media (max-width: 720px) {
+  /* round 4 phone layout (task preview collapse, 200px editor) reverted: it pushed Output under the dock (lost 0-2) */
+  .lab-work-area #editor .cm-editor { font-size: 13px !important; }
+}
+
+/* Lab editor colours stay local; shared editors retain their existing palette. */
+.lab-work-area #editor :is(.cm-codeComment, .tok-comment, .cm-comment, .cm-taskCommentFold) {
+  color: var(--c-meta) !important;
+  font-style: italic !important;
+}
+.lab-work-area #editor :is(.cm-gutters, .cm-foldGutter .cm-gutterElement) { color: var(--c-meta); }
+
+/* Desktop page system. These rules deliberately leave the existing phone and
+   tablet cascade intact; lab workspaces retain their full-width frame. */
+.lesson-overview { display: none; }
+.lesson-reading-grid, .lesson-content-flow, .lesson-primary { display: contents; }
+@media (min-width: 1024px) {
+  .page-frame, .teacher-frame,
+  body:has(:is(.page-frame, .teacher-frame, .docs-layout)) .site-header-row,
+  body:has(:is(.page-frame, .teacher-frame, .docs-layout)) > header > .header-lesson-nav {
+    width: 100%; max-width: 1200px !important; margin-left: auto; margin-right: auto;
+    box-sizing: border-box;
+  }
+  body:has(:is(.page-frame, .teacher-frame, .docs-layout)) .site-header-row { padding-left: 20px; padding-right: 20px; }
+  body:has(:is(.page-frame, .teacher-frame, .docs-layout)) > header > .header-lesson-nav { padding-left: 20px !important; padding-right: 20px !important; }
+  .teacher-class-grid { max-width: none !important; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+  .teacher-create-card { max-width: none !important; }
+  .home-page { padding-left: 20px; padding-right: 20px; }
+  .home-page :is(#titleRow, .home-chapter, .home-continue-card) { max-width: none !important; }
+  .home-page > footer { width: 100%; }
+  .home-page #titleRow { flex-wrap: nowrap; }
+  .home-page #titleRow h1 { flex: 1; }
+  .account-card :is(form, input) { max-width: 72ch; }
+  .module-page > div:has(> h1) { align-items: start !important; flex-direction: column; }
+  .content-lesson-title h1 { flex: 0 0 100%; margin-bottom: 8px !important; }
+  .content-lesson-title > a { margin-left: auto; }
+  .content-lesson-title { row-gap: 8px !important; margin-bottom: 12px !important; }
+  .content-lesson-main .lesson-reading-body { max-width: none; min-width: 0; }
+  .content-lesson-main .content-prose { max-width: 72ch; }
+  .lesson-wide-media { width: 100% !important; }
+  .content-lesson-main .livecodeblock-body > :is(.livecodeblock-editor, .livecodeblock-preview) {
+    flex: 1 1 0; width: 50%; min-width: 0;
+  }
+  .docs-layout {
+    width: calc(100% - 40px); max-width: 1160px; margin: 20px auto;
+    box-sizing: border-box; padding: 24px;
+    grid-template-columns: minmax(0, 1fr) 280px; gap: 0 32px;
+  }
+  .docs-main { display: contents; }
+  .docs-main > * { grid-column: 1; min-width: 0; }
+  .docs-sidebar { grid-column: 2; grid-row: 1 / span 4; border-right: 0; border-left: 1px solid var(--c-line); padding-left: 16px; position: static; max-height: 420px; overflow-y: auto; }
+  .docs-main-search { position: static; margin: 0 0 20px; padding: 0 0 16px; }
+  .docs-title { grid-row: 2; margin-top: 0; }
+  .docs-breadcrumb { grid-row: 3; color: var(--c-meta); font-size: var(--fs-meta); margin-bottom: 16px; }
+  .docs-body { max-width: 72ch !important; }
+  .docs-main > :is(.doc-live-snippet, .docs-sandbox, .docs-pagination) { grid-column: 1 / -1; }
+  .docs-layout .doc-live-snippet { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px !important; }
+  .docs-layout .doc-live-toolbar { grid-column: 1 / -1; }
+  .docs-layout .doc-live-output { height: 180px; box-sizing: border-box; }
+  .docs-layout .doc-live-snippet > * { min-width: 0; }
+  .docs-hub > p { max-width: 72ch; }
+}
+@media (min-width: 1200px) {
+  .lesson-reading-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; column-gap: 32px; align-items: start; }
+  .lesson-reading-grid > * { grid-column: 1; min-width: 0; }
+  .lesson-reading-grid > .lesson-overview {
+    display: block; grid-column: 2; grid-row: 1;
+    padding: 18px; border: 1px solid var(--c-line); border-radius: 8px;
+    background: var(--c-bg); color: var(--c-meta); font-family: var(--font-mono); font-size: var(--fs-meta);
+  }
+  .lesson-overview h2 { font-size: 14px; color: var(--c-fg); margin: 0 0 12px; }
+  .lesson-overview nav { margin-top: 24px; }
+  .lesson-overview ul { list-style: none; padding: 0; margin: 0; }
+  .lesson-overview li { margin-top: 10px; }
+  .lesson-overview .outline-subheading { padding-left: 12px; }
+  .lesson-overview a { color: var(--c-cyan); text-decoration: none; }
+  .lesson-overview a:hover { text-decoration: underline; }
+  .lesson-reading-grid > .lesson-book-link { display: none; }
+  .lesson-reading-grid > .lesson-description { grid-row: 1; max-width: 72ch; }
+  .lesson-reading-grid > .lesson-reading-body { display: contents; }
+  .lesson-reading-body > .content-prose { grid-column: 1; min-width: 0; }
+  .lesson-reading-body > :not(.content-prose), .lesson-reading-grid > .lesson-wide-media { grid-column: 1 / -1; }
+  .lesson-reading-grid > .lesson-wide-media { grid-row: 2; }
+  .content-prose :is(h2, h3) { scroll-margin-top: 24px; }
+  .docs-hub { display: grid; grid-template-columns: minmax(0, 1fr) 300px; column-gap: 32px; align-items: start; }
+  .docs-hub > * { grid-column: 1; }
+  .docs-hub > h1 { grid-column: 1 / -1; }
+  .docs-hub > .docs-hub-topics { grid-column: 2; grid-row: 2 / span 4; margin-top: 0 !important; }
+  .docs-hub-topics > div { grid-template-columns: 1fr !important; }
+}
+
+/* Targeted desktop corrections; the mobile cascade remains unchanged. */
+@media (min-width: 1024px) {
+  .home-module-summary { display: grid; grid-template-columns: 3.5rem minmax(0, 1fr) 240px 16px; align-items: center; }
+  .home-module-progress { margin-left: 0; }
+  .home-module-progress > button { display: grid !important; grid-template-columns: 80px 1fr; width: 220px; text-align: left; }
+  .home-module-summary .module-open-affordance { justify-self: end; }
+  .account-page > :is(.account-card, section) { width: 100%; max-width: 720px !important; box-sizing: border-box; margin-left: auto; margin-right: auto; }
+  .account-card :is(form, input) { max-width: none; }
+  .schedule-module-row > button { min-width: 0; white-space: normal !important; line-height: 1.4; }
+  .schedule-module-row > button > svg { flex: 0 0 14px; }
+  .schedule-module-name { min-width: 0; overflow-wrap: anywhere; }
+  .schedule-module-row > button > span:last-child { flex-shrink: 0; }
+  .lesson-focused-grid { display: block; }
+  .lesson-focused-grid.has-outline { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 32px; align-items: start; }
+  .lesson-focused-grid > .lesson-primary { display: block; grid-column: 1; grid-row: 1; min-width: 0; }
+  .lesson-focused-grid > .lesson-overview { display: block; grid-column: 2; grid-row: 1; position: sticky; top: 20px; max-height: calc(100vh - 40px); overflow-y: auto; padding: 18px; border: 1px solid var(--c-line); border-radius: 8px; background: var(--c-bg); color: var(--c-meta); font-size: var(--fs-meta); }
+  .lesson-focused-grid .lesson-reading-body { display: block; }
+  .lesson-focused-grid .lesson-reading-body > .content-prose:first-child > :first-child { margin-top: 0; }
+  .lesson-overview nav { margin-top: 0; }
+  .lesson-overview h2 { margin: 0 0 12px; font-size: 14px; color: var(--c-fg); }
+  .lesson-overview ul { list-style: none; padding: 0; margin: 0; }
+  .lesson-overview li { margin-top: 10px; }
+  .lesson-overview a { color: var(--c-cyan); }
+  .docs-layout:has(.docs-main-search > input[aria-label="Search JavaScript documentation"]) { display: grid; grid-template-columns: minmax(0, 1fr) 280px; align-items: start; overflow: visible; }
+  .docs-layout:has(.docs-main-search > input[aria-label="Search JavaScript documentation"]) .docs-main { display: block; grid-column: 1; grid-row: 1; min-width: 0; max-width: none; padding: 0; }
+  .docs-layout:has(.docs-main-search > input[aria-label="Search JavaScript documentation"]) .docs-sidebar { grid-row: 1; position: sticky; top: 20px; max-height: calc(100vh - 40px); overflow: hidden; }
+  .docs-layout:has(.docs-main-search > input[aria-label="Search JavaScript documentation"]) .docs-sidebar-scroll { overflow-y: auto; }
+  .docs-layout:has(.docs-main-search > input[aria-label="Search JavaScript documentation"]) .docs-main-search { margin-bottom: 12px; padding-bottom: 12px; }
+  .docs-layout:has(.docs-main-search > input[aria-label="Search JavaScript documentation"]) .docs-title { margin: 0 0 8px; }
+  .docs-layout:has(.docs-main-search > input[aria-label="Search JavaScript documentation"]) .docs-breadcrumb { margin-bottom: 4px; }
+  .docs-layout:has(.docs-main-search > input[aria-label="Search JavaScript documentation"]) .doc-live-snippet { grid-template-columns: minmax(0, 1fr); }
+  .docs-layout:has(.docs-main-search > input[aria-label="Search JavaScript documentation"]) .doc-live-output { height: auto; }
+}
+@media (min-width: 1024px) {
+  .lesson-focused-grid > .lesson-primary:has(> .lesson-wide-media) { display: flex; flex-direction: column; }
+  .lesson-focused-grid .lesson-primary > .lesson-wide-media { order: -1; margin-top: 0 !important; }
+  .lesson-focused-grid .lesson-primary:has(> .lesson-wide-media) > .lesson-description { margin-top: 12px !important; }
+  body:has(.lesson-slides-frame) > header { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 12px 20px; }
+  body:has(.lesson-slides-frame) > header .site-header-row { width: auto; flex: 1; margin: 0; padding: 0; }
+  body:has(.lesson-slides-frame) > header > .header-lesson-nav { width: auto; max-width: 440px !important; margin: 0; padding: 0 !important; flex-shrink: 0; }
+  body:has(.lesson-slides-frame) > header > .header-lesson-nav .hdr-lesson-link { max-width: 100%; }
+}
+@media (min-width: 1024px) {
+  body:has(.lesson-slides-frame) > header { max-width: 1200px; width: 100%; box-sizing: border-box; margin: 0 auto; }
+  body:has(.lesson-slides-frame) > header .lesson-nav-full { display: none; }
+  body:has(.lesson-slides-frame) > header .lesson-nav-short { display: inline; }
+}
+
+/* Climb 3 r5: a full-width 16:9 player at 1440 was taller than the viewport and hid its controls and the
+   completion actions (lost 2-0). Cap it so the whole player, plus the title above it, fits on screen. */
+@media (min-width: 1024px) {
+  .lesson-wide-media.lesson-video-frame { width: min(100%, calc((100svh - 300px) * 16 / 9)) !important; margin-inline: auto !important; }
+}

@@ -102,7 +102,7 @@ export default function DocLiveSnippet({ initialCode, fileKey }: Props) {
   };
 
   return (
-    <div style={{ margin: '8px 0 4px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+    <div className="doc-live-snippet" style={{ margin: '8px 0 4px', display: 'flex', flexDirection: 'column', gap: 6 }}>
       <div className="doc-live-toolbar" style={{ display: 'flex', gap: 8 }}>
         <button
           type="button"
@@ -134,10 +134,10 @@ export default function DocLiveSnippet({ initialCode, fileKey }: Props) {
           <RotateCcw size={12} /> Reset
         </button>
       </div>
-      <div style={{ ...paneStyle, height: 180 }}>
+      <div className="doc-live-editor" style={{ ...paneStyle, height: 180 }}>
         <CodeMirrorPane value={code} onChange={setCode} fileKey={fileKey} />
       </div>
-      <div style={{ ...paneStyle, background: 'var(--x-111111)', minHeight: 90, maxHeight: 220, overflowY: 'auto' }}>
+      <div className="doc-live-output" style={{ ...paneStyle, background: 'var(--x-111111)', minHeight: 90, maxHeight: 220, overflowY: 'auto' }}>
         {!hasRun ? (
           <div
             style={{

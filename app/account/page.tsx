@@ -103,8 +103,8 @@ export default function AccountPage() {
   }
 
   return (
-    <div style={S.page}>
-      <div style={S.card}>
+    <div className="account-page" style={S.page}>
+      <div className="page-frame account-card" style={S.card}>
         <Link href="/" style={{ color: 'var(--c-cyan)', fontSize: 13, textDecoration: 'none' }}>← Back to course</Link>
         <h1 style={S.h1}>My account</h1>
         <p style={{ color: 'var(--c-meta)', marginTop: -14, marginBottom: 22 }}>Manage the name shown to your class.</p>

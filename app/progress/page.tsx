@@ -49,7 +49,7 @@ export default function ProgressPage() {
 
   if (user === undefined || !progress.loaded || !manifest) {
     return (
-      <div style={containerStyle}>
+      <div className="page-frame" style={containerStyle}>
         <p style={{ color: 'var(--c-meta)' }}>Loading...</p>
       </div>
     );
@@ -57,7 +57,7 @@ export default function ProgressPage() {
 
   if (!user || !progress.authed) {
     return (
-      <div style={containerStyle}>
+      <div className="page-frame" style={containerStyle}>
         <nav style={navStyle}>
           <Link href="/" style={linkStyle}>Home</Link>
           <span style={{ color: 'var(--c-meta)' }}>›</span>
@@ -110,7 +110,7 @@ export default function ProgressPage() {
   const unitEntries = Array.from(unitMap.entries()).sort((a, b) => a[0].localeCompare(b[0]));
 
   return (
-    <div style={containerStyle}>
+    <div className="page-frame" style={containerStyle}>
       <nav style={navStyle}>
         <Link href="/" style={linkStyle}>Home</Link>
         <span style={{ color: 'var(--c-meta)' }}>›</span>

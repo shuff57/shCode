@@ -9,6 +9,8 @@ import { bracketMatching, indentOnInput, HighlightStyle, syntaxHighlighting, fol
 import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { highlightSelectionMatches } from '@codemirror/search';
 import { jsAutocomplete } from '../lib/editor-completions';
+import { taskCommentFold } from '../lib/editor-task-fold';
+import type { LabTaskScenario } from '../lib/lab-task-scenario';
 import { tags as t } from '@lezer/highlight';
 
 // Dracula palette — port of the CodeMirror 5 dracula theme used in public/moshion/editor.html.
@@ -31,7 +33,7 @@ const dracula = {
 };
 
 const draculaHighlight = HighlightStyle.define([
-  { tag: [t.comment, t.lineComment, t.blockComment, t.docComment], color: 'var(--x-a7b5df)', fontStyle: 'normal' },
+  { tag: [t.comment, t.lineComment, t.blockComment, t.docComment], class: 'cm-codeComment' },
   { tag: [t.keyword, t.operatorKeyword, t.modifier, t.controlKeyword], color: dracula.pink },
   { tag: [t.string, t.special(t.string), t.regexp], color: dracula.yellow },
   { tag: [t.number, t.bool, t.null, t.atom], color: dracula.purple },
@@ -60,6 +62,7 @@ const darkTheme = EditorView.theme({
     height: '100%',
     fontSize: '14px',
   },
+  '.cm-codeComment': { color: 'var(--x-a7b5df)', fontStyle: 'normal' },
   '.cm-content': {
     fontFamily: "'Fira Code', 'Consolas', 'Courier New', monospace",
     caretColor: dracula.cursor,
@@ -85,6 +88,25 @@ const darkTheme = EditorView.theme({
     border: `1px solid ${dracula.purple}`,
     borderRadius: '3px',
     padding: '0 6px',
+  },
+  '.cm-taskCommentFold': {
+    appearance: 'none',
+    font: 'inherit',
+    color: 'var(--x-a7b5df)',
+    background: 'var(--c-bg)',
+    border: '1px dashed var(--c-line)',
+    borderRadius: '4px',
+    padding: '2px 6px',
+    maxWidth: '100%',
+    whiteSpace: 'normal',
+    textAlign: 'left',
+    cursor: 'pointer',
+  },
+  '.cm-taskCommentFold:hover, .cm-taskCommentFold:focus-visible': {
+    color: 'var(--c-cyan)',
+    background: 'var(--c-line)',
+    outline: '2px solid var(--c-cyan)',
+    outlineOffset: '2px',
   },
   '.cm-activeLineGutter': {
     backgroundColor: dracula.activeLine,
@@ -192,6 +214,8 @@ export interface CodeMirrorPaneProps {
    * through a Compartment, so the text, cursor and undo history stay put.
    */
   collab?: Extension | null;
+  /** Authored task-card scenario; folding never modifies the document. */
+  taskComment?: LabTaskScenario | null;
 }
 
 export default function CodeMirrorPane({
@@ -201,6 +225,7 @@ export default function CodeMirrorPane({
   language = 'javascript',
   readOnly = false,
   collab = null,
+  taskComment = null,
 }: CodeMirrorPaneProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
@@ -220,7 +245,7 @@ export default function CodeMirrorPane({
     const view = new EditorView({
       state: EditorState.create({
         doc: value,
-        extensions: [makeExtensions(onChange, language, readOnly), collabSlot.current.of(collabRef.current ?? [])],
+        extensions: [makeExtensions(onChange, language, readOnly), taskCommentFold(taskComment), collabSlot.current.of(collabRef.current ?? [])],
       }),
       parent: containerRef.current,
     });

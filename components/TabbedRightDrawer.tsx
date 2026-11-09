@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, ReactNode } from 'react';
+import { useState, useEffect, useCallback, useRef, ReactNode, CSSProperties } from 'react';
 
 export interface DrawerTab {
   key: string;
@@ -224,7 +224,6 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
           display: 'flex',
           flexDirection: 'column',
           gap: 4,
-          width: narrow ? undefined : 80,
           transition: dragging ? 'none' : 'right 0.22s ease',
         }}
       >
@@ -239,11 +238,8 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
               className="shd-tab"
               onClick={() => setActiveKey(isActive ? null : t.key)}
               style={{
-                background: isActive ? 'var(--c-bg)' : 'var(--c-deep2)',
-                border: '1px solid var(--c-line)',
-                borderRight: 'none',
+                '--shd-tab-accent': t.color ?? 'var(--c-purple)',
                 borderRadius: '6px 0 0 6px',
-                color: t.color ?? 'var(--c-purple)',
                 writingMode: 'horizontal-tb',
                 textOrientation: 'mixed',
                 padding: '9px 8px',
@@ -251,8 +247,7 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
                 fontWeight: 600,
                 cursor: 'pointer',
                 letterSpacing: '0.06em',
-                outline: 'none',
-              }}
+              } as CSSProperties}
             >
               {t.label}
             </button>

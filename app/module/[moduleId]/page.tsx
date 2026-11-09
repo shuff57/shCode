@@ -28,7 +28,7 @@ export default async function ModulePage({
 
   return (
     <main
-      className="text-text"
+      className="text-text page-frame module-page"
       style={{ width: '100%', minWidth: 0, boxSizing: 'border-box', maxWidth: 960, margin: '0 auto', padding: '24px 20px 48px' }}
     >
       <nav style={{ marginBottom: 16, fontSize: 13, color: 'var(--c-meta)' }}>

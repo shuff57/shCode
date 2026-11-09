@@ -1395,44 +1395,6 @@ export default function LessonWorkspace({
                     {aiCheckBusy ? 'Reading your code…' : 'Check'}
                   </button>
                 )}
-                <button
-                  style={{
-                    padding: '6px 14px',
-                    borderRadius: 4,
-                    background: 'transparent',
-                    color: 'var(--c-meta)',
-                    border: '1px solid var(--c-line)',
-                    cursor: 'pointer',
-                    fontSize: 13,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 5,
-                  }}
-                  onClick={() => {
-                    const what = isTextMode ? 'text' : 'code';
-                    if (window.confirm(`Reset your ${what} to the starter? Unsaved work will be lost.`)) {
-                      resetLesson(lesson);
-                      stopRun();
-                      // The starter has not been run either: "Press Run", not "you changed your code".
-                      setMoshionRun(NO_MOSHION_RUN);
-                      setSolutionLoaded(false);
-                      // Reset also discards any AI marks: the starter has not been graded.
-                      aiVerdictsRef.current = null;
-                      aiFallbackRef.current = null;
-                      setAiCheckNote(null);
-                      // A plan lesson's strip recomputes from the restored text in
-                      // the effect above; setting the authored cards here would flash
-                      // the old four onto it.
-                      if (!planStrip && (isTextMode || aiCheck)) setRequirements(lesson.requirements);
-                      setResetMsg(isTextMode ? 'Text reset to starter.' : 'Code reset to starter.');
-                      setTimeout(() => setResetMsg(null), 2500);
-                      if (isReshapeMode) setReshapeResetKey((k) => k + 1);
-                    }
-                  }}
-                >
-                  <RotateCcw size={12} />
-                  Reset
-                </button>
                 <span className="run-hint">Ctrl+Enter</span>
                 {resetMsg && (
                   <span
@@ -1489,7 +1451,60 @@ export default function LessonWorkspace({
                   : '✗ Fix runtime error before submitting'}
               </span>
             )}
-            <div className="toolbar-utilities" style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+            {(isMoshionMode || isConsoleMode) && (
+              <button
+                style={{ marginLeft: 'auto' }}
+                className="btn-primary btn-sm toolbar-submit"
+                onClick={handleSubmit}
+                disabled={submitted || !canSubmit}
+                title={!canSubmit ? moshionWords.title : undefined}
+              >
+                <Send size={14} />
+                Submit
+              </button>
+            )}
+            <div className="toolbar-utilities" role="group" aria-label="Editor tools" style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+              {(isTextMode || isConsoleMode || isReshapeMode || isMoshionMode) && (
+                <button
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: 4,
+                    background: 'transparent',
+                    color: 'var(--c-meta)',
+                    border: '1px solid var(--c-line)',
+                    cursor: 'pointer',
+                    fontSize: 13,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 5,
+                  }}
+                  onClick={() => {
+                    const what = isTextMode ? 'text' : 'code';
+                    if (window.confirm(`Reset your ${what} to the starter? Unsaved work will be lost.`)) {
+                      resetLesson(lesson);
+                      stopRun();
+                      // The starter has not been run either: "Press Run", not "you changed your code".
+                      setMoshionRun(NO_MOSHION_RUN);
+                      setSolutionLoaded(false);
+                      // Reset also discards any AI marks: the starter has not been graded.
+                      aiVerdictsRef.current = null;
+                      aiFallbackRef.current = null;
+                      setAiCheckNote(null);
+                      // A plan lesson's strip recomputes from the restored text in
+                      // the effect above; setting the authored cards here would flash
+                      // the old four onto it.
+                      if (!planStrip && (isTextMode || aiCheck)) setRequirements(lesson.requirements);
+                      setResetMsg(isTextMode ? 'Text reset to starter.' : 'Code reset to starter.');
+                      setTimeout(() => setResetMsg(null), 2500);
+                      if (isReshapeMode) setReshapeResetKey((k) => k + 1);
+                    }
+                  }}
+                  className="toolbar-reset"
+                >
+                  <RotateCcw size={12} />
+                  Reset
+                </button>
+              )}
               <SolutionPanel
                 lessonId={lesson.id}
                 onInsert={(solutionFiles) => {
@@ -1540,18 +1555,6 @@ export default function LessonWorkspace({
                     </span>
                   )}
                 </>
-              )}
-              {(isMoshionMode || isConsoleMode) && (
-                <button
-                  style={{ marginLeft: 'auto' }}
-                  className="btn-primary btn-sm toolbar-submit"
-                  onClick={handleSubmit}
-                  disabled={submitted || !canSubmit}
-                  title={!canSubmit ? moshionWords.title : undefined}
-                >
-                  <Send size={14} />
-                  Submit
-                </button>
               )}
             </div>
           </div>

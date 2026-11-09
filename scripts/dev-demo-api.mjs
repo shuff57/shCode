@@ -252,15 +252,29 @@ export function mountDemoApi({ server, express, devIdentity, role, root }) {
   server.get('/api/lesson-state', route(stateIndexGet));
   // Teacher grading weights for the seeded class; mirrors the default-weight
   // response without needing a separate D1 route in dev.
+  // Dev-only, in-memory overrides so the settings panel's save path can be exercised without D1
+  // (the real PUT is functions/api/classes/[id]/grading-weights/index.ts).
+  const devWeightOverrides = new Map();
+  const devWeights = () => Object.entries(DEFAULT_WEIGHTS).map(([category, weight]) => ({
+    category,
+    weight: devWeightOverrides.has(category) ? devWeightOverrides.get(category) : weight,
+    isDefault: !devWeightOverrides.has(category),
+    setBy: devWeightOverrides.has(category) ? 'dev@local' : null,
+    setAt: null,
+  }));
   server.get('/api/classes/:id/grading-weights', (_req, res) => {
-    const weights = Object.entries(DEFAULT_WEIGHTS).map(([category, weight]) => ({
-      category,
-      weight,
-      isDefault: true,
-      setBy: null,
-      setAt: null,
-    }));
-    res.json({ weights });
+    res.json({ weights: devWeights() });
+  });
+  server.put('/api/classes/:id/grading-weights', json, (req, res) => {
+    const entries = req.body?.entries;
+    if (!Array.isArray(entries)) return res.status(400).json({ error: 'entries array required' });
+    for (const e of entries) {
+      if (!e || !(e.category in DEFAULT_WEIGHTS)) return res.status(400).json({ error: 'Unknown category' });
+      if (e.weight === null) devWeightOverrides.delete(e.category);
+      else if (Number.isInteger(e.weight) && e.weight >= 0 && e.weight <= 100) devWeightOverrides.set(e.category, e.weight);
+      else return res.status(400).json({ error: 'weight must be an integer 0-100 or null' });
+    }
+    res.json({ ok: true, weights: devWeights() });
   });
   server.post('/api/lesson-state/:lessonId', json, route(statePost, ['lessonId']));
   server.delete('/api/lesson-state/:lessonId', route(stateDelete, ['lessonId']));

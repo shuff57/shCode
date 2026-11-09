@@ -467,7 +467,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
       )}
 
       {units.map((unit) => (
-        <div key={unit.unitId} style={{ marginBottom: 16, overflowX: 'auto' }}>
+        <div className="schedule-unit" key={unit.unitId} style={{ marginBottom: 16, overflowX: 'auto' }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: C.accent, marginBottom: 8 }}>
             {unit.unitId}
           </div>
@@ -496,7 +496,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
 
             return (
               <div key={mod.moduleId} style={{ borderBottom: `1px solid ${C.border}`, padding: '8px 0', minHeight: 46, boxSizing: 'border-box', minWidth: compact ? 0 : 1044 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: compact ? 'minmax(0, 1fr)' : 'minmax(280px, 1fr) 370px 370px', alignItems: 'center', gap: 12 }}>
+                <div className="schedule-module-row" style={{ display: 'grid', gridTemplateColumns: compact ? 'minmax(0, 1fr)' : 'minmax(280px, 1fr) 370px 370px', alignItems: 'center', gap: 12 }}>
                   <button
                     type="button"
                     onClick={() => toggle(mod.moduleId)}
@@ -508,7 +508,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                     }}
                   >
                     {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                    {mod.label}
+                    <span className="schedule-module-name">{mod.label}</span>
                     <span style={{ color: C.dim, fontSize: 13 }}>
                       ({mod.lessons.length})
                     </span>
