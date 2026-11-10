@@ -128,10 +128,17 @@ for (const l of lessons) {
 // A lesson may also link to an app page the export serves (the texture
 // editor, the sound mixer, the docs). Those live under app/<route>/page.tsx,
 // not under public/, and before this the only way to link one was to stop
-// linking it at all. Keep the rule narrow: an exact route file, no globs,
-// no dynamic segments.
+// linking it at all. Keep the rule narrow: an exact route file, no globs.
+// The one dynamic segment allowed is a docs section (/docs/moshion/groups),
+// and only when the slug is in that docs set's own section list, so a typo
+// in a deep link still fails here instead of 404ing for a student.
+const { getAllSectionSlugs: moshionSlugs } = await import('../lib/moshion-docs.ts');
+const { getAllSectionSlugs: jsSlugs } = await import('../lib/js-docs.ts');
+const DOC_SLUGS = { moshion: new Set(moshionSlugs()), js: new Set(jsSlugs()) };
 function appRouteExists(href) {
   const clean = href.replace(/^\//, '').split(/[?#]/)[0].replace(/\/$/, '');
+  const doc = clean.match(/^docs\/(moshion|js)\/([^/]+)$/);
+  if (doc && DOC_SLUGS[doc[1]].has(doc[2])) return true;
   const bases = clean ? [clean] : [''];
   for (const base of bases) {
     for (const ext of ['tsx', 'ts', 'jsx', 'js']) {

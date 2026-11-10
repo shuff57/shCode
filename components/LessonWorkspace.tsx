@@ -1219,21 +1219,9 @@ export default function LessonWorkspace({
                 },
               ] as DrawerTab[])
             : []),
-          // The teaching for a console lesson lives in lesson.json's `steps` —
-          // what console.log does, why numbers take no quotes, what a boolean
-          // is. Nothing mounted LessonSteps, so all of it was invisible and the
-          // student got requirement titles and a comment-only starter file.
-          // Only offered when the lesson actually has steps.
-          ...((lesson.steps?.length ?? 0) > 0
-            ? ([
-                {
-                  key: 'steps',
-                  label: 'Steps',
-                  color: 'var(--c-yellow)',
-                  content: <LessonSteps lesson={lesson} />,
-                },
-              ] as DrawerTab[])
-            : []),
+          // The lesson's `steps` are NOT a drawer tab: "Your task" (LabTaskCard
+          // on console and moSHion labs, the collapsible strip above the editor
+          // on the rest) already shows the same LessonSteps on the left.
           {
             key: 'quest',
             label: 'Quest',
