@@ -155,6 +155,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "info": "Forget a saved texture."
  },
  {
+  "label": "deltaTime",
+  "type": "constant",
+  "detail": "number",
+  "info": "Milliseconds since the previous frame, as in p5: about 16.7 at 60 frames a second, more when the computer is slow."
+ },
+ {
   "label": "dist",
   "type": "function",
   "detail": "(a: Vec2, b: Vec2): number",

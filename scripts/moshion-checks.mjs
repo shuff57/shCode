@@ -374,6 +374,21 @@ export const SEMANTIC_CHECKS = [
     },
   },
   {
+    name: 'deltaTime is the milliseconds since the last frame: 0 before the first, ~16.7 at 60 a second',
+    area: 'timing',
+    // shCode #104.
+    run({ runSketch }) {
+      const r = runSketch(`
+        function setup(){ new Canvas(200,200); dtSeen = [deltaTime]; dtX = 0; }
+        function draw(){ dtSeen.push(deltaTime); dtX += 120 * deltaTime / 1000; }`, { frames: 60 });
+      if (!r.ok) return `sketch threw: ${r.error?.message}`;
+      const { dtSeen: seen, dtX: x } = r.box.sandbox;
+      if (seen[0] !== 0) return `deltaTime in setup() was ${seen[0]}, wanted 0`;
+      if (!seen.slice(1).every((v) => close(v, 1000 / 60, 0.01))) return `deltaTime per frame ${JSON.stringify(seen.slice(1, 4))}, wanted 16.67`;
+      return close(x, 120, 0.5) ? true : `moving 120 * deltaTime / 1000 for 60 frames went ${x.toFixed(2)}, wanted 120`;
+    },
+  },
+  {
     name: 'world.maxSpeed: 60 by default, opt-in to raise, one warning naming it',
     area: 'physics',
     // shCode #84. The cap is planck's global maxTranslation; a fresh sketch must start at 60

@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Source repo | `shuff57/moshion` (local checkout `../moshion`) |
-| Commit | `11caeb5` (`moshion.js`, `docs/moshion.d.ts`), branch `main` (= `origin/main`) |
+| Commit | `242f783` (`moshion.js`, `docs/moshion.d.ts`), branch `main` |
 | Commit date | 2026-11-12 |
 | Vendored | 2026-11-12 (`a662f3d`: `textStyle(NORMAL \| BOLD \| ITALIC \| BOLDITALIC)` (shCode #103), on top of `3f1e70a`'s API audit, `90921bd`'s `textLayer(n)`, `b1a2575`'s `sprite.clone()` and `world.maxSpeed`, `f3e1378` and the `f259b22` sound sync). `textStyle` was first patched in here by hand (`61cfed53`); this sync replaces that patch with the upstream engine, which matches it, so the copy is now upstream `a662f3d` plus the local lines below. |
 
@@ -41,6 +41,10 @@ so the comparison does see changes. Not covered by it: the 60-frame cap (the
 harness steps its clock by exactly one frame) and the per-run seed (the
 harness does not load `runner.html`). Upstream gates: `tests/api-audit.spec.mjs`
 (35 checks) and the rest of the moshion suite, all passing.
+
+**`242f783` (2026-11-12), `deltaTime` (shCode #104).** The milliseconds since the last frame, as in p5
+(~16.7 at 60 a second, 0 before the first frame), exposed like `frameCount`. Gate: 698/698 sketches unchanged,
+102/102 checks (one new).
 
 **`11caeb5` (2026-11-12), fonts and text layout.** On top of `a662f3d`, changing
 only the text section and `runner.html`:

@@ -54,6 +54,20 @@ interface Catalog {
 
 const TRANSPARENT = '';
 
+// Opacity (shCode #105, 2026-11-12). A pixel is '#rrggbb' when solid and
+// '#rrggbbaa' when see-through: both are CSS colours, so the grid, the flood
+// fill (which compares the strings) and the PNG export (fillStyle) handle them
+// with no special case. The opacity slider is a percent, 100 = solid.
+const hex2 = (v: number) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0');
+/** '#rrggbb' of any colour this editor stores. */
+const baseOf = (c: string) => c.slice(0, 7);
+/** Opacity of a stored colour, 0-100. */
+const opacityOf = (c: string) => (c.length === 9 ? Math.round((parseInt(c.slice(7), 16) / 255) * 100) : 100);
+/** A colour at an opacity (percent): solid colours stay '#rrggbb'. */
+const atOpacity = (base: string, pct: number) => (pct >= 100 ? baseOf(base) : baseOf(base) + hex2((pct / 100) * 255));
+/** A swatch's background: the colour over a small checkerboard, so see-through shows. */
+const swatchBg = (c: string) => `linear-gradient(${c}, ${c}), repeating-conic-gradient(#9a9a9a 0 25%, #d8d8d8 0 50%) 50% / 8px 8px`;
+
 // The Kenney pack's own working palette, plus black and white. A fixed palette
 // is the single biggest reason beginner pixel art looks coherent -- a free
 // colour picker produces 40 muddy near-greys.
@@ -113,6 +127,7 @@ export default function TextureEditor() {
   const [index, setIndex] = useState(0);
 
   const [color, setColor] = useState('#7ec850');
+  const [opacity, setOpacity] = useState(100);
   const [recent, setRecent] = useState<string[]>([]);
   const [tool, setTool] = useState<Tool>('pencil');
   const [name, setName] = useState('');
@@ -461,8 +476,10 @@ export default function TextureEditor() {
         for (let y = 0; y < fh; y++) {
           for (let x = 0; x < fw; x++) {
             const i = (y * img.naturalWidth + f * fw + x) * 4;
-            if (data[i + 3] < 24) continue;
-            cells[y * fw + x] = `#${hex(data[i])}${hex(data[i + 1])}${hex(data[i + 2])}`;
+            const a = data[i + 3];
+            if (a < 24) continue;
+            // A half see-through pixel keeps its opacity (#105); a nearly solid one is solid.
+            cells[y * fw + x] = `#${hex(data[i])}${hex(data[i + 1])}${hex(data[i + 2])}${a < 250 ? hex(a) : ''}`;
           }
         }
         out.push(cells);
@@ -578,7 +595,7 @@ export default function TextureEditor() {
   function applyAt(i: number) {
     if (tool === 'pick') {
       const c = grid[i];
-      if (c) { setColor(c); noteColor(c); }
+      if (c) { setColor(c); setOpacity(opacityOf(c)); noteColor(c); }
       return;
     }
     if (tool === 'move') return;
@@ -942,10 +959,10 @@ export default function TextureEditor() {
                 {recent.slice(0, 6).map((c) => (
                   <button
                     key={'r' + c}
-                    onClick={() => { setColor(c); if (tool === 'eraser' || tool === 'move') setTool('pencil'); }}
-                    title={c}
+                    onClick={() => { setColor(c); setOpacity(opacityOf(c)); if (tool === 'eraser' || tool === 'move') setTool('pencil'); }}
+                    title={opacityOf(c) < 100 ? `${baseOf(c)} at ${opacityOf(c)}%` : c}
                     style={{
-                      height: 18, background: c, cursor: 'pointer', borderRadius: 3,
+                      height: 18, background: swatchBg(c), cursor: 'pointer', borderRadius: 3,
                       border: color === c ? '2px solid var(--brand)' : '1px solid var(--border)',
                     }}
                   />
@@ -961,23 +978,34 @@ export default function TextureEditor() {
             {PALETTE.map((c) => (
               <button
                 key={c}
-                onClick={() => { setColor(c); noteColor(c); if (tool === 'eraser' || tool === 'move') setTool('pencil'); }}
+                onClick={() => { const next = atOpacity(c, opacity); setColor(next); noteColor(next); if (tool === 'eraser' || tool === 'move') setTool('pencil'); }}
                 title={c}
                 style={{
                   height: 18, background: c, cursor: 'pointer', borderRadius: 3,
-                  border: color === c ? '2px solid var(--brand)' : '1px solid var(--border)',
+                  border: baseOf(color) === c ? '2px solid var(--brand)' : '1px solid var(--border)',
                 }}
               />
             ))}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
             <input
-              type="color" value={color} aria-label="custom colour"
-              onChange={(e) => { setColor(e.target.value); noteColor(e.target.value); }}
+              type="color" value={baseOf(color)} aria-label="custom colour"
+              onChange={(e) => { const next = atOpacity(e.target.value, opacity); setColor(next); noteColor(next); }}
               style={{ width: 34, height: 24, background: 'none', border: '1px solid var(--border)', borderRadius: 4, cursor: 'pointer' }}
             />
-            <code style={{ fontSize: 10, opacity: 0.75 }}>{color}</code>
+            <code style={{ fontSize: 10, opacity: 0.75 }}>{baseOf(color)}</code>
           </div>
+          {/* #105: how solid the colour is. Lower is more see-through; the swatch shows it over a checkerboard. */}
+          <label style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, fontSize: 11 }}>
+            <span style={{ width: 46 }}>Opacity</span>
+            <input
+              type="range" min={5} max={100} step={5} value={opacity} aria-label="opacity"
+              onChange={(e) => { const v = Number(e.target.value); setOpacity(v); setColor(atOpacity(color, v)); }}
+              style={{ flex: 1, minWidth: 0 }}
+            />
+            <span style={{ width: 30, textAlign: 'right' }}>{opacity}%</span>
+            <span aria-hidden="true" style={{ width: 16, height: 16, borderRadius: 3, border: '1px solid var(--border)', background: swatchBg(color) }} />
+          </label>
 
           <button style={{ ...railBtn(), marginBottom: 6 }} onClick={() => importInput.current?.click()}
             title={`Open a PNG, JPEG, GIF or WebP from your computer. Big pictures shrink to fit ${MAX_DIM}x${MAX_DIM}.`}>

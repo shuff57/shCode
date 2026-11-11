@@ -218,6 +218,39 @@ function draw() {
 }`,
       },
       {
+        title: 'Time in seconds: deltaTime',
+        body: `deltaTime is how many milliseconds passed since the last frame: about 16.7 when the game runs at 60 frames a second, more when the computer is slow. Divide by 1000 to get seconds.
+
+That lets you write timing in seconds instead of counting frames. x += 120 * deltaTime / 1000 moves 120 pixels every second, and a cooldown can be a number of seconds that counts down by deltaTime / 1000 each frame, so 2.5 means two and a half seconds.
+
+Counting frames still works too (frameCount, every(), 60 frames = 1 second). Use whichever reads more clearly for what you are making.`,
+        code: `let cooldown = 0;   // seconds until you can dash again
+let x = 40;
+
+function setup() {
+  new Canvas(400, 200);
+}
+
+function draw() {
+  background('#222');
+  let seconds = deltaTime / 1000;
+  x += 60 * seconds;            // 60 pixels a second
+  if (x > 380) x = 40;
+
+  if (cooldown > 0) cooldown -= seconds;
+  if (kb.presses('space') && cooldown <= 0) {
+    x += 80;
+    cooldown = 1.5;             // one and a half seconds
+  }
+
+  fill('gold');
+  circle(x, 100, 30);
+  fill('white');
+  textSize(16);
+  text(cooldown > 0 ? 'Dash in ' + cooldown.toFixed(1) + ' s' : 'Dash: READY (space)', 10, 24);
+}`,
+      },
+      {
         title: 'Fresh dice: random() and randomSeed()',
         body: `random() with nothing in the brackets gives a number from 0 up to (not including) 1. random(10) gives one from 0 up to 10, random(5, 10) one from 5 up to 10, and random(['red', 'gold', 'lime']) picks one item from a list.
 
