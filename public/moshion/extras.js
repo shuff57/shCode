@@ -604,3 +604,111 @@
   g.multiplayer = multiplayer;
   if (typeof window !== 'undefined' && window !== g) { window.online = online; window.multiplayer = multiplayer; }
 })();
+
+// ---- save / load / saved (#97) -------------------------------------------
+//
+// save(key, value, where) and load(key, where). 'local' (the default) is
+// exactly the engine's storeItem/getItem: this browser only. 'remote' is the
+// student's account, so it follows them to another computer. The page loaded
+// this sketch's remote saves into window.__moshionRemote BEFORE the sketch ran
+// (runner.html), so load() stays synchronous, and every change is posted up for
+// the page to write back (lib/moshion-storage.ts, /api/sketch-saves).
+// window.__moshionRemoteState says how that went: 'ready', 'signed-out',
+// 'offline', or absent (the code never says 'remote', or no page serves it).
+// Anything but 'ready' keeps the save in this browser and says so ONCE, rather
+// than failing a game over a missing network.
+//
+// saved(name, defaults, where) is the same store as one object: the saved
+// fields laid over `defaults`, plus .save(where?) to write the object back.
+//
+// Limits mirror lib/sketch-saves-core.ts, so a refusal happens here, with the
+// sketch's line number, instead of silently in the page.
+(function () {
+  'use strict';
+  var g = typeof globalThis !== 'undefined' ? globalThis : window;
+  var MAX_NAMES = 100, MAX_NAME = 100, MAX_VALUE = 16 * 1024, MAX_TOTAL = 64 * 1024;
+  var warned = false;
+
+  function where_(where, fn) {
+    if (where === undefined || where === null || where === 'local') return 'local';
+    if (where === 'remote') return 'remote';
+    throw new Error(fn + "(): where to save is 'local' or 'remote', not " + JSON.stringify(where));
+  }
+  function remote() {
+    if (g.__moshionRemoteState === 'ready' && g.__moshionRemote) return g.__moshionRemote;
+    if (!warned) {
+      warned = true;
+      var st = g.__moshionRemoteState;
+      console.warn(
+        st === 'signed-out' ? "'remote' saves need you to be signed in, so this sketch is saving in this browser only."
+          : st === 'offline' ? "Your account could not be reached, so 'remote' saves are kept in this browser only for now."
+          : "'remote' saves are not available here, so this sketch is saving in this browser only."
+      );
+    }
+    return null;
+  }
+  function post(msg) {
+    msg.source = 'preview-storage';
+    try { if (g.parent && g.parent !== g) g.parent.postMessage(msg, '*'); } catch (e) { /* no host */ }
+  }
+
+  function save(key, value, where) {
+    if (typeof key !== 'string' || !key) {
+      throw new Error("save(): start with a name in quotes, like save('best', score)");
+    }
+    if (value === undefined) value = null;
+    var r = where_(where, 'save') === 'remote' ? remote() : null;
+    if (!r) { g.storeItem(key, value); return value; }
+    var raw = JSON.stringify(value);
+    if (key.length > MAX_NAME) throw new Error('save(): a save name can be at most ' + MAX_NAME + ' characters.');
+    if (raw.length > MAX_VALUE) throw new Error('save(): "' + key + '" is too big to save online (over 16 KB).');
+    var had = Object.prototype.hasOwnProperty.call(r, key);
+    if (!had && Object.keys(r).length >= MAX_NAMES) {
+      throw new Error('save(): a sketch can save at most ' + MAX_NAMES + ' different names online.');
+    }
+    var before = r[key];
+    r[key] = raw;
+    if (JSON.stringify(r).length > MAX_TOTAL) {
+      if (had) r[key] = before; else delete r[key];
+      throw new Error("save(): this sketch's online saves would be over 64 KB in total.");
+    }
+    post({ op: 'set', key: key, value: raw, remote: true });
+    return value;
+  }
+
+  function load(key, where) {
+    var r = where_(where, 'load') === 'remote' ? remote() : null;
+    if (!r) return g.getItem(key);
+    if (!Object.prototype.hasOwnProperty.call(r, key)) return null;
+    try { return JSON.parse(r[key]); } catch (e) { return r[key]; }
+  }
+
+  function saved(name, defaults, where) {
+    where_(where, 'saved');
+    if (typeof name !== 'string' || !name) {
+      throw new Error("saved(): start with a name in quotes, like saved('player', { best: 0 })");
+    }
+    var stored = load(name, where);
+    var obj = Object.assign({}, defaults || {},
+      stored && typeof stored === 'object' && !Array.isArray(stored) ? stored : {});
+    // Not enumerable, so JSON.stringify and for...in never see it.
+    Object.defineProperty(obj, 'save', {
+      value: function (w) { save(name, this, w === undefined ? where : w); return this; },
+      enumerable: false, writable: true, configurable: true,
+    });
+    return obj;
+  }
+
+  // The page reports a write it could not make (offline, or a limit the server
+  // counts in bytes) on the same message channel.
+  if (typeof g.addEventListener === 'function') {
+    g.addEventListener('message', function (e) {
+      var d = e && e.data;
+      if (d && d.source === 'preview-storage-remote-error' && typeof d.message === 'string') console.warn(d.message);
+    });
+  }
+
+  g.save = save;
+  g.load = load;
+  g.saved = saved;
+})();

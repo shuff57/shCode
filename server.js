@@ -629,6 +629,10 @@ app.prepare().catch((err) => {
     server.delete('/api/games/:id', libRoute(gamesOne.onRequestDelete));
     server.post('/api/games/:id/share', express.json(), libRoute(gamesShare.onRequestPost));
     server.get('/api/games/:id/assets', libRoute(gamesAssets.onRequestGet));
+    // Suggestions on class games (#96): a fixed list, no free text.
+    const gamesSuggest = await import('./functions/api/games/[id]/suggestions.ts');
+    server.get('/api/games/:id/suggestions', libRoute(gamesSuggest.onRequestGet));
+    server.post('/api/games/:id/suggestions', express.json(), libRoute(gamesSuggest.onRequestPost));
     server.get('/api/classes/:id/game-shares', libRoute(gamesModerate.onRequestGet));
     server.post('/api/classes/:id/game-shares', express.json(), libRoute(gamesModerate.onRequestPost));
     // Versions, proposed changes and their conversations (migration 0048, lib/game-flow-core.ts). Two
@@ -658,6 +662,11 @@ app.prepare().catch((err) => {
     const prefsRoute = await import('./functions/api/prefs.ts');
     server.get('/api/prefs', libRoute(prefsRoute.onRequestGet));
     server.put('/api/prefs', express.json(), libRoute(prefsRoute.onRequestPut));
+    // A sketch's 'remote' saves (functions/api/sketch-saves.ts, #97), same database. The page
+    // flushes them with fetch keepalive on page hide, which is still application/json.
+    const sketchSaves = await import('./functions/api/sketch-saves.ts');
+    server.get('/api/sketch-saves', libRoute(sketchSaves.onRequestGet));
+    server.put('/api/sketch-saves', express.json({ limit: '200kb' }), libRoute(sketchSaves.onRequestPut));
     server.get('/api/library', libRoute(libList.onRequestGet));
     server.get('/api/library/shared', libRoute(shareList.onRequestGet));
     server.get('/api/library/shared/:id', libRoute(shareOne.onRequestGet));

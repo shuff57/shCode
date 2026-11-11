@@ -2130,6 +2130,52 @@ function draw() {
   text('space=score  r=reset', 14, 76);
 }`,
       },
+      {
+        title: 'Saving to your account: save() and load()',
+        body: `storeItem() keeps a value in this browser only. Open your game on another computer and the high score is gone. save() and load() do the same job, and they can also keep the value in your shCode account instead.
+
+save(name, value) saves a value under a name, and load(name) reads it back (null when nothing is saved yet). On their own they work exactly like storeItem() and getItem(), in this browser.
+
+Add 'remote' at the end and the value is kept in your account: save('best', score, 'remote') and load('best', 'remote'). Sign in on any computer, run the same game, and it is still there. 'local' means this browser, and it is what you get when you leave the word out.
+
+Remote saves belong to one sketch: a lesson keeps its own, the Sandbox keeps its own, and a game from the Library keeps each player's saves in that player's own account. You must be signed in. If you are not, or the internet drops, the save stays in this browser and the console says so once, so the game keeps running.
+
+To keep several values together, use saved(name, defaults). It gives back an object with your saved fields laid over the defaults. Change its fields, then call .save() to save the whole object: saved('player', { best: 0, coins: 0 }, 'remote') remembers 'remote', so player.save() goes to your account too.
+
+A remote save can hold up to 100 names, 16 KB for one value and 64 KB in total, which is plenty for scores, levels and settings. Never save a password: anyone who can see your code can read it.`,
+        code: `let player;
+let score = 0;
+
+function setup() {
+  new Canvas(400, 400);
+  // Saved in your account, so it follows you to any computer.
+  player = saved('player', { best: 0, plays: 0 }, 'remote');
+  player.plays += 1;
+  player.save();
+}
+
+function update() {
+  if (kb.presses(' ')) {
+    score++;
+    if (score > player.best) {
+      player.best = score;
+      player.save();
+    }
+  }
+}
+
+function draw() {
+  background('#222');
+  fill('white');
+  textSize(18);
+  text('Score: ' + score, 14, 30);
+  fill('gold');
+  text('Best: ' + player.best, 14, 54);
+  fill('#888');
+  textSize(12);
+  text('Plays: ' + player.plays + '   space = score', 14, 76);
+}`,
+      },
     ],
   },
   {

@@ -2,6 +2,8 @@
 
 import { type RefObject, useEffect, useRef } from 'react';
 import { mergeAssets, type GameAsset } from './game-assets';
+import { checkSketchData, isSketchKey } from './sketch-saves-core';
+import { errorText } from './http-error';
 import { parseProvenance, type Provenance } from './share-choice';
 
 // Saves for moSHion sketches.
@@ -563,7 +565,16 @@ export function applyLibraryChanges(changes: {
 export function useMoshionStorage(
   ref: RefObject<HTMLIFrameElement | null>,
   overlay?: { assets?: readonly GameAsset[]; ownWins?: boolean },
+  remote?: { key: string; wanted: boolean },
 ): void {
+  // A sketch's 'remote' saves (#97, extras.js save/load/saved). Only fetched
+  // when the code mentions 'remote' (wantsRemote, lib/sketch-saves-core.ts), so
+  // no other sketch pays a request. Held in memory for this preview's life, so a
+  // rerun starts from the latest writes, not from a fetch that may predate them.
+  const remoteOpt = useRef(remote);
+  remoteOpt.current = remote;
+  const remoteState = useRemoteSaves();
+
   // A published game's own pictures and sounds (/play, lib/game-assets.ts),
   // laid over the store this frame is handed at `init`. Read through a ref so
   // a new array does not re-attach the listener. The keys the game supplied
@@ -572,6 +583,7 @@ export function useMoshionStorage(
   const overlayRef = useRef(overlay);
   overlayRef.current = overlay;
   const lockedRef = useRef<Set<string>>(new Set());
+  const waitingRef = useRef<MessageEventSource | null>(null);
   useEffect(() => {
     function onMessage(e: MessageEvent) {
       const frame = ref.current;
@@ -580,16 +592,39 @@ export function useMoshionStorage(
       if (!d || typeof d !== 'object') return;
 
       if (d.source === 'preview-storage-request') {
-        const o = overlayRef.current;
-        const merged = mergeAssets(readStore(), o?.assets, !!o?.ownWins);
-        lockedRef.current = merged.locked;
-        frame.contentWindow.postMessage(
-          { source: 'preview-storage-init', data: merged.store },
-          '*'
-        );
+        const reply = (extra: Record<string, unknown>) => {
+          const now = ref.current;
+          if (!now || !now.contentWindow || now.contentWindow !== e.source) return; // rerun since: that frame is gone
+          const o = overlayRef.current;
+          const merged = mergeAssets(readStore(), o?.assets, !!o?.ownWins);
+          lockedRef.current = merged.locked;
+          now.contentWindow.postMessage({ source: 'preview-storage-init', data: merged.store, ...extra }, '*');
+        };
+        const r = remoteOpt.current;
+        if (!r?.wanted || !isSketchKey(r.key)) { reply({}); return; }
+        // The runner asks every 40 ms until it hears back; answer the first ask
+        // with 'wait' and the init once the account's saves are here.
+        if (waitingRef.current === e.source) return;
+        waitingRef.current = e.source;
+        frame.contentWindow.postMessage({ source: 'preview-storage-wait' }, '*');
+        void remoteState.load(r.key).then((got) => {
+          waitingRef.current = null;
+          reply(got.state === 'ready' ? { remote: { ...got.data }, remoteState: 'ready' } : { remoteState: got.state });
+        });
         return;
       }
       if (d.source !== 'preview-storage') return;
+
+      if (d.remote === true) {
+        // A 'remote' save: never written into this browser's store.
+        if (typeof d.key === 'string' && typeof d.value === 'string') {
+          remoteState.set(d.key, d.value, (message) => {
+            const now = ref.current;
+            if (now?.contentWindow) now.contentWindow.postMessage({ source: 'preview-storage-remote-error', message }, '*');
+          });
+        }
+        return;
+      }
 
       if (d.op === 'clear') {
         writeStore({});
@@ -612,5 +647,103 @@ export function useMoshionStorage(
 
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
-  }, [ref]);
+  }, [ref, remoteState]);
+}
+
+type RemoteLoad = { state: 'ready'; data: Record<string, string> } | { state: 'signed-out' | 'offline' };
+
+/**
+ * One sketch's remote saves for one preview: load once, then keep the map in
+ * memory and write it back whole ({ key, data } to PUT /api/sketch-saves) at
+ * most every 2 s while it changes, and at once when the page is hidden or the
+ * preview goes away (fetch keepalive, so a closing tab still gets it out).
+ */
+function useRemoteSaves() {
+  const stateRef = useRef<{
+    key: string | null;
+    loaded: Promise<RemoteLoad> | null;
+    data: Record<string, string>;
+    dirty: boolean;
+    timer: ReturnType<typeof setTimeout> | null;
+    lastError: string | null;
+  }>({ key: null, loaded: null, data: {}, dirty: false, timer: null, lastError: null });
+  const api = useRef<{
+    load: (k: string) => Promise<RemoteLoad>;
+    set: (name: string, value: string, onError: (m: string) => void) => void;
+    flush: (keepalive: boolean, onError?: (m: string) => void) => void;
+  } | null>(null);
+
+  if (!api.current) {
+    const st = stateRef.current;
+    const flush = (keepalive: boolean, onError?: (m: string) => void) => {
+      if (st.timer) { clearTimeout(st.timer); st.timer = null; }
+      if (!st.dirty || !st.key) return;
+      st.dirty = false;
+      const checked = checkSketchData(st.data);
+      if (!checked.ok) { onError?.(checked.error); return; }
+      const body = JSON.stringify({ key: st.key, data: checked.data });
+      void fetch('/api/sketch-saves', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body,
+        keepalive: keepalive && body.length < 60_000,
+        credentials: 'same-origin',
+      }).then(async (res) => {
+        if (res.ok) { st.lastError = null; return; }
+        const msg = `Your online save did not go through: ${await errorText(res)}`;
+        if (res.status >= 500) st.dirty = true; // try again with the next change
+        if (msg !== st.lastError) { st.lastError = msg; onError?.(msg); }
+      }).catch(() => {
+        st.dirty = true;
+        const msg = 'Your account could not be reached, so the last online save is waiting. It is sent with the next save.';
+        if (msg !== st.lastError) { st.lastError = msg; onError?.(msg); }
+      });
+    };
+    api.current = {
+      load(k: string) {
+        if (st.key !== k) {
+          flush(true);
+          st.key = k; st.data = {}; st.dirty = false; st.loaded = null;
+        }
+        if (!st.loaded) {
+          st.loaded = fetch(`/api/sketch-saves?key=${encodeURIComponent(k)}`, { credentials: 'same-origin' })
+            .then(async (res): Promise<RemoteLoad> => {
+              if (res.status === 401 || res.status === 403) return { state: 'signed-out' };
+              if (!res.ok) return { state: 'offline' };
+              const body = (await res.json()) as { data?: unknown };
+              const checked = checkSketchData(body?.data ?? {});
+              // Writes made while the fetch was out win over what it brought back.
+              st.data = { ...(checked.ok ? checked.data : {}), ...st.data };
+              return { state: 'ready', data: st.data };
+            })
+            .catch((): RemoteLoad => ({ state: 'offline' }))
+            .then((got) => {
+              if (got.state !== 'ready') st.loaded = null; // ask again on the next run
+              return got;
+            });
+        }
+        return st.loaded.then((got) => (got.state === 'ready' ? { state: 'ready', data: st.data } : got));
+      },
+      set(name: string, value: string, onError: (m: string) => void) {
+        st.data[name] = value;
+        st.dirty = true;
+        if (!st.timer) st.timer = setTimeout(() => { st.timer = null; flush(false, onError); }, 2000);
+      },
+      flush,
+    };
+  }
+
+  // Out at once when the tab is hidden or closed, and when this preview goes.
+  useEffect(() => {
+    const out = () => api.current?.flush(true);
+    const onHide = () => { if (document.visibilityState === 'hidden') out(); };
+    document.addEventListener('visibilitychange', onHide);
+    window.addEventListener('pagehide', out);
+    return () => {
+      document.removeEventListener('visibilitychange', onHide);
+      window.removeEventListener('pagehide', out);
+      out();
+    };
+  }, []);
+  return api.current;
 }

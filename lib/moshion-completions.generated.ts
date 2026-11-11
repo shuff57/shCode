@@ -293,6 +293,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "info": ""
  },
  {
+  "label": "load",
+  "type": "function",
+  "detail": "(name, where?)",
+  "info": "Read a saved value back, or null. where: 'local' (default) or 'remote'."
+ },
+ {
   "label": "loadJSON",
   "type": "function",
   "detail": "(path: string, callback?: (data: any) => void): Promise<any> & Record<string, any>",
@@ -471,6 +477,18 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "type": "function",
   "detail": "(n: number, decimals?: number): number",
   "info": ""
+ },
+ {
+  "label": "save",
+  "type": "function",
+  "detail": "(name, value, where?)",
+  "info": "Save a value under a name. where: 'local' (this browser, the default) or 'remote' (your account, on any computer)."
+ },
+ {
+  "label": "saved",
+  "type": "function",
+  "detail": "(name, defaults, where?)",
+  "info": "A saved object: its saved fields over the defaults. Change it, then call .save() (or .save('remote'))."
  },
  {
   "label": "saveTexture",
