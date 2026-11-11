@@ -1690,6 +1690,7 @@ export default function LessonWorkspace({
         isOpen={historyOpen}
         onClose={() => setHistoryOpen(false)}
         lessonId={lesson.id}
+        saveToAccount={lessonProgress.authed && !solutionLoaded}
       />
       <SubmitDialog
         isOpen={submitOpen}

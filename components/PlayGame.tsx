@@ -194,9 +194,9 @@ export default function PlayGame() {
               <button
                 type="button"
                 style={quiet}
-                title={g.mine ? 'Put this game in your moSHion sandbox; Publish game there updates it' : 'Copy this game into your own moSHion sandbox to change it'}
-                onClick={() => {
-                  const ok = remixIntoSandbox(
+                title={g.mine ? 'Open this game in your sandbox; Publish game there updates it' : 'Copy this game into a new project in your sandbox to change it'}
+                onClick={async () => {
+                  const ok = await remixIntoSandbox(
                     { id: g.id, title: g.title, code: g.code, mine: g.mine, owner: g.owner, choice: g.choice, remixedFrom: g.remixedFrom, version: g.version },
                     undefined,
                     (m) => setNote(m),

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState, useRef, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { ChevronDown, ChevronUp, CloudUpload, History, Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen, RotateCcw, Users } from 'lucide-react';
 import type { Extension } from '@codemirror/state';
@@ -22,6 +22,9 @@ import DocsDrawer from './DocsDrawer';
 import PublishGameButton from './PublishGameButton';
 import ProposeChangeButton from './ProposeChangeButton';
 import CodeTogetherBar, { useCodeTogetherAvailable } from './CodeTogetherBar';
+import SandboxProjectPicker from './SandboxProjectPicker';
+import { useSandboxProjects } from '../lib/sandbox-projects';
+import { projectLessonId } from '../lib/sandbox-projects-core';
 import { RUN_TIMEOUT_MS, errorWithLocation, runStudentCode, timerLimitMessage } from '../lib/js-runner-source';
 import {
   NO_TEACHER_MODES,
@@ -33,15 +36,7 @@ import {
 } from '../lib/lesson-mode';
 import EditorPlaceholder from './diagram/EditorPlaceholder';
 import { emptyDiagram, type DiagramDoc } from '../lib/diagram-types';
-import {
-  SANDBOX_EARLY_PICK_SCRIPT,
-  SANDBOX_MODES,
-  SANDBOX_MODE_KEY,
-  getMode,
-  sandboxLesson,
-  takeEarlyPick,
-  type SandboxModeId,
-} from '../lib/sandbox-modes';
+import { getMode, sandboxLesson } from '../lib/sandbox-modes';
 
 // The B-rep kernel + three.js viewport are heavy; a plain JS or moSHion
 // sandbox session should never pay for them. Same dynamic-import pattern
@@ -68,7 +63,6 @@ function parseChart(text: string | undefined): DiagramDoc {
   return emptyDiagram();
 }
 
-const MODE_KEY = SANDBOX_MODE_KEY;
 // Which side (Build/Code) reSHape opens on. Read once at page load and
 // handed to ReshapeStudio as `startSide` -- the studio owns the toggle
 // itself from then on (see its own file header), so this is a
@@ -96,18 +90,6 @@ interface LogLine {
   message: string;
 }
 
-const noSubscribe = () => () => {};
-/**
- * The early-click catcher (SANDBOX_EARLY_PICK_SCRIPT), in the page's HTML only:
- * true while the server renders and while React hydrates that HTML, false in a
- * page React builds itself (a visit from another page of the app), where the
- * buttons work from the first moment and a script would never run anyway.
- */
-function EarlyPickScript() {
-  const inServerHtml = useSyncExternalStore(noSubscribe, () => false, () => true);
-  return inServerHtml ? <script dangerouslySetInnerHTML={{ __html: SANDBOX_EARLY_PICK_SCRIPT }} /> : null;
-}
-
 export default function SandboxWorkspace() {
   const setLesson = useLessonStore((s) => s.setLesson);
   const fileContents = useLessonStore((s) => s.fileContents);
@@ -115,15 +97,22 @@ export default function SandboxWorkspace() {
   const resetLesson = useLessonStore((s) => s.resetLesson);
   const lessonProgress = useLessonState();
 
-  const [modeId, setModeId] = useState<SandboxModeId>('moshion');
+  // The open project (lib/sandbox-projects.ts). Each project is its own lesson
+  // id, so its draft, cloud save and History are its own; switching projects is
+  // switching lessons. `project` is null only once the student has deleted
+  // every project, and the page then offers to make one.
+  const projectsState = useSandboxProjects();
+  const project = projectsState.current;
+  const noProjects = projectsState.loaded && !project;
+  const modeId = project?.mode ?? 'moshion';
   const mode = useMemo(() => getMode(modeId), [modeId]);
-  const lesson = useMemo(() => sandboxLesson(mode), [mode]);
+  const lessonId = project ? projectLessonId(project) : 'sandbox-moshion';
+  const lesson = useMemo(() => sandboxLesson(mode, lessonId), [mode, lessonId]);
 
   // The same cloud-save surface a lesson has on cs-3d: one deliberate Save
   // writes the live workspace to lesson_sync, arrival merges a save from
   // another device, and History lists both this device's snapshots and the
-  // cloud saves. Each mode is its own lesson id, so the four modes keep
-  // independent cloud rows and histories.
+  // cloud saves, all for the open project.
   const cloud = useCloudWorkspace(lesson, lessonProgress.authed);
   const [historyOpen, setHistoryOpen] = useState(false);
 
@@ -229,38 +218,29 @@ export default function SandboxWorkspace() {
 
   useEffect(() => () => { runRef.current?.kill(); }, []);
 
-  // Restore the last mode before the first paint that matters. Reading in an
-  // effect rather than useState's initialiser keeps the server and client
-  // markup identical, which a static export needs. A mode button clicked
-  // before this ran (the page still loading) wins: SANDBOX_EARLY_PICK_SCRIPT
-  // kept that click, which would otherwise have done nothing.
+  // Read in an effect rather than useState's initialiser so the server and
+  // client markup stay identical, which a static export needs.
   useEffect(() => {
-    const early = takeEarlyPick(window as Parameters<typeof takeEarlyPick>[0]);
-    if (early) setModeId(early);
     try {
-      const saved = window.localStorage.getItem(MODE_KEY);
-      if (!early && saved && SANDBOX_MODES.some((m) => m.id === saved)) {
-        setModeId(saved as SandboxModeId);
-      }
       const b = window.localStorage.getItem(BUILD_KEY);
       if (b === '0') setBuild(false);
     } catch { /* private mode */ }
   }, []);
 
-  // An early click's pressed look (html[data-sandbox-pick]) goes once the page shows that mode itself.
+  // Each project is its own lesson id, so the store keeps independent drafts
+  // and switching back finds your code where you left it. A switch stops the
+  // run and brings back a pane hidden in full screen.
   useEffect(() => {
-    const d = document.documentElement;
-    if (d.getAttribute('data-sandbox-pick') === modeId) d.removeAttribute('data-sandbox-pick');
-  }, [modeId]);
-
-  // Each mode is its own lesson id, so the store keeps three independent
-  // drafts and switching back finds your code where you left it.
-  useEffect(() => {
+    runRef.current?.kill();
+    runRef.current = null;
     setLesson(lesson);
     setCode('');
     setRunKey(0);
     setIsRunning(false);
     setLogs([]);
+    setTogetherOpen(false);
+    setEditorHidden(false);
+    setConsoleHidden(false);
   }, [lesson, setLesson]);
 
   // Keep the draft. Nothing else in the sandbox writes it, so without this a
@@ -288,17 +268,6 @@ export default function SandboxWorkspace() {
       document.removeEventListener('visibilitychange', onHide);
     };
   }, [fileContents, lesson.id]);
-
-  function chooseMode(next: SandboxModeId) {
-    if (next === modeId || together) return;
-    setTogetherOpen(false);
-    runRef.current?.kill();
-    runRef.current = null;
-    try { window.localStorage.setItem(MODE_KEY, next); } catch { /* private mode */ }
-    setEditorHidden(false);
-    setConsoleHidden(false);
-    setModeId(next);
-  }
 
   // ---- Running ----------------------------------------------------------
 
@@ -684,22 +653,7 @@ export default function SandboxWorkspace() {
 
   const reshapeToolbarExtra = isReshape ? (
     <>
-      {!reshapeIsBuild && (
-        <div className="sandbox-modes" role="group" aria-label="Program type">
-          {SANDBOX_MODES.map((m) => (
-            <button
-              key={m.id}
-              type="button"
-              aria-pressed={m.id === modeId}
-              className={m.id === modeId ? 'sandbox-mode is-active' : 'sandbox-mode'}
-              data-sandbox-mode={m.id}
-              onClick={() => chooseMode(m.id)}
-            >
-              {m.label}
-            </button>
-          ))}
-        </div>
-      )}
+      {!reshapeIsBuild && <SandboxProjectPicker state={projectsState} />}
       {lockNote && <span className="sandbox-lock">{lockNote}</span>}
       {renderCloudChips()}
       <button style={chipStyle} onClick={reset}>
@@ -719,7 +673,6 @@ export default function SandboxWorkspace() {
 
   return (
     <>
-      <EarlyPickScript />
       <TabbedRightDrawer storageKey="shCode:sandbox-drawer" tabs={drawerTabs} />
       <div
         className={
@@ -741,23 +694,13 @@ export default function SandboxWorkspace() {
 
         {!isReshape && (
           <div className="run-toolbar sandbox-toolbar">
-            <div className="sandbox-modes" role="group" aria-label="Program type">
-              {SANDBOX_MODES.map((m) => (
-                <button
-                  key={m.id}
-                  type="button"
-                  aria-pressed={m.id === modeId}
-                  className={m.id === modeId ? 'sandbox-mode is-active' : 'sandbox-mode'}
-                  data-sandbox-mode={m.id}
-                  onClick={() => chooseMode(m.id)}
-                  disabled={together && m.id !== modeId}
-                  title={together && m.id !== modeId ? 'Leave Code together to switch' : undefined}
-                >
-                  {m.label}
-                </button>
-              ))}
-            </div>
-            {!isFlow && <button className="btn-run" onClick={run} title="Run (Ctrl+Enter)" aria-keyshortcuts="Control+Enter">▶ Run</button>}
+            <SandboxProjectPicker
+              state={projectsState}
+              locked={together}
+              lockedTitle="Leave Code together to switch projects"
+              startOpen={noProjects}
+            />
+            {!isFlow && !noProjects && <button className="btn-run" onClick={run} title="Run (Ctrl+Enter)" aria-keyshortcuts="Control+Enter">▶ Run</button>}
             {isRunning && !isFlow && (
               <button
                 className="btn-secondary btn-sm"
@@ -769,7 +712,7 @@ export default function SandboxWorkspace() {
             )}
             {/* Grouped and pushed right: this program (History, Save, Reset), with classmates (Code together,
                 Publish game), then the view. Thin lines between the groups (.sandbox-tb-end). */}
-            <div className="sandbox-tb-end">
+            {!noProjects && <div className="sandbox-tb-end">
               <div className="sandbox-tb-group" role="group" aria-label="This program">
                 {renderCloudChips()}
                 <button
@@ -802,9 +745,9 @@ export default function SandboxWorkspace() {
                   {/* The Games library: publish this sketch so classmates can play and remix it. */}
                   {mode.preview === 'moshion' && lessonProgress.authed && (
                     <>
-                      <PublishGameButton getCode={getScript} />
+                      <PublishGameButton key={`publish-${lesson.id}`} getCode={getScript} />
                       {/* Shown only while the code is a remix of a classmate's game: send the change back (lib/game-flow-core.ts). */}
-                      <ProposeChangeButton getCode={getScript} />
+                      <ProposeChangeButton key={`propose-${lesson.id}`} getCode={getScript} />
                     </>
                   )}
                 </div>
@@ -821,14 +764,21 @@ export default function SandboxWorkspace() {
                   </button>
                 </div>
               )}
-            </div>
+            </div>}
           </div>
         )}
 
-        <div className="editor-preview-container sandbox-split" id="split">
+        {noProjects && (
+          <div className="sandbox-empty" role="status">
+            <p style={{ margin: 0, fontSize: 16, color: 'var(--c-fg)' }}>You have no projects.</p>
+            <p style={{ margin: 0 }}>Press the Projects button above, then New project, to start one.</p>
+          </div>
+        )}
+
+        {!noProjects && <div className="editor-preview-container sandbox-split" id="split">
           {isReshape ? (
             <ReshapeStudio
-              key={`${modeId}-${reshapeResetKey}`}
+              key={`${lesson.id}-${reshapeResetKey}`}
               value={fileContents['script.js'] ?? ''}
               onChange={(t) => updateFile('script.js', t)}
               sides={reshapeSides}
@@ -845,7 +795,7 @@ export default function SandboxWorkspace() {
             />
           ) : isFlow && chart ? (
             <div className="sandbox-flow" ref={flowFrameRef}>
-              <DiagramEditor value={chart} onChange={onChartChange} height={flowH} />
+              <DiagramEditor key={lesson.id} value={chart} onChange={onChartChange} height={flowH} />
             </div>
           ) : (
             <>
@@ -910,7 +860,7 @@ export default function SandboxWorkspace() {
               <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>
             </>
           )}
-        </div>
+        </div>}
         {full && !isReshape && !isFlow && (
           <button
             type="button"
@@ -923,7 +873,7 @@ export default function SandboxWorkspace() {
           </button>
         )}
 
-        {!isConsole && !reshapeIsBuild && !isFlow && (
+        {!isConsole && !reshapeIsBuild && !isFlow && !noProjects && (
           <div className="sandbox-console-wrap">
             <div className="output-header">Console</div>
             <div className="sandbox-console-body">
@@ -958,32 +908,9 @@ export default function SandboxWorkspace() {
         .sandbox-title { margin: 0; font-size: 28px; color: var(--text); }
         .sandbox-subtitle { color: var(--c-meta); font-size: 0.85rem; }
         .sandbox-toolbar { margin-bottom: 0; flex-shrink: 0; gap: 8px; }
-        .sandbox-modes {
-          display: inline-flex;
-          border: 1px solid var(--c-line);
-          border-radius: 4px;
-          overflow: hidden;
-          margin-right: 6px;
-        }
-        .sandbox-mode {
-          padding: 6px 13px;
-          background: transparent;
-          color: var(--c-meta);
-          border: 0;
-          border-right: 1px solid var(--c-line);
-          cursor: pointer;
-          font-size: 13px;
-        }
-        .sandbox-mode:last-child { border-right: 0; }
-        .sandbox-mode:hover { color: var(--text); }
-        .sandbox-mode.is-active { background: color-mix(in srgb, var(--c-purple) 30%, var(--c-bg)); color: var(--c-fg); }
-        .sandbox-mode:disabled { opacity: 0.35; cursor: not-allowed; }
-        /* A mode clicked while the page was still loading looks pressed at once
-           (SANDBOX_EARLY_PICK_SCRIPT); the page switches to it as it starts. */
-        html[data-sandbox-pick] .sandbox-mode.is-active { background: transparent; color: var(--c-comment); }
-        ${SANDBOX_MODES.map((m) => `html[data-sandbox-pick='${m.id}'] .sandbox-mode[data-sandbox-mode='${m.id}']`).join(',\n        ')} {
-          background: var(--c-line);
-          color: var(--c-fg);
+        .sandbox-empty {
+          flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; justify-content: center;
+          gap: 6px; color: var(--c-meta); font-size: 14px; border: 1px dashed var(--c-line); border-radius: 8px; padding: 24px;
         }
         .sandbox-lock { color: var(--c-orange); font-size: 12px; margin-right: 10px; }
         /* Above the editor so the save note (and Publish game's panel) can hang over it. */
@@ -1141,6 +1068,7 @@ export default function SandboxWorkspace() {
         isOpen={historyOpen}
         onClose={() => setHistoryOpen(false)}
         lessonId={lesson.id}
+        saveToAccount={lessonProgress.authed}
         // ReshapeStudio only reads `value` at mount, so a restored version
         // needs a fresh instance to put the old model back on screen. Code
         // and chart modes resync from `fileContents` on their own.

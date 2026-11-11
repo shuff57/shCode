@@ -115,15 +115,17 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
     setBusy(null);
     if (!r.ok) { say(r.error, true); return; }
     const g = r.value.game;
-    const done = remixIntoSandbox(
+    setBusy(id);
+    const done = await remixIntoSandbox(
       { id: g.id, title: g.title, code: g.code, mine: mineToo && g.mine, owner: g.owner, choice: g.choice, remixedFrom: g.remixedFrom, version: g.version },
       undefined,
       (m) => say(m, true),
     );
+    setBusy(null);
     if (done) {
       say(mineToo && g.mine
-        ? `"${g.title}" is in your moSHion sandbox now. Press Run to play it, then change anything you like.`
-        : `"${g.title}" is in your moSHion sandbox now. Change anything you like, then press Propose change to send it back to ${g.owner}.`);
+        ? `"${g.title}" is open in the sandbox now. Press Run to play it, then change anything you like.`
+        : `"${g.title}" is a new project in your sandbox. Change anything you like, then press Propose change to send it back to ${g.owner}.`);
     }
   }
 

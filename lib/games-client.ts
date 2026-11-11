@@ -4,16 +4,16 @@
 // publish button, the Library's Games section and /play make, plus Remix,
 // which copies a game's code into the student's own moSHion sandbox draft.
 //
-// The sandbox keeps ONE moSHion draft (lesson id 'sandbox-moshion' in
-// shCode:progress, lib/version-control.ts). Remix never overwrites a draft that
-// differs from the starter without asking, and keeps the old draft as a
-// History snapshot first, so a mis-click can be undone from the sandbox's
-// History button.
+// The sandbox holds several projects (lib/sandbox-projects.ts), each its own
+// draft. Remix makes a NEW moSHion project holding the game's code, so it never
+// writes over anything. Opening one of your own games opens the project it is
+// published from when there is one (asking before replacing code that differs,
+// and keeping the old code as a History snapshot), else a new project.
 //
-// Which game the sandbox draft is "published as" lives in localStorage
-// (shCode:sandbox-game): re-publishing updates that game. Remixing someone
-// else's game clears it, so publishing a remix makes a new game of your own;
-// opening one of your own games sets it, so publishing again updates it.
+// Which game a moSHion project is "published as" lives in localStorage, one
+// record per project (sandboxGameKey): re-publishing updates that game.
+// "The sandbox" in the functions below is the moSHion project open now, or the
+// one opened last (moshionLessonId).
 //
 // Sharing choices (lib/share-choice.ts, migration 0045): the record also keeps
 // `from`, where the sandbox code was remixed from (the original's id, title,
@@ -25,7 +25,9 @@
 import { useLessonStore } from './store';
 import { loadProgress, normalizeEol, saveProgress } from './version-control';
 import { addLocalSnapshot } from './local-history';
-import { SANDBOX_MODE_KEY, getMode } from './sandbox-modes';
+import { getMode } from './sandbox-modes';
+import { createProject, moshionLessonId, openProject, getProjectsState, startProjects } from './sandbox-projects';
+import { parseProjectLessonId, projectLessonId } from './sandbox-projects-core';
 import { errorText } from './http-error';
 import type { GameMode } from './games-core';
 import type { GameAssetsResponse } from './game-assets';
@@ -33,7 +35,11 @@ import { canRemix, parseProvenance, provenanceOf, remixRefusal, type Provenance,
 
 export const SANDBOX_GAME_KEY = 'shCode:sandbox-game';
 export const GAMES_CHANGED = 'shcode:games-changed';
-const SANDBOX_MOSHION = 'sandbox-moshion';
+
+/** Where a moSHion project's published-as record lives. The old moSHion sandbox keeps the key it always had. */
+export function sandboxGameKey(lessonId: string): string {
+  return lessonId === 'sandbox-moshion' ? SANDBOX_GAME_KEY : `${SANDBOX_GAME_KEY}:${lessonId}`;
+}
 
 export interface MyGame {
   id: string;
@@ -113,9 +119,9 @@ export interface SandboxGame {
   version?: number | null;
 }
 
-export function readSandboxGame(): SandboxGame {
+export function readSandboxGame(lessonId: string = moshionLessonId()): SandboxGame {
   try {
-    const v = JSON.parse(localStorage.getItem(SANDBOX_GAME_KEY) || 'null');
+    const v = JSON.parse(localStorage.getItem(sandboxGameKey(lessonId)) || 'null');
     if (v && typeof v.title === 'string') {
       return {
         id: typeof v.id === 'string' ? v.id : null, title: v.title, from: parseProvenance(v.from),
@@ -127,18 +133,32 @@ export function readSandboxGame(): SandboxGame {
   return { id: null, title: '', from: null };
 }
 
-export function writeSandboxGame(g: SandboxGame): void {
+export function writeSandboxGame(g: SandboxGame, lessonId: string = moshionLessonId()): void {
   // A caller that does not know about versions keeps the one already recorded for the same original.
   let rec = g;
   if (g.fromVersion === undefined || g.version === undefined) {
-    const old = readSandboxGame();
+    const old = readSandboxGame(lessonId);
     rec = {
       ...g,
       fromVersion: g.fromVersion !== undefined ? g.fromVersion : old.from && g.from && old.from.id === g.from.id ? old.fromVersion ?? null : null,
       version: g.version !== undefined ? g.version : old.id && old.id === g.id ? old.version ?? null : null,
     };
   }
-  try { localStorage.setItem(SANDBOX_GAME_KEY, JSON.stringify(rec)); } catch { /* private mode */ }
+  try { localStorage.setItem(sandboxGameKey(lessonId), JSON.stringify(rec)); } catch { /* private mode */ }
+}
+
+/** Every moSHion project on this browser whose record says it is published as game `id`. */
+function projectsPublishedAs(id: string): string[] {
+  const out: string[] = [];
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k || (k !== SANDBOX_GAME_KEY && !k.startsWith(`${SANDBOX_GAME_KEY}:`))) continue;
+      const lessonId = k === SANDBOX_GAME_KEY ? 'sandbox-moshion' : k.slice(SANDBOX_GAME_KEY.length + 1);
+      if (readSandboxGame(lessonId).id === id) out.push(lessonId);
+    }
+  } catch { /* private mode */ }
+  return out;
 }
 
 // ---- calls -----------------------------------------------------------------
@@ -215,7 +235,7 @@ export async function setGameShared(id: string, share: boolean, choice?: ShareCh
 export async function deleteGame(id: string) {
   const r = await call<{ ok: true }>(`/api/games/${encodeURIComponent(id)}`, { method: 'DELETE' });
   if (r.ok) {
-    if (readSandboxGame().id === id) writeSandboxGame({ ...readSandboxGame(), id: null });
+    for (const lessonId of projectsPublishedAs(id)) writeSandboxGame({ ...readSandboxGame(lessonId), id: null }, lessonId);
     announce();
   }
   return r;
@@ -238,29 +258,25 @@ export interface RemixSource {
 }
 
 /**
- * Put a game's code into this student's moSHion sandbox draft and open the
- * sandbox. Returns false when the student said no to replacing their draft, or
- * when the game is someone else's "just play" game (`refused` gets the plain
- * reason; the server would refuse to publish the remix anyway).
- * `ask` is the confirm (window.confirm by default).
+ * Open a game in the sandbox as a moSHion project, and go to the sandbox. Someone else's game becomes
+ * a NEW project (named "<title> remix"), so nothing is ever written over. One of your own games opens
+ * the project it is published from on this browser (asking first if that project's code differs, and
+ * keeping it in History), else a new project named after it. Resolves false when the student said no,
+ * when the game is someone else's "just play" game, or when no project could be made (`refused` gets
+ * the plain reason: the 30-project limit, or no connection). `ask` is the confirm (window.confirm by default).
  */
-export function remixIntoSandbox(
+export async function remixIntoSandbox(
   game: RemixSource,
   ask: (message: string) => boolean = (m) => window.confirm(m),
   refused: (message: string) => void = (m) => window.alert(m),
-): boolean {
+): Promise<boolean> {
   if (!game.mine && !canRemix(game.choice)) {
     refused(remixRefusal('game', game.title, game.owner ?? 'Its maker'));
     return false;
   }
-  if (!writeSandboxCode(game.code, `Before opening "${game.title}"`, () => ask(
-    `Replace the code in your moSHion sandbox with "${game.title}"?\n\n`
-    + 'Your sandbox code now is kept in the sandbox\'s History, so you can get it back from there.',
-  ))) return false;
-  const live = useLessonStore.getState().lesson?.id === SANDBOX_MOSHION;
-
+  await startProjects();
   // Your own game keeps the credit it already has; someone else's becomes the credit.
-  writeSandboxGame(game.mine
+  const record: SandboxGame = game.mine
     ? { id: game.id, title: game.title, from: game.remixedFrom ?? null, fromVersion: null, version: game.version ?? null }
     : {
       id: null,
@@ -271,10 +287,28 @@ export function remixIntoSandbox(
         id: game.id, title: game.title, author: game.owner ?? 'A classmate',
         choice: game.choice, provenance: game.remixedFrom ?? null,
       }),
-    });
-  try { localStorage.setItem(SANDBOX_MODE_KEY, 'moshion'); } catch { /* private mode */ }
+    };
+
+  const home = game.mine
+    ? getProjectsState().projects.find((p) => p.mode === 'moshion' && projectsPublishedAs(game.id).includes(projectLessonId(p)))
+    : undefined;
+  let lessonId: string;
+  if (home) {
+    lessonId = projectLessonId(home);
+    if (!writeSandboxCode(game.code, `Before opening "${game.title}"`, () => ask(
+      `Replace the code in your project "${home.name}" with "${game.title}" as it is published now?\n\n`
+      + 'The code there now is kept in that project\'s History, so you can get it back from there.',
+    ), lessonId)) return false;
+    openProject(home);
+  } else {
+    const made = await createProject('moshion', game.mine ? game.title : remixTitle(game.title), { 'script.js': normalizeEol(game.code) });
+    if (!made.ok) { refused(made.error); return false; }
+    lessonId = projectLessonId(made.project);
+  }
+  writeSandboxGame(record, lessonId);
   announce();
-  if (!live) window.location.assign('/sandbox/');
+  // On the sandbox already (the Library drawer tab), it follows the open project by itself.
+  if (!parseProjectLessonId(useLessonStore.getState().lesson?.id ?? '')) window.location.assign('/sandbox/');
   return true;
 }
 
@@ -284,23 +318,28 @@ export function remixIntoSandbox(
  * it alone) and the old draft is kept as a History snapshot labelled `snapshotLabel`. Used by Remix and by
  * "Bring in the newest version" (lib/game-flow-client.ts). Returns false when the student said no.
  */
-export function writeSandboxCode(code: string, snapshotLabel: string, confirm: (current: string) => boolean): boolean {
+export function writeSandboxCode(
+  code: string,
+  snapshotLabel: string,
+  confirm: (current: string) => boolean,
+  lessonId: string = moshionLessonId(),
+): boolean {
   const mode = getMode('moshion');
   const starter = normalizeEol(mode.starter);
   const next = normalizeEol(code);
   const store = useLessonStore.getState();
-  const live = store.lesson?.id === SANDBOX_MOSHION;
-  const saved = loadProgress(SANDBOX_MOSHION);
+  const live = store.lesson?.id === lessonId;
+  const saved = loadProgress(lessonId);
   const files: Record<string, string> = live ? { ...store.fileContents } : { ...(saved?.fileContents ?? {}) };
   const current = normalizeEol(files['script.js'] ?? starter);
 
   if (current.trim() && current !== starter && current !== next) {
     if (!confirm(current)) return false;
-    addLocalSnapshot(SANDBOX_MOSHION, files, snapshotLabel);
+    addLocalSnapshot(lessonId, files, snapshotLabel);
   }
 
   files['script.js'] = next;
-  saveProgress(SANDBOX_MOSHION, {
+  saveProgress(lessonId, {
     fileContents: files,
     commits: saved?.commits ?? [],
     lastCommittedFileContents: saved?.lastCommittedFileContents ?? { 'script.js': starter },
@@ -313,10 +352,10 @@ export function writeSandboxCode(code: string, snapshotLabel: string, confirm: (
 }
 
 /** The moSHion sandbox draft's code as it is now (the open editor when the sandbox is on screen). */
-export function readSandboxCode(): string {
+export function readSandboxCode(lessonId: string = moshionLessonId()): string {
   const store = useLessonStore.getState();
-  if (store.lesson?.id === SANDBOX_MOSHION) return store.fileContents['script.js'] ?? '';
-  return loadProgress(SANDBOX_MOSHION)?.fileContents?.['script.js'] ?? normalizeEol(getMode('moshion').starter);
+  if (store.lesson?.id === lessonId) return store.fileContents['script.js'] ?? '';
+  return loadProgress(lessonId)?.fileContents?.['script.js'] ?? normalizeEol(getMode('moshion').starter);
 }
 
 function remixTitle(title: string): string {

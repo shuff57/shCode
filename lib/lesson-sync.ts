@@ -89,6 +89,28 @@ function writeRecord(lessonId: string, rec: SyncRecord): void {
   }
 }
 
+/**
+ * A copy of `files` was just saved for `lessonId` at `revision` by someone other
+ * than the Save button (a new sandbox project's first code): remember it as the
+ * row this device has seen, so the next Save names that revision.
+ */
+export function recordSavedCopy(lessonId: string, files: FileMap, revision: number): void {
+  writeRecord(lessonId, { base: { ...files }, revision });
+  const rt = runtimes.get(lessonId);
+  if (rt) { rt.base = { ...files }; rt.revision = revision; }
+}
+
+/** Forget what this device knows about a lesson's saved copy (a deleted sandbox project). */
+export function forgetSavedCopy(lessonId: string): void {
+  runtimes.delete(lessonId);
+  if (typeof window === 'undefined') return;
+  try {
+    const all = readMap();
+    delete all[lessonId];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+  } catch { /* quota / private mode */ }
+}
+
 export function starterContents(lesson: Lesson): FileMap {
   return Object.fromEntries(
     flattenFiles(lesson.files).map((f) => [f.path, normalizeEol(f.content || '')]),

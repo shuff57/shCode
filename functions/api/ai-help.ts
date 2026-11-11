@@ -97,9 +97,10 @@ const MAX_CODE_BLOCK_LINES = 3;
 // directly and show a worked piece, up to this many lines per code block.
 export const SANDBOX_CODE_BLOCK_LINES = 15;
 
-// The sandbox's own lesson ids (lib/sandbox-modes.ts: `sandbox-${mode.id}`).
+// The sandbox's own lesson ids: `sandbox-<mode>` for the old sandboxes and
+// `sandbox-<mode>-<10 letters/digits>` for a project (lib/sandbox-projects-core.ts).
 // Flowchart mode goes through the diagram tutor and is never loosened.
-const SANDBOX_LESSON_RE = /^sandbox-(?:js|moshion|reshape)$/;
+const SANDBOX_LESSON_RE = /^sandbox-(?:js|moshion|reshape)(?:-[a-z0-9]{8,16})?$/;
 
 // Course work pasted into the sandbox: a starter's `// STEP 1:` comments, a
 // lesson header (`// 5.3.4 Lab: ...`) or a reference solution's own header.

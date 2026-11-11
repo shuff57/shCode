@@ -213,6 +213,17 @@ function draw() {
 `;
 
 const SAM = { email: 'sam@example.org', role: 'student', label: "Sam's screen" };
+// The undo-restore poster's saved version: a small moSHion sketch.
+const MOSHION_SAVED_V1 = `function setup() {
+  new Canvas(400, 400);
+}
+
+function draw() {
+  background(40, 42, 54);
+  fill(80, 250, 123);
+  circle(mouseX, mouseY, 40);
+}
+`;
 const ALEX = { email: 'alex@example.org', role: 'student', label: "Alex's screen" };
 // The teacher clip's class: two more students, so Sam's and Alex's drafts stay the starter for the other clips.
 const MAYA = { email: 'maya@example.org', role: 'student', label: "Maya's screen" };
@@ -243,6 +254,55 @@ async function joinCodeTogether(page, demo) {
 }
 
 const RECIPES = {
+  // Sandbox projects (migration 0049, components/SandboxProjectPicker.tsx): Sam makes a JavaScript
+  // project beside the moSHion one, runs it, then switches back and finds the moSHion code untouched.
+  // Start the dev server fresh: Sam's list must hold only the moSHion sandbox.
+  '2026-11-sandbox-projects': {
+    people: [SAM],
+    path: '/sandbox/',
+    async before({ pages: [p] }) {
+      await p.getByTestId('sandbox-projects-button').waitFor({ timeout: 30000 });
+    },
+    async run({ demos: [d], pages: [p] }) {
+      await d.click(p.getByTestId('sandbox-projects-button'), { after: 500 });
+      await d.click(p.getByRole('button', { name: 'New project' }), { after: 300 });
+      await d.click(p.getByRole('radio', { name: 'JavaScript' }), { after: 200 });
+      await d.cursorTo(p.getByLabel('Name'), 400);
+      await p.getByLabel('Name').click();
+      await d.type('Hello names', 45);
+      await d.click(p.getByRole('button', { name: 'Make project' }), { after: 900 });
+      await d.click(p.getByRole('button', { name: /Run/ }).first(), { after: 1100 });
+      await d.click(p.getByTestId('sandbox-projects-button'), { after: 900 });
+      await d.click(p.locator('[data-testid=sandbox-projects] li button').filter({ hasText: 'moSHion sandbox' }).first(), { after: 1200 });
+    },
+  },
+
+  // A History restore keeps the code it replaces (components/HistoryPanel.tsx): Sam saves, changes the
+  // code, restores the saved version, and History now lists the code from before the restore.
+  '2026-11-undo-restore': {
+    people: [SAM],
+    path: '/sandbox/',
+    posterOnly: true,
+    async run({ demos: [d], pages: [p] }) {
+      await p.getByTestId('sandbox-projects-button').waitFor({ timeout: 30000 });
+      // The moSHion sandbox, whichever project an earlier recipe left open.
+      await p.getByTestId('sandbox-projects-button').click();
+      await p.locator('[data-testid=sandbox-projects] li button').filter({ hasText: 'moSHion sandbox' }).first().click();
+      await p.waitForTimeout(600);
+      await d.setCode(MOSHION_SAVED_V1);
+      await p.getByRole('button', { name: 'Save', exact: true }).click();
+      await p.getByText(/^✓ Saved/).waitFor({ timeout: 15000 });
+      await d.setCode(MOSHION_SAVED_V1.replace('fill(80, 250, 123);', "fill('tomato');").replace('40);', '90);'));
+      await p.getByRole('button', { name: 'History' }).click();
+      await p.getByRole('button', { name: 'Restore this version' }).click();
+      await p.getByRole('dialog', { name: 'Version history' }).waitFor({ state: 'detached', timeout: 15000 });
+      await p.getByRole('button', { name: 'History' }).click();
+      const kept = p.getByText(/^Before restoring the version from/).first();
+      await kept.waitFor({ timeout: 15000 });
+      await d.click(kept, { after: 500 });
+    },
+  },
+
   // Versions, proposed changes and their conversations (migration 0048, lib/game-flow-core.ts).
   '2026-11-propose-changes': {
     people: [KAI, NIA],

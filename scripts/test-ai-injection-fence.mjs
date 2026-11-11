@@ -207,7 +207,8 @@ try {
   ok('sandbox-moshion gets the sandbox rules', sb('sandbox-moshion'));
   ok('sandbox-js gets the sandbox rules', sb('sandbox-js'));
   ok('a lesson id keeps the hint-only rules', !sb('5-3-pinball-3-lab-build-the-table'));
-  ok('a look-alike id keeps the hint-only rules', !sb('sandbox-moshion-x') && !sb('xsandbox-js') && !sb('sandbox'));
+  ok('a sandbox project gets the sandbox rules', sb('sandbox-moshion-k3x9q0w2ab') && sb('sandbox-js-a1b2c3d4e5'));
+  ok('a look-alike id keeps the hint-only rules', !sb('sandbox-moshion-x') && !sb('xsandbox-js') && !sb('sandbox') && !sb('sandbox-moshion-K3X9Q0W2AB') && !sb('sandbox-flow-k3x9q0w2ab', own, 'diagram'));
   ok('flowchart mode is never loosened', !sb('sandbox-flow', own, 'diagram') && !sb('sandbox-moshion', own, 'diagram'));
   ok('pasted STEP comments keep the hint-only rules', !sb('sandbox-moshion', own + '\n  // STEP 2: build three obstacles'));
   ok('a pasted lesson header keeps the hint-only rules', !sb('sandbox-moshion', '// 5.3.4 Lab: Build the table.\n' + own));

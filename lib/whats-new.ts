@@ -46,6 +46,43 @@ export interface WhatsNewEntry {
 
 export const WHATS_NEW: WhatsNewEntry[] = [
   {
+    id: '2026-11-sandbox-projects',
+    date: '2026-11-11',
+    audience: 'student',
+    title: 'Many projects in the Sandbox',
+    summary:
+      'The Sandbox now holds many projects at once, each with its own name, type and code, and Remix opens a game as a new project ' +
+      'instead of replacing yours. Your list follows you to any computer you sign in on; press Save in a project to take its code too.',
+    steps: [
+      "In the Sandbox, press the button with your project's name at the top left, then New project.",
+      'Pick a type, give it a name, and press Make project. Pick any project in the list to switch to it.',
+      'Use More beside a project to rename it, make a copy or delete it. You can keep up to 30.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-sandbox-projects.mp4',
+      poster: '/whats-new/2026-11-sandbox-projects.jpg',
+      alt: 'Sam opens the project list, makes a JavaScript project called Hello names and runs it, then switches back to the moSHion sandbox, whose code is just as it was.',
+    },
+    action: { label: 'Open the Sandbox', href: '/sandbox' },
+  },
+  {
+    id: '2026-11-undo-restore',
+    date: '2026-11-11',
+    audience: 'student',
+    title: 'Undo a restore from History',
+    summary:
+      'Restoring an older version no longer throws away the code you had. History keeps it first as a version called ' +
+      '"Before restoring", so if you picked the wrong one you can restore your code straight back.',
+    steps: [
+      'Press History, pick a version, and press Restore this version.',
+      'Changed your mind? Open History again and restore the version called Before restoring.',
+    ],
+    media: {
+      poster: '/whats-new/2026-11-undo-restore.jpg',
+      alt: 'Version history with a new version at the top called Before restoring, holding the code that was there before the restore.',
+    },
+  },
+  {
     id: '2026-11-propose-changes',
     date: '2026-11-10',
     audience: 'student',

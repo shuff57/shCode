@@ -662,6 +662,15 @@ app.prepare().catch((err) => {
     const prefsRoute = await import('./functions/api/prefs.ts');
     server.get('/api/prefs', libRoute(prefsRoute.onRequestGet));
     server.put('/api/prefs', express.json(), libRoute(prefsRoute.onRequestPut));
+    // Sandbox projects (functions/api/sandbox-projects/*, migration 0049), same database. Dev keeps
+    // lesson_sync in the in-memory map above, not here, so the first GET always seeds the moSHion
+    // sandbox and a delete leaves that map's copy behind (a random project id is never reused).
+    const sbProjects = await import('./functions/api/sandbox-projects/index.ts');
+    const sbProject = await import('./functions/api/sandbox-projects/[id].ts');
+    server.get('/api/sandbox-projects', libRoute(sbProjects.onRequestGet));
+    server.post('/api/sandbox-projects', express.json(), libRoute(sbProjects.onRequestPost));
+    server.patch('/api/sandbox-projects/:id', express.json(), libRoute(sbProject.onRequestPatch));
+    server.delete('/api/sandbox-projects/:id', libRoute(sbProject.onRequestDelete));
     // A sketch's 'remote' saves (functions/api/sketch-saves.ts, #97), same database. The page
     // flushes them with fetch keepalive on page hide, which is still application/json.
     const sketchSaves = await import('./functions/api/sketch-saves.ts');

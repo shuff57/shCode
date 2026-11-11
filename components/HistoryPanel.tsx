@@ -8,16 +8,20 @@
 // The two sources stay separate because they mean different things:
 //   This device — localStorage snapshots (lib/local-history.ts), only here.
 //   Cloud       — saves in D1 (lesson_sync_history), reachable anywhere.
-// Selecting a version previews it. Restoring on This device changes only this
-// browser; restoring on Cloud also makes it the saved copy every device loads.
+// Selecting a version previews it. A restore never loses the code it replaces:
+// that code is kept first as a This-device version ("Before restoring ..."),
+// and, signed in, also saved to the account so it is in Cloud history, which
+// makes a restore something you can undo from either tab on any device. A
+// Cloud restore makes the chosen version the saved copy every device loads;
+// with `saveToAccount` a This-device restore does too.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { diffLines } from 'diff';
 import { useLessonStore } from '../lib/store';
 import { getCurrentUser } from '../lib/auth';
 import { restoreVersionToCloud } from '../lib/lesson-sync';
-import { TOGETHER_COPY, listLocalHistory, type LocalSnapshot } from '../lib/local-history';
-import type { FileMap } from '../lib/lesson-sync-merge';
+import { TOGETHER_COPY, addLocalSnapshot, listLocalHistory, type LocalSnapshot } from '../lib/local-history';
+import { filesEqual, type FileMap } from '../lib/lesson-sync-merge';
 import { Cloud, HardDrive, RotateCcw, Users, X } from 'lucide-react';
 
 interface HistoryPanelProps {
@@ -27,6 +31,8 @@ interface HistoryPanelProps {
   /** Called after a restore lands. The sandbox remounts its studio, which only
    *  hydrates from the file at mount; a lesson leaves it unset. */
   onRestore?: () => void;
+  /** Signed in and saving to the account: a restore from either tab is saved there too. */
+  saveToAccount?: boolean;
 }
 
 type Tab = 'device' | 'cloud';
@@ -169,7 +175,7 @@ const badgeStyle: React.CSSProperties = {
   fontWeight: 500,
 };
 
-export default function HistoryPanel({ isOpen, onClose, lessonId, onRestore }: HistoryPanelProps) {
+export default function HistoryPanel({ isOpen, onClose, lessonId, onRestore, saveToAccount = false }: HistoryPanelProps) {
   const [tab, setTab] = useState<Tab>('device');
   const [device, setDevice] = useState<LocalSnapshot[]>([]);
   const [deviceSel, setDeviceSel] = useState<LocalSnapshot | null>(null);
@@ -339,28 +345,41 @@ export default function HistoryPanel({ isOpen, onClose, lessonId, onRestore }: H
 
   const restore = async () => {
     if (!snapshot || restoring) return;
-    const toCloud = tab === 'cloud';
-    const question = toCloud
-      ? 'Restore this version for every device? It becomes the saved copy other devices load.'
-      : 'Restore this version on this device? Anything unsaved here will be replaced.';
+    const current = { ...useLessonStore.getState().fileContents };
+    if (filesEqual(current, snapshot)) {
+      setRestoreNote('This version is the same as your code now, so there is nothing to restore.');
+      return;
+    }
+    const toCloud = tab === 'cloud' || saveToAccount;
+    const when = snapshotTime ? fmtFull(snapshotTime) : 'earlier';
+    const question = `Restore the version from ${when}?\n\n`
+      + 'Your code now is kept in History first, so you can undo this by restoring it.'
+      + (toCloud ? ' The restored version also becomes the saved copy your other devices open.' : '');
     if (!window.confirm(question)) return;
 
     setRestoreNote(null);
+    setRestoring(true);
+    // Keep what is about to be replaced: on this device always, and in the
+    // account's Cloud history when the restore goes there, so it can be undone
+    // from anywhere. Saved while the editor still holds it.
+    addLocalSnapshot(lessonId, current, `Before restoring the version from ${when}`);
+    const keptInCloud = toCloud ? await restoreVersionToCloud(lessonId, current) : 'saved';
+
     useLessonStore.setState({ fileContents: { ...snapshot } });
 
     // This device only: the editor change is the whole action.
     if (!toCloud) {
+      setRestoring(false);
       onRestore?.();
       onClose();
       return;
     }
 
-    // Cloud: also write it back, so another device loading this lesson gets it.
-    setRestoring(true);
-    const result = await restoreVersionToCloud(lessonId, snapshot);
+    // Also write it back, so another device opening this gets it.
+    const result = keptInCloud === 'error' ? 'error' : await restoreVersionToCloud(lessonId, snapshot);
     setRestoring(false);
     if (result === 'error') {
-      setRestoreNote('Restored on this device, but could not save it for other devices. Press Save to try again.');
+      setRestoreNote('Restored on this device, but could not save it for other devices. Press Save to try again. Your code from before is in the This device tab.');
       onRestore?.();
       return;
     }
@@ -643,9 +662,9 @@ export default function HistoryPanel({ isOpen, onClose, lessonId, onRestore }: H
                     onClick={() => void restore()}
                     disabled={restoring}
                     title={
-                      tab === 'cloud'
-                        ? 'Restore this version and save it for every device'
-                        : 'Restore this version on this device only'
+                      tab === 'cloud' || saveToAccount
+                        ? 'Restore this version and save it for every device. Your code now is kept in History first.'
+                        : 'Restore this version on this device. Your code now is kept in History first.'
                     }
                     style={{
                       marginLeft: narrow ? 0 : 'auto',

@@ -106,7 +106,8 @@ check('Save is gated on being signed in', workspace.includes('lessonProgress.aut
 check('history restore remounts a reSHape model', workspace.includes('onRestore={() =>'), true);
 
 const modes = readFileSync(join(root, 'lib', 'sandbox-modes.ts'), 'utf8');
-check('each mode is its own lesson id', /id: `sandbox-\$\{mode\.id\}`/.test(modes), true);
+check('an old sandbox keeps its lesson id; a project brings its own', /lessonId = `sandbox-\$\{mode\.id\}`/.test(modes) && /id: lessonId,/.test(modes), true);
+check('the sandbox opens the project\'s lesson id', workspace.includes('sandboxLesson(mode, lessonId)'), true);
 
 console.log(`test-sandbox-cloud-save: ${n} checks`);
 rmSync(out, { recursive: true, force: true });

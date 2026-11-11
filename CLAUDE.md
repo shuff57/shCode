@@ -347,11 +347,33 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
 - `lesson-drafts` doubles as diagram storage (the serialized `DiagramDoc`);
   there is no diagram-specific table.
 - **The standalone `/sandbox` uses the lesson-sync save path**, not the retired
-  commit banner. Each mode is its own lesson id (`sandbox-js`, `sandbox-moshion`,
-  `sandbox-reshape`, `sandbox-flow`), so Save writes a `lesson_sync` row (and a
+  commit banner. Each **project** is its own lesson id, so Save writes a `lesson_sync` row (and a
   Cloud history row) and arrival merges another device's copy, exactly as a
   lesson does. The ids are absent from `lessons-manifest.json`, so
   `isLessonAccessible` fails open. localStorage remains the offline draft.
+- **Sandbox projects (migration 0049, 2026-11-11; not deployed yet).** A student keeps up to 30 named
+  sandbox programs, each one of the four types. The project switcher (`components/SandboxProjectPicker.tsx`)
+  replaced the type tabs (and the early-click script that served them): New project (type + name), and per
+  row Rename / Make a copy / Delete. The four old sandboxes keep their lesson ids (`sandbox-<mode>`, project id
+  = the mode), so no code moved; a new project is `sandbox-<mode>-<10 [a-z0-9]>` (`lib/sandbox-projects-core.ts`;
+  CODY's `SANDBOX_LESSON_RE` reads the type from it). `sandbox_projects` holds only the list (name, type,
+  tombstone `deleted_at`); the code stays in lesson_sync / history / the browser draft. `GET|POST
+  /api/sandbox-projects`, `PATCH|DELETE /api/sandbox-projects/[id]`: email from the session, a POST of an
+  existing id returns it (retries), of a deleted id 409s. An account's first GET seeds one project per old
+  `sandbox-<mode>` lesson_sync row (else the moSHion one); the browser POSTs an old sandbox it holds a
+  non-starter draft of. Delete tombstones and removes that lesson id's lesson_sync and history rows in one
+  batch; the browser clears its draft, This-device history and published-as record. Signed out, the list
+  lives in this browser only. Browser store: `lib/sandbox-projects.ts` (lists and the open project are
+  per account hash, so two students on one computer do not share a list). Remix makes a NEW moSHion project
+  (`remixIntoSandbox` is async; the limit is refused in plain words); "Open in sandbox" on your own game
+  reopens the project published as it. The published-as record is per project (`sandboxGameKey`). Still
+  shared by every moSHion project: the sketch-saves and lobby game key `'sandbox'`. Tests:
+  `scripts/test-sandbox-projects.mjs`. Apply 0049 before deploying.
+- **A History restore never loses the code it replaces** (`components/HistoryPanel.tsx`): it is kept first as
+  a This-device version "Before restoring the version from ...", and with `saveToAccount` (signed in; a lesson
+  passes `authed && !solutionLoaded`) it is pushed to the account before the chosen version, so both sit in
+  Cloud history and the restore can be undone from any device. Restoring from either tab then saves the chosen
+  version to the account.
 - Teacher pushes to a student's pool stamp `authored_by_email = session.email`
   server-side; clients cannot set it. Legacy NULLs coerce to `student_email`.
 - **CODY** (Code. Optimizer. Development. Yielder.) is the student-facing name of the `/api/ai-help` tutor. In the free sandbox (`lessonId` `sandbox-js|moshion|reshape`, code mode only) it answers directly with code blocks up to 15 lines but never writes the whole program (#83, `isSandboxHelp` in `functions/api/ai-help.ts`); code that carries `// STEP` comments, a `// 5.3.4`-style lesson header or "reference solution" is pasted course work and gets the hint-only rules, decided server-side because the lesson id is client-supplied. On Workers AI (the `AI` binding) students have no per-student cap and get `X-RateLimit-Unlimited: 1`; the UI hides the "helps left" line. The per-student per-unit quota below applies only on the Ollama fallback. The global ceiling counts both.
@@ -629,7 +651,7 @@ open with the code to read out. A mode button clicked before the sandbox hydrate
 ### Games library (Part B, migration 0042)
 A student publishes a moSHion sketch from the sandbox (`components/PublishGameButton.tsx`: title, share with my class,
 Update / Publish as a new game; which game the sandbox draft is published as lives in localStorage
-`shCode:sandbox-game`). Tables `library_games` (code <= 64 KB in UTF-8 bytes, `mode`/`players` read from
+`shCode:sandbox-game`, one record per moSHion project: `sandboxGameKey()` in `lib/games-client.ts`). Tables `library_games` (code <= 64 KB in UTF-8 bytes, `mode`/`players` read from
 `multiplayer('...', n)` by a regex that ignores comments, informational only, tombstone `deleted_at`, 30 live per
 account) and `library_game_shares`, same rules as `library_shares`: owner-only edit/delete, shared into the
 publisher's live classes (enrolled, plus taught for a teacher/admin), a class's teachers hide/unhide/remove, names as
