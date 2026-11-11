@@ -42,6 +42,12 @@
 // 'math' (centre, y up, counter-clockwise angles) and the showGrid() / showMouse()
 // helpers. It follows the moSHion repo's docs/data/moshion-docs.js Coordinates pages;
 // the default stays screen coordinates (top-left, y down), as in p5play.
+// The moSHion 3f1e70a sync (2026-11-12, the API audit) updated pages rather than adding
+// features: w/h resize the collider, group settings reach existing members, one table of
+// touch verbs (sensors gained overlapped()), mouse verbs take a button, getSpriteAt takes
+// a point and finds HUD sprites, world.rayCast with no callback, GrabberJoint.target, the
+// collider spellings and the errors for a typo, 60 frames a second on any screen, and two
+// new pages: "Fresh dice: random() and randomSeed()" and "Degrees for trig: angleMode()".
 // If a future lesson needs one of the still-listed items, that's a new gap to close then.
 
 import {
@@ -188,6 +194,8 @@ function draw() {
 
 Combine frameCount with Math.sin or Math.cos to get smooth back-and-forth motion without any physics.
 
+A game runs 60 frames a second on every screen, including 120 Hz and 144 Hz monitors, so frameCount, vel.x and every() mean the same thing on any computer. A slow computer can still fall below 60.
+
 frameRate() (no arguments) returns how many frames per second your sketch is actually managing right now — call it inside draw() and print it if you want to see whether a busy scene is slowing things down.`,
         code: `let ball;
 
@@ -207,6 +215,27 @@ function draw() {
   fill('white');
   textSize(14);
   text('frame ' + frameCount, 10, 20);
+}`,
+      },
+      {
+        title: 'Fresh dice: random() and randomSeed()',
+        body: `random() with nothing in the brackets gives a number from 0 up to (not including) 1. random(10) gives one from 0 up to 10, random(5, 10) one from 5 up to 10, and random(['red', 'gold', 'lime']) picks one item from a list.
+
+Every time you press Run, the numbers are different, so each playthrough deals a new level, a new enemy wave, a new set of stars.
+
+To get the same numbers every run, call randomSeed(n) at the top of setup() with any whole number. The same seed always gives the same sequence. That helps when you are hunting a bug that only happens with one particular layout: seed it, and the layout comes back every time.`,
+        code: `function setup() {
+  new Canvas(400, 300);
+  // randomSeed(7); // uncomment: the same stars every run
+  for (let i = 0; i < 40; i++) {
+    const star = new Sprite(random(400), random(300), random(2, 6));
+    star.collider = 'none';
+    star.color = random(['white', 'gold', 'lightblue']);
+  }
+}
+
+function draw() {
+  background('#112');
 }`,
       },
       {
@@ -430,7 +459,9 @@ function draw() {
 
 'dynamic' is the default — gravity pulls it, other sprites push it. Use it for players, enemies, projectiles.
 
-'static' never moves and never reacts. Use it for floors, walls, and platforms. 'kinematic' moves only when you set its velocity — gravity ignores it. Use it for moving platforms and doors. 'none' turns physics off entirely — the sprite still draws, but nothing collides with it. Use it for cursors, UI, and decorations. A sprite with collider = 'none' is a sensor: you can still detect overlaps, but there's no physical pushback.`,
+'static' never moves and never reacts. Use it for floors, walls, and platforms. 'kinematic' moves only when you set its velocity — gravity ignores it. Use it for moving platforms and doors. 'none' turns physics off entirely — the sprite still draws, but nothing collides with it. Use it for cursors, UI, and decorations. A sprite with collider = 'none' is a sensor: you can still detect overlaps, but there's no physical pushback.
+
+The type works on circles too: new Sprite(x, y, 30, 'static') is a static ball. Capital letters are fine ('Static'), and so is the first letter alone ('s'). A misspelt type such as 'statik' stops the sketch with an error that lists the four real ones, instead of quietly making a dynamic sprite. sprite.body and sprite.physicsType are older names for the same setting.`,
         code: `let elevator;
 
 function setup() {
@@ -523,7 +554,11 @@ function draw() {
 
 You can also pass a body type as the last argument: new Sprite(x, y, w, h, 'static').
 
-The engine chooses the collider shape from these arguments — you don't set a .shape property directly (though you can read it to check whether a sprite is 'circle' or 'rect').`,
+new Sprite() with no numbers at all makes a 50×50 square in the middle of what the camera shows.
+
+You can change the size later: .w and .h (or .width and .height, or .diameter for a circle) resize the sprite AND its collider, so what you see is what bumps into things. On a circle, setting either .w or .h sets both, because a circle has one size. .scale is different: it only changes how the sprite is drawn.
+
+You can read .shape to check whether a sprite is 'circle' or 'rect', and set it to switch ('box' means the same as 'rect').`,
         code: `function setup() {
   new Canvas(400, 400);
   world.gravity.y = 10;
@@ -701,6 +736,37 @@ function update() {
   const dx = mouseX - turret.x, dy = mouseY - turret.y;
   const angleToMouse = Math.atan2(dy, dx) * 180 / Math.PI;
   turret.rotateTo(angleToMouse, 4); // turns at most 4°/frame toward the mouse
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
+      {
+        title: 'Degrees for trig: angleMode()',
+        body: `Every angle on a sprite is in degrees: rotation, direction, angleTo(). But cos(), sin() and tan() start out in radians, the unit math uses, where a half turn is PI (about 3.14) instead of 180. So cos(90) is not 0.
+
+Call angleMode(DEGREES) once at the top of setup() and they switch to degrees: cos(90) is 0, sin(90) is 1, and atan2(y, x) gives its answer back in degrees. Now the angle a sprite faces goes straight into cos() and sin(): the example below fires a dot the way a spinning turret points.
+
+angleMode(RADIANS) switches back, and angleMode() with nothing tells you which one is on.`,
+        code: `let turret;
+
+function setup() {
+  new Canvas(400, 300);
+  angleMode(DEGREES);
+  turret = new Sprite(200, 150, 40, 12, 'static');
+  turret.color = 'gold';
+}
+
+function update() {
+  turret.rotation += 2;
+  if (frameCount % 20 === 0) {
+    const shot = new Sprite(turret.x, turret.y, 8);
+    shot.collider = 'none';
+    shot.vel.x = cos(turret.rotation) * 4;
+    shot.vel.y = sin(turret.rotation) * 4;
+    shot.life = 60;
+  }
 }
 
 function draw() {
@@ -1029,7 +1095,14 @@ Dynamic and static sprites collide by default. To let one sprite pass through an
 
 Use colliding for ground checks, walls, and enemies that block the player. Use overlapping for coins, goal zones, power-ups, and other triggers that shouldn't shove the player.
 
-overlaps() is a question you ask, not a setting you turn on. a.overlaps(b) answers "are these touching right now?" and changes nothing, so calling it once in setup() does not make a and b pass through each other (in p5play it does). To let a coin, a pickup or a bullet pass through, set its collider to 'none'; then ask overlaps() or overlapping() every frame in update() to find out when something reaches it.`,
+overlaps() is a question you ask, not a setting you turn on. a.overlaps(b) answers "are these touching right now?" and changes nothing, so calling it once in setup() does not make a and b pass through each other (in p5play it does). To let a coin, a pickup or a bullet pass through, set its collider to 'none'; then ask overlaps() or overlapping() every frame in update() to find out when something reaches it.
+
+The six questions follow one pattern. The -s word is the first frame, the -ing word counts frames while it lasts, and the -ed word is the frame it ends:
+
+collides(b), colliding(b), collided(b) — the physical bodies touching.
+overlaps(b), overlapping(b), overlapped(b) — the shapes overlapping, whatever the colliders.
+
+overlaps() is the one exception: it is true on every frame the two overlap, not only the first. For the first frame only, ask overlapping(b) === 1.`,
         code: `let player, wall, zone;
 
 function setup() {
@@ -1112,7 +1185,7 @@ function draw() {
 
 colliding() reads real physics contacts from Box2D — it's not the same as the manual bounding-box math that overlaps() uses. Use colliding(ground) before a jump to confirm the player is standing on something solid.
 
-If you need to know which sprite was hit, iterate the group yourself and test one-by-one. When you delete sprites in response to a hit, loop over [...group] (a copy) so the shrinking group doesn't skip items.`,
+If you need to know which sprite was hit, pass a callback, which works on all six questions: player.collides(enemies, (p, e) => e.delete()). Or iterate the group yourself and test one-by-one. When you delete sprites in response to a hit, loop over [...group] (a copy) so the shrinking group doesn't skip items.`,
         code: `let player, enemies;
 let hp = 3;
 
@@ -1161,7 +1234,9 @@ A sensor fixes that. sprite.addSensor(offsetX, offsetY, w, h) adds a box that ri
 
 The offsets are measured from the sprite's centre. For a player 40 tall, the feet are 20 below the centre, so a strip 4 tall at offset 21 sits just under them. Make it a little narrower than the player so it doesn't touch a wall beside them.
 
-A sensor has two questions: feet.overlaps(walls) (true or false) and feet.overlapping(walls) (how many frames it has been touching). feet.remove() takes it off again; deleting the sprite does that too.`,
+A sensor has three questions: feet.overlaps(walls) (true or false), feet.overlapping(walls) (how many frames it has been touching) and feet.overlapped(walls) (true on the frame it stops touching: the moment the player leaves the ground). Each takes a callback too, like a sprite's: feet.overlaps(walls, (sensor, wall) => { ... }). feet.remove() takes it off again; deleting the sprite does that too.
+
+Another way to ask "is something under me?" is a ray: world.rayCast(player.x, player.y + 21, player.x, player.y + 27) looks along that short line and gives back what it hits first, or null if nothing is there. It looks straight through sensors and collider 'none' sprites, so a coin under your feet does not count as ground.`,
         code: `let player, walls, feet;
 
 function setup() {
@@ -1205,6 +1280,8 @@ function draw() {
       {
         title: 'Spawning and defaults',
         body: `A Group holds many sprites that share traits. Set a property on the group and every sprite spawned into it inherits that value as its default.
+
+Settings for how a sprite looks and what it is made of also change the sprites already in the group: enemies.color = 'red' turns every current enemy red, and the next one made too. That covers color, stroke, layer, visible, opacity, text, size (w, h, diameter), collider, bounciness, friction, density and drag. Where a sprite is and how it moves (x, y, vel, rotation, life) only set the starting value for new sprites, and so does any property you invent yourself, like enemies.hp = 3.
 
 Create a group with new Group(). Then spawn sprites into it with new groupName.Sprite(...) — note the capital S. That factory reads the group's color, diameter, collider, and other defaults, copies them onto the new sprite, and adds the sprite to the group.
 
@@ -1634,7 +1711,7 @@ function draw() {
 
 mouse.pressing() returns true while any mouse button is held. mouse.presses() is true only on the first frame of a click — use it for single-shot actions. mouse.released() is true on the frame the button is released.
 
-To tell the buttons apart, mouse.left, mouse.center and mouse.right each count one button on their own. mouse.pos is the cursor as an {x, y} object, handy for passing straight to a method that takes a target.
+To tell the buttons apart, give the button's name: mouse.presses('right') is the first frame of a right-click, mouse.pressing('left') is true while the left button is held, and the same works for 'center' and for released(). With nothing in the brackets they answer for any button. mouse.left, mouse.center and mouse.right also count how many frames each button has been held. mouse.pos is the cursor as an {x, y} object, handy for passing straight to a method that takes a target.
 
 mouse.x and mouse.y are world coordinates — they already include the camera, so comparing them to a sprite's x and y always works. mouse.canvasPos is the same cursor measured in screen pixels instead. Use it for anything pinned to the screen rather than the world, like a HUD button: once the camera scrolls, mouse.x is somewhere out in the level while canvasPos is still where the cursor looks like it is.
 
@@ -1699,7 +1776,9 @@ function drawTop() {
       },
       {
         title: 'Hit-testing with the mouse',
-        body: `world.getSpriteAt(x, y) returns the top-most (highest layer) sprite at that world position, or undefined if nothing is there. It checks both circles (radius test) and rectangles (bounding box).
+        body: `world.getSpriteAt(x, y) returns the top-most sprite at that world position, or undefined if nothing is there: the highest layer, and between two on the same layer, the one made later (the one drawn on top). It checks both circles (radius test) and rectangles (bounding box). It also takes a point, world.getSpriteAt(mouse), and it finds a screenSpace HUD sprite where it is drawn, even after the camera has scrolled.
+
+world.getSpritesAt(x, y) returns every sprite there, top-most first.
 
 This is the pattern for click-to-select: on mouse.presses(), call world.getSpriteAt(mouse.x, mouse.y) and remember the result. Then you can drag it, change its color, or delete it.`,
         code: `let selected;
@@ -1861,11 +1940,13 @@ function draw() {
       },
       {
         title: 'GrabberJoint',
-        body: `A GrabberJoint lets you pull a physics sprite toward a target position with a spring force. It's how you drag boxes around in a physics puzzle.
+        body: `A GrabberJoint pulls a physics sprite toward a target point with a spring force. It's how you drag boxes around in a physics puzzle: the box swings and tumbles on the way instead of teleporting.
 
-Create it with new GrabberJoint(anchorSprite, draggedSprite, options). The anchor is usually a static sprite at a fixed position. Pass { maxForce: 200 } to control how strong the pull is — higher values feel snappier.
+Create it with new GrabberJoint(anchorSprite, draggedSprite, options). The anchor is any static sprite; the pull starts at the dragged sprite. Pass { maxForce: 200 } to control how strong the pull is — higher values feel snappier.
 
-Call joint.delete() to release the sprite.`,
+Move the target by setting joint.target to a point. grab.target = mouse every frame drags the sprite after the cursor.
+
+Call joint.delete() (or joint.remove()) to let go.`,
         code: `let box, anchor, grab;
 
 function setup() {
@@ -1873,7 +1954,7 @@ function setup() {
   world.gravity.y = 10;
   new Sprite(200, 380, 400, 20, 'static');
 
-  anchor = new Sprite(200, 200, 10, 10, 'static');
+  anchor = new Sprite(0, 0, 4, 4, 'static');
   anchor.visible = false;
 
   box = new Sprite(200, 300, 50, 50);
@@ -1881,15 +1962,10 @@ function setup() {
 }
 
 function update() {
-  if (mouse.presses() && world.getSpriteAt(mouse.x, mouse.y) === box) {
-    anchor.x = mouse.x;
-    anchor.y = mouse.y;
+  if (mouse.presses() && world.getSpriteAt(mouse) === box) {
     grab = new GrabberJoint(anchor, box, { maxForce: 200 });
   }
-  if (grab && mouse.pressing()) {
-    anchor.x = mouse.x;
-    anchor.y = mouse.y;
-  }
+  if (grab) grab.target = mouse;
   if (mouse.released() && grab) {
     grab.delete();
     grab = null;
@@ -1939,7 +2015,7 @@ function draw() {
         title: 'addAni and changeAni',
         body: `moSHion supports minimal sprite-sheet animation. sprite.addAni(name, sheetUrl, frameCount) loads a horizontal frame strip from an image URL and registers it under the given name. The first addAni call auto-activates that animation.
 
-sprite.changeAni(name) switches to a previously registered animation. If the name isn't found, it's a silent no-op — nothing happens.
+sprite.changeAni(name) switches to a previously registered animation. If the name isn't found, nothing changes, and the console says so once, listing the names the sprite does have — a misspelt name otherwise looks just like a frozen sprite.
 
 ani.frameDelay controls how many game frames each animation frame is held for (default 4). Set it on the Ani object returned by addAni, or on sprite.ani.frameDelay after activation.
 

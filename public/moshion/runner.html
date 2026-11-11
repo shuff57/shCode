@@ -320,6 +320,15 @@
 <script src="./textures/textures.js"></script>
 <script src="./moshion.js"></script>
 <script src="./extras.js"></script>
+<script>
+	/* A fresh random() sequence every run (upstream 3f1e70a). The engine's
+	   own default seed is fixed, so scripts/moshion-harness.mjs (which loads
+	   moshion.js without this page) still replays a sketch byte for byte --
+	   but in a student's hands every playthrough rolled the same dice. A
+	   sketch that wants a repeatable run calls randomSeed(n) in setup(),
+	   which comes after this. */
+	if (typeof randomSeed === 'function') randomSeed((Math.random() * 4294967296) >>> 0);
+</script>
 </head>
 <body>
 <div id="error"></div>

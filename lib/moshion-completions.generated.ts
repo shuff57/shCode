@@ -23,6 +23,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "info": ""
  },
  {
+  "label": "angleMode",
+  "type": "function",
+  "detail": "(mode?: typeof DEGREES | typeof RADIANS): typeof DEGREES | typeof RADIANS",
+  "info": "Sets the unit cos/sin/tan take and atan/atan2 return."
+ },
+ {
   "label": "Ani",
   "type": "class",
   "detail": "class",
@@ -35,10 +41,16 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "info": ""
  },
  {
+  "label": "atan",
+  "type": "function",
+  "detail": "(v: number): number",
+  "info": "Returns radians, or degrees after angleMode(DEGREES)."
+ },
+ {
   "label": "atan2",
   "type": "function",
   "detail": "(y: number, x: number): number",
-  "info": ""
+  "info": "Returns radians, or degrees after angleMode(DEGREES)."
  },
  {
   "label": "background",
@@ -110,7 +122,7 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "label": "cos",
   "type": "function",
   "detail": "(angle: number): number",
-  "info": ""
+  "info": "Radians by default; degrees after angleMode(DEGREES), the unit every sprite angle (rotation, direction, angleTo) already uses."
  },
  {
   "label": "createVector",
@@ -122,6 +134,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "label": "degrees",
   "type": "function",
   "detail": "(rad: number): number",
+  "info": ""
+ },
+ {
+  "label": "DEGREES",
+  "type": "constant",
+  "detail": "'degrees'",
   "info": ""
  },
  {
@@ -230,7 +248,7 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "label": "Group",
   "type": "class",
   "detail": "class",
-  "info": ""
+  "info": "A list of sprites that share settings."
  },
  {
   "label": "HALF_PI",
@@ -272,7 +290,7 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "label": "Joint",
   "type": "class",
   "detail": "class",
-  "info": ""
+  "info": "Every joint throws a TypeError if either argument is not a live Sprite, or if both are the same sprite."
  },
  {
   "label": "kb",
@@ -455,6 +473,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "info": ""
  },
  {
+  "label": "RADIANS",
+  "type": "constant",
+  "detail": "'radians'",
+  "info": ""
+ },
+ {
   "label": "random",
   "type": "function",
   "detail": "(): number",
@@ -620,6 +644,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "label": "strokeWeight",
   "type": "function",
   "detail": "(n: number): void",
+  "info": ""
+ },
+ {
+  "label": "tan",
+  "type": "function",
+  "detail": "(angle: number): number",
   "info": ""
  },
  {
@@ -850,7 +880,7 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "w",
    "type": "property",
    "detail": "number",
-   "info": ""
+   "info": "Width and height."
   },
   {
    "label": "h",
@@ -862,18 +892,18 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "shape",
    "type": "property",
    "detail": "'circle' | 'rect'",
-   "info": ""
-  },
-  {
-   "label": "body",
-   "type": "property",
-   "detail": "'static' | 'kinematic' | 'dynamic'",
-   "info": ""
+   "info": "'box' is accepted as another name for 'rect'."
   },
   {
    "label": "collider",
    "type": "property",
-   "detail": "'static' | 'kinematic' | 'dynamic' | 'none'",
+   "detail": "Collider",
+   "info": "How the sprite takes part in physics: 'dynamic' moves, falls, gets pushed (the default) 'static' never moves: floors and walls 'kinematic' moves only by its vel"
+  },
+  {
+   "label": "body",
+   "type": "property",
+   "detail": "Collider",
    "info": ""
   },
   {
@@ -898,7 +928,7 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "density",
    "type": "property",
    "detail": "number",
-   "info": ""
+   "info": "Default 1."
   },
   {
    "label": "mass",
@@ -999,25 +1029,25 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
   {
    "label": "overlaps",
    "type": "method",
-   "detail": "(other: Sprite | Group): boolean",
+   "detail": "(other: Sprite | Group, cb?: (self: Sprite, other: Sprite) => void): boolean",
    "info": ""
   },
   {
    "label": "colliding",
    "type": "method",
-   "detail": "(other: Sprite | Group): number",
+   "detail": "(other: Sprite | Group, cb?: (self: Sprite, other: Sprite) => void): number",
    "info": ""
   },
   {
    "label": "collides",
    "type": "method",
-   "detail": "(other: Sprite | Group): boolean",
+   "detail": "(other: Sprite | Group, cb?: (self: Sprite, other: Sprite) => void): boolean",
    "info": ""
   },
   {
    "label": "collided",
    "type": "method",
-   "detail": "(other: Sprite | Group): boolean",
+   "detail": "(other: Sprite | Group, cb?: (self: Sprite, other: Sprite) => void): boolean",
    "info": ""
   },
   {
@@ -1031,6 +1061,12 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "type": "method",
    "detail": "(other: Sprite | Group, cb?: (self: Sprite, other: Sprite) => void): boolean",
    "info": ""
+  },
+  {
+   "label": "remove",
+   "type": "method",
+   "detail": "(s: Sprite): void",
+   "info": "Takes `s` out of this group only."
   },
   {
    "label": "distanceTo",
@@ -1054,7 +1090,7 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "moveTowards",
    "type": "method",
    "detail": "(x: number, y: number, tracking?: number): void",
-   "info": ""
+   "info": "Steps this fraction (default 0.1) of the remaining distance to the target every call — call once per update() frame for a smooth approach."
   },
   {
    "label": "moveAway",
@@ -1093,12 +1129,6 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "info": ""
   },
   {
-   "label": "remove",
-   "type": "method",
-   "detail": "(): void",
-   "info": ""
-  },
-  {
    "label": "addSensor",
    "type": "method",
    "detail": "(offsetX?: number, offsetY?: number, w?: number, h?: number): Sensor",
@@ -1120,13 +1150,13 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "rotationLock",
    "type": "property",
    "detail": "boolean",
-   "info": "True freezes rotation."
+   "info": "True freezes rotation, including explicit angularVelocity writes."
   },
   {
    "label": "rotationSpeed",
    "type": "property",
    "detail": "number",
-   "info": "Live alias of angularVelocity, degrees per frame."
+   "info": ""
   },
   {
    "label": "gravityScale",
@@ -1138,7 +1168,7 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "rollingResistance",
    "type": "property",
    "detail": "number",
-   "info": "Alias of drag; planck has no true rolling resistance."
+   "info": ""
   },
   {
    "label": "applyTorque",
@@ -1185,8 +1215,8 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
   {
    "label": "physicsType",
    "type": "property",
-   "detail": "'dynamic' | 'static' | 'kinematic' | 'none'",
-   "info": "Alias of .collider."
+   "detail": "Collider",
+   "info": ""
   },
   {
    "label": "physicsEnabled",
@@ -1204,7 +1234,7 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "visualOnly",
    "type": "property",
    "detail": "boolean",
-   "info": "Draw only — no physics body participation."
+   "info": "The opposite of physicsEnabled (the same flag, read the other way)."
   },
   {
    "label": "angleToFace",
@@ -1276,7 +1306,7 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "colour",
    "type": "property",
    "detail": "string",
-   "info": "Aliases of .color."
+   "info": ""
   },
   {
    "label": "fill",
@@ -1415,14 +1445,20 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
   {
    "label": "overlaps",
    "type": "method",
-   "detail": "(other: Sprite | Group): boolean",
+   "detail": "(other: Sprite | Group, cb?: (sensor: Sensor, other: Sprite) => void): boolean",
    "info": "True while this sensor touches `other` (any member, for a Group)."
   },
   {
    "label": "overlapping",
    "type": "method",
-   "detail": "(other: Sprite | Group): number",
+   "detail": "(other: Sprite | Group, cb?: (sensor: Sensor, other: Sprite) => void): number",
    "info": "Frames it has been touching `other` (the longest member, for a Group); 0 when not."
+  },
+  {
+   "label": "overlapped",
+   "type": "method",
+   "detail": "(other: Sprite | Group, cb?: (sensor: Sensor, other: Sprite) => void): boolean",
+   "info": "True on the frame it stops touching `other`."
   },
   {
    "label": "remove",
@@ -1466,12 +1502,6 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "push",
    "type": "method",
    "detail": "(...sprites: Sprite[]): number",
-   "info": ""
-  },
-  {
-   "label": "remove",
-   "type": "method",
-   "detail": "(s: Sprite): void",
    "info": ""
   },
   {
@@ -1663,12 +1693,6 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "info": ""
   },
   {
-   "label": "remove",
-   "type": "method",
-   "detail": "(s: Sprite): void",
-   "info": ""
-  },
-  {
    "label": "overlaps",
    "type": "method",
    "detail": "(other: Sprite | Group, cb?: (self: Sprite, other: Sprite) => void): boolean",
@@ -1827,6 +1851,12 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "type": "method",
    "detail": "(): void",
    "info": ""
+  },
+  {
+   "label": "remove",
+   "type": "method",
+   "detail": "(): void",
+   "info": "Same as delete()."
   }
  ],
  "DistanceJoint": [
@@ -1841,6 +1871,32 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "type": "method",
    "detail": "(): void",
    "info": ""
+  },
+  {
+   "label": "remove",
+   "type": "method",
+   "detail": "(): void",
+   "info": "Same as delete()."
+  }
+ ],
+ "GrabberJoint": [
+  {
+   "label": "target",
+   "type": "property",
+   "detail": "Vec2",
+   "info": "Where sprite b is pulled to."
+  },
+  {
+   "label": "delete",
+   "type": "method",
+   "detail": "(): void",
+   "info": ""
+  },
+  {
+   "label": "remove",
+   "type": "method",
+   "detail": "(): void",
+   "info": "Same as delete()."
   }
  ],
  "Sound": [
@@ -1952,7 +2008,7 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "getSpriteAt",
    "type": "method",
    "detail": "(x: number, y: number): Sprite | undefined",
-   "info": ""
+   "info": "The topmost sprite at a point (highest layer; on a tie, the one made later), or undefined."
   },
   {
    "label": "getSpritesAt",
@@ -1999,8 +2055,34 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
   {
    "label": "rayCast",
    "type": "method",
-   "detail": "(x1: number | { x: number; y: number; }, y1: number | { x: number; y: number; }, x2: number, y2: number, callback: (sprite: Sprite | null, point: Vec2, normal: Vec2, fraction: number) => number): void",
+   "detail": "(x1: number, y1: number, x2: number, y2: number): RayHit | null",
    "info": "Ray-cast the world for all fixtures in the path of the ray."
+  }
+ ],
+ "RayHit": [
+  {
+   "label": "sprite",
+   "type": "property",
+   "detail": "Sprite | null",
+   "info": "The sprite hit, or null for a body that is not a sprite."
+  },
+  {
+   "label": "point",
+   "type": "property",
+   "detail": "Vec2",
+   "info": ""
+  },
+  {
+   "label": "normal",
+   "type": "property",
+   "detail": "Vec2",
+   "info": ""
+  },
+  {
+   "label": "fraction",
+   "type": "property",
+   "detail": "number",
+   "info": "0..1, how far along the ray."
   }
  ],
  "Kb": [
@@ -2011,13 +2093,13 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "info": ""
   },
   {
-   "label": "pressing",
+   "label": "presses",
    "type": "method",
    "detail": "(key: string): boolean",
    "info": ""
   },
   {
-   "label": "presses",
+   "label": "pressing",
    "type": "method",
    "detail": "(key: string): boolean",
    "info": ""
@@ -2032,7 +2114,7 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "holding",
    "type": "method",
    "detail": "(key: string): number",
-   "info": ""
+   "info": "Frames held, once held past holdThreshold; 0 before that."
   },
   {
    "label": "held",
@@ -2182,7 +2264,7 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "releases",
    "type": "method",
    "detail": "(key: string): boolean",
-   "info": "Alias of released() — true on the frame the key comes back up."
+   "info": ""
   }
  ],
  "Mouse": [
@@ -2225,50 +2307,56 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
   {
    "label": "pressing",
    "type": "method",
-   "detail": "(): boolean",
+   "detail": "(button?: MouseButton): boolean",
    "info": ""
   },
   {
    "label": "presses",
    "type": "method",
-   "detail": "(): boolean",
+   "detail": "(button?: MouseButton): boolean",
    "info": ""
   },
   {
    "label": "holds",
    "type": "method",
-   "detail": "(): boolean",
+   "detail": "(button?: MouseButton): boolean",
    "info": ""
   },
   {
    "label": "holding",
    "type": "method",
-   "detail": "(): number",
+   "detail": "(button?: MouseButton): number",
    "info": ""
   },
   {
    "label": "held",
    "type": "method",
-   "detail": "(): boolean",
+   "detail": "(button?: MouseButton): boolean",
    "info": ""
   },
   {
    "label": "released",
    "type": "method",
-   "detail": "(): boolean",
+   "detail": "(button?: MouseButton): boolean",
    "info": ""
   },
   {
    "label": "pressed",
    "type": "method",
-   "detail": "(): boolean",
+   "detail": "(button?: MouseButton): boolean",
+   "info": ""
+  },
+  {
+   "label": "releases",
+   "type": "method",
+   "detail": "(button?: MouseButton): boolean",
    "info": ""
   },
   {
    "label": "left",
    "type": "property",
    "detail": "number",
-   "info": ""
+   "info": "Frames this button has been held (0 when up)."
   },
   {
    "label": "center",
@@ -2280,12 +2368,6 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "right",
    "type": "property",
    "detail": "number",
-   "info": ""
-  },
-  {
-   "label": "releases",
-   "type": "method",
-   "detail": "(): boolean",
    "info": ""
   },
   {
@@ -2314,27 +2396,27 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
   },
   {
    "label": "drag",
-   "type": "method",
-   "detail": "(button?: number): number",
-   "info": "Per-button drag counters, same signed-counter scheme as the press verbs."
+   "type": "property",
+   "detail": "((button?: MouseButton) => number) & { readonly left: number; readonly center: number; readonly right: number }",
+   "info": "The raw drag counter for a button (default 'left'): frames moved while held, negative for one frame on release."
   },
   {
    "label": "dragging",
    "type": "method",
-   "detail": "(button?: number): number",
-   "info": ""
+   "detail": "(button?: MouseButton): number",
+   "info": "Frames the pointer has moved with this button held; 0 when not."
   },
   {
    "label": "drags",
    "type": "method",
-   "detail": "(button?: number): boolean",
-   "info": ""
+   "detail": "(button?: MouseButton): boolean",
+   "info": "The first frame of a drag."
   },
   {
    "label": "dragged",
    "type": "method",
-   "detail": "(button?: number): boolean",
-   "info": ""
+   "detail": "(button?: MouseButton): boolean",
+   "info": "The frame a drag ends."
   }
  ],
  "Camera": [
@@ -2489,12 +2571,6 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "info": ""
   },
   {
-   "label": "remove",
-   "type": "method",
-   "detail": "(s: Sprite): void",
-   "info": ""
-  },
-  {
    "label": "overlaps",
    "type": "method",
    "detail": "(other: Sprite | Group, cb?: (self: Sprite, other: Sprite) => void): boolean",
@@ -2627,6 +2703,12 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "type": "method",
    "detail": "(): void",
    "info": ""
+  },
+  {
+   "label": "remove",
+   "type": "method",
+   "detail": "(): void",
+   "info": "Same as delete()."
   }
  ],
  "SliderJoint": [
@@ -2635,6 +2717,12 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "type": "method",
    "detail": "(): void",
    "info": ""
+  },
+  {
+   "label": "remove",
+   "type": "method",
+   "detail": "(): void",
+   "info": "Same as delete()."
   }
  ],
  "WheelJoint": [
@@ -2643,14 +2731,12 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "type": "method",
    "detail": "(): void",
    "info": ""
-  }
- ],
- "GrabberJoint": [
+  },
   {
-   "label": "delete",
+   "label": "remove",
    "type": "method",
    "detail": "(): void",
-   "info": ""
+   "info": "Same as delete()."
   }
  ],
  "GlueJoint": [
@@ -2659,6 +2745,12 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "type": "method",
    "detail": "(): void",
    "info": ""
+  },
+  {
+   "label": "remove",
+   "type": "method",
+   "detail": "(): void",
+   "info": "Same as delete()."
   }
  ],
  "Game": [

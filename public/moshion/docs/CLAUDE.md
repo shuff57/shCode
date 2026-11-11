@@ -10,9 +10,9 @@ hand-authored JavaScript facade over [planck.js][] (a pure-JS/TS port of
 Box2D). There is no build step, no bundler, no test suite, and no linter
 configured.
 
-- `moshion.js` (~800 lines) — the entire engine. Edit directly; do not split
+- `moshion.js` (~4,100 lines) — the entire engine. Edit directly; do not split
   without discussion.
-- `moshion.d.ts` (~170 lines) — public API types. Keep in sync with runtime
+- `moshion.d.ts` (~1,000 lines) — public API types. Keep in sync with runtime
   behavior in `moshion.js`.
 - `planck.min.js` — vendored planck.js v1.5.0 (MIT). Do not edit.
 - `runner.html` — sandbox host used by the app's preview iframes
@@ -129,6 +129,30 @@ frame has run (Error). The in-app docs teach it in the Coordinates section of
 `5.1.26 Lab: A grid like math (optional)` (`lessons/5-1-25-math-grid`).
 
 ### Key invariants when editing
+
+- **The loop runs 60 game frames a second, not one per screen refresh**
+  (upstream 3f1e70a). `loop()` skips a requestAnimationFrame tick that comes
+  before the next frame is due, carrying the remainder so 144 Hz still
+  averages 60; it never runs two frames in one tick. Every unit is per frame,
+  so one frame per rAF ran a 144 Hz screen 2.4x fast. The node harness
+  (`scripts/moshion-harness.mjs`) advances its clock by `FRAME_MS` per step,
+  so every step still runs exactly one frame. A stub that steps with a
+  frozen clock would now run no frames at all.
+- **`w`/`h` are accessors that rebuild the collider**, as `diameter` always
+  did. A size that cannot be a collider (0, NaN, Infinity) changes the drawing
+  only (`_physW/_physH` keep the last good size). Write `_w/_h` internally when
+  no rebuild is wanted.
+- **Group properties cascade.** The names in `GROUP_CASCADE_` are accessors on
+  `Group.prototype`: a write sets every current member and records a default
+  in `group._defaults`, replayed by `new group.Sprite()` before the group's own
+  enumerable fields (made-up ones like `hp`). Position, motion and `life` are
+  deliberately not on the list.
+- **`collider` is the one body-type setting**; `body` and `physicsType` alias
+  it, and `_colliderName()` normalises/validates every spelling (a typo throws).
+- **One walk for the touch verbs**: `Sprite.prototype._verb` (shared by
+  `Sensor`) and `Group.prototype._verb`.
+- **`random()`'s default seed is fixed**, so the harness replays a sketch byte
+  for byte; `runner.html` (shCode's own) reseeds it per run for players.
 
 - **Units are pixels-per-frame for velocity, degrees-per-frame for angular
   velocity, raw Newtons for `applyForce`, raw m/s² for gravity.** The facade
