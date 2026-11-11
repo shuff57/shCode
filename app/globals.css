@@ -3469,9 +3469,6 @@ a.mod-row.is-next {
 .docs-set-link:hover .docs-set-name { color: var(--c-cyan); }
 .docs-set-link:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 3px; border-radius: 2px; }
 
-/* Account: Save with nothing changed reads as not ready (meta text on the card, a line outline in place of
-   the fill; same box size), never as a half-transparent primary that looks pressable. */
-
 /* Quiz on a wide screen: the "N of M answered" count is docked to the question column, right-aligned on
    the "Check your understanding" row, and that row stays in view (sticky) while the questions scroll.
    Replaces the r3 floating column beside the questions. */
@@ -3488,3 +3485,197 @@ a.mod-row.is-next {
   }
   .student-quiz > .quiz-head > .quiz-answered-count + div { margin-left: 0 !important; }
 }
+
+/* climb4 r5 rail inset */
+/* Desktop tool rail, drawer CLOSED: each tab is a whole rounded button (all four borders) set 10px in from the
+   viewport edge, so nothing reads as cut off. Drawer OPEN (.shd-open, set by TabbedRightDrawer): the earlier
+   rules still apply, so the tabs sit flush on the drawer's edge and follow a drag-resize (html.shd-resizing
+   keeps its transition: none). Phone dock untouched. Revert = delete this block and the `shd-open` class. */
+@media (min-width: 721px) {
+  :root { --shd-rail-inset: 10px; }
+  body .shd-tabstrip:not(.shd-open) { right: var(--shd-rail-inset) !important; }
+  body .shd-tabstrip:not(.shd-open) .shd-tab { border-right: 1px solid var(--c-line) !important; border-radius: 6px !important; }
+  body .shd-tabstrip:not(.shd-open) .shd-tab:hover { border-color: var(--shd-tab-accent, var(--c-purple)) !important; }
+  body:has(.lesson-progress-footer):has(.shd-tabstrip:not(.shd-open)) .issue-fab {
+    right: calc(var(--shd-rail-inset) + (var(--shd-rail-width) - 34px) / 2);
+  }
+}
+/* end climb4 r5 rail inset */
+
+/* climb4 r5 student */
+/* One way forward at the bottom of a lesson: once the completion panel (Next: ...), the written grader
+   (Continue to next lesson) or the diagram (Next lesson) shows its own Next, the bottom prev/next pair goes;
+   the header's pair stays. A quiz has no Next of its own, so its bottom pair stays. */
+.content-lesson-main:has(:is(.completion-next, .lesson-next-action)) .lesson-bottom-nav { display: none; }
+
+/* climb4 r5 teacher */
+/* Gradebook pager: one module per page (app/teacher/page.tsx GradebookView). */
+.gb-pager { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 8px; margin: 4px 0 12px; }
+.gb-pager-step {
+  height: 36px; padding: 0 12px; border-radius: 4px; border: 1px solid var(--c-line); background: var(--c-deep2);
+  color: var(--c-cyan); font-family: var(--font-mono); font-size: 13px; font-weight: 700; white-space: nowrap; cursor: pointer;
+}
+.gb-pager-step:hover:not(:disabled) { border-color: var(--c-cyan); }
+.gb-pager-step:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 1px; }
+.gb-pager-step:disabled { color: var(--c-meta); cursor: not-allowed; opacity: 0.7; }
+.gb-pager-select {
+  height: 36px; min-width: 0; max-width: 440px; field-sizing: content; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--c-line);
+  background: var(--c-deep2); color: var(--c-fg); font-family: var(--font-prose); font-size: 15px;
+}
+.gb-pager-where {
+  margin: 0 0 0 4px; font-family: var(--font-prose); font-size: 14px; line-height: 1.5; color: var(--c-meta);
+  font-variant-numeric: tabular-nums;
+}
+.gb-pager-where strong { color: var(--c-fg); font-weight: 600; }
+@media (max-width: 640px) {
+  .gb-pager-select { flex: 1 1 100%; max-width: none; order: -1; }
+  .gb-pager-step { flex: 1 1 0; }
+  .gb-pager-where { flex: 1 1 100%; margin-left: 0; }
+}
+/* Today queue: the assignment (prompt + rubric) above the student's answer (components/SubmissionQueue.tsx). */
+.sq-assignment { background: var(--c-bg); border-radius: 4px; padding: 0; font-family: var(--font-prose); }
+.sq-assignment summary {
+  cursor: pointer; padding: 10px 12px; font-size: 14px; font-weight: 600; color: var(--c-fg); line-height: 1.5;
+  list-style-position: inside;
+}
+.sq-assignment summary:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: -2px; border-radius: 4px; }
+.sq-assignment-meta { font-weight: 400; color: var(--c-meta); font-size: 13px; }
+.sq-assignment-body { display: grid; gap: 12px; padding: 0 12px 12px; }
+@media (min-width: 1000px) {
+  .sq-assignment-body { grid-template-columns: minmax(0, 1fr); }
+}
+.sq-assignment-top { padding: 10px 12px 4px; }
+.sq-assignment-label { font-size: 13px; font-weight: 600; color: var(--c-meta); margin-bottom: 4px; }
+.sq-assignment-prompt {
+  font-size: 14px; line-height: 1.5; color: var(--c-fg); white-space: pre-wrap; max-width: 70ch;
+  max-height: 220px; overflow-y: auto;
+}
+/* A long rubric scrolls inside its own box so the student's answer stays near the top of the row. */
+.sq-assignment-rubric { list-style: none; margin: 0; padding: 0 8px 0 0; display: grid; gap: 0; max-height: 260px; overflow-y: auto; }
+.sq-assignment-rubric > li { padding: 6px 0; border-top: 1px solid color-mix(in srgb, var(--c-line) 60%, transparent); }
+.sq-assignment-rubric > li:first-child { border-top: 0; padding-top: 0; }
+.sq-rubric-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.sq-rubric-title { font-size: 14px; font-weight: 600; color: var(--c-fg); line-height: 1.4; }
+.sq-rubric-required {
+  margin-left: 8px; font-size: 12px; font-weight: 600; color: var(--c-orange); border: 1px solid color-mix(in srgb, var(--c-orange) 45%, transparent);
+  border-radius: 4px; padding: 0 6px; white-space: nowrap;
+}
+.sq-rubric-points { flex: 0 0 auto; font-size: 13px; color: var(--c-meta); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sq-rubric-desc { font-size: 13px; line-height: 1.5; color: var(--c-meta); margin-top: 2px; max-width: 70ch; }
+
+/* Review form: "New score" and "Feedback" labels share one top line; Save sits at the foot of the row. */
+@container (min-width: 620px) {
+  .override-fields { align-items: flex-start; }
+  .override-fields > .override-actions { align-self: flex-end; padding-bottom: 0; }
+}
+/* Roster column headings sort the list (click; aria-sort on the heading). */
+.roster-sort {
+  display: inline-flex; align-items: center; gap: 4px; padding: 4px 0; margin: 0; background: none; border: 0; border-radius: 4px;
+  font: inherit; font-family: var(--font-prose); font-size: 13px; font-weight: 600; color: var(--c-meta); cursor: pointer; text-align: left;
+}
+.roster-sort:hover { color: var(--c-fg); }
+.roster-sort:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; }
+.roster-sort.is-on { color: var(--c-fg); }
+.roster-sort-arrow { font-size: 12px; color: var(--c-meta); opacity: 0.7; }
+.roster-sort.is-on .roster-sort-arrow { color: var(--c-cyan); opacity: 1; }
+.roster-sort-reset { font-weight: 500; color: var(--c-cyan); }
+/* end climb4 r5 teacher */
+
+/* climb4 r5 student (continued) */
+/* Reading text: lists keep their markers (Tailwind's preflight strips them), and a bold inline
+   reference such as "Read before attempting `1.1.11 Name That Umbrella`" never splits mid-name. */
+.content-prose ul { list-style: disc; }
+.content-prose ol { list-style: decimal; }
+.content-prose ul ul { list-style: circle; margin: 0.3em 0 0; }
+@media (max-width: 720px) {
+  /* markers outside, so a wrapped item's second line lines up with its first */
+  .content-lesson-main .content-prose :is(ul, ol) { padding-left: 20px; list-style-position: outside; }
+}
+.content-lesson-main .content-prose ul ul > li { margin: 0; }
+@media (min-width: 721px) { .content-lesson-main .content-prose ul ul { columns: 2; column-gap: 32px; max-width: 560px; } }
+.content-prose li::marker { color: var(--c-meta); }
+.content-prose strong > code { white-space: nowrap; }
+/* A list inside a lab step sits inside the step's text column, markers included. */
+.lab-task-card .step-instructions ul, .lab-task-card .step-instructions ol { padding-left: 20px !important; margin: 4px 0 6px; }
+.lab-task-card .step-instructions li { margin: 2px 0; }
+/* Worked example: the syntax refresher is one labelled block with its list inside, open by default. */
+.content-prose details.syntax-refresher {
+  margin: 10px 0 16px; padding: 10px 14px; border: 1px solid var(--c-line); border-radius: 6px; background: var(--c-deep2);
+}
+.content-prose details.syntax-refresher > summary { cursor: pointer; color: var(--c-fg); font-weight: 600; font-size: 14px; }
+.content-prose details.syntax-refresher[open] > summary { margin-bottom: 6px; }
+.content-prose details.syntax-refresher p, .content-prose details.syntax-refresher li { font-size: 14px; color: var(--c-fg); }
+.content-prose details.syntax-refresher p { margin: 6px 0; }
+.content-prose details.syntax-refresher ul { margin: 4px 0; }
+
+/* Phone lesson dock: with only the Docs tab there is no full-width bar, just the Docs pill beside the
+   feedback flag; the content keeps a bottom gutter at least as tall as the dock plus the safe area. */
+@media (max-width: 720px) {
+  .content-lesson-main { padding-bottom: calc(var(--lesson-tool-dock, 60px) + 24px) !important; }
+}
+
+/* Phone home: Continue is a full-width button under the title in a shorter card; a chapter's subtitle
+   and its count share one line under "Chapter N". */
+@media (max-width: 720px) {
+  .home-continue-card { flex-direction: column !important; align-items: stretch !important; gap: 8px !important; padding: 12px 14px !important; }
+  .home-continue-card > div > span:first-child { margin-bottom: 2px !important; }
+  .home-continue-action { margin-left: 0 !important; align-self: stretch !important; width: 100%; min-height: 40px; box-sizing: border-box; }
+  .home-chapter > summary { align-items: baseline !important; column-gap: 12px !important; }
+  .home-chapter > summary > span:first-child { flex: 0 0 100%; }
+  .home-chapter > summary > span:nth-child(2):not(:last-child) { flex: 0 1 auto !important; order: 1; }
+  .home-chapter > summary > .home-chapter-count { order: 2; margin-left: auto !important; }
+}
+
+/* Home, wide: a chapter's count reads at body size beside its title, not tiny at the far right. */
+.home-chapter > summary > .home-chapter-count { opacity: 1; }
+.home-chapter > summary > .home-chapter-count button { font-size: inherit !important; }
+.home-chapter > summary > .home-chapter-count .unit-progress-count {
+  font-family: var(--font-prose); font-size: 15px; color: var(--c-meta) !important; font-weight: 600; font-variant-numeric: tabular-nums;
+}
+@media (min-width: 721px) {
+  .home-chapter > summary > .home-chapter-count { margin-left: 8px !important; }
+  .home-chapter > summary > .home-chapter-count .unit-progress-count::before { content: "·"; margin-right: 12px; color: var(--c-line); }
+}
+
+/* Module page: the progress bar under the title is a real bar with the count beside it. */
+.module-page > div:has(> h1) .unit-progress-track {
+  width: 240px !important; max-width: 60vw; height: 8px !important; border-radius: 4px !important;
+  background: color-mix(in srgb, var(--c-fg) 18%, transparent) !important;
+}
+.module-page > div:has(> h1) .unit-progress-count { font-family: var(--font-prose); font-size: 15px; font-variant-numeric: tabular-nums; }
+.module-page > div:has(> h1) button { gap: 12px !important; }
+
+/* Lesson footer: the strip is labelled (Module progress), and the pink segment has a legend. */
+.lesson-progress-here {
+  display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: -1px;
+  border-radius: 2px; background: var(--c-pink);
+}
+.lesson-progress-total-label { color: var(--c-meta); }
+@media (max-width: 720px) { .lesson-progress-total-label { display: none; } }
+
+/* Quiz, wide: the questions use the shared content frame (960px); short options sit two to a row;
+   the answered count is body-size with its own bar, docked on the sticky heading row. */
+@media (min-width: 721px) {
+  .student-quiz { max-width: 960px !important; }
+  .student-quiz .quiz-question-card { max-width: none; }
+  .student-quiz .quiz-guidance p { max-width: 70ch; }
+  .student-quiz > .quiz-head > .quiz-answered-count {
+    gap: 10px; padding: 4px 12px; font-family: var(--font-prose); font-size: 15px; font-weight: 600; color: var(--c-fg);
+    background: var(--c-deep2);
+  }
+  .quiz-answered-bar {
+    display: inline-block; position: relative; width: 96px; height: 6px; border-radius: 3px; overflow: hidden;
+    background: color-mix(in srgb, var(--c-fg) 18%, transparent);
+  }
+  .quiz-answered-bar > span { position: absolute; inset: 0 auto 0 0; background: var(--c-cyan); border-radius: 3px; transition: width 200ms ease; }
+  .quiz-answered-count.is-complete .quiz-answered-bar > span { background: var(--c-green); }
+  .quiz-options.is-short { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) { .quiz-answered-bar { display: none; } }
+
+/* Written lesson, wide: the divider above the form, the form, its disclosures and the bottom navigation
+   share one 760px column, so the page reads as one block. */
+@media (min-width: 721px) {
+  .content-lesson-main .written-grader { max-width: 760px; box-sizing: border-box; }
+}
+/* end climb4 r5 student */

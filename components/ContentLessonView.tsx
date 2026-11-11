@@ -421,7 +421,9 @@ export default function ContentLessonView({ lesson }: Props) {
         <CompletionPanel lessonId={lesson.id} lessonType={preview} />
       )}
 
-      <div style={{ marginTop: 24 }}>
+      {/* Hidden by CSS (.lesson-bottom-nav, globals.css "climb4 r5 student") once the completion panel,
+          the written grader or the diagram shows its own Next; kept whenever there is none (quiz, not yet done). */}
+      <div className="lesson-bottom-nav" style={{ marginTop: 24 }}>
         <HeaderLessonNav />
       </div>
 

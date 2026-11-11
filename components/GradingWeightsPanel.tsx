@@ -114,10 +114,8 @@ export default function GradingWeightsPanel({ classId, desktop = false }: { clas
         ) : (
           <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Grading weights</h2>
         )}
-        <span style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: C.dim, fontVariantNumeric: 'tabular-nums' }}>Total <strong style={{ color: C.text }}>{total}</strong></span>
       </div>
       <p style={{ maxWidth: 720, margin: '0 0 8px', fontFamily: 'var(--font-prose)', fontSize: 13, lineHeight: 1.5, color: C.dim }}>
-        Each share is its weight divided by the total.<br />
         Only categories with work count toward a student’s grade; empty categories drop out.
       </p>
       {/* One column, so the header row below lines up with every row's fields. */}
@@ -191,6 +189,12 @@ export default function GradingWeightsPanel({ classId, desktop = false }: { clas
             )}
           </div>
         ))}
+        {/* Footer: the total sits under the Weight column it adds up, with how a share follows from it. */}
+        <div style={{ display: 'grid', gridTemplateColumns: rowCols, alignItems: 'baseline', gap: 8, padding: '8px 0 0', fontFamily: 'var(--font-prose)', fontSize: 13, color: C.dim, fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ lineHeight: 1.4 }}><span style={{ fontWeight: 600, color: C.text }}>Total</span> · shares are each weight ÷ total</span>
+          <strong style={{ textAlign: 'right', paddingRight: 9, color: C.text, fontSize: 15, fontWeight: 600 }}>{total}</strong>
+          <span style={{ gridColumn: '3 / -1' }} />
+        </div>
       </div>
       {!desktop && <div role="status" style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: C.dim, marginTop: 12 }}>{saving ? 'Saving…' : ''}</div>}
       {!desktop && error && <div style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-red)', marginTop: 4 }}>{error}</div>}

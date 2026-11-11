@@ -68,6 +68,12 @@ interface SubmissionItem {
   capped?: boolean;
 }
 
+/** The assignment a row answers, from the queue GET's `assignments` (teacher-only, server-side config). */
+interface AssignmentBrief {
+  prompt: string;
+  rubric: Array<{ id: string; title: string; points: number; description?: string; required?: boolean }>;
+}
+
 interface Props {
   classId: string;
   /** lesson id -> title, so a row says "3.3.14 Filter" rather than a folder id. */
@@ -403,11 +409,68 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
 }
 
 // ---------------------------------------------------------------------------
+// The assignment beside the answer
+// ---------------------------------------------------------------------------
+
+/**
+ * The task the student was given and the criteria it is graded on, so a teacher marking an answer can
+ * see the question. Open on a desktop, folded on a phone (where the answer and the form matter most).
+ * Renders nothing when the server sent no brief for the lesson.
+ */
+function AssignmentBlock({ brief }: { brief: AssignmentBrief }) {
+  // The prompt is always shown; the rubric is folded so the answer and the score field stay on screen
+  // (open by default it pushed both below the fold and lost its blind comparison).
+  const [open, setOpen] = useState(false);
+  const total = brief.rubric.reduce((n, c) => n + (c.points > 0 ? c.points : 0), 0);
+  return (
+    <div className="sq-assignment">
+      {brief.prompt && (
+        <div className="sq-assignment-top">
+          <div className="sq-assignment-label">Assignment</div>
+          <div className="sq-assignment-prompt">{brief.prompt}</div>
+        </div>
+      )}
+    {brief.rubric.length > 0 && (
+    <details open={open} onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}>
+      <summary>
+        Rubric
+        <span className="sq-assignment-meta">
+          {brief.rubric.length > 0 ? ` · ${brief.rubric.length} criteri${brief.rubric.length === 1 ? 'on' : 'a'}${total > 0 ? `, ${total} point${total === 1 ? '' : 's'}` : ''}` : ''}
+        </span>
+      </summary>
+      <div className="sq-assignment-body">
+        {(
+          <div>
+            <ol className="sq-assignment-rubric">
+              {brief.rubric.map((c) => (
+                <li key={c.id}>
+                  <div className="sq-rubric-head">
+                    <span className="sq-rubric-title">
+                      {c.title}
+                      {c.required && <span className="sq-rubric-required">Required</span>}
+                    </span>
+                    <span className="sq-rubric-points">{c.points > 0 ? `${c.points} pt${c.points === 1 ? '' : 's'}` : 'met / not met'}</span>
+                  </div>
+                  {c.description && <div className="sq-rubric-desc">{c.description}</div>}
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+      </div>
+    </details>
+    )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main component
 // ---------------------------------------------------------------------------
 
 export function SubmissionQueue({ classId, lessonTitles }: Props) {
   const [submissions, setSubmissions] = useState<SubmissionItem[]>([]);
+  const [assignments, setAssignments] = useState<Record<string, AssignmentBrief>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -426,8 +489,10 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
         }
         return res.json();
       })
-      .then((json: { submissions: SubmissionItem[] }) => {
-        if (mounted) setSubmissions(json.submissions);
+      .then((json: { submissions: SubmissionItem[]; assignments?: Record<string, AssignmentBrief> }) => {
+        if (!mounted) return;
+        setSubmissions(json.submissions);
+        setAssignments(json.assignments && typeof json.assignments === 'object' ? json.assignments : {});
       })
       .catch((err: Error) => {
         if (mounted) setError(err.message);
@@ -509,6 +574,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
         // the marker alone kept a graded submission reading "Needs manual
         // grade" forever — the gradebook already treats it as scored.
         const failed = sub.score === null && parseFailedGrade(sub.grade_json);
+        const brief = Object.prototype.hasOwnProperty.call(assignments, sub.lesson_id) ? assignments[sub.lesson_id] : undefined;
 
         return (
           <div
@@ -597,6 +663,9 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
               </div>
             )}
 
+            {/* The question and its criteria, above the answer they grade. */}
+            {brief && <AssignmentBlock brief={brief} />}
+
             {/* Grading criteria */}
             {gradeData && (
               <div
@@ -618,7 +687,8 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                       key={c.id}
                       style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '4px 0', color: 'var(--c-fg)' }}
                     >
-                      <span>{c.title || c.id}</span>
+                      {/* The stored verdict carries only the criterion id; the brief has its title. */}
+                      <span>{c.title || brief?.rubric.find((r) => r.id === c.id)?.title || c.id}</span>
                       <span style={{ color: 'var(--c-meta)', flex: '0 0 auto' }}>
                         {/* Every rubric is zero-point under green-to-advance, so
                             "3/0" says nothing — show the verdict instead. */}

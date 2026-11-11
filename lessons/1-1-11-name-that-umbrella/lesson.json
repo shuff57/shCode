@@ -14,7 +14,7 @@
     {
       "id": "s1",
       "title": "Name the umbrella activity",
-      "instructions": "Read the scenario. Log the umbrella activity that best matches it, using console.log. Choose from training/communication, risk management, configuration management, quality management, architecture management, or security management."
+      "instructions": "Read the scenario. Log the umbrella activity that best matches it, using console.log. Choose from\n\n- training/communication,\n- risk management,\n- configuration management,\n- quality management,\n- architecture management, or\n- security management."
     }
   ],
   "requirements": [

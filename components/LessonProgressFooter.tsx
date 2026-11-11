@@ -202,7 +202,10 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
           segments were competing for the same ~70px, and the tally on the
           right already says how many lessons the module has. */}
       <span className="lesson-progress-count" style={{ color: 'var(--c-meta)', minWidth: 96 }}>
-        {idx >= 0 ? `Lesson ${idx + 1} of ${lessons.length}` : `${lessons.length} lessons`}
+        {idx >= 0 ? (
+          // The legend for the pink segment: same colour, says what it marks.
+          <><span className="lesson-progress-here" aria-hidden="true" />You are here: lesson {idx + 1} of {lessons.length}</>
+        ) : `${lessons.length} lessons`}
       </span>
       {/* Segments, not dots. A dot is a fixed 14px, so 31 of them plus the
           surrounding text stopped fitting somewhere around 700px wide and the
@@ -210,7 +213,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
           had already finished slid off the left edge. Segments divide whatever
           width they are handed, so the rail cannot overflow at any viewport;
           it only gets thinner. */}
-      <div className="lesson-progress-segs">
+      <div className="lesson-progress-segs" role="group" aria-label={`Module ${moduleId} progress, one segment per lesson`}>
         {lessons.map((l, i) => {
           const isCurrent = l.id === currentLessonId;
           const state = snap.states[l.id];
@@ -260,7 +263,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
             cursor: isLocked ? 'not-allowed' : undefined,
           };
           const segClass = `lesson-progress-seg${isCurrent ? ' is-current' : ''}`;
-          const titleText = `${l.numberedId} ${l.displayTitle}${isDone ? ' (complete)' : isStarted ? ' (in progress)' : ''}${isCurrent ? ' (current)' : ''}${isLocked ? ' (locked — get a green to unlock)' : ''}`;
+          const titleText = `${l.numberedId} ${l.displayTitle}${isDone ? ' (complete)' : isStarted ? ' (in progress)' : ''}${isCurrent ? ' (you are here)' : ''}${isLocked ? ' (locked — get a green to unlock)' : ''}`;
           // Fast hover tooltip, replacing the slow ~1s native `title`
           // tooltip. One shared element for the whole rail (segments can be
           // ~3.7px wide; a per-segment bubble would overflow), positioned
@@ -305,7 +308,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
               key={l.id}
               href={lessonHref(l)}
               className={segClass}
-              aria-label={`${l.numberedId} ${l.displayTitle}`}
+              aria-label={`${l.numberedId} ${l.displayTitle}${isCurrent ? ', you are here' : ''}`}
               aria-current={isCurrent ? 'page' : undefined}
               aria-describedby={tip && tip.lessonId === l.id ? tipId : undefined}
               style={segStyle}
@@ -405,8 +408,8 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
           <span style={{ color: 'var(--c-cyan)' }}>Sign in</span> to save progress
         </span>
       ) : (
-        <span style={{ color: 'var(--c-meta)', minWidth: 68, textAlign: 'right' }}>
-          {done}/{lessons.length} · {pct}%
+        <span className="lesson-progress-total" title={`Module progress: ${done} of ${lessons.length} lessons done`} style={{ color: 'var(--c-meta)', minWidth: 68, textAlign: 'right' }}>
+          <span className="lesson-progress-total-label">Module progress </span>{done}/{lessons.length} · {pct}%
         </span>
       )}
     </div>

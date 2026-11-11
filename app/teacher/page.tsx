@@ -12,7 +12,7 @@ import { AnnouncementsPanel } from '../../components/AnnouncementsPanel';
 import DueDatesPanel from '../../components/DueDatesPanel';
 import GradingWeightsPanel from '../../components/GradingWeightsPanel';
 import SolutionReleasePanel from '../../components/SolutionReleasePanel';
-import { moduleOptions, selectGradebookLessons } from '../../lib/gradebook-view';
+import { defaultModule, moduleKey, moduleOptions, modulePages, pagedColumnWidth, pagerFor, pageSize, resolveModuleParam, selectGradebookLessons } from '../../lib/gradebook-view';
 import { describeGrade, opensInCodeEditor, showLateBadge, stillFailingRequirements, submissionWasLate, verdictWord, type RequirementEventRow } from '../../lib/teacher-drawer';
 import MostMissedPanel from '../../components/MostMissedPanel';
 import ClassLibraryModeration from '../../components/ClassLibraryModeration';
@@ -151,6 +151,12 @@ function submissionScoreLabel(sub: { score: number | null; possible: number | nu
 
 function pctColor(pct: number): string {
   return pct >= 100 ? 'var(--c-green)' : pct > 0 ? 'var(--c-yellow)' : 'var(--c-meta)';
+}
+
+/** A grade that COUNTS (something is done or past due): 0% is the worst state there is, so it is red like
+ *  the past-due count beside it, not the muted grey that means "nothing counted yet" (shown as —). */
+function countedGradeColor(pct: number): string {
+  return pct <= 0 ? 'var(--c-red)' : pctColor(pct);
 }
 
 /** The 80x6 bar from UnitProgressBadge, reused so the roster and the
@@ -577,6 +583,31 @@ const S = {
 // Roster columns on a wide screen: name, grade, graded done, past due, last active, then the row's
 // actions in their own right-aligned track (at least 16px of column gap plus 8px of lead before Open).
 const ROSTER_COLS = 'minmax(180px, 2fr) 154px 112px 80px 136px minmax(144px, auto)';
+
+/** Roster column sort (desktop headings). Null = the order the server sent, which is the default. */
+type RosterSortKey = 'name' | 'grade' | 'missing' | 'active';
+type RosterSort = { key: RosterSortKey; dir: 'asc' | 'desc' } | null;
+/** First click on a heading: name A-Z, lowest grade first, most past due first, most recently active first. */
+const ROSTER_FIRST_DIR: Record<RosterSortKey, 'asc' | 'desc'> = { name: 'asc', grade: 'asc', missing: 'desc', active: 'desc' };
+/** Display order only. A student with nothing counted yet (grade "—") or no activity sorts last either way. */
+function sortRosterRows<R extends { student_email: string }>(rows: R[], sort: RosterSort, prog: (email: string) => StudentProgress | undefined): R[] {
+  if (!sort) return rows;
+  const sign = sort.dir === 'asc' ? 1 : -1;
+  const label = (r: R) => (fullName(prog(r.student_email)?.firstName, prog(r.student_email)?.lastName) ?? r.student_email).toLowerCase();
+  const value = (r: R): number | null => {
+    const p = prog(r.student_email);
+    if (sort.key === 'grade') return p?.gradedCounted && Number.isFinite(p.weightedPercent) ? p.weightedPercent : null;
+    if (sort.key === 'missing') return p?.gradedMissing ?? 0;
+    if (sort.key === 'active') return p?.last_active ?? null;
+    return null;
+  };
+  return [...rows].sort((a, b) => {
+    if (sort.key === 'name') return sign * label(a).localeCompare(label(b));
+    const va = value(a), vb = value(b);
+    if (va === null || vb === null) return va === vb ? label(a).localeCompare(label(b)) : va === null ? 1 : -1;
+    return sign * (va - vb) || label(a).localeCompare(label(b));
+  });
+}
 
 // ---------------------------------------------------------------------------
 // StudentDrawer — right-side panel showing per-lesson progress
@@ -1306,15 +1337,29 @@ function GradebookView({
   // examples carry no grade, so they were 640 columns of dots between the ones a teacher came to read.
   const [showAll, setShowAll] = useState(false);
   const [showCategoryColumns, setShowCategoryColumns] = useState(false);
-  // One module's columns (its `unit` string), or null for every module.
-  const [moduleFilter, setModuleFilter] = useState<string | null>(null);
+  // The page: one module's columns (its `unit` string), null for every module, undefined while the teacher
+  // has not picked one (the default page below). The address carries it as `&module=1.1` or `&module=all`,
+  // read once on mount so a reload or a shared link keeps the page.
+  const [modulePick, setModulePick] = useState<string | null | undefined>(undefined);
+  const [moduleParam] = useState<string | null>(() => (typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('module')));
+  function pickModule(unit: string | null) {
+    setModulePick(unit);
+    try {
+      const u = new URL(window.location.href);
+      u.searchParams.set('module', unit === null ? 'all' : moduleKey(unit));
+      window.history.replaceState(window.history.state, '', u.toString());
+    } catch { /* an address bar we cannot rewrite is not worth failing a page change over */ }
+    gridElement?.scrollTo({ left: 0 });
+  }
   const [grades, setGrades] = useState<Map<string, GridGrade>>(new Map());
-  // 168px columns: at 112px the blind panel preferred the old grid 3-0 (titles truncated), and 140px with
-  // three-line titles read as cramped. At 168px (156px of text) a title is two lines of 13px prose;
-  // measured 2026-11-10, 135 of the 149 graded titles fit, the other 14 end in an ellipsis and keep
-  // their full text in the tooltip.
-  const CELL_W = 168;
+  // At least 168px columns: at 112px the blind panel preferred the old grid 3-0 (titles truncated), and 140px
+  // with three-line titles read as cramped. At 168px (156px of text) a title is two lines of 13px prose;
+  // measured 2026-11-10, 135 of the 149 graded titles fit. A one-module page has few columns, so they grow
+  // to share the grid's width up to 240px (pagedColumnWidth) and the long titles fit too. The width is
+  // set below, once the page is known; the scroll sync reads it through this ref.
+  const cellWRef = useRef(168);
   const [gridElement, setGridElement] = useState<HTMLDivElement | null>(null);
+  const [gridW, setGridW] = useState(0);
   const [gridScroll, setGridScroll] = useState({ left: false, right: false, more: 0, partialWidth: 0, rightInset: 0, first: 0, last: 0 });
   const syncGridRef = useRef<(() => void) | null>(null);
 
@@ -1349,8 +1394,9 @@ function GradebookView({
         partialWidth: remaining > 1 && partial ? edge - partial.getBoundingClientRect().left : 0,
         left: gridElement.scrollLeft > 1,
         right: remaining > 1,
-        more: Math.min(lessonCount, Math.max(0, Math.ceil((remaining - 1) / CELL_W))),
+        more: Math.min(lessonCount, Math.max(0, Math.ceil((remaining - 1) / cellWRef.current))),
       };
+      setGridW((w) => (w === gridElement.clientWidth ? w : gridElement.clientWidth));
       setGridScroll((prev) => prev.left === next.left && prev.right === next.right && prev.more === next.more && prev.first === next.first && prev.last === next.last && prev.partialWidth === next.partialWidth && prev.rightInset === next.rightInset ? prev : next);
       // Unit band labels ("1.3 DOCUMENTATION AND ...") are fitted to the part of their span that is in view,
       // between the frozen name columns and the right edge (or the cover over a partial column), so a label
@@ -1468,9 +1514,21 @@ function GradebookView({
   const isGradedLesson = (l: LessonMeta) =>
     lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode }) !== null;
   const moduleChoices = moduleOptions(orderedLessons, isGradedLesson);
-  // A module that vanished (manifest changed) falls back to all rather than an empty grid.
-  const moduleSel = moduleFilter !== null && moduleChoices.some((m) => m.unit === moduleFilter) ? moduleFilter : null;
+  // Paging by module: the pages, the one shown (the teacher's pick, else the address, else the module
+  // that was due most recently), and its neighbours. A pick that is no longer a page (the manifest
+  // changed, or ungraded lessons were hidden again) falls back to the default page, never an empty grid.
+  const pages = modulePages(moduleChoices, showAll);
+  const chosen = modulePick !== undefined ? modulePick : resolveModuleParam(pages, moduleParam);
+  const moduleSel: string | null = chosen === null
+    ? null
+    : chosen !== undefined && pages.some((p) => p.unit === chosen)
+      ? chosen
+      : defaultModule(pages, orderedLessons, isGradedLesson, gbData.dueDates, Date.now());
+  const pager = pagerFor(pages, moduleSel);
   const picked = selectGradebookLessons(orderedLessons, { module: moduleSel, showAll, isCounted: isGradedLesson });
+  // Every module under the same switches: what the CSV exports and what "Missing or ungraded work" looks
+  // across, so neither depends on the page being looked at.
+  const everyLesson = moduleSel === null ? picked.lessons : selectGradebookLessons(orderedLessons, { module: null, showAll, isCounted: isGradedLesson }).lessons;
   const hiddenCount = picked.hidden;
   let displayLessons = picked.lessons;
   let displaySpans = picked.spans;
@@ -1637,7 +1695,7 @@ function GradebookView({
   // A reading or a slide deck has a due date through its module but is not graded, so only graded lessons
   // count as a problem here, the same set the grade's "past due" number counts.
   const gradedIds = new Set(
-    displayLessons.filter((l) => lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode }) !== null).map((l) => l.id),
+    [...everyLesson, ...displayLessons].filter((l) => lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode }) !== null).map((l) => l.id),
   );
   const isProblem = (st: GradebookStudent) =>
     Object.entries(st.cells).some(([id, c]) => gradedIds.has(id) && (c.pending || (c.late && c.state !== 'completed')));
@@ -1666,9 +1724,18 @@ function GradebookView({
   const shownCats = GRADE_CATEGORIES.filter((c) => displayLessons.some((l) => catOf.get(l.id) === c));
 
   const categoryColumnCount = shownCats.length ? (showCategoryColumns ? shownCats.length : 1) : 0;
+  // Column width for this page (see cellWRef above): the room right of the frozen and total columns,
+  // shared by this module's lessons; the every-module grid keeps the 168px minimum.
+  const CELL_W = moduleSel === null
+    ? 168
+    : pagedColumnWidth(gridW - EMAIL_W - GRADE_W - CAT_W * categoryColumnCount, displayLessons.length);
+  cellWRef.current = CELL_W;
+  const showScrollCue = moduleSel === null || gridScroll.left || gridScroll.right;
 
   function handleDownloadCsv() {
-    const csv = buildGradebookCsv(gbData!.students, displayLessons.map((l) => l.id), gbData!.dueDates, Object.fromEntries(displayLessons.map((l) => [l.id, l.title])));
+    // Every module, never just the page on screen.
+    const all = everyLesson.length > 0 ? everyLesson : displayLessons;
+    const csv = buildGradebookCsv(gbData!.students, all.map((l) => l.id), gbData!.dueDates, Object.fromEntries(all.map((l) => [l.id, l.title])));
     downloadCsv(csv, `gradebook-${className.replace(/\s+/g, '-')}.csv`);
   }
 
@@ -1708,19 +1775,8 @@ function GradebookView({
           <option value="grade">Order: lowest grade first</option>
           <option value="missing">Order: most past due first</option>
         </select>
-        <select
-          value={moduleSel ?? ''}
-          onChange={(e) => setModuleFilter(e.target.value === '' ? null : e.target.value)}
-          aria-label="Show one module's columns"
-          className="teacher-field"
-          style={{ background: 'var(--c-deep2)', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4, height: 32, padding: '4px 8px', fontFamily: 'var(--font-prose)', fontSize: 15, maxWidth: narrow ? '100%' : 200, minWidth: 0 }}
-        >
-          <option value="">All modules</option>
-          {moduleChoices.map((m) => (
-            <option key={m.unit} value={m.unit}>{m.unit} ({m.counted} counted / {m.total})</option>
-          ))}
-        </select>
-        {/* Scroll cue: moved up from its own row so the grid starts one row higher. */}
+        {/* Scroll cue: on the every-module grid always, on a module page only when its columns do not fit. */}
+        {showScrollCue && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: narrow ? 0 : 'auto', flexShrink: 0 }}>
           {/* Where the view is in the course, so "N more" has a position. */}
           {gridScroll.first > 0 && displayLessons.length > 0 && (
@@ -1750,7 +1806,8 @@ function GradebookView({
           </button>
           <span aria-live="polite" className="sr-only">{gridScroll.right ? `${gridScroll.more} more lesson${gridScroll.more === 1 ? '' : 's'} to the right.` : 'All lessons shown.'} Student names stay in view.</span>
         </div>
-        <details style={{ position: 'relative', fontSize: 13, color: 'var(--c-fg)', flexShrink: 0 }}>
+        )}
+        <details style={{ position: 'relative', fontSize: 13, color: 'var(--c-fg)', flexShrink: 0, marginLeft: !showScrollCue && !narrow ? 'auto' : undefined }}>
           <summary style={{ cursor: 'pointer', height: 32, boxSizing: 'border-box', padding: '4px 12px', border: '1px solid var(--c-line)', borderRadius: 4 }}>More{showAll || problemsOnly ? ' •' : ''} ▾</summary>
           <div style={{ position: 'absolute', top: '100%', right: 0, zIndex: 30, background: 'var(--c-deep2)', border: '1px solid var(--c-line)', borderRadius: 6, padding: 16, width: 260, maxWidth: 'calc(100vw - 64px)', boxSizing: 'border-box', display: 'grid', gap: 12 }}>
         <label style={{ fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.4, color: 'var(--c-fg)', display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }} title="By default the grid shows only the lessons that count toward the grade. Tick this to add the ones that do not (readings, slides, examples, and any lab or chart with no grade category). They show a check mark, never a score.">
@@ -1783,6 +1840,58 @@ function GradebookView({
           </div>
         </details>
       </div>
+
+      {/* Pager: one module's lessons per page, or every module (the old scrolling grid). */}
+      {pages.length > 0 && (
+        <nav aria-label="Gradebook pages" className="gb-pager">
+          <button
+            type="button"
+            className="gb-pager-step"
+            disabled={pager.position === 0 || pager.prev === null}
+            onClick={() => pager.prev !== null && pickModule(pager.prev)}
+            aria-label={pager.prev ? `Previous module: ${pager.prev}` : 'No previous module'}
+          >
+            ‹ Previous module
+          </button>
+          <select
+            value={moduleSel ?? ''}
+            onChange={(e) => pickModule(e.target.value === '' ? null : e.target.value)}
+            aria-label="Gradebook page: one module, or all modules"
+            className="teacher-field gb-pager-select"
+          >
+            {pages.map((m) => (
+              <option key={m.unit} value={m.unit}>{m.unit} · {pageSize(m, showAll)} {showAll ? 'lessons' : 'graded'}</option>
+            ))}
+            <option value="">All modules · {everyLesson.length} {showAll ? 'lessons' : 'graded'}</option>
+          </select>
+          <button
+            type="button"
+            className="gb-pager-step"
+            disabled={pager.next === null}
+            onClick={() => pager.next !== null && pickModule(pager.next)}
+            aria-label={pager.next ? `${pager.position === 0 ? 'First' : 'Next'} module: ${pager.next}` : 'No next module'}
+          >
+            {pager.position === 0 ? 'First module ›' : 'Next module ›'}
+          </button>
+          <p className="gb-pager-where" aria-live="polite">
+            {pager.position > 0 ? (
+              <>
+                <strong>Module {pager.unit}</strong>
+                <span aria-hidden="true"> · </span>
+                <span>{displayLessons.length} {showAll ? '' : 'graded '}lesson{displayLessons.length === 1 ? '' : 's'}</span>
+                <span aria-hidden="true"> · </span>
+                <span>module {pager.position} of {pager.total}</span>
+              </>
+            ) : (
+              <>
+                <strong>All modules</strong>
+                <span aria-hidden="true"> · </span>
+                <span>{displayLessons.length} {showAll ? '' : 'graded '}lessons in {pager.total} modules</span>
+              </>
+            )}
+          </p>
+        </nav>
+      )}
 
       <div aria-label="Gradebook legend" style={{ display: 'flex', flexWrap: 'nowrap', gap: 16, marginBottom: 8, overflowX: 'auto', paddingBottom: 4, fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-meta)' }}>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0, whiteSpace: 'nowrap' }}>
@@ -2004,7 +2113,7 @@ function GradebookView({
                         width: GRADE_W, minWidth: GRADE_W, padding: '8px 8px', textAlign: 'center',
                         borderBottom: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
                         fontSize: 14, fontWeight: 700, fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums',
-                        color: !g || g.counted === 0 ? 'var(--c-meta)' : pctColor(g.pct),
+                        color: !g || g.counted === 0 ? 'var(--c-meta)' : countedGradeColor(g.pct),
                       }}
                       title={g ? (g.counted === 0 ? 'Nothing is due yet and nothing is done' : `Grade so far ${g.pct}%${g.missing > 0 ? `, ${g.missing} past due and not done` : ''}`) : 'Loading'}
                     >
@@ -2030,7 +2139,7 @@ function GradebookView({
                         borderBottom: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)',
                         fontSize: 14, fontWeight: 700,
                         background: 'color-mix(in srgb, var(--c-comment) 10.0%, transparent)',
-                        color: v === undefined ? 'var(--c-meta)' : pctColor(v),
+                        color: v === undefined ? 'var(--c-meta)' : countedGradeColor(v),
                       }}
                       title={v === undefined ? `${CATEGORY_LABEL[c]}: nothing counted yet` : `${CATEGORY_LABEL[c]}: ${v}%`}
                     >
@@ -2278,10 +2387,11 @@ function ListView() {
               </dl>
             </div>
           ))}
-      {/* Create form: a card in the same grid, at a class card's width. */}
-      <div className="teacher-create-card" style={{ ...S.card, marginBottom: 0, maxWidth: 880 }}>
-        <h2 style={{ ...S.h2, marginBottom: 12 }}>Create class</h2>
-        <form onSubmit={(e) => { void handleCreate(e); }} style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+      {/* Create form: a quiet secondary row under the class cards (no card fill, a dashed outline), so the
+          classes stay the primary things on the page. */}
+      <div className="teacher-create-card" style={{ gridColumn: '1 / -1', marginBottom: 0, maxWidth: 880, background: 'transparent', border: '1px dashed var(--c-line)', borderRadius: 8, padding: '12px 16px', boxSizing: 'border-box' }}>
+        <h2 style={{ ...S.h2, fontSize: 15, lineHeight: '22px', marginBottom: 8, color: 'var(--c-fg)' }}>New class</h2>
+        <form onSubmit={(e) => { void handleCreate(e); }} style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap', maxWidth: 640 }}>
           <div style={{ flex: '1 1 260px', minWidth: 0 }}>
           <label htmlFor="new-class-name" style={S.label}>Class name</label>
           <input
@@ -2371,6 +2481,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
   const [drawerEmail, setDrawerEmail] = useState<string | null>(null);
   // The lesson to open expanded inside the drawer (a chart or quiz from the Today queue, a grid cell).
   const [drawerLesson, setDrawerLesson] = useState<string | null>(null);
+  const [rosterSort, setRosterSort] = useState<RosterSort>(null);
 
   // Section tabs. Seeded from ?tab= (or the top-nav "Gradebook" shortcut's ?view=gradebook) on mount only.
   // With no explicit tab the page opens on Students, and moves itself to Today once if submissions are
@@ -2810,12 +2921,40 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             {roster.length === 0 ? (
               <p style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 15 }}>No students enrolled yet.</p>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: compact ? 6 : 0 }}>
-                {!compact && <div style={{ display: 'grid', gridTemplateColumns: ROSTER_COLS, gap: 16, padding: '12px 12px 8px', color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600, borderBottom: '1px solid var(--c-line)' }}><span>Student</span><span>Grade so far</span><span>Graded done</span><span>Past due</span><span>Last active</span><span /></div>}
+              <div role={compact ? undefined : 'table'} aria-label={compact ? undefined : 'Roster'} style={{ display: 'flex', flexDirection: 'column', gap: compact ? 6 : 0 }}>
+                {!compact && (
+                  <div role="row" style={{ display: 'grid', gridTemplateColumns: ROSTER_COLS, gap: 16, padding: '8px 12px 4px', color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600, borderBottom: '1px solid var(--c-line)' }}>
+                    {([
+                      ['name', 'Student'], ['grade', 'Grade so far'], [null, 'Graded done'], ['missing', 'Past due'], ['active', 'Last active'],
+                    ] as const).map(([key, text]) => {
+                      if (key === null) return <span key={text} role="columnheader" style={{ padding: '4px 0' }}>{text}</span>;
+                      const on = rosterSort?.key === key;
+                      return (
+                        <span key={key} role="columnheader" aria-sort={on ? (rosterSort!.dir === 'asc' ? 'ascending' : 'descending') : 'none'}>
+                          <button
+                            type="button"
+                            className={`roster-sort${on ? ' is-on' : ''}`}
+                            onClick={() => setRosterSort(on ? { key, dir: rosterSort!.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: ROSTER_FIRST_DIR[key] })}
+                            title={`Sort by ${text.toLowerCase()}`}
+                          >
+                            {text}
+                            <span aria-hidden="true" className="roster-sort-arrow">{on ? (rosterSort!.dir === 'asc' ? '↑' : '↓') : '↕'}</span>
+                          </button>
+                        </span>
+                      );
+                    })}
+                    <span role="columnheader">
+                      {rosterSort && (
+                        <button type="button" className="roster-sort roster-sort-reset" onClick={() => setRosterSort(null)}>Default order</button>
+                      )}
+                      {!rosterSort && <span className="sr-only">Actions</span>}
+                    </span>
+                  </div>
+                )}
                 {/* Desktop: 20px name + 18px email + 12px padding + 1px border = 51px.
                     Phone: row 1 = name + grade, row 2 = counts on one line + Open and a compact More
                     (about 64px). Putting Open/More on the name row stranded the grade below them (lost 3-0). */}
-                {roster.map((row) => {
+                {sortRosterRows(roster, rosterSort, (e) => progressMap.get(e)).map((row) => {
                   const prog = progressMap.get(row.student_email);
                   // A stale or older response can lack weightedPercent; a NaN
                   // here would render "NaN% of grade", so fall back to 0.
@@ -2823,26 +2962,30 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                   return (
                     <div
                       key={row.student_email}
+                      role={compact ? undefined : 'row'}
                       style={{ background: 'var(--c-bg)', borderRadius: compact ? 6 : 0, padding: compact ? '8px 12px' : '6px 12px', borderBottom: '1px solid var(--c-line)', display: 'grid', gridTemplateColumns: compact ? 'minmax(0, 1fr) auto' : ROSTER_COLS, alignItems: 'center', minWidth: 0, minHeight: compact ? undefined : 51, boxSizing: 'border-box', gap: compact ? '2px 8px' : 16 }}
                     >
-                      <div style={{ minWidth: 0, gridColumn: compact ? 1 : undefined, gridRow: compact ? 1 : undefined, fontFamily: 'var(--font-prose)' }} title={`Enrolled ${fmt(row.enrolled_at)} by ${row.enrolled_by ?? 'self'}`}>
+                      {/* Phone: the name and the grade share row 1 across BOTH columns (the grade laid over its
+                          right end), so column 2 is only as wide as Open + ⋯ and the counts in row 2 fit one line. */}
+                      <div role={compact ? undefined : 'cell'} style={{ minWidth: 0, gridColumn: compact ? '1 / -1' : undefined, gridRow: compact ? 1 : undefined, paddingRight: compact ? 136 : undefined, fontFamily: 'var(--font-prose)' }} title={`Enrolled ${fmt(row.enrolled_at)} by ${row.enrolled_by ?? 'self'}`}>
                         <div style={{ fontSize: 15, lineHeight: compact ? '22px' : '20px', fontWeight: 600, color: 'var(--c-fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fullName(prog?.firstName, prog?.lastName) ?? row.student_email}</div>
                         {!compact && <div style={{ color: 'var(--c-meta)', fontSize: 13, lineHeight: '18px', marginTop: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.student_email}</div>}
                       </div>
-                      <div title="Grade so far, under this class's weights" style={{ gridColumn: compact ? 2 : undefined, gridRow: compact ? 1 : undefined, display: 'flex', flexDirection: compact ? 'column' : undefined, alignItems: compact ? 'flex-end' : 'center', justifyContent: compact ? 'flex-end' : undefined, gap: compact ? 0 : 10, whiteSpace: 'nowrap', lineHeight: compact ? '20px' : '22px' }}>
+                      <div role={compact ? undefined : 'cell'} title="Grade so far, under this class's weights" style={{ gridColumn: compact ? '1 / -1' : undefined, gridRow: compact ? 1 : undefined, justifySelf: compact ? 'end' : undefined, display: 'flex', alignItems: compact ? 'baseline' : 'center', justifyContent: compact ? 'flex-end' : undefined, gap: compact ? 6 : 10, whiteSpace: 'nowrap', lineHeight: compact ? '22px' : '22px' }}>
                         {/* The coloured number is the grade; completion is the "Graded done" column (on a phone, the
                             "graded" count under the name), so no bar here suggests course progress. On a phone the
                             number carries its own label under it, since there is no column header above it. */}
-                        <strong style={{ color: prog?.gradedCounted ? pctColor(wp) : 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: compact ? 16 : 15, fontVariantNumeric: 'tabular-nums', minWidth: compact ? undefined : 44, textAlign: 'right' }}>{prog?.gradedCounted ? `${wp}%` : '—'}</strong>
-                        {compact && <span style={{ fontFamily: 'var(--font-prose)', fontSize: 12, lineHeight: '16px', color: 'var(--c-meta)' }}>grade so far</span>}
+                        {/* Phone: one line, the label in meta before the number ("Grade so far 100%"). */}
+                        {compact && <span style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-meta)' }}>Grade so far</span>}
+                        <strong style={{ color: prog?.gradedCounted ? countedGradeColor(wp) : 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: compact ? 16 : 15, fontVariantNumeric: 'tabular-nums', minWidth: compact ? undefined : 44, textAlign: 'right' }}>{prog?.gradedCounted ? `${wp}%` : '—'}</strong>
                       </div>
-                      <div style={{ gridColumn: compact ? 1 : undefined, gridRow: compact ? 2 : undefined, minWidth: 0, display: 'flex', flexWrap: 'nowrap', overflow: 'hidden', gap: compact ? '0 6px' : 8, lineHeight: '18px', fontFamily: 'var(--font-prose)', fontSize: compact ? 13 : 14, color: compact ? 'var(--c-meta)' : 'var(--c-fg)', fontVariantNumeric: 'tabular-nums' }}>
+                      <div role={compact ? undefined : 'cell'} style={{ gridColumn: compact ? 1 : undefined, gridRow: compact ? 2 : undefined, minWidth: 0, display: 'flex', flexWrap: compact ? 'wrap' : 'nowrap', overflow: compact ? undefined : 'hidden', gap: compact ? '0 6px' : 8, lineHeight: '18px', fontFamily: 'var(--font-prose)', fontSize: compact ? 13 : 14, color: compact ? 'var(--c-meta)' : 'var(--c-fg)', fontVariantNumeric: 'tabular-nums' }}>
                         <span style={{ whiteSpace: 'nowrap' }}>{prog?.gradedDone ?? 0}/{prog?.gradedTotal ?? '—'}{compact && ' graded'}</span>
                         {compact && <span aria-hidden="true">·</span>}
                         {compact && <span style={{ whiteSpace: 'nowrap', fontWeight: prog?.gradedMissing ? 700 : 400, color: prog?.gradedMissing ? 'var(--c-red)' : 'var(--c-meta)' }}>{prog?.gradedMissing ?? 0} past due</span>}
                       </div>
-                      {!compact && <><strong style={{ fontFamily: 'var(--font-prose)', fontSize: 15, fontVariantNumeric: 'tabular-nums', color: prog?.gradedMissing ? 'var(--c-red)' : 'var(--c-meta)' }}>{prog?.gradedMissing || '—'}</strong><span title={prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'} style={{ minWidth: 0, fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: '18px', color: prog?.last_active ? 'var(--c-fg)' : 'var(--c-meta)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'}</span></>}
-                      <div style={{ gridColumn: compact ? 2 : undefined, gridRow: compact ? 2 : undefined, minWidth: 0, display: 'flex', flexWrap: 'nowrap', gap: compact ? 6 : 8, justifyContent: 'flex-end', justifySelf: 'end', alignItems: 'center', paddingLeft: compact ? 0 : 8 }}>
+                      {!compact && <><strong role="cell" style={{ fontFamily: 'var(--font-prose)', fontSize: 15, fontVariantNumeric: 'tabular-nums', color: prog?.gradedMissing ? 'var(--c-red)' : 'var(--c-meta)' }}>{prog?.gradedMissing || '—'}</strong><span role="cell" title={prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'} style={{ minWidth: 0, fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: '18px', color: prog?.last_active ? 'var(--c-fg)' : 'var(--c-meta)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'}</span></>}
+                      <div role={compact ? undefined : 'cell'} style={{ gridColumn: compact ? 2 : undefined, gridRow: compact ? 2 : undefined, minWidth: 0, display: 'flex', flexWrap: 'nowrap', gap: compact ? 6 : 8, justifyContent: 'flex-end', justifySelf: 'end', alignItems: 'center', paddingLeft: compact ? 0 : 8 }}>
                         {/* The row's action: a full-strength cyan outline with a bold label and a faint tint, so it
                             reads as the thing to press without a column of bright fills outshouting the grades. */}
                         <button

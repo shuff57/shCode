@@ -810,6 +810,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
           {passed && (
             <div style={{ marginTop: 16 }}>
               <button
+                className="lesson-next-action"
                 onClick={() => navigateToNextLesson(lessonId)}
                 style={{
                   padding: '10px 18px',

@@ -688,6 +688,7 @@ export default function DiagramAssignmentView({
               : 'All checks passed and this part is complete.'}
           </span>
           <button
+            className="lesson-next-action"
             onClick={() => navigateToNextLesson(lessonId)}
             style={{
               padding: '8px 16px',

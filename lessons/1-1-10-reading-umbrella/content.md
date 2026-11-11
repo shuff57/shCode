@@ -5,7 +5,13 @@
 What you'll learn from it:
 
 - An umbrella activity is work that runs alongside *every* phase, not inside one.
-- The six listed are training/communication, risk management, configuration management, quality management, architecture management, and security management.
+- The six listed are
+  - training/communication,
+  - risk management,
+  - configuration management,
+  - quality management,
+  - architecture management, and
+  - security management.
 - Umbrella activities belong to no single phase: they hold the whole project up.
 
 **Try it:** The kitchen-cleanup analogy: the four phases are like cooking a meal, and umbrella activities are the cleanup that keeps the kitchen usable the whole time. Run the block below to log two umbrella activities and, for each, which phase you think it touches most.

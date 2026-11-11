@@ -115,6 +115,44 @@ const ids2 = r2.body.submissions.map((s) => s.id);
 check('total never exceeds the cap', ids2.length, Q.QUEUE_TOTAL_CAP);
 check('with more than the cap needing a human, every listed row needs a human', ids2.every((id) => id.startsWith('f')), true);
 
+// ---- the assignment brief (prompt + rubric) the Today queue shows -------------
+// Fresh rows for real catalog lessons: a written part, a capped strict PA part, and the unknown 'lab-x'.
+db.exec("DELETE FROM lesson_submissions");
+const WRITTEN = '1-1-22-a1-2-describe-lifecycle', LAB = '1-2-28-a1-2-1-fix-ten-declarations', PA = '1-6-1-ch1-pa-design-chart';
+ins.run('w1', 's1@x', WRITTEN, 'my essay', JSON.stringify({ criteria: [] }), 3, 4, 5000);
+ins.run('w2', 's2@x', WRITTEN, 'other essay', JSON.stringify({ criteria: [] }), 4, 4, 5001);
+ins.run('l1', 's1@x', LAB, 'code', JSON.stringify({ gradingFailed: true }), null, null, 5002);
+ins.run('p1', 's2@x', PA, 'plan', JSON.stringify({ criteria: [] }), 1, 3, 5003);
+ins.run('u1', 's3@x', 'lab-x', 'code', JSON.stringify({ criteria: [] }), 1, 1, 5004);
+db.prepare('INSERT INTO classes VALUES (?, ?)').run('C2', 'other@x');
+const r3 = await get();
+const A = r3.body.assignments ?? {};
+check('the teacher of the class gets an assignments map', typeof A, 'object');
+check('one brief per listed lesson, unknown lesson absent (fails closed)', Object.keys(A).sort(), [LAB, PA, WRITTEN].sort());
+check('written part: the prompt is the task the student read', /four framework activities/.test(A[WRITTEN].prompt), true);
+check('written part: criteria carry title and points', A[WRITTEN].rubric.every((c) => typeof c.title === 'string' && c.title && typeof c.points === 'number'), true);
+check('lab part: the model instructions are cut, the task stays',
+  [/Several declarations are missing/.test(A[LAB].prompt), /You cannot run their code/.test(A[LAB].prompt)], [true, false]);
+check('a graded test part drops criterion descriptions (they name the answers)', A[PA].rubric.some((c) => 'description' in c), false);
+check('a brief holds only prompt and rubric', Object.values(A).every((b) => JSON.stringify(Object.keys(b).sort()) === '["prompt","rubric"]'), true);
+const ALLOWED = new Set(['id', 'title', 'points', 'description', 'required']);
+check('a criterion holds no check, model, gate or other server-only field',
+  Object.values(A).every((b) => b.rubric.every((c) => Object.keys(c).every((k) => ALLOWED.has(k)))), true);
+const raw = JSON.stringify(r3.body);
+check('no solution, pseudocode, answer key, model or context docs anywhere in the response',
+  ['"solution', '"pseudocode', '"answers"', '"answerKey', '"model"', '"contextDocs"', '"gate"', '"check"'].filter((k) => raw.includes(k)), []);
+check('a student is refused', (await get('s1@x', 'student')).status, 403);
+check('a student is never sent a brief', 'assignments' in (await get('s1@x', 'student')).body, false);
+check('the teacher of another class is refused', (await get('other@x', 'teacher')).status, 403);
+db.prepare('INSERT INTO class_teachers VALUES (?, ?)').run('C1', 'co@x');
+check('a co-teacher gets the briefs', Object.keys((await get('co@x', 'teacher')).body.assignments ?? {}).length, 3);
+check('an admin gets the briefs', Object.keys((await get('admin@x', 'admin')).body.assignments ?? {}).length, 3);
+{
+  const res = await onRequestGet({ env: { DB: d1(db) }, data: { email: 't@x', role: 'teacher' }, params: { id: 'NOPE' },
+    request: new Request('https://example.test/api/classes/NOPE/submission-queue') });
+  check('an unknown class is 404', res.status, 404);
+}
+
 // ---- the pure ordering rules -----------------------------------------------
 const row = (id, t, score, g) => ({ id, submitted_at: t, score, grade_json: g });
 const F = JSON.stringify({ gradingFailed: true });

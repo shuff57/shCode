@@ -51,3 +51,45 @@ export async function loadAiGrader(
   // resolve to something off Object.prototype.
   return Object.prototype.hasOwnProperty.call(AI_GRADERS, lessonId) ? AI_GRADERS[lessonId] : null;
 }
+
+/**
+ * What a TEACHER reviewing a submission is shown of the assignment (the Today tab's review queue):
+ * the task the student was given and each criterion's title and points. Built from the same
+ * server-side config, and only ever returned by a teacher/admin-gated route (submission-queue GET).
+ *
+ * Deliberately narrow. It never carries the model id, context docs, the hybrid chart gate or a
+ * criterion's deterministic `check`, and on a graded test part (`strict`) it drops each
+ * criterion's description too, because those name the answers. Solutions, after-tries pseudocode
+ * and quiz keys live elsewhere and are never read here.
+ */
+export interface TeacherBriefCriterion {
+  id: string;
+  title: string;
+  points: number;
+  description?: string;
+  required?: boolean;
+}
+export interface TeacherBrief {
+  prompt: string;
+  rubric: TeacherBriefCriterion[];
+}
+
+// Lab graders wrap the task in model instructions ("The task they were given: ... You cannot run their
+// code: ..."); the teacher needs the task, not the instructions.
+const TASK_RE = /The task they were given:\s*([\s\S]*?)\s*You cannot run their code/;
+
+export function teacherBrief(cfg: AiGraderConfig | null): TeacherBrief | null {
+  if (!cfg || typeof cfg.prompt !== 'string' || !Array.isArray(cfg.rubric)) return null;
+  const task = cfg.prompt.match(TASK_RE)?.[1]?.trim();
+  const prompt = (task || cfg.prompt).trim();
+  const rubric: TeacherBriefCriterion[] = [];
+  for (const r of cfg.rubric) {
+    if (!r || typeof r.id !== 'string' || typeof r.title !== 'string') continue;
+    const item: TeacherBriefCriterion = { id: r.id, title: r.title, points: typeof r.points === 'number' ? r.points : 0 };
+    if (!cfg.strict && typeof r.description === 'string' && r.description.trim()) item.description = r.description.trim();
+    if (r.required === true) item.required = true;
+    rubric.push(item);
+  }
+  if (!prompt && rubric.length === 0) return null;
+  return { prompt, rubric };
+}

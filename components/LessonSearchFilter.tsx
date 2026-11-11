@@ -69,6 +69,10 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
   const nextLesson = progress.loaded && progress.authed ? [...lessons].sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true })).find((l) => progress.states[l.id] !== 'completed') : undefined;
   // The module the "Next up" card points into is marked in the list below (accent edge + label).
   const nextModuleId = nextLesson ? (parseNumberedId(nextLesson.title) ?? '').split('.').slice(0, 2).join('.') : null;
+  // "Continue" once the next lesson's module has any progress (the same rule as the module row's
+  // "In progress" label below); "Start" only for a module nobody has opened yet.
+  const nextInProgress = !!nextLesson && (progress.states[nextLesson.id] === 'started'
+    || lessons.some((l) => progress.states[l.id] && (parseNumberedId(l.title) ?? '').split('.').slice(0, 2).join('.') === nextModuleId));
   const [query, setQuery] = useState('');
   // Due dates are per class, so every chip on this page reads one chosen
   // class. Renders nothing at all for a student.
@@ -142,10 +146,10 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
       {nextLesson && (
         <div className="home-continue-card">
           <div style={{ minWidth: 0 }}>
-            <span style={{ display: 'block', color: 'var(--c-meta)', fontSize: 13, marginBottom: 4 }}>{progress.states[nextLesson.id] === 'started' ? 'Continue learning' : 'Next up'}</span>
+            <span style={{ display: 'block', color: 'var(--c-meta)', fontSize: 13, marginBottom: 4 }}>{nextInProgress ? 'Continue learning' : 'Next up'}</span>
             <span className="home-continue-title">{nextLesson.title}</span>
           </div>
-          <Link href={lessonHref(nextLesson)} className="home-continue-action">{progress.states[nextLesson.id] === 'started' ? 'Continue →' : 'Start →'}</Link>
+          <Link href={lessonHref(nextLesson)} className="home-continue-action">{nextInProgress ? 'Continue →' : 'Start →'}</Link>
         </div>
       )}
       {Array.from(groups.entries()).map(([top, group]) => {
@@ -176,7 +180,7 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
             <summary className="flex items-baseline gap-3 p-4 cursor-pointer hover:bg-muted transition list-none">
               <span className="text-2xl font-bold">Chapter {top}</span>
               {group.label && <span className="text-base opacity-80">{group.label}</span>}
-              <span className="ml-auto flex items-center gap-4 text-sm opacity-80">
+              <span className="home-chapter-count ml-auto flex items-center gap-4 text-sm opacity-80">
                 <UnitProgressBadge lessons={unitLessonRefs} label={`Chapter ${top}`} />
 
               </span>

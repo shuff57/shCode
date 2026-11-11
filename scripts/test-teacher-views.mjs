@@ -52,6 +52,47 @@ check('nothing counted in scope falls back to all of it, not an empty grid', sel
 check('fallback is not "narrowed"', sel.narrowed, false);
 check('null unit groups as Other', selectGradebookLessons([{ id: 'z', unit: null, c: true }], { module: 'Other', showAll: false, isCounted }).lessons.length, 1);
 
+// ---- paging by module ------------------------------------------------------
+const GV = req(join(out, 'gradebook-view.js'));
+const M35 = '3.5 Readings only';
+const paged = [...lessons, { id: 'f', unit: M35, c: false }];
+const opts = moduleOptions(paged, isCounted);
+check('module key is the leading number', GV.moduleKey('1.1 Software Lifecycle'), '1.1');
+check('module key falls back to the label', GV.moduleKey('Other'), 'Other');
+check('pages skip a module with nothing counted', GV.modulePages(opts, false).map((p) => p.unit), [M33, M34]);
+check('with ungraded shown it is a page', GV.modulePages(opts, true).map((p) => p.unit), [M33, M34, M35]);
+check('nothing counted anywhere: every module is a page',
+  GV.modulePages(moduleOptions(paged, () => false), false).map((p) => p.unit), [M33, M34, M35]);
+check('page size: counted only', GV.pageSize(opts[1], false), 1);
+check('page size: everything', GV.pageSize(opts[1], true), 3);
+const pages = GV.modulePages(opts, false);
+check('a page shows exactly its module\'s counted lessons',
+  selectGradebookLessons(paged, { module: pages[1].unit, showAll: false, isCounted }).lessons.map((l) => l.id), ['c']);
+check('first page: no previous', GV.pagerFor(pages, M33), { unit: M33, position: 1, total: 2, prev: null, next: M34 });
+check('last page: no next', GV.pagerFor(pages, M34), { unit: M34, position: 2, total: 2, prev: M33, next: null });
+check('all modules: position 0, next is the first page', GV.pagerFor(pages, null), { unit: null, position: 0, total: 2, prev: null, next: M33 });
+check('a stale unit reads as all modules', GV.pagerFor(pages, 'gone').position, 0);
+check('address: all', GV.resolveModuleParam(pages, 'all'), null);
+check('address: a key', GV.resolveModuleParam(pages, '3.4'), M34);
+check('address: a full label', GV.resolveModuleParam(pages, M33), M33);
+check('address: a stale key means no choice', GV.resolveModuleParam(pages, '9.9'), undefined);
+check('address: absent means no choice', GV.resolveModuleParam(pages, null), undefined);
+check('address: a module that is not a page means no choice', GV.resolveModuleParam(pages, '3.5'), undefined);
+check('default: the most recently past-due counted lesson',
+  GV.defaultModule(pages, paged, isCounted, { a: 100, c: 200 }, 300), M34);
+check('default: a later past date wins whatever the order',
+  GV.defaultModule(pages, paged, isCounted, { a: 250, c: 200 }, 300), M33);
+check('default: nothing past, the next one coming due',
+  GV.defaultModule(pages, paged, isCounted, { a: 900, c: 500 }, 300), M34);
+check('default: an uncounted lesson\'s date is ignored',
+  GV.defaultModule(pages, paged, isCounted, { d: 250, a: 100 }, 300), M33);
+check('default: no dates, the first page', GV.defaultModule(pages, paged, isCounted, undefined, 300), M33);
+check('default: no pages', GV.defaultModule([], paged, isCounted, undefined, 300), null);
+check('column width grows to share the room', GV.pagedColumnWidth(800, 4), 200);
+check('column width never below the minimum', GV.pagedColumnWidth(300, 4), 168);
+check('column width capped', GV.pagedColumnWidth(2000, 2), 240);
+check('column width: no columns', GV.pagedColumnWidth(800, 0), 168);
+
 // ---- late rule -------------------------------------------------------------
 check('late badge: counted and late', D.showLateBadge(true, true), true);
 check('late badge: a reading is never late', D.showLateBadge(false, true), false);

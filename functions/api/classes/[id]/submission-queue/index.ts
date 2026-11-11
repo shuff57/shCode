@@ -7,13 +7,15 @@
 // score NULL, shown as "needs manual grade"), then the 50 most recent other graded
 // rows; at most 100 in all (lib/submission-queue-order.ts). The rows needing a human
 // are fetched by their own query so routine rows can never push them off the list.
+// GET also returns `assignments`: lesson id -> { prompt, rubric } (functions/_shared/aiGraders.ts
+// teacherBrief) for the lessons listed, so the queue shows the question beside the answer.
 // POST lets a teacher override the AI score and optionally attach feedback.
 //
 // Auth: caller must be an owner / co-teacher of the class OR an admin.
 
 import { canManageClass } from '../../../../_shared/classAuth';
 import { bestScoreOverAllRows, capFor, rowScore, scoreOverride } from '../../../../_shared/attempts';
-import { loadAiGrader } from '../../../../_shared/aiGraders';
+import { loadAiGrader, teacherBrief, type TeacherBrief } from '../../../../_shared/aiGraders';
 import { orderQueue, QUEUE_ROUTINE_CAP, QUEUE_TOTAL_CAP } from '../../../../../lib/submission-queue-order';
 
 interface Env {
@@ -138,7 +140,21 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (
   const submissions = await Promise.all(
     rows.map(async (r) => ({ ...r, limit: await rowLimit(env, request, r), capped: capFor(r.lesson_id) !== undefined })),
   );
-  return json({ submissions });
+
+  // The assignment each listed row answers (task + criteria titles and points), once per lesson, so the
+  // teacher sees the question beside the answer. Keyed by the lesson ids of rows already listed (read
+  // from the database, never the request) and resolved against the bundled grader config, which only
+  // holds lessons in the built catalog. Fails closed: a lesson with no config, or a lookup that throws,
+  // is simply absent. This is a teacher/admin read; POST /api/grade-written is unchanged and never
+  // takes a prompt or rubric from a client.
+  const assignments: Record<string, TeacherBrief> = {};
+  for (const lessonId of new Set(rows.map((r) => r.lesson_id))) {
+    try {
+      const brief = teacherBrief(await loadAiGrader(env, request, lessonId));
+      if (brief) assignments[lessonId] = brief;
+    } catch { /* fail closed: no brief for this lesson */ }
+  }
+  return json({ submissions, assignments });
 };
 
 // POST — teacher overrides an AI grade.

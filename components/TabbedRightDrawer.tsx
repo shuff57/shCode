@@ -214,7 +214,7 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
 
       {/* Labels run along the desktop rail and move with the drawer. Phones use a horizontal dock. */}
       <div
-        className={`shd-tabstrip${tabs.length === 1 && tabs[0].label === 'Docs' ? ' shd-docs-only' : ''}`}
+        className={`shd-tabstrip${tabs.length === 1 && tabs[0].label === 'Docs' ? ' shd-docs-only' : ''}${open ? ' shd-open' : ''}`}
         style={{
           position: 'fixed',
           right: 'var(--shd-tabbed, 0px)',

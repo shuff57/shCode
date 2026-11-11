@@ -209,19 +209,22 @@ export function AnnouncementsPanel({ classId }: Props) {
             Pin this announcement
           </label>
           {/* Post ends the pin row, so the composer is one line shorter and Post stays in view. */}
+          {/* Disabled until there is something to post; the disabled look is a quiet outline with readable
+              text (not a faded green that still reads as pressable). */}
           <button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || content.trim() === ''}
+            title={content.trim() === '' ? 'Write the announcement first' : undefined}
             style={{
-              background: 'var(--c-green)',
-              color: 'var(--c-bg)',
-              border: 'none',
+              background: content.trim() === '' ? 'transparent' : 'var(--c-green)',
+              color: content.trim() === '' ? 'var(--c-meta)' : 'var(--c-bg)',
+              border: content.trim() === '' ? '1px solid var(--c-line)' : '1px solid transparent',
               borderRadius: 4,
               padding: '8px 20px',
               marginLeft: 'auto',
               fontWeight: 700,
               fontSize: 14,
-              cursor: submitting ? 'not-allowed' : 'pointer',
+              cursor: submitting || content.trim() === '' ? 'not-allowed' : 'pointer',
               opacity: submitting ? 0.6 : 1,
             }}
           >

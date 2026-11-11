@@ -40,6 +40,7 @@ import {
   moduleIdFromTitle,
   resolveDueAt,
   schoolDateString,
+  SCHOOL_TZ,
   type DueDateRow,
   type DueScope,
   type OpenDateRow,
@@ -89,6 +90,16 @@ const ENDPOINT: Record<Kind, string> = { open: 'open-dates', due: 'due-dates' };
 // For an available-after grid a past date is not "late" — the gate already
 // opened — so the due wording is replaced on those fields only.
 const OPEN_PAST_HINT = 'Already in the past — the lesson is open now';
+
+// "Pacific Time", named once for the schedule header; the zone id itself if the browser cannot name it.
+function schoolZoneName(): string {
+  try {
+    const opts = { timeZone: SCHOOL_TZ, timeZoneName: 'longGeneric' } as unknown as Intl.DateTimeFormatOptions;
+    return new Intl.DateTimeFormat('en-US', opts).formatToParts(new Date()).find((p) => p.type === 'timeZoneName')?.value ?? SCHOOL_TZ;
+  } catch {
+    return SCHOOL_TZ;
+  }
+}
 
 const C = {
   border: 'var(--c-line)',
@@ -184,6 +195,8 @@ function DateTimeField({
   ariaSuffix,
   pastHint,
   showLabel = true,
+  emptyText,
+  emptyColor,
 }: {
   label: string;
   color: string;
@@ -194,6 +207,10 @@ function DateTimeField({
   /** Forwarded to the popover grid; set on available-after fields only. */
   pastHint?: string;
   showLabel?: boolean;
+  /** What an empty date reads instead of "Not set": a module whose lessons carry their own dates says
+   *  "Mixed" (or "Set per lesson"), never "Not set". */
+  emptyText?: string;
+  emptyColor?: string;
 }) {
   const date = row?.date ?? '';
   const time = row?.time ?? '';
@@ -211,7 +228,7 @@ function DateTimeField({
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', boxSizing: 'border-box', maxWidth: '100%', padding: showLabel ? 0 : '0 0 0 12px', borderLeft: showLabel ? undefined : `1px solid ${C.border}` }}>
       {showLabel && <span style={{ fontFamily: 'var(--font-prose)', fontSize: 14, fontWeight: 600, flexBasis: '100%', color }}>{label}</span>}
       <span style={{ position: 'relative', display: 'inline-flex' }}>
-      {!date && <span aria-hidden="true" style={{ position: 'absolute', left: 7, top: 1, bottom: 1, right: 26, display: 'flex', alignItems: 'center', background: 'var(--c-deep2)', color: C.dim, fontFamily: 'var(--font-prose)', fontSize: 15, pointerEvents: 'none', zIndex: 1 }}>Not set</span>}
+      {!date && <span aria-hidden="true" style={{ position: 'absolute', left: 7, top: 1, bottom: 1, right: 26, display: 'flex', alignItems: 'center', background: 'var(--c-deep2)', color: emptyColor ?? C.dim, fontFamily: 'var(--font-prose)', fontSize: 15, fontWeight: emptyText ? 600 : undefined, pointerEvents: 'none', zIndex: 1 }}>{emptyText ?? 'Not set'}</span>}
       <input
         type="date"
         value={date}
@@ -293,8 +310,19 @@ function DateTimeField({
   );
 }
 
+/** A module field with no date of its own whose lessons DO carry dates: "Mixed" (orange) when they differ,
+ *  "Set per lesson" / "From unit" when they agree. Only a module with no dated lesson under it reads "Not set". */
+function emptyFor(summary: { kind: 'none' | 'single' | 'mixed'; ownDueAt: number | null; overrides: number }): { emptyText?: string; emptyColor?: string } {
+  if (summary.ownDueAt !== null) return {};
+  if (summary.kind === 'mixed') return { emptyText: 'Mixed', emptyColor: C.warn };
+  // Every lesson has the same date: from their own rows, or (no lesson rows) inherited from the unit.
+  if (summary.kind === 'single') return { emptyText: summary.overrides > 0 ? 'Set per lesson' : 'From unit', emptyColor: C.text };
+  return {};
+}
+
 export default function DueDatesPanel({ classId }: { classId: string }) {
   const [compact, setCompact] = useState(false);
+  const zoneName = useMemo(() => schoolZoneName(), []);
   useEffect(() => {
     const media = window.matchMedia('(max-width: 640px)');
     const sync = () => setCompact(media.matches);
@@ -488,8 +516,9 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
 
       {units.map((unit) => (
         <div className="schedule-unit" key={unit.unitId} style={{ marginBottom: 16, overflowX: 'auto' }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: C.accent, marginBottom: 8 }}>
-            {unit.unitId}
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 8 }}>
+            <span style={{ fontSize: 14, fontWeight: 700, color: C.accent }}>{unit.unitId}</span>
+            <span style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: C.dim }}>Times are in {zoneName}</span>
           </div>
 
           {/* Group headers: what each column group sets, with what its two fields are in meta. */}
@@ -555,11 +584,13 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                     ariaSuffix={`module ${mod.moduleId}`}
                     pastHint={OPEN_PAST_HINT}
                     showLabel={compact}
+                    {...emptyFor(openSummary)}
                   />
 
                   <DateTimeField
                     label="Due at"
                     color={C.dim}
+                    {...emptyFor(dueSummary)}
                     row={byKey.due.get(`module:${mod.moduleId}`)}
                     onWrite={(date, time) => { void write('due', [{ scope: 'module', scopeId: mod.moduleId, date, time }]); }}
                     ariaSuffix={`module ${mod.moduleId}`}

@@ -320,6 +320,8 @@ export default function QuizView({ lessonId, config }: Props) {
           aria-live="polite"
         >
           {answeredCount} of {questions.length} answered
+          {/* Wide screens only (CSS): the same count as a bar inside the pill. */}
+          <span className="quiz-answered-bar" aria-hidden="true"><span style={{ width: `${questions.length ? Math.round((answeredCount / questions.length) * 100) : 0}%` }} /></span>
         </span>
         {summative && (
           <div style={{ marginLeft: 'auto' }}>
@@ -410,7 +412,8 @@ export default function QuizView({ lessonId, config }: Props) {
               </pre>
             ) : null}
 
-            <div className="quiz-options">
+            {/* Short options (every one <= 40 characters) sit two to a row on a wide screen (CSS). */}
+            <div className={`quiz-options${q.options.every((o) => o.length <= 40) ? ' is-short' : ''}`}>
               {order.map((oi) => {
                 const opt = q.options[oi];
                 const selected = picked === oi;
