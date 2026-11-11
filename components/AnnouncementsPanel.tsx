@@ -169,7 +169,7 @@ export function AnnouncementsPanel({ classId }: Props) {
         }}
       >
         <label htmlFor="announcement-content" style={{ fontFamily: 'var(--font-prose)', fontWeight: 600, color: 'var(--c-fg)', fontSize: 14, marginBottom: -6 }}>
-          New Announcement
+          New announcement
         </label>
 
         <textarea

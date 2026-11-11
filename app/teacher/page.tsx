@@ -28,7 +28,7 @@ import { CATEGORY_LABEL, GRADE_CATEGORIES, lessonGradeCategory, lessonPercent, t
 import { buildGradesCsv } from '../../lib/grades-csv';
 import { FeedbackProvider, useFeedback } from '../../components/FeedbackProvider';
 import { RowMenu } from '../../components/RowMenu';
-import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowUpDown, MousePointerClick } from 'lucide-react';
 import { toMermaid } from '../../lib/diagram-mermaid';
 
 // ---------------------------------------------------------------------------
@@ -587,7 +587,7 @@ const S = {
 // actions in their own right-aligned track (at least 16px of column gap plus 8px of lead before Open).
 // r7 T6: the actions track is a fixed width ("View progress" + More), because the header row and every
 // student row are separate grids and an auto track sized each one differently.
-const ROSTER_COLS = 'minmax(180px, 2fr) 154px 112px 80px 136px 220px';
+const ROSTER_COLS = 'minmax(180px, 2fr) 140px 144px 80px 136px 220px';
 
 /** Roster column sort (desktop headings). Null = the order the server sent, which is the default. */
 type RosterSortKey = 'name' | 'grade' | 'missing' | 'active';
@@ -1923,6 +1923,8 @@ function GradebookView({
             {statusLabel(status, true)}{label}
           </span>
         ))}
+        {/* r8 T5: a still screen shows no hover, so say once that a cell opens the work. */}
+        <span className="gb-open-hint"><MousePointerClick size={14} aria-hidden="true" />Select a score to open the work</span>
       </div>
 
       {/* Scrollable matrix */}
@@ -2175,6 +2177,7 @@ function GradebookView({
                   return (
                     <td
                       key={lesson.id}
+                      className={isCodingLesson || cell ? 'gb-cell-open' : undefined}
                       style={{
                         width: CELL_W, minWidth: CELL_W, maxWidth: CELL_W,
                         padding: '8px 4px', fontSize: 14,
@@ -2322,7 +2325,7 @@ function ListView() {
       {/* Heading row: title and intro on the left, the one page action on the right (r7 T3). */}
       <div className="teacher-list-head">
         <div style={{ minWidth: 0 }}>
-          <h1 style={{ ...S.h1, marginBottom: 8 }}>My Classes</h1>
+          <h1 style={{ ...S.h1, marginBottom: 8 }}>My classes</h1>
           <p style={{ color: 'var(--c-meta)', margin: 0, fontFamily: 'var(--font-prose)', fontSize: 15, lineHeight: 1.5, maxWidth: '70ch' }}>Your classroom at a glance. Open a class to review work and support your students.</p>
         </div>
         <button
@@ -2436,7 +2439,7 @@ function ListView() {
               </div>
               {/* Badges and the action that acts on them share one row. Each badge is a way in to the tab
                   that answers it: "to grade" opens Today, "behind" opens Students. */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 12, fontFamily: 'var(--font-prose)' }}>
                 {!c.archived_at && (chips[c.id] === undefined ? (
                   <span style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13 }}>checking…</span>
                 ) : chips[c.id].behind === 0 && chips[c.id].toGrade === 0 ? (
@@ -2821,6 +2824,10 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
 
   const { class: cls, isOwner, roster, coTeachers } = detail;
   const isArchived = !!cls.archived_at;
+  // r8 T7: when every student has the same number of graded lessons, the heading says it once ("of 149") and
+  // each row shows just the count. A class whose totals differ keeps the per-row fractions.
+  const rosterTotals = new Set(roster.map((r) => progressMap.get(r.student_email)?.gradedTotal).filter((n): n is number => typeof n === 'number'));
+  const rosterCommonTotal = rosterTotals.size === 1 ? [...rosterTotals][0] : null;
 
   return (
     <div className={activeTab === 'gradebook' ? 'teacher-gradebook' : 'teacher-frame'}>
@@ -2933,7 +2940,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         {/* Needs Attention view: one strip, the heading beside its chips, so the grading form below sits
             in the first screen. An opened chip still spreads to the full width under the strip. */}
           <div style={{ ...S.card, padding: compact ? '8px 16px' : '8px 20px', marginBottom: 0, display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px 16px' }}>
-            <h2 style={{ ...S.h2, fontSize: 16, lineHeight: '36px', margin: 0, whiteSpace: 'nowrap' }}>Needs Attention</h2>
+            <h2 style={{ ...S.h2, fontSize: 16, lineHeight: '36px', margin: 0, whiteSpace: 'nowrap' }}>Needs attention</h2>
             <div style={{ flex: '1 1 320px', minWidth: 0 }}>
             <NeedsAttentionPanel
               classId={classId}
@@ -2954,7 +2961,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
           </div>
         {/* Submission Review Queue */}
         <div id="submission-review-queue" style={{ ...S.card, padding: compact ? 16 : '16px 20px', marginBottom: 0, scrollMarginTop: 100 }}>
-          <h2 style={{ ...S.h2, fontSize: 18, marginBottom: 8 }}>Submission Review Queue</h2>
+          <h2 style={{ ...S.h2, fontSize: 18, marginBottom: 8 }}>Submission review queue</h2>
           <SubmissionQueue classId={classId} lessonTitles={lessonTitles} />
         </div>
         {/* Past due */}
@@ -2968,7 +2975,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
       {activeTab === 'students' && (
         <div role="tabpanel" id={`panel-students`} aria-labelledby={`tab-students`} style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
         {/* Roster view */}
-          <div style={{ ...S.card, padding: compact ? 16 : 20, marginBottom: 0 }}>
+          <div className={compact ? 'roster-panel is-compact' : 'roster-panel'} style={{ ...S.card, padding: compact ? 16 : 20, marginBottom: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 4 }}>
             <h2 style={{ ...S.h2, fontSize: 18, lineHeight: '26px', marginBottom: 0 }}>Roster ({roster.length})</h2>
             <button
@@ -3003,13 +3010,17 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             {roster.length === 0 ? (
               <p style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 15 }}>No students enrolled yet.</p>
             ) : (
-              <div className="roster-list" role={compact ? undefined : 'table'} aria-label={compact ? undefined : 'Roster'} style={{ display: 'flex', flexDirection: 'column', gap: compact ? 6 : 0 }}>
+              <div className="roster-list" role={compact ? undefined : 'table'} aria-label={compact ? undefined : 'Roster'} style={{ display: 'flex', flexDirection: 'column', gap: compact ? 8 : 0 }}>
                 {!compact && (
                   <div role="row" style={{ display: 'grid', gridTemplateColumns: ROSTER_COLS, gap: 16, padding: '8px 12px 4px', color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600, borderBottom: '1px solid var(--c-line)' }}>
                     {([
                       ['name', 'Student'], ['grade', 'Grade so far'], [null, 'Graded done'], ['missing', 'Past due'], ['active', 'Last active'],
                     ] as const).map(([key, text]) => {
-                      if (key === null) return <span key={text} role="columnheader" style={{ padding: '4px 0' }}>{text}</span>;
+                      if (key === null) return (
+                        <span key={text} role="columnheader" style={{ padding: '4px 0', whiteSpace: 'nowrap' }} title="Graded lessons this student has finished, out of every graded lesson in the course">
+                          {text}{rosterCommonTotal != null && <span className="roster-head-of"> (of {rosterCommonTotal})</span>}
+                        </span>
+                      );
                       const on = rosterSort?.key === key;
                       return (
                         <span key={key} role="columnheader" aria-sort={on ? (rosterSort!.dir === 'asc' ? 'ascending' : 'descending') : 'none'}>
@@ -3033,6 +3044,10 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                     </span>
                   </div>
                 )}
+                {/* r8 T1: on a phone the grade's label is said once, above the cards, not on every card. */}
+                {compact && (
+                  <div className="roster-card-head" aria-hidden="true"><span>Student</span><span>Grade so far</span></div>
+                )}
                 {/* Desktop: 20px name + 18px email + 12px padding + 1px border = 51px.
                     Phone: row 1 = name + grade, row 2 = counts on one line + Open and a compact More
                     (about 64px). Putting Open/More on the name row stranded the grade below them (lost 3-0). */}
@@ -3045,12 +3060,13 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                     <div
                       key={row.student_email}
                       role={compact ? undefined : 'row'}
-                      style={{ background: 'var(--c-bg)', borderRadius: compact ? 6 : 0, padding: compact ? '8px 12px' : '6px 12px', borderBottom: '1px solid var(--c-line)', display: 'grid', gridTemplateColumns: compact ? 'minmax(0, 1fr) auto' : ROSTER_COLS, alignItems: 'center', minWidth: 0, minHeight: compact ? undefined : 51, boxSizing: 'border-box', gap: compact ? '2px 8px' : 16 }}
+                      className={compact ? 'roster-pcard' : undefined}
+                      style={{ background: 'var(--c-bg)', borderRadius: compact ? 8 : 0, padding: compact ? '10px 14px' : '6px 12px', borderBottom: '1px solid var(--c-line)', display: 'grid', gridTemplateColumns: compact ? 'minmax(0, 1fr) auto' : ROSTER_COLS, alignItems: 'center', minWidth: 0, minHeight: compact ? undefined : 51, boxSizing: 'border-box', gap: compact ? '4px 10px' : 16 }}
                     >
                       {/* Phone: the name and the grade share row 1 across BOTH columns (the grade laid over its
                           right end), so column 2 is only as wide as Open + ⋯ and the counts in row 2 fit one line. */}
-                      <div role={compact ? undefined : 'cell'} style={{ minWidth: 0, gridColumn: compact ? '1 / -1' : undefined, gridRow: compact ? 1 : undefined, paddingRight: compact ? 136 : undefined, fontFamily: 'var(--font-prose)' }} title={`Enrolled ${fmt(row.enrolled_at)} by ${row.enrolled_by ?? 'self'}`}>
-                        <div style={{ fontSize: 15, lineHeight: compact ? '22px' : '20px', fontWeight: 600, color: 'var(--c-fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fullName(prog?.firstName, prog?.lastName) ?? row.student_email}</div>
+                      <div role={compact ? undefined : 'cell'} style={{ minWidth: 0, gridColumn: compact ? '1 / -1' : undefined, gridRow: compact ? 1 : undefined, paddingRight: compact ? 64 : undefined, fontFamily: 'var(--font-prose)' }} title={`Enrolled ${fmt(row.enrolled_at)} by ${row.enrolled_by ?? 'self'}`}>
+                        <div style={{ fontSize: compact ? 16 : 15, lineHeight: compact ? '22px' : '20px', fontWeight: compact ? 700 : 600, color: 'var(--c-fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fullName(prog?.firstName, prog?.lastName) ?? row.student_email}</div>
                         {!compact && <div style={{ color: 'var(--c-meta)', fontSize: 13, lineHeight: '18px', marginTop: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.student_email}</div>}
                       </div>
                       <div role={compact ? undefined : 'cell'} title="Grade so far, under this class's weights" style={{ gridColumn: compact ? '1 / -1' : undefined, gridRow: compact ? 1 : undefined, justifySelf: compact ? 'end' : undefined, display: 'flex', alignItems: compact ? 'baseline' : 'center', justifyContent: compact ? 'flex-end' : undefined, gap: compact ? 6 : 10, whiteSpace: 'nowrap', lineHeight: compact ? '22px' : '22px' }}>
@@ -3058,15 +3074,18 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                             "graded" count under the name), so no bar here suggests course progress. On a phone the
                             number carries its own label under it, since there is no column header above it. */}
                         {/* Phone: one line, the label in meta before the number ("Grade so far 100%"). */}
-                        {compact && <span style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-meta)' }}>Grade so far</span>}
+                        {compact && <span className="sr-only">Grade so far </span>}
                         <strong style={{ color: prog?.gradedCounted ? countedGradeColor(wp) : 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: compact ? 16 : 15, fontVariantNumeric: 'tabular-nums', minWidth: compact ? undefined : 44, textAlign: 'right' }}>{prog?.gradedCounted ? `${wp}%` : '—'}</strong>
                       </div>
                       <div role={compact ? undefined : 'cell'} style={{ gridColumn: compact ? 1 : undefined, gridRow: compact ? 2 : undefined, minWidth: 0, display: 'flex', flexWrap: compact ? 'wrap' : 'nowrap', overflow: compact ? undefined : 'hidden', gap: compact ? '4px 4px' : 8, lineHeight: '18px', fontFamily: 'var(--font-prose)', fontSize: compact ? 13 : 14, color: compact ? 'var(--c-meta)' : 'var(--c-fg)', fontVariantNumeric: 'tabular-nums' }}>
-                        {/* r7 T7: on a phone the two counts are labelled chips, the past-due one red when it is not 0. */}
-                        <span className={compact ? 'roster-chip' : undefined} style={{ whiteSpace: 'nowrap' }}>{prog?.gradedDone ?? 0}/{prog?.gradedTotal ?? '—'}{compact && ' graded'}</span>
+                        {/* r8 T1: on a phone the two counts are one quiet meta line, "7/149 graded · 6 past due",
+                            the past-due part red only when it is above 0. */}
+                        <span className={compact ? 'roster-chip' : undefined} style={{ whiteSpace: 'nowrap' }}>{prog?.gradedDone ?? 0}{(compact || rosterCommonTotal == null) && <>/{prog?.gradedTotal ?? '—'}</>}{compact && ' graded'}</span>
+                        {compact && <span aria-hidden="true" className="roster-chip-sep">·</span>}
                         {compact && <span className={prog?.gradedMissing ? 'roster-chip is-late' : 'roster-chip'} style={{ whiteSpace: 'nowrap' }}>{prog?.gradedMissing ?? 0} past due</span>}
                       </div>
-                      {!compact && <><strong role="cell" style={{ fontFamily: 'var(--font-prose)', fontSize: 15, fontVariantNumeric: 'tabular-nums', color: prog?.gradedMissing ? 'var(--c-red)' : 'var(--c-meta)' }}>{prog?.gradedMissing || '—'}</strong><span role="cell" title={prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'} style={{ minWidth: 0, fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: '18px', color: prog?.last_active ? 'var(--c-fg)' : 'var(--c-meta)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'}</span></>}
+                      {/* r8 T7: past due is a small red badge above 0 and a plain 0 at zero, so the column compares. */}
+                      {!compact && <><span role="cell" style={{ fontFamily: 'var(--font-prose)', fontSize: 14, fontVariantNumeric: 'tabular-nums' }}>{prog?.gradedMissing ? <span className="roster-late-badge" title={`${prog.gradedMissing} graded lesson${prog.gradedMissing === 1 ? '' : 's'} past due`}>{prog.gradedMissing}</span> : <span className="roster-zero">0</span>}</span><span role="cell" title={prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'} style={{ minWidth: 0, fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: '18px', color: prog?.last_active ? 'var(--c-fg)' : 'var(--c-meta)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'}</span></>}
                       <div role={compact ? undefined : 'cell'} style={{ gridColumn: compact ? 2 : undefined, gridRow: compact ? 2 : undefined, minWidth: 0, display: 'flex', flexWrap: 'nowrap', gap: compact ? 6 : 8, justifyContent: 'flex-end', justifySelf: 'end', alignItems: 'center', paddingLeft: compact ? 0 : 8 }}>
                         {/* The row's action: a full-strength cyan outline with a bold label and a faint tint, so it
                             reads as the thing to press without a column of bright fills outshouting the grades. */}
@@ -3075,7 +3094,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                           className="teacher-row-open"
                           aria-label={`View progress for ${fullName(prog?.firstName, prog?.lastName) ?? row.student_email}`}
                           title="Lessons, scores and submissions for this student"
-                          style={{ background: 'color-mix(in srgb, var(--c-cyan) 8%, transparent)', color: 'var(--c-cyan)', border: '1px solid var(--c-cyan)', borderRadius: 4, height: 32, boxSizing: 'border-box', padding: compact ? '0 8px' : '0 14px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: compact ? 40 : undefined, lineHeight: '18px', flexShrink: 0, fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                          style={{ background: 'color-mix(in srgb, var(--c-cyan) 8%, transparent)', color: 'var(--c-cyan)', border: '1px solid var(--c-cyan)', borderRadius: 4, height: 32, boxSizing: 'border-box', padding: compact ? '0 14px' : '0 14px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: compact ? 64 : undefined, lineHeight: '18px', flexShrink: 0, fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
                           onClick={() => { setDrawerLesson(null); setDrawerEmail(row.student_email); }}
                         >
                           {/* r7 T6: say what opens (the student's progress drawer), not just "Open". On a phone the

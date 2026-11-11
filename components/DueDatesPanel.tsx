@@ -231,11 +231,12 @@ function DateTimeField({
           className="dd-mixed-btn"
           aria-expanded={mixed.lessonsShown}
           onClick={mixed.onShowLessons}
-          aria-label={`${label} for ${ariaSuffix}: mixed, set per lesson. ${mixed.lessonsShown ? 'Hide' : 'Show'} the lessons`}
-          title={mixed.lessonsShown ? 'Hide the lessons' : 'Show the lessons and their dates'}
+          aria-label={`${label} for ${ariaSuffix}: mixed dates, set per lesson. ${mixed.lessonsShown ? 'Hide' : 'Show'} the lessons`}
+          title={mixed.lessonsShown ? 'Hide the lessons' : 'Edit each lesson\'s date'}
         >
-          <span style={{ color: emptyColor ?? C.warn, fontWeight: 700 }}>Mixed</span>
-          <span className="dd-mixed-btn-sub">set per lesson</span>
+          {/* r8 T6: name what the control does. */}
+          <span style={{ color: emptyColor ?? C.warn, fontWeight: 700 }}>Mixed dates</span>
+          <span className="dd-mixed-btn-sub"><span aria-hidden="true">· </span>Edit lessons</span>
           <span aria-hidden="true" className="dd-mixed-btn-chev">{mixed.lessonsShown ? <ChevronDown size={14} /> : <ChevronRight size={14} />}</span>
         </button>
       </span>

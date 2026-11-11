@@ -4260,3 +4260,287 @@ div:has(> .docs-set-link) > .docs-set-link:focus-visible { outline: none; }
 /* (r7 S12) the reSHape studio's own toolbar has no room for the save line; it shows only in the sandbox row */
 .sandbox-save-state:not(.sandbox-tb-end .sandbox-save-state) { display: none; }
 /* end climb4 r7 student */
+
+/* climb4 r8 teacher */
+/* r8 T1 Students phone: calm two-line cards. Name and grade on line one, one quiet meta line plus Open and the
+   menu on line two. The grade's label is said once above the list. The outer card's frame is dropped so the
+   student cards are not boxes inside a box. */
+.roster-panel.is-compact { background: transparent !important; border: 0 !important; padding: 4px 0 0 !important; box-shadow: none !important; }
+.roster-pcard { border: 1px solid var(--c-line) !important; background: var(--c-deep) !important; }
+.roster-card-head {
+  display: flex; justify-content: space-between; padding: 0 14px 2px; font-family: var(--font-prose); font-size: 13px;
+  font-weight: 600; color: var(--c-meta);
+}
+.roster-pcard .roster-chip { font-size: 14px; }
+.roster-chip-sep { color: var(--c-meta); padding: 0 2px; }
+/* r8 T7 Students desktop: the denominator once in the heading; past due as a small red badge, 0 as a plain 0. */
+.roster-head-of { font-weight: 500; }
+.roster-late-badge {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 22px; padding: 0 7px;
+  box-sizing: border-box; border-radius: 11px; font-weight: 700; font-size: 13px; font-variant-numeric: tabular-nums;
+  color: var(--c-red); background: color-mix(in srgb, var(--c-red) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--c-red) 45%, transparent);
+}
+.roster-zero { color: var(--c-meta); display: inline-block; min-width: 26px; text-align: center; font-variant-numeric: tabular-nums; }
+/* r8 T3 Class list: the badges on a class card read at 13px. */
+.teacher-class-card .teacher-chip-link { font-size: 13px; }
+/* r8 T6 Schedule: the Mixed control is outlined like the date inputs (solid, not dashed) and says what it does. */
+.dd-mixed-btn { border: 1px solid color-mix(in srgb, var(--c-line) 60%, var(--c-meta)); }
+.dd-mixed-btn-sub { color: var(--c-cyan); font-weight: 500; }
+.dd-mixed-btn-sub > span { color: var(--c-meta); }
+.dd-mixed-btn:hover { border-color: var(--c-cyan); }
+/* r8 T5 Gradebook: a cell that opens the work has a quiet static cue (a dotted underline in its own colour),
+   a cyan frame on hover and focus, and the legend says once what selecting a cell does. */
+.gb-cell-open > span { text-decoration: underline dotted; text-decoration-color: color-mix(in srgb, currentColor 55%, transparent); text-underline-offset: 4px; text-decoration-thickness: 1px; }
+.gb-cell-open:hover { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-cyan) 70%, transparent); }
+.gb-cell-open:hover > span { text-decoration-color: currentColor; }
+.gb-cell-open:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: -2px; }
+.gb-open-hint { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; flex-shrink: 0; white-space: nowrap; color: var(--c-meta); font-family: var(--font-prose); font-size: 13px; }
+.gb-open-hint svg { color: var(--c-cyan); }
+/* end climb4 r8 teacher */
+/* climb4 r8 student */
+/* r8 S1 moSHion lab, desktop: an inline code chip in a step never breaks inside itself; a long one (a whole
+   statement, MarkdownWithLiveBlocks .code-long) may break only after its "=", so a call is never split. The editor's code is 13.5px (the step text is 14px prose), and the room for
+   it comes from the gutters and the preview's spare width, so no starter line wraps and the 400px canvas
+   still fits. The tool buttons go quiet (a colour dot each) so the task, the editor and Run lead. */
+.lab-task-card .lesson-step code { white-space: nowrap; }
+.lab-task-card .lesson-step code.code-long:has(> .code-nowrap) { white-space: normal; }
+.lab-task-card .lesson-step code.code-long > .code-nowrap { white-space: nowrap; }
+.lab-task-card .lesson-step > strong { font-size: 15px; }
+@media (min-width: 1200px) {
+  body:has(.shd-inline-tools) .lab-work-area:has(#previewPane):not(:has(.output-header)) { gap: 10px; }
+  body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) #editor .cm-editor { font-size: 13.5px !important; }
+  body:has(.shd-inline-tools) .lab-work-area:has(#previewPane):not(:has(.output-header)) .editor-body { padding-left: 3px; padding-right: 3px; }
+  body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) #editor .cm-gutters { padding-right: 3px; }
+  body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) #editor .cm-line { padding-left: 4px; }
+  body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) .editor-preview-container:not(.sandbox-split) > #previewPane { flex-basis: 404px; }
+}
+@media (min-width: 721px) {
+  .shd-inline-tool { color: var(--c-fg); font-weight: 600; display: inline-flex; align-items: center; gap: 7px; }
+  .shd-inline-tool::before {
+    content: ''; width: 7px; height: 7px; border-radius: 50%; flex: 0 0 auto;
+    background: var(--shd-tab-accent, var(--c-purple));
+  }
+}
+/* r8 S8 Console lab: the module strip at the foot reads at a glance (14px prose, 10px bars, the current
+   lesson a wider pink block), and the task's last line points at the requirements where they are shown. */
+.lab-task-end-narrow { display: none; }
+@media (max-width: 720px) {
+  .lab-task-end-wide { display: none; }
+  .lab-task-end-narrow { display: inline; }
+}
+@media (min-width: 721px) {
+  .lesson-progress-footer { font-size: 14px !important; padding-top: 12px !important; padding-bottom: 12px !important; }
+  .lesson-progress-footer > a { font-family: var(--font-mono); font-size: 14px; }
+  .lesson-progress-footer .lesson-progress-count,
+  .lesson-progress-footer .lesson-progress-total { font-size: 14px; color: var(--c-fg) !important; }
+  .lesson-progress-footer .lesson-progress-total-label { color: var(--c-meta); }
+  .lesson-progress-footer .lesson-progress-segs { height: 22px; gap: 3px; }
+  .lesson-progress-footer .lesson-progress-seg { height: 22px !important; padding-top: 12px; border-radius: 2px !important; }
+  .lesson-progress-footer .lesson-progress-seg.is-current { flex-grow: 2.4 !important; padding-top: 0; box-shadow: 0 0 0 1px var(--c-fg); }
+  .lesson-progress-footer a.lesson-progress-seg:not(.is-current):hover { padding-top: 6px; }
+  .lesson-progress-here { width: 12px; height: 12px; }
+}
+/* r8 S16 Lesson pages: the previous / next strip is lesson navigation, not site navigation. It sits on the
+   page background under the header on every lesson page (labs too), each side says what it is
+   ("Previous", "Next lesson") before the title, and the module position ("Lesson 9 of 22") sits between
+   them, so the separate "Module 1.1 · Lesson 9 of 22" line above the title goes. */
+@media (min-width: 721px) {
+  body:has(:is(.content-lesson-main, .lab-work-area)):not(:has(.lesson-slides-frame)) > header:has(> .header-lesson-nav) {
+    background: linear-gradient(var(--header-bg), var(--header-bg)) top left / 100% calc(100% - 46px) no-repeat !important;
+  }
+  body:has(:is(.content-lesson-main, .lab-work-area)):not(:has(.lesson-slides-frame)) > header > .header-lesson-nav {
+    margin-top: 8px; height: 38px; padding-top: 0 !important; padding-bottom: 0 !important;
+    border-top: 0 !important; border-bottom: 1px solid var(--c-line);
+  }
+  .header-lesson-nav .hdr-lesson-link {
+    height: 36px; gap: 8px; padding: 0 4px; border: 0 !important; background: transparent !important;
+    color: var(--c-fg) !important; font-size: 14px;
+  }
+  .header-lesson-nav .hdr-lesson-link:hover { color: var(--c-cyan) !important; }
+  .header-lesson-nav .hdr-lesson-link:hover .lesson-nav-full { text-decoration: underline; text-underline-offset: 3px; }
+  .header-lesson-nav .hdr-lesson-link:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: -2px; border-radius: 4px; }
+  .header-lesson-nav .hdr-lesson-link[aria-disabled="true"] { color: var(--c-meta) !important; }
+  .hdr-lesson-label {
+    flex: 0 0 auto; font-family: var(--font-prose); font-size: 13px; font-weight: 600; color: var(--c-meta);
+    white-space: nowrap;
+  }
+  .header-lesson-nav .hdr-lesson-pos {
+    display: inline-flex; align-items: center; flex: 0 0 auto; white-space: nowrap;
+    font-family: var(--font-prose); font-size: 13px; color: var(--c-meta); font-variant-numeric: tabular-nums;
+  }
+  .header-lesson-nav .hdr-lesson-pos::before { content: "Lesson\00a0"; }
+  .header-lesson-nav:has(.hdr-lesson-pos) .hdr-lesson-link { max-width: 44% !important; }
+  body:has(.header-lesson-nav .hdr-lesson-pos):not(:has(.lesson-slides-frame)) .lesson-position { display: none !important; }
+  /* slides keep their one-row header: there the strip is compact and labelled the same way */
+  body:has(.lesson-slides-frame) .header-lesson-nav .hdr-lesson-pos { display: none; }
+}
+@media (max-width: 720px) { .hdr-lesson-label { display: none; } }
+/* r8 S11 Lesson pages: the breadcrumb ends at the module (the title right under it is the last crumb), the
+   Docs button sits with the badge row on the left, and the worked example's empty Output is plain text
+   (no play glyph that reads as a second Run button). */
+.content-lesson-main > nav:first-child .lesson-breadcrumb-current { display: none; }
+@media (min-width: 721px) {
+  .content-lesson-main:not(:has(.lesson-slides-frame)) .content-lesson-title > .shd-inline-host {
+    order: 0; margin-left: 6px !important; padding-left: 12px; border-left: 1px solid var(--c-line);
+  }
+}
+.livecode-empty-icon { display: none !important; }
+.livecode-empty strong { color: var(--c-fg) !important; }
+/* r8 S4 Reading: a list inside a list is compact (tight lines, no gaps), a nested list that is one sentence
+   written as a list (every item but the last ends in a comma, MarkdownWithLiveBlocks .list-as-sentence)
+   runs on as that sentence after its lead-in, and the first screen's rhythm is tighter. */
+.content-lesson-main .content-prose ul ul, .content-lesson-main .content-prose ol ul { margin: 4px 0 2px !important; }
+.content-lesson-main .content-prose li li { margin: 0 !important; line-height: 1.5; }
+.content-lesson-main .content-prose ul.list-as-sentence { display: inline; padding: 0; margin: 0 !important; list-style: none; }
+.content-lesson-main .content-prose ul.list-as-sentence > li { display: inline; margin: 0 !important; }
+.content-lesson-main .content-prose ul.list-as-sentence > li::marker { content: none; }
+.content-lesson-main .content-prose ul.list-as-sentence > li + li::before { content: " "; }
+@media (min-width: 721px) {
+  .content-lesson-main > nav:first-child { margin-bottom: 2px !important; }
+  .content-lesson-main .content-lesson-title { margin-bottom: 8px !important; }
+  .content-lesson-main .lesson-description { margin-top: 0 !important; margin-bottom: 10px !important; }
+  .content-lesson-main .lesson-book-link { margin: 0 0 6px !important; }
+  .content-lesson-main .content-prose > h2:first-child { margin-top: 14px !important; }
+  .content-lesson-main .content-prose > ul > li { margin: 6px 0 !important; }
+  .content-lesson-main .content-prose > p { margin-top: 0; margin-bottom: 12px; }
+}
+/* r8 S6 Written: the disabled Submit is a normal button with its reason as a short hint beside it. */
+.written-submit-hint { font-family: var(--font-prose); font-size: 14px; color: var(--c-meta); }
+.written-submit:disabled { cursor: not-allowed; }
+/* r8 S7 Sandbox toolbar: Run leads (Ctrl+Enter beside it), then Save with where the code is kept, then the
+   quiet History / Reset; Full screen and the Share group (labelled, Code together and Publish game) sit at
+   the far right. The tool buttons in the title row are one labelled group, "Tools". */
+.sandbox-run-key { font-family: var(--font-prose); font-size: 13px; color: var(--c-meta); white-space: nowrap; }
+@media (min-width: 721px) {
+  .sandbox-header .sandbox-run-hint { display: none; }
+  .sandbox-header .sandbox-run-hint + .shd-inline-host { margin-left: auto !important; padding-left: 0 !important; border-left: 0 !important; }
+  .sandbox-toolbar { gap: 12px; }
+  .sandbox-toolbar .sandbox-tb-end { margin-left: 8px !important; flex: 1 1 auto; min-width: 0; }
+  .sandbox-toolbar .sandbox-tb-end > .sandbox-tb-view { margin-left: auto; }
+  .sandbox-toolbar .sandbox-tb-end > .sandbox-tb-program { border-left: 1px solid var(--c-line); padding-left: 12px !important; }
+  .sandbox-toolbar .sandbox-tb-end > .sandbox-tb-view { border-left: 0 !important; padding-left: 0 !important; }
+  .sandbox-header .shd-inline-host::before {
+    content: "Tools"; margin-right: 10px; font-family: var(--font-prose); font-size: 13px; font-weight: 600; color: var(--c-meta);
+  }
+}
+.sandbox-tb-label { font-family: var(--font-prose); font-size: 13px; font-weight: 600; color: var(--c-meta); margin-right: 2px; }
+.sandbox-tb-program .sandbox-save-btn { order: -1; }
+/* r8 S9 Progress: the grade card is as wide as what it holds; the rule is one line, the rest under
+   "How your grade works". */
+@media (min-width: 721px) {
+  .grade-summary-card { width: fit-content; max-width: 100%; min-width: min(100%, 560px); box-sizing: border-box; }
+}
+/* r8 S10 Docs hub: no paragraph between search and the sets (a small "Reference sets" label instead); the
+   JavaScript topics are a plain list of links with arrows, not filter-like pills. JavaScript docs: the
+   search box spans the article column, Reset is a normal quiet button (clearly greyed while there is
+   nothing to reset), and the reference-set bar above is one slim row. */
+.docs-hub-sets-label {
+  margin: 4px 0 10px; font-family: var(--font-prose); font-size: 14px !important; font-weight: 600; color: var(--c-meta); letter-spacing: 0;
+}
+.docs-hub-topics > div { display: flex !important; flex-direction: column; gap: 0 !important; flex-wrap: nowrap; }
+.docs-hub-topics .docs-topic-tile {
+  min-height: 0 !important; padding: 8px 4px !important; border: 0 !important; border-bottom: 1px solid var(--c-line) !important;
+  border-radius: 0 !important; justify-content: space-between !important; font-weight: 500;
+  font-size: 15px;
+}
+.docs-hub-topics .docs-topic-tile > span[aria-hidden="true"] { display: inline !important; color: var(--c-meta); }
+.docs-hub-topics .docs-topic-tile:hover { background: transparent !important; color: var(--c-fg) !important; }
+.docs-hub-topics .docs-topic-tile:hover > span:first-child { text-decoration: underline; text-underline-offset: 3px; }
+.docs-hub-topics .docs-topic-tile:hover > span[aria-hidden="true"] { color: var(--c-cyan); }
+.docs-hub-topics > h2 { font-size: 15px !important; margin-bottom: 4px !important; }
+.docs-main > .docs-main-search > input { width: 100% !important; font-family: var(--font-prose); }
+.doc-live-reset { font-family: var(--font-mono); font-size: 13px !important; min-height: 32px; border-style: solid !important; }
+.doc-live-reset:not(:disabled) { color: var(--c-fg) !important; }
+.doc-live-reset:not(:disabled):hover { border-color: var(--c-meta) !important; }
+.doc-live-reset:disabled { opacity: 0.5 !important; border-style: solid !important; cursor: not-allowed !important; }
+.docs-family-bar { padding-top: 4px !important; padding-bottom: 4px !important; }
+.docs-family-bar .docs-family-home { color: var(--c-meta) !important; font-family: var(--font-prose); font-size: 14px !important; }
+.docs-family-bar .docs-family-tab { padding: 3px 10px !important; }
+@media (min-width: 1024px) { .docs-layout { margin-top: 12px !important; } }
+/* r8 S12 Quiz, desktop: the questions and answers are a readable column (answer rows end near their text),
+   and the heading row's jump link is short. */
+@media (min-width: 721px) {
+  .student-quiz .quiz-question-card { max-width: 760px; }
+  .student-quiz .quiz-guidance { max-width: 760px; }
+  .student-quiz > .quiz-head { max-width: 760px; }
+}
+/* r8 S14 Home: a module not started yet is a light row (no fill until hover, a hairline between rows), so
+   the module in progress stands out and more fit; the chapter title, its subtitle and its count are three
+   clearly separate things. */
+.home-chapter > div:has(> details) { gap: 0 !important; }
+.home-chapter > div > details:not(.home-module-current) {
+  background: transparent !important; border-radius: 0 !important; border-bottom: 1px solid var(--c-line);
+}
+.home-chapter > div > details:not(.home-module-current):last-child { border-bottom: 0; }
+.home-chapter > div > details.home-module-current { margin-bottom: 6px; border-radius: 6px !important; }
+.home-chapter > div > details:not(.home-module-current) > .home-module-summary:hover { background: color-mix(in srgb, var(--c-fg) 6%, transparent) !important; }
+.home-chapter > div > details:not(.home-module-current) .home-module-title { color: var(--c-fg); }
+@media (min-width: 721px) {
+  .home-chapter > div > details:not(.home-module-current) > .home-module-summary { padding-top: 10px !important; padding-bottom: 10px !important; }
+  .home-chapter > summary > span:nth-child(2):not(:last-child) {
+    padding-left: 14px; border-left: 1px solid var(--c-line); color: var(--c-fg) !important; opacity: 1 !important;
+    font-family: var(--font-prose); font-size: 17px !important; font-weight: 500;
+  }
+  .home-chapter > summary > .home-chapter-count { margin-left: auto !important; }
+  .home-chapter > summary > .home-chapter-count .unit-progress-count::before { content: none !important; }
+}
+@media (max-width: 720px) {
+  .home-chapter > div > details:not(.home-module-current) > .home-module-summary { padding-top: 9px !important; padding-bottom: 9px !important; }
+  .home-chapter > div > details:not(.home-module-current) .home-module-progress .unit-progress-track { display: none !important; }
+  .home-module-summary .home-module-now { display: table; margin: 6px 0 2px !important; }
+  .home-chapter > summary { padding-bottom: 8px !important; }
+}
+/* r8 S15 Account (type only): the email is a value in the reading face; the theme names fit one line. */
+.account-card > div > div:has(> svg) { font-family: var(--font-prose); font-size: 15px !important; color: var(--c-fg) !important; }
+.account-card > a:first-child { font-family: var(--font-prose); font-size: 14px !important; }
+.account-page .appearance-tile { font-family: var(--font-prose); font-size: 13px; white-space: nowrap; }
+/* r8 S2 Phone console lab: the task card shows the whole scenario question. Folded, it keeps the scenario
+   and each step's title; the step's detail (the list of choices), its hints and the task's last line wait
+   behind "Show full task", and the step title ends in an ellipsis to say there is more. */
+@media (max-width: 720px) {
+  .lab-work-area:has(.output-header) .lab-task-card[open]:not(.is-full) .lab-task-content { max-height: none !important; overflow: visible !important; }
+  .lab-work-area:has(.output-header) .lab-task-card[open]:not(.is-full) .lab-task-content::after { content: none !important; }
+  .lab-work-area:has(.output-header) .lab-task-card[open]:not(.is-full) .lab-task-content > p:first-child { margin-bottom: 6px !important; line-height: 1.45 !important; }
+  .lab-work-area:has(.output-header) .lab-task-card[open]:not(.is-full) :is(.step-instructions, .step-hints, .step-commit-badge, .lab-task-end) { display: none !important; }
+  .lab-work-area:has(.output-header) .lab-task-card[open]:not(.is-full) .lesson-step { margin-bottom: 0 !important; }
+  .lab-work-area:has(.output-header) .lab-task-card[open]:not(.is-full) .lesson-step > strong::after { content: " \2026"; font-weight: 400; color: var(--c-meta); }
+}
+/* r8 S3 Quiz: the pass mark is its own short bold line, always shown; the rest is one short sentence. */
+.quiz-guidance .quiz-pass-mark { display: block; color: var(--c-fg); font-weight: 700; }
+@media (max-width: 720px) {
+  .student-quiz .quiz-guidance.r7-guide > p { margin: 0 0 10px !important; line-height: 1.45 !important; }
+  .student-quiz .quiz-guidance .quiz-pass-mark { font-size: 14px; margin-bottom: 1px; }
+  .student-quiz > .quiz-head { margin-bottom: 6px !important; align-items: center !important; }
+  .content-lesson-main:has(.student-quiz) .content-lesson-title { row-gap: 6px !important; }
+}
+/* r8 S13 Slides, desktop: the lesson strip sits under the header like every other lesson page (r8 S16; the
+   "Lesson 1 of 22" line goes), and the deck leaves room for its navigation plus two lines of description. */
+@media (min-width: 1024px) {
+  body:has(.lesson-slides-frame) > header { display: block !important; padding: 0 !important; max-width: none !important; margin: 0 !important; }
+  body:has(.lesson-slides-frame) > header .site-header-row { width: 100% !important; max-width: 1200px !important; margin: 0 auto !important; padding: 16px 20px !important; }
+  body:has(.lesson-slides-frame) > header > .header-lesson-nav { width: 100% !important; max-width: 1200px !important; margin: 8px auto 0 !important; padding: 0 20px !important; }
+  body:has(.lesson-slides-frame) > header > .header-lesson-nav .hdr-lesson-link { max-width: 44% !important; }
+  body:has(.lesson-slides-frame) > header .lesson-nav-full { display: inline !important; }
+  body:has(.lesson-slides-frame) > header .lesson-nav-short { display: none !important; }
+  body:has(.lesson-slides-frame) > header:has(> .header-lesson-nav) {
+    background: linear-gradient(var(--header-bg), var(--header-bg)) top left / 100% calc(100% - 46px) no-repeat !important;
+  }
+  body:has(.lesson-slides-frame) > header > .header-lesson-nav {
+    height: 38px; border-top: 0 !important; border-bottom: 1px solid var(--c-line);
+  }
+  body:has(.lesson-slides-frame) .header-lesson-nav .hdr-lesson-pos { display: inline-flex !important; }
+  body:has(.lesson-slides-frame) .lesson-position { display: none !important; }
+  .content-lesson-main .lesson-slides-frame { height: max(320px, calc(100dvh - 344px)) !important; }
+  .content-lesson-main:has(.lesson-slides-frame) .lesson-description { margin-top: 6px !important; }
+}
+/* r8 S4b Phone reading: the last line above the bottom bar stays crisp (a 6px shadow instead of the 28px
+   fade; the bar keeps its top border and progress line), a lesson link never breaks inside its name, and
+   top-level list items sit closer. */
+.content-prose a.lesson-ref-link, .content-prose a.lesson-ref-link > code { white-space: nowrap !important; }
+@media (max-width: 720px) {
+  body:has(.content-lesson-main)::before { height: 8px !important; }
+  .content-lesson-main .content-prose > ul > li { margin: 4px 0 !important; }
+  .content-lesson-main .content-prose > p { margin-bottom: 10px; }
+}
+/* end climb4 r8 student */

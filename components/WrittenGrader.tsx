@@ -223,6 +223,8 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
     maxSubmissions !== null && attemptsKnown && anyRow && progress.authed && progress.states[lessonId] !== 'completed',
   );
   const locked = capUnknown || capReached || (oneShot && (!!result || alreadySubmitted));
+  // Submit needs a real answer (20 characters); below that the button stays disabled with a hint beside it.
+  const tooShort = response.trim().length < 20;
 
   useEffect(() => {
     // Local cache is the always-available fallback; server draft is canonical
@@ -554,20 +556,20 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
 
       <div className="written-actions" style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 10, flexWrap: 'wrap' }}>
         <button
+          className="written-submit"
           onClick={submit}
-          disabled={loading || locked || response.trim().length < 20}
+          disabled={loading || locked || tooShort}
+          aria-describedby={tooShort && !locked && !loading ? `written-hint-${lessonId}` : undefined}
           style={{
             padding: '8px 16px',
             borderRadius: 6,
             border: 'none',
             fontWeight: 600,
-            cursor: loading ? 'wait' : response.trim().length < 20 ? 'not-allowed' : 'pointer',
-            // Disabled reads as disabled (flat grey fill, dashed edge, not-allowed cursor) but its
-            // label stays readable: meta on the line colour is above 4.5:1, the old dim was ~2.6:1.
-            background: loading || locked || response.trim().length < 20 ? 'var(--c-line)' : 'var(--c-purple)',
-            color: response.trim().length < 20 || locked ? 'var(--c-meta)' : loading ? 'var(--c-fg)' : 'var(--c-bg)',
-            outline: !loading && (response.trim().length < 20 || locked) ? '1px dashed var(--c-comment)' : undefined,
-            outlineOffset: -1,
+            cursor: loading ? 'wait' : tooShort ? 'not-allowed' : 'pointer',
+            // Disabled reads as disabled (flat grey fill, not-allowed cursor) but its label stays
+            // readable: meta on the line colour is above 4.5:1. The reason sits beside it as a hint.
+            background: loading || locked || tooShort ? 'var(--c-line)' : 'var(--c-purple)',
+            color: tooShort || locked ? 'var(--c-meta)' : loading ? 'var(--c-fg)' : 'var(--c-bg)',
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
@@ -583,9 +585,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
               : oneShot
                 ? 'Submitting…'
                 : 'Grading…'
-            : response.trim().length < 20 && !locked
-              ? 'Write something to submit'
-              : oneShot
+            : oneShot
               ? locked
                 ? 'Submitted'
                 : 'Submit my answer'
@@ -597,7 +597,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
                 ? 'Grade'
                 : result
                 ? 'Re-submit for feedback'
-                : 'Submit for feedback'}
+                : 'Submit'}
         </button>
         <button
           onClick={saveNow}
@@ -608,9 +608,10 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
             borderRadius: 6,
             border: '1px solid var(--c-line)',
             fontWeight: 600,
-            cursor: !progress.authed ? 'not-allowed' : saveStatus === 'saving' ? 'wait' : 'pointer',
+            cursor: !progress.authed || response.trim().length === 0 ? 'not-allowed' : saveStatus === 'saving' ? 'wait' : 'pointer',
             background: 'transparent',
-            color: !progress.authed ? 'var(--c-comment)' : 'var(--c-fg)',
+            // Nothing to save yet reads as unavailable (meta text), not as a live button.
+            color: !progress.authed ? 'var(--c-comment)' : response.trim().length === 0 ? 'var(--c-meta)' : 'var(--c-fg)',
             opacity: !progress.authed ? 0.6 : 1,
             display: 'inline-flex',
             alignItems: 'center',
@@ -621,6 +622,11 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
           {saveStatus === 'saving' ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
           {saveStatus === 'saved' ? 'Saved ✓' : saveStatus === 'error' ? 'Save failed' : 'Save draft'}
         </button>
+        {tooShort && !locked && !loading && (
+          <span id={`written-hint-${lessonId}`} className="written-submit-hint">
+            {response.trim().length === 0 ? 'Write something to submit' : 'Write a little more to submit'}
+          </span>
+        )}
         <span style={{ color: 'var(--c-meta)', fontSize: 13 }}>
           {response.trim().length} chars{codeInput ? '' : ` · ${response.trim().split(/\s+/).filter(Boolean).length} words`}
         </span>

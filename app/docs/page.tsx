@@ -12,10 +12,7 @@ export default function DocsIndex() {
     <main className="docs-hub page-frame" style={{ maxWidth: 1120, width: '100%', margin: '0 auto', padding: '28px 20px', color: 'var(--c-fg)' }}>
       <h1 style={{ fontSize: 28, marginBottom: 8 }}>Docs</h1>
       <DocsHubSearch />
-      <p style={{ color: 'var(--c-meta)', marginBottom: 24 }}>
-        The reference for everything you write in this course. Pick a set — the pages inside
-        each one switch between the others at the top.
-      </p>
+      <h2 className="docs-hub-sets-label">Reference sets</h2>
       <div
         style={{
         border: '1px solid var(--c-purple)',
@@ -33,7 +30,7 @@ export default function DocsIndex() {
           <span className="docs-set-name">JavaScript</span> <span aria-hidden="true">→</span>
         </Link>
         <p style={{ color: 'var(--c-meta)', fontSize: 14, margin: '6px 0 0' }}>
-          The basics — values, variables, conditionals, loops, functions, arrays, objects, JSON.
+          The basics: values, variables, conditionals, loops, functions, arrays, objects, JSON.
         </p>
       </div>
       <div
@@ -52,7 +49,7 @@ export default function DocsIndex() {
           <span className="docs-set-name">moSHion</span> <span aria-hidden="true">→</span>
         </Link>
         <p style={{ color: 'var(--c-meta)', fontSize: 14, margin: '6px 0 0' }}>
-          The game engine — sprites, physics, collisions, groups, the canvas.
+          The game engine: sprites, physics, collisions, groups, the canvas.
         </p>
       </div>
       <div
@@ -70,7 +67,7 @@ export default function DocsIndex() {
           <span className="docs-set-name">reSHape</span> <span aria-hidden="true">→</span>
         </Link>
         <p style={{ color: 'var(--c-meta)', fontSize: 14, margin: '6px 0 0' }}>
-          Solid modelling — reSHape Script on the B-rep kernel.
+          Solid modelling: reSHape Script on the B-rep kernel.
         </p>
       </div>
       <section className="docs-hub-topics" style={{ marginTop: 24 }}>

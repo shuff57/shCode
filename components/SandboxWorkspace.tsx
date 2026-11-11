@@ -668,14 +668,6 @@ export default function SandboxWorkspace() {
 
   const renderCloudChips = () => (
     <>
-      <button
-        style={chipStyle}
-        onClick={() => setHistoryOpen(true)}
-        title="Restore a version saved on this device or in the cloud"
-      >
-        <History size={12} />
-        History
-      </button>
       {lessonProgress.authed && (
         // The note hangs below Save for a few seconds instead of sitting in the row and pushing every button along.
         <span style={{ position: 'relative', display: 'inline-flex' }}>
@@ -699,6 +691,14 @@ export default function SandboxWorkspace() {
           <span className="sandbox-save-dot" aria-hidden="true" />{saveState.text}
         </span>
       )}
+      <button
+        style={chipStyle}
+        onClick={() => setHistoryOpen(true)}
+        title="Restore a version saved on this device or in the cloud"
+      >
+        <History size={12} />
+        History
+      </button>
     </>
   );
 
@@ -780,6 +780,7 @@ export default function SandboxWorkspace() {
               ))}
             </div>
             {!isFlow && <button className="btn-run" onClick={run} title="Run (Ctrl+Enter)" aria-keyshortcuts="Control+Enter">▶ Run</button>}
+            {!isFlow && <span className="sandbox-run-key" aria-hidden="true">Ctrl+Enter</span>}
             {isRunning && !isFlow && (
               <button
                 className="btn-secondary btn-sm"
@@ -789,10 +790,10 @@ export default function SandboxWorkspace() {
                 ■ Stop
               </button>
             )}
-            {/* Grouped and pushed right: this program (History, Save, Reset), with classmates (Code together,
-                Publish game), then the view. Thin lines between the groups (.sandbox-tb-end). */}
+            {/* Grouped: this program (Save and where it is kept, History, Reset) right after Run, then the
+                view, then sharing with classmates (Code together, Publish game) at the far right. */}
             <div className="sandbox-tb-end">
-              <div className="sandbox-tb-group" role="group" aria-label="This program">
+              <div className="sandbox-tb-group sandbox-tb-program" role="group" aria-label="This program">
                 {renderCloudChips()}
                 <button
                   style={together ? { ...chipStyle, opacity: 0.45, cursor: 'not-allowed' } : chipStyle}
@@ -804,8 +805,21 @@ export default function SandboxWorkspace() {
                   Reset
                 </button>
               </div>
+              {!isFlow && (
+                <div className="sandbox-tb-group sandbox-tb-view">
+                  <button
+                    style={chipStyle}
+                    onClick={toggleFull}
+                    title={full ? 'Leave full screen (Esc)' : 'Fill the screen with the preview'}
+                  >
+                    {full ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
+                    {full ? 'Exit full screen' : 'Full screen'}
+                  </button>
+                </div>
+              )}
               {((togetherLang && (mayTogether || together)) || (mode.preview === 'moshion' && lessonProgress.authed)) && (
-                <div className="sandbox-tb-group" role="group" aria-label="With classmates">
+                <div className="sandbox-tb-group sandbox-tb-share" role="group" aria-label="Share with classmates">
+                  <span className="sandbox-tb-label" aria-hidden="true">Share</span>
                   {togetherLang && (mayTogether || together) && (
                     <button
                       type="button"
@@ -825,18 +839,6 @@ export default function SandboxWorkspace() {
                   {mode.preview === 'moshion' && lessonProgress.authed && (
                     <PublishGameButton getCode={getScript} />
                   )}
-                </div>
-              )}
-              {!isFlow && (
-                <div className="sandbox-tb-group">
-                  <button
-                    style={chipStyle}
-                    onClick={toggleFull}
-                    title={full ? 'Leave full screen (Esc)' : 'Fill the screen with the preview'}
-                  >
-                    {full ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
-                    {full ? 'Exit full screen' : 'Full screen'}
-                  </button>
                 </div>
               )}
             </div>

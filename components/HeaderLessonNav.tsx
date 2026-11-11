@@ -129,7 +129,8 @@ export default function HeaderLessonNav() {
   const nextLocked = !currentCompleted && !bypassesLessonLock(snap.role);
 
   return (
-    <div
+    <nav
+      aria-label="Lesson navigation"
       className="header-lesson-nav"
       style={{
         display: 'flex',
@@ -145,7 +146,8 @@ export default function HeaderLessonNav() {
     >
       {prev ? (
         <a className="hdr-lesson-link" href={lessonHref(prev)}>
-          <span style={{ color: 'var(--c-meta)' }}>←</span>
+          <span style={{ color: 'var(--c-meta)' }} aria-hidden="true">←</span>
+          <span className="hdr-lesson-label">Previous</span>
           <span style={titleStyle}><span className="lesson-nav-full">{prev.title}</span><span className="lesson-nav-short">{shortLabel(prev)}</span></span>
         </a>
       ) : (
@@ -170,6 +172,7 @@ export default function HeaderLessonNav() {
               gap: 6,
             }}
           >
+            <span className="hdr-lesson-label">Next lesson</span>
             <span style={titleStyle}><span className="lesson-nav-full">{next.title}</span><span className="lesson-nav-short">{shortLabel(next)}</span></span>
             <span style={{ color: 'var(--c-meta)' }} aria-hidden="true">🔒</span>
           </span>
@@ -178,13 +181,14 @@ export default function HeaderLessonNav() {
             className="hdr-lesson-link hdr-lesson-link-right"
             href={lessonHref(next)}
           >
+            <span className="hdr-lesson-label">Next lesson</span>
             <span style={titleStyle}><span className="lesson-nav-full">{next.title}</span><span className="lesson-nav-short">{shortLabel(next)}</span></span>
-            <span style={{ color: 'var(--c-meta)' }}>→</span>
+            <span style={{ color: 'var(--c-meta)' }} aria-hidden="true">→</span>
           </a>
         )
       ) : (
         <span />
       )}
-    </div>
+    </nav>
   );
 }

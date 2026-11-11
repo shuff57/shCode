@@ -233,7 +233,7 @@ export default function StudentGradebook({ lessons }: Props) {
   return (
     <>
     {grades.length > 0 && (
-      <div style={cardStyle}>
+      <div className="grade-summary-card" style={cardStyle}>
         <h3 style={{ margin: '0 0 10px 0', fontSize: 'var(--fs-h2)', fontWeight: 700 }}>Your grade so far</h3>
         {grades.map((g) => (
           // One compact row per class: the two numbers, then the class and the rule beside them,
@@ -249,22 +249,23 @@ export default function StudentGradebook({ lessons }: Props) {
                 <strong style={{ fontSize: 28, lineHeight: 1.2, color: STATUS_COLOR.missing }}>{g.missingCount}</strong><span style={{ fontSize: 13 }}> graded lessons</span>
               </a>}
             </div>
-            <div style={{ flex: '1 1 320px', minWidth: 0, maxWidth: '64ch' }}>
+            <div style={{ flex: '0 1 auto', minWidth: 0, maxWidth: '64ch' }}>
               <div style={{ color: 'var(--c-meta)', fontSize: 13 }}>{grades.length > 1 ? g.className : 'In your class'}</div>
               <div style={{ color: 'var(--c-meta)', fontSize: 14, marginTop: 2, lineHeight: 1.5 }}>
-                Past due means a graded lesson not finished by its due date: it counts as 0 until you finish it. Work not due yet does not count. The Missing or late list below also shows work you finished late.
+                Past due work counts as 0 until you finish it.
               </div>
             </div>
           </div>
         ))}
         <details style={{ marginTop: 2 }}>
           <summary style={{ cursor: 'pointer', fontSize: 13 }}>How your grade works</summary>
-          <ul style={{ margin: '8px 0 0 0', paddingLeft: 20, listStyle: 'disc', fontSize: 13, lineHeight: 1.6, opacity: 0.85 }}>
+          <ul style={{ margin: '8px 0 0 0', paddingLeft: 20, listStyle: 'disc', fontSize: 14, lineHeight: 1.6, maxWidth: '68ch', color: 'var(--c-meta)' }}>
             <li>Each graded assignment counts toward a part of your grade (Lab, Written, Quiz, Chapter test). The chip beside each assignment below says which part.</li>
             <li>Where an assignment allows several tries, your best try is the one that counts, not the latest.</li>
-            <li>An assignment past its due date that is not done counts as 0 until you finish it. Turning it in later replaces the 0.</li>
+            <li>Past due means a graded assignment not finished by its due date. It counts as 0 until you finish it. Turning it in later replaces the 0.</li>
             <li>An assignment that is not due yet does not count against you.</li>
             <li>Handing something in late is marked &ldquo;Completed late&rdquo; so your teacher can see it. It does not lower the percent shown here.</li>
+            <li>The Missing or late list below shows work not done yet and work you finished late.</li>
           </ul>
         </details>
       </div>

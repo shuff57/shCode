@@ -328,7 +328,7 @@ export default function QuizView({ lessonId, config }: Props) {
         </span>
         {/* Wide screens only (CSS): where the hand-in button is, as a jump to it. */}
         <a className="quiz-submit-hint" href={`#quiz-submit-${lessonId}`}>
-          {summative ? 'Submit' : 'Check my answers'} is after question {questions.length} <span aria-hidden="true">↓</span>
+          {summative ? 'Submit' : 'Check answers'} <span aria-hidden="true">↓</span>
         </a>
         {summative && (
           <div style={{ marginLeft: 'auto' }}>
@@ -350,7 +350,7 @@ export default function QuizView({ lessonId, config }: Props) {
           ? `Answer all ${questions.length}. After each try you see your total, not which ones were wrong. Submit what you have if one has you stuck: the next part unlocks and you can come back and use your other tries.`
           : summative
           ? `Answer all ${questions.length}. Nothing is marked here — your teacher hands the score back. If one has you stuck, submit what you have and move on: the next part unlocks and you can come back to this one. Once all ${questions.length} are answered, submitting is final.`
-          : `Pick the answer that fits best for each question. You need ${needed} of ${questions.length} right to move on, and you can change your answers and try again as many times as you like.`}
+          : <><strong className="quiz-pass-mark">You need {needed} of {questions.length} right to move on.</strong>{' '}<span className="quiz-guide-rest">Change your answers and try again as often as you like.</span></>}
       </p>
         <button type="button" className="quiz-guidance-more" aria-expanded={guideOpen} aria-controls={`quiz-guide-${lessonId}`} onClick={() => setGuideOpen((v) => !v)}>
           {guideOpen ? 'less' : 'more'}

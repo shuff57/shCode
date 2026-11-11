@@ -160,8 +160,37 @@ function parseChunks(src: string): Chunk[] {
   return chunks;
 }
 
+// A long inline code sample (a whole statement such as `player = new Sprite(200, 200, 40, 40)`) is
+// marked `code-long` so a narrow column (the lab task card, globals.css r8 S1) can set it on its own
+// line instead of breaking it mid-call. An assignment may break only after its `=`. Block code
+// (`<pre><code class=...>`) is never touched: marked writes inline code as a bare `<code>`.
+const LONG_INLINE_CODE = 24;
+function markLongInlineCode(html: string): string {
+  return html.replace(/<code>([^<]*)<\/code>/g, (whole, body: string) => {
+    if (body.replace(/&[^;\s]+;/g, 'x').length < LONG_INLINE_CODE) return whole;
+    const parts = body.split(/(?<= =) (?=\S)/);
+    const inner = parts.length === 2
+      ? parts.map((p) => `<span class="code-nowrap">${p}</span>`).join(' ')
+      : body;
+    return `<code class="code-long">${inner}</code>`;
+  });
+}
+
+// A nested list that is really one sentence written as a list ("The six listed are" then "risk
+// management," ... "and security management.") is marked `list-as-sentence` so a reading can run it on
+// as that sentence (globals.css r8 S4). Only a list nested right after its lead-in text, of three or more
+// short plain items where every item but the last ends with a comma (", and" / ", or" included).
+function markSentenceLists(html: string): string {
+  return html.replace(/(<li>[^<]+)<ul>((?:\n?<li>[^<]*<\/li>)+)\n?<\/ul>/g, (whole, lead: string, items: string) => {
+    const texts = Array.from(items.matchAll(/<li>([^<]*)<\/li>/g), (m) => m[1].trim());
+    if (texts.length < 3 || texts.some((t) => t.length === 0 || t.length > 40)) return whole;
+    if (!texts.slice(0, -1).every((t) => /,(?:\s+(?:and|or))?$/.test(t))) return whole;
+    return `${lead}<ul class="list-as-sentence">${items}</ul>`;
+  });
+}
+
 function renderMarkdown(src: string): string {
-  const html = String(marked.parse(src));
+  const html = markSentenceLists(markLongInlineCode(String(marked.parse(src))));
   return DOMPurify.sanitize(html);
 }
 

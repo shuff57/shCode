@@ -7,6 +7,7 @@ import { DOCS_FAMILY } from '../lib/docs-family';
 export default function DocsFamilyBar({ currentId }: { currentId: string }) {
   return (
     <div
+      className="docs-family-bar"
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -21,6 +22,7 @@ export default function DocsFamilyBar({ currentId }: { currentId: string }) {
     >
       <Link
         href="/docs"
+        className="docs-family-home"
         style={{
           color: 'var(--c-comment)',
           fontSize: 13,
@@ -38,6 +40,7 @@ export default function DocsFamilyBar({ currentId }: { currentId: string }) {
             key={m.id}
             href={`/docs/${m.id}/${m.rootSection}`}
             aria-current={active ? 'page' : undefined}
+            className="docs-family-tab"
             style={{
               padding: '4px 12px',
               borderRadius: 4,
