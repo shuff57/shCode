@@ -25,6 +25,16 @@ export default function LabTaskCard({ lesson }: { lesson: Lesson }) {
       <div className="lab-task-content" id={`task-${lesson.id}`}>
         {scenario && <p style={{ margin: '0 0 14px', color: 'var(--c-fg)', fontSize: 14, lineHeight: 1.5 }}>{scenario}</p>}
         <LessonSteps lesson={lesson} />
+        {/* Where the task ends, and why the header can count more requirements than there are steps:
+            Check tests the requirements (listed under the Quest tab), not the steps one for one. */}
+        {lesson.steps.length > 0 && (
+          <p className="lab-task-end">
+            End of task: {lesson.steps.length} {lesson.steps.length === 1 ? 'step' : 'steps'}
+            {(lesson.requirements?.length ?? 0) > 0 && (
+              <> · Check tests {lesson.requirements.length} {lesson.requirements.length === 1 ? 'requirement' : 'requirements'} (listed under Quest)</>
+            )}
+          </p>
+        )}
       </div>
       <button type="button" className="lab-task-more" aria-expanded={full} aria-controls={`task-${lesson.id}`} onClick={() => setFull((v) => !v)}>
         {full ? 'Show less' : 'Show full task'}

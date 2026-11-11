@@ -15,7 +15,7 @@ import { ChevronDown, ChevronRight, MessageSquare } from 'lucide-react';
 import { formatDue } from '../lib/due-dates-core';
 import { sortLessons } from '../lib/lesson-order';
 import { lessonHref } from '../lib/lesson-href';
-import { lessonGradeCategory, lessonPercent, type GradeCategory } from '../lib/grading-weights';
+import { CATEGORY_LABEL, lessonGradeCategory, lessonPercent, type GradeCategory } from '../lib/grading-weights';
 // Status derivation is shared with the endpoint that builds these cells, so
 // the page and the teacher's gradebook can never disagree about whether a
 // student is behind. See lib/gradebook-cell.ts.
@@ -67,6 +67,17 @@ const CATEGORY_SHORT: Record<GradeCategory, string> = {
   q2: 'Q2 project',
   q4: 'Q4 project',
 };
+
+/** The chip's words. Every quiz, written answer, chart and coded lab inside a module counts toward the
+ *  same part of the grade (CATEGORY_LABEL.lab, "Regular submodules"), so for that part the chip names what
+ *  kind of work it is (the manifest's preview / scoreKind) rather than calling a quiz a "Lab". */
+function chipLabel(category: GradeCategory, lesson: ManifestLesson): string {
+  if (category !== 'lab') return CATEGORY_SHORT[category];
+  if (lesson.preview === 'quiz' || lesson.scoreKind === 'quiz') return 'Quiz';
+  if (lesson.scoreKind === 'written' || lesson.preview === 'assignment') return 'Written';
+  if (lesson.preview === 'diagram') return 'Chart';
+  return 'Lab';
+}
 
 const STATUS_LABEL: Record<CellStatus, string> = {
   pending: 'Awaiting teacher',
@@ -192,6 +203,20 @@ export default function StudentGradebook({ lessons }: Props) {
   // a student halfway through a lesson that something was wrong.
   const isMissingOrLate = (st: CellStatus) => st !== 'started' && needsAttention(st);
   const attentionCount = rows.filter((r) => isMissingOrLate(r.status)).length;
+  // What the "Missing or late" count is made of. It is wider than the summary's "past due" number,
+  // which counts only graded lessons past due and not done (per class); this list also holds work
+  // finished after its due date and work waiting for the teacher, so say so instead of leaving
+  // two different numbers side by side unexplained.
+  const attentionParts = (
+    [
+      ['missing', 'past due, not done'],
+      ['done-late', 'finished late'],
+      ['pending', 'waiting for your teacher'],
+    ] as const
+  )
+    .map(([st, words]) => ({ n: rows.filter((r) => r.status === st).length, words }))
+    .filter((p) => p.n > 0);
+  const attentionBreakdown = attentionParts.map((p) => `${p.n} ${p.words}`).join(', ');
   const nowMs = Date.now();
   const isInProgress = (r: { status: CellStatus; tried: boolean }) => r.status === 'started' || (r.tried && r.status === 'not-started');
   const progressCount = rows.filter(isInProgress).length;
@@ -255,6 +280,8 @@ export default function StudentGradebook({ lessons }: Props) {
           id="missing-late-filter"
           onClick={() => setFilter('attention')}
           style={filter === 'attention' ? tabActive : tabIdle}
+          title={attentionBreakdown ? `Missing or late: ${attentionBreakdown}` : undefined}
+          aria-describedby={attentionParts.length > 1 ? 'missing-late-breakdown' : undefined}
         >
           Missing or late ({attentionCount})
         </button>
@@ -266,6 +293,11 @@ export default function StudentGradebook({ lessons }: Props) {
           In progress ({progressCount})
         </button>
       </div>
+      {attentionParts.length > 1 && (
+        <p id="missing-late-breakdown" className="progress-attention-breakdown">
+          Missing or late ({attentionCount}): {attentionBreakdown}.
+        </p>
+      )}
 
       {rows.length === 0 ? (
         <p style={mutedStyle}>
@@ -358,9 +390,9 @@ export default function StudentGradebook({ lessons }: Props) {
                         {category && (
                           <span
                             style={chipStyle}
-                            title={`Counts toward the ${CATEGORY_SHORT[category].toLowerCase()} part of your grade`}
+                            title={`Counts toward the ${CATEGORY_LABEL[category].toLowerCase()} part of your grade`}
                           >
-                            {CATEGORY_SHORT[category]}
+                            {chipLabel(category, lesson)}
                           </span>
                         )}
                       </td>

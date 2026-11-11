@@ -286,12 +286,56 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
     }
   }
 
+  // Save comes last, after every field it saves (score, feedback, and on a capped part the
+  // keep-this-score choice). Without that choice it ends the score/feedback row on a wide form.
+  const actions = (
+    <div className="override-actions" style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
+      <button
+        type="submit"
+        disabled={submitting}
+        style={{
+          background: 'var(--c-cyan)',
+          color: 'var(--c-bg)',
+          border: 'none',
+          borderRadius: 4,
+          padding: '4px 16px',
+          height: 32,
+          fontWeight: 700,
+          fontSize: 14,
+          cursor: submitting ? 'not-allowed' : 'pointer',
+          opacity: submitting ? 0.5 : 1,
+        }}
+      >
+        {submitting ? 'Saving…' : 'Save grade'}
+      </button>
+      {enforceMax && (
+      <button
+        type="button"
+        onClick={handleClear}
+        disabled={submitting}
+        title="Drop a 'use this as the score' choice you made earlier on this part"
+        style={{ background: 'none', border: '1px solid var(--c-line)', borderRadius: 4, color: 'var(--c-meta)', padding: '4px 12px', fontSize: 13, height: 32, opacity: submitting ? 0.5 : 1, cursor: submitting ? 'not-allowed' : 'pointer' }}
+      >
+        Clear my score choice
+      </button>
+      )}
+
+      {msg && (
+        <span style={{ fontFamily: 'var(--font-prose)', fontSize: 14, color: msg.type === 'success' ? 'var(--c-green)' : 'var(--c-red)' }}>
+          {msg.text}
+        </span>
+      )}
+    </div>
+  );
+
   return (
     <form
       onSubmit={handleOverride}
+      className="override-form"
       style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--c-line)' }}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6 }}>
+      <div className="override-fields">
+      <div className="override-score" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6 }}>
         <label htmlFor={`override-score-${submissionId}`} style={FIELD_LABEL}>
           {unitTotal !== null
             ? `New mark (criteria met, out of ${unitTotal}):`
@@ -320,7 +364,7 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
         />
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
+      <div className="override-feedback" style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
         <label htmlFor={`override-feedback-${submissionId}`} style={FIELD_LABEL}>
           Feedback (optional):
         </label>
@@ -343,6 +387,9 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
         />
       </div>
 
+      {!enforceMax && actions}
+      </div>
+
       {enforceMax && (
         <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.5, color: 'var(--c-meta)', maxWidth: '70ch' }}>
           <input type="checkbox" style={{ marginTop: 4, flexShrink: 0 }} checked={replaceBest} onChange={(e) => setReplaceBest(e.target.checked)} />
@@ -350,44 +397,7 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
         </label>
       )}
 
-      {/* Save comes last, after every field it saves (score, feedback, the keep-this-score choice). */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
-        <button
-          type="submit"
-          disabled={submitting}
-          style={{
-            background: 'var(--c-cyan)',
-            color: 'var(--c-bg)',
-            border: 'none',
-            borderRadius: 4,
-            padding: '4px 16px',
-            height: 32,
-            fontWeight: 700,
-            fontSize: 14,
-            cursor: submitting ? 'not-allowed' : 'pointer',
-            opacity: submitting ? 0.5 : 1,
-          }}
-        >
-          {submitting ? 'Saving…' : 'Save grade'}
-        </button>
-        {enforceMax && (
-        <button
-          type="button"
-          onClick={handleClear}
-          disabled={submitting}
-          title="Drop a 'use this as the score' choice you made earlier on this part"
-          style={{ background: 'none', border: '1px solid var(--c-line)', borderRadius: 4, color: 'var(--c-meta)', padding: '4px 12px', fontSize: 13, height: 32, opacity: submitting ? 0.5 : 1, cursor: submitting ? 'not-allowed' : 'pointer' }}
-        >
-          Clear my score choice
-        </button>
-        )}
-
-        {msg && (
-          <span style={{ fontFamily: 'var(--font-prose)', fontSize: 14, color: msg.type === 'success' ? 'var(--c-green)' : 'var(--c-red)' }}>
-            {msg.text}
-          </span>
-        )}
-      </div>
+      {enforceMax && actions}
     </form>
   );
 }

@@ -27,10 +27,10 @@ export default function DocsIndex() {
       >
         <Link
           href="/docs/js/values"
-          style={{ color: 'var(--c-purple)', fontWeight: 600, fontSize: '1.05rem', textDecoration: 'none' }}
+          className="docs-set-link"
         >
-          <span style={{ display: 'inline-block', color: 'var(--c-green)', fontSize: 12, fontWeight: 700, letterSpacing: '.08em', marginBottom: 6 }}>START HERE</span><br />
-          JavaScript →
+          <span className="docs-set-kicker" style={{ display: 'inline-block', color: 'var(--c-green)', fontSize: 12, fontWeight: 700, letterSpacing: '.08em', marginBottom: 6 }}>START HERE</span><br />
+          <span className="docs-set-name">JavaScript</span> <span aria-hidden="true">→</span>
         </Link>
         <p style={{ color: 'var(--c-meta)', fontSize: 14, margin: '6px 0 0' }}>
           The basics — values, variables, conditionals, loops, functions, arrays, objects, JSON.
@@ -47,9 +47,9 @@ export default function DocsIndex() {
       >
         <Link
           href="/docs/moshion/overview"
-          style={{ color: 'var(--c-purple)', fontWeight: 600, fontSize: '1.05rem', textDecoration: 'none' }}
+          className="docs-set-link"
         >
-          moSHion →
+          <span className="docs-set-name">moSHion</span> <span aria-hidden="true">→</span>
         </Link>
         <p style={{ color: 'var(--c-meta)', fontSize: 14, margin: '6px 0 0' }}>
           The game engine — sprites, physics, collisions, groups, the canvas.
@@ -65,9 +65,9 @@ export default function DocsIndex() {
       >
         <Link
           href="/docs/reshape/overview"
-          style={{ color: 'var(--c-purple)', fontWeight: 600, fontSize: '1.05rem', textDecoration: 'none' }}
+          className="docs-set-link"
         >
-          reSHape →
+          <span className="docs-set-name">reSHape</span> <span aria-hidden="true">→</span>
         </Link>
         <p style={{ color: 'var(--c-meta)', fontSize: 14, margin: '6px 0 0' }}>
           Solid modelling — reSHape Script on the B-rep kernel.

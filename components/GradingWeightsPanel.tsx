@@ -100,10 +100,10 @@ export default function GradingWeightsPanel({ classId, desktop = false }: { clas
     <div>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: desktop ? 'wrap' : undefined, gap: 12, marginBottom: 12 }}>
         {desktop ? (
-          <div style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: '4px 12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
             <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Grading weights</h2>
             {/* The save state reads as part of the panel: a status with its mark, then the note that says how
-                saving works, the same pattern as the Due dates panel. */}
+                saving works, on its own quiet line under the heading (beside it, it crowded the title). */}
             <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, fontFamily: 'var(--font-prose)', fontSize: 13 }}>
               <span role="status" style={{ fontWeight: 600, color: error ? 'var(--c-red)' : saving ? C.dim : dirty ? 'var(--c-orange)' : 'var(--c-green)' }}>
                 {!error && !saving && !dirty && <span aria-hidden="true">✓ </span>}{error || (saving ? 'Saving…' : dirty ? 'Not saved' : 'Saved')}

@@ -174,7 +174,7 @@ export function AnnouncementsPanel({ classId }: Props) {
 
         <textarea
           id="announcement-content"
-          rows={4}
+          rows={3}
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Write your announcement..."
@@ -187,7 +187,7 @@ export function AnnouncementsPanel({ classId }: Props) {
             color: 'var(--c-fg)',
             border: '1px solid var(--c-comment)',
             borderRadius: 4,
-            padding: '12px 12px',
+            padding: '8px 12px',
             fontSize: 15,
             lineHeight: 1.5,
             fontFamily: 'var(--font-prose)',
@@ -196,7 +196,7 @@ export function AnnouncementsPanel({ classId }: Props) {
           }}
         />
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           <input
             type="checkbox"
             id="announcement-pinned"
@@ -208,9 +208,7 @@ export function AnnouncementsPanel({ classId }: Props) {
           <label htmlFor="announcement-pinned" style={{ fontFamily: 'var(--font-prose)', fontSize: 14, color: 'var(--c-fg)', cursor: 'pointer' }}>
             Pin this announcement
           </label>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {/* Post ends the pin row, so the composer is one line shorter and Post stays in view. */}
           <button
             type="submit"
             disabled={submitting}
@@ -220,6 +218,7 @@ export function AnnouncementsPanel({ classId }: Props) {
               border: 'none',
               borderRadius: 4,
               padding: '8px 20px',
+              marginLeft: 'auto',
               fontWeight: 700,
               fontSize: 14,
               cursor: submitting ? 'not-allowed' : 'pointer',
@@ -228,11 +227,10 @@ export function AnnouncementsPanel({ classId }: Props) {
           >
             {submitting ? 'Posting...' : 'Post'}
           </button>
-
-          {createError && (
-            <span style={{ color: 'var(--c-red)', fontFamily: 'var(--font-prose)', fontSize: 13 }}>{createError}</span>
-          )}
         </div>
+        {createError && (
+          <span style={{ color: 'var(--c-red)', fontFamily: 'var(--font-prose)', fontSize: 13 }}>{createError}</span>
+        )}
       </form>
 
       {/* Existing announcements */}

@@ -301,7 +301,7 @@ export default function QuizView({ lessonId, config }: Props) {
 
   return (
     <section className="student-quiz" style={{ marginTop: 16, paddingTop: 12, borderTop: '2px solid var(--c-line)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+      <div className="quiz-head" style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
         <h2
           style={{
             fontSize: 20,

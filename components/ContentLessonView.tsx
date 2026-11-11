@@ -25,29 +25,39 @@ function LessonPrimary({ wrap, children }: { wrap: boolean; children: ReactNode 
   return wrap ? <div className="lesson-primary">{children}</div> : <>{children}</>;
 }
 
-// The lesson summary. On a phone (<= 720px, CSS) it is clamped to two lines so the teaching
-// starts sooner; "more" shows the rest. The toggle appears only when the text is really cut.
-function LessonDescription({ children }: { children: ReactNode }) {
-  const ref = useRef<HTMLParagraphElement | null>(null);
+// The lesson summary. On a phone (<= 720px) a short one (about five lines at 390px) shows whole;
+// a longer one is cut at a word boundary with an ellipsis and an inline "more" at the end.
+const SUMMARY_FULL_MAX = 240;
+const SUMMARY_CUT_AT = 180;
+function cutAtWord(text: string, max: number): string {
+  const head = text.slice(0, max);
+  const space = head.lastIndexOf(' ');
+  return (space > max * 0.6 ? head.slice(0, space) : head).replace(/[\s,;:.—-]+$/, '');
+}
+function LessonDescription({ text }: { text: string }) {
   const [open, setOpen] = useState(false);
-  const [cut, setCut] = useState(false);
+  const [phone, setPhone] = useState(false);
   useEffect(() => {
-    const el = ref.current;
-    if (!el || open) return;
-    const measure = () => setCut(el.scrollHeight > el.clientHeight + 2);
-    measure();
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-  }, [open]);
+    const mq = window.matchMedia('(max-width: 720px)');
+    const update = () => setPhone(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+  const long = phone && text.length > SUMMARY_FULL_MAX;
+  // An odd number of backticks before the cut would leave a code span open; cut before it instead.
+  let shown = long && !open ? cutAtWord(text, SUMMARY_CUT_AT) : text;
+  if ((shown.match(/`/g)?.length ?? 0) % 2 === 1) shown = cutAtWord(shown.slice(0, shown.lastIndexOf('`')), SUMMARY_CUT_AT);
   return (
-    <>
-      <p ref={ref} className={`lesson-description${open ? ' is-open' : ''}`} style={{ color: 'var(--c-meta)', margin: '0 0 4px', fontSize: 14, lineHeight: 1.35 }}>{children}</p>
-      {(cut || open) && (
+    <p className={`lesson-description${open ? ' is-open' : ''}`} style={{ color: 'var(--c-meta)', margin: '0 0 4px', fontSize: 14, lineHeight: 1.35 }}>
+      {withInlineCode(shown)}
+      {long && !open ? '…' : null}
+      {long && (
         <button type="button" className="lesson-description-more" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
           {open ? 'less' : 'more'}
         </button>
       )}
-    </>
+    </p>
   );
 }
 
@@ -276,7 +286,7 @@ export default function ContentLessonView({ lesson }: Props) {
       </aside>}
       <LessonPrimary wrap={focusedLayout}>
       {lesson.description && !meta.quiz ? (
-        <LessonDescription>{withInlineCode(lesson.description)}</LessonDescription>
+        <LessonDescription text={lesson.description} />
       ) : null}
 
       {meta.videoUrl && meta.videoUrl.trim() ? (

@@ -1315,7 +1315,7 @@ function GradebookView({
   // their full text in the tooltip.
   const CELL_W = 168;
   const [gridElement, setGridElement] = useState<HTMLDivElement | null>(null);
-  const [gridScroll, setGridScroll] = useState({ left: false, right: false, more: 0, partialWidth: 0, rightInset: 0 });
+  const [gridScroll, setGridScroll] = useState({ left: false, right: false, more: 0, partialWidth: 0, rightInset: 0, first: 0, last: 0 });
   const syncGridRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
@@ -1330,14 +1330,28 @@ function GradebookView({
         const rect = col.getBoundingClientRect();
         return rect.left < edge - 0.01 && rect.right > edge + 0.01;
       });
+      // Which lesson columns are in view (more than half of one past the frozen names counts; a column
+      // cut by the right edge does not, matching the "N more" count), for the "Lessons 1-5 of 149" label.
+      const frozenEdge = gridElement.getBoundingClientRect().left + gridElement.clientLeft + Number(gridElement.dataset.frozen ?? 0);
+      const lessonCols = Array.from(gridElement.querySelectorAll<HTMLElement>('col[data-lesson-col]'));
+      let first = 0;
+      let last = 0;
+      lessonCols.forEach((col, i) => {
+        const rect = col.getBoundingClientRect();
+        if (!first && rect.right - frozenEdge > rect.width / 2) first = i + 1;
+        if (rect.left < edge && rect.right <= edge + 0.5) last = i + 1;
+      });
+      if (last < first) last = first;
       const next = {
+        first,
+        last,
         rightInset: gridElement.offsetWidth - gridElement.clientLeft - gridElement.clientWidth,
         partialWidth: remaining > 1 && partial ? edge - partial.getBoundingClientRect().left : 0,
         left: gridElement.scrollLeft > 1,
         right: remaining > 1,
         more: Math.min(lessonCount, Math.max(0, Math.ceil((remaining - 1) / CELL_W))),
       };
-      setGridScroll((prev) => prev.left === next.left && prev.right === next.right && prev.more === next.more && prev.partialWidth === next.partialWidth && prev.rightInset === next.rightInset ? prev : next);
+      setGridScroll((prev) => prev.left === next.left && prev.right === next.right && prev.more === next.more && prev.first === next.first && prev.last === next.last && prev.partialWidth === next.partialWidth && prev.rightInset === next.rightInset ? prev : next);
       // Unit band labels ("1.3 DOCUMENTATION AND ...") are fitted to the part of their span that is in view,
       // between the frozen name columns and the right edge (or the cover over a partial column), so a label
       // ends in an ellipsis instead of being cut mid-word by the edge. Written straight to the DOM: this
@@ -1551,7 +1565,7 @@ function GradebookView({
       }
       // A number for every finished lesson, 100 included: the cell background carries the state.
       return withLate(cell, (
-        <span style={{ color: 'inherit', fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', fontWeight: 700, fontSize: 14 }}>
+        <span style={{ color: 'inherit', fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', fontWeight: 600, fontSize: 15 }}>
           {pct}
         </span>
       ));
@@ -1708,6 +1722,12 @@ function GradebookView({
         </select>
         {/* Scroll cue: moved up from its own row so the grid starts one row higher. */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: narrow ? 0 : 'auto', flexShrink: 0 }}>
+          {/* Where the view is in the course, so "N more" has a position. */}
+          {gridScroll.first > 0 && displayLessons.length > 0 && (
+            <span style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-meta)', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+              Lessons <strong style={{ color: 'var(--c-fg)', fontWeight: 600 }}>{gridScroll.first === gridScroll.last ? gridScroll.first : `${gridScroll.first}–${gridScroll.last}`}</strong> of {displayLessons.length}
+            </span>
+          )}
           <button
             type="button"
             disabled={!gridScroll.left}
@@ -1811,7 +1831,7 @@ function GradebookView({
             <col style={{ width: EMAIL_W }} />
             <col style={{ width: GRADE_W }} />
             {Array.from({ length: categoryColumnCount }, (_, i) => <col key={`category-${i}`} style={{ width: CAT_W }} />)}
-            {displayLessons.map((lesson) => <col key={lesson.id} style={{ width: CELL_W }} />)}
+            {displayLessons.map((lesson) => <col key={lesson.id} data-lesson-col style={{ width: CELL_W }} />)}
           </colgroup>
           {/* Unit-spanning header row */}
           <thead>
@@ -2809,15 +2829,12 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                         <div style={{ fontSize: 15, lineHeight: compact ? '22px' : '20px', fontWeight: 600, color: 'var(--c-fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fullName(prog?.firstName, prog?.lastName) ?? row.student_email}</div>
                         {!compact && <div style={{ color: 'var(--c-meta)', fontSize: 13, lineHeight: '18px', marginTop: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.student_email}</div>}
                       </div>
-                      <div title="Grade so far, under this class's weights" style={{ gridColumn: compact ? 2 : undefined, gridRow: compact ? 1 : undefined, display: 'flex', alignItems: 'center', justifyContent: compact ? 'flex-end' : undefined, gap: 10, whiteSpace: 'nowrap', lineHeight: '22px' }}>
-                        {/* The number leads; the thin neutral bar under it is the grade's scale, not a
-                            completion bar (that is the "Graded done" fraction beside it). */}
+                      <div title="Grade so far, under this class's weights" style={{ gridColumn: compact ? 2 : undefined, gridRow: compact ? 1 : undefined, display: 'flex', flexDirection: compact ? 'column' : undefined, alignItems: compact ? 'flex-end' : 'center', justifyContent: compact ? 'flex-end' : undefined, gap: compact ? 0 : 10, whiteSpace: 'nowrap', lineHeight: compact ? '20px' : '22px' }}>
+                        {/* The coloured number is the grade; completion is the "Graded done" column (on a phone, the
+                            "graded" count under the name), so no bar here suggests course progress. On a phone the
+                            number carries its own label under it, since there is no column header above it. */}
                         <strong style={{ color: prog?.gradedCounted ? pctColor(wp) : 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: compact ? 16 : 15, fontVariantNumeric: 'tabular-nums', minWidth: compact ? undefined : 44, textAlign: 'right' }}>{prog?.gradedCounted ? `${wp}%` : '—'}</strong>
-                        {!compact && prog?.gradedCounted ? (
-                          <span aria-hidden="true" style={{ position: 'relative', display: 'inline-block', width: 64, height: 4, borderRadius: 2, background: 'color-mix(in srgb, var(--c-meta) 22%, transparent)', overflow: 'hidden', flexShrink: 0 }}>
-                            <span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${Math.max(0, Math.min(100, wp))}%`, background: pctColor(wp), borderRadius: 2 }} />
-                          </span>
-                        ) : null}
+                        {compact && <span style={{ fontFamily: 'var(--font-prose)', fontSize: 12, lineHeight: '16px', color: 'var(--c-meta)' }}>grade so far</span>}
                       </div>
                       <div style={{ gridColumn: compact ? 1 : undefined, gridRow: compact ? 2 : undefined, minWidth: 0, display: 'flex', flexWrap: 'nowrap', overflow: 'hidden', gap: compact ? '0 6px' : 8, lineHeight: '18px', fontFamily: 'var(--font-prose)', fontSize: compact ? 13 : 14, color: compact ? 'var(--c-meta)' : 'var(--c-fg)', fontVariantNumeric: 'tabular-nums' }}>
                         <span style={{ whiteSpace: 'nowrap' }}>{prog?.gradedDone ?? 0}/{prog?.gradedTotal ?? '—'}{compact && ' graded'}</span>
@@ -2950,14 +2967,14 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         <div style={{ ...S.card, marginBottom: 0, padding: compact ? 16 : 20 }}>
           <GradingWeightsPanel classId={classId} desktop={desktop} />
         </div>
-        <div style={{ display: 'grid', gap: 16, minWidth: 0 }}>
+        <div className="settings-side" style={{ display: 'grid', gap: 12, minWidth: 0 }}>
         {/* Code */}
-        <div style={{ ...S.card, padding: compact ? 16 : 20, marginBottom: 0 }}>
+        <div style={{ ...S.card, padding: 16, marginBottom: 0 }}>
           {/* A labelled value at body size: the editable panels (weights, announcements) lead the page, not
               the code. */}
-          <h2 style={{ ...S.h2, marginBottom: 12 }}>Join code</h2>
+          <h2 style={{ ...S.h2, marginBottom: 8 }}>Join code</h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-            <span style={{ ...S.code, padding: '4px 12px', border: '1px solid var(--c-line)', borderRadius: 4, background: 'var(--c-deep2)' }} aria-label={`Join code ${currentCode.split('').join(' ')}`}>{currentCode}</span>
+            <span style={{ ...S.code }} aria-label={`Join code ${currentCode.split('').join(' ')}`}>{currentCode}</span>
             {isOwner ? (
               <button
                 style={regenerating ? S.btnDisabled : { ...S.btn('transparent'), color: 'var(--c-meta)', border: '1px solid var(--c-line)' }}
@@ -2974,10 +2991,10 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
           <p style={{ margin: '8px 0 0', fontFamily: 'var(--font-prose)', fontSize: 13, lineHeight: 1.5, color: 'var(--c-meta)', maxWidth: '70ch' }}>Students join this class with this code.</p>
         </div>
         {/* Co-teachers */}
-        <div style={{ ...S.card, marginBottom: 0, padding: compact ? 16 : 20 }}>
-          <h2 style={S.h2}>Co-teachers ({coTeachers.length})</h2>
+        <div style={{ ...S.card, marginBottom: 0, padding: 16 }}>
+          <h2 style={{ ...S.h2, marginBottom: 8 }}>Co-teachers ({coTeachers.length})</h2>
           {coTeachers.length === 0 ? (
-            <p style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 15, marginBottom: isOwner ? 16 : 0 }}>No co-teachers added yet.</p>
+            <p style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 15, margin: 0, marginBottom: isOwner ? 12 : 0 }}>No co-teachers added yet.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: isOwner ? 16 : 0 }}>
               {coTeachers.map((ct) => (
@@ -3025,8 +3042,8 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         </div>
         {/* Announcements: in the right-hand column on desktop, so it is visible without scrolling past the
             weights (it used to sit under them while this column stood half empty). */}
-        <div style={{ ...S.card, marginBottom: 0, padding: compact ? 16 : 20 }}>
-          <h2 style={S.h2}>Announcements</h2>
+        <div style={{ ...S.card, marginBottom: 0, padding: 16 }}>
+          <h2 style={{ ...S.h2, marginBottom: 8 }}>Announcements</h2>
           <AnnouncementsPanel classId={classId} />
         </div>
         </div>

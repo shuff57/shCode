@@ -100,11 +100,12 @@ const C = {
   open: 'var(--c-purple)',
 };
 
-// One field style (system pass rule 5): an inset surface, a visible border, 15px prose text.
+// One field style (system pass rule 5): an inset surface, a visible border, 15px prose text. A filled
+// date reads strongest: fg text and a border brighter than the line colour.
 const dateInput: React.CSSProperties = {
   background: 'var(--c-deep2)',
   color: C.text,
-  border: `1px solid ${C.border}`,
+  border: `1px solid color-mix(in srgb, ${C.border} 60%, var(--c-meta))`,
   borderRadius: 4,
   padding: '4px 8px',
   fontSize: 15,
@@ -115,12 +116,11 @@ const dateInput: React.CSSProperties = {
   colorScheme: 'dark',
 };
 
-// An empty optional date/time is quieter than a filled one (rule 5): no fill, a softer dashed border,
-// meta-coloured text. Still clearly a field.
+// An empty optional date/time is quieter than a filled one (rule 5) but plainly an editable field: the same
+// shape and surface, a solid 1px border in the line colour, "Not set" in meta colour.
 const emptyField: React.CSSProperties = {
-  background: 'transparent',
   color: C.dim,
-  border: `1px dashed color-mix(in srgb, ${C.border} 100%, var(--c-meta) 25%)`,
+  border: `1px solid ${C.border}`,
 };
 
 // The module column, then the Available after group and the Due group with a clear gap between them.
@@ -211,7 +211,7 @@ function DateTimeField({
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', boxSizing: 'border-box', maxWidth: '100%', padding: showLabel ? 0 : '0 0 0 12px', borderLeft: showLabel ? undefined : `1px solid ${C.border}` }}>
       {showLabel && <span style={{ fontFamily: 'var(--font-prose)', fontSize: 14, fontWeight: 600, flexBasis: '100%', color }}>{label}</span>}
       <span style={{ position: 'relative', display: 'inline-flex' }}>
-      {!date && <span aria-hidden="true" style={{ position: 'absolute', left: 7, top: 1, bottom: 1, right: 26, display: 'flex', alignItems: 'center', background: 'var(--c-deep)', color: C.dim, fontFamily: 'var(--font-prose)', fontSize: 14, pointerEvents: 'none', zIndex: 1 }}>Not set</span>}
+      {!date && <span aria-hidden="true" style={{ position: 'absolute', left: 7, top: 1, bottom: 1, right: 26, display: 'flex', alignItems: 'center', background: 'var(--c-deep2)', color: C.dim, fontFamily: 'var(--font-prose)', fontSize: 15, pointerEvents: 'none', zIndex: 1 }}>Not set</span>}
       <input
         type="date"
         value={date}
@@ -237,7 +237,7 @@ function DateTimeField({
           setCalOpen((v) => !v);
         }}
         style={{
-          background: date ? 'var(--c-deep2)' : 'var(--c-deep)',
+          background: 'var(--c-deep2)',
           border: `1px solid ${calOpen ? C.accent : date ? C.border : 'transparent'}`,
           borderRadius: 4,
           color: C.accent,
@@ -261,7 +261,7 @@ function DateTimeField({
           onWrite(date, value === '' ? null : value);
         }}
         className="teacher-field"
-        style={{ ...timeInput, ...(date === '' ? { ...emptyField, opacity: 0.6, cursor: 'not-allowed' } : {}) }}
+        style={{ ...timeInput, ...(date === '' ? { ...emptyField, opacity: 0.75, cursor: 'not-allowed' } : {}) }}
         aria-label={`${label} time for ${ariaSuffix}`}
         title={date === '' ? 'Set a date first' : undefined}
       />

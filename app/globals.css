@@ -3401,3 +3401,90 @@ a.mod-row.is-next {
     padding: 10px 4px !important; white-space: normal !important; overflow-wrap: anywhere; line-height: 1.2;
   }
 }
+
+/* climb4 r4 */
+/* Lab task: inline code in a step reads as code at full contrast in every theme (orange on deep2 is in the
+   theme check), and the card says where the task ends and how the step count relates to the requirements. */
+.lab-task-card .lesson-step code {
+  background: var(--c-deep2) !important; color: var(--c-orange) !important;
+  border: 1px solid var(--c-line); border-radius: 3px; padding: 1px 5px;
+  font-family: var(--font-mono); font-weight: 500; font-size: 0.92em;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+.lab-task-card .lesson-step pre code { border: 0; padding: 0; background: transparent !important; }
+.lab-task-end {
+  margin: 14px 0 0; padding-top: 10px; border-top: 1px solid var(--c-line);
+  font-family: var(--font-prose); font-size: var(--fs-meta); line-height: 1.45; color: var(--c-meta);
+}
+
+/* Video: the player, its one-line description and the whole completion panel fit a 900px screen. */
+@media (min-width: 1024px) {
+  .lesson-wide-media.lesson-video-frame { width: min(100%, calc(44svh * 16 / 9)) !important; margin-top: 8px !important; }
+}
+
+/* Reading summary on a phone: shown whole when short; a long one is cut at a word in the component
+   (ContentLessonView) with "more" inline, so the CSS line clamp is off. */
+@media (max-width: 720px) {
+  .content-lesson-main .lesson-description:not(.is-open) { display: block; -webkit-line-clamp: unset; overflow: visible; }
+  .content-lesson-main .lesson-description .lesson-description-more { display: inline; margin: 0 0 0 4px; padding: 0; min-height: 0; font-size: inherit; }
+}
+
+/* Module Continue on a phone: "Continue:" on the first line, the whole lesson title under it. */
+@media (max-width: 720px) {
+  .module-continue-action { flex-direction: column; align-items: flex-start; gap: 2px; }
+  /* the arrow ends the title's last line instead of taking a line of its own */
+  .module-continue-action > span[aria-hidden="true"] { display: none; }
+  .module-continue-title::after { content: " \2192" / ""; }
+  .module-continue-title { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; }
+}
+
+/* Teacher review queue: score, feedback and Save grade share one row when the form is wide (the queue);
+   in a narrow column (the student drawer) they stack as before. Field order is unchanged. */
+.override-form { container-type: inline-size; }
+.override-fields { display: flex; flex-direction: column; gap: 8px; }
+@container (min-width: 620px) {
+  .override-fields { flex-direction: row; align-items: flex-end; gap: 16px; }
+  .override-score { flex: 0 0 auto; max-width: 240px; }
+  .override-feedback { flex: 1 1 auto; min-width: 0; margin-top: 0 !important; }
+  .override-feedback textarea { min-height: 60px !important; }
+  .override-fields > .override-actions { flex: 0 0 auto; margin-top: 0 !important; padding-bottom: 14px; }
+}
+
+/* Console lab: the folded starter comment says what it is ("⋯ 5 comment lines (task notes)") and that it
+   opens, in meta colour, still far quieter than the old "Task card" chip. */
+.lab-work-area #editor .cm-taskCommentFold.is-quiet { cursor: pointer; border-radius: 3px; text-decoration: underline dotted; text-underline-offset: 3px; }
+.lab-work-area #editor .cm-taskCommentFold.is-quiet:hover { color: var(--c-cyan) !important; text-decoration-style: solid; }
+
+/* Written answers: the supporting disclosures sit clearly apart from Submit / Save draft. */
+.written-grader > details:first-of-type { margin-top: 20px !important; }
+
+/* Progress: what the "Missing or late" count is made of, as a quiet line under the filter chips. */
+.progress-attention-breakdown { margin: -4px 0 12px; font-family: var(--font-prose); font-size: var(--fs-meta); line-height: 1.5; color: var(--c-meta); text-align: right; }
+
+/* Docs hub: the three reference sets are the strongest links on the page (fg text, >= 7:1 in every
+   theme, underlined in the link colour); the topic shortcuts stay the quieter cyan tiles. */
+.docs-set-link { color: var(--c-fg); font-weight: 700; font-size: var(--fs-h2); text-decoration: none; }
+.docs-set-link .docs-set-name { text-decoration: underline; text-decoration-color: var(--c-cyan); text-decoration-thickness: 2px; text-underline-offset: 5px; }
+.docs-set-link > span[aria-hidden="true"] { color: var(--c-cyan); }
+.docs-set-link:hover .docs-set-name { color: var(--c-cyan); }
+.docs-set-link:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 3px; border-radius: 2px; }
+
+/* Account: Save with nothing changed reads as not ready (meta text on the card, a line outline in place of
+   the fill; same box size), never as a half-transparent primary that looks pressable. */
+
+/* Quiz on a wide screen: the "N of M answered" count is docked to the question column, right-aligned on
+   the "Check your understanding" row, and that row stays in view (sticky) while the questions scroll.
+   Replaces the r3 floating column beside the questions. */
+@media (min-width: 721px) {
+  .student-quiz { display: block; max-width: 760px; }
+  .student-quiz > .quiz-progress-float { display: none !important; }
+  .student-quiz > .quiz-head {
+    position: sticky; top: 0; z-index: 6; background: var(--bg);
+    padding: 6px 0; margin-bottom: 4px !important;
+  }
+  .student-quiz > .quiz-head > .quiz-answered-count {
+    position: static !important; width: auto !important; height: auto !important; overflow: visible !important;
+    clip: auto !important; margin-left: auto;
+  }
+  .student-quiz > .quiz-head > .quiz-answered-count + div { margin-left: 0 !important; }
+}
