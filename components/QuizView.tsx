@@ -315,6 +315,12 @@ export default function QuizView({ lessonId, config }: Props) {
           <ListChecks size={18} color="var(--c-yellow)" />
           Check your understanding
         </h2>
+        <span
+          className={`quiz-answered-count${allAnswered ? ' is-complete' : ''}`}
+          aria-live="polite"
+        >
+          {answeredCount} of {questions.length} answered
+        </span>
         {summative && (
           <div style={{ marginLeft: 'auto' }}>
             <SolutionPanel lessonId={lessonId} readOnly />

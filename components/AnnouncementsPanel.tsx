@@ -181,11 +181,13 @@ export function AnnouncementsPanel({ classId }: Props) {
           onChange={(e) => setContent(e.target.value)}
           placeholder="Write your announcement..."
           disabled={submitting}
+          className="teacher-field"
+          // The same inset field surface as the grading weights: darker than the card, a visible border.
           style={{
             width: '100%',
-            background: 'var(--c-bg)',
+            background: 'color-mix(in srgb, var(--c-deep) 50%, var(--x-151515))',
             color: 'var(--c-fg)',
-            border: '1px solid var(--c-line)',
+            border: '1px solid var(--c-comment)',
             borderRadius: 4,
             padding: '12px 12px',
             fontSize: 14,

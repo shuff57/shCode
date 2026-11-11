@@ -146,6 +146,8 @@ export default function LessonWorkspace({
   const [consoleResetKey, setConsoleResetKey] = useState(0);
   const [consoleOpen, setConsoleOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  // Phone labs: whether the "More" disclosure (Reset / History / Save) is open.
+  const [toolsOpen, setToolsOpen] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   // Tries on a capped performance-assessment part, counted on the server
@@ -1383,6 +1385,19 @@ export default function LessonWorkspace({
                     {aiCheckBusy ? 'Reading your code…' : 'Check'}
                   </button>
                 )}
+                {(isMoshionMode || isConsoleMode) && (
+                  // Run -> Check -> Submit read as one sequence (the header's copy of
+                  // Submit is hidden in a lab; same handler, same disabled rule).
+                  <button
+                    className="btn-primary btn-sm toolbar-submit"
+                    onClick={handleSubmit}
+                    disabled={submitted || !canSubmit}
+                    title={!canSubmit ? moshionWords.title : undefined}
+                  >
+                    <Send size={14} />
+                    Submit
+                  </button>
+                )}
                 <span className="run-hint">Ctrl+Enter</span>
                 {resetMsg && (
                   <span
@@ -1439,19 +1454,18 @@ export default function LessonWorkspace({
                   : '✗ Fix runtime error before submitting'}
               </span>
             )}
-            {(isMoshionMode || isConsoleMode) && (
-              <button
-                style={{ marginLeft: 'auto' }}
-                className="btn-primary btn-sm toolbar-submit"
-                onClick={handleSubmit}
-                disabled={submitted || !canSubmit}
-                title={!canSubmit ? moshionWords.title : undefined}
-              >
-                <Send size={14} />
-                Submit
-              </button>
-            )}
-            <div className="toolbar-utilities" role="group" aria-label="Editor tools" style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+            {/* Phone only (CSS shows it in a lab below 720px): Reset, History and Save fold
+                behind one disclosure so Run, Check and Submit get the row. */}
+            <button
+              type="button"
+              className="btn-secondary btn-sm toolbar-more"
+              aria-expanded={toolsOpen}
+              aria-controls={`editor-tools-${lesson.id}`}
+              onClick={() => setToolsOpen((v) => !v)}
+            >
+              More <span aria-hidden="true">{toolsOpen ? '▴' : '▾'}</span>
+            </button>
+            <div id={`editor-tools-${lesson.id}`} className={`toolbar-utilities${toolsOpen ? ' is-open' : ''}`} role="group" aria-label="Editor tools" style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
               {(isTextMode || isConsoleMode || isReshapeMode || isMoshionMode) && (
                 <button
                   style={{

@@ -970,15 +970,17 @@ export default function SandboxWorkspace() {
           font-size: 13px;
         }
         .sandbox-mode:last-child { border-right: 0; }
-        .sandbox-mode:hover { color: var(--text); }
-        .sandbox-mode.is-active { background: color-mix(in srgb, var(--c-purple) 30%, var(--c-bg)); color: var(--c-fg); }
+        .sandbox-mode:hover { color: var(--text); background: color-mix(in srgb, var(--c-fg) 8%, transparent); }
+        /* The selected mode is a solid accent fill, unmistakable beside the quiet ones. */
+        .sandbox-mode.is-active { background: var(--c-purple); color: var(--c-bg); font-weight: 700; }
         .sandbox-mode:disabled { opacity: 0.35; cursor: not-allowed; }
         /* A mode clicked while the page was still loading looks pressed at once
            (SANDBOX_EARLY_PICK_SCRIPT); the page switches to it as it starts. */
-        html[data-sandbox-pick] .sandbox-mode.is-active { background: transparent; color: var(--c-comment); }
+        html[data-sandbox-pick] .sandbox-mode.is-active { background: transparent; color: var(--c-meta); font-weight: 400; }
         ${SANDBOX_MODES.map((m) => `html[data-sandbox-pick='${m.id}'] .sandbox-mode[data-sandbox-mode='${m.id}']`).join(',\n        ')} {
-          background: var(--c-line);
-          color: var(--c-fg);
+          background: var(--c-purple);
+          color: var(--c-bg);
+          font-weight: 700;
         }
         .sandbox-lock { color: var(--c-orange); font-size: 12px; margin-right: 10px; }
         /* Above the editor so the save note (and Publish game's panel) can hang over it. */

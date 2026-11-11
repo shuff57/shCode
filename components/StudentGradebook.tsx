@@ -206,7 +206,7 @@ export default function StudentGradebook({ lessons }: Props) {
     <>
     {grades.length > 0 && (
       <div style={cardStyle}>
-        <h3 style={{ margin: '0 0 10px 0' }}>Your grade so far</h3>
+        <h3 style={{ margin: '0 0 10px 0', fontSize: 'var(--fs-h2)', fontWeight: 700 }}>Your grade so far</h3>
         {grades.map((g) => (
           // One compact row per class: the two numbers, then the class and the rule beside them,
           // so the assignments table starts higher (climb 4: the summary was a tall, mostly empty card).
@@ -218,7 +218,7 @@ export default function StudentGradebook({ lessons }: Props) {
               </div>
               {g.missingCount > 0 && <a href="#missing-late-filter" style={{ color: 'var(--c-fg)', textDecoration: 'none', paddingRight: 20, borderRight: '1px solid var(--c-line)' }}>
                 <div style={{ color: 'var(--c-meta)', fontSize: 13, marginBottom: 2 }}>Past due</div>
-                <strong style={{ fontSize: 28, lineHeight: 1.2 }}>{g.missingCount}</strong><span style={{ fontSize: 13 }}> graded lessons</span>
+                <strong style={{ fontSize: 28, lineHeight: 1.2, color: STATUS_COLOR.missing }}>{g.missingCount}</strong><span style={{ fontSize: 13 }}> graded lessons</span>
               </a>}
             </div>
             <div style={{ flex: '1 1 320px', minWidth: 0, maxWidth: '64ch' }}>
@@ -246,7 +246,7 @@ export default function StudentGradebook({ lessons }: Props) {
         {/* marginRight:auto, not flex:1 — flex:1 lets the heading shrink to
             nothing on a phone and its text then overlaps the filter pills
             instead of pushing them onto the next line. */}
-        <h3 style={{ margin: 0, marginRight: 'auto' }}>Assignments</h3>
+        <h3 style={{ margin: 0, marginRight: 'auto', fontSize: 'var(--fs-h2)', fontWeight: 700 }}>Assignments</h3>
         <button type="button" onClick={() => setFilter('all')} style={filter === 'all' ? tabActive : tabIdle}>
           All ({rows.length})
         </button>
@@ -433,6 +433,8 @@ const cardStyle: React.CSSProperties = {
 
 const headingStyle: React.CSSProperties = {
   margin: '0 0 14px 0',
+  fontSize: 'var(--fs-h2)',
+  fontWeight: 700,
   borderBottom: '1px solid var(--c-line)',
   paddingBottom: 8,
 };

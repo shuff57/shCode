@@ -2410,7 +2410,6 @@ body { box-sizing: border-box; padding-right: 20px; }
 @media (min-width: 721px) {
   body:has(.shd-tabstrip) .lab-work-area { margin-right: calc(var(--shd-rail-width) + var(--shd-rail-gap) + var(--shd-tabbed, 0px)); }
   body:has(.shd-tabstrip) .lab-work-area .editor-card { margin-right: 0; }
-  .lab-work-area .toolbar-submit { display: none; }
   .lab-work-area .editor-preview-container:not(.sandbox-split) > #editorPane { min-width: min(480px, 64%); flex-basis: 64%; }  /* never starve the preview at medium widths or with a drawer open */
   .lab-work-area #previewPane { min-width: 0; flex-basis: 36%; }
   .lab-work-area .console-empty { min-width: 0; }
@@ -2949,7 +2948,7 @@ a.mod-row:hover { background: var(--x-343746); border-top-color: var(--c-comment
 /* Climb 3 r5: a full-width 16:9 player at 1440 was taller than the viewport and hid its controls and the
    completion actions (lost 2-0). Cap it so the whole player, plus the title above it, fits on screen. */
 @media (min-width: 1024px) {
-  .lesson-wide-media.lesson-video-frame { width: min(100%, calc((100svh - 300px) * 16 / 9)) !important; margin-inline: auto !important; }
+  .lesson-wide-media.lesson-video-frame { width: min(100%, calc(58svh * 16 / 9)) !important; margin-inline: auto !important; }
 }
 
 /* climb4 r1 teacher */
@@ -3011,10 +3010,10 @@ body:has(.content-lesson-main) .lesson-position { width: 100%; max-width: 1080px
   /* The task is clamped to a few whole lines with a fade and a "Show full task" button
      (components/LabTaskCard.tsx); nothing is cut mid-line and nothing scrolls inside the card. */
   .lab-work-area:has(.output-header) .lab-task-card[open]:not(.is-full) .lab-task-content {
-    max-height: 105px; overflow: hidden; position: relative;
+    max-height: 84px; overflow: hidden; position: relative;
   }
   .lab-work-area:has(.output-header) .lab-task-card[open]:not(.is-full) .lab-task-content::after {
-    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 42px;
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 14px;
     background: linear-gradient(transparent, var(--c-bg)); pointer-events: none;
   }
   .lab-work-area:has(.output-header) .lab-task-card[open] .lab-task-more { display: inline-flex; }
@@ -3087,3 +3086,84 @@ body:has(.content-lesson-main) .lesson-position { width: 100%; max-width: 1080px
     text-transform: none !important; letter-spacing: 0 !important; font-weight: 500 !important;
   }
 }
+
+/* climb4 r2 teacher */
+/* Class list: "Create class" is a class card's width, not the page's; the input sizes to a class name. */
+@media (min-width: 1024px) {
+  .teacher-create-card { max-width: 640px !important; }
+}
+/* Roster: Download grades is a quiet utility; it answers the pointer like the other outlined buttons. */
+.teacher-utility-btn:not(:disabled):hover { border-color: var(--c-meta) !important; background: color-mix(in srgb, var(--c-fg) 6%, transparent) !important; }
+.teacher-utility-btn:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; }
+/* Inset fields (announcement text) share the grading-weight inputs' hover and focus states. */
+.teacher-field:hover { border-color: var(--c-meta) !important; }
+.teacher-field:focus { outline: 2px solid var(--c-cyan); outline-offset: 1px; border-color: var(--c-cyan) !important; }
+.teacher-field::placeholder { color: var(--c-dim); opacity: 1; }
+
+/* climb4 r2 student */
+/* Module page: the type label has a fixed column and the duration a fixed right-aligned width, so
+   "Worked Example" keeps the same gap to "~10 min" as "Slides" does to "~5 min". */
+@media (min-width: 721px) {
+  .mod-row .mod-row-badge { flex: 0 0 150px; min-width: 150px; justify-content: flex-start !important; }
+  .mod-row .mod-row-duration { display: inline-block; min-width: 7ch; text-align: right; }
+}
+
+/* Docs sidebar: page links under the open topic at full strength (the base rule's 0.65 opacity
+   out-ranked the reset); the current page keeps its filled, bold, light-text state. */
+.docs-sidebar .docs-sidebar-pages li a { opacity: 1; color: var(--c-cyan); }
+.docs-sidebar .docs-sidebar-pages li a:hover:not(.current) { background: var(--muted); }
+.docs-sidebar .docs-sidebar-pages li a.current { color: var(--c-fg); box-shadow: inset 3px 0 0 var(--c-purple); }
+
+/* Console and moSHion labs on desktop: Submit sits after Check in the editor toolbar, so the
+   header's copy of the same button is hidden. */
+.toolbar-more { display: none; }
+@media (min-width: 721px) {
+  .lab-work-area .run-toolbar .toolbar-submit { margin-left: 0 !important; }
+  body:has(.lab-work-area .toolbar-submit) .lab-assignment-header .assignment-header-center > button { display: none; }
+}
+
+/* Console and moSHion labs on a phone: Run is the big primary action, Check and Submit normal
+   buttons, Reset / History / Save behind one "More" disclosure (a second row when open). */
+@media (max-width: 720px) {
+  .lab-work-area .run-toolbar { flex-wrap: wrap !important; row-gap: 6px !important; overflow: visible !important; }
+  .lab-work-area .run-toolbar > .btn-run {
+    flex: 1 1 auto !important; min-height: 40px; padding: 8px 16px !important;
+    font-size: 15px !important; font-weight: 700;
+  }
+  .lab-work-area .run-toolbar > :is(.toolbar-check, .toolbar-submit, .toolbar-more) {
+    flex: 0 0 auto !important; min-height: 40px; padding: 8px 12px !important; font-size: 13px !important;
+  }
+  .lab-work-area .run-toolbar > .toolbar-more { display: inline-flex; align-items: center; gap: 4px; min-width: 44px; }
+  .lab-work-area .run-toolbar .toolbar-utilities:not(.is-open) { display: none !important; }
+  .lab-work-area .run-toolbar .toolbar-utilities.is-open { flex: 1 0 100% !important; order: 3; justify-content: flex-start; }
+  .lab-work-area .run-toolbar .toolbar-utilities > button {
+    flex: 0 0 auto !important; min-height: 32px; min-width: 44px; padding: 6px 12px !important; font-size: 13px !important;
+  }
+}
+
+/* Runnable examples in readings: Run is one horizontal button (icon left of label), as tall as Reset. */
+.livecodeblock-toolbar > button {
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  height: 32px; box-sizing: border-box;
+}
+.livecodeblock-toolbar > .btn-run { padding: 0 16px; font-size: 14px; font-weight: 700; }
+.livecodeblock-toolbar > button > svg { flex: 0 0 auto; }
+
+/* Video and slide lessons: the caption under the media is a readable measure, not the full width. */
+.lesson-primary:has(> .lesson-wide-media) > .lesson-description,
+.lesson-wide-media ~ .lesson-description { max-width: 70ch; text-wrap: pretty; }
+
+/* Quiz: "N of M answered" beside the heading. */
+.quiz-answered-count {
+  display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 999px;
+  border: 1px solid var(--c-line); color: var(--c-meta); font-size: var(--fs-meta);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.quiz-answered-count.is-complete { color: var(--c-green); border-color: color-mix(in srgb, var(--c-green) 55%, transparent); }
+
+/* Written answers: the daily grade count is quiet helper text under Submit. */
+.written-quota-note { margin: 6px 0 10px; }
+.written-quota-note [role="status"] { margin: 0 !important; font-size: var(--fs-micro) !important; }
+
+/* Standalone links (the book link above a reading) never leave one word alone on a line. */
+.lesson-book-link, .lesson-book-link a { text-wrap: balance; }

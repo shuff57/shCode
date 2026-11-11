@@ -72,7 +72,7 @@ export default function DocsIndex() {
         </p>
       </div>
       <section className="docs-hub-topics" style={{ marginTop: 24 }}>
-        <h2 style={{ fontSize: 18, margin: '0 0 12px' }}>Jump to a topic</h2>
+        <h2 style={{ fontSize: 18, margin: '0 0 12px' }}>Jump to a JavaScript topic</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 8 }}>
           {sections.map((section) => (
             <Link key={section.slug} href={`/docs/js/${section.slug}`} className="docs-topic-tile" style={{ padding: '12px 16px', border: '1px solid var(--c-line)', borderRadius: 6, color: 'var(--c-cyan)', textDecoration: 'none', background: 'var(--c-bg)' }}>

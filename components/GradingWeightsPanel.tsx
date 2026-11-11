@@ -93,6 +93,8 @@ export default function GradingWeightsPanel({ classId, desktop = false }: { clas
   }
 
   const total = rows.reduce((sum, r) => sum + r.weight, 0);
+  // Category | Weight (the field) | Share | Reset — shared by the header row and every category row.
+  const rowCols = desktop ? 'minmax(0, 1fr) 60px 64px 48px' : 'minmax(0, 1fr) 60px 56px 48px';
 
   return (
     <div>
@@ -113,9 +115,16 @@ export default function GradingWeightsPanel({ classId, desktop = false }: { clas
         Each share is its weight divided by the total.<br />
         Only categories with work count toward a student’s grade; empty categories drop out.
       </p>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '0 24px' }}>
+      {/* One column, so the header row below lines up with every row's fields. */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', maxWidth: 640 }}>
+        <div aria-hidden="true" style={{ display: 'grid', gridTemplateColumns: rowCols, alignItems: 'end', gap: 8, padding: '8px 0 6px', borderBottom: `1px solid ${C.border}`, fontFamily: 'var(--font-prose)', fontSize: 12, fontWeight: 600, color: C.dim }}>
+          <span>Category</span>
+          <span style={{ textAlign: 'right' }}>Weight</span>
+          <span style={{ textAlign: 'right' }}>Share</span>
+          <span />
+        </div>
         {rows.map((r) => (
-          <div key={r.category} style={{ display: 'grid', gridTemplateColumns: desktop ? 'minmax(0, 1fr) 60px 92px 48px' : 'minmax(0, 1fr) 60px 84px 48px', alignItems: 'center', gap: 8, padding: '8px 0', borderBottom: `1px solid color-mix(in srgb, ${C.border} 60%, transparent)` }}>
+          <div key={r.category} style={{ display: 'grid', gridTemplateColumns: rowCols, alignItems: 'center', gap: 8, padding: '8px 0', borderBottom: `1px solid color-mix(in srgb, ${C.border} 60%, transparent)` }}>
             {/* Label (what the row is) in the reading face; the share beside the input is the quiet helper. */}
             <span style={{ flex: 1, minWidth: 0, fontFamily: 'var(--font-prose)', fontSize: 14, fontWeight: 500, lineHeight: 1.35, color: C.text }}>{CATEGORY_LABEL[r.category]}</span>
             <input
@@ -136,22 +145,22 @@ export default function GradingWeightsPanel({ classId, desktop = false }: { clas
                 }
               }}
               className="teacher-weight-input"
-              // An input surface that reads as editable against the card: lighter fill, a stronger border,
-              // and a cyan focus ring (globals.css, climb4 r1 teacher).
+              // A real number field, not a badge: an inset surface darker than the card, a 1px visible border,
+              // regular weight, and a cyan focus ring (globals.css, climb4 r1 teacher).
               style={{
                 width: 60, height: 32, boxSizing: 'border-box',
-                background: 'color-mix(in srgb, var(--c-fg) 7%, var(--c-bg))',
+                background: 'color-mix(in srgb, var(--c-deep) 50%, var(--x-151515))',
                 color: C.text,
                 border: '1px solid var(--c-comment)',
-                borderRadius: 6,
+                borderRadius: 4,
                 padding: '4px 8px',
-                fontSize: 15,
-                fontWeight: 700,
+                fontSize: 14,
+                fontWeight: 400,
                 textAlign: 'right',
                 fontVariantNumeric: 'tabular-nums',
               }}
             />
-            <span title="Effective share when all categories have work" style={{ fontSize: 13, color: C.dim, textAlign: 'right', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{total > 0 ? `${(r.weight / total * 100).toFixed(1)}% share` : '—'}</span>
+            <span title="Effective share when all categories have work" style={{ fontSize: 13, color: C.dim, textAlign: 'right', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{total > 0 ? `${(r.weight / total * 100).toFixed(1)}%` : '—'}</span>
             {r.isDefault ? (
               <span />
             ) : (

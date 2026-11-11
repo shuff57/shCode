@@ -307,6 +307,43 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
             fontSize: 14,
           }}
         />
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <label htmlFor={`override-feedback-${submissionId}`} style={{ fontSize: 13, color: 'var(--c-fg)' }}>
+          Feedback (optional):
+        </label>
+        <textarea
+          id={`override-feedback-${submissionId}`}
+          rows={2}
+          value={feedback}
+          onChange={(e) => setFeedback(e.target.value)}
+          style={{
+            width: '100%',
+            background: 'var(--c-bg)',
+            color: 'var(--c-fg)',
+            border: '1px solid var(--c-line)',
+            borderRadius: 4,
+            padding: '8px 12px',
+            fontSize: 14,
+            fontFamily: 'inherit',
+            resize: 'vertical',
+            minHeight: 64,
+            maxHeight: 120,
+            boxSizing: 'border-box',
+          }}
+        />
+      </div>
+
+      {enforceMax && (
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--c-meta)' }}>
+          <input type="checkbox" checked={replaceBest} onChange={(e) => setReplaceBest(e.target.checked)} />
+          Use this as the student&apos;s score even if it is lower than their best try (otherwise the higher one is kept on a part with a try limit). This stays until you change or clear it; the student&apos;s later tries do not undo it.
+        </label>
+      )}
+
+      {/* Save comes last, after every field it saves (score, feedback, the keep-this-score choice). */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
         <button
           type="submit"
           disabled={submitting}
@@ -343,39 +380,6 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
           </span>
         )}
       </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <label htmlFor={`override-feedback-${submissionId}`} style={{ fontSize: 13, color: 'var(--c-fg)' }}>
-          Feedback (optional):
-        </label>
-        <textarea
-          id={`override-feedback-${submissionId}`}
-          rows={2}
-          value={feedback}
-          onChange={(e) => setFeedback(e.target.value)}
-          style={{
-            width: '100%',
-            background: 'var(--c-bg)',
-            color: 'var(--c-fg)',
-            border: '1px solid var(--c-line)',
-            borderRadius: 4,
-            padding: '8px 12px',
-            fontSize: 14,
-            fontFamily: 'inherit',
-            resize: 'vertical',
-            minHeight: 64,
-            maxHeight: 120,
-            boxSizing: 'border-box',
-          }}
-        />
-      </div>
-
-      {enforceMax && (
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--c-meta)' }}>
-          <input type="checkbox" checked={replaceBest} onChange={(e) => setReplaceBest(e.target.checked)} />
-          Use this as the student&apos;s score even if it is lower than their best try (otherwise the higher one is kept on a part with a try limit). This stays until you change or clear it; the student&apos;s later tries do not undo it.
-        </label>
-      )}
     </form>
   );
 }

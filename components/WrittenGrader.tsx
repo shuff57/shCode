@@ -486,7 +486,6 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
         />
       </div>
       <AttemptBanner max={maxSubmissions} used={attempts} loading={!loaded} />
-      <GradeQuotaNote />
       {codeInput ? (
         // CodeMirrorPane fills its parent (height: 100%), so the parent needs a
         // height of its own. No Run button, lint or autocomplete, on purpose:
@@ -560,8 +559,12 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
             border: 'none',
             fontWeight: 600,
             cursor: loading ? 'wait' : response.trim().length < 20 ? 'not-allowed' : 'pointer',
-            background: loading ? 'var(--c-line)' : response.trim().length < 20 ? 'var(--c-line)' : 'var(--c-purple)',
-            color: response.trim().length < 20 || locked ? 'var(--c-dim)' : 'var(--c-bg)',
+            // Disabled reads as disabled (flat grey fill, dashed edge, not-allowed cursor) but its
+            // label stays readable: meta on the line colour is above 4.5:1, the old dim was ~2.6:1.
+            background: loading || locked || response.trim().length < 20 ? 'var(--c-line)' : 'var(--c-purple)',
+            color: response.trim().length < 20 || locked ? 'var(--c-meta)' : loading ? 'var(--c-fg)' : 'var(--c-bg)',
+            outline: !loading && (response.trim().length < 20 || locked) ? '1px dashed var(--c-comment)' : undefined,
+            outlineOffset: -1,
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
@@ -629,6 +632,10 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
               : `${maxSubmissions - attempts} of ${maxSubmissions} attempts left`}
           </span>
         )}
+      </div>
+      {/* Quiet helper text under the controls it counts (was between the label and the box). */}
+      <div className="written-quota-note">
+        <GradeQuotaNote />
       </div>
 
       {prompt.trim() ? <details style={{ marginBottom: 10, border: '1px solid var(--c-line)', borderRadius: 6, padding: '8px 12px' }}>

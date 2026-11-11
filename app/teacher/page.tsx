@@ -1300,6 +1300,7 @@ function GradebookView({
   const CELL_W = 140;
   const [gridElement, setGridElement] = useState<HTMLDivElement | null>(null);
   const [gridScroll, setGridScroll] = useState({ left: false, right: false, more: 0, partialWidth: 0, rightInset: 0 });
+  const syncGridRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     if (!gridElement) return;
@@ -1321,7 +1322,23 @@ function GradebookView({
         more: Math.min(lessonCount, Math.max(0, Math.ceil((remaining - 1) / CELL_W))),
       };
       setGridScroll((prev) => prev.left === next.left && prev.right === next.right && prev.more === next.more && prev.partialWidth === next.partialWidth && prev.rightInset === next.rightInset ? prev : next);
+      // Unit band labels ("1.3 DOCUMENTATION AND ...") are fitted to the part of their span that is in view,
+      // between the frozen name columns and the right edge (or the cover over a partial column), so a label
+      // ends in an ellipsis instead of being cut mid-word by the edge. Written straight to the DOM: this
+      // runs on every scroll frame and needs no re-render.
+      const frozenRight = gridElement.getBoundingClientRect().left + gridElement.clientLeft + Number(gridElement.dataset.frozen ?? 0);
+      const visibleRight = edge - next.partialWidth;
+      gridElement.querySelectorAll<HTMLElement>('[data-unit-label]').forEach((label) => {
+        const cell = label.parentElement;
+        if (!cell) return;
+        const r = cell.getBoundingClientRect();
+        const from = Math.max(r.left, frozenRight);
+        const to = Math.min(r.right, visibleRight);
+        label.style.marginLeft = `${Math.max(0, from - r.left - 4)}px`;
+        label.style.width = `${Math.max(0, to - from - 8)}px`;
+      });
     };
+    syncGridRef.current = sync;
     sync();
     gridElement.addEventListener('scroll', sync, { passive: true });
     const observer = new ResizeObserver(sync);
@@ -1330,8 +1347,11 @@ function GradebookView({
     return () => {
       gridElement.removeEventListener('scroll', sync);
       observer.disconnect();
+      syncGridRef.current = null;
     };
   }, [gridElement]);
+  // A new set of columns (module filter, readings shown) can keep the table's width; refit the unit labels.
+  useEffect(() => { syncGridRef.current?.(); });
 
   // The grade so far beside each name: the same number the roster shows (one endpoint, one rule).
   useEffect(() => {
@@ -1756,6 +1776,7 @@ function GradebookView({
       <div
         ref={setGridElement}
         data-lesson-count={displayLessons.length}
+        data-frozen={EMAIL_W + (narrow ? 0 : GRADE_W)}
         style={{
           width: '100%',
           overflow: 'auto',
@@ -1838,7 +1859,7 @@ function GradebookView({
                     width: CELL_W * count,
                   }}
                 >
-                  {unit}
+                  <span data-unit-label style={{ display: 'block', boxSizing: 'border-box', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{unit}</span>
                 </th>
               ))}
             </tr>
@@ -1869,9 +1890,10 @@ function GradebookView({
                   style={{
                     position: 'sticky', top: HEAD1_H, zIndex: 2,
                     width: CELL_W, minWidth: CELL_W, maxWidth: CELL_W,
-                    // A small number line plus at most two title lines in the proportional face; the
-                    // full title (with points and due date) is the header's tooltip.
-                    height: 82, boxSizing: 'border-box', verticalAlign: 'top', overflow: 'hidden',
+                    // A small number line plus up to four title lines in the proportional face (measured: every
+                    // graded title fits in four at 124px, seven of them need the fourth), so none ends in an
+                    // ellipsis. One fixed height for the whole row; the full title is the tooltip.
+                    height: 84, boxSizing: 'border-box', verticalAlign: 'top', overflow: 'hidden',
                     background: stickyBg, padding: '6px 8px 6px',
                     borderTop: `3px solid ${catOf.get(lesson.id) ? CAT_COLOR[catOf.get(lesson.id) as GradeCategory] : 'var(--c-line)'}`,
                     borderBottom: '2px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)',
@@ -2594,11 +2616,13 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         role="tablist"
         aria-label="Class sections"
         className="teacher-tabs"
-        // On a phone the five tabs sit in a 3-column grid of two rows, all visible: a single scrolling row
-        // lost 3-0 to it in the blind panel (Schedule clipped, Class settings out of sight).
-        style={{ position: 'sticky', top: 0, zIndex: 20, background: 'var(--c-bg)', padding: compact ? '6px 0' : '8px 0', marginBottom: 12, display: compact ? 'grid' : 'flex', gridTemplateColumns: compact ? 'repeat(3, minmax(0, 1fr))' : undefined, gap: compact ? 6 : 8, flexWrap: 'nowrap', overflowX: 'auto', borderBottom: '1px solid var(--c-line)' }}
+        // On a phone the five tabs sit in two rows, all visible: a single scrolling row lost 3-0 to it in the
+        // blind panel (Schedule clipped, Class settings out of sight). A 6-track grid: three tabs of two tracks
+        // on the first row, two of three on the second, so both rows fill the width and "Class settings" gets
+        // the room to stay on one line.
+        style={{ position: 'sticky', top: 0, zIndex: 20, background: 'var(--c-bg)', padding: compact ? '6px 0' : '8px 0', marginBottom: 12, display: compact ? 'grid' : 'flex', gridTemplateColumns: compact ? 'repeat(6, minmax(0, 1fr))' : undefined, gap: compact ? 6 : 8, flexWrap: 'nowrap', overflowX: 'auto', borderBottom: '1px solid var(--c-line)' }}
       >
-        {TABS.map((t) => {
+        {TABS.map((t, tabIndex) => {
           const on = activeTab === t.id;
           const badge = t.id === 'today' ? (awaitingCount ?? 0) : t.id === 'students' ? roster.length : 0;
           return (
@@ -2627,7 +2651,14 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                 fontWeight: on ? 700 : 500,
                 boxShadow: 'none',
                 border: `1px solid ${on ? 'var(--c-purple)' : 'var(--c-line)'}`,
-                borderRadius: 6, flexShrink: 0, whiteSpace: 'nowrap', fontSize: compact ? 13 : 14, padding: compact ? '4px 10px' : '4px 16px',
+                borderRadius: 6, flexShrink: 0, whiteSpace: 'nowrap', fontSize: compact ? 13 : 14, padding: compact ? '4px 8px' : '4px 16px',
+                // Phone: equal-height cells, label centred; a label that still cannot fit (a wider font from
+                // Appearance settings) wraps inside its cell instead of being clipped.
+                ...(compact ? {
+                  gridColumn: tabIndex < 3 ? 'span 2' : 'span 3',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                  whiteSpace: 'normal', height: 'auto', minHeight: 36, lineHeight: '16px', minWidth: 0,
+                } : {}),
               }}
             >
               {t.label}
@@ -2689,7 +2720,9 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             <h2 style={{ ...S.h2, fontSize: 18, lineHeight: '26px', marginBottom: 0 }}>Roster ({roster.length})</h2>
             <button
               type="button"
-              style={{ ...(roster.length === 0 || progressMap.size === 0 ? S.btnDisabled : S.btn('var(--c-cyan)')), ...(compact ? { fontSize: 12, padding: '8px 12px', lineHeight: '18px' } : {}) }}
+              className="teacher-utility-btn"
+              // A utility, not the page's action: outlined and quiet, so each row's Open is what reads as the action.
+              style={{ ...(roster.length === 0 || progressMap.size === 0 ? S.btnDisabled : { ...S.btn('transparent'), color: 'var(--c-fg)', border: '1px solid var(--c-line)', fontWeight: 500 }), ...(compact ? { fontSize: 12, padding: '8px 12px', lineHeight: '18px' } : {}) }}
               disabled={roster.length === 0 || progressMap.size === 0}
               title="One row per student: the grade so far, how many graded lessons are done and past due, and a column per grade category. Ready to copy into a spreadsheet or the grade book."
               onClick={() => {
@@ -2734,7 +2767,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                         <div style={{ fontSize: 15, lineHeight: compact ? '22px' : '20px', fontWeight: 600, color: 'var(--c-fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fullName(prog?.firstName, prog?.lastName) ?? row.student_email}</div>
                         {!compact && <div style={{ color: 'var(--c-meta)', fontSize: 13, lineHeight: '18px', marginTop: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.student_email}</div>}
                       </div>
-                      <div title="Grade so far, under this class's weights" style={{ gridColumn: compact ? 2 : undefined, gridRow: compact ? 2 : undefined, display: 'flex', alignItems: 'center', justifyContent: compact ? 'flex-end' : undefined, gap: 10, whiteSpace: 'nowrap', lineHeight: '22px' }}>
+                      <div title="Grade so far, under this class's weights" style={{ gridColumn: compact ? 2 : undefined, gridRow: compact ? 1 : undefined, display: 'flex', alignItems: 'center', justifyContent: compact ? 'flex-end' : undefined, gap: 10, whiteSpace: 'nowrap', lineHeight: '22px' }}>
                         {/* The number leads; the thin neutral bar under it is the grade's scale, not a
                             completion bar (that is the "Graded done" fraction beside it). */}
                         <strong style={{ color: prog?.gradedCounted ? pctColor(wp) : 'var(--c-meta)', fontSize: compact ? 16 : 15, fontVariantNumeric: 'tabular-nums', minWidth: compact ? undefined : 44, textAlign: 'right' }}>{prog?.gradedCounted ? `${wp}%` : '—'}</strong>
@@ -2744,20 +2777,20 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                           </span>
                         ) : null}
                       </div>
-                      <div style={{ gridColumn: compact ? 1 : undefined, gridRow: compact ? 2 : undefined, minWidth: 0, display: 'flex', flexWrap: 'wrap', gap: compact ? '0 6px' : 8, lineHeight: '18px', fontSize: compact ? 12 : 14, color: compact ? 'var(--c-meta)' : 'var(--c-fg)', fontVariantNumeric: 'tabular-nums' }}>
+                      <div style={{ gridColumn: compact ? '1 / -1' : undefined, gridRow: compact ? 2 : undefined, minWidth: 0, display: 'flex', flexWrap: 'wrap', gap: compact ? '0 6px' : 8, lineHeight: '18px', fontSize: compact ? 12 : 14, color: compact ? 'var(--c-meta)' : 'var(--c-fg)', fontVariantNumeric: 'tabular-nums' }}>
                         <span style={{ whiteSpace: 'nowrap' }}>{prog?.gradedDone ?? 0}/{prog?.gradedTotal ?? '—'}{compact && ' graded'}</span>
                         {compact && <span aria-hidden="true">·</span>}
                         {compact && <span style={{ whiteSpace: 'nowrap', fontWeight: prog?.gradedMissing ? 700 : 400, color: prog?.gradedMissing ? 'var(--c-red)' : 'var(--c-meta)' }}>{prog?.gradedMissing ?? 0} past due</span>}
                       </div>
                       {!compact && <><strong style={{ fontSize: 15, fontVariantNumeric: 'tabular-nums', color: prog?.gradedMissing ? 'var(--c-red)' : 'var(--c-meta)' }}>{prog?.gradedMissing || '—'}</strong><span title={prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'} style={{ minWidth: 0, fontSize: 14, lineHeight: '18px', color: prog?.last_active ? 'var(--c-fg)' : 'var(--c-meta)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'}</span></>}
-                      <div style={{ gridColumn: compact ? 2 : undefined, gridRow: compact ? 1 : undefined, minWidth: 0, display: 'flex', flexWrap: 'nowrap', gap: 8, justifyContent: 'flex-end', alignItems: 'center' }}>
-                        {/* A quiet row action: outlined, so a column of them does not outshout the grades and
-                            the red past-due numbers, but still a bordered button with a hover fill. */}
+                      <div style={{ gridColumn: compact ? '1 / -1' : undefined, gridRow: compact ? 3 : undefined, minWidth: 0, display: 'flex', flexWrap: 'nowrap', gap: 8, justifyContent: 'flex-end', alignItems: 'center' }}>
+                        {/* The row's action: a full-strength cyan outline with a bold label and a faint tint, so it
+                            reads as the thing to press without a column of bright fills outshouting the grades. */}
                         <button
                           type="button"
                           className="teacher-row-open"
                           aria-label={`Open ${fullName(prog?.firstName, prog?.lastName) ?? row.student_email}`}
-                          style={{ background: 'transparent', color: 'var(--c-cyan)', border: '1px solid color-mix(in srgb, var(--c-cyan) 55%, transparent)', borderRadius: 4, height: 32, boxSizing: 'border-box', padding: '0 12px', lineHeight: '18px', flexShrink: 0, fontSize: 12, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                          style={{ background: 'color-mix(in srgb, var(--c-cyan) 8%, transparent)', color: 'var(--c-cyan)', border: '1px solid var(--c-cyan)', borderRadius: 4, height: 32, boxSizing: 'border-box', padding: '0 14px', lineHeight: '18px', flexShrink: 0, fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
                           onClick={() => { setDrawerLesson(null); setDrawerEmail(row.student_email); }}
                         >
                           Open

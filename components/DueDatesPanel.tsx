@@ -546,51 +546,66 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                   />
                 </div>
 
-                <div style={{ display: isOpen || openSummary.kind === 'mixed' || dueSummary.kind === 'mixed' ? 'flex' : 'none', alignItems: 'center', gap: 12, flexWrap: 'wrap', margin: '8px 0 0 24px' }}>
-                  {openSummary.kind !== 'none' && (
-                    <span style={{ fontSize: 13, color: openSummary.kind === 'mixed' ? C.warn : C.open }}>
-                      {openSummary.kind === 'mixed'
-                        ? `Opens: mixed · ${openSummary.overrides} override${openSummary.overrides === 1 ? '' : 's'}`
-                        : openSummary.dueAt !== null
-                          ? `Opens: ${formatDueTime(openSummary.dueAt)}`
-                          : ''}
+                {/* The module's summary sits under its own columns: what Opens says under Available after,
+                    what Due says under Due, so the two states never run together as one sentence. On a
+                    phone the two parts stack, each on its own line. */}
+                <div
+                  className="schedule-module-summary"
+                  style={{
+                    display: isOpen || openSummary.kind === 'mixed' || dueSummary.kind === 'mixed' ? 'grid' : 'none',
+                    gridTemplateColumns: compact ? 'minmax(0, 1fr)' : 'minmax(280px, 1fr) 320px 320px',
+                    alignItems: 'start', gap: compact ? 6 : 12, margin: compact ? '8px 0 0 22px' : '6px 0 0',
+                  }}
+                >
+                  {!compact && <span aria-hidden="true" />}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', minWidth: 0 }}>
+                    {openSummary.kind !== 'none' && (
+                      <span style={{ fontSize: 13, color: openSummary.kind === 'mixed' ? C.warn : C.open }}>
+                        <span style={{ fontWeight: 700 }}>Opens:</span>{' '}
+                        {openSummary.kind === 'mixed'
+                          ? `mixed · ${openSummary.overrides} override${openSummary.overrides === 1 ? '' : 's'}`
+                          : openSummary.dueAt !== null
+                            ? formatDueTime(openSummary.dueAt)
+                            : ''}
+                      </span>
+                    )}
+                    {openSummary.kind === 'mixed' && openSummary.ownDueAt !== null && (
+                      <button
+                        type="button"
+                        onClick={() => applyToAll('open')}
+                        style={{
+                          background: 'none', border: `1px solid ${C.border}`, color: C.open,
+                          borderRadius: 4, padding: '4px 8px', fontSize: 13, cursor: 'pointer',
+                          fontFamily: 'inherit',
+                        }}
+                      >
+                        Apply this Opens to all
+                      </button>
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', minWidth: 0 }}>
+                    <span style={{ fontSize: 13, color: dueSummary.kind === 'mixed' ? C.warn : C.dim }}>
+                      <span style={{ fontWeight: 700 }}>Due:</span>{' '}
+                      {dueSummary.kind === 'mixed'
+                        ? `mixed · ${dueSummary.overrides} override${dueSummary.overrides === 1 ? '' : 's'}`
+                        : dueSummary.kind === 'single' && dueSummary.dueAt !== null
+                          ? `${formatDueTime(dueSummary.dueAt)} for all lessons`
+                          : 'none set'}
                     </span>
-                  )}
-                  <span style={{ fontSize: 13, color: dueSummary.kind === 'mixed' ? C.warn : C.dim }}>
-                    {dueSummary.kind === 'mixed'
-                      ? `Due: mixed · ${dueSummary.overrides} override${dueSummary.overrides === 1 ? '' : 's'}`
-                      : dueSummary.kind === 'single' && dueSummary.dueAt !== null
-                        ? `Due: ${formatDueTime(dueSummary.dueAt)} for all lessons`
-                        : 'No due date'}
-                  </span>
-
-                  {openSummary.kind === 'mixed' && openSummary.ownDueAt !== null && (
-                    <button
-                      type="button"
-                      onClick={() => applyToAll('open')}
-                      style={{
-                        background: 'none', border: `1px solid ${C.border}`, color: C.open,
-                        borderRadius: 4, padding: '4px 8px', fontSize: 13, cursor: 'pointer',
-                        fontFamily: 'inherit',
-                      }}
-                    >
-                      Apply this Opens to all
-                    </button>
-                  )}
-
-                  {dueSummary.kind === 'mixed' && dueSummary.ownDueAt !== null && (
-                    <button
-                      type="button"
-                      onClick={() => applyToAll('due')}
-                      style={{
-                        background: 'none', border: `1px solid ${C.border}`, color: C.warn,
-                        borderRadius: 4, padding: '4px 8px', fontSize: 13, cursor: 'pointer',
-                        fontFamily: 'inherit',
-                      }}
-                    >
-                      Apply {formatDue(dueSummary.ownDueAt)} to all
-                    </button>
-                  )}
+                    {dueSummary.kind === 'mixed' && dueSummary.ownDueAt !== null && (
+                      <button
+                        type="button"
+                        onClick={() => applyToAll('due')}
+                        style={{
+                          background: 'none', border: `1px solid ${C.border}`, color: C.warn,
+                          borderRadius: 4, padding: '4px 8px', fontSize: 13, cursor: 'pointer',
+                          fontFamily: 'inherit',
+                        }}
+                      >
+                        Apply {formatDue(dueSummary.ownDueAt)} to all
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {isOpen && (
