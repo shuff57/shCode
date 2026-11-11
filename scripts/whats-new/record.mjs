@@ -284,6 +284,48 @@ async function joinCodeTogether(page, demo) {
 }
 
 const RECIPES = {
+  // Fonts (phases 1-3): Sam draws an A with three lines and an O with an ellipse in the Font maker,
+  // then types in the test box and sees the words in the new font. Start the dev server fresh.
+  '2026-11-fonts': {
+    people: [SAM],
+    path: '/fonts/',
+    async before({ pages: [p] }) {
+      await p.locator('svg[aria-label^="Drawing area"]').waitFor({ timeout: 60000 });
+      await p.getByRole('button', { name: 'Make a font', exact: true }).evaluate((el) => window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 8));
+      await p.waitForTimeout(500);
+    },
+    async run({ demos: [d], pages: [p] }) {
+      const svg = p.locator('svg[aria-label^="Drawing area"]');
+      const at = (x, y) => svg.evaluate((el, [x, y]) => {
+        const q = new DOMPoint(x, -y).matrixTransform(el.getScreenCTM());
+        return [q.x, q.y];
+      }, [x, y]);
+      const drag = async (a, b) => {
+        const [ax, ay] = await at(...a);
+        const [bx, by] = await at(...b);
+        await d.moveTo(ax, ay, 350);
+        await p.mouse.down();
+        await d.moveTo(bx, by, 500);
+        await p.mouse.up();
+        await d.pause(250);
+      };
+      await d.click(p.getByRole('button', { name: /^Letter A(, drawn)?$/ }), { after: 200 });
+      await d.click(p.getByRole('button', { name: 'Line', exact: true }), { after: 200 });
+      await drag([80, 0], [325, 700]);
+      await drag([325, 700], [570, 0]);
+      await drag([180, 250], [470, 250]);
+      await d.click(p.getByRole('button', { name: /^Letter O(, drawn)?$/ }), { after: 200 });
+      await d.click(p.getByRole('button', { name: 'Ellipse', exact: true }), { after: 200 });
+      await drag([70, 0], [550, 700]);
+      const box = p.getByLabel(/Test your font/);
+      await d.scrollTo(box, 700);
+      await d.click(box, { after: 200 });
+      await p.keyboard.press('Control+A');
+      await d.type('AOA OAO', 90);
+      await d.pause(1800);
+    },
+  },
+
   // Sandbox projects (migration 0049, components/SandboxProjectPicker.tsx): Sam makes a JavaScript
   // project beside the moSHion one, runs it, then switches back and finds the moSHion code untouched.
   // Start the dev server fresh: Sam's list must hold only the moSHion sandbox.

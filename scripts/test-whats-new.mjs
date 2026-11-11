@@ -187,7 +187,7 @@ check('every entry has an audience, a short title and summary, and at most 3 ste
   }
 });
 check('every action is an in-site page that exists', () => {
-  const pages = new Set(['/', '/sandbox', '/library', '/account', '/teacher', '/docs']);
+  const pages = new Set(['/', '/sandbox', '/library', '/account', '/teacher', '/docs', '/fonts']);
   for (const e of WHATS_NEW) {
     if (!e.action) continue;
     const { href, label } = e.action;
@@ -200,7 +200,7 @@ check('every action is an in-site page that exists', () => {
       if (docs[2]) assert.ok(Number(docs[2]) >= 1 && Number(docs[2]) <= sec.pages.length, `${e.id}: ${href} has no such page`);
     } else {
       // The Library opens on a tab from ?tab= (components/ClassLibraryPanel.tsx).
-      const page = href.replace(/^\/library\?tab=(games|pictures|sounds)$/, '/library');
+      const page = href.replace(/^\/library\?tab=(games|pictures|sounds|fonts)$/, '/library');
       assert.ok(pages.has(page), `${e.id}: ${href} is not a known page`);
     }
   }

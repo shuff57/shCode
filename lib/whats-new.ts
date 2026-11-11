@@ -49,6 +49,26 @@ export interface WhatsNewEntry {
 
 export const WHATS_NEW: WhatsNewEntry[] = [
   {
+    id: '2026-11-fonts',
+    date: '2026-11-11',
+    audience: 'student',
+    title: 'Fonts for your sketches',
+    summary:
+      "The words in your moSHion sketches can now use 15 built-in fonts, from pixel and arcade to handwriting, with textFont('name'). " +
+      'You can also add a font file of your own, or draw your own font letter by letter in the Font maker, then use it in any sketch and share it with your class.',
+    steps: [
+      "Open Learn, then Fonts, to see every font and copy its textFont('name') line.",
+      'Press Make a font, pick a letter, draw it with the pen, shapes, grid squares or curves, then press Save font.',
+      "In a sketch, call textFont('name') before text(). textWeight(), textOutline() and textWrap() change how it looks.",
+    ],
+    media: {
+      clip: '/whats-new/2026-11-fonts.mp4',
+      poster: '/whats-new/2026-11-fonts.jpg',
+      alt: 'Sam draws a letter A with three lines and an O with an ellipse in the Font maker, then types AOA OAO and sees the words in his own font.',
+    },
+    action: { label: 'Open Fonts', href: '/fonts' },
+  },
+  {
     id: '2026-11-sandbox-projects',
     date: '2026-11-11',
     audience: 'student',
