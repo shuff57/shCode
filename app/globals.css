@@ -2338,6 +2338,11 @@ body { box-sizing: border-box; padding-right: 20px; }
   body:has(.shd-tabstrip) .content-lesson-main {
     width: calc(100% - var(--shd-rail-width) - var(--shd-rail-gap) - var(--shd-tabbed, 0px)) !important;
   }
+  /* #95: the closed rail's clearance stays off the chrome (above), but an OPEN
+     drawer covers the page, so the header and the module strip make room for
+     its width, exactly as the work surfaces do. */
+  body > header,
+  body .lesson-progress-footer { margin-right: var(--shd-tabbed, 0px); transition: margin-right 0.22s ease; }
 }
 @media (max-width: 720px) {
   body, body:has(.shd-tabstrip) { padding-right: 10px; }
