@@ -225,6 +225,7 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
         }}
       >
         {!label?.startsWith('Chapter') && <span
+          className="unit-progress-track"
           style={{
             position: 'relative',
             display: 'inline-block',
@@ -256,7 +257,7 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
             }}
           />
         </span>}
-        <span style={{ color: allDone ? 'var(--c-green)' : 'inherit', fontWeight: 600 }}>
+        <span className="unit-progress-count" style={{ color: allDone ? 'var(--c-green)' : 'inherit', fontWeight: 600 }}>
           {`${done} of ${total} done`}
         </span>
       </button>

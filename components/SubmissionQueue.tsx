@@ -455,7 +455,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
   ).length;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       {/* The list below is the most recent graded work of every kind, so say that first and count what is
           listed; the orange note then counts only the rows the AI grader failed on. */}
       <div style={{ fontSize: 13, color: 'var(--c-meta)' }}>
@@ -495,22 +495,22 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
               background: 'var(--c-deep)',
               border: '1px solid var(--c-line)',
               borderRadius: 6,
-              padding: 'clamp(16px, 2vw, 20px)',
+              // Compact (climb4 r1): the response and the score field have to sit in the first screen.
+              padding: '12px 16px',
               minWidth: 0,
               display: 'flex',
               flexDirection: 'column',
-              gap: 12,
+              gap: 10,
             }}
           >
             {/* Header row */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
-              <div style={{ flex: '1 1 240px', minWidth: 0, overflowWrap: 'anywhere' }}>
-                <div style={{ fontWeight: 600, color: 'var(--c-fg)', fontSize: 14 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+              {/* Who, what and when on one line (wraps on a narrow screen). */}
+              <div style={{ flex: '1 1 240px', minWidth: 0, overflowWrap: 'anywhere', fontSize: 13, lineHeight: 1.5, color: 'var(--c-meta)' }}>
+                <strong style={{ fontWeight: 600, color: 'var(--c-fg)', fontSize: 14 }}>
                   {sub.student_email}
-                </div>
-                <div style={{ fontSize: 13, color: 'var(--c-meta)', marginTop: 4, lineHeight: 1.5 }}>
-                  {lessonLabel(sub.lesson_id, lessonTitles)} &middot; submitted {formatTs(sub.submitted_at)}
-                </div>
+                </strong>
+                {' '}&middot; <span style={{ color: 'var(--c-fg)' }}>{lessonLabel(sub.lesson_id, lessonTitles)}</span> &middot; submitted {formatTs(sub.submitted_at)}
               </div>
               <div
                 style={{
@@ -555,7 +555,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                   border: '1px solid var(--c-orange)',
                   borderLeft: '4px solid var(--c-orange)',
                   borderRadius: 4,
-                  padding: '8px 12px',
+                  padding: '6px 12px',
                   fontSize: 13,
                   color: 'var(--c-fg)',
                   lineHeight: 1.5,
@@ -564,10 +564,10 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                 The AI grader could not score this. The student&apos;s answer is below and is
                 safe — read it and set a score yourself.
                 {failed.error && (
-                  <div style={{ color: 'var(--c-meta)', marginTop: 4, fontFamily: 'monospace', fontSize: 12 }}>
-                    {failed.error}
-                    {failed.httpStatus ? ` (HTTP ${failed.httpStatus})` : ''}
-                  </div>
+                  <span style={{ color: 'var(--c-meta)', marginLeft: 8, fontFamily: 'monospace', fontSize: 12 }}>
+                    ({failed.error}
+                    {failed.httpStatus ? `, HTTP ${failed.httpStatus}` : ''})
+                  </span>
                 )}
               </div>
             )}

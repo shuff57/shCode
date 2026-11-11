@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import type { Lesson } from '../lib/types';
 import { flattenFiles } from '../lib/store';
 import LessonSteps from './LessonSteps';
@@ -13,15 +15,20 @@ export default function LabTaskCard({ lesson }: { lesson: Lesson }) {
     ? flattenFiles(lesson.files).find((file) => file.path === 'script.js')?.content ?? ''
     : '';
   const scenario = extractLabTaskScenario(starter)?.scenario;
+  // Phone only (the CSS shows the button and the clamp below 720px): the task starts as a few lines.
+  const [full, setFull] = useState(false);
 
   return (
-    <details className="lab-task-card" open aria-label="Your task"
+    <details className={`lab-task-card${full ? ' is-full' : ''}`} open aria-label="Your task"
       style={{ background: 'var(--c-bg)', border: '1px solid var(--c-line)', borderRadius: 8, padding: 16, minWidth: 0, alignSelf: 'start' }}>
       <summary className="lab-task-heading">Your task</summary>
       <div className="lab-task-content" id={`task-${lesson.id}`}>
         {scenario && <p style={{ margin: '0 0 14px', color: 'var(--c-fg)', fontSize: 14, lineHeight: 1.5 }}>{scenario}</p>}
         <LessonSteps lesson={lesson} />
       </div>
+      <button type="button" className="lab-task-more" aria-expanded={full} aria-controls={`task-${lesson.id}`} onClick={() => setFull((v) => !v)}>
+        {full ? 'Show less' : 'Show full task'}
+      </button>
     </details>
   );
 }

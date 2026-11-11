@@ -236,7 +236,7 @@ export default function ContentLessonView({ lesson }: Props) {
         </span>
         <span style={{ color: 'var(--c-meta)', fontSize: 13 }}>~{lesson.estimateMins ?? '?'} min</span>
         {preview === 'slides' && slidesUrl && deckReady === true ? (
-          <a href={slidesUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', background: 'var(--c-green)', color: 'var(--c-bg)', fontWeight: 700, fontSize: 13, padding: '4px 10px', borderRadius: 6, textDecoration: 'none' }}>
+          <a href={slidesUrl} target="_blank" rel="noopener noreferrer" className="slides-newtab" style={{ display: 'inline-block', background: 'transparent', color: 'var(--c-cyan)', fontWeight: 600, fontSize: 13, padding: '4px 10px', borderRadius: 6, border: '1px solid var(--c-line)', textDecoration: 'none' }}>
             Open in new tab →
           </a>
         ) : null}
@@ -319,7 +319,7 @@ export default function ContentLessonView({ lesson }: Props) {
             <nav aria-label="Slide navigation" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 10 }}>
               <button className="btn-secondary btn-sm" disabled={!deckLoaded || slidePosition?.current === 1} onClick={() => navigateSlide('ArrowLeft')}>‹ Previous</button>
               <span aria-live="polite" style={{ color: 'var(--c-meta)', fontSize: 13 }}>{slidePosition ? `Slide ${slidePosition.current} of ${slidePosition.total}` : 'Slides'}</span>
-              <button className="btn-secondary btn-sm" disabled={!deckLoaded || (!!slidePosition && slidePosition.current >= slidePosition.total)} onClick={() => navigateSlide('ArrowRight')}>Next ›</button>
+              <button className="btn-secondary btn-sm slide-next" disabled={!deckLoaded || (!!slidePosition && slidePosition.current >= slidePosition.total)} onClick={() => navigateSlide('ArrowRight')}>Next ›</button>
             </nav>
           </div>
         ) : slidesUrl && deckReady === null ? (

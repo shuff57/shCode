@@ -476,7 +476,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
   return (
     <section style={{ marginTop: 16, paddingTop: 14, borderTop: '2px solid var(--c-line)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-        <label style={{ fontSize: 13, color: 'var(--c-meta)' }}>{codeInput ? 'Your program (JavaScript)' : 'Your response'}</label>
+        <label style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-fg)' }}>{codeInput ? 'Your program (JavaScript)' : 'Your response'}</label>
         <SolutionPanel
           lessonId={lessonId}
           onInsert={(files) => {
@@ -530,14 +530,18 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
           }}
           placeholder="Write your response here. Full sentences preferred."
           rows={7}
+          className="written-response-input"
           style={{
             width: '100%',
-            background: 'var(--c-bg)',
+            maxWidth: 760,
+            boxSizing: 'border-box',
+            display: 'block',
+            background: 'var(--c-deep2)',
             color: 'var(--c-fg)',
-            border: '1px solid var(--c-line)',
+            border: '1px solid var(--c-comment)',
             borderRadius: 6,
             padding: 12,
-            fontSize: formatting ? textSize : 14,
+            fontSize: formatting ? textSize : 15,
             fontFamily: 'system-ui, sans-serif',
             lineHeight: 1.5,
             resize: 'vertical',

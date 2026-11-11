@@ -41,7 +41,8 @@ const sectionStyle: React.CSSProperties = {
 
 const summaryStyle: React.CSSProperties = {
   cursor: 'pointer',
-  padding: '8px 12px',
+  padding: '6px 12px',
+  lineHeight: '22px',
   background: 'var(--c-bg)',
   border: '1px solid var(--c-line)',
   borderRadius: 16,
@@ -132,7 +133,7 @@ export function NeedsAttentionPanel({ classId, lessonTitles, onOpenStudent, onOp
 
   if (loading) {
     return (
-      <div style={{ color: 'var(--c-meta)', fontStyle: 'italic', padding: 16, fontSize: 14 }}>
+      <div style={{ color: 'var(--c-meta)', fontStyle: 'italic', padding: '8px 0', fontSize: 14 }}>
         Loading attention data...
       </div>
     );
@@ -164,7 +165,7 @@ export function NeedsAttentionPanel({ classId, lessonTitles, onOpenStudent, onOp
 
   if (!hasAny) {
     return (
-      <div style={{ color: 'var(--c-green)', padding: 16, fontSize: 14 }}>
+      <div style={{ color: 'var(--c-green)', padding: '8px 0', fontSize: 14 }}>
         All students are on track.
       </div>
     );

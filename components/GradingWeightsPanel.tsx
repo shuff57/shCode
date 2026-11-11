@@ -109,14 +109,15 @@ export default function GradingWeightsPanel({ classId, desktop = false }: { clas
         )}
         <span style={{ fontSize: 13, color: C.dim }}>Total <strong style={{ color: C.text }}>{total}</strong></span>
       </div>
-      <p style={{ maxWidth: 720, margin: '0 0 12px', fontSize: 13, lineHeight: 1.5, color: C.dim }}>
+      <p style={{ maxWidth: 720, margin: '0 0 8px', fontFamily: 'var(--font-prose)', fontSize: 13, lineHeight: 1.5, color: C.dim }}>
         Each share is its weight divided by the total.<br />
         Only categories with work count toward a student’s grade; empty categories drop out.
       </p>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '0 24px' }}>
         {rows.map((r) => (
-          <div key={r.category} style={{ display: 'grid', gridTemplateColumns: desktop ? 'minmax(0, 1fr) 50px 96px 48px' : 'minmax(0, 1fr) 50px 88px 48px', alignItems: 'center', gap: 8, padding: '8px 0', borderBottom: `1px solid ${C.border}` }}>
-            <span style={{ flex: 1, fontSize: 13 }}>{CATEGORY_LABEL[r.category]}</span>
+          <div key={r.category} style={{ display: 'grid', gridTemplateColumns: desktop ? 'minmax(0, 1fr) 60px 92px 48px' : 'minmax(0, 1fr) 60px 84px 48px', alignItems: 'center', gap: 8, padding: '8px 0', borderBottom: `1px solid color-mix(in srgb, ${C.border} 60%, transparent)` }}>
+            {/* Label (what the row is) in the reading face; the share beside the input is the quiet helper. */}
+            <span style={{ flex: 1, minWidth: 0, fontFamily: 'var(--font-prose)', fontSize: 14, fontWeight: 500, lineHeight: 1.35, color: C.text }}>{CATEGORY_LABEL[r.category]}</span>
             <input
               type="number"
               aria-label={`${CATEGORY_LABEL[r.category]} weight`}
@@ -134,17 +135,23 @@ export default function GradingWeightsPanel({ classId, desktop = false }: { clas
                   write(r.category, v);
                 }
               }}
+              className="teacher-weight-input"
+              // An input surface that reads as editable against the card: lighter fill, a stronger border,
+              // and a cyan focus ring (globals.css, climb4 r1 teacher).
               style={{
-                width: 50, height: 32, boxSizing: 'border-box',
-                background: C.input,
+                width: 60, height: 32, boxSizing: 'border-box',
+                background: 'color-mix(in srgb, var(--c-fg) 7%, var(--c-bg))',
                 color: C.text,
-                border: `1px solid ${C.border}`,
-                borderRadius: 4,
+                border: '1px solid var(--c-comment)',
+                borderRadius: 6,
                 padding: '4px 8px',
-                fontSize: 13,
+                fontSize: 15,
+                fontWeight: 700,
+                textAlign: 'right',
+                fontVariantNumeric: 'tabular-nums',
               }}
             />
-            <span title="Effective share when all categories have work" style={{ fontSize: desktop ? 14 : 13, color: desktop ? C.text : C.dim, textAlign: 'right', whiteSpace: 'nowrap' }}>{total > 0 ? `${(r.weight / total * 100).toFixed(1)}% share` : '—'}</span>
+            <span title="Effective share when all categories have work" style={{ fontSize: 13, color: C.dim, textAlign: 'right', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{total > 0 ? `${(r.weight / total * 100).toFixed(1)}% share` : '—'}</span>
             {r.isDefault ? (
               <span />
             ) : (

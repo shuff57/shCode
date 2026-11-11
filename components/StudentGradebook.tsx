@@ -208,24 +208,28 @@ export default function StudentGradebook({ lessons }: Props) {
       <div style={cardStyle}>
         <h3 style={{ margin: '0 0 10px 0' }}>Your grade so far</h3>
         {grades.map((g) => (
-          <div key={g.classId} style={{ marginBottom: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'stretch', gap: 16, flexWrap: 'wrap' }}>
-              <div style={{ minWidth: 140, paddingRight: 20, borderRight: '1px solid var(--c-line)' }}>
-                <div style={{ color: 'var(--c-meta)', fontSize: 13, marginBottom: 4 }}>Grade so far</div>
-                <strong style={{ fontSize: 28 }}>{g.percent}%</strong>
+          // One compact row per class: the two numbers, then the class and the rule beside them,
+          // so the assignments table starts higher (climb 4: the summary was a tall, mostly empty card).
+          <div key={g.classId} className="grade-summary-row" style={{ display: 'flex', alignItems: 'center', gap: '12px 24px', flexWrap: 'wrap', marginBottom: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'stretch', gap: 20 }}>
+              <div style={{ minWidth: 110, paddingRight: 20, borderRight: '1px solid var(--c-line)' }}>
+                <div style={{ color: 'var(--c-meta)', fontSize: 13, marginBottom: 2 }}>Grade so far</div>
+                <strong style={{ fontSize: 28, lineHeight: 1.2 }}>{g.percent}%</strong>
               </div>
-              {g.missingCount > 0 && <a href="#missing-late-filter" style={{ color: 'var(--c-fg)', textDecoration: 'none' }}>
-                <div style={{ color: 'var(--c-meta)', fontSize: 13, marginBottom: 4 }}>Past due</div>
-                <strong style={{ fontSize: 28 }}>{g.missingCount}</strong><span style={{ fontSize: 13 }}> graded lessons</span>
+              {g.missingCount > 0 && <a href="#missing-late-filter" style={{ color: 'var(--c-fg)', textDecoration: 'none', paddingRight: 20, borderRight: '1px solid var(--c-line)' }}>
+                <div style={{ color: 'var(--c-meta)', fontSize: 13, marginBottom: 2 }}>Past due</div>
+                <strong style={{ fontSize: 28, lineHeight: 1.2 }}>{g.missingCount}</strong><span style={{ fontSize: 13 }}> graded lessons</span>
               </a>}
             </div>
-            <div style={{ color: 'var(--c-meta)', fontSize: 13, marginTop: 8 }}>{grades.length > 1 ? g.className : 'In your class'}</div>
-            <div style={{ color: 'var(--c-meta)', fontSize: 14, marginTop: 6 }}>
-              Unfinished work past its due date counts as zero until you finish it; work not due yet is excluded.
+            <div style={{ flex: '1 1 320px', minWidth: 0, maxWidth: '64ch' }}>
+              <div style={{ color: 'var(--c-meta)', fontSize: 13 }}>{grades.length > 1 ? g.className : 'In your class'}</div>
+              <div style={{ color: 'var(--c-meta)', fontSize: 14, marginTop: 2, lineHeight: 1.5 }}>
+                Unfinished work past its due date counts as zero until you finish it; work not due yet is excluded.
+              </div>
             </div>
           </div>
         ))}
-        <details style={{ marginTop: 6 }}>
+        <details style={{ marginTop: 2 }}>
           <summary style={{ cursor: 'pointer', fontSize: 13 }}>How your grade works</summary>
           <ul style={{ margin: '8px 0 0 0', paddingLeft: 20, listStyle: 'disc', fontSize: 13, lineHeight: 1.6, opacity: 0.85 }}>
             <li>Each graded assignment counts toward a part of your grade (Lab, Written, Quiz, Chapter test). The chip beside each assignment below says which part.</li>

@@ -2951,3 +2951,139 @@ a.mod-row:hover { background: var(--x-343746); border-top-color: var(--c-comment
 @media (min-width: 1024px) {
   .lesson-wide-media.lesson-video-frame { width: min(100%, calc((100svh - 300px) * 16 / 9)) !important; margin-inline: auto !important; }
 }
+
+/* climb4 r1 teacher */
+/* Class list: cards keep a readable width (one class no longer stretches to 1160px, which left
+   "Review work" far from the name and badges it acts on). */
+@media (min-width: 1024px) {
+  .teacher-class-grid { grid-template-columns: repeat(auto-fill, minmax(560px, 640px)); }
+}
+.teacher-class-link:hover, .teacher-class-link:focus-visible { color: var(--c-cyan) !important; text-decoration-color: var(--c-cyan) !important; }
+/* Roster "Open": a quiet outlined row action that still answers the pointer. */
+.teacher-row-open:hover { background: color-mix(in srgb, var(--c-cyan) 14%, transparent) !important; border-color: var(--c-cyan) !important; }
+.teacher-row-open:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; }
+/* Grading weights: an editable field has its own focus state. */
+.teacher-weight-input:hover { border-color: var(--c-meta) !important; }
+.teacher-weight-input:focus { outline: 2px solid var(--c-cyan); outline-offset: 1px; border-color: var(--c-cyan) !important; }
+
+/* climb4 r1 student */
+/* Lesson position label ("Module 1.1 · Lesson 5 of 22") shares the left edge of the column below it. */
+.lesson-position { padding: 0; }
+body:has(.content-lesson-main) .lesson-position { width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 20px; box-sizing: border-box; }
+@media (min-width: 721px) {
+  body:has(.shd-tabstrip):has(.content-lesson-main) .lesson-position { width: calc(100% - var(--shd-rail-width) - var(--shd-rail-gap) - var(--shd-tabbed, 0px)); }
+  /* the label already sits above the breadcrumb; the main's own top padding doubled the gap */
+  .content-lesson-main { padding-top: 6px !important; }
+}
+@media (min-width: 1024px) {
+  body:has(.content-lesson-main) .lesson-position { max-width: 1200px; }
+}
+
+/* Console labs on desktop: code and Output fill the viewport down to the progress strip.
+   Long code scrolls inside the editor, long output inside Output. */
+@media (min-width: 721px) {
+  .lab-work-area:has(.output-header) .editor-preview-container { height: max(320px, calc(100svh - 370px)); }
+  .lab-work-area:has(.output-header) .pane { height: 100%; min-height: 0; }
+  .lab-work-area:has(.output-header) #editorPane > div,
+  .lab-work-area:has(.output-header) #editor > div { height: 100% !important; }
+  .lab-work-area:has(.output-header) #editor { height: 100%; }
+  .lab-work-area:has(.output-header) #editor .cm-editor { height: 100%; }
+  .lab-work-area:has(.output-header) #editor .cm-scroller { max-height: none; }
+  .lab-work-area:has(.output-header) .run-output { max-height: none; }
+}
+
+/* Console labs on a phone: one row of editor controls (labels kept, icons dropped) and a task
+   card capped in height that scrolls inside itself, so code and the top of Output fit above the dock.
+   If the row cannot fit (very narrow phones) the tools wrap to a second row as before. */
+@media (max-width: 720px) {
+  .lab-work-area .run-toolbar { gap: 4px !important; }
+  .lab-work-area .run-toolbar button { min-width: 0; padding: 6px !important; font-size: 12px !important; gap: 4px !important; }
+  .lab-work-area .run-toolbar .toolbar-submit { margin-left: 0 !important; }
+  .lab-work-area .toolbar-utilities {
+    flex: 1 0 auto !important; padding-top: 0 !important; border-top: 0 !important;
+    gap: 4px !important; flex-wrap: nowrap !important; margin-left: 0 !important;
+  }
+  .lab-work-area .toolbar-utilities > button { flex: 1 0 auto !important; }
+  .lab-work-area .run-toolbar :is(.toolbar-submit, .toolbar-utilities > button) > svg,
+  .lab-work-area .run-toolbar .toolbar-history > span[aria-hidden="true"] { display: none; }
+  .lab-work-area .toolbar-utilities .toolbar-reset { margin-right: 4px; }
+  .lab-work-area .toolbar-utilities .toolbar-reset::after { right: -5px; }
+  /* The task is clamped to a few whole lines with a fade and a "Show full task" button
+     (components/LabTaskCard.tsx); nothing is cut mid-line and nothing scrolls inside the card. */
+  .lab-work-area:has(.output-header) .lab-task-card[open]:not(.is-full) .lab-task-content {
+    max-height: 105px; overflow: hidden; position: relative;
+  }
+  .lab-work-area:has(.output-header) .lab-task-card[open]:not(.is-full) .lab-task-content::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 42px;
+    background: linear-gradient(transparent, var(--c-bg)); pointer-events: none;
+  }
+  .lab-work-area:has(.output-header) .lab-task-card[open] .lab-task-more { display: inline-flex; }
+}
+
+.lab-task-more {
+  display: none; align-items: center; gap: 4px; margin-top: 6px; padding: 4px 10px; min-height: 32px;
+  background: transparent; color: var(--c-cyan); border: 1px solid color-mix(in srgb, var(--c-cyan) 55%, transparent);
+  border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.lab-task-more:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; }
+/* Slides: Next advances the lesson and is the primary action; opening the deck in a tab is secondary. */
+.content-lesson-main nav[aria-label="Slide navigation"] button.slide-next:not(:disabled) {
+  background: var(--c-green); color: var(--c-deep2); border-color: var(--c-green); font-weight: 700;
+}
+.content-lesson-main nav[aria-label="Slide navigation"] button.slide-next:hover:not(:disabled) { background: var(--x-79fc99); border-color: var(--x-79fc99); }
+.slides-newtab:hover { border-color: var(--c-cyan) !important; background: color-mix(in srgb, var(--c-cyan) 10%, transparent) !important; }
+
+/* Home: "Chapter 1" and its subtitle stack on a phone instead of running together. */
+@media (max-width: 720px) {
+  .home-chapter > summary { flex-wrap: wrap; row-gap: 2px; }
+  .home-chapter > summary > span:nth-child(2):not(:last-child) { flex: 0 0 100%; order: 1; color: var(--c-meta); opacity: 1; }
+  .home-chapter > summary > span:last-child { order: 2; margin-left: 0; }
+}
+
+/* Home: module progress reads at body size, with a longer bar and a visible track. */
+.home-module-progress .unit-progress-track { background: color-mix(in srgb, var(--c-fg) 18%, transparent) !important; height: 8px !important; border-radius: 4px !important; }
+.home-module-progress .unit-progress-count { font-size: var(--fs-body); }
+@media (min-width: 1024px) {
+  .home-module-summary { grid-template-columns: 3.5rem minmax(0, 1fr) 320px 16px; }
+  .home-module-progress > button { grid-template-columns: 160px 1fr; width: 310px; column-gap: 12px; }
+  .home-module-progress .unit-progress-track { width: 100% !important; }
+}
+
+/* Written answers: the response box is an input surface, not background, at a readable width. */
+.written-response-input:focus { outline: 2px solid var(--c-cyan); outline-offset: 1px; border-color: var(--c-cyan) !important; }
+.written-response-input::placeholder { color: var(--c-dim); opacity: 1; }
+
+/* Docs hub: the topic column no longer stretches the gaps between the three set cards. */
+@media (min-width: 1200px) {
+  .docs-hub { grid-template-rows: auto auto auto auto auto 1fr; }
+  .docs-hub > .docs-hub-topics { grid-row: 2 / -1; }
+}
+
+/* Docs prose: inline code reads as code. */
+.docs-body :not(pre) > code {
+  font-family: var(--font-mono); font-size: 0.9em; color: var(--c-orange);
+  background: var(--c-deep2); border: 1px solid var(--c-line); border-radius: 4px;
+  padding: 1px 5px; white-space: nowrap;
+}
+
+/* Empty preview hints (sandbox, moSHion labs) at full meta contrast. */
+.reshape-empty { color: var(--c-meta); }
+
+/* Quiz lessons on desktop: a shorter stack above the first question. */
+@media (min-width: 1024px) {
+  .content-lesson-main:has(.student-quiz) .content-lesson-title { margin-bottom: 4px !important; row-gap: 4px !important; }
+  .content-lesson-main:has(.student-quiz) .content-lesson-title h1 { margin-bottom: 0 !important; }
+  .content-lesson-main:has(.student-quiz) .lesson-reading-body { margin-top: 4px !important; }
+  .content-lesson-main .student-quiz { margin-top: 10px !important; padding-top: 10px !important; }
+  .student-quiz .quiz-guidance p { margin-bottom: 12px !important; }
+}
+
+/* Module page: the lesson title is read first; the type badge is a quiet coloured label after it. */
+@media (min-width: 721px) {
+  .mod-row-title { font-size: 15px; font-weight: 600 !important; color: var(--c-fg); }
+  .mod-row .mod-row-badge {
+    order: 2; min-width: 120px; padding: 2px 0 !important; gap: 5px !important;
+    background: transparent !important; border-color: transparent !important;
+    text-transform: none !important; letter-spacing: 0 !important; font-weight: 500 !important;
+  }
+}

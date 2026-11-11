@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { searchDocs, type DocSearchResult, type DocSection } from '../../../../lib/docs-core';
 import DocLiveSnippet from '../../../../components/DocLiveSnippet';
+import { splitDocCode } from '../../../../lib/doc-inline-code';
 
 interface Props {
   section: DocSection;
@@ -164,7 +165,9 @@ export default function JsDocsClient({
             <p key={i}>
               {para.split('\n').map((line, j, arr) => (
                 <span key={j}>
-                  {line}
+                  {splitDocCode(line, page.code ?? '').map((span, k) =>
+                    span.code ? <code key={k}>{span.text}</code> : span.text,
+                  )}
                   {j < arr.length - 1 && <br />}
                 </span>
               ))}

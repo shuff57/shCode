@@ -430,8 +430,18 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
 
   return (
     <div>
-      <p style={{ color: C.dim, fontSize: 13, margin: '0 0 4px 0' }}>Set module dates for the whole group, or open a module to set individual lessons.</p>
-      <details style={{ color: C.dim, fontSize: 13, margin: '0 0 16px 0' }}>
+      {/* Intro and save state share one line: the save state is a small inline indicator, not a box that
+          outweighs the dates. */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', justifyContent: 'space-between', gap: '4px 16px', margin: '0 0 4px 0' }}>
+        <p style={{ color: C.dim, fontSize: 13, margin: 0, minWidth: 0 }}>Set module dates for the whole group, or open a module to set individual lessons.</p>
+        <span role="status" aria-live="polite" style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, fontSize: 12, color: C.dim, whiteSpace: 'nowrap' }}>
+          <span style={{ color: saving ? 'var(--c-cyan)' : error ? 'var(--c-orange)' : 'var(--c-green)', fontWeight: 600 }}>
+            {saving ? 'Saving…' : error ? 'Could not save or load dates — see details below' : '✓ Saved'}
+          </span>
+          <span>· changes save automatically</span>
+        </span>
+      </div>
+      <details style={{ color: C.dim, fontSize: 13, margin: '0 0 12px 0' }}>
         <summary style={{ color: C.accent, cursor: 'pointer', marginBottom: 8 }}>How dates work</summary>
         <div>
         A module&apos;s date applies to every lesson inside it. Give one lesson its own date and the
@@ -449,12 +459,6 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
       {error && (
         <p style={{ color: 'var(--c-red)', fontSize: 13, marginBottom: 12 }}>{error}</p>
       )}
-      <div role="status" aria-live="polite" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, margin: '0 0 16px', padding: '12px 12px', border: `1px solid ${C.border}`, borderRadius: 6, background: 'var(--c-deep2)', fontSize: 13 }}>
-        <span style={{ color: 'var(--c-fg)' }}>Changes save automatically</span>
-        <span style={{ color: saving ? 'var(--c-cyan)' : error ? 'var(--c-orange)' : 'var(--c-green)', fontWeight: 600 }}>
-          · {saving ? 'Saving…' : error ? 'Could not save or load dates — see details above' : 'Saved'}
-        </span>
-      </div>
 
       {units.length === 0 && !loading && (
         <p style={{ color: C.dim }}>
@@ -472,7 +476,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
             {unit.unitId}
           </div>
 
-          <div style={{ display: compact ? 'none' : 'grid', gridTemplateColumns: 'minmax(280px, 1fr) 370px 370px', gap: 12, minWidth: 1044, padding: '8px 0 8px', borderBottom: `1px solid ${C.border}`, color: C.dim, fontSize: 13, fontWeight: 600 }}>
+          <div style={{ display: compact ? 'none' : 'grid', gridTemplateColumns: 'minmax(280px, 1fr) 320px 320px', gap: 12, minWidth: 944, padding: '8px 0 8px', borderBottom: `1px solid ${C.border}`, color: C.dim, fontSize: 13, fontWeight: 600 }}>
             <span>Module</span><span style={{ color: C.open }}>Available after · Date / time</span><span>Due · Date / time</span>
           </div>
           {unit.modules.map((mod) => {
@@ -495,8 +499,8 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
             };
 
             return (
-              <div key={mod.moduleId} style={{ borderBottom: `1px solid ${C.border}`, padding: '8px 0', minHeight: 46, boxSizing: 'border-box', minWidth: compact ? 0 : 1044 }}>
-                <div className="schedule-module-row" style={{ display: 'grid', gridTemplateColumns: compact ? 'minmax(0, 1fr)' : 'minmax(280px, 1fr) 370px 370px', alignItems: 'center', gap: 12 }}>
+              <div key={mod.moduleId} style={{ borderBottom: `1px solid ${C.border}`, padding: '8px 0', minHeight: 46, boxSizing: 'border-box', minWidth: compact ? 0 : 944 }}>
+                <div className="schedule-module-row" style={{ display: 'grid', gridTemplateColumns: compact ? 'minmax(0, 1fr)' : 'minmax(280px, 1fr) 320px 320px', alignItems: 'center', gap: 12 }}>
                   <button
                     type="button"
                     onClick={() => toggle(mod.moduleId)}
@@ -508,9 +512,17 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                     }}
                   >
                     {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                    <span className="schedule-module-name">{mod.label}</span>
-                    <span style={{ color: C.dim, fontSize: 13 }}>
-                      ({mod.lessons.length})
+                    {/* One line on desktop (ellipsis, full name in the tooltip) so every row is the same height,
+                        with the lesson count right after the name as quiet secondary text. */}
+                    <span
+                      className="schedule-module-name"
+                      title={mod.label}
+                      style={compact ? { flexShrink: 1 } : { flexShrink: 1, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                    >
+                      {mod.label}
+                    </span>
+                    <span style={{ color: C.dim, fontSize: 12, fontWeight: 400, whiteSpace: 'nowrap', flexShrink: 0 }}>
+                      {mod.lessons.length} lesson{mod.lessons.length === 1 ? '' : 's'}
                     </span>
                   </button>
 
