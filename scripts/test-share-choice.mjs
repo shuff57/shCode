@@ -158,6 +158,15 @@ r = await publish(BEN, { title: 'Kite remix', remixedFrom: kite, choice: 'free' 
 check('a remix of a credit game may pick any choice', r.status === 201 && r.body.game.choice === 'free' && r.body.game.remixedFrom.choice === 'credit', r);
 r = await publish(BEN, { title: 'Stray', remixedFrom: 'f'.repeat(32) });
 check('an unknown original records nothing', r.status === 201 && r.body.game.remixedFrom === null && r.body.game.choice === 'credit', r);
+// A remix of a built-in course game (lib/builtin-games.ts): the credit comes from that list, in full.
+r = await publish(BEN, { title: 'Paddle Rally remix', remixedFrom: 'builtin-paddle-rally' });
+check('a remix of a built-in course game is credited to its author from the built-in list',
+  r.status === 201 && r.body.game.choice === 'credit'
+  && eq(r.body.game.remixedFrom, { id: 'builtin-paddle-rally', title: 'Paddle Rally', author: 'Steven Huff', choice: 'credit', first: null }), r);
+r = await publish(BEN, { title: 'Trail remix', remixedFrom: 'builtin-trail' });
+check('a play-only lesson game or an unknown built-in records nothing', r.status === 201 && r.body.game.remixedFrom === null, r);
+r = await publish(BEN, { title: 'Fake', remixedFrom: 'builtin-nope' });
+check('an unknown built-in records nothing', r.status === 201 && r.body.game.remixedFrom === null, r);
 r = await publish(ANA, { title: 'Kite again', remixedFrom: kite });
 check('your own game is not a remix of someone else', r.status === 201 && r.body.game.remixedFrom === null, r);
 

@@ -16,7 +16,9 @@
 // is made: the server takes the original's title, author (first name + last
 // initial) and choice from the original's own row, refuses a remix of a "just
 // play" game (403), and holds a remix of a "keep remixes open" game to 'open'
-// (any other choice is 400, now and on every later update).
+// (any other choice is 400, now and on every later update). A `remixedFrom` of
+// 'builtin-<id>' names a built-in course game (lib/builtin-games.ts): its title,
+// author and choice come from that list.
 //
 // Versions (migration 0048, lib/game-flow-core.ts): every publish and update saves a version of the
 // code. An update takes `message`, "What did you change?" (1-80 characters); a body without one (a
@@ -30,12 +32,14 @@ import { originalGame } from '../../_shared/shareChoice';
 import { firstVersionStmt, openChangeCounts, saveVersionStmts, savedAs } from '../../_shared/gameFlow';
 import { ownerName } from '../../_shared/games';
 import { cleanMessage } from '../../../lib/game-flow-core';
+import { remixableBuiltin } from '../../../lib/builtin-games';
 import {
   PROVENANCE_COLUMNS,
   canRemix,
   choiceOf,
   decideChoice,
   provenanceFromRow,
+  provenanceOf,
   provenanceToRow,
   remixRefusal,
   type Provenance,
@@ -138,7 +142,11 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ r
     return json({ error: `You have ${GAME_MAX_PER_OWNER} published games, the most you can have. Delete one in the Library to publish another.` }, 409);
   }
   let remixedFrom: Provenance | null = null;
-  if (isGameId(body.remixedFrom)) {
+  // A remix of a built-in course game (Paddle Rally): the credit comes from lib/builtin-games.ts.
+  const builtin = remixableBuiltin(body.remixedFrom);
+  if (builtin) {
+    remixedFrom = provenanceOf({ id: body.remixedFrom as string, title: builtin.title, author: builtin.author, choice: builtin.choice, provenance: null });
+  } else if (isGameId(body.remixedFrom)) {
     const original = await originalGame(env.DB, body.remixedFrom, data.email);
     if (original) {
       if (!canRemix(original.choice)) {

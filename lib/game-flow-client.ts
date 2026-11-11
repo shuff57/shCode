@@ -8,6 +8,7 @@
 // "New" in a list is decided here: the browser remembers when it last opened each conversation
 // (localStorage, per account) and a row whose updatedAt is later reads as new.
 
+import { isBuiltinRef } from './builtin-games';
 import { errorText } from './http-error';
 import { mergeChange } from './game-merge';
 import { conflictText, type ChangeCan, type ChangeRole, type ChangeStatus } from './game-flow-core';
@@ -199,7 +200,8 @@ export type SyncCheck =
 /** Is there a newer version of the game the sandbox draft came from? */
 export async function checkForNewer(): Promise<SyncCheck> {
   const rec = readSandboxGame();
-  if (!rec.from) return { kind: 'none' };
+  // A remix of a built-in game (Paddle Rally) has nothing to send a change to: no Propose change.
+  if (!rec.from || isBuiltinRef(rec.from.id)) return { kind: 'none' };
   const r = await getGame(rec.from.id);
   if (!r.ok) return { kind: 'gone' };
   const g = r.value.game;
@@ -223,7 +225,7 @@ export type SyncResult =
  */
 export async function bringInNewest(): Promise<SyncResult> {
   const rec = readSandboxGame();
-  if (!rec.from) return { kind: 'error', text: 'This sandbox code is not a remix of a classmate’s game.' };
+  if (!rec.from || isBuiltinRef(rec.from.id)) return { kind: 'error', text: 'This sandbox code is not a remix of a classmate’s game.' };
   const g = await getGame(rec.from.id);
   if (!g.ok) return { kind: 'error', text: g.error };
   const newest = g.value.game.version ?? 1;

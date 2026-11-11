@@ -5,10 +5,13 @@
 // code in MoshionPreview with gameKey "game-<id>" so the lobby (a game that
 // calls multiplayer('versus' | 'coop', n)) lists only rooms for THIS game, and
 // offers Run/Restart, Remix and View code. /play?builtin=<id> runs one of the
-// built-in games (public/builtin-games.json: the finished Trail, Checkers and
-// Quest from the lesson demos) PLAY ONLY: no Remix, no View code, because they
-// are the games students build in those chains, and with the lesson demo's room
-// key ('demo-<fence>') so Library and lesson players can join each other.
+// built-in games (public/builtin-games.json, listed in lib/builtin-games.ts).
+// The finished Trail, Checkers and Quest from the lesson demos are PLAY ONLY: no
+// Remix, no View code, because they are the games students build in those
+// chains, and they use the lesson demo's room key ('demo-<fence>') so Library
+// and lesson players can join each other. A course game with an author
+// (Paddle Rally, by Steven Huff) also offers Remix and View code; a remix is
+// credited to its author, and its room key is 'builtin-<id>'.
 // Every game is packed (packForUrl) before it runs: the code travels in the
 // runner's URL and a request line over ~16 KB is refused. The code runs only inside that
 // sandboxed iframe (no allow-same-origin), exactly as any sketch does; nothing
@@ -38,7 +41,8 @@ import Console from './Console';
 import { getGame, getGameAssets, remixIntoSandbox, type FullGame } from '../lib/games-client';
 import { builtinTextureNames, listWords, missingToShow, type GameAsset } from '../lib/game-assets';
 import { isGameId } from '../lib/games-core';
-import { CHOICE_TEXT } from '../lib/share-choice';
+import { CHOICE_TEXT, canRemix as canRemixChoice, type ShareChoice } from '../lib/share-choice';
+import { builtinRef, builtinRoomKey } from '../lib/builtin-games';
 import { RemixCreditLine } from './ShareChoicePicker';
 import { changeHref, gameChangesHref, getChange, type ChangeDetail } from '../lib/game-flow-client';
 import { GITHUB_WORD, isChangeId } from '../lib/game-flow-core';
@@ -53,7 +57,15 @@ type State =
   | { kind: 'builtin'; game: BuiltinGame };
 
 export interface BuiltinGame {
-  id: string; title: string; blurb: string; lesson: string; fence: string; mode: string; players: number; code: string;
+  id: string; title: string; blurb: string; mode: string; players: number; code: string;
+  /** How many play and how, when it says more than mode + players. */
+  modeText?: string;
+  /** A lesson game (play only). */
+  lesson?: string; fence?: string;
+  /** A course game (lib/builtin-games.ts): who made it, and who may do what with it. */
+  author?: string; choice?: ShareChoice;
+  /** The room key (lib/builtin-games.ts builtinRoomKey); older files have only the fence. */
+  room?: string;
 }
 
 const quiet: React.CSSProperties = {
@@ -119,6 +131,7 @@ export default function PlayGame() {
   if (state.kind === 'builtin') {
     const b = state.game;
     const online = b.mode === 'versus' || b.mode === 'coop';
+    const remixable = !!b.author && canRemixChoice(b.choice);
     return (
       <div style={wrap}>
         {back}
@@ -126,16 +139,43 @@ export default function PlayGame() {
           <div style={{ flex: '1 1 260px', minWidth: 0 }}>
             <h1 style={{ fontSize: 22, margin: 0 }}>{b.title}</h1>
             <div style={{ fontSize: 13, color: 'var(--c-dim)' }}>
-              Built in · {b.blurb}{online ? ' Play a classmate with the bar above the game, or press L to play both sides on one computer.' : ''}
+              {b.author ? <>by {b.author} · {CHOICE_TEXT.game[b.choice ?? 'credit'].short} · </> : 'Built in · '}{b.modeText ? `${b.modeText}. ` : ''}{b.blurb}
+              {online ? (b.author ? ' Play classmates online with the bar above the game.' : ' Play a classmate with the bar above the game, or press L to play both sides on one computer.') : ''}
             </div>
           </div>
-          <button type="button" className="btn-run" onClick={() => setRunKey((k) => k + 1)}>
-            {runKey === 0 ? '▶ Play' : '↻ Restart'}
-          </button>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <button type="button" className="btn-run" onClick={() => setRunKey((k) => k + 1)}>
+              {runKey === 0 ? '▶ Play' : '↻ Restart'}
+            </button>
+            {remixable && (
+              <>
+                <button
+                  type="button"
+                  style={quiet}
+                  title="Copy this game into a new project in your sandbox to change it"
+                  onClick={async () => {
+                    const ok = await remixIntoSandbox(
+                      { id: builtinRef(b.id), title: b.title, code: b.code, mine: false, owner: b.author, choice: b.choice },
+                      undefined,
+                      (m) => setNote(m),
+                    );
+                    if (ok) setNote('Opening your sandbox…');
+                  }}
+                >
+                  Remix
+                </button>
+                <button type="button" style={quiet} aria-expanded={showCode} onClick={() => setShowCode((s) => !s)}>
+                  {showCode ? 'Hide code' : 'View code'}
+                </button>
+              </>
+            )}
+          </div>
         </div>
+        {note && <div role="status" style={{ fontSize: 12, color: 'var(--c-green)', margin: '0 0 6px' }}>{note}</div>}
         <div style={{ height: 'max(360px, calc(100vh - 230px))', border: '1px solid var(--c-line)', borderRadius: 6, overflow: 'hidden', display: 'flex' }}>
-          <MoshionPreview code={packForUrl(b.code)} runKey={runKey} gameKey={'demo-' + b.fence} />
+          <MoshionPreview code={packForUrl(b.code)} runKey={runKey} gameKey={b.room ?? builtinRoomKey(b)} />
         </div>
+        {showCode && remixable && <CodeBlock code={b.code} />}
       </div>
     );
   }
@@ -258,17 +298,21 @@ export default function PlayGame() {
         </div>
       </div>
       <GameSuggestions gameId={g.id} owner={g.owner} mine={g.mine} />
-      {showCode && canRemix && (
-        <pre
-          aria-label="Game code"
-          style={{
-            marginTop: 10, padding: 12, maxHeight: 420, overflow: 'auto', fontSize: 12, lineHeight: 1.5,
-            background: 'var(--c-deep2)', border: '1px solid var(--c-line)', borderRadius: 6, whiteSpace: 'pre',
-          }}
-        >
-          <code>{runCode}</code>
-        </pre>
-      )}
+      {showCode && canRemix && <CodeBlock code={runCode} />}
     </div>
+  );
+}
+
+function CodeBlock({ code }: { code: string }) {
+  return (
+    <pre
+      aria-label="Game code"
+      style={{
+        marginTop: 10, padding: 12, maxHeight: 420, overflow: 'auto', fontSize: 12, lineHeight: 1.5,
+        background: 'var(--c-deep2)', border: '1px solid var(--c-line)', borderRadius: 6, whiteSpace: 'pre',
+      }}
+    >
+      <code>{code}</code>
+    </pre>
   );
 }

@@ -10,6 +10,7 @@
 //   - Propose this change: "What did you change?" plus an optional first comment; See my changes first.
 //     Sending again while one is open updates it. The maker sees it in their Library.
 
+import { isBuiltinRef } from '../lib/builtin-games';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { GitPullRequest } from 'lucide-react';
 import DiffViewer from './DiffViewer';
@@ -77,7 +78,8 @@ export default function ProposeChangeButton({ getCode }: { getCode: () => string
     return () => { live = false; window.removeEventListener('keydown', onKey); window.removeEventListener('mousedown', onDown); };
   }, [open, fromId, compare]);
 
-  if (!from || sync?.kind === 'none') return null;
+  // A remix of a built-in game (lib/builtin-games.ts) has no maker's game to send a change to.
+  if (!from || isBuiltinRef(from.id) || sync?.kind === 'none') return null;
 
   const behind = sync?.kind === 'behind' ? sync : null;
 

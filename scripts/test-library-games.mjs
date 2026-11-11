@@ -70,6 +70,7 @@ check('declaredMode: no call is none, 1 player', JSON.stringify(core.declaredMod
 check('declaredMode: a commented-out call does not count', core.declaredMode("// multiplayer('coop', 3)\n/* multiplayer('versus', 4) */").mode === 'none');
 check('declaredMode: players default to 2, double quotes, any case', JSON.stringify(core.declaredMode('multiplayer( "Coop" )')) === '{"mode":"coop","players":2}');
 check('declaredMode: 4 players local', JSON.stringify(core.declaredMode("multiplayer('local', 4)")) === '{"mode":"local","players":4}');
+check('declaredMode: a real-time game (a third argument) still counts', JSON.stringify(core.declaredMode("multiplayer('versus', 4, { realtime: true })")) === '{"mode":"versus","players":4}');
 check('cleanTitle collapses spaces', core.cleanTitle('  Pong   Duel ').title === 'Pong Duel');
 check('cleanTitle refuses markup and empty', 'error' in core.cleanTitle('<b>x</b>') && 'error' in core.cleanTitle('   '));
 check('cleanTitle: 60 is fine, 61 is not', 'title' in core.cleanTitle('x'.repeat(60)) && 'error' in core.cleanTitle('x'.repeat(61)));

@@ -37,6 +37,7 @@ import { sectionHeading, sectionNote, sectionStyle } from './library-ui';
 import ShareChoicePicker, { RemixCreditLine, lockedChoice, useLastChoice } from './ShareChoicePicker';
 import GameChangesInbox from './GameChangesInbox';
 import { gameChangesHref } from '../lib/game-flow-client';
+import { builtinRef } from '../lib/builtin-games';
 
 const btn: React.CSSProperties = {
   fontSize: 12, padding: '4px 8px', borderRadius: 4, cursor: 'pointer', whiteSpace: 'nowrap',
@@ -50,30 +51,53 @@ const rowStyle: React.CSSProperties = {
 };
 const badge: React.CSSProperties = { fontSize: 11, color: 'var(--c-dim)', whiteSpace: 'nowrap' };
 
-// Built-in games (public/builtin-games.json, made from the lesson demos by
-// scripts/generate-builtin-games.mjs): PLAY ONLY, no Remix and no code, because
-// they are the games students build in Trail, Checkers and Quest.
-interface Builtin { id: string; title: string; blurb: string; mode: GameMode; players: number }
-function BuiltinGames() {
+// Built-in games (public/builtin-games.json, made from lib/builtin-games.ts by
+// scripts/generate-builtin-games.mjs). Trail, Checkers and Quest are PLAY ONLY,
+// no Remix and no code, because they are the games students build in the
+// lessons. A course game with an author (Paddle Rally, by Steven Huff) also
+// has Remix, which makes a new sandbox project credited to its author.
+interface Builtin { id: string; title: string; blurb: string; mode: GameMode; players: number; modeText?: string; code: string; author?: string; choice?: ShareChoice }
+function BuiltinGames({ onMessage }: { onMessage?: (text: string, bad: boolean) => void }) {
   const [games, setGames] = useState<Builtin[] | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+  // Shown here, beside the Remix button that was pressed.
+  const [note, setNote] = useState<{ text: string; bad: boolean } | null>(null);
+  const say = (text: string, bad = false) => { setNote({ text, bad }); onMessage?.(text, bad); };
   useEffect(() => {
     fetch('/builtin-games.json').then((r) => (r.ok ? r.json() : null))
       .then((d: { games: Builtin[] } | null) => setGames(d?.games ?? []))
       .catch(() => setGames([]));
   }, []);
+  async function remix(g: Builtin) {
+    setBusy(g.id);
+    const done = await remixIntoSandbox(
+      { id: builtinRef(g.id), title: g.title, code: g.code, mine: false, owner: g.author, choice: g.choice },
+      undefined,
+      (m) => say(m, true),
+    );
+    setBusy(null);
+    if (done) say(`"${g.title}" is a new project in your sandbox. Change anything you like; it says who made it first.`);
+  }
   if (games && games.length === 0) return null;
   return (
     <section aria-labelledby="games-builtin-h" style={sectionStyle}>
       <h3 id="games-builtin-h" style={sectionHeading}>Built in ({games ? games.length : '…'})</h3>
-      <p style={sectionNote}>The games you build in the lessons, ready to play.</p>
+      <p style={sectionNote}>The games you build in the lessons, and games made for you to remix.</p>
+      {note && <div role="status" style={{ fontSize: 12, margin: '0 0 6px', color: note.bad ? 'var(--c-red)' : 'var(--c-green)' }}>{note.text}</div>}
       {games && <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         {games.map((g) => (
           <div key={g.id} style={rowStyle}>
             <div style={{ minWidth: 140, flex: '1 1 160px' }}>
-              <div style={{ fontSize: 13, fontWeight: 600 }}>{g.title}</div>
-              <div style={{ ...badge, whiteSpace: 'normal' }}>{modeLabel(g.mode, g.players)} · {g.blurb}</div>
+              <div style={{ fontSize: 13, fontWeight: 600 }}>{g.title}{g.author && <span style={{ ...badge, fontWeight: 400 }}> · by {g.author}</span>}</div>
+              <div style={{ ...badge, whiteSpace: 'normal' }}>{g.modeText ?? modeLabel(g.mode, g.players)} · {g.blurb}</div>
             </div>
             <a href={`/play/?builtin=${g.id}`} style={playBtn}>Play</a>
+            {g.author && canRemix(g.choice) && (
+              <button type="button" style={btn} disabled={busy === g.id} onClick={() => void remix(g)}
+                title="Copy this game into a new project in your sandbox to change it">
+                Remix
+              </button>
+            )}
           </div>
         ))}
       </div>}
@@ -161,7 +185,7 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
     return (
       <div style={{ marginTop: 8 }}>
         <p style={{ ...sectionNote, margin: 0 }}>Sign in to publish games and play the ones your class made.</p>
-        <BuiltinGames />
+        <BuiltinGames onMessage={onMessage} />
       </div>
     );
   }
@@ -278,7 +302,7 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
       )}
       </section>
 
-      <BuiltinGames />
+      <BuiltinGames onMessage={onMessage} />
     </div>
   );
 }

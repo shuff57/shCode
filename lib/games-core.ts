@@ -62,7 +62,8 @@ export function checkCode(raw: unknown): { code: string } | { error: string; too
  */
 export function declaredMode(code: string): { mode: GameMode; players: number } {
   const bare = code.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/.*$/gm, '$1');
-  const m = /\bmultiplayer\s*\(\s*(['"`])\s*(none|local|coop|versus)\s*\1\s*(?:,\s*(\d+)\s*)?\)/i.exec(bare);
+  // A third argument ({ realtime: true }) is allowed: without it a real-time game read as 1 player.
+  const m = /\bmultiplayer\s*\(\s*(['"`])\s*(none|local|coop|versus)\s*\1\s*(?:,\s*(\d+)\s*)?(?:,[^)]*)?\)/i.exec(bare);
   if (!m) return { mode: 'none', players: 1 };
   const mode = m[2].toLowerCase() as GameMode;
   if (mode === 'none') return { mode, players: 1 };

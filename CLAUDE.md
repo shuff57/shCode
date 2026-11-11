@@ -696,6 +696,14 @@ the class's teachers and an admin. `components/GameSuggestions.tsx` under the ga
 `game-shares` POST `action: 'clear-suggestions'` deletes only their class's (enrolled now) students' picks; the list
 carries that count and the moderation row's menu offers "Clear suggestions…". Tests: `scripts/test-game-suggestions.mjs`.
 Apply 0047 before deploying.
+**Built-in course games (2026-11-11).** `lib/builtin-games.ts` is the one list of Library -> Games -> Built in
+(the generator, the Library, /play and the publish route all read it). Lesson games (Trail, Checkers, Quest) stay play
+only. A course game is a file (`games/<name>.js`, first: Paddle Rally by Steven Huff, 2-4 players on one keyboard or
+online in a real-time host-decides room, room key `builtin-<id>`) with an `author` (shown in full: the course's own
+work) and a `choice`: /play and the Library offer Remix and View code. A remix stores `builtin-<id>` as where it came
+from; on publish the server takes the credit from the list (never the browser). Propose change and "Bring in the
+newest version" are hidden for these remixes: a built-in has no versions to send a change to. Edit the game in
+`games/`, then `node --import ./scripts/register-ts.mjs scripts/generate-builtin-games.mjs` (`--check` is in npm test).
 **The Library is three tabs** (`components/ClassLibraryPanel.tsx`): Games (My games / Class games / Built in),
 Pictures and Sounds (Mine / Shared with my class / Built in), `?tab=games|pictures|sounds`, remembered in
 `shCode:library-tab`, Games when arriving from /play.
