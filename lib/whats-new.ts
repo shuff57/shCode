@@ -84,6 +84,106 @@ export const WHATS_NEW: WhatsNewEntry[] = [
     },
   },
   {
+    id: '2026-11-save-to-account',
+    date: '2026-11-10',
+    audience: 'student',
+    title: 'Save to your account',
+    summary:
+      'A moSHion game can now keep a high score or a level in your shCode account, so it is still there on another computer. ' +
+      "Add 'remote' when you save and load.",
+    steps: [
+      "save('best', score, 'remote') keeps a value in your account.",
+      "load('best', 'remote') reads it back on any computer where you are signed in.",
+      "Or use saved('player', { best: 0 }, 'remote') and call player.save() after you change it.",
+    ],
+    media: {
+      clip: '/whats-new/2026-11-save-to-account.mp4',
+      poster: '/whats-new/2026-11-save-to-account.jpg',
+      alt: 'One student on two computers side by side: the game reads Plays: 1 on the first, then Plays: 2 on the second.',
+    },
+    action: { label: 'Read Saving to your account', href: '/docs/moshion/persistence?page=2' },
+  },
+  {
+    id: '2026-11-game-suggestions',
+    date: '2026-11-10',
+    audience: 'student',
+    title: "Suggest ideas for a classmate's game",
+    summary:
+      "When you play a classmate's game, you can pick suggestions like \"Add more obstacles\" or \"Make it harder\" to help them make it better. " +
+      'On your own games, you see what players picked.',
+    steps: [
+      'Open Learn, then Library, and play a game from Class games.',
+      'Under the game, pick any suggestions that fit. Pick one again to take it back.',
+      'Open your own game to see what your classmates suggested.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-game-suggestions.mp4',
+      poster: '/whats-new/2026-11-game-suggestions.jpg',
+      alt: "Two screens: Alex picks Add more obstacles and So fun! under Sam's game, and Sam sees both with Alex's name.",
+    },
+    action: { label: 'Open the Library', href: '/library?tab=games' },
+  },
+  {
+    id: '2026-11-pictures-that-move',
+    date: '2026-11-10',
+    audience: 'student',
+    title: 'Pictures that move, and your own pictures',
+    summary:
+      'The Library has 21 new built-in animations, like a spinning coin, a blinking heart and a waving flag. ' +
+      'In the Texture editor, Import picture brings in a picture from your computer.',
+    steps: [
+      'Open the Library, pick Pictures, and click an animation to see each of its frames.',
+      "Copy code gives you the line that uses it, like sprite.texture = 'coinSpin';",
+      'In the Texture editor, press Import picture. A big picture shrinks to fit 64 by 64; press Save to keep it.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-pictures-that-move.mp4',
+      poster: '/whats-new/2026-11-pictures-that-move.jpg',
+      alt: "The Library's spinning coin shown frame by frame, then a picture imported into the Texture editor's grid.",
+    },
+    action: { label: 'Open the Library', href: '/library?tab=pictures' },
+  },
+  {
+    id: '2026-11-library-cleanup',
+    date: '2026-11-10',
+    audience: 'teacher',
+    title: 'Tidy up the class Library',
+    summary:
+      "From a class's Students tab you can delete a game, picture or sound a student shared, clear a student's whole Library, " +
+      'and clear the suggestions students picked on a class game.',
+    steps: [
+      'Open Teach, then Classes, pick a class, and open the Students tab.',
+      "Under Shared games or Shared textures and sounds, open a row's menu to Delete it or Clear suggestions.",
+      "In a student's row menu, Clear Library… deletes everything they saved, after you confirm.",
+    ],
+    media: {
+      clip: '/whats-new/2026-11-library-cleanup.mp4',
+      poster: '/whats-new/2026-11-library-cleanup.jpg',
+      alt: "A class's Shared games list: a game's menu offers Clear suggestions, and the confirm says what goes.",
+    },
+    action: { label: 'Open my classes', href: '/teacher' },
+  },
+  {
+    id: '2026-11-share-your-way',
+    date: '2026-11-09',
+    audience: 'student',
+    title: 'Choose how classmates use what you share',
+    summary:
+      'When you share a game, picture or sound, you pick who can do what with it: just play it, remix it and give you credit, ' +
+      'keep remixes open, or free for anyone. A remix of an open game says who made the first one.',
+    steps: [
+      'In the moSHion Sandbox, press Publish game and tick Share with my class.',
+      'Under Who can do what with it, pick one. The game page shows your choice.',
+      'If your game uses your own pictures or sounds, share them too, so classmates see the game as you made it.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-share-your-way.mp4',
+      poster: '/whats-new/2026-11-share-your-way.jpg',
+      alt: 'Publishing a game with "keep remixes open" picked; its game page then shows that choice.',
+    },
+    action: { label: 'Open the Sandbox', href: '/sandbox' },
+  },
+  {
     id: '2026-11-code-together',
     date: '2026-11-08',
     audience: 'student',

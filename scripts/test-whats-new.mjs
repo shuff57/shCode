@@ -191,7 +191,9 @@ check('every action is an in-site page that exists', () => {
       assert.ok(sec, `${e.id}: no moSHion docs section ${docs[1]}`);
       if (docs[2]) assert.ok(Number(docs[2]) >= 1 && Number(docs[2]) <= sec.pages.length, `${e.id}: ${href} has no such page`);
     } else {
-      assert.ok(pages.has(href), `${e.id}: ${href} is not a known page`);
+      // The Library opens on a tab from ?tab= (components/ClassLibraryPanel.tsx).
+      const page = href.replace(/^\/library\?tab=(games|pictures|sounds)$/, '/library');
+      assert.ok(pages.has(page), `${e.id}: ${href} is not a known page`);
     }
   }
 });
