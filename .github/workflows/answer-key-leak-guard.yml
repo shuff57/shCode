@@ -42,9 +42,19 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
+        id: node
         with:
           node-version: 24
-          cache: npm
+
+      # node_modules itself, keyed on the lockfile and the exact Node version:
+      # a hit skips `npm ci` (13-16s of unpacking ~1.2 GB) entirely. A miss --
+      # a dependency or Node bump -- installs from scratch and saves a new one.
+      - name: Cache node_modules
+        id: node-modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-node${{ steps.node.outputs.node-version }}-${{ hashFiles('package-lock.json') }}
 
       # reshape-cad is consumed three ways: the npm file: deps point at the
       # vendored copy inside this repo, but scripts/_pkg-load.mjs resolves the
@@ -66,16 +76,27 @@ jobs:
       # The B-rep kernel bundle is gitignored and needs the OpenCascade wasm.
       # Build scripts (check-reshape-solutions.mjs) load replicad_single.js
       # from public/reshape/kernel/. Pull the same build npm serves.
+      - name: Cache the OpenCascade wasm
+        id: occt-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/occt/replicad-opencascadejs-1.1.0
+          key: occt-replicad-opencascadejs-1.1.0
+
       - name: Fetch OpenCascade wasm for the B-rep kernel
-        id: occt
         run: |
-          cd "$(mktemp -d)"
-          npm pack replicad-opencascadejs@1.1.0 --silent
-          tar xzf replicad-opencascadejs-1.1.0.tgz package/dist/replicad_single.js package/dist/replicad_single.wasm
-          echo "OCCT_DIR=$PWD/package/dist" >> "$GITHUB_ENV"
+          dir="$HOME/occt/replicad-opencascadejs-1.1.0"
+          if [ ! -f "$dir/package/dist/replicad_single.wasm" ]; then
+            mkdir -p "$dir" && cd "$dir"
+            npm pack replicad-opencascadejs@1.1.0 --silent
+            tar xzf replicad-opencascadejs-1.1.0.tgz package/dist/replicad_single.js package/dist/replicad_single.wasm
+            rm replicad-opencascadejs-1.1.0.tgz
+          fi
+          echo "OCCT_DIR=$dir/package/dist" >> "$GITHUB_ENV"
 
       - name: Install dependencies
-        run: npm ci --include=dev --prefer-offline --no-audit --no-fund
+        if: steps.node-modules.outputs.cache-hit != 'true'
+        run: npm ci --include=dev --no-audit --no-fund
 
       # build-pii-guard-models.mjs (in prebuild) downloads ~24 MB of ONNX
       # weights from Hugging Face and skips any file already present. Keyed on
