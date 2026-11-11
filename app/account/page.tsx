@@ -128,9 +128,11 @@ export default function AccountPage() {
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             maxLength={100}
-            placeholder="Optional — shown instead of your email"
+            aria-describedby="first-name-help"
             style={S.input}
           />
+          {/* A visible helper under the field, not a placeholder that vanishes once typing starts (climb4 r10 S13). */}
+          <p id="first-name-help" className="account-field-help">Optional. Shown to your class instead of your email.</p>
 
           <label style={S.label}>Last name</label>
           <input

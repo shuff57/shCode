@@ -627,7 +627,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
             {response.trim().length === 0 ? 'Write something to submit' : 'Write a little more to submit'}
           </span>
         )}
-        <span style={{ color: 'var(--c-meta)', fontSize: 13 }}>
+        <span className="written-count" style={{ color: 'var(--c-meta)', fontSize: 13 }}>
           {response.trim().length} chars{codeInput ? '' : ` · ${response.trim().split(/\s+/).filter(Boolean).length} words`}
         </span>
         {maxSubmissions === null ? null : !attemptsKnown ? (
@@ -667,7 +667,11 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
 <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.5, paddingTop: 10 }}><LessonNumberLinks text={prompt.trim()} hrefs={sourceHrefs} /></div>
       </details> : null}
 
-      {afterPrompt ? <details style={{ margin: '0 0 16px', padding: '10px 14px', border: '1px solid var(--c-line)', borderRadius: 6 }}><summary style={{ cursor: 'pointer', color: 'var(--c-purple)', fontSize: 14 }}>See how this is graded</summary>{afterPrompt}</details> : null}
+      {afterPrompt ? <details
+        className="written-graded-details"
+        // Wide screens open "See how this is graded" at first: it is what a student needs before writing (climb4 r10 S8).
+        ref={(el) => { if (el && !el.dataset.autoOpened) { el.dataset.autoOpened = '1'; if (window.matchMedia('(min-width: 1000px)').matches) el.open = true; } }}
+        style={{ margin: '0 0 16px', padding: '10px 14px', border: '1px solid var(--c-line)', borderRadius: 6 }}><summary style={{ cursor: 'pointer', color: 'var(--c-purple)', fontSize: 14 }}>See how this is graded</summary>{afterPrompt}</details> : null}
       </div>
 
       {/* Its own row rather than squeezed in beside Submit: on a narrow screen

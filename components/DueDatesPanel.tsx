@@ -116,7 +116,8 @@ const C = {
 const dateInput: React.CSSProperties = {
   background: 'var(--c-deep2)',
   color: C.text,
-  border: `1px solid color-mix(in srgb, ${C.border} 60%, var(--c-meta))`,
+  // r10 T5: a lighter frame (the line colour with a little meta) so the value, not the box, carries the contrast.
+  border: `1px solid color-mix(in srgb, ${C.border} 82%, var(--c-meta))`,
   borderRadius: 4,
   padding: '4px 8px',
   fontSize: 15,
@@ -624,13 +625,15 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                     type="button"
                     onClick={() => toggle(mod.moduleId)}
                     aria-expanded={isOpen}
+                    className="schedule-module-toggle"
                     style={{
                       background: 'none', border: 'none', color: C.text, cursor: 'pointer',
                       display: 'inline-flex', alignItems: 'flex-start', gap: 8, padding: 0,
                       fontSize: 15, whiteSpace: 'normal', fontWeight: 600, fontFamily: 'var(--font-prose)', flex: '1 1 240px', textAlign: 'left', minWidth: 0,
                     }}
                   >
-                    <span aria-hidden="true" style={{ display: 'inline-flex', height: 21, alignItems: 'center', flex: '0 0 14px' }}>{isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}</span>
+                    {/* r10 T5: a larger chevron in a small framed box, so the row reads as something that opens. */}
+                    <span aria-hidden="true" className="schedule-module-chev">{isOpen ? <ChevronDown size={16} strokeWidth={2.25} /> : <ChevronRight size={16} strokeWidth={2.25} />}</span>
                     {/* The name (up to two lines, full name in the tooltip) with the lesson count on its own
                         line under it in meta, so a long name never runs into its count (rule 4). */}
                     <span className="schedule-module-text" style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: '1 1 auto' }}>

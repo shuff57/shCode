@@ -1384,6 +1384,8 @@ export default function LessonWorkspace({
                     </button>
                   )
                 )}
+                {/* The shortcut belongs to the first button (Run, or Check / Grade on a text lesson), so it sits right after it (climb4 r10 S7). */}
+                <span className="run-hint">Ctrl+Enter</span>
                 {aiCheck && !isTextMode && !isReshapeMode && (
                   // Run shows what the code prints; Check is the AI read that marks the Quest cards.
                   <button
@@ -1408,7 +1410,12 @@ export default function LessonWorkspace({
                     Submit
                   </button>
                 )}
-                <span className="run-hint">Ctrl+Enter</span>
+                {(isMoshionMode || isConsoleMode) && !submitted && !canSubmit && !runtimeError && !isSummative && !cap.unknown && !cap.reached && (
+                  // Why Submit is shut, in a few words beside it (climb4 r10 S7); the full reason is on its hover.
+                  <span className="toolbar-submit-hint">
+                    {allRequirementsPassed ? 'Run it, then Submit' : aiCheck ? 'Pass Check to submit' : 'Pass the tests to submit'}
+                  </span>
+                )}
                 {resetMsg && (
                   <span
                     role="status"

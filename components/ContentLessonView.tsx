@@ -299,11 +299,6 @@ export default function ContentLessonView({ lesson }: Props) {
           {badge.label}
         </span>
         <span style={{ color: 'var(--c-meta)', fontSize: 13 }}>~{lesson.estimateMins ?? '?'} min</span>
-        {preview === 'slides' && slidesUrl && deckReady === true ? (
-          <a href={slidesUrl} target="_blank" rel="noopener noreferrer" className="slides-newtab" style={{ display: 'inline-block', background: 'transparent', color: 'var(--c-cyan)', fontWeight: 600, fontSize: 13, padding: '4px 10px', borderRadius: 6, border: '1px solid var(--c-line)', textDecoration: 'none' }}>
-            Open in new tab →
-          </a>
-        ) : null}
         {/* Desktop: the Docs button sits here, with the lesson's own details (TabbedRightDrawer inlineHostId). */}
         <div id="content-tools-host" className="shd-inline-host" />
       </div>
@@ -383,7 +378,7 @@ export default function ContentLessonView({ lesson }: Props) {
               {!deckLoaded && <div role="status" style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', color: 'var(--c-meta)' }}>Loading slides…</div>}
             </div>
             <nav aria-label="Slide navigation" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 10 }}>
-              <button className="btn-secondary btn-sm" disabled={!deckLoaded || slidePosition?.current === 1} onClick={() => navigateSlide('ArrowLeft')}>‹ Previous</button>
+              <button className="btn-secondary btn-sm" disabled={!deckLoaded || slidePosition?.current === 1} onClick={() => navigateSlide('ArrowLeft')}>‹ Previous slide</button>
               <span className="slide-nav-middle">
                 <span aria-live="polite" className="slide-count" style={{ color: 'var(--c-meta)', fontSize: 13 }}>{slidePosition ? `Slide ${slidePosition.current} of ${slidePosition.total}` : 'Slides'}</span>
                 <button
@@ -395,8 +390,12 @@ export default function ContentLessonView({ lesson }: Props) {
                 >
                   <Maximize2 size={13} aria-hidden="true" /> Full screen
                 </button>
+                {/* Beside Full screen, so every way to view the deck is in one row under it (climb4 r10 S10). */}
+                <a href={slidesUrl} target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm slides-newtab slides-newtab-row">
+                  Open in new tab <span aria-hidden="true">↗</span>
+                </a>
               </span>
-              <button className="btn-secondary btn-sm slide-next" disabled={!deckLoaded || (!!slidePosition && slidePosition.current >= slidePosition.total)} onClick={() => navigateSlide('ArrowRight')}>Next ›</button>
+              <button className="btn-secondary btn-sm slide-next" disabled={!deckLoaded || (!!slidePosition && slidePosition.current >= slidePosition.total)} onClick={() => navigateSlide('ArrowRight')}>Next slide ›</button>
             </nav>
           </div>
         ) : slidesUrl && deckReady === null ? (

@@ -100,7 +100,7 @@ export default function HeaderNav() {
       <button className="mobile-header-menu" type="button" aria-label="Open navigation menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(v => !v)} style={{ display: 'none', background: 'transparent', color: 'var(--header-fg)', border: '1px solid var(--c-comment)', borderRadius: 4, padding: '6px 9px', fontSize: 18, lineHeight: 1, cursor: 'pointer' }}>
         ☰
       </button>
-      <Link className="mobile-join-link" href="/join-class" style={{ display: 'none', color: 'var(--c-yellow)', fontSize: 12, whiteSpace: 'nowrap' }}>Join your class</Link>
+      <Link className="mobile-join-link header-join-btn" href="/join-class" style={{ display: 'none', color: 'var(--c-yellow)', fontSize: 12, whiteSpace: 'nowrap' }}>Join your class</Link>
       <nav className={`desktop-header-links flex items-center gap-4 flex-wrap justify-end${menuOpen ? ' mobile-open' : ''}`}>
       <Link href="/" style={{ color: 'var(--header-fg)' }} {...cur('lessons')}>Lessons</Link>
 
@@ -157,6 +157,7 @@ export default function HeaderNav() {
       {loaded && user?.role === 'student' && hasEnrollments === false && (
         <Link
           href="/join-class"
+          className="header-join-btn"
           style={{
             background: 'var(--c-yellow)',
             color: 'var(--c-bg)',

@@ -1588,7 +1588,7 @@ function GradebookView({
       <span style={{
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
         whiteSpace: 'nowrap', boxSizing: 'border-box',
-        fontFamily: 'var(--font-prose)', fontSize: 12, lineHeight: '20px', letterSpacing: '0.01em',
+        fontFamily: 'var(--font-prose)', fontSize: 13, lineHeight: '20px',
         fontWeight: overdue || status === 'grade' ? 700 : 600,
         padding: status === 'not-due' ? 0 : '0 8px', borderRadius: 4,
         // r7 T2: a missing / late cell is light text with a red dot on a faint red fill. Red text on the red
@@ -1634,7 +1634,7 @@ function GradebookView({
       }
       // A number for every finished lesson, 100 included: the cell background carries the state.
       return withLate(cell, (
-        <span style={{ color: 'inherit', fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', fontWeight: 600, fontSize: 16 }}>
+        <span style={{ color: 'inherit', fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', fontWeight: 600, fontSize: 15 }}>
           {pct}
         </span>
       ));
@@ -1648,7 +1648,7 @@ function GradebookView({
       const partial = cell.score ?? cell.submitted_score;
       if (partial !== null) {
         return withLate(cell, (
-          <span style={{ color: 'inherit', fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', fontWeight: 700, fontSize: 13 }}>
+          <span style={{ color: 'inherit', fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', fontWeight: 600, fontSize: 15 }}>
             {partial}
           </span>
         ));
@@ -1658,7 +1658,7 @@ function GradebookView({
     // Has submission data but no lesson_state (edge case)
     if (cell.submitted_score !== null) {
       return withLate(cell, (
-        <span style={{ color: 'inherit', fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', fontSize: 14 }}>
+        <span style={{ color: 'inherit', fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', fontWeight: 600, fontSize: 15 }}>
           {cell.submitted_score}
         </span>
       ));
@@ -1911,20 +1911,36 @@ function GradebookView({
         </div>
       </div>
 
-      {/* r9 T1: the legend is one quiet line of small swatches and words, lighter than the controls above it. */}
-      <div aria-label="Gradebook legend" className="gb-legend" style={{ display: 'flex', flexWrap: 'nowrap', gap: 18, marginBottom: 10, overflowX: 'auto', paddingBottom: 2, fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-meta)' }}>
-        {([
-          { key: 'done', swatch: 'var(--c-green)', term: '100', label: 'done' },
-          { key: 'missing', swatch: 'var(--c-red)', term: 'Missing', label: 'past due' },
-          { key: 'grade', swatch: 'var(--c-orange)', term: 'Grade', label: 'needs grading' },
-          { key: 'started', swatch: 'var(--c-yellow)', term: 'Started', label: 'in progress' },
-          { key: 'not-due', swatch: 'var(--c-line)', term: '—', label: 'not due yet' },
-        ] as const).map(({ key, swatch, term, label }) => (
-          <span key={key} className="gb-legend-item">
-            <span aria-hidden="true" className="gb-legend-swatch" style={{ background: swatch }} />
-            <span className="gb-legend-term">{term}</span>{label}
-          </span>
-        ))}
+      {/* r10 T1: the legend is a "Key": closed, five swatches with a short label each and room between them;
+          open, a plain sentence for each state. The hint that a cell opens the work sits at the row's end. */}
+      <div className="gb-legend-row">
+        <details className="gb-key">
+          <summary aria-label="Gradebook key: what each cell means. Select to read more.">
+            <span className="gb-key-title">Key</span>
+            <span className="gb-legend" role="list">
+              {([
+                { key: 'done', swatch: 'var(--c-green)', label: 'Done' },
+                { key: 'missing', swatch: 'var(--c-red)', label: 'Missing' },
+                { key: 'grade', swatch: 'var(--c-orange)', label: 'Needs grading' },
+                { key: 'started', swatch: 'var(--c-yellow)', label: 'Started' },
+                { key: 'not-due', swatch: 'var(--c-line)', label: 'Not due yet' },
+              ] as const).map(({ key, swatch, label }) => (
+                <span key={key} role="listitem" className="gb-legend-item">
+                  <span aria-hidden="true" className="gb-legend-swatch" style={{ background: swatch }} />
+                  {label}
+                </span>
+              ))}
+            </span>
+            <span className="gb-key-more" aria-hidden="true">What these mean</span>
+          </summary>
+          <dl className="gb-key-list">
+            <div><dt><span aria-hidden="true" className="gb-legend-swatch" style={{ background: 'var(--c-green)' }} />Done</dt><dd>A number is the score on finished work, out of 100.</dd></div>
+            <div><dt><span aria-hidden="true" className="gb-legend-swatch" style={{ background: 'var(--c-red)' }} />Missing</dt><dd>Past its due date and not done. It counts as 0 in the grade.</dd></div>
+            <div><dt><span aria-hidden="true" className="gb-legend-swatch" style={{ background: 'var(--c-orange)' }} />Needs grading</dt><dd>Handed in and waiting for your score on the Today tab.</dd></div>
+            <div><dt><span aria-hidden="true" className="gb-legend-swatch" style={{ background: 'var(--c-yellow)' }} />Started</dt><dd>Opened but not finished yet.</dd></div>
+            <div><dt><span aria-hidden="true" className="gb-legend-swatch" style={{ background: 'var(--c-line)' }} />Not due yet</dt><dd>A dash: not started, and the due date has not passed.</dd></div>
+          </dl>
+        </details>
         {/* r8 T5: a still screen shows no hover, so say once that a cell opens the work. */}
         <span className="gb-open-hint"><MousePointerClick size={14} aria-hidden="true" />Select a score to open the work</span>
       </div>
@@ -2166,7 +2182,7 @@ function GradebookView({
                   );
                 })()}
                 {/* Category totals: the server's per-category percent, a dash where nothing in it counts yet */}
-                {!showCategoryColumns && shownCats.length > 0 && <td className="gb-cell-summary" style={{ width: CAT_W, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '8px 8px', color: 'var(--c-fg)', fontSize: 13, fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', background: 'color-mix(in srgb, var(--c-purple) 6%, transparent)', borderBottom: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)' }} title={shownCats.map(c => `${CATEGORY_LABEL[c]}: ${grades.get(student.email)?.cats[c] === undefined ? 'nothing counted yet' : `${grades.get(student.email)?.cats[c]}%`}`).join(' · ')}>
+                {!showCategoryColumns && shownCats.length > 0 && <td className="gb-cell-summary" style={{ width: CAT_W, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '8px 8px', color: 'var(--c-fg)', fontSize: 14, fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', background: 'color-mix(in srgb, var(--c-purple) 6%, transparent)', borderBottom: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)' }} title={shownCats.map(c => `${CATEGORY_LABEL[c]}: ${grades.get(student.email)?.cats[c] === undefined ? 'nothing counted yet' : `${grades.get(student.email)?.cats[c]}%`}`).join(' · ')}>
                   {(() => {
                     const c = shownCats.find(c => grades.get(student.email)?.cats[c] !== undefined);
                     return c ? <strong>{CAT_SHORT[c]} {grades.get(student.email)?.cats[c]}%</strong> : <span style={{ color: 'var(--c-meta)' }}>—</span>;
@@ -2462,7 +2478,7 @@ function ListView() {
                 </div>
                 {/* The badges. Each one is a way in to the tab
                     that answers it: "to grade" opens Today, "behind" opens Students. */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 12, fontFamily: 'var(--font-prose)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 13, fontFamily: 'var(--font-prose)' }}>
                   {!c.archived_at && (chips[c.id] === undefined ? (
                     <span style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13 }}>checking…</span>
                   ) : chips[c.id].behind === 0 && chips[c.id].toGrade === 0 ? (
@@ -2496,7 +2512,8 @@ function ListView() {
                           title="See who is behind on the Students tab"
                           style={{ color: 'var(--c-bg)', background: 'var(--c-red)', borderRadius: 10, padding: '4px 8px', fontWeight: 700, textDecoration: 'none' }}
                         >
-                          {chips[c.id].behind} behind
+                          {/* r10 T7: say what is counted. */}
+                          {chips[c.id].behind} {chips[c.id].behind === 1 ? 'student' : 'students'} behind
                         </a>
                       )}
                     </>
@@ -2528,8 +2545,9 @@ function ListView() {
                     </button>
                   </dd>
                 </div>
-                <div><dt>Year</dt><dd>{c.school_year || 'Not set'}</dd></div>
-                <div><dt>Role</dt><dd style={{ textTransform: 'capitalize' }}>{c.role}</dd></div>
+                {/* r10 T7: Year and Role are background facts, set quieter than Students and Join code. */}
+                <div className="tcc-quiet"><dt>Year</dt><dd>{c.school_year || 'Not set'}</dd></div>
+                <div className="tcc-quiet"><dt>Role</dt><dd style={{ textTransform: 'capitalize' }}>{c.role}</dd></div>
               </dl>
               <div className="tcc-action">
                 <button
@@ -2987,7 +3005,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         {/* Needs Attention view: one strip, the heading beside its chips, so the grading form below sits
             in the first screen. An opened chip still spreads to the full width under the strip. */}
           <div style={{ ...S.card, padding: compact ? '8px 16px' : '8px 20px', marginBottom: 0, display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px 16px' }}>
-            <h2 style={{ ...S.h2, fontSize: 16, lineHeight: '36px', margin: 0, whiteSpace: 'nowrap' }}>Needs attention</h2>
+            <h2 style={{ ...S.h2, fontSize: 18, lineHeight: '36px', margin: 0, whiteSpace: 'nowrap' }}>Needs attention</h2>
             <div style={{ flex: '1 1 320px', minWidth: 0 }}>
             <NeedsAttentionPanel
               classId={classId}
@@ -3140,20 +3158,23 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                             reads as the thing to press without a column of bright fills outshouting the grades. */}
                         <button
                           type="button"
-                          className="teacher-row-open"
                           aria-label={`View progress for ${fullName(prog?.firstName, prog?.lastName) ?? row.student_email}`}
                           title="Lessons, scores and submissions for this student"
-                          style={{ background: 'color-mix(in srgb, var(--c-cyan) 8%, transparent)', color: 'var(--c-cyan)', border: '1px solid var(--c-cyan)', borderRadius: 4, height: 32, boxSizing: 'border-box', padding: compact ? '0 14px' : '0 14px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: compact ? 64 : undefined, lineHeight: '18px', flexShrink: 0, fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                          className="teacher-row-open"
+                          // r10 T4: on a phone the "Progress" button is narrower (padding 0 8px, no 64px minimum).
+                          style={{ background: 'color-mix(in srgb, var(--c-cyan) 8%, transparent)', color: 'var(--c-cyan)', border: '1px solid var(--c-cyan)', borderRadius: 4, height: 32, boxSizing: 'border-box', padding: compact ? '0 8px' : '0 14px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', lineHeight: '18px', flexShrink: 0, fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
                           onClick={() => { setDrawerLesson(null); setDrawerEmail(row.student_email); }}
                         >
                           {/* r7 T6: say what opens (the student's progress drawer), not just "Open". On a phone the
                               row has room for a chevron only (its name says the same), so the card stays two rows. */}
-                          {compact ? 'Open' : 'View progress'}
+                          {/* r10 T4: on a phone it says what it opens ("Progress"); the accessible name is unchanged. */}
+                          {compact ? 'Progress' : 'View progress'}
                         </button>
                         <RowMenu
                           label={`More actions for ${row.student_email}`}
                           buttonText={compact ? '⋯' : 'More'}
                           caret={!compact}
+                          className={compact ? 'roster-more-compact' : undefined}
                           disabled={removingEmail === row.student_email}
                           items={[
                             { label: 'Remove from class…', danger: true, title: 'Takes them off this class roster. Their work is kept.', onSelect: () => { void handleRemove(row.student_email); } },
@@ -3274,8 +3295,9 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             <h2 style={{ ...S.h2, margin: 0 }}>Join code</h2>
             {isOwner && (
               <RowMenu
-                label="Join code actions"
-                buttonText="More"
+                label="Code options"
+                // r10 T6: the menu says what it is about, not just "More".
+                buttonText="Code options"
                 disabled={regenerating}
                 items={[
                   { label: regenerating ? 'Making a new code…' : 'Make a new join code…', danger: true, disabled: regenerating, title: 'The old code stops working right away', onSelect: () => { void handleRegenCode(); } },

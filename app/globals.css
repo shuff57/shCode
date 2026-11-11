@@ -4692,14 +4692,6 @@ input.dd-date { width: 152px; padding-right: 30px !important; }
 .content-lesson-main .content-prose li > :is(ul, ol) { margin: 3px 0 2px !important; padding-left: 22px; }
 .content-lesson-main .content-prose li li { margin: 2px 0 0 !important; font-size: 15px; line-height: 1.35; }
 .content-lesson-main .content-prose li li::marker { color: var(--c-meta); }
-/* r9 S5 Content lessons: a runnable example is as wide as the reading column, so the text and the code
-   share one left and one right edge (it no longer runs under the "On this page" box). */
-@media (min-width: 721px) {
-  .content-lesson-main .lesson-reading-body > .livecodeblock { max-width: 659px; box-sizing: border-box; }
-}
-@media (min-width: 1200px) {
-  .lesson-reading-grid:not(.lesson-focused-grid) > .lesson-reading-body > .livecodeblock { grid-column: 1 !important; }
-}
 /* r9 S2 moSHion lab, desktop: the editor's code is 13px so the longest starter line ends well inside the
    editor next to the 400px canvas, and a long inline code chip in a step sits whole on its own line. */
 @media (min-width: 1200px) {
@@ -4719,10 +4711,7 @@ input.dd-date { width: 152px; padding-right: 30px !important; }
   .lab-assignment-header .assignment-unmet-hint { color: var(--c-meta); }
   .lab-work-area:has(.output-header) #editor .cm-scroller { min-height: clamp(216px, calc(100svh - 470px), 520px); max-height: none; }
 }
-/* r9 S7 Quiz: where Check is, said in plain words (not a link). Phone lesson nav: the number leads. */
-@media (min-width: 721px) {
-  .quiz-submit-hint { color: var(--c-meta) !important; text-decoration: none !important; font-size: 14px; }
-}
+/* r9 S7 Phone lesson nav: the number leads. (The quiz's plain-text Check hint was reverted in r10.) */
 .lesson-nav-short .lesson-nav-num { font-weight: 700; color: var(--c-fg); }
 .lesson-nav-short .lesson-nav-kind { color: var(--c-meta); }
 /* r9 S8 Home: a module not started shows only its count (no empty track), and every count ends on one
@@ -4814,3 +4803,194 @@ input.dd-date { width: 152px; padding-right: 30px !important; }
 /* r9 S14 Account: Save is the app's primary action colour (the green Continue / Run), not the old blue. */
 .account-page .btn-primary { background: var(--c-green); color: var(--c-deep2); font-weight: 700; }
 /* end climb4 r9 student */
+/* climb4 r10 student */
+/* r10 S1 Site header: "Join your class" is a quiet outlined button (accent text and border, no fill),
+   so each page's own primary action leads. Phone header too (HeaderNav .header-join-btn). */
+.site-header-nav-wrap .header-join-btn {
+  background: transparent !important; color: var(--c-yellow) !important;
+  border: 1px solid color-mix(in srgb, var(--c-yellow) 70%, transparent); border-radius: 4px;
+  padding: 3px 10px !important; font-weight: 600; text-decoration: none; line-height: 1.4;
+}
+.site-header-nav-wrap .header-join-btn:hover { border-color: var(--c-yellow); background: color-mix(in srgb, var(--c-yellow) 10%, transparent) !important; }
+.site-header-nav-wrap .header-join-btn:focus-visible { outline: 2px solid var(--c-yellow); outline-offset: 2px; }
+@media (max-width: 600px) {
+  .site-header-nav-wrap .mobile-join-link.header-join-btn { padding: 4px 8px !important; font-size: 12px; }
+}
+/* r10 S11 Phone home: the chapter's subtitle sits left and its "N of M done" count right, on one line
+   with clear space between them (the old rule pinned the count against the subtitle). */
+@media (max-width: 720px) {
+  .home-chapter > summary > span.home-chapter-count:last-child { margin-left: auto !important; padding-left: 12px; }
+  .home-chapter > summary > .home-chapter-count .unit-progress-count { font-size: 14px; }
+}
+/* r10 S2 Module: a locked row is dimmed halfway, not to half opacity. Its title is about 80% of a full
+   title's strength (over 7:1 on the row), the number, type label and duration read at the normal meta
+   colour, and only the LOCKED pill and the left rail stay muted. Desktop and phone. */
+.mod-row[aria-disabled] { opacity: 1 !important; box-shadow: none !important; border-left-color: color-mix(in srgb, var(--c-line) 75%, var(--c-meta)) !important; }
+.mod-row[aria-disabled] .mod-row-title { color: color-mix(in srgb, var(--c-fg) 80%, var(--card)) !important; }
+.mod-row[aria-disabled] .mod-row-title .mod-row-num, .mod-row[aria-disabled] .mod-row-duration { color: var(--c-meta) !important; }
+.mod-row[aria-disabled] .mod-row-badge {
+  color: var(--c-meta) !important; background: transparent !important; border-color: transparent !important;
+}
+.mod-row[aria-disabled] .mod-row-state > span { opacity: 0.7; }
+/* r10 S3 Sandbox toolbar, desktop: one type scale (13px) and one quiet secondary style for every
+   button that is not Run (Save, History, Reset, Full screen, Share, and the Tools row): icon and label,
+   meta-coloured text, a faint outline. Run is the one filled action; the mode tabs read at 13px. */
+@media (min-width: 721px) {
+  .sandbox-shell .sandbox-toolbar :is(.sandbox-tb-program, .sandbox-tb-view, .sandbox-tb-share) button,
+  .sandbox-shell .sandbox-toolbar .sandbox-share-trigger,
+  .sandbox-shell .sandbox-header .shd-inline-tool {
+    height: 32px; box-sizing: border-box; padding: 0 12px !important; gap: 7px !important; align-items: center;
+    font-family: var(--font-mono) !important; font-size: 13px !important; font-weight: 700 !important;
+    color: var(--c-meta) !important; background: transparent !important;
+    border: 1px solid color-mix(in srgb, var(--c-line) 85%, transparent) !important; border-radius: 6px !important;
+  }
+  .sandbox-shell .sandbox-toolbar .sandbox-tb-program > button:not(:disabled):hover,
+  .sandbox-shell .sandbox-toolbar :is(.sandbox-tb-view, .sandbox-tb-share) button:hover,
+  .sandbox-shell .sandbox-toolbar .sandbox-share-trigger:hover,
+  .sandbox-shell .sandbox-header .shd-inline-tool:hover { color: var(--c-fg) !important; border-color: var(--c-meta) !important; }
+  .sandbox-shell .sandbox-toolbar .sandbox-tb-program button svg,
+  .sandbox-shell .sandbox-toolbar :is(.sandbox-tb-view, .sandbox-tb-share) button svg { width: 14px; height: 14px; }
+  .sandbox-shell .sandbox-toolbar .sandbox-save-btn { color: var(--c-fg) !important; }
+  .sandbox-shell .sandbox-header .shd-inline-tool[aria-pressed="true"] { color: var(--c-fg) !important; border-color: var(--shd-tab-accent, var(--c-cyan)) !important; }
+  .sandbox-shell .sandbox-toolbar .btn-run { height: 34px; padding: 0 18px !important; font-size: 14px !important; font-weight: 700 !important; }
+  .sandbox-shell .sandbox-toolbar .sandbox-mode { font-size: 13px !important; height: 32px; }
+  .sandbox-shell .sandbox-toolbar .sandbox-mode:not(.is-active) { color: var(--c-meta) !important; font-weight: 600; }
+  .sandbox-shell .sandbox-toolbar .sandbox-mode:not(.is-active):hover { color: var(--c-fg) !important; }
+  .sandbox-shell .sandbox-toolbar .sandbox-run-key { font-size: 12px; margin-left: -2px; }
+  .sandbox-shell .sandbox-toolbar .sandbox-save-state { margin: 0 8px 0 4px; }
+}
+/* r10 S4 moSHion lab, desktop: the preview pane is exactly the 400px canvas, the editor's left gutter is
+   slimmer (line numbers and fold column) and its code 12.5px, so the editor keeps a clear right margin
+   after its longest line while the task column takes every pixel left over (wider prose lines). */
+@media (min-width: 1200px) {
+  body:has(.shd-inline-tools) .lab-work-area:has(#previewPane):not(:has(.output-header)) { grid-template-columns: minmax(300px, 1fr) minmax(0, 1060px); gap: 10px; }
+  body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) .editor-preview-container:not(.sandbox-split) > #previewPane { flex-basis: 400px; }
+  body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) #editor .cm-editor { font-size: 12.5px !important; }
+  body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) #editor .cm-lineNumbers .cm-gutterElement { padding: 0 2px 0 4px; min-width: 16px !important; }
+  body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) #editor .cm-foldGutter .cm-gutterElement { padding: 0 1px; }
+  body:has(.shd-inline-tools) .lab-work-area:has(#previewPane):not(:has(.output-header)) > .lab-task-card[open] { padding-left: 14px !important; padding-right: 12px !important; }
+  body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) .lab-task-card .lesson-steps { padding-left: 16px !important; }
+}
+/* r10 S7 Labs, desktop: "Ctrl+Enter" sits right after Run (LessonWorkspace moved it), a shut Submit says
+   why beside it (.toolbar-submit-hint), and the AI-grade allowance leaves the header until it runs low
+   (its hover text and the low warning stay; the phone already did this). */
+.run-toolbar .toolbar-submit-hint { display: none; }
+@media (min-width: 721px) {
+  .lab-work-area .run-toolbar .btn-run + .run-hint { margin-left: -2px; margin-right: 6px; color: var(--c-meta); opacity: 1; font-family: var(--font-prose); font-size: 12px; }
+  .run-toolbar .toolbar-submit-hint {
+    display: inline; font-family: var(--font-prose); font-size: 13px; color: var(--c-meta); white-space: nowrap;
+  }
+  .lab-assignment-header .assignment-quota:not(:has(.is-low)):not(:has(> div > :not(.grade-quota-note))) { display: none !important; }
+  .lab-assignment-header .assignment-quota .grade-quota-note:not(.is-low) { display: none; }
+}
+/* r10 S8 Written: the character and word counts sit right-aligned just under the box; Submit, Save draft
+   and the reason Submit is shut get their own row; the AI-grade allowance is a quiet line under them.
+   (WrittenGrader also opens "See how this is graded" at first on wide screens.) */
+.written-actions .written-count { order: -1; flex: 0 0 100%; text-align: right; margin: -4px 0 0; font-family: var(--font-prose); }
+.written-actions .written-quota-note { flex: 0 0 100%; text-align: right; margin: -2px 0 0 !important; }
+.written-graded-details > summary { margin-bottom: 0; }
+.written-graded-details[open] > summary { margin-bottom: 8px; }
+.written-graded-details .content-prose { font-family: var(--font-prose) !important; font-size: 14px; line-height: 1.5; color: var(--c-fg); }
+.written-graded-details .content-prose p { margin: 0 0 10px; font-family: var(--font-prose) !important; font-size: 14px !important; line-height: 1.5 !important; }
+.written-graded-details .content-prose h2 { font-family: var(--font-mono); font-size: 15px !important; margin: 4px 0 6px !important; padding: 0 !important; border: 0 !important; }
+.written-graded-details .content-prose table { width: 100%; margin: 0 !important; font-size: 14px; }
+.written-graded-details .content-prose :is(th, td) { font-family: var(--font-prose) !important; font-size: 14px !important; padding: 6px 10px !important; text-align: left !important; line-height: 1.4 !important; }
+.written-graded-details .content-prose th { font-weight: 700; color: var(--c-meta); }
+/* r10 S9 Docs hub: the JavaScript card carries a green top edge and a tinted "Start here" tag, at the same size.
+   (The docs-js page part of S9 was reverted.) */
+.docs-set-card:has(.docs-set-start) { box-shadow: inset 0 3px 0 var(--c-green); border-color: color-mix(in srgb, var(--c-green) 45%, var(--c-line)); }
+.docs-set-card .docs-set-start { background: color-mix(in srgb, var(--c-green) 14%, transparent); }
+/* r10 S10 Slides: Full screen and Open in new tab are two quiet outlined buttons together beside the slide
+   counter, under the deck (ContentLessonView moved the new-tab link out of the title row); the deck's own
+   buttons say "Previous slide" / "Next slide", so they differ from "Next lesson". */
+.content-lesson-main nav[aria-label="Slide navigation"] .slide-nav-middle { gap: 10px; }
+.content-lesson-main nav[aria-label="Slide navigation"] :is(.slide-fullscreen, .slides-newtab-row) {
+  display: inline-flex !important; align-items: center; gap: 6px; height: 32px; box-sizing: border-box; padding: 0 12px !important;
+  background: transparent !important; color: var(--c-fg) !important; border: 1px solid var(--c-line) !important; border-radius: 6px;
+  font-family: var(--font-mono); font-size: 13px !important; font-weight: 700 !important; text-decoration: none !important;
+}
+.content-lesson-main nav[aria-label="Slide navigation"] :is(.slide-fullscreen:not(:disabled), .slides-newtab-row):hover { border-color: var(--c-meta) !important; }
+.content-lesson-main nav[aria-label="Slide navigation"] .slide-count { margin-right: 6px; font-family: var(--font-prose); font-size: 14px !important; }
+.content-lesson-main nav[aria-label="Slide navigation"] :is(button, a, .slide-count) { white-space: nowrap; }
+@media (max-width: 720px) {
+  .content-lesson-main nav[aria-label="Slide navigation"] { flex-wrap: wrap; row-gap: 8px; }
+  .content-lesson-main nav[aria-label="Slide navigation"] .slide-nav-middle { order: 3; flex: 1 0 100%; justify-content: center; gap: 8px; }
+  .content-lesson-main nav[aria-label="Slide navigation"] .slide-count { margin-right: 2px; font-size: 13px !important; }
+  .content-lesson-main nav[aria-label="Slide navigation"] :is(.slide-fullscreen, .slides-newtab-row) { padding: 0 8px !important; font-size: 12px !important; }
+  .content-lesson-main nav[aria-label="Slide navigation"] .slide-nav-middle { justify-content: space-between; gap: 4px; }
+}
+/* r10 S13 Account: the Email label wears the same label style as First name / Last name, and "Optional"
+   for the first name is a helper line under the field (app/account/page.tsx .account-field-help). */
+.account-card > div:has(> div > svg) > div:first-child { font-family: var(--font-prose); font-size: 14px !important; font-weight: 600; color: var(--c-fg); }
+.account-card form input[type="text"] { font-family: var(--font-prose); font-size: 15px; }
+.account-card .account-field-help { margin: -10px 0 16px; font-family: var(--font-prose); font-size: 13px; line-height: 1.45; color: var(--c-meta); }
+/* end climb4 r10 student */
+/* climb4 r10 teacher */
+/* r10 T1 Gradebook: the legend is a "Key" row of its own, set apart from the toolbar above and the table below.
+   Closed: five swatches with one or two words each, 13px prose, 24px apart. Open: a sentence per state. Table type
+   sits on one scale: names, grades and cells 14-15px, headings 13px/600, nothing under 12px. */
+.gb-legend-row { display: flex; align-items: flex-start; gap: 12px 24px; flex-wrap: wrap; margin: 6px 0 16px; }
+.gb-key { flex: 1 1 auto; min-width: 0; font-family: var(--font-prose); }
+.gb-key > summary {
+  list-style: none; display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; cursor: pointer;
+  padding: 6px 12px; border-radius: 6px; border: 1px solid color-mix(in srgb, var(--c-line) 70%, transparent);
+  background: color-mix(in srgb, var(--c-bg) 55%, transparent);
+}
+.gb-key > summary::-webkit-details-marker { display: none; }
+.gb-key > summary:hover { border-color: var(--c-line); }
+.gb-key > summary:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; }
+.gb-key-title { font-size: 13px; font-weight: 600; color: var(--c-meta); }
+.gb-key .gb-legend { display: inline-flex; flex-wrap: wrap; gap: 6px 24px; font-size: 13px; line-height: 20px; color: var(--c-fg); }
+.gb-key .gb-legend-item { gap: 8px; font-weight: 500; }
+.gb-key .gb-legend-swatch, .gb-key-list .gb-legend-swatch { width: 10px; height: 10px; border-radius: 3px; display: inline-block; flex-shrink: 0; }
+.gb-key-more { font-size: 13px; color: var(--c-cyan); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, var(--c-cyan) 50%, transparent); }
+.gb-key-more::after { content: ' \25BE'; text-decoration: none; display: inline-block; margin-left: 4px; }
+.gb-key[open] .gb-key-more::after { content: ' \25B4'; }
+.gb-key-list {
+  margin: 10px 0 0; padding: 12px 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px 24px;
+  border: 1px solid color-mix(in srgb, var(--c-line) 70%, transparent); border-radius: 6px; max-width: 980px;
+}
+.gb-key-list > div { min-width: 0; }
+.gb-key-list dt { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--c-fg); line-height: 20px; }
+.gb-key-list dd { margin: 2px 0 0 18px; font-size: 13px; line-height: 19px; color: var(--c-meta); }
+.gb-legend-row > .gb-open-hint { margin-left: auto; padding-top: 7px; }
+.gb-head-unit { font-size: 13px !important; letter-spacing: 0 !important; }
+.gb-head-totals { font-size: 13px !important; letter-spacing: 0 !important; }
+.gb-head-lesson .gb-lesson-link > strong { letter-spacing: 0 !important; }
+/* r10 T4 Students phone: the card's action says "Progress". To keep the counts on one line beside it, the counts
+   are 13px and the menu button is 32px wide. */
+.roster-pcard .roster-chip { font-size: 13px !important; }
+.roster-more-compact { min-width: 32px !important; width: 32px; padding: 0 !important; }
+/* r10 T5 Schedule: each module row is an obvious disclosure. The chevron is 16px in a 22px framed box in the
+   accent colour, and the module name carries a thin accent underline (visible without hover). The date and time
+   boxes have a lighter frame (DueDatesPanel dateInput), so the module names lead the table. */
+.schedule-module-toggle { gap: 10px !important; }
+.schedule-module-chev {
+  display: inline-flex; align-items: center; justify-content: center; flex: 0 0 22px; width: 22px; height: 22px; margin-top: 0;
+  box-sizing: border-box; border-radius: 4px; color: var(--c-cyan);
+  border: 1px solid color-mix(in srgb, var(--c-cyan) 40%, transparent); background: color-mix(in srgb, var(--c-cyan) 8%, transparent);
+}
+.schedule-module-toggle .schedule-module-name {
+  text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, var(--c-cyan) 50%, transparent);
+}
+.schedule-module-toggle:hover .schedule-module-name { color: var(--c-cyan); text-decoration-color: var(--c-cyan); }
+.schedule-module-toggle:hover .schedule-module-chev { border-color: var(--c-cyan); }
+.schedule-module-toggle:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 3px; border-radius: 4px; }
+/* r10 T6 Settings: each share carries a thin bar scaled to the largest weight (GradingWeightsPanel), so the larger
+   categories read as larger. The join code's menu is named "Code options" (page.tsx). */
+.gw-share-track {
+  flex: 1 1 auto; max-width: 64px; height: 6px; border-radius: 3px; overflow: hidden;
+  background: color-mix(in srgb, var(--c-line) 55%, transparent);
+}
+.gw-share-bar { display: block; height: 100%; border-radius: 3px; background: color-mix(in srgb, var(--c-cyan) 75%, transparent); }
+/* r10 T7 Class list: the badges are 13px; Copy is 28px tall like the other small buttons; Year and Role are 14px
+   meta, quieter than Students and Join code. */
+.tcc-copy { height: 28px; padding: 0 10px; font-size: 13px; }
+.tcc-r9 .tcc-facts > .tcc-quiet dd { font-size: 14px; color: var(--c-meta); }
+.tcc-r9 .tcc-facts > div:not(.tcc-quiet) dd { font-weight: 600; }
+/* r10 T8 Type pass: buttons on the class page are one size and weight (14px/600 in the code face): the gradebook's
+   Previous / Next and More, the row menus (RowMenu), and "Needs attention" is a section heading at 18px like the rest. */
+.gb-pager-step { font-size: 14px !important; font-weight: 600 !important; }
+.gb-toolbar .gb-toolbar-right > details > summary { font-size: 14px; font-weight: 600; }
+/* end climb4 r10 teacher */

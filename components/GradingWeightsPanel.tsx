@@ -96,7 +96,9 @@ export default function GradingWeightsPanel({ classId, desktop = false }: { clas
   // Category | Weight (the field) | Share | Reset — shared by the header row and every category row.
   // r7 T5: the Weight track holds the input and its "/ total" unit, so a weight reads as a share of the total.
   // r8 T2: the total is said once (the Weight heading and the Total row), not as "/ 115" on every row.
-  const rowCols = desktop ? 'minmax(0, 1fr) 128px 104px 48px' : 'minmax(0, 1fr) 76px 56px 48px';
+  // r10 T6: the Share column is wider on a wide screen so each share carries a thin bar beside its number.
+  const rowCols = desktop ? 'minmax(0, 1fr) 114px 132px 48px' : 'minmax(0, 1fr) 76px 56px 48px';
+  const maxWeight = Math.max(1, ...rows.map((x) => (Number.isFinite(x.weight) ? x.weight : 0)));
 
   return (
     <div>
@@ -168,7 +170,15 @@ export default function GradingWeightsPanel({ classId, desktop = false }: { clas
               }}
             />
             </span>
-            <span title="Effective share when all categories have work" style={{ fontFamily: 'var(--font-prose)', fontSize: 14, color: C.text, textAlign: 'right', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{total > 0 ? `${(r.weight / total * 100).toFixed(1)}%` : '—'}</span>
+            <span title="Effective share when all categories have work" className="gw-share" style={{ fontFamily: 'var(--font-prose)', fontSize: 14, color: C.text, textAlign: 'right', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10 }}>
+              {/* r10 T6: a thin bar, longest for the largest weight, so the bigger categories read as bigger. */}
+              {desktop && total > 0 && (
+                <span aria-hidden="true" className="gw-share-track">
+                  <span className="gw-share-bar" style={{ width: `${Math.max(0, Math.min(100, (r.weight / maxWeight) * 100))}%` }} />
+                </span>
+              )}
+              <span style={{ minWidth: 44 }}>{total > 0 ? `${(r.weight / total * 100).toFixed(1)}%` : '—'}</span>
+            </span>
             {r.isDefault ? (
               <span />
             ) : (
