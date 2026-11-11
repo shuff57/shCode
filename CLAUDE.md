@@ -677,7 +677,7 @@ Apply 0047 before deploying.
 **The Library is three tabs** (`components/ClassLibraryPanel.tsx`): Games (My games / Class games / Built in),
 Pictures and Sounds (Mine / Shared with my class / Built in), `?tab=games|pictures|sounds`, remembered in
 `shCode:library-tab`, Games when arriving from /play.
-**Versions and proposed changes (migration 0048, not deployed yet; spec `codehs-review/GAME-FLOW-SPEC.md`).** A small
+**Versions and proposed changes (migration 0048, deployed 2026-11-11; spec `codehs-review/GAME-FLOW-SPEC.md`).** A small
 GitHub flow, plain words on the buttons and the GitHub term in one small line per panel (owner's decision). Every
 publish/Update saves a version with "What did you change?" (`library_game_versions`, newest 20, Go back = a NEW
 version). A classmate who remixed a game presses **Propose change** in the sandbox (`game_changes`, base code stored
@@ -691,7 +691,7 @@ games") and can delete comments, close or remove. Who sees what: `gameAccess`/`c
 `functions/_shared/gameFlow.ts`; rules and words: `lib/game-flow-core.ts`; browser: `lib/game-flow-client.ts`. The
 sandbox record `shCode:sandbox-game` carries `fromVersion` (the remix's base) and `version` (which version of your
 own game the draft holds; Publish warns when the game is ahead). Docs: moSHion "Sharing and changes". Tests:
-`scripts/test-game-merge.mjs`, `scripts/test-game-flow.mjs`. Apply 0048 before deploying.
+`scripts/test-game-merge.mjs`, `scripts/test-game-flow.mjs`.
 
 ## Build + deploy
 
