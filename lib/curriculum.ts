@@ -89,7 +89,25 @@ export interface ModuleArtifact {
   html: string;
 }
 
-export async function listModules(): Promise<ModuleSummary[]> {
+// A production build renders every lesson page (twice: /lesson/ and
+// /assignment/), and each one asks for its module. Uncached, that meant every
+// page re-read all 97 module files and all ~990 lesson.json files one await at
+// a time, and ran the module's markdown through marked + DOMPurify (jsdom) for
+// HTML a lesson page never shows -- most of the export's time. The tree does
+// not change during a build, so production memoises per process; dev reads
+// fresh every time so an edited lesson or module shows up on reload.
+// The cached objects are shared between pages: callers must not mutate them.
+const memoise = process.env.NODE_ENV === 'production';
+let modulesCache: Promise<ModuleSummary[]> | null = null;
+const moduleCache = new Map<string, ReturnType<typeof readModule>>();
+
+export function listModules(): Promise<ModuleSummary[]> {
+  if (!memoise) return readModules();
+  if (!modulesCache) modulesCache = readModules();
+  return modulesCache;
+}
+
+async function readModules(): Promise<ModuleSummary[]> {
   let entries: { name: string; isFile: () => boolean }[] = [];
   try {
     entries = await fs.readdir(MODULES_DIR, { withFileTypes: true }) as any;
@@ -127,19 +145,33 @@ function parseNumberedIdFromTitle(title: string): string | null {
   return m ? m[1] : null;
 }
 
-async function listLessonsInModule(moduleId: string, requiredCategory?: string): Promise<LessonInModule[]> {
-  const out: LessonInModule[] = [];
+// Every lesson folder's parsed lesson.json, in readdir order. One read of the
+// tree per build process (see `memoise`), not one per module asked for.
+let lessonMetasCache: Promise<{ name: string; parsed: any }[]> | null = null;
+
+function lessonMetas(): Promise<{ name: string; parsed: any }[]> {
+  if (!memoise) return readLessonMetas();
+  if (!lessonMetasCache) lessonMetasCache = readLessonMetas();
+  return lessonMetasCache;
+}
+
+async function readLessonMetas(): Promise<{ name: string; parsed: any }[]> {
   let dirs: any[] = [];
   try {
     dirs = await fs.readdir(LESSONS_DIR, { withFileTypes: true });
-  } catch { return out; }
-
-  for (const d of dirs) {
-    if (!d.isDirectory()) continue;
+  } catch { return []; }
+  const metas = await Promise.all(dirs.map(async (d) => {
+    if (!d.isDirectory()) return null;
     const meta = await readIfExists(path.join(LESSONS_DIR, d.name, 'lesson.json'));
-    if (!meta) continue;
-    let parsed: any;
-    try { parsed = JSON.parse(meta); } catch { continue; }
+    if (!meta) return null;
+    try { return { name: d.name as string, parsed: JSON.parse(meta) }; } catch { return null; }
+  }));
+  return metas.filter((m): m is { name: string; parsed: any } => m !== null);
+}
+
+async function listLessonsInModule(moduleId: string, requiredCategory?: string): Promise<LessonInModule[]> {
+  const out: LessonInModule[] = [];
+  for (const { name, parsed } of await lessonMetas()) {
     const numberedId = parseNumberedIdFromTitle(String(parsed.title || ''));
     if (!numberedId) continue;
     // Numbered id must start with moduleId + "." (so "2.1" matches "2.1.1", "2.1.10" but not "2.11.1")
@@ -148,7 +180,7 @@ async function listLessonsInModule(moduleId: string, requiredCategory?: string):
     if (requiredCategory && parsed.category !== requiredCategory) continue;
     const titleRest = String(parsed.title).replace(/^\d+\.\d+\.\d+\s*/, '').trim();
     out.push({
-      id: d.name,
+      id: name,
       numberedId,
       title: parsed.title,
       displayTitle: titleRest,
@@ -162,7 +194,14 @@ async function listLessonsInModule(moduleId: string, requiredCategory?: string):
   return out;
 }
 
-export async function getModule(moduleId: string): Promise<{
+export function getModule(moduleId: string): ReturnType<typeof readModule> {
+  if (!memoise) return readModule(moduleId);
+  let hit = moduleCache.get(moduleId);
+  if (!hit) { hit = readModule(moduleId); moduleCache.set(moduleId, hit); }
+  return hit;
+}
+
+async function readModule(moduleId: string): Promise<{
   summary: ModuleSummary;
   html: string;
   lessons: LessonInModule[];
