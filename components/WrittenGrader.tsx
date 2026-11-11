@@ -4,7 +4,8 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { CircleCheck, CircleX, Circle, Loader2, Lightbulb, Sparkles, Save } from 'lucide-react';
 import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
 import { isPassingGrade, criteriaScore } from '../lib/grade-pass';
-import { navigateToNextLesson } from '../lib/lesson-neighbors';
+import { NextLessonButton } from './LessonOutcome';
+import { ranWhen } from '../lib/outcome-words';
 import LessonNumberLinks, { useSourceHrefs } from './LessonNumberLinks';
 import {
   fetchDraft,
@@ -163,6 +164,26 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
   const [offline, setOffline] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  // ux1 B3: "Draft saved 3:04 PM" stays beside the button (it used to flash "Saved ✓" for under a
+  // second), and a grade that just arrived is announced beside Submit and scrolled into view.
+  const [savedAt, setSavedAt] = useState<number | null>(null);
+  const [gradedAt, setGradedAt] = useState<number | null>(null);
+  const [clock, setClock] = useState(() => Date.now());
+  useEffect(() => {
+    if (!savedAt && !gradedAt) return;
+    const t = setInterval(() => setClock(Date.now()), 15_000);
+    return () => clearInterval(t);
+  }, [savedAt, gradedAt]);
+  useEffect(() => {
+    if (!gradedAt) return;
+    const raf = requestAnimationFrame(() => {
+      const el = document.getElementById(`written-feedback-${lessonId}`);
+      if (!el) return;
+      const calm = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      el.scrollIntoView({ block: 'start', behavior: calm ? 'auto' : 'smooth' });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [gradedAt, lessonId]);
   // The questions name the lessons to reread ("1.1.17"). The same linkifier the
   // coding criteria use, so both surfaces behave identically.
   const sourceHrefs = useSourceHrefs([prompt]);
@@ -282,6 +303,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
     setSaveStatus('saving');
     const ok = progress.authed ? await saveDraft(lessonId, response) : false;
     setSaveStatus(ok ? 'saved' : 'error');
+    if (ok) { setSavedAt(Date.now()); setClock(Date.now()); }
     setTimeout(() => setSaveStatus('idle'), 2000);
   }
 
@@ -423,6 +445,8 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
       lastFailedRef.current = null;
       setResult(data as GradeResult);
       setResultIsBest(false);
+      setGradedAt(Date.now());
+      setClock(Date.now());
       // One attempt just spent. Unknown stays unknown -- we know this one happened,
       // not how many came before, and inventing a count would unlock a capped item.
       setAttempts((n) => (n === null ? null : n + 1));
@@ -596,7 +620,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
                 : typeof config.maxSubmissions === 'number'
                 ? 'Grade'
                 : result
-                ? 'Re-submit for feedback'
+                ? (isPassing(result) ? 'Submit again (optional)' : 'Submit again')
                 : 'Submit'}
         </button>
         <button
@@ -622,6 +646,18 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
           {saveStatus === 'saving' ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
           {saveStatus === 'saved' ? 'Saved ✓' : saveStatus === 'error' ? 'Save failed' : 'Save draft'}
         </button>
+        {/* What Submit and Save draft did, beside them and still there afterwards (ux1 B3). */}
+        <span className="written-outcome" role="status" aria-live="polite">
+          {loading ? (
+            <span className="written-outcome-busy">{stage ? `${GRADE_STAGE_LABELS[stage]}…` : 'Grading…'} Your feedback will show below.</span>
+          ) : result && !oneShot ? (
+            <a className={`written-outcome-result${isPassing(result) ? ' is-pass' : ' is-fail'}`} href={`#written-feedback-${lessonId}`}>
+              {isPassing(result) ? 'Result: passed' : 'Result: needs more work'}
+              {gradedAt ? ` · graded ${ranWhen(gradedAt, clock)}` : ''} · See feedback <span aria-hidden="true">↓</span>
+            </a>
+          ) : null}
+          {savedAt && !loading ? <span className="written-outcome-saved">Draft saved {ranWhen(savedAt, clock)}</span> : null}
+        </span>
         {tooShort && !locked && !loading && (
           <span id={`written-hint-${lessonId}`} className="written-submit-hint">
             {response.trim().length === 0 ? 'Write something to submit' : 'Write a little more to submit'}
@@ -735,7 +771,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
         // reads as full marks while the recorded score is 1.5 of 3.
         const earnedCriteria = criteriaScore(result.criteria);
         return (
-        <div style={{ marginTop: 20 }}>
+        <div id={`written-feedback-${lessonId}`} className="written-feedback" style={{ marginTop: 20 }}>
           {resultIsBest ? (
             <div style={{ marginBottom: 8, color: 'var(--c-cyan)', fontSize: 13 }}>This is your best try, the one that counts.</div>
           ) : maxSubmissions !== null ? (
@@ -825,24 +861,8 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
 
           {passed && (
             <div style={{ marginTop: 16 }}>
-              <button
-                className="lesson-next-action"
-                onClick={() => navigateToNextLesson(lessonId)}
-                style={{
-                  padding: '10px 18px',
-                  borderRadius: 6,
-                  border: 'none',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  background: 'var(--c-green)',
-                  color: 'var(--c-bg)',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                }}
-              >
-                Continue to next lesson →
-              </button>
+              {/* The same Next every lesson type shows (ux1 B1). */}
+              <NextLessonButton lessonId={lessonId} />
               <p style={{ margin: '8px 0 0', color: 'var(--c-meta)', fontSize: 13 }}>
                 {/* A zero-point rubric (3.9.1, 3.9.3) has no score to raise, so
                     "keep revising to push your score higher" is an invitation to

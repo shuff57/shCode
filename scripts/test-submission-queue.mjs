@@ -152,6 +152,44 @@ check('an admin gets the briefs', Object.keys((await get('admin@x', 'admin')).bo
     request: new Request('https://example.test/api/classes/NOPE/submission-queue') });
   check('an unknown class is 404', res.status, 404);
 }
+// A prompt written to the model ("The student wrote pseudocode ...") is never shown as the assignment:
+// the lesson's own description is (ux1 G5).
+check('PA part: the grader instructions are not the assignment', /^\s*The student\b/.test(A[PA].prompt), false);
+check('PA part: the lesson description is', /Pick one of four problems/.test(A[PA].prompt), true);
+check('no listed brief begins with the model-addressed "The student"', Object.values(A).some((b) => /^\s*The student\b/.test(b.prompt)), false);
+
+// ---- ?briefs= : the drawer's rubric lookup -----------------------------------
+async function briefs(q, email = 't@x', role = 'teacher') {
+  const res = await onRequestGet({ env: { DB: d1(db) }, data: { email, role }, params: { id: 'C1' },
+    request: new Request(`https://example.test/api/classes/C1/submission-queue?briefs=${encodeURIComponent(q)}`) });
+  return { status: res.status, body: await res.json() };
+}
+{
+  const b = await briefs(`${PA},${LAB},lab-x,__proto__`);
+  check('briefs: known lessons only, unknown and prototype names absent', Object.keys(b.body.assignments).sort(), [LAB, PA].sort());
+  check('briefs: no submissions in the answer', 'submissions' in b.body, false);
+  check('briefs: a student is refused', (await briefs(PA, 's1@x', 'student')).status, 403);
+  check('briefs: another class’s teacher is refused', (await briefs(PA, 'other@x', 'teacher')).status, 403);
+  check('briefs: at most 20 ids are looked up', Object.keys((await briefs(Array(30).fill(PA).map((p, i) => (i < 25 ? `x${i}` : p)).join(','))).body.assignments).length, 0);
+}
+
+// ---- one card per student and lesson, ordered by whether the score counts ----
+{
+  const F = JSON.stringify({ gradingFailed: true }), R = JSON.stringify({ results: [] });
+  const sub = (id, s, l, t, score, g = R) => ({ id, student_email: s, lesson_id: l, submitted_at: t, score, grade_json: g });
+  const cards = Q.collapseQueue([sub('a2', 'ben', 'pa', 12, 1.5), sub('a1', 'ben', 'pa', 11, 1.5), sub('d', 'dev', 'lab', 5, null, F), sub('q', 'ada', 'quiz', 9, 4)]);
+  check('collapse: two tries of one part are one card, the newest', cards.map((c) => [c.key, c.row.id, c.others]), [['ben|pa', 'a2', 1], ['dev|lab', 'd', 0], ['ada|quiz', 'q', 0]]);
+  const mixed = Q.collapseQueue([sub('new', 'ben', 'pa', 20, 2), sub('old', 'ben', 'pa', 10, null, F)]);
+  check('collapse: the hand-in that needs a human wins over a newer graded one', [mixed[0].row.id, mixed[0].others], ['old', 1]);
+  const counts = (c) => c.key !== 'dev|lab';
+  check('order: cards whose score does not count go last', Q.orderCards(cards, counts).map((c) => c.key), ['ben|pa', 'ada|quiz', 'dev|lab']);
+  const urgent = (c) => Q.needsHuman(c.row);
+  check('order: a card needing a score leads, counted before practice, then the rest',
+    Q.orderCards([...cards, { key: 'eli|lab2', row: sub('e', 'eli', 'lab2', 30, null, F) }], counts, [], urgent).map((c) => c.key),
+    ['eli|lab2', 'dev|lab', 'ben|pa', 'ada|quiz']);
+  check('order: a reload keeps the order on screen, new cards first',
+    Q.orderCards([...cards, { key: 'eli|x' }], () => true, ['dev|lab', 'ada|quiz', 'ben|pa']).map((c) => c.key), ['eli|x', 'dev|lab', 'ada|quiz', 'ben|pa']);
+}
 
 // ---- the pure ordering rules -----------------------------------------------
 const row = (id, t, score, g) => ({ id, submitted_at: t, score, grade_json: g });

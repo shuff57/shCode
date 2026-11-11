@@ -24,7 +24,7 @@
 // and deletes every child override in the same batch, which is why the API
 // takes an entries array rather than a single row.
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useFeedback } from './FeedbackProvider';
 import { Calendar, ChevronDown, ChevronRight, X } from 'lucide-react';
 import CalendarPopover from './CalendarPopover';
@@ -38,6 +38,7 @@ import {
   formatDueTime,
   moduleDueSummary,
   moduleIdFromTitle,
+  dateWindowProblem,
   resolveDueAt,
   schoolDateString,
   SCHOOL_TZ,
@@ -203,7 +204,8 @@ function DateTimeField({
   label: string;
   color: string;
   row: ApiDate | undefined;
-  onWrite: (date: string | null, time: string | null) => void;
+  /** Resolves true when the server now holds exactly what was sent. */
+  onWrite: (date: string | null, time: string | null) => Promise<boolean> | void;
   onClear?: () => void;
   ariaSuffix: string;
   /** Forwarded to the popover grid; set on available-after fields only. */
@@ -222,6 +224,61 @@ function DateTimeField({
   const time = row?.time ?? '';
   const [calOpen, setCalOpen] = useState(false);
   const dateRef = useRef<HTMLButtonElement>(null);
+  // ux1 G7: what is typed is a DRAFT until the field loses focus or Enter is pressed. A native date input
+  // reports a full date after every segment (1902-10-24 on the way to 10/24/2026) and an empty value while
+  // half typed, and each of those used to be saved (or delete the saved date). Null = show the saved value.
+  const [draftDate, setDraftDate] = useState<string | null>(null);
+  const [draftTime, setDraftTime] = useState<string | null>(null);
+  const [focused, setFocused] = useState(false);
+  const [problem, setProblem] = useState<string | null>(null);
+  const msgId = useId();
+  const shownDate = draftDate ?? date;
+  const shownTime = draftTime ?? time;
+
+  // Send one change; afterwards the field shows what the server holds, never a value it refused.
+  const commit = async (nextDate: string | null, nextTime: string | null) => {
+    if (nextDate !== null && nextDate !== date) {
+      const p = dateWindowProblem(nextDate, schoolDateString(Date.now()));
+      if (p) {
+        setProblem(p);
+        return;
+      }
+    }
+    setProblem(null);
+    const ok = await onWrite(nextDate, nextDate === null ? null : nextTime);
+    setDraftDate(null);
+    setDraftTime(null);
+    if (ok === false) setProblem('Not saved. The field shows the date that is saved.');
+  };
+
+  const commitDate = (el: HTMLInputElement) => {
+    if (el.validity.badInput) {
+      // Half typed: say so and keep the saved date; nothing is sent.
+      setProblem('Finish the date (month, day and year), or clear it. Nothing was saved.');
+      return;
+    }
+    if (draftDate === null) return;
+    if (draftDate === date) {
+      setDraftDate(null);
+      setProblem(null);
+      return;
+    }
+    // Clearing the date clears the whole row: there is no such thing as a time-only entry.
+    void commit(draftDate === '' ? null : draftDate, draftDate === '' ? null : time || null);
+  };
+
+  const commitTime = (el: HTMLInputElement) => {
+    if (draftTime === null || date === '') return;
+    if (el.validity.badInput) {
+      setProblem('Finish the time, or clear it. Nothing was saved.');
+      return;
+    }
+    if (draftTime === time) {
+      setDraftTime(null);
+      return;
+    }
+    void commit(date, draftTime === '' ? null : draftTime);
+  };
 
   if (mixed && !date) {
     return (
@@ -244,9 +301,11 @@ function DateTimeField({
     );
   }
 
+  // A pick from the calendar grid is a whole, deliberate date: it is sent at once.
   const pickFromGrid = (d: string) => {
     setCalOpen(false);
-    onWrite(d, time || null);
+    setDraftDate(null);
+    void commit(d, time || null);
   };
 
   return (
@@ -255,19 +314,34 @@ function DateTimeField({
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', boxSizing: 'border-box', maxWidth: '100%', padding: showLabel ? 0 : '0 0 0 12px', borderLeft: showLabel ? undefined : `1px solid ${C.border}` }}>
       {showLabel && <span style={{ fontFamily: 'var(--font-prose)', fontSize: 14, fontWeight: 600, flexBasis: '100%', color }}>{label}</span>}
       <span style={{ position: 'relative', display: 'inline-flex' }}>
-      {!date && <span aria-hidden="true" style={{ position: 'absolute', left: 7, top: 1, bottom: 1, right: 26, display: 'flex', alignItems: 'center', background: 'var(--c-deep2)', color: (mixed ? undefined : emptyColor) ?? C.dim, fontFamily: 'var(--font-prose)', fontSize: 15, fontWeight: emptyText && !mixed ? 600 : undefined, pointerEvents: 'none', zIndex: 1 }}>{(mixed ? undefined : emptyText) ?? 'Not set'}</span>}
+      {/* "Not set" covers an empty field only while it is not being typed in (ux1 G7). */}
+      {!shownDate && !focused && <span aria-hidden="true" style={{ position: 'absolute', left: 7, top: 1, bottom: 1, right: 26, display: 'flex', alignItems: 'center', background: 'var(--c-deep2)', color: (mixed ? undefined : emptyColor) ?? C.dim, fontFamily: 'var(--font-prose)', fontSize: 15, fontWeight: emptyText && !mixed ? 600 : undefined, pointerEvents: 'none', zIndex: 1 }}>{(mixed ? undefined : emptyText) ?? 'Not set'}</span>}
       <input
         type="date"
-        value={date}
+        value={shownDate}
         onChange={(e) => {
-          const value = e.target.value;
-          // Clearing the date clears the whole row — there is no such thing
-          // as a time-only entry.
-          onWrite(value === '' ? null : value, value === '' ? null : time || null);
+          setDraftDate(e.target.value);
+          setProblem(null);
+        }}
+        onFocus={() => setFocused(true)}
+        onBlur={(e) => {
+          setFocused(false);
+          commitDate(e.currentTarget);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            commitDate(e.currentTarget);
+          } else if (e.key === 'Escape' && draftDate !== null) {
+            setDraftDate(null);
+            setProblem(null);
+          }
         }}
         className="teacher-field dd-date"
-        style={date ? dateInput : { ...dateInput, ...emptyField }}
+        style={shownDate ? dateInput : { ...dateInput, ...emptyField }}
         aria-label={`${label} date for ${ariaSuffix}`}
+        aria-invalid={problem ? true : undefined}
+        aria-describedby={problem ? `${msgId}` : undefined}
       />
       <button
         ref={dateRef}
@@ -298,12 +372,21 @@ function DateTimeField({
       </span>
       <input
         type="time"
-        value={time}
+        value={shownTime}
         disabled={date === ''}
         onChange={(e) => {
-          const value = e.target.value;
           if (date === '') return;
-          onWrite(date, value === '' ? null : value);
+          setDraftTime(e.target.value);
+          setProblem(null);
+        }}
+        onBlur={(e) => commitTime(e.currentTarget)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            commitTime(e.currentTarget);
+          } else if (e.key === 'Escape' && draftTime !== null) {
+            setDraftTime(null);
+          }
         }}
         className="teacher-field"
         style={{ ...timeInput, ...(date === '' ? { ...emptyField, opacity: 0.75, cursor: 'not-allowed' } : {}) }}
@@ -314,6 +397,7 @@ function DateTimeField({
         <button
           type="button"
           title={`Clear this ${label.toLowerCase()} override — the lesson goes back to the module's date`}
+          aria-label={`Clear the ${label.toLowerCase()} date for ${ariaSuffix}`}
           onClick={onClear}
           style={{
             background: 'none', border: 'none', color: C.dim, cursor: 'pointer',
@@ -322,6 +406,9 @@ function DateTimeField({
         >
           <X size={14} />
         </button>
+      )}
+      {problem && (
+        <span id={msgId} role="alert" className="dd-date-msg">{problem}</span>
       )}
       {calOpen && (
         <CalendarPopover
@@ -463,11 +550,11 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
 
   // One write path for every edit. `date: null` deletes the row.
   const write = useCallback(
-    async (kind: Kind, entries: { scope: DueScope; scopeId: string; date: string | null; time?: string | null }[]) => {
-      if (entries.length === 0) return;
+    async (kind: Kind, entries: { scope: DueScope; scopeId: string; date: string | null; time?: string | null }[]): Promise<boolean> => {
+      if (entries.length === 0) return true;
       if (failedParts[kind]) {
         toast(`Not saved: the ${kind === 'due' ? 'due' : 'available-after'} dates did not load. Reload the page first.`, { kind: 'error' });
-        return;
+        return false;
       }
       setSaving(true);
       setError(null);
@@ -482,17 +569,32 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
           const body = (await res.json().catch(() => ({}))) as { error?: string };
           setError(body.error ?? `Save failed (HTTP ${res.status})`);
           toast(`Not saved: ${body.error ?? `HTTP ${res.status}`}`, { kind: 'error' });
-          return;
+          return false;
         }
         // Re-read rather than patch locally: the server owns the timezone
         // conversion, so the instant for a date we just sent is not ours to
         // guess. Only the kind we wrote is re-read — the other is untouched.
         const fresh = await fetchKind(kind);
         setDates((prev) => ({ ...prev, [kind]: fresh }));
-        toast(kind === 'due' ? 'Due date saved.' : 'Available-after date saved.');
+        // Only say "saved" for what the server now holds (ux1 G7): every dated entry must come back as sent.
+        const held = entries.every((e) => {
+          const r = fresh.find((f) => f.scope === e.scope && f.scopeId === e.scopeId);
+          return e.date === null ? !r : !!r && r.date === e.date && (!e.time || r.time === e.time);
+        });
+        const what = kind === 'due' ? 'Due date' : 'Available-after date';
+        if (!held) {
+          toast(`${what} not saved as typed. The field shows what is saved.`, { kind: 'error' });
+          return false;
+        }
+        const one = entries.length === 1 ? entries[0] : null;
+        toast(one && one.date === null
+          ? `${what} cleared.${one.scope === 'lesson' ? ' The lesson goes back to the module\u2019s date.' : ''}`
+          : `${what} saved.`);
+        return true;
       } catch {
         setError('Save failed — check your connection.');
         toast('Not saved: check your connection.', { kind: 'error' });
+        return false;
       } finally {
         setSaving(false);
       }
@@ -591,15 +693,16 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
             const settingDueAll = dueMixed && settingAll.has(`due:${mod.moduleId}`);
             // "Set one date for all" means what it says: the picked date becomes the module's date and every
             // lesson's own date of that kind is dropped, in one batch.
-            const setOneForAll = (kind: Kind, date: string | null, time: string | null) => {
-              if (date === null) return;
-              void write(kind, [
+            const setOneForAll = async (kind: Kind, date: string | null, time: string | null): Promise<boolean> => {
+              if (date === null) return false;
+              const ok = await write(kind, [
                 { scope: 'module', scopeId: mod.moduleId, date, time },
                 ...mod.lessons
                   .filter((l) => byKey[kind].has(`lesson:${l.id}`))
                   .map((l) => ({ scope: 'lesson' as DueScope, scopeId: l.id, date: null })),
               ]);
               toggleSettingAll(`${kind}:${mod.moduleId}`, false);
+              return ok;
             };
             // A module with its own date whose lessons still differ says so under its name, so the collapsed
             // row keeps one shape and the summary line only appears when the module is open.
@@ -658,8 +761,8 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                     color={C.open}
                     row={byKey.open.get(`module:${mod.moduleId}`)}
                     onWrite={(date, time) => {
-                      if (settingOpenAll) setOneForAll('open', date, time);
-                      else void write('open', [{ scope: 'module', scopeId: mod.moduleId, date, time }]);
+                      if (settingOpenAll) return setOneForAll('open', date, time);
+                      else return write('open', [{ scope: 'module', scopeId: mod.moduleId, date, time }]);
                     }}
                     ariaSuffix={`module ${mod.moduleId}`}
                     pastHint={OPEN_PAST_HINT}
@@ -675,8 +778,8 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                     mixed={dueMixed && !settingDueAll ? { lessonsShown: isOpen, onShowLessons: () => toggle(mod.moduleId) } : undefined}
                     row={byKey.due.get(`module:${mod.moduleId}`)}
                     onWrite={(date, time) => {
-                      if (settingDueAll) setOneForAll('due', date, time);
-                      else void write('due', [{ scope: 'module', scopeId: mod.moduleId, date, time }]);
+                      if (settingDueAll) return setOneForAll('due', date, time);
+                      else return write('due', [{ scope: 'module', scopeId: mod.moduleId, date, time }]);
                     }}
                     ariaSuffix={`module ${mod.moduleId}`}
                     showLabel={compact}
@@ -806,7 +909,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                             label="Available after"
                             color={C.open}
                             row={openRow}
-                            onWrite={(date, time) => { void write('open', [{ scope: 'lesson', scopeId: lesson.id, date, time }]); }}
+                            onWrite={(date, time) => write('open', [{ scope: 'lesson', scopeId: lesson.id, date, time }])}
                             onClear={() => { void write('open', [{ scope: 'lesson', scopeId: lesson.id, date: null }]); }}
                             ariaSuffix={fieldName}
                             pastHint={OPEN_PAST_HINT}
@@ -817,7 +920,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                             label="Due at"
                             color={C.dim}
                             row={dueRow}
-                            onWrite={(date, time) => { void write('due', [{ scope: 'lesson', scopeId: lesson.id, date, time }]); }}
+                            onWrite={(date, time) => write('due', [{ scope: 'lesson', scopeId: lesson.id, date, time }])}
                             onClear={() => { void write('due', [{ scope: 'lesson', scopeId: lesson.id, date: null }]); }}
                             ariaSuffix={fieldName}
                             showLabel={compact}

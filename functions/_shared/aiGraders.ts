@@ -24,6 +24,9 @@ export interface AiGraderConfig {
   rubric: RubricItem[];
   model?: string;
   contextDocs?: string[];
+  /** The lesson's description, kept only where `prompt` is addressed to the model ("The student wrote
+   *  ..."), so a teacher is shown the task rather than the grader's instructions (teacherBrief). */
+  brief?: string;
   /** Graded test part: the strict marking framing instead of the lenient default. */
   strict?: boolean;
   /**
@@ -77,11 +80,16 @@ export interface TeacherBrief {
 // Lab graders wrap the task in model instructions ("The task they were given: ... You cannot run their
 // code: ..."); the teacher needs the task, not the instructions.
 const TASK_RE = /The task they were given:\s*([\s\S]*?)\s*You cannot run their code/;
+// A prompt written TO the model about the student, not to the student.
+const MODEL_ADDRESSED_RE = /^\s*The student\b/;
 
 export function teacherBrief(cfg: AiGraderConfig | null): TeacherBrief | null {
   if (!cfg || typeof cfg.prompt !== 'string' || !Array.isArray(cfg.rubric)) return null;
   const task = cfg.prompt.match(TASK_RE)?.[1]?.trim();
-  const prompt = (task || cfg.prompt).trim();
+  // Never the grader's own instructions: a prompt addressed to the model ("The student wrote ...")
+  // is replaced by the lesson's description, or by nothing when there is none.
+  const toModel = MODEL_ADDRESSED_RE.test(cfg.prompt);
+  const prompt = (task || (toModel ? (typeof cfg.brief === 'string' ? cfg.brief : '') : cfg.prompt)).trim();
   const rubric: TeacherBriefCriterion[] = [];
   for (const r of cfg.rubric) {
     if (!r || typeof r.id !== 'string' || typeof r.title !== 'string') continue;

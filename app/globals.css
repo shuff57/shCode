@@ -4994,3 +4994,134 @@ input.dd-date { width: 152px; padding-right: 30px !important; }
 .gb-pager-step { font-size: 14px !important; font-weight: 600 !important; }
 .gb-toolbar .gb-toolbar-right > details > summary { font-size: 14px; font-weight: 600; }
 /* end climb4 r10 teacher */
+/* ux1 student */
+/* B1/B2 The "it worked" block (components/LessonOutcome.tsx): readings, quizzes, labs and written answers say
+   it the same way, with Next beside it. */
+.lesson-outcome {
+  display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; margin: 16px 0 12px; padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--c-green) 45%, transparent); border-left: 4px solid var(--c-green);
+  border-radius: 8px; background: color-mix(in srgb, var(--c-green) 7%, var(--c-bg));
+  font-family: var(--font-prose);
+}
+.lesson-outcome-icon { flex: 0 0 auto; }
+.lesson-outcome-text { flex: 1 1 260px; min-width: 0; }
+.lesson-outcome-title { margin: 0; min-height: 1.4em; font-size: 17px; font-weight: 700; color: var(--c-green); line-height: 1.4; }
+.lesson-outcome-detail { margin: 2px 0 0; font-size: 14px; line-height: 1.5; color: var(--c-meta); }
+.lesson-outcome .completion-next { flex: 0 1 auto; }
+.lesson-outcome-undo {
+  background: transparent; border: 0; color: var(--c-meta); text-decoration: underline; text-underline-offset: 3px;
+  cursor: pointer; padding: 8px 6px; font-size: 14px; min-height: 36px;
+}
+.lesson-outcome-undo:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; border-radius: 4px; }
+.editor-body > .lesson-outcome { margin: 0 0 10px; }
+.assignment-done-note { color: var(--c-green); font-family: var(--font-prose); font-size: 14px; font-weight: 600; white-space: nowrap; }
+/* B3 Quiz: the score sits in the sticky heading row; each marked question says Right / Not right yet. */
+.quiz-head-score {
+  display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 3px 10px; border-radius: 6px;
+  font-family: var(--font-prose); font-size: 14px; font-weight: 700; text-decoration: none;
+  border: 1px solid currentColor; background: var(--c-deep2);
+}
+.quiz-head-score.is-pass { color: var(--c-green); }
+.quiz-head-score.is-fail { color: var(--c-orange); }
+.quiz-head-when { font-family: var(--font-prose); font-size: 12px; font-weight: 500; color: var(--c-meta); }
+.quiz-q-verdict { margin-left: auto; flex: 0 0 auto; font-size: 13px; font-weight: 700; font-family: var(--font-prose); white-space: nowrap; padding-left: 8px; }
+.quiz-q-verdict.is-right { color: var(--c-green); }
+.quiz-q-verdict.is-wrong { color: var(--c-red); }
+.student-quiz .quiz-question-card { scroll-margin-top: 72px; }
+@media (max-width: 720px) {
+  .student-quiz > .quiz-head { position: sticky; top: 0; z-index: 6; background: var(--bg); padding: 6px 0; flex-wrap: wrap !important; }
+  .student-quiz > .quiz-head > .quiz-head-score { order: 5; flex: 1 1 100%; justify-content: flex-start; }
+  .student-quiz .quiz-question-card { scroll-margin-top: 96px; }
+}
+/* B3/B4 Labs: once checked, the "Check looks for" row is the result, with each red line's reason, when it ran,
+   and "Out of date" once the code changes. A phone shows it too (it used to be desktop-only). */
+.lab-check-tests.has-results { border-left-color: var(--c-cyan); }
+.lab-check-tests.has-results:has(li[data-status="failed"]) { border-left-color: var(--c-red); }
+.lab-check-item { display: flex; flex-direction: column; min-width: 0; }
+.lab-check-why { color: var(--c-meta); font-size: 13px; line-height: 1.45; }
+.lab-check-tests li[data-status="failed"] .lab-check-why { color: var(--x-ff7b7b, var(--c-red)); }
+.lab-check-when { font-size: 12px; color: var(--c-meta); white-space: nowrap; }
+.lab-check-tests.is-stale ul { opacity: 0.55; }
+.lab-check-tests.is-stale .lab-check-when { color: var(--c-orange); font-weight: 600; }
+.run-stamp { margin-left: 10px; font-family: var(--font-prose); font-size: 12px; font-weight: 500; color: var(--c-meta); }
+.run-stamp.is-stale { color: var(--c-orange); font-weight: 600; }
+.run-output.is-stale { opacity: 0.55; }
+#previewPane { position: relative; }
+.run-stamp-float { position: absolute; top: 6px; right: 8px; z-index: 2; margin: 0; padding: 2px 8px; border-radius: 4px; background: var(--c-deep2); border: 1px solid var(--c-line); }
+@media (max-width: 720px) {
+  .lab-check-tests.has-results { display: flex; }
+}
+/* B3 Written answer: what Submit and Save draft did, beside them. */
+.written-outcome { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-family: var(--font-prose); font-size: 14px; }
+.written-outcome:empty { display: none; }
+.written-outcome-busy { color: var(--c-cyan); font-weight: 600; }
+.written-outcome-result { font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.written-outcome-result.is-pass { color: var(--c-green); }
+.written-outcome-result.is-fail { color: var(--c-orange); }
+.written-outcome-result:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; border-radius: 3px; }
+.written-outcome-saved { color: var(--c-meta); font-size: 13px; }
+.written-feedback { scroll-margin-top: 16px; }
+/* end ux1 student */
+/* ux1 teacher */
+/* G1: the rubric as marks beside the score. */
+.sq-mark { border: 0; margin: 0; padding: 0; min-width: 0; font-family: var(--font-prose); container-type: inline-size; }
+.sq-mark-legend { padding: 0; font-size: 14px; font-weight: 600; color: var(--c-fg); margin-bottom: 4px; }
+.sq-mark-sub { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; font-size: 13px; line-height: 1.5; color: var(--c-meta); margin-bottom: 6px; }
+.sq-mark-total { color: var(--c-fg); font-weight: 600; font-variant-numeric: tabular-nums; }
+.sq-mark-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); column-gap: 20px; }
+@container (min-width: 480px) { .sq-mark-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.sq-mark-item { display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 1px solid color-mix(in srgb, var(--c-line) 50%, transparent); min-width: 0; }
+.sq-mark-check { width: 18px; height: 18px; margin: 1px 0 0; flex: 0 0 auto; accent-color: var(--c-cyan); cursor: pointer; }
+.sq-mark-check:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; }
+.sq-mark-stepper { display: inline-flex; align-items: center; gap: 4px; flex: 0 0 auto; }
+.sq-mark-of { font-size: 13px; color: var(--c-meta); font-variant-numeric: tabular-nums; }
+.sq-mark-label { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 auto; cursor: pointer; }
+.sq-mark-label .sq-rubric-title { font-weight: 500; font-size: 14px; line-height: 1.35; overflow-wrap: anywhere; }
+.sq-mark-meta { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 13px; color: var(--c-meta); }
+.sq-mark-ai.is-met { color: var(--c-green); }
+.sq-mark-ai.is-partial, .sq-mark-partial { color: var(--c-yellow); }
+.sq-mark-ai.is-missing { color: var(--c-orange); }
+.sq-mark-note { font-size: 13px; line-height: 1.45; color: var(--c-meta); }
+.sq-score-src { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; font-family: var(--font-prose); font-size: 13px; color: var(--c-meta); max-width: 240px; }
+.sq-score-use {
+  background: none; border: 0; padding: 2px 0; cursor: pointer; font-family: var(--font-prose); font-size: 13px;
+  color: var(--c-cyan); text-decoration: underline; text-underline-offset: 3px; white-space: nowrap;
+}
+.sq-score-use:hover { color: var(--c-fg); }
+.sq-score-use:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; border-radius: 3px; }
+.sq-keep { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+.sq-keep input { accent-color: var(--c-cyan); width: 16px; height: 16px; }
+.sq-keep-help { flex: 1 1 100%; margin: 0; font-family: var(--font-prose); font-size: 13px; line-height: 1.5; color: var(--c-meta); max-width: 70ch; }
+.sq-save-status:empty { display: none; }
+.sq-save-status:focus { outline: none; }
+.sq-save-status:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; border-radius: 3px; }
+/* In the student drawer (600px) the rubric sits above the score, not beside it. */
+.drawer-override { container-type: inline-size; }
+@container (max-width: 760px) {
+  .drawer-override .override-form.has-aside { display: flex !important; flex-direction: column; }
+  .drawer-override .override-form.has-aside .override-aside { padding-right: 0; }
+}
+/* G2, G4: the note kept with a score, and whether a score changes the grade. */
+.sq-teacher-note { font-family: var(--font-prose); font-size: 14px; line-height: 1.5; color: var(--c-fg); max-width: 80ch; overflow-wrap: anywhere; }
+.sq-teacher-note-label { font-weight: 700; color: var(--c-cyan); }
+.sq-weight-note { margin: 0; font-family: var(--font-prose); font-size: 14px; line-height: 1.5; color: var(--c-fg); max-width: 80ch; padding: 6px 10px; border-left: 3px solid var(--c-meta); background: color-mix(in srgb, var(--c-meta) 10%, transparent); border-radius: 2px; }
+.sq-weight-tag { font-family: var(--font-prose); font-size: 13px; color: var(--c-meta); border: 1px solid var(--c-line); border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
+/* G5: a quiz hand-in read as questions and answers. */
+.sq-quiz { list-style: decimal; margin: 0; padding: 0 0 0 22px; display: grid; gap: 6px; font-family: var(--font-prose); font-size: 14px; line-height: 1.45; color: var(--c-fg); max-height: 320px; overflow-y: auto; }
+.sq-quiz-row { min-width: 0; overflow-wrap: anywhere; }
+.sq-quiz-q { display: block; }
+.sq-quiz-a { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--c-meta); font-size: 13px; }
+.sq-quiz-ok, .sq-quiz-no { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; }
+.sq-quiz-ok { color: var(--c-green); }
+.sq-quiz-no { color: var(--c-red); }
+/* G6: reopen a quiz from its card. */
+.sq-reopen {
+  margin-top: 10px; background: none; border: 1px solid var(--c-orange); color: var(--c-orange); border-radius: 4px;
+  padding: 4px 10px; font-family: var(--font-prose); font-size: 13px; cursor: pointer;
+}
+.sq-reopen:hover { background: color-mix(in srgb, var(--c-orange) 12%, transparent); }
+.sq-reopen:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; }
+.sq-reopen:disabled { opacity: 0.6; cursor: not-allowed; }
+/* G7: a date field that refused what was typed. */
+.dd-date-msg { flex: 1 1 100%; font-family: var(--font-prose); font-size: 13px; line-height: 1.4; color: var(--c-orange); }
+/* end ux1 teacher */

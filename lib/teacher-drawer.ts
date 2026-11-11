@@ -175,3 +175,108 @@ export const CODE_PREVIEW_SET: ReadonlySet<string> = new Set(['console', 'exampl
 export function opensInCodeEditor(preview: string | null | undefined): boolean {
   return CODE_PREVIEW_SET.has(preview ?? '');
 }
+
+// ---------------------------------------------------------------------------
+// Does a teacher's score on this lesson change the grade? (review queue and drawer, one wording)
+// ---------------------------------------------------------------------------
+
+/**
+ * What a teacher's score on a lesson does to the course grade, from the same manifest fields the grade
+ * itself reads (lessonGradeCategory for "counts at all", maxScore for "the score is the percent"):
+ *  - 'counts':    the score is the lesson's percent (score / maxScore).
+ *  - 'done-only': the lesson counts, but as done or not done: lessonPercent() gives 100 once it is
+ *                 completed whatever the score, because it has no maximum (a 0-point lab).
+ *  - 'practice':  the lesson has no grade category and does not count at all.
+ * Null when the lesson is not in the manifest (nothing to say, so say nothing).
+ */
+export type ScoreWeight = 'counts' | 'done-only' | 'practice';
+
+export function scoreWeight(meta: { counts: boolean; maxScore?: number | null } | null | undefined): ScoreWeight | null {
+  if (!meta) return null;
+  if (!meta.counts) return 'practice';
+  return typeof meta.maxScore === 'number' && meta.maxScore > 0 ? 'counts' : 'done-only';
+}
+
+/** The one sentence both the queue card and the drawer show; null when the score counts as usual. */
+export function scoreWeightNote(w: ScoreWeight | null): string | null {
+  if (w === 'practice') return 'Practice: this lesson does not count toward the grade. Your score is kept for your records only.';
+  if (w === 'done-only') return 'Your score does not change the grade: this lab counts as 100% once it is done, whatever the score.';
+  return null;
+}
+
+/** The short tag for a card header. */
+export function scoreWeightTag(w: ScoreWeight | null): string | null {
+  if (w === 'practice') return 'Practice, not graded';
+  if (w === 'done-only') return 'Score does not change the grade';
+  return null;
+}
+
+/** "7 / 10" whenever a maximum is known; "7 (no maximum set)" when nothing says what it is out of. */
+export function scoreOutOf(score: number | null | undefined, max: number | null | undefined): string {
+  const s = typeof score === 'number' && Number.isFinite(score) ? String(Math.round(score * 100) / 100) : 'no score';
+  if (typeof max === 'number' && Number.isFinite(max) && max > 0) return `${s} / ${max}`;
+  return typeof score === 'number' ? `${s} (no maximum set)` : s;
+}
+
+// ---------------------------------------------------------------------------
+// A quiz hand-in, as the teacher reads it
+// ---------------------------------------------------------------------------
+
+export interface QuizAnswerRow {
+  id: string;
+  /** The question's text, or the id in words when the page has no text for it. */
+  question: string;
+  /** "Choice B", or "No answer". The options' text is not available to the teacher's page. */
+  chosen: string;
+  /** Right or wrong when the stored grade says; null when the hand-in carried no key. */
+  correct: boolean | null;
+}
+
+function choiceName(picked: unknown): string {
+  if (typeof picked === 'number' && Number.isInteger(picked) && picked >= 0) {
+    return picked < 26 ? `Choice ${String.fromCharCode(65 + picked)}` : `Choice ${picked + 1}`;
+  }
+  if (typeof picked === 'string' && picked.trim()) return picked.trim().slice(0, 200);
+  return 'No answer';
+}
+
+/**
+ * A quiz hand-in as question / chosen answer / right or wrong. The stored grade's `quiz` list is the
+ * source (one { id, picked, correct? } per question, in the quiz's order); the response's `answers`
+ * map fills in a pick the grade lacks. Returns null when the grade is not a quiz.
+ */
+export function quizAnswerRows(
+  gradeJson: string | null | undefined,
+  response: string | null | undefined,
+  stems: Readonly<Record<string, string>> | null | undefined,
+): QuizAnswerRow[] | null {
+  let grade: unknown;
+  try {
+    grade = gradeJson ? JSON.parse(gradeJson) : null;
+  } catch {
+    return null;
+  }
+  const quiz = grade && typeof grade === 'object' ? (grade as { quiz?: unknown }).quiz : undefined;
+  if (!Array.isArray(quiz)) return null;
+  let answers: Record<string, unknown> = {};
+  try {
+    const a = response ? (JSON.parse(response) as { answers?: unknown })?.answers : null;
+    if (a && typeof a === 'object') answers = a as Record<string, unknown>;
+  } catch {
+    answers = {};
+  }
+  const out: QuizAnswerRow[] = [];
+  for (const q of quiz.slice(0, 200)) {
+    if (!q || typeof q !== 'object' || typeof (q as { id?: unknown }).id !== 'string') continue;
+    const k = q as { id: string; picked?: unknown; correct?: unknown };
+    const picked = k.picked !== undefined && k.picked !== null ? k.picked : answers[k.id];
+    const stem = stems && Object.prototype.hasOwnProperty.call(stems, k.id) ? stems[k.id] : '';
+    out.push({
+      id: k.id,
+      question: stem || k.id.replace(/^q\d+[-_]?/i, '').replace(/[-_]+/g, ' ').trim() || k.id,
+      chosen: choiceName(picked),
+      correct: k.correct === true ? true : k.correct === false ? false : null,
+    });
+  }
+  return out;
+}

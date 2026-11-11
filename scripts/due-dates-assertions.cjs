@@ -27,6 +27,7 @@ const {
   dueStatus,
   isPastDue,
   isAvailable,
+  dateWindowProblem,
 } = require(LIB + '/due-dates-core.js');
 
 let fails = 0;
@@ -338,6 +339,23 @@ const openSummary = moduleDueSummary(openIndex, '1.1', ['1-1-4-sdlc-overview', '
 eq('a module with one overridden child is mixed', openSummary.kind, 'mixed');
 eq('and it counts the override', openSummary.overrides, 1);
 eq('and it reports the module row it would apply', openSummary.ownDueAt, 200);
+
+// ---------------------------------------------------------------------------
+// The schedule panel's sane-date window (ux1 G7): typing passes through 1902-10-24 and 10/30/1906 on the
+// way to the date meant; none of them may be saved.
+const TODAY = '2026-11-11';
+eq('a date this school year is fine', dateWindowProblem('2026-11-20', TODAY), null);
+eq('today is fine', dateWindowProblem(TODAY, TODAY), null);
+eq('exactly a year back is fine', dateWindowProblem('2025-11-11', TODAY), null);
+eq('exactly two years ahead is fine', dateWindowProblem('2028-11-11', TODAY), null);
+eq('1902 is refused', typeof dateWindowProblem('1902-10-24', TODAY), 'string');
+eq('1906 is refused, and says to check the year', /check the year/.test(dateWindowProblem('1906-10-30', TODAY) || ''), true);
+eq('a day past the year back is refused', typeof dateWindowProblem('2025-11-10', TODAY), 'string');
+eq('a day past two years ahead is refused', typeof dateWindowProblem('2028-11-12', TODAY), 'string');
+eq('year 20262 is refused', typeof dateWindowProblem('20262-01-01', TODAY), 'string');
+eq('February 30 is not a real date', dateWindowProblem('2027-02-30', TODAY), 'That is not a real date.');
+eq('an empty value is not a whole date', /whole date/.test(dateWindowProblem('', TODAY) || ''), true);
+eq('a leap day in a leap year is fine', dateWindowProblem('2028-02-29', TODAY), null);
 
 // ---------------------------------------------------------------------------
 console.log('');

@@ -1,7 +1,7 @@
 'use client';
 
 import { lessonLabel } from '../lib/lesson-title-order';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { CircleCheck, CircleX } from 'lucide-react';
 import { parseDiagramArtifact, parseDiagramGrade, parseDiagramResponse } from '../lib/diagram-submission';
@@ -11,6 +11,21 @@ import { diagramFrameHeight } from '../lib/diagram-types';
 import SubmissionBoundary from './SubmissionBoundary';
 import PlanCheckPanel from './PlanCheckPanel';
 import { useFeedback } from './FeedbackProvider';
+import {
+  buildMarkCriteria,
+  clampMark,
+  controlFor,
+  criterionMax,
+  initialMarks,
+  rubricFitsForm,
+  rubricTotal,
+  scoreSourceText,
+  type MarkCriterion,
+  type ScoreSource,
+} from '../lib/rubric-mark';
+import { quizAnswerRows, scoreOutOf, scoreWeightNote, scoreWeightTag, type ScoreWeight } from '../lib/teacher-drawer';
+import { readTeacherNotes } from '../lib/gradebook-cell';
+import { collapseQueue, needsHuman, orderCards } from '../lib/submission-queue-order';
 
 // Only pulled in when a flowchart submission is actually on screen — a class
 // with no diagram assignments never downloads React Flow.
@@ -78,6 +93,10 @@ interface Props {
   classId: string;
   /** lesson id -> title, so a row says "3.3.14 Filter" rather than a folder id. */
   lessonTitles?: Record<string, string>;
+  /** lesson id -> whether a teacher's score on it changes the grade (lib/teacher-drawer.ts scoreWeight). */
+  lessonWeights?: Record<string, ScoreWeight>;
+  /** Called after a score is saved or a quiz reopened, so the page can update its "to grade" count at once. */
+  onGraded?: () => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -139,15 +158,6 @@ function parseFailedGrade(raw: string): FailedGrade | null {
   }
 }
 
-/** A multiple-choice quiz stores its per-question picks under `quiz` (the same test the student drawer uses). */
-function isQuizGrade(raw: string): boolean {
-  try {
-    return Array.isArray((JSON.parse(raw) as { quiz?: unknown })?.quiz);
-  } catch {
-    return false;
-  }
-}
-
 /** A console code lab saves the workspace's GradeReport: one `results` entry per requirement, passed or failed.
  *  Nothing AI scored it, so the row says how many checks passed instead of "AI score: 0 / 0". */
 function labChecks(raw: string): { passed: number; total: number } | null {
@@ -190,12 +200,18 @@ interface OverrideFormProps {
    *  extra credit is allowed, the mark simply becomes the score, and there is no choice to clear (the
    *  server 400s a clear there), so neither the box nor the clear button is shown. */
   enforceMax?: boolean;
-  /** Shown to the LEFT of the score and feedback (climb4 r7 T4): the compact rubric on a submission that
-   *  needs a manual grade, so the criteria and the score are read together. */
+  /** Shown to the LEFT of the score and feedback (climb4 r7 T4). Ignored when `criteria` gives a rubric to mark. */
   aside?: React.ReactNode;
-  /** A 0-point part (no criteria, no points): the mark is recorded for the teacher and the course
-   *  grade does not change (the lab counts as done at 100%). */
+  /** A 0-point part (no criteria, no points). Kept for callers; the sentence about the grade is `weightNote`. */
   zeroPoint?: boolean;
+  /** The rubric to mark, with the AI's verdicts where the stored grade has them (ux1 G1). Marking fills the
+   *  score with the total. Shown only when the rubric's maximum is what the score is out of. */
+  criteria?: MarkCriterion[];
+  /** The teacher's score already saved on this hand-in, and their note: the form opens on them. */
+  savedScore?: number | null;
+  savedFeedback?: string | null;
+  /** The plain sentence when this score does not change the grade (scoreWeightNote), shown above the fields. */
+  weightNote?: string | null;
   onOverride: () => void;
 }
 
@@ -206,15 +222,163 @@ function markUnit(g: GradeJson | null): { total: number } | null {
   return { total: g.criteria.length };
 }
 
-export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = null, enforceMax = false, zeroPoint = false, aside, onOverride }: OverrideFormProps) {
-  // The queue reloads after a save and unmounts this form, taking its inline message with it; a toast survives that.
+function verdictLabel(v: string | null | undefined): string {
+  return v === 'met' ? 'Met' : v === 'partial' ? 'Partly met' : v === 'missing' ? 'Not met' : '';
+}
+
+/**
+ * The rubric as controls (ux1 G1): a checkbox for an all-or-nothing criterion (half-ticked when it is
+ * partly met), a number stepper for one worth more than a point. Space toggles a box; Tab moves on.
+ */
+function RubricMarker({
+  criteria,
+  marks,
+  onMark,
+  aiMarked,
+  formId,
+}: {
+  criteria: MarkCriterion[];
+  marks: Record<string, number>;
+  onMark: (id: string, value: number) => void;
+  aiMarked: boolean;
+  formId: string;
+}) {
+  const [details, setDetails] = useState(false);
+  const hasDetails = criteria.some((c) => c.aiFeedback);
+  const listId = `sq-mark-${formId}`;
+  const each = criteria.length > 1 && criteria.every((c) => criterionMax(c) === criterionMax(criteria[0])) ? criteria[0].points : null;
+  const { total, marked, max } = rubricTotal(criteria, marks);
+  return (
+    <fieldset className="sq-mark">
+      <legend className="sq-mark-legend">
+        Rubric
+        <span className="sq-assignment-meta">
+          {` · ${criteria.length} criteri${criteria.length === 1 ? 'on' : 'a'}`}
+          {each !== null ? (each > 0 ? `, ${each} point${each === 1 ? '' : 's'} each` : ', each met or not met') : `, ${max} points`}
+        </span>
+      </legend>
+      <div className="sq-mark-sub">
+        <span>
+          {aiMarked ? 'Marked from the AI grader’s verdicts. Change any you disagree with.' : 'Tick what the answer does. The score adds itself up.'}
+        </span>
+        <span className="sq-mark-total" aria-live="polite">
+          {marked > 0 ? `Adds up to ${total} of ${max}` : ''}
+        </span>
+        {hasDetails && (
+          <button type="button" className="sq-rubric-compact-toggle" aria-expanded={details} aria-controls={listId} onClick={() => setDetails((v) => !v)}>
+            {details ? 'Hide AI notes' : 'Show AI notes'}
+          </button>
+        )}
+      </div>
+      <ol id={listId} className="sq-mark-list">
+        {criteria.map((c) => {
+          const m = marks[c.id];
+          const cmax = criterionMax(c);
+          const inputId = `${listId}-${c.id}`;
+          const ai = c.aiVerdict ? verdictLabel(c.aiVerdict) : '';
+          return (
+            <li key={c.id} className="sq-mark-item">
+              {controlFor(c) === 'check' ? (
+                <input
+                  id={inputId}
+                  type="checkbox"
+                  className="sq-mark-check"
+                  checked={m === cmax}
+                  ref={(el) => {
+                    if (el) el.indeterminate = typeof m === 'number' && m > 0 && m < cmax;
+                  }}
+                  onChange={() => onMark(c.id, m === cmax ? 0 : cmax)}
+                />
+              ) : (
+                <span className="sq-mark-stepper">
+                  <input
+                    id={inputId}
+                    type="number"
+                    min={0}
+                    max={cmax}
+                    step={0.5}
+                    value={typeof m === 'number' ? m : ''}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (v === '') return;
+                      onMark(c.id, clampMark(c, Number(v)));
+                    }}
+                    className="teacher-field"
+                    style={{ ...FIELD, width: 56, height: 30, padding: '2px 6px', fontVariantNumeric: 'tabular-nums' }}
+                  />
+                  <span className="sq-mark-of">/ {cmax}</span>
+                </span>
+              )}
+              <label htmlFor={inputId} className="sq-mark-label">
+                <span className="sq-rubric-title">
+                  {c.title}
+                  {c.required && <span className="sq-rubric-required">Required</span>}
+                </span>
+                <span className="sq-mark-meta">
+                  {each === null && controlFor(c) === 'check' && <span>{c.points > 0 ? `${c.points} pt` : 'met / not'}</span>}
+                  {typeof m === 'number' && m > 0 && m < cmax && controlFor(c) === 'check' && <span className="sq-mark-partial">partly met</span>}
+                  {ai && <span className={`sq-mark-ai is-${c.aiVerdict}`}>AI: {ai}</span>}
+                </span>
+                {details && c.aiFeedback && <span className="sq-mark-note">{c.aiFeedback}</span>}
+              </label>
+            </li>
+          );
+        })}
+      </ol>
+    </fieldset>
+  );
+}
+
+export function OverrideForm({
+  classId,
+  submissionId,
+  unitTotal,
+  pointsMax = null,
+  enforceMax = false,
+  aside,
+  criteria,
+  savedScore = null,
+  savedFeedback = null,
+  weightNote = null,
+  onOverride,
+}: OverrideFormProps) {
+  // A toast survives a reload of the list; the inline status below is where focus goes after a save.
   const { toast } = useFeedback();
-  const [score, setScore] = useState('');
-  const [feedback, setFeedback] = useState('');
+  const formMax = unitTotal ?? pointsMax ?? null;
+  const rubric = criteria && rubricFitsForm(criteria, formMax) ? criteria : null;
+  const [marks, setMarks] = useState<Record<string, number>>(() => (rubric ? initialMarks(rubric) : {}));
+  const aiMarked = !!rubric && rubric.some((c) => !!c.aiVerdict);
+  const [score, setScore] = useState(savedScore !== null && savedScore !== undefined ? String(savedScore) : '');
+  const [source, setSource] = useState<ScoreSource>(savedScore !== null && savedScore !== undefined ? 'saved' : 'empty');
+  const [feedback, setFeedback] = useState(savedFeedback ?? '');
   // Capped parts only: the box is not rendered elsewhere (the server ignores it there anyway).
   const [replaceBest, setReplaceBest] = useState(false);
+  const [whatIsThis, setWhatIsThis] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [msg, setMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const statusRef = useRef<HTMLSpanElement>(null);
+  const sum = rubric ? rubricTotal(rubric, marks) : null;
+
+  // Focus the result line once it says what happened, so a keyboard or screen reader user is not dropped on <body>.
+  useEffect(() => {
+    if (msg) statusRef.current?.focus();
+  }, [msg]);
+
+  function mark(id: string, value: number) {
+    const next = { ...marks, [id]: value };
+    setMarks(next);
+    // A hand-typed score wins: marking after typing leaves the typed number and says what the rubric adds up to.
+    if (source !== 'hand' && rubric) {
+      setScore(String(rubricTotal(rubric, next).total));
+      setSource('rubric');
+    }
+  }
+
+  function applyRubricTotal() {
+    if (!sum) return;
+    setScore(String(sum.total));
+    setSource('rubric');
+  }
 
   // Drop a "use this as the score" choice made earlier: the part goes back to the best its rows give.
   async function handleClear() {
@@ -228,8 +392,8 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
         body: JSON.stringify({ submissionId, clearOverride: true }),
       });
       if (!res.ok) throw new Error(await errorText(res));
-      setMsg({ type: 'success', text: 'Cleared. The score is now the student\u2019s best again.' });
-      toast('Cleared. The score is now the student\u2019s best again.');
+      setMsg({ type: 'success', text: 'Cleared. The score is now the student’s best again.' });
+      toast('Cleared. The score is now the student’s best again.');
       onOverride();
     } catch (err) {
       setMsg({ type: 'error', text: err instanceof Error ? err.message : 'Clear failed' });
@@ -240,6 +404,10 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
 
   async function handleOverride(e: React.FormEvent) {
     e.preventDefault();
+    if (score.trim() === '') {
+      setMsg({ type: 'error', text: rubric ? 'Mark the rubric or type a score first.' : 'Type a score first.' });
+      return;
+    }
     const parsedScore = Number(score);
     if (isNaN(parsedScore) || parsedScore < 0) {
       setMsg({ type: 'error', text: 'Enter a valid score.' });
@@ -258,11 +426,7 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
     setMsg(null);
 
     try {
-      // The path takes the CLASS id and the body uses the endpoint's own field
-      // names. Both were wrong here: the submission id was being interpolated
-      // as the class id, and {id, overrideScore, overrideFeedback} does not
-      // match the {submissionId, score, feedback} the handler validates — so
-      // every override 400'd or 404'd and no teacher could correct a grade.
+      // The path takes the CLASS id and the body uses the endpoint's own field names.
       const res = await fetch(`/api/classes/${encodeURIComponent(classId)}/submission-queue`, {
         method: 'POST',
         credentials: 'same-origin',
@@ -270,7 +434,7 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
         body: JSON.stringify({
           submissionId,
           score: parsedScore,
-          feedback: feedback || undefined,
+          feedback: feedback.trim() || undefined,
           replaceBest: replaceBest || undefined,
         }),
       });
@@ -280,13 +444,16 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
       }
 
       const out = (await res.json().catch(() => null)) as { overrideActive?: boolean; stateScore?: number } | null;
+      const outOf = formMax !== null ? ` / ${formMax}` : '';
+      const kept = out && out.overrideActive && !replaceBest;
       setMsg({
         type: 'success',
-        text: out && out.overrideActive && !replaceBest
-          ? `Saved on this try. A score you set earlier is still in force (${out.stateScore}); tick the box to change it.`
-          : 'Grade overridden successfully.',
+        text: kept
+          ? `Saved ${parsedScore}${outOf} on this try. A score you set earlier is still in force (${out!.stateScore}); tick the box to change it.`
+          : `Saved: ${parsedScore}${outOf}${feedback.trim() ? ', with your note' : ''}.`,
       });
-      toast(out && out.overrideActive && !replaceBest ? 'Saved on this try. An earlier score is still in force.' : 'Score saved.');
+      setSource('saved');
+      toast(kept ? 'Saved on this try. An earlier score is still in force.' : 'Score saved.');
       onOverride();
     } catch (err) {
       setMsg({ type: 'error', text: err instanceof Error ? err.message : 'Override failed' });
@@ -295,8 +462,10 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
     }
   }
 
-  // Save comes last, after every field it saves (score, feedback, and on a capped part the
-  // keep-this-score choice). Without that choice it ends the score/feedback row on a wide form.
+  const sourceText = scoreSourceText(source, sum ? { total: sum.total, marked: sum.marked, count: rubric!.length } : null);
+  const aiSum = aiMarked && source === 'empty' && sum ? sum.total : null;
+
+  // Save sits right under the fields (score, feedback, and on a capped part the short keep-this-score choice).
   const actions = (
     <div className="override-actions" style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
       <button
@@ -329,16 +498,21 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
       </button>
       )}
 
-      {msg && (
-        <span style={{ fontFamily: 'var(--font-prose)', fontSize: 14, color: msg.type === 'success' ? 'var(--c-green)' : 'var(--c-red)' }}>
-          {msg.text}
-        </span>
-      )}
+      <span
+        ref={statusRef}
+        tabIndex={-1}
+        role={msg?.type === 'error' ? 'alert' : 'status'}
+        className="sq-save-status"
+        style={{ fontFamily: 'var(--font-prose)', fontSize: 14, color: msg?.type === 'success' ? 'var(--c-green)' : 'var(--c-red)' }}
+      >
+        {msg?.text ?? ''}
+      </span>
     </div>
   );
 
   const body = (
     <>
+      {weightNote && <p role="note" className="sq-weight-note">{weightNote}</p>}
       <div className="override-fields">
       <div className="override-score" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6 }}>
         <label htmlFor={`override-score-${submissionId}`} style={FIELD_LABEL}>
@@ -346,9 +520,7 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
             ? `New mark (criteria met, out of ${unitTotal}):`
             : pointsMax !== null
               ? `New score (points, out of ${pointsMax}):`
-              : zeroPoint
-                ? 'New mark (0-point lab: recorded for you, does not change the course grade):'
-                : 'New score:'}
+              : 'New score:'}
         </label>
         <input
           id={`override-score-${submissionId}`}
@@ -357,7 +529,11 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
           max={enforceMax ? unitTotal ?? pointsMax ?? undefined : undefined}
           step={0.5}
           value={score}
-          onChange={(e) => setScore(e.target.value)}
+          onChange={(e) => {
+            setScore(e.target.value);
+            setSource(e.target.value === '' ? 'empty' : 'hand');
+          }}
+          aria-describedby={`override-src-${submissionId}`}
           className="teacher-field"
           style={{
             ...FIELD,
@@ -367,11 +543,19 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
             fontVariantNumeric: 'tabular-nums',
           }}
         />
+        <span id={`override-src-${submissionId}`} className="sq-score-src">
+          {aiSum !== null ? `The AI’s marks add up to ${aiSum}` : sourceText}
+          {rubric && sum && sum.marked > 0 && (source === 'hand' || source === 'saved' || source === 'empty') && Number(score) !== sum.total && (
+            <button type="button" className="sq-score-use" onClick={applyRubricTotal}>
+              Use {sum.total}
+            </button>
+          )}
+        </span>
       </div>
 
       <div className="override-feedback" style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
         <label htmlFor={`override-feedback-${submissionId}`} style={FIELD_LABEL}>
-          Feedback (optional):
+          Note to the student (optional):
         </label>
         <textarea
           id={`override-feedback-${submissionId}`}
@@ -396,25 +580,39 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
       </div>
 
       {enforceMax && (
-        <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.5, color: 'var(--c-meta)', maxWidth: '70ch' }}>
-          <input type="checkbox" style={{ marginTop: 4, flexShrink: 0 }} checked={replaceBest} onChange={(e) => setReplaceBest(e.target.checked)} />
-          Use this as the student&apos;s score even if it is lower than their best try (otherwise the higher one is kept on a part with a try limit). This stays until you change or clear it; the student&apos;s later tries do not undo it.
-        </label>
+        <div className="sq-keep">
+          <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-prose)', fontSize: 14, color: 'var(--c-fg)' }}>
+            <input type="checkbox" checked={replaceBest} onChange={(e) => setReplaceBest(e.target.checked)} />
+            Use this score even if it is lower than their best try
+          </label>
+          <button type="button" className="sq-score-use" aria-expanded={whatIsThis} aria-controls={`keep-help-${submissionId}`} onClick={() => setWhatIsThis((v) => !v)}>
+            What is this?
+          </button>
+          {whatIsThis && (
+            <p id={`keep-help-${submissionId}`} className="sq-keep-help">
+              On a part with a try limit the higher of your score and the student&apos;s best try is kept, so your
+              score never lowers it. Tick this to make your score the one that counts, lower or not. It stays until
+              you change it or press Clear my score choice; the student&apos;s later tries do not undo it.
+            </p>
+          )}
+        </div>
       )}
 
       {enforceMax && actions}
     </>
   );
 
+  const left = rubric ? <RubricMarker criteria={rubric} marks={marks} onMark={mark} aiMarked={aiMarked} formId={submissionId} /> : aside;
+
   return (
     <form
       onSubmit={handleOverride}
-      className={aside ? 'override-form has-aside' : 'override-form'}
+      className={left ? 'override-form has-aside' : 'override-form'}
       style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--c-line)' }}
     >
-      {aside ? (
+      {left ? (
         <>
-          <div className="override-aside">{aside}</div>
+          <div className="override-aside">{left}</div>
           <div className="override-main">{body}</div>
         </>
       ) : body}
@@ -535,16 +733,29 @@ function RubricCompact({ brief, submissionId }: { brief: AssignmentBrief; submis
 // Main component
 // ---------------------------------------------------------------------------
 
-export function SubmissionQueue({ classId, lessonTitles }: Props) {
+export function SubmissionQueue({ classId, lessonTitles, lessonWeights, onGraded }: Props) {
+  const { confirm, toast } = useFeedback();
   const [submissions, setSubmissions] = useState<SubmissionItem[]>([]);
   const [assignments, setAssignments] = useState<Record<string, AssignmentBrief>>({});
-  const [loading, setLoading] = useState(true);
+  const [quizStems, setQuizStems] = useState<Record<string, Record<string, string>>>({});
+  const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [reopening, setReopening] = useState<string | null>(null);
+  // The card order the teacher is looking at: a reload after a save keeps it, so the card just graded
+  // does not jump down the list and the next one does not slide up under the cursor (ux1 G3).
+  const orderRef = useRef<string[]>([]);
+
+  useEffect(() => {
+    let live = true;
+    fetch('/quiz-stems.json').then((r) => (r.ok ? r.json() : null)).catch(() => null).then((d) => {
+      if (live && d && typeof d === 'object') setQuizStems(d as Record<string, Record<string, string>>);
+    });
+    return () => { live = false; };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
-    setLoading(true);
     setError(null);
 
     fetch(`/api/classes/${encodeURIComponent(classId)}/submission-queue`, {
@@ -565,7 +776,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
         if (mounted) setError(err.message);
       })
       .finally(() => {
-        if (mounted) setLoading(false);
+        if (mounted) setLoaded(true);
       });
 
     return () => {
@@ -575,9 +786,37 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
 
   function handleOverride() {
     setRefreshKey((k) => k + 1);
+    onGraded?.();
   }
 
-  if (loading) {
+  // Reopen a quiz from its card (ux1 G6): the same route and the same rules as the drawer's.
+  async function reopenQuiz(sub: SubmissionItem, title: string, handIns: number) {
+    const ok = await confirm({
+      title: `Reopen "${title}" for ${sub.student_email}?`,
+      message: `${handIns > 1 ? `All ${handIns} of their hand-ins` : 'Their hand-in'} of this quiz and its score are removed.\nTheir answers are kept, so they can change them and hand it in again.`,
+      confirmLabel: 'Reopen quiz',
+      danger: true,
+    });
+    if (!ok) return;
+    setReopening(sub.id);
+    try {
+      const res = await fetch(`/api/classes/${encodeURIComponent(classId)}/lesson-unsubmit`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ studentEmail: sub.student_email, lessonId: sub.lesson_id }),
+      });
+      if (!res.ok) throw new Error(await errorText(res));
+      toast(`Reopened "${title}" for ${sub.student_email}. They can change their answers and hand it in again.`);
+      handleOverride();
+    } catch (err) {
+      toast(`Could not reopen the quiz: ${err instanceof Error ? err.message : 'network error'}. Nothing changed.`, { kind: 'error' });
+    } finally {
+      setReopening(null);
+    }
+  }
+
+  if (!loaded) {
     return (
       <div style={{ color: 'var(--c-meta)', fontStyle: 'italic', padding: 16, fontFamily: 'var(--font-prose)', fontSize: 14 }}>
         Loading submission queue...
@@ -585,7 +824,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
     );
   }
 
-  if (error) {
+  if (error && submissions.length === 0) {
     return (
       <div style={{ color: 'var(--c-red)', padding: 16, fontFamily: 'var(--font-prose)', fontSize: 14 }}>
         Failed to load: {error}
@@ -601,22 +840,31 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
     );
   }
 
-  // Ungraded attempts are the ones with a deadline attached — a student is
-  // waiting on a human for these — so say how many there are rather than making
-  // a teacher spot orange badges down a list of fifty.
-  const needsManual = submissions.filter(
-    (s) => parseFailedGrade(s.grade_json) && s.score === null,
-  ).length;
+  // One card per student and lesson (ux1 G5), the ones whose score changes the grade first (ux1 G4).
+  const weightOf = (lessonId: string): ScoreWeight | null =>
+    lessonWeights && Object.prototype.hasOwnProperty.call(lessonWeights, lessonId) ? lessonWeights[lessonId] : null;
+  const counts = (c: { row: SubmissionItem }) => {
+    const w = weightOf(c.row.lesson_id);
+    return w === null || w === 'counts';
+  };
+  const cards = orderCards(collapseQueue(submissions), counts, orderRef.current, (c) => needsHuman(c.row));
+  orderRef.current = cards.map((c) => c.key);
+  const needsManual = cards.filter((c) => needsHuman(c.row)).length;
+  const later = cards.filter((c) => !counts(c)).length;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-      {/* The list below is the most recent graded work of every kind, so say that first and count what is
-          listed; the orange note then counts only the rows the AI grader failed on. */}
+      {/* What is listed, then how many need a human, and that the ones whose score changes nothing come last. */}
       <div style={{ fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.5, color: 'var(--c-meta)', maxWidth: '70ch', marginBottom: 8 }}>
-        {submissions.length} recent submission{submissions.length === 1 ? '' : 's'}, {needsManual > 0 ? 'the ones needing a manual grade first, then ' : ''}newest first
-        {needsManual > 0 ? '' : '. Every one has a score; override it below if you disagree'}.
+        {cards.length} recent submission{cards.length === 1 ? '' : 's'}, one per student and lesson.{' '}
+        {needsManual > 0
+          ? `${needsManual} need${needsManual === 1 ? 's' : ''} your score.`
+          : 'Every one has a score; change it below if you disagree.'}
+        {later > 0 ? ` Work whose score does not change the grade is listed after the work whose score does.` : ''}
       </div>
-      {submissions.map((sub) => {
+      {error && <div role="alert" style={{ color: 'var(--c-red)', fontFamily: 'var(--font-prose)', fontSize: 14, marginBottom: 8 }}>Could not refresh the list: {error}</div>}
+      {cards.map(({ key, row: sub, others }) => {
+        const title = lessonLabel(sub.lesson_id, lessonTitles);
         // A flowchart submission nests its rubric under `ai`, so the plain
         // top-level reader returns null for it; fall through to the diagram
         // reader before deciding there is no criteria breakdown to show.
@@ -636,16 +884,25 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
         // The row's own criteria say it first; a grader-outage row has none, so the server's
         // limit carries the unit (round 6: the form must always say what the mark is out of).
         const unit = markUnit(gradeData) ?? (sub.limit?.unit === 'criteria' ? { total: sub.limit.max } : null);
-        // The row's own score, not the marker, decides. An override writes a
-        // score onto the row but leaves gradingFailed in place, so keying on
-        // the marker alone kept a graded submission reading "Needs manual
-        // grade" forever — the gradebook already treats it as scored.
+        // The row's own score, not the marker, decides (a mark leaves the marker in place).
         const failed = sub.score === null && parseFailedGrade(sub.grade_json);
         const brief = Object.prototype.hasOwnProperty.call(assignments, sub.lesson_id) ? assignments[sub.lesson_id] : undefined;
+        const quiz = quizAnswerRows(sub.grade_json, sub.response, quizStems[sub.lesson_id]);
+        const notes = readTeacherNotes(sub.grade_json);
+        const teacherScored = hasTeacherReview(sub.grade_json) && sub.score !== null;
+        // What a score here is out of: the row's own points, else the part's (the server's limit).
+        const outOf = sub.possible !== null && sub.possible > 0 ? sub.possible : sub.limit?.unit === 'points' ? sub.limit.max : null;
+        const weight = weightOf(sub.lesson_id);
+        const weightNote = scoreWeightNote(weight);
+        const weightTag = scoreWeightTag(weight);
+        const pointsMax = sub.limit?.unit === 'points' ? sub.limit.max : null;
+        const criteria = brief || gradeData ? buildMarkCriteria(brief?.rubric, gradeData?.criteria) : [];
+        const rubricShown = rubricFitsForm(criteria, unit?.total ?? pointsMax);
 
         return (
           <div
-            key={sub.id}
+            key={key}
+            className="sq-card"
             // One container per thing (rule 6): submissions are separated by a divider inside the queue's
             // card, not boxed a second time.
             style={{
@@ -661,14 +918,17 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
               <div style={{ flex: '1 1 240px', minWidth: 0, overflowWrap: 'anywhere', fontFamily: 'var(--font-prose)', display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {/* Who and what on one line (climb4 r6: the stacked identity pushed Save grade below the fold). */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', columnGap: 8, lineHeight: 1.4 }}>
+                <h3 style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', columnGap: 8, lineHeight: 1.4, margin: 0, fontSize: 'inherit', fontWeight: 'inherit', fontFamily: 'var(--font-prose)' }}>
                   <strong style={{ fontWeight: 600, color: 'var(--c-fg)', fontSize: 16 }}>
                     {sub.student_email}
                   </strong>
                   <span aria-hidden="true" style={{ color: 'var(--c-meta)' }}>·</span>
-                  <span style={{ color: 'var(--c-fg)', fontSize: 15 }}>{lessonLabel(sub.lesson_id, lessonTitles)}</span>
-                </div>
-                <span style={{ color: 'var(--c-meta)', fontSize: 13, lineHeight: 1.5 }}>Submitted {formatTs(sub.submitted_at)}</span>
+                  <span style={{ color: 'var(--c-fg)', fontSize: 15 }}>{title}</span>
+                </h3>
+                <span style={{ color: 'var(--c-meta)', fontSize: 13, lineHeight: 1.5 }}>
+                  Submitted {formatTs(sub.submitted_at)}
+                  {others > 0 ? ` · handed in ${others + 1} times, ${failed ? 'this one needs your score' : 'showing the newest'}` : ''}
+                </span>
               </div>
               <div className="sq-head-right">
               <div
@@ -686,24 +946,22 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                 }}
               >
                 {failed
-                  ? 'Needs manual grade'
+                  ? 'Needs your score'
                   : unit
                     ? // A pass/fail rubric stores 0 of 0, so the stored numbers say nothing. Its grade is
                       // criteria met out of the criteria count, and that is what a mark is in.
-                      hasTeacherReview(sub.grade_json)
-                      ? `Teacher mark: ${sub.score ?? '—'} of ${unit.total} criteria`
+                      teacherScored
+                      ? `Your mark: ${sub.score} of ${unit.total} criteria`
                       : `AI: ${criteriaScore(gradeData?.criteria as Array<{ verdict: string }>)} of ${unit.total} criteria met`
-                    : hasTeacherReview(sub.grade_json)
-                      ? // A 0-point lab stores 0 of 0, so "7 / 0" would be the teacher's own mark over nothing.
-                        sub.possible === 0
-                        ? `Teacher mark: ${sub.score ?? '—'}`
-                        : `Teacher score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`
-                      : isQuizGrade(sub.grade_json)
-                        ? `Quiz score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`
+                    : teacherScored
+                      ? `Your score: ${scoreOutOf(sub.score, outOf)}`
+                      : quiz
+                        ? sub.score === null ? 'Quiz: not scored yet' : `Quiz score: ${scoreOutOf(sub.score, outOf)}`
                         : labChecks(sub.grade_json)
                           ? `Lab checks: ${labChecks(sub.grade_json)!.passed} of ${labChecks(sub.grade_json)!.total} passed`
-                          : `AI score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`}
+                          : `AI score: ${scoreOutOf(sub.score, outOf)}`}
               </div>
+              {weightTag && <div className="sq-weight-tag">{weightTag}</div>}
               {failed && (
                 // One compact line on the header's right (climb4 r6); the full sentence and the
                 // grader's own error stay reachable in the tooltip and to screen readers.
@@ -724,19 +982,29 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
               </div>
             </div>
 
-            {/* Advisory only, and only for the Chapter 3 plan part: the rules
-                grade the same text deterministically, so a teacher can see where
-                they disagree with the AI before this becomes the recorded grade. */}
+            {/* Does this score change the grade? Said before the form, in the drawer's words (ux1 G4). */}
+            {weightNote && <p role="note" className="sq-weight-note">{weightNote}</p>}
+
+            {/* The teacher's own note, kept with their score (ux1 G2). */}
+            {notes.feedback && (
+              <div className="sq-teacher-note">
+                <span className="sq-teacher-note-label">Your note{notes.reviewedAt ? `, ${formatTs(notes.reviewedAt)}` : ''}:</span>{' '}
+                <span style={{ whiteSpace: 'pre-wrap' }}>{notes.feedback}</span>
+              </div>
+            )}
+
+            {/* Advisory only, and only for the Chapter 3 plan part. */}
             <PlanCheckPanel lessonId={sub.lesson_id} response={sub.response} />
 
             {/* Assignment (prompt + folded rubric) and the answer side by side at >= 1000px (climb4 r6). */}
             <div className="sq-review-cols">
             <div className="sq-review-col">
-            {/* The question and its criteria, above the answer they grade. */}
-            {brief && <AssignmentBlock brief={brief} hideRubric={!!failed} />}
+            {/* The question and its criteria, above the answer they grade. The rubric moves into the form
+                when it can be marked there. */}
+            {brief && <AssignmentBlock brief={brief} hideRubric={!!failed || rubricShown} />}
 
-            {/* Grading criteria */}
-            {gradeData && (
+            {/* Grading criteria, when they are not already the marking list */}
+            {gradeData && !rubricShown && gradeData.criteria.length > 0 && (
               <div
                 style={{
                   background: 'var(--c-bg)',
@@ -756,11 +1024,8 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                       key={c.id}
                       style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '4px 0', color: 'var(--c-fg)' }}
                     >
-                      {/* The stored verdict carries only the criterion id; the brief has its title. */}
                       <span>{c.title || brief?.rubric.find((r) => r.id === c.id)?.title || c.id}</span>
                       <span style={{ color: 'var(--c-meta)', flex: '0 0 auto' }}>
-                        {/* Every rubric is zero-point under green-to-advance, so
-                            "3/0" says nothing — show the verdict instead. */}
                         {max ? `${c.earned ?? '?'}/${max}` : (c.verdict ?? '—')}
                       </span>
                     </div>
@@ -780,26 +1045,41 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
               }}
             >
               <div className="sq-answer-label" style={{ fontFamily: 'var(--font-prose)', fontWeight: 700, color: 'var(--c-fg)', fontSize: 14, marginBottom: 4 }}>
-                {diagram ? 'Student diagram' : 'Student response'}
+                {diagram ? 'Student diagram' : quiz ? 'Student answers' : 'Student response'}
               </div>
               <SubmissionBoundary raw={sub.response}>
-                {diagram ? (
+                {quiz ? (
+                  // A quiz is question / chosen answer / right or wrong, never its raw JSON (ux1 G5).
+                  <ol className="sq-quiz">
+                    {quiz.map((q) => (
+                      <li key={q.id} className="sq-quiz-row">
+                        <span className="sq-quiz-q">{q.question}</span>
+                        <span className="sq-quiz-a">
+                          {q.chosen}
+                          {q.correct !== null && (
+                            <span className={q.correct ? 'sq-quiz-ok' : 'sq-quiz-no'}>
+                              {q.correct ? <CircleCheck size={13} aria-hidden="true" /> : <CircleX size={13} aria-hidden="true" />}
+                              {q.correct ? 'Right' : 'Wrong'}
+                            </span>
+                          )}
+                        </span>
+                      </li>
+                    ))}
+                    {quiz.length === 0 && <li className="sq-quiz-row">(no answers)</li>}
+                  </ol>
+                ) : diagram ? (
                   <>
                     <DiagramEditor
                       value={diagram}
                       readOnly
                       height={diagramFrameHeight(diagram, 300, 560)}
-                      // A review card is short by design, so let the fit shrink
-                      // far enough to show the whole diagram; the teacher can
-                      // scroll-zoom into anything they need to read closely.
                       fitMinZoom={0.3}
                     />
                     <div style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, marginTop: 5 }}>
                       {diagram.nodes.length} shapes · {diagram.edges.length} arrows · scroll to zoom,
                       drag to pan
                     </div>
-                    {/* The text the AI actually graded, beside the drawing: the chart is a display
-                        copy, and the teacher must always be able to see what the model read. */}
+                    {/* The text the AI actually graded, beside the drawing. */}
                     {parseDiagramResponse(sub.response) === null && sub.response ? (
                       <div style={{ marginTop: 8 }}>
                         <div style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, marginBottom: 4 }}>What the AI read</div>
@@ -836,18 +1116,31 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                   </div>
                 )}
               </SubmissionBoundary>
+              {quiz && (
+                <button
+                  type="button"
+                  className="sq-reopen"
+                  disabled={reopening === sub.id}
+                  onClick={() => { void reopenQuiz(sub, title, others + 1); }}
+                >
+                  {reopening === sub.id ? 'Reopening…' : `Reopen quiz for ${sub.student_email}`}
+                </button>
+              )}
             </div>
             </div>
 
             {/* Override form */}
             <OverrideForm
+              key={sub.id}
               classId={classId}
               submissionId={sub.id}
               unitTotal={unit?.total ?? null}
-              pointsMax={sub.limit?.unit === 'points' ? sub.limit.max : null}
+              pointsMax={pointsMax}
               enforceMax={sub.capped === true}
-              zeroPoint={!unit && sub.limit?.unit !== 'points' && sub.possible === 0 && !isQuizGrade(sub.grade_json)}
-              aside={failed && brief && brief.rubric.length > 0 ? <RubricCompact brief={brief} submissionId={sub.id} /> : undefined}
+              criteria={rubricShown ? criteria : undefined}
+              savedScore={teacherScored ? sub.score : null}
+              savedFeedback={notes.feedback}
+              aside={failed && brief && brief.rubric.length > 0 && !rubricShown ? <RubricCompact brief={brief} submissionId={sub.id} /> : undefined}
               onOverride={handleOverride}
             />
 

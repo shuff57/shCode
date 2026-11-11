@@ -32,15 +32,12 @@ export default function LabTaskCard({ lesson }: { lesson: Lesson }) {
             End of task: {lesson.steps.length} {lesson.steps.length === 1 ? 'step' : 'steps'}
             {(lesson.requirements?.length ?? 0) > 0 && (
               <> · Check tests {lesson.requirements.length} {lesson.requirements.length === 1 ? 'requirement' : 'requirements'}{' '}
-                {lesson.preview !== 'console' ? '(listed under Quest)' : (
-                  // Desktop shows them under Run / Check (.lab-check-tests); a phone keeps them under Quest.
-                  <>
-                    <span className="lab-task-end-wide">
-                      {lesson.requirements.length <= 3 ? '(shown above the editor)' : '(the first 3 shown above the editor, all of them under Quest)'}
-                    </span>
-                    <span className="lab-task-end-narrow">(listed under Quest)</span>
-                  </>
-                )}
+                {/* The row under Run / Check lists them on a wide screen (all once checked, ux1 B3); a phone
+                    shows the results there after Check and the list itself under Quest. */}
+                <span className="lab-task-end-wide">
+                  {lesson.requirements.length <= 3 ? '(shown above the editor)' : '(the first 3 shown above the editor, all of them after Check)'}
+                </span>
+                <span className="lab-task-end-narrow">(listed under Quest, results above the editor after Check)</span>
               </>
             )}
           </p>

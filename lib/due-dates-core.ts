@@ -331,3 +331,27 @@ export function isPastDue(dueAt: number | null, completedAt: number | null | und
   const status = dueStatus(dueAt, completedAt, now);
   return status === 'late' || status === 'done-late';
 }
+
+/**
+ * A date a teacher may set from the schedule panel: a real calendar day (YYYY-MM-DD) no more than
+ * `yearsBefore` years before `today` and no more than `yearsAfter` years after it. Typing into a native
+ * date field passes through dates like 1902-10-24 on the way to the one meant, and each used to be saved.
+ * `today` is the school's date string (schoolDateString). Returns null when the date is fine, else the
+ * sentence to show beside the field.
+ */
+export function dateWindowProblem(date: string, today: string, yearsBefore = 1, yearsAfter = 2): string | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+  const t = /^(\d{4})-(\d{2})-(\d{2})$/.exec(today);
+  if (!m || !t) return 'That is not a whole date. Type the month, day and year.';
+  const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  const check = new Date(Date.UTC(y, mo - 1, d));
+  if (check.getUTCFullYear() !== y || check.getUTCMonth() !== mo - 1 || check.getUTCDate() !== d) {
+    return 'That is not a real date.';
+  }
+  const shift = (years: number) => `${String(Number(t[1]) + years).padStart(4, '0')}-${t[2]}-${t[3]}`;
+  const earliest = shift(-yearsBefore);
+  const latest = shift(yearsAfter);
+  if (date < earliest) return `That is more than ${yearsBefore === 1 ? 'a year' : `${yearsBefore} years`} ago. Not saved: check the year.`;
+  if (date > latest) return `That is more than ${yearsAfter} years ahead. Not saved: check the year.`;
+  return null;
+}

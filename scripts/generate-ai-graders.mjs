@@ -138,6 +138,12 @@ for (const id of readdirSync(lessonsDir)) {
     out[id] = {
       lessonTitle: lesson.title,
       prompt: g.prompt,
+      // What a TEACHER is shown as the assignment in the review queue when the prompt is written to the
+      // model ("The student wrote ...") rather than to the student: the lesson's own description, which
+      // the student already sees. Only stored where it is needed (functions/_shared/aiGraders.ts teacherBrief).
+      ...(/^\s*The student\b/.test(g.prompt) && !/The task they were given:/.test(g.prompt) && typeof lesson.description === 'string' && lesson.description.trim()
+        ? { brief: lesson.description.trim() }
+        : {}),
       rubric: g.rubric,
       ...(g.model ? { model: g.model } : {}),
       ...(g.contextDocs ? { contextDocs: g.contextDocs } : {}),

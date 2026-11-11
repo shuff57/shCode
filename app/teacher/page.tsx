@@ -1,7 +1,7 @@
 'use client';
 
 import LessonModeControl from '../../components/LessonModeControl';
-import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { compareLessons, compareUnitLabels, lessonLabel } from '../../lib/lesson-title-order';
 import { csvCell } from '../../lib/grades-csv';
@@ -13,7 +13,8 @@ import DueDatesPanel from '../../components/DueDatesPanel';
 import GradingWeightsPanel from '../../components/GradingWeightsPanel';
 import SolutionReleasePanel from '../../components/SolutionReleasePanel';
 import { defaultModule, moduleKey, moduleOptions, modulePages, pagedColumnWidth, pagerFor, pageSize, resolveModuleParam, selectGradebookLessons } from '../../lib/gradebook-view';
-import { describeGrade, opensInCodeEditor, showLateBadge, stillFailingRequirements, submissionWasLate, verdictWord, type RequirementEventRow } from '../../lib/teacher-drawer';
+import { describeGrade, opensInCodeEditor, quizAnswerRows, scoreOutOf, scoreWeight, scoreWeightNote, showLateBadge, stillFailingRequirements, submissionWasLate, verdictWord, type RequirementEventRow, type ScoreWeight } from '../../lib/teacher-drawer';
+import { buildMarkCriteria } from '../../lib/rubric-mark';
 import MostMissedPanel from '../../components/MostMissedPanel';
 import ClassLibraryModeration from '../../components/ClassLibraryModeration';
 import ClassGamesModeration from '../../components/ClassGamesModeration';
@@ -23,7 +24,7 @@ import PastDuePanel from '../../components/PastDuePanel';
 import { formatDue, schoolDateString } from '../../lib/due-dates-core';
 import { lessonHref } from '../../lib/lesson-href';
 import { criteriaScore } from '../../lib/grade-pass';
-import { practiceDisplay } from '../../lib/gradebook-cell';
+import { practiceDisplay, readTeacherNotes } from '../../lib/gradebook-cell';
 import { CATEGORY_LABEL, GRADE_CATEGORIES, lessonGradeCategory, lessonPercent, type GradeCategory } from '../../lib/grading-weights';
 import { buildGradesCsv } from '../../lib/grades-csv';
 import { FeedbackProvider, useFeedback } from '../../components/FeedbackProvider';
@@ -719,6 +720,32 @@ function StudentDrawer({
     });
   }, [classId, email, reloadKey]);
 
+  // The assignment rubric of each hand-in shown here, so Override score can be marked from it (ux1 G1).
+  // Same teacher-only route the review queue reads, asking only for briefs; a lesson with no grader config
+  // simply has none and its form falls back to the stored criteria or a plain score field.
+  const [briefs, setBriefs] = useState<Record<string, { prompt: string; rubric: Array<{ id: string; title: string; points: number; required?: boolean }> }>>({});
+  useEffect(() => {
+    if (!detail) return;
+    const ids = Object.keys(detail.latestSubmissions).filter((id) => {
+      try { return !Array.isArray((JSON.parse(detail.latestSubmissions[id].grade_json ?? 'null') as { quiz?: unknown } | null)?.quiz); } catch { return true; }
+    });
+    if (ids.length === 0) return;
+    let live = true;
+    const chunks: string[][] = [];
+    for (let i = 0; i < ids.length; i += 20) chunks.push(ids.slice(i, i + 20));
+    void Promise.all(chunks.map((c) =>
+      apiFetch<{ assignments?: Record<string, { prompt: string; rubric: Array<{ id: string; title: string; points: number; required?: boolean }> }> }>(
+        `/api/classes/${encodeURIComponent(classId)}/submission-queue?briefs=${encodeURIComponent(c.join(','))}`,
+      ).catch(() => null),
+    )).then((all) => {
+      if (!live) return;
+      const out: typeof briefs = {};
+      for (const r of all) if (r && r.error === null && r.data.assignments) Object.assign(out, r.data.assignments);
+      setBriefs(out);
+    });
+    return () => { live = false; };
+  }, [detail, classId]);
+
   // Arrived from a queue row or a grid cell: open that lesson's submission and bring it into view once.
   const focusedRef = useRef<string | null>(null);
   useEffect(() => {
@@ -745,9 +772,9 @@ function StudentDrawer({
   // them and resubmit. Removes the submission and its score, so confirm first.
   async function unsubmit(lessonId: string, title: string) {
     const ok = await confirm({
-      title: `Unsubmit "${title}"?`,
-      message: `${email}'s submission and score for this quiz are removed.\nThey keep their answers and can change them and hand it in again.`,
-      confirmLabel: 'Unsubmit',
+      title: `Reopen "${title}" for ${email}?`,
+      message: `Every hand-in of this quiz by ${email} and its score are removed.\nTheir answers are kept, so they can change them and hand it in again.`,
+      confirmLabel: 'Reopen quiz',
       danger: true,
     });
     if (!ok) return;
@@ -758,9 +785,9 @@ function StudentDrawer({
       body: JSON.stringify({ studentEmail: email, lessonId }),
     }).catch(() => null);
     setUnsubmitting(null);
-    if (res === null) { setErr('Network error'); toast('Could not unsubmit: network error. Nothing changed.', { kind: 'error' }); }
-    else if (res.error !== null) { setErr(res.error); toast(`Could not unsubmit: ${res.error}`, { kind: 'error' }); }
-    else { setReloadKey((k) => k + 1); toast(`Unsubmitted "${title}". The student can change their answers and hand it in again.`); }
+    if (res === null) { setErr('Network error'); toast('Could not reopen the quiz: network error. Nothing changed.', { kind: 'error' }); }
+    else if (res.error !== null) { setErr(res.error); toast(`Could not reopen the quiz: ${res.error}`, { kind: 'error' }); }
+    else { setReloadKey((k) => k + 1); toast(`Reopened "${title}". The student can change their answers and hand it in again.`); }
   }
 
   // Give tries back on a capped part. 'give-back-one' removes the newest try (the
@@ -856,7 +883,16 @@ function StudentDrawer({
   // submission on file — a free-response answer that did not pass. Without
   // this it fell through to "Not started", which is the opposite of true and
   // worse than the missing row it replaced.
-  function stateBadge(state: 'started' | 'completed' | undefined, submitted = false, missing = false, practice = false) {
+  function stateBadge(state: 'started' | 'completed' | undefined, submitted = false, missing = false, practice = false, teacherScored = false) {
+    // A hand-in you have scored is not "In progress" or merely "Submitted" any more (ux1 G3). The grade still
+    // counts it only once the lesson is done (studentGrading), which the tooltip says.
+    if (teacherScored && state !== 'completed') {
+      return (
+        <span style={{ background: 'var(--c-cyan)', color: 'var(--c-bg)', borderRadius: 4, padding: '4px 8px', fontSize: 12, fontWeight: 700, flexShrink: 0 }} title="You have scored this hand-in. The student has not finished the lesson yet, so the grade counts it once they do.">
+          Scored by you
+        </span>
+      );
+    }
     if (!state && !submitted && missing) {
       return (
         <span style={{ background: 'var(--c-red)', color: 'var(--c-bg)', borderRadius: 4, padding: '4px 8px', fontSize: 12, fontWeight: 700, flexShrink: 0 }} title="Past its due date and never opened">
@@ -1037,6 +1073,21 @@ function StudentDrawer({
                       // malformed grade_json — skip
                     }
                   }
+                  // The teacher's own score and note on the latest hand-in (ux1 G2, G3).
+                  const tnotes = sub ? readTeacherNotes(sub.grade_json) : null;
+                  const teacherScored = !!sub && sub.score !== null && tnotes?.reviewedAt != null;
+                  const isQuiz = Array.isArray(gradeData?.quiz);
+                  const brief = Object.prototype.hasOwnProperty.call(briefs, lesson.id) ? briefs[lesson.id] : undefined;
+                  const briefPoints = brief ? brief.rubric.reduce((n, c) => n + (c.points > 0 ? c.points : 0), 0) : 0;
+                  // What a score on this lesson is out of: the part's maximum, else the hand-in's own, else its rubric's.
+                  const outOf = meta?.maxScore ?? (sub && sub.possible !== null && sub.possible > 0 ? sub.possible : null) ?? (briefPoints > 0 ? briefPoints : null);
+                  const weight = meta ? scoreWeight({ counts: lessonGradeCategory({ title: meta.title, preview: meta.preview, scoreKind: meta.scoreKind, assignmentCode: meta.assignmentCode }) !== null, maxScore: meta.maxScore }) : null;
+                  // Practice work never shows a points value, finished or not. `practice` is true only once the
+                  // lesson is done, so a teacher's score on an unfinished hand-in needs its own "does it count"
+                  // check (an id with no current lesson.json keeps the counted look, as `practice` does).
+                  const counted = !meta || lessonGradeCategory({ title: meta.title, preview: meta.preview, scoreKind: meta.scoreKind, assignmentCode: meta.assignmentCode }) !== null;
+                  const shownScore =
+                    ls?.state === 'completed' && !practice && ls.score !== null ? ls.score : teacherScored && counted ? sub!.score : null;
 
                   return (
                     <div key={lesson.id} id={`drawer-lesson-${lesson.id}`} style={{ marginBottom: 8, background: 'var(--c-bg)', borderRadius: 6, padding: '12px 16px', border: `1px solid ${focusLessonId === lesson.id ? 'var(--c-cyan)' : 'color-mix(in srgb, var(--c-line) 20%, transparent)'}` }}>
@@ -1050,16 +1101,17 @@ function StudentDrawer({
                             </span>
                           )}
                         </span>
-                        {stateBadge(ls?.state, !!sub, !!detail.grading?.missingIds?.includes(lesson.id), practice)}
+                        {stateBadge(ls?.state, !!sub, !!detail.grading?.missingIds?.includes(lesson.id), practice, teacherScored && counted)}
                         {sub && showLateBadge(!!meta && !practice && lessonGradeCategory({ title: meta.title, preview: meta.preview, scoreKind: meta.scoreKind, assignmentCode: meta.assignmentCode }) !== null, submissionWasLate(sub.submitted_at, sub.due_at_submit)) && (
                           <span style={{ background: 'color-mix(in srgb, var(--c-red) 18.0%, transparent)', color: 'var(--c-red)', border: '1px solid var(--c-red)', borderRadius: 4, padding: '4px 8px', fontSize: 12, fontWeight: 700, flexShrink: 0 }} title={`Handed in after the due date (${sub.due_at_submit ? formatDue(sub.due_at_submit) : ''})`}>
                             Late
                           </span>
                         )}
                         {/* A 0-point (mastery) lab stores score 0 of 0: "0 pts" beside "Complete" reads as a zero. */}
-                        {ls?.state === 'completed' && !practice && ls.score !== null && !(sub && sub.possible === 0 && !ls.score) && (
-                          <span style={{ fontSize: 12, color: 'var(--c-cyan)', fontFamily: 'monospace', flexShrink: 0 }}>
-                            {ls.score}{sub?.possible ? ` of ${sub.possible}` : ''} pts
+                        {/* Always "x / max" (ux1 G3). A 0-point lab's stored 0 of 0 is not shown as a zero. */}
+                        {shownScore !== null && !practice && !(sub && sub.possible === 0 && !shownScore && !teacherScored) && (
+                          <span style={{ fontSize: 13, color: 'var(--c-cyan)', fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                            {teacherScored ? 'Your score: ' : 'Score: '}{scoreOutOf(shownScore, outOf)}
                           </span>
                         )}
                         {/* lessonMap.has(...) guards against a stale/renumbered id with
@@ -1085,8 +1137,20 @@ function StudentDrawer({
                             {isExpanded ? 'Hide' : 'View submission'}
                           </button>
                         )}
-                        {sub && !Array.isArray(gradeData?.quiz) && (
+                        {sub && isQuiz && (
                           <button
+                            type="button"
+                            disabled={unsubmitting === lesson.id}
+                            style={{ background: 'none', border: '1px solid var(--c-orange)', borderRadius: 4, color: 'var(--c-orange)', fontSize: 12, cursor: 'pointer', padding: '4px 8px', flexShrink: 0 }}
+                            title="Removes their hand-in and score; their answers are kept so they can change them and hand it in again"
+                            onClick={() => { void unsubmit(lesson.id, lesson.title); }}
+                          >
+                            {unsubmitting === lesson.id ? 'Reopening…' : 'Reopen quiz'}
+                          </button>
+                        )}
+                        {sub && !isQuiz && (
+                          <button
+                            id={`override-btn-${lesson.id}`}
                             style={{ background: 'none', border: '1px solid var(--c-purple)', borderRadius: 4, color: 'var(--c-purple)', fontSize: 12, cursor: 'pointer', padding: '4px 8px', flexShrink: 0 }}
                             aria-expanded={overrideOpen === lesson.id}
                             title="Change this student's score for the lesson, with an optional comment they will see"
@@ -1097,25 +1161,26 @@ function StudentDrawer({
                         )}
                         {/* The three actions that remove something live in one menu, in words, so a routine
                             click on View or Override cannot land on Reset by accident. Each still confirms. */}
-                        {sub && (typeof lesson.maxSubmissions === 'number' || Array.isArray(gradeData?.quiz)) && (
+                        {sub && typeof lesson.maxSubmissions === 'number' && (
                           <RowMenu
                             label={`More actions for ${lesson.title}`}
                             buttonText="More"
                             disabled={givingBack === lesson.id || unsubmitting === lesson.id}
                             items={[
-                              ...(typeof lesson.maxSubmissions === 'number'
-                                ? [
-                                    { label: 'Give back one try', title: 'Removes their newest try; their other tries and best score stay.', onSelect: () => { void giveBack(lesson.id, lesson.title, 'give-back-one'); } },
-                                    { label: 'Reset all tries', danger: true, title: 'Clears every submission on this part so they get all their tries back.', onSelect: () => { void giveBack(lesson.id, lesson.title, 'reset'); } },
-                                  ]
-                                : []),
-                              ...(Array.isArray(gradeData?.quiz)
-                                ? [{ label: 'Unsubmit quiz', danger: true, title: 'Reopens the quiz: the submission and score are removed; they keep their answers.', onSelect: () => { void unsubmit(lesson.id, lesson.title); } }]
-                                : []),
+                              { label: 'Give back one try', title: 'Removes their newest try; their other tries and best score stay.', onSelect: () => { void giveBack(lesson.id, lesson.title, 'give-back-one'); } },
+                              { label: 'Reset all tries', danger: true, title: 'Clears every submission on this part so they get all their tries back.', onSelect: () => { void giveBack(lesson.id, lesson.title, 'reset'); } },
                             ]}
                           />
                         )}
                       </div>
+
+                      {/* The teacher's note, kept with their score (ux1 G2). The student reads it on their Progress page. */}
+                      {tnotes?.feedback && (
+                        <div style={{ marginTop: 8, fontSize: 13, lineHeight: 1.5, color: 'var(--c-fg)', fontFamily: 'var(--font-prose)', overflowWrap: 'anywhere' }}>
+                          <span style={{ fontWeight: 700, color: 'var(--c-cyan)' }}>Your note{tnotes.reviewedAt ? ` (${fmtTs(tnotes.reviewedAt)})` : ''}:</span>{' '}
+                          <span style={{ whiteSpace: 'pre-wrap' }}>{tnotes.feedback}</span>
+                        </div>
+                      )}
 
                       {/* Console labs: the checklist items this student has missed and not passed yet. */}
                       {meta && meta.preview === 'console' && ls?.state !== 'completed' && (() => {
@@ -1140,7 +1205,7 @@ function StudentDrawer({
                       {/* Override score: the same form the review queue uses, so the rules (the part's maximum, "keep the
                           higher score" on a part with a try limit, the persisted choice) are one set of rules. */}
                       {overrideOpen === lesson.id && sub && (
-                        <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid color-mix(in srgb, var(--c-line) 20%, transparent)' }}>
+                        <div className="drawer-override" style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid color-mix(in srgb, var(--c-line) 20%, transparent)' }}>
                           <div style={{ fontSize: 13, color: 'var(--c-meta)' }}>
                             Latest hand-in {fmtTs(sub.submitted_at)}{submissionScoreLabel(sub) ? ` · ${submissionScoreLabel(sub)}` : ''}
                           </div>
@@ -1152,10 +1217,21 @@ function StudentDrawer({
                                 ? gradeData.criteria.length
                                 : null
                             }
+                            // The hand-in's own maximum only, never the rubric's total: on a part with a try limit
+                            // the form enforces this number, and the server's ceiling decides what it accepts.
                             pointsMax={sub.possible !== null && sub.possible > 0 ? sub.possible : null}
                             enforceMax={typeof lesson.maxSubmissions === 'number'}
-                            zeroPoint={meta?.maxScore == null && !(sub.possible !== null && sub.possible > 0) && !(gradeData && Array.isArray(gradeData.criteria) && gradeData.criteria.length > 0)}
-                            onOverride={() => { setOverrideOpen(null); setNotice(`Saved. ${lesson.title} now carries your score. ${meta?.maxScore == null ? 'The course grade does not change: this lab counts as done at 100% whatever its points.' : 'The student sees it on their gradebook, marked teacher-adjusted.'}`); setReloadKey((k) => k + 1); }}
+                            criteria={brief || (gradeData?.criteria && gradeData.criteria.length > 0) ? buildMarkCriteria(brief?.rubric, gradeData?.criteria) : undefined}
+                            savedScore={teacherScored ? sub.score : null}
+                            savedFeedback={tnotes?.feedback ?? null}
+                            weightNote={scoreWeightNote(weight)}
+                            onOverride={() => {
+                              setOverrideOpen(null);
+                              setNotice(`Saved. ${lesson.title} now carries your score. ${scoreWeightNote(weight) ?? 'The student sees it, and any note, on their Progress page, marked teacher-adjusted.'}`);
+                              setReloadKey((k) => k + 1);
+                              // The form closes on save: put focus back on the button that opened it, not on <body>.
+                              window.setTimeout(() => document.getElementById(`override-btn-${lesson.id}`)?.focus(), 0);
+                            }}
                           />
                         </div>
                       )}
@@ -1228,9 +1304,11 @@ function StudentDrawer({
                                     ? `${gradeData.criteria.filter((c) => c.verdict === 'met' || c.verdict === 'partial').length} of ${gradeData.criteria.length} criteria met`
                                     : gradeData.structural && gradeData.structural.length > 0
                                       ? `${gradeData.structural.filter((s) => s.passed).length} of ${gradeData.structural.length} checks passed`
-                                      : /"gradingFailed"\s*:\s*true/.test(sub.grade_json ?? '')
+                                      : /"gradingFailed"\s*:\s*true/.test(sub.grade_json ?? '') && sub.score === null
                                         ? 'Needs your score: the AI grader could not score this'
-                                        : 'graded'}
+                                        : teacherScored && counted
+                                          ? `Scored by you: ${scoreOutOf(sub.score, outOf)}`
+                                          : 'graded'}
                               </div>
 
                               {/* Diagram assignments store their browser-side checks here.
@@ -1275,19 +1353,27 @@ function StudentDrawer({
                           {/* The answer itself. Diagram submissions store a
                               DiagramDoc, so render the Mermaid projection of it
                               rather than raw JSON; everything else is prose. */}
-                          {Array.isArray(gradeData?.quiz) && (() => {
-                            const rows = (gradeData!.quiz as Array<{ id?: unknown; correct?: unknown }>).filter((q) => q && typeof q.id === 'string');
+                          {isQuiz && (() => {
+                            // Question / chosen answer / right or wrong, the same reading as the review queue's (ux1 G5).
+                            const rows = quizAnswerRows(sub.grade_json, sub.response, quizStems[lesson.id]) ?? [];
                             const missed = rows.filter((q) => q.correct === false);
+                            const keyed = rows.some((q) => q.correct !== null);
                             return (
                               <div style={{ marginBottom: 8 }}>
                                 <div style={{ fontSize: 13, color: 'var(--c-meta)', marginBottom: 4 }}>
-                                  {missed.length === 0 ? 'No questions missed' : `Missed ${missed.length} of ${rows.length}`}
+                                  {!keyed ? `${rows.length} answers` : missed.length === 0 ? 'No questions missed' : `Missed ${missed.length} of ${rows.length}`}
                                 </div>
-                                {missed.map((q) => (
-                                  <div key={String(q.id)} style={{ fontSize: 12, background: 'var(--c-deep)', borderRadius: 4, padding: '8px 12px', marginBottom: 4, color: 'var(--c-fg)', overflowWrap: 'anywhere' }}>
-                                    {quizStems[lesson.id]?.[String(q.id)] ?? String(q.id)}
-                                  </div>
-                                ))}
+                                <ol className="sq-quiz">
+                                  {rows.map((q) => (
+                                    <li key={q.id} className="sq-quiz-row">
+                                      <span className="sq-quiz-q">{q.question}</span>
+                                      <span className="sq-quiz-a">
+                                        {q.chosen}
+                                        {q.correct !== null && <span className={q.correct ? 'sq-quiz-ok' : 'sq-quiz-no'}>{q.correct ? 'Right' : 'Wrong'}</span>}
+                                      </span>
+                                    </li>
+                                  ))}
+                                </ol>
                               </div>
                             );
                           })()}
@@ -2707,17 +2793,29 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
   }, []);
 
   // How many submissions are waiting for this teacher: the Today badge, and the reason to open on Today.
+  // Bumped after a score is saved in the queue (ux1 G3), so the badge and the Needs attention chips drop at once.
+  const [gradedTick, setGradedTick] = useState(0);
   useEffect(() => {
     if (!detail) return;
     let cancelled = false;
     void apiFetch<{ awaiting_grade?: unknown[] }>(`/api/classes/${classId}/needs-attention`).then((res) => {
       if (cancelled) return;
+      if (res.error !== null && gradedTick > 0) return; // a failed refresh keeps the count it had
       const n = res.error === null ? (res.data.awaiting_grade?.length ?? 0) : 0;
       setAwaitingCount(n);
-      if (n > 0 && !pickedTab.current) setActiveTab('today');
+      if (n > 0 && !pickedTab.current && gradedTick === 0) setActiveTab('today');
     });
     return () => { cancelled = true; };
-  }, [detail, classId]);
+  }, [detail, classId, gradedTick]);
+  // Whether a teacher's score on each lesson changes the grade, for the queue's practice label and order (ux1 G4).
+  const lessonWeights = useMemo(() => {
+    const out: Record<string, ScoreWeight> = {};
+    for (const [id, l] of lessonMap) {
+      const w = scoreWeight({ counts: lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode }) !== null, maxScore: l.maxScore });
+      if (w) out[id] = w;
+    }
+    return out;
+  }, [lessonMap]);
 
   async function handleRegenCode() {
     const ok = await confirm({
@@ -3008,6 +3106,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             <h2 style={{ ...S.h2, fontSize: 18, lineHeight: '36px', margin: 0, whiteSpace: 'nowrap' }}>Needs attention</h2>
             <div style={{ flex: '1 1 320px', minWidth: 0 }}>
             <NeedsAttentionPanel
+              key={gradedTick}
               classId={classId}
               lessonTitles={lessonTitles}
               onOpenStudent={(email: string) => { setDrawerLesson(null); setDrawerEmail(email); }}
@@ -3027,7 +3126,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         {/* Submission Review Queue */}
         <div id="submission-review-queue" style={{ ...S.card, padding: compact ? 16 : '16px 20px', marginBottom: 0, scrollMarginTop: 100 }}>
           <h2 style={{ ...S.h2, fontSize: 18, marginBottom: 8 }}>Submission review queue</h2>
-          <SubmissionQueue classId={classId} lessonTitles={lessonTitles} />
+          <SubmissionQueue classId={classId} lessonTitles={lessonTitles} lessonWeights={lessonWeights} onGraded={() => setGradedTick((t) => t + 1)} />
         </div>
         {/* Past due */}
         <div style={{ ...S.card, padding: compact ? 16 : 20, marginBottom: 0 }}>

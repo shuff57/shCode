@@ -58,12 +58,10 @@ export default function TabbedRightDrawer({ tabs, storageKey, inlineHostId }: Pr
   }, []);
 
   useEffect(() => {
-    const savedActive = localStorage.getItem(activeStorage);
-    // A phone starts with the drawer closed: an overlay left open from a
-    // desktop session would hide the whole lesson on load.
-    if (savedActive && tabs.some((t) => t.key === savedActive) && !window.matchMedia('(max-width: 720px)').matches) {
-      setActiveKey(savedActive);
-    }
+    // Every page starts with the drawer CLOSED (ux1 B6). Re-opening the tab left open last time put
+    // the Quest drawer over a moSHion lab on arrival, narrowing the editor and covering the header;
+    // a student opens a tool when they want it. The width they chose is still remembered.
+    try { localStorage.removeItem(activeStorage); } catch { /* storage blocked: nothing to forget */ }
     const savedWidth = parseInt(localStorage.getItem(widthStorage) ?? '', 10);
     if (!Number.isNaN(savedWidth)) {
       setWidth(Math.max(MIN_W, Math.min(MAX_W, savedWidth)));
@@ -71,11 +69,29 @@ export default function TabbedRightDrawer({ tabs, storageKey, inlineHostId }: Pr
     setMounted(true);
   }, [activeStorage, widthStorage, tabs]);
 
+  // The drawer starts below the site header, never over it (ux1 B6): it used to run from the top
+  // of the window, so its resize edge sat on the header's Gradebook link and the account menu. As
+  // the page scrolls the header leaves and the drawer takes the full height.
+  const [top, setTop] = useState(0);
   useEffect(() => {
-    if (!mounted) return;
-    if (activeKey) localStorage.setItem(activeStorage, activeKey);
-    else localStorage.removeItem(activeStorage);
-  }, [activeKey, mounted, activeStorage]);
+    if (activeKey === null) return;
+    let raf = 0;
+    const measure = () => {
+      raf = 0;
+      const header = document.querySelector('body > header') ?? document.querySelector('header');
+      const bottom = header ? header.getBoundingClientRect().bottom : 0;
+      setTop(Math.max(0, Math.round(bottom)));
+    };
+    const schedule = () => { if (!raf) raf = requestAnimationFrame(measure); };
+    measure();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+    };
+  }, [activeKey]);
 
   // Publish open width so body padding can reflow.
   useEffect(() => {
@@ -137,7 +153,7 @@ export default function TabbedRightDrawer({ tabs, storageKey, inlineHostId }: Pr
         className="shd-drawer"
         style={{
           position: 'fixed',
-          top: 0,
+          top,
           right: 0,
           // Issue #17: this used to be a flat 0, so at z-index 900 the
           // drawer sat entirely over LessonProgressFooter (z-index 50)

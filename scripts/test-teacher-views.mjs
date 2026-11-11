@@ -12,12 +12,13 @@ import { fileURLToPath } from 'node:url';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = mkdtempSync(join(tmpdir(), 'shcode-teacher-views-'));
 execFileSync('node', [join(root, 'node_modules/typescript/bin/tsc'),
-  join(root, 'lib/gradebook-view.ts'), join(root, 'lib/teacher-drawer.ts'),
+  join(root, 'lib/gradebook-view.ts'), join(root, 'lib/teacher-drawer.ts'), join(root, 'lib/rubric-mark.ts'),
   '--outDir', out, '--module', 'commonjs', '--target', 'es2022', '--skipLibCheck'], { cwd: root, stdio: 'inherit' });
 writeFileSync(join(out, 'package.json'), '{"type":"commonjs"}');
 const req = createRequire(import.meta.url);
 const { moduleOptions, selectGradebookLessons } = req(join(out, 'gradebook-view.js'));
 const D = req(join(out, 'teacher-drawer.js'));
+const RM = req(join(out, 'rubric-mark.js'));
 
 let n = 0;
 function check(name, got, want) {
@@ -157,5 +158,56 @@ check('console opens the code editor', D.opensInCodeEditor('console'), true);
 check('diagram does not', D.opensInCodeEditor('diagram'), false);
 check('quiz does not', D.opensInCodeEditor('quiz'), false);
 check('missing preview does not', D.opensInCodeEditor(null), false);
+
+// ---- ux1 G1: scoring from the rubric ----------------------------------------
+{
+  const rubric = [
+    { id: 'a', title: 'Inputs', points: 0, required: true },
+    { id: 'b', title: 'Compare', points: 0 },
+    { id: 'c', title: 'Report', points: 0 },
+  ];
+  const stored = [{ id: 'a', verdict: 'met' }, { id: 'b', verdict: 'partial', feedback: 'half there' }, { id: 'zzz', verdict: 'met' }];
+  const cr = RM.buildMarkCriteria(rubric, stored);
+  check('rubric criteria carry the AI verdict by id; an unknown stored id is not added', cr.map((c) => [c.id, c.aiVerdict]), [['a', 'met'], ['b', 'partial'], ['c', null]]);
+  check('pass/fail criteria are checkboxes, each worth 1', [cr.map(RM.controlFor), cr.map(RM.criterionMax)], [['check', 'check', 'check'], [1, 1, 1]]);
+  const m0 = RM.initialMarks(cr);
+  check('AI verdicts pre-mark: met 1, partly 0.5, unsaid unmarked', m0, { a: 1, b: 0.5 });
+  check('total, marked and max', RM.rubricTotal(cr, m0), { total: 1.5, marked: 2, max: 3 });
+  check('a pass/fail rubric fits a form out of its criteria count', RM.rubricFitsForm(cr, 3), true);
+  check('...and not a form out of 10', RM.rubricFitsForm(cr, 10), false);
+  check('an unknown form maximum takes any rubric', RM.rubricFitsForm(cr, null), true);
+  check('no criteria never fits', RM.rubricFitsForm([], null), false);
+  const pts = RM.buildMarkCriteria([{ id: 'p', title: 'Plan', points: 4 }, { id: 'q', title: 'One', points: 1 }], [{ id: 'p', verdict: 'partial', earned: 2.6 }]);
+  check('a criterion over a point is a stepper; a 1-point one a checkbox', pts.map(RM.controlFor), ['stepper', 'check']);
+  check('a partly met pointed criterion starts at the AI points on half steps', RM.initialMarks(pts), { p: 2.5 });
+  check('a mark is clamped to 0..points', [RM.clampMark(pts[0], 9), RM.clampMark(pts[0], -1), RM.clampMark(pts[0], NaN)], [4, 0, 0]);
+  const solo = RM.buildMarkCriteria(null, [{ id: 'uses-loop', max: 2, verdict: 'met', earned: 2 }]);
+  check('without a rubric the stored criteria are marked, titled from the id', [solo[0].title, solo[0].points], ['Uses loop', 2]);
+  check('source words: rubric, part marked', RM.scoreSourceText('rubric', { total: 2, marked: 2, count: 3 }), 'From the rubric (2 of 3 criteria marked)');
+  check('source words: typed by hand says what the rubric adds up to', RM.scoreSourceText('hand', { total: 2, marked: 2, count: 3 }), 'Typed by hand (the rubric adds up to 2)');
+  check('source words: saved', RM.scoreSourceText('saved', null), 'Your saved score');
+}
+
+// ---- ux1 G3, G4: score wording and whether a score counts ---------------------
+check('a score always reads x / max', [D.scoreOutOf(7, 10), D.scoreOutOf(1.555, 3)], ['7 / 10', '1.56 / 3']);
+check('no maximum is said, never a dash', D.scoreOutOf(7, null), '7 (no maximum set)');
+check('a lesson with points counts', D.scoreWeight({ counts: true, maxScore: 5 }), 'counts');
+check('a counted lab with no maximum is done-only', D.scoreWeight({ counts: true, maxScore: null }), 'done-only');
+check('a lesson with no category is practice', D.scoreWeight({ counts: false, maxScore: 5 }), 'practice');
+check('unknown lesson: nothing said', [D.scoreWeight(null), D.scoreWeightNote(null), D.scoreWeightNote('counts')], [null, null, null]);
+check('practice and done-only each have one sentence, no em dash',
+  ['practice', 'done-only'].map((w) => typeof D.scoreWeightNote(w) === 'string' && !D.scoreWeightNote(w).includes('\u2014')), [true, true]);
+
+// ---- ux1 G5: a quiz hand-in as questions and answers --------------------------
+{
+  const g = JSON.stringify({ variant: 0, quiz: [{ id: 'q1-four-ps', picked: 2, correct: true }, { id: 'q2-order', picked: 0, correct: false }, { id: 'q3-x' }] });
+  const r = JSON.stringify({ answers: { 'q3-x': 1 }, graded: true });
+  const rows = D.quizAnswerRows(g, r, { 'q1-four-ps': 'What are the four Ps?' });
+  check('quiz rows: question text, chosen letter, right or wrong', rows.map((x) => [x.question, x.chosen, x.correct]),
+    [['What are the four Ps?', 'Choice C', true], ['order', 'Choice A', false], ['x', 'Choice B', null]]);
+  check('not a quiz is null', D.quizAnswerRows(JSON.stringify({ criteria: [] }), '', {}), null);
+  check('malformed grade is null', D.quizAnswerRows('{', '', {}), null);
+  check('a question with no pick says so', D.quizAnswerRows(JSON.stringify({ quiz: [{ id: 'q1' }] }), null, null)[0].chosen, 'No answer');
+}
 
 console.log(`\n${n} checks`);

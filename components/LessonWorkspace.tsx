@@ -7,7 +7,7 @@ import { useLessonStore, flattenFiles } from '../lib/store';
 import { buildPreviewHtml } from '../lib/preview-builder';
 import { saveProgress, normalizeEol } from '../lib/version-control';
 import { seedPlan } from '../lib/plan-seed';
-import { recordSubmission, saveDraft, streamGrade } from '../lib/written-grader-store';
+import { fetchSubmissions, recordSubmission, saveDraft, streamGrade } from '../lib/written-grader-store';
 import { classifyGradeFailure, gradeFailureMessage } from '../lib/grade-error';
 import { aiCheckText, aiNoteForRun, applyAiVerdicts, canSubmitMoshion, fallbackRunner, moshionRunNeed, moshionRunStep, moshionSubmitWords, NO_MOSHION_RUN, reportFromRequirements, runLetsSubmit, staleAiNote, verdictsFromCriteria, type AiVerdicts, type MoshionRun } from '../lib/ai-check';
 import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
@@ -15,7 +15,8 @@ import GradeQuotaNote from './GradeQuotaNote';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
 import AiGradeResultPanel, { type AiGradeResultData } from './AiGradeResultPanel';
 import { useAttemptCap, useCompletionRepair } from '../lib/use-attempt-cap';
-import { navigateToNextLesson } from '../lib/lesson-neighbors';
+import LessonOutcome from './LessonOutcome';
+import { isOutOfDate, latestSubmittedAt, ranWhen, submittedOn } from '../lib/outcome-words';
 import { grade } from '../lib/grader';
 import type { GradeReport as GradeReportType, GradeContext } from '../lib/grader';
 import { NO_TEACHER_MODES, resolveMode, type TeacherModes } from '../lib/lesson-mode';
@@ -157,6 +158,23 @@ export default function LessonWorkspace({
   const [toolsOpen, setToolsOpen] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  // ux1 B1/B2/B4. When THIS visit submitted (focus goes to Next), the code it submitted (Submit
+  // opens again once the code changes, so a redo is possible), and the newest submission the
+  // server holds for a return visit.
+  const [submittedAt, setSubmittedAt] = useState<number | null>(null);
+  const [submittedOnText, setSubmittedOnText] = useState<string | null>(null);
+  const [priorSubmittedAt, setPriorSubmittedAt] = useState<number | null>(null);
+  // When the last Run / the last marking of the cards happened, and the text each one read.
+  const [ranAt, setRanAt] = useState<number | null>(null);
+  const [ranOn, setRanOn] = useState<string | null>(null);
+  const [checkedAt, setCheckedAt] = useState<number | null>(null);
+  const [checkedOn, setCheckedOn] = useState<string | null>(null);
+  const [clock, setClock] = useState(() => Date.now());
+  useEffect(() => {
+    if (!ranAt && !checkedAt && !submittedAt) return;
+    const t = setInterval(() => setClock(Date.now()), 15_000);
+    return () => clearInterval(t);
+  }, [ranAt, checkedAt, submittedAt]);
   // Tries on a capped performance-assessment part, counted on the server
   // (lib/use-attempt-cap.ts). Absent maxSubmissions = uncapped, nothing changes.
   const lessonProgress = useLessonState();
@@ -512,6 +530,9 @@ export default function LessonWorkspace({
     const logs: Array<{type: string; message: string; timestamp: string}> = [];
 
     const finish = () => {
+      setRanAt(Date.now());
+      setClock(Date.now());
+      setRanOn(scriptContent);
       setIsRunning(false);
       setConsoleOutput(logs);
       setRunKey((k) => k + 1);
@@ -646,6 +667,9 @@ export default function LessonWorkspace({
     setRuntimeError(null);
     setMoshionRun((r) => moshionRunStep(r, { type: 'run', text: code }));
     setQ5Code(code);
+    setRanAt(Date.now());
+    setClock(Date.now());
+    setRanOn(code);
     setRunKey((k) => k + 1);
     setConsoleResetKey((k) => k + 1);
     setConsoleOpen(true);
@@ -824,6 +848,14 @@ export default function LessonWorkspace({
         return { ...r, ...result };
       });
     const ai = aiVerdictsRef.current;
+    // The cards now describe this text: stamp when, so the row can say "Checked just now" and
+    // "Out of date" once the code changes (ux1 B4). An aiCheck lab without fresh verdicts keeps
+    // its cards ungraded, which is not a new result.
+    if (!aiCheck || aiFallbackRef.current === aiText(files) || (ai && ai.text === aiText(files))) {
+      setCheckedAt(Date.now());
+      setClock(Date.now());
+      setCheckedOn(files['script.js'] ?? '');
+    }
     // On an aiCheck lab Run is for running: the AI's Grade owns the cards, so with no fresh
     // verdicts they stay ungraded rather than showing the pattern check's red and green.
     setRequirements(
@@ -892,10 +924,13 @@ export default function LessonWorkspace({
       const verdicts = verdictsFromCriteria(data.criteria ?? [], aiCheck.rubric.map((r) => r.id));
       aiVerdictsRef.current = { verdicts, text };
       setRequirements(applyAiVerdicts(useLessonStore.getState().requirements, verdicts));
+      setCheckedAt(Date.now());
+      setClock(Date.now());
+      setCheckedOn(useLessonStore.getState().fileContents['script.js'] ?? '');
       const green = Object.values(verdicts).filter((v) => v.passed).length;
       setAiCheckNote({
         kind: 'ok',
-        text: `${data.summary ? data.summary + ' ' : ''}(${green} of ${aiCheck.rubric.length} green. Open Quest for the notes.)`.trim(),
+        text: `${data.summary ? data.summary + ' ' : ''}(${green} of ${aiCheck.rubric.length} passed. Each one is listed above.)`.trim(),
         hints: Array.isArray(data.hints) ? data.hints : [],
       });
     } catch (e) {
@@ -1063,8 +1098,11 @@ export default function LessonWorkspace({
       cap.spend();
       return;
     }
+    // Stay on the page (ux1 B1): the outcome block above the editor says it worked, and its
+    // Next takes focus. Submit opens again once the code changes, for a student who wants to redo it.
     setSubmitted(true);
-    navigateToNextLesson(lesson.id);
+    setSubmittedAt(Date.now());
+    setSubmittedOnText(JSON.stringify(state.fileContents));
   };
 
   const totalScore = gradeReport?.totalScore || 0;
@@ -1114,10 +1152,40 @@ export default function LessonWorkspace({
       : runLetsSubmit({ error: runtimeError, pending: false }, expectsRuntimeError) &&
         (isNoPoints ? allRequirementsPassed : totalScore >= (lesson.grading?.passingScore ?? 0)));
   const canSubmit = canSubmitByWork && !cap.unknown && !cap.reached;
+  // The code on screen is the code just submitted: nothing new to hand in. Edit it and Submit opens
+  // again (subject to the same checks), which is how a student redoes a submitted lab.
+  const scriptNow = files['script.js'] ?? '';
+  const submitLocked = submitted && submittedOnText !== null && submittedOnText === JSON.stringify(files);
+  // Done on an earlier visit, from the saved lesson state the header and the module bar read.
+  const isLab = isConsoleMode || isMoshionMode;
+  const priorDone = isLab && !capped && lessonProgress.states[lesson.id] === 'completed';
+  useEffect(() => {
+    if (!priorDone || !lessonProgress.authed || priorSubmittedAt !== null) return;
+    let live = true;
+    void fetchSubmissions(lesson.id).then((r) => {
+      if (live && r.loaded) setPriorSubmittedAt(latestSubmittedAt(r.records as { submittedAt?: number }[]) ?? 0);
+    });
+    return () => { live = false; };
+  }, [priorDone, lessonProgress.authed, lesson.id, priorSubmittedAt]);
+  const showOutcome = !capped && (submitted || priorDone);
+  const outcomeAt = submittedAt ?? (priorSubmittedAt || null);
+  const checksStale = isOutOfDate(checkedOn, scriptNow);
+  const runStale = isOutOfDate(ranOn, scriptNow);
+  const anyChecked = requirements.some((r) => r.status === 'passed' || r.status === 'failed');
+  // A display-only copy of the last marked cards. An AI-checked lab drops its marks on the first edit
+  // (Submit records the cards as shown, see #68), which made a result vanish rather than say it is
+  // old; the row keeps showing this copy, dimmed and labelled "Out of date", until the next Check.
+  // Nothing grades, records or gates Submit from it.
+  const [lastMarked, setLastMarked] = useState<typeof requirements | null>(null);
+  useEffect(() => {
+    if (anyChecked) setLastMarked(requirements);
+  }, [anyChecked, requirements]);
+  const rowReqs = anyChecked ? requirements : checksStale && lastMarked ? lastMarked : requirements;
+  const rowMarked = anyChecked || (checksStale && !!lastMarked);
   // Why a moSHion lab's Submit is shut, in the header and on Submit's hover. A test part, a spent
   // try cap or a submitted lab says nothing here: the banner and the header already do.
   const moshionWords =
-    isMoshionMode && !isSummative && !submitted && !cap.unknown && !cap.reached
+    isMoshionMode && !isSummative && !submitLocked && !cap.unknown && !cap.reached
       ? moshionSubmitWords({ need: moshionNeed, cardsOk: allRequirementsPassed, aiCheck: !!aiCheck })
       : {};
   // Any lesson with graded criteria keeps the score header, not just the
@@ -1288,8 +1356,10 @@ export default function LessonWorkspace({
           score={headerScore}
           totalPossible={headerTotal}
           onSubmit={handleSubmit}
-          submitted={submitted}
+          submitted={submitLocked}
           canSubmit={canSubmit}
+          doneNote={showOutcome ? 'Submitted' : undefined}
+          hideScore={showOutcome && !anyChecked}
           unitLabel={headerUnitLabel}
           showStatus={!isMoshionMode}
           showSubmit
@@ -1332,6 +1402,19 @@ export default function LessonWorkspace({
       )}
       <div className="editor-card">
         <div className="editor-body">
+          {showOutcome ? (
+            <LessonOutcome
+              lessonId={lesson.id}
+              id={`lab-outcome-${lesson.id}`}
+              title={outcomeAt ? `Submitted on ${submittedOn(outcomeAt, clock)}` : 'Submitted'}
+              detail={
+                submitLocked
+                  ? <>Your teacher can see it. Want to change it? Edit your code, press {aiCheck ? 'Check' : 'Run'}, then Submit again. Your best result is kept.</>
+                  : <>This lab is done. You can keep working on it: change your code, press {aiCheck ? 'Check' : 'Run'}, then Submit again. Your best result is kept.</>
+              }
+              focusKey={submittedAt}
+            />
+          ) : null}
           <div className="run-toolbar">
             {(isTextMode || isConsoleMode || isReshapeMode || isMoshionMode) && (
               <>
@@ -1403,14 +1486,14 @@ export default function LessonWorkspace({
                   <button
                     className="btn-primary btn-sm toolbar-submit"
                     onClick={handleSubmit}
-                    disabled={submitted || !canSubmit}
-                    title={!canSubmit ? moshionWords.title : undefined}
+                    disabled={submitLocked || !canSubmit}
+                    title={submitLocked ? 'Already submitted. Change your code to submit again.' : !canSubmit ? moshionWords.title : undefined}
                   >
                     <Send size={14} />
                     Submit
                   </button>
                 )}
-                {(isMoshionMode || isConsoleMode) && !submitted && !canSubmit && !runtimeError && !isSummative && !cap.unknown && !cap.reached && (
+                {(isMoshionMode || isConsoleMode) && !submitLocked && !canSubmit && !runtimeError && !isSummative && !cap.unknown && !cap.reached && (
                   // Why Submit is shut, in a few words beside it (climb4 r10 S7); the full reason is on its hover.
                   <span className="toolbar-submit-hint">
                     {allRequirementsPassed ? 'Run it, then Submit' : aiCheck ? 'Pass Check to submit' : 'Pass the tests to submit'}
@@ -1509,6 +1592,9 @@ export default function LessonWorkspace({
                       aiVerdictsRef.current = null;
                       aiFallbackRef.current = null;
                       setAiCheckNote(null);
+                      setLastMarked(null);
+                      setCheckedOn(null);
+                      setCheckedAt(null);
                       // A plan lesson's strip recomputes from the restored text in
                       // the effect above; setting the authored cards here would flash
                       // the old four onto it.
@@ -1577,23 +1663,46 @@ export default function LessonWorkspace({
               )}
             </div>
           </div>
-          {isConsoleMode && requirements.length > 0 && (
+          {isLab && requirements.length > 0 && (() => {
             // What Check (or Run, with no AI check) marks, right under the buttons, so the task, the
-            // editor and the test read as one sequence. The Quest drawer keeps the full cards.
-            <div className="lab-check-tests">
-              <span className="lab-check-tests-label">{aiGraded ? 'Grade looks for' : aiCheck || isTextMode ? 'Check looks for' : 'Run checks'}</span>
-              <ul>
-                {requirements.slice(0, 3).map((r) => (
-                  <li key={r.id} data-status={r.status}>
-                    <span className="lab-check-dot" aria-hidden="true">{r.status === 'passed' ? '✓' : r.status === 'failed' ? '✗' : '○'}</span>
-                    <span>{checkLine(r.description || r.title)}</span>
-                    <span className="sr-only">{r.status === 'passed' ? ' (done)' : r.status === 'failed' ? ' (not yet)' : ' (not checked yet)'}</span>
-                  </li>
-                ))}
-                {requirements.length > 3 && <li className="lab-check-more">and {requirements.length - 3} more under Quest</li>}
-              </ul>
-            </div>
-          )}
+            // editor and the test read as one sequence. Once the cards are marked this row IS the
+            // result (ux1 B3): every requirement green or red, a red one with its reason, the time it
+            // ran, and "Out of date" once the code changes (B4). The Quest drawer keeps the full cards.
+            const passedN = rowReqs.filter((r) => r.status === 'passed').length;
+            const shown = rowMarked ? rowReqs : requirements.slice(0, 3);
+            return (
+              <div className={`lab-check-tests${rowMarked ? ' has-results' : ''}${rowMarked && checksStale ? ' is-stale' : ''}`} id={`lab-check-${lesson.id}`}>
+                <span className="lab-check-tests-label">
+                  {rowMarked
+                    ? `${passedN} of ${rowReqs.length} passed`
+                    : aiGraded ? 'Grade looks for' : aiCheck || isTextMode ? 'Check looks for' : 'Run checks'}
+                </span>
+                {rowMarked && checkedAt ? (
+                  <span className="lab-check-when" role="status" aria-live="polite">
+                    {checksStale ? `Out of date: ${aiCheck ? 'check' : 'run'} again` : `Checked ${ranWhen(checkedAt, clock)}`}
+                  </span>
+                ) : null}
+                <ul>
+                  {shown.map((r) => {
+                    const why = r.status === 'failed' ? (r.messages ?? []).filter(Boolean)[0] : undefined;
+                    return (
+                      <li key={r.id} data-status={r.status}>
+                        <span className="lab-check-dot" aria-hidden="true">{r.status === 'passed' ? '✓' : r.status === 'failed' ? '✗' : '○'}</span>
+                        <span className="lab-check-item">
+                          <span>{rowMarked ? r.title : checkLine(r.description || r.title)}</span>
+                          <span className="sr-only">{r.status === 'passed' ? ' (done)' : r.status === 'failed' ? ' (not yet)' : ' (not checked yet)'}</span>
+                          {r.status === 'failed' ? (
+                            <span className="lab-check-why">{why ? checkLine(why) : r.description ? `Not yet. It looks for: ${checkLine(r.description)}` : 'Not found in your code yet.'}</span>
+                          ) : null}
+                        </span>
+                      </li>
+                    );
+                  })}
+                  {!rowMarked && requirements.length > 3 && <li className="lab-check-more">and {requirements.length - 3} more under Quest</li>}
+                </ul>
+              </div>
+            );
+          })()}
           {aiCheck && (
             // The AI's read of the steps, directly under the Grade button and
             // above the textarea it graded.
@@ -1663,9 +1772,14 @@ export default function LessonWorkspace({
                 <div className="pane" id="previewPane">
                   {isConsoleMode ? (
                     <>
-                      <div className="output-header">Output</div>
+                      <div className="output-header">
+                        Output
+                        {ranAt && !isRunning ? (
+                          <span className={`run-stamp${runStale ? ' is-stale' : ''}`}>{runStale ? 'Out of date: run again' : `Ran ${ranWhen(ranAt, clock)}`}</span>
+                        ) : null}
+                      </div>
                       <pre
-                        className="console-output run-output"
+                        className={`console-output run-output${runStale ? ' is-stale' : ''}`}
                         role="log"
                         aria-live="polite"
                         aria-atomic="false"
@@ -1677,7 +1791,7 @@ export default function LessonWorkspace({
                             {runKey === 0
                               ? 'Click Run to see output.'
                               : lesson.requirements.length > 0
-                                ? 'Checked. Nothing was printed. Open the Quest panel to see which checks passed.'
+                                ? 'Ran. Nothing was printed. The checks are listed above the editor.'
                                 : 'Ran. Nothing was printed.'}
                           </div>
                         ) : (
@@ -1690,7 +1804,12 @@ export default function LessonWorkspace({
                       </pre>
                     </>
                   ) : isMoshionMode ? (
-                    <MoshionPreview ref={labFrameRef} code={q5Code} runKey={runKey} gameKey={lesson.id} />
+                    <>
+                      {ranAt && runKey > 0 ? (
+                        <span className={`run-stamp run-stamp-float${runStale ? ' is-stale' : ''}`}>{runStale ? 'Out of date: run again' : `Ran ${ranWhen(ranAt, clock)}`}</span>
+                      ) : null}
+                      <MoshionPreview ref={labFrameRef} code={q5Code} runKey={runKey} gameKey={lesson.id} />
+                    </>
                   ) : (
                     <LivePreview srcDoc={srcDoc} />
                   )}

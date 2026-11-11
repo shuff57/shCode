@@ -95,6 +95,22 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (
     return json({ error: 'Not authorized for this class' }, 403);
   }
 
+  // `?briefs=<lessonId>[,<lessonId>...]`: the assignment briefs only (the student drawer's Override score
+  // marks a rubric from them), no submissions. Same teacher/admin gate, same fail-closed lookup; at most
+  // 20 ids, each resolved against the bundled config and never echoed back unless it is a real lesson.
+  const briefsParam = new URL(request.url).searchParams.get('briefs');
+  if (briefsParam !== null) {
+    const ids = [...new Set(briefsParam.split(',').map((s) => s.trim()).filter((s) => s.length > 0 && s.length <= 200))].slice(0, 20);
+    const assignments: Record<string, TeacherBrief> = {};
+    for (const lessonId of ids) {
+      try {
+        const brief = teacherBrief(await loadAiGrader(env, request, lessonId));
+        if (brief) assignments[lessonId] = brief;
+      } catch { /* fail closed */ }
+    }
+    return json({ assignments });
+  }
+
   const now = Date.now();
 
   // Rows a human must grade: the outage marker by the same exact JSON rule attempts.ts counts with

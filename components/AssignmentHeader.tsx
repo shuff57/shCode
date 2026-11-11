@@ -34,6 +34,10 @@ interface AssignmentHeaderProps {
   /** Id for an empty slot at the end of the status row: the desktop tool buttons
    *  (TabbedRightDrawer's inlineHostId) render into it. */
   toolsHostId?: string;
+  /** The lab was handed in (this visit or an earlier one): said in place of "still needed" (ux1 B2). */
+  doneNote?: string;
+  /** Hide the "0/1 done" count: on a return visit nothing has been checked yet, and a zero read as lost work. */
+  hideScore?: boolean;
 }
 
 export default function AssignmentHeader({
@@ -53,10 +57,12 @@ export default function AssignmentHeader({
   unmetNote,
   blockedNote,
   toolsHostId,
+  doneNote,
+  hideScore = false,
 }: AssignmentHeaderProps) {
   const pct = totalPossible > 0 ? Math.round((score / totalPossible) * 100) : 0;
 
-  const scoreBlock = (
+  const scoreBlock = hideScore ? null : (
     <div className="assignment-score">
       <div className="score-bar">
         <div
@@ -70,13 +76,15 @@ export default function AssignmentHeader({
     </div>
   );
 
-  const statusBadge = showStatus && !(compactLab && !submitted) ? (
+  const statusBadge = showStatus && !doneNote && !(compactLab && !submitted) ? (
     <span className={`assignment-status ${submitted ? 'submitted' : 'in-progress'}`}>
       {submitted ? 'Submitted' : 'In Progress'}
     </span>
   ) : null;
 
-  const unmetHint =
+  const unmetHint = doneNote ? (
+    <div className="assignment-done-note"><span aria-hidden="true">✓ </span>{doneNote}</div>
+  ) :
     !submitted && !canSubmit && unmetTitles && unmetTitles.length > 0 ? (
       compactLab ? (
         // One status on a lab (climb4 r9 S6): the count sits in the score text, so the hint is the next action.
