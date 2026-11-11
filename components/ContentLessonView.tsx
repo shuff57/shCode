@@ -17,6 +17,7 @@ import { withInlineCode } from './InlineCode';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import DocsDrawer from './DocsDrawer';
 import { withAlpha } from '../lib/color-alpha';
+import { Maximize2 } from 'lucide-react';
 
 // Outline updates must not re-inject markdown HTML and discard heading IDs.
 const MarkdownWithLiveBlocks = memo(MarkdownWithLiveBlocksContent);
@@ -108,6 +109,32 @@ export default function ContentLessonView({ lesson }: Props) {
   const readingLayout = !meta.quiz && !meta.diagram;
   const focusedLayout = readingLayout && preview !== 'example';
   const hasOutline = readingLayout && !meta.videoUrl && preview !== 'slides' && outline.length >= 2;
+  // "On this page" marks the section being read: the last heading above a line 30% down the window,
+  // the first one at the top of the page.
+  const [activeHeading, setActiveHeading] = useState<string | null>(null);
+  useEffect(() => {
+    if (!hasOutline) return;
+    let raf = 0;
+    const pick = () => {
+      raf = 0;
+      const line = window.innerHeight * 0.3;
+      let current = outline[0]?.id ?? null;
+      for (const h of outline) {
+        const el = document.getElementById(h.id);
+        if (el && el.getBoundingClientRect().top <= line) current = h.id;
+      }
+      setActiveHeading(current);
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(pick); };
+    pick();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [hasOutline, outline]);
 
   useEffect(() => {
     const main = mainRef.current;
@@ -226,6 +253,7 @@ export default function ContentLessonView({ lesson }: Props) {
     <>
       <TabbedRightDrawer
         storageKey="shCode:content-drawer"
+        inlineHostId="content-tools-host"
         tabs={[
           {
             key: 'docs',
@@ -276,12 +304,14 @@ export default function ContentLessonView({ lesson }: Props) {
             Open in new tab →
           </a>
         ) : null}
+        {/* Desktop: the Docs button sits here, with the lesson's own details (TabbedRightDrawer inlineHostId). */}
+        <div id="content-tools-host" className="shd-inline-host" />
       </div>
       <div className={readingLayout ? `lesson-reading-grid${focusedLayout ? ' lesson-focused-grid' : ''}${hasOutline ? ' has-outline' : ''}` : 'lesson-content-flow'}>
       {hasOutline && <aside className="lesson-overview" aria-label="Lesson overview">
         <nav aria-label="On this page">
           <h2>On this page</h2>
-          <ul>{outline.map((heading) => <li key={heading.id} className={heading.level === 3 ? 'outline-subheading' : undefined}><a href={`#${heading.id}`}>{heading.title}</a></li>)}</ul>
+          <ul>{outline.map((heading) => <li key={heading.id} className={heading.level === 3 ? 'outline-subheading' : undefined}><a href={`#${heading.id}`} aria-current={activeHeading === heading.id ? 'location' : undefined}>{heading.title}</a></li>)}</ul>
         </nav>
       </aside>}
       <LessonPrimary wrap={focusedLayout}>
@@ -354,7 +384,18 @@ export default function ContentLessonView({ lesson }: Props) {
             </div>
             <nav aria-label="Slide navigation" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 10 }}>
               <button className="btn-secondary btn-sm" disabled={!deckLoaded || slidePosition?.current === 1} onClick={() => navigateSlide('ArrowLeft')}>‹ Previous</button>
-              <span aria-live="polite" style={{ color: 'var(--c-meta)', fontSize: 13 }}>{slidePosition ? `Slide ${slidePosition.current} of ${slidePosition.total}` : 'Slides'}</span>
+              <span className="slide-nav-middle">
+                <span aria-live="polite" className="slide-count" style={{ color: 'var(--c-meta)', fontSize: 13 }}>{slidePosition ? `Slide ${slidePosition.current} of ${slidePosition.total}` : 'Slides'}</span>
+                <button
+                  type="button"
+                  className="btn-secondary btn-sm slide-fullscreen"
+                  disabled={!deckLoaded}
+                  onClick={() => { void frameRef.current?.requestFullscreen?.(); }}
+                  title="Show the slides on the whole screen (Esc to leave)"
+                >
+                  <Maximize2 size={13} aria-hidden="true" /> Full screen
+                </button>
+              </span>
               <button className="btn-secondary btn-sm slide-next" disabled={!deckLoaded || (!!slidePosition && slidePosition.current >= slidePosition.total)} onClick={() => navigateSlide('ArrowRight')}>Next ›</button>
             </nav>
           </div>

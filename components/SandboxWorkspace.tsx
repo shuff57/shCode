@@ -651,6 +651,21 @@ export default function SandboxWorkspace() {
   // reason to switch program type mid-model).
   // History and Save ride in both toolbars: reSHape folds the sandbox's chrome
   // into ReshapeStudio's own row, while every other mode has the normal one.
+  // What Save has done for the code on screen: always kept on this device (the local draft), and in the
+  // cloud once a Save in this visit succeeded and nothing has changed since.
+  const contentKey = `${modeId}:${JSON.stringify(fileContents)}`;
+  const [cloudKey, setCloudKey] = useState<string | null>(null);
+  const wasSaving = useRef(false);
+  useEffect(() => {
+    if (wasSaving.current && !cloud.saving && cloud.note && cloud.note.kind !== 'error') setCloudKey(contentKey);
+    wasSaving.current = cloud.saving;
+  }, [cloud.saving, cloud.note, contentKey]);
+  const saveState = cloudKey === null || !cloudKey.startsWith(`${modeId}:`)
+    ? { kind: 'device', text: 'Saved on this device' }
+    : cloudKey === contentKey
+      ? { kind: 'cloud', text: 'Saved to the cloud' }
+      : { kind: 'changed', text: 'Changed since cloud save' };
+
   const renderCloudChips = () => (
     <>
       <button
@@ -666,6 +681,7 @@ export default function SandboxWorkspace() {
         <span style={{ position: 'relative', display: 'inline-flex' }}>
           <button
             style={chipStyle}
+            className="sandbox-save-btn"
             onClick={saveToCloud}
             disabled={cloud.saving}
             title="Save this sandbox to the cloud so you can open it on another device."
@@ -676,6 +692,11 @@ export default function SandboxWorkspace() {
           <span role="status" aria-live="polite" className="sandbox-save-note" data-kind={cloud.note?.kind ?? ''} hidden={!cloud.note}>
             {cloud.note ? `${cloud.note.kind === 'error' ? '✗' : '✓'} ${cloud.note.text}` : null}
           </span>
+        </span>
+      )}
+      {lessonProgress.authed && (
+        <span className="sandbox-save-state" data-state={saveState.kind} title="Your code is always kept in this browser. Save also puts it in your account, so it opens on any device.">
+          <span className="sandbox-save-dot" aria-hidden="true" />{saveState.text}
         </span>
       )}
     </>
@@ -719,7 +740,7 @@ export default function SandboxWorkspace() {
   return (
     <>
       <EarlyPickScript />
-      <TabbedRightDrawer storageKey="shCode:sandbox-drawer" tabs={drawerTabs} />
+      <TabbedRightDrawer storageKey="shCode:sandbox-drawer" tabs={drawerTabs} inlineHostId="sandbox-tools-host" />
       <div
         className={
           'sandbox-shell'
@@ -735,6 +756,8 @@ export default function SandboxWorkspace() {
             <span className="sandbox-subtitle">{mode.blurb}</span>
             {/* Up here rather than at the end of the toolbar, where it took a row of its own at 1366 wide. */}
             {!isReshape && !isFlow && <span className="run-hint sandbox-run-hint">Ctrl+Enter to run</span>}
+            {/* Desktop: the drawer's tool buttons (Textures, Sounds, Library, CODY, Docs) render here. */}
+            <div id="sandbox-tools-host" className="shd-inline-host" />
           </div>
         )}
 

@@ -242,7 +242,7 @@ export default function StudentGradebook({ lessons }: Props) {
             <div style={{ display: 'flex', alignItems: 'stretch', gap: 20 }}>
               <div style={{ minWidth: 110, paddingRight: 20, borderRight: '1px solid var(--c-line)' }}>
                 <div style={{ color: 'var(--c-meta)', fontSize: 13, marginBottom: 2 }}>Grade so far</div>
-                <strong style={{ fontSize: 28, lineHeight: 1.2 }}>{g.percent}%</strong>
+                <strong className={g.missingCount > 0 && g.percent < 70 ? 'grade-so-far is-warning' : 'grade-so-far'} style={{ fontSize: 28, lineHeight: 1.2 }}>{g.percent}%</strong>
               </div>
               {g.missingCount > 0 && <a href="#missing-late-filter" style={{ color: 'var(--c-fg)', textDecoration: 'none', paddingRight: 20, borderRight: '1px solid var(--c-line)' }}>
                 <div style={{ color: 'var(--c-meta)', fontSize: 13, marginBottom: 2 }}>Past due</div>
@@ -252,7 +252,7 @@ export default function StudentGradebook({ lessons }: Props) {
             <div style={{ flex: '1 1 320px', minWidth: 0, maxWidth: '64ch' }}>
               <div style={{ color: 'var(--c-meta)', fontSize: 13 }}>{grades.length > 1 ? g.className : 'In your class'}</div>
               <div style={{ color: 'var(--c-meta)', fontSize: 14, marginTop: 2, lineHeight: 1.5 }}>
-                Unfinished work past its due date counts as zero until you finish it; work not due yet is excluded.
+                Past due means a graded lesson not finished by its due date: it counts as 0 until you finish it. Work not due yet does not count. The Missing or late list below also shows work you finished late.
               </div>
             </div>
           </div>
@@ -413,7 +413,10 @@ export default function StudentGradebook({ lessons }: Props) {
                         </span>
                       </td>
                       <td style={scoreCellStyle}>
-                        {bestText ?? score ?? '\u2014'}
+                        {bestText ?? score ?? (status === 'missing'
+                          // Past due and not done: the grade above counts it as 0 until it is finished.
+                          ? <span className="gb-zero" title="Counts as 0 until you finish it">0</span>
+                          : '\u2014')}
                         {t && t.used > 0 && !tried && (
                           <div style={{ color: 'var(--c-meta)', fontSize: 13 }}>
                             {t.used} of {t.cap} {t.cap === 1 ? 'try' : 'tries'} used

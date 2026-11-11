@@ -190,6 +190,9 @@ interface OverrideFormProps {
    *  extra credit is allowed, the mark simply becomes the score, and there is no choice to clear (the
    *  server 400s a clear there), so neither the box nor the clear button is shown. */
   enforceMax?: boolean;
+  /** Shown to the LEFT of the score and feedback (climb4 r7 T4): the compact rubric on a submission that
+   *  needs a manual grade, so the criteria and the score are read together. */
+  aside?: React.ReactNode;
   /** A 0-point part (no criteria, no points): the mark is recorded for the teacher and the course
    *  grade does not change (the lab counts as done at 100%). */
   zeroPoint?: boolean;
@@ -203,7 +206,7 @@ function markUnit(g: GradeJson | null): { total: number } | null {
   return { total: g.criteria.length };
 }
 
-export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = null, enforceMax = false, zeroPoint = false, onOverride }: OverrideFormProps) {
+export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = null, enforceMax = false, zeroPoint = false, aside, onOverride }: OverrideFormProps) {
   // The queue reloads after a save and unmounts this form, taking its inline message with it; a toast survives that.
   const { toast } = useFeedback();
   const [score, setScore] = useState('');
@@ -334,12 +337,8 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
     </div>
   );
 
-  return (
-    <form
-      onSubmit={handleOverride}
-      className="override-form"
-      style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--c-line)' }}
-    >
+  const body = (
+    <>
       <div className="override-fields">
       <div className="override-score" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6 }}>
         <label htmlFor={`override-score-${submissionId}`} style={FIELD_LABEL}>
@@ -404,6 +403,21 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
       )}
 
       {enforceMax && actions}
+    </>
+  );
+
+  return (
+    <form
+      onSubmit={handleOverride}
+      className={aside ? 'override-form has-aside' : 'override-form'}
+      style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--c-line)' }}
+    >
+      {aside ? (
+        <>
+          <div className="override-aside">{aside}</div>
+          <div className="override-main">{body}</div>
+        </>
+      ) : body}
     </form>
   );
 }
@@ -417,7 +431,7 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
  * see the question. Open on a desktop, folded on a phone (where the answer and the form matter most).
  * Renders nothing when the server sent no brief for the lesson.
  */
-function AssignmentBlock({ brief }: { brief: AssignmentBrief }) {
+function AssignmentBlock({ brief, hideRubric = false }: { brief: AssignmentBrief; hideRubric?: boolean }) {
   // The prompt is always shown; the rubric is folded so the answer and the score field stay on screen
   // (open by default it pushed both below the fold and lost its blind comparison).
   const [open, setOpen] = useState(false);
@@ -430,7 +444,7 @@ function AssignmentBlock({ brief }: { brief: AssignmentBrief }) {
           <div className="sq-assignment-prompt">{brief.prompt}</div>
         </div>
       )}
-    {brief.rubric.length > 0 && (
+    {brief.rubric.length > 0 && !hideRubric && (
     <details open={open} onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}>
       <summary>
         Rubric
@@ -460,6 +474,54 @@ function AssignmentBlock({ brief }: { brief: AssignmentBrief }) {
       </div>
     </details>
     )}
+    </div>
+  );
+}
+
+/**
+ * The rubric OPEN but compact, beside the score field of a submission that needs a manual grade
+ * (climb4 r7 T4): one line per criterion, title left and points right, two columns when there is room.
+ * The descriptions stay behind a disclosure so Save grade stays on screen.
+ */
+function RubricCompact({ brief, submissionId }: { brief: AssignmentBrief; submissionId: string }) {
+  const [details, setDetails] = useState(false);
+  const total = brief.rubric.reduce((n, c) => n + (c.points > 0 ? c.points : 0), 0);
+  const hasDescriptions = brief.rubric.some((c) => c.description);
+  const listId = `sq-rubric-${submissionId}`;
+  // Every criterion worth the same: say it once in the heading and give the titles the room.
+  const each = brief.rubric.length > 1 && brief.rubric.every((c) => c.points === brief.rubric[0].points) ? brief.rubric[0].points : null;
+  return (
+    <div className="sq-rubric-compact">
+      <div className="sq-rubric-compact-head">
+        <span className="sq-rubric-compact-title">
+          Rubric
+          <span className="sq-assignment-meta">
+            {` · ${brief.rubric.length} criteri${brief.rubric.length === 1 ? 'on' : 'a'}`}
+            {each !== null
+              ? each > 0 ? `, ${each} point${each === 1 ? '' : 's'} each` : ', each met or not met'
+              : total > 0 ? `, ${total} point${total === 1 ? '' : 's'}` : ''}
+          </span>
+        </span>
+        {hasDescriptions && (
+          <button type="button" className="sq-rubric-compact-toggle" aria-expanded={details} aria-controls={listId} onClick={() => setDetails((v) => !v)}>
+            {details ? 'Hide descriptions' : 'Show descriptions'}
+          </button>
+        )}
+      </div>
+      <ol id={listId} className={details ? 'sq-rubric-compact-list is-detailed' : 'sq-rubric-compact-list'}>
+        {brief.rubric.map((c) => (
+          <li key={c.id}>
+            <div className="sq-rubric-head">
+              <span className="sq-rubric-title" title={details ? undefined : c.description ? `${c.title}: ${c.description}` : c.title}>
+                {c.title}
+                {c.required && <span className="sq-rubric-required">Required</span>}
+              </span>
+              {each === null && <span className="sq-rubric-points">{c.points > 0 ? `${c.points} pt${c.points === 1 ? '' : 's'}` : 'met / not'}</span>}
+            </div>
+            {details && c.description && <div className="sq-rubric-desc">{c.description}</div>}
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }
@@ -611,8 +673,11 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                   color: failed ? 'var(--c-bg)' : 'var(--c-fg)',
                   padding: '4px 12px',
                   borderRadius: 4,
-                  fontSize: 13,
-                  fontWeight: 600,
+                  // r7 T8: a status and a score, read as data: the reading face, not small mono.
+                  fontFamily: 'var(--font-prose)',
+                  fontSize: 14,
+                  fontWeight: 700,
+                  fontVariantNumeric: 'tabular-nums',
                 }}
               >
                 {failed
@@ -663,7 +728,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
             <div className="sq-review-cols">
             <div className="sq-review-col">
             {/* The question and its criteria, above the answer they grade. */}
-            {brief && <AssignmentBlock brief={brief} />}
+            {brief && <AssignmentBlock brief={brief} hideRubric={!!failed} />}
 
             {/* Grading criteria */}
             {gradeData && (
@@ -709,7 +774,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                 padding: '10px 12px',
               }}
             >
-              <div style={{ fontFamily: 'var(--font-prose)', fontWeight: 600, color: 'var(--c-meta)', fontSize: 13, marginBottom: 4 }}>
+              <div className="sq-answer-label" style={{ fontFamily: 'var(--font-prose)', fontWeight: 700, color: 'var(--c-fg)', fontSize: 14, marginBottom: 4 }}>
                 {diagram ? 'Student diagram' : 'Student response'}
               </div>
               <SubmissionBoundary raw={sub.response}>
@@ -777,6 +842,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
               pointsMax={sub.limit?.unit === 'points' ? sub.limit.max : null}
               enforceMax={sub.capped === true}
               zeroPoint={!unit && sub.limit?.unit !== 'points' && sub.possible === 0 && !isQuizGrade(sub.grade_json)}
+              aside={failed && brief && brief.rubric.length > 0 ? <RubricCompact brief={brief} submissionId={sub.id} /> : undefined}
               onOverride={handleOverride}
             />
 

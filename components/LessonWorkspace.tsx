@@ -64,6 +64,13 @@ interface LessonWorkspaceProps {
   mode?: 'lesson' | 'assignment';
 }
 
+/** A requirement's description as one plain line for the lab's "Check looks for" row: markdown
+ *  backticks dropped and the trailing "Help: ..." pointer cut (the Quest card keeps both). */
+function checkLine(text: string): string {
+  const cut = text.split(/\s+Help:\s/)[0];
+  return cut.replace(/`/g, '').trim();
+}
+
 export default function LessonWorkspace({
   lesson,
   mode,
@@ -1130,6 +1137,7 @@ export default function LessonWorkspace({
       <CarryForwardBanner lesson={lesson} />
       <TabbedRightDrawer
         storageKey="shCode:drawer"
+        inlineHostId="lab-tools-host"
         tabs={[
           {
             key: 'help',
@@ -1289,10 +1297,12 @@ export default function LessonWorkspace({
           unmetTitles={unmetTitles}
           unmetNote={isMoshionMode ? moshionWords.note : aiCheck ? 'press Check to mark them' : undefined}
           blockedNote={moshionWords.line}
+          toolsHostId="lab-tools-host"
         />
       ) : (
         <div id="titleRow">
           <h1>{lesson.title}</h1>
+          <div id="lab-tools-host" className="shd-inline-host" />
         </div>
       )}
       {!showAssignmentHeader && capped ? <AttemptBanner max={cap.max} used={cap.used} loading={cap.loading} /> : null}
@@ -1560,6 +1570,23 @@ export default function LessonWorkspace({
               )}
             </div>
           </div>
+          {isConsoleMode && requirements.length > 0 && (
+            // What Check (or Run, with no AI check) marks, right under the buttons, so the task, the
+            // editor and the test read as one sequence. The Quest drawer keeps the full cards.
+            <div className="lab-check-tests">
+              <span className="lab-check-tests-label">{aiGraded ? 'Grade looks for' : aiCheck || isTextMode ? 'Check looks for' : 'Run checks'}</span>
+              <ul>
+                {requirements.slice(0, 3).map((r) => (
+                  <li key={r.id} data-status={r.status}>
+                    <span className="lab-check-dot" aria-hidden="true">{r.status === 'passed' ? '✓' : r.status === 'failed' ? '✗' : '○'}</span>
+                    <span>{checkLine(r.description || r.title)}</span>
+                    <span className="sr-only">{r.status === 'passed' ? ' (done)' : r.status === 'failed' ? ' (not yet)' : ' (not checked yet)'}</span>
+                  </li>
+                ))}
+                {requirements.length > 3 && <li className="lab-check-more">and {requirements.length - 3} more under Quest</li>}
+              </ul>
+            </div>
+          )}
           {aiCheck && (
             // The AI's read of the steps, directly under the Grade button and
             // above the textarea it graded.

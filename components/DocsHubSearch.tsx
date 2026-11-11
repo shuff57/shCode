@@ -7,6 +7,7 @@
 
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import Link from 'next/link';
+import { Search } from 'lucide-react';
 import { searchAllDocs, type HubDocSet, type HubSearchResult } from '../lib/docs-hub-search';
 
 async function loadSets(): Promise<HubDocSet[]> {
@@ -66,6 +67,19 @@ export default function DocsHubSearch() {
     if (e.key === 'Escape') { e.preventDefault(); setQuery(''); inputRef.current?.focus(); }
   };
 
+  // "/" anywhere on the page (outside a text field) jumps to the search box, as the hint in the box says.
+  useEffect(() => {
+    const onKey = (e: globalThis.KeyboardEvent) => {
+      if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      e.preventDefault();
+      inputRef.current?.focus();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   const status = !searching
     ? 'Type a word like array, sprite or extrude.'
     : !sets
@@ -77,6 +91,8 @@ export default function DocsHubSearch() {
   return (
     <div className="docs-hub-search" role="search">
       <label htmlFor={`${id}-q`} className="docs-hub-search-label">Search all docs</label>
+      <div className="docs-hub-search-field">
+      <Search size={16} className="docs-hub-search-icon" aria-hidden="true" />
       <input
         ref={inputRef}
         id={`${id}-q`}
@@ -90,7 +106,10 @@ export default function DocsHubSearch() {
         onFocus={load}
         onChange={(e) => setQuery(e.target.value)}
         onKeyDown={onInputKey}
+        aria-keyshortcuts="/"
       />
+      {!query && <kbd className="docs-hub-search-key" aria-hidden="true" title="Press / to search">/</kbd>}
+      </div>
       <p id={`${id}-status`} className="docs-hub-search-status" role="status" aria-live="polite">{status}</p>
       {searching && results.length > 0 && (
         <ol id={`${id}-results`} ref={listRef} className="docs-hub-search-results" onKeyDown={onListKey}>

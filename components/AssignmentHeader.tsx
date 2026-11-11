@@ -31,6 +31,9 @@ interface AssignmentHeaderProps {
   /** Why Submit is shut when no card is: on a moSHion lab, the code in the editor has not run
    *  clean yet (lib/ai-check.ts moshionSubmitWords). Shown in place of the "Still needed" list. */
   blockedNote?: string;
+  /** Id for an empty slot at the end of the status row: the desktop tool buttons
+   *  (TabbedRightDrawer's inlineHostId) render into it. */
+  toolsHostId?: string;
 }
 
 export default function AssignmentHeader({
@@ -49,6 +52,7 @@ export default function AssignmentHeader({
   unmetTitles,
   unmetNote,
   blockedNote,
+  toolsHostId,
 }: AssignmentHeaderProps) {
   const pct = totalPossible > 0 ? Math.round((score / totalPossible) * 100) : 0;
 
@@ -105,6 +109,7 @@ export default function AssignmentHeader({
         {unmetHint}
         {scoreAlign === 'right' && scoreBlock}
         {submitButton}
+        {toolsHostId ? <div id={toolsHostId} className="shd-inline-host" /> : null}
       </div>
     </div>
   );

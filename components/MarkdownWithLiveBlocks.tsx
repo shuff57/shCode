@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
+import { getHrefsByLessonNumber } from '../lib/lesson-neighbors';
 import { marked } from 'marked';
 import DOMPurify from 'isomorphic-dompurify';
 import LiveCodeBlock from './LiveCodeBlock';
@@ -165,8 +166,39 @@ function renderMarkdown(src: string): string {
 }
 
 // HTML is already run through DOMPurify in renderMarkdown; safe to inject.
+// A lesson named in inline code ("`1.1.11 Name That Umbrella`") becomes a real link to that lesson
+// once the catalog resolves its number, styled as a link rather than as code (globals.css
+// .lesson-ref-link). Only code that is a lesson number followed by a capitalised title qualifies.
+const LESSON_REF = /^(\d+\.\d+\.\d+)\s+[A-Z]/;
+
 function HtmlChunk({ html }: { html: string }) {
-  return <article className="content-prose" dangerouslySetInnerHTML={{ __html: html }} />;
+  const ref = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    const root = ref.current;
+    if (!root) return;
+    const codes = Array.from(root.querySelectorAll('code')).filter(
+      (c) => !c.closest('pre, a') && LESSON_REF.test(c.textContent ?? ''),
+    );
+    if (codes.length === 0) return;
+    let cancelled = false;
+    const numbers = codes.map((c) => (c.textContent ?? '').match(LESSON_REF)![1]);
+    getHrefsByLessonNumber(Array.from(new Set(numbers))).then((hrefs) => {
+      if (cancelled) return;
+      codes.forEach((c, i) => {
+        const href = hrefs[numbers[i]];
+        if (!href || !c.isConnected || c.closest('a')) return;
+        const a = document.createElement('a');
+        a.href = href;
+        a.className = 'lesson-ref-link';
+        c.replaceWith(a);
+        a.appendChild(c);
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [html]);
+  return <article ref={ref} className="content-prose" dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
 interface Props {

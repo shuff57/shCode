@@ -585,7 +585,9 @@ const S = {
 
 // Roster columns on a wide screen: name, grade, graded done, past due, last active, then the row's
 // actions in their own right-aligned track (at least 16px of column gap plus 8px of lead before Open).
-const ROSTER_COLS = 'minmax(180px, 2fr) 154px 112px 80px 136px minmax(144px, auto)';
+// r7 T6: the actions track is a fixed width ("View progress" + More), because the header row and every
+// student row are separate grids and an auto track sized each one differently.
+const ROSTER_COLS = 'minmax(180px, 2fr) 154px 112px 80px 136px 220px';
 
 /** Roster column sort (desktop headings). Null = the order the server sent, which is the default. */
 type RosterSortKey = 'name' | 'grade' | 'missing' | 'active';
@@ -1560,7 +1562,7 @@ function GradebookView({
   const gradeLeft = narrow ? undefined : EMAIL_W;
 
   type CellStatus = 'missing' | 'late' | 'grade' | 'started' | 'not-due';
-  const overdueFill = 'color-mix(in srgb, var(--c-red) 18%, transparent)';
+  const overdueFill = 'color-mix(in srgb, var(--c-red) 11%, transparent)';
 
   // Presentation only: keep the existing score branches and pending-review priority.
   function nonScoreStatus(cell: GradebookCell | undefined, graded: boolean): CellStatus | null {
@@ -1587,10 +1589,14 @@ function GradebookView({
         fontFamily: 'var(--font-prose)', fontSize: 12, lineHeight: '20px', letterSpacing: '0.01em',
         fontWeight: overdue || status === 'grade' ? 700 : 600,
         padding: status === 'not-due' ? 0 : '0 8px', borderRadius: 4,
-        color: overdue ? 'var(--c-red)' : status === 'grade' ? 'var(--c-orange)' : status === 'started' ? 'var(--c-yellow)' : 'var(--c-meta)',
+        // r7 T2: a missing / late cell is light text with a red dot on a faint red fill. Red text on the red
+        // fill was the least legible thing in the grid.
+        color: overdue ? 'var(--c-fg)' : status === 'grade' ? 'var(--c-orange)' : status === 'started' ? 'var(--c-yellow)' : 'var(--c-meta)',
+        gap: overdue ? 6 : undefined,
         background: overdue && legend ? overdueFill : status === 'grade' ? 'color-mix(in srgb, var(--c-orange) 12%, transparent)' : 'transparent',
         border: status === 'grade' ? '1px solid color-mix(in srgb, var(--c-orange) 45%, transparent)' : status === 'started' ? '1px solid color-mix(in srgb, var(--c-yellow) 40%, transparent)' : '1px solid transparent',
       }}>
+        {overdue && <span aria-hidden="true" style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--c-red)', flexShrink: 0 }} />}
         {label}
       </span>
     );
@@ -1789,9 +1795,8 @@ function GradebookView({
               {pager.position > 0 ? (
                 <>
                   {/* The picker names the module, so this line carries only the counts (climb4 r6). */}
-                  <span>{displayLessons.length} {showAll ? '' : 'graded '}lesson{displayLessons.length === 1 ? '' : 's'}</span>
-                  <span aria-hidden="true"> · </span>
-                  <span>module {pager.position} of {pager.total}</span>
+                  {/* r7 T2: the picker already carries the lesson count, so this says only where the page is. */}
+                  <span>Module {pager.position} of {pager.total}</span>
                 </>
               ) : (
                 <>
@@ -1979,9 +1984,13 @@ function GradebookView({
                   borderBottom: '2px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
                   textAlign: 'center', color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600,
                 }}
-                title="Grade so far: work done plus work past its due date, under this class's weights. Lessons not due yet are left out."
+                title="Grade so far: work done plus work past its due date, under this class's weights. Lessons not due yet are left out. The number in brackets is how many graded lessons are past due and not done."
               >
                 Grade
+                {/* r7 T2: what the bracketed number beside a grade is. */}
+                <span style={{ display: 'block', marginTop: 2, fontSize: 12, fontWeight: 500, lineHeight: '16px', whiteSpace: 'nowrap' }}>
+                  <span style={{ color: 'var(--c-red)' }}>(n)</span> past due
+                </span>
               </th>
               {shownCats.length > 0 && (
                 <th
@@ -2032,7 +2041,7 @@ function GradebookView({
                     background: stickyBg, padding: '8px 4px 8px',
                     borderTop: `3px solid ${CAT_COLOR[c]}`,
                     borderBottom: '2px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
-                    textAlign: 'center', color: CAT_COLOR[c], fontSize: 12, fontWeight: 700,
+                    textAlign: 'center', color: CAT_COLOR[c], fontFamily: 'var(--font-prose)', fontSize: 12, fontWeight: 700,
                   }}
                 >
                   <span style={{ whiteSpace: 'nowrap', fontSize: 13 }}>{CAT_SHORT[c]}</span>
@@ -2080,7 +2089,7 @@ function GradebookView({
                       lineHeight: 1.25,
                     }}
                   >
-                    <strong style={{ display: 'block', color: 'var(--c-meta)', fontSize: 12, lineHeight: '16px', fontWeight: 600, letterSpacing: '0.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{lesson.title.match(/^\d+\.\d+\.\d+/)?.[0] ?? lesson.title}</strong>
+                    <strong style={{ display: 'block', color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, lineHeight: '16px', fontWeight: 600, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{lesson.title.match(/^\d+\.\d+\.\d+/)?.[0] ?? lesson.title}</strong>
                     <span className="gb-lesson-title" style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, maxHeight: 36, marginTop: 2, color: 'var(--c-fg)', fontFamily: 'var(--font-prose)', fontSize: 14, fontWeight: 600, lineHeight: '18px', overflow: 'hidden', whiteSpace: 'normal', overflowWrap: 'break-word' }}>{lesson.title.replace(/^\d+\.\d+\.\d+\s*[:–—.-]?\s*/, '')}</span>
                   </a>
                 </th>
@@ -2148,7 +2157,7 @@ function GradebookView({
                       style={{
                         width: CAT_W, minWidth: CAT_W, maxWidth: CAT_W, padding: '8px 4px', textAlign: 'center',
                         borderBottom: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)',
-                        fontSize: 14, fontWeight: 700,
+                        fontSize: 14, fontWeight: 700, fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums',
                         background: 'color-mix(in srgb, var(--c-comment) 10.0%, transparent)',
                         color: v === undefined ? 'var(--c-meta)' : countedGradeColor(v),
                       }}
@@ -2226,6 +2235,23 @@ function ListView() {
   const [newName, setNewName] = useState('');
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState('');
+  // r7 T3: "New class" is a button at the top right of the heading that opens a small form under it, so the
+  // grid holds only class cards. With no class yet the form starts open.
+  const [createOpen, setCreateOpen] = useState(false);
+  const createInputRef = useRef<HTMLInputElement>(null);
+  const newClassBtnRef = useRef<HTMLButtonElement>(null);
+  const createPanelRef = useRef<HTMLFormElement>(null);
+  // The form is a popover over the page: a click outside it (and outside its button) closes it.
+  useEffect(() => {
+    if (!createOpen) return;
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as Node;
+      if (createPanelRef.current?.contains(t) || newClassBtnRef.current?.contains(t)) return;
+      setCreateOpen(false);
+    };
+    document.addEventListener('mousedown', onDown);
+    return () => document.removeEventListener('mousedown', onDown);
+  }, [createOpen]);
   // Per class: students with work past due, and submissions waiting for a grade. Filled in as each class
   // answers, so the list shows at a glance which of five classes needs a teacher first.
   const [chips, setChips] = useState<Record<string, { behind: number; toGrade: number }>>({});
@@ -2283,6 +2309,8 @@ function ListView() {
     }
   }
 
+  const showCreate = createOpen || classes.length === 0;
+
   if (loading) return <div style={{ color: 'var(--c-meta)' }}>Loading…</div>;
   if (forbidden)
     return (
@@ -2291,11 +2319,77 @@ function ListView() {
 
   return (
     <div className="teacher-frame">
-      <h1 style={{ ...S.h1, marginBottom: 8 }}>My Classes</h1>
-      <p style={{ color: 'var(--c-meta)', margin: '0 0 24px', fontFamily: 'var(--font-prose)', fontSize: 15, lineHeight: 1.5, maxWidth: '70ch' }}>Your classroom at a glance. Open a class to review work and support your students.</p>
+      {/* Heading row: title and intro on the left, the one page action on the right (r7 T3). */}
+      <div className="teacher-list-head">
+        <div style={{ minWidth: 0 }}>
+          <h1 style={{ ...S.h1, marginBottom: 8 }}>My Classes</h1>
+          <p style={{ color: 'var(--c-meta)', margin: 0, fontFamily: 'var(--font-prose)', fontSize: 15, lineHeight: 1.5, maxWidth: '70ch' }}>Your classroom at a glance. Open a class to review work and support your students.</p>
+        </div>
+        <button
+          ref={newClassBtnRef}
+          type="button"
+          className="teacher-new-class-btn"
+          aria-expanded={showCreate}
+          aria-controls="new-class-panel"
+          onClick={() => {
+            const next = !createOpen;
+            setCreateOpen(next);
+            if (next) window.setTimeout(() => createInputRef.current?.focus(), 0);
+          }}
+        >
+          <span aria-hidden="true">+</span> New class
+        </button>
+        {showCreate && (
+          <form
+            id="new-class-panel"
+            className={classes.length > 0 ? 'teacher-create-panel is-pop' : 'teacher-create-panel'}
+            ref={createPanelRef}
+            onSubmit={(e) => { void handleCreate(e); }}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape' && classes.length > 0) {
+                setCreateOpen(false);
+                newClassBtnRef.current?.focus();
+              }
+            }}
+          >
+            <div style={{ flex: '1 1 260px', minWidth: 0 }}>
+              <label htmlFor="new-class-name" style={S.label}>New class name</label>
+              <input
+                ref={createInputRef}
+                className="teacher-field"
+                style={{ ...S.input, width: '100%', minWidth: 0 }}
+                id="new-class-name"
+                placeholder="e.g. Introduction to coding"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={creating || !newName.trim()}
+              style={{ ...(creating || !newName.trim() ? S.btnDisabled : S.btn('var(--c-purple)')), height: 36 }}
+            >
+              {creating ? 'Creating…' : 'Create class'}
+            </button>
+            {classes.length > 0 && (
+              <button
+                type="button"
+                className="teacher-utility-btn"
+                onClick={() => { setCreateOpen(false); newClassBtnRef.current?.focus(); }}
+                style={{ height: 36, padding: '0 12px', borderRadius: 4, border: '1px solid var(--c-line)', background: 'transparent', color: 'var(--c-fg)', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+            )}
+            {createError && <p style={{ ...S.error, flexBasis: '100%', margin: 0 }}>{createError}</p>}
+          </form>
+        )}
+      </div>
+
 
       {/* Include archived toggle */}
-      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-prose)', fontSize: 14, color: 'var(--c-meta)', marginBottom: 24, cursor: 'pointer' }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-prose)', fontSize: 14, color: 'var(--c-meta)', marginBottom: 16, cursor: 'pointer' }}>
         <input
           type="checkbox"
           checked={includeArchived}
@@ -2305,9 +2399,8 @@ function ListView() {
         Include archived classes
       </label>
 
-      {/* Class list and the Create class card share one responsive grid, at one card width. */}
       {classes.length === 0 && (
-        <p style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 15 }}>No classes yet. Create your first class below.</p>
+        <p style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 15 }}>No classes yet. Name your first class above.</p>
       )}
         <div className="teacher-class-grid" style={{ display: 'grid', gap: 16, maxWidth: 880 }}>
           {[...classes].sort((x, y) => Number(y.id === lastId) - Number(x.id === lastId)).map((c) => (
@@ -2398,33 +2491,6 @@ function ListView() {
               </dl>
             </div>
           ))}
-      {/* Create form: a quiet secondary row under the class cards (no card fill, a dashed outline), so the
-          classes stay the primary things on the page. */}
-      <div className="teacher-create-card" style={{ gridColumn: '1 / -1', marginBottom: 0, maxWidth: 880, background: 'transparent', border: '1px dashed var(--c-line)', borderRadius: 8, padding: '12px 16px', boxSizing: 'border-box' }}>
-        <h2 style={{ ...S.h2, fontSize: 15, lineHeight: '22px', marginBottom: 8, color: 'var(--c-fg)' }}>New class</h2>
-        <form onSubmit={(e) => { void handleCreate(e); }} style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap', maxWidth: 640 }}>
-          <div style={{ flex: '1 1 260px', minWidth: 0 }}>
-          <label htmlFor="new-class-name" style={S.label}>Class name</label>
-          <input
-            className="teacher-field"
-            style={{ ...S.input, width: '100%', minWidth: 0 }}
-            id="new-class-name"
-            placeholder="e.g. Introduction to coding"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            required
-          />
-          </div>
-          <button
-            type="submit"
-            disabled={creating || !newName.trim()}
-            style={{ ...(creating || !newName.trim() ? S.btnDisabled : S.btn('var(--c-purple)')), height: 36 }}
-          >
-            {creating ? 'Creating…' : 'Create class'}
-          </button>
-        </form>
-        {createError && <p style={S.error}>{createError}</p>}
-      </div>
         </div>
 
     </div>
@@ -2492,7 +2558,9 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
   const [drawerEmail, setDrawerEmail] = useState<string | null>(null);
   // The lesson to open expanded inside the drawer (a chart or quiz from the Today queue, a grid cell).
   const [drawerLesson, setDrawerLesson] = useState<string | null>(null);
-  const [rosterSort, setRosterSort] = useState<RosterSort>(null);
+  // r7 T6: the roster starts sorted by name A-Z, so a heading always shows which column orders the list.
+  const [rosterSort, setRosterSort] = useState<RosterSort>({ key: 'name', dir: 'asc' });
+  const rosterSortIsDefault = rosterSort?.key === 'name' && rosterSort.dir === 'asc';
 
   // Section tabs. Seeded from ?tab= (or the top-nav "Gradebook" shortcut's ?view=gradebook) on mount only.
   // With no explicit tab the page opens on Students, and moves itself to Today once if submissions are
@@ -2757,11 +2825,13 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
   return (
     <div className={activeTab === 'gradebook' ? 'teacher-gradebook' : 'teacher-frame'}>
       {/* Back link */}
+      {/* r7 T8: a secondary link, so the reading face at 14px, not small mono. */}
       <button
-        style={{ background: 'none', border: 'none', color: 'var(--c-cyan)', cursor: 'pointer', fontSize: 13, padding: 0, marginBottom: compact ? 4 : 8 }}
+        className="teacher-back-link"
+        style={{ background: 'none', border: 'none', color: 'var(--c-cyan)', cursor: 'pointer', fontFamily: 'var(--font-prose)', fontSize: 14, fontWeight: 500, padding: 0, marginBottom: compact ? 4 : 8 }}
         onClick={() => router.push('/teacher')}
       >
-        ← Back to list
+        ← All classes
       </button>
 
       {/* Header. On a phone the Actions menu stays beside the title instead of taking a row of its own. */}
@@ -2773,7 +2843,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
           </div>
           {/* Labelled facts (system pass rule 3): label in meta, value in the body colour. */}
           <div style={{ display: 'flex', gap: compact ? '4px 16px' : '4px 24px', fontFamily: 'var(--font-prose)', fontSize: 13, lineHeight: '20px', flexWrap: 'wrap', alignItems: 'baseline' }}>
-            <span title="Students join with this code. Regenerate it under Class settings."><span style={S.metaLabel}>Join code</span> <strong style={{ fontFamily: 'var(--font-mono)', fontSize: 14, color: 'var(--c-cyan)', letterSpacing: '0.08em' }}>{currentCode}</strong></span>
+            <span title="Students join with this code. Regenerate it under Class settings."><span style={S.metaLabel}>Join code</span> <strong style={{ fontFamily: 'var(--font-mono)', fontSize: 14, color: 'var(--c-cyan)', letterSpacing: '0.04em' }}>{currentCode}</strong></span>
             {cls.school_year && <span><span style={S.metaLabel}>Year</span> <span style={S.metaValue}>{cls.school_year}</span></span>}
             {!compact && <span><span style={S.metaLabel}>Created</span> <span style={S.metaValue}>{fmt(cls.created_at)}</span></span>}
             {cls.archived_at && <span><span style={S.metaLabel}>Archived</span> <span style={S.metaValue}>{fmt(cls.archived_at)}</span></span>}
@@ -2903,9 +2973,10 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             <h2 style={{ ...S.h2, fontSize: 18, lineHeight: '26px', marginBottom: 0 }}>Roster ({roster.length})</h2>
             <button
               type="button"
-              className="teacher-utility-btn"
               // A utility, not the page's action: outlined and quiet, so each row's Open is what reads as the action.
-              style={{ ...(roster.length === 0 || progressMap.size === 0 ? S.btnDisabled : { ...S.btn('transparent'), color: 'var(--c-fg)', border: '1px solid var(--c-line)', fontWeight: 500 }), ...(compact ? { fontSize: 12, padding: '8px 12px', lineHeight: '18px' } : {}) }}
+              // r7 T7: on a phone it sits on its own line under the heading as a quiet text action.
+              className={compact ? 'teacher-utility-btn roster-csv-compact' : 'teacher-utility-btn'}
+              style={compact ? undefined : (roster.length === 0 || progressMap.size === 0 ? S.btnDisabled : { ...S.btn('transparent'), color: 'var(--c-fg)', border: '1px solid var(--c-line)', fontWeight: 500 })}
               disabled={roster.length === 0 || progressMap.size === 0}
               title="One row per student: the grade so far, how many graded lessons are done and past due, and a column per grade category. Ready to copy into a spreadsheet or the grade book."
               onClick={() => {
@@ -2946,19 +3017,19 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                             type="button"
                             className={`roster-sort${on ? ' is-on' : ''}`}
                             onClick={() => setRosterSort(on ? { key, dir: rosterSort!.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: ROSTER_FIRST_DIR[key] })}
-                            title={`Sort by ${text.toLowerCase()}`}
+                            title={on ? `Sorted by ${text.toLowerCase()}, ${rosterSort!.dir === 'asc' ? (key === 'name' ? 'A to Z' : 'lowest first') : (key === 'name' ? 'Z to A' : 'highest first')}. Click to reverse.` : `Sort by ${text.toLowerCase()}`}
                           >
                             {text}
-                            <span aria-hidden="true" className="roster-sort-arrow">{on ? (rosterSort!.dir === 'asc' ? <ArrowUp size={14} strokeWidth={2.5} /> : <ArrowDown size={14} strokeWidth={2.5} />) : <ArrowUpDown size={13} strokeWidth={2} />}</span>
+                            <span aria-hidden="true" className="roster-sort-arrow">{on ? (rosterSort!.dir === 'asc' ? <ArrowUp size={14} strokeWidth={2.5} /> : <ArrowDown size={14} strokeWidth={2.5} />) : <ArrowUpDown size={12} strokeWidth={2} />}</span>
                           </button>
                         </span>
                       );
                     })}
                     <span role="columnheader">
-                      {rosterSort && (
-                        <button type="button" className="roster-sort roster-sort-reset" onClick={() => setRosterSort(null)}>Default order</button>
+                      {!rosterSortIsDefault && (
+                        <button type="button" className="roster-sort roster-sort-reset" onClick={() => setRosterSort({ key: 'name', dir: 'asc' })}>Reset to A-Z</button>
                       )}
-                      {!rosterSort && <span className="sr-only">Actions</span>}
+                      {rosterSortIsDefault && <span className="sr-only">Actions</span>}
                     </span>
                   </div>
                 )}
@@ -2990,10 +3061,10 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                         {compact && <span style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-meta)' }}>Grade so far</span>}
                         <strong style={{ color: prog?.gradedCounted ? countedGradeColor(wp) : 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: compact ? 16 : 15, fontVariantNumeric: 'tabular-nums', minWidth: compact ? undefined : 44, textAlign: 'right' }}>{prog?.gradedCounted ? `${wp}%` : '—'}</strong>
                       </div>
-                      <div role={compact ? undefined : 'cell'} style={{ gridColumn: compact ? 1 : undefined, gridRow: compact ? 2 : undefined, minWidth: 0, display: 'flex', flexWrap: compact ? 'wrap' : 'nowrap', overflow: compact ? undefined : 'hidden', gap: compact ? '0 6px' : 8, lineHeight: '18px', fontFamily: 'var(--font-prose)', fontSize: compact ? 13 : 14, color: compact ? 'var(--c-meta)' : 'var(--c-fg)', fontVariantNumeric: 'tabular-nums' }}>
-                        <span style={{ whiteSpace: 'nowrap' }}>{prog?.gradedDone ?? 0}/{prog?.gradedTotal ?? '—'}{compact && ' graded'}</span>
-                        {compact && <span aria-hidden="true">·</span>}
-                        {compact && <span style={{ whiteSpace: 'nowrap', fontWeight: prog?.gradedMissing ? 700 : 400, color: prog?.gradedMissing ? 'var(--c-red)' : 'var(--c-meta)' }}>{prog?.gradedMissing ?? 0} past due</span>}
+                      <div role={compact ? undefined : 'cell'} style={{ gridColumn: compact ? 1 : undefined, gridRow: compact ? 2 : undefined, minWidth: 0, display: 'flex', flexWrap: compact ? 'wrap' : 'nowrap', overflow: compact ? undefined : 'hidden', gap: compact ? '4px 4px' : 8, lineHeight: '18px', fontFamily: 'var(--font-prose)', fontSize: compact ? 13 : 14, color: compact ? 'var(--c-meta)' : 'var(--c-fg)', fontVariantNumeric: 'tabular-nums' }}>
+                        {/* r7 T7: on a phone the two counts are labelled chips, the past-due one red when it is not 0. */}
+                        <span className={compact ? 'roster-chip' : undefined} style={{ whiteSpace: 'nowrap' }}>{prog?.gradedDone ?? 0}/{prog?.gradedTotal ?? '—'}{compact && ' graded'}</span>
+                        {compact && <span className={prog?.gradedMissing ? 'roster-chip is-late' : 'roster-chip'} style={{ whiteSpace: 'nowrap' }}>{prog?.gradedMissing ?? 0} past due</span>}
                       </div>
                       {!compact && <><strong role="cell" style={{ fontFamily: 'var(--font-prose)', fontSize: 15, fontVariantNumeric: 'tabular-nums', color: prog?.gradedMissing ? 'var(--c-red)' : 'var(--c-meta)' }}>{prog?.gradedMissing || '—'}</strong><span role="cell" title={prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'} style={{ minWidth: 0, fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: '18px', color: prog?.last_active ? 'var(--c-fg)' : 'var(--c-meta)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'}</span></>}
                       <div role={compact ? undefined : 'cell'} style={{ gridColumn: compact ? 2 : undefined, gridRow: compact ? 2 : undefined, minWidth: 0, display: 'flex', flexWrap: 'nowrap', gap: compact ? 6 : 8, justifyContent: 'flex-end', justifySelf: 'end', alignItems: 'center', paddingLeft: compact ? 0 : 8 }}>
@@ -3002,11 +3073,14 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                         <button
                           type="button"
                           className="teacher-row-open"
-                          aria-label={`Open ${fullName(prog?.firstName, prog?.lastName) ?? row.student_email}`}
-                          style={{ background: 'color-mix(in srgb, var(--c-cyan) 8%, transparent)', color: 'var(--c-cyan)', border: '1px solid var(--c-cyan)', borderRadius: 4, height: 32, boxSizing: 'border-box', padding: compact ? '0 10px' : '0 14px', lineHeight: '18px', flexShrink: 0, fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                          aria-label={`View progress for ${fullName(prog?.firstName, prog?.lastName) ?? row.student_email}`}
+                          title="Lessons, scores and submissions for this student"
+                          style={{ background: 'color-mix(in srgb, var(--c-cyan) 8%, transparent)', color: 'var(--c-cyan)', border: '1px solid var(--c-cyan)', borderRadius: 4, height: 32, boxSizing: 'border-box', padding: compact ? '0 8px' : '0 14px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: compact ? 40 : undefined, lineHeight: '18px', flexShrink: 0, fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
                           onClick={() => { setDrawerLesson(null); setDrawerEmail(row.student_email); }}
                         >
-                          Open
+                          {/* r7 T6: say what opens (the student's progress drawer), not just "Open". On a phone the
+                              row has room for a chevron only (its name says the same), so the card stays two rows. */}
+                          {compact ? 'Open' : 'View progress'}
                         </button>
                         <RowMenu
                           label={`More actions for ${row.student_email}`}
@@ -3126,23 +3200,45 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         <div style={{ ...S.card, padding: 16, marginBottom: 0 }}>
           {/* A labelled value at body size: the editable panels (weights, announcements) lead the page, not
               the code. */}
-          <h2 style={{ ...S.h2, marginBottom: 8 }}>Join code</h2>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-            <span style={{ ...S.code }} aria-label={`Join code ${currentCode.split('').join(' ')}`}>{currentCode}</span>
-            {isOwner ? (
-              <button
-                style={regenerating ? S.btnDisabled : { ...S.btn('transparent'), color: 'var(--c-meta)', border: '1px solid var(--c-line)' }}
+          {/* r7 T5: the routine action (Copy) sits beside the code; making a new code is in the card's menu,
+              with its confirm. */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 8 }}>
+            <h2 style={{ ...S.h2, margin: 0 }}>Join code</h2>
+            {isOwner && (
+              <RowMenu
+                label="Join code actions"
+                buttonText="More"
                 disabled={regenerating}
-                onClick={() => { void handleRegenCode(); }}
-              >
-                {regenerating ? 'Regenerating…' : 'Regenerate code'}
-              </button>
-            ) : (
-              // The server only lets the owner rotate the code; a button that always fails is worse than a sentence.
-              <span style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-meta)' }}>Only the class owner can make a new join code.</span>
+                items={[
+                  { label: regenerating ? 'Making a new code…' : 'Make a new join code…', danger: true, disabled: regenerating, title: 'The old code stops working right away', onSelect: () => { void handleRegenCode(); } },
+                ]}
+              />
             )}
           </div>
-          <p style={{ margin: '8px 0 0', fontFamily: 'var(--font-prose)', fontSize: 13, lineHeight: 1.5, color: 'var(--c-meta)', maxWidth: '70ch' }}>Students join this class with this code.</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <span style={{ ...S.code, letterSpacing: '0.06em' }} aria-label={`Join code ${currentCode.split('').join(' ')}`}>{currentCode}</span>
+            <button
+              type="button"
+              className="teacher-utility-btn"
+              style={{ ...S.btn('transparent'), color: 'var(--c-cyan)', border: '1px solid var(--c-cyan)', fontWeight: 700 }}
+              aria-label={`Copy join code ${currentCode}`}
+              onClick={() => {
+                void (async () => {
+                  try {
+                    await navigator.clipboard.writeText(currentCode);
+                    toast('Join code copied.');
+                  } catch {
+                    toast(`Could not copy. The join code is ${currentCode}.`, { kind: 'error' });
+                  }
+                })();
+              }}
+            >
+              Copy
+            </button>
+          </div>
+          <p style={{ margin: '8px 0 0', fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.5, color: 'var(--c-meta)', maxWidth: '70ch' }}>
+            Students join this class with this code.{!isOwner && ' Only the class owner can make a new one.'}
+          </p>
         </div>
         {/* Co-teachers */}
         <div style={{ ...S.card, marginBottom: 0, padding: 16 }}>

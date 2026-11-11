@@ -66,19 +66,23 @@ const itemStyle: React.CSSProperties = {
   background: 'var(--c-deep)',
   border: '1px solid var(--c-line)',
   borderRadius: 4,
-  fontSize: 13,
+  // r7 T8: a list item is read as a sentence: the reading face at 14px.
+  fontFamily: 'var(--font-prose)',
+  fontSize: 14,
   color: 'var(--c-fg)',
   lineHeight: 1.45,
 };
 
 const clickableStyle: React.CSSProperties = {
   color: 'var(--c-cyan)',
+  fontFamily: 'var(--font-prose)',
   cursor: 'pointer',
   textDecoration: 'underline',
 };
 
 const mutedStyle: React.CSSProperties = {
   color: 'var(--c-meta)',
+  fontFamily: 'var(--font-prose)',
   fontSize: 13,
 };
 

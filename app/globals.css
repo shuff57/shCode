@@ -3790,3 +3790,473 @@ a.mod-row.is-next {
   .gb-toolbar .gb-toolbar-right input[type="search"] { flex: 0 1 160px !important; width: 160px !important; }
   .gb-toolbar .gb-toolbar-right select { field-sizing: content; max-width: 240px; }
 }
+
+/* climb4 r7 teacher */
+/* r7 T1 Schedule: a mixed module is one control the size of a date + time pair; it opens the lessons. */
+.dd-mixed-btn {
+  display: inline-flex; align-items: center; gap: 8px; width: 284px; max-width: 100%; height: 34px; padding: 0 10px;
+  box-sizing: border-box; border-radius: 4px; cursor: pointer; text-align: left;
+  background: var(--c-deep2); border: 1px dashed color-mix(in srgb, var(--c-orange) 55%, var(--c-line));
+  color: var(--c-fg); font-family: var(--font-prose); font-size: 15px; line-height: 1;
+}
+.dd-mixed-btn-sub { color: var(--c-meta); font-size: 14px; flex: 1 1 auto; white-space: nowrap; }
+.dd-mixed-btn-chev { display: inline-flex; color: var(--c-meta); }
+.dd-mixed-btn:hover { border-style: solid; border-color: var(--c-orange); }
+.dd-mixed-btn:hover .dd-mixed-btn-chev { color: var(--c-fg); }
+.dd-mixed-btn:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 1px; }
+/* r7 T2 Gradebook: the module picker is as wide as the module's full name (up to 520px), never cut off. */
+@media (min-width: 641px) {
+  .gb-toolbar .gb-pager-select { field-sizing: content; max-width: 520px !important; min-width: 220px; text-overflow: clip; }
+}
+/* r7 T3 Class list: "+ New class" at the heading's right opens a small form under the heading; the grid
+   holds only class cards. */
+.teacher-list-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+.teacher-new-class-btn {
+  display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; box-sizing: border-box; flex-shrink: 0;
+  margin-top: 4px; border-radius: 6px; border: 1px solid color-mix(in srgb, var(--c-purple) 70%, var(--c-line));
+  background: color-mix(in srgb, var(--c-purple) 12%, transparent); color: var(--c-fg);
+  font-family: var(--font-mono); font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap;
+}
+.teacher-new-class-btn > span { color: var(--c-purple); font-size: 17px; line-height: 1; }
+.teacher-new-class-btn:hover { background: color-mix(in srgb, var(--c-purple) 22%, transparent); border-color: var(--c-purple); }
+.teacher-new-class-btn[aria-expanded="true"] { border-color: var(--c-purple); }
+.teacher-new-class-btn:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; }
+.teacher-list-head { position: relative; }
+.teacher-create-panel {
+  display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; flex: 1 1 100%; max-width: 640px; box-sizing: border-box;
+  margin: 0; padding: 16px; border-radius: 8px; background: var(--c-deep); border: 1px solid var(--c-line);
+}
+.teacher-create-panel.is-pop {
+  position: absolute; right: 0; top: 52px; z-index: 30; width: min(560px, 100%);
+  background: var(--c-deep2); box-shadow: 0 12px 32px color-mix(in srgb, var(--c-bg) 70%, transparent);
+}
+.teacher-class-grid { max-width: none !important; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 600px)) !important; }
+@media (max-width: 640px) { .teacher-create-panel.is-pop { position: static; width: 100%; box-shadow: none; } }
+/* r7 T4 Today: the student's answer is the thing being graded (filled, a cyan edge, a strong label); the
+   assignment is a quieter outlined panel. On a submission that needs a manual grade the rubric is open and
+   compact beside the score field. */
+.sq-review-cols .sq-assignment { background: transparent; border: 1px solid color-mix(in srgb, var(--c-line) 80%, transparent); }
+.sq-review-answer { box-shadow: inset 3px 0 0 var(--c-cyan); padding-left: 15px !important; }
+.override-form.has-aside .override-main { container-type: inline-size; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+@media (min-width: 1000px) {
+  /* Same two columns as the assignment / answer row above, so the score field lines up under the answer. */
+  .override-form.has-aside { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 10px !important; align-items: start; }
+  .override-form.has-aside .override-aside { padding-right: 14px; }
+}
+.sq-rubric-compact { font-family: var(--font-prose); min-width: 0; }
+.sq-rubric-compact-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+.sq-rubric-compact-title { font-size: 14px; font-weight: 600; color: var(--c-fg); }
+.sq-rubric-compact-toggle {
+  background: none; border: 0; padding: 2px 0; cursor: pointer; font-family: var(--font-prose); font-size: 13px;
+  color: var(--c-cyan); text-decoration: underline; text-underline-offset: 3px; white-space: nowrap;
+}
+.sq-rubric-compact-toggle:hover { color: var(--c-fg); }
+.sq-rubric-compact-toggle:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; border-radius: 3px; }
+.sq-rubric-compact-list {
+  list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); column-gap: 20px;
+  max-height: 260px; overflow-y: auto;
+}
+@media (min-width: 1000px) { .sq-rubric-compact-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.sq-rubric-compact-list > li { padding: 3px 0; border-bottom: 1px solid color-mix(in srgb, var(--c-line) 50%, transparent); min-width: 0; }
+.sq-rubric-compact-list .sq-rubric-title { font-weight: 500; min-width: 0; line-height: 1.35; overflow-wrap: anywhere; }
+.sq-rubric-compact-list.is-detailed .sq-rubric-title { white-space: normal; font-weight: 600; }
+/* r7 T6 Students: the column that orders the roster is cyan with one arrow; the others carry a faint two-way
+   arrow. */
+.roster-sort.is-on { color: var(--c-cyan) !important; }
+.roster-sort.is-on .roster-sort-arrow { color: var(--c-cyan) !important; }
+.roster-sort:not(.is-on) .roster-sort-arrow { color: var(--c-meta) !important; opacity: 0.55; }
+.roster-sort:not(.is-on):hover .roster-sort-arrow { opacity: 1; }
+/* r7 T7 Students phone: Download grades is a quiet text action on its own line; the counts are chips. */
+.roster-csv-compact {
+  flex: 1 1 100%; order: 2; text-align: left; align-self: flex-start; background: none !important; border: 0 !important;
+  padding: 2px 0 !important; height: auto !important; margin: -4px 0 4px; cursor: pointer;
+  font-family: var(--font-prose); font-size: 14px; font-weight: 500; color: var(--c-cyan);
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.roster-csv-compact:disabled { color: var(--c-meta); text-decoration: none; cursor: not-allowed; }
+.roster-chip { font-family: var(--font-prose); font-size: 13px; font-weight: 500; color: var(--c-meta); }
+.roster-chip.is-late { color: var(--c-red); font-weight: 700; }
+/* r7 T8 Type: the class page's way back is a prose link with a visible hover and focus. */
+.teacher-back-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.teacher-back-link:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; border-radius: 3px; }
+
+/* climb4 r7 student */
+/* r7 S1 Lab and sandbox tools in the page's own toolbar (TabbedRightDrawer inlineHostId): on desktop the
+   CODY / Docs / Textures / Sounds / Library / Quest / File buttons are one row at the end of the lab's status
+   line (the sandbox's title row), not a fixed 76px rail, so the workspace gets the full page width. The
+   drawer they open is unchanged; while it is open the work surfaces make room for it. A moSHion lab then
+   gives the editor 13px code and room for 76 characters, and the preview a fixed 412px for the 400px canvas. */
+.shd-inline-host:empty { display: none; }
+@media (min-width: 721px) {
+  .shd-inline-host { order: 9; margin-left: auto; display: flex; align-items: center; flex: 0 0 auto; }
+  .lab-assignment-header .assignment-quota:has([role="status"]) ~ .shd-inline-host { margin-left: 4px; padding-left: 12px; border-left: 1px solid var(--c-line); }
+  #titleRow:has(> .shd-inline-host) { display: flex; align-items: center; gap: 16px; }
+  .sandbox-header:has(> .shd-inline-host) { align-items: center; }
+  .sandbox-header .sandbox-run-hint + .shd-inline-host { margin-left: 8px; padding-left: 12px; border-left: 1px solid var(--c-line); }
+  .shd-inline-tools { display: flex; gap: 6px; flex-wrap: nowrap; }
+  .shd-inline-tool {
+    height: 30px; padding: 0 12px; box-sizing: border-box; border-radius: 6px; border: 1px solid var(--c-line);
+    background: transparent; color: var(--shd-tab-accent, var(--c-purple)); cursor: pointer; white-space: nowrap;
+    font-family: var(--font-mono); font-size: 13px; font-weight: 700; letter-spacing: 0; line-height: 1;
+  }
+  .shd-inline-tool:hover { border-color: var(--shd-tab-accent, var(--c-purple)); }
+  .shd-inline-tool[aria-pressed="true"] {
+    color: var(--c-fg); border-color: var(--shd-tab-accent, var(--c-purple));
+    background: color-mix(in srgb, var(--shd-tab-accent, var(--c-purple)) 18%, transparent);
+  }
+  .shd-inline-tool:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; }
+  body:has(.shd-inline-tools) :is(.assignment-header, .lab-work-area, .sandbox-shell, #titleRow, :not(.lab-work-area) > .editor-card) {
+    margin-right: var(--shd-tabbed, 0px); transition: margin-right 0.22s ease;
+  }
+  html.shd-resizing body:has(.shd-inline-tools) :is(.assignment-header, .lab-work-area, .sandbox-shell) { transition: none; }
+}
+@media (min-width: 1200px) {
+  body:has(.shd-inline-tools) .lab-work-area:has(#previewPane):not(:has(.output-header)) { grid-template-columns: 320px minmax(0, 1fr); gap: 12px; }
+  body:has(.shd-inline-tools) .lab-work-area:has(#previewPane):not(:has(.output-header)) > .lab-task-card[open] { padding-left: 14px !important; padding-right: 14px !important; }
+  body:has(.shd-inline-tools) .lab-work-area:has(#previewPane):not(:has(.output-header)) .editor-body { padding-left: 6px; padding-right: 6px; }
+  body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) #editor .cm-editor { font-size: 13px !important; }
+  body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) .editor-preview-container:not(.sandbox-split) > #editorPane { flex: 1 1 auto; min-width: 0; }
+  body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) .editor-preview-container:not(.sandbox-split) > #previewPane { flex: 0 0 408px; min-width: 0; }
+}
+/* r7 S2 Console lab, desktop: what Check looks for sits right under Run / Check / Submit (LessonWorkspace
+   .lab-check-tests), the editor and Output are as tall as the program plus room to type (not the whole
+   screen), and an untouched starter marks the empty last line as the place to type. */
+.lab-check-tests {
+  display: flex; align-items: baseline; gap: 6px 12px; flex-wrap: wrap; margin: 0 0 8px; padding: 8px 12px;
+  border: 1px solid var(--c-line); border-left: 3px solid var(--c-green); border-radius: 6px; background: var(--c-bg);
+  font-family: var(--font-prose); font-size: 14px; line-height: 1.45; color: var(--c-fg);
+}
+.lab-check-tests-label { font-weight: 700; color: var(--c-fg); white-space: nowrap; }
+.lab-check-tests ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 300px; }
+.lab-check-tests li { display: flex; gap: 8px; align-items: baseline; }
+.lab-check-dot { flex: 0 0 auto; width: 14px; text-align: center; color: var(--c-meta); font-weight: 700; }
+.lab-check-tests li[data-status="passed"] .lab-check-dot { color: var(--c-green); }
+.lab-check-tests li[data-status="failed"] .lab-check-dot { color: var(--c-red); }
+.lab-check-tests .lab-check-more { color: var(--c-meta); padding-left: 22px; }
+@media (min-width: 721px) {
+  .lab-work-area:has(.output-header) .editor-preview-container { height: auto; min-height: 0; }
+  .lab-work-area:has(.output-header) .pane { height: auto; min-height: 260px; }
+  .lab-work-area:has(.output-header) #editorPane > div,
+  .lab-work-area:has(.output-header) #editor > div { height: auto !important; }
+  .lab-work-area:has(.output-header) #editor { height: auto; }
+  .lab-work-area:has(.output-header) #editor .cm-editor { height: auto; }
+  .lab-work-area:has(.output-header) #editor .cm-scroller { min-height: 216px; max-height: max(280px, calc(100svh - 440px)); }
+  .lab-work-area:has(.output-header) .run-output { max-height: max(280px, calc(100svh - 440px)); }
+  .lab-work-area:has(.output-header) #previewPane { display: flex; flex-direction: column; }
+  .lab-work-area:has(.output-header) #previewPane .run-output { flex: 1 1 auto; }
+}
+.lab-work-area:has(.output-header) #editor .cm-content:not(:has(> .cm-line > span:not(.cm-codeComment))) > .cm-line:last-child:has(> br:only-child)::before {
+  content: "\2190  type your answer on this line"; color: var(--c-cyan); font-style: italic; opacity: 0.85; pointer-events: none;
+}
+@media (min-width: 721px) {
+  /* a short lab keeps the progress strip at the foot of the window, not halfway up it */
+  body:has(.lab-work-area .output-header) { min-height: 100svh; box-sizing: border-box; }
+  body:has(.lab-work-area .output-header) > .lesson-progress-footer { margin-top: auto; }
+}
+/* r7 S3 Phone console lab: the editor gets the room. The task card is three lines with "Show full task" on
+   its heading row (no button row of its own), the "Check looks for" row stays a desktop thing (Quest is in
+   the dock), and the editor opens at least 13 lines tall with Output under it, above the dock. */
+@media (max-width: 720px) {
+  .lab-check-tests { display: none; }
+  .lab-work-area:has(.output-header) .lab-task-card[open] { position: relative; }
+  .lab-work-area:has(.output-header) .lab-task-card[open] .lab-task-more {
+    position: absolute; top: 4px; right: 6px; margin: 0; min-height: 32px; padding: 0 8px; border: 0;
+    text-decoration: underline; text-underline-offset: 3px; background: transparent;
+  }
+  .lab-work-area:has(.output-header) .lab-task-card[open] > .lab-task-heading { margin-bottom: 4px; }
+  .lab-work-area:has(.output-header) #editorPane { min-height: 0; max-height: none; }
+  .lab-work-area:has(.output-header) #editor .cm-scroller { min-height: 260px !important; max-height: 50svh; }
+  .lab-work-area:has(.output-header) #previewPane { height: 120px; }
+}
+/* r7 S4 Phone reading and quiz: the bottom bar reads as chrome. A soft fade above it says the text goes on
+   underneath, and a thin cyan line on its top edge fills as the page is read (a scroll-driven animation; a
+   browser without one just shows the fade). Labs keep their own dock as it is. */
+@media (max-width: 720px) {
+  body:has(.content-lesson-main)::before {
+    content: ''; position: fixed; left: 0; right: 0; bottom: var(--lesson-tool-dock); height: 28px;
+    z-index: 899; pointer-events: none;
+    background:
+      linear-gradient(var(--c-cyan), var(--c-cyan)) left bottom / 0% 2px no-repeat,
+      linear-gradient(color-mix(in srgb, var(--bg) 0%, transparent), var(--bg)) left top / 100% calc(100% - 2px) no-repeat;
+  }
+  body:has(.content-lesson-main)::after { box-shadow: 0 -1px 0 var(--c-line); }
+  @supports (animation-timeline: scroll()) {
+    body:has(.content-lesson-main)::before { animation: r7-read-progress linear both; animation-timeline: scroll(root block); }
+  }
+}
+@keyframes r7-read-progress {
+  from { background-size: 0% 2px, 100% calc(100% - 2px); }
+  to { background-size: 100% 2px, 100% calc(100% - 2px); }
+}
+/* r7 S5 Phone quiz: less before the first answer. The heading and the answered count share one row, the
+   instructions open as one line with "more" (QuizView .quiz-guidance-more), and the gaps above the first
+   question are tightened. Desktop never shows the toggle. */
+.quiz-guidance-more { display: none; }
+@media (max-width: 720px) {
+  .student-quiz { margin-top: 6px !important; padding-top: 10px !important; }
+  .student-quiz > .quiz-head { flex-wrap: nowrap !important; justify-content: space-between; gap: 8px !important; margin-bottom: 4px !important; }
+  .student-quiz > .quiz-head > h2 { font-size: 15px !important; gap: 6px !important; white-space: nowrap; min-width: 0; flex: 0 1 auto; }
+  .student-quiz > .quiz-head > h2 > svg { display: none; }
+  .student-quiz > .quiz-head > .quiz-answered-count {
+    flex: 0 0 auto; font-family: var(--font-prose) !important; font-size: 13px !important; font-weight: 600;
+    padding: 3px 8px !important; gap: 0 !important; white-space: nowrap; letter-spacing: 0;
+  }
+  .student-quiz .quiz-guidance.r7-guide > p { margin: 0 0 8px !important; font-size: 13px !important; line-height: 1.5; }
+  .student-quiz .quiz-question-card:first-of-type { border-top: 0 !important; padding-top: 10px !important; }
+  .content-lesson-main:has(.student-quiz) .content-lesson-title { margin-bottom: 4px !important; }
+}
+@media (max-width: 720px) {
+  /* closed, "Review lesson instructions" sits at the right end of the Quiz / time row instead of a row of its own */
+  .content-lesson-main:has(.student-quiz) .quiz-intro:not([open]) { width: fit-content; margin: -37px 0 12px auto; }
+}
+/* r7 S16 (quiz part) "Review lesson instructions" is a link-like control in the reading face, not tiny mono. */
+.quiz-intro > summary { font-family: var(--font-prose); font-size: 14px !important; color: var(--c-cyan) !important; letter-spacing: 0; }
+.quiz-intro > summary:hover { text-decoration: underline; text-underline-offset: 3px; }
+/* r7 S6 Desktop quiz: one outline level. A question is its text over a divider (no filled, bordered card
+   around bordered answer rows), the question reads heavier than its answers, rows are tighter so two whole
+   questions fit a 900px screen, and the sticky heading row says where Check / Submit is (a jump link). */
+.quiz-submit-hint { display: none; }
+@media (min-width: 721px) {
+  .student-quiz .quiz-question-card {
+    background: transparent !important; border: 0 !important; border-top: 1px solid var(--c-line) !important;
+    border-radius: 0 !important; padding: 14px 0 8px !important; margin-bottom: 4px !important;
+  }
+  .student-quiz .quiz-question-card.is-correct { border-left: 4px solid var(--c-green) !important; padding-left: 14px !important; }
+  .student-quiz .quiz-question-card.is-wrong { border-left: 4px solid var(--c-red) !important; padding-left: 14px !important; }
+  .student-quiz .quiz-question-card > div:first-child { font-size: 16px !important; font-weight: 600; margin-bottom: 10px !important; }
+  .student-quiz .quiz-question-card > div:first-child .prose-copy { font-size: 16px; font-weight: 600; }
+  .student-quiz .quiz-question-card .quiz-options { gap: 6px; padding-left: 30px; }
+  .student-quiz .quiz-option { min-height: 38px; padding: 7px 12px; align-items: center; font-weight: 400; }
+  .student-quiz .quiz-option > span { font-size: 15px; line-height: 1.4; }
+  .student-quiz .quiz-guidance p { margin-bottom: 4px !important; }
+  .quiz-submit-hint {
+    display: inline-flex; align-items: center; gap: 4px; margin-left: 12px; white-space: nowrap;
+    font-family: var(--font-prose); font-size: 14px; color: var(--c-cyan); text-decoration: underline; text-underline-offset: 3px;
+  }
+  .quiz-submit-hint:hover { color: var(--c-fg); }
+  .quiz-submit-hint:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; border-radius: 3px; }
+}
+/* r7 S9 Module: the run of completed lessons before the next one is one quiet row ("16 completed lessons ·
+   1.1.1 to 1.1.17", Show / Hide, remembered per module), so the Next up row is in the first screen. */
+.mod-done-fold {
+  display: flex; align-items: center; gap: 10px; width: 100%; box-sizing: border-box; padding: 10px 14px;
+  background: transparent; border: 1px dashed var(--c-line); border-left: 4px solid var(--c-green); border-radius: 4px;
+  color: var(--c-fg); cursor: pointer; text-align: left; font-family: var(--font-prose); font-size: 15px; line-height: 1.4;
+}
+.mod-done-fold:hover { border-style: solid; background: color-mix(in srgb, var(--c-fg) 5%, transparent); }
+.mod-done-fold:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; }
+.mod-done-fold-check { color: var(--c-green); font-weight: 700; }
+.mod-done-fold-text { flex: 1 1 auto; min-width: 0; font-weight: 600; }
+.mod-done-fold-range { font-weight: 400; color: var(--c-meta); font-variant-numeric: tabular-nums; }
+.mod-done-fold-action { flex: 0 0 auto; color: var(--c-cyan); font-weight: 600; font-size: 14px; }
+.unit-progress-started { display: none; }
+.module-page .unit-progress-started {
+  display: inline-flex; align-items: center; gap: 6px; margin-left: 4px;
+  font-family: var(--font-prose); font-size: 14px; font-weight: 500; color: var(--c-meta);
+}
+.module-page .unit-progress-started::before { content: '·'; margin-right: 2px; }
+.module-page .unit-progress-started-swatch { display: inline-block; width: 10px; height: 8px; border-radius: 2px; background: color-mix(in srgb, var(--c-yellow) 55%, transparent); }
+.module-page .unit-progress-started-bar { background: color-mix(in srgb, var(--c-yellow) 55%, transparent) !important; }
+@media (max-width: 720px) {
+  .mod-done-fold-range { display: none; }
+  .mod-done-fold { font-size: 14px; }
+  /* the state pill is the row's first meta item on a phone, so no separator dot before it */
+  .mod-row-details .mod-row-state:has(> span)::before { content: none; }
+}
+@media (max-width: 720px) {
+  .module-page > div:has(> h1) button:has(.unit-progress-started) { flex-wrap: wrap; row-gap: 2px !important; }
+  .module-page > div:has(> h1) button:has(.unit-progress-started) .unit-progress-track { flex: 0 0 100%; max-width: none !important; width: 100% !important; margin-bottom: 4px; }
+  .module-page .unit-progress-started { margin-left: 0; font-size: 14px; }
+}
+/* r7 S7a Video, wide: the player on the left (larger), and its description with the completion panel in a
+   column on the right, top-aligned with the player. Built on the existing elements with display: contents. */
+@media (min-width: 1100px) {
+  .content-lesson-main:has(.lesson-video-frame) {
+    display: grid !important; grid-template-columns: minmax(0, 720px) minmax(280px, 1fr); column-gap: 28px; align-content: start;
+  }
+  .content-lesson-main:has(.lesson-video-frame) > * { grid-column: 1 / -1; min-width: 0; }
+  .content-lesson-main:has(.lesson-video-frame) > .lesson-reading-grid,
+  .content-lesson-main:has(.lesson-video-frame) > .lesson-reading-grid > .lesson-primary { display: contents; }
+  .content-lesson-main:has(.lesson-video-frame) > .lesson-reading-grid > .lesson-primary > * { grid-column: 1 / -1; }
+  .content-lesson-main .lesson-wide-media.lesson-video-frame {
+    grid-column: 1 !important; grid-row: 3 / span 3; align-self: start;
+    width: 100% !important; max-width: 720px; margin: 8px 0 0 !important;
+  }
+  .content-lesson-main:has(.lesson-video-frame) .lesson-primary > .lesson-description {
+    grid-column: 2 !important; grid-row: 3; align-self: start; margin: 8px 0 0 !important; max-width: 52ch;
+    font-size: 16px !important; line-height: 1.55 !important; color: var(--c-fg) !important;
+  }
+  .content-lesson-main:has(.lesson-video-frame) > section:has(.completion-done-text, h2) {
+    grid-column: 2; grid-row: 4; align-self: start; margin-top: 16px !important;
+  }
+  .content-lesson-main:has(.lesson-video-frame) > nav { grid-row: 1; }
+  body:has(.lesson-video-frame) { min-height: 100svh; box-sizing: border-box; }
+  body:has(.lesson-video-frame) > .lesson-progress-footer { margin-top: auto; }
+  .content-lesson-main:has(.lesson-video-frame) > .content-lesson-title { grid-row: 2; }
+}
+/* r7 S7b Written answer, wide: the prompt and its help ("What to answer", "See how this is graded") on the
+   left, the answer box with Submit on the right, top-aligned (WrittenGrader .written-answer / .written-help).
+   The bottom previous/next pair goes: the strip under the site nav already carries the same two links. */
+@media (min-width: 1100px) {
+  .content-lesson-main:has(> .written-grader .written-answer) {
+    display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); column-gap: 36px;
+    grid-template-rows: auto auto auto 1fr; align-content: start;
+  }
+  .content-lesson-main:has(> .written-grader .written-answer) > * { grid-column: 1 / -1; min-width: 0; }
+  .content-lesson-main:has(> .written-grader .written-answer) > nav { grid-row: 1; }
+  .content-lesson-main:has(> .written-grader .written-answer) > .content-lesson-title { grid-row: 2; }
+  .content-lesson-main:has(> .written-grader .written-answer) > .lesson-reading-grid { grid-column: 1; grid-row: 3; align-self: start; }
+  .content-lesson-main > .written-grader:has(.written-answer) { display: contents; }
+  .content-lesson-main > .written-grader > .written-help { grid-column: 1; grid-row: 4; align-self: start; margin-top: 16px; }
+  .content-lesson-main > .written-grader > .written-answer {
+    grid-column: 2; grid-row: 3 / span 2; align-self: start; padding: 14px 16px 16px;
+    border: 1px solid var(--c-line); border-radius: 8px; background: var(--c-deep2);
+  }
+  .content-lesson-main > .written-grader > .written-answer .written-response-input { max-width: none !important; min-height: 220px; background: var(--c-bg) !important; }
+  .content-lesson-main > .written-grader > :not(.written-answer):not(.written-help) { grid-column: 1 / -1; }
+  .content-lesson-main:has(> .written-grader .written-answer) > .lesson-bottom-nav { display: none; }
+  .content-lesson-main:has(> .written-grader .written-answer) .lesson-reading-grid .content-prose p { font-size: 16px; line-height: 1.6; }
+  body:has(.written-answer) { min-height: 100svh; box-sizing: border-box; }
+  body:has(.written-answer) > .lesson-progress-footer { margin-top: auto; }
+}
+/* the two help disclosures read as sentences, in the reading face */
+.written-help > details > summary { font-family: var(--font-prose); font-size: 15px !important; font-weight: 600; color: var(--c-purple); letter-spacing: 0; }
+/* r7 S8 Reading: the book link is a clear source action (outlined, link colour, reading face); a lesson
+   named in the text is a real link that looks like one, not inline code (MarkdownWithLiveBlocks
+   .lesson-ref-link); a list inside a list is one column again (r5's two unlabelled columns removed). */
+.lesson-book-link a {
+  display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--c-cyan) 45%, transparent);
+  font-family: var(--font-prose); font-size: 15px !important; font-weight: 600;
+  color: var(--c-cyan) !important; text-decoration: none !important;
+}
+.lesson-book-link a::after { content: "\2197" / ""; font-weight: 400; }
+.lesson-book-link a:hover { background: color-mix(in srgb, var(--c-cyan) 10%, transparent); border-color: var(--c-cyan); }
+.lesson-book-link a:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; }
+.content-prose a.lesson-ref-link { color: var(--c-cyan); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.content-prose a.lesson-ref-link > code {
+  background: none !important; border: 0 !important; padding: 0 !important; color: inherit !important;
+  font-family: var(--font-prose) !important; font-size: inherit !important; font-weight: inherit; white-space: normal;
+}
+.content-prose a.lesson-ref-link:hover { color: var(--c-fg); }
+.content-prose a.lesson-ref-link:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; border-radius: 2px; }
+@media (min-width: 721px) { .content-lesson-main .content-prose ul ul { columns: auto; column-count: auto; max-width: none; } }
+.content-lesson-main .content-prose ul ul { margin: 6px 0 2px; }
+.content-lesson-main .content-prose ul ul > li { margin: 2px 0; }
+/* r7 S16 Type on the student screens: text that is read as a sentence, a value or a secondary link moves to
+   the reading face at a readable size, with no letter-spacing. Mono stays for the brand, page titles,
+   buttons, tabs and code. */
+.content-lesson-main > nav:first-child { font-family: var(--font-prose); font-size: 14px !important; letter-spacing: 0; }
+.content-lesson-main > nav:first-child * { letter-spacing: 0; }
+.content-lesson-title > span:not(:has(svg)) { font-family: var(--font-prose); font-size: 14px !important; letter-spacing: 0; }
+.header-lesson-nav .hdr-lesson-link { font-family: var(--font-prose); font-size: 14px; letter-spacing: 0; }
+.header-lesson-nav .hdr-lesson-pos { font-family: var(--font-prose); letter-spacing: 0; }
+.lesson-progress-footer .lesson-progress-count,
+.lesson-progress-footer .lesson-progress-total { font-family: var(--font-prose); font-size: 13px; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+.lesson-progress-footer > a { font-size: 13px; }
+.lab-task-end { font-size: 13px; }
+/* r7 S11a Content lessons (reading, slides, video, example, written, quiz): on desktop the Docs button sits at
+   the end of the lesson's badge row (same inline host as the labs, r7 S1 styles), not on a rail at the
+   window edge; the open drawer pushes the page over. */
+@media (min-width: 721px) {
+  body:has(.content-lesson-main .shd-inline-tools) { padding-right: calc(20px + var(--shd-tabbed, 0px)) !important; }
+  .content-lesson-title > .shd-inline-host { align-self: center; }
+}
+/* r7 S11b "On this page" marks the section in view (ContentLessonView aria-current="location"): a cyan bar
+   and full-strength text on the current item, the rest in the meta colour. The worked example's empty
+   Output says what Run does, centred in the pane with the Run glyph. */
+.lesson-overview ul { border-left: 1px solid var(--c-line); }
+.lesson-overview li { margin-top: 0 !important; }
+.lesson-overview li a { display: block; padding: 5px 0 5px 12px; margin-left: -1px; border-left: 2px solid transparent; color: var(--c-meta) !important; text-decoration: none; }
+.lesson-overview li a:hover { color: var(--c-fg) !important; text-decoration: none; }
+.lesson-overview li a[aria-current="location"] { color: var(--c-cyan) !important; border-left-color: var(--c-cyan); font-weight: 600; }
+.lesson-overview li a:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 1px; }
+.lesson-overview li.outline-subheading a { padding-left: 24px; }
+.livecodeblock-preview .run-output:has(.livecode-empty) { display: flex; align-items: center; justify-content: center; }
+.livecode-empty {
+  display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
+  font-family: var(--font-prose); font-style: normal !important; font-size: 14px !important; color: var(--c-meta) !important;
+}
+.livecode-empty strong { color: var(--c-green); font-weight: 700; }
+.livecode-empty-icon {
+  display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--c-green) 50%, transparent); color: var(--c-green); font-size: 12px;
+}
+/* r7 S10 Slides, desktop: the badge row shares the title's line so the deck gets the height, the deck frame
+   fills the window down to its navigation, and Full screen sits beside the slide count (ContentLessonView
+   .slide-fullscreen, the iframe's own requestFullscreen). */
+.slide-nav-middle { display: inline-flex; align-items: center; gap: 12px; }
+.slide-fullscreen { display: inline-flex; align-items: center; gap: 6px; }
+.slide-count { font-family: var(--font-prose); font-size: 14px !important; font-variant-numeric: tabular-nums; }
+@media (min-width: 721px) {
+  .content-lesson-main:has(.lesson-slides-frame) .content-lesson-title { flex-wrap: nowrap !important; gap: 4px 12px !important; }
+  .content-lesson-main:has(.lesson-slides-frame) .content-lesson-title h1 { flex: 0 1 auto !important; width: auto !important; margin-right: 8px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .content-lesson-main:has(.lesson-slides-frame) .content-lesson-title > * { flex-shrink: 0; }
+  .content-lesson-main .content-lesson-title .slides-newtab { margin-left: auto; }
+  .content-lesson-main .content-lesson-title .slides-newtab + .shd-inline-host { margin-left: 0; }
+  .content-lesson-main .lesson-slides-frame { height: max(320px, calc(100dvh - 318px)) !important; aspect-ratio: auto !important; }
+}
+/* r7 S12 Sandbox toolbar: the groups (this program | with classmates | view) keep their dividers, the
+   secondary buttons go quiet (no fill, meta text, full colour on hover), Save keeps its fill, and a small
+   state line beside Save says where the code is kept (SandboxWorkspace .sandbox-save-state). */
+.sandbox-tb-end button:not(.sandbox-save-btn) { background: transparent !important; color: var(--c-meta) !important; }
+.sandbox-tb-end button:not(.sandbox-save-btn):not(:disabled):hover { color: var(--c-fg) !important; border-color: var(--c-meta) !important; }
+.sandbox-tb-end .sandbox-save-btn { color: var(--c-fg) !important; font-weight: 700; }
+.sandbox-tb-end > * + * { padding-left: 12px !important; }
+.sandbox-tb-end { gap: 12px !important; }
+.sandbox-save-state {
+  display: inline-flex; align-items: center; gap: 6px; margin-left: 2px; white-space: nowrap;
+  font-family: var(--font-prose); font-size: 13px; color: var(--c-meta);
+}
+.sandbox-save-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c-meta); }
+.sandbox-save-state[data-state="cloud"] .sandbox-save-dot { background: var(--c-green); }
+.sandbox-save-state[data-state="changed"] .sandbox-save-dot { background: var(--c-orange); }
+@media (max-width: 1100px) { .sandbox-save-state { display: none; } }
+/* r7 S13a Docs hub: the search box shows what it is (magnifier) and its key ("/" focuses it, DocsHubSearch);
+   the JavaScript topics are light chips, not a tall stack of boxes; each reference card is one click target
+   (the title link's hit area covers the card, with a hover and focus ring on the card). */
+.docs-hub-search-field { position: relative; }
+.docs-hub-search-field .docs-hub-search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--c-meta); pointer-events: none; }
+.docs-hub-search-field input { padding-left: 40px !important; padding-right: 44px !important; min-height: 46px; }
+.docs-hub-search-key {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none;
+  min-width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;
+  border: 1px solid var(--c-line); border-bottom-width: 2px; border-radius: 4px; background: var(--c-bg);
+  font-family: var(--font-mono); font-size: 12px; color: var(--c-meta);
+}
+.docs-hub-topics > div { display: flex !important; flex-wrap: wrap; gap: 8px !important; align-content: flex-start; }
+.docs-hub-topics .docs-topic-tile {
+  min-height: 34px; padding: 5px 14px !important; border-radius: 17px !important; background: transparent !important;
+  font-family: var(--font-prose); font-size: 14px; font-weight: 600; justify-content: center;
+}
+.docs-hub-topics .docs-topic-tile > span[aria-hidden="true"] { display: none; }
+.docs-hub-topics .docs-topic-tile:hover { background: color-mix(in srgb, var(--c-cyan) 10%, transparent) !important; }
+.docs-hub-topics .docs-topic-tile:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; }
+.docs-hub-topics > h2 { font-size: 16px !important; }
+div:has(> .docs-set-link) { position: relative; transition: border-color 120ms ease, background-color 120ms ease; }
+div:has(> .docs-set-link) > .docs-set-link::before { content: ''; position: absolute; inset: 0; border-radius: inherit; }
+div:has(> .docs-set-link):hover { border-color: var(--c-cyan) !important; background-color: color-mix(in srgb, var(--c-cyan) 5%, var(--c-bg)) !important; }
+div:has(> .docs-set-link:focus-visible) { outline: 2px solid var(--c-cyan); outline-offset: 2px; }
+div:has(> .docs-set-link) > .docs-set-link:focus-visible { outline: none; }
+/* r7 S13b JavaScript docs: the reference list on the right is in the reading face with no letter-spacing;
+   the runnable example's Output is compact until there is output; disabled Reset stays legible (DocLiveSnippet: meta text, dashed edge). Output stays under the code (side by side wrapped the code) but
+   its empty state is short enough that it sits in the first screen. */
+.docs-sidebar-title { font-family: var(--font-prose); letter-spacing: 0 !important; text-transform: none !important; font-size: 14px !important; }
+.docs-sidebar .docs-sidebar-section-title, .docs-sidebar .docs-sidebar-pages li a, .docs-sidebar-footer a {
+  font-family: var(--font-prose); letter-spacing: 0; font-size: 14px !important;
+}
+.doc-live-output-header + div { font-family: var(--font-prose); }
+@media (min-width: 721px) {
+  .docs-layout .doc-live-output:has(> .doc-live-output-header + div > span) { min-height: 0 !important; }
+  .docs-layout .doc-live-output > .doc-live-output-header + div:has(> span) { min-height: 52px !important; }
+}
+.doc-live-reset:disabled { opacity: 1 !important; border-style: dashed !important; cursor: not-allowed !important; }
+/* r7 S14 Progress: a grade held down by past-due work is in the warning colour; a past-due row's Score
+   reads 0 (what the grade counts it as), and the summary's sentence says how "Past due" and "Missing or
+   late" differ (StudentGradebook). */
+.grade-so-far.is-warning { color: var(--c-orange); }
+.gb-zero { color: var(--c-red); font-weight: 700; font-variant-numeric: tabular-nums; cursor: help; }
+.grade-summary-row ~ details > summary { font-family: var(--font-prose); font-size: 14px !important; color: var(--c-cyan); letter-spacing: 0; }
+/* (r7 S12) the reSHape studio's own toolbar has no room for the save line; it shows only in the sandbox row */
+.sandbox-save-state:not(.sandbox-tb-end .sandbox-save-state) { display: none; }
+/* end climb4 r7 student */

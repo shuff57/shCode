@@ -475,6 +475,9 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
 
   return (
     <section className="written-grader" style={{ marginTop: 16, paddingTop: 14, borderTop: '2px solid var(--c-line)' }}>
+      {/* The answer (label, box, Submit) and the help under it are two blocks so a wide screen can set
+          them side by side (globals.css r7 S7b); a narrow one stacks them as before. */}
+      <div className="written-answer">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
         <label style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-fg)' }}>{codeInput ? 'Your program (JavaScript)' : 'Your response'}</label>
         <SolutionPanel
@@ -637,7 +640,9 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
           <GradeQuotaNote />
         </div>
       </div>
+      </div>
 
+      <div className="written-help">
       {prompt.trim() ? <details style={{ marginBottom: 10, border: '1px solid var(--c-line)', borderRadius: 6, padding: '8px 12px' }}>
         <summary style={{ cursor: 'pointer', color: 'var(--c-purple)', fontSize: 13 }}>What to answer · task guidance</summary>
               <h2 style={{ fontSize: 18, marginBottom: 6, color: 'var(--c-fg)', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -657,6 +662,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
       </details> : null}
 
       {afterPrompt ? <details style={{ margin: '0 0 16px', padding: '10px 14px', border: '1px solid var(--c-line)', borderRadius: 6 }}><summary style={{ cursor: 'pointer', color: 'var(--c-purple)', fontSize: 14 }}>See how this is graded</summary>{afterPrompt}</details> : null}
+      </div>
 
       {/* Its own row rather than squeezed in beside Submit: on a narrow screen
           the label, menu and description wrap, and wrapping them through the

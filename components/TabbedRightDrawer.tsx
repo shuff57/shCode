@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef, ReactNode, CSSProperties } from 'react';
+import { createPortal } from 'react-dom';
 
 export interface DrawerTab {
   key: string;
@@ -13,13 +14,18 @@ export interface DrawerTab {
 interface Props {
   tabs: DrawerTab[];
   storageKey: string;
+  /** Desktop only: the id of an element in the page's own toolbar (a lab's status row, the sandbox
+   *  header). When it is on the page the tabs render there as one row of buttons instead of the
+   *  fixed rail along the right edge, so the workspace gets the full page width. Phones keep the
+   *  bottom dock. The drawer itself (and its resize) is the same either way. */
+  inlineHostId?: string;
 }
 
 const MIN_W = 240;
 const MAX_W = 600;
 const DEFAULT_W = 320;
 
-export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
+export default function TabbedRightDrawer({ tabs, storageKey, inlineHostId }: Props) {
   const [mounted, setMounted] = useState(false);
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [closeBtnHovered, setCloseBtnHovered] = useState(false);
@@ -32,6 +38,13 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
   // While the edge is dragged the tabs follow it at once; the slide is only for opening and closing.
   const [dragging, setDragging] = useState(false);
   widthRef.current = width;
+  // The inline host, when the page has one (looked up after every commit: the host is a sibling
+  // that can mount or unmount with the page's header).
+  const [inlineHost, setInlineHost] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    const el = inlineHostId ? document.getElementById(inlineHostId) : null;
+    if (el !== inlineHost) setInlineHost(el);
+  });
 
   const activeStorage = `${storageKey}:active`;
   const widthStorage = `${storageKey}:width`;
@@ -212,8 +225,32 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
         </div>
       </div>
 
+      {/* Inline: one row of tool buttons in the page's own toolbar (desktop with a host). */}
+      {inlineHost && !narrow ? createPortal(
+        <div className="shd-inline-tools" role="group" aria-label="Lesson tools">
+          {tabs.map((t) => {
+            const isActive = t.key === activeKey;
+            return (
+              <button
+                key={t.key}
+                type="button"
+                aria-label={`${t.label} tab`}
+                title={t.label}
+                aria-pressed={isActive}
+                className="shd-inline-tool"
+                onClick={() => setActiveKey(isActive ? null : t.key)}
+                style={{ '--shd-tab-accent': t.color ?? 'var(--c-purple)' } as CSSProperties}
+              >
+                {t.label}
+              </button>
+            );
+          })}
+        </div>,
+        inlineHost,
+      ) : null}
+
       {/* Labels run along the desktop rail and move with the drawer. Phones use a horizontal dock. */}
-      <div
+      {inlineHost && !narrow ? null : <div
         className={`shd-tabstrip${tabs.length === 1 && tabs[0].label === 'Docs' ? ' shd-docs-only' : ''}${open ? ' shd-open' : ''}`}
         style={{
           position: 'fixed',
@@ -253,7 +290,7 @@ export default function TabbedRightDrawer({ tabs, storageKey }: Props) {
             </button>
           );
         })}
-      </div>
+      </div>}
     </>
   );
 }

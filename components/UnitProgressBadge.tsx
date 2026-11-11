@@ -244,6 +244,7 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
                 width: `${Math.round(((done + started) / total) * 100)}%`,
                 background: 'color-mix(in srgb, var(--c-yellow) 33.3333%, transparent)',
               }}
+              className="unit-progress-started-bar"
             />
           ) : null}
           <span
@@ -260,6 +261,10 @@ export default function UnitProgressBadge({ lessons, label }: Props) {
         <span className={`unit-progress-count${done + started === 0 ? ' is-empty' : ''}`} style={{ color: allDone ? 'var(--c-green)' : 'inherit', fontWeight: 600 }}>
           {`${done} of ${total} done`}
         </span>
+        {/* Module page only (CSS): what the pale yellow part of the bar is. */}
+        {started > 0 ? (
+          <span className="unit-progress-started"><span className="unit-progress-started-swatch" aria-hidden="true" />{started} in progress</span>
+        ) : null}
       </button>
 
       {open &&

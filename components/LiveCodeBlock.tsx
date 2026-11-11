@@ -290,7 +290,7 @@ export default function LiveCodeBlock({
                 aria-label="Program output"
               >
                 {!hasRunPlain ? (
-                  <div className="console-empty">Click Run to see output.</div>
+                  <div className="console-empty livecode-empty"><span className="livecode-empty-icon" aria-hidden="true">▶</span><span>Press <strong>Run</strong> to see what this code prints.</span></div>
                 ) : plainLogs.length === 0 ? (
                   <div className="console-empty">(no output)</div>
                 ) : (

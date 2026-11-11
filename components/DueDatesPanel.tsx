@@ -212,33 +212,31 @@ function DateTimeField({
    *  "Mixed" (or "Set per lesson"), never "Not set". */
   emptyText?: string;
   emptyColor?: string;
-  /** A module whose lessons carry different dates: when set and the module has no date of its own, the
-   *  field is a summary chip ("Mixed · set per lesson") with "show lessons" and "Set one date for all",
-   *  never an input that reads "Mixed" (climb4 r6). */
+  /** A module whose lessons carry different dates and no date of its own: the field is ONE control the
+   *  size of a date + time pair, "Mixed · set per lesson", that opens the module's lessons (climb4 r7 T1).
+   *  "Set one date for all" lives in the opened module's summary line, not in the row. */
   mixed?: { lessonsShown: boolean; onShowLessons: () => void };
 }) {
   const date = row?.date ?? '';
   const time = row?.time ?? '';
   const [calOpen, setCalOpen] = useState(false);
-  const [settingAll, setSettingAll] = useState(false);
   const dateRef = useRef<HTMLButtonElement>(null);
 
-  if (mixed && !date && !settingAll) {
+  if (mixed && !date) {
     return (
       <span className="dd-mixed" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', boxSizing: 'border-box', maxWidth: '100%', padding: showLabel ? 0 : '0 0 0 12px', borderLeft: showLabel ? undefined : `1px solid ${C.border}` }}>
         {showLabel && <span style={{ fontFamily: 'var(--font-prose)', fontSize: 14, fontWeight: 600, flexBasis: '100%', color }}>{label}</span>}
-        <span
-          className="dd-mixed-chip"
-          aria-label={`${label} for ${ariaSuffix}: mixed, set per lesson`}
-          style={{ color: emptyColor ?? C.warn }}
+        <button
+          type="button"
+          className="dd-mixed-btn"
+          aria-expanded={mixed.lessonsShown}
+          onClick={mixed.onShowLessons}
+          aria-label={`${label} for ${ariaSuffix}: mixed, set per lesson. ${mixed.lessonsShown ? 'Hide' : 'Show'} the lessons`}
+          title={mixed.lessonsShown ? 'Hide the lessons' : 'Show the lessons and their dates'}
         >
-          Mixed <span aria-hidden="true">·</span> set per lesson
-        </span>
-        <button type="button" className="dd-mixed-link" aria-expanded={mixed.lessonsShown} onClick={mixed.onShowLessons}>
-          {mixed.lessonsShown ? 'hide lessons' : 'show lessons'}
-        </button>
-        <button type="button" className="dd-mixed-setall" onClick={() => setSettingAll(true)} aria-label={`Set one ${label.toLowerCase()} date for all of ${ariaSuffix}`}>
-          Set one date for all
+          <span style={{ color: emptyColor ?? C.warn, fontWeight: 700 }}>Mixed</span>
+          <span className="dd-mixed-btn-sub">set per lesson</span>
+          <span aria-hidden="true" className="dd-mixed-btn-chev">{mixed.lessonsShown ? <ChevronDown size={14} /> : <ChevronRight size={14} />}</span>
         </button>
       </span>
     );
@@ -366,6 +364,17 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
   const { toast } = useFeedback();
   const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState<Set<string>>(new Set());
+  // `${kind}:${moduleId}` of a mixed module whose field shows a date picker because the teacher chose
+  // "Set one date for all" (the field is otherwise the Mixed control).
+  const [settingAll, setSettingAll] = useState<Set<string>>(new Set());
+  const toggleSettingAll = (key: string, on: boolean) => {
+    setSettingAll((prev) => {
+      const next = new Set(prev);
+      if (on) next.add(key);
+      else next.delete(key);
+      return next;
+    });
+  };
 
   // Both endpoints, one shape. The GET bodies differ only in the key they
   // hang the array off and the name of the timestamp field.
@@ -513,7 +522,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
         </span>
       </div>
       <details style={{ color: C.dim, fontSize: 13, margin: '0 0 12px 0' }}>
-        <summary style={{ color: C.accent, cursor: 'pointer', marginBottom: 8 }}>How dates work</summary>
+        <summary style={{ color: C.accent, cursor: 'pointer', marginBottom: 8, fontFamily: 'var(--font-prose)', fontSize: 14 }}>How dates work</summary>
         <div style={{ fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.5, maxWidth: '70ch' }}>
         A module&apos;s date applies to every lesson inside it. Give one lesson its own date and the
         module reads <strong>Mixed</strong>; clear that date and the lesson goes back to inheriting.
@@ -544,7 +553,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
       {units.map((unit) => (
         <div className="schedule-unit" key={unit.unitId} style={{ marginBottom: 16, overflowX: 'auto' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 8 }}>
-            <span style={{ fontSize: 14, fontWeight: 700, color: C.accent }}>{unit.unitId}</span>
+            <span style={{ fontFamily: 'var(--font-prose)', fontSize: 15, fontWeight: 700, color: C.accent }}>{unit.unitId}</span>
             <span style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: C.dim }}>Times are in {zoneName}</span>
           </div>
 
@@ -573,6 +582,39 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
               ]);
             };
 
+            const openMixed = openSummary.kind === 'mixed' && openSummary.ownDueAt === null;
+            const dueMixed = dueSummary.kind === 'mixed' && dueSummary.ownDueAt === null;
+            const settingOpenAll = openMixed && settingAll.has(`open:${mod.moduleId}`);
+            const settingDueAll = dueMixed && settingAll.has(`due:${mod.moduleId}`);
+            // "Set one date for all" means what it says: the picked date becomes the module's date and every
+            // lesson's own date of that kind is dropped, in one batch.
+            const setOneForAll = (kind: Kind, date: string | null, time: string | null) => {
+              if (date === null) return;
+              void write(kind, [
+                { scope: 'module', scopeId: mod.moduleId, date, time },
+                ...mod.lessons
+                  .filter((l) => byKey[kind].has(`lesson:${l.id}`))
+                  .map((l) => ({ scope: 'lesson' as DueScope, scopeId: l.id, date: null })),
+              ]);
+              toggleSettingAll(`${kind}:${mod.moduleId}`, false);
+            };
+            // A module with its own date whose lessons still differ says so under its name, so the collapsed
+            // row keeps one shape and the summary line only appears when the module is open.
+            const ownWithOverrides = Math.max(
+              openSummary.kind === 'mixed' && openSummary.ownDueAt !== null ? openSummary.overrides : 0,
+              dueSummary.kind === 'mixed' && dueSummary.ownDueAt !== null ? dueSummary.overrides : 0,
+            );
+            const setAllButton = (kind: Kind, on: boolean) => (
+              <button
+                type="button"
+                className="dd-mixed-setall"
+                onClick={() => toggleSettingAll(`${kind}:${mod.moduleId}`, !on)}
+                aria-label={on ? 'Cancel setting one date' : `Set one ${kind === 'open' ? 'available-after' : 'due'} date for all of module ${mod.moduleId}`}
+              >
+                {on ? 'Cancel' : 'Set one date for all'}
+              </button>
+            );
+
             return (
               <div key={mod.moduleId} style={{ borderBottom: `1px solid ${C.border}`, padding: '10px 0', minHeight: 58, boxSizing: 'border-box', minWidth: compact ? 0 : 960 }}>
                 <div className="schedule-module-row" style={{ display: 'grid', gridTemplateColumns: compact ? 'minmax(0, 1fr)' : MODULE_COLS, alignItems: 'center', gap: compact ? 12 : MODULE_GAP }}>
@@ -599,6 +641,9 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                       </span>
                       <span style={{ color: C.dim, fontSize: 13, lineHeight: '18px', fontWeight: 400, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
                         {mod.lessons.length} lesson{mod.lessons.length === 1 ? '' : 's'}
+                        {ownWithOverrides > 0 && (
+                          <span style={{ color: C.warn }}> · {ownWithOverrides} with {ownWithOverrides === 1 ? 'its' : 'their'} own date</span>
+                        )}
                       </span>
                     </span>
                   </button>
@@ -607,21 +652,27 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                     label="Available after"
                     color={C.open}
                     row={byKey.open.get(`module:${mod.moduleId}`)}
-                    onWrite={(date, time) => { void write('open', [{ scope: 'module', scopeId: mod.moduleId, date, time }]); }}
+                    onWrite={(date, time) => {
+                      if (settingOpenAll) setOneForAll('open', date, time);
+                      else void write('open', [{ scope: 'module', scopeId: mod.moduleId, date, time }]);
+                    }}
                     ariaSuffix={`module ${mod.moduleId}`}
                     pastHint={OPEN_PAST_HINT}
                     showLabel={compact}
-                    {...emptyFor(openSummary)}
-                    mixed={openSummary.kind === 'mixed' && openSummary.ownDueAt === null ? { lessonsShown: isOpen, onShowLessons: () => toggle(mod.moduleId) } : undefined}
+                    {...(settingOpenAll ? { emptyText: 'Pick a date', emptyColor: C.text } : emptyFor(openSummary))}
+                    mixed={openMixed && !settingOpenAll ? { lessonsShown: isOpen, onShowLessons: () => toggle(mod.moduleId) } : undefined}
                   />
 
                   <DateTimeField
                     label="Due at"
                     color={C.dim}
-                    {...emptyFor(dueSummary)}
-                    mixed={dueSummary.kind === 'mixed' && dueSummary.ownDueAt === null ? { lessonsShown: isOpen, onShowLessons: () => toggle(mod.moduleId) } : undefined}
+                    {...(settingDueAll ? { emptyText: 'Pick a date', emptyColor: C.text } : emptyFor(dueSummary))}
+                    mixed={dueMixed && !settingDueAll ? { lessonsShown: isOpen, onShowLessons: () => toggle(mod.moduleId) } : undefined}
                     row={byKey.due.get(`module:${mod.moduleId}`)}
-                    onWrite={(date, time) => { void write('due', [{ scope: 'module', scopeId: mod.moduleId, date, time }]); }}
+                    onWrite={(date, time) => {
+                      if (settingDueAll) setOneForAll('due', date, time);
+                      else void write('due', [{ scope: 'module', scopeId: mod.moduleId, date, time }]);
+                    }}
                     ariaSuffix={`module ${mod.moduleId}`}
                     showLabel={compact}
                   />
@@ -629,11 +680,12 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
 
                 {/* The module's summary sits under its own columns: what Opens says under Available after,
                     what Due says under Due, so the two states never run together as one sentence. On a
-                    phone the two parts stack, each on its own line. */}
+                    phone the two parts stack, each on its own line. Only an OPEN module shows it, so every
+                    collapsed row has the same height and shape (climb4 r7 T1). */}
                 <div
                   className="schedule-module-summary"
                   style={{
-                    display: isOpen || openSummary.kind === 'mixed' || dueSummary.kind === 'mixed' ? 'grid' : 'none',
+                    display: isOpen ? 'grid' : 'none',
                     gridTemplateColumns: compact ? 'minmax(0, 1fr)' : MODULE_COLS,
                     alignItems: 'start', gap: compact ? 6 : MODULE_GAP, margin: compact ? '8px 0 0 22px' : '6px 0 0',
                     fontFamily: 'var(--font-prose)',
@@ -651,6 +703,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                             : ''}
                       </span>
                     )}
+                    {openMixed && setAllButton('open', settingOpenAll)}
                     {openSummary.kind === 'mixed' && openSummary.ownDueAt !== null && (
                       <button
                         type="button"
@@ -674,6 +727,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                           ? `${formatDueTime(dueSummary.dueAt)} for all lessons`
                           : 'none set'}
                     </span>
+                    {dueMixed && setAllButton('due', settingDueAll)}
                     {dueSummary.kind === 'mixed' && dueSummary.ownDueAt !== null && (
                       <button
                         type="button"

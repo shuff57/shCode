@@ -296,6 +296,9 @@ export default function QuizView({ lessonId, config }: Props) {
     void recordLessonCompleted(lessonId);
   }, [capped, loaded, progress.authed, progress.states, cap.used, lessonId]);
 
+  // Phone only (CSS): the quiz's instructions open as one line with "more".
+  const [guideOpen, setGuideOpen] = useState(false);
+
   if (!loaded) return null;
   if (!questions.length) return null;
 
@@ -323,6 +326,10 @@ export default function QuizView({ lessonId, config }: Props) {
           {/* Wide screens only (CSS): the same count as a bar inside the pill. */}
           <span className="quiz-answered-bar" aria-hidden="true"><span style={{ width: `${questions.length ? Math.round((answeredCount / questions.length) * 100) : 0}%` }} /></span>
         </span>
+        {/* Wide screens only (CSS): where the hand-in button is, as a jump to it. */}
+        <a className="quiz-submit-hint" href={`#quiz-submit-${lessonId}`}>
+          {summative ? 'Submit' : 'Check my answers'} is after question {questions.length} <span aria-hidden="true">↓</span>
+        </a>
         {summative && (
           <div style={{ marginLeft: 'auto' }}>
             <SolutionPanel lessonId={lessonId} readOnly />
@@ -338,13 +345,17 @@ export default function QuizView({ lessonId, config }: Props) {
         </span>
         <span className="quiz-progress-track"><span style={{ width: `${questions.length ? Math.round((answeredCount / questions.length) * 100) : 0}%` }} /></span>
       </div>
-      <div className="quiz-guidance is-expanded"><p style={{ color: 'var(--c-meta)', fontSize: 13, margin: '0 0 20px' }}>
+      <div className={`quiz-guidance is-expanded r7-guide${guideOpen ? ' is-open' : ''}`}><p id={`quiz-guide-${lessonId}`} style={{ color: 'var(--c-meta)', fontSize: 13, margin: '0 0 20px' }}>
         {capped
           ? `Answer all ${questions.length}. After each try you see your total, not which ones were wrong. Submit what you have if one has you stuck: the next part unlocks and you can come back and use your other tries.`
           : summative
           ? `Answer all ${questions.length}. Nothing is marked here — your teacher hands the score back. If one has you stuck, submit what you have and move on: the next part unlocks and you can come back to this one. Once all ${questions.length} are answered, submitting is final.`
           : `Pick the answer that fits best for each question. You need ${needed} of ${questions.length} right to move on, and you can change your answers and try again as many times as you like.`}
-      </p></div>
+      </p>
+        <button type="button" className="quiz-guidance-more" aria-expanded={guideOpen} aria-controls={`quiz-guide-${lessonId}`} onClick={() => setGuideOpen((v) => !v)}>
+          {guideOpen ? 'less' : 'more'}
+        </button>
+      </div>
       <AttemptBanner
         max={cap.max}
         used={cap.used}
@@ -495,7 +506,7 @@ export default function QuizView({ lessonId, config }: Props) {
         );
       })}
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 18, flexWrap: 'wrap' }}>
+      <div id={`quiz-submit-${lessonId}`} style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 18, flexWrap: 'wrap', scrollMarginTop: 80 }}>
         <button
           onClick={submit}
           disabled={!canSubmit || locked}
