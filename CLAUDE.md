@@ -666,6 +666,14 @@ moderation panels' RowMenu (`POST /api/classes/[id]/library-delete {itemId}`, `/
 into that class) and "Clear Library..." in the student's row menu (`/clear-library {email}`, requireText; tombstones,
 shares, uploads and R2 objects; counts in the toast). Rules `functions/_shared/libraryDelete.ts`; tests
 `scripts/test-library-delete.mjs`. `RowMenu` opens upward when a row is near the window's bottom.
+**Suggestions on class games (#96, migration 0047).** A classmate helps a game's author by picking from a FIXED list
+(`lib/game-suggestions.ts`; ids are stored, never renamed; no free text, the 2026-11-10 decision that games stay "game
+data, not chat"). `GET|POST /api/games/[id]/suggestions {suggestion, on}`: visibleGame()'s access, the author reads and
+cannot pick, nobody picks on a hidden game, counts for everyone, names (first name + last initial) only for the author,
+the class's teachers and an admin. `components/GameSuggestions.tsx` under the game on /play. A teacher's
+`game-shares` POST `action: 'clear-suggestions'` deletes only their class's (enrolled now) students' picks; the list
+carries that count and the moderation row's menu offers "Clear suggestions…". Tests: `scripts/test-game-suggestions.mjs`.
+Apply 0047 before deploying.
 **The Library is three tabs** (`components/ClassLibraryPanel.tsx`): Games (My games / Class games / Built in),
 Pictures and Sounds (Mine / Shared with my class / Built in), `?tab=games|pictures|sounds`, remembered in
 `shCode:library-tab`, Games when arriving from /play.

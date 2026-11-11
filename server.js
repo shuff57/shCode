@@ -629,6 +629,10 @@ app.prepare().catch((err) => {
     server.delete('/api/games/:id', libRoute(gamesOne.onRequestDelete));
     server.post('/api/games/:id/share', express.json(), libRoute(gamesShare.onRequestPost));
     server.get('/api/games/:id/assets', libRoute(gamesAssets.onRequestGet));
+    // Suggestions on class games (#96): a fixed list, no free text.
+    const gamesSuggest = await import('./functions/api/games/[id]/suggestions.ts');
+    server.get('/api/games/:id/suggestions', libRoute(gamesSuggest.onRequestGet));
+    server.post('/api/games/:id/suggestions', express.json(), libRoute(gamesSuggest.onRequestPost));
     server.get('/api/classes/:id/game-shares', libRoute(gamesModerate.onRequestGet));
     server.post('/api/classes/:id/game-shares', express.json(), libRoute(gamesModerate.onRequestPost));
     // A teacher deleting a student's shared item or game, or clearing their whole Library

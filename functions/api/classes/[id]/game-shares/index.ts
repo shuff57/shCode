@@ -1,5 +1,9 @@
 // GET  /api/classes/[id]/game-shares  — every game shared into this class, hidden ones too
-// POST /api/classes/[id]/game-shares  { gameId, action: 'hide' | 'unhide' | 'remove' }
+// POST /api/classes/[id]/game-shares  { gameId, action: 'hide' | 'unhide' | 'remove' | 'clear-suggestions' }
+//
+// clear-suggestions (#96) deletes the suggestions this class's students (enrolled
+// now) made on the game; suggestions from another class the game is shared into
+// are that class's teachers' to clear. The list's `suggestions` is that count.
 //
 // Owner, co-teacher or admin only (the games twin of library-shares). Hide
 // keeps the share but takes the game out of every student's view; remove takes
@@ -32,6 +36,16 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
   const rows = await gamesSharedInto(env.DB, [classId]);
   // canDelete: the publisher is a student enrolled in this class now (game-delete.ts allows exactly these).
   const students = await deletableOwners(env.DB, classId);
+  const counts = new Map<string, number>();
+  if (rows.length) {
+    const marks = rows.map(() => '?').join(',');
+    const r = await env.DB.prepare(
+      `SELECT gs.game_id, COUNT(*) AS n FROM game_suggestions gs
+         JOIN enrollments e ON e.student_email = gs.from_email AND e.class_id = ? AND e.expires_at > ?
+        WHERE gs.game_id IN (${marks}) GROUP BY gs.game_id`,
+    ).bind(classId, Date.now(), ...rows.map((g) => g.id)).all<{ game_id: string; n: number }>();
+    for (const c of r.results ?? []) counts.set(c.game_id, c.n);
+  }
   return json({
     games: rows.map((r) => ({
       id: r.id, title: r.title, mode: r.mode, players: r.players,
@@ -39,6 +53,7 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
       owner: ownerLabel(r.first_name, r.last_name),
       sharedAt: r.shared_at, updatedAt: r.updated_at, hidden: r.hidden_at != null,
       canDelete: students.has(r.owner_email),
+      suggestions: counts.get(r.id) ?? 0,
     })),
   });
 };
@@ -65,8 +80,17 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async ({ par
       .bind(gameId, classId).run();
   } else if (body.action === 'remove') {
     res = await env.DB.prepare(`DELETE FROM library_game_shares WHERE game_id = ? AND class_id = ?`).bind(gameId, classId).run();
+  } else if (body.action === 'clear-suggestions') {
+    const shared = await env.DB.prepare(`SELECT 1 AS x FROM library_game_shares WHERE game_id = ? AND class_id = ?`)
+      .bind(gameId, classId).first();
+    if (!shared) return json({ error: 'Not found' }, 404);
+    const del = await env.DB.prepare(
+      `DELETE FROM game_suggestions WHERE game_id = ? AND from_email IN
+         (SELECT student_email FROM enrollments WHERE class_id = ? AND expires_at > ?)`,
+    ).bind(gameId, classId, now).run();
+    return json({ ok: true, cleared: del.meta?.changes ?? 0 });
   } else {
-    return json({ error: "action must be 'hide', 'unhide' or 'remove'" }, 400);
+    return json({ error: "action must be 'hide', 'unhide', 'remove' or 'clear-suggestions'" }, 400);
   }
   if (!res.meta || res.meta.changes === 0) return json({ error: 'Not found' }, 404);
   return json({ ok: true });

@@ -24,6 +24,8 @@ interface Row {
   hidden: boolean;
   /** The publisher is a student enrolled in this class now, so a teacher may delete it outright. */
   canDelete?: boolean;
+  /** Suggestions this class's students picked on it (#96). */
+  suggestions?: number;
 }
 
 export default function ClassGamesModeration({ classId }: { classId: string }) {
@@ -70,6 +72,25 @@ export default function ClassGamesModeration({ classId }: { classId: string }) {
     await load();
   };
 
+  const clearSuggestions = async (r: Row) => {
+    if (!(await confirm({
+      title: `Clear the suggestions on "${r.title}"?`,
+      message: `The ${r.suggestions} suggestion${r.suggestions === 1 ? '' : 's'} this class's students picked on it go away, for ${r.owner} too. Students can pick again afterwards. The game is not changed.`,
+      confirmLabel: 'Clear',
+      danger: true,
+    }))) return;
+    const res = await fetch(`/api/classes/${encodeURIComponent(classId)}/game-shares`, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ gameId: r.id, action: 'clear-suggestions' }),
+    });
+    if (!res.ok) { toast(await errorText(res), { kind: 'error' }); return; }
+    const { cleared } = (await res.json()) as { cleared: number };
+    toast(`Cleared ${cleared} suggestion${cleared === 1 ? '' : 's'} on "${r.title}".`);
+    await load();
+  };
+
   if (error) return <p style={{ color: 'var(--c-red)', fontSize: 13 }}>{error}</p>;
   if (!rows) return <p style={{ color: 'var(--c-dim)', fontSize: 13 }}>Loading…</p>;
   if (!rows.length) {
@@ -83,6 +104,7 @@ export default function ClassGamesModeration({ classId }: { classId: string }) {
           <div style={{ fontSize: 13, minWidth: 160 }}>
             <strong>{r.title}</strong> <span style={{ color: 'var(--c-dim)' }}>by {r.owner} · {r.modeLabel}</span>
             {r.hidden && <span style={{ color: 'var(--c-orange)' }}> · hidden from students</span>}
+            {!!r.suggestions && <span style={{ color: 'var(--c-dim)' }}> · {r.suggestions} suggestion{r.suggestions === 1 ? '' : 's'}</span>}
           </div>
           <span style={{ flex: 1 }} />
           <a href={playHref(r.id)} target="_blank" rel="noopener noreferrer" style={btn}>Play ↗</a>
@@ -90,10 +112,13 @@ export default function ClassGamesModeration({ classId }: { classId: string }) {
             ? <button type="button" style={btn} onClick={() => void act(r, 'unhide')}>Show again</button>
             : <button type="button" style={btn} onClick={() => void act(r, 'hide')}>Hide</button>}
           <button type="button" style={{ ...btn, color: 'var(--c-red)' }} onClick={() => void act(r, 'remove')}>Remove</button>
-          {r.canDelete && (
+          {(r.canDelete || !!r.suggestions) && (
             <RowMenu
               label={`More actions for ${r.title}`}
-              items={[{ label: 'Delete…', danger: true, title: `Deletes it from ${r.owner}'s own Library too, on every computer.`, onSelect: () => { void remove(r); } }]}
+              items={[
+                ...(r.suggestions ? [{ label: 'Clear suggestions…', danger: true, title: "Removes what this class's students suggested on it.", onSelect: () => { void clearSuggestions(r); } }] : []),
+                ...(r.canDelete ? [{ label: 'Delete…', danger: true, title: `Deletes it from ${r.owner}'s own Library too, on every computer.`, onSelect: () => { void remove(r); } }] : []),
+              ]}
             />
           )}
         </div>

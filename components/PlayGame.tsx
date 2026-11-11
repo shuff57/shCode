@@ -34,6 +34,7 @@ import { builtinTextureNames, listWords, missingToShow, type GameAsset } from '.
 import { isGameId } from '../lib/games-core';
 import { CHOICE_TEXT } from '../lib/share-choice';
 import { RemixCreditLine } from './ShareChoicePicker';
+import GameSuggestions from './GameSuggestions';
 
 type State =
   | { kind: 'loading' }
@@ -214,6 +215,7 @@ export default function PlayGame() {
           />
         </div>
       </div>
+      <GameSuggestions gameId={g.id} owner={g.owner} mine={g.mine} />
       {showCode && canRemix && (
         <pre
           aria-label="Game code"
