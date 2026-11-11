@@ -219,6 +219,11 @@ const MAYA = { email: 'maya@example.org', role: 'student', label: "Maya's screen
 const LEO = { email: 'leo@example.org', role: 'student', label: "Leo's screen" };
 // No dev_student cookie: the dev server's own identity, which owns the seeded 'dev-class' (DEV_REAL_DB=1).
 const TEACHER = { email: null, role: 'teacher', label: 'Teacher' };
+// The change-flow clips' people: Nia makes the game, Kai remixes and proposes; Ivy and Ravi for the teacher poster.
+const NIA = { email: 'nia@example.org', role: 'student', label: "Nia's screen (made the game)" };
+const KAI = { email: 'kai@example.org', role: 'student', label: "Kai's screen" };
+const IVY = { email: 'ivy@example.org', role: 'student', label: "Ivy's screen" };
+const RAVI = { email: 'ravi@example.org', role: 'student', label: "Ravi's screen" };
 
 async function startCodeTogether(page, demo) {
   await (demo ? demo.click(page.getByRole('button', { name: 'Code together', exact: true })) : page.getByRole('button', { name: 'Code together', exact: true }).click());
@@ -238,6 +243,79 @@ async function joinCodeTogether(page, demo) {
 }
 
 const RECIPES = {
+  // Versions, proposed changes and their conversations (migration 0048, lib/game-flow-core.ts).
+  '2026-11-propose-changes': {
+    people: [KAI, NIA],
+    path: '/library/?tab=games',
+    storage: { 'shCode:sandbox-mode': 'moshion' },
+    async setup({ person }) {
+      // Nia publishes a game and shares it with the class.
+      const n = await person(NIA, '/sandbox/', { 'shCode:sandbox-mode': 'moshion' });
+      await publishGame(n.page, 'Star Dodge', MOSHION_DODGE);
+    },
+    async before({ demos: [k], pages: [pk, pn] }) {
+      // Kai remixes it and makes the stars faster (cut from the clip).
+      const row = pk.locator('div').filter({ hasText: /^Star Dodge/ }).filter({ has: pk.getByRole('button', { name: 'Remix' }) }).last();
+      await row.getByRole('button', { name: 'Remix' }).click();
+      await pk.waitForURL(/\/sandbox/, { timeout: 30000 });
+      await pk.getByRole('button', { name: /Propose change/ }).waitFor({ timeout: 30000 });
+      await k.setCode(MOSHION_DODGE.replace('s.vel.y = 3;', 's.vel.y = 6;'));
+      await pk.waitForTimeout(600);
+      // The panel is open with the title typed when the clip starts: the clip is sending it and accepting it.
+      await pk.getByRole('button', { name: /Propose change/ }).click();
+      await pk.locator('#propose-title').fill('Faster stars');
+      await pn.reload({ waitUntil: 'domcontentloaded' });
+      await pn.getByRole('heading', { name: /My games/ }).waitFor({ timeout: 30000 });
+    },
+    async run({ demos: [k, n], pages: [pk, pn] }) {
+      await k.click(pk.getByRole('button', { name: 'Propose this change' }), { ms: 450, after: 300 });
+      await pk.getByText(/^Sent to/).waitFor({ timeout: 30000 });
+      await k.pause(600);
+      await pn.reload({ waitUntil: 'domcontentloaded' });
+      const link = pn.getByRole('link', { name: 'Faster stars' });
+      await link.waitFor({ timeout: 30000 });
+      await n.click(link, { ms: 500, after: 200 });
+      const accept = pn.getByRole('button', { name: 'Accept' });
+      await accept.waitFor({ timeout: 30000 });
+      await n.pause(900);
+      await n.click(accept, { ms: 500, after: 300 });
+      await pn.getByText(/^Accepted\./).waitFor({ timeout: 30000 });
+      await n.pause(1400);
+    },
+  },
+
+  '2026-11-teacher-game-changes': {
+    people: [TEACHER],
+    path: '/teacher/?class=dev-class&tab=students',
+    posterOnly: true,
+    async setup({ person }) {
+      // Ivy publishes and shares a game; Ravi proposes a change; they talk it over (all through the API).
+      const ivy = await person(IVY, '/library/?tab=games');
+      const id = await ivy.page.evaluate(async (code) => {
+        const r = await fetch('/api/games', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: 'Maze Run', code }) });
+        const g = (await r.json()).game;
+        await fetch(`/api/games/${g.id}/share`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ share: true }) });
+        return g.id;
+      }, MOSHION_DODGE);
+      const ravi = await person(RAVI, '/library/?tab=games');
+      const cid = await ravi.page.evaluate(async ([gid, code]) => {
+        const r = await fetch(`/api/games/${gid}/changes`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title: 'Two more walls', code, baseVersion: 1, note: 'I added two walls near the end. Is it too hard now?' }),
+        });
+        return (await r.json()).id;
+      }, [id, MOSHION_DODGE.replace("player.color = 'gold';", "player.color = 'gold';\n  new Sprite(100, 200, 120, 12, 'static');\n  new Sprite(300, 260, 120, 12, 'static');")]);
+      await ivy.page.evaluate(async (c) => {
+        await fetch(`/api/game-changes/${c}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'comment', body: 'Not too hard, I like it! Could the second wall be a bit shorter?' }) });
+      }, cid);
+    },
+    async run({ demos: [t], pages: [p] }) {
+      await p.getByRole('heading', { name: 'Proposed changes to games' }).waitFor({ timeout: 30000 });
+      await t.scrollTo(p.getByRole('heading', { name: 'Proposed changes to games' }), 600);
+      await t.click(p.getByRole('button', { name: /Newest comments/ }), { after: 600 });
+    },
+  },
+
   '2026-11-class-together-panels': {
     people: [TEACHER],
     path: '/teacher/?class=dev-class&tab=students',

@@ -46,6 +46,44 @@ export interface WhatsNewEntry {
 
 export const WHATS_NEW: WhatsNewEntry[] = [
   {
+    id: '2026-11-propose-changes',
+    date: '2026-11-10',
+    audience: 'student',
+    title: "Propose a change to a classmate's game",
+    summary:
+      "Remix a classmate's game, make it better, and send your change back. They see exactly what you changed, can try it " +
+      'and talk it over with you, and can accept it into their game with your name on it. It is how programmers work together on GitHub.',
+    steps: [
+      "In Library, Games, press Remix on a classmate's game, then change it in the Sandbox.",
+      'Press Propose change, say what you changed, and send it. Updating your own game now asks what you changed and keeps a History.',
+      'Find answers under Proposed changes in your Library, and join the conversation. Your teacher can read every conversation.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-propose-changes.mp4',
+      poster: '/whats-new/2026-11-propose-changes.jpg',
+      alt: "Kai sends a change to Nia's game from the Sandbox; on Nia's screen the change appears in the Library, Nia opens it and presses Accept.",
+    },
+    action: { label: 'Open the Games library', href: '/library' },
+  },
+  {
+    id: '2026-11-teacher-game-changes',
+    date: '2026-11-10',
+    audience: 'teacher',
+    title: "Students can propose changes to each other's games",
+    summary:
+      "A student who remixes a classmate's game can propose the change back, with a conversation any classmate can join. " +
+      "It is the one place in the Games library where students type to each other, so every conversation is on the class's Students tab for you.",
+    steps: [
+      'Open Teach, then Classes, and pick a class.',
+      'On the Students tab, scroll to Proposed changes to games. Newest comments shows what students wrote.',
+      'Press View to open a conversation, where you can delete a comment, close the conversation or remove the proposal.',
+    ],
+    media: {
+      poster: '/whats-new/2026-11-teacher-game-changes.jpg',
+      alt: "The class page's Proposed changes to games panel, listing the newest comments students wrote, each with a View link.",
+    },
+  },
+  {
     id: '2026-11-code-together',
     date: '2026-11-08',
     audience: 'student',
