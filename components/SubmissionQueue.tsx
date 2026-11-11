@@ -593,12 +593,17 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
             {/* Header: who (the card's title), what (its own line), when (to the minute, in meta). */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
               <div style={{ flex: '1 1 240px', minWidth: 0, overflowWrap: 'anywhere', fontFamily: 'var(--font-prose)', display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <strong style={{ fontWeight: 600, color: 'var(--c-fg)', fontSize: 16, lineHeight: 1.4 }}>
-                  {sub.student_email}
-                </strong>
-                <span style={{ color: 'var(--c-fg)', fontSize: 15, lineHeight: 1.4 }}>{lessonLabel(sub.lesson_id, lessonTitles)}</span>
+                {/* Who and what on one line (climb4 r6: the stacked identity pushed Save grade below the fold). */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', columnGap: 8, lineHeight: 1.4 }}>
+                  <strong style={{ fontWeight: 600, color: 'var(--c-fg)', fontSize: 16 }}>
+                    {sub.student_email}
+                  </strong>
+                  <span aria-hidden="true" style={{ color: 'var(--c-meta)' }}>·</span>
+                  <span style={{ color: 'var(--c-fg)', fontSize: 15 }}>{lessonLabel(sub.lesson_id, lessonTitles)}</span>
+                </div>
                 <span style={{ color: 'var(--c-meta)', fontSize: 13, lineHeight: 1.5 }}>Submitted {formatTs(sub.submitted_at)}</span>
               </div>
+              <div className="sq-head-right">
               <div
                 style={{
                   flexShrink: 0,
@@ -629,6 +634,24 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                           ? `Lab checks: ${labChecks(sub.grade_json)!.passed} of ${labChecks(sub.grade_json)!.total} passed`
                           : `AI score: ${sub.score ?? '—'} / ${sub.possible ?? '—'}`}
               </div>
+              {failed && (
+                // One compact line on the header's right (climb4 r6); the full sentence and the
+                // grader's own error stay reachable in the tooltip and to screen readers.
+                <div
+                  role="note"
+                  className="sq-grader-note"
+                  title={`The AI grader could not score this. The student's answer is below and is safe: read it and set a score yourself.${
+                    failed.error ? ` (${failed.error}${failed.httpStatus ? `, HTTP ${failed.httpStatus}` : ''})` : ''
+                  }`}
+                >
+                  AI grader unavailable: set a score yourself
+                  <span className="sr-only">
+                    . The student&apos;s answer is below and is safe.
+                    {failed.error ? ` (${failed.error}${failed.httpStatus ? `, HTTP ${failed.httpStatus}` : ''})` : ''}
+                  </span>
+                </div>
+              )}
+              </div>
             </div>
 
             {/* Advisory only, and only for the Chapter 3 plan part: the rules
@@ -636,33 +659,9 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                 they disagree with the AI before this becomes the recorded grade. */}
             <PlanCheckPanel lessonId={sub.lesson_id} response={sub.response} />
 
-            {failed && (
-              // A wrapped prose notice (rule 3): an accent edge and a tint, no second border.
-              <div
-                role="note"
-                style={{
-                  background: 'color-mix(in srgb, var(--c-orange) 10%, transparent)',
-                  borderLeft: '4px solid var(--c-orange)',
-                  borderRadius: 4,
-                  padding: '8px 12px',
-                  fontFamily: 'var(--font-prose)',
-                  fontSize: 14,
-                  color: 'var(--c-fg)',
-                  lineHeight: 1.5,
-                  maxWidth: '70ch',
-                }}
-              >
-                The AI grader could not score this. The student&apos;s answer is below and is
-                safe — read it and set a score yourself.
-                {failed.error && (
-                  <span style={{ display: 'block', color: 'var(--c-meta)', marginTop: 2, fontFamily: 'var(--font-mono)', fontSize: 12 }}>
-                    ({failed.error}
-                    {failed.httpStatus ? `, HTTP ${failed.httpStatus}` : ''})
-                  </span>
-                )}
-              </div>
-            )}
-
+            {/* Assignment (prompt + folded rubric) and the answer side by side at >= 1000px (climb4 r6). */}
+            <div className="sq-review-cols">
+            <div className="sq-review-col">
             {/* The question and its criteria, above the answer they grade. */}
             {brief && <AssignmentBlock brief={brief} />}
 
@@ -699,9 +698,11 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                 })}
               </div>
             )}
+            </div>
 
             {/* Student response: a filled block, no border inside the queue's card (rule 6). */}
             <div
+              className="sq-review-col sq-review-answer"
               style={{
                 background: 'var(--c-bg)',
                 borderRadius: 4,
@@ -765,6 +766,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                   </div>
                 )}
               </SubmissionBoundary>
+            </div>
             </div>
 
             {/* Override form */}

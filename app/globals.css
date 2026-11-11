@@ -3679,3 +3679,114 @@ a.mod-row.is-next {
   .content-lesson-main .written-grader { max-width: 760px; box-sizing: border-box; }
 }
 /* end climb4 r5 student */
+
+/* climb4 r6 */
+/* 1. Today queue: badge + one-line grader note on the header's right; assignment and answer side by side. */
+.sq-head-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; max-width: 100%; }
+.sq-grader-note {
+  font-family: var(--font-prose); font-size: 13px; line-height: 1.4; color: var(--c-fg);
+  border-left: 3px solid var(--c-orange); padding: 1px 0 1px 8px; cursor: help; text-align: right;
+}
+.sq-review-cols { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.sq-review-col { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.sq-review-col:empty { display: none; }
+@media (min-width: 1000px) {
+  .sq-review-cols { flex-direction: row; align-items: flex-start; }
+  .sq-review-cols > .sq-review-col { flex: 1 1 0; }
+}
+.sq-review-answer { display: block; }
+/* 3. Roster sort headings read as buttons: a visible arrow on the active column, a dimmer up/down glyph on the rest. */
+.roster-sort { cursor: pointer; gap: 6px; text-underline-offset: 3px; }
+.roster-sort:hover { text-decoration: underline; color: var(--c-fg); }
+.roster-sort-arrow { display: inline-flex; align-items: center; font-size: 14px; line-height: 1; color: var(--c-meta); opacity: 1; }
+.roster-sort-arrow svg { display: block; }
+.roster-sort:not(.is-on) .roster-sort-arrow { color: color-mix(in srgb, var(--c-meta) 75%, transparent); }
+.roster-sort:hover .roster-sort-arrow { color: var(--c-fg); }
+.roster-sort.is-on .roster-sort-arrow { color: var(--c-fg); opacity: 1; }
+/* 5. Schedule: a module whose lessons differ shows a summary chip, not a date input that reads "Mixed". */
+.dd-mixed-chip {
+  display: inline-flex; align-items: center; gap: 4px; height: 28px; padding: 0 10px; box-sizing: border-box;
+  border-radius: 14px; background: color-mix(in srgb, currentColor 12%, transparent);
+  font-family: var(--font-prose); font-size: 14px; font-weight: 600; white-space: nowrap;
+}
+.dd-mixed-link, .dd-mixed-setall {
+  background: none; border: 0; padding: 2px 0; margin: 0; cursor: pointer; white-space: nowrap;
+  font-family: var(--font-prose); font-size: 13px; color: var(--c-cyan); text-decoration: underline; text-underline-offset: 3px;
+}
+.dd-mixed-setall { color: var(--c-meta); text-decoration-style: dotted; }
+.dd-mixed-link:hover, .dd-mixed-setall:hover { color: var(--c-fg); }
+.dd-mixed-link:focus-visible, .dd-mixed-setall:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; border-radius: 3px; }
+/* 6. Gradebook toolbar: row 1 = pager + its counts, with find / order / More on the right; row 2 = legend. */
+.gb-toolbar > .gb-pager { margin: 0; flex: 0 1 auto; min-width: 0; flex-wrap: nowrap; }
+.gb-toolbar .gb-pager-select { max-width: 360px; text-overflow: ellipsis; }
+.gb-toolbar .gb-pager-where { font-size: 13px; white-space: nowrap; }
+.gb-toolbar .gb-toolbar-right input[type="search"], .gb-toolbar .gb-toolbar-right select, .gb-toolbar .gb-toolbar-right > details > summary { height: 36px !important; }
+.gb-toolbar .gb-toolbar-right > details > summary { display: flex; align-items: center; }
+@media (max-width: 640px) {
+  .gb-toolbar > .gb-pager { flex: 1 1 100%; flex-wrap: wrap; }
+  .gb-toolbar .gb-pager-where { white-space: normal; }
+}
+/* 7. Video lesson: the player starts at the article's left edge, on one axis with the title and description. */
+.lesson-wide-media.lesson-video-frame { margin-left: 0 !important; margin-right: auto !important; }
+/* 10. Phone quiz: one container per question is the answer rows themselves; questions are separated by a
+   divider and spacing (no padded, bordered card around padded answer boxes). A marked question keeps its
+   green/red edge. The docs-only dock on reading and quiz pages is a slim 40px bar. */
+@media (max-width: 720px) {
+  .student-quiz .quiz-question-card {
+    background: transparent !important; border: 0 !important; border-top: 1px solid var(--c-line) !important;
+    border-radius: 0 !important; padding: 16px 0 8px !important; margin-bottom: 4px !important;
+  }
+  .student-quiz .quiz-question-card.is-correct { border-left: 4px solid var(--c-green) !important; padding-left: 10px !important; }
+  .student-quiz .quiz-question-card.is-wrong { border-left: 4px solid var(--c-red) !important; padding-left: 10px !important; }
+  .student-quiz .quiz-question-card .quiz-option { width: 100%; box-sizing: border-box; }
+  body:has(.content-lesson-main):has(.shd-tabstrip.shd-docs-only) { --lesson-tool-dock: calc(40px + env(safe-area-inset-bottom)); }
+  body:has(.content-lesson-main) .shd-tabstrip.shd-docs-only { padding: 4px 12px calc(4px + env(safe-area-inset-bottom)) !important; }
+  body:has(.content-lesson-main) .shd-tabstrip.shd-docs-only .shd-tab { padding: 5px 14px !important; line-height: 1.2; }
+  body:has(.content-lesson-main):has(.shd-tabstrip.shd-docs-only) .issue-fab { bottom: calc(4px + env(safe-area-inset-bottom)) !important; width: 32px !important; height: 32px !important; }
+  body:has(.content-lesson-main):has(.shd-tabstrip.shd-docs-only) .content-lesson-main { padding-bottom: calc(56px + env(safe-area-inset-bottom)) !important; }
+}
+/* 11. Phone module Continue: the lesson title is a caption (at most two lines) above a normal-height primary
+   button that reads "Continue →". One link, so its name is still "Continue: <lesson>". */
+@media (max-width: 720px) {
+  .module-continue-action {
+    background: transparent !important; color: var(--c-fg); padding: 0; min-height: 0;
+    flex-direction: column; align-items: stretch; gap: 6px;
+  }
+  .module-continue-title {
+    order: -1; font-weight: 500; font-size: 14px; line-height: 1.4; color: var(--c-fg);
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; white-space: normal;
+  }
+  .module-continue-title::after { content: none; }
+  .module-continue-colon { display: none; }
+  .module-continue-verb {
+    display: flex; align-items: center; justify-content: center; min-height: 44px; box-sizing: border-box; padding: 0 16px;
+    border-radius: 6px; background: var(--c-green); color: var(--c-deep2); font-weight: 700; font-size: 15px;
+  }
+  .module-continue-verb::after { content: " \2192" / ""; white-space: pre; }
+  .module-continue-action:hover .module-continue-verb { background: var(--x-79fc99); }
+}
+/* 12. Phone reading: content headings clearly under the lesson title (h1 22, h2 18, h3 16), 20px above the first h2. */
+@media (max-width: 720px) {
+  .content-lesson-main .content-lesson-title h1 { font-size: 22px !important; }
+  .content-lesson-main .content-prose h2 { font-size: 18px !important; line-height: 1.35 !important; margin-top: 28px !important; }
+  .content-lesson-main .content-prose h2:first-of-type { margin-top: 20px !important; }
+  .content-lesson-main .content-prose h3 { font-size: 16px !important; line-height: 1.4 !important; }
+}
+/* 14. Desktop lesson pages: the previous/next strip is its own tier, 8px under the global nav and off the
+   header's fill (the fill now ends with the nav row), still on the content frame's edges. Slides keep their
+   one-row header. */
+@media (min-width: 721px) {
+  body:has(.content-lesson-main):not(:has(.lesson-slides-frame)) > header:has(> .header-lesson-nav) {
+    background: linear-gradient(var(--header-bg), var(--header-bg)) top left / 100% calc(100% - 40px) no-repeat !important;
+  }
+  body:has(.content-lesson-main):not(:has(.lesson-slides-frame)) > header > .header-lesson-nav { margin-top: 8px; }
+}
+/* 15. Progress: the Missing-or-late breakdown is the chip's own second line, not a line over the table. */
+.progress-attention-chip .progress-attention-breakdown {
+  display: block; margin: 1px 0 0; text-align: center; font-family: var(--font-prose); font-size: 12px; font-weight: 500;
+  line-height: 1.3; color: inherit;
+}
+@media (min-width: 641px) {
+  .gb-toolbar .gb-toolbar-right input[type="search"] { flex: 0 1 160px !important; width: 160px !important; }
+  .gb-toolbar .gb-toolbar-right select { field-sizing: content; max-width: 240px; }
+}

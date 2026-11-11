@@ -162,7 +162,9 @@ export default function ModuleLessonsList({
         const rowStyle: React.CSSProperties = {
           padding: '10px 14px',
           borderLeft: '4px solid ' + badge.color,
-          borderRight: '2px solid ' + stripeColor,
+          // A completed row says so with its DONE pill; a green right edge on top of it was a second signal
+          // for the same fact (climb4 r6). An in-progress row keeps its yellow edge.
+          borderRight: '2px solid ' + (lessonState === 'completed' ? 'var(--border)' : stripeColor),
           textDecoration: 'none',
           color: 'var(--text)',
           opacity: locked ? 0.5 : 1,

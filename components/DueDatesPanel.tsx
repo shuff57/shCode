@@ -197,6 +197,7 @@ function DateTimeField({
   showLabel = true,
   emptyText,
   emptyColor,
+  mixed,
 }: {
   label: string;
   color: string;
@@ -211,11 +212,37 @@ function DateTimeField({
    *  "Mixed" (or "Set per lesson"), never "Not set". */
   emptyText?: string;
   emptyColor?: string;
+  /** A module whose lessons carry different dates: when set and the module has no date of its own, the
+   *  field is a summary chip ("Mixed · set per lesson") with "show lessons" and "Set one date for all",
+   *  never an input that reads "Mixed" (climb4 r6). */
+  mixed?: { lessonsShown: boolean; onShowLessons: () => void };
 }) {
   const date = row?.date ?? '';
   const time = row?.time ?? '';
   const [calOpen, setCalOpen] = useState(false);
+  const [settingAll, setSettingAll] = useState(false);
   const dateRef = useRef<HTMLButtonElement>(null);
+
+  if (mixed && !date && !settingAll) {
+    return (
+      <span className="dd-mixed" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', boxSizing: 'border-box', maxWidth: '100%', padding: showLabel ? 0 : '0 0 0 12px', borderLeft: showLabel ? undefined : `1px solid ${C.border}` }}>
+        {showLabel && <span style={{ fontFamily: 'var(--font-prose)', fontSize: 14, fontWeight: 600, flexBasis: '100%', color }}>{label}</span>}
+        <span
+          className="dd-mixed-chip"
+          aria-label={`${label} for ${ariaSuffix}: mixed, set per lesson`}
+          style={{ color: emptyColor ?? C.warn }}
+        >
+          Mixed <span aria-hidden="true">·</span> set per lesson
+        </span>
+        <button type="button" className="dd-mixed-link" aria-expanded={mixed.lessonsShown} onClick={mixed.onShowLessons}>
+          {mixed.lessonsShown ? 'hide lessons' : 'show lessons'}
+        </button>
+        <button type="button" className="dd-mixed-setall" onClick={() => setSettingAll(true)} aria-label={`Set one ${label.toLowerCase()} date for all of ${ariaSuffix}`}>
+          Set one date for all
+        </button>
+      </span>
+    );
+  }
 
   const pickFromGrid = (d: string) => {
     setCalOpen(false);
@@ -228,7 +255,7 @@ function DateTimeField({
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', boxSizing: 'border-box', maxWidth: '100%', padding: showLabel ? 0 : '0 0 0 12px', borderLeft: showLabel ? undefined : `1px solid ${C.border}` }}>
       {showLabel && <span style={{ fontFamily: 'var(--font-prose)', fontSize: 14, fontWeight: 600, flexBasis: '100%', color }}>{label}</span>}
       <span style={{ position: 'relative', display: 'inline-flex' }}>
-      {!date && <span aria-hidden="true" style={{ position: 'absolute', left: 7, top: 1, bottom: 1, right: 26, display: 'flex', alignItems: 'center', background: 'var(--c-deep2)', color: emptyColor ?? C.dim, fontFamily: 'var(--font-prose)', fontSize: 15, fontWeight: emptyText ? 600 : undefined, pointerEvents: 'none', zIndex: 1 }}>{emptyText ?? 'Not set'}</span>}
+      {!date && <span aria-hidden="true" style={{ position: 'absolute', left: 7, top: 1, bottom: 1, right: 26, display: 'flex', alignItems: 'center', background: 'var(--c-deep2)', color: (mixed ? undefined : emptyColor) ?? C.dim, fontFamily: 'var(--font-prose)', fontSize: 15, fontWeight: emptyText && !mixed ? 600 : undefined, pointerEvents: 'none', zIndex: 1 }}>{(mixed ? undefined : emptyText) ?? 'Not set'}</span>}
       <input
         type="date"
         value={date}
@@ -585,12 +612,14 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                     pastHint={OPEN_PAST_HINT}
                     showLabel={compact}
                     {...emptyFor(openSummary)}
+                    mixed={openSummary.kind === 'mixed' && openSummary.ownDueAt === null ? { lessonsShown: isOpen, onShowLessons: () => toggle(mod.moduleId) } : undefined}
                   />
 
                   <DateTimeField
                     label="Due at"
                     color={C.dim}
                     {...emptyFor(dueSummary)}
+                    mixed={dueSummary.kind === 'mixed' && dueSummary.ownDueAt === null ? { lessonsShown: isOpen, onShowLessons: () => toggle(mod.moduleId) } : undefined}
                     row={byKey.due.get(`module:${mod.moduleId}`)}
                     onWrite={(date, time) => { void write('due', [{ scope: 'module', scopeId: mod.moduleId, date, time }]); }}
                     ariaSuffix={`module ${mod.moduleId}`}

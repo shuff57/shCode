@@ -46,7 +46,7 @@ export default function ModuleContinue({
   return (
     <div className="module-continue">
       <Link href={lessonHref(lesson)} className="module-continue-action">
-        <span className="module-continue-verb">{verb}:</span>
+        <span className="module-continue-verb">{verb}<span className="module-continue-colon">:</span></span>
         <span className="module-continue-title">{lesson.numberedId} {lesson.displayTitle}</span>
         <span aria-hidden="true">→</span>
       </Link>

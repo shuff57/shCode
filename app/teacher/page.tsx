@@ -28,6 +28,7 @@ import { CATEGORY_LABEL, GRADE_CATEGORIES, lessonGradeCategory, lessonPercent, t
 import { buildGradesCsv } from '../../lib/grades-csv';
 import { FeedbackProvider, useFeedback } from '../../components/FeedbackProvider';
 import { RowMenu } from '../../components/RowMenu';
+import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import { toMermaid } from '../../lib/diagram-mermaid';
 
 // ---------------------------------------------------------------------------
@@ -517,7 +518,9 @@ const S = {
     fontWeight: 600,
     fontSize: 14,
     cursor: 'not-allowed',
-    opacity: 0.5,
+    opacity: 1, // beats the global `:disabled { opacity: .5 }`
+    // climb4 r6: no fade. Meta text on the line fill is >= 4.5:1 in every theme (4.75 dark), and the grey
+    // fill against the coloured enabled fills is what says "not yet".
   } as React.CSSProperties,
 
   // One field style for the teacher screens (system pass rule 5): an inset surface, a visible 1px
@@ -1623,7 +1626,7 @@ function GradebookView({
       }
       // A number for every finished lesson, 100 included: the cell background carries the state.
       return withLate(cell, (
-        <span style={{ color: 'inherit', fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', fontWeight: 600, fontSize: 15 }}>
+        <span style={{ color: 'inherit', fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', fontWeight: 600, fontSize: 16 }}>
           {pct}
         </span>
       ));
@@ -1747,14 +1750,73 @@ function GradebookView({
         display: 'flex', flexDirection: 'column',
       } : undefined}
     >
-      {/* Toolbar */}
-      <div style={{ marginBottom: 8, display: 'flex', flexWrap: narrow ? 'wrap' : 'nowrap', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', fontSize: 13, color: 'var(--c-meta)', whiteSpace: 'nowrap' }}>
-          {visibleStudents.length === gbData.students.length
-            ? `${gbData.students.length} student${gbData.students.length !== 1 ? 's' : ''}`
-            : `${visibleStudents.length} of ${gbData.students.length} students`}
-          {' · '}{displayLessons.length} lesson{displayLessons.length !== 1 ? 's' : ''}
-        </span>
+      {/* Toolbar, two rows (climb4 r6): the pager and its counts, with find / order / More on the right;
+          then the legend. */}
+      <div className="gb-toolbar" style={{ marginBottom: 8, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
+        {/* Pager: one module's lessons per page, or every module (the old scrolling grid). */}
+        {pages.length > 0 && (
+          <nav aria-label="Gradebook pages" className="gb-pager">
+            <button
+              type="button"
+              className="gb-pager-step"
+              disabled={pager.position === 0 || pager.prev === null}
+              onClick={() => pager.prev !== null && pickModule(pager.prev)}
+              aria-label={pager.prev ? `Previous module: ${pager.prev}` : 'No previous module'}
+            >
+              ‹ Previous
+            </button>
+            <select
+              value={moduleSel ?? ''}
+              onChange={(e) => pickModule(e.target.value === '' ? null : e.target.value)}
+              aria-label="Gradebook page: one module, or all modules"
+              className="teacher-field gb-pager-select"
+            >
+              {pages.map((m) => (
+                <option key={m.unit} value={m.unit}>{m.unit} · {pageSize(m, showAll)} {showAll ? 'lessons' : 'graded'}</option>
+              ))}
+              <option value="">All modules · {everyLesson.length} {showAll ? 'lessons' : 'graded'}</option>
+            </select>
+            <button
+              type="button"
+              className="gb-pager-step"
+              disabled={pager.next === null}
+              onClick={() => pager.next !== null && pickModule(pager.next)}
+              aria-label={pager.next ? `${pager.position === 0 ? 'First' : 'Next'} module: ${pager.next}` : 'No next module'}
+            >
+              {pager.position === 0 ? 'First module ›' : 'Next ›'}
+            </button>
+            <p className="gb-pager-where" aria-live="polite">
+              {pager.position > 0 ? (
+                <>
+                  {/* The picker names the module, so this line carries only the counts (climb4 r6). */}
+                  <span>{displayLessons.length} {showAll ? '' : 'graded '}lesson{displayLessons.length === 1 ? '' : 's'}</span>
+                  <span aria-hidden="true"> · </span>
+                  <span>module {pager.position} of {pager.total}</span>
+                </>
+              ) : (
+                <>
+                  <span>{displayLessons.length} {showAll ? '' : 'graded '}lessons in {pager.total} modules</span>
+                </>
+              )}
+              {/* The student count only when a search narrows it (the grid's rows already show the class). */}
+              {visibleStudents.length !== gbData.students.length && (
+                <>
+                  <span aria-hidden="true"> · </span>
+                  <span>{visibleStudents.length} of {gbData.students.length} students</span>
+                </>
+              )}
+            </p>
+          </nav>
+        )}
+        {pages.length === 0 && (
+          <span style={{ fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', fontSize: 13, color: 'var(--c-meta)', whiteSpace: 'nowrap' }}>
+            {visibleStudents.length === gbData.students.length
+              ? `${gbData.students.length} student${gbData.students.length !== 1 ? 's' : ''}`
+              : `${visibleStudents.length} of ${gbData.students.length} students`}
+            {' · '}{displayLessons.length} lesson{displayLessons.length !== 1 ? 's' : ''}
+          </span>
+        )}
+        <div className="gb-toolbar-right" style={{ display: 'flex', flexWrap: narrow ? 'wrap' : 'nowrap', alignItems: 'center', gap: 8, marginLeft: narrow ? 0 : 'auto', minWidth: 0, flex: narrow ? '1 1 100%' : undefined }}>
         <input
           type="search"
           value={query}
@@ -1839,59 +1901,8 @@ function GradebookView({
         <button style={{ ...S.btn('transparent'), color: 'var(--c-cyan)', border: '1px solid var(--c-line)' }} onClick={handleDownloadCsv}>Export CSV</button>
           </div>
         </details>
+        </div>
       </div>
-
-      {/* Pager: one module's lessons per page, or every module (the old scrolling grid). */}
-      {pages.length > 0 && (
-        <nav aria-label="Gradebook pages" className="gb-pager">
-          <button
-            type="button"
-            className="gb-pager-step"
-            disabled={pager.position === 0 || pager.prev === null}
-            onClick={() => pager.prev !== null && pickModule(pager.prev)}
-            aria-label={pager.prev ? `Previous module: ${pager.prev}` : 'No previous module'}
-          >
-            ‹ Previous module
-          </button>
-          <select
-            value={moduleSel ?? ''}
-            onChange={(e) => pickModule(e.target.value === '' ? null : e.target.value)}
-            aria-label="Gradebook page: one module, or all modules"
-            className="teacher-field gb-pager-select"
-          >
-            {pages.map((m) => (
-              <option key={m.unit} value={m.unit}>{m.unit} · {pageSize(m, showAll)} {showAll ? 'lessons' : 'graded'}</option>
-            ))}
-            <option value="">All modules · {everyLesson.length} {showAll ? 'lessons' : 'graded'}</option>
-          </select>
-          <button
-            type="button"
-            className="gb-pager-step"
-            disabled={pager.next === null}
-            onClick={() => pager.next !== null && pickModule(pager.next)}
-            aria-label={pager.next ? `${pager.position === 0 ? 'First' : 'Next'} module: ${pager.next}` : 'No next module'}
-          >
-            {pager.position === 0 ? 'First module ›' : 'Next module ›'}
-          </button>
-          <p className="gb-pager-where" aria-live="polite">
-            {pager.position > 0 ? (
-              <>
-                <strong>Module {pager.unit}</strong>
-                <span aria-hidden="true"> · </span>
-                <span>{displayLessons.length} {showAll ? '' : 'graded '}lesson{displayLessons.length === 1 ? '' : 's'}</span>
-                <span aria-hidden="true"> · </span>
-                <span>module {pager.position} of {pager.total}</span>
-              </>
-            ) : (
-              <>
-                <strong>All modules</strong>
-                <span aria-hidden="true"> · </span>
-                <span>{displayLessons.length} {showAll ? '' : 'graded '}lessons in {pager.total} modules</span>
-              </>
-            )}
-          </p>
-        </nav>
-      )}
 
       <div aria-label="Gradebook legend" style={{ display: 'flex', flexWrap: 'nowrap', gap: 16, marginBottom: 8, overflowX: 'auto', paddingBottom: 4, fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-meta)' }}>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0, whiteSpace: 'nowrap' }}>
@@ -2070,7 +2081,7 @@ function GradebookView({
                     }}
                   >
                     <strong style={{ display: 'block', color: 'var(--c-meta)', fontSize: 12, lineHeight: '16px', fontWeight: 600, letterSpacing: '0.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{lesson.title.match(/^\d+\.\d+\.\d+/)?.[0] ?? lesson.title}</strong>
-                    <span className="gb-lesson-title" style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, maxHeight: 36, marginTop: 2, color: 'var(--c-fg)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600, lineHeight: '18px', overflow: 'hidden', whiteSpace: 'normal', overflowWrap: 'break-word' }}>{lesson.title.replace(/^\d+\.\d+\.\d+\s*[:–—.-]?\s*/, '')}</span>
+                    <span className="gb-lesson-title" style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, maxHeight: 36, marginTop: 2, color: 'var(--c-fg)', fontFamily: 'var(--font-prose)', fontSize: 14, fontWeight: 600, lineHeight: '18px', overflow: 'hidden', whiteSpace: 'normal', overflowWrap: 'break-word' }}>{lesson.title.replace(/^\d+\.\d+\.\d+\s*[:–—.-]?\s*/, '')}</span>
                   </a>
                 </th>
               ))}
@@ -2851,7 +2862,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         <div role="tabpanel" id={`panel-today`} aria-labelledby={`tab-today`} style={{ display: 'grid', gap: 12, gridTemplateColumns: 'minmax(0, 1fr)' }}>
         {/* Needs Attention view: one strip, the heading beside its chips, so the grading form below sits
             in the first screen. An opened chip still spreads to the full width under the strip. */}
-          <div style={{ ...S.card, padding: compact ? '12px 16px' : '12px 20px', marginBottom: 0, display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px 16px' }}>
+          <div style={{ ...S.card, padding: compact ? '8px 16px' : '8px 20px', marginBottom: 0, display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px 16px' }}>
             <h2 style={{ ...S.h2, fontSize: 16, lineHeight: '36px', margin: 0, whiteSpace: 'nowrap' }}>Needs Attention</h2>
             <div style={{ flex: '1 1 320px', minWidth: 0 }}>
             <NeedsAttentionPanel
@@ -2921,7 +2932,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             {roster.length === 0 ? (
               <p style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 15 }}>No students enrolled yet.</p>
             ) : (
-              <div role={compact ? undefined : 'table'} aria-label={compact ? undefined : 'Roster'} style={{ display: 'flex', flexDirection: 'column', gap: compact ? 6 : 0 }}>
+              <div className="roster-list" role={compact ? undefined : 'table'} aria-label={compact ? undefined : 'Roster'} style={{ display: 'flex', flexDirection: 'column', gap: compact ? 6 : 0 }}>
                 {!compact && (
                   <div role="row" style={{ display: 'grid', gridTemplateColumns: ROSTER_COLS, gap: 16, padding: '8px 12px 4px', color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600, borderBottom: '1px solid var(--c-line)' }}>
                     {([
@@ -2938,7 +2949,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                             title={`Sort by ${text.toLowerCase()}`}
                           >
                             {text}
-                            <span aria-hidden="true" className="roster-sort-arrow">{on ? (rosterSort!.dir === 'asc' ? '↑' : '↓') : '↕'}</span>
+                            <span aria-hidden="true" className="roster-sort-arrow">{on ? (rosterSort!.dir === 'asc' ? <ArrowUp size={14} strokeWidth={2.5} /> : <ArrowDown size={14} strokeWidth={2.5} />) : <ArrowUpDown size={13} strokeWidth={2} />}</span>
                           </button>
                         </span>
                       );

@@ -369,7 +369,7 @@ export default function QuizView({ lessonId, config }: Props) {
         return (
           <div
             key={q.id}
-            className="quiz-question-card"
+            className={`quiz-question-card${isCorrect ? ' is-correct' : isWrong ? ' is-wrong' : ''}`}
             style={{
               background: 'var(--c-bg)',
               border: '1px solid var(--c-line)',

@@ -209,20 +209,24 @@ export function AnnouncementsPanel({ classId }: Props) {
             Pin this announcement
           </label>
           {/* Post ends the pin row, so the composer is one line shorter and Post stays in view. */}
-          {/* Disabled until there is something to post; the disabled look is a quiet outline with readable
-              text (not a faded green that still reads as pressable). */}
+          {/* Disabled until there is something to post: a grey fill with readable text (not a faded green
+              that still reads as pressable, and not an outline that reads as enabled). */}
           <button
             type="submit"
             disabled={submitting || content.trim() === ''}
             title={content.trim() === '' ? 'Write the announcement first' : undefined}
             style={{
-              background: content.trim() === '' ? 'transparent' : 'var(--c-green)',
+              // Empty: the same disabled look as every teacher button on this tab (S.btnDisabled in
+              // app/teacher/page.tsx: line fill, meta text, >= 4.5:1, no outline) (climb4 r6).
+              background: content.trim() === '' ? 'var(--c-line)' : 'var(--c-green)',
               color: content.trim() === '' ? 'var(--c-meta)' : 'var(--c-bg)',
-              border: content.trim() === '' ? '1px solid var(--c-line)' : '1px solid transparent',
+              border: 'none',
               borderRadius: 4,
-              padding: '8px 20px',
+              padding: '4px 20px',
+              height: 36,
+              boxSizing: 'border-box',
               marginLeft: 'auto',
-              fontWeight: 700,
+              fontWeight: 600,
               fontSize: 14,
               cursor: submitting || content.trim() === '' ? 'not-allowed' : 'pointer',
               opacity: submitting ? 0.6 : 1,

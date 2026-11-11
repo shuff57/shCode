@@ -209,14 +209,17 @@ export default function StudentGradebook({ lessons }: Props) {
   // two different numbers side by side unexplained.
   const attentionParts = (
     [
-      ['missing', 'past due, not done'],
-      ['done-late', 'finished late'],
-      ['pending', 'waiting for your teacher'],
+      ['missing', 'past due, not done', 'not done'],
+      ['done-late', 'finished late', 'late'],
+      ['pending', 'waiting for your teacher', 'waiting'],
     ] as const
   )
-    .map(([st, words]) => ({ n: rows.filter((r) => r.status === st).length, words }))
+    .map(([st, words, short]) => ({ n: rows.filter((r) => r.status === st).length, words, short }))
     .filter((p) => p.n > 0);
   const attentionBreakdown = attentionParts.map((p) => `${p.n} ${p.words}`).join(', ');
+  // The same breakdown in a chip's words: it lives INSIDE the "Missing or late" chip (climb4 r6), so it
+  // can never read as a description of whichever filter is selected.
+  const attentionShort = attentionParts.map((p) => `${p.n} ${p.short}`).join(' · ');
   const nowMs = Date.now();
   const isInProgress = (r: { status: CellStatus; tried: boolean }) => r.status === 'started' || (r.tried && r.status === 'not-started');
   const progressCount = rows.filter(isInProgress).length;
@@ -279,11 +282,15 @@ export default function StudentGradebook({ lessons }: Props) {
           type="button"
           id="missing-late-filter"
           onClick={() => setFilter('attention')}
-          style={filter === 'attention' ? tabActive : tabIdle}
+          style={{ ...(filter === 'attention' ? tabActive : tabIdle), ...(attentionParts.length > 1 ? { borderRadius: 12, lineHeight: 1.3 } : {}) }}
+          className={attentionParts.length > 1 ? 'progress-attention-chip has-breakdown' : 'progress-attention-chip'}
           title={attentionBreakdown ? `Missing or late: ${attentionBreakdown}` : undefined}
           aria-describedby={attentionParts.length > 1 ? 'missing-late-breakdown' : undefined}
         >
           Missing or late ({attentionCount})
+          {attentionParts.length > 1 && (
+            <span className="progress-attention-breakdown" aria-hidden="true">{attentionShort}</span>
+          )}
         </button>
         <button
           type="button"
@@ -294,9 +301,9 @@ export default function StudentGradebook({ lessons }: Props) {
         </button>
       </div>
       {attentionParts.length > 1 && (
-        <p id="missing-late-breakdown" className="progress-attention-breakdown">
+        <span id="missing-late-breakdown" className="sr-only">
           Missing or late ({attentionCount}): {attentionBreakdown}.
-        </p>
+        </span>
       )}
 
       {rows.length === 0 ? (
