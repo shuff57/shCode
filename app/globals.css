@@ -2384,13 +2384,29 @@ body { box-sizing: border-box; padding-right: 20px; }
 .lab-task-card .step-instructions { opacity: 1; font-size: 14px; line-height: 1.5; }
 .lab-task-card .step-instructions p { margin: 6px 0; }
 .lab-task-card .step-hints { color: var(--c-meta); margin-top: 6px; }
-.lab-task-heading { color: var(--c-cyan); font-size: 14px; font-weight: 700; cursor: pointer; }
-.lab-task-card[open] > .lab-task-heading { margin-bottom: 10px; }
-.lab-task-heading:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 4px; }
+/* "Your task": a yellow tab (the colour the Steps tab had) that opens and closes the panel.
+   Phone: a bar above the panel. Desktop: against the left screen edge and the panel, like the tool tabs on the right. */
+.lab-task-tab {
+  font: inherit; font-size: 0.8125rem; font-weight: 600; text-align: left; cursor: pointer;
+  color: var(--c-yellow); background: var(--c-deep2); border: 1px solid var(--c-line); border-radius: 6px; padding: 8px 12px;
+  transition: background-color 120ms, border-color 120ms;
+}
+.lab-task-tab::before { content: "\25B8\00a0"; }
+.lab-task-tab[aria-expanded="true"]::before { content: "\25BE\00a0"; }
+.lab-task-tab[aria-expanded="true"] { background: color-mix(in srgb, var(--c-yellow) 18%, var(--c-deep2)); border-color: var(--c-yellow); }
+.lab-task-tab:hover { background: color-mix(in srgb, var(--c-yellow) 10%, var(--c-deep2)); border-color: var(--c-yellow); }
+.lab-task-tab[aria-expanded="true"]:hover { background: color-mix(in srgb, var(--c-yellow) 18%, var(--c-deep2)); }
+.lab-task-tab:focus-visible { outline: 2px solid var(--c-yellow); outline-offset: -3px; }
 @media (min-width: 721px) {
-  .lab-work-area:has(> .lab-task-card:not([open])) { grid-template-columns: 44px minmax(0, 1fr); }
-  .lab-task-card:not([open]) { padding: 12px !important; }
-  .lab-task-card:not([open]) > .lab-task-heading { writing-mode: vertical-rl; white-space: nowrap; }
+  .lab-work-area { position: relative; margin-left: calc(var(--shd-rail-width) - 20px); }
+  .lab-work-area > .lab-task-tab {
+    position: absolute; top: 0; left: calc(-1 * var(--shd-rail-width)); z-index: 2;
+    width: var(--shd-rail-width); box-sizing: border-box; padding: 12px 9px; white-space: nowrap;
+    writing-mode: vertical-rl; text-orientation: mixed; letter-spacing: 0.04em;
+    border-right: 0; border-radius: 8px 0 0 8px;
+  }
+  .lab-work-area > .lab-task-tab::before { content: none; }
+  .lab-work-area:has(> .lab-task-tab[aria-expanded="false"]) { grid-template-columns: minmax(0, 1fr); }
 }
 .lab-work-area .editor-body { margin: 0; padding: 10px; border: 1px solid var(--c-line); border-radius: 8px; }
 .lab-work-area .editor-card { min-width: 0; }
@@ -2418,8 +2434,6 @@ body { box-sizing: border-box; padding-right: 20px; }
 @media (max-width: 720px) {
   .lab-work-area { display: flex; flex-direction: column; gap: 8px; }
   .lab-task-card { width: 100%; box-sizing: border-box; padding: 10px 12px !important; }
-  .lab-task-heading { font-size: 13px; }
-  .lab-task-card[open] > .lab-task-heading { margin-bottom: 6px; }
   .lab-task-card .lesson-step { margin-bottom: 8px; }
   .lab-task-card .step-instructions { line-height: 1.5; }
   .lab-work-area .editor-card { width: 100%; }
