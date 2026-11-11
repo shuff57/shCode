@@ -49,12 +49,19 @@ jobs:
       # node_modules itself, keyed on the lockfile and the exact Node version:
       # a hit skips `npm ci` (13-16s of unpacking ~1.2 GB) entirely. A miss --
       # a dependency or Node bump -- installs from scratch and saves a new one.
+      # Two native binaries nothing in this job runs are left out (~417 MB):
+      # onnxruntime-node's (the PII guard runs onnxruntime-web in the browser)
+      # and wrangler's workerd. Their package.json and JS stay, so module
+      # resolution is unchanged; only the binaries are missing on a hit.
       - name: Cache node_modules
         id: node-modules
         uses: actions/cache@v4
         with:
-          path: node_modules
-          key: node-modules-${{ runner.os }}-node${{ steps.node.outputs.node-version }}-${{ hashFiles('package-lock.json') }}
+          path: |
+            node_modules
+            !node_modules/onnxruntime-node/bin
+            !node_modules/@cloudflare/workerd-linux-64/bin
+          key: node-modules-slim-${{ runner.os }}-node${{ steps.node.outputs.node-version }}-${{ hashFiles('package-lock.json') }}
 
       # reshape-cad is consumed three ways: the npm file: deps point at the
       # vendored copy inside this repo, but scripts/_pkg-load.mjs resolves the
