@@ -1988,6 +1988,8 @@ textSize(px) sets the font size in pixels. fill(color) sets the text color (yes,
 
 You can also pass size and color directly to text(): text('hello', 10, 20, 18, 'gold'). The constants CENTER, LEFT, and RIGHT are available for textAlign.
 
+textStyle(BOLD) makes the text that follows bold, textStyle(ITALIC) slanted, and textStyle(BOLDITALIC) both. textStyle(NORMAL) goes back to plain. Like textSize(), it lasts until you change it, and each call replaces the last one: to get bold AND italic, use BOLDITALIC, not one call after the other.
+
 You can build strings with + just like normal JavaScript: 'Score: ' + score.`,
         code: `let score = 0;
 

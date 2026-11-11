@@ -47,6 +47,18 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "info": ""
  },
  {
+  "label": "BOLD",
+  "type": "constant",
+  "detail": "'bold'",
+  "info": ""
+ },
+ {
+  "label": "BOLDITALIC",
+  "type": "constant",
+  "detail": "'bold italic'",
+  "info": ""
+ },
+ {
   "label": "camera",
   "type": "constant",
   "detail": "Camera",
@@ -251,6 +263,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "info": ""
  },
  {
+  "label": "ITALIC",
+  "type": "constant",
+  "detail": "'italic'",
+  "info": ""
+ },
+ {
   "label": "Joint",
   "type": "class",
   "detail": "class",
@@ -392,6 +410,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "label": "noLoop",
   "type": "function",
   "detail": "(): void",
+  "info": ""
+ },
+ {
+  "label": "NORMAL",
+  "type": "constant",
+  "detail": "'normal'",
   "info": ""
  },
  {
@@ -621,6 +645,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "type": "function",
   "detail": "(px: number): void",
   "info": ""
+ },
+ {
+  "label": "textStyle",
+  "type": "function",
+  "detail": "(style: 'normal' | 'bold' | 'italic' | 'bold italic'): void",
+  "info": "Bold or italic text: textStyle(BOLD), textStyle(ITALIC), textStyle(BOLDITALIC) for both, textStyle(NORMAL) to go back."
  },
  {
   "label": "textureNames",

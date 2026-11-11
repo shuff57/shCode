@@ -6,6 +6,7 @@
 | Commit | `90921bd` (`moshion.js`, `docs/moshion.d.ts`), branch `main` (= `origin/main`) |
 | Commit date | 2026-11-11 |
 | Vendored | 2026-11-11 (`90921bd`: `textLayer(n)`, on top of `b1a2575`'s `sprite.clone()` and `world.maxSpeed`, `f3e1378` and the `f259b22` sound sync) |
+| Patched here | 2026-11-12: `textStyle(NORMAL \| BOLD \| ITALIC \| BOLDITALIC)` (shCode #103), the same change as upstream `a662f3d` (on top of `3f1e70a`). Upstream `3f1e70a` itself (the API audit fixes) is NOT vendored yet. |
 
 `main` now carries both the default-gravity-0 change (`91f7e6b`, vendored
 2026-11-01) and the math coordinates work on top of it (`4b36bef` engine,

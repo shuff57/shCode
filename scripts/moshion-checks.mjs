@@ -270,6 +270,44 @@ export const SEMANTIC_CHECKS = [
     },
   },
   {
+    name: 'textStyle(BOLD | ITALIC | BOLDITALIC | NORMAL) sets the font of text(); normal keeps the old font string',
+    area: 'drawing',
+    // shCode #103: textStyle did not exist, so a sketch calling it stopped with a ReferenceError.
+    run({ createSandbox }) {
+      const box = createSandbox();
+      box.run(`
+        function setup(){
+          new Canvas(200,200);
+          try { textStyle('bolt'); bad = 'no error'; } catch (e) { bad = e.message; }
+        }
+        function draw(){
+          textSize(20);
+          text('plain', 10, 20);
+          textStyle(ITALIC); textStyle(BOLD); text('bold', 10, 40);
+          textStyle(BOLDITALIC); text('both', 10, 60);
+          textLayer(1); textStyle(ITALIC); text('layered', 10, 80); textLayer();
+          now = textStyle();
+          textStyle(NORMAL); text('back', 10, 100);
+        }
+      `);
+      if (box.errors.length) return `sketch threw: ${box.errors[0].message}`;
+      box.pump(2);
+      box.ops.length = 0;
+      box.pump(1);
+      const fonts = [];
+      let font = null;
+      for (const o of box.ops) {
+        if (o.op === 'set:font') font = o.args[0];
+        if (o.op === 'fillText') fonts.push(o.args[0] + '=' + font);
+      }
+      const want = ['plain=20px monospace', 'bold=bold 20px monospace', 'both=bold italic 20px monospace', 'back=20px monospace', 'layered=italic 20px monospace'];
+      if (JSON.stringify(fonts) !== JSON.stringify(want)) return `fonts ${JSON.stringify(fonts)}, wanted ${JSON.stringify(want)}`;
+      if (box.sandbox.now !== 'italic') return `textStyle() returned ${box.sandbox.now}, wanted italic`;
+      if (!/^textStyle\(style\): style must be NORMAL, BOLD, ITALIC or BOLDITALIC/.test(box.sandbox.bad)) return `textStyle('bolt') said: ${box.sandbox.bad}`;
+      return true;
+    },
+  },
+  {
     name: 'world.maxSpeed: 60 by default, opt-in to raise, one warning naming it',
     area: 'physics',
     // shCode #84. The cap is planck's global maxTranslation; a fresh sketch must start at 60
