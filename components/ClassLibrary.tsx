@@ -12,8 +12,9 @@
 // where it came from (addToLibrary's `from`), which the sync sends to the
 // account so "Remixed from <name> by <who>" follows it to every device.
 //
-// Fonts (2026-11-12) show a sample drawn in the font and have Copy to mine but
-// no Remix: there is no font editor to open a copy in yet.
+// Fonts (2026-11-12) show a sample drawn in the font and have Copy to mine.
+// A font made in the Font maker (its drawing is its meta) also has Remix, which
+// opens the copy in the Font maker; an uploaded font is a finished file.
 
 import { SpriteThumb, SpriteViewer, texMeta } from './SpriteThumb';
 import { useCallback, useEffect, useState } from 'react';
@@ -23,6 +24,7 @@ import { openEditor, prepareTab } from '../lib/remix';
 import { CHOICE_TEXT, provenanceOf, type Provenance, type ShareChoice } from '../lib/share-choice';
 import { RemixCreditLine } from './ShareChoicePicker';
 import { FontSample } from './FontLibrary';
+import { isFontDrawing } from '../lib/font-face';
 import { sectionHeading, sectionNote, sectionStyle } from './library-ui';
 
 interface SharedItem {
@@ -209,8 +211,10 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
                   fontSize: 11, padding: '2px 6px', borderRadius: 4, cursor: 'pointer', whiteSpace: 'nowrap',
                   background: 'transparent', color: 'var(--c-cyan)', border: '1px solid var(--c-line)',
                 }}>Copy to mine</button>
-                {kind !== 'font' && <button type="button" onClick={() => void copy(it, true)} aria-label={`Remix ${it.name}`}
-                  title={kind === 'texture' ? 'Make your own copy and open it in the Texture editor' : 'Make your own copy and open it in the Sound mixer'}
+                {(kind !== 'font' || isFontDrawing(art[it.id]?.meta)) && <button type="button" onClick={() => void copy(it, true)} aria-label={`Remix ${it.name}`}
+                  title={kind === 'texture' ? 'Make your own copy and open it in the Texture editor'
+                    : kind === 'font' ? 'Make your own copy and open it in the Font maker'
+                    : 'Make your own copy and open it in the Sound mixer'}
                   style={{
                     fontSize: 11, padding: '2px 6px', borderRadius: 4, cursor: 'pointer', whiteSpace: 'nowrap',
                     background: 'transparent', color: 'var(--c-cyan)', border: '1px solid var(--c-line)',

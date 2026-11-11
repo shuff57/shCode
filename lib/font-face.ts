@@ -100,6 +100,14 @@ export function useFontFamily(key: string, src: FontSource | null): State {
   return state;
 }
 
+/**
+ * Was this font made in the Font maker (its meta is a saved drawing, lib/font-doc.ts)? A quick look
+ * only, so the Library can offer Remix without loading the font-building code; the editor checks fully.
+ */
+export function isFontDrawing(meta: string | null | undefined): boolean {
+  return typeof meta === 'string' && meta.startsWith('{"v":1,"glyphs":');
+}
+
 /** Check that `dataUri` really is a font the browser can draw (the browser's own sanitizer decides). */
 export async function fontWorks(dataUri: string): Promise<boolean> {
   if (typeof FontFace !== 'function') return true;

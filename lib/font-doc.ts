@@ -7,11 +7,14 @@
 // and a classmate's Remix opens a copy. It is JSON with short keys, because it
 // counts against the student's 500 KB of fonts.
 //
-// Every piece -- a pen stroke, a line, an arc, an ellipse, a box, grid squares
-// -- is turned into polygons, and all of a letter's polygons are merged
+// Every piece -- a pen stroke, a line, an arc, an ellipse, a box, grid squares,
+// a point-and-curve shape -- is turned into polygons, and all of a letter's
+// polygons are merged
 // (polygon-clipping's union), so overlapping strokes become ONE clean outline
 // and a ring (an outlined circle or box) keeps its hole. The merged outline is
-// what goes into the font, written by opentype.js. Coordinates are font units:
+// what goes into the font, written by opentype.js. Point-and-curve shapes are
+// combined with each other first by XOR, so a shape drawn inside another is a
+// hole (the middle of an O) and two shapes drawn apart are both filled. Coordinates are font units:
 // 1000 to the em, y up from the baseline (0), capitals 700 tall, small letters
 // 500, descenders down to -200.
 //
@@ -34,6 +37,8 @@ export const MAX_DOC_BYTES = 48 * 1024;
 const TOLERANCE = 1.5;
 
 export type P = [number, number];
+/** A point of a point-and-curve shape and its curve handle (dx, dy from the point; 0, 0 is a sharp corner). */
+export type CurvePt = [number, number, number, number];
 /** One thing drawn on a letter. `w` is a line's thickness; 0 means filled (ellipse, box). */
 export type Piece =
   | { t: 'pen'; p: P[]; w: number }
@@ -41,7 +46,8 @@ export type Piece =
   | { t: 'arc'; a: P; m: P; b: P; w: number }
   | { t: 'ellipse'; a: P; b: P; w: number }
   | { t: 'box'; a: P; b: P; w: number }
-  | { t: 'grid'; s: number; c: P[] };
+  | { t: 'grid'; s: number; c: P[] }
+  | { t: 'curve'; p: CurvePt[] };
 export interface Glyph { adv: number; pieces: Piece[] }
 export interface FontDoc { v: 1; glyphs: Record<string, Glyph> }
 
@@ -119,6 +125,34 @@ export function arcPoints(a: P, m: P, b: P): P[] {
   return out;
 }
 
+/**
+ * The closed outline of a point-and-curve shape, as points along it. Between
+ * two points the line is a cubic curve whose controls are the first point plus
+ * its handle and the second point minus its handle, so a point's handle bends
+ * the line through it smoothly on both sides; no handle is a sharp corner.
+ */
+export function curveRing(pts: CurvePt[]): Ring {
+  const out: Ring = [];
+  const n = pts.length;
+  for (let i = 0; i < n; i++) {
+    const [x0, y0, h0x, h0y] = pts[i];
+    const [x3, y3, h3x, h3y] = pts[(i + 1) % n];
+    const c1: P = [x0 + h0x, y0 + h0y], c2: P = [x3 - h3x, y3 - h3y];
+    const straight = h0x === 0 && h0y === 0 && h3x === 0 && h3y === 0;
+    const len = Math.hypot(c1[0] - x0, c1[1] - y0) + Math.hypot(c2[0] - c1[0], c2[1] - c1[1]) + Math.hypot(x3 - c2[0], y3 - c2[1]);
+    const steps = straight ? 1 : Math.max(6, Math.ceil(len / 12));
+    for (let k = 0; k < steps; k++) {
+      const t = k / steps, u = 1 - t;
+      out.push([
+        u * u * u * x0 + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t * t * t * x3,
+        u * u * u * y0 + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t * t * t * y3,
+      ]);
+    }
+  }
+  if (out.length) out.push(out[0]);
+  return out;
+}
+
 function strokePolys(pts: P[], w: number): Poly[] {
   if (!pts.length || !(w > 0)) return [];
   if (pts.length === 1) return [[circlePoints(pts[0][0], pts[0][1], w / 2, w / 2)]];
@@ -159,6 +193,8 @@ export function piecePolys(piece: Piece): Poly[] {
     }
     case 'grid':
       return piece.c.map(([col, row]) => [rectRing(col * piece.s, row * piece.s, (col + 1) * piece.s, (row + 1) * piece.s)]);
+    case 'curve':
+      return piece.p.length >= 3 ? [[curveRing(piece.p)]] : [];
   }
 }
 
@@ -215,9 +251,20 @@ export function glyphOutline(g: Glyph): Poly[] {
   // Snapped to an eighth of a unit: polygon-clipping can fail to close a ring
   // when many nearly-equal points from overlapping round ends meet.
   const snap = (v: number) => Math.round(v * 8) / 8;
-  const polys = g.pieces.flatMap(piecePolys)
+  const prep = (list: Piece[]) => list.flatMap(piecePolys)
     .filter((p) => p.length && p[0].length >= 4)
     .map((p) => p.map((r) => r.map(([x, y]) => [snap(x), snap(y)] as P)));
+  const polys = prep(g.pieces.filter((p) => p.t !== 'curve'));
+  // Point-and-curve shapes XOR each other first: one inside another is a hole.
+  const curves = prep(g.pieces.filter((p) => p.t === 'curve'));
+  if (curves.length) {
+    try {
+      const x = polygonClipping.xor(curves[0] as never, ...(curves.slice(1) as never[])) as unknown as Poly[];
+      polys.push(...x);
+    } catch {
+      polys.push(...curves);
+    }
+  }
   if (!polys.length) return [];
   let merged: Poly[];
   try {
@@ -313,6 +360,8 @@ function isPiece(v: unknown): v is Piece {
     case 'arc': return w && isPoint(p.a) && isPoint(p.m) && isPoint(p.b);
     case 'ellipse': case 'box': return w && isPoint(p.a) && isPoint(p.b);
     case 'grid': return typeof p.s === 'number' && p.s >= 10 && p.s <= 500 && Array.isArray(p.c) && p.c.length <= 4000 && p.c.every(isPoint);
+    case 'curve': return Array.isArray(p.p) && p.p.length >= 3 && p.p.length <= 400
+      && p.p.every((q) => Array.isArray(q) && q.length === 4 && q.every((n) => typeof n === 'number' && Number.isFinite(n) && Math.abs(n) < 10000));
     default: return false;
   }
 }

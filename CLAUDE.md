@@ -584,7 +584,12 @@ server, up to 48 KB for fonts only, `metaLimit()`), so a made font has Edit (`/f
 `scripts/test-font-doc.mjs` (npm test). **Packages:** this worktree's `node_modules` is a symlink to `../shCode/node_modules`,
 and `npm install` here DELETES that symlink (it happened 2026-11-12). Add a dependency by editing package.json, running
 `npm install --package-lock-only --legacy-peer-deps` in a temporary copy, and copying only the new packages into the shared
-folder. Phase 3b, still to come: point-and-curve with automatic holes, and Remix of a made font.
+folder. **Phase 3b:** the Curve tool (`{ t: 'curve', p: [x, y, hx, hy][] }`: click to place points, drag while
+placing to give a point a handle, close on the first point or Enter; in Select every point and handle drags, a handle
+dragged back onto its point is a sharp corner). A letter's curve shapes are XORed with each other before the union with
+the other pieces, so a shape inside another is a hole. A shared font whose meta is a drawing (`isFontDrawing`, a quick
+check in `lib/font-face.ts` so the Library does not load the font-building code) has Remix: Copy to mine with its
+drawing and credit, then `/fonts?edit=<name>` opens the copy.
 
 ### Online game rooms (Phase 6, board games)
 - A sketch plays a classmate on another computer through `online` (`public/moshion/extras.js`, NOT the vendored

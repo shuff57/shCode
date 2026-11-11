@@ -12,7 +12,10 @@
 // on a grid, click again to erase) and Select (move a piece, drag its handles,
 // Delete). Thickness is shared by the line tools. Undo / Redo, the letter's
 // width (a handle at its right edge, or the number), and "Copy from" another
-// letter. Point-and-curve is phase 3b.
+// letter. Curve (phase 3b): click to place points, drag while placing one to
+// bend the line through it, click the first point (or Enter) to close the
+// shape; a curve shape inside another is a hole. In Select, a curve shape's
+// points and their handles can be dragged.
 //
 // Everything is in font units (lib/font-doc.ts): 1000 to the em, y up from the
 // baseline. The canvas is an SVG flipped so y goes up; pointer positions are
@@ -23,11 +26,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ASCENDER, CAP_HEIGHT, CHARSET, DEFAULT_ADVANCE, DESCENDER, MAX_DOC_BYTES, X_HEIGHT,
   arcPoints, buildFont, drawn, emptyDoc, fontDataUri, glyphOutline, piecePolys, serializeDoc, simplify,
-  type FontDoc, type Glyph, type P, type Piece,
+  type CurvePt, type FontDoc, type Glyph, type P, type Piece,
 } from '../lib/font-doc';
 import { FONT_LIMITS, listSavedFonts, saveFont } from '../lib/moshion-storage';
 
-type Tool = 'pen' | 'line' | 'arc' | 'ellipse' | 'box' | 'grid' | 'select';
+type Tool = 'pen' | 'line' | 'arc' | 'ellipse' | 'box' | 'grid' | 'curve' | 'select';
 const TOOLS: { id: Tool; label: string; hint: string }[] = [
   { id: 'pen', label: 'Pen', hint: 'Draw freehand. Your line is smoothed when you let go.' },
   { id: 'line', label: 'Line', hint: 'Drag from one end to the other.' },
@@ -35,6 +38,7 @@ const TOOLS: { id: Tool; label: string; hint: string }[] = [
   { id: 'ellipse', label: 'Ellipse', hint: 'Drag from one corner to the other. Tick Filled for a solid shape.' },
   { id: 'box', label: 'Box', hint: 'Drag from one corner to the other. Tick Filled for a solid shape.' },
   { id: 'grid', label: 'Grid', hint: 'Click or drag to fill squares. Click a filled square to empty it.' },
+  { id: 'curve', label: 'Curve', hint: 'Click to place points; drag while placing one to bend the line through it. Click the first point (or press Enter) to close the shape. A shape drawn inside another becomes a hole. Esc cancels, Backspace takes back a point.' },
   { id: 'select', label: 'Select', hint: 'Click a piece to pick it. Drag it to move, drag a dot to reshape, Delete to remove.' },
 ];
 const DRAFT_KEY = 'shCode:font-maker-draft';
@@ -59,19 +63,56 @@ function movePiece(p: Piece, dx: number, dy: number): Piece {
     case 'arc': return { ...p, a: m(p.a), m: m(p.m), b: m(p.b) };
     case 'ellipse': case 'box': return { ...p, a: m(p.a), b: m(p.b) };
     case 'grid': return p; // grid squares stay on their grid
+    case 'curve': return { ...p, p: p.p.map(([x, y, hx, hy]) => [x + dx, y + dy, hx, hy] as CurvePt) };
   }
 }
 
-type Handle = 'a' | 'm' | 'b';
-function handlesOf(p: Piece): { id: Handle; at: P }[] {
+// 'a' | 'm' | 'b' for a line, arc, ellipse or box; 'p<i>' (a point) and 'h<i>' (its curve handle) for a curve shape.
+type Handle = string;
+function handlesOf(p: Piece): { id: Handle; at: P; small?: boolean; from?: P }[] {
   if (p.t === 'line' || p.t === 'ellipse' || p.t === 'box') return [{ id: 'a', at: p.a }, { id: 'b', at: p.b }];
   if (p.t === 'arc') return [{ id: 'a', at: p.a }, { id: 'm', at: p.m }, { id: 'b', at: p.b }];
+  if (p.t === 'curve') {
+    const out: { id: Handle; at: P; small?: boolean; from?: P }[] = [];
+    p.p.forEach(([x, y, hx, hy], i) => {
+      out.push({ id: 'p' + i, at: [x, y] });
+      // A corner's handle sits a little way off the point so it can be grabbed to make the corner round.
+      const h: P = hx === 0 && hy === 0 ? [x + 60, y] : [x + hx, y + hy];
+      out.push({ id: 'h' + i, at: h, small: true, from: [x, y] });
+    });
+    return out;
+  }
   return [];
 }
 function setHandle(p: Piece, h: Handle, at: P): Piece {
-  if (p.t === 'arc') return { ...p, [h]: at };
-  if ((p.t === 'line' || p.t === 'ellipse' || p.t === 'box') && h !== 'm') return { ...p, [h]: at };
+  if (p.t === 'arc' && (h === 'a' || h === 'm' || h === 'b')) return { ...p, [h]: at };
+  if ((p.t === 'line' || p.t === 'ellipse' || p.t === 'box') && (h === 'a' || h === 'b')) return { ...p, [h]: at };
+  if (p.t === 'curve') {
+    const i = Number(h.slice(1));
+    if (!(i >= 0 && i < p.p.length)) return p;
+    const pts = p.p.slice();
+    const [x, y, hx, hy] = pts[i];
+    if (h[0] === 'p') pts[i] = [at[0], at[1], hx, hy];
+    else {
+      const dx = at[0] - x, dy = at[1] - y;
+      // Dragged back onto its point: a sharp corner again.
+      pts[i] = Math.hypot(dx, dy) < 12 ? [x, y, 0, 0] : [x, y, dx, dy];
+    }
+    return { ...p, p: pts };
+  }
   return p;
+}
+
+/** An unfinished curve shape as an SVG path (its points so far, not closed). */
+function openCurvePath(pts: CurvePt[]): string {
+  if (!pts.length) return '';
+  let d = `M${pts[0][0]} ${pts[0][1]}`;
+  for (let i = 1; i < pts.length; i++) {
+    const [x0, y0, h0x, h0y] = pts[i - 1];
+    const [x3, y3, h3x, h3y] = pts[i];
+    d += `C${x0 + h0x} ${y0 + h0y} ${x3 - h3x} ${y3 - h3y} ${x3} ${y3}`;
+  }
+  return d;
 }
 
 function polysPath(polys: P[][][]): string {
@@ -131,6 +172,9 @@ export default function FontEditor({ start, onSaved }: {
   const [past, setPast] = useState<FontDoc[]>([]);
   const [future, setFuture] = useState<FontDoc[]>([]);
   const [draft, setDraft] = useState<Piece | null>(null);
+  /** The curve shape being placed, point by point, and where the pointer is (for the line to the next point). */
+  const [building, setBuilding] = useState<CurvePt[] | null>(null);
+  const [hover, setHover] = useState<P | null>(null);
   const [sample, setSample] = useState('Hello! My own font 123');
   const [preview, setPreview] = useState<string | null>(null);
   const [note, setNote] = useState<{ text: string; bad: boolean } | null>(null);
@@ -141,6 +185,7 @@ export default function FontEditor({ start, onSaved }: {
     | { kind: 'grid'; erase: boolean; s: number; done: Set<string> }
     | { kind: 'move'; index: number; from: P; orig: Piece }
     | { kind: 'handle'; index: number; handle: Handle }
+    | { kind: 'curvePt'; index: number; from: P }
     | { kind: 'width' }
     | null
   >(null);
@@ -242,7 +287,24 @@ export default function FontEditor({ start, onSaved }: {
       commit(withGlyph(gridToggle(at, d, glyph)));
       return;
     }
+    if (tool === 'curve') {
+      const pts = building ?? [];
+      // Back on the first point: the shape is closed.
+      if (pts.length >= 3 && Math.hypot(at[0] - pts[0][0], at[1] - pts[0][1]) < 30) { finishCurve(pts); return; }
+      const next: CurvePt[] = [...pts, [at[0], at[1], 0, 0]];
+      setBuilding(next);
+      drag.current = { kind: 'curvePt', index: next.length - 1, from: at };
+      return;
+    }
     if (tool === 'select') setSel(null);
+  }
+
+  /** Close the curve shape being placed and add it to the letter (3 points at least). */
+  function finishCurve(pts: CurvePt[] | null = building) {
+    setBuilding(null);
+    setHover(null);
+    if (!pts || pts.length < 3) return;
+    commit(withGlyph({ ...glyph, pieces: [...glyph.pieces, { t: 'curve', p: pts.map((q) => q.map(Math.round) as CurvePt) }] }));
   }
 
   function pieceDown(e: React.PointerEvent, index: number) {
@@ -271,8 +333,16 @@ export default function FontEditor({ start, onSaved }: {
 
   function move(e: React.PointerEvent) {
     const d = drag.current;
+    if (tool === 'curve' && building) setHover(toFont(e));
     if (!d) return;
     const at = toFont(e);
+    if (d.kind === 'curvePt') {
+      // Dragging while placing a point bends the line through it (its handle).
+      const dx = at[0] - d.from[0], dy = at[1] - d.from[1];
+      const smooth = Math.hypot(dx, dy) >= 10;
+      setBuilding((b) => b && b.map((q, i) => (i === d.index ? [q[0], q[1], smooth ? dx : 0, smooth ? dy : 0] : q)));
+      return;
+    }
     if (d.kind === 'pen') {
       const last = d.pts[d.pts.length - 1];
       if (Math.hypot(at[0] - last[0], at[1] - last[1]) >= 4) { d.pts.push(at); setDraft({ t: 'pen', p: d.pts.slice(), w: thick }); }
@@ -331,6 +401,12 @@ export default function FontEditor({ start, onSaved }: {
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null;
       if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      if (building) {
+        // While placing a curve shape: Enter closes it, Esc drops it, Backspace takes back a point.
+        if (e.key === 'Enter') { e.preventDefault(); finishCurve(); return; }
+        if (e.key === 'Escape') { e.preventDefault(); setBuilding(null); setHover(null); return; }
+        if (e.key === 'Backspace' || e.key === 'Delete') { e.preventDefault(); setBuilding(building.length > 1 ? building.slice(0, -1) : null); return; }
+      }
       if ((e.key === 'Delete' || e.key === 'Backspace') && sel !== null) {
         e.preventDefault();
         commit(withGlyph({ ...glyph, pieces: glyph.pieces.filter((_, i) => i !== sel) }));
@@ -395,7 +471,7 @@ export default function FontEditor({ start, onSaved }: {
           return (
             <button key={c} type="button" aria-pressed={cur}
               aria-label={`${c === ' ' ? 'Space' : `Letter ${c}`}${has ? ', drawn' : ''}`}
-              onClick={() => { setCh(c); setSel(null); }}
+              onClick={() => { finishCurve(); setCh(c); setSel(null); }}
               style={{
                 minWidth: c === ' ' ? 54 : 28, height: 28, padding: '0 4px', borderRadius: 4, cursor: 'pointer', fontSize: 13,
                 fontFamily: 'monospace', position: 'relative',
@@ -414,7 +490,7 @@ export default function FontEditor({ start, onSaved }: {
         <div role="group" aria-label="Tools" style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
           {TOOLS.map((t) => (
             <button key={t.id} type="button" aria-pressed={tool === t.id} title={t.hint}
-              onClick={() => { setTool(t.id); if (t.id !== 'select') setSel(null); }} style={tool === t.id ? on : btn}>
+              onClick={() => { if (t.id !== 'curve') finishCurve(); setTool(t.id); if (t.id !== 'select') setSel(null); }} style={tool === t.id ? on : btn}>
               {t.label}
             </button>
           ))}
@@ -484,9 +560,34 @@ export default function FontEditor({ start, onSaved }: {
               onPointerDown={(e) => pieceDown(e, i)} style={{ cursor: 'move' }} />
           ))}
           {draft && <path d={polysPath(piecePolys(draft.t === 'pen' ? { ...draft, p: draft.p } : draft))} fill="var(--c-purple)" opacity={0.6} />}
+          {building && (
+            <>
+              {building.length >= 3 && <path d={polysPath(piecePolys({ t: 'curve', p: building }))} fill="var(--c-purple)" opacity={0.25} />}
+              <path d={openCurvePath(building)} fill="none" stroke="var(--c-purple)" strokeWidth={6} />
+              {hover && (() => {
+                const l = building[building.length - 1];
+                return <line x1={l[0]} y1={l[1]} x2={hover[0]} y2={hover[1]} stroke="var(--c-purple)" strokeWidth={3} strokeDasharray="12 8" />;
+              })()}
+              {building.map((q, i) => (
+                <g key={i}>
+                  {(q[2] !== 0 || q[3] !== 0) && (
+                    <line x1={q[0] - q[2]} y1={q[1] - q[3]} x2={q[0] + q[2]} y2={q[1] + q[3]} stroke="var(--c-yellow)" strokeWidth={3} />
+                  )}
+                  <circle cx={q[0]} cy={q[1]} r={i === 0 ? 22 : 14} fill={i === 0 ? 'var(--c-green)' : 'var(--c-bg)'} stroke="var(--c-purple)" strokeWidth={5}>
+                    {i === 0 && <title>Click here to close the shape</title>}
+                  </circle>
+                </g>
+              ))}
+            </>
+          )}
           {tool === 'select' && selected && handlesOf(selected).map((h) => (
-            <circle key={h.id} cx={h.at[0]} cy={h.at[1]} r={handleR} fill="var(--c-bg)" stroke="var(--c-yellow)" strokeWidth={6}
-              onPointerDown={(e) => handleDown(e, sel!, h.id)} style={{ cursor: 'grab' }} />
+            <g key={h.id}>
+              {h.from && <line x1={h.from[0]} y1={h.from[1]} x2={h.at[0]} y2={h.at[1]} stroke="var(--c-yellow)" strokeWidth={3} opacity={0.7} />}
+              <circle cx={h.at[0]} cy={h.at[1]} r={h.small ? 11 : handleR} fill={h.small ? 'var(--c-yellow)' : 'var(--c-bg)'} stroke="var(--c-yellow)" strokeWidth={6}
+                onPointerDown={(e) => handleDown(e, sel!, h.id)} style={{ cursor: 'grab' }}>
+                <title>{h.small ? 'Drag to bend the line through this point (back onto the point for a sharp corner)' : 'Drag to move this point'}</title>
+              </circle>
+            </g>
           ))}
           {selected?.t === 'arc' && tool === 'select' && (
             <polyline points={arcPoints(selected.a, selected.m, selected.b).map(([x, y]) => `${x},${y}`).join(' ')} fill="none" stroke="var(--c-yellow)" strokeWidth={3} strokeDasharray="10 8" />

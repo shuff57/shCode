@@ -59,6 +59,26 @@ check('an arc bent the other way goes the other way round', arc2.every(([, y]) =
 check('three points in a row are a straight line', fd.arcPoints([0, 0], [100, 0], [200, 0]).length === 2);
 check('an empty letter has no outline', fd.glyphOutline(glyph()).length === 0);
 
+// ---- point and curve (3b) ----
+const sq = (x0, y0, x1, y1) => ({ t: 'curve', p: [[x0, y0, 0, 0], [x1, y0, 0, 0], [x1, y1, 0, 0], [x0, y1, 0, 0]] });
+o = fd.glyphOutline(glyph(sq(100, 0, 500, 400)));
+check('a point-and-curve shape with sharp corners is that polygon', o.length === 1 && o[0].length === 1 && covered(o) === 160000, covered(o));
+o = fd.glyphOutline(glyph(sq(100, 0, 500, 400), sq(200, 100, 400, 300)));
+check('a shape drawn inside another becomes a hole', o.length === 1 && o[0].length === 2 && covered(o) === 160000 - 40000, covered(o));
+o = fd.glyphOutline(glyph(sq(100, 0, 300, 200), sq(400, 0, 600, 200)));
+check('two shapes drawn apart are both filled', o.length === 2 && covered(o) === 80000, covered(o));
+o = fd.glyphOutline(glyph(sq(200, 100, 400, 300), sq(100, 0, 500, 400)));
+check('the hole works whichever shape was drawn first', o.length === 1 && o[0].length === 2);
+o = fd.glyphOutline(glyph(sq(100, 0, 500, 400), sq(200, 100, 400, 300), { t: 'line', a: [300, 100], b: [300, 300], w: 40 }));
+check('another tool drawn in the hole fills that part of it', o.length === 1 && covered(o) > 160000 - 40000);
+const bulge = fd.curveRing([[100, 0, 0, 0], [300, 0, 0, 120], [100, 400, 0, 0]]);
+check('a point with a handle makes the line through it a smooth curve: it dips, then turns up', Math.min(...bulge.map(([, y]) => y)) < -20 && bulge.length > 10, Math.min(...bulge.map(([, y]) => y)));
+check('a shape with no handles stays straight-sided: one point per corner', fd.curveRing([[0, 0, 0, 0], [100, 0, 0, 0], [0, 100, 0, 0]]).length === 4);
+check('a curve point list round-trips through the saved drawing',
+  fd.parseDoc(fd.serializeDoc({ v: 1, glyphs: { O: { adv: 600, pieces: [{ t: 'curve', p: [[1, 2, 3, 4], [5, 6, 0, 0], [7, 8, -1, 1]] }] } } })).glyphs.O.pieces[0].p.length === 3);
+check('a curve with fewer than 3 points, or a bad point, is dropped',
+  fd.parseDoc(JSON.stringify({ v: 1, glyphs: { O: { adv: 600, pieces: [{ t: 'curve', p: [[1, 2, 0, 0], [3, 4, 0, 0]] }, { t: 'curve', p: [[1, 2], [3, 4, 0, 0], [5, 6, 0, 0]] }] } } })).glyphs.O.pieces.length === 0);
+
 // ---- a whole font ----
 const doc = fd.emptyDoc();
 doc.glyphs.A = { adv: 650, pieces: [
