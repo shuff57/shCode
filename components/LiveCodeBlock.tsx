@@ -263,6 +263,9 @@ export default function LiveCodeBlock({
           {
             '--lcb-editor-h': `${height}px`,
             '--lcb-preview-side': `${previewSize}px`,
+            // How many lines the authored example has: a stacked block (globals.css) sizes its
+            // editor to the code instead of a fixed square.
+            '--lcb-lines': String(Math.max(2, initialCode.split('\n').length)),
           } as CSSProperties
         }
       >

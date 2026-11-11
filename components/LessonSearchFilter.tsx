@@ -67,6 +67,8 @@ interface Props {
 export default function LessonSearchFilter({ units, lessons }: Props) {
   const progress = useLessonState();
   const nextLesson = progress.loaded && progress.authed ? [...lessons].sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true })).find((l) => progress.states[l.id] !== 'completed') : undefined;
+  // The module the "Next up" card points into is marked in the list below (accent edge + label).
+  const nextModuleId = nextLesson ? (parseNumberedId(nextLesson.title) ?? '').split('.').slice(0, 2).join('.') : null;
   const [query, setQuery] = useState('');
   // Due dates are per class, so every chip on this page reads one chosen
   // class. Renders nothing at all for a student.
@@ -195,12 +197,12 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
                 return (
                   <details
                     key={u.id}
-                    className="bg-muted rounded overflow-hidden"
+                    className={`bg-muted rounded overflow-hidden${u.id === nextModuleId ? ' home-module-current' : ''}`}
                     open={!!trimmed}
                   >
                     <summary className="home-module-summary flex items-baseline gap-3 p-3 cursor-pointer hover:bg-accent transition list-none">
                       <span className="font-bold">{u.id}</span>
-                      <span className="text-base">{u.title}</span>
+                      <span className="text-base home-module-title">{u.title}{u.id === nextModuleId && <span className="home-module-now">{progress.states[nextLesson!.id] === 'started' || moduleLessonIds.some((id) => progress.states[id]) ? 'In progress' : 'Next up'}</span>}</span>
                       <span className="home-module-progress ml-auto flex items-center gap-4 text-sm">
                         <UnitProgressBadge lessons={moduleLessonRefs} label={`Module ${u.id}`} />
                         <ModuleDueChip

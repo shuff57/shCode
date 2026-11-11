@@ -514,19 +514,28 @@ const S = {
     opacity: 0.5,
   } as React.CSSProperties,
 
+  // One field style for the teacher screens (system pass rule 5): an inset surface, a visible 1px
+  // border, 15px prose text. Hover and focus come from the `teacher-field` class in globals.css.
   input: {
-    background: 'var(--c-bg)',
+    background: 'var(--c-deep2)',
     border: '1px solid var(--c-line)',
     borderRadius: 4,
     color: 'var(--c-fg)',
     padding: '4px 12px',
-    height: 32,
+    height: 36,
     boxSizing: 'border-box',
     maxWidth: '100%',
-    fontSize: 14,
-    outline: 'none',
+    fontFamily: 'var(--font-prose)',
+    fontSize: 15,
     minWidth: 220,
   } as React.CSSProperties,
+
+  // A form label above its field (rule 5): prose 14px/600.
+  label: { display: 'block', fontFamily: 'var(--font-prose)', fontSize: 14, fontWeight: 600, color: 'var(--c-fg)', marginBottom: 6 } as React.CSSProperties,
+
+  // A metadata item's label and value (rule 3).
+  metaLabel: { color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13 } as React.CSSProperties,
+  metaValue: { color: 'var(--c-fg)', fontFamily: 'var(--font-prose)', fontSize: 13, fontVariantNumeric: 'tabular-nums' } as React.CSSProperties,
 
   error: { color: 'var(--c-red)', fontSize: 13, marginTop: 8 } as React.CSSProperties,
 
@@ -543,12 +552,13 @@ const S = {
       letterSpacing: '0.05em',
     }) as React.CSSProperties,
 
+  // The join code is a value to read out, not the page's headline: code face, body size.
   code: {
-    fontFamily: 'monospace',
-    fontSize: 28,
+    fontFamily: 'var(--font-mono)',
+    fontSize: 18,
     fontWeight: 700,
     color: 'var(--c-cyan)',
-    letterSpacing: '0.15em',
+    letterSpacing: '0.08em',
   } as React.CSSProperties,
 
   table: { width: '100%', borderCollapse: 'collapse' as const, fontSize: 14 },
@@ -563,6 +573,10 @@ const S = {
   },
   td: { padding: '8px 12px', borderBottom: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)', verticalAlign: 'middle' as const },
 };
+
+// Roster columns on a wide screen: name, grade, graded done, past due, last active, then the row's
+// actions in their own right-aligned track (at least 16px of column gap plus 8px of lead before Open).
+const ROSTER_COLS = 'minmax(180px, 2fr) 154px 112px 80px 136px minmax(144px, auto)';
 
 // ---------------------------------------------------------------------------
 // StudentDrawer — right-side panel showing per-lesson progress
@@ -1295,9 +1309,11 @@ function GradebookView({
   // One module's columns (its `unit` string), or null for every module.
   const [moduleFilter, setModuleFilter] = useState<string | null>(null);
   const [grades, setGrades] = useState<Map<string, GridGrade>>(new Map());
-  // 140px columns: at 112px the blind panel preferred the old grid 3-0 (titles truncated). The header
-  // title is set in the proportional reading face, three lines at most.
-  const CELL_W = 140;
+  // 168px columns: at 112px the blind panel preferred the old grid 3-0 (titles truncated), and 140px with
+  // three-line titles read as cramped. At 168px (156px of text) a title is two lines of 13px prose;
+  // measured 2026-11-10, 135 of the 149 graded titles fit, the other 14 end in an ellipsis and keep
+  // their full text in the tooltip.
+  const CELL_W = 168;
   const [gridElement, setGridElement] = useState<HTMLDivElement | null>(null);
   const [gridScroll, setGridScroll] = useState({ left: false, right: false, more: 0, partialWidth: 0, rightInset: 0 });
   const syncGridRef = useRef<(() => void) | null>(null);
@@ -1652,7 +1668,7 @@ function GradebookView({
     >
       {/* Toolbar */}
       <div style={{ marginBottom: 8, display: 'flex', flexWrap: narrow ? 'wrap' : 'nowrap', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 13, color: 'var(--c-meta)', whiteSpace: 'nowrap' }}>
+        <span style={{ fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', fontSize: 13, color: 'var(--c-meta)', whiteSpace: 'nowrap' }}>
           {visibleStudents.length === gbData.students.length
             ? `${gbData.students.length} student${gbData.students.length !== 1 ? 's' : ''}`
             : `${visibleStudents.length} of ${gbData.students.length} students`}
@@ -1664,13 +1680,15 @@ function GradebookView({
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Find a student"
           aria-label="Find a student by name or email"
-          style={{ background: 'var(--c-deep)', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4, height: 32, boxSizing: 'border-box', padding: '4px 8px', fontSize: 14, width: narrow ? '100%' : 180, minWidth: 0, flex: narrow ? '1 1 100%' : '0 1 180px' }}
+          className="teacher-field"
+          style={{ background: 'var(--c-deep2)', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4, height: 32, boxSizing: 'border-box', padding: '4px 8px', fontFamily: 'var(--font-prose)', fontSize: 15, width: narrow ? '100%' : 180, minWidth: 0, flex: narrow ? '1 1 100%' : '0 1 180px' }}
         />
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as 'name' | 'grade' | 'missing')}
           aria-label="Order students by"
-          style={{ background: 'var(--c-deep)', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4, height: 32, padding: '4px 8px', fontSize: 14, maxWidth: narrow ? '100%' : 240, minWidth: 0 }}
+          className="teacher-field"
+          style={{ background: 'var(--c-deep2)', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4, height: 32, padding: '4px 8px', fontFamily: 'var(--font-prose)', fontSize: 15, maxWidth: narrow ? '100%' : 240, minWidth: 0 }}
         >
           <option value="name">Order: name</option>
           <option value="grade">Order: lowest grade first</option>
@@ -1680,7 +1698,8 @@ function GradebookView({
           value={moduleSel ?? ''}
           onChange={(e) => setModuleFilter(e.target.value === '' ? null : e.target.value)}
           aria-label="Show one module's columns"
-          style={{ background: 'var(--c-deep)', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4, height: 32, padding: '4px 8px', fontSize: 14, maxWidth: narrow ? '100%' : 180, minWidth: 0 }}
+          className="teacher-field"
+          style={{ background: 'var(--c-deep2)', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4, height: 32, padding: '4px 8px', fontFamily: 'var(--font-prose)', fontSize: 15, maxWidth: narrow ? '100%' : 200, minWidth: 0 }}
         >
           <option value="">All modules</option>
           {moduleChoices.map((m) => (
@@ -1714,15 +1733,15 @@ function GradebookView({
         <details style={{ position: 'relative', fontSize: 13, color: 'var(--c-fg)', flexShrink: 0 }}>
           <summary style={{ cursor: 'pointer', height: 32, boxSizing: 'border-box', padding: '4px 12px', border: '1px solid var(--c-line)', borderRadius: 4 }}>More{showAll || problemsOnly ? ' •' : ''} ▾</summary>
           <div style={{ position: 'absolute', top: '100%', right: 0, zIndex: 30, background: 'var(--c-deep2)', border: '1px solid var(--c-line)', borderRadius: 6, padding: 16, width: 260, maxWidth: 'calc(100vw - 64px)', boxSizing: 'border-box', display: 'grid', gap: 12 }}>
-        <label style={{ fontSize: 12, color: 'var(--c-fg)', display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer' }} title="By default the grid shows only the lessons that count toward the grade. Tick this to add the ones that do not (readings, slides, examples, and any lab or chart with no grade category). They show a check mark, never a score.">
+        <label style={{ fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.4, color: 'var(--c-fg)', display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }} title="By default the grid shows only the lessons that count toward the grade. Tick this to add the ones that do not (readings, slides, examples, and any lab or chart with no grade category). They show a check mark, never a score.">
           <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
           Include ungraded lessons{hiddenCount > 0 ? ` (${hiddenCount} hidden)` : ''}
         </label>
-        <label style={{ fontSize: 12, color: 'var(--c-fg)', display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
+        <label style={{ fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.4, color: 'var(--c-fg)', display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
           <input type="checkbox" checked={problemsOnly} onChange={(e) => setProblemsOnly(e.target.checked)} />
           Missing or ungraded work
         </label>
-        <label style={{ fontSize: 12, color: 'var(--c-fg)', display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+        <label style={{ fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.4, color: 'var(--c-fg)', display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
           <input type="checkbox" checked={showCategoryColumns} onChange={e => setShowCategoryColumns(e.target.checked)} />
           Show category columns
         </label>
@@ -1745,7 +1764,7 @@ function GradebookView({
         </details>
       </div>
 
-      <div aria-label="Gradebook legend" style={{ display: 'flex', flexWrap: 'nowrap', gap: 16, marginBottom: 8, overflowX: 'auto', paddingBottom: 4, fontSize: 13, color: 'var(--c-meta)' }}>
+      <div aria-label="Gradebook legend" style={{ display: 'flex', flexWrap: 'nowrap', gap: 16, marginBottom: 8, overflowX: 'auto', paddingBottom: 4, fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-meta)' }}>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0, whiteSpace: 'nowrap' }}>
           <span style={{ color: 'var(--c-green)', fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', fontSize: 14, fontWeight: 700 }}>100</span>done
         </span>
@@ -1805,8 +1824,7 @@ function GradebookView({
                   boxSizing: 'border-box',
                   background: headerBg, padding: '8px 12px',
                   borderBottom: '2px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
-                  textAlign: 'left', color: 'var(--c-meta)', fontSize: 13, fontWeight: 700,
-                  textTransform: 'uppercase', letterSpacing: '0.06em',
+                  textAlign: 'left', color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600,
                 }}
               >
                 Student
@@ -1819,8 +1837,7 @@ function GradebookView({
                   boxSizing: 'border-box',
                   background: headerBg, padding: '8px 8px',
                   borderBottom: '2px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
-                  textAlign: 'center', color: 'var(--c-meta)', fontSize: 13, fontWeight: 700,
-                  textTransform: 'uppercase', letterSpacing: '0.06em',
+                  textAlign: 'center', color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600,
                 }}
                 title="Grade so far: work done plus work past its due date, under this class's weights. Lessons not due yet are left out."
               >
@@ -1835,8 +1852,7 @@ function GradebookView({
                     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                     background: headerBg, padding: '4px 4px',
                     borderBottom: '1px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
-                    textAlign: 'center', color: 'var(--c-meta)', fontSize: 13, fontWeight: 700,
-                    textTransform: 'uppercase', letterSpacing: '0.06em',
+                    textAlign: 'center', color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600,
                   }}
                   title="Percent per grade category, from the same rule as the grade"
                 >
@@ -1854,8 +1870,7 @@ function GradebookView({
                     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                     background: headerBg, padding: '4px 4px',
                     borderBottom: '1px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
-                    textAlign: 'center', color: 'var(--c-purple)', fontSize: 12, fontWeight: 700,
-                    textTransform: 'uppercase', letterSpacing: '0.06em',
+                    textAlign: 'center', color: 'var(--c-purple)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600,
                     width: CELL_W * count,
                   }}
                 >
@@ -1865,7 +1880,7 @@ function GradebookView({
             </tr>
             {/* Per-lesson title row */}
             <tr>
-              {!showCategoryColumns && shownCats.length > 0 && <th style={{ position: 'sticky', top: HEAD1_H, zIndex: 2, width: CAT_W, background: stickyBg, color: 'var(--c-meta)', fontSize: 13, borderBottom: '2px solid var(--c-line)' }}>Summary</th>}
+              {!showCategoryColumns && shownCats.length > 0 && <th style={{ position: 'sticky', top: HEAD1_H, zIndex: 2, width: CAT_W, background: stickyBg, color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600, borderBottom: '2px solid var(--c-line)' }}>Summary</th>}
               {showCategoryColumns && shownCats.map((c) => (
                 <th
                   key={c}
@@ -1890,11 +1905,11 @@ function GradebookView({
                   style={{
                     position: 'sticky', top: HEAD1_H, zIndex: 2,
                     width: CELL_W, minWidth: CELL_W, maxWidth: CELL_W,
-                    // A small number line plus up to four title lines in the proportional face (measured: every
-                    // graded title fits in four at 124px, seven of them need the fourth), so none ends in an
-                    // ellipsis. One fixed height for the whole row; the full title is the tooltip.
-                    height: 84, boxSizing: 'border-box', verticalAlign: 'top', overflow: 'hidden',
-                    background: stickyBg, padding: '6px 8px 6px',
+                    // The lesson number as a small meta line, then the title in at most two lines of 13px
+                    // prose. One fixed height for exactly that (3 + 6 + 16 + 2 + 36 + 6 + 2 = 71px); a
+                    // longer title ends in an ellipsis and its full text is the tooltip.
+                    height: 72, boxSizing: 'border-box', verticalAlign: 'top', overflow: 'hidden',
+                    background: stickyBg, padding: '6px 6px 6px',
                     borderTop: `3px solid ${catOf.get(lesson.id) ? CAT_COLOR[catOf.get(lesson.id) as GradeCategory] : 'var(--c-line)'}`,
                     borderBottom: '2px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)',
                     textAlign: 'left', color: 'var(--c-fg)', fontSize: 13,
@@ -1909,6 +1924,7 @@ function GradebookView({
                     that is 30,000px wide.
                   */}
                   <a
+                    className="gb-lesson-link"
                     href={lessonHref(lesson)}
                     target="_blank"
                     rel="noreferrer"
@@ -1918,14 +1934,14 @@ function GradebookView({
                       textDecoration: 'none',
                       // Full title stays available in the header tooltip.
                       display: 'block',
-                      maxWidth: CELL_W - 16,
+                      maxWidth: CELL_W - 12,
                       whiteSpace: 'normal',
                       overflow: 'hidden',
                       lineHeight: 1.25,
                     }}
                   >
-                    <strong style={{ display: 'block', color: 'var(--c-meta)', fontSize: 11, lineHeight: '14px', fontWeight: 600, letterSpacing: '0.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{lesson.title.match(/^\d+\.\d+\.\d+/)?.[0] ?? lesson.title}</strong>
-                    <span style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, maxHeight: 51, marginTop: 2, color: 'var(--c-purple)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600, lineHeight: '17px', overflow: 'hidden', whiteSpace: 'normal', overflowWrap: 'break-word', hyphens: 'auto' }}>{lesson.title.replace(/^\d+\.\d+\.\d+\s*[:–—.-]?\s*/, '')}</span>
+                    <strong style={{ display: 'block', color: 'var(--c-meta)', fontSize: 12, lineHeight: '16px', fontWeight: 600, letterSpacing: '0.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{lesson.title.match(/^\d+\.\d+\.\d+/)?.[0] ?? lesson.title}</strong>
+                    <span className="gb-lesson-title" style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, maxHeight: 36, marginTop: 2, color: 'var(--c-fg)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600, lineHeight: '18px', overflow: 'hidden', whiteSpace: 'normal', overflowWrap: 'break-word' }}>{lesson.title.replace(/^\d+\.\d+\.\d+\s*[:–—.-]?\s*/, '')}</span>
                   </a>
                 </th>
               ))}
@@ -2136,10 +2152,10 @@ function ListView() {
   return (
     <div className="teacher-frame">
       <h1 style={{ ...S.h1, marginBottom: 8 }}>My Classes</h1>
-      <p style={{ color: 'var(--c-meta)', margin: '0 0 24px', fontSize: 14 }}>Your classroom at a glance. Open a class to review work and support your students.</p>
+      <p style={{ color: 'var(--c-meta)', margin: '0 0 24px', fontFamily: 'var(--font-prose)', fontSize: 15, lineHeight: 1.5, maxWidth: '70ch' }}>Your classroom at a glance. Open a class to review work and support your students.</p>
 
       {/* Include archived toggle */}
-      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--c-meta)', marginBottom: 24, cursor: 'pointer' }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-prose)', fontSize: 14, color: 'var(--c-meta)', marginBottom: 24, cursor: 'pointer' }}>
         <input
           type="checkbox"
           checked={includeArchived}
@@ -2149,10 +2165,10 @@ function ListView() {
         Include archived classes
       </label>
 
-      {/* Class list */}
-      {classes.length === 0 ? (
-        <p style={{ color: 'var(--c-meta)' }}>No classes yet. Create your first class below.</p>
-      ) : (
+      {/* Class list and the Create class card share one responsive grid, at one card width. */}
+      {classes.length === 0 && (
+        <p style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 15 }}>No classes yet. Create your first class below.</p>
+      )}
         <div className="teacher-class-grid" style={{ display: 'grid', gap: 16, maxWidth: 880 }}>
           {[...classes].sort((x, y) => Number(y.id === lastId) - Number(x.id === lastId)).map((c) => (
             <div
@@ -2183,25 +2199,46 @@ function ListView() {
                   {c.name}
                 </a>
                 {c.archived_at && <span style={S.badge(true)}>Archived</span>}
-                {c.id === lastId && <span style={{ fontSize: 13, color: 'var(--c-meta)' }}>last opened</span>}
+                {c.id === lastId && <span style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-meta)' }}>last opened</span>}
               </div>
-              {/* Badges and the action that acts on them share one row. */}
+              {/* Badges and the action that acts on them share one row. Each badge is a way in to the tab
+                  that answers it: "to grade" opens Today, "behind" opens Students. */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 12 }}>
                 {!c.archived_at && (chips[c.id] === undefined ? (
-                  <span style={{ color: 'var(--c-meta)' }}>checking…</span>
+                  <span style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13 }}>checking…</span>
                 ) : chips[c.id].behind === 0 && chips[c.id].toGrade === 0 ? (
-                  <span style={{ color: 'var(--c-green)' }}>All caught up</span>
+                  <span style={{ color: 'var(--c-green)', fontFamily: 'var(--font-prose)', fontSize: 13 }}>All caught up</span>
                 ) : (
                   <>
                     {chips[c.id].toGrade > 0 && (
-                      <span style={{ color: 'var(--c-bg)', background: 'var(--c-orange)', borderRadius: 10, padding: '4px 8px', fontWeight: 700 }}>
+                      <a
+                        href={`/teacher/?class=${encodeURIComponent(c.id)}&tab=today`}
+                        onClick={(e) => {
+                          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                          e.preventDefault();
+                          router.push(`/teacher?class=${c.id}&tab=today`);
+                        }}
+                        className="teacher-chip-link"
+                        title="Open this class's Today tab"
+                        style={{ color: 'var(--c-bg)', background: 'var(--c-orange)', borderRadius: 10, padding: '4px 8px', fontWeight: 700, textDecoration: 'none' }}
+                      >
                         {chips[c.id].toGrade} to grade
-                      </span>
+                      </a>
                     )}
                     {chips[c.id].behind > 0 && (
-                      <span style={{ color: 'var(--c-bg)', background: 'var(--c-red)', borderRadius: 10, padding: '4px 8px', fontWeight: 700 }}>
+                      <a
+                        href={`/teacher/?class=${encodeURIComponent(c.id)}&tab=students`}
+                        onClick={(e) => {
+                          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                          e.preventDefault();
+                          router.push(`/teacher?class=${c.id}&tab=students`);
+                        }}
+                        className="teacher-chip-link"
+                        title="See who is behind on the Students tab"
+                        style={{ color: 'var(--c-bg)', background: 'var(--c-red)', borderRadius: 10, padding: '4px 8px', fontWeight: 700, textDecoration: 'none' }}
+                      >
                         {chips[c.id].behind} behind
-                      </span>
+                      </a>
                     )}
                   </>
                 ))}
@@ -2212,39 +2249,42 @@ function ListView() {
                   {chips[c.id]?.toGrade > 0 ? 'Review work →' : 'Open class →'}
                 </button>
               </div>
-              <div style={{ display: 'flex', gap: '4px 20px', color: 'var(--c-meta)', fontSize: 13, flexWrap: 'wrap' }}>
-                <span>Code: <span style={{ fontFamily: 'monospace', color: 'var(--c-cyan)' }}>{c.code}</span></span>
-                {c.school_year && <span>Year: {c.school_year}</span>}
-                <span>{c.student_count} student{c.student_count !== 1 ? 's' : ''}</span>
-                <span style={{ textTransform: 'capitalize' }}>{c.role}</span>
-              </div>
+              {/* Labelled facts, most useful first (system pass rule 3). */}
+              <dl className="teacher-class-facts" style={{ display: 'flex', gap: '6px 24px', flexWrap: 'wrap', margin: 0, paddingTop: 12, borderTop: '1px solid color-mix(in srgb, var(--c-line) 60%, transparent)' }}>
+                <div style={{ display: 'flex', gap: 6, alignItems: 'baseline' }}><dt style={S.metaLabel}>Students</dt><dd style={{ ...S.metaValue, margin: 0 }}>{c.student_count}</dd></div>
+                <div style={{ display: 'flex', gap: 6, alignItems: 'baseline' }}><dt style={S.metaLabel}>Join code</dt><dd style={{ margin: 0, fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: 'var(--c-cyan)', letterSpacing: '0.04em' }}>{c.code}</dd></div>
+                {c.school_year && <div style={{ display: 'flex', gap: 6, alignItems: 'baseline' }}><dt style={S.metaLabel}>Year</dt><dd style={{ ...S.metaValue, margin: 0 }}>{c.school_year}</dd></div>}
+                <div style={{ display: 'flex', gap: 6, alignItems: 'baseline' }}><dt style={S.metaLabel}>Role</dt><dd style={{ ...S.metaValue, margin: 0, textTransform: 'capitalize' }}>{c.role}</dd></div>
+              </dl>
             </div>
           ))}
-        </div>
-      )}
-      {/* Create form */}
-      <div className="teacher-create-card" style={{ ...S.card, marginTop: 24, maxWidth: 880 }}>
-        <h2 style={S.h2}>Create class</h2>
-        <form onSubmit={(e) => { void handleCreate(e); }} style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-          <label htmlFor="new-class-name" style={{ fontSize: 14, fontWeight: 600 }}>Class name</label>
+      {/* Create form: a card in the same grid, at a class card's width. */}
+      <div className="teacher-create-card" style={{ ...S.card, marginBottom: 0, maxWidth: 880 }}>
+        <h2 style={{ ...S.h2, marginBottom: 12 }}>Create class</h2>
+        <form onSubmit={(e) => { void handleCreate(e); }} style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+          <div style={{ flex: '1 1 260px', minWidth: 0 }}>
+          <label htmlFor="new-class-name" style={S.label}>Class name</label>
           <input
-            style={{ ...S.input, width: 'min(100%, 360px)', minWidth: 0, flex: '1 1 300px' }}
+            className="teacher-field"
+            style={{ ...S.input, width: '100%', minWidth: 0 }}
             id="new-class-name"
             placeholder="e.g. Introduction to coding"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             required
           />
+          </div>
           <button
             type="submit"
             disabled={creating || !newName.trim()}
-            style={creating || !newName.trim() ? S.btnDisabled : S.btn('var(--c-purple)')}
+            style={{ ...(creating || !newName.trim() ? S.btnDisabled : S.btn('var(--c-purple)')), height: 36 }}
           >
             {creating ? 'Creating…' : 'Create class'}
           </button>
         </form>
         {createError && <p style={S.error}>{createError}</p>}
       </div>
+        </div>
 
     </div>
   );
@@ -2589,11 +2629,12 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             <h1 style={{ ...S.h1, fontSize: compact ? 21 : 28, lineHeight: 1.2, margin: 0, overflowWrap: 'anywhere' }}>{cls.name}</h1>
             {isArchived && <span style={S.badge(true)}>Archived</span>}
           </div>
-          <div style={{ display: 'flex', gap: compact ? 8 : 14, color: 'var(--c-meta)', fontSize: 13, flexWrap: 'wrap' }}>
-            {cls.school_year && <span>Year: {cls.school_year}</span>}
-            {!compact && <span>Created: {fmt(cls.created_at)}</span>}
-            <span title="Students join with this code. Regenerate it under Class settings.">Join code: <strong style={{ fontFamily: 'monospace', color: 'var(--c-cyan)', letterSpacing: '0.08em' }}>{currentCode}</strong></span>
-            {cls.archived_at && <span>Archived: {fmt(cls.archived_at)}</span>}
+          {/* Labelled facts (system pass rule 3): label in meta, value in the body colour. */}
+          <div style={{ display: 'flex', gap: compact ? '4px 16px' : '4px 24px', fontFamily: 'var(--font-prose)', fontSize: 13, lineHeight: '20px', flexWrap: 'wrap', alignItems: 'baseline' }}>
+            <span title="Students join with this code. Regenerate it under Class settings."><span style={S.metaLabel}>Join code</span> <strong style={{ fontFamily: 'var(--font-mono)', fontSize: 14, color: 'var(--c-cyan)', letterSpacing: '0.08em' }}>{currentCode}</strong></span>
+            {cls.school_year && <span><span style={S.metaLabel}>Year</span> <span style={S.metaValue}>{cls.school_year}</span></span>}
+            {!compact && <span><span style={S.metaLabel}>Created</span> <span style={S.metaValue}>{fmt(cls.created_at)}</span></span>}
+            {cls.archived_at && <span><span style={S.metaLabel}>Archived</span> <span style={S.metaValue}>{fmt(cls.archived_at)}</span></span>}
           </div>
         </div>
 
@@ -2747,12 +2788,13 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             </button>
           </div>
             {roster.length === 0 ? (
-              <p style={{ color: 'var(--c-meta)', fontSize: 14 }}>No students enrolled yet.</p>
+              <p style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 15 }}>No students enrolled yet.</p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: compact ? 6 : 0 }}>
-                {!compact && <div style={{ display: 'grid', gridTemplateColumns: 'minmax(180px, 2fr) 154px 112px 80px 150px 128px', gap: 16, padding: '12px 12px 8px', color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600, borderBottom: '1px solid var(--c-line)' }}><span>Student</span><span>Grade so far</span><span>Graded done</span><span>Past due</span><span>Last active</span><span /></div>}
+                {!compact && <div style={{ display: 'grid', gridTemplateColumns: ROSTER_COLS, gap: 16, padding: '12px 12px 8px', color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600, borderBottom: '1px solid var(--c-line)' }}><span>Student</span><span>Grade so far</span><span>Graded done</span><span>Past due</span><span>Last active</span><span /></div>}
                 {/* Desktop: 20px name + 18px email + 12px padding + 1px border = 51px.
-                    Phone: one row of name + Open/More, one row of counts + grade (about 70px). */}
+                    Phone: row 1 = name + grade, row 2 = counts on one line + Open and a compact More
+                    (about 64px). Putting Open/More on the name row stranded the grade below them (lost 3-0). */}
                 {roster.map((row) => {
                   const prog = progressMap.get(row.student_email);
                   // A stale or older response can lack weightedPercent; a NaN
@@ -2761,7 +2803,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                   return (
                     <div
                       key={row.student_email}
-                      style={{ background: 'var(--c-bg)', borderRadius: compact ? 6 : 0, padding: compact ? '8px 12px' : '6px 12px', borderBottom: '1px solid var(--c-line)', display: 'grid', gridTemplateColumns: compact ? 'minmax(0, 1fr) auto' : 'minmax(180px, 2fr) 154px 112px 80px 150px 128px', alignItems: 'center', minWidth: 0, minHeight: compact ? undefined : 51, boxSizing: 'border-box', gap: compact ? '4px 8px' : 16 }}
+                      style={{ background: 'var(--c-bg)', borderRadius: compact ? 6 : 0, padding: compact ? '8px 12px' : '6px 12px', borderBottom: '1px solid var(--c-line)', display: 'grid', gridTemplateColumns: compact ? 'minmax(0, 1fr) auto' : ROSTER_COLS, alignItems: 'center', minWidth: 0, minHeight: compact ? undefined : 51, boxSizing: 'border-box', gap: compact ? '2px 8px' : 16 }}
                     >
                       <div style={{ minWidth: 0, gridColumn: compact ? 1 : undefined, gridRow: compact ? 1 : undefined, fontFamily: 'var(--font-prose)' }} title={`Enrolled ${fmt(row.enrolled_at)} by ${row.enrolled_by ?? 'self'}`}>
                         <div style={{ fontSize: 15, lineHeight: compact ? '22px' : '20px', fontWeight: 600, color: 'var(--c-fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fullName(prog?.firstName, prog?.lastName) ?? row.student_email}</div>
@@ -2770,33 +2812,35 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                       <div title="Grade so far, under this class's weights" style={{ gridColumn: compact ? 2 : undefined, gridRow: compact ? 1 : undefined, display: 'flex', alignItems: 'center', justifyContent: compact ? 'flex-end' : undefined, gap: 10, whiteSpace: 'nowrap', lineHeight: '22px' }}>
                         {/* The number leads; the thin neutral bar under it is the grade's scale, not a
                             completion bar (that is the "Graded done" fraction beside it). */}
-                        <strong style={{ color: prog?.gradedCounted ? pctColor(wp) : 'var(--c-meta)', fontSize: compact ? 16 : 15, fontVariantNumeric: 'tabular-nums', minWidth: compact ? undefined : 44, textAlign: 'right' }}>{prog?.gradedCounted ? `${wp}%` : '—'}</strong>
+                        <strong style={{ color: prog?.gradedCounted ? pctColor(wp) : 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: compact ? 16 : 15, fontVariantNumeric: 'tabular-nums', minWidth: compact ? undefined : 44, textAlign: 'right' }}>{prog?.gradedCounted ? `${wp}%` : '—'}</strong>
                         {!compact && prog?.gradedCounted ? (
                           <span aria-hidden="true" style={{ position: 'relative', display: 'inline-block', width: 64, height: 4, borderRadius: 2, background: 'color-mix(in srgb, var(--c-meta) 22%, transparent)', overflow: 'hidden', flexShrink: 0 }}>
                             <span style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${Math.max(0, Math.min(100, wp))}%`, background: pctColor(wp), borderRadius: 2 }} />
                           </span>
                         ) : null}
                       </div>
-                      <div style={{ gridColumn: compact ? '1 / -1' : undefined, gridRow: compact ? 2 : undefined, minWidth: 0, display: 'flex', flexWrap: 'wrap', gap: compact ? '0 6px' : 8, lineHeight: '18px', fontSize: compact ? 12 : 14, color: compact ? 'var(--c-meta)' : 'var(--c-fg)', fontVariantNumeric: 'tabular-nums' }}>
+                      <div style={{ gridColumn: compact ? 1 : undefined, gridRow: compact ? 2 : undefined, minWidth: 0, display: 'flex', flexWrap: 'nowrap', overflow: 'hidden', gap: compact ? '0 6px' : 8, lineHeight: '18px', fontFamily: 'var(--font-prose)', fontSize: compact ? 13 : 14, color: compact ? 'var(--c-meta)' : 'var(--c-fg)', fontVariantNumeric: 'tabular-nums' }}>
                         <span style={{ whiteSpace: 'nowrap' }}>{prog?.gradedDone ?? 0}/{prog?.gradedTotal ?? '—'}{compact && ' graded'}</span>
                         {compact && <span aria-hidden="true">·</span>}
                         {compact && <span style={{ whiteSpace: 'nowrap', fontWeight: prog?.gradedMissing ? 700 : 400, color: prog?.gradedMissing ? 'var(--c-red)' : 'var(--c-meta)' }}>{prog?.gradedMissing ?? 0} past due</span>}
                       </div>
-                      {!compact && <><strong style={{ fontSize: 15, fontVariantNumeric: 'tabular-nums', color: prog?.gradedMissing ? 'var(--c-red)' : 'var(--c-meta)' }}>{prog?.gradedMissing || '—'}</strong><span title={prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'} style={{ minWidth: 0, fontSize: 14, lineHeight: '18px', color: prog?.last_active ? 'var(--c-fg)' : 'var(--c-meta)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'}</span></>}
-                      <div style={{ gridColumn: compact ? '1 / -1' : undefined, gridRow: compact ? 3 : undefined, minWidth: 0, display: 'flex', flexWrap: 'nowrap', gap: 8, justifyContent: 'flex-end', alignItems: 'center' }}>
+                      {!compact && <><strong style={{ fontFamily: 'var(--font-prose)', fontSize: 15, fontVariantNumeric: 'tabular-nums', color: prog?.gradedMissing ? 'var(--c-red)' : 'var(--c-meta)' }}>{prog?.gradedMissing || '—'}</strong><span title={prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'} style={{ minWidth: 0, fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: '18px', color: prog?.last_active ? 'var(--c-fg)' : 'var(--c-meta)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'}</span></>}
+                      <div style={{ gridColumn: compact ? 2 : undefined, gridRow: compact ? 2 : undefined, minWidth: 0, display: 'flex', flexWrap: 'nowrap', gap: compact ? 6 : 8, justifyContent: 'flex-end', justifySelf: 'end', alignItems: 'center', paddingLeft: compact ? 0 : 8 }}>
                         {/* The row's action: a full-strength cyan outline with a bold label and a faint tint, so it
                             reads as the thing to press without a column of bright fills outshouting the grades. */}
                         <button
                           type="button"
                           className="teacher-row-open"
                           aria-label={`Open ${fullName(prog?.firstName, prog?.lastName) ?? row.student_email}`}
-                          style={{ background: 'color-mix(in srgb, var(--c-cyan) 8%, transparent)', color: 'var(--c-cyan)', border: '1px solid var(--c-cyan)', borderRadius: 4, height: 32, boxSizing: 'border-box', padding: '0 14px', lineHeight: '18px', flexShrink: 0, fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                          style={{ background: 'color-mix(in srgb, var(--c-cyan) 8%, transparent)', color: 'var(--c-cyan)', border: '1px solid var(--c-cyan)', borderRadius: 4, height: 32, boxSizing: 'border-box', padding: compact ? '0 10px' : '0 14px', lineHeight: '18px', flexShrink: 0, fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
                           onClick={() => { setDrawerLesson(null); setDrawerEmail(row.student_email); }}
                         >
                           Open
                         </button>
                         <RowMenu
                           label={`More actions for ${row.student_email}`}
+                          buttonText={compact ? '⋯' : 'More'}
+                          caret={!compact}
                           disabled={removingEmail === row.student_email}
                           items={[
                             { label: 'Remove from class…', danger: true, title: 'Takes them off this class roster. Their work is kept.', onSelect: () => { void handleRemove(row.student_email); } },
@@ -2815,6 +2859,8 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
           <h2 style={S.h2}>Add student by email</h2>
           <form onSubmit={(e) => { void handleEnroll(e); }} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' }}>
             <input
+              className="teacher-field"
+              aria-label="Student email"
               style={S.input}
               type="email"
               placeholder="student@example.com"
@@ -2825,7 +2871,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             <button
               type="submit"
               disabled={enrolling || !enrollEmail.trim()}
-              style={enrolling || !enrollEmail.trim() ? S.btnDisabled : S.btn('var(--c-green)')}
+              style={{ ...(enrolling || !enrollEmail.trim() ? S.btnDisabled : S.btn('var(--c-green)')), height: 36 }}
             >
               {enrolling ? 'Adding…' : 'Add student'}
             </button>
@@ -2907,9 +2953,11 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         <div style={{ display: 'grid', gap: 16, minWidth: 0 }}>
         {/* Code */}
         <div style={{ ...S.card, padding: compact ? 16 : 20, marginBottom: 0 }}>
-          <div style={{ color: 'var(--c-meta)', fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Join Code</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
-            <span style={S.code}>{currentCode}</span>
+          {/* A labelled value at body size: the editable panels (weights, announcements) lead the page, not
+              the code. */}
+          <h2 style={{ ...S.h2, marginBottom: 12 }}>Join code</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+            <span style={{ ...S.code, padding: '4px 12px', border: '1px solid var(--c-line)', borderRadius: 4, background: 'var(--c-deep2)' }} aria-label={`Join code ${currentCode.split('').join(' ')}`}>{currentCode}</span>
             {isOwner ? (
               <button
                 style={regenerating ? S.btnDisabled : { ...S.btn('transparent'), color: 'var(--c-meta)', border: '1px solid var(--c-line)' }}
@@ -2920,16 +2968,16 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
               </button>
             ) : (
               // The server only lets the owner rotate the code; a button that always fails is worse than a sentence.
-              <span style={{ fontSize: 13, color: 'var(--c-meta)' }}>Only the class owner can make a new join code.</span>
+              <span style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-meta)' }}>Only the class owner can make a new join code.</span>
             )}
           </div>
-          
+          <p style={{ margin: '8px 0 0', fontFamily: 'var(--font-prose)', fontSize: 13, lineHeight: 1.5, color: 'var(--c-meta)', maxWidth: '70ch' }}>Students join this class with this code.</p>
         </div>
         {/* Co-teachers */}
         <div style={{ ...S.card, marginBottom: 0, padding: compact ? 16 : 20 }}>
           <h2 style={S.h2}>Co-teachers ({coTeachers.length})</h2>
           {coTeachers.length === 0 ? (
-            <p style={{ color: 'var(--c-meta)', fontSize: 14, marginBottom: isOwner ? 16 : 0 }}>No co-teachers added yet.</p>
+            <p style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 15, marginBottom: isOwner ? 16 : 0 }}>No co-teachers added yet.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: isOwner ? 16 : 0 }}>
               {coTeachers.map((ct) => (
@@ -2941,7 +2989,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                     <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'var(--c-fg)', marginBottom: 4 }}>
                       {ct.teacher_email}
                     </div>
-                    <div style={{ fontSize: 13, color: 'var(--c-meta)' }}>
+                    <div style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-meta)' }}>
                       added {fmtTs(ct.added_at)}{ct.added_by ? ` by ${ct.added_by}` : ''}
                     </div>
                   </div>
@@ -2955,6 +3003,8 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
           {isOwner && (
             <form onSubmit={(e) => { void handleAddCoTeacher(e); }} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' }}>
               <input
+                className="teacher-field"
+                aria-label="Co-teacher email"
                 style={S.input}
                 type="email"
                 placeholder="teacher@example.com"
@@ -2965,7 +3015,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
               <button
                 type="submit"
                 disabled={addingCoTeacher || !coTeacherEmail.trim()}
-                style={addingCoTeacher || !coTeacherEmail.trim() ? S.btnDisabled : S.btn('var(--c-purple)')}
+                style={{ ...(addingCoTeacher || !coTeacherEmail.trim() ? S.btnDisabled : S.btn('var(--c-purple)')), height: 36 }}
               >
                 {addingCoTeacher ? 'Adding…' : 'Add co-teacher'}
               </button>

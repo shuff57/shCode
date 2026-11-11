@@ -14,6 +14,7 @@ import { useCountedLessons } from '../lib/lesson-counted';
 import LessonAccessChip from './LessonAccessChip';
 import { moduleSummaryForClass, ownDate, resolveForClass, useTeacherDue } from '../lib/due-dates-edit';
 import { withAlpha } from '../lib/color-alpha';
+import { pickNextLesson } from '../lib/module-next';
 
 interface LessonItem {
   id: string;
@@ -85,6 +86,14 @@ export default function ModuleLessonsList({
     return lessons.length; // all done
   })();
   const lockBypass = bypassesLessonLock(progress.role);
+  // The row the module page's Continue button points at (same pick, lib/module-next.ts).
+  const nextPick = pickNextLesson(lessons.map((l) => l.id), {
+    loaded: progress.loaded,
+    state: (id) => progress.states[id],
+    isAvailable: (id) => lessonAvailability(due, id, moduleId, unitId, now).available,
+    bypass: lockBypass,
+  });
+  const nextId = nextPick?.kind === 'next' ? nextPick.id : null;
 
   // Module header summary: one date if every lesson agrees, otherwise "Mixed"
   // with the range it spans. Computed, never stored — see lib/due-dates-core.
@@ -142,7 +151,8 @@ export default function ModuleLessonsList({
         const href = lessonHref(l);
         const lessonState = progress.states[l.id];
         const stripeColor = stateStripeColors[lessonState ?? ''] ?? 'var(--border)';
-        const stateLabel = stateLabels[lessonState ?? ''];
+        const isNext = l.id === nextId;
+        const stateLabel = stateLabels[lessonState ?? ''] ?? (isNext ? 'Next up' : undefined);
         const lessonDue = resolveDue(due, l.id, moduleId, unitId);
         // Two independent gates — sequence and clock. Either closes the row.
         const availability = lessonAvailability(due, l.id, moduleId, unitId, now);
@@ -209,12 +219,12 @@ export default function ModuleLessonsList({
               </span>
             ) : stateLabel ? (
               <span
-                className={lessonState === 'completed' ? 'mod-row-done' : undefined}
+                className={lessonState === 'completed' ? 'mod-row-done' : isNext ? 'mod-row-next-label' : undefined}
                 style={{
                   fontSize: 12,
-                  color: stripeColor,
-                  background: withAlpha(stripeColor, '22'),
-                  border: '1px solid ' + withAlpha(stripeColor, '55'),
+                  color: isNext && !lessonState ? 'var(--c-cyan)' : stripeColor,
+                  background: withAlpha(isNext && !lessonState ? 'var(--c-cyan)' : stripeColor, '22'),
+                  border: '1px solid ' + withAlpha(isNext && !lessonState ? 'var(--c-cyan)' : stripeColor, '55'),
                   borderRadius: 999,
                   padding: '2px 8px',
                   fontWeight: 600,
@@ -327,8 +337,9 @@ export default function ModuleLessonsList({
             ) : (
               <Link
                 href={href}
-                className="mod-row bg-card border-border border rounded block hover:bg-muted shadow-lg"
+                className={`mod-row bg-card border-border border rounded block hover:bg-muted shadow-lg${isNext ? ' is-next' : ''}`}
                 style={rowStyle}
+                aria-current={isNext ? 'step' : undefined}
               >
                 {inner}
               </Link>

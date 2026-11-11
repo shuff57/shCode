@@ -279,7 +279,7 @@ export default function StudentGradebook({ lessons }: Props) {
         </p>
       ) : (
         <div style={scrollWrapStyle} tabIndex={0} role="region" aria-label="Assignments table">
-          <table style={tableStyle}>
+          <table className="student-gradebook-table" style={tableStyle}>
             <thead>
               <tr style={theadRowStyle}>
                 <th style={thStyle}>Assignment</th>
@@ -364,7 +364,7 @@ export default function StudentGradebook({ lessons }: Props) {
                           </span>
                         )}
                       </td>
-                      <td style={{ ...tdStyle, color: 'var(--x-b9c5e8)' }}>
+                      <td className="gb-due-cell" style={{ ...tdStyle, color: 'var(--x-b9c5e8)' }}>
                         {due ? formatDue(due) : '—'}
                         {dueSoon && <span style={{ ...chipStyle, color: 'var(--c-orange)', borderColor: 'var(--c-orange)' }}>due soon</span>}
                       </td>

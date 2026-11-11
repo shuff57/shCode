@@ -100,18 +100,32 @@ const C = {
   open: 'var(--c-purple)',
 };
 
+// One field style (system pass rule 5): an inset surface, a visible border, 15px prose text.
 const dateInput: React.CSSProperties = {
-  background: C.input,
+  background: 'var(--c-deep2)',
   color: C.text,
   border: `1px solid ${C.border}`,
   borderRadius: 4,
   padding: '4px 8px',
-  fontSize: 14,
-  height: 32,
+  fontSize: 15,
+  height: 34,
   boxSizing: 'border-box',
-  fontFamily: 'inherit',
+  fontFamily: 'var(--font-prose)',
+  fontVariantNumeric: 'tabular-nums',
   colorScheme: 'dark',
 };
+
+// An empty optional date/time is quieter than a filled one (rule 5): no fill, a softer dashed border,
+// meta-coloured text. Still clearly a field.
+const emptyField: React.CSSProperties = {
+  background: 'transparent',
+  color: C.dim,
+  border: `1px dashed color-mix(in srgb, ${C.border} 100%, var(--c-meta) 25%)`,
+};
+
+// The module column, then the Available after group and the Due group with a clear gap between them.
+const MODULE_COLS = 'minmax(280px, 1fr) 320px 320px';
+const MODULE_GAP = '12px 28px';
 
 // 96px clipped "08:00 AM" to "08:00 A"; the AM/PM segment and the clock icon need about 120px.
 const timeInput: React.CSSProperties = { ...dateInput, width: 124, minWidth: 124 };
@@ -195,9 +209,9 @@ function DateTimeField({
     // flexWrap + maxWidth: at phone width the label, calendar, date, time and clear controls are wider than the
     // row, and a nowrap field pushed the page 23px past the screen.
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', boxSizing: 'border-box', maxWidth: '100%', padding: showLabel ? 0 : '0 0 0 12px', borderLeft: showLabel ? undefined : `1px solid ${C.border}` }}>
-      {showLabel && <span style={{ fontSize: 13, fontWeight: 700, flexBasis: '100%', color }}>{label}</span>}
+      {showLabel && <span style={{ fontFamily: 'var(--font-prose)', fontSize: 14, fontWeight: 600, flexBasis: '100%', color }}>{label}</span>}
       <span style={{ position: 'relative', display: 'inline-flex' }}>
-      {!date && <span aria-hidden="true" style={{ position: 'absolute', left: 7, top: 1, bottom: 1, right: 26, display: 'flex', alignItems: 'center', background: C.input, color: C.dim, fontSize: 13, pointerEvents: 'none', zIndex: 1 }}>Not set</span>}
+      {!date && <span aria-hidden="true" style={{ position: 'absolute', left: 7, top: 1, bottom: 1, right: 26, display: 'flex', alignItems: 'center', background: 'var(--c-deep)', color: C.dim, fontFamily: 'var(--font-prose)', fontSize: 14, pointerEvents: 'none', zIndex: 1 }}>Not set</span>}
       <input
         type="date"
         value={date}
@@ -207,7 +221,8 @@ function DateTimeField({
           // as a time-only entry.
           onWrite(value === '' ? null : value, value === '' ? null : time || null);
         }}
-        style={dateInput}
+        className="teacher-field"
+        style={date ? dateInput : { ...dateInput, ...emptyField }}
         aria-label={`${label} date for ${ariaSuffix}`}
       />
       <button
@@ -222,8 +237,8 @@ function DateTimeField({
           setCalOpen((v) => !v);
         }}
         style={{
-          background: C.input,
-          border: `1px solid ${calOpen ? C.accent : C.border}`,
+          background: date ? 'var(--c-deep2)' : 'var(--c-deep)',
+          border: `1px solid ${calOpen ? C.accent : date ? C.border : 'transparent'}`,
           borderRadius: 4,
           color: C.accent,
           cursor: 'pointer',
@@ -245,7 +260,8 @@ function DateTimeField({
           if (date === '') return;
           onWrite(date, value === '' ? null : value);
         }}
-        style={{ ...timeInput, opacity: date === '' ? 0.5 : 1, cursor: date === '' ? 'not-allowed' : undefined }}
+        className="teacher-field"
+        style={{ ...timeInput, ...(date === '' ? { ...emptyField, opacity: 0.6, cursor: 'not-allowed' } : {}) }}
         aria-label={`${label} time for ${ariaSuffix}`}
         title={date === '' ? 'Set a date first' : undefined}
       />
@@ -433,8 +449,8 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
       {/* Intro and save state share one line: the save state is a small inline indicator, not a box that
           outweighs the dates. */}
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', justifyContent: 'space-between', gap: '4px 16px', margin: '0 0 4px 0' }}>
-        <p style={{ color: C.dim, fontSize: 13, margin: 0, minWidth: 0 }}>Set module dates for the whole group, or open a module to set individual lessons.</p>
-        <span role="status" aria-live="polite" style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, fontSize: 12, color: C.dim, whiteSpace: 'nowrap' }}>
+        <p style={{ color: C.dim, fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.5, margin: 0, minWidth: 0, maxWidth: '70ch' }}>Set module dates for the whole group, or open a module to set individual lessons.</p>
+        <span role="status" aria-live="polite" style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, fontFamily: 'var(--font-prose)', fontSize: 13, color: C.dim, whiteSpace: 'nowrap' }}>
           <span style={{ color: saving ? 'var(--c-cyan)' : error ? 'var(--c-orange)' : 'var(--c-green)', fontWeight: 600 }}>
             {saving ? 'Saving…' : error ? 'Could not save or load dates — see details below' : '✓ Saved'}
           </span>
@@ -443,7 +459,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
       </div>
       <details style={{ color: C.dim, fontSize: 13, margin: '0 0 12px 0' }}>
         <summary style={{ color: C.accent, cursor: 'pointer', marginBottom: 8 }}>How dates work</summary>
-        <div>
+        <div style={{ fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.5, maxWidth: '70ch' }}>
         A module&apos;s date applies to every lesson inside it. Give one lesson its own date and the
         module reads <strong>Mixed</strong>; clear that date and the lesson goes back to inheriting.
         <br />
@@ -457,11 +473,11 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
       </details>
 
       {error && (
-        <p style={{ color: 'var(--c-red)', fontSize: 13, marginBottom: 12 }}>{error}</p>
+        <p style={{ color: 'var(--c-red)', fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.5, marginBottom: 12, maxWidth: '70ch' }}>{error}</p>
       )}
 
       {units.length === 0 && !loading && (
-        <p style={{ color: C.dim }}>
+        <p style={{ color: C.dim, fontFamily: 'var(--font-prose)', fontSize: 15 }}>
           {lessons.length > 0
             ? 'No numbered lessons to set dates on.'
             : error
@@ -472,12 +488,15 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
 
       {units.map((unit) => (
         <div className="schedule-unit" key={unit.unitId} style={{ marginBottom: 16, overflowX: 'auto' }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: C.accent, marginBottom: 8 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: C.accent, marginBottom: 8 }}>
             {unit.unitId}
           </div>
 
-          <div style={{ display: compact ? 'none' : 'grid', gridTemplateColumns: 'minmax(280px, 1fr) 320px 320px', gap: 12, minWidth: 944, padding: '8px 0 8px', borderBottom: `1px solid ${C.border}`, color: C.dim, fontSize: 13, fontWeight: 600 }}>
-            <span>Module</span><span style={{ color: C.open }}>Available after · Date / time</span><span>Due · Date / time</span>
+          {/* Group headers: what each column group sets, with what its two fields are in meta. */}
+          <div style={{ display: compact ? 'none' : 'grid', gridTemplateColumns: MODULE_COLS, gap: MODULE_GAP, minWidth: 960, padding: '8px 0 8px', borderBottom: `1px solid ${C.border}`, color: C.dim, fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600, alignItems: 'end' }}>
+            <span>Module</span>
+            <span style={{ paddingLeft: 13 }}><span style={{ color: C.open }}>Available after</span> <span style={{ fontWeight: 400 }}>· date and time</span></span>
+            <span style={{ paddingLeft: 13 }}><span style={{ color: C.text }}>Due</span> <span style={{ fontWeight: 400 }}>· date and time</span></span>
           </div>
           {unit.modules.map((mod) => {
             const lessonIds = mod.lessons.map((l) => l.id);
@@ -499,30 +518,32 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
             };
 
             return (
-              <div key={mod.moduleId} style={{ borderBottom: `1px solid ${C.border}`, padding: '8px 0', minHeight: 46, boxSizing: 'border-box', minWidth: compact ? 0 : 944 }}>
-                <div className="schedule-module-row" style={{ display: 'grid', gridTemplateColumns: compact ? 'minmax(0, 1fr)' : 'minmax(280px, 1fr) 320px 320px', alignItems: 'center', gap: 12 }}>
+              <div key={mod.moduleId} style={{ borderBottom: `1px solid ${C.border}`, padding: '10px 0', minHeight: 58, boxSizing: 'border-box', minWidth: compact ? 0 : 960 }}>
+                <div className="schedule-module-row" style={{ display: 'grid', gridTemplateColumns: compact ? 'minmax(0, 1fr)' : MODULE_COLS, alignItems: 'center', gap: compact ? 12 : MODULE_GAP }}>
                   <button
                     type="button"
                     onClick={() => toggle(mod.moduleId)}
                     aria-expanded={isOpen}
                     style={{
                       background: 'none', border: 'none', color: C.text, cursor: 'pointer',
-                      display: 'inline-flex', alignItems: 'center', gap: 8, padding: 0,
-                      fontSize: 14, whiteSpace: compact ? 'normal' : 'nowrap', fontWeight: 600, fontFamily: 'inherit', flex: '1 1 240px', textAlign: 'left',
+                      display: 'inline-flex', alignItems: 'flex-start', gap: 8, padding: 0,
+                      fontSize: 15, whiteSpace: 'normal', fontWeight: 600, fontFamily: 'var(--font-prose)', flex: '1 1 240px', textAlign: 'left', minWidth: 0,
                     }}
                   >
-                    {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                    {/* One line on desktop (ellipsis, full name in the tooltip) so every row is the same height,
-                        with the lesson count right after the name as quiet secondary text. */}
-                    <span
-                      className="schedule-module-name"
-                      title={mod.label}
-                      style={compact ? { flexShrink: 1 } : { flexShrink: 1, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-                    >
-                      {mod.label}
-                    </span>
-                    <span style={{ color: C.dim, fontSize: 12, fontWeight: 400, whiteSpace: 'nowrap', flexShrink: 0 }}>
-                      {mod.lessons.length} lesson{mod.lessons.length === 1 ? '' : 's'}
+                    <span aria-hidden="true" style={{ display: 'inline-flex', height: 21, alignItems: 'center', flex: '0 0 14px' }}>{isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}</span>
+                    {/* The name (up to two lines, full name in the tooltip) with the lesson count on its own
+                        line under it in meta, so a long name never runs into its count (rule 4). */}
+                    <span className="schedule-module-text" style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: '1 1 auto' }}>
+                      <span
+                        className="schedule-module-name"
+                        title={mod.label}
+                        style={{ minWidth: 0, lineHeight: '21px', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, overflow: 'hidden' }}
+                      >
+                        {mod.label}
+                      </span>
+                      <span style={{ color: C.dim, fontSize: 13, lineHeight: '18px', fontWeight: 400, whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
+                        {mod.lessons.length} lesson{mod.lessons.length === 1 ? '' : 's'}
+                      </span>
                     </span>
                   </button>
 
@@ -553,12 +574,13 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                   className="schedule-module-summary"
                   style={{
                     display: isOpen || openSummary.kind === 'mixed' || dueSummary.kind === 'mixed' ? 'grid' : 'none',
-                    gridTemplateColumns: compact ? 'minmax(0, 1fr)' : 'minmax(280px, 1fr) 320px 320px',
-                    alignItems: 'start', gap: compact ? 6 : 12, margin: compact ? '8px 0 0 22px' : '6px 0 0',
+                    gridTemplateColumns: compact ? 'minmax(0, 1fr)' : MODULE_COLS,
+                    alignItems: 'start', gap: compact ? 6 : MODULE_GAP, margin: compact ? '8px 0 0 22px' : '6px 0 0',
+                    fontFamily: 'var(--font-prose)',
                   }}
                 >
                   {!compact && <span aria-hidden="true" />}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', minWidth: 0, paddingLeft: compact ? 0 : 13 }}>
                     {openSummary.kind !== 'none' && (
                       <span style={{ fontSize: 13, color: openSummary.kind === 'mixed' ? C.warn : C.open }}>
                         <span style={{ fontWeight: 700 }}>Opens:</span>{' '}
@@ -583,8 +605,8 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                       </button>
                     )}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', minWidth: 0 }}>
-                    <span style={{ fontSize: 13, color: dueSummary.kind === 'mixed' ? C.warn : C.dim }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', minWidth: 0, paddingLeft: compact ? 0 : 13 }}>
+                    <span style={{ fontSize: 13, lineHeight: 1.5, color: dueSummary.kind === 'mixed' ? C.warn : C.dim }}>
                       <span style={{ fontWeight: 700 }}>Due:</span>{' '}
                       {dueSummary.kind === 'mixed'
                         ? `mixed · ${dueSummary.overrides} override${dueSummary.overrides === 1 ? '' : 's'}`
@@ -610,7 +632,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
 
                 {isOpen && (
                   <div style={{ margin: compact ? '12px 0 0' : '12px 0 8px 24px', overflowX: 'auto' }}>
-                    <div style={{ display: compact ? 'none' : 'grid', gridTemplateColumns: 'minmax(220px, 1fr) 350px 350px auto auto', gap: 12, minWidth: 1040, padding: '0 0 8px', borderBottom: `1px solid ${C.border}`, color: C.dim, fontSize: 13, fontWeight: 600 }}>
+                    <div style={{ display: compact ? 'none' : 'grid', gridTemplateColumns: 'minmax(220px, 1fr) 350px 350px auto auto', gap: 12, minWidth: 1040, padding: '0 0 8px', borderBottom: `1px solid ${C.border}`, color: C.dim, fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600 }}>
                       <span>Lesson</span><span style={{ color: C.open }}>Available after</span><span>Due</span><span>Early access</span><span>Late access</span>
                     </div>
                     {mod.lessons.map((lesson) => {
@@ -627,7 +649,9 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                           <span
                             style={{
                               flex: compact ? '1 1 100%' : '1 1 240px',
-                              fontSize: 13,
+                              fontFamily: 'var(--font-prose)',
+                              fontSize: 14,
+                              lineHeight: 1.5,
                               color: openRow || dueRow ? C.text : C.dim,
                             }}
                           >

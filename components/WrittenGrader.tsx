@@ -474,7 +474,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
   if (!loaded) return null;
 
   return (
-    <section style={{ marginTop: 16, paddingTop: 14, borderTop: '2px solid var(--c-line)' }}>
+    <section className="written-grader" style={{ marginTop: 16, paddingTop: 14, borderTop: '2px solid var(--c-line)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
         <label style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-fg)' }}>{codeInput ? 'Your program (JavaScript)' : 'Your response'}</label>
         <SolutionPanel
@@ -549,7 +549,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
         )
       )}
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 10, flexWrap: 'wrap' }}>
+      <div className="written-actions" style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 10, flexWrap: 'wrap' }}>
         <button
           onClick={submit}
           disabled={loading || locked || response.trim().length < 20}
@@ -632,10 +632,10 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
               : `${maxSubmissions - attempts} of ${maxSubmissions} attempts left`}
           </span>
         )}
-      </div>
-      {/* Quiet helper text under the controls it counts (was between the label and the box). */}
-      <div className="written-quota-note">
-        <GradeQuotaNote />
+        {/* Quiet one-line meta note after the controls it counts; the detail is in its tooltip. */}
+        <div className="written-quota-note">
+          <GradeQuotaNote />
+        </div>
       </div>
 
       {prompt.trim() ? <details style={{ marginBottom: 10, border: '1px solid var(--c-line)', borderRadius: 6, padding: '8px 12px' }}>

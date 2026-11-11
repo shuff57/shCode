@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { sections } from '../../lib/js-docs';
+import DocsHubSearch from '../../components/DocsHubSearch';
 
 // The docs hub — what the nav's single Docs tab lands on. It is a door to
 // the family: each reference set gets a card, and every set's pages carry a
@@ -10,6 +11,7 @@ export default function DocsIndex() {
   return (
     <main className="docs-hub page-frame" style={{ maxWidth: 1120, width: '100%', margin: '0 auto', padding: '28px 20px', color: 'var(--c-fg)' }}>
       <h1 style={{ fontSize: 28, marginBottom: 8 }}>Docs</h1>
+      <DocsHubSearch />
       <p style={{ color: 'var(--c-meta)', marginBottom: 24 }}>
         The reference for everything you write in this course. Pick a set — the pages inside
         each one switch between the others at the top.

@@ -25,6 +25,32 @@ function LessonPrimary({ wrap, children }: { wrap: boolean; children: ReactNode 
   return wrap ? <div className="lesson-primary">{children}</div> : <>{children}</>;
 }
 
+// The lesson summary. On a phone (<= 720px, CSS) it is clamped to two lines so the teaching
+// starts sooner; "more" shows the rest. The toggle appears only when the text is really cut.
+function LessonDescription({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLParagraphElement | null>(null);
+  const [open, setOpen] = useState(false);
+  const [cut, setCut] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || open) return;
+    const measure = () => setCut(el.scrollHeight > el.clientHeight + 2);
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [open]);
+  return (
+    <>
+      <p ref={ref} className={`lesson-description${open ? ' is-open' : ''}`} style={{ color: 'var(--c-meta)', margin: '0 0 4px', fontSize: 14, lineHeight: 1.35 }}>{children}</p>
+      {(cut || open) && (
+        <button type="button" className="lesson-description-more" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
+          {open ? 'less' : 'more'}
+        </button>
+      )}
+    </>
+  );
+}
+
 interface Props {
   lesson: Lesson;
 }
@@ -250,7 +276,7 @@ export default function ContentLessonView({ lesson }: Props) {
       </aside>}
       <LessonPrimary wrap={focusedLayout}>
       {lesson.description && !meta.quiz ? (
-        <p className="lesson-description" style={{ color: 'var(--c-meta)', margin: '0 0 4px', fontSize: 14, lineHeight: 1.35 }}>{withInlineCode(lesson.description)}</p>
+        <LessonDescription>{withInlineCode(lesson.description)}</LessonDescription>
       ) : null}
 
       {meta.videoUrl && meta.videoUrl.trim() ? (

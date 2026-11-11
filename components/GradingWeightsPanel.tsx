@@ -102,14 +102,19 @@ export default function GradingWeightsPanel({ classId, desktop = false }: { clas
         {desktop ? (
           <div style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: '4px 12px' }}>
             <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Grading weights</h2>
-            <span role="status" style={{ fontSize: 13, color: error ? 'var(--c-red)' : saving ? C.dim : dirty ? 'var(--c-orange)' : 'var(--c-green)' }}>
-              {error || (saving ? 'Saving…' : dirty ? 'Not saved' : 'Saved')}
+            {/* The save state reads as part of the panel: a status with its mark, then the note that says how
+                saving works, the same pattern as the Due dates panel. */}
+            <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, fontFamily: 'var(--font-prose)', fontSize: 13 }}>
+              <span role="status" style={{ fontWeight: 600, color: error ? 'var(--c-red)' : saving ? C.dim : dirty ? 'var(--c-orange)' : 'var(--c-green)' }}>
+                {!error && !saving && !dirty && <span aria-hidden="true">✓ </span>}{error || (saving ? 'Saving…' : dirty ? 'Not saved' : 'Saved')}
+              </span>
+              {!error && <span style={{ color: C.dim }}>· changes save automatically</span>}
             </span>
           </div>
         ) : (
           <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Grading weights</h2>
         )}
-        <span style={{ fontSize: 13, color: C.dim }}>Total <strong style={{ color: C.text }}>{total}</strong></span>
+        <span style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: C.dim, fontVariantNumeric: 'tabular-nums' }}>Total <strong style={{ color: C.text }}>{total}</strong></span>
       </div>
       <p style={{ maxWidth: 720, margin: '0 0 8px', fontFamily: 'var(--font-prose)', fontSize: 13, lineHeight: 1.5, color: C.dim }}>
         Each share is its weight divided by the total.<br />
@@ -117,7 +122,7 @@ export default function GradingWeightsPanel({ classId, desktop = false }: { clas
       </p>
       {/* One column, so the header row below lines up with every row's fields. */}
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', maxWidth: 640 }}>
-        <div aria-hidden="true" style={{ display: 'grid', gridTemplateColumns: rowCols, alignItems: 'end', gap: 8, padding: '8px 0 6px', borderBottom: `1px solid ${C.border}`, fontFamily: 'var(--font-prose)', fontSize: 12, fontWeight: 600, color: C.dim }}>
+        <div aria-hidden="true" style={{ display: 'grid', gridTemplateColumns: rowCols, alignItems: 'end', gap: 8, padding: '8px 0 6px', borderBottom: `1px solid ${C.border}`, fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600, color: C.dim }}>
           <span>Category</span>
           <span style={{ textAlign: 'right' }}>Weight</span>
           <span style={{ textAlign: 'right' }}>Share</span>
@@ -154,13 +159,14 @@ export default function GradingWeightsPanel({ classId, desktop = false }: { clas
                 border: '1px solid var(--c-comment)',
                 borderRadius: 4,
                 padding: '4px 8px',
-                fontSize: 14,
+                fontFamily: 'var(--font-prose)',
+                fontSize: 15,
                 fontWeight: 400,
                 textAlign: 'right',
                 fontVariantNumeric: 'tabular-nums',
               }}
             />
-            <span title="Effective share when all categories have work" style={{ fontSize: 13, color: C.dim, textAlign: 'right', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{total > 0 ? `${(r.weight / total * 100).toFixed(1)}%` : '—'}</span>
+            <span title="Effective share when all categories have work" style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: C.dim, textAlign: 'right', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>{total > 0 ? `${(r.weight / total * 100).toFixed(1)}%` : '—'}</span>
             {r.isDefault ? (
               <span />
             ) : (
@@ -186,8 +192,8 @@ export default function GradingWeightsPanel({ classId, desktop = false }: { clas
           </div>
         ))}
       </div>
-      {!desktop && <div role="status" style={{ fontSize: 13, color: C.dim, marginTop: 12 }}>{saving ? 'Saving…' : ''}</div>}
-      {!desktop && error && <div style={{ fontSize: 13, color: 'var(--c-red)', marginTop: 4 }}>{error}</div>}
+      {!desktop && <div role="status" style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: C.dim, marginTop: 12 }}>{saving ? 'Saving…' : ''}</div>}
+      {!desktop && error && <div style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-red)', marginTop: 4 }}>{error}</div>}
     </div>
   );
 }

@@ -3167,3 +3167,237 @@ body:has(.content-lesson-main) .lesson-position { width: 100%; max-width: 1080px
 
 /* Standalone links (the book link above a reading) never leave one word alone on a line. */
 .lesson-book-link, .lesson-book-link a { text-wrap: balance; }
+
+/* climb4 r3 teacher */
+/* Class list: class cards and the Create class card share one responsive grid at one card width, so a
+   wide screen holds two side by side instead of leaving the right half empty. */
+.teacher-class-grid { max-width: none !important; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)) !important; align-items: start; }
+.teacher-class-grid > .teacher-create-card { max-width: none !important; margin: 0 !important; }
+/* A class card's attention badges are links to the tab that answers them. */
+.teacher-chip-link { display: inline-block; font-family: var(--font-prose); font-size: var(--fs-micro); line-height: 16px; }
+.teacher-chip-link:hover { filter: brightness(1.08); text-decoration: underline !important; text-underline-offset: 2px; }
+.teacher-chip-link:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; }
+.teacher-class-facts dt, .teacher-class-facts dd { margin: 0; }
+/* Gradebook: a lesson title in the header answers the pointer like the link it is. */
+.gb-lesson-link:hover .gb-lesson-title, .gb-lesson-link:focus-visible .gb-lesson-title { text-decoration: underline; text-underline-offset: 2px; color: var(--c-cyan) !important; }
+.gb-lesson-link:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 1px; }
+/* Schedule: the module name and its count are one column beside the chevron (the r2 desktop rule kept
+   the last span from shrinking, which is now that column). */
+.schedule-module-row > button > .schedule-module-text { flex: 1 1 auto; min-width: 0; }
+
+/* climb4 r3 student */
+/* Rule 1: what a person reads as a sentence or scans as data is the prose face; chrome and code stay mono. */
+.content-lesson-main .lesson-description {
+  font-family: var(--font-prose) !important; font-size: 15px !important; line-height: 1.5 !important;
+  max-width: 70ch; color: var(--c-meta);
+}
+.lesson-book-link a, .lesson-position, .lesson-overview a,
+.assignment-unmet-hint, .assignment-score .score-text, .grade-quota-note,
+.module-meta-line, .module-page section > h2 + p, .mod-row-title > span:last-child, .mod-row-badge, .mod-row-duration,
+.home-module-title, .home-chapter > summary > span:nth-child(2), .home-continue-card > div > span:first-child,
+.home-module-progress .unit-progress-count, .sandbox-header .sandbox-subtitle, .sandbox-header .sandbox-run-hint,
+.console-empty, .written-actions > span, .student-quiz .quiz-guidance p,
+.progress-page .progress-summary-line, .progress-page .grade-summary-row, .progress-page details ul, .progress-page p, .progress-page li,
+.docs-hub > p, .docs-hub p, .account-page p, .account-page legend, .lesson-description-more, .completion-done-text,
+.content-lesson-main .lesson-reading-body:not(.prose-copy) .content-prose :is(p, li) {
+  font-family: var(--font-prose);
+}
+.console-empty { font-style: normal; }
+.content-lesson-main .lesson-reading-body:not(.prose-copy) .content-prose :is(p, li) { font-size: 15px; line-height: 1.55; }
+.lesson-overview a { font-size: 14px; line-height: 1.4; }
+.home-module-progress .unit-progress-count, .assignment-score .score-text { font-variant-numeric: tabular-nums; }
+@media (min-width: 721px) { .student-quiz .quiz-guidance p { font-size: 14px !important; line-height: 1.5; max-width: 70ch; } }
+.docs-hub > p { font-size: 15px; line-height: 1.5; max-width: 70ch; }
+.docs-hub p { line-height: 1.5; }
+.account-page p { line-height: 1.5; max-width: 70ch; }
+.account-card form label { font-family: var(--font-prose); font-size: 14px !important; font-weight: 600 !important; }
+.sandbox-header .sandbox-subtitle { font-size: 14px; }
+
+/* Lesson header: the summary's "more" toggle and the header's position count are phone-only. */
+.lesson-description-more, .hdr-lesson-pos { display: none; }
+
+/* Rule 7: on a phone the stack above the first teaching content is compact. Prev/next and the
+   position share one line (HeaderLessonNav), the title is 22px, the summary is two lines with a
+   "more" toggle (ContentLessonView), the book link is a compact inline link. */
+@media (max-width: 720px) {
+  .hdr-lesson-pos {
+    display: inline-flex; align-items: center; flex: 0 0 auto;
+    font-family: var(--font-prose); font-size: var(--fs-micro); color: var(--c-meta);
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .header-lesson-nav:has(.hdr-lesson-pos) .hdr-lesson-link { max-width: 40% !important; }
+  body:has(.hdr-lesson-pos) .lesson-position { display: none !important; }
+  .content-lesson-title h1, .assignment-header-left h1 { font-size: 22px !important; line-height: 1.2 !important; }
+  .content-lesson-main > nav:first-of-type { margin-bottom: 2px !important; }
+  .content-lesson-main .content-lesson-title { margin-bottom: 4px !important; row-gap: 4px !important; }
+  .content-lesson-main .content-lesson-title h1 { margin-bottom: 0 !important; }
+  .content-lesson-main .lesson-description:not(.is-open) {
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .content-lesson-main .lesson-description { margin-bottom: 0 !important; }
+  .lesson-description-more {
+    display: inline-block; margin: 0 0 4px; padding: 2px 0; min-height: 24px;
+    background: none; border: 0; color: var(--c-cyan); font-size: 14px; font-weight: 600;
+    text-decoration: underline; cursor: pointer;
+  }
+  .content-lesson-main .lesson-book-link { margin: 6px 0 !important; }
+  .content-lesson-main .lesson-book-link a { font-size: 14px !important; }
+  /* A console lab's AI-grade allowance is meta detail; on a phone it shows only once it runs low. */
+  .lab-assignment-header .assignment-quota:not(:has(.is-low)) { display: none !important; }
+}
+
+/* F3: the AI-grade allowance sits apart from the requirement count, as a quiet meta note. */
+.lab-assignment-header .assignment-quota:has([role="status"]) { padding-left: 12px; border-left: 1px solid var(--c-line); }
+.lab-assignment-header .assignment-quota .grade-quota-note { font-size: var(--fs-meta) !important; white-space: nowrap; cursor: help; }
+.grade-quota-note { cursor: help; }
+
+/* Written answers: the response box, the actions and both disclosures share one width; the
+   allowance is a one-line note after the buttons. */
+.written-grader > :first-child, .written-grader > .written-actions, .written-grader > details { max-width: 760px; box-sizing: border-box; }
+.written-actions .written-quota-note { margin: 0 0 0 auto; }
+.written-actions .written-quota-note [role="status"] { font-size: var(--fs-meta) !important; }
+.written-grader > details > summary { font-size: 14px !important; }
+.written-grader > details p { font-family: var(--font-prose); font-size: 14px !important; line-height: 1.5; max-width: 70ch; }
+
+/* Quiz: compact answer rows; on a wide screen the "answered" count stays in view beside them. */
+.quiz-options { gap: 6px; }
+.student-quiz .quiz-option { min-height: 40px; padding: 7px 12px; }
+.student-quiz .quiz-question-card { padding: 10px 14px !important; margin-bottom: 8px !important; }
+.quiz-progress-float { display: none; }
+@media (min-width: 1200px) {
+  .student-quiz { display: grid; grid-template-columns: minmax(0, 760px) 200px; column-gap: 40px; max-width: 1000px; align-items: start; }
+  .student-quiz > * { grid-column: 1; min-width: 0; }
+  .student-quiz > .quiz-progress-float {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+    grid-column: 2; grid-row: 1 / span 40; align-self: start; position: sticky; top: 24px;
+  }
+  /* the inline pill stays as the announced (aria-live) copy, visually hidden here */
+  .student-quiz > div:first-child > .quiz-answered-count {
+    position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+  }
+  .quiz-progress-track { display: block; width: 100%; height: 6px; border-radius: 3px; overflow: hidden; background: color-mix(in srgb, var(--c-fg) 14%, transparent); }
+  .quiz-progress-track > span { display: block; height: 100%; background: var(--c-cyan); transition: width 160ms ease; }
+}
+
+/* Completion: the next lesson is a clear action once this one is done. */
+.completion-next {
+  display: inline-flex; align-items: center; gap: 6px; min-width: 0; max-width: 100%; min-height: 36px;
+  box-sizing: border-box; padding: 6px 14px; border-radius: 6px; text-decoration: none;
+  background: var(--c-green); color: var(--c-deep2); font-weight: 700; font-size: 14px;
+}
+.completion-next-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.completion-next:hover { background: var(--x-79fc99); }
+.completion-next:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 3px; }
+
+/* F2 + rule 8, module page: Continue beside the heading; the row it points at is marked. */
+.module-continue { margin: -4px 0 20px; }
+.module-continue-action {
+  display: inline-flex; align-items: baseline; gap: 8px; max-width: 100%; min-height: 40px; box-sizing: border-box;
+  padding: 9px 16px; border-radius: 6px; text-decoration: none; line-height: 1.3;
+  background: var(--c-green); color: var(--c-deep2); font-weight: 700; font-size: 15px;
+}
+.module-continue-title { font-family: var(--font-prose); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.module-continue-action:hover { background: var(--x-79fc99); }
+.module-continue-action:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 3px; }
+.module-continue.is-done { color: var(--c-green); font-family: var(--font-prose); font-size: 15px; font-weight: 600; }
+a.mod-row.is-next {
+  background: color-mix(in srgb, var(--c-cyan) 9%, var(--card)) !important;
+  border-top-color: color-mix(in srgb, var(--c-cyan) 55%, transparent) !important;
+  border-bottom-color: color-mix(in srgb, var(--c-cyan) 55%, transparent) !important;
+}
+.mod-row-title > span:last-child { font-size: 15px; }
+@media (max-width: 720px) {
+  .module-continue-action { display: flex; width: 100%; }
+  .mod-row .mod-row-badge {
+    background: transparent !important; border-color: transparent !important; padding: 0 !important;
+    text-transform: none !important; letter-spacing: 0 !important; font-weight: 500 !important;
+  }
+  .mod-row-title { font-size: 15px !important; }
+  .mod-row-title > span:last-child { font-weight: 600; }
+}
+
+/* Rule 8, home: the module the "Next up" card points into stands apart from untouched ones;
+   an untouched module's track is quiet instead of a long grey bar. */
+.home-module-current { background: color-mix(in srgb, var(--c-cyan) 8%, var(--muted)) !important; box-shadow: inset 4px 0 0 var(--c-cyan); }
+.home-module-now {
+  display: inline-flex; align-items: center; margin-left: 10px; padding: 1px 8px; border-radius: 999px; vertical-align: 2px;
+  border: 1px solid color-mix(in srgb, var(--c-cyan) 55%, transparent); color: var(--c-cyan);
+  font-family: var(--font-prose); font-size: var(--fs-micro); font-weight: 600; white-space: nowrap;
+}
+.home-module-progress .unit-progress-track.is-empty { opacity: .45; }
+.home-module-progress .unit-progress-count.is-empty { color: var(--c-meta) !important; font-weight: 500 !important; }
+@media (max-width: 720px) {
+  .home-continue-card { padding: 12px 14px !important; gap: 10px !important; flex-direction: row !important; flex-wrap: wrap; align-items: center !important; }
+  .home-continue-title { font-size: 16px !important; line-height: 1.35; }
+  .home-continue-action { margin-left: auto; }
+  .home-module-summary { padding-top: 12px !important; padding-bottom: 12px !important; row-gap: 6px; }
+  .home-module-now { margin-left: 8px; }
+}
+
+/* Progress: the assignment title leads; headers, dates and scores read as data (rules 1, 4). */
+.student-gradebook-table th { font-family: var(--font-prose); font-size: 13px !important; font-weight: 600 !important; color: var(--c-meta) !important; text-transform: none !important; letter-spacing: 0 !important; }
+.student-gradebook-table td { font-family: var(--font-prose); font-size: 14px; font-variant-numeric: tabular-nums; }
+.student-gradebook-table .progress-assignment-link { font-size: 15px; font-weight: 600 !important; }
+.student-gradebook-table .gb-due-cell { color: var(--c-meta) !important; }
+
+/* F1, docs hub search. */
+.docs-hub-search { margin: 4px 0 24px; }
+.docs-hub-search-label { display: block; margin-bottom: 6px; font-family: var(--font-prose); font-size: 14px; font-weight: 600; color: var(--c-fg); }
+.docs-hub-search input {
+  width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 6px;
+  background: var(--c-deep2); color: var(--c-fg); border: 1px solid var(--c-line);
+  font-family: var(--font-prose); font-size: 15px;
+}
+.docs-hub-search input::placeholder { color: var(--c-dim); opacity: 1; }
+.docs-hub-search input:hover { border-color: var(--c-meta); }
+.docs-hub-search input:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 1px; border-color: var(--c-cyan); }
+.docs-hub-search-status { margin: 6px 0 0; font-family: var(--font-prose); font-size: var(--fs-meta); color: var(--c-meta); }
+.docs-hub-search-results {
+  list-style: none; margin: 8px 0 0; padding: 0; max-height: 420px; overflow-y: auto;
+  border: 1px solid var(--c-line); border-radius: 6px; background: var(--c-bg);
+}
+.docs-hub-search-results li + li { border-top: 1px solid var(--c-line); }
+.docs-hub-search-results a { display: block; padding: 10px 14px; color: var(--c-fg); text-decoration: none; }
+.docs-hub-search-results a:hover { background: var(--x-343746); }
+.docs-hub-search-results a:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: -2px; background: var(--x-343746); }
+.docs-hub-search-result-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 12px; }
+.docs-hub-search-result-title { color: var(--c-cyan); font-weight: 600; font-size: 15px; }
+.docs-hub-search-result-where { font-family: var(--font-prose); font-size: var(--fs-micro); color: var(--c-meta); }
+.docs-hub-search-result-snippet { display: block; margin-top: 2px; font-family: var(--font-prose); font-size: var(--fs-meta); line-height: 1.45; color: var(--c-meta); }
+@media (min-width: 1200px) {
+  .docs-hub { grid-template-rows: repeat(6, auto) 1fr; }
+}
+
+/* Docs pages: the open topic is a heading (no fill); only the current page is filled.
+   The example's output pane is labelled like the lab's. */
+.docs-sidebar .docs-sidebar-section.active .docs-sidebar-section-title { background: transparent; color: var(--c-fg); }
+.doc-live-output-header {
+  position: sticky; top: 0; z-index: 1; padding: 5px 10px;
+  background: var(--c-line); color: var(--c-fg); font-size: var(--fs-micro); font-weight: 700;
+}
+
+/* Readings: a console example in a narrow column stacks Output under the code, so the editor
+   keeps the full width and a one-line statement does not wrap. */
+.livecodeblock { container-type: inline-size; }
+@media (min-width: 721px) {
+  @container (max-width: 960px) {
+    .livecodeblock-body:has(> .livecodeblock-preview--plain) { flex-direction: column !important; height: auto !important; }
+    .content-lesson-main .livecodeblock-body:has(> .livecodeblock-preview--plain) > .livecodeblock-editor {
+      flex: none !important; width: 100% !important; height: clamp(72px, calc(var(--lcb-lines, 8) * 20px + 28px), 260px) !important;
+      border-right: 0 !important; border-bottom: 1px solid var(--border);
+    }
+    .content-lesson-main .livecodeblock-body:has(> .livecodeblock-preview--plain) > .livecodeblock-preview--plain {
+      flex: none !important; width: 100% !important; height: 120px !important;
+    }
+  }
+}
+
+/* Sandbox and labs on a wide screen: the tool rail is wider and its labels read horizontally.
+   Drawer behaviour, drag-resize and tab order are unchanged. */
+@media (min-width: 1200px) {
+  :root { --shd-rail-width: 76px; }
+  body .shd-tabstrip .shd-tab {
+    writing-mode: horizontal-tb !important; text-align: center;
+    padding: 10px 4px !important; white-space: normal !important; overflow-wrap: anywhere; line-height: 1.2;
+  }
+}

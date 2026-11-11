@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import ModuleLessonsList from '../../../components/ModuleLessonsList';
 import UnitProgressBadge from '../../../components/UnitProgressBadge';
 import ModuleTeacherPanel from '../../../components/ModuleTeacherPanel';
+import ModuleContinue from '../../../components/ModuleContinue';
 
 export async function generateStaticParams() {
   const modules = await listModules();
@@ -38,9 +39,14 @@ export default async function ModulePage({
       </nav>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}><h1 style={{ margin: 0, fontSize: 28, lineHeight: 1.2, fontWeight: 700 }}>Module {summary.id} — {summary.title}</h1><UnitProgressBadge lessons={lessons.map(l => ({ id: l.id, title: l.displayTitle, type: l.type }))} /></div>
-      <p style={{ color: 'var(--c-meta)', fontSize: 13, marginTop: 0, marginBottom: 16, whiteSpace: 'normal' }}>
+      <p className="module-meta-line" style={{ color: 'var(--c-meta)', fontSize: 13, marginTop: 0, marginBottom: 16, whiteSpace: 'normal' }}>
         Quarter {summary.quarter ?? '?'} · Weeks {summary.weeks?.join('–') ?? '?'} · {summary.environment ?? '?'}
       </p>
+      <ModuleContinue
+        lessons={lessons.map((l) => ({ id: l.id, numberedId: l.numberedId, displayTitle: l.displayTitle, type: l.type, preview: l.preview }))}
+        moduleId={summary.id}
+        unitId={summary.category ?? null}
+      />
 
       <section style={{ marginBottom: 32 }}>
         <h2

@@ -327,6 +327,15 @@ export default function QuizView({ lessonId, config }: Props) {
           </div>
         )}
       </div>
+      {/* Desktop >= 1200px only (CSS): the same count, kept in view in the empty column beside the
+          questions. The pill above stays the announced one (aria-live), so this copy is hidden from
+          screen readers. */}
+      <div className="quiz-progress-float" aria-hidden="true">
+        <span className={`quiz-answered-count${allAnswered ? ' is-complete' : ''}`}>
+          {answeredCount} of {questions.length} answered
+        </span>
+        <span className="quiz-progress-track"><span style={{ width: `${questions.length ? Math.round((answeredCount / questions.length) * 100) : 0}%` }} /></span>
+      </div>
       <div className="quiz-guidance is-expanded"><p style={{ color: 'var(--c-meta)', fontSize: 13, margin: '0 0 20px' }}>
         {capped
           ? `Answer all ${questions.length}. After each try you see your total, not which ones were wrong. Submit what you have if one has you stuck: the next part unlocks and you can come back and use your other tries.`

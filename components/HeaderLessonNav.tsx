@@ -55,6 +55,22 @@ function computeNeighbors(
   };
 }
 
+// "9 of 22": where this lesson sits in its module, counted the way lib/curriculum.ts lists a
+// module (numbered id under the module's X.Y prefix, same category, numeric order). Shown on a
+// phone between prev and next, so the page's own "Module X · Lesson N of M" line can go.
+function modulePosition(lessons: ManifestLesson[], id: string): { index: number; total: number } | null {
+  const current = lessons.find((l) => l.id === id);
+  const num = current ? parseNumberedId(current.title) : null;
+  if (!current || !num) return null;
+  const mod = num.split('.').slice(0, 2).join('.') + '.';
+  const ids = lessons
+    .filter((l) => l.category === current.category && (parseNumberedId(l.title) ?? '').startsWith(mod))
+    .map((l) => ({ id: l.id, n: parseNumberedId(l.title) as string }))
+    .sort((a, b) => a.n.localeCompare(b.n, undefined, { numeric: true }));
+  const index = ids.findIndex((l) => l.id === id);
+  return index < 0 ? null : { index: index + 1, total: ids.length };
+}
+
 // Only the id matters. The prefix a neighbour needs comes from that
 // neighbour's own type, never from the page we happen to be standing on —
 // a reading and the assignment after it live under different prefixes.
@@ -96,6 +112,7 @@ export default function HeaderLessonNav() {
 
   const { prev, next } = computeNeighbors(lessons, route.id);
   if (!prev && !next) return null;
+  const pos = modulePosition(lessons, route.id);
 
   const titleStyle: React.CSSProperties = {
     whiteSpace: 'nowrap',
@@ -134,6 +151,11 @@ export default function HeaderLessonNav() {
       ) : (
         <span />
       )}
+      {pos ? (
+        <span className="hdr-lesson-pos" aria-label={`Lesson ${pos.index} of ${pos.total} in this module`}>
+          {pos.index} of {pos.total}
+        </span>
+      ) : null}
       {next ? (
         nextLocked ? (
           <span

@@ -78,9 +78,23 @@ interface Props {
 // Helpers
 // ---------------------------------------------------------------------------
 
+// To the minute, never seconds (system pass rule 3).
 function formatTs(ts: number): string {
-  return new Date(ts).toLocaleString();
+  return new Date(ts).toLocaleString(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
 }
+
+// One field style for the teacher screens (system pass rule 5): inset surface, visible border, 15px prose;
+// hover and focus come from the `teacher-field` class in globals.css.
+const FIELD: React.CSSProperties = {
+  background: 'var(--c-deep2)',
+  color: 'var(--c-fg)',
+  border: '1px solid var(--c-line)',
+  borderRadius: 4,
+  fontFamily: 'var(--font-prose)',
+  fontSize: 15,
+  boxSizing: 'border-box',
+};
+const FIELD_LABEL: React.CSSProperties = { fontFamily: 'var(--font-prose)', fontSize: 14, fontWeight: 600, color: 'var(--c-fg)' };
 
 function parseGradeJson(raw: string): GradeJson | null {
   try {
@@ -277,8 +291,8 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
       onSubmit={handleOverride}
       style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--c-line)' }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-        <label htmlFor={`override-score-${submissionId}`} style={{ fontSize: 13, color: 'var(--c-fg)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 6 }}>
+        <label htmlFor={`override-score-${submissionId}`} style={FIELD_LABEL}>
           {unitTotal !== null
             ? `New mark (criteria met, out of ${unitTotal}):`
             : pointsMax !== null
@@ -295,22 +309,19 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
           step={0.5}
           value={score}
           onChange={(e) => setScore(e.target.value)}
+          className="teacher-field"
           style={{
-            width: 80,
-            height: 32,
-            boxSizing: 'border-box',
-            background: 'var(--c-bg)',
-            color: 'var(--c-fg)',
-            border: '1px solid var(--c-line)',
-            borderRadius: 4,
+            ...FIELD,
+            width: 96,
+            height: 36,
             padding: '4px 8px',
-            fontSize: 14,
+            fontVariantNumeric: 'tabular-nums',
           }}
         />
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <label htmlFor={`override-feedback-${submissionId}`} style={{ fontSize: 13, color: 'var(--c-fg)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
+        <label htmlFor={`override-feedback-${submissionId}`} style={FIELD_LABEL}>
           Feedback (optional):
         </label>
         <textarea
@@ -318,15 +329,12 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
           rows={2}
           value={feedback}
           onChange={(e) => setFeedback(e.target.value)}
+          className="teacher-field"
           style={{
+            ...FIELD,
             width: '100%',
-            background: 'var(--c-bg)',
-            color: 'var(--c-fg)',
-            border: '1px solid var(--c-line)',
-            borderRadius: 4,
             padding: '8px 12px',
-            fontSize: 14,
-            fontFamily: 'inherit',
+            lineHeight: 1.5,
             resize: 'vertical',
             minHeight: 64,
             maxHeight: 120,
@@ -336,8 +344,8 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
       </div>
 
       {enforceMax && (
-        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--c-meta)' }}>
-          <input type="checkbox" checked={replaceBest} onChange={(e) => setReplaceBest(e.target.checked)} />
+        <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.5, color: 'var(--c-meta)', maxWidth: '70ch' }}>
+          <input type="checkbox" style={{ marginTop: 4, flexShrink: 0 }} checked={replaceBest} onChange={(e) => setReplaceBest(e.target.checked)} />
           Use this as the student&apos;s score even if it is lower than their best try (otherwise the higher one is kept on a part with a try limit). This stays until you change or clear it; the student&apos;s later tries do not undo it.
         </label>
       )}
@@ -375,7 +383,7 @@ export function OverrideForm({ classId, submissionId, unitTotal, pointsMax = nul
         )}
 
         {msg && (
-          <span style={{ fontSize: 13, color: msg.type === 'success' ? 'var(--c-green)' : 'var(--c-red)' }}>
+          <span style={{ fontFamily: 'var(--font-prose)', fontSize: 14, color: msg.type === 'success' ? 'var(--c-green)' : 'var(--c-red)' }}>
             {msg.text}
           </span>
         )}
@@ -429,7 +437,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
 
   if (loading) {
     return (
-      <div style={{ color: 'var(--c-meta)', fontStyle: 'italic', padding: 16, fontSize: 14 }}>
+      <div style={{ color: 'var(--c-meta)', fontStyle: 'italic', padding: 16, fontFamily: 'var(--font-prose)', fontSize: 14 }}>
         Loading submission queue...
       </div>
     );
@@ -437,7 +445,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
 
   if (error) {
     return (
-      <div style={{ color: 'var(--c-red)', padding: 16, fontSize: 14 }}>
+      <div style={{ color: 'var(--c-red)', padding: 16, fontFamily: 'var(--font-prose)', fontSize: 14 }}>
         Failed to load: {error}
       </div>
     );
@@ -445,7 +453,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
 
   if (submissions.length === 0) {
     return (
-      <div style={{ color: 'var(--c-meta)', padding: 16, fontSize: 14 }}>
+      <div style={{ color: 'var(--c-meta)', padding: '8px 0', fontFamily: 'var(--font-prose)', fontSize: 15 }}>
         No submissions in the review queue.
       </div>
     );
@@ -459,10 +467,10 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
   ).length;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
       {/* The list below is the most recent graded work of every kind, so say that first and count what is
           listed; the orange note then counts only the rows the AI grader failed on. */}
-      <div style={{ fontSize: 13, color: 'var(--c-meta)' }}>
+      <div style={{ fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.5, color: 'var(--c-meta)', maxWidth: '70ch', marginBottom: 8 }}>
         {submissions.length} recent submission{submissions.length === 1 ? '' : 's'}, {needsManual > 0 ? 'the ones needing a manual grade first, then ' : ''}newest first
         {needsManual > 0 ? '' : '. Every one has a score; override it below if you disagree'}.
       </div>
@@ -495,29 +503,29 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
         return (
           <div
             key={sub.id}
+            // One container per thing (rule 6): submissions are separated by a divider inside the queue's
+            // card, not boxed a second time.
             style={{
-              background: 'var(--c-deep)',
-              border: '1px solid var(--c-line)',
-              borderRadius: 6,
-              // Compact (climb4 r1): the response and the score field have to sit in the first screen.
-              padding: '12px 16px',
+              borderTop: '1px solid var(--c-line)',
+              padding: '16px 0',
               minWidth: 0,
               display: 'flex',
               flexDirection: 'column',
               gap: 10,
             }}
           >
-            {/* Header row */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-              {/* Who, what and when on one line (wraps on a narrow screen). */}
-              <div style={{ flex: '1 1 240px', minWidth: 0, overflowWrap: 'anywhere', fontSize: 13, lineHeight: 1.5, color: 'var(--c-meta)' }}>
-                <strong style={{ fontWeight: 600, color: 'var(--c-fg)', fontSize: 14 }}>
+            {/* Header: who (the card's title), what (its own line), when (to the minute, in meta). */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+              <div style={{ flex: '1 1 240px', minWidth: 0, overflowWrap: 'anywhere', fontFamily: 'var(--font-prose)', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <strong style={{ fontWeight: 600, color: 'var(--c-fg)', fontSize: 16, lineHeight: 1.4 }}>
                   {sub.student_email}
                 </strong>
-                {' '}&middot; <span style={{ color: 'var(--c-fg)' }}>{lessonLabel(sub.lesson_id, lessonTitles)}</span> &middot; submitted {formatTs(sub.submitted_at)}
+                <span style={{ color: 'var(--c-fg)', fontSize: 15, lineHeight: 1.4 }}>{lessonLabel(sub.lesson_id, lessonTitles)}</span>
+                <span style={{ color: 'var(--c-meta)', fontSize: 13, lineHeight: 1.5 }}>Submitted {formatTs(sub.submitted_at)}</span>
               </div>
               <div
                 style={{
+                  flexShrink: 0,
                   background: failed ? 'var(--c-orange)' : 'var(--c-line)',
                   color: failed ? 'var(--c-bg)' : 'var(--c-fg)',
                   padding: '4px 12px',
@@ -553,22 +561,25 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
             <PlanCheckPanel lessonId={sub.lesson_id} response={sub.response} />
 
             {failed && (
+              // A wrapped prose notice (rule 3): an accent edge and a tint, no second border.
               <div
+                role="note"
                 style={{
-                  background: 'var(--c-bg)',
-                  border: '1px solid var(--c-orange)',
+                  background: 'color-mix(in srgb, var(--c-orange) 10%, transparent)',
                   borderLeft: '4px solid var(--c-orange)',
                   borderRadius: 4,
-                  padding: '6px 12px',
-                  fontSize: 13,
+                  padding: '8px 12px',
+                  fontFamily: 'var(--font-prose)',
+                  fontSize: 14,
                   color: 'var(--c-fg)',
                   lineHeight: 1.5,
+                  maxWidth: '70ch',
                 }}
               >
                 The AI grader could not score this. The student&apos;s answer is below and is
                 safe — read it and set a score yourself.
                 {failed.error && (
-                  <span style={{ color: 'var(--c-meta)', marginLeft: 8, fontFamily: 'monospace', fontSize: 12 }}>
+                  <span style={{ display: 'block', color: 'var(--c-meta)', marginTop: 2, fontFamily: 'var(--font-mono)', fontSize: 12 }}>
                     ({failed.error}
                     {failed.httpStatus ? `, HTTP ${failed.httpStatus}` : ''})
                   </span>
@@ -581,10 +592,10 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
               <div
                 style={{
                   background: 'var(--c-bg)',
-                  border: '1px solid var(--c-line)',
                   borderRadius: 4,
-                  padding: 10,
-                  fontSize: 13,
+                  padding: '10px 12px',
+                  fontFamily: 'var(--font-prose)',
+                  fontSize: 14,
                 }}
               >
                 <div style={{ fontWeight: 600, color: 'var(--c-fg)', marginBottom: 8 }}>
@@ -609,16 +620,15 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
               </div>
             )}
 
-            {/* Student response */}
+            {/* Student response: a filled block, no border inside the queue's card (rule 6). */}
             <div
               style={{
                 background: 'var(--c-bg)',
-                border: '1px solid var(--c-line)',
                 borderRadius: 4,
-                padding: 10,
+                padding: '10px 12px',
               }}
             >
-              <div style={{ fontWeight: 600, color: 'var(--c-fg)', fontSize: 13, marginBottom: 4 }}>
+              <div style={{ fontFamily: 'var(--font-prose)', fontWeight: 600, color: 'var(--c-meta)', fontSize: 13, marginBottom: 4 }}>
                 {diagram ? 'Student diagram' : 'Student response'}
               </div>
               <SubmissionBoundary raw={sub.response}>
@@ -633,7 +643,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                       // scroll-zoom into anything they need to read closely.
                       fitMinZoom={0.3}
                     />
-                    <div style={{ color: 'var(--c-meta)', fontSize: 13, marginTop: 5 }}>
+                    <div style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, marginTop: 5 }}>
                       {diagram.nodes.length} shapes · {diagram.edges.length} arrows · scroll to zoom,
                       drag to pan
                     </div>
@@ -641,7 +651,7 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
                         copy, and the teacher must always be able to see what the model read. */}
                     {parseDiagramResponse(sub.response) === null && sub.response ? (
                       <div style={{ marginTop: 8 }}>
-                        <div style={{ color: 'var(--c-meta)', fontSize: 13, marginBottom: 4 }}>What the AI read</div>
+                        <div style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, marginBottom: 4 }}>What the AI read</div>
                         <div
                           style={{
                             color: 'var(--c-fg)',
@@ -693,10 +703,10 @@ export function SubmissionQueue({ classId, lessonTitles }: Props) {
               <div
                 style={{
                   background: 'var(--c-bg)',
-                  border: '1px solid var(--c-line)',
                   borderRadius: 4,
-                  padding: 10,
-                  fontSize: 13,
+                  padding: '10px 12px',
+                  fontFamily: 'var(--font-prose)',
+                  fontSize: 14,
                 }}
               >
                 <div style={{ fontWeight: 600, color: 'var(--c-fg)', marginBottom: 8 }}>

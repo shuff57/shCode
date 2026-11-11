@@ -19,7 +19,7 @@ export interface RowMenuItem {
   title?: string;
 }
 
-export function RowMenu({ items, label = 'More actions', buttonText = 'More', disabled = false }: { items: RowMenuItem[]; label?: string; buttonText?: string; disabled?: boolean }) {
+export function RowMenu({ items, label = 'More actions', buttonText = 'More', disabled = false, caret = true }: { items: RowMenuItem[]; label?: string; buttonText?: string; disabled?: boolean; caret?: boolean }) {
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState<{ top?: number; bottom?: number; right: number } | null>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -92,9 +92,9 @@ export function RowMenu({ items, label = 'More actions', buttonText = 'More', di
         aria-label={label}
         onClick={() => (open ? setOpen(false) : openMenu())}
         onKeyDown={(e) => { if (e.key === 'ArrowDown' && !open) { e.preventDefault(); openMenu(); } }}
-        style={{ background: 'none', border: '1px solid var(--c-comment)', borderRadius: 4, color: 'var(--c-meta)', fontSize: 13, height: 32, boxSizing: 'border-box', cursor: disabled ? 'not-allowed' : 'pointer', padding: '4px 8px', flexShrink: 0, opacity: disabled ? 0.5 : 1 }}
+        style={{ background: 'none', border: '1px solid var(--c-comment)', borderRadius: 4, color: 'var(--c-meta)', fontSize: 13, height: 32, boxSizing: 'border-box', cursor: disabled ? 'not-allowed' : 'pointer', padding: caret ? '4px 8px' : '4px 10px', minWidth: caret ? undefined : 36, flexShrink: 0, opacity: disabled ? 0.5 : 1 }}
       >
-        {buttonText} <span aria-hidden="true">▾</span>
+        {buttonText}{caret && <> <span aria-hidden="true">▾</span></>}
       </button>
       {open && pos && (
         <div

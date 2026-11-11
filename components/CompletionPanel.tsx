@@ -1,12 +1,14 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { CircleCheck, Circle } from 'lucide-react';
 import {
   recordLessonCompleted,
   resetLessonState,
   useLessonState,
 } from '../lib/progress';
-import { navigateToNextLesson } from '../lib/lesson-neighbors';
+import { getNextLesson, navigateToNextLesson } from '../lib/lesson-neighbors';
+import { lessonHref } from '../lib/lesson-href';
 
 interface Props {
   lessonId: string;
@@ -26,6 +28,14 @@ const TYPE_VERB: Record<string, string> = {
 export default function CompletionPanel({ lessonId, lessonType, description }: Props) {
   const snap = useLessonState();
   const complete = snap.states[lessonId] === 'completed';
+  // The same next lesson the header's "→" link and Mark-as-complete's auto-advance go to. It is
+  // shown as an action only once this lesson is complete, which is what unlocks it.
+  const [next, setNext] = useState<{ title: string; href: string } | null>(null);
+  useEffect(() => {
+    let live = true;
+    getNextLesson(lessonId).then((n) => { if (live) setNext(n ? { title: n.title, href: lessonHref(n) } : null); });
+    return () => { live = false; };
+  }, [lessonId]);
 
   const verb = TYPE_VERB[lessonType] ?? 'finished this lesson';
   const title = 'Mark as complete';
@@ -46,8 +56,13 @@ export default function CompletionPanel({ lessonId, lessonType, description }: P
   if (complete) return (
     <section aria-live="polite" style={{ marginTop: 20, padding: '16px 18px', border: '1px solid color-mix(in srgb, var(--c-green) 33.3333%, transparent)', borderRadius: 8, background: 'color-mix(in srgb, var(--c-green) 3.9216%, transparent)', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
       <CircleCheck size={20} color="var(--c-green)" />
-      <span style={{ color: 'var(--c-green)', flex: 1 }}>Completed · next lesson unlocked</span>
+      <span className="completion-done-text" style={{ color: 'var(--c-green)', flex: 1 }}>Completed · next lesson unlocked</span>
       <button onClick={toggle} disabled={!snap.authed} style={{ background: 'transparent', border: 0, color: 'var(--c-meta)', textDecoration: 'underline', cursor: 'pointer', padding: 6 }}>Undo</button>
+      {next && (
+        <a className="completion-next" href={next.href}>
+          <span className="completion-next-verb">Next:</span> <span className="completion-next-title">{next.title}</span> <span aria-hidden="true">→</span>
+        </a>
+      )}
     </section>
   );
 
