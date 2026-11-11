@@ -11,10 +11,15 @@
 // (it has to run in their browser). `canRemix` is false for a "just play" game
 // that is not the caller's, and the UI then hides View code and Remix; the
 // server refuses to publish a remix of it (POST /api/games).
+//
+// Versions and proposed changes (migration 0048): GET also carries `version`, `contributors` (the
+// classmates whose proposed changes were accepted, first name + last initial) and `openChanges`.
+// DELETE closes the game's open proposals.
 
 import { json, ownerName, visibleGame, type SessionData } from '../../_shared/games';
 import { isGameId, modeLabel, type GameMode } from '../../../lib/games-core';
 import { canRemix, choiceOf, provenanceFromRow } from '../../../lib/share-choice';
+import { closeChangesStmts, contributorsOf, openChangeCounts } from '../../_shared/gameFlow';
 
 interface Env {
   DB: D1Database;
@@ -31,8 +36,12 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
   if (seen.mine) {
     shared = !!(await env.DB.prepare(`SELECT 1 AS x FROM library_game_shares WHERE game_id = ? LIMIT 1`).bind(id).first());
   }
+  const vrow = await env.DB.prepare(`SELECT version FROM library_games WHERE id = ?`).bind(id).first<{ version: number }>();
+  const contributors = await contributorsOf(env.DB, id);
+  const openChanges = (await openChangeCounts(env.DB, [id])).get(id) ?? 0;
   return json({
     game: {
+      version: vrow?.version ?? 1, contributors, openChanges,
       id: row.id, title: row.title, code: row.code, mode: row.mode, players: row.players,
       modeLabel: modeLabel(row.mode as GameMode, row.players),
       owner: await ownerName(env.DB, row.owner_email), mine: seen.mine, hidden: seen.hidden,
@@ -58,6 +67,7 @@ export const onRequestDelete: PagesFunction<Env, 'id', SessionData> = async ({ p
       .bind(now, now, id, data.email),
     // A class must not keep a game its publisher deleted.
     env.DB.prepare(`DELETE FROM library_game_shares WHERE game_id = ?`).bind(id),
+    ...closeChangesStmts(env.DB, 'g.id = ?', [id], now),
   ]);
   return json({ ok: true, id, deletedAt: now });
 };

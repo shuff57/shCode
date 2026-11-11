@@ -2424,6 +2424,66 @@ function drawTop() {
     ],
   },
   {
+    slug: 'sharing',
+    title: 'Sharing and changes',
+    pages: [
+      {
+        title: 'Versions: saving with a note',
+        body: `Publish game saves your sketch as a game in your Library. Every time you press Update game after that, it asks "What did you change?" and saves a new version with your answer as its note: "Added a second level", "Fixed the jump".
+
+Your game's History lists every version with its note, who made it and when. See the changes shows exactly which lines changed: red lines are gone, green lines are new. Go back to this version puts an old version's code back as a NEW version, so nothing is ever lost, and you can go back from going back.
+
+Write notes that say what changed, not "update" or "stuff". In a month, "Coins give 5 points now" tells you something; "changes" does not.
+
+On GitHub, saving a version with a note is called a commit, the note is the commit message, and the list is the commit history.`,
+      },
+      {
+        title: 'Remix: your own copy',
+        body: `Remix on a classmate's game copies its code into your own sandbox. Change anything: it is your copy, and the original does not change. When you publish it, it says "Remixed from" the original, with its maker's name.
+
+Your sandbox remembers which game and which version you started from. That is what lets you send your change back (Propose change) and bring in the maker's newer versions later.
+
+A game shared as "Just play" has no Remix. A game shared as "keep remixes open" asks that your remix is shared the same way.
+
+On GitHub, your own copy of someone else's project is called a fork.`,
+      },
+      {
+        title: 'Proposing a change',
+        body: `Made something better in your remix: a fixed bug, a new level, a nicer jump? Send it back. In the sandbox press Propose change, say what you changed in a few words, and (if you like) why. Press See my changes first to check exactly what you are sending.
+
+The maker sees it in their Library under Proposed changes. They can look at the changes, press Try it to play the game with your change in, and then Accept it or say No thanks. If they accept, it becomes a new version of their game with your name on it, and the game's page says "With changes by" you.
+
+Every proposed change has a conversation. The maker, you, and any classmate who can see the game can comment: ask a question, say what you tried, suggest something. It stays open after the change is accepted or not, until the maker or a teacher closes it. Your teacher can read every conversation. Talk about the game and the code, and be kind.
+
+To change your proposal, edit the code in your sandbox and press Propose change again: it updates the one you sent. Take it back takes it away.
+
+On GitHub this is called a pull request, and accepting one is called merging.`,
+      },
+      {
+        title: 'Bring in the newest version',
+        body: `While you work on your remix, the maker might change their game too. When they do, Propose change shows a dot, and the panel says the game has a newer version. Bring in the newest version puts their new lines into your code and keeps yours. Your code from before goes to the sandbox's History first, so nothing is lost.
+
+If you and the maker changed the SAME lines, the two changes cannot be put together by themselves. You pick: keep your code for now, or start from the newest version and copy your change back in by hand (your code is in History). See both shows the two side by side.
+
+Bring in the newest version before you propose, so the maker can accept your change without a clash.
+
+On GitHub this is called syncing your fork, and two changes to the same lines is a merge conflict.`,
+      },
+      {
+        title: 'How this matches GitHub',
+        body: `Everything here is a small version of how programmers work together on GitHub:
+
+Update game with a note is a commit. History is the commit history. Go back to this version is a revert.
+
+Remix is a fork. Bring in the newest version is syncing your fork.
+
+Propose change is a pull request. Its conversation is the pull request's conversation. See the changes is "Files changed". Try it is checking out the branch and testing it. Accept is merge, and No thanks is closing it.
+
+Two changes to the same lines is a merge conflict. On GitHub you fix it by editing the lines yourself; here you keep one version and copy your change back in.`,
+      },
+    ],
+  },
+  {
     slug: 'patterns',
     title: 'Game Patterns',
     pages: [

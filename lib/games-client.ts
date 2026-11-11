@@ -46,6 +46,9 @@ export interface MyGame {
   shared: boolean;
   choice: ShareChoice;
   remixedFrom: Provenance | null;
+  /** The game's version (migration 0048) and how many proposed changes wait for it. */
+  version?: number;
+  openChanges?: number;
 }
 
 export interface SharedGame {
@@ -81,6 +84,10 @@ export interface FullGame {
   /** False for someone else's "just play" game: no View code, no Remix. */
   canRemix: boolean;
   remixedFrom: Provenance | null;
+  /** Migration 0048: the current version, classmates whose proposed changes were accepted, open proposals. */
+  version?: number;
+  contributors?: string[];
+  openChanges?: number;
 }
 
 export function playHref(id: string): string {
@@ -96,21 +103,42 @@ function announce() {
 /**
  * `from`: where the sandbox code was remixed from, or null for the student's
  * own work. Kept after publishing, so "Publish as a new game" credits it too.
+ * `fromVersion`: the version of `from` the sandbox code started at (migration
+ * 0048), the base a proposed change and "Bring in the newest version" diff
+ * against. Moves forward when the newest version is brought in.
  */
-export interface SandboxGame { id: string | null; title: string; from?: Provenance | null }
+export interface SandboxGame {
+  id: string | null; title: string; from?: Provenance | null; fromVersion?: number | null;
+  /** For the student's OWN game (`id`): the version the sandbox code is based on, so Update can say when the game has moved on (an accepted change). */
+  version?: number | null;
+}
 
 export function readSandboxGame(): SandboxGame {
   try {
     const v = JSON.parse(localStorage.getItem(SANDBOX_GAME_KEY) || 'null');
     if (v && typeof v.title === 'string') {
-      return { id: typeof v.id === 'string' ? v.id : null, title: v.title, from: parseProvenance(v.from) };
+      return {
+        id: typeof v.id === 'string' ? v.id : null, title: v.title, from: parseProvenance(v.from),
+        fromVersion: Number.isInteger(v.fromVersion) && v.fromVersion > 0 ? v.fromVersion : null,
+        version: Number.isInteger(v.version) && v.version > 0 ? v.version : null,
+      };
     }
   } catch { /* private mode or junk */ }
   return { id: null, title: '', from: null };
 }
 
 export function writeSandboxGame(g: SandboxGame): void {
-  try { localStorage.setItem(SANDBOX_GAME_KEY, JSON.stringify(g)); } catch { /* private mode */ }
+  // A caller that does not know about versions keeps the one already recorded for the same original.
+  let rec = g;
+  if (g.fromVersion === undefined || g.version === undefined) {
+    const old = readSandboxGame();
+    rec = {
+      ...g,
+      fromVersion: g.fromVersion !== undefined ? g.fromVersion : old.from && g.from && old.from.id === g.from.id ? old.fromVersion ?? null : null,
+      version: g.version !== undefined ? g.version : old.id && old.id === g.id ? old.version ?? null : null,
+    };
+  }
+  try { localStorage.setItem(SANDBOX_GAME_KEY, JSON.stringify(rec)); } catch { /* private mode */ }
 }
 
 // ---- calls -----------------------------------------------------------------
@@ -155,11 +183,11 @@ export async function publishGame(
   title: string,
   code: string,
   id: string | null,
-  opts: { choice?: ShareChoice; remixedFrom?: string | null; retryAsNew?: boolean } = {},
+  opts: { choice?: ShareChoice; remixedFrom?: string | null; retryAsNew?: boolean; message?: string } = {},
 ) {
   const post = (body: Record<string, unknown>) => call<{
     created: boolean;
-    game: { id: string; title: string; mode: GameMode; players: number; choice: ShareChoice; remixedFrom: Provenance | null };
+    game: { id: string; title: string; mode: GameMode; players: number; choice: ShareChoice; remixedFrom: Provenance | null; version?: number };
   }>('/api/games', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -168,7 +196,7 @@ export async function publishGame(
   const extra: Record<string, unknown> = {};
   if (opts.choice) extra.choice = opts.choice;
   if (opts.remixedFrom) extra.remixedFrom = opts.remixedFrom;
-  let r = await post(id ? { id, title, code, ...extra } : { title, code, ...extra });
+  let r = await post(id ? { id, title, code, ...extra, ...(opts.message ? { message: opts.message } : {}) } : { title, code, ...extra });
   if (!r.ok && r.status === 404 && id && opts.retryAsNew !== false) r = await post({ title, code, ...extra });
   if (r.ok) announce();
   return r;
@@ -205,6 +233,8 @@ export interface RemixSource {
   owner?: string;
   choice?: ShareChoice;
   remixedFrom?: Provenance | null;
+  /** The game's version now (0048): what a proposed change from this remix starts from. */
+  version?: number;
 }
 
 /**
@@ -223,41 +253,20 @@ export function remixIntoSandbox(
     refused(remixRefusal('game', game.title, game.owner ?? 'Its maker'));
     return false;
   }
-  const mode = getMode('moshion');
-  const starter = normalizeEol(mode.starter);
-  const code = normalizeEol(game.code);
-  const store = useLessonStore.getState();
-  const live = store.lesson?.id === SANDBOX_MOSHION;
-  const saved = loadProgress(SANDBOX_MOSHION);
-  const files: Record<string, string> = live ? { ...store.fileContents } : { ...(saved?.fileContents ?? {}) };
-  const current = normalizeEol(files['script.js'] ?? starter);
-
-  if (current.trim() && current !== starter && current !== code) {
-    const yes = ask(
-      `Replace the code in your moSHion sandbox with "${game.title}"?\n\n`
-      + 'Your sandbox code now is kept in the sandbox\'s History, so you can get it back from there.',
-    );
-    if (!yes) return false;
-    addLocalSnapshot(SANDBOX_MOSHION, files, `Before opening "${game.title}"`);
-  }
-
-  files['script.js'] = code;
-  saveProgress(SANDBOX_MOSHION, {
-    fileContents: files,
-    commits: saved?.commits ?? [],
-    lastCommittedFileContents: saved?.lastCommittedFileContents ?? { 'script.js': starter },
-    completedSteps: [],
-  });
-  // The sandbox may be open behind this panel (the Library drawer tab): its
-  // in-memory draft is written back on page hide, so update it too.
-  if (live) store.updateFile('script.js', code);
+  if (!writeSandboxCode(game.code, `Before opening "${game.title}"`, () => ask(
+    `Replace the code in your moSHion sandbox with "${game.title}"?\n\n`
+    + 'Your sandbox code now is kept in the sandbox\'s History, so you can get it back from there.',
+  ))) return false;
+  const live = useLessonStore.getState().lesson?.id === SANDBOX_MOSHION;
 
   // Your own game keeps the credit it already has; someone else's becomes the credit.
   writeSandboxGame(game.mine
-    ? { id: game.id, title: game.title, from: game.remixedFrom ?? null }
+    ? { id: game.id, title: game.title, from: game.remixedFrom ?? null, fromVersion: null, version: game.version ?? null }
     : {
       id: null,
       title: remixTitle(game.title),
+      fromVersion: game.version ?? null,
+      version: null,
       from: provenanceOf({
         id: game.id, title: game.title, author: game.owner ?? 'A classmate',
         choice: game.choice, provenance: game.remixedFrom ?? null,
@@ -267,6 +276,47 @@ export function remixIntoSandbox(
   announce();
   if (!live) window.location.assign('/sandbox/');
   return true;
+}
+
+/**
+ * Put `code` into the moSHion sandbox draft (the open editor too, when the sandbox is on screen). When the
+ * draft holds work that differs from the starter and from `code`, `confirm` is asked first (false = leave
+ * it alone) and the old draft is kept as a History snapshot labelled `snapshotLabel`. Used by Remix and by
+ * "Bring in the newest version" (lib/game-flow-client.ts). Returns false when the student said no.
+ */
+export function writeSandboxCode(code: string, snapshotLabel: string, confirm: (current: string) => boolean): boolean {
+  const mode = getMode('moshion');
+  const starter = normalizeEol(mode.starter);
+  const next = normalizeEol(code);
+  const store = useLessonStore.getState();
+  const live = store.lesson?.id === SANDBOX_MOSHION;
+  const saved = loadProgress(SANDBOX_MOSHION);
+  const files: Record<string, string> = live ? { ...store.fileContents } : { ...(saved?.fileContents ?? {}) };
+  const current = normalizeEol(files['script.js'] ?? starter);
+
+  if (current.trim() && current !== starter && current !== next) {
+    if (!confirm(current)) return false;
+    addLocalSnapshot(SANDBOX_MOSHION, files, snapshotLabel);
+  }
+
+  files['script.js'] = next;
+  saveProgress(SANDBOX_MOSHION, {
+    fileContents: files,
+    commits: saved?.commits ?? [],
+    lastCommittedFileContents: saved?.lastCommittedFileContents ?? { 'script.js': starter },
+    completedSteps: [],
+  });
+  // The sandbox may be open behind this panel (the Library drawer tab): its
+  // in-memory draft is written back on page hide, so update it too.
+  if (live) store.updateFile('script.js', next);
+  return true;
+}
+
+/** The moSHion sandbox draft's code as it is now (the open editor when the sandbox is on screen). */
+export function readSandboxCode(): string {
+  const store = useLessonStore.getState();
+  if (store.lesson?.id === SANDBOX_MOSHION) return store.fileContents['script.js'] ?? '';
+  return loadProgress(SANDBOX_MOSHION)?.fileContents?.['script.js'] ?? normalizeEol(getMode('moshion').starter);
 }
 
 function remixTitle(title: string): string {

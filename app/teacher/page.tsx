@@ -19,6 +19,7 @@ import ClassLibraryModeration from '../../components/ClassLibraryModeration';
 import ClassGamesModeration from '../../components/ClassGamesModeration';
 import { useClearStudentLibrary } from '../../components/ClearStudentLibrary';
 import ClassCodeSessions from '../../components/ClassCodeSessions';
+import ClassGameChanges from '../../components/ClassGameChanges';
 import PastDuePanel from '../../components/PastDuePanel';
 import { formatDue, schoolDateString } from '../../lib/due-dates-core';
 import { lessonHref } from '../../lib/lesson-href';
@@ -2777,6 +2778,11 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         <div style={S.card}>
           <h2 style={S.h2}>Shared games</h2>
           <ClassGamesModeration classId={classId} />
+        </div>
+        {/* Changes students proposed to each other's games, and their conversations (free text; teachers read them here) */}
+        <div style={S.card}>
+          <h2 style={S.h2}>Proposed changes to games</h2>
+          <ClassGameChanges classId={classId} />
         </div>
         {/* Programs students wrote together in the sandbox (Code together); kept 30 days */}
         <div style={S.card}>

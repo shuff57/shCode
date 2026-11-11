@@ -24,6 +24,12 @@
 // no Remix and no View code (canRemix false; the code still reaches this page
 // so it can run, and the server refuses to publish a remix of it). A remix
 // says where it came from under the title ("Remixed from Plane by Sam W.").
+//
+// Versions and proposed changes (migration 0048, lib/game-flow-core.ts): the title line says which
+// version this is and who else changed it ("With changes by Ben D."), with links to History and the
+// proposed changes. /play?game=<id>&change=<cid> is Try it: it runs what Accept would save (the proposal
+// merged into the game as it is now, or the proposal alone when they clash), with a room key of its own
+// ('try-<id>') so trying a change never joins rooms where classmates play the real game.
 
 import { useEffect, useState } from 'react';
 import MoshionPreview from './MoshionPreview';
@@ -34,6 +40,8 @@ import { builtinTextureNames, listWords, missingToShow, type GameAsset } from '.
 import { isGameId } from '../lib/games-core';
 import { CHOICE_TEXT } from '../lib/share-choice';
 import { RemixCreditLine } from './ShareChoicePicker';
+import { changeHref, gameChangesHref, getChange, type ChangeDetail } from '../lib/game-flow-client';
+import { GITHUB_WORD, isChangeId } from '../lib/game-flow-core';
 
 type State =
   | { kind: 'loading' }
@@ -59,6 +67,8 @@ export default function PlayGame() {
   const [note, setNote] = useState<string | null>(null);
   // null while the game's pictures and sounds are still on their way.
   const [assets, setAssets] = useState<{ list: GameAsset[]; missing: string[] } | null>(null);
+  /** Try it: the proposed change being tried, or null for the game itself. */
+  const [trying, setTrying] = useState<ChangeDetail | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -79,6 +89,10 @@ export default function PlayGame() {
     }
     const id = params.get('game') ?? '';
     if (!isGameId(id)) { setState({ kind: 'missing' }); return; }
+    const cid = params.get('change');
+    if (cid && isChangeId(cid)) {
+      void getChange(cid).then((c) => { if (live && c.ok && c.value.game?.id === id) setTrying(c.value); });
+    }
     void getGame(id).then((r) => {
       if (!live) return;
       if (r.ok) {
@@ -144,6 +158,10 @@ export default function PlayGame() {
   const effectiveRunKey = assets ? runKey : 0;
   // A classmate's "just play" game: play only (the server says so; older answers mean yes).
   const canRemix = g.mine || g.canRemix !== false;
+  // Try it: what Accept would save, or the proposal alone when the two clash.
+  const tryCode = trying ? (trying.after?.ok ? trying.after.code : trying.change.code) : null;
+  const runCode = tryCode ?? g.code;
+  const contributors = g.contributors ?? [];
   return (
     <div style={wrap}>
       {back}
@@ -155,6 +173,16 @@ export default function PlayGame() {
             {g.hidden && <span style={{ color: 'var(--c-orange)' }}> · hidden from students</span>}
           </div>
           <RemixCreditLine from={g.remixedFrom} style={{ fontSize: 13 }} />
+          {canRemix && (
+            <div style={{ fontSize: 13, color: 'var(--c-dim)' }}>
+              Version {g.version ?? 1}
+              {contributors.length > 0 && <> · With changes by {contributors.join(', ')}</>}
+              {' · '}<a href={gameChangesHref(g.id, 'history')} style={{ color: 'var(--c-cyan)' }}>History</a>
+              {' · '}<a href={gameChangesHref(g.id)} style={{ color: 'var(--c-cyan)' }}>
+                Proposed changes{g.openChanges ? ` (${g.openChanges} open)` : ''}
+              </a>
+            </div>
+          )}
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button type="button" className="btn-run" onClick={() => setRunKey((k) => k + 1)}>
@@ -168,7 +196,7 @@ export default function PlayGame() {
                 title={g.mine ? 'Put this game in your moSHion sandbox; Publish game there updates it' : 'Copy this game into your own moSHion sandbox to change it'}
                 onClick={() => {
                   const ok = remixIntoSandbox(
-                    { id: g.id, title: g.title, code: g.code, mine: g.mine, owner: g.owner, choice: g.choice, remixedFrom: g.remixedFrom },
+                    { id: g.id, title: g.title, code: g.code, mine: g.mine, owner: g.owner, choice: g.choice, remixedFrom: g.remixedFrom, version: g.version },
                     undefined,
                     (m) => setNote(m),
                   );
@@ -185,6 +213,20 @@ export default function PlayGame() {
         </div>
       </div>
       {note && <div role="status" style={{ fontSize: 12, color: 'var(--c-green)', margin: '0 0 6px' }}>{note}</div>}
+      {trying && (
+        <div role="note" style={{
+          margin: '0 0 8px', padding: '8px 12px', borderRadius: 6, fontSize: 13, lineHeight: 1.5,
+          border: '1px solid color-mix(in srgb, var(--c-purple) 55%, transparent)', background: 'color-mix(in srgb, var(--c-purple) 10%, transparent)',
+        }}>
+          <strong>Trying {trying.change.from}&apos;s proposed change:</strong> &ldquo;{trying.change.title}&rdquo;.{' '}
+          {trying.change.status !== 'open' ? 'This change is closed, so this is the code as it was proposed. '
+            : trying.after?.ok ? `This is how "${g.title}" would play if it is accepted. `
+            : `It clashes with newer changes to "${g.title}", so this is the proposed code on its own. `}
+          <a href={changeHref(trying.change.id)} style={{ color: 'var(--c-cyan)' }}>Back to the conversation</a>
+          {' · '}<a href={`/play/?game=${g.id}`} style={{ color: 'var(--c-cyan)' }}>Play the game as it is</a>
+          <div style={{ fontSize: 12, color: 'var(--c-dim)' }}>{GITHUB_WORD.review}</div>
+        </div>
+      )}
       {assets && assets.missing.length > 0 && (
         <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: '0 0 6px' }}>
           Some pictures or sounds in this game aren&apos;t shared, so they won&apos;t show: {listWords(assets.missing)}.
@@ -193,9 +235,9 @@ export default function PlayGame() {
       )}
       <div style={{ height: 'max(360px, calc(100vh - 330px))', border: '1px solid var(--c-line)', borderRadius: 6, overflow: 'hidden', display: 'flex' }}>
         <MoshionPreview
-          code={packForUrl(g.code)}
+          code={packForUrl(runCode)}
           runKey={effectiveRunKey}
-          gameKey={'game-' + g.id}
+          gameKey={trying ? 'try-' + g.id : 'game-' + g.id}
           assets={assets?.list}
           assetsOwnWins={g.mine}
         />
@@ -222,7 +264,7 @@ export default function PlayGame() {
             background: 'var(--c-deep2)', border: '1px solid var(--c-line)', borderRadius: 6, whiteSpace: 'pre',
           }}
         >
-          <code>{g.code}</code>
+          <code>{runCode}</code>
         </pre>
       )}
     </div>

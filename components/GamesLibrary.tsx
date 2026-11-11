@@ -13,6 +13,10 @@
 // to the student's last choice, locked to "keep remixes open" for a remix of a
 // game that asked for that. A classmate's "just play" game has no Remix. A
 // remix shows "Remixed from <title> by <name>".
+//
+// Versions and proposed changes (migration 0048, lib/game-flow-core.ts): each game links to its
+// History and its proposed changes (/changes?game=<id>), "Proposed changes" lists the conversations
+// that concern the student (GameChangesInbox), and Remix says how to send a change back.
 
 import { useCallback, useEffect, useState } from 'react';
 import {
@@ -31,6 +35,8 @@ import { modeLabel, type GameMode } from '../lib/games-core';
 import { CHOICE_TEXT, canRemix, type ShareChoice } from '../lib/share-choice';
 import { sectionHeading, sectionNote, sectionStyle } from './library-ui';
 import ShareChoicePicker, { RemixCreditLine, lockedChoice, useLastChoice } from './ShareChoicePicker';
+import GameChangesInbox from './GameChangesInbox';
+import { gameChangesHref } from '../lib/game-flow-client';
 
 const btn: React.CSSProperties = {
   fontSize: 12, padding: '4px 8px', borderRadius: 4, cursor: 'pointer', whiteSpace: 'nowrap',
@@ -110,11 +116,15 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
     if (!r.ok) { say(r.error, true); return; }
     const g = r.value.game;
     const done = remixIntoSandbox(
-      { id: g.id, title: g.title, code: g.code, mine: mineToo && g.mine, owner: g.owner, choice: g.choice, remixedFrom: g.remixedFrom },
+      { id: g.id, title: g.title, code: g.code, mine: mineToo && g.mine, owner: g.owner, choice: g.choice, remixedFrom: g.remixedFrom, version: g.version },
       undefined,
       (m) => say(m, true),
     );
-    if (done) say(`"${g.title}" is in your moSHion sandbox now. Press Run to play it, then change anything you like.`);
+    if (done) {
+      say(mineToo && g.mine
+        ? `"${g.title}" is in your moSHion sandbox now. Press Run to play it, then change anything you like.`
+        : `"${g.title}" is in your moSHion sandbox now. Change anything you like, then press Propose change to send it back to ${g.owner}.`);
+    }
   }
 
   function openChooser(g: MyGame) {
@@ -180,10 +190,10 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {mine.games.map((g) => (
             <div key={g.id} style={rowStyle}>
-              <div style={{ minWidth: 140, flex: '1 1 160px' }}>
+              <div style={{ minWidth: 200, flex: '1 1 240px' }}>
                 <div style={{ fontSize: 13, fontWeight: 600 }}>{g.title}</div>
-                <div style={badge}>
-                  {modeLabel(g.mode, g.players)}
+                <div style={{ ...badge, whiteSpace: 'normal' }}>
+                  {modeLabel(g.mode, g.players)}{g.version ? ` · version ${g.version}` : ''}
                   {g.shared
                     ? <span style={{ color: 'var(--c-green)' }}> · shared with your class ({CHOICE_TEXT.game[g.choice ?? 'credit'].short})</span>
                     : ' · only you'}
@@ -201,6 +211,11 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
                 title={g.shared ? 'In your class' + "'" + 's Games. Click to change who can do what, or stop sharing.' : 'Put this in your class' + "'" + 's Games.'}>
                 {g.shared ? 'Shared with class ✓' : 'Share with class'}
               </button>
+              <a href={gameChangesHref(g.id, 'history')} style={btn} title="Every version of this game, with what changed">History</a>
+              <a href={gameChangesHref(g.id)} style={g.openChanges ? { ...btn, color: 'var(--c-orange)', borderColor: 'color-mix(in srgb, var(--c-orange) 55%, transparent)' } : btn}
+                title="Changes classmates proposed to this game">
+                {g.openChanges ? `${g.openChanges} proposed ${g.openChanges === 1 ? 'change' : 'changes'}` : 'Proposed changes'}
+              </a>
               <button type="button" style={{ ...btn, color: 'var(--c-red)' }} disabled={busy === g.id} onClick={() => void remove(g)}>Delete</button>
               {choosing?.id === g.id && (
                 <div style={{ flex: '1 1 100%', minWidth: 0, marginTop: 4 }}>
@@ -223,6 +238,8 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
       )}
 
       </section>
+
+      <GameChangesInbox />
 
       <section aria-labelledby="games-class-h" style={sectionStyle}>
       <h3 id="games-class-h" style={{ ...sectionHeading, margin: '0 0 6px' }}>Class games ({shared.kind === 'ok' ? shared.games.length : '…'})</h3>
@@ -249,6 +266,9 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
                   title="Copy this game's code into your own moSHion sandbox">
                   Remix
                 </button>
+              )}
+              {canRemix(g.choice) && (
+                <a href={gameChangesHref(g.id)} style={btn} title="Proposed changes to this game, and their conversations">Changes</a>
               )}
             </div>
           ))}

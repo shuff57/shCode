@@ -21,6 +21,11 @@
 // A game deleted since (by the student elsewhere, or by a teacher) answers 404:
 // the panel forgets it and offers "Publish as a new game" rather than quietly
 // making a new one.
+//
+// Versions (migration 0048, lib/game-flow-core.ts): Update game asks "What did you change?" and saves
+// a version with that note (GitHub's commit message). The published line links to History. When the
+// game has a newer version than the sandbox code is based on (the student accepted a classmate's change),
+// the panel says so and offers to bring it in before Update would replace it (GitHub's rejected push).
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Gamepad2 } from 'lucide-react';
@@ -39,6 +44,9 @@ import { LIBRARY_UPDATED, localLibraryItems, type LibraryKind } from '../lib/mos
 import { builtinTextureNames, listWords } from '../lib/game-assets';
 import { CHOICE_TEXT, type Provenance, type ShareChoice } from '../lib/share-choice';
 import ShareChoicePicker, { RemixCreditLine, lockedChoice, useLastChoice } from './ShareChoicePicker';
+import { GITHUB_WORD, MESSAGE_MAX, cleanMessage } from '../lib/game-flow-core';
+import { bringInOwnNewest, gameChangesHref, startFromOwnNewest, type SyncResult } from '../lib/game-flow-client';
+import { GitHubWord } from './game-flow-ui';
 
 const chip: React.CSSProperties = {
   padding: '6px 10px',
@@ -61,7 +69,7 @@ const quiet: React.CSSProperties = {
   background: 'transparent', color: 'var(--c-fg)', border: '1px solid var(--c-line)',
 };
 
-interface Published { id: string; title: string; shared: boolean; choice: ShareChoice }
+interface Published { id: string; title: string; shared: boolean; choice: ShareChoice; version?: number }
 
 const GONE_TEXT = 'That game was deleted. Publish it again as a new game?';
 
@@ -108,6 +116,11 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
   const [from, setFrom] = useState<Provenance | null>(null);
   /** The game the sandbox was published as is gone (deleted, or a 404 on Update). */
   const [gone, setGone] = useState(false);
+  /** "What did you change?" for an Update (a version's note). */
+  const [message, setMessage] = useState('');
+  /** The game is at a newer version than the sandbox code is based on. */
+  const [ahead, setAhead] = useState<{ from: number; newest: number } | null>(null);
+  const [aheadRes, setAheadRes] = useState<SyncResult | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
   // What the sandbox draft is published as, checked against the server (a
@@ -120,7 +133,8 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
     const r = await getGame(rec.id);
     if (r.ok && r.value.game.mine) {
       const g = r.value.game;
-      setPublished({ id: rec.id, title: g.title, shared: !!g.shared, choice: g.choice });
+      setPublished({ id: rec.id, title: g.title, shared: !!g.shared, choice: g.choice, version: g.version });
+      setAhead(rec.version && g.version && g.version > rec.version ? { from: rec.version, newest: g.version } : null);
       setShare(!!g.shared);
       setChoice(lockedChoice(g.remixedFrom ?? rec.from, g.choice));
       setTitle(rec.title || g.title);
@@ -195,9 +209,15 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
     if ('error' in t) { setNote({ text: t.error, bad: true }); return; }
     const c = checkCode(getCode());
     if ('error' in c) { setNote({ text: c.error, bad: true }); return; }
-    setBusy(true);
     const updating = asNew ? null : published?.id ?? null;
-    const r = await publishGame(t.title, c.code, updating, { choice, remixedFrom: from?.id ?? null, retryAsNew: false });
+    let msg: string | undefined;
+    if (updating) {
+      const m = cleanMessage(message, 'version');
+      if ('error' in m) { setNote({ text: m.error, bad: true }); return; }
+      msg = m.message;
+    }
+    setBusy(true);
+    const r = await publishGame(t.title, c.code, updating, { choice, remixedFrom: from?.id ?? null, retryAsNew: false, message: msg });
     if (!r.ok) {
       setBusy(false);
       if (r.status === 404 && updating) {
@@ -213,7 +233,8 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
     }
     const id = r.value.game.id;
     const stored = r.value.game.choice ?? choice;
-    writeSandboxGame({ id, title: t.title, from });
+    writeSandboxGame({ id, title: t.title, from, version: r.value.game.version ?? null });
+    setAhead(null);
     rememberChoice(stored);
     setGone(false);
     let shared = published && published.id === id ? published.shared : false;
@@ -224,10 +245,11 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
       else shareNote = ` It is not shared yet: ${s.error}`;
     }
     setBusy(false);
-    setPublished({ id, title: t.title, shared, choice: stored });
+    setPublished({ id, title: t.title, shared, choice: stored, version: r.value.game.version });
     setTitle(t.title);
+    setMessage('');
     setNote({
-      text: (r.value.created ? `Published "${t.title}".` : `Updated "${t.title}".`)
+      text: (r.value.created ? `Published "${t.title}".` : `Updated "${t.title}": version ${r.value.game.version ?? ''} saved.`)
         + (!shared ? ' Only you can see it until you share it with your class.'
           : stored === 'play' ? ' Your class can play it from Library → Games.'
           : ' Your class can play and remix it from Library → Games.')
@@ -280,7 +302,56 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
               </span>
               {' · '}
               <a href={playHref(published.id)} style={{ color: 'var(--c-cyan)' }}>Play page</a>
+              {published.version ? <>{' · '}<a href={gameChangesHref(published.id, 'history')} style={{ color: 'var(--c-cyan)' }}>History (version {published.version})</a></> : null}
             </p>
+          )}
+          {published && ahead && aheadRes?.kind !== 'conflict' && (
+            <div style={{ margin: '0 0 8px', padding: '8px 10px', border: '1px solid color-mix(in srgb, var(--c-orange) 55%, transparent)', borderRadius: 4 }}>
+              Your game is at version {ahead.newest}, but your sandbox code is version {ahead.from}
+              {' '}(you accepted a change, or updated from another computer). Bring it in first, or Update replaces it.
+              <div style={{ marginTop: 6 }}>
+                <button type="button" style={{ ...quiet, fontSize: 12, padding: '4px 10px' }} disabled={busy} onClick={() => {
+                  setBusy(true);
+                  void bringInOwnNewest().then((r) => {
+                    setBusy(false);
+                    setAheadRes(r);
+                    if (r.kind === 'merged') { setAhead(null); setAheadRes(null); setNote({ text: `Brought in version ${r.version}. Your code from before is in History. Run it, then Update.`, bad: false }); }
+                    else if (r.kind === 'error') setNote({ text: r.text, bad: true });
+                  });
+                }}>Bring in version {ahead.newest}</button>
+              </div>
+            </div>
+          )}
+          {published && aheadRes?.kind === 'conflict' && (
+            <div style={{ margin: '0 0 8px', padding: '8px 10px', border: '1px solid color-mix(in srgb, var(--c-orange) 55%, transparent)', borderRadius: 4 }}>
+              <div style={{ color: 'var(--c-orange)' }}>{aheadRes.text}</div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
+                <button type="button" style={{ ...quiet, fontSize: 12, padding: '4px 10px' }} onClick={() => { setAheadRes(null); setAhead(null); }}>Keep my sandbox code</button>
+                <button type="button" style={{ ...quiet, fontSize: 12, padding: '4px 10px' }} onClick={() => {
+                  startFromOwnNewest(aheadRes.newestCode, aheadRes.version, published.title);
+                  setAheadRes(null); setAhead(null);
+                  setNote({ text: `Your sandbox has version ${aheadRes.version} now. Your old code is in History.`, bad: false });
+                }}>Take version {aheadRes.version}</button>
+              </div>
+            </div>
+          )}
+          {published && (
+            <>
+              <label style={{ display: 'block', margin: '0 0 4px' }} htmlFor="publish-game-message">What did you change?</label>
+              <input
+                id="publish-game-message"
+                value={message}
+                maxLength={MESSAGE_MAX}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter' && !busy) void go(false); }}
+                placeholder="Added a second level"
+                style={{
+                  width: '100%', boxSizing: 'border-box', padding: '6px 8px', borderRadius: 4, fontSize: 13,
+                  background: 'var(--c-deep)', color: 'var(--c-fg)', border: '1px solid var(--c-line)',
+                }}
+              />
+              <div style={{ margin: '0 0 8px' }}><GitHubWord>{GITHUB_WORD.version}</GitHubWord></div>
+            </>
           )}
           <label style={{ display: 'block', margin: '0 0 4px' }} htmlFor="publish-game-title">Title</label>
           <input
@@ -344,7 +415,10 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
             </div>
           )}
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <button type="button" style={{ ...primary, opacity: busy ? 0.6 : 1 }} disabled={busy} onClick={() => void go(gone && !published)}>
+            <button type="button" style={{ ...primary, opacity: busy || (!!published && !message.trim()) ? 0.6 : 1 }}
+              disabled={busy || (!!published && !message.trim())}
+              title={published && !message.trim() ? 'Say what you changed first' : undefined}
+              onClick={() => void go(gone && !published)}>
               {busy ? 'Publishing…' : published ? 'Update game' : gone ? 'Publish as a new game' : 'Publish'}
             </button>
             {published && (

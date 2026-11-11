@@ -20,6 +20,7 @@ import SoundMixer from './SoundMixer';
 import ClassLibraryPanel from './ClassLibraryPanel';
 import DocsDrawer from './DocsDrawer';
 import PublishGameButton from './PublishGameButton';
+import ProposeChangeButton from './ProposeChangeButton';
 import CodeTogetherBar, { useCodeTogetherAvailable } from './CodeTogetherBar';
 import { RUN_TIMEOUT_MS, errorWithLocation, runStudentCode, timerLimitMessage } from '../lib/js-runner-source';
 import {
@@ -800,7 +801,11 @@ export default function SandboxWorkspace() {
                   )}
                   {/* The Games library: publish this sketch so classmates can play and remix it. */}
                   {mode.preview === 'moshion' && lessonProgress.authed && (
-                    <PublishGameButton getCode={getScript} />
+                    <>
+                      <PublishGameButton getCode={getScript} />
+                      {/* Shown only while the code is a remix of a classmate's game: send the change back (lib/game-flow-core.ts). */}
+                      <ProposeChangeButton getCode={getScript} />
+                    </>
                   )}
                 </div>
               )}

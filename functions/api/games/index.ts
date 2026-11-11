@@ -17,11 +17,19 @@
 // initial) and choice from the original's own row, refuses a remix of a "just
 // play" game (403), and holds a remix of a "keep remixes open" game to 'open'
 // (any other choice is 400, now and on every later update).
+//
+// Versions (migration 0048, lib/game-flow-core.ts): every publish and update saves a version of the
+// code. An update takes `message`, "What did you change?" (1-80 characters); a body without one (a
+// stale cached page) is saved as "Updated the game" rather than lost. A save that races another save
+// of the same game answers 409 and changes nothing.
 
 import { json, type SessionData } from '../../_shared/games';
 import { GAME_CODE_MAX, GAME_MAX_PER_OWNER, checkCode, cleanTitle, declaredMode, isGameId } from '../../../lib/games-core';
 import { newUploadId } from '../../_shared/uploads';
 import { originalGame } from '../../_shared/shareChoice';
+import { firstVersionStmt, openChangeCounts, saveVersionStmts, savedAs } from '../../_shared/gameFlow';
+import { ownerName } from '../../_shared/games';
+import { cleanMessage } from '../../../lib/game-flow-core';
 import {
   PROVENANCE_COLUMNS,
   canRemix,
@@ -52,17 +60,20 @@ interface MineRow extends ProvenanceRow {
   updated_at: number;
   shared: number;
   share_choice: string | null;
+  version: number;
 }
 
 export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ env, data }: Ctx) => {
   const r = await env.DB.prepare(
-    `SELECT id, title, mode, players, LENGTH(code) AS bytes, created_at, updated_at, share_choice, ${PROVENANCE_COLUMNS},
+    `SELECT id, title, mode, players, LENGTH(code) AS bytes, created_at, updated_at, share_choice, version, ${PROVENANCE_COLUMNS},
             EXISTS (SELECT 1 FROM library_game_shares s WHERE s.game_id = library_games.id) AS shared
        FROM library_games WHERE owner_email = ? AND deleted_at IS NULL
       ORDER BY updated_at DESC`,
   ).bind(data.email).all<MineRow>();
+  const open = await openChangeCounts(env.DB, (r.results ?? []).map((g) => g.id));
   return json({
     games: (r.results ?? []).map((g) => ({
+      version: g.version ?? 1, openChanges: open.get(g.id) ?? 0,
       id: g.id, title: g.title, mode: g.mode, players: g.players, bytes: g.bytes,
       createdAt: g.created_at, updatedAt: g.updated_at, shared: !!g.shared,
       choice: choiceOf(g.share_choice), remixedFrom: provenanceFromRow(g),
@@ -75,7 +86,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ r
   if (Number(request.headers.get('Content-Length') || 0) > MAX_BODY) {
     return json({ error: `That is too large to publish; the most a game can be is ${GAME_CODE_MAX / 1024} KB of code.` }, 413);
   }
-  let body: { id?: unknown; title?: unknown; code?: unknown; choice?: unknown; remixedFrom?: unknown };
+  let body: { id?: unknown; title?: unknown; code?: unknown; choice?: unknown; remixedFrom?: unknown; message?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -91,19 +102,33 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ r
   if (body.id !== undefined && body.id !== null) {
     if (!isGameId(body.id)) return json({ error: 'Not found' }, 404);
     const existing = await env.DB.prepare(
-      `SELECT share_choice, ${PROVENANCE_COLUMNS} FROM library_games WHERE id = ? AND owner_email = ? AND deleted_at IS NULL`,
-    ).bind(body.id, data.email).first<ProvenanceRow & { share_choice: string | null }>();
+      `SELECT share_choice, version, ${PROVENANCE_COLUMNS} FROM library_games WHERE id = ? AND owner_email = ? AND deleted_at IS NULL`,
+    ).bind(body.id, data.email).first<ProvenanceRow & { share_choice: string | null; version: number }>();
     if (!existing) return json({ error: 'Not found' }, 404);
     // Where it came from was fixed when it was first published; an update never moves it.
     const remixedFrom = provenanceFromRow(existing);
     const ch = decideChoice(body.choice ?? choiceOf(existing.share_choice), remixedFrom);
     if ('error' in ch) return json(ch, 400);
-    const res = await env.DB.prepare(
-      `UPDATE library_games SET title = ?, code = ?, mode = ?, players = ?, share_choice = ?, updated_at = ?
-        WHERE id = ? AND owner_email = ? AND deleted_at IS NULL`,
-    ).bind(t.title, c.code, mode, players, ch.choice, now, body.id, data.email).run();
-    if (!res.meta || res.meta.changes === 0) return json({ error: 'Not found' }, 404);
-    return json({ ok: true, created: false, game: { id: body.id, title: t.title, mode, players, updatedAt: now, choice: ch.choice, remixedFrom } });
+    const m = body.message === undefined || body.message === null ? { message: 'Updated the game' } : cleanMessage(body.message, 'version');
+    if ('error' in m) return json({ error: m.error }, 400);
+    const me = await ownerName(env.DB, data.email);
+    const expect = existing.version ?? 1;
+    try {
+      await env.DB.batch(saveVersionStmts(env.DB, {
+        gameId: body.id, expectVersion: expect, code: c.code, mode, players, message: m.message,
+        authorEmail: data.email, authorName: me, ownerName: me, now,
+        set: { title: t.title, share_choice: ch.choice },
+      }));
+    } catch {
+      return json({ error: 'Your game was saved somewhere else a moment ago. Try again.' }, 409);
+    }
+    if (!(await savedAs(env.DB, body.id, expect, c.code))) {
+      const still = await env.DB.prepare(`SELECT 1 AS x FROM library_games WHERE id = ? AND owner_email = ? AND deleted_at IS NULL`)
+        .bind(body.id, data.email).first();
+      if (!still) return json({ error: 'Not found' }, 404);
+      return json({ error: 'Your game was saved somewhere else a moment ago. Try again.' }, 409);
+    }
+    return json({ ok: true, created: false, game: { id: body.id, title: t.title, mode, players, updatedAt: now, choice: ch.choice, remixedFrom, version: expect + 1 } });
   }
 
   const count = await env.DB.prepare(
@@ -126,11 +151,13 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ r
   if ('error' in ch) return json(ch, 400);
   const p = provenanceToRow(remixedFrom);
   const id = newUploadId();
-  await env.DB.prepare(
+  const me = await ownerName(env.DB, data.email);
+  await env.DB.batch([env.DB.prepare(
     `INSERT INTO library_games (id, owner_email, title, code, mode, players, created_at, updated_at, share_choice, ${PROVENANCE_COLUMNS})
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   ).bind(id, data.email, t.title, c.code, mode, players, now, now, ch.choice,
     p.remixed_from_id, p.remixed_from_title, p.remixed_from_author, p.remixed_from_choice,
-    p.origin_id, p.origin_title, p.origin_author).run();
-  return json({ ok: true, created: true, game: { id, title: t.title, mode, players, updatedAt: now, choice: ch.choice, remixedFrom } }, 201);
+    p.origin_id, p.origin_title, p.origin_author),
+  firstVersionStmt(env.DB, id, c.code, data.email, me, now)]);
+  return json({ ok: true, created: true, game: { id, title: t.title, mode, players, updatedAt: now, choice: ch.choice, remixedFrom, version: 1 } }, 201);
 };

@@ -13,6 +13,7 @@
 
 import { canManageClass } from './classAuth';
 import { r2Key } from './library';
+import { closeChangesStmts } from './gameFlow';
 
 export type SessionData = { email: string; role: 'admin' | 'teacher' | 'student' };
 
@@ -76,6 +77,8 @@ export async function deleteLibraryItemFor(db: D1Database, bucket: R2Bucket | un
 /** Tombstone one game for its owner and take it out of every class. Games have no bytes in R2. */
 export async function deleteGameFor(db: D1Database, owner: string, id: string, now = Date.now()): Promise<void> {
   await db.batch([
+    // Its open proposed changes close (migration 0048); before the tombstone, so they still match.
+    ...closeChangesStmts(db, 'g.id = ? AND g.owner_email = ? AND g.deleted_at IS NULL', [id, owner], now),
     db.prepare(`UPDATE library_games SET deleted_at = ?, updated_at = ? WHERE id = ? AND owner_email = ? AND deleted_at IS NULL`)
       .bind(now, now, id, owner),
     db.prepare(`DELETE FROM library_game_shares WHERE game_id = ?`).bind(id),
@@ -105,6 +108,14 @@ export async function clearLibraryOf(db: D1Database, bucket: R2Bucket | undefine
   const uploads = (await db.prepare(`SELECT id FROM uploads WHERE owner_email = ?`).bind(owner).all<{ id: string }>()).results ?? [];
 
   await db.batch([
+    // Proposed changes (migration 0048): those on this account's games close, and this account's own
+    // open proposals to classmates' games are removed, with an event in each conversation.
+    ...closeChangesStmts(db, 'g.owner_email = ? AND g.deleted_at IS NULL', [owner], now),
+    db.prepare(
+      `INSERT INTO game_change_comments (id, change_id, kind, author_email, author_name, body, created_at)
+       SELECT lower(hex(randomblob(16))), id, 'event', '', 'A teacher', 'removed', ? FROM game_changes WHERE from_email = ? AND status = 'open'`,
+    ).bind(now, owner),
+    db.prepare(`UPDATE game_changes SET status = 'removed', decided_at = ?, updated_at = ? WHERE from_email = ? AND status = 'open'`).bind(now, now, owner),
     db.prepare(`DELETE FROM library_shares WHERE item_id IN (SELECT id FROM library_items WHERE owner_email = ?)`).bind(owner),
     db.prepare(`UPDATE library_items SET deleted_at = ?, updated_at = ? WHERE owner_email = ? AND deleted_at IS NULL`).bind(now, now, owner),
     db.prepare(`DELETE FROM library_game_shares WHERE game_id IN (SELECT id FROM library_games WHERE owner_email = ?)`).bind(owner),

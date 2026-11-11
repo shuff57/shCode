@@ -631,6 +631,21 @@ app.prepare().catch((err) => {
     server.get('/api/games/:id/assets', libRoute(gamesAssets.onRequestGet));
     server.get('/api/classes/:id/game-shares', libRoute(gamesModerate.onRequestGet));
     server.post('/api/classes/:id/game-shares', express.json(), libRoute(gamesModerate.onRequestPost));
+    // Versions, proposed changes and their conversations (migration 0048, lib/game-flow-core.ts). Two
+    // dev_student cookies are the maker and a classmate who remixes and proposes.
+    const gamesVersions = await import('./functions/api/games/[id]/versions.ts');
+    const gamesChanges = await import('./functions/api/games/[id]/changes.ts');
+    const changeOne = await import('./functions/api/game-changes/[cid].ts');
+    const changeInbox = await import('./functions/api/game-changes/index.ts');
+    const classChanges = await import('./functions/api/classes/[id]/game-changes.ts');
+    server.get('/api/games/:id/versions', libRoute(gamesVersions.onRequestGet));
+    server.post('/api/games/:id/versions', express.json(), libRoute(gamesVersions.onRequestPost));
+    server.get('/api/games/:id/changes', libRoute(gamesChanges.onRequestGet));
+    server.post('/api/games/:id/changes', express.json({ limit: '200kb' }), libRoute(gamesChanges.onRequestPost));
+    server.get('/api/game-changes', libRoute(changeInbox.onRequestGet));
+    server.get('/api/game-changes/:cid', libRoute(changeOne.onRequestGet));
+    server.post('/api/game-changes/:cid', express.json(), libRoute(changeOne.onRequestPost));
+    server.get('/api/classes/:id/game-changes', libRoute(classChanges.onRequestGet));
     // A teacher deleting a student's shared item or game, or clearing their whole Library
     // (functions/_shared/libraryDelete.ts). Dev uploads live in the stub map below, not this database.
     const libDelete = await import('./functions/api/classes/[id]/library-delete.ts');
