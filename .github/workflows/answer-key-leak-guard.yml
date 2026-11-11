@@ -37,7 +37,10 @@ env:
 jobs:
   answer-key-leak-guard:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # Runs take ~75 s warm, under 4.5 min cold (peak 4.1 min before the caches).
+    # 15 leaves room for a cold cache on a slow runner, and a hung build now
+    # holds a runner 15 min instead of 45.
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
