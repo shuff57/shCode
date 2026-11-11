@@ -643,6 +643,11 @@ app.prepare().catch((err) => {
     const prefsRoute = await import('./functions/api/prefs.ts');
     server.get('/api/prefs', libRoute(prefsRoute.onRequestGet));
     server.put('/api/prefs', express.json(), libRoute(prefsRoute.onRequestPut));
+    // A sketch's 'remote' saves (functions/api/sketch-saves.ts, #97), same database. The page
+    // flushes them with fetch keepalive on page hide, which is still application/json.
+    const sketchSaves = await import('./functions/api/sketch-saves.ts');
+    server.get('/api/sketch-saves', libRoute(sketchSaves.onRequestGet));
+    server.put('/api/sketch-saves', express.json({ limit: '200kb' }), libRoute(sketchSaves.onRequestPut));
     server.get('/api/library', libRoute(libList.onRequestGet));
     server.get('/api/library/shared', libRoute(shareList.onRequestGet));
     server.get('/api/library/shared/:id', libRoute(shareOne.onRequestGet));

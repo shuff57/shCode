@@ -389,17 +389,35 @@
 	// keeps the store and hands us a copy. Wait for it BEFORE running the
 	// sketch: moSHion's getItem() is synchronous, and a save that arrived after
 	// setup() had already read it would be worse than no save at all.
+	//
+	// A sketch that saves to 'remote' (#97, extras.js save/load) needs its
+	// account's saves too, which the page has to fetch first. The page answers
+	// 'preview-storage-wait' at once, which stops the asking and swaps the short
+	// no-host fallback for a long one; the init that follows carries `remote`
+	// (the map) and `remoteState` ('ready' | 'signed-out' | 'offline').
 	var started = false;
-	function start(store) {
+	function start(store, remote, remoteState) {
 		if (started) return;
 		started = true;
 		clearInterval(ask);
+		clearTimeout(fallback);
 		window.removeEventListener('message', onInit);
 		window.__moshionStorage = (store && typeof store === 'object') ? store : {};
+		if (remoteState) {
+			window.__moshionRemoteState = remoteState;
+			window.__moshionRemote = (remote && typeof remote === 'object') ? remote : {};
+		}
 		inject();
 	}
 	function onInit(e) {
-		if (e.data && e.data.source === 'preview-storage-init') start(e.data.data);
+		var d = e.data;
+		if (!d) return;
+		if (d.source === 'preview-storage-init') start(d.data, d.remote, d.remoteState);
+		else if (d.source === 'preview-storage-wait' && !started) {
+			clearInterval(ask);
+			clearTimeout(fallback);
+			fallback = setTimeout(function () { start({}, null, 'offline'); }, 8000);
+		}
 	}
 	function request() {
 		try { window.parent.postMessage({ source: 'preview-storage-request' }, '*'); }
@@ -412,7 +430,7 @@
 	// store after the timeout rather than a sketch that never starts.
 	var ask = setInterval(request, 40);
 	request();
-	setTimeout(function () { start({}); }, 400);
+	var fallback = setTimeout(function () { start({}); }, 400);
 })();
 </script>
 </body>

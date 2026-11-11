@@ -2,7 +2,8 @@
 
 import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { useMoshionStorage } from '../lib/moshion-storage';
-import { useMoshionOnline } from '../lib/moshion-online';
+import { useMoshionOnline, roomGameKey } from '../lib/moshion-online';
+import { wantsRemote } from '../lib/sketch-saves-core';
 import MoshionLobby from './MoshionLobby';
 import type { GameAsset } from '../lib/game-assets';
 
@@ -46,7 +47,9 @@ const MoshionPreview = forwardRef<HTMLIFrameElement, Props>(function MoshionPrev
   // the same node rather than replaced.
   const innerRef = useRef<HTMLIFrameElement | null>(null);
   useImperativeHandle(ref, () => innerRef.current as HTMLIFrameElement, [runKey]);
-  useMoshionStorage(innerRef, { assets, ownWins: assetsOwnWins });
+  // 'remote' saves (#97) live under the same key the rooms use, so a Library
+  // game keeps each player's progress per game and a lesson per lesson.
+  useMoshionStorage(innerRef, { assets, ownWins: assetsOwnWins }, { key: roomGameKey(gameKey), wanted: wantsRemote(code) });
   const online = useMoshionOnline(innerRef, gameKey);
   const lobby = online.lobby;
 

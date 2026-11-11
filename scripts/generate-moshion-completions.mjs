@@ -97,6 +97,10 @@ for (const owner of Object.keys({ ...members, ...parents })) flat[owner] = resol
 globals.push(
   { label: 'rgba', type: 'function', detail: '(r, g, b, a)', info: 'A colour with alpha: red, green, blue 0-255 and alpha 0-1.' },
   { label: 'randomColor', type: 'function', detail: '(a?)', info: 'A random colour, optionally with alpha.' },
+  // save/load/saved (#97): 'local' is this browser (storeItem), 'remote' the student's account.
+  { label: 'save', type: 'function', detail: "(name, value, where?)", info: "Save a value under a name. where: 'local' (this browser, the default) or 'remote' (your account, on any computer)." },
+  { label: 'load', type: 'function', detail: "(name, where?)", info: "Read a saved value back, or null. where: 'local' (default) or 'remote'." },
+  { label: 'saved', type: 'function', detail: "(name, defaults, where?)", info: "A saved object: its saved fields over the defaults. Change it, then call .save() (or .save('remote'))." },
   { label: 'online', type: 'variable', detail: 'Online', info: 'Play with a classmate on another computer: host(), join(code), send(move), onMove(fn).' },
   // multiplayer() and what it adds (extras.js; codehs-review/MULTIPLAYER-SPEC.md).
   { label: 'multiplayer', type: 'function', detail: "(mode, players?, { realtime? })", info: "Call once in setup(): 'none', 'local' (one keyboard), 'coop' or 'versus' (online, with a lobby), for 2-4 players. { realtime: true }: a real-time room." },
