@@ -32,7 +32,7 @@
 // Without --occt it emits only our own layer and says what is missing, rather
 // than writing a half-bundle that fails at runtime with a 404.
 
-import { execFileSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import {
   copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync,
 } from 'node:fs';
@@ -108,6 +108,9 @@ mkdirSync(dest, { recursive: true });
 // common ancestor across kernel+script+sketch) and nest the output
 // (dest/kernel/src/occt-build.js, ...), which the browser cannot fetch from
 // the flat /reshape/kernel/ paths dynamicImportKernel() hardcodes.
+// The three compiles write disjoint files, so they run side by side; any one
+// failing (a type error included) still fails the build.
+const compiles = [];
 for (const [pkg, files] of Object.entries(PACKAGE_SOURCES)) {
   const srcDir = path.join(reshapeCadRoot, pkg, 'src');
   const existingFiles = files.filter((f) => existsSync(path.join(srcDir, f)));
@@ -119,21 +122,25 @@ for (const [pkg, files] of Object.entries(PACKAGE_SOURCES)) {
     console.log(`  [${pkg}] No source files found, skipping package`);
     continue;
   }
-  execFileSync(
-    process.execPath,
-    [
-      path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
-      ...existingFiles.map((f) => path.join(srcDir, f)),
-      '--outDir', dest,
-      '--rootDir', srcDir,
-      '--module', 'es2022',
-      '--target', 'es2022',
-      '--moduleResolution', 'bundler',
-      '--skipLibCheck',
-    ],
-    { cwd: root, stdio: 'inherit' },
-  );
+  const args = [
+    path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'),
+    ...existingFiles.map((f) => path.join(srcDir, f)),
+    '--outDir', dest,
+    '--rootDir', srcDir,
+    '--module', 'es2022',
+    '--target', 'es2022',
+    '--moduleResolution', 'bundler',
+    '--skipLibCheck',
+  ];
+  compiles.push(new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, args, { cwd: root, stdio: 'inherit' });
+    child.on('error', reject);
+    child.on('exit', (code, signal) => (code === 0
+      ? resolve()
+      : reject(new Error(`tsc for the ${pkg} package failed (${signal ?? `exit ${code}`})`))));
+  }));
 }
+await Promise.all(compiles);
 
 // tsc leaves `from './model-types'` (legal TypeScript, not a legal browser
 // module specifier) and, at a package boundary, `from '@shuff57/reshape-script/model-types'`

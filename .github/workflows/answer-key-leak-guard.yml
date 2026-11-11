@@ -21,6 +21,10 @@ on:
   schedule:
     - cron: '27 7 * * *'
   workflow_dispatch:
+    inputs:
+      cpus:
+        description: 'EXPERIMENT: static export workers (0 = Next default)'
+        default: '4'
 
 permissions:
   contents: read
@@ -28,7 +32,7 @@ permissions:
 # A newer push to the same branch or PR supersedes the run in flight: the
 # guard checks the whole tree, so only the newest commit's verdict matters.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.cpus }}
   cancel-in-progress: true
 
 env:
@@ -36,7 +40,7 @@ env:
   # Next defaults to (cores - 1) static-page workers, leaving one of the
   # runner's 4 vCPUs idle through the ~2,100-page export. next.config.js
   # reads this; unset (a dev machine) keeps Next's own default.
-  NEXT_BUILD_CPUS: '4'
+  NEXT_BUILD_CPUS: ${{ inputs.cpus || '4' }}
 
 jobs:
   answer-key-leak-guard:

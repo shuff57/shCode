@@ -19,6 +19,24 @@ const groupsDir = path.join(root, 'curriculum', 'groups');
 const lessonsDir = path.join(root, 'lessons');
 const modulesDir = path.join(root, 'curriculum', 'modules');
 
+// Every lesson folder's parsed lesson.json, read once for the whole run
+// rather than once per group file.
+let metasPromise = null;
+function lessonMetas() {
+  metasPromise ??= (async () => {
+    const dirs = (await fs.readdir(lessonsDir, { withFileTypes: true })).filter((d) => d.isDirectory());
+    const metas = await Promise.all(dirs.map(async (dir) => {
+      try {
+        return { dir, meta: JSON.parse(await fs.readFile(path.join(lessonsDir, dir.name, 'lesson.json'), 'utf8')) };
+      } catch {
+        return null;
+      }
+    }));
+    return metas.filter(Boolean);
+  })();
+  return metasPromise;
+}
+
 async function moduleScreens(moduleId) {
   // Mirrors listLessonsInModule() in lib/curriculum.ts: a lesson belongs to a
   // module when the number on its TITLE starts with the module id, and to the
@@ -32,14 +50,7 @@ async function moduleScreens(moduleId) {
     if (m) category = m[1].trim().replace(/^["']|["']$/g, '');
   }
   const out = [];
-  for (const dir of await fs.readdir(lessonsDir, { withFileTypes: true })) {
-    if (!dir.isDirectory()) continue;
-    let meta;
-    try {
-      meta = JSON.parse(await fs.readFile(path.join(lessonsDir, dir.name, 'lesson.json'), 'utf8'));
-    } catch {
-      continue;
-    }
+  for (const { dir, meta } of await lessonMetas()) {
     const numbered = String(meta.title || '').match(/^(\d+\.\d+\.\d+)/)?.[1];
     if (!numbered) continue;
     if (!(numbered === moduleId || numbered.startsWith(moduleId + '.'))) continue;
