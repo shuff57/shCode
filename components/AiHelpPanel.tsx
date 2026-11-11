@@ -31,8 +31,19 @@ export default function AiHelpPanel({ lesson }: Props) {
   const [streaming, setStreaming] = useState(false);
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // An answer could not be fetched (not a question the safety check held back): CODY's oops face.
+  const [failed, setFailed] = useState(false);
   const [quota, setQuota] = useState<{ limit: number; remaining: number } | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  // Offline turns CODY's face sleepy (#88); it wakes when the connection is back.
+  const [offline, setOffline] = useState(false);
+  useEffect(() => {
+    const update = () => setOffline(typeof navigator !== 'undefined' && navigator.onLine === false);
+    update();
+    window.addEventListener('online', update);
+    window.addEventListener('offline', update);
+    return () => { window.removeEventListener('online', update); window.removeEventListener('offline', update); };
+  }, []);
 
   // Track the most recent runtime error so the user can ask "what's wrong?"
   // without having to retype anything.
@@ -50,6 +61,7 @@ export default function AiHelpPanel({ lesson }: Props) {
   async function ask(userQuery: string) {
     if (streaming) return;
     setError(null);
+    setFailed(false);
     setChecking(true);
     // Safety gate (regex + on-device ML): blocks before any network call,
     // before the response area is cleared, before anything changes except
@@ -103,6 +115,7 @@ export default function AiHelpPanel({ lesson }: Props) {
           detail = `HTTP ${res.status}`;
         }
         setError(detail || `HTTP ${res.status}`);
+        setFailed(true);
         setStreaming(false);
         return;
       }
@@ -119,6 +132,7 @@ export default function AiHelpPanel({ lesson }: Props) {
     } catch (e: unknown) {
       if ((e as Error).name === 'AbortError') return;
       setError(e instanceof Error ? e.message : String(e));
+      setFailed(true);
     } finally {
       setStreaming(false);
       abortRef.current = null;
@@ -144,7 +158,7 @@ export default function AiHelpPanel({ lesson }: Props) {
     if (q) ask(q);
   };
 
-  const cody = codyState({ busy: streaming || checking, hasAnswer: !!response.trim() });
+  const cody = codyState({ busy: streaming || checking, hasAnswer: !!response.trim(), failed, offline });
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, gap: 10 }}>
