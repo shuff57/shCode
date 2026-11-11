@@ -548,6 +548,18 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   (`components/PrefsSync.tsx`) and clears it on sign-out. UI: `components/AppearanceSettings.tsx` on `/account`; the
   home background is `components/HomeBackdrop.tsx`. Tests: `scripts/test-prefs.mjs`.
 
+### moSHion fonts and text layout (2026-11-12, phase 1 of 3)
+`textFont('name')`, `fontNames()`, `textWeight(100..900)`, `textStyle()`, `textDecoration(UNDERLINE|STRIKETHROUGH|NONE)`,
+`textOutline(color, px)`, `textSpacing(px)`, `textLeading(px)`, `textWrap(width, WORD|CHAR)`, and `\n` in `text()` starts a
+new line. All in the engine's text section (upstream `moshion` first, then vendored; VENDORED.md). The 15 built-in fonts
+(OFL, Roboto Slab Apache-2.0) are latin WOFF2 in `public/moshion/fonts/` with `LICENSES/` and the catalog `fonts.js`,
+written by `node scripts/fetch-moshion-fonts.mjs` (run by hand, output committed, so students' browsers never contact
+Google). A font is fetched in CORS mode, so `public/_headers` and `server.js` allow `/moshion/fonts/*` like
+`/moshion/assets/*`; without that every built-in font falls back to monospace in the sandboxed runner. `runner.html`
+waits up to 2 s for the fonts a sketch names in `textFont('...')`. A saved font is a `font:<name>` data URI in the store
+(the Library side is phase 2: migration 0050, Library Fonts tab, sandbox drawer, `/fonts`; phase 3 is the font maker).
+A sketch that uses none of this draws exactly as before ('14px monospace', same canvas calls).
+
 ### Online game rooms (Phase 6, board games)
 - A sketch plays a classmate on another computer through `online` (`public/moshion/extras.js`, NOT the vendored
   engine): `host(players?)`, `join(code)`, `send(move)`, `onMove(fn(move, seat))`, `leave()`, plus `status`, `code`,

@@ -95,6 +95,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "info": ""
  },
  {
+  "label": "CHAR",
+  "type": "constant",
+  "detail": "'char'",
+  "info": ""
+ },
+ {
   "label": "circle",
   "type": "function",
   "detail": "(x: number, y: number, d: number): void",
@@ -207,6 +213,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "type": "function",
   "detail": "(n: number): number",
   "info": ""
+ },
+ {
+  "label": "fontNames",
+  "type": "function",
+  "detail": "(): string[]",
+  "info": "Every font name textFont() accepts right now: 'monospace', the built-in fonts and the ones you saved, sorted."
  },
  {
   "label": "frameCount",
@@ -431,6 +443,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "info": ""
  },
  {
+  "label": "NONE",
+  "type": "constant",
+  "detail": "'none'",
+  "info": ""
+ },
+ {
   "label": "NORMAL",
   "type": "constant",
   "detail": "'normal'",
@@ -635,6 +653,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "info": ""
  },
  {
+  "label": "STRIKETHROUGH",
+  "type": "constant",
+  "detail": "'line-through'",
+  "info": ""
+ },
+ {
   "label": "stroke",
   "type": "function",
   "detail": "(c: string | number): void",
@@ -665,16 +689,46 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "info": ""
  },
  {
+  "label": "textDecoration",
+  "type": "function",
+  "detail": "(...lines: Array<'underline' | 'line-through' | 'none'>): void",
+  "info": "A line under the text (UNDERLINE), through it (STRIKETHROUGH), both, or NONE."
+ },
+ {
+  "label": "textFont",
+  "type": "function",
+  "detail": "(name: string): void",
+  "info": "The typeface for text(): a built-in font ('sans', 'serif', 'code', 'rounded', 'pixel', 'arcade', 'handwriting', 'comic', 'bubbly', 'space', 'spooky', 'slab', 'b"
+ },
+ {
   "label": "textLayer",
   "type": "function",
   "detail": "(n?: number | null): void",
   "info": "Puts the text() calls that follow, in draw(), on layer `n` among the sprites: over every sprite whose `.layer` is `n` or lower, under every sprite whose `.layer"
  },
  {
+  "label": "textLeading",
+  "type": "function",
+  "detail": "(px: number | null): void",
+  "info": "Pixels from one line of text to the next (a '\\n' in text(), or textWrap())."
+ },
+ {
+  "label": "textOutline",
+  "type": "function",
+  "detail": "(color?: string | number | null, thickness?: number): void",
+  "info": "An outline around every letter, drawn behind it: textOutline('black', 3)."
+ },
+ {
   "label": "textSize",
   "type": "function",
   "detail": "(px: number): void",
   "info": ""
+ },
+ {
+  "label": "textSpacing",
+  "type": "function",
+  "detail": "(px: number): void",
+  "info": "Extra pixels between letters; a negative number squeezes them."
  },
  {
   "label": "textStyle",
@@ -687,6 +741,18 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "type": "function",
   "detail": "(): string[]",
   "info": "Every texture name usable right now — built-ins plus saved art, sorted."
+ },
+ {
+  "label": "textWeight",
+  "type": "function",
+  "detail": "(weight: number): void",
+  "info": "How thick the letters are, 100 (thin) to 900 (heavy): 400 is normal, 700 is bold."
+ },
+ {
+  "label": "textWrap",
+  "type": "function",
+  "detail": "(width?: number | null, mode?: 'word' | 'char'): void",
+  "info": "Breaks text() onto new lines so it fits inside `width` pixels: between words (WORD, the default) or anywhere (CHAR)."
  },
  {
   "label": "Tiles",
@@ -704,6 +770,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "label": "TWO_PI",
   "type": "constant",
   "detail": "number",
+  "info": ""
+ },
+ {
+  "label": "UNDERLINE",
+  "type": "constant",
+  "detail": "'underline'",
   "info": ""
  },
  {
@@ -734,6 +806,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "label": "width",
   "type": "constant",
   "detail": "number",
+  "info": ""
+ },
+ {
+  "label": "WORD",
+  "type": "constant",
+  "detail": "'word'",
   "info": ""
  },
  {

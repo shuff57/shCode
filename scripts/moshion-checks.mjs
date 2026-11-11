@@ -300,10 +300,76 @@ export const SEMANTIC_CHECKS = [
         if (o.op === 'set:font') font = o.args[0];
         if (o.op === 'fillText') fonts.push(o.args[0] + '=' + font);
       }
-      const want = ['plain=20px monospace', 'bold=bold 20px monospace', 'both=bold italic 20px monospace', 'back=20px monospace', 'layered=italic 20px monospace'];
+      const want = ['plain=20px monospace', 'bold=700 20px monospace', 'both=italic 700 20px monospace', 'back=20px monospace', 'layered=italic 20px monospace'];
       if (JSON.stringify(fonts) !== JSON.stringify(want)) return `fonts ${JSON.stringify(fonts)}, wanted ${JSON.stringify(want)}`;
       if (box.sandbox.now !== 'italic') return `textStyle() returned ${box.sandbox.now}, wanted italic`;
       if (!/^textStyle\(style\): style must be NORMAL, BOLD, ITALIC or BOLDITALIC/.test(box.sandbox.bad)) return `textStyle('bolt') said: ${box.sandbox.bad}`;
+      return true;
+    },
+  },
+  {
+    name: 'textFont/textWeight: a built-in font and a weight reach the canvas font; an unknown font warns once and changes nothing',
+    area: 'drawing',
+    // The fonts work (2026-11-12). Built-ins come from public/moshion/fonts/fonts.js, which the harness loads like runner.html.
+    run({ createSandbox }) {
+      const box = createSandbox();
+      box.run(`
+        function setup(){ new Canvas(200,200); }
+        function draw(){
+          textSize(20);
+          textFont('rounded'); textWeight(300); text('a', 10, 20);
+          textStyle(ITALIC); text('b', 10, 40);
+          textFont('nope'); textFont('nope'); text('c', 10, 60);
+          textFont('monospace'); textStyle(NORMAL); text('d', 10, 80);
+          names = fontNames(); now = textFont();
+          try { textWeight(1500); bad = 'no error'; } catch (e) { bad = e.message; }
+          noLoop();
+        }
+      `);
+      if (box.errors.length) return `sketch threw: ${box.errors[0].message}`;
+      box.pump(1);
+      const fonts = [];
+      let font = null;
+      for (const o of box.ops) {
+        if (o.op === 'set:font') font = o.args[0];
+        if (o.op === 'fillText') fonts.push(o.args[0] + '=' + font);
+      }
+      const want = ['a=300 20px "moshion-rounded", monospace', 'b=italic 20px "moshion-rounded", monospace',
+        'c=italic 20px "moshion-rounded", monospace', 'd=20px monospace'];
+      if (JSON.stringify(fonts) !== JSON.stringify(want)) return `fonts ${JSON.stringify(fonts)}, wanted ${JSON.stringify(want)}`;
+      const warns = box.consoleLines.filter((l) => /No font named "nope"/.test(l.text ?? l));
+      if (warns.length !== 1) return `wanted one "No font named" warning, got ${warns.length}`;
+      if (!box.sandbox.names.includes('rounded') || !box.sandbox.names.includes('monospace')) return `fontNames() = ${box.sandbox.names}`;
+      if (box.sandbox.now !== 'monospace') return `textFont() = ${box.sandbox.now}`;
+      if (!/^textWeight\(weight\): weight must be a whole number/.test(box.sandbox.bad)) return `textWeight(1500) said: ${box.sandbox.bad}`;
+      return true;
+    },
+  },
+  {
+    name: 'text lines: \\n breaks, textWrap wraps, textLeading spaces them; decoration, outline and spacing paint where the line is',
+    area: 'drawing',
+    // The fonts work (2026-11-12). The harness measures every character as 6 px wide.
+    run({ createSandbox }) {
+      const box = createSandbox();
+      box.run(`
+        function setup(){ new Canvas(400,400); }
+        function draw(){
+          textSize(10);
+          text('one\\ntwo', 10, 20);
+          textLeading(30); textWrap(40); text('aaa bbb ccc', 100, 20); textWrap(); textLeading(null);
+          textAlign(CENTER); textDecoration(UNDERLINE, STRIKETHROUGH); text('abc', 200, 100); textDecoration(NONE); textAlign(LEFT);
+          textOutline('black', 3); text('o', 10, 200); textOutline();
+          textSpacing(4); text('xy', 10, 300); textSpacing(0);
+          noLoop();
+        }
+      `);
+      if (box.errors.length) return `sketch threw: ${box.errors[0].message}`;
+      box.pump(1);
+      const texts = box.ops.filter((o) => o.op === 'fillText' || o.op === 'strokeText').map((o) => `${o.op === 'strokeText' ? 'S:' : ''}${o.args[0]}@${o.args[1]},${o.args[2]}`);
+      const want = ['one@10,20', 'two@10,32.5', 'aaa@100,20', 'bbb@100,50', 'ccc@100,80', 'abc@191,100', 'S:o@10,200', 'o@10,200', 'x@10,300', 'y@20,300'];
+      if (JSON.stringify(texts) !== JSON.stringify(want)) return `text calls ${JSON.stringify(texts)}, wanted ${JSON.stringify(want)}`;
+      const lines = box.ops.filter((o) => o.op === 'fillRect').map((o) => o.args.map((n) => Math.round(n * 100) / 100).join(','));
+      if (!lines.includes('191,101.2,18,1') || !lines.includes('191,97,18,1')) return `decoration rects ${JSON.stringify(lines)}`;
       return true;
     },
   },

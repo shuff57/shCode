@@ -149,6 +149,13 @@ app.prepare().catch((err) => {
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
     next();
   });
+  // textFont()'s built-in fonts: a font is always fetched in CORS mode, so the
+  // sandboxed runner needs this too (public/_headers says the same).
+  server.use('/moshion/fonts', (_req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    next();
+  });
 
   // ---- gated dev stubs: fail-closed, explicit opt-in ----------------------
   // Everything between this if and its closing brace exists only to make

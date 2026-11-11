@@ -25,6 +25,10 @@ const EXTRAS = join(REPO, 'public', 'moshion', 'extras.js');
 // make-moshion-textures.py has run) and the engine already falls back to
 // saved-textures-only, so it is not fatal here.
 const TEXTURES = join(REPO, 'public', 'moshion', 'textures', 'textures.js');
+// The built-in font catalog (scripts/fetch-moshion-fonts.mjs), loaded before
+// moshion.js exactly as runner.html does, for the same reason as TEXTURES:
+// without it textFont('rounded') would warn here and work in the browser.
+const FONTS = join(REPO, 'public', 'moshion', 'fonts', 'fonts.js');
 
 const FRAME_MS = 1000 / 60;
 
@@ -336,6 +340,9 @@ export function createSandbox({ width = 800, height = 600 } = {}) {
   runInContext(readFileSync(PLANCK, 'utf8'), sandbox, { filename: 'planck.min.js' });
   if (existsSync(TEXTURES)) {
     runInContext(readFileSync(TEXTURES, 'utf8'), sandbox, { filename: 'textures.js' });
+  }
+  if (existsSync(FONTS)) {
+    runInContext(readFileSync(FONTS, 'utf8'), sandbox, { filename: 'fonts.js' });
   }
   runInContext(readFileSync(MOSHION, 'utf8'), sandbox, { filename: 'moshion.js' });
   runInContext(readFileSync(EXTRAS, 'utf8'), sandbox, { filename: 'extras.js' });

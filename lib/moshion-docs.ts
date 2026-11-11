@@ -2064,7 +2064,7 @@ textSize(px) sets the font size in pixels. fill(color) sets the text color (yes,
 
 You can also pass size and color directly to text(): text('hello', 10, 20, 18, 'gold'). The constants CENTER, LEFT, and RIGHT are available for textAlign.
 
-textStyle(BOLD) makes the text that follows bold, textStyle(ITALIC) slanted, and textStyle(BOLDITALIC) both. textStyle(NORMAL) goes back to plain. Like textSize(), it lasts until you change it, and each call replaces the last one: to get bold AND italic, use BOLDITALIC, not one call after the other.
+For a different typeface, bold, italic, underlines, outlines and wrapped lines, see the next three pages: Fonts, Weight and style, and Lines, outlines and spacing.
 
 You can build strings with + just like normal JavaScript: 'Score: ' + score.`,
         code: `let score = 0;
@@ -2093,6 +2093,134 @@ function draw() {
   fill('#888');
   textSize(12);
   text('press space to score', 20, 160);
+}`,
+      },
+      {
+        title: 'Fonts: textFont()',
+        body: `textFont('name') picks the typeface for the text() calls that follow. Like textSize(), it lasts until you change it.
+
+The built-in fonts:
+'sans' clean and plain
+'serif' like a book
+'code' code, every letter the same width
+'rounded' soft round ends
+'pixel' pixel art
+'arcade' old arcade screens
+'handwriting' written with a marker
+'comic' comic book
+'bubbly' round and bubbly
+'space' sci-fi
+'spooky' dripping horror
+'slab' thick square feet
+'blocky' big blocky signs
+'script' joined-up handwriting
+'tall' tall and narrow
+
+textFont('monospace') goes back to the default font. fontNames() lists every name textFont() knows, including fonts you saved in your Library.
+
+A name it does not know prints "No font named ..." in the console once, and the text keeps the font it had. Check the spelling: font names are in quotes and are case-sensitive.
+
+Fonts load while your sketch starts. The preview waits a moment for the fonts named in textFont('...'), so the first frame is right. A name built up from pieces (textFont('pix' + 'el')) works too, but can show the default font for a moment first.`,
+        code: `function setup() {
+  new Canvas(400, 300);
+}
+
+function draw() {
+  background('#1b1d2a');
+  fill('white');
+  textSize(26);
+
+  textFont('arcade');
+  text('GAME OVER', 20, 50);
+
+  textFont('handwriting');
+  text('Nice try!', 20, 110);
+
+  textFont('spooky');
+  fill('limegreen');
+  text('The swamp wins', 20, 170);
+
+  textFont('rounded');
+  fill('gold');
+  text('Score: 120', 20, 230);
+}`,
+      },
+      {
+        title: 'Weight and style: textWeight(), textStyle()',
+        body: `textWeight(n) sets how thick the letters are, from 100 (thin) to 900 (heavy). 400 is normal and 700 is bold. A font that does not have the weight you ask for uses its nearest one: 'sans' goes all the way from 100 to 900, but 'arcade' only has one weight.
+
+textStyle(BOLD) is weight 700, textStyle(ITALIC) slants the letters, textStyle(BOLDITALIC) does both, and textStyle(NORMAL) goes back to plain, upright, weight 400. Each textStyle() call replaces the last one, so textStyle(ITALIC) followed by textStyle(BOLD) is just bold. For both, use BOLDITALIC.
+
+To get slanted AND a particular weight, call textStyle(ITALIC) first, then textWeight(): textWeight() only changes the weight.`,
+        code: `function setup() {
+  new Canvas(400, 300);
+}
+
+function draw() {
+  background('#1b1d2a');
+  fill('white');
+  textFont('sans');
+  textSize(22);
+
+  textStyle(NORMAL);
+  for (let i = 0; i < 5; i++) {
+    let w = 100 + i * 200;
+    textWeight(w);
+    text('weight ' + w, 20, 40 + i * 34);
+  }
+
+  textStyle(ITALIC);
+  textWeight(800);
+  fill('orange');
+  text('slanted and heavy', 20, 250);
+}`,
+      },
+      {
+        title: 'Lines, outlines and spacing',
+        body: `A '\\n' inside the words starts a new line: text('Line one\\nLine two', 20, 40).
+
+textWrap(width) breaks long text onto new lines so it fits inside width pixels, between words. textWrap(width, CHAR) may break in the middle of a word, which suits a name with no spaces. textWrap() turns wrapping off.
+
+textLeading(px) is the distance from one line to the next. textLeading(null) goes back to the normal gap (1.25 times the text size).
+
+textDecoration(UNDERLINE) draws a line under the text, textDecoration(STRIKETHROUGH) a line through it, textDecoration(UNDERLINE, STRIKETHROUGH) both, and textDecoration(NONE) neither. The line is the text's colour.
+
+textOutline('black', 3) draws a 3-pixel outline around every letter, which makes words easy to read on a busy background. textOutline() turns it off.
+
+textSpacing(px) puts extra pixels between the letters (a negative number squeezes them together). textSpacing(0) is normal.
+
+All of these last until you change them, like textSize(), and they work with textAlign(), textLayer() and every font.`,
+        code: `function setup() {
+  new Canvas(400, 320);
+}
+
+function draw() {
+  background('#3a6');
+  textFont('bubbly');
+  textSize(30);
+  fill('white');
+  textOutline('black', 4);
+  textAlign(CENTER);
+  text('LEVEL 2', 200, 50);
+  textOutline();
+
+  textAlign(LEFT);
+  textFont('sans');
+  textSize(16);
+  fill('#112');
+  textWrap(220);
+  textLeading(22);
+  text('Collect every coin before the timer runs out. Watch out for the bats!', 20, 100);
+  textWrap();
+  textLeading(null);
+
+  textDecoration(UNDERLINE);
+  text('Press SPACE to start', 20, 220);
+  textDecoration(NONE);
+
+  textSpacing(6);
+  text('S P A C E D', 20, 270);
+  textSpacing(0);
 }`,
       },
       {

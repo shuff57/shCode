@@ -24,3 +24,10 @@
 /moshion/assets/*
   Access-Control-Allow-Origin: *
   Cross-Origin-Resource-Policy: cross-origin
+
+# moSHion's textFont() loads its built-in fonts with FontFace, and a font is
+# always fetched in CORS mode, so from the sandboxed runner every built-in font
+# would be blocked and text would fall back to monospace without this.
+/moshion/fonts/*
+  Access-Control-Allow-Origin: *
+  Cross-Origin-Resource-Policy: cross-origin

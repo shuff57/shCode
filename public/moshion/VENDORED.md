@@ -3,8 +3,8 @@
 | | |
 | --- | --- |
 | Source repo | `shuff57/moshion` (local checkout `../moshion`) |
-| Commit | `a662f3d` (`moshion.js`, `docs/moshion.d.ts`), branch `main` (= `origin/main`) |
-| Commit date | 2026-11-11 |
+| Commit | `11caeb5` (`moshion.js`, `docs/moshion.d.ts`), branch `main` (= `origin/main`) |
+| Commit date | 2026-11-12 |
 | Vendored | 2026-11-12 (`a662f3d`: `textStyle(NORMAL \| BOLD \| ITALIC \| BOLDITALIC)` (shCode #103), on top of `3f1e70a`'s API audit, `90921bd`'s `textLayer(n)`, `b1a2575`'s `sprite.clone()` and `world.maxSpeed`, `f3e1378` and the `f259b22` sound sync). `textStyle` was first patched in here by hand (`61cfed53`); this sync replaces that patch with the upstream engine, which matches it, so the copy is now upstream `a662f3d` plus the local lines below. |
 
 **`3f1e70a` (2026-11-12), the API audit.** Fixes and one consistent shape, no new
@@ -41,6 +41,24 @@ so the comparison does see changes. Not covered by it: the 60-frame cap (the
 harness steps its clock by exactly one frame) and the per-run seed (the
 harness does not load `runner.html`). Upstream gates: `tests/api-audit.spec.mjs`
 (35 checks) and the rest of the moshion suite, all passing.
+
+**`11caeb5` (2026-11-12), fonts and text layout.** On top of `a662f3d`, changing
+only the text section and `runner.html`:
+
+- `textFont('name')` (15 built-in fonts in `fonts/`, or a saved `font:<name>`
+  data URI), `fontNames()`, `textWeight(100..900)`; `textStyle()` now sets weight
+  700/400 and italic.
+- `textDecoration(UNDERLINE | STRIKETHROUGH | NONE)`, `textOutline(color, px)`,
+  `textSpacing(px)`, `textLeading(px)`, `textWrap(width, WORD | CHAR)`, and `\n` in
+  `text()` starts a new line.
+- `runner.html` loads `fonts/fonts.js` before the engine and waits up to 2 s for
+  the fonts a sketch names. shCode's copy of the fonts is `public/moshion/fonts/`
+  (`scripts/fetch-moshion-fonts.mjs`, catalog base `/moshion/fonts/`); the
+  sandboxed runner needs `/moshion/fonts/*` allowed cross-origin (`public/_headers`,
+  `server.js`).
+- Proof: shCode's gate, 695/695 course and docs sketches unchanged, 101/101
+  checks (two new: fonts and weights, lines and decoration).
+
 
 `main` now carries both the default-gravity-0 change (`91f7e6b`, vendored
 2026-11-01) and the math coordinates work on top of it (`4b36bef` engine,
