@@ -186,6 +186,13 @@ check('saving the name again brings it back, same id', r.status === 200 && r.bod
   check('fonts stop at 500 KB of files per account, said as 500 KB', last === 3 && r.status === 413 && /full \(500 KB\)/.test(r.body.error), { last, r });
   r = await get(B);
   check('the quota answer carries fonts', r.body.quota?.font?.maxBytes > 0, r.body.quota);
+  // A font made in the Font maker keeps its drawing as meta, up to 48 KB; other kinds stay at 8 KB.
+  r = await put(A, { kind: 'font', name: 'drawn', dataUri: WOFF2, meta: '{"v":1,"glyphs":{}}' + ' '.repeat(40 * 1024) });
+  check('a font keeps a drawing of 40 KB as its meta', r.status === 201, r);
+  r = await put(A, { kind: 'font', name: 'drawn2', dataUri: WOFF2, meta: 'x'.repeat(49 * 1024) });
+  check('a drawing over 48 KB is refused in plain words', r.status === 413 && /drawing is too large/.test(r.body.error), r);
+  r = await put(A, { kind: 'texture', name: 'bigmeta', dataUri: PNG, meta: 'x'.repeat(9 * 1024) });
+  check('a texture still keeps at most 8 KB of meta', r.status === 413, r);
 }
 
 console.log(`\ntest-library: ${passed} passed, ${failed} failed`);

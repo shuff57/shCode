@@ -74,6 +74,9 @@ const MAX_TEXTURE_TOTAL_BYTES = 1024 * 1024;
 // than let a student's fonts push out a lesson draft. A data URI is 4/3 of
 // its file, and the stored value is that URI JSON-quoted.
 const FONT_PREFIX = 'font:';
+// The Font maker's drawing of a font it made (lib/font-doc.ts), stored raw
+// beside the font so the maker can reopen it; counted in the font budget.
+const FONTMETA_PREFIX = 'fontmeta:';
 const MAX_FONT_VALUE_BYTES = Math.ceil(150 * 1024 * 4 / 3) + 128;
 const MAX_FONT_TOTAL_BYTES = Math.ceil(500 * 1024 * 4 / 3) + 4096;
 
@@ -88,7 +91,7 @@ function storeBytes(store: Store): { draft: number; sound: number; texture: numb
     const bytes = key.length + value.length;
     if (key.startsWith(SOUND_PREFIX)) sound += bytes;
     else if (key.startsWith('texture:') || key.startsWith('texmeta:')) texture += bytes;
-    else if (key.startsWith(FONT_PREFIX)) font += bytes;
+    else if (key.startsWith(FONT_PREFIX) || key.startsWith(FONTMETA_PREFIX)) font += bytes;
     else draft += bytes;
   }
   return { draft, sound, texture, font };
@@ -501,6 +504,8 @@ export interface SavedFont {
   /** The font FILE's size in bytes (what a student sees beside a file), not the stored text's. */
   fileBytes: number;
   type: 'TTF' | 'OTF' | 'WOFF' | 'WOFF2' | null;
+  /** True for a font made in the Font maker: its drawing is kept, so it can be edited. */
+  editable: boolean;
 }
 
 /** TTF, OTF, WOFF or WOFF2 from a font's first bytes; null for anything else. The server checks again. */
@@ -539,6 +544,7 @@ export function listSavedFonts(): SavedFont[] {
       dataUri,
       fileBytes: Math.floor((dataUri.length - comma - 1) * 3 / 4),
       type: fontTypeOf(dataUriHead(dataUri)),
+      editable: typeof store[FONTMETA_PREFIX + key.slice(FONT_PREFIX.length)] === 'string',
     });
   }
   return out.sort((a, b) => a.name.localeCompare(b.name));
@@ -552,7 +558,7 @@ export const FONT_LIMITS = { fileBytes: 150 * 1024, totalFileBytes: 500 * 1024 }
  * name becomes what a sketch writes, textFont('name'), so it is a code-safe
  * identifier, as a texture's or a sound's name is.
  */
-export function saveFont(name: string, dataUri: string): string | null {
+export function saveFont(name: string, dataUri: string, drawing: string | null = null): string | null {
   if (!/^[A-Za-z][A-Za-z0-9_]{0,39}$/.test(name)) {
     return 'Name must start with a letter and contain only letters, digits and _ (it becomes a name in code).';
   }
@@ -564,6 +570,10 @@ export function saveFont(name: string, dataUri: string): string | null {
   }
   const store = readStore();
   const next: Store = { ...store, [FONT_PREFIX + name]: encoded };
+  // A font made in the Font maker keeps its drawing; an uploaded font over the
+  // same name loses any old one, so Edit never opens a drawing of another font.
+  if (drawing) next[FONTMETA_PREFIX + name] = drawing;
+  else delete next[FONTMETA_PREFIX + name];
   if (!withinCaps(next)) {
     return `Saved fonts are full (${FONT_LIMITS.totalFileBytes / 1024} KB in all). Delete one before saving another.`;
   }
@@ -573,9 +583,16 @@ export function saveFont(name: string, dataUri: string): string | null {
   return null;
 }
 
+/** The Font maker's drawing of a saved font, as saved (lib/font-doc.ts parseDoc reads it), or null. */
+export function readFontDrawing(name: string): string | null {
+  const v = readStore()[FONTMETA_PREFIX + name];
+  return typeof v === 'string' ? v : null;
+}
+
 export function deleteSavedFont(name: string): void {
   const store = readStore();
   delete store[FONT_PREFIX + name];
+  delete store[FONTMETA_PREFIX + name];
   writeStore(store);
   markDeleted('font', name, true);
   localChanged();
@@ -597,8 +614,8 @@ export interface LocalLibraryItem {
 const PREFIX: Record<LibraryKind, [string, string]> = {
   texture: [TEXTURE_PREFIX, TEXMETA_PREFIX],
   sound: [SOUND_PREFIX, SNDMETA_PREFIX],
-  // A font has no meta; nothing writes the second key.
-  font: [FONT_PREFIX, 'fontmeta:'],
+  // An uploaded font has no meta; a font made in the Font maker keeps its drawing there.
+  font: [FONT_PREFIX, FONTMETA_PREFIX],
 };
 
 /**

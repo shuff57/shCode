@@ -31,6 +31,10 @@ export function fileBytesOf(dataUriLength: number): number {
 }
 export const MAX_ITEMS_PER_KIND = 200;
 export const MAX_META_BYTES = 8 * 1024;
+/** A font's meta is the Font maker's drawing (lib/font-doc.ts MAX_DOC_BYTES), so it may be larger. */
+export function metaLimit(kind: LibraryKind): number {
+  return kind === 'font' ? 48 * 1024 : MAX_META_BYTES;
+}
 
 /** The same rule the texture editor and the mixer use: a name that is also code. */
 export const NAME_RE = /^[A-Za-z][A-Za-z0-9_]{0,39}$/;

@@ -1,7 +1,9 @@
 'use client';
 
-// The Fonts page (/fonts) and the sandbox's Fonts drawer: add a font from a
-// file, try your own words in every font, and copy the textFont('name') line.
+// The Fonts page (/fonts) and the sandbox's Fonts drawer: make a font
+// (FontEditor: draw each letter), add a font from a file, try your own words in
+// every font, and copy the textFont('name') line. /fonts?edit=<name> opens a
+// font made here in the editor again (its drawing is kept: fontmeta:<name>).
 //
 // Adding a font (phase 2 of the fonts work, 2026-11-12): a TTF, OTF, WOFF or
 // WOFF2 file of at most 150 KB is read in the browser, checked three ways
@@ -9,11 +11,22 @@
 // loader accepts it, and it fits), previewed, named, and saved with saveFont()
 // under `font:<name>`, where a sketch's textFont('name') finds it and the
 // library sync takes it to the student's account. The server checks the bytes
-// and the limits again. Drawing a font of your own is phase 3.
+// and the limits again. The editor is loaded only when it is opened, so the
+// font-building libraries (opentype.js, polygon-clipping) stay out of every
+// other page.
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { BuiltinFonts, DEFAULT_SAMPLE, FontSample, MyFonts } from './FontLibrary';
-import { FONT_LIMITS, fontTypeOf, listSavedFonts, saveFont } from '../lib/moshion-storage';
+import { FONT_LIMITS, fontTypeOf, listSavedFonts, readFontDrawing, saveFont } from '../lib/moshion-storage';
+import { editParam } from '../lib/remix';
+import { parseDoc, type FontDoc } from '../lib/font-doc';
+
+const FontEditor = dynamic(() => import('./FontEditor'), {
+  ssr: false,
+  loading: () => <p style={{ fontSize: 13, color: 'var(--c-dim)' }}>Opening the Font maker…</p>,
+});
+type Mode = 'make' | 'upload';
 import { fontWorks } from '../lib/font-face';
 import { sectionHeading, sectionNote } from './library-ui';
 
@@ -30,6 +43,9 @@ const input: React.CSSProperties = {
 };
 
 export default function FontMaker({ compact = false }: { compact?: boolean }) {
+  const [mode, setMode] = useState<Mode>(compact ? 'upload' : 'make');
+  /** The saved font being edited (?edit=<name>), once its drawing is read; undefined while looking. */
+  const [start, setStart] = useState<{ name: string; doc: FontDoc } | null | undefined>(undefined);
   const [sample, setSample] = useState('');
   const [picked, setPicked] = useState<{ dataUri: string; file: string; kb: number; type: string } | null>(null);
   const [name, setName] = useState('');
@@ -38,6 +54,15 @@ export default function FontMaker({ compact = false }: { compact?: boolean }) {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const say = (text: string, bad = false) => setNote({ text, bad });
+
+  // /fonts?edit=<name>: open that font's drawing in the editor.
+  useEffect(() => {
+    const name = editParam();
+    if (!name) { setStart(null); return; }
+    const doc = parseDoc(readFontDrawing(name));
+    if (doc) { setStart({ name, doc }); setMode('make'); }
+    else { setStart(null); say(`${name} was not made in the Font maker (or is not saved here), so it can't be opened to draw on.`, true); }
+  }, []);
 
   async function choose(file: File | undefined) {
     setNote(null);
@@ -93,6 +118,27 @@ export default function FontMaker({ compact = false }: { compact?: boolean }) {
         </>
       )}
 
+      <div role="group" aria-label="Make or add a font" style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
+        {(['make', 'upload'] as const).map((m) => (
+          <button key={m} type="button" aria-pressed={mode === m} onClick={() => setMode(m)} style={{
+            fontSize: 13, padding: '5px 14px', borderRadius: 6, cursor: 'pointer', fontWeight: mode === m ? 700 : 500,
+            background: mode === m ? 'var(--c-purple)' : 'transparent', color: mode === m ? 'var(--c-bg)' : 'var(--c-meta)',
+            border: `1px solid ${mode === m ? 'var(--c-purple)' : 'var(--c-line)'}`,
+          }}>
+            {m === 'make' ? 'Make a font' : 'Add a font file'}
+          </button>
+        ))}
+      </div>
+
+      {mode === 'make' && (
+        <section aria-label="Make a font" style={{ marginBottom: 18 }}>
+          {start === undefined ? null : (
+            <FontEditor start={start} />
+          )}
+        </section>
+      )}
+
+      {mode === 'upload' && (
       <section aria-labelledby="addfont-h" style={{ marginBottom: 16 }}>
         <h2 id="addfont-h" style={{ ...sectionHeading, fontSize: 15 }}>Add a font</h2>
         <p style={sectionNote}>
@@ -124,8 +170,9 @@ export default function FontMaker({ compact = false }: { compact?: boolean }) {
             </div>
           </div>
         )}
-        {note && <div role="status" style={{ fontSize: 13, marginTop: 8, color: note.bad ? 'var(--c-red)' : 'var(--c-green)' }}>{note.text}</div>}
       </section>
+      )}
+      {note && <div role="status" style={{ fontSize: 13, margin: '0 0 8px', color: note.bad ? 'var(--c-red)' : 'var(--c-green)' }}>{note.text}</div>}
 
       <label htmlFor="font-sample" style={{ display: 'block', fontSize: 13, marginBottom: 4 }}>Try your own words</label>
       <input id="font-sample" value={sample} onChange={(e) => setSample(e.target.value)} placeholder={DEFAULT_SAMPLE}

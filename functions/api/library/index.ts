@@ -23,7 +23,7 @@ import { isUploadId, newUploadId } from '../../_shared/uploads';
 import {
   MAX_ITEM_BYTES,
   MAX_ITEMS_PER_KIND,
-  MAX_META_BYTES,
+  metaLimit,
   MAX_TOTAL_BYTES,
   FONT_FILE_MAX,
   FONT_FILES_TOTAL_MAX,
@@ -113,7 +113,9 @@ export const onRequestPut: PagesFunction<Env, string, SessionData> = async ({ re
   if (typeof dataUri !== 'string') return json({ error: 'dataUri must be a string' }, 400);
   const meta = body.meta == null ? null : body.meta;
   if (meta !== null && typeof meta !== 'string') return json({ error: 'meta must be a string or null' }, 400);
-  if (meta && meta.length > MAX_META_BYTES) return json({ error: 'meta is too large' }, 413);
+  if (meta && meta.length > metaLimit(kind)) {
+    return json({ error: kind === 'font' ? 'This font\'s drawing is too large to keep. Remove some pieces and save again.' : 'meta is too large' }, 413);
+  }
   const baseHash = typeof body.baseHash === 'string' ? body.baseHash : null;
 
   const label = kind === 'texture' ? 'texture' : kind === 'sound' ? 'sound' : 'font';

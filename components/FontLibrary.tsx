@@ -19,6 +19,7 @@ import { sectionHeading, sectionNote, sectionStyle } from './library-ui';
 import { LIBRARY_LOCAL_CHANGE, LIBRARY_UPDATED, deleteSavedFont, listSavedFonts, type SavedFont } from '../lib/moshion-storage';
 import { LIBRARY_SYNC_STATUS, signedInForSync } from '../lib/library-sync';
 import { builtinFontCatalog, useFontFamily, weightRange, type FontCatalog, type FontSource } from '../lib/font-face';
+import { editorUrl } from '../lib/remix';
 
 export const DEFAULT_SAMPLE = 'Level 1: find the golden key! 0123456789';
 
@@ -133,6 +134,14 @@ function MyFontsInner({ sample = '', onMessage, emptyHint }: ListProps) {
               <span>{f.type ?? 'font'} · {Math.max(1, Math.round(f.fileBytes / 1024))} KB</span>
               <RemixCredit item={{ kind: 'font', name: f.name }} style={{ fontSize: 11 }} />
               <ShareToggle kind="font" name={f.name} onMessage={onMessage} />
+              {/* A font made in the Font maker reopens there; an uploaded one is a finished file. */}
+              {f.editable && (
+                <a href={editorUrl('font', f.name)} style={{ fontSize: 11, color: 'var(--c-cyan)' }}
+                  {...(typeof window !== 'undefined' && !window.location.pathname.startsWith('/fonts') && !window.location.pathname.startsWith('/library')
+                    ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+                  Edit
+                </a>
+              )}
               <button type="button" onClick={() => void remove(f)} aria-label={`Delete ${f.name}`} style={delBtn}>Delete</button>
             </div>
           </div>

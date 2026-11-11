@@ -38,7 +38,7 @@ type Store = Record<string, string>;
 const KEYS: Record<AssetKind, [string, string]> = {
   texture: ['texture:', 'texmeta:'],
   sound: ['sound:', 'sndmeta:'],
-  // A font has no meta; the second key is never written by anything.
+  // A font made in the Font maker keeps its drawing as meta (an upload has none).
   font: ['font:', 'fontmeta:'],
 };
 

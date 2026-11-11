@@ -570,8 +570,21 @@ because fonts sit in localStorage (`font:<name>`, own budget in `lib/moshion-sto
 characters per site, shared with drafts, textures and sounds. Pages: `/fonts` (`components/FontMaker.tsx`: add a font,
 try your own words, your fonts, the built-ins; also the sandbox's Fonts drawer), Library -> Fonts tab, Learn menu ->
 Fonts. Cards draw their sample in the font itself (`lib/font-face.ts`; built-ins from `public/moshion/fonts/fonts.json`).
-No Remix for a font yet: there is no font editor to open a copy in. Apply 0050 (`npm run d1:migrate`) before deploying;
-until it is applied a font save fails the CHECK with a 500.
+Apply 0050 (`npm run d1:migrate`) before deploying (applied to production 2026-11-12).
+
+**The Font maker (phase 3a).** `/fonts` -> Make a font: `components/FontEditor.tsx` (loaded with next/dynamic, so
+opentype.js and polygon-clipping stay out of every other page). Pen (smoothed), Line, Arc (bend with its middle dot),
+Ellipse and Box (outlined or filled), Grid, Select (move, handles, Delete), Undo/Redo, the letter's width, Copy from;
+a live test sentence in the font being drawn; the work in progress in localStorage `shCode:font-maker-draft`.
+`lib/font-doc.ts` is the model: a `FontDoc` of pieces per character in font units (1000 em, y up); every piece becomes
+polygons, a letter's polygons are merged with polygon-clipping (snapped to 1/8 unit; if it still fails, the pieces go in
+unmerged with consistent winding, which a nonzero fill draws the same), and opentype.js writes an OTF. The drawing is
+kept beside the font (`fontmeta:<name>` in the browser store, counted in the font budget; the item's `meta` on the
+server, up to 48 KB for fonts only, `metaLimit()`), so a made font has Edit (`/fonts?edit=<name>`). Tests:
+`scripts/test-font-doc.mjs` (npm test). **Packages:** this worktree's `node_modules` is a symlink to `../shCode/node_modules`,
+and `npm install` here DELETES that symlink (it happened 2026-11-12). Add a dependency by editing package.json, running
+`npm install --package-lock-only --legacy-peer-deps` in a temporary copy, and copying only the new packages into the shared
+folder. Phase 3b, still to come: point-and-curve with automatic holes, and Remix of a made font.
 
 ### Online game rooms (Phase 6, board games)
 - A sketch plays a classmate on another computer through `online` (`public/moshion/extras.js`, NOT the vendored
