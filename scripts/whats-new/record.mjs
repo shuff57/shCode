@@ -32,7 +32,7 @@
 // Never touches the playwright-cli session `mom`: this launches its own browser.
 
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, statSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { tmpdir, homedir } from 'node:os';
 import { join, dirname } from 'node:path';
@@ -238,6 +238,133 @@ async function joinCodeTogether(page, demo) {
 }
 
 const RECIPES = {
+  // #97: one student, two computers. The left run saves plays: 1 to the account;
+  // the right one, a different browser with no local copy, reads it back as 2.
+  '2026-11-save-to-account': {
+    people: [
+      { ...SAM, label: "Sam's computer at school" },
+      { ...SAM, label: "Sam's computer at home" },
+    ],
+    path: '/sandbox/',
+    storage: { 'shCode:sandbox-mode': 'moshion' },
+    async before({ demos, pages }) {
+      // The account starts empty, whatever an earlier recording saved.
+      await pages[0].evaluate(() => fetch('/api/sketch-saves', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'sandbox', data: {} }),
+      }));
+      for (const d of demos) await d.setCode(MOSHION_SAVE);
+    },
+    async run({ demos: [school, home], pages: [ps, ph] }) {
+      await school.click(ps.getByRole('button', { name: /Run/ }).first(), { after: 3000 });
+      // The save reaches the account within 2 s.
+      await home.click(ph.getByRole('button', { name: /Run/ }).first(), { after: 3200 });
+    },
+  },
+
+  // #96: Alex picks two suggestions on Sam's game; Sam reloads and sees them, with Alex's name.
+  '2026-11-game-suggestions': {
+    people: [SAM, ALEX],
+    path: '/library/?tab=games',
+    async setup({ person }) {
+      const s = await person(SAM, '/sandbox/');
+      await publishGame(s.page, 'Spike Run', MOSHION_DODGE);
+    },
+    async before({ pages: [ps, pa] }) {
+      const id = await myGameId(ps, 'Spike Run');
+      // Alex's picks from an earlier recording are taken back.
+      await pa.evaluate(async (gid) => {
+        const r = await fetch(`/api/games/${gid}/suggestions`).then((x) => x.json());
+        for (const s of r.mine || []) {
+          await fetch(`/api/games/${gid}/suggestions`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ suggestion: s, on: false }) });
+        }
+      }, id);
+      for (const p of [ps, pa]) {
+        await p.goto(new URL(`/play/?game=${id}`, p.url()).href, { waitUntil: 'networkidle' });
+        await p.locator('#game-suggestions-h').waitFor({ timeout: 30000 });
+        await p.locator('#game-suggestions-h').evaluate((el) => window.scrollBy({ top: el.getBoundingClientRect().top - 420 }));
+      }
+    },
+    async run({ demos: [sam, alex], pages: [ps, pa] }) {
+      await alex.pause(500);
+      await alex.click(pa.getByRole('button', { name: /^Add more obstacles/ }), { after: 600 });
+      await alex.click(pa.getByRole('button', { name: /^So fun!/ }), { after: 900 });
+      await ps.reload({ waitUntil: 'networkidle' });
+      await ps.locator('#game-suggestions-h').waitFor({ timeout: 30000 });
+      await sam.scrollTo(ps.locator('#game-suggestions-h'), 800);
+      await sam.pause(2600);
+    },
+  },
+
+  // #99 and the built-in animations: an animated picture's frames, then a picture imported from the computer.
+  '2026-11-pictures-that-move': {
+    people: [SAM],
+    path: '/library/?tab=pictures',
+    async run({ demos: [d], pages: [p] }) {
+      const frames = p.getByRole('button', { name: 'See the 6 frames of coinSpin' })
+        .or(p.getByRole('button', { name: /^See the \d+ frames of coinSpin$/ })).first();
+      await d.scrollTo(frames, 900);
+      await d.pause(900);
+      await d.click(frames, { after: 2200 });
+      // A blown-up copy of a built-in sprite stands in for "a picture you drew".
+      const file = await pixelArtFile(p, 'frog', 4, 'my-frog.png');
+      await p.goto(new URL('/textures/', p.url()).href, { waitUntil: 'networkidle' });
+      await d.pause(500);
+      const chooser = p.waitForEvent('filechooser');
+      await d.click(p.getByRole('button', { name: /Import picture/ }), { after: 100 });
+      await (await chooser).setFiles(file);
+      await d.pause(2600);
+    },
+  },
+
+  // Sharing choices: publish a game as "keep remixes open"; the play page says so.
+  '2026-11-share-your-way': {
+    people: [SAM],
+    path: '/sandbox/',
+    storage: { 'shCode:sandbox-mode': 'moshion' },
+    async before({ demos: [d] }) { await d.setCode(MOSHION_DODGE); },
+    async run({ demos: [d], pages: [p] }) {
+      const dialog = p.getByRole('dialog', { name: 'Publish game' });
+      await d.click(p.getByRole('button', { name: 'Publish game' }), { ms: 450, after: 500 });
+      await d.click(p.locator('#publish-game-title'), { ms: 400, after: 150 });
+      await p.keyboard.press('Control+A');
+      await d.type('Star Catcher', 45);
+      const share = dialog.getByRole('checkbox');
+      if ((await share.count()) && !(await share.isChecked())) await d.click(share, { after: 300 });
+      await d.click(dialog.getByRole('radio', { name: /keep remixes open/ }), { ms: 500, after: 1300 });
+      await d.click(dialog.getByRole('button', { name: /^Publish$/ }), { ms: 400, after: 900 });
+      const id = await myGameId(p, 'Star Catcher');
+      await p.goto(new URL(`/play/?game=${id}`, p.url()).href, { waitUntil: 'networkidle' });
+      await d.pause(2200);
+    },
+  },
+
+  // Teacher: the Shared games row counts suggestions; its menu clears them (confirm shown, then Cancel).
+  '2026-11-library-cleanup': {
+    people: [TEACHER],
+    path: '/teacher/?class=dev-class&tab=students',
+    async setup({ person }) {
+      const m = await person(MAYA, '/sandbox/');
+      await publishGame(m.page, 'Maze Dash', MOSHION_DODGE);
+      const id = await myGameId(m.page, 'Maze Dash');
+      const l = await person(LEO, '/library/');
+      await l.page.evaluate(async (gid) => {
+        for (const s of ['more-levels', 'harder']) {
+          await fetch(`/api/games/${gid}/suggestions`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ suggestion: s, on: true }) });
+        }
+      }, id);
+    },
+    async run({ demos: [t], pages: [p] }) {
+      const heading = p.getByRole('heading', { name: 'Shared games' });
+      await heading.waitFor({ timeout: 30000 });
+      await t.scrollTo(heading, 1100);
+      await t.pause(900);
+      await t.click(p.getByRole('button', { name: 'More actions for Maze Dash' }).first(), { after: 900 });
+      await t.click(p.getByRole('menuitem', { name: /Clear suggestions/ }), { after: 2600 });
+      await t.click(p.getByRole('button', { name: 'Cancel' }), { after: 700 });
+    },
+  },
+
   '2026-11-class-together-panels': {
     people: [TEACHER],
     path: '/teacher/?class=dev-class&tab=students',
@@ -436,6 +563,53 @@ function draw() {
   }
 }
 `;
+
+const MOSHION_SAVE = `let player;
+
+function setup() {
+  new Canvas(360, 240);
+  // Kept in your account, so it follows you to any computer.
+  player = saved('player', { plays: 0 }, 'remote');
+  player.plays += 1;
+  player.save();
+}
+
+function draw() {
+  background('#1b1d2a');
+  fill('gold');
+  textSize(34);
+  text('Plays: ' + player.plays, 70, 135);
+}
+`;
+
+/** The newest of this person's own games with that title. */
+async function myGameId(page, title) {
+  const id = await page.evaluate(async (t) => {
+    const r = await fetch('/api/games').then((x) => x.json());
+    return (r.games || []).find((g) => g.title === t)?.id ?? null;
+  }, title);
+  if (!id) throw new Error(`no game titled ${title}`);
+  return id;
+}
+
+/** Writes a built-in texture blown up `k` times (nearest neighbour) to a temp PNG, for a file chooser. */
+async function pixelArtFile(page, name, k, filename) {
+  const b64 = await page.evaluate(async ([n, kk]) => {
+    const img = new Image();
+    img.src = `/moshion/textures/${n}.png`;
+    await img.decode();
+    const c = document.createElement('canvas');
+    c.width = img.naturalWidth * kk; c.height = img.naturalHeight * kk;
+    const ctx = c.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(img, 0, 0, c.width, c.height);
+    return c.toDataURL('image/png').split(',')[1];
+  }, [name, k]);
+  const dir = mkdtempSync(join(tmpdir(), 'whats-new-pic-'));
+  const file = join(dir, filename);
+  writeFileSync(file, Buffer.from(b64, 'base64'));
+  return file;
+}
 
 async function publishGame(page, title, code) {
   await page.goto(new URL('/sandbox/', page.url()).href, { waitUntil: 'networkidle' });
