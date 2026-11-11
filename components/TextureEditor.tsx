@@ -41,6 +41,7 @@ import {
   SavedTexture,
   LIBRARY_UPDATED,
 } from '../lib/moshion-storage';
+import { importSize, blockFactor, pixelScale, textureNameFromFile, IMPORT_TYPES, IMPORT_MAX_BYTES } from '../lib/texture-import';
 
 interface CatalogEntry { file: string; w: number; h: number; group: string }
 interface Catalog {
@@ -429,7 +430,8 @@ export default function TextureEditor() {
     label: string,
     frameCount = 1,
     delay = 4,
-    loadedHolds: number[] | null = null
+    loadedHolds: number[] | null = null,
+    doneText: string | null = null
   ) => {
     const img = new Image();
     img.onload = () => {
@@ -473,13 +475,68 @@ export default function TextureEditor() {
       setFps(Math.max(1, Math.round(60 / delay)));
       setHolds(loadedHolds && loadedHolds.length === frameCount ? loadedHolds.slice() : null);
       setMessage({
-        text: `Loaded ${label} (${fw}x${fh}${frameCount > 1 ? `, ${frameCount} frames` : ''}). Edit and save under any name.`,
+        text: doneText ?? `Loaded ${label} (${fw}x${fh}${frameCount > 1 ? `, ${frameCount} frames` : ''}). Edit and save under any name.`,
         bad: false,
       });
     };
     img.onerror = () => setMessage({ text: `Could not load ${label}.`, bad: true });
     img.src = src;
   }, [commit, snapshot]);
+
+  // Import a picture from the computer (#99). It is fitted into the grid
+  // (lib/texture-import.ts), then read through loadImage like any other texture,
+  // so Ctrl+Z, the name box and the message all behave the same. Nothing is
+  // saved until the student presses Save.
+  const importInput = useRef<HTMLInputElement | null>(null);
+  function importPicture(file: File) {
+    if (!IMPORT_TYPES.includes(file.type)) {
+      setMessage({ text: 'Pick a PNG, JPEG, GIF or WebP picture.', bad: true });
+      return;
+    }
+    if (file.size > IMPORT_MAX_BYTES) {
+      setMessage({ text: 'That picture is over 10 MB. Try a smaller one.', bad: true });
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const sw = img.naturalWidth, sh = img.naturalHeight;
+      // Blown-up pixel art? Only worth reading the pixels when the sides divide.
+      const k = blockFactor(sw, sh, MAX_DIM);
+      let scale: number | null = null;
+      if (k && sw * sh <= 4_000_000) {
+        const full = document.createElement('canvas');
+        full.width = sw; full.height = sh;
+        const fctx = full.getContext('2d');
+        if (fctx) {
+          fctx.drawImage(img, 0, 0);
+          try { scale = pixelScale(fctx.getImageData(0, 0, sw, sh).data, sw, sh, k); } catch { /* unreadable: smooth it */ }
+        }
+      }
+      const size = importSize(sw, sh, MAX_DIM, scale);
+      const c = document.createElement('canvas');
+      const ctx = size && c.getContext('2d');
+      if (!size || !ctx) { setMessage({ text: 'That picture could not be read.', bad: true }); return; }
+      c.width = size.w; c.height = size.h;
+      ctx.imageSmoothingEnabled = size.smooth;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, 0, 0, size.w, size.h);
+      const label = textureNameFromFile(file.name);
+      const shrunk = size.w !== sw || size.h !== sh;
+      loadImage(c.toDataURL('image/png'), label, 1, 4, null,
+        `Imported ${label} (${size.w}x${size.h}` +
+        (!shrunk ? ''
+          : !size.smooth ? `: the ${sw}x${sh} picture is pixel art blown up ${sw / size.w} times`
+          : `, shrunk from ${sw}x${sh} to fit the ${MAX_DIM}x${MAX_DIM} grid`) +
+        '). Edit it, then Save.');
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      setMessage({ text: 'That picture could not be read.', bad: true });
+    };
+    img.src = url;
+  }
 
   // Remix from the Library (lib/remix.ts): /textures/?edit=<name> opens that
   // saved texture as soon as the editor loads.
@@ -922,8 +979,23 @@ export default function TextureEditor() {
             <code style={{ fontSize: 10, opacity: 0.75 }}>{color}</code>
           </div>
 
+          <button style={{ ...railBtn(), marginBottom: 6 }} onClick={() => importInput.current?.click()}
+            title={`Open a PNG, JPEG, GIF or WebP from your computer. Big pictures shrink to fit ${MAX_DIM}x${MAX_DIM}.`}>
+            ↑ Import picture
+          </button>
+          <input
+            ref={importInput}
+            type="file"
+            accept={IMPORT_TYPES.join(',')}
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              e.target.value = '';
+              if (f) importPicture(f);
+            }}
+          />
           <button style={{ ...railBtn(), marginBottom: 6 }} onClick={download} title="Download the PNG (a strip, if animated)">
-            ↓ PNG
+            ↓ Download PNG
           </button>
           <div style={{ display: 'flex', gap: 6 }}>
             <button style={railBtn(showHelp)} onClick={() => setShowHelp((v) => !v)} aria-label="keyboard shortcuts">?</button>
