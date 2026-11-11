@@ -264,7 +264,7 @@ function DateTimeField({
           // as a time-only entry.
           onWrite(value === '' ? null : value, value === '' ? null : time || null);
         }}
-        className="teacher-field"
+        className="teacher-field dd-date"
         style={date ? dateInput : { ...dateInput, ...emptyField }}
         aria-label={`${label} date for ${ariaSuffix}`}
       />
@@ -281,7 +281,8 @@ function DateTimeField({
         }}
         style={{
           background: 'var(--c-deep2)',
-          border: `1px solid ${calOpen ? C.accent : date ? C.border : 'transparent'}`,
+          // r9 T7: the same quiet icon button whether or not a date is set; framed only while open.
+          border: `1px solid ${calOpen ? C.accent : 'transparent'}`,
           borderRadius: 4,
           color: C.accent,
           cursor: 'pointer',

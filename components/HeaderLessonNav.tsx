@@ -85,6 +85,14 @@ function shortLabel(n: Neighbor) {
   return `${parseNumberedId(n.title) ?? ''} ${labels[kind] ?? 'Lesson'}`.trim();
 }
 
+// Phones: the lesson number leads in full strength and the type follows quieter, so two neighbours
+// of the same type ("1.1.17 Reading", "1.1.19 Reading") read as two different places (climb4 r9 S7).
+function ShortLabel({ n }: { n: Neighbor }) {
+  const num = parseNumberedId(n.title);
+  const kind = shortLabel(n).slice(num ? num.length : 0).trim();
+  return <span className="lesson-nav-short">{num ? <b className="lesson-nav-num">{num}</b> : null}{num ? ' ' : ''}<span className="lesson-nav-kind">{kind}</span></span>;
+}
+
 export default function HeaderLessonNav() {
   const pathname = usePathname();
   const [lessons, setLessons] = useState<ManifestLesson[] | null>(null);
@@ -148,7 +156,7 @@ export default function HeaderLessonNav() {
         <a className="hdr-lesson-link" href={lessonHref(prev)}>
           <span style={{ color: 'var(--c-meta)' }} aria-hidden="true">←</span>
           <span className="hdr-lesson-label">Previous</span>
-          <span style={titleStyle}><span className="lesson-nav-full">{prev.title}</span><span className="lesson-nav-short">{shortLabel(prev)}</span></span>
+          <span style={titleStyle}><span className="lesson-nav-full">{prev.title}</span><ShortLabel n={prev} /></span>
         </a>
       ) : (
         <span />
@@ -173,7 +181,7 @@ export default function HeaderLessonNav() {
             }}
           >
             <span className="hdr-lesson-label">Next lesson</span>
-            <span style={titleStyle}><span className="lesson-nav-full">{next.title}</span><span className="lesson-nav-short">{shortLabel(next)}</span></span>
+            <span style={titleStyle}><span className="lesson-nav-full">{next.title}</span><ShortLabel n={next} /></span>
             <span style={{ color: 'var(--c-meta)' }} aria-hidden="true">🔒</span>
           </span>
         ) : (
@@ -182,7 +190,7 @@ export default function HeaderLessonNav() {
             href={lessonHref(next)}
           >
             <span className="hdr-lesson-label">Next lesson</span>
-            <span style={titleStyle}><span className="lesson-nav-full">{next.title}</span><span className="lesson-nav-short">{shortLabel(next)}</span></span>
+            <span style={titleStyle}><span className="lesson-nav-full">{next.title}</span><ShortLabel n={next} /></span>
             <span style={{ color: 'var(--c-meta)' }} aria-hidden="true">→</span>
           </a>
         )

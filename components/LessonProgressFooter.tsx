@@ -403,6 +403,11 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
             document.body,
           )}
       </div>
+      {/* Wide screens only (CSS): what the segment colours mean. The pink "here" is said by the count on the left. */}
+      <span className="lesson-progress-legend" aria-hidden="true">
+        <span><i className="is-done" />done</span>
+        <span><i className="is-todo" />to do</span>
+      </span>
       {snap.loaded && !snap.authed ? (
         <span style={{ color: 'var(--c-meta)' }}>
           <span style={{ color: 'var(--c-cyan)' }}>Sign in</span> to save progress

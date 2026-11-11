@@ -13,62 +13,31 @@ export default function DocsIndex() {
       <h1 style={{ fontSize: 28, marginBottom: 8 }}>Docs</h1>
       <DocsHubSearch />
       <h2 className="docs-hub-sets-label">Reference sets</h2>
-      <div
-        style={{
-        border: '1px solid var(--c-purple)',
-          borderRadius: 8,
-          padding: 20,
-          marginBottom: 16,
-          background: 'linear-gradient(110deg, var(--x-302b42), var(--c-bg))',
-        }}
-      >
-        <Link
-          href="/docs/js/values"
-          className="docs-set-link"
-        >
-          <span className="docs-set-kicker" style={{ display: 'inline-block', color: 'var(--c-green)', fontSize: 12, fontWeight: 700, letterSpacing: '.08em', marginBottom: 6 }}>START HERE</span><br />
-          <span className="docs-set-name">JavaScript</span> <span aria-hidden="true">→</span>
+      {/* Three equal cards (climb4 r9 S11): the whole card is the link (globals.css r7 S13a), and each
+          says so with a visible "Open" at its right edge. JavaScript carries a small "Start here" tag. */}
+      <div className="docs-set-card">
+        <Link href="/docs/js/values" className="docs-set-link">
+          <span className="docs-set-name">JavaScript</span>
         </Link>
-        <p style={{ color: 'var(--c-meta)', fontSize: 14, margin: '6px 0 0' }}>
-          The basics: values, variables, conditionals, loops, functions, arrays, objects, JSON.
-        </p>
+        <span className="docs-set-start">Start here</span>
+        <span className="docs-set-open" aria-hidden="true">Open <span>→</span></span>
+        <p>The basics: values, variables, conditionals, loops, functions, arrays, objects, JSON.</p>
       </div>
-      <div
-        style={{
-          border: '1px solid var(--c-line)',
-          borderRadius: 8,
-          padding: '16px 20px',
-          marginBottom: 16,
-          background: 'var(--c-bg)',
-        }}
-      >
-        <Link
-          href="/docs/moshion/overview"
-          className="docs-set-link"
-        >
-          <span className="docs-set-name">moSHion</span> <span aria-hidden="true">→</span>
+      <div className="docs-set-card">
+        <Link href="/docs/moshion/overview" className="docs-set-link">
+          <span className="docs-set-name">moSHion</span>
         </Link>
-        <p style={{ color: 'var(--c-meta)', fontSize: 14, margin: '6px 0 0' }}>
-          The game engine: sprites, physics, collisions, groups, the canvas.
-        </p>
+        <span />
+        <span className="docs-set-open" aria-hidden="true">Open <span>→</span></span>
+        <p>The game engine: sprites, physics, collisions, groups, the canvas.</p>
       </div>
-      <div
-        style={{
-          border: '1px solid var(--c-line)',
-          borderRadius: 8,
-          padding: '16px 20px',
-          background: 'var(--c-bg)',
-        }}
-      >
-        <Link
-          href="/docs/reshape/overview"
-          className="docs-set-link"
-        >
-          <span className="docs-set-name">reSHape</span> <span aria-hidden="true">→</span>
+      <div className="docs-set-card">
+        <Link href="/docs/reshape/overview" className="docs-set-link">
+          <span className="docs-set-name">reSHape</span>
         </Link>
-        <p style={{ color: 'var(--c-meta)', fontSize: 14, margin: '6px 0 0' }}>
-          Solid modelling: reSHape Script on the B-rep kernel.
-        </p>
+        <span />
+        <span className="docs-set-open" aria-hidden="true">Open <span>→</span></span>
+        <p>Solid modelling: reSHape Script on the B-rep kernel.</p>
       </div>
       <section className="docs-hub-topics" style={{ marginTop: 24 }}>
         <h2 style={{ fontSize: 18, margin: '0 0 12px' }}>Jump to a JavaScript topic</h2>

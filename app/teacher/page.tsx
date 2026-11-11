@@ -1553,7 +1553,9 @@ function GradebookView({
 
   // Category total columns, between the grade and the first lesson.
   const CAT_W = showCategoryColumns ? 64 : 116;
-  const EMAIL_W = narrow ? 110 : 190;
+  // r9 T1: on a wide screen the Grade column holds two aligned slots (grade, past due), so it takes 38px
+  // from the name column. The two still add up to 274px, so the lesson columns keep their width.
+  const EMAIL_W = narrow ? 110 : 152;
   // Height of the unit header row. The per-lesson row sticks at this offset, so
   // the row has to BE this tall: a unit title that wrapped made it 100px and the
   // lesson row slid 67px up over it.
@@ -1722,7 +1724,7 @@ function GradebookView({
       if (sortBy === 'missing') return (grades.get(b.email)?.missing ?? 0) - (grades.get(a.email)?.missing ?? 0) || byName(a, b);
       return byName(a, b);
     });
-  const GRADE_W = 84;
+  const GRADE_W = narrow ? 84 : 122;
 
   // Which grade category each shown lesson belongs to (null = not graded) and the categories that appear,
   // in the course's own order. Each category gets a total column; the numbers are the server's
@@ -1909,18 +1911,18 @@ function GradebookView({
         </div>
       </div>
 
-      <div aria-label="Gradebook legend" style={{ display: 'flex', flexWrap: 'nowrap', gap: 16, marginBottom: 8, overflowX: 'auto', paddingBottom: 4, fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-meta)' }}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0, whiteSpace: 'nowrap' }}>
-          <span style={{ color: 'var(--c-green)', fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', fontSize: 14, fontWeight: 700 }}>100</span>done
-        </span>
+      {/* r9 T1: the legend is one quiet line of small swatches and words, lighter than the controls above it. */}
+      <div aria-label="Gradebook legend" className="gb-legend" style={{ display: 'flex', flexWrap: 'nowrap', gap: 18, marginBottom: 10, overflowX: 'auto', paddingBottom: 2, fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-meta)' }}>
         {([
-          { status: 'missing', label: 'past due' },
-          { status: 'grade', label: 'needs grading' },
-          { status: 'started', label: 'in progress' },
-          { status: 'not-due', label: 'not due yet' },
-        ] as const).map(({ status, label }) => (
-          <span key={status} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0, whiteSpace: 'nowrap' }}>
-            {statusLabel(status, true)}{label}
+          { key: 'done', swatch: 'var(--c-green)', term: '100', label: 'done' },
+          { key: 'missing', swatch: 'var(--c-red)', term: 'Missing', label: 'past due' },
+          { key: 'grade', swatch: 'var(--c-orange)', term: 'Grade', label: 'needs grading' },
+          { key: 'started', swatch: 'var(--c-yellow)', term: 'Started', label: 'in progress' },
+          { key: 'not-due', swatch: 'var(--c-line)', term: '—', label: 'not due yet' },
+        ] as const).map(({ key, swatch, term, label }) => (
+          <span key={key} className="gb-legend-item">
+            <span aria-hidden="true" className="gb-legend-swatch" style={{ background: swatch }} />
+            <span className="gb-legend-term">{term}</span>{label}
           </span>
         ))}
         {/* r8 T5: a still screen shows no hover, so say once that a cell opens the work. */}
@@ -1973,6 +1975,7 @@ function GradebookView({
                   borderBottom: '2px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
                   textAlign: 'left', color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600,
                 }}
+                className="gb-head-student"
               >
                 Student
               </th>
@@ -1986,13 +1989,13 @@ function GradebookView({
                   borderBottom: '2px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
                   textAlign: 'center', color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600,
                 }}
-                title="Grade so far: work done plus work past its due date, under this class's weights. Lessons not due yet are left out. The number in brackets is how many graded lessons are past due and not done."
+                className="gb-head-grade"
+                title="Grade so far: work done plus work past its due date, under this class's weights. Lessons not due yet are left out. Past due is how many graded lessons are past due and not done."
               >
-                Grade
-                {/* r7 T2: what the bracketed number beside a grade is. */}
-                <span style={{ display: 'block', marginTop: 2, fontSize: 12, fontWeight: 500, lineHeight: '16px', whiteSpace: 'nowrap' }}>
-                  <span style={{ color: 'var(--c-red)' }}>(n)</span> past due
-                </span>
+                {/* r9 T1: grade and past due are two aligned slots with their own headings (one slot on a phone). */}
+                {narrow ? 'Grade' : (
+                  <span className="gb-grade-pair"><span>Grade</span><span>Past due</span></span>
+                )}
               </th>
               {shownCats.length > 0 && (
                 <th
@@ -2006,6 +2009,7 @@ function GradebookView({
                     textAlign: 'center', color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600,
                   }}
                   title="Percent per grade category, from the same rule as the grade"
+                  className="gb-head-totals"
                 >
                   Totals
                 </th>
@@ -2015,6 +2019,7 @@ function GradebookView({
                   key={unit}
                   colSpan={count}
                   title={unit}
+                  className="gb-head-unit"
                   style={{
                     position: 'sticky', top: 0, zIndex: 2,
                     height: HEAD1_H, boxSizing: 'border-box',
@@ -2031,10 +2036,11 @@ function GradebookView({
             </tr>
             {/* Per-lesson title row */}
             <tr>
-              {!showCategoryColumns && shownCats.length > 0 && <th style={{ position: 'sticky', top: HEAD1_H, zIndex: 2, width: CAT_W, background: stickyBg, color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600, borderBottom: '2px solid var(--c-line)' }}>Summary</th>}
-              {showCategoryColumns && shownCats.map((c) => (
+              {!showCategoryColumns && shownCats.length > 0 && <th className="gb-head-summary" style={{ position: 'sticky', top: HEAD1_H, zIndex: 2, width: CAT_W, background: stickyBg, color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600, borderBottom: '2px solid var(--c-line)' }}>Summary</th>}
+              {showCategoryColumns && shownCats.map((c, ci) => (
                 <th
                   key={c}
+                  className={ci === shownCats.length - 1 ? 'gb-cat-last' : undefined}
                   title={`${CATEGORY_LABEL[c]}: percent across this category's graded lessons`}
                   style={{
                     position: 'sticky', top: HEAD1_H, zIndex: 2,
@@ -2052,6 +2058,7 @@ function GradebookView({
               {displayLessons.map((lesson) => (
                 <th
                   key={lesson.id}
+                  className="gb-head-lesson"
                   title={`${lesson.title}${lesson.maxScore ? ` · ${lesson.maxScore} pts` : ''}${gbData.dueDates?.[lesson.id] ? ` · Due ${formatDue(gbData.dueDates[lesson.id])}` : ''}`}
                   style={{
                     position: 'sticky', top: HEAD1_H, zIndex: 2,
@@ -2130,6 +2137,7 @@ function GradebookView({
                   const bg = i % 2 === 0 ? 'var(--c-deep)' : 'var(--x-252636)';
                   return (
                     <td
+                      className="gb-cell-grade"
                       style={{
                         position: 'sticky', left: gradeLeft, zIndex: 1, background: bg,
                         width: GRADE_W, minWidth: GRADE_W, padding: '8px 8px', textAlign: 'center',
@@ -2139,23 +2147,37 @@ function GradebookView({
                       }}
                       title={g ? (g.counted === 0 ? 'Nothing is due yet and nothing is done' : `Grade so far ${g.pct}%${g.missing > 0 ? `, ${g.missing} past due and not done` : ''}`) : 'Loading'}
                     >
-                      {g ? (g.counted === 0 ? '—' : `${g.pct}%`) : '…'}
-                      {g && g.missing > 0 && <span style={{ color: 'var(--c-red)', fontWeight: 400, marginLeft: 4 }}>({g.missing})</span>}
+                      {narrow ? (
+                        <>
+                          {g ? (g.counted === 0 ? '—' : `${g.pct}%`) : '…'}
+                          {g && g.missing > 0 && <span style={{ color: 'var(--c-red)', fontWeight: 400, marginLeft: 4 }}>({g.missing})</span>}
+                        </>
+                      ) : (
+                        <span className="gb-grade-pair">
+                          <span>{g ? (g.counted === 0 ? '—' : `${g.pct}%`) : '…'}</span>
+                          <span>
+                            {g && g.missing > 0
+                              ? <span className="gb-late-badge" aria-label={`${g.missing} past due`}>{g.missing}</span>
+                              : <span className="gb-grade-zero">{g ? '0' : ''}</span>}
+                          </span>
+                        </span>
+                      )}
                     </td>
                   );
                 })()}
                 {/* Category totals: the server's per-category percent, a dash where nothing in it counts yet */}
-                {!showCategoryColumns && shownCats.length > 0 && <td style={{ width: CAT_W, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '8px 8px', color: 'var(--c-fg)', fontSize: 13, fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', background: 'color-mix(in srgb, var(--c-purple) 6%, transparent)', borderBottom: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)' }} title={shownCats.map(c => `${CATEGORY_LABEL[c]}: ${grades.get(student.email)?.cats[c] === undefined ? 'nothing counted yet' : `${grades.get(student.email)?.cats[c]}%`}`).join(' · ')}>
+                {!showCategoryColumns && shownCats.length > 0 && <td className="gb-cell-summary" style={{ width: CAT_W, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '8px 8px', color: 'var(--c-fg)', fontSize: 13, fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', background: 'color-mix(in srgb, var(--c-purple) 6%, transparent)', borderBottom: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)' }} title={shownCats.map(c => `${CATEGORY_LABEL[c]}: ${grades.get(student.email)?.cats[c] === undefined ? 'nothing counted yet' : `${grades.get(student.email)?.cats[c]}%`}`).join(' · ')}>
                   {(() => {
                     const c = shownCats.find(c => grades.get(student.email)?.cats[c] !== undefined);
                     return c ? <strong>{CAT_SHORT[c]} {grades.get(student.email)?.cats[c]}%</strong> : <span style={{ color: 'var(--c-meta)' }}>—</span>;
                   })()}
                 </td>}
-                {showCategoryColumns && shownCats.map((c) => {
+                {showCategoryColumns && shownCats.map((c, ci) => {
                   const v = grades.get(student.email)?.cats[c];
                   return (
                     <td
                       key={c}
+                      className={ci === shownCats.length - 1 ? 'gb-cat-last' : undefined}
                       style={{
                         width: CAT_W, minWidth: CAT_W, maxWidth: CAT_W, padding: '8px 4px', textAlign: 'center',
                         borderBottom: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)',
@@ -2231,6 +2253,7 @@ function useGradingWeightsDesktop() {
 
 function ListView() {
   const router = useRouter();
+  const { toast } = useFeedback();
   const [classes, setClasses] = useState<ClassSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [forbidden, setForbidden] = useState(false);
@@ -2409,89 +2432,113 @@ function ListView() {
           {[...classes].sort((x, y) => Number(y.id === lastId) - Number(x.id === lastId)).map((c) => (
             <div
               key={c.id}
-              className="teacher-class-card"
+              className="teacher-class-card tcc-r9"
               style={{
                 ...S.card,
                 marginBottom: 0,
                 opacity: c.archived_at ? 0.6 : 1,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 12,
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
-                {/* The class name is the way in: a real link (opens in a new tab, copies as a URL) that the
-                    router handles on a plain click. */}
-                <a
-                  href={`/teacher/?class=${encodeURIComponent(c.id)}`}
-                  onClick={(e) => {
-                    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
-                    e.preventDefault();
-                    router.push(`/teacher?class=${c.id}`);
-                  }}
-                  className="teacher-class-link"
-                  style={{ fontWeight: 700, fontSize: 18, lineHeight: 1.3, color: 'var(--c-fg)', textDecoration: 'underline', textDecorationColor: 'color-mix(in srgb, var(--c-cyan) 55%, transparent)', textUnderlineOffset: 4, textDecorationThickness: 1, overflowWrap: 'anywhere' }}
-                >
-                  {c.name}
-                </a>
-                {c.archived_at && <span style={S.badge(true)}>Archived</span>}
-                {c.id === lastId && <span style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-meta)' }}>last opened</span>}
+              {/* r9 T3: one class reads as a complete summary. Name and badges on the left, the labelled facts
+                  as a 2x2 grid in the middle, the action on the right (stacked on a narrow screen). */}
+              <div className="tcc-main">
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
+                  {/* The class name is the way in: a real link (opens in a new tab, copies as a URL) that the
+                      router handles on a plain click. */}
+                  <a
+                    href={`/teacher/?class=${encodeURIComponent(c.id)}`}
+                    onClick={(e) => {
+                      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                      e.preventDefault();
+                      router.push(`/teacher?class=${c.id}`);
+                    }}
+                    className="teacher-class-link"
+                    style={{ fontWeight: 700, fontSize: 18, lineHeight: 1.3, color: 'var(--c-fg)', textDecoration: 'underline', textDecorationColor: 'color-mix(in srgb, var(--c-cyan) 55%, transparent)', textUnderlineOffset: 4, textDecorationThickness: 1, overflowWrap: 'anywhere' }}
+                  >
+                    {c.name}
+                  </a>
+                  {c.archived_at && <span style={S.badge(true)}>Archived</span>}
+                  {c.id === lastId && <span style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-meta)' }}>last opened</span>}
+                </div>
+                {/* The badges. Each one is a way in to the tab
+                    that answers it: "to grade" opens Today, "behind" opens Students. */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 12, fontFamily: 'var(--font-prose)' }}>
+                  {!c.archived_at && (chips[c.id] === undefined ? (
+                    <span style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13 }}>checking…</span>
+                  ) : chips[c.id].behind === 0 && chips[c.id].toGrade === 0 ? (
+                    <span style={{ color: 'var(--c-green)', fontFamily: 'var(--font-prose)', fontSize: 13 }}>All caught up</span>
+                  ) : (
+                    <>
+                      {chips[c.id].toGrade > 0 && (
+                        <a
+                          href={`/teacher/?class=${encodeURIComponent(c.id)}&tab=today`}
+                          onClick={(e) => {
+                            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                            e.preventDefault();
+                            router.push(`/teacher?class=${c.id}&tab=today`);
+                          }}
+                          className="teacher-chip-link"
+                          title="Open this class's Today tab"
+                          style={{ color: 'var(--c-bg)', background: 'var(--c-orange)', borderRadius: 10, padding: '4px 8px', fontWeight: 700, textDecoration: 'none' }}
+                        >
+                          {chips[c.id].toGrade} to grade
+                        </a>
+                      )}
+                      {chips[c.id].behind > 0 && (
+                        <a
+                          href={`/teacher/?class=${encodeURIComponent(c.id)}&tab=students`}
+                          onClick={(e) => {
+                            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                            e.preventDefault();
+                            router.push(`/teacher?class=${c.id}&tab=students`);
+                          }}
+                          className="teacher-chip-link"
+                          title="See who is behind on the Students tab"
+                          style={{ color: 'var(--c-bg)', background: 'var(--c-red)', borderRadius: 10, padding: '4px 8px', fontWeight: 700, textDecoration: 'none' }}
+                        >
+                          {chips[c.id].behind} behind
+                        </a>
+                      )}
+                    </>
+                  ))}
+                </div>
               </div>
-              {/* Badges and the action that acts on them share one row. Each badge is a way in to the tab
-                  that answers it: "to grade" opens Today, "behind" opens Students. */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 12, fontFamily: 'var(--font-prose)' }}>
-                {!c.archived_at && (chips[c.id] === undefined ? (
-                  <span style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13 }}>checking…</span>
-                ) : chips[c.id].behind === 0 && chips[c.id].toGrade === 0 ? (
-                  <span style={{ color: 'var(--c-green)', fontFamily: 'var(--font-prose)', fontSize: 13 }}>All caught up</span>
-                ) : (
-                  <>
-                    {chips[c.id].toGrade > 0 && (
-                      <a
-                        href={`/teacher/?class=${encodeURIComponent(c.id)}&tab=today`}
-                        onClick={(e) => {
-                          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
-                          e.preventDefault();
-                          router.push(`/teacher?class=${c.id}&tab=today`);
-                        }}
-                        className="teacher-chip-link"
-                        title="Open this class's Today tab"
-                        style={{ color: 'var(--c-bg)', background: 'var(--c-orange)', borderRadius: 10, padding: '4px 8px', fontWeight: 700, textDecoration: 'none' }}
-                      >
-                        {chips[c.id].toGrade} to grade
-                      </a>
-                    )}
-                    {chips[c.id].behind > 0 && (
-                      <a
-                        href={`/teacher/?class=${encodeURIComponent(c.id)}&tab=students`}
-                        onClick={(e) => {
-                          if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
-                          e.preventDefault();
-                          router.push(`/teacher?class=${c.id}&tab=students`);
-                        }}
-                        className="teacher-chip-link"
-                        title="See who is behind on the Students tab"
-                        style={{ color: 'var(--c-bg)', background: 'var(--c-red)', borderRadius: 10, padding: '4px 8px', fontWeight: 700, textDecoration: 'none' }}
-                      >
-                        {chips[c.id].behind} behind
-                      </a>
-                    )}
-                  </>
-                ))}
+              <dl className="teacher-class-facts tcc-facts">
+                <div><dt>Students</dt><dd>{c.student_count}</dd></div>
+                <div>
+                  <dt>Join code</dt>
+                  <dd className="tcc-code">
+                    <span aria-label={`Join code ${c.code.split('').join(' ')}`}>{c.code}</span>
+                    <button
+                      type="button"
+                      className="tcc-copy"
+                      aria-label={`Copy join code ${c.code}`}
+                      onClick={() => {
+                        void (async () => {
+                          try {
+                            await navigator.clipboard.writeText(c.code);
+                            toast('Join code copied.');
+                          } catch {
+                            toast(`Could not copy. The join code is ${c.code}.`, { kind: 'error' });
+                          }
+                        })();
+                      }}
+                    >
+                      Copy
+                    </button>
+                  </dd>
+                </div>
+                <div><dt>Year</dt><dd>{c.school_year || 'Not set'}</dd></div>
+                <div><dt>Role</dt><dd style={{ textTransform: 'capitalize' }}>{c.role}</dd></div>
+              </dl>
+              <div className="tcc-action">
                 <button
-                  style={{ ...S.btn('var(--c-cyan)'), flexShrink: 0, marginLeft: 'auto' }}
+                  style={{ ...S.btn('var(--c-cyan)'), flexShrink: 0 }}
                   onClick={() => router.push(`/teacher?class=${c.id}`)}
                 >
                   {chips[c.id]?.toGrade > 0 ? 'Review work →' : 'Open class →'}
                 </button>
               </div>
-              {/* Labelled facts, most useful first (system pass rule 3). */}
-              <dl className="teacher-class-facts" style={{ display: 'flex', gap: '6px 24px', flexWrap: 'wrap', margin: 0, paddingTop: 12, borderTop: '1px solid color-mix(in srgb, var(--c-line) 60%, transparent)' }}>
-                <div style={{ display: 'flex', gap: 6, alignItems: 'baseline' }}><dt style={S.metaLabel}>Students</dt><dd style={{ ...S.metaValue, margin: 0 }}>{c.student_count}</dd></div>
-                <div style={{ display: 'flex', gap: 6, alignItems: 'baseline' }}><dt style={S.metaLabel}>Join code</dt><dd style={{ margin: 0, fontFamily: 'var(--font-mono)', fontSize: 14, fontWeight: 700, color: 'var(--c-cyan)', letterSpacing: '0.04em' }}>{c.code}</dd></div>
-                {c.school_year && <div style={{ display: 'flex', gap: 6, alignItems: 'baseline' }}><dt style={S.metaLabel}>Year</dt><dd style={{ ...S.metaValue, margin: 0 }}>{c.school_year}</dd></div>}
-                <div style={{ display: 'flex', gap: 6, alignItems: 'baseline' }}><dt style={S.metaLabel}>Role</dt><dd style={{ ...S.metaValue, margin: 0, textTransform: 'capitalize' }}>{c.role}</dd></div>
-              </dl>
             </div>
           ))}
         </div>
@@ -3040,13 +3087,15 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                       {!rosterSortIsDefault && (
                         <button type="button" className="roster-sort roster-sort-reset" onClick={() => setRosterSort({ key: 'name', dir: 'asc' })}>Reset to A-Z</button>
                       )}
-                      {rosterSortIsDefault && <span className="sr-only">Actions</span>}
+                      {/* r9 T4: a visible, quiet heading over the row actions. */}
+                      {rosterSortIsDefault && <span className="roster-actions-head">Actions</span>}
                     </span>
                   </div>
                 )}
-                {/* r8 T1: on a phone the grade's label is said once, above the cards, not on every card. */}
+                {/* r8 T1: on a phone the grade's label is said once, above the cards, not on every card.
+                    r9 T5: said to screen readers only; the cards are self-explanatory on screen. */}
                 {compact && (
-                  <div className="roster-card-head" aria-hidden="true"><span>Student</span><span>Grade so far</span></div>
+                  <div className="roster-card-head sr-only"><span>Student</span> <span>Grade so far</span></div>
                 )}
                 {/* Desktop: 20px name + 18px email + 12px padding + 1px border = 51px.
                     Phone: row 1 = name + grade, row 2 = counts on one line + Open and a compact More
@@ -3287,17 +3336,23 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             </div>
           )}
           {isOwner && (
-            <form onSubmit={(e) => { void handleAddCoTeacher(e); }} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-              <input
-                className="teacher-field"
-                aria-label="Co-teacher email"
-                style={S.input}
-                type="email"
-                placeholder="teacher@example.com"
-                value={coTeacherEmail}
-                onChange={(e) => setCoTeacherEmail(e.target.value)}
-                required
-              />
+            <form onSubmit={(e) => { void handleAddCoTeacher(e); }} style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+              {/* r9 T6: a persistent visible label, not only the placeholder. */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label htmlFor="co-teacher-email" style={{ fontFamily: 'var(--font-prose)', fontWeight: 600, color: 'var(--c-fg)', fontSize: 14 }}>
+                  Co-teacher&apos;s email
+                </label>
+                <input
+                  id="co-teacher-email"
+                  className="teacher-field"
+                  style={S.input}
+                  type="email"
+                  placeholder="teacher@example.com"
+                  value={coTeacherEmail}
+                  onChange={(e) => setCoTeacherEmail(e.target.value)}
+                  required
+                />
+              </div>
               <button
                 type="submit"
                 disabled={addingCoTeacher || !coTeacherEmail.trim()}

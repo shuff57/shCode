@@ -1,10 +1,35 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { getCurrentUser, CurrentUser } from '../lib/auth';
 import NavDropdown from './NavDropdown';
 import AuthButton from './AuthButton';
+
+// Which top-nav section the page belongs to, so its nav item can carry aria-current and the
+// accent underline (globals.css climb4 r9 S1). The query string matters only for the teacher
+// gradebook (`/teacher?view=gradebook` or a class's `tab=gradebook`).
+type NavSection = 'lessons' | 'learn' | 'teach' | 'gradebook' | 'issues' | null;
+function navSection(pathname: string, search: string): NavSection {
+  const p = pathname.replace(/\/+$/, '') || '/';
+  if (p === '/' || p.startsWith('/module/') || p.startsWith('/lesson/') || p.startsWith('/assignment/')) return 'lessons';
+  if (p === '/progress') return 'gradebook';
+  if (p === '/issues') return 'issues';
+  if (/^\/(docs|sandbox|library|textures|sound|play)(\/|$)/.test(p)) return 'learn';
+  if (p === '/teacher' && /(?:^|[?&])(?:view|tab)=gradebook(?:&|$)/.test(search)) return 'gradebook';
+  if (p.startsWith('/teacher') || p.startsWith('/admin')) return 'teach';
+  return null;
+}
+
+// useSearchParams needs a Suspense boundary in a static export; this tiny child is the only part
+// that reads it, so the rest of the header still prerenders.
+function SearchWatch({ onChange }: { onChange: (s: string) => void }) {
+  const params = useSearchParams();
+  const s = params?.toString() ?? '';
+  useEffect(() => { onChange(s); }, [s, onChange]);
+  return null;
+}
 
 // Menu-item style shared by both dropdowns below — a real <Link>/<a>, not a
 // div with onClick, so it stays keyboard- and screen-reader-reachable.
@@ -62,17 +87,24 @@ export default function HeaderNav() {
   }, []);
 
   const isStaff = loaded && (user?.role === 'teacher' || user?.role === 'admin');
+  const pathname = usePathname() || '/';
+  const [search, setSearch] = useState('');
+  const section = navSection(pathname, search);
+  const cur = (s: NavSection) => (section === s ? { 'aria-current': 'page' as const, className: 'nav-current' } : {});
 
   return (
     <div ref={menuRef} className="site-header-nav-wrap">
+      <Suspense fallback={null}><SearchWatch onChange={setSearch} /></Suspense>
+      {/* Phones: the report-an-issue flag renders in here (ReportIssueButton, climb4 r9 S15). */}
+      <span id="header-flag-slot" className="header-flag-slot" />
       <button className="mobile-header-menu" type="button" aria-label="Open navigation menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(v => !v)} style={{ display: 'none', background: 'transparent', color: 'var(--header-fg)', border: '1px solid var(--c-comment)', borderRadius: 4, padding: '6px 9px', fontSize: 18, lineHeight: 1, cursor: 'pointer' }}>
         ☰
       </button>
       <Link className="mobile-join-link" href="/join-class" style={{ display: 'none', color: 'var(--c-yellow)', fontSize: 12, whiteSpace: 'nowrap' }}>Join your class</Link>
       <nav className={`desktop-header-links flex items-center gap-4 flex-wrap justify-end${menuOpen ? ' mobile-open' : ''}`}>
-      <Link href="/" style={{ color: 'var(--header-fg)' }}>Lessons</Link>
+      <Link href="/" style={{ color: 'var(--header-fg)' }} {...cur('lessons')}>Lessons</Link>
 
-      <NavDropdown label="Learn" triggerStyle={{ color: 'var(--header-fg)', fontSize: 15 }}>
+      <NavDropdown label="Learn" current={section === 'learn'} triggerStyle={{ color: 'var(--header-fg)', fontSize: 15 }}>
         <Link href="/sandbox" style={itemStyle}>Sandbox</Link>
         {/* The pixel editor behind `sprite.texture`. Linked here rather than
             only from the docs: a page nothing navigates to is the failure
@@ -91,7 +123,7 @@ export default function HeaderNav() {
       </NavDropdown>
 
       {isStaff && (
-        <NavDropdown label="Teach" triggerStyle={{ color: 'var(--header-fg)', fontSize: 15 }}>
+        <NavDropdown label="Teach" current={section === 'teach'} triggerStyle={{ color: 'var(--header-fg)', fontSize: 15 }}>
           <Link href="/teacher" style={itemStyle}>Classes</Link>
           <Link href="/teacher/issues" style={itemStyle}>Issues</Link>
           {user?.role === 'admin' && (
@@ -103,7 +135,7 @@ export default function HeaderNav() {
       {/* Top-level shortcut into the same gradebook DetailView tab reaches via
           Teach -> Classes -> pick a class -> Gradebook tab. Staff only. */}
       {isStaff && (
-        <Link href="/teacher?view=gradebook" style={{ color: 'var(--header-fg)' }}>Gradebook</Link>
+        <Link href="/teacher?view=gradebook" style={{ color: 'var(--header-fg)' }} {...cur('gradebook')}>Gradebook</Link>
       )}
 
       {/* Students only get two extra links — not worth a dropdown for two.
@@ -112,14 +144,14 @@ export default function HeaderNav() {
           this link the only way in is the one-off link shown after filing a
           report, which is not visibility. */}
       {loaded && user?.role === 'student' && (
-        <Link href="/issues" style={{ color: 'var(--header-fg)' }}>Issues</Link>
+        <Link href="/issues" style={{ color: 'var(--header-fg)' }} {...cur('issues')}>Issues</Link>
       )}
       {/* The student's own gradebook. Until 2026-09-02 /progress was linked
           from NOWHERE in the app — the score table, the due dates and the
           teacher's override comments all rendered on a page reachable only by
           typing the URL. scripts/check-reachable.mjs now holds that open. */}
       {loaded && user?.role === 'student' && (
-        <Link href="/progress" style={{ color: 'var(--header-fg)' }}>Gradebook</Link>
+        <Link href="/progress" style={{ color: 'var(--header-fg)' }} {...cur('gradebook')}>Gradebook</Link>
       )}
 
       {loaded && user?.role === 'student' && hasEnrollments === false && (

@@ -217,12 +217,14 @@ export default function StudentGradebook({ lessons }: Props) {
     .map(([st, words, short]) => ({ n: rows.filter((r) => r.status === st).length, words, short }))
     .filter((p) => p.n > 0);
   const attentionBreakdown = attentionParts.map((p) => `${p.n} ${p.words}`).join(', ');
-  // The same breakdown in a chip's words: it lives INSIDE the "Missing or late" chip (climb4 r6), so it
-  // can never read as a description of whichever filter is selected.
-  const attentionShort = attentionParts.map((p) => `${p.n} ${p.short}`).join(' · ');
   const nowMs = Date.now();
   const isInProgress = (r: { status: CellStatus; tried: boolean }) => r.status === 'started' || (r.tried && r.status === 'not-started');
   const progressCount = rows.filter(isInProgress).length;
+  // The one action the summary offers when work is past due (climb4 r9 S10): the past-due lesson
+  // with the earliest due date. Same rows and status as the list below, so it is always one of them.
+  const oldestMissing = rows
+    .filter((r) => r.status === 'missing')
+    .sort((a, b) => (dueDates[a.lesson.id] ?? Infinity) - (dueDates[b.lesson.id] ?? Infinity))[0];
   const shown =
     filter === 'attention'
       ? rows.filter((r) => isMissingOrLate(r.status))
@@ -257,6 +259,11 @@ export default function StudentGradebook({ lessons }: Props) {
             </div>
           </div>
         ))}
+        {oldestMissing && grades.some((g) => g.missingCount > 0) && (
+          <p className="grade-summary-action">
+            <a href={lessonHref(oldestMissing.lesson)} className="grade-summary-start">Start with the oldest: {oldestMissing.lesson.title} <span aria-hidden="true">→</span></a>
+          </p>
+        )}
         <details style={{ marginTop: 2 }}>
           <summary style={{ cursor: 'pointer', fontSize: 13 }}>How your grade works</summary>
           <ul style={{ margin: '8px 0 0 0', paddingLeft: 20, listStyle: 'disc', fontSize: 14, lineHeight: 1.6, maxWidth: '68ch', color: 'var(--c-meta)' }}>
@@ -283,15 +290,12 @@ export default function StudentGradebook({ lessons }: Props) {
           type="button"
           id="missing-late-filter"
           onClick={() => setFilter('attention')}
-          style={{ ...(filter === 'attention' ? tabActive : tabIdle), ...(attentionParts.length > 1 ? { borderRadius: 12, lineHeight: 1.3 } : {}) }}
-          className={attentionParts.length > 1 ? 'progress-attention-chip has-breakdown' : 'progress-attention-chip'}
+          style={filter === 'attention' ? tabActive : tabIdle}
+          className="progress-attention-chip"
           title={attentionBreakdown ? `Missing or late: ${attentionBreakdown}` : undefined}
           aria-describedby={attentionParts.length > 1 ? 'missing-late-breakdown' : undefined}
         >
           Missing or late ({attentionCount})
-          {attentionParts.length > 1 && (
-            <span className="progress-attention-breakdown" aria-hidden="true">{attentionShort}</span>
-          )}
         </button>
         <button
           type="button"
@@ -301,10 +305,11 @@ export default function StudentGradebook({ lessons }: Props) {
           In progress ({progressCount})
         </button>
       </div>
+      {/* What "Missing or late" is made of, on its own line under the filters (climb4 r9 S10), so every chip is one line. */}
       {attentionParts.length > 1 && (
-        <span id="missing-late-breakdown" className="sr-only">
-          Missing or late ({attentionCount}): {attentionBreakdown}.
-        </span>
+        <p id="missing-late-breakdown" className="progress-attention-note">
+          Missing or late ({attentionCount}): {attentionParts.map((p) => `${p.n} ${p.words}`).join(' · ')}
+        </p>
       )}
 
       {rows.length === 0 ? (

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Flag } from 'lucide-react';
@@ -99,6 +100,18 @@ export default function ReportIssueButton() {
   useEffect(() => {
     getCurrentUser().then((u) => setSignedIn(!!u));
   }, []);
+
+  // Phones (<= 720px): the flag sits in the site header beside the menu button (HeaderNav's
+  // #header-flag-slot) instead of floating over the page, where it covered list content.
+  // Same button, same dialog, same accessible name (globals.css climb4 r9 S15).
+  const [headerSlot, setHeaderSlot] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 720px)');
+    const update = () => setHeaderSlot(mq.matches ? document.getElementById('header-flag-slot') : null);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, [pathname]);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -245,15 +258,28 @@ export default function ReportIssueButton() {
 
   return (
     <>
-      <button
-        type="button"
-        className="issue-fab"
-        onClick={() => setOpen(true)}
-        title="Report an issue: a bug, quirk, or idea"
-        aria-label="Report an issue"
-      >
-        <Flag size={16} aria-hidden="true" />
-      </button>
+      {headerSlot ? createPortal(
+        <button
+          type="button"
+          className="issue-fab-header"
+          onClick={() => setOpen(true)}
+          title="Report an issue: a bug, quirk, or idea"
+          aria-label="Report an issue"
+        >
+          <Flag size={15} aria-hidden="true" />
+        </button>,
+        headerSlot,
+      ) : (
+        <button
+          type="button"
+          className="issue-fab"
+          onClick={() => setOpen(true)}
+          title="Report an issue: a bug, quirk, or idea"
+          aria-label="Report an issue"
+        >
+          <Flag size={16} aria-hidden="true" />
+        </button>
+      )}
 
       <dialog
         ref={dialogRef}

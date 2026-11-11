@@ -190,7 +190,8 @@ function markSentenceLists(html: string): string {
 }
 
 function renderMarkdown(src: string): string {
-  const html = markSentenceLists(markLongInlineCode(String(marked.parse(src))));
+  // climb4 r9 S4: a nested list stays a real (compact) list; markSentenceLists is no longer applied.
+  const html = markLongInlineCode(String(marked.parse(src)));
   return DOMPurify.sanitize(html);
 }
 

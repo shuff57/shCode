@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, useRef, useSyncExternalStore } from 'react';
 import dynamic from 'next/dynamic';
-import { ChevronDown, ChevronUp, CloudUpload, History, Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen, RotateCcw, Users } from 'lucide-react';
+import { ChevronDown, ChevronUp, CloudUpload, History, Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen, RotateCcw, Share2, Users } from 'lucide-react';
 import type { Extension } from '@codemirror/state';
 import { useLessonStore } from '../lib/store';
 import { saveProgress } from '../lib/version-control';
@@ -819,25 +819,45 @@ export default function SandboxWorkspace() {
               )}
               {((togetherLang && (mayTogether || together)) || (mode.preview === 'moshion' && lessonProgress.authed)) && (
                 <div className="sandbox-tb-group sandbox-tb-share" role="group" aria-label="Share with classmates">
-                  <span className="sandbox-tb-label" aria-hidden="true">Share</span>
-                  {togetherLang && (mayTogether || together) && (
+                  {/* One Share button holds Code together and Publish game (climb4 r9 S9). While a Code together
+                      session is on, its button stays in the row: it carries the session's pictures and people. */}
+                  {together && togetherLang && (
                     <button
                       type="button"
-                      style={together ? { ...chipStyle, color: 'var(--c-fg)', border: '1px solid var(--c-purple)' } : chipStyle}
+                      style={{ ...chipStyle, color: 'var(--c-fg)', border: '1px solid var(--c-purple)' }}
                       aria-haspopup="dialog"
                       aria-expanded={togetherOpen}
                       onClick={() => setTogetherOpen(true)}
-                      title={together ? `Coding together, ${togetherHere} here: the session code, who is here, and Leave` : 'Write one program with classmates at the same time'}
+                      title={`Coding together, ${togetherHere} here: the session code, who is here, and Leave`}
                       data-testid="code-together-button"
                     >
                       <Users size={12} aria-hidden="true" />
                       {/* In a session CodeTogetherBar puts the code's pictures and a dot per person in here (badgeHost). */}
-                      {together ? <span ref={setTogetherBadge} style={{ display: 'inline-flex' }} /> : 'Code together'}
+                      <span ref={setTogetherBadge} style={{ display: 'inline-flex' }} />
+                    </button>
+                  )}
+                  {((!together && togetherLang && mayTogether) || (mode.preview === 'moshion' && lessonProgress.authed)) && (
+                  <ShareMenu chipStyle={chipStyle}>
+                  {!together && togetherLang && mayTogether && (
+                    <button
+                      type="button"
+                      style={chipStyle}
+                      aria-haspopup="dialog"
+                      aria-expanded={togetherOpen}
+                      onClick={() => setTogetherOpen(true)}
+                      title="Write one program with classmates at the same time"
+                      data-testid="code-together-button"
+                      data-share-close=""
+                    >
+                      <Users size={12} aria-hidden="true" />
+                      Code together
                     </button>
                   )}
                   {/* The Games library: publish this sketch so classmates can play and remix it. */}
                   {mode.preview === 'moshion' && lessonProgress.authed && (
                     <PublishGameButton getCode={getScript} />
+                  )}
+                  </ShareMenu>
                   )}
                 </div>
               )}
@@ -1171,5 +1191,49 @@ export default function SandboxWorkspace() {
         }}
       />
     </>
+  );
+}
+
+// The sandbox toolbar's Share button (climb4 r9 S9): one quiet button that opens a small panel with
+// Code together and Publish game, so the row is not packed with sharing controls beside Run.
+// Click outside or Escape closes it; Code together closes it as it opens its own dialog. Publish
+// game's panel opens inside it and the menu stays open while that panel is in use.
+function ShareMenu({ chipStyle, children }: { chipStyle: React.CSSProperties; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => { document.removeEventListener('mousedown', onDown); document.removeEventListener('keydown', onKey); };
+  }, [open]);
+  return (
+    <div ref={ref} className="sandbox-share-menu">
+      <button
+        type="button"
+        style={chipStyle}
+        className="sandbox-share-trigger"
+        aria-haspopup="true"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        title="Code together with classmates, or publish this sketch as a game"
+      >
+        <Share2 size={12} aria-hidden="true" />
+        Share
+        <ChevronDown size={12} aria-hidden="true" />
+      </button>
+      {open && (
+        <div
+          className="sandbox-share-panel"
+          role="group"
+          aria-label="Share with classmates"
+          onClick={(e) => { if ((e.target as HTMLElement).closest('[data-share-close]')) setOpen(false); }}
+        >
+          {children}
+        </div>
+      )}
+    </div>
   );
 }

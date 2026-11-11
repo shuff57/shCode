@@ -326,10 +326,10 @@ export default function QuizView({ lessonId, config }: Props) {
           {/* Wide screens only (CSS): the same count as a bar inside the pill. */}
           <span className="quiz-answered-bar" aria-hidden="true"><span style={{ width: `${questions.length ? Math.round((answeredCount / questions.length) * 100) : 0}%` }} /></span>
         </span>
-        {/* Wide screens only (CSS): where the hand-in button is, as a jump to it. */}
-        <a className="quiz-submit-hint" href={`#quiz-submit-${lessonId}`}>
-          {summative ? 'Submit' : 'Check answers'} <span aria-hidden="true">↓</span>
-        </a>
+        {/* Wide screens only (CSS): where the hand-in button is, said as plain text (climb4 r9 S7), not a jump link. */}
+        <span className="quiz-submit-hint">
+          {summative ? 'Submit' : 'Check'} is after question {questions.length}
+        </span>
         {summative && (
           <div style={{ marginLeft: 'auto' }}>
             <SolutionPanel lessonId={lessonId} readOnly />

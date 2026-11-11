@@ -158,6 +158,21 @@ export default function JsDocsClient({
               Page {pageIndex + 1} of {section.pages.length}
             </span>
           )}
+          {/* Previous / next page of this topic beside the count (climb4 r9 S11); the footer keeps the full titles. */}
+          {section.pages.length > 1 && (
+            <span className="docs-page-step">
+              {hasPrev ? (
+                <Link href={pageHref(basePath, section.slug, pageIndex - 1)} aria-label={`Previous page: ${section.pages[pageIndex - 1].title}`}>‹ Previous</Link>
+              ) : (
+                <span aria-disabled="true">‹ Previous</span>
+              )}
+              {hasNext ? (
+                <Link href={pageHref(basePath, section.slug, pageIndex + 1)} aria-label={`Next page: ${section.pages[pageIndex + 1].title}`}>Next ›</Link>
+              ) : (
+                <span aria-disabled="true">Next ›</span>
+              )}
+            </span>
+          )}
         </header>
         <h1 className="docs-title">{page.title}</h1>
         <div className="docs-body" style={{ maxWidth: '70ch' }}>

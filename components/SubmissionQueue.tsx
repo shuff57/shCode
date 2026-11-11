@@ -508,7 +508,12 @@ function RubricCompact({ brief, submissionId }: { brief: AssignmentBrief; submis
           </button>
         )}
       </div>
-      <ol id={listId} className={details ? 'sq-rubric-compact-list is-detailed' : 'sq-rubric-compact-list'}>
+      {/* r9 T2: on a wide screen the two columns share row tracks and fill down, then across (--sq-rows). */}
+      <ol
+        id={listId}
+        className={details ? 'sq-rubric-compact-list is-detailed' : 'sq-rubric-compact-list'}
+        style={{ ['--sq-rows' as string]: Math.ceil(brief.rubric.length / 2) } as React.CSSProperties}
+      >
         {brief.rubric.map((c) => (
           <li key={c.id}>
             <div className="sq-rubric-head">

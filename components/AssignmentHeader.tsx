@@ -70,7 +70,7 @@ export default function AssignmentHeader({
     </div>
   );
 
-  const statusBadge = showStatus ? (
+  const statusBadge = showStatus && !(compactLab && !submitted) ? (
     <span className={`assignment-status ${submitted ? 'submitted' : 'in-progress'}`}>
       {submitted ? 'Submitted' : 'In Progress'}
     </span>
@@ -78,7 +78,12 @@ export default function AssignmentHeader({
 
   const unmetHint =
     !submitted && !canSubmit && unmetTitles && unmetTitles.length > 0 ? (
-      <div className="assignment-unmet-hint">
+      compactLab ? (
+        // One status on a lab (climb4 r9 S6): the count sits in the score text, so the hint is the next action.
+        <div className="assignment-unmet-hint">
+          <span className="assignment-unmet-desktop">Next: press Check to test your code</span><span className="assignment-unmet-mobile">{unmetTitles.length} still needed</span>
+        </div>
+      ) : <div className="assignment-unmet-hint">
         <span className="assignment-unmet-desktop">Still needed: </span>{unmetTitles.length}<span className="assignment-unmet-mobile"> still needed</span><span className="assignment-unmet-desktop"> {unmetTitles.length === 1 ? 'requirement' : 'requirements'} · press Check</span>
       </div>
     ) : !submitted && !canSubmit && blockedNote ? (
