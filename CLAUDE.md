@@ -776,9 +776,16 @@ npx wrangler r2 bucket create shcode-uploads
   `maxScore` before, so a completed one read 100% and holds a stored score of 0/NULL; with the new max it
   would show 0% until reopened. `node scripts/backfill-grandfather-scores.mjs` is a read-only dry run
   (215 parts on 2026-10-04); `--emit-sql f.sql` writes guarded UPDATEs for the owner to review and run.
-- **The stamp goes stale.** `--check` also refuses a stamp more than 24 hours old (the deploy
-  slipped, and attempts between the stamp and the deploy would count against the cap before the
-  rule was live). Re-stamp at the real go-live, or pass `--allow-old` knowingly.
+- **The stamp goes stale, until it has shipped.** While `TRIES_STAMP_SHIPPED` is false, `--check`
+  refuses a stamp more than 24 hours old (the first deploy slipped, and attempts between the stamp
+  and the deploy would count against the cap before the rule was live): re-stamp at the real
+  go-live, or pass `--allow-old` knowingly. Once that deploy is live, run
+  `node scripts/stamp-tries-applied.mjs --mark-shipped` and commit; later deploys then pass with no
+  override (a deploy after the rule is live cannot slip). `--set-now` puts the flag back to false.
+  The author's stamp shipped 2026-10-04 and is marked shipped, so plain `npm run deploy` works.
+- **Nothing stray in `public/`.** It is published byte for byte, so `prebuild` (and `npm test`) runs
+  `scripts/check-public-strays.mjs`, which refuses `*.orig`, `*.rej`, `*.bak`, `*.swp`, `*~` and
+  `.DS_Store` under it. Delete the file; do not move it aside for one deploy.
 
 ### Self-hosting (another teacher running their own copy)
 
@@ -799,7 +806,8 @@ Set your own `AUTH_SECRET`, `OLLAMA_API_KEY`, `ADMIN_EMAILS` and `TEACHER_EMAILS
 With an empty `pa-pseudocode/` the three tries, AI feedback and best score all work; students just
 never see a solution (see `pa-pseudocode/README.md`). Write your own pseudocode files to turn that
 on, and set your own `TRIES_APPLIED` (run `node scripts/stamp-tries-applied.mjs --set-now` once,
-before your students first use a capped part, and commit it).
+before your students first use a capped part, and commit it; after that deploy is live, run
+`--mark-shipped` once and commit, so later deploys do not need `--allow-old`).
 
 ## Static-export gotcha
 

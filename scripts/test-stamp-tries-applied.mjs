@@ -28,6 +28,7 @@ writeFileSync(
   join(tmp, 'lib/attempt-cap.ts'),
   readFileSync(join(root, 'lib/attempt-cap.ts'), 'utf8')
     .replace(/TRIES_GO_LIVE_STAMPED = true;/, 'TRIES_GO_LIVE_STAMPED = false;')
+    .replace(/TRIES_STAMP_SHIPPED = true;/, 'TRIES_STAMP_SHIPPED = false;')
     .replace(/TRIES_APPLIED = \d{13};/, 'TRIES_APPLIED = 1791065875120;'),
 );
 copyFileSync(join(root, 'scripts/stamp-tries-applied.mjs'), join(tmp, 'scripts/stamp-tries-applied.mjs'));
@@ -48,6 +49,7 @@ const cap = () => readFileSync(join(tmp, 'lib/attempt-cap.ts'), 'utf8');
 
 eq(run('--check'), 1, 'unstamped (TRIES_GO_LIVE_STAMPED false): the deploy check refuses');
 eq(run('--nonsense'), 1, 'no mode: refuses');
+eq(run('--mark-shipped'), 1, 'unstamped: --mark-shipped refuses (nothing has shipped)');
 eq(run('--set-now'), 0, '--set-now stamps');
 if (!/TRIES_GO_LIVE_STAMPED = true;/.test(cap())) fail('--set-now did not flip the flag'); else ok('--set-now flips the flag');
 const stampedAt = Number(cap().match(/TRIES_APPLIED = (\d{13});/)[1]);
@@ -72,8 +74,21 @@ eq(run('--check'), 1, 'a stamp two days old: refuses (the deploy slipped; attemp
   eq(r.status, 0, 'a stamp two days old with TRIES_STAMP_ALLOW_OLD=1 (how `npm run deploy` passes it): passes');
   if (!/WARNING/.test(r.stderr)) fail('the env override did not warn loudly'); else ok('the env override warns loudly on stderr');
 }
-// back to a fresh stamp for the cases below
-writeFileSync(join(tmp, 'lib/attempt-cap.ts'), cap().replace(/TRIES_APPLIED = \d{13};/, `TRIES_APPLIED = ${Date.now()};`));
+// Once the stamp has shipped, a later deploy cannot slip: the old stamp passes with no override.
+eq(run('--mark-shipped'), 0, '--mark-shipped flips the flag');
+if (!/TRIES_STAMP_SHIPPED = true;/.test(cap())) fail('--mark-shipped did not flip TRIES_STAMP_SHIPPED'); else ok('TRIES_STAMP_SHIPPED is true');
+eq(run('--check'), 1, 'marked shipped but uncommitted: refuses');
+git('add', '-A'); git('commit', '-q', '-m', 'shipped');
+{
+  const r = spawnSync('node', [join(tmp, 'scripts/stamp-tries-applied.mjs'), '--check'], { cwd: tmp, encoding: 'utf8' });
+  eq(r.status, 0, 'a stamp two days old that has shipped: passes with no override');
+  if (/WARNING/.test(r.stderr)) fail('a shipped stamp should not warn'); else ok('...and does not warn');
+}
+eq(run('--mark-shipped'), 0, '--mark-shipped twice is a no-op');
+// back to a fresh stamp for the cases below; a NEW stamp is unshipped again
+writeFileSync(join(tmp, 'lib/attempt-cap.ts'), cap()
+  .replace(/TRIES_APPLIED = \d{13};/, `TRIES_APPLIED = ${Date.now()};`)
+  .replace(/TRIES_STAMP_SHIPPED = true;/, 'TRIES_STAMP_SHIPPED = false;'));
 git('add', '-A'); git('commit', '-q', '-m', 'fresh');
 eq(run('--check'), 0, 'a fresh stamp passes again');
 
@@ -115,6 +130,18 @@ eq(run('--check'), 1, 'TRIES_APPLIED no longer a fixed literal: refuses');
 // the real file: the flag and literal exist, and the deploy script runs the guard
 const real = readFileSync(join(root, 'lib/attempt-cap.ts'), 'utf8');
 if (!/export const TRIES_GO_LIVE_STAMPED = (true|false);/.test(real)) fail('lib/attempt-cap.ts lost TRIES_GO_LIVE_STAMPED'); else ok('lib/attempt-cap.ts has the go-live flag');
+if (!/export const TRIES_STAMP_SHIPPED = (true|false);/.test(real)) fail('lib/attempt-cap.ts lost TRIES_STAMP_SHIPPED'); else ok('lib/attempt-cap.ts has the shipped flag');
+// --set-now on an already-shipped repo must put the shipped flag back to false (checked on a copy).
+{
+  const t2 = mkdtempSync(join(tmpdir(), 'stamp-tries-reset-'));
+  mkdirSync(join(t2, 'lib')); mkdirSync(join(t2, 'scripts'));
+  writeFileSync(join(t2, 'lib/attempt-cap.ts'), real.replace(/TRIES_GO_LIVE_STAMPED = true;/, 'TRIES_GO_LIVE_STAMPED = false;').replace(/TRIES_STAMP_SHIPPED = false;/, 'TRIES_STAMP_SHIPPED = true;'));
+  copyFileSync(join(root, 'scripts/stamp-tries-applied.mjs'), join(t2, 'scripts/stamp-tries-applied.mjs'));
+  spawnSync('node', [join(t2, 'scripts/stamp-tries-applied.mjs'), '--set-now'], { cwd: t2, encoding: 'utf8' });
+  const after = readFileSync(join(t2, 'lib/attempt-cap.ts'), 'utf8');
+  if (!/TRIES_STAMP_SHIPPED = false;/.test(after)) fail('--set-now left TRIES_STAMP_SHIPPED true'); else ok('--set-now makes a new stamp unshipped (the 24-hour rule protects its first deploy)');
+  rmSync(t2, { recursive: true, force: true });
+}
 const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).scripts.deploy;
 if (!/stamp-tries-applied\.mjs --check/.test(pkg)) fail('npm run deploy does not run the go-live stamp check'); else ok('npm run deploy runs the go-live stamp check');
 if (!/check-pa-attempts\.mjs --require-pseudocode/.test(pkg)) fail('npm run deploy does not require the pseudocode'); else ok('npm run deploy requires the pseudocode');

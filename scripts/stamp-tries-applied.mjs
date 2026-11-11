@@ -6,11 +6,15 @@
 //                                                     exit 1 unless the stamp is set, sane and committed
 //   node scripts/stamp-tries-applied.mjs --set-now   the human, once, at go-live: writes the
 //                                                     current instant and flips the flag; commit it
+//   node scripts/stamp-tries-applied.mjs --mark-shipped
+//                                                     the human, once, after the first deploy that
+//                                                     carried the stamp is live; commit it
 //
 // --check refuses when: TRIES_GO_LIVE_STAMPED is false; TRIES_APPLIED is in the future; it is
 // earlier than the commit that introduced it (a stamp that predates the feature is a typo; skipped
 // with a loud warning on a shallow clone, where that commit cannot be found); more
-// than 24 hours old (the deploy slipped; --allow-old or TRIES_STAMP_ALLOW_OLD=1 overrides, loudly); or
+// than 24 hours old while TRIES_STAMP_SHIPPED is false (the first deploy slipped; --allow-old or
+// TRIES_STAMP_ALLOW_OLD=1 overrides, loudly; once the stamp has shipped, no later deploy can slip); or
 // lib/attempt-cap.ts differs from HEAD (a deploy worktree is built from HEAD, so an uncommitted
 // stamp would not ship). Never move a stamped value EARLIER once students have used the
 // deploy: that confiscates tries (see the comment in lib/attempt-cap.ts).
@@ -26,20 +30,33 @@ const rel = 'lib/attempt-cap.ts';
 const src = readFileSync(file, 'utf8');
 const m = src.match(/export const TRIES_APPLIED = (\d{13});/);
 const f = src.match(/export const TRIES_GO_LIVE_STAMPED = (true|false);/);
+const sh = src.match(/export const TRIES_STAMP_SHIPPED = (true|false);/);
 
 function die(msg) { console.error(`[stamp-tries-applied] ${msg}`); process.exit(1); }
-if (!m || !f) die('lib/attempt-cap.ts no longer has the fixed TRIES_APPLIED / TRIES_GO_LIVE_STAMPED literals');
+if (!m || !f || !sh) die('lib/attempt-cap.ts no longer has the fixed TRIES_APPLIED / TRIES_GO_LIVE_STAMPED / TRIES_STAMP_SHIPPED literals');
 
-const mode = process.argv.includes('--set-now') ? 'set' : process.argv.includes('--check') ? 'check' : null;
-if (!mode) die('pass --check (deploy guard) or --set-now (once, at go-live)');
+const mode = process.argv.includes('--set-now') ? 'set'
+  : process.argv.includes('--mark-shipped') ? 'shipped'
+  : process.argv.includes('--check') ? 'check' : null;
+if (!mode) die('pass --check (deploy guard), --set-now (once, at go-live) or --mark-shipped (once, after that deploy is live)');
+
+if (mode === 'shipped') {
+  if (f[1] !== 'true') die('not stamped yet: run --set-now at go-live and deploy it first.');
+  if (sh[1] === 'true') { console.log('[stamp-tries-applied] already marked shipped.'); process.exit(0); }
+  writeFileSync(file, src.replace(/export const TRIES_STAMP_SHIPPED = false;/, 'export const TRIES_STAMP_SHIPPED = true;'));
+  console.log('[stamp-tries-applied] TRIES_STAMP_SHIPPED = true. Commit lib/attempt-cap.ts; later deploys no longer need --allow-old.');
+  process.exit(0);
+}
 
 if (mode === 'set') {
   if (f[1] === 'true') die('already stamped: refusing to move the go-live instant (that confiscates or hands out tries). Edit the file by hand only with a decision recorded in lib/attempt-cap.ts.');
   const now = Date.now();
   writeFileSync(file, src
     .replace(/export const TRIES_APPLIED = \d{13};/, `export const TRIES_APPLIED = ${now};`)
-    .replace(/export const TRIES_GO_LIVE_STAMPED = false;/, 'export const TRIES_GO_LIVE_STAMPED = true;'));
-  console.log(`[stamp-tries-applied] TRIES_APPLIED = ${now} (${new Date(now).toISOString()}), stamped. Commit lib/attempt-cap.ts, then deploy.`);
+    .replace(/export const TRIES_GO_LIVE_STAMPED = false;/, 'export const TRIES_GO_LIVE_STAMPED = true;')
+    // A new stamp has not shipped yet: the 24-hour rule protects its first deploy again.
+    .replace(/export const TRIES_STAMP_SHIPPED = true;/, 'export const TRIES_STAMP_SHIPPED = false;'));
+  console.log(`[stamp-tries-applied] TRIES_APPLIED = ${now} (${new Date(now).toISOString()}), stamped. Commit lib/attempt-cap.ts, then deploy; once that deploy is live, run --mark-shipped and commit.`);
   process.exit(0);
 }
 
@@ -50,12 +67,12 @@ if (applied > Date.now()) die(`TRIES_APPLIED (${new Date(applied).toISOString()}
 // counts against the cap although the rule was not live yet. Re-stamp at the real go-live, or pass
 // --allow-old to say you know (the students' tries in that gap are the cost).
 const STALE_MS = 24 * 3600 * 1000;
-if (Date.now() - applied > STALE_MS) {
+if (Date.now() - applied > STALE_MS && sh[1] !== 'true') {
   // `npm run deploy` cannot pass a flag to this step, so the same knowing override is also an env var:
   //   TRIES_STAMP_ALLOW_OLD=1 npm run deploy
   // For every deploy AFTER the first one that shipped the stamp: the rule has been live since the stamp, so no tries are lost.
   if (!process.argv.includes('--allow-old') && process.env.TRIES_STAMP_ALLOW_OLD !== '1') {
-    die(`TRIES_APPLIED (${new Date(applied).toISOString()}) is more than 24 hours old: the deploy slipped, and attempts made between the stamp and the deploy would count against the cap before the rule was live. Un-stamp it (set TRIES_GO_LIVE_STAMPED back to false and the literal to the placeholder, in a commit) and run --set-now again at the real go-live, or pass --allow-old (or set TRIES_STAMP_ALLOW_OLD=1 for npm run deploy) to deploy anyway. Once a deploy has shipped this stamp, later deploys are not "slipped": set it.`);
+    die(`TRIES_APPLIED (${new Date(applied).toISOString()}) is more than 24 hours old and TRIES_STAMP_SHIPPED is false. If a deploy has ALREADY shipped this stamp, run \`node scripts/stamp-tries-applied.mjs --mark-shipped\` and commit: later deploys cannot slip. If not, the first deploy slipped, and attempts made between the stamp and the deploy would count against the cap before the rule was live: un-stamp it (TRIES_GO_LIVE_STAMPED false and the literal back to the placeholder, in a commit) and run --set-now again at the real go-live, or pass --allow-old (TRIES_STAMP_ALLOW_OLD=1 for npm run deploy) to deploy anyway.`);
   }
   console.error(`[stamp-tries-applied] WARNING: --allow-old / TRIES_STAMP_ALLOW_OLD. The stamp is ${Math.round((Date.now() - applied) / 3600000)} hours old; every attempt since ${new Date(applied).toISOString()} counts against the cap.`);
 }

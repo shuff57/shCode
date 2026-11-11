@@ -61,6 +61,16 @@ export const TRIES_APPLIED = 1791125019914;
  */
 export const TRIES_GO_LIVE_STAMPED = true;
 
+/**
+ * Has a deploy already shipped the stamp above? FALSE from `--set-now` until the first
+ * deploy that carries it is live; then `node scripts/stamp-tries-applied.mjs --mark-shipped`
+ * flips it (commit the result). The deploy guard refuses a stamp more than 24 hours old
+ * only while this is false: that rule protects the FIRST deploy (a slipped go-live counts
+ * attempts before the rule was live), and once the rule is live no later deploy can slip.
+ * The author's stamp shipped with the deploy of 2026-10-04.
+ */
+export const TRIES_STAMP_SHIPPED = true;
+
 /** The instant from which attempts count: the later of the two cutoffs. */
 export const COUNT_SINCE = Math.max(ATTEMPT_CAPS_APPLIED, TRIES_APPLIED);
 
