@@ -7,15 +7,18 @@
 // It opens by itself (decideAutoOpen) only when someone is signed in, on the
 // home page, a module's lesson list, the Sandbox or the Library (never a lesson,
 // where a quiz or timed part could be running, and never inside a frame), for
-// entries of their audience they have not seen that shipped in the last 45
-// days, at most once per browser session per account. Automated browsers
-// (navigator.webdriver) do not get it by themselves, so it never sits over a
-// test's clicks; `?whats-new` in the URL opens it anyway with every entry.
-// Closing it, by Close, Got it, Escape, the backdrop or an action, marks
-// every entry it showed as seen for this account.
+// entries of their audience they have not seen that are still live (shipped
+// in the last LIVE_DAYS, 14), at most once per browser session per account.
+// Automated browsers (navigator.webdriver) do not get it by themselves, so it
+// never sits over a test's clicks; `?whats-new` in the URL opens it anyway with
+// every live entry. A retired entry is shown nowhere.
+// Closing it marks what it showed as seen ONLY when the reader ticked "Don't
+// show these again" (owner's decision 2026-11-11). Closed without the tick, by
+// Close, Escape, the backdrop or an action, it comes back in the next browser
+// session (still at most once per session) and the menu's dot stays on.
 //
-// openWhatsNew() opens it with every entry for the reader's role (the account
-// menu and /account call it). useWhatsNewUnseen() drives the menu's dot.
+// openWhatsNew() opens it with every live entry for the reader's role (the
+// account menu and /account call it), or a line saying there is nothing new. useWhatsNewUnseen() drives the menu's dot.
 
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
@@ -23,7 +26,7 @@ import { getCurrentUser, type CurrentUser } from '../lib/auth';
 import { WHATS_NEW, type WhatsNewEntry } from '../lib/whats-new';
 import {
   decideAutoOpen,
-  entriesFor,
+  liveEntriesFor,
   entriesToAutoShow,
   markSeen,
   markShownThisSession,
@@ -125,18 +128,18 @@ export default function WhatsNewModal() {
       const returnTo = ((e as CustomEvent).detail?.returnFocusTo as HTMLElement | null) ?? (document.activeElement as HTMLElement | null);
       void getCurrentUser().then((u) => {
         if (!u) return;
-        const entries = entriesFor(WHATS_NEW, u.role);
-        if (entries.length) setOpen({ entries, returnTo });
+        // An empty list still opens, saying so: a menu item that does nothing reads as broken.
+        setOpen({ entries: liveEntriesFor(WHATS_NEW, u.role), returnTo });
       });
     };
     window.addEventListener(OPEN_EVENT, onOpen);
     return () => window.removeEventListener(OPEN_EVENT, onOpen);
   }, []);
 
-  const close = useCallback(() => {
+  const close = useCallback((dismiss: boolean) => {
     const was = openRef.current;
     if (!was) return;
-    if (user) markSeen(was.entries.map((e) => e.id), user.email, local());
+    if (user && dismiss) markSeen(was.entries.map((e) => e.id), user.email, local());
     setOpen(null);
     window.dispatchEvent(new Event(CHANGED_EVENT));
     // Back to where the reader was: the opener if it is still on the page, else (a menu item that has gone) the
@@ -194,7 +197,10 @@ const S = {
     justifySelf: 'start', background: 'none', border: '1px solid var(--brand)', color: 'var(--c-fg)', borderRadius: 4,
     padding: '6px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer', textDecoration: 'none',
   } as React.CSSProperties,
-  foot: { display: 'flex', justifyContent: 'flex-end', gap: 10, padding: '10px 16px 14px', borderTop: '1px solid var(--c-line)' } as React.CSSProperties,
+  foot: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10, padding: '10px 16px 14px', borderTop: '1px solid var(--c-line)' } as React.CSSProperties,
+  dismiss: {
+    display: 'inline-flex', alignItems: 'center', gap: 8, marginRight: 'auto', fontSize: 14, color: 'var(--c-fg)', cursor: 'pointer',
+  } as React.CSSProperties,
   primary: {
     background: 'var(--brand)', color: 'var(--on-brand)', border: 'none', borderRadius: 4, padding: '8px 18px',
     fontSize: 14, fontWeight: 700, cursor: 'pointer',
@@ -212,8 +218,13 @@ function formatDate(iso: string): string {
 
 const FOCUSABLE = 'a[href], button:not([disabled]), video[controls], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
-function WhatsNewDialog({ entries, onClose }: { entries: WhatsNewEntry[]; onClose: () => void }) {
+function WhatsNewDialog({ entries, onClose: closeWith }: { entries: WhatsNewEntry[]; onClose: (dismiss: boolean) => void }) {
   const ref = useRef<HTMLDivElement>(null);
+  // "Don't show these again": every way out reads it, so Escape and the backdrop respect it too.
+  const [dismiss, setDismiss] = useState(false);
+  const dismissRef = useRef(false);
+  dismissRef.current = dismiss;
+  const onClose = useCallback(() => closeWith(dismissRef.current), [closeWith]);
   const uid = useId();
   const titleId = `${uid}-title`;
   const [expanded, setExpanded] = useState<string>(entries[0]?.id ?? '');
@@ -278,6 +289,11 @@ function WhatsNewDialog({ entries, onClose }: { entries: WhatsNewEntry[]; onClos
           </button>
         </div>
         <div style={S.body}>
+          {entries.length === 0 && (
+            <p style={{ margin: 0, color: 'var(--c-dim)', lineHeight: 1.6 }} data-testid="whats-new-empty">
+              Nothing new right now. New features are listed here for two weeks after they arrive.
+            </p>
+          )}
           <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {entries.map((entry, i) => {
               const isOpen = !many || expanded === entry.id;
@@ -338,8 +354,21 @@ function WhatsNewDialog({ entries, onClose }: { entries: WhatsNewEntry[]; onClos
           </ul>
         </div>
         <div style={S.foot}>
+          {entries.length > 0 && (
+            <label style={S.dismiss}>
+              <input
+                type="checkbox"
+                checked={dismiss}
+                onChange={(e) => setDismiss(e.target.checked)}
+                className="whats-new-focus"
+                data-testid="whats-new-dismiss"
+                style={{ width: 16, height: 16, margin: 0, accentColor: 'var(--brand)' }}
+              />
+              Don&apos;t show {entries.length > 1 ? 'these' : 'this'} again
+            </label>
+          )}
           <button type="button" style={S.primary} onClick={onClose} className="whats-new-focus" data-testid="whats-new-done">
-            Got it
+            {dismiss ? 'Got it' : 'Close'}
           </button>
         </div>
       </div>

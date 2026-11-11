@@ -10,7 +10,7 @@
 // its own at most once per browser session per account, even if it was closed
 // by a reload rather than by Close.
 
-import { AUTO_SHOW_DAYS, type WhatsNewEntry } from './whats-new';
+import { LIVE_DAYS, type WhatsNewEntry } from './whats-new';
 
 export const SEEN_PREFIX = 'shcode.whatsNew.seen:';
 export const SHOWN_PREFIX = 'shcode.whatsNew.shown:';
@@ -109,23 +109,35 @@ export function shippedAt(date: string): number {
 }
 
 /**
- * The entries that may open the popup by themselves: for this role, not yet
- * seen, and shipped within the last `days` days (an old feature is not news to
- * a new student). A date in the future (more than a day out) does not count.
+ * Live: shipped within the last `days` days (LIVE_DAYS). After that an entry is
+ * retired: no popup, not in the list, no dot. A bad date, or one more than a day
+ * in the future, is never live.
  */
+export function isLive(e: WhatsNewEntry, now: number = Date.now(), days: number = LIVE_DAYS): boolean {
+  const t = shippedAt(e.date);
+  if (!Number.isFinite(t)) return false;
+  return now - t <= days * DAY_MS && t <= now + DAY_MS;
+}
+
+/** The list the account menu and /account open: this role's live entries, newest first. */
+export function liveEntriesFor(
+  entries: WhatsNewEntry[],
+  role: Role,
+  now: number = Date.now(),
+  days: number = LIVE_DAYS,
+): WhatsNewEntry[] {
+  return entriesFor(entries, role).filter((e) => isLive(e, now, days));
+}
+
+/** The entries that may open the popup by themselves: this role's live entries not yet seen. */
 export function entriesToAutoShow(
   entries: WhatsNewEntry[],
   seen: Set<string>,
   role: Role,
   now: number = Date.now(),
-  days: number = AUTO_SHOW_DAYS,
+  days: number = LIVE_DAYS,
 ): WhatsNewEntry[] {
-  return entriesFor(entries, role).filter((e) => {
-    if (seen.has(e.id)) return false;
-    const t = shippedAt(e.date);
-    if (!Number.isFinite(t)) return false;
-    return now - t <= days * DAY_MS && t <= now + DAY_MS;
-  });
+  return liveEntriesFor(entries, role, now, days).filter((e) => !seen.has(e.id));
 }
 
 /**
@@ -148,7 +160,7 @@ export interface AutoOpenInput {
   inFrame: boolean;
   /** navigator.webdriver: automated browsers do not get it by themselves, so it never blocks a test's clicks. */
   automated: boolean;
-  /** `?whats-new` in the URL: open with every entry for this role, whatever else holds. */
+  /** `?whats-new` in the URL: open with every live entry for this role, seen or not, on any page. */
   forced: boolean;
   shownThisSession: boolean;
   seen: Set<string>;
@@ -160,7 +172,7 @@ export interface AutoOpenInput {
 export function decideAutoOpen(input: AutoOpenInput): WhatsNewEntry[] {
   const { user, pathname, inFrame, automated, forced, shownThisSession, seen, now, entries } = input;
   if (!user || inFrame) return [];
-  if (forced) return entriesFor(entries, user.role);
+  if (forced) return liveEntriesFor(entries, user.role, now);
   if (automated || shownThisSession || !isAutoOpenPath(pathname)) return [];
   return entriesToAutoShow(entries, seen, user.role, now);
 }

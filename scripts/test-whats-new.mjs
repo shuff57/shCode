@@ -2,9 +2,10 @@
 // What's New (lib/whats-new.ts, lib/whats-new-state.ts, components/WhatsNewModal.tsx).
 // What has to hold:
 //   1. the popup opens by itself only for a signed-in user, on a listed page,
-//      for entries of their audience that they have not seen and that shipped
-//      within AUTO_SHOW_DAYS; never in a frame, never for an automated browser,
-//      at most once per session per account;
+//      for entries of their audience that they have not seen and that are live
+//      (shipped within LIVE_DAYS); never in a frame, never for an automated
+//      browser, at most once per session per account; a retired entry (older
+//      than LIVE_DAYS) is shown nowhere, not even in the menu's list;
 //   2. seen-state is per account, and malformed or throwing storage reads as
 //      "nothing seen" without throwing;
 //   3. the entries are well formed: unique ids, valid dates newest first, at
@@ -21,7 +22,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const { WHATS_NEW, AUTO_SHOW_DAYS } = await import(join(root, 'lib/whats-new.ts'));
+const { WHATS_NEW, LIVE_DAYS } = await import(join(root, 'lib/whats-new.ts'));
 const S = await import(join(root, 'lib/whats-new-state.ts'));
 const { sections } = await import(join(root, 'lib/moshion-docs.ts'));
 
@@ -53,10 +54,10 @@ const ids = (list) => list.map((e) => e.id);
 
 // ---- 1. the auto-show window and audience ----
 check('a student auto-shows unseen student + all entries inside the window', () => {
-  assert.deepEqual(ids(S.entriesToAutoShow(sample, new Set(), 'student', now, 45)), ['s-new', 'all-new']);
+  assert.deepEqual(ids(S.entriesToAutoShow(sample, new Set(), 'student', now, 14)), ['s-new', 'all-new']);
 });
 check('a teacher also gets the student news, inside the window', () => {
-  assert.deepEqual(ids(S.entriesToAutoShow(sample, new Set(), 'teacher', now, 45)), ['s-new', 't-new', 'all-new']);
+  assert.deepEqual(ids(S.entriesToAutoShow(sample, new Set(), 'teacher', now, 14)), ['s-new', 't-new', 'all-new']);
 });
 check('an admin reads everything, like a teacher', () => {
   assert.deepEqual(ids(S.entriesFor(sample, 'admin')), ['s-new', 't-new', 'all-new', 's-old']);
@@ -65,15 +66,22 @@ check('a student never sees teacher news, even in the full list', () => {
   assert.deepEqual(ids(S.entriesFor(sample, 'student')), ['s-new', 'all-new', 's-old']);
 });
 check('seen entries do not auto-show', () => {
-  assert.deepEqual(ids(S.entriesToAutoShow(sample, new Set(['s-new']), 'student', now, 45)), ['all-new']);
-  assert.deepEqual(S.entriesToAutoShow(sample, new Set(['s-new', 'all-new']), 'student', now, 45), []);
+  assert.deepEqual(ids(S.entriesToAutoShow(sample, new Set(['s-new']), 'student', now, 14)), ['all-new']);
+  assert.deepEqual(S.entriesToAutoShow(sample, new Set(['s-new', 'all-new']), 'student', now, 14), []);
 });
-check('the window is 45 days, and an entry 45 days old still counts but 46 does not', () => {
-  assert.equal(AUTO_SHOW_DAYS, 45);
+check('an entry is live for 14 days: 14 days old still counts, 15 is retired', () => {
+  assert.equal(LIVE_DAYS, 14);
   const e = [{ id: 'x', date: '2026-01-01', audience: 'all', title: 't', summary: 's' }];
   const t = Date.parse('2026-01-01T00:00:00Z');
-  assert.equal(S.entriesToAutoShow(e, new Set(), 'student', t + 45 * DAY).length, 1);
-  assert.equal(S.entriesToAutoShow(e, new Set(), 'student', t + 46 * DAY).length, 0);
+  assert.equal(S.entriesToAutoShow(e, new Set(), 'student', t + 14 * DAY).length, 1);
+  assert.equal(S.entriesToAutoShow(e, new Set(), 'student', t + 15 * DAY).length, 0);
+  assert.equal(S.liveEntriesFor(e, 'student', t + 14 * DAY).length, 1);
+  assert.equal(S.liveEntriesFor(e, 'student', t + 15 * DAY).length, 0);
+});
+check('the menu lists live entries only, seen or not', () => {
+  assert.deepEqual(ids(S.liveEntriesFor(sample, 'student', now)), ['s-new', 'all-new']);
+  assert.deepEqual(ids(S.liveEntriesFor(sample, 'teacher', now)), ['s-new', 't-new', 'all-new']);
+  assert.deepEqual(S.liveEntriesFor(sample, 'student', now + 30 * DAY), []);
 });
 check('bad dates and dates more than a day ahead never auto-show', () => {
   const odd = [
@@ -81,7 +89,7 @@ check('bad dates and dates more than a day ahead never auto-show', () => {
     { id: 'b', date: '2026-11-31x', audience: 'all', title: 't', summary: 's' },
     { id: 'c', date: '2027-01-01', audience: 'all', title: 't', summary: 's' },
   ];
-  assert.deepEqual(S.entriesToAutoShow(odd, new Set(), 'student', now, 45), []);
+  assert.deepEqual(S.entriesToAutoShow(odd, new Set(), 'student', now, 14), []);
 });
 
 // ---- the page and session rule ----
@@ -104,9 +112,9 @@ check('signed out never opens, even forced', () => {
 check('inside a frame never opens, even forced', () => {
   assert.deepEqual(S.decideAutoOpen({ ...base, inFrame: true, forced: true }), []);
 });
-check('an automated browser does not get it by itself; ?whats-new forces every entry for the role', () => {
+check('an automated browser does not get it by itself; ?whats-new forces every live entry for the role', () => {
   assert.deepEqual(S.decideAutoOpen({ ...base, automated: true }), []);
-  assert.deepEqual(ids(S.decideAutoOpen({ ...base, automated: true, forced: true, pathname: '/lesson/x', seen: new Set(['s-new']) })), ['s-new', 'all-new', 's-old']);
+  assert.deepEqual(ids(S.decideAutoOpen({ ...base, automated: true, forced: true, pathname: '/lesson/x', seen: new Set(['s-new']) })), ['s-new', 'all-new']);
 });
 check('at most once per session: shown this session means no auto-open', () => {
   assert.deepEqual(S.decideAutoOpen({ ...base, shownThisSession: true }), []);

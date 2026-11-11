@@ -165,11 +165,11 @@ export default function AccountPage() {
 
       <AppearanceSettings />
 
-      {/* Every What's New entry for this account's role, newest first (components/WhatsNewModal.tsx). */}
+      {/* This role's live What's New entries (the last two weeks), newest first (components/WhatsNewModal.tsx). */}
       <section aria-labelledby="whats-new-h" style={{ ...S.card, marginTop: 24 }}>
         <h2 id="whats-new-h" style={{ fontSize: 20, fontWeight: 700, margin: '0 0 4px', color: 'var(--c-fg)' }}>What&apos;s new</h2>
         <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: '0 0 12px' }}>
-          New things you can do in shCode, with a short clip of each.
+          New things you can do in shCode from the last two weeks, with a short clip of each.
         </p>
         <button type="button" className="btn-primary" onClick={(e) => openWhatsNew(e.currentTarget)} data-testid="whats-new-account">
           See what&apos;s new

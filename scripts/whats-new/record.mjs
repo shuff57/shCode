@@ -213,6 +213,36 @@ function draw() {
 `;
 
 const SAM = { email: 'sam@example.org', role: 'student', label: "Sam's screen" };
+// #101: the textLayer() docs example, with the player moving by itself.
+const MOSHION_TEXT_LAYER = `let player, tree;
+
+function setup() {
+  new Canvas(400, 300);
+  player = new Sprite(30, 150, 40, 40);
+  player.color = 'deepskyblue';
+  player.collider = 'none';
+  player.layer = 1;
+
+  tree = new Sprite(280, 150, 70, 120);
+  tree.collider = 'none';
+  tree.color = 'forestgreen';
+  tree.layer = 10;
+}
+
+function update() {
+  player.x += 2;
+  if (player.x > 420) player.x = -20;
+}
+
+function draw() {
+  background('#222');
+  fill('white');
+  textSize(24);
+  textLayer(5); // over the player (layer 1), under the tree (layer 10)
+  text('Welcome to the forest', 60, 160);
+  textLayer();
+}
+`;
 // The undo-restore poster's saved version: a small moSHion sketch.
 const MOSHION_SAVED_V1 = `function setup() {
   new Canvas(400, 400);
@@ -274,6 +304,42 @@ const RECIPES = {
       await d.click(p.getByRole('button', { name: /Run/ }).first(), { after: 1100 });
       await d.click(p.getByTestId('sandbox-projects-button'), { after: 900 });
       await d.click(p.locator('[data-testid=sandbox-projects] li button').filter({ hasText: 'moSHion sandbox' }).first(), { after: 1200 });
+    },
+  },
+
+  // #101 textLayer(n): the docs example with the player sliding on its own, so the words are seen
+  // painted over the player (layer 1) and under the tree (layer 10).
+  '2026-11-text-layer': {
+    people: [SAM],
+    path: '/sandbox/',
+    async before({ demos: [d], pages: [p] }) {
+      await p.getByTestId('sandbox-projects-button').waitFor({ timeout: 30000 });
+      await d.setCode(MOSHION_TEXT_LAYER);
+      // Started before the clip: on a slow machine the first seconds after Run are an empty preview.
+      await p.getByRole('button', { name: /Run/ }).first().click();
+      await p.frameLocator('iframe').first().locator('canvas').first().waitFor({ timeout: 60000 });
+      await p.waitForTimeout(2500);
+      await d.moveTo(1180, 560, 16);
+    },
+    async run({ demos: [d] }) {
+      // The square passes under the words, and the words under the tree.
+      await d.pause(8000);
+    },
+  },
+
+  // #90/#95: a lab's steps open from the yellow "Your task" tab on the left edge.
+  '2026-11-your-task-tab': {
+    people: [SAM],
+    path: '/lesson/3-1-13-lab-syntax-naming/',
+    posterOnly: true,
+    async run({ demos: [d], pages: [p] }) {
+      const tab = p.locator('.lab-task-tab').first();
+      await tab.waitFor({ timeout: 60000 });
+      if ((await tab.getAttribute('aria-expanded')) !== 'true') await d.click(tab, { after: 600 });
+      await p.locator('.lab-task-card').first().waitFor({ timeout: 15000 });
+      // Off the tab, so its words can be read.
+      await d.moveTo(70, 640, 400);
+      await d.pause(500);
     },
   },
 

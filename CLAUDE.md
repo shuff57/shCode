@@ -1078,11 +1078,14 @@ A popup tells a returning student or teacher what changed since they last looked
 mounted once in `app/layout.tsx`). Entries are `lib/whats-new.ts`, newest first; the rules are `lib/whats-new-state.ts`.
 It opens by itself only when someone is signed in, on `/`, `/module/*`, `/sandbox` or `/library` (never a lesson, so
 never over a quiz or a timed part, never `/play`, never inside a frame), for unseen entries of their audience
-(`student` | `teacher` | `all`; teachers and admins also see the student entries) shipped within 45 days, at most once per browser session
-per account. Seen-state is localStorage `shcode.whatsNew.seen:<hash of the email>`, so two students on one computer
-each see it once. Automated browsers (`navigator.webdriver`) never get it by themselves, so it cannot sit over a test's
+(`student` | `teacher` | `all`; teachers and admins also see the student entries) that are still live, at most once per browser session
+per account. An entry is marked seen ONLY when the reader ticks "Don't show these again" before closing (owner's
+decision 2026-11-11); closed without the tick it pops up again next browser session and the menu dot stays. Seen-state
+is localStorage `shcode.whatsNew.seen:<hash of the email>`, so two students on one computer each dismiss it on their own. Automated browsers (`navigator.webdriver`) never get it by themselves, so it cannot sit over a test's
 clicks; `?whats-new` forces it open. "What's new" in the account menu (a dot while recent news is unseen) and on
-`/account` lists every entry for the role.
+`/account` lists the role's live entries ("Nothing new right now" when there are none). **An entry is live for 14 days
+after its ship date** (`LIVE_DAYS`, owner's decision 2026-11-11), then retired: no popup, not listed, no dot. A retired
+entry stays in `WHATS_NEW` (ids are never reused) and its clip stays in `public/whats-new/`.
 
 To announce a feature:
 1. Add a recipe under the entry's id in `scripts/whats-new/record.mjs` and record it against a FRESH dev server

@@ -13,9 +13,11 @@
 // Entry fields:
 //   id        stable, unique, NEVER reused or renamed. Seen-state is stored per
 //             id, so a renamed id pops up again for everyone who saw it.
-//   date      'YYYY-MM-DD' it shipped (git log --date=short). The popup opens on
-//             its own only for unseen entries shipped within AUTO_SHOW_DAYS;
-//             older ones stay in the list behind "What's new" in the account menu.
+//   date      'YYYY-MM-DD' it shipped (git log --date=short). An entry is LIVE
+//             for LIVE_DAYS after that: it may pop up (while unseen), it is in the
+//             list behind "What's new" in the account menu and on /account, and
+//             it lights the menu's dot. After that it is retired and shown
+//             nowhere, but stays in this file: an id is never reused.
 //   audience  'student' | 'teacher' | 'all'. A student never sees a teacher
 //             entry and a teacher (or admin) never sees a student one.
 //   title     a few words.
@@ -29,7 +31,8 @@
 //   action    optional { label, href }: a button that closes the popup and goes
 //             there (a page in this site, never an outside link).
 
-export const AUTO_SHOW_DAYS = 45;
+/** Days an entry stays live after its ship date (owner's decision 2026-11-11: two weeks, then retired). */
+export const LIVE_DAYS = 14;
 
 export type WhatsNewAudience = 'student' | 'teacher' | 'all';
 
@@ -81,6 +84,26 @@ export const WHATS_NEW: WhatsNewEntry[] = [
       poster: '/whats-new/2026-11-undo-restore.jpg',
       alt: 'Version history with a new version at the top called Before restoring, holding the code that was there before the restore.',
     },
+  },
+  {
+    id: '2026-11-text-layer',
+    date: '2026-11-11',
+    audience: 'student',
+    title: 'Text between sprites',
+    summary:
+      'In moSHion, textLayer(n) gives text a layer, the way a sprite has one: the words are drawn over sprites on that layer or lower ' +
+      'and under the higher ones. Before, text written in draw() always sat under every sprite.',
+    steps: [
+      'Give your sprites layers, for example player.layer = 1 and tree.layer = 10.',
+      'In draw(), write textLayer(5) before text(...) to put the words between them.',
+      'Write textLayer() with nothing in the brackets to put text back under every sprite.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-text-layer.mp4',
+      poster: '/whats-new/2026-11-text-layer.jpg',
+      alt: 'A blue square slides across the words "Welcome to the forest": the words are drawn over the square, and the green tree is drawn over the words.',
+    },
+    action: { label: 'Read about textLayer()', href: '/docs/moshion/text' },
   },
   {
     id: '2026-11-propose-changes',
@@ -199,6 +222,23 @@ export const WHATS_NEW: WhatsNewEntry[] = [
       alt: "A class's Shared games list: a game's menu offers Clear suggestions, and the confirm says what goes.",
     },
     action: { label: 'Open my classes', href: '/teacher' },
+  },
+  {
+    id: '2026-11-your-task-tab',
+    date: '2026-11-10',
+    audience: 'student',
+    title: '"Your task" is a yellow tab on the left',
+    summary:
+      'In a lab, the steps now open from a yellow Your task tab on the left edge of the screen, right beside your code. ' +
+      'The Steps tab on the right is gone, because it showed the same steps.',
+    steps: [
+      'Open a lab and press the yellow Your task tab on the left to show or hide the steps.',
+      'The page remembers whether you left the steps open or closed.',
+    ],
+    media: {
+      poster: '/whats-new/2026-11-your-task-tab.jpg',
+      alt: 'A lab with the yellow Your task tab on the left edge of the screen and the lab\'s steps open beside the code.',
+    },
   },
   {
     id: '2026-11-share-your-way',
