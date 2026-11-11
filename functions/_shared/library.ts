@@ -1,20 +1,34 @@
-// Rules for the texture and sound library (functions/api/library/*), shared by
-// the routes and their test. See migrations/0039_library.sql.
+// Rules for the texture, sound and font library (functions/api/library/*),
+// shared by the routes and their test. See migrations/0039_library.sql and
+// 0050_library_fonts.sql (fonts, 2026-11-12).
 
 import { sniffImageType } from './uploads';
 
-export type LibraryKind = 'texture' | 'sound';
+export type LibraryKind = 'texture' | 'sound' | 'font';
 
 /** Per item, measured on the data URI the browser stores. Mirrors lib/moshion-storage.ts. */
+// A font is 150 KB of file at most and 500 KB of files per account (the
+// owner's decision, 2026-11-12): fonts sit in the same browser localStorage as
+// lesson drafts, pictures and sounds, and that holds ~5 million characters per
+// site. A data URI is 4/3 of the file plus its prefix, hence the odd numbers.
+export const FONT_FILE_MAX = 150 * 1024;
+export const FONT_FILES_TOTAL_MAX = 500 * 1024;
 export const MAX_ITEM_BYTES: Record<LibraryKind, number> = {
   texture: 64 * 1024,
   sound: 256 * 1024,
+  font: Math.ceil(FONT_FILE_MAX * 4 / 3) + 64,
 };
 /** Per account, live items only. */
 export const MAX_TOTAL_BYTES: Record<LibraryKind, number> = {
   texture: 1024 * 1024,
   sound: 2 * 1024 * 1024,
+  font: Math.ceil(FONT_FILES_TOTAL_MAX * 4 / 3) + 64,
 };
+
+/** The file size a data URI of `n` characters holds, roughly (for messages in KB of file). */
+export function fileBytesOf(dataUriLength: number): number {
+  return Math.floor(dataUriLength * 3 / 4);
+}
 export const MAX_ITEMS_PER_KIND = 200;
 export const MAX_META_BYTES = 8 * 1024;
 
@@ -22,7 +36,7 @@ export const MAX_META_BYTES = 8 * 1024;
 export const NAME_RE = /^[A-Za-z][A-Za-z0-9_]{0,39}$/;
 
 export function isKind(v: unknown): v is LibraryKind {
-  return v === 'texture' || v === 'sound';
+  return v === 'texture' || v === 'sound' || v === 'font';
 }
 
 /** `data:<anything>;base64,<payload>` -> bytes, or null. The declared type is ignored. */
@@ -56,10 +70,27 @@ export function sniffSoundType(b: Uint8Array): 'audio/wav' | 'audio/ogg' | 'audi
   return null;
 }
 
+/**
+ * The real type of a font, from its first four bytes: TrueType (00 01 00 00,
+ * or 'true' from old Macs), OpenType with CFF outlines ('OTTO'), WOFF ('wOFF')
+ * or WOFF2 ('wOF2'). A font collection ('ttcf') and anything else is null.
+ * The browser checks every font again (its font sanitizer) before drawing one.
+ */
+export function sniffFontType(b: Uint8Array): 'font/ttf' | 'font/otf' | 'font/woff' | 'font/woff2' | null {
+  if (b.length < 12) return null;
+  const tag = String.fromCharCode(b[0], b[1], b[2], b[3]);
+  if ((b[0] === 0x00 && b[1] === 0x01 && b[2] === 0x00 && b[3] === 0x00) || tag === 'true') return 'font/ttf';
+  if (tag === 'OTTO') return 'font/otf';
+  if (tag === 'wOFF') return 'font/woff';
+  if (tag === 'wOF2') return 'font/woff2';
+  return null;
+}
+
 /** The stored MIME for a data URI of this kind, from its bytes; null refuses it. */
 export function sniffLibraryItem(kind: LibraryKind, dataUri: string): string | null {
   const bytes = decodeDataUri(dataUri);
   if (!bytes || bytes.length === 0) return null;
+  if (kind === 'font') return sniffFontType(bytes);
   return kind === 'texture' ? sniffImageType(bytes) : sniffSoundType(bytes);
 }
 

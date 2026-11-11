@@ -49,6 +49,9 @@ check('usesItem: part of a longer string does not count', !core.usesItem(new Set
 check('usedItems leaves out built-in picture names, but not a sound of that name',
   eq(core.usedItems(`x('coin'); y('hero')`, [{ kind: 'texture', name: 'coin' }, { kind: 'sound', name: 'coin' }, { kind: 'texture', name: 'hero' }], new Set(['coin'])),
     [{ kind: 'sound', name: 'coin' }, { kind: 'texture', name: 'hero' }]));
+check('usedItems: a font named in textFont() is used, and so is an explicit font: key (2026-11-12)',
+  eq(core.usedItems(`textFont('BigBlock'); x('font:Title')`, [{ kind: 'font', name: 'BigBlock' }, { kind: 'font', name: 'Title' }, { kind: 'font', name: 'Unused' }]),
+    [{ kind: 'font', name: 'BigBlock' }, { kind: 'font', name: 'Title' }]));
 
 // ---- the world -------------------------------------------------------------
 const db = makeD1();

@@ -12,7 +12,7 @@
 
 export interface SharedRow {
   id: string;
-  kind: 'texture' | 'sound';
+  kind: 'texture' | 'sound' | 'font';
   name: string;
   bytes: number;
   owner_email: string;

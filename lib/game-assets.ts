@@ -38,6 +38,8 @@ type Store = Record<string, string>;
 const KEYS: Record<AssetKind, [string, string]> = {
   texture: ['texture:', 'texmeta:'],
   sound: ['sound:', 'sndmeta:'],
+  // A font has no meta; the second key is never written by anything.
+  font: ['font:', 'fontmeta:'],
 };
 
 /** The frame count in a texmeta string, or undefined for a still. Tolerates the double-encoded form. */

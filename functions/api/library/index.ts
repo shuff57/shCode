@@ -1,4 +1,4 @@
-// GET /api/library  — the caller's textures and sounds (tombstones included) + quota
+// GET /api/library  — the caller's textures, sounds and fonts (tombstones included) + quota
 // PUT /api/library  — save one item: { kind, name, dataUri, meta, baseHash, remixedFrom? }
 //
 // The account copy of what the texture editor and the sound mixer save in the
@@ -25,7 +25,10 @@ import {
   MAX_ITEMS_PER_KIND,
   MAX_META_BYTES,
   MAX_TOTAL_BYTES,
+  FONT_FILE_MAX,
+  FONT_FILES_TOTAL_MAX,
   NAME_RE,
+  fileBytesOf,
   isKind,
   itemHash,
   r2Key,
@@ -87,6 +90,7 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ en
     quota: {
       texture: { bytes: used('texture'), maxBytes: MAX_TOTAL_BYTES.texture, maxItemBytes: MAX_ITEM_BYTES.texture },
       sound: { bytes: used('sound'), maxBytes: MAX_TOTAL_BYTES.sound, maxItemBytes: MAX_ITEM_BYTES.sound },
+      font: { bytes: used('font'), maxBytes: MAX_TOTAL_BYTES.font, maxItemBytes: MAX_ITEM_BYTES.font },
     },
   });
 };
@@ -102,7 +106,7 @@ export const onRequestPut: PagesFunction<Env, string, SessionData> = async ({ re
     return json({ error: 'Invalid JSON body' }, 400);
   }
   const { kind, name, dataUri } = body;
-  if (!isKind(kind)) return json({ error: "kind must be 'texture' or 'sound'" }, 400);
+  if (!isKind(kind)) return json({ error: "kind must be 'texture', 'sound' or 'font'" }, 400);
   if (typeof name !== 'string' || !NAME_RE.test(name)) {
     return json({ error: 'Name must start with a letter and contain only letters, digits and _ (40 at most).' }, 400);
   }
@@ -112,14 +116,20 @@ export const onRequestPut: PagesFunction<Env, string, SessionData> = async ({ re
   if (meta && meta.length > MAX_META_BYTES) return json({ error: 'meta is too large' }, 413);
   const baseHash = typeof body.baseHash === 'string' ? body.baseHash : null;
 
-  const label = kind === 'texture' ? 'texture' : 'sound';
+  const label = kind === 'texture' ? 'texture' : kind === 'sound' ? 'sound' : 'font';
   if (dataUri.length > MAX_ITEM_BYTES[kind]) {
-    return json({ error: `That ${label} is ${Math.round(dataUri.length / 1024)} KB; the limit is ${MAX_ITEM_BYTES[kind] / 1024} KB.` }, 413);
+    // A font's limit is said in KB of FILE, the number a student sees beside the file.
+    const [have, max] = kind === 'font'
+      ? [fileBytesOf(dataUri.length), FONT_FILE_MAX]
+      : [dataUri.length, MAX_ITEM_BYTES[kind]];
+    return json({ error: `That ${label} is ${Math.round(have / 1024)} KB; the limit is ${Math.round(max / 1024)} KB.` }, 413);
   }
   // The type comes from the bytes, never from the data URI's own label.
   const mime = sniffLibraryItem(kind, dataUri);
   if (!mime) {
-    return json({ error: kind === 'texture' ? 'That is not a PNG, JPEG, GIF or WebP image.' : 'That is not a WAV, MP3 or OGG sound.' }, 415);
+    return json({ error: kind === 'texture' ? 'That is not a PNG, JPEG, GIF or WebP image.'
+      : kind === 'sound' ? 'That is not a WAV, MP3 or OGG sound.'
+      : 'That is not a TTF, OTF, WOFF or WOFF2 font file.' }, 415);
   }
   const hash = await itemHash(dataUri, meta);
 
@@ -144,7 +154,8 @@ export const onRequestPut: PagesFunction<Env, string, SessionData> = async ({ re
     return json({ error: `Your library holds ${MAX_ITEMS_PER_KIND} ${label}s at most. Delete one first.` }, 413);
   }
   if ((totals?.bytes ?? 0) + dataUri.length > MAX_TOTAL_BYTES[kind]) {
-    return json({ error: `Your ${label}s are full (${MAX_TOTAL_BYTES[kind] / 1024 / 1024} MB). Delete one first.` }, 413);
+    const full = kind === 'font' ? `${FONT_FILES_TOTAL_MAX / 1024} KB` : `${MAX_TOTAL_BYTES[kind] / 1024 / 1024} MB`;
+    return json({ error: `Your ${label}s are full (${full}). Delete one first.` }, 413);
   }
 
   const id = existing && isUploadId(existing.id) ? existing.id : newUploadId();

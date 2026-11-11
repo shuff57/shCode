@@ -2771,7 +2771,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         </div>
         {/* Textures and sounds students shared with this class (#81) */}
         <div style={S.card}>
-          <h2 style={S.h2}>Shared textures and sounds</h2>
+          <h2 style={S.h2}>Shared textures, sounds and fonts</h2>
           <ClassLibraryModeration classId={classId} />
         </div>
         {/* Games students published from the moSHion sandbox and shared with this class */}

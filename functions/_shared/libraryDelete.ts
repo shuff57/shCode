@@ -88,12 +88,13 @@ export async function deleteGameFor(db: D1Database, owner: string, id: string, n
 export interface ClearCounts {
   pictures: number;
   sounds: number;
+  fonts: number;
   images: number;
   games: number;
 }
 
 /**
- * Every picture, sound, uploaded image and published game of one account:
+ * Every picture, sound, font, uploaded image and published game of one account:
  * library items and games become tombstones (their shares go), upload rows are
  * deleted, and every R2 object behind them is removed. One D1 batch, so a
  * half-cleared library is not a state this can leave behind.
@@ -128,6 +129,7 @@ export async function clearLibraryOf(db: D1Database, bucket: R2Bucket | undefine
   return {
     pictures: items.filter((i) => i.kind === 'texture').length,
     sounds: items.filter((i) => i.kind === 'sound').length,
+    fonts: items.filter((i) => i.kind === 'font').length,
     images: uploads.length,
     games: games?.n ?? 0,
   };

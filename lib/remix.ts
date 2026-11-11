@@ -6,7 +6,7 @@
 import type { LibraryKind } from './moshion-storage';
 
 export function editorUrl(kind: LibraryKind, name: string): string {
-  return (kind === 'texture' ? '/textures/' : '/sound/') + '?edit=' + encodeURIComponent(name);
+  return (kind === 'texture' ? '/textures/' : kind === 'font' ? '/fonts/' : '/sound/') + '?edit=' + encodeURIComponent(name);
 }
 
 /**

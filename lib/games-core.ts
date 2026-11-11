@@ -148,7 +148,7 @@ export function stringLiterals(code: string): string[] {
   return out;
 }
 
-export type AssetKind = 'texture' | 'sound';
+export type AssetKind = 'texture' | 'sound' | 'font';
 
 /** Does a code with these string literals use the saved item `kind`:`name`? */
 export function usesItem(literals: ReadonlySet<string>, kind: AssetKind, name: string): boolean {

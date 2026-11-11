@@ -7,6 +7,7 @@
 // menu, POST /api/classes/[id]/library-delete) removes it from the student's own
 // Library too, on every computer; only for a student enrolled in this class (`canDelete`).
 
+import { FontSample } from './FontLibrary';
 import { useCallback, useEffect, useState } from 'react';
 import { errorText } from '../lib/http-error';
 import { useFeedback } from './FeedbackProvider';
@@ -15,7 +16,7 @@ import { deleteItemConfirm } from '../lib/library-delete-words';
 
 interface Row {
   id: string;
-  kind: 'texture' | 'sound';
+  kind: 'texture' | 'sound' | 'font';
   name: string;
   owner: string;
   ownerEmail: string;
@@ -48,7 +49,7 @@ export default function ClassLibraryModeration({ classId }: { classId: string })
     return dataUri;
   }, [art]);
   useEffect(() => {
-    for (const r of rows ?? []) if (r.kind === 'texture' && !art[r.id]) void preview(r.id);
+    for (const r of rows ?? []) if ((r.kind === 'texture' || r.kind === 'font') && !art[r.id]) void preview(r.id);
   }, [rows, art, preview]);
 
   const act = async (r: Row, action: 'hide' | 'unhide' | 'remove') => {
@@ -70,7 +71,7 @@ export default function ClassLibraryModeration({ classId }: { classId: string })
   };
 
   const remove = async (r: Row) => {
-    const noun = r.kind === 'texture' ? 'picture' : 'sound';
+    const noun = r.kind === 'texture' ? 'picture' : r.kind === 'font' ? 'font' : 'sound';
     if (!(await confirm({ ...deleteItemConfirm(r.owner, r.kind, r.name), confirmLabel: 'Delete', danger: true }))) return;
     const res = await fetch(`/api/classes/${encodeURIComponent(classId)}/library-delete`, {
       method: 'POST',
@@ -86,7 +87,7 @@ export default function ClassLibraryModeration({ classId }: { classId: string })
   if (error) return <p style={{ color: 'var(--c-red)', fontSize: 13 }}>{error}</p>;
   if (!rows) return <p style={{ color: 'var(--c-dim)', fontSize: 13 }}>Loading…</p>;
   if (!rows.length) {
-    return <p style={{ color: 'var(--c-dim)', fontSize: 13, margin: 0 }}>Nothing shared yet. When a student presses &ldquo;Share with class&rdquo; on a texture or sound, it shows up here and in every classmate&rsquo;s library at once.</p>;
+    return <p style={{ color: 'var(--c-dim)', fontSize: 13, margin: 0 }}>Nothing shared yet. When a student presses &ldquo;Share with class&rdquo; on a texture, sound or font, it shows up here and in every classmate&rsquo;s library at once.</p>;
   }
   const btn = { fontSize: 12, padding: '3px 8px', borderRadius: 4, cursor: 'pointer', background: 'transparent', color: 'var(--c-cyan)', border: '1px solid var(--c-line)' } as const;
   return (
@@ -99,6 +100,8 @@ export default function ClassLibraryModeration({ classId }: { classId: string })
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={art[r.id]} alt="" style={{ height: 36, imageRendering: 'pixelated', objectFit: 'cover', objectPosition: 'left', maxWidth: 'none' }} />
               )
+              : r.kind === 'font'
+              ? art[r.id] && <FontSample fontKey={`mod:${r.id}:${art[r.id].length}`} src={{ dataUri: art[r.id] }} text="Aa" size={20} />
               : (
                 <button type="button" aria-label={`Play ${r.name}`} style={{ ...btn, border: 'none' }}
                   onClick={async () => { const d = await preview(r.id); if (d) new Audio(d).play().catch(() => {}); }}>▶</button>

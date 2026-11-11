@@ -84,7 +84,7 @@ export function planSync(
   const S = new Map(server.map((s) => [itemKey(s.kind, s.name), s]));
   const keys = new Set([...L.keys(), ...Object.keys(base), ...S.keys(), ...deletes]);
   // Names a rename must avoid, per kind: everything here and everything there.
-  const taken: Record<LibraryKind, Set<string>> = { texture: new Set(), sound: new Set() };
+  const taken: Record<LibraryKind, Set<string>> = { texture: new Set(), sound: new Set(), font: new Set() };
   for (const l of local) taken[l.kind].add(l.name);
   for (const s of server) taken[s.kind].add(s.name);
 
@@ -203,7 +203,7 @@ export async function runSync(email: string): Promise<SyncResult> {
     }
     serverItems = ((await res.json()) as { items: ServerItem[] }).items ?? [];
   } catch {
-    result.problems.push('Offline: your textures and sounds are saved here and will sync later.');
+    result.problems.push('Offline: your textures, sounds and fonts are saved here and will sync later.');
     return finish(result);
   }
 
@@ -292,7 +292,7 @@ export async function runSync(email: string): Promise<SyncResult> {
       const renamesOnly = put.filter((p) => result.renamed.some((r) => r.kind === p.kind && r.to === p.name));
       applyLibraryChanges({ put: renamesOnly, remove });
       result.downloaded = 0;
-      result.problems.push('This browser is out of room for your whole library. Delete a texture or sound you no longer need.');
+      result.problems.push('This browser is out of room for your whole library. Delete a texture, sound or font you no longer need.');
     }
   }
 

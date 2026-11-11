@@ -66,24 +66,38 @@ const MAX_SOUND_TOTAL_BYTES = 2 * 1024 * 1024;
 // out sketch saves, and sketch saves can never push out a texture.
 const MAX_TEXTURE_TOTAL_BYTES = 1024 * 1024;
 
+// Saved fonts (textFont('name'), 2026-11-12) get a budget of their own too:
+// 150 KB of font file each and 500 KB of files in all, the same as an
+// account's library allows (functions/_shared/library.ts). localStorage holds
+// ~5 million characters per site, and drafts, sketch saves, textures and
+// sounds can already take 3.5 million of them, so fonts are kept small rather
+// than let a student's fonts push out a lesson draft. A data URI is 4/3 of
+// its file, and the stored value is that URI JSON-quoted.
+const FONT_PREFIX = 'font:';
+const MAX_FONT_VALUE_BYTES = Math.ceil(150 * 1024 * 4 / 3) + 128;
+const MAX_FONT_TOTAL_BYTES = Math.ceil(500 * 1024 * 4 / 3) + 4096;
+
 type Store = Record<string, string>;
 
-function storeBytes(store: Store): { draft: number; sound: number; texture: number } {
+function storeBytes(store: Store): { draft: number; sound: number; texture: number; font: number } {
   let draft = 0;
   let sound = 0;
   let texture = 0;
+  let font = 0;
   for (const [key, value] of Object.entries(store)) {
     const bytes = key.length + value.length;
     if (key.startsWith(SOUND_PREFIX)) sound += bytes;
     else if (key.startsWith('texture:') || key.startsWith('texmeta:')) texture += bytes;
+    else if (key.startsWith(FONT_PREFIX)) font += bytes;
     else draft += bytes;
   }
-  return { draft, sound, texture };
+  return { draft, sound, texture, font };
 }
 
 function withinCaps(store: Store): boolean {
-  const { draft, sound, texture } = storeBytes(store);
-  return draft <= MAX_TOTAL_BYTES && sound <= MAX_SOUND_TOTAL_BYTES && texture <= MAX_TEXTURE_TOTAL_BYTES;
+  const { draft, sound, texture, font } = storeBytes(store);
+  return draft <= MAX_TOTAL_BYTES && sound <= MAX_SOUND_TOTAL_BYTES && texture <= MAX_TEXTURE_TOTAL_BYTES
+    && font <= MAX_FONT_TOTAL_BYTES;
 }
 
 function readStore(): Store {
@@ -138,7 +152,7 @@ export function writeLocalDeletes(keys: string[]): void {
     else window.localStorage.removeItem(LOCAL_DELETES_KEY);
   } catch { /* private mode */ }
 }
-function markDeleted(kind: 'texture' | 'sound', name: string, deleted: boolean): void {
+function markDeleted(kind: 'texture' | 'sound' | 'font', name: string, deleted: boolean): void {
   const key = `${kind}:${name}`;
   const cur = readLocalDeletes().filter((k) => k !== key);
   writeLocalDeletes(deleted ? [...cur, key] : cur);
@@ -169,10 +183,10 @@ function writeOrigins(all: Record<string, unknown>): void {
   } catch { /* private mode */ }
 }
 /** Where this browser's copy of `kind:name` was copied from, or null. */
-export function localOrigin(kind: 'texture' | 'sound', name: string): Provenance | null {
+export function localOrigin(kind: LibraryKind, name: string): Provenance | null {
   return parseProvenance(readOrigins()[`${kind}:${name}`]);
 }
-export function setLocalOrigin(kind: 'texture' | 'sound', name: string, from: Provenance | null): void {
+export function setLocalOrigin(kind: LibraryKind, name: string, from: Provenance | null): void {
   const all = readOrigins();
   const key = `${kind}:${name}`;
   if (!from && !(key in all)) return;
@@ -181,7 +195,7 @@ export function setLocalOrigin(kind: 'texture' | 'sound', name: string, from: Pr
   writeOrigins(all);
 }
 /** Move a credit with a rename (the sync's "keep both" renames this browser's copy). */
-export function moveLocalOrigin(kind: 'texture' | 'sound', from: string, to: string): void {
+export function moveLocalOrigin(kind: LibraryKind, from: string, to: string): void {
   const all = readOrigins();
   const a = `${kind}:${from}`;
   if (!(a in all)) return;
@@ -474,13 +488,106 @@ export function deleteSavedSound(name: string): void {
   localChanged();
 }
 
+// ---- saved fonts ------------------------------------------------------------
+//
+// A font is saved under `font:<name>` as a data URI, exactly as a texture is,
+// and the preview bridge hands the sketch the same store, so textFont('name')
+// finds it with no upload and no API route (the engine's _savedFontSrc). Fonts
+// arrive from the Font maker page (/fonts: upload a file) or Copy to mine.
+
+export interface SavedFont {
+  name: string;
+  dataUri: string;
+  /** The font FILE's size in bytes (what a student sees beside a file), not the stored text's. */
+  fileBytes: number;
+  type: 'TTF' | 'OTF' | 'WOFF' | 'WOFF2' | null;
+}
+
+/** TTF, OTF, WOFF or WOFF2 from a font's first bytes; null for anything else. The server checks again. */
+export function fontTypeOf(bytes: Uint8Array): SavedFont['type'] {
+  if (bytes.length < 12) return null;
+  const tag = String.fromCharCode(bytes[0], bytes[1], bytes[2], bytes[3]);
+  if ((bytes[0] === 0 && bytes[1] === 1 && bytes[2] === 0 && bytes[3] === 0) || tag === 'true') return 'TTF';
+  if (tag === 'OTTO') return 'OTF';
+  if (tag === 'wOFF') return 'WOFF';
+  if (tag === 'wOF2') return 'WOFF2';
+  return null;
+}
+
+function dataUriHead(dataUri: string): Uint8Array {
+  try {
+    const comma = dataUri.indexOf(',');
+    const bin = atob(dataUri.slice(comma + 1, comma + 1 + 24));
+    return Uint8Array.from(bin, (c) => c.charCodeAt(0));
+  } catch {
+    return new Uint8Array(0);
+  }
+}
+
+/** Every font saved in this browser, sorted by name. */
+export function listSavedFonts(): SavedFont[] {
+  const store = readStore();
+  const out: SavedFont[] = [];
+  for (const key of Object.keys(store)) {
+    if (!key.startsWith(FONT_PREFIX)) continue;
+    let dataUri: unknown;
+    try { dataUri = JSON.parse(store[key]); } catch { continue; }
+    if (typeof dataUri !== 'string' || !dataUri.startsWith('data:')) continue;
+    const comma = dataUri.indexOf(',');
+    out.push({
+      name: key.slice(FONT_PREFIX.length),
+      dataUri,
+      fileBytes: Math.floor((dataUri.length - comma - 1) * 3 / 4),
+      type: fontTypeOf(dataUriHead(dataUri)),
+    });
+  }
+  return out.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/** The limits, for the Font maker page to show and check before reading a file. */
+export const FONT_LIMITS = { fileBytes: 150 * 1024, totalFileBytes: 500 * 1024 };
+
+/**
+ * Save one font. Returns null on success, or a human-readable reason. The
+ * name becomes what a sketch writes, textFont('name'), so it is a code-safe
+ * identifier, as a texture's or a sound's name is.
+ */
+export function saveFont(name: string, dataUri: string): string | null {
+  if (!/^[A-Za-z][A-Za-z0-9_]{0,39}$/.test(name)) {
+    return 'Name must start with a letter and contain only letters, digits and _ (it becomes a name in code).';
+  }
+  if (!dataUri.startsWith('data:') || !fontTypeOf(dataUriHead(dataUri))) return 'That is not a TTF, OTF, WOFF or WOFF2 font file.';
+  const encoded = JSON.stringify(dataUri);
+  if (encoded.length > MAX_FONT_VALUE_BYTES) {
+    const kb = Math.round((dataUri.length - dataUri.indexOf(',') - 1) * 3 / 4 / 1024);
+    return `That font is ${kb} KB; the limit is ${FONT_LIMITS.fileBytes / 1024} KB. A WOFF2 version of the same font is usually much smaller.`;
+  }
+  const store = readStore();
+  const next: Store = { ...store, [FONT_PREFIX + name]: encoded };
+  if (!withinCaps(next)) {
+    return `Saved fonts are full (${FONT_LIMITS.totalFileBytes / 1024} KB in all). Delete one before saving another.`;
+  }
+  writeStore(next);
+  markDeleted('font', name, false);
+  localChanged();
+  return null;
+}
+
+export function deleteSavedFont(name: string): void {
+  const store = readStore();
+  delete store[FONT_PREFIX + name];
+  writeStore(store);
+  markDeleted('font', name, true);
+  localChanged();
+}
+
 // ---- the library sync's view of the store ---------------------------------
 //
 // lib/library-sync.ts sees each saved texture or sound as one item: its data
 // URI plus the raw meta string beside it (texmeta:/sndmeta:), carried opaquely
 // so a round trip through the account changes nothing.
 
-export type LibraryKind = 'texture' | 'sound';
+export type LibraryKind = 'texture' | 'sound' | 'font';
 export interface LocalLibraryItem {
   kind: LibraryKind;
   name: string;
@@ -490,6 +597,8 @@ export interface LocalLibraryItem {
 const PREFIX: Record<LibraryKind, [string, string]> = {
   texture: [TEXTURE_PREFIX, TEXMETA_PREFIX],
   sound: [SOUND_PREFIX, SNDMETA_PREFIX],
+  // A font has no meta; nothing writes the second key.
+  font: [FONT_PREFIX, 'fontmeta:'],
 };
 
 /**
@@ -514,7 +623,7 @@ export function addToLibrary(item: LocalLibraryItem, from: Provenance | null = n
 export function localLibraryItems(): LocalLibraryItem[] {
   const store = readStore();
   const out: LocalLibraryItem[] = [];
-  for (const kind of ['texture', 'sound'] as const) {
+  for (const kind of ['texture', 'sound', 'font'] as const) {
     const [p, mp] = PREFIX[kind];
     for (const key of Object.keys(store)) {
       if (!key.startsWith(p)) continue;

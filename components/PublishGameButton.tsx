@@ -76,7 +76,7 @@ const GONE_TEXT = 'That game was deleted. Publish it again as a new game?';
 /** One of the student's own items the code uses. `local` = only in this browser, not in the account yet. */
 interface UsedItem { kind: LibraryKind; name: string; state: 'shared' | 'not-shared' | 'local' }
 
-/** The student's own pictures and sounds `code` uses, account copy first, then this browser's. */
+/** The student's own pictures, sounds and fonts `code` uses, account copy first, then this browser's. */
 async function findUsedItems(code: string): Promise<UsedItem[]> {
   const builtins = await builtinTextureNames();
   const byKey = new Map<string, UsedItem>();
@@ -86,16 +86,20 @@ async function findUsedItems(code: string): Promise<UsedItem[]> {
     if (!byKey.has(k)) byKey.set(k, { kind: l.kind, name: l.name, state: 'local' });
   }
   return usedItems(code, [...byKey.values()], builtins)
-    .sort((a, b) => (a.kind === b.kind ? a.name.localeCompare(b.name) : a.kind === 'texture' ? -1 : 1));
+    .sort((a, b) => (a.kind === b.kind ? a.name.localeCompare(b.name) : KIND_ORDER[a.kind] - KIND_ORDER[b.kind]));
 }
+
+const KIND_ORDER: Record<LibraryKind, number> = { texture: 0, sound: 1, font: 2 };
 
 /** "Your game uses your pictures: hero and coin, and your sound: jump." */
 function usesSentence(used: UsedItem[]): string {
   const pics = used.filter((u) => u.kind === 'texture').map((u) => u.name);
   const snds = used.filter((u) => u.kind === 'sound').map((u) => u.name);
+  const fnts = used.filter((u) => u.kind === 'font').map((u) => u.name);
   const parts: string[] = [];
   if (pics.length) parts.push(`your ${pics.length === 1 ? 'picture' : 'pictures'}: ${listWords(pics)}`);
   if (snds.length) parts.push(`your ${snds.length === 1 ? 'sound' : 'sounds'}: ${listWords(snds)}`);
+  if (fnts.length) parts.push(`your ${fnts.length === 1 ? 'font' : 'fonts'}: ${listWords(fnts)}`);
   return `Your game uses ${parts.join(', and ')}.`;
 }
 

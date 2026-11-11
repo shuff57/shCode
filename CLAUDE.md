@@ -557,8 +557,21 @@ written by `node scripts/fetch-moshion-fonts.mjs` (run by hand, output committed
 Google). A font is fetched in CORS mode, so `public/_headers` and `server.js` allow `/moshion/fonts/*` like
 `/moshion/assets/*`; without that every built-in font falls back to monospace in the sandboxed runner. `runner.html`
 waits up to 2 s for the fonts a sketch names in `textFont('...')`. A saved font is a `font:<name>` data URI in the store
-(the Library side is phase 2: migration 0050, Library Fonts tab, sandbox drawer, `/fonts`; phase 3 is the font maker).
-A sketch that uses none of this draws exactly as before ('14px monospace', same canvas calls).
+(phase 3, drawing a font, is still to come). A sketch that uses none of this draws exactly as before ('14px monospace',
+same canvas calls).
+
+**Student fonts (phase 2, migration 0050; not deployed yet).** A font is a third Library kind, `'font'`, beside
+`'texture'` and `'sound'`: same routes, sync, sharing choices, Copy to mine, teacher hide/remove/delete, Clear Library and
+published-game assets. 0050 rebuilds `library_items` because SQLite cannot widen its `kind` CHECK in place (every column
+and row copied; nothing has a FOREIGN KEY to it). TTF/OTF/WOFF/WOFF2 only, typed by their first bytes
+(`sniffFontType`, server) and again by the browser's own font loader before saving. Limits (owner's decision 2026-11-12):
+**150 KB a font, 500 KB of fonts per student**, measured as FILE size (`FONT_FILE_MAX`, `FONT_FILES_TOTAL_MAX`), kept small
+because fonts sit in localStorage (`font:<name>`, own budget in `lib/moshion-storage.ts`) and that holds ~5 million
+characters per site, shared with drafts, textures and sounds. Pages: `/fonts` (`components/FontMaker.tsx`: add a font,
+try your own words, your fonts, the built-ins; also the sandbox's Fonts drawer), Library -> Fonts tab, Learn menu ->
+Fonts. Cards draw their sample in the font itself (`lib/font-face.ts`; built-ins from `public/moshion/fonts/fonts.json`).
+No Remix for a font yet: there is no font editor to open a copy in. Apply 0050 (`npm run d1:migrate`) before deploying;
+until it is applied a font save fails the CHECK with a 500.
 
 ### Online game rooms (Phase 6, board games)
 - A sketch plays a classmate on another computer through `online` (`public/moshion/extras.js`, NOT the vendored

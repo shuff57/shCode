@@ -268,7 +268,10 @@ check('the clear toast says the counts with plurals',
 check('an empty clear says so', words.clearedSentence('Sam W.', { pictures: 0, sounds: 0, images: 0, games: 0 }) === "Sam W.'s Library was already empty.");
 w = words.clearLibraryConfirm('Sam W.', 'Sam');
 check('the clear confirm lists every kind and says it cannot be undone',
-  w.title === "Clear Sam W.'s Library?" && /picture, sound, uploaded image and published game/.test(w.message) && /can't be undone/.test(w.message), w);
+  w.title === "Clear Sam W.'s Library?" && /picture, sound, font, uploaded image and published game/.test(w.message) && /can't be undone/.test(w.message), w);
+check('the clear toast names fonts only when there were some',
+  words.clearedSentence('Sam W.', { pictures: 1, sounds: 0, fonts: 2, images: 0, games: 0 }) === "Cleared Sam W.'s Library: 1 picture, 0 sounds, 2 fonts, 0 images, 0 games."
+  && words.clearedSentence('Sam W.', { pictures: 1, sounds: 0, fonts: 0, images: 0, games: 0 }) === "Cleared Sam W.'s Library: 1 picture, 0 sounds, 0 images, 0 games.");
 
 console.log(`\ntest-library-delete: ${passed} passed, ${failed} failed`);
 if (failed) process.exit(1);

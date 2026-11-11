@@ -1,14 +1,16 @@
 'use client';
 
 // The Library page (/library) and the Library tab in the sandbox and lessons:
-// three tabs, Games | Pictures | Sounds. Pictures and Sounds each have Mine
+// four tabs, Games | Pictures | Sounds | Fonts. Pictures and Sounds each have Mine
 // (with Share with class and Edit), Shared with my class (Copy to mine, Remix)
 // and Built in (Copy code, Remix); Games has My games, Class games and Built in
-// (GamesLibrary: Play, Remix, Share, Delete).
+// (GamesLibrary: Play, Remix, Share, Delete). Fonts (2026-11-12) has Mine
+// (MyFonts: sample, Copy textFont, Share, Delete), Shared with my class (Copy to
+// mine) and Built in (the 15 fonts that come with moSHion).
 //
 // Only the open tab mounts, so opening the page does not fetch every list.
 // The tab is remembered in localStorage (shCode:library-tab) and, on /library
-// itself, in the address as ?tab=games|pictures|sounds so a link can open one.
+// itself, in the address as ?tab=games|pictures|sounds|fonts so a link can open one.
 // Picked on mount from the address, then "came here from /play" (Games), then
 // the remembered tab, then Pictures.
 
@@ -17,17 +19,19 @@ import ClassLibrary from './ClassLibrary';
 import MyLibrary from './MyLibrary';
 import BuiltInLibrary from './BuiltInLibrary';
 import GamesLibrary from './GamesLibrary';
+import { BuiltinFonts, MyFonts } from './FontLibrary';
 
-type Tab = 'games' | 'pictures' | 'sounds';
+type Tab = 'games' | 'pictures' | 'sounds' | 'fonts';
 const TABS: { id: Tab; label: string }[] = [
   { id: 'games', label: 'Games' },
   { id: 'pictures', label: 'Pictures' },
   { id: 'sounds', label: 'Sounds' },
+  { id: 'fonts', label: 'Fonts' },
 ];
 const STORE_KEY = 'shCode:library-tab';
 
 function isTab(v: unknown): v is Tab {
-  return v === 'games' || v === 'pictures' || v === 'sounds';
+  return v === 'games' || v === 'pictures' || v === 'sounds' || v === 'fonts';
 }
 
 function onLibraryPage(): boolean {
@@ -75,7 +79,7 @@ export default function ClassLibraryPanel() {
     <div style={{ padding: '4px 2px', color: 'var(--c-fg)' }}>
       <h2 style={{ fontSize: 16, margin: '0 0 4px' }}>Library</h2>
       <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: '0 0 8px', lineHeight: 1.5 }}>
-        Your games, pictures and sounds, the ones your class shared, and the ones built in.
+        Your games, pictures, sounds and fonts, the ones your class shared, and the ones built in.
       </p>
 
       <div
@@ -129,6 +133,25 @@ export default function ClassLibraryPanel() {
       {tab && (
         <div role="tabpanel" id={panelId(tab)} aria-labelledby={tabId(tab)}>
           {tab === 'games' && <GamesLibrary />}
+          {tab === 'fonts' && (
+            <>
+              <MyFonts onMessage={say} />
+              <ClassLibrary
+                key="class-font"
+                kind="font"
+                title="Shared with my class"
+                onMessage={say}
+                section={{
+                  signedOut: <>Sign in to see what your class has shared.</>,
+                  empty: (
+                    <>Nothing shared yet. Press <strong style={{ color: 'var(--c-fg)' }}>Share with class</strong> on
+                      a font of yours above and it shows up here for everyone in your class.</>
+                  ),
+                }}
+              />
+              <BuiltinFonts />
+            </>
+          )}
           {(tab === 'pictures' || tab === 'sounds') && (() => {
             const kind = tab === 'pictures' ? 'texture' : 'sound';
             const what = tab === 'pictures' ? 'picture' : 'sound';

@@ -82,6 +82,8 @@ export default function HeaderNav() {
             the texture editor for the same reason: a tool no page reaches is
             a tool nobody finds. */}
         <Link href="/sound" style={itemStyle}>Sounds</Link>
+        {/* Fonts for textFont('name'): the built-in ones and the student's own uploads. */}
+        <Link href="/fonts" style={itemStyle}>Fonts</Link>
         {/* What classmates shared (#81): textures and sounds, with Copy to mine. */}
         <Link href="/library" style={itemStyle}>Library</Link>
         {/* One Docs tab for the whole family — JavaScript, moSHion and reSHape

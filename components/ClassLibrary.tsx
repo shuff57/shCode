@@ -1,6 +1,6 @@
 'use client';
 
-// "From your class": textures or sounds classmates shared (#81), with a preview
+// "From your class": textures, sounds or fonts classmates shared (#81), with a preview
 // and "Copy to mine", which saves a copy into the student's own library (and so
 // their account). Renders nothing when signed out or when nothing is shared.
 // A teacher who opens the editor sees hidden items too, marked; hiding and
@@ -11,6 +11,9 @@
 // refuses the copy (GET /api/library/shared/[id] answers 403). A copy records
 // where it came from (addToLibrary's `from`), which the sync sends to the
 // account so "Remixed from <name> by <who>" follows it to every device.
+//
+// Fonts (2026-11-12) show a sample drawn in the font and have Copy to mine but
+// no Remix: there is no font editor to open a copy in yet.
 
 import { SpriteThumb, SpriteViewer, texMeta } from './SpriteThumb';
 import { useCallback, useEffect, useState } from 'react';
@@ -19,6 +22,7 @@ import { addToLibrary, localLibraryItems, type LibraryKind } from '../lib/moshio
 import { openEditor, prepareTab } from '../lib/remix';
 import { CHOICE_TEXT, provenanceOf, type Provenance, type ShareChoice } from '../lib/share-choice';
 import { RemixCreditLine } from './ShareChoicePicker';
+import { FontSample } from './FontLibrary';
 import { sectionHeading, sectionNote, sectionStyle } from './library-ui';
 
 interface SharedItem {
@@ -85,9 +89,9 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
     return body;
   }, [art]);
 
-  // Textures are small: fetch every preview once the list is in.
+  // Textures and fonts are small: fetch every preview once the list is in.
   useEffect(() => {
-    if (kind !== 'texture' || !items) return;
+    if ((kind !== 'texture' && kind !== 'font') || !items) return;
     for (const it of items) if (!art[it.id]) void fetchArt(it.id);
   }, [items, kind, art, fetchArt]);
 
@@ -131,7 +135,9 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
     onMessage?.(
       kind === 'texture'
         ? `Copied "${it.name}" from ${it.owner} as "${name}". Use it with sprite.texture = '${name}'.`
-        : `Copied "${it.name}" from ${it.owner} as "${name}". Play it with loadSound('${name}').`,
+        : kind === 'font'
+          ? `Copied "${it.name}" from ${it.owner} as "${name}". Use it with textFont('${name}').`
+          : `Copied "${it.name}" from ${it.owner} as "${name}". Play it with loadSound('${name}').`,
       false,
     );
   };
@@ -144,7 +150,9 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
           <h3 id={headingId} style={sectionHeading}>{title ?? 'From your class'} ({items.length})</h3>
           <p style={sectionNote}>
             <strong style={{ color: 'var(--c-fg)' }}>Copy to mine</strong> saves a copy into your own, so{' '}
-            {kind === 'texture' ? <code>sprite.texture = &apos;name&apos;</code> : <code>loadSound(&apos;name&apos;)</code>} works in your sketches.
+            {kind === 'texture' ? <code>sprite.texture = &apos;name&apos;</code>
+              : kind === 'font' ? <code>textFont(&apos;name&apos;)</code>
+              : <code>loadSound(&apos;name&apos;)</code>} works in your sketches.
           </p>
         </>
       ) : (
@@ -155,7 +163,7 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
         {items.map((it) => (
           <div key={it.id} style={{
-            width: kind === 'texture' ? 92 : 'auto', padding: 6, borderRadius: 6,
+            width: kind === 'texture' ? 92 : kind === 'font' ? '100%' : 'auto', padding: 6, borderRadius: 6,
             border: `1px solid ${it.hidden ? 'color-mix(in srgb, var(--c-orange) 53.3333%, transparent)' : 'var(--c-line)'}`, background: 'var(--c-deep2)',
             display: 'flex', flexDirection: kind === 'texture' ? 'column' : 'row', alignItems: 'center', gap: 6,
           }}>
@@ -167,6 +175,12 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
                   <SpriteThumb src={art[it.id].dataUri} {...texMeta(art[it.id].meta)} size={46} alt={it.name} />
                 )}
               </button>
+            ) : kind === 'font' ? (
+              <div style={{ flex: '1 1 220px', minWidth: 0 }}>
+                {art[it.id]
+                  ? <FontSample fontKey={`shared:${it.id}:${art[it.id].dataUri.length}`} src={{ dataUri: art[it.id].dataUri }} text="" size={20} />
+                  : <div style={{ fontSize: 12, color: 'var(--c-dim)' }}>Loading…</div>}
+              </div>
             ) : (
               <button type="button" aria-label={`Play ${it.name}`} onClick={async () => {
                 const c = await fetchArt(it.id);
@@ -195,12 +209,12 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
                   fontSize: 11, padding: '2px 6px', borderRadius: 4, cursor: 'pointer', whiteSpace: 'nowrap',
                   background: 'transparent', color: 'var(--c-cyan)', border: '1px solid var(--c-line)',
                 }}>Copy to mine</button>
-                <button type="button" onClick={() => void copy(it, true)} aria-label={`Remix ${it.name}`}
+                {kind !== 'font' && <button type="button" onClick={() => void copy(it, true)} aria-label={`Remix ${it.name}`}
                   title={kind === 'texture' ? 'Make your own copy and open it in the Texture editor' : 'Make your own copy and open it in the Sound mixer'}
                   style={{
                     fontSize: 11, padding: '2px 6px', borderRadius: 4, cursor: 'pointer', whiteSpace: 'nowrap',
                     background: 'transparent', color: 'var(--c-cyan)', border: '1px solid var(--c-line)',
-                  }}>Remix</button>
+                  }}>Remix</button>}
               </div>
             )}
           </div>

@@ -16,6 +16,7 @@ import Console from './Console';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import AiHelpPanel from './AiHelpPanel';
 import TextureEditor from './TextureEditor';
+import FontMaker from './FontMaker';
 import SoundMixer from './SoundMixer';
 import ClassLibraryPanel from './ClassLibraryPanel';
 import DocsDrawer from './DocsDrawer';
@@ -555,6 +556,18 @@ export default function SandboxWorkspace() {
           content: <SoundMixer />,
           headerExtra: (
             <a href="/sound" target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
+              Full page ↗
+            </a>
+          ),
+        } as DrawerTab,
+        // Fonts for textFont('name'): add one from a file, try them all, copy the line.
+        {
+          key: 'fonts',
+          label: 'Fonts',
+          color: 'var(--c-pink)',
+          content: <FontMaker compact />,
+          headerExtra: (
+            <a href="/fonts" target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
               Full page ↗
             </a>
           ),

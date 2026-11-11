@@ -161,5 +161,32 @@ check('the list carries the tombstone so other devices learn of the delete',
 r = await put(A, { kind: 'sound', name: 'zap', dataUri: WAV, meta: '{"kind":"sfx"}', baseHash: 'anything' });
 check('saving the name again brings it back, same id', r.status === 200 && r.body.item.id === zap.id && r.body.item.deletedAt === null, r);
 
+// 6. fonts (migration 0050, 2026-11-12): TTF/OTF/WOFF/WOFF2 by their bytes; 150 KB a font, 500 KB in all.
+{
+  const font = (tag, n = 64) => 'data:font/x;base64,' + b64([...tag, ...new Array(n).fill(0)]);
+  const TTF = font([0, 1, 0, 0]), OTF = font([0x4f, 0x54, 0x54, 0x4f]), WOFF = font([0x77, 0x4f, 0x46, 0x46]), WOFF2 = font([0x77, 0x4f, 0x46, 0x32]);
+  const TTC = font([0x74, 0x74, 0x63, 0x66]);
+  check('sniff: TTF, OTF, WOFF and WOFF2 are fonts',
+    shared.sniffLibraryItem('font', TTF) === 'font/ttf' && shared.sniffLibraryItem('font', OTF) === 'font/otf'
+    && shared.sniffLibraryItem('font', WOFF) === 'font/woff' && shared.sniffLibraryItem('font', WOFF2) === 'font/woff2');
+  check('sniff: a PNG, a WAV or a font collection is not a font; a font is not a texture',
+    shared.sniffLibraryItem('font', PNG) === null && shared.sniffLibraryItem('font', WAV) === null
+    && shared.sniffLibraryItem('font', TTC) === null && shared.sniffLibraryItem('texture', WOFF2) === null);
+  r = await put(B, { kind: 'font', name: 'title', dataUri: WOFF2, meta: null });
+  check('a WOFF2 font is saved, typed from its bytes', r.status === 201 && r.body.item.kind === 'font' && r.body.item.mime === 'font/woff2', r);
+  r = await put(B, { kind: 'font', name: 'bad', dataUri: PNG, meta: null });
+  check('a picture saved as a font is refused in plain words', r.status === 415 && /TTF, OTF, WOFF or WOFF2/.test(r.body.error), r);
+  r = await put(B, { kind: 'font', name: 'big', dataUri: font([0, 1, 0, 0], 151 * 1024), meta: null });
+  check('a font over 150 KB is refused, the limit said in KB of file', r.status === 413 && /the limit is 150 KB/.test(r.body.error), r);
+  let last = 0;
+  for (let i = 0; i < 6; i++) {
+    const s2 = await put(B, { kind: 'font', name: 'f' + i, dataUri: font([0x77, 0x4f, 0x46, 0x32], 140 * 1024), meta: null });
+    if (s2.status === 201) last = i + 1; else { r = s2; break; }
+  }
+  check('fonts stop at 500 KB of files per account, said as 500 KB', last === 3 && r.status === 413 && /full \(500 KB\)/.test(r.body.error), { last, r });
+  r = await get(B);
+  check('the quota answer carries fonts', r.body.quota?.font?.maxBytes > 0, r.body.quota);
+}
+
 console.log(`\ntest-library: ${passed} passed, ${failed} failed`);
 if (failed) process.exit(1);
