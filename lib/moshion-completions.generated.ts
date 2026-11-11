@@ -611,6 +611,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "info": ""
  },
  {
+  "label": "textLayer",
+  "type": "function",
+  "detail": "(n?: number | null): void",
+  "info": "Puts the text() calls that follow, in draw(), on layer `n` among the sprites: over every sprite whose `.layer` is `n` or lower, under every sprite whose `.layer"
+ },
+ {
   "label": "textSize",
   "type": "function",
   "detail": "(px: number): void",

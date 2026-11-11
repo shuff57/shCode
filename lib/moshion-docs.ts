@@ -2051,6 +2051,42 @@ function drawTop() {
 }`,
       },
       {
+        title: 'Text between sprites: textLayer()',
+        body: `Text drawn in draw() goes under every sprite, and drawTop() puts it over all of them. To put words in between (a sign over the player but behind a tree), give the text a layer, the same way you give a sprite one.
+
+textLayer(5) works like textSize(): every text() you write after it in draw() goes on layer 5. It is painted over every sprite whose layer is 5 or lower, and under every sprite whose layer is higher. Change the number to move the text up or down. textLayer() with nothing in the brackets puts text back under every sprite.
+
+Text is not a sprite, so text.layer = 10 does nothing: write textLayer(10) instead. drawTop() is still the place for a score or a timer, because it goes over everything, whatever the layer.`,
+        code: `let player, tree;
+
+function setup() {
+  new Canvas(400, 300);
+  player = new Sprite(80, 150, 40, 40);
+  player.color = 'deepskyblue';
+  player.layer = 1;
+
+  tree = new Sprite(260, 150, 70, 120);
+  tree.collider = 'none';
+  tree.color = 'forestgreen';
+  tree.layer = 10;
+}
+
+function update() {
+  player.vel.x = 0;
+  if (kb.pressing('left')) player.vel.x = -3;
+  if (kb.pressing('right')) player.vel.x = 3;
+}
+
+function draw() {
+  background('#222');
+  fill('white');
+  textSize(24);
+  textLayer(5); // over the player (layer 1), under the tree (layer 10)
+  text('Welcome to the forest', 60, 160);
+  textLayer();  // back to under every sprite
+}`,
+      },
+      {
         title: 'Labels on sprites',
         body: `sprite.text puts a label directly on a sprite — a name tag, an HP counter, a damage number — without you tracking its x/y yourself. It's centered over the sprite and follows it automatically as the sprite moves, and it stays right-side-up even if the sprite rotates. Set it to null (the default) to remove the label.
 

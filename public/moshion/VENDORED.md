@@ -3,9 +3,9 @@
 | | |
 | --- | --- |
 | Source repo | `shuff57/moshion` (local checkout `../moshion`) |
-| Commit | `b1a2575352b6e7eee50e68afa374c2401b2165e0` (`b1a2575`), branch `main` (= `origin/main`) |
-| Commit date | 2026-11-06 |
-| Vendored | 2026-11-06 (`b1a2575`: `sprite.clone()` and `world.maxSpeed`, on top of `f3e1378` and the `f259b22` sound sync) |
+| Commit | `90921bd` (`moshion.js`, `docs/moshion.d.ts`), branch `main` (= `origin/main`) |
+| Commit date | 2026-11-11 |
+| Vendored | 2026-11-11 (`90921bd`: `textLayer(n)`, on top of `b1a2575`'s `sprite.clone()` and `world.maxSpeed`, `f3e1378` and the `f259b22` sound sync) |
 
 `main` now carries both the default-gravity-0 change (`91f7e6b`, vendored
 2026-11-01) and the math coordinates work on top of it (`4b36bef` engine,
@@ -34,6 +34,18 @@ A later sync, 2026-11-03 (`f259b22`), adds the sound work. `f3e1378` (2026-11-06
 adds one `window` `blur` listener that releases every held key and mouse button
 (shCode issue #78); its gates are upstream `tests/focus.spec.mjs` and the "losing
 focus releases a held key" check in `scripts/moshion-checks.mjs`.
+
+`90921bd` (2026-11-11) adds `textLayer(n)` (shCode #101): after it, `text()` called
+from `draw()` is painted among the world's sprites, over every sprite whose
+`.layer` is `n` or lower and under every higher one; `textLayer()` goes back to
+painting at once. Only `moshion.js` and `docs/moshion.d.ts` came over (the same
+diff applied to this copy, so the shCode-only lines below stay). Proof: 692 of
+the 693 course sketches (lessons, live blocks, `solution/` variants, docs
+examples) hash identically on `b1a2575` and `90921bd` over 180 frames with
+`Math.random` seeded; the one that differs is the new docs example, which calls
+`textLayer()`. Gates: upstream `tests/textlayer.spec.mjs` and the `textLayer(n)`
+check in `scripts/moshion-checks.mjs`. The docs page "Text between sprites:
+textLayer()" is in both `lib/moshion-docs.ts` and upstream `docs/data/moshion-docs.js`.
 
 `b1a2575` (2026-11-06) adds `sprite.clone()` (shCode #87: looks and physics,
 starts still, same groups) and `world.maxSpeed` (shCode #84: planck's per-step

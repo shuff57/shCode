@@ -35,15 +35,3 @@ attach them as fixtures. Surface it as one plain switch (for example
 `sprite.collider = 'texture'` or `sprite.fitCollider()`; decide the name
 before building). Today's workaround, which the student already uses, is a
 separate invisible hitbox sprite.
-
-## #101 Docs note: text is not a sprite
-
-**Asked:** "I can't layer texts" (their sketch set `text.layer = 10`).
-
-**Found:** not a bug. `text()` called in `draw()` is always under the sprites,
-because moSHion paints sprites after `draw()`; `drawTop()` is the hook for
-drawing on top (`lib/moshion-docs.ts`, the drawTop section). `text.layer = 10`
-puts a value on the `text` function and does nothing.
-
-**Plan:** one sentence where the docs explain `.layer`: text is not a sprite and
-has no layer; to draw text over sprites, call it from `drawTop()`.

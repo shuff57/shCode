@@ -235,6 +235,41 @@ export const SEMANTIC_CHECKS = [
     },
   },
   {
+    name: 'textLayer(n) paints text among the sprites by layer; without it text stays under them all',
+    area: 'drawing',
+    // shCode #101. Upstream spec: ../moshion tests/textlayer.spec.mjs.
+    run({ createSandbox }) {
+      const box = createSandbox();
+      box.run(`
+        function setup(){
+          new Canvas(200,200); world.gravity.y = 0;
+          hi = new Sprite(100, 100, 50, 50, 'static'); hi.color = '#ff00ff'; hi.layer = 10;
+          lo = new Sprite(100, 100, 80, 80, 'static'); lo.color = '#0000ff';
+          try { textLayer('top'); bad = 'no error'; } catch (e) { bad = e.message; }
+        }
+        function draw(){
+          background('#000000');
+          text('a', 10, 20);
+          textLayer(5); text('b', 10, 40);
+          textLayer(10); text('c', 10, 60);
+          textLayer(); text('d', 10, 80);
+        }
+        function drawTop(){ textLayer(-5); text('top', 10, 100); textLayer(); }
+      `);
+      if (box.errors.length) return `sketch threw: ${box.errors[0].message}`;
+      box.pump(2);
+      box.ops.length = 0;
+      box.pump(1);
+      const seq = box.ops
+        .filter((o) => o.op === 'fillText' || (o.op === 'fillRect' && (o.fill === '#0000ff' || o.fill === '#ff00ff')))
+        .map((o) => (o.op === 'fillText' ? o.args[0] : o.fill === '#0000ff' ? 'lo' : 'hi'));
+      const want = ['a', 'd', 'lo', 'b', 'hi', 'c', 'top'];
+      if (JSON.stringify(seq) !== JSON.stringify(want)) return `paint order ${JSON.stringify(seq)}, wanted ${JSON.stringify(want)}`;
+      if (!/^textLayer\(n\): n must be a number/.test(box.sandbox.bad)) return `textLayer('top') said: ${box.sandbox.bad}`;
+      return true;
+    },
+  },
+  {
     name: 'world.maxSpeed: 60 by default, opt-in to raise, one warning naming it',
     area: 'physics',
     // shCode #84. The cap is planck's global maxTranslation; a fresh sketch must start at 60
