@@ -12,6 +12,13 @@ const nextConfig = {
   // attempts — on a different page each run, since it is I/O contention rather
   // than anything about the page.
   staticPageGenerationTimeout: 300,
+  // CI sets NEXT_BUILD_CPUS to the runner's core count: Next's default of
+  // (cores - 1) export workers leaves a quarter of a 4-vCPU runner idle. Only
+  // spread when set -- an explicit `cpus: undefined` would drop Next to its
+  // 4-worker fallback on every machine.
+  ...(Number(process.env.NEXT_BUILD_CPUS) > 0
+    ? { experimental: { cpus: Number(process.env.NEXT_BUILD_CPUS) } }
+    : {}),
   // @shuff57/reshape-* (file: deps into ../reshape-cad/packages/*, B1
   // extraction) are real symlinks into a sibling repo with its own
   // node_modules/react -- without this, webpack bundles react out of THEIR

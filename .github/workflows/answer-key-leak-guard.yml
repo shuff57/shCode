@@ -25,6 +25,19 @@ on:
 permissions:
   contents: read
 
+# A newer push to the same branch or PR supersedes the run in flight: the
+# guard checks the whole tree, so only the newest commit's verdict matters.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+  # Next defaults to (cores - 1) static-page workers, leaving one of the
+  # runner's 4 vCPUs idle through the ~2,100-page export. next.config.js
+  # reads this; unset (a dev machine) keeps Next's own default.
+  NEXT_BUILD_CPUS: '4'
+
 jobs:
   answer-key-leak-guard:
     runs-on: ubuntu-latest
@@ -66,18 +79,41 @@ jobs:
           echo "OCCT_DIR=$PWD/package/dist" >> "$GITHUB_ENV"
 
       - name: Install dependencies
-        run: npm ci --include=dev
+        run: npm ci --include=dev --prefer-offline --no-audit --no-fund
 
-      - name: Build the B-rep kernel bundle
-        run: node scripts/build-brep-kernel.mjs --occt "$OCCT_DIR"
+      # build-pii-guard-models.mjs (in prebuild) downloads ~24 MB of ONNX
+      # weights from Hugging Face and skips any file already present. Keyed on
+      # the lockfile too: it also copies the ONNX runtime out of node_modules,
+      # and a skipped copy must not outlive a dependency bump.
+      - name: Cache the PII-guard models
+        uses: actions/cache@v4
+        with:
+          path: public/models
+          key: pii-models-${{ hashFiles('scripts/build-pii-guard-models.mjs', 'package-lock.json') }}
 
-      # `npm run build` runs the full prebuild chain (generators + the
-      # starter-bundle leak check) and then `next build`, which exports out/.
-      - name: Build (runs check-solution-leak in prebuild)
+      # Next's webpack cache. Only pushes and the schedule write it, so a PR
+      # run pays the restore but never the upload.
+      - name: Restore the Next.js build cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .next/cache
+          key: next-${{ runner.os }}-${{ hashFiles('package-lock.json', 'next.config.js') }}-${{ github.sha }}
+          restore-keys: next-${{ runner.os }}-${{ hashFiles('package-lock.json', 'next.config.js') }}-
+
+      # `npm run build` runs the full prebuild chain -- including the B-rep
+      # kernel bundle (build-brep-kernel.mjs reads OCCT_DIR from the env set
+      # above) and check-solution-leak, the starter-bundle leak check -- and
+      # then `next build`, which exports out/. A failing prebuild check fails
+      # this step.
+      - name: Build (kernel bundle + check-solution-leak run in prebuild)
         run: npm run build
 
-      - name: Starter-bundle leak check
-        run: node scripts/check-solution-leak.mjs
+      - name: Save the Next.js build cache
+        if: github.event_name != 'pull_request'
+        uses: actions/cache/save@v4
+        with:
+          path: .next/cache
+          key: next-${{ runner.os }}-${{ hashFiles('package-lock.json', 'next.config.js') }}-${{ github.sha }}
 
       - name: Built-page answer-key leak check
         run: node scripts/check-quiz-key-leak.mjs
