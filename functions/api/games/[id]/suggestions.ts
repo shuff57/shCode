@@ -8,8 +8,13 @@
 // on a hidden game. Counts are for everyone; names (first name + last initial,
 // never an email) only for the author, the teachers of a class the game is
 // shared into, and an admin.
+//
+// Feedback switches (migration 0051): suggestions are feedback, so they follow
+// feedbackState() exactly as comments do. Closed, a classmate gets no counts and
+// cannot pick (403); the author and the class's teachers still read.
 
 import { callerClasses, gameClassesFor, json, visibleGame, type SessionData } from '../../../_shared/games';
+import { feedbackState } from '../../../_shared/gameComments';
 import { ownerLabel } from '../../../_shared/libraryShare';
 import { isGameId } from '../../../../lib/games-core';
 import { SUGGESTIONS, isSuggestionId, type SuggestionsView } from '../../../../lib/game-suggestions';
@@ -49,7 +54,13 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
   if (!isGameId(gameId)) return json({ error: 'Not found' }, 404);
   const seen = await visibleGame(env.DB, data, gameId);
   if (!seen) return json({ error: 'Not found' }, 404);
-  return json(await view(env, data, gameId, seen.mine, seen.hidden));
+  const st = await feedbackState(env.DB, data, gameId);
+  if (st && !st.canRead) {
+    const closed: SuggestionsView = { options: SUGGESTIONS, counts: {}, mine: [], canSuggest: false, closed: st.closed };
+    return json(closed);
+  }
+  const v = await view(env, data, gameId, seen.mine, seen.hidden);
+  return json({ ...v, canSuggest: v.canSuggest && !!st?.canWrite, closed: st?.closed ?? null });
 };
 
 export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async ({ params, env, data, request }: Ctx) => {
@@ -59,6 +70,8 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async ({ par
   if (!seen) return json({ error: 'Not found' }, 404);
   if (seen.mine) return json({ error: 'This is your game. Your classmates suggest; you read them here.' }, 403);
   if (seen.hidden) return json({ error: 'This game is hidden from the class.' }, 403);
+  const st = await feedbackState(env.DB, data, gameId);
+  if (!st?.canWrite) return json({ error: 'Feedback is turned off for this game.', closed: st?.closed ?? null }, 403);
   let body: { suggestion?: unknown; on?: unknown };
   try { body = await request.json(); } catch { return json({ error: 'Invalid JSON body' }, 400); }
   if (!isSuggestionId(body.suggestion)) return json({ error: 'Pick a suggestion from the list.' }, 400);
@@ -71,5 +84,5 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async ({ par
     await env.DB.prepare(`DELETE FROM game_suggestions WHERE game_id = ? AND from_email = ? AND suggestion_id = ?`)
       .bind(gameId, data.email, body.suggestion).run();
   }
-  return json(await view(env, data, gameId, false, false));
+  return json({ ...(await view(env, data, gameId, false, false)), closed: null });
 };

@@ -640,6 +640,13 @@ app.prepare().catch((err) => {
     const gamesSuggest = await import('./functions/api/games/[id]/suggestions.ts');
     server.get('/api/games/:id/suggestions', libRoute(gamesSuggest.onRequestGet));
     server.post('/api/games/:id/suggestions', express.json(), libRoute(gamesSuggest.onRequestPost));
+    // Comments and replies on class games, and the maker's feedback switch (migration 0051).
+    const gamesComments = await import('./functions/api/games/[id]/comments.ts');
+    const gamesFeedback = await import('./functions/api/games/[id]/feedback.ts');
+    server.get('/api/games/:id/comments', libRoute(gamesComments.onRequestGet));
+    server.post('/api/games/:id/comments', express.json(), libRoute(gamesComments.onRequestPost));
+    server.delete('/api/games/:id/comments', libRoute(gamesComments.onRequestDelete));
+    server.post('/api/games/:id/feedback', express.json(), libRoute(gamesFeedback.onRequestPost));
     server.get('/api/classes/:id/game-shares', libRoute(gamesModerate.onRequestGet));
     server.post('/api/classes/:id/game-shares', express.json(), libRoute(gamesModerate.onRequestPost));
     // Versions, proposed changes and their conversations (migration 0048, lib/game-flow-core.ts). Two

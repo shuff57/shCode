@@ -739,6 +739,20 @@ the class's teachers and an admin. `components/GameSuggestions.tsx` under the ga
 `game-shares` POST `action: 'clear-suggestions'` deletes only their class's (enrolled now) students' picks; the list
 carries that count and the moderation row's menu offers "Clear suggestions…". Tests: `scripts/test-game-suggestions.mjs`.
 Apply 0047 before deploying.
+**Comments on class games (migration 0051, 2026-11-12; not deployed yet).** The owner reversed part of the 2026-11-10
+"game data, not chat" rule for games: on `/play` classmates now write comments in their own words and reply (one level:
+a reply to a reply hangs off the same top comment), under the proposed-change conversations' rules (`cleanComment`,
+1000 characters, 40 an hour per person, 500 live per game, first name + last initial, never an email, "Your teacher can
+read every comment"). Routes `GET|POST|DELETE /api/games/[id]/comments` (`?comment=<cid>` to delete: its writer, a
+teacher of a class it is shared into, or an admin who can open it; a deleted top comment with live replies stays as
+"deleted" with no words) and the maker's `POST /api/games/[id]/feedback {on}`. ONE rule decides who reads and writes,
+`feedbackState()` in `functions/_shared/gameComments.ts`, and it governs Suggestions too: open only while the maker's
+switch (`library_games.feedback_on`, default on), the teacher's per-game switch (`library_game_shares.feedback_off_at`)
+and the class switch (`classes.game_feedback_off`) are all on for a class the reader sees the game through; closed, a
+classmate gets a one-line note and nothing else, the maker and the class's teachers still read. Teachers: `game-shares`
+POST `feedback-off|feedback-on` (gameId) and `class-feedback-off|class-feedback-on`; the Shared games panel has the class
+switch, a per-game switch in each row's menu, and comment counts. UI `components/GameComments.tsx`; the publish panel
+has "Let classmates give feedback". Tests `scripts/test-game-comments.mjs` (npm test). Apply 0051 before deploying.
 **Built-in course games (2026-11-11).** `lib/builtin-games.ts` is the one list of Library -> Games -> Built in
 (the generator, the Library, /play and the publish route all read it). Lesson games (Trail, Checkers, Quest) stay play
 only. A course game is a file (`games/<name>.js`, first: Paddle Rally by Steven Huff, 2-4 players on one keyboard or

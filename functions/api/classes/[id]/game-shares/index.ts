@@ -1,5 +1,13 @@
 // GET  /api/classes/[id]/game-shares  — every game shared into this class, hidden ones too
-// POST /api/classes/[id]/game-shares  { gameId, action: 'hide' | 'unhide' | 'remove' | 'clear-suggestions' }
+// POST /api/classes/[id]/game-shares  { gameId, action: 'hide' | 'unhide' | 'remove' | 'clear-suggestions'
+//                                               | 'feedback-off' | 'feedback-on' }
+//                                      { action: 'class-feedback-off' | 'class-feedback-on' }
+//
+// Feedback switches (migration 0051): feedback-off / -on closes or opens comments
+// and suggestions on ONE game for this class; class-feedback-off / -on does it for
+// every game in the class. Either way the creator and the class's teachers still
+// read what was written (functions/_shared/gameComments.ts). The list carries each
+// game's `feedbackOff` and `comments` (live ones), and the class's `classFeedbackOff`.
 //
 // clear-suggestions (#96) deletes the suggestions this class's students (enrolled
 // now) made on the game; suggestions from another class the game is shared into
@@ -46,7 +54,23 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
     ).bind(classId, Date.now(), ...rows.map((g) => g.id)).all<{ game_id: string; n: number }>();
     for (const c of r.results ?? []) counts.set(c.game_id, c.n);
   }
+  const comments = new Map<string, number>();
+  const feedbackOff = new Set<string>();
+  if (rows.length) {
+    const marks = rows.map(() => '?').join(',');
+    const ids = rows.map((g) => g.id);
+    const [cr, fr] = await Promise.all([
+      env.DB.prepare(`SELECT game_id, COUNT(*) AS n FROM game_comments WHERE deleted_at IS NULL AND game_id IN (${marks}) GROUP BY game_id`)
+        .bind(...ids).all<{ game_id: string; n: number }>(),
+      env.DB.prepare(`SELECT game_id FROM library_game_shares WHERE class_id = ? AND feedback_off_at IS NOT NULL AND game_id IN (${marks})`)
+        .bind(classId, ...ids).all<{ game_id: string }>(),
+    ]);
+    for (const c of cr.results ?? []) comments.set(c.game_id, c.n);
+    for (const f of fr.results ?? []) feedbackOff.add(f.game_id);
+  }
+  const cls = await env.DB.prepare(`SELECT game_feedback_off FROM classes WHERE id = ?`).bind(classId).first<{ game_feedback_off: number | null }>();
   return json({
+    classFeedbackOff: !!cls?.game_feedback_off,
     games: rows.map((r) => ({
       id: r.id, title: r.title, mode: r.mode, players: r.players,
       modeLabel: modeLabel(r.mode as GameMode, r.players), bytes: r.bytes,
@@ -54,6 +78,8 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
       sharedAt: r.shared_at, updatedAt: r.updated_at, hidden: r.hidden_at != null,
       canDelete: students.has(r.owner_email),
       suggestions: counts.get(r.id) ?? 0,
+      comments: comments.get(r.id) ?? 0,
+      feedbackOff: feedbackOff.has(r.id),
     })),
   });
 };
@@ -68,9 +94,14 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async ({ par
   } catch {
     return json({ error: 'Invalid JSON body' }, 400);
   }
+  const now = Date.now();
+  if (body.action === 'class-feedback-off' || body.action === 'class-feedback-on') {
+    await env.DB.prepare(`UPDATE classes SET game_feedback_off = ? WHERE id = ?`)
+      .bind(body.action === 'class-feedback-off' ? 1 : 0, classId).run();
+    return json({ ok: true, classFeedbackOff: body.action === 'class-feedback-off' });
+  }
   const gameId = String(body.gameId ?? '');
   if (!isGameId(gameId)) return json({ error: 'Not found' }, 404);
-  const now = Date.now();
   let res: D1Result;
   if (body.action === 'hide') {
     res = await env.DB.prepare(`UPDATE library_game_shares SET hidden_at = ?, hidden_by = ? WHERE game_id = ? AND class_id = ?`)
@@ -89,8 +120,14 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async ({ par
          (SELECT student_email FROM enrollments WHERE class_id = ? AND expires_at > ?)`,
     ).bind(gameId, classId, now).run();
     return json({ ok: true, cleared: del.meta?.changes ?? 0 });
+  } else if (body.action === 'feedback-off') {
+    res = await env.DB.prepare(`UPDATE library_game_shares SET feedback_off_at = ?, feedback_off_by = ? WHERE game_id = ? AND class_id = ?`)
+      .bind(now, data.email, gameId, classId).run();
+  } else if (body.action === 'feedback-on') {
+    res = await env.DB.prepare(`UPDATE library_game_shares SET feedback_off_at = NULL, feedback_off_by = NULL WHERE game_id = ? AND class_id = ?`)
+      .bind(gameId, classId).run();
   } else {
-    return json({ error: "action must be 'hide', 'unhide', 'remove' or 'clear-suggestions'" }, 400);
+    return json({ error: "action must be 'hide', 'unhide', 'remove', 'clear-suggestions', 'feedback-off', 'feedback-on', 'class-feedback-off' or 'class-feedback-on'" }, 400);
   }
   if (!res.meta || res.meta.changes === 0) return json({ error: 'Not found' }, 404);
   return json({ ok: true });

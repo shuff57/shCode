@@ -4,7 +4,9 @@
 // any of a fixed list (lib/game-suggestions.ts) to help the author; picking one
 // again takes it back. Nothing is typed, so nothing here is chat. The author
 // sees how many picked each one and who; a classmate sees the counts and their
-// own picks. Route: GET|POST /api/games/[id]/suggestions.
+// own picks. Route: GET|POST /api/games/[id]/suggestions. With feedback turned
+// off (the creator's or a teacher's switch, migration 0051) a classmate sees no
+// panel at all.
 
 import { useEffect, useState } from 'react';
 import type { SuggestionsView } from '../lib/game-suggestions';
@@ -31,6 +33,9 @@ export default function GameSuggestions({ gameId, owner, mine }: Props) {
   }, [gameId]);
 
   if (!view) return null;
+  // Feedback closed to this reader (migration 0051): nothing to show a classmate.
+  // The creator and the class's teachers still see the counts (GameComments says why it is closed).
+  if (view.closed && !mine && !view.who) return null;
 
   async function toggle(id: string, on: boolean) {
     setBusy(id);

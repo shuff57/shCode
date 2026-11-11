@@ -47,6 +47,7 @@ import { RemixCreditLine } from './ShareChoicePicker';
 import { changeHref, gameChangesHref, getChange, type ChangeDetail } from '../lib/game-flow-client';
 import { GITHUB_WORD, isChangeId } from '../lib/game-flow-core';
 import GameSuggestions from './GameSuggestions';
+import GameComments from './GameComments';
 
 type State =
   | { kind: 'loading' }
@@ -298,6 +299,7 @@ export default function PlayGame() {
         </div>
       </div>
       <GameSuggestions gameId={g.id} owner={g.owner} mine={g.mine} />
+      <GameComments gameId={g.id} owner={g.owner} />
       {showCode && canRemix && <CodeBlock code={runCode} />}
     </div>
   );

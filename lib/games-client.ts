@@ -22,6 +22,7 @@
 // play" game is refused here with a plain sentence (and by the server on
 // publish), and a remix of a "keep remixes open" game can only be shared 'open'.
 
+import type { GameCommentsView } from './game-comments-core';
 import { useLessonStore } from './store';
 import { loadProgress, normalizeEol, saveProgress } from './version-control';
 import { addLocalSnapshot } from './local-history';
@@ -94,6 +95,8 @@ export interface FullGame {
   version?: number;
   contributors?: string[];
   openChanges?: number;
+  /** Migration 0051: the creator's "Let classmates give feedback" switch. Absent from an older answer: on. */
+  feedbackOn?: boolean;
 }
 
 export function playHref(id: string): string {
@@ -227,6 +230,38 @@ export async function setGameShared(id: string, share: boolean, choice?: ShareCh
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(choice && share ? { share, choice } : { share }),
+  });
+  if (r.ok) announce();
+  return r;
+}
+
+// ---- comments and the feedback switch (migration 0051) ----------------------
+
+const commentsUrl = (id: string) => `/api/games/${encodeURIComponent(id)}/comments`;
+
+export function getGameComments(id: string) {
+  return call<GameCommentsView>(commentsUrl(id));
+}
+
+/** Add a comment, or a reply when `parentId` is given. Answers the whole list again. */
+export function postGameComment(id: string, body: string, parentId?: string) {
+  return call<GameCommentsView>(commentsUrl(id), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(parentId ? { body, parentId } : { body }),
+  });
+}
+
+export function deleteGameComment(id: string, commentId: string) {
+  return call<GameCommentsView>(`${commentsUrl(id)}?comment=${encodeURIComponent(commentId)}`, { method: 'DELETE' });
+}
+
+/** The creator's switch: on lets classmates comment and suggest; off closes both. */
+export async function setGameFeedback(id: string, on: boolean) {
+  const r = await call<{ ok: true; feedbackOn: boolean }>(`/api/games/${encodeURIComponent(id)}/feedback`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ on }),
   });
   if (r.ok) announce();
   return r;

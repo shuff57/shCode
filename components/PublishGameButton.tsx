@@ -35,6 +35,7 @@ import {
   playHref,
   publishGame,
   readSandboxGame,
+  setGameFeedback,
   setGameShared,
   writeSandboxGame,
 } from '../lib/games-client';
@@ -107,6 +108,9 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [share, setShare] = useState(true);
+  // The game's "Let classmates give feedback" switch (migration 0051): what is wanted, and what the server holds.
+  const [feedbackOn, setFeedbackOn] = useState(true);
+  const [feedbackSaved, setFeedbackSaved] = useState(true);
   const [published, setPublished] = useState<Published | null>(null);
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<{ text: string; bad: boolean } | null>(null);
@@ -140,6 +144,8 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
       setPublished({ id: rec.id, title: g.title, shared: !!g.shared, choice: g.choice, version: g.version });
       setAhead(rec.version && g.version && g.version > rec.version ? { from: rec.version, newest: g.version } : null);
       setShare(!!g.shared);
+      setFeedbackOn(g.feedbackOn !== false);
+      setFeedbackSaved(g.feedbackOn !== false);
       setChoice(lockedChoice(g.remixedFrom ?? rec.from, g.choice));
       setTitle(rec.title || g.title);
       setGone(false);
@@ -247,6 +253,15 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
       const s = await setGameShared(id, share, stored);
       if (s.ok) shared = s.value.shared;
       else shareNote = ` It is not shared yet: ${s.error}`;
+    }
+    // A new game starts with feedback on; send the switch only when it differs from what the game has.
+    const savedNow = r.value.created ? true : feedbackSaved;
+    if (feedbackOn !== savedNow) {
+      const f = await setGameFeedback(id, feedbackOn);
+      if (f.ok) setFeedbackSaved(feedbackOn);
+      else shareNote += ` Feedback was not changed: ${f.error}`;
+    } else {
+      setFeedbackSaved(feedbackOn);
     }
     setBusy(false);
     setPublished({ id, title: t.title, shared, choice: stored, version: r.value.game.version });
@@ -380,6 +395,13 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
           </label>
           {share && (
             <ShareChoicePicker thing="game" value={choice} onChange={setChoice} from={from} idPrefix="publish-game" />
+          )}
+          {share && (
+            <label style={{ display: 'flex', alignItems: 'center', gap: 6, margin: '0 0 10px' }}
+              title="Classmates can write comments and pick suggestions under your game. You can change this later on its play page.">
+              <input type="checkbox" checked={feedbackOn} onChange={(e) => setFeedbackOn(e.target.checked)} />
+              Let classmates give feedback
+            </label>
           )}
           {used.length > 0 && (
             <div style={{ margin: '0 0 10px', padding: '8px 10px', border: '1px solid var(--c-line)', borderRadius: 4 }}>

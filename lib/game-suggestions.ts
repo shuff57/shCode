@@ -40,4 +40,10 @@ export interface SuggestionsView {
   who?: Record<string, string[]>;
   /** False for the author (and on a hidden game): they read suggestions, they do not make them. */
   canSuggest: boolean;
+  /**
+   * Why feedback is closed for this reader (migration 0051: the creator's or a
+   * teacher's switch), or null/absent when open. Closed to a classmate, counts and
+   * picks are not sent; the creator and the class's teachers still see them.
+   */
+  closed?: 'creator' | 'teacher' | 'hidden' | 'unshared' | null;
 }

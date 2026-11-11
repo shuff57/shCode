@@ -36,7 +36,7 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
   if (seen.mine) {
     shared = !!(await env.DB.prepare(`SELECT 1 AS x FROM library_game_shares WHERE game_id = ? LIMIT 1`).bind(id).first());
   }
-  const vrow = await env.DB.prepare(`SELECT version FROM library_games WHERE id = ?`).bind(id).first<{ version: number }>();
+  const vrow = await env.DB.prepare(`SELECT version, feedback_on FROM library_games WHERE id = ?`).bind(id).first<{ version: number; feedback_on: number | null }>();
   const contributors = await contributorsOf(env.DB, id);
   const openChanges = (await openChangeCounts(env.DB, [id])).get(id) ?? 0;
   return json({
@@ -46,6 +46,8 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
       modeLabel: modeLabel(row.mode as GameMode, row.players),
       owner: await ownerName(env.DB, row.owner_email), mine: seen.mine, hidden: seen.hidden,
       ...(seen.mine ? { shared } : {}),
+      // The creator's "Let classmates give feedback" switch (migration 0051).
+      feedbackOn: (vrow?.feedback_on ?? 1) !== 0,
       choice: choiceOf(row.share_choice),
       canRemix: seen.mine || canRemix(row.share_choice),
       remixedFrom: provenanceFromRow(row),
