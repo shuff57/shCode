@@ -33,6 +33,9 @@ export default function ClassLibraryModeration({ classId }: { classId: string })
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/classes/${encodeURIComponent(classId)}/library-shares`, { credentials: 'same-origin' });
+    // The class page above has already found this class, so a 404 here means this list has nothing for it (a
+    // class this route's data does not know yet): show the empty state, never "Class not found" (ux3).
+    if (res.status === 404) { setError(null); setRows([]); return; }
     if (!res.ok) { setError(await errorText(res)); return; }
     setError(null);
     setRows(((await res.json()) as { items: Row[] }).items);

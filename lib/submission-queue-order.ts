@@ -107,12 +107,16 @@ export function collapseQueue<T extends { id: string; student_email: string; les
  *   2. needs your score but the score does not change the grade, or not yet (`needOther`),
  *   3. already has a score (the rest; inside it, the ones that change the grade first).
  */
-export function queueIntro(total: number, needCounts: number, needOther: number): string {
+// `heldInPlace`: the cards on screen are NOT in the order this sentence describes, because a card the teacher
+// just scored keeps its place (orderCards' `previous`) instead of jumping under them. The sentence then says
+// so, rather than claiming an order that is not on screen until a reload (rewalk2 T1).
+export function queueIntro(total: number, needCounts: number, needOther: number, heldInPlace = false): string {
   const s = (n: number, one: string, many: string) => (n === 1 ? one : many);
   const base = `${total} recent submission${total === 1 ? '' : 's'}, one per student and lesson.`;
   const need = needCounts + needOther;
+  const held = heldInPlace ? ' Cards you just scored stay where they are until you reload the page.' : '';
   if (need === 0) {
-    return `${base} Every one has a score; change it below if you disagree. The ones whose score changes the grade are listed first.`;
+    return `${base} Every one has a score; change it below if you disagree.${heldInPlace ? held : ' The ones whose score changes the grade are listed first.'}`;
   }
   let lead = `${need} ${s(need, 'needs', 'need')} your score and ${s(need, 'is', 'are')} listed first`;
   if (needCounts > 0 && needOther > 0) {
@@ -121,7 +125,7 @@ export function queueIntro(total: number, needCounts: number, needOther: number)
     lead += `, though ${s(needOther, 'its', 'their')} score does not change the grade right now`;
   }
   const rest = total - need;
-  return `${base} ${lead}.${rest > 0 ? ` Work that already has a score comes after.` : ''}`;
+  return `${base} ${lead}.${rest > 0 ? ` Work that already has a score comes after.` : ''}${held}`;
 }
 
 /**

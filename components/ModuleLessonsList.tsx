@@ -103,6 +103,7 @@ export default function ModuleLessonsList({
     loaded: progress.loaded,
     state: (id) => progress.states[id],
     isAvailable: (id) => lessonAvailability(due, id, moduleId, unitId, now).available,
+    workedAt: (id) => progress.workedAt?.[id],
     bypass: lockBypass,
   });
   const nextId = nextPick?.kind === 'next' ? nextPick.id : null;

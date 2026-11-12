@@ -177,7 +177,7 @@ function seedClass(sql, root, teacherEmail) {
   }
 }
 
-export function mountDemoApi({ server, express, devIdentity, role, root }) {
+export function mountDemoApi({ server, express, devIdentity, role, roleOf, root }) {
   const db = openDb(root);
   let fakePort = 0;
   startFakeOllama((p) => { fakePort = p; });
@@ -237,6 +237,9 @@ export function mountDemoApi({ server, express, devIdentity, role, root }) {
     db.raw.run('INSERT OR IGNORE INTO enrollments (class_id, student_email, enrolled_at, expires_at) VALUES (?, ?, ?, ?)', [CLASS_ID, email, devSeededAt, FAR]);
   };
 
+  // The session role is the browser's `dev_role` cookie when it has one (server.js devRoleOf), else DEV_ROLE.
+  // It used to be DEV_ROLE for everyone, so a `dev_role=student` browser was told it was a teacher by
+  // /api/lesson-state and skipped every lesson lock (ux3: a walker finished 1.1.11 before 1.1.1).
   const route = (handler, paramNames = [], roleOverride) => async (req, res) => {
     const email = devIdentity(req);
     ensure(email);
@@ -250,7 +253,7 @@ export function mountDemoApi({ server, express, devIdentity, role, root }) {
     const params = {};
     for (const n of paramNames) params[n] = req.params[n];
     try {
-      const out = await handler({ request, env, params, data: { email, role: roleOverride ?? role }, waitUntil() {} });
+      const out = await handler({ request, env, params, data: { email, role: roleOverride ?? (roleOf ? roleOf(req) : role) }, waitUntil() {} });
       res.status(out.status);
       const type = out.headers.get('content-type');
       if (type) res.type(type);
@@ -351,4 +354,10 @@ export function mountDemoApi({ server, express, devIdentity, role, root }) {
     res.json({ ok: true });
   });
   console.log('  [demo] DEV_REAL_DB: real tries handlers over in-memory SQLite, fake AI grader');
+  // server.js keeps the library, games and Code together routes on a second in-memory database that is
+  // seeded with dev-class only; it reads a class created here through this, so a new class's panels see it
+  // (ux3: they answered "Class not found"; production has one D1, so this was dev-only).
+  return {
+    classById: (id) => db.raw.query('SELECT id, name, code, owner_email, school_year, created_at FROM classes WHERE id = ?').get(id) ?? null,
+  };
 }

@@ -140,8 +140,13 @@ const emptyField: React.CSSProperties = {
 const MODULE_COLS = 'minmax(280px, 1fr) 320px 320px';
 const MODULE_GAP = '12px 28px';
 
-// 96px clipped "08:00 AM" to "08:00 A"; the AM/PM segment and the clock icon need about 120px.
-const timeInput: React.CSSProperties = { ...dateInput, width: 96, minWidth: 96 };
+// Both boxes are sized in `ch` (the width of a digit in the field's own face) plus their padding and border, so a
+// full date (12/15/2026, and the MM/DD/YYYY hint) and a time (11:59 PM) are entirely visible in any font. ux3: a
+// fixed 116px box with 30px kept on the right for the old native calendar indicator showed "12/15/202".
+// The Mixed control (.dd-mixed-btn in globals.css) is DATE_W + TIME_W + 82px wide: it ends with the calendar buttons.
+const DATE_W = 'calc(11.5ch + 18px)';
+const TIME_W = 'calc(9ch + 18px)';
+const timeInput: React.CSSProperties = { ...dateInput, width: TIME_W, minWidth: TIME_W };
 
 function numericCompare(a: string, b: string): number {
   return a.localeCompare(b, undefined, { numeric: true });
@@ -232,6 +237,8 @@ function DateTimeField({
   const [calOpen, setCalOpen] = useState(false);
   const calRef = useRef<HTMLButtonElement>(null);
   const groupRef = useRef<HTMLSpanElement>(null);
+  const dateRef = useRef<HTMLInputElement>(null);
+  const timeRef = useRef<HTMLInputElement>(null);
   // What is typed is a DRAFT (text) until the pair loses focus or Enter is pressed. Null = show the saved value.
   const [draftDate, setDraftDate] = useState<string | null>(null);
   const [draftTime, setDraftTime] = useState<string | null>(null);
@@ -395,8 +402,12 @@ function DateTimeField({
       ref={groupRef}
       className="dd-pair"
       onBlur={(e) => {
-        // The pair is one edit: only when focus leaves the date, the time AND the calendar button is it sent.
-        if (groupRef.current && e.relatedTarget instanceof Node && groupRef.current.contains(e.relatedTarget)) return;
+        // The pair is one edit: moving between the date and the time does not send half of it. Leaving both
+        // does, wherever focus goes next, the row's own calendar or clear button included (ux3: Tab from the
+        // time to the calendar button used to count as still inside, so "Not saved yet" sat there until focus
+        // left the whole row).
+        const to = e.relatedTarget;
+        if (to && (to === dateRef.current || to === timeRef.current)) return;
         if (calOpen) return;
         setFocused(false);
         void commit();
@@ -408,6 +419,7 @@ function DateTimeField({
       {/* "Not set" covers an empty field only while it is not being typed in (ux1 G7). */}
       {!shownDate && !focused && <span aria-hidden="true" style={{ position: 'absolute', left: 7, top: 1, bottom: 1, right: 1, display: 'flex', alignItems: 'center', background: 'var(--c-deep2)', color: (mixed ? undefined : emptyColor) ?? C.dim, fontFamily: 'var(--font-prose)', fontSize: 15, fontWeight: emptyText && !mixed ? 600 : undefined, pointerEvents: 'none', zIndex: 1 }}>{(mixed ? undefined : emptyText) ?? 'Not set'}</span>}
       <input
+        ref={dateRef}
         type="text"
         inputMode="text"
         autoComplete="off"
@@ -421,13 +433,14 @@ function DateTimeField({
         {...selectAllOnFocus}
         onKeyDown={keys}
         className="teacher-field dd-date"
-        style={shownDate ? { ...dateInput, width: 116 } : { ...dateInput, width: 116, ...emptyField }}
+        style={shownDate ? { ...dateInput, width: DATE_W } : { ...dateInput, width: DATE_W, ...emptyField }}
         aria-label={`${label} date for ${ariaSuffix}, month/day/year`}
         aria-invalid={problem ? true : undefined}
         aria-describedby={problem ? `${msgId}` : undefined}
       />
       </span>
       <input
+        ref={timeRef}
         type="text"
         autoComplete="off"
         spellCheck={false}
@@ -723,7 +736,7 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                 : problems.size > 0
                   ? `Last change not saved: ${problems.size === 1 ? 'a date needs' : `${problems.size} dates need`} fixing (see the orange note)`
                   : dirty.size > 0
-                    ? 'Not saved yet: press Enter or leave the field to save'
+                    ? 'Not saved yet: press Enter, or move on from the date and time, to save'
                     : '✓ Saved'}
           </span>
           {problems.size === 0 && dirty.size === 0 && <span>· changes save automatically</span>}

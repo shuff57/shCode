@@ -261,7 +261,7 @@ export default function StudentGradebook({ lessons }: Props) {
         ))}
         {oldestMissing && grades.some((g) => g.missingCount > 0) && (
           <p className="grade-summary-action">
-            <a href={lessonHref(oldestMissing.lesson)} className="grade-summary-start">Start with the oldest: {oldestMissing.lesson.title} <span aria-hidden="true">→</span></a>
+            <a href={lessonHref(oldestMissing.lesson)} className="grade-summary-start">Oldest past-due lesson: {oldestMissing.lesson.title} <span aria-hidden="true">→</span></a>
           </p>
         )}
         <details style={{ marginTop: 2 }}>

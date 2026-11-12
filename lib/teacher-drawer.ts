@@ -241,6 +241,45 @@ export function scoreCountNote(
   return null;
 }
 
+/**
+ * The score on the hand-in a queue card shows (its newest try) is not always the score the grade reads:
+ * the grade reads lesson_state.score (functions/_shared/grading.ts, the ONE rule), which keeps the best try,
+ * or the teacher's chosen score when score_override holds it. When the two differ, the card says both
+ * (rewalk2 T4: "Quiz score: 4 / 5" in the queue beside "best 5 of 5" in the gradebook). Null when they agree,
+ * when either is unknown, or when the score does not change the grade now (`countNote` already says why).
+ * `fmt` renders one score in the card's own unit ("5 / 5", "3 of 4 criteria").
+ */
+export interface CountedScoreNote {
+  /** The header chip: the score that counts. */
+  chip: string;
+  /** The always-visible sentence: this try, and what counts. */
+  note: string;
+}
+
+export function countedScoreNote(opts: {
+  rowScore: number | null | undefined;
+  stateScore: number | null | undefined;
+  stateOverride?: boolean;
+  lessonState?: 'started' | 'completed' | null;
+  /** True when the row shown is the student's newest hand-in of this lesson. */
+  newest: boolean;
+  /** A ScoreCountNote is shown for this card (the score does not change the grade now). */
+  hasCountNote: boolean;
+  fmt: (score: number) => string;
+}): CountedScoreNote | null {
+  const { rowScore, stateScore } = opts;
+  if (opts.hasCountNote || opts.lessonState !== 'completed') return null;
+  if (typeof rowScore !== 'number' || !Number.isFinite(rowScore)) return null;
+  if (typeof stateScore !== 'number' || !Number.isFinite(stateScore)) return null;
+  if (Math.abs(rowScore - stateScore) < 1e-9) return null;
+  const which = opts.stateOverride ? 'your chosen score' : 'best try';
+  const thisTry = opts.newest ? 'Newest try' : 'This try';
+  return {
+    chip: `Counts: ${opts.fmt(stateScore)} (${opts.stateOverride ? 'your score' : 'best try'})`,
+    note: `${thisTry}: ${opts.fmt(rowScore)}. Counts toward the grade: ${which}, ${opts.fmt(stateScore)}.`,
+  };
+}
+
 /** The one sentence both the queue card and the drawer show; null when the score counts as usual. */
 export function scoreWeightNote(w: ScoreWeight | null): string | null {
   return scoreCountNote(w)?.note ?? null;

@@ -15,6 +15,9 @@ export interface LessonStateSnapshot {
   authed: boolean;
   states: Record<string, LessonState>;
   scores: Record<string, number>;
+  /** For a lesson in progress: the last time the student worked in it (epoch ms). Absent for finished or
+   *  never-opened lessons, and from a server that does not send it. */
+  workedAt?: Record<string, number>;
   role: Role | null;
 }
 
@@ -39,8 +42,8 @@ async function load(): Promise<LessonStateSnapshot> {
       return { loaded: true, authed: false, states: {}, scores: {}, role: null };
     }
     if (!res.ok) throw new Error(`lesson-state GET ${res.status}`);
-    const data = (await res.json()) as { states: Record<string, LessonState>; scores: Record<string, number>; role?: Role };
-    return { loaded: true, authed: true, states: data.states ?? {}, scores: data.scores ?? {}, role: data.role ?? null };
+    const data = (await res.json()) as { states: Record<string, LessonState>; scores: Record<string, number>; workedAt?: Record<string, number>; role?: Role };
+    return { loaded: true, authed: true, states: data.states ?? {}, scores: data.scores ?? {}, workedAt: data.workedAt ?? {}, role: data.role ?? null };
   } catch {
     return { loaded: true, authed: false, states: {}, scores: {}, role: null };
   }
@@ -97,7 +100,7 @@ export async function recordLessonStarted(lessonId: string, siblingIds?: readonl
   if (cache.states[lessonId]) return;
   const ok = await postState(lessonId, 'started');
   if (ok) {
-    cache = { ...cache, states: { ...cache.states, [lessonId]: 'started' } };
+    cache = { ...cache, states: { ...cache.states, [lessonId]: 'started' }, workedAt: { ...cache.workedAt, [lessonId]: Date.now() } };
     notify();
   }
 }

@@ -12,7 +12,9 @@
 // `quizzes`: lesson id -> each question's text, options and key (functions/_shared/quizTeacher.ts), so a
 // quiz hand-in reads "Picked: <text>. Answer: <text>" (ux2 T3b). Both are teacher/admin-only.
 // Each submission carries `lessonState` (the student's lesson_state for that lesson) and `pastDue`, so the
-// card can say when a score will not count yet (ux2 T1). Read-only facts; no grade is computed here.
+// card can say when a score will not count yet (ux2 T1), and `stateScore` / `stateOverride` (lesson_state.score
+// and whether score_override holds it), the score the ONE grade rule reads, so a card whose newest try differs
+// says which one counts (ux3). Read-only facts; no grade is computed here.
 // POST lets a teacher override the AI score and optionally attach feedback.
 //
 // Auth: caller must be an owner / co-teacher of the class OR an admin.
@@ -172,6 +174,8 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (
       limit: await rowLimit(env, request, r),
       capped: capFor(r.lesson_id) !== undefined,
       lessonState: facts.state.get(`${r.student_email}|${r.lesson_id}`) ?? null,
+      stateScore: facts.score.get(`${r.student_email}|${r.lesson_id}`)?.score ?? null,
+      stateOverride: facts.score.get(`${r.student_email}|${r.lesson_id}`)?.override ?? false,
       pastDue: facts.pastDue(r.student_email, r.lesson_id),
     })),
   );
@@ -207,8 +211,13 @@ async function lessonFacts(
   classId: string,
   rows: Array<{ student_email: string; lesson_id: string }>,
   now: number,
-): Promise<{ state: Map<string, 'started' | 'completed'>; pastDue: (email: string, lessonId: string) => boolean }> {
+): Promise<{
+  state: Map<string, 'started' | 'completed'>;
+  score: Map<string, { score: number | null; override: boolean }>;
+  pastDue: (email: string, lessonId: string) => boolean;
+}> {
   const state = new Map<string, 'started' | 'completed'>();
+  const score = new Map<string, { score: number | null; override: boolean }>();
   const lessonIds = [...new Set(rows.map((r) => r.lesson_id))].slice(0, QUEUE_TOTAL_CAP);
   if (lessonIds.length > 0) {
     try {
@@ -223,6 +232,20 @@ async function lessonFacts(
         if (r.state === 'started' || r.state === 'completed') state.set(`${r.student_email}|${r.lesson_id}`, r.state);
       }
     } catch { /* unknown state: nothing is said */ }
+    // The stored score and whether the teacher's override holds it, in their own read so a failure here
+    // (a database without migration 0034's column) never costs the card its lessonState.
+    try {
+      const res = await env.DB.prepare(
+        `SELECT student_email, lesson_id, score, score_override FROM lesson_state
+          WHERE lesson_id IN (${lessonIds.map((_, i) => `?${i + 3}`).join(', ')})
+            AND student_email IN (SELECT student_email FROM enrollments WHERE class_id = ?1 AND expires_at > ?2)`,
+      )
+        .bind(classId, now, ...lessonIds)
+        .all<{ student_email: string; lesson_id: string; score: number | null; score_override: number | null }>();
+      for (const r of res.results ?? []) {
+        score.set(`${r.student_email}|${r.lesson_id}`, { score: typeof r.score === 'number' ? r.score : null, override: r.score_override !== null && r.score_override !== undefined });
+      }
+    } catch { /* unknown stored score: the card shows only its own try */ }
   }
   let pastDue: (email: string, lessonId: string) => boolean = () => false;
   try {
@@ -239,7 +262,7 @@ async function lessonFacts(
       };
     }
   } catch { /* no due facts: "not past due" */ }
-  return { state, pastDue };
+  return { state, score, pastDue };
 }
 
 // POST — teacher overrides an AI grade.

@@ -2201,6 +2201,7 @@ function GradebookView({
               <tr className="gb-avg-row">
                 <th scope="row" className="gb-avg-label" style={{ position: 'sticky', left: 0, zIndex: 1, width: EMAIL_W, minWidth: EMAIL_W }}>
                   Class average
+                  <span className="gb-avg-sub">of finished work</span>
                 </th>
                 <td
                   className="gb-avg-cell"
@@ -2220,11 +2221,13 @@ function GradebookView({
                         ? `${lesson.title}: nobody has finished it yet`
                         : `${lesson.title}: average ${a.avg} across the ${a.n} of ${classStudents.length} students who finished it. Missing work is not in this average.`}
                     >
+                      {/* ux3: "100" alone read as the column's result over a column of Missing cells. The average
+                          of finished work says so, with how many finished, in a quiet line. */}
                       {a.avg === null ? <span className="gb-avg-none">—</span> : (
-                        <>
-                          <strong>{a.avg}</strong>
+                        <span className="gb-avg-line">
+                          <span className="gb-avg-v">{a.avg} avg</span>
                           <span className="gb-avg-n">{a.n} of {classStudents.length} done</span>
-                        </>
+                        </span>
                       )}
                     </td>
                   );

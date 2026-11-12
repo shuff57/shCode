@@ -23,7 +23,7 @@ import {
   type MarkCriterion,
   type ScoreSource,
 } from '../lib/rubric-mark';
-import { quizAnswerRows, scoreCountNote, scoreOutOf, studentFirstName, type QuizAnswerRow, type ScoreWeight, type TeacherQuiz } from '../lib/teacher-drawer';
+import { countedScoreNote, quizAnswerRows, scoreCountNote, scoreOutOf, studentFirstName, type QuizAnswerRow, type ScoreWeight, type TeacherQuiz } from '../lib/teacher-drawer';
 import { readTeacherNotes } from '../lib/gradebook-cell';
 import { collapseQueue, needsHuman, orderCards, queueIntro } from '../lib/submission-queue-order';
 
@@ -85,6 +85,10 @@ interface SubmissionItem {
    *  whether a teacher's score counts yet (ux2 T1). Older servers send neither. */
   lessonState?: 'started' | 'completed' | null;
   pastDue?: boolean;
+  /** lesson_state.score (the score the grade reads: the best try, or the teacher's chosen score when
+   *  `stateOverride`), so a card can say which score counts when its newest try differs (ux3). */
+  stateScore?: number | null;
+  stateOverride?: boolean;
 }
 
 /** The assignment a row answers, from the queue GET's `assignments` (teacher-only, server-side config). */
@@ -572,6 +576,29 @@ export function OverrideForm({
         </span>
       </div>
 
+      {/* The "use this score even if it is lower" choice belongs to the score, so it follows the score field: on a
+          phone or in the drawer (one column) it sits ABOVE the note, where the pinned Save bar cannot cover it
+          while the note is being typed (rewalk2 T9). In the wide queue form it is shown under the row as
+          before (globals.css ux3: order). */}
+      {enforceMax && (
+        <div className="sq-keep">
+          <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-prose)', fontSize: 14, color: 'var(--c-fg)' }}>
+            <input type="checkbox" checked={replaceBest} onChange={(e) => setReplaceBest(e.target.checked)} />
+            Use this score even if it is lower than their best try
+          </label>
+          <button type="button" className="sq-score-use" aria-expanded={whatIsThis} aria-controls={`keep-help-${submissionId}`} onClick={() => setWhatIsThis((v) => !v)}>
+            What is this?
+          </button>
+          {whatIsThis && (
+            <p id={`keep-help-${submissionId}`} className="sq-keep-help">
+              On a part with a try limit the higher of your score and the student&apos;s best try is kept, so your
+              score never lowers it. Tick this to make your score the one that counts, lower or not. It stays until
+              you change it or press Clear my score choice; the student&apos;s later tries do not undo it.
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="override-feedback" style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
         <label htmlFor={`override-feedback-${submissionId}`} style={FIELD_LABEL}>
           Note to the student (optional):
@@ -596,25 +623,6 @@ export function OverrideForm({
       </div>
 
       </div>
-
-      {enforceMax && (
-        <div className="sq-keep">
-          <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-prose)', fontSize: 14, color: 'var(--c-fg)' }}>
-            <input type="checkbox" checked={replaceBest} onChange={(e) => setReplaceBest(e.target.checked)} />
-            Use this score even if it is lower than their best try
-          </label>
-          <button type="button" className="sq-score-use" aria-expanded={whatIsThis} aria-controls={`keep-help-${submissionId}`} onClick={() => setWhatIsThis((v) => !v)}>
-            What is this?
-          </button>
-          {whatIsThis && (
-            <p id={`keep-help-${submissionId}`} className="sq-keep-help">
-              On a part with a try limit the higher of your score and the student&apos;s best try is kept, so your
-              score never lowers it. Tick this to make your score the one that counts, lower or not. It stays until
-              you change it or press Clear my score choice; the student&apos;s later tries do not undo it.
-            </p>
-          )}
-        </div>
-      )}
 
     </>
   );
@@ -911,8 +919,12 @@ export function SubmissionQueue({ classId, lessonTitles, lessonWeights, onGraded
       studentName: studentFirstName(nameOf(row.student_email)?.firstName, row.student_email),
     });
   const counts = (c: { row: SubmissionItem }) => countNoteOf(c.row) === null;
-  const cards = orderCards(collapseQueue(submissions), counts, orderRef.current, (c) => needsHuman(c.row));
+  const collapsed = collapseQueue(submissions);
+  const cards = orderCards(collapsed, counts, orderRef.current, (c) => needsHuman(c.row));
   orderRef.current = cards.map((c) => c.key);
+  // Is what is on screen the order the intro describes? Not after a Save that kept a card in place (ux3).
+  const natural = orderCards(collapsed, counts, [], (c) => needsHuman(c.row)).map((c) => c.key);
+  const heldInPlace = natural.some((k, i) => k !== cards[i]?.key);
   const needCounts = cards.filter((c) => needsHuman(c.row) && counts(c)).length;
   const needOther = cards.filter((c) => needsHuman(c.row) && !counts(c)).length;
 
@@ -920,7 +932,7 @@ export function SubmissionQueue({ classId, lessonTitles, lessonWeights, onGraded
     <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
       {/* What is listed, then how many need a human, and that the ones whose score changes nothing come last. */}
       <div style={{ fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.5, color: 'var(--c-meta)', maxWidth: '70ch', marginBottom: 8 }}>
-        {queueIntro(cards.length, needCounts, needOther)}
+        {queueIntro(cards.length, needCounts, needOther, heldInPlace)}
       </div>
       {error && <div role="alert" style={{ color: 'var(--c-red)', fontFamily: 'var(--font-prose)', fontSize: 14, marginBottom: 8 }}>Could not refresh the list: {error}</div>}
       {cards.map(({ key, row: sub, others }) => {
@@ -962,6 +974,17 @@ export function SubmissionQueue({ classId, lessonTitles, lessonWeights, onGraded
         const pointsMax = sub.limit?.unit === 'points' ? sub.limit.max : null;
         const criteria = brief || gradeData ? buildMarkCriteria(brief?.rubric, gradeData?.criteria) : [];
         const rubricShown = rubricFitsForm(criteria, unit?.total ?? pointsMax);
+        // The newest try's score and the score the grade reads can differ (best try kept, or the teacher's
+        // chosen score): then the chip shows what counts and a sentence names both (ux3).
+        const counted = countedScoreNote({
+          rowScore: sub.score,
+          stateScore: sub.stateScore,
+          stateOverride: sub.stateOverride === true,
+          lessonState: sub.lessonState ?? null,
+          newest: !(others > 0 && failed),
+          hasCountNote: countNote !== null,
+          fmt: (n) => (unit ? `${Math.round(n * 100) / 100} of ${unit.total} criteria` : scoreOutOf(n, outOf)),
+        });
 
         return (
           <div
@@ -1012,7 +1035,9 @@ export function SubmissionQueue({ classId, lessonTitles, lessonWeights, onGraded
               >
                 {failed
                   ? 'Needs your score'
-                  : unit
+                  : counted
+                    ? counted.chip
+                    : unit
                     ? // A pass/fail rubric stores 0 of 0, so the stored numbers say nothing. Its grade is
                       // criteria met out of the criteria count, and that is what a mark is in.
                       teacherScored
@@ -1049,6 +1074,7 @@ export function SubmissionQueue({ classId, lessonTitles, lessonWeights, onGraded
 
             {/* Does this score change the grade now? Said before the form, always visible, in the drawer's words. */}
             {countNote && <p role="note" className={`sq-weight-note is-${countNote.reason}`}>{countNote.note}</p>}
+            {counted && <p role="note" className="sq-weight-note is-counted">{counted.note}</p>}
 
             {/* The teacher's own note, kept with their score (ux1 G2). */}
             {notes.feedback && (
@@ -1181,7 +1207,7 @@ export function SubmissionQueue({ classId, lessonTitles, lessonWeights, onGraded
             {/* An auto-scored quiz: its score, and changing it is a deliberate step (ux2 T3c). */}
             {quizScored && !showForm && (
               <div className="sq-quiz-scored">
-                <span>Scored automatically: <strong>{scoreOutOf(sub.score, outOf)}</strong>. Nothing to grade.</span>
+                <span>{counted ? 'This try scored automatically' : 'Scored automatically'}: <strong>{scoreOutOf(sub.score, outOf)}</strong>. Nothing to grade.</span>
                 <button
                   type="button"
                   className="sq-score-use"

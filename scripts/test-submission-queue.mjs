@@ -44,6 +44,7 @@ const handlerJs = join(outDir, ENTRY.replace(/\.ts$/, '.js'));
 if (!existsSync(handlerJs)) { console.error(`FAIL: tsc did not emit ${handlerJs}\n${log}`); process.exit(1); }
 const { onRequestGet } = require(handlerJs);
 const Q = require(join(outDir, 'lib/submission-queue-order.js'));
+const TD = await import('../lib/teacher-drawer.ts');
 
 // ---- D1 shim over node:sqlite ------------------------------------------------
 function d1(db) {
@@ -256,6 +257,31 @@ check('orderQueue: routine cap and total cap',
     '9 recent submissions, one per student and lesson. 1 needs your score and is listed first, though its score does not change the grade right now. Work that already has a score comes after.');
   check('intro: nothing needs a score', Q.queueIntro(1, 0, 0), '1 recent submission, one per student and lesson. Every one has a score; change it below if you disagree. The ones whose score changes the grade are listed first.');
   check('intro: no em dash', /\u2014/.test(Q.queueIntro(4, 1, 1) + Q.queueIntro(2, 0, 2)), false);
+  // ux3 (rewalk2 T1): after a Save the scored card keeps its place, so the intro must not claim the order.
+  check('intro: a just-scored card held in place, nothing else needs a score',
+    Q.queueIntro(6, 0, 0, true),
+    '6 recent submissions, one per student and lesson. Every one has a score; change it below if you disagree. Cards you just scored stay where they are until you reload the page.');
+  check('intro: held in place while others still need a score',
+    Q.queueIntro(6, 1, 0, true).endsWith('Work that already has a score comes after. Cards you just scored stay where they are until you reload the page.'), true);
+  // Held in place = the order on screen differs from the order the intro describes.
+  const graded = list.map((c) => c.key === 'need-practice' ? card('need-practice', false, false) : c);
+  const shown = Q.orderCards(graded, (c) => c.countsNow, ordered, (c) => Q.needsHuman(c.row)).map((c) => c.key);
+  const natural = Q.orderCards(graded, (c) => c.countsNow, [], (c) => Q.needsHuman(c.row)).map((c) => c.key);
+  check('a saved card stays where it was', shown, ordered);
+  check('...which is not the order a reload gives', natural.join() !== shown.join(), true);
+}
+{
+  // ux3 (rewalk2 T4/T8): newest try vs the score the grade reads.
+  const fmt = (n) => `${n} / 5`;
+  const base = { lessonState: 'completed', newest: true, hasCountNote: false, fmt };
+  check('counted: newest 4, best 5', TD.countedScoreNote({ ...base, rowScore: 4, stateScore: 5 }),
+    { chip: 'Counts: 5 / 5 (best try)', note: 'Newest try: 4 / 5. Counts toward the grade: best try, 5 / 5.' });
+  check('counted: the teacher chose a lower score', TD.countedScoreNote({ ...base, rowScore: 5, stateScore: 3, stateOverride: true }).note,
+    'Newest try: 5 / 5. Counts toward the grade: your chosen score, 3 / 5.');
+  check('counted: same score says nothing', TD.countedScoreNote({ ...base, rowScore: 5, stateScore: 5 }), null);
+  check('counted: not finished says nothing (the count note speaks)', TD.countedScoreNote({ ...base, lessonState: 'started', rowScore: 4, stateScore: 5 }), null);
+  check('counted: practice says nothing', TD.countedScoreNote({ ...base, hasCountNote: true, rowScore: 4, stateScore: 5 }), null);
+  check('counted: unknown stored score says nothing', TD.countedScoreNote({ ...base, rowScore: 4, stateScore: null }), null);
 }
 
 // ---- ux2 review: staff on a roster are in NO student list of needs-attention (one helper, classStaff.ts) ----

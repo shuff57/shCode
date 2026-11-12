@@ -5264,3 +5264,32 @@ input.dd-date { width: 152px; padding-right: 30px !important; }
 .lesson-card-state.is-completed { color: var(--c-green); border: 1px solid color-mix(in srgb, var(--c-green) 45%, transparent); }
 .lesson-card-state.is-started { color: var(--c-yellow); border: 1px solid color-mix(in srgb, var(--c-yellow) 45%, transparent); }
 /* end ux2 student */
+/* ux3 */
+/* 1/2 Schedule: the date field is plain text now, so the 30px kept for the old native calendar indicator only
+   squeezed the value ("12/15/202"). The calendar button sits outside the box. */
+input.dd-date { padding-right: 8px !important; }
+/* The Mixed control (a module row) ends where the module rows' calendar buttons end: DueDatesPanel's
+   DATE_W + 8 + TIME_W + 8 + 30px, in the same 15px face so `ch` matches. */
+.dd-mixed-btn { width: calc(20.5ch + 82px); font-size: 15px; }
+/* 6 Grading form: the "use this score even if it is lower" row follows the score field in the DOM. In one column
+   (phone, drawer) it stays there, above the note, so the pinned Save bar cannot cover it while the note is typed;
+   in the wide queue form it is laid out under the score + note row, as before. */
+@container (min-width: 620px) {
+  .override-fields { flex-wrap: wrap; row-gap: 8px; }
+  .override-fields > .sq-keep { order: 3; flex: 1 1 100%; }
+}
+/* On a phone the bar is one row (Save + Clear my score choice), and a field scrolled into view (Tab, or the
+   browser bringing a focused field above the keyboard) stops above the bar, not under it. */
+@media (max-width: 640px) {
+  .override-form > .sq-actions-bar { column-gap: 6px !important; }
+  .sq-actions-bar > button[type="submit"] { padding: 4px 12px !important; }
+  .sq-actions-bar > button + button { padding: 4px 8px !important; white-space: nowrap; }
+  .sq-actions-bar > .sq-save-status:not(:empty) { flex: 1 1 100%; }
+  .override-form :is(input, textarea, select, button) { scroll-margin-bottom: 96px; }
+}
+/* 7 Gradebook class average: the average of finished work and how many finished, quiet (meta, regular weight),
+   so a column of Missing cells is not topped by a bold "100". */
+.gb-avg-line { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.gb-avg-v { font-size: 13px; font-weight: 500; color: var(--c-meta); white-space: nowrap; }
+.gb-avg-sub { display: block; font-size: 12px; font-weight: 400; color: var(--c-meta); }
+/* end ux3 */

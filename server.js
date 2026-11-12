@@ -190,9 +190,10 @@ app.prepare().catch((err) => {
   };
   // DEV_REAL_DB=1: the real tries handlers over an in-memory SQLite with a fake AI grader
   // (scripts/dev-demo-api.mjs). Mounted before the stubs below, so these routes win.
+  let demoApi = null;
   if (process.env.DEV_REAL_DB === '1') {
     const { mountDemoApi } = await import('./scripts/dev-demo-api.mjs');
-    mountDemoApi({ server, express, devIdentity, role: DEV_ROLE, root: process.cwd() });
+    demoApi = mountDemoApi({ server, express, devIdentity, role: DEV_ROLE, roleOf: devRoleOf, root: process.cwd() });
   }
   server.get('/api/me', (req, res) => {
     res.json({ email: devIdentity(req), role: devRoleOf(req) });
@@ -383,7 +384,7 @@ app.prepare().catch((err) => {
     return devLessonStates.get(id);
   };
   server.get('/api/lesson-state', (req, res) => {
-    res.json({ ...devStateFor(req), role: DEV_ROLE });
+    res.json({ ...devStateFor(req), role: devRoleOf(req) });
   });
   server.post('/api/lesson-state/:lessonId', express.json(), (req, res) => {
     const st = devStateFor(req);
@@ -585,6 +586,12 @@ app.prepare().catch((err) => {
       const email = devIdentity(req);
       const role = devRoleOf(req);
       ensureMember(email, role);
+      // A class created on the class page lives in dev-demo-api's database; copy its row here so the class
+      // routes below (shared items, shared games, Code together sessions) know it, as one D1 would.
+      if (demoApi && req.params.id && req.path.startsWith('/api/classes/')) {
+        const c = demoApi.classById(req.params.id);
+        if (c) libDb.sqlite.prepare('INSERT OR IGNORE INTO classes (id, name, code, owner_email, school_year, created_at) VALUES (?, ?, ?, ?, ?, ?)').run(c.id, c.name, c.code, c.owner_email, c.school_year, c.created_at);
+      }
       const request = new Request(`http://localhost${req.originalUrl}`, {
         method: req.method,
         headers: { 'content-type': 'application/json' },
