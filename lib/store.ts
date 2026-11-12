@@ -15,6 +15,8 @@ import {
 import { listCommits, createCommit as apiCreateCommit } from './commits-api';
 import { rememberedStarter, starterFile } from './starter-variants';
 import { carryMessage, mergeCarriedFiles } from './carry-forward';
+import { keepInHistory } from './local-history';
+import { filesEqual } from './lesson-sync-merge';
 
 interface UIState {
   sidebarOpen: boolean;
@@ -38,8 +40,15 @@ interface LessonState {
 
   // Lesson actions
   setLesson: (lesson: Lesson) => void;
-  /** Reset to the canonical starter from lesson.files, erasing any saved draft. */
-  resetLesson: (lesson: Lesson) => void;
+  /**
+   * Reset to the canonical starter from lesson.files, erasing any saved draft. The code it
+   * replaces goes into History first (read back): since work uploads by itself, the starter
+   * would otherwise replace the account's copy too with the old code kept nowhere. False =
+   * it could not be kept, and nothing was reset (say NOT_KEPT_TEXT, lib/local-history.ts).
+   * `discard: true` when the editor shows something that is NOT the person's own work (the
+   * reference solution a teacher inserted): it is replaced without being put in History.
+   */
+  resetLesson: (lesson: Lesson, opts?: { discard?: boolean }) => boolean;
   selectFile: (path: string) => void;
   updateFile: (path: string, value: string) => void;
   moveFile: (from: string, to: string) => void;
@@ -141,7 +150,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
     }
   },
 
-  resetLesson: (lesson) => {
+  resetLesson: (lesson, opts) => {
     // Load the canonical starter from the lesson bundle — never from localStorage.
     // Also wipes the stored draft so the next page-load starts fresh.
     const files = flattenFiles(lesson.files);
@@ -159,6 +168,13 @@ export const useLessonStore = create<LessonState>((set, get) => ({
     const defaultFile = jsPreviewModes.includes(lesson.preview || '')
       ? (files.find((f) => f.path.endsWith('.js'))?.path || files[0]?.path)
       : files[0]?.path;
+
+    const open = get();
+    if (typeof window !== 'undefined' && !opts?.discard && open.lesson?.id === lesson.id && !filesEqual(open.fileContents, fileContents)) {
+      let kept = false;
+      try { kept = keepInHistory(lesson.id, { ...open.fileContents }, 'Yours, before you reset'); } catch { kept = false; }
+      if (!kept) return false;
+    }
 
     set({
       lesson,
@@ -180,6 +196,7 @@ export const useLessonStore = create<LessonState>((set, get) => ({
         })
         .catch(() => { /* unauthenticated or offline */ });
     }
+    return true;
   },
 
   selectFile: (path) => set({ currentFile: path }),
@@ -309,6 +326,12 @@ export const useLessonStore = create<LessonState>((set, get) => ({
     if (!carried) return false;
 
     const merged = mergeCarriedFiles(state.fileContents, carried);
+    // The files it replaces go into History first (read back); if they cannot, nothing is brought in.
+    if (typeof window !== 'undefined' && !filesEqual(merged, state.fileContents)) {
+      let kept = false;
+      try { kept = keepInHistory(lesson.id, { ...state.fileContents }, 'Yours, before you brought work forward'); } catch { kept = false; }
+      if (!kept) return false;
+    }
     const commit = createCommit(carryMessage(sourceTitle), Object.keys(merged), merged);
 
     set({

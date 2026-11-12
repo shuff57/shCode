@@ -428,7 +428,7 @@ export function requestSync(email: string, force = false): void {
   });
 }
 
-/** Wire the triggers for `email`: now, after every local save or delete, and on returning to the tab. */
+/** Wire the triggers for `email`: now, after every local save or delete, on returning to the tab, and on `online`. */
 export function startLibrarySync(email: string): () => void {
   requestSync(email, true);
   let t: ReturnType<typeof setTimeout> | null = null;
@@ -437,11 +437,15 @@ export function startLibrarySync(email: string): () => void {
     t = setTimeout(() => requestSync(email, true), 1500);
   };
   const onVisible = () => { if (document.visibilityState === 'visible') requestSync(email); };
+  // Back online: what changed while the connection was down goes now, not on the next visit.
+  const onOnline = () => requestSync(email, true);
   window.addEventListener(LIBRARY_LOCAL_CHANGE, onChange);
+  window.addEventListener('online', onOnline);
   document.addEventListener('visibilitychange', onVisible);
   return () => {
     if (t) clearTimeout(t);
     window.removeEventListener(LIBRARY_LOCAL_CHANGE, onChange);
+    window.removeEventListener('online', onOnline);
     document.removeEventListener('visibilitychange', onVisible);
   };
 }

@@ -353,6 +353,9 @@ await test('3. a stale tab after another account signed in: refused with 409, to
     M.store.useLessonStore.getState().updateFile('script.js', 'A work, not saved');
     M.store.saveOpenDraft('L1');
     M.records.saveQuizRecord('Q1', { answers: { q1: 2 } });
+    // setLesson fires a background GET of the lesson's commits: let it land (as A, before B
+    // signs in) so it is not counted against what happens after the account changes.
+    await new Promise((r) => setTimeout(r, 100));
   `);
   const writesBefore = b.server.writes.length;
   const refusedBefore = b.server.refused.length;

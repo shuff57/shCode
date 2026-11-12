@@ -50,6 +50,7 @@ export default function CarryForwardBanner({ lesson }: { lesson: Lesson }) {
   const [sourceTitle, setSourceTitle] = useState<string | null>(null);
   const [carried, setCarried] = useState<Record<string, string> | null>(null);
   const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   const sourceId = lesson.carryFrom;
 
@@ -123,6 +124,8 @@ export default function CarryForwardBanner({ lesson }: { lesson: Lesson }) {
           const ok = await carryForward(sourceId!, sourceTitle ?? '');
           setBusy(false);
           if (ok) setPhase('hidden');
+          // Nothing was brought in (the work it would replace could not be kept, or there was none).
+          else setFailed(true);
         }}
         style={{
           padding: '6px 12px',
@@ -155,6 +158,11 @@ export default function CarryForwardBanner({ lesson }: { lesson: Lesson }) {
       >
         Start from the starter
       </button>
+      {failed && (
+        <span role="status" style={{ fontSize: 13, color: 'var(--text)', flexBasis: '100%' }}>
+          Nothing was brought forward: this computer could not keep your current work in History first, or there was no earlier work to bring.
+        </span>
+      )}
       <button
         type="button"
         aria-label="Dismiss"

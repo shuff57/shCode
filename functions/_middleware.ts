@@ -47,7 +47,9 @@ interface Env {
   AUTH_SECRET: string;
 }
 
-type SessionData = { email: string; role: 'admin' | 'teacher' | 'student' };
+// `wo`: the session's work owner, so GET /api/me can hand it to the page (lib/outbox.ts confirms
+// the account before uploading). Routes that do not read it are unaffected.
+type SessionData = { email: string; role: 'admin' | 'teacher' | 'student'; wo?: string };
 type Ctx = EventContext<Env, string, SessionData>;
 
 const PUBLIC_API_PREFIXES = ['/api/auth/'];
@@ -77,6 +79,7 @@ export const onRequest: PagesFunction<Env, string, SessionData> = async (context
 
   data.email = session.email;
   data.role = session.role;
+  data.wo = wo;
   const res = await next();
   if (readCookie(request, OWNER_COOKIE) === wo) return res;
   // A WebSocket upgrade (101, /api/live/*) cannot be rebuilt without losing its socket.

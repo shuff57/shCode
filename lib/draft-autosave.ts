@@ -33,15 +33,43 @@ export function flushAllPendingSaves(): void {
   for (const s of [...pendingSaves]) {
     try { s.flush(); } catch { /* one failed save never stops the others */ }
   }
-  for (const fn of [...otherFlushers]) {
+  for (const fn of [...otherFlushers.keys()]) {
     try { fn(); } catch { /* same */ }
   }
 }
 
-const otherFlushers = new Set<() => void>();
-/** A page part with its own save timer: `fn` runs its waiting save, if any. Returns the undo. */
-export function registerFlush(fn: () => void): () => void {
-  otherFlushers.add(fn);
+/**
+ * Run only the saves that are really waiting: debounced saves with a countdown running, and
+ * page parts that said they have one (registerFlush's `isPending`). The outbox calls this
+ * before it reads a draft (lib/outbox.ts): a tab whose editor is merely OPEN, with nothing
+ * unsaved, must never write it over a draft another tab wrote since.
+ */
+export function flushPendingSaves(): void {
+  for (const s of [...pendingSaves]) {
+    try { s.flush(); } catch { /* one failed save never stops the others */ }
+  }
+  for (const [fn, isPending] of [...otherFlushers]) {
+    try { if (isPending && isPending()) fn(); } catch { /* same */ }
+  }
+}
+
+/** True while this tab has an edit it has not written yet (a countdown, or a part that says so). */
+export function hasPendingSaves(): boolean {
+  if (pendingSaves.size > 0) return true;
+  for (const isPending of otherFlushers.values()) {
+    try { if (isPending && isPending()) return true; } catch { /* ignore */ }
+  }
+  return false;
+}
+
+const otherFlushers = new Map<() => void, (() => boolean) | undefined>();
+/**
+ * A page part with its own save timer: `fn` runs its waiting save, if any. `isPending` says
+ * whether one is waiting; without it the part is flushed only by flushAllPendingSaves().
+ * Returns the undo.
+ */
+export function registerFlush(fn: () => void, isPending?: () => boolean): () => void {
+  otherFlushers.set(fn, isPending);
   return () => { otherFlushers.delete(fn); };
 }
 

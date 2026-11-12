@@ -114,11 +114,25 @@ export function addLocalSnapshot(
  * History" before replacing it must check this first and change nothing on false.
  */
 export function keepInHistory(lessonId: string, files: FileMap, message: string): boolean {
-  if (typeof window === 'undefined') return false;
+  return keepSnapshot(lessonId, files, message) !== null;
+}
+
+/**
+ * keepInHistory, answering WHICH version holds the files: the id of the newest stored
+ * version once it reads back with exactly these files, or null when it does not.
+ */
+export function keepSnapshot(lessonId: string, files: FileMap, message: string): string | null {
+  if (typeof window === 'undefined') return null;
   addLocalSnapshot(lessonId, files, message);
   const newest = readAll()[lessonId]?.[0];
-  return !!newest && filesEqual(newest.files, files);
+  return newest && filesEqual(newest.files, files) ? newest.id : null;
 }
+
+/**
+ * Said when an action that replaces the student's code (Reset, another starter, bringing work
+ * forward) could not put the current code in History first, and so changed nothing.
+ */
+export const NOT_KEPT_TEXT = 'This computer could not keep your current work in History, so nothing was changed.';
 
 export function clearLocalHistory(lessonId: string): void {
   const all = readAll();

@@ -15,6 +15,7 @@
 import { useEffect, useState } from 'react';
 import type { Lesson } from '../lib/types';
 import { useLessonStore } from '../lib/store';
+import { keepInHistory, NOT_KEPT_TEXT } from '../lib/local-history';
 import {
   isUntouchedStarter,
   rememberedStarter,
@@ -75,6 +76,12 @@ export default function StarterPicker({ lesson }: { lesson: Lesson }) {
       )
     ) {
       return;
+    }
+    // What it replaces goes into History first (read back): the new starter uploads by itself.
+    if (!isUntouchedStarter(lesson, text)) {
+      let kept = false;
+      try { kept = keepInHistory(lesson.id, { ...files }, 'Yours, before you loaded another starter'); } catch { kept = false; }
+      if (!kept) { setNote(NOT_KEPT_TEXT); return; }
     }
     updateFile(file, v.text);
     rememberStarter(lesson.id, v.id);

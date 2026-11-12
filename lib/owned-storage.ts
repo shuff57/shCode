@@ -160,6 +160,12 @@ export interface OwnedStorage {
   removeItem(key: string): void;
   /** This owner's base keys that start with `prefix`. */
   keys(prefix?: string): string[];
+  /**
+   * When the record was last written (the envelope's `t`), or null when there is none.
+   * The outbox (lib/outbox.ts) compares it to tell whether a record changed while it was
+   * being uploaded.
+   */
+  stamp(key: string): number | null;
 }
 
 export interface OwnedStorageOptions {
@@ -167,6 +173,8 @@ export interface OwnedStorageOptions {
   storage: () => KV | null;
   now?: () => number;
 }
+
+let lastStamp = 0;
 
 export function createOwnedStorage(opts: OwnedStorageOptions): OwnedStorage {
   const owner = opts.owner;
@@ -197,7 +205,14 @@ export function createOwnedStorage(opts: OwnedStorageOptions): OwnedStorage {
       report({ kind: 'blocked', key, at: now() });
       return 'blocked';
     }
-    const env: Envelope = { v: 1, d, t: now(), up: null };
+    // `t` never repeats on this page, so two writes in one millisecond still read as two
+    // changes to the outbox (lib/outbox.ts compares it). It is also above the stamp of the
+    // record it replaces, so two TABS writing one key never leave the same stamp on different
+    // contents (each tab counts for itself; a review reproduced that collision).
+    const before = readEnvelope(key);
+    const t = Math.max(now(), lastStamp + 1, before && typeof before.t === 'number' ? before.t + 1 : 0);
+    lastStamp = t;
+    const env: Envelope = { v: 1, d, t, up: null };
     let text: string;
     try { text = JSON.stringify(env); } catch { return 'blocked'; }
     try {
@@ -235,6 +250,10 @@ export function createOwnedStorage(opts: OwnedStorageOptions): OwnedStorage {
       const s = kv();
       if (!s) return;
       try { s.removeItem(fullKey(key)); } catch { /* blocked: nothing to remove */ }
+    },
+    stamp(key) {
+      const e = readEnvelope(key);
+      return e && typeof e.t === 'number' ? e.t : null;
     },
     keys(prefix = '') {
       const s = kv();
@@ -397,6 +416,7 @@ function lazyOwned(make: () => OwnedStorage): OwnedStorage {
     setJSON: (k, v) => get().setJSON(k, v),
     removeItem: (k) => get().removeItem(k),
     keys: (p) => get().keys(p),
+    stamp: (k) => get().stamp(k),
   };
 }
 

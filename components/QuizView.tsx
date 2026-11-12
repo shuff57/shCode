@@ -8,6 +8,7 @@ import { getHrefsByLessonNumber } from '../lib/lesson-neighbors';
 import LessonOutcome, { NextLessonButton } from './LessonOutcome';
 import { quizScoreLine, ranWhen } from '../lib/outcome-words';
 import { fetchDraft, saveDraft, recordSubmission } from '../lib/written-grader-store';
+import { isOffline, OFFLINE_HANDIN_TEXT } from '../lib/offline';
 import { changedSinceCheck, countCorrect, passThreshold, restoreQuizState } from '../lib/quiz-grade';
 import { withInlineCode } from './InlineCode';
 import { sourceHintNumbers, sourceHintParts } from '../lib/source-hint';
@@ -93,6 +94,8 @@ export default function QuizView({ lessonId, config }: Props) {
   const [checkedAt, setCheckedAt] = useState<number | null>(null);
   const [checkCount, setCheckCount] = useState(0);
   const [now, setNow] = useState(() => Date.now());
+  // Offline, a Check or Submit is not queued (it has a time and maybe a try): say so instead.
+  const [offlineNote, setOfflineNote] = useState(false);
   const progress = useLessonState();
   // Tries, counted on the server. A capped quiz replaces the one-shot lock.
   const cap = useAttemptCap(lessonId, config.maxSubmissions, progress.authed, bypassesLessonLock(progress.role));
@@ -255,6 +258,8 @@ export default function QuizView({ lessonId, config }: Props) {
 
   async function submit() {
     if (!canSubmit) return;
+    if (progress.authed && isOffline()) { setOfflineNote(true); return; }
+    setOfflineNote(false);
     setChecked({ ...answers });
     // This Check's score, from the answers being checked (state updates land after this call).
     const correctCount = countCorrect(questions, answers);
@@ -593,6 +598,12 @@ export default function QuizView({ lessonId, config }: Props) {
               ? 'Check again'
               : 'Check my answers'}
         </button>
+
+        {offlineNote ? (
+          <span role="status" aria-live="polite" data-offline-handin="" style={{ color: 'var(--c-orange)', fontSize: 14, flexBasis: '100%' }}>
+            {OFFLINE_HANDIN_TEXT}
+          </span>
+        ) : null}
 
         {!allAnswered ? (
           <span style={{ color: 'var(--c-meta)', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>

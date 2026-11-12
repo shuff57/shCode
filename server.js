@@ -200,7 +200,8 @@ app.prepare().catch((err) => {
     demoApi = mountDemoApi({ server, express, devIdentity, role: DEV_ROLE, roleOf: devRoleOf, root: process.cwd() });
   }
   server.get('/api/me', (req, res) => {
-    res.json({ email: devIdentity(req), role: devRoleOf(req) });
+    // `wo` as the real route returns it (functions/api/me.ts), derived the dev way.
+    res.json({ email: devIdentity(req), role: devRoleOf(req), wo: devOwner.devOwnerId(devIdentity(req)) });
   });
   server.post('/api/auth/login', (req, res) => {
     res.append('Set-Cookie', devOwner.devSignInCookies(req, devIdentity));
@@ -265,10 +266,12 @@ app.prepare().catch((err) => {
   server.get('/api/lesson-sync/:lessonId', (req, res) => {
     const row = devSync.get(syncKey(req));
     if (!row) return res.json({ files: null, revision: 0, updatedAt: null });
-    res.json(row);
+    res.json({ ...row, versioned: devVersioned(syncKey(req), row.revision) });
   });
+  // As the real route: this revision has a Cloud history row (it was a Save, not an upload by itself).
+  const devVersioned = (key, revision) => (devSyncHistory.get(key) ?? []).some((h) => h.revision === revision);
   server.put('/api/lesson-sync/:lessonId', express.json({ limit: '5mb' }), (req, res) => {
-    const { files, baseRevision } = req.body || {};
+    const { files, baseRevision, auto } = req.body || {};
     if (!files || typeof files !== 'object' || Array.isArray(files)) {
       return res.status(400).json({ error: 'files object required' });
     }
@@ -281,14 +284,18 @@ app.prepare().catch((err) => {
         files: row.files,
         revision: row.revision,
         updatedAt: row.updatedAt,
+        versioned: devVersioned(key, row.revision),
       });
     }
     const next = { files, revision: (row?.revision ?? 0) + 1, updatedAt: Date.now() };
     devSync.set(key, next);
-    // The Cloud tab of History, same 20-row cap as the real table.
-    const history = devSyncHistory.get(key) ?? [];
-    history.unshift({ id: crypto.randomUUID(), files, revision: next.revision, updatedAt: next.updatedAt });
-    devSyncHistory.set(key, history.slice(0, 20));
+    // The Cloud tab of History, same 20-row cap as the real table. An upload the page made
+    // by itself (`auto: true`, lib/outbox.ts) keeps no history row, as in the real route.
+    if (auto !== true) {
+      const history = devSyncHistory.get(key) ?? [];
+      history.unshift({ id: crypto.randomUUID(), files, revision: next.revision, updatedAt: next.updatedAt });
+      devSyncHistory.set(key, history.slice(0, 20));
+    }
     res.json({ revision: next.revision, updatedAt: next.updatedAt });
   });
   // Cloud save history. Real route: functions/api/lesson-sync-history/index.ts.

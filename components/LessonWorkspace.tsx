@@ -41,8 +41,10 @@ import AssignmentHeader from './AssignmentHeader';
 import SubmitDialog from './SubmitDialog';
 import GradeReportView from './GradeReport';
 import TeacherPushBanner from './TeacherPushBanner';
-import { useCloudWorkspace } from '../lib/lesson-sync';
-import { addLocalSnapshot } from '../lib/local-history';
+import { useCloudWorkspace, noteDraftSaved } from '../lib/lesson-sync';
+import { UploadChip, TwoVersionsNotice, useUploadStatus } from './UploadStatus';
+import { isOffline, OFFLINE_HANDIN_TEXT } from '../lib/offline';
+import { addLocalSnapshot, NOT_KEPT_TEXT } from '../lib/local-history';
 import CarryForwardBanner from './CarryForwardBanner';
 import GuestWorkOffer from './GuestWorkOffer';
 import DocsDrawer from './DocsDrawer';
@@ -345,6 +347,8 @@ export default function LessonWorkspace({
   // the reference solution is loaded, for the same reason the localStorage
   // autosave is. See lib/lesson-sync.ts.
   const cloud = useCloudWorkspace(lesson, lessonProgress.authed && !solutionLoaded);
+  // Where the code is: on this computer, uploading by itself, uploaded (lib/outbox.ts).
+  const upload = useUploadStatus(lesson.id, lessonProgress.authed && !solutionLoaded);
 
   const isConsoleMode = lesson.preview === 'console';
   // A lesson whose graded file is prose/pseudocode (README.md), not a script the
@@ -747,7 +751,12 @@ export default function LessonWorkspace({
   autosaveLessonId.current = lesson.id;
   const autosave = useRef<DebouncedSave | null>(null);
   if (autosave.current === null) {
-    autosave.current = createDebouncedSave(() => { saveOpenDraft(autosaveLessonId.current); }, 2000);
+    // The draft is written, then queued to upload by itself when it differs from what the
+    // account last had (lib/lesson-sync.ts noteDraftSaved; a no-op signed out).
+    autosave.current = createDebouncedSave(() => {
+      saveOpenDraft(autosaveLessonId.current);
+      noteDraftSaved(autosaveLessonId.current);
+    }, 2000);
   }
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -1102,7 +1111,10 @@ export default function LessonWorkspace({
         possible: gradeReport.totalPossible,
       });
       if (!ok) {
-        alert(ownerMismatched() ? OWNER_MISMATCH_HANDIN_TEXT : 'Submission could not be recorded on the server. Please reload and try again.');
+        // Not queued: a hand-in has a time and a try count, so it is sent only by the student.
+        alert(ownerMismatched() ? OWNER_MISMATCH_HANDIN_TEXT
+          : isOffline() ? OFFLINE_HANDIN_TEXT
+          : 'Submission could not be recorded on the server. Please reload and try again.');
         return;
       }
       // Best try counts; the lesson_state upsert also refuses to lower it.
@@ -1711,7 +1723,9 @@ export default function LessonWorkspace({
                   onClick={() => {
                     const what = isTextMode ? 'text' : 'code';
                     if (window.confirm(`Reset your ${what} to the starter? Unsaved work will be lost.`)) {
-                      resetLesson(lesson);
+                      // The code it replaces is put in History first; if it cannot be, nothing is reset.
+                      // (The reference solution is not the person's work: it is discarded, not kept.)
+                      if (!resetLesson(lesson, { discard: solutionLoaded })) { window.alert(NOT_KEPT_TEXT); return; }
                       stopRun();
                       // The starter has not been run either: "Press Run", not "you changed your code".
                       setMoshionRun(NO_MOSHION_RUN);
@@ -1772,7 +1786,7 @@ export default function LessonWorkspace({
                     <CloudUpload size={14} />
                     <span className="toolbar-button-label">{cloud.saving ? 'Saving…' : 'Save'}</span>
                   </button>
-                  {cloud.note && (
+                  {cloud.note ? (
                     <span
                       role="status"
                       aria-live="polite"
@@ -1786,11 +1800,14 @@ export default function LessonWorkspace({
                       {cloud.note.kind === 'error' ? '✗ ' : '✓ '}
                       {cloud.note.text}
                     </span>
+                  ) : (
+                    <UploadChip status={upload} />
                   )}
                 </>
               )}
             </div>
           </div>
+          {lessonProgress.authed && !solutionLoaded ? <TwoVersionsNotice lessonId={lesson.id} status={upload} /> : null}
           {isLab && requirements.length > 0 ? <>{labCheckSummary}{renderCheckRow('above')}</> : null}
           {aiCheck ? renderAiNote(isLab ? 'above' : 'only') : null}
           <div

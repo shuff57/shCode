@@ -15,7 +15,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { diffLines } from 'diff';
 import { useLessonStore } from '../lib/store';
 import { getCurrentUser } from '../lib/auth';
-import { restoreVersionToCloud } from '../lib/lesson-sync';
+import { restoreVersionToCloud, keepBeforeRestore } from '../lib/lesson-sync';
 import { TOGETHER_COPY, listLocalHistory, type LocalSnapshot } from '../lib/local-history';
 import type { FileMap } from '../lib/lesson-sync-merge';
 import { Cloud, HardDrive, RotateCcw, Users, X } from 'lucide-react';
@@ -346,6 +346,16 @@ export default function HistoryPanel({ isOpen, onClose, lessonId, onRestore }: H
     if (!window.confirm(question)) return;
 
     setRestoreNote(null);
+    // Everything this restore replaces goes into History first (lib/lesson-sync.ts): the editor's
+    // text uploads by itself afterwards, so nothing may be replaced that is kept nowhere.
+    setRestoring(true);
+    const kept = await keepBeforeRestore(lessonId, snapshot, toCloud);
+    setRestoring(false);
+    if (kept === 'not-open') return;
+    if (kept === 'history') {
+      setRestoreNote('This computer could not keep your current work in History, so nothing was restored.');
+      return;
+    }
     useLessonStore.setState({ fileContents: { ...snapshot } });
 
     // This device only: the editor change is the whole action.

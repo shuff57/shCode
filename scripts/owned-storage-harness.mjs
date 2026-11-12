@@ -22,7 +22,7 @@ export const SECRET = 'test-secret-for-owned-storage';
 const MODULES = [
   'store', 'lesson-sync', 'work-records', 'guest-work', 'owner-guard', 'auth', 'owner-fetch', 'local-history',
   'moshion-storage', 'starter-variants', 'carry-forward', 'games-client', 'draft-autosave', 'library-sync',
-  'owned-storage', 'version-control',
+  'owned-storage', 'version-control', 'outbox', 'outbox-senders', 'outbox-page', 'offline', 'written-grader-store',
 ].map((m) => `lib/${m}.ts`);
 
 let compiled = null;
@@ -61,7 +61,10 @@ export function createBrowser({ quota = 0, db = null } = {}) {
   fs.writeFileSync(storeFile, '{}');
   const tabs = [];
   const jar = { session: null, owner: null };
-  const server = { rows: {}, writes: [], refused: [], drafts: {} };
+  // history: Cloud history rows the real route would write (a Save, never an `auto` upload).
+  // holds: requests parked until released (browser.hold). answer: a scripted reply that runs
+  // before the routes (a 500, a 401 from a route...), or null to fall through.
+  const server = { rows: {}, writes: [], refused: [], drafts: {}, history: {}, holds: [], answer: null, puts: [] };
   const cookieHeader = () => [jar.session && `shcode_session=${jar.session}`, jar.owner && `shcode_owner=${jar.owner}`]
     .filter(Boolean).join('; ');
   // The DB the middleware reads for a session with no `wo` claim.
@@ -69,6 +72,8 @@ export function createBrowser({ quota = 0, db = null } = {}) {
     prepare() { return { bind() { return { first: async () => null, run: async () => ({}) }; } }; },
   };
 
+  // As the real route: this revision has a Cloud history row (a Save, not an upload by itself).
+  const versioned = (email, id, revision) => (server.history[email]?.[id] ?? []).includes(revision);
   async function routes(req, email) {
     const u = new URL(req.url);
     const m = /^\/api\/lesson-sync\/([^/]+)$/.exec(u.pathname);
@@ -77,22 +82,24 @@ export function createBrowser({ quota = 0, db = null } = {}) {
       const mine = (server.rows[email] ||= {});
       if (req.method === 'GET') {
         const row = mine[id];
-        return Response.json(row ? { files: row.files, revision: row.revision, updatedAt: 1 } : { files: null, revision: 0, updatedAt: null });
+        return Response.json(row ? { files: row.files, revision: row.revision, updatedAt: 1, versioned: versioned(email, id, row.revision) } : { files: null, revision: 0, updatedAt: null });
       }
       const body = await req.json();
       const row = mine[id];
+      server.puts.push({ email, id, files: body.files, baseRevision: body.baseRevision, auto: body.auto === true, keys: Object.keys(body) });
       if ((row?.revision ?? 0) !== body.baseRevision) {
-        return Response.json({ files: row?.files ?? null, revision: row?.revision ?? 0, updatedAt: 1 }, { status: 409 });
+        return Response.json({ conflict: true, files: row?.files ?? null, revision: row?.revision ?? 0, updatedAt: row?.updatedAt ?? 1, versioned: versioned(email, id, row?.revision ?? 0) }, { status: 409 });
       }
-      mine[id] = { files: body.files, revision: (row?.revision ?? 0) + 1 };
-      return Response.json({ revision: mine[id].revision, updatedAt: 2 });
+      mine[id] = { files: body.files, revision: (row?.revision ?? 0) + 1, updatedAt: Date.now() };
+      if (body.auto !== true) ((server.history[email] ||= {})[id] ||= []).push(mine[id].revision);
+      return Response.json({ revision: mine[id].revision, updatedAt: mine[id].updatedAt });
     }
     if (u.pathname.startsWith('/api/lesson-submissions') || u.pathname.startsWith('/api/lesson-drafts/')) {
       const body = req.method === 'GET' ? null : await req.text();
       (server.drafts[email] ||= []).push({ path: u.pathname, body });
       return Response.json({ ok: true });
     }
-    if (u.pathname === '/api/me') return Response.json({ email, role: 'student' });
+    if (u.pathname === '/api/me') return Response.json({ email, role: 'student', wo: await workOwnerFor(email, SECRET) });
     if (u.pathname === '/api/accept-terms') {
       (server.terms ||= []).push(email);
       return Response.json({ ok: true });
@@ -102,6 +109,14 @@ export function createBrowser({ quota = 0, db = null } = {}) {
 
   async function handleFetch(f) {
     const url = new URL(f.url, 'http://localhost').href;
+    const pathname = new URL(url).pathname;
+    for (const h of [...server.holds]) {
+      if (h.re.test(`${f.method} ${pathname}`)) {
+        server.holds.splice(server.holds.indexOf(h), 1);
+        h.reachedResolve();
+        await h.gate;
+      }
+    }
     const headers = new Headers(f.headers);
     headers.set('Cookie', cookieHeader());
     const request = new Request(url, { method: f.method, headers, body: f.method === 'GET' ? undefined : f.body });
@@ -111,12 +126,16 @@ export function createBrowser({ quota = 0, db = null } = {}) {
       request,
       env: { DB, AUTH_SECRET: SECRET },
       data,
-      next: async () => { ran = data.email; return routes(request.clone(), data.email); },
+      next: async () => {
+        ran = data.email;
+        const scripted = server.answer ? await server.answer(request.clone(), data.email) : null;
+        return scripted ?? routes(request.clone(), data.email);
+      },
       params: {},
       waitUntil() {},
       passThroughOnException() {},
     });
-    if (ran) server.writes.push({ email: ran, method: f.method, path: new URL(url).pathname, owner: f.headers['x-work-owner'] ?? null, body: f.body });
+    if (ran) server.writes.push({ email: ran, method: f.method, path: new URL(url).pathname, owner: f.headers['x-work-owner'] ?? null, body: f.body, keepalive: !!f.keepalive });
     else server.refused.push({ status: res.status, path: new URL(url).pathname, owner: f.headers['x-work-owner'] ?? null });
     // The browser keeps what the response sets, as a real one would.
     let changed = false;
@@ -131,6 +150,23 @@ export function createBrowser({ quota = 0, db = null } = {}) {
     const h = {};
     res.headers.forEach((v, k) => { if (k !== 'set-cookie') h[k] = v; });
     return { status: res.status, headers: h, body: await res.text() };
+  }
+
+  // One Web Locks manager per browser, shared by its tabs (navigator.locks in the tab).
+  const lockState = new Map(); // name -> { held: boolean, queue: [send] }
+  function onLock(tab, { id, name, ifAvailable }) {
+    const st = lockState.get(name) ?? { held: false, queue: [] };
+    lockState.set(name, st);
+    const grant = (g) => { if (tab.alive) tab.child.send({ lockGrant: { id, granted: g } }); };
+    if (!st.held) { st.held = true; grant(true); return; }
+    if (ifAvailable) { grant(false); return; }
+    st.queue.push(() => grant(true));
+  }
+  function onLockRelease({ name }) {
+    const st = lockState.get(name);
+    if (!st) return;
+    const next = st.queue.shift();
+    if (next) next(); else st.held = false;
   }
 
   function pushCookie() {
@@ -154,6 +190,19 @@ export function createBrowser({ quota = 0, db = null } = {}) {
     jar,
     /** Sign out (both cookies cleared together, as logout.ts does). */
     signOut() { jar.session = null; jar.owner = null; pushCookie(); },
+    /** The session ends but the owner cookie stays (a session that expired on the server side). */
+    expireSession() { jar.session = null; pushCookie(); },
+    /**
+     * Park the next request whose "METHOD /path" matches `re` until release() is called.
+     * `reached` resolves when it arrives.
+     */
+    hold(re) {
+      let release; let reachedResolve;
+      const gate = new Promise((r) => { release = r; });
+      const reached = new Promise((r) => { reachedResolve = r; });
+      server.holds.push({ re, gate, reachedResolve });
+      return { release: () => release(), reached };
+    },
     /** The raw localStorage contents. */
     storage() { return JSON.parse(fs.readFileSync(storeFile, 'utf8')); },
     setStorage(obj) { fs.writeFileSync(storeFile, JSON.stringify(obj)); },
@@ -173,6 +222,8 @@ export function createBrowser({ quota = 0, db = null } = {}) {
       await new Promise((resolve, reject) => {
         child.on('message', async (msg) => {
           if (msg.ready) return resolve();
+          if (msg.lock) return onLock(tab, msg.lock);
+          if (msg.lockRelease) return onLockRelease(msg.lockRelease);
           if (msg.fetch) {
             const reply = await handleFetch(msg.fetch);
             if (tab.alive) child.send({ fetchReply: { id: msg.fetch.id, ...reply } });

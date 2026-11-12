@@ -1,7 +1,11 @@
 // GET /api/lesson-sync/[lessonId]
 //   -> { files: null, revision: 0, updatedAt: null } when this device has no
-//      workspace yet, else { files, revision, updatedAt }
-// PUT /api/lesson-sync/[lessonId]  body { files, baseRevision }
+//      workspace yet, else { files, revision, updatedAt, versioned }
+//      (`versioned`: this very revision has a Cloud history row, i.e. it was a Save and not
+//      an upload the page made by itself. The page uses it to know whether a Save of the same
+//      files still owes a history version, and whether replacing the row loses a version
+//      that is kept nowhere. Also on the 409 below. Older pages ignore it.)
+// PUT /api/lesson-sync/[lessonId]  body { files, baseRevision, auto? }
 //   -> 200 { revision, updatedAt }
 //   -> 409 { conflict: true, files, revision, updatedAt } when another device
 //      advanced the row first (a normal sync outcome, not an error)
@@ -14,6 +18,11 @@
 //
 // PUT is gated by isLessonAccessible, like the commits POST: a student cannot
 // write a locked lesson's workspace through curl either.
+//
+// `auto: true` marks an upload the page made by itself (lib/outbox.ts, up to one per
+// lesson per 30 s of typing): it advances the row exactly like a Save but writes NO Cloud
+// history row, so uploads by themselves cannot push the student's real Saves out of the
+// 20 kept. Anything other than the boolean true is an ordinary Save.
 
 import { gzipJson, gunzipJson } from '../../_shared/gzip';
 import { isLessonAccessible, lockedResponse } from '../../_shared/lessonAccess';
@@ -57,7 +66,12 @@ export const onRequestGet: PagesFunction<Env, 'lessonId', SessionData> = async (
   const files = row.files_gz
     ? await gunzipJson<Record<string, string>>(row.files_gz)
     : {};
-  return json({ files, revision: row.revision, updatedAt: row.updated_at });
+  return json({
+    files,
+    revision: row.revision,
+    updatedAt: row.updated_at,
+    versioned: await hasHistoryRow(env, data.email, lessonId, row.revision),
+  });
 };
 
 export const onRequestPut: PagesFunction<Env, 'lessonId', SessionData> = async (context: Ctx) => {
@@ -66,9 +80,9 @@ export const onRequestPut: PagesFunction<Env, 'lessonId', SessionData> = async (
 
   const { request, env, data } = context;
 
-  let body: { files?: unknown; baseRevision?: unknown };
+  let body: { files?: unknown; baseRevision?: unknown; auto?: unknown };
   try {
-    body = (await request.json()) as { files?: unknown; baseRevision?: unknown };
+    body = (await request.json()) as { files?: unknown; baseRevision?: unknown; auto?: unknown };
   } catch {
     return json({ error: 'Invalid JSON body' }, 400);
   }
@@ -91,6 +105,8 @@ export const onRequestPut: PagesFunction<Env, 'lessonId', SessionData> = async (
       ? body.baseRevision
       : 0;
 
+  const auto = body.auto === true;
+
   if (JSON.stringify(files).length > MAX_FILES_JSON_BYTES) {
     return json({ error: 'Workspace too large to sync' }, 413);
   }
@@ -112,7 +128,7 @@ export const onRequestPut: PagesFunction<Env, 'lessonId', SessionData> = async (
     .bind(filesGz, now, data.email, lessonId, baseRevision)
     .run();
   if (changedRows(updated) > 0) {
-    await recordHistory(env, data.email, lessonId, filesGz, baseRevision + 1, now);
+    if (!auto) await recordHistory(env, data.email, lessonId, filesGz, baseRevision + 1, now);
     return json({ revision: baseRevision + 1, updatedAt: now });
   }
 
@@ -127,7 +143,7 @@ export const onRequestPut: PagesFunction<Env, 'lessonId', SessionData> = async (
     .bind(data.email, lessonId, filesGz, now)
     .run();
   if (changedRows(inserted) > 0) {
-    await recordHistory(env, data.email, lessonId, filesGz, 1, now);
+    if (!auto) await recordHistory(env, data.email, lessonId, filesGz, 1, now);
     return json({ revision: 1, updatedAt: now });
   }
 
@@ -149,6 +165,7 @@ export const onRequestPut: PagesFunction<Env, 'lessonId', SessionData> = async (
       files: currentFiles,
       revision: current.revision,
       updatedAt: current.updated_at,
+      versioned: await hasHistoryRow(env, data.email, lessonId, current.revision),
     },
     409,
   );
@@ -159,6 +176,23 @@ function changedRows(result: { meta?: { changes?: number } }): number {
 }
 
 const HISTORY_LIMIT = 20;
+
+/**
+ * Whether Cloud history holds this revision. A failed read answers false: the page then
+ * treats the row as not yet a Saved version, which only makes it keep or save more.
+ */
+async function hasHistoryRow(env: Env, studentEmail: string, lessonId: string, revision: number): Promise<boolean> {
+  try {
+    const row = await env.DB.prepare(
+      'SELECT 1 AS x FROM lesson_sync_history WHERE student_email = ? AND lesson_id = ? AND revision = ? LIMIT 1',
+    )
+      .bind(studentEmail, lessonId, revision)
+      .first<{ x: number }>();
+    return !!row;
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Mirror a successful save into the Cloud history and prune its old end.

@@ -6,8 +6,10 @@ import { ChevronDown, ChevronUp, CloudUpload, History, Maximize2, Minimize2, Pan
 import type { Extension } from '@codemirror/state';
 import { useLessonStore } from '../lib/store';
 import { saveProgress } from '../lib/version-control';
-import { useCloudWorkspace } from '../lib/lesson-sync';
-import { TOGETHER_COPY, addLocalSnapshot, keepInHistory } from '../lib/local-history';
+import { useCloudWorkspace, noteDraftSaved } from '../lib/lesson-sync';
+import { TwoVersionsNotice, sandboxDotState, useUploadStatus } from './UploadStatus';
+import { uploadText } from '../lib/outbox';
+import { TOGETHER_COPY, NOT_KEPT_TEXT, addLocalSnapshot, keepInHistory } from '../lib/local-history';
 import { registerFlush } from '../lib/draft-autosave';
 import { useLessonState } from '../lib/progress';
 import CodeEditor from './CodeEditor';
@@ -124,7 +126,11 @@ export default function SandboxWorkspace() {
   // another device, and History lists both this device's snapshots and the
   // cloud saves. Each mode is its own lesson id, so the four modes keep
   // independent cloud rows and histories.
-  const cloud = useCloudWorkspace(lesson, lessonProgress.authed);
+  // Declared before the cloud hook: a Code together session stops uploads by itself.
+  const [together, setTogether] = useState(false);
+  const cloud = useCloudWorkspace(lesson, lessonProgress.authed, !together);
+  // Uploading by itself (lib/outbox.ts): its words replace the state line beside Save.
+  const upload = useUploadStatus(lesson.id, lessonProgress.authed);
   const [historyOpen, setHistoryOpen] = useState(false);
 
   // Code together (REALTIME-SPEC.md Part 2): the JavaScript and moSHion modes
@@ -136,7 +142,6 @@ export default function SandboxWorkspace() {
   const togetherLang = modeId === 'js' || modeId === 'moshion' ? modeId : null;
   const mayTogether = useCodeTogetherAvailable(togetherLang, lessonProgress.authed);
   const [togetherOpen, setTogetherOpen] = useState(false);
-  const [together, setTogether] = useState(false);
   const [togetherHere, setTogetherHere] = useState(0);
   const [togetherBadge, setTogetherBadge] = useState<HTMLSpanElement | null>(null);
   const [collabExt, setCollabExt] = useState<Extension | null>(null);
@@ -278,12 +283,23 @@ export default function SandboxWorkspace() {
           lastCommittedFileContents: st.lastCommittedFileContents,
           completedSteps: [],
         });
+        // Queued to upload by itself when it differs from what the account has (signed in only).
+        noteDraftSaved(st.lesson.id);
       } catch { /* private mode or quota: the draft stays in memory */ }
     };
-    const timer = setTimeout(save, 800);
-    const onHide = () => { if (document.visibilityState === 'hidden') save(); };
+    // Only a save that is really waiting runs early: a sandbox that is merely open must not
+    // write its editor over a draft another tab saved since (lib/outbox.ts reads that draft).
+    let pending = true;
+    const timer = setTimeout(() => { pending = false; save(); }, 800);
+    const flushIfPending = () => {
+      if (!pending) return;
+      pending = false;
+      clearTimeout(timer);
+      save();
+    };
+    const onHide = () => { if (document.visibilityState === 'hidden') flushIfPending(); };
     document.addEventListener('visibilitychange', onHide);
-    const offFlush = registerFlush(save);
+    const offFlush = registerFlush(flushIfPending, () => pending);
     return () => {
       offFlush();
       clearTimeout(timer);
@@ -388,7 +404,8 @@ export default function SandboxWorkspace() {
   function reset() {
     if (window.confirm(isFlow ? 'Clear the chart and start over? This cannot be undone.' : 'Reset code to the starter? Unsaved work will be lost.')) {
       // resetLesson also wipes the saved draft; setLesson would load it back.
-      resetLesson(lesson);
+      // The code it replaces is put in History first; if it cannot be, nothing is reset.
+      if (!resetLesson(lesson)) { window.alert(NOT_KEPT_TEXT); return; }
       stopRun();
       setLogs([]);
       // ReshapeStudio's own "Clear model" button (inside its Build toolbar)
@@ -690,9 +707,15 @@ export default function SandboxWorkspace() {
         </span>
       )}
       {lessonProgress.authed && (
-        <span className="sandbox-save-state" data-state={saveState.kind} title="Your code is always kept in this browser. Save also puts it in your account, so it opens on any device.">
-          <span className="sandbox-save-dot" aria-hidden="true" />{saveState.text}
-        </span>
+        upload.state !== 'none' ? (
+          <span className="sandbox-save-state" data-state={sandboxDotState(upload.state)} data-upload-state={upload.state} title="Your code is kept on this computer and uploads to your account by itself.">
+            <span className="sandbox-save-dot" aria-hidden="true" />{uploadText(upload)}
+          </span>
+        ) : (
+          <span className="sandbox-save-state" data-state={saveState.kind} title="Your code is always kept in this browser. Save also puts it in your account, so it opens on any device.">
+            <span className="sandbox-save-dot" aria-hidden="true" />{saveState.text}
+          </span>
+        )
       )}
       <button
         style={chipStyle}
@@ -764,6 +787,7 @@ export default function SandboxWorkspace() {
           </div>
         )}
 
+        {lessonProgress.authed && <TwoVersionsNotice lessonId={lesson.id} status={upload} />}
         {!isReshape && (
           <div className="run-toolbar sandbox-toolbar">
             <div className="sandbox-modes" role="group" aria-label="Program type">

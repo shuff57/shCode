@@ -452,7 +452,7 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   `scripts/test-quiz-unsubmit.mjs` (wired into `npm test`), which drives the real
   handler against a D1 stub.
 
-### Work kept in this browser, per account (no migration; design `.ui-hill-climb/ux1/option2-design.md`, stage 1)
+### Work kept in this browser, per account (no migration; design `.ui-hill-climb/ux1/option2-design.md`, stages 1-2)
 - **Every personal browser key goes through `lib/owned-storage.ts`** and is named `w1:<owner>:<key>` (drafts
   `progress:<id>`, `sync:<id>`, `quiz:`, `written:`, `diagram:`, `flowblock:`, `liveBlock:`, `starter:`,
   `carry-dismissed:`, `local-history`, `sandbox-game`, `moshion-store`, `library-*`; quiz/written/diagram through
@@ -499,6 +499,89 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   (a guest until the next sign-in). Tests: `scripts/test-owned-storage.mjs` (real modules, one process per tab, real
   middleware), `scripts/test-owner-check.mjs`, `scripts/test-owner-notices.mjs` (the notice, rendered).
 - Deploy: nothing to apply. No migration, no new variable (it uses `AUTH_SECRET`).
+- **Stage 2: work uploads by itself (the outbox, `lib/outbox.ts`).** One entry per record at
+  `w1:<owner>:outbox:<record key>` (one key per entry, so two tabs never rewrite each other's), holding no copy of
+  the work: a send reads the STORED record as it is then. One kind: `progress:<id>` (lab and sandbox code, sender
+  `labSender` in `lib/lesson-sync.ts`, through the existing PUT `/api/lesson-sync/[id]` with the revision this computer
+  last saw plus `auto: true`). **Flowchart drafts are not queued:** a late retry of `/api/lesson-drafts/[id]` cannot
+  tell whether the server's copy is newer, so their retry waits for stage 3 (`baseUpdatedAt`); DiagramAssignmentView
+  is as before. Started by `components/OutboxRunner.tsx` through `startOutboxForPage` (`lib/outbox-page.ts`: senders by
+  dynamic import after render, `/api/me` asked uncached); nothing starts at import.
+- **A drain never writes an editor into storage.** Before reading it runs only saves that are really waiting in that
+  tab (`flushPendingSaves`, `lib/draft-autosave.ts`; `registerFlush(fn, isPending)`; the sandbox's own save and its
+  hide-flush are pending-only too), and "already uploaded" is decided from the stored draft and the stored `sync:<id>`
+  record, never one tab's memory. A tab whose editor is merely open and older cannot overwrite another tab's draft.
+- **The account is confirmed, not assumed:** `/api/me` returned a user, the owner cookie still names the page's owner,
+  and its `wo` (now returned by `functions/api/me.ts` via the middleware's `data.wo`, and by `server.js`; older pages
+  ignore it) equals the page's owner. A page opened offline asks again (uncached `refreshCurrentUser`) and reloads the
+  senders on `online` and on tab visible until both work.
+- **When it sends:** page load (once GET `/api/me` answers), `online`, tab visible, 30 s after the last queued edit, and
+  tab hidden or `pagehide` (pending saves flushed first, fetch keepalive). Backoff 5 s to 5 min; `navigator.locks`
+  (`shcode-outbox:<owner>`, `ifAvailable`) so two tabs of one student do not send at once. Only when ALL hold: the
+  browser is online, the owner cookie now equals the page's owner, this page's `/api/me` answered signed in, the page
+  is not `guest`, the entry is not paused. 401 pauses the entry ("Sign in again to upload"; a later page that `/api/me`
+  confirms lifts it); a 409 owner-mismatch stops the page. An entry is removed ONLY if the record's envelope stamp `t`
+  is unchanged since that send began and its `q` was not re-queued (an edit typed during a send goes next time);
+  `t` is strictly increasing per page (`lib/owned-storage.ts`). That removal is the only delete the outbox does.
+- **The server half:** `auto: true` (the boolean only) makes the PUT skip the Cloud history row, so uploads cannot push
+  real Saves out of the 20 kept. An ordinary Save sends the same body as before. `server.js` does the same in dev.
+  **Save stays a Cloud history version:** after an upload by itself the `sync:<id>` record keeps `saved` (the files of
+  the last deliberate Save; null = none), and a Save whose files differ from it is sent as an ordinary PUT even when the
+  account already has them (the handler then advances the revision and writes the row). With no upload in between, Save
+  answers "No changes to save." exactly as before. Save and every other awaited step re-check that the editor still
+  shows that lesson before reading or replacing it.
+- **A tab's runtime moves only together with its editor** (`lib/lesson-sync.ts`): `rt` is the account row THAT TAB'S
+  EDITOR is based on. A drain follows the STORED record and moves a tab's `rt` only when that tab's editor is what was
+  sent (it shows that text, or that tab wrote that very draft: `wroteDraft`), and after a merge only when the editor got
+  the other computer's files. A tab that is behind is never "caught up" in memory (two reviews reproduced older text
+  overwriting newer that way): its Save with nothing of its own answers "No changes to save.", and with its own edits
+  meets the server's 409 and merges. In that 409 branch a file changed on both sides keeps this tab's text only after
+  the account's copy is in History ("From another computer or tab, <time>", read back; else nothing is sent), and
+  identical files are still sent as a Save unless this computer knows they are a Saved version (an upload by itself
+  whose answer was lost must not swallow the Cloud history version).
+- **The server says whether the live row is a Saved version:** GET `/api/lesson-sync/[id]` and its 409 carry
+  `versioned` (Cloud history has a row for that revision; false after an upload by itself; `server.js` mirrors it; an
+  older page ignores it). The page uses it instead of guessing: an arrival that reads an unversioned row records
+  `saved: null`, so the next Save sends it and makes the version; `restoreVersionToCloud` puts an unversioned live row
+  in History ("Replaced by a restored version, <time>", read back) before replacing it, and refuses if it cannot.
+  Unknown (`versioned` absent) counts as NOT a Saved version wherever something is about to be replaced.
+- **A History restore keeps what it replaces FIRST** (`keepBeforeRestore`, called by `components/HistoryPanel.tsx` before
+  the editor changes, for Device and Cloud restores): the editor's text, what this computer last uploaded by itself,
+  and for a Cloud restore the account's live row. If one cannot be kept: "This computer could not keep your current
+  work in History, so nothing was restored." (The restored editor uploads by itself afterwards, so a restore that
+  replaced first could lose an upload that had no Cloud history version.) Open the other one records `saved: null`
+  unless the server vouched for that version, so a Save pressed next still makes the Cloud history version.
+- **Everything that replaces the whole editor keeps the old code in History first** (read back; on failure nothing
+  changes and the student is told, `NOT_KEPT_TEXT`): Reset (`resetLesson` now returns false when it could not), the
+  starter picker, carry-forward, History restore, Remix, Use that work, joining Code together. Before stage 2 the
+  replaced code was only lost on that computer; now the replacement uploads by itself over the account's copy too.
+  A new action that replaces the editor must do the same.
+- **Stamps never repeat for one key across tabs** (`lib/owned-storage.ts` writes above the stamp it replaces), and a
+  merge after an upload replaces the stored draft whole only when it is, by CONTENT, exactly what was sent.
+- **Known limit, as before stage 2:** two tabs of one student on one lesson share ONE stored draft, last writer wins.
+- **A Code together session holds uploads in every tab:** `upload-hold:<id>:<random>` per session tab (stored, refreshed
+  every minute, runs out after 3 minutes so a crashed tab cannot hold uploads for ever; a tab leaving removes only its
+  own; `holdAutoUpload`).
+- **Two versions.** Server newer and NO file changed on both sides: `mergeSyncFiles`, upload, and the draft takes the
+  other computer's files. A file changed on both sides (on upload OR on arrival, `restoreWorkspace`): the entry
+  PAUSES, nothing is merged or recorded, the other version goes into History as "From another computer, <time>"
+  (`keepSnapshot`), and `components/UploadStatus.tsx` shows "This lesson was also changed on another computer." with
+  Keep mine (only after the other version is confirmed in History by read-back: its snapshot is still there, or the
+  account's copy at exactly that revision is fetched and kept; otherwise nothing changes, the lesson stays paused and
+  says "This computer could not keep the other version in History, so nothing was changed."; then uploads this
+  computer's version as a Save, files only the other side changed still come in, honoured only against the revision the
+  student saw) / Open the other one (`openOtherVersion`: the student's own version is
+  put in History and read back FIRST; if that fails nothing changes). A Save pressed meanwhile keeps today's merge.
+- **The chip** (beside Save in a lab, the state line in the sandbox): "Saved on this computer. Will upload when you're
+  back online" / "Saved on this computer" (online, waiting for the 30 s) / "Uploading..." / "Uploaded 10:42" /
+  "Two versions. Choose" / "Sign in again to upload". A Code together session turns uploads by itself off.
+- **Hand-ins are never queued** (Check, Submit, the commit Submit makes): offline they say "You're offline. Your answer
+  is saved on this computer. Hand it in when you're back online." (`lib/offline.ts`; `gradeFailureMessage('network')`,
+  lab Submit, QuizView Check/Submit). Library sync also runs on `online`.
+- Tests: `scripts/test-outbox.mjs` (npm test; same harness, plus offline events, fetch holds, scripted answers and a
+  Web Locks manager shared across tab processes), and the `auto` cases in `scripts/test-lesson-sync.mjs` (real handler).
+- Deploy: nothing to apply. No migration, no new variable, no new binding. Uploads by themselves add D1 writes (at most
+  one per lesson per 30 s of typing) and no history rows.
 
 ### Image uploads
 - `GET /api/uploads` — caller's images + quota (40 files / 20 MB, 2 MB each)

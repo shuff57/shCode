@@ -58,6 +58,7 @@ const sessionStorage = {
 
 let cookie = process.env.OS_COOKIE || '';
 const listeners = {};
+const docListeners = {};
 globalThis.window = globalThis;
 globalThis.localStorage = localStorage;
 globalThis.sessionStorage = sessionStorage;
@@ -67,17 +68,42 @@ globalThis.document = {
   get cookie() { return cookie; },
   set cookie(_v) { /* the page never sets it in these tests */ },
   visibilityState: 'visible',
-  addEventListener() {},
-  removeEventListener() {},
+  addEventListener(t, fn) { (docListeners[t] ||= []).push(fn); },
+  removeEventListener(t, fn) { docListeners[t] = (docListeners[t] || []).filter((f) => f !== fn); },
 };
 globalThis.addEventListener = (t, fn) => { (listeners[t] ||= []).push(fn); };
 globalThis.removeEventListener = (t, fn) => { listeners[t] = (listeners[t] || []).filter((f) => f !== fn); };
 globalThis.dispatchEvent = () => true;
 
+// navigator: onLine follows T.setOnline; locks is one Web Locks manager per "browser",
+// held by the parent so two tab processes really contend for it.
+let lseq = 0;
+const lockWait = new Map();
+const navigatorFake = {
+  get onLine() { return online; },
+  locks: {
+    request(name, opts, cb) {
+      if (typeof opts === 'function') { cb = opts; opts = {}; }
+      if (noLocks) return Promise.resolve(cb({ name }));
+      return new Promise((resolve, reject) => {
+        const id = ++lseq;
+        lockWait.set(id, async (granted) => {
+          try { resolve(await cb(granted ? { name } : null)); } catch (e) { reject(e); } finally {
+            if (granted) process.send({ lockRelease: { name } });
+          }
+        });
+        process.send({ lock: { id, name, ifAvailable: !!opts.ifAvailable } });
+      });
+    },
+  },
+};
+let noLocks = false;
+Object.defineProperty(globalThis, 'navigator', { value: navigatorFake, configurable: true, writable: true });
+
 // fetch -> the parent's real middleware
 let seq = 0;
 const pending = new Map();
-let online = true;
+var online = true;
 globalThis.fetch = (input, init = {}) => {
   if (!online) return Promise.reject(new TypeError('Failed to fetch'));
   const url = typeof input === 'string' ? input : input.url;
@@ -86,7 +112,7 @@ globalThis.fetch = (input, init = {}) => {
   const id = `f${++seq}`;
   return new Promise((resolve) => {
     pending.set(id, resolve);
-    process.send({ fetch: { id, url, method: init.method || 'GET', headers, body: typeof init.body === 'string' ? init.body : null } });
+    process.send({ fetch: { id, url, method: init.method || 'GET', headers, body: typeof init.body === 'string' ? init.body : null, keepalive: !!init.keepalive } });
   });
 };
 
@@ -110,6 +136,11 @@ function modules() {
     auth: load('lib/auth.js'),
     ownerFetch: load('lib/owner-fetch.js'),
     autosave: load('lib/draft-autosave.js'),
+    outbox: load('lib/outbox.js'),
+    senders: load('lib/outbox-senders.js'),
+    outboxPage: load('lib/outbox-page.js'),
+    offline: load('lib/offline.js'),
+    grader: load('lib/written-grader-store.js'),
   };
   return M;
 }
@@ -117,7 +148,30 @@ function modules() {
 const T = {
   get reloads() { return reloads; },
   session: sessionStorage,
-  setOnline(v) { online = v; },
+  setOnline(v, { silent = false } = {}) {
+    const was = online;
+    online = v;
+    if (was !== v && !silent) for (const fn of [...(listeners[v ? 'online' : 'offline'] || [])]) fn();
+  },
+  setVisible(v) {
+    globalThis.document.visibilityState = v ? 'visible' : 'hidden';
+    for (const fn of [...(docListeners.visibilitychange || [])]) fn();
+  },
+  noLocks(v = true) { noLocks = v; },
+  listenerCount() {
+    return Object.values(listeners).reduce((n, l) => n + l.length, 0) + Object.values(docListeners).reduce((n, l) => n + l.length, 0);
+  },
+  /** Require a compiled module again, from scratch, and report what it started. */
+  freshLoad(rel) {
+    const file = require.resolve(path.join(outDir, rel));
+    delete require.cache[file];
+    const before = new Set(process.getActiveResourcesInfo());
+    const n = this.listenerCount();
+    require(file);
+    const after = process.getActiveResourcesInfo().filter((r) => !before.has(r));
+    return { resources: after, listeners: this.listenerCount() - n };
+  },
+  sleep: (ms) => new Promise((r) => setTimeout(r, ms)),
   failWrites(pattern) { failPattern = pattern; },
   hide() { for (const fn of listeners.pagehide || []) fn(); },
   raw: localStorage,
@@ -125,6 +179,12 @@ const T = {
 
 process.on('message', async (msg) => {
   if (msg.cookie !== undefined) { cookie = msg.cookie; return; }
+  if (msg.lockGrant) {
+    const w = lockWait.get(msg.lockGrant.id);
+    lockWait.delete(msg.lockGrant.id);
+    w?.(msg.lockGrant.granted);
+    return;
+  }
   if (msg.fetchReply) {
     const r = msg.fetchReply;
     const resolve = pending.get(r.id);
