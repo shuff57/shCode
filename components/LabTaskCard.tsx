@@ -37,7 +37,7 @@ export default function LabTaskCard({ lesson }: { lesson: Lesson }) {
                 <span className="lab-task-end-wide">
                   {lesson.requirements.length <= 3 ? '(shown above the editor)' : '(the first 3 shown above the editor, all of them after Check)'}
                 </span>
-                <span className="lab-task-end-narrow">(listed under Quest, results above the editor after Check)</span>
+                <span className="lab-task-end-narrow">(listed under Quest, results under the editor after Check)</span>
               </>
             )}
           </p>

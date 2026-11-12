@@ -197,18 +197,66 @@ export function scoreWeight(meta: { counts: boolean; maxScore?: number | null } 
   return typeof meta.maxScore === 'number' && meta.maxScore > 0 ? 'counts' : 'done-only';
 }
 
+/**
+ * Whether a teacher's score on one student's hand-in changes the grade NOW, and if not, why: the one
+ * place the queue card and the drawer get their words from (ux2 T1), so the two cannot drift.
+ *
+ * Reads the same facts the grade does (studentGrading in functions/_shared/grading.ts): a lesson counts
+ * at its percent only once lesson_state is 'completed'; a lesson that is not finished is left out until
+ * it is due, then counts as 0 whatever score is stored. Nothing here computes a grade.
+ *  - weight 'practice' / 'done-only': the score never changes the grade (the lesson's kind decides).
+ *  - lessonState 'started': the score is saved but not used until the student finishes the lesson.
+ * `lessonState` null/undefined means no lesson_state row: a teacher score creates a finished row, so it
+ * counts as soon as it is saved, and nothing is said.
+ */
+export interface ScoreCountNote {
+  /** Why: 'practice' | 'done-only' never change the grade; 'unfinished' does not yet. */
+  reason: 'practice' | 'done-only' | 'unfinished';
+  /** Short tag for a card header. */
+  tag: string;
+  /** The always-visible sentence beside the score. */
+  note: string;
+}
+
+export function scoreCountNote(
+  w: ScoreWeight | null,
+  opts: { lessonState?: 'started' | 'completed' | null; pastDue?: boolean; studentName?: string | null } = {},
+): ScoreCountNote | null {
+  if (w === 'practice') {
+    return { reason: 'practice', tag: 'Practice, not graded', note: 'Practice: this lesson does not count toward the grade. Your score is kept for your records only.' };
+  }
+  if (w === 'done-only') {
+    return { reason: 'done-only', tag: 'Score does not change the grade', note: 'Your score does not change the grade: this lab counts as 100% once it is done, whatever the score.' };
+  }
+  if (opts.lessonState === 'started') {
+    const who = opts.studentName?.trim() || 'the student';
+    return {
+      reason: 'unfinished',
+      tag: 'Counts once finished',
+      note: opts.pastDue
+        ? `Counts once ${who} finishes this lesson. A score you save is kept, but the lesson is past due, so until then the grade counts it as 0.`
+        : `Counts once ${who} finishes this lesson. A score you save is kept, but until then the grade leaves this lesson out.`,
+    };
+  }
+  return null;
+}
+
 /** The one sentence both the queue card and the drawer show; null when the score counts as usual. */
 export function scoreWeightNote(w: ScoreWeight | null): string | null {
-  if (w === 'practice') return 'Practice: this lesson does not count toward the grade. Your score is kept for your records only.';
-  if (w === 'done-only') return 'Your score does not change the grade: this lab counts as 100% once it is done, whatever the score.';
-  return null;
+  return scoreCountNote(w)?.note ?? null;
 }
 
 /** The short tag for a card header. */
 export function scoreWeightTag(w: ScoreWeight | null): string | null {
-  if (w === 'practice') return 'Practice, not graded';
-  if (w === 'done-only') return 'Score does not change the grade';
-  return null;
+  return scoreCountNote(w)?.tag ?? null;
+}
+
+/** "Ben" from a first name, else the part of the email before @ ("ben"), for a sentence about the student. */
+export function studentFirstName(firstName: string | null | undefined, email: string): string {
+  const f = (firstName ?? '').trim();
+  if (f) return f;
+  const at = email.indexOf('@');
+  return at > 0 ? email.slice(0, at) : email;
 }
 
 /** "7 / 10" whenever a maximum is known; "7 (no maximum set)" when nothing says what it is out of. */
@@ -226,10 +274,30 @@ export interface QuizAnswerRow {
   id: string;
   /** The question's text, or the id in words when the page has no text for it. */
   question: string;
-  /** "Choice B", or "No answer". The options' text is not available to the teacher's page. */
+  /** "Choice B", or "No answer": the letter, kept for a screen reader and when no option text is known. */
   chosen: string;
-  /** Right or wrong when the stored grade says; null when the hand-in carried no key. */
+  /** The text of the option the student picked, when the teacher-only quiz content has it (ux2 T3b). */
+  chosenText: string | null;
+  /** The text of the right option, when the teacher-only quiz content has it. */
+  answerText: string | null;
+  /** Right or wrong when the stored grade says (or the key does); null when neither knows. */
   correct: boolean | null;
+}
+
+/**
+ * One quiz as a TEACHER reads it: each question's text, its options in authored order, and the index of
+ * the right one. Built server-side from lesson.json and only ever returned by the teacher/admin-gated
+ * submission-queue route (functions/_shared/quiz-teacher.generated.ts). Never in a student response.
+ */
+export interface TeacherQuizQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  /** Index into `options` (authored order, the same index QuizView stores as `picked`); null = no key. */
+  answer: number | null;
+}
+export interface TeacherQuiz {
+  questions: TeacherQuizQuestion[];
 }
 
 function choiceName(picked: unknown): string {
@@ -249,6 +317,7 @@ export function quizAnswerRows(
   gradeJson: string | null | undefined,
   response: string | null | undefined,
   stems: Readonly<Record<string, string>> | null | undefined,
+  content?: TeacherQuiz | null,
 ): QuizAnswerRow[] | null {
   let grade: unknown;
   try {
@@ -265,17 +334,27 @@ export function quizAnswerRows(
   } catch {
     answers = {};
   }
+  const byId = new Map((content?.questions ?? []).map((q) => [q.id, q] as const));
   const out: QuizAnswerRow[] = [];
   for (const q of quiz.slice(0, 200)) {
     if (!q || typeof q !== 'object' || typeof (q as { id?: unknown }).id !== 'string') continue;
     const k = q as { id: string; picked?: unknown; correct?: unknown };
     const picked = k.picked !== undefined && k.picked !== null ? k.picked : answers[k.id];
     const stem = stems && Object.prototype.hasOwnProperty.call(stems, k.id) ? stems[k.id] : '';
+    const full = byId.get(k.id);
+    const optionAt = (i: unknown): string | null =>
+      full && typeof i === 'number' && Number.isInteger(i) && i >= 0 && i < full.options.length ? full.options[i] : null;
+    const key = full && typeof full.answer === 'number' ? full.answer : null;
+    // The stored verdict first (it is what the student was scored on); the key only fills a gap.
+    const stored = k.correct === true ? true : k.correct === false ? false : null;
+    const fromKey = key !== null && typeof picked === 'number' ? picked === key : null;
     out.push({
       id: k.id,
-      question: stem || k.id.replace(/^q\d+[-_]?/i, '').replace(/[-_]+/g, ' ').trim() || k.id,
+      question: full?.question || stem || k.id.replace(/^q\d+[-_]?/i, '').replace(/[-_]+/g, ' ').trim() || k.id,
       chosen: choiceName(picked),
-      correct: k.correct === true ? true : k.correct === false ? false : null,
+      chosenText: optionAt(picked),
+      answerText: key !== null ? optionAt(key) : null,
+      correct: stored ?? fromKey,
     });
   }
   return out;

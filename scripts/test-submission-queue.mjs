@@ -68,6 +68,7 @@ db.exec(`
   CREATE TABLE enrollments (class_id TEXT, student_email TEXT, expires_at INTEGER);
   CREATE TABLE lesson_submissions (id TEXT PRIMARY KEY, student_email TEXT, lesson_id TEXT, response TEXT,
     grade_json TEXT, score REAL, possible REAL, submitted_at INTEGER, due_at_submit INTEGER);
+  CREATE TABLE lesson_state (student_email TEXT, lesson_id TEXT, state TEXT, started_at INTEGER, completed_at INTEGER, score REAL);
   INSERT INTO classes VALUES ('C1', 't@x');
 `);
 const FAR = 4102444800000;
@@ -205,5 +206,102 @@ check('orderQueue: a needing-human row inside recent moves up, newest first',
   Q.orderQueue([row('p', 5, null, F)], [row('x', 9, 0, R), row('q', 8, null, F)]).map((r) => r.id), ['q', 'p', 'x']);
 check('orderQueue: routine cap and total cap',
   Q.orderQueue([row('p', 5, null, F)], [row('x', 9, 0, R), row('y', 8, 0, R), row('z', 7, 0, R)], 3, 5).map((r) => r.id), ['p', 'x', 'y']);
+
+// ---- ux2 T1: each row says the student's lesson state, so the card can say a score does not count yet ----
+{
+  db.exec('DELETE FROM lesson_submissions');
+  ins.run('st1', 's1@x', PA, 'plan', JSON.stringify({ criteria: [] }), 1.5, 3, 6000);
+  ins.run('st2', 's2@x', WRITTEN, 'essay', JSON.stringify({ criteria: [] }), 4, 4, 6001);
+  ins.run('st3', 's3@x', LAB, 'code', JSON.stringify({ gradingFailed: true }), null, null, 6002);
+  db.prepare('INSERT INTO lesson_state VALUES (?, ?, ?, 1, NULL, 1.5)').run('s1@x', PA, 'started');
+  db.prepare('INSERT INTO lesson_state VALUES (?, ?, ?, 1, 2, 4)').run('s2@x', WRITTEN, 'completed');
+  db.prepare('INSERT INTO lesson_state VALUES (?, ?, ?, 1, 2, 4)').run('stranger@x', PA, 'completed');
+  const r = await get();
+  const by = Object.fromEntries(r.body.submissions.map((x) => [x.id, x]));
+  check('lessonState: started, completed, and none (no row yet)', [by.st1.lessonState, by.st2.lessonState, by.st3.lessonState], ['started', 'completed', null]);
+  check('pastDue: a class with no due dates is never past due', [by.st1.pastDue, by.st2.pastDue, by.st3.pastDue], [false, false, false]);
+}
+
+// ---- ux2 T3b: a quiz hand-in's questions, options and key, for the teacher only ----
+{
+  const QUIZ = '1-1-18-same-framework';
+  db.exec('DELETE FROM lesson_submissions');
+  ins.run('qz', 's1@x', QUIZ, JSON.stringify({ answers: { 'q1-four-ps-named': 2 } }), JSON.stringify({ quiz: [{ id: 'q1-four-ps-named', picked: 2, correct: true }] }), 5, 5, 7000);
+  const r = await get();
+  const quiz = r.body.quizzes?.[QUIZ];
+  check('quizzes: the listed quiz has its questions', Array.isArray(quiz?.questions) && quiz.questions.length > 0, true);
+  const q1 = quiz.questions.find((q) => q.id === 'q1-four-ps-named');
+  check('quizzes: a question carries its text, every option and the key index', [typeof q1.question, q1.options.length, q1.options[q1.answer]], ['string', 4, 'Problem, project, people, product']);
+  check('quizzes: only listed quiz lessons are sent', Object.keys(r.body.quizzes), [QUIZ]);
+  check('quizzes: a student is refused (never sent a key)', [(await get('s1@x', 'student')).status, 'quizzes' in (await get('s1@x', 'student')).body], [403, false]);
+  check('quizzes: another class’s teacher is refused', (await get('other@x', 'teacher')).status, 403);
+  const b = await briefs(`${QUIZ},__proto__,lab-x`);
+  check('briefs: the drawer gets the quiz content by id, unknown and prototype names absent', Object.keys(b.body.quizzes), [QUIZ]);
+  check('briefs: a student asking for quiz content is refused', (await briefs(QUIZ, 's1@x', 'student')).status, 403);
+}
+
+// ---- ux2 T2: the intro says the order the cards are in ----
+{
+  const F2 = JSON.stringify({ gradingFailed: true }), R2 = JSON.stringify({ results: [] });
+  const card = (key, needs, countsNow) => ({ key, row: { id: key, score: needs ? null : 1, grade_json: needs ? F2 : R2 }, countsNow });
+  const list = [card('scored-practice', false, false), card('need-practice', true, false), card('scored-counts', false, true), card('need-counts', true, true)];
+  const ordered = Q.orderCards(list, (c) => c.countsNow, [], (c) => Q.needsHuman(c.row)).map((c) => c.key);
+  check('order: needs a score AND counts, then needs a score but does not count, then scored (counting first)',
+    ordered, ['need-counts', 'need-practice', 'scored-counts', 'scored-practice']);
+  check('intro: both kinds needing a score, in that order',
+    Q.queueIntro(4, 1, 1),
+    '4 recent submissions, one per student and lesson. 2 need your score and are listed first: the 1 whose score changes the grade, then the 1 whose score does not change the grade right now. Work that already has a score comes after.');
+  check('intro: only a card whose score does not count needs a score (the walker’s case): it says so, never "listed after"',
+    Q.queueIntro(9, 0, 1),
+    '9 recent submissions, one per student and lesson. 1 needs your score and is listed first, though its score does not change the grade right now. Work that already has a score comes after.');
+  check('intro: nothing needs a score', Q.queueIntro(1, 0, 0), '1 recent submission, one per student and lesson. Every one has a score; change it below if you disagree. The ones whose score changes the grade are listed first.');
+  check('intro: no em dash', /\u2014/.test(Q.queueIntro(4, 1, 1) + Q.queueIntro(2, 0, 2)), false);
+}
+
+// ---- ux2 review: staff on a roster are in NO student list of needs-attention (one helper, classStaff.ts) ----
+{
+  const NA = 'functions/api/classes/[id]/needs-attention.ts';
+  const t2 = spawnSync('node', [
+    join(root, 'node_modules/typescript/bin/tsc'), join(root, NA),
+    '--outDir', outDir, '--rootDir', root, '--module', 'commonjs', '--target', 'es2022',
+    '--moduleResolution', 'node', '--skipLibCheck', '--esModuleInterop', '--resolveJsonModule',
+    '--types', '@cloudflare/workers-types',
+  ], { cwd: root, encoding: 'utf8' });
+  if (`${t2.stdout ?? ''}${t2.stderr ?? ''}`.includes('needs-attention')) { console.error('FAIL: tsc error in needs-attention:\n' + t2.stdout + t2.stderr); process.exit(1); }
+  const NAget = require(join(outDir, NA.replace(/\.ts$/, '.js'))).onRequestGet;
+  const S = require(join(outDir, 'functions/_shared/classStaff.js'));
+  const ndb = new DatabaseSync(':memory:');
+  ndb.exec(`
+    CREATE TABLE classes (id TEXT PRIMARY KEY, owner_email TEXT, archived_at INTEGER);
+    CREATE TABLE class_teachers (class_id TEXT, teacher_email TEXT);
+    CREATE TABLE students (email TEXT PRIMARY KEY, role TEXT NOT NULL DEFAULT 'student');
+    CREATE TABLE enrollments (class_id TEXT, student_email TEXT, enrolled_at INTEGER, expires_at INTEGER);
+    CREATE TABLE lesson_state (student_email TEXT, lesson_id TEXT, state TEXT, started_at INTEGER, completed_at INTEGER, score REAL);
+    CREATE TABLE lesson_submissions (id TEXT PRIMARY KEY, student_email TEXT, lesson_id TEXT, response TEXT,
+      grade_json TEXT, score REAL, possible REAL, submitted_at INTEGER);
+    INSERT INTO classes VALUES ('N1', 'owner@x', NULL);
+    INSERT INTO class_teachers VALUES ('N1', 'co@x');
+  `);
+  const old = Date.now() - 30 * 86400000;
+  // A student, the owner, a co-teacher and a student account promoted to teacher, all enrolled, all inactive,
+  // all stuck on a lesson, all with a failing submission; the owner also has a hand-in waiting for a score.
+  for (const [email, role] of [['kid@x', 'student'], ['owner@x', 'student'], ['co@x', 'student'], ['prom@x', 'teacher']]) {
+    ndb.prepare('INSERT INTO students VALUES (?, ?)').run(email, role);
+    ndb.prepare('INSERT INTO enrollments VALUES (?, ?, ?, ?)').run('N1', email, old, FAR);
+    ndb.prepare("INSERT INTO lesson_state VALUES (?, 'L1', 'started', ?, NULL, NULL)").run(email, old);
+    ndb.prepare("INSERT INTO lesson_submissions VALUES (?, ?, 'L2', 'a', '{}', 1, 10, ?)").run(`f-${email}`, email, old);
+  }
+  ndb.prepare("INSERT INTO lesson_submissions VALUES ('w-owner', 'owner@x', 'L3', 'a', ?, NULL, NULL, ?)").run(JSON.stringify({ gradingFailed: true }), old);
+  const res = await NAget({ env: { DB: d1(ndb) }, data: { email: 'owner@x', role: 'teacher' }, params: { id: 'N1' },
+    request: new Request('https://example.test/api/classes/N1/needs-attention') });
+  const body = await res.json();
+  const who = (list) => [...new Set(list.map((r) => r.student_email))].sort();
+  check('staff helper: owner, co-teacher and non-student role', [...(await S.classStaffEmails(d1(ndb), 'N1'))].sort(), ['co@x', 'owner@x', 'prom@x']);
+  check('needs-attention: inactive lists students only', who(body.inactive), ['kid@x']);
+  check('needs-attention: stuck lists students only', who(body.stuck), ['kid@x']);
+  check('needs-attention: failed submissions list students only (the reviewed gap)', who(body.failed_submission), ['kid@x']);
+  check('needs-attention: work waiting for a score is kept, so it matches the review queue', who(body.awaiting_grade), ['owner@x']);
+  check('withoutStaff: an empty staff set returns the list as it is', S.withoutStaff([{ student_email: 'a' }], new Set()).length, 1);
+}
 
 console.log(`\n${n} checks`);

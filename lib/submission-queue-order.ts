@@ -101,6 +101,30 @@ export function collapseQueue<T extends { id: string; student_email: string; les
 }
 
 /**
+ * The queue's intro sentence, built from the same three groups orderCards() sorts by (ux2 T2), so the
+ * sentence and the order cannot disagree:
+ *   1. needs your score and the score changes the grade (`needCounts`),
+ *   2. needs your score but the score does not change the grade, or not yet (`needOther`),
+ *   3. already has a score (the rest; inside it, the ones that change the grade first).
+ */
+export function queueIntro(total: number, needCounts: number, needOther: number): string {
+  const s = (n: number, one: string, many: string) => (n === 1 ? one : many);
+  const base = `${total} recent submission${total === 1 ? '' : 's'}, one per student and lesson.`;
+  const need = needCounts + needOther;
+  if (need === 0) {
+    return `${base} Every one has a score; change it below if you disagree. The ones whose score changes the grade are listed first.`;
+  }
+  let lead = `${need} ${s(need, 'needs', 'need')} your score and ${s(need, 'is', 'are')} listed first`;
+  if (needCounts > 0 && needOther > 0) {
+    lead += `: the ${needCounts} whose score changes the grade, then the ${needOther} whose score does not change the grade right now`;
+  } else if (needOther > 0) {
+    lead += `, though ${s(needOther, 'its', 'their')} score does not change the grade right now`;
+  }
+  const rest = total - need;
+  return `${base} ${lead}.${rest > 0 ? ` Work that already has a score comes after.` : ''}`;
+}
+
+/**
  * The order cards are read in. Cards that need the teacher's score come first (the student is waiting on
  * them), then the rest; inside each, the cards whose score changes the grade come before the ones whose
  * score does not (a practice lesson, a 0-point lab), each group in the order it came.

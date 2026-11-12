@@ -213,7 +213,8 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
           had already finished slid off the left edge. Segments divide whatever
           width they are handed, so the rail cannot overflow at any viewport;
           it only gets thinner. */}
-      <div className="lesson-progress-segs" role="group" aria-label={`Module ${moduleId} progress, one segment per lesson`}>
+      {/* Until the saved progress has loaded the segments say nothing (a flash of "0/22" read as lost work, ux2 S9). */}
+      <div className={`lesson-progress-segs${snap.loaded ? '' : ' is-loading'}`} aria-busy={!snap.loaded || undefined} role="group" aria-label={`Module ${moduleId} progress, one segment per lesson`}>
         {lessons.map((l, i) => {
           const isCurrent = l.id === currentLessonId;
           const state = snap.states[l.id];
@@ -406,9 +407,10 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
       {/* Wide screens only (CSS): what the segment colours mean. The pink "here" is said by the count on the left. */}
       <span className="lesson-progress-legend" aria-hidden="true">
         <span><i className="is-done" />done</span>
+        <span><i className="is-started" />started</span>
         <span><i className="is-todo" />to do</span>
       </span>
-      {snap.loaded && !snap.authed ? (
+      {!snap.loaded ? null : !snap.authed ? (
         <span style={{ color: 'var(--c-meta)' }}>
           <span style={{ color: 'var(--c-cyan)' }}>Sign in</span> to save progress
         </span>

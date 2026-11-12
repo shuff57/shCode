@@ -5,7 +5,7 @@ import { CircleCheck, CircleX, Circle, Loader2, Lightbulb, Sparkles, Save } from
 import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
 import { isPassingGrade, criteriaScore } from '../lib/grade-pass';
 import { NextLessonButton } from './LessonOutcome';
-import { ranWhen } from '../lib/outcome-words';
+import { ranWhen, writtenAnswerStatus } from '../lib/outcome-words';
 import LessonNumberLinks, { useSourceHrefs } from './LessonNumberLinks';
 import {
   fetchDraft,
@@ -157,6 +157,10 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
   // a stage nobody reported.
   const [stage, setStage] = useState<GradeStage | null>(null);
   const [result, setResult] = useState<GradeResult | null>(null);
+  // The answer text `result` graded (ux2 S4). Null when unknown (an older saved result).
+  const [resultFor, setResultFor] = useState<string | null>(null);
+  // The text the last "Save draft" stored, so "Draft saved" is only shown while it is still true.
+  const [savedText, setSavedText] = useState<string | null>(null);
   // The result on screen was rebuilt from the server's best try (a return visit, another device),
   // not just graded, so the page says whose it is.
   const [resultIsBest, setResultIsBest] = useState(false);
@@ -246,6 +250,8 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
   const locked = capUnknown || capReached || (oneShot && (!!result || alreadySubmitted));
   // Submit needs a real answer (20 characters); below that the button stays disabled with a hint beside it.
   const tooShort = response.trim().length < 20;
+  // Whether the result on screen is for the text in the box, and whether "Draft saved" is still true (ux2 S4).
+  const status = writtenAnswerStatus({ response, resultFor: result ? resultFor : null, savedText: savedAt ? savedText : null });
 
   useEffect(() => {
     // Local cache is the always-available fallback; server draft is canonical
@@ -255,11 +261,11 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
     (async () => {
       const [serverDraft, prior] = await Promise.all([
         progress.authed ? fetchDraft(lessonId) : Promise.resolve(null),
-        // Only worth asking when the answer changes something: a one-shot lock or
-        // a cap. A formative item has neither and never made this call.
-        progress.authed && (oneShot || maxSubmissions !== null)
+        // Signed in, the server's hand-ins are read on every visit: they are the only source of a
+        // result shown on return (below), as well as the one-shot lock and the try count.
+        progress.authed
           ? fetchSubmissions(lessonId)
-          : Promise.resolve({ records: [], loaded: !progress.authed }),
+          : Promise.resolve({ records: [], loaded: true }),
       ]);
       if (cancelled) return;
       if (prior.records.length > 0) setAlreadySubmitted(true);
@@ -274,19 +280,32 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
       } else {
         setResponse(local.response);
       }
-      // On a capped part the page must still show what the student EARNED when they come back
-      // (another day, another device, a cleared cache): the locked box used to say "your best one is
-      // your score" and show no score and none of the feedback. Once every try is spent the best
-      // try is the part's grade, so that is what is shown; before then the last try on this device
-      // stays, and the best one stands in only when this device has nothing.
+      // A result on return comes ONLY from the server's graded hand-ins for the signed-in account,
+      // never from this browser's saved copy: on a shared computer that copy may be another
+      // student's, and "Result: passed" would claim work this student never handed in.
+      // On a capped part, once every try is spent the best try is the part's grade; before that,
+      // the latest try. Elsewhere the latest graded try.
+      const graded = prior.records.filter((r) => {
+        const g = r.gradeJson as { criteria?: unknown; gradingFailed?: unknown } | null;
+        return !!g && typeof g === 'object' && Array.isArray(g.criteria) && g.gradingFailed !== true;
+      });
+      const latest = graded.length ? graded[graded.length - 1] : null;
       if (maxSubmissions !== null && prior.loaded) {
         const best = bestGradedTry(prior.records);
         const spent = countAttempts(prior.records) >= maxSubmissions;
-        if (best && (spent || !local.lastResult)) {
+        if (best && spent) {
           setResult(best);
           setResultIsBest(true);
-        } else if (local.lastResult) setResult(local.lastResult);
-      } else if (local.lastResult) setResult(local.lastResult);
+          const bestRow = prior.records.find((r) => r.gradeJson === (best as unknown));
+          setResultFor(bestRow ? bestRow.response : null);
+        } else if (latest) {
+          setResult(latest.gradeJson as GradeResult);
+          setResultFor(latest.response);
+        }
+      } else if (latest && !oneShot) {
+        setResult(latest.gradeJson as GradeResult);
+        setResultFor(latest.response);
+      }
       setLoaded(true);
     })();
     return () => {
@@ -303,7 +322,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
     setSaveStatus('saving');
     const ok = progress.authed ? await saveDraft(lessonId, response) : false;
     setSaveStatus(ok ? 'saved' : 'error');
-    if (ok) { setSavedAt(Date.now()); setClock(Date.now()); }
+    if (ok) { setSavedAt(Date.now()); setSavedText(response); setClock(Date.now()); }
     setTimeout(() => setSaveStatus('idle'), 2000);
   }
 
@@ -444,6 +463,9 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
       // A successful grade supersedes any failed attempt for this text.
       lastFailedRef.current = null;
       setResult(data as GradeResult);
+      setResultFor(response);
+      // The answer is handed in now: a "Draft saved" beside the result would say the opposite.
+      setSavedAt(null);
       setResultIsBest(false);
       setGradedAt(Date.now());
       setClock(Date.now());
@@ -619,6 +641,8 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
                 ? `Grade (${Math.max(0, maxSubmissions - attempts)} left)`
                 : typeof config.maxSubmissions === 'number'
                 ? 'Grade'
+                : result && status.resultStale
+                ? 'Submit this answer'
                 : result
                 ? (isPassing(result) ? 'Submit again (optional)' : 'Submit again')
                 : 'Submit'}
@@ -651,12 +675,14 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
           {loading ? (
             <span className="written-outcome-busy">{stage ? `${GRADE_STAGE_LABELS[stage]}…` : 'Grading…'} Your feedback will show below.</span>
           ) : result && !oneShot ? (
-            <a className={`written-outcome-result${isPassing(result) ? ' is-pass' : ' is-fail'}`} href={`#written-feedback-${lessonId}`}>
-              {isPassing(result) ? 'Result: passed' : 'Result: needs more work'}
-              {gradedAt ? ` · graded ${ranWhen(gradedAt, clock)}` : ''} · See feedback <span aria-hidden="true">↓</span>
+            <a className={`written-outcome-result${isPassing(result) ? ' is-pass' : ' is-fail'}${status.resultStale ? ' is-stale' : ''}`} href={`#written-feedback-${lessonId}`}>
+              {status.resultStale
+                ? `Your earlier answer ${isPassing(result) ? 'passed' : 'needs more work'}. This one is not graded yet.`
+                : <>{isPassing(result) ? 'Result: passed' : 'Result: needs more work'}{gradedAt ? ` · graded ${ranWhen(gradedAt, clock)}` : ''}</>}
+              {' '}· See feedback <span aria-hidden="true">↓</span>
             </a>
           ) : null}
-          {savedAt && !loading ? <span className="written-outcome-saved">Draft saved {ranWhen(savedAt, clock)}</span> : null}
+          {savedAt && !loading && status.showDraftSaved ? <span className="written-outcome-saved">Draft saved {ranWhen(savedAt, clock)}</span> : null}
         </span>
         {tooShort && !locked && !loading && (
           <span id={`written-hint-${lessonId}`} className="written-submit-hint">
@@ -772,6 +798,9 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
         const earnedCriteria = criteriaScore(result.criteria);
         return (
         <div id={`written-feedback-${lessonId}`} className="written-feedback" style={{ marginTop: 20 }}>
+          {status.resultStale ? (
+            <div className="ux2-stale-note" role="note">This feedback is for your earlier answer. Submit to get feedback on what you have written now.</div>
+          ) : null}
           {resultIsBest ? (
             <div style={{ marginBottom: 8, color: 'var(--c-cyan)', fontSize: 13 }}>This is your best try, the one that counts.</div>
           ) : maxSubmissions !== null ? (

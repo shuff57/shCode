@@ -48,14 +48,20 @@ export default function HeaderNav() {
   const [hasEnrollments, setHasEnrollments] = useState<boolean | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  // Phone menu (ux2 S6). Closing by hand (Escape, a tap outside) puts focus back on the ☰ button; a tap
+  // outside lands on a full-screen backdrop, so it only closes the menu and never also opens what is
+  // underneath (a walker opened a module that way).
+  const closeMenu = (refocus: boolean) => {
+    setMenuOpen(false);
+    if (refocus) requestAnimationFrame(() => menuButtonRef.current?.focus());
+  };
 
   useEffect(() => {
     if (!menuOpen) return;
-    const outside = (event: MouseEvent) => { if (!menuRef.current?.contains(event.target as Node)) setMenuOpen(false); };
-    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') setMenuOpen(false); };
-    document.addEventListener('mousedown', outside);
+    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') closeMenu(true); };
     document.addEventListener('keydown', escape);
-    return () => { document.removeEventListener('mousedown', outside); document.removeEventListener('keydown', escape); };
+    return () => { document.removeEventListener('keydown', escape); };
   }, [menuOpen]);
 
   useEffect(() => {
@@ -91,18 +97,31 @@ export default function HeaderNav() {
   const [search, setSearch] = useState('');
   const section = navSection(pathname, search);
   const cur = (s: NavSection) => (section === s ? { 'aria-current': 'page' as const, className: 'nav-current' } : {});
+  // A new page closes the menu: it used to stay open on top of the page just chosen.
+  useEffect(() => { setMenuOpen(false); }, [pathname, search]);
+  // Not in a class yet (known, not guessed): the only time "Join your class" is shown, on any screen.
+  const showJoin = loaded && user?.role === 'student' && hasEnrollments === false;
 
   return (
     <div ref={menuRef} className="site-header-nav-wrap">
       <Suspense fallback={null}><SearchWatch onChange={setSearch} /></Suspense>
       {/* Phones: the report-an-issue flag renders in here (ReportIssueButton, climb4 r9 S15). */}
       <span id="header-flag-slot" className="header-flag-slot" />
-      <button className="mobile-header-menu" type="button" aria-label="Open navigation menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(v => !v)} style={{ display: 'none', background: 'transparent', color: 'var(--header-fg)', border: '1px solid var(--c-comment)', borderRadius: 4, padding: '6px 9px', fontSize: 18, lineHeight: 1, cursor: 'pointer' }}>
+      <button ref={menuButtonRef} className="mobile-header-menu" type="button" aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen(v => !v)} style={{ display: 'none', background: 'transparent', color: 'var(--header-fg)', border: '1px solid var(--c-comment)', borderRadius: 4, padding: '6px 9px', fontSize: 18, lineHeight: 1, cursor: 'pointer' }}>
         ☰
       </button>
-      <Link className="mobile-join-link header-join-btn" href="/join-class" style={{ display: 'none', color: 'var(--c-yellow)', fontSize: 12, whiteSpace: 'nowrap' }}>Join your class</Link>
-      <nav className={`desktop-header-links flex items-center gap-4 flex-wrap justify-end${menuOpen ? ' mobile-open' : ''}`}>
+      {showJoin ? <Link className="mobile-join-link header-join-btn" href="/join-class" style={{ display: 'none', color: 'var(--c-yellow)', fontSize: 12, whiteSpace: 'nowrap' }}>Join your class</Link> : null}
+      {menuOpen ? (
+        // Phones only (CSS): swallows the tap that closes the menu.
+        <button type="button" className="mobile-menu-backdrop" tabIndex={-1} aria-hidden="true" onClick={() => closeMenu(true)} />
+      ) : null}
+      <nav
+        className={`desktop-header-links flex items-center gap-4 flex-wrap justify-end${menuOpen ? ' mobile-open' : ''}`}
+        onClick={(e) => { if ((e.target as Element).closest('a[href]')) setMenuOpen(false); }}
+      >
       <Link href="/" style={{ color: 'var(--header-fg)' }} {...cur('lessons')}>Lessons</Link>
+      {/* Phones only (CSS): the sandbox in one obvious tap, not hidden under "Learn". */}
+      <Link href="/sandbox" className="mobile-menu-only" style={{ color: 'var(--header-fg)' }}>Sandbox</Link>
 
       <NavDropdown label="Learn" current={section === 'learn'} triggerStyle={{ color: 'var(--header-fg)', fontSize: 15 }}>
         <Link href="/sandbox" style={itemStyle}>Sandbox</Link>
@@ -154,7 +173,7 @@ export default function HeaderNav() {
         <Link href="/progress" style={{ color: 'var(--header-fg)' }} {...cur('gradebook')}>Gradebook</Link>
       )}
 
-      {loaded && user?.role === 'student' && hasEnrollments === false && (
+      {showJoin && (
         <Link
           href="/join-class"
           className="header-join-btn"

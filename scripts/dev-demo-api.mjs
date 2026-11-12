@@ -29,7 +29,12 @@ import { onRequestGet as myGradebookGet } from '../functions/api/my-gradebook.ts
 import { ATTEMPT_CAPS } from '../functions/_shared/pa-pseudocode.generated.ts';
 import { COUNT_SINCE } from '../lib/attempt-cap.ts';
 import { DEFAULT_WEIGHTS } from '../lib/grading-weights.ts';
-import { onRequestGet as classesGet } from '../functions/api/classes/index.ts';
+import { onRequestGet as classesGet, onRequestPost as classesPost } from '../functions/api/classes/index.ts';
+import { onRequestPost as classBulkEnrollPost } from '../functions/api/classes/[id]/enrollments/bulk.ts';
+import { onRequestPost as classTeachersPost } from '../functions/api/classes/[id]/teachers/index.ts';
+import { onRequestDelete as classTeacherDelete } from '../functions/api/classes/[id]/teachers/[email].ts';
+import { onRequestGet as classAccessGet, onRequestPut as classAccessPut } from '../functions/api/classes/[id]/lesson-access/index.ts';
+import { onRequestGet as classModesGet, onRequestPost as classModesPost } from '../functions/api/classes/[id]/lesson-modes.ts';
 import { onRequestGet as classDetailGet, onRequestPatch as classDetailPatch } from '../functions/api/classes/[id]/index.ts';
 import { onRequestGet as classGradebookGet } from '../functions/api/classes/[id]/gradebook.ts';
 import { onRequestGet as classProgressGet } from '../functions/api/classes/[id]/progress.ts';
@@ -217,8 +222,16 @@ export function mountDemoApi({ server, express, devIdentity, role, root }) {
   }
   const enrolled = new Set();
   const devSeededAt = Date.now();
+  // The teacher (no dev_student cookie, DEV_ROLE teacher/admin) owns the class and is never enrolled in it: production refuses to
+  // enroll a non-student, and enrolling them here put the teacher on their own roster at 0% (ux2 T6).
+  const teacherIdentity = devIdentity({ headers: {} });
   const ensure = (email) => {
     if (enrolled.has(email)) return;
+    if (email === teacherIdentity && role !== 'student') {
+      enrolled.add(email);
+      db.raw.run("INSERT OR IGNORE INTO students (email, password_hash, created_at, role) VALUES (?, ?, ?, 'teacher')", [email, 'x', devSeededAt]);
+      return;
+    }
     enrolled.add(email);
     db.raw.run('INSERT OR IGNORE INTO students (email, password_hash, created_at) VALUES (?, ?, ?)', [email, 'x', devSeededAt]);
     db.raw.run('INSERT OR IGNORE INTO enrollments (class_id, student_email, enrolled_at, expires_at) VALUES (?, ?, ?, ?)', [CLASS_ID, email, devSeededAt, FAR]);
@@ -288,6 +301,16 @@ export function mountDemoApi({ server, express, devIdentity, role, root }) {
   server.get('/api/my-gradebook', route(myGradebookGet));
   // Teacher side: the class pages' real handlers, so the grid, the roster and the drawer show real numbers.
   server.get('/api/classes', route(classesGet));
+  // Day-one class admin (ux2 T7): these were missing here, so Create class, Bulk enroll and co-teachers answered
+  // a bare 404 in dev only. The real handlers; production routes them by file name.
+  server.post('/api/classes', json, route(classesPost));
+  server.post('/api/classes/:id/enrollments/bulk', json, route(classBulkEnrollPost, ['id']));
+  server.post('/api/classes/:id/teachers', json, route(classTeachersPost, ['id']));
+  server.delete('/api/classes/:id/teachers/:email', route(classTeacherDelete, ['id', 'email']));
+  server.get('/api/classes/:id/lesson-access', route(classAccessGet, ['id']));
+  server.put('/api/classes/:id/lesson-access', json, route(classAccessPut, ['id']));
+  server.get('/api/classes/:id/lesson-modes', route(classModesGet, ['id']));
+  server.post('/api/classes/:id/lesson-modes', json, route(classModesPost, ['id']));
   server.get('/api/classes/:id', route(classDetailGet, ['id']));
   server.patch('/api/classes/:id', json, route(classDetailPatch, ['id']));
   server.get('/api/classes/:id/gradebook', route(classGradebookGet, ['id']));

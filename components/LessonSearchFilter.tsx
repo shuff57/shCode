@@ -2,7 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { useLessonState } from '../lib/progress';
+import { bypassesLessonLock, useLessonState } from '../lib/progress';
+import { pickNextLesson } from '../lib/module-next';
+import { lessonAvailability, useDueDates, useNow } from '../lib/due-dates';
 import { lessonHref } from '../lib/lesson-href';
 import HomeModuleLessons from './HomeModuleLessons';
 import UnitProgressBadge from './UnitProgressBadge';
@@ -66,7 +68,29 @@ interface Props {
 
 export default function LessonSearchFilter({ units, lessons }: Props) {
   const progress = useLessonState();
-  const nextLesson = progress.loaded && progress.authed ? [...lessons].sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true })).find((l) => progress.states[l.id] !== 'completed') : undefined;
+  // "Next" is the module page's Continue rule (lib/module-next.ts pickNextLesson), over the whole course
+  // in lesson-number order: the first lesson not completed, unless a teacher's open date holds it shut
+  // (then there is no card, as the module page shows no Continue). One rule, so the home card and the
+  // module's Continue and "Next up" row can never point at different lessons (ux2 S9).
+  const due = useDueDates();
+  const now = useNow();
+  const ordered = useMemo(
+    () => [...lessons].sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true })),
+    [lessons],
+  );
+  const pick = progress.authed
+    ? pickNextLesson(ordered.map((l) => l.id), {
+        loaded: progress.loaded,
+        state: (id) => progress.states[id],
+        isAvailable: (id) => {
+          const l = ordered.find((x) => x.id === id);
+          const mod = l ? (parseNumberedId(l.title) ?? '').split('.').slice(0, 2).join('.') : '';
+          return lessonAvailability(due, id, mod || null, l?.category ?? null, now).available;
+        },
+        bypass: bypassesLessonLock(progress.role),
+      })
+    : null;
+  const nextLesson = pick?.kind === 'next' ? ordered[pick.index] : undefined;
   // The module the "Next up" card points into is marked in the list below (accent edge + label).
   const nextModuleId = nextLesson ? (parseNumberedId(nextLesson.title) ?? '').split('.').slice(0, 2).join('.') : null;
   // "Continue" once the next lesson's module has any progress (the same rule as the module row's

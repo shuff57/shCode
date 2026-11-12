@@ -46,3 +46,23 @@ export function quizScoreLine(correct: number, total: number, needed: number): s
     ? `Passed: ${correct} of ${total} right`
     : `${correct} of ${total} right. You need ${needed}.`;
 }
+
+/**
+ * The written lesson's status line (ux2 S4). `resultFor` is the text the result on screen graded
+ * (null: no result, or unknown), `savedText` what "Save draft" last stored (null: not saved this
+ * visit). Compared with whitespace at the ends ignored, the way the grader reads them.
+ *   - resultStale: the box no longer holds the graded answer, so the result is for the earlier one.
+ *   - showDraftSaved: "Draft saved" is true now: the box still holds what was saved, and that text
+ *     is not simply the answer already handed in (then the result line says everything).
+ */
+export function writtenAnswerStatus(input: {
+  response: string;
+  resultFor: string | null;
+  savedText: string | null;
+}): { resultStale: boolean; showDraftSaved: boolean } {
+  const now = input.response.trim();
+  const resultStale = input.resultFor !== null && input.resultFor.trim() !== now;
+  const showDraftSaved =
+    input.savedText !== null && input.savedText.trim() === now && !(input.resultFor !== null && input.resultFor.trim() === now);
+  return { resultStale, showDraftSaved };
+}

@@ -31,6 +31,7 @@ import CalendarPopover from './CalendarPopover';
 import LessonAccessChip from './LessonAccessChip';
 import { lessonGradeCategory } from '../lib/grading-weights';
 import { withAlpha } from '../lib/color-alpha';
+import { draftsAfterSave, formatDateForField, formatTimeForField, planDateCommit } from '../lib/typed-date';
 import {
   buildDueIndex,
   buildOpenIndex,
@@ -38,7 +39,6 @@ import {
   formatDueTime,
   moduleDueSummary,
   moduleIdFromTitle,
-  dateWindowProblem,
   resolveDueAt,
   schoolDateString,
   SCHOOL_TZ,
@@ -141,7 +141,7 @@ const MODULE_COLS = 'minmax(280px, 1fr) 320px 320px';
 const MODULE_GAP = '12px 28px';
 
 // 96px clipped "08:00 AM" to "08:00 A"; the AM/PM segment and the clock icon need about 120px.
-const timeInput: React.CSSProperties = { ...dateInput, width: 124, minWidth: 124 };
+const timeInput: React.CSSProperties = { ...dateInput, width: 96, minWidth: 96 };
 
 function numericCompare(a: string, b: string): number {
   return a.localeCompare(b, undefined, { numeric: true });
@@ -181,13 +181,14 @@ function groupLessons(lessons: ManifestLesson[]): UnitGroup[] {
   return out;
 }
 
-// One date + time pair. The calendar icon opens a CalendarPopover month grid
-// anchored to the field — same reason the due-date chip uses one: the native
-// date input's popup is unreliable to open on its own. The grid writes the
-// date and keeps the time already in the row. The time input is disabled
-// until a date exists, because a time with no date has nothing to write —
-// the server takes the pair or nothing, and a lone time silently doing
-// nothing is worse than a control that says it isn't ready.
+// One date + time pair (ux2 T4). Both are plain text fields: the native segmented date input put a click in
+// the middle of the box on the YEAR, so typing 12/15/2026 there produced 11/04/152026. Here whatever is typed
+// is read by lib/typed-date.ts (12/15/2026, 2026-12-15, 12152026; 3:00 PM, 3pm, 15:00), focus by click or
+// Tab selects the whole value so typing replaces it, and Tab goes date -> time -> calendar button.
+// The pair is ONE edit: it is sent when focus leaves the pair (or on Enter), so a time typed right after a
+// date is saved with it (a date saved on its own blur used to wipe the time being typed). A value the page
+// cannot read, or a date outside the school window, is refused in a sentence that says what is wrong and
+// what is still saved, and the field goes back to the saved value.
 function DateTimeField({
   label,
   color,
@@ -200,6 +201,8 @@ function DateTimeField({
   emptyText,
   emptyColor,
   mixed,
+  onProblem,
+  onDirty,
 }: {
   label: string;
   color: string;
@@ -219,65 +222,116 @@ function DateTimeField({
    *  size of a date + time pair, "Mixed · set per lesson", that opens the module's lessons (climb4 r7 T1).
    *  "Set one date for all" lives in the opened module's summary line, not in the row. */
   mixed?: { lessonsShown: boolean; onShowLessons: () => void };
+  /** Told whether this field is showing a refusal, so the panel's header never says "Saved" over one. */
+  onProblem?: (has: boolean) => void;
+  /** Told whether this field holds an edit that is not saved yet (typed, or waiting for a save to return). */
+  onDirty?: (has: boolean) => void;
 }) {
   const date = row?.date ?? '';
   const time = row?.time ?? '';
   const [calOpen, setCalOpen] = useState(false);
-  const dateRef = useRef<HTMLButtonElement>(null);
-  // ux1 G7: what is typed is a DRAFT until the field loses focus or Enter is pressed. A native date input
-  // reports a full date after every segment (1902-10-24 on the way to 10/24/2026) and an empty value while
-  // half typed, and each of those used to be saved (or delete the saved date). Null = show the saved value.
+  const calRef = useRef<HTMLButtonElement>(null);
+  const groupRef = useRef<HTMLSpanElement>(null);
+  // What is typed is a DRAFT (text) until the pair loses focus or Enter is pressed. Null = show the saved value.
   const [draftDate, setDraftDate] = useState<string | null>(null);
   const [draftTime, setDraftTime] = useState<string | null>(null);
   const [focused, setFocused] = useState(false);
-  const [problem, setProblem] = useState<string | null>(null);
-  const msgId = useId();
-  const shownDate = draftDate ?? date;
-  const shownTime = draftTime ?? time;
-
-  // Send one change; afterwards the field shows what the server holds, never a value it refused.
-  const commit = async (nextDate: string | null, nextTime: string | null) => {
-    if (nextDate !== null && nextDate !== date) {
-      const p = dateWindowProblem(nextDate, schoolDateString(Date.now()));
-      if (p) {
-        setProblem(p);
-        return;
-      }
-    }
-    setProblem(null);
-    const ok = await onWrite(nextDate, nextDate === null ? null : nextTime);
-    setDraftDate(null);
-    setDraftTime(null);
-    if (ok === false) setProblem('Not saved. The field shows the date that is saved.');
+  const [problem, setProblemState] = useState<string | null>(null);
+  const onProblemRef = useRef(onProblem);
+  onProblemRef.current = onProblem;
+  const setProblem = (p: string | null) => {
+    setProblemState(p);
+    onProblemRef.current?.(p !== null);
   };
+  useEffect(() => () => onProblemRef.current?.(false), []);
+  const msgId = useId();
+  // A click selects the whole value on the way in; the mouseup that follows must not undo that selection.
+  const justFocused = useRef(false);
+  const shownDate = draftDate ?? formatDateForField(date);
+  const shownTime = draftTime ?? formatTimeForField(time);
 
-  const commitDate = (el: HTMLInputElement) => {
-    if (el.validity.badInput) {
-      // Half typed: say so and keep the saved date; nothing is sent.
-      setProblem('Finish the date (month, day and year), or clear it. Nothing was saved.');
+  // The drafts as of NOW, for code that runs after an await (a render's closure would be out of date).
+  const draftDateRef = useRef<string | null>(null);
+  const draftTimeRef = useRef<string | null>(null);
+  const setDD = (v: string | null) => { draftDateRef.current = v; setDraftDate(v); };
+  const setDT = (v: string | null) => { draftTimeRef.current = v; setDraftTime(v); };
+  // What the server holds as far as this field knows. Updated from the row on every render, and at once to
+  // what was sent when a save succeeds, because the list is read back after the save and an edit queued in
+  // the meantime must be planned against the new value, not the old one.
+  const savedRef = useRef({ date, time });
+  const lastRow = useRef({ date, time });
+  if (lastRow.current.date !== date || lastRow.current.time !== time) {
+    lastRow.current = { date, time };
+    savedRef.current = { date, time };
+  }
+  const savedWordsOf = (v: { date: string; time: string }) =>
+    v.date ? `${formatDateForField(v.date)}${v.time ? ` ${formatTimeForField(v.time)}` : ''}` : 'no date';
+
+  // A draft that differs from what is saved is an unsent edit: the panel's header must not say "Saved" then.
+  const onDirtyRef = useRef(onDirty);
+  onDirtyRef.current = onDirty;
+  useEffect(() => { onDirtyRef.current?.(draftDate !== null || draftTime !== null); }, [draftDate, draftTime]);
+  useEffect(() => () => onDirtyRef.current?.(false), []);
+
+  // Send the pair. One save at a time: an edit committed while one is in flight (Enter, then a correction and
+  // Enter again, or a calendar pick) is QUEUED and sent when the first returns, never dropped. After each save
+  // only the drafts that are still exactly what was sent are cleared, so a newer edit stays on screen.
+  const busy = useRef(false);
+  const queued = useRef<{ picked?: string } | null>(null);
+  const commit = async (picked?: string) => {
+    if (busy.current) {
+      // The latest request wins, but a calendar pick is kept unless a newer pick replaces it.
+      queued.current = { picked: picked ?? queued.current?.picked };
       return;
     }
-    if (draftDate === null) return;
-    if (draftDate === date) {
-      setDraftDate(null);
+    busy.current = true;
+    try {
+      let next: { picked?: string } | null = { picked };
+      while (next) {
+        await commitOnce(next.picked);
+        next = queued.current;
+        queued.current = null;
+      }
+    } finally {
+      busy.current = false;
+    }
+  };
+  const commitOnce = async (picked?: string) => {
+    const sentDate = draftDateRef.current;
+    const sentTime = draftTimeRef.current;
+    const saved = savedRef.current;
+    const plan = planDateCommit({ saved, draftDate: sentDate, draftTime: sentTime, picked, today: schoolDateString(Date.now()) });
+    if (plan.kind === 'idle') return;
+    if (plan.kind === 'unchanged') {
+      setDD(null);
+      setDT(null);
       setProblem(null);
       return;
     }
-    // Clearing the date clears the whole row: there is no such thing as a time-only entry.
-    void commit(draftDate === '' ? null : draftDate, draftDate === '' ? null : time || null);
-  };
-
-  const commitTime = (el: HTMLInputElement) => {
-    if (draftTime === null || date === '') return;
-    if (el.validity.badInput) {
-      setProblem('Finish the time, or clear it. Nothing was saved.');
+    if (plan.kind === 'needs-date') {
+      setDD(null);
+      setDT(null);
+      setProblem(plan.problem);
       return;
     }
-    if (draftTime === time) {
-      setDraftTime(null);
+    if (plan.kind === 'refuse') {
+      // Back to the saved value, and say what is still saved.
+      setDD(null);
+      setDT(null);
+      const why = plan.problem;
+      setProblem(/not saved/i.test(why) ? `${why} Still saved: ${savedWordsOf(saved)}.` : `${why} Not saved. Still saved: ${savedWordsOf(saved)}.`);
       return;
     }
-    void commit(date, draftTime === '' ? null : draftTime);
+    setProblem(null);
+    const ok = await onWrite(plan.date, plan.date === null ? null : plan.time);
+    if (ok !== false) savedRef.current = { date: plan.date ?? '', time: plan.date === null ? '' : plan.time ?? '' };
+    // Only the drafts that are still what was sent go; an edit typed during the save stays.
+    const keep = draftsAfterSave({ date: sentDate, time: sentTime }, { date: draftDateRef.current, time: draftTimeRef.current });
+    setDD(keep.date);
+    setDT(keep.time);
+    if (ok === false && keep.date === null && keep.time === null) {
+      setProblem(`Not saved. The field shows what is saved: ${savedWordsOf(savedRef.current)}.`);
+    }
   };
 
   if (mixed && !date) {
@@ -301,51 +355,102 @@ function DateTimeField({
     );
   }
 
-  // A pick from the calendar grid is a whole, deliberate date: it is sent at once.
+  // A pick from the calendar grid is a whole, deliberate date: it is sent at once (or right after a save in
+  // flight), with any time typed.
   const pickFromGrid = (d: string) => {
     setCalOpen(false);
-    setDraftDate(null);
-    void commit(d, time || null);
+    // Shown at once as the field's value (a draft), then sent like a typed date: queued behind a save in flight.
+    setDD(formatDateForField(d));
+    void commit();
   };
 
+  const selectAllOnFocus = {
+    onFocus: (e: React.FocusEvent<HTMLInputElement>) => {
+      setFocused(true);
+      justFocused.current = true;
+      e.currentTarget.select();
+    },
+    onMouseUp: (e: React.MouseEvent<HTMLInputElement>) => {
+      if (justFocused.current) e.preventDefault();
+      justFocused.current = false;
+    },
+  };
+  const keys = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    justFocused.current = false;
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      void commit();
+    } else if (e.key === 'Escape' && (draftDate !== null || draftTime !== null)) {
+      setDD(null);
+      setDT(null);
+      setProblem(null);
+    }
+  };
+  const timeReady = date !== '' || (draftDate !== null && draftDate.trim() !== '');
+
   return (
-    // flexWrap + maxWidth: at phone width the label, calendar, date, time and clear controls are wider than the
+    // flexWrap + maxWidth: at phone width the label, date, time, calendar and clear controls are wider than the
     // row, and a nowrap field pushed the page 23px past the screen.
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', boxSizing: 'border-box', maxWidth: '100%', padding: showLabel ? 0 : '0 0 0 12px', borderLeft: showLabel ? undefined : `1px solid ${C.border}` }}>
+    <span
+      ref={groupRef}
+      className="dd-pair"
+      onBlur={(e) => {
+        // The pair is one edit: only when focus leaves the date, the time AND the calendar button is it sent.
+        if (groupRef.current && e.relatedTarget instanceof Node && groupRef.current.contains(e.relatedTarget)) return;
+        if (calOpen) return;
+        setFocused(false);
+        void commit();
+      }}
+      style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', boxSizing: 'border-box', maxWidth: '100%', padding: showLabel ? 0 : '0 0 0 12px', borderLeft: showLabel ? undefined : `1px solid ${C.border}` }}
+    >
       {showLabel && <span style={{ fontFamily: 'var(--font-prose)', fontSize: 14, fontWeight: 600, flexBasis: '100%', color }}>{label}</span>}
       <span style={{ position: 'relative', display: 'inline-flex' }}>
       {/* "Not set" covers an empty field only while it is not being typed in (ux1 G7). */}
-      {!shownDate && !focused && <span aria-hidden="true" style={{ position: 'absolute', left: 7, top: 1, bottom: 1, right: 26, display: 'flex', alignItems: 'center', background: 'var(--c-deep2)', color: (mixed ? undefined : emptyColor) ?? C.dim, fontFamily: 'var(--font-prose)', fontSize: 15, fontWeight: emptyText && !mixed ? 600 : undefined, pointerEvents: 'none', zIndex: 1 }}>{(mixed ? undefined : emptyText) ?? 'Not set'}</span>}
+      {!shownDate && !focused && <span aria-hidden="true" style={{ position: 'absolute', left: 7, top: 1, bottom: 1, right: 1, display: 'flex', alignItems: 'center', background: 'var(--c-deep2)', color: (mixed ? undefined : emptyColor) ?? C.dim, fontFamily: 'var(--font-prose)', fontSize: 15, fontWeight: emptyText && !mixed ? 600 : undefined, pointerEvents: 'none', zIndex: 1 }}>{(mixed ? undefined : emptyText) ?? 'Not set'}</span>}
       <input
-        type="date"
+        type="text"
+        inputMode="text"
+        autoComplete="off"
+        spellCheck={false}
+        placeholder="MM/DD/YYYY"
         value={shownDate}
         onChange={(e) => {
-          setDraftDate(e.target.value);
-          setProblem(null);
+          setDD(e.target.value);
+          if (problem) setProblem(null);
         }}
-        onFocus={() => setFocused(true)}
-        onBlur={(e) => {
-          setFocused(false);
-          commitDate(e.currentTarget);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            commitDate(e.currentTarget);
-          } else if (e.key === 'Escape' && draftDate !== null) {
-            setDraftDate(null);
-            setProblem(null);
-          }
-        }}
+        {...selectAllOnFocus}
+        onKeyDown={keys}
         className="teacher-field dd-date"
-        style={shownDate ? dateInput : { ...dateInput, ...emptyField }}
-        aria-label={`${label} date for ${ariaSuffix}`}
+        style={shownDate ? { ...dateInput, width: 116 } : { ...dateInput, width: 116, ...emptyField }}
+        aria-label={`${label} date for ${ariaSuffix}, month/day/year`}
         aria-invalid={problem ? true : undefined}
         aria-describedby={problem ? `${msgId}` : undefined}
       />
+      </span>
+      <input
+        type="text"
+        autoComplete="off"
+        spellCheck={false}
+        placeholder={timeReady ? '11:59 PM' : ''}
+        value={shownTime}
+        disabled={!timeReady}
+        onChange={(e) => {
+          setDT(e.target.value);
+          if (problem) setProblem(null);
+        }}
+        {...selectAllOnFocus}
+        onKeyDown={keys}
+        className="teacher-field dd-time"
+        style={{ ...timeInput, ...(!timeReady ? { ...emptyField, opacity: 0.75, cursor: 'not-allowed' } : {}) }}
+        aria-label={`${label} time for ${ariaSuffix}`}
+        aria-invalid={problem ? true : undefined}
+        aria-describedby={problem ? `${msgId}` : undefined}
+        title={!timeReady ? 'Set a date first' : 'Type a time like 3:00 PM'}
+      />
       <button
-        ref={dateRef}
+        ref={calRef}
         type="button"
+        className="dd-cal-btn"
         title={`Open the ${label.toLowerCase()} calendar`}
         aria-label={`Open the ${label.toLowerCase()} calendar for ${ariaSuffix}`}
         aria-expanded={calOpen}
@@ -354,45 +459,10 @@ function DateTimeField({
           e.stopPropagation();
           setCalOpen((v) => !v);
         }}
-        style={{
-          background: 'var(--c-deep2)',
-          // r9 T7: the same quiet icon button whether or not a date is set; framed only while open.
-          border: `1px solid ${calOpen ? C.accent : 'transparent'}`,
-          borderRadius: 4,
-          color: C.accent,
-          cursor: 'pointer',
-          display: 'inline-flex',
-          alignItems: 'center',
-          padding: 3,
-          position: 'absolute', right: 2, top: 2, bottom: 2, zIndex: 2,
-        }}
+        style={{ borderColor: calOpen ? C.accent : undefined }}
       >
-        <Calendar size={13} strokeWidth={2} />
+        <Calendar size={15} strokeWidth={2} />
       </button>
-      </span>
-      <input
-        type="time"
-        value={shownTime}
-        disabled={date === ''}
-        onChange={(e) => {
-          if (date === '') return;
-          setDraftTime(e.target.value);
-          setProblem(null);
-        }}
-        onBlur={(e) => commitTime(e.currentTarget)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            commitTime(e.currentTarget);
-          } else if (e.key === 'Escape' && draftTime !== null) {
-            setDraftTime(null);
-          }
-        }}
-        className="teacher-field"
-        style={{ ...timeInput, ...(date === '' ? { ...emptyField, opacity: 0.75, cursor: 'not-allowed' } : {}) }}
-        aria-label={`${label} time for ${ariaSuffix}`}
-        title={date === '' ? 'Set a date first' : undefined}
-      />
       {onClear && row && (
         <button
           type="button"
@@ -407,12 +477,15 @@ function DateTimeField({
           <X size={14} />
         </button>
       )}
+      {/* The clear button's room is kept when there is nothing to clear, so a lesson with its own date lines
+          up with the lessons around it (a row used to shift left when its × appeared). */}
+      {onClear && !row && <span aria-hidden="true" className="dd-clear-space" />}
       {problem && (
         <span id={msgId} role="alert" className="dd-date-msg">{problem}</span>
       )}
       {calOpen && (
         <CalendarPopover
-          anchor={dateRef.current}
+          anchor={calRef.current}
           value={date === '' ? null : date}
           today={schoolDateString(Date.now())}
           onPick={pickFromGrid}
@@ -453,6 +526,28 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
   const [failedParts, setFailedParts] = useState<Record<Kind, boolean>>({ open: false, due: false });
   const { toast } = useFeedback();
   const [saving, setSaving] = useState(false);
+  // Fields showing a refused value (ux2 T4): while any is, the header says so instead of "Saved".
+  const [problems, setProblems] = useState<Set<string>>(new Set());
+  const markProblem = useCallback((key: string, has: boolean) => {
+    setProblems((prev) => {
+      if (prev.has(key) === has) return prev;
+      const next = new Set(prev);
+      if (has) next.add(key);
+      else next.delete(key);
+      return next;
+    });
+  }, []);
+  // Fields holding an edit that is not saved yet: the header says so rather than "Saved".
+  const [dirty, setDirty] = useState<Set<string>>(new Set());
+  const markDirty = useCallback((key: string, has: boolean) => {
+    setDirty((prev) => {
+      if (prev.has(key) === has) return prev;
+      const next = new Set(prev);
+      if (has) next.add(key);
+      else next.delete(key);
+      return next;
+    });
+  }, []);
   const [open, setOpen] = useState<Set<string>>(new Set());
   // `${kind}:${moduleId}` of a mixed module whose field shows a date picker because the teacher chose
   // "Set one date for all" (the field is otherwise the Mixed control).
@@ -620,10 +715,18 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', justifyContent: 'space-between', gap: '4px 16px', margin: '0 0 4px 0' }}>
         <p style={{ color: C.dim, fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.5, margin: 0, minWidth: 0, maxWidth: '70ch' }}>Set module dates for the whole group, or open a module to set individual lessons.</p>
         <span role="status" aria-live="polite" style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, fontFamily: 'var(--font-prose)', fontSize: 13, color: C.dim, whiteSpace: 'nowrap' }}>
-          <span style={{ color: saving ? 'var(--c-cyan)' : error ? 'var(--c-orange)' : 'var(--c-green)', fontWeight: 600 }}>
-            {saving ? 'Saving…' : error ? 'Could not save or load dates — see details below' : '✓ Saved'}
+          <span style={{ color: saving ? 'var(--c-cyan)' : error || problems.size > 0 ? 'var(--c-orange)' : dirty.size > 0 ? 'var(--c-fg)' : 'var(--c-green)', fontWeight: 600 }}>
+            {saving
+              ? 'Saving…'
+              : error
+                ? 'Could not save or load dates — see details below'
+                : problems.size > 0
+                  ? `Last change not saved: ${problems.size === 1 ? 'a date needs' : `${problems.size} dates need`} fixing (see the orange note)`
+                  : dirty.size > 0
+                    ? 'Not saved yet: press Enter or leave the field to save'
+                    : '✓ Saved'}
           </span>
-          <span>· changes save automatically</span>
+          {problems.size === 0 && dirty.size === 0 && <span>· changes save automatically</span>}
         </span>
       </div>
       <details style={{ color: C.dim, fontSize: 13, margin: '0 0 12px 0' }}>
@@ -767,6 +870,8 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                     ariaSuffix={`module ${mod.moduleId}`}
                     pastHint={OPEN_PAST_HINT}
                     showLabel={compact}
+                    onProblem={(has) => markProblem(`open:module:${mod.moduleId}`, has)}
+                    onDirty={(has) => markDirty(`open:module:${mod.moduleId}`, has)}
                     {...(settingOpenAll ? { emptyText: 'Pick a date', emptyColor: C.text } : emptyFor(openSummary))}
                     mixed={openMixed && !settingOpenAll ? { lessonsShown: isOpen, onShowLessons: () => toggle(mod.moduleId) } : undefined}
                   />
@@ -783,6 +888,8 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                     }}
                     ariaSuffix={`module ${mod.moduleId}`}
                     showLabel={compact}
+                    onProblem={(has) => markProblem(`due:module:${mod.moduleId}`, has)}
+                    onDirty={(has) => markDirty(`due:module:${mod.moduleId}`, has)}
                   />
                 </div>
 
@@ -914,6 +1021,8 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                             ariaSuffix={fieldName}
                             pastHint={OPEN_PAST_HINT}
                             showLabel={compact}
+                            onProblem={(has) => markProblem(`open:lesson:${lesson.id}`, has)}
+                    onDirty={(has) => markDirty(`open:lesson:${lesson.id}`, has)}
                           />
 
                           <DateTimeField
@@ -924,6 +1033,8 @@ export default function DueDatesPanel({ classId }: { classId: string }) {
                             onClear={() => { void write('due', [{ scope: 'lesson', scopeId: lesson.id, date: null }]); }}
                             ariaSuffix={fieldName}
                             showLabel={compact}
+                            onProblem={(has) => markProblem(`due:lesson:${lesson.id}`, has)}
+                    onDirty={(has) => markDirty(`due:lesson:${lesson.id}`, has)}
                           />
 
                           <LessonAccessChip classId={classId} lessonId={lesson.id} lessonTitle={lesson.title} kind="early" />

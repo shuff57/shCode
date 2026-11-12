@@ -65,6 +65,9 @@ interface LessonWorkspaceProps {
   mode?: 'lesson' | 'assignment';
 }
 
+/** Said when the AI checker could not answer and the lab's own checks marked the cards (ux2 S5). */
+const FALLBACK_NOTE = 'The AI checker is not available right now, so these results come from the built-in checks.';
+
 /** A requirement's description as one plain line for the lab's "Check looks for" row: markdown
  *  backticks dropped and the trailing "Help: ..." pointer cut (the Quest card keeps both). */
 function checkLine(text: string): string {
@@ -883,7 +886,9 @@ export default function LessonWorkspace({
       return;
     }
     aiFallbackRef.current = text;
-    setAiCheckNote({ kind: 'error', text: `${why} The pattern check marked your cards instead, so you can keep going.` });
+    // Plain words, no server text (ux2 S5): which checker marked the cards is all the student needs.
+    void why;
+    setAiCheckNote({ kind: 'error', text: FALLBACK_NOTE });
     // The same runner a plain Run of this lab uses (lib/ai-check.ts fallbackRunner).
     const runner = fallbackRunner(lesson);
     if (runner === 'grade') trackRun(runTests());
@@ -930,7 +935,7 @@ export default function LessonWorkspace({
       const green = Object.values(verdicts).filter((v) => v.passed).length;
       setAiCheckNote({
         kind: 'ok',
-        text: `${data.summary ? data.summary + ' ' : ''}(${green} of ${aiCheck.rubric.length} passed. Each one is listed above.)`.trim(),
+        text: `${data.summary ? data.summary + ' ' : ''}(${green} of ${aiCheck.rubric.length} passed.)`.trim(),
         hints: Array.isArray(data.hints) ? data.hints : [],
       });
     } catch (e) {
@@ -1199,6 +1204,114 @@ export default function LessonWorkspace({
   const headerTotal = countCriteria ? totalCriteria : totalPossible;
   const headerUnitLabel = countCriteria ? '' : 'pts';
 
+  // ---- The lab's check result (ux2 S3, S4, S5) -------------------------------------------------
+  const checkVerb = aiCheck ? 'Check' : 'Run';
+  const failedN = requirements.filter((r) => r.status === 'failed').length;
+  // A submitted lab on a return visit, nothing checked yet in this one: the "Submitted" block says
+  // what is true and how to hand in again, so no hollow "Check looks for" row or "Pass Check to
+  // submit" hint contradicts it beside a greyed Submit.
+  const restingSubmitted = showOutcome && !rowMarked;
+  // What the student does next, in the header's status line. It follows the check: before it,
+  // after a red one, after an edit, and once everything is green.
+  const labNext = !isLab || restingSubmitted
+    ? undefined
+    : !rowMarked
+      ? `Next: press ${checkVerb} to test your code`
+      : checksStale
+        ? `Next: you changed your code, press ${checkVerb} again`
+        : failedN > 0
+          ? `Next: fix the red ${failedN === 1 ? 'one' : 'ones'}, then press ${checkVerb} again`
+          : canSubmit && !submitLocked
+            ? (showOutcome ? 'Next: Submit again' : 'Next: Submit')
+            : undefined;
+  // The "AI checker is not available" note only while it explains the marks on screen: not once
+  // they are all green, and not after the lab is handed in.
+  const shownNote = aiCheckNote && aiCheckNote.kind === 'error' && aiCheckNote.text === FALLBACK_NOTE
+    && (allRequirementsPassed || submitLocked || restingSubmitted) ? null : aiCheckNote;
+  const renderCheckRow = (where: 'above' | 'below') => {
+    if (restingSubmitted) return null;
+    const passedN = rowReqs.filter((r) => r.status === 'passed').length;
+            const shown = rowMarked ? rowReqs : requirements.slice(0, 3);
+            return (
+              <div className={`lab-check-tests lab-check-${where}${rowMarked ? ' has-results' : ''}${rowMarked && checksStale ? ' is-stale' : ''}`} id={where === 'below' ? `lab-check-below-${lesson.id}` : `lab-check-${lesson.id}`} tabIndex={where === 'below' ? -1 : undefined}>
+                <span className="lab-check-tests-label">
+                  {rowMarked
+                    ? `${passedN} of ${rowReqs.length} passed`
+                    : aiGraded ? 'Grade looks for' : aiCheck || isTextMode ? 'Check looks for' : 'Run checks'}
+                </span>
+                {rowMarked && checkedAt ? (
+                  <span className="lab-check-when" role="status" aria-live="polite">
+                    {checksStale ? `Out of date: ${aiCheck ? 'check' : 'run'} again` : `Checked ${ranWhen(checkedAt, clock)}`}
+                  </span>
+                ) : null}
+                <ul>
+                  {shown.map((r) => {
+                    const why = r.status === 'failed' ? (r.messages ?? []).filter(Boolean)[0] : undefined;
+                    return (
+                      <li key={r.id} data-status={r.status}>
+                        <span className="lab-check-dot" aria-hidden="true">{r.status === 'passed' ? '✓' : r.status === 'failed' ? '✗' : '○'}</span>
+                        <span className="lab-check-item">
+                          <span>{rowMarked ? r.title : checkLine(r.description || r.title)}</span>
+                          <span className="sr-only">{r.status === 'passed' ? ' (done)' : r.status === 'failed' ? ' (not yet)' : ' (not checked yet)'}</span>
+                          {r.status === 'failed' ? (
+                            <span className="lab-check-why">{why ? checkLine(why) : r.description ? `Not yet. It looks for: ${checkLine(r.description)}` : 'Not found in your code yet.'}</span>
+                          ) : null}
+                        </span>
+                      </li>
+                    );
+                  })}
+                  {!rowMarked && requirements.length > 3 && <li className="lab-check-more">and {requirements.length - 3} more under Quest</li>}
+                </ul>
+              </div>
+            );
+  };
+  // Phones only (CSS): one line of a fixed height from the start, so a Check never moves the editor.
+  const labPassedN = rowReqs.filter((r) => r.status === 'passed').length;
+  const labCheckSummary = (
+    <div className={`lab-check-summary${rowMarked ? ' has-results' : ''}${rowMarked && checksStale ? ' is-stale' : ''}${rowMarked && !checksStale && labPassedN < rowReqs.length ? ' has-failed' : ''}`}>
+      {restingSubmitted ? (
+        <span>Submitted. To change it, edit your code and press {checkVerb}.</span>
+      ) : (
+        <button
+          type="button"
+          className="lab-check-summary-btn"
+          onClick={() => {
+            const el = document.getElementById(`lab-check-below-${lesson.id}`);
+            if (!el) return;
+            el.scrollIntoView({ block: 'start', behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+            el.focus({ preventScroll: true });
+          }}
+        >
+          {rowMarked
+            ? checksStale
+              ? `Out of date: press ${checkVerb} again`
+              : `${labPassedN} of ${rowReqs.length} passed · tap for details`
+            : `Press ${checkVerb} to test your code · ${requirements.length} ${requirements.length === 1 ? 'check' : 'checks'} below`}
+        </button>
+      )}
+    </div>
+  );
+  const renderAiNote = (where: 'above' | 'below' | 'only') => (
+            <div className={`lab-ainote-${where}${!shownNote ? ' ai-check-help' : ''}`} style={{ marginBottom: 6 }}>
+              <div role="status" aria-live="polite" className="ux2-prose" style={{ fontSize: 13, color: 'var(--c-meta)' }}>
+                {shownNote
+                  ? aiNoteForRun(shownNote, { allGreen: allRequirementsPassed, runErrored: !!runtimeError })
+                  : isTextMode
+                    ? 'Plain English is welcome. The AI marks the Quest cards from what your steps mean, not the exact words.'
+                    : isMoshionMode
+                      ? 'Run to preview · Check to mark Quest · Submit when green and error-free.'
+                      : 'Run to preview · Check to mark Quest · Submit when green.'}
+              </div>
+              {shownNote?.kind === 'ok' && shownNote.hints && shownNote.hints.length > 0 && (
+                <ul style={{ margin: '4px 0 0', paddingLeft: 20, fontSize: 14, color: 'var(--c-meta)' }}>
+                  {shownNote.hints.map((h, i) => (
+                    <li key={i}>{h}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+  );
+
   return (
     <>
       <TeacherPushBanner />
@@ -1358,7 +1471,8 @@ export default function LessonWorkspace({
           onSubmit={handleSubmit}
           submitted={submitLocked}
           canSubmit={canSubmit}
-          doneNote={showOutcome ? 'Submitted' : undefined}
+          doneNote={restingSubmitted ? 'Submitted' : undefined}
+          nextHint={labNext}
           hideScore={showOutcome && !anyChecked}
           unitLabel={headerUnitLabel}
           showStatus={!isMoshionMode}
@@ -1493,10 +1607,10 @@ export default function LessonWorkspace({
                     Submit
                   </button>
                 )}
-                {(isMoshionMode || isConsoleMode) && !submitLocked && !canSubmit && !runtimeError && !isSummative && !cap.unknown && !cap.reached && (
+                {(isMoshionMode || isConsoleMode) && !submitLocked && !canSubmit && !runtimeError && !isSummative && !cap.unknown && !cap.reached && !restingSubmitted && (
                   // Why Submit is shut, in a few words beside it (climb4 r10 S7); the full reason is on its hover.
                   <span className="toolbar-submit-hint">
-                    {allRequirementsPassed ? 'Run it, then Submit' : aiCheck ? 'Pass Check to submit' : 'Pass the tests to submit'}
+                    {allRequirementsPassed ? 'Run it, then Submit' : `Pass ${checkVerb} to submit`}
                   </span>
                 )}
                 {resetMsg && (
@@ -1663,68 +1777,8 @@ export default function LessonWorkspace({
               )}
             </div>
           </div>
-          {isLab && requirements.length > 0 && (() => {
-            // What Check (or Run, with no AI check) marks, right under the buttons, so the task, the
-            // editor and the test read as one sequence. Once the cards are marked this row IS the
-            // result (ux1 B3): every requirement green or red, a red one with its reason, the time it
-            // ran, and "Out of date" once the code changes (B4). The Quest drawer keeps the full cards.
-            const passedN = rowReqs.filter((r) => r.status === 'passed').length;
-            const shown = rowMarked ? rowReqs : requirements.slice(0, 3);
-            return (
-              <div className={`lab-check-tests${rowMarked ? ' has-results' : ''}${rowMarked && checksStale ? ' is-stale' : ''}`} id={`lab-check-${lesson.id}`}>
-                <span className="lab-check-tests-label">
-                  {rowMarked
-                    ? `${passedN} of ${rowReqs.length} passed`
-                    : aiGraded ? 'Grade looks for' : aiCheck || isTextMode ? 'Check looks for' : 'Run checks'}
-                </span>
-                {rowMarked && checkedAt ? (
-                  <span className="lab-check-when" role="status" aria-live="polite">
-                    {checksStale ? `Out of date: ${aiCheck ? 'check' : 'run'} again` : `Checked ${ranWhen(checkedAt, clock)}`}
-                  </span>
-                ) : null}
-                <ul>
-                  {shown.map((r) => {
-                    const why = r.status === 'failed' ? (r.messages ?? []).filter(Boolean)[0] : undefined;
-                    return (
-                      <li key={r.id} data-status={r.status}>
-                        <span className="lab-check-dot" aria-hidden="true">{r.status === 'passed' ? '✓' : r.status === 'failed' ? '✗' : '○'}</span>
-                        <span className="lab-check-item">
-                          <span>{rowMarked ? r.title : checkLine(r.description || r.title)}</span>
-                          <span className="sr-only">{r.status === 'passed' ? ' (done)' : r.status === 'failed' ? ' (not yet)' : ' (not checked yet)'}</span>
-                          {r.status === 'failed' ? (
-                            <span className="lab-check-why">{why ? checkLine(why) : r.description ? `Not yet. It looks for: ${checkLine(r.description)}` : 'Not found in your code yet.'}</span>
-                          ) : null}
-                        </span>
-                      </li>
-                    );
-                  })}
-                  {!rowMarked && requirements.length > 3 && <li className="lab-check-more">and {requirements.length - 3} more under Quest</li>}
-                </ul>
-              </div>
-            );
-          })()}
-          {aiCheck && (
-            // The AI's read of the steps, directly under the Grade button and
-            // above the textarea it graded.
-            <div className={!aiCheckNote ? 'ai-check-help' : undefined} style={{ marginBottom: 6 }}>
-              <div role="status" aria-live="polite" style={{ fontSize: 13, color: 'var(--c-meta)' }}>
-                {aiCheckNote
-                  ? aiNoteForRun(aiCheckNote, { allGreen: allRequirementsPassed, runErrored: !!runtimeError })
-                  : isTextMode
-                    ? 'Plain English is welcome. The AI marks the Quest cards from what your steps mean, not the exact words.'
-                    : isMoshionMode
-                      ? 'Run to preview · Check to mark Quest · Submit when green and error-free.'
-                      : 'Run to preview · Check to mark Quest · Submit when green.'}
-              </div>
-              {aiCheckNote?.kind === 'ok' && aiCheckNote.hints && aiCheckNote.hints.length > 0 && (
-                <ul style={{ margin: '4px 0 0', paddingLeft: 20, fontSize: 14, color: 'var(--c-meta)' }}>
-                  {aiCheckNote.hints.map((h, i) => (
-                    <li key={i}>{h}</li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
+          {isLab && requirements.length > 0 ? <>{labCheckSummary}{renderCheckRow('above')}</> : null}
+          {aiCheck ? renderAiNote(isLab ? 'above' : 'only') : null}
           <div
             className="editor-preview-container"
             id="split"
@@ -1791,7 +1845,7 @@ export default function LessonWorkspace({
                             {runKey === 0
                               ? 'Click Run to see output.'
                               : lesson.requirements.length > 0
-                                ? 'Ran. Nothing was printed. The checks are listed above the editor.'
+                                ? 'Ran. Nothing was printed. Your check results are listed with the buttons.'
                                 : 'Ran. Nothing was printed.'}
                           </div>
                         ) : (
@@ -1818,6 +1872,10 @@ export default function LessonWorkspace({
               </>
             )}
           </div>
+          {/* Phones only (CSS): the full result under the editor, so a Check never pushes the line being
+              typed under the on-screen keyboard (ux2 S3). The one-line summary above it keeps its height. */}
+          {isLab && requirements.length > 0 ? renderCheckRow('below') : null}
+          {isLab && aiCheck ? renderAiNote('below') : null}
           {!isConsoleMode && (
             <details
               className="console"

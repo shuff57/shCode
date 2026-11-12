@@ -365,8 +365,9 @@ export default function StudentGradebook({ lessons }: Props) {
                 const open = hasFeedback && !!expanded[lesson.id];
                 return (
                   <Fragment key={lesson.id}>
-                    <tr style={rowStyle}>
-                      <td style={tdStyle}>
+                    {/* Phones stack each row as a small card: title and score, then due and status (ux2 S8). */}
+                    <tr style={rowStyle} className="gb-row">
+                      <td style={tdStyle} className="gb-title-cell">
                         {hasFeedback ? (
                           <button
                             type="button"
@@ -410,16 +411,16 @@ export default function StudentGradebook({ lessons }: Props) {
                         )}
                       </td>
                       <td className="gb-due-cell" style={{ ...tdStyle, color: 'var(--x-b9c5e8)' }}>
-                        {due ? formatDue(due) : '—'}
+                        <span className="gb-cell-label">Due </span>{due ? formatDue(due) : '—'}
                         {dueSoon && <span style={{ ...chipStyle, color: 'var(--c-orange)', borderColor: 'var(--c-orange)' }}>due soon</span>}
                       </td>
-                      <td style={tdStyle}>
+                      <td style={tdStyle} className="gb-status-cell">
                         <span style={{ ...badgeStyle, color: statusColor, borderColor: statusColor }}>
                           {statusLabel}
                         </span>
                       </td>
-                      <td style={scoreCellStyle}>
-                        {bestText ?? score ?? (status === 'missing'
+                      <td style={scoreCellStyle} className="gb-score-cell">
+                        <span className="gb-cell-label">Score </span>{bestText ?? score ?? (status === 'missing'
                           // Past due and not done: the grade above counts it as 0 until it is finished.
                           ? <span className="gb-zero" title="Counts as 0 until you finish it">0</span>
                           : '\u2014')}
@@ -439,7 +440,7 @@ export default function StudentGradebook({ lessons }: Props) {
                       </td>
                     </tr>
                     {open && (
-                      <tr>
+                      <tr className="gb-feedback-row">
                         <td colSpan={4} style={{ padding: '0 0 12px 0' }}>
                           <div style={feedbackBoxStyle}>
                             <div style={feedbackHeadStyle}>

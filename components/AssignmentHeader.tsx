@@ -38,6 +38,8 @@ interface AssignmentHeaderProps {
   doneNote?: string;
   /** Hide the "0/1 done" count: on a return visit nothing has been checked yet, and a zero read as lost work. */
   hideScore?: boolean;
+  /** A lab's next step as the check stands now (ux2 S4): "Next: fix the red one ...", "Next: Submit". */
+  nextHint?: string;
 }
 
 export default function AssignmentHeader({
@@ -59,6 +61,7 @@ export default function AssignmentHeader({
   toolsHostId,
   doneNote,
   hideScore = false,
+  nextHint,
 }: AssignmentHeaderProps) {
   const pct = totalPossible > 0 ? Math.round((score / totalPossible) * 100) : 0;
 
@@ -84,6 +87,12 @@ export default function AssignmentHeader({
 
   const unmetHint = doneNote ? (
     <div className="assignment-done-note"><span aria-hidden="true">✓ </span>{doneNote}</div>
+  ) : compactLab && nextHint ? (
+    // A lab says its next step as the check stands NOW: never "press Check" right after a Check.
+    <div className="assignment-unmet-hint" role="status" aria-live="polite">
+      <span className="assignment-unmet-desktop">{nextHint}</span>
+      <span className="assignment-unmet-mobile">{unmetTitles && unmetTitles.length > 0 ? `${unmetTitles.length} still needed` : nextHint.replace(/^Next: /, '')}</span>
+    </div>
   ) :
     !submitted && !canSubmit && unmetTitles && unmetTitles.length > 0 ? (
       compactLab ? (

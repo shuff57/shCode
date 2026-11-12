@@ -163,7 +163,7 @@ export default function HeaderLessonNav() {
       )}
       {pos ? (
         <span className="hdr-lesson-pos" aria-label={`Lesson ${pos.index} of ${pos.total} in this module`}>
-          {pos.index} of {pos.total}
+          {pos.index} of {pos.total}<span className="hdr-pos-scope">{"\u00a0"}in this module</span>
         </span>
       ) : null}
       {next ? (

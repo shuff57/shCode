@@ -88,6 +88,7 @@ export default function ReportIssueButton() {
 
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleRef = useRef<HTMLInputElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   // An uploaded-but-unsent screenshot is a real file inside the student's
   // 20 MB / 40 file quota. These two refs are what let us hand it back on
@@ -117,8 +118,18 @@ export default function ReportIssueButton() {
     const dialog = dialogRef.current;
     if (!dialog) return;
     if (open) {
+      // On a phone, focusing the title field opens the on-screen keyboard at once and it covers
+      // Cancel / Send report (ux2 S7). There the dialog's heading takes focus instead (screen readers
+      // still start at the top); the student taps the field when ready to type.
+      const touch = window.matchMedia?.('(pointer: coarse), (max-width: 600px)').matches;
+      const heading = headingRef.current;
+      if (heading) {
+        if (touch) heading.setAttribute('autofocus', '');
+        else heading.removeAttribute('autofocus');
+      }
       dialog.showModal();
-      setTimeout(() => titleRef.current?.focus(), 0);
+      if (touch) setTimeout(() => headingRef.current?.focus({ preventScroll: true }), 0);
+      else setTimeout(() => titleRef.current?.focus(), 0);
     } else {
       dialog.close();
     }
@@ -299,7 +310,7 @@ export default function ReportIssueButton() {
           </div>
         ) : (
           <form onSubmit={submit} className="issue-form">
-            <h3>Report an issue</h3>
+            <h3 ref={headingRef} tabIndex={-1} style={{ outline: 'none' }}>Report an issue</h3>
 
             <div className="issue-kinds">
               {KINDS.map((k) => (

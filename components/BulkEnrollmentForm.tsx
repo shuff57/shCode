@@ -1,21 +1,25 @@
 'use client';
 
 import { useState } from 'react';
+import { errorText } from '../lib/http-error';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
+// What POST /api/classes/[id]/enrollments/bulk answers (functions/api/classes/[id]/enrollments/bulk.ts).
+// This form used to read { enrolled, already_enrolled, no_account, errors } at the top level, which the route
+// never sent: a successful bulk enroll threw on `result.errors.length` (ux2 T7).
 interface BulkEnrollResult {
-  enrolled: number;
-  already_enrolled: number;
-  no_account: number;
-  errors: string[];
+  results: Array<{ email: string; status: 'enrolled' | 'already_enrolled' | 'no_account' | 'error'; message?: string }>;
+  summary: { enrolled: number; already_enrolled: number; no_account: number; error: number };
 }
 
 interface Props {
   classId: string;
   onDone: () => void;
+  /** The class join code, for the "they need to sign up first" next step. */
+  joinCode?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -40,7 +44,7 @@ function parseEmails(raw: string): string[] {
 // Component
 // ---------------------------------------------------------------------------
 
-export function BulkEnrollmentForm({ classId, onDone }: Props) {
+export function BulkEnrollmentForm({ classId, onDone, joinCode }: Props) {
   const [rawText, setRawText] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<BulkEnrollResult | null>(null);
@@ -66,15 +70,17 @@ export function BulkEnrollmentForm({ classId, onDone }: Props) {
       });
 
       if (!res.ok) {
-        const msg = await res.text().catch(() => 'Unknown error');
-        throw new Error(msg || `${res.status}`);
+        throw new Error(`Could not enroll: ${(await errorText(res)).replace(/\.$/, '')}. Nothing changed.`);
       }
 
-      const json = (await res.json()) as BulkEnrollResult;
-      setResult(json);
+      const json = (await res.json()) as Partial<BulkEnrollResult>;
+      setResult({
+        results: Array.isArray(json.results) ? json.results : [],
+        summary: { enrolled: 0, already_enrolled: 0, no_account: 0, error: 0, ...(json.summary ?? {}) },
+      });
       onDone();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Enrollment failed');
+      setError(err instanceof Error ? err.message : 'Could not enroll: the network did not answer. Nothing changed.');
     } finally {
       setLoading(false);
     }
@@ -143,8 +149,12 @@ export function BulkEnrollmentForm({ classId, onDone }: Props) {
         <div style={{ color: 'var(--c-red)', fontSize: 14 }}>{error}</div>
       )}
 
-      {result && (
+      {result && (() => {
+        const noAccount = result.results.filter((r) => r.status === 'no_account').map((r) => r.email);
+        const failed = result.results.filter((r) => r.status === 'error');
+        return (
         <div
+          role="status"
           style={{
             background: 'var(--c-bg)',
             border: '1px solid var(--c-line)',
@@ -153,31 +163,38 @@ export function BulkEnrollmentForm({ classId, onDone }: Props) {
             display: 'flex',
             flexDirection: 'column',
             gap: 4,
+            fontFamily: 'var(--font-prose)',
             fontSize: 14,
+            lineHeight: 1.5,
             color: 'var(--c-fg)',
           }}
         >
           <div>
-            <span style={{ color: 'var(--c-green)', fontWeight: 600 }}>{result.enrolled}</span> enrolled
+            <span style={{ color: 'var(--c-green)', fontWeight: 600 }}>{result.summary.enrolled}</span> added to the class
           </div>
-          <div>
-            <span style={{ color: 'var(--c-yellow)', fontWeight: 600 }}>{result.already_enrolled}</span> already enrolled
-          </div>
-          <div>
-            <span style={{ color: 'var(--c-orange)', fontWeight: 600 }}>{result.no_account}</span> no account found
-          </div>
-          {result.errors.length > 0 && (
-            <div style={{ marginTop: 4 }}>
-              <span style={{ color: 'var(--c-red)', fontWeight: 600 }}>Errors:</span>
-              <ul style={{ margin: '4px 0 0', paddingLeft: 20 }}>
-                {result.errors.map((e, i) => (
-                  <li key={i} style={{ color: 'var(--c-red)' }}>{e}</li>
-                ))}
-              </ul>
+          {result.summary.already_enrolled > 0 && (
+            <div>
+              <span style={{ fontWeight: 600 }}>{result.summary.already_enrolled}</span> already in the class
+            </div>
+          )}
+          {noAccount.length > 0 && (
+            <div>
+              <span style={{ color: 'var(--c-orange)', fontWeight: 600 }}>{noAccount.length}</span> with no student account yet:{' '}
+              <span style={{ overflowWrap: 'anywhere' }}>{noAccount.join(', ')}</span>.
+              <div style={{ color: 'var(--c-meta)' }}>
+                They need to sign up first{joinCode ? `. Share the join code ${joinCode}, or add them here after they sign up.` : ', then add them here.'}
+                {' '}A teacher account cannot be added as a student.
+              </div>
+            </div>
+          )}
+          {failed.length > 0 && (
+            <div style={{ color: 'var(--c-red)' }}>
+              Could not add {failed.map((f) => f.email).join(', ')}. Try them again.
             </div>
           )}
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

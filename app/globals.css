@@ -5125,3 +5125,142 @@ input.dd-date { width: 152px; padding-right: 30px !important; }
 /* G7: a date field that refused what was typed. */
 .dd-date-msg { flex: 1 1 100%; font-family: var(--font-prose); font-size: 13px; line-height: 1.4; color: var(--c-orange); }
 /* end ux1 teacher */
+/* ux2 teacher */
+/* T5: a queue card's who-and-what line stays under the class tabs while the card is graded, and the Save row
+   stays at the bottom of the view (above an on-screen keyboard) while any part of the form is on screen. */
+.sq-card > .sq-card-head { position: sticky; top: var(--teacher-tabs-h, 0px); z-index: 6; background: var(--c-deep); padding: 8px 0 6px; margin-top: -8px; box-shadow: 0 1px 0 color-mix(in srgb, var(--c-line) 60%, transparent); }
+@media (max-width: 640px) {
+  /* On a phone only the name line sticks; the badges scroll with the card. */
+  .sq-card > .sq-card-head { display: contents !important; }
+  .sq-card > .sq-card-head > .sq-head-who { flex: 0 0 auto !important; position: sticky; top: var(--teacher-tabs-h, 0px); z-index: 6; background: var(--c-deep); padding: 6px 0; box-shadow: 0 1px 0 color-mix(in srgb, var(--c-line) 60%, transparent); }
+}
+.override-form > .sq-actions-bar {
+  position: sticky; bottom: var(--kb-inset, 0px); z-index: 5; grid-column: 1 / -1;
+  background: var(--c-deep); padding: 8px 0; margin-top: 4px !important;
+  box-shadow: 0 -1px 0 color-mix(in srgb, var(--c-line) 60%, transparent);
+}
+.drawer-override .override-form > .sq-actions-bar { background: var(--c-bg); }
+/* In the drawer the form is one column: its parts take the full width (the wide-screen grid's align-items: start
+   shrank them to nothing, since the rubric and the fields have no width of their own). */
+.drawer-override .override-form { align-items: stretch !important; }
+.override-form :is(input, textarea, select, button) { scroll-margin-top: calc(var(--teacher-tabs-h, 0px) + 112px); scroll-margin-bottom: 72px; }
+@media (min-width: 641px) {
+  /* The stuck header stays short: the score and the tags sit in one row on the right, not a column. */
+  .sq-card > .sq-card-head .sq-head-right { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: flex-end; column-gap: 8px; max-width: 60%; }
+}
+.override-form > .override-heading { grid-column: 1 / -1; margin: 0; font-family: var(--font-prose); font-size: 15px; font-weight: 600; color: var(--c-fg); }
+/* T1: "does not count yet" reads as a caution, not a quiet aside. */
+.sq-weight-note.is-unfinished { border-left-color: var(--c-orange); background: color-mix(in srgb, var(--c-orange) 10%, transparent); }
+/* T3: quiz answers with the option text, a quiz with no hand-in, an auto-scored quiz's score. */
+.sq-quiz-row > .sq-quiz-a { display: flex; margin-top: 2px; }
+.sq-quiz-k { color: var(--c-meta); }
+.sq-quiz-t { color: var(--c-fg); }
+.drawer-quiz-none { margin: 8px 0 0; font-family: var(--font-prose); font-size: 13px; line-height: 1.5; color: var(--c-meta); max-width: 70ch; }
+.sq-quiz-scored { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-top: 4px; padding-top: 10px; border-top: 1px solid var(--c-line); font-family: var(--font-prose); font-size: 14px; color: var(--c-fg); }
+/* T4: the typed date/time pair; the calendar button follows the time in the Tab order. */
+.dd-cal-btn { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 34px; box-sizing: border-box; border-radius: 4px; border: 1px solid color-mix(in srgb, var(--c-line) 82%, var(--c-meta)); background: var(--c-deep2); color: var(--c-cyan); cursor: pointer; padding: 0; flex: 0 0 auto; }
+.dd-cal-btn:hover { border-color: var(--c-cyan); }
+.dd-cal-btn:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; }
+.dd-clear-space { display: inline-block; width: 18px; height: 18px; flex: 0 0 auto; }
+.dd-pair input::placeholder { color: var(--c-meta); opacity: 1; }
+/* T6: the roster opened from "N students behind", and a staff row that is listed but not counted. */
+.roster-filter-note { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 8px 0; padding: 8px 12px; border-left: 3px solid var(--c-red); background: color-mix(in srgb, var(--c-red) 8%, transparent); font-family: var(--font-prose); font-size: 14px; line-height: 1.5; color: var(--c-fg); }
+.roster-staff-note { font-family: var(--font-prose); font-size: 13px; line-height: 18px; color: var(--c-meta); font-style: italic; }
+/* T8: the gradebook's class average row. */
+.gb-avg-row > * { background: color-mix(in srgb, var(--c-cyan) 7%, var(--c-deep)); border-bottom: 2px solid var(--c-line); font-family: var(--font-prose); font-variant-numeric: tabular-nums; }
+.gb-avg-label { padding: 8px 12px; text-align: left; font-size: 13px; font-weight: 700; color: var(--c-fg); white-space: nowrap; }
+.gb-avg-cell { padding: 6px 4px; text-align: center; font-size: 14px; color: var(--c-fg); line-height: 1.2; }
+.gb-avg-cell strong { display: block; font-weight: 700; }
+.gb-avg-n { display: block; font-size: 12px; color: var(--c-meta); white-space: nowrap; }
+.gb-avg-none { color: var(--c-meta); }
+.gb-filter-count { padding-top: 7px; font-family: var(--font-prose); font-size: 13px; color: var(--c-fg); font-variant-numeric: tabular-nums; }
+.gb-filter-count:not(:empty) { margin-left: auto; }
+.gb-filter-count:not(:empty) + .gb-open-hint { margin-left: 16px; }
+/* end ux2 teacher */
+/* ux2 student */
+/* S2 quiz: a question changed since the Check keeps no mark and says so; the score line is out of date. */
+.quiz-q-verdict.is-changed { color: var(--c-orange); font-weight: 600; }
+.student-quiz .quiz-question-card.is-changed { border-left: 4px dashed var(--c-orange) !important; padding-left: 14px !important; }
+@media (max-width: 720px) { .student-quiz .quiz-question-card.is-changed { padding-left: 10px !important; } }
+.quiz-head-score.is-stale > span:first-of-type { opacity: 0.7; }
+.ux2-stale-word { color: var(--c-orange); font-weight: 600; }
+/* S4 written: the result belongs to an earlier answer. */
+.written-outcome-result.is-stale { color: var(--c-orange); }
+.ux2-stale-note { margin-bottom: 10px; padding: 8px 12px; border: 1px dashed var(--c-orange); border-radius: 6px; color: var(--c-fg); font-family: var(--font-prose); font-size: 13px; }
+/* S5: notes under a lab's buttons are sentences: the prose face. */
+.ux2-prose { font-family: var(--font-prose); }
+/* S3 lab check result. Wide screens: the full row above the editor, as before. Phones: one line of a fixed
+   height from the start (it never grows on Check, so the editor does not move), the full list under the editor. */
+.lab-check-summary, .lab-check-below, .lab-ainote-below { display: none; }
+@media (max-width: 720px) {
+  .lab-work-area .lab-check-tests.lab-check-above, .lab-work-area .lab-ainote-above { display: none; }
+  .lab-work-area .lab-check-summary {
+    display: flex; align-items: center; height: 40px; margin: 0 0 6px; padding: 0 10px; box-sizing: border-box; overflow: hidden;
+    border: 1px solid var(--c-line); border-left: 3px solid var(--c-line); border-radius: 6px; background: var(--c-bg);
+    font-family: var(--font-prose); font-size: 14px; color: var(--c-meta); white-space: nowrap;
+  }
+  .lab-work-area .lab-check-summary.has-results { border-left-color: var(--c-green); color: var(--c-fg); }
+  .lab-work-area .lab-check-summary.has-failed { border-left-color: var(--c-red); }
+  .lab-work-area .lab-check-summary.is-stale { border-left-color: var(--c-orange); color: var(--c-orange); }
+  .lab-check-summary > span { overflow: hidden; text-overflow: ellipsis; }
+  .lab-check-summary-btn {
+    flex: 1 1 auto; min-width: 0; height: 100%; padding: 0; border: 0; background: transparent; color: inherit;
+    font: inherit; text-align: left; cursor: pointer; overflow: hidden; text-overflow: ellipsis;
+  }
+  .lab-check-summary-btn:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; }
+  .lab-work-area .lab-check-tests.lab-check-below { display: flex; margin: 8px 0 0; scroll-margin-top: 64px; }
+  .lab-work-area .lab-check-below:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; }
+  .lab-work-area .lab-ainote-below { display: block; margin-top: 6px; }
+  .lab-work-area .lab-ainote-below.ai-check-help { display: none; }
+}
+/* S6 phone menu: Sandbox one tap away, Learn / Teach open in place (they no longer cover the other items or run
+   off the edge), items big enough to tap, and a backdrop that only closes the menu. */
+.mobile-menu-only, .mobile-menu-backdrop { display: none; }
+@media (max-width: 600px) {
+  .mobile-menu-backdrop { display: block; position: fixed; inset: 0; z-index: 119; border: 0; padding: 0; margin: 0; background: rgba(0, 0, 0, 0.35); cursor: default; }
+  .desktop-header-links.mobile-open { max-height: calc(100dvh - 72px); overflow-y: auto; }
+  .desktop-header-links.mobile-open .mobile-menu-only { display: flex; }
+  .desktop-header-links.mobile-open > a, .desktop-header-links.mobile-open > div > button,
+  .desktop-header-links.mobile-open [role="menu"] > a { display: flex; align-items: center; min-height: 40px; box-sizing: border-box; }
+  .desktop-header-links.mobile-open [role="menu"] {
+    position: static !important; box-shadow: none !important; min-width: 0 !important; margin: 4px 0 0; padding: 2px 0 2px 12px !important;
+    border: 0 !important; border-left: 2px solid var(--c-line) !important; border-radius: 0 !important; background: transparent !important;
+  }
+  .desktop-header-links.mobile-open > div { display: block !important; }
+}
+/* S7 written answer on a phone: Submit, Save draft and what they did sit ABOVE the answer box, so they stay
+   in view while the on-screen keyboard covers the bottom of the screen. (A row stuck above the keyboard would
+   cover the very line being typed, which the browser keeps just above the keyboard.) */
+@media (max-width: 720px) {
+  .written-answer { display: flex; flex-direction: column; }
+  .written-answer > * { order: 3; }
+  .written-answer > :first-child { order: 0; }
+  .written-answer > .written-actions { order: 2; margin: 0 0 8px !important; }
+}
+/* S8 phone gradebook (/progress): each assignment is a small card, the score always on screen. */
+.gb-cell-label { display: none; }
+@media (max-width: 600px) {
+  .student-gradebook-table, .student-gradebook-table tbody { display: block; width: 100% !important; min-width: 0 !important; }
+  .student-gradebook-table thead { display: none; }
+  .student-gradebook-table tr.gb-row {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "title score" "due status";
+    gap: 4px 12px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--c-line);
+  }
+  .student-gradebook-table tr.gb-row > td { display: block; padding: 0 !important; border: 0 !important; min-width: 0; white-space: normal !important; }
+  .student-gradebook-table .gb-title-cell { grid-area: title; overflow-wrap: anywhere; }
+  .student-gradebook-table .gb-score-cell { grid-area: score; text-align: right !important; font-weight: 700; }
+  .student-gradebook-table .gb-due-cell { grid-area: due; font-size: 13px; }
+  .student-gradebook-table .gb-status-cell { grid-area: status; text-align: right; }
+  .student-gradebook-table .gb-cell-label { display: inline; color: var(--c-meta); font-weight: 400; font-size: 12px; }
+  .student-gradebook-table tr.gb-feedback-row, .student-gradebook-table tr.gb-feedback-row > td { display: block; }
+}
+/* S9 lesson footer strip: nothing to read before progress loads; yellow "started" is in the legend. The header's
+   "Lesson 10 of 22" says which count it is, since the lesson number (1.1.11) sits right beside it. */
+.lesson-progress-segs.is-loading { opacity: 0.3; }
+.lesson-progress-legend i.is-started { display: inline-block; width: 12px; height: 8px; border-radius: 2px; background: var(--c-yellow); }
+@media (max-width: 720px) { .hdr-pos-scope { display: none; } }
+/* S9 home lesson cards: done / in progress in words beside the title. */
+.lesson-card-state { font-family: var(--font-prose); font-size: 12px; font-weight: 700; padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
+.lesson-card-state.is-completed { color: var(--c-green); border: 1px solid color-mix(in srgb, var(--c-green) 45%, transparent); }
+.lesson-card-state.is-started { color: var(--c-yellow); border: 1px solid color-mix(in srgb, var(--c-yellow) 45%, transparent); }
+/* end ux2 student */

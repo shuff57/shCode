@@ -210,4 +210,44 @@ check('practice and done-only each have one sentence, no em dash',
   check('a question with no pick says so', D.quizAnswerRows(JSON.stringify({ quiz: [{ id: 'q1' }] }), null, null)[0].chosen, 'No answer');
 }
 
+// ---- ux2 T1: one helper says whether a teacher's score changes the grade now ----
+{
+  const unfinished = D.scoreCountNote('counts', { lessonState: 'started', studentName: 'Ben' });
+  check('a counted lesson the student has not finished: the score does not count yet, said with their name',
+    [unfinished.reason, unfinished.tag, unfinished.note.startsWith('Counts once Ben finishes this lesson.')], ['unfinished', 'Counts once finished', true]);
+  check('past due and not finished: says it counts as 0 until then',
+    /past due, so until then the grade counts it as 0/.test(D.scoreCountNote('counts', { lessonState: 'started', pastDue: true, studentName: 'Ben' }).note), true);
+  check('finished, or no lesson_state row yet (a teacher score finishes it): nothing to say',
+    [D.scoreCountNote('counts', { lessonState: 'completed' }), D.scoreCountNote('counts', { lessonState: null }), D.scoreCountNote(null, {})], [null, null, null]);
+  check('practice and done-only win over unfinished: the score never counts, whatever the state',
+    [D.scoreCountNote('practice', { lessonState: 'started' }).reason, D.scoreCountNote('done-only', { lessonState: 'started' }).reason], ['practice', 'done-only']);
+  check('the old label helpers read from the same helper (one wording)',
+    [D.scoreWeightNote('done-only') === D.scoreCountNote('done-only').note, D.scoreWeightTag('practice') === D.scoreCountNote('practice').tag], [true, true]);
+  check('no name: "the student"', D.scoreCountNote('counts', { lessonState: 'started' }).note.startsWith('Counts once the student finishes'), true);
+  check('no em dash in any count note',
+    [D.scoreCountNote('counts', { lessonState: 'started', pastDue: true }), D.scoreCountNote('practice'), D.scoreCountNote('done-only')].some((x) => x.note.includes('\u2014')), false);
+  check('studentFirstName: the first name, else the email before @', [D.studentFirstName(' Ben ', 'b@x'), D.studentFirstName(null, 'cleo@school.test')], ['Ben', 'cleo']);
+}
+
+// ---- ux2 T3b: quiz rows carry the picked option's text and the right answer's ----
+{
+  const content = { questions: [
+    { id: 'q1-four-ps', question: 'What are the four Ps?', options: ['Plan', 'Purpose', 'Problem, project, people, product', 'Price'], answer: 2 },
+    { id: 'q2-order', question: 'Which comes first?', options: ['Construction', 'Inception'], answer: 1 },
+    { id: 'q3-x', question: 'Unkeyed', options: ['A', 'B'], answer: null },
+  ] };
+  const g = JSON.stringify({ quiz: [{ id: 'q1-four-ps', picked: 2, correct: true }, { id: 'q2-order', picked: 0, correct: false }, { id: 'q3-x', picked: 1 }, { id: 'q4-gone', picked: 0 }] });
+  const rows = D.quizAnswerRows(g, null, {}, content);
+  check('quiz rows: question text from the teacher content, picked text, right answer text',
+    rows.map((x) => [x.question, x.chosenText, x.answerText, x.correct]),
+    [['What are the four Ps?', 'Problem, project, people, product', 'Problem, project, people, product', true],
+     ['Which comes first?', 'Construction', 'Inception', false],
+     ['Unkeyed', 'B', null, null],
+     ['gone', null, null, null]]);
+  check('the stored verdict wins; the key only fills a gap',
+    D.quizAnswerRows(JSON.stringify({ quiz: [{ id: 'q2-order', picked: 1 }] }), null, null, content)[0].correct, true);
+  check('an index outside the options is not shown as text', D.quizAnswerRows(JSON.stringify({ quiz: [{ id: 'q2-order', picked: 7 }] }), null, null, content)[0].chosenText, null);
+  check('without teacher content the letters remain', D.quizAnswerRows(g, null, {}, null).map((x) => [x.chosen, x.chosenText]).slice(0, 2), [['Choice C', null], ['Choice A', null]]);
+}
+
 console.log(`\n${n} checks`);

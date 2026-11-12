@@ -4,16 +4,15 @@ import LessonModeControl from '../../components/LessonModeControl';
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { compareLessons, compareUnitLabels, lessonLabel } from '../../lib/lesson-title-order';
-import { csvCell } from '../../lib/grades-csv';
 import { NeedsAttentionPanel } from '../../components/NeedsAttentionPanel';
 import { BulkEnrollmentForm } from '../../components/BulkEnrollmentForm';
-import { SubmissionQueue, OverrideForm } from '../../components/SubmissionQueue';
+import { SubmissionQueue, OverrideForm, QuizAnswers } from '../../components/SubmissionQueue';
 import { AnnouncementsPanel } from '../../components/AnnouncementsPanel';
 import DueDatesPanel from '../../components/DueDatesPanel';
 import GradingWeightsPanel from '../../components/GradingWeightsPanel';
 import SolutionReleasePanel from '../../components/SolutionReleasePanel';
 import { defaultModule, moduleKey, moduleOptions, modulePages, pagedColumnWidth, pagerFor, pageSize, resolveModuleParam, selectGradebookLessons } from '../../lib/gradebook-view';
-import { describeGrade, opensInCodeEditor, quizAnswerRows, scoreOutOf, scoreWeight, scoreWeightNote, showLateBadge, stillFailingRequirements, submissionWasLate, verdictWord, type RequirementEventRow, type ScoreWeight } from '../../lib/teacher-drawer';
+import { describeGrade, opensInCodeEditor, quizAnswerRows, scoreCountNote, scoreOutOf, scoreWeight, showLateBadge, stillFailingRequirements, studentFirstName, submissionWasLate, verdictWord, type RequirementEventRow, type ScoreWeight, type TeacherQuiz } from '../../lib/teacher-drawer';
 import { buildMarkCriteria } from '../../lib/rubric-mark';
 import MostMissedPanel from '../../components/MostMissedPanel';
 import ClassLibraryModeration from '../../components/ClassLibraryModeration';
@@ -26,11 +25,12 @@ import { lessonHref } from '../../lib/lesson-href';
 import { criteriaScore } from '../../lib/grade-pass';
 import { practiceDisplay, readTeacherNotes } from '../../lib/gradebook-cell';
 import { CATEGORY_LABEL, GRADE_CATEGORIES, lessonGradeCategory, lessonPercent, type GradeCategory } from '../../lib/grading-weights';
-import { buildGradesCsv } from '../../lib/grades-csv';
+import { buildGradesCsv, buildLessonScoresCsv, classAverage, compareByLastName } from '../../lib/grades-csv';
 import { FeedbackProvider, useFeedback } from '../../components/FeedbackProvider';
 import { RowMenu } from '../../components/RowMenu';
 import { ArrowDown, ArrowUp, ArrowUpDown, MousePointerClick } from 'lucide-react';
 import { toMermaid } from '../../lib/diagram-mermaid';
+import { errorText } from '../../lib/http-error';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -84,6 +84,8 @@ interface StudentProgress {
   gradedMissing?: number;
   gradedCounted?: number;
   categories?: Array<{ category: string; percent: number }>;
+  /** The owner, a co-teacher or a non-student account on the roster: listed, never counted (ux2 T6). */
+  staff?: boolean;
 }
 
 interface LessonStateEntry {
@@ -253,6 +255,8 @@ interface GridGrade {
   missing: number;
   /** Percent per grade category, from the same studentGrading() call. Only categories with something counted. */
   cats: Record<string, number>;
+  /** A staff account on the roster (ux2 T6): not a row of the gradebook, not in its averages. */
+  staff: boolean;
 }
 
 /** Header stripe and total-column tint per grade category. None of these is a state colour (green, yellow, red, orange). */
@@ -380,13 +384,8 @@ async function apiFetch<T>(
     const data = (await res.json()) as T;
     return { data, error: null };
   }
-  let errorMsg = `HTTP ${res.status}`;
-  try {
-    const body = (await res.json()) as { error?: string };
-    if (body.error) errorMsg = body.error;
-  } catch {
-    // ignore parse errors
-  }
+  // The server's own sentence when it sent one; never a raw HTML page or a bare "HTTP 404" (ux2 T7).
+  const errorMsg = await errorText(res);
   return { data: null, error: errorMsg, status: res.status };
 }
 
@@ -399,62 +398,8 @@ function fmtTs(ms: number) {
 }
 
 // ---------------------------------------------------------------------------
-// CSV helper — no libraries, ~30 lines
+// CSV download (the rows are built in lib/grades-csv.ts, where they are tested)
 // ---------------------------------------------------------------------------
-
-function buildGradebookCsv(
-  students: GradebookStudent[],
-  lessonIds: string[],
-  dueDates?: Record<string, number>,
-  titles?: Record<string, string>,
-): string {
-  const escape = (v: string) => (v.includes(',') || v.includes('"') || v.includes('\n') ? `"${v.replace(/"/g, '""')}"` : v);
-
-  // Header cells are lesson titles ("3.2.10 Loops"), in the order the caller sorted them; the folder id
-  // is only a fallback. csvCell neutralises a leading = + - @ (a title is authored text, still guard it).
-  const header = [csvCell('student_email'), ...lessonIds.map((id) => csvCell(lessonLabel(id, titles)))].join(',');
-
-  // Second header row carries each lesson's due date, so the export is
-  // self-contained — a spreadsheet opened in March still says what was due.
-  // Blank for lessons with no due date. Omitted entirely if the class sets none.
-  const hasDue = dueDates && Object.keys(dueDates).length > 0;
-  const dueRow = hasDue
-    ? ['due_date', ...lessonIds.map((lid) => (dueDates![lid] ? schoolDateString(dueDates![lid]) : ''))]
-        .map(escape)
-        .join(',')
-    : null;
-
-  const rows = students.map((s) => {
-    const cols = [s.email, ...lessonIds.map((lid) => {
-      const c = s.cells[lid];
-      if (!c) return '';
-      // "L" suffix = late. Kept as a suffix rather than its own column so the
-      // matrix stays one cell per lesson.
-      const suffix = c.late ? 'L' : '';
-      // Before the C branch. An outage row is state=completed with a NULL
-      // score, so it would otherwise export as "C" — a finished lesson — into
-      // the one file a teacher pastes straight into a grade system.
-      if (c.pending) return 'P' + suffix;
-      // A 0-point (mastery) lab stores score 0 of 0 and reads done on screen; "0" would paste as no credit.
-      // A teacher's mark on one (override score) is the one non-zero number such a lab can hold: keep it.
-      if (c.state === 'completed' && c.possible === 0) return (c.score ? String(c.score) : 'C') + suffix;
-      if (c.score !== null) return String(c.score) + suffix;
-      if (c.state === 'completed') return 'C' + suffix;
-      if (c.state === 'started') return 'S' + suffix;
-      // Submitted, graded, and did NOT pass. WrittenGrader only writes a
-      // lesson_state row when the grade passes, so a failing submission has
-      // no state at all — and every branch above missed it, exporting the
-      // same empty cell as a student who never opened the lesson. The matrix
-      // on screen already had this branch; the CSV, which is the file a
-      // teacher actually pastes into a grade system, did not.
-      if (c.submitted_score !== null) return 's' + c.submitted_score + suffix;
-      return suffix || '';
-    })];
-    return cols.map(escape).join(',');
-  });
-
-  return [header, ...(dueRow ? [dueRow] : []), ...rows].join('\r\n');
-}
 
 function downloadCsv(csv: string, filename: string) {
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -724,24 +669,29 @@ function StudentDrawer({
   // Same teacher-only route the review queue reads, asking only for briefs; a lesson with no grader config
   // simply has none and its form falls back to the stored criteria or a plain score field.
   const [briefs, setBriefs] = useState<Record<string, { prompt: string; rubric: Array<{ id: string; title: string; points: number; required?: boolean }> }>>({});
+  // A quiz hand-in's questions, options and key (teacher-only, same route), for "Picked / Answer" (ux2 T3b).
+  const [quizContent, setQuizContent] = useState<Record<string, TeacherQuiz>>({});
   useEffect(() => {
     if (!detail) return;
-    const ids = Object.keys(detail.latestSubmissions).filter((id) => {
-      try { return !Array.isArray((JSON.parse(detail.latestSubmissions[id].grade_json ?? 'null') as { quiz?: unknown } | null)?.quiz); } catch { return true; }
-    });
+    const ids = Object.keys(detail.latestSubmissions);
     if (ids.length === 0) return;
     let live = true;
     const chunks: string[][] = [];
     for (let i = 0; i < ids.length; i += 20) chunks.push(ids.slice(i, i + 20));
     void Promise.all(chunks.map((c) =>
-      apiFetch<{ assignments?: Record<string, { prompt: string; rubric: Array<{ id: string; title: string; points: number; required?: boolean }> }> }>(
+      apiFetch<{ assignments?: Record<string, { prompt: string; rubric: Array<{ id: string; title: string; points: number; required?: boolean }> }>; quizzes?: Record<string, TeacherQuiz> }>(
         `/api/classes/${encodeURIComponent(classId)}/submission-queue?briefs=${encodeURIComponent(c.join(','))}`,
       ).catch(() => null),
     )).then((all) => {
       if (!live) return;
       const out: typeof briefs = {};
-      for (const r of all) if (r && r.error === null && r.data.assignments) Object.assign(out, r.data.assignments);
+      const qs: Record<string, TeacherQuiz> = {};
+      for (const r of all) {
+        if (r && r.error === null && r.data.assignments) Object.assign(out, r.data.assignments);
+        if (r && r.error === null && r.data.quizzes) Object.assign(qs, r.data.quizzes);
+      }
       setBriefs(out);
+      setQuizContent(qs);
     });
     return () => { live = false; };
   }, [detail, classId]);
@@ -1088,6 +1038,15 @@ function StudentDrawer({
                   const counted = !meta || lessonGradeCategory({ title: meta.title, preview: meta.preview, scoreKind: meta.scoreKind, assignmentCode: meta.assignmentCode }) !== null;
                   const shownScore =
                     ls?.state === 'completed' && !practice && ls.score !== null ? ls.score : teacherScored && counted ? sub!.score : null;
+                  // Does a teacher score here change the grade now? The queue card's helper, so the words match (ux2 T1).
+                  const dueAt = detail.dueDates?.[lesson.id];
+                  const countNote = scoreCountNote(weight, {
+                    lessonState: ls?.state ?? null,
+                    pastDue: typeof dueAt === 'number' && dueAt <= Date.now(),
+                    studentName: studentFirstName(detail.firstName, email),
+                  });
+                  // A quiz by its lesson, so a quiz with no hand-in row still says why nothing can be shown (ux2 T3a).
+                  const quizLesson = isQuiz || meta?.scoreKind === 'quiz' || meta?.preview === 'quiz';
 
                   return (
                     <div key={lesson.id} id={`drawer-lesson-${lesson.id}`} style={{ marginBottom: 8, background: 'var(--c-bg)', borderRadius: 6, padding: '12px 16px', border: `1px solid ${focusLessonId === lesson.id ? 'var(--c-cyan)' : 'color-mix(in srgb, var(--c-line) 20%, transparent)'}` }}>
@@ -1133,8 +1092,9 @@ function StudentDrawer({
                           <button
                             style={{ background: 'none', border: '1px solid var(--c-comment)', borderRadius: 4, color: 'var(--c-cyan)', fontSize: 12, cursor: 'pointer', padding: '4px 8px', flexShrink: 0 }}
                             onClick={() => toggleSub(lesson.id)}
+                            aria-expanded={isExpanded}
                           >
-                            {isExpanded ? 'Hide' : 'View submission'}
+                            {isExpanded ? 'Hide' : isQuiz ? 'View answers' : 'View submission'}
                           </button>
                         )}
                         {sub && isQuiz && (
@@ -1173,6 +1133,20 @@ function StudentDrawer({
                           />
                         )}
                       </div>
+
+                      {/* A score that does not change the grade now says so, in the queue card's words (ux2 T1). Shown
+                          once there is a teacher score to be wrong about; the override form shows it too. */}
+                      {countNote && teacherScored && overrideOpen !== lesson.id && (
+                        <p role="note" className={`sq-weight-note is-${countNote.reason}`} style={{ marginTop: 8 }}>{countNote.note}</p>
+                      )}
+
+                      {/* A finished quiz with no hand-in row (its score came from lesson progress only): nothing to show
+                          or reopen, and the row says so rather than offering nothing (ux2 T3a). */}
+                      {quizLesson && !sub && ls?.state === 'completed' && (
+                        <p className="drawer-quiz-none">
+                          Only the score was saved for this quiz (no hand-in), so there are no answers to show or reopen.
+                        </p>
+                      )}
 
                       {/* The teacher's note, kept with their score (ux1 G2). The student reads it on their Progress page. */}
                       {tnotes?.feedback && (
@@ -1224,10 +1198,10 @@ function StudentDrawer({
                             criteria={brief || (gradeData?.criteria && gradeData.criteria.length > 0) ? buildMarkCriteria(brief?.rubric, gradeData?.criteria) : undefined}
                             savedScore={teacherScored ? sub.score : null}
                             savedFeedback={tnotes?.feedback ?? null}
-                            weightNote={scoreWeightNote(weight)}
+                            weightNote={countNote?.note ?? null}
                             onOverride={() => {
                               setOverrideOpen(null);
-                              setNotice(`Saved. ${lesson.title} now carries your score. ${scoreWeightNote(weight) ?? 'The student sees it, and any note, on their Progress page, marked teacher-adjusted.'}`);
+                              setNotice(`Saved. ${lesson.title} now carries your score. ${countNote?.note ?? 'The student sees it, and any note, on their Progress page, marked teacher-adjusted.'}`);
                               setReloadKey((k) => k + 1);
                               // The form closes on save: put focus back on the button that opened it, not on <body>.
                               window.setTimeout(() => document.getElementById(`override-btn-${lesson.id}`)?.focus(), 0);
@@ -1292,7 +1266,7 @@ function StudentDrawer({
                             );
                           })()}
 
-                          {gradeData && describeGrade(sub.grade_json)?.from !== 'ai' && (
+                          {gradeData && !isQuiz && describeGrade(sub.grade_json)?.from !== 'ai' && (
                             <div style={{ marginBottom: 8 }}>
                               <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--c-green)', marginBottom: 8 }}>
                                 {/* A pass/fail rubric has no point total, and a diagram
@@ -1355,7 +1329,7 @@ function StudentDrawer({
                               rather than raw JSON; everything else is prose. */}
                           {isQuiz && (() => {
                             // Question / chosen answer / right or wrong, the same reading as the review queue's (ux1 G5).
-                            const rows = quizAnswerRows(sub.grade_json, sub.response, quizStems[lesson.id]) ?? [];
+                            const rows = quizAnswerRows(sub.grade_json, sub.response, quizStems[lesson.id], quizContent[lesson.id]) ?? [];
                             const missed = rows.filter((q) => q.correct === false);
                             const keyed = rows.some((q) => q.correct !== null);
                             return (
@@ -1363,17 +1337,7 @@ function StudentDrawer({
                                 <div style={{ fontSize: 13, color: 'var(--c-meta)', marginBottom: 4 }}>
                                   {!keyed ? `${rows.length} answers` : missed.length === 0 ? 'No questions missed' : `Missed ${missed.length} of ${rows.length}`}
                                 </div>
-                                <ol className="sq-quiz">
-                                  {rows.map((q) => (
-                                    <li key={q.id} className="sq-quiz-row">
-                                      <span className="sq-quiz-q">{q.question}</span>
-                                      <span className="sq-quiz-a">
-                                        {q.chosen}
-                                        {q.correct !== null && <span className={q.correct ? 'sq-quiz-ok' : 'sq-quiz-no'}>{q.correct ? 'Right' : 'Wrong'}</span>}
-                                      </span>
-                                    </li>
-                                  ))}
-                                </ol>
+                                <QuizAnswers rows={rows} />
                               </div>
                             );
                           })()}
@@ -1417,6 +1381,7 @@ function GradebookView({
   onOpenStudent: (email: string, lessonId?: string) => void;
 }) {
   const router = useRouter();
+  const { toast } = useFeedback();
   const [gbData, setGbData] = useState<GradebookData | null>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
@@ -1530,6 +1495,7 @@ function GradebookView({
         counted: p.gradedCounted ?? 1,
         missing: p.gradedMissing ?? 0,
         cats: Object.fromEntries((p.categories ?? []).map((c) => [c.category, c.percent])),
+        staff: p.staff === true,
       }])));
     }).catch(() => { /* the column just stays empty; the grid still works */ });
     return () => { cancelled = true; };
@@ -1797,12 +1763,12 @@ function GradebookView({
   const isProblem = (st: GradebookStudent) =>
     Object.entries(st.cells).some(([id, c]) => gradedIds.has(id) && (c.pending || (c.late && c.state !== 'completed')));
   const q = query.trim().toLowerCase();
-  const hasName = (st: GradebookStudent) => !!(st.lastName || st.firstName);
-  // Named students first, by last name; accounts with no name set go last, by email.
-  const byName = (a: GradebookStudent, b: GradebookStudent) =>
-    Number(!hasName(a)) - Number(!hasName(b)) ||
-    (hasName(a) ? `${a.lastName ?? ''} ${a.firstName ?? ''}` : a.email).localeCompare(hasName(b) ? `${b.lastName ?? ''} ${b.firstName ?? ''}` : b.email);
-  const visibleStudents = gbData.students
+  // Named students first by LAST name then first name; accounts with no name set go last, by email (ux2 T8:
+  // the option says "last name", because the rows show "First Last" and A-Z by first name was what people expected).
+  const byName = compareByLastName;
+  // Staff on the roster (owner, co-teacher, non-student account) are not gradebook rows (ux2 T6).
+  const classStudents = gbData.students.filter((st) => !grades.get(st.email)?.staff);
+  const visibleStudents = classStudents
     .filter((st) => (q === '' ? true : `${st.firstName ?? ''} ${st.lastName ?? ''} ${st.email}`.toLowerCase().includes(q)))
     .filter((st) => !problemsOnly || isProblem(st))
     .sort((a, b) => {
@@ -1810,7 +1776,7 @@ function GradebookView({
       if (sortBy === 'missing') return (grades.get(b.email)?.missing ?? 0) - (grades.get(a.email)?.missing ?? 0) || byName(a, b);
       return byName(a, b);
     });
-  const GRADE_W = narrow ? 84 : 122;
+  const GRADE_W = narrow ? 64 : 122;
 
   // Which grade category each shown lesson belongs to (null = not graded) and the categories that appear,
   // in the course's own order. Each category gets a total column; the numbers are the server's
@@ -1820,21 +1786,44 @@ function GradebookView({
   );
   const shownCats = GRADE_CATEGORIES.filter((c) => displayLessons.some((l) => catOf.get(l.id) === c));
 
-  const categoryColumnCount = shownCats.length ? (showCategoryColumns ? shownCats.length : 1) : 0;
+  // ux2 T9: on a phone the Summary column is left out (it is still there through "Show category columns"), so a
+  // lesson column fits beside the names; the frozen name + grade + summary were wider than the whole grid box.
+  const showSummary = !showCategoryColumns && shownCats.length > 0 && !narrow;
+  const categoryColumnCount = shownCats.length ? (showCategoryColumns ? shownCats.length : showSummary ? 1 : 0) : 0;
   // Column width for this page (see cellWRef above): the room right of the frozen and total columns,
   // shared by this module's lessons; the every-module grid keeps the 168px minimum.
-  const CELL_W = moduleSel === null
-    ? 168
-    : pagedColumnWidth(gridW - EMAIL_W - GRADE_W - CAT_W * categoryColumnCount, displayLessons.length);
+  const CELL_W = narrow
+    ? Math.max(92, Math.floor(((gridW || 300) - EMAIL_W) / 2)) // two lesson columns beside the names once the grade scrolls off
+    : moduleSel === null
+      ? 168
+      : pagedColumnWidth(gridW - EMAIL_W - GRADE_W - CAT_W * categoryColumnCount, displayLessons.length);
   cellWRef.current = CELL_W;
   const showScrollCue = moduleSel === null || gridScroll.left || gridScroll.right;
 
   function handleDownloadCsv() {
-    // Every module, never just the page on screen.
+    // Every module, never just the page on screen; every student, never just the search result.
     const all = everyLesson.length > 0 ? everyLesson : displayLessons;
-    const csv = buildGradebookCsv(gbData!.students, all.map((l) => l.id), gbData!.dueDates, Object.fromEntries(all.map((l) => [l.id, l.title])));
-    downloadCsv(csv, `gradebook-${className.replace(/\s+/g, '-')}.csv`);
+    const csv = buildLessonScoresCsv(
+      classStudents.map((st) => {
+        const g = grades.get(st.email);
+        return { email: st.email, firstName: st.firstName, lastName: st.lastName, grade: g && g.counted > 0 ? g.pct : null, cells: st.cells };
+      }),
+      all.map((l) => ({ id: l.id, title: l.title, maxScore: l.maxScore, due: gbData!.dueDates?.[l.id] ? schoolDateString(gbData!.dueDates[l.id]) : null })),
+    );
+    const file = `lesson-scores-${className.replace(/\s+/g, '-')}-${schoolDateString(Date.now())}.csv`;
+    downloadCsv(csv, file);
+    toast(`Downloaded ${file}: one row per student, one column per graded lesson.`);
   }
+
+  // ux2 T8: a class average per lesson and for the grade, for display only: the mean of the percents already on
+  // this page, over the students who have one (a finished lesson; a grade with something counted). Missing work
+  // is not in a lesson's average (it is in each student's grade, by the one grade rule).
+  const gradeAvg = classAverage(classStudents.map((st) => { const g = grades.get(st.email); return g && g.counted > 0 ? g.pct : null; }));
+  const lessonAvg = (lesson: LessonMeta) =>
+    classAverage(classStudents.map((st) => {
+      const c = st.cells[lesson.id];
+      return c?.state === 'completed' && gradedIds.has(lesson.id) ? lessonPercent(c.state, c.score, lesson.maxScore) : null;
+    }));
 
   return (
     <div
@@ -1891,21 +1880,12 @@ function GradebookView({
                   <span>{displayLessons.length} {showAll ? '' : 'graded '}lessons in {pager.total} modules</span>
                 </>
               )}
-              {/* The student count only when a search narrows it (the grid's rows already show the class). */}
-              {visibleStudents.length !== gbData.students.length && (
-                <>
-                  <span aria-hidden="true"> · </span>
-                  <span>{visibleStudents.length} of {gbData.students.length} students</span>
-                </>
-              )}
             </p>
           </nav>
         )}
         {pages.length === 0 && (
           <span style={{ fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', fontSize: 13, color: 'var(--c-meta)', whiteSpace: 'nowrap' }}>
-            {visibleStudents.length === gbData.students.length
-              ? `${gbData.students.length} student${gbData.students.length !== 1 ? 's' : ''}`
-              : `${visibleStudents.length} of ${gbData.students.length} students`}
+            {`${classStudents.length} student${classStudents.length !== 1 ? 's' : ''}`}
             {' · '}{displayLessons.length} lesson{displayLessons.length !== 1 ? 's' : ''}
           </span>
         )}
@@ -1926,7 +1906,7 @@ function GradebookView({
           className="teacher-field"
           style={{ background: 'var(--c-deep2)', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4, height: 32, padding: '4px 8px', fontFamily: 'var(--font-prose)', fontSize: 15, maxWidth: narrow ? '100%' : 240, minWidth: 0 }}
         >
-          <option value="name">Order: name</option>
+          <option value="name">Order: last name, A to Z</option>
           <option value="grade">Order: lowest grade first</option>
           <option value="missing">Order: most past due first</option>
         </select>
@@ -1991,7 +1971,10 @@ function GradebookView({
         >
           {fullScreen ? '✕ Exit full screen' : '⛶ Full screen'}
         </button>
-        <button style={{ ...S.btn('transparent'), color: 'var(--c-cyan)', border: '1px solid var(--c-line)' }} onClick={handleDownloadCsv}>Export CSV</button>
+        <button style={{ ...S.btn('transparent'), color: 'var(--c-cyan)', border: '1px solid var(--c-line)', whiteSpace: 'normal', height: 'auto', minHeight: 32 }} onClick={handleDownloadCsv}>Download lesson scores (CSV)</button>
+        <p style={{ margin: 0, fontFamily: 'var(--font-prose)', fontSize: 13, lineHeight: 1.45, color: 'var(--c-meta)' }}>
+          One row per student, one column per graded lesson. For one row per student with the grade only, use Download grades on the Students tab.
+        </p>
           </div>
         </details>
         </div>
@@ -2027,6 +2010,11 @@ function GradebookView({
             <div><dt><span aria-hidden="true" className="gb-legend-swatch" style={{ background: 'var(--c-line)' }} />Not due yet</dt><dd>A dash: not started, and the due date has not passed.</dd></div>
           </dl>
         </details>
+        {/* ux2 T8: how many students a search shows, here rather than in the toolbar, so typing in Find a
+            student never pushes the toolbar onto a second row under the cursor. */}
+        <span className="gb-filter-count" aria-live="polite">
+          {visibleStudents.length !== classStudents.length ? `Showing ${visibleStudents.length} of ${classStudents.length} students` : ''}
+        </span>
         {/* r8 T5: a still screen shows no hover, so say once that a cell opens the work. */}
         <span className="gb-open-hint"><MousePointerClick size={14} aria-hidden="true" />Select a score to open the work</span>
       </div>
@@ -2099,7 +2087,7 @@ function GradebookView({
                   <span className="gb-grade-pair"><span>Grade</span><span>Past due</span></span>
                 )}
               </th>
-              {shownCats.length > 0 && (
+              {categoryColumnCount > 0 && (
                 <th
                   colSpan={categoryColumnCount}
                   style={{
@@ -2138,7 +2126,7 @@ function GradebookView({
             </tr>
             {/* Per-lesson title row */}
             <tr>
-              {!showCategoryColumns && shownCats.length > 0 && <th className="gb-head-summary" style={{ position: 'sticky', top: HEAD1_H, zIndex: 2, width: CAT_W, background: stickyBg, color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600, borderBottom: '2px solid var(--c-line)' }}>Summary</th>}
+              {showSummary && <th className="gb-head-summary" style={{ position: 'sticky', top: HEAD1_H, zIndex: 2, width: CAT_W, background: stickyBg, color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600, borderBottom: '2px solid var(--c-line)' }}>Summary</th>}
               {showCategoryColumns && shownCats.map((c, ci) => (
                 <th
                   key={c}
@@ -2208,6 +2196,41 @@ function GradebookView({
             </tr>
           </thead>
           <tbody>
+            {/* ux2 T8: how the class did, per lesson and on the grade. Display only, from the cells on this page. */}
+            {classStudents.length > 1 && (
+              <tr className="gb-avg-row">
+                <th scope="row" className="gb-avg-label" style={{ position: 'sticky', left: 0, zIndex: 1, width: EMAIL_W, minWidth: EMAIL_W }}>
+                  Class average
+                </th>
+                <td
+                  className="gb-avg-cell"
+                  style={{ position: 'sticky', left: gradeLeft, zIndex: 1, width: GRADE_W, minWidth: GRADE_W }}
+                  title={gradeAvg.avg === null ? 'No student has anything counted yet' : `Average grade so far: ${gradeAvg.avg}%, across ${gradeAvg.n} student${gradeAvg.n === 1 ? '' : 's'} with something counted`}
+                >
+                  {gradeAvg.avg === null ? '—' : `${gradeAvg.avg}%`}
+                </td>
+                {Array.from({ length: categoryColumnCount }, (_, i) => <td key={`avg-cat-${i}`} className="gb-avg-cell" aria-hidden="true" />)}
+                {displayLessons.map((lesson) => {
+                  const a = lessonAvg(lesson);
+                  return (
+                    <td
+                      key={lesson.id}
+                      className="gb-avg-cell"
+                      title={a.avg === null
+                        ? `${lesson.title}: nobody has finished it yet`
+                        : `${lesson.title}: average ${a.avg} across the ${a.n} of ${classStudents.length} students who finished it. Missing work is not in this average.`}
+                    >
+                      {a.avg === null ? <span className="gb-avg-none">—</span> : (
+                        <>
+                          <strong>{a.avg}</strong>
+                          <span className="gb-avg-n">{a.n} of {classStudents.length} done</span>
+                        </>
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            )}
             {visibleStudents.length === 0 && (
               <tr><td colSpan={displayLessons.length + categoryColumnCount + 2} style={{ padding: 16, color: 'var(--c-meta)' }}>No student matches. Clear the search or the filter above.</td></tr>
             )}
@@ -2252,7 +2275,7 @@ function GradebookView({
                       {narrow ? (
                         <>
                           {g ? (g.counted === 0 ? '—' : `${g.pct}%`) : '…'}
-                          {g && g.missing > 0 && <span style={{ color: 'var(--c-red)', fontWeight: 400, marginLeft: 4 }}>({g.missing})</span>}
+                          {g && g.missing > 0 && <span style={{ display: 'block', color: 'var(--c-red)', fontWeight: 400, fontSize: 12, lineHeight: '14px' }} aria-label={`${g.missing} past due and not done`}>{g.missing} missing</span>}
                         </>
                       ) : (
                         <span className="gb-grade-pair">
@@ -2268,7 +2291,7 @@ function GradebookView({
                   );
                 })()}
                 {/* Category totals: the server's per-category percent, a dash where nothing in it counts yet */}
-                {!showCategoryColumns && shownCats.length > 0 && <td className="gb-cell-summary" style={{ width: CAT_W, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '8px 8px', color: 'var(--c-fg)', fontSize: 14, fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', background: 'color-mix(in srgb, var(--c-purple) 6%, transparent)', borderBottom: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)' }} title={shownCats.map(c => `${CATEGORY_LABEL[c]}: ${grades.get(student.email)?.cats[c] === undefined ? 'nothing counted yet' : `${grades.get(student.email)?.cats[c]}%`}`).join(' · ')}>
+                {showSummary && <td className="gb-cell-summary" style={{ width: CAT_W, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '8px 8px', color: 'var(--c-fg)', fontSize: 14, fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', background: 'color-mix(in srgb, var(--c-purple) 6%, transparent)', borderBottom: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)' }} title={shownCats.map(c => `${CATEGORY_LABEL[c]}: ${grades.get(student.email)?.cats[c] === undefined ? 'nothing counted yet' : `${grades.get(student.email)?.cats[c]}%`}`).join(' · ')}>
                   {(() => {
                     const c = shownCats.find(c => grades.get(student.email)?.cats[c] !== undefined);
                     return c ? <strong>{CAT_SHORT[c]} {grades.get(student.email)?.cats[c]}%</strong> : <span style={{ color: 'var(--c-meta)' }}>—</span>;
@@ -2411,7 +2434,8 @@ function ListView() {
         apiFetch<{ awaiting_grade?: unknown[] }>(`/api/classes/${c.id}/needs-attention`),
       ]).then(([prog, att]) => {
         if (cancelled || prog.error !== null) return;
-        const behind = prog.data.students.filter((p) => (p.gradedMissing ?? 0) > 0).length;
+        // The roster's own number: students (never staff) with graded work past due and not done (ux2 T6).
+        const behind = prog.data.students.filter((p) => !p.staff && (p.gradedMissing ?? 0) > 0).length;
         const toGrade = att.error === null ? (att.data.awaiting_grade?.length ?? 0) : 0;
         setChips((prev) => ({ ...prev, [c.id]: { behind, toGrade } }));
       });
@@ -2430,7 +2454,7 @@ function ListView() {
     });
     setCreating(false);
     if (result.error !== null) {
-      setCreateError(result.error);
+      setCreateError(`Could not create the class: ${result.error.replace(/\.$/, '')}. Nothing was created; try again.`);
     } else {
       setNewName('');
       router.push(`/teacher?class=${result.data.class.id}`);
@@ -2510,7 +2534,7 @@ function ListView() {
                 Cancel
               </button>
             )}
-            {createError && <p style={{ ...S.error, flexBasis: '100%', margin: 0 }}>{createError}</p>}
+            {createError && <p role="alert" style={{ ...S.error, flexBasis: '100%', margin: 0, fontFamily: 'var(--font-prose)', fontSize: 14 }}>{createError}</p>}
           </form>
         )}
       </div>
@@ -2588,14 +2612,14 @@ function ListView() {
                       )}
                       {chips[c.id].behind > 0 && (
                         <a
-                          href={`/teacher/?class=${encodeURIComponent(c.id)}&tab=students`}
+                          href={`/teacher/?class=${encodeURIComponent(c.id)}&tab=students&filter=behind`}
                           onClick={(e) => {
                             if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
                             e.preventDefault();
-                            router.push(`/teacher?class=${c.id}&tab=students`);
+                            router.push(`/teacher?class=${c.id}&tab=students&filter=behind`);
                           }}
                           className="teacher-chip-link"
-                          title="See who is behind on the Students tab"
+                          title="Students with graded work past due and not done. Opens the roster showing only them."
                           style={{ color: 'var(--c-bg)', background: 'var(--c-red)', borderRadius: 10, padding: '4px 8px', fontWeight: 700, textDecoration: 'none' }}
                         >
                           {/* r10 T7: say what is counted. */}
@@ -2672,7 +2696,7 @@ function parseTab(v: string | null): TabId | undefined {
   return TABS.some((t) => t.id === v) ? (v as TabId) : undefined;
 }
 
-function DetailView({ classId, initialTab }: { classId: string; initialTab?: TabId }) {
+function DetailView({ classId, initialTab, initialFilter }: { classId: string; initialTab?: TabId; initialFilter?: 'behind' }) {
   const desktop = useGradingWeightsDesktop();
   const [compact, setCompact] = useState(false);
   useEffect(() => {
@@ -2713,7 +2737,18 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
   // The lesson to open expanded inside the drawer (a chart or quiz from the Today queue, a grid cell).
   const [drawerLesson, setDrawerLesson] = useState<string | null>(null);
   // r7 T6: the roster starts sorted by name A-Z, so a heading always shows which column orders the list.
-  const [rosterSort, setRosterSort] = useState<RosterSort>({ key: 'name', dir: 'asc' });
+  const [rosterSort, setRosterSort] = useState<RosterSort>(initialFilter === 'behind' ? { key: 'missing', dir: 'desc' } : { key: 'name', dir: 'asc' });
+  // ux2 T6: "N students behind" on the class card opens the roster showing exactly those N students.
+  const [rosterFilter, setRosterFilter] = useState<'behind' | null>(initialFilter ?? null);
+  function clearRosterFilter() {
+    setRosterFilter(null);
+    setRosterSort({ key: 'name', dir: 'asc' });
+    try {
+      const u = new URL(window.location.href);
+      u.searchParams.delete('filter');
+      window.history.replaceState(window.history.state, '', u.toString());
+    } catch { /* fine */ }
+  }
   const rosterSortIsDefault = rosterSort?.key === 'name' && rosterSort.dir === 'asc';
 
   // Section tabs. Seeded from ?tab= (or the top-nav "Gradebook" shortcut's ?view=gradebook) on mount only.
@@ -2746,23 +2781,60 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
       row.scrollLeft = Math.max(0, left - 16);
     }
   }, [activeTab, compact, loading]);
+  // ux2 T5: the class tabs' height, so a queue card's sticky header sits just under them; and whether a
+  // grading form has focus, so on a phone the tabs stop sticking while the teacher types (they took ~110px of
+  // the ~500px a keyboard leaves). --kb-inset lifts the sticky Save row above an on-screen keyboard.
+  const tabsRef = useRef<HTMLDivElement | null>(null);
+  const [tabsH, setTabsH] = useState(0);
+  const [grading, setGrading] = useState(false);
+  const [kbInset, setKbInset] = useState(0);
+  useEffect(() => {
+    const el = tabsRef.current;
+    if (!el) return;
+    const sync = () => setTabsH(Math.round(el.getBoundingClientRect().height));
+    sync();
+    const ro = new ResizeObserver(sync);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [loading]);
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const sync = () => setKbInset(Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop)));
+    sync();
+    vv.addEventListener('resize', sync);
+    vv.addEventListener('scroll', sync);
+    return () => { vv.removeEventListener('resize', sync); vv.removeEventListener('scroll', sync); };
+  }, []);
+  const studentNames = useMemo(() => {
+    const out: Record<string, { firstName?: string | null; lastName?: string | null }> = {};
+    for (const [email, p] of progressMap) out[email] = { firstName: p.firstName, lastName: p.lastName };
+    return out;
+  }, [progressMap]);
+
   // Remember the class for next time (the class list and the top-nav Gradebook shortcut offer it first).
   useEffect(() => {
     try { window.localStorage.setItem('shcode:lastClass', classId); } catch { /* private window: fine */ }
   }, [classId]);
 
+  // Only the first load shows "Loading…". A refresh after an action (add a student, bulk enroll, a co-teacher)
+  // keeps the page on screen: blanking it unmounted every panel, so the bulk-enroll result vanished as it
+  // arrived and the teacher lost their place (ux2 T7).
+  const loadedOnce = useRef(false);
   const loadDetail = useCallback(async () => {
-    setLoading(true);
+    if (!loadedOnce.current) setLoading(true);
     setLoadError('');
     const result = await apiFetch<ClassDetail>(`/api/classes/${classId}`);
     if (result.error !== null) {
-      setLoadError(result.error);
+      if (loadedOnce.current) toast(`Could not refresh the class: ${result.error}`, { kind: 'error' });
+      else setLoadError(result.error);
     } else {
+      loadedOnce.current = true;
       setDetail(result.data);
       setCurrentCode(result.data.class.code);
     }
     setLoading(false);
-  }, [classId]);
+  }, [classId, toast]);
 
   useEffect(() => {
     void loadDetail();
@@ -2871,10 +2943,13 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
     );
     setEnrolling(false);
     if (result.error !== null) {
-      if (result.status === 404) setEnrollError('No account found for that email.');
-      else if (result.status === 409) setEnrollError('Already enrolled.');
-      else setEnrollError(result.error);
+      // Say what to do next, not only what went wrong (ux2 T7).
+      if (result.status === 404 && /account/i.test(result.error)) setEnrollError(`No account uses ${enrollEmail.trim()} yet. They need to sign up first. Share the join code ${currentCode}, or add them here after they sign up.`);
+      else if (result.status === 409) setEnrollError(`${enrollEmail.trim()} is already in this class.`);
+      else if (result.status === 400 && /not a student/i.test(result.error)) setEnrollError(`${enrollEmail.trim()} is a teacher account, so it cannot be added as a student. Add them as a co-teacher under Class settings instead.`);
+      else setEnrollError(`Could not add ${enrollEmail.trim()}: ${result.error.replace(/\.$/, '')}. Nothing changed.`);
     } else {
+      toast(`Added ${enrollEmail.trim()} to the class.`);
       setEnrollEmail('');
       void loadDetail();
     }
@@ -2987,13 +3062,26 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
 
   const { class: cls, isOwner, roster, coTeachers } = detail;
   const isArchived = !!cls.archived_at;
+  // ux2 T6: staff on the roster (owner, co-teacher, non-student account) are listed last and never counted.
+  const isStaffRow = (email: string) => progressMap.get(email)?.staff === true;
+  const studentRoster = roster.filter((r) => !isStaffRow(r.student_email));
+  const staffRoster = roster.filter((r) => isStaffRow(r.student_email));
+  const behindRoster = studentRoster.filter((r) => (progressMap.get(r.student_email)?.gradedMissing ?? 0) > 0);
+  const rosterShown = rosterFilter === 'behind'
+    ? sortRosterRows(behindRoster, rosterSort, (e) => progressMap.get(e))
+    : [...sortRosterRows(studentRoster, rosterSort, (e) => progressMap.get(e)), ...staffRoster];
   // r8 T7: when every student has the same number of graded lessons, the heading says it once ("of 149") and
   // each row shows just the count. A class whose totals differ keeps the per-row fractions.
-  const rosterTotals = new Set(roster.map((r) => progressMap.get(r.student_email)?.gradedTotal).filter((n): n is number => typeof n === 'number'));
+  const rosterTotals = new Set(studentRoster.map((r) => progressMap.get(r.student_email)?.gradedTotal).filter((n): n is number => typeof n === 'number'));
   const rosterCommonTotal = rosterTotals.size === 1 ? [...rosterTotals][0] : null;
 
   return (
-    <div className={activeTab === 'gradebook' ? 'teacher-gradebook' : 'teacher-frame'}>
+    <div
+      className={activeTab === 'gradebook' ? 'teacher-gradebook' : 'teacher-frame'}
+      style={{ ['--teacher-tabs-h' as string]: `${grading && compact ? 0 : tabsH}px`, ['--kb-inset' as string]: `${kbInset}px` } as React.CSSProperties}
+      onFocus={(e) => setGrading(!!(e.target as HTMLElement).closest?.('.override-form'))}
+      onBlur={(e) => { if (!(e.relatedTarget as HTMLElement | null)?.closest?.('.override-form')) setGrading(false); }}
+    >
       {/* Back link */}
       {/* r7 T8: a secondary link, so the reading face at 14px, not small mono. */}
       <button
@@ -3038,16 +3126,17 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
       <div
         role="tablist"
         aria-label="Class sections"
+        ref={tabsRef}
         className="teacher-tabs"
         // On a phone the five tabs sit in two rows, all visible: a single scrolling row lost 3-0 to it in the
         // blind panel (Schedule clipped, Class settings out of sight). A 6-track grid: three tabs of two tracks
         // on the first row, two of three on the second, so both rows fill the width and "Class settings" gets
         // the room to stay on one line.
-        style={{ position: 'sticky', top: 0, zIndex: 20, background: 'var(--c-bg)', padding: compact ? '6px 0' : '8px 0', marginBottom: 12, display: compact ? 'grid' : 'flex', gridTemplateColumns: compact ? 'repeat(6, minmax(0, 1fr))' : undefined, gap: compact ? 6 : 8, flexWrap: 'nowrap', overflowX: 'auto', borderBottom: '1px solid var(--c-line)' }}
+        style={{ position: grading && compact ? 'static' : 'sticky', top: 0, zIndex: 20, background: 'var(--c-bg)', padding: compact ? '6px 0' : '8px 0', marginBottom: 12, display: compact ? 'grid' : 'flex', gridTemplateColumns: compact ? 'repeat(6, minmax(0, 1fr))' : undefined, gap: compact ? 6 : 8, flexWrap: 'nowrap', overflowX: 'auto', borderBottom: '1px solid var(--c-line)' }}
       >
         {TABS.map((t, tabIndex) => {
           const on = activeTab === t.id;
-          const badge = t.id === 'today' ? (awaitingCount ?? 0) : t.id === 'students' ? roster.length : 0;
+          const badge = t.id === 'today' ? (awaitingCount ?? 0) : t.id === 'students' ? studentRoster.length : 0;
           return (
             <button
               key={t.id}
@@ -3126,7 +3215,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         {/* Submission Review Queue */}
         <div id="submission-review-queue" style={{ ...S.card, padding: compact ? 16 : '16px 20px', marginBottom: 0, scrollMarginTop: 100 }}>
           <h2 style={{ ...S.h2, fontSize: 18, marginBottom: 8 }}>Submission review queue</h2>
-          <SubmissionQueue classId={classId} lessonTitles={lessonTitles} lessonWeights={lessonWeights} onGraded={() => setGradedTick((t) => t + 1)} />
+          <SubmissionQueue classId={classId} lessonTitles={lessonTitles} lessonWeights={lessonWeights} studentNames={studentNames} onGraded={() => setGradedTick((t) => t + 1)} />
         </div>
         {/* Past due */}
         <div style={{ ...S.card, padding: compact ? 16 : 20, marginBottom: 0 }}>
@@ -3141,7 +3230,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         {/* Roster view */}
           <div className={compact ? 'roster-panel is-compact' : 'roster-panel'} style={{ ...S.card, padding: compact ? 16 : 20, marginBottom: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 4 }}>
-            <h2 style={{ ...S.h2, fontSize: 18, lineHeight: '26px', marginBottom: 0 }}>Roster ({roster.length})</h2>
+            <h2 style={{ ...S.h2, fontSize: 18, lineHeight: '26px', marginBottom: 0 }}>Roster ({studentRoster.length})</h2>
             <button
               type="button"
               // A utility, not the page's action: outlined and quiet, so each row's Open is what reads as the action.
@@ -3151,7 +3240,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
               disabled={roster.length === 0 || progressMap.size === 0}
               title="One row per student: the grade so far, how many graded lessons are done and past due, and a column per grade category. Ready to copy into a spreadsheet or the grade book."
               onClick={() => {
-                const csv = buildGradesCsv(roster.map((r) => {
+                const csv = buildGradesCsv(studentRoster.map((r) => {
                   const p = progressMap.get(r.student_email);
                   return {
                     email: r.student_email,
@@ -3165,12 +3254,24 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                     categories: p?.categories,
                   };
                 }));
-                downloadCsv(csv, `grades-${cls.name.replace(/\s+/g, '-')}-${schoolDateString(Date.now())}.csv`);
+                const file = `grades-${cls.name.replace(/\s+/g, '-')}-${schoolDateString(Date.now())}.csv`;
+                downloadCsv(csv, file);
+                toast(`Downloaded ${file}: one row per student with the grade so far.`);
               }}
             >
               Download grades (CSV)
             </button>
           </div>
+            {/* ux2 T6: the class card's "N students behind" lands here showing exactly those students. */}
+            {rosterFilter === 'behind' && (
+              <div role="status" className="roster-filter-note">
+                <span>
+                  Showing the {behindRoster.length} student{behindRoster.length === 1 ? '' : 's'} with graded work past due and not done,
+                  most past due first.
+                </span>
+                <button type="button" className="sq-score-use" onClick={clearRosterFilter}>Show everyone</button>
+              </div>
+            )}
             {roster.length === 0 ? (
               <p style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 15 }}>No students enrolled yet.</p>
             ) : (
@@ -3217,8 +3318,9 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                 {/* Desktop: 20px name + 18px email + 12px padding + 1px border = 51px.
                     Phone: row 1 = name + grade, row 2 = counts on one line + Open and a compact More
                     (about 64px). Putting Open/More on the name row stranded the grade below them (lost 3-0). */}
-                {sortRosterRows(roster, rosterSort, (e) => progressMap.get(e)).map((row) => {
+                {rosterShown.map((row) => {
                   const prog = progressMap.get(row.student_email);
+                  const staffRow = prog?.staff === true;
                   // A stale or older response can lack weightedPercent; a NaN
                   // here would render "NaN% of grade", so fall back to 0.
                   const wp = prog && Number.isFinite(prog.weightedPercent) ? prog.weightedPercent : 0;
@@ -3234,6 +3336,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                       <div role={compact ? undefined : 'cell'} style={{ minWidth: 0, gridColumn: compact ? '1 / -1' : undefined, gridRow: compact ? 1 : undefined, paddingRight: compact ? 64 : undefined, fontFamily: 'var(--font-prose)' }} title={`Enrolled ${fmt(row.enrolled_at)} by ${row.enrolled_by ?? 'self'}`}>
                         <div style={{ fontSize: compact ? 16 : 15, lineHeight: compact ? '22px' : '20px', fontWeight: compact ? 700 : 600, color: 'var(--c-fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fullName(prog?.firstName, prog?.lastName) ?? row.student_email}</div>
                         {!compact && <div style={{ color: 'var(--c-meta)', fontSize: 13, lineHeight: '18px', marginTop: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.student_email}</div>}
+                        {staffRow && <div className="roster-staff-note">Teacher account: not counted in the class numbers</div>}
                       </div>
                       <div role={compact ? undefined : 'cell'} title="Grade so far, under this class's weights" style={{ gridColumn: compact ? '1 / -1' : undefined, gridRow: compact ? 1 : undefined, justifySelf: compact ? 'end' : undefined, display: 'flex', alignItems: compact ? 'baseline' : 'center', justifyContent: compact ? 'flex-end' : undefined, gap: compact ? 6 : 10, whiteSpace: 'nowrap', lineHeight: compact ? '22px' : '22px' }}>
                         {/* The coloured number is the grade; completion is the "Graded done" column (on a phone, the
@@ -3241,7 +3344,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                             number carries its own label under it, since there is no column header above it. */}
                         {/* Phone: one line, the label in meta before the number ("Grade so far 100%"). */}
                         {compact && <span className="sr-only">Grade so far </span>}
-                        <strong style={{ color: prog?.gradedCounted ? countedGradeColor(wp) : 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: compact ? 16 : 15, fontVariantNumeric: 'tabular-nums', minWidth: compact ? undefined : 44, textAlign: 'right' }}>{prog?.gradedCounted ? `${wp}%` : '—'}</strong>
+                        <strong style={{ color: prog?.gradedCounted && !staffRow ? countedGradeColor(wp) : 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: compact ? 16 : 15, fontVariantNumeric: 'tabular-nums', minWidth: compact ? undefined : 44, textAlign: 'right' }}>{prog?.gradedCounted && !staffRow ? `${wp}%` : '—'}</strong>
                       </div>
                       <div role={compact ? undefined : 'cell'} style={{ gridColumn: compact ? 1 : undefined, gridRow: compact ? 2 : undefined, minWidth: 0, display: 'flex', flexWrap: compact ? 'wrap' : 'nowrap', overflow: compact ? undefined : 'hidden', gap: compact ? '4px 4px' : 8, lineHeight: '18px', fontFamily: 'var(--font-prose)', fontSize: compact ? 13 : 14, color: compact ? 'var(--c-meta)' : 'var(--c-fg)', fontVariantNumeric: 'tabular-nums' }}>
                         {/* r8 T1: on a phone the two counts are one quiet meta line, "7/149 graded · 6 past due",
@@ -3309,12 +3412,12 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
               {enrolling ? 'Adding…' : 'Add student'}
             </button>
           </form>
-          {enrollError && <p style={S.error}>{enrollError}</p>}
+          {enrollError && <p role="alert" style={{ ...S.error, fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.5, maxWidth: '70ch' }}>{enrollError}</p>}
         </div>
         {/* Bulk enroll */}
         <div style={S.card}>
           <h2 style={S.h2}>Bulk enroll</h2>
-          <BulkEnrollmentForm classId={classId} onDone={() => { void loadDetail(); }} />
+          <BulkEnrollmentForm classId={classId} joinCode={currentCode} onDone={() => { void loadDetail(); }} />
         </div>
         {/* Textures and sounds students shared with this class (#81) */}
         <div style={S.card}>
@@ -3523,7 +3626,7 @@ function TeacherPageInner() {
     <FeedbackProvider>
       <div style={S.page}>
         {classId ? (
-          <DetailView classId={classId} initialTab={parseTab(params.get('tab')) ?? (wantsGradebook ? 'gradebook' : undefined)} />
+          <DetailView classId={classId} initialTab={parseTab(params.get('tab')) ?? (wantsGradebook ? 'gradebook' : undefined)} initialFilter={params.get('filter') === 'behind' ? 'behind' : undefined} />
         ) : wantsGradebook ? (
           <GradebookRedirect />
         ) : (

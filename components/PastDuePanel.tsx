@@ -9,6 +9,7 @@
 
 import { useEffect, useState } from 'react';
 import { formatDue } from '../lib/due-dates';
+import { errorText } from '../lib/http-error';
 
 interface OverdueLesson {
   lessonId: string;
@@ -18,6 +19,8 @@ interface OverdueLesson {
 
 interface StudentRow {
   email: string;
+  firstName?: string | null;
+  lastName?: string | null;
   pastDue: number;
   lessons: OverdueLesson[];
   truncated: boolean;
@@ -44,8 +47,7 @@ export default function PastDuePanel({ classId }: { classId: string }) {
         const res = await fetch(`/api/classes/${classId}/past-due`, { credentials: 'same-origin' });
         if (!alive) return;
         if (!res.ok) {
-          const body = (await res.json().catch(() => ({}))) as { error?: string };
-          setError(body.error ?? `HTTP ${res.status}`);
+          setError(`Could not load who is behind: ${(await errorText(res)).replace(/\.$/, '')}.`);
           return;
         }
         setData((await res.json()) as PastDueData);
@@ -73,10 +75,11 @@ export default function PastDuePanel({ classId }: { classId: string }) {
 
   return (
     <div>
-      <p style={{ color: C.dim, fontSize: 13, margin: '0 0 12px 0' }}>
-        {data.lessonCount} lesson{data.lessonCount === 1 ? '' : 's'} past due ·{' '}
-        {behind.length} of {data.students.length} student{data.students.length === 1 ? '' : 's'} behind.
-        Nothing is locked; this is a reporting view only.
+      {/* ux2 T6: the same count as the roster's Past due column and the class card (graded lessons only). */}
+      <p style={{ color: C.dim, fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.5, margin: '0 0 12px 0', maxWidth: '70ch' }}>
+        {behind.length} of {data.students.length} student{data.students.length === 1 ? '' : 's'} behind: graded work past due
+        and not done ({data.lessonCount} graded lesson{data.lessonCount === 1 ? ' has' : 's have'} passed {data.lessonCount === 1 ? 'its' : 'their'} due date).
+        Readings and slides are not counted. Nothing is locked.
       </p>
 
       {behind.length === 0 ? (
@@ -87,15 +90,16 @@ export default function PastDuePanel({ classId }: { classId: string }) {
             <button
               type="button"
               onClick={() => setOpen(open === student.email ? null : student.email)}
+              aria-expanded={open === student.email}
               style={{
                 background: 'none', border: 'none', color: C.text, cursor: 'pointer',
                 display: 'flex', alignItems: 'center', gap: 12, padding: 0, width: '100%',
                 fontSize: 13, fontFamily: 'inherit', textAlign: 'left',
               }}
             >
-              <span style={{ flex: 1 }}>{student.email}</span>
+              <span style={{ flex: 1 }}>{[student.firstName, student.lastName].filter(Boolean).join(' ') || student.email}</span>
               <span style={{ color: C.late, fontWeight: 600 }}>
-                {student.pastDue} past due
+                {student.pastDue} graded past due
               </span>
             </button>
 

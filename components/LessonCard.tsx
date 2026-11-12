@@ -90,6 +90,10 @@ export default function LessonCard({ lesson, lockedForStudent = false }: Props) 
           </span>
         )}
         <h3 className="font-semibold text-text">{lesson.title}</h3>
+        {/* The stripe alone did not say it (ux2 S9): the student's own state, in words, as the module page shows it. */}
+        {lessonState === 'completed' || lessonState === 'started' ? (
+          <span className={`lesson-card-state is-${lessonState}`}>{lessonState === 'completed' ? '✓ Done' : 'In progress'}</span>
+        ) : null}
         {!pBadge && (
           <span
             className="lesson-type-badge"

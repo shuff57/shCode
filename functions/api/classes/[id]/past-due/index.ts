@@ -1,5 +1,5 @@
 // GET /api/classes/[id]/past-due
-//   -> { asOf, lessonCount, students: [{ email, pastDue, lessons: [...] }] }
+//   -> { asOf, lessonCount, scope: 'graded', students: [{ email, firstName, lastName, pastDue, lessons: [...] }] }
 //
 // Teacher-only. Which students are behind, and on what.
 //
@@ -16,8 +16,11 @@
 // endpoint is the live picture.
 
 import { canManageClass } from '../../../../_shared/classAuth';
-import { loadClassDueRows, loadLessonScopeMap } from '../../../../_shared/dueDates';
+import { classStaffEmails, withoutStaff } from '../../../../_shared/classStaff';
+import { loadClassDueRows, loadClassDueWaivers, loadLessonScopeMap } from '../../../../_shared/dueDates';
+import { loadClassWeights, studentGrading } from '../../../../_shared/grading';
 import { buildDueIndex, resolveDueAt } from '../../../../../lib/due-dates-core';
+import { lessonGradeCategory } from '../../../../../lib/grading-weights';
 
 interface Env {
   DB: D1Database;
@@ -32,10 +35,17 @@ const MAX_LESSONS_LISTED = 12;
 
 interface StateRow {
   student_email: string;
-  lesson_id: string | null;
-  state: string | null;
+  lesson_id: string;
+  state: 'started' | 'completed';
+  score: number | null;
 }
 
+// ux2 T6: "past due" means ONE thing on every teacher screen: GRADED lessons whose due date has passed and
+// that the student has not finished, minus waived ones. That is studentGrading()'s missingIds, the number the
+// roster, the drawer, the gradebook and the class card already show, so this list is read from the same call
+// instead of a second rule. (It used to count every lesson, readings and slides included: "97 lessons past
+// due" here against "6 past due" on the roster for the same student.) Staff accounts on the roster (the
+// owner, a co-teacher, a non-student role) are left out (functions/_shared/classStaff.ts).
 export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (context: Ctx) => {
   const { request, env, data, params } = context;
   const classId = params.id;
@@ -47,61 +57,79 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
 
   const now = Date.now();
   const rows = await loadClassDueRows(env.DB, classId);
-  if (rows.length === 0) return json({ asOf: now, lessonCount: 0, students: [] });
+  if (rows.length === 0) return json({ asOf: now, lessonCount: 0, scope: 'graded', students: [] });
 
   const scopeMap = await loadLessonScopeMap(env, request);
-  if (!scopeMap) return json({ asOf: now, lessonCount: 0, students: [], warning: 'Lesson manifest unavailable' });
+  if (!scopeMap) return json({ asOf: now, lessonCount: 0, scope: 'graded', students: [], warning: 'Lesson manifest unavailable' });
 
   const index = buildDueIndex(rows);
 
-  // Every lesson whose deadline has already passed, earliest first.
-  const overdue: { lessonId: string; title: string; dueAt: number }[] = [];
+  // Every GRADED lesson whose deadline has already passed (class-wide, before waivers), earliest first.
+  const overdue = new Map<string, { lessonId: string; title: string; dueAt: number }>();
   for (const [lessonId, scope] of scopeMap) {
+    if (lessonGradeCategory({ title: scope.title, preview: scope.preview, scoreKind: scope.scoreKind, assignmentCode: scope.assignmentCode }) === null) continue;
     const dueAt = resolveDueAt(index, { lessonId, moduleId: scope.moduleId, unitId: scope.unitId });
-    if (dueAt !== null && dueAt < now) overdue.push({ lessonId, title: scope.title, dueAt });
+    if (dueAt !== null && dueAt <= now) overdue.set(lessonId, { lessonId, title: scope.title, dueAt });
   }
-  overdue.sort((a, b) => a.dueAt - b.dueAt);
+  if (overdue.size === 0) return json({ asOf: now, lessonCount: 0, scope: 'graded', students: [] });
 
-  if (overdue.length === 0) return json({ asOf: now, lessonCount: 0, students: [] });
+  const roster = await env.DB
+    .prepare('SELECT student_email FROM enrollments WHERE class_id = ? AND expires_at > ?')
+    .bind(classId, now)
+    .all<{ student_email: string }>();
+  const staff = await classStaffEmails(env.DB, classId);
+  const emails = withoutStaff(roster.results ?? [], staff).map((r) => r.student_email);
 
-  // One query for the whole roster. LEFT JOIN so a student with no
-  // lesson_state rows at all still appears — they are the most behind.
-  const result = await env.DB
+  const stateResult = await env.DB
     .prepare(
-      `SELECT e.student_email, ls.lesson_id, ls.state
-         FROM enrollments e
-         LEFT JOIN lesson_state ls ON ls.student_email = e.student_email
+      `SELECT ls.student_email, ls.lesson_id, ls.state, ls.score
+         FROM lesson_state ls
+         JOIN enrollments e ON e.student_email = ls.student_email
         WHERE e.class_id = ? AND e.expires_at > ?`,
     )
     .bind(classId, now)
     .all<StateRow>();
-
-  const completedBy = new Map<string, Set<string>>();
-  const roster = new Set<string>();
-  for (const row of result.results ?? []) {
-    roster.add(row.student_email);
-    if (row.state === 'completed' && row.lesson_id) {
-      let set = completedBy.get(row.student_email);
-      if (!set) { set = new Set(); completedBy.set(row.student_email, set); }
-      set.add(row.lesson_id);
-    }
+  const statesBy = new Map<string, StateRow[]>();
+  for (const r of stateResult.results ?? []) {
+    const list = statesBy.get(r.student_email);
+    if (list) list.push(r);
+    else statesBy.set(r.student_email, [r]);
   }
+  const names = await env.DB
+    .prepare(
+      `SELECT email, first_name, last_name FROM students WHERE email IN (
+         SELECT student_email FROM enrollments WHERE class_id = ? AND expires_at > ?)`,
+    )
+    .bind(classId, now)
+    .all<{ email: string; first_name: string | null; last_name: string | null }>();
+  const nameOf = new Map((names.results ?? []).map((n) => [n.email, n]));
+  const weights = await loadClassWeights(env.DB, classId);
+  const waivers = await loadClassDueWaivers(env.DB, classId);
 
-  const students = [...roster].map((email) => {
-    const done = completedBy.get(email) ?? new Set<string>();
-    const missing = overdue.filter((l) => !done.has(l.lessonId));
+  const students = emails.map((email) => {
+    const g = studentGrading(scopeMap, statesBy.get(email) ?? [], weights, {
+      index,
+      waived: waivers.get(email) ?? new Set<string>(),
+      now,
+    });
+    const missing = g.missingIds
+      .map((id) => overdue.get(id))
+      .filter((l): l is { lessonId: string; title: string; dueAt: number } => !!l)
+      .sort((a, b) => a.dueAt - b.dueAt);
     return {
       email,
-      pastDue: missing.length,
+      firstName: nameOf.get(email)?.first_name ?? null,
+      lastName: nameOf.get(email)?.last_name ?? null,
+      pastDue: g.missingCount,
       lessons: missing.slice(0, MAX_LESSONS_LISTED),
-      truncated: missing.length > MAX_LESSONS_LISTED,
+      truncated: g.missingCount > MAX_LESSONS_LISTED,
     };
   });
 
   // Most behind first; ties alphabetical so the order is stable between loads.
   students.sort((a, b) => (b.pastDue - a.pastDue) || a.email.localeCompare(b.email));
 
-  return json({ asOf: now, lessonCount: overdue.length, students });
+  return json({ asOf: now, lessonCount: overdue.size, scope: 'graded', students });
 };
 
 function json(body: unknown, status = 200): Response {
