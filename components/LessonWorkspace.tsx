@@ -3,9 +3,11 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import type { ChangeEvent } from 'react';
 import dynamic from 'next/dynamic';
 import type { Lesson } from '../lib/types';
-import { useLessonStore, flattenFiles } from '../lib/store';
+import { useLessonStore, flattenFiles, saveOpenDraft } from '../lib/store';
 import { buildPreviewHtml } from '../lib/preview-builder';
 import { saveProgress, normalizeEol } from '../lib/version-control';
+import { createDebouncedSave, type DebouncedSave } from '../lib/draft-autosave';
+import { OWNER_MISMATCH_HANDIN_TEXT, ownerMismatched } from '../lib/owner-fetch';
 import { seedPlan } from '../lib/plan-seed';
 import { fetchSubmissions, recordSubmission, saveDraft, streamGrade } from '../lib/written-grader-store';
 import { classifyGradeFailure, gradeFailureMessage } from '../lib/grade-error';
@@ -42,6 +44,7 @@ import TeacherPushBanner from './TeacherPushBanner';
 import { useCloudWorkspace } from '../lib/lesson-sync';
 import { addLocalSnapshot } from '../lib/local-history';
 import CarryForwardBanner from './CarryForwardBanner';
+import GuestWorkOffer from './GuestWorkOffer';
 import DocsDrawer from './DocsDrawer';
 import TextureEditor from './TextureEditor';
 import SoundMixer from './SoundMixer';
@@ -737,22 +740,32 @@ export default function LessonWorkspace({
   // Auto-save to localStorage (debounced). Skipped while the reference
   // solution is loaded so an admin/teacher reviewing it can't accidentally
   // overwrite their own draft.
+  // A pending save is FLUSHED, never dropped, when the lesson unmounts or the page
+  // hides (lib/draft-autosave.ts): every write lands in the keys of the owner this
+  // page loaded with (lib/owned-storage.ts), so it can never reach someone else's.
+  const autosaveLessonId = useRef(lesson.id);
+  autosaveLessonId.current = lesson.id;
+  const autosave = useRef<DebouncedSave | null>(null);
+  if (autosave.current === null) {
+    autosave.current = createDebouncedSave(() => { saveOpenDraft(autosaveLessonId.current); }, 2000);
+  }
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (solutionLoaded) return;
-    const timer = setTimeout(() => {
-      const state = useLessonStore.getState();
-      if (state.lesson) {
-        saveProgress(state.lesson.id, {
-          fileContents: state.fileContents,
-          commits: state.commits,
-          lastCommittedFileContents: state.lastCommittedFileContents,
-          completedSteps: [],
-        });
-      }
-    }, 2000);
-    return () => clearTimeout(timer);
+    if (solutionLoaded) { autosave.current?.cancel(); return; }
+    autosave.current?.schedule();
   }, [files, commits, solutionLoaded]);
+  useEffect(() => {
+    const saver = autosave.current;
+    const onHide = () => { if (document.visibilityState === 'hidden') saver?.flush(); };
+    const onPageHide = () => saver?.flush();
+    document.addEventListener('visibilitychange', onHide);
+    window.addEventListener('pagehide', onPageHide);
+    return () => {
+      document.removeEventListener('visibilitychange', onHide);
+      window.removeEventListener('pagehide', onPageHide);
+      saver?.flush();
+    };
+  }, []);
 
   // The shortcut effect below registers once ([] deps), so it would call the
   // runTests closure from the first render forever -- grading a reSHape
@@ -1089,7 +1102,7 @@ export default function LessonWorkspace({
         possible: gradeReport.totalPossible,
       });
       if (!ok) {
-        alert('Submission could not be recorded on the server. Please reload and try again.');
+        alert(ownerMismatched() ? OWNER_MISMATCH_HANDIN_TEXT : 'Submission could not be recorded on the server. Please reload and try again.');
         return;
       }
       // Best try counts; the lesson_state upsert also refuses to lower it.
@@ -1315,6 +1328,7 @@ export default function LessonWorkspace({
   return (
     <>
       <TeacherPushBanner />
+      <GuestWorkOffer lesson={lesson} />
       <CarryForwardBanner lesson={lesson} />
       <TabbedRightDrawer
         storageKey="shCode:drawer"

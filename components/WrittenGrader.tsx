@@ -26,6 +26,8 @@ import { useRepairLoop } from '../lib/use-attempt-cap';
 import CodeMirrorPane from './CodeMirrorPane';
 import dynamic from 'next/dynamic';
 import { withAlpha } from '../lib/color-alpha';
+import { loadWrittenRecord, saveWrittenRecord, type WrittenRecord } from '../lib/work-records';
+import { OWNER_MISMATCH_HANDIN_TEXT } from '../lib/owner-fetch';
 
 // The editor engine is a few hundred kB; only the parts that set `formatting` download it.
 const RichAnswerEditor = dynamic(() => import('./RichAnswerEditor'), {
@@ -100,39 +102,12 @@ function bestGradedTry(records: SubmissionRecord[]): GradeResult | null {
   return best;
 }
 
-const STORAGE_PREFIX = 'shCode:written:';
-const LEGACY_STORAGE_PREFIX = 'shCode_writtenGrader:';
-
-interface StoredState {
-  response: string;
-  lastResult?: GradeResult;
-  lastSubmittedAt?: number;
-}
-
-function loadState(lessonId: string): StoredState {
-  // One-time migration from the legacy key so in-progress drafts survive.
-  try {
-    const legacyKey = LEGACY_STORAGE_PREFIX + lessonId;
-    const legacy = localStorage.getItem(legacyKey);
-    if (legacy !== null) {
-      if (localStorage.getItem(STORAGE_PREFIX + lessonId) === null) {
-        localStorage.setItem(STORAGE_PREFIX + lessonId, legacy);
-      }
-      localStorage.removeItem(legacyKey);
-    }
-  } catch {}
-
-  try {
-    const raw = localStorage.getItem(STORAGE_PREFIX + lessonId);
-    if (raw) return JSON.parse(raw);
-  } catch {}
-  return { response: '' };
-}
-
+// This browser's copy lives under the page's owner (`w1:<owner>:written:<lessonId>`,
+// lib/work-records.ts). The older unprefixed keys are set aside by lib/owned-storage.ts.
+type StoredState = WrittenRecord<GradeResult>;
+const loadState = (lessonId: string): StoredState => loadWrittenRecord<GradeResult>(lessonId);
 function saveState(lessonId: string, state: StoredState) {
-  try {
-    localStorage.setItem(STORAGE_PREFIX + lessonId, JSON.stringify(state));
-  } catch {}
+  saveWrittenRecord<GradeResult>(lessonId, state);
 }
 
 // totalPossible === 0 ⇒ pass/fail rubric (all rubric points are 0). Pass when
@@ -434,6 +409,12 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
         }));
         await recordFailedAttempt(reason, res.status);
         await refreshAttempts();
+        return;
+      }
+      if (status === 409 && (data as { error?: string } | null)?.error === 'owner-mismatch') {
+        // Someone else signed in on this computer after this page opened. Nothing was
+        // handed in (functions/_middleware.ts); not a grader failure, so not recorded.
+        setError(OWNER_MISMATCH_HANDIN_TEXT);
         return;
       }
       if (data && !data.ok && (data as { capReached?: boolean }).capReached === true) {

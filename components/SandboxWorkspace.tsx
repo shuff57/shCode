@@ -7,7 +7,8 @@ import type { Extension } from '@codemirror/state';
 import { useLessonStore } from '../lib/store';
 import { saveProgress } from '../lib/version-control';
 import { useCloudWorkspace } from '../lib/lesson-sync';
-import { TOGETHER_COPY, addLocalSnapshot } from '../lib/local-history';
+import { TOGETHER_COPY, addLocalSnapshot, keepInHistory } from '../lib/local-history';
+import { registerFlush } from '../lib/draft-autosave';
 import { useLessonState } from '../lib/progress';
 import CodeEditor from './CodeEditor';
 import HistoryPanel from './HistoryPanel';
@@ -141,9 +142,9 @@ export default function SandboxWorkspace() {
   const [collabExt, setCollabExt] = useState<Extension | null>(null);
   const cloudRef = useRef(cloud);
   cloudRef.current = cloud;
-  const togetherSnapshot = useCallback((label: string) => {
-    addLocalSnapshot(lesson.id, useLessonStore.getState().fileContents, label);
-  }, [lesson.id]);
+  const togetherSnapshot = useCallback((label: string) => (
+    keepInHistory(lesson.id, useLessonStore.getState().fileContents, label)
+  ), [lesson.id]);
   // Leaving (or the host ending it) keeps the shared program as this student's
   // own draft, through the same path as Save, so it reaches Cloud history too.
   const keepTogetherCopy = useCallback(() => {
@@ -282,7 +283,9 @@ export default function SandboxWorkspace() {
     const timer = setTimeout(save, 800);
     const onHide = () => { if (document.visibilityState === 'hidden') save(); };
     document.addEventListener('visibilitychange', onHide);
+    const offFlush = registerFlush(save);
     return () => {
+      offFlush();
       clearTimeout(timer);
       document.removeEventListener('visibilitychange', onHide);
     };

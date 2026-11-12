@@ -13,7 +13,7 @@
 
 import { useEffect, useState } from 'react';
 import DiagramBlock from './DiagramBlock';
-import { STARTER_PICKED, STARTER_REQUESTED, starterKey } from '../lib/starter-variants';
+import { STARTER_PICKED, STARTER_REQUESTED, rememberedStarterId } from '../lib/starter-variants';
 
 interface Props {
   lessonId: string;
@@ -42,10 +42,8 @@ export default function LabPlanChart({ lessonId, mermaid, caption, variants }: P
   // (a lesson whose charts are not per problem) changes nothing.
   useEffect(() => {
     const has = (id: string | null | undefined) => !!id && !!variants?.some((v) => v.id === id);
-    try {
-      const r = localStorage.getItem(starterKey(lessonId));
-      if (has(r)) setPicked(r as string);
-    } catch { /* private mode: the chart keeps its default */ }
+    const r = rememberedStarterId(lessonId);
+    if (has(r)) setPicked(r as string);
     const onPick = (e: Event) => {
       const d = (e as CustomEvent<{ lessonId: string; id: string }>).detail;
       if (d?.lessonId === lessonId && has(d.id)) setPicked(d.id);

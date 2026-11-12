@@ -99,6 +99,12 @@ export interface DocSyncOptions {
   /** A cursor asked for while this editor's own typing was unconfirmed can be sent now, or someone's typing moved this caret. */
   wantCursor?: () => void;
   now?: () => number;
+  /**
+   * Asked once, right before the room's text first replaces what is in the editor: keep
+   * the editor's own text somewhere safe and answer true. On false nothing is replaced
+   * and collab is never installed (the caller leaves the session).
+   */
+  keepBeforeReplace?: (() => boolean) | null;
 }
 
 const quiet = [Transaction.addToHistory.of(false), Transaction.remote.of(true)];
@@ -122,6 +128,9 @@ export class DocSync {
   /** The room's text and version while collab is not installed yet. */
   private base: { doc: Text; version: number } | null = null;
   private awaitingSeed = false;
+  /** The first replacement of the editor's own text has happened (or was refused). */
+  private replacedOnce = false;
+  private refused = false;
   private inFlightAt = 0;
   /**
    * The room's accepted updates this editor applied, in order: `items[i]`
@@ -439,8 +448,13 @@ export class DocSync {
   private install() {
     const ed = this.ed;
     const b = this.base;
-    if (!ed || !b || this.awaitingSeed || this.installed) return;
+    if (!ed || !b || this.awaitingSeed || this.installed || this.refused) return;
     if (ed.state.doc.toString() !== b.doc.toString()) {
+      if (!this.replacedOnce && this.opts.keepBeforeReplace && !this.opts.keepBeforeReplace()) {
+        this.refused = true;
+        return;
+      }
+      this.replacedOnce = true;
       ed.dispatch({ changes: { from: 0, to: ed.state.doc.length, insert: b.doc }, annotations: quiet, filter: false });
     }
     ed.dispatch({ effects: this.inner.reconfigure([
@@ -448,6 +462,7 @@ export class DocSync {
       charAuthor.of((state, pos) => this.localAuthor(state, pos)),
     ]) });
     this.installed = true;
+    this.replacedOnce = true; // later swaps are the room's own text (a reset), not the student's
     this.base = null;
     this.placePending();
     this.cursorNowSendable();
@@ -744,6 +759,8 @@ export interface LiveDocClientOptions {
   onStatus: (s: DocStatus) => void;
   /** The session is over for this tab (the editor goes back to being yours). */
   onEnded: (e: DocEnded) => void;
+  /** See DocSyncOptions.keepBeforeReplace. */
+  keepBeforeReplace?: (() => boolean) | null;
 }
 
 export class LiveDocClient {
@@ -775,6 +792,7 @@ export class LiveDocClient {
     this.sync = new DocSync({
       send: (m) => this.send(m), wantPush: () => this.schedulePush(), onRewound: () => this.calm(REWOUND),
       wantCursor: () => this.sendCursorSoon(),
+      keepBeforeReplace: opts.keepBeforeReplace ?? null,
     });
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const client = this;

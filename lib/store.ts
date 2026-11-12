@@ -398,3 +398,20 @@ export const useLessonStore = create<LessonState>((set, get) => ({
     return Object.entries(idMap).find(([, fileId]) => fileId === id)?.[0];
   },
 }));
+
+/**
+ * Write the open lesson's draft, if the store is still showing `lessonId` (after a
+ * switch it holds another lesson, whose own workspace saves it). The lab autosave
+ * (components/LessonWorkspace.tsx, lib/draft-autosave.ts) calls this, and so does
+ * scripts/test-owned-storage.mjs. The write lands in the page owner's keys.
+ */
+export function saveOpenDraft(lessonId: string): 'ok' | 'full' | 'blocked' | 'skipped' {
+  const state = useLessonStore.getState();
+  if (!state.lesson || state.lesson.id !== lessonId) return 'skipped';
+  return saveProgress(state.lesson.id, {
+    fileContents: state.fileContents,
+    commits: state.commits,
+    lastCommittedFileContents: state.lastCommittedFileContents,
+    completedSteps: [],
+  });
+}

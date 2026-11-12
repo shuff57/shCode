@@ -137,7 +137,7 @@ no longer walks `lessons/_retired/` -- it had been shipping the retired JSCAD
 starters into the Pages Functions worker. `scripts/drive-phase-b.py` section 4
 drives the studio's Export STL/OBJ/3MF buttons instead of the runner's Save
 bar. Kept on purpose: the `/docs/jscad/*` redirects, the `sandbox-jscad*`
-localStorage rename in `lib/version-control.ts`, `.gauntlet/oracle.json`, and
+localStorage rename (retired with per-account storage: old drafts are set aside, see "Work kept in this browser"), `.gauntlet/oracle.json`, and
 the comments that compare kernel results with the old engine.
 
 ### Where the line already falls
@@ -351,7 +351,7 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   `sandbox-reshape`, `sandbox-flow`), so Save writes a `lesson_sync` row (and a
   Cloud history row) and arrival merges another device's copy, exactly as a
   lesson does. The ids are absent from `lessons-manifest.json`, so
-  `isLessonAccessible` fails open. localStorage remains the offline draft.
+  `isLessonAccessible` fails open. The browser copy (`w1:<owner>:progress:<id>`) remains the offline draft.
 - Teacher pushes to a student's pool stamp `authored_by_email = session.email`
   server-side; clients cannot set it. Legacy NULLs coerce to `student_email`.
 - **CODY** (Code. Optimizer. Development. Yielder.) is the student-facing name of the `/api/ai-help` tutor. In the free sandbox (`lessonId` `sandbox-js|moshion|reshape`, code mode only) it answers directly with code blocks up to 15 lines but never writes the whole program (#83, `isSandboxHelp` in `functions/api/ai-help.ts`); code that carries `// STEP` comments, a `// 5.3.4`-style lesson header or "reference solution" is pasted course work and gets the hint-only rules, decided server-side because the lesson id is client-supplied. On Workers AI (the `AI` binding) students have no per-student cap and get `X-RateLimit-Unlimited: 1`; the UI hides the "helps left" line. The per-student per-unit quota below applies only on the Ollama fallback. The global ceiling counts both.
@@ -452,6 +452,54 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   `scripts/test-quiz-unsubmit.mjs` (wired into `npm test`), which drives the real
   handler against a D1 stub.
 
+### Work kept in this browser, per account (no migration; design `.ui-hill-climb/ux1/option2-design.md`, stage 1)
+- **Every personal browser key goes through `lib/owned-storage.ts`** and is named `w1:<owner>:<key>` (drafts
+  `progress:<id>`, `sync:<id>`, `quiz:`, `written:`, `diagram:`, `flowblock:`, `liveBlock:`, `starter:`,
+  `carry-dismissed:`, `local-history`, `sandbox-game`, `moshion-store`, `library-*`; quiz/written/diagram through
+  `lib/work-records.ts`). `<owner>` is the readable cookie `shcode_owner`, or `guest` when there is none.
+  `scripts/test-owned-storage-keys.mjs` fails on any raw storage use (calls, `window['localStorage']`,
+  destructuring, `Storage.prototype`, the bare string) outside its non-personal allowlist (prefs, drawer, tabs, last
+  class, What's new, ...): a new personal key uses `ownedLocal`.
+- **The owner id needs no database:** base32 of HMAC-SHA256(`AUTH_SECRET`, `"work-owner:" + normalizeEmail(email)`),
+  16 chars (`workOwnerFor` in `functions/_shared/auth.ts`), also the JWT's `wo` claim. Login and signup set the cookie
+  and logout clears it in the same response as the session cookie; the middleware sets it on a page load (re-signing
+  an older session with `wo`, keeping its end) and on any `/api/*` answer while the browser lacks it. Known limits:
+  an account whose email changes, or every account after `AUTH_SECRET` is rotated, gets a NEW namespace; the old
+  work stays on that computer, shown to nobody.
+- **The namespaces are not encryption.** They stop the app from showing, handing in or uploading another account's
+  work. Everything is plain text in localStorage, and anyone with the browser's developer tools on that computer can
+  read every namespace. Signing out is still what protects a shared computer.
+- **A page reads the owner once, at load, and never changes it.** No "current owner" marker, nothing moved or cleared
+  when the person changes, no storage events or channels. Sign-in and sign-out reload the page (`AuthButton`). A
+  pending lab or Try-it save is flushed (never dropped) on unmount and page hide (`lib/draft-autosave.ts`). A page
+  that loaded as `guest` but finds (GET `/api/me`) that it is signed in runs every waiting save and reloads once
+  (`lib/owner-guard.ts`; loop guard `shcode.ownerReload` in sessionStorage; no reload if a save failed). Nothing is
+  moved, removed or refused: what was typed before the reload stays under `guest`, and a lab is offered back after
+  the reload like any work typed signed out.
+- **Every `/api/*` request carries `X-Work-Owner`** (`lib/owner-fetch.ts`, installed by `components/OwnerNotices.tsx`
+  in the root layout; not on `/api/auth/*` or GET `/api/me`). The middleware answers a mismatch with 409
+  `{error:'owner-mismatch'}` + `X-Owner-Mismatch: 1` and runs nothing; no header (an old bundle) is accepted as
+  before; `/api/accept-terms` is exempt (session still required: the sign-in dialog calls it from a page that loaded
+  signed out). The page then shows "Someone else is signed in on this computer now..." and sends no more API calls
+  until the cookie names its owner again. Uploads are otherwise unchanged in stage 1 (no outbox, no auto-upload).
+- **Storage problems are said out loud** (`components/OwnerNotices.tsx`): a full store, or a browser refusing writes
+  ("This browser is not letting the page save your work on this computer...", once per page). A failed write never
+  removes what was stored; Save to cloud still works.
+- **Work saved before this** (unprefixed `shCode:progress`, `shCode:sync`, `shCode:quiz:*`, `moshion.store.v1`, ...,
+  list in `LEGACY_EXACT`/`LEGACY_PREFIXES`) is copied on first load into `w1:legacy:<old key>` (copy, verify, remove)
+  and is NEVER given back automatically: a server copy that matches proves nothing about who typed it (two students
+  can both be at revision 1 of the same starter). It waits there for a later teacher export (not built). The old
+  `sandbox-jscad*` draft names are therefore not renamed any more.
+- **Signed out = `guest`**, shared by everyone signed out on that computer. After signing in, a lab with guest work
+  shows "You have work in this lesson from before you signed in" (`components/GuestWorkOffer.tsx`,
+  `lib/guest-work.ts`): Use that work or No thanks. Never merged on its own. Use that work COPIES the guest draft into the account; the guest copy is never removed (another signed-out tab may be saving there). Anything that promises "kept in History"
+  before replacing code (Use that work, Remix, joining Code together) calls `keepInHistory()` (`lib/local-history.ts`)
+  and changes nothing if the snapshot did not read back. Joining Code together keeps the joiner's code twice: before the join request and again at the moment the shared program replaces the editor (`keepBeforeReplace`, `lib/live-doc.ts`).
+- Dev: `scripts/dev-owner.mjs` derives the id the same way with a fixed dev secret; logout sets `dev_signed_out=1`
+  (a guest until the next sign-in). Tests: `scripts/test-owned-storage.mjs` (real modules, one process per tab, real
+  middleware), `scripts/test-owner-check.mjs`, `scripts/test-owner-notices.mjs` (the notice, rendered).
+- Deploy: nothing to apply. No migration, no new variable (it uses `AUTH_SECRET`).
+
 ### Image uploads
 - `GET /api/uploads` — caller's images + quota (40 files / 20 MB, 2 MB each)
 - `POST /api/uploads` — store one image. Raw body with `X-Filename`, or
@@ -479,7 +527,8 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
 
 ### Texture and sound library (synced)
 - Saved textures (texture editor) and sounds (mixer, including imported MP3/WAV/OGG clips, #85) still live
-  in the browser store `moshion.store.v1` that the preview bridge hands sketches (`lib/moshion-storage.ts`).
+  in the browser store (`w1:<owner>:moshion-store`, per account, see "Work kept in this browser") that the preview
+  bridge hands sketches (`lib/moshion-storage.ts`).
   A signed-in student's copy also lives in their account: migration 0039 `library_items`, bytes in R2
   (`UPLOADS`, `library/<id>`), **never public** (owner-only routes; a sketch gets data URIs via the bridge).
 - Routes: `GET|PUT /api/library`, `GET|DELETE /api/library/[id]`. Type from the bytes (textures
@@ -487,8 +536,8 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   2 MB, 200 items. A save or delete against a version another device changed is 409 + the current item.
   A delete leaves a tombstone row so other devices learn of it. Tests: `scripts/test-library.mjs`.
 - `lib/library-sync.ts` merges three copies (this browser, the account, and the per-account BASE in
-  `moshion.library.base.v1`): changed on both keeps both (`hero`, `hero_2`). **A delete reaches the account
-  only when the student pressed Delete** (`moshion.library.deleted.v1`); an item a sketch wiped with
+  `w1:<owner>:library-base`): changed on both keeps both (`hero`, `hero_2`). **A delete reaches the account
+  only when the student pressed Delete** (`w1:<owner>:library-deleted`); an item a sketch wiped with
   `clearStorage()` is downloaded again. Mounted once in the root layout (`components/LibrarySync.tsx`);
   `logout()` removes synced copies from the browser and leaves unsynced ones. Tests:
   `scripts/test-library-sync.mjs`. The dev server serves `/api/library` from the real handlers over an
@@ -615,8 +664,8 @@ open with the code to read out. A mode button clicked before the sandbox hydrate
 
 ### Games library (Part B, migration 0042)
 A student publishes a moSHion sketch from the sandbox (`components/PublishGameButton.tsx`: title, share with my class,
-Update / Publish as a new game; which game the sandbox draft is published as lives in localStorage
-`shCode:sandbox-game`). Tables `library_games` (code <= 64 KB in UTF-8 bytes, `mode`/`players` read from
+Update / Publish as a new game; which game the sandbox draft is published as lives in the browser under
+`w1:<owner>:sandbox-game`). Tables `library_games` (code <= 64 KB in UTF-8 bytes, `mode`/`players` read from
 `multiplayer('...', n)` by a regex that ignores comments, informational only, tombstone `deleted_at`, 30 live per
 account) and `library_game_shares`, same rules as `library_shares`: owner-only edit/delete, shared into the
 publisher's live classes (enrolled, plus taught for a teacher/admin), a class's teachers hide/unhide/remove, names as
@@ -895,7 +944,7 @@ Times, Seed Tray, Library Cart — the same seventeen lines and the same four
 mistakes, worded in that problem's names; the first is the shipped
 `README.md`). `components/StarterPicker.tsx`, above the editor, writes the
 chosen starter over the graded file and remembers the pick in
-`shCode:starter:<lessonId>`, which is what makes Reset restore the pair's own
+`w1:<owner>:starter:<lessonId>`, which is what makes Reset restore the pair's own
 starter instead of the first problem's (`lib/starter-variants.ts`; only WHICH
 starter is read from storage, the text still comes from the bundle). Choosing
 over typed work confirms first. Each starter is its problem's reference answer

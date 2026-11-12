@@ -359,6 +359,11 @@ export default function HistoryPanel({ isOpen, onClose, lessonId, onRestore }: H
     setRestoring(true);
     const result = await restoreVersionToCloud(lessonId, snapshot);
     setRestoring(false);
+    if (result === 'owner') {
+      setRestoreNote('Restored on this device. Not saved for other devices: someone else is signed in on this computer now.');
+      onRestore?.();
+      return;
+    }
     if (result === 'error') {
       setRestoreNote('Restored on this device, but could not save it for other devices. Press Save to try again.');
       onRestore?.();

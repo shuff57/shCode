@@ -2,13 +2,14 @@
 // 409 if the email is already registered.
 
 import {
-  buildSessionCookie,
   hashPassword,
   isAdminEmail,
   isTeacherEmail,
   normalizeEmail,
   SESSION_TTL_SECONDS,
+  sessionCookies,
   signSession,
+  workOwnerFor,
 } from '../../_shared/auth';
 import { checkRateLimit, rateLimitExceeded } from '../../_shared/rateLimit';
 import { TERMS_VERSION } from '../../_shared/terms';
@@ -97,16 +98,16 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
     .bind(email, passwordHash, Date.now(), role, firstName, lastName, Date.now(), TERMS_VERSION)
     .run();
 
+  // The account's work-owner id rides in the JWT (`wo`) and in the readable
+  // shcode_owner cookie, set here beside the session cookie (lib/owned-storage.ts).
+  const workOwner = await workOwnerFor(email, env.AUTH_SECRET);
   const token = await signSession(email, role, env.AUTH_SECRET);
   const secure = new URL(request.url).protocol === 'https:';
-  return json({ email, role, firstName, lastName }, 201, {
-    'Set-Cookie': buildSessionCookie(token, SESSION_TTL_SECONDS, secure),
-  });
+  return json({ email, role, firstName, lastName }, 201, sessionCookies(token, workOwner, SESSION_TTL_SECONDS, secure));
 };
 
-function json(body: unknown, status = 200, headers: Record<string, string> = {}): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { 'Content-Type': 'application/json', ...headers },
-  });
+function json(body: unknown, status = 200, cookies: string[] = []): Response {
+  const headers = new Headers({ 'Content-Type': 'application/json' });
+  for (const c of cookies) headers.append('Set-Cookie', c);
+  return new Response(JSON.stringify(body), { status, headers });
 }

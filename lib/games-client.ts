@@ -24,14 +24,16 @@
 
 import { useLessonStore } from './store';
 import { loadProgress, normalizeEol, saveProgress } from './version-control';
-import { addLocalSnapshot } from './local-history';
+import { keepInHistory } from './local-history';
 import { SANDBOX_MODE_KEY, getMode } from './sandbox-modes';
 import { errorText } from './http-error';
 import type { GameMode } from './games-core';
 import type { GameAssetsResponse } from './game-assets';
 import { canRemix, parseProvenance, provenanceOf, remixRefusal, type Provenance, type ShareChoice } from './share-choice';
+import { ownedLocal } from './owned-storage';
 
-export const SANDBOX_GAME_KEY = 'shCode:sandbox-game';
+// `w1:<owner>:sandbox-game` (lib/owned-storage.ts).
+export const SANDBOX_GAME_KEY = 'sandbox-game';
 export const GAMES_CHANGED = 'shcode:games-changed';
 const SANDBOX_MOSHION = 'sandbox-moshion';
 
@@ -101,7 +103,7 @@ export interface SandboxGame { id: string | null; title: string; from?: Provenan
 
 export function readSandboxGame(): SandboxGame {
   try {
-    const v = JSON.parse(localStorage.getItem(SANDBOX_GAME_KEY) || 'null');
+    const v = ownedLocal.getJSON<{ id?: unknown; title?: unknown; from?: unknown }>(SANDBOX_GAME_KEY);
     if (v && typeof v.title === 'string') {
       return { id: typeof v.id === 'string' ? v.id : null, title: v.title, from: parseProvenance(v.from) };
     }
@@ -110,7 +112,7 @@ export function readSandboxGame(): SandboxGame {
 }
 
 export function writeSandboxGame(g: SandboxGame): void {
-  try { localStorage.setItem(SANDBOX_GAME_KEY, JSON.stringify(g)); } catch { /* private mode */ }
+  ownedLocal.setJSON(SANDBOX_GAME_KEY, g); // best effort: a full store just does not remember
 }
 
 // ---- calls -----------------------------------------------------------------
@@ -238,7 +240,11 @@ export function remixIntoSandbox(
       + 'Your sandbox code now is kept in the sandbox\'s History, so you can get it back from there.',
     );
     if (!yes) return false;
-    addLocalSnapshot(SANDBOX_MOSHION, files, `Before opening "${game.title}"`);
+    // The promise above is only kept if the snapshot really is in History: else change nothing.
+    if (!keepInHistory(SANDBOX_MOSHION, files, `Before opening "${game.title}"`)) {
+      refused('Nothing was changed. This computer could not keep your sandbox code in History, so it was not replaced.');
+      return false;
+    }
   }
 
   files['script.js'] = code;

@@ -4,6 +4,7 @@ import Header from '../components/Header';
 import { AnnouncementBanner } from '../components/AnnouncementBanner';
 import ReportIssueButton from '../components/ReportIssueButton';
 import StaleBuildGuard from '../components/StaleBuildGuard';
+import OwnerNotices from '../components/OwnerNotices';
 import LibrarySync from '../components/LibrarySync';
 import PrefsSync from '../components/PrefsSync';
 import WhatsNewModal from '../components/WhatsNewModal';
@@ -28,6 +29,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body>
+        {/* First: installs the X-Work-Owner header before any page fetch (lib/owner-fetch.ts). */}
+        <OwnerNotices />
         <StaleBuildGuard />
         <LibrarySync />
         <PrefsSync />

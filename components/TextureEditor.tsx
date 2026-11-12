@@ -41,6 +41,7 @@ import {
   SavedTexture,
   LIBRARY_UPDATED,
 } from '../lib/moshion-storage';
+import { ownedSession } from '../lib/owned-storage';
 
 interface CatalogEntry { file: string; w: number; h: number; group: string }
 interface Catalog {
@@ -96,7 +97,7 @@ export function fitFrame(src: CopiedFrame, w: number, h: number): Frame {
 }
 function readCopiedFrame(): CopiedFrame | null {
   try {
-    const v = JSON.parse(window.sessionStorage.getItem(FRAME_CLIPBOARD) || 'null');
+    const v = ownedSession.getJSON<CopiedFrame>(FRAME_CLIPBOARD);
     if (v && Number.isInteger(v.w) && Number.isInteger(v.h) && Array.isArray(v.cells) && v.cells.length === v.w * v.h) return v;
   } catch { /* nothing copied, or private mode */ }
   return null;
@@ -332,7 +333,7 @@ export default function TextureEditor() {
 
   function copyFrame() {
     const c: CopiedFrame = { w, h, cells: frames[index].slice() };
-    try { window.sessionStorage.setItem(FRAME_CLIPBOARD, JSON.stringify(c)); } catch { /* still works for this page */ }
+    ownedSession.setJSON(FRAME_CLIPBOARD, c); // a failed copy still works for this page
     setCopiedFrame(c);
     setMessage({ text: `Copied frame ${index + 1}. Paste puts it after the frame you are on, in this texture or another.`, bad: false });
   }

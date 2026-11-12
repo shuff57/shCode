@@ -1,5 +1,6 @@
 'use client';
 
+import { registerFlush } from '../lib/draft-autosave';
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { Play, RotateCcw } from 'lucide-react';
@@ -7,6 +8,7 @@ import MoshionPreview from './MoshionPreview';
 import LiveConsole from './LiveConsole';
 import CodeMirrorPane from './CodeMirrorPane';
 import { RUN_TIMEOUT_MS, errorWithLocation, lineColOf, runStudentCode } from '../lib/js-runner-source';
+import { ownedLocal } from '../lib/owned-storage';
 
 interface Props {
   code: string;
@@ -129,12 +131,9 @@ export const LIVE_SKETCH_RUN = 'shcode:live-sketch-run';
 
 function storageKeyFor(lessonId: string | undefined, blockId: string | undefined): string | null {
   if (!lessonId || !blockId) return null;
-  return `shCode:liveBlock:${lessonId}:${blockId}`;
-}
-
-function legacyStorageKeyFor(lessonId: string | undefined, blockId: string | undefined): string | null {
-  if (!lessonId || !blockId) return null;
-  return `liveCodeBlock:${lessonId}:${blockId}`;
+  // `w1:<owner>:liveBlock:<lessonId>:<blockId>` (lib/owned-storage.ts). The older
+  // unprefixed `shCode:liveBlock:` and `liveCodeBlock:` keys are set aside there.
+  return `liveBlock:${lessonId}:${blockId}`;
 }
 
 export default function LiveCodeBlock({
@@ -149,24 +148,13 @@ export default function LiveCodeBlock({
 }: Props) {
   const initialCode = code.trim();
   const storageKey = storageKeyFor(lessonId, blockId);
-  const legacyKey = legacyStorageKeyFor(lessonId, blockId);
 
   // Load any saved edit synchronously so the first render of the editor
   // already reflects the student's in-progress work, avoiding a flash
   // of the original starter code on reload.
   const [editorCode, setEditorCode] = useState<string>(() => {
     if (!storageKey || typeof window === 'undefined') return initialCode;
-    // One-time migration from the old `liveCodeBlock:*` key.
-    if (legacyKey) {
-      const legacyValue = window.localStorage.getItem(legacyKey);
-      if (legacyValue !== null) {
-        if (window.localStorage.getItem(storageKey) === null) {
-          window.localStorage.setItem(storageKey, legacyValue);
-        }
-        window.localStorage.removeItem(legacyKey);
-      }
-    }
-    const saved = window.localStorage.getItem(storageKey);
+    const saved = ownedLocal.getItem(storageKey);
     return saved !== null ? saved : initialCode;
   });
 
@@ -191,17 +179,33 @@ export default function LiveCodeBlock({
   // Persist edits to localStorage, debounced so we don't write on every
   // keystroke. Removes the entry when the code is back at its starter so
   // stale storage doesn't accumulate.
+  // A pending write is flushed, never dropped, when the block unmounts or the page
+  // hides: it can only ever land in this page's own owner's keys.
+  const pendingWrite = useRef<(() => void) | null>(null);
   useEffect(() => {
     if (!storageKey || typeof window === 'undefined') return;
-    const timer = setTimeout(() => {
+    const write = () => {
+      pendingWrite.current = null;
       if (editorCode === initialCode) {
-        window.localStorage.removeItem(storageKey);
+        ownedLocal.removeItem(storageKey);
       } else {
-        window.localStorage.setItem(storageKey, editorCode);
+        ownedLocal.setItem(storageKey, editorCode);
       }
-    }, 300);
+    };
+    pendingWrite.current = write;
+    const timer = setTimeout(write, 300);
     return () => clearTimeout(timer);
   }, [editorCode, initialCode, storageKey]);
+  useEffect(() => {
+    const flush = () => pendingWrite.current?.();
+    window.addEventListener('pagehide', flush);
+    const offFlush = registerFlush(flush);
+    return () => {
+      offFlush();
+      window.removeEventListener('pagehide', flush);
+      flush();
+    };
+  }, []);
 
   const [plainLogs, setPlainLogs] = useState<PlainLogEntry[]>([]);
   const [hasRunPlain, setHasRunPlain] = useState(false);
@@ -242,7 +246,7 @@ export default function LiveCodeBlock({
     setPlainLogs([]);
     setHasRunPlain(false);
     if (storageKey && typeof window !== 'undefined') {
-      window.localStorage.removeItem(storageKey);
+      ownedLocal.removeItem(storageKey);
     }
   }
 

@@ -188,6 +188,10 @@ app.prepare().catch((err) => {
     const m = /(?:^|;\s*)dev_role=(student|teacher|admin)(?:;|$)/.exec(req.headers.cookie || '');
     return m ? m[1] : DEV_ROLE;
   };
+  // Per-account browser storage (lib/owned-storage.ts): the owner cookie on page loads and
+  // the X-Work-Owner 409 on /api/*, as functions/_middleware.ts does. Before every /api route.
+  const devOwner = await import('./scripts/dev-owner.mjs');
+  devOwner.mountDevOwner({ server, devIdentity });
   // DEV_REAL_DB=1: the real tries handlers over an in-memory SQLite with a fake AI grader
   // (scripts/dev-demo-api.mjs). Mounted before the stubs below, so these routes win.
   let demoApi = null;
@@ -199,9 +203,12 @@ app.prepare().catch((err) => {
     res.json({ email: devIdentity(req), role: devRoleOf(req) });
   });
   server.post('/api/auth/login', (req, res) => {
+    res.append('Set-Cookie', devOwner.devSignInCookies(req, devIdentity));
     res.json({ email: devIdentity(req), role: devRoleOf(req) });
   });
   server.post('/api/auth/logout', (_req, res) => {
+    // Signed out = a guest until the next sign-in (dev_signed_out=1, scripts/dev-owner.mjs).
+    res.append('Set-Cookie', devOwner.devSignOutCookies());
     res.json({ ok: true });
   });
   // Class-scoped student data. The real routes are

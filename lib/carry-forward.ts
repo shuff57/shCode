@@ -11,6 +11,8 @@
 // Nothing here touches the network. The store action in lib/store.ts fetches the
 // source's newest commit (or its offline draft) and calls mergeCarriedFiles.
 
+import { ownedLocal } from './owned-storage';
+
 /** The message a carried commit is recorded under. Exact wording is asserted by
  *  scripts/test-carry-forward.mjs and shown in the History panel. */
 export function carryMessage(sourceTitle: string): string {
@@ -18,16 +20,20 @@ export function carryMessage(sourceTitle: string): string {
   return `Brought forward from ${title}`;
 }
 
-/** localStorage key for "the student chose the starter over their own work", per
- *  (target, source) pair, so the strip does not reappear on every visit. */
+/** Storage key for "the student chose the starter over their own work", per
+ *  (target, source) pair, so the strip does not reappear on every visit. Stored
+ *  under this page's owner (`w1:<owner>:carry-dismissed:...`, lib/owned-storage.ts). */
 export function carryDismissKey(targetId: string, sourceId: string): string {
-  return `shCode:carry-dismissed:${targetId}<-${sourceId}`;
+  return `carry-dismissed:${targetId}<-${sourceId}`;
 }
+
+const ownedOrNone = (): Pick<Storage, 'getItem' | 'setItem'> | undefined =>
+  typeof window === 'undefined' ? undefined : ownedLocal;
 
 export function isCarryDismissed(
   targetId: string,
   sourceId: string,
-  storage: Pick<Storage, 'getItem'> | undefined = typeof window === 'undefined' ? undefined : window.localStorage
+  storage: Pick<Storage, 'getItem'> | undefined = ownedOrNone()
 ): boolean {
   if (!storage) return false;
   try {
@@ -40,7 +46,7 @@ export function isCarryDismissed(
 export function dismissCarry(
   targetId: string,
   sourceId: string,
-  storage: Pick<Storage, 'setItem'> | undefined = typeof window === 'undefined' ? undefined : window.localStorage
+  storage: Pick<Storage, 'setItem'> | undefined = ownedOrNone()
 ): void {
   if (!storage) return;
   try {

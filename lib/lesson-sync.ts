@@ -25,14 +25,15 @@ import { useLessonStore, flattenFiles } from './store';
 import { loadProgress, normalizeContents, normalizeEol } from './version-control';
 import { filesEqual, mergeSyncFiles, type FileMap } from './lesson-sync-merge';
 import type { Lesson } from './types';
+import { ownedLocal } from './owned-storage';
 
-const STORAGE_KEY = 'shCode:sync';
+// `w1:<owner>:sync:<lessonId>` (lib/owned-storage.ts): the server row this device last saw.
+const SYNC_KEY = 'sync:';
 
-interface SyncRecord {
+export interface SyncRecord {
   base: FileMap;
   revision: number;
 }
-type SyncMap = Record<string, SyncRecord>;
 
 interface Runtime {
   /** The server row this device last saw (the merge base). */
@@ -50,10 +51,12 @@ export interface RemoteWorkspace {
   updatedAt: number | null;
 }
 
-export type SaveResult = 'saved' | 'unchanged' | 'error';
+/** 'owner': refused because someone else is signed in on this computer now (409 owner-mismatch). */
+export type SaveResult = 'saved' | 'unchanged' | 'error' | 'owner';
 
 type PushResponse =
   | { ok: true; revision: number; updatedAt: number }
+  | { ok: false; owner: true }
   | { ok: false; conflict: RemoteWorkspace }
   | { ok: false; error: string };
 
@@ -61,32 +64,19 @@ type PushResponse =
 // Per-lesson record: the server row this device last saw.
 // ---------------------------------------------------------------------------
 
-function readMap(): SyncMap {
-  if (typeof window === 'undefined') return {};
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') as SyncMap;
-  } catch {
-    return {};
-  }
-}
-
-function readRecord(lessonId: string): SyncRecord | null {
-  const rec = readMap()[lessonId];
+export function readRecord(lessonId: string): SyncRecord | null {
+  if (typeof window === 'undefined') return null;
+  const rec = ownedLocal.getJSON<SyncRecord>(SYNC_KEY + lessonId);
   if (!rec || typeof rec.revision !== 'number' || !rec.base || typeof rec.base !== 'object') {
     return null;
   }
   return rec;
 }
 
-function writeRecord(lessonId: string, rec: SyncRecord): void {
+export function writeRecord(lessonId: string, rec: SyncRecord): void {
   if (typeof window === 'undefined') return;
-  try {
-    const all = readMap();
-    all[lessonId] = rec;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-  } catch {
-    /* quota / private mode: the save still works for this session */
-  }
+  // A full store keeps the old record; the save itself still worked for this session.
+  ownedLocal.setJSON(SYNC_KEY + lessonId, rec);
 }
 
 export function starterContents(lesson: Lesson): FileMap {
@@ -160,6 +150,10 @@ export async function pushWorkspace(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ files, baseRevision }),
     });
+    if (res.status === 409 && res.headers.get('X-Owner-Mismatch') === '1') {
+      // Someone else is signed in on this computer now. Nothing was written; no retry.
+      return { ok: false, owner: true };
+    }
     if (res.status === 409) {
       const data = (await res.json()) as RemoteWorkspace;
       return {
@@ -196,7 +190,7 @@ function editing(lessonId: string): boolean {
   return useLessonStore.getState().lesson?.id === lessonId;
 }
 
-async function saveWorkspace(lesson: Lesson): Promise<SaveResult> {
+export async function saveWorkspace(lesson: Lesson): Promise<SaveResult> {
   if (!editing(lesson.id)) return 'error';
   const rt = runtimeFor(lesson);
   const files = useLessonStore.getState().fileContents;
@@ -216,6 +210,7 @@ async function saveWorkspace(lesson: Lesson): Promise<SaveResult> {
       writeRecord(lesson.id, { base: files, revision: result.revision });
       return 'saved';
     }
+    if ('owner' in result) return 'owner';
     if (!('conflict' in result)) {
       // Offline / server error. The student can press Save again.
       return 'error';
@@ -238,7 +233,7 @@ async function saveWorkspace(lesson: Lesson): Promise<SaveResult> {
     if (filesEqual(merged, remoteFiles)) return 'unchanged';
 
     const retry = await pushWorkspace(lesson.id, merged, remote.revision);
-    if (!retry.ok) return 'error';
+    if (!retry.ok) return 'owner' in retry ? 'owner' : 'error';
     rt.base = merged;
     rt.revision = retry.revision;
     writeRecord(lesson.id, { base: merged, revision: retry.revision });
@@ -280,6 +275,7 @@ export async function restoreVersionToCloud(lessonId: string, files: FileMap): P
       writeRecord(lessonId, { base: files, revision: result.revision });
       return 'saved';
     }
+    if ('owner' in result) return 'owner';
     if (!('conflict' in result) || result.conflict.files === null) return 'error';
     // Another device saved between our read and this write. The chosen
     // version still wins; name the revision it just handed us and retry.
@@ -293,7 +289,7 @@ export async function restoreVersionToCloud(lessonId: string, files: FileMap): P
  * changed. Silent by design: this is the retired Pull button, done on arrival.
  * Never writes.
  */
-async function restoreWorkspace(lesson: Lesson): Promise<void> {
+export async function restoreWorkspace(lesson: Lesson): Promise<void> {
   if (!editing(lesson.id)) return;
   const rt = runtimeFor(lesson);
   const remote = await fetchWorkspace(lesson.id);
@@ -363,6 +359,8 @@ export function useCloudWorkspace(lesson: Lesson, enabled: boolean): CloudWorksp
       setNote({ kind: 'saved', text: 'Saved — open this lesson on any device.' });
     } else if (result === 'unchanged') {
       setNote({ kind: 'unchanged', text: 'No changes to save.' });
+    } else if (result === 'owner') {
+      setNote({ kind: 'error', text: 'Not saved: someone else is signed in on this computer now. Your work stays on this computer under your name.' });
     } else {
       setNote({ kind: 'error', text: 'Could not save. Check your connection and try again.' });
     }

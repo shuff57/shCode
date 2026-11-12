@@ -16,37 +16,20 @@ import { getCurrentUser } from '../lib/auth';
 import SolutionPanel from './SolutionPanel';
 import { AttemptBanner, PseudocodePanel, SolutionWait, parseRevealWait, type RevealWait } from './AttemptCap';
 import { useAttemptCap } from '../lib/use-attempt-cap';
+import { loadQuizRecord, saveQuizRecord, type QuizAnswers, type QuizRecord } from '../lib/work-records';
 
 interface Props {
   lessonId: string;
   config: QuizConfig;
 }
 
-const STORAGE_PREFIX = 'shCode:quiz:';
-
-// An absent key means "not answered yet" — 0 is a real first option, so it can
-// never stand in for "unanswered".
-type Answers = Record<string, number>;
-
-interface StoredState {
-  answers: Answers;
-  graded?: boolean;
-  /** The answers as they were at the last Check (ux2 S2). Absent on state saved before it: the answers. */
-  checked?: Answers | null;
-}
-
-function loadState(lessonId: string): StoredState {
-  try {
-    const raw = localStorage.getItem(STORAGE_PREFIX + lessonId);
-    if (raw) return JSON.parse(raw);
-  } catch {}
-  return { answers: {} };
-}
-
+// This browser's copy of the picks lives under the page's owner
+// (`w1:<owner>:quiz:<lessonId>`, lib/work-records.ts, lib/owned-storage.ts).
+type Answers = QuizAnswers;
+type StoredState = QuizRecord;
+const loadState = loadQuizRecord;
 function saveState(lessonId: string, state: StoredState) {
-  try {
-    localStorage.setItem(STORAGE_PREFIX + lessonId, JSON.stringify(state));
-  } catch {}
+  saveQuizRecord(lessonId, state);
 }
 // The marking the server hands back after a summative hand-in, keyed by
 // question id. `answer` is the option's AUTHORED index, directly comparable
