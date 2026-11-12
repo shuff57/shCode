@@ -16,7 +16,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "rubric": [
       {
         "id": "r1",
-        "title": "Quality management identified",
+        "title": "The right umbrella activity is logged",
         "description": "Logs the correct umbrella activity for Miguel's testing scenario. Help: 1.1.10 (Umbrella Activities)",
         "points": 1
       }

@@ -74,7 +74,7 @@
       "id": "r5",
       "title": "Make your sprite once, in setup()",
       "description": "new Sprite(...) is written in setup(), or in a function that setup() calls, and no new Sprite(...) or new Canvas(...) is in draw(), which runs about 60 times a second. Help: 5.1.4 (Worked Example: Minimum Sprite Program) and 5.1.8 (Storing the sprite in a let variable)",
-      "hint": "Put new Sprite(...) inside setup(). If a new Sprite( or new Canvas( line is in draw(), or in a function draw() calls, move it up into setup(): draw() would make a new one every frame, and they pile up.",
+      "hint": "Write your new Sprite(...) line inside setup(), under the canvas line. If you already have a new Sprite( or new Canvas( line in draw(), or in a function draw() calls, move it up into setup(): draw() would make a new one every frame, and they pile up.",
       "type": "inFunction",
       "function": "setup",
       "followCalls": true,
