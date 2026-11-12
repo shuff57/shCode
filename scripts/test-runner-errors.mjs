@@ -474,6 +474,23 @@ console.log('a plain first sentence for the slips beginners make');
       && r.box.startsWith('The word deepskyblue is not defined. If it is a colour or text, put quotes around it.\nReferenceError: deepskyblue is not defined'), hintOf(r) + ' ' + JSON.stringify(r.box));
 }
 {
+  // #74: the colour chained onto new Sprite(...) lands in the variable; the crash comes in draw().
+  const r = runFrame(sketch(
+    'let player;', 'function setup() {', '  new Canvas(400, 400);',
+    "  player = new Sprite(200, 200, 40, 40).color = 'deepskyblue';", '}',
+    'function draw() {', "  background('#222');", '  player.vel.x = 4;', '}'));
+  check('player = new Sprite(...).color = ... names the cause, though the crash is in draw()',
+    r.errors.length === 1 && r.errors[0].name === 'TypeError' && r.errors[0].line === 8
+      && r.errors[0].hint === 'player = new Sprite(...).color = ... puts the color in player, not the sprite. Make the sprite on one line, then set player.color on the next.',
+    hintOf(r));
+  const ok = runFrame(sketch(
+    'let player;', 'function setup() {', '  new Canvas(400, 400);',
+    "  // player = new Sprite(200, 200, 40, 40).color = 'red';", '  player = new Sprite(200, 200, 40, 40);',
+    "  player.color = 'deepskyblue';", '}', 'function draw() {', '  player.vel.x = 4;', '  player.foo.bar = 1;', '}'));
+  check('the two-line form, and the same chain only in a comment, get no such sentence',
+    ok.errors.length === 1 && ok.errors[0].name === 'TypeError' && !ok.errors[0].hint, hintOf(ok));
+}
+{
   // Quotes would make these worse: a misspelt command, a misspelt name.
   const r1 = runFrame(sketch('function setup() {', '  new Canvas(400, 400);', '}', 'function draw() {', "  bakground('#222');", '}'));
   check('a misspelt command (bakground(...)) gets no quotes advice',

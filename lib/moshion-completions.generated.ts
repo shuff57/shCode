@@ -872,7 +872,13 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "frame",
    "type": "property",
    "detail": "number",
-   "info": ""
+   "info": "The frame showing, 0 first."
+  },
+  {
+   "label": "tick",
+   "type": "property",
+   "detail": "number",
+   "info": "Game frames the current frame has been showing, 0 when it just started."
   },
   {
    "label": "spriteSheet",
@@ -1089,8 +1095,8 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
   {
    "label": "addAni",
    "type": "method",
-   "detail": "(name: string, sheetUrl: string, frameCount: number): Ani",
-   "info": ""
+   "detail": "(name: string, sheet: string, frameCount?: number): Ani",
+   "info": "`sheet` is a picture's path or the name of a texture (a drawn animation brings its own frames and durations; a count given here overrides them)."
   },
   {
    "label": "changeAni",
@@ -1577,6 +1583,12 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "info": "Art for every member, current and future (`new group.Sprite()`)."
   },
   {
+   "label": "scale",
+   "type": "property",
+   "detail": "{ x: number; y: number }",
+   "info": "Scale for every member, current and future."
+  },
+  {
    "label": "newSprite",
    "type": "method",
    "detail": "(x: number, y: number, w?: number, h?: number): Sprite",
@@ -1763,6 +1775,12 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "type": "property",
    "detail": "string | HTMLImageElement | HTMLCanvasElement | ImageBitmap | null",
    "info": "Art for every member, current and future (`new group.Sprite()`)."
+  },
+  {
+   "label": "scale",
+   "type": "property",
+   "detail": "{ x: number; y: number }",
+   "info": "Scale for every member, current and future."
   },
   {
    "label": "newSprite",
@@ -2641,6 +2659,12 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "type": "property",
    "detail": "string | HTMLImageElement | HTMLCanvasElement | ImageBitmap | null",
    "info": "Art for every member, current and future (`new group.Sprite()`)."
+  },
+  {
+   "label": "scale",
+   "type": "property",
+   "detail": "{ x: number; y: number }",
+   "info": "Scale for every member, current and future."
   },
   {
    "label": "newSprite",

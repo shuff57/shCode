@@ -64,7 +64,28 @@ export function errorWithLocation(
   col?: number | null,
 ): string {
   const where = line ? ` (line ${line}${col ? `, col ${col}` : ''})` : '';
-  return `${name || 'Error'}: ${message || ''}${where}`;
+  const plain = plainConsoleSentence(name, message);
+  return `${plain ? plain + '\n' : ''}${name || 'Error'}: ${message || ''}${where}`;
+}
+
+// A plain first sentence for an error a beginner cannot read on their own, put
+// above the engine's line the way the moSHion runner does (runner.html,
+// plainSentence). #69: `JSON.parse(readSave)` hands JSON.parse a function, which
+// it turns into the function's own text, and the browser answers `Unexpected
+// token 'u', "function re"... is not valid JSON`. Only the three values that are
+// not text at all are named; a string that is not JSON (what 3.8.14 has the
+// student try on purpose) keeps the browser's message alone.
+export function plainConsoleSentence(name?: string, message?: string): string {
+  if (name !== 'SyntaxError' || !message) return '';
+  const m = /^Unexpected token .+, "(.*)"\.\.\. is not valid JSON$|^"(.*)" is not valid JSON$/.exec(message);
+  if (!m) return '';
+  const start = m[1] ?? m[2] ?? '';
+  if (/^(async\s+)?function\b|^\(?[\w$, ]*\)?\s*=>/.test(start)) {
+    return 'JSON.parse was given a function, not text. Give it the string you want to read, like JSON.parse(text).';
+  }
+  if (start === '[object Object]') return 'JSON.parse was given an object, not text. An object is already data: use it without JSON.parse.';
+  if (start === 'undefined') return 'JSON.parse was given a variable with no value yet (undefined), not text.';
+  return '';
 }
 
 // What a host sends: the script, plus the answers collected so far and which

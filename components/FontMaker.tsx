@@ -51,6 +51,9 @@ export default function FontMaker({ compact = false }: { compact?: boolean }) {
   const [name, setName] = useState('');
   const [note, setNote] = useState<{ text: string; bad: boolean } | null>(null);
   const [busy, setBusy] = useState(false);
+  // #106: a font you already have can be replaced, the way a game is updated.
+  // Saving over a name you have asks once; the Replace button is the yes.
+  const [replaceName, setReplaceName] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const say = (text: string, bad = false) => setNote({ text, bad });
@@ -93,15 +96,20 @@ export default function FontMaker({ compact = false }: { compact?: boolean }) {
     }
   }
 
-  function save() {
+  function save(replace = false) {
     if (!picked) return;
-    if (listSavedFonts().some((f) => f.name === name)) {
-      say(`You already have a font called ${name}. Pick another name, or delete that one first.`, true);
+    const had = listSavedFonts().some((f) => f.name === name);
+    if (had && !replace) {
+      setReplaceName(name);
+      say(`You already have a font called ${name}. Replace it with this file, or pick another name.`, true);
       return;
     }
     const err = saveFont(name, picked.dataUri);
     if (err) { say(err, true); return; }
-    say(`Saved. Use it in a sketch with textFont('${name}');`);
+    setReplaceName(null);
+    say(had
+      ? `Replaced ${name}. Sketches that use textFont('${name}') now get the new file.`
+      : `Saved. Use it in a sketch with textFont('${name}');`);
     setPicked(null);
     if (fileRef.current) fileRef.current.value = '';
   }
@@ -162,7 +170,10 @@ export default function FontMaker({ compact = false }: { compact?: boolean }) {
               <label htmlFor="font-name" style={{ fontSize: 13 }}>Name</label>
               <input id="font-name" value={name} onChange={(e) => setName(e.target.value)} style={{ ...input, width: 200 }}
                 aria-describedby="font-name-help" maxLength={40} spellCheck={false} />
-              <button type="button" className="btn-run" onClick={save} disabled={!/^[A-Za-z][A-Za-z0-9_]{0,39}$/.test(name)}>Save font</button>
+              <button type="button" className="btn-run" onClick={() => save()} disabled={!/^[A-Za-z][A-Za-z0-9_]{0,39}$/.test(name)}>Save font</button>
+              {replaceName === name && (
+                <button type="button" className="btn-secondary btn-sm" onClick={() => save(true)}>Replace {name}</button>
+              )}
               <button type="button" className="btn-secondary btn-sm" onClick={() => { setPicked(null); if (fileRef.current) fileRef.current.value = ''; }}>Cancel</button>
             </div>
             <div id="font-name-help" style={{ fontSize: 12, color: 'var(--c-dim)' }}>

@@ -684,13 +684,39 @@ export default function TextureEditor() {
     });
   }
 
+  // #109: "Download PNG doesn't seem to do anything." It said nothing on the
+  // page either way, and clicked a detached link to a data: URL -- the one
+  // download in the app built that way. It now goes through a Blob URL on a
+  // link in the page (as the lab's file download does) and says what it did,
+  // or why it did not, under the canvas.
   function download() {
-    const url = toStrip();
-    if (!url) return;
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${name.trim() || 'texture'}${frames.length > 1 ? `_${frames.length}f` : ''}.png`;
-    a.click();
+    if (frames.every((f) => f.every((c) => !c))) {
+      setMessage({ text: 'Every frame is empty, so there is nothing to download. Draw something first.', bad: true });
+      return;
+    }
+    const dataUrl = toStrip();
+    if (!dataUrl) { setMessage({ text: 'Could not render the image.', bad: true }); return; }
+    const file = `${name.trim() || 'texture'}${frames.length > 1 ? `_${frames.length}f` : ''}.png`;
+    try {
+      const bytes = atob(dataUrl.slice(dataUrl.indexOf(',') + 1));
+      const buf = new Uint8Array(bytes.length);
+      for (let i = 0; i < bytes.length; i++) buf[i] = bytes.charCodeAt(i);
+      const url = URL.createObjectURL(new Blob([buf], { type: 'image/png' }));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10_000);
+    } catch {
+      setMessage({ text: 'This browser would not download the picture. Save it instead, or ask your teacher whether downloads are blocked.', bad: true });
+      return;
+    }
+    setMessage({
+      text: `Downloaded ${file}. Look in your Downloads folder. If nothing arrived, this computer may block downloads.`,
+      bad: false,
+    });
   }
 
   // Their NEW. Undoable rather than a confirm dialog -- an accidental NEW is

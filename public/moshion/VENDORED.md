@@ -3,9 +3,42 @@
 | | |
 | --- | --- |
 | Source repo | `shuff57/moshion` (local checkout `../moshion`) |
-| Commit | `242f783` (`moshion.js`, `docs/moshion.d.ts`), branch `main` |
+| Commit | `1ef273a` (`moshion.js`, `docs/moshion.d.ts`), branch `main` |
 | Commit date | 2026-11-12 |
 | Vendored | 2026-11-12 (`a662f3d`: `textStyle(NORMAL \| BOLD \| ITALIC \| BOLDITALIC)` (shCode #103), on top of `3f1e70a`'s API audit, `90921bd`'s `textLayer(n)`, `b1a2575`'s `sprite.clone()` and `world.maxSpeed`, `f3e1378` and the `f259b22` sound sync). `textStyle` was first patched in here by hand (`61cfed53`); this sync replaces that patch with the upstream engine, which matches it, so the copy is now upstream `a662f3d` plus the local lines below. |
+
+**`1ef273a` (2026-11-12): group `scale`, `ani.frame`/`ani.tick`, `addAni` by texture
+name, and plain sound warnings (shCode #108, #110, #111).**
+
+- A group's `scale` cascades to the members it already has, like `color`, and one
+  axis can be set alone: `walls.scale.y = 3`, `walls.scale = { y: 3 }`. A number or
+  `[x, y]` still sets both. It used to be a plain field: new members only, and
+  `.y` on the number did nothing.
+- `ani.frame` is a setter: a whole number, wrapped (-1 is the last frame), and the
+  frame starts from the beginning of its duration. `ani.tick` (new) is how many
+  game frames the current frame has shown, settable below that frame's duration.
+  A frame past the end used to draw a blank slice, and a jump kept the old count.
+
+- `addAni(name, sheet, frames?)` takes a texture name as the sheet, built-in or saved;
+  a drawn animation brings its frame count and durations unless a count is given. A
+  name used to become `img.src = 'walk'` and draw nothing. An unknown name warns once.
+- A sound that fails to load says why in the console, once per file: no saved sound
+  by that name (with the near names, case included), a saved name typed with `.mp3`,
+  a file on another website, or anything else with the browser's reason. A `.play()`
+  before the sound has loaded says so once. Both were silent; the docs even said "a
+  misspelled path shows no error". Checked in the browser on the sandbox; the
+  headless harness has no audio, so the gate covers only `addAni`.
+
+Proof, 2026-11-12: all 617 moSHion sketches in `lessons/` (every `.js` file and
+`js live` block that touches the engine) were run in `scripts/moshion-harness.mjs`
+on the previous engine and on this one, 180 frames, once with no input and once with
+a fixed mouse and keyboard script, `Math.random` seeded the same; the hash of the draw
+ops, console, error and every sprite's position, scale and frame matched for all 617.
+Gates: the checks "a group scale reaches current members...", "ani.frame jumps
+to a frame..." and "addAni takes the name of a drawn texture..." in
+`scripts/moshion-checks.mjs`; the full gate passes 698/698 sketches and 105/105 checks.
+The 617-sketch parity run predates the sound and addAni lines, which only change
+failure paths and name-like sheets (no course sketch passes one).
 
 **`3f1e70a` (2026-11-12), the API audit.** Fixes and one consistent shape, no new
 subsystem:

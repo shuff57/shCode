@@ -69,6 +69,22 @@ const MAX_SCREENSHOT_MB = 2;
  *  truncating it, so staying well under keeps the rest of the report. */
 const MAX_SNAPSHOT_CHARS = 8000;
 
+/** One video frame as an image under the upload limit: PNG, else JPEG, else JPEG at half size. */
+async function frameToFile(video: HTMLVideoElement): Promise<File | null> {
+  const limit = MAX_SCREENSHOT_MB * 1024 * 1024;
+  for (const [scale, type, quality] of [[1, 'image/png', undefined], [1, 'image/jpeg', 0.85], [0.5, 'image/jpeg', 0.8]] as const) {
+    const c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(video.videoWidth * scale));
+    c.height = Math.max(1, Math.round(video.videoHeight * scale));
+    const ctx = c.getContext('2d');
+    if (!ctx) return null;
+    ctx.drawImage(video, 0, 0, c.width, c.height);
+    const blob = await new Promise<Blob | null>((r) => c.toBlob(r, type, quality));
+    if (blob && blob.size <= limit) return new File([blob], type === 'image/png' ? 'screenshot.png' : 'screenshot.jpg', { type });
+  }
+  return null;
+}
+
 export default function ReportIssueButton() {
   const [open, setOpen] = useState(false);
   const [kind, setKind] = useState<IssueKind>('bug');
@@ -167,6 +183,58 @@ export default function ReportIssueButton() {
     }
   }
 
+  // #93: take the screenshot from here instead of before opening the report. The
+  // browser's own tab capture is the only way that also shows the sketch: its
+  // iframe has no allow-same-origin, so a DOM-to-image library cannot read it
+  // (and must not be given that permission; CLAUDE.md, Image uploads). Chrome
+  // asks once to share the tab; the dialog is hidden while one frame is grabbed,
+  // then it goes through acceptShot like a picked file. A refusal (or a computer
+  // that blocks capture) leaves Attach and paste as they were.
+  const [capturing, setCapturing] = useState(false);
+  // Read after mount: the server render has no navigator, and a different first
+  // render on the client would be a hydration mismatch.
+  const [canCapture, setCanCapture] = useState(false);
+  useEffect(() => { setCanCapture(!!navigator.mediaDevices?.getDisplayMedia); }, []);
+
+  async function takeShot() {
+    setError(null);
+    let stream: MediaStream;
+    try {
+      stream = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+        audio: false,
+        preferCurrentTab: true,
+      } as DisplayMediaStreamOptions);
+    } catch {
+      setError('No screenshot was taken: sharing was cancelled, or this computer does not allow it. You can still attach or paste one.');
+      return;
+    }
+    let file: File | null = null;
+    setCapturing(true);
+    try {
+      const video = document.createElement('video');
+      video.muted = true;
+      video.srcObject = stream;
+      // A capture that never delivers a frame would leave play() pending and the
+      // dialog invisible for good; give up after a few seconds instead.
+      const timeout = new Promise<never>((_, reject) => setTimeout(() => reject(new Error('no frame')), 5000));
+      await Promise.race([video.play(), timeout]);
+      // Let the hidden dialog leave the screen before the frame is taken.
+      await new Promise((r) => setTimeout(r, 400));
+      file = video.videoWidth > 0 ? await frameToFile(video) : null;
+    } catch {
+      file = null;
+    } finally {
+      stream.getTracks().forEach((t) => t.stop());
+      setCapturing(false);
+    }
+    if (!file) {
+      setError('The screenshot could not be taken. You can still attach or paste one.');
+      return;
+    }
+    await acceptShot(file);
+  }
+
   function onPaste(e: React.ClipboardEvent) {
     const item = Array.from(e.clipboardData.items).find((i) => i.type.startsWith('image/'));
     const file = item?.getAsFile();
@@ -257,7 +325,7 @@ export default function ReportIssueButton() {
 
       <dialog
         ref={dialogRef}
-        className="issue-dialog"
+        className={capturing ? 'issue-dialog issue-capturing' : 'issue-dialog'}
         onClose={close}
         onPaste={onPaste}
         onClick={(e) => {
@@ -338,6 +406,11 @@ export default function ReportIssueButton() {
                 </>
               ) : (
                 <>
+                  {canCapture && (
+                    <button type="button" onClick={() => void takeShot()} disabled={shotBusy || capturing}>
+                      Take screenshot
+                    </button>
+                  )}
                   <button type="button" onClick={() => fileRef.current?.click()} disabled={shotBusy}>
                     {shotBusy ? 'Attaching...' : 'Attach screenshot'}
                   </button>
@@ -466,6 +539,9 @@ export default function ReportIssueButton() {
         }
 
         .issue-shot { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+        .issue-shot { flex-wrap: wrap; }
+        /* Out of the picture while Take screenshot grabs its frame (#93). */
+        .issue-capturing, .issue-capturing::backdrop { opacity: 0 !important; transition: none !important; }
         .issue-shot img {
           height: 40px; max-width: 80px; object-fit: cover;
           border: 1px solid var(--border); border-radius: 4px; display: block;

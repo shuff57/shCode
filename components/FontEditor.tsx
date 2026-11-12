@@ -178,6 +178,7 @@ export default function FontEditor({ start, onSaved }: {
   const [sample, setSample] = useState('Hello! My own font 123');
   const [preview, setPreview] = useState<string | null>(null);
   const [note, setNote] = useState<{ text: string; bad: boolean } | null>(null);
+  const [replaceName, setReplaceName] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const drag = useRef<
     | { kind: 'pen'; pts: P[] }
@@ -423,13 +424,16 @@ export default function FontEditor({ start, onSaved }: {
     return () => window.removeEventListener('keydown', onKey);
   });
 
-  function save() {
+  function save(replace = false) {
     if (!NAME_RE.test(name)) { setNote({ text: 'The name must start with a letter and use only letters, digits and _.', bad: true }); return; }
     if (!Object.values(doc.glyphs).some(drawn)) { setNote({ text: 'Draw at least one letter first.', bad: true }); return; }
-    if (name !== editing && listSavedFonts().some((f) => f.name === name)) {
-      setNote({ text: `You already have a font called ${name}. Pick another name, or open that one with Edit.`, bad: true });
+    // #106: saving over another font you have asks once; Replace is the yes.
+    if (name !== editing && !replace && listSavedFonts().some((f) => f.name === name)) {
+      setReplaceName(name);
+      setNote({ text: `You already have a font called ${name}. Replace it with this drawing, pick another name, or open that one with Edit.`, bad: true });
       return;
     }
+    setReplaceName(null);
     const json = serializeDoc(doc);
     if (json.length > MAX_DOC_BYTES) { setNote({ text: 'This drawing is too big to keep. Remove some pieces (long pen lines are the biggest) and save again.', bad: true }); return; }
     let buf: ArrayBuffer;
@@ -645,7 +649,10 @@ export default function FontEditor({ start, onSaved }: {
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
         <label htmlFor="fm-name" style={{ fontSize: 13 }}>Name</label>
         <input id="fm-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={40} spellCheck={false} style={{ ...field, width: 180 }} />
-        <button type="button" className="btn-run" onClick={save}>{editing && editing === name ? 'Save changes' : 'Save font'}</button>
+        <button type="button" className="btn-run" onClick={() => save()}>{editing && editing === name ? 'Save changes' : 'Save font'}</button>
+        {replaceName === name && name !== editing && (
+          <button type="button" style={btn} onClick={() => save(true)}>Replace {name}</button>
+        )}
         <button type="button" style={btn} onClick={newFont}>Start a new font</button>
         <span style={{ fontSize: 12, color: 'var(--c-dim)' }}>You will write <code>textFont(&apos;{NAME_RE.test(name) ? name : 'name'}&apos;)</code></span>
       </div>

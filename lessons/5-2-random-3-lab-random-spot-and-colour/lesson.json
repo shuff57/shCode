@@ -15,7 +15,7 @@
     {
       "id": "s1",
       "title": "A random spot",
-      "instructions": "`draw()` already has a block that runs once a second: `if (frameCount % 60 === 0) { ... }`. Inside it, set `coin.x` to a random number from 30 to 370 and `coin.y` to a random number from 30 to 270. Run it and wait: once a second the coin should jump to a new place, always fully on the canvas.",
+      "instructions": "`draw()` already has a block that runs once a second: `if (frameCount % 60 === 0) { ... }`. Inside it, set `coin.x` to a random number from 30 to 370 and `coin.y` to a random number from 30 to 270. Use moSHion's `random(min, max)`: JavaScript's `Math.random()` takes no numbers, so `Math.random(30, 370)` quietly ignores them and still gives a number from 0 to 1. Run it and wait: once a second the coin should jump to a new place, always fully on the canvas.",
       "hints": [
         "`random(min, max)` gives a number from `min` up to `max`. Decimals are fine for a position.",
         "`coin.x = random(30, 370);` is one of the two lines. The other one is for `coin.y`."
@@ -48,7 +48,7 @@
       "hint": "Set coin.x to random(30, 370).",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.x\\s*=\\s*[^;\\n]*\\brandom\\s*\\(|\\b(\\w+)\\s*=\\s*[^;\\n]*\\brandom\\s*\\([^;\\n]*[;\\n][\\s\\S]*?\\.x\\s*=\\s*\\1\\b|new\\s+Sprite\\s*\\(\\s*random\\s*\\(",
+      "pattern": "\\.x\\s*=\\s*[^;\\n]*(?:(?<![.\\w$])random\\s*\\(|Math\\.random\\s*\\(\\s*\\))|\\b(\\w+)\\s*=\\s*[^;\\n]*(?:(?<![.\\w$])random\\s*\\(|Math\\.random\\s*\\(\\s*\\))[^;\\n]*[;\\n][\\s\\S]*?\\.x\\s*=\\s*\\1\\b|new\\s+Sprite\\s*\\(\\s*random\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -60,7 +60,7 @@
       "hint": "Set coin.y to random(30, 270).",
       "type": "regex",
       "file": "script.js",
-      "pattern": "\\.y\\s*=\\s*[^;\\n]*\\brandom\\s*\\(|\\b(\\w+)\\s*=\\s*[^;\\n]*\\brandom\\s*\\([^;\\n]*[;\\n][\\s\\S]*?\\.y\\s*=\\s*\\1\\b|new\\s+Sprite\\s*\\([^;]*?\\)\\s*,\\s*random\\s*\\(",
+      "pattern": "\\.y\\s*=\\s*[^;\\n]*(?:(?<![.\\w$])random\\s*\\(|Math\\.random\\s*\\(\\s*\\))|\\b(\\w+)\\s*=\\s*[^;\\n]*(?:(?<![.\\w$])random\\s*\\(|Math\\.random\\s*\\(\\s*\\))[^;\\n]*[;\\n][\\s\\S]*?\\.y\\s*=\\s*\\1\\b|new\\s+Sprite\\s*\\([^;]*?\\)\\s*,\\s*random\\s*\\(",
       "flags": "",
       "points": 0,
       "status": "pending"
@@ -84,7 +84,7 @@
       "hint": "floor(random(colors.length)) is a whole number from 0 to 4.",
       "type": "regex",
       "file": "script.js",
-      "pattern": "(?:floor|round|int|trunc)\\s*\\(\\s*(?:Math\\.)?random\\s*\\(\\s*(?:\\)\\s*\\*\\s*|0\\s*,\\s*)?[A-Za-z_]\\w*\\.length|random\\s*\\(\\s*[A-Za-z_]\\w*\\s*\\)",
+      "pattern": "(?:floor|round|int|trunc)\\s*\\(\\s*(?:Math\\.random\\s*\\(\\s*\\)\\s*\\*\\s*|(?<![.\\w$])random\\s*\\(\\s*(?:0\\s*,\\s*)?)[A-Za-z_]\\w*\\.length|(?<![.\\w$])random\\s*\\(\\s*[A-Za-z_]\\w*\\s*\\)",
       "flags": "",
       "points": 0,
       "status": "pending"

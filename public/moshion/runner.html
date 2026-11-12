@@ -123,7 +123,24 @@
 		if (name === 'ReferenceError' && (m = /^([A-Za-z_$][\w$]*) is not defined$/.exec(msg)) && usedBare(m[1], text)) {
 			return 'The word ' + m[1] + ' is not defined. If it is a colour or text, put quotes around it.';
 		}
+		// #74: `player = new Sprite(...).color = 'red'` stores 'red' in player, so
+		// the error comes later, on a line that uses player as a sprite, and names
+		// neither the cause nor its line. Said only when the sketch has that line.
+		if (name === 'TypeError' && (m = chainedSet((window.__previewSources || {})['sketch.js']))) {
+			return m[0] + ' = new Sprite(...).' + m[1] + ' = ... puts the ' + m[1] + ' in ' + m[0]
+				+ ', not the sprite. Make the sprite on one line, then set ' + m[0] + '.' + m[1] + ' on the next.';
+		}
 		return '';
+	}
+	function chainedSet(code) {
+		if (typeof code !== 'string') return null;
+		var rx = /(^|[^\w$.])([A-Za-z_$][\w$]*)\s*=\s*new\s+(?:[A-Za-z_$][\w$]*\.)?Sprite\s*\([^;]*?\)\s*\.\s*([A-Za-z_$][\w$]*)\s*=(?!=)/;
+		var lines = code.split('\n');
+		for (var i = 0; i < lines.length; i++) {
+			var c = rx.exec(lines[i].replace(/\/\/.*$/, ''));
+			if (c) return [c[2], c[3]];
+		}
+		return null;
 	}
 	// "It came up." The host keeps Submit shut from Run until this frame has
 	// reported back one way or the other: an error (reportError), or this

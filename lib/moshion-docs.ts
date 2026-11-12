@@ -1314,7 +1314,7 @@ function draw() {
         title: 'Spawning and defaults',
         body: `A Group holds many sprites that share traits. Set a property on the group and every sprite spawned into it inherits that value as its default.
 
-Settings for how a sprite looks and what it is made of also change the sprites already in the group: enemies.color = 'red' turns every current enemy red, and the next one made too. That covers color, stroke, layer, visible, opacity, text, size (w, h, diameter), collider, bounciness, friction, density and drag. Where a sprite is and how it moves (x, y, vel, rotation, life) only set the starting value for new sprites, and so does any property you invent yourself, like enemies.hp = 3.
+Settings for how a sprite looks and what it is made of also change the sprites already in the group: enemies.color = 'red' turns every current enemy red, and the next one made too. That covers color, stroke, layer, visible, opacity, scale, text, size (w, h, diameter), collider, bounciness, friction, density and drag. A group's scale can change one direction on its own: walls.scale.y = 3 makes every wall three times as tall and leaves its width alone, and walls.scale = 2 sets both. Where a sprite is and how it moves (x, y, vel, rotation, life) only set the starting value for new sprites, and so does any property you invent yourself, like enemies.hp = 3.
 
 Create a group with new Group(). Then spawn sprites into it with new groupName.Sprite(...) — note the capital S. That factory reads the group's color, diameter, collider, and other defaults, copies them onto the new sprite, and adds the sprite to the group.
 
@@ -1499,9 +1499,9 @@ function draw() {
         title: 'Sound',
         body: `loadSound('file.mp3') gives you a Sound. Call .play() for a one-off effect and .loop() for music that should keep going.
 
-moSHion ships a small 8-bit palette you can load straight away: '/moshion/assets/coin.wav' is a short chime, '/moshion/assets/music.wav' is a short tune, and jump.wav, hit.wav, laser.wav, powerup.wav, explode.wav, blip.wav, select.wav and tone.wav sit in the same folder, with title.wav, win.wav and lose.wav for menus. For board and battle games there are dice.wav, step.wav, sword.wav, clang.wav, potion.wav, levelup.wav, crown.wav, whoosh.wav, pop.wav and door.wav. Every one is in the Library under Built in, where you can play it and copy the line that loads it. Type the path exactly as shown: a misspelled path shows no error, the sound just never plays.
+moSHion ships a small 8-bit palette you can load straight away: '/moshion/assets/coin.wav' is a short chime, '/moshion/assets/music.wav' is a short tune, and jump.wav, hit.wav, laser.wav, powerup.wav, explode.wav, blip.wav, select.wav and tone.wav sit in the same folder, with title.wav, win.wav and lose.wav for menus. For board and battle games there are dice.wav, step.wav, sword.wav, clang.wav, potion.wav, levelup.wav, crown.wav, whoosh.wav, pop.wav and door.wav. Every one is in the Library under Built in, where you can play it and copy the line that loads it. Type the path exactly as shown. A sound that cannot load never plays, and the console says why.
 
-The sound mixer at /sound (also the Sounds tab beside a moSHion lesson's code) builds a sound from a chip preset and saves it in this browser. Load a saved sound by name instead of by path: let zap = loadSound('zap');. A saved name wins over a built-in file with the same name.
+The sound mixer at /sound (also the Sounds tab beside a moSHion lesson's code) builds a sound from a chip preset and saves it, and Import a clip there saves your own MP3, WAV or OGG file. Load a saved sound by its name, exactly as you saved it, capitals too, and without .mp3: let zap = loadSound('zap');. A saved name wins over a built-in file with the same name. A saved sound can be about 190 KB at most, which is a few seconds of effect or a short music loop, not a whole song: for music, save a short loop and play it with .loop(). A link to a sound on another website does not work here; download the file and import it instead.
 
 .play() starts a fresh copy every time it's called, so firing a laser three times in three frames gives you three overlapping shots rather than one restarting over and over. .loop() is the opposite — it's the single track you start once and stop later, and calling it again while it's already going does nothing.
 
@@ -2050,7 +2050,11 @@ function draw() {
 
 sprite.changeAni(name) switches to a previously registered animation. If the name isn't found, nothing changes, and the console says so once, listing the names the sprite does have — a misspelt name otherwise looks just like a frozen sprite.
 
+The sheet can also be the name of a texture: sprite.addAni('walk', 'myWalk') uses an animation you drew in the Texture editor, with its own frames and durations, so you can switch between two drawn animations with changeAni. Give a frame count to override it.
+
 ani.frameDelay controls how many game frames each animation frame is held for (default 4). Set it on the Ani object returned by addAni, or on sprite.ani.frameDelay after activation.
+
+sprite.ani.frame is the frame showing, starting at 0. Set it to jump: sprite.ani.frame = 2 shows the third frame from the start of its time on screen, and -1 is the last frame. sprite.ani.tick is how many game frames the current frame has been showing; set it after frame to start part-way through a frame that lasts more than one (sprite.ani.frame = 1; sprite.ani.tick = 1; is the second game frame of frame 1). Both work on an animated texture you drew in the Texture editor too.
 
 Setting sprite.image clears any active animation, and vice versa — they're mutually exclusive.`,
         code: `let ghost;

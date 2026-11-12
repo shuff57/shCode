@@ -164,6 +164,79 @@ export const SEMANTIC_CHECKS = [
     },
   },
   {
+    name: 'a group scale reaches current members, and one axis can be set alone',
+    area: 'group',
+    // shCode #108: `door.scale = 2` reached only sprites made afterwards, and
+    // `door.scale.y = 3` changed nothing (it was .y on the number 2).
+    run({ runSketch }) {
+      const r = runSketch(`
+        var g, a, b, out;
+        function setup(){ new Canvas(400,400);
+          g = new Group(); a = new g.Sprite(100,100,20,20); a.scale = { x: 1, y: 4 };
+          g.scale = 2;                       // after a exists
+          g.scale.y = 3;                     // one axis
+          b = new g.Sprite(200,100,20,20);   // a new member gets the whole default
+          g.scale = { x: 5 };                // one axis, object form
+          out = [a.scale.x, a.scale.y, b.scale.x, b.scale.y, g.scale.x, g.scale.y];
+        }
+        function draw(){ background(0); }
+      `, { frames: 2 });
+      if (!r.ok) return `sketch threw: ${r.error && r.error.message}`;
+      const got = JSON.stringify(r.box.sandbox.out);
+      return got === '[5,3,5,3,5,3]' || `expected [5,3,5,3,5,3] (a, b, group), got ${got}`;
+    },
+  },
+  {
+    name: 'ani.frame jumps to a frame from its start, ani.tick to a step inside it',
+    area: 'animation',
+    // shCode #110: frame was a plain field, so a jump kept the old frame's count,
+    // and a frame past the end drew a blank slice.
+    run({ runSketch }) {
+      const r = runSketch(`
+        var s, a, seq = [], set = [];
+        function setup(){ new Canvas(200,200);
+          s = new Sprite(50,50,20,20);
+          a = s.addAni('walk', '/moshion/assets/ghost_idle.avif', 4);
+          a.frameDelay = 3;
+          a.frame = 7; set.push(a.frame);   // wraps: 7 of 4 is 3
+          a.frame = -1; set.push(a.frame);  // the last frame
+          a.frame = 2; a.tick = 1;
+        }
+        function draw(){ background(0); seq.push(a.frame + ':' + a.tick); }
+      `, { frames: 5 });
+      if (!r.ok) return `sketch threw: ${r.error && r.error.message}`;
+      const { seq, set } = r.box.sandbox;
+      if (set.join() !== '3,3') return `expected frame 7 -> 3 and -1 -> 3, got ${set.join()}`;
+      const want = '2:1 2:2 3:0 3:1 3:2';
+      return seq.join(' ') === want || `expected ${want}, got ${seq.join(' ')}`;
+    },
+  },
+  {
+    name: 'addAni takes the name of a drawn texture, with its frames and durations',
+    area: 'animation',
+    // shCode #111: a texture drawn in the editor has no URL; its name became
+    // img.src = 'walk' and the sprite drew nothing, with no message.
+    run({ runSketch }) {
+      const r = runSketch(`
+        var s, a, b;
+        function setup(){ new Canvas(200,200);
+          storeItem('texture:walk', 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==');
+          storeItem('texmeta:walk', { frames: 3, frameDelay: 5, delays: [2, 3, 4] });
+          s = new Sprite(50,50,20,20);
+          a = s.addAni('w', 'walk');
+          b = s.addAni('x', 'nosuchTexture');
+        }
+        function draw(){ background(0); }
+      `, { frames: 2 });
+      if (!r.ok) return `sketch threw: ${r.error && r.error.message}`;
+      const a = r.box.sandbox.a;
+      if (a.frameCount !== 3 || String(a.frameDelays) !== '2,3,4') return `expected 3 frames held 2,3,4, got ${a.frameCount} held ${a.frameDelays}`;
+      if (!String(a.spriteSheet.src).startsWith('data:image/png')) return 'the saved strip was not used as the sheet';
+      const warned = r.console.some((l) => l.type === 'warn' && /no texture called 'nosuchTexture'/.test(l.text));
+      return warned || 'an unknown texture name in addAni() said nothing';
+    },
+  },
+  {
     name: 'losing focus releases a held key and button (no keyup ever arrives)',
     area: 'input',
     // shCode #78: hold 'a', click the editor, and the keyup went to the parent page.

@@ -165,6 +165,20 @@ console.log('console runner: errors carry the line they happened on\n');
   check('no line means no parenthetical, so an error without one is unchanged',
     errorWithLocation('Error', 'boom', null, null) === 'Error: boom',
     errorWithLocation('Error', 'boom', null, null));
+  // #69: JSON.parse handed a function, an object or undefined gets a plain first line;
+  // a string that is simply not JSON keeps the browser's message alone.
+  check('JSON.parse of a function says so above the browser message',
+    errorWithLocation('SyntaxError', `Unexpected token 'u', "function re"... is not valid JSON`, 6, 7)
+      === `JSON.parse was given a function, not text. Give it the string you want to read, like JSON.parse(text).\nSyntaxError: Unexpected token 'u', "function re"... is not valid JSON (line 6, col 7)`,
+    errorWithLocation('SyntaxError', `Unexpected token 'u', "function re"... is not valid JSON`, 6, 7));
+  check('JSON.parse of an object and of undefined say so',
+    errorWithLocation('SyntaxError', '"[object Object]" is not valid JSON').startsWith('JSON.parse was given an object, not text.')
+      && errorWithLocation('SyntaxError', '"undefined" is not valid JSON').startsWith('JSON.parse was given a variable with no value yet'),
+    errorWithLocation('SyntaxError', '"undefined" is not valid JSON'));
+  check('a string that is not JSON keeps only the browser message',
+    errorWithLocation('SyntaxError', `Unexpected token 'h', "hello world" is not valid JSON`, 3, null)
+      === `SyntaxError: Unexpected token 'h', "hello world" is not valid JSON (line 3)`,
+    errorWithLocation('SyntaxError', `Unexpected token 'h', "hello world" is not valid JSON`, 3, null));
   check('a missing name falls back to Error',
     errorWithLocation(undefined, 'boom', 3, 1) === 'Error: boom (line 3, col 1)',
     errorWithLocation(undefined, 'boom', 3, 1));

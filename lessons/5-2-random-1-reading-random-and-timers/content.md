@@ -24,7 +24,7 @@ With two numbers, `random(min, max)` starts at `min` instead of 0.
 
 **Where the decimals come from.** The computer picks any point on the number line between the two ends, so most answers have a long tail of digits. A sprite does not mind: `x = 211.54` is a fine place to stand. But sometimes you need a whole number: a die roll, a column in a grid, a spot in a list.
 
-**`floor` cuts the decimals off.** `floor(4.1827)` is `4`. It always rounds down. If you remember a line with `Math.random()` and `Math.floor()` in the loops unit's card example, which you only read and never wrote, `random` and `floor` are the same two tools with shorter names. If you do not remember it, nothing is missing: this page is where they are taught.
+**`floor` cuts the decimals off.** `floor(4.1827)` is `4`. It always rounds down. If you remember a line with `Math.random()` and `Math.floor()` in the loops unit's card example, which you only read and never wrote, `floor` is `Math.floor` with a shorter name. `random` is not quite `Math.random`: moSHion's `random(min, max)` takes the two ends, while JavaScript's `Math.random()` takes no numbers at all, so `Math.random(30, 370)` quietly ignores them and still gives 0 to 1. If you do not remember that line, nothing is missing: this page is where they are taught.
 
 ```js
 floor(random(6))   // 0, 1, 2, 3, 4 or 5
