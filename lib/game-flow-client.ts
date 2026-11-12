@@ -12,9 +12,10 @@ import { isBuiltinRef } from './builtin-games';
 import { errorText } from './http-error';
 import { mergeChange } from './game-merge';
 import { conflictText, type ChangeCan, type ChangeRole, type ChangeStatus } from './game-flow-core';
+import { CHANGES_CHANGED, CHANGES_SEEN, SEEN_KEY } from './game-notices';
 import { GAMES_CHANGED, getGame, readSandboxCode, readSandboxGame, writeSandboxCode, writeSandboxGame } from './games-client';
 
-export const CHANGES_CHANGED = 'shcode:game-changes-changed';
+export { CHANGES_CHANGED };
 
 type Result<T> = { ok: true; value: T } | { ok: false; error: string; status: number; body?: Record<string, unknown> };
 
@@ -159,7 +160,6 @@ export function getClassChanges(classId: string) {
 
 // ---- seen state ("new" badges) ------------------------------------------------------
 
-const SEEN_KEY = 'shcode.gameChanges.seen';
 
 function seenMap(): Record<string, number> {
   try { return JSON.parse(localStorage.getItem(SEEN_KEY) || '{}') ?? {}; } catch { return {}; }
@@ -170,6 +170,7 @@ export function markSeen(id: string, at = Date.now()): void {
   // Keep the newest 300.
   const keep = Object.entries(m).sort((a, b) => b[1] - a[1]).slice(0, 300);
   try { localStorage.setItem(SEEN_KEY, JSON.stringify(Object.fromEntries(keep))); } catch { /* private mode */ }
+  try { window.dispatchEvent(new Event(CHANGES_SEEN)); } catch { /* no window */ }
 }
 export function isNew(row: { id: string; updatedAt: number }): boolean {
   const at = seenMap()[row.id];

@@ -13,6 +13,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import DiffViewer from './DiffViewer';
+import { hashTargetStyle, useHashTarget } from './useHashTarget';
 import {
   actOnChange, changeHref, eventText, gameChangesHref, getChange, markSeen, tryChangeHref, when,
   type ChangeDetail, type ConversationItem,
@@ -62,6 +63,8 @@ export default function ChangeThread({ id }: { id: string }) {
       document.title = `${r.value.change.title} — shCode`;
     } else setErr({ text: r.error, status: r.status });
   }, [id]);
+  // A notification opened this page at one comment (#112).
+  const target = useHashTarget(!!d);
 
   // Load, then look again every 30 s while the tab is in view (a conversation is not live chat).
   useEffect(() => {
@@ -245,13 +248,13 @@ export default function ChangeThread({ id }: { id: string }) {
         <div>
           <ol style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
             {d.conversation.map((x) => x.kind === 'event' ? (
-              <li key={x.id} style={{ fontSize: 13, color: 'var(--c-dim)', padding: '2px 12px', display: 'flex', gap: 8, alignItems: 'baseline' }}>
+              <li key={x.id} id={`c-${x.id}`} style={{ fontSize: 13, color: 'var(--c-dim)', padding: '2px 12px', display: 'flex', gap: 8, alignItems: 'baseline', ...(target === `c-${x.id}` ? hashTargetStyle : {}) }}>
                 <span aria-hidden="true" style={{ color: x.body === 'accepted' ? 'var(--c-purple)' : 'var(--c-line)' }}>●</span>
                 <span>{isChangeEvent(x.body) ? eventText(x.body, x.author || 'Someone', x.extra) : ''}</span>
                 <span style={{ fontSize: 12 }}>{when(x.createdAt)}</span>
               </li>
             ) : (
-              <li key={x.id} style={flowCard}>
+              <li key={x.id} id={`c-${x.id}`} style={{ ...flowCard, ...(target === `c-${x.id}` ? hashTargetStyle : {}) }}>
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', fontSize: 13, marginBottom: 4 }}>
                   <strong>{x.author}</strong>
                   <Badge b={x.badge} />
