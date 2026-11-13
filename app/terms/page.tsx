@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import LegalLinks from '../../components/LegalLinks';
 
 export const metadata = {
@@ -86,8 +87,7 @@ export default function TermsPage() {
 
       <h2>Contact</h2>
       <p>
-        Questions about these terms:{' '}
-        <a href="mailto:support@lefthanddev.com?subject=Terms%20question">support@lefthanddev.com</a>.
+        Questions about these terms: send us a message on the <Link href="/contact">contact page</Link>.
       </p>
 
       <LegalLinks />
