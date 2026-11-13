@@ -345,7 +345,8 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   `functions/_shared/dueDates.ts` exports `isLessonAvailableForStudent` ready
   for a route that wants to enforce it server-side; nothing calls it yet.
 - `lesson-drafts` doubles as diagram storage (the serialized `DiagramDoc`);
-  there is no diagram-specific table.
+  there is no diagram-specific table. Its POST takes an optional `baseUpdatedAt` (see "Work kept in this browser",
+  stage 3).
 - **The standalone `/sandbox` uses the lesson-sync save path**, not the retired
   commit banner. Each **project** is its own lesson id, so Save writes a `lesson_sync` row (and a
   Cloud history row) and arrival merges another device's copy, exactly as a
@@ -474,11 +475,11 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   `scripts/test-quiz-unsubmit.mjs` (wired into `npm test`), which drives the real
   handler against a D1 stub.
 
-### Work kept in this browser, per account (no migration; design `.ui-hill-climb/ux1/option2-design.md`, stages 1-2)
+### Work kept in this browser, per account (no migration; design `.ui-hill-climb/ux1/option2-design.md`, stages 1-3)
 - **Every personal browser key goes through `lib/owned-storage.ts`** and is named `w1:<owner>:<key>` (drafts
   `progress:<id>`, `sync:<id>`, `quiz:`, `written:`, `diagram:`, `flowblock:`, `liveBlock:`, `starter:`,
-  `carry-dismissed:`, `local-history`, `sandbox-game`, `moshion-store`, `library-*`; quiz/written/diagram through
-  `lib/work-records.ts`). `<owner>` is the readable cookie `shcode_owner`, or `guest` when there is none.
+  `carry-dismissed:`, `local-history`, `sandbox-game`, `moshion-store`, `library-*`, `draft-sync:`,
+  `draft-kept:`; quiz/written/diagram through `lib/work-records.ts`). `<owner>` is the readable cookie `shcode_owner`, or `guest` when there is none.
   `scripts/test-owned-storage-keys.mjs` fails on any raw storage use (calls, `window['localStorage']`,
   destructuring, `Storage.prototype`, the bare string) outside its non-personal allowlist (prefs, drawer, tabs, last
   class, What's new, ...): a new personal key uses `ownedLocal`.
@@ -523,11 +524,9 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
 - Deploy: nothing to apply. No migration, no new variable (it uses `AUTH_SECRET`).
 - **Stage 2: work uploads by itself (the outbox, `lib/outbox.ts`).** One entry per record at
   `w1:<owner>:outbox:<record key>` (one key per entry, so two tabs never rewrite each other's), holding no copy of
-  the work: a send reads the STORED record as it is then. One kind: `progress:<id>` (lab and sandbox code, sender
+  the work: a send reads the STORED record as it is then. Stage 2's kind: `progress:<id>` (lab and sandbox code, sender
   `labSender` in `lib/lesson-sync.ts`, through the existing PUT `/api/lesson-sync/[id]` with the revision this computer
-  last saw plus `auto: true`). **Flowchart drafts are not queued:** a late retry of `/api/lesson-drafts/[id]` cannot
-  tell whether the server's copy is newer, so their retry waits for stage 3 (`baseUpdatedAt`); DiagramAssignmentView
-  is as before. Started by `components/OutboxRunner.tsx` through `startOutboxForPage` (`lib/outbox-page.ts`: senders by
+  last saw plus `auto: true`). Stage 3 added `written:<id>` and `diagram:<id>` (below). Started by `components/OutboxRunner.tsx` through `startOutboxForPage` (`lib/outbox-page.ts`: senders by
   dynamic import after render, `/api/me` asked uncached); nothing starts at import.
 - **A drain never writes an editor into storage.** Before reading it runs only saves that are really waiting in that
   tab (`flushPendingSaves`, `lib/draft-autosave.ts`; `registerFlush(fn, isPending)`; the sandbox's own save and its
@@ -602,8 +601,47 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   lab Submit, QuizView Check/Submit). Library sync also runs on `online`.
 - Tests: `scripts/test-outbox.mjs` (npm test; same harness, plus offline events, fetch holds, scripted answers and a
   Web Locks manager shared across tab processes), and the `auto` cases in `scripts/test-lesson-sync.mjs` (real handler).
-- Deploy: nothing to apply. No migration, no new variable, no new binding. Uploads by themselves add D1 writes (at most
-  one per lesson per 30 s of typing) and no history rows.
+- Deploy (stage 2): nothing to apply. No migration, no new variable, no new binding. Uploads by themselves add D1 writes
+  (at most one per lesson per 30 s of typing) and no history rows.
+- **Stage 3: written answers and flowchart drafts upload by themselves** (`lib/draft-sync.ts`, rules in
+  `lib/draft-sync-core.ts`; two more outbox kinds). Same outbox, same "when it sends" rules. A send reads the stored
+  record and never writes it; what this computer remembers about the account (`draft-sync:<kind>:<id>`) moves only to
+  what really went up or came down, and **"could not ask the account" is never "the account has nothing"** (`askDraft`
+  returns `ok: false`; an arrival that failed changes nothing).
+- **Quiz picks before Check are NOT uploaded, on purpose** (owner's decision 2026-11-12). They stay on that computer
+  until Check, exactly as before; `components/QuizView.tsx` does not import the draft sync. A version with its own
+  table and route was built and removed: six independent reviews each reproduced a new ordering in which uploading
+  picks disturbed a handed-in quiz (a one-shot test opening unlocked, an older hand-in uploaded over newer picks, marks
+  lost on a spent paper). The cause is structural: a quiz's `lesson_drafts` row is both its hand-in and its lock, the
+  page saves whatever it shows, and the page loads once from the browser and again when sign-in settles. Anyone who
+  tries again should first make the lock independent of what the page loaded (decide it from the server's submissions)
+  before syncing picks at all.
+- **`POST /api/lesson-drafts/[id]` takes an optional `baseUpdatedAt`** (the row this browser last saw; null = none): a
+  different stored row answers 409 `{conflict, response, updatedAt}` and writes nothing. Uploads by themselves and the
+  Save draft buttons send it; a quiz's Check sends the old body and overwrites as before (the row is the quiz's own). `updated_at` is strictly increasing per row on both routes, decided inside the
+  write (`MAX(now, stored + 1)`; the teacher reopen and tries-reset writes do the same), because a guarded upload reads
+  the stamp as "exactly the version I saw". An answer overtaken while it was on its way (what this computer remembers changed
+  between asking and hearing back: an upload, a hand-in, a choice; `textToken`) is not applied. That is decided
+  by "did anything change meanwhile", never by comparing stamps: a row purged with a class and recreated can carry an
+  older stamp, and a purged row is simply forgotten on the next open.
+- **Text is never merged.** A written answer or flowchart changed here AND in the account: the entry pauses, this
+  computer's stays open, and `components/DraftVersions.tsx` asks "This answer was also changed on another computer."
+  Keep mine / Use the other one. The one not chosen is ADDED to the kept versions on this computer first
+  (`draft-kept:<kind>:<id>:<random>`, one key per version so two tabs never rewrite each other's, read back; if it
+  cannot be, nothing changes) and each stays offered ("Switch to
+  it" / "Remove it") until the student removes it; a later choice never replaces an earlier kept one. **A hand-in never
+  overwrites another computer's version unseen** (`handInText`): one waiting for a choice, or one its guarded write
+  finds, is kept first; if it cannot be kept the account's row is left alone and the choice waits (the submission row
+  itself is unaffected). **An arrival writes the stored record before it remembers agreeing with the account**; if the
+  record cannot be written nothing is remembered (an old record that looked like a new edit once uploaded over the text
+  just fetched). Both screens read this computer's copy again AFTER the account answers. **Work typed before stage 3** (text in
+  the browser, no `draft-sync` record) that differs from the account's: the account's opens, as it did before, and the
+  browser's is kept beside it; if it cannot be kept, it is asked as two versions instead.
+- A flowchart's untouched starter is not uploaded (`blank`). Its account save moved from "2.5 s after an edit, dropped
+  on failure" to the outbox (30 s after the last edit, on reconnect, on tab hide, retried). `server.js` mirrors both
+  routes for dev. Tests: `scripts/test-draft-sync.mjs` (rules, the real handlers, two browsers sharing one database).
+- Deploy (stage 3): nothing to apply. No migration, no new variable. The drafts route change is backwards compatible
+  (a page that sends no `baseUpdatedAt` behaves as before).
 
 ### Image uploads
 - `GET /api/uploads` — caller's images + quota (40 files / 20 MB, 2 MB each)

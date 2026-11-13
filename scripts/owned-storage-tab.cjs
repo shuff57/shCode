@@ -141,6 +141,8 @@ function modules() {
     outboxPage: load('lib/outbox-page.js'),
     offline: load('lib/offline.js'),
     grader: load('lib/written-grader-store.js'),
+    draftSync: load('lib/draft-sync.js'),
+    draftCore: load('lib/draft-sync-core.js'),
   };
   return M;
 }

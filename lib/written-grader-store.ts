@@ -36,7 +36,8 @@ export async function fetchDraft(lessonId: string): Promise<DraftPayload | null>
   }
 }
 
-export async function saveDraft(lessonId: string, response: string): Promise<boolean> {
+/** Write the account's draft row whatever is there (a hand-in). The row's new time, or null when it failed. */
+export async function putDraft(lessonId: string, response: string): Promise<number | null> {
   try {
     const res = await fetch(`/api/lesson-drafts/${encodeURIComponent(lessonId)}`, {
       method: 'POST',
@@ -44,10 +45,16 @@ export async function saveDraft(lessonId: string, response: string): Promise<boo
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ response }),
     });
-    return res.ok;
+    if (!res.ok) return null;
+    const body = (await res.json().catch(() => null)) as { updatedAt?: unknown } | null;
+    return typeof body?.updatedAt === 'number' ? body.updatedAt : 0;
   } catch {
-    return false;
+    return null;
   }
+}
+
+export async function saveDraft(lessonId: string, response: string): Promise<boolean> {
+  return (await putDraft(lessonId, response)) !== null;
 }
 
 export interface SubmissionFetch {

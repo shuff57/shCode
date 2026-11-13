@@ -8,8 +8,6 @@ import { NextLessonButton } from './LessonOutcome';
 import { ranWhen, writtenAnswerStatus } from '../lib/outcome-words';
 import LessonNumberLinks, { useSourceHrefs } from './LessonNumberLinks';
 import {
-  fetchDraft,
-  saveDraft,
   recordSubmission,
   fetchSubmissions,
   streamGrade,
@@ -27,6 +25,9 @@ import CodeMirrorPane from './CodeMirrorPane';
 import dynamic from 'next/dynamic';
 import { withAlpha } from '../lib/color-alpha';
 import { loadWrittenRecord, saveWrittenRecord, type WrittenRecord } from '../lib/work-records';
+import { arriveText, askDraft, handInText, noteTextSaved, saveTextNow, textToken } from '../lib/draft-sync';
+import DraftVersions from './DraftVersions';
+import { UploadChip, useUploadStatus } from './UploadStatus';
 import { OWNER_MISMATCH_HANDIN_TEXT } from '../lib/owner-fetch';
 
 // The editor engine is a few hundred kB; only the parts that set `formatting` download it.
@@ -227,15 +228,18 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
   const tooShort = response.trim().length < 20;
   // Whether the result on screen is for the text in the box, and whether "Draft saved" is still true (ux2 S4).
   const status = writtenAnswerStatus({ response, resultFor: result ? resultFor : null, savedText: savedAt ? savedText : null });
+  // Where the answer is: on this computer, uploading, uploaded (lib/outbox.ts).
+  const upload = useUploadStatus(lessonId, progress.authed, 'written');
 
   useEffect(() => {
     // Local cache is the always-available fallback; server draft is canonical
     // when signed in. Prefer server if it's newer (or exists at all).
     let cancelled = false;
     const local = loadState(lessonId);
+    const token = textToken('written', lessonId);
     (async () => {
       const [serverDraft, prior] = await Promise.all([
-        progress.authed ? fetchDraft(lessonId) : Promise.resolve(null),
+        progress.authed ? askDraft(lessonId) : Promise.resolve(null),
         // Signed in, the server's hand-ins are read on every visit: they are the only source of a
         // result shown on return (below), as well as the one-shot lock and the try count.
         progress.authed
@@ -250,10 +254,17 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
         setAttempts(prior.loaded ? countAttempts(prior.records) : null);
         setAnyRow(prior.loaded && prior.records.length > 0);
       }
-      if (serverDraft && serverDraft.response) {
-        setResponse(serverDraft.response);
+      // Which text opens (lib/draft-sync-core.ts textArrival): the account's unless this computer
+      // has changes the account does not. Changed on both: this computer's opens and the student
+      // chooses (DraftVersions). Could not ask the account: this computer's, nothing recorded.
+      const arrived = serverDraft ? arriveText('written', lessonId, serverDraft, undefined, token) : null;
+      if (arrived && arrived.use === 'server' && serverDraft && serverDraft.ok && serverDraft.row) {
+        setResponse(serverDraft.row.text);
       } else {
-        setResponse(local.response);
+        // Read again NOW: when this effect runs a second time (sign-in state settling) the student
+        // may have typed while the account was being asked, and the copy read before the request
+        // would put the older text back over it.
+        setResponse(loadState(lessonId).response);
       }
       // A result on return comes ONLY from the server's graded hand-ins for the signed-in account,
       // never from this browser's saved copy: on a shared computer that copy may be another
@@ -291,12 +302,17 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
   useEffect(() => {
     if (!loaded) return;
     saveState(lessonId, { response, lastResult: result ?? undefined, lastSubmittedAt: Date.now() });
-  }, [response, result, lessonId, loaded]);
+    // Text the account does not have yet uploads by itself (lib/draft-sync.ts); never a hand-in.
+    if (progress.authed) noteTextSaved('written', lessonId);
+  }, [response, result, lessonId, loaded, progress.authed]);
 
   async function saveNow() {
     setSaveStatus('saving');
-    const ok = progress.authed ? await saveDraft(lessonId, response) : false;
-    setSaveStatus(ok ? 'saved' : 'error');
+    // The same guarded send as an upload by itself: it never overwrites another computer's newer text.
+    const how = progress.authed ? await saveTextNow('written', lessonId) : 'error';
+    const ok = how === 'saved';
+    // Two versions: the note above the box asks; this button did not fail.
+    setSaveStatus(ok ? 'saved' : how === 'two-versions' ? 'idle' : 'error');
     if (ok) { setSavedAt(Date.now()); setSavedText(response); setClock(Date.now()); }
     setTimeout(() => setSaveStatus('idle'), 2000);
   }
@@ -321,7 +337,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
     // draft is still saved here, and the work is already in front of the teacher.
     // A network drop (no reply at all) writes nothing anywhere: the student retries.
     if (maxSubmissions !== null) {
-      await saveDraft(lessonId, response);
+      await handInText('written', lessonId, response);
       // Still unlock the next part after a grader outage (it is ours, not the
       // student's). The server only completes a capped part once a row exists, and
       // the marker it wrote is that row; with no reply at all there is none, the
@@ -343,7 +359,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
           attemptedAt: Date.now(),
         },
       }),
-      saveDraft(lessonId, response),
+      handInText('written', lessonId, response),
     ]);
     // Only suppress the retry once the row is actually on the server. Marking
     // it before the POST would mean a student whose network dropped never got
@@ -483,7 +499,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
           score: data.totalEarned,
           possible: data.totalPossible,
         });
-        saveDraft(lessonId, response);
+        void handInText('written', lessonId, response);
       }
     } catch (e) {
       const reason = e instanceof Error ? e.message : String(e);
@@ -518,6 +534,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
         />
       </div>
       <AttemptBanner max={maxSubmissions} used={attempts} loading={!loaded} />
+      <DraftVersions kind="written" lessonId={lessonId} noun="answer" enabled={progress.authed && !locked} current={response} onUse={setResponse} />
       {codeInput ? (
         // CodeMirrorPane fills its parent (height: 100%), so the parent needs a
         // height of its own. No Run button, lint or autocomplete, on purpose:
@@ -664,6 +681,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
             </a>
           ) : null}
           {savedAt && !loading && status.showDraftSaved ? <span className="written-outcome-saved">Draft saved {ranWhen(savedAt, clock)}</span> : null}
+          {!loading && !(savedAt && status.showDraftSaved) && upload.state !== 'conflict' ? <UploadChip status={upload} what="answer" style={{ maxWidth: 260 }} /> : null}
         </span>
         {tooShort && !locked && !loading && (
           <span id={`written-hint-${lessonId}`} className="written-submit-hint">

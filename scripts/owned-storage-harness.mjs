@@ -16,6 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { onRequest } from '../functions/_middleware.ts';
 import { signSession, workOwnerFor } from '../functions/_shared/auth.ts';
 
+import { compileHandler, makeD1 } from './_d1-sqlite.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const SECRET = 'test-secret-for-owned-storage';
 
@@ -23,7 +24,25 @@ const MODULES = [
   'store', 'lesson-sync', 'work-records', 'guest-work', 'owner-guard', 'auth', 'owner-fetch', 'local-history',
   'moshion-storage', 'starter-variants', 'carry-forward', 'games-client', 'draft-autosave', 'library-sync',
   'owned-storage', 'version-control', 'outbox', 'outbox-senders', 'outbox-page', 'offline', 'written-grader-store',
+  'draft-sync', 'draft-sync-core',
 ].map((m) => `lib/${m}.ts`);
+
+// The REAL draft routes (stage 3) over a real SQLite with every migration applied.
+let draftRoutes = null;
+function realDraftRoutes() {
+  if (!draftRoutes) {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'shcode-draft-routes-'));
+    draftRoutes = {
+      dir,
+      'lesson-drafts': compileHandler('api/lesson-drafts/[lessonId].ts', path.join(dir, 'drafts')),
+    };
+  }
+  return draftRoutes;
+}
+/** A database two browsers ("two computers") can share: createBrowser({ d1 }). */
+export function sharedD1() { realDraftRoutes(); return makeD1(); }
+/** Compile the draft routes now, so the first request in a test is not seconds slow. */
+export function warmDraftRoutes() { realDraftRoutes(); }
 
 let compiled = null;
 export function compile() {
@@ -55,7 +74,9 @@ export async function account(email) {
  * server.rows: { [email]: { [lessonId]: { files, revision } } } (lesson-sync)
  * server.writes: every request the middleware let through, with the account it ran as.
  */
-export function createBrowser({ quota = 0, db = null } = {}) {
+export function createBrowser({ quota = 0, db = null, d1 = null } = {}) {
+  // lesson_drafts, served by the real handler. Made on first use.
+  let draftDb = d1;
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'shcode-browser-'));
   const storeFile = path.join(dir, 'localStorage.json');
   fs.writeFileSync(storeFile, '{}');
@@ -94,7 +115,17 @@ export function createBrowser({ quota = 0, db = null } = {}) {
       if (body.auto !== true) ((server.history[email] ||= {})[id] ||= []).push(mine[id].revision);
       return Response.json({ revision: mine[id].revision, updatedAt: mine[id].updatedAt });
     }
-    if (u.pathname.startsWith('/api/lesson-submissions') || u.pathname.startsWith('/api/lesson-drafts/')) {
+    const dm = /^\/api\/(lesson-drafts)\/([^/]+)$/.exec(u.pathname);
+    if (dm) {
+      const body = req.method === 'GET' ? null : await req.clone().text();
+      if (dm[1] === 'lesson-drafts' && req.method !== 'GET') (server.drafts[email] ||= []).push({ path: u.pathname, body });
+      const h = realDraftRoutes()[dm[1]];
+      const fn = { GET: h.onRequestGet, POST: h.onRequestPost, PUT: h.onRequestPut, DELETE: h.onRequestDelete }[req.method];
+      if (!fn) return Response.json({ error: 'method' }, { status: 405 });
+      draftDb ||= makeD1();
+      return fn({ request: req, env: { DB: draftDb }, data: { email }, params: { lessonId: decodeURIComponent(dm[2]) } });
+    }
+    if (u.pathname.startsWith('/api/lesson-submissions')) {
       const body = req.method === 'GET' ? null : await req.text();
       (server.drafts[email] ||= []).push({ path: u.pathname, body });
       return Response.json({ ok: true });
@@ -177,6 +208,8 @@ export function createBrowser({ quota = 0, db = null } = {}) {
   const browser = {
     storeFile,
     server,
+    /** The draft route's database (lesson_drafts). */
+    get d1() { draftDb ||= makeD1(); return draftDb; },
     /**
      * Sign in as `acct` (both cookies set together, as login.ts does). `ownerCookie: false`
      * models a browser holding the session but not the owner cookie (a page served from a
@@ -259,6 +292,7 @@ export function createBrowser({ quota = 0, db = null } = {}) {
 }
 
 export function cleanup() {
+  if (draftRoutes) fs.rmSync(draftRoutes.dir, { recursive: true, force: true });
   if (compiled) fs.rmSync(compiled, { recursive: true, force: true });
   compiled = null;
 }
