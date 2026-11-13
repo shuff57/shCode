@@ -668,6 +668,9 @@ app.prepare().catch((err) => {
     server.get('/api/games/:id/changes', libRoute(gamesChanges.onRequestGet));
     server.post('/api/games/:id/changes', express.json({ limit: '200kb' }), libRoute(gamesChanges.onRequestPost));
     server.get('/api/game-changes', libRoute(changeInbox.onRequestGet));
+    // The notification bell (#112): proposed-change activity and comments on the caller's games.
+    const notifications = await import('./functions/api/notifications.ts');
+    server.get('/api/notifications', libRoute(notifications.onRequestGet));
     server.get('/api/game-changes/:cid', libRoute(changeOne.onRequestGet));
     server.post('/api/game-changes/:cid', express.json(), libRoute(changeOne.onRequestPost));
     server.get('/api/classes/:id/game-changes', libRoute(classChanges.onRequestGet));

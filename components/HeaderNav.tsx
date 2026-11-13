@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { getCurrentUser, CurrentUser } from '../lib/auth';
 import NavDropdown from './NavDropdown';
 import AuthButton from './AuthButton';
+import NotificationBell from './NotificationBell';
 
 // Menu-item style shared by both dropdowns below — a real <Link>/<a>, not a
 // div with onClick, so it stays keyboard- and screen-reader-reachable.
@@ -64,7 +65,7 @@ export default function HeaderNav() {
   const isStaff = loaded && (user?.role === 'teacher' || user?.role === 'admin');
 
   return (
-    <div ref={menuRef} className="site-header-nav-wrap">
+    <div ref={menuRef} className="site-header-nav-wrap" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
       <button className="mobile-header-menu" type="button" aria-label="Open navigation menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(v => !v)} style={{ display: 'none', background: 'transparent', color: 'var(--header-fg)', border: '1px solid var(--c-comment)', borderRadius: 4, padding: '6px 9px', fontSize: 18, lineHeight: 1, cursor: 'pointer' }}>
         ☰
       </button>
@@ -141,6 +142,8 @@ export default function HeaderNav() {
       )}
         <AuthButton />
       </nav>
+      {/* #112: what classmates did on your games and proposed changes. Outside <nav> so a phone shows it too. */}
+      <NotificationBell enabled={!!user} />
     </div>
   );
 }

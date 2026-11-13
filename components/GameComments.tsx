@@ -15,6 +15,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { FeedbackProvider, useFeedback } from './FeedbackProvider';
+import { hashTargetStyle, useHashTarget } from './useHashTarget';
+import { markGameCommentsSeen } from '../lib/game-notices';
 import { deleteGameComment, getGameComments, postGameComment, setGameFeedback } from '../lib/games-client';
 import { COMMENT_MAX, closedText, type GameComment, type GameCommentsView } from '../lib/game-comments-core';
 
@@ -55,9 +57,15 @@ function GameCommentsInner({ gameId, owner }: Props) {
 
   const load = useCallback(async () => {
     const r = await getGameComments(gameId);
-    if (r.ok) setView(r.value);
+    if (r.ok) {
+      setView(r.value);
+      // Shown: the bell (#112) stops counting this game's comments up to now.
+      if (r.value.canWrite || r.value.isMaker || r.value.canModerate) markGameCommentsSeen(gameId);
+    }
   }, [gameId]);
   useEffect(() => { void load(); }, [load]);
+  // A notification opened this page at one comment (#112).
+  const target = useHashTarget(!!view);
 
   if (!view) return null;
   const note = view.closed ? closedText(view.closed, view.isMaker) : '';
@@ -105,7 +113,7 @@ function GameCommentsInner({ gameId, owner }: Props) {
   const count = view.comments.filter((c) => !c.deleted).length;
 
   const one = (c: GameComment, isReply: boolean) => (
-    <div key={c.id} style={{ marginLeft: isReply ? 22 : 0, padding: '6px 0', borderTop: isReply ? 'none' : '1px solid var(--c-line)' }}>
+    <div key={c.id} id={`comment-${c.id}`} style={{ marginLeft: isReply ? 22 : 0, padding: '6px 0', borderTop: isReply ? 'none' : '1px solid var(--c-line)', ...(target === `comment-${c.id}` ? hashTargetStyle : {}) }}>
       <div style={{ fontSize: 12, color: 'var(--c-dim)', display: 'flex', gap: 8, alignItems: 'baseline', flexWrap: 'wrap' }}>
         <strong style={{ color: 'var(--c-fg)', fontSize: 13 }}>{c.mine ? `${c.author} (you)` : c.author}</strong>
         {c.byMaker && <span style={{ fontSize: 11, padding: '0 6px', borderRadius: 8, border: '1px solid var(--c-purple)', color: 'var(--c-purple)' }}>maker</span>}
