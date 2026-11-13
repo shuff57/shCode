@@ -11,8 +11,8 @@ let lastKey = 'none yet';
 
 function setup() {
   new Canvas(400, 300);
-  chime = loadSound('/moshion/assets/coin.wav');
-  tune = loadSound('/moshion/assets/music.wav');
+  chime = loadSound('coin');
+  tune = loadSound('music');
   tune.volume = 0.4;   // the tune sits under the chime
 }
 

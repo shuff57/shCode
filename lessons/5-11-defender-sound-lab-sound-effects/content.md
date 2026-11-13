@@ -4,27 +4,27 @@ About 15 minutes. The game in `script.js` is your 7.10.2 game, and it plays exac
 
 ### A sound is an object you load
 
-`loadSound(path)` downloads a sound file and gives you back a **Sound** object. Keep it in a variable, the same way you keep a sprite:
+`loadSound(name)` downloads one of the course's sounds and gives you back a **Sound** object. Keep it in a variable, the same way you keep a sprite:
 
 ```js
 let zap;
 
 function setup() {
   new Canvas(400, 400);
-  zap = loadSound('/moshion/assets/coin.wav');
+  zap = loadSound('coin');
 }
 ```
 
-The course has two sound files, and the path has to be typed exactly, quotes and all:
+Every built-in sound has a name, and the name has to be typed exactly, quotes and all. This lab uses two:
 
-| Path | What it sounds like |
+| Name | What it sounds like |
 | --- | --- |
-| `'/moshion/assets/coin.wav'` | a short blip, about a fifth of a second |
-| `'/moshion/assets/music.wav'` | a five-second tune |
+| `'coin'` | a short blip, about a fifth of a second |
+| `'music'` | a five-second tune |
 
-A misspelled path does not show an error. The sound just never plays, so if your game stays silent, check the path first.
+Library, Built in, lists the rest (`'jump'`, `'laser'`, `'explode'` and more), each with a play button. A misspelled name never plays, and the console says so, so if your game stays silent, look in the console first. The full path, `'/moshion/assets/coin.wav'`, reaches the same file and still works.
 
-**Load once, in `setup()`. Play later.** A sound file has to download before it can play, and that takes a moment. A `.play()` that comes before the download has finished does nothing at all: no sound and no error. So every sound is loaded once, in `setup()`, and played later, when something happens in the game. Loading inside `draw()` or inside a constructor would start a new download every time, and each `.play()` would come too early to be heard.
+**Load once, in `setup()`. Play later.** A sound file has to download before it can play, and that takes a moment. A `.play()` that comes before the download has finished does nothing at all: no sound, only a note in the console. So every sound is loaded once, in `setup()`, and played later, when something happens in the game. Loading inside `draw()` or inside a constructor would start a new download every time, and each `.play()` would come too early to be heard.
 
 ### Playing it
 
@@ -40,9 +40,9 @@ A Sound has properties you can set, the way a sprite has `color`:
 That is how one file gives you two different sounds. Load it twice, into two variables, and set each one differently:
 
 ```js
-zap = loadSound('/moshion/assets/coin.wav');
+zap = loadSound('coin');
 zap.volume = 0.3;    // shots come often, so keep them quiet
-boom = loadSound('/moshion/assets/coin.wav');
+boom = loadSound('coin');
 boom.rate = 0.5;     // the same blip, slower and lower
 ```
 

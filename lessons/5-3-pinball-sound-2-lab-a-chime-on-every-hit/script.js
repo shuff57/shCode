@@ -47,7 +47,7 @@ function setup() {
 
   score = 0;
 
-  // STEP 1: load the chime here, once: '/moshion/assets/coin.wav'
+  // STEP 1: load the chime here, once: its name is 'coin'
 }
 
 function draw() {

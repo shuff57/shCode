@@ -16,8 +16,8 @@ function setup() {
   star = new Sprite(200, -10, 18);
   star.collider = 'none';   // nothing pushes the star: this code moves it
   star.color = 'gold';
-  chime = loadSound('/moshion/assets/coin.wav');
-  thud = loadSound('/moshion/assets/coin.wav');
+  chime = loadSound('coin');
+  thud = loadSound('coin');
   thud.rate = 0.5;   // the same file, slower and lower
   // STEP 1: load the tune, set its volume from level, and start it looping.
 }

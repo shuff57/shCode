@@ -4,7 +4,7 @@ let blip;
 
 function setup() {
   new Canvas(400, 300);
-  blip = loadSound('/moshion/assets/coin.wav');
+  blip = loadSound('coin');
 }
 
 function draw() {

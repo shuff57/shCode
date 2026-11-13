@@ -17,12 +17,12 @@ function setup() {
   star = new Sprite(200, -10, 18);
   star.collider = 'none';   // nothing pushes the star: this code moves it
   star.color = 'gold';
-  chime = loadSound('/moshion/assets/coin.wav');
+  chime = loadSound('coin');
   // STEP 2: change these two lines: a list of three sounds from the coin
   //   file, each with its own rate.
-  thud = loadSound('/moshion/assets/coin.wav');
+  thud = loadSound('coin');
   thud.rate = 0.5;   // the same file, slower and lower
-  music = loadSound('/moshion/assets/music.wav');
+  music = loadSound('music');
   music.volume = level / 10;   // 4 tenths: under the effects
   music.loop();                // starts when the file has arrived
 }

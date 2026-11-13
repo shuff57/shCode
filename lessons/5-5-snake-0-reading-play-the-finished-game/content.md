@@ -248,10 +248,10 @@ function startRound() {
 function setup() {
   new Canvas(400, 400);
   best = Number(getItem('snakeBest')) || 0;
-  coinSound = loadSound('/moshion/assets/coin.wav');
-  loseSound = loadSound('/moshion/assets/lose.wav');
-  startSound = loadSound('/moshion/assets/select.wav');
-  winSound = loadSound('/moshion/assets/win.wav');
+  coinSound = loadSound('coin');
+  loseSound = loadSound('lose');
+  startSound = loadSound('select');
+  winSound = loadSound('win');
   startRound();                 // a snake to look at behind the title
   state = 'title';
   makeEyes();

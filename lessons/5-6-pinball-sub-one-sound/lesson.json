@@ -20,7 +20,7 @@
     {
       "id": "s2",
       "title": "Load it once",
-      "instructions": "In `setup()`, load the sound once and keep it in a variable: `const blip = loadSound('/moshion/assets/coin.wav');`. It loads asynchronously, so a browser will not play it before the page has had a click or a key press."
+      "instructions": "In `setup()`, load the sound once and keep it in a variable: `const blip = loadSound('coin');`. It loads asynchronously, so a browser will not play it before the page has had a click or a key press."
     },
     {
       "id": "s3",
@@ -37,7 +37,7 @@
       "id": "r1",
       "title": "Loaded once",
       "description": "The sound is loaded in setup() and kept in a variable, not loaded inside draw(). Help: 5.6.1 (Reading: A sound on a hit)",
-      "hint": "const blip = loadSound('/moshion/assets/coin.wav');",
+      "hint": "const blip = loadSound('coin');",
       "type": "regex",
       "file": "script.js",
       "pattern": "\\bloadSound\\s*\\(",
@@ -68,7 +68,7 @@
   "aiCheck": {
     "file": "script.js",
     "rubricTitle": "What the AI read in your code",
-    "prompt": "The student wrote a short moSHion sketch for \"Sub-build: One key, one sound\". The task: load one sound once in setup(), keep it in a variable, and play it inside a key test so it fires once per press rather than every frame. This is a sub-build: a small isolated program whose only job is this one mechanic, so judge the mechanic itself and not style. Accept any variable names, helper functions, arrow functions, ternaries and semicolons. A line that only exists in a comment or a string does not count. moSHion facts: colliding(b) is 0 while apart and counts frames while touching, so an if on it alone is true every frame of a touch; a stored \"last frame\" value makes it true once. .life = n counts down one per frame and deletes the sprite at 0. A sprite with collider 'none' is passed through and has its gravity off. loadSound(path) in setup() and sound.play() where the event happens; a browser will not play sound before the student's first click or key. Write short, plain notes for a 14-year-old, name the student's own line when something is missing, and never write corrected code.",
+    "prompt": "The student wrote a short moSHion sketch for \"Sub-build: One key, one sound\". The task: load one sound once in setup(), keep it in a variable, and play it inside a key test so it fires once per press rather than every frame. This is a sub-build: a small isolated program whose only job is this one mechanic, so judge the mechanic itself and not style. Accept any variable names, helper functions, arrow functions, ternaries and semicolons. A line that only exists in a comment or a string does not count. moSHion facts: colliding(b) is 0 while apart and counts frames while touching, so an if on it alone is true every frame of a touch; a stored \"last frame\" value makes it true once. .life = n counts down one per frame and deletes the sprite at 0. A sprite with collider 'none' is passed through and has its gravity off. loadSound(name) in setup() (a built-in name such as 'coin', or a full path such as '/moshion/assets/coin.wav') and sound.play() where the event happens; a browser will not play sound before the student's first click or key. Write short, plain notes for a 14-year-old, name the student's own line when something is missing, and never write corrected code.",
     "rubric": [
       {
         "id": "r1",

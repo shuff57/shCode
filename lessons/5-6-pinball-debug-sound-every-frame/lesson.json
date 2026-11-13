@@ -46,7 +46,7 @@
       "id": "r2",
       "title": "Loaded once",
       "description": "loadSound is called once, in setup(), not inside draw(). Help: 5.6.1 (Reading: A sound on a hit)",
-      "hint": "blip = loadSound('/moshion/assets/coin.wav');",
+      "hint": "blip = loadSound('coin');",
       "type": "regex",
       "file": "script.js",
       "pattern": "function\\s+setup\\s*\\([^)]*\\)\\s*\\{[\\s\\S]{0,500}?loadSound\\s*\\(",

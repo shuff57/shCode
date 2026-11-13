@@ -14,8 +14,8 @@ function setup() {
   star = new Sprite(200, -10, 18);
   star.collider = 'none';   // nothing pushes the star: this code moves it
   star.color = 'gold';
-  // STEP 1: load two sounds here, once: the chime from the coin file, and the
-  //   thud from the same file at half speed.
+  // STEP 1: load two sounds here, once: the chime from the 'coin' sound, and
+  //   the thud from the same sound at half speed.
 }
 
 // The star goes back to the top, at a random x.

@@ -9,15 +9,15 @@ By the end of this reading you should be able to answer:
 - Where does `.play()` go, so a hit gives one chime and not a buzz?
 - Why can a sketch stay silent until you click it?
 
-**A sound is a file the sketch downloads.** `loadSound(path)` starts downloading a sound file and hands you back a sound straight away. Keep it in a variable made with `let` at the top of the file, the way you keep a sprite (5.1.8). The course has a short chime at this path, typed exactly, quotes included:
+**A sound is a file the sketch downloads.** `loadSound(name)` starts downloading one of the course's sounds and hands you back a sound straight away. Keep it in a variable made with `let` at the top of the file, the way you keep a sprite (5.1.8). The course's short chime is called `'coin'`, typed exactly, quotes included:
 
 ```js
-chime = loadSound('/moshion/assets/coin.wav');
+chime = loadSound('coin');
 ```
 
-A misspelled path shows no error. The sound just never plays, so when a sketch stays silent, check the path letter by letter.
+A misspelled name never plays, and the console says so, so when a sketch stays silent, look in the console and check the name letter by letter. The full path, `'/moshion/assets/coin.wav'`, reaches the same file and still works.
 
-**Load once, in `setup()`. Play later.** The file takes a moment to arrive, and a `.play()` that comes before it has arrived does nothing at all: no sound and no error. So a sound is loaded once, in `setup()`, and played later, when something happens. A `loadSound` in `draw()` would start a new download 60 times a second, and none of them would be ready in time to play.
+**Load once, in `setup()`. Play later.** The file takes a moment to arrive, and a `.play()` that comes before it has arrived does nothing at all: no sound, only a note in the console. So a sound is loaded once, in `setup()`, and played later, when something happens. A `loadSound` in `draw()` would start a new download 60 times a second, and none of them would be ready in time to play.
 
 Write it as `chime = loadSound(...)`, with no `let` in front, the way `player = new Sprite(...)` is written in 5.1.8. The `let chime;` at the top already made the variable. A `let` inside `setup()` would make a second `chime` that only `setup()` can see.
 
@@ -46,7 +46,7 @@ function setup() {
   ball.color = 'deepskyblue';
   ball.bounciness = 0.6;
 
-  chime = loadSound('/moshion/assets/coin.wav');
+  chime = loadSound('coin');
   chime.volume = 0.5;
   wasTouching = false;
 }
@@ -82,7 +82,7 @@ function draw() {
 
 | Term | Meaning |
 |------|---------|
-| **`loadSound(path)`** | Starts downloading a sound file and gives back a sound. Called once, in `setup()`. |
+| **`loadSound(name)`** | Starts downloading the course's sound with that name and gives back a sound. Called once, in `setup()`. |
 | **`.play()`** | Plays one copy of the sound from the start. Each call is a new copy. |
 | **`.volume`** | How loud this sound is, from `0` (silent) to `1` (full). |
-| **`'/moshion/assets/coin.wav'`** | The course's short chime. A misspelled path never plays and shows no error. |
+| **`'coin'`** | The course's short chime. A misspelled name never plays; the console says why. |

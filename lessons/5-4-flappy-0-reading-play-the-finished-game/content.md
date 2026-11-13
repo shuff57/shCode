@@ -326,9 +326,9 @@ function setup() {
   score = 0;
   newBest = false;
 
-  jumpSound = loadSound('/moshion/assets/jump.wav');
-  coinSound = loadSound('/moshion/assets/coin.wav');
-  hitSound = loadSound('/moshion/assets/hit.wav');
+  jumpSound = loadSound('jump');
+  coinSound = loadSound('coin');
+  hitSound = loadSound('hit');
 
   for (let i = 0; i < 5; i++) {
     clouds.push({ x: 40 + i * 90, y: random(40, 150), s: random(0.7, 1.3), v: random(0.15, 0.4) });

@@ -16,16 +16,16 @@ function setup() {
   star = new Sprite(200, -10, 18);
   star.collider = 'none';   // nothing pushes the star: this code moves it
   star.color = 'gold';
-  chime = loadSound('/moshion/assets/coin.wav');
+  chime = loadSound('coin');
   thuds = [
-    loadSound('/moshion/assets/coin.wav'),
-    loadSound('/moshion/assets/coin.wav'),
-    loadSound('/moshion/assets/coin.wav'),
+    loadSound('coin'),
+    loadSound('coin'),
+    loadSound('coin'),
   ];
   thuds[0].rate = 0.4;   // three speeds of one file: three different thuds
   thuds[1].rate = 0.5;
   thuds[2].rate = 0.6;
-  music = loadSound('/moshion/assets/music.wav');
+  music = loadSound('music');
   music.volume = level / 10;   // 4 tenths: under the effects
   music.loop();                // starts when the file has arrived
 }

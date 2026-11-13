@@ -136,10 +136,10 @@ function setup() {
   ball.friction = 0;
   ball.isSuperFast = true;      // checks hits every step so it cannot tunnel through a flipper
 
-  popSound = loadSound('/moshion/assets/coin.wav');
-  hitSound = loadSound('/moshion/assets/blip.wav');
-  loseSound = loadSound('/moshion/assets/lose.wav');
-  launchSound = loadSound('/moshion/assets/powerup.wav');
+  popSound = loadSound('coin');
+  hitSound = loadSound('blip');
+  loseSound = loadSound('lose');
+  launchSound = loadSound('powerup');
 
   best = Number(getItem('pinballBest')) || 0;
   state = 'title';

@@ -124,7 +124,7 @@ function setup() {
     if (phase === 'online') applyMove(m, who);
   });
   for (const name of ['sword', 'clang', 'potion', 'levelup', 'win', 'lose', 'select', 'hit']) {
-    snd[name] = loadSound('/moshion/assets/' + name + '.wav');
+    snd[name] = loadSound(name);
   }
   for (let i = 0; i < 2; i++) {
     const b = new Sprite(SPOT[i], 170, 72, 72);

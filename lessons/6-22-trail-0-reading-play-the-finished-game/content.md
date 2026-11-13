@@ -68,7 +68,7 @@ function setup() {
     if (phase === 'online') applyMove(m, who);
   });
   for (const name of ['dice', 'step', 'jump', 'whoosh', 'blip', 'win', 'select']) {
-    snd[name] = loadSound('/moshion/assets/' + name + '.wav');
+    snd[name] = loadSound(name);
   }
   path = makePath(TRACK);
   for (let i = 0; i < path.length; i++) {

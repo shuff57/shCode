@@ -11,7 +11,7 @@ function draw() {
   circle(200, 150, 120);
 
   // BUG 2: loading every frame.
-  blip = loadSound('/moshion/assets/coin.wav');
+  blip = loadSound('coin');
 
   if (kb.presses('space')) {
     flash = 12;

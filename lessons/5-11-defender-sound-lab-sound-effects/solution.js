@@ -116,9 +116,9 @@ function setup() {
   new Canvas(400, 400);
 
   // Load each sound once, here. It plays later, when something happens.
-  zap = loadSound('/moshion/assets/coin.wav');
+  zap = loadSound('coin');
   zap.volume = 0.3;
-  boom = loadSound('/moshion/assets/coin.wav');
+  boom = loadSound('coin');
   boom.rate = 0.5;
 
   base = new Sprite(200, 392, 400, 16, 'static');

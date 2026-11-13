@@ -10,18 +10,18 @@ By the end of this reading you should be able to answer:
 - Why can a sketch stay silent until the player clicks or presses a key?
 - Where in the code does a `.play()` go?
 
-**A sound is a file the sketch downloads.** You met this in 7.11.3: `loadSound(path)` starts downloading a sound file and hands you back a **Sound** at once. Keep it in a variable, the way you keep a sprite. The course's two everyday sound files are these, and the path is typed exactly, quotes included:
+**A sound is a file the sketch downloads.** You met this in 7.11.3: `loadSound(name)` starts downloading one of the course's sounds and hands you back a **Sound** at once. Keep it in a variable, the way you keep a sprite. The two everyday sounds are these, and the name is typed exactly, quotes included:
 
-| Path | What it is |
+| Name | What it is |
 | --- | --- |
-| `'/moshion/assets/coin.wav'` | a short two-note chime, about a fifth of a second |
-| `'/moshion/assets/music.wav'` | a soft tune about five seconds long, made to loop |
+| `'coin'` | a short two-note chime, about a fifth of a second |
+| `'music'` | a soft tune about five seconds long, made to loop |
 
-A misspelled path shows no error. The sound just never plays, so when a sketch stays silent, check the path first.
+A misspelled name never plays, and the console says so and lists the names that exist, so when a sketch stays silent, look in the console first. The full path, `'/moshion/assets/coin.wav'`, reaches the same file and still works.
 
-**More files, and sounds you make yourself.** The same folder holds a small 8-bit palette you can use straight away: `jump.wav`, `hit.wav`, `laser.wav`, `powerup.wav`, `explode.wav`, `blip.wav`, `select.wav`, `tone.wav`, and `title.wav`, `win.wav`, `lose.wav` for menus. They load exactly like the two above.
+**More sounds, and sounds you make yourself.** There is a small 8-bit palette you can use straight away: `'jump'`, `'hit'`, `'laser'`, `'powerup'`, `'explode'`, `'blip'`, `'select'`, `'tone'`, and `'title'`, `'win'`, `'lose'` for menus, plus more for board and battle games in Library, Built in. They load exactly like the two above: `loadSound('jump')`.
 
-The **sound mixer** at [shCode /sound](/sound) (also the **Sounds** tab beside your code in every moSHion lesson) builds a sound from a chip preset and lets you mix several channels, set each one's volume, rate and pan, and save the result. It also has a **Mic** panel: make a short sound with your mouth, and the mixer fits the Tweak knobs to it so you have a starting point to adjust. A saved sound is loaded by **name**, with no path to spell:
+The **sound mixer** at [shCode /sound](/sound) (also the **Sounds** tab beside your code in every moSHion lesson) builds a sound from a chip preset and lets you mix several channels, set each one's volume, rate and pan, and save the result. It also has a **Mic** panel: make a short sound with your mouth, and the mixer fits the Tweak knobs to it so you have a starting point to adjust. A saved sound is loaded by **name** too, the same way as a built-in one:
 
 ```js
 let zap = loadSound('zap');
@@ -29,16 +29,16 @@ zap.volume = 0.8;
 zap.play();
 ```
 
-The mixer keeps that sound in this browser, next to your saved textures, and a sketch on this site finds it. A saved name wins over a built-in file with the same name.
+The mixer keeps that sound in this browser, next to your saved textures, and a sketch on this site finds it. If you save a sound under a built-in name, such as `coin`, yours plays instead of the built-in one.
 
-**Load once, in `setup()`. Play later.** The file takes a moment to arrive, and a `.play()` that comes before it has arrived does nothing at all: no sound and no error. So every sound is loaded once, in `setup()`, and played later, when something happens. A `loadSound` in `draw()` would start a new download 60 times a second, and none of them would ever be ready.
+**Load once, in `setup()`. Play later.** The file takes a moment to arrive, and a `.play()` that comes before it has arrived does nothing at all: no sound, only a note in the console. So every sound is loaded once, in `setup()`, and played later, when something happens. A `loadSound` in `draw()` would start a new download 60 times a second, and none of them would ever be ready.
 
 ```js
 let chime;
 
 function setup() {
   new Canvas(400, 400);
-  chime = loadSound('/moshion/assets/coin.wav');
+  chime = loadSound('coin');
 }
 ```
 
@@ -71,8 +71,7 @@ function setup() {
 
 | Term | Meaning |
 | --- | --- |
-| **`loadSound(path)`** | Starts downloading a sound file and gives back a Sound. Called once, in `setup()`. |
-| **`loadSound('name')`** | Loads a sound you saved in the sound mixer, by name instead of by path. |
+| **`loadSound('name')`** | Starts downloading the sound with that name (one you saved in the sound mixer, or a built-in one) and gives back a Sound. Called once, in `setup()`. |
 | **`.play()`** | Plays one copy from the start. Each call is a new copy, so quick calls overlap. |
 | **`.loop()`** | Plays the sound over and over until `.stop()`. One looping copy at most, so calling it again does nothing. |
 | **`.stop()`** | Stops every copy of that sound. |

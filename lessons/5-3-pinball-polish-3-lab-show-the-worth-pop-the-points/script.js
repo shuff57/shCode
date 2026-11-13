@@ -50,7 +50,7 @@ function setup() {
 
   score = 0;
 
-  chime = loadSound('/moshion/assets/coin.wav');
+  chime = loadSound('coin');
 }
 
 function draw() {

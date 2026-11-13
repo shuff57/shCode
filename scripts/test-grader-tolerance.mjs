@@ -1834,7 +1834,7 @@ for (const id of Object.values(L)) {
   {
     const id = '5-3-pinball-sound-2-lab-a-chime-on-every-hit';
     const S = solutionFiles(id);
-    const load = "  chime = loadSound('/moshion/assets/coin.wav');";
+    const load = "  chime = loadSound('coin');";
     const hit = '    if (touching && !b.wasTouching) {' + nl + '      score += b.worth;' + nl + '      chime.play();' + nl + '    }';
     const noPlay = '    if (touching && !b.wasTouching) {' + nl + '      score += b.worth;' + nl + '    }';
     const mem = '    b.wasTouching = touching;';
@@ -1849,26 +1849,32 @@ for (const id of Object.values(L)) {
       ['reference', 'pass', S],
       ['untouched starter', 'r1', starterFiles(id)],
       // r1: the load
-      ['double quotes', 'pass', edit(S, p('/moshion/assets/coin.wav'), 'loadSound("/moshion/assets/coin.wav")')],
-      ['backticks', 'pass', edit(S, p('/moshion/assets/coin.wav'), 'loadSound(' + BT + '/moshion/assets/coin.wav' + BT + ')')],
-      ['the short path assets/coin.wav', 'pass', edit(S, p('/moshion/assets/coin.wav'), p('assets/coin.wav'))],
-      ['./assets/coin.wav', 'pass', edit(S, p('/moshion/assets/coin.wav'), p('./assets/coin.wav'))],
-      ['music.wav instead', 'pass', edit(S, p('/moshion/assets/coin.wav'), p('/moshion/assets/music.wav'))],
+      ['double quotes', 'pass', edit(S, p('coin'), 'loadSound("coin")')],
+      ['backticks', 'pass', edit(S, p('coin'), 'loadSound(' + BT + 'coin' + BT + ')')],
+      ['the full path /moshion/assets/coin.wav', 'pass', edit(S, p('coin'), p('/moshion/assets/coin.wav'))],
+      ['full path in double quotes', 'pass', edit(S, p('coin'), 'loadSound("/moshion/assets/coin.wav")')],
+      ['the short path assets/coin.wav', 'pass', edit(S, p('coin'), p('assets/coin.wav'))],
+      ['./assets/coin.wav', 'pass', edit(S, p('coin'), p('./assets/coin.wav'))],
+      ['music instead', 'pass', edit(S, p('coin'), p('music'))],
+      ['music.wav by path instead', 'pass', edit(S, p('coin'), p('/moshion/assets/music.wav'))],
       ['loaded first, before the canvas', 'pass', edit(edit(S, load + nl, ''), '  new Canvas(440, 420);', load + nl + '  new Canvas(440, 420);')],
       ['on the same line as the score', 'pass', edit(edit(S, load + nl, ''), '  score = 0;', '  score = 0; ' + load.trim())],
       ['a volume line after it', 'pass', edit(S, load, load + nl + '  chime.volume = 0.5;')],
-      ['another name, no semicolons', 'pass', { 'script.js': src.replace(/chime/g, 'ding').replace("loadSound('/moshion/assets/coin.wav');", "loadSound('/moshion/assets/coin.wav')").replace('ding.play();', 'ding.play()') }],
+      ['another name, no semicolons', 'pass', { 'script.js': src.replace(/chime/g, 'ding').replace("loadSound('coin');", "loadSound('coin')").replace('ding.play();', 'ding.play()') }],
       ['var at the top', 'pass', edit(S, 'let chime;', 'var chime;')],
-      ['a sound on each bumper', 'pass', edit(edit(S, load, "  b1.ding = loadSound('/moshion/assets/coin.wav');" + nl + "  b2.ding = loadSound('/moshion/assets/coin.wav');" + nl + "  b3.ding = loadSound('/moshion/assets/coin.wav');"), 'chime.play();', 'b.ding.play();')],
-      ['sounds kept in a list', 'pass', edit(edit(edit(S, 'let chime;', 'let sounds = [];'), load, "  sounds.push(loadSound('/moshion/assets/coin.wav'));"), 'chime.play();', 'sounds[0].play();')],
+      ['a sound on each bumper', 'pass', edit(edit(S, load, "  b1.ding = loadSound('coin');" + nl + "  b2.ding = loadSound('coin');" + nl + "  b3.ding = loadSound('coin');"), 'chime.play();', 'b.ding.play();')],
+      ['sounds kept in a list', 'pass', edit(edit(edit(S, 'let chime;', 'let sounds = [];'), load, "  sounds.push(loadSound('coin'));"), 'chime.play();', 'sounds[0].play();')],
       ['let in front, inside setup()', 'r1', edit(S, load, '  let ' + load.trim())],
       ['const in front, inside setup()', 'r1', edit(S, load, '  const ' + load.trim())],
-      ['path typo: asset', 'r1', edit(S, p('/moshion/assets/coin.wav'), p('/moshion/asset/coin.wav'))],
-      ['a file that does not exist: coin.mp3', 'r1', edit(S, p('/moshion/assets/coin.wav'), p('/moshion/assets/coin.mp3'))],
+      ['name typo: cion', 'r1', edit(S, p('coin'), p('cion'))],
+      ['name typo: coins', 'r1', edit(S, p('coin'), p('coins'))],
+      ['name in capitals: Coin', 'r1', edit(S, p('coin'), p('Coin'))],
+      ['path typo: asset', 'r1', edit(S, p('coin'), p('/moshion/asset/coin.wav'))],
+      ['a file that does not exist: coin.mp3', 'r1', edit(S, p('coin'), p('/moshion/assets/coin.mp3'))],
       ['loaded again in draw()', 'r1', edit(S, "  background('#222');", "  background('#222');" + nl + load)],
       ['loaded only in draw()', 'r1', edit(edit(S, load + nl, ''), "  background('#222');", "  background('#222');" + nl + load)],
       ['the load only in a comment', 'r1', edit(S, load, '  // ' + load.trim())],
-      ['loaded at the top of the file, not in setup() (not taught)', 'r1', edit(edit(S, load + nl, ''), 'let chime;', "let chime = loadSound('/moshion/assets/coin.wav');")],
+      ['loaded at the top of the file, not in setup() (not taught)', 'r1', edit(edit(S, load + nl, ''), 'let chime;', "let chime = loadSound('coin');")],
       // r2: the play
       ['play above the score line', 'pass', edit(S, hit, '    if (touching && !b.wasTouching) {' + nl + '      chime.play();' + nl + '      score += b.worth;' + nl + '    }')],
       ['a second braceless if', 'pass', edit(S, hit, noPlay + nl + '    if (touching && !b.wasTouching) chime.play();')],

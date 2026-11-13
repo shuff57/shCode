@@ -20,18 +20,18 @@ function setup() {
   star = new Sprite(200, -10, 18);
   star.collider = 'none';   // nothing pushes the star: this code moves it
   star.color = 'gold';
-  chime = loadSound('/moshion/assets/coin.wav');
+  chime = loadSound('coin');
   thuds = [
-    loadSound('/moshion/assets/coin.wav'),
-    loadSound('/moshion/assets/coin.wav'),
-    loadSound('/moshion/assets/coin.wav'),
+    loadSound('coin'),
+    loadSound('coin'),
+    loadSound('coin'),
   ];
   thuds[0].rate = 0.4;   // three speeds of one file: three different thuds
   thuds[1].rate = 0.5;
   thuds[2].rate = 0.6;
-  music = loadSound('/moshion/assets/music.wav');
+  music = loadSound('music');
   music.volume = 0.4;    // the tune sits under the effects
-  notes = loadSound('/moshion/assets/music.wav', {
+  notes = loadSound('music', {
     clips: { one: [0, 1.3], two: [1.3, 2.6], three: [2.6, 4], four: [4, 5.3] },
   });
   loadSettings();

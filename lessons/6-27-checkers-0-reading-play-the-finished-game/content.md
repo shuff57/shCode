@@ -58,7 +58,7 @@ function setup() {
     if (phase === 'online') applyMove(m, who);
   });
   for (const name of ['step', 'pop', 'crown', 'win', 'select', 'blip']) {
-    snd[name] = loadSound('/moshion/assets/' + name + '.wav');
+    snd[name] = loadSound(name);
   }
   for (let i = 0; i < 12; i++) {
     const s = new Sprite(-50, -50, 26, 26);
