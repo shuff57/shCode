@@ -227,7 +227,7 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
       msg = m.message;
     }
     setBusy(true);
-    const r = await publishGame(t.title, c.code, updating, { choice, remixedFrom: from?.id ?? null, retryAsNew: false, message: msg });
+    const r = await publishGame(t.title, c.code, updating, { choice, remixedFrom: from?.id ?? null, fromVersion: readSandboxGame().fromVersion ?? null, retryAsNew: false, message: msg });
     if (!r.ok) {
       setBusy(false);
       if (r.status === 404 && updating) {

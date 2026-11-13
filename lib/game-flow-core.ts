@@ -55,6 +55,8 @@ export function isChangeId(s: unknown): s is string {
 
 /** The GitHub word for each thing, shown once per panel in small text. */
 export const GITHUB_WORD = {
+  family: 'On GitHub a remix is called a fork, and an accepted change is a merged pull request.',
+  star: 'On GitHub this is called starring a project.',
   version: 'On GitHub, saving a version with a note is called a commit.',
   history: 'On GitHub this list is called the commit history.',
   propose: 'On GitHub this is called a pull request.',

@@ -753,6 +753,21 @@ classmate gets a one-line note and nothing else, the maker and the class's teach
 POST `feedback-off|feedback-on` (gameId) and `class-feedback-off|class-feedback-on`; the Shared games panel has the class
 switch, a per-game switch in each row's menu, and comment counts. UI `components/GameComments.tsx`; the publish panel
 has "Let classmates give feedback". Tests `scripts/test-game-comments.mjs` (npm test). Apply 0051 before deploying.
+**Stars and the family tree (migration 0052, 2026-11-12; not deployed yet).** GitHub's starring in the game flow's plain
+words (`GITHUB_WORD.star` names the term once): a Star toggle, one per person (`game_stars`), beside Run on /play with a count
+that opens who starred it (first name + last initial, "You"), Star/Starred on Class games rows, and Library -> Games ->
+**Starred** (`GET /api/games/starred`: only games the caller may still open, newest star first). Anyone visibleGame() lets
+open the game may star it, the maker too; nobody stars a hidden game; a star carries no words, so it ignores the 0051 feedback
+switches. `GET|POST /api/games/[id]/star {on}`; `GET /api/games` and `/api/games/shared` carry `stars` + `starred`
+(`starsFor`, `functions/_shared/gameStars.ts`). UI `components/GameStarButton.tsx`. The **family tree**
+(`GET /api/games/[id]/family`, `components/GameFamilyTree.tsx` on /play) is drawn on the course flowchart canvas (read-only
+`DiagramEditor`, via `familyToDiagram()`: original = Start oval, remix = Task box, a game the reader cannot open = connector
+circle, a click opens the game through the editor's read-only `onNodeClick`; node labels keep their own line breaks): who
+remixed what, when and from which version (`library_games.remixed_from_version`, 0052, sent by the publish panel from the sandbox record's `fromVersion`;
+NULL for older remixes), plus accepted changes as arrows back up (routed round the left like a loop's return). Privacy is `assembleFamily()` in
+`lib/game-family.ts`: a game the reader cannot open is never named by its own row; a leaf is dropped and counted, a link in
+the chain is a plain box named only by a visible remix's credit. Tests: `scripts/test-game-stars-family.mjs` (npm test).
+Apply 0052 before deploying.
 **Built-in course games (2026-11-11).** `lib/builtin-games.ts` is the one list of Library -> Games -> Built in
 (the generator, the Library, /play and the publish route all read it). Lesson games (Trail, Checkers, Quest) stay play
 only. A course game is a file (`games/<name>.js`, first: Paddle Rally by Steven Huff, 2-4 players on one keyboard or

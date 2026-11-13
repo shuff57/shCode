@@ -10,6 +10,7 @@ import { callerClasses, gamesSharedInto, json, type SessionData } from '../../..
 import { ownerLabel } from '../../../_shared/libraryShare';
 import { modeLabel, type GameMode } from '../../../../lib/games-core';
 import { choiceOf, provenanceFromRow } from '../../../../lib/share-choice';
+import { starsFor } from '../../../_shared/gameStars';
 
 interface Env {
   DB: D1Database;
@@ -35,6 +36,12 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ en
       sharedAt: r.shared_at, updatedAt: r.updated_at, hidden: r.hidden_at != null,
       choice: choiceOf(r.share_choice), remixedFrom: provenanceFromRow(r),
     });
+  }
+  // Stars (migration 0052): how many, and whether the caller starred it.
+  const { counts, mine } = await starsFor(env.DB, [...seen.keys()], data.email);
+  for (const [id, g] of seen) {
+    g.stars = counts.get(id) ?? 0;
+    g.starred = mine.has(id);
   }
   return json({ games: [...seen.values()] });
 };

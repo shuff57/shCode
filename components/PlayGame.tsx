@@ -48,6 +48,8 @@ import { changeHref, gameChangesHref, getChange, type ChangeDetail } from '../li
 import { GITHUB_WORD, isChangeId } from '../lib/game-flow-core';
 import GameSuggestions from './GameSuggestions';
 import GameComments from './GameComments';
+import GameStarButton from './GameStarButton';
+import GameFamilyTree from './GameFamilyTree';
 
 type State =
   | { kind: 'loading' }
@@ -226,7 +228,8 @@ export default function PlayGame() {
             </div>
           )}
         </div>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+          {!trying && <GameStarButton gameId={g.id} />}
           <button type="button" className="btn-run" onClick={() => setRunKey((k) => k + 1)}>
             {runKey === 0 ? '▶ Run' : '↻ Restart'}
           </button>
@@ -299,6 +302,7 @@ export default function PlayGame() {
         </div>
       </div>
       <GameSuggestions gameId={g.id} owner={g.owner} mine={g.mine} />
+      <GameFamilyTree gameId={g.id} />
       <GameComments gameId={g.id} owner={g.owner} />
       {showCode && canRemix && <CodeBlock code={runCode} />}
     </div>

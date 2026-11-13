@@ -632,11 +632,18 @@ app.prepare().catch((err) => {
     server.get('/api/games', libRoute(gamesMine.onRequestGet));
     server.post('/api/games', express.json({ limit: '200kb' }), libRoute(gamesMine.onRequestPost));
     server.get('/api/games/shared', libRoute(gamesShared.onRequestGet));
+    const gamesStarred = await import('./functions/api/games/starred/index.ts');
+    server.get('/api/games/starred', libRoute(gamesStarred.onRequestGet));
     server.get('/api/games/:id', libRoute(gamesOne.onRequestGet));
     server.delete('/api/games/:id', libRoute(gamesOne.onRequestDelete));
     server.post('/api/games/:id/share', express.json(), libRoute(gamesShare.onRequestPost));
     server.get('/api/games/:id/assets', libRoute(gamesAssets.onRequestGet));
     // Suggestions on class games (#96): a fixed list, no free text.
+    const gamesStar = await import('./functions/api/games/[id]/star.ts');
+    const gamesFamily = await import('./functions/api/games/[id]/family.ts');
+    server.get('/api/games/:id/star', libRoute(gamesStar.onRequestGet));
+    server.post('/api/games/:id/star', express.json(), libRoute(gamesStar.onRequestPost));
+    server.get('/api/games/:id/family', libRoute(gamesFamily.onRequestGet));
     const gamesSuggest = await import('./functions/api/games/[id]/suggestions.ts');
     server.get('/api/games/:id/suggestions', libRoute(gamesSuggest.onRequestGet));
     server.post('/api/games/:id/suggestions', express.json(), libRoute(gamesSuggest.onRequestPost));

@@ -25,6 +25,9 @@ import {
   getGame,
   listMyGames,
   listSharedGames,
+  listStarredGames,
+  setGameStarred,
+  type StarredGame,
   playHref,
   remixIntoSandbox,
   setGameShared,
@@ -32,6 +35,8 @@ import {
   type SharedGame,
 } from '../lib/games-client';
 import { modeLabel, type GameMode } from '../lib/games-core';
+import { StarCount, StarIcon } from './GameStarButton';
+import { GITHUB_WORD } from '../lib/game-flow-core';
 import { CHOICE_TEXT, canRemix, type ShareChoice } from '../lib/share-choice';
 import { sectionHeading, sectionNote, sectionStyle } from './library-ui';
 import ShareChoicePicker, { RemixCreditLine, lockedChoice, useLastChoice } from './ShareChoicePicker';
@@ -110,6 +115,7 @@ type Loaded<T> = { kind: 'loading' } | { kind: 'signed-out' } | { kind: 'error';
 export default function GamesLibrary({ onMessage }: { onMessage?: (text: string, bad: boolean) => void }) {
   const [mine, setMine] = useState<Loaded<MyGame>>({ kind: 'loading' });
   const [shared, setShared] = useState<Loaded<SharedGame>>({ kind: 'loading' });
+  const [starred, setStarred] = useState<Loaded<StarredGame>>({ kind: 'loading' });
   const [busy, setBusy] = useState<string | null>(null);
   // Shown in this section, where the button was pressed (the panel's own
   // message line sits at the top, out of view by the time you reach Games).
@@ -119,11 +125,20 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
   const [lastChoice, rememberChoice] = useLastChoice('game');
 
   const load = useCallback(async () => {
-    const [a, b] = await Promise.all([listMyGames(), listSharedGames()]);
+    const [a, b, c] = await Promise.all([listMyGames(), listSharedGames(), listStarredGames()]);
+    setStarred(c.ok ? { kind: 'ok', games: c.value.games } : c.status === 401 ? { kind: 'signed-out' } : { kind: 'error', text: c.error });
     setMine(a.ok ? { kind: 'ok', games: a.value.games } : a.status === 401 ? { kind: 'signed-out' } : { kind: 'error', text: a.error });
     // The class list leaves out your own games: they are already under "My games".
     setShared(b.ok ? { kind: 'ok', games: b.value.games.filter((g) => !g.mine) } : b.status === 401 ? { kind: 'signed-out' } : { kind: 'error', text: b.error });
   }, []);
+
+  async function star(id: string, on: boolean) {
+    setBusy('star-' + id);
+    const r = await setGameStarred(id, on);
+    setBusy(null);
+    if (!r.ok) { setNote({ text: r.error, bad: true }); return; }
+    void load();
+  }
   useEffect(() => {
     void load();
     const on = () => { void load(); };
@@ -220,6 +235,7 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
                 <div style={{ fontSize: 13, fontWeight: 600 }}>{g.title}</div>
                 <div style={{ ...badge, whiteSpace: 'normal' }}>
                   {modeLabel(g.mode, g.players)}{g.version ? ` · version ${g.version}` : ''}
+                  {g.stars ? <> · <StarCount count={g.stars} starred={g.starred} /></> : null}
                   {g.shared
                     ? <span style={{ color: 'var(--c-green)' }}> · shared with your class ({CHOICE_TEXT.game[g.choice ?? 'credit'].short})</span>
                     : ' · only you'}
@@ -282,10 +298,18 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
                 <div style={{ fontSize: 13, fontWeight: 600 }}>{g.title}</div>
                 <div style={badge}>
                   by {g.owner} · {g.modeLabel} · {CHOICE_TEXT.game[g.choice ?? 'credit'].short}
+                  {g.stars ? <> · <StarCount count={g.stars} starred={g.starred} /></> : null}
                   {g.hidden && <span style={{ color: 'var(--c-orange)' }}> · hidden from students</span>}
                 </div>
                 <RemixCreditLine from={g.remixedFrom} />
               </div>
+              {!g.hidden && (
+                <button type="button" style={{ ...btn, display: 'inline-flex', alignItems: 'center', gap: 5 }} aria-pressed={!!g.starred}
+                  disabled={busy === 'star-' + g.id} onClick={() => void star(g.id, !g.starred)}
+                  title={g.starred ? 'Take your star back' : 'Star it: tells the maker you like it and keeps it in Starred'}>
+                  <StarIcon on={!!g.starred} size={13} />{g.starred ? 'Starred' : 'Star'}
+                </button>
+              )}
               <a href={playHref(g.id)} style={playBtn}>Play</a>
               {canRemix(g.choice) && (
                 <button type="button" style={btn} disabled={busy === g.id} onClick={() => void remix(g.id, false)}
@@ -300,6 +324,41 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
           ))}
         </div>
       )}
+      </section>
+
+      {/* GitHub's Stars list, in plain words (migration 0052). */}
+      <section aria-labelledby="games-starred-h" style={sectionStyle}>
+      <h3 id="games-starred-h" style={{ ...sectionHeading, margin: '0 0 6px', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <StarIcon on size={15} /> Starred ({starred.kind === 'ok' ? starred.games.length : '…'})
+      </h3>
+      {starred.kind === 'loading' && <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: 0 }}>Loading…</p>}
+      {starred.kind === 'error' && <p style={{ fontSize: 13, color: 'var(--c-red)', margin: 0 }}>{starred.text}</p>}
+      {starred.kind === 'ok' && !starred.games.length && (
+        <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: 0 }}>
+          Nothing starred yet. Press <strong style={{ color: 'var(--c-fg)' }}>Star</strong> on a game you like to keep it here.
+        </p>
+      )}
+      {starred.kind === 'ok' && starred.games.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {starred.games.map((g) => (
+            <div key={g.id} style={rowStyle}>
+              <div style={{ minWidth: 140, flex: '1 1 160px' }}>
+                <div style={{ fontSize: 13, fontWeight: 600 }}>{g.title}</div>
+                <div style={badge}>
+                  by {g.mine ? `${g.owner} (you)` : g.owner} · {g.modeLabel} · <StarCount count={g.stars} starred />
+                </div>
+                <RemixCreditLine from={g.remixedFrom} />
+              </div>
+              <button type="button" style={{ ...btn, display: 'inline-flex', alignItems: 'center', gap: 5 }} aria-pressed
+                disabled={busy === 'star-' + g.id} onClick={() => void star(g.id, false)} title="Take your star back">
+                <StarIcon on size={13} />Starred
+              </button>
+              <a href={playHref(g.id)} style={playBtn}>Play</a>
+            </div>
+          ))}
+        </div>
+      )}
+      <p style={{ ...sectionNote, margin: '6px 0 0' }}>{GITHUB_WORD.star}</p>
       </section>
 
       <BuiltinGames onMessage={onMessage} />

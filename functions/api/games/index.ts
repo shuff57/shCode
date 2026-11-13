@@ -29,6 +29,7 @@ import { json, type SessionData } from '../../_shared/games';
 import { GAME_CODE_MAX, GAME_MAX_PER_OWNER, checkCode, cleanTitle, declaredMode, isGameId } from '../../../lib/games-core';
 import { newUploadId } from '../../_shared/uploads';
 import { originalGame } from '../../_shared/shareChoice';
+import { starsFor } from '../../_shared/gameStars';
 import { firstVersionStmt, openChangeCounts, saveVersionStmts, savedAs } from '../../_shared/gameFlow';
 import { ownerName } from '../../_shared/games';
 import { cleanMessage } from '../../../lib/game-flow-core';
@@ -75,9 +76,11 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ en
       ORDER BY updated_at DESC`,
   ).bind(data.email).all<MineRow>();
   const open = await openChangeCounts(env.DB, (r.results ?? []).map((g) => g.id));
+  const stars = await starsFor(env.DB, (r.results ?? []).map((g) => g.id), data.email);
   return json({
     games: (r.results ?? []).map((g) => ({
       version: g.version ?? 1, openChanges: open.get(g.id) ?? 0,
+      stars: stars.counts.get(g.id) ?? 0, starred: stars.mine.has(g.id),
       id: g.id, title: g.title, mode: g.mode, players: g.players, bytes: g.bytes,
       createdAt: g.created_at, updatedAt: g.updated_at, shared: !!g.shared,
       choice: choiceOf(g.share_choice), remixedFrom: provenanceFromRow(g),
@@ -90,7 +93,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ r
   if (Number(request.headers.get('Content-Length') || 0) > MAX_BODY) {
     return json({ error: `That is too large to publish; the most a game can be is ${GAME_CODE_MAX / 1024} KB of code.` }, 413);
   }
-  let body: { id?: unknown; title?: unknown; code?: unknown; choice?: unknown; remixedFrom?: unknown; message?: unknown };
+  let body: { id?: unknown; title?: unknown; code?: unknown; choice?: unknown; remixedFrom?: unknown; fromVersion?: unknown; message?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -142,6 +145,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ r
     return json({ error: `You have ${GAME_MAX_PER_OWNER} published games, the most you can have. Delete one in the Library to publish another.` }, 409);
   }
   let remixedFrom: Provenance | null = null;
+  let fromVersion: number | null = null;
   // A remix of a built-in course game (Paddle Rally): the credit comes from lib/builtin-games.ts.
   const builtin = remixableBuiltin(body.remixedFrom);
   if (builtin) {
@@ -153,6 +157,14 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ r
         return json({ error: remixRefusal('game', original.provenance.title, original.provenance.author), justPlay: true }, 403);
       }
       remixedFrom = original.provenance;
+      // Which version the remix started from (migration 0052, the family tree). Only
+      // a whole number up to the original's newest version is kept; anything else is
+      // simply not recorded, never an error.
+      if (Number.isInteger(body.fromVersion) && (body.fromVersion as number) > 0) {
+        const v = await env.DB.prepare(`SELECT version FROM library_games WHERE id = ?`)
+          .bind(body.remixedFrom).first<{ version: number | null }>();
+        if ((body.fromVersion as number) <= (v?.version ?? 1)) fromVersion = body.fromVersion as number;
+      }
     }
   }
   const ch = decideChoice(body.choice, remixedFrom);
@@ -161,11 +173,11 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ r
   const id = newUploadId();
   const me = await ownerName(env.DB, data.email);
   await env.DB.batch([env.DB.prepare(
-    `INSERT INTO library_games (id, owner_email, title, code, mode, players, created_at, updated_at, share_choice, ${PROVENANCE_COLUMNS})
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO library_games (id, owner_email, title, code, mode, players, created_at, updated_at, share_choice, ${PROVENANCE_COLUMNS}, remixed_from_version)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   ).bind(id, data.email, t.title, c.code, mode, players, now, now, ch.choice,
     p.remixed_from_id, p.remixed_from_title, p.remixed_from_author, p.remixed_from_choice,
-    p.origin_id, p.origin_title, p.origin_author),
+    p.origin_id, p.origin_title, p.origin_author, fromVersion),
   firstVersionStmt(env.DB, id, c.code, data.email, me, now)]);
   return json({ ok: true, created: true, game: { id, title: t.title, mode, players, updatedAt: now, choice: ch.choice, remixedFrom, version: 1 } }, 201);
 };

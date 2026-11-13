@@ -56,6 +56,9 @@ export interface MyGame {
   /** The game's version (migration 0048) and how many proposed changes wait for it. */
   version?: number;
   openChanges?: number;
+  /** How many people starred it (migration 0052), and whether you did. */
+  stars?: number;
+  starred?: boolean;
 }
 
 export interface SharedGame {
@@ -73,6 +76,9 @@ export interface SharedGame {
   hidden: boolean;
   choice: ShareChoice;
   remixedFrom: Provenance | null;
+  /** How many people starred it (migration 0052), and whether you did. */
+  stars?: number;
+  starred?: boolean;
 }
 
 export interface FullGame {
@@ -186,6 +192,36 @@ export function listSharedGames() {
   return call<{ games: SharedGame[] }>('/api/games/shared');
 }
 
+/** A game you starred (migration 0052), as GET /api/games/starred lists it. */
+export interface StarredGame {
+  id: string;
+  title: string;
+  mode: GameMode;
+  players: number;
+  modeLabel: string;
+  owner: string;
+  mine: boolean;
+  updatedAt: number;
+  starredAt: number;
+  choice: ShareChoice;
+  remixedFrom: Provenance | null;
+  stars: number;
+  starred: true;
+}
+
+export function listStarredGames() {
+  return call<{ games: StarredGame[] }>('/api/games/starred');
+}
+
+/** Star or unstar a game; answers the game's stars as they are now. */
+export function setGameStarred(id: string, on: boolean) {
+  return call<import('./game-stars').StarView>(`/api/games/${encodeURIComponent(id)}/star`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ on }),
+  });
+}
+
 export function getGame(id: string) {
   return call<{ game: FullGame }>(`/api/games/${encodeURIComponent(id)}`);
 }
@@ -206,7 +242,7 @@ export async function publishGame(
   title: string,
   code: string,
   id: string | null,
-  opts: { choice?: ShareChoice; remixedFrom?: string | null; retryAsNew?: boolean; message?: string } = {},
+  opts: { choice?: ShareChoice; remixedFrom?: string | null; fromVersion?: number | null; retryAsNew?: boolean; message?: string } = {},
 ) {
   const post = (body: Record<string, unknown>) => call<{
     created: boolean;
@@ -219,6 +255,7 @@ export async function publishGame(
   const extra: Record<string, unknown> = {};
   if (opts.choice) extra.choice = opts.choice;
   if (opts.remixedFrom) extra.remixedFrom = opts.remixedFrom;
+  if (opts.remixedFrom && opts.fromVersion) extra.fromVersion = opts.fromVersion;
   let r = await post(id ? { id, title, code, ...extra, ...(opts.message ? { message: opts.message } : {}) } : { title, code, ...extra });
   if (!r.ok && r.status === 404 && id && opts.retryAsNew !== false) r = await post({ title, code, ...extra });
   if (r.ok) announce();

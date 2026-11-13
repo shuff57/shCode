@@ -256,6 +256,11 @@ interface Props {
   drawerTabs?: { key: string; label: string; content: ReactNode }[];
   /** Pinned under the drawer's tabs, e.g. the Check button. */
   drawerFooter?: ReactNode;
+  /**
+   * Read-only only: a click on a shape (a generated chart whose shapes stand
+   * for something, e.g. a game's family tree, where a click opens that game).
+   */
+  onNodeClick?: (id: string) => void;
   /** Bumping this opens the drawer on `drawerFocus`'s tab (e.g. after Check). */
   drawerFocus?: { tab: string; nonce: number };
 }
@@ -280,6 +285,7 @@ function Canvas({
   drawerTabs,
   drawerFooter,
   drawerFocus,
+  onNodeClick,
 }: Props) {
   const initial = useMemo(() => docToFlow(value), []); // eslint-disable-line react-hooks/exhaustive-deps
   const [nodes, setNodes] = useState<Node[]>(initial.nodes);
@@ -1112,6 +1118,7 @@ function Canvas({
           onNodeDrag={readOnly ? undefined : onNodeDrag}
           onNodeDragStop={readOnly ? undefined : onNodeDragStop}
           onSelectionChange={readOnly ? undefined : onSelectionChange}
+          onNodeClick={readOnly && onNodeClick ? (_, node) => onNodeClick(node.id) : undefined}
           onNodeDoubleClick={
             readOnly
               ? undefined

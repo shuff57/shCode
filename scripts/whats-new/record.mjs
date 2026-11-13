@@ -284,6 +284,50 @@ async function joinCodeTogether(page, demo) {
 }
 
 const RECIPES = {
+  // Migration 0052: Alex stars Sam's game, sees who starred it, then reads the game's family tree.
+  '2026-11-stars-family': {
+    people: [ALEX],
+    path: '/library/?tab=games',
+    async setup({ person }) {
+      // Published and shared through the API, as the publish panel does.
+      const publish = (page, body) => page.evaluate(async ([b]) => {
+        const r = await fetch('/api/games', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) }).then((x) => x.json());
+        await fetch(`/api/games/${r.game.id}/share`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ share: true }) });
+        return r.game.id;
+      }, [body]);
+      const s = await person(SAM, '/library/?tab=games');
+      const id = await publish(s.page, { title: 'Spike Run', code: MOSHION_DODGE });
+      // Two classmates remix it, each from version 1.
+      for (const [who, title] of [[ALEX, 'Spike Run Turbo'], [MAYA, 'Spike Run Night']]) {
+        const p = await person(who, '/library/?tab=games');
+        await publish(p.page, { title, code: MOSHION_DODGE, remixedFrom: id, fromVersion: 1 });
+      }
+    },
+    async before({ pages: [p] }) {
+      const id = await p.evaluate(async () => {
+        const r = await fetch('/api/games/shared').then((x) => x.json());
+        return (r.games || []).find((g) => g.title === 'Spike Run')?.id ?? null;
+      });
+      if (!id) throw new Error('Sam has not shared Spike Run');
+      // A star from an earlier recording is taken back.
+      await p.evaluate((gid) => fetch(`/api/games/${gid}/star`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ on: false }) }), id);
+      await p.goto(new URL(`/play/?game=${id}`, p.url()).href, { waitUntil: 'networkidle' });
+      await p.getByRole('button', { name: /^Star$/ }).waitFor({ timeout: 30000 });
+    },
+    async run({ demos: [d], pages: [p] }) {
+      await d.pause(400);
+      await d.click(p.getByRole('button', { name: /^Star$/ }), { ms: 500, after: 700 });
+      await d.click(p.getByRole('button', { name: /Show who starred it/ }), { ms: 400, after: 1400 });
+      await p.keyboard.press('Escape');
+      const tree = p.locator('summary', { hasText: 'Family tree' });
+      await tree.waitFor({ timeout: 30000 });
+      await d.scrollTo(tree, 900);
+      await d.pause(800);
+      await d.cursorTo(p.locator('.react-flow__node').filter({ hasText: 'Spike Run Turbo' }).first(), 700);
+      await d.pause(2200);
+    },
+  },
+
   // Fonts (phases 1-3): Sam draws an A with three lines and an O with an ellipse in the Font maker,
   // then types in the test box and sees the words in the new font. Start the dev server fresh.
   '2026-11-fonts': {

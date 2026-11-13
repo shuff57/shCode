@@ -49,6 +49,26 @@ export interface WhatsNewEntry {
 
 export const WHATS_NEW: WhatsNewEntry[] = [
   {
+    id: '2026-11-stars-family',
+    date: '2026-11-12',
+    audience: 'student',
+    title: 'Star games and see their family tree',
+    summary:
+      "Press Star on a classmate's game to tell them you like it. Every game you star waits for you in the Library's Starred list. " +
+      'Under a game, its family tree shows who remixed it, when, and from which version, drawn as a flowchart.',
+    steps: [
+      'Open a game from Class games and press Star beside Run. Press the number to see who starred it.',
+      'Open Learn, then Library, then Games, to find every game you starred under Starred.',
+      'Scroll down under a game to its Family tree, and click a box to play that remix.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-stars-family.mp4',
+      poster: '/whats-new/2026-11-stars-family.jpg',
+      alt: "Alex stars Sam's game Spike Run, sees the count go to 1, then scrolls to its family tree: Spike Run at the top with arrows down to Alex's and Maya's remixes.",
+    },
+    action: { label: 'Open the Library', href: '/library?tab=games' },
+  },
+  {
     id: '2026-11-fonts',
     date: '2026-11-11',
     audience: 'student',

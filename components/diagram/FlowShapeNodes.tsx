@@ -185,6 +185,10 @@ function ShapeNode({ id, data, selected }: NodeProps) {
           fontFamily: 'system-ui, sans-serif',
           overflow: shape === 'comment' ? 'visible' : 'hidden',
           wordBreak: 'break-word',
+          // A label's own line breaks show (a generated chart, e.g. a game's
+          // family tree, puts title / maker / date on three lines). Labels
+          // typed in one line are unaffected.
+          whiteSpace: 'pre-line',
           // The label is inert so clicks reach the node beneath it — except
           // while editing, when the textarea has to receive them.
           pointerEvents: d.editing ? 'auto' : 'none',
