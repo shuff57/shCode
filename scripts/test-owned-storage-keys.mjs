@@ -60,7 +60,7 @@ const NON_PERSONAL = {
   'components/LabPlanChart.tsx': ['KEY + lessonId'], // chart open or folded
   'components/ClassLibraryPanel.tsx': ['STORE_KEY'], // remembered Library tab
   'components/ModuleLessonsList.tsx': ['foldKey'], // done lessons folded
-  'components/TabbedRightDrawer.tsx': ['activeStorage', 'widthStorage'], // drawer tab and width
+  'components/TabbedRightDrawer.tsx': ['activeStorage', 'widthStorage', 'dockClosedStorage'], // drawer tab and width, lab side panel closed
   'components/DocsDrawer.tsx': ['setStorage'], // docs set picked
   'components/SandboxWorkspace.tsx': ['MODE_KEY', 'BUILD_KEY'], // sandbox tab, Build/Code side
   'components/WrittenGrader.tsx': ["'shcode:writtenTextSize'"], // text size

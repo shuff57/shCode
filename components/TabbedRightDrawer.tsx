@@ -9,6 +9,8 @@ export interface DrawerTab {
   color?: string;
   content: ReactNode;
   headerExtra?: ReactNode;
+  /** Only on a wide screen with a dock (the lab's Task tab: a phone shows the task above the editor). */
+  dockedOnly?: boolean;
 }
 
 interface Props {
@@ -19,13 +21,20 @@ interface Props {
    *  fixed rail along the right edge, so the workspace gets the full page width. Phones keep the
    *  bottom dock. The drawer itself (and its resize) is the same either way. */
   inlineHostId?: string;
+  /** Desktop only: the id of a column in the page's own layout (a lab's side column). When it is on
+   *  the page the open tab renders INSIDE it, in the page's flow, instead of as a fixed drawer over
+   *  the window's right edge: the page is never pushed sideways and the header and footer never
+   *  move. Phones keep the overlay drawer. */
+  dockHostId?: string;
+  /** With a dock: the tab open when the page loads (unless the student closed the panel last time). */
+  dockDefaultKey?: string;
 }
 
 const MIN_W = 240;
 const MAX_W = 600;
 const DEFAULT_W = 320;
 
-export default function TabbedRightDrawer({ tabs, storageKey, inlineHostId }: Props) {
+export default function TabbedRightDrawer({ tabs: allTabs, storageKey, inlineHostId, dockHostId, dockDefaultKey }: Props) {
   const [mounted, setMounted] = useState(false);
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [closeBtnHovered, setCloseBtnHovered] = useState(false);
@@ -41,13 +50,40 @@ export default function TabbedRightDrawer({ tabs, storageKey, inlineHostId }: Pr
   // The inline host, when the page has one (looked up after every commit: the host is a sibling
   // that can mount or unmount with the page's header).
   const [inlineHost, setInlineHost] = useState<HTMLElement | null>(null);
+  const [dockHost, setDockHost] = useState<HTMLElement | null>(null);
   useEffect(() => {
     const el = inlineHostId ? document.getElementById(inlineHostId) : null;
     if (el !== inlineHost) setInlineHost(el);
+    const dock = dockHostId ? document.getElementById(dockHostId) : null;
+    if (dock !== dockHost) setDockHost(dock);
   });
 
   const activeStorage = `${storageKey}:active`;
   const widthStorage = `${storageKey}:width`;
+  const dockClosedStorage = `${storageKey}:dock-closed`;
+  const docked = !!dockHost && !narrow;
+  // A tab only a dock can show (the lab's Task) is left out where there is no dock.
+  const tabs = docked ? allTabs : allTabs.filter((t) => !t.dockedOnly);
+
+  // With a dock the panel opens on its default tab, unless the student closed it last time.
+  const openedDefault = useRef(false);
+  useEffect(() => {
+    if (!docked || !mounted || openedDefault.current || !dockDefaultKey) return;
+    openedDefault.current = true;
+    let closed = false;
+    try { closed = localStorage.getItem(dockClosedStorage) === '1'; } catch { /* storage blocked: open */ }
+    if (!closed) setActiveKey((k) => k ?? dockDefaultKey);
+  }, [docked, mounted, dockDefaultKey, dockClosedStorage]);
+  // Leaving the dock (the window got narrow) closes a tab only the dock can show.
+  useEffect(() => {
+    if (activeKey && !tabs.some((t) => t.key === activeKey)) setActiveKey(null);
+  }, [activeKey, tabs]);
+  const choose = (key: string | null) => {
+    setActiveKey(key);
+    if (docked) {
+      try { localStorage.setItem(dockClosedStorage, key === null ? '1' : '0'); } catch { /* not remembered */ }
+    }
+  };
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 720px)');
@@ -74,7 +110,7 @@ export default function TabbedRightDrawer({ tabs, storageKey, inlineHostId }: Pr
   // the page scrolls the header leaves and the drawer takes the full height.
   const [top, setTop] = useState(0);
   useEffect(() => {
-    if (activeKey === null) return;
+    if (activeKey === null || docked) return;
     let raf = 0;
     const measure = () => {
       raf = 0;
@@ -91,12 +127,12 @@ export default function TabbedRightDrawer({ tabs, storageKey, inlineHostId }: Pr
       window.removeEventListener('scroll', schedule);
       window.removeEventListener('resize', schedule);
     };
-  }, [activeKey]);
+  }, [activeKey, docked]);
 
-  // Publish open width so body padding can reflow.
+  // Publish open width so body padding can reflow (an overlay drawer only: a dock is in the page).
   useEffect(() => {
     const cssVar = '--shd-tabbed';
-    if (activeKey && mounted && !narrow) {
+    if (activeKey && mounted && !narrow && !docked) {
       document.documentElement.style.setProperty(cssVar, `${width}px`);
     } else {
       document.documentElement.style.removeProperty(cssVar);
@@ -104,7 +140,7 @@ export default function TabbedRightDrawer({ tabs, storageKey, inlineHostId }: Pr
     return () => {
       document.documentElement.style.removeProperty(cssVar);
     };
-  }, [activeKey, width, mounted, narrow]);
+  }, [activeKey, width, mounted, narrow, docked]);
 
   const onHandlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -119,7 +155,9 @@ export default function TabbedRightDrawer({ tabs, storageKey, inlineHostId }: Pr
   const onHandlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     if (!(e.buttons & 1)) return;
     const first = pendingW.current === null;
-    pendingW.current = Math.max(MIN_W, Math.min(MAX_W, window.innerWidth - e.clientX));
+    // The dragged edge is the panel's left edge; a dock's right edge is not the window's.
+    const right = e.currentTarget.parentElement?.getBoundingClientRect().right ?? window.innerWidth;
+    pendingW.current = Math.max(MIN_W, Math.min(MAX_W, right - e.clientX));
     if (first) {
       requestAnimationFrame(() => {
         if (pendingW.current !== null) setWidth(pendingW.current);
@@ -146,100 +184,119 @@ export default function TabbedRightDrawer({ tabs, storageKey, inlineHostId }: Pr
   const open = activeKey !== null;
   const active = tabs.find((t) => t.key === activeKey) ?? null;
 
-  return (
+  // The panel itself: a resize edge, a title row with the tab's extras and a close button, and the
+  // tab's content. The same markup is a column in the page (dock) or a fixed drawer (overlay).
+  const panel = (
     <>
       <div
-        aria-label={active?.label ?? 'Drawer'}
-        className="shd-drawer"
+        role="separator"
+        aria-label="Resize panel"
+        aria-orientation="vertical"
+        onPointerDown={onHandlePointerDown}
+        onPointerMove={onHandlePointerMove}
+        onPointerUp={onHandlePointerUp}
+        onPointerCancel={onHandlePointerUp}
+        style={{ position: 'absolute', left: -2, top: 0, bottom: 0, width: 6, cursor: 'ew-resize', zIndex: 1 }}
+      />
+      <div
         style={{
-          position: 'fixed',
-          top,
-          right: 0,
-          // Issue #17: this used to be a flat 0, so at z-index 900 the
-          // drawer sat entirely over LessonProgressFooter (z-index 50)
-          // whenever it was open, including the module-progress bar's own
-          // clickable dots. LessonProgressFooter publishes its own height
-          // to this var (0px when it isn't mounted at all, e.g. no module).
-          bottom: 'var(--shd-footer-height, 0px)',
-          width: `min(${width}px, 100vw)`,
-          background: 'var(--c-deep2)',
-          borderLeft: '1px solid var(--c-line)',
           display: 'flex',
-          flexDirection: 'column',
-          zIndex: 900,
-          transform: open ? 'translateX(0)' : 'translateX(100%)',
-          transition: 'transform 0.22s ease',
-          pointerEvents: open ? 'auto' : 'none',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '10px 14px',
+          borderBottom: '1px solid var(--c-line)',
+          flexShrink: 0,
         }}
       >
-        <div
-          role="separator"
-          aria-label="Resize drawer"
-          aria-orientation="vertical"
-          onPointerDown={onHandlePointerDown}
-          onPointerMove={onHandlePointerMove}
-          onPointerUp={onHandlePointerUp}
-          onPointerCancel={onHandlePointerUp}
-          style={{
-            position: 'absolute',
-            left: -2,
-            top: 0,
-            bottom: 0,
-            width: 6,
-            cursor: 'ew-resize',
-            zIndex: 1,
-          }}
-        />
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '10px 14px',
-            borderBottom: '1px solid var(--c-line)',
-            flexShrink: 0,
-          }}
-        >
-          <span style={{ color: 'var(--c-fg)', fontWeight: 600, fontSize: '0.9rem', letterSpacing: '0.02em' }}>
-            {active?.label}
-          </span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {active?.headerExtra}
-            <button
-              aria-label="Close drawer"
-              onClick={() => setActiveKey(null)}
-              onMouseEnter={() => setCloseBtnHovered(true)}
-              onMouseLeave={() => setCloseBtnHovered(false)}
-              style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '1.25rem',
-                lineHeight: 1,
-                padding: '2px 4px',
-                color: closeBtnHovered ? 'var(--c-fg)' : 'var(--c-dim)',
-                transition: 'color 0.15s',
-              }}
-            >
-              &times;
-            </button>
-          </div>
-        </div>
-        <div
-          style={{
-            flex: 1,
-            overflowY: 'auto',
-            padding: '14px 16px',
-            color: 'var(--c-fg)',
-            fontSize: '0.875rem',
-            lineHeight: 1.5,
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          {active?.content}
+        <span style={{ color: 'var(--c-fg)', fontWeight: 600, fontSize: '0.9rem', letterSpacing: '0.02em' }}>
+          {active?.label}
+        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {active?.headerExtra}
+          <button
+            type="button"
+            aria-label={docked ? 'Close panel' : 'Close drawer'}
+            onClick={() => choose(null)}
+            onMouseEnter={() => setCloseBtnHovered(true)}
+            onMouseLeave={() => setCloseBtnHovered(false)}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '1.25rem',
+              lineHeight: 1,
+              padding: '2px 4px',
+              color: closeBtnHovered ? 'var(--c-fg)' : 'var(--c-dim)',
+              transition: 'color 0.15s',
+            }}
+          >
+            &times;
+          </button>
         </div>
       </div>
+      <div
+        className="shd-panel-body"
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          overscrollBehavior: 'contain',
+          padding: '14px 16px',
+          color: 'var(--c-fg)',
+          fontSize: '0.875rem',
+          lineHeight: 1.5,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {active?.content}
+      </div>
+    </>
+  );
+
+  return (
+    <>
+      {docked ? (
+        // In the page: only while a tab is open, so a closed panel gives the work the full width.
+        open ? createPortal(
+          <div
+            aria-label={active?.label ?? 'Panel'}
+            role="complementary"
+            className="shd-dock"
+            style={{ width, '--shd-dock-w': `${width}px` } as CSSProperties}
+          >
+            {panel}
+          </div>,
+          dockHost!,
+        ) : null
+      ) : (
+        <div
+          aria-label={active?.label ?? 'Drawer'}
+          className="shd-drawer"
+          style={{
+            position: 'fixed',
+            top,
+            right: 0,
+            // Issue #17: this used to be a flat 0, so at z-index 900 the
+            // drawer sat entirely over LessonProgressFooter (z-index 50)
+            // whenever it was open, including the module-progress bar's own
+            // clickable dots. LessonProgressFooter publishes its own height
+            // to this var (0px when it isn't mounted at all, e.g. no module).
+            bottom: 'var(--shd-footer-height, 0px)',
+            width: `min(${width}px, 100vw)`,
+            background: 'var(--c-deep2)',
+            borderLeft: '1px solid var(--c-line)',
+            display: 'flex',
+            flexDirection: 'column',
+            zIndex: 900,
+            transform: open ? 'translateX(0)' : 'translateX(100%)',
+            transition: 'transform 0.22s ease',
+            pointerEvents: open ? 'auto' : 'none',
+          }}
+        >
+          {panel}
+        </div>
+      )}
 
       {/* Inline: one row of tool buttons in the page's own toolbar (desktop with a host). */}
       {inlineHost && !narrow ? createPortal(
@@ -254,7 +311,7 @@ export default function TabbedRightDrawer({ tabs, storageKey, inlineHostId }: Pr
                 title={t.label}
                 aria-pressed={isActive}
                 className="shd-inline-tool"
-                onClick={() => setActiveKey(isActive ? null : t.key)}
+                onClick={() => choose(isActive ? null : t.key)}
                 style={{ '--shd-tab-accent': t.color ?? 'var(--c-purple)' } as CSSProperties}
               >
                 {t.label}
@@ -289,7 +346,7 @@ export default function TabbedRightDrawer({ tabs, storageKey, inlineHostId }: Pr
               title={t.label}
               aria-pressed={isActive}
               className="shd-tab"
-              onClick={() => setActiveKey(isActive ? null : t.key)}
+              onClick={() => choose(isActive ? null : t.key)}
               style={{
                 '--shd-tab-accent': t.color ?? 'var(--c-purple)',
                 borderRadius: '6px 0 0 6px',

@@ -34,7 +34,7 @@ import MoshionPreview from './MoshionPreview';
 import RequirementsSection from './RequirementsSection';
 import PlanChartPanel from './PlanChartPanel';
 import LessonSteps from './LessonSteps';
-import LabTaskCard from './LabTaskCard';
+import LabTaskCard, { LabTaskContent } from './LabTaskCard';
 import Console from './Console';
 import HistoryPanel from './HistoryPanel';
 import AssignmentHeader from './AssignmentHeader';
@@ -1230,7 +1230,9 @@ export default function LessonWorkspace({
   const headerUnitLabel = countCriteria ? '' : 'pts';
 
   // ---- The lab's check result (ux2 S3, S4, S5) -------------------------------------------------
-  const checkVerb = aiCheck ? 'Check' : 'Run';
+  // The button the student presses, by its own label: Grade on a scored AI part, Check on an AI-checked or
+  // pseudocode lab (a text lesson's pattern check is labelled Check too), Run otherwise.
+  const checkVerb = aiGraded ? 'Grade' : aiCheck || isTextMode ? 'Check' : 'Run';
   const failedN = requirements.filter((r) => r.status === 'failed').length;
   // A submitted lab on a return visit, nothing checked yet in this one: the "Submitted" block says
   // what is true and how to hand in again, so no hollow "Check looks for" row or "Pass Check to
@@ -1254,7 +1256,9 @@ export default function LessonWorkspace({
   const shownNote = aiCheckNote && aiCheckNote.kind === 'error' && aiCheckNote.text === FALLBACK_NOTE
     && (allRequirementsPassed || submitLocked || restingSubmitted) ? null : aiCheckNote;
   const renderCheckRow = (where: 'above' | 'below') => {
-    if (restingSubmitted) return null;
+    // Only results: before a Check there is no "Check looks for" list over the editor (it spelled out
+    // what the grader wants and crowded the editor; the Quest tab still lists the requirements).
+    if (restingSubmitted || !rowMarked) return null;
     const passedN = rowReqs.filter((r) => r.status === 'passed').length;
             const shown = rowMarked ? rowReqs : requirements.slice(0, 3);
             return (
@@ -1266,7 +1270,7 @@ export default function LessonWorkspace({
                 </span>
                 {rowMarked && checkedAt ? (
                   <span className="lab-check-when" role="status" aria-live="polite">
-                    {checksStale ? `Out of date: ${aiCheck ? 'check' : 'run'} again` : `Checked ${ranWhen(checkedAt, clock)}`}
+                    {checksStale ? `Out of date: ${checkVerb.toLowerCase()} again` : `Checked ${ranWhen(checkedAt, clock)}`}
                   </span>
                 ) : null}
                 <ul>
@@ -1296,6 +1300,8 @@ export default function LessonWorkspace({
     <div className={`lab-check-summary${rowMarked ? ' has-results' : ''}${rowMarked && checksStale ? ' is-stale' : ''}${rowMarked && !checksStale && labPassedN < rowReqs.length ? ' has-failed' : ''}`}>
       {restingSubmitted ? (
         <span>Submitted. To change it, edit your code and press {checkVerb}.</span>
+      ) : !rowMarked ? (
+        <span>Press {checkVerb} to test your code</span>
       ) : (
         <button
           type="button"
@@ -1311,7 +1317,7 @@ export default function LessonWorkspace({
             ? checksStale
               ? `Out of date: press ${checkVerb} again`
               : `${labPassedN} of ${rowReqs.length} passed · tap for details`
-            : `Press ${checkVerb} to test your code · ${requirements.length} ${requirements.length === 1 ? 'check' : 'checks'} below`}
+            : `Press ${checkVerb} to test your code`}
         </button>
       )}
     </div>
@@ -1345,7 +1351,22 @@ export default function LessonWorkspace({
       <TabbedRightDrawer
         storageKey="shCode:drawer"
         inlineHostId="lab-tools-host"
+        // A console or moSHion lab has a side column beside the editor (wide screens): the open tab
+        // shows there, in the page, and it opens on the task. Other lessons keep the overlay drawer.
+        dockHostId={isLab ? 'lab-dock-host' : undefined}
+        dockDefaultKey={isLab && lesson.steps.length > 0 ? 'task' : undefined}
         tabs={[
+          ...(isLab && lesson.steps.length > 0
+            ? ([
+                {
+                  key: 'task',
+                  label: 'Task',
+                  color: 'var(--c-yellow)',
+                  dockedOnly: true,
+                  content: <LabTaskContent lesson={lesson} />,
+                },
+              ] as DrawerTab[])
+            : []),
           {
             key: 'help',
             label: 'CODY',
@@ -1436,9 +1457,9 @@ export default function LessonWorkspace({
                 },
               ] as DrawerTab[])
             : []),
-          // The lesson's `steps` are NOT a drawer tab: "Your task" (LabTaskCard
-          // on console and moSHion labs, the collapsible strip above the editor
-          // on the rest) already shows the same LessonSteps on the left.
+          // On a console or moSHion lab the steps are the Task tab (first, above) on a wide screen and
+          // LabTaskCard above the editor on a phone; the other lessons show them in the collapsible
+          // strip above the editor.
           {
             key: 'quest',
             label: 'Quest',
@@ -1921,6 +1942,8 @@ export default function LessonWorkspace({
           )}
         </div>
       </div>
+      {/* The lab's side column (wide screens): TabbedRightDrawer puts the open tab here. Empty, it takes no room. */}
+      {isLab ? <div id="lab-dock-host" className="lab-dock-host" /> : null}
       </div>
       {aiGraded ? (
         <AiGradeResultPanel

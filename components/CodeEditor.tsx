@@ -2,10 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type { Extension } from '@codemirror/state';
-import { flattenFiles, useLessonStore } from '../lib/store';
+import { useLessonStore } from '../lib/store';
 import CodeMirrorPane from './CodeMirrorPane';
 import ImageLibrary from './ImageLibrary';
-import { extractLabTaskScenario } from '../lib/lab-task-scenario';
 
 /** `collab`: Code together's shared-editing extension (the sandbox only), handed to CodeMirrorPane. */
 export default function CodeEditor({ plainText = false, collab = null }: { plainText?: boolean; collab?: Extension | null }) {
@@ -119,10 +118,8 @@ export default function CodeEditor({ plainText = false, collab = null }: { plain
             key={lesson?.id ?? 'sandbox'}
             fileKey={currentFile}
             collab={collab}
-            taskComment={lesson?.preview === 'console' && currentFile === 'script.js'
-              ? extractLabTaskScenario(flattenFiles(lesson.files).find((file) => file.path === 'script.js')?.content ?? '')
-              : null}
-            taskCommentQuiet={(lesson?.steps?.length ?? 0) > 0}
+            // The starter's own comments stay in full (no "task notes" fold): they are the student's
+            // instructions inside their own file, and a fold made the line numbers skip.
           />
         )}
       </div>
