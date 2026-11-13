@@ -101,7 +101,8 @@ export default function DraftVersions({ kind, lessonId, noun, enabled, current, 
   return (
     <div role="status" data-kept-version={kind} style={{ ...bar, borderColor: 'var(--border)', fontSize: 13, display: 'grid', gap: 8 }}>
       {kept.map((k) => {
-        const whose = k.which === 'mine' ? `A ${noun} you had on this computer` : `A ${noun} from another computer`;
+        const article = /^[aeiou]/i.test(noun) ? 'An' : 'A';
+        const whose = k.which === 'mine' ? `${article} ${noun} you had on this computer` : `${article} ${noun} from another computer`;
         const preview = kind === 'written' ? k.text.replace(/\s+/g, ' ').trim().slice(0, 60) : '';
         return (
           <div key={k.text} style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
