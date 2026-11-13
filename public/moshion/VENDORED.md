@@ -3,9 +3,28 @@
 | | |
 | --- | --- |
 | Source repo | `shuff57/moshion` (local checkout `../moshion`) |
-| Commit | `1ef273a` (`moshion.js`, `docs/moshion.d.ts`), branch `main` |
-| Commit date | 2026-11-12 |
+| Commit | `91135b4` (`moshion.js`, `docs/moshion.d.ts`), branch `main` |
+| Commit date | 2026-11-13 |
 | Vendored | 2026-11-12 (`a662f3d`: `textStyle(NORMAL \| BOLD \| ITALIC \| BOLDITALIC)` (shCode #103), on top of `3f1e70a`'s API audit, `90921bd`'s `textLayer(n)`, `b1a2575`'s `sprite.clone()` and `world.maxSpeed`, `f3e1378` and the `f259b22` sound sync). `textStyle` was first patched in here by hand (`61cfed53`); this sync replaces that patch with the upstream engine, which matches it, so the copy is now upstream `a662f3d` plus the local lines below. |
+
+**`91135b4` (2026-11-13): `loadSound('coin')` plays the built-in sound by name.**
+
+- A bare name now resolves saved first (`sound:<name>`), then the built-in `.wav` of
+  that name in `assets/` beside `moshion.js` (here `/moshion/assets/`, from
+  `document.currentScript`, so no local path line was needed), then the name as a URL.
+  It used to look only among saved sounds, so the mixer's own snippet
+  `loadSound('coin')` failed with "there is no saved sound called 'coin'".
+- The engine's list `BUILTIN_SOUNDS_` is the 23 `.wav` files in `assets/` (the same 23
+  as `PALETTE` in `lib/sound/presets.ts`); a name not on it is never fetched from
+  `assets/`. The warning now says "no saved or built-in sound", suggests near names
+  from both and lists the built-ins; `loadSound('coin.wav')` says to drop the `.wav`.
+- shCode side: the Library's Built in "Copy code", the mixer's palette buttons, the
+  Sound docs page and its example use the name form; the path form still works.
+
+Proof: upstream `tests/builtin-sounds.spec.mjs` 11/11 (real Chromium with Web Audio:
+coin and jump load, a saved `hit` wins, `zap` is not fetched, the warnings); upstream
+docs (68 examples), integration and api-audit specs pass. In shCode's dev sandbox,
+`loadSound('coin')` reported `loaded: true, 0.22s, error null` with no warning.
 
 **`1ef273a` (2026-11-12): group `scale`, `ani.frame`/`ani.tick`, `addAni` by texture
 name, and plain sound warnings (shCode #108, #110, #111).**

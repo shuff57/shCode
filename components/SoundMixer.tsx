@@ -1020,16 +1020,16 @@ zap.rate = 1;
 zap.pan = 0;
 zap.play();`}</pre>
         <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: '0 0 6px' }}>
-          A saved sound wins over a built-in file with the same name. The course palette is also
-          available by path, so a game can use it without saving anything:
+          The built-in sounds load by name too, without saving anything. A sound you save under
+          one of their names plays instead of the built-in one:
         </p>
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
           {PALETTE.map((p) => (
             <button
               key={p.name}
               style={btn}
-              onClick={() => copy(`let ${p.name.replace(/[^A-Za-z0-9_]/g, '_')} = loadSound('${p.file}');`)}
-              title={`Copy loadSound('${p.file}')`}
+              onClick={() => copy(`let ${p.name.replace(/[^A-Za-z0-9_]/g, '_')} = loadSound('${p.name}');`)}
+              title={`Copy loadSound('${p.name}')`}
             >
               {p.label}
             </button>

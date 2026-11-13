@@ -1499,9 +1499,9 @@ function draw() {
         title: 'Sound',
         body: `loadSound('file.mp3') gives you a Sound. Call .play() for a one-off effect and .loop() for music that should keep going.
 
-moSHion ships a small 8-bit palette you can load straight away: '/moshion/assets/coin.wav' is a short chime, '/moshion/assets/music.wav' is a short tune, and jump.wav, hit.wav, laser.wav, powerup.wav, explode.wav, blip.wav, select.wav and tone.wav sit in the same folder, with title.wav, win.wav and lose.wav for menus. For board and battle games there are dice.wav, step.wav, sword.wav, clang.wav, potion.wav, levelup.wav, crown.wav, whoosh.wav, pop.wav and door.wav. Every one is in the Library under Built in, where you can play it and copy the line that loads it. Type the path exactly as shown. A sound that cannot load never plays, and the console says why.
+moSHion ships a small 8-bit palette you load by name, no path needed: loadSound('coin') is a short chime and loadSound('music') is a short tune. There are also jump, hit, laser, powerup, explode, blip, select and tone, with title, win and lose for menus. For board and battle games there are dice, step, sword, clang, potion, levelup, crown, whoosh, pop and door. Every one is in the Library under Built in, where you can play it and copy the line that loads it. The longer path, loadSound('/moshion/assets/coin.wav'), still works. A sound that cannot load never plays, and the console says why.
 
-The sound mixer at /sound (also the Sounds tab beside a moSHion lesson's code) builds a sound from a chip preset and saves it, and Import a clip there saves your own MP3, WAV or OGG file. Load a saved sound by its name, exactly as you saved it, capitals too, and without .mp3: let zap = loadSound('zap');. A saved name wins over a built-in file with the same name. A saved sound can be about 190 KB at most, which is a few seconds of effect or a short music loop, not a whole song: for music, save a short loop and play it with .loop(). A link to a sound on another website does not work here; download the file and import it instead.
+The sound mixer at /sound (also the Sounds tab beside a moSHion lesson's code) builds a sound from a chip preset and saves it, and Import a clip there saves your own MP3, WAV or OGG file. Load a saved sound by its name, exactly as you saved it, capitals too, and without .mp3: let zap = loadSound('zap');. A sound you save under a built-in name, like coin, plays instead of the built-in one. A saved sound can be about 190 KB at most, which is a few seconds of effect or a short music loop, not a whole song: for music, save a short loop and play it with .loop(). A link to a sound on another website does not work here; download the file and import it instead.
 
 .play() starts a fresh copy every time it's called, so firing a laser three times in three frames gives you three overlapping shots rather than one restarting over and over. .loop() is the opposite — it's the single track you start once and stop later, and calling it again while it's already going does nothing.
 
@@ -1520,8 +1520,8 @@ function setup() {
   new Canvas(400, 300);
   world.gravity.y = 0;
 
-  coin = loadSound('/moshion/assets/coin.wav');
-  music = loadSound('/moshion/assets/music.wav');
+  coin = loadSound('coin');
+  music = loadSound('music');
   music.volume = 0.3;
 
   player = new Sprite(60, 150, 24, 24);

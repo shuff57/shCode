@@ -3,7 +3,7 @@
 // "Built in" on the Library page and tab: every texture and sound that ships
 // with moSHion, so a student can find them without the docs. A built-in works
 // in any sketch straight away (`sprite.texture = 'sword'`,
-// `loadSound('/moshion/assets/dice.wav')`); Remix makes an editable copy in the
+// `loadSound('dice')`); Remix makes an editable copy in the
 // student's own library (and so their account) and opens it in the Texture
 // editor or the Sound mixer (lib/remix.ts); Share can then hand it to the class.
 //
@@ -164,7 +164,7 @@ export default function BuiltInLibrary({ onMessage, kind }: {
                 onClick={() => { new Audio(p.file).play().catch(() => {}); }}
                 style={{ background: 'transparent', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4, cursor: 'pointer', padding: '2px 8px' }}>▶</button>
               <span style={{ fontSize: 12 }}>{p.label}</span>
-              <button type="button" style={small} onClick={() => copyText(`let ${p.name} = loadSound('${p.file}');`)}
+              <button type="button" style={small} onClick={() => copyText(`let ${p.name} = loadSound('${p.name}');`)}
                 aria-label={`Copy code for ${p.label}`}>Copy code</button>
               <button type="button" style={small} onClick={() => void remixSound(p)}
                 aria-label={`Remix ${p.label}`} title="Make your own copy and open it in the Sound mixer">Remix</button>

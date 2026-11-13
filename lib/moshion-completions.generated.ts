@@ -362,7 +362,7 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "label": "loadSound",
   "type": "function",
   "detail": "(url: string, opts?: { clips?: SoundClips; }): Sound",
-  "info": "Load a sound from a URL."
+  "info": "Load a sound from a URL or by name."
  },
  {
   "label": "map",
