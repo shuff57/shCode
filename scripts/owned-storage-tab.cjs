@@ -143,7 +143,11 @@ function modules() {
     grader: load('lib/written-grader-store.js'),
     draftSync: load('lib/draft-sync.js'),
     draftCore: load('lib/draft-sync-core.js'),
+    cipher: load('lib/work-cipher.js'),
   };
+  // Step two of the rollout (sealing new records) is off in the shipped code; the sealed runs turn it on.
+  // Set explicitly either way, so these tests mean the same whatever the shipped default is.
+  M.owned.__setSealNewRecordsForTests(process.env.OS_SEAL === '1');
   return M;
 }
 

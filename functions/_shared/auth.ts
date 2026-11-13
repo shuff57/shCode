@@ -191,6 +191,49 @@ export async function workOwnerFor(email: string, secret: string): Promise<strin
   return out;
 }
 
+// ---- Work key (lib/owned-storage.ts, lib/work-cipher.ts) ----
+//
+// The key an account's stored work is sealed with in the browser: 32 bytes,
+// HMAC-SHA256(AUTH_SECRET, "work-key:" + normalized email), base64url. Like the owner id it
+// needs no table. It lives in the readable `shcode_wk` cookie (value `<owner id>.<key>`), set on
+// sign-in and on a page load with a valid session, ALWAYS together with the owner cookie, with the
+// same Path, SameSite, Max-Age and Secure, and cleared at sign-out and on a page load with no
+// session. It is never set by an /api answer: such an answer can arrive after the account signed
+// out, and would hand a signed-out browser the key again.
+// What that buys: once the account is signed out or its session has ended, this browser no
+// longer holds the key, so that account's stored work cannot be read on the computer. While the
+// account is signed in the key is in the browser, as the account itself is.
+// Known limit, the same as the owner id's: rotating AUTH_SECRET or changing an account's email
+// changes the key, and work on a computer that had not uploaded can no longer be opened.
+
+export const WORK_KEY_COOKIE = 'shcode_wk';
+
+export async function workKeyFor(email: string, secret: string): Promise<string> {
+  const key = await crypto.subtle.importKey('raw', secretBytes(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const mac = new Uint8Array(
+    await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(`work-key:${normalizeEmail(email)}`)),
+  );
+  let bin = '';
+  for (const b of mac) bin += String.fromCharCode(b);
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+/**
+ * The cookie's value: `<owner id>.<key>`. The key names the account it belongs to, so a page never
+ * takes a key that arrived for another account as its own (the browser applies Set-Cookie headers
+ * one at a time, and a slow answer can land after someone else signed in).
+ */
+export function workKeyCookieValue(workOwner: string, workKey: string): string {
+  return `${workOwner}.${workKey}`;
+}
+
+/** `value` is workKeyCookieValue(...), or '' with Max-Age 0 to clear. */
+export function buildWorkKeyCookie(value: string, maxAgeSeconds: number, secure: boolean): string {
+  const parts = [`${WORK_KEY_COOKIE}=${value}`, 'Path=/', 'SameSite=Lax', `Max-Age=${maxAgeSeconds}`];
+  if (secure) parts.push('Secure');
+  return parts.join('; ');
+}
+
 export function buildOwnerCookie(value: string, maxAgeSeconds: number, secure: boolean): string {
   const parts = [`${OWNER_COOKIE}=${value}`, 'Path=/', 'SameSite=Lax', `Max-Age=${maxAgeSeconds}`];
   if (secure) parts.push('Secure');
@@ -213,9 +256,13 @@ export function buildSessionCookie(value: string, maxAgeSeconds: number, secure:
   return parts.join('; ');
 }
 
-/** The session cookie and the owner cookie, as Set-Cookie values, set together. */
-export function sessionCookies(token: string, workOwner: string, maxAgeSeconds: number, secure: boolean): string[] {
-  return [buildSessionCookie(token, maxAgeSeconds, secure), buildOwnerCookie(workOwner, maxAgeSeconds, secure)];
+/** The session cookie, the owner cookie and the work-key cookie, as Set-Cookie values, set together. */
+export function sessionCookies(token: string, workOwner: string, maxAgeSeconds: number, secure: boolean, workKey?: string): string[] {
+  return [
+    buildSessionCookie(token, maxAgeSeconds, secure),
+    buildOwnerCookie(workOwner, maxAgeSeconds, secure),
+    ...(workKey ? [buildWorkKeyCookie(workKeyCookieValue(workOwner, workKey), maxAgeSeconds, secure)] : []),
+  ];
 }
 
 export function readSessionCookie(request: Request): string | null {

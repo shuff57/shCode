@@ -139,3 +139,19 @@ export function clearLocalHistory(lessonId: string): void {
   delete all[lessonId];
   writeAll(all);
 }
+
+/**
+ * A lab's code that lib/owned-storage.ts set aside (a page from before sealing saved it beside the
+ * sealed draft): put it in this lesson's History, where the student can see and restore it.
+ * Registered by components/OwnerNotices.tsx before the page-start sweep.
+ */
+const SET_ASIDE_MESSAGE = 'From an older tab';
+export function showSetAsideInHistory(key: string, d: unknown): void {
+  const m = /^progress:(.+)$/.exec(key);
+  const files = (d as { fileContents?: unknown } | null)?.fileContents;
+  if (!m || !files || typeof files !== 'object' || Array.isArray(files)) return;
+  // At most three History entries per lesson: an older tab autosaving every few seconds must not push the
+  // student's own snapshots out of the 20 kept. Every set-aside copy is still stored (`aside:`).
+  if ((readAll()[m[1]] ?? []).filter((x) => x.message === SET_ASIDE_MESSAGE).length >= 3) return;
+  keepInHistory(m[1], files as FileMap, SET_ASIDE_MESSAGE);
+}

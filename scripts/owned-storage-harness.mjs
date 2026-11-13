@@ -14,7 +14,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { onRequest } from '../functions/_middleware.ts';
-import { signSession, workOwnerFor } from '../functions/_shared/auth.ts';
+import { signSession, workKeyFor, workOwnerFor } from '../functions/_shared/auth.ts';
+import { fromBase64, openText } from '../lib/work-cipher.ts';
 
 import { compileHandler, makeD1 } from './_d1-sqlite.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -24,7 +25,7 @@ const MODULES = [
   'store', 'lesson-sync', 'work-records', 'guest-work', 'owner-guard', 'auth', 'owner-fetch', 'local-history',
   'moshion-storage', 'starter-variants', 'carry-forward', 'games-client', 'draft-autosave', 'library-sync',
   'owned-storage', 'version-control', 'outbox', 'outbox-senders', 'outbox-page', 'offline', 'written-grader-store',
-  'draft-sync', 'draft-sync-core',
+  'draft-sync', 'draft-sync-core', 'work-cipher',
 ].map((m) => `lib/${m}.ts`);
 
 // The REAL draft routes (stage 3) over a real SQLite with every migration applied.
@@ -66,7 +67,7 @@ export function compile() {
 
 /** An account: its email and the work-owner id the server derives for it. */
 export async function account(email) {
-  return { email, wo: await workOwnerFor(email, SECRET) };
+  return { email, wo: await workOwnerFor(email, SECRET), wk: await workKeyFor(email, SECRET) };
 }
 
 /**
@@ -74,19 +75,28 @@ export async function account(email) {
  * server.rows: { [email]: { [lessonId]: { files, revision } } } (lesson-sync)
  * server.writes: every request the middleware let through, with the account it ran as.
  */
-export function createBrowser({ quota = 0, db = null, d1 = null } = {}) {
+/**
+ * `sealing`: the browser keeps the work-key cookie the server sends (lib/owned-storage.ts seals an
+ * account's records with it). Off by default: those tests are the plain path, which is also what a
+ * page gets from a server that sends no key. `sealWrites`: the tabs also seal NEW records (step two of
+ * the rollout; off in the shipped code). KEYED=1 in the environment = key cookie, sealing off (what ships
+ * now); SEALED=1 = key cookie and sealing on (step two).
+ */
+export function createBrowser({ quota = 0, db = null, d1 = null, sealing = process.env.SEALED === '1' || process.env.KEYED === '1', sealWrites = sealing && process.env.KEYED !== '1' } = {}) {
   // lesson_drafts, served by the real handler. Made on first use.
   let draftDb = d1;
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'shcode-browser-'));
   const storeFile = path.join(dir, 'localStorage.json');
   fs.writeFileSync(storeFile, '{}');
   const tabs = [];
-  const jar = { session: null, owner: null };
+  const jar = { session: null, owner: null, key: null };
+  // owner id -> key, for every account that signed in here, so the tests can look inside sealed records.
+  const knownKeys = new Map();
   // history: Cloud history rows the real route would write (a Save, never an `auto` upload).
   // holds: requests parked until released (browser.hold). answer: a scripted reply that runs
   // before the routes (a 500, a 401 from a route...), or null to fall through.
   const server = { rows: {}, writes: [], refused: [], drafts: {}, history: {}, holds: [], answer: null, puts: [] };
-  const cookieHeader = () => [jar.session && `shcode_session=${jar.session}`, jar.owner && `shcode_owner=${jar.owner}`]
+  const cookieHeader = () => [jar.session && `shcode_session=${jar.session}`, jar.owner && `shcode_owner=${jar.owner}`, jar.key && `shcode_wk=${jar.key}`]
     .filter(Boolean).join('; ');
   // The DB the middleware reads for a session with no `wo` claim.
   const DB = db ?? {
@@ -171,10 +181,11 @@ export function createBrowser({ quota = 0, db = null, d1 = null } = {}) {
     // The browser keeps what the response sets, as a real one would.
     let changed = false;
     for (const c of res.headers.getSetCookie()) {
-      const m = /^(shcode_session|shcode_owner)=([^;]*);.*?Max-Age=(\d+)/.exec(c);
+      const m = /^(shcode_session|shcode_owner|shcode_wk)=([^;]*);.*?Max-Age=(\d+)/.exec(c);
       if (!m) continue;
       const v = m[3] === '0' ? null : m[2];
-      if (m[1] === 'shcode_session') jar.session = v; else jar.owner = v;
+      if (m[1] === 'shcode_wk') { if (!sealing && v !== null) continue; jar.key = v; }
+      else if (m[1] === 'shcode_session') jar.session = v; else jar.owner = v;
       changed = true;
     }
     if (changed) pushCookie();
@@ -215,14 +226,17 @@ export function createBrowser({ quota = 0, db = null, d1 = null } = {}) {
      * models a browser holding the session but not the owner cookie (a page served from a
      * cache the server never saw, or the cookie deleted by hand).
      */
-    async signIn(acct, { ownerCookie = true } = {}) {
+    async signIn(acct, { ownerCookie = true, keyCookie = sealing } = {}) {
       jar.session = await signSession(acct.email, 'student', SECRET);
       jar.owner = ownerCookie ? acct.wo : null;
+      // login.ts sets the work key in the same response (keyCookie: false = a browser without it).
+      jar.key = keyCookie ? `${acct.wo}.${acct.wk ?? await workKeyFor(acct.email, SECRET)}` : null;
+      knownKeys.set(acct.wo, acct.wk ?? await workKeyFor(acct.email, SECRET));
       pushCookie();
     },
     jar,
     /** Sign out (both cookies cleared together, as logout.ts does). */
-    signOut() { jar.session = null; jar.owner = null; pushCookie(); },
+    signOut() { jar.session = null; jar.owner = null; jar.key = null; pushCookie(); },
     /** The session ends but the owner cookie stays (a session that expired on the server side). */
     expireSession() { jar.session = null; pushCookie(); },
     /**
@@ -236,8 +250,32 @@ export function createBrowser({ quota = 0, db = null, d1 = null } = {}) {
       server.holds.push({ re, gate, reachedResolve });
       return { release: () => release(), reached };
     },
-    /** The raw localStorage contents. */
-    storage() { return JSON.parse(fs.readFileSync(storeFile, 'utf8')); },
+    /** localStorage exactly as stored (sealed records are unreadable text). */
+    rawStorage() { return JSON.parse(fs.readFileSync(storeFile, 'utf8')); },
+    /**
+     * localStorage as the tests read it: a sealed record `s1:<owner>:<key>` is shown OPENED, under
+     * `w1:<owner>:<key>` in the plain envelope shape, when its account signed in on this browser.
+     * So one assertion covers both the plain and the sealed run. Where both copies exist the sealed
+     * one is shown, as it is for a page.
+     */
+    storage() {
+      const raw = JSON.parse(fs.readFileSync(storeFile, 'utf8'));
+      const out = {};
+      for (const [k, v] of Object.entries(raw)) if (!k.startsWith('s1:')) out[k] = v;
+      for (const [k, v] of Object.entries(raw)) {
+        const m = /^s1:([a-z2-7]{16}):(.*)$/s.exec(k);
+        if (!m) continue;
+        const key = knownKeys.get(m[1]);
+        let env = null;
+        try { env = JSON.parse(v); } catch { env = null; }
+        const text = key && env && typeof env.e === 'string'
+          ? openText(fromBase64(key.replace(/-/g, '+').replace(/_/g, '/') + '='), env.e, k) : null;
+        if (text === null) { out[k] = v; continue; }
+        // The sealed copy is the record, as it is for a page, whatever a plain copy beside it says.
+        out[`w1:${m[1]}:${m[2]}`] = JSON.stringify({ v: 1, d: JSON.parse(text), t: env.t, up: null });
+      }
+      return out;
+    },
     setStorage(obj) { fs.writeFileSync(storeFile, JSON.stringify(obj)); },
     /** Open a tab. It reads the cookie as it is NOW, like a page load. */
     async open(name = `tab${tabs.length}`) {
@@ -245,6 +283,7 @@ export function createBrowser({ quota = 0, db = null, d1 = null } = {}) {
         env: {
           ...process.env, NODE_OPTIONS: '',
           OS_OUT: compile(), OS_STORE: storeFile, OS_QUOTA: String(quota),
+          OS_SEAL: sealWrites ? '1' : '0',
           OS_COOKIE: cookieHeader().replace(/shcode_session=[^;]*(; )?/, ''),
         },
         stdio: ['ignore', 'inherit', 'inherit', 'ipc'],

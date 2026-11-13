@@ -467,9 +467,84 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   an older session with `wo`, keeping its end) and on any `/api/*` answer while the browser lacks it. Known limits:
   an account whose email changes, or every account after `AUTH_SECRET` is rotated, gets a NEW namespace; the old
   work stays on that computer, shown to nobody.
-- **The namespaces are not encryption.** They stop the app from showing, handing in or uploading another account's
-  work. Everything is plain text in localStorage, and anyone with the browser's developer tools on that computer can
-  read every namespace. Signing out is still what protects a shared computer.
+- **SEALING SHIPS IN TWO STEPS, AND STEP TWO IS NOT ON YET** (owner's decision 2026-11-13). `SEAL_NEW_RECORDS` in
+  `lib/owned-storage.ts` is `false`: pages get the key cookie, read sealed records and keep a sealed record sealed,
+  but save NEW records as plain text exactly as before, and the page-start sweep does nothing. **So today nothing is
+  sealed and everything below describes step two.** Why: a tab still running the bundle from BEFORE this code cannot
+  see sealed records and writes plain copies beside them; four reviews each found a new way for that to disturb
+  sealed work (a starter becoming the lesson, Reset deleting unseen typing, History filling up, a deleted picture
+  coming back). Step two is one line of runtime code (`SEAL_NEW_RECORDS = true`), plus the assertion marked STEP TWO in
+  `scripts/test-sealed-storage.mjs` and this note, in a later deploy, a week or two after step one
+  is live, when no tab from before step one can still be open. A step-one tab still open then behaves correctly
+  (test 15). Known and accepted if a pre-step-one tab somehow survives into step two: its plain copies are set
+  aside, not lost, but `library-deleted` written by it is ignored (a picture it deleted comes back).
+- **An account's records are sealed** (owner's decision 2026-11-12; `lib/work-cipher.ts`, a first-party
+  ChaCha20-Poly1305 checked against RFC 8439 and Node's own in `scripts/test-work-cipher.mjs`; synchronous because
+  every storage read is). The key is 32 bytes of HMAC-SHA256(`AUTH_SECRET`, `"work-key:" + email`) (`workKeyFor`), in
+  the readable `shcode_wk` cookie as `<owner id>.<key>`. A sealed record is `s1:<owner>:<key>` = `{v, t, e}`; the
+  stamp `t` stays readable. `guest` and `legacy` records are never sealed.
+  - **What it buys:** after sign-out, or once the session has ended, a page that loads on that computer has no key,
+    and that account's sealed work cannot be read from the browser's storage, developer tools or not.
+  - **What it does not, said plainly:**
+    1. While the account is signed in the key is in the browser, as the account is.
+    2. **A tab left open keeps working with its account's work until it is closed or reloaded**, sign-out in
+       another tab or not, exactly as before sealing. (A version where such a tab read nothing but could still save
+       was built and removed after review: its blank screens were saved over real drafts and over History. Not
+       losing work outranks locking an open tab.) Only pages that LOAD after the sign-out have no key.
+    3. `moshion-store` (pictures, sounds, a sketch's saved data) is NOT sealed: a running sketch rewrites it up to
+       sixty times a second (`neverSealed`).
+    4. A record stays plain until a later page start seals it when: a page from before sealing wrote it; storage
+       was full when the sweep tried; or the page that wrote it loaded WITHOUT the key cookie (it then works in
+       plain records for as long as it stays open, silently; this needs a page served from the browser's cache
+       without the middleware's cookies, since every full page load with a session sets the key).
+    5. Key NAMES (lesson ids, record kinds, stamps) are readable.
+    6. A page-load answer that was already on its way when the account signed out can put the owner and key cookies
+       back (the owner cookie alone always could). The next page load with no session removes both, and a page that
+       hears "not signed in" from `/api/me` removes the key cookie at once (`dropWorkKeyCookie`).
+  - **The key cookie is set only together with the owner cookie**: sign-in, and a page load with a valid session
+    (either one missing or wrong sends BOTH). It is cleared at sign-out and on a page load with no session. **An
+    `/api/*` answer never sets it**: a slow answer can land after the account signed out, and would hand a signed-out
+    browser the key back. And a page takes a key only if it names the page's own owner (`parseWorkKeyCookie`): the
+    browser applies Set-Cookie headers one at a time, so the two cookies can briefly belong to different accounts,
+    and a record sealed with another account's key would be unreadable for good.
+  - The owner and the key are taken from ONE reading of the cookies (`pageOwner`).
+  - Sealed records have their own prefix so a page from before sealing (a tab left open across the update) never
+    sees one: it would read a sealed `w1:` record as "no work yet" and save a starter over it. Such a page writes
+    plain `w1:` records instead. **Where both copies exist, the sealed one is the record, whatever the stamps say.**
+    ("Newer wins" was built first and reviewed out: the older page cannot see the sealed draft, so what it saves may
+    be a blank starter with a newer stamp, which then became the lesson and uploaded over the account's copy.
+    `lib/stale-build-guard.ts` does not reload a working old tab, so such tabs can live for days.) The plain copy is
+    never dropped: before a save or the page-start sweep removes it, it is kept sealed under
+    `aside:<t>:<random>:<key>` (read back, never over an existing name) and, for lab code, put in that lesson's
+    History as "From an older tab" (`onSetAside`, `showSetAsideInHistory`; at most three such entries per lesson, so
+    an old tab's autosaves cannot push the student's own snapshots out). Removing a record (Reset) keeps a differing
+    plain copy the same way first. If it cannot be kept, the save is refused
+    and both copies stay exactly where they are. Other kinds of record have no History, so their set-aside copy is
+    kept but has no screen yet.
+  - `sealPlainRecords()` (run when the layout's chunk loads, `components/OwnerNotices.tsx`, on `ownedLocal` and
+    `ownedSession`) seals a plain record that has NO sealed copy, keeping its stamp, and only if neither place moved
+    since it read them; it never rewrites an existing sealed record. A save removes a plain copy only if it is the
+    very one it read. What cannot be closed without a lock is the instant between two adjacent storage calls (the
+    last check and the write): another tab saving that very record in that instant loses to the sweep, the same
+    crossing as the known "two tabs, one record, last writer wins" limit. The text is built before the checks so
+    nothing runs in between. `scripts/test-sealed-storage.mjs` case 10 breaks if any of the three guards is removed.
+  - **A read hands out its own copy** (the cache holds opened text, not objects): a caller that changes what it got
+    and then fails to save cannot change what the next read sees.
+  - **No key = plain records exactly as before** (a server from before this, self-hosting without the cookie),
+    EXCEPT a record that already has a sealed copy is locked: reads answer nothing, writes and removes are refused
+    (`'locked'`), and the page says the work is locked and to reload before typing. The page never reloads itself
+    (that dropped what was being typed). A locked record is never overwritten.
+  - A sealed record the key cannot open (`AUTH_SECRET` rotated, or the email changed while the owner id did not) is
+    moved whole to `s1:<owner>:unreadable:<t>:<random>:<key>` at page start so new work can be saved. Work that had
+    not uploaded is then unreadable for good (accepted by the owner; stages 2-3 upload lab code, written answers and
+    flowcharts by themselves, so what is at risk is quiz picks before Check, Try-it blocks and History).
+  - Dev: `scripts/dev-owner.mjs` mirrors the cookies, and its signed-out mode now answers 401 on every `/api/*`
+    route but `/api/auth/*`, as production does (it used to keep serving the dev identity's lesson data).
+  - Tests: `scripts/test-sealed-storage.mjs`, and the stage 1-3 suites run twice more: `KEYED=1` (key cookie, sealing
+    off: what ships now) and `SEALED=1` (step two; the harness
+    then keeps the key cookie and turns sealing on; `browser.storage()` shows sealed records opened so one assertion covers both runs,
+    `rawStorage()` is what is really stored).
+  - Deploy: nothing to apply. Functions and site can go in either order (no cookie = plain; an old page ignores it).
 - **A page reads the owner once, at load, and never changes it.** No "current owner" marker, nothing moved or cleared
   when the person changes, no storage events or channels. Sign-in and sign-out reload the page (`AuthButton`). A
   pending lab or Try-it save is flushed (never dropped) on unmount and page hide (`lib/draft-autosave.ts`). A page
