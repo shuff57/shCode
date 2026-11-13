@@ -19,8 +19,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { diffLines } from 'diff';
 import { useLessonStore } from '../lib/store';
 import { getCurrentUser } from '../lib/auth';
-import { restoreVersionToCloud } from '../lib/lesson-sync';
-import { TOGETHER_COPY, addLocalSnapshot, listLocalHistory, type LocalSnapshot } from '../lib/local-history';
+import { restoreVersionToCloud, keepBeforeRestore } from '../lib/lesson-sync';
+import { TOGETHER_COPY, listLocalHistory, type LocalSnapshot } from '../lib/local-history';
 import { filesEqual, type FileMap } from '../lib/lesson-sync-merge';
 import { Cloud, HardDrive, RotateCcw, Users, X } from 'lucide-react';
 
@@ -358,13 +358,26 @@ export default function HistoryPanel({ isOpen, onClose, lessonId, onRestore, sav
     if (!window.confirm(question)) return;
 
     setRestoreNote(null);
+    // Everything this restore replaces goes into History on this computer first (lib/lesson-sync.ts,
+    // read back): the editor's text uploads by itself afterwards, so nothing may be replaced that is
+    // kept nowhere.
     setRestoring(true);
-    // Keep what is about to be replaced: on this device always, and in the
-    // account's Cloud history when the restore goes there, so it can be undone
-    // from anywhere. Saved while the editor still holds it.
-    addLocalSnapshot(lessonId, current, `Before restoring the version from ${when}`);
+    const kept = await keepBeforeRestore(lessonId, snapshot, toCloud);
+    if (kept === 'not-open') { setRestoring(false); return; }
+    if (kept === 'history') {
+      setRestoring(false);
+      setRestoreNote('This computer could not keep your current work in History, so nothing was restored.');
+      return;
+    }
+    // And in the account's Cloud history when the restore goes there, so it can be undone from any
+    // device. Saved while the editor still holds it.
     const keptInCloud = toCloud ? await restoreVersionToCloud(lessonId, current) : 'saved';
-
+    // Typed while the account was written: that text is in no History, so nothing is replaced.
+    if (!filesEqual(useLessonStore.getState().fileContents, current)) {
+      setRestoring(false);
+      setRestoreNote('Your code changed while it was being kept, so nothing was restored. Try again.');
+      return;
+    }
     useLessonStore.setState({ fileContents: { ...snapshot } });
 
     // This device only: the editor change is the whole action.
@@ -376,8 +389,13 @@ export default function HistoryPanel({ isOpen, onClose, lessonId, onRestore, sav
     }
 
     // Also write it back, so another device opening this gets it.
-    const result = keptInCloud === 'error' ? 'error' : await restoreVersionToCloud(lessonId, snapshot);
+    const result = keptInCloud === 'error' || keptInCloud === 'owner' ? keptInCloud : await restoreVersionToCloud(lessonId, snapshot);
     setRestoring(false);
+    if (result === 'owner') {
+      setRestoreNote('Restored on this device. Not saved for other devices: someone else is signed in on this computer now.');
+      onRestore?.();
+      return;
+    }
     if (result === 'error') {
       setRestoreNote('Restored on this device, but could not save it for other devices. Press Save to try again. Your code from before is in the This device tab.');
       onRestore?.();

@@ -10,8 +10,8 @@
 // published from when there is one (asking before replacing code that differs,
 // and keeping the old code as a History snapshot), else a new project.
 //
-// Which game a moSHion project is "published as" lives in localStorage, one
-// record per project (sandboxGameKey): re-publishing updates that game.
+// Which game a moSHion project is "published as" lives in the browser (`w1:<owner>:sandbox-game[:<id>]`,
+// lib/owned-storage.ts), one record per project (sandboxGameKey): re-publishing updates that game.
 // "The sandbox" in the functions below is the moSHion project open now, or the
 // one opened last (moshionLessonId).
 //
@@ -25,7 +25,7 @@
 import type { GameCommentsView } from './game-comments-core';
 import { useLessonStore } from './store';
 import { loadProgress, normalizeEol, saveProgress } from './version-control';
-import { addLocalSnapshot } from './local-history';
+import { keepInHistory } from './local-history';
 import { getMode } from './sandbox-modes';
 import { createProject, moshionLessonId, openProject, getProjectsState, startProjects } from './sandbox-projects';
 import { parseProjectLessonId, projectLessonId } from './sandbox-projects-core';
@@ -33,8 +33,10 @@ import { errorText } from './http-error';
 import type { GameMode } from './games-core';
 import type { GameAssetsResponse } from './game-assets';
 import { canRemix, parseProvenance, provenanceOf, remixRefusal, type Provenance, type ShareChoice } from './share-choice';
+import { ownedLocal } from './owned-storage';
 
-export const SANDBOX_GAME_KEY = 'shCode:sandbox-game';
+// `w1:<owner>:sandbox-game` (lib/owned-storage.ts).
+export const SANDBOX_GAME_KEY = 'sandbox-game';
 export const GAMES_CHANGED = 'shcode:games-changed';
 
 /** Where a moSHion project's published-as record lives. The old moSHion sandbox keeps the key it always had. */
@@ -130,12 +132,12 @@ export interface SandboxGame {
 
 export function readSandboxGame(lessonId: string = moshionLessonId()): SandboxGame {
   try {
-    const v = JSON.parse(localStorage.getItem(sandboxGameKey(lessonId)) || 'null');
+    const v = ownedLocal.getJSON<{ id?: unknown; title?: unknown; from?: unknown; fromVersion?: number; version?: number }>(sandboxGameKey(lessonId));
     if (v && typeof v.title === 'string') {
       return {
         id: typeof v.id === 'string' ? v.id : null, title: v.title, from: parseProvenance(v.from),
-        fromVersion: Number.isInteger(v.fromVersion) && v.fromVersion > 0 ? v.fromVersion : null,
-        version: Number.isInteger(v.version) && v.version > 0 ? v.version : null,
+        fromVersion: typeof v.fromVersion === 'number' && Number.isInteger(v.fromVersion) && v.fromVersion > 0 ? v.fromVersion : null,
+        version: typeof v.version === 'number' && Number.isInteger(v.version) && v.version > 0 ? v.version : null,
       };
     }
   } catch { /* private mode or junk */ }
@@ -153,20 +155,17 @@ export function writeSandboxGame(g: SandboxGame, lessonId: string = moshionLesso
       version: g.version !== undefined ? g.version : old.id && old.id === g.id ? old.version ?? null : null,
     };
   }
-  try { localStorage.setItem(sandboxGameKey(lessonId), JSON.stringify(rec)); } catch { /* private mode */ }
+  ownedLocal.setJSON(sandboxGameKey(lessonId), rec); // best effort: a full store just does not remember
 }
 
 /** Every moSHion project on this browser whose record says it is published as game `id`. */
 function projectsPublishedAs(id: string): string[] {
   const out: string[] = [];
-  try {
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (!k || (k !== SANDBOX_GAME_KEY && !k.startsWith(`${SANDBOX_GAME_KEY}:`))) continue;
-      const lessonId = k === SANDBOX_GAME_KEY ? 'sandbox-moshion' : k.slice(SANDBOX_GAME_KEY.length + 1);
-      if (readSandboxGame(lessonId).id === id) out.push(lessonId);
-    }
-  } catch { /* private mode */ }
+  for (const k of ownedLocal.keys(SANDBOX_GAME_KEY)) {
+    if (k !== SANDBOX_GAME_KEY && !k.startsWith(`${SANDBOX_GAME_KEY}:`)) continue;
+    const lessonId = k === SANDBOX_GAME_KEY ? 'sandbox-moshion' : k.slice(SANDBOX_GAME_KEY.length + 1);
+    if (readSandboxGame(lessonId).id === id) out.push(lessonId);
+  }
   return out;
 }
 
@@ -388,13 +387,15 @@ export async function remixIntoSandbox(
  * Put `code` into the moSHion sandbox draft (the open editor too, when the sandbox is on screen). When the
  * draft holds work that differs from the starter and from `code`, `confirm` is asked first (false = leave
  * it alone) and the old draft is kept as a History snapshot labelled `snapshotLabel`. Used by Remix and by
- * "Bring in the newest version" (lib/game-flow-client.ts). Returns false when the student said no.
+ * "Bring in the newest version" (lib/game-flow-client.ts). Returns false when the student said no, or when
+ * the snapshot did not read back from History (`refused` is told why, and nothing is changed).
  */
 export function writeSandboxCode(
   code: string,
   snapshotLabel: string,
   confirm: (current: string) => boolean,
   lessonId: string = moshionLessonId(),
+  refused: (message: string) => void = (m) => window.alert(m),
 ): boolean {
   const mode = getMode('moshion');
   const starter = normalizeEol(mode.starter);
@@ -407,7 +408,11 @@ export function writeSandboxCode(
 
   if (current.trim() && current !== starter && current !== next) {
     if (!confirm(current)) return false;
-    addLocalSnapshot(lessonId, files, snapshotLabel);
+    // The promise the confirm made is only kept if the snapshot really is in History: else change nothing.
+    if (!keepInHistory(lessonId, files, snapshotLabel)) {
+      refused('Nothing was changed. This computer could not keep your sandbox code in History, so it was not replaced.');
+      return false;
+    }
   }
 
   files['script.js'] = next;

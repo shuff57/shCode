@@ -41,7 +41,8 @@ const sectionStyle: React.CSSProperties = {
 
 const summaryStyle: React.CSSProperties = {
   cursor: 'pointer',
-  padding: '8px 12px',
+  padding: '6px 12px',
+  lineHeight: '22px',
   background: 'var(--c-bg)',
   border: '1px solid var(--c-line)',
   borderRadius: 16,
@@ -65,19 +66,23 @@ const itemStyle: React.CSSProperties = {
   background: 'var(--c-deep)',
   border: '1px solid var(--c-line)',
   borderRadius: 4,
-  fontSize: 13,
+  // r7 T8: a list item is read as a sentence: the reading face at 14px.
+  fontFamily: 'var(--font-prose)',
+  fontSize: 14,
   color: 'var(--c-fg)',
   lineHeight: 1.45,
 };
 
 const clickableStyle: React.CSSProperties = {
   color: 'var(--c-cyan)',
+  fontFamily: 'var(--font-prose)',
   cursor: 'pointer',
   textDecoration: 'underline',
 };
 
 const mutedStyle: React.CSSProperties = {
   color: 'var(--c-meta)',
+  fontFamily: 'var(--font-prose)',
   fontSize: 13,
 };
 
@@ -87,6 +92,22 @@ const awaitingSummaryStyle: React.CSSProperties = {
   ...summaryStyle,
   borderColor: 'var(--c-orange)',
   color: 'var(--c-orange)',
+};
+
+// Failed work is red and a stuck lesson is yellow, the theme's own semantic colours (the gradebook's
+// "Missing" and "Started"), so the pills say how bad each thing is before they are opened. Inactive stays
+// neutral: it is a nudge, not a grade.
+const failedSummaryStyle: React.CSSProperties = {
+  ...summaryStyle,
+  borderColor: 'var(--c-red)',
+  color: 'var(--c-red)',
+  background: 'color-mix(in srgb, var(--c-red) 8%, transparent)',
+};
+const stuckSummaryStyle: React.CSSProperties = {
+  ...summaryStyle,
+  borderColor: 'var(--c-yellow)',
+  color: 'var(--c-yellow)',
+  background: 'color-mix(in srgb, var(--c-yellow) 6%, transparent)',
 };
 
 // ---------------------------------------------------------------------------
@@ -132,7 +153,7 @@ export function NeedsAttentionPanel({ classId, lessonTitles, onOpenStudent, onOp
 
   if (loading) {
     return (
-      <div style={{ color: 'var(--c-meta)', fontStyle: 'italic', padding: 16, fontSize: 14 }}>
+      <div style={{ color: 'var(--c-meta)', fontStyle: 'italic', padding: '8px 0', fontSize: 14 }}>
         Loading attention data...
       </div>
     );
@@ -164,7 +185,7 @@ export function NeedsAttentionPanel({ classId, lessonTitles, onOpenStudent, onOp
 
   if (!hasAny) {
     return (
-      <div style={{ color: 'var(--c-green)', padding: 16, fontSize: 14 }}>
+      <div style={{ color: 'var(--c-green)', padding: '8px 0', fontSize: 14 }}>
         All students are on track.
       </div>
     );
@@ -223,7 +244,7 @@ export function NeedsAttentionPanel({ classId, lessonTitles, onOpenStudent, onOp
       {/* Failed submissions */}
       {data.failed_submission.length > 0 && (
         <details onToggle={(e) => { const open = e.currentTarget.open; setExpanded((prev) => ({ ...prev, failed: open })); }} style={{ ...sectionStyle, width: expanded.failed ? '100%' : undefined }}>
-          <summary style={summaryStyle}>
+          <summary style={failedSummaryStyle}>
             {data.failed_submission.length} failed
           </summary>
           <div style={listStyle}>
@@ -268,7 +289,7 @@ export function NeedsAttentionPanel({ classId, lessonTitles, onOpenStudent, onOp
       {/* Stuck */}
       {data.stuck.length > 0 && (
         <details onToggle={(e) => { const open = e.currentTarget.open; setExpanded((prev) => ({ ...prev, stuck: open })); }} style={{ ...sectionStyle, width: expanded.stuck ? '100%' : undefined }}>
-          <summary style={summaryStyle}>
+          <summary style={stuckSummaryStyle}>
             {data.stuck.length} stuck
           </summary>
           <div style={listStyle}>

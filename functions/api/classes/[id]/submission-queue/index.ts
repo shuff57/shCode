@@ -7,17 +7,30 @@
 // score NULL, shown as "needs manual grade"), then the 50 most recent other graded
 // rows; at most 100 in all (lib/submission-queue-order.ts). The rows needing a human
 // are fetched by their own query so routine rows can never push them off the list.
+// GET also returns `assignments`: lesson id -> { prompt, rubric } (functions/_shared/aiGraders.ts
+// teacherBrief) for the lessons listed, so the queue shows the question beside the answer, and
+// `quizzes`: lesson id -> each question's text, options and key (functions/_shared/quizTeacher.ts), so a
+// quiz hand-in reads "Picked: <text>. Answer: <text>" (ux2 T3b). Both are teacher/admin-only.
+// Each submission carries `lessonState` (the student's lesson_state for that lesson) and `pastDue`, so the
+// card can say when a score will not count yet (ux2 T1), and `stateScore` / `stateOverride` (lesson_state.score
+// and whether score_override holds it), the score the ONE grade rule reads, so a card whose newest try differs
+// says which one counts (ux3). Read-only facts; no grade is computed here.
 // POST lets a teacher override the AI score and optionally attach feedback.
 //
 // Auth: caller must be an owner / co-teacher of the class OR an admin.
 
 import { canManageClass } from '../../../../_shared/classAuth';
 import { bestScoreOverAllRows, capFor, rowScore, scoreOverride } from '../../../../_shared/attempts';
-import { loadAiGrader } from '../../../../_shared/aiGraders';
+import { loadAiGrader, teacherBrief, type TeacherBrief } from '../../../../_shared/aiGraders';
+import { teacherQuiz } from '../../../../_shared/quizTeacher';
+import { loadClassDueRows, loadClassDueWaivers, loadLessonScopeMap } from '../../../../_shared/dueDates';
+import { buildDueIndex, resolveDueAt } from '../../../../../lib/due-dates-core';
+import type { TeacherQuiz } from '../../../../../lib/teacher-drawer';
 import { orderQueue, QUEUE_ROUTINE_CAP, QUEUE_TOTAL_CAP } from '../../../../../lib/submission-queue-order';
 
 interface Env {
   DB: D1Database;
+  ASSETS?: Fetcher;
 }
 type SessionData = { email: string; role: 'admin' | 'teacher' | 'student' };
 type Ctx = EventContext<Env, 'id', SessionData>;
@@ -93,6 +106,25 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (
     return json({ error: 'Not authorized for this class' }, 403);
   }
 
+  // `?briefs=<lessonId>[,<lessonId>...]`: the assignment briefs only (the student drawer's Override score
+  // marks a rubric from them), no submissions. Same teacher/admin gate, same fail-closed lookup; at most
+  // 20 ids, each resolved against the bundled config and never echoed back unless it is a real lesson.
+  const briefsParam = new URL(request.url).searchParams.get('briefs');
+  if (briefsParam !== null) {
+    const ids = [...new Set(briefsParam.split(',').map((s) => s.trim()).filter((s) => s.length > 0 && s.length <= 200))].slice(0, 20);
+    const assignments: Record<string, TeacherBrief> = {};
+    const quizzes: Record<string, TeacherQuiz> = {};
+    for (const lessonId of ids) {
+      try {
+        const brief = teacherBrief(await loadAiGrader(env, request, lessonId));
+        if (brief) assignments[lessonId] = brief;
+      } catch { /* fail closed */ }
+      const quiz = teacherQuiz(lessonId);
+      if (quiz) quizzes[lessonId] = quiz;
+    }
+    return json({ assignments, quizzes });
+  }
+
   const now = Date.now();
 
   // Rows a human must grade: the outage marker by the same exact JSON rule attempts.ts counts with
@@ -135,11 +167,103 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (
   // `capped` tells the form whether the ceiling is ENFORCED: only a part with a try limit has one
   // (the POST below refuses a mark above it there); on any other part the unit is a label and a
   // teacher may still give extra credit (round 7).
+  const facts = await lessonFacts(env, request, classId, rows, now);
   const submissions = await Promise.all(
-    rows.map(async (r) => ({ ...r, limit: await rowLimit(env, request, r), capped: capFor(r.lesson_id) !== undefined })),
+    rows.map(async (r) => ({
+      ...r,
+      limit: await rowLimit(env, request, r),
+      capped: capFor(r.lesson_id) !== undefined,
+      lessonState: facts.state.get(`${r.student_email}|${r.lesson_id}`) ?? null,
+      stateScore: facts.score.get(`${r.student_email}|${r.lesson_id}`)?.score ?? null,
+      stateOverride: facts.score.get(`${r.student_email}|${r.lesson_id}`)?.override ?? false,
+      pastDue: facts.pastDue(r.student_email, r.lesson_id),
+    })),
   );
-  return json({ submissions });
+
+  // The assignment each listed row answers (task + criteria titles and points), once per lesson, so the
+  // teacher sees the question beside the answer. Keyed by the lesson ids of rows already listed (read
+  // from the database, never the request) and resolved against the bundled grader config, which only
+  // holds lessons in the built catalog. Fails closed: a lesson with no config, or a lookup that throws,
+  // is simply absent. This is a teacher/admin read; POST /api/grade-written is unchanged and never
+  // takes a prompt or rubric from a client.
+  const assignments: Record<string, TeacherBrief> = {};
+  const quizzes: Record<string, TeacherQuiz> = {};
+  for (const lessonId of new Set(rows.map((r) => r.lesson_id))) {
+    try {
+      const brief = teacherBrief(await loadAiGrader(env, request, lessonId));
+      if (brief) assignments[lessonId] = brief;
+    } catch { /* fail closed: no brief for this lesson */ }
+    const quiz = teacherQuiz(lessonId);
+    if (quiz) quizzes[lessonId] = quiz;
+  }
+  return json({ submissions, assignments, quizzes });
 };
+
+/**
+ * The lesson_state of each listed (student, lesson) pair, and whether the lesson is past due for that
+ * student in this class (lesson over module over unit, a waiver means not past due): the two facts the
+ * grade reads that decide whether a teacher's score on the row counts yet. Best effort: a missing
+ * manifest or a failed read says "not past due" and leaves the state unknown, never an error.
+ */
+async function lessonFacts(
+  env: Env,
+  request: Request,
+  classId: string,
+  rows: Array<{ student_email: string; lesson_id: string }>,
+  now: number,
+): Promise<{
+  state: Map<string, 'started' | 'completed'>;
+  score: Map<string, { score: number | null; override: boolean }>;
+  pastDue: (email: string, lessonId: string) => boolean;
+}> {
+  const state = new Map<string, 'started' | 'completed'>();
+  const score = new Map<string, { score: number | null; override: boolean }>();
+  const lessonIds = [...new Set(rows.map((r) => r.lesson_id))].slice(0, QUEUE_TOTAL_CAP);
+  if (lessonIds.length > 0) {
+    try {
+      const res = await env.DB.prepare(
+        `SELECT student_email, lesson_id, state FROM lesson_state
+          WHERE lesson_id IN (${lessonIds.map((_, i) => `?${i + 3}`).join(', ')})
+            AND student_email IN (SELECT student_email FROM enrollments WHERE class_id = ?1 AND expires_at > ?2)`,
+      )
+        .bind(classId, now, ...lessonIds)
+        .all<{ student_email: string; lesson_id: string; state: string }>();
+      for (const r of res.results ?? []) {
+        if (r.state === 'started' || r.state === 'completed') state.set(`${r.student_email}|${r.lesson_id}`, r.state);
+      }
+    } catch { /* unknown state: nothing is said */ }
+    // The stored score and whether the teacher's override holds it, in their own read so a failure here
+    // (a database without migration 0034's column) never costs the card its lessonState.
+    try {
+      const res = await env.DB.prepare(
+        `SELECT student_email, lesson_id, score, score_override FROM lesson_state
+          WHERE lesson_id IN (${lessonIds.map((_, i) => `?${i + 3}`).join(', ')})
+            AND student_email IN (SELECT student_email FROM enrollments WHERE class_id = ?1 AND expires_at > ?2)`,
+      )
+        .bind(classId, now, ...lessonIds)
+        .all<{ student_email: string; lesson_id: string; score: number | null; score_override: number | null }>();
+      for (const r of res.results ?? []) {
+        score.set(`${r.student_email}|${r.lesson_id}`, { score: typeof r.score === 'number' ? r.score : null, override: r.score_override !== null && r.score_override !== undefined });
+      }
+    } catch { /* unknown stored score: the card shows only its own try */ }
+  }
+  let pastDue: (email: string, lessonId: string) => boolean = () => false;
+  try {
+    const scopeMap = await loadLessonScopeMap(env, request);
+    const dueRows = await loadClassDueRows(env.DB, classId);
+    if (scopeMap && dueRows.length > 0) {
+      const index = buildDueIndex(dueRows);
+      const waivers = await loadClassDueWaivers(env.DB, classId);
+      pastDue = (email, lessonId) => {
+        const scope = scopeMap.get(lessonId);
+        if (!scope || waivers.get(email)?.has(lessonId)) return false;
+        const at = resolveDueAt(index, { lessonId, moduleId: scope.moduleId, unitId: scope.unitId });
+        return at !== null && at <= now;
+      };
+    }
+  } catch { /* no due facts: "not past due" */ }
+  return { state, score, pastDue };
+}
 
 // POST — teacher overrides an AI grade.
 export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async (

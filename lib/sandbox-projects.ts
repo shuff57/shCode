@@ -7,8 +7,8 @@
 // Signed in, the account's list (GET /api/sandbox-projects) is the truth and a
 // copy is kept in this browser so the sandbox opens on the last project at once,
 // before the list arrives. Signed out, the list lives only in this browser.
-// Each account on a browser has its own list and its own open project (the key
-// carries a hash of the email, never the email), so two students sharing a
+// Each account on a browser has its own list and its own open project: the keys
+// are `w1:<owner>:sandbox-*` (lib/owned-storage.ts), so two students sharing a
 // computer do not see each other's projects.
 //
 // A project's code is a sandbox draft under the project's lesson id, so Save,
@@ -21,6 +21,7 @@
 import { useEffect, useSyncExternalStore } from 'react';
 import { getCurrentUser } from './auth';
 import { accountHash } from './whats-new-state';
+import { ownedLocal } from './owned-storage';
 import { clearProgress, loadProgress, normalizeEol, saveProgress } from './version-control';
 import { clearLocalHistory } from './local-history';
 import { forgetSavedCopy, pushWorkspace, recordSavedCopy } from './lesson-sync';
@@ -43,10 +44,11 @@ import {
 
 export type { SandboxProject } from './sandbox-projects-core';
 
-const LIST_PREFIX = 'shCode:sandbox-projects:';
-const CURRENT_KEY = 'shCode:sandbox-current';
-const OPENED_KEY = 'shCode:sandbox-opened';
-const ACCOUNT_KEY = 'shCode:sandbox-account';
+// Base keys under `w1:<owner>:` (lib/owned-storage.ts).
+const LIST_PREFIX = 'sandbox-projects:';
+const CURRENT_KEY = 'sandbox-current';
+const OPENED_KEY = 'sandbox-opened';
+const ACCOUNT_KEY = 'sandbox-account';
 const GUEST = 'guest';
 
 export interface ProjectsState {
@@ -83,14 +85,14 @@ const serverState: ProjectsState = { ...state, current: FALLBACK };
 
 function read<T>(key: string, fallback: T): T {
   try {
-    const raw = localStorage.getItem(key);
-    return raw == null ? fallback : (JSON.parse(raw) as T);
+    const v = ownedLocal.getJSON<T>(key);
+    return v == null ? fallback : v;
   } catch {
     return fallback;
   }
 }
 function write(key: string, value: unknown): void {
-  try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* quota, private mode */ }
+  ownedLocal.setJSON(key, value); // best effort: a full store just does not remember
 }
 
 function cachedList(account: string): { projects: SandboxProject[]; seeded: boolean } {
@@ -126,7 +128,7 @@ function setCurrentIdFor(account: string, lessonId: string | null): void {
 }
 
 function lastAccount(): string {
-  try { return localStorage.getItem(ACCOUNT_KEY) || GUEST; } catch { return GUEST; }
+  try { return ownedLocal.getItem(ACCOUNT_KEY) || GUEST; } catch { return GUEST; }
 }
 
 /** A sandbox this browser has a draft of that differs from its starter (code written before projects existed). */
@@ -192,7 +194,7 @@ export function startProjects(): Promise<void> {
   started = (async () => {
     const user = await getCurrentUser().catch(() => null);
     const account = user ? accountHash(user.email) : GUEST;
-    try { localStorage.setItem(ACCOUNT_KEY, account); } catch { /* private mode */ }
+    ownedLocal.setItem(ACCOUNT_KEY, account);
 
     if (!user) {
       const { projects, seeded } = cachedList(GUEST);
@@ -253,7 +255,8 @@ function forgetLocal(lessonId: string): void {
   try { clearProgress(lessonId); } catch { /* private mode */ }
   clearLocalHistory(lessonId);
   forgetSavedCopy(lessonId);
-  try { localStorage.removeItem(`shCode:sandbox-game:${lessonId}`); } catch { /* private mode */ }
+  // Its published-as record (sandboxGameKey in lib/games-client.ts, which imports this module).
+  ownedLocal.removeItem(`sandbox-game:${lessonId}`);
 }
 
 function storeList(projects: SandboxProject[]): void {

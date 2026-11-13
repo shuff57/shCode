@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { LessonGroup } from '../lib/lesson-groups';
 import { badgeForLesson } from '../lib/lesson-badges';
@@ -14,6 +14,7 @@ import { useCountedLessons } from '../lib/lesson-counted';
 import LessonAccessChip from './LessonAccessChip';
 import { moduleSummaryForClass, ownDate, resolveForClass, useTeacherDue } from '../lib/due-dates-edit';
 import { withAlpha } from '../lib/color-alpha';
+import { pickNextLesson } from '../lib/module-next';
 
 interface LessonItem {
   id: string;
@@ -59,6 +60,18 @@ export default function ModuleLessonsList({
   // pure lessonAvailability(), not the hook — a hook inside .map() would be
   // a different number of hooks per render.
   const now = useNow();
+  // The run of completed lessons before the next one folds into one row; opening it is remembered per module.
+  const foldKey = `shCode:module-done-open:${moduleId ?? 'none'}`;
+  const [showDone, setShowDone] = useState(false);
+  useEffect(() => {
+    try { setShowDone(localStorage.getItem(foldKey) === '1'); } catch { /* storage blocked: stays folded */ }
+  }, [foldKey]);
+  const toggleDone = () => {
+    setShowDone((v) => {
+      try { if (v) localStorage.removeItem(foldKey); else localStorage.setItem(foldKey, '1'); } catch { /* ignore */ }
+      return !v;
+    });
+  };
 
   if (lessons.length === 0) {
     return <p style={{ color: 'var(--c-meta)' }}>No lessons yet.</p>;
@@ -85,6 +98,21 @@ export default function ModuleLessonsList({
     return lessons.length; // all done
   })();
   const lockBypass = bypassesLessonLock(progress.role);
+  // The row the module page's Continue button points at (same pick, lib/module-next.ts).
+  const nextPick = pickNextLesson(lessons.map((l) => l.id), {
+    loaded: progress.loaded,
+    state: (id) => progress.states[id],
+    isAvailable: (id) => lessonAvailability(due, id, moduleId, unitId, now).available,
+    workedAt: (id) => progress.workedAt?.[id],
+    bypass: lockBypass,
+  });
+  const nextId = nextPick?.kind === 'next' ? nextPick.id : null;
+  // Rows 0..foldEnd-1: the unbroken run of completed lessons before the next one (folded when 3 or more).
+  const nextIdx = nextId ? lessons.findIndex((l) => l.id === nextId) : -1;
+  let foldEnd = 0;
+  while (foldEnd < nextIdx && completed(lessons[foldEnd].id)) foldEnd++;
+  if (foldEnd < 3) foldEnd = 0;
+  const folded = foldEnd > 0 && !showDone;
 
   // Module header summary: one date if every lesson agrees, otherwise "Mixed"
   // with the range it spans. Computed, never stored — see lib/due-dates-core.
@@ -137,12 +165,25 @@ export default function ModuleLessonsList({
         </p>
       )}
       <ol style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+      {foldEnd > 0 && (
+        <li style={{ marginBottom: 8 }}>
+          <button type="button" className="mod-done-fold" aria-expanded={showDone} onClick={toggleDone}>
+            <span className="mod-done-fold-check" aria-hidden="true">✓</span>
+            <span className="mod-done-fold-text">
+              {foldEnd} completed {foldEnd === 1 ? 'lesson' : 'lessons'}
+              <span className="mod-done-fold-range"> · {lessons[0].numberedId} to {lessons[foldEnd - 1].numberedId}</span>
+            </span>
+            <span className="mod-done-fold-action">{showDone ? 'Hide' : 'Show'} <span aria-hidden="true">{showDone ? '▴' : '▾'}</span></span>
+          </button>
+        </li>
+      )}
       {lessons.map((l, idx) => {
         const badge = badgeForLesson({ type: l.type, preview: l.preview });
         const href = lessonHref(l);
         const lessonState = progress.states[l.id];
         const stripeColor = stateStripeColors[lessonState ?? ''] ?? 'var(--border)';
-        const stateLabel = stateLabels[lessonState ?? ''];
+        const isNext = l.id === nextId;
+        const stateLabel = isNext ? 'Next up' : stateLabels[lessonState ?? ''];
         const lessonDue = resolveDue(due, l.id, moduleId, unitId);
         // Two independent gates — sequence and clock. Either closes the row.
         const availability = lessonAvailability(due, l.id, moduleId, unitId, now);
@@ -152,7 +193,9 @@ export default function ModuleLessonsList({
         const rowStyle: React.CSSProperties = {
           padding: '10px 14px',
           borderLeft: '4px solid ' + badge.color,
-          borderRight: '2px solid ' + stripeColor,
+          // A completed row says so with its DONE pill; a green right edge on top of it was a second signal
+          // for the same fact (climb4 r6). An in-progress row keeps its yellow edge.
+          borderRight: '2px solid ' + (lessonState === 'completed' ? 'var(--border)' : stripeColor),
           textDecoration: 'none',
           color: 'var(--text)',
           opacity: locked ? 0.5 : 1,
@@ -209,12 +252,12 @@ export default function ModuleLessonsList({
               </span>
             ) : stateLabel ? (
               <span
-                className={lessonState === 'completed' ? 'mod-row-done' : undefined}
+                className={lessonState === 'completed' ? 'mod-row-done' : isNext ? 'mod-row-next-label' : undefined}
                 style={{
                   fontSize: 12,
-                  color: stripeColor,
-                  background: withAlpha(stripeColor, '22'),
-                  border: '1px solid ' + withAlpha(stripeColor, '55'),
+                  color: isNext ? 'var(--c-cyan)' : stripeColor,
+                  background: withAlpha(isNext ? 'var(--c-cyan)' : stripeColor, '22'),
+                  border: '1px solid ' + withAlpha(isNext ? 'var(--c-cyan)' : stripeColor, '55'),
                   borderRadius: 999,
                   padding: '2px 8px',
                   fontWeight: 600,
@@ -274,7 +317,15 @@ export default function ModuleLessonsList({
           </>
         );
 
-        const heading = groupHeadings.get(l.id);
+        if (folded && idx < foldEnd) return null;
+        // A group whose first screen is folded away keeps its heading above its first visible screen.
+        const heading = groupHeadings.get(l.id)
+          ?? (folded && idx === foldEnd && groups
+            ? (() => {
+                const gi = groups.findIndex((g) => g.screens.includes(l.id));
+                return gi >= 0 ? { group: groups[gi], index: gi + 1 } : undefined;
+              })()
+            : undefined);
         const minutes = heading
           ? heading.group.screens.reduce(
               (sum, s) => sum + (lessons.find((x) => x.id === s)?.estimateMins ?? 0),
@@ -327,8 +378,9 @@ export default function ModuleLessonsList({
             ) : (
               <Link
                 href={href}
-                className="mod-row bg-card border-border border rounded block hover:bg-muted shadow-lg"
+                className={`mod-row bg-card border-border border rounded block hover:bg-muted shadow-lg${isNext ? ' is-next' : ''}`}
                 style={rowStyle}
+                aria-current={isNext ? 'step' : undefined}
               >
                 {inner}
               </Link>

@@ -31,6 +31,15 @@ interface AssignmentHeaderProps {
   /** Why Submit is shut when no card is: on a moSHion lab, the code in the editor has not run
    *  clean yet (lib/ai-check.ts moshionSubmitWords). Shown in place of the "Still needed" list. */
   blockedNote?: string;
+  /** Id for an empty slot at the end of the status row: the desktop tool buttons
+   *  (TabbedRightDrawer's inlineHostId) render into it. */
+  toolsHostId?: string;
+  /** The lab was handed in (this visit or an earlier one): said in place of "still needed" (ux1 B2). */
+  doneNote?: string;
+  /** Hide the "0/1 done" count: on a return visit nothing has been checked yet, and a zero read as lost work. */
+  hideScore?: boolean;
+  /** A lab's next step as the check stands now (ux2 S4): "Next: fix the red one ...", "Next: Submit". */
+  nextHint?: string;
 }
 
 export default function AssignmentHeader({
@@ -49,10 +58,14 @@ export default function AssignmentHeader({
   unmetTitles,
   unmetNote,
   blockedNote,
+  toolsHostId,
+  doneNote,
+  hideScore = false,
+  nextHint,
 }: AssignmentHeaderProps) {
   const pct = totalPossible > 0 ? Math.round((score / totalPossible) * 100) : 0;
 
-  const scoreBlock = (
+  const scoreBlock = hideScore ? null : (
     <div className="assignment-score">
       <div className="score-bar">
         <div
@@ -66,15 +79,28 @@ export default function AssignmentHeader({
     </div>
   );
 
-  const statusBadge = showStatus ? (
+  const statusBadge = showStatus && !doneNote && !(compactLab && !submitted) ? (
     <span className={`assignment-status ${submitted ? 'submitted' : 'in-progress'}`}>
       {submitted ? 'Submitted' : 'In Progress'}
     </span>
   ) : null;
 
-  const unmetHint =
+  const unmetHint = doneNote ? (
+    <div className="assignment-done-note"><span aria-hidden="true">✓ </span>{doneNote}</div>
+  ) : compactLab && nextHint ? (
+    // A lab says its next step as the check stands NOW: never "press Check" right after a Check.
+    <div className="assignment-unmet-hint" role="status" aria-live="polite">
+      <span className="assignment-unmet-desktop">{nextHint}</span>
+      <span className="assignment-unmet-mobile">{unmetTitles && unmetTitles.length > 0 ? `${unmetTitles.length} still needed` : nextHint.replace(/^Next: /, '')}</span>
+    </div>
+  ) :
     !submitted && !canSubmit && unmetTitles && unmetTitles.length > 0 ? (
-      <div className="assignment-unmet-hint">
+      compactLab ? (
+        // One status on a lab (climb4 r9 S6): the count sits in the score text, so the hint is the next action.
+        <div className="assignment-unmet-hint">
+          <span className="assignment-unmet-desktop">Next: press Check to test your code</span><span className="assignment-unmet-mobile">{unmetTitles.length} still needed</span>
+        </div>
+      ) : <div className="assignment-unmet-hint">
         <span className="assignment-unmet-desktop">Still needed: </span>{unmetTitles.length}<span className="assignment-unmet-mobile"> still needed</span><span className="assignment-unmet-desktop"> {unmetTitles.length === 1 ? 'requirement' : 'requirements'} · press Check</span>
       </div>
     ) : !submitted && !canSubmit && blockedNote ? (
@@ -105,6 +131,7 @@ export default function AssignmentHeader({
         {unmetHint}
         {scoreAlign === 'right' && scoreBlock}
         {submitButton}
+        {toolsHostId ? <div id={toolsHostId} className="shd-inline-host" /> : null}
       </div>
     </div>
   );

@@ -2,12 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { ChevronDown, ChevronUp, CloudUpload, History, Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen, RotateCcw, Users } from 'lucide-react';
+import { ChevronDown, ChevronUp, CloudUpload, History, Maximize2, Minimize2, PanelLeftClose, PanelLeftOpen, RotateCcw, Share2, Users } from 'lucide-react';
 import type { Extension } from '@codemirror/state';
 import { useLessonStore } from '../lib/store';
 import { saveProgress } from '../lib/version-control';
-import { useCloudWorkspace } from '../lib/lesson-sync';
-import { TOGETHER_COPY, addLocalSnapshot } from '../lib/local-history';
+import { useCloudWorkspace, noteDraftSaved } from '../lib/lesson-sync';
+import { TwoVersionsNotice, sandboxDotState, useUploadStatus } from './UploadStatus';
+import { uploadText } from '../lib/outbox';
+import { TOGETHER_COPY, NOT_KEPT_TEXT, addLocalSnapshot, keepInHistory } from '../lib/local-history';
+import { registerFlush } from '../lib/draft-autosave';
 import { useLessonState } from '../lib/progress';
 import CodeEditor from './CodeEditor';
 import HistoryPanel from './HistoryPanel';
@@ -114,7 +117,11 @@ export default function SandboxWorkspace() {
   // writes the live workspace to lesson_sync, arrival merges a save from
   // another device, and History lists both this device's snapshots and the
   // cloud saves, all for the open project.
-  const cloud = useCloudWorkspace(lesson, lessonProgress.authed);
+  // Declared before the cloud hook: a Code together session stops uploads by itself.
+  const [together, setTogether] = useState(false);
+  const cloud = useCloudWorkspace(lesson, lessonProgress.authed, !together);
+  // Uploading by itself (lib/outbox.ts): its words replace the state line beside Save.
+  const upload = useUploadStatus(lesson.id, lessonProgress.authed);
   const [historyOpen, setHistoryOpen] = useState(false);
 
   // Code together (REALTIME-SPEC.md Part 2): the JavaScript and moSHion modes
@@ -126,15 +133,14 @@ export default function SandboxWorkspace() {
   const togetherLang = modeId === 'js' || modeId === 'moshion' ? modeId : null;
   const mayTogether = useCodeTogetherAvailable(togetherLang, lessonProgress.authed);
   const [togetherOpen, setTogetherOpen] = useState(false);
-  const [together, setTogether] = useState(false);
   const [togetherHere, setTogetherHere] = useState(0);
   const [togetherBadge, setTogetherBadge] = useState<HTMLSpanElement | null>(null);
   const [collabExt, setCollabExt] = useState<Extension | null>(null);
   const cloudRef = useRef(cloud);
   cloudRef.current = cloud;
-  const togetherSnapshot = useCallback((label: string) => {
-    addLocalSnapshot(lesson.id, useLessonStore.getState().fileContents, label);
-  }, [lesson.id]);
+  const togetherSnapshot = useCallback((label: string) => (
+    keepInHistory(lesson.id, useLessonStore.getState().fileContents, label)
+  ), [lesson.id]);
   // Leaving (or the host ending it) keeps the shared program as this student's
   // own draft, through the same path as Save, so it reaches Cloud history too.
   const keepTogetherCopy = useCallback(() => {
@@ -259,12 +265,25 @@ export default function SandboxWorkspace() {
           lastCommittedFileContents: st.lastCommittedFileContents,
           completedSteps: [],
         });
+        // Queued to upload by itself when it differs from what the account has (signed in only).
+        noteDraftSaved(st.lesson.id);
       } catch { /* private mode or quota: the draft stays in memory */ }
     };
-    const timer = setTimeout(save, 800);
-    const onHide = () => { if (document.visibilityState === 'hidden') save(); };
+    // Only a save that is really waiting runs early: a sandbox that is merely open must not
+    // write its editor over a draft another tab saved since (lib/outbox.ts reads that draft).
+    let pending = true;
+    const timer = setTimeout(() => { pending = false; save(); }, 800);
+    const flushIfPending = () => {
+      if (!pending) return;
+      pending = false;
+      clearTimeout(timer);
+      save();
+    };
+    const onHide = () => { if (document.visibilityState === 'hidden') flushIfPending(); };
     document.addEventListener('visibilitychange', onHide);
+    const offFlush = registerFlush(flushIfPending, () => pending);
     return () => {
+      offFlush();
       clearTimeout(timer);
       document.removeEventListener('visibilitychange', onHide);
     };
@@ -356,7 +375,8 @@ export default function SandboxWorkspace() {
   function reset() {
     if (window.confirm(isFlow ? 'Clear the chart and start over? This cannot be undone.' : 'Reset code to the starter? Unsaved work will be lost.')) {
       // resetLesson also wipes the saved draft; setLesson would load it back.
-      resetLesson(lesson);
+      // The code it replaces is put in History first; if it cannot be, nothing is reset.
+      if (!resetLesson(lesson)) { window.alert(NOT_KEPT_TEXT); return; }
       stopRun();
       setLogs([]);
       // ReshapeStudio's own "Clear model" button (inside its Build toolbar)
@@ -634,21 +654,29 @@ export default function SandboxWorkspace() {
   // reason to switch program type mid-model).
   // History and Save ride in both toolbars: reSHape folds the sandbox's chrome
   // into ReshapeStudio's own row, while every other mode has the normal one.
+  // What Save has done for the code on screen: always kept on this device (the local draft), and in the
+  // cloud once a Save in this visit succeeded and nothing has changed since.
+  const contentKey = `${modeId}:${JSON.stringify(fileContents)}`;
+  const [cloudKey, setCloudKey] = useState<string | null>(null);
+  const wasSaving = useRef(false);
+  useEffect(() => {
+    if (wasSaving.current && !cloud.saving && cloud.note && cloud.note.kind !== 'error') setCloudKey(contentKey);
+    wasSaving.current = cloud.saving;
+  }, [cloud.saving, cloud.note, contentKey]);
+  const saveState = cloudKey === null || !cloudKey.startsWith(`${modeId}:`)
+    ? { kind: 'device', text: 'Saved on this device' }
+    : cloudKey === contentKey
+      ? { kind: 'cloud', text: 'Saved to the cloud' }
+      : { kind: 'changed', text: 'Changed since cloud save' };
+
   const renderCloudChips = () => (
     <>
-      <button
-        style={chipStyle}
-        onClick={() => setHistoryOpen(true)}
-        title="Restore a version saved on this device or in the cloud"
-      >
-        <History size={12} />
-        History
-      </button>
       {lessonProgress.authed && (
         // The note hangs below Save for a few seconds instead of sitting in the row and pushing every button along.
         <span style={{ position: 'relative', display: 'inline-flex' }}>
           <button
             style={chipStyle}
+            className="sandbox-save-btn"
             onClick={saveToCloud}
             disabled={cloud.saving}
             title="Save this sandbox to the cloud so you can open it on another device."
@@ -661,6 +689,25 @@ export default function SandboxWorkspace() {
           </span>
         </span>
       )}
+      {lessonProgress.authed && (
+        upload.state !== 'none' ? (
+          <span className="sandbox-save-state" data-state={sandboxDotState(upload.state)} data-upload-state={upload.state} title="Your code is kept on this computer and uploads to your account by itself.">
+            <span className="sandbox-save-dot" aria-hidden="true" />{uploadText(upload)}
+          </span>
+        ) : (
+          <span className="sandbox-save-state" data-state={saveState.kind} title="Your code is always kept in this browser. Save also puts it in your account, so it opens on any device.">
+            <span className="sandbox-save-dot" aria-hidden="true" />{saveState.text}
+          </span>
+        )
+      )}
+      <button
+        style={chipStyle}
+        onClick={() => setHistoryOpen(true)}
+        title="Restore a version saved on this device or in the cloud"
+      >
+        <History size={12} />
+        History
+      </button>
     </>
   );
 
@@ -686,7 +733,7 @@ export default function SandboxWorkspace() {
 
   return (
     <>
-      <TabbedRightDrawer storageKey="shCode:sandbox-drawer" tabs={drawerTabs} />
+      <TabbedRightDrawer storageKey="shCode:sandbox-drawer" tabs={drawerTabs} inlineHostId="sandbox-tools-host" />
       <div
         className={
           'sandbox-shell'
@@ -702,9 +749,12 @@ export default function SandboxWorkspace() {
             <span className="sandbox-subtitle">{mode.blurb}</span>
             {/* Up here rather than at the end of the toolbar, where it took a row of its own at 1366 wide. */}
             {!isReshape && !isFlow && <span className="run-hint sandbox-run-hint">Ctrl+Enter to run</span>}
+            {/* Desktop: the drawer's tool buttons (Textures, Sounds, Library, CODY, Docs) render here. */}
+            <div id="sandbox-tools-host" className="shd-inline-host" />
           </div>
         )}
 
+        {lessonProgress.authed && <TwoVersionsNotice lessonId={lesson.id} status={upload} />}
         {!isReshape && (
           <div className="run-toolbar sandbox-toolbar">
             <SandboxProjectPicker
@@ -714,6 +764,7 @@ export default function SandboxWorkspace() {
               startOpen={noProjects}
             />
             {!isFlow && !noProjects && <button className="btn-run" onClick={run} title="Run (Ctrl+Enter)" aria-keyshortcuts="Control+Enter">▶ Run</button>}
+            {!isFlow && !noProjects && <span className="sandbox-run-key" aria-hidden="true">Ctrl+Enter</span>}
             {isRunning && !isFlow && (
               <button
                 className="btn-secondary btn-sm"
@@ -723,10 +774,10 @@ export default function SandboxWorkspace() {
                 ■ Stop
               </button>
             )}
-            {/* Grouped and pushed right: this program (History, Save, Reset), with classmates (Code together,
-                Publish game), then the view. Thin lines between the groups (.sandbox-tb-end). */}
+            {/* Grouped: this program (Save and where it is kept, History, Reset) right after Run, then the
+                view, then sharing with classmates (Code together, Publish game) at the far right. */}
             {!noProjects && <div className="sandbox-tb-end">
-              <div className="sandbox-tb-group" role="group" aria-label="This program">
+              <div className="sandbox-tb-group sandbox-tb-program" role="group" aria-label="This program">
                 {renderCloudChips()}
                 <button
                   style={together ? { ...chipStyle, opacity: 0.45, cursor: 'not-allowed' } : chipStyle}
@@ -738,21 +789,52 @@ export default function SandboxWorkspace() {
                   Reset
                 </button>
               </div>
+              {!isFlow && (
+                <div className="sandbox-tb-group sandbox-tb-view">
+                  <button
+                    style={chipStyle}
+                    onClick={toggleFull}
+                    title={full ? 'Leave full screen (Esc)' : 'Fill the screen with the preview'}
+                  >
+                    {full ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
+                    {full ? 'Exit full screen' : 'Full screen'}
+                  </button>
+                </div>
+              )}
               {((togetherLang && (mayTogether || together)) || (mode.preview === 'moshion' && lessonProgress.authed)) && (
-                <div className="sandbox-tb-group" role="group" aria-label="With classmates">
-                  {togetherLang && (mayTogether || together) && (
+                <div className="sandbox-tb-group sandbox-tb-share" role="group" aria-label="Share with classmates">
+                  {/* One Share button holds Code together and Publish game (climb4 r9 S9). While a Code together
+                      session is on, its button stays in the row: it carries the session's pictures and people. */}
+                  {together && togetherLang && (
                     <button
                       type="button"
-                      style={together ? { ...chipStyle, color: 'var(--c-fg)', border: '1px solid var(--c-purple)' } : chipStyle}
+                      style={{ ...chipStyle, color: 'var(--c-fg)', border: '1px solid var(--c-purple)' }}
                       aria-haspopup="dialog"
                       aria-expanded={togetherOpen}
                       onClick={() => setTogetherOpen(true)}
-                      title={together ? `Coding together, ${togetherHere} here: the session code, who is here, and Leave` : 'Write one program with classmates at the same time'}
+                      title={`Coding together, ${togetherHere} here: the session code, who is here, and Leave`}
                       data-testid="code-together-button"
                     >
                       <Users size={12} aria-hidden="true" />
                       {/* In a session CodeTogetherBar puts the code's pictures and a dot per person in here (badgeHost). */}
-                      {together ? <span ref={setTogetherBadge} style={{ display: 'inline-flex' }} /> : 'Code together'}
+                      <span ref={setTogetherBadge} style={{ display: 'inline-flex' }} />
+                    </button>
+                  )}
+                  {((!together && togetherLang && mayTogether) || (mode.preview === 'moshion' && lessonProgress.authed)) && (
+                  <ShareMenu chipStyle={chipStyle}>
+                  {!together && togetherLang && mayTogether && (
+                    <button
+                      type="button"
+                      style={chipStyle}
+                      aria-haspopup="dialog"
+                      aria-expanded={togetherOpen}
+                      onClick={() => setTogetherOpen(true)}
+                      title="Write one program with classmates at the same time"
+                      data-testid="code-together-button"
+                      data-share-close=""
+                    >
+                      <Users size={12} aria-hidden="true" />
+                      Code together
                     </button>
                   )}
                   {/* The Games library: publish this sketch so classmates can play and remix it. */}
@@ -763,18 +845,8 @@ export default function SandboxWorkspace() {
                       <ProposeChangeButton key={`propose-${lesson.id}`} getCode={getScript} />
                     </>
                   )}
-                </div>
-              )}
-              {!isFlow && (
-                <div className="sandbox-tb-group">
-                  <button
-                    style={chipStyle}
-                    onClick={toggleFull}
-                    title={full ? 'Leave full screen (Esc)' : 'Fill the screen with the preview'}
-                  >
-                    {full ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
-                    {full ? 'Exit full screen' : 'Full screen'}
-                  </button>
+                  </ShareMenu>
+                  )}
                 </div>
               )}
             </div>}
@@ -1090,5 +1162,49 @@ export default function SandboxWorkspace() {
         }}
       />
     </>
+  );
+}
+
+// The sandbox toolbar's Share button (climb4 r9 S9): one quiet button that opens a small panel with
+// Code together and Publish game, so the row is not packed with sharing controls beside Run.
+// Click outside or Escape closes it; Code together closes it as it opens its own dialog. Publish
+// game's panel opens inside it and the menu stays open while that panel is in use.
+function ShareMenu({ chipStyle, children }: { chipStyle: React.CSSProperties; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => { document.removeEventListener('mousedown', onDown); document.removeEventListener('keydown', onKey); };
+  }, [open]);
+  return (
+    <div ref={ref} className="sandbox-share-menu">
+      <button
+        type="button"
+        style={chipStyle}
+        className="sandbox-share-trigger"
+        aria-haspopup="true"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        title="Code together with classmates, or publish this sketch as a game"
+      >
+        <Share2 size={12} aria-hidden="true" />
+        Share
+        <ChevronDown size={12} aria-hidden="true" />
+      </button>
+      {open && (
+        <div
+          className="sandbox-share-panel"
+          role="group"
+          aria-label="Share with classmates"
+          onClick={(e) => { if ((e.target as HTMLElement).closest('[data-share-close]')) setOpen(false); }}
+        >
+          {children}
+        </div>
+      )}
+    </div>
   );
 }

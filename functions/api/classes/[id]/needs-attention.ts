@@ -3,6 +3,7 @@
 // Only the class owner, co-teachers, or an admin may call this endpoint.
 
 import { canManageClass } from '../../../_shared/classAuth';
+import { classStaffEmails, withoutStaff } from '../../../_shared/classStaff';
 import { isPassingSubmission } from '../../../../lib/grade-pass';
 
 interface Env {
@@ -222,7 +223,16 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
       days_waiting: Math.floor((now - row.submitted_at) / MS_PER_DAY),
     }));
 
-  return json({ inactive, failed_submission, stuck, awaiting_grade });
+  // ux2 T6: a staff account on the roster (owner, co-teacher, non-student role) is not a student who is
+  // inactive, stuck or failing (functions/_shared/classStaff.ts, the same helper as the roster and past due).
+  // Work waiting for a score stays under awaiting_grade so it matches the review queue.
+  const staff = await classStaffEmails(env.DB, classId);
+  return json({
+    inactive: withoutStaff(inactive, staff),
+    failed_submission: withoutStaff(failed_submission, staff),
+    stuck: withoutStaff(stuck, staff),
+    awaiting_grade,
+  });
 };
 
 function json(body: unknown, status = 200): Response {

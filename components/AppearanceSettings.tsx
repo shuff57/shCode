@@ -41,7 +41,7 @@ const S = {
     padding: 24,
   } as React.CSSProperties,
   h2: { fontSize: 20, fontWeight: 700, margin: '0 0 4px', color: 'var(--c-fg)' } as React.CSSProperties,
-  intro: { fontSize: 13, color: 'var(--c-dim)', margin: '0 0 16px' } as React.CSSProperties,
+  intro: { fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.5, maxWidth: '70ch', color: 'var(--c-meta)', margin: '0 0 16px' } as React.CSSProperties,
   fieldset: { border: 'none', padding: 0, margin: '0 0 20px', minWidth: 0 } as React.CSSProperties,
   legend: { fontSize: 14, fontWeight: 700, marginBottom: 8, color: 'var(--c-fg)', padding: 0 } as React.CSSProperties,
   grid: (min: number): React.CSSProperties => ({

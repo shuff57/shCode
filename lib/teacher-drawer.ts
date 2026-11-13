@@ -175,3 +175,226 @@ export const CODE_PREVIEW_SET: ReadonlySet<string> = new Set(['console', 'exampl
 export function opensInCodeEditor(preview: string | null | undefined): boolean {
   return CODE_PREVIEW_SET.has(preview ?? '');
 }
+
+// ---------------------------------------------------------------------------
+// Does a teacher's score on this lesson change the grade? (review queue and drawer, one wording)
+// ---------------------------------------------------------------------------
+
+/**
+ * What a teacher's score on a lesson does to the course grade, from the same manifest fields the grade
+ * itself reads (lessonGradeCategory for "counts at all", maxScore for "the score is the percent"):
+ *  - 'counts':    the score is the lesson's percent (score / maxScore).
+ *  - 'done-only': the lesson counts, but as done or not done: lessonPercent() gives 100 once it is
+ *                 completed whatever the score, because it has no maximum (a 0-point lab).
+ *  - 'practice':  the lesson has no grade category and does not count at all.
+ * Null when the lesson is not in the manifest (nothing to say, so say nothing).
+ */
+export type ScoreWeight = 'counts' | 'done-only' | 'practice';
+
+export function scoreWeight(meta: { counts: boolean; maxScore?: number | null } | null | undefined): ScoreWeight | null {
+  if (!meta) return null;
+  if (!meta.counts) return 'practice';
+  return typeof meta.maxScore === 'number' && meta.maxScore > 0 ? 'counts' : 'done-only';
+}
+
+/**
+ * Whether a teacher's score on one student's hand-in changes the grade NOW, and if not, why: the one
+ * place the queue card and the drawer get their words from (ux2 T1), so the two cannot drift.
+ *
+ * Reads the same facts the grade does (studentGrading in functions/_shared/grading.ts): a lesson counts
+ * at its percent only once lesson_state is 'completed'; a lesson that is not finished is left out until
+ * it is due, then counts as 0 whatever score is stored. Nothing here computes a grade.
+ *  - weight 'practice' / 'done-only': the score never changes the grade (the lesson's kind decides).
+ *  - lessonState 'started': the score is saved but not used until the student finishes the lesson.
+ * `lessonState` null/undefined means no lesson_state row: a teacher score creates a finished row, so it
+ * counts as soon as it is saved, and nothing is said.
+ */
+export interface ScoreCountNote {
+  /** Why: 'practice' | 'done-only' never change the grade; 'unfinished' does not yet. */
+  reason: 'practice' | 'done-only' | 'unfinished';
+  /** Short tag for a card header. */
+  tag: string;
+  /** The always-visible sentence beside the score. */
+  note: string;
+}
+
+export function scoreCountNote(
+  w: ScoreWeight | null,
+  opts: { lessonState?: 'started' | 'completed' | null; pastDue?: boolean; studentName?: string | null } = {},
+): ScoreCountNote | null {
+  if (w === 'practice') {
+    return { reason: 'practice', tag: 'Practice, not graded', note: 'Practice: this lesson does not count toward the grade. Your score is kept for your records only.' };
+  }
+  if (w === 'done-only') {
+    return { reason: 'done-only', tag: 'Score does not change the grade', note: 'Your score does not change the grade: this lab counts as 100% once it is done, whatever the score.' };
+  }
+  if (opts.lessonState === 'started') {
+    const who = opts.studentName?.trim() || 'the student';
+    return {
+      reason: 'unfinished',
+      tag: 'Counts once finished',
+      note: opts.pastDue
+        ? `Counts once ${who} finishes this lesson. A score you save is kept, but the lesson is past due, so until then the grade counts it as 0.`
+        : `Counts once ${who} finishes this lesson. A score you save is kept, but until then the grade leaves this lesson out.`,
+    };
+  }
+  return null;
+}
+
+/**
+ * The score on the hand-in a queue card shows (its newest try) is not always the score the grade reads:
+ * the grade reads lesson_state.score (functions/_shared/grading.ts, the ONE rule), which keeps the best try,
+ * or the teacher's chosen score when score_override holds it. When the two differ, the card says both
+ * (rewalk2 T4: "Quiz score: 4 / 5" in the queue beside "best 5 of 5" in the gradebook). Null when they agree,
+ * when either is unknown, or when the score does not change the grade now (`countNote` already says why).
+ * `fmt` renders one score in the card's own unit ("5 / 5", "3 of 4 criteria").
+ */
+export interface CountedScoreNote {
+  /** The header chip: the score that counts. */
+  chip: string;
+  /** The always-visible sentence: this try, and what counts. */
+  note: string;
+}
+
+export function countedScoreNote(opts: {
+  rowScore: number | null | undefined;
+  stateScore: number | null | undefined;
+  stateOverride?: boolean;
+  lessonState?: 'started' | 'completed' | null;
+  /** True when the row shown is the student's newest hand-in of this lesson. */
+  newest: boolean;
+  /** A ScoreCountNote is shown for this card (the score does not change the grade now). */
+  hasCountNote: boolean;
+  fmt: (score: number) => string;
+}): CountedScoreNote | null {
+  const { rowScore, stateScore } = opts;
+  if (opts.hasCountNote || opts.lessonState !== 'completed') return null;
+  if (typeof rowScore !== 'number' || !Number.isFinite(rowScore)) return null;
+  if (typeof stateScore !== 'number' || !Number.isFinite(stateScore)) return null;
+  if (Math.abs(rowScore - stateScore) < 1e-9) return null;
+  const which = opts.stateOverride ? 'your chosen score' : 'best try';
+  const thisTry = opts.newest ? 'Newest try' : 'This try';
+  return {
+    chip: `Counts: ${opts.fmt(stateScore)} (${opts.stateOverride ? 'your score' : 'best try'})`,
+    note: `${thisTry}: ${opts.fmt(rowScore)}. Counts toward the grade: ${which}, ${opts.fmt(stateScore)}.`,
+  };
+}
+
+/** The one sentence both the queue card and the drawer show; null when the score counts as usual. */
+export function scoreWeightNote(w: ScoreWeight | null): string | null {
+  return scoreCountNote(w)?.note ?? null;
+}
+
+/** The short tag for a card header. */
+export function scoreWeightTag(w: ScoreWeight | null): string | null {
+  return scoreCountNote(w)?.tag ?? null;
+}
+
+/** "Ben" from a first name, else the part of the email before @ ("ben"), for a sentence about the student. */
+export function studentFirstName(firstName: string | null | undefined, email: string): string {
+  const f = (firstName ?? '').trim();
+  if (f) return f;
+  const at = email.indexOf('@');
+  return at > 0 ? email.slice(0, at) : email;
+}
+
+/** "7 / 10" whenever a maximum is known; "7 (no maximum set)" when nothing says what it is out of. */
+export function scoreOutOf(score: number | null | undefined, max: number | null | undefined): string {
+  const s = typeof score === 'number' && Number.isFinite(score) ? String(Math.round(score * 100) / 100) : 'no score';
+  if (typeof max === 'number' && Number.isFinite(max) && max > 0) return `${s} / ${max}`;
+  return typeof score === 'number' ? `${s} (no maximum set)` : s;
+}
+
+// ---------------------------------------------------------------------------
+// A quiz hand-in, as the teacher reads it
+// ---------------------------------------------------------------------------
+
+export interface QuizAnswerRow {
+  id: string;
+  /** The question's text, or the id in words when the page has no text for it. */
+  question: string;
+  /** "Choice B", or "No answer": the letter, kept for a screen reader and when no option text is known. */
+  chosen: string;
+  /** The text of the option the student picked, when the teacher-only quiz content has it (ux2 T3b). */
+  chosenText: string | null;
+  /** The text of the right option, when the teacher-only quiz content has it. */
+  answerText: string | null;
+  /** Right or wrong when the stored grade says (or the key does); null when neither knows. */
+  correct: boolean | null;
+}
+
+/**
+ * One quiz as a TEACHER reads it: each question's text, its options in authored order, and the index of
+ * the right one. Built server-side from lesson.json and only ever returned by the teacher/admin-gated
+ * submission-queue route (functions/_shared/quiz-teacher.generated.ts). Never in a student response.
+ */
+export interface TeacherQuizQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  /** Index into `options` (authored order, the same index QuizView stores as `picked`); null = no key. */
+  answer: number | null;
+}
+export interface TeacherQuiz {
+  questions: TeacherQuizQuestion[];
+}
+
+function choiceName(picked: unknown): string {
+  if (typeof picked === 'number' && Number.isInteger(picked) && picked >= 0) {
+    return picked < 26 ? `Choice ${String.fromCharCode(65 + picked)}` : `Choice ${picked + 1}`;
+  }
+  if (typeof picked === 'string' && picked.trim()) return picked.trim().slice(0, 200);
+  return 'No answer';
+}
+
+/**
+ * A quiz hand-in as question / chosen answer / right or wrong. The stored grade's `quiz` list is the
+ * source (one { id, picked, correct? } per question, in the quiz's order); the response's `answers`
+ * map fills in a pick the grade lacks. Returns null when the grade is not a quiz.
+ */
+export function quizAnswerRows(
+  gradeJson: string | null | undefined,
+  response: string | null | undefined,
+  stems: Readonly<Record<string, string>> | null | undefined,
+  content?: TeacherQuiz | null,
+): QuizAnswerRow[] | null {
+  let grade: unknown;
+  try {
+    grade = gradeJson ? JSON.parse(gradeJson) : null;
+  } catch {
+    return null;
+  }
+  const quiz = grade && typeof grade === 'object' ? (grade as { quiz?: unknown }).quiz : undefined;
+  if (!Array.isArray(quiz)) return null;
+  let answers: Record<string, unknown> = {};
+  try {
+    const a = response ? (JSON.parse(response) as { answers?: unknown })?.answers : null;
+    if (a && typeof a === 'object') answers = a as Record<string, unknown>;
+  } catch {
+    answers = {};
+  }
+  const byId = new Map((content?.questions ?? []).map((q) => [q.id, q] as const));
+  const out: QuizAnswerRow[] = [];
+  for (const q of quiz.slice(0, 200)) {
+    if (!q || typeof q !== 'object' || typeof (q as { id?: unknown }).id !== 'string') continue;
+    const k = q as { id: string; picked?: unknown; correct?: unknown };
+    const picked = k.picked !== undefined && k.picked !== null ? k.picked : answers[k.id];
+    const stem = stems && Object.prototype.hasOwnProperty.call(stems, k.id) ? stems[k.id] : '';
+    const full = byId.get(k.id);
+    const optionAt = (i: unknown): string | null =>
+      full && typeof i === 'number' && Number.isInteger(i) && i >= 0 && i < full.options.length ? full.options[i] : null;
+    const key = full && typeof full.answer === 'number' ? full.answer : null;
+    // The stored verdict first (it is what the student was scored on); the key only fills a gap.
+    const stored = k.correct === true ? true : k.correct === false ? false : null;
+    const fromKey = key !== null && typeof picked === 'number' ? picked === key : null;
+    out.push({
+      id: k.id,
+      question: full?.question || stem || k.id.replace(/^q\d+[-_]?/i, '').replace(/[-_]+/g, ' ').trim() || k.id,
+      chosen: choiceName(picked),
+      chosenText: optionAt(picked),
+      answerText: key !== null ? optionAt(key) : null,
+      correct: stored ?? fromKey,
+    });
+  }
+  return out;
+}

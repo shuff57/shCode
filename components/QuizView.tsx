@@ -4,9 +4,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { CircleCheck, CircleX, Circle, ListChecks } from 'lucide-react';
 import type { QuizConfig } from '../lib/types';
 import { bestOfScore, bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
-import { getHrefsByLessonNumber, navigateToNextLesson } from '../lib/lesson-neighbors';
+import { getHrefsByLessonNumber } from '../lib/lesson-neighbors';
+import LessonOutcome, { NextLessonButton } from './LessonOutcome';
+import { quizScoreLine, ranWhen } from '../lib/outcome-words';
 import { fetchDraft, saveDraft, recordSubmission } from '../lib/written-grader-store';
-import { countCorrect, passThreshold } from '../lib/quiz-grade';
+import { isOffline, OFFLINE_HANDIN_TEXT } from '../lib/offline';
+import { changedSinceCheck, countCorrect, passThreshold, restoreQuizState } from '../lib/quiz-grade';
 import { withInlineCode } from './InlineCode';
 import { sourceHintNumbers, sourceHintParts } from '../lib/source-hint';
 import { buildQuizView } from '../lib/quiz-variant';
@@ -14,35 +17,20 @@ import { getCurrentUser } from '../lib/auth';
 import SolutionPanel from './SolutionPanel';
 import { AttemptBanner, PseudocodePanel, SolutionWait, parseRevealWait, type RevealWait } from './AttemptCap';
 import { useAttemptCap } from '../lib/use-attempt-cap';
+import { loadQuizRecord, saveQuizRecord, type QuizAnswers, type QuizRecord } from '../lib/work-records';
 
 interface Props {
   lessonId: string;
   config: QuizConfig;
 }
 
-const STORAGE_PREFIX = 'shCode:quiz:';
-
-// An absent key means "not answered yet" — 0 is a real first option, so it can
-// never stand in for "unanswered".
-type Answers = Record<string, number>;
-
-interface StoredState {
-  answers: Answers;
-  graded?: boolean;
-}
-
-function loadState(lessonId: string): StoredState {
-  try {
-    const raw = localStorage.getItem(STORAGE_PREFIX + lessonId);
-    if (raw) return JSON.parse(raw);
-  } catch {}
-  return { answers: {} };
-}
-
+// This browser's copy of the picks lives under the page's owner
+// (`w1:<owner>:quiz:<lessonId>`, lib/work-records.ts, lib/owned-storage.ts).
+type Answers = QuizAnswers;
+type StoredState = QuizRecord;
+const loadState = loadQuizRecord;
 function saveState(lessonId: string, state: StoredState) {
-  try {
-    localStorage.setItem(STORAGE_PREFIX + lessonId, JSON.stringify(state));
-  } catch {}
+  saveQuizRecord(lessonId, state);
 }
 // The marking the server hands back after a summative hand-in, keyed by
 // question id. `answer` is the option's AUTHORED index, directly comparable
@@ -89,7 +77,10 @@ async function fetchReveal(lessonId: string): Promise<RevealResult> {
 
 export default function QuizView({ lessonId, config }: Props) {
   const [answers, setAnswers] = useState<Answers>({});
-  const [graded, setGraded] = useState(false);
+  // The answers as they stood at the last Check, or null before any. A question whose answer has
+  // changed since keeps no mark; the others keep theirs until the next Check (ux2 S2).
+  const [checked, setChecked] = useState<Answers | null>(null);
+  const graded = checked !== null;
   const [loaded, setLoaded] = useState(false);
   const [sourceHrefs, setSourceHrefs] = useState<Record<string, string>>({});
   const [identity, setIdentity] = useState('guest');
@@ -98,6 +89,13 @@ export default function QuizView({ lessonId, config }: Props) {
   const [tries, setTries] = useState<TriesSummary | null>(null);
   // Capped quiz, every try spent, key not yet released by the teacher.
   const [wait, setWait] = useState<RevealWait | null>(null);
+  // Set by each Check in THIS visit (ux1 B1/B3/B4): what the score line says when it ran, and where
+  // the page scrolls afterwards. A return visit reads the saved state instead and steals no focus.
+  const [checkedAt, setCheckedAt] = useState<number | null>(null);
+  const [checkCount, setCheckCount] = useState(0);
+  const [now, setNow] = useState(() => Date.now());
+  // Offline, a Check or Submit is not queued (it has a time and maybe a try): say so instead.
+  const [offlineNote, setOfflineNote] = useState(false);
   const progress = useLessonState();
   // Tries, counted on the server. A capped quiz replaces the one-shot lock.
   const cap = useAttemptCap(lessonId, config.maxSubmissions, progress.authed, bypassesLessonLock(progress.role));
@@ -132,9 +130,41 @@ export default function QuizView({ lessonId, config }: Props) {
   // On a capped quiz the paper stays open until the last try is spent, and a
   // hand-in is never final before that: the lock is the try count.
   const locked = capped ? cap.reached : summative && graded && allAnswered;
-  const correctCount = countCorrect(questions, answers);
+  // The score is the CHECKED answers' score: a change after a Check does not move it until the next one.
+  const correctCount = countCorrect(questions, checked ?? answers);
   const needed = passThreshold(questions.length, config.passPercent);
   const passed = graded && correctCount >= needed;
+  const changedIds = summative ? [] : changedSinceCheck(questions, answers, checked);
+  const changed = new Set(changedIds);
+  const scoreStale = changedIds.length > 0;
+  // Done on an earlier visit (or earlier in this one): the saved lesson state, read the way the
+  // header's progress already reads it. A practice quiz only: a test reports "sat", not "passed".
+  const doneBefore = !summative && !capped && progress.states[lessonId] === 'completed';
+  const bestScore = progress.scores[lessonId];
+  const justPassed = !summative && hasKey && passed && checkCount > 0;
+  const scoreLine = graded && !summative && hasKey ? quizScoreLine(correctCount, questions.length, needed) : null;
+
+  // "Checked just now" turns into a clock time after a minute.
+  useEffect(() => {
+    if (!checkedAt) return;
+    const t = setInterval(() => setNow(Date.now()), 15_000);
+    return () => clearInterval(t);
+  }, [checkedAt]);
+
+  // After a practice Check: to the first question that is not right yet, so the fix is in view. A pass
+  // scrolls to its result instead (LessonOutcome moves focus to Next).
+  useEffect(() => {
+    if (!checkCount || summative || !hasKey || !graded) return;
+    if (correctCount >= needed) return;
+    const raf = requestAnimationFrame(() => {
+      const el = document.querySelector<HTMLElement>(`.student-quiz[data-lesson="${CSS.escape(lessonId)}"] .quiz-question-card.is-wrong`);
+      if (!el) return;
+      const calm = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      el.scrollIntoView({ block: 'start', behavior: calm ? 'auto' : 'smooth' });
+    });
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkCount]);
 
   // The reread hints name lessons by number; the manifest is what turns those
   // into hrefs, and it is already cached by the header nav on most pages.
@@ -166,17 +196,25 @@ export default function QuizView({ lessonId, config }: Props) {
       if (cancelled) return;
       if (user?.email) setIdentity(user.email);
       let next: StoredState = local;
+      let fromServer = false;
       if (serverDraft?.response) {
         try {
           const parsed = JSON.parse(serverDraft.response);
-          if (parsed && typeof parsed === 'object' && parsed.answers) next = parsed;
+          if (parsed && typeof parsed === 'object' && parsed.answers) {
+            next = parsed;
+            fromServer = true;
+          }
         } catch {
           // A draft written by an earlier, non-quiz version of this lesson is
           // prose, not JSON. Keep the local answers rather than throwing it away.
         }
       }
-      setAnswers(next.answers ?? {});
-      setGraded(!!next.graded);
+      // Answers may come back from this browser; marks and the score only from the server's saved
+      // copy for the signed-in account (a shared computer's browser may hold someone else's
+      // checked quiz): see restoreQuizState.
+      const restored = restoreQuizState(next, fromServer);
+      setAnswers(restored.answers);
+      setChecked(restored.checked);
       setLoaded(true);
     })();
     return () => {
@@ -186,8 +224,8 @@ export default function QuizView({ lessonId, config }: Props) {
 
   useEffect(() => {
     if (!loaded) return;
-    saveState(lessonId, { answers, graded });
-  }, [answers, graded, lessonId, loaded]);
+    saveState(lessonId, { answers, graded, checked });
+  }, [answers, graded, checked, lessonId, loaded]);
 
   // A test's marking is server-held: once this student has a hand-in the
   // route returns the key for their form; before that it refuses. Both
@@ -212,14 +250,22 @@ export default function QuizView({ lessonId, config }: Props) {
   function pick(questionId: string, index: number) {
     // A submitted test is final -- the paper does not reopen.
     if (locked) return;
-    // Stale marks mislead more than no marks, so changing anything clears them.
-    setGraded(false);
+    // A test's hand-in state is all or nothing, so a change clears it. A practice quiz keeps the
+    // marks on every question not touched (ux2 S2): `changed` hides only this one's.
+    if (summative) setChecked(null);
     setAnswers((prev) => ({ ...prev, [questionId]: index }));
   }
 
   async function submit() {
     if (!canSubmit) return;
-    setGraded(true);
+    if (progress.authed && isOffline()) { setOfflineNote(true); return; }
+    setOfflineNote(false);
+    setChecked({ ...answers });
+    // This Check's score, from the answers being checked (state updates land after this call).
+    const correctCount = countCorrect(questions, answers);
+    setCheckedAt(Date.now());
+    setNow(Date.now());
+    setCheckCount((n) => n + 1);
     const payload = JSON.stringify({ answers, graded: true });
 
     // Green-to-advance on a test means "you sat it", never "you passed it".
@@ -228,13 +274,7 @@ export default function QuizView({ lessonId, config }: Props) {
     // row is in, because the score it records is the server's best total.
     if (!capped && (summative || correctCount >= needed)) {
       await recordLessonCompleted(lessonId, hasKey ? bestOfScore(progress.scores[lessonId], correctCount) : undefined);
-      // Skipped when the marking is about to be revealed. 1800ms is enough to
-      // notice a screen change and not enough to read eight answers and their
-      // explanations, so navigating here would take the paper away at exactly
-      // the moment it became worth reading. The part still unlocks -- it unlocked
-      // on the line above -- and the next-lesson nav is on the page.
-      if (!revealAfterSubmit) setTimeout(() => navigateToNextLesson(lessonId), 1800);
-
+      // No auto-advance (ux1 B1): the student sees the result and chooses Next, which is beside it.
     }
     let recorded = false;
     if (progress.authed) {
@@ -296,12 +336,15 @@ export default function QuizView({ lessonId, config }: Props) {
     void recordLessonCompleted(lessonId);
   }, [capped, loaded, progress.authed, progress.states, cap.used, lessonId]);
 
+  // Phone only (CSS): the quiz's instructions open as one line with "more".
+  const [guideOpen, setGuideOpen] = useState(false);
+
   if (!loaded) return null;
   if (!questions.length) return null;
 
   return (
-    <section className="student-quiz" style={{ marginTop: 16, paddingTop: 12, borderTop: '2px solid var(--c-line)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+    <section className="student-quiz" data-lesson={lessonId} style={{ marginTop: 16, paddingTop: 12, borderTop: '2px solid var(--c-line)' }}>
+      <div className="quiz-head" style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
         <h2
           style={{
             fontSize: 20,
@@ -315,19 +358,64 @@ export default function QuizView({ lessonId, config }: Props) {
           <ListChecks size={18} color="var(--c-yellow)" />
           Check your understanding
         </h2>
+        <span
+          className={`quiz-answered-count${allAnswered ? ' is-complete' : ''}`}
+          aria-live="polite"
+        >
+          {answeredCount} of {questions.length} answered
+          {/* Wide screens only (CSS): the same count as a bar inside the pill. */}
+          <span className="quiz-answered-bar" aria-hidden="true"><span style={{ width: `${questions.length ? Math.round((answeredCount / questions.length) * 100) : 0}%` }} /></span>
+        </span>
+        {/* After a Check the score sits here, in the sticky row the eye is on (ux1 B3). Announced once,
+            by the line beside the Check button; this copy is for sighted readers. */}
+        {scoreLine ? (
+          <a className={`quiz-head-score${passed ? ' is-pass' : ' is-fail'}${scoreStale ? ' is-stale' : ''}`} href={`#quiz-submit-${lessonId}`} aria-hidden="true" tabIndex={-1}>
+            {passed ? <CircleCheck size={15} /> : <CircleX size={15} />}
+            <span>{scoreLine}</span>
+            {scoreStale
+              ? <span className="quiz-head-when ux2-stale-word">Out of date: check again</span>
+              : checkedAt ? <span className="quiz-head-when">checked {ranWhen(checkedAt, now)}</span> : null}
+          </a>
+        ) : null}
+        {/* Wide screens only (CSS): where the hand-in button is, as a jump to it. */}
+        <a className="quiz-submit-hint" href={`#quiz-submit-${lessonId}`}>
+          {summative ? 'Submit' : 'Check answers'} <span aria-hidden="true">↓</span>
+        </a>
         {summative && (
           <div style={{ marginLeft: 'auto' }}>
             <SolutionPanel lessonId={lessonId} readOnly />
           </div>
         )}
       </div>
-      <div className="quiz-guidance is-expanded"><p style={{ color: 'var(--c-meta)', fontSize: 13, margin: '0 0 20px' }}>
+      {/* Desktop >= 1200px only (CSS): the same count, kept in view in the empty column beside the
+          questions. The pill above stays the announced one (aria-live), so this copy is hidden from
+          screen readers. */}
+      <div className="quiz-progress-float" aria-hidden="true">
+        <span className={`quiz-answered-count${allAnswered ? ' is-complete' : ''}`}>
+          {answeredCount} of {questions.length} answered
+        </span>
+        <span className="quiz-progress-track"><span style={{ width: `${questions.length ? Math.round((answeredCount / questions.length) * 100) : 0}%` }} /></span>
+      </div>
+      {/* Once passed, the result block below says what is left to do (redo is optional), so the
+          "You need 4 of 5" instructions no longer stand at the top contradicting it (ux1 B2). */}
+      {doneBefore ? null : <div className={`quiz-guidance is-expanded r7-guide${guideOpen ? ' is-open' : ''}`}><p id={`quiz-guide-${lessonId}`} style={{ color: 'var(--c-meta)', fontSize: 13, margin: '0 0 20px' }}>
         {capped
           ? `Answer all ${questions.length}. After each try you see your total, not which ones were wrong. Submit what you have if one has you stuck: the next part unlocks and you can come back and use your other tries.`
           : summative
           ? `Answer all ${questions.length}. Nothing is marked here — your teacher hands the score back. If one has you stuck, submit what you have and move on: the next part unlocks and you can come back to this one. Once all ${questions.length} are answered, submitting is final.`
-          : `Pick the answer that fits best for each question. You need ${needed} of ${questions.length} right to move on, and you can change your answers and try again as many times as you like.`}
-      </p></div>
+          : <><strong className="quiz-pass-mark">You need {needed} of {questions.length} right to move on.</strong>{' '}<span className="quiz-guide-rest">Change your answers and try again as often as you like.</span></>}
+      </p>
+        <button type="button" className="quiz-guidance-more" aria-expanded={guideOpen} aria-controls={`quiz-guide-${lessonId}`} onClick={() => setGuideOpen((v) => !v)}>
+          {guideOpen ? 'less' : 'more'}
+        </button>
+      </div>}
+      {doneBefore && !justPassed ? (
+        <LessonOutcome
+          lessonId={lessonId}
+          title={typeof bestScore === 'number' && hasKey ? `Passed: ${bestScore} of ${questions.length} right` : 'Passed'}
+          detail="You can change your answers and check again to practise. Your best score is kept."
+        />
+      ) : null}
       <AttemptBanner
         max={cap.max}
         used={cap.used}
@@ -345,14 +433,17 @@ export default function QuizView({ lessonId, config }: Props) {
         const rv = summative ? reveal?.[q.id] : undefined;
         // Marks draw only after a hand-in (graded) and, on a test, only once the
         // server has handed back the key for this student's own form.
-        const showMarks = graded && (summative ? !!rv : true);
+        // A practice question whose answer changed since the Check keeps no mark (ux2 S2).
+        const isChanged = changed.has(q.id);
+        const showMarks = graded && !isChanged && (summative ? !!rv : true);
         const answerIndex = rv ? rv.answer : q.answer;
         const isCorrect = showMarks && picked === answerIndex;
         const isWrong = showMarks && picked !== undefined && picked !== answerIndex;
         return (
           <div
             key={q.id}
-            className="quiz-question-card"
+            id={`quiz-q-${lessonId}-${q.id}`}
+            className={`quiz-question-card${isCorrect ? ' is-correct' : isWrong ? ' is-wrong' : ''}${isChanged ? ' is-changed' : ''}`}
             style={{
               background: 'var(--c-bg)',
               border: '1px solid var(--c-line)',
@@ -375,6 +466,8 @@ export default function QuizView({ lessonId, config }: Props) {
             >
               <span style={{ color: 'var(--c-meta)', fontWeight: 600, minWidth: 22 }}>{qi + 1}.</span>
               <span className="prose-copy">{withInlineCode(q.question)}</span>
+              {/* Colour alone said right or wrong: say it in words, at the question (ux1 B3). */}
+              {isCorrect ? <span className="quiz-q-verdict is-right">Right</span> : isWrong ? <span className="quiz-q-verdict is-wrong">Not right yet</span> : isChanged ? <span className="quiz-q-verdict is-changed">Changed, not checked yet</span> : null}
             </div>
 
             {q.code ? (
@@ -395,7 +488,8 @@ export default function QuizView({ lessonId, config }: Props) {
               </pre>
             ) : null}
 
-            <div className="quiz-options">
+            {/* Short options (every one <= 40 characters) sit two to a row on a wide screen (CSS). */}
+            <div className={`quiz-options${q.options.every((o) => o.length <= 40) ? ' is-short' : ''}`}>
               {order.map((oi) => {
                 const opt = q.options[oi];
                 const selected = picked === oi;
@@ -404,7 +498,7 @@ export default function QuizView({ lessonId, config }: Props) {
                 // attempt turns "try again" into "click the green one".
                 const markAsAnswer = graded && (summative
                   ? !!rv && oi === rv.answer // after a test hand-in the right option is shown
-                  : oi === q.answer && (isCorrect || passed));
+                  : !isChanged && oi === q.answer && (isCorrect || passed));
                 const markAsMistake = showMarks && selected && oi !== answerIndex;
                 return (
                   <label
@@ -477,7 +571,7 @@ export default function QuizView({ lessonId, config }: Props) {
         );
       })}
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 18, flexWrap: 'wrap' }}>
+      <div id={`quiz-submit-${lessonId}`} style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 18, flexWrap: 'wrap', scrollMarginTop: 80 }}>
         <button
           onClick={submit}
           disabled={!canSubmit || locked}
@@ -504,6 +598,12 @@ export default function QuizView({ lessonId, config }: Props) {
               ? 'Check again'
               : 'Check my answers'}
         </button>
+
+        {offlineNote ? (
+          <span role="status" aria-live="polite" data-offline-handin="" style={{ color: 'var(--c-orange)', fontSize: 14, flexBasis: '100%' }}>
+            {OFFLINE_HANDIN_TEXT}
+          </span>
+        ) : null}
 
         {!allAnswered ? (
           <span style={{ color: 'var(--c-meta)', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -534,8 +634,10 @@ export default function QuizView({ lessonId, config }: Props) {
           </span>
         ) : null}
 
-        {graded && !summative ? (
+        {graded && !summative && !justPassed ? (
           <span
+            role="status"
+            aria-live="polite"
             style={{
               color: passed ? 'var(--c-green)' : 'var(--c-orange)',
               fontSize: 15,
@@ -543,16 +645,29 @@ export default function QuizView({ lessonId, config }: Props) {
               display: 'flex',
               alignItems: 'center',
               gap: 6,
+              flexWrap: 'wrap',
             }}
           >
             {passed ? <CircleCheck size={16} /> : <CircleX size={16} />}
             {correctCount} of {questions.length} right
-            {passed
-              ? ' — passed, moving on.'
-              : ` — you need ${needed}. Read the notes above, change your answers and check again.`}
+            {scoreStale
+              ? `${passed ? '. Passed' : ''} at your last check. You changed ${changedIds.length === 1 ? 'an answer' : `${changedIds.length} answers`} since: press Check again to mark ${changedIds.length === 1 ? 'it' : 'them'}.`
+              : passed
+              ? '. Passed.'
+              : `. You need ${needed}. The questions marked "Not right yet" have a note: change those answers and check again.`}
+            {checkedAt && !scoreStale ? <span className="quiz-head-when">Checked {ranWhen(checkedAt, now)}{checkCount > 1 ? ` (check ${checkCount})` : ''}</span> : null}
           </span>
         ) : null}
+        {graded && summative && progress.states[lessonId] === 'completed' && !capped ? <NextLessonButton lessonId={lessonId} focusKey={checkCount || null} /> : null}
       </div>
+      {justPassed ? (
+        <LessonOutcome
+          lessonId={lessonId}
+          title={`Passed: ${correctCount} of ${questions.length} right`}
+          detail={<>Checked {checkedAt ? ranWhen(checkedAt, now) : 'just now'}. The next lesson is unlocked. You can still change answers and check again; your best score is kept.</>}
+          focusKey={checkCount}
+        />
+      ) : null}
       {wait ? (
         <SolutionWait
           wait={wait}

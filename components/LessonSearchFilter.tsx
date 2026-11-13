@@ -2,7 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { useLessonState } from '../lib/progress';
+import { bypassesLessonLock, isSequenceLocked, useLessonState } from '../lib/progress';
+import { pickNextLesson } from '../lib/module-next';
+import { lessonAvailability, useDueDates, useNow } from '../lib/due-dates';
 import { lessonHref } from '../lib/lesson-href';
 import HomeModuleLessons from './HomeModuleLessons';
 import UnitProgressBadge from './UnitProgressBadge';
@@ -66,7 +68,54 @@ interface Props {
 
 export default function LessonSearchFilter({ units, lessons }: Props) {
   const progress = useLessonState();
-  const nextLesson = progress.loaded && progress.authed ? [...lessons].sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true })).find((l) => progress.states[l.id] !== 'completed') : undefined;
+  // "Next" is the module page's Continue rule (lib/module-next.ts pickNextLesson) over the whole course in
+  // lesson-number order: the in-progress lesson worked on most recently, else the first unfinished lesson the
+  // student may open (in order inside its module; no open date holding it shut). One rule, so the home card
+  // and the module's Continue and "Next up" row can never point at different lessons (ux2 S9, ux3).
+  const due = useDueDates();
+  const now = useNow();
+  const ordered = useMemo(
+    () => [...lessons].sort((a, b) => a.title.localeCompare(b.title, undefined, { numeric: true })),
+    [lessons],
+  );
+  const moduleOf = (l: Lesson | undefined) => (l ? (parseNumberedId(l.title) ?? '').split('.').slice(0, 2).join('.') : '');
+  // Each module's lessons in order (the same list the module page and the lesson's lock use), for the in-order lock.
+  const siblingsOf = useMemo(() => {
+    const byModule = new Map<string, string[]>();
+    for (const l of ordered) {
+      const key = `${l.category ?? ''}\u0000${moduleOf(l)}`;
+      if (!byModule.has(key)) byModule.set(key, []);
+      byModule.get(key)!.push(l.id);
+    }
+    const out = new Map<string, string[]>();
+    for (const list of byModule.values()) for (const id of list) out.set(id, list);
+    return out;
+  }, [ordered]);
+  const role = progress.role;
+  const pick = progress.authed
+    ? pickNextLesson(ordered.map((l) => l.id), {
+        loaded: progress.loaded,
+        state: (id) => progress.states[id],
+        isAvailable: (id) => {
+          const l = ordered.find((x) => x.id === id);
+          const mod = moduleOf(l);
+          return lessonAvailability(due, id, mod || null, l?.category ?? null, now).available;
+        },
+        locked: (id) => isSequenceLocked(siblingsOf.get(id) ?? [id], id, progress.states, role),
+        workedAt: (id) => progress.workedAt?.[id],
+        bypass: bypassesLessonLock(role),
+      })
+    : null;
+  const nextLesson = pick?.kind === 'next' ? ordered[pick.index] : undefined;
+  // The module the "Next up" card points into is marked in the list below (accent edge + label).
+  const nextModuleId = nextLesson ? moduleOf(nextLesson) : null;
+  // Why this lesson, in words: the card used to say only "Continue learning", and a student who had worked
+  // out of order read the choice as a bug (rewalk2 S6).
+  const anyProgress = Object.keys(progress.states).length > 0;
+  const nextLabel = pick?.kind === 'next' && pick.reason === 'in-progress'
+    ? 'Continue where you left off'
+    : anyProgress ? 'Next up: the first lesson you have not finished' : 'Start here';
+  const nextVerb = pick?.kind === 'next' && pick.started ? 'Continue →' : 'Start →';
   const [query, setQuery] = useState('');
   // Due dates are per class, so every chip on this page reads one chosen
   // class. Renders nothing at all for a student.
@@ -140,10 +189,10 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
       {nextLesson && (
         <div className="home-continue-card">
           <div style={{ minWidth: 0 }}>
-            <span style={{ display: 'block', color: 'var(--c-meta)', fontSize: 13, marginBottom: 4 }}>{progress.states[nextLesson.id] === 'started' ? 'Continue learning' : 'Next up'}</span>
+            <span style={{ display: 'block', color: 'var(--c-meta)', fontSize: 13, marginBottom: 4 }}>{nextLabel}</span>
             <span className="home-continue-title">{nextLesson.title}</span>
           </div>
-          <Link href={lessonHref(nextLesson)} className="home-continue-action">{progress.states[nextLesson.id] === 'started' ? 'Continue →' : 'Start →'}</Link>
+          <Link href={lessonHref(nextLesson)} className="home-continue-action">{nextVerb}</Link>
         </div>
       )}
       {Array.from(groups.entries()).map(([top, group]) => {
@@ -174,7 +223,7 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
             <summary className="flex items-baseline gap-3 p-4 cursor-pointer hover:bg-muted transition list-none">
               <span className="text-2xl font-bold">Chapter {top}</span>
               {group.label && <span className="text-base opacity-80">{group.label}</span>}
-              <span className="ml-auto flex items-center gap-4 text-sm opacity-80">
+              <span className="home-chapter-count ml-auto flex items-center gap-4 text-sm opacity-80">
                 <UnitProgressBadge lessons={unitLessonRefs} label={`Chapter ${top}`} />
 
               </span>
@@ -195,12 +244,12 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
                 return (
                   <details
                     key={u.id}
-                    className="bg-muted rounded overflow-hidden"
+                    className={`bg-muted rounded overflow-hidden${u.id === nextModuleId ? ' home-module-current' : ''}`}
                     open={!!trimmed}
                   >
                     <summary className="home-module-summary flex items-baseline gap-3 p-3 cursor-pointer hover:bg-accent transition list-none">
                       <span className="font-bold">{u.id}</span>
-                      <span className="text-base">{u.title}</span>
+                      <span className="text-base home-module-title">{u.title}{u.id === nextModuleId && <span className="home-module-now">{progress.states[nextLesson!.id] === 'started' || moduleLessonIds.some((id) => progress.states[id]) ? 'In progress' : 'Next up'}</span>}</span>
                       <span className="home-module-progress ml-auto flex items-center gap-4 text-sm">
                         <UnitProgressBadge lessons={moduleLessonRefs} label={`Module ${u.id}`} />
                         <ModuleDueChip

@@ -13,7 +13,7 @@ interface Env {
   DB: D1Database;
 }
 
-type Session = { email: string; role: 'admin' | 'teacher' | 'student' };
+type Session = { email: string; role: 'admin' | 'teacher' | 'student'; wo?: string };
 type Ctx = EventContext<Env, string, Session>;
 
 const MAX_NAME_LEN = 100;
@@ -35,6 +35,9 @@ export const onRequestGet: PagesFunction<Env, string, Session> = async (context:
     role: data.role,
     firstName: row?.first_name ?? null,
     lastName: row?.last_name ?? null,
+    // The account's work owner (set by functions/_middleware.ts). The page compares it with the
+    // owner it loaded with before uploading by itself (lib/outbox.ts); older pages ignore it.
+    ...(data.wo ? { wo: data.wo } : {}),
   });
 };
 

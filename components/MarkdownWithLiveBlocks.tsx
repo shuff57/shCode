@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
+import { getHrefsByLessonNumber } from '../lib/lesson-neighbors';
 import { marked } from 'marked';
 import DOMPurify from 'isomorphic-dompurify';
 import LiveCodeBlock from './LiveCodeBlock';
@@ -159,14 +160,75 @@ function parseChunks(src: string): Chunk[] {
   return chunks;
 }
 
+// A long inline code sample (a whole statement such as `player = new Sprite(200, 200, 40, 40)`) is
+// marked `code-long` so a narrow column (the lab task card, globals.css r8 S1) can set it on its own
+// line instead of breaking it mid-call. An assignment may break only after its `=`. Block code
+// (`<pre><code class=...>`) is never touched: marked writes inline code as a bare `<code>`.
+const LONG_INLINE_CODE = 24;
+function markLongInlineCode(html: string): string {
+  return html.replace(/<code>([^<]*)<\/code>/g, (whole, body: string) => {
+    if (body.replace(/&[^;\s]+;/g, 'x').length < LONG_INLINE_CODE) return whole;
+    const parts = body.split(/(?<= =) (?=\S)/);
+    const inner = parts.length === 2
+      ? parts.map((p) => `<span class="code-nowrap">${p}</span>`).join(' ')
+      : body;
+    return `<code class="code-long">${inner}</code>`;
+  });
+}
+
+// A nested list that is really one sentence written as a list ("The six listed are" then "risk
+// management," ... "and security management.") is marked `list-as-sentence` so a reading can run it on
+// as that sentence (globals.css r8 S4). Only a list nested right after its lead-in text, of three or more
+// short plain items where every item but the last ends with a comma (", and" / ", or" included).
+function markSentenceLists(html: string): string {
+  return html.replace(/(<li>[^<]+)<ul>((?:\n?<li>[^<]*<\/li>)+)\n?<\/ul>/g, (whole, lead: string, items: string) => {
+    const texts = Array.from(items.matchAll(/<li>([^<]*)<\/li>/g), (m) => m[1].trim());
+    if (texts.length < 3 || texts.some((t) => t.length === 0 || t.length > 40)) return whole;
+    if (!texts.slice(0, -1).every((t) => /,(?:\s+(?:and|or))?$/.test(t))) return whole;
+    return `${lead}<ul class="list-as-sentence">${items}</ul>`;
+  });
+}
+
 function renderMarkdown(src: string): string {
-  const html = String(marked.parse(src));
+  // climb4 r9 S4: a nested list stays a real (compact) list; markSentenceLists is no longer applied.
+  const html = markLongInlineCode(String(marked.parse(src)));
   return DOMPurify.sanitize(html);
 }
 
 // HTML is already run through DOMPurify in renderMarkdown; safe to inject.
+// A lesson named in inline code ("`1.1.11 Name That Umbrella`") becomes a real link to that lesson
+// once the catalog resolves its number, styled as a link rather than as code (globals.css
+// .lesson-ref-link). Only code that is a lesson number followed by a capitalised title qualifies.
+const LESSON_REF = /^(\d+\.\d+\.\d+)\s+[A-Z]/;
+
 function HtmlChunk({ html }: { html: string }) {
-  return <article className="content-prose" dangerouslySetInnerHTML={{ __html: html }} />;
+  const ref = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    const root = ref.current;
+    if (!root) return;
+    const codes = Array.from(root.querySelectorAll('code')).filter(
+      (c) => !c.closest('pre, a') && LESSON_REF.test(c.textContent ?? ''),
+    );
+    if (codes.length === 0) return;
+    let cancelled = false;
+    const numbers = codes.map((c) => (c.textContent ?? '').match(LESSON_REF)![1]);
+    getHrefsByLessonNumber(Array.from(new Set(numbers))).then((hrefs) => {
+      if (cancelled) return;
+      codes.forEach((c, i) => {
+        const href = hrefs[numbers[i]];
+        if (!href || !c.isConnected || c.closest('a')) return;
+        const a = document.createElement('a');
+        a.href = href;
+        a.className = 'lesson-ref-link';
+        c.replaceWith(a);
+        a.appendChild(c);
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [html]);
+  return <article ref={ref} className="content-prose" dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
 interface Props {

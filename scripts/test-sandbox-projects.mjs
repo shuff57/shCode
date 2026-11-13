@@ -147,7 +147,7 @@ check('Remix makes a new project', /export async function remixIntoSandbox[\s\S]
 check('the published-as record is per project', games.includes('sandboxGameKey(lessonId)'), true);
 const hp = read('components/HistoryPanel.tsx');
 const restoreAt = hp.indexOf('const restore = async');
-const keepAt = hp.indexOf('addLocalSnapshot(lessonId, current', restoreAt);
+const keepAt = hp.indexOf('await keepBeforeRestore(lessonId, snapshot, toCloud)', restoreAt);
 const replaceAt = hp.indexOf('useLessonStore.setState({ fileContents: { ...snapshot } })', restoreAt);
 check('a restore keeps the code it replaces before replacing it', keepAt > restoreAt && replaceAt > keepAt, true);
 check('signed in, the replaced code goes to Cloud history too', /restoreVersionToCloud\(lessonId, current\)/.test(hp), true);

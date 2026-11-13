@@ -4,7 +4,8 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { CircleCheck, CircleX, Circle, Loader2, Lightbulb, Sparkles, Save } from 'lucide-react';
 import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
 import { isPassingGrade, criteriaScore } from '../lib/grade-pass';
-import { navigateToNextLesson } from '../lib/lesson-neighbors';
+import { NextLessonButton } from './LessonOutcome';
+import { ranWhen, writtenAnswerStatus } from '../lib/outcome-words';
 import LessonNumberLinks, { useSourceHrefs } from './LessonNumberLinks';
 import {
   fetchDraft,
@@ -25,6 +26,8 @@ import { useRepairLoop } from '../lib/use-attempt-cap';
 import CodeMirrorPane from './CodeMirrorPane';
 import dynamic from 'next/dynamic';
 import { withAlpha } from '../lib/color-alpha';
+import { loadWrittenRecord, saveWrittenRecord, type WrittenRecord } from '../lib/work-records';
+import { OWNER_MISMATCH_HANDIN_TEXT } from '../lib/owner-fetch';
 
 // The editor engine is a few hundred kB; only the parts that set `formatting` download it.
 const RichAnswerEditor = dynamic(() => import('./RichAnswerEditor'), {
@@ -99,39 +102,12 @@ function bestGradedTry(records: SubmissionRecord[]): GradeResult | null {
   return best;
 }
 
-const STORAGE_PREFIX = 'shCode:written:';
-const LEGACY_STORAGE_PREFIX = 'shCode_writtenGrader:';
-
-interface StoredState {
-  response: string;
-  lastResult?: GradeResult;
-  lastSubmittedAt?: number;
-}
-
-function loadState(lessonId: string): StoredState {
-  // One-time migration from the legacy key so in-progress drafts survive.
-  try {
-    const legacyKey = LEGACY_STORAGE_PREFIX + lessonId;
-    const legacy = localStorage.getItem(legacyKey);
-    if (legacy !== null) {
-      if (localStorage.getItem(STORAGE_PREFIX + lessonId) === null) {
-        localStorage.setItem(STORAGE_PREFIX + lessonId, legacy);
-      }
-      localStorage.removeItem(legacyKey);
-    }
-  } catch {}
-
-  try {
-    const raw = localStorage.getItem(STORAGE_PREFIX + lessonId);
-    if (raw) return JSON.parse(raw);
-  } catch {}
-  return { response: '' };
-}
-
+// This browser's copy lives under the page's owner (`w1:<owner>:written:<lessonId>`,
+// lib/work-records.ts). The older unprefixed keys are set aside by lib/owned-storage.ts.
+type StoredState = WrittenRecord<GradeResult>;
+const loadState = (lessonId: string): StoredState => loadWrittenRecord<GradeResult>(lessonId);
 function saveState(lessonId: string, state: StoredState) {
-  try {
-    localStorage.setItem(STORAGE_PREFIX + lessonId, JSON.stringify(state));
-  } catch {}
+  saveWrittenRecord<GradeResult>(lessonId, state);
 }
 
 // totalPossible === 0 ⇒ pass/fail rubric (all rubric points are 0). Pass when
@@ -156,6 +132,10 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
   // a stage nobody reported.
   const [stage, setStage] = useState<GradeStage | null>(null);
   const [result, setResult] = useState<GradeResult | null>(null);
+  // The answer text `result` graded (ux2 S4). Null when unknown (an older saved result).
+  const [resultFor, setResultFor] = useState<string | null>(null);
+  // The text the last "Save draft" stored, so "Draft saved" is only shown while it is still true.
+  const [savedText, setSavedText] = useState<string | null>(null);
   // The result on screen was rebuilt from the server's best try (a return visit, another device),
   // not just graded, so the page says whose it is.
   const [resultIsBest, setResultIsBest] = useState(false);
@@ -163,6 +143,26 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
   const [offline, setOffline] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  // ux1 B3: "Draft saved 3:04 PM" stays beside the button (it used to flash "Saved ✓" for under a
+  // second), and a grade that just arrived is announced beside Submit and scrolled into view.
+  const [savedAt, setSavedAt] = useState<number | null>(null);
+  const [gradedAt, setGradedAt] = useState<number | null>(null);
+  const [clock, setClock] = useState(() => Date.now());
+  useEffect(() => {
+    if (!savedAt && !gradedAt) return;
+    const t = setInterval(() => setClock(Date.now()), 15_000);
+    return () => clearInterval(t);
+  }, [savedAt, gradedAt]);
+  useEffect(() => {
+    if (!gradedAt) return;
+    const raf = requestAnimationFrame(() => {
+      const el = document.getElementById(`written-feedback-${lessonId}`);
+      if (!el) return;
+      const calm = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      el.scrollIntoView({ block: 'start', behavior: calm ? 'auto' : 'smooth' });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [gradedAt, lessonId]);
   // The questions name the lessons to reread ("1.1.17"). The same linkifier the
   // coding criteria use, so both surfaces behave identically.
   const sourceHrefs = useSourceHrefs([prompt]);
@@ -223,6 +223,10 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
     maxSubmissions !== null && attemptsKnown && anyRow && progress.authed && progress.states[lessonId] !== 'completed',
   );
   const locked = capUnknown || capReached || (oneShot && (!!result || alreadySubmitted));
+  // Submit needs a real answer (20 characters); below that the button stays disabled with a hint beside it.
+  const tooShort = response.trim().length < 20;
+  // Whether the result on screen is for the text in the box, and whether "Draft saved" is still true (ux2 S4).
+  const status = writtenAnswerStatus({ response, resultFor: result ? resultFor : null, savedText: savedAt ? savedText : null });
 
   useEffect(() => {
     // Local cache is the always-available fallback; server draft is canonical
@@ -232,11 +236,11 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
     (async () => {
       const [serverDraft, prior] = await Promise.all([
         progress.authed ? fetchDraft(lessonId) : Promise.resolve(null),
-        // Only worth asking when the answer changes something: a one-shot lock or
-        // a cap. A formative item has neither and never made this call.
-        progress.authed && (oneShot || maxSubmissions !== null)
+        // Signed in, the server's hand-ins are read on every visit: they are the only source of a
+        // result shown on return (below), as well as the one-shot lock and the try count.
+        progress.authed
           ? fetchSubmissions(lessonId)
-          : Promise.resolve({ records: [], loaded: !progress.authed }),
+          : Promise.resolve({ records: [], loaded: true }),
       ]);
       if (cancelled) return;
       if (prior.records.length > 0) setAlreadySubmitted(true);
@@ -251,19 +255,32 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
       } else {
         setResponse(local.response);
       }
-      // On a capped part the page must still show what the student EARNED when they come back
-      // (another day, another device, a cleared cache): the locked box used to say "your best one is
-      // your score" and show no score and none of the feedback. Once every try is spent the best
-      // try is the part's grade, so that is what is shown; before then the last try on this device
-      // stays, and the best one stands in only when this device has nothing.
+      // A result on return comes ONLY from the server's graded hand-ins for the signed-in account,
+      // never from this browser's saved copy: on a shared computer that copy may be another
+      // student's, and "Result: passed" would claim work this student never handed in.
+      // On a capped part, once every try is spent the best try is the part's grade; before that,
+      // the latest try. Elsewhere the latest graded try.
+      const graded = prior.records.filter((r) => {
+        const g = r.gradeJson as { criteria?: unknown; gradingFailed?: unknown } | null;
+        return !!g && typeof g === 'object' && Array.isArray(g.criteria) && g.gradingFailed !== true;
+      });
+      const latest = graded.length ? graded[graded.length - 1] : null;
       if (maxSubmissions !== null && prior.loaded) {
         const best = bestGradedTry(prior.records);
         const spent = countAttempts(prior.records) >= maxSubmissions;
-        if (best && (spent || !local.lastResult)) {
+        if (best && spent) {
           setResult(best);
           setResultIsBest(true);
-        } else if (local.lastResult) setResult(local.lastResult);
-      } else if (local.lastResult) setResult(local.lastResult);
+          const bestRow = prior.records.find((r) => r.gradeJson === (best as unknown));
+          setResultFor(bestRow ? bestRow.response : null);
+        } else if (latest) {
+          setResult(latest.gradeJson as GradeResult);
+          setResultFor(latest.response);
+        }
+      } else if (latest && !oneShot) {
+        setResult(latest.gradeJson as GradeResult);
+        setResultFor(latest.response);
+      }
       setLoaded(true);
     })();
     return () => {
@@ -280,6 +297,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
     setSaveStatus('saving');
     const ok = progress.authed ? await saveDraft(lessonId, response) : false;
     setSaveStatus(ok ? 'saved' : 'error');
+    if (ok) { setSavedAt(Date.now()); setSavedText(response); setClock(Date.now()); }
     setTimeout(() => setSaveStatus('idle'), 2000);
   }
 
@@ -393,6 +411,12 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
         await refreshAttempts();
         return;
       }
+      if (status === 409 && (data as { error?: string } | null)?.error === 'owner-mismatch') {
+        // Someone else signed in on this computer after this page opened. Nothing was
+        // handed in (functions/_middleware.ts); not a grader failure, so not recorded.
+        setError(OWNER_MISMATCH_HANDIN_TEXT);
+        return;
+      }
       if (data && !data.ok && (data as { capReached?: boolean }).capReached === true) {
         // Every try is spent (a second tab, a stale page). That is the server
         // doing its job, not a grader outage: NOT written as a failed attempt, which
@@ -420,7 +444,12 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
       // A successful grade supersedes any failed attempt for this text.
       lastFailedRef.current = null;
       setResult(data as GradeResult);
+      setResultFor(response);
+      // The answer is handed in now: a "Draft saved" beside the result would say the opposite.
+      setSavedAt(null);
       setResultIsBest(false);
+      setGradedAt(Date.now());
+      setClock(Date.now());
       // One attempt just spent. Unknown stays unknown -- we know this one happened,
       // not how many came before, and inventing a count would unlock a capped item.
       setAttempts((n) => (n === null ? null : n + 1));
@@ -474,9 +503,12 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
   if (!loaded) return null;
 
   return (
-    <section style={{ marginTop: 16, paddingTop: 14, borderTop: '2px solid var(--c-line)' }}>
+    <section className="written-grader" style={{ marginTop: 16, paddingTop: 14, borderTop: '2px solid var(--c-line)' }}>
+      {/* The answer (label, box, Submit) and the help under it are two blocks so a wide screen can set
+          them side by side (globals.css r7 S7b); a narrow one stacks them as before. */}
+      <div className="written-answer">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-        <label style={{ fontSize: 13, color: 'var(--c-meta)' }}>{codeInput ? 'Your program (JavaScript)' : 'Your response'}</label>
+        <label style={{ fontSize: 14, fontWeight: 600, color: 'var(--c-fg)' }}>{codeInput ? 'Your program (JavaScript)' : 'Your response'}</label>
         <SolutionPanel
           lessonId={lessonId}
           onInsert={(files) => {
@@ -486,7 +518,6 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
         />
       </div>
       <AttemptBanner max={maxSubmissions} used={attempts} loading={!loaded} />
-      <GradeQuotaNote />
       {codeInput ? (
         // CodeMirrorPane fills its parent (height: 100%), so the parent needs a
         // height of its own. No Run button, lint or autocomplete, on purpose:
@@ -530,14 +561,18 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
           }}
           placeholder="Write your response here. Full sentences preferred."
           rows={7}
+          className="written-response-input"
           style={{
             width: '100%',
-            background: 'var(--c-bg)',
+            maxWidth: 760,
+            boxSizing: 'border-box',
+            display: 'block',
+            background: 'var(--c-deep2)',
             color: 'var(--c-fg)',
-            border: '1px solid var(--c-line)',
+            border: '1px solid var(--c-comment)',
             borderRadius: 6,
             padding: 12,
-            fontSize: formatting ? textSize : 14,
+            fontSize: formatting ? textSize : 15,
             fontFamily: 'system-ui, sans-serif',
             lineHeight: 1.5,
             resize: 'vertical',
@@ -546,18 +581,22 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
         )
       )}
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 10, flexWrap: 'wrap' }}>
+      <div className="written-actions" style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 10, flexWrap: 'wrap' }}>
         <button
+          className="written-submit"
           onClick={submit}
-          disabled={loading || locked || response.trim().length < 20}
+          disabled={loading || locked || tooShort}
+          aria-describedby={tooShort && !locked && !loading ? `written-hint-${lessonId}` : undefined}
           style={{
             padding: '8px 16px',
             borderRadius: 6,
             border: 'none',
             fontWeight: 600,
-            cursor: loading ? 'wait' : response.trim().length < 20 ? 'not-allowed' : 'pointer',
-            background: loading ? 'var(--c-line)' : response.trim().length < 20 ? 'var(--c-line)' : 'var(--c-purple)',
-            color: response.trim().length < 20 || locked ? 'var(--c-dim)' : 'var(--c-bg)',
+            cursor: loading ? 'wait' : tooShort ? 'not-allowed' : 'pointer',
+            // Disabled reads as disabled (flat grey fill, not-allowed cursor) but its label stays
+            // readable: meta on the line colour is above 4.5:1. The reason sits beside it as a hint.
+            background: loading || locked || tooShort ? 'var(--c-line)' : 'var(--c-purple)',
+            color: tooShort || locked ? 'var(--c-meta)' : loading ? 'var(--c-fg)' : 'var(--c-bg)',
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
@@ -573,9 +612,7 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
               : oneShot
                 ? 'Submitting…'
                 : 'Grading…'
-            : response.trim().length < 20 && !locked
-              ? 'Write something to submit'
-              : oneShot
+            : oneShot
               ? locked
                 ? 'Submitted'
                 : 'Submit my answer'
@@ -585,9 +622,11 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
                 ? `Grade (${Math.max(0, maxSubmissions - attempts)} left)`
                 : typeof config.maxSubmissions === 'number'
                 ? 'Grade'
+                : result && status.resultStale
+                ? 'Submit this answer'
                 : result
-                ? 'Re-submit for feedback'
-                : 'Submit for feedback'}
+                ? (isPassing(result) ? 'Submit again (optional)' : 'Submit again')
+                : 'Submit'}
         </button>
         <button
           onClick={saveNow}
@@ -598,9 +637,10 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
             borderRadius: 6,
             border: '1px solid var(--c-line)',
             fontWeight: 600,
-            cursor: !progress.authed ? 'not-allowed' : saveStatus === 'saving' ? 'wait' : 'pointer',
+            cursor: !progress.authed || response.trim().length === 0 ? 'not-allowed' : saveStatus === 'saving' ? 'wait' : 'pointer',
             background: 'transparent',
-            color: !progress.authed ? 'var(--c-comment)' : 'var(--c-fg)',
+            // Nothing to save yet reads as unavailable (meta text), not as a live button.
+            color: !progress.authed ? 'var(--c-comment)' : response.trim().length === 0 ? 'var(--c-meta)' : 'var(--c-fg)',
             opacity: !progress.authed ? 0.6 : 1,
             display: 'inline-flex',
             alignItems: 'center',
@@ -611,7 +651,26 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
           {saveStatus === 'saving' ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
           {saveStatus === 'saved' ? 'Saved ✓' : saveStatus === 'error' ? 'Save failed' : 'Save draft'}
         </button>
-        <span style={{ color: 'var(--c-meta)', fontSize: 13 }}>
+        {/* What Submit and Save draft did, beside them and still there afterwards (ux1 B3). */}
+        <span className="written-outcome" role="status" aria-live="polite">
+          {loading ? (
+            <span className="written-outcome-busy">{stage ? `${GRADE_STAGE_LABELS[stage]}…` : 'Grading…'} Your feedback will show below.</span>
+          ) : result && !oneShot ? (
+            <a className={`written-outcome-result${isPassing(result) ? ' is-pass' : ' is-fail'}${status.resultStale ? ' is-stale' : ''}`} href={`#written-feedback-${lessonId}`}>
+              {status.resultStale
+                ? `Your earlier answer ${isPassing(result) ? 'passed' : 'needs more work'}. This one is not graded yet.`
+                : <>{isPassing(result) ? 'Result: passed' : 'Result: needs more work'}{gradedAt ? ` · graded ${ranWhen(gradedAt, clock)}` : ''}</>}
+              {' '}· See feedback <span aria-hidden="true">↓</span>
+            </a>
+          ) : null}
+          {savedAt && !loading && status.showDraftSaved ? <span className="written-outcome-saved">Draft saved {ranWhen(savedAt, clock)}</span> : null}
+        </span>
+        {tooShort && !locked && !loading && (
+          <span id={`written-hint-${lessonId}`} className="written-submit-hint">
+            {response.trim().length === 0 ? 'Write something to submit' : 'Write a little more to submit'}
+          </span>
+        )}
+        <span className="written-count" style={{ color: 'var(--c-meta)', fontSize: 13 }}>
           {response.trim().length} chars{codeInput ? '' : ` · ${response.trim().split(/\s+/).filter(Boolean).length} words`}
         </span>
         {maxSubmissions === null ? null : !attemptsKnown ? (
@@ -625,8 +684,14 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
               : `${maxSubmissions - attempts} of ${maxSubmissions} attempts left`}
           </span>
         )}
+        {/* Quiet one-line meta note after the controls it counts; the detail is in its tooltip. */}
+        <div className="written-quota-note">
+          <GradeQuotaNote />
+        </div>
+      </div>
       </div>
 
+      <div className="written-help">
       {prompt.trim() ? <details style={{ marginBottom: 10, border: '1px solid var(--c-line)', borderRadius: 6, padding: '8px 12px' }}>
         <summary style={{ cursor: 'pointer', color: 'var(--c-purple)', fontSize: 13 }}>What to answer · task guidance</summary>
               <h2 style={{ fontSize: 18, marginBottom: 6, color: 'var(--c-fg)', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -645,7 +710,12 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
 <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.5, paddingTop: 10 }}><LessonNumberLinks text={prompt.trim()} hrefs={sourceHrefs} /></div>
       </details> : null}
 
-      {afterPrompt ? <details style={{ margin: '0 0 16px', padding: '10px 14px', border: '1px solid var(--c-line)', borderRadius: 6 }}><summary style={{ cursor: 'pointer', color: 'var(--c-purple)', fontSize: 14 }}>See how this is graded</summary>{afterPrompt}</details> : null}
+      {afterPrompt ? <details
+        className="written-graded-details"
+        // Wide screens open "See how this is graded" at first: it is what a student needs before writing (climb4 r10 S8).
+        ref={(el) => { if (el && !el.dataset.autoOpened) { el.dataset.autoOpened = '1'; if (window.matchMedia('(min-width: 1000px)').matches) el.open = true; } }}
+        style={{ margin: '0 0 16px', padding: '10px 14px', border: '1px solid var(--c-line)', borderRadius: 6 }}><summary style={{ cursor: 'pointer', color: 'var(--c-purple)', fontSize: 14 }}>See how this is graded</summary>{afterPrompt}</details> : null}
+      </div>
 
       {/* Its own row rather than squeezed in beside Submit: on a narrow screen
           the label, menu and description wrap, and wrapping them through the
@@ -708,7 +778,10 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
         // reads as full marks while the recorded score is 1.5 of 3.
         const earnedCriteria = criteriaScore(result.criteria);
         return (
-        <div style={{ marginTop: 20 }}>
+        <div id={`written-feedback-${lessonId}`} className="written-feedback" style={{ marginTop: 20 }}>
+          {status.resultStale ? (
+            <div className="ux2-stale-note" role="note">This feedback is for your earlier answer. Submit to get feedback on what you have written now.</div>
+          ) : null}
           {resultIsBest ? (
             <div style={{ marginBottom: 8, color: 'var(--c-cyan)', fontSize: 13 }}>This is your best try, the one that counts.</div>
           ) : maxSubmissions !== null ? (
@@ -798,23 +871,8 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
 
           {passed && (
             <div style={{ marginTop: 16 }}>
-              <button
-                onClick={() => navigateToNextLesson(lessonId)}
-                style={{
-                  padding: '10px 18px',
-                  borderRadius: 6,
-                  border: 'none',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  background: 'var(--c-green)',
-                  color: 'var(--c-bg)',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                }}
-              >
-                Continue to next lesson →
-              </button>
+              {/* The same Next every lesson type shows (ux1 B1). */}
+              <NextLessonButton lessonId={lessonId} />
               <p style={{ margin: '8px 0 0', color: 'var(--c-meta)', fontSize: 13 }}>
                 {/* A zero-point rubric (3.9.1, 3.9.3) has no score to raise, so
                     "keep revising to push your score higher" is an invitation to

@@ -81,7 +81,7 @@ const created = await put('L1', { 'script.js': 'first' }, 0);
 check('first write creates revision 1', [created[0], created[1].revision], [200, 1]);
 check('read returns the workspace', await get('L1'), [
   200,
-  { files: { 'script.js': 'first' }, revision: 1, updatedAt: created[1].updatedAt },
+  { files: { 'script.js': 'first' }, revision: 1, updatedAt: created[1].updatedAt, versioned: true },
 ]);
 
 const conflict = await put('L1', { 'script.js': 'stale' }, 0);
@@ -129,6 +129,39 @@ check('an older save keeps the older copy', (await histGet({ id: oldestId }))[1]
 check('another student cannot read a save id', (await histGet({ id: newestId }, 'other@example.invalid'))[0], 404);
 check('another student has no history', (await histGet({ lessonId: 'L1' }, 'other@example.invalid'))[1].saves, []);
 check('history needs a lessonId or id', (await histGet({}))[0], 400);
+
+// An upload the page made by itself (`auto: true`, lib/outbox.ts) advances the row exactly
+// like a Save but writes no history row; anything but the boolean true is an ordinary Save.
+const putRaw = async (lessonId, body, email) => {
+  const r = await h.onRequestPut(ctx('PUT', lessonId, body, email));
+  return [r.status, await r.json()];
+};
+const autoCreate = await putRaw('L3', { files: { 'script.js': 'auto 1' }, baseRevision: 0, auto: true });
+check('auto: the first write creates revision 1', [autoCreate[0], autoCreate[1].revision], [200, 1]);
+const autoAdvance = await putRaw('L3', { files: { 'script.js': 'auto 2' }, baseRevision: 1, auto: true });
+check('auto: a later write advances the row', [autoAdvance[0], autoAdvance[1].revision], [200, 2]);
+check('auto: the row holds the newest upload', (await get('L3'))[1].files, { 'script.js': 'auto 2' });
+check('auto: no history row for either', (await histGet({ lessonId: 'L3' }))[1].saves, []);
+const autoStale = await putRaw('L3', { files: { 'script.js': 'stale' }, baseRevision: 1, auto: true });
+check('auto: a stale revision is still refused with the live row', [autoStale[0], autoStale[1].files], [409, { 'script.js': 'auto 2' }]);
+const notAuto = await putRaw('L3', { files: { 'script.js': 'by hand' }, baseRevision: 2, auto: 'true' });
+check('auto: only the boolean true skips history (a string is a Save)', notAuto[0], 200);
+const saveAfter = await put('L3', { 'script.js': 'saved' }, 3);
+check('a Save after uploads writes its history row', saveAfter[0], 200);
+check('history lists only the two Saves', (await histGet({ lessonId: 'L3' }))[1].saves.map((x) => x.revision), [4, 3]);
+
+// A Save of files the row already holds, at the current revision (the student pressed Save after
+// an upload by itself): the handler does not answer "unchanged"; it advances the revision and
+// writes the history row, which is what makes that Save a Cloud history version.
+const sameAgain = await putRaw('L3', { files: { 'script.js': 'saved' }, baseRevision: 4 });
+check('a Save of identical files advances the revision', [sameAgain[0], sameAgain[1].revision], [200, 5]);
+check('and writes its history row', (await histGet({ lessonId: 'L3' }))[1].saves.map((x) => x.revision), [5, 4, 3]);
+// `versioned`: whether this very revision is a Saved version (has a Cloud history row).
+check('versioned: a row written by a Save says true', (await get('L3'))[1].versioned, true);
+const autoAgain = await putRaw('L3', { files: { 'script.js': 'auto 3' }, baseRevision: 5, auto: true });
+check('versioned: a row written by an upload by itself says false', [autoAgain[0], (await get('L3'))[1].versioned], [200, false]);
+const staleAgain = await putRaw('L3', { files: { 'script.js': 'stale' }, baseRevision: 1 });
+check('versioned: the 409 carries it too', [staleAgain[0], staleAgain[1].versioned], [409, false]);
 
 // The newest 20 survive; the six oldest are pruned.
 for (let i = 1; i <= 25; i++) {

@@ -11,6 +11,7 @@
 // pick, and the file it already holds is still correct.
 
 import type { Lesson, StarterVariant } from './types';
+import { ownedLocal } from './owned-storage';
 
 export type { StarterVariant };
 
@@ -21,8 +22,15 @@ export const STARTER_PICKED = 'shcode:starter-picked';
  *  `{ lessonId, id, handled }`; StarterPicker sets `handled` when `id` is one of its problems. */
 export const STARTER_REQUESTED = 'shcode:starter-requested';
 
-export const starterKey = (lessonId: string) => `shCode:starter:${lessonId}`;
+// `w1:<owner>:starter:<lessonId>` (lib/owned-storage.ts).
+export const starterKey = (lessonId: string) => `starter:${lessonId}`;
 const key = starterKey;
+
+/** The remembered problem id for a lesson, or null. */
+export function rememberedStarterId(lessonId: string): string | null {
+  if (typeof window === 'undefined') return null;
+  return ownedLocal.getItem(key(lessonId));
+}
 
 /** The file a starter seeds. README.md is the graded file of a text lesson. */
 export const starterFile = (variant: StarterVariant) => variant.file ?? 'README.md';
@@ -30,22 +38,13 @@ export const starterFile = (variant: StarterVariant) => variant.file ?? 'README.
 export function rememberedStarter(lesson: Lesson): StarterVariant | null {
   const all = lesson.starterVariants;
   if (!all || all.length === 0 || typeof window === 'undefined') return null;
-  let id: string | null = null;
-  try {
-    id = localStorage.getItem(key(lesson.id));
-  } catch {
-    return null; // private mode: the pick is not remembered
-  }
+  const id = rememberedStarterId(lesson.id);
   return all.find((v) => v.id === id) ?? null;
 }
 
 export function rememberStarter(lessonId: string, id: string): void {
   if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(key(lessonId), id);
-  } catch {
-    /* not remembered */
-  }
+  ownedLocal.setItem(key(lessonId), id); // best effort: a full store just does not remember
   // The lesson's Flow Chart follows the pick (components/LabPlanChart.tsx), and
   // it works even where storage is blocked, so tell it directly as well.
   window.dispatchEvent(new CustomEvent(STARTER_PICKED, { detail: { lessonId, id } }));

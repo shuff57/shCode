@@ -33,7 +33,7 @@
           "Problem, plan, program, product"
         ],
         "answer": 2,
-        "explanation": "Problem, project, people, product. They are the four factors a framework gets elaborated around.",
+        "explanation": "Each P is a factor a framework gets elaborated around: what has to be solved, how the work is managed, who does it, and what gets built. Look for the list where every word is one of those.",
         "sourceIds": [
           "1-1-17-reading-four-ps"
         ]
@@ -49,7 +49,7 @@
           "Requirements, architecture, release, support"
         ],
         "answer": 1,
-        "explanation": "Inception, elaboration, construction, deployment: the book's names. The five-phase list in the 1.1.5 video (design, development, testing, deployment, maintenance) is the same lifecycle under industry names.",
+        "explanation": "The book's four names run from the first idea to the release. The five-phase list in the 1.1.5 video (design, development, testing, deployment, maintenance) is the same lifecycle under industry names, not the book's four.",
         "sourceIds": [
           "1-1-6-reading-four-phases"
         ]
@@ -81,7 +81,7 @@
           "The banking system: the product has to be reliable for thousands of people, so the phases carry more weight"
         ],
         "answer": 3,
-        "explanation": "Same four activities, heavier elaboration. The product and the people it serves are what raise the stakes.",
+        "explanation": "Both teams do the same four activities. What raises the stakes is the product and how many people depend on it: the more that rides on it, the more weight elaboration carries.",
         "sourceIds": [
           "1-1-17-reading-four-ps"
         ]
@@ -97,7 +97,7 @@
           "Product"
         ],
         "answer": 2,
-        "explanation": "People. Problem is how hard the work is, project is how it is managed, product is what gets built.",
+        "explanation": "Problem is how hard the work is, project is how it is managed, product is what gets built. The one that is left is about who does the work.",
         "sourceIds": [
           "1-1-17-reading-four-ps"
         ]

@@ -102,6 +102,12 @@ const darkTheme = EditorView.theme({
     textAlign: 'left',
     cursor: 'pointer',
   },
+  '.cm-taskCommentFold.is-quiet': {
+    border: '0',
+    background: 'transparent',
+    padding: '0 4px',
+    color: 'var(--c-meta)',
+  },
   '.cm-taskCommentFold:hover, .cm-taskCommentFold:focus-visible': {
     color: 'var(--c-cyan)',
     background: 'var(--c-line)',
@@ -216,6 +222,8 @@ export interface CodeMirrorPaneProps {
   collab?: Extension | null;
   /** Authored task-card scenario; folding never modifies the document. */
   taskComment?: LabTaskScenario | null;
+  /** The "Your task" panel shows the same scenario, so the fold is a bare marker. */
+  taskCommentQuiet?: boolean;
 }
 
 export default function CodeMirrorPane({
@@ -226,6 +234,7 @@ export default function CodeMirrorPane({
   readOnly = false,
   collab = null,
   taskComment = null,
+  taskCommentQuiet = false,
 }: CodeMirrorPaneProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
@@ -245,7 +254,7 @@ export default function CodeMirrorPane({
     const view = new EditorView({
       state: EditorState.create({
         doc: value,
-        extensions: [makeExtensions(onChange, language, readOnly), taskCommentFold(taskComment), collabSlot.current.of(collabRef.current ?? [])],
+        extensions: [makeExtensions(onChange, language, readOnly), taskCommentFold(taskComment, { quiet: taskCommentQuiet }), collabSlot.current.of(collabRef.current ?? [])],
       }),
       parent: containerRef.current,
     });

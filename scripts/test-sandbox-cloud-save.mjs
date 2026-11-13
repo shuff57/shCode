@@ -79,7 +79,7 @@ const created = await put('sandbox-moshion', 0);
 check('sandbox save creates revision 1', [created[0], created[1].revision], [200, 1]);
 check('sandbox workspace reads back', await get('sandbox-moshion'), [
   200,
-  { files, revision: 1, updatedAt: created[1].updatedAt },
+  { files, revision: 1, updatedAt: created[1].updatedAt, versioned: true },
 ]);
 check('another student sees none', await get('sandbox-moshion', 'other@example.invalid'), [
   200,
@@ -98,7 +98,7 @@ check('Cloud history carries the sandbox files', [save[0], save[1].save?.files],
 // The client half: the sandbox must use the lesson-sync hook and the same
 // History panel a lesson uses, and Save must be the deliberate action.
 const workspace = readFileSync(join(root, 'components', 'SandboxWorkspace.tsx'), 'utf8');
-check('sandbox uses the lesson-sync hook', workspace.includes('useCloudWorkspace(lesson, lessonProgress.authed)'), true);
+check('sandbox uses the lesson-sync hook', workspace.includes('useCloudWorkspace(lesson, lessonProgress.authed'), true);
 check('sandbox records a device snapshot on Save', workspace.includes('addLocalSnapshot('), true);
 check('sandbox renders HistoryPanel', workspace.includes('<HistoryPanel'), true);
 check('HistoryPanel gets the sandbox lesson id', workspace.includes('lessonId={lesson.id}'), true);

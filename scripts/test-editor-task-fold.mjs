@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { EditorState } from '@codemirror/state';
 import { extractLabTaskScenario } from '../lib/lab-task-scenario.ts';
-import { taskCommentFold } from '../lib/editor-task-fold.ts';
+import { taskCommentFold, taskFoldMarker, foldedLineCount } from '../lib/editor-task-fold.ts';
 
 const starter = fs.readFileSync(new URL('../lessons/1-1-11-name-that-umbrella/script.js', import.meta.url), 'utf8');
 const task = extractLabTaskScenario(starter);
@@ -41,4 +41,21 @@ assert.equal(extractLabTaskScenario('// 1.2.3 Title\n\n// STEP 1: Declare two va
 assert.equal(extractLabTaskScenario('// STEP 1: Declare two variables\n//         and log them\n\nlet a;').fold, null, 'a two-line STEP comment never folds');
 assert.equal(extractLabTaskScenario('// STEP 1: First thing to do here\n// STEP 2: Second thing to do here\n// and a note about both\n').fold, null, 'a block holding two STEP markers never folds');
 assert.ok(extractLabTaskScenario('// STEP 1: A scenario line\n//   second line\n//   third line\n').fold, 'a three-line single-STEP block folds');
+// Beside the "Your task" panel the fold is a short quiet label saying what it hides, never a
+// second "Task card" label, and the document and fold range are exactly what the loud fold gives.
+assert.equal(taskFoldMarker(true, 5).text, '⋯ 5 comment lines (task notes)');
+assert.equal(taskFoldMarker(true, 1).text, '⋯ 1 comment line (task notes)');
+assert.equal(foldedLineCount('// a\n//   b\n//   c\n'), 3, 'a trailing newline is not a line');
+assert.ok(!taskFoldMarker(true).text.includes('Task card'));
+assert.ok(taskFoldMarker(false).text.includes('Task card'));
+assert.ok(taskFoldMarker(true).label.length > 0, 'the quiet marker keeps an accessible name');
+{
+  const quiet = taskCommentFold(task, { quiet: true });
+  const q = EditorState.create({ doc: starter, extensions: [quiet] });
+  assert.equal(q.field(quiet).size, 1, 'quiet fold still folds the starter comment');
+  assert.equal(q.doc.toString(), starter, 'quiet fold preserves every document byte');
+  const r = q.field(quiet).iter();
+  assert.equal(r.from, task.fold.from);
+  assert.equal(r.to, task.fold.to);
+}
 console.log('test-editor-task-fold: all checks passed');

@@ -1,19 +1,19 @@
 'use client';
 
 import LessonModeControl from '../../components/LessonModeControl';
-import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { compareLessons, compareUnitLabels, lessonLabel } from '../../lib/lesson-title-order';
-import { csvCell } from '../../lib/grades-csv';
 import { NeedsAttentionPanel } from '../../components/NeedsAttentionPanel';
 import { BulkEnrollmentForm } from '../../components/BulkEnrollmentForm';
-import { SubmissionQueue, OverrideForm } from '../../components/SubmissionQueue';
+import { SubmissionQueue, OverrideForm, QuizAnswers } from '../../components/SubmissionQueue';
 import { AnnouncementsPanel } from '../../components/AnnouncementsPanel';
 import DueDatesPanel from '../../components/DueDatesPanel';
 import GradingWeightsPanel from '../../components/GradingWeightsPanel';
 import SolutionReleasePanel from '../../components/SolutionReleasePanel';
-import { moduleOptions, selectGradebookLessons } from '../../lib/gradebook-view';
-import { describeGrade, opensInCodeEditor, showLateBadge, stillFailingRequirements, submissionWasLate, verdictWord, type RequirementEventRow } from '../../lib/teacher-drawer';
+import { defaultModule, moduleKey, moduleOptions, modulePages, pagedColumnWidth, pagerFor, pageSize, resolveModuleParam, selectGradebookLessons } from '../../lib/gradebook-view';
+import { describeGrade, opensInCodeEditor, quizAnswerRows, scoreCountNote, scoreOutOf, scoreWeight, showLateBadge, stillFailingRequirements, studentFirstName, submissionWasLate, verdictWord, type RequirementEventRow, type ScoreWeight, type TeacherQuiz } from '../../lib/teacher-drawer';
+import { buildMarkCriteria } from '../../lib/rubric-mark';
 import MostMissedPanel from '../../components/MostMissedPanel';
 import ClassLibraryModeration from '../../components/ClassLibraryModeration';
 import ClassGamesModeration from '../../components/ClassGamesModeration';
@@ -24,12 +24,14 @@ import PastDuePanel from '../../components/PastDuePanel';
 import { formatDue, schoolDateString } from '../../lib/due-dates-core';
 import { lessonHref } from '../../lib/lesson-href';
 import { criteriaScore } from '../../lib/grade-pass';
-import { practiceDisplay } from '../../lib/gradebook-cell';
+import { practiceDisplay, readTeacherNotes } from '../../lib/gradebook-cell';
 import { CATEGORY_LABEL, GRADE_CATEGORIES, lessonGradeCategory, lessonPercent, type GradeCategory } from '../../lib/grading-weights';
-import { buildGradesCsv } from '../../lib/grades-csv';
+import { buildGradesCsv, buildLessonScoresCsv, classAverage, compareByLastName } from '../../lib/grades-csv';
 import { FeedbackProvider, useFeedback } from '../../components/FeedbackProvider';
 import { RowMenu } from '../../components/RowMenu';
+import { ArrowDown, ArrowUp, ArrowUpDown, MousePointerClick } from 'lucide-react';
 import { toMermaid } from '../../lib/diagram-mermaid';
+import { errorText } from '../../lib/http-error';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -83,6 +85,8 @@ interface StudentProgress {
   gradedMissing?: number;
   gradedCounted?: number;
   categories?: Array<{ category: string; percent: number }>;
+  /** The owner, a co-teacher or a non-student account on the roster: listed, never counted (ux2 T6). */
+  staff?: boolean;
 }
 
 interface LessonStateEntry {
@@ -152,6 +156,12 @@ function submissionScoreLabel(sub: { score: number | null; possible: number | nu
 
 function pctColor(pct: number): string {
   return pct >= 100 ? 'var(--c-green)' : pct > 0 ? 'var(--c-yellow)' : 'var(--c-meta)';
+}
+
+/** A grade that COUNTS (something is done or past due): 0% is the worst state there is, so it is red like
+ *  the past-due count beside it, not the muted grey that means "nothing counted yet" (shown as —). */
+function countedGradeColor(pct: number): string {
+  return pct <= 0 ? 'var(--c-red)' : pctColor(pct);
 }
 
 /** The 80x6 bar from UnitProgressBadge, reused so the roster and the
@@ -246,6 +256,8 @@ interface GridGrade {
   missing: number;
   /** Percent per grade category, from the same studentGrading() call. Only categories with something counted. */
   cats: Record<string, number>;
+  /** A staff account on the roster (ux2 T6): not a row of the gradebook, not in its averages. */
+  staff: boolean;
 }
 
 /** Header stripe and total-column tint per grade category. None of these is a state colour (green, yellow, red, orange). */
@@ -373,13 +385,8 @@ async function apiFetch<T>(
     const data = (await res.json()) as T;
     return { data, error: null };
   }
-  let errorMsg = `HTTP ${res.status}`;
-  try {
-    const body = (await res.json()) as { error?: string };
-    if (body.error) errorMsg = body.error;
-  } catch {
-    // ignore parse errors
-  }
+  // The server's own sentence when it sent one; never a raw HTML page or a bare "HTTP 404" (ux2 T7).
+  const errorMsg = await errorText(res);
   return { data: null, error: errorMsg, status: res.status };
 }
 
@@ -392,62 +399,8 @@ function fmtTs(ms: number) {
 }
 
 // ---------------------------------------------------------------------------
-// CSV helper — no libraries, ~30 lines
+// CSV download (the rows are built in lib/grades-csv.ts, where they are tested)
 // ---------------------------------------------------------------------------
-
-function buildGradebookCsv(
-  students: GradebookStudent[],
-  lessonIds: string[],
-  dueDates?: Record<string, number>,
-  titles?: Record<string, string>,
-): string {
-  const escape = (v: string) => (v.includes(',') || v.includes('"') || v.includes('\n') ? `"${v.replace(/"/g, '""')}"` : v);
-
-  // Header cells are lesson titles ("3.2.10 Loops"), in the order the caller sorted them; the folder id
-  // is only a fallback. csvCell neutralises a leading = + - @ (a title is authored text, still guard it).
-  const header = [csvCell('student_email'), ...lessonIds.map((id) => csvCell(lessonLabel(id, titles)))].join(',');
-
-  // Second header row carries each lesson's due date, so the export is
-  // self-contained — a spreadsheet opened in March still says what was due.
-  // Blank for lessons with no due date. Omitted entirely if the class sets none.
-  const hasDue = dueDates && Object.keys(dueDates).length > 0;
-  const dueRow = hasDue
-    ? ['due_date', ...lessonIds.map((lid) => (dueDates![lid] ? schoolDateString(dueDates![lid]) : ''))]
-        .map(escape)
-        .join(',')
-    : null;
-
-  const rows = students.map((s) => {
-    const cols = [s.email, ...lessonIds.map((lid) => {
-      const c = s.cells[lid];
-      if (!c) return '';
-      // "L" suffix = late. Kept as a suffix rather than its own column so the
-      // matrix stays one cell per lesson.
-      const suffix = c.late ? 'L' : '';
-      // Before the C branch. An outage row is state=completed with a NULL
-      // score, so it would otherwise export as "C" — a finished lesson — into
-      // the one file a teacher pastes straight into a grade system.
-      if (c.pending) return 'P' + suffix;
-      // A 0-point (mastery) lab stores score 0 of 0 and reads done on screen; "0" would paste as no credit.
-      // A teacher's mark on one (override score) is the one non-zero number such a lab can hold: keep it.
-      if (c.state === 'completed' && c.possible === 0) return (c.score ? String(c.score) : 'C') + suffix;
-      if (c.score !== null) return String(c.score) + suffix;
-      if (c.state === 'completed') return 'C' + suffix;
-      if (c.state === 'started') return 'S' + suffix;
-      // Submitted, graded, and did NOT pass. WrittenGrader only writes a
-      // lesson_state row when the grade passes, so a failing submission has
-      // no state at all — and every branch above missed it, exporting the
-      // same empty cell as a student who never opened the lesson. The matrix
-      // on screen already had this branch; the CSV, which is the file a
-      // teacher actually pastes into a grade system, did not.
-      if (c.submitted_score !== null) return 's' + c.submitted_score + suffix;
-      return suffix || '';
-    })];
-    return cols.map(escape).join(',');
-  });
-
-  return [header, ...(dueRow ? [dueRow] : []), ...rows].join('\r\n');
-}
 
 function downloadCsv(csv: string, filename: string) {
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -512,22 +465,33 @@ const S = {
     fontWeight: 600,
     fontSize: 14,
     cursor: 'not-allowed',
-    opacity: 0.5,
+    opacity: 1, // beats the global `:disabled { opacity: .5 }`
+    // climb4 r6: no fade. Meta text on the line fill is >= 4.5:1 in every theme (4.75 dark), and the grey
+    // fill against the coloured enabled fills is what says "not yet".
   } as React.CSSProperties,
 
+  // One field style for the teacher screens (system pass rule 5): an inset surface, a visible 1px
+  // border, 15px prose text. Hover and focus come from the `teacher-field` class in globals.css.
   input: {
-    background: 'var(--c-bg)',
+    background: 'var(--c-deep2)',
     border: '1px solid var(--c-line)',
     borderRadius: 4,
     color: 'var(--c-fg)',
     padding: '4px 12px',
-    height: 32,
+    height: 36,
     boxSizing: 'border-box',
     maxWidth: '100%',
-    fontSize: 14,
-    outline: 'none',
+    fontFamily: 'var(--font-prose)',
+    fontSize: 15,
     minWidth: 220,
   } as React.CSSProperties,
+
+  // A form label above its field (rule 5): prose 14px/600.
+  label: { display: 'block', fontFamily: 'var(--font-prose)', fontSize: 14, fontWeight: 600, color: 'var(--c-fg)', marginBottom: 6 } as React.CSSProperties,
+
+  // A metadata item's label and value (rule 3).
+  metaLabel: { color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13 } as React.CSSProperties,
+  metaValue: { color: 'var(--c-fg)', fontFamily: 'var(--font-prose)', fontSize: 13, fontVariantNumeric: 'tabular-nums' } as React.CSSProperties,
 
   error: { color: 'var(--c-red)', fontSize: 13, marginTop: 8 } as React.CSSProperties,
 
@@ -544,12 +508,13 @@ const S = {
       letterSpacing: '0.05em',
     }) as React.CSSProperties,
 
+  // The join code is a value to read out, not the page's headline: code face, body size.
   code: {
-    fontFamily: 'monospace',
-    fontSize: 28,
+    fontFamily: 'var(--font-mono)',
+    fontSize: 18,
     fontWeight: 700,
     color: 'var(--c-cyan)',
-    letterSpacing: '0.15em',
+    letterSpacing: '0.08em',
   } as React.CSSProperties,
 
   table: { width: '100%', borderCollapse: 'collapse' as const, fontSize: 14 },
@@ -564,6 +529,37 @@ const S = {
   },
   td: { padding: '8px 12px', borderBottom: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)', verticalAlign: 'middle' as const },
 };
+
+// Roster columns on a wide screen: name, grade, graded done, past due, last active, then the row's
+// actions in their own right-aligned track (at least 16px of column gap plus 8px of lead before Open).
+// r7 T6: the actions track is a fixed width ("View progress" + More), because the header row and every
+// student row are separate grids and an auto track sized each one differently.
+const ROSTER_COLS = 'minmax(180px, 2fr) 140px 144px 80px 136px 220px';
+
+/** Roster column sort (desktop headings). Null = the order the server sent, which is the default. */
+type RosterSortKey = 'name' | 'grade' | 'missing' | 'active';
+type RosterSort = { key: RosterSortKey; dir: 'asc' | 'desc' } | null;
+/** First click on a heading: name A-Z, lowest grade first, most past due first, most recently active first. */
+const ROSTER_FIRST_DIR: Record<RosterSortKey, 'asc' | 'desc'> = { name: 'asc', grade: 'asc', missing: 'desc', active: 'desc' };
+/** Display order only. A student with nothing counted yet (grade "—") or no activity sorts last either way. */
+function sortRosterRows<R extends { student_email: string }>(rows: R[], sort: RosterSort, prog: (email: string) => StudentProgress | undefined): R[] {
+  if (!sort) return rows;
+  const sign = sort.dir === 'asc' ? 1 : -1;
+  const label = (r: R) => (fullName(prog(r.student_email)?.firstName, prog(r.student_email)?.lastName) ?? r.student_email).toLowerCase();
+  const value = (r: R): number | null => {
+    const p = prog(r.student_email);
+    if (sort.key === 'grade') return p?.gradedCounted && Number.isFinite(p.weightedPercent) ? p.weightedPercent : null;
+    if (sort.key === 'missing') return p?.gradedMissing ?? 0;
+    if (sort.key === 'active') return p?.last_active ?? null;
+    return null;
+  };
+  return [...rows].sort((a, b) => {
+    if (sort.key === 'name') return sign * label(a).localeCompare(label(b));
+    const va = value(a), vb = value(b);
+    if (va === null || vb === null) return va === vb ? label(a).localeCompare(label(b)) : va === null ? 1 : -1;
+    return sign * (va - vb) || label(a).localeCompare(label(b));
+  });
+}
 
 // ---------------------------------------------------------------------------
 // StudentDrawer — right-side panel showing per-lesson progress
@@ -670,6 +666,37 @@ function StudentDrawer({
     });
   }, [classId, email, reloadKey]);
 
+  // The assignment rubric of each hand-in shown here, so Override score can be marked from it (ux1 G1).
+  // Same teacher-only route the review queue reads, asking only for briefs; a lesson with no grader config
+  // simply has none and its form falls back to the stored criteria or a plain score field.
+  const [briefs, setBriefs] = useState<Record<string, { prompt: string; rubric: Array<{ id: string; title: string; points: number; required?: boolean }> }>>({});
+  // A quiz hand-in's questions, options and key (teacher-only, same route), for "Picked / Answer" (ux2 T3b).
+  const [quizContent, setQuizContent] = useState<Record<string, TeacherQuiz>>({});
+  useEffect(() => {
+    if (!detail) return;
+    const ids = Object.keys(detail.latestSubmissions);
+    if (ids.length === 0) return;
+    let live = true;
+    const chunks: string[][] = [];
+    for (let i = 0; i < ids.length; i += 20) chunks.push(ids.slice(i, i + 20));
+    void Promise.all(chunks.map((c) =>
+      apiFetch<{ assignments?: Record<string, { prompt: string; rubric: Array<{ id: string; title: string; points: number; required?: boolean }> }>; quizzes?: Record<string, TeacherQuiz> }>(
+        `/api/classes/${encodeURIComponent(classId)}/submission-queue?briefs=${encodeURIComponent(c.join(','))}`,
+      ).catch(() => null),
+    )).then((all) => {
+      if (!live) return;
+      const out: typeof briefs = {};
+      const qs: Record<string, TeacherQuiz> = {};
+      for (const r of all) {
+        if (r && r.error === null && r.data.assignments) Object.assign(out, r.data.assignments);
+        if (r && r.error === null && r.data.quizzes) Object.assign(qs, r.data.quizzes);
+      }
+      setBriefs(out);
+      setQuizContent(qs);
+    });
+    return () => { live = false; };
+  }, [detail, classId]);
+
   // Arrived from a queue row or a grid cell: open that lesson's submission and bring it into view once.
   const focusedRef = useRef<string | null>(null);
   useEffect(() => {
@@ -696,9 +723,9 @@ function StudentDrawer({
   // them and resubmit. Removes the submission and its score, so confirm first.
   async function unsubmit(lessonId: string, title: string) {
     const ok = await confirm({
-      title: `Unsubmit "${title}"?`,
-      message: `${email}'s submission and score for this quiz are removed.\nThey keep their answers and can change them and hand it in again.`,
-      confirmLabel: 'Unsubmit',
+      title: `Reopen "${title}" for ${email}?`,
+      message: `Every hand-in of this quiz by ${email} and its score are removed.\nTheir answers are kept, so they can change them and hand it in again.`,
+      confirmLabel: 'Reopen quiz',
       danger: true,
     });
     if (!ok) return;
@@ -709,9 +736,9 @@ function StudentDrawer({
       body: JSON.stringify({ studentEmail: email, lessonId }),
     }).catch(() => null);
     setUnsubmitting(null);
-    if (res === null) { setErr('Network error'); toast('Could not unsubmit: network error. Nothing changed.', { kind: 'error' }); }
-    else if (res.error !== null) { setErr(res.error); toast(`Could not unsubmit: ${res.error}`, { kind: 'error' }); }
-    else { setReloadKey((k) => k + 1); toast(`Unsubmitted "${title}". The student can change their answers and hand it in again.`); }
+    if (res === null) { setErr('Network error'); toast('Could not reopen the quiz: network error. Nothing changed.', { kind: 'error' }); }
+    else if (res.error !== null) { setErr(res.error); toast(`Could not reopen the quiz: ${res.error}`, { kind: 'error' }); }
+    else { setReloadKey((k) => k + 1); toast(`Reopened "${title}". The student can change their answers and hand it in again.`); }
   }
 
   // Give tries back on a capped part. 'give-back-one' removes the newest try (the
@@ -807,7 +834,16 @@ function StudentDrawer({
   // submission on file — a free-response answer that did not pass. Without
   // this it fell through to "Not started", which is the opposite of true and
   // worse than the missing row it replaced.
-  function stateBadge(state: 'started' | 'completed' | undefined, submitted = false, missing = false, practice = false) {
+  function stateBadge(state: 'started' | 'completed' | undefined, submitted = false, missing = false, practice = false, teacherScored = false) {
+    // A hand-in you have scored is not "In progress" or merely "Submitted" any more (ux1 G3). The grade still
+    // counts it only once the lesson is done (studentGrading), which the tooltip says.
+    if (teacherScored && state !== 'completed') {
+      return (
+        <span style={{ background: 'var(--c-cyan)', color: 'var(--c-bg)', borderRadius: 4, padding: '4px 8px', fontSize: 12, fontWeight: 700, flexShrink: 0 }} title="You have scored this hand-in. The student has not finished the lesson yet, so the grade counts it once they do.">
+          Scored by you
+        </span>
+      );
+    }
     if (!state && !submitted && missing) {
       return (
         <span style={{ background: 'var(--c-red)', color: 'var(--c-bg)', borderRadius: 4, padding: '4px 8px', fontSize: 12, fontWeight: 700, flexShrink: 0 }} title="Past its due date and never opened">
@@ -988,6 +1024,30 @@ function StudentDrawer({
                       // malformed grade_json — skip
                     }
                   }
+                  // The teacher's own score and note on the latest hand-in (ux1 G2, G3).
+                  const tnotes = sub ? readTeacherNotes(sub.grade_json) : null;
+                  const teacherScored = !!sub && sub.score !== null && tnotes?.reviewedAt != null;
+                  const isQuiz = Array.isArray(gradeData?.quiz);
+                  const brief = Object.prototype.hasOwnProperty.call(briefs, lesson.id) ? briefs[lesson.id] : undefined;
+                  const briefPoints = brief ? brief.rubric.reduce((n, c) => n + (c.points > 0 ? c.points : 0), 0) : 0;
+                  // What a score on this lesson is out of: the part's maximum, else the hand-in's own, else its rubric's.
+                  const outOf = meta?.maxScore ?? (sub && sub.possible !== null && sub.possible > 0 ? sub.possible : null) ?? (briefPoints > 0 ? briefPoints : null);
+                  const weight = meta ? scoreWeight({ counts: lessonGradeCategory({ title: meta.title, preview: meta.preview, scoreKind: meta.scoreKind, assignmentCode: meta.assignmentCode }) !== null, maxScore: meta.maxScore }) : null;
+                  // Practice work never shows a points value, finished or not. `practice` is true only once the
+                  // lesson is done, so a teacher's score on an unfinished hand-in needs its own "does it count"
+                  // check (an id with no current lesson.json keeps the counted look, as `practice` does).
+                  const counted = !meta || lessonGradeCategory({ title: meta.title, preview: meta.preview, scoreKind: meta.scoreKind, assignmentCode: meta.assignmentCode }) !== null;
+                  const shownScore =
+                    ls?.state === 'completed' && !practice && ls.score !== null ? ls.score : teacherScored && counted ? sub!.score : null;
+                  // Does a teacher score here change the grade now? The queue card's helper, so the words match (ux2 T1).
+                  const dueAt = detail.dueDates?.[lesson.id];
+                  const countNote = scoreCountNote(weight, {
+                    lessonState: ls?.state ?? null,
+                    pastDue: typeof dueAt === 'number' && dueAt <= Date.now(),
+                    studentName: studentFirstName(detail.firstName, email),
+                  });
+                  // A quiz by its lesson, so a quiz with no hand-in row still says why nothing can be shown (ux2 T3a).
+                  const quizLesson = isQuiz || meta?.scoreKind === 'quiz' || meta?.preview === 'quiz';
 
                   return (
                     <div key={lesson.id} id={`drawer-lesson-${lesson.id}`} style={{ marginBottom: 8, background: 'var(--c-bg)', borderRadius: 6, padding: '12px 16px', border: `1px solid ${focusLessonId === lesson.id ? 'var(--c-cyan)' : 'color-mix(in srgb, var(--c-line) 20%, transparent)'}` }}>
@@ -1001,16 +1061,17 @@ function StudentDrawer({
                             </span>
                           )}
                         </span>
-                        {stateBadge(ls?.state, !!sub, !!detail.grading?.missingIds?.includes(lesson.id), practice)}
+                        {stateBadge(ls?.state, !!sub, !!detail.grading?.missingIds?.includes(lesson.id), practice, teacherScored && counted)}
                         {sub && showLateBadge(!!meta && !practice && lessonGradeCategory({ title: meta.title, preview: meta.preview, scoreKind: meta.scoreKind, assignmentCode: meta.assignmentCode }) !== null, submissionWasLate(sub.submitted_at, sub.due_at_submit)) && (
                           <span style={{ background: 'color-mix(in srgb, var(--c-red) 18.0%, transparent)', color: 'var(--c-red)', border: '1px solid var(--c-red)', borderRadius: 4, padding: '4px 8px', fontSize: 12, fontWeight: 700, flexShrink: 0 }} title={`Handed in after the due date (${sub.due_at_submit ? formatDue(sub.due_at_submit) : ''})`}>
                             Late
                           </span>
                         )}
                         {/* A 0-point (mastery) lab stores score 0 of 0: "0 pts" beside "Complete" reads as a zero. */}
-                        {ls?.state === 'completed' && !practice && ls.score !== null && !(sub && sub.possible === 0 && !ls.score) && (
-                          <span style={{ fontSize: 12, color: 'var(--c-cyan)', fontFamily: 'monospace', flexShrink: 0 }}>
-                            {ls.score}{sub?.possible ? ` of ${sub.possible}` : ''} pts
+                        {/* Always "x / max" (ux1 G3). A 0-point lab's stored 0 of 0 is not shown as a zero. */}
+                        {shownScore !== null && !practice && !(sub && sub.possible === 0 && !shownScore && !teacherScored) && (
+                          <span style={{ fontSize: 13, color: 'var(--c-cyan)', fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', flexShrink: 0 }}>
+                            {teacherScored ? 'Your score: ' : 'Score: '}{scoreOutOf(shownScore, outOf)}
                           </span>
                         )}
                         {/* lessonMap.has(...) guards against a stale/renumbered id with
@@ -1032,12 +1093,25 @@ function StudentDrawer({
                           <button
                             style={{ background: 'none', border: '1px solid var(--c-comment)', borderRadius: 4, color: 'var(--c-cyan)', fontSize: 12, cursor: 'pointer', padding: '4px 8px', flexShrink: 0 }}
                             onClick={() => toggleSub(lesson.id)}
+                            aria-expanded={isExpanded}
                           >
-                            {isExpanded ? 'Hide' : 'View submission'}
+                            {isExpanded ? 'Hide' : isQuiz ? 'View answers' : 'View submission'}
                           </button>
                         )}
-                        {sub && !Array.isArray(gradeData?.quiz) && (
+                        {sub && isQuiz && (
                           <button
+                            type="button"
+                            disabled={unsubmitting === lesson.id}
+                            style={{ background: 'none', border: '1px solid var(--c-orange)', borderRadius: 4, color: 'var(--c-orange)', fontSize: 12, cursor: 'pointer', padding: '4px 8px', flexShrink: 0 }}
+                            title="Removes their hand-in and score; their answers are kept so they can change them and hand it in again"
+                            onClick={() => { void unsubmit(lesson.id, lesson.title); }}
+                          >
+                            {unsubmitting === lesson.id ? 'Reopening…' : 'Reopen quiz'}
+                          </button>
+                        )}
+                        {sub && !isQuiz && (
+                          <button
+                            id={`override-btn-${lesson.id}`}
                             style={{ background: 'none', border: '1px solid var(--c-purple)', borderRadius: 4, color: 'var(--c-purple)', fontSize: 12, cursor: 'pointer', padding: '4px 8px', flexShrink: 0 }}
                             aria-expanded={overrideOpen === lesson.id}
                             title="Change this student's score for the lesson, with an optional comment they will see"
@@ -1048,25 +1122,40 @@ function StudentDrawer({
                         )}
                         {/* The three actions that remove something live in one menu, in words, so a routine
                             click on View or Override cannot land on Reset by accident. Each still confirms. */}
-                        {sub && (typeof lesson.maxSubmissions === 'number' || Array.isArray(gradeData?.quiz)) && (
+                        {sub && typeof lesson.maxSubmissions === 'number' && (
                           <RowMenu
                             label={`More actions for ${lesson.title}`}
                             buttonText="More"
                             disabled={givingBack === lesson.id || unsubmitting === lesson.id}
                             items={[
-                              ...(typeof lesson.maxSubmissions === 'number'
-                                ? [
-                                    { label: 'Give back one try', title: 'Removes their newest try; their other tries and best score stay.', onSelect: () => { void giveBack(lesson.id, lesson.title, 'give-back-one'); } },
-                                    { label: 'Reset all tries', danger: true, title: 'Clears every submission on this part so they get all their tries back.', onSelect: () => { void giveBack(lesson.id, lesson.title, 'reset'); } },
-                                  ]
-                                : []),
-                              ...(Array.isArray(gradeData?.quiz)
-                                ? [{ label: 'Unsubmit quiz', danger: true, title: 'Reopens the quiz: the submission and score are removed; they keep their answers.', onSelect: () => { void unsubmit(lesson.id, lesson.title); } }]
-                                : []),
+                              { label: 'Give back one try', title: 'Removes their newest try; their other tries and best score stay.', onSelect: () => { void giveBack(lesson.id, lesson.title, 'give-back-one'); } },
+                              { label: 'Reset all tries', danger: true, title: 'Clears every submission on this part so they get all their tries back.', onSelect: () => { void giveBack(lesson.id, lesson.title, 'reset'); } },
                             ]}
                           />
                         )}
                       </div>
+
+                      {/* A score that does not change the grade now says so, in the queue card's words (ux2 T1). Shown
+                          once there is a teacher score to be wrong about; the override form shows it too. */}
+                      {countNote && teacherScored && overrideOpen !== lesson.id && (
+                        <p role="note" className={`sq-weight-note is-${countNote.reason}`} style={{ marginTop: 8 }}>{countNote.note}</p>
+                      )}
+
+                      {/* A finished quiz with no hand-in row (its score came from lesson progress only): nothing to show
+                          or reopen, and the row says so rather than offering nothing (ux2 T3a). */}
+                      {quizLesson && !sub && ls?.state === 'completed' && (
+                        <p className="drawer-quiz-none">
+                          Only the score was saved for this quiz (no hand-in), so there are no answers to show or reopen.
+                        </p>
+                      )}
+
+                      {/* The teacher's note, kept with their score (ux1 G2). The student reads it on their Progress page. */}
+                      {tnotes?.feedback && (
+                        <div style={{ marginTop: 8, fontSize: 13, lineHeight: 1.5, color: 'var(--c-fg)', fontFamily: 'var(--font-prose)', overflowWrap: 'anywhere' }}>
+                          <span style={{ fontWeight: 700, color: 'var(--c-cyan)' }}>Your note{tnotes.reviewedAt ? ` (${fmtTs(tnotes.reviewedAt)})` : ''}:</span>{' '}
+                          <span style={{ whiteSpace: 'pre-wrap' }}>{tnotes.feedback}</span>
+                        </div>
+                      )}
 
                       {/* Console labs: the checklist items this student has missed and not passed yet. */}
                       {meta && meta.preview === 'console' && ls?.state !== 'completed' && (() => {
@@ -1091,7 +1180,7 @@ function StudentDrawer({
                       {/* Override score: the same form the review queue uses, so the rules (the part's maximum, "keep the
                           higher score" on a part with a try limit, the persisted choice) are one set of rules. */}
                       {overrideOpen === lesson.id && sub && (
-                        <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid color-mix(in srgb, var(--c-line) 20%, transparent)' }}>
+                        <div className="drawer-override" style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid color-mix(in srgb, var(--c-line) 20%, transparent)' }}>
                           <div style={{ fontSize: 13, color: 'var(--c-meta)' }}>
                             Latest hand-in {fmtTs(sub.submitted_at)}{submissionScoreLabel(sub) ? ` · ${submissionScoreLabel(sub)}` : ''}
                           </div>
@@ -1103,10 +1192,21 @@ function StudentDrawer({
                                 ? gradeData.criteria.length
                                 : null
                             }
+                            // The hand-in's own maximum only, never the rubric's total: on a part with a try limit
+                            // the form enforces this number, and the server's ceiling decides what it accepts.
                             pointsMax={sub.possible !== null && sub.possible > 0 ? sub.possible : null}
                             enforceMax={typeof lesson.maxSubmissions === 'number'}
-                            zeroPoint={meta?.maxScore == null && !(sub.possible !== null && sub.possible > 0) && !(gradeData && Array.isArray(gradeData.criteria) && gradeData.criteria.length > 0)}
-                            onOverride={() => { setOverrideOpen(null); setNotice(`Saved. ${lesson.title} now carries your score. ${meta?.maxScore == null ? 'The course grade does not change: this lab counts as done at 100% whatever its points.' : 'The student sees it on their gradebook, marked teacher-adjusted.'}`); setReloadKey((k) => k + 1); }}
+                            criteria={brief || (gradeData?.criteria && gradeData.criteria.length > 0) ? buildMarkCriteria(brief?.rubric, gradeData?.criteria) : undefined}
+                            savedScore={teacherScored ? sub.score : null}
+                            savedFeedback={tnotes?.feedback ?? null}
+                            weightNote={countNote?.note ?? null}
+                            onOverride={() => {
+                              setOverrideOpen(null);
+                              setNotice(`Saved. ${lesson.title} now carries your score. ${countNote?.note ?? 'The student sees it, and any note, on their Progress page, marked teacher-adjusted.'}`);
+                              setReloadKey((k) => k + 1);
+                              // The form closes on save: put focus back on the button that opened it, not on <body>.
+                              window.setTimeout(() => document.getElementById(`override-btn-${lesson.id}`)?.focus(), 0);
+                            }}
                           />
                         </div>
                       )}
@@ -1167,7 +1267,7 @@ function StudentDrawer({
                             );
                           })()}
 
-                          {gradeData && describeGrade(sub.grade_json)?.from !== 'ai' && (
+                          {gradeData && !isQuiz && describeGrade(sub.grade_json)?.from !== 'ai' && (
                             <div style={{ marginBottom: 8 }}>
                               <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--c-green)', marginBottom: 8 }}>
                                 {/* A pass/fail rubric has no point total, and a diagram
@@ -1179,9 +1279,11 @@ function StudentDrawer({
                                     ? `${gradeData.criteria.filter((c) => c.verdict === 'met' || c.verdict === 'partial').length} of ${gradeData.criteria.length} criteria met`
                                     : gradeData.structural && gradeData.structural.length > 0
                                       ? `${gradeData.structural.filter((s) => s.passed).length} of ${gradeData.structural.length} checks passed`
-                                      : /"gradingFailed"\s*:\s*true/.test(sub.grade_json ?? '')
+                                      : /"gradingFailed"\s*:\s*true/.test(sub.grade_json ?? '') && sub.score === null
                                         ? 'Needs your score: the AI grader could not score this'
-                                        : 'graded'}
+                                        : teacherScored && counted
+                                          ? `Scored by you: ${scoreOutOf(sub.score, outOf)}`
+                                          : 'graded'}
                               </div>
 
                               {/* Diagram assignments store their browser-side checks here.
@@ -1226,19 +1328,17 @@ function StudentDrawer({
                           {/* The answer itself. Diagram submissions store a
                               DiagramDoc, so render the Mermaid projection of it
                               rather than raw JSON; everything else is prose. */}
-                          {Array.isArray(gradeData?.quiz) && (() => {
-                            const rows = (gradeData!.quiz as Array<{ id?: unknown; correct?: unknown }>).filter((q) => q && typeof q.id === 'string');
+                          {isQuiz && (() => {
+                            // Question / chosen answer / right or wrong, the same reading as the review queue's (ux1 G5).
+                            const rows = quizAnswerRows(sub.grade_json, sub.response, quizStems[lesson.id], quizContent[lesson.id]) ?? [];
                             const missed = rows.filter((q) => q.correct === false);
+                            const keyed = rows.some((q) => q.correct !== null);
                             return (
                               <div style={{ marginBottom: 8 }}>
                                 <div style={{ fontSize: 13, color: 'var(--c-meta)', marginBottom: 4 }}>
-                                  {missed.length === 0 ? 'No questions missed' : `Missed ${missed.length} of ${rows.length}`}
+                                  {!keyed ? `${rows.length} answers` : missed.length === 0 ? 'No questions missed' : `Missed ${missed.length} of ${rows.length}`}
                                 </div>
-                                {missed.map((q) => (
-                                  <div key={String(q.id)} style={{ fontSize: 12, background: 'var(--c-deep)', borderRadius: 4, padding: '8px 12px', marginBottom: 4, color: 'var(--c-fg)', overflowWrap: 'anywhere' }}>
-                                    {quizStems[lesson.id]?.[String(q.id)] ?? String(q.id)}
-                                  </div>
-                                ))}
+                                <QuizAnswers rows={rows} />
                               </div>
                             );
                           })()}
@@ -1282,6 +1382,7 @@ function GradebookView({
   onOpenStudent: (email: string, lessonId?: string) => void;
 }) {
   const router = useRouter();
+  const { toast } = useFeedback();
   const [gbData, setGbData] = useState<GradebookData | null>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
@@ -1293,12 +1394,31 @@ function GradebookView({
   // examples carry no grade, so they were 640 columns of dots between the ones a teacher came to read.
   const [showAll, setShowAll] = useState(false);
   const [showCategoryColumns, setShowCategoryColumns] = useState(false);
-  // One module's columns (its `unit` string), or null for every module.
-  const [moduleFilter, setModuleFilter] = useState<string | null>(null);
+  // The page: one module's columns (its `unit` string), null for every module, undefined while the teacher
+  // has not picked one (the default page below). The address carries it as `&module=1.1` or `&module=all`,
+  // read once on mount so a reload or a shared link keeps the page.
+  const [modulePick, setModulePick] = useState<string | null | undefined>(undefined);
+  const [moduleParam] = useState<string | null>(() => (typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('module')));
+  function pickModule(unit: string | null) {
+    setModulePick(unit);
+    try {
+      const u = new URL(window.location.href);
+      u.searchParams.set('module', unit === null ? 'all' : moduleKey(unit));
+      window.history.replaceState(window.history.state, '', u.toString());
+    } catch { /* an address bar we cannot rewrite is not worth failing a page change over */ }
+    gridElement?.scrollTo({ left: 0 });
+  }
   const [grades, setGrades] = useState<Map<string, GridGrade>>(new Map());
-  const CELL_W = 140;
+  // At least 168px columns: at 112px the blind panel preferred the old grid 3-0 (titles truncated), and 140px
+  // with three-line titles read as cramped. At 168px (156px of text) a title is two lines of 13px prose;
+  // measured 2026-11-10, 135 of the 149 graded titles fit. A one-module page has few columns, so they grow
+  // to share the grid's width up to 240px (pagedColumnWidth) and the long titles fit too. The width is
+  // set below, once the page is known; the scroll sync reads it through this ref.
+  const cellWRef = useRef(168);
   const [gridElement, setGridElement] = useState<HTMLDivElement | null>(null);
-  const [gridScroll, setGridScroll] = useState({ left: false, right: false, more: 0, partialWidth: 0, rightInset: 0 });
+  const [gridW, setGridW] = useState(0);
+  const [gridScroll, setGridScroll] = useState({ left: false, right: false, more: 0, partialWidth: 0, rightInset: 0, first: 0, last: 0 });
+  const syncGridRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     if (!gridElement) return;
@@ -1312,15 +1432,46 @@ function GradebookView({
         const rect = col.getBoundingClientRect();
         return rect.left < edge - 0.01 && rect.right > edge + 0.01;
       });
+      // Which lesson columns are in view (more than half of one past the frozen names counts; a column
+      // cut by the right edge does not, matching the "N more" count), for the "Lessons 1-5 of 149" label.
+      const frozenEdge = gridElement.getBoundingClientRect().left + gridElement.clientLeft + Number(gridElement.dataset.frozen ?? 0);
+      const lessonCols = Array.from(gridElement.querySelectorAll<HTMLElement>('col[data-lesson-col]'));
+      let first = 0;
+      let last = 0;
+      lessonCols.forEach((col, i) => {
+        const rect = col.getBoundingClientRect();
+        if (!first && rect.right - frozenEdge > rect.width / 2) first = i + 1;
+        if (rect.left < edge && rect.right <= edge + 0.5) last = i + 1;
+      });
+      if (last < first) last = first;
       const next = {
+        first,
+        last,
         rightInset: gridElement.offsetWidth - gridElement.clientLeft - gridElement.clientWidth,
         partialWidth: remaining > 1 && partial ? edge - partial.getBoundingClientRect().left : 0,
         left: gridElement.scrollLeft > 1,
         right: remaining > 1,
-        more: Math.min(lessonCount, Math.max(0, Math.ceil((remaining - 1) / CELL_W))),
+        more: Math.min(lessonCount, Math.max(0, Math.ceil((remaining - 1) / cellWRef.current))),
       };
-      setGridScroll((prev) => prev.left === next.left && prev.right === next.right && prev.more === next.more && prev.partialWidth === next.partialWidth && prev.rightInset === next.rightInset ? prev : next);
+      setGridW((w) => (w === gridElement.clientWidth ? w : gridElement.clientWidth));
+      setGridScroll((prev) => prev.left === next.left && prev.right === next.right && prev.more === next.more && prev.first === next.first && prev.last === next.last && prev.partialWidth === next.partialWidth && prev.rightInset === next.rightInset ? prev : next);
+      // Unit band labels ("1.3 DOCUMENTATION AND ...") are fitted to the part of their span that is in view,
+      // between the frozen name columns and the right edge (or the cover over a partial column), so a label
+      // ends in an ellipsis instead of being cut mid-word by the edge. Written straight to the DOM: this
+      // runs on every scroll frame and needs no re-render.
+      const frozenRight = gridElement.getBoundingClientRect().left + gridElement.clientLeft + Number(gridElement.dataset.frozen ?? 0);
+      const visibleRight = edge - next.partialWidth;
+      gridElement.querySelectorAll<HTMLElement>('[data-unit-label]').forEach((label) => {
+        const cell = label.parentElement;
+        if (!cell) return;
+        const r = cell.getBoundingClientRect();
+        const from = Math.max(r.left, frozenRight);
+        const to = Math.min(r.right, visibleRight);
+        label.style.marginLeft = `${Math.max(0, from - r.left - 4)}px`;
+        label.style.width = `${Math.max(0, to - from - 8)}px`;
+      });
     };
+    syncGridRef.current = sync;
     sync();
     gridElement.addEventListener('scroll', sync, { passive: true });
     const observer = new ResizeObserver(sync);
@@ -1329,8 +1480,11 @@ function GradebookView({
     return () => {
       gridElement.removeEventListener('scroll', sync);
       observer.disconnect();
+      syncGridRef.current = null;
     };
   }, [gridElement]);
+  // A new set of columns (module filter, readings shown) can keep the table's width; refit the unit labels.
+  useEffect(() => { syncGridRef.current?.(); });
 
   // The grade so far beside each name: the same number the roster shows (one endpoint, one rule).
   useEffect(() => {
@@ -1342,6 +1496,7 @@ function GradebookView({
         counted: p.gradedCounted ?? 1,
         missing: p.gradedMissing ?? 0,
         cats: Object.fromEntries((p.categories ?? []).map((c) => [c.category, c.percent])),
+        staff: p.staff === true,
       }])));
     }).catch(() => { /* the column just stays empty; the grid still works */ });
     return () => { cancelled = true; };
@@ -1417,9 +1572,21 @@ function GradebookView({
   const isGradedLesson = (l: LessonMeta) =>
     lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode }) !== null;
   const moduleChoices = moduleOptions(orderedLessons, isGradedLesson);
-  // A module that vanished (manifest changed) falls back to all rather than an empty grid.
-  const moduleSel = moduleFilter !== null && moduleChoices.some((m) => m.unit === moduleFilter) ? moduleFilter : null;
+  // Paging by module: the pages, the one shown (the teacher's pick, else the address, else the module
+  // that was due most recently), and its neighbours. A pick that is no longer a page (the manifest
+  // changed, or ungraded lessons were hidden again) falls back to the default page, never an empty grid.
+  const pages = modulePages(moduleChoices, showAll);
+  const chosen = modulePick !== undefined ? modulePick : resolveModuleParam(pages, moduleParam);
+  const moduleSel: string | null = chosen === null
+    ? null
+    : chosen !== undefined && pages.some((p) => p.unit === chosen)
+      ? chosen
+      : defaultModule(pages, orderedLessons, isGradedLesson, gbData.dueDates, Date.now());
+  const pager = pagerFor(pages, moduleSel);
   const picked = selectGradebookLessons(orderedLessons, { module: moduleSel, showAll, isCounted: isGradedLesson });
+  // Every module under the same switches: what the CSV exports and what "Missing or ungraded work" looks
+  // across, so neither depends on the page being looked at.
+  const everyLesson = moduleSel === null ? picked.lessons : selectGradebookLessons(orderedLessons, { module: null, showAll, isCounted: isGradedLesson }).lessons;
   const hiddenCount = picked.hidden;
   let displayLessons = picked.lessons;
   let displaySpans = picked.spans;
@@ -1437,11 +1604,11 @@ function GradebookView({
   const stickyBg = 'var(--c-deep)';
   const headerBg = 'var(--c-bg)';
 
-  // At 1440px the default columns use 390px + 6 × 140px = 1230px.
-  // The card has 1270px available, leaving six complete lesson columns visible.
   // Category total columns, between the grade and the first lesson.
   const CAT_W = showCategoryColumns ? 64 : 116;
-  const EMAIL_W = narrow ? 110 : 190;
+  // r9 T1: on a wide screen the Grade column holds two aligned slots (grade, past due), so it takes 38px
+  // from the name column. The two still add up to 274px, so the lesson columns keep their width.
+  const EMAIL_W = narrow ? 110 : 152;
   // Height of the unit header row. The per-lesson row sticks at this offset, so
   // the row has to BE this tall: a unit title that wrapped made it 100px and the
   // lesson row slid 67px up over it.
@@ -1450,7 +1617,7 @@ function GradebookView({
   const gradeLeft = narrow ? undefined : EMAIL_W;
 
   type CellStatus = 'missing' | 'late' | 'grade' | 'started' | 'not-due';
-  const overdueFill = 'color-mix(in srgb, var(--c-red) 18%, transparent)';
+  const overdueFill = 'color-mix(in srgb, var(--c-red) 11%, transparent)';
 
   // Presentation only: keep the existing score branches and pending-review priority.
   function nonScoreStatus(cell: GradebookCell | undefined, graded: boolean): CellStatus | null {
@@ -1474,13 +1641,17 @@ function GradebookView({
       <span style={{
         display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
         whiteSpace: 'nowrap', boxSizing: 'border-box',
-        fontFamily: 'monospace', fontSize: 12, lineHeight: '20px',
+        fontFamily: 'var(--font-prose)', fontSize: 13, lineHeight: '20px',
         fontWeight: overdue || status === 'grade' ? 700 : 600,
         padding: status === 'not-due' ? 0 : '0 8px', borderRadius: 4,
-        color: overdue ? 'var(--c-red)' : status === 'grade' ? 'var(--c-orange)' : status === 'started' ? 'var(--c-yellow)' : 'var(--c-meta)',
+        // r7 T2: a missing / late cell is light text with a red dot on a faint red fill. Red text on the red
+        // fill was the least legible thing in the grid.
+        color: overdue ? 'var(--c-fg)' : status === 'grade' ? 'var(--c-orange)' : status === 'started' ? 'var(--c-yellow)' : 'var(--c-meta)',
+        gap: overdue ? 6 : undefined,
         background: overdue && legend ? overdueFill : status === 'grade' ? 'color-mix(in srgb, var(--c-orange) 12%, transparent)' : 'transparent',
         border: status === 'grade' ? '1px solid color-mix(in srgb, var(--c-orange) 45%, transparent)' : status === 'started' ? '1px solid color-mix(in srgb, var(--c-yellow) 40%, transparent)' : '1px solid transparent',
       }}>
+        {overdue && <span aria-hidden="true" style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--c-red)', flexShrink: 0 }} />}
         {label}
       </span>
     );
@@ -1512,11 +1683,11 @@ function GradebookView({
       // Practice work (no grade category; only visible with "Show readings and slides") has no mark:
       // its 100 is a placeholder, so a check says "done" without implying a score.
       if (!graded) {
-        return withLate(cell, <span style={{ color: 'inherit', fontFamily: 'monospace', fontWeight: 700, fontSize: 13 }}>✓</span>);
+        return withLate(cell, <span style={{ color: 'inherit', fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', fontWeight: 700, fontSize: 13 }}>✓</span>);
       }
       // A number for every finished lesson, 100 included: the cell background carries the state.
       return withLate(cell, (
-        <span style={{ color: 'inherit', fontFamily: 'monospace', fontWeight: 700, fontSize: 14 }}>
+        <span style={{ color: 'inherit', fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', fontWeight: 600, fontSize: 15 }}>
           {pct}
         </span>
       ));
@@ -1530,7 +1701,7 @@ function GradebookView({
       const partial = cell.score ?? cell.submitted_score;
       if (partial !== null) {
         return withLate(cell, (
-          <span style={{ color: 'inherit', fontFamily: 'monospace', fontWeight: 700, fontSize: 13 }}>
+          <span style={{ color: 'inherit', fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', fontWeight: 600, fontSize: 15 }}>
             {partial}
           </span>
         ));
@@ -1540,7 +1711,7 @@ function GradebookView({
     // Has submission data but no lesson_state (edge case)
     if (cell.submitted_score !== null) {
       return withLate(cell, (
-        <span style={{ color: 'inherit', fontFamily: 'monospace', fontSize: 14 }}>
+        <span style={{ color: 'inherit', fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', fontWeight: 600, fontSize: 15 }}>
           {cell.submitted_score}
         </span>
       ));
@@ -1588,17 +1759,17 @@ function GradebookView({
   // A reading or a slide deck has a due date through its module but is not graded, so only graded lessons
   // count as a problem here, the same set the grade's "past due" number counts.
   const gradedIds = new Set(
-    displayLessons.filter((l) => lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode }) !== null).map((l) => l.id),
+    [...everyLesson, ...displayLessons].filter((l) => lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode }) !== null).map((l) => l.id),
   );
   const isProblem = (st: GradebookStudent) =>
     Object.entries(st.cells).some(([id, c]) => gradedIds.has(id) && (c.pending || (c.late && c.state !== 'completed')));
   const q = query.trim().toLowerCase();
-  const hasName = (st: GradebookStudent) => !!(st.lastName || st.firstName);
-  // Named students first, by last name; accounts with no name set go last, by email.
-  const byName = (a: GradebookStudent, b: GradebookStudent) =>
-    Number(!hasName(a)) - Number(!hasName(b)) ||
-    (hasName(a) ? `${a.lastName ?? ''} ${a.firstName ?? ''}` : a.email).localeCompare(hasName(b) ? `${b.lastName ?? ''} ${b.firstName ?? ''}` : b.email);
-  const visibleStudents = gbData.students
+  // Named students first by LAST name then first name; accounts with no name set go last, by email (ux2 T8:
+  // the option says "last name", because the rows show "First Last" and A-Z by first name was what people expected).
+  const byName = compareByLastName;
+  // Staff on the roster (owner, co-teacher, non-student account) are not gradebook rows (ux2 T6).
+  const classStudents = gbData.students.filter((st) => !grades.get(st.email)?.staff);
+  const visibleStudents = classStudents
     .filter((st) => (q === '' ? true : `${st.firstName ?? ''} ${st.lastName ?? ''} ${st.email}`.toLowerCase().includes(q)))
     .filter((st) => !problemsOnly || isProblem(st))
     .sort((a, b) => {
@@ -1606,7 +1777,7 @@ function GradebookView({
       if (sortBy === 'missing') return (grades.get(b.email)?.missing ?? 0) - (grades.get(a.email)?.missing ?? 0) || byName(a, b);
       return byName(a, b);
     });
-  const GRADE_W = 84;
+  const GRADE_W = narrow ? 64 : 122;
 
   // Which grade category each shown lesson belongs to (null = not graded) and the categories that appear,
   // in the course's own order. Each category gets a total column; the numbers are the server's
@@ -1616,12 +1787,44 @@ function GradebookView({
   );
   const shownCats = GRADE_CATEGORIES.filter((c) => displayLessons.some((l) => catOf.get(l.id) === c));
 
-  const categoryColumnCount = shownCats.length ? (showCategoryColumns ? shownCats.length : 1) : 0;
+  // ux2 T9: on a phone the Summary column is left out (it is still there through "Show category columns"), so a
+  // lesson column fits beside the names; the frozen name + grade + summary were wider than the whole grid box.
+  const showSummary = !showCategoryColumns && shownCats.length > 0 && !narrow;
+  const categoryColumnCount = shownCats.length ? (showCategoryColumns ? shownCats.length : showSummary ? 1 : 0) : 0;
+  // Column width for this page (see cellWRef above): the room right of the frozen and total columns,
+  // shared by this module's lessons; the every-module grid keeps the 168px minimum.
+  const CELL_W = narrow
+    ? Math.max(92, Math.floor(((gridW || 300) - EMAIL_W) / 2)) // two lesson columns beside the names once the grade scrolls off
+    : moduleSel === null
+      ? 168
+      : pagedColumnWidth(gridW - EMAIL_W - GRADE_W - CAT_W * categoryColumnCount, displayLessons.length);
+  cellWRef.current = CELL_W;
+  const showScrollCue = moduleSel === null || gridScroll.left || gridScroll.right;
 
   function handleDownloadCsv() {
-    const csv = buildGradebookCsv(gbData!.students, displayLessons.map((l) => l.id), gbData!.dueDates, Object.fromEntries(displayLessons.map((l) => [l.id, l.title])));
-    downloadCsv(csv, `gradebook-${className.replace(/\s+/g, '-')}.csv`);
+    // Every module, never just the page on screen; every student, never just the search result.
+    const all = everyLesson.length > 0 ? everyLesson : displayLessons;
+    const csv = buildLessonScoresCsv(
+      classStudents.map((st) => {
+        const g = grades.get(st.email);
+        return { email: st.email, firstName: st.firstName, lastName: st.lastName, grade: g && g.counted > 0 ? g.pct : null, cells: st.cells };
+      }),
+      all.map((l) => ({ id: l.id, title: l.title, maxScore: l.maxScore, due: gbData!.dueDates?.[l.id] ? schoolDateString(gbData!.dueDates[l.id]) : null })),
+    );
+    const file = `lesson-scores-${className.replace(/\s+/g, '-')}-${schoolDateString(Date.now())}.csv`;
+    downloadCsv(csv, file);
+    toast(`Downloaded ${file}: one row per student, one column per graded lesson.`);
   }
+
+  // ux2 T8: a class average per lesson and for the grade, for display only: the mean of the percents already on
+  // this page, over the students who have one (a finished lesson; a grade with something counted). Missing work
+  // is not in a lesson's average (it is in each student's grade, by the one grade rule).
+  const gradeAvg = classAverage(classStudents.map((st) => { const g = grades.get(st.email); return g && g.counted > 0 ? g.pct : null; }));
+  const lessonAvg = (lesson: LessonMeta) =>
+    classAverage(classStudents.map((st) => {
+      const c = st.cells[lesson.id];
+      return c?.state === 'completed' && gradedIds.has(lesson.id) ? lessonPercent(c.state, c.score, lesson.maxScore) : null;
+    }));
 
   return (
     <div
@@ -1631,55 +1834,127 @@ function GradebookView({
         display: 'flex', flexDirection: 'column',
       } : undefined}
     >
-      {/* Toolbar */}
-      <div style={{ marginBottom: 12, display: 'flex', flexWrap: narrow ? 'wrap' : 'nowrap', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 13, color: 'var(--c-meta)', whiteSpace: 'nowrap' }}>
-          {visibleStudents.length === gbData.students.length
-            ? `${gbData.students.length} student${gbData.students.length !== 1 ? 's' : ''}`
-            : `${visibleStudents.length} of ${gbData.students.length} students`}
-          {' · '}{displayLessons.length} lesson{displayLessons.length !== 1 ? 's' : ''}
-        </span>
+      {/* Toolbar, two rows (climb4 r6): the pager and its counts, with find / order / More on the right;
+          then the legend. */}
+      <div className="gb-toolbar" style={{ marginBottom: 8, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
+        {/* Pager: one module's lessons per page, or every module (the old scrolling grid). */}
+        {pages.length > 0 && (
+          <nav aria-label="Gradebook pages" className="gb-pager">
+            <button
+              type="button"
+              className="gb-pager-step"
+              disabled={pager.position === 0 || pager.prev === null}
+              onClick={() => pager.prev !== null && pickModule(pager.prev)}
+              aria-label={pager.prev ? `Previous module: ${pager.prev}` : 'No previous module'}
+            >
+              ‹ Previous
+            </button>
+            <select
+              value={moduleSel ?? ''}
+              onChange={(e) => pickModule(e.target.value === '' ? null : e.target.value)}
+              aria-label="Gradebook page: one module, or all modules"
+              className="teacher-field gb-pager-select"
+            >
+              {pages.map((m) => (
+                <option key={m.unit} value={m.unit}>{m.unit} · {pageSize(m, showAll)} {showAll ? 'lessons' : 'graded'}</option>
+              ))}
+              <option value="">All modules · {everyLesson.length} {showAll ? 'lessons' : 'graded'}</option>
+            </select>
+            <button
+              type="button"
+              className="gb-pager-step"
+              disabled={pager.next === null}
+              onClick={() => pager.next !== null && pickModule(pager.next)}
+              aria-label={pager.next ? `${pager.position === 0 ? 'First' : 'Next'} module: ${pager.next}` : 'No next module'}
+            >
+              {pager.position === 0 ? 'First module ›' : 'Next ›'}
+            </button>
+            <p className="gb-pager-where" aria-live="polite">
+              {pager.position > 0 ? (
+                <>
+                  {/* The picker names the module, so this line carries only the counts (climb4 r6). */}
+                  {/* r7 T2: the picker already carries the lesson count, so this says only where the page is. */}
+                  <span>Module {pager.position} of {pager.total}</span>
+                </>
+              ) : (
+                <>
+                  <span>{displayLessons.length} {showAll ? '' : 'graded '}lessons in {pager.total} modules</span>
+                </>
+              )}
+            </p>
+          </nav>
+        )}
+        {pages.length === 0 && (
+          <span style={{ fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', fontSize: 13, color: 'var(--c-meta)', whiteSpace: 'nowrap' }}>
+            {`${classStudents.length} student${classStudents.length !== 1 ? 's' : ''}`}
+            {' · '}{displayLessons.length} lesson{displayLessons.length !== 1 ? 's' : ''}
+          </span>
+        )}
+        <div className="gb-toolbar-right" style={{ display: 'flex', flexWrap: narrow ? 'wrap' : 'nowrap', alignItems: 'center', gap: 8, marginLeft: narrow ? 0 : 'auto', minWidth: 0, flex: narrow ? '1 1 100%' : undefined }}>
         <input
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Find a student"
           aria-label="Find a student by name or email"
-          style={{ background: 'var(--c-deep)', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4, height: 32, boxSizing: 'border-box', padding: '4px 8px', fontSize: 14, width: narrow ? '100%' : 180, minWidth: 0, flex: narrow ? '1 1 100%' : '0 1 180px' }}
+          className="teacher-field"
+          style={{ background: 'var(--c-deep2)', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4, height: 32, boxSizing: 'border-box', padding: '4px 8px', fontFamily: 'var(--font-prose)', fontSize: 15, width: narrow ? '100%' : 180, minWidth: 0, flex: narrow ? '1 1 100%' : '0 1 180px' }}
         />
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as 'name' | 'grade' | 'missing')}
           aria-label="Order students by"
-          style={{ background: 'var(--c-deep)', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4, height: 32, padding: '4px 8px', fontSize: 14, maxWidth: narrow ? '100%' : 240, minWidth: 0 }}
+          className="teacher-field"
+          style={{ background: 'var(--c-deep2)', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4, height: 32, padding: '4px 8px', fontFamily: 'var(--font-prose)', fontSize: 15, maxWidth: narrow ? '100%' : 240, minWidth: 0 }}
         >
-          <option value="name">Order: name</option>
+          <option value="name">Order: last name, A to Z</option>
           <option value="grade">Order: lowest grade first</option>
           <option value="missing">Order: most past due first</option>
         </select>
-        <select
-          value={moduleSel ?? ''}
-          onChange={(e) => setModuleFilter(e.target.value === '' ? null : e.target.value)}
-          aria-label="Show one module's columns"
-          style={{ background: 'var(--c-deep)', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4, height: 32, padding: '4px 8px', fontSize: 14, maxWidth: narrow ? '100%' : 180, minWidth: 0 }}
-        >
-          <option value="">All modules</option>
-          {moduleChoices.map((m) => (
-            <option key={m.unit} value={m.unit}>{m.unit} ({m.counted} counted / {m.total})</option>
-          ))}
-        </select>
-        <details style={{ position: 'relative', fontSize: 13, color: 'var(--c-fg)', marginLeft: 'auto', flexShrink: 0 }}>
+        {/* Scroll cue: on the every-module grid always, on a module page only when its columns do not fit. */}
+        {showScrollCue && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: narrow ? 0 : 'auto', flexShrink: 0 }}>
+          {/* Where the view is in the course, so "N more" has a position. */}
+          {gridScroll.first > 0 && displayLessons.length > 0 && (
+            <span style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-meta)', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+              Lessons <strong style={{ color: 'var(--c-fg)', fontWeight: 600 }}>{gridScroll.first === gridScroll.last ? gridScroll.first : `${gridScroll.first}–${gridScroll.last}`}</strong> of {displayLessons.length}
+            </span>
+          )}
+          <button
+            type="button"
+            disabled={!gridScroll.left}
+            aria-label="Scroll back three lesson columns"
+            onClick={() => gridElement?.scrollBy({ left: -CELL_W * 3, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })}
+            title="Student names stay in view while the lessons scroll"
+            style={{ height: 32, padding: '0 8px', flexShrink: 0, borderRadius: 4, border: '1px solid var(--c-line)', background: 'var(--c-deep2)', color: 'var(--c-cyan)', fontSize: 13, opacity: gridScroll.left ? 1 : 0.5, cursor: gridScroll.left ? 'pointer' : 'not-allowed' }}
+          >
+            ← Back
+          </button>
+          <button
+            type="button"
+            disabled={!gridScroll.right}
+            aria-label={`Scroll forward three lesson columns, ${gridScroll.more} more lessons to the right`}
+            onClick={() => gridElement?.scrollBy({ left: CELL_W * 3, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })}
+            title="Student names stay in view while the lessons scroll"
+            style={{ height: 32, padding: '0 12px', flexShrink: 0, whiteSpace: 'nowrap', borderRadius: 4, border: '1px solid var(--c-cyan)', background: 'var(--c-deep2)', color: 'var(--c-cyan)', fontSize: 13, fontWeight: 700, opacity: gridScroll.right ? 1 : 0.5, cursor: gridScroll.right ? 'pointer' : 'not-allowed' }}
+          >
+            {gridScroll.right ? `${gridScroll.more} more lesson${gridScroll.more === 1 ? '' : 's'} →` : gridScroll.left ? 'End of lessons' : 'All lessons in view'}
+          </button>
+          <span aria-live="polite" className="sr-only">{gridScroll.right ? `${gridScroll.more} more lesson${gridScroll.more === 1 ? '' : 's'} to the right.` : 'All lessons shown.'} Student names stay in view.</span>
+        </div>
+        )}
+        <details style={{ position: 'relative', fontSize: 13, color: 'var(--c-fg)', flexShrink: 0, marginLeft: !showScrollCue && !narrow ? 'auto' : undefined }}>
           <summary style={{ cursor: 'pointer', height: 32, boxSizing: 'border-box', padding: '4px 12px', border: '1px solid var(--c-line)', borderRadius: 4 }}>More{showAll || problemsOnly ? ' •' : ''} ▾</summary>
           <div style={{ position: 'absolute', top: '100%', right: 0, zIndex: 30, background: 'var(--c-deep2)', border: '1px solid var(--c-line)', borderRadius: 6, padding: 16, width: 260, maxWidth: 'calc(100vw - 64px)', boxSizing: 'border-box', display: 'grid', gap: 12 }}>
-        <label style={{ fontSize: 12, color: 'var(--c-fg)', display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer' }} title="By default the grid shows only the lessons that count toward the grade. Tick this to add the ones that do not (readings, slides, examples, and any lab or chart with no grade category). They show a check mark, never a score.">
+        <label style={{ fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.4, color: 'var(--c-fg)', display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }} title="By default the grid shows only the lessons that count toward the grade. Tick this to add the ones that do not (readings, slides, examples, and any lab or chart with no grade category). They show a check mark, never a score.">
           <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
           Include ungraded lessons{hiddenCount > 0 ? ` (${hiddenCount} hidden)` : ''}
         </label>
-        <label style={{ fontSize: 12, color: 'var(--c-fg)', display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
+        <label style={{ fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.4, color: 'var(--c-fg)', display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
           <input type="checkbox" checked={problemsOnly} onChange={(e) => setProblemsOnly(e.target.checked)} />
           Missing or ungraded work
         </label>
-        <label style={{ fontSize: 12, color: 'var(--c-fg)', display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+        <label style={{ fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.4, color: 'var(--c-fg)', display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
           <input type="checkbox" checked={showCategoryColumns} onChange={e => setShowCategoryColumns(e.target.checked)} />
           Show category columns
         </label>
@@ -1697,47 +1972,52 @@ function GradebookView({
         >
           {fullScreen ? '✕ Exit full screen' : '⛶ Full screen'}
         </button>
-        <button style={{ ...S.btn('transparent'), color: 'var(--c-cyan)', border: '1px solid var(--c-line)' }} onClick={handleDownloadCsv}>Export CSV</button>
+        <button style={{ ...S.btn('transparent'), color: 'var(--c-cyan)', border: '1px solid var(--c-line)', whiteSpace: 'normal', height: 'auto', minHeight: 32 }} onClick={handleDownloadCsv}>Download lesson scores (CSV)</button>
+        <p style={{ margin: 0, fontFamily: 'var(--font-prose)', fontSize: 13, lineHeight: 1.45, color: 'var(--c-meta)' }}>
+          One row per student, one column per graded lesson. For one row per student with the grade only, use Download grades on the Students tab.
+        </p>
           </div>
         </details>
+        </div>
       </div>
 
-      <div aria-label="Gradebook legend" style={{ display: 'flex', flexWrap: 'nowrap', gap: 16, marginBottom: 12, overflowX: 'auto', paddingBottom: 4, fontSize: 13, color: 'var(--c-meta)' }}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0, whiteSpace: 'nowrap' }}>
-          <span style={{ color: 'var(--c-green)', fontFamily: 'monospace', fontSize: 14, fontWeight: 700 }}>100</span>done
+      {/* r10 T1: the legend is a "Key": closed, five swatches with a short label each and room between them;
+          open, a plain sentence for each state. The hint that a cell opens the work sits at the row's end. */}
+      <div className="gb-legend-row">
+        <details className="gb-key">
+          <summary aria-label="Gradebook key: what each cell means. Select to read more.">
+            <span className="gb-key-title">Key</span>
+            <span className="gb-legend" role="list">
+              {([
+                { key: 'done', swatch: 'var(--c-green)', label: 'Done' },
+                { key: 'missing', swatch: 'var(--c-red)', label: 'Missing' },
+                { key: 'grade', swatch: 'var(--c-orange)', label: 'Needs grading' },
+                { key: 'started', swatch: 'var(--c-yellow)', label: 'Started' },
+                { key: 'not-due', swatch: 'var(--c-line)', label: 'Not due yet' },
+              ] as const).map(({ key, swatch, label }) => (
+                <span key={key} role="listitem" className="gb-legend-item">
+                  <span aria-hidden="true" className="gb-legend-swatch" style={{ background: swatch }} />
+                  {label}
+                </span>
+              ))}
+            </span>
+            <span className="gb-key-more" aria-hidden="true">What these mean</span>
+          </summary>
+          <dl className="gb-key-list">
+            <div><dt><span aria-hidden="true" className="gb-legend-swatch" style={{ background: 'var(--c-green)' }} />Done</dt><dd>A number is the score on finished work, out of 100.</dd></div>
+            <div><dt><span aria-hidden="true" className="gb-legend-swatch" style={{ background: 'var(--c-red)' }} />Missing</dt><dd>Past its due date and not done. It counts as 0 in the grade.</dd></div>
+            <div><dt><span aria-hidden="true" className="gb-legend-swatch" style={{ background: 'var(--c-orange)' }} />Needs grading</dt><dd>Handed in and waiting for your score on the Today tab.</dd></div>
+            <div><dt><span aria-hidden="true" className="gb-legend-swatch" style={{ background: 'var(--c-yellow)' }} />Started</dt><dd>Opened but not finished yet.</dd></div>
+            <div><dt><span aria-hidden="true" className="gb-legend-swatch" style={{ background: 'var(--c-line)' }} />Not due yet</dt><dd>A dash: not started, and the due date has not passed.</dd></div>
+          </dl>
+        </details>
+        {/* ux2 T8: how many students a search shows, here rather than in the toolbar, so typing in Find a
+            student never pushes the toolbar onto a second row under the cursor. */}
+        <span className="gb-filter-count" aria-live="polite">
+          {visibleStudents.length !== classStudents.length ? `Showing ${visibleStudents.length} of ${classStudents.length} students` : ''}
         </span>
-        {([
-          { status: 'missing', label: 'past due' },
-          { status: 'grade', label: 'needs grading' },
-          { status: 'started', label: 'in progress' },
-          { status: 'not-due', label: 'not due yet' },
-        ] as const).map(({ status, label }) => (
-          <span key={status} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0, whiteSpace: 'nowrap' }}>
-            {statusLabel(status, true)}{label}
-          </span>
-        ))}
-      </div>
-
-      <div style={{ marginBottom: 8, display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 8, color: 'var(--c-meta)', fontSize: 13 }}>
-        <button
-          type="button"
-          disabled={!gridScroll.left}
-          aria-label="Scroll back three lesson columns"
-          onClick={() => gridElement?.scrollBy({ left: -CELL_W * 3, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })}
-          style={{ height: 28, padding: '0 8px', borderRadius: 4, border: '1px solid var(--c-line)', background: 'var(--c-deep2)', color: 'var(--c-cyan)', fontSize: 13, opacity: gridScroll.left ? 1 : 0.5, cursor: gridScroll.left ? 'pointer' : 'not-allowed' }}
-        >
-          ← Back
-        </button>
-        <button
-          type="button"
-          disabled={!gridScroll.right}
-          aria-label={`Scroll forward three lesson columns, ${gridScroll.more} more lessons to the right`}
-          onClick={() => gridElement?.scrollBy({ left: CELL_W * 3, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })}
-          style={{ height: 28, padding: '0 12px', borderRadius: 4, border: '1px solid var(--c-cyan)', background: 'var(--c-deep2)', color: 'var(--c-cyan)', fontSize: 13, fontWeight: 700, opacity: gridScroll.right ? 1 : 0.5, cursor: gridScroll.right ? 'pointer' : 'not-allowed' }}
-        >
-          {gridScroll.right ? `${gridScroll.more} more lesson${gridScroll.more === 1 ? '' : 's'} →` : gridScroll.left ? 'End of lessons' : 'All lessons in view'}
-        </button>
-        <span aria-live="polite">{gridScroll.right ? `${gridScroll.more} more lesson${gridScroll.more === 1 ? '' : 's'} to the right.` : 'All lessons shown.'} Student names stay in view.</span>
+        {/* r8 T5: a still screen shows no hover, so say once that a cell opens the work. */}
+        <span className="gb-open-hint"><MousePointerClick size={14} aria-hidden="true" />Select a score to open the work</span>
       </div>
 
       {/* Scrollable matrix */}
@@ -1755,6 +2035,7 @@ function GradebookView({
       <div
         ref={setGridElement}
         data-lesson-count={displayLessons.length}
+        data-frozen={EMAIL_W + (narrow ? 0 : GRADE_W)}
         style={{
           width: '100%',
           overflow: 'auto',
@@ -1770,7 +2051,7 @@ function GradebookView({
             <col style={{ width: EMAIL_W }} />
             <col style={{ width: GRADE_W }} />
             {Array.from({ length: categoryColumnCount }, (_, i) => <col key={`category-${i}`} style={{ width: CAT_W }} />)}
-            {displayLessons.map((lesson) => <col key={lesson.id} style={{ width: CELL_W }} />)}
+            {displayLessons.map((lesson) => <col key={lesson.id} data-lesson-col style={{ width: CELL_W }} />)}
           </colgroup>
           {/* Unit-spanning header row */}
           <thead>
@@ -1783,9 +2064,9 @@ function GradebookView({
                   boxSizing: 'border-box',
                   background: headerBg, padding: '8px 12px',
                   borderBottom: '2px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
-                  textAlign: 'left', color: 'var(--c-meta)', fontSize: 13, fontWeight: 700,
-                  textTransform: 'uppercase', letterSpacing: '0.06em',
+                  textAlign: 'left', color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600,
                 }}
+                className="gb-head-student"
               >
                 Student
               </th>
@@ -1797,14 +2078,17 @@ function GradebookView({
                   boxSizing: 'border-box',
                   background: headerBg, padding: '8px 8px',
                   borderBottom: '2px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
-                  textAlign: 'center', color: 'var(--c-meta)', fontSize: 13, fontWeight: 700,
-                  textTransform: 'uppercase', letterSpacing: '0.06em',
+                  textAlign: 'center', color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600,
                 }}
-                title="Grade so far: work done plus work past its due date, under this class's weights. Lessons not due yet are left out."
+                className="gb-head-grade"
+                title="Grade so far: work done plus work past its due date, under this class's weights. Lessons not due yet are left out. Past due is how many graded lessons are past due and not done."
               >
-                Grade
+                {/* r9 T1: grade and past due are two aligned slots with their own headings (one slot on a phone). */}
+                {narrow ? 'Grade' : (
+                  <span className="gb-grade-pair"><span>Grade</span><span>Past due</span></span>
+                )}
               </th>
-              {shownCats.length > 0 && (
+              {categoryColumnCount > 0 && (
                 <th
                   colSpan={categoryColumnCount}
                   style={{
@@ -1813,10 +2097,10 @@ function GradebookView({
                     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                     background: headerBg, padding: '4px 4px',
                     borderBottom: '1px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
-                    textAlign: 'center', color: 'var(--c-meta)', fontSize: 13, fontWeight: 700,
-                    textTransform: 'uppercase', letterSpacing: '0.06em',
+                    textAlign: 'center', color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600,
                   }}
                   title="Percent per grade category, from the same rule as the grade"
+                  className="gb-head-totals"
                 >
                   Totals
                 </th>
@@ -1826,27 +2110,28 @@ function GradebookView({
                   key={unit}
                   colSpan={count}
                   title={unit}
+                  className="gb-head-unit"
                   style={{
                     position: 'sticky', top: 0, zIndex: 2,
                     height: HEAD1_H, boxSizing: 'border-box',
                     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                     background: headerBg, padding: '4px 4px',
                     borderBottom: '1px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
-                    textAlign: 'center', color: 'var(--c-purple)', fontSize: 12, fontWeight: 700,
-                    textTransform: 'uppercase', letterSpacing: '0.06em',
+                    textAlign: 'center', color: 'var(--c-purple)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600,
                     width: CELL_W * count,
                   }}
                 >
-                  {unit}
+                  <span data-unit-label style={{ display: 'block', boxSizing: 'border-box', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{unit}</span>
                 </th>
               ))}
             </tr>
             {/* Per-lesson title row */}
             <tr>
-              {!showCategoryColumns && shownCats.length > 0 && <th style={{ position: 'sticky', top: HEAD1_H, zIndex: 2, width: CAT_W, background: stickyBg, color: 'var(--c-meta)', fontSize: 13, borderBottom: '2px solid var(--c-line)' }}>Summary</th>}
-              {showCategoryColumns && shownCats.map((c) => (
+              {showSummary && <th className="gb-head-summary" style={{ position: 'sticky', top: HEAD1_H, zIndex: 2, width: CAT_W, background: stickyBg, color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600, borderBottom: '2px solid var(--c-line)' }}>Summary</th>}
+              {showCategoryColumns && shownCats.map((c, ci) => (
                 <th
                   key={c}
+                  className={ci === shownCats.length - 1 ? 'gb-cat-last' : undefined}
                   title={`${CATEGORY_LABEL[c]}: percent across this category's graded lessons`}
                   style={{
                     position: 'sticky', top: HEAD1_H, zIndex: 2,
@@ -1855,7 +2140,7 @@ function GradebookView({
                     background: stickyBg, padding: '8px 4px 8px',
                     borderTop: `3px solid ${CAT_COLOR[c]}`,
                     borderBottom: '2px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
-                    textAlign: 'center', color: CAT_COLOR[c], fontSize: 12, fontWeight: 700,
+                    textAlign: 'center', color: CAT_COLOR[c], fontFamily: 'var(--font-prose)', fontSize: 12, fontWeight: 700,
                   }}
                 >
                   <span style={{ whiteSpace: 'nowrap', fontSize: 13 }}>{CAT_SHORT[c]}</span>
@@ -1864,14 +2149,16 @@ function GradebookView({
               {displayLessons.map((lesson) => (
                 <th
                   key={lesson.id}
+                  className="gb-head-lesson"
                   title={`${lesson.title}${lesson.maxScore ? ` · ${lesson.maxScore} pts` : ''}${gbData.dueDates?.[lesson.id] ? ` · Due ${formatDue(gbData.dueDates[lesson.id])}` : ''}`}
                   style={{
                     position: 'sticky', top: HEAD1_H, zIndex: 2,
                     width: CELL_W, minWidth: CELL_W, maxWidth: CELL_W,
-                    // A separate number plus two title lines keeps assignments identifiable
-                    // without widening the six-column desktop viewport.
-                    height: 76, boxSizing: 'border-box', verticalAlign: 'top', overflow: 'hidden',
-                    background: stickyBg, padding: '8px 4px 8px',
+                    // The lesson number as a small meta line, then the title in at most two lines of 13px
+                    // prose. One fixed height for exactly that (3 + 6 + 16 + 2 + 36 + 6 + 2 = 71px); a
+                    // longer title ends in an ellipsis and its full text is the tooltip.
+                    height: 72, boxSizing: 'border-box', verticalAlign: 'top', overflow: 'hidden',
+                    background: stickyBg, padding: '6px 6px 6px',
                     borderTop: `3px solid ${catOf.get(lesson.id) ? CAT_COLOR[catOf.get(lesson.id) as GradeCategory] : 'var(--c-line)'}`,
                     borderBottom: '2px solid var(--c-line)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)',
                     textAlign: 'left', color: 'var(--c-fg)', fontSize: 13,
@@ -1886,6 +2173,7 @@ function GradebookView({
                     that is 30,000px wide.
                   */}
                   <a
+                    className="gb-lesson-link"
                     href={lessonHref(lesson)}
                     target="_blank"
                     rel="noreferrer"
@@ -1895,20 +2183,58 @@ function GradebookView({
                       textDecoration: 'none',
                       // Full title stays available in the header tooltip.
                       display: 'block',
-                      maxWidth: CELL_W - 8,
+                      maxWidth: CELL_W - 12,
                       whiteSpace: 'normal',
                       overflow: 'hidden',
                       lineHeight: 1.25,
                     }}
                   >
-                    <strong style={{ display: 'block', color: 'var(--c-meta)', fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{lesson.title.match(/^\d+\.\d+\.\d+/)?.[0] ?? lesson.title}</strong>
-                    <span style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, height: 36, marginTop: 4, color: 'var(--c-purple)', fontSize: 13, fontWeight: 700, lineHeight: '18px', overflow: 'hidden', whiteSpace: 'normal', overflowWrap: 'anywhere' }}>{lesson.title.replace(/^\d+\.\d+\.\d+\s*[:–—.-]?\s*/, '')}</span>
+                    <strong style={{ display: 'block', color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, lineHeight: '16px', fontWeight: 600, fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{lesson.title.match(/^\d+\.\d+\.\d+/)?.[0] ?? lesson.title}</strong>
+                    <span className="gb-lesson-title" style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 2, maxHeight: 36, marginTop: 2, color: 'var(--c-fg)', fontFamily: 'var(--font-prose)', fontSize: 14, fontWeight: 600, lineHeight: '18px', overflow: 'hidden', whiteSpace: 'normal', overflowWrap: 'break-word' }}>{lesson.title.replace(/^\d+\.\d+\.\d+\s*[:–—.-]?\s*/, '')}</span>
                   </a>
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
+            {/* ux2 T8: how the class did, per lesson and on the grade. Display only, from the cells on this page. */}
+            {classStudents.length > 1 && (
+              <tr className="gb-avg-row">
+                <th scope="row" className="gb-avg-label" style={{ position: 'sticky', left: 0, zIndex: 1, width: EMAIL_W, minWidth: EMAIL_W }}>
+                  Class average
+                  <span className="gb-avg-sub">of finished work</span>
+                </th>
+                <td
+                  className="gb-avg-cell"
+                  style={{ position: 'sticky', left: gradeLeft, zIndex: 1, width: GRADE_W, minWidth: GRADE_W }}
+                  title={gradeAvg.avg === null ? 'No student has anything counted yet' : `Average grade so far: ${gradeAvg.avg}%, across ${gradeAvg.n} student${gradeAvg.n === 1 ? '' : 's'} with something counted`}
+                >
+                  {gradeAvg.avg === null ? '—' : `${gradeAvg.avg}%`}
+                </td>
+                {Array.from({ length: categoryColumnCount }, (_, i) => <td key={`avg-cat-${i}`} className="gb-avg-cell" aria-hidden="true" />)}
+                {displayLessons.map((lesson) => {
+                  const a = lessonAvg(lesson);
+                  return (
+                    <td
+                      key={lesson.id}
+                      className="gb-avg-cell"
+                      title={a.avg === null
+                        ? `${lesson.title}: nobody has finished it yet`
+                        : `${lesson.title}: average ${a.avg} across the ${a.n} of ${classStudents.length} students who finished it. Missing work is not in this average.`}
+                    >
+                      {/* ux3: "100" alone read as the column's result over a column of Missing cells. The average
+                          of finished work says so, with how many finished, in a quiet line. */}
+                      {a.avg === null ? <span className="gb-avg-none">—</span> : (
+                        <span className="gb-avg-line">
+                          <span className="gb-avg-v">{a.avg} avg</span>
+                          <span className="gb-avg-n">{a.n} of {classStudents.length} done</span>
+                        </span>
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            )}
             {visibleStudents.length === 0 && (
               <tr><td colSpan={displayLessons.length + categoryColumnCount + 2} style={{ padding: 16, color: 'var(--c-meta)' }}>No student matches. Clear the search or the filter above.</td></tr>
             )}
@@ -1925,7 +2251,7 @@ function GradebookView({
                     width: EMAIL_W, minWidth: EMAIL_W,
                     padding: '8px 12px',
                     borderBottom: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
-                    fontFamily: 'monospace', fontSize: 14, color: 'var(--c-cyan)',
+                    fontFamily: 'var(--font-prose)', fontSize: 14, fontWeight: 500, color: 'var(--c-cyan)',
                     overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
                     cursor: 'pointer',
                   }}
@@ -1940,38 +2266,53 @@ function GradebookView({
                   const bg = i % 2 === 0 ? 'var(--c-deep)' : 'var(--x-252636)';
                   return (
                     <td
+                      className="gb-cell-grade"
                       style={{
                         position: 'sticky', left: gradeLeft, zIndex: 1, background: bg,
                         width: GRADE_W, minWidth: GRADE_W, padding: '8px 8px', textAlign: 'center',
                         borderBottom: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 26.6667%, transparent)',
-                        fontSize: 14, fontWeight: 700,
-                        color: !g || g.counted === 0 ? 'var(--c-meta)' : pctColor(g.pct),
+                        fontSize: 14, fontWeight: 700, fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums',
+                        color: !g || g.counted === 0 ? 'var(--c-meta)' : countedGradeColor(g.pct),
                       }}
                       title={g ? (g.counted === 0 ? 'Nothing is due yet and nothing is done' : `Grade so far ${g.pct}%${g.missing > 0 ? `, ${g.missing} past due and not done` : ''}`) : 'Loading'}
                     >
-                      {g ? (g.counted === 0 ? '—' : `${g.pct}%`) : '…'}
-                      {g && g.missing > 0 && <span style={{ color: 'var(--c-red)', fontWeight: 400, marginLeft: 4 }}>({g.missing})</span>}
+                      {narrow ? (
+                        <>
+                          {g ? (g.counted === 0 ? '—' : `${g.pct}%`) : '…'}
+                          {g && g.missing > 0 && <span style={{ display: 'block', color: 'var(--c-red)', fontWeight: 400, fontSize: 12, lineHeight: '14px' }} aria-label={`${g.missing} past due and not done`}>{g.missing} missing</span>}
+                        </>
+                      ) : (
+                        <span className="gb-grade-pair">
+                          <span>{g ? (g.counted === 0 ? '—' : `${g.pct}%`) : '…'}</span>
+                          <span>
+                            {g && g.missing > 0
+                              ? <span className="gb-late-badge" aria-label={`${g.missing} past due`}>{g.missing}</span>
+                              : <span className="gb-grade-zero">{g ? '0' : ''}</span>}
+                          </span>
+                        </span>
+                      )}
                     </td>
                   );
                 })()}
                 {/* Category totals: the server's per-category percent, a dash where nothing in it counts yet */}
-                {!showCategoryColumns && shownCats.length > 0 && <td style={{ width: CAT_W, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '8px 8px', color: 'var(--c-fg)', fontSize: 12, background: 'color-mix(in srgb, var(--c-purple) 6%, transparent)', borderBottom: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)' }} title={shownCats.map(c => `${CATEGORY_LABEL[c]}: ${grades.get(student.email)?.cats[c] === undefined ? 'nothing counted yet' : `${grades.get(student.email)?.cats[c]}%`}`).join(' · ')}>
+                {showSummary && <td className="gb-cell-summary" style={{ width: CAT_W, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', padding: '8px 8px', color: 'var(--c-fg)', fontSize: 14, fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums', background: 'color-mix(in srgb, var(--c-purple) 6%, transparent)', borderBottom: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)' }} title={shownCats.map(c => `${CATEGORY_LABEL[c]}: ${grades.get(student.email)?.cats[c] === undefined ? 'nothing counted yet' : `${grades.get(student.email)?.cats[c]}%`}`).join(' · ')}>
                   {(() => {
                     const c = shownCats.find(c => grades.get(student.email)?.cats[c] !== undefined);
                     return c ? <strong>{CAT_SHORT[c]} {grades.get(student.email)?.cats[c]}%</strong> : <span style={{ color: 'var(--c-meta)' }}>—</span>;
                   })()}
                 </td>}
-                {showCategoryColumns && shownCats.map((c) => {
+                {showCategoryColumns && shownCats.map((c, ci) => {
                   const v = grades.get(student.email)?.cats[c];
                   return (
                     <td
                       key={c}
+                      className={ci === shownCats.length - 1 ? 'gb-cat-last' : undefined}
                       style={{
                         width: CAT_W, minWidth: CAT_W, maxWidth: CAT_W, padding: '8px 4px', textAlign: 'center',
                         borderBottom: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)', borderRight: '1px solid color-mix(in srgb, var(--c-line) 13.3333%, transparent)',
-                        fontSize: 14, fontWeight: 700,
+                        fontSize: 14, fontWeight: 700, fontFamily: 'var(--font-prose)', fontVariantNumeric: 'tabular-nums',
                         background: 'color-mix(in srgb, var(--c-comment) 10.0%, transparent)',
-                        color: v === undefined ? 'var(--c-meta)' : pctColor(v),
+                        color: v === undefined ? 'var(--c-meta)' : countedGradeColor(v),
                       }}
                       title={v === undefined ? `${CATEGORY_LABEL[c]}: nothing counted yet` : `${CATEGORY_LABEL[c]}: ${v}%`}
                     >
@@ -1987,6 +2328,7 @@ function GradebookView({
                   return (
                     <td
                       key={lesson.id}
+                      className={isCodingLesson || cell ? 'gb-cell-open' : undefined}
                       style={{
                         width: CELL_W, minWidth: CELL_W, maxWidth: CELL_W,
                         padding: '8px 4px', fontSize: 14,
@@ -2040,6 +2382,7 @@ function useGradingWeightsDesktop() {
 
 function ListView() {
   const router = useRouter();
+  const { toast } = useFeedback();
   const [classes, setClasses] = useState<ClassSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [forbidden, setForbidden] = useState(false);
@@ -2047,6 +2390,23 @@ function ListView() {
   const [newName, setNewName] = useState('');
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState('');
+  // r7 T3: "New class" is a button at the top right of the heading that opens a small form under it, so the
+  // grid holds only class cards. With no class yet the form starts open.
+  const [createOpen, setCreateOpen] = useState(false);
+  const createInputRef = useRef<HTMLInputElement>(null);
+  const newClassBtnRef = useRef<HTMLButtonElement>(null);
+  const createPanelRef = useRef<HTMLFormElement>(null);
+  // The form is a popover over the page: a click outside it (and outside its button) closes it.
+  useEffect(() => {
+    if (!createOpen) return;
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as Node;
+      if (createPanelRef.current?.contains(t) || newClassBtnRef.current?.contains(t)) return;
+      setCreateOpen(false);
+    };
+    document.addEventListener('mousedown', onDown);
+    return () => document.removeEventListener('mousedown', onDown);
+  }, [createOpen]);
   // Per class: students with work past due, and submissions waiting for a grade. Filled in as each class
   // answers, so the list shows at a glance which of five classes needs a teacher first.
   const [chips, setChips] = useState<Record<string, { behind: number; toGrade: number }>>({});
@@ -2078,7 +2438,8 @@ function ListView() {
         apiFetch<{ awaiting_grade?: unknown[] }>(`/api/classes/${c.id}/needs-attention`),
       ]).then(([prog, att]) => {
         if (cancelled || prog.error !== null) return;
-        const behind = prog.data.students.filter((p) => (p.gradedMissing ?? 0) > 0).length;
+        // The roster's own number: students (never staff) with graded work past due and not done (ux2 T6).
+        const behind = prog.data.students.filter((p) => !p.staff && (p.gradedMissing ?? 0) > 0).length;
         const toGrade = att.error === null ? (att.data.awaiting_grade?.length ?? 0) : 0;
         setChips((prev) => ({ ...prev, [c.id]: { behind, toGrade } }));
       });
@@ -2097,12 +2458,14 @@ function ListView() {
     });
     setCreating(false);
     if (result.error !== null) {
-      setCreateError(result.error);
+      setCreateError(`Could not create the class: ${result.error.replace(/\.$/, '')}. Nothing was created; try again.`);
     } else {
       setNewName('');
       router.push(`/teacher?class=${result.data.class.id}`);
     }
   }
+
+  const showCreate = createOpen || classes.length === 0;
 
   if (loading) return <div style={{ color: 'var(--c-meta)' }}>Loading…</div>;
   if (forbidden)
@@ -2112,11 +2475,77 @@ function ListView() {
 
   return (
     <div className="teacher-frame">
-      <h1 style={{ ...S.h1, marginBottom: 8 }}>My Classes</h1>
-      <p style={{ color: 'var(--c-meta)', margin: '0 0 24px', fontSize: 14 }}>Your classroom at a glance. Open a class to review work and support your students.</p>
+      {/* Heading row: title and intro on the left, the one page action on the right (r7 T3). */}
+      <div className="teacher-list-head">
+        <div style={{ minWidth: 0 }}>
+          <h1 style={{ ...S.h1, marginBottom: 8 }}>My classes</h1>
+          <p style={{ color: 'var(--c-meta)', margin: 0, fontFamily: 'var(--font-prose)', fontSize: 15, lineHeight: 1.5, maxWidth: '70ch' }}>Your classroom at a glance. Open a class to review work and support your students.</p>
+        </div>
+        <button
+          ref={newClassBtnRef}
+          type="button"
+          className="teacher-new-class-btn"
+          aria-expanded={showCreate}
+          aria-controls="new-class-panel"
+          onClick={() => {
+            const next = !createOpen;
+            setCreateOpen(next);
+            if (next) window.setTimeout(() => createInputRef.current?.focus(), 0);
+          }}
+        >
+          <span aria-hidden="true">+</span> New class
+        </button>
+        {showCreate && (
+          <form
+            id="new-class-panel"
+            className={classes.length > 0 ? 'teacher-create-panel is-pop' : 'teacher-create-panel'}
+            ref={createPanelRef}
+            onSubmit={(e) => { void handleCreate(e); }}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape' && classes.length > 0) {
+                setCreateOpen(false);
+                newClassBtnRef.current?.focus();
+              }
+            }}
+          >
+            <div style={{ flex: '1 1 260px', minWidth: 0 }}>
+              <label htmlFor="new-class-name" style={S.label}>New class name</label>
+              <input
+                ref={createInputRef}
+                className="teacher-field"
+                style={{ ...S.input, width: '100%', minWidth: 0 }}
+                id="new-class-name"
+                placeholder="e.g. Introduction to coding"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={creating || !newName.trim()}
+              style={{ ...(creating || !newName.trim() ? S.btnDisabled : S.btn('var(--c-purple)')), height: 36 }}
+            >
+              {creating ? 'Creating…' : 'Create class'}
+            </button>
+            {classes.length > 0 && (
+              <button
+                type="button"
+                className="teacher-utility-btn"
+                onClick={() => { setCreateOpen(false); newClassBtnRef.current?.focus(); }}
+                style={{ height: 36, padding: '0 12px', borderRadius: 4, border: '1px solid var(--c-line)', background: 'transparent', color: 'var(--c-fg)', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+            )}
+            {createError && <p role="alert" style={{ ...S.error, flexBasis: '100%', margin: 0, fontFamily: 'var(--font-prose)', fontSize: 14 }}>{createError}</p>}
+          </form>
+        )}
+      </div>
+
 
       {/* Include archived toggle */}
-      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'var(--c-meta)', marginBottom: 24, cursor: 'pointer' }}>
+      <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontFamily: 'var(--font-prose)', fontSize: 14, color: 'var(--c-meta)', marginBottom: 16, cursor: 'pointer' }}>
         <input
           type="checkbox"
           checked={includeArchived}
@@ -2126,94 +2555,125 @@ function ListView() {
         Include archived classes
       </label>
 
-      {/* Class list */}
-      {classes.length === 0 ? (
-        <p style={{ color: 'var(--c-meta)' }}>No classes yet. Create your first class below.</p>
-      ) : (
+      {classes.length === 0 && (
+        <p style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 15 }}>No classes yet. Name your first class above.</p>
+      )}
         <div className="teacher-class-grid" style={{ display: 'grid', gap: 16, maxWidth: 880 }}>
           {[...classes].sort((x, y) => Number(y.id === lastId) - Number(x.id === lastId)).map((c) => (
             <div
               key={c.id}
+              className="teacher-class-card tcc-r9"
               style={{
                 ...S.card,
                 marginBottom: 0,
                 opacity: c.archived_at ? 0.6 : 1,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 16,
-                flexWrap: 'wrap',
               }}
             >
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
-                  <span style={{ fontWeight: 700, fontSize: 18, overflowWrap: 'anywhere' }}>{c.name}</span>
-
+              {/* r9 T3: one class reads as a complete summary. Name and badges on the left, the labelled facts
+                  as a 2x2 grid in the middle, the action on the right (stacked on a narrow screen). */}
+              <div className="tcc-main">
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
+                  {/* The class name is the way in: a real link (opens in a new tab, copies as a URL) that the
+                      router handles on a plain click. */}
+                  <a
+                    href={`/teacher/?class=${encodeURIComponent(c.id)}`}
+                    onClick={(e) => {
+                      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                      e.preventDefault();
+                      router.push(`/teacher?class=${c.id}`);
+                    }}
+                    className="teacher-class-link"
+                    style={{ fontWeight: 700, fontSize: 18, lineHeight: 1.3, color: 'var(--c-fg)', textDecoration: 'underline', textDecorationColor: 'color-mix(in srgb, var(--c-cyan) 55%, transparent)', textUnderlineOffset: 4, textDecorationThickness: 1, overflowWrap: 'anywhere' }}
+                  >
+                    {c.name}
+                  </a>
                   {c.archived_at && <span style={S.badge(true)}>Archived</span>}
-                  {c.id === lastId && <span style={{ fontSize: 13, color: 'var(--c-meta)' }}>last opened</span>}
+                  {c.id === lastId && <span style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-meta)' }}>last opened</span>}
                 </div>
-                {!c.archived_at && (
-                  <div style={{ display: 'flex', gap: 8, marginBottom: 8, flexWrap: 'wrap', fontSize: 12 }}>
-                    {chips[c.id] === undefined ? (
-                      <span style={{ color: 'var(--c-meta)' }}>checking…</span>
-                    ) : chips[c.id].behind === 0 && chips[c.id].toGrade === 0 ? (
-                      <span style={{ color: 'var(--c-green)' }}>All caught up</span>
-                    ) : (
-                      <>
-                        {chips[c.id].toGrade > 0 && (
-                          <span style={{ color: 'var(--c-bg)', background: 'var(--c-orange)', borderRadius: 10, padding: '4px 8px', fontWeight: 700 }}>
-                            {chips[c.id].toGrade} to grade
-                          </span>
-                        )}
-                        {chips[c.id].behind > 0 && (
-                          <span style={{ color: 'var(--c-bg)', background: 'var(--c-red)', borderRadius: 10, padding: '4px 8px', fontWeight: 700 }}>
-                            {chips[c.id].behind} behind
-                          </span>
-                        )}
-                      </>
-                    )}
-                  </div>
-                )}
-                <div style={{ display: 'flex', gap: 24, color: 'var(--c-meta)', fontSize: 13, flexWrap: 'wrap' }}>
-                  <span>Code: <span style={{ fontFamily: 'monospace', color: 'var(--c-cyan)' }}>{c.code}</span></span>
-                  {c.school_year && <span>Year: {c.school_year}</span>}
-                  <span>{c.student_count} student{c.student_count !== 1 ? 's' : ''}</span>
-                  <span style={{ textTransform: 'capitalize' }}>{c.role}</span>
+                {/* The badges. Each one is a way in to the tab
+                    that answers it: "to grade" opens Today, "behind" opens Students. */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 13, fontFamily: 'var(--font-prose)' }}>
+                  {!c.archived_at && (chips[c.id] === undefined ? (
+                    <span style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13 }}>checking…</span>
+                  ) : chips[c.id].behind === 0 && chips[c.id].toGrade === 0 ? (
+                    <span style={{ color: 'var(--c-green)', fontFamily: 'var(--font-prose)', fontSize: 13 }}>All caught up</span>
+                  ) : (
+                    <>
+                      {chips[c.id].toGrade > 0 && (
+                        <a
+                          href={`/teacher/?class=${encodeURIComponent(c.id)}&tab=today`}
+                          onClick={(e) => {
+                            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                            e.preventDefault();
+                            router.push(`/teacher?class=${c.id}&tab=today`);
+                          }}
+                          className="teacher-chip-link"
+                          title="Open this class's Today tab"
+                          style={{ color: 'var(--c-bg)', background: 'var(--c-orange)', borderRadius: 10, padding: '4px 8px', fontWeight: 700, textDecoration: 'none' }}
+                        >
+                          {chips[c.id].toGrade} to grade
+                        </a>
+                      )}
+                      {chips[c.id].behind > 0 && (
+                        <a
+                          href={`/teacher/?class=${encodeURIComponent(c.id)}&tab=students&filter=behind`}
+                          onClick={(e) => {
+                            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                            e.preventDefault();
+                            router.push(`/teacher?class=${c.id}&tab=students&filter=behind`);
+                          }}
+                          className="teacher-chip-link"
+                          title="Students with graded work past due and not done. Opens the roster showing only them."
+                          style={{ color: 'var(--c-bg)', background: 'var(--c-red)', borderRadius: 10, padding: '4px 8px', fontWeight: 700, textDecoration: 'none' }}
+                        >
+                          {/* r10 T7: say what is counted. */}
+                          {chips[c.id].behind} {chips[c.id].behind === 1 ? 'student' : 'students'} behind
+                        </a>
+                      )}
+                    </>
+                  ))}
                 </div>
               </div>
-              <button
-                style={{ ...S.btn('var(--c-cyan)'), flexShrink: 0, marginLeft: 'auto' }}
-                onClick={() => router.push(`/teacher?class=${c.id}`)}
-              >
-                {chips[c.id]?.toGrade > 0 ? 'Review work →' : 'Open class →'}
-              </button>
+              <dl className="teacher-class-facts tcc-facts">
+                <div><dt>Students</dt><dd>{c.student_count}</dd></div>
+                <div>
+                  <dt>Join code</dt>
+                  <dd className="tcc-code">
+                    <span aria-label={`Join code ${c.code.split('').join(' ')}`}>{c.code}</span>
+                    <button
+                      type="button"
+                      className="tcc-copy"
+                      aria-label={`Copy join code ${c.code}`}
+                      onClick={() => {
+                        void (async () => {
+                          try {
+                            await navigator.clipboard.writeText(c.code);
+                            toast('Join code copied.');
+                          } catch {
+                            toast(`Could not copy. The join code is ${c.code}.`, { kind: 'error' });
+                          }
+                        })();
+                      }}
+                    >
+                      Copy
+                    </button>
+                  </dd>
+                </div>
+                {/* r10 T7: Year and Role are background facts, set quieter than Students and Join code. */}
+                <div className="tcc-quiet"><dt>Year</dt><dd>{c.school_year || 'Not set'}</dd></div>
+                <div className="tcc-quiet"><dt>Role</dt><dd style={{ textTransform: 'capitalize' }}>{c.role}</dd></div>
+              </dl>
+              <div className="tcc-action">
+                <button
+                  style={{ ...S.btn('var(--c-cyan)'), flexShrink: 0 }}
+                  onClick={() => router.push(`/teacher?class=${c.id}`)}
+                >
+                  {chips[c.id]?.toGrade > 0 ? 'Review work →' : 'Open class →'}
+                </button>
+              </div>
             </div>
           ))}
         </div>
-      )}
-      {/* Create form */}
-      <div className="teacher-create-card" style={{ ...S.card, marginTop: 24, maxWidth: 880 }}>
-        <h2 style={S.h2}>Create class</h2>
-        <form onSubmit={(e) => { void handleCreate(e); }} style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-          <label htmlFor="new-class-name" style={{ fontSize: 14, fontWeight: 600 }}>Class name</label>
-          <input
-            style={{ ...S.input, width: 'min(100%, 360px)', minWidth: 0, flex: '1 1 300px' }}
-            id="new-class-name"
-            placeholder="e.g. Introduction to coding"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            required
-          />
-          <button
-            type="submit"
-            disabled={creating || !newName.trim()}
-            style={creating || !newName.trim() ? S.btnDisabled : S.btn('var(--c-purple)')}
-          >
-            {creating ? 'Creating…' : 'Create class'}
-          </button>
-        </form>
-        {createError && <p style={S.error}>{createError}</p>}
-      </div>
 
     </div>
   );
@@ -2240,7 +2700,7 @@ function parseTab(v: string | null): TabId | undefined {
   return TABS.some((t) => t.id === v) ? (v as TabId) : undefined;
 }
 
-function DetailView({ classId, initialTab }: { classId: string; initialTab?: TabId }) {
+function DetailView({ classId, initialTab, initialFilter }: { classId: string; initialTab?: TabId; initialFilter?: 'behind' }) {
   const desktop = useGradingWeightsDesktop();
   const [compact, setCompact] = useState(false);
   useEffect(() => {
@@ -2280,6 +2740,20 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
   const [drawerEmail, setDrawerEmail] = useState<string | null>(null);
   // The lesson to open expanded inside the drawer (a chart or quiz from the Today queue, a grid cell).
   const [drawerLesson, setDrawerLesson] = useState<string | null>(null);
+  // r7 T6: the roster starts sorted by name A-Z, so a heading always shows which column orders the list.
+  const [rosterSort, setRosterSort] = useState<RosterSort>(initialFilter === 'behind' ? { key: 'missing', dir: 'desc' } : { key: 'name', dir: 'asc' });
+  // ux2 T6: "N students behind" on the class card opens the roster showing exactly those N students.
+  const [rosterFilter, setRosterFilter] = useState<'behind' | null>(initialFilter ?? null);
+  function clearRosterFilter() {
+    setRosterFilter(null);
+    setRosterSort({ key: 'name', dir: 'asc' });
+    try {
+      const u = new URL(window.location.href);
+      u.searchParams.delete('filter');
+      window.history.replaceState(window.history.state, '', u.toString());
+    } catch { /* fine */ }
+  }
+  const rosterSortIsDefault = rosterSort?.key === 'name' && rosterSort.dir === 'asc';
 
   // Section tabs. Seeded from ?tab= (or the top-nav "Gradebook" shortcut's ?view=gradebook) on mount only.
   // With no explicit tab the page opens on Students, and moves itself to Today once if submissions are
@@ -2300,23 +2774,71 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
       window.history.replaceState(window.history.state, '', u.toString());
     } catch { /* an address bar we cannot rewrite is not worth failing a tab click over */ }
   }
+  // On a phone the tab row scrolls sideways: keep the open tab in view (Class settings starts off-screen).
+  useEffect(() => {
+    if (!compact) return;
+    const tab = document.getElementById(`tab-${activeTab}`);
+    const row = tab?.parentElement;
+    if (!tab || !row) return;
+    const left = tab.offsetLeft - row.offsetLeft;
+    if (left < row.scrollLeft || left + tab.offsetWidth > row.scrollLeft + row.clientWidth) {
+      row.scrollLeft = Math.max(0, left - 16);
+    }
+  }, [activeTab, compact, loading]);
+  // ux2 T5: the class tabs' height, so a queue card's sticky header sits just under them; and whether a
+  // grading form has focus, so on a phone the tabs stop sticking while the teacher types (they took ~110px of
+  // the ~500px a keyboard leaves). --kb-inset lifts the sticky Save row above an on-screen keyboard.
+  const tabsRef = useRef<HTMLDivElement | null>(null);
+  const [tabsH, setTabsH] = useState(0);
+  const [grading, setGrading] = useState(false);
+  const [kbInset, setKbInset] = useState(0);
+  useEffect(() => {
+    const el = tabsRef.current;
+    if (!el) return;
+    const sync = () => setTabsH(Math.round(el.getBoundingClientRect().height));
+    sync();
+    const ro = new ResizeObserver(sync);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [loading]);
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const sync = () => setKbInset(Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop)));
+    sync();
+    vv.addEventListener('resize', sync);
+    vv.addEventListener('scroll', sync);
+    return () => { vv.removeEventListener('resize', sync); vv.removeEventListener('scroll', sync); };
+  }, []);
+  const studentNames = useMemo(() => {
+    const out: Record<string, { firstName?: string | null; lastName?: string | null }> = {};
+    for (const [email, p] of progressMap) out[email] = { firstName: p.firstName, lastName: p.lastName };
+    return out;
+  }, [progressMap]);
+
   // Remember the class for next time (the class list and the top-nav Gradebook shortcut offer it first).
   useEffect(() => {
     try { window.localStorage.setItem('shcode:lastClass', classId); } catch { /* private window: fine */ }
   }, [classId]);
 
+  // Only the first load shows "Loading…". A refresh after an action (add a student, bulk enroll, a co-teacher)
+  // keeps the page on screen: blanking it unmounted every panel, so the bulk-enroll result vanished as it
+  // arrived and the teacher lost their place (ux2 T7).
+  const loadedOnce = useRef(false);
   const loadDetail = useCallback(async () => {
-    setLoading(true);
+    if (!loadedOnce.current) setLoading(true);
     setLoadError('');
     const result = await apiFetch<ClassDetail>(`/api/classes/${classId}`);
     if (result.error !== null) {
-      setLoadError(result.error);
+      if (loadedOnce.current) toast(`Could not refresh the class: ${result.error}`, { kind: 'error' });
+      else setLoadError(result.error);
     } else {
+      loadedOnce.current = true;
       setDetail(result.data);
       setCurrentCode(result.data.class.code);
     }
     setLoading(false);
-  }, [classId]);
+  }, [classId, toast]);
 
   useEffect(() => {
     void loadDetail();
@@ -2347,17 +2869,29 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
   }, []);
 
   // How many submissions are waiting for this teacher: the Today badge, and the reason to open on Today.
+  // Bumped after a score is saved in the queue (ux1 G3), so the badge and the Needs attention chips drop at once.
+  const [gradedTick, setGradedTick] = useState(0);
   useEffect(() => {
     if (!detail) return;
     let cancelled = false;
     void apiFetch<{ awaiting_grade?: unknown[] }>(`/api/classes/${classId}/needs-attention`).then((res) => {
       if (cancelled) return;
+      if (res.error !== null && gradedTick > 0) return; // a failed refresh keeps the count it had
       const n = res.error === null ? (res.data.awaiting_grade?.length ?? 0) : 0;
       setAwaitingCount(n);
-      if (n > 0 && !pickedTab.current) setActiveTab('today');
+      if (n > 0 && !pickedTab.current && gradedTick === 0) setActiveTab('today');
     });
     return () => { cancelled = true; };
-  }, [detail, classId]);
+  }, [detail, classId, gradedTick]);
+  // Whether a teacher's score on each lesson changes the grade, for the queue's practice label and order (ux1 G4).
+  const lessonWeights = useMemo(() => {
+    const out: Record<string, ScoreWeight> = {};
+    for (const [id, l] of lessonMap) {
+      const w = scoreWeight({ counts: lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode }) !== null, maxScore: l.maxScore });
+      if (w) out[id] = w;
+    }
+    return out;
+  }, [lessonMap]);
 
   async function handleRegenCode() {
     const ok = await confirm({
@@ -2413,10 +2947,13 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
     );
     setEnrolling(false);
     if (result.error !== null) {
-      if (result.status === 404) setEnrollError('No account found for that email.');
-      else if (result.status === 409) setEnrollError('Already enrolled.');
-      else setEnrollError(result.error);
+      // Say what to do next, not only what went wrong (ux2 T7).
+      if (result.status === 404 && /account/i.test(result.error)) setEnrollError(`No account uses ${enrollEmail.trim()} yet. They need to sign up first. Share the join code ${currentCode}, or add them here after they sign up.`);
+      else if (result.status === 409) setEnrollError(`${enrollEmail.trim()} is already in this class.`);
+      else if (result.status === 400 && /not a student/i.test(result.error)) setEnrollError(`${enrollEmail.trim()} is a teacher account, so it cannot be added as a student. Add them as a co-teacher under Class settings instead.`);
+      else setEnrollError(`Could not add ${enrollEmail.trim()}: ${result.error.replace(/\.$/, '')}. Nothing changed.`);
     } else {
+      toast(`Added ${enrollEmail.trim()} to the class.`);
       setEnrollEmail('');
       void loadDetail();
     }
@@ -2529,35 +3066,55 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
 
   const { class: cls, isOwner, roster, coTeachers } = detail;
   const isArchived = !!cls.archived_at;
+  // ux2 T6: staff on the roster (owner, co-teacher, non-student account) are listed last and never counted.
+  const isStaffRow = (email: string) => progressMap.get(email)?.staff === true;
+  const studentRoster = roster.filter((r) => !isStaffRow(r.student_email));
+  const staffRoster = roster.filter((r) => isStaffRow(r.student_email));
+  const behindRoster = studentRoster.filter((r) => (progressMap.get(r.student_email)?.gradedMissing ?? 0) > 0);
+  const rosterShown = rosterFilter === 'behind'
+    ? sortRosterRows(behindRoster, rosterSort, (e) => progressMap.get(e))
+    : [...sortRosterRows(studentRoster, rosterSort, (e) => progressMap.get(e)), ...staffRoster];
+  // r8 T7: when every student has the same number of graded lessons, the heading says it once ("of 149") and
+  // each row shows just the count. A class whose totals differ keeps the per-row fractions.
+  const rosterTotals = new Set(studentRoster.map((r) => progressMap.get(r.student_email)?.gradedTotal).filter((n): n is number => typeof n === 'number'));
+  const rosterCommonTotal = rosterTotals.size === 1 ? [...rosterTotals][0] : null;
 
   return (
-    <div className={activeTab === 'gradebook' ? 'teacher-gradebook' : 'teacher-frame'}>
+    <div
+      className={activeTab === 'gradebook' ? 'teacher-gradebook' : 'teacher-frame'}
+      style={{ ['--teacher-tabs-h' as string]: `${grading && compact ? 0 : tabsH}px`, ['--kb-inset' as string]: `${kbInset}px` } as React.CSSProperties}
+      onFocus={(e) => setGrading(!!(e.target as HTMLElement).closest?.('.override-form'))}
+      onBlur={(e) => { if (!(e.relatedTarget as HTMLElement | null)?.closest?.('.override-form')) setGrading(false); }}
+    >
       {/* Back link */}
+      {/* r7 T8: a secondary link, so the reading face at 14px, not small mono. */}
       <button
-        style={{ background: 'none', border: 'none', color: 'var(--c-cyan)', cursor: 'pointer', fontSize: 13, padding: 0, marginBottom: 8 }}
+        className="teacher-back-link"
+        style={{ background: 'none', border: 'none', color: 'var(--c-cyan)', cursor: 'pointer', fontFamily: 'var(--font-prose)', fontSize: 14, fontWeight: 500, padding: 0, marginBottom: compact ? 4 : 8 }}
         onClick={() => router.push('/teacher')}
       >
-        ← Back to list
+        ← All classes
       </button>
 
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: compact ? 'wrap' : 'nowrap', gap: 8, marginBottom: 8 }}>
-        <div style={{ minWidth: 0, flex: 1, flexBasis: compact ? '100%' : undefined }}>
+      {/* Header. On a phone the Actions menu stays beside the title instead of taking a row of its own. */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'nowrap', gap: 8, marginBottom: compact ? 4 : 8 }}>
+        <div style={{ minWidth: 0, flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4, minWidth: 0 }}>
-            <h1 style={{ ...S.h1, fontSize: 28, lineHeight: 1.2, margin: 0, overflowWrap: 'anywhere' }}>{cls.name}</h1>
+            <h1 style={{ ...S.h1, fontSize: compact ? 21 : 28, lineHeight: 1.2, margin: 0, overflowWrap: 'anywhere' }}>{cls.name}</h1>
             {isArchived && <span style={S.badge(true)}>Archived</span>}
           </div>
-          <div style={{ display: 'flex', gap: compact ? 8 : 14, color: 'var(--c-meta)', fontSize: 13, flexWrap: 'wrap' }}>
-            {cls.school_year && <span>Year: {cls.school_year}</span>}
-            {!compact && <span>Created: {fmt(cls.created_at)}</span>}
-            <span title="Students join with this code. Regenerate it under Class settings.">Join code: <strong style={{ fontFamily: 'monospace', color: 'var(--c-cyan)', letterSpacing: '0.08em' }}>{currentCode}</strong></span>
-            {cls.archived_at && <span>Archived: {fmt(cls.archived_at)}</span>}
+          {/* Labelled facts (system pass rule 3): label in meta, value in the body colour. */}
+          <div style={{ display: 'flex', gap: compact ? '4px 16px' : '4px 24px', fontFamily: 'var(--font-prose)', fontSize: 13, lineHeight: '20px', flexWrap: 'wrap', alignItems: 'baseline' }}>
+            <span title="Students join with this code. Regenerate it under Class settings."><span style={S.metaLabel}>Join code</span> <strong style={{ fontFamily: 'var(--font-mono)', fontSize: 14, color: 'var(--c-cyan)', letterSpacing: '0.04em' }}>{currentCode}</strong></span>
+            {cls.school_year && <span><span style={S.metaLabel}>Year</span> <span style={S.metaValue}>{cls.school_year}</span></span>}
+            {!compact && <span><span style={S.metaLabel}>Created</span> <span style={S.metaValue}>{fmt(cls.created_at)}</span></span>}
+            {cls.archived_at && <span><span style={S.metaLabel}>Archived</span> <span style={S.metaValue}>{fmt(cls.archived_at)}</span></span>}
           </div>
         </div>
 
         {/* Owner-only actions */}
         {isOwner && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, flexShrink: 0, maxWidth: compact ? '45%' : undefined }}>
             <RowMenu buttonText="Actions" label="Class actions" items={[
               { label: isArchived ? 'Unarchive class' : 'Archive class…', disabled: archiving, onSelect: () => { void handleArchiveToggle(); } },
               { label: 'Delete permanently…', danger: true, disabled: deleting, onSelect: () => { void handleDelete(); } },
@@ -2573,11 +3130,17 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
       <div
         role="tablist"
         aria-label="Class sections"
-        style={{ position: 'sticky', top: 0, zIndex: 20, background: 'var(--c-bg)', padding: '8px 0', marginBottom: 12, display: compact ? 'grid' : 'flex', gridTemplateColumns: compact ? 'repeat(3, minmax(0, 1fr))' : undefined, gap: 8, flexWrap: 'nowrap', overflowX: 'auto', borderBottom: '1px solid var(--c-line)' }}
+        ref={tabsRef}
+        className="teacher-tabs"
+        // On a phone the five tabs sit in two rows, all visible: a single scrolling row lost 3-0 to it in the
+        // blind panel (Schedule clipped, Class settings out of sight). A 6-track grid: three tabs of two tracks
+        // on the first row, two of three on the second, so both rows fill the width and "Class settings" gets
+        // the room to stay on one line.
+        style={{ position: grading && compact ? 'static' : 'sticky', top: 0, zIndex: 20, background: 'var(--c-bg)', padding: compact ? '6px 0' : '8px 0', marginBottom: 12, display: compact ? 'grid' : 'flex', gridTemplateColumns: compact ? 'repeat(6, minmax(0, 1fr))' : undefined, gap: compact ? 6 : 8, flexWrap: 'nowrap', overflowX: 'auto', borderBottom: '1px solid var(--c-line)' }}
       >
-        {TABS.map((t) => {
+        {TABS.map((t, tabIndex) => {
           const on = activeTab === t.id;
-          const badge = t.id === 'today' ? (awaitingCount ?? 0) : t.id === 'students' ? roster.length : 0;
+          const badge = t.id === 'today' ? (awaitingCount ?? 0) : t.id === 'students' ? studentRoster.length : 0;
           return (
             <button
               key={t.id}
@@ -2604,8 +3167,14 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                 fontWeight: on ? 700 : 500,
                 boxShadow: 'none',
                 border: `1px solid ${on ? 'var(--c-purple)' : 'var(--c-line)'}`,
-                gridColumn: compact && t.id === 'settings' ? 'span 2' : undefined,
-                borderRadius: 6, flexShrink: 0, whiteSpace: 'nowrap', fontSize: compact ? 12 : 14, padding: compact ? '4px 8px' : '4px 16px',
+                borderRadius: 6, flexShrink: 0, whiteSpace: 'nowrap', fontSize: compact ? 13 : 14, padding: compact ? '4px 8px' : '4px 16px',
+                // Phone: equal-height cells, label centred; a label that still cannot fit (a wider font from
+                // Appearance settings) wraps inside its cell instead of being clipped.
+                ...(compact ? {
+                  gridColumn: tabIndex < 3 ? 'span 2' : 'span 3',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+                  whiteSpace: 'normal', height: 'auto', minHeight: 36, lineHeight: '16px', minWidth: 0,
+                } : {}),
               }}
             >
               {t.label}
@@ -2623,11 +3192,14 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
       </div>
 
       {activeTab === 'today' && (
-        <div role="tabpanel" id={`panel-today`} aria-labelledby={`tab-today`} style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
-        {/* Needs Attention view */}
-          <div style={{ ...S.card, padding: compact ? 16 : 20, marginBottom: 0 }}>
-            <h2 style={{ ...S.h2, fontSize: 18, marginBottom: 16 }}>Needs Attention</h2>
+        <div role="tabpanel" id={`panel-today`} aria-labelledby={`tab-today`} style={{ display: 'grid', gap: 12, gridTemplateColumns: 'minmax(0, 1fr)' }}>
+        {/* Needs Attention view: one strip, the heading beside its chips, so the grading form below sits
+            in the first screen. An opened chip still spreads to the full width under the strip. */}
+          <div style={{ ...S.card, padding: compact ? '8px 16px' : '8px 20px', marginBottom: 0, display: 'flex', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px 16px' }}>
+            <h2 style={{ ...S.h2, fontSize: 18, lineHeight: '36px', margin: 0, whiteSpace: 'nowrap' }}>Needs attention</h2>
+            <div style={{ flex: '1 1 320px', minWidth: 0 }}>
             <NeedsAttentionPanel
+              key={gradedTick}
               classId={classId}
               lessonTitles={lessonTitles}
               onOpenStudent={(email: string) => { setDrawerLesson(null); setDrawerEmail(email); }}
@@ -2642,11 +3214,12 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                 }
               }}
             />
+            </div>
           </div>
         {/* Submission Review Queue */}
-        <div id="submission-review-queue" style={{ ...S.card, padding: compact ? 16 : 20, marginBottom: 0, scrollMarginTop: 100 }}>
-          <h2 style={{ ...S.h2, fontSize: 18, marginBottom: 16 }}>Submission Review Queue</h2>
-          <SubmissionQueue classId={classId} lessonTitles={lessonTitles} />
+        <div id="submission-review-queue" style={{ ...S.card, padding: compact ? 16 : '16px 20px', marginBottom: 0, scrollMarginTop: 100 }}>
+          <h2 style={{ ...S.h2, fontSize: 18, marginBottom: 8 }}>Submission review queue</h2>
+          <SubmissionQueue classId={classId} lessonTitles={lessonTitles} lessonWeights={lessonWeights} studentNames={studentNames} onGraded={() => setGradedTick((t) => t + 1)} />
         </div>
         {/* Past due */}
         <div style={{ ...S.card, padding: compact ? 16 : 20, marginBottom: 0 }}>
@@ -2659,16 +3232,19 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
       {activeTab === 'students' && (
         <div role="tabpanel" id={`panel-students`} aria-labelledby={`tab-students`} style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
         {/* Roster view */}
-          <div style={{ ...S.card, padding: compact ? 16 : 20, marginBottom: 0 }}>
+          <div className={compact ? 'roster-panel is-compact' : 'roster-panel'} style={{ ...S.card, padding: compact ? 16 : 20, marginBottom: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 4 }}>
-            <h2 style={{ ...S.h2, fontSize: 18, lineHeight: '26px', marginBottom: 0 }}>Roster ({roster.length})</h2>
+            <h2 style={{ ...S.h2, fontSize: 18, lineHeight: '26px', marginBottom: 0 }}>Roster ({studentRoster.length})</h2>
             <button
               type="button"
-              style={{ ...(roster.length === 0 || progressMap.size === 0 ? S.btnDisabled : S.btn('var(--c-cyan)')), ...(compact ? { fontSize: 12, padding: '8px 12px', lineHeight: '18px' } : {}) }}
+              // A utility, not the page's action: outlined and quiet, so each row's Open is what reads as the action.
+              // r7 T7: on a phone it sits on its own line under the heading as a quiet text action.
+              className={compact ? 'teacher-utility-btn roster-csv-compact' : 'teacher-utility-btn'}
+              style={compact ? undefined : (roster.length === 0 || progressMap.size === 0 ? S.btnDisabled : { ...S.btn('transparent'), color: 'var(--c-fg)', border: '1px solid var(--c-line)', fontWeight: 500 })}
               disabled={roster.length === 0 || progressMap.size === 0}
               title="One row per student: the grade so far, how many graded lessons are done and past due, and a column per grade category. Ready to copy into a spreadsheet or the grade book."
               onClick={() => {
-                const csv = buildGradesCsv(roster.map((r) => {
+                const csv = buildGradesCsv(studentRoster.map((r) => {
                   const p = progressMap.get(r.student_email);
                   return {
                     email: r.student_email,
@@ -2682,53 +3258,129 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                     categories: p?.categories,
                   };
                 }));
-                downloadCsv(csv, `grades-${cls.name.replace(/\s+/g, '-')}-${schoolDateString(Date.now())}.csv`);
+                const file = `grades-${cls.name.replace(/\s+/g, '-')}-${schoolDateString(Date.now())}.csv`;
+                downloadCsv(csv, file);
+                toast(`Downloaded ${file}: one row per student with the grade so far.`);
               }}
             >
               Download grades (CSV)
             </button>
           </div>
+            {/* ux2 T6: the class card's "N students behind" lands here showing exactly those students. */}
+            {rosterFilter === 'behind' && (
+              <div role="status" className="roster-filter-note">
+                <span>
+                  Showing the {behindRoster.length} student{behindRoster.length === 1 ? '' : 's'} with graded work past due and not done,
+                  most past due first.
+                </span>
+                <button type="button" className="sq-score-use" onClick={clearRosterFilter}>Show everyone</button>
+              </div>
+            )}
             {roster.length === 0 ? (
-              <p style={{ color: 'var(--c-meta)', fontSize: 14 }}>No students enrolled yet.</p>
+              <p style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 15 }}>No students enrolled yet.</p>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: compact ? 6 : 0 }}>
-                {!compact && <div style={{ display: 'grid', gridTemplateColumns: 'minmax(180px, 2fr) 154px 112px 80px 150px 128px', gap: 16, padding: '12px 12px 8px', color: 'var(--c-fg)', fontSize: 12, fontWeight: 600 }}><span>Student</span><span>Grade so far</span><span>Graded done</span><span>Past due</span><span>Last active</span><span /></div>}
-                {/* Desktop: 18px name + 14px email + 10px padding + 1px border = 43px.
-                    Phone: 22px name/grade + 18px counts + 28px actions + 8px gaps
-                    + 16px padding + 1px border = 93px; counts and actions own full rows. */}
-                {roster.map((row) => {
+              <div className="roster-list" role={compact ? undefined : 'table'} aria-label={compact ? undefined : 'Roster'} style={{ display: 'flex', flexDirection: 'column', gap: compact ? 8 : 0 }}>
+                {!compact && (
+                  <div role="row" style={{ display: 'grid', gridTemplateColumns: ROSTER_COLS, gap: 16, padding: '8px 12px 4px', color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600, borderBottom: '1px solid var(--c-line)' }}>
+                    {([
+                      ['name', 'Student'], ['grade', 'Grade so far'], [null, 'Graded done'], ['missing', 'Past due'], ['active', 'Last active'],
+                    ] as const).map(([key, text]) => {
+                      if (key === null) return (
+                        <span key={text} role="columnheader" style={{ padding: '4px 0', whiteSpace: 'nowrap' }} title="Graded lessons this student has finished, out of every graded lesson in the course">
+                          {text}{rosterCommonTotal != null && <span className="roster-head-of"> (of {rosterCommonTotal})</span>}
+                        </span>
+                      );
+                      const on = rosterSort?.key === key;
+                      return (
+                        <span key={key} role="columnheader" aria-sort={on ? (rosterSort!.dir === 'asc' ? 'ascending' : 'descending') : 'none'}>
+                          <button
+                            type="button"
+                            className={`roster-sort${on ? ' is-on' : ''}`}
+                            onClick={() => setRosterSort(on ? { key, dir: rosterSort!.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: ROSTER_FIRST_DIR[key] })}
+                            title={on ? `Sorted by ${text.toLowerCase()}, ${rosterSort!.dir === 'asc' ? (key === 'name' ? 'A to Z' : 'lowest first') : (key === 'name' ? 'Z to A' : 'highest first')}. Click to reverse.` : `Sort by ${text.toLowerCase()}`}
+                          >
+                            {text}
+                            <span aria-hidden="true" className="roster-sort-arrow">{on ? (rosterSort!.dir === 'asc' ? <ArrowUp size={14} strokeWidth={2.5} /> : <ArrowDown size={14} strokeWidth={2.5} />) : <ArrowUpDown size={12} strokeWidth={2} />}</span>
+                          </button>
+                        </span>
+                      );
+                    })}
+                    <span role="columnheader">
+                      {!rosterSortIsDefault && (
+                        <button type="button" className="roster-sort roster-sort-reset" onClick={() => setRosterSort({ key: 'name', dir: 'asc' })}>Reset to A-Z</button>
+                      )}
+                      {/* r9 T4: a visible, quiet heading over the row actions. */}
+                      {rosterSortIsDefault && <span className="roster-actions-head">Actions</span>}
+                    </span>
+                  </div>
+                )}
+                {/* r8 T1: on a phone the grade's label is said once, above the cards, not on every card.
+                    r9 T5: said to screen readers only; the cards are self-explanatory on screen. */}
+                {compact && (
+                  <div className="roster-card-head sr-only"><span>Student</span> <span>Grade so far</span></div>
+                )}
+                {/* Desktop: 20px name + 18px email + 12px padding + 1px border = 51px.
+                    Phone: row 1 = name + grade, row 2 = counts on one line + Open and a compact More
+                    (about 64px). Putting Open/More on the name row stranded the grade below them (lost 3-0). */}
+                {rosterShown.map((row) => {
                   const prog = progressMap.get(row.student_email);
+                  const staffRow = prog?.staff === true;
                   // A stale or older response can lack weightedPercent; a NaN
                   // here would render "NaN% of grade", so fall back to 0.
                   const wp = prog && Number.isFinite(prog.weightedPercent) ? prog.weightedPercent : 0;
                   return (
                     <div
                       key={row.student_email}
-                      style={{ background: 'var(--c-bg)', borderRadius: compact ? 6 : 0, padding: compact ? '8px 12px' : '4px 12px', borderBottom: '1px solid var(--c-line)', display: 'grid', gridTemplateColumns: compact ? 'minmax(0, 1fr) auto' : 'minmax(180px, 2fr) 154px 112px 80px 150px 128px', alignItems: 'center', minWidth: 0, minHeight: compact ? undefined : 43, boxSizing: 'border-box', gap: compact ? '4px 8px' : 16 }}
+                      role={compact ? undefined : 'row'}
+                      className={compact ? 'roster-pcard' : undefined}
+                      style={{ background: 'var(--c-bg)', borderRadius: compact ? 8 : 0, padding: compact ? '10px 14px' : '6px 12px', borderBottom: '1px solid var(--c-line)', display: 'grid', gridTemplateColumns: compact ? 'minmax(0, 1fr) auto' : ROSTER_COLS, alignItems: 'center', minWidth: 0, minHeight: compact ? undefined : 51, boxSizing: 'border-box', gap: compact ? '4px 10px' : 16 }}
                     >
-                      <div style={{ minWidth: 0 }} title={`Enrolled ${fmt(row.enrolled_at)} by ${row.enrolled_by ?? 'self'}`}>
-                        <div style={{ fontSize: 15, lineHeight: compact ? '22px' : '18px', fontWeight: 600, color: 'var(--c-fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fullName(prog?.firstName, prog?.lastName) ?? row.student_email}</div>
-                        {!compact && <div style={{ color: 'var(--c-meta)', fontSize: 13, lineHeight: '14px', marginTop: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.student_email}</div>}
+                      {/* Phone: the name and the grade share row 1 across BOTH columns (the grade laid over its
+                          right end), so column 2 is only as wide as Open + ⋯ and the counts in row 2 fit one line. */}
+                      <div role={compact ? undefined : 'cell'} style={{ minWidth: 0, gridColumn: compact ? '1 / -1' : undefined, gridRow: compact ? 1 : undefined, paddingRight: compact ? 64 : undefined, fontFamily: 'var(--font-prose)' }} title={`Enrolled ${fmt(row.enrolled_at)} by ${row.enrolled_by ?? 'self'}`}>
+                        <div style={{ fontSize: compact ? 16 : 15, lineHeight: compact ? '22px' : '20px', fontWeight: compact ? 700 : 600, color: 'var(--c-fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fullName(prog?.firstName, prog?.lastName) ?? row.student_email}</div>
+                        {!compact && <div style={{ color: 'var(--c-meta)', fontSize: 13, lineHeight: '18px', marginTop: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.student_email}</div>}
+                        {staffRow && <div className="roster-staff-note">Teacher account: not counted in the class numbers</div>}
                       </div>
-                      <div title="Grade so far, under this class's weights" style={{ display: 'flex', alignItems: 'center', justifyContent: compact ? 'flex-end' : undefined, gap: 12, whiteSpace: 'nowrap', lineHeight: '22px' }}>
-                        {!compact && <MiniBar pct={wp} />}
-                        <strong style={{ color: prog?.gradedCounted ? pctColor(wp) : 'var(--c-meta)', fontSize: compact ? 16 : 15, fontVariantNumeric: 'tabular-nums' }}>{prog?.gradedCounted ? `${wp}%` : '—'}</strong>
+                      <div role={compact ? undefined : 'cell'} title="Grade so far, under this class's weights" style={{ gridColumn: compact ? '1 / -1' : undefined, gridRow: compact ? 1 : undefined, justifySelf: compact ? 'end' : undefined, display: 'flex', alignItems: compact ? 'baseline' : 'center', justifyContent: compact ? 'flex-end' : undefined, gap: compact ? 6 : 10, whiteSpace: 'nowrap', lineHeight: compact ? '22px' : '22px' }}>
+                        {/* The coloured number is the grade; completion is the "Graded done" column (on a phone, the
+                            "graded" count under the name), so no bar here suggests course progress. On a phone the
+                            number carries its own label under it, since there is no column header above it. */}
+                        {/* Phone: one line, the label in meta before the number ("Grade so far 100%"). */}
+                        {compact && <span className="sr-only">Grade so far </span>}
+                        <strong style={{ color: prog?.gradedCounted && !staffRow ? countedGradeColor(wp) : 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: compact ? 16 : 15, fontVariantNumeric: 'tabular-nums', minWidth: compact ? undefined : 44, textAlign: 'right' }}>{prog?.gradedCounted && !staffRow ? `${wp}%` : '—'}</strong>
                       </div>
-                      <div style={{ gridColumn: compact ? '1 / -1' : undefined, minWidth: 0, display: 'flex', flexWrap: 'wrap', gap: compact ? '0 6px' : 8, lineHeight: '18px', fontSize: compact ? 12 : 14, color: compact ? 'var(--c-meta)' : 'var(--c-fg)', fontVariantNumeric: 'tabular-nums' }}>
-                        <span style={{ whiteSpace: 'nowrap' }}>{prog?.gradedDone ?? 0}/{prog?.gradedTotal ?? '—'}{compact && ' graded'}</span>
-                        {compact && <span aria-hidden="true">·</span>}
-                        {compact && <span style={{ whiteSpace: 'nowrap', fontWeight: prog?.gradedMissing ? 700 : 400, color: prog?.gradedMissing ? 'var(--c-red)' : 'var(--c-meta)' }}>{prog?.gradedMissing ?? 0} past due</span>}
+                      <div role={compact ? undefined : 'cell'} style={{ gridColumn: compact ? 1 : undefined, gridRow: compact ? 2 : undefined, minWidth: 0, display: 'flex', flexWrap: compact ? 'wrap' : 'nowrap', overflow: compact ? undefined : 'hidden', gap: compact ? '4px 4px' : 8, lineHeight: '18px', fontFamily: 'var(--font-prose)', fontSize: compact ? 13 : 14, color: compact ? 'var(--c-meta)' : 'var(--c-fg)', fontVariantNumeric: 'tabular-nums' }}>
+                        {/* r8 T1: on a phone the two counts are one quiet meta line, "7/149 graded · 6 past due",
+                            the past-due part red only when it is above 0. */}
+                        <span className={compact ? 'roster-chip' : undefined} style={{ whiteSpace: 'nowrap' }}>{prog?.gradedDone ?? 0}{(compact || rosterCommonTotal == null) && <>/{prog?.gradedTotal ?? '—'}</>}{compact && ' graded'}</span>
+                        {compact && <span aria-hidden="true" className="roster-chip-sep">·</span>}
+                        {compact && <span className={prog?.gradedMissing ? 'roster-chip is-late' : 'roster-chip'} style={{ whiteSpace: 'nowrap' }}>{prog?.gradedMissing ?? 0} past due</span>}
                       </div>
-                      {!compact && <><strong style={{ fontSize: 15, fontVariantNumeric: 'tabular-nums', color: prog?.gradedMissing ? 'var(--c-red)' : 'var(--c-meta)' }}>{prog?.gradedMissing || '—'}</strong><span title={prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'} style={{ minWidth: 0, fontSize: 13, lineHeight: '18px', color: 'var(--c-fg)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'}</span></>}
-                      <div style={{ gridColumn: compact ? '1 / -1' : undefined, minWidth: 0, display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'flex-end', alignItems: 'center' }}>
+                      {/* r8 T7: past due is a small red badge above 0 and a plain 0 at zero, so the column compares. */}
+                      {!compact && <><span role="cell" style={{ fontFamily: 'var(--font-prose)', fontSize: 14, fontVariantNumeric: 'tabular-nums' }}>{prog?.gradedMissing ? <span className="roster-late-badge" title={`${prog.gradedMissing} graded lesson${prog.gradedMissing === 1 ? '' : 's'} past due`}>{prog.gradedMissing}</span> : <span className="roster-zero">0</span>}</span><span role="cell" title={prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'} style={{ minWidth: 0, fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: '18px', color: prog?.last_active ? 'var(--c-fg)' : 'var(--c-meta)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{prog?.last_active ? fmtTs(prog.last_active) : 'No activity yet'}</span></>}
+                      <div role={compact ? undefined : 'cell'} style={{ gridColumn: compact ? 2 : undefined, gridRow: compact ? 2 : undefined, minWidth: 0, display: 'flex', flexWrap: 'nowrap', gap: compact ? 6 : 8, justifyContent: 'flex-end', justifySelf: 'end', alignItems: 'center', paddingLeft: compact ? 0 : 8 }}>
+                        {/* The row's action: a full-strength cyan outline with a bold label and a faint tint, so it
+                            reads as the thing to press without a column of bright fills outshouting the grades. */}
                         <button
-                          style={{ ...S.btn('var(--c-cyan)'), padding: '4px 12px', lineHeight: '18px', flexShrink: 0, fontSize: 12 }}
+                          type="button"
+                          aria-label={`View progress for ${fullName(prog?.firstName, prog?.lastName) ?? row.student_email}`}
+                          title="Lessons, scores and submissions for this student"
+                          className="teacher-row-open"
+                          // r10 T4: on a phone the "Progress" button is narrower (padding 0 8px, no 64px minimum).
+                          style={{ background: 'color-mix(in srgb, var(--c-cyan) 8%, transparent)', color: 'var(--c-cyan)', border: '1px solid var(--c-cyan)', borderRadius: 4, height: 32, boxSizing: 'border-box', padding: compact ? '0 8px' : '0 14px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', lineHeight: '18px', flexShrink: 0, fontSize: 13, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
                           onClick={() => { setDrawerLesson(null); setDrawerEmail(row.student_email); }}
                         >
-                          Open
+                          {/* r7 T6: say what opens (the student's progress drawer), not just "Open". On a phone the
+                              row has room for a chevron only (its name says the same), so the card stays two rows. */}
+                          {/* r10 T4: on a phone it says what it opens ("Progress"); the accessible name is unchanged. */}
+                          {compact ? 'Progress' : 'View progress'}
                         </button>
                         <RowMenu
                           label={`More actions for ${row.student_email}`}
+                          buttonText={compact ? '⋯' : 'More'}
+                          caret={!compact}
+                          className={compact ? 'roster-more-compact' : undefined}
                           disabled={removingEmail === row.student_email}
                           items={[
                             { label: 'Remove from class…', danger: true, title: 'Takes them off this class roster. Their work is kept.', onSelect: () => { void handleRemove(row.student_email); } },
@@ -2747,6 +3399,8 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
           <h2 style={S.h2}>Add student by email</h2>
           <form onSubmit={(e) => { void handleEnroll(e); }} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' }}>
             <input
+              className="teacher-field"
+              aria-label="Student email"
               style={S.input}
               type="email"
               placeholder="student@example.com"
@@ -2757,17 +3411,17 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             <button
               type="submit"
               disabled={enrolling || !enrollEmail.trim()}
-              style={enrolling || !enrollEmail.trim() ? S.btnDisabled : S.btn('var(--c-green)')}
+              style={{ ...(enrolling || !enrollEmail.trim() ? S.btnDisabled : S.btn('var(--c-green)')), height: 36 }}
             >
               {enrolling ? 'Adding…' : 'Add student'}
             </button>
           </form>
-          {enrollError && <p style={S.error}>{enrollError}</p>}
+          {enrollError && <p role="alert" style={{ ...S.error, fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.5, maxWidth: '70ch' }}>{enrollError}</p>}
         </div>
         {/* Bulk enroll */}
         <div style={S.card}>
           <h2 style={S.h2}>Bulk enroll</h2>
-          <BulkEnrollmentForm classId={classId} onDone={() => { void loadDetail(); }} />
+          <BulkEnrollmentForm classId={classId} joinCode={currentCode} onDone={() => { void loadDetail(); }} />
         </div>
         {/* Textures and sounds students shared with this class (#81) */}
         <div style={S.card}>
@@ -2796,7 +3450,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         <div role="tabpanel" id={`panel-gradebook`} aria-labelledby={`tab-gradebook`} style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
         {/* Gradebook view */}
           <div style={{ ...S.card, padding: compact ? 16 : 20, marginBottom: 0 }}>
-            <h2 style={{ ...S.h2, marginBottom: 16 }}>Gradebook</h2>
+            <h2 style={{ ...S.h2, marginBottom: 12 }}>Gradebook</h2>
             <GradebookView
               classId={classId}
               className={cls.name}
@@ -2841,32 +3495,57 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
         <div style={{ ...S.card, marginBottom: 0, padding: compact ? 16 : 20 }}>
           <GradingWeightsPanel classId={classId} desktop={desktop} />
         </div>
-        <div style={{ display: 'grid', gap: 16, minWidth: 0 }}>
+        <div className="settings-side" style={{ display: 'grid', gap: 12, minWidth: 0 }}>
         {/* Code */}
-        <div style={{ ...S.card, padding: compact ? 16 : 20, marginBottom: 0 }}>
-          <div style={{ color: 'var(--c-meta)', fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Join Code</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
-            <span style={S.code}>{currentCode}</span>
-            {isOwner ? (
-              <button
-                style={regenerating ? S.btnDisabled : { ...S.btn('transparent'), color: 'var(--c-meta)', border: '1px solid var(--c-line)' }}
+        <div style={{ ...S.card, padding: 16, marginBottom: 0 }}>
+          {/* A labelled value at body size: the editable panels (weights, announcements) lead the page, not
+              the code. */}
+          {/* r7 T5: the routine action (Copy) sits beside the code; making a new code is in the card's menu,
+              with its confirm. */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 8 }}>
+            <h2 style={{ ...S.h2, margin: 0 }}>Join code</h2>
+            {isOwner && (
+              <RowMenu
+                label="Code options"
+                // r10 T6: the menu says what it is about, not just "More".
+                buttonText="Code options"
                 disabled={regenerating}
-                onClick={() => { void handleRegenCode(); }}
-              >
-                {regenerating ? 'Regenerating…' : 'Regenerate code'}
-              </button>
-            ) : (
-              // The server only lets the owner rotate the code; a button that always fails is worse than a sentence.
-              <span style={{ fontSize: 13, color: 'var(--c-meta)' }}>Only the class owner can make a new join code.</span>
+                items={[
+                  { label: regenerating ? 'Making a new code…' : 'Make a new join code…', danger: true, disabled: regenerating, title: 'The old code stops working right away', onSelect: () => { void handleRegenCode(); } },
+                ]}
+              />
             )}
           </div>
-          
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <span style={{ ...S.code, letterSpacing: '0.06em' }} aria-label={`Join code ${currentCode.split('').join(' ')}`}>{currentCode}</span>
+            <button
+              type="button"
+              className="teacher-utility-btn"
+              style={{ ...S.btn('transparent'), color: 'var(--c-cyan)', border: '1px solid var(--c-cyan)', fontWeight: 700 }}
+              aria-label={`Copy join code ${currentCode}`}
+              onClick={() => {
+                void (async () => {
+                  try {
+                    await navigator.clipboard.writeText(currentCode);
+                    toast('Join code copied.');
+                  } catch {
+                    toast(`Could not copy. The join code is ${currentCode}.`, { kind: 'error' });
+                  }
+                })();
+              }}
+            >
+              Copy
+            </button>
+          </div>
+          <p style={{ margin: '8px 0 0', fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.5, color: 'var(--c-meta)', maxWidth: '70ch' }}>
+            Students join this class with this code.{!isOwner && ' Only the class owner can make a new one.'}
+          </p>
         </div>
         {/* Co-teachers */}
-        <div style={{ ...S.card, marginBottom: 16 }}>
-          <h2 style={S.h2}>Co-teachers ({coTeachers.length})</h2>
+        <div style={{ ...S.card, marginBottom: 0, padding: 16 }}>
+          <h2 style={{ ...S.h2, marginBottom: 8 }}>Co-teachers ({coTeachers.length})</h2>
           {coTeachers.length === 0 ? (
-            <p style={{ color: 'var(--c-meta)', fontSize: 14, marginBottom: isOwner ? 16 : 0 }}>No co-teachers added yet.</p>
+            <p style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 15, margin: 0, marginBottom: isOwner ? 12 : 0 }}>No co-teachers added yet.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: isOwner ? 16 : 0 }}>
               {coTeachers.map((ct) => (
@@ -2878,7 +3557,7 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
                     <div style={{ fontFamily: 'monospace', fontSize: 14, color: 'var(--c-fg)', marginBottom: 4 }}>
                       {ct.teacher_email}
                     </div>
-                    <div style={{ fontSize: 13, color: 'var(--c-meta)' }}>
+                    <div style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-meta)' }}>
                       added {fmtTs(ct.added_at)}{ct.added_by ? ` by ${ct.added_by}` : ''}
                     </div>
                   </div>
@@ -2890,19 +3569,27 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
             </div>
           )}
           {isOwner && (
-            <form onSubmit={(e) => { void handleAddCoTeacher(e); }} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-              <input
-                style={S.input}
-                type="email"
-                placeholder="teacher@example.com"
-                value={coTeacherEmail}
-                onChange={(e) => setCoTeacherEmail(e.target.value)}
-                required
-              />
+            <form onSubmit={(e) => { void handleAddCoTeacher(e); }} style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+              {/* r9 T6: a persistent visible label, not only the placeholder. */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label htmlFor="co-teacher-email" style={{ fontFamily: 'var(--font-prose)', fontWeight: 600, color: 'var(--c-fg)', fontSize: 14 }}>
+                  Co-teacher&apos;s email
+                </label>
+                <input
+                  id="co-teacher-email"
+                  className="teacher-field"
+                  style={S.input}
+                  type="email"
+                  placeholder="teacher@example.com"
+                  value={coTeacherEmail}
+                  onChange={(e) => setCoTeacherEmail(e.target.value)}
+                  required
+                />
+              </div>
               <button
                 type="submit"
                 disabled={addingCoTeacher || !coTeacherEmail.trim()}
-                style={addingCoTeacher || !coTeacherEmail.trim() ? S.btnDisabled : S.btn('var(--c-purple)')}
+                style={{ ...(addingCoTeacher || !coTeacherEmail.trim() ? S.btnDisabled : S.btn('var(--c-purple)')), height: 36 }}
               >
                 {addingCoTeacher ? 'Adding…' : 'Add co-teacher'}
               </button>
@@ -2910,11 +3597,12 @@ function DetailView({ classId, initialTab }: { classId: string; initialTab?: Tab
           )}
           {coTeacherError && <p style={S.error}>{coTeacherError}</p>}
         </div>
-        </div>
-        {/* Announcements */}
-        <div style={S.card}>
-          <h2 style={S.h2}>Announcements</h2>
+        {/* Announcements: in the right-hand column on desktop, so it is visible without scrolling past the
+            weights (it used to sit under them while this column stood half empty). */}
+        <div style={{ ...S.card, marginBottom: 0, padding: 16 }}>
+          <h2 style={{ ...S.h2, marginBottom: 8 }}>Announcements</h2>
           <AnnouncementsPanel classId={classId} />
+        </div>
         </div>
         </div>
       )}
@@ -2947,7 +3635,7 @@ function TeacherPageInner() {
     <FeedbackProvider>
       <div style={S.page}>
         {classId ? (
-          <DetailView classId={classId} initialTab={parseTab(params.get('tab')) ?? (wantsGradebook ? 'gradebook' : undefined)} />
+          <DetailView classId={classId} initialTab={parseTab(params.get('tab')) ?? (wantsGradebook ? 'gradebook' : undefined)} initialFilter={params.get('filter') === 'behind' ? 'behind' : undefined} />
         ) : wantsGradebook ? (
           <GradebookRedirect />
         ) : (

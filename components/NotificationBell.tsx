@@ -13,6 +13,7 @@ import {
   CHANGES_CHANGED, CHANGES_SEEN, GAMES_SEEN_KEY, READ_ALL_KEY, SEEN_KEY,
   markAllNoticesRead, markNoticeRead, noticeItems, noticeSeen, noticeUnread, refreshNotices,
 } from '../lib/game-notices';
+import { ownedLocal } from '../lib/owned-storage';
 
 function when(ms: number): string {
   const d = Date.now() - ms;
@@ -40,7 +41,8 @@ export default function NotificationBell({ enabled }: { enabled: boolean }) {
     const onVisible = () => { if (document.visibilityState === 'visible') ask(); };
     const onChanged = () => ask(0);
     // Another tab opened a conversation or a game: what was read is in localStorage, so a recount is enough.
-    const onStorage = (e: StorageEvent) => { if (e.key === SEEN_KEY || e.key === GAMES_SEEN_KEY || e.key === READ_ALL_KEY) sync(); };
+    const watched = [SEEN_KEY, GAMES_SEEN_KEY, READ_ALL_KEY].map((k) => ownedLocal.fullKey(k));
+    const onStorage = (e: StorageEvent) => { if (e.key && watched.includes(e.key)) sync(); };
     document.addEventListener('visibilitychange', onVisible);
     window.addEventListener(CHANGES_CHANGED, onChanged);
     window.addEventListener(CHANGES_SEEN, sync);

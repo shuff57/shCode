@@ -91,28 +91,110 @@ function secretBytes(secret: string): Uint8Array {
 
 export type Role = 'admin' | 'teacher' | 'student';
 
-export async function signSession(email: string, role: Role, secret: string): Promise<string> {
-  return new SignJWT({ email, role })
+export async function signSession(
+  email: string,
+  role: Role,
+  secret: string,
+  /** Epoch seconds. Given when an existing session is re-signed to add `wo`, so it keeps its end. */
+  expiresAt?: number,
+): Promise<string> {
+  // `wo` is the account's work-owner id (lib/owned-storage.ts), so the middleware can
+  // check X-Work-Owner without recomputing it. Always present on a new session.
+  const wo = await workOwnerFor(email, secret);
+  return new SignJWT({ email, role, wo })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime(`${SESSION_TTL_SECONDS}s`)
+    .setExpirationTime(expiresAt ?? `${SESSION_TTL_SECONDS}s`)
     .sign(secretBytes(secret));
+}
+
+export interface Session {
+  email: string;
+  role: Role;
+  /** The account's work-owner id; absent on a session signed before the claim existed (re-signed on the next page load). */
+  wo?: string;
+  /** Epoch seconds the session ends. */
+  exp?: number;
 }
 
 export async function verifySession(
   token: string,
   secret: string,
-): Promise<{ email: string; role: Role } | null> {
+): Promise<Session | null> {
   try {
     const { payload } = await jwtVerify(token, secretBytes(secret));
     const email = String(payload.email || '').toLowerCase();
     if (!email) return null;
     const raw = payload.role;
     const role: Role = raw === 'admin' || raw === 'teacher' ? raw : 'student';
-    return { email, role };
+    const out: Session = { email, role };
+    if (typeof payload.wo === 'string' && isWorkOwnerId(payload.wo)) out.wo = payload.wo;
+    if (typeof payload.exp === 'number') out.exp = payload.exp;
+    return out;
   } catch {
     return null;
   }
+}
+
+// ---- Work owner (browser storage namespace) ----
+//
+// The page keeps each account's work in this browser under `w1:<id>:...`
+// (lib/owned-storage.ts) and reads <id> from the readable cookie below. The id is a
+// KEYED HASH of the account's email: base32 of HMAC-SHA256(AUTH_SECRET,
+// "work-owner:" + normalizeEmail(email)), first 16 characters. So it:
+//  * never needs a database read, a table or a migration, and can never be missing
+//    for a signed-in account (a failed lookup used to leave a signed-in page saving
+//    under the shared `guest` space);
+//  * is the same for an account on every request and every device;
+//  * cannot be turned back into the email without AUTH_SECRET.
+// Known limits: rotating AUTH_SECRET gives every account a new namespace (its old
+// browser work stays on the computer, unseen); so does changing an account's email.
+// The cookie is set and cleared in the same responses as the session cookie, with the
+// same Path, SameSite, Max-Age and Secure. Not HttpOnly: the page has to read it.
+// Not sensitive on its own: it grants nothing (the session cookie does).
+
+export const OWNER_COOKIE = 'shcode_owner';
+/** Header every page request to /api/* carries: the owner the page loaded with. */
+export const WORK_OWNER_HEADER = 'X-Work-Owner';
+const WORK_OWNER_RE = /^[a-z2-7]{16}$/;
+const BASE32 = 'abcdefghijklmnopqrstuvwxyz234567';
+
+export function isWorkOwnerId(v: unknown): v is string {
+  return typeof v === 'string' && WORK_OWNER_RE.test(v);
+}
+
+/** 16 base32 characters (80 bits) of HMAC-SHA256(secret, "work-owner:" + email). */
+export async function workOwnerFor(email: string, secret: string): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    'raw',
+    secretBytes(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  const mac = new Uint8Array(
+    await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(`work-owner:${normalizeEmail(email)}`)),
+  );
+  // 16 x 5 bits from the first 10 bytes, most significant bit first.
+  let out = '';
+  let bits = 0;
+  let acc = 0;
+  for (let i = 0; i < mac.length && out.length < 16; i++) {
+    acc = (acc << 8) | mac[i];
+    bits += 8;
+    while (bits >= 5 && out.length < 16) {
+      bits -= 5;
+      out += BASE32[(acc >> bits) & 31];
+    }
+    acc &= (1 << bits) - 1;
+  }
+  return out;
+}
+
+export function buildOwnerCookie(value: string, maxAgeSeconds: number, secure: boolean): string {
+  const parts = [`${OWNER_COOKIE}=${value}`, 'Path=/', 'SameSite=Lax', `Max-Age=${maxAgeSeconds}`];
+  if (secure) parts.push('Secure');
+  return parts.join('; ');
 }
 
 // ---- Session cookie ----
@@ -131,11 +213,20 @@ export function buildSessionCookie(value: string, maxAgeSeconds: number, secure:
   return parts.join('; ');
 }
 
+/** The session cookie and the owner cookie, as Set-Cookie values, set together. */
+export function sessionCookies(token: string, workOwner: string, maxAgeSeconds: number, secure: boolean): string[] {
+  return [buildSessionCookie(token, maxAgeSeconds, secure), buildOwnerCookie(workOwner, maxAgeSeconds, secure)];
+}
+
 export function readSessionCookie(request: Request): string | null {
+  return readCookie(request, SESSION_COOKIE);
+}
+
+export function readCookie(request: Request, name: string): string | null {
   const header = request.headers.get('Cookie') || '';
   for (const part of header.split(/;\s*/)) {
     const [k, ...rest] = part.split('=');
-    if (k === SESSION_COOKIE) return rest.join('=');
+    if (k === name) return rest.join('=');
   }
   return null;
 }

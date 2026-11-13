@@ -5,6 +5,7 @@
 // (class_grading_weights, defaulting per lib/grading-weights.ts).
 
 import { canManageClass } from '../../../_shared/classAuth';
+import { classStaffEmails } from '../../../_shared/classStaff';
 import { loadLessonScopeMap, loadClassDueRows, loadClassDueWaivers } from '../../../_shared/dueDates';
 import { buildDueIndex } from '../../../../lib/due-dates-core';
 import { loadClassWeights, studentGrading } from '../../../_shared/grading';
@@ -87,6 +88,9 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
   const names = new Map((nameRows.results ?? []).map((n) => [n.email, n]));
   const dueIndex = buildDueIndex(await loadClassDueRows(env.DB, classId));
   const waivers = await loadClassDueWaivers(env.DB, classId);
+  // ux2 T6: the owner, a co-teacher or a non-student account on the roster. Their row is still returned (the
+  // roster lists them) but flagged, so no count, average or "behind" list includes them.
+  const staff = await classStaffEmails(env.DB, classId);
   const statesByStudent = new Map<string, (StateRow & { student_email: string })[]>();
   if (rows.length > 0) {
     const stateResult = await env.DB.prepare(
@@ -113,6 +117,7 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
       });
       return {
         ...r,
+        staff: staff.has(r.student_email),
         firstName: names.get(r.student_email)?.first_name ?? null,
         lastName: names.get(r.student_email)?.last_name ?? null,
         weightedPercent: g.percent,

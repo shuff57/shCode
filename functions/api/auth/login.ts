@@ -2,10 +2,11 @@
 // 401 if the pair is wrong; does NOT reveal whether the email exists.
 
 import {
-  buildSessionCookie,
   normalizeEmail,
   SESSION_TTL_SECONDS,
+  sessionCookies,
   signSession,
+  workOwnerFor,
   verifyPassword,
 } from '../../_shared/auth';
 import { checkRateLimit, rateLimitExceeded } from '../../_shared/rateLimit';
@@ -85,14 +86,16 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
 
   const role: 'admin' | 'teacher' | 'student' =
     row.role === 'admin' || row.role === 'teacher' ? row.role : 'student';
+  // The account's work-owner id rides in the JWT (`wo`) and in the readable
+  // shcode_owner cookie, set here beside the session cookie (lib/owned-storage.ts).
+  const workOwner = await workOwnerFor(email, env.AUTH_SECRET);
   const token = await signSession(email, role, env.AUTH_SECRET);
   const secure = new URL(request.url).protocol === 'https:';
   // Accounts made before the signup checkboxes have no acceptance record; the
   // sign-in dialog asks them once (POST /api/accept-terms).
   const needsTerms = row.terms_accepted_at == null;
-  return json({ email, role, firstName: row.first_name, lastName: row.last_name, needsTerms }, 200, {
-    'Set-Cookie': buildSessionCookie(token, SESSION_TTL_SECONDS, secure),
-  });
+  return json({ email, role, firstName: row.first_name, lastName: row.last_name, needsTerms }, 200,
+    sessionCookies(token, workOwner, SESSION_TTL_SECONDS, secure));
 };
 
 async function loadLockout(
@@ -145,9 +148,8 @@ async function recordFailedLogin(db: D1Database, email: string, now: number): Pr
   }
 }
 
-function json(body: unknown, status = 200, headers: Record<string, string> = {}): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { 'Content-Type': 'application/json', ...headers },
-  });
+function json(body: unknown, status = 200, cookies: string[] = []): Response {
+  const headers = new Headers({ 'Content-Type': 'application/json' });
+  for (const c of cookies) headers.append('Set-Cookie', c);
+  return new Response(JSON.stringify(body), { status, headers });
 }

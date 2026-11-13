@@ -16,6 +16,7 @@
 // trimmed to its newest five versions and the write is tried once more.
 
 import { filesEqual, type FileMap } from './lesson-sync-merge';
+import { ownedLocal } from './owned-storage';
 
 export interface LocalSnapshot {
   id: string;
@@ -24,14 +25,15 @@ export interface LocalSnapshot {
   files: FileMap;
 }
 
-const STORAGE_KEY = 'shCode:local-history';
+// `w1:<owner>:local-history` (lib/owned-storage.ts): this account's versions on this browser.
+const STORAGE_KEY = 'local-history';
 const PER_LESSON = 20;
 const LESSONS = 40;
 
 function readAll(): Record<string, LocalSnapshot[]> {
   if (typeof window === 'undefined') return {};
   try {
-    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    const raw = ownedLocal.getJSON<Record<string, unknown>>(STORAGE_KEY) ?? {};
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {};
     const out: Record<string, LocalSnapshot[]> = {};
     for (const [lessonId, list] of Object.entries(raw)) {
@@ -45,19 +47,13 @@ function readAll(): Record<string, LocalSnapshot[]> {
 
 function writeAll(all: Record<string, LocalSnapshot[]>): void {
   if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-  } catch {
+  if (ownedLocal.setJSON(STORAGE_KEY, all) === 'full') {
     // Quota is the only realistic failure. Keep the newest five per lesson and
-    // make one more attempt; in private mode this still throws and the history
-    // simply stays in memory for the session.
+    // make one more attempt; if that fails too the stored history stays as it
+    // was and the new version lives in memory for the session.
     const trimmed: Record<string, LocalSnapshot[]> = {};
     for (const [lessonId, list] of Object.entries(all)) trimmed[lessonId] = list.slice(0, 5);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
-    } catch {
-      /* ignore */
-    }
+    ownedLocal.setJSON(STORAGE_KEY, trimmed);
   }
 }
 
@@ -110,6 +106,33 @@ export function addLocalSnapshot(
   writeAll(all);
   return snapshot;
 }
+
+/**
+ * Make sure `files` is in this lesson's History on this device, and SAY whether it is:
+ * true only when the newest stored version, read back from storage, holds exactly these
+ * files (already there, or written now). Anything that promises "your work is kept in
+ * History" before replacing it must check this first and change nothing on false.
+ */
+export function keepInHistory(lessonId: string, files: FileMap, message: string): boolean {
+  return keepSnapshot(lessonId, files, message) !== null;
+}
+
+/**
+ * keepInHistory, answering WHICH version holds the files: the id of the newest stored
+ * version once it reads back with exactly these files, or null when it does not.
+ */
+export function keepSnapshot(lessonId: string, files: FileMap, message: string): string | null {
+  if (typeof window === 'undefined') return null;
+  addLocalSnapshot(lessonId, files, message);
+  const newest = readAll()[lessonId]?.[0];
+  return newest && filesEqual(newest.files, files) ? newest.id : null;
+}
+
+/**
+ * Said when an action that replaces the student's code (Reset, another starter, bringing work
+ * forward) could not put the current code in History first, and so changed nothing.
+ */
+export const NOT_KEPT_TEXT = 'This computer could not keep your current work in History, so nothing was changed.';
 
 export function clearLocalHistory(lessonId: string): void {
   const all = readAll();

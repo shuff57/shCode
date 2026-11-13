@@ -113,8 +113,8 @@ export interface CodeTogetherBarProps {
   getText: () => string;
   /** The editor still holds the mode's untouched starter (or nothing): joining loses nothing, so it does not ask. */
   isUntouched: () => boolean;
-  /** The current files, kept as a History snapshot before joining. */
-  snapshot: (label: string) => void;
+  /** Keep the current files as a History snapshot before joining; true once it is really there. */
+  snapshot: (label: string) => boolean;
   /** The shared-editing extension for the editor, or null to give the editor back. */
   onCollab: (ext: Extension | null) => void;
   /** In a session or not (the sandbox locks Reset and the mode tabs while it is). */
@@ -206,12 +206,14 @@ export default function CodeTogetherBar({
   useEffect(() => { cb.current.onHere?.(here); }, [here]);
 
   /** The editor goes back to being yours, with the shared text kept as your draft. */
-  const finish = useCallback((text: string | null) => {
+  const finish = useCallback((text: string | null, keep = true) => {
     clientRef.current?.stop();
     clientRef.current = null;
     cb.current.onCollab(null);
     cb.current.onActive(false);
-    cb.current.keepCopy();
+    // `keep` is false only when the shared program never reached this editor (a refused join):
+    // the code here is still the student's own, so it is not saved as a Code together copy.
+    if (keep) cb.current.keepCopy();
     setSession(null);
     setStatus(null);
     setBusy(false);
@@ -223,6 +225,17 @@ export default function CodeTogetherBar({
       code,
       device,
       seed: hosting ? () => cb.current.getText() : null,
+      // A joiner may have typed since the snapshot taken before joining: keep the editor's
+      // text as it is at the very moment the shared program is about to replace it.
+      keepBeforeReplace: hosting ? null : () => {
+        if (cb.current.isUntouched() || cb.current.snapshot('Before Code together')) return true;
+        queueMicrotask(() => {
+          if (clientRef.current !== client) return;
+          void leaveRoom(code, device);
+          finish('You did not join. This computer could not keep your code in History, so it was left as it is.', false);
+        });
+        return false;
+      },
       onStatus: (s) => { if (clientRef.current === client) setStatus(s); },
       onEnded: (e) => { if (clientRef.current === client) finish(endedNote(e)); },
     });
@@ -260,13 +273,26 @@ export default function CodeTogetherBar({
     if (!codeIcons(want) && !/^[A-Z0-9]{6}$/.test(want)) { setError('A session code is 4 pictures (4 letters, like BHKE).'); return; }
     const untouched = cb.current.isUntouched();
     if (!untouched && !window.confirm(JOIN_CONFIRM)) return;
+    // The confirm promised the joiner's code is kept in History: keep it BEFORE joining,
+    // and do not join if this computer could not keep it.
+    if (!untouched && !cb.current.snapshot('Before Code together')) {
+      setError('You did not join. This computer could not keep your code in History, so it was left as it is.');
+      return;
+    }
     setBusy(true);
     setError(null);
     setNote(null);
     try {
       const r = await api('POST', `/api/rooms/${encodeURIComponent(want)}/join`, { device, kind: 'code' });
       if (r.status !== 200) { setError(errorOf(r)); setBusy(false); return; }
-      if (!untouched) cb.current.snapshot('Before Code together');
+      // Anything typed while the join was on its way is kept too, right before the shared
+      // program takes the editor. If it cannot be kept, give the seat back and change nothing.
+      if (!cb.current.isUntouched() && !cb.current.snapshot('Before Code together')) {
+        void leaveRoom(String(r.body.code), device);
+        setError('You did not join. This computer could not keep your code in History, so it was left as it is.');
+        setBusy(false);
+        return;
+      }
       setTyped('');
       setPicking(false);
       enter(String(r.body.code), false);

@@ -4,6 +4,8 @@
 // through here -- callers keep them in console.warn and send them to the
 // teacher side (recordFailedAttempt), which is where staff look.
 
+import { isOffline, OFFLINE_HANDIN_TEXT } from './offline';
+
 export type GradeFailureKind =
   | 'network' // fetch threw: offline, dropped, DNS
   | 'rate-limit' // 429: the server's own text is already calm
@@ -61,6 +63,8 @@ export function gradeFailureMessage({ kind, serverMessage, keepsTries }: GradeFa
   const tail = keepsTries === true ? DRAFT_TAIL : keepsTries === false ? SENT_TAIL : '';
   switch (kind) {
     case 'network':
+      // The browser knows it is offline: a hand-in is not queued (lib/offline.ts), so say what to do.
+      if (isOffline()) return OFFLINE_HANDIN_TEXT;
       return keepsTries === true
         ? 'We could not reach the grader. Check your connection, then try again. Your work is saved and this did not use one of your tries.'
         : NETWORK_TEXT;

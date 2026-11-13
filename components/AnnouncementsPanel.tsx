@@ -25,8 +25,9 @@ interface Props {
 // Helpers
 // ---------------------------------------------------------------------------
 
+// To the minute, never seconds (system pass rule 3).
 function formatTs(ts: number): string {
-  return new Date(ts).toLocaleString();
+  return new Date(ts).toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 }
 
 // ---------------------------------------------------------------------------
@@ -142,7 +143,7 @@ export function AnnouncementsPanel({ classId }: Props) {
 
   if (loading) {
     return (
-      <div style={{ color: 'var(--c-meta)', fontStyle: 'italic', padding: 16, fontSize: 14 }}>
+      <div style={{ color: 'var(--c-meta)', fontStyle: 'italic', padding: 16, fontFamily: 'var(--font-prose)', fontSize: 14 }}>
         Loading announcements...
       </div>
     );
@@ -150,7 +151,7 @@ export function AnnouncementsPanel({ classId }: Props) {
 
   if (error) {
     return (
-      <div style={{ color: 'var(--c-red)', padding: 16, fontSize: 14 }}>
+      <div style={{ color: 'var(--c-red)', padding: 16, fontFamily: 'var(--font-prose)', fontSize: 14 }}>
         Failed to load: {error}
       </div>
     );
@@ -158,44 +159,44 @@ export function AnnouncementsPanel({ classId }: Props) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      {/* Create form */}
+      {/* Create form: flat inside the card (one container per thing), its label above the field. */}
       <form
         onSubmit={handleCreate}
         style={{
-          background: 'var(--c-deep)',
-          border: '1px solid var(--c-line)',
-          borderRadius: 6,
-          padding: 14,
           display: 'flex',
           flexDirection: 'column',
           gap: 12,
         }}
       >
-        <div style={{ fontWeight: 600, color: 'var(--c-fg)', fontSize: 14 }}>
-          New Announcement
-        </div>
+        <label htmlFor="announcement-content" style={{ fontFamily: 'var(--font-prose)', fontWeight: 600, color: 'var(--c-fg)', fontSize: 14, marginBottom: -6 }}>
+          New announcement
+        </label>
 
         <textarea
-          rows={4}
+          id="announcement-content"
+          rows={3}
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Write your announcement..."
           disabled={submitting}
+          className="teacher-field"
+          // The same inset field surface as the grading weights: darker than the card, a visible border.
           style={{
             width: '100%',
-            background: 'var(--c-bg)',
+            background: 'color-mix(in srgb, var(--c-deep) 50%, var(--x-151515))',
             color: 'var(--c-fg)',
-            border: '1px solid var(--c-line)',
+            border: '1px solid var(--c-comment)',
             borderRadius: 4,
-            padding: '12px 12px',
-            fontSize: 14,
-            fontFamily: 'inherit',
+            padding: '8px 12px',
+            fontSize: 15,
+            lineHeight: 1.5,
+            fontFamily: 'var(--font-prose)',
             resize: 'vertical',
             boxSizing: 'border-box',
           }}
         />
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           <input
             type="checkbox"
             id="announcement-pinned"
@@ -204,50 +205,54 @@ export function AnnouncementsPanel({ classId }: Props) {
             disabled={submitting}
             style={{ accentColor: 'var(--c-purple)' }}
           />
-          <label htmlFor="announcement-pinned" style={{ fontSize: 13, color: 'var(--c-fg)', cursor: 'pointer' }}>
+          <label htmlFor="announcement-pinned" style={{ fontFamily: 'var(--font-prose)', fontSize: 14, color: 'var(--c-fg)', cursor: 'pointer' }}>
             Pin this announcement
           </label>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {/* Post ends the pin row, so the composer is one line shorter and Post stays in view. */}
+          {/* Disabled until there is something to post: a grey fill with readable text (not a faded green
+              that still reads as pressable, and not an outline that reads as enabled). */}
           <button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || content.trim() === ''}
+            title={content.trim() === '' ? 'Write the announcement first' : undefined}
             style={{
-              background: 'var(--c-green)',
-              color: 'var(--c-bg)',
+              // Empty: the same disabled look as every teacher button on this tab (S.btnDisabled in
+              // app/teacher/page.tsx: line fill, meta text, >= 4.5:1, no outline) (climb4 r6).
+              background: content.trim() === '' ? 'var(--c-line)' : 'var(--c-green)',
+              color: content.trim() === '' ? 'var(--c-meta)' : 'var(--c-bg)',
               border: 'none',
               borderRadius: 4,
-              padding: '8px 20px',
-              fontWeight: 700,
+              padding: '4px 20px',
+              height: 36,
+              boxSizing: 'border-box',
+              marginLeft: 'auto',
+              fontWeight: 600,
               fontSize: 14,
-              cursor: submitting ? 'not-allowed' : 'pointer',
+              cursor: submitting || content.trim() === '' ? 'not-allowed' : 'pointer',
               opacity: submitting ? 0.6 : 1,
             }}
           >
             {submitting ? 'Posting...' : 'Post'}
           </button>
-
-          {createError && (
-            <span style={{ color: 'var(--c-red)', fontSize: 13 }}>{createError}</span>
-          )}
         </div>
+        {createError && (
+          <span style={{ color: 'var(--c-red)', fontFamily: 'var(--font-prose)', fontSize: 13 }}>{createError}</span>
+        )}
       </form>
 
       {/* Existing announcements */}
       {announcements.length === 0 ? (
-        <div style={{ color: 'var(--c-meta)', fontSize: 14, padding: 8 }}>
+        <div style={{ color: 'var(--c-meta)', fontFamily: 'var(--font-prose)', fontSize: 15, paddingTop: 12, borderTop: '1px solid var(--c-line)' }}>
           No announcements yet.
         </div>
       ) : (
         announcements.map((a) => (
           <div
             key={a.id}
+            // A divider between posts, not a bordered box inside the card (rule 6).
             style={{
-              background: 'var(--c-deep)',
-              border: '1px solid var(--c-line)',
-              borderRadius: 6,
-              padding: 12,
+              borderTop: '1px solid var(--c-line)',
+              paddingTop: 12,
               display: 'flex',
               flexDirection: 'column',
               gap: 8,
@@ -274,7 +279,7 @@ export function AnnouncementsPanel({ classId }: Props) {
                     Pinned
                   </span>
                 )}
-                <span style={{ fontSize: 13, color: 'var(--c-meta)' }}>
+                <span style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-meta)' }}>
                   {a.author_email} &middot; {formatTs(a.created_at)}
                 </span>
               </div>
@@ -299,8 +304,10 @@ export function AnnouncementsPanel({ classId }: Props) {
             <div
               style={{
                 color: 'var(--c-fg)',
-                fontSize: 14,
+                fontFamily: 'var(--font-prose)',
+                fontSize: 15,
                 lineHeight: 1.5,
+                maxWidth: '70ch',
                 whiteSpace: 'pre-wrap',
               }}
             >

@@ -1377,7 +1377,14 @@ const setRelease = (db, classId, scope, scopeId, at) => db.raw.run(
   eq((await mark(db, { submissionId: id0, score: 2 })).status, 200, '...and a mark within it is taken');
   // the form reads it: the SubmissionQueue source shows the unit from the row's limit when it has no criteria
   const ui = readFileSync(join(root, 'components/SubmissionQueue.tsx'), 'utf8');
-  if (!/sub\.limit\?\.unit === 'criteria'/.test(ui) || !/pointsMax=\{sub\.limit\?\.unit === 'points'/.test(ui)) fail('SubmissionQueue does not take the form unit from the row limit');
+  // The points maximum is named once (`const pointsMax = <the row's limit>`) and handed to the form as is; a
+  // rubric total may decide only whether the rubric is shown (rubricFitsForm), never the number the form enforces.
+  const pointsFromLimit =
+    /const pointsMax = sub\.limit\?\.unit === 'points' \? sub\.limit\.max : null;/.test(ui) &&
+    (ui.match(/const pointsMax =/g) || []).length === 1 &&
+    /pointsMax=\{pointsMax\}/.test(ui) &&
+    !/pointsMax=\{(?!pointsMax\})/.test(ui);
+  if (!/sub\.limit\?\.unit === 'criteria'/.test(ui) || !pointsFromLimit) fail('SubmissionQueue does not take the form unit from the row limit');
   else ok('SubmissionQueue takes the override form unit (criteria met or points, out of N) from the server limit');
 }
 

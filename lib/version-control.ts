@@ -1,3 +1,4 @@
+import { ownedLocal, type WriteResult } from './owned-storage';
 import type { Commit, FileHistory, Version, FileNode } from './types';
 
 // ---- Generate file ID map from FileNode tree ----
@@ -117,72 +118,52 @@ export function getFileHistoryFromCommits(
 }
 
 
-// ---- localStorage persistence ----
-const STORAGE_KEY = 'shCode:progress';
-const LEGACY_STORAGE_KEY = 'shCode_progress';
+// ---- persistence (this page's owner's records, lib/owned-storage.ts) ----
+//
+// One record per lesson, `w1:<owner>:progress:<lessonId>`. Commits are NOT kept here:
+// the server owns them (lib/store.ts resets them to [] on load), and full commit
+// snapshots were the heaviest thing in the old single `shCode:progress` map. That map
+// and its older `shCode_progress` name are set aside by lib/owned-storage.ts and are
+// never given back automatically (a later stage adds a teacher export).
 
-export function saveProgress(
-  lessonId: string,
-  data: {
-    fileContents: Record<string, string>;
-    commits: Commit[];
-    lastCommittedFileContents: Record<string, string>;
-    completedSteps: string[];
-  }
-): void {
-  const all = loadAllProgress();
-  all[lessonId] = data;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-}
+export const PROGRESS_KEY = 'progress:';
 
-export function loadProgress(
-  lessonId: string
-): {
+export interface DraftProgress {
   fileContents: Record<string, string>;
   commits: Commit[];
   lastCommittedFileContents: Record<string, string>;
   completedSteps: string[];
-} | null {
-  const all = loadAllProgress();
-  return all[lessonId] || null;
+}
+
+/** Write a lesson's draft. Never throws; a failed write keeps the previous draft. */
+export function saveProgress(lessonId: string, data: DraftProgress): WriteResult {
+  return ownedLocal.setJSON(PROGRESS_KEY + lessonId, {
+    fileContents: data.fileContents,
+    commits: [],
+    lastCommittedFileContents: data.lastCommittedFileContents,
+    completedSteps: data.completedSteps ?? [],
+  });
+}
+
+export function loadProgress(lessonId: string): DraftProgress | null {
+  return asDraft(ownedLocal.getJSON(PROGRESS_KEY + lessonId));
 }
 
 export function clearProgress(lessonId: string): void {
-  const all = loadAllProgress();
-  delete all[lessonId];
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+  ownedLocal.removeItem(PROGRESS_KEY + lessonId);
 }
 
-function loadAllProgress(): Record<string, any> {
-  // One-time migration from the old underscore key so existing drafts
-  // survive the rename.
-  const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
-  if (legacy !== null && localStorage.getItem(STORAGE_KEY) === null) {
-    localStorage.setItem(STORAGE_KEY, legacy);
-  }
-  if (legacy !== null) localStorage.removeItem(LEGACY_STORAGE_KEY);
-
-  let all: Record<string, any>;
-  try {
-    all = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-  } catch {
-    return {};
-  }
-
-  // The sandbox names its draft after the mode it belongs to, so renaming the
-  // jscad mode to reshape would strand whatever a student had open in it.
-  // Rewrite the key instead. Idempotent, and it never overwrites a newer draft
-  // already sitting under the new name.
-  let moved = false;
-  for (const key of Object.keys(all)) {
-    if (!key.startsWith('sandbox-jscad')) continue;
-    const renamed = `sandbox-reshape${key.slice('sandbox-jscad'.length)}`;
-    if (all[renamed] === undefined) all[renamed] = all[key];
-    delete all[key];
-    moved = true;
-  }
-  if (moved) {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); } catch { /* quota, private mode */ }
-  }
-  return all;
+/** A stored draft, or null when the record is not one. */
+export function asDraft(v: unknown): DraftProgress | null {
+  if (!v || typeof v !== 'object') return null;
+  const r = v as Partial<DraftProgress>;
+  if (!r.fileContents || typeof r.fileContents !== 'object') return null;
+  return {
+    fileContents: r.fileContents,
+    commits: [],
+    lastCommittedFileContents: r.lastCommittedFileContents && typeof r.lastCommittedFileContents === 'object'
+      ? r.lastCommittedFileContents
+      : { ...r.fileContents },
+    completedSteps: Array.isArray(r.completedSteps) ? r.completedSteps : [],
+  };
 }

@@ -15,7 +15,7 @@ import { ChevronDown, ChevronRight, MessageSquare } from 'lucide-react';
 import { formatDue } from '../lib/due-dates-core';
 import { sortLessons } from '../lib/lesson-order';
 import { lessonHref } from '../lib/lesson-href';
-import { lessonGradeCategory, lessonPercent, type GradeCategory } from '../lib/grading-weights';
+import { CATEGORY_LABEL, lessonGradeCategory, lessonPercent, type GradeCategory } from '../lib/grading-weights';
 // Status derivation is shared with the endpoint that builds these cells, so
 // the page and the teacher's gradebook can never disagree about whether a
 // student is behind. See lib/gradebook-cell.ts.
@@ -67,6 +67,17 @@ const CATEGORY_SHORT: Record<GradeCategory, string> = {
   q2: 'Q2 project',
   q4: 'Q4 project',
 };
+
+/** The chip's words. Every quiz, written answer, chart and coded lab inside a module counts toward the
+ *  same part of the grade (CATEGORY_LABEL.lab, "Regular submodules"), so for that part the chip names what
+ *  kind of work it is (the manifest's preview / scoreKind) rather than calling a quiz a "Lab". */
+function chipLabel(category: GradeCategory, lesson: ManifestLesson): string {
+  if (category !== 'lab') return CATEGORY_SHORT[category];
+  if (lesson.preview === 'quiz' || lesson.scoreKind === 'quiz') return 'Quiz';
+  if (lesson.scoreKind === 'written' || lesson.preview === 'assignment') return 'Written';
+  if (lesson.preview === 'diagram') return 'Chart';
+  return 'Lab';
+}
 
 const STATUS_LABEL: Record<CellStatus, string> = {
   pending: 'Awaiting teacher',
@@ -192,9 +203,28 @@ export default function StudentGradebook({ lessons }: Props) {
   // a student halfway through a lesson that something was wrong.
   const isMissingOrLate = (st: CellStatus) => st !== 'started' && needsAttention(st);
   const attentionCount = rows.filter((r) => isMissingOrLate(r.status)).length;
+  // What the "Missing or late" count is made of. It is wider than the summary's "past due" number,
+  // which counts only graded lessons past due and not done (per class); this list also holds work
+  // finished after its due date and work waiting for the teacher, so say so instead of leaving
+  // two different numbers side by side unexplained.
+  const attentionParts = (
+    [
+      ['missing', 'past due, not done', 'not done'],
+      ['done-late', 'finished late', 'late'],
+      ['pending', 'waiting for your teacher', 'waiting'],
+    ] as const
+  )
+    .map(([st, words, short]) => ({ n: rows.filter((r) => r.status === st).length, words, short }))
+    .filter((p) => p.n > 0);
+  const attentionBreakdown = attentionParts.map((p) => `${p.n} ${p.words}`).join(', ');
   const nowMs = Date.now();
   const isInProgress = (r: { status: CellStatus; tried: boolean }) => r.status === 'started' || (r.tried && r.status === 'not-started');
   const progressCount = rows.filter(isInProgress).length;
+  // The one action the summary offers when work is past due (climb4 r9 S10): the past-due lesson
+  // with the earliest due date. Same rows and status as the list below, so it is always one of them.
+  const oldestMissing = rows
+    .filter((r) => r.status === 'missing')
+    .sort((a, b) => (dueDates[a.lesson.id] ?? Infinity) - (dueDates[b.lesson.id] ?? Infinity))[0];
   const shown =
     filter === 'attention'
       ? rows.filter((r) => isMissingOrLate(r.status))
@@ -205,34 +235,44 @@ export default function StudentGradebook({ lessons }: Props) {
   return (
     <>
     {grades.length > 0 && (
-      <div style={cardStyle}>
-        <h3 style={{ margin: '0 0 10px 0' }}>Your grade so far</h3>
+      <div className="grade-summary-card" style={cardStyle}>
+        <h3 style={{ margin: '0 0 10px 0', fontSize: 'var(--fs-h2)', fontWeight: 700 }}>Your grade so far</h3>
         {grades.map((g) => (
-          <div key={g.classId} style={{ marginBottom: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'stretch', gap: 16, flexWrap: 'wrap' }}>
-              <div style={{ minWidth: 140, paddingRight: 20, borderRight: '1px solid var(--c-line)' }}>
-                <div style={{ color: 'var(--c-meta)', fontSize: 13, marginBottom: 4 }}>Grade so far</div>
-                <strong style={{ fontSize: 28 }}>{g.percent}%</strong>
+          // One compact row per class: the two numbers, then the class and the rule beside them,
+          // so the assignments table starts higher (climb 4: the summary was a tall, mostly empty card).
+          <div key={g.classId} className="grade-summary-row" style={{ display: 'flex', alignItems: 'center', gap: '12px 24px', flexWrap: 'wrap', marginBottom: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'stretch', gap: 20 }}>
+              <div style={{ minWidth: 110, paddingRight: 20, borderRight: '1px solid var(--c-line)' }}>
+                <div style={{ color: 'var(--c-meta)', fontSize: 13, marginBottom: 2 }}>Grade so far</div>
+                <strong className={g.missingCount > 0 && g.percent < 70 ? 'grade-so-far is-warning' : 'grade-so-far'} style={{ fontSize: 28, lineHeight: 1.2 }}>{g.percent}%</strong>
               </div>
-              {g.missingCount > 0 && <a href="#missing-late-filter" style={{ color: 'var(--c-fg)', textDecoration: 'none' }}>
-                <div style={{ color: 'var(--c-meta)', fontSize: 13, marginBottom: 4 }}>Past due</div>
-                <strong style={{ fontSize: 28 }}>{g.missingCount}</strong><span style={{ fontSize: 13 }}> graded lessons</span>
+              {g.missingCount > 0 && <a href="#missing-late-filter" style={{ color: 'var(--c-fg)', textDecoration: 'none', paddingRight: 20, borderRight: '1px solid var(--c-line)' }}>
+                <div style={{ color: 'var(--c-meta)', fontSize: 13, marginBottom: 2 }}>Past due</div>
+                <strong style={{ fontSize: 28, lineHeight: 1.2, color: STATUS_COLOR.missing }}>{g.missingCount}</strong><span style={{ fontSize: 13 }}> graded lessons</span>
               </a>}
             </div>
-            <div style={{ color: 'var(--c-meta)', fontSize: 13, marginTop: 8 }}>{grades.length > 1 ? g.className : 'In your class'}</div>
-            <div style={{ color: 'var(--c-meta)', fontSize: 14, marginTop: 6 }}>
-              Unfinished work past its due date counts as zero until you finish it; work not due yet is excluded.
+            <div style={{ flex: '0 1 auto', minWidth: 0, maxWidth: '64ch' }}>
+              <div style={{ color: 'var(--c-meta)', fontSize: 13 }}>{grades.length > 1 ? g.className : 'In your class'}</div>
+              <div style={{ color: 'var(--c-meta)', fontSize: 14, marginTop: 2, lineHeight: 1.5 }}>
+                Past due work counts as 0 until you finish it.
+              </div>
             </div>
           </div>
         ))}
-        <details style={{ marginTop: 6 }}>
+        {oldestMissing && grades.some((g) => g.missingCount > 0) && (
+          <p className="grade-summary-action">
+            <a href={lessonHref(oldestMissing.lesson)} className="grade-summary-start">Oldest past-due lesson: {oldestMissing.lesson.title} <span aria-hidden="true">→</span></a>
+          </p>
+        )}
+        <details style={{ marginTop: 2 }}>
           <summary style={{ cursor: 'pointer', fontSize: 13 }}>How your grade works</summary>
-          <ul style={{ margin: '8px 0 0 0', paddingLeft: 20, listStyle: 'disc', fontSize: 13, lineHeight: 1.6, opacity: 0.85 }}>
+          <ul style={{ margin: '8px 0 0 0', paddingLeft: 20, listStyle: 'disc', fontSize: 14, lineHeight: 1.6, maxWidth: '68ch', color: 'var(--c-meta)' }}>
             <li>Each graded assignment counts toward a part of your grade (Lab, Written, Quiz, Chapter test). The chip beside each assignment below says which part.</li>
             <li>Where an assignment allows several tries, your best try is the one that counts, not the latest.</li>
-            <li>An assignment past its due date that is not done counts as 0 until you finish it. Turning it in later replaces the 0.</li>
+            <li>Past due means a graded assignment not finished by its due date. It counts as 0 until you finish it. Turning it in later replaces the 0.</li>
             <li>An assignment that is not due yet does not count against you.</li>
             <li>Handing something in late is marked &ldquo;Completed late&rdquo; so your teacher can see it. It does not lower the percent shown here.</li>
+            <li>The Missing or late list below shows work not done yet and work you finished late.</li>
           </ul>
         </details>
       </div>
@@ -242,7 +282,7 @@ export default function StudentGradebook({ lessons }: Props) {
         {/* marginRight:auto, not flex:1 — flex:1 lets the heading shrink to
             nothing on a phone and its text then overlaps the filter pills
             instead of pushing them onto the next line. */}
-        <h3 style={{ margin: 0, marginRight: 'auto' }}>Assignments</h3>
+        <h3 style={{ margin: 0, marginRight: 'auto', fontSize: 'var(--fs-h2)', fontWeight: 700 }}>Assignments</h3>
         <button type="button" onClick={() => setFilter('all')} style={filter === 'all' ? tabActive : tabIdle}>
           All ({rows.length})
         </button>
@@ -251,6 +291,9 @@ export default function StudentGradebook({ lessons }: Props) {
           id="missing-late-filter"
           onClick={() => setFilter('attention')}
           style={filter === 'attention' ? tabActive : tabIdle}
+          className="progress-attention-chip"
+          title={attentionBreakdown ? `Missing or late: ${attentionBreakdown}` : undefined}
+          aria-describedby={attentionParts.length > 1 ? 'missing-late-breakdown' : undefined}
         >
           Missing or late ({attentionCount})
         </button>
@@ -262,6 +305,12 @@ export default function StudentGradebook({ lessons }: Props) {
           In progress ({progressCount})
         </button>
       </div>
+      {/* What "Missing or late" is made of, on its own line under the filters (climb4 r9 S10), so every chip is one line. */}
+      {attentionParts.length > 1 && (
+        <p id="missing-late-breakdown" className="progress-attention-note">
+          Missing or late ({attentionCount}): {attentionParts.map((p) => `${p.n} ${p.words}`).join(' · ')}
+        </p>
+      )}
 
       {rows.length === 0 ? (
         <p style={mutedStyle}>
@@ -275,7 +324,7 @@ export default function StudentGradebook({ lessons }: Props) {
         </p>
       ) : (
         <div style={scrollWrapStyle} tabIndex={0} role="region" aria-label="Assignments table">
-          <table style={tableStyle}>
+          <table className="student-gradebook-table" style={tableStyle}>
             <thead>
               <tr style={theadRowStyle}>
                 <th style={thStyle}>Assignment</th>
@@ -316,8 +365,9 @@ export default function StudentGradebook({ lessons }: Props) {
                 const open = hasFeedback && !!expanded[lesson.id];
                 return (
                   <Fragment key={lesson.id}>
-                    <tr style={rowStyle}>
-                      <td style={tdStyle}>
+                    {/* Phones stack each row as a small card: title and score, then due and status (ux2 S8). */}
+                    <tr style={rowStyle} className="gb-row">
+                      <td style={tdStyle} className="gb-title-cell">
                         {hasFeedback ? (
                           <button
                             type="button"
@@ -354,23 +404,26 @@ export default function StudentGradebook({ lessons }: Props) {
                         {category && (
                           <span
                             style={chipStyle}
-                            title={`Counts toward the ${CATEGORY_SHORT[category].toLowerCase()} part of your grade`}
+                            title={`Counts toward the ${CATEGORY_LABEL[category].toLowerCase()} part of your grade`}
                           >
-                            {CATEGORY_SHORT[category]}
+                            {chipLabel(category, lesson)}
                           </span>
                         )}
                       </td>
-                      <td style={{ ...tdStyle, color: 'var(--x-b9c5e8)' }}>
-                        {due ? formatDue(due) : '—'}
+                      <td className="gb-due-cell" style={{ ...tdStyle, color: 'var(--x-b9c5e8)' }}>
+                        <span className="gb-cell-label">Due </span>{due ? formatDue(due) : '—'}
                         {dueSoon && <span style={{ ...chipStyle, color: 'var(--c-orange)', borderColor: 'var(--c-orange)' }}>due soon</span>}
                       </td>
-                      <td style={tdStyle}>
+                      <td style={tdStyle} className="gb-status-cell">
                         <span style={{ ...badgeStyle, color: statusColor, borderColor: statusColor }}>
                           {statusLabel}
                         </span>
                       </td>
-                      <td style={scoreCellStyle}>
-                        {bestText ?? score ?? '\u2014'}
+                      <td style={scoreCellStyle} className="gb-score-cell">
+                        <span className="gb-cell-label">Score </span>{bestText ?? score ?? (status === 'missing'
+                          // Past due and not done: the grade above counts it as 0 until it is finished.
+                          ? <span className="gb-zero" title="Counts as 0 until you finish it">0</span>
+                          : '\u2014')}
                         {t && t.used > 0 && !tried && (
                           <div style={{ color: 'var(--c-meta)', fontSize: 13 }}>
                             {t.used} of {t.cap} {t.cap === 1 ? 'try' : 'tries'} used
@@ -387,7 +440,7 @@ export default function StudentGradebook({ lessons }: Props) {
                       </td>
                     </tr>
                     {open && (
-                      <tr>
+                      <tr className="gb-feedback-row">
                         <td colSpan={4} style={{ padding: '0 0 12px 0' }}>
                           <div style={feedbackBoxStyle}>
                             <div style={feedbackHeadStyle}>
@@ -429,6 +482,8 @@ const cardStyle: React.CSSProperties = {
 
 const headingStyle: React.CSSProperties = {
   margin: '0 0 14px 0',
+  fontSize: 'var(--fs-h2)',
+  fontWeight: 700,
   borderBottom: '1px solid var(--c-line)',
   paddingBottom: 8,
 };

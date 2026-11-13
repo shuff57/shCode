@@ -122,6 +122,7 @@ export default function CodeEditor({ plainText = false, collab = null }: { plain
             taskComment={lesson?.preview === 'console' && currentFile === 'script.js'
               ? extractLabTaskScenario(flattenFiles(lesson.files).find((file) => file.path === 'script.js')?.content ?? '')
               : null}
+            taskCommentQuiet={(lesson?.steps?.length ?? 0) > 0}
           />
         )}
       </div>

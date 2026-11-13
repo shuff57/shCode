@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Flag } from 'lucide-react';
@@ -103,6 +104,7 @@ export default function ReportIssueButton() {
 
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleRef = useRef<HTMLInputElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   // An uploaded-but-unsent screenshot is a real file inside the student's
   // 20 MB / 40 file quota. These two refs are what let us hand it back on
@@ -116,12 +118,34 @@ export default function ReportIssueButton() {
     getCurrentUser().then((u) => setSignedIn(!!u));
   }, []);
 
+  // Phones (<= 720px): the flag sits in the site header beside the menu button (HeaderNav's
+  // #header-flag-slot) instead of floating over the page, where it covered list content.
+  // Same button, same dialog, same accessible name (globals.css climb4 r9 S15).
+  const [headerSlot, setHeaderSlot] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 720px)');
+    const update = () => setHeaderSlot(mq.matches ? document.getElementById('header-flag-slot') : null);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, [pathname]);
+
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
     if (open) {
+      // On a phone, focusing the title field opens the on-screen keyboard at once and it covers
+      // Cancel / Send report (ux2 S7). There the dialog's heading takes focus instead (screen readers
+      // still start at the top); the student taps the field when ready to type.
+      const touch = window.matchMedia?.('(pointer: coarse), (max-width: 600px)').matches;
+      const heading = headingRef.current;
+      if (heading) {
+        if (touch) heading.setAttribute('autofocus', '');
+        else heading.removeAttribute('autofocus');
+      }
       dialog.showModal();
-      setTimeout(() => titleRef.current?.focus(), 0);
+      if (touch) setTimeout(() => headingRef.current?.focus({ preventScroll: true }), 0);
+      else setTimeout(() => titleRef.current?.focus(), 0);
     } else {
       dialog.close();
     }
@@ -313,15 +337,28 @@ export default function ReportIssueButton() {
 
   return (
     <>
-      <button
-        type="button"
-        className="issue-fab"
-        onClick={() => setOpen(true)}
-        title="Report an issue: a bug, quirk, or idea"
-        aria-label="Report an issue"
-      >
-        <Flag size={16} aria-hidden="true" />
-      </button>
+      {headerSlot ? createPortal(
+        <button
+          type="button"
+          className="issue-fab-header"
+          onClick={() => setOpen(true)}
+          title="Report an issue: a bug, quirk, or idea"
+          aria-label="Report an issue"
+        >
+          <Flag size={15} aria-hidden="true" />
+        </button>,
+        headerSlot,
+      ) : (
+        <button
+          type="button"
+          className="issue-fab"
+          onClick={() => setOpen(true)}
+          title="Report an issue: a bug, quirk, or idea"
+          aria-label="Report an issue"
+        >
+          <Flag size={16} aria-hidden="true" />
+        </button>
+      )}
 
       <dialog
         ref={dialogRef}
@@ -341,7 +378,7 @@ export default function ReportIssueButton() {
           </div>
         ) : (
           <form onSubmit={submit} className="issue-form">
-            <h3>Report an issue</h3>
+            <h3 ref={headingRef} tabIndex={-1} style={{ outline: 'none' }}>Report an issue</h3>
 
             <div className="issue-kinds">
               {KINDS.map((k) => (

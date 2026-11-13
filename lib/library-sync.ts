@@ -32,6 +32,7 @@ import {
   type LocalLibraryItem,
 } from './moshion-storage';
 import { choiceOf, parseProvenance, type Provenance, type ShareChoice } from './share-choice';
+import { ownedLocal } from './owned-storage';
 
 export interface ServerItem {
   id: string;
@@ -159,14 +160,10 @@ export async function itemHash(dataUri: string, meta: string | null): Promise<st
   return Array.from(new Uint8Array(digest), (n) => n.toString(16).padStart(2, '0')).join('');
 }
 
-const BASE_KEY = 'moshion.library.base.v1';
+const BASE_KEY = 'library-base'; // w1:<owner>:library-base (lib/owned-storage.ts)
 function readAllBases(): Record<string, Base> {
-  try {
-    const v = JSON.parse(window.localStorage.getItem(BASE_KEY) || '{}');
-    return v && typeof v === 'object' ? v : {};
-  } catch {
-    return {};
-  }
+  const v = ownedLocal.getJSON<Record<string, Base>>(BASE_KEY);
+  return v && typeof v === 'object' && !Array.isArray(v) ? v : {};
 }
 function readBase(email: string): Base {
   return readAllBases()[email] ?? {};
@@ -175,10 +172,8 @@ function writeBase(email: string, base: Base | null): void {
   const all = readAllBases();
   if (base && Object.keys(base).length) all[email] = base;
   else delete all[email];
-  try {
-    if (Object.keys(all).length) window.localStorage.setItem(BASE_KEY, JSON.stringify(all));
-    else window.localStorage.removeItem(BASE_KEY);
-  } catch { /* private mode */ }
+  if (Object.keys(all).length) ownedLocal.setJSON(BASE_KEY, all);
+  else ownedLocal.removeItem(BASE_KEY);
 }
 
 export interface SyncResult {
@@ -433,7 +428,7 @@ export function requestSync(email: string, force = false): void {
   });
 }
 
-/** Wire the triggers for `email`: now, after every local save or delete, and on returning to the tab. */
+/** Wire the triggers for `email`: now, after every local save or delete, on returning to the tab, and on `online`. */
 export function startLibrarySync(email: string): () => void {
   requestSync(email, true);
   let t: ReturnType<typeof setTimeout> | null = null;
@@ -442,11 +437,15 @@ export function startLibrarySync(email: string): () => void {
     t = setTimeout(() => requestSync(email, true), 1500);
   };
   const onVisible = () => { if (document.visibilityState === 'visible') requestSync(email); };
+  // Back online: what changed while the connection was down goes now, not on the next visit.
+  const onOnline = () => requestSync(email, true);
   window.addEventListener(LIBRARY_LOCAL_CHANGE, onChange);
+  window.addEventListener('online', onOnline);
   document.addEventListener('visibilitychange', onVisible);
   return () => {
     if (t) clearTimeout(t);
     window.removeEventListener(LIBRARY_LOCAL_CHANGE, onChange);
+    window.removeEventListener('online', onOnline);
     document.removeEventListener('visibilitychange', onVisible);
   };
 }

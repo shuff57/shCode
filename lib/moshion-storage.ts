@@ -5,6 +5,7 @@ import { mergeAssets, type GameAsset } from './game-assets';
 import { checkSketchData, isSketchKey } from './sketch-saves-core';
 import { errorText } from './http-error';
 import { parseProvenance, type Provenance } from './share-choice';
+import { ownedLocal } from './owned-storage';
 
 // Saves for moSHion sketches.
 //
@@ -34,7 +35,10 @@ import { parseProvenance, type Provenance } from './share-choice';
 // still there for the 6.5.7 example that loads it, which is the point those
 // two lessons are making.
 
-const KEY = 'moshion.store.v1';
+// Kept under this page's owner, `w1:<owner>:moshion-store` (lib/owned-storage.ts):
+// each account on a shared computer has its own sketch saves, pictures and sounds.
+// (Before that it was the one unprefixed `moshion.store.v1` every account shared.)
+const KEY = 'moshion-store';
 
 // A student sketch can call storeItem() every frame. The app keeps lesson
 // drafts in this same localStorage, so an unbounded sketch could evict a
@@ -104,25 +108,14 @@ function withinCaps(store: Store): boolean {
 }
 
 function readStore(): Store {
-  try {
-    const raw = window.localStorage.getItem(KEY);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object' ? (parsed as Store) : {};
-  } catch {
-    return {};
-  }
+  const parsed = ownedLocal.getJSON<Store>(KEY);
+  return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
 }
 
 function writeStore(store: Store): boolean {
-  try {
-    if (!withinCaps(store)) return false;
-    window.localStorage.setItem(KEY, JSON.stringify(store));
-    return true;
-  } catch {
-    /* quota, private mode -- the sketch keeps its in-frame copy either way */
-    return false;
-  }
+  if (!withinCaps(store)) return false;
+  // quota, private mode -- the sketch keeps its in-frame copy either way
+  return ownedLocal.setJSON(KEY, store) === 'ok';
 }
 
 // A save or delete made here tells the library sync (lib/library-sync.ts) to
@@ -140,20 +133,14 @@ function localChanged(): void {
 // item that is merely missing here -- a sketch called clearStorage(), or the
 // browser dropped its storage -- is downloaded again instead of deleted
 // everywhere.
-const LOCAL_DELETES_KEY = 'moshion.library.deleted.v1';
+const LOCAL_DELETES_KEY = 'library-deleted'; // w1:<owner>:library-deleted
 export function readLocalDeletes(): string[] {
-  try {
-    const v = JSON.parse(window.localStorage.getItem(LOCAL_DELETES_KEY) || '[]');
-    return Array.isArray(v) ? v.filter((x) => typeof x === 'string') : [];
-  } catch {
-    return [];
-  }
+  const v = ownedLocal.getJSON<unknown[]>(LOCAL_DELETES_KEY);
+  return Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [];
 }
 export function writeLocalDeletes(keys: string[]): void {
-  try {
-    if (keys.length) window.localStorage.setItem(LOCAL_DELETES_KEY, JSON.stringify([...new Set(keys)]));
-    else window.localStorage.removeItem(LOCAL_DELETES_KEY);
-  } catch { /* private mode */ }
+  if (keys.length) ownedLocal.setJSON(LOCAL_DELETES_KEY, [...new Set(keys)]);
+  else ownedLocal.removeItem(LOCAL_DELETES_KEY);
 }
 function markDeleted(kind: 'texture' | 'sound' | 'font', name: string, deleted: boolean): void {
   const key = `${kind}:${name}`;
@@ -170,20 +157,14 @@ function markDeleted(kind: 'texture' | 'sound' | 'font', name: string, deleted: 
 // sync sends the original's id with the first upload (PUT /api/library
 // remixedFrom); from then on the account's copy of the credit is the one shown,
 // on every device.
-const ORIGIN_KEY = 'moshion.library.origin.v1';
+const ORIGIN_KEY = 'library-origin'; // w1:<owner>:library-origin
 function readOrigins(): Record<string, unknown> {
-  try {
-    const v = JSON.parse(window.localStorage.getItem(ORIGIN_KEY) || '{}');
-    return v && typeof v === 'object' && !Array.isArray(v) ? v : {};
-  } catch {
-    return {};
-  }
+  const v = ownedLocal.getJSON<Record<string, unknown>>(ORIGIN_KEY);
+  return v && typeof v === 'object' && !Array.isArray(v) ? v : {};
 }
 function writeOrigins(all: Record<string, unknown>): void {
-  try {
-    if (Object.keys(all).length) window.localStorage.setItem(ORIGIN_KEY, JSON.stringify(all));
-    else window.localStorage.removeItem(ORIGIN_KEY);
-  } catch { /* private mode */ }
+  if (Object.keys(all).length) ownedLocal.setJSON(ORIGIN_KEY, all);
+  else ownedLocal.removeItem(ORIGIN_KEY);
 }
 /** Where this browser's copy of `kind:name` was copied from, or null. */
 export function localOrigin(kind: LibraryKind, name: string): Provenance | null {

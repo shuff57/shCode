@@ -16,6 +16,8 @@ export interface NavDropdownProps {
   align?: 'left' | 'right';
   triggerStyle?: React.CSSProperties;
   panelStyle?: React.CSSProperties;
+  /** The page is inside this menu's section: the trigger is marked (aria-current, globals.css climb4 r9 S1). */
+  current?: boolean;
 }
 
 export default function NavDropdown({
@@ -24,6 +26,7 @@ export default function NavDropdown({
   align = 'left',
   triggerStyle,
   panelStyle,
+  current = false,
 }: NavDropdownProps) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -50,6 +53,8 @@ export default function NavDropdown({
         type="button"
         aria-haspopup="true"
         aria-expanded={open}
+        aria-current={current ? 'true' : undefined}
+        className={current ? 'nav-current' : undefined}
         onClick={() => setOpen((v) => !v)}
         style={{
           background: 'none',

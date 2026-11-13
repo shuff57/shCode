@@ -12,12 +12,13 @@ import { fileURLToPath } from 'node:url';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = mkdtempSync(join(tmpdir(), 'shcode-teacher-views-'));
 execFileSync('node', [join(root, 'node_modules/typescript/bin/tsc'),
-  join(root, 'lib/gradebook-view.ts'), join(root, 'lib/teacher-drawer.ts'),
+  join(root, 'lib/gradebook-view.ts'), join(root, 'lib/teacher-drawer.ts'), join(root, 'lib/rubric-mark.ts'),
   '--outDir', out, '--module', 'commonjs', '--target', 'es2022', '--skipLibCheck'], { cwd: root, stdio: 'inherit' });
 writeFileSync(join(out, 'package.json'), '{"type":"commonjs"}');
 const req = createRequire(import.meta.url);
 const { moduleOptions, selectGradebookLessons } = req(join(out, 'gradebook-view.js'));
 const D = req(join(out, 'teacher-drawer.js'));
+const RM = req(join(out, 'rubric-mark.js'));
 
 let n = 0;
 function check(name, got, want) {
@@ -51,6 +52,47 @@ sel = selectGradebookLessons(lessons.map((l) => ({ ...l, c: false })), { module:
 check('nothing counted in scope falls back to all of it, not an empty grid', sel.lessons.map((l) => l.id), ['a', 'b']);
 check('fallback is not "narrowed"', sel.narrowed, false);
 check('null unit groups as Other', selectGradebookLessons([{ id: 'z', unit: null, c: true }], { module: 'Other', showAll: false, isCounted }).lessons.length, 1);
+
+// ---- paging by module ------------------------------------------------------
+const GV = req(join(out, 'gradebook-view.js'));
+const M35 = '3.5 Readings only';
+const paged = [...lessons, { id: 'f', unit: M35, c: false }];
+const opts = moduleOptions(paged, isCounted);
+check('module key is the leading number', GV.moduleKey('1.1 Software Lifecycle'), '1.1');
+check('module key falls back to the label', GV.moduleKey('Other'), 'Other');
+check('pages skip a module with nothing counted', GV.modulePages(opts, false).map((p) => p.unit), [M33, M34]);
+check('with ungraded shown it is a page', GV.modulePages(opts, true).map((p) => p.unit), [M33, M34, M35]);
+check('nothing counted anywhere: every module is a page',
+  GV.modulePages(moduleOptions(paged, () => false), false).map((p) => p.unit), [M33, M34, M35]);
+check('page size: counted only', GV.pageSize(opts[1], false), 1);
+check('page size: everything', GV.pageSize(opts[1], true), 3);
+const pages = GV.modulePages(opts, false);
+check('a page shows exactly its module\'s counted lessons',
+  selectGradebookLessons(paged, { module: pages[1].unit, showAll: false, isCounted }).lessons.map((l) => l.id), ['c']);
+check('first page: no previous', GV.pagerFor(pages, M33), { unit: M33, position: 1, total: 2, prev: null, next: M34 });
+check('last page: no next', GV.pagerFor(pages, M34), { unit: M34, position: 2, total: 2, prev: M33, next: null });
+check('all modules: position 0, next is the first page', GV.pagerFor(pages, null), { unit: null, position: 0, total: 2, prev: null, next: M33 });
+check('a stale unit reads as all modules', GV.pagerFor(pages, 'gone').position, 0);
+check('address: all', GV.resolveModuleParam(pages, 'all'), null);
+check('address: a key', GV.resolveModuleParam(pages, '3.4'), M34);
+check('address: a full label', GV.resolveModuleParam(pages, M33), M33);
+check('address: a stale key means no choice', GV.resolveModuleParam(pages, '9.9'), undefined);
+check('address: absent means no choice', GV.resolveModuleParam(pages, null), undefined);
+check('address: a module that is not a page means no choice', GV.resolveModuleParam(pages, '3.5'), undefined);
+check('default: the most recently past-due counted lesson',
+  GV.defaultModule(pages, paged, isCounted, { a: 100, c: 200 }, 300), M34);
+check('default: a later past date wins whatever the order',
+  GV.defaultModule(pages, paged, isCounted, { a: 250, c: 200 }, 300), M33);
+check('default: nothing past, the next one coming due',
+  GV.defaultModule(pages, paged, isCounted, { a: 900, c: 500 }, 300), M34);
+check('default: an uncounted lesson\'s date is ignored',
+  GV.defaultModule(pages, paged, isCounted, { d: 250, a: 100 }, 300), M33);
+check('default: no dates, the first page', GV.defaultModule(pages, paged, isCounted, undefined, 300), M33);
+check('default: no pages', GV.defaultModule([], paged, isCounted, undefined, 300), null);
+check('column width grows to share the room', GV.pagedColumnWidth(800, 4), 200);
+check('column width never below the minimum', GV.pagedColumnWidth(300, 4), 168);
+check('column width capped', GV.pagedColumnWidth(2000, 2), 240);
+check('column width: no columns', GV.pagedColumnWidth(800, 0), 168);
 
 // ---- late rule -------------------------------------------------------------
 check('late badge: counted and late', D.showLateBadge(true, true), true);
@@ -116,5 +158,96 @@ check('console opens the code editor', D.opensInCodeEditor('console'), true);
 check('diagram does not', D.opensInCodeEditor('diagram'), false);
 check('quiz does not', D.opensInCodeEditor('quiz'), false);
 check('missing preview does not', D.opensInCodeEditor(null), false);
+
+// ---- ux1 G1: scoring from the rubric ----------------------------------------
+{
+  const rubric = [
+    { id: 'a', title: 'Inputs', points: 0, required: true },
+    { id: 'b', title: 'Compare', points: 0 },
+    { id: 'c', title: 'Report', points: 0 },
+  ];
+  const stored = [{ id: 'a', verdict: 'met' }, { id: 'b', verdict: 'partial', feedback: 'half there' }, { id: 'zzz', verdict: 'met' }];
+  const cr = RM.buildMarkCriteria(rubric, stored);
+  check('rubric criteria carry the AI verdict by id; an unknown stored id is not added', cr.map((c) => [c.id, c.aiVerdict]), [['a', 'met'], ['b', 'partial'], ['c', null]]);
+  check('pass/fail criteria are checkboxes, each worth 1', [cr.map(RM.controlFor), cr.map(RM.criterionMax)], [['check', 'check', 'check'], [1, 1, 1]]);
+  const m0 = RM.initialMarks(cr);
+  check('AI verdicts pre-mark: met 1, partly 0.5, unsaid unmarked', m0, { a: 1, b: 0.5 });
+  check('total, marked and max', RM.rubricTotal(cr, m0), { total: 1.5, marked: 2, max: 3 });
+  check('a pass/fail rubric fits a form out of its criteria count', RM.rubricFitsForm(cr, 3), true);
+  check('...and not a form out of 10', RM.rubricFitsForm(cr, 10), false);
+  check('an unknown form maximum takes any rubric', RM.rubricFitsForm(cr, null), true);
+  check('no criteria never fits', RM.rubricFitsForm([], null), false);
+  const pts = RM.buildMarkCriteria([{ id: 'p', title: 'Plan', points: 4 }, { id: 'q', title: 'One', points: 1 }], [{ id: 'p', verdict: 'partial', earned: 2.6 }]);
+  check('a criterion over a point is a stepper; a 1-point one a checkbox', pts.map(RM.controlFor), ['stepper', 'check']);
+  check('a partly met pointed criterion starts at the AI points on half steps', RM.initialMarks(pts), { p: 2.5 });
+  check('a mark is clamped to 0..points', [RM.clampMark(pts[0], 9), RM.clampMark(pts[0], -1), RM.clampMark(pts[0], NaN)], [4, 0, 0]);
+  const solo = RM.buildMarkCriteria(null, [{ id: 'uses-loop', max: 2, verdict: 'met', earned: 2 }]);
+  check('without a rubric the stored criteria are marked, titled from the id', [solo[0].title, solo[0].points], ['Uses loop', 2]);
+  check('source words: rubric, part marked', RM.scoreSourceText('rubric', { total: 2, marked: 2, count: 3 }), 'From the rubric (2 of 3 criteria marked)');
+  check('source words: typed by hand says what the rubric adds up to', RM.scoreSourceText('hand', { total: 2, marked: 2, count: 3 }), 'Typed by hand (the rubric adds up to 2)');
+  check('source words: saved', RM.scoreSourceText('saved', null), 'Your saved score');
+}
+
+// ---- ux1 G3, G4: score wording and whether a score counts ---------------------
+check('a score always reads x / max', [D.scoreOutOf(7, 10), D.scoreOutOf(1.555, 3)], ['7 / 10', '1.56 / 3']);
+check('no maximum is said, never a dash', D.scoreOutOf(7, null), '7 (no maximum set)');
+check('a lesson with points counts', D.scoreWeight({ counts: true, maxScore: 5 }), 'counts');
+check('a counted lab with no maximum is done-only', D.scoreWeight({ counts: true, maxScore: null }), 'done-only');
+check('a lesson with no category is practice', D.scoreWeight({ counts: false, maxScore: 5 }), 'practice');
+check('unknown lesson: nothing said', [D.scoreWeight(null), D.scoreWeightNote(null), D.scoreWeightNote('counts')], [null, null, null]);
+check('practice and done-only each have one sentence, no em dash',
+  ['practice', 'done-only'].map((w) => typeof D.scoreWeightNote(w) === 'string' && !D.scoreWeightNote(w).includes('\u2014')), [true, true]);
+
+// ---- ux1 G5: a quiz hand-in as questions and answers --------------------------
+{
+  const g = JSON.stringify({ variant: 0, quiz: [{ id: 'q1-four-ps', picked: 2, correct: true }, { id: 'q2-order', picked: 0, correct: false }, { id: 'q3-x' }] });
+  const r = JSON.stringify({ answers: { 'q3-x': 1 }, graded: true });
+  const rows = D.quizAnswerRows(g, r, { 'q1-four-ps': 'What are the four Ps?' });
+  check('quiz rows: question text, chosen letter, right or wrong', rows.map((x) => [x.question, x.chosen, x.correct]),
+    [['What are the four Ps?', 'Choice C', true], ['order', 'Choice A', false], ['x', 'Choice B', null]]);
+  check('not a quiz is null', D.quizAnswerRows(JSON.stringify({ criteria: [] }), '', {}), null);
+  check('malformed grade is null', D.quizAnswerRows('{', '', {}), null);
+  check('a question with no pick says so', D.quizAnswerRows(JSON.stringify({ quiz: [{ id: 'q1' }] }), null, null)[0].chosen, 'No answer');
+}
+
+// ---- ux2 T1: one helper says whether a teacher's score changes the grade now ----
+{
+  const unfinished = D.scoreCountNote('counts', { lessonState: 'started', studentName: 'Ben' });
+  check('a counted lesson the student has not finished: the score does not count yet, said with their name',
+    [unfinished.reason, unfinished.tag, unfinished.note.startsWith('Counts once Ben finishes this lesson.')], ['unfinished', 'Counts once finished', true]);
+  check('past due and not finished: says it counts as 0 until then',
+    /past due, so until then the grade counts it as 0/.test(D.scoreCountNote('counts', { lessonState: 'started', pastDue: true, studentName: 'Ben' }).note), true);
+  check('finished, or no lesson_state row yet (a teacher score finishes it): nothing to say',
+    [D.scoreCountNote('counts', { lessonState: 'completed' }), D.scoreCountNote('counts', { lessonState: null }), D.scoreCountNote(null, {})], [null, null, null]);
+  check('practice and done-only win over unfinished: the score never counts, whatever the state',
+    [D.scoreCountNote('practice', { lessonState: 'started' }).reason, D.scoreCountNote('done-only', { lessonState: 'started' }).reason], ['practice', 'done-only']);
+  check('the old label helpers read from the same helper (one wording)',
+    [D.scoreWeightNote('done-only') === D.scoreCountNote('done-only').note, D.scoreWeightTag('practice') === D.scoreCountNote('practice').tag], [true, true]);
+  check('no name: "the student"', D.scoreCountNote('counts', { lessonState: 'started' }).note.startsWith('Counts once the student finishes'), true);
+  check('no em dash in any count note',
+    [D.scoreCountNote('counts', { lessonState: 'started', pastDue: true }), D.scoreCountNote('practice'), D.scoreCountNote('done-only')].some((x) => x.note.includes('\u2014')), false);
+  check('studentFirstName: the first name, else the email before @', [D.studentFirstName(' Ben ', 'b@x'), D.studentFirstName(null, 'cleo@school.test')], ['Ben', 'cleo']);
+}
+
+// ---- ux2 T3b: quiz rows carry the picked option's text and the right answer's ----
+{
+  const content = { questions: [
+    { id: 'q1-four-ps', question: 'What are the four Ps?', options: ['Plan', 'Purpose', 'Problem, project, people, product', 'Price'], answer: 2 },
+    { id: 'q2-order', question: 'Which comes first?', options: ['Construction', 'Inception'], answer: 1 },
+    { id: 'q3-x', question: 'Unkeyed', options: ['A', 'B'], answer: null },
+  ] };
+  const g = JSON.stringify({ quiz: [{ id: 'q1-four-ps', picked: 2, correct: true }, { id: 'q2-order', picked: 0, correct: false }, { id: 'q3-x', picked: 1 }, { id: 'q4-gone', picked: 0 }] });
+  const rows = D.quizAnswerRows(g, null, {}, content);
+  check('quiz rows: question text from the teacher content, picked text, right answer text',
+    rows.map((x) => [x.question, x.chosenText, x.answerText, x.correct]),
+    [['What are the four Ps?', 'Problem, project, people, product', 'Problem, project, people, product', true],
+     ['Which comes first?', 'Construction', 'Inception', false],
+     ['Unkeyed', 'B', null, null],
+     ['gone', null, null, null]]);
+  check('the stored verdict wins; the key only fills a gap',
+    D.quizAnswerRows(JSON.stringify({ quiz: [{ id: 'q2-order', picked: 1 }] }), null, null, content)[0].correct, true);
+  check('an index outside the options is not shown as text', D.quizAnswerRows(JSON.stringify({ quiz: [{ id: 'q2-order', picked: 7 }] }), null, null, content)[0].chosenText, null);
+  check('without teacher content the letters remain', D.quizAnswerRows(g, null, {}, null).map((x) => [x.chosen, x.chosenText]).slice(0, 2), [['Choice C', null], ['Choice A', null]]);
+}
 
 console.log(`\n${n} checks`);

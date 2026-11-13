@@ -23,8 +23,10 @@ const DiagramEditor = dynamic(() => import('./diagram/DiagramEditor'), {
   loading: () => <EditorPlaceholder height={420} />,
 });
 import { diagramFrameHeight, type DiagramDoc } from '../lib/diagram-types';
+import { ownedLocal } from '../lib/owned-storage';
 
-const STORAGE_PREFIX = 'shCode:flowblock:';
+// `w1:<owner>:flowblock:<lessonId>:<blockId>` (lib/owned-storage.ts).
+const STORAGE_PREFIX = 'flowblock:';
 
 interface Props {
   /** Mermaid source from the fence body. */
@@ -55,7 +57,7 @@ export default function DiagramBlock({
   useEffect(() => {
     if (readOnly) return;
     try {
-      const raw = localStorage.getItem(storageKey);
+      const raw = ownedLocal.getItem(storageKey);
       if (raw) {
         const parsed = JSON.parse(raw);
         if (parsed && Array.isArray(parsed.nodes) && Array.isArray(parsed.edges)) {
@@ -69,18 +71,14 @@ export default function DiagramBlock({
   const onChange = useCallback(
     (next: DiagramDoc) => {
       setDoc(next);
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(next));
-      } catch {}
+      ownedLocal.setItem(storageKey, JSON.stringify(next));
     },
     [storageKey],
   );
 
   const reset = useCallback(() => {
     setDoc(fromMermaid(source));
-    try {
-      localStorage.removeItem(storageKey);
-    } catch {}
+    ownedLocal.removeItem(storageKey);
   }, [source, storageKey]);
 
   if (!ready) return null;

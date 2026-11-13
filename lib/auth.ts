@@ -15,6 +15,8 @@ export interface CurrentUser {
   lastName: string | null;
   /** True when login found no terms-acceptance record (older account). */
   needsTerms?: boolean;
+  /** The account's work owner, when the server sends it (GET /api/me). */
+  wo?: string;
 }
 
 /** "First Last", trimmed, handling either half being null. Null if both are unset. */
@@ -58,6 +60,7 @@ async function fetchCurrentUser(): Promise<CurrentUser | null> {
       role?: string;
       firstName?: string | null;
       lastName?: string | null;
+      wo?: string;
     };
     if (!data.email) return null;
     return {
@@ -65,10 +68,21 @@ async function fetchCurrentUser(): Promise<CurrentUser | null> {
       role: parseRole(data.role),
       firstName: data.firstName ?? null,
       lastName: data.lastName ?? null,
+      ...(typeof data.wo === 'string' ? { wo: data.wo } : {}),
     };
   } catch {
     return null;
   }
+}
+
+/**
+ * Ask GET /api/me again, past the cache (lib/outbox.ts, when a page that opened offline gets its
+ * connection back). A user that comes back replaces the cached answer; a failure leaves it.
+ */
+export async function refreshCurrentUser(): Promise<CurrentUser | null> {
+  const user = await fetchCurrentUser();
+  if (user) cache = user;
+  return user;
 }
 
 /** Force the next getCurrentUser() call to re-fetch. */

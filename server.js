@@ -195,19 +195,28 @@ app.prepare().catch((err) => {
     const m = /(?:^|;\s*)dev_role=(student|teacher|admin)(?:;|$)/.exec(req.headers.cookie || '');
     return m ? m[1] : DEV_ROLE;
   };
+  // Per-account browser storage (lib/owned-storage.ts): the owner cookie on page loads and
+  // the X-Work-Owner 409 on /api/*, as functions/_middleware.ts does. Before every /api route.
+  const devOwner = await import('./scripts/dev-owner.mjs');
+  devOwner.mountDevOwner({ server, devIdentity });
   // DEV_REAL_DB=1: the real tries handlers over an in-memory SQLite with a fake AI grader
   // (scripts/dev-demo-api.mjs). Mounted before the stubs below, so these routes win.
+  let demoApi = null;
   if (process.env.DEV_REAL_DB === '1') {
     const { mountDemoApi } = await import('./scripts/dev-demo-api.mjs');
-    mountDemoApi({ server, express, devIdentity, role: DEV_ROLE, root: process.cwd() });
+    demoApi = mountDemoApi({ server, express, devIdentity, role: DEV_ROLE, roleOf: devRoleOf, root: process.cwd() });
   }
   server.get('/api/me', (req, res) => {
-    res.json({ email: devIdentity(req), role: devRoleOf(req) });
+    // `wo` as the real route returns it (functions/api/me.ts), derived the dev way.
+    res.json({ email: devIdentity(req), role: devRoleOf(req), wo: devOwner.devOwnerId(devIdentity(req)) });
   });
   server.post('/api/auth/login', (req, res) => {
+    res.append('Set-Cookie', devOwner.devSignInCookies(req, devIdentity));
     res.json({ email: devIdentity(req), role: devRoleOf(req) });
   });
   server.post('/api/auth/logout', (_req, res) => {
+    // Signed out = a guest until the next sign-in (dev_signed_out=1, scripts/dev-owner.mjs).
+    res.append('Set-Cookie', devOwner.devSignOutCookies());
     res.json({ ok: true });
   });
   // Class-scoped student data. The real routes are
@@ -264,10 +273,12 @@ app.prepare().catch((err) => {
   server.get('/api/lesson-sync/:lessonId', (req, res) => {
     const row = devSync.get(syncKey(req));
     if (!row) return res.json({ files: null, revision: 0, updatedAt: null });
-    res.json(row);
+    res.json({ ...row, versioned: devVersioned(syncKey(req), row.revision) });
   });
+  // As the real route: this revision has a Cloud history row (it was a Save, not an upload by itself).
+  const devVersioned = (key, revision) => (devSyncHistory.get(key) ?? []).some((h) => h.revision === revision);
   server.put('/api/lesson-sync/:lessonId', express.json({ limit: '5mb' }), (req, res) => {
-    const { files, baseRevision } = req.body || {};
+    const { files, baseRevision, auto } = req.body || {};
     if (!files || typeof files !== 'object' || Array.isArray(files)) {
       return res.status(400).json({ error: 'files object required' });
     }
@@ -280,14 +291,18 @@ app.prepare().catch((err) => {
         files: row.files,
         revision: row.revision,
         updatedAt: row.updatedAt,
+        versioned: devVersioned(key, row.revision),
       });
     }
     const next = { files, revision: (row?.revision ?? 0) + 1, updatedAt: Date.now() };
     devSync.set(key, next);
-    // The Cloud tab of History, same 20-row cap as the real table.
-    const history = devSyncHistory.get(key) ?? [];
-    history.unshift({ id: crypto.randomUUID(), files, revision: next.revision, updatedAt: next.updatedAt });
-    devSyncHistory.set(key, history.slice(0, 20));
+    // The Cloud tab of History, same 20-row cap as the real table. An upload the page made
+    // by itself (`auto: true`, lib/outbox.ts) keeps no history row, as in the real route.
+    if (auto !== true) {
+      const history = devSyncHistory.get(key) ?? [];
+      history.unshift({ id: crypto.randomUUID(), files, revision: next.revision, updatedAt: next.updatedAt });
+      devSyncHistory.set(key, history.slice(0, 20));
+    }
     res.json({ revision: next.revision, updatedAt: next.updatedAt });
   });
   // Cloud save history. Real route: functions/api/lesson-sync-history/index.ts.
@@ -390,7 +405,7 @@ app.prepare().catch((err) => {
     return devLessonStates.get(id);
   };
   server.get('/api/lesson-state', (req, res) => {
-    res.json({ ...devStateFor(req), role: DEV_ROLE });
+    res.json({ ...devStateFor(req), role: devRoleOf(req) });
   });
   server.post('/api/lesson-state/:lessonId', express.json(), (req, res) => {
     const st = devStateFor(req);
@@ -592,6 +607,12 @@ app.prepare().catch((err) => {
       const email = devIdentity(req);
       const role = devRoleOf(req);
       ensureMember(email, role);
+      // A class created on the class page lives in dev-demo-api's database; copy its row here so the class
+      // routes below (shared items, shared games, Code together sessions) know it, as one D1 would.
+      if (demoApi && req.params.id && req.path.startsWith('/api/classes/')) {
+        const c = demoApi.classById(req.params.id);
+        if (c) libDb.sqlite.prepare('INSERT OR IGNORE INTO classes (id, name, code, owner_email, school_year, created_at) VALUES (?, ?, ?, ?, ?, ?)').run(c.id, c.name, c.code, c.owner_email, c.school_year, c.created_at);
+      }
       const request = new Request(`http://localhost${req.originalUrl}`, {
         method: req.method,
         headers: { 'content-type': 'application/json' },

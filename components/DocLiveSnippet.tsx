@@ -117,12 +117,14 @@ export default function DocLiveSnippet({ initialCode, fileKey }: Props) {
           type="button"
           disabled={!dirty && !hasRun}
           onClick={handleReset}
+          className="doc-live-reset"
           style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: 4,
             background: 'transparent',
-            color: dirty || hasRun ? 'var(--c-purple)' : 'var(--c-comment)',
+            // Disabled still reads (meta, dashed edge), it just does nothing until the code changes or runs.
+            color: dirty || hasRun ? 'var(--c-purple)' : 'var(--c-meta)',
             border: '1px solid var(--c-line)',
             borderRadius: 4,
             padding: '4px 10px',
@@ -137,7 +139,8 @@ export default function DocLiveSnippet({ initialCode, fileKey }: Props) {
       <div className="doc-live-editor" style={{ ...paneStyle, height: 180 }}>
         <CodeMirrorPane value={code} onChange={setCode} fileKey={fileKey} />
       </div>
-      <div className="doc-live-output" style={{ ...paneStyle, background: 'var(--x-111111)', minHeight: 90, maxHeight: 220, overflowY: 'auto' }}>
+      <div className="doc-live-output" role="region" aria-label="Output" style={{ ...paneStyle, background: 'var(--x-111111)', minHeight: 90, maxHeight: 220, overflowY: 'auto' }}>
+        <div className="doc-live-output-header" aria-hidden="true">Output</div>
         {!hasRun ? (
           <div
             style={{
@@ -153,7 +156,7 @@ export default function DocLiveSnippet({ initialCode, fileKey }: Props) {
               minHeight: 90,
             }}
           >
-            <span>Click Run to see the output</span>
+            <span>Press <strong style={{ color: 'var(--c-green)' }}>Run</strong> to see the output here.</span>
           </div>
         ) : logs.length === 0 ? (
           <div

@@ -29,6 +29,7 @@ import {
   type CurvePt, type FontDoc, type Glyph, type P, type Piece,
 } from '../lib/font-doc';
 import { FONT_LIMITS, listSavedFonts, saveFont } from '../lib/moshion-storage';
+import { ownedLocal } from '../lib/owned-storage';
 
 type Tool = 'pen' | 'line' | 'arc' | 'ellipse' | 'box' | 'grid' | 'curve' | 'select';
 const TOOLS: { id: Tool; label: string; hint: string }[] = [
@@ -41,7 +42,8 @@ const TOOLS: { id: Tool; label: string; hint: string }[] = [
   { id: 'curve', label: 'Curve', hint: 'Click to place points; drag while placing one to bend the line through it. Click the first point (or press Enter) to close the shape. A shape drawn inside another becomes a hole. Esc cancels, Backspace takes back a point.' },
   { id: 'select', label: 'Select', hint: 'Click a piece to pick it. Drag it to move, drag a dot to reshape, Delete to remove.' },
 ];
-const DRAFT_KEY = 'shCode:font-maker-draft';
+// `w1:<owner>:font-maker-draft` (lib/owned-storage.ts): an account's unsaved drawing.
+const DRAFT_KEY = 'font-maker-draft';
 const NAME_RE = /^[A-Za-z][A-Za-z0-9_]{0,39}$/;
 
 const btn: React.CSSProperties = {
@@ -142,9 +144,7 @@ function defaultArcMiddle(a: P, b: P): P {
 
 function readDraft(): { doc: FontDoc; name: string } | null {
   try {
-    const raw = window.localStorage.getItem(DRAFT_KEY);
-    if (!raw) return null;
-    const v = JSON.parse(raw) as { doc?: FontDoc; name?: string };
+    const v = ownedLocal.getJSON<{ doc?: FontDoc; name?: string }>(DRAFT_KEY);
     if (!v || !v.doc || v.doc.v !== 1 || typeof v.doc.glyphs !== 'object') return null;
     return { doc: v.doc, name: typeof v.name === 'string' ? v.name : '' };
   } catch {
@@ -200,7 +200,7 @@ export default function FontEditor({ start, onSaved }: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
-    try { window.localStorage.setItem(DRAFT_KEY, JSON.stringify({ doc, name })); } catch { /* full or blocked: the drawing is still on screen */ }
+    ownedLocal.setJSON(DRAFT_KEY, { doc, name }); // full or blocked: the drawing is still on screen
   }, [doc, name]);
 
   const glyph: Glyph = doc.glyphs[ch] ?? { adv: ch === ' ' ? 300 : DEFAULT_ADVANCE, pieces: [] };

@@ -3,11 +3,13 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import type { ChangeEvent } from 'react';
 import dynamic from 'next/dynamic';
 import type { Lesson } from '../lib/types';
-import { useLessonStore, flattenFiles } from '../lib/store';
+import { useLessonStore, flattenFiles, saveOpenDraft } from '../lib/store';
 import { buildPreviewHtml } from '../lib/preview-builder';
 import { saveProgress, normalizeEol } from '../lib/version-control';
+import { createDebouncedSave, type DebouncedSave } from '../lib/draft-autosave';
+import { OWNER_MISMATCH_HANDIN_TEXT, ownerMismatched } from '../lib/owner-fetch';
 import { seedPlan } from '../lib/plan-seed';
-import { recordSubmission, saveDraft, streamGrade } from '../lib/written-grader-store';
+import { fetchSubmissions, recordSubmission, saveDraft, streamGrade } from '../lib/written-grader-store';
 import { classifyGradeFailure, gradeFailureMessage } from '../lib/grade-error';
 import { aiCheckText, aiNoteForRun, applyAiVerdicts, canSubmitMoshion, fallbackRunner, moshionRunNeed, moshionRunStep, moshionSubmitWords, NO_MOSHION_RUN, reportFromRequirements, runLetsSubmit, staleAiNote, verdictsFromCriteria, type AiVerdicts, type MoshionRun } from '../lib/ai-check';
 import { bypassesLessonLock, recordLessonCompleted, useLessonState } from '../lib/progress';
@@ -15,7 +17,8 @@ import GradeQuotaNote from './GradeQuotaNote';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
 import AiGradeResultPanel, { type AiGradeResultData } from './AiGradeResultPanel';
 import { useAttemptCap, useCompletionRepair } from '../lib/use-attempt-cap';
-import { navigateToNextLesson } from '../lib/lesson-neighbors';
+import LessonOutcome from './LessonOutcome';
+import { isOutOfDate, latestSubmittedAt, ranWhen, submittedOn } from '../lib/outcome-words';
 import { grade } from '../lib/grader';
 import type { GradeReport as GradeReportType, GradeContext } from '../lib/grader';
 import { NO_TEACHER_MODES, resolveMode, type TeacherModes } from '../lib/lesson-mode';
@@ -38,9 +41,12 @@ import AssignmentHeader from './AssignmentHeader';
 import SubmitDialog from './SubmitDialog';
 import GradeReportView from './GradeReport';
 import TeacherPushBanner from './TeacherPushBanner';
-import { useCloudWorkspace } from '../lib/lesson-sync';
-import { addLocalSnapshot } from '../lib/local-history';
+import { useCloudWorkspace, noteDraftSaved } from '../lib/lesson-sync';
+import { UploadChip, TwoVersionsNotice, useUploadStatus } from './UploadStatus';
+import { isOffline, OFFLINE_HANDIN_TEXT } from '../lib/offline';
+import { addLocalSnapshot, NOT_KEPT_TEXT } from '../lib/local-history';
 import CarryForwardBanner from './CarryForwardBanner';
+import GuestWorkOffer from './GuestWorkOffer';
 import DocsDrawer from './DocsDrawer';
 import TextureEditor from './TextureEditor';
 import SoundMixer from './SoundMixer';
@@ -62,6 +68,16 @@ const ReshapeStudio = dynamic(() => import('./reshape/ReshapeStudio'), { ssr: fa
 interface LessonWorkspaceProps {
   lesson: Lesson;
   mode?: 'lesson' | 'assignment';
+}
+
+/** Said when the AI checker could not answer and the lab's own checks marked the cards (ux2 S5). */
+const FALLBACK_NOTE = 'The AI checker is not available right now, so these results come from the built-in checks.';
+
+/** A requirement's description as one plain line for the lab's "Check looks for" row: markdown
+ *  backticks dropped and the trailing "Help: ..." pointer cut (the Quest card keeps both). */
+function checkLine(text: string): string {
+  const cut = text.split(/\s+Help:\s/)[0];
+  return cut.replace(/`/g, '').trim();
 }
 
 export default function LessonWorkspace({
@@ -146,8 +162,27 @@ export default function LessonWorkspace({
   const [consoleResetKey, setConsoleResetKey] = useState(0);
   const [consoleOpen, setConsoleOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  // Phone labs: whether the "More" disclosure (Reset / History / Save) is open.
+  const [toolsOpen, setToolsOpen] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  // ux1 B1/B2/B4. When THIS visit submitted (focus goes to Next), the code it submitted (Submit
+  // opens again once the code changes, so a redo is possible), and the newest submission the
+  // server holds for a return visit.
+  const [submittedAt, setSubmittedAt] = useState<number | null>(null);
+  const [submittedOnText, setSubmittedOnText] = useState<string | null>(null);
+  const [priorSubmittedAt, setPriorSubmittedAt] = useState<number | null>(null);
+  // When the last Run / the last marking of the cards happened, and the text each one read.
+  const [ranAt, setRanAt] = useState<number | null>(null);
+  const [ranOn, setRanOn] = useState<string | null>(null);
+  const [checkedAt, setCheckedAt] = useState<number | null>(null);
+  const [checkedOn, setCheckedOn] = useState<string | null>(null);
+  const [clock, setClock] = useState(() => Date.now());
+  useEffect(() => {
+    if (!ranAt && !checkedAt && !submittedAt) return;
+    const t = setInterval(() => setClock(Date.now()), 15_000);
+    return () => clearInterval(t);
+  }, [ranAt, checkedAt, submittedAt]);
   // Tries on a capped performance-assessment part, counted on the server
   // (lib/use-attempt-cap.ts). Absent maxSubmissions = uncapped, nothing changes.
   const lessonProgress = useLessonState();
@@ -312,6 +347,8 @@ export default function LessonWorkspace({
   // the reference solution is loaded, for the same reason the localStorage
   // autosave is. See lib/lesson-sync.ts.
   const cloud = useCloudWorkspace(lesson, lessonProgress.authed && !solutionLoaded);
+  // Where the code is: on this computer, uploading by itself, uploaded (lib/outbox.ts).
+  const upload = useUploadStatus(lesson.id, lessonProgress.authed && !solutionLoaded);
 
   const isConsoleMode = lesson.preview === 'console';
   // A lesson whose graded file is prose/pseudocode (README.md), not a script the
@@ -503,6 +540,9 @@ export default function LessonWorkspace({
     const logs: Array<{type: string; message: string; timestamp: string}> = [];
 
     const finish = () => {
+      setRanAt(Date.now());
+      setClock(Date.now());
+      setRanOn(scriptContent);
       setIsRunning(false);
       setConsoleOutput(logs);
       setRunKey((k) => k + 1);
@@ -637,6 +677,9 @@ export default function LessonWorkspace({
     setRuntimeError(null);
     setMoshionRun((r) => moshionRunStep(r, { type: 'run', text: code }));
     setQ5Code(code);
+    setRanAt(Date.now());
+    setClock(Date.now());
+    setRanOn(code);
     setRunKey((k) => k + 1);
     setConsoleResetKey((k) => k + 1);
     setConsoleOpen(true);
@@ -701,22 +744,37 @@ export default function LessonWorkspace({
   // Auto-save to localStorage (debounced). Skipped while the reference
   // solution is loaded so an admin/teacher reviewing it can't accidentally
   // overwrite their own draft.
+  // A pending save is FLUSHED, never dropped, when the lesson unmounts or the page
+  // hides (lib/draft-autosave.ts): every write lands in the keys of the owner this
+  // page loaded with (lib/owned-storage.ts), so it can never reach someone else's.
+  const autosaveLessonId = useRef(lesson.id);
+  autosaveLessonId.current = lesson.id;
+  const autosave = useRef<DebouncedSave | null>(null);
+  if (autosave.current === null) {
+    // The draft is written, then queued to upload by itself when it differs from what the
+    // account last had (lib/lesson-sync.ts noteDraftSaved; a no-op signed out).
+    autosave.current = createDebouncedSave(() => {
+      saveOpenDraft(autosaveLessonId.current);
+      noteDraftSaved(autosaveLessonId.current);
+    }, 2000);
+  }
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (solutionLoaded) return;
-    const timer = setTimeout(() => {
-      const state = useLessonStore.getState();
-      if (state.lesson) {
-        saveProgress(state.lesson.id, {
-          fileContents: state.fileContents,
-          commits: state.commits,
-          lastCommittedFileContents: state.lastCommittedFileContents,
-          completedSteps: [],
-        });
-      }
-    }, 2000);
-    return () => clearTimeout(timer);
+    if (solutionLoaded) { autosave.current?.cancel(); return; }
+    autosave.current?.schedule();
   }, [files, commits, solutionLoaded]);
+  useEffect(() => {
+    const saver = autosave.current;
+    const onHide = () => { if (document.visibilityState === 'hidden') saver?.flush(); };
+    const onPageHide = () => saver?.flush();
+    document.addEventListener('visibilitychange', onHide);
+    window.addEventListener('pagehide', onPageHide);
+    return () => {
+      document.removeEventListener('visibilitychange', onHide);
+      window.removeEventListener('pagehide', onPageHide);
+      saver?.flush();
+    };
+  }, []);
 
   // The shortcut effect below registers once ([] deps), so it would call the
   // runTests closure from the first render forever -- grading a reSHape
@@ -815,6 +873,14 @@ export default function LessonWorkspace({
         return { ...r, ...result };
       });
     const ai = aiVerdictsRef.current;
+    // The cards now describe this text: stamp when, so the row can say "Checked just now" and
+    // "Out of date" once the code changes (ux1 B4). An aiCheck lab without fresh verdicts keeps
+    // its cards ungraded, which is not a new result.
+    if (!aiCheck || aiFallbackRef.current === aiText(files) || (ai && ai.text === aiText(files))) {
+      setCheckedAt(Date.now());
+      setClock(Date.now());
+      setCheckedOn(files['script.js'] ?? '');
+    }
     // On an aiCheck lab Run is for running: the AI's Grade owns the cards, so with no fresh
     // verdicts they stay ungraded rather than showing the pattern check's red and green.
     setRequirements(
@@ -842,7 +908,9 @@ export default function LessonWorkspace({
       return;
     }
     aiFallbackRef.current = text;
-    setAiCheckNote({ kind: 'error', text: `${why} The pattern check marked your cards instead, so you can keep going.` });
+    // Plain words, no server text (ux2 S5): which checker marked the cards is all the student needs.
+    void why;
+    setAiCheckNote({ kind: 'error', text: FALLBACK_NOTE });
     // The same runner a plain Run of this lab uses (lib/ai-check.ts fallbackRunner).
     const runner = fallbackRunner(lesson);
     if (runner === 'grade') trackRun(runTests());
@@ -883,10 +951,13 @@ export default function LessonWorkspace({
       const verdicts = verdictsFromCriteria(data.criteria ?? [], aiCheck.rubric.map((r) => r.id));
       aiVerdictsRef.current = { verdicts, text };
       setRequirements(applyAiVerdicts(useLessonStore.getState().requirements, verdicts));
+      setCheckedAt(Date.now());
+      setClock(Date.now());
+      setCheckedOn(useLessonStore.getState().fileContents['script.js'] ?? '');
       const green = Object.values(verdicts).filter((v) => v.passed).length;
       setAiCheckNote({
         kind: 'ok',
-        text: `${data.summary ? data.summary + ' ' : ''}(${green} of ${aiCheck.rubric.length} green. Open Quest for the notes.)`.trim(),
+        text: `${data.summary ? data.summary + ' ' : ''}(${green} of ${aiCheck.rubric.length} passed.)`.trim(),
         hints: Array.isArray(data.hints) ? data.hints : [],
       });
     } catch (e) {
@@ -1040,7 +1111,10 @@ export default function LessonWorkspace({
         possible: gradeReport.totalPossible,
       });
       if (!ok) {
-        alert('Submission could not be recorded on the server. Please reload and try again.');
+        // Not queued: a hand-in has a time and a try count, so it is sent only by the student.
+        alert(ownerMismatched() ? OWNER_MISMATCH_HANDIN_TEXT
+          : isOffline() ? OFFLINE_HANDIN_TEXT
+          : 'Submission could not be recorded on the server. Please reload and try again.');
         return;
       }
       // Best try counts; the lesson_state upsert also refuses to lower it.
@@ -1054,8 +1128,11 @@ export default function LessonWorkspace({
       cap.spend();
       return;
     }
+    // Stay on the page (ux1 B1): the outcome block above the editor says it worked, and its
+    // Next takes focus. Submit opens again once the code changes, for a student who wants to redo it.
     setSubmitted(true);
-    navigateToNextLesson(lesson.id);
+    setSubmittedAt(Date.now());
+    setSubmittedOnText(JSON.stringify(state.fileContents));
   };
 
   const totalScore = gradeReport?.totalScore || 0;
@@ -1105,10 +1182,40 @@ export default function LessonWorkspace({
       : runLetsSubmit({ error: runtimeError, pending: false }, expectsRuntimeError) &&
         (isNoPoints ? allRequirementsPassed : totalScore >= (lesson.grading?.passingScore ?? 0)));
   const canSubmit = canSubmitByWork && !cap.unknown && !cap.reached;
+  // The code on screen is the code just submitted: nothing new to hand in. Edit it and Submit opens
+  // again (subject to the same checks), which is how a student redoes a submitted lab.
+  const scriptNow = files['script.js'] ?? '';
+  const submitLocked = submitted && submittedOnText !== null && submittedOnText === JSON.stringify(files);
+  // Done on an earlier visit, from the saved lesson state the header and the module bar read.
+  const isLab = isConsoleMode || isMoshionMode;
+  const priorDone = isLab && !capped && lessonProgress.states[lesson.id] === 'completed';
+  useEffect(() => {
+    if (!priorDone || !lessonProgress.authed || priorSubmittedAt !== null) return;
+    let live = true;
+    void fetchSubmissions(lesson.id).then((r) => {
+      if (live && r.loaded) setPriorSubmittedAt(latestSubmittedAt(r.records as { submittedAt?: number }[]) ?? 0);
+    });
+    return () => { live = false; };
+  }, [priorDone, lessonProgress.authed, lesson.id, priorSubmittedAt]);
+  const showOutcome = !capped && (submitted || priorDone);
+  const outcomeAt = submittedAt ?? (priorSubmittedAt || null);
+  const checksStale = isOutOfDate(checkedOn, scriptNow);
+  const runStale = isOutOfDate(ranOn, scriptNow);
+  const anyChecked = requirements.some((r) => r.status === 'passed' || r.status === 'failed');
+  // A display-only copy of the last marked cards. An AI-checked lab drops its marks on the first edit
+  // (Submit records the cards as shown, see #68), which made a result vanish rather than say it is
+  // old; the row keeps showing this copy, dimmed and labelled "Out of date", until the next Check.
+  // Nothing grades, records or gates Submit from it.
+  const [lastMarked, setLastMarked] = useState<typeof requirements | null>(null);
+  useEffect(() => {
+    if (anyChecked) setLastMarked(requirements);
+  }, [anyChecked, requirements]);
+  const rowReqs = anyChecked ? requirements : checksStale && lastMarked ? lastMarked : requirements;
+  const rowMarked = anyChecked || (checksStale && !!lastMarked);
   // Why a moSHion lab's Submit is shut, in the header and on Submit's hover. A test part, a spent
   // try cap or a submitted lab says nothing here: the banner and the header already do.
   const moshionWords =
-    isMoshionMode && !isSummative && !submitted && !cap.unknown && !cap.reached
+    isMoshionMode && !isSummative && !submitLocked && !cap.unknown && !cap.reached
       ? moshionSubmitWords({ need: moshionNeed, cardsOk: allRequirementsPassed, aiCheck: !!aiCheck })
       : {};
   // Any lesson with graded criteria keeps the score header, not just the
@@ -1122,12 +1229,122 @@ export default function LessonWorkspace({
   const headerTotal = countCriteria ? totalCriteria : totalPossible;
   const headerUnitLabel = countCriteria ? '' : 'pts';
 
+  // ---- The lab's check result (ux2 S3, S4, S5) -------------------------------------------------
+  const checkVerb = aiCheck ? 'Check' : 'Run';
+  const failedN = requirements.filter((r) => r.status === 'failed').length;
+  // A submitted lab on a return visit, nothing checked yet in this one: the "Submitted" block says
+  // what is true and how to hand in again, so no hollow "Check looks for" row or "Pass Check to
+  // submit" hint contradicts it beside a greyed Submit.
+  const restingSubmitted = showOutcome && !rowMarked;
+  // What the student does next, in the header's status line. It follows the check: before it,
+  // after a red one, after an edit, and once everything is green.
+  const labNext = !isLab || restingSubmitted
+    ? undefined
+    : !rowMarked
+      ? `Next: press ${checkVerb} to test your code`
+      : checksStale
+        ? `Next: you changed your code, press ${checkVerb} again`
+        : failedN > 0
+          ? `Next: fix the red ${failedN === 1 ? 'one' : 'ones'}, then press ${checkVerb} again`
+          : canSubmit && !submitLocked
+            ? (showOutcome ? 'Next: Submit again' : 'Next: Submit')
+            : undefined;
+  // The "AI checker is not available" note only while it explains the marks on screen: not once
+  // they are all green, and not after the lab is handed in.
+  const shownNote = aiCheckNote && aiCheckNote.kind === 'error' && aiCheckNote.text === FALLBACK_NOTE
+    && (allRequirementsPassed || submitLocked || restingSubmitted) ? null : aiCheckNote;
+  const renderCheckRow = (where: 'above' | 'below') => {
+    if (restingSubmitted) return null;
+    const passedN = rowReqs.filter((r) => r.status === 'passed').length;
+            const shown = rowMarked ? rowReqs : requirements.slice(0, 3);
+            return (
+              <div className={`lab-check-tests lab-check-${where}${rowMarked ? ' has-results' : ''}${rowMarked && checksStale ? ' is-stale' : ''}`} id={where === 'below' ? `lab-check-below-${lesson.id}` : `lab-check-${lesson.id}`} tabIndex={where === 'below' ? -1 : undefined}>
+                <span className="lab-check-tests-label">
+                  {rowMarked
+                    ? `${passedN} of ${rowReqs.length} passed`
+                    : aiGraded ? 'Grade looks for' : aiCheck || isTextMode ? 'Check looks for' : 'Run checks'}
+                </span>
+                {rowMarked && checkedAt ? (
+                  <span className="lab-check-when" role="status" aria-live="polite">
+                    {checksStale ? `Out of date: ${aiCheck ? 'check' : 'run'} again` : `Checked ${ranWhen(checkedAt, clock)}`}
+                  </span>
+                ) : null}
+                <ul>
+                  {shown.map((r) => {
+                    const why = r.status === 'failed' ? (r.messages ?? []).filter(Boolean)[0] : undefined;
+                    return (
+                      <li key={r.id} data-status={r.status}>
+                        <span className="lab-check-dot" aria-hidden="true">{r.status === 'passed' ? '✓' : r.status === 'failed' ? '✗' : '○'}</span>
+                        <span className="lab-check-item">
+                          <span>{rowMarked ? r.title : checkLine(r.description || r.title)}</span>
+                          <span className="sr-only">{r.status === 'passed' ? ' (done)' : r.status === 'failed' ? ' (not yet)' : ' (not checked yet)'}</span>
+                          {r.status === 'failed' ? (
+                            <span className="lab-check-why">{why ? checkLine(why) : r.description ? `Not yet. It looks for: ${checkLine(r.description)}` : 'Not found in your code yet.'}</span>
+                          ) : null}
+                        </span>
+                      </li>
+                    );
+                  })}
+                  {!rowMarked && requirements.length > 3 && <li className="lab-check-more">and {requirements.length - 3} more under Quest</li>}
+                </ul>
+              </div>
+            );
+  };
+  // Phones only (CSS): one line of a fixed height from the start, so a Check never moves the editor.
+  const labPassedN = rowReqs.filter((r) => r.status === 'passed').length;
+  const labCheckSummary = (
+    <div className={`lab-check-summary${rowMarked ? ' has-results' : ''}${rowMarked && checksStale ? ' is-stale' : ''}${rowMarked && !checksStale && labPassedN < rowReqs.length ? ' has-failed' : ''}`}>
+      {restingSubmitted ? (
+        <span>Submitted. To change it, edit your code and press {checkVerb}.</span>
+      ) : (
+        <button
+          type="button"
+          className="lab-check-summary-btn"
+          onClick={() => {
+            const el = document.getElementById(`lab-check-below-${lesson.id}`);
+            if (!el) return;
+            el.scrollIntoView({ block: 'start', behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+            el.focus({ preventScroll: true });
+          }}
+        >
+          {rowMarked
+            ? checksStale
+              ? `Out of date: press ${checkVerb} again`
+              : `${labPassedN} of ${rowReqs.length} passed · tap for details`
+            : `Press ${checkVerb} to test your code · ${requirements.length} ${requirements.length === 1 ? 'check' : 'checks'} below`}
+        </button>
+      )}
+    </div>
+  );
+  const renderAiNote = (where: 'above' | 'below' | 'only') => (
+            <div className={`lab-ainote-${where}${!shownNote ? ' ai-check-help' : ''}`} style={{ marginBottom: 6 }}>
+              <div role="status" aria-live="polite" className="ux2-prose" style={{ fontSize: 13, color: 'var(--c-meta)' }}>
+                {shownNote
+                  ? aiNoteForRun(shownNote, { allGreen: allRequirementsPassed, runErrored: !!runtimeError })
+                  : isTextMode
+                    ? 'Plain English is welcome. The AI marks the Quest cards from what your steps mean, not the exact words.'
+                    : isMoshionMode
+                      ? 'Run to preview · Check to mark Quest · Submit when green and error-free.'
+                      : 'Run to preview · Check to mark Quest · Submit when green.'}
+              </div>
+              {shownNote?.kind === 'ok' && shownNote.hints && shownNote.hints.length > 0 && (
+                <ul style={{ margin: '4px 0 0', paddingLeft: 20, fontSize: 14, color: 'var(--c-meta)' }}>
+                  {shownNote.hints.map((h, i) => (
+                    <li key={i}>{h}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+  );
+
   return (
     <>
       <TeacherPushBanner />
+      <GuestWorkOffer lesson={lesson} />
       <CarryForwardBanner lesson={lesson} />
       <TabbedRightDrawer
         storageKey="shCode:drawer"
+        inlineHostId="lab-tools-host"
         tabs={[
           {
             key: 'help',
@@ -1278,8 +1495,11 @@ export default function LessonWorkspace({
           score={headerScore}
           totalPossible={headerTotal}
           onSubmit={handleSubmit}
-          submitted={submitted}
+          submitted={submitLocked}
           canSubmit={canSubmit}
+          doneNote={restingSubmitted ? 'Submitted' : undefined}
+          nextHint={labNext}
+          hideScore={showOutcome && !anyChecked}
           unitLabel={headerUnitLabel}
           showStatus={!isMoshionMode}
           showSubmit
@@ -1287,10 +1507,12 @@ export default function LessonWorkspace({
           unmetTitles={unmetTitles}
           unmetNote={isMoshionMode ? moshionWords.note : aiCheck ? 'press Check to mark them' : undefined}
           blockedNote={moshionWords.line}
+          toolsHostId="lab-tools-host"
         />
       ) : (
         <div id="titleRow">
           <h1>{lesson.title}</h1>
+          <div id="lab-tools-host" className="shd-inline-host" />
         </div>
       )}
       {!showAssignmentHeader && capped ? <AttemptBanner max={cap.max} used={cap.used} loading={cap.loading} /> : null}
@@ -1320,6 +1542,19 @@ export default function LessonWorkspace({
       )}
       <div className="editor-card">
         <div className="editor-body">
+          {showOutcome ? (
+            <LessonOutcome
+              lessonId={lesson.id}
+              id={`lab-outcome-${lesson.id}`}
+              title={outcomeAt ? `Submitted on ${submittedOn(outcomeAt, clock)}` : 'Submitted'}
+              detail={
+                submitLocked
+                  ? <>Your teacher can see it. Want to change it? Edit your code, press {aiCheck ? 'Check' : 'Run'}, then Submit again. Your best result is kept.</>
+                  : <>This lab is done. You can keep working on it: change your code, press {aiCheck ? 'Check' : 'Run'}, then Submit again. Your best result is kept.</>
+              }
+              focusKey={submittedAt}
+            />
+          ) : null}
           <div className="run-toolbar">
             {(isTextMode || isConsoleMode || isReshapeMode || isMoshionMode) && (
               <>
@@ -1372,6 +1607,8 @@ export default function LessonWorkspace({
                     </button>
                   )
                 )}
+                {/* The shortcut belongs to the first button (Run, or Check / Grade on a text lesson), so it sits right after it (climb4 r10 S7). */}
+                <span className="run-hint">Ctrl+Enter</span>
                 {aiCheck && !isTextMode && !isReshapeMode && (
                   // Run shows what the code prints; Check is the AI read that marks the Quest cards.
                   <button
@@ -1383,7 +1620,25 @@ export default function LessonWorkspace({
                     {aiCheckBusy ? 'Reading your code…' : 'Check'}
                   </button>
                 )}
-                <span className="run-hint">Ctrl+Enter</span>
+                {(isMoshionMode || isConsoleMode) && (
+                  // Run -> Check -> Submit read as one sequence (the header's copy of
+                  // Submit is hidden in a lab; same handler, same disabled rule).
+                  <button
+                    className="btn-primary btn-sm toolbar-submit"
+                    onClick={handleSubmit}
+                    disabled={submitLocked || !canSubmit}
+                    title={submitLocked ? 'Already submitted. Change your code to submit again.' : !canSubmit ? moshionWords.title : undefined}
+                  >
+                    <Send size={14} />
+                    Submit
+                  </button>
+                )}
+                {(isMoshionMode || isConsoleMode) && !submitLocked && !canSubmit && !runtimeError && !isSummative && !cap.unknown && !cap.reached && !restingSubmitted && (
+                  // Why Submit is shut, in a few words beside it (climb4 r10 S7); the full reason is on its hover.
+                  <span className="toolbar-submit-hint">
+                    {allRequirementsPassed ? 'Run it, then Submit' : `Pass ${checkVerb} to submit`}
+                  </span>
+                )}
                 {resetMsg && (
                   <span
                     role="status"
@@ -1439,19 +1694,18 @@ export default function LessonWorkspace({
                   : '✗ Fix runtime error before submitting'}
               </span>
             )}
-            {(isMoshionMode || isConsoleMode) && (
-              <button
-                style={{ marginLeft: 'auto' }}
-                className="btn-primary btn-sm toolbar-submit"
-                onClick={handleSubmit}
-                disabled={submitted || !canSubmit}
-                title={!canSubmit ? moshionWords.title : undefined}
-              >
-                <Send size={14} />
-                Submit
-              </button>
-            )}
-            <div className="toolbar-utilities" role="group" aria-label="Editor tools" style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+            {/* Phone only (CSS shows it in a lab below 720px): Reset, History and Save fold
+                behind one disclosure so Run, Check and Submit get the row. */}
+            <button
+              type="button"
+              className="btn-secondary btn-sm toolbar-more"
+              aria-expanded={toolsOpen}
+              aria-controls={`editor-tools-${lesson.id}`}
+              onClick={() => setToolsOpen((v) => !v)}
+            >
+              More <span aria-hidden="true">{toolsOpen ? '▴' : '▾'}</span>
+            </button>
+            <div id={`editor-tools-${lesson.id}`} className={`toolbar-utilities${toolsOpen ? ' is-open' : ''}`} role="group" aria-label="Editor tools" style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
               {(isTextMode || isConsoleMode || isReshapeMode || isMoshionMode) && (
                 <button
                   style={{
@@ -1469,7 +1723,9 @@ export default function LessonWorkspace({
                   onClick={() => {
                     const what = isTextMode ? 'text' : 'code';
                     if (window.confirm(`Reset your ${what} to the starter? Unsaved work will be lost.`)) {
-                      resetLesson(lesson);
+                      // The code it replaces is put in History first; if it cannot be, nothing is reset.
+                      // (The reference solution is not the person's work: it is discarded, not kept.)
+                      if (!resetLesson(lesson, { discard: solutionLoaded })) { window.alert(NOT_KEPT_TEXT); return; }
                       stopRun();
                       // The starter has not been run either: "Press Run", not "you changed your code".
                       setMoshionRun(NO_MOSHION_RUN);
@@ -1478,6 +1734,9 @@ export default function LessonWorkspace({
                       aiVerdictsRef.current = null;
                       aiFallbackRef.current = null;
                       setAiCheckNote(null);
+                      setLastMarked(null);
+                      setCheckedOn(null);
+                      setCheckedAt(null);
                       // A plan lesson's strip recomputes from the restored text in
                       // the effect above; setting the authored cards here would flash
                       // the old four onto it.
@@ -1527,7 +1786,7 @@ export default function LessonWorkspace({
                     <CloudUpload size={14} />
                     <span className="toolbar-button-label">{cloud.saving ? 'Saving…' : 'Save'}</span>
                   </button>
-                  {cloud.note && (
+                  {cloud.note ? (
                     <span
                       role="status"
                       aria-live="polite"
@@ -1541,33 +1800,16 @@ export default function LessonWorkspace({
                       {cloud.note.kind === 'error' ? '✗ ' : '✓ '}
                       {cloud.note.text}
                     </span>
+                  ) : (
+                    <UploadChip status={upload} />
                   )}
                 </>
               )}
             </div>
           </div>
-          {aiCheck && (
-            // The AI's read of the steps, directly under the Grade button and
-            // above the textarea it graded.
-            <div className={!aiCheckNote ? 'ai-check-help' : undefined} style={{ marginBottom: 6 }}>
-              <div role="status" aria-live="polite" style={{ fontSize: 13, color: 'var(--c-meta)' }}>
-                {aiCheckNote
-                  ? aiNoteForRun(aiCheckNote, { allGreen: allRequirementsPassed, runErrored: !!runtimeError })
-                  : isTextMode
-                    ? 'Plain English is welcome. The AI marks the Quest cards from what your steps mean, not the exact words.'
-                    : isMoshionMode
-                      ? 'Run to preview · Check to mark Quest · Submit when green and error-free.'
-                      : 'Run to preview · Check to mark Quest · Submit when green.'}
-              </div>
-              {aiCheckNote?.kind === 'ok' && aiCheckNote.hints && aiCheckNote.hints.length > 0 && (
-                <ul style={{ margin: '4px 0 0', paddingLeft: 20, fontSize: 14, color: 'var(--c-meta)' }}>
-                  {aiCheckNote.hints.map((h, i) => (
-                    <li key={i}>{h}</li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
+          {lessonProgress.authed && !solutionLoaded ? <TwoVersionsNotice lessonId={lesson.id} status={upload} /> : null}
+          {isLab && requirements.length > 0 ? <>{labCheckSummary}{renderCheckRow('above')}</> : null}
+          {aiCheck ? renderAiNote(isLab ? 'above' : 'only') : null}
           <div
             className="editor-preview-container"
             id="split"
@@ -1615,9 +1857,14 @@ export default function LessonWorkspace({
                 <div className="pane" id="previewPane">
                   {isConsoleMode ? (
                     <>
-                      <div className="output-header">Output</div>
+                      <div className="output-header">
+                        Output
+                        {ranAt && !isRunning ? (
+                          <span className={`run-stamp${runStale ? ' is-stale' : ''}`}>{runStale ? 'Out of date: run again' : `Ran ${ranWhen(ranAt, clock)}`}</span>
+                        ) : null}
+                      </div>
                       <pre
-                        className="console-output run-output"
+                        className={`console-output run-output${runStale ? ' is-stale' : ''}`}
                         role="log"
                         aria-live="polite"
                         aria-atomic="false"
@@ -1629,7 +1876,7 @@ export default function LessonWorkspace({
                             {runKey === 0
                               ? 'Click Run to see output.'
                               : lesson.requirements.length > 0
-                                ? 'Checked. Nothing was printed. Open the Quest panel to see which checks passed.'
+                                ? 'Ran. Nothing was printed. Your check results are listed with the buttons.'
                                 : 'Ran. Nothing was printed.'}
                           </div>
                         ) : (
@@ -1642,7 +1889,12 @@ export default function LessonWorkspace({
                       </pre>
                     </>
                   ) : isMoshionMode ? (
-                    <MoshionPreview ref={labFrameRef} code={q5Code} runKey={runKey} gameKey={lesson.id} />
+                    <>
+                      {ranAt && runKey > 0 ? (
+                        <span className={`run-stamp run-stamp-float${runStale ? ' is-stale' : ''}`}>{runStale ? 'Out of date: run again' : `Ran ${ranWhen(ranAt, clock)}`}</span>
+                      ) : null}
+                      <MoshionPreview ref={labFrameRef} code={q5Code} runKey={runKey} gameKey={lesson.id} />
+                    </>
                   ) : (
                     <LivePreview srcDoc={srcDoc} />
                   )}
@@ -1651,6 +1903,10 @@ export default function LessonWorkspace({
               </>
             )}
           </div>
+          {/* Phones only (CSS): the full result under the editor, so a Check never pushes the line being
+              typed under the on-screen keyboard (ux2 S3). The one-line summary above it keeps its height. */}
+          {isLab && requirements.length > 0 ? renderCheckRow('below') : null}
+          {isLab && aiCheck ? renderAiNote('below') : null}
           {!isConsoleMode && (
             <details
               className="console"

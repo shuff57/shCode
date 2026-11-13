@@ -55,6 +55,22 @@ function computeNeighbors(
   };
 }
 
+// "9 of 22": where this lesson sits in its module, counted the way lib/curriculum.ts lists a
+// module (numbered id under the module's X.Y prefix, same category, numeric order). Shown on a
+// phone between prev and next, so the page's own "Module X · Lesson N of M" line can go.
+function modulePosition(lessons: ManifestLesson[], id: string): { index: number; total: number } | null {
+  const current = lessons.find((l) => l.id === id);
+  const num = current ? parseNumberedId(current.title) : null;
+  if (!current || !num) return null;
+  const mod = num.split('.').slice(0, 2).join('.') + '.';
+  const ids = lessons
+    .filter((l) => l.category === current.category && (parseNumberedId(l.title) ?? '').startsWith(mod))
+    .map((l) => ({ id: l.id, n: parseNumberedId(l.title) as string }))
+    .sort((a, b) => a.n.localeCompare(b.n, undefined, { numeric: true }));
+  const index = ids.findIndex((l) => l.id === id);
+  return index < 0 ? null : { index: index + 1, total: ids.length };
+}
+
 // Only the id matters. The prefix a neighbour needs comes from that
 // neighbour's own type, never from the page we happen to be standing on —
 // a reading and the assignment after it live under different prefixes.
@@ -67,6 +83,14 @@ function shortLabel(n: Neighbor) {
   const kind = n.preview ?? n.type ?? 'Lesson';
   const labels: Record<string, string> = { reading: 'Reading', quiz: 'Quiz', video: 'Video', slides: 'Slides', example: 'Example', console: 'Lab', moshion: 'Lab' };
   return `${parseNumberedId(n.title) ?? ''} ${labels[kind] ?? 'Lesson'}`.trim();
+}
+
+// Phones: the lesson number leads in full strength and the type follows quieter, so two neighbours
+// of the same type ("1.1.17 Reading", "1.1.19 Reading") read as two different places (climb4 r9 S7).
+function ShortLabel({ n }: { n: Neighbor }) {
+  const num = parseNumberedId(n.title);
+  const kind = shortLabel(n).slice(num ? num.length : 0).trim();
+  return <span className="lesson-nav-short">{num ? <b className="lesson-nav-num">{num}</b> : null}{num ? ' ' : ''}<span className="lesson-nav-kind">{kind}</span></span>;
 }
 
 export default function HeaderLessonNav() {
@@ -96,6 +120,7 @@ export default function HeaderLessonNav() {
 
   const { prev, next } = computeNeighbors(lessons, route.id);
   if (!prev && !next) return null;
+  const pos = modulePosition(lessons, route.id);
 
   const titleStyle: React.CSSProperties = {
     whiteSpace: 'nowrap',
@@ -112,7 +137,8 @@ export default function HeaderLessonNav() {
   const nextLocked = !currentCompleted && !bypassesLessonLock(snap.role);
 
   return (
-    <div
+    <nav
+      aria-label="Lesson navigation"
       className="header-lesson-nav"
       style={{
         display: 'flex',
@@ -128,12 +154,18 @@ export default function HeaderLessonNav() {
     >
       {prev ? (
         <a className="hdr-lesson-link" href={lessonHref(prev)}>
-          <span style={{ color: 'var(--c-meta)' }}>←</span>
-          <span style={titleStyle}><span className="lesson-nav-full">{prev.title}</span><span className="lesson-nav-short">{shortLabel(prev)}</span></span>
+          <span style={{ color: 'var(--c-meta)' }} aria-hidden="true">←</span>
+          <span className="hdr-lesson-label">Previous</span>
+          <span style={titleStyle}><span className="lesson-nav-full">{prev.title}</span><ShortLabel n={prev} /></span>
         </a>
       ) : (
         <span />
       )}
+      {pos ? (
+        <span className="hdr-lesson-pos" aria-label={`Lesson ${pos.index} of ${pos.total} in this module`}>
+          {pos.index} of {pos.total}<span className="hdr-pos-scope">{"\u00a0"}in this module</span>
+        </span>
+      ) : null}
       {next ? (
         nextLocked ? (
           <span
@@ -148,7 +180,8 @@ export default function HeaderLessonNav() {
               gap: 6,
             }}
           >
-            <span style={titleStyle}><span className="lesson-nav-full">{next.title}</span><span className="lesson-nav-short">{shortLabel(next)}</span></span>
+            <span className="hdr-lesson-label">Next lesson</span>
+            <span style={titleStyle}><span className="lesson-nav-full">{next.title}</span><ShortLabel n={next} /></span>
             <span style={{ color: 'var(--c-meta)' }} aria-hidden="true">🔒</span>
           </span>
         ) : (
@@ -156,13 +189,14 @@ export default function HeaderLessonNav() {
             className="hdr-lesson-link hdr-lesson-link-right"
             href={lessonHref(next)}
           >
-            <span style={titleStyle}><span className="lesson-nav-full">{next.title}</span><span className="lesson-nav-short">{shortLabel(next)}</span></span>
-            <span style={{ color: 'var(--c-meta)' }}>→</span>
+            <span className="hdr-lesson-label">Next lesson</span>
+            <span style={titleStyle}><span className="lesson-nav-full">{next.title}</span><ShortLabel n={next} /></span>
+            <span style={{ color: 'var(--c-meta)' }} aria-hidden="true">→</span>
           </a>
         )
       ) : (
         <span />
       )}
-    </div>
+    </nav>
   );
 }

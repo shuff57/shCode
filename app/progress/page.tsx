@@ -49,7 +49,7 @@ export default function ProgressPage() {
 
   if (user === undefined || !progress.loaded || !manifest) {
     return (
-      <div className="page-frame" style={containerStyle}>
+      <div className="page-frame progress-page" style={containerStyle}>
         <p style={{ color: 'var(--c-meta)' }}>Loading...</p>
       </div>
     );
@@ -57,7 +57,7 @@ export default function ProgressPage() {
 
   if (!user || !progress.authed) {
     return (
-      <div className="page-frame" style={containerStyle}>
+      <div className="page-frame progress-page" style={containerStyle}>
         <nav style={navStyle}>
           <Link href="/" style={linkStyle}>Home</Link>
           <span style={{ color: 'var(--c-meta)' }}>›</span>
@@ -110,7 +110,7 @@ export default function ProgressPage() {
   const unitEntries = Array.from(unitMap.entries()).sort((a, b) => a[0].localeCompare(b[0]));
 
   return (
-    <div className="page-frame" style={containerStyle}>
+    <div className="page-frame progress-page" style={containerStyle}>
       <nav style={navStyle}>
         <Link href="/" style={linkStyle}>Home</Link>
         <span style={{ color: 'var(--c-meta)' }}>›</span>
@@ -118,7 +118,7 @@ export default function ProgressPage() {
       </nav>
 
       <h1 style={{ fontSize: 28, fontWeight: 700, margin: '0 0 12px' }}>Your progress</h1>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 16, color: 'var(--c-meta)', fontSize: 14 }}>
+      <div className="progress-summary-line" style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', marginBottom: 16, color: 'var(--c-meta)', fontSize: 14 }}>
         <span><strong style={{ color: 'var(--c-fg)' }}>{completedIds.length}</strong> of {totalLessons} lessons done</span>
         <a href="#missing-late-filter" style={{ color: 'var(--c-cyan)' }}>Review missing or late work →</a>
       </div>

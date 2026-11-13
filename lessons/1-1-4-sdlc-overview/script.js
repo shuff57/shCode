@@ -1,5 +1,5 @@
 // 1.1.4 What a Program Is
-// Follow the steps on the left. Write your code below each comment.
+// Follow the steps in Your task. Write your code below each comment.
 
 // Step 1: Print "Hello, world!" to the console.
 

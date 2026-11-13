@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { searchDocs, type DocSearchResult, type DocSection } from '../../../../lib/docs-core';
 import DocLiveSnippet from '../../../../components/DocLiveSnippet';
+import { splitDocCode } from '../../../../lib/doc-inline-code';
 
 interface Props {
   section: DocSection;
@@ -157,6 +158,21 @@ export default function JsDocsClient({
               Page {pageIndex + 1} of {section.pages.length}
             </span>
           )}
+          {/* Previous / next page of this topic beside the count (climb4 r9 S11); the footer keeps the full titles. */}
+          {section.pages.length > 1 && (
+            <span className="docs-page-step">
+              {hasPrev ? (
+                <Link href={pageHref(basePath, section.slug, pageIndex - 1)} aria-label={`Previous page: ${section.pages[pageIndex - 1].title}`}>‹ Previous</Link>
+              ) : (
+                <span aria-disabled="true">‹ Previous</span>
+              )}
+              {hasNext ? (
+                <Link href={pageHref(basePath, section.slug, pageIndex + 1)} aria-label={`Next page: ${section.pages[pageIndex + 1].title}`}>Next ›</Link>
+              ) : (
+                <span aria-disabled="true">Next ›</span>
+              )}
+            </span>
+          )}
         </header>
         <h1 className="docs-title">{page.title}</h1>
         <div className="docs-body" style={{ maxWidth: '70ch' }}>
@@ -164,7 +180,9 @@ export default function JsDocsClient({
             <p key={i}>
               {para.split('\n').map((line, j, arr) => (
                 <span key={j}>
-                  {line}
+                  {splitDocCode(line, page.code ?? '').map((span, k) =>
+                    span.code ? <code key={k}>{span.text}</code> : span.text,
+                  )}
                   {j < arr.length - 1 && <br />}
                 </span>
               ))}

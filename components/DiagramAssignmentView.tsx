@@ -51,8 +51,8 @@ import { checkDiagram, allPassed, type CheckResult } from '../lib/diagram-check'
 import { describeDiagram, fromMermaid } from '../lib/diagram-mermaid';
 import { DEFAULT_RULES, emptyDiagram, type DiagramConfig, type DiagramDoc } from '../lib/diagram-types';
 import { withAlpha } from '../lib/color-alpha';
+import { loadDiagramText, saveDiagramText } from '../lib/work-records';
 
-const STORAGE_PREFIX = 'shCode:diagram:';
 
 interface CriterionResult {
   id: string;
@@ -152,7 +152,7 @@ export default function DiagramAssignmentView({
   useEffect(() => {
     let cancelled = false;
     const local = parseDoc(
-      typeof window === 'undefined' ? null : localStorage.getItem(STORAGE_PREFIX + lessonId),
+      typeof window === 'undefined' ? null : loadDiagramText(lessonId),
     );
     (async () => {
       const server = progress.authed ? await fetchDraft(lessonId) : null;
@@ -169,9 +169,7 @@ export default function DiagramAssignmentView({
   // ---- local cache on every edit; server draft debounced
   useEffect(() => {
     if (!loaded) return;
-    try {
-      localStorage.setItem(STORAGE_PREFIX + lessonId, JSON.stringify(doc));
-    } catch {}
+    saveDiagramText(lessonId, JSON.stringify(doc)); // w1:<owner>:diagram:<lessonId>
     if (!progress.authed) return;
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
@@ -688,6 +686,7 @@ export default function DiagramAssignmentView({
               : 'All checks passed and this part is complete.'}
           </span>
           <button
+            className="lesson-next-action"
             onClick={() => navigateToNextLesson(lessonId)}
             style={{
               padding: '8px 16px',

@@ -11,10 +11,12 @@
 //   READ_ALL_KEY   when "Mark all as read" was last pressed
 
 import { unreadCount, type NoticeItem, type NoticeSeen } from './game-notices-core';
+import { ownedLocal } from './owned-storage';
 
-export const SEEN_KEY = 'shcode.gameChanges.seen';
-export const GAMES_SEEN_KEY = 'shcode.gameComments.seen';
-export const READ_ALL_KEY = 'shcode.notices.readAll';
+// Base keys under `w1:<owner>:` (lib/owned-storage.ts): what one account has read.
+export const SEEN_KEY = 'game-changes-seen';
+export const GAMES_SEEN_KEY = 'game-comments-seen';
+export const READ_ALL_KEY = 'notices-read-all';
 /** Fired when anything here is marked read, so the bell on the same page recounts. */
 export const CHANGES_SEEN = 'shcode:game-changes-seen';
 /** The same event name lib/game-flow-client.ts fires after any change to a proposal. */
@@ -25,8 +27,16 @@ let items: NoticeItem[] | null = null;
 let fetchedAt = 0;
 let loading: Promise<void> | null = null;
 
-function readMap(key: string): Record<string, number> {
-  try { return JSON.parse(localStorage.getItem(key) || '{}') ?? {}; } catch { return {}; }
+export function readSeenMap(key: string): Record<string, number> {
+  try {
+    const v = ownedLocal.getJSON<Record<string, number>>(key);
+    return v && typeof v === 'object' ? v : {};
+  } catch { return {}; }
+}
+export function writeSeenMap(key: string, m: Record<string, number>): void {
+  // Keep the newest 300.
+  const keep = Object.entries(m).sort((a, b) => b[1] - a[1]).slice(0, 300);
+  ownedLocal.setJSON(key, Object.fromEntries(keep)); // best effort
 }
 function announce() {
   try { window.dispatchEvent(new Event(CHANGES_SEEN)); } catch { /* no window */ }
@@ -34,8 +44,8 @@ function announce() {
 
 export function noticeSeen(): NoticeSeen {
   let readAllAt: number | null = null;
-  try { const v = Number(localStorage.getItem(READ_ALL_KEY)); readAllAt = Number.isFinite(v) && v > 0 ? v : null; } catch { /* none */ }
-  return { changes: readMap(SEEN_KEY), games: readMap(GAMES_SEEN_KEY), readAllAt };
+  try { const v = Number(ownedLocal.getItem(READ_ALL_KEY)); readAllAt = Number.isFinite(v) && v > 0 ? v : null; } catch { /* none */ }
+  return { changes: readSeenMap(SEEN_KEY), games: readSeenMap(GAMES_SEEN_KEY), readAllAt };
 }
 
 /** The items from the last answer, or null before one arrived (or when every try failed). */
@@ -63,10 +73,9 @@ export function refreshNotices(maxAgeMs = TTL_MS): Promise<void> {
 }
 
 function stamp(key: string, id: string, at: number) {
-  const m = readMap(key);
+  const m = readSeenMap(key);
   m[id] = Math.max(at, m[id] ?? 0);
-  const keep = Object.entries(m).sort((a, b) => b[1] - a[1]).slice(0, 300);
-  try { localStorage.setItem(key, JSON.stringify(Object.fromEntries(keep))); } catch { /* private mode */ }
+  writeSeenMap(key, m);
 }
 
 /** A game's comments were shown: every comment on it up to now is read. */
@@ -83,6 +92,6 @@ export function markNoticeRead(item: NoticeItem): void {
 }
 
 export function markAllNoticesRead(): void {
-  try { localStorage.setItem(READ_ALL_KEY, String(Date.now())); } catch { /* private mode */ }
+  ownedLocal.setItem(READ_ALL_KEY, String(Date.now()));
   announce();
 }

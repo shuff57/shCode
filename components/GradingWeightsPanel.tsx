@@ -93,33 +93,51 @@ export default function GradingWeightsPanel({ classId, desktop = false }: { clas
   }
 
   const total = rows.reduce((sum, r) => sum + r.weight, 0);
+  // Category | Weight (the field) | Share | Reset — shared by the header row and every category row.
+  // r7 T5: the Weight track holds the input and its "/ total" unit, so a weight reads as a share of the total.
+  // r8 T2: the total is said once (the Weight heading and the Total row), not as "/ 115" on every row.
+  // r10 T6: the Share column is wider on a wide screen so each share carries a thin bar beside its number.
+  const rowCols = desktop ? 'minmax(0, 1fr) 114px 132px 48px' : 'minmax(0, 1fr) 76px 56px 48px';
+  const maxWeight = Math.max(1, ...rows.map((x) => (Number.isFinite(x.weight) ? x.weight : 0)));
 
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: desktop ? 'wrap' : undefined, gap: 12, marginBottom: 12 }}>
         {desktop ? (
-          <div style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: '4px 12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
             <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Grading weights</h2>
-            <span role="status" style={{ fontSize: 13, color: error ? 'var(--c-red)' : saving ? C.dim : dirty ? 'var(--c-orange)' : 'var(--c-green)' }}>
-              {error || (saving ? 'Saving…' : dirty ? 'Not saved' : 'Saved')}
+            {/* The save state reads as part of the panel: a status with its mark, then the note that says how
+                saving works, on its own quiet line under the heading (beside it, it crowded the title). */}
+            <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 6, fontFamily: 'var(--font-prose)', fontSize: 13 }}>
+              <span role="status" style={{ fontWeight: 600, color: error ? 'var(--c-red)' : saving ? C.dim : dirty ? 'var(--c-orange)' : 'var(--c-green)' }}>
+                {!error && !saving && !dirty && <span aria-hidden="true">✓ </span>}{error || (saving ? 'Saving…' : dirty ? 'Not saved' : 'Saved')}
+              </span>
+              {!error && <span style={{ color: C.dim }}>· changes save automatically</span>}
             </span>
           </div>
         ) : (
           <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Grading weights</h2>
         )}
-        <span style={{ fontSize: 13, color: C.dim }}>Total <strong style={{ color: C.text }}>{total}</strong></span>
       </div>
-      <p style={{ maxWidth: 720, margin: '0 0 12px', fontSize: 13, lineHeight: 1.5, color: C.dim }}>
-        Each share is its weight divided by the total.<br />
-        Only categories with work count toward a student’s grade; empty categories drop out.
+      <p style={{ maxWidth: 640, margin: '0 0 8px', fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.5, color: C.dim }}>
+        <strong style={{ color: C.text, fontWeight: 600 }}>Weight</strong> is a number you choose; <strong style={{ color: C.text, fontWeight: 600 }}>Share</strong> is its percent of the total. Only categories with work count toward a student’s grade; empty categories drop out.
       </p>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '0 24px' }}>
+      {/* One column, so the header row below lines up with every row's fields. */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', maxWidth: 640 }}>
+        <div aria-hidden="true" style={{ display: 'grid', gridTemplateColumns: rowCols, alignItems: 'end', gap: 8, padding: '8px 0 6px', borderBottom: `1px solid ${C.border}`, fontFamily: 'var(--font-prose)', fontSize: 13, fontWeight: 600, color: C.dim }}>
+          <span>Category</span>
+          <span style={{ whiteSpace: 'nowrap' }}>Weight{desktop && <span style={{ fontWeight: 500 }}> (total {total})</span>}</span>
+          <span style={{ textAlign: 'right' }}>{desktop ? 'Share of grade' : 'Share'}</span>
+          <span />
+        </div>
         {rows.map((r) => (
-          <div key={r.category} style={{ display: 'grid', gridTemplateColumns: desktop ? 'minmax(0, 1fr) 50px 96px 48px' : 'minmax(0, 1fr) 50px 88px 48px', alignItems: 'center', gap: 8, padding: '8px 0', borderBottom: `1px solid ${C.border}` }}>
-            <span style={{ flex: 1, fontSize: 13 }}>{CATEGORY_LABEL[r.category]}</span>
+          <div key={r.category} style={{ display: 'grid', gridTemplateColumns: rowCols, alignItems: 'center', gap: 8, padding: '8px 0', borderBottom: `1px solid color-mix(in srgb, ${C.border} 60%, transparent)` }}>
+            {/* Label (what the row is) in the reading face; the share beside the input is the quiet helper. */}
+            <span style={{ flex: 1, minWidth: 0, fontFamily: 'var(--font-prose)', fontSize: 14, fontWeight: 500, lineHeight: 1.35, color: C.text }}>{CATEGORY_LABEL[r.category]}</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
             <input
               type="number"
-              aria-label={`${CATEGORY_LABEL[r.category]} weight`}
+              aria-label={`${CATEGORY_LABEL[r.category]} weight, out of a total of ${total}`}
               min={0}
               max={100}
               value={r.weight}
@@ -134,17 +152,33 @@ export default function GradingWeightsPanel({ classId, desktop = false }: { clas
                   write(r.category, v);
                 }
               }}
+              className="teacher-weight-input"
+              // A real number field, not a badge: an inset surface darker than the card, a 1px visible border,
+              // regular weight, and a cyan focus ring (globals.css, climb4 r1 teacher).
               style={{
-                width: 50, height: 32, boxSizing: 'border-box',
-                background: C.input,
+                width: 60, height: 32, boxSizing: 'border-box',
+                background: 'color-mix(in srgb, var(--c-deep) 50%, var(--x-151515))',
                 color: C.text,
-                border: `1px solid ${C.border}`,
+                border: '1px solid var(--c-comment)',
                 borderRadius: 4,
                 padding: '4px 8px',
-                fontSize: 13,
+                fontFamily: 'var(--font-prose)',
+                fontSize: 15,
+                fontWeight: 400,
+                textAlign: 'right',
+                fontVariantNumeric: 'tabular-nums',
               }}
             />
-            <span title="Effective share when all categories have work" style={{ fontSize: desktop ? 14 : 13, color: desktop ? C.text : C.dim, textAlign: 'right', whiteSpace: 'nowrap' }}>{total > 0 ? `${(r.weight / total * 100).toFixed(1)}% share` : '—'}</span>
+            </span>
+            <span title="Effective share when all categories have work" className="gw-share" style={{ fontFamily: 'var(--font-prose)', fontSize: 14, color: C.text, textAlign: 'right', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10 }}>
+              {/* r10 T6: a thin bar, longest for the largest weight, so the bigger categories read as bigger. */}
+              {desktop && total > 0 && (
+                <span aria-hidden="true" className="gw-share-track">
+                  <span className="gw-share-bar" style={{ width: `${Math.max(0, Math.min(100, (r.weight / maxWeight) * 100))}%` }} />
+                </span>
+              )}
+              <span style={{ minWidth: 44 }}>{total > 0 ? `${(r.weight / total * 100).toFixed(1)}%` : '—'}</span>
+            </span>
             {r.isDefault ? (
               <span />
             ) : (
@@ -169,9 +203,16 @@ export default function GradingWeightsPanel({ classId, desktop = false }: { clas
             )}
           </div>
         ))}
+        {/* Footer: the total sits under the Weight column it adds up, with how a share follows from it. */}
+        <div style={{ display: 'grid', gridTemplateColumns: rowCols, alignItems: 'baseline', gap: 8, padding: '8px 0 0', fontFamily: 'var(--font-prose)', fontSize: 13, color: C.dim, fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ lineHeight: 1.4 }}><span style={{ fontWeight: 600, color: C.text, fontSize: 14 }}>Total</span></span>
+          <strong style={{ width: 60, boxSizing: 'border-box', textAlign: 'right', paddingRight: 9, color: C.text, fontSize: 15, fontWeight: 600 }}>{total}</strong>
+          <span style={{ textAlign: 'right', color: C.text, fontSize: 14 }}>{total > 0 ? '100%' : '—'}</span>
+          <span />
+        </div>
       </div>
-      {!desktop && <div role="status" style={{ fontSize: 13, color: C.dim, marginTop: 12 }}>{saving ? 'Saving…' : ''}</div>}
-      {!desktop && error && <div style={{ fontSize: 13, color: 'var(--c-red)', marginTop: 4 }}>{error}</div>}
+      {!desktop && <div role="status" style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: C.dim, marginTop: 12 }}>{saving ? 'Saving…' : ''}</div>}
+      {!desktop && error && <div style={{ fontFamily: 'var(--font-prose)', fontSize: 13, color: 'var(--c-red)', marginTop: 4 }}>{error}</div>}
     </div>
   );
 }
