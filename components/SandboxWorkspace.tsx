@@ -857,6 +857,30 @@ export default function SandboxWorkspace() {
                     {full ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
                     {full ? 'Exit full screen' : 'Full screen'}
                   </button>
+                  {/* In the toolbar, beside Exit full screen: floating over the row they
+                      covered Stop and Save, and Exit full screen itself (#115). */}
+                  {full && (
+                    <button
+                      type="button"
+                      style={chipStyle}
+                      onClick={() => setEditorHidden((h) => !h)}
+                      title={editorHidden ? 'Show the editor again' : 'Hide the editor and keep the shape'}
+                    >
+                      {editorHidden ? <PanelLeftOpen size={12} /> : <PanelLeftClose size={12} />}
+                      {editorHidden ? 'Editor' : 'Hide editor'}
+                    </button>
+                  )}
+                  {full && !isConsole && (
+                    <button
+                      type="button"
+                      style={chipStyle}
+                      onClick={() => setConsoleHidden((h) => !h)}
+                      title={consoleHidden ? 'Show the console again' : 'Hide the console and keep the shape'}
+                    >
+                      {consoleHidden ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                      {consoleHidden ? 'Console' : 'Hide console'}
+                    </button>
+                  )}
                 </div>
               )}
               {((togetherLang && (mayTogether || together)) || (mode.preview === 'moshion' && lessonProgress.authed)) && (
@@ -1016,17 +1040,6 @@ export default function SandboxWorkspace() {
             </>
           )}
         </div>}
-        {full && !isReshape && !isFlow && (
-          <button
-            type="button"
-            className="sandbox-editor-toggle"
-            onClick={() => setEditorHidden((h) => !h)}
-            title={editorHidden ? 'Show the editor again' : 'Hide the editor and keep the shape'}
-          >
-            {editorHidden ? <PanelLeftOpen size={13} /> : <PanelLeftClose size={13} />}
-            {editorHidden ? 'Editor' : 'Hide editor'}
-          </button>
-        )}
 
         {!isConsole && !reshapeIsBuild && !isFlow && !noProjects && (
           <div className="sandbox-console-wrap" ref={consoleWrapRef}>
@@ -1048,7 +1061,8 @@ export default function SandboxWorkspace() {
             </div>
           </div>
         )}
-        {full && !isConsole && !reshapeIsBuild && !isFlow && (
+        {/* reSHape has its own toolbar row, so its console toggle still floats. */}
+        {full && isReshape && !reshapeIsBuild && (
           <button
             type="button"
             className="sandbox-console-toggle"
@@ -1179,26 +1193,6 @@ export default function SandboxWorkspace() {
           overflow: hidden;
         }
         .sandbox-shell.is-editor-hidden #editorPane { display: none; }
-        .sandbox-editor-toggle {
-          position: absolute;
-          top: 12px;
-          /* Stays where it always was when the editor is resized (#115): following the
-             edge would slide it over the toolbar's buttons. */
-          left: calc(min(420px, 45%) + 22px);
-          z-index: 50;
-          display: inline-flex;
-          align-items: center;
-          gap: 5px;
-          padding: 5px 10px;
-          font-size: 12px;
-          color: var(--x-d3d5e3);
-          background: color-mix(in srgb, var(--c-bg) 92.0%, transparent);
-          border: 1px solid var(--x-565a70);
-          border-radius: 4px;
-          cursor: pointer;
-        }
-        .sandbox-editor-toggle:hover { background: var(--c-line); }
-        .sandbox-shell.is-editor-hidden .sandbox-editor-toggle { left: 12px; }
         .sandbox-console-toggle {
           position: absolute;
           right: 12px;
