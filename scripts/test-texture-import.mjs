@@ -5,9 +5,12 @@
 //   2. pixel art blown up by a whole number comes back at its real size,
 //      pixel for pixel (no smoothing);
 //   3. anything else shrinks to fit the grid, keeping its shape, smoothed;
-//   4. every file name becomes a name saveTexture accepts.
+//   4. every file name becomes a name saveTexture accepts;
+//   5. an SVG (#114) is drawn at its own pixel size, or its viewBox's, never
+//      kept as an SVG: it goes through lib/svg-raster.ts into a PNG first.
 import assert from 'node:assert/strict';
 import { importSize, blockFactor, isBlockScaled, pixelScale, textureNameFromFile, IMPORT_TYPES } from '../lib/texture-import.ts';
+import { svgIntrinsicSize, fitSide, isSvgFile } from '../lib/svg-raster.ts';
 
 const MAX = 64;
 assert.deepEqual(importSize(21, 21, MAX), { w: 21, h: 21, smooth: false });
@@ -69,5 +72,24 @@ const art21 = new Uint8ClampedArray(21 * 21 * 4).map((_, i) => (i * 37) % 256);
 assert.equal(pixelScale(blowUp(art21, 21, 21, 4), 84, 84, 2), 4);
 assert.equal(pixelScale(blowUp(art21, 21, 21, 1), 21, 21, 2), null, 'not blown up');
 assert.ok(!IMPORT_TYPES.includes('image/svg+xml'), 'SVG is not pixels');
+
+// 5. SVG sizes.
+assert.deepEqual(svgIntrinsicSize({ width: '120', height: '80' }), { w: 120, h: 80 });
+assert.deepEqual(svgIntrinsicSize({ width: '120px', height: '80px', viewBox: '0 0 10 10' }), { w: 120, h: 80 }, 'own size wins');
+assert.deepEqual(svgIntrinsicSize({ viewBox: '0 0 300 150' }), { w: 300, h: 150 }, 'only a viewBox');
+assert.deepEqual(svgIntrinsicSize({ viewBox: '-5,-5,40,20' }), { w: 40, h: 20 }, 'commas and an offset');
+assert.deepEqual(svgIntrinsicSize({ width: '100%', height: '100%', viewBox: '0 0 24 24' }), { w: 24, h: 24 }, '% is not a pixel size');
+assert.deepEqual(svgIntrinsicSize({ width: '200', viewBox: '0 0 100 50' }), { w: 200, h: 100 }, 'one side follows the viewBox shape');
+assert.deepEqual(svgIntrinsicSize({ height: '30' }), { w: 30, h: 30 });
+assert.equal(svgIntrinsicSize({ width: '10cm', height: '5cm' }), null);
+assert.equal(svgIntrinsicSize({ viewBox: '0 0 0 10' }), null, 'a flat viewBox is no size');
+assert.equal(svgIntrinsicSize({}), null);
+assert.deepEqual(fitSide(300, 150, 64), { w: 64, h: 32 });
+assert.deepEqual(fitSide(24, 24, 64), { w: 24, h: 24 }, 'never grows');
+assert.deepEqual(fitSide(5000, 1, 1024), { w: 1024, h: 1 }, 'never 0 high');
+assert.ok(isSvgFile({ name: 'Body.svg', type: '' }), 'no type from the computer');
+assert.ok(isSvgFile({ name: 'x', type: 'image/svg+xml' }));
+assert.ok(!isSvgFile({ name: 'Body.png', type: 'image/png' }));
+assert.equal(textureNameFromFile('Body.svg'), 'Body');
 
 console.log('test-texture-import: ok');

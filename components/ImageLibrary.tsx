@@ -10,6 +10,7 @@ import {
   listUploads,
   uploadImage,
 } from '../lib/uploads';
+import { isSvgFile, svgToPng, SvgError } from '../lib/svg-raster';
 
 // Inline styles using the Dracula palette, matching AuthButton / teacher page.
 const C = {
@@ -76,9 +77,11 @@ export default function ImageLibrary({ onClose, onPick }: Props) {
       // should. Slower and correct beats faster and over-quota.
       for (const f of list) {
         try {
-          await uploadImage(f);
+          // #114: an SVG goes up as a PNG drawn in this browser; the server never
+          // takes an SVG, because one can carry a script.
+          await uploadImage(isSvgFile(f) ? await svgToPng(f, { maxSide: 1024 }) : f);
         } catch (e) {
-          setError(e instanceof UploadError ? e.message : `Could not upload ${f.name}.`);
+          setError(e instanceof UploadError || e instanceof SvgError ? e.message : `Could not upload ${f.name}.`);
           break;
         }
       }
@@ -167,7 +170,7 @@ export default function ImageLibrary({ onClose, onPick }: Props) {
           <input
             ref={fileInput}
             type="file"
-            accept="image/png,image/jpeg,image/gif,image/webp"
+            accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml,.svg"
             multiple
             hidden
             onChange={(e) => {
@@ -246,7 +249,7 @@ export default function ImageLibrary({ onClose, onPick }: Props) {
 
         <p style={{ color: C.dim, fontSize: 11, marginTop: 16, borderTop: `1px solid ${C.line}`, paddingTop: 10 }}>
           Anyone who has the link to an image can view it, so don&apos;t upload anything private.
-          PNG, JPEG, GIF and WebP only.
+          PNG, JPEG, GIF and WebP; an SVG is turned into a PNG.
         </p>
       </div>
     </div>

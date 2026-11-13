@@ -76,7 +76,8 @@ export function textureNameFromFile(filename: string): string {
   return n.slice(0, 40);
 }
 
-// The kinds a browser can decode into a canvas without surprises. SVG is left
-// out on purpose: it is a document, not pixels, and the editor only wants pixels.
+// The kinds a browser can decode into a canvas without surprises. SVG is not
+// one of them: it is a document, not pixels. The editor turns an SVG into a PNG
+// first (lib/svg-raster.ts) and then imports that.
 export const IMPORT_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
 export const IMPORT_MAX_BYTES = 10 * 1024 * 1024;

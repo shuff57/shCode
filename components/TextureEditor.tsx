@@ -42,6 +42,7 @@ import {
   LIBRARY_UPDATED,
 } from '../lib/moshion-storage';
 import { importSize, blockFactor, pixelScale, textureNameFromFile, IMPORT_TYPES, IMPORT_MAX_BYTES } from '../lib/texture-import';
+import { isSvgFile, svgToPng, SvgError } from '../lib/svg-raster';
 import { ownedSession } from '../lib/owned-storage';
 
 interface CatalogEntry { file: string; w: number; h: number; group: string }
@@ -506,13 +507,21 @@ export default function TextureEditor() {
   // so Ctrl+Z, the name box and the message all behave the same. Nothing is
   // saved until the student presses Save.
   const importInput = useRef<HTMLInputElement | null>(null);
-  function importPicture(file: File) {
-    if (!IMPORT_TYPES.includes(file.type)) {
-      setMessage({ text: 'Pick a PNG, JPEG, GIF or WebP picture.', bad: true });
-      return;
-    }
+  function importPicture(file: File, label = textureNameFromFile(file.name)) {
     if (file.size > IMPORT_MAX_BYTES) {
       setMessage({ text: 'That picture is over 10 MB. Try a smaller one.', bad: true });
+      return;
+    }
+    // #114: an SVG is drawn into a picture the size of the grid first, so it
+    // comes in sharp and is never kept as an SVG.
+    if (isSvgFile(file)) {
+      svgToPng(file, { maxSide: MAX_DIM, fallback: MAX_DIM })
+        .then((png) => importPicture(png, label))
+        .catch((e) => setMessage({ text: e instanceof SvgError ? e.message : 'That SVG could not be read.', bad: true }));
+      return;
+    }
+    if (!IMPORT_TYPES.includes(file.type)) {
+      setMessage({ text: 'Pick a PNG, JPEG, GIF, WebP or SVG picture.', bad: true });
       return;
     }
     const url = URL.createObjectURL(file);
@@ -540,7 +549,6 @@ export default function TextureEditor() {
       ctx.imageSmoothingEnabled = size.smooth;
       ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(img, 0, 0, size.w, size.h);
-      const label = textureNameFromFile(file.name);
       const shrunk = size.w !== sw || size.h !== sh;
       loadImage(c.toDataURL('image/png'), label, 1, 4, null,
         `Imported ${label} (${size.w}x${size.h}` +
@@ -1035,13 +1043,13 @@ export default function TextureEditor() {
           </label>
 
           <button style={{ ...railBtn(), marginBottom: 6 }} onClick={() => importInput.current?.click()}
-            title={`Open a PNG, JPEG, GIF or WebP from your computer. Big pictures shrink to fit ${MAX_DIM}x${MAX_DIM}.`}>
+            title={`Open a PNG, JPEG, GIF, WebP or SVG from your computer. Big pictures shrink to fit ${MAX_DIM}x${MAX_DIM}.`}>
             ↑ Import picture
           </button>
           <input
             ref={importInput}
             type="file"
-            accept={IMPORT_TYPES.join(',')}
+            accept={[...IMPORT_TYPES, 'image/svg+xml', '.svg'].join(',')}
             style={{ display: 'none' }}
             onChange={(e) => {
               const f = e.target.files?.[0];
