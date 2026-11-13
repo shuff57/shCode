@@ -1810,4 +1810,45 @@ export const SEMANTIC_CHECKS = [
       return true;
     },
   },
+  {
+    // shCode #116: a ragdoll built from hinges went floppy. stiffness holds the
+    // starting pose; lowerLimit/upperLimit stop the turn; both are in degrees
+    // from the starting pose. Default (no options) must stay exactly floppy.
+    name: 'HingeJoint stiffness holds a limb up, limits stop the turn, plain hinges stay floppy',
+    area: 'physics',
+    run({ runSketch }) {
+      const r = runSketch(`
+        // Each arm in its own column, so a hanging one never lands on another.
+        function arm(x, opt) {
+          const pin = new Sprite(x, 100, 10, 10, 'static');
+          const rod = new Sprite(x + 50, 100, 100, 12);
+          return [new HingeJoint(pin, rod, Object.assign({ anchor: { x, y: 100 } }, opt)), rod];
+        }
+        function setup(){ new Canvas(700, 400); world.gravity.y = 10;
+          [floppy] = arm(20);
+          [stiff, stiffRod] = arm(150, { stiffness: 1 });
+          [limited] = arm(280, { upperLimit: 30 });
+          [later] = arm(410);
+          later.stiffness = 1; later.stiffness = 0;
+          bad = null;
+          try { floppy.lowerLimit = 'down'; } catch (e) { bad = e.message; }
+          defaults = [floppy.stiffness, floppy.lowerLimit, floppy.upperLimit];
+          gone = arm(540, { stiffness: 1 })[0]; gone.delete();
+          swung = 0; laterSwung = 0;
+        }
+        // A free hinge is a pendulum, still swinging at the end: keep how far it went.
+        function draw(){ background('#222'); swung = Math.max(swung, floppy.angle); laterSwung = Math.max(laterSwung, later.angle); }
+      `, { frames: 180 });
+      if (!r.ok) return 'sketch threw: ' + r.error?.message;
+      const b = r.box.sandbox;
+      if (JSON.stringify(b.defaults) !== '[0,null,null]') return 'a plain hinge should start at stiffness 0 with no limits, got ' + JSON.stringify(b.defaults);
+      if (!(b.swung > 70)) return 'a plain hinge should swing down past 70 degrees, it reached ' + b.swung;
+      if (!(Math.abs(b.stiff.angle) < 5)) return 'stiffness 1 should hold the arm level, it sagged to ' + b.stiff.angle;
+      if (!(b.limited.angle <= 31 && b.limited.angle > 25)) return 'upperLimit 30 should stop the arm at 30 degrees, it is at ' + b.limited.angle;
+      if (!(b.laterSwung > 70)) return 'setting stiffness back to 0 should make it floppy again, it reached ' + b.laterSwung;
+      if (!b.bad || !/lowerLimit must be a number of degrees/.test(b.bad)) return 'a non-number limit should throw a plain error, got ' + b.bad;
+      if (!(Math.hypot(b.stiffRod.vel.x, b.stiffRod.vel.y) < 0.05)) return 'a stiff arm should come to rest, it still moves at ' + JSON.stringify(b.stiffRod.vel);
+      return true;
+    },
+  },
 ];

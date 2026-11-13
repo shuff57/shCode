@@ -3,9 +3,26 @@
 | | |
 | --- | --- |
 | Source repo | `shuff57/moshion` (local checkout `../moshion`) |
-| Commit | `91135b4` (`moshion.js`, `docs/moshion.d.ts`), branch `main` |
+| Commit | `ed04214` (`moshion.js`, `docs/moshion.d.ts`), branch `main` |
 | Commit date | 2026-11-13 |
 | Vendored | 2026-11-12 (`a662f3d`: `textStyle(NORMAL \| BOLD \| ITALIC \| BOLDITALIC)` (shCode #103), on top of `3f1e70a`'s API audit, `90921bd`'s `textLayer(n)`, `b1a2575`'s `sprite.clone()` and `world.maxSpeed`, `f3e1378` and the `f259b22` sound sync). `textStyle` was first patched in here by hand (`61cfed53`); this sync replaces that patch with the upstream engine, which matches it, so the copy is now upstream `a662f3d` plus the local lines below. |
+
+**`ed04214` (2026-11-13): `HingeJoint` stiffness and limits (shCode #116).**
+
+- `hinge.stiffness`, 0 (floppy, the default) to 1, holds the pose the two sprites
+  started in: a planck motor aimed back at that pose, its strength worked out from
+  everything joined on past sprite b, so 1 holds a whole arm up and smaller numbers
+  sag. `lowerLimit`/`upperLimit` stop the turn, in degrees from the starting pose
+  (the direction of `rotation`); `null` takes a side off. `hinge.angle` reads how far
+  it has turned. All three can be options or set later.
+- The return speed (2 + 3 * stiffness) was measured: 4 + 16 * stiffness made the
+  reporting student's ragdoll and four other sizes shake on the floor for good; this
+  one settles to 0 for each. Two ragdolls piled on each other keep a slow ~1 px sway.
+- A hinge with no options is unchanged: the per-step drive walks an empty list. The
+  gate passes 699/699 sketches (one new docs example) and 106/106 checks (one new:
+  "HingeJoint stiffness holds a limb up..."); upstream `tests/hinge-stiffness.spec.mjs`
+  (8 checks) plus api-audit, integration, math-origin and web-swinger pass. Applied
+  here as the upstream diff, so the local lines below are untouched.
 
 **`91135b4` (2026-11-13): `loadSound('coin')` plays the built-in sound by name.**
 

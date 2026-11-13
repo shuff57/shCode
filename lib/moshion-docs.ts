@@ -1912,6 +1912,45 @@ function draw() {
 }`,
       },
       {
+        title: 'Stiff hinges and limits',
+        body: `A plain hinge swings freely, so a body built from hinges (a ragdoll, a robot arm) goes floppy. Two settings fix that.
+
+stiffness, from 0 to 1, is how hard the hinge tries to stay in the pose it started in. 0 (the default) is floppy. 1 holds a limb up against gravity and springs it back after a hit. Something in between sags a little.
+
+lowerLimit and upperLimit stop the hinge at an angle, in degrees, counted from the starting pose in the same direction as rotation. An elbow that only bends one way is { lowerLimit: 0, upperLimit: 140 }. Set one to null to take that limit off.
+
+Pass them in the options, new HingeJoint(a, b, { stiffness: 0.6, lowerLimit: -45, upperLimit: 45 }), or change them later: elbow.stiffness = 0. joint.angle tells you how far it has turned from the starting pose.
+
+Put the anchor where the two parts really meet (a shoulder, a knee). Without one, the pivot is the middle of the first sprite.`,
+        code: `let elbow;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 10;
+
+  const shoulder = new Sprite(120, 100, 16, 16, 'static');
+  const upper = new Sprite(170, 100, 100, 18);
+  const lower = new Sprite(260, 100, 80, 14);
+  upper.color = 'khaki';
+  lower.color = 'orange';
+
+  new HingeJoint(shoulder, upper, { anchor: { x: 120, y: 100 }, stiffness: 1 });
+  elbow = new HingeJoint(upper, lower, {
+    anchor: { x: 220, y: 100 },
+    stiffness: 0.5,
+    lowerLimit: 0,
+    upperLimit: 120,
+  });
+}
+
+function draw() {
+  background('#222');
+  // Hold the mouse down to make the elbow floppy.
+  elbow.stiffness = mouse.pressing() ? 0 : 0.5;
+  text('elbow: ' + round(elbow.angle) + ' degrees', 10, 20);
+}`,
+      },
+      {
         title: 'SliderJoint',
         body: `A SliderJoint locks two sprites to a single axis of motion and forbids rotation between them. It's perfect for pistons, elevators, and sliding panels.
 

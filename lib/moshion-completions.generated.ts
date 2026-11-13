@@ -290,7 +290,7 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "label": "HingeJoint",
   "type": "class",
   "detail": "class",
-  "info": ""
+  "info": "Angles are in degrees, counted from the pose the two sprites were in when the hinge was made, in the same direction as `rotation`."
  },
  {
   "label": "int",
@@ -1945,9 +1945,65 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "type": "property",
    "detail": "number",
    "info": ""
+  },
+  {
+   "label": "stiffness",
+   "type": "property",
+   "detail": "number",
+   "info": "HingeJoint: 0 (floppy, the default) to 1 (holds its starting pose)."
+  },
+  {
+   "label": "lowerLimit",
+   "type": "property",
+   "detail": "number | null",
+   "info": "HingeJoint: the smallest angle it may turn to, in degrees from the starting pose."
+  },
+  {
+   "label": "upperLimit",
+   "type": "property",
+   "detail": "number | null",
+   "info": "HingeJoint: the largest angle it may turn to, in degrees from the starting pose."
   }
  ],
  "Joint": [
+  {
+   "label": "delete",
+   "type": "method",
+   "detail": "(): void",
+   "info": ""
+  },
+  {
+   "label": "remove",
+   "type": "method",
+   "detail": "(): void",
+   "info": "Same as delete()."
+  }
+ ],
+ "HingeJoint": [
+  {
+   "label": "stiffness",
+   "type": "property",
+   "detail": "number",
+   "info": "How hard it holds its starting pose: 0 floppy (default) to 1 stiff."
+  },
+  {
+   "label": "lowerLimit",
+   "type": "property",
+   "detail": "number | null",
+   "info": "Stops it turning below this angle; null for no limit."
+  },
+  {
+   "label": "upperLimit",
+   "type": "property",
+   "detail": "number | null",
+   "info": "Stops it turning past this angle; null for no limit."
+  },
+  {
+   "label": "angle",
+   "type": "property",
+   "detail": "number",
+   "info": "How far it has turned from the starting pose."
+  },
   {
    "label": "delete",
    "type": "method",
@@ -2803,20 +2859,6 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "type": "property",
    "detail": "boolean",
    "info": ""
-  }
- ],
- "HingeJoint": [
-  {
-   "label": "delete",
-   "type": "method",
-   "detail": "(): void",
-   "info": ""
-  },
-  {
-   "label": "remove",
-   "type": "method",
-   "detail": "(): void",
-   "info": "Same as delete()."
   }
  ],
  "SliderJoint": [
