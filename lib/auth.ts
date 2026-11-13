@@ -51,9 +51,17 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
   return inFlight;
 }
 
+let meAnswer: 'signed-in' | 'signed-out' | 'unknown' = 'unknown';
+/** What the last GET /api/me established. 'unknown' = no answer, or one that settles nothing. */
+export function lastMeAnswer(): 'signed-in' | 'signed-out' | 'unknown' {
+  return meAnswer;
+}
+
 async function fetchCurrentUser(): Promise<CurrentUser | null> {
   try {
     const res = await fetch('/api/me', { credentials: 'same-origin' });
+    // 401 is the server SAYING nobody is signed in; anything else that is not ok is "could not tell".
+    meAnswer = res.ok ? 'signed-in' : res.status === 401 ? 'signed-out' : 'unknown';
     if (!res.ok) return null;
     const data = (await res.json()) as {
       email?: string;
@@ -62,7 +70,7 @@ async function fetchCurrentUser(): Promise<CurrentUser | null> {
       lastName?: string | null;
       wo?: string;
     };
-    if (!data.email) return null;
+    if (!data.email) { meAnswer = 'unknown'; return null; }
     return {
       email: data.email,
       role: parseRole(data.role),
@@ -71,6 +79,7 @@ async function fetchCurrentUser(): Promise<CurrentUser | null> {
       ...(typeof data.wo === 'string' ? { wo: data.wo } : {}),
     };
   } catch {
+    meAnswer = 'unknown';
     return null;
   }
 }

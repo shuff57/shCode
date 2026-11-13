@@ -378,8 +378,10 @@ await test('3. a stale tab after another account signed in: refused with 409, to
   assert.equal(b.server.drafts[B.email], undefined, 'A\'s answer was handed in to B');
   assert.equal(b.server.rows[B.email], undefined, 'A\'s code was saved to B');
   // A's work is where A left it.
-  assert.equal(await tabA.run(`return M.vc.loadProgress('L1').fileContents['script.js'];`), 'A work, not saved');
+  // (Read from storage, not through A's stale tab: with sealing on, a tab whose account is no longer
+  // the signed-in one opens nothing. scripts/test-sealed-storage.mjs case 12.)
   const s = b.storage();
+  assert.equal(JSON.parse(s[`w1:${A.wo}:progress:L1`]).d.fileContents['script.js'], 'A work, not saved');
   assert.deepEqual(JSON.parse(s[`w1:${A.wo}:quiz:Q1`]).d.answers, { q1: 2 });
   assert.equal(s[`w1:${B.wo}:quiz:Q1`], undefined);
   // A signs back in: the same tab may send again, as A.

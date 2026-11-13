@@ -7,8 +7,8 @@
 //    with a fixed dev-only secret. No table, no lookup, stable across dev restarts.
 //  * A page load sets `shcode_owner` to the identity's id (and clears it while signed out),
 //    and so does any /api/* answer while it is missing or wrong, as production does.
-//  * Sign-out sets `dev_signed_out=1` (the browser is then a guest: /api/me answers 401 and
-//    the owner cookie is cleared); sign-in clears it. Both answer with the owner cookie in
+//  * Sign-out sets `dev_signed_out=1` (the browser is then a guest: every /api/* route but
+//    /api/auth/* answers 401, as in production, and the owner and work-key cookies are cleared); sign-in clears it. Both answer with the owner cookie in
 //    the same response, as the real auth routes do.
 //  * /api/* (but not /api/auth/*, nor the OWNER_CHECK_EXEMPT paths) with an X-Work-Owner
 //    header that is not the identity's id is refused with 409 owner-mismatch, by the same
@@ -43,6 +43,11 @@ const cookieOf = (req, name) => {
 export const devSignedOut = (req) => cookieOf(req, 'dev_signed_out') === '1';
 
 const ownerCookie = (v, maxAge) => `shcode_owner=${v}; Path=/; SameSite=Lax; Max-Age=${maxAge}`;
+// The work key (functions/_shared/auth.ts workKeyFor), derived the same way with the dev secret.
+export function devWorkKey(identity) {
+  return crypto.createHmac('sha256', DEV_SECRET).update(`work-key:${String(identity).trim().toLowerCase()}`).digest('base64url');
+}
+const keyCookie = (v, maxAge) => `shcode_wk=${v}; Path=/; SameSite=Lax; Max-Age=${maxAge}`;
 
 function isDocument(req) {
   if (req.method !== 'GET' && req.method !== 'HEAD') return false;
@@ -58,8 +63,10 @@ export function mountDevOwner({ server, devIdentity }) {
     if (path.startsWith('/api/auth/')) return next();
     if (path.startsWith('/api/')) {
       if (devSignedOut(req)) {
-        if (path === '/api/me') return res.status(401).json({ error: 'Not signed in' });
-        return next();
+        // As production (functions/_middleware.ts): with no session EVERY /api/* route answers 401,
+        // not just /api/me. Before this the dev server kept serving the dev identity's lesson data
+        // to a "signed out" page, which then showed that student's work as a guest's.
+        return res.status(401).json({ error: 'Not signed in' });
       }
       const want = devOwnerId(devIdentity(req));
       const claimed = req.get('x-work-owner') ?? null;
@@ -74,9 +81,15 @@ export function mountDevOwner({ server, devIdentity }) {
       const have = cookieOf(req, 'shcode_owner');
       if (devSignedOut(req)) {
         if (have !== null) res.append('Set-Cookie', ownerCookie('', 0));
+        if (cookieOf(req, 'shcode_wk') !== null) res.append('Set-Cookie', keyCookie('', 0));
       } else {
         const want = devOwnerId(devIdentity(req));
-        if (have !== want) res.append('Set-Cookie', ownerCookie(want, MAX_AGE));
+        // Owner and key together, as production: either wrong or missing sends both.
+        const wk = `${want}.${devWorkKey(devIdentity(req))}`;
+        if (have !== want || cookieOf(req, 'shcode_wk') !== wk) {
+          res.append('Set-Cookie', ownerCookie(want, MAX_AGE));
+          res.append('Set-Cookie', keyCookie(wk, MAX_AGE));
+        }
       }
     }
     return next();
@@ -85,8 +98,8 @@ export function mountDevOwner({ server, devIdentity }) {
 
 /** The dev sign-in and sign-out stubs' cookies. */
 export function devSignInCookies(req, devIdentity) {
-  return ['dev_signed_out=; Path=/; Max-Age=0', ownerCookie(devOwnerId(devIdentity(req)), MAX_AGE)];
+  return ['dev_signed_out=; Path=/; Max-Age=0', ownerCookie(devOwnerId(devIdentity(req)), MAX_AGE), keyCookie(`${devOwnerId(devIdentity(req))}.${devWorkKey(devIdentity(req))}`, MAX_AGE)];
 }
 export function devSignOutCookies() {
-  return ['dev_signed_out=1; Path=/; SameSite=Lax', ownerCookie('', 0)];
+  return ['dev_signed_out=1; Path=/; SameSite=Lax', ownerCookie('', 0), keyCookie('', 0)];
 }

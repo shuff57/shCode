@@ -24,13 +24,17 @@
 import {
   buildOwnerCookie,
   buildSessionCookie,
+  buildWorkKeyCookie,
   OWNER_COOKIE,
   readCookie,
   readSessionCookie,
   SESSION_TTL_SECONDS,
   signSession,
   verifySession,
+  WORK_KEY_COOKIE,
   WORK_OWNER_HEADER,
+  workKeyCookieValue,
+  workKeyFor,
   workOwnerFor,
   type Session,
 } from './_shared/auth';
@@ -86,6 +90,8 @@ export const onRequest: PagesFunction<Env, string, SessionData> = async (context
   if (res.status === 101 || (res as Response & { webSocket?: unknown }).webSocket) return res;
   // The browser holds this session but not (or not the right) owner cookie: give it the
   // account's, so the next page load keeps its work under the account, never `guest`.
+  // (The work key is NOT repaired here, only on a page load: this answer may arrive after the
+  // account signed out, and must not put its key back in a signed-out browser.)
   const out = new Response(res.body, res);
   out.headers.append('Set-Cookie', buildOwnerCookie(wo, maxAgeOf(session), url.protocol === 'https:'));
   return out;
@@ -116,21 +122,30 @@ async function document(context: Ctx, url: URL): Promise<Response> {
 async function ownerCookiesFor(request: Request, env: Env, url: URL): Promise<string[]> {
   const secure = url.protocol === 'https:';
   const have = readCookie(request, OWNER_COOKIE);
+  const haveKey = readCookie(request, WORK_KEY_COOKIE);
   const token = readSessionCookie(request);
   const session: Session | null = token ? await verifySession(token, env.AUTH_SECRET) : null;
   if (!session) {
-    // No session (signed out, expired, or a rotated secret): the page is a guest.
-    return have !== null ? [buildOwnerCookie('', 0, secure)] : [];
+    // No session (signed out, expired, or a rotated secret): the page is a guest, and the
+    // browser no longer holds the key to anyone's stored work.
+    return [
+      ...(have !== null ? [buildOwnerCookie('', 0, secure)] : []),
+      ...(haveKey !== null ? [buildWorkKeyCookie('', 0, secure)] : []),
+    ];
   }
   const maxAge = maxAgeOf(session);
+  const owner = session.wo ?? (await workOwnerFor(session.email, env.AUTH_SECRET));
+  const wantKey = workKeyCookieValue(owner, await workKeyFor(session.email, env.AUTH_SECRET));
   if (session.wo) {
-    return have === session.wo ? [] : [buildOwnerCookie(session.wo, maxAge, secure)];
+    // Both right: nothing. Either one missing or wrong: BOTH are sent, together.
+    if (have === owner && haveKey === wantKey) return [];
+    return [buildOwnerCookie(owner, maxAge, secure), buildWorkKeyCookie(wantKey, maxAge, secure)];
   }
   // A session signed before the `wo` claim existed: re-sign the SAME session with it,
   // keeping its end time, and set the owner cookie beside it.
   const wo = await workOwnerFor(session.email, env.AUTH_SECRET);
   const resigned = await signSession(session.email, session.role, env.AUTH_SECRET, session.exp);
-  return [buildSessionCookie(resigned, maxAge, secure), buildOwnerCookie(wo, maxAge, secure)];
+  return [buildSessionCookie(resigned, maxAge, secure), buildOwnerCookie(wo, maxAge, secure), buildWorkKeyCookie(wantKey, maxAge, secure)];
 }
 
 function json(body: unknown, status = 200, extra: Record<string, string> = {}): Response {

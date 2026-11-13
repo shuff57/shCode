@@ -10,6 +10,8 @@
 //    account, and this page's work stays on this computer under its own owner.
 //  * This computer's storage is full, so the latest change was not kept here. The
 //    earlier copy is untouched.
+//  * This account's work here is sealed and this page has no key for it (the key cookie is
+//    missing). The work is locked, not lost; the student reloads (a page load brings the key).
 //  * This browser is not letting the page save here at all (storage turned off, or a
 //    write refused for another reason). Shown once per page; Save to cloud still works.
 //
@@ -17,9 +19,10 @@
 
 import { useEffect, useState, type CSSProperties } from 'react';
 import { installOwnerFetch, onOwnerMismatch } from '../lib/owner-fetch';
-import { GUEST, lastStorageProblem, onStorageProblem, pageOwner, readOwnerCookie } from '../lib/owned-storage';
+import { dropWorkKeyCookie, GUEST, lastStorageProblem, onSetAside, onStorageProblem, ownedLocal, ownedSession, pageOwner, readOwnerCookie } from '../lib/owned-storage';
+import { showSetAsideInHistory } from '../lib/local-history';
 import { guardSignedInGuest } from '../lib/owner-guard';
-import { getCurrentUser } from '../lib/auth';
+import { getCurrentUser, lastMeAnswer } from '../lib/auth';
 
 export const BLOCKED_TEXT =
   'This browser is not letting the page save your work on this computer. Keep this tab open and use Save to send it to your account.';
@@ -28,8 +31,22 @@ export const STUCK_TEXT =
   'You are signed in, but this page opened as "not signed in". What you type here is kept on this computer as "not signed in" '
   + 'and is not sent to your account. Reload the page to use your account.';
 
+export const LOCKED_TEXT =
+  'Your saved work on this computer is locked, because this page could not confirm you are signed in. It is still there. '
+  + 'Reload the page before you type: what you type on this page now cannot be saved on this computer. '
+  + 'If it still says this after reloading, sign in again.';
+
 // Runs when the layout's client chunk is evaluated, before any page effect fetches.
-if (typeof window !== 'undefined') installOwnerFetch();
+if (typeof window !== 'undefined') {
+  installOwnerFetch();
+  // A lab's code that gets set aside is shown in that lesson's History (lib/local-history.ts).
+  onSetAside((key, d) => showSetAsideInHistory(key, d));
+  // Seal the account's records that are still plain text (work from before sealing, or written
+  // by a page left open across the update). Needs the key; without one it does nothing.
+  try { ownedLocal.sealPlainRecords(); } catch { /* reads work on either form; tried again next load */ }
+  // The tab's own storage too (a copied picture frame from before sealing).
+  try { ownedSession.sealPlainRecords(); } catch { /* as above */ }
+}
 
 function changedText(): string {
   const mine = pageOwner();
@@ -90,8 +107,12 @@ export default function OwnerNotices() {
   const [full, setFull] = useState(false);
   // 'blocked' is shown once per page: 'no' -> 'shown' -> 'done' (hidden for good).
   const [blocked, setBlocked] = useState<'no' | 'shown' | 'done'>('no');
+  // This account has sealed work here and this page has no key for it.
+  const [locked, setLocked] = useState(false);
 
   useEffect(() => {
+    let session: Storage | null = null;
+    try { session = window.sessionStorage; } catch { session = null; }
     const show = () => setChanged(changedText());
     const offMismatch = onOwnerMismatch(show);
     const onVisible = () => {
@@ -100,14 +121,19 @@ export default function OwnerNotices() {
     document.addEventListener('visibilitychange', onVisible);
     const offFull = onStorageProblem((p) => {
       if (p.kind === 'full') setFull(true);
+      else if (p.kind === 'locked') setLocked(true);
       else setBlocked((b) => (b === 'no' ? 'shown' : b));
     });
+    // Locked from the start (sealed work here, no key on this page). The page does NOT reload
+    // itself: a reload would drop what is being typed, and a locked record refuses the save.
+    if (ownedLocal.locked() && readOwnerCookie() === pageOwner()) setLocked(true);
     // A write refused before this mounted (the adapter reports a blocked store once).
     const early = lastStorageProblem();
     if (early?.kind === 'blocked') setBlocked((b) => (b === 'no' ? 'shown' : b));
     else if (early?.kind === 'full') setFull(true);
-    let session: Storage | null = null;
-    try { session = window.sessionStorage; } catch { session = null; }
+    // The server says nobody is signed in while this page is an account's: the session is gone, so
+    // the key leaves the browser now (the next page that loads has none). This page keeps working.
+    void getCurrentUser().then(() => { if (lastMeAnswer() === 'signed-out' && pageOwner() !== GUEST) dropWorkKeyCookie(); });
     void guardSignedInGuest({ me: getCurrentUser, reload: () => window.location.reload(), session })
       // Signed in, but this page stays "not signed in" (it could not reload itself): say so now,
       // not only when a later request is refused. With a failed save on the page the storage
@@ -120,7 +146,7 @@ export default function OwnerNotices() {
     };
   }, []);
 
-  if (!changed && !full && blocked !== 'shown') return null;
+  if (!changed && !full && blocked !== 'shown' && !locked) return null;
   return (
     <>
       {changed && (
@@ -132,13 +158,19 @@ export default function OwnerNotices() {
           </span>
         </div>
       )}
-      {blocked === 'shown' && !changed && (
+      {locked && !changed && (
+        <div role="alert" data-owner-notice="locked" style={box}>
+          <span style={{ flex: '1 1 260px' }}>{LOCKED_TEXT}</span>
+          <button type="button" style={btn} onClick={() => window.location.reload()}>Reload page</button>
+        </div>
+      )}
+      {blocked === 'shown' && !changed && !locked && (
         <div role="status" data-owner-notice="blocked" style={box}>
           <span style={{ flex: '1 1 260px' }}>{BLOCKED_TEXT}</span>
           <button type="button" style={quiet} onClick={() => setBlocked('done')}>OK</button>
         </div>
       )}
-      {full && !changed && blocked !== 'shown' && (
+      {full && !changed && blocked !== 'shown' && !locked && (
         <div role="status" data-owner-notice="full" style={box}>
           <span style={{ flex: '1 1 260px' }}>
             This computer is out of space, so your latest change was not kept on it. Your earlier work here is safe.
