@@ -547,12 +547,13 @@ await test('6b. Use that work with History unable to write: the account draft an
   assert.deepEqual(r.draft, { 'script.js': 'A unsaved work' }, 'the account draft was overwritten');
   assert.equal(r.history, 0);
   assert.ok(b.storage()['w1:guest:progress:L1'], 'the guest copy was removed');
-  // Remix promises the same: with History failing it changes nothing.
+  // Remix promises the same: with History failing it changes nothing. With sandbox projects a remix either makes a
+  // new project (nothing replaced) or replaces an existing project's code through writeSandboxCode, which keeps it.
   const remix = await t.run(`
     M.vc.saveProgress('sandbox-moshion', { fileContents: { 'script.js': 'my own game' }, commits: [], lastCommittedFileContents: {}, completedSteps: [] });
     T.failWrites('local-history');
     let told = '';
-    const ok = M.games.remixIntoSandbox({ id: 'g1', title: 'Their game', code: 'their code', mine: true, choice: 'free' }, () => true, (m) => { told = m; });
+    const ok = M.games.writeSandboxCode('their code', 'Before opening "Their game"', () => true, 'sandbox-moshion', (m) => { told = m; });
     T.failWrites(null);
     return { ok, told, draft: M.vc.loadProgress('sandbox-moshion').fileContents['script.js'] };
   `);
