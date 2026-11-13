@@ -172,8 +172,13 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
       ref={footerRef}
       className="lesson-progress-footer"
       style={{
-        position: 'relative',
-        flexShrink: 0,
+        // Pinned to the bottom of the window (owner, 2026-11-12): in document
+        // flow it scrolled away with long readings. globals.css reserves the
+        // same height at the bottom of the body so nothing sits under it.
+        position: 'fixed',
+        left: 0,
+        right: 0,
+        bottom: 0,
         background: 'var(--x-191a23)',
         borderTop: '2px solid var(--c-comment)',
         padding: '10px 16px',

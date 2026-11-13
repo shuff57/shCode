@@ -2143,12 +2143,13 @@ details.console > summary::-webkit-details-marker { display: none; }
   .home-module-summary > span:last-child { width: 100%; margin-left: 0; padding-left: 0; }
 }
 
-/* Lesson progress belongs to the document, never over the student's work. */
-body:has(.lesson-progress-footer) { gap: 10px; padding-bottom: 20px !important; }
+/* The lesson progress footer is fixed to the bottom of the window; the body
+   reserves its measured height (plus a gap) so the student's work scrolls clear of it. */
+body:has(.lesson-progress-footer) { gap: 10px; padding-bottom: calc(var(--shd-footer-height, 40px) + 20px) !important; }
 body:has(.lesson-progress-footer) .assignment-header { margin-bottom: 0; padding-top: 6px; padding-bottom: 8px; gap: 10px; }
 body:has(.lesson-progress-footer) .editor-body { margin-top: 0; padding-top: 8px; }
 @media (max-width: 720px) {
-  body:has(.lesson-progress-footer) { padding-bottom: 12px !important; }
+  body:has(.lesson-progress-footer) { padding-bottom: calc(var(--shd-footer-height, 36px) + 12px) !important; }
   /* A flowing tool row replaces the second fixed row over the editor. */
   body:has(.lesson-progress-footer) .shd-tabstrip {
     position: static !important; width: 100%; flex-wrap: wrap;
