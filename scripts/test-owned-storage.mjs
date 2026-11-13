@@ -378,8 +378,10 @@ await test('3. a stale tab after another account signed in: refused with 409, to
   assert.equal(b.server.drafts[B.email], undefined, 'A\'s answer was handed in to B');
   assert.equal(b.server.rows[B.email], undefined, 'A\'s code was saved to B');
   // A's work is where A left it.
-  assert.equal(await tabA.run(`return M.vc.loadProgress('L1').fileContents['script.js'];`), 'A work, not saved');
+  // (Read from storage, not through A's stale tab: with sealing on, a tab whose account is no longer
+  // the signed-in one opens nothing. scripts/test-sealed-storage.mjs case 12.)
   const s = b.storage();
+  assert.equal(JSON.parse(s[`w1:${A.wo}:progress:L1`]).d.fileContents['script.js'], 'A work, not saved');
   assert.deepEqual(JSON.parse(s[`w1:${A.wo}:quiz:Q1`]).d.answers, { q1: 2 });
   assert.equal(s[`w1:${B.wo}:quiz:Q1`], undefined);
   // A signs back in: the same tab may send again, as A.
@@ -545,12 +547,13 @@ await test('6b. Use that work with History unable to write: the account draft an
   assert.deepEqual(r.draft, { 'script.js': 'A unsaved work' }, 'the account draft was overwritten');
   assert.equal(r.history, 0);
   assert.ok(b.storage()['w1:guest:progress:L1'], 'the guest copy was removed');
-  // Remix promises the same: with History failing it changes nothing.
+  // Remix promises the same: with History failing it changes nothing. With sandbox projects a remix either makes a
+  // new project (nothing replaced) or replaces an existing project's code through writeSandboxCode, which keeps it.
   const remix = await t.run(`
     M.vc.saveProgress('sandbox-moshion', { fileContents: { 'script.js': 'my own game' }, commits: [], lastCommittedFileContents: {}, completedSteps: [] });
     T.failWrites('local-history');
     let told = '';
-    const ok = M.games.remixIntoSandbox({ id: 'g1', title: 'Their game', code: 'their code', mine: true, choice: 'free' }, () => true, (m) => { told = m; });
+    const ok = M.games.writeSandboxCode('their code', 'Before opening "Their game"', () => true, 'sandbox-moshion', (m) => { told = m; });
     T.failWrites(null);
     return { ok, told, draft: M.vc.loadProgress('sandbox-moshion').fileContents['script.js'] };
   `);

@@ -85,3 +85,7 @@ functions/_shared/pa-pseudocode.generated.ts
 *.orig
 *.rej
 *.bak
+
+# CI, `npm run deploy` and Cloudflare all install from package-lock.json. A bun.lock
+# here makes Cloudflare switch to `bun install --frozen-lockfile`, and it drifts.
+bun.lock

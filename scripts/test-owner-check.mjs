@@ -18,10 +18,10 @@
 import assert from 'node:assert/strict';
 import { SignJWT } from 'jose';
 import { onRequest } from '../functions/_middleware.ts';
-import { isWorkOwnerId, signSession, verifySession, workOwnerFor } from '../functions/_shared/auth.ts';
+import { isWorkOwnerId, signSession, verifySession, sessionCookies, workKeyFor, workOwnerFor } from '../functions/_shared/auth.ts';
 import { isOwnerMismatch, wantsDocument } from '../functions/_shared/ownerCheck.ts';
 import { onRequestPost as logout } from '../functions/api/auth/logout.ts';
-import { devOwnerId, mountDevOwner } from './dev-owner.mjs';
+import { devOwnerId, devWorkKey, mountDevOwner } from './dev-owner.mjs';
 
 const SECRET = 'owner-check-secret';
 let failed = 0;
@@ -52,8 +52,8 @@ async function call({ path = '/api/lesson-drafts/x', method = 'POST', cookie = '
   return { res, ran, data, cookies: res.headers.getSetCookie?.() ?? [], same: res === sentinel };
 }
 
-const A = { email: 'a@school.org', wo: await workOwnerFor('a@school.org', SECRET) };
-const B = { email: 'b@school.org', wo: await workOwnerFor('b@school.org', SECRET) };
+const A = { email: 'a@school.org', wo: await workOwnerFor('a@school.org', SECRET), wk: await workKeyFor('a@school.org', SECRET) };
+const B = { email: 'b@school.org', wo: await workOwnerFor('b@school.org', SECRET), wk: await workKeyFor('b@school.org', SECRET) };
 /** A session as signed before the `wo` claim existed. */
 const oldToken = (acct, exp = Math.floor(Date.now() / 1000) + 3600) => new SignJWT({ email: acct.email, role: 'student' })
   .setProtectedHeader({ alg: 'HS256' }).setIssuedAt().setExpirationTime(exp).sign(new TextEncoder().encode(SECRET));
@@ -133,7 +133,11 @@ await test('an API answer gives a browser without the owner cookie the account\'
   const me = await call({ path: '/api/me', method: 'GET', cookie: await sessionOf(A) });
   assert.equal(me.ran, true);
   assert.ok(me.cookies.some((c) => c.startsWith(`shcode_owner=${A.wo}; Path=/; SameSite=Lax; Max-Age=`)), 'no owner cookie on /api/me');
+  // The work key is NOT set by an API answer (it may arrive after the account signed out and would
+  // hand a signed-out browser the key again): only the owner cookie is repaired here.
+  assert.ok(!me.cookies.some((c) => c.startsWith('shcode_wk=')), 'an API answer set the work key');
   assert.deepEqual((await call({ path: '/api/me', method: 'GET', cookie: `${await sessionOf(A)}; shcode_owner=${A.wo}` })).cookies, []);
+  assert.deepEqual((await call({ path: '/api/me', method: 'GET', cookie: `${await sessionOf(A)}; shcode_owner=${A.wo}; shcode_wk=${B.wo}.${B.wk}` })).cookies, []);
   assert.ok((await call({ path: '/api/me', method: 'GET', cookie: await sessionOf(A, false) })).cookies
     .some((c) => c.startsWith(`shcode_owner=${A.wo}`)));
   const ws = await call({ path: '/api/live/ABCD', method: 'GET', cookie: await sessionOf(A), upgrade: true });
@@ -151,7 +155,21 @@ await test('page load with a session: the owner cookie is set to the account, re
   assert.match(c, new RegExp(`^shcode_owner=${A.wo}; Path=/; SameSite=Lax; Max-Age=(\\d+); Secure$`));
   const age = Number(/Max-Age=(\d+)/.exec(c)[1]);
   assert.ok(age > 60 * 60 * 24 * 6 && age <= 60 * 60 * 24 * 7);
-  assert.deepEqual((await call({ ...PAGE, cookie: `${await sessionOf(A)}; shcode_owner=${A.wo}` })).cookies, []);
+  // The work key comes in the SAME response, names its account, has the same lifetime, is readable.
+  const k = r.cookies.find((x) => x.startsWith('shcode_wk='));
+  assert.equal(k, `shcode_wk=${A.wo}.${A.wk}; Path=/; SameSite=Lax; Max-Age=${age}; Secure`);
+  assert.ok(!/HttpOnly/.test(k));
+  const both = `shcode_owner=${A.wo}; shcode_wk=${A.wo}.${A.wk}`;
+  assert.deepEqual((await call({ ...PAGE, cookie: `${await sessionOf(A)}; ${both}` })).cookies, []);
+  // Either one missing or wrong: BOTH are sent together, never one alone.
+  for (const have of [`shcode_owner=${A.wo}`, `shcode_wk=${A.wo}.${A.wk}`, `shcode_owner=${A.wo}; shcode_wk=${B.wo}.${B.wk}`, `shcode_owner=${B.wo}; shcode_wk=${A.wo}.${A.wk}`, `shcode_owner=${A.wo}; shcode_wk=${A.wk}`]) {
+    const got = (await call({ ...PAGE, cookie: `${await sessionOf(A)}; ${have}` })).cookies.map((c) => c.split(';')[0]).sort();
+    assert.deepEqual(got, [`shcode_owner=${A.wo}`, `shcode_wk=${A.wo}.${A.wk}`], `with "${have}"`);
+  }
+  // No session: a left-over key is cleared with a left-over owner cookie.
+  assert.deepEqual((await call({ ...PAGE, cookie: both })).cookies.map((c) => c.split(';')[0] + ';' + /Max-Age=\d+/.exec(c)[0]), ['shcode_owner=;Max-Age=0', 'shcode_wk=;Max-Age=0']);
+  // login sets all three in one response.
+  assert.deepEqual(sessionCookies('tok', A.wo, 60, true, A.wk).map((c) => c.split(';')[0]), ['shcode_session=tok', `shcode_owner=${A.wo}`, `shcode_wk=${A.wo}.${A.wk}`]);
   const wrong = await call({ ...PAGE, cookie: `${await sessionOf(A)}; shcode_owner=${B.wo}` });
   assert.ok(wrong.cookies.some((x) => x.startsWith(`shcode_owner=${A.wo}`)), 'a wrong cookie is corrected');
 });
@@ -187,7 +205,8 @@ await test('page load signed out clears a left-over owner cookie; scripts and ba
 await test('sign-out clears the session cookie and the owner cookie in one response', async () => {
   const res = await logout({ request: new Request('https://shcode.test/api/auth/logout', { method: 'POST' }) });
   const c = res.headers.getSetCookie();
-  assert.equal(c.length, 2);
+  assert.equal(c.length, 3);
+  assert.ok(c.some((x) => /^shcode_wk=; .*Max-Age=0/.test(x)), 'the work key stays in the browser after sign-out');
   assert.ok(c.some((x) => /^shcode_session=; .*Max-Age=0/.test(x)));
   assert.ok(c.some((x) => /^shcode_owner=; .*Max-Age=0/.test(x)));
 });
@@ -223,6 +242,13 @@ await test('dev server: same derivation, same rule, owner cookie on page loads a
   const outPage = run('/lessons/x/', `dev_student=ben; dev_signed_out=1; shcode_owner=${devOwnerId('ben')}`, { 'sec-fetch-dest': 'document' });
   assert.ok(outPage.cookies.some((c) => c.startsWith('shcode_owner=;')));
   assert.equal(run('/api/me', 'dev_student=ben; dev_signed_out=1').status, 401);
+  // ...and so does every data route, as in production (it used to keep serving ben's lesson data).
+  const outData = run('/api/lesson-sync/sandbox-js', 'dev_student=ben; dev_signed_out=1');
+  assert.deepEqual([outData.status, outData.next], [401, false]);
+  assert.equal(run('/api/auth/login', 'dev_student=ben; dev_signed_out=1').next, true);
+  const outKey = run('/lessons/x/', `dev_student=ben; dev_signed_out=1; shcode_wk=${devOwnerId('ben')}.${devWorkKey('ben')}`, { 'sec-fetch-dest': 'document' });
+  assert.ok(outKey.cookies.some((c) => /^shcode_wk=; .*Max-Age=0/.test(c)), 'a left-over key cookie is cleared on a signed-out page load');
+  assert.equal(devWorkKey('Ben@School.test'), await workKeyFor('ben@school.test', 'shcode-dev-only-work-owner-secret'), 'the dev key is derived as production derives it');
 });
 
 console.log(`owner check: ${passed} passed, ${failed} failed`);

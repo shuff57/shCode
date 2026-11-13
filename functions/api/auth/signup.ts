@@ -9,6 +9,7 @@ import {
   SESSION_TTL_SECONDS,
   sessionCookies,
   signSession,
+  workKeyFor,
   workOwnerFor,
 } from '../../_shared/auth';
 import { checkRateLimit, rateLimitExceeded } from '../../_shared/rateLimit';
@@ -103,7 +104,7 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
   const workOwner = await workOwnerFor(email, env.AUTH_SECRET);
   const token = await signSession(email, role, env.AUTH_SECRET);
   const secure = new URL(request.url).protocol === 'https:';
-  return json({ email, role, firstName, lastName }, 201, sessionCookies(token, workOwner, SESSION_TTL_SECONDS, secure));
+  return json({ email, role, firstName, lastName }, 201, sessionCookies(token, workOwner, SESSION_TTL_SECONDS, secure, await workKeyFor(email, env.AUTH_SECRET)));
 };
 
 function json(body: unknown, status = 200, cookies: string[] = []): Response {

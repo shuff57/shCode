@@ -6,6 +6,7 @@ import {
   SESSION_TTL_SECONDS,
   sessionCookies,
   signSession,
+  workKeyFor,
   workOwnerFor,
   verifyPassword,
 } from '../../_shared/auth';
@@ -95,7 +96,7 @@ export const onRequestPost: PagesFunction<Env, string, { email: string }> = asyn
   // sign-in dialog asks them once (POST /api/accept-terms).
   const needsTerms = row.terms_accepted_at == null;
   return json({ email, role, firstName: row.first_name, lastName: row.last_name, needsTerms }, 200,
-    sessionCookies(token, workOwner, SESSION_TTL_SECONDS, secure));
+    sessionCookies(token, workOwner, SESSION_TTL_SECONDS, secure, await workKeyFor(email, env.AUTH_SECRET)));
 };
 
 async function loadLockout(
