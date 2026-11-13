@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import LegalLinks from '../../components/LegalLinks';
 
 export const metadata = {
@@ -121,8 +122,7 @@ export default function PrivacyPage() {
 
       <h2>Contact</h2>
       <p>
-        Privacy questions or requests:{' '}
-        <a href="mailto:support@lefthanddev.com?subject=Privacy%20request">support@lefthanddev.com</a>.
+        Privacy questions or requests: send us a message on the <Link href="/contact">contact page</Link>.
       </p>
 
       <LegalLinks />
