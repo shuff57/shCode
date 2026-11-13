@@ -7,6 +7,18 @@
 | Commit date | 2026-11-13 |
 | Vendored | 2026-11-12 (`a662f3d`: `textStyle(NORMAL \| BOLD \| ITALIC \| BOLDITALIC)` (shCode #103), on top of `3f1e70a`'s API audit, `90921bd`'s `textLayer(n)`, `b1a2575`'s `sprite.clone()` and `world.maxSpeed`, `f3e1378` and the `f259b22` sound sync). `textStyle` was first patched in here by hand (`61cfed53`); this sync replaces that patch with the upstream engine, which matches it, so the copy is now upstream `a662f3d` plus the local lines below. |
 
+**Local patch, 2026-11-13, upstream branch `fix/fill-rgb-background` (not yet on `main`): colours
+from numbers.** `fill()`, `stroke()` and `background()` read a colour the way p5 does: a CSS string,
+one number for grey, grey and alpha, `r, g, b`, or `r, g, b, alpha` (alpha 0-255). `fill(80, 250, 123)`
+used to read only the 80 and paint grey, `fill(0, 0, 0, 120)` came out solid black, and
+`background(220)` or `background(40, 42, 54)` handed the canvas a bare number, which it ignores, so the
+screen stayed black. The sandbox's own starter uses both. Applied here by hand because the upstream
+checkout had another session's uncommitted work; the same three edits are committed upstream on that
+branch, so the next sync from `main` after it merges replaces this patch with identical code. Gate
+check "fill, stroke and background take grey, grey+alpha, r,g,b and r,g,b,alpha like p5" (fails on the
+engine before it); 699/699 sketches, 107/107 checks. The docs and the lessons that taught around the old
+limit (6.6.19, 6.6.25, 5.3 Pinball challenges, the colour pages) were reworded.
+
 **`ed04214` (2026-11-13): `HingeJoint` stiffness and limits (shCode #116).**
 
 - `hinge.stiffness`, 0 (floppy, the default) to 1, holds the pose the two sprites

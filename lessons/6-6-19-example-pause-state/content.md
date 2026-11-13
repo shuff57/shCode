@@ -136,4 +136,4 @@ function draw() {
 - Game data (score, position) is **preserved**, just not changed while paused.
 - The toggle pattern: pressing the same key in opposite states toggles between them. It needs `kb.presses` (one frame per press) and `else if` (one state per frame), or the state flips straight back.
 - Draw the game behind the overlay so the player sees what's frozen.
-- A semi-transparent rectangle (`fill('rgba(0, 0, 0, 0.5)')`) dims the background to make the overlay pop. The last number in `rgba(...)` runs from 0 (see-through) to 1 (solid). moSHion's `fill()` reads only its first value, so p5's `fill(0, 0, 0, 120)` would paint solid black over the frozen score instead of dimming it.
+- A semi-transparent rectangle (`fill('rgba(0, 0, 0, 0.5)')`) dims the background to make the overlay pop. The last number in `rgba(...)` runs from 0 (see-through) to 1 (solid). p5's form `fill(0, 0, 0, 120)` works too; there the last number runs from 0 to 255.

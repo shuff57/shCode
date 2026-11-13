@@ -55,7 +55,7 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
  {
   "label": "background",
   "type": "function",
-  "detail": "(color: string): void",
+  "detail": "(c: string | number): void",
   "info": ""
  },
  {
@@ -212,7 +212,7 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "label": "fill",
   "type": "function",
   "detail": "(c: string | number): void",
-  "info": ""
+  "info": "A CSS colour ('red', '#ff79c6'), one number for grey (0-255), grey and alpha, r, g, b, or r, g, b, alpha."
  },
  {
   "label": "floor",
@@ -668,7 +668,7 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "label": "stroke",
   "type": "function",
   "detail": "(c: string | number): void",
-  "info": ""
+  "info": "A CSS colour ('red', '#ff79c6'), one number for grey (0-255), grey and alpha, r, g, b, or r, g, b, alpha."
  },
  {
   "label": "strokeWeight",

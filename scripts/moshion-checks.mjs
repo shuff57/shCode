@@ -1851,4 +1851,38 @@ export const SEMANTIC_CHECKS = [
       return true;
     },
   },
+  {
+    // fill(80, 250, 123) read only the 80 and painted grey; background(220)
+    // handed the canvas a bare number (ignored, so the screen stayed black);
+    // fill(0, 0, 0, 120) came out solid. The sandbox's own starter uses two of these.
+    name: 'fill, stroke and background take grey, grey+alpha, r,g,b and r,g,b,alpha like p5',
+    area: 'drawing',
+    run({ runSketch }) {
+      const r = runSketch(`
+        function setup(){ new Canvas(200, 200); }
+        function draw(){
+          background(40, 42, 54);
+          fill(80, 250, 123); rect(0, 0, 10, 10);
+          fill(200); rect(20, 0, 10, 10);
+          fill(0, 0, 0, 120); rect(40, 0, 10, 10);
+          fill(255, 128); rect(60, 0, 10, 10);
+          fill('#ff79c6'); rect(80, 0, 10, 10);
+          fill([10, 20, 30]); rect(100, 0, 10, 10);
+          stroke(255, 0, 0); fill(300, -5, 12.6); rect(120, 0, 10, 10);
+          fill(); rect(140, 0, 10, 10);
+        }
+      `, { frames: 1 });
+      if (!r.ok) return 'sketch threw: ' + r.error?.message;
+      const rects = r.ops.filter((o) => o.op === 'fillRect');
+      const bg = rects.find((o) => o.args[2] === 200 && o.args[3] === 200);
+      if (!bg || bg.fill !== 'rgb(40,42,54)') return 'background(40, 42, 54) painted ' + (bg && bg.fill);
+      const want = ['rgb(80,250,123)', 'rgb(200,200,200)', 'rgba(0,0,0,0.47058823529411764)', 'rgba(255,255,255,0.5019607843137255)',
+        '#ff79c6', 'rgb(10,20,30)', 'rgb(255,0,13)', 'rgb(255,0,13)'];
+      const got = rects.filter((o) => o !== bg).map((o) => o.fill);
+      if (JSON.stringify(got) !== JSON.stringify(want)) return 'fills were ' + JSON.stringify(got) + ', expected ' + JSON.stringify(want);
+      const stroked = r.ops.filter((o) => o.op === 'strokeRect' || o.op === 'stroke').map((o) => o.stroke);
+      if (stroked.length && !stroked.includes('rgb(255,0,0)')) return 'stroke(255, 0, 0) drew ' + JSON.stringify(stroked);
+      return true;
+    },
+  },
 ];

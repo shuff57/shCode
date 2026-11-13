@@ -298,7 +298,7 @@ function draw() {
       },
       {
         title: 'A colour with alpha',
-        body: `A colour is one CSS string. fill(), stroke(), background() and a sprite's .color all take the same one, and the alpha goes inside it: 'rgba(255, 99, 71, 0.5)' is that red at half strength. The p5 form fill(r, g, b, a) does not work here — fill() reads only its first argument, so fill(0, 0, 0, 120) paints solid black.
+        body: `A colour is a CSS string. fill(), stroke(), background() and a sprite's .color all take the same one, and the alpha can go inside it: 'rgba(255, 99, 71, 0.5)' is that red at half strength, with the alpha from 0 to 1. fill(), stroke() and background() also take numbers the way p5 does: fill(255, 99, 71) for red, fill(200) for light grey, and a fourth number for alpha, fill(255, 99, 71, 128), where the alpha runs from 0 to 255.
 
 shCode adds two helpers so you do not have to build the string yourself. rgba(r, g, b, a) rounds and clamps the channels and the alpha, and randomColor(alpha) or randomColor(minAlpha, maxAlpha) picks a random colour for you. Both return a plain string, so they go anywhere a colour goes.`,
         code: `let dots = [];
@@ -327,7 +327,7 @@ rect and square are placed by their top-left corner. circle is placed by its cen
 
 fill(color) sets the colour inside the next shapes, and stroke(color) sets the outline. noFill() and noStroke() turn either one off, and strokeWeight(n) makes the outline thicker. They stay set until you change them, so set the colour just before the shape it belongs to. square() follows fill() like every other shape: fill('deepskyblue') then square(...) draws a blue square.
 
-fill() reads only its first value, so p5's fill(0, 0, 0, 120) ignores the alpha (and the green and blue) and paints solid black; for a see-through colour pass one rgba string instead, such as fill('rgba(0, 0, 0, 0.5)'), where the last number runs from 0 (clear) to 1 (solid).`,
+A colour can be a name or string, fill('deepskyblue'), or numbers as in p5: fill(80, 250, 123) for green, fill(200) for grey. For a see-through colour add an alpha: fill(0, 0, 0, 120), where the alpha runs from 0 (clear) to 255 (solid), or the string fill('rgba(0, 0, 0, 0.5)'), where it runs from 0 to 1.`,
         code: `function setup() {
   new Canvas(400, 300);
 }
