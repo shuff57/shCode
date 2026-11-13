@@ -41,7 +41,8 @@ export default function NotificationBell({ enabled }: { enabled: boolean }) {
     const onVisible = () => { if (document.visibilityState === 'visible') ask(); };
     const onChanged = () => ask(0);
     // Another tab opened a conversation or a game: what was read is in localStorage, so a recount is enough.
-    const watched = [SEEN_KEY, GAMES_SEEN_KEY, READ_ALL_KEY].map((k) => ownedLocal.fullKey(k));
+    // storedKeys, not fullKey: a sealed record lives under another name (lib/owned-storage.ts).
+    const watched = [SEEN_KEY, GAMES_SEEN_KEY, READ_ALL_KEY].flatMap((k) => ownedLocal.storedKeys(k));
     const onStorage = (e: StorageEvent) => { if (e.key && watched.includes(e.key)) sync(); };
     document.addEventListener('visibilitychange', onVisible);
     window.addEventListener(CHANGES_CHANGED, onChanged);

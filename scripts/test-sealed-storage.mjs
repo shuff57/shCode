@@ -666,6 +666,23 @@ await test('16. Reset (removing a record) keeps a differing plain copy an older 
   await b.close();
 });
 
+await test('17. storedKeys names where a record really is, sealed or plain, so a storage event can be matched (the bell)', async () => {
+  for (const sealing of [true, false]) {
+    const A = await account(`bell-${sealing}@school.org`);
+    const b = createBrowser({ sealing });
+    await b.signIn(A);
+    const t = await b.open('bell');
+    const names = await t.run(`
+      M.owned.ownedLocal.setItem('notices-read-all', '123');
+      return M.owned.ownedLocal.storedKeys('notices-read-all');
+    `);
+    const written = Object.keys(b.rawStorage()).filter((k) => k.endsWith(':notices-read-all'));
+    assert.equal(written.length, 1, `sealing ${sealing}: expected one stored copy, got ${written}`);
+    assert.ok(names.includes(written[0]), `sealing ${sealing}: ${written[0]} is not among ${names}`);
+    await b.close();
+  }
+});
+
 cleanup();
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);

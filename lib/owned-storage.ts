@@ -258,6 +258,11 @@ export interface OwnedStorage {
   readonly owner: string;
   /** The real key a base key is stored under. */
   fullKey(key: string): string;
+  /**
+   * Every real key a base key can be stored under: the plain name and the sealed one. Match a
+   * `storage` event against these, not `fullKey` alone, or a sealed record's change goes unseen.
+   */
+  storedKeys(key: string): string[];
   /** The record as a string (what a raw getItem used to return). */
   getItem(key: string): string | null;
   /** The record as stored with setJSON. */
@@ -542,6 +547,7 @@ export function createOwnedStorage(opts: OwnedStorageOptions): OwnedStorage {
   return {
     owner,
     fullKey,
+    storedKeys: (key) => [fullKey(key), sealedKey(key)],
     getItem(key) {
       const r = read(key);
       if (r.state !== 'open') return null;
@@ -805,6 +811,7 @@ function lazyOwned(make: () => OwnedStorage): OwnedStorage {
   return {
     get owner() { return get().owner; },
     fullKey: (k) => get().fullKey(k),
+    storedKeys: (k) => get().storedKeys(k),
     getItem: (k) => get().getItem(k),
     getJSON: <T = unknown>(k: string) => get().getJSON<T>(k),
     setItem: (k, v) => get().setItem(k, v),
