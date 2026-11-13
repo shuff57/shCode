@@ -283,7 +283,56 @@ async function joinCodeTogether(page, demo) {
   await page.locator('[data-testid=together-code][data-code]').waitFor({ timeout: 30000 });
 }
 
+const MOSHION_TEXTURE_ONE_NAME = `// One name for your art: .texture
+let coin, heart;
+
+function setup() {
+  new Canvas(400, 260);
+  coin = new Sprite(120, 110, 90, 90);
+  coin.collider = 'none';
+  coin.texture = 'coinSpin';
+  coin.texture.frameDelay = 8;   // slower spin
+
+  heart = new Sprite(280, 110, 90, 90);
+  heart.collider = 'none';
+  heart.texture = 'heartLose';
+  heart.texture.loop = false;    // play once, then stop
+}
+
+function draw() {
+  background('#282a36');
+  if (kb.presses('space')) heart.texture.frame = 0;   // play it again
+  fill('white');
+  textSize(13);
+  text(coin.texture.name + ': picture ' + coin.texture.frame, 40, 200);
+  text(heart.texture.name + ': picture ' + heart.texture.frame, 215, 200);
+  text('SPACE plays the heart again', 100, 240);
+}
+`;
+
 const RECIPES = {
+  '2026-11-texture-one-name': {
+    people: [SAM],
+    path: '/sandbox/',
+    storage: { 'shCode:sandbox-mode': 'moshion' },
+    async before({ demos: [d], pages: [p] }) {
+      // Running before the clip starts, as the realtime clip does; the clip is the play.
+      await d.setCode(MOSHION_TEXTURE_ONE_NAME);
+      await p.getByRole('button', { name: /Run/ }).first().click();
+      await p.frameLocator('iframe').first().locator('canvas').first().waitFor({ timeout: 30000 });
+      // scroll the editor back to the top, where the .texture lines are
+      await p.locator('.cm-scroller').first().evaluate((el) => { el.scrollTop = 0; });
+    },
+    async run({ demos: [d], pages: [p] }) {
+      await d.pause(1800);
+      await focusCanvas(p, d);
+      await hold(p, ['Space'], 120);
+      await d.pause(2600);
+      await hold(p, ['Space'], 120);
+      await d.pause(2600);
+    },
+  },
+
   // Migration 0052: Alex stars Sam's game, sees who starred it, then reads the game's family tree.
   '2026-11-stars-family': {
     people: [ALEX],

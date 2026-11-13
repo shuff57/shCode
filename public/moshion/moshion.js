@@ -30,7 +30,8 @@
  *   sprite.pattern = url      (repeats at natural size inside the shape instead of stretching,
  *                             for ground/walls; also a group default)
  *   sprite.texture = 'coin'   (a NAMED pixel-art picture from textures/, or one saved with
- *                             saveTexture(); textureNames() lists them; also a group default)
+ *                             saveTexture(); textureNames() lists them; also a group default.
+ *                             Reads back the texture: .name, .frame, .frameDelay, .loop)
  *   new HingeJoint(a,b,opt)   new DistanceJoint(a,b,opt)   joint.delete()
  *   new SliderJoint(a,b,opt)  new WheelJoint(a,b,opt)  new GrabberJoint(a,b,opt)
  *   new GlueJoint(a,b)        joint.length (DistanceJoint, settable post-construction)
@@ -559,12 +560,11 @@
     return (typeof raw === 'string' && raw.slice(0, 5) === 'data:') ? raw : null;
   }
 
-  // `loadSound('myZap')` resolves a sound the mixer saved under
-  // `sound:<name>`, the same way a saved texture resolves. Only a code-safe
-  // NAME is looked up: a path or a data: URI is left alone, so
-  // `/moshion/assets/coin.wav` and a pasted data URI behave exactly as before.
-  // The mixer's save path writes the data: URI here through the same storage
-  // bridge, so there is no upload and no API route.
+  // `loadSound('myZap')` resolves a sound saved under `sound:<name>`, the same
+  // way a saved texture resolves. Only a code-safe NAME is looked up: a path or
+  // a data: URI is left alone, so `/assets/coin.wav` and a pasted data URI
+  // behave exactly as before. A host page saves the data: URI through the same
+  // store (storeItem / the preview bridge); no upload or API is involved.
   const SOUND_PREFIX_ = 'sound:';
   function _savedSoundSrc(name) {
     if (typeof name !== 'string') return null;
@@ -1332,15 +1332,50 @@
     // exclusive with `.image` and an active `.ani`, the same way those two
     // already exclude each other.
     //
-    // The getter hands back the NAME, not the Image -- `if (s.texture ===
-    // 'coin')` is the question students actually ask.
-    get texture() { return this._texture; }
+    // The getter hands back the texture ITSELF, so one name covers picking the
+    // art and controlling it (shCode, 2026-11-13, "one name: .texture"):
+    //   sprite.texture.name         'coin'   (if (s.texture.name === 'coin'))
+    //   sprite.texture.frameDelay   speed, .frame, .loop, .frameCount
+    // An animated texture's object IS sprite.ani (the same Ani); a still
+    // one is a StillTexture with the same fields (frameCount 1). Both print as
+    // their name, so text('using ' + s.texture) still reads 'using coin'.
+    // null when the sprite has no texture. It used to return the name string.
+    //
+    // An animation made with addAni() counts too: sprite.texture is the one
+    // showing (the same object as sprite.ani), and `sprite.texture = 'run'`
+    // switches to the sprite's own animation called 'run' the way
+    // changeAni('run') does. The sprite's own animation names come first,
+    // then the texture catalog. So .texture is the one name for the art a
+    // sprite shows, whichever way it was added.
+    get texture() {
+      if (this._texture) return this._textureObj || null;
+      return this.ani || null;
+    }
     set texture(name) {
+      // `a.texture = b.texture` copies by name.
+      if (name && typeof name === 'object' && typeof name.name === 'string') name = name.name;
+      // One of this sprite's own addAni() animations (not one a texture made):
+      // switch to it, exactly as changeAni(name) does.
+      if (typeof name === 'string' && this._anis && Object.prototype.hasOwnProperty.call(this._anis, name)) {
+        const own = this._anis[name];
+        if (own && own !== this._textureArt) {
+          this.ani = own;
+          this._img = null;
+          this._emoji = null;
+          this._texture = null;
+          return;
+        }
+      }
       if (name === null || name === undefined || name === '') {
-        // Only undo art that CAME from a texture; an addAni()/image the sketch
-        // set itself is not ours to clear.
-        if (this._texture) { this._img = null; this.ani = null; }
+        // Undo the art .texture reads back: a texture, or the animation
+        // showing (an addAni() one stays registered, so changeAni() or
+        // .texture = its name brings it back). An .image the sketch set
+        // itself is not ours to clear.
+        if (this._texture) this._img = null;
+        this.ani = null;
         this._texture = null;
+        this._textureArt = null;
+        this._textureObj = null;
         return;
       }
       const src = _textureSrc(name);
@@ -1358,10 +1393,23 @@
         );
         return;
       }
+      const meta = _textureMeta(name);
+
+      // Setting the texture the sprite is ALREADY showing changes nothing, so
+      // `door.texture = 'openDoor'` inside update() keeps animating instead of
+      // restarting at frame 0 every frame (it used to freeze on frame 0; seen
+      // in student code 2026-11-13). Replay with `sprite.texture.frame = 0`. Only
+      // when that art is still the one on screen (an image, addAni() or
+      // changeAni() since then means it is not) and the saved art has not been
+      // redrawn under the same name.
+      const key = src + '|' + (meta ? meta.frames + '/' + meta.frameDelay + '/' + meta.delays : '');
+      const showing = this._textureArt && (this.ani ? this.ani === this._textureArt : this._img === this._textureArt);
+      if (String(name) === this._texture && key === this._textureKey && showing) return;
+
       this._texture = String(name);
+      this._textureKey = key;
       this._emoji = null;
 
-      const meta = _textureMeta(name);
       if (meta) {
         // The strip is exactly what Ani already slices -- width / frameCount
         // per frame, one row. So an animated texture needs no new draw path:
@@ -1372,9 +1420,13 @@
         this._anis[name] = ani;
         this.ani = ani;
         this._img = null;
+        this._textureArt = ani;
+        this._textureObj = ani;
       } else {
         this._img = loadArt_(src);
         this.ani = null;
+        this._textureArt = this._img;
+        this._textureObj = new StillTexture(this._texture);
       }
     }
 
@@ -1486,6 +1538,16 @@
       if (this.ani) {
         const own = this._anis && Object.keys(this._anis).find((n) => this._anis[n] === this.ani);
         c.ani = own ? c._anis[own] : Object.assign(Object.create(Ani.prototype), this.ani);
+      }
+      // so re-setting the same texture on the copy is a no-op too
+      if (this._texture && this._textureArt) {
+        c._textureKey = this._textureKey;
+        c._textureArt = this._textureArt === this.ani ? c.ani : c._img;
+      }
+      if (this._texture && this._textureObj) {
+        c._textureObj = this._textureObj instanceof Ani
+          ? ((c._anis && c._anis[this._texture]) || c.ani)
+          : new StillTexture(this._texture);
       }
       // groups (the constructor already put it in allSprites)
       for (const g of this._groups) if (g !== allSprites) g.push(c);
@@ -1884,6 +1946,10 @@
         : null;
       this._frame = 0;
       this._tick = 0;
+      // false = play once and stay on the last frame (a door that opens and
+      // stays open). Setting `frame = 0` plays it again; `loop = true` resumes
+      // looping from wherever it stopped.
+      this.loop = true;
       this.spriteSheet = loadArt_(sheetUrl);
     }
     // Which frame is showing, 0 first. Setting it jumps there (shCode #110):
@@ -1917,10 +1983,29 @@
     }
     _advance() {
       if (this.frameCount <= 1) return;
+      if (!this.loop && this._frame >= this.frameCount - 1) return;
       if (++this._tick < this.holdOf(this._frame)) return;
       this._tick = 0;
       this._frame = (this._frame + 1) % this.frameCount;
     }
+    /** Prints as its name: text('using ' + s.texture) reads 'using coin'. */
+    toString() { return String(this.name); }
+  }
+
+  // What `sprite.texture` reads back for a STILL texture: the same fields an
+  // animated one (an Ani) has, so a sketch can read .name / .frameCount the
+  // same way for both. One picture, so frame stays 0 and the timing fields do
+  // nothing.
+  class StillTexture {
+    constructor(name) {
+      this.name = name;
+      this.frame = 0;
+      this.frameCount = 1;
+      this.frameDelay = 4;
+      this.frameDelays = null;
+      this.loop = true;
+    }
+    toString() { return String(this.name); }
   }
 
   // Per-sprite named-animation registry (`sprite.addAni` fills it in).
@@ -3930,9 +4015,9 @@
       const ctx = _audioCtx();
       if (!ctx || typeof fetch !== 'function') return null;
       try {
-        // A sound saved by the mixer is a data: URI under `sound:<name>`; with
-        // none, a built-in name is its file in assets/; a path or a pasted
-        // data: URI passes through untouched.
+        // A saved sound is a data: URI under `sound:<name>`; with none, a
+        // built-in name is its file in assets/; a path or a pasted data: URI
+        // passes through untouched.
         const res = await fetch(_savedSoundSrc(this.url) || _builtInSoundSrc(this.url) || this.url);
         if (!res.ok) throw new Error('HTTP ' + res.status);
         const bytes = await res.arrayBuffer();

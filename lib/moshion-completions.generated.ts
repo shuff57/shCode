@@ -653,6 +653,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "info": ""
  },
  {
+  "label": "StillTexture",
+  "type": "class",
+  "detail": "class",
+  "info": "What `sprite.texture` reads back for a still (one-picture) texture: the same fields as an animated one, with frameCount 1."
+ },
+ {
   "label": "storeItem",
   "type": "function",
   "detail": "(name: string, val: any): void",
@@ -881,9 +887,65 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "info": "Game frames the current frame has been showing, 0 when it just started."
   },
   {
+   "label": "loop",
+   "type": "property",
+   "detail": "boolean",
+   "info": "true (default) repeats forever; false plays once and stays on the last frame."
+  },
+  {
    "label": "spriteSheet",
    "type": "property",
    "detail": "HTMLImageElement",
+   "info": ""
+  },
+  {
+   "label": "toString",
+   "type": "method",
+   "detail": "(): string",
+   "info": "The name, so `'using ' + sprite.texture` reads 'using coin'."
+  }
+ ],
+ "StillTexture": [
+  {
+   "label": "name",
+   "type": "property",
+   "detail": "string",
+   "info": ""
+  },
+  {
+   "label": "frame",
+   "type": "property",
+   "detail": "number",
+   "info": "Always 0: one picture."
+  },
+  {
+   "label": "frameCount",
+   "type": "property",
+   "detail": "number",
+   "info": "Always 1."
+  },
+  {
+   "label": "frameDelay",
+   "type": "property",
+   "detail": "number",
+   "info": "No effect on a still."
+  },
+  {
+   "label": "frameDelays",
+   "type": "property",
+   "detail": "null",
+   "info": ""
+  },
+  {
+   "label": "loop",
+   "type": "property",
+   "detail": "boolean",
+   "info": "No effect on a still."
+  },
+  {
+   "label": "toString",
+   "type": "method",
+   "detail": "(): string",
    "info": ""
   }
  ],
@@ -1083,7 +1145,7 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
   {
    "label": "texture",
    "type": "property",
-   "detail": "string | null",
+   "detail": "Ani | StillTexture | null",
    "info": "Named art from the texture catalog, e.g."
   },
   {

@@ -331,7 +331,7 @@ function draw() {
   for (let i = 0; i < 2; i++) {
     const f = fighters[i];
     const b = bodies[i];
-    if (b.texture !== f.skin) b.texture = f.skin;
+    b.texture = f.skin;   // the same texture again changes nothing
     lunge[i] = max(lunge[i] - 1, 0);
     shake[i] = max(shake[i] - 1, 0);
     const toward = i === 0 ? 1 : -1;

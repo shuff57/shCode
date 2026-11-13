@@ -1577,7 +1577,7 @@ export const SEMANTIC_CHECKS = [
       `, { frames: 2 });
       if (!r.ok) return 'sketch threw: ' + r.error?.message;
       const b = r.box.sandbox;
-      if (b.a.texture !== 'coin') return 'sprite.texture read back as ' + JSON.stringify(b.a.texture) + ', expected "coin"';
+      if (!b.a.texture || b.a.texture.name !== 'coin') return 'sprite.texture.name read back as ' + JSON.stringify(b.a.texture && b.a.texture.name) + ', expected "coin"';
       if (!b.had) return "hasTexture('coin') was false — the built-in catalog did not load";
       if (b.nope) return 'hasTexture() returned true for a name that does not exist';
       if (!b.names || b.names.length < 10) return 'textureNames() returned ' + (b.names ? b.names.length : 'nothing') + ' names';
@@ -1654,7 +1654,7 @@ export const SEMANTIC_CHECKS = [
       `, { frames: 2 });
       if (!r.ok) return 'sketch threw: ' + r.error?.message;
       const b = r.box.sandbox;
-      if (b.a.texture !== 'mine') return 'a saved texture did not set sprite.texture; got ' + JSON.stringify(b.a.texture);
+      if (!b.a.texture || b.a.texture.name !== 'mine') return 'a saved texture did not set sprite.texture; got ' + JSON.stringify(b.a.texture && b.a.texture.name);
       if (!b.listed) return 'a saved texture was not in textureNames() — the editor could save art nothing can find';
       if (!b.threw) return 'saveTexture accepted a value that is not a data: URL';
       const srcs = r.ops.filter((o) => o.op === 'drawImage').map((o) => String(o.args[0]));
@@ -1674,7 +1674,7 @@ export const SEMANTIC_CHECKS = [
           a = new Sprite(50, 50, 50, 50); a.texture = 'crate'; a.image = '/moshion/assets/star.webp';
           afterImage = a.texture;
           b = new Sprite(100, 50, 50, 50); b.texture = 'gem'; b.addAni('x', '/moshion/assets/ghost_fly.avif', 4);
-          afterAni = b.texture;
+          afterAni = b.texture && b.texture.name; afterAniIsAni = b.texture === b.ani;
           c = new Sprite(150, 50, 50, 50); c.texture = 'coin'; c.texture = null;
           afterNull = c.texture; }
         function draw(){ background('#222'); }
@@ -1682,7 +1682,8 @@ export const SEMANTIC_CHECKS = [
       if (!r.ok) return 'sketch threw: ' + r.error?.message;
       const b = r.box.sandbox;
       if (b.afterImage !== null) return 'setting .image left .texture at ' + JSON.stringify(b.afterImage);
-      if (b.afterAni !== null) return 'addAni() left .texture at ' + JSON.stringify(b.afterAni);
+      // Since upstream 4074761, .texture reads back the addAni() animation showing.
+      if (b.afterAni !== 'x' || b.afterAniIsAni !== true) return 'after addAni(), .texture should be that animation; got ' + JSON.stringify(b.afterAni);
       if (b.afterNull !== null) return 'texture = null left .texture at ' + JSON.stringify(b.afterNull);
       return true;
     },
@@ -1882,6 +1883,109 @@ export const SEMANTIC_CHECKS = [
       if (JSON.stringify(got) !== JSON.stringify(want)) return 'fills were ' + JSON.stringify(got) + ', expected ' + JSON.stringify(want);
       const stroked = r.ops.filter((o) => o.op === 'strokeRect' || o.op === 'stroke').map((o) => o.stroke);
       if (stroked.length && !stroked.includes('rgb(255,0,0)')) return 'stroke(255, 0, 0) drew ' + JSON.stringify(stroked);
+      return true;
+    },
+  },
+
+  {
+    name: 'ani.loop = false plays once and stays on the last frame; frame = 0 replays',
+    area: 'texture',
+    run({ runSketch }) {
+      const r = runSketch(`
+        function setup(){ new Canvas(200,200);
+          saveTexture('door', 'data:image/png;base64,D4=', { frames: 4, frameDelay: 2 });
+          d = new Sprite(60, 100, 40, 40); d.collider='none'; d.texture = 'door';
+          defaultLoop = d.ani.loop;
+          d.ani.loop = false;
+          l = new Sprite(140, 100, 40, 40); l.collider='none'; l.texture = 'door';
+          seen = []; lseen = []; replay = [];
+        }
+        function draw(){ background('#222');
+          if (frameCount < 20) seen.push(d.ani.frame);
+          else if (frameCount === 20) d.ani.frame = 0;
+          else replay.push(d.ani.frame);
+          lseen.push(l.ani.frame);
+        }
+      `, { frames: 32 });
+      if (!r.ok) return 'sketch threw: ' + r.error?.message;
+      const b = r.box.sandbox;
+      if (b.defaultLoop !== true) return 'ani.loop should default to true, was ' + b.defaultLoop;
+      // Played through every frame in order, then held the last one.
+      const firsts = [...new Set(b.seen)];
+      if (JSON.stringify(firsts) !== '[0,1,2,3]') return 'a play-once animation showed frames ' + JSON.stringify(firsts);
+      if (b.seen.slice(-6).some((f) => f !== 3)) return 'a play-once animation did not stay on its last frame: ' + JSON.stringify(b.seen);
+      // frame = 0 plays it again, and it stops on the last frame again.
+      if (!b.replay.includes(1) || b.replay[b.replay.length - 1] !== 3) {
+        return 'setting frame = 0 did not replay it to the end: ' + JSON.stringify(b.replay);
+      }
+      // A looping sprite sharing the same texture still wraps around.
+      const lastZero = b.lseen.lastIndexOf(0);
+      if (!(lastZero > b.lseen.indexOf(3))) return 'the default looping animation stopped wrapping: ' + JSON.stringify(b.lseen);
+      return true;
+    },
+  },
+
+  {
+    name: 'setting the texture a sprite already shows does not restart it (no freeze when set every frame)',
+    area: 'texture',
+    run({ runSketch }) {
+      const r = runSketch(`
+        function setup(){ new Canvas(200,200);
+          saveTexture('door', 'data:image/png;base64,D4=', { frames: 4, frameDelay: 2 });
+          saveTexture('walk', 'data:image/png;base64,W4=', { frames: 4, frameDelay: 2 });
+          d = new Sprite(60, 100, 40, 40); d.collider='none';
+          w = new Sprite(140, 100, 40, 40); w.collider='none';
+          k = new Sprite(100, 40, 40, 40); k.collider='none';
+          k.texture = 'door'; k.addAni('other', 'data:image/png;base64,O2=', 2);
+          k.changeAni('other'); k.texture = 'door'; kBack = k.ani && k.ani.name;
+          seen = []; switched = [];
+        }
+        function update(){
+          d.texture = 'door';                                   // every frame, the student pattern
+          w.texture = frameCount < 10 ? 'door' : 'walk';        // a DIFFERENT name still switches
+        }
+        function draw(){ background('#222'); seen.push(d.ani.frame); if (frameCount === 10) switched.push(w.texture.name, w.texture.frame); }
+      `, { frames: 20 });
+      if (!r.ok) return 'sketch threw: ' + r.error?.message;
+      const b = r.box.sandbox;
+      if (Math.max(...b.seen) < 3) return 'setting the same texture every frame froze it: frames ' + JSON.stringify(b.seen);
+      if (b.switched[0] !== 'walk' || b.switched[1] !== 0) return 'switching to a different texture did not start it at frame 0: ' + JSON.stringify(b.switched);
+      if (b.kBack !== 'door') return 'after changeAni(), setting the texture again did not bring it back; ani is ' + b.kBack;
+      return true;
+    },
+  },
+
+  {
+    name: 'sprite.texture reads back the texture: .name, and an animated one is controlled through it',
+    area: 'texture',
+    run({ runSketch }) {
+      const r = runSketch(`
+        function setup(){ new Canvas(200,200);
+          saveTexture('door', 'data:image/png;base64,D4=', { frames: 4, frameDelay: 2 });
+          d = new Sprite(60, 100, 40, 40); d.collider='none'; d.texture = 'door';
+          same = d.texture === d.ani;
+          d.texture.frameDelay = 3; aniDelay = d.ani.frameDelay;
+          d.texture.loop = false;
+          c = new Sprite(140, 100, 40, 40); c.collider='none'; c.texture = 'coin';
+          still = { name: c.texture.name, count: c.texture.frameCount, frame: c.texture.frame, ani: c.ani };
+          printed = 'using ' + c.texture;
+          e = new Sprite(100, 40, 40, 40); e.collider='none'; e.texture = c.texture; copied = e.texture.name;
+          n = new Sprite(100, 160, 40, 40); none = n.texture;
+          cl = d.clone(); cloneIsOwn = cl.texture === cl.ani && cl.texture !== d.texture;
+          seen = [];
+        }
+        function draw(){ background('#222'); seen.push(d.texture.frame); }
+      `, { frames: 30 });
+      if (!r.ok) return 'sketch threw: ' + r.error?.message;
+      const b = r.box.sandbox;
+      if (b.same !== true) return 'an animated sprite.texture is not the same object as sprite.ani';
+      if (b.aniDelay !== 3) return 'sprite.texture.frameDelay = 3 did not reach the animation (ani.frameDelay ' + b.aniDelay + ')';
+      if (b.seen[b.seen.length - 1] !== 3 || b.seen.slice(-5).some((f) => f !== 3)) return 'sprite.texture.loop = false did not stop on the last frame: ' + JSON.stringify(b.seen);
+      if (b.still.name !== 'coin' || b.still.count !== 1 || b.still.frame !== 0 || b.still.ani !== null) return 'a still texture read back wrong: ' + JSON.stringify(b.still);
+      if (b.printed !== 'using coin') return 'a texture did not print as its name: ' + JSON.stringify(b.printed);
+      if (b.copied !== 'coin') return 'a.texture = b.texture did not copy the texture; got ' + JSON.stringify(b.copied);
+      if (b.none !== null) return 'a sprite with no texture read back ' + JSON.stringify(b.none) + ', expected null';
+      if (b.cloneIsOwn !== true) return "a clone's texture is not its own animation";
       return true;
     },
   },

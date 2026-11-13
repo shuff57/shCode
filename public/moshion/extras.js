@@ -258,7 +258,10 @@
     if (sp.vel) { o.vx = r2(sp.vel.x); o.vy = r2(sp.vel.y); }
     if (sp.shape === 'circle') o.d = Math.max(0, r2(sp.w)); else { o.w = Math.max(0, r2(sp.w)); o.h = Math.max(0, r2(sp.h)); }
     if (typeof sp.color === 'string' && sp.color.length <= 40 && COLOR_RE.test(sp.color)) o.c = sp.color;
-    if (typeof sp.texture === 'string' && TEXTURE_RE.test(sp.texture)) o.tx = sp.texture;
+    // sprite.texture reads back the texture object (its .name) since 2026-11-13;
+    // a string is an older engine.
+    var tn = typeof sp.texture === 'string' ? sp.texture : (sp.texture && sp.texture.name);
+    if (typeof tn === 'string' && TEXTURE_RE.test(tn)) o.tx = tn;
     o.v = sp.visible !== false;
     return o;
   }
@@ -324,7 +327,8 @@
 
   function lookPeer(p, st) {
     if (st.c !== undefined && p.color !== st.c) p.color = st.c;
-    if (st.tx !== undefined && p.texture !== st.tx) { try { p.texture = st.tx; } catch (e) { /* unknown here */ } }
+    var ptn = typeof p.texture === 'string' ? p.texture : (p.texture && p.texture.name);
+    if (st.tx !== undefined && ptn !== st.tx) { try { p.texture = st.tx; } catch (e) { /* unknown here */ } }
     if (st.v !== undefined) p.visible = st.v;
     if (st.d !== undefined) { if (p.w !== st.d) p.diameter = st.d; }
     else if (st.w !== undefined && st.h !== undefined && (p.w !== st.w || p.h !== st.h)) { p.w = st.w; p.h = st.h; }

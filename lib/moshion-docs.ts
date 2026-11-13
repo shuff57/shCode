@@ -812,7 +812,7 @@ function draw() {
 
 If the string has no dot in it, moSHion treats it as an emoji: sprite.image = '🧍' draws that emoji character centered on the sprite at the sprite's height as the font size. This is a quick way to get a visible character without loading assets.
 
-Setting .image clears any active animation (sprite.ani), and vice versa — they're mutually exclusive.`,
+Setting .image clears any active animation (sprite.texture), and vice versa — they're mutually exclusive.`,
         code: `let player;
 
 function setup() {
@@ -861,11 +861,13 @@ candy: candyGreen, candyOrange, candyYellow, swirl, swirlMint
 
 Animated ones to try: coinSpin (and coinSilverSpin, coinBronzeSpin), starTwinkle, gemSparkle (and gemGreenSparkle, gemYellowSparkle, gemOrangeSparkle), heartBlink, playerJump (one per player colour, like playerBlueJump), flagWave (one per flag colour), torchFlicker and boom.
 
-Every animation loops. Two are made to play once: heartLose (a heart flashes, then shows half) and boom (an explosion that grows and fades). Show them for one loop, then change the picture or remove the sprite. heartLose shows 6 pictures for 10 frames each, so after(60, () => heart.texture = 'heartHalf'). boom shows 6 pictures for 6 frames each, so after(36, () => blast.remove()).
+Every animation loops unless you set sprite.texture.loop = false, which plays it once and stops on the last picture. Two are made to play once: heartLose (a heart flashes, then shows half) and boom (an explosion that grows and fades). Show them for one loop, then change the picture or remove the sprite. heartLose shows 6 pictures for 10 frames each, so after(60, () => heart.texture = 'heartHalf'). boom shows 6 pictures for 6 frames each, so after(36, () => blast.remove()).
 
 Call textureNames() to print the list from inside a sketch, and hasTexture('coin') to check one name. A name that does not exist warns in the console and suggests near matches rather than failing silently, so a typo tells you what it was.
 
-Reading sprite.texture gives back the name you set, which makes if (s.texture === 'coin') work. Setting .texture clears .image and .ani, exactly the way those two already clear each other.
+Reading sprite.texture gives back the texture itself. Its name is sprite.texture.name, so ask if (s.texture.name === 'coin'). An animated texture is controlled through the same name: sprite.texture.frameDelay is the speed (game frames per picture, lower is faster), sprite.texture.frame is the picture showing now, sprite.texture.loop = false plays it once, and sprite.texture.frameCount says how many pictures it has. A sprite with no texture reads back null. An animation made with addAni counts too: sprite.texture is whichever animation is showing. Setting .texture clears .image, and setting .image clears the texture.
+
+Setting the texture a sprite already shows does nothing, so door.texture = 'openDoor' inside update() keeps the animation playing instead of starting it over every frame. Setting a different name starts that one at its first picture. To play the same one again from the start, set sprite.texture.frame = 0.
 
 Textures draw with smoothing turned off, so a 21x21 tile stretched across a 50x50 sprite stays blocky instead of blurring. A plain .image still smooths.
 
@@ -906,6 +908,21 @@ function update() {
 function draw() {
   background('#222');
 }`,
+      },
+      {
+        title: 'Patterns: ground that repeats',
+        body: `A picture on a big sprite stretches. A floor 400 pixels wide made from one small tile picture comes out smeared. sprite.pattern repeats the picture at its real size instead, starting from the sprite's top-left corner, so the floor looks like many tiles side by side.
+
+moSHion ships two 16 by 16 tiles for this: '/moshion/assets/ground_tile.png' and '/moshion/assets/grass_tile.png'. sprite.pattern also takes any other picture path, or a canvas you drew on yourself in code.
+
+A group takes a pattern too: platforms.pattern = '/moshion/assets/grass_tile.png' covers every platform, each one repeating from its own top-left corner. If the picture fails to load, the sprite keeps its plain color instead of disappearing.
+
+If a sprite has an .image, a .texture or an animation as well, that draws instead of the pattern. Use pattern for surfaces like floors and walls, and texture or image for characters and objects.
+
+A floor across the bottom of a 400 by 300 canvas looks like this:
+
+let ground = new Sprite(200, 276, 400, 48, 'static');
+ground.pattern = '/moshion/assets/ground_tile.png';`,
       },
     ],
   },
@@ -2091,9 +2108,11 @@ sprite.changeAni(name) switches to a previously registered animation. If the nam
 
 The sheet can also be the name of a texture: sprite.addAni('walk', 'myWalk') uses an animation you drew in the Texture editor, with its own frames and durations, so you can switch between two drawn animations with changeAni. Give a frame count to override it.
 
-ani.frameDelay controls how many game frames each animation frame is held for (default 4). Set it on the Ani object returned by addAni, or on sprite.ani.frameDelay after activation.
+frameDelay controls how many game frames each animation frame is held for (default 4). Set it on the animation addAni returns, or on sprite.texture.frameDelay: after addAni, sprite.texture is the animation showing, and sprite.texture = 'fly' switches to the sprite's own animation called 'fly', the same as changeAni('fly'). (sprite.ani is an older name for the same thing and still works.)
 
-sprite.ani.frame is the frame showing, starting at 0. Set it to jump: sprite.ani.frame = 2 shows the third frame from the start of its time on screen, and -1 is the last frame. sprite.ani.tick is how many game frames the current frame has been showing; set it after frame to start part-way through a frame that lasts more than one (sprite.ani.frame = 1; sprite.ani.tick = 1; is the second game frame of frame 1). Both work on an animated texture you drew in the Texture editor too.
+loop is true by default, so an animation repeats forever. Set sprite.texture.loop = false to play it once and stop on the last frame, like a door that opens and stays open. Set sprite.texture.frame = 0 to play it again. The same works for a texture drawn in the Textures tab: after sprite.texture = 'openDoor', use sprite.texture.loop = false.
+
+sprite.texture.frame is the frame showing, starting at 0. Set it to jump: sprite.texture.frame = 2 shows the third frame from the start of its time on screen, and -1 is the last frame. sprite.texture.tick is how many game frames the current frame has been showing; set it after frame to start part-way through a frame that lasts more than one (sprite.texture.frame = 1; sprite.texture.tick = 1; is the second game frame of frame 1). Both work on an animated texture you drew in the Texture editor too.
 
 Setting sprite.image clears any active animation, and vice versa — they're mutually exclusive.`,
         code: `let ghost;

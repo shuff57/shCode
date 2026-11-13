@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Source repo | `shuff57/moshion` (local checkout `../moshion`) |
-| Commit | `ed04214` (`moshion.js`, `docs/moshion.d.ts`), branch `main` |
+| Commit | `4074761` (`moshion.js`, `docs/moshion.d.ts`), branch `main` |
 | Commit date | 2026-11-13 |
 | Vendored | 2026-11-12 (`a662f3d`: `textStyle(NORMAL \| BOLD \| ITALIC \| BOLDITALIC)` (shCode #103), on top of `3f1e70a`'s API audit, `90921bd`'s `textLayer(n)`, `b1a2575`'s `sprite.clone()` and `world.maxSpeed`, `f3e1378` and the `f259b22` sound sync). `textStyle` was first patched in here by hand (`61cfed53`); this sync replaces that patch with the upstream engine, which matches it, so the copy is now upstream `a662f3d` plus the local lines below. |
 
@@ -18,6 +18,26 @@ branch, so the next sync from `main` after it merges replaces this patch with id
 check "fill, stroke and background take grey, grey+alpha, r,g,b and r,g,b,alpha like p5" (fails on the
 engine before it); 699/699 sketches, 107/107 checks. The docs and the lessons that taught around the old
 limit (6.6.19, 6.6.25, 5.3 Pinball challenges, the colour pages) were reworded.
+
+**`f164957` + `4074761` (2026-11-13): one name for a texture.** The engine is now upstream
+`4074761` plus the local `/moshion/textures/` line and the fill/stroke/background patch above.
+
+- `sprite.texture` reads back the texture itself, not its name: `.name`, and for an animated one
+  the same object as `sprite.ani` (`.frameDelay`, `.frame`, `.tick`, `.loop`, `.frameCount`). A still
+  one is a `StillTexture` with the same fields (`frameCount` 1). Both print as their name; no texture
+  reads `null`; `a.texture = b.texture` copies by name. Name checks are `s.texture.name === 'coin'`
+  (`s.texture === 'coin'` is now always false).
+- `ani.loop = false` plays once and stays on the last frame; `frame = 0` replays.
+- Setting the texture a sprite already shows does not restart it (set every frame in `update()`, it
+  froze on frame 0: seen in a student's door animation).
+- `.texture` also reads and switches `addAni()` animations: `sprite.texture = 'run'` is
+  `changeAni('run')`; `.texture = null` clears the one showing.
+
+Changed for it here: `extras.js` (online sprite sharing reads `.texture.name`), the 7.16 Quest demo
+(and `public/builtin-games.json`), `scripts/moshion-checks.mjs` (three new checks, three reads),
+lesson 6.4.6 and the docs teach `.texture` where they said `.ani`, and a What's New entry. A search of
+every saved student program (2026-11-13) found one `.texture` comparison, which keeps working.
+Gates: upstream `tests/texture-unify.spec.mjs`; here the three new checks in `moshion-checks.mjs`.
 
 **`ed04214` (2026-11-13): `HingeJoint` stiffness and limits (shCode #116).**
 

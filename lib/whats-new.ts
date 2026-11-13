@@ -49,6 +49,27 @@ export interface WhatsNewEntry {
 
 export const WHATS_NEW: WhatsNewEntry[] = [
   {
+    id: '2026-11-texture-one-name',
+    date: '2026-11-13',
+    audience: 'student',
+    title: 'One name for your art: .texture',
+    summary:
+      "In moSHion, .texture now does everything for a sprite's picture or animation: pick it with sprite.texture = 'coinSpin', " +
+      'then control it with the same name, like sprite.texture.frameDelay for the speed and sprite.texture.loop = false to play it once. ' +
+      'Code that uses .ani still works.',
+    steps: [
+      "Check which one is showing with sprite.texture.name === 'coinSpin' (not sprite.texture === 'coinSpin').",
+      'Setting the same texture again no longer restarts it, so it is safe to set it every frame. Use sprite.texture.frame = 0 to play it again.',
+      "It works for textures from the Textures tab and for animations made with addAni: sprite.texture = 'run' switches to your 'run' animation.",
+    ],
+    media: {
+      clip: '/whats-new/2026-11-texture-one-name.mp4',
+      poster: '/whats-new/2026-11-texture-one-name.jpg',
+      alt: 'A moSHion sketch: a coin spins slowly, and a heart plays its animation once and stops, then plays again when Space is pressed.',
+    },
+    action: { label: 'Open the Sandbox', href: '/sandbox' },
+  },
+  {
     id: '2026-11-stars-family',
     date: '2026-11-12',
     audience: 'student',
