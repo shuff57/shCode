@@ -103,7 +103,7 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async (conte
         `INSERT INTO lesson_drafts (student_email, lesson_id, response, updated_at)
            VALUES (?, ?, ?, ?)
          ON CONFLICT(student_email, lesson_id)
-           DO UPDATE SET response = excluded.response, updated_at = excluded.updated_at`,
+           DO UPDATE SET response = excluded.response, updated_at = MAX(excluded.updated_at, lesson_drafts.updated_at + 1)`,
       )
       .bind(email, lessonId, JSON.stringify({ answers: savedAnswers(latest.response), graded: false }), Date.now()),
     env.DB

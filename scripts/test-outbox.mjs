@@ -20,7 +20,8 @@
 //      is byte for byte what it was.
 //   9. Two tabs of one student draining at once: one write per change (Web Locks), and
 //      without Web Locks the server row still advances once.
-//  10. (removed in review round 1: flowcharts are not in the outbox until stage 3; see R4)
+//  10. (flowcharts joined the outbox in stage 3 through the guarded drafts route; see R4 and
+//      scripts/test-draft-sync.mjs)
 //  11. Closing the tab sends the last edit with fetch keepalive.
 //  12. Loading the modules starts no timer or listener; stopping the outbox removes its own.
 //  13. Offline, a hand-in says what to do instead of a generic error.
@@ -28,7 +29,7 @@
 // Run: node --import ./scripts/register-ts.mjs scripts/test-outbox.mjs
 
 import assert from 'node:assert/strict';
-import { account, cleanup, createBrowser } from './owned-storage-harness.mjs';
+import { account, cleanup, createBrowser, warmDraftRoutes } from './owned-storage-harness.mjs';
 
 let failed = 0;
 let passed = 0;
@@ -520,16 +521,26 @@ await test('R3. History cannot keep the other version: Keep mine changes nothing
   }
 });
 
-await test('R4. flowcharts are not in the outbox in this stage', async () => {
+await test('R4. flowcharts upload through the guarded drafts route (stage 3), never as a blind retry', async () => {
+  // Stage 2 kept flowcharts out because a retried POST could not tell whether the account's copy was
+  // newer. Stage 3 sends `baseUpdatedAt`; the full cases are scripts/test-draft-sync.mjs (B10, H2).
   const fs = await import('node:fs');
   const src = fs.readFileSync(new URL('../components/DiagramAssignmentView.tsx', import.meta.url), 'utf8');
-  assert.ok(!/outbox/.test(src), 'DiagramAssignmentView still queues into the outbox');
+  assert.ok(!/saveDraft\(/.test(src), 'DiagramAssignmentView still posts a draft with no base check');
+  assert.ok(/noteTextSaved\('diagram'/.test(src), 'DiagramAssignmentView does not queue its draft');
+  // The real route is compiled on first use (seconds): do it before the page's wait starts.
+  warmDraftRoutes();
   const A = await account('a@school.org');
   const b = createBrowser();
   await b.signIn(A);
   const t = await b.open('A');
-  await t.run(START() + `M.outbox.enqueue('diagram', 'D1'); await idle();`);
-  assert.deepEqual(entryKeys(b, A.wo), [], 'a diagram entry was queued');
+  await t.run(START() + `
+    M.records.saveDiagramText('D1', '{"nodes":[{"id":"n1"}],"edges":[]}');
+    M.draftSync.noteTextSaved('diagram', 'D1');
+    await idle();
+  `);
+  assert.deepEqual(entryKeys(b, A.wo), [], 'the entry was not cleared after the upload');
+  assert.deepEqual(b.server.drafts[A.email].map((d) => Object.keys(JSON.parse(d.body)).sort()), [['baseUpdatedAt', 'response']]);
   await t.run(STOP);
   await b.close();
 });

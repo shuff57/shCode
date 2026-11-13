@@ -42,7 +42,10 @@ import GradeQuotaNote from './GradeQuotaNote';
 import { AttemptBanner, PseudocodePanel } from './AttemptCap';
 import { useAttemptCap, useCompletionRepair } from '../lib/use-attempt-cap';
 import { navigateToNextLesson } from '../lib/lesson-neighbors';
-import { fetchDraft, saveDraft, recordSubmission, streamGrade } from '../lib/written-grader-store';
+import { recordSubmission, streamGrade } from '../lib/written-grader-store';
+import { arriveText, askDraft, handInText, noteTextSaved, saveTextNow, textToken } from '../lib/draft-sync';
+import DraftVersions from './DraftVersions';
+import { UploadChip, useUploadStatus } from './UploadStatus';
 import { classifyGradeFailure, gradeFailureMessage } from '../lib/grade-error';
 import { passFraction } from '../lib/grade-pass';
 import { GRADE_STAGE_LABELS, type GradeStage } from '../lib/grade-written-core';
@@ -146,39 +149,49 @@ export default function DiagramAssignmentView({
   const capped = cap.max !== null;
   // A grader outage (or a lost completion call) must not leave the NEXT part locked.
   useCompletionRepair(lessonId, cap, progress);
-  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // An untouched starter is not work: it is never uploaded over nothing or asked about.
+  const blank = useMemo(() => JSON.stringify(starter), [starter]);
+  const upload = useUploadStatus(lessonId, progress.authed, 'diagram');
 
-  // ---- load: server draft wins over the local cache, starter is the floor
+  // ---- load: the account's chart unless this computer has changes the account does not
+  // (lib/draft-sync-core.ts textArrival); changed on both, this computer's opens and the student
+  // chooses (DraftVersions). The starter is the floor.
   useEffect(() => {
     let cancelled = false;
     const local = parseDoc(
       typeof window === 'undefined' ? null : loadDiagramText(lessonId),
     );
+    const token = textToken('diagram', lessonId);
     (async () => {
-      const server = progress.authed ? await fetchDraft(lessonId) : null;
+      const server = progress.authed ? await askDraft(lessonId) : null;
       if (cancelled) return;
-      const remote = parseDoc(server?.response ?? null);
-      setDoc(remote ?? local ?? starter);
+      const arrived = server ? arriveText('diagram', lessonId, server, blank, token) : null;
+      const remote = arrived && arrived.use === 'server' && server && server.ok ? parseDoc(server.row?.text ?? null) : null;
+      // This computer's copy is read again NOW: on a second run of this effect the student may have
+      // drawn while the account was being asked.
+      const fresh = server ? parseDoc(loadDiagramText(lessonId)) : local;
+      setDoc(remote ?? fresh ?? starter);
       setLoaded(true);
     })();
     return () => {
       cancelled = true;
     };
-  }, [lessonId, progress.authed, starter]);
+  }, [lessonId, progress.authed, starter, blank]);
 
-  // ---- local cache on every edit; server draft debounced
+  // ---- this computer's copy on every edit; it uploads by itself through the outbox
+  // (lib/draft-sync.ts: 30 s after the last edit, on reconnect, when the tab is hidden), and a
+  // failed upload is tried again instead of being dropped.
   useEffect(() => {
     if (!loaded) return;
     saveDiagramText(lessonId, JSON.stringify(doc)); // w1:<owner>:diagram:<lessonId>
-    if (!progress.authed) return;
-    if (saveTimer.current) clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(() => {
-      saveDraft(lessonId, JSON.stringify(doc));
-    }, 2500);
-    return () => {
-      if (saveTimer.current) clearTimeout(saveTimer.current);
-    };
-  }, [doc, lessonId, loaded, progress.authed]);
+    if (progress.authed) noteTextSaved('diagram', lessonId, blank);
+  }, [doc, lessonId, loaded, progress.authed, blank]);
+
+  // The other version, chosen in DraftVersions: only a chart that parses replaces the canvas.
+  const useVersion = useCallback((text: string) => {
+    const next = parseDoc(text);
+    if (next) setDoc(next);
+  }, []);
 
   // Stale results mislead more than no results, so any edit clears them.
   const onChange = useCallback((next: DiagramDoc) => {
@@ -254,8 +267,9 @@ export default function DiagramAssignmentView({
 
   async function saveNow() {
     setSaveStatus('saving');
-    const ok = progress.authed ? await saveDraft(lessonId, JSON.stringify(doc)) : false;
-    setSaveStatus(ok ? 'saved' : 'error');
+    // The same guarded send as an upload by itself: it never overwrites another computer's newer chart.
+    const how = progress.authed ? await saveTextNow('diagram', lessonId) : 'error';
+    setSaveStatus(how === 'saved' ? 'saved' : how === 'two-versions' ? 'idle' : 'error');
     setTimeout(() => setSaveStatus('idle'), 2000);
   }
 
@@ -314,7 +328,7 @@ export default function DiagramAssignmentView({
           score: results.filter((r) => r.passed).length,
           possible: results.length,
         });
-        saveDraft(lessonId, JSON.stringify(doc));
+        void handInText('diagram', lessonId, JSON.stringify(doc));
         if (capped) cap.spend();
       }
       await recordLessonCompleted(lessonId, capped ? bestOf(passedCount) : 0);
@@ -383,7 +397,7 @@ export default function DiagramAssignmentView({
           score: data.totalEarned,
           possible: data.totalPossible,
         });
-        saveDraft(lessonId, JSON.stringify(doc));
+        void handInText('diagram', lessonId, JSON.stringify(doc));
         if (capped) cap.spend();
       }
     } catch (e) {
@@ -416,6 +430,7 @@ export default function DiagramAssignmentView({
 
       <AttemptBanner max={cap.max} used={cap.used} loading={cap.loading} />
       <GradeQuotaNote />
+      <DraftVersions kind="diagram" lessonId={lessonId} noun="chart" enabled={progress.authed && !cap.reached} current={JSON.stringify(doc)} onUse={useVersion} />
 
       <DiagramEditor
         value={doc}
@@ -578,6 +593,7 @@ export default function DiagramAssignmentView({
         <span style={{ color: 'var(--x-666666)', fontSize: 12 }}>
           {doc.nodes.length} shapes · {doc.edges.length} arrows
         </span>
+        {upload.state !== 'conflict' ? <UploadChip status={upload} what="chart" style={{ maxWidth: 260 }} /> : null}
       </div>
 
       {/* Always mounted so a screen reader hears the text when it appears. */}

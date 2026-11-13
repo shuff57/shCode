@@ -9,17 +9,17 @@
 // waits for anything; both re-read when the outbox says something changed.
 
 import { useEffect, useState, type CSSProperties } from 'react';
-import { onOutboxChange, uploadStatus, uploadText, type UploadState, type UploadStatus } from '../lib/outbox';
+import { onOutboxChange, uploadStatus, uploadText, type OutboxKind, type UploadState, type UploadStatus } from '../lib/outbox';
 import { keepMine, openOtherVersion, type OpenOtherResult } from '../lib/lesson-sync';
 
 const NONE: UploadStatus = { state: 'none', at: null, other: null };
 
 /** The lesson's upload status, kept current. `enabled` false (signed out, reference solution) shows nothing. */
-export function useUploadStatus(lessonId: string, enabled: boolean): UploadStatus {
+export function useUploadStatus(lessonId: string, enabled: boolean, kind: OutboxKind = 'lab'): UploadStatus {
   const [status, setStatus] = useState<UploadStatus>(NONE);
   useEffect(() => {
     if (!enabled) { setStatus(NONE); return; }
-    const read = () => setStatus(uploadStatus('lab', lessonId));
+    const read = () => setStatus(uploadStatus(kind, lessonId));
     read();
     const off = onOutboxChange(read);
     // The browser going on or off line changes the words, and so does another tab's upload.
@@ -33,7 +33,7 @@ export function useUploadStatus(lessonId: string, enabled: boolean): UploadStatu
       window.removeEventListener('offline', read);
       document.removeEventListener('visibilitychange', onVisible);
     };
-  }, [lessonId, enabled]);
+  }, [lessonId, enabled, kind]);
   return status;
 }
 
@@ -54,7 +54,7 @@ export function sandboxDotState(s: UploadState): 'device' | 'cloud' | 'changed' 
   return 'device';
 }
 
-export function UploadChip({ status, style }: { status: UploadStatus; style?: CSSProperties }) {
+export function UploadChip({ status, style, what = 'code' }: { status: UploadStatus; style?: CSSProperties; what?: string }) {
   const text = uploadText(status);
   if (!text) return null;
   return (
@@ -62,7 +62,7 @@ export function UploadChip({ status, style }: { status: UploadStatus; style?: CS
       role="status"
       aria-live="polite"
       data-upload-state={status.state}
-      title={status.state === 'conflict' ? 'Choose a version in the note above the editor.' : 'Your code is kept on this computer and uploads to your account by itself.'}
+      title={status.state === 'conflict' ? 'Choose a version in the note above.' : `Your ${what} is kept on this computer and uploads to your account by itself.`}
       style={{
         color: COLOR[status.state],
         fontFamily: 'var(--font-prose)',

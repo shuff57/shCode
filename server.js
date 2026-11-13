@@ -247,7 +247,19 @@ app.prepare().catch((err) => {
     if (typeof response !== 'string') {
       return res.status(400).json({ error: 'response (string) required' });
     }
-    const updatedAt = Date.now();
+    // As the real route: with baseUpdatedAt (a number, or null for "no row") a different stored
+    // row answers 409 with that row and nothing is written. Without it, it overwrites (a hand-in).
+    const row = devDrafts.get(draftKey(req));
+    if (Object.prototype.hasOwnProperty.call(req.body, 'baseUpdatedAt')) {
+      const base = req.body.baseUpdatedAt;
+      if (base !== null && !(typeof base === 'number' && Number.isFinite(base))) {
+        return res.status(400).json({ error: 'baseUpdatedAt must be a number or null' });
+      }
+      if ((row ? row.updatedAt : null) !== base) {
+        return res.status(409).json({ conflict: true, response: row ? row.response : null, updatedAt: row ? row.updatedAt : null });
+      }
+    }
+    const updatedAt = Math.max(Date.now(), (row ? row.updatedAt : 0) + 1);
     devDrafts.set(draftKey(req), { response, updatedAt });
     res.json({ ok: true, updatedAt });
   });

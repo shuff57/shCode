@@ -32,8 +32,10 @@
 //    if that failed too. Confirmed means: a user came back, the owner cookie still names this
 //    page's owner, and the `wo` /api/me returns (when it returns one) is this page's owner.
 //
-// Only lab and sandbox code (`progress:<id>`) is queued in this stage. Flowchart drafts wait
-// for stage 3: their route cannot yet tell whether the server's copy is newer.
+// Three kinds: lab and sandbox code (`progress:<id>`, lib/lesson-sync.ts), and since stage 3
+// written answers (`written:<id>`) and flowchart drafts (`diagram:<id>`), both in
+// lib/draft-sync.ts. Hand-ins are never queued. Quiz picks before Check are NOT uploaded: six
+// reviews each found a new way for that to disturb a handed-in quiz, so it was left out.
 //
 // Runs: when the page loads (once /api/me answers), on `online`, when the tab becomes visible,
 // EDIT_DELAY after the last queued change, and when the tab is hidden or closed (fetch
@@ -44,15 +46,15 @@
 import { GUEST, ownedLocal, pageIsAccount, pageOwner, readOwnerCookie } from './owned-storage';
 import { flushPendingSaves } from './draft-autosave';
 
-export type OutboxKind = 'lab';
+export type OutboxKind = 'lab' | 'written' | 'diagram';
 export const OUTBOX_PREFIX = 'outbox:';
-const RECORD_PREFIX: Record<OutboxKind, string> = { lab: 'progress:' };
+const RECORD_PREFIX: Record<OutboxKind, string> = { lab: 'progress:', written: 'written:', diagram: 'diagram:' };
 
 function isKind(k: unknown): k is OutboxKind {
   return typeof k === 'string' && Object.prototype.hasOwnProperty.call(RECORD_PREFIX, k);
 }
 
-/** The record an entry stands for: `progress:<id>` (lab and sandbox code). */
+/** The record an entry stands for: `progress:<id>` (lab and sandbox code), `written:<id>`, `diagram:<id>`. */
 export function recordKeyOf(kind: OutboxKind, id: string): string {
   return RECORD_PREFIX[kind] + id;
 }
