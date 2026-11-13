@@ -1,13 +1,13 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { EditorView, keymap, lineNumbers, highlightActiveLine, highlightActiveLineGutter } from '@codemirror/view';
-import { Compartment, EditorState, type Extension } from '@codemirror/state';
+import { EditorView, keymap, lineNumbers, highlightActiveLine, highlightActiveLineGutter, drawSelection, rectangularSelection, crosshairCursor } from '@codemirror/view';
+import { Compartment, EditorState, Prec, type Extension } from '@codemirror/state';
 import { javascript } from '@codemirror/lang-javascript';
-import { defaultKeymap, indentWithTab, history, historyKeymap } from '@codemirror/commands';
+import { defaultKeymap, indentWithTab, history, historyKeymap, simplifySelection } from '@codemirror/commands';
 import { bracketMatching, indentOnInput, HighlightStyle, syntaxHighlighting, foldGutter, foldKeymap } from '@codemirror/language';
-import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
-import { highlightSelectionMatches } from '@codemirror/search';
+import { closeBrackets, closeBracketsKeymap, closeCompletion } from '@codemirror/autocomplete';
+import { highlightSelectionMatches, selectNextOccurrence } from '@codemirror/search';
 import { jsAutocomplete } from '../lib/editor-completions';
 import { taskCommentFold } from '../lib/editor-task-fold';
 import type { LabTaskScenario } from '../lib/lab-task-scenario';
@@ -180,6 +180,31 @@ function makeExtensions(
     EditorView.lineWrapping,
     EditorState.tabSize.of(2),
   ];
+
+  // #113: several cursors at once in a pane the student types in. Ctrl+click (Cmd+click on a
+  // Mac) adds a cursor, Ctrl+D adds the next copy of the selected word, Alt+drag selects a box,
+  // and Esc goes back to one cursor (the binding below). drawSelection is what draws the extra
+  // cursors; the browser's own caret can only show one.
+  if (!readOnly) {
+    exts.push(
+      EditorState.allowMultipleSelections.of(true),
+      drawSelection(),
+      rectangularSelection(),
+      crosshairCursor(),
+      keymap.of([{ key: 'Mod-d', run: selectNextOccurrence, preventDefault: true }]),
+      // One Esc always goes back to one cursor. The suggestion list's own Esc runs at the highest
+      // precedence and, for a moment after every keystroke, swallowed the key with nothing on
+      // screen, so the extra cursors stayed. Same precedence, and added before jsAutocomplete().
+      Prec.highest(keymap.of([{
+        key: 'Escape',
+        run: (view) => {
+          if (view.state.selection.ranges.length < 2) return false;
+          closeCompletion(view);
+          return simplifySelection(view);
+        },
+      }])),
+    );
+  }
 
   if (language === 'javascript') {
     // `{` auto-closes like ( [ and quotes (lang-javascript's own languageData). It was excluded
