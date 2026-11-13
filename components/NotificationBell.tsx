@@ -7,7 +7,7 @@
 // Items: GET /api/notifications. Words and the unread rule: lib/game-notices-core.ts. Store: lib/game-notices.ts.
 
 import { useEffect, useRef, useState } from 'react';
-import { Bell } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import { isUnread, noticeAction, noticeHref, type NoticeItem } from '../lib/game-notices-core';
 import {
   CHANGES_CHANGED, CHANGES_SEEN, GAMES_SEEN_KEY, READ_ALL_KEY, SEEN_KEY,
@@ -85,7 +85,7 @@ export default function NotificationBell({ enabled }: { enabled: boolean }) {
           width: 34, height: 34, borderRadius: 6, cursor: 'pointer', color: 'var(--header-fg)',
           background: open ? 'var(--c-deep2)' : 'transparent', border: '1px solid transparent',
         }}>
-        <Bell size={18} aria-hidden="true" />
+        <Mail size={18} aria-hidden="true" />
         {unread > 0 && (
           <span aria-hidden="true" data-testid="notification-count"
             style={{
