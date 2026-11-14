@@ -893,6 +893,24 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "info": "How many times it plays: true (default) forever, false once, a number n plays it n times (`loop = 3`)."
   },
   {
+   "label": "pause",
+   "type": "method",
+   "detail": "(): void",
+   "info": "Freezes the animation on the frame showing."
+  },
+  {
+   "label": "play",
+   "type": "method",
+   "detail": "(): void",
+   "info": "Carries on from where pause() stopped it."
+  },
+  {
+   "label": "paused",
+   "type": "property",
+   "detail": "boolean",
+   "info": "true while paused."
+  },
+  {
    "label": "spriteSheet",
    "type": "property",
    "detail": "HTMLImageElement",
@@ -941,6 +959,24 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "type": "property",
    "detail": "boolean | number",
    "info": "No effect on a still."
+  },
+  {
+   "label": "pause",
+   "type": "method",
+   "detail": "(): void",
+   "info": "No effect on a still."
+  },
+  {
+   "label": "play",
+   "type": "method",
+   "detail": "(): void",
+   "info": "No effect on a still."
+  },
+  {
+   "label": "paused",
+   "type": "property",
+   "detail": "boolean",
+   "info": ""
   },
   {
    "label": "toString",
