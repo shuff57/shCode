@@ -425,6 +425,61 @@ export default function SandboxWorkspace() {
     }
   }, []);
 
+  // The console's height, set by the bar on its top edge (drag it, or focus it and use the
+  // up and down arrow keys). null = the default height. Kept for this visit, in and out of
+  // full screen. A taller console takes its room from the editor and the game, which always
+  // keep a usable height.
+  const [consoleH, setConsoleH] = useState<number | null>(null);
+  const consoleRef = useRef<HTMLDivElement>(null);
+  const clampConsole = useCallback((want: number) => {
+    const shell = shellRef.current;
+    const split = shell?.querySelector<HTMLElement>('#split, .sandbox-split');
+    if (!shell || !split) return Math.round(want);
+    const keep = document.fullscreenElement ? 160 : 280; // what the editor and game keep
+    // Measured against the shell's own bottom edge, not the panes' current sizes, so a
+    // console that is already too tall (say, just after leaving full screen) is cut back.
+    const bottom = shell.getBoundingClientRect().bottom - (parseFloat(getComputedStyle(shell).paddingBottom) || 0);
+    const most = bottom - (split.getBoundingClientRect().top + keep) - 12;
+    return Math.round(Math.max(72, Math.min(want, Math.max(72, most))));
+  }, []);
+  const startConsoleDrag = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const wrap = consoleRef.current;
+    const shell = shellRef.current;
+    if (!wrap || !shell || e.button !== 0) return;
+    e.preventDefault();
+    const bar = e.currentTarget;
+    bar.setPointerCapture(e.pointerId);
+    bar.focus();
+    const startY = e.clientY;
+    const startH = wrap.getBoundingClientRect().height;
+    shell.classList.add('is-sizing');
+    const move = (ev: PointerEvent) => setConsoleH(clampConsole(startH + (startY - ev.clientY)));
+    const end = () => {
+      shell.classList.remove('is-sizing');
+      bar.removeEventListener('pointermove', move);
+      bar.removeEventListener('pointerup', end);
+      bar.removeEventListener('pointercancel', end);
+    };
+    bar.addEventListener('pointermove', move);
+    bar.addEventListener('pointerup', end);
+    bar.addEventListener('pointercancel', end);
+  }, [clampConsole]);
+  const keyConsole = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+    e.preventDefault();
+    const now = consoleRef.current?.getBoundingClientRect().height ?? 120;
+    const step = (e.shiftKey ? 80 : 24) * (e.key === 'ArrowUp' ? 1 : -1);
+    setConsoleH(clampConsole(now + step));
+  }, [clampConsole]);
+  // Leaving full screen (or a smaller window) can leave too little room: fit it again.
+  useEffect(() => {
+    if (consoleH === null) return;
+    const refit = () => setConsoleH((h) => (h === null ? h : clampConsole(h)));
+    const t = setTimeout(refit, 120);
+    window.addEventListener('resize', refit);
+    return () => { clearTimeout(t); window.removeEventListener('resize', refit); };
+  }, [full, consoleH === null, clampConsole]);
+
 
   // Pane resize — same drag-handle plumbing as LessonWorkspace. No-ops
   // gracefully (early return) when reSHape has replaced #split's contents
@@ -939,12 +994,30 @@ export default function SandboxWorkspace() {
         </div>}
 
         {!isConsole && !reshapeIsBuild && !isFlow && !noProjects && (
-          <div className="sandbox-console-wrap">
+          <>
+          <div
+            className="sandbox-console-divider"
+            role="separator"
+            aria-orientation="horizontal"
+            aria-label="Console height: drag up or down, or use the up and down arrow keys"
+            title="Drag to make the console taller or shorter"
+            tabIndex={0}
+            onPointerDown={startConsoleDrag}
+            onKeyDown={keyConsole}
+          >
+            <span className="sandbox-console-grip" aria-hidden="true" />
+          </div>
+          <div
+            className="sandbox-console-wrap"
+            ref={consoleRef}
+            style={consoleH !== null ? { height: consoleH, minHeight: 72, maxHeight: 'none' } : undefined}
+          >
             <div className="output-header">Console</div>
             <div className="sandbox-console-body">
               <Console resetKey={String(consoleResetKey)} />
             </div>
           </div>
+          </>
         )}
       </div>
       <style>{`
@@ -1007,8 +1080,33 @@ export default function SandboxWorkspace() {
           height: 120px;
           min-height: 120px;
           max-height: 60vh;
-          resize: vertical;
         }
+        /* The bar on top of the console: drag it up for a taller console. It sits in the
+           shell's gap (negative margins), so it adds no height of its own. */
+        .sandbox-console-divider {
+          flex: 0 0 8px;
+          margin-block: -8px;
+          position: relative;
+          cursor: row-resize;
+          touch-action: none;
+          border-radius: 4px;
+          outline: none;
+        }
+        .sandbox-console-grip {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          width: 40px;
+          height: 4px;
+          margin: -2px 0 0 -20px;
+          border-radius: 2px;
+          background: var(--border);
+        }
+        .sandbox-console-divider:hover .sandbox-console-grip,
+        .sandbox-console-divider:focus-visible .sandbox-console-grip { background: var(--c-cyan); }
+        .sandbox-console-divider:focus-visible { box-shadow: 0 0 0 2px var(--c-cyan); }
+        .sandbox-shell.is-sizing { user-select: none; cursor: row-resize; }
+        .sandbox-shell.is-sizing iframe { pointer-events: none; }
         /* A lobby bar above the canvas takes height from the row that holds it,
            so the console (empty most of the time, and still resizable) gives some back. */
         .sandbox-shell:has([data-testid='moshion-lobby']) .sandbox-console-wrap {
