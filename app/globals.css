@@ -5312,3 +5312,247 @@ input.dd-date { padding-right: 8px !important; }
 .gb-avg-v { font-size: 13px; font-weight: 500; color: var(--c-meta); white-space: nowrap; }
 .gb-avg-sub { display: block; font-size: 12px; font-weight: 400; color: var(--c-meta); }
 /* end ux3 */
+
+/* ---- Lab side column (2026-11-13) ----
+   One place for the task and the tools. On a wide screen a console or moSHion lab is two columns:
+   the work (editor and Output) and a side panel that holds the open tab (Task, CODY, Docs, Quest,
+   File, ...; components/TabbedRightDrawer.tsx `dockHostId`). The panel is part of the page, so
+   opening a tab never pushes the page, the header or the footer sideways, and only one panel is
+   ever open: no task column on the left plus a drawer on the right. Closing it gives the work the
+   whole width. A phone keeps the task above the editor and the overlay drawer. */
+.lab-dock-host { display: none; }
+@media (min-width: 721px) {
+  /* !important: older rounds set a left task column for each kind of lab (one rule per kind, more
+     specific than these); the task is a tab of the side panel now, so every lab uses these two. */
+  /* Three columns: the task sidebar (left), the work, the tools sidebar (right); each placed by column so
+     a lab with no steps (no task sidebar) keeps the work in the middle. */
+  .lab-work-area {
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    gap: 16px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  .lab-work-area > .lab-task-side { grid-column: 1; grid-row: 1; }
+  .lab-work-area > .editor-card { grid-column: 2; grid-row: 1; }
+  .lab-work-area > .lab-dock-host { grid-column: 3; grid-row: 1; }
+  .lab-work-area > .lab-task-tab,
+  .lab-work-area > .lab-task-card { display: none; }
+  .lab-dock-host { display: block; position: relative; align-self: stretch; min-width: 0; }
+  .lab-dock-host:empty { display: none; }
+  /* The column: the open panel, then the strip of tabs down the right edge. As tall as the editor beside
+     it, never taller (the wrap adds no height of its own; the panel scrolls inside). */
+  .shd-dock-wrap { display: flex; align-items: flex-start; height: 0; min-height: 100%; }
+  .shd-dock-wrap.is-open { align-items: stretch; }
+  .shd-dock {
+    position: relative; min-height: 0; max-width: 42vw; box-sizing: border-box;
+    display: flex; flex-direction: column; overflow: hidden;
+    background: var(--c-deep2); border: 1px solid var(--c-line); border-radius: 8px;
+  }
+  /* The arrow tab: alone at the work's right edge when the panel is shut, on the panel's left edge when open. */
+  .shd-handle-dock { align-self: flex-start; margin-top: 12px; }
+  .shd-dock-wrap.is-open .shd-handle-dock { margin-right: -1px; position: relative; z-index: 1; border-right-color: var(--c-deep2); }
+}
+@media (max-width: 720px) {
+  .lab-dock-host { display: none !important; }
+}
+
+/* The task in the panel and above a phone editor: the reading face, steps as a plain list. */
+.lab-task-content { font-family: var(--font-prose); font-size: 14px; line-height: 1.5; }
+.lab-task-scenario { margin: 0 0 14px; color: var(--c-fg); }
+.shd-dock .lesson-steps { margin: 0; padding-left: 20px; }
+.shd-dock .lesson-step { margin: 0 0 14px; padding: 0; }
+.shd-dock .step-instructions { opacity: 1; font-size: 14px; line-height: 1.5; }
+.shd-dock .step-instructions p { margin: 6px 0; }
+.shd-dock .step-hints { color: var(--c-meta); margin-top: 6px; }
+.shd-dock .lab-task-end { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--c-line); color: var(--c-meta); font-size: 13px; }
+
+/* Quest cards in a panel or drawer: the same size as the rest of the panel, not page headings. */
+.shd-panel-body > section > h2 { font-size: 15px; margin: 0 0 10px; }
+.shd-panel-body .requirement { padding: 10px 12px; margin: 0; }
+.shd-panel-body .requirement h3 { font-size: 14px; line-height: 1.35; margin: 0 0 4px; }
+.shd-panel-body .requirement p,
+.shd-panel-body .requirement li { font-family: var(--font-prose); font-size: 13px; line-height: 1.45; }
+
+/* Phone: "Show full task" sits under the task, never over its first lines. */
+@media (max-width: 720px) {
+  .lab-work-area:has(.output-header) .lab-task-card .lab-task-more {
+    position: static; margin-top: 6px; padding: 0; min-height: 32px;
+  }
+}
+/* With no "Check looks for" row over it, a console lab's editor reaches down to the module strip. */
+@media (min-width: 721px) {
+  .lab-work-area:has(.output-header) #editor .cm-scroller { min-height: clamp(216px, calc(100svh - 390px), 640px); }
+}
+@media (min-width: 721px) {
+  /* ...and makes room again while Check's results (and the checker's note) are shown above it. */
+  .lab-work-area:has(.output-header):has(.lab-check-above) #editor .cm-scroller { min-height: clamp(216px, calc(100svh - 510px), 520px); }
+}
+
+/* ---- Written answer (2026-11-13) ----
+   The task reads top to bottom on the left (description, the whole intro, What to answer, How this is
+   graded), all open; the answer box and Submit are on the right and stay in view while it is read. */
+.written-prompt {
+  margin: 0 0 14px; padding: 12px 16px; border: 1px solid var(--c-line); border-left: 3px solid var(--c-purple);
+  border-radius: 6px; background: var(--c-deep2);
+}
+.written-prompt-title {
+  display: flex; align-items: center; gap: 8px; margin: 0 0 8px;
+  font-size: 15px; color: var(--c-fg); border: 0; padding: 0;
+}
+.written-prompt-text { white-space: pre-wrap; font-family: var(--font-prose); font-size: 15px; line-height: 1.55; color: var(--c-fg); }
+.written-prompt-note { margin: 10px 0 0; font-family: var(--font-prose); font-size: 13px; line-height: 1.5; color: var(--c-meta); }
+@media (min-width: 1100px) {
+  .content-lesson-main:has(> .written-grader .written-answer) {
+    max-width: 1240px !important;
+    grid-template-columns: minmax(0, 1.15fr) minmax(380px, 1fr) !important;
+  }
+  .content-lesson-main > .written-grader > .written-answer { position: sticky; top: 16px; }
+  .content-lesson-main > .written-grader > .written-help { margin-top: 4px; }
+}
+@media (max-width: 1099px) {
+  /* One column: the questions and how they are graded come before the box they are answered in. */
+  .written-grader:has(> .written-help) { display: flex; flex-direction: column; }
+  .written-grader > .written-help { order: -1; }
+}
+
+/* Next lesson is the way forward: a filled green button (the colour of Run and of a slide deck's Next),
+   where Previous stays a quiet link. A locked Next keeps its quiet look and its padlock. */
+.header-lesson-nav .hdr-lesson-link.hdr-lesson-next {
+  background: var(--c-green) !important; color: var(--c-deep2) !important;
+  border: 1px solid var(--c-green) !important; border-radius: 6px;
+  height: 30px; padding: 0 12px !important; font-weight: 700; align-self: center;
+  transition: filter 120ms;
+}
+.header-lesson-nav .hdr-lesson-next .hdr-lesson-label,
+.header-lesson-nav .hdr-lesson-next .lesson-nav-num,
+.header-lesson-nav .hdr-lesson-next .lesson-nav-kind { color: var(--c-deep2) !important; }
+.header-lesson-nav .hdr-lesson-next .hdr-lesson-label { font-weight: 700; }
+.header-lesson-nav .hdr-lesson-link.hdr-lesson-next:hover { color: var(--c-deep2) !important; filter: brightness(1.12); }
+.header-lesson-nav .hdr-lesson-link.hdr-lesson-next:hover .lesson-nav-full { text-decoration: none; }
+.header-lesson-nav .hdr-lesson-link.hdr-lesson-next:focus-visible { outline: 2px solid var(--c-fg); outline-offset: 2px; }
+/* The side tabs read the same on every lesson page: narrow, vertical labels down the right edge, like the
+   strip beside a lab's work (an earlier round made them 76px wide and horizontal on a wide screen). */
+@media (min-width: 1200px) {
+  :root { --shd-rail-width: 40px; }
+  body .shd-tabstrip .shd-tab {
+    writing-mode: vertical-rl !important; text-align: initial;
+    padding: 12px 9px !important; white-space: nowrap !important; line-height: normal;
+  }
+}
+/* A reading, quiz or written page with its Docs drawer open sits left of the drawer (its inline
+   `margin: 0 auto` kept it centred under the drawer, which covered the answer box). Closed, it is centred. */
+@media (min-width: 721px) {
+  body:has(.shd-tabstrip.shd-open) .content-lesson-main {
+    margin-left: auto !important;
+    margin-right: calc(var(--shd-rail-width) + var(--shd-rail-gap) + var(--shd-tabbed, 0px)) !important;
+  }
+}
+
+/* The arrow tab that opens and closes a lesson's side panel (TabbedRightDrawer `handle`), and the row of
+   menu buttons at the top of the open panel. Sub-menus (Docs' JavaScript / moSHion / reSHape) stay inside
+   their menu. */
+.shd-handle {
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+  width: 22px; height: 56px; padding: 0; box-sizing: border-box;
+  font: inherit; font-size: 20px; font-weight: 700; line-height: 1;
+  color: var(--c-purple); background: var(--c-deep2);
+  border: 1px solid var(--c-line); border-radius: 8px 0 0 8px;
+  transition: background-color 120ms, border-color 120ms, color 120ms;
+}
+.shd-handle:hover { color: var(--c-fg); border-color: var(--c-purple); background: color-mix(in srgb, var(--c-purple) 14%, var(--c-deep2)); }
+.shd-handle:focus-visible { outline: 2px solid var(--c-purple); outline-offset: 2px; }
+@media (min-width: 721px) {
+  /* On the fixed rail of a reading or written page the arrow keeps its shape (the rail's tabs are vertical). */
+  body .shd-tabstrip .shd-tab.shd-handle {
+    writing-mode: horizontal-tb !important; width: 22px !important; height: 56px; padding: 0 !important;
+    border-right: 0 !important; border-radius: 8px 0 0 8px !important; font-size: 20px !important;
+  }
+  :root:has(.shd-tabstrip .shd-handle) { --shd-rail-width: 22px; }
+}
+.shd-switch {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 2px;
+  padding: 8px 8px; border-bottom: 1px solid var(--c-line); flex-shrink: 0;
+}
+.shd-switch-btn {
+  font: inherit; font-family: var(--font-prose); font-size: 13px; font-weight: 600; cursor: pointer;
+  padding: 4px 7px; min-height: 28px; border-radius: 6px;
+  color: var(--c-meta); background: transparent; border: 1px solid transparent;
+  transition: background-color 120ms, border-color 120ms, color 120ms;
+}
+.shd-switch-btn::before {
+  content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; vertical-align: 1px;
+  background: var(--shd-tab-accent, var(--c-purple));
+}
+.shd-switch-btn:hover { color: var(--c-fg); border-color: var(--c-line); }
+.shd-switch-btn[aria-pressed="true"] {
+  color: var(--c-fg); border-color: var(--shd-tab-accent, var(--c-purple));
+  background: color-mix(in srgb, var(--shd-tab-accent, var(--c-purple)) 18%, transparent);
+}
+.shd-switch-btn:focus-visible { outline: 2px solid var(--shd-tab-accent, var(--c-purple)); outline-offset: 1px; }
+.shd-switch-extra { margin-left: auto; }
+
+/* The lab's task sidebar (LabTaskSidebar): the panel, then its arrow tab on the panel's right edge (alone at
+   the work's left edge when shut). As tall as the editor beside it; the task scrolls inside. Phones show the
+   task above the editor instead (LabTaskCard). */
+.lab-task-side { display: none; }
+@media (min-width: 721px) {
+  .lab-task-side { display: block; position: relative; align-self: stretch; min-width: 0; }
+  .lab-task-side-inner { display: flex; align-items: flex-start; height: 0; min-height: 100%; }
+  .lab-task-side.is-open .lab-task-side-inner { align-items: stretch; }
+  .lab-task-side-panel {
+    width: clamp(260px, 22vw, 340px); min-height: 0; box-sizing: border-box;
+    display: flex; flex-direction: column; overflow: hidden;
+    background: var(--c-deep2); border: 1px solid var(--c-line); border-radius: 8px;
+  }
+  .lab-task-side-head {
+    flex-shrink: 0; padding: 10px 14px; border-bottom: 1px solid var(--c-line);
+    color: var(--c-yellow); font-weight: 700; font-size: 0.9rem; letter-spacing: 0.02em;
+  }
+  .lab-task-side-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 14px 16px; }
+  .lab-task-side .lesson-steps { margin: 0; padding-left: 20px; }
+  .lab-task-side .lesson-step { margin: 0 0 14px; padding: 0; }
+  .lab-task-side .step-instructions { opacity: 1; font-size: 14px; line-height: 1.5; }
+  .lab-task-side .step-instructions p { margin: 6px 0; }
+  .lab-task-side .step-hints { color: var(--c-meta); margin-top: 6px; }
+  .lab-task-side .lab-task-end { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--c-line); color: var(--c-meta); font-size: 13px; }
+  .lab-task-side .shd-handle-left { align-self: flex-start; margin-top: 12px; }
+  .lab-task-side.is-open .shd-handle-left { margin-left: -1px; position: relative; z-index: 1; border-left-color: var(--c-deep2); }
+}
+/* The left sidebar's arrow tab is the mirror of the right one: its rounded side faces the work. */
+.shd-handle.shd-handle-left { border-radius: 0 8px 8px 0; color: var(--c-yellow); }
+.shd-handle.shd-handle-left:hover { border-color: var(--c-yellow); background: color-mix(in srgb, var(--c-yellow) 14%, var(--c-deep2)); }
+.shd-handle.shd-handle-left:focus-visible { outline-color: var(--c-yellow); }
+/* With both sidebars open the work column narrows: the lab toolbar drops its hints first (Ctrl+Enter, "Pass
+   Check to submit"; Submit's own tooltip still says it), then the utility buttons' words keep their icons. */
+@media (min-width: 721px) {
+  .lab-work-area > .editor-card { container-type: inline-size; container-name: labwork; }
+  @container labwork (max-width: 860px) {
+    .run-toolbar .run-hint, .run-toolbar .toolbar-submit-hint { display: none; }
+  }
+  @container labwork (max-width: 620px) {
+    .run-toolbar .toolbar-utilities .toolbar-button-label { display: none; }
+  }
+}
+/* A shut sidebar is a strip as tall as the work beside it, and the whole strip opens it: its name runs
+   down the middle (no arrow). Open, the small arrow tab on the panel's edge closes it. */
+.shd-handle-label {
+  writing-mode: vertical-rl; text-orientation: mixed; white-space: nowrap;
+  font-size: 13px; font-weight: 700; letter-spacing: 0.06em; line-height: 1;
+}
+@media (min-width: 721px) {
+  .shd-dock-wrap:not(.is-open),
+  .lab-task-side:not(.is-open) .lab-task-side-inner { align-items: stretch; }
+  .shd-dock-wrap:not(.is-open) .shd-handle-dock,
+  .lab-task-side:not(.is-open) .shd-handle-left {
+    align-self: stretch; height: auto; margin-top: 0; width: 26px;
+    flex-direction: column; justify-content: center; padding: 0;
+    border-radius: 8px;
+  }
+  /* The same on a reading, quiz or written page: the shut Docs strip runs down the right edge. */
+  body .shd-tabstrip:not(.shd-open) .shd-tab.shd-handle {
+    flex: 1 1 auto; height: auto !important; width: 26px !important;
+    flex-direction: column; justify-content: center; padding: 0 !important;
+  }
+  body .shd-tabstrip:not(.shd-open):has(.shd-handle) { --shd-rail-width: 26px; }
+  :root:has(.shd-tabstrip:not(.shd-open) .shd-handle) { --shd-rail-width: 26px; }
+}

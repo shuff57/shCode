@@ -152,7 +152,6 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
   if (lessons.length === 0) return null;
   const idx = lessons.findIndex((l) => l.id === currentLessonId);
   const done = lessons.filter((l) => snap.states[l.id] === 'completed').length;
-  const pct = Math.round((done / lessons.length) * 100);
 
   // Linear progression: a dot is clickable iff every prior lesson is
   // completed. Unauthed (snap.loaded === false on the server) defaults
@@ -203,13 +202,11 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
       >
         Module {moduleId}
       </Link>
-      {/* Dropped below 720px (see globals.css): at phone width this and the
-          segments were competing for the same ~70px, and the tally on the
-          right already says how many lessons the module has. */}
+      {/* Which lesson this is: the pink swatch is the legend for the pink segment. (Dropped below 720px, see
+          globals.css.) The "You are here" and "Module progress" words came off the bar, 2026-11-13. */}
       <span className="lesson-progress-count" style={{ color: 'var(--c-meta)', minWidth: 96 }}>
         {idx >= 0 ? (
-          // The legend for the pink segment: same colour, says what it marks.
-          <><span className="lesson-progress-here" aria-hidden="true" />You are here: lesson {idx + 1} of {lessons.length}</>
+          <><span className="lesson-progress-here" aria-hidden="true" />Lesson {idx + 1} of {lessons.length}</>
         ) : `${lessons.length} lessons`}
       </span>
       {/* Segments, not dots. A dot is a fixed 14px, so 31 of them plus the
@@ -420,9 +417,7 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
           <span style={{ color: 'var(--c-cyan)' }}>Sign in</span> to save progress
         </span>
       ) : (
-        <span className="lesson-progress-total" title={`Module progress: ${done} of ${lessons.length} lessons done`} style={{ color: 'var(--c-meta)', minWidth: 68, textAlign: 'right' }}>
-          <span className="lesson-progress-total-label">Module progress </span>{done}/{lessons.length} · {pct}%
-        </span>
+        <span className="sr-only">{done} of {lessons.length} lessons in this module done.</span>
       )}
     </div>
   );

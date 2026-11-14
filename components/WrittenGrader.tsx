@@ -710,29 +710,31 @@ export default function WrittenGrader({ lessonId, lessonTitle, prompt, config, a
       </div>
 
       <div className="written-help">
-      {prompt.trim() ? <details style={{ marginBottom: 10, border: '1px solid var(--c-line)', borderRadius: 6, padding: '8px 12px' }}>
-        <summary style={{ cursor: 'pointer', color: 'var(--c-purple)', fontSize: 13 }}>What to answer · task guidance</summary>
-              <h2 style={{ fontSize: 18, marginBottom: 6, color: 'var(--c-fg)', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <Sparkles size={18} color="var(--c-purple)" />
-        {config.rubricTitle ?? 'Written response — AI-graded'}
-      </h2>
-      <p style={{ color: 'var(--c-meta)', fontSize: 13, margin: '0 0 12px' }}>
-        {codeInput
-          ? 'Write your answer as JavaScript. There is no Run button, so read it through the way the computer would before you submit.'
-          : 'Answer in your own everyday words — you are graded on having the right idea, not on exact wording, spelling or length. The AI grader checks each criterion and points you back at the lesson to reread if something is missing.' +
-            (maxSubmissions === null
-              ? ' You can revise and resubmit as many times as you want.'
-              : ` You get ${maxSubmissions} tries: revise and resubmit, and your best one counts.`)}
-      </p>
-
-<div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.5, paddingTop: 10 }}><LessonNumberLinks text={prompt.trim()} hrefs={sourceHrefs} /></div>
-      </details> : null}
+      {/* The questions, always open: they are what the student answers (they sat folded shut under
+          "What to answer · task guidance" while the rubric was open). */}
+      {prompt.trim() ? (
+        <section className="written-prompt" aria-labelledby={`written-prompt-${lessonId}`}>
+          <h2 id={`written-prompt-${lessonId}`} className="written-prompt-title">
+            <Sparkles size={16} color="var(--c-purple)" aria-hidden="true" />
+            What to answer
+          </h2>
+          <div className="written-prompt-text"><LessonNumberLinks text={prompt.trim()} hrefs={sourceHrefs} /></div>
+          <p className="written-prompt-note">
+            {codeInput
+              ? 'Write your answer as JavaScript. There is no Run button, so read it through the way the computer would before you submit.'
+              : 'Answer in your own everyday words: you are graded on having the right idea, not on exact wording, spelling or length. The AI grader checks each criterion and points you back at the lesson to reread if something is missing.' +
+                (maxSubmissions === null
+                  ? ' You can revise and resubmit as many times as you want.'
+                  : ` You get ${maxSubmissions} tries: revise and resubmit, and your best one counts.`)}
+          </p>
+        </section>
+      ) : null}
 
       {afterPrompt ? <details
         className="written-graded-details"
         // Wide screens open "See how this is graded" at first: it is what a student needs before writing (climb4 r10 S8).
         ref={(el) => { if (el && !el.dataset.autoOpened) { el.dataset.autoOpened = '1'; if (window.matchMedia('(min-width: 1000px)').matches) el.open = true; } }}
-        style={{ margin: '0 0 16px', padding: '10px 14px', border: '1px solid var(--c-line)', borderRadius: 6 }}><summary style={{ cursor: 'pointer', color: 'var(--c-purple)', fontSize: 14 }}>See how this is graded</summary>{afterPrompt}</details> : null}
+        style={{ margin: '0 0 16px', padding: '10px 14px', border: '1px solid var(--c-line)', borderRadius: 6 }}><summary style={{ cursor: 'pointer', color: 'var(--c-purple)', fontSize: 14 }}>How this is graded</summary>{afterPrompt}</details> : null}
       </div>
 
       {/* Its own row rather than squeezed in beside Submit: on a narrow screen

@@ -186,12 +186,11 @@ export default function HeaderLessonNav() {
           </span>
         ) : (
           <a
-            className="hdr-lesson-link hdr-lesson-link-right"
+            className="hdr-lesson-link hdr-lesson-link-right hdr-lesson-next"
             href={lessonHref(next)}
           >
-            <span className="hdr-lesson-label">Next lesson</span>
+            <span className="hdr-lesson-label">Next</span>
             <span style={titleStyle}><span className="lesson-nav-full">{next.title}</span><ShortLabel n={next} /></span>
-            <span style={{ color: 'var(--c-meta)' }} aria-hidden="true">→</span>
           </a>
         )
       ) : (

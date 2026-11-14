@@ -103,12 +103,14 @@ export default function ContentLessonView({ lesson }: Props) {
   // A writeup (the WrittenGrader branch below) draws its rubric AFTER the "What to answer"
   // box, not above it in file order. No rubric heading: everything renders as before.
   const rubricSplit = !meta.quiz && !meta.diagram && meta.aiGrader ? splitRubric(contentMd) : null;
-  const writtenIntro = rubricSplit?.before.trim().split(/(?<=\.)\s+/);
-  const bodyMd = writtenIntro ? writtenIntro.slice(0, 2).join(' ') : contentMd;
-  const writtenGuidance = writtenIntro?.slice(2).join(' ') ?? '';
+  // A writeup shows everything above its rubric, whole and open (it once kept two sentences and folded
+  // the rest, a table and the questions included, under "What to answer").
+  const bodyMd = rubricSplit ? rubricSplit.before.trim() : contentMd;
   const readingLayout = !meta.quiz && !meta.diagram;
   const focusedLayout = readingLayout && preview !== 'example';
-  const hasOutline = readingLayout && !meta.videoUrl && preview !== 'slides' && outline.length >= 2;
+  // No "On this page" beside a writeup: its column squeezed the task into a few words a line, and the
+  // task is one screen of reading beside the answer box.
+  const hasOutline = readingLayout && !meta.aiGrader && !meta.videoUrl && preview !== 'slides' && outline.length >= 2;
   // "On this page" marks the section being read: the last heading above a line 30% down the window,
   // the first one at the top of the page.
   const [activeHeading, setActiveHeading] = useState<string | null>(null);
@@ -253,7 +255,7 @@ export default function ContentLessonView({ lesson }: Props) {
     <>
       <TabbedRightDrawer
         storageKey="shCode:content-drawer"
-        inlineHostId="content-tools-host"
+        // No inline host: the Docs tab sits on the side strip at the right edge, as in a lab.
         tabs={[
           {
             key: 'docs',
@@ -299,8 +301,6 @@ export default function ContentLessonView({ lesson }: Props) {
           {badge.label}
         </span>
         <span style={{ color: 'var(--c-meta)', fontSize: 13 }}>~{lesson.estimateMins ?? '?'} min</span>
-        {/* Desktop: the Docs button sits here, with the lesson's own details (TabbedRightDrawer inlineHostId). */}
-        <div id="content-tools-host" className="shd-inline-host" />
       </div>
       <div className={readingLayout ? `lesson-reading-grid${focusedLayout ? ' lesson-focused-grid' : ''}${hasOutline ? ' has-outline' : ''}` : 'lesson-content-flow'}>
       {hasOutline && <aside className="lesson-overview" aria-label="Lesson overview">
@@ -455,7 +455,7 @@ export default function ContentLessonView({ lesson }: Props) {
           // prompt IS the instructions and keeps rendering as before.
           prompt={meta.aiGrader.summative ? '' : (meta.aiGrader.prompt ?? contentMd.slice(0, 2000))}
           config={meta.aiGrader}
-          afterPrompt={rubricSplit ? <MarkdownWithLiveBlocks src={[writtenGuidance, rubricSplit.rubric].filter(Boolean).join('\n\n')} lessonId={lesson.id} /> : undefined}
+          afterPrompt={rubricSplit?.rubric ? <MarkdownWithLiveBlocks src={rubricSplit.rubric} lessonId={lesson.id} /> : undefined}
         />
       ) : (
         <CompletionPanel lessonId={lesson.id} lessonType={preview} />
