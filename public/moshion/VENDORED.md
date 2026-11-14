@@ -273,7 +273,10 @@ it as a URL; a path or a data: URI still bypasses the store. The 8-bit palette
 (never the working tree), copies `moshion.js` (reapplying the `/moshion/textures/` line), `docs/moshion.d.ts` and
 `planck.min.js`, regenerates the autocomplete, runs the moshion gates, and stamps the Commit row above. `-- --check`
 only reports drift; `npm run deploy` runs it first as a warning. Afterwards read the `moshion.d.ts` diff and add
-wording to `lib/moshion-docs.ts` for anything new. The manual steps below are what it automates.
+wording to `lib/moshion-docs.ts` for anything new: `scripts/check-moshion-docs-coverage.mjs` (also in `npm test`) fails
+while a name in the typings is in neither those docs nor the shrink-only `scripts/moshion-docs-gaps.json`. Two places hold
+moSHion docs: shCode's `lib/moshion-docs.ts` (the course reference, the one guarded) and the moshion repo's
+`docs/data/moshion-docs.js` (the standalone engine site); they overlap but are not copies. The manual steps below are what it automates.
 
 1. Copy the files in the first two lists from the new commit, then re-apply
    the `/moshion/textures/` line in `moshion.js`. The WAV palette now matches

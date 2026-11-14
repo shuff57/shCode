@@ -14,7 +14,8 @@
 // docs/moshion.d.ts, planck.min.js. Textures, fonts, sounds, runner.html and
 // extras.js are shCode's own or synced by their generators (see VENDORED.md).
 // After a sync, read the d.ts diff it prints: lib/moshion-docs.ts (the in-app
-// docs) is written by hand and may need a sentence for a new feature.
+// docs) is written by hand and needs a sentence for a new feature; the
+// check-moshion-docs-coverage step FAILS the sync until it has one.
 
 import { spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -114,6 +115,7 @@ const steps = [
   ['test-moshion-extras.mjs'],
   ['test-editor-completions.mjs'],
   ['check-docs-prose.mjs'],
+  ['check-moshion-docs-coverage.mjs'],
 ];
 let failed = false;
 for (const [s] of steps) {
