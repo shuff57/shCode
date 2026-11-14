@@ -87,6 +87,9 @@ if (checkOnly) {
     console.log(`[sync-moshion] differs: ${drifted.map((d) => d.to).join(', ')}. Bring it in with: npm run sync:moshion`);
     console.log('[sync-moshion] (a difference with nothing newer upstream means shCode has an unpushed local edit)');
   }
+  // The two hand-written docs sets (shCode's and the moshion repo's) must not drift apart either.
+  const dd = run(process.execPath, [...NODE, join('scripts', 'check-moshion-docs-drift.mjs')], { cwd: root });
+  process.stdout.write(dd.stdout || '');
   process.exit(0);
 }
 

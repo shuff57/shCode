@@ -923,7 +923,7 @@ Textures draw with smoothing turned off, so a 21x21 tile stretched across a 50x5
 
 Draw your own in the texture editor — the Textures tab in the sandbox, or the Textures link in the header. Open a built-in, change it, save it under any name. Save more than one frame and the texture ANIMATES: sprite.texture = 'myWalk' plays it, with no addAni call, because a saved animation is stored as the same horizontal frame strip addAni already slices.
 
-In code, saveTexture('myGuy', dataUrl) stores a data: URL under a name, and from then on sprite.texture = 'myGuy' finds it — including in a later sketch, because it lives in the same store as storeItem(). A saved name beats a built-in one, so saving 'coin' replaces the built-in coin everywhere. deleteTexture('myGuy') forgets it. Keep saved art small: the store holds 64 KB per value and 512 KB in total, which is generous for pixel art and far too small for a photograph.
+In code, saveTexture('myGuy', dataUrl) stores a data: URL under a name, and from then on sprite.texture = 'myGuy' finds it — including in a later sketch, because it lives in the same store as storeItem(). A saved name beats a built-in one, so saving 'coin' replaces the built-in coin everywhere. Pass { frames: 4 } as a third argument and the picture is read as a horizontal strip of 4 frames, which sprite.texture = 'myGuy' then plays without an addAni call. deleteTexture('myGuy') forgets it. Keep saved art small: the store holds 64 KB per value and 512 KB in total, which is generous for pixel art and far too small for a photograph.
 
 The built-in art is Kenney's "Platformer Art: Pixel Redux" pack, released under CC0 — public domain, free for classroom and commercial use alike.`,
         code: `let player, coins;
@@ -1421,6 +1421,56 @@ function update() {
 
 function draw() {
   background('#222');
+}`,
+      },
+      {
+        title: 'Ray casting',
+        body: `world.rayCast(x1, y1, x2, y2, callback) casts a ray from one point to another and calls your callback for every physics shape the ray touches. The callback receives (sprite, point, normal, fraction): sprite is the Sprite that was hit (or null), point is the hit position in world pixels, normal is the surface normal (a unit vector pointing away from the surface), and fraction is how far along the ray the hit happened, from 0 to 1.
+
+What you return from the callback controls how the ray continues. Return the fraction you were handed (or a smaller number) to clip the ray there — the standard pattern for finding the single closest hit. Return 0 to stop at the first hit. Return 1 to keep going past every hit (all objects on the line). Return -1 to ignore a fixture — useful for skipping sensor sprites, which rayCast does report: filter them with if (sprite && sprite.collider === "none") return -1.
+
+Ray casting is how you build hitscan weapons, line-of-sight checks, aim previews, and anchor-point picking: cast a ray toward a target and read where and what it first touches.`,
+        code: `let player, target, wall;
+
+function setup() {
+  new Canvas(400, 300);
+  world.gravity.y = 10;
+
+  new Sprite(200, 290, 400, 20, "static");   // floor
+
+  player = new Sprite(50, 200, 20, 20, "static");
+  player.color = "#5baafd";
+
+  // A barrier with a gap under it: aim through the gap to reach the target,
+  // aim straight at the barrier and the ray stops here instead.
+  wall = new Sprite(200, 170, 20, 110, "static");
+  wall.color = "#333844";
+
+  target = new Sprite(320, 250, 30, 30);
+  target.color = "tomato";
+}
+
+function update() {
+  if (mouse.presses()) {
+    let hit;
+    world.rayCast(player.x, player.y, mouse.x, mouse.y, function (sprite, point, normal, fraction) {
+      if (sprite && sprite.collider === "none") return -1; // skip sensors
+      hit = { sprite, point, normal, fraction };
+      return fraction; // clip at each hit to find the closest
+    });
+    if (hit && hit.sprite === target) {
+      hit.sprite.color = "gold";
+    }
+  }
+}
+
+function draw() {
+  background("#222");
+  // mouse.x/y read (0, 0) until the cursor has been over the canvas once.
+  if (!mouse.isActive) return;
+  stroke("#5baafd");
+  strokeWeight(2);
+  line(player.x, player.y, mouse.x, mouse.y);
 }`,
       },
       {

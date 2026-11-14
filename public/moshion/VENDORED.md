@@ -276,7 +276,10 @@ only reports drift; `npm run deploy` runs it first as a warning. Afterwards read
 wording to `lib/moshion-docs.ts` for anything new: `scripts/check-moshion-docs-coverage.mjs` (also in `npm test`) fails
 while a name in the typings is in neither those docs nor the shrink-only `scripts/moshion-docs-gaps.json`. Two places hold
 moSHion docs: shCode's `lib/moshion-docs.ts` (the course reference, the one guarded) and the moshion repo's
-`docs/data/moshion-docs.js` (the standalone engine site); they overlap but are not copies. The manual steps below are what it automates.
+`docs/data/moshion-docs.js` (the standalone engine site); they were reconciled on 2026-11-14 and now say the same thing about the engine, except for the pages listed (with reasons) in
+`scripts/moshion-docs-divergence.json` (shCode's texture editor, Library, mixer and asset paths). `scripts/check-moshion-docs-drift.mjs`
+(run by `sync-moshion --check`, so by `npm run deploy`) prints any shared page that has drifted since; it warns, never blocks, because the two repos
+are pushed separately. When you change a shared page, change it in both. The manual steps below are what it automates.
 
 1. Copy the files in the first two lists from the new commit, then re-apply
    the `/moshion/textures/` line in `moshion.js`. The WAV palette now matches

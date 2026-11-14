@@ -1,0 +1,27 @@
+{
+  "note": "Pages of the moSHion docs that are meant to differ between shCode (lib/moshion-docs.ts) and the moshion repo (docs/data/moshion-docs.js). Read by scripts/check-moshion-docs-drift.mjs. Adding a page here needs a reason; a page that is only stale belongs in neither list: fix it.",
+  "different": [
+    "Sprite|Textures: named pixel art",
+    "Sprite|Patterns: ground that repeats",
+    "Groups|Sound",
+    "Animation|addAni and changeAni",
+    "Animation|Animation objects: Ani, StillTexture and Anis",
+    "Text & HUD|Fonts: textFont()"
+  ],
+  "differentWhy": {
+    "Sprite|Textures: named pixel art": "shCode ships 126 textures (the repo ships fewer) and has a texture editor",
+    "Sprite|Patterns: ground that repeats": "shCode's example uses its own /moshion/assets tiles; the repo's builds a tile in code",
+    "Groups|Sound": "shCode has the Library, the sound mixer and the 190 KB saved-sound limit",
+    "Animation|addAni and changeAni": "shCode's copy also teaches animations drawn in the texture editor",
+    "Animation|Animation objects: Ani, StillTexture and Anis": "a sentence about the texture editor's per-frame lengths",
+    "Text & HUD|Fonts: textFont()": "a sentence about fonts saved in the Library"
+  },
+  "shCodeOnly": [
+    "Canvas|A colour with alpha",
+    "Persistence|Saving to your account: save() and load()"
+  ],
+  "shCodeOnlySections": ["Multiplayer", "Sharing and changes"],
+  "moshionOnly": [
+    "Sprite|Image files on sprites"
+  ]
+}
