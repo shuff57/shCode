@@ -3081,7 +3081,9 @@ function DetailView({ classId, initialTab, initialFilter }: { classId: string; i
 
   return (
     <div
-      className={activeTab === 'gradebook' ? 'teacher-gradebook' : 'teacher-frame'}
+      // Every tab in the same frame, so the site bar and the class title never jump when the tab changes;
+      // the gradebook's table scrolls sideways inside it when a module has many lessons.
+      className={activeTab === 'gradebook' ? 'teacher-frame teacher-gradebook' : 'teacher-frame'}
       style={{ ['--teacher-tabs-h' as string]: `${grading && compact ? 0 : tabsH}px`, ['--kb-inset' as string]: `${kbInset}px` } as React.CSSProperties}
       onFocus={(e) => setGrading(!!(e.target as HTMLElement).closest?.('.override-form'))}
       onBlur={(e) => { if (!(e.relatedTarget as HTMLElement | null)?.closest?.('.override-form')) setGrading(false); }}

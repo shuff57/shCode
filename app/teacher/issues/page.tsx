@@ -24,15 +24,18 @@ import IssueVoteControl, { type VoteState } from '../../../components/IssueVoteC
 // ---------------------------------------------------------------------------
 
 const S = {
+  // The teacher pages' frame and faces (app/teacher/page.tsx): a padded page around a .teacher-frame, the
+  // heading in the mono face, everything else in the reading face.
   page: {
     minHeight: '100vh',
     background: 'var(--bg)',
     color: 'var(--text)',
-    padding: '32px 24px',
-    fontFamily: 'inherit',
+    padding: '24px clamp(16px, 3vw, 32px)',
+    fontFamily: 'var(--font-prose)',
+    fontSize: 15,
   } as React.CSSProperties,
 
-  h1: { fontSize: 28, fontWeight: 700, marginBottom: 24, color: 'var(--text)' } as React.CSSProperties,
+  h1: { fontFamily: 'var(--font-mono)', fontSize: 28, fontWeight: 700, margin: '8px 0 20px', color: 'var(--text)' } as React.CSSProperties,
 
   card: {
     background: 'var(--card)',
@@ -43,35 +46,40 @@ const S = {
   } as React.CSSProperties,
 
   select: {
-    background: 'var(--bg)',
-    border: '1px solid var(--border)',
+    background: 'var(--c-deep2)',
+    border: '1px solid var(--c-line)',
     borderRadius: 4,
     color: 'var(--text)',
-    padding: '5px 8px',
-    fontSize: 13,
+    height: 36,
+    padding: '4px 8px',
+    fontFamily: 'var(--font-prose)',
+    fontSize: 14,
     cursor: 'pointer',
-    outline: 'none',
   } as React.CSSProperties,
 
   input: {
-    background: 'var(--bg)',
-    border: '1px solid var(--border)',
+    background: 'var(--c-deep2)',
+    border: '1px solid var(--c-line)',
     borderRadius: 4,
     color: 'var(--text)',
+    height: 36,
+    boxSizing: 'border-box',
     padding: '6px 10px',
-    fontSize: 13,
-    minWidth: 240,
-    outline: 'none',
-    fontFamily: 'inherit',
+    fontSize: 14,
+    minWidth: 260,
+    fontFamily: 'var(--font-prose)',
   } as React.CSSProperties,
 
+  // The class pages' secondary button: outlined, mono, bold.
   button: {
-    background: 'var(--muted)',
-    border: '1px solid var(--border)',
+    background: 'transparent',
+    border: '1px solid var(--c-line)',
     borderRadius: 4,
-    color: 'var(--text)',
-    padding: '6px 14px',
+    color: 'var(--c-fg)',
+    padding: '7px 14px',
+    fontFamily: 'var(--font-mono)',
     fontSize: 13,
+    fontWeight: 700,
     cursor: 'pointer',
   } as React.CSSProperties,
 
@@ -99,9 +107,10 @@ function chipStyle(active: boolean, color: string): React.CSSProperties {
     boxShadow: active ? `inset 0 0 0 2px ${color}` : 'none',
     opacity: active ? 1 : 0.65,
     borderRadius: 999,
-    padding: '3px 12px',
-    fontSize: 12,
-    fontWeight: active ? 700 : 500,
+    padding: '4px 12px',
+    fontFamily: 'var(--font-prose)',
+    fontSize: 13,
+    fontWeight: active ? 700 : 600,
     cursor: 'pointer',
     textTransform: 'capitalize',
   };
@@ -456,6 +465,7 @@ function IssuesPageInner() {
 
   return (
     <div style={S.page}>
+      <div className="teacher-frame">
       <h1 style={S.h1}>Issue reports</h1>
 
       {/* The tally doubles as the status filter. It used to be a static
@@ -839,6 +849,7 @@ function IssuesPageInner() {
           </div>
         );
       })}
+      </div>
     </div>
   );
 }

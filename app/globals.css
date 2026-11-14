@@ -5562,3 +5562,9 @@ input.dd-date { padding-right: 8px !important; }
 @media (max-width: 720px) {
   .home-module-summary .home-module-progress { flex-wrap: wrap !important; row-gap: 4px; min-width: 0; }
 }
+/* My classes: the class cards and the heading row (with + New class) run the full width of the teacher
+   frame, lining up with the site bar, like the class page (they stopped at 880px with space to the right). */
+.teacher-class-grid { grid-template-columns: minmax(0, 1fr) !important; }
+@media (min-width: 761px) { .teacher-list-head { max-width: none; } }
+/* The gradebook shares the teacher frame; its table scrolls sideways inside it when it is wider. */
+.teacher-frame.teacher-gradebook { min-width: 0; }
