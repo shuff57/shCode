@@ -78,6 +78,24 @@ const SANCTIONED = {
     // restores the tessellated area exactly (sketch-arc-assertions.cjs).
     removeCorner: 'splices one design corner out and merges the two edges beside it, deciding every corner- and edge-keyed field explicitly',
   },
+  // cleanSketch() drops a REPEATED point (the same corner twice in a row, or the
+  // first point again at the end) before a pull/pocket is built. The answer this
+  // file demands, written down:
+  //   - it never moves a coordinate: it only removes a point that is identical
+  //     (within 1e-9) to its neighbour, so every surviving corner sits exactly
+  //     where it did.
+  //   - bulges are keyed by EDGE and constraints name corners/edges by index, so
+  //     removing a point would shift them; it therefore returns the sketch
+  //     UNTOUCHED when either exists, and the refusal sentence handles it.
+  //   - rounds/chamfers are keyed by CORNER: they are remapped through the same
+  //     old-to-new index map, so each still describes the corner it described;
+  //     when a dropped repeat and the corner it merges into both had one, the
+  //     first wins.
+  // It works on a copy that only the pull/pocket builder reads; the stored
+  // sketch is never rewritten.
+  'reshape-cad/packages/layer/src/extrude-pocket.ts': {
+    cleanSketch: 'drops an exact repeated point from a copy; refuses to touch a sketch with bulges or constraints; remaps rounds/chamfers through the same index map',
+  },
   'reshape-cad/packages/script/src/model-codegen.ts': {
     applyParam: 'writes a DESIGN corner from a drag handle or a typed dimension',
     solveDoc: 'writes DESIGN corners the constraint solver moved, gated by outlineOf',
