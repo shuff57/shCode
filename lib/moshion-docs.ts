@@ -349,6 +349,56 @@ function draw() {
   line(40, 240, 360, 240);
 }`,
       },
+      {
+        title: 'Math helpers: abs, sqrt, lerp, dist and friends',
+        body: `These work the way they do in p5 and in plain math class. abs(n) drops a minus sign: abs(-4) is 4. sqrt(n) is the square root: sqrt(9) is 3. pow(base, exponent) raises to a power: pow(2, 3) is 8. ceil(n) rounds up, floor(n) rounds down, and int(n) is the same as floor(n), so int(3.7) is 3 and int(-3.7) is -4. max(...) and min(...) pick the biggest or smallest of the numbers you give them, or of one list: max(3, 9, 2) is 9.
+
+atan(v) is the angle whose tangent is v, in radians (in degrees after angleMode(DEGREES)). ellipse(x, y, w, h) draws an oval w wide and h tall, and with no h it is a circle w across.
+
+lerp(a, b, t) is the number a fraction t of the way from a to b: lerp(0, 10, 0.25) is 2.5. dist(x1, y1, x2, y2) is the straight-line distance between two points, and it also takes two things with an x and a y, so dist(a, b) works on two sprites: dist(0, 0, 3, 4) is 5.
+
+nf(num, left, right) turns a number into text with a fixed number of digits, which keeps a score from jumping around on screen. left is how many digits go before the point and right is how many after: nf(7, 2) is '07', nf(3.14159, 1, 2) is '3.14', and nf(12.5, 3, 1) is '012.5'.
+
+millis() is the number of milliseconds since the sketch started. TWO_PI is a full turn in radians and HALF_PI is a quarter turn, next to PI. These are for radians; sprites turn in degrees unless you call angleMode().`,
+        code: `function setup() {
+  new Canvas(400, 200);
+}
+
+function draw() {
+  background(30);
+  fill('white');
+  textSize(16);
+  text('dist(0, 0, 3, 4) = ' + dist(0, 0, 3, 4), 20, 40);
+  text('lerp(0, 10, 0.25) = ' + lerp(0, 10, 0.25), 20, 70);
+  text('int(-3.7) = ' + int(-3.7), 20, 100);
+  text('nf(7, 2) = ' + nf(7, 2), 20, 130);
+  text('seconds so far = ' + nf(millis() / 1000, 1, 1), 20, 160);
+}`,
+      },
+      {
+        title: 'Vectors: createVector',
+        body: `A vector is a pair of numbers, x and y, with some maths built in. createVector(x, y) makes one (new Vector(x, y) does the same). It is handy for a position or a speed you want to add up.
+
+v.add(x, y), v.sub(x, y), v.mult(n) and v.div(n) CHANGE v and also hand it back, so you can chain them. v.set(x, y) replaces both numbers. v.copy() makes a separate vector, so changing the copy leaves v alone. v.mag() is its length: createVector(3, 4).mag() is 5. v.normalize() shrinks it to length 1 while keeping its direction, and v.dist(other) is the distance to another point.
+
+Because add, sub, mult, div and normalize change the vector they are called on, call copy() first when you want to keep the original.`,
+        code: `let v;
+
+function setup() {
+  new Canvas(400, 200);
+  v = createVector(3, 4);
+}
+
+function draw() {
+  background(30);
+  fill('white');
+  textSize(16);
+  let w = v.copy().mult(2);
+  text('v = (' + v.x + ', ' + v.y + '), length ' + v.mag(), 20, 50);
+  text('copy times 2 = (' + w.x + ', ' + w.y + ')', 20, 90);
+  text('v is still (' + v.x + ', ' + v.y + ')', 20, 130);
+}`,
+      },
     ],
   },
   {
@@ -924,6 +974,50 @@ A floor across the bottom of a 400 by 300 canvas looks like this:
 let ground = new Sprite(200, 276, 400, 48, 'static');
 ground.pattern = '/moshion/assets/ground_tile.png';`,
       },
+      {
+        title: 'Collider constants: STATIC, DYNAMIC, KINEMATIC',
+        body: `Instead of the words in quotes you can use constants: s.collider = STATIC is the same as s.collider = 'static'. DYNAMIC is 'dynamic' and KINEMATIC is 'kinematic'. STA, DYN and KIN are shorter spellings of the same three. They are only names for the same strings, so use whichever reads best to you.`,
+      },
+      {
+        title: 'Other names for sprite properties',
+        body: `Some sprite properties have a second name, because code written for other libraries uses it. They all work and they do the same thing. Setting a size one resizes the collider too.
+
+sprite.pos is also sprite.position. sprite.vel is also sprite.velocity. sprite.collider is also sprite.body and sprite.physicsType. sprite.color is also sprite.colour and sprite.fill. sprite.textColor is also sprite.textFill. sprite.angularVelocity is also sprite.rotationSpeed. sprite.drag is also sprite.rollingResistance. sprite.prevPos is also sprite.previousPosition and sprite.prevRotation is also sprite.previousRotation.
+
+For size: sprite.w is also sprite.width, sprite.h is also sprite.height, sprite.hw and sprite.halfWidth are half the width, sprite.hh and sprite.halfHeight are half the height, and sprite.d, sprite.r and sprite.radius are the diameter or radius of a circle.
+
+Most of these are marked as old names in the editor. Pick the short one you were taught and stick with it.`,
+      },
+      {
+        title: 'Physics switches on a sprite',
+        body: `These are properties you set to change how one sprite takes part in physics.
+
+sprite.gravityScale multiplies the world's gravity for this sprite only: 0 makes it weightless and 2 makes it fall twice as hard. sprite.rotationDrag slows its spinning the way drag slows its moving. sprite.surfaceSpeed turns a static sprite into a conveyor belt: anything touching it is carried along at that speed, in pixels per frame.
+
+sprite.isSuperFast = true switches on extra careful collision checking for a sprite so fast that it would otherwise pass straight through a thin wall. sprite.physicsEnabled = false leaves the sprite drawn but takes it out of the physics completely, and sprite.visualOnly is the same switch the other way round (sprite.visualOnly = true means sprite.physicsEnabled = false).
+
+sprite.allowSleeping lets a sprite that has stopped moving go to sleep so physics skips it, and sprite.sleeping tells you whether it is asleep right now. The world has its own world.allowSleeping switch too.
+
+sprite.applyTorque(t) gives it a push to spin, the way applyForce gives a push to move. sprite.applyForceScaled(fx, fy) is applyForce multiplied by the sprite's mass, so a heavy sprite and a light one speed up equally. sprite.resetMass() makes the sprite recalculate its mass. sprite.centerOfMass is where the weight balances, in pixels, and you can only read it.`,
+      },
+      {
+        title: 'Motion and direction helpers',
+        body: `sprite.setSpeedAndDirection(speed, direction) sets both at once: sprite.setSpeedAndDirection(5, 0) moves the sprite right at 5 pixels a frame. sprite.isMoving is true while the sprite is moving.
+
+sprite.angleToFace(x, y) tells you how many degrees the sprite would have to turn to face a point, the short way round: a positive number is a clockwise turn, or counter-clockwise in math mode. sprite.rotationToFace(x, y) gives the rotation the sprite would end up with instead. Both also take a sprite or anything with an x and a y.
+
+sprite.prevPos is where the sprite was at the end of the last frame and sprite.prevRotation is how it was turned, so you can see how far it moved this frame. sprite.scaleBy(x, y) multiplies the sprite's current scale, so scaleBy(2) doubles how big it is drawn. It changes only how it looks. The collider keeps its size.`,
+      },
+      {
+        title: 'Sprite housekeeping: removed, groups, joints, screenSpace',
+        body: `sprite.removed is true once a sprite has been deleted, which is useful if you kept a variable pointing at it. sprite.groups lists every group the sprite is in, and sprite.joints lists every joint attached to it.
+
+sprite.autoDraw = false stops the engine drawing the sprite, and sprite.autoUpdate = false stops it running the sprite's update. Use them when you want to draw or update that sprite yourself.
+
+sprite.screenSpace = true pins a sprite to the screen: it ignores the camera and is drawn on top of everything, which is what a score display or a health bar wants.
+
+sprite.textStroke is the outline color of a sprite's text, and sprite.textStrokeWeight is how thick that outline is.`,
+      },
     ],
   },
   {
@@ -1131,6 +1225,14 @@ function draw() {
   background('#222');
 }`,
       },
+      {
+        title: 'World switches and explosions',
+        body: `world.explodeAt(x, y, radius, magnitude, falloff) pushes every sprite near a point away from it. The push is strongest in the middle and fades to falloff times as strong at the edge of the radius. Physics never lets anything go faster than world.maxSpeed, so a very big magnitude makes every sprite in range fly off at the same top speed.
+
+world.bounceThreshold is the slowest hit, in pixels per frame, that still makes a sprite bounce. Slower hits just stop.
+
+world.allowSleeping lets resting sprites go to sleep so the physics skips them. By default the world steps itself every frame. world.autoStep = false hands that job to you, and then you call world.physicsUpdate() when you want it to move forward by one step. Most sketches never need that.`,
+      },
     ],
   },
   {
@@ -1320,6 +1422,12 @@ function update() {
 function draw() {
   background('#222');
 }`,
+      },
+      {
+        title: 'Ray hits and sensors',
+        body: `world.rayCast with no callback returns a hit or null. A hit has four things on it: hit.sprite is what the ray touched, hit.point is where, hit.normal is the direction the surface faces at that spot, and hit.fraction is how far along the ray it was, from 0 at the start to 1 at the end.
+
+A Sensor, from addSensor(), has a sprite property too: sensor.sprite is the sprite it rides on. So when a sensor answers true, sensor.sprite tells you whose it is.`,
       },
     ],
   },
@@ -1646,6 +1754,18 @@ function draw() {
   background('#112');
 }`,
       },
+      {
+        title: 'More group tools: amount, contains, newSprite',
+        body: `group.amount is how many sprites are in the group. Set it and the group makes new sprites or deletes extras until it matches: enemies.amount = 5. group.contains(s) is true if the sprite s is in the group. group.newSprite(x, y, w, h) makes a sprite in the group, the same as new group.Sprite(x, y, w, h). group.deleteAll() is the old name for group.delete().
+
+A sprite's s.groups list shows which groups that one sprite is in.`,
+      },
+      {
+        title: 'Sound status: playing, loaded, duration',
+        body: `A Sound you loaded can tell you how it is doing. sound.loaded is true once the file has downloaded and been decoded, and sound.duration is how long it is in seconds, which is 0 until then. sound.playing is true while it is making noise. sound.url is the name or address you loaded it with.
+
+If something went wrong, sound.error holds a message and the sound stays silent. sound.blocked is true if the browser refused to start audio. That is rare, because the sketch unlocks sound by itself on the first click or key press.`,
+      },
     ],
   },
   {
@@ -1684,6 +1804,10 @@ function update() {
 function draw() {
   background('#222');
 }`,
+      },
+      {
+        title: 'camera.off() and camera.on()',
+        body: `camera.off() makes everything you draw after it ignore the camera, so it stays put on the screen. camera.on() puts the camera back, and the world scrolls again. Use off() before drawing a score or a health bar and on() when you are done. A sprite with screenSpace = true does the same thing for itself.`,
       },
     ],
   },
@@ -1853,6 +1977,22 @@ function update() {
 function draw() {
   background('#222');
 }`,
+      },
+      {
+        title: 'Every named key: kb.arrowLeft, kb.ctrl and the rest',
+        body: `For the common keys the kb object has a true or false property that is true while the key is held: kb.space, kb.enter, kb.escape, kb.tab, kb.backspace, kb.shift, kb.control (or kb.ctrl), kb.alt (or kb.opt, or kb.option), kb.capsLock, kb.arrowUp, kb.arrowDown, kb.arrowLeft, kb.arrowRight, and kb.meta (or kb.cmd, or kb.command, or kb.win, or kb.windows) for the key with the logo on it. kb.arrowLeft is the same as kb.pressing('arrowLeft').
+
+kb.pressed(key) and kb.releases(key) are old names that are easy to mix up: kb.pressed fires when the key comes back UP, the same as released(). To catch the moment a key goes down, use presses().`,
+      },
+      {
+        title: 'More about the mouse: drags, scroll, cursor',
+        body: `mouse.position is another name for mouse.pos. mouse.isOnCanvas is true while the pointer is over the canvas.
+
+mouse.drags() is true on the first frame of a drag, mouse.dragging() counts the frames the pointer has been moving with a button held, and mouse.dragged() is true on the frame the drag ends. Each takes a button name: 'left', 'center' or 'right'.
+
+mouse.scrollDelta has an x and a y for how far the wheel moved since the last frame, and is 0 when it did not move. mouse.cursor changes the shape of the pointer over the canvas, with a CSS cursor name: mouse.cursor = 'pointer' gives a pointing hand.
+
+mouse.pressed(button) and mouse.releases(button) are old names, like the kb ones: use presses() and released().`,
       },
     ],
   },
@@ -2065,6 +2205,14 @@ function draw() {
   background('#222');
 }`,
       },
+      {
+        title: 'Joint: what every joint shares',
+        body: `Every joint (GlueJoint, DistanceJoint, HingeJoint, SliderJoint, WheelJoint, GrabberJoint) is a Joint. Make one with two different sprites that are both still in the game. If either is not a sprite, or you give the same one twice, you get a plain error.
+
+joint.delete() takes a joint away, and joint.remove() does the same. sprite.joints lists the joints on a sprite.
+
+Joints take an options object as the last argument. anchor is the point in the world where the joint pins the two sprites together, and each kind of joint has its own default for it. lowerLimit and upperLimit belong to HingeJoint: they stop it turning past an angle, in degrees from the pose it started in. maxForce is how hard a GrabberJoint is allowed to pull, and it is 100 unless you say otherwise.`,
+      },
     ],
   },
   {
@@ -2144,6 +2292,14 @@ function update() {
 function draw() {
   background('#222');
 }`,
+      },
+      {
+        title: 'Animation objects: Ani, StillTexture and Anis',
+        body: `sprite.texture gives you back an object. For a texture that moves it is an Ani, and for a single picture it is a StillTexture. Both have a name, a frame, a frameCount, frameDelay and loop, so you can read them the same way. A still has frameCount 1 and nothing for it to animate.
+
+sprite.texture.frameDelays is an optional list with one number per frame, saying how many game frames to hold that frame for. It is null when every frame lasts frameDelay frames. An animation you draw in the Textures tab can have different lengths for different frames, so this is where they show up.
+
+sprite.texture.spriteSheet is the loaded picture the frames are cut from. Printing a texture shows its name (that is its toString), so text('using ' + sprite.texture) reads using coin. Anis is the type that holds Ani objects by name.`,
       },
     ],
   },
@@ -2415,6 +2571,10 @@ function draw() {
   background('#222');
 }`,
       },
+      {
+        title: 'Wrapping words: WORD and CHAR',
+        body: `The second thing you give textWrap says where a line may break. WORD, the default, breaks only between words. CHAR may break in the middle of a word, which suits a name with no spaces. textWrap(220, WORD) is the same as textWrap(220).`,
+      },
     ],
   },
   {
@@ -2512,6 +2672,12 @@ function draw() {
   textSize(12);
   text('Plays: ' + player.plays + '   space = score', 14, 76);
 }`,
+      },
+      {
+        title: 'Erasing and loading files: clearStorage and loadJSON',
+        body: `clearStorage() forgets everything your sketch stored with storeItem. After it, getItem on any name gives null. It clears the whole store at once, not just one name, so for a Reset button on a single high score use removeItem('highScore') instead.
+
+loadJSON(path, callback) reads a JSON file and hands the data to your callback when it arrives: loadJSON('level1.json', (data) => { level = data; }). It also returns an object that fills in once the file has loaded, but the callback form is the one to rely on, because a file takes a moment to arrive.`,
       },
     ],
   },
@@ -2803,6 +2969,16 @@ function drawTop() {
     text('Your keys go to the host.', 10, 44, 14, 'white');
   }
 }`,
+      },
+      {
+        title: 'The online object, step by step',
+        body: `multiplayer() is the easy way in. Under it is the online object, which does the same job with the details showing. You only need it if you want to build your own lobby.
+
+online.host(players) starts a room for 2 to 4 players and online.code becomes the room's 4-letter code. online.join(code) joins a classmate's room. online.leave() leaves it, and when the host leaves the room closes. online.codeIcons is the same code as 4 picture names, for drawing it.
+
+online.status is one of 'off', 'connecting', 'waiting', 'ready', 'closed' or 'error', and if it is 'error' then online.error says what went wrong in words. online.seat is your place in the room, 0 for the host, and online.seats is how many players the room is for. online.players lists who is in it. online.live is true while you are in a real-time room.
+
+online.unshare(sprite) stops showing one of your sprites on the other computers, and online.unshare() stops all of them. The game object has status and code too, for a sketch that used multiplayer().`,
       },
     ],
   },

@@ -36,7 +36,7 @@ for (const [type, list] of Object.entries(MOSHION_MEMBERS)) {
   for (const m of list) {
     // `.name` anywhere, or `name(` for a method written bare (e.g. inside a code example).
     // An option written as `{ name: value }` counts too (hinge options, sprite options).
-    names.push({ key: `${type}.${m.label}`, re: new RegExp(`\\.${esc(m.label)}($|[^\\w$])|(^|[^\\w$.])${esc(m.label)}\\(|[{,]\\s*${esc(m.label)}\\s*:`) });
+    names.push({ key: `${type}.${m.label}`, re: new RegExp(`\\.${esc(m.label)}($|[^\\w$])|(^|[^\\w$.])${esc(m.label)}\\(|(^|[{,])\\s*${esc(m.label)}\\s*:`, 'm') });
   }
 }
 
