@@ -889,8 +889,8 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
   {
    "label": "loop",
    "type": "property",
-   "detail": "boolean",
-   "info": "true (default) repeats forever; false plays once and stays on the last frame."
+   "detail": "boolean | number",
+   "info": "How many times it plays: true (default) forever, false once, a number n plays it n times (`loop = 3`)."
   },
   {
    "label": "spriteSheet",
@@ -939,7 +939,7 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
   {
    "label": "loop",
    "type": "property",
-   "detail": "boolean",
+   "detail": "boolean | number",
    "info": "No effect on a still."
   },
   {
