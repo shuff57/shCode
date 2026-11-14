@@ -221,8 +221,9 @@ export default function TabbedRightDrawer({ tabs: allTabs, storageKey, inlineHos
       title={handleLabel}
       onClick={() => choose(open ? null : openKey())}
     >
-      <span aria-hidden="true">{open ? '\u203a' : '\u2039'}</span>
-      {open ? null : <span className="shd-handle-label" aria-hidden="true">{tabs.length === 1 ? tabs[0].label : 'Tools'}</span>}
+      {open
+        ? <span aria-hidden="true">{'\u203a'}</span>
+        : <span className="shd-handle-label" aria-hidden="true">{tabs.length === 1 ? tabs[0].label : 'Tools'}</span>}
     </button>
   );
 
