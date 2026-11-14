@@ -202,9 +202,13 @@ export default function LessonProgressFooter({ moduleId, currentLessonId, lesson
       >
         Module {moduleId}
       </Link>
-      {/* Where you are and how far through, for a screen reader only: the pink segment shows it on screen
-          (the "You are here" and "Module progress" words were taken off the bar, 2026-11-13). */}
-      {idx >= 0 ? <span className="sr-only">Lesson {idx + 1} of {lessons.length}.</span> : null}
+      {/* Which lesson this is: the pink swatch is the legend for the pink segment. (Dropped below 720px, see
+          globals.css.) The "You are here" and "Module progress" words came off the bar, 2026-11-13. */}
+      <span className="lesson-progress-count" style={{ color: 'var(--c-meta)', minWidth: 96 }}>
+        {idx >= 0 ? (
+          <><span className="lesson-progress-here" aria-hidden="true" />Lesson {idx + 1} of {lessons.length}</>
+        ) : `${lessons.length} lessons`}
+      </span>
       {/* Segments, not dots. A dot is a fixed 14px, so 31 of them plus the
           surrounding text stopped fitting somewhere around 700px wide and the
           row silently became a scroller with no scrollbar — the lessons you
