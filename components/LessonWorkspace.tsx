@@ -48,9 +48,7 @@ import { addLocalSnapshot, NOT_KEPT_TEXT } from '../lib/local-history';
 import CarryForwardBanner from './CarryForwardBanner';
 import GuestWorkOffer from './GuestWorkOffer';
 import DocsDrawer from './DocsDrawer';
-import TextureEditor from './TextureEditor';
 import SoundMixer from './SoundMixer';
-import ClassLibraryPanel from './ClassLibraryPanel';
 import AiHelpPanel from './AiHelpPanel';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import SolutionPanel from './SolutionPanel';
@@ -1401,32 +1399,12 @@ export default function LessonWorkspace({
               </a>
             ) : undefined,
           },
-          // Only moSHion lessons have sprites, so only they can use a texture.
-          // Without this tab the student has to leave their code, draw on
-          // /textures, and navigate back; the editor writes to the same
-          // localStorage the preview bridge hydrates, so the name is ready as
-          // soon as they hit Run. `#8be9fd` is already the File tab's colour.
-          ...(isMoshionMode
+          // Textures, Sounds and Library live in the sandbox, where students make their own things; a
+          // lesson keeps its tools to the task. The exception is the sound module's labs (6.11 lesson ids,
+          // shown as "6.15 Sound and Music"): their readings send students to the Sounds tab beside the
+          // code. A sound saved there lands in `sound:<name>` in the store the preview bridge hydrates.
+          ...(isMoshionMode && lesson.id.startsWith('6-11-sound-')
             ? ([
-                {
-                  key: 'textures',
-                  label: 'Textures',
-                  color: 'var(--c-pink)',
-                  content: <TextureEditor />,
-                  headerExtra: (
-                    <a
-                      href="/textures"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn-secondary btn-sm"
-                    >
-                      Full page ↗
-                    </a>
-                  ),
-                },
-                // The same seam for sound. A sound saved here lands in
-                // `sound:<name>` in the store the preview bridge hydrates, so
-                // the sketch can play it by name without leaving the lesson.
                 {
                   key: 'sounds',
                   label: 'Sounds',
@@ -1439,18 +1417,6 @@ export default function LessonWorkspace({
                       rel="noopener noreferrer"
                       className="btn-secondary btn-sm"
                     >
-                      Full page ↗
-                    </a>
-                  ),
-                },
-                // The Library: your own saved art with Share, and what classmates shared (#81).
-                {
-                  key: 'class',
-                  label: 'Library',
-                  color: 'var(--c-yellow)',
-                  content: <ClassLibraryPanel />,
-                  headerExtra: (
-                    <a href="/library" target="_blank" rel="noopener noreferrer" className="btn-secondary btn-sm">
                       Full page ↗
                     </a>
                   ),

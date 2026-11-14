@@ -5335,12 +5335,18 @@ input.dd-date { padding-right: 8px !important; }
   .lab-work-area > .lab-task-card { display: none; }
   .lab-dock-host { display: block; position: relative; align-self: stretch; min-width: 0; }
   .lab-dock-host:empty { display: none; }
-  /* As tall as the editor beside it, never taller: the panel scrolls inside. */
+  /* The column: the open panel, then the strip of tabs down the right edge. As tall as the editor beside
+     it, never taller (the wrap adds no height of its own; the panel scrolls inside). */
+  .shd-dock-wrap { display: flex; align-items: flex-start; height: 0; min-height: 100%; }
+  .shd-dock-wrap.is-open { align-items: stretch; }
   .shd-dock {
-    position: relative; height: 0; min-height: 100%; max-width: 42vw; box-sizing: border-box;
+    position: relative; min-height: 0; max-width: 42vw; box-sizing: border-box;
     display: flex; flex-direction: column; overflow: hidden;
     background: var(--c-deep2); border: 1px solid var(--c-line); border-radius: 8px;
   }
+  /* The arrow tab: alone at the work's right edge when the panel is shut, on the panel's left edge when open. */
+  .shd-handle-dock { align-self: flex-start; margin-top: 12px; }
+  .shd-dock-wrap.is-open .shd-handle-dock { margin-right: -1px; position: relative; z-index: 1; border-right-color: var(--c-deep2); }
 }
 @media (max-width: 720px) {
   .lab-dock-host { display: none !important; }
@@ -5404,3 +5410,79 @@ input.dd-date { padding-right: 8px !important; }
   .written-grader:has(> .written-help) { display: flex; flex-direction: column; }
   .written-grader > .written-help { order: -1; }
 }
+
+/* Next lesson is the way forward: a filled green button (the colour of Run and of a slide deck's Next),
+   where Previous stays a quiet link. A locked Next keeps its quiet look and its padlock. */
+.header-lesson-nav .hdr-lesson-link.hdr-lesson-next {
+  background: var(--c-green) !important; color: var(--c-deep2) !important;
+  border: 1px solid var(--c-green) !important; border-radius: 6px;
+  height: 30px; padding: 0 12px !important; font-weight: 700; align-self: center;
+  transition: filter 120ms;
+}
+.header-lesson-nav .hdr-lesson-next .hdr-lesson-label,
+.header-lesson-nav .hdr-lesson-next .lesson-nav-num,
+.header-lesson-nav .hdr-lesson-next .lesson-nav-kind { color: var(--c-deep2) !important; }
+.header-lesson-nav .hdr-lesson-next .hdr-lesson-label { font-weight: 700; }
+.header-lesson-nav .hdr-lesson-link.hdr-lesson-next:hover { color: var(--c-deep2) !important; filter: brightness(1.12); }
+.header-lesson-nav .hdr-lesson-link.hdr-lesson-next:hover .lesson-nav-full { text-decoration: none; }
+.header-lesson-nav .hdr-lesson-link.hdr-lesson-next:focus-visible { outline: 2px solid var(--c-fg); outline-offset: 2px; }
+/* The side tabs read the same on every lesson page: narrow, vertical labels down the right edge, like the
+   strip beside a lab's work (an earlier round made them 76px wide and horizontal on a wide screen). */
+@media (min-width: 1200px) {
+  :root { --shd-rail-width: 40px; }
+  body .shd-tabstrip .shd-tab {
+    writing-mode: vertical-rl !important; text-align: initial;
+    padding: 12px 9px !important; white-space: nowrap !important; line-height: normal;
+  }
+}
+/* A reading, quiz or written page with its Docs drawer open sits left of the drawer (its inline
+   `margin: 0 auto` kept it centred under the drawer, which covered the answer box). Closed, it is centred. */
+@media (min-width: 721px) {
+  body:has(.shd-tabstrip.shd-open) .content-lesson-main {
+    margin-left: auto !important;
+    margin-right: calc(var(--shd-rail-width) + var(--shd-rail-gap) + var(--shd-tabbed, 0px)) !important;
+  }
+}
+
+/* The arrow tab that opens and closes a lesson's side panel (TabbedRightDrawer `handle`), and the row of
+   menu buttons at the top of the open panel. Sub-menus (Docs' JavaScript / moSHion / reSHape) stay inside
+   their menu. */
+.shd-handle {
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+  width: 22px; height: 56px; padding: 0; box-sizing: border-box;
+  font: inherit; font-size: 20px; font-weight: 700; line-height: 1;
+  color: var(--c-purple); background: var(--c-deep2);
+  border: 1px solid var(--c-line); border-radius: 8px 0 0 8px;
+  transition: background-color 120ms, border-color 120ms, color 120ms;
+}
+.shd-handle:hover { color: var(--c-fg); border-color: var(--c-purple); background: color-mix(in srgb, var(--c-purple) 14%, var(--c-deep2)); }
+.shd-handle:focus-visible { outline: 2px solid var(--c-purple); outline-offset: 2px; }
+@media (min-width: 721px) {
+  /* On the fixed rail of a reading or written page the arrow keeps its shape (the rail's tabs are vertical). */
+  body .shd-tabstrip .shd-tab.shd-handle {
+    writing-mode: horizontal-tb !important; width: 22px !important; height: 56px; padding: 0 !important;
+    border-right: 0 !important; border-radius: 8px 0 0 8px !important; font-size: 20px !important;
+  }
+  :root:has(.shd-tabstrip .shd-handle) { --shd-rail-width: 22px; }
+}
+.shd-switch {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 2px;
+  padding: 8px 8px; border-bottom: 1px solid var(--c-line); flex-shrink: 0;
+}
+.shd-switch-btn {
+  font: inherit; font-family: var(--font-prose); font-size: 13px; font-weight: 600; cursor: pointer;
+  padding: 4px 7px; min-height: 28px; border-radius: 6px;
+  color: var(--c-meta); background: transparent; border: 1px solid transparent;
+  transition: background-color 120ms, border-color 120ms, color 120ms;
+}
+.shd-switch-btn::before {
+  content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; vertical-align: 1px;
+  background: var(--shd-tab-accent, var(--c-purple));
+}
+.shd-switch-btn:hover { color: var(--c-fg); border-color: var(--c-line); }
+.shd-switch-btn[aria-pressed="true"] {
+  color: var(--c-fg); border-color: var(--shd-tab-accent, var(--c-purple));
+  background: color-mix(in srgb, var(--shd-tab-accent, var(--c-purple)) 18%, transparent);
+}
+.shd-switch-btn:focus-visible { outline: 2px solid var(--shd-tab-accent, var(--c-purple)); outline-offset: 1px; }
+.shd-switch-extra { margin-left: auto; }

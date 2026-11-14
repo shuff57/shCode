@@ -78,7 +78,10 @@ export default function TabbedRightDrawer({ tabs: allTabs, storageKey, inlineHos
   useEffect(() => {
     if (activeKey && !tabs.some((t) => t.key === activeKey)) setActiveKey(null);
   }, [activeKey, tabs]);
+  // The tab the arrow reopens: the last one shown, else the page's default, else the first.
+  const lastKey = useRef<string | null>(null);
   const choose = (key: string | null) => {
+    if (key !== null) lastKey.current = key;
     setActiveKey(key);
     if (docked) {
       try { localStorage.setItem(dockClosedStorage, key === null ? '1' : '0'); } catch { /* not remembered */ }
@@ -184,6 +187,30 @@ export default function TabbedRightDrawer({ tabs: allTabs, storageKey, inlineHos
   const open = activeKey !== null;
   const active = tabs.find((t) => t.key === activeKey) ?? null;
 
+  // Lesson pages (a lab's dock, or the fixed drawer with no toolbar host) open the sidebar with one small
+  // arrow tab; inside it, a row of buttons switches menus. The sandbox keeps its toolbar buttons, and a
+  // phone its bottom bar of tabs.
+  const useHandle = docked || (!inlineHost && !narrow);
+  const openKey = () =>
+    lastKey.current && tabs.some((t) => t.key === lastKey.current) ? lastKey.current
+      : dockDefaultKey && tabs.some((t) => t.key === dockDefaultKey) ? dockDefaultKey
+        : tabs[0].key;
+  const handleLabel = open
+    ? 'Close the side panel'
+    : `Open the side panel (${tabs.map((t) => t.label).join(', ')})`;
+  const handle = (extraClass: string) => (
+    <button
+      type="button"
+      className={`shd-handle ${extraClass}`}
+      aria-expanded={open}
+      aria-label={handleLabel}
+      title={handleLabel}
+      onClick={() => choose(open ? null : openKey())}
+    >
+      <span aria-hidden="true">{open ? '\u203a' : '\u2039'}</span>
+    </button>
+  );
+
   // The panel itself: a resize edge, a title row with the tab's extras and a close button, and the
   // tab's content. The same markup is a column in the page (dock) or a fixed drawer (overlay).
   const panel = (
@@ -198,42 +225,66 @@ export default function TabbedRightDrawer({ tabs: allTabs, storageKey, inlineHos
         onPointerCancel={onHandlePointerUp}
         style={{ position: 'absolute', left: -2, top: 0, bottom: 0, width: 6, cursor: 'ew-resize', zIndex: 1 }}
       />
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '10px 14px',
-          borderBottom: '1px solid var(--c-line)',
-          flexShrink: 0,
-        }}
-      >
-        <span style={{ color: 'var(--c-fg)', fontWeight: 600, fontSize: '0.9rem', letterSpacing: '0.02em' }}>
-          {active?.label}
-        </span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {active?.headerExtra}
-          <button
-            type="button"
-            aria-label={docked ? 'Close panel' : 'Close drawer'}
-            onClick={() => choose(null)}
-            onMouseEnter={() => setCloseBtnHovered(true)}
-            onMouseLeave={() => setCloseBtnHovered(false)}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '1.25rem',
-              lineHeight: 1,
-              padding: '2px 4px',
-              color: closeBtnHovered ? 'var(--c-fg)' : 'var(--c-dim)',
-              transition: 'color 0.15s',
-            }}
-          >
-            &times;
-          </button>
+      {useHandle && tabs.length > 1 ? (
+        // One button per menu: the sidebar switches between them in place (opened and closed by the arrow).
+        <div className="shd-switch" role="group" aria-label="Side panel menus">
+          {tabs.map((t) => {
+            const isActive = t.key === activeKey;
+            return (
+              <button
+                key={t.key}
+                type="button"
+                aria-pressed={isActive}
+                className="shd-switch-btn"
+                onClick={() => choose(t.key)}
+                style={{ '--shd-tab-accent': t.color ?? 'var(--c-purple)' } as CSSProperties}
+              >
+                {t.label}
+              </button>
+            );
+          })}
+          {active?.headerExtra ? <span className="shd-switch-extra">{active.headerExtra}</span> : null}
         </div>
-      </div>
+      ) : (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '10px 14px',
+            borderBottom: '1px solid var(--c-line)',
+            flexShrink: 0,
+          }}
+        >
+          <span style={{ color: 'var(--c-fg)', fontWeight: 600, fontSize: '0.9rem', letterSpacing: '0.02em' }}>
+            {active?.label}
+          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {active?.headerExtra}
+            {useHandle ? null : (
+              <button
+                type="button"
+                aria-label="Close drawer"
+                onClick={() => choose(null)}
+                onMouseEnter={() => setCloseBtnHovered(true)}
+                onMouseLeave={() => setCloseBtnHovered(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '1.25rem',
+                  lineHeight: 1,
+                  padding: '2px 4px',
+                  color: closeBtnHovered ? 'var(--c-fg)' : 'var(--c-dim)',
+                  transition: 'color 0.15s',
+                }}
+              >
+                &times;
+              </button>
+            )}
+          </div>
+        </div>
+      )}
       <div
         className="shd-panel-body"
         style={{
@@ -257,18 +308,24 @@ export default function TabbedRightDrawer({ tabs: allTabs, storageKey, inlineHos
   return (
     <>
       {docked ? (
-        // In the page: only while a tab is open, so a closed panel gives the work the full width.
-        open ? createPortal(
-          <div
-            aria-label={active?.label ?? 'Panel'}
-            role="complementary"
-            className="shd-dock"
-            style={{ width, '--shd-dock-w': `${width}px` } as CSSProperties}
-          >
-            {panel}
+        // In the page: a strip of tabs down the right edge of the work, always there, and the open tab's
+        // panel just left of it. Closed, only the strip takes room.
+        createPortal(
+          <div className={`shd-dock-wrap${open ? ' is-open' : ''}`}>
+            {handle('shd-handle-dock')}
+            {open ? (
+              <div
+                aria-label={active?.label ?? 'Panel'}
+                role="complementary"
+                className="shd-dock"
+                style={{ width } as CSSProperties}
+              >
+                {panel}
+              </div>
+            ) : null}
           </div>,
           dockHost!,
-        ) : null
+        )
       ) : (
         <div
           aria-label={active?.label ?? 'Drawer'}
@@ -299,7 +356,7 @@ export default function TabbedRightDrawer({ tabs: allTabs, storageKey, inlineHos
       )}
 
       {/* Inline: one row of tool buttons in the page's own toolbar (desktop with a host). */}
-      {inlineHost && !narrow ? createPortal(
+      {inlineHost && !narrow && !docked ? createPortal(
         <div className="shd-inline-tools" role="group" aria-label="Lesson tools">
           {tabs.map((t) => {
             const isActive = t.key === activeKey;
@@ -323,7 +380,7 @@ export default function TabbedRightDrawer({ tabs: allTabs, storageKey, inlineHos
       ) : null}
 
       {/* Labels run along the desktop rail and move with the drawer. Phones use a horizontal dock. */}
-      {inlineHost && !narrow ? null : <div
+      {(inlineHost && !narrow) || docked ? null : <div
         className={`shd-tabstrip${tabs.length === 1 && tabs[0].label === 'Docs' ? ' shd-docs-only' : ''}${open ? ' shd-open' : ''}`}
         style={{
           position: 'fixed',
@@ -337,7 +394,7 @@ export default function TabbedRightDrawer({ tabs: allTabs, storageKey, inlineHos
           transition: dragging ? 'none' : 'right 0.22s ease',
         }}
       >
-        {tabs.map((t) => {
+        {useHandle ? handle('shd-tab') : tabs.map((t) => {
           const isActive = t.key === activeKey;
           return (
             <button

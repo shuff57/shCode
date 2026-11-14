@@ -255,7 +255,7 @@ export default function ContentLessonView({ lesson }: Props) {
     <>
       <TabbedRightDrawer
         storageKey="shCode:content-drawer"
-        inlineHostId="content-tools-host"
+        // No inline host: the Docs tab sits on the side strip at the right edge, as in a lab.
         tabs={[
           {
             key: 'docs',
@@ -301,8 +301,6 @@ export default function ContentLessonView({ lesson }: Props) {
           {badge.label}
         </span>
         <span style={{ color: 'var(--c-meta)', fontSize: 13 }}>~{lesson.estimateMins ?? '?'} min</span>
-        {/* Desktop: the Docs button sits here, with the lesson's own details (TabbedRightDrawer inlineHostId). */}
-        <div id="content-tools-host" className="shd-inline-host" />
       </div>
       <div className={readingLayout ? `lesson-reading-grid${focusedLayout ? ' lesson-focused-grid' : ''}${hasOutline ? ' has-outline' : ''}` : 'lesson-content-flow'}>
       {hasOutline && <aside className="lesson-overview" aria-label="Lesson overview">
