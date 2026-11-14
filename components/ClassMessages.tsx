@@ -6,7 +6,7 @@
 // the words stay readable here, and Put back undoes it). Conversations between a student and a teacher
 // are not listed: those are in the teacher's own mailbox. GET|POST /api/classes/[id]/messages.
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { errorText } from '../lib/http-error';
 import { useFeedback } from './FeedbackProvider';
 
@@ -32,6 +32,8 @@ function when(ms: number): string {
   }
 }
 
+const REFRESH_MS = 30_000;
+
 const btn = { fontSize: 12, padding: '3px 8px', borderRadius: 4, cursor: 'pointer', background: 'transparent', color: 'var(--c-cyan)', border: '1px solid var(--c-line)' } as const;
 
 export default function ClassMessages({ classId }: { classId: string }) {
@@ -52,7 +54,28 @@ export default function ClassMessages({ classId }: { classId: string }) {
     setError(null);
     setData((await res.json()) as Overview);
   }, [base]);
-  useEffect(() => { void load(); }, [load]);
+  // A teacher may leave the class page open all lesson: refresh every 30 s while the tab is visible, and
+  // when it comes back into view, so new conversations and messages show up (the open one too).
+  const openRef = useRef<string | null>(null);
+  openRef.current = open;
+  useEffect(() => {
+    void load();
+    const refresh = () => {
+      if (document.visibilityState !== 'visible') return;
+      void load();
+      const id = openRef.current;
+      if (!id) return;
+      void fetch(`${base}?thread=${encodeURIComponent(id)}`, { credentials: 'same-origin', cache: 'no-store' })
+        .then(async (res) => {
+          if (!res.ok || openRef.current !== id) return;
+          setThread(((await res.json()) as { thread: Thread }).thread);
+        })
+        .catch(() => { /* the next refresh tries again */ });
+    };
+    const timer = window.setInterval(refresh, REFRESH_MS);
+    document.addEventListener('visibilitychange', refresh);
+    return () => { window.clearInterval(timer); document.removeEventListener('visibilitychange', refresh); };
+  }, [load, base]);
 
   const act = async (body: Record<string, unknown>, done: (json: unknown) => string | null): Promise<boolean> => {
     setBusy(true);
