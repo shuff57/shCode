@@ -5324,13 +5324,17 @@ input.dd-date { padding-right: 8px !important; }
 @media (min-width: 721px) {
   /* !important: older rounds set a left task column for each kind of lab (one rule per kind, more
      specific than these); the task is a tab of the side panel now, so every lab uses these two. */
+  /* Three columns: the task sidebar (left), the work, the tools sidebar (right); each placed by column so
+     a lab with no steps (no task sidebar) keeps the work in the middle. */
   .lab-work-area {
-    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
     gap: 16px !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
   }
-  .lab-work-area:has(> .lab-dock-host:empty) { grid-template-columns: minmax(0, 1fr) !important; }
+  .lab-work-area > .lab-task-side { grid-column: 1; grid-row: 1; }
+  .lab-work-area > .editor-card { grid-column: 2; grid-row: 1; }
+  .lab-work-area > .lab-dock-host { grid-column: 3; grid-row: 1; }
   .lab-work-area > .lab-task-tab,
   .lab-work-area > .lab-task-card { display: none; }
   .lab-dock-host { display: block; position: relative; align-self: stretch; min-width: 0; }
@@ -5486,3 +5490,46 @@ input.dd-date { padding-right: 8px !important; }
 }
 .shd-switch-btn:focus-visible { outline: 2px solid var(--shd-tab-accent, var(--c-purple)); outline-offset: 1px; }
 .shd-switch-extra { margin-left: auto; }
+
+/* The lab's task sidebar (LabTaskSidebar): the panel, then its arrow tab on the panel's right edge (alone at
+   the work's left edge when shut). As tall as the editor beside it; the task scrolls inside. Phones show the
+   task above the editor instead (LabTaskCard). */
+.lab-task-side { display: none; }
+@media (min-width: 721px) {
+  .lab-task-side { display: block; position: relative; align-self: stretch; min-width: 0; }
+  .lab-task-side-inner { display: flex; align-items: flex-start; height: 0; min-height: 100%; }
+  .lab-task-side.is-open .lab-task-side-inner { align-items: stretch; }
+  .lab-task-side-panel {
+    width: clamp(260px, 22vw, 340px); min-height: 0; box-sizing: border-box;
+    display: flex; flex-direction: column; overflow: hidden;
+    background: var(--c-deep2); border: 1px solid var(--c-line); border-radius: 8px;
+  }
+  .lab-task-side-head {
+    flex-shrink: 0; padding: 10px 14px; border-bottom: 1px solid var(--c-line);
+    color: var(--c-yellow); font-weight: 700; font-size: 0.9rem; letter-spacing: 0.02em;
+  }
+  .lab-task-side-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 14px 16px; }
+  .lab-task-side .lesson-steps { margin: 0; padding-left: 20px; }
+  .lab-task-side .lesson-step { margin: 0 0 14px; padding: 0; }
+  .lab-task-side .step-instructions { opacity: 1; font-size: 14px; line-height: 1.5; }
+  .lab-task-side .step-instructions p { margin: 6px 0; }
+  .lab-task-side .step-hints { color: var(--c-meta); margin-top: 6px; }
+  .lab-task-side .lab-task-end { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--c-line); color: var(--c-meta); font-size: 13px; }
+  .lab-task-side .shd-handle-left { align-self: flex-start; margin-top: 12px; }
+  .lab-task-side.is-open .shd-handle-left { margin-left: -1px; position: relative; z-index: 1; border-left-color: var(--c-deep2); }
+}
+/* The left sidebar's arrow tab is the mirror of the right one: its rounded side faces the work. */
+.shd-handle.shd-handle-left { border-radius: 0 8px 8px 0; color: var(--c-yellow); }
+.shd-handle.shd-handle-left:hover { border-color: var(--c-yellow); background: color-mix(in srgb, var(--c-yellow) 14%, var(--c-deep2)); }
+.shd-handle.shd-handle-left:focus-visible { outline-color: var(--c-yellow); }
+/* With both sidebars open the work column narrows: the lab toolbar drops its hints first (Ctrl+Enter, "Pass
+   Check to submit"; Submit's own tooltip still says it), then the utility buttons' words keep their icons. */
+@media (min-width: 721px) {
+  .lab-work-area > .editor-card { container-type: inline-size; container-name: labwork; }
+  @container labwork (max-width: 860px) {
+    .run-toolbar .run-hint, .run-toolbar .toolbar-submit-hint { display: none; }
+  }
+  @container labwork (max-width: 620px) {
+    .run-toolbar .toolbar-utilities .toolbar-button-label { display: none; }
+  }
+}

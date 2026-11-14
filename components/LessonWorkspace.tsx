@@ -34,7 +34,7 @@ import MoshionPreview from './MoshionPreview';
 import RequirementsSection from './RequirementsSection';
 import PlanChartPanel from './PlanChartPanel';
 import LessonSteps from './LessonSteps';
-import LabTaskCard, { LabTaskContent } from './LabTaskCard';
+import LabTaskCard, { LabTaskSidebar } from './LabTaskCard';
 import Console from './Console';
 import HistoryPanel from './HistoryPanel';
 import AssignmentHeader from './AssignmentHeader';
@@ -1349,22 +1349,11 @@ export default function LessonWorkspace({
       <TabbedRightDrawer
         storageKey="shCode:drawer"
         inlineHostId="lab-tools-host"
-        // A console or moSHion lab has a side column beside the editor (wide screens): the open tab
-        // shows there, in the page, and it opens on the task. Other lessons keep the overlay drawer.
+        // A console or moSHion lab has a tools column right of the editor (wide screens): the open tab
+        // shows there, in the page, and it starts closed. The task is the LEFT sidebar (LabTaskSidebar).
+        // Other lessons keep the overlay drawer.
         dockHostId={isLab ? 'lab-dock-host' : undefined}
-        dockDefaultKey={isLab && lesson.steps.length > 0 ? 'task' : undefined}
         tabs={[
-          ...(isLab && lesson.steps.length > 0
-            ? ([
-                {
-                  key: 'task',
-                  label: 'Task',
-                  color: 'var(--c-yellow)',
-                  dockedOnly: true,
-                  content: <LabTaskContent lesson={lesson} />,
-                },
-              ] as DrawerTab[])
-            : []),
           {
             key: 'help',
             label: 'CODY',
@@ -1423,9 +1412,8 @@ export default function LessonWorkspace({
                 },
               ] as DrawerTab[])
             : []),
-          // On a console or moSHion lab the steps are the Task tab (first, above) on a wide screen and
-          // LabTaskCard above the editor on a phone; the other lessons show them in the collapsible
-          // strip above the editor.
+          // On a console or moSHion lab the steps are the left sidebar on a wide screen and LabTaskCard
+          // above the editor on a phone; the other lessons show them in the collapsible strip above the editor.
           {
             key: 'quest',
             label: 'Quest',
@@ -1520,7 +1508,7 @@ export default function LessonWorkspace({
       )}
       <div className={(isConsoleMode || isMoshionMode) ? 'lab-work-area' : undefined}>
       {lesson.steps.length > 0 && (
-        (isConsoleMode || isMoshionMode) ? <LabTaskCard lesson={lesson} /> : (
+        (isConsoleMode || isMoshionMode) ? <><LabTaskCard lesson={lesson} /><LabTaskSidebar lesson={lesson} /></> : (
           <details className="lab-task-strip" style={{ padding: '8px 12px', margin: '4px 0 8px', border: '1px solid var(--c-line)', borderRadius: 6, background: 'var(--c-bg)' }}>
             <summary style={{ cursor: 'pointer', fontSize: 13, color: 'var(--c-meta)' }}><strong style={{ color: 'var(--c-cyan)' }}>Your task</strong> · {lesson.steps[0].title} <span className="task-disclosure">· Show all steps</span></summary>
             <LessonSteps lesson={lesson} />
@@ -1614,7 +1602,7 @@ export default function LessonWorkspace({
                     className="btn-primary btn-sm toolbar-submit"
                     onClick={handleSubmit}
                     disabled={submitLocked || !canSubmit}
-                    title={submitLocked ? 'Already submitted. Change your code to submit again.' : !canSubmit ? moshionWords.title : undefined}
+                    title={submitLocked ? 'Already submitted. Change your code to submit again.' : !canSubmit ? (moshionWords.title ?? (allRequirementsPassed ? 'Run it, then Submit' : `Pass ${checkVerb} to submit`)) : undefined}
                   >
                     <Send size={14} />
                     Submit

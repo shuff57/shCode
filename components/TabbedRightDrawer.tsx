@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, ReactNode, CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
+import { BOTH_SIDEBARS_MIN, SIDEBAR_OPENED } from './LabTaskCard';
 
 export interface DrawerTab {
   key: string;
@@ -80,8 +81,21 @@ export default function TabbedRightDrawer({ tabs: allTabs, storageKey, inlineHos
   }, [activeKey, tabs]);
   // The tab the arrow reopens: the last one shown, else the page's default, else the first.
   const lastKey = useRef<string | null>(null);
+  // A lab's two sidebars take turns on a narrower screen (LabTaskSidebar): opening this one closes the task,
+  // and the task opening closes this one.
+  useEffect(() => {
+    if (!docked) return;
+    const onOpened = (e: Event) => {
+      if ((e as CustomEvent<string>).detail === 'left' && window.innerWidth < BOTH_SIDEBARS_MIN) setActiveKey(null);
+    };
+    window.addEventListener(SIDEBAR_OPENED, onOpened);
+    return () => window.removeEventListener(SIDEBAR_OPENED, onOpened);
+  }, [docked]);
   const choose = (key: string | null) => {
     if (key !== null) lastKey.current = key;
+    if (docked && key !== null && activeKey === null && window.innerWidth < BOTH_SIDEBARS_MIN) {
+      window.dispatchEvent(new CustomEvent(SIDEBAR_OPENED, { detail: 'right' }));
+    }
     setActiveKey(key);
     if (docked) {
       try { localStorage.setItem(dockClosedStorage, key === null ? '1' : '0'); } catch { /* not remembered */ }
