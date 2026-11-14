@@ -71,8 +71,17 @@ export default function JsDocsClient({
   }
 
   return (
-    <div className="docs-layout docs-js">
+    <div className="docs-layout">
       <aside className="docs-sidebar">
+        <div className="docs-sidebar-search">
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search docs…"
+            aria-label="Search documentation"
+          />
+        </div>
         <div className="docs-sidebar-scroll">
           {isSearching ? (
             <div className="docs-sidebar-results">
@@ -146,8 +155,8 @@ export default function JsDocsClient({
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search JavaScript docs…"
-            aria-label="Search JavaScript documentation"
+            placeholder={searchPlaceholder}
+            aria-label="Search documentation"
           />
         </div>
 
@@ -156,21 +165,6 @@ export default function JsDocsClient({
           {section.pages.length > 1 && (
             <span className="docs-page-pill">
               Page {pageIndex + 1} of {section.pages.length}
-            </span>
-          )}
-          {/* Previous / next page of this topic beside the count (climb4 r9 S11); the footer keeps the full titles. */}
-          {section.pages.length > 1 && (
-            <span className="docs-page-step">
-              {hasPrev ? (
-                <Link href={pageHref(basePath, section.slug, pageIndex - 1)} aria-label={`Previous page: ${section.pages[pageIndex - 1].title}`}>‹ Previous</Link>
-              ) : (
-                <span aria-disabled="true">‹ Previous</span>
-              )}
-              {hasNext ? (
-                <Link href={pageHref(basePath, section.slug, pageIndex + 1)} aria-label={`Next page: ${section.pages[pageIndex + 1].title}`}>Next ›</Link>
-              ) : (
-                <span aria-disabled="true">Next ›</span>
-              )}
             </span>
           )}
         </header>

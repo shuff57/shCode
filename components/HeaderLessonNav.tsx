@@ -135,6 +135,10 @@ export default function HeaderLessonNav() {
   // bypass the gate.
   const currentCompleted = snap.states[route.id] === 'completed';
   const nextLocked = !currentCompleted && !bypassesLessonLock(snap.role);
+  // Each button takes the colour its lesson has in the module bar at the bottom: green done, yellow
+  // started, grey not started yet (globals.css, [data-state]).
+  const stateOf = (n: Neighbor) =>
+    snap.states[n.id] === 'completed' ? 'done' : snap.states[n.id] === 'started' ? 'started' : 'todo';
 
   return (
     <nav
@@ -153,8 +157,7 @@ export default function HeaderLessonNav() {
       }}
     >
       {prev ? (
-        <a className="hdr-lesson-link" href={lessonHref(prev)}>
-          <span style={{ color: 'var(--c-meta)' }} aria-hidden="true">←</span>
+        <a className="hdr-lesson-link hdr-lesson-prev" data-state={stateOf(prev)} href={lessonHref(prev)}>
           <span className="hdr-lesson-label">Previous</span>
           <span style={titleStyle}><span className="lesson-nav-full">{prev.title}</span><ShortLabel n={prev} /></span>
         </a>
@@ -170,6 +173,7 @@ export default function HeaderLessonNav() {
         nextLocked ? (
           <span
             className="hdr-lesson-link hdr-lesson-link-right"
+            data-state="locked"
             title="Get a green on this lesson before moving forward"
             aria-disabled="true"
             style={{
@@ -187,6 +191,7 @@ export default function HeaderLessonNav() {
         ) : (
           <a
             className="hdr-lesson-link hdr-lesson-link-right hdr-lesson-next"
+            data-state={stateOf(next)}
             href={lessonHref(next)}
           >
             <span className="hdr-lesson-label">Next</span>

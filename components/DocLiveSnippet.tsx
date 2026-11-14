@@ -103,39 +103,6 @@ export default function DocLiveSnippet({ initialCode, fileKey }: Props) {
 
   return (
     <div className="doc-live-snippet" style={{ margin: '8px 0 4px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-      <div className="doc-live-toolbar" style={{ display: 'flex', gap: 8 }}>
-        <button
-          type="button"
-          className="btn-run"
-          onClick={handleRun}
-          disabled={running}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 4, minHeight: 32, fontSize: 14 }}
-        >
-          <Play size={12} /> {running ? 'Running…' : 'Run'}
-        </button>
-        <button
-          type="button"
-          disabled={!dirty && !hasRun}
-          onClick={handleReset}
-          className="doc-live-reset"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-            background: 'transparent',
-            // Disabled still reads (meta, dashed edge), it just does nothing until the code changes or runs.
-            color: dirty || hasRun ? 'var(--c-purple)' : 'var(--c-meta)',
-            border: '1px solid var(--c-line)',
-            borderRadius: 4,
-            padding: '4px 10px',
-            fontSize: '0.75rem',
-            fontWeight: 600,
-            cursor: dirty || hasRun ? 'pointer' : 'default',
-          }}
-        >
-          <RotateCcw size={12} /> Reset
-        </button>
-      </div>
       <div className="doc-live-editor" style={{ ...paneStyle, height: 180 }}>
         <CodeMirrorPane value={code} onChange={setCode} fileKey={fileKey} />
       </div>
@@ -191,7 +158,39 @@ export default function DocLiveSnippet({ initialCode, fileKey }: Props) {
           </pre>
         )}
       </div>
-
+      <div className="doc-live-toolbar" style={{ display: 'flex', gap: 8 }}>
+        <button
+          type="button"
+          className="btn-run"
+          onClick={handleRun}
+          disabled={running}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 4, minHeight: 32, fontSize: 14 }}
+        >
+          <Play size={12} /> {running ? 'Running…' : 'Run'}
+        </button>
+        <button
+          type="button"
+          disabled={!dirty && !hasRun}
+          onClick={handleReset}
+          className="doc-live-reset"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            background: 'transparent',
+            // Disabled still reads (meta, dashed edge), it just does nothing until the code changes or runs.
+            color: dirty || hasRun ? 'var(--c-purple)' : 'var(--c-meta)',
+            border: '1px solid var(--c-line)',
+            borderRadius: 4,
+            padding: '4px 10px',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            cursor: dirty || hasRun ? 'pointer' : 'default',
+          }}
+        >
+          <RotateCcw size={12} /> Reset
+        </button>
+      </div>
     </div>
   );
 }
