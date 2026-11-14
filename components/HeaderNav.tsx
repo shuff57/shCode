@@ -160,14 +160,9 @@ export default function HeaderNav() {
         <Link href="/teacher?view=gradebook" style={{ color: 'var(--header-fg)' }} {...cur('gradebook')}>Gradebook</Link>
       )}
 
-      {/* Students only get two extra links — not worth a dropdown for two.
-          Students get the anonymised queue at /issues, staff get the triage
-          page above (a different route, kept separate deliberately). Without
-          this link the only way in is the one-off link shown after filing a
-          report, which is not visibility. */}
-      {loaded && user?.role === 'student' && (
-        <Link href="/issues" style={{ color: 'var(--header-fg)' }} {...cur('issues')}>Issues</Link>
-      )}
+      {/* Issues left the top bar on 2026-11-14 (owner's decision): students reach the anonymised
+          queue at /issues from the envelope's Issues tab and the /messages page (components/IssuesTab.tsx,
+          components/MessagesPage.tsx); staff keep Teach -> Issues above as well. */}
       {/* The student's own gradebook. Until 2026-09-02 /progress was linked
           from NOWHERE in the app — the score table, the due dates and the
           teacher's override comments all rendered on a page reachable only by
@@ -195,7 +190,7 @@ export default function HeaderNav() {
         <AuthButton />
       </nav>
       {/* #112: what classmates did on your games and proposed changes. Outside <nav> so a phone shows it too. */}
-      <NotificationBell enabled={!!user} />
+      <NotificationBell enabled={!!user} staff={isStaff} />
     </div>
   );
 }

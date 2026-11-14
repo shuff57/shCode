@@ -71,6 +71,21 @@ export function sendReply(threadId: string, body: string, share?: OutgoingShare)
   return ask<ThreadView>(`/api/messages/${encodeURIComponent(threadId)}`, post({ body, share }));
 }
 
+/** A group of people of one class (migration 0055). */
+export function createGroup(classId: string, people: string[], title: string): Promise<Result<ThreadView>> {
+  return ask<ThreadView>('/api/messages', post({ classId, create: 'group', people, title }));
+}
+
+/** A channel for the whole class. */
+export function createChannel(classId: string, name: string): Promise<Result<ThreadView>> {
+  return ask<ThreadView>('/api/messages', post({ classId, create: 'channel', name }));
+}
+
+/** Rename, add people, leave, lock, unlock, delete, remove or restore a message (see functions/api/messages/[id].ts). */
+export function manageThread<T = ThreadView>(id: string, action: string, extra: Record<string, unknown> = {}): Promise<Result<T>> {
+  return ask<T>(`/api/messages/${encodeURIComponent(id)}`, post({ action, ...extra }));
+}
+
 export function fetchShare(id: string): Promise<Result<ShareView>> {
   return ask<ShareView>(`/api/shares/${encodeURIComponent(id)}`);
 }

@@ -93,7 +93,9 @@ check('a student messages a classmate; the answer is the conversation, marked as
 r = await count(BEN);
 check('the classmate has one unread conversation', r.body.unread === 1);
 r = await list(BEN);
-check("the classmate's list shows it, unread, with the first words", r.body.threads.length === 1 && r.body.threads[0].unread && /lunch/.test(r.body.threads[0].last.snippet) && r.body.threads[0].other.name === 'Ana L.');
+// (Every class also lists its #general channel, migration 0055.)
+const benOwn = r.body.threads.filter((t) => t.kind !== 'channel');
+check("the classmate's list shows it, unread, with the first words", benOwn.length === 1 && benOwn[0].unread && /lunch/.test(benOwn[0].last.snippet) && benOwn[0].other.name === 'Ana L.');
 r = await open(BEN, AB);
 check('opening it shows the message and the conversation can be answered', r.status === 200 && r.body.canSend && r.body.messages[0].author === 'Ana L.' && !r.body.messages[0].mine);
 r = await count(BEN);
@@ -140,7 +142,7 @@ check('nothing refused was stored', r.body.messages.length === 3);
 r = await act(T1, 'C1', { action: 'messages-off' });
 check('the teacher turns messages between classmates off', r.status === 200 && r.body.studentMessagesOn === false);
 r = await reply(ANA, AB, 'still there?');
-check('an existing conversation between classmates is closed (403, plain reason)', r.status === 403 && r.body.why === 'class-off' && /turned off/.test(r.body.error));
+check('an existing conversation between classmates is closed (403, plain reason)', r.status === 403 && r.body.why === 'class-off' && /teacher only/.test(r.body.error));
 r = await open(ANA, AB);
 check('...it can still be read, and says why it cannot be answered', r.status === 200 && !r.body.canSend && /message your teacher/.test(r.body.whyText));
 r = await reply(ANA, AT, 'Thanks!');

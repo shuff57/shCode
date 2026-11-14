@@ -14,10 +14,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Send } from 'lucide-react';
 import {
-  LANG_LABEL, MESSAGE_MAX, WATCHED_NOTE, blockText, cleanMessage, cleanShareCode,
-  type PeopleClass, type ShareLang,
+  GROUP_NOTE, LANG_LABEL, MESSAGE_MAX, WATCHED_NOTE, blockText, channelNote, cleanMessage, cleanShareCode,
+  type PeopleClass, type ShareLang, type ThreadSummary,
 } from '../lib/messages-core';
-import { fetchPeople, sendNew, type OutgoingShare } from '../lib/messages-client';
+import { fetchPeople, fetchThreads, sendNew, sendReply, type OutgoingShare } from '../lib/messages-client';
 
 export interface SendProgramButtonProps {
   lang: ShareLang;
@@ -37,6 +37,8 @@ const field: React.CSSProperties = {
 export default function SendProgramButton({ lang, chipStyle, getCode, title, session }: SendProgramButtonProps) {
   const [open, setOpen] = useState(false);
   const [classes, setClasses] = useState<PeopleClass[] | null>(null);
+  // Groups and channels (migration 0055) are places to send to as well; an invitation goes to people only.
+  const [places, setPlaces] = useState<ThreadSummary[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [classId, setClassId] = useState('');
   const [to, setTo] = useState('');
@@ -56,14 +58,20 @@ export default function SendProgramButton({ lang, chipStyle, getCode, title, ses
       setClasses(r.value);
       if (r.value.length) setClassId(r.value[0].id);
     });
+    void fetchThreads().then((r) => { if (r.ok) setPlaces(r.value.filter((t) => t.kind === 'group' || t.kind === 'channel')); });
   }, [open, classes]);
 
   const cls = classes?.find((c) => c.id === classId) ?? null;
   const people = useMemo(() => cls?.people ?? [], [cls]);
   const person = people.find((p) => p.key === to) ?? null;
+  const here = useMemo(() => places.filter((t) => t.classId === classId), [places, classId]);
+  const place = to.startsWith('t:') ? here.find((t) => `t:${t.id}` === to) ?? null : null;
+  const target = person ?? place;
+  // An invitation is for people: not a whole channel.
+  useEffect(() => { if (place?.kind === 'channel' && kind !== 'copy') setKind('copy'); }, [place, kind]);
 
   const send = async () => {
-    if (busy || !cls || !person) return;
+    if (busy || !cls || !target) return;
     setError(null);
     let share: OutgoingShare;
     if (kind === 'together' || kind === 'watch') {
@@ -81,10 +89,11 @@ export default function SendProgramButton({ lang, chipStyle, getCode, title, ses
       body = c.body;
     }
     setBusy(true);
-    const r = await sendNew(cls.id, person.key, body, share);
+    const r = person ? await sendNew(cls.id, person.key, body, share) : await sendReply(place!.id, body, share);
     setBusy(false);
     if (!r.ok) { setError(r.error); return; }
-    setSent(`Sent to ${person.name}${person.name.endsWith('.') ? '' : '.'} It is in your messages too (the envelope at the top).`);
+    const name = person ? person.name : place!.kind === 'channel' ? `#${place!.title}` : place!.title;
+    setSent(`Sent to ${name}${name.endsWith('.') ? '' : '.'} It is in your messages too (the envelope at the top).`);
     setNote('');
     setTo('');
   };
@@ -118,14 +127,14 @@ export default function SendProgramButton({ lang, chipStyle, getCode, title, ses
                   <span>A copy of it as it is now. They can run it and remix it, but not change yours.</span>
                 </label>
                 <label style={{ display: 'flex', gap: 6, alignItems: 'flex-start', cursor: session ? 'pointer' : 'default', color: session ? 'var(--c-fg)' : 'var(--c-dim)' }}>
-                  <input type="radio" name="send-kind" checked={kind === 'together'} disabled={!session} onChange={() => setKind('together')} data-testid="send-kind-together" />
+                  <input type="radio" name="send-kind" checked={kind === 'together'} disabled={!session || place?.kind === 'channel'} onChange={() => setKind('together')} data-testid="send-kind-together" />
                   <span>
                     An invitation to your Code together session, to write it with you.
                     {!session && ' Start Code together first to invite someone.'}
                   </span>
                 </label>
                 <label style={{ display: 'flex', gap: 6, alignItems: 'flex-start', cursor: session ? 'pointer' : 'default', color: session ? 'var(--c-fg)' : 'var(--c-dim)' }}>
-                  <input type="radio" name="send-kind" checked={kind === 'watch'} disabled={!session} onChange={() => setKind('watch')} data-testid="send-kind-watch" />
+                  <input type="radio" name="send-kind" checked={kind === 'watch'} disabled={!session || place?.kind === 'channel'} onChange={() => setKind('watch')} data-testid="send-kind-watch" />
                   <span>An invitation to watch your session live, as you type. They cannot change it.</span>
                 </label>
               </fieldset>
@@ -140,12 +149,26 @@ export default function SendProgramButton({ lang, chipStyle, getCode, title, ses
               <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--c-meta)' }}>
                 To
                 <select value={to} onChange={(e) => { setTo(e.target.value); setSent(null); }} style={{ ...field, flex: 1, minWidth: 0 }} data-testid="send-program-to">
-                  <option value="">Choose a person…</option>
-                  {people.map((p) => <option key={p.key} value={p.key}>{p.name}{p.teacher && p.name !== 'Teacher' ? ' (teacher)' : ''}</option>)}
+                  <option value="">Choose a person, group or channel…</option>
+                  <optgroup label="People">
+                    {people.map((p) => <option key={p.key} value={p.key}>{p.name}{p.teacher && p.name !== 'Teacher' ? ' (teacher)' : ''}</option>)}
+                  </optgroup>
+                  {here.some((t) => t.kind === 'group') && (
+                    <optgroup label="Groups">
+                      {here.filter((t) => t.kind === 'group').map((t) => <option key={t.id} value={`t:${t.id}`}>{t.title}</option>)}
+                    </optgroup>
+                  )}
+                  {here.some((t) => t.kind === 'channel') && (
+                    <optgroup label="Channels">
+                      {here.filter((t) => t.kind === 'channel').map((t) => <option key={t.id} value={`t:${t.id}`}>#{t.title}{t.locked ? ' (teachers only)' : ''}</option>)}
+                    </optgroup>
+                  )}
                 </select>
               </label>
               {cls.classmatesBlocked && <p style={{ margin: 0, fontSize: 12, color: 'var(--c-meta)' }}>{blockText(cls.classmatesBlocked, '', cls.name)}</p>}
               {person && !person.teacher && !cls.teaches && <p style={{ margin: 0, fontSize: 12, color: 'var(--c-meta)' }}>{WATCHED_NOTE}</p>}
+              {place && <p style={{ margin: 0, fontSize: 12, color: 'var(--c-meta)' }}>{place.kind === 'channel' ? channelNote(cls.name) : GROUP_NOTE}</p>}
+              {place?.kind === 'channel' && session && <p style={{ margin: 0, fontSize: 12, color: 'var(--c-meta)' }}>An invitation goes to people or a group, not a whole channel.</p>}
               <label htmlFor="send-program-note" className="sr-only">A note with it (you can leave it empty)</label>
               <textarea id="send-program-note" value={note} rows={2} maxLength={MESSAGE_MAX + 50}
                 placeholder="A note with it (you can leave it empty)"
@@ -155,11 +178,11 @@ export default function SendProgramButton({ lang, chipStyle, getCode, title, ses
               {sent && <p role="status" style={{ margin: 0, fontSize: 12, color: 'var(--c-green)' }}>{sent}</p>}
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
                 <button type="button" onClick={() => setOpen(false)} style={{ ...chipStyle }}>Close</button>
-                <button type="button" onClick={() => void send()} disabled={busy || !person} data-testid="send-program-send"
+                <button type="button" onClick={() => void send()} disabled={busy || !target} data-testid="send-program-send"
                   style={{
                     ...chipStyle, fontWeight: 600, border: '1px solid transparent',
-                    background: busy || !person ? 'var(--c-deep)' : 'var(--brand)',
-                    color: busy || !person ? 'var(--c-dim)' : 'var(--on-brand)', cursor: busy || !person ? 'default' : 'pointer',
+                    background: busy || !target ? 'var(--c-deep)' : 'var(--brand)',
+                    color: busy || !target ? 'var(--c-dim)' : 'var(--on-brand)', cursor: busy || !target ? 'default' : 'pointer',
                   }}>
                   {busy ? 'Sending…' : `Send ${kind === 'copy' ? `${LANG_LABEL[lang]} copy` : 'invitation'}`}
                 </button>

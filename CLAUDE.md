@@ -912,6 +912,38 @@ messages. Tests: `scripts/test-messages.mjs` (real handlers, npm test). Dev: `DE
 dev`, two `dev_student` cookies are two classmates (a dev student joins the dev class on its first API call).
 Deploy: apply 0053 (`npm run d1:migrate`) before the site.
 
+### Groups, channels, messaging levels, Messages page (migration 0055, 2026-11-14)
+Owner's decisions 2026-11-14: Discord-like groups and channels, in the envelope's dropdown AND a full page;
+students and teachers make groups; anyone makes channels (teachers lock/rename/delete); three levels. A conversation
+(`message_threads.kind`) is now `teacher` | `students` (two people, as before) | `group` (2-8 people of one class,
+`GROUP_MAX_PEOPLE`, its people are its `message_members`, optional `title` else shown as its people's names,
+`pair_key` `group|<id>`) | `channel` (the whole class reads and, unless `locked`, posts; `pair_key`
+`channel|<class>|<name>` so names are unique per class; names tidied Discord-style by `cleanChannelName`; #general is
+made for every class the first time anyone lists (`ensureGeneral`) and can be locked but not renamed or deleted; a
+channel's `message_members` rows only hold `read_at`, made on open or post by `touchMember`). **Levels** for a STUDENT,
+per class (`classes.student_messages_off`, now 0/1/2) and per student (`class_message_mutes.level`, 0055); the stricter
+wins (`postBlock` in `functions/_shared/messages.ts`): 0 On; 1 Teacher only (a direct message to a teacher of the
+class, nothing else: no classmates, groups or channels; what the 0053 switch and pause meant); 2 Off (nothing, not
+even to the teacher; reading stays). Teachers are never limited. **Who reads** is ONE function, `threadAccess`: two
+people (plus the class's teachers between two students), a group's people plus the class's teachers (as onlookers who
+cannot post), a channel everyone in the class now; everything else is 404. The class's teachers (`moderate`) remove
+and put back messages in student conversations, groups and channels and still see the words; they lock, unlock,
+rename and delete channels and delete groups (`POST /api/messages/[id] {action}`); a group's people rename it, add
+people, leave it (the last one out deletes it); a channel's maker may rename it. A conversation opens on its newest
+200 messages (`THREAD_VIEW_LIMIT`); a channel holds 10,000 (`MESSAGES_PER_CHANNEL`). Students make at most 10 groups
+and channels a day, a class has at most 30 channels. **The envelope count** counts two-person conversations and groups;
+a channel with news is shown bold in the list instead. Routes: `POST /api/messages {classId, create: 'group' | 'channel'}`;
+`GET /api/messages` lists channels (per class) then the rest; `?people=1` lists nobody with `allBlocked` when Off.
+Teacher panel (`ClassMessages.tsx`): a level menu for the class and one per student, groups listed with conversations;
+`POST /api/classes/[id]/messages {action: 'class-level' | 'student-level', level}` (0053's `messages-off/on` and
+`mute/unmute` still work as levels 1/0). UI: `components/Mailbox.tsx` holds the list (`ConversationList`: each class's
+channels, Groups, Direct messages), the conversation (`ThreadPane`, with the group/channel tools and the teacher's
+Remove), and New message/group/channel; the dropdown uses them and links the full page `/messages` (`?c=<id>`,
+`components/MessagesPage.tsx`, two columns, one at a time under 760 px). **Issues left the top bar**: the envelope has
+an Issues tab (`components/IssuesTab.tsx`) and /messages links Issues; staff keep Teach -> Issues. Programs: a copy may
+go into a group or channel ("Send to..." lists them); an invitation (Code together, Watch live) only to a person or a
+group. Tests: `scripts/test-chat-groups.mjs` (npm test). Deploy: apply 0055 before the site.
+
 ### Programs sent in messages: copy, Code together, Watch live (migration 0054, 2026-11-14)
 The sandbox's Share menu has **Send to...** (`components/SendProgramButton.tsx`, JavaScript and moSHion modes, signed
 in and in a class): pick a person (same list and rules as New message), an optional note, and one of three kinds, stored

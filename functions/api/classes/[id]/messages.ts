@@ -1,9 +1,13 @@
-// GET  /api/classes/[id]/messages            — the class's switch, its students (muted or not) and every
-//                                              conversation between two of its students, newest first
+// GET  /api/classes/[id]/messages            — the class's level, its students (each with their own level)
+//                                              and every conversation between two of its students and every
+//                                              group of the class, newest first
 // GET  /api/classes/[id]/messages?thread=<id> — one of those conversations, removed messages included
 //                                              (marked; their words stay readable to the class's teachers)
-// POST /api/classes/[id]/messages  { action: 'messages-off' | 'messages-on' }
-//                                  { action: 'mute' | 'unmute', student: <person key> }
+// POST /api/classes/[id]/messages  { action: 'class-level', level: 0 | 1 | 2 }   (migration 0055)
+//                                  { action: 'student-level', student: <person key>, level: 0 | 1 | 2 }
+//                                  levels: 0 On, 1 Teacher only, 2 Off; the stricter of class and student wins
+//                                  (still understood: 'messages-off' | 'messages-on' = class 1 | 0,
+//                                   'mute' | 'unmute' = student 1 | 0)
 //                                  { action: 'remove' | 'restore', messageId }
 //
 // Migration 0053. Owner, co-teacher or admin only. A teacher reads every conversation between two
@@ -17,7 +21,7 @@ import { canManageClass } from '../../../_shared/classAuth';
 import {
   classPeople, emailForKey, json, personKeys, threadShares, threadWithMembers, threadMessages, type SessionData,
 } from '../../../_shared/messages';
-import { isPersonKey, isThreadId, shareSnippet, snippetOf, type ShareKind } from '../../../../lib/messages-core';
+import { groupLabel, isLevel, isPersonKey, isThreadId, shareSnippet, snippetOf, type MessageLevel, type ShareKind } from '../../../../lib/messages-core';
 
 interface Env {
   DB: D1Database;
@@ -33,7 +37,7 @@ async function allowed(env: Env, data: SessionData, classId: string): Promise<Re
 }
 
 interface ThreadListRow {
-  id: string; last_at: number; created_at: number; names: string | null; n: number;
+  id: string; kind: string; title: string; last_at: number; created_at: number; names: string | null; n: number;
   m_body: string | null; m_at: number | null; m_deleted: number | null; m_author: string | null;
   m_share_kind: ShareKind | null; m_share_title: string | null;
 }
@@ -42,10 +46,11 @@ async function overview(env: Env, classId: string) {
   const cls = await env.DB.prepare(`SELECT student_messages_off FROM classes WHERE id = ?`).bind(classId).first<{ student_messages_off: number | null }>();
   const people = (await classPeople(env.DB, classId)).filter((p) => !p.teacher);
   const keys = await personKeys(env.DB, people.map((p) => p.email));
-  const muted = new Set(((await env.DB.prepare(`SELECT student_email FROM class_message_mutes WHERE class_id = ?`).bind(classId)
-    .all<{ student_email: string }>()).results ?? []).map((r) => r.student_email));
+  const levels = new Map(((await env.DB.prepare(`SELECT student_email, level FROM class_message_mutes WHERE class_id = ?`).bind(classId)
+    .all<{ student_email: string; level: number }>()).results ?? []).map((r) => [r.student_email, toLevel(r.level)]));
+  const level = toLevel(cls?.student_messages_off);
   const rows = (await env.DB.prepare(
-    `SELECT t.id, t.last_at, t.created_at,
+    `SELECT t.id, t.kind, t.title, t.last_at, t.created_at,
             (SELECT GROUP_CONCAT(name, '|') FROM (SELECT name FROM message_members WHERE thread_id = t.id ORDER BY name)) AS names,
             (SELECT COUNT(*) FROM messages WHERE thread_id = t.id) AS n,
             x.body AS m_body, x.created_at AS m_at, x.deleted_at AS m_deleted,
@@ -54,14 +59,21 @@ async function overview(env: Env, classId: string) {
        FROM message_threads t
        LEFT JOIN messages x ON x.id = (SELECT y.id FROM messages y WHERE y.thread_id = t.id ORDER BY y.created_at DESC, y.rowid DESC LIMIT 1)
        LEFT JOIN message_shares xs ON xs.message_id = x.id
-      WHERE t.class_id = ? AND t.kind = 'students'
+      WHERE t.class_id = ? AND t.kind IN ('students', 'group')
       ORDER BY t.last_at DESC LIMIT 200`,
   ).bind(classId).all<ThreadListRow>()).results ?? [];
   return {
-    studentMessagesOn: !cls?.student_messages_off,
-    students: people.flatMap((p) => (keys.has(p.email) ? [{ key: keys.get(p.email)!, name: p.name, muted: muted.has(p.email) }] : [])),
+    level,
+    studentMessagesOn: level === 0,
+    students: people.flatMap((p) => {
+      if (!keys.has(p.email)) return [];
+      const own = levels.get(p.email) ?? 0;
+      return [{ key: keys.get(p.email)!, name: p.name, level: own, muted: own > 0 }];
+    }),
     threads: rows.map((r) => ({
       id: r.id,
+      kind: r.kind === 'group' ? 'group' : 'students',
+      title: r.kind === 'group' ? groupLabel(r.title, (r.names ?? '').split('|').filter(Boolean)) : '',
       people: (r.names ?? '').split('|').filter(Boolean),
       count: r.n,
       lastAt: r.last_at,
@@ -75,11 +87,13 @@ async function overview(env: Env, classId: string) {
   };
 }
 
-/** A conversation this teacher may read on this page: in this class, and between two students (or the teacher is in it). */
+const toLevel = (n: unknown): MessageLevel => (Number(n) >= 2 ? 2 : Number(n) >= 1 ? 1 : 0);
+
+/** A conversation this teacher may read on this page: in this class, and not another teacher's own two-person one. */
 async function readableThread(env: Env, data: SessionData, classId: string, threadId: string) {
   const t = await threadWithMembers(env.DB, threadId);
   if (!t || t.thread.class_id !== classId) return null;
-  if (t.thread.kind !== 'students' && !t.members.some((m) => m.email === data.email)) return null;
+  if (t.thread.kind === 'teacher' && !t.members.some((m) => m.email === data.email)) return null;
   return t;
 }
 
@@ -121,23 +135,31 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async ({ par
   const classId = String(params.id);
   const refused = await allowed(env, data, classId);
   if (refused) return refused;
-  let body: { action?: unknown; student?: unknown; messageId?: unknown };
+  let body: { action?: unknown; student?: unknown; messageId?: unknown; level?: unknown };
   try { body = await request.json(); } catch { return json({ error: 'Invalid JSON body' }, 400); }
   const now = Date.now();
 
-  if (body.action === 'messages-off' || body.action === 'messages-on') {
-    await env.DB.prepare(`UPDATE classes SET student_messages_off = ? WHERE id = ?`).bind(body.action === 'messages-off' ? 1 : 0, classId).run();
+  // The older names (0053's switch and pause) still work: they are levels 1 and 0.
+  if (body.action === 'messages-off' || body.action === 'messages-on') { body.level = body.action === 'messages-off' ? 1 : 0; body.action = 'class-level'; }
+  if (body.action === 'mute' || body.action === 'unmute') { body.level = body.action === 'mute' ? 1 : 0; body.action = 'student-level'; }
+
+  if (body.action === 'class-level') {
+    if (!isLevel(body.level)) return json({ error: 'Choose On, Teacher only or Off.' }, 400);
+    await env.DB.prepare(`UPDATE classes SET student_messages_off = ? WHERE id = ?`).bind(body.level, classId).run();
     return json(await overview(env, classId));
   }
 
-  if (body.action === 'mute' || body.action === 'unmute') {
+  if (body.action === 'student-level') {
+    if (!isLevel(body.level)) return json({ error: 'Choose On, Teacher only or Off.' }, 400);
     if (!isPersonKey(body.student)) return json({ error: 'Choose a student.' }, 400);
     const email = await emailForKey(env.DB, body.student);
     const enrolled = email && (await classPeople(env.DB, classId)).some((p) => p.email === email && !p.teacher);
     if (!email || !enrolled) return json({ error: 'That student is not in this class.' }, 404);
-    if (body.action === 'mute') {
-      await env.DB.prepare(`INSERT OR IGNORE INTO class_message_mutes (class_id, student_email, muted_at, muted_by) VALUES (?, ?, ?, ?)`)
-        .bind(classId, email, now, data.email).run();
+    if (body.level > 0) {
+      await env.DB.prepare(
+        `INSERT INTO class_message_mutes (class_id, student_email, muted_at, muted_by, level) VALUES (?, ?, ?, ?, ?)
+         ON CONFLICT (class_id, student_email) DO UPDATE SET level = excluded.level, muted_at = excluded.muted_at, muted_by = excluded.muted_by`,
+      ).bind(classId, email, now, data.email, body.level).run();
     } else {
       await env.DB.prepare(`DELETE FROM class_message_mutes WHERE class_id = ? AND student_email = ?`).bind(classId, email).run();
     }

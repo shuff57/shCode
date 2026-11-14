@@ -6,8 +6,9 @@
 // the list; clicking an item opens that conversation or game, scrolled to the comment.
 // Items: GET /api/notifications. Words and the unread rule: lib/game-notices-core.ts. Store: lib/game-notices.ts.
 //
-// It is also the mailbox (migration 0053): a Messages tab (components/Mailbox.tsx) beside the Activity
-// tab above. The count on the icon adds both. The message count is asked for every 30 s while the tab
+// It is also the mailbox (migration 0053): a Messages tab (components/Mailbox.tsx; groups and channels
+// since 0055, and a link to the full /messages page), an Issues tab (components/IssuesTab.tsx; Issues left
+// the top bar on 2026-11-14) and the Activity tab above. The count on the icon adds both. The message count is asked for every 30 s while the tab
 // is visible, and when it comes back into view (lib/messages-client.ts).
 
 import { useEffect, useRef, useState } from 'react';
@@ -19,10 +20,11 @@ import {
 } from '../lib/game-notices';
 import { ownedLocal } from '../lib/owned-storage';
 import Mailbox from './Mailbox';
+import IssuesTab from './IssuesTab';
 import { MESSAGES_CHANGED, messageUnread, refreshMessageCount } from '../lib/messages-client';
 import { COUNT_POLL_MS } from '../lib/messages-core';
 
-type Tab = 'messages' | 'activity';
+type Tab = 'messages' | 'issues' | 'activity';
 
 function when(ms: number): string {
   const d = Date.now() - ms;
@@ -33,7 +35,8 @@ function when(ms: number): string {
   return new Date(ms).toLocaleDateString();
 }
 
-export default function NotificationBell({ enabled }: { enabled: boolean }) {
+/** `staff`: a teacher or admin (the Issues tab leads to the triage page). */
+export default function NotificationBell({ enabled, staff = false }: { enabled: boolean; staff?: boolean }) {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<NoticeItem[] | null>(null);
   const [unread, setUnread] = useState(0);
@@ -140,12 +143,16 @@ export default function NotificationBell({ enabled }: { enabled: boolean }) {
             <button type="button" role="tab" aria-selected={tab === 'messages'} onClick={() => setTab('messages')} data-testid="mailbox-tab-messages" style={tabStyle(tab === 'messages')}>
               Messages{badge(mail)}
             </button>
+            <button type="button" role="tab" aria-selected={tab === 'issues'} onClick={() => setTab('issues')} data-testid="mailbox-tab-issues" style={tabStyle(tab === 'issues')}>
+              Issues
+            </button>
             <button type="button" role="tab" aria-selected={tab === 'activity'} onClick={() => setTab('activity')} data-testid="mailbox-tab-activity" style={tabStyle(tab === 'activity')}>
               Activity{badge(unread)}
             </button>
           </div>
 
           {tab === 'messages' && <Mailbox active={open} />}
+          {tab === 'issues' && <IssuesTab active={open} staff={staff} />}
 
           {tab === 'activity' && (<>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderBottom: '1px solid var(--c-line)' }}>

@@ -49,6 +49,43 @@ export interface WhatsNewEntry {
 
 export const WHATS_NEW: WhatsNewEntry[] = [
   {
+    id: '2026-11-groups-channels',
+    date: '2026-11-14',
+    audience: 'student',
+    title: 'Group chats and class channels',
+    summary:
+      'Messages now has groups and channels, like Discord. Make a group with up to 8 people from your class, or post in your class’s channels. ' +
+      'Messages is also a full page now, and Issues moved into the envelope. Your teacher can read groups and channels.',
+    steps: [
+      'Click the envelope, then Group or Channel to make one. Every class has #general.',
+      'Pick the people (for a group) or a name (for a channel), then press Make.',
+      'The arrows button at the top of the envelope opens Messages as a full page.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-groups-channels.mp4',
+      poster: '/whats-new/2026-11-groups-channels.jpg',
+      alt: "Sam makes a group called Maze team with Alex and writes 'Who wants to build the maze?'. On Alex's screen the envelope shows 1, and Alex opens the Maze team group and sees Sam's message.",
+    },
+  },
+  {
+    id: '2026-11-message-levels',
+    date: '2026-11-14',
+    audience: 'teacher',
+    title: 'Groups, channels, and turning messages off',
+    summary:
+      'Students can now make group chats and class channels. On the class page’s Messages panel, set student messages for the whole class, or for one student: ' +
+      'On, Teacher only (they can only message you), or Off (they can read but not send). Lock or delete channels from your mailbox.',
+    steps: [
+      'Open your class, then the Students tab, and scroll to Messages.',
+      'Choose On, Teacher only or Off for the class, or next to one student.',
+      'Groups are listed there to read; channels are in your envelope and on the Messages page.',
+    ],
+    media: {
+      poster: '/whats-new/2026-11-message-levels.jpg',
+      alt: "The Messages panel on the class page: a menu for student messages in the class set to On, and a menu next to each student, one of them set to Off, above the class's conversations and groups.",
+    },
+  },
+  {
     id: '2026-11-send-program',
     date: '2026-11-14',
     audience: 'student',

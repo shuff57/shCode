@@ -349,6 +349,65 @@ const RECIPES = {
     },
   },
 
+  '2026-11-groups-channels': {
+    people: [SAM, ALEX],
+    path: '/',
+    async setup({ person }) {
+      const t = await person(TEACHER, '/');
+      await t.page.evaluate(() => fetch('/api/classes/dev-class/messages', {
+        method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'class-level', level: 0 }),
+      }));
+    },
+    async before({ pages: [ps, pa] }) {
+      // Alex has to be in the dev class before Sam looks for him (any API call puts a dev student there).
+      await pa.evaluate(() => fetch('/api/messages?count=1', { credentials: 'same-origin' }));
+      // The group form open with Alex ticked and a name: the clip is making it and Alex getting it.
+      await ps.getByTestId('notification-bell').click();
+      await ps.getByTestId('mailbox-new-group').click();
+      await ps.getByTestId('group-title').fill('Maze team');
+      const alexBox = ps.locator('label').filter({ hasText: /alex/i }).getByTestId('group-person');
+      await alexBox.waitFor({ timeout: 30000 });
+      await alexBox.check();
+    },
+    async run({ demos: [sam, alex], pages: [ps, pa] }) {
+      await sam.pause(600);
+      await sam.click(ps.getByTestId('group-create'), { ms: 350, after: 300 });
+      await ps.getByTestId('mailbox-compose').waitFor({ timeout: 20000 });
+      await sam.type('Who wants to build the maze?', 28);
+      await sam.click(ps.getByTestId('mailbox-send'), { ms: 300, after: 300 });
+      await pa.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
+      await pa.getByTestId('notification-count').waitFor({ timeout: 10000 });
+      await alex.click(pa.getByTestId('notification-bell'), { ms: 350, after: 400 });
+      await alex.click(pa.locator('[data-testid=mailbox-thread][data-kind=group]').first(), { ms: 350, after: 300 });
+      await pa.getByTestId('mailbox-message').first().waitFor({ timeout: 10000 });
+      await alex.pause(1800);
+    },
+  },
+
+  '2026-11-message-levels': {
+    people: [TEACHER],
+    path: '/teacher/?class=dev-class&tab=students',
+    posterOnly: true,
+    async setup({ person }) {
+      const l = await person(LEO, '/');
+      await l.page.evaluate(() => fetch('/api/messages?count=1', { credentials: 'same-origin' }));
+      const t = await person(TEACHER, '/');
+      await t.page.evaluate(async () => {
+        const post = (body) => fetch('/api/classes/dev-class/messages', {
+          method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+        }).then((r) => r.json());
+        const o = await post({ action: 'class-level', level: 0 });
+        const leo = o.students.find((s) => /leo/i.test(s.name));
+        if (leo) await post({ action: 'student-level', student: leo.key, level: 2 });
+      });
+    },
+    async run({ demos: [t], pages: [p] }) {
+      await p.getByTestId('class-messages-level').waitFor({ timeout: 60000 });
+      await t.scrollTo(p.getByTestId('class-messages-level'), 600);
+      await t.pause(800);
+    },
+  },
+
   '2026-11-send-program': {
     people: [SAM, ALEX],
     path: '/sandbox/',
