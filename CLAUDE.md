@@ -889,6 +889,29 @@ cookie; no binding = 503, never a half-working room. Dev: `scripts/dev-live.mjs`
 `npx wrangler dev -c wrangler.test.toml` in workers/live/, local only). Deploy order: apply 0043, `wrangler deploy` in
 workers/live/, then the site (its wrangler.toml declares the `LIVE` binding with `script_name = "shcode-live"`).
 
+### Messages (migration 0053, 2026-11-13)
+Person-to-person messages inside shCode, no outside service (owner's decision: small and in-app, not a separate chat
+server). A conversation is between TWO people in ONE class (`message_threads.pair_key` = class + both emails sorted, so
+a second "New message" reopens it): a student and a teacher of the class (always allowed, both ways, a paused student
+too), or two students enrolled in it (unless `classes.student_messages_off`, or the writer is in `class_message_mutes`).
+**The class's teachers read every conversation between two of its students** and students are told so above each one
+(`WATCHED_NOTE`); a student-teacher conversation is read by those two only. Every rule is `sendRule()` in
+`functions/_shared/messages.ts`, re-checked on every message. Words: `cleanMessage()` in `lib/messages-core.ts` (1000
+characters, 30 lines, no control characters, and `findPII` from `lib/pii-check.ts`, refused with a plain reason;
+also run in the browser before sending). Caps for students: 10 a minute, 200 a day; 2000 per conversation. People are
+named first name + last initial (a teacher with no name on file is "Teacher"); the page never gets an email: a person is
+addressed by a random public key (`person_keys`, `p` + 20 hex). A teacher's Remove sets `messages.deleted_at`
+(students see "Removed by a teacher", never the words; teachers still see them, struck through; Put back undoes it).
+Routes: `GET|POST /api/messages` (`?count=1` the unread count, `?people=1` whom the caller may write to),
+`GET|POST /api/messages/[id]` (GET marks it read), `GET|POST /api/classes/[id]/messages` (owner, co-teacher, admin:
+the switch, mute/unmute, the students-only conversations, `?thread=`, remove/restore; reading there marks nothing read).
+UI: the header envelope (`components/NotificationBell.tsx`) has Messages (`components/Mailbox.tsx`) and Activity tabs;
+its count adds both; the count is asked every 30 s while visible and on tab focus, an open conversation every 10 s
+(polling, no WebSocket). Teacher panel: `components/ClassMessages.tsx`, Students tab. Deleting a class deletes its
+messages. Tests: `scripts/test-messages.mjs` (real handlers, npm test). Dev: `DEV_REAL_DB=1 DEV_ROLE=teacher npm run
+dev`, two `dev_student` cookies are two classmates (a dev student joins the dev class on its first API call).
+Deploy: apply 0053 (`npm run d1:migrate`) before the site.
+
 ### Code together (migration 0044; not deployed yet)
 2-4 classmates edit ONE sandbox program at once (spec: `codehs-review/REALTIME-SPEC.md` Part 2). Sandbox only, the
 JavaScript and moSHion modes, never a lesson. The toolbar's **Code together** button (signed in and in a class, from

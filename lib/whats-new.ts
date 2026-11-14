@@ -49,6 +49,45 @@ export interface WhatsNewEntry {
 
 export const WHATS_NEW: WhatsNewEntry[] = [
   {
+    id: '2026-11-messages',
+    date: '2026-11-13',
+    audience: 'student',
+    title: 'Messages: write to your teacher and classmates',
+    summary:
+      'The envelope at the top of every page is now your mailbox. Send a message to your teacher or to a classmate, and read their replies there. ' +
+      'Your teacher can read messages between classmates, and messages with phone numbers, addresses or emails are not sent.',
+    steps: [
+      'Click the envelope at the top right, then New message.',
+      'Pick a person from your class, type your message and press Enter to send it.',
+      'A number on the envelope means someone wrote to you. Click it to read and reply.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-messages.mp4',
+      poster: '/whats-new/2026-11-messages.jpg',
+      alt: "Sam opens the mailbox, picks Alex and sends 'Build a game together after lunch?'. On Alex's screen a 1 appears on the envelope, and Alex's mailbox shows Sam's new message.",
+    },
+  },
+  {
+    id: '2026-11-class-messages',
+    date: '2026-11-13',
+    audience: 'teacher',
+    title: 'Messages with your students',
+    summary:
+      'Students can message you and their classmates from the envelope at the top of every page. ' +
+      "Your class page's Messages panel lists every conversation between two of your students: read them, remove a message, pause a student, " +
+      'or turn classmate messages off.',
+    steps: [
+      'Open a class, then the Students tab, and scroll to Messages.',
+      'Press Read on a conversation. Remove hides a message from students ("Removed by a teacher"); Put back undoes it.',
+      'Untick "Students can message classmates" to turn it off. Students can still message you.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-class-messages.mp4',
+      poster: '/whats-new/2026-11-class-messages.jpg',
+      alt: "The class page's Messages panel: the teacher reads a conversation between Maya and Leo, removes one message, then turns messages between classmates off.",
+    },
+  },
+  {
     id: '2026-11-texture-one-name',
     date: '2026-11-13',
     audience: 'student',

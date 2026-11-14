@@ -310,7 +310,67 @@ function draw() {
 }
 `;
 
+// Messages (migration 0053): one student sends a classmate a message through the API, for the teacher clip.
+async function sendByApi(page, toName, body) {
+  return page.evaluate(async ([toName, body]) => {
+    const r = await fetch('/api/messages?people=1', { credentials: 'same-origin' });
+    const { classes } = await r.json();
+    const cls = classes.find((c) => c.people.some((p) => p.name === toName));
+    if (!cls) throw new Error(`no class with ${toName}`);
+    const to = cls.people.find((p) => p.name === toName).key;
+    const s = await fetch('/api/messages', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ classId: cls.id, to, body }) });
+    if (!s.ok) throw new Error(await s.text());
+  }, [toName, body]);
+}
+
 const RECIPES = {
+  '2026-11-messages': {
+    people: [SAM, ALEX],
+    path: '/',
+    async setup({ person }) {
+      // The teacher clip below ends with messages between classmates switched off: on again first.
+      const t = await person(TEACHER, '/');
+      await t.page.evaluate(() => fetch('/api/classes/dev-class/messages', {
+        method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'messages-on' }),
+      }));
+    },
+    async run({ demos: [sam, alex], pages: [ps, pa] }) {
+      await sam.click(ps.getByTestId('notification-bell'), { ms: 350, after: 300 });
+      await sam.click(ps.getByTestId('mailbox-new'), { ms: 350, after: 300 });
+      await sam.click(ps.getByTestId('mailbox-person').filter({ hasText: 'alex' }), { ms: 350, after: 250 });
+      await sam.type('Build a game together after lunch?', 30);
+      await sam.click(ps.getByTestId('mailbox-send'), { ms: 350, after: 250 });
+      // The bell asks every 30 s and when the tab comes back into view: stand in for that.
+      await pa.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
+      await pa.getByTestId('notification-count').waitFor({ timeout: 10000 });
+      await alex.pause(300);
+      await alex.click(pa.getByTestId('notification-bell'), { ms: 350, after: 600 });
+      await alex.click(pa.getByTestId('mailbox-thread').first(), { ms: 350, after: 1800 });
+    },
+  },
+
+  '2026-11-class-messages': {
+    people: [TEACHER],
+    path: '/teacher/?class=dev-class&tab=students',
+    async setup({ person }) {
+      const m = await person(MAYA, '/');
+      const l = await person(LEO, '/');
+      // Any messages call puts a dev student in the dev class; Leo has to be there before Maya looks for him.
+      await l.page.evaluate(() => fetch('/api/messages?count=1', { credentials: 'same-origin' }));
+      await sendByApi(m.page, 'leo D.', 'Can you help me with the loop in 2.3?');
+      await sendByApi(l.page, 'maya D.', 'Sure, look at the condition first.');
+      await sendByApi(m.page, 'leo D.', 'Got it, thanks!');
+    },
+    async run({ demos: [t], pages: [p] }) {
+      await p.getByTestId('class-messages').waitFor({ timeout: 60000 });
+      await t.scrollTo(p.getByRole('heading', { name: 'Messages', exact: true }), 1200);
+      await t.pause(900);
+      await t.click(p.getByTestId('class-messages-thread').first().getByRole('button', { name: 'Read' }), { after: 1600 });
+      await t.click(p.getByTestId('class-messages-remove').nth(1), { after: 1800 });
+      await t.click(p.getByTestId('class-messages-switch'), { after: 2200 });
+    },
+  },
+
   '2026-11-texture-one-name': {
     people: [SAM],
     path: '/sandbox/',

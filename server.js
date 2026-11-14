@@ -704,6 +704,17 @@ app.prepare().catch((err) => {
     // The notification bell (#112): proposed-change activity and comments on the caller's games.
     const notifications = await import('./functions/api/notifications.ts');
     server.get('/api/notifications', libRoute(notifications.onRequestGet));
+    // Messages (migration 0053): the mailbox in the header and the class page's Messages panel. Two
+    // dev_student cookies are two classmates; the teacher has no cookie (DEV_ROLE=teacher).
+    const messagesInbox = await import('./functions/api/messages/index.ts');
+    const messagesOne = await import('./functions/api/messages/[id].ts');
+    const classMessages = await import('./functions/api/classes/[id]/messages.ts');
+    server.get('/api/messages', libRoute(messagesInbox.onRequestGet));
+    server.post('/api/messages', express.json(), libRoute(messagesInbox.onRequestPost));
+    server.get('/api/messages/:id', libRoute(messagesOne.onRequestGet));
+    server.post('/api/messages/:id', express.json(), libRoute(messagesOne.onRequestPost));
+    server.get('/api/classes/:id/messages', libRoute(classMessages.onRequestGet));
+    server.post('/api/classes/:id/messages', express.json(), libRoute(classMessages.onRequestPost));
     server.get('/api/game-changes/:cid', libRoute(changeOne.onRequestGet));
     server.post('/api/game-changes/:cid', express.json(), libRoute(changeOne.onRequestPost));
     server.get('/api/classes/:id/game-changes', libRoute(classChanges.onRequestGet));

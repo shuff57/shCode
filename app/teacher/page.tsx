@@ -19,6 +19,7 @@ import ClassLibraryModeration from '../../components/ClassLibraryModeration';
 import ClassGamesModeration from '../../components/ClassGamesModeration';
 import { useClearStudentLibrary } from '../../components/ClearStudentLibrary';
 import ClassCodeSessions from '../../components/ClassCodeSessions';
+import ClassMessages from '../../components/ClassMessages';
 import ClassGameChanges from '../../components/ClassGameChanges';
 import PastDuePanel from '../../components/PastDuePanel';
 import { formatDue, schoolDateString } from '../../lib/due-dates-core';
@@ -2964,7 +2965,7 @@ function DetailView({ classId, initialTab, initialFilter }: { classId: string; i
     const name = detail.class.name;
     const ok = await confirm({
       title: `Permanently delete "${name}"?`,
-      message: 'This cannot be undone.\nIt removes the class, its enrollments and its co-teachers, AND all progress (completions, scores, submissions, saved work) of every student who is not enrolled in another class.\nStudents who are also in another class keep their progress.',
+      message: 'This cannot be undone.\nIt removes the class, its enrollments, its co-teachers and every message sent in it, AND all progress (completions, scores, submissions, saved work) of every student who is not enrolled in another class.\nStudents who are also in another class keep their progress.',
       confirmLabel: 'Delete the class',
       danger: true,
       requireText: name,
@@ -3439,6 +3440,11 @@ function DetailView({ classId, initialTab, initialFilter }: { classId: string; i
         <div style={S.card}>
           <h2 style={S.h2}>Proposed changes to games</h2>
           <ClassGameChanges classId={classId} />
+        </div>
+        {/* Messages between students of this class (migration 0053): the switch, pausing a student, reading and removing */}
+        <div style={S.card}>
+          <h2 style={S.h2}>Messages</h2>
+          <ClassMessages classId={classId} />
         </div>
         {/* Programs students wrote together in the sandbox (Code together); kept 30 days */}
         <div style={S.card}>
