@@ -5556,3 +5556,9 @@ input.dd-date { padding-right: 8px !important; }
   body .shd-tabstrip:not(.shd-open):has(.shd-handle) { --shd-rail-width: 26px; }
   :root:has(.shd-tabstrip:not(.shd-open) .shd-handle) { --shd-rail-width: 26px; }
 }
+
+/* Phone home: a module's due date drops under its "0 of 22 done" when the two do not fit on one line (it
+   was cut off mid-time: "Sat, Oct 24 · 8:59 P"). */
+@media (max-width: 720px) {
+  .home-module-summary .home-module-progress { flex-wrap: wrap !important; row-gap: 4px; min-width: 0; }
+}
