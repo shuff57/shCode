@@ -1989,4 +1989,38 @@ export const SEMANTIC_CHECKS = [
       return true;
     },
   },
+
+  {
+    name: 'loop = 3 plays an animation three times, then stays on the last frame; frame = 0 counts again',
+    area: 'texture',
+    run({ runSketch }) {
+      const r = runSketch(`
+        function setup(){ new Canvas(200,200);
+          saveTexture('door', 'data:image/png;base64,D4=', { frames: 4, frameDelay: 2 });
+          d = new Sprite(60, 100, 40, 40); d.collider='none'; d.texture = 'door';
+          d.texture.loop = 3;
+          odd = [];
+          for (const v of [0, -1, 0.5, 2.7, Infinity, true, false]) { d.texture.loop = v; odd.push(d.texture.loop); }
+          d.texture.loop = 3;
+          seen = []; again = []; every = [];
+          e = new Sprite(140, 100, 40, 40); e.collider='none'; e.texture = 'door';
+        }
+        function update(){ e.texture.loop = 3; }   // set every frame: must still stop after three
+        function draw(){ background('#222');
+          every.push(e.texture.frame);
+          if (frameCount < 40) seen.push(d.texture.frame);
+          else if (frameCount === 40) d.texture.frame = 0;
+          else again.push(d.texture.frame);
+        }
+      `, { frames: 80 });
+      if (!r.ok) return 'sketch threw: ' + r.error?.message;
+      const b = r.box.sandbox;
+      const passes = (a) => a.filter((f, i) => i > 0 && f < a[i - 1]).length;
+      if (JSON.stringify(b.odd) !== '[false,false,false,2,true,true,false]') return 'loop values read back as ' + JSON.stringify(b.odd);
+      if (passes(b.seen) !== 2 || b.seen[b.seen.length - 1] !== 3) return 'loop = 3 should wrap twice and stop on frame 3: ' + JSON.stringify(b.seen);
+      if (passes(b.again) !== 2 || b.again[b.again.length - 1] !== 3) return 'frame = 0 should play all three times again: ' + JSON.stringify(b.again);
+      if (passes(b.every) !== 2 || b.every[b.every.length - 1] !== 3) return 'loop = 3 set every frame should still stop after three: ' + JSON.stringify(b.every);
+      return true;
+    },
+  },
 ];
