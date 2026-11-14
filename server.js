@@ -710,9 +710,11 @@ app.prepare().catch((err) => {
     const messagesOne = await import('./functions/api/messages/[id].ts');
     const classMessages = await import('./functions/api/classes/[id]/messages.ts');
     server.get('/api/messages', libRoute(messagesInbox.onRequestGet));
-    server.post('/api/messages', express.json(), libRoute(messagesInbox.onRequestPost));
+    server.post('/api/messages', express.json({ limit: '512kb' }), libRoute(messagesInbox.onRequestPost));
     server.get('/api/messages/:id', libRoute(messagesOne.onRequestGet));
-    server.post('/api/messages/:id', express.json(), libRoute(messagesOne.onRequestPost));
+    server.post('/api/messages/:id', express.json({ limit: '512kb' }), libRoute(messagesOne.onRequestPost));
+    const messageShare = await import('./functions/api/shares/[id].ts');
+    server.get('/api/shares/:id', libRoute(messageShare.onRequestGet));
     server.get('/api/classes/:id/messages', libRoute(classMessages.onRequestGet));
     server.post('/api/classes/:id/messages', express.json(), libRoute(classMessages.onRequestPost));
     server.get('/api/game-changes/:cid', libRoute(changeOne.onRequestGet));

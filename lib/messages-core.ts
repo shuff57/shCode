@@ -93,7 +93,7 @@ export interface ThreadSummary {
   unread: boolean;
 }
 
-/** One message as a page receives it. `body` is null once a teacher removed it. */
+/** One message as a page receives it. `body` is null once a teacher removed it (and `share` too). */
 export interface MessageItem {
   id: string;
   mine: boolean;
@@ -102,6 +102,75 @@ export interface MessageItem {
   body: string | null;
   removed: boolean;
   at: number;
+  /** A sandbox program sent with it (migration 0054), or null. */
+  share: ShareCard | null;
+}
+
+// ---- a sandbox program in a message (migration 0054) ---------------------------------------------
+
+export type ShareKind = 'copy' | 'together' | 'watch';
+export type ShareLang = 'js' | 'moshion';
+/** The most code a copy may hold, in UTF-8 bytes (the same as a published game). */
+export const SHARE_CODE_MAX = 64 * 1024;
+export const SHARE_TITLE_MAX = 40;
+export const LANG_LABEL: Record<ShareLang, string> = { js: 'JavaScript', moshion: 'moSHion' };
+
+/** What a message shows for a program sent with it. */
+export interface ShareCard {
+  id: string;
+  kind: ShareKind;
+  lang: ShareLang;
+  title: string;
+  /** 'together' and 'watch': the session is still open (the code is given only then). */
+  open?: boolean;
+  room?: string;
+}
+
+/** GET /api/shares/[id]. */
+export interface ShareView extends ShareCard {
+  author: string;
+  mine: boolean;
+  at: number;
+  /** 'copy' only. */
+  code?: string;
+}
+
+export const isShareId = isHex32;
+export const isShareLang = (v: unknown): v is ShareLang => v === 'js' || v === 'moshion';
+
+/** The project name as sent: one line, at most 40 characters, checked for personal details. */
+export function cleanShareTitle(raw: unknown): { title: string } | { error: string; safety?: true } {
+  const title = (typeof raw === 'string' ? raw : '').replace(/\s+/g, ' ').trim();
+  if ([...title].length > SHARE_TITLE_MAX) return { title: [...title].slice(0, SHARE_TITLE_MAX).join('') };
+  // eslint-disable-next-line no-control-regex
+  if (/[\u0000-\u001f\u007f]/.test(title)) return { error: 'That project name has special characters in it. Rename it in plain words.' };
+  const pii = findPII(title);
+  if (pii) return { error: `The project name looks like it has ${PII_WORDS[pii] ?? 'personal information'} in it, so it was not sent. Rename the project first.`, safety: true };
+  return { title };
+}
+
+/** A copy's code: not empty, at most 64 KB, and checked for personal details like a message. */
+export function cleanShareCode(raw: unknown): { code: string } | { error: string; safety?: true } {
+  if (typeof raw !== 'string' || !raw.trim()) return { error: 'There is no code to send yet.' };
+  const code = raw.replace(/\r\n?/g, '\n');
+  if (new TextEncoder().encode(code).length > SHARE_CODE_MAX) return { error: 'This program is too long to send (64 KB is the most). Publish it as a game instead, or send a shorter one.' };
+  // eslint-disable-next-line no-control-regex
+  if (/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(code)) return { error: 'This program has special characters in it, so it was not sent.' };
+  const pii = findPII(code);
+  if (pii) {
+    return {
+      error: `This program looks like it has ${PII_WORDS[pii] ?? 'personal information'} in it, so it was not sent. To keep everyone safe, programs you send cannot have phone numbers, addresses, emails or other personal details in them.`,
+      safety: true,
+    };
+  }
+  return { code };
+}
+
+/** The line a mailbox list shows for a message that is only a program (after "You: " or a name). */
+export function shareSnippet(kind: ShareKind, title: string): string {
+  if (kind === 'together') return 'An invitation to Code together';
+  if (kind === 'watch') return 'An invitation to watch live';
+  return `A program${title ? `: ${title}` : ''}`;
 }
 
 /** GET /api/messages/[id]. */
@@ -138,5 +207,6 @@ export function pairKey(classId: string, a: string, b: string): string {
   return [classId, ...[a, b].sort()].join('|');
 }
 
-export const isThreadId = (v: unknown): v is string => typeof v === 'string' && /^[0-9a-f]{32}$/.test(v);
+function isHex32(v: unknown): v is string { return typeof v === 'string' && /^[0-9a-f]{32}$/.test(v); }
+export const isThreadId = isHex32;
 export const isPersonKey = (v: unknown): v is string => typeof v === 'string' && /^p[0-9a-f]{20}$/.test(v);

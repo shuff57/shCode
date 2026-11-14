@@ -912,6 +912,37 @@ messages. Tests: `scripts/test-messages.mjs` (real handlers, npm test). Dev: `DE
 dev`, two `dev_student` cookies are two classmates (a dev student joins the dev class on its first API call).
 Deploy: apply 0053 (`npm run d1:migrate`) before the site.
 
+### Programs sent in messages: copy, Code together, Watch live (migration 0054, 2026-11-14)
+The sandbox's Share menu has **Send to...** (`components/SendProgramButton.tsx`, JavaScript and moSHion modes, signed
+in and in a class): pick a person (same list and rules as New message), an optional note, and one of three kinds, stored
+in `message_shares` (one row per message, 128-bit hex id; a message may then have empty words):
+- `copy`: the code as it is now (64 KB UTF-8, and `findPII` runs on the CODE and the project name too, the same
+  refusal as a message: `cleanShareCode`/`cleanShareTitle` in `lib/messages-core.ts`). The card opens `/shared?id=`
+  (`components/SharedProgram.tsx`): it runs (moSHion in `MoshionPreview` with room key `share-<id>`, JavaScript in the
+  sandbox's Worker runner) and its code is shown read-only; **Remix** makes a NEW sandbox project ("<title> from
+  <name>"), so nothing of the reader's is written over.
+- `together`: only while the sender holds a seat in an open Code together session of that mode. The card's Join opens
+  `/sandbox/?join=<code>&lang=` (`shareHref`): the sandbox opens a project of that mode (the most recent, else a new
+  "Code together" one), drops the query, and opens the Code together popup with the code typed in (`invite` prop);
+  joining is still the student's own Join press (asks, keeps their code in History).
+- `watch`: also needs the sender's open session. The card opens `/shared?id=`, which connects `LiveDocClient` with
+  `watch: true` to `GET /api/live/[code]?watch=1`: a read-only CodeMirror following the program as it is typed, and
+  "Run what they have so far". **Who may watch** (`mayWatch`, `functions/_shared/live.ts`): shares a live class with the
+  host AND (is a teacher/admin, OR is a member of a conversation holding a `watch` share for this very session,
+  `room_code` + `room_created_at`, from someone else, in a message not removed). A watcher holds NO seat in D1; its
+  ticket has `watch: true` and seat `watchSeatOf(email, device)` >= `WATCH_SEAT_BASE` (1000). `LiveDocCore` refuses a
+  watcher's push and seed (`WATCH_ONLY`, then resets it), never relays its cursor, does not add it to the teacher
+  copy's participants, and lists it in `players` with `watching: true`: the coders see "Cy D. (watching)" with a
+  hollow dot, and watchers are not counted as coding. **The seat number is the safety catch**: a Worker from before
+  watching ignores `watch` and decodes the seat against `seats`, so it refuses a watch ticket instead of making it an
+  editor. Deploy the Worker BEFORE the site all the same.
+A card for a closed session (or a reused code: `room_created_at` differs) says it has ended and carries no code.
+Opening a share (`GET /api/shares/[id]`) = may read the message: its two people, and for a students' conversation
+the class's teachers and admins; a teacher's Remove hides the card and the program from the students (teachers keep
+it). Deleting a class deletes its shares. Mailbox and teacher panel draw cards with `components/ShareCardView.tsx`.
+Tests: `scripts/test-message-shares.mjs`, `scripts/test-live-watch.mjs` (both npm test). Deploy order: apply 0054,
+`cd workers/live && npx wrangler deploy`, then the site.
+
 ### Code together (migration 0044; not deployed yet)
 2-4 classmates edit ONE sandbox program at once (spec: `codehs-review/REALTIME-SPEC.md` Part 2). Sandbox only, the
 JavaScript and moSHion modes, never a lesson. The toolbar's **Code together** button (signed in and in a class, from

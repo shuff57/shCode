@@ -49,6 +49,25 @@ export interface WhatsNewEntry {
 
 export const WHATS_NEW: WhatsNewEntry[] = [
   {
+    id: '2026-11-send-program',
+    date: '2026-11-14',
+    audience: 'student',
+    title: 'Send your sandbox program to a classmate',
+    summary:
+      'In the sandbox, Share then Send to… puts your program in a message. Send a copy they can run and remix, ' +
+      'or, while you Code together, invite them to join you or just to watch live as you type.',
+    steps: [
+      'In the sandbox, click Share, then Send to….',
+      'Pick a classmate or your teacher, choose what to send, and press Send.',
+      'They open it from the envelope: Open runs a copy, Join codes with you, Watch shows your typing.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-send-program.mp4',
+      poster: '/whats-new/2026-11-send-program.jpg',
+      alt: "Sam sends a copy of a moSHion sketch to Alex with the note 'Try my sketch!'. On Alex's screen a 1 appears on the envelope, and Alex's mailbox shows the note and a card with an Open button.",
+    },
+  },
+  {
     id: '2026-11-messages',
     date: '2026-11-13',
     audience: 'student',

@@ -349,6 +349,45 @@ const RECIPES = {
     },
   },
 
+  '2026-11-send-program': {
+    people: [SAM, ALEX],
+    path: '/sandbox/',
+    storage: { 'shCode:sandbox-mode': 'moshion' },
+    async setup({ person }) {
+      const t = await person(TEACHER, '/');
+      await t.page.evaluate(() => fetch('/api/classes/dev-class/messages', {
+        method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'messages-on' }),
+      }));
+    },
+    async before({ pages: [ps, pa] }) {
+      // Alex has to be in the dev class before Sam looks for him (any API call puts a dev student there).
+      await pa.evaluate(() => fetch('/api/messages?count=1', { credentials: 'same-origin' }));
+      await ps.locator('.cm-content').first().waitFor({ timeout: 120000 });
+      // The panel open with Alex chosen and a note: the clip is the send and what Alex gets.
+      await ps.locator('.sandbox-share-trigger').click();
+      await ps.getByTestId('send-program').click();
+      const to = ps.getByTestId('send-program-to');
+      const opt = to.locator('option', { hasText: 'alex' }).first();
+      await opt.waitFor({ state: 'attached', timeout: 20000 });
+      await to.selectOption(await opt.getAttribute('value'));
+      await ps.getByTestId('send-program-panel').locator('textarea').fill('Try my sketch!');
+    },
+    async run({ demos: [sam, alex], pages: [ps, pa] }) {
+      await sam.pause(700);
+      await sam.click(ps.getByTestId('send-program-send'), { ms: 350, after: 300 });
+      await ps.getByTestId('send-program-panel').getByRole('status').waitFor({ timeout: 20000 });
+      // The envelope asks every 30 s and when the tab comes back into view: stand in for that.
+      await pa.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
+      await pa.getByTestId('notification-count').waitFor({ timeout: 10000 });
+      await alex.click(pa.getByTestId('notification-bell'), { ms: 350, after: 300 });
+      // Ends on the card in Alex's mailbox (Open runs it on its own page, which does not fit in 15 s).
+      await alex.click(pa.getByTestId('mailbox-thread').first(), { ms: 350, after: 300 });
+      await pa.getByTestId('share-card').last().waitFor({ timeout: 10000 });
+      await alex.cursorTo(pa.getByTestId('share-open').last(), 400);
+      await alex.pause(1800);
+    },
+  },
+
   '2026-11-class-messages': {
     people: [TEACHER],
     path: '/teacher/?class=dev-class&tab=students',

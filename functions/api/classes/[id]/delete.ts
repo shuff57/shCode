@@ -64,7 +64,8 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async (conte
     env.DB.prepare('DELETE FROM enrollments WHERE class_id = ?').bind(classId),
     env.DB.prepare('DELETE FROM class_teachers WHERE class_id = ?').bind(classId),
     env.DB.prepare('DELETE FROM classes WHERE id = ?').bind(classId),
-    // 10-13: the class's conversations (migration 0053) go with it
+    // 10-14: the class's conversations (migration 0053) and the programs sent in them (0054) go with it
+    env.DB.prepare('DELETE FROM message_shares WHERE thread_id IN (SELECT id FROM message_threads WHERE class_id = ?)').bind(classId),
     env.DB.prepare('DELETE FROM messages WHERE thread_id IN (SELECT id FROM message_threads WHERE class_id = ?)').bind(classId),
     env.DB.prepare('DELETE FROM message_members WHERE thread_id IN (SELECT id FROM message_threads WHERE class_id = ?)').bind(classId),
     env.DB.prepare('DELETE FROM message_threads WHERE class_id = ?').bind(classId),

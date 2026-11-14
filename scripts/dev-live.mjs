@@ -119,7 +119,7 @@ export function makeDevLive({ db, identity, now = Date.now }) {
       if (origin && new URL(origin).host !== req.headers.host) return refuse(socket, 403, { error: 'Wrong origin.' });
       const who = identity(req);
       if (!who) return refuse(socket, 401, { error: 'Not signed in' });
-      const auth = await authorizeLive(db, who.email, who.role, decodeURIComponent(m[1]), url.searchParams.get('device'), now());
+      const auth = await authorizeLive(db, who.email, who.role, decodeURIComponent(m[1]), url.searchParams.get('device'), now(), url.searchParams.get('watch') === '1');
       if (!auth.ok) return refuse(socket, auth.status, { error: auth.error });
       if (auth.kind === 'code') return acceptDoc(req, socket, head, auth);
       wss.handleUpgrade(req, socket, head, (ws) => {

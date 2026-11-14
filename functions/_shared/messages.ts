@@ -3,9 +3,12 @@
 
 import { ownerLabel } from './libraryShare';
 import {
-  MESSAGES_PER_DAY, MESSAGES_PER_MINUTE, MESSAGES_PER_THREAD, blockText,
-  type MessageItem, type MessagePerson, type SendBlock, type ThreadView,
+  MESSAGES_PER_DAY, MESSAGES_PER_MINUTE, MESSAGES_PER_THREAD, blockText, cleanMessage, cleanShareCode, cleanShareTitle,
+  isShareLang,
+  type MessageItem, type MessagePerson, type SendBlock, type ShareCard, type ShareKind, type ShareLang, type ThreadView,
 } from '../../lib/messages-core';
+import { CODE_ROOM_GAMES } from '../../lib/live-protocol';
+import { getRoom, normalizeCode, roomKind } from './rooms';
 
 export type SessionData = { email: string; role: 'admin' | 'teacher' | 'student' };
 
@@ -151,6 +154,81 @@ export async function threadMessages(db: D1Database, threadId: string): Promise<
   ).bind(threadId).all<MessageRow>()).results ?? [];
 }
 
+// ---- a sandbox program sent in a message (migration 0054) ----------------------------------------
+
+export interface ShareRow {
+  id: string; message_id: string; thread_id: string; author_email: string; kind: ShareKind; lang: ShareLang;
+  title: string; code: string | null; room_code: string | null; room_created_at: number | null; created_at: number;
+}
+
+/** Is the Code together session a share points at still open (the same session, not a reused code)? */
+export async function shareRoomOpen(db: D1Database, row: Pick<ShareRow, 'room_code' | 'room_created_at'>, now = Date.now()): Promise<boolean> {
+  if (!row.room_code) return false;
+  const room = await getRoom(db, row.room_code);
+  return !!room && room.created_at === row.room_created_at && room.closed_at == null && room.expires_at > now;
+}
+
+export async function shareCard(db: D1Database, row: ShareRow, now = Date.now()): Promise<ShareCard> {
+  const card: ShareCard = { id: row.id, kind: row.kind, lang: row.lang, title: row.title };
+  if (row.kind === 'together' || row.kind === 'watch') {
+    card.open = await shareRoomOpen(db, row, now);
+    if (card.open) card.room = row.room_code!;
+  }
+  return card;
+}
+
+/** The cards of a conversation's messages, by message id. */
+export async function threadShares(db: D1Database, threadId: string, now = Date.now()): Promise<Map<string, ShareCard>> {
+  const rows = (await db.prepare(`SELECT * FROM message_shares WHERE thread_id = ?`).bind(threadId).all<ShareRow>()).results ?? [];
+  const out = new Map<string, ShareCard>();
+  for (const r of rows) out.set(r.message_id, await shareCard(db, r, now));
+  return out;
+}
+
+/** A share checked and ready to store with its message. */
+export interface PendingShare {
+  kind: ShareKind; lang: ShareLang; title: string; code: string | null; roomCode: string | null; roomCreatedAt: number | null;
+}
+
+/**
+ * The `share` of a send, checked: a copy's code (64 KB, personal details), or the Code together session
+ * the sender is in now. `body` may be empty when a share comes with it. null `share` = an ordinary message.
+ */
+export async function prepareSend(
+  db: D1Database, email: string, raw: { body?: unknown; share?: unknown }, now = Date.now(),
+): Promise<{ ok: true; body: string; share: PendingShare | null } | { ok: false; status: number; body: Record<string, unknown> }> {
+  if (raw.share == null) {
+    const c = cleanMessage(raw.body);
+    return 'error' in c ? { ok: false, status: 400, body: c } : { ok: true, body: c.body, share: null };
+  }
+  const sh = raw.share as Record<string, unknown>;
+  if (typeof sh !== 'object' || (sh.kind !== 'copy' && sh.kind !== 'together' && sh.kind !== 'watch') || !isShareLang(sh.lang)) {
+    return { ok: false, status: 400, body: { error: 'That program could not be sent.' } };
+  }
+  let body = '';
+  if (typeof raw.body === 'string' && raw.body.trim()) {
+    const c = cleanMessage(raw.body);
+    if ('error' in c) return { ok: false, status: 400, body: c };
+    body = c.body;
+  }
+  const t = cleanShareTitle(sh.title);
+  if ('error' in t) return { ok: false, status: 400, body: t };
+  if (sh.kind === 'copy') {
+    const c = cleanShareCode(sh.code);
+    if ('error' in c) return { ok: false, status: 400, body: c };
+    return { ok: true, body, share: { kind: 'copy', lang: sh.lang, title: t.title, code: c.code, roomCode: null, roomCreatedAt: null } };
+  }
+  const code = normalizeCode(sh.room);
+  const room = code ? await getRoom(db, code) : null;
+  const ended = { ok: false as const, status: 409, body: { error: 'That Code together session has ended, so it cannot be shared. Start a new one first.' } };
+  if (!room || roomKind(room) !== 'code' || room.closed_at != null || room.expires_at <= now) return ended;
+  if (room.game !== CODE_ROOM_GAMES[sh.lang]) return { ok: false, status: 400, body: { error: 'That session is for a different kind of program.' } };
+  const seated = await db.prepare(`SELECT 1 AS x FROM game_room_players WHERE code = ? AND email = ? AND left_at IS NULL`)
+    .bind(room.code, email).first();
+  if (!seated) return { ok: false, status: 403, body: { error: 'You can only invite people to a Code together session you are in.' } };
+  return { ok: true, body, share: { kind: sh.kind, lang: sh.lang, title: t.title, code: null, roomCode: room.code, roomCreatedAt: room.created_at } };
+}
+
 export function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -170,7 +248,7 @@ export async function memberView(db: D1Database, data: SessionData, threadId: st
   const cls = await classInfo(db, t.thread.class_id);
   let why: SendBlock = 'archived';
   if (cls) why = (await sendRule(db, cls, data.email, other.email)).why;
-  const rows = await threadMessages(db, threadId);
+  const [rows, shares] = await Promise.all([threadMessages(db, threadId), threadShares(db, threadId)]);
   const names = new Map(t.members.map((m) => [m.email, m]));
   const messages: MessageItem[] = rows.map((r) => ({
     id: r.id,
@@ -180,6 +258,8 @@ export async function memberView(db: D1Database, data: SessionData, threadId: st
     body: r.deleted_at == null ? r.body : null,
     removed: r.deleted_at != null,
     at: r.created_at,
+    // A removed message's program goes with it (GET /api/shares refuses it to the students too).
+    share: r.deleted_at == null ? shares.get(r.id) ?? null : null,
   }));
   return {
     id: t.thread.id,
@@ -216,11 +296,21 @@ export function newId(): string {
   return Array.from(buf, (n) => n.toString(16).padStart(2, '0')).join('');
 }
 
-/** Add a message (already cleaned and allowed) and mark the conversation read for its writer. */
-export async function appendMessage(db: D1Database, email: string, threadId: string, body: string, now = Date.now()): Promise<void> {
-  await db.batch([
-    db.prepare(`INSERT INTO messages (id, thread_id, author_email, body, created_at) VALUES (?, ?, ?, ?, ?)`).bind(newId(), threadId, email, body, now),
+/** Add a message (already cleaned and allowed), with its program if any, and mark the conversation read for its writer. */
+export async function appendMessage(
+  db: D1Database, email: string, threadId: string, body: string, now = Date.now(), share: PendingShare | null = null,
+): Promise<void> {
+  const id = newId();
+  const steps = [
+    db.prepare(`INSERT INTO messages (id, thread_id, author_email, body, created_at) VALUES (?, ?, ?, ?, ?)`).bind(id, threadId, email, body, now),
     db.prepare(`UPDATE message_threads SET last_at = MAX(last_at, ?) WHERE id = ?`).bind(now, threadId),
     db.prepare(`UPDATE message_members SET read_at = MAX(read_at, ?) WHERE thread_id = ? AND email = ?`).bind(now, threadId, email),
-  ]);
+  ];
+  if (share) {
+    steps.push(db.prepare(
+      `INSERT INTO message_shares (id, message_id, thread_id, author_email, kind, lang, title, code, room_code, room_created_at, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ).bind(newId(), id, threadId, email, share.kind, share.lang, share.title, share.code, share.roomCode, share.roomCreatedAt, now));
+  }
+  await db.batch(steps);
 }

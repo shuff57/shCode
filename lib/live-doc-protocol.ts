@@ -75,6 +75,7 @@ export const SAVE_EVERY_MS = 2 * 60 * 1000;
 export const KEEP_SESSIONS_MS = 30 * 24 * 60 * 60 * 1000;
 
 export const TOO_BIG = 'The shared program can be at most 64 KB. That change was not shared.';
+export const WATCH_ONLY = 'You are watching this session, so you cannot change the program.';
 
 export interface WireUpdate { changes: unknown; clientID: string; seat: number }
 
@@ -302,7 +303,7 @@ export class LiveDocCore {
     const bySeat = new Map<number, LivePlayer>();
     for (const s of this.open(except)) {
       const a = s.attachment()!;
-      bySeat.set(a.seat, { seat: a.seat, name: a.name, left: false });
+      bySeat.set(a.seat, a.watch ? { seat: a.seat, name: a.name, left: false, watching: true } : { seat: a.seat, name: a.name, left: false });
     }
     return [...bySeat.values()].sort((a, b) => a.seat - b.seat);
   }
@@ -345,7 +346,8 @@ export class LiveDocCore {
       };
       changed = true;
     }
-    if (!this.participants.includes(ticket.email)) {
+    // A watcher is not a writer of the program: the teacher's record names the people who wrote it.
+    if (!ticket.watch && !this.participants.includes(ticket.email)) {
       this.participants.push(ticket.email);
       this.dirty = true;
       changed = true;
@@ -365,7 +367,7 @@ export class LiveDocCore {
     LiveDocCore.say(ws, {
       t: 'hello', code: ticket.code, seat: ticket.seat, seats: ticket.seats, players: this.players(),
       version: this.version, doc: this.doc.toString(), clientID: clientIdOf(ticket.seat), host: this.meta!.hostName,
-      epoch: this.epoch, since: this.since,
+      epoch: this.epoch, since: this.since, ...(ticket.watch ? { watch: true } : {}),
     });
     this.announce(ws);
     // A joiner here before the host (or after the host went) starts the host-gone clock; the host stops it.
@@ -422,6 +424,10 @@ export class LiveDocCore {
       return;
     }
     if (v.t === 'ping') { LiveDocCore.say(ws, { t: 'pong' }); return; }
+    // A watcher reads: pull and ping only. Its edits are refused (and it is put back to the room's
+    // text); its cursor is not shown to anyone.
+    if (a.watch && (v.t === 'push' || v.t === 'seed')) { this.refuse(ws, WATCH_ONLY, 'bad', v.t === 'push'); return; }
+    if (a.watch && v.t === 'cursor') return;
     if (v.t === 'push') { this.push(ws, a, v.version, v.updates); return; }
     if (v.t === 'pull') {
       if (!Number.isInteger(v.version) || (v.version as number) < 0) { this.reset(ws); return; }

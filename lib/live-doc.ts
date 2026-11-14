@@ -761,6 +761,8 @@ export interface LiveDocClientOptions {
   onEnded: (e: DocEnded) => void;
   /** See DocSyncOptions.keepBeforeReplace. */
   keepBeforeReplace?: (() => boolean) | null;
+  /** Watch only (migration 0054, "Watch live"): the editor is read-only and nothing is sent but pings. */
+  watch?: boolean;
 }
 
 export class LiveDocClient {
@@ -809,12 +811,13 @@ export class LiveDocClient {
       if (overDocCap(tr.newDoc)) { client.note(TOO_BIG); return []; }
       return tr;
     });
-    this.extension = [this.sync.inner.of([]), presenceField, presenceTheme, tagPlacer, limits, plugin];
+    this.extension = [this.sync.inner.of([]), presenceField, presenceTheme, tagPlacer, limits, plugin,
+      ...(opts.watch ? [EditorState.readOnly.of(true), EditorView.editable.of(false)] : [])];
   }
 
   start() {
     this.connect();
-    this.watchdog = setInterval(() => { if (this.sync.hasSendable()) this.sync.push(); }, WATCHDOG_MS);
+    if (!this.opts.watch) this.watchdog = setInterval(() => { if (this.sync.hasSendable()) this.sync.push(); }, WATCHDOG_MS);
   }
 
   /** Stop for good (Leave, or the page going). Does not tell the server: the caller posts leave. */
@@ -864,12 +867,16 @@ export class LiveDocClient {
     try { s.send(JSON.stringify(msg)); return true; } catch { return false; }
   }
 
+  private routePath(): string {
+    return `/api/live/${encodeURIComponent(this.code)}?device=${encodeURIComponent(this.opts.device)}${this.opts.watch ? '&watch=1' : ''}`;
+  }
+
   private connect() {
     if (this.stopped) return;
     let sock: WebSocket;
     try {
       const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
-      sock = new WebSocket(`${proto}//${location.host}/api/live/${encodeURIComponent(this.code)}?device=${encodeURIComponent(this.opts.device)}`);
+      sock = new WebSocket(`${proto}//${location.host}${this.routePath()}`);
     } catch {
       void this.problem();
       return;
@@ -903,7 +910,7 @@ export class LiveDocClient {
     let status = 0;
     let error = '';
     try {
-      const res = await fetch(`/api/live/${encodeURIComponent(this.code)}?device=${encodeURIComponent(this.opts.device)}`, { credentials: 'same-origin' });
+      const res = await fetch(this.routePath(), { credentials: 'same-origin' });
       status = res.status;
       try { const b = await res.json(); if (typeof b?.error === 'string') error = b.error; } catch { /* no body */ }
     } catch { status = 0; }
@@ -1009,12 +1016,12 @@ export class LiveDocClient {
   }
 
   private schedulePush() {
-    if (this.pushTimer || this.stopped) return;
+    if (this.pushTimer || this.stopped || this.opts.watch) return;
     this.pushTimer = setTimeout(() => { this.pushTimer = null; this.sync.push(); }, PUSH_DELAY_MS);
   }
 
   private sendCursorSoon() {
-    if (this.cursorTimer || this.stopped) return;
+    if (this.cursorTimer || this.stopped || this.opts.watch) return;
     const wait = Math.max(0, CURSOR_MS - (Date.now() - this.lastCursorAt));
     this.cursorTimer = setTimeout(() => {
       this.cursorTimer = null;

@@ -131,12 +131,17 @@ export interface CodeTogetherBarProps {
   dialogHost?: HTMLElement | null;
   /** Inside the toolbar's Code together button: the code's pictures and a dot per person go here in a session. */
   badgeHost?: HTMLElement | null;
+  /** The session this tab is in now (its code), or null: "Send to..." can invite someone to it. */
+  onSession?: (code: string | null) => void;
+  /** A session someone invited this student to (a message's Join): the popup opens with its code typed in. */
+  invite?: string | null;
 }
 
 interface Session { code: string; hosting: boolean }
 
 export default function CodeTogetherBar({
   lang, getText, isUntouched, snapshot, onCollab, onActive, onHere, keepCopy, open, onOpenChange, dialogHost, badgeHost,
+  onSession, invite,
 }: CodeTogetherBarProps) {
   const [device] = useState(() => (typeof window === 'undefined' ? '' : deviceId()));
   const [session, setSession] = useState<Session | null>(null);
@@ -161,8 +166,8 @@ export default function CodeTogetherBar({
    */
   const leaving = useRef<Promise<void> | null>(null);
   // The callbacks change identity with the sandbox's renders; the client holds the latest.
-  const cb = useRef({ getText, isUntouched, snapshot, onCollab, onActive, keepCopy, onOpenChange, onHere });
-  cb.current = { getText, isUntouched, snapshot, onCollab, onActive, keepCopy, onOpenChange, onHere };
+  const cb = useRef({ getText, isUntouched, snapshot, onCollab, onActive, keepCopy, onOpenChange, onHere, onSession });
+  cb.current = { getText, isUntouched, snapshot, onCollab, onActive, keepCopy, onOpenChange, onHere, onSession };
   const game = CODE_ROOM_GAMES[lang];
   const uid = useId();
 
@@ -202,8 +207,19 @@ export default function CodeTogetherBar({
     return () => clearTimeout(t);
   }, [notice]);
 
-  const here = session ? Math.max(1, status?.players.length ?? 0) : 0;
+  // Watchers (a "Watch live" invitation, or a teacher) are listed by name but are not counted as coding.
+  const here = session ? Math.max(1, (status?.players ?? []).filter((p) => !p.watching).length) : 0;
   useEffect(() => { cb.current.onHere?.(here); }, [here]);
+  useEffect(() => { cb.current.onSession?.(session?.code ?? null); }, [session]);
+  // An invitation from a message: open the popup with its code typed in. Joining is still the student's
+  // own press of Join, which asks first and keeps their code in History, exactly as joining by hand does.
+  useEffect(() => {
+    if (!invite || sessionRef.current) return;
+    setTyped(invite);
+    setPicking(false);
+    setError(null);
+    cb.current.onOpenChange(true);
+  }, [invite]);
 
   /** The editor goes back to being yours, with the shared text kept as your draft. */
   const finish = useCallback((text: string | null, keep = true) => {
@@ -372,7 +388,7 @@ export default function CodeTogetherBar({
     else if (st.phase === 'reconnecting') {
       shortLine = 'Offline: reconnecting...';
       longLine = 'Offline: trying to reconnect. Your typing will be shared when you are back.';
-    } else if (players.length <= 1) {
+    } else if (players.filter((p) => !p.watching).length <= 1) {
       shortLine = session.hosting ? 'Waiting for classmates' : 'Waiting for the others';
       longLine = session.hosting
         ? `Waiting for classmates (up to ${st.seats || people} people): they can pick this session from Open sessions, or type the code.`
@@ -391,7 +407,7 @@ export default function CodeTogetherBar({
           : null;
 
   // Who is here, each with the colour their caret wears in the editor; this tab's own entry says "you".
-  const nameOf = (p: { seat: number; name: string }) => (p.seat === mySeat ? (p.name ? `${p.name} (you)` : 'you') : p.name);
+  const nameOf = (p: { seat: number; name: string; watching?: boolean }) => (p.seat === mySeat ? (p.name ? `${p.name} (you)` : 'you') : p.watching ? `${p.name || 'Someone'} (watching)` : p.name);
   const peopleList = () => (
     <span
       data-testid="together-people"
@@ -402,7 +418,7 @@ export default function CodeTogetherBar({
       {listed.map((p) => (
         <span key={p.seat} data-seat={p.seat} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, minWidth: 0, overflowWrap: 'anywhere' }}>
           {p.seat >= 0 ? (
-            <span aria-hidden="true" style={{ display: 'inline-block', width: 9, height: 9, borderRadius: '50%', background: seatColor(p.seat), flex: 'none' }} />
+            <span aria-hidden="true" style={{ display: 'inline-block', width: 9, height: 9, borderRadius: '50%', background: 'watching' in p && p.watching ? 'transparent' : seatColor(p.seat), border: 'watching' in p && p.watching ? '1px solid var(--c-dim)' : 'none', flex: 'none' }} />
           ) : null}
           {nameOf(p)}
         </span>
@@ -420,7 +436,7 @@ export default function CodeTogetherBar({
       </span>
       <span aria-hidden="true" data-testid="together-dots" style={{ display: 'inline-flex', gap: 3 }}>
         {listed.map((p) => (
-          <span key={p.seat} style={{ width: 8, height: 8, borderRadius: '50%', background: p.seat >= 0 ? seatColor(p.seat) : 'var(--c-dim)' }} />
+          <span key={p.seat} style={{ width: 8, height: 8, borderRadius: '50%', background: p.seat >= 0 && !('watching' in p && p.watching) ? seatColor(p.seat) : 'var(--c-dim)' }} />
         ))}
       </span>
       {st?.phase === 'reconnecting' || !st || st.phase === 'connecting' ? (

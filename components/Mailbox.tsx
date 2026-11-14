@@ -13,6 +13,7 @@ import {
   type PeopleClass, type ThreadSummary, type ThreadView,
 } from '../lib/messages-core';
 import { fetchPeople, fetchThread, fetchThreads, sendNew, sendReply } from '../lib/messages-client';
+import ShareCardView from './ShareCardView';
 
 type View = { kind: 'list' } | { kind: 'thread'; id: string } | { kind: 'new' };
 
@@ -142,14 +143,17 @@ function ThreadPane({ id, onBack }: { id: string; onBack: () => void }) {
         {!view && !error && <p style={{ margin: 0, fontSize: 13, color: 'var(--c-dim)' }}>Loading…</p>}
         {view?.messages.map((m) => (
           <div key={m.id} data-testid="mailbox-message" style={{ alignSelf: m.mine ? 'flex-end' : 'flex-start', maxWidth: '85%' }}>
-            <div style={{
-              fontSize: 13, lineHeight: 1.45, padding: '6px 10px', borderRadius: 8, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere',
-              background: m.removed ? 'transparent' : m.mine ? 'color-mix(in srgb, var(--brand) 22%, var(--c-bg))' : 'var(--c-deep2)',
-              border: m.removed ? '1px dashed var(--c-line)' : '1px solid transparent',
-              color: m.removed ? 'var(--c-dim)' : 'var(--c-fg)', fontStyle: m.removed ? 'italic' : 'normal',
-            }}>
-              {m.removed ? 'Removed by a teacher' : m.body}
-            </div>
+            {(m.removed || m.body) && (
+              <div style={{
+                fontSize: 13, lineHeight: 1.45, padding: '6px 10px', borderRadius: 8, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere',
+                background: m.removed ? 'transparent' : m.mine ? 'color-mix(in srgb, var(--brand) 22%, var(--c-bg))' : 'var(--c-deep2)',
+                border: m.removed ? '1px dashed var(--c-line)' : '1px solid transparent',
+                color: m.removed ? 'var(--c-dim)' : 'var(--c-fg)', fontStyle: m.removed ? 'italic' : 'normal',
+              }}>
+                {m.removed ? 'Removed by a teacher' : m.body}
+              </div>
+            )}
+            {m.share && <ShareCardView card={m.share} mine={m.mine} author={m.author} />}
             <div style={{ fontSize: 10, color: 'var(--c-dim)', marginTop: 2, textAlign: m.mine ? 'right' : 'left' }}>
               {m.mine ? 'You' : m.author} · {clock(m.at)}
             </div>

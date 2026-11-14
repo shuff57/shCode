@@ -3,7 +3,7 @@
 // announced with MESSAGES_CHANGED so the bell recounts without asking the server again.
 
 import { errorText } from './http-error';
-import type { PeopleClass, ThreadSummary, ThreadView } from './messages-core';
+import type { PeopleClass, ShareKind, ShareLang, ShareView, ThreadSummary, ThreadView } from './messages-core';
 
 export const MESSAGES_CHANGED = 'shcode:messages-changed';
 
@@ -58,10 +58,26 @@ const post = (body: unknown): RequestInit => ({
   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
 });
 
-export function sendNew(classId: string, to: string, body: string): Promise<Result<ThreadView>> {
-  return ask<ThreadView>('/api/messages', post({ classId, to, body }));
+/** A sandbox program to send with a message (migration 0054). */
+export type OutgoingShare =
+  | { kind: Extract<ShareKind, 'copy'>; lang: ShareLang; title: string; code: string }
+  | { kind: Extract<ShareKind, 'together' | 'watch'>; lang: ShareLang; title: string; room: string };
+
+export function sendNew(classId: string, to: string, body: string, share?: OutgoingShare): Promise<Result<ThreadView>> {
+  return ask<ThreadView>('/api/messages', post({ classId, to, body, share }));
 }
 
-export function sendReply(threadId: string, body: string): Promise<Result<ThreadView>> {
-  return ask<ThreadView>(`/api/messages/${encodeURIComponent(threadId)}`, post({ body }));
+export function sendReply(threadId: string, body: string, share?: OutgoingShare): Promise<Result<ThreadView>> {
+  return ask<ThreadView>(`/api/messages/${encodeURIComponent(threadId)}`, post({ body, share }));
+}
+
+export function fetchShare(id: string): Promise<Result<ShareView>> {
+  return ask<ShareView>(`/api/shares/${encodeURIComponent(id)}`);
+}
+
+/** Where a program's card leads: the copy's own page, or the sandbox ready to join the session. */
+export function shareHref(card: { id: string; kind: ShareKind; lang: ShareLang; room?: string }): string {
+  // A watch invitation opens on /shared, where the program is shown read-only as it is typed.
+  if (card.kind === 'together') return card.room ? `/sandbox/?join=${encodeURIComponent(card.room)}&lang=${card.lang}` : `/shared/?id=${card.id}`;
+  return `/shared/?id=${card.id}`;
 }

@@ -15,9 +15,9 @@
 
 import { canManageClass } from '../../../_shared/classAuth';
 import {
-  classPeople, emailForKey, json, personKeys, threadWithMembers, threadMessages, type SessionData,
+  classPeople, emailForKey, json, personKeys, threadShares, threadWithMembers, threadMessages, type SessionData,
 } from '../../../_shared/messages';
-import { isPersonKey, isThreadId, snippetOf } from '../../../../lib/messages-core';
+import { isPersonKey, isThreadId, shareSnippet, snippetOf, type ShareKind } from '../../../../lib/messages-core';
 
 interface Env {
   DB: D1Database;
@@ -35,6 +35,7 @@ async function allowed(env: Env, data: SessionData, classId: string): Promise<Re
 interface ThreadListRow {
   id: string; last_at: number; created_at: number; names: string | null; n: number;
   m_body: string | null; m_at: number | null; m_deleted: number | null; m_author: string | null;
+  m_share_kind: ShareKind | null; m_share_title: string | null;
 }
 
 async function overview(env: Env, classId: string) {
@@ -48,9 +49,11 @@ async function overview(env: Env, classId: string) {
             (SELECT GROUP_CONCAT(name, '|') FROM (SELECT name FROM message_members WHERE thread_id = t.id ORDER BY name)) AS names,
             (SELECT COUNT(*) FROM messages WHERE thread_id = t.id) AS n,
             x.body AS m_body, x.created_at AS m_at, x.deleted_at AS m_deleted,
-            (SELECT name FROM message_members WHERE thread_id = t.id AND email = x.author_email) AS m_author
+            (SELECT name FROM message_members WHERE thread_id = t.id AND email = x.author_email) AS m_author,
+            xs.kind AS m_share_kind, xs.title AS m_share_title
        FROM message_threads t
        LEFT JOIN messages x ON x.id = (SELECT y.id FROM messages y WHERE y.thread_id = t.id ORDER BY y.created_at DESC, y.rowid DESC LIMIT 1)
+       LEFT JOIN message_shares xs ON xs.message_id = x.id
       WHERE t.class_id = ? AND t.kind = 'students'
       ORDER BY t.last_at DESC LIMIT 200`,
   ).bind(classId).all<ThreadListRow>()).results ?? [];
@@ -62,7 +65,12 @@ async function overview(env: Env, classId: string) {
       people: (r.names ?? '').split('|').filter(Boolean),
       count: r.n,
       lastAt: r.last_at,
-      last: r.m_at == null ? null : { author: r.m_author ?? 'Someone', snippet: snippetOf(r.m_body ?? ''), at: r.m_at, removed: r.m_deleted != null },
+      last: r.m_at == null ? null : {
+        author: r.m_author ?? 'Someone',
+        snippet: r.m_body || !r.m_share_kind ? snippetOf(r.m_body ?? '') : shareSnippet(r.m_share_kind, r.m_share_title ?? ''),
+        at: r.m_at,
+        removed: r.m_deleted != null,
+      },
     })),
   };
 }
@@ -79,7 +87,7 @@ async function threadView(env: Env, data: SessionData, classId: string, threadId
   const t = await readableThread(env, data, classId, threadId);
   if (!t) return null;
   const names = new Map(t.members.map((m) => [m.email, m]));
-  const rows = await threadMessages(env.DB, threadId);
+  const [rows, shares] = await Promise.all([threadMessages(env.DB, threadId), threadShares(env.DB, threadId)]);
   return {
     id: t.thread.id,
     people: t.members.map((m) => ({ name: m.name, teacher: !!m.teacher })),
@@ -90,6 +98,8 @@ async function threadView(env: Env, data: SessionData, classId: string, threadId
       body: r.body,
       removed: r.deleted_at != null,
       at: r.created_at,
+      // A teacher can still open a removed message's program (GET /api/shares/[id]).
+      share: shares.get(r.id) ?? null,
     })),
   };
 }

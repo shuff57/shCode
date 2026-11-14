@@ -9,7 +9,7 @@
 // the same rules and answers kind 'code' with a DocTicket: the socket goes to
 // the LiveDoc Durable Object (env.LIVE_DOC), a game room's to LiveRoom (env.LIVE).
 
-import { CONTROL_HEADER, codeLangOf, type DocTicket, type LiveTicket } from '../../lib/live-protocol';
+import { CONTROL_HEADER, codeLangOf, watchSeatOf, type DocTicket, type LiveTicket } from '../../lib/live-protocol';
 import { ownerLabel } from './libraryShare';
 import { type Role, deviceOf, getRoom, liveRoomKey, mayJoin, normalizeCode, roomKind, roomPlayers } from './rooms';
 
@@ -22,13 +22,52 @@ export const LIVE_OFFLINE = 'Real-time play is not switched on for this site yet
 export const CODE_OFFLINE = 'Code together is not switched on for this site yet. Ask your teacher.';
 export const NOT_IN_ROOM = 'You are not in that room.';
 
+export const NOT_WATCHING = 'You were not invited to watch that session.';
+
+/**
+ * May this person WATCH a Code together session (read it as it is typed, change nothing)? They must
+ * share a live class with its host, as anyone joining must, and be either a teacher (or admin), or
+ * someone a "Watch live" message (migration 0054) invited to this very session, in a message a
+ * teacher has not removed. A watcher holds no seat in D1.
+ */
+async function mayWatch(db: D1Database, room: { code: string; created_at: number; host_email: string }, email: string, role: Role, now: number): Promise<boolean> {
+  if (!(await mayJoin(db, room.host_email, email, role, now))) return false;
+  if (role === 'teacher' || role === 'admin') return true;
+  const invited = await db.prepare(
+    `SELECT 1 AS x FROM message_shares s
+       JOIN message_members m ON m.thread_id = s.thread_id AND m.email = ?
+       JOIN messages x ON x.id = s.message_id AND x.deleted_at IS NULL
+      WHERE s.kind = 'watch' AND s.room_code = ? AND s.room_created_at = ? AND s.author_email != ?
+      LIMIT 1`,
+  ).bind(email, room.code, room.created_at, email).first();
+  return !!invited;
+}
+
 export async function authorizeLive(
-  db: D1Database, email: string, role: Role, rawCode: unknown, rawDevice: unknown, now = Date.now(),
+  db: D1Database, email: string, role: Role, rawCode: unknown, rawDevice: unknown, now = Date.now(), watch = false,
 ): Promise<LiveAuth> {
   const code = normalizeCode(rawCode);
   if (!code) return { ok: false, status: 400, error: 'A room code is 4 pictures (4 letters, like BHKE).' };
   const device = deviceOf(rawDevice);
   const room = await getRoom(db, code);
+  if (watch) {
+    const lang = room && roomKind(room) === 'code' ? codeLangOf(room.game) : null;
+    if (!room || !lang || !(await mayWatch(db, room, email, role, now))) return { ok: false, status: 404, error: NOT_WATCHING };
+    if (room.closed_at || room.expires_at <= now) return { ok: false, status: 410, error: 'That session has ended.' };
+    const players = await roomPlayers(db, code);
+    const host = players.find((p) => p.seat === 0);
+    const me = await db.prepare(`SELECT first_name, last_name FROM students WHERE email = ?`).bind(email).first<{ first_name: string | null; last_name: string | null }>();
+    return {
+      ok: true,
+      kind: 'code',
+      roomKey: liveRoomKey(room),
+      ticket: {
+        code, seat: watchSeatOf(email, device), seats: room.seats, name: ownerLabel(me?.first_name ?? null, me?.last_name ?? null),
+        expiresAt: room.expires_at, kind: 'code', email, host: room.host_email,
+        hostName: host ? ownerLabel(host.first_name, host.last_name) : '', lang, roomKey: liveRoomKey(room), startedAt: room.created_at, watch: true,
+      },
+    };
+  }
   const players = room ? await roomPlayers(db, code) : [];
   const me = players.find((p) => p.email === email && p.device === device);
   // A stranger, a code that does not exist and a seat in another tab all read the same.

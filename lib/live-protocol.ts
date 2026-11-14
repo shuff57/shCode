@@ -69,7 +69,8 @@ export interface LiveAttachment extends LiveTicket {
   seq: number;
 }
 
-export interface LivePlayer { seat: number; name: string; left: boolean }
+/** `watching`: a Code together watcher (migration 0054's "watch live"): sees the program, cannot change it. */
+export interface LivePlayer { seat: number; name: string; left: boolean; watching?: boolean }
 export type LiveState = 'waiting' | 'ready' | 'closed';
 
 /** One shared sprite's state, as online.share() sends it. */
@@ -573,7 +574,25 @@ export interface DocTicket extends LiveTicket {
   /** The Durable Object's name (code + creation time) and the room's creation time. */
   roomKey: string;
   startedAt: number;
+  /**
+   * A watcher (a "Watch live" invitation, or a teacher of the class): reads the program as it is
+   * typed and can change nothing. A watcher holds no seat in D1; its seat number is WATCH_SEAT_BASE
+   * and up, which a Worker from before watching refuses (a seat must be below `seats`), so a watch
+   * ticket can never become an editor there.
+   */
+  watch?: boolean;
 }
+
+export const WATCH_SEAT_BASE = 1000;
+const WATCH_SEAT_SPAN = 1_000_000;
+
+/** A watcher's seat: fixed per account and tab, so the same tab reconnecting replaces its own socket. */
+export function watchSeatOf(email: string, device: string): number {
+  let h = 2166136261;
+  for (const ch of `${email}|${device}`) { h ^= ch.codePointAt(0)!; h = Math.imul(h, 16777619) >>> 0; }
+  return WATCH_SEAT_BASE + (h % WATCH_SEAT_SPAN);
+}
+export const isWatchSeat = (seat: number): boolean => seat >= WATCH_SEAT_BASE;
 
 const EMAIL_MAX = 254;
 const ROOM_KEY_RE = /^[A-Z0-9]{4,6}-\d{1,16}$/;
@@ -582,6 +601,7 @@ export function encodeDocTicket(t: DocTicket): string {
   return JSON.stringify({
     kind: 'code', code: t.code, seat: t.seat, seats: t.seats, name: t.name, expiresAt: t.expiresAt,
     email: t.email, host: t.host, hostName: t.hostName, lang: t.lang, roomKey: t.roomKey, startedAt: t.startedAt,
+    ...(t.watch ? { watch: true } : {}),
   });
 }
 
@@ -591,8 +611,13 @@ export function decodeDocTicket(raw: string | null | undefined): DocTicket | nul
   let v: Record<string, unknown>;
   try { v = JSON.parse(raw); } catch { return null; }
   if (!v || typeof v !== 'object' || v.kind !== 'code') return null;
-  const base = decodeTicket(JSON.stringify({ code: v.code, seat: v.seat, seats: v.seats, name: v.name, expiresAt: v.expiresAt }));
+  // A watcher's seat is outside the room's seats on purpose (see DocTicket.watch); an editor's is inside them.
+  const watch = v.watch === true;
+  if (v.watch !== undefined && !watch) return null;
+  if (watch && !(Number.isInteger(v.seat) && (v.seat as number) >= WATCH_SEAT_BASE && (v.seat as number) < WATCH_SEAT_BASE + WATCH_SEAT_SPAN)) return null;
+  const base = decodeTicket(JSON.stringify({ code: v.code, seat: watch ? 0 : v.seat, seats: v.seats, name: v.name, expiresAt: v.expiresAt }));
   if (!base) return null;
+  if (watch) base.seat = v.seat as number;
   const { email, host, hostName, lang, roomKey, startedAt } = v;
   if (typeof email !== 'string' || !email || email.length > EMAIL_MAX) return null;
   if (typeof host !== 'string' || !host || host.length > EMAIL_MAX) return null;
@@ -600,5 +625,5 @@ export function decodeDocTicket(raw: string | null | undefined): DocTicket | nul
   if (lang !== 'js' && lang !== 'moshion') return null;
   if (typeof roomKey !== 'string' || !ROOM_KEY_RE.test(roomKey)) return null;
   if (typeof startedAt !== 'number' || !Number.isFinite(startedAt)) return null;
-  return { ...base, kind: 'code', email, host, hostName, lang, roomKey, startedAt };
+  return { ...base, kind: 'code', email, host, hostName, lang, roomKey, startedAt, ...(watch ? { watch: true } : {}) };
 }

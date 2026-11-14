@@ -9,6 +9,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { errorText } from '../lib/http-error';
 import { useFeedback } from './FeedbackProvider';
+import ShareCardView from './ShareCardView';
+import type { ShareCard } from '../lib/messages-core';
 
 interface Overview {
   studentMessagesOn: boolean;
@@ -21,7 +23,7 @@ interface Overview {
 interface Thread {
   id: string;
   people: { name: string; teacher: boolean }[];
-  messages: { id: string; author: string; teacher: boolean; body: string; removed: boolean; at: number }[];
+  messages: { id: string; author: string; teacher: boolean; body: string; removed: boolean; at: number; share?: ShareCard | null }[];
 }
 
 function when(ms: number): string {
@@ -108,7 +110,7 @@ export default function ClassMessages({ classId }: { classId: string }) {
       <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, color: 'var(--c-meta)', maxWidth: '70ch' }}>
         Students can message you and their classmates from the mailbox at the top of every page. Messages with phone
         numbers, addresses or emails are refused. Every conversation between two students is listed below, and students
-        are told you can read them. Your own conversations with students are in your mailbox.
+        are told you can read them. A program sent in a message shows as a card: Open runs the copy, Watch shows a session live. Your own conversations with students are in your mailbox.
       </p>
 
       <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: busy ? 'default' : 'pointer' }}>
@@ -196,6 +198,7 @@ export default function ClassMessages({ classId }: { classId: string }) {
                             <div style={{ fontSize: 13, lineHeight: 1.45, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', color: m.removed ? 'var(--c-dim)' : 'var(--c-fg)', textDecoration: m.removed ? 'line-through' : 'none' }}>
                               {m.body}
                             </div>
+                            {m.share && <ShareCardView card={m.share} mine={false} author={m.author} onlooker />}
                           </div>
                           <button type="button" style={btn} disabled={busy} data-testid="class-messages-remove"
                             onClick={() => void act({ action: m.removed ? 'restore' : 'remove', messageId: m.id }, (j) => {

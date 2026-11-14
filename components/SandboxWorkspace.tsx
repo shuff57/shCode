@@ -27,7 +27,8 @@ import PublishGameButton from './PublishGameButton';
 import ProposeChangeButton from './ProposeChangeButton';
 import CodeTogetherBar, { useCodeTogetherAvailable } from './CodeTogetherBar';
 import SandboxProjectPicker from './SandboxProjectPicker';
-import { useSandboxProjects } from '../lib/sandbox-projects';
+import { createProject, openProject, useSandboxProjects } from '../lib/sandbox-projects';
+import SendProgramButton from './SendProgramButton';
 import { projectLessonId } from '../lib/sandbox-projects-core';
 import { RUN_TIMEOUT_MS, errorWithLocation, runStudentCode, timerLimitMessage } from '../lib/js-runner-source';
 import {
@@ -138,6 +139,43 @@ export default function SandboxWorkspace() {
   const [collabExt, setCollabExt] = useState<Extension | null>(null);
   const cloudRef = useRef(cloud);
   cloudRef.current = cloud;
+  // The session this tab is in (its code), for "Send to..." invitations, and a session a message
+  // invited this student to (/sandbox/?join=<code>&lang=js|moshion, lib/messages-client.ts shareHref).
+  const [togetherCode, setTogetherCode] = useState<string | null>(null);
+  const [invite, setInvite] = useState<string | null>(null);
+  const [pendingJoin, setPendingJoin] = useState<{ code: string; lang: 'js' | 'moshion' } | null>(null);
+  const joinProjectAsked = useRef(false);
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const code = (q.get('join') ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const lang = q.get('lang');
+    if (!q.has('join')) return;
+    // Out of the address bar, so a reload does not ask again.
+    q.delete('join');
+    q.delete('lang');
+    const rest = q.toString();
+    window.history.replaceState(window.history.state, '', window.location.pathname + (rest ? `?${rest}` : '') + window.location.hash);
+    if (code && (lang === 'js' || lang === 'moshion')) setPendingJoin({ code, lang });
+  }, []);
+  // The session is for one kind of program: open a project of that kind first (the most recent one,
+  // else a new "Code together" project). Joining replaces that project's code only after the student
+  // presses Join, which keeps the code in History first, exactly as joining by hand does.
+  useEffect(() => {
+    if (!pendingJoin || !projectsState.loaded || joinProjectAsked.current) return;
+    if (project?.mode === pendingJoin.lang) return;
+    joinProjectAsked.current = true;
+    const other = projectsState.projects.find((p) => p.mode === pendingJoin.lang);
+    if (other) { openProject(other); return; }
+    void createProject(pendingJoin.lang, 'Code together').then((r) => {
+      if (!r.ok) { setPendingJoin(null); window.alert(r.error); }
+    });
+  }, [pendingJoin, projectsState.loaded, projectsState.projects, project?.mode]);
+  useEffect(() => {
+    if (!pendingJoin || project?.mode !== pendingJoin.lang || !mayTogether) return;
+    setInvite(pendingJoin.code);
+    setPendingJoin(null);
+  }, [pendingJoin, project?.mode, mayTogether]);
+
   const togetherSnapshot = useCallback((label: string) => (
     keepInHistory(lesson.id, useLessonStore.getState().fileContents, label)
   ), [lesson.id]);
@@ -866,7 +904,7 @@ export default function SandboxWorkspace() {
                       <span ref={setTogetherBadge} style={{ display: 'inline-flex' }} />
                     </button>
                   )}
-                  {((!together && togetherLang && mayTogether) || (mode.preview === 'moshion' && lessonProgress.authed)) && (
+                  {((togetherLang && (mayTogether || together)) || (mode.preview === 'moshion' && lessonProgress.authed)) && (
                   <ShareMenu chipStyle={chipStyle}>
                   {!together && togetherLang && mayTogether && (
                     <button
@@ -882,6 +920,17 @@ export default function SandboxWorkspace() {
                       <Users size={12} aria-hidden="true" />
                       Code together
                     </button>
+                  )}
+                  {/* Send a copy, or an invitation to this Code together session, in a message (migration 0054). */}
+                  {togetherLang && (mayTogether || together) && (
+                    <SendProgramButton
+                      key={`send-${lesson.id}`}
+                      lang={togetherLang}
+                      chipStyle={chipStyle}
+                      getCode={getScript}
+                      title={project?.name ?? ''}
+                      session={together ? togetherCode : null}
+                    />
                   )}
                   {/* The Games library: publish this sketch so classmates can play and remix it. */}
                   {mode.preview === 'moshion' && lessonProgress.authed && (
@@ -946,6 +995,8 @@ export default function SandboxWorkspace() {
                     onOpenChange={setTogetherOpen}
                     dialogHost={shellRef.current}
                     badgeHost={togetherBadge}
+                    onSession={setTogetherCode}
+                    invite={invite}
                   />
                 )}
                 <div style={{ flex: '1 1 auto', minHeight: 0 }}>

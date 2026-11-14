@@ -13,6 +13,9 @@
 // Fails CLOSED: with no LIVE binding (the site deployed before the Worker) it
 // answers 503 and touches nothing else.
 //
+// ?watch=1 (migration 0054, "Watch live"): a teacher of the class, or someone a message invited to watch
+// this very session, gets a watch ticket: no seat in D1, and the LiveDoc refuses its edits.
+//
 // Code together (migration 0044): a room of kind 'code' goes to env.LIVE_DOC
 // (the LiveDoc class in the same Worker) with a DocTicket instead, and answers
 // 503 without that binding. Each Durable Object also refuses the other kind's
@@ -37,7 +40,8 @@ export const onRequestGet: PagesFunction<Env, 'code', SessionData> = async ({ en
   }
   if (!env.LIVE && !env.LIVE_DOC) return json({ error: LIVE_OFFLINE, offline: true }, 503);
 
-  const auth = await authorizeLive(env.DB, data.email, data.role, params.code, url.searchParams.get('device'));
+  // ?watch=1: a read-only seat (functions/_shared/live.ts mayWatch; the room refuses its edits).
+  const auth = await authorizeLive(env.DB, data.email, data.role, params.code, url.searchParams.get('device'), Date.now(), url.searchParams.get('watch') === '1');
   if (!auth.ok) return json({ error: auth.error }, auth.status);
   const ns = auth.kind === 'code' ? env.LIVE_DOC : env.LIVE;
   if (!ns) return json({ error: auth.kind === 'code' ? CODE_OFFLINE : LIVE_OFFLINE, offline: true }, 503);
