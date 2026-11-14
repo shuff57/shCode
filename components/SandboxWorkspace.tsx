@@ -441,11 +441,11 @@ export default function SandboxWorkspace() {
   const consoleWrapRef = useRef<HTMLDivElement>(null);
   const sizeConsole = useCallback((h: number) => {
     const box = shellRef.current?.getBoundingClientRect();
-    if (box) setFullConsoleH(Math.round(Math.max(60, Math.min(box.height - 100, h))));
+    if (box) setFullConsoleH(Math.round(Math.max(60, Math.min(box.height - 64, h))));
   }, []);
   const sizeEditor = useCallback((w: number) => {
     const box = shellRef.current?.getBoundingClientRect();
-    if (box) setFullEditorW(Math.round(Math.max(220, Math.min(box.width - 160, w))));
+    if (box) setFullEditorW(Math.round(Math.max(220, Math.min(box.width - 350, w))));
   }, []);
   const startSizing = useCallback((kind: 'console' | 'editor') => (e: React.PointerEvent<HTMLDivElement>) => {
     const shell = shellRef.current;
@@ -857,30 +857,6 @@ export default function SandboxWorkspace() {
                     {full ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
                     {full ? 'Exit full screen' : 'Full screen'}
                   </button>
-                  {/* In the toolbar, beside Exit full screen: floating over the row they
-                      covered Stop and Save, and Exit full screen itself (#115). */}
-                  {full && (
-                    <button
-                      type="button"
-                      style={chipStyle}
-                      onClick={() => setEditorHidden((h) => !h)}
-                      title={editorHidden ? 'Show the editor again' : 'Hide the editor and keep the shape'}
-                    >
-                      {editorHidden ? <PanelLeftOpen size={12} /> : <PanelLeftClose size={12} />}
-                      {editorHidden ? 'Editor' : 'Hide editor'}
-                    </button>
-                  )}
-                  {full && !isConsole && (
-                    <button
-                      type="button"
-                      style={chipStyle}
-                      onClick={() => setConsoleHidden((h) => !h)}
-                      title={consoleHidden ? 'Show the console again' : 'Hide the console and keep the shape'}
-                    >
-                      {consoleHidden ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-                      {consoleHidden ? 'Console' : 'Hide console'}
-                    </button>
-                  )}
                 </div>
               )}
               {((togetherLang && (mayTogether || together)) || (mode.preview === 'moshion' && lessonProgress.authed)) && (
@@ -1061,6 +1037,48 @@ export default function SandboxWorkspace() {
             </div>
           </div>
         )}
+        {/* Full screen hides the toolbar so the editor and console get the whole height; these are the
+            controls still needed there, in the corner over the preview (Ctrl+Enter and Esc work too). */}
+        {full && !isReshape && !isFlow && !noProjects && (
+          <div className="sandbox-full-controls" role="toolbar" aria-label="Full screen controls">
+            <button type="button" className="btn-run sandbox-full-run" onClick={run} title="Run (Ctrl+Enter)" aria-keyshortcuts="Control+Enter">▶ Run</button>
+            {isRunning && (
+              <button type="button" style={{ ...chipStyle, color: 'var(--c-red)', borderColor: 'var(--c-red)' }} onClick={stopRun} title="Stop the program">
+                ■ Stop
+              </button>
+            )}
+            {/* Icons only, named for hover and screen readers: with words the group was 500px wide
+                and sat on a widened editor. */}
+            <button
+              type="button"
+              className="sandbox-full-icon"
+              style={chipStyle}
+              onClick={() => setEditorHidden((h) => !h)}
+              title={editorHidden ? 'Show the editor' : 'Hide the editor'}
+              aria-label={editorHidden ? 'Show the editor' : 'Hide the editor'}
+              aria-pressed={editorHidden}
+            >
+              {editorHidden ? <PanelLeftOpen size={14} /> : <PanelLeftClose size={14} />}
+            </button>
+            {!isConsole && (
+              <button
+                type="button"
+                className="sandbox-full-icon"
+                style={chipStyle}
+                onClick={() => setConsoleHidden((h) => !h)}
+                title={consoleHidden ? 'Show the console' : 'Hide the console'}
+                aria-label={consoleHidden ? 'Show the console' : 'Hide the console'}
+                aria-pressed={consoleHidden}
+              >
+                {consoleHidden ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </button>
+            )}
+            <button type="button" style={chipStyle} onClick={toggleFull} title="Leave full screen (Esc)">
+              <Minimize2 size={12} />
+              Exit
+            </button>
+          </div>
+        )}
         {/* reSHape has its own toolbar row, so its console toggle still floats. */}
         {full && isReshape && !reshapeIsBuild && (
           <button
@@ -1169,6 +1187,13 @@ export default function SandboxWorkspace() {
         }
         .sandbox-shell.is-full .sandbox-header,
         .sandbox-shell.is-full .divider { display: none; }
+        /* Full screen hides the toolbar too: the corner controls below replace it. reSHape keeps
+           its own row, which holds its tools. */
+        .sandbox-shell.is-full .sandbox-toolbar { display: none; }
+        .sandbox-shell.is-full {
+          /* The editor's width, read by the editor and by the console beside it. */
+          --fe-w: min(var(--full-editor-w, min(560px, 50%)), calc(100% - 350px));
+        }
         .sandbox-shell.is-full .sandbox-split { min-height: 0; }
         /* !important beats the inline flex the divider drag leaves behind --
            without it the pane keeps whatever split it was dragged to. */
@@ -1181,8 +1206,7 @@ export default function SandboxWorkspace() {
           /* .pane sets height:100%, which would win over the top/bottom pair
              and hang the panel 24px past the bottom of the frame. */
           height: auto;
-          width: var(--full-editor-w, min(420px, 45%));
-          max-width: calc(100% - 160px);
+          width: var(--fe-w);
           flex: 0 0 auto !important;
           min-width: 0;
           z-index: 40;
@@ -1214,17 +1238,34 @@ export default function SandboxWorkspace() {
            right corner, so it never covers a line of output. */
         .sandbox-shell.is-full .sandbox-console-wrap {
           position: absolute;
-          left: 8px;
+          /* Beside the editor, not under it: output lines start at the console's left edge,
+             which the floating editor used to cover. */
+          left: calc(var(--fe-w) + 32px);
           right: 8px;
           bottom: 8px;
-          height: var(--full-console-h, 30%);
-          max-height: calc(100% - 100px);
+          height: var(--full-console-h, 34%);
+          max-height: calc(100% - 64px);
           min-height: 0;
           resize: none;
           border: 1px solid var(--x-565a70);
           box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.45);
         }
         .sandbox-shell.is-console-hidden .sandbox-console-wrap { display: none; }
+        .sandbox-shell.is-full.is-editor-hidden .sandbox-console-wrap { left: 8px; }
+        .sandbox-full-controls {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          z-index: 50;
+          display: flex;
+          gap: 6px;
+          align-items: center;
+          padding: 4px;
+          border-radius: 8px;
+          background: color-mix(in srgb, var(--c-bg) 88%, transparent);
+        }
+        .sandbox-full-controls .sandbox-full-run { padding: 4px 12px; font-size: 13px; }
+        .sandbox-full-controls .sandbox-full-icon { padding: 5px 7px; }
         /* #115: the edges that resize the console and the floating editor in
            full screen. A thin bar shows where to grab; it brightens on hover and
            on keyboard focus. */
