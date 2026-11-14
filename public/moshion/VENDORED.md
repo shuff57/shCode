@@ -269,6 +269,12 @@ it as a URL; a path or a data: URI still bypasses the store. The 8-bit palette
 
 ## To resync
 
+**Automatic path: `npm run sync:moshion`** (`scripts/sync-moshion.mjs`). It reads upstream `origin/main`
+(never the working tree), copies `moshion.js` (reapplying the `/moshion/textures/` line), `docs/moshion.d.ts` and
+`planck.min.js`, regenerates the autocomplete, runs the moshion gates, and stamps the Commit row above. `-- --check`
+only reports drift; `npm run deploy` runs it first as a warning. Afterwards read the `moshion.d.ts` diff and add
+wording to `lib/moshion-docs.ts` for anything new. The manual steps below are what it automates.
+
 1. Copy the files in the first two lists from the new commit, then re-apply
    the `/moshion/textures/` line in `moshion.js`. The WAV palette now matches
    `f259b22`; copy it or leave it, the files are identical.
