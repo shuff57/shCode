@@ -5533,3 +5533,26 @@ input.dd-date { padding-right: 8px !important; }
     .run-toolbar .toolbar-utilities .toolbar-button-label { display: none; }
   }
 }
+/* A shut sidebar is a strip as tall as the work beside it, and the whole strip opens it: the arrow at the
+   top, the sidebar's name down it. Open, the small arrow tab on the panel's edge closes it. */
+.shd-handle-label {
+  writing-mode: vertical-rl; text-orientation: mixed; white-space: nowrap;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.04em; line-height: 1;
+}
+@media (min-width: 721px) {
+  .shd-dock-wrap:not(.is-open),
+  .lab-task-side:not(.is-open) .lab-task-side-inner { align-items: stretch; }
+  .shd-dock-wrap:not(.is-open) .shd-handle-dock,
+  .lab-task-side:not(.is-open) .shd-handle-left {
+    align-self: stretch; height: auto; margin-top: 0; width: 26px;
+    flex-direction: column; justify-content: flex-start; gap: 12px; padding-top: 14px;
+    border-radius: 8px;
+  }
+  /* The same on a reading, quiz or written page: the shut Docs strip runs down the right edge. */
+  body .shd-tabstrip:not(.shd-open) .shd-tab.shd-handle {
+    flex: 1 1 auto; height: auto !important; width: 26px !important;
+    flex-direction: column; justify-content: flex-start; gap: 12px; padding-top: 14px !important;
+  }
+  body .shd-tabstrip:not(.shd-open):has(.shd-handle) { --shd-rail-width: 26px; }
+  :root:has(.shd-tabstrip:not(.shd-open) .shd-handle) { --shd-rail-width: 26px; }
+}

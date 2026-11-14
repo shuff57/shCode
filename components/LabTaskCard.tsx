@@ -97,6 +97,7 @@ export function LabTaskSidebar({ lesson }: { lesson: Lesson }) {
           onClick={onToggle}
         >
           <span aria-hidden="true">{open ? '\u2039' : '\u203a'}</span>
+          {open ? null : <span className="shd-handle-label" aria-hidden="true">Task</span>}
         </button>
       </div>
     </div>
