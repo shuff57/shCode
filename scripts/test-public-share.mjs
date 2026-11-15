@@ -271,7 +271,7 @@ check('...and Everyone is closed to her', r.body.public.allowed === false);
 // ---- 7. the notice's words, link and unread rule (lib/game-notices-core.ts, shared with the bell) ----
 const mk = (extra) => ({ kind: 'public', key: 'public:game:x', what: 'game', title: 'Dodge', who: 'Ana L.', pulled: false, snippet: '', at: Date.now() - 1000, ...extra });
 check('a teacher\'s notice reads "<name> made the game "Dodge" public" and opens the class list',
-  nc.noticeAction(mk({})) === 'made the game “Dodge” public' && nc.noticeHref(mk({ classId: 'C1' })) === '/teacher/?class=C1&tab=students#public-shares');
+  nc.noticeAction(mk({})) === 'made the game “Dodge” public' && nc.noticeHref(mk({ classId: 'C1' })) === '/teacher/?class=C1&tab=shared#public-shares');
 check('an owner\'s notice says a teacher took it down and opens the right Library tab',
   /^took down your game “Dodge”:$/.test(nc.noticeAction(mk({ pulled: true, snippet: 'why' }))) && nc.noticeHref(mk({ pulled: true, what: 'picture' })) === '/library/?tab=pictures' && nc.noticeHref(mk({ pulled: true })) === '/library/?tab=games');
 check('it is unread until that notice was opened, then read (keyed by the notice, not the game)',

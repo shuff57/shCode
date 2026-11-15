@@ -266,7 +266,7 @@ function AdminUsersInner() {
       <div style={S.page}>
         <p style={{ color: 'var(--c-red)', fontSize: 16, marginBottom: 16 }}>Admin access required.</p>
         <Link href="/" style={{ color: 'var(--c-cyan)', fontSize: 14 }}>
-          ← Home
+          Home
         </Link>
       </div>
     );

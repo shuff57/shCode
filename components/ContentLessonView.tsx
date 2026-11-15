@@ -378,7 +378,7 @@ export default function ContentLessonView({ lesson }: Props) {
               {!deckLoaded && <div role="status" style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', color: 'var(--c-meta)' }}>Loading slides…</div>}
             </div>
             <nav aria-label="Slide navigation" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 10 }}>
-              <button className="btn-secondary btn-sm" disabled={!deckLoaded || slidePosition?.current === 1} onClick={() => navigateSlide('ArrowLeft')}>‹ Previous slide</button>
+              <button className="btn-secondary btn-sm" disabled={!deckLoaded || slidePosition?.current === 1} onClick={() => navigateSlide('ArrowLeft')}>Previous slide</button>
               <span className="slide-nav-middle">
                 <span aria-live="polite" className="slide-count" style={{ color: 'var(--c-meta)', fontSize: 13 }}>{slidePosition ? `Slide ${slidePosition.current} of ${slidePosition.total}` : 'Slides'}</span>
                 <button
@@ -395,7 +395,7 @@ export default function ContentLessonView({ lesson }: Props) {
                   Open in new tab <span aria-hidden="true">↗</span>
                 </a>
               </span>
-              <button className="btn-secondary btn-sm slide-next" disabled={!deckLoaded || (!!slidePosition && slidePosition.current >= slidePosition.total)} onClick={() => navigateSlide('ArrowRight')}>Next slide ›</button>
+              <button className="btn-secondary btn-sm slide-next" disabled={!deckLoaded || (!!slidePosition && slidePosition.current >= slidePosition.total)} onClick={() => navigateSlide('ArrowRight')}>Next slide</button>
             </nav>
           </div>
         ) : slidesUrl && deckReady === null ? (

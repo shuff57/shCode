@@ -42,7 +42,7 @@ const date = (ms: number | null) => {
   try { return new Date(ms).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }); } catch { return ''; }
 };
 
-export default function ClassGuests({ classId }: { classId: string }) {
+export default function ClassGuests({ classId, onPendingChange }: { classId: string; onPendingChange?: (waiting: number) => void }) {
   const { toast, confirm } = useFeedback();
   const [rows, setRows] = useState<Row[] | null>(null);
   const [off, setOff] = useState(false);
@@ -54,6 +54,7 @@ export default function ClassGuests({ classId }: { classId: string }) {
 
   const base = `/api/classes/${encodeURIComponent(classId)}/guests`;
   const apply = (b: { guests: Row[]; guestsOff: boolean; unusedCodes: number; schoolRequired: boolean; schoolDomains: string[] }) => {
+    onPendingChange?.(b.guests.filter((g) => g.status === 'pending').length);
     setRows(b.guests); setOff(b.guestsOff); setUnused(b.unusedCodes); setSchoolOn(b.schoolRequired); setDomains(b.schoolDomains.join(', '));
   };
   const load = useCallback(async () => {
@@ -94,15 +95,18 @@ export default function ClassGuests({ classId }: { classId: string }) {
   };
 
   const schoolSettings = (
-    <div data-testid="guest-school-settings" style={{ border: '1px solid var(--c-line)', borderRadius: 6, padding: '8px 10px', marginBottom: 8 }}>
-      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13 }}>
+    // Folded away while it is off: a class that does not use the school-email check should not carry its settings on every visit.
+    <details data-testid="guest-school-settings" open={schoolOn || undefined} style={{ border: '1px solid var(--c-line)', borderRadius: 6, padding: '8px 10px', marginBottom: 8 }}>
+      <summary style={{ cursor: 'pointer', fontSize: 13, color: 'var(--c-meta)' }}>
+        School email check: {schoolOn ? 'on' : 'off (your approval is the only gate)'}
+      </summary>
+      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, marginTop: 8 }}>
         <input type="checkbox" checked={schoolOn} disabled={busy} data-testid="guest-school-switch"
           onChange={(e) => void post({ action: 'school-settings', required: e.target.checked, domains }, e.target.checked ? 'Guests now have to confirm a school email before you can approve them.' : 'Guests no longer need a school email. Your approval is the only gate.')} />
         Ask guests for a school email first
       </label>
       <p style={{ margin: '4px 0 6px', fontSize: 12, color: 'var(--c-meta)', lineHeight: 1.5 }}>
-        School mail only lets school accounts write to each other, so this site sends nothing. The guest gives a school address; you email them a
-        phrase from your school account; they type it back. Only someone who can read that inbox can. Then it is still your yes or no.
+        School mail only lets school accounts write to each other, so this site sends nothing: you email the phrase shown on the request, and the guest types it back.
       </p>
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
         <label htmlFor={`school-domains-${classId}`} style={{ fontSize: 12, color: 'var(--c-dim)' }}>School domains</label>
@@ -111,7 +115,7 @@ export default function ClassGuests({ classId }: { classId: string }) {
         <button type="button" style={btn} disabled={busy} data-testid="guest-school-save"
           onClick={() => void post({ action: 'school-settings', required: schoolOn, domains }, 'Saved the school domains.')}>Save</button>
       </div>
-    </div>
+    </details>
   );
 
   const classSwitch = (
@@ -163,11 +167,15 @@ export default function ClassGuests({ classId }: { classId: string }) {
   return (
     <div id="guests" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       <p style={{ margin: '0 0 4px', fontSize: 12, color: 'var(--c-meta)', lineHeight: 1.5 }}>
-        A student can ask to bring someone with an account into the coding sessions <em>they</em> start. Nothing opens until you say yes. They are not
-        in your class: no roster, no grades, no class messages, and they cannot start sessions. They can message the student who invited them, and
-        you can read that conversation (it is in Messages below, marked guest). Signup does not check email, so go by the address and the
-        student&apos;s own words.
+        A student can ask to bring someone with an account into the sessions they start. Nothing opens until you say yes.
       </p>
+      <details style={{ fontSize: 12, color: 'var(--c-meta)', lineHeight: 1.5, maxWidth: '70ch', marginBottom: 4 }}>
+        <summary style={{ cursor: 'pointer', color: 'var(--c-cyan)' }}>How this works</summary>
+        <p style={{ margin: '4px 0 0' }}>
+          Guests are not in your class: no roster, grades or class messages, and they cannot start sessions. They can message the student who
+          invited them, and you can read it under Messages (marked guest). Signup does not check email, so go by the address and what the student wrote.
+        </p>
+      </details>
       {classSwitch}
       {schoolSettings}
       {!pending.length && !approved.length && !ended.length && (

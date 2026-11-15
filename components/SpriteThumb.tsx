@@ -138,7 +138,7 @@ export function SpriteViewer({ name, src, frames = 1, frameDelay = 6, onClose, c
         aria-modal="true"
         aria-label={name}
         style={{
-          background: 'var(--c-bg)', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderTop: '3px solid var(--brand)',
+          background: 'var(--c-bg)', color: 'var(--c-fg)', border: '1px solid var(--c-line)',
           borderRadius: 8, width: 'min(620px, 100%)', maxHeight: 'min(90vh, 760px)', overflowY: 'auto',
           boxShadow: '0 12px 40px rgba(0, 0, 0, 0.45)', padding: '12px 16px 16px', display: 'flex', flexDirection: 'column', gap: 12,
         }}

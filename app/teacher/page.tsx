@@ -1,7 +1,7 @@
 'use client';
 
 import LessonModeControl from '../../components/LessonModeControl';
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { compareLessons, compareUnitLabels, lessonLabel } from '../../lib/lesson-title-order';
 import { NeedsAttentionPanel } from '../../components/NeedsAttentionPanel';
@@ -1850,7 +1850,7 @@ function GradebookView({
               onClick={() => pager.prev !== null && pickModule(pager.prev)}
               aria-label={pager.prev ? `Previous module: ${pager.prev}` : 'No previous module'}
             >
-              ‹ Previous
+              Previous
             </button>
             <select
               value={moduleSel ?? ''}
@@ -1870,7 +1870,7 @@ function GradebookView({
               onClick={() => pager.next !== null && pickModule(pager.next)}
               aria-label={pager.next ? `${pager.position === 0 ? 'First' : 'Next'} module: ${pager.next}` : 'No next module'}
             >
-              {pager.position === 0 ? 'First module ›' : 'Next ›'}
+              {pager.position === 0 ? 'First module' : 'Next'}
             </button>
             <p className="gb-pager-where" aria-live="polite">
               {pager.position > 0 ? (
@@ -1931,7 +1931,7 @@ function GradebookView({
             title="Student names stay in view while the lessons scroll"
             style={{ height: 32, padding: '0 8px', flexShrink: 0, borderRadius: 4, border: '1px solid var(--c-line)', background: 'var(--c-deep2)', color: 'var(--c-cyan)', fontSize: 13, opacity: gridScroll.left ? 1 : 0.5, cursor: gridScroll.left ? 'pointer' : 'not-allowed' }}
           >
-            ← Back
+            Back
           </button>
           <button
             type="button"
@@ -2686,21 +2686,58 @@ function ListView() {
 // Detail view
 // ---------------------------------------------------------------------------
 
-type TabId = 'today' | 'students' | 'gradebook' | 'schedule' | 'settings';
+type TabId = 'today' | 'students' | 'gradebook' | 'schedule' | 'shared' | 'messages' | 'settings';
 
 const TABS: Array<{ id: TabId; label: string; color: string }> = [
   { id: 'today', label: 'Today', color: 'var(--c-orange)' },
   { id: 'students', label: 'Students', color: 'var(--c-purple)' },
   { id: 'gradebook', label: 'Gradebook', color: 'var(--c-cyan)' },
   { id: 'schedule', label: 'Schedule', color: 'var(--c-green)' },
+  // The course (Today to Schedule), then what students make and say (the next two), then the class's own settings.
+  // The Students tab used to hold all ten cards; shared work and messages/guests were split out of it.
+  { id: 'shared', label: 'Shared work', color: 'var(--c-pink)' },
+  { id: 'messages', label: 'Messages & guests', color: 'var(--c-orange)' },
   { id: 'settings', label: 'Class settings', color: 'var(--c-meta)' },
 ];
+
+/** Where each of the panels that used to sit on the Students tab lives now, by the element id an old link ends in. */
+const HASH_TAB: Record<string, TabId> = {
+  '#guests': 'messages', '#guests-card': 'messages', '#messages-card': 'messages',
+  '#public-shares': 'shared', '#public-shares-card': 'shared', '#shared-games-card': 'shared', '#shared-library-card': 'shared',
+  '#game-changes-card': 'shared', '#code-sessions-card': 'shared',
+};
 
 /** ?tab= value -> tab. Accepts the two names the old tabs used (roster, attention) so saved links still land. */
 function parseTab(v: string | null): TabId | undefined {
   if (v === 'roster') return 'students';
   if (v === 'attention') return 'today';
   return TABS.some((t) => t.id === v) ? (v as TabId) : undefined;
+}
+
+/** "Jump to" links for a tab with several sections: anchors (so they can be opened in a new tab and shared), scrolled under the sticky tabs. */
+function SectionNav({ label, items }: { label: string; items: Array<{ id: string; text: string }> }) {
+  return (
+    <nav aria-label={label} style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '6px 8px', fontFamily: 'var(--font-prose)', fontSize: 13 }}>
+      <span style={{ color: 'var(--c-meta)' }}>Jump to</span>
+      {items.map((it) => (
+        <a
+          key={it.id}
+          href={`#${it.id}`}
+          className="teacher-section-link"
+          onClick={(e) => {
+            const el = document.getElementById(it.id);
+            if (!el) return;
+            e.preventDefault();
+            const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            el.scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' });
+            try { window.history.replaceState(window.history.state, '', `${window.location.pathname}${window.location.search}#${it.id}`); } catch { /* fine */ }
+          }}
+        >
+          {it.text}
+        </a>
+      ))}
+    </nav>
+  );
 }
 
 function DetailView({ classId, initialTab, initialFilter }: { classId: string; initialTab?: TabId; initialFilter?: 'behind' }) {
@@ -2777,6 +2814,53 @@ function DetailView({ classId, initialTab, initialFilter }: { classId: string; i
       window.history.replaceState(window.history.state, '', u.toString());
     } catch { /* an address bar we cannot rewrite is not worth failing a tab click over */ }
   }
+  // Guest requests waiting for this teacher: the badge on Messages & guests, so a request is not buried in a long page. The panel
+  // reports its own count after every decision (onPendingChange); this is only the first reading, before that tab is opened.
+  const [pendingGuests, setPendingGuests] = useState(0);
+  useEffect(() => {
+    if (!detail) return;
+    let cancelled = false;
+    void apiFetch<{ guests?: Array<{ status: string }> }>(`/api/classes/${classId}/guests`).then((res) => {
+      if (!cancelled && res.error === null) setPendingGuests((res.data.guests ?? []).filter((g) => g.status === 'pending').length);
+    });
+    return () => { cancelled = true; };
+  }, [detail, classId]);
+  // A link made before the split (?tab=students#guests, ?tab=students#public-shares) lands on the tab its panel moved to,
+  // and any #section link scrolls to its card once the tab and its content have drawn.
+  const [hashTick, setHashTick] = useState(0);
+  useEffect(() => {
+    const land = () => {
+      const moved = HASH_TAB[window.location.hash];
+      if (moved && (initialTab === undefined || initialTab === 'students')) { pickedTab.current = true; setActiveTab(moved); }
+      setHashTick((t) => t + 1);
+    };
+    land();
+    // A link to this same page that differs only in its #section (an Activity notice clicked while a class is open) does not reload it.
+    window.addEventListener('hashchange', land);
+    return () => window.removeEventListener('hashchange', land);
+  }, [initialTab]);
+  // A link to another tab of this class that arrives while it is open (the address changed, the page did not reload) opens that tab.
+  const firstTabLink = useRef(true);
+  useEffect(() => {
+    // Not on mount: the tab seeded the state already, and an old ?tab=students#guests link was just moved to its new tab above.
+    if (firstTabLink.current) { firstTabLink.current = false; return; }
+    if (initialTab) { pickedTab.current = true; setActiveTab(initialTab); }
+  }, [initialTab]);
+  useEffect(() => {
+    const raw = window.location.hash.slice(1);
+    // The two ids the Activity feed has always linked to are inside their cards; scroll to the card, which clears the sticky tabs.
+    const hash = ({ guests: 'guests-card', 'public-shares': 'public-shares-card' } as Record<string, string>)[raw] ?? raw;
+    if (!hash || loading) return;
+    let tries = 0;
+    const timer = window.setInterval(() => {
+      const el = document.getElementById(hash);
+      if (el || ++tries > 20) {
+        window.clearInterval(timer);
+        el?.scrollIntoView({ behavior: 'auto', block: 'start' });
+      }
+    }, 150);
+    return () => window.clearInterval(timer);
+  }, [activeTab, loading, hashTick]);
   // On a phone the tab row scrolls sideways: keep the open tab in view (Class settings starts off-screen).
   useEffect(() => {
     if (!compact) return;
@@ -3060,7 +3144,7 @@ function DetailView({ classId, initialTab, initialFilter }: { classId: string; i
           style={{ ...S.btn('var(--c-comment)'), color: 'var(--c-fg)', marginBottom: 16 }}
           onClick={() => router.push('/teacher')}
         >
-          ← Back to list
+          Back to list
         </button>
         <p style={{ color: 'var(--c-red)' }}>{loadError}</p>
       </div>
@@ -3098,7 +3182,7 @@ function DetailView({ classId, initialTab, initialFilter }: { classId: string; i
         style={{ background: 'none', border: 'none', color: 'var(--c-cyan)', cursor: 'pointer', fontFamily: 'var(--font-prose)', fontSize: 14, fontWeight: 500, padding: 0, marginBottom: compact ? 4 : 8 }}
         onClick={() => router.push('/teacher')}
       >
-        ← All classes
+        All classes
       </button>
 
       {/* Header. On a phone the Actions menu stays beside the title instead of taking a row of its own. */}
@@ -3137,18 +3221,21 @@ function DetailView({ classId, initialTab, initialFilter }: { classId: string; i
         aria-label="Class sections"
         ref={tabsRef}
         className="teacher-tabs"
-        // On a phone the five tabs sit in two rows, all visible: a single scrolling row lost 3-0 to it in the
-        // blind panel (Schedule clipped, Class settings out of sight). A 6-track grid: three tabs of two tracks
-        // on the first row, two of three on the second, so both rows fill the width and "Class settings" gets
-        // the room to stay on one line.
-        style={{ position: grading && compact ? 'static' : 'sticky', top: 0, zIndex: 20, background: 'var(--c-bg)', padding: compact ? '6px 0' : '8px 0', marginBottom: 12, display: compact ? 'grid' : 'flex', gridTemplateColumns: compact ? 'repeat(6, minmax(0, 1fr))' : undefined, gap: compact ? 6 : 8, flexWrap: 'nowrap', overflowX: 'auto', borderBottom: '1px solid var(--c-line)' }}
+        // On a phone the seven tabs sit in two rows, all visible: a single scrolling row lost 3-0 to it in the
+        // blind panel (Schedule clipped, Class settings out of sight). A 12-track grid: four tabs of three tracks
+        // on the first row (the course), three of four on the second (what students make, and settings), so
+        // both rows fill the width and the longer labels get room.
+        style={{ position: grading && compact ? 'static' : 'sticky', top: 0, zIndex: 20, background: 'var(--c-bg)', padding: compact ? '6px 0' : '8px 0', marginBottom: 12, display: compact ? 'grid' : 'flex', gridTemplateColumns: compact ? 'repeat(12, minmax(0, 1fr))' : undefined, gap: compact ? 6 : 8, flexWrap: 'nowrap', overflowX: 'auto', borderBottom: '1px solid var(--c-line)' }}
       >
         {TABS.map((t, tabIndex) => {
           const on = activeTab === t.id;
-          const badge = t.id === 'today' ? (awaitingCount ?? 0) : t.id === 'students' ? studentRoster.length : 0;
+          // On a wide screen a thin rule sets the course tabs apart from what students make and say.
+          const rule = !compact && t.id === 'shared';
+          const badge = t.id === 'today' ? (awaitingCount ?? 0) : t.id === 'students' ? studentRoster.length : t.id === 'messages' ? pendingGuests : 0;
           return (
+            <Fragment key={t.id}>
+            {rule && <span aria-hidden="true" style={{ alignSelf: 'stretch', width: 1, margin: '2px 4px', background: 'var(--c-line)', flexShrink: 0 }} />}
             <button
-              key={t.id}
               type="button"
               role="tab"
               id={`tab-${t.id}`}
@@ -3176,7 +3263,7 @@ function DetailView({ classId, initialTab, initialFilter }: { classId: string; i
                 // Phone: equal-height cells, label centred; a label that still cannot fit (a wider font from
                 // Appearance settings) wraps inside its cell instead of being clipped.
                 ...(compact ? {
-                  gridColumn: tabIndex < 3 ? 'span 2' : 'span 3',
+                  gridColumn: tabIndex < 4 ? 'span 3' : 'span 4',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center',
                   whiteSpace: 'normal', height: 'auto', minHeight: 36, lineHeight: '16px', minWidth: 0,
                 } : {}),
@@ -3186,12 +3273,13 @@ function DetailView({ classId, initialTab, initialFilter }: { classId: string; i
               {badge > 0 && (
                 <span
                   style={{ marginLeft: compact ? 4 : 8, background: on ? 'var(--c-bg)' : t.color, color: on ? t.color : 'var(--c-bg)', borderRadius: 10, padding: compact ? '0 4px' : '0 8px', fontSize: 12, fontWeight: 700 }}
-                  title={t.id === 'today' ? `${badge} submission${badge === 1 ? '' : 's'} waiting for you to grade` : `${badge} enrolled student${badge === 1 ? '' : 's'}`}
+                  title={t.id === 'today' ? `${badge} submission${badge === 1 ? '' : 's'} waiting for you to grade` : t.id === 'messages' ? `${badge} guest request${badge === 1 ? '' : 's'} waiting for you to decide` : `${badge} enrolled student${badge === 1 ? '' : 's'}`}
                 >
                   {badge}
                 </span>
               )}
             </button>
+            </Fragment>
           );
         })}
       </div>
@@ -3428,42 +3516,62 @@ function DetailView({ classId, initialTab, initialFilter }: { classId: string; i
           <h2 style={S.h2}>Bulk enroll</h2>
           <BulkEnrollmentForm classId={classId} joinCode={currentCode} onDone={() => { void loadDetail(); }} />
         </div>
-        {/* Textures and sounds students shared with this class (#81) */}
-        <div style={S.card}>
-          <h2 style={S.h2}>Shared textures, sounds and fonts</h2>
-          <ClassLibraryModeration classId={classId} />
         </div>
-        {/* Games students published from the moSHion sandbox and shared with this class */}
-        <div style={S.card}>
-          <h2 style={S.h2}>Shared games</h2>
-          <ClassGamesModeration classId={classId} />
+      )}
+
+      {activeTab === 'shared' && (
+        <div role="tabpanel" id="panel-shared" aria-labelledby="tab-shared" style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
+          <SectionNav
+            label="Sections on this tab"
+            items={[
+              { id: 'public-shares-card', text: 'Newly public' },
+              { id: 'shared-games-card', text: 'Games' },
+              { id: 'shared-library-card', text: 'Pictures, sounds and fonts' },
+              { id: 'game-changes-card', text: 'Proposed changes' },
+              { id: 'code-sessions-card', text: 'Code together' },
+            ]}
+          />
+          {/* What students shared with EVERYONE (migration 0058): live at once, so a teacher sees it here and can take it down.
+              The Activity feed's "made ... public" notice links to #public-shares. */}
+          <div style={{ ...S.card, scrollMarginTop: 'calc(var(--teacher-tabs-h, 0px) + 12px)' }} id="public-shares-card">
+            <h2 style={S.h2}>Newly public</h2>
+            <ClassPublicShares classId={classId} />
+          </div>
+          {/* Games students published from the moSHion sandbox and shared with this class */}
+          <div style={{ ...S.card, scrollMarginTop: 'calc(var(--teacher-tabs-h, 0px) + 12px)' }} id="shared-games-card">
+            <h2 style={S.h2}>Shared games</h2>
+            <ClassGamesModeration classId={classId} />
+          </div>
+          {/* Textures, sounds and fonts students shared with this class (#81) */}
+          <div style={{ ...S.card, scrollMarginTop: 'calc(var(--teacher-tabs-h, 0px) + 12px)' }} id="shared-library-card">
+            <h2 style={S.h2}>Shared textures, sounds and fonts</h2>
+            <ClassLibraryModeration classId={classId} />
+          </div>
+          {/* Changes students proposed to each other's games, and their conversations (free text; teachers read them here) */}
+          <div style={{ ...S.card, scrollMarginTop: 'calc(var(--teacher-tabs-h, 0px) + 12px)' }} id="game-changes-card">
+            <h2 style={S.h2}>Proposed changes to games</h2>
+            <ClassGameChanges classId={classId} />
+          </div>
+          {/* Programs students wrote together in the sandbox (Code together); kept 30 days */}
+          <div style={{ ...S.card, scrollMarginTop: 'calc(var(--teacher-tabs-h, 0px) + 12px)' }} id="code-sessions-card">
+            <h2 style={S.h2}>Code together sessions</h2>
+            <ClassCodeSessions classId={classId} />
+          </div>
         </div>
-        {/* What students shared with EVERYONE (migration 0058): live at once, so a teacher sees it here and can take it down.
-            The Activity feed's "made ... public" notice links to #public-shares. */}
-        <div style={S.card} id="public-shares-card">
-          <h2 style={S.h2}>Newly public</h2>
-          <ClassPublicShares classId={classId} />
-        </div>
-        {/* Changes students proposed to each other's games, and their conversations (free text; teachers read them here) */}
-        <div style={S.card}>
-          <h2 style={S.h2}>Proposed changes to games</h2>
-          <ClassGameChanges classId={classId} />
-        </div>
-        {/* Messages between students of this class (migration 0053): the switch, pausing a student, reading and removing */}
-        <div style={S.card}>
-          <h2 style={S.h2}>Messages</h2>
-          <ClassMessages classId={classId} />
-        </div>
-        {/* Guests students asked to bring into the sessions they start (migration 0059): nothing opens until a teacher approves. */}
-        <div style={S.card} id="guests-card">
-          <h2 style={S.h2}>Guests</h2>
-          <ClassGuests classId={classId} />
-        </div>
-        {/* Programs students wrote together in the sandbox (Code together); kept 30 days */}
-        <div style={S.card}>
-          <h2 style={S.h2}>Code together sessions</h2>
-          <ClassCodeSessions classId={classId} />
-        </div>
+      )}
+
+      {activeTab === 'messages' && (
+        <div role="tabpanel" id="panel-messages" aria-labelledby="tab-messages" style={{ display: 'grid', gap: 16, gridTemplateColumns: 'minmax(0, 1fr)' }}>
+          {/* Guests first: a request waits here until a teacher decides (migration 0059), so it leads the tab. */}
+          <div style={{ ...S.card, scrollMarginTop: 'calc(var(--teacher-tabs-h, 0px) + 12px)' }} id="guests-card">
+            <h2 style={S.h2}>Guests{pendingGuests > 0 ? ` (${pendingGuests} waiting)` : ''}</h2>
+            <ClassGuests classId={classId} onPendingChange={setPendingGuests} />
+          </div>
+          {/* Messages between students of this class (migration 0053): the switch, pausing a student, reading and removing */}
+          <div style={{ ...S.card, scrollMarginTop: 'calc(var(--teacher-tabs-h, 0px) + 12px)' }} id="messages-card">
+            <h2 style={S.h2}>Messages</h2>
+            <ClassMessages classId={classId} />
+          </div>
         </div>
       )}
 

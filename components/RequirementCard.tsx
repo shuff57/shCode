@@ -17,9 +17,6 @@ export default function RequirementCard({
   if (req.status === 'passed') classes.push('pass');
   if (req.status === 'failed') classes.push('fail');
 
-  const borderColor =
-    req.status === 'passed' ? 'var(--c-green)' : req.status === 'failed' ? 'var(--c-red)' : 'var(--c-line)';
-
   const status =
     req.status === 'passed'
       ? { text: 'Passed', icon: '\u2713', color: 'var(--c-green)' }
@@ -30,7 +27,6 @@ export default function RequirementCard({
   return (
     <div
       className={classes.join(' ')}
-      style={{ borderLeft: `4px solid ${borderColor}` }}
     >
       <h3 className="text-xl req-title-row">
         <span className="req-title">{req.title}</span>

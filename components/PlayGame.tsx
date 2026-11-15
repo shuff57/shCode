@@ -129,7 +129,7 @@ export default function PlayGame() {
   }, []);
 
   const wrap: React.CSSProperties = { maxWidth: 1100, margin: '0 auto', width: '100%', padding: '8px 16px 24px', boxSizing: 'border-box', color: 'var(--c-fg)' };
-  const back = <a href="/library/" style={{ color: 'var(--c-cyan)', fontSize: 13 }}>← Library</a>;
+  const back = <a href="/library/" style={{ color: 'var(--c-cyan)', fontSize: 13 }}>Library</a>;
 
   if (state.kind === 'builtin') {
     const b = state.game;

@@ -21,12 +21,6 @@ const typeBadgeColors: Record<string, string> = {
   example: 'var(--x-a78bfa)',
 };
 
-// Right-edge stripe colors signal per-lesson progress state.
-const stateStripeColors: Record<string, string> = {
-  completed: 'var(--c-green)',
-  started: 'var(--c-yellow)',
-};
-
 interface Props {
   lesson: Lesson;
   // Home page passes `true` for every lesson except the first one in its
@@ -43,7 +37,6 @@ export default function LessonCard({ lesson, lockedForStudent = false }: Props) 
   const counted = useCountedLessons();
   const teacherDue = useTeacherDue();
   const lessonState = progress.states[lesson.id];
-  const stripeColor = stateStripeColors[lessonState ?? ''] ?? 'var(--border)';
   // The card only has the lesson itself, so its module comes off the numbered
   // title prefix — "1.1.4 What a Program Is" -> "1.1".
   const moduleId = moduleIdFromTitle(lesson.title);
@@ -59,8 +52,6 @@ export default function LessonCard({ lesson, lockedForStudent = false }: Props) 
   const locked = (progress.loaded && lockedForStudent && !bypass) || timeLocked;
 
   const cardStyle: React.CSSProperties = {
-    borderLeftColor: pBadge?.color ?? typeBadgeColors[type] ?? 'var(--brand)',
-    borderRightColor: stripeColor,
     opacity: locked ? 0.5 : 1,
     cursor: locked ? 'not-allowed' : undefined,
   };
@@ -187,7 +178,7 @@ export default function LessonCard({ lesson, lockedForStudent = false }: Props) 
   if (locked) {
     return (
       <div
-        className="bg-card border-border border rounded p-4 block border-l-4 border-r-4 shadow-lg"
+        className="bg-card border-border border rounded p-4 block shadow-lg"
         style={cardStyle}
         aria-disabled="true"
       >
@@ -199,7 +190,7 @@ export default function LessonCard({ lesson, lockedForStudent = false }: Props) 
   return (
     <Link
       href={href}
-      className="bg-card border-border border rounded p-4 hover:bg-muted block border-l-4 border-r-4 shadow-lg"
+      className="bg-card border-border border rounded p-4 hover:bg-muted block shadow-lg"
       style={cardStyle}
     >
       {inner}

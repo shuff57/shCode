@@ -46,7 +46,7 @@ appears in `classPeople()`, so every messaging/channel/@mention list stays class
    types an email (and `findPII` would refuse one anyway).
 2. **Redeem.** The guest, signed in with their own account, enters the code (`/join-class` gets a second box, or
    `/guest`). Status becomes `pending`. The guest sees "Waiting for <teacher> to say yes."
-3. **Approve.** Class page -> Students tab -> **Guests**: who invited, the guest's first name + last initial,
+3. **Approve.** Class page -> Messages & guests tab -> **Guests**: who invited, the guest's first name + last initial,
    their account role and when it was created, **Approve / Decline**. Nothing is live until a teacher of the
    vouching class approves. Either teacher of the class can later **Revoke**; so can the host student, at once.
 4. **Expire.** Same school-year cutoff as enrollments (`getCurrentExpirationDate`). Approval does not renew.

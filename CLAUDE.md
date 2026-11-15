@@ -765,7 +765,7 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   it at once as first name + last initial, never the email; hidden items only for the class's teachers);
   `GET|POST /api/classes/[id]/library-shares` hide / unhide / remove (owner, co-teacher, admin). Re-sharing does not
   undo a hide; deleting the item unshares it. UI: `ShareToggle`, `ClassLibrary` (Copy to mine), and
-  `ClassLibraryModeration` on the class page's Students tab. Tests: `scripts/test-library-share.mjs`. In dev every
+  `ClassLibraryModeration` on the class page's Shared work tab. Tests: `scripts/test-library-share.mjs`. In dev every
   `dev_student` identity is enrolled in one "Dev class".
 
 ### A sketch's remote saves (#97, migration 0046)
@@ -907,7 +907,7 @@ Routes: `GET|POST /api/messages` (`?count=1` the unread count, `?people=1` whom 
 the switch, mute/unmute, the students-only conversations, `?thread=`, remove/restore; reading there marks nothing read).
 UI: the header envelope (`components/NotificationBell.tsx`) has Messages (`components/Mailbox.tsx`) and Activity tabs;
 its count adds both; the count is asked every 30 s while visible and on tab focus, an open conversation every 10 s
-(polling, no WebSocket). Teacher panel: `components/ClassMessages.tsx`, Students tab. Deleting a class deletes its
+(polling, no WebSocket). Teacher panel: `components/ClassMessages.tsx`, Messages & guests tab. Deleting a class deletes its
 messages. Tests: `scripts/test-messages.mjs` (real handlers, npm test). Dev: `DEV_REAL_DB=1 DEV_ROLE=teacher npm run
 dev`, two `dev_student` cookies are two classmates (a dev student joins the dev class on its first API call).
 Deploy: apply 0053 (`npm run d1:migrate`) before the site.
@@ -1033,7 +1033,7 @@ the app); a pull shows the student "Your teacher took this down" with an optiona
   `hidden_at`, narrowing or stopping never deletes it (`unpublishStatement` only removes a LIVE row), so the student cannot make it
   public again. **Putting back deletes the row** (`restorePublic`): permission, not publication, so a student who narrowed to their
   classes after the pull is not republished against their choice (found by a test that asserted nothing). The class switch is
-  `class-off|class-on` on the same route. Panel: `components/ClassPublicShares.tsx`, the "Newly public" card on the Students tab
+  `class-off|class-on` on the same route. Panel: `components/ClassPublicShares.tsx`, the "Newly public" card on the Shared work tab
   (`#public-shares`).
 - **Told in the app:** `publicNotices` adds a `public` kind to the envelope's Activity feed (`lib/game-notices-core.ts`): a teacher
   sees "<name> made the game "X" public" (14 days, links to the class list); an owner sees "Your teacher took down your game "X"",
@@ -1173,11 +1173,11 @@ evicted between writes wakes behind, and a client ahead of it (push/pull past it
 that refuses an oversized paste in plain words), added to `CodeMirrorPane` through its `collab` Compartment prop. **The
 text is kept for teachers:** the LiveDoc writes its own copy (never a client's) to D1 `code_sessions` through its own
 `DB` binding (`writeCodeSession`): at once on the first change, then at most every 2 minutes while it changes, on close
-and when the last person leaves; rows older than 30 days go on the next write. The class page's Students tab shows
+and when the last person leaves; rows older than 30 days go on the next write. The class page's Shared work tab shows
 "Code together sessions" (`components/ClassCodeSessions.tsx`, `GET /api/classes/[id]/code-sessions`, owner, co-teacher
 or admin; host or any participant enrolled; `?id=` for the text). Dev: `DEV_REAL_DB=1 DEV_ROLE=teacher npm run dev`, two
 students with `dev_student=<name>; dev_role=student` cookies (server.js `devRoleOf`), the teacher with no cookie on
-`/teacher?class=dev-class&tab=students`. Tests: `scripts/test-live-doc.mjs` (npm test: convergence of two collab clients
+`/teacher?class=dev-class&tab=shared`. Tests: `scripts/test-live-doc.mjs` (npm test: convergence of two collab clients
 under random concurrent edits, kind routing, the teacher route), `scripts/test-live-worker.mjs` (LiveDoc case, local
 wrangler dev). Deploy order: apply 0044 (`npm run d1:migrate`), `cd workers/live && npx wrangler deploy` (adds LiveDoc,
 tag v2, D1 binding), then the site (the repo wrangler.toml now declares `LIVE_DOC`; do not deploy the site from this
@@ -1208,7 +1208,7 @@ first name + last initial, never an email (the moderation list included). Routes
 gets a hidden one marked; else 404), `POST /api/games/[id]/share`, `GET /api/games/shared`,
 `GET|POST /api/classes/[id]/game-shares`. Rules in `lib/games-core.ts`, reads in `functions/_shared/games.ts`,
 browser calls and Remix in `lib/games-client.ts`. UI: Library -> Games (`components/GamesLibrary.tsx`),
-`/play?game=<id>` (`components/PlayGame.tsx`), class page Students tab "Shared games"
+`/play?game=<id>` (`components/PlayGame.tsx`), class page Shared work tab "Shared games"
 (`components/ClassGamesModeration.tsx`). **A published game runs only in `MoshionPreview` on /play with
 `gameKey="game-<id>"`** (so the lobby lists only that game's rooms); nothing else may execute it. Remix writes the
 code into the `sandbox-moshion` draft, asks before replacing a draft that differs from the starter and keeps the old
@@ -1293,7 +1293,7 @@ with it); the maker reviews it on `/changes?id=<cid>` (See the changes, Try it o
 Try it and "Bring in the newest version"); a clash is never shown as conflict markers. **The conversation is free
 text that any classmate who can see the game may join** (owner decision 2026-11-10, the one exception to "games carry
 game data, not chat"; #96's fixed-list `game_suggestions` is a different feature); it stays open after a decision
-until the maker or a teacher closes it, and the class's teachers read it all on the Students tab ("Proposed changes to
+until the maker or a teacher closes it, and the class's teachers read it all on the Shared work tab ("Proposed changes to
 games") and can delete comments, close or remove. Who sees what: `gameAccess`/`changeAccess` in
 `functions/_shared/gameFlow.ts`; rules and words: `lib/game-flow-core.ts`; browser: `lib/game-flow-client.ts`. The
 sandbox record `shCode:sandbox-game` carries `fromVersion` (the remix's base) and `version` (which version of your
@@ -1400,8 +1400,16 @@ before your students first use a capped part, and commit it; after that deploy i
 segments need `generateStaticParams()` at build time. For runtime-only IDs
 (classes, per-student views), use **query-string routing** on a single static
 page — e.g. `/teacher?class=<id>`, `/teacher-edit?class=X&student=Y&lesson=Z`.
-The class page (`/teacher?class=<id>`) has five sections, `&tab=today|students|gradebook|schedule|settings`
-(the old `roster` and `attention` values and `?view=gradebook` still land). Only the open tab mounts, so a
+The class page (`/teacher?class=<id>`) has seven sections, `&tab=today|students|gradebook|schedule|shared|messages|settings`
+(the old `roster` and `attention` values and `?view=gradebook` still land). **The Students tab is only the roster, Add
+student and Bulk enroll** (2026-11-15; it had grown to ten stacked cards): **Shared work** (`shared`) holds Newly public,
+Shared games, Shared textures/sounds/fonts, Proposed changes to games and Code together sessions, with a "Jump to" list
+(`SectionNav`); **Messages & guests** (`messages`) holds Guests (first: a request waits there for a decision, and the tab carries a
+count badge of waiting requests, `ClassGuests onPendingChange`) and Messages. On a wide screen a thin rule sets those two
+tabs and Class settings apart from the course tabs; on a phone the tabs are a 12-track grid, four then three. **A link made
+before the split still lands:** `?tab=students#guests` and `#public-shares` (and the other card ids) are mapped to their new
+tab by `HASH_TAB` and scrolled to under the sticky tabs; the Activity feed now links `tab=messages#guests` and
+`tab=shared#public-shares`. Only the open tab mounts, so a
 new panel belongs under exactly one tab in `DetailView`, not alongside them all. With no `tab` it opens on
 Students and moves to Today once if submissions are waiting for a grade; the last class opened is kept in
 `localStorage` (`shcode:lastClass`) for the class list and the top-nav Gradebook shortcut.
@@ -1699,6 +1707,10 @@ To announce a feature:
 - URL path params with `@` or other non-alphanum characters: ALWAYS
   `decodeURIComponent` + `normalizeEmail` before using them. Pages doesn't
   auto-decode.
+- **No coloured left or top edge on a card, row, banner, note, selection or dialog** (owner's decision 2026-11-15: it is the "AI
+  accent stripe"). State is said in words or a pill ("Done", "In progress", "Next up", "Passed / Not yet", a quiz verdict), a selection
+  by a tint, a note by its tint, a dialog by nothing. Left in on purpose because they carry meaning: diff add/remove bars
+  (`DiffViewer`, `HistoryPanel`), the gradebook's category-coloured header edge, flowchart shape styling, and editor cursors.
 - Inline style convention for components, using the Dracula palette defined in
   `app/globals.css`. See `components/AuthButton.tsx`, `app/teacher/page.tsx` for
   the established look.

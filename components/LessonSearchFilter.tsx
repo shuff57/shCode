@@ -115,7 +115,7 @@ export default function LessonSearchFilter({ units, lessons }: Props) {
   const nextLabel = pick?.kind === 'next' && pick.reason === 'in-progress'
     ? 'Continue where you left off'
     : anyProgress ? 'Next up: the first lesson you have not finished' : 'Start here';
-  const nextVerb = pick?.kind === 'next' && pick.started ? 'Continue →' : 'Start →';
+  const nextVerb = pick?.kind === 'next' && pick.started ? 'Continue' : 'Start';
   const [query, setQuery] = useState('');
   // Due dates are per class, so every chip on this page reads one chosen
   // class. Renders nothing at all for a student.

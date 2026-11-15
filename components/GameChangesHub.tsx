@@ -97,7 +97,7 @@ export default function GameChangesHub({ gameId, initialTab }: { gameId: string;
 
   return (
     <div>
-      <a href="/library/?tab=games" style={flowLink}>← Library</a>
+      <a href="/library/?tab=games" style={flowLink}>Library</a>
       <h1 style={{ fontSize: 22, margin: '8px 0 2px', overflowWrap: 'anywhere' }}>{g.title}</h1>
       <div style={{ fontSize: 13, color: 'var(--c-dim)' }}>
         by {g.mine ? `${g.maker} (you)` : g.maker} · version {g.version} · <a href={playHref(g.id)} style={flowLink}>Play</a>

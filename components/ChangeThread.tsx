@@ -106,7 +106,7 @@ export default function ChangeThread({ id }: { id: string }) {
   return (
     <div>
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', fontSize: 13 }}>
-        {g && <a href={gameChangesHref(g.id)} style={flowLink}>← All proposed changes to {gameTitle}</a>}
+        {g && <a href={gameChangesHref(g.id)} style={flowLink}>All proposed changes to {gameTitle}</a>}
         <a href="/library/?tab=games" style={flowLink}>Library</a>
       </div>
 

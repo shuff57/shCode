@@ -337,7 +337,6 @@ export default function SandboxProjectPicker({
                       padding: '8px 8px',
                       borderRadius: 6,
                       border: 'none',
-                      borderLeft: `3px solid ${isOpen ? 'var(--c-purple)' : 'transparent'}`,
                       background: isOpen ? 'var(--c-line)' : 'transparent',
                       color: 'var(--c-fg)',
                       cursor: locked && !isOpen ? 'not-allowed' : 'pointer',

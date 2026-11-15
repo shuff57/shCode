@@ -161,7 +161,7 @@ const S = {
     display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
   } as React.CSSProperties,
   dialog: {
-    background: 'var(--c-bg)', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderTop: '3px solid var(--brand)',
+    background: 'var(--c-bg)', color: 'var(--c-fg)', border: '1px solid var(--c-line)',
     borderRadius: 8, width: 'min(640px, 100%)', maxHeight: 'min(90vh, 860px)', display: 'flex', flexDirection: 'column',
     boxShadow: '0 12px 40px rgba(0, 0, 0, 0.45)', outline: 'none',
   } as React.CSSProperties,

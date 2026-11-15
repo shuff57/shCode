@@ -125,7 +125,7 @@ export default function ClassGamesModeration({ classId }: { classId: string }) {
   if (error) return <p style={{ color: 'var(--c-red)', fontSize: 13 }}>{error}</p>;
   if (!rows) return <p style={{ color: 'var(--c-dim)', fontSize: 13 }}>Loading…</p>;
   if (!rows.length) {
-    return <>{classSwitch}<p style={{ color: 'var(--c-dim)', fontSize: 13, margin: 0 }}>No games shared yet. When a student presses &ldquo;Publish game&rdquo; in the moSHion sandbox and shares it, it shows up here and in every classmate&rsquo;s Library under Games.</p></>;
+    return <>{classSwitch}<p style={{ color: 'var(--c-dim)', fontSize: 13, margin: 0 }}>No games shared yet. Games students publish and share show up here.</p></>;
   }
   const btn = { fontSize: 12, padding: '3px 8px', borderRadius: 4, cursor: 'pointer', background: 'transparent', color: 'var(--c-cyan)', border: '1px solid var(--c-line)', textDecoration: 'none' } as const;
   return (

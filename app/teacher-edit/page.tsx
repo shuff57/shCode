@@ -324,7 +324,7 @@ function TeacherEditInner() {
           Invalid URL — missing class, student, or lesson parameter.
         </p>
         <a href="/teacher" style={{ color: 'var(--c-cyan)', fontSize: 14 }}>
-          ← Back to teacher dashboard
+          Back to teacher dashboard
         </a>
       </div>
     );
@@ -341,7 +341,7 @@ function TeacherEditInner() {
           Teacher or admin access required.
         </p>
         <a href="/teacher" style={{ color: 'var(--c-cyan)', fontSize: 14 }}>
-          ← Sign in as a teacher
+          Sign in as a teacher
         </a>
       </div>
     );
@@ -461,7 +461,7 @@ function TeacherEditInner() {
           href={`/teacher?class=${encodeURIComponent(classId)}`}
           style={{ color: 'var(--c-cyan)', fontSize: 14, textDecoration: 'none' }}
         >
-          ← Back to class
+          Back to class
         </a>
       </div>
 
@@ -473,7 +473,7 @@ function TeacherEditInner() {
         <div style={{ padding: 32 }}>
           <p style={S.error}>{loadError}</p>
           <a href={`/teacher?class=${encodeURIComponent(classId)}`} style={{ color: 'var(--c-cyan)', fontSize: 14 }}>
-            ← Back to class
+            Back to class
           </a>
         </div>
       )}
@@ -484,7 +484,7 @@ function TeacherEditInner() {
             Student hasn&apos;t saved any work yet on this lesson — cannot edit.
           </p>
           <a href={`/teacher?class=${encodeURIComponent(classId)}`} style={{ color: 'var(--c-cyan)', fontSize: 14 }}>
-            ← Back to class
+            Back to class
           </a>
         </div>
       )}

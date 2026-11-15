@@ -27,8 +27,7 @@ export default function ClassGameChanges({ classId }: { classId: string }) {
   if (!data.changes.length) {
     return (
       <p style={{ color: 'var(--c-dim)', fontSize: 13, margin: 0, lineHeight: 1.5 }}>
-        None yet. When a student remixes a classmate&apos;s game and proposes the change back, it shows here with its conversation.
-        Students are told teachers can read every conversation.
+        None yet. Changes students propose to each other&apos;s games show here, with their conversations.
       </p>
     );
   }
@@ -43,7 +42,7 @@ export default function ClassGameChanges({ classId }: { classId: string }) {
   return (
     <div>
       <p style={{ color: 'var(--c-dim)', fontSize: 13, margin: '0 0 8px', lineHeight: 1.5 }}>
-        Students propose changes to each other&apos;s games and talk them over. View a conversation to delete a comment, close it to new comments, or remove the proposal.
+        Open a conversation to delete a comment, close it, or remove the proposal.
       </p>
       <div style={{ display: 'flex', gap: 6, margin: '0 0 8px' }}>
         {tabBtn('changes', `Proposals (${data.changes.length})`)}

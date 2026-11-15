@@ -447,7 +447,6 @@ export default function QuizView({ lessonId, config }: Props) {
             style={{
               background: 'var(--c-bg)',
               border: '1px solid var(--c-line)',
-              borderLeft: `4px solid ${isCorrect ? 'var(--c-green)' : isWrong ? 'var(--c-red)' : 'var(--c-line)'}`,
               borderRadius: 6,
               padding: '12px 16px',
               marginBottom: 10,

@@ -94,8 +94,7 @@ export default function ClassPublicShares({ classId }: { classId: string }) {
   return (
     <div id="public-shares" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
       <p style={{ margin: '0 0 4px', fontSize: 12, color: 'var(--c-meta)', lineHeight: 1.5 }}>
-        Students can share a picture, sound, font or game with <strong>everyone in a class on shCode</strong>. It goes live at once, so
-        this is where you see it. Taking it down puts it back with their classes.
+        What students share with <strong>everyone</strong> goes live at once. Take it down here and it goes back to their classes only.
       </p>
       {classSwitch}
       {!rows.length && (

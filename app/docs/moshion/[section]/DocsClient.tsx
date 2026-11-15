@@ -212,7 +212,7 @@ export default function DocsClient({
                 })}
               </nav>
               <div className="docs-sidebar-footer">
-                <Link href="/">← Back to lessons</Link>
+                <Link href="/">Back to lessons</Link>
               </div>
             </>
           )}
@@ -301,14 +301,14 @@ export default function DocsClient({
               className="btn-secondary btn-sm"
               href={`${basePath}/${section.slug}?page=${pageIndex}`}
             >
-              ← {section.pages[pageIndex - 1].title}
+              Previous: {section.pages[pageIndex - 1].title}
             </Link>
           ) : prevSection ? (
             <Link
               className="btn-secondary btn-sm"
               href={`${basePath}/${prevSection.slug}?page=${prevSection.pages.length}`}
             >
-              ← {prevSection.title}
+              Previous: {prevSection.title}
             </Link>
           ) : (
             <span />
@@ -318,14 +318,14 @@ export default function DocsClient({
               className="btn-secondary btn-sm"
               href={`${basePath}/${section.slug}?page=${pageIndex + 2}`}
             >
-              {section.pages[pageIndex + 1].title} →
+              Next: {section.pages[pageIndex + 1].title}
             </Link>
           ) : nextSection ? (
             <Link
               className="btn-secondary btn-sm"
               href={`${basePath}/${nextSection.slug}`}
             >
-              {nextSection.title} →
+              Next: {nextSection.title}
             </Link>
           ) : (
             <span />

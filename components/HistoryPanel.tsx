@@ -131,7 +131,6 @@ const rowStyleBase = (active: boolean): React.CSSProperties => ({
   textAlign: 'left',
   background: active ? 'var(--c-line)' : 'transparent',
   border: 'none',
-  borderLeft: `3px solid ${active ? ACCENT : 'transparent'}`,
   borderRadius: 0,
   padding: '9px 12px',
   cursor: 'pointer',

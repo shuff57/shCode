@@ -181,7 +181,7 @@ export default function IssuesPage() {
       <div style={S.page}>
         <h1 style={S.h1}>Issue reports</h1>
         <p style={{ opacity: 0.7 }}>Sign in to see what everyone else has reported.</p>
-        <Link href="/" style={{ color: 'var(--brand)', fontSize: 14 }}>← Home</Link>
+        <Link href="/" style={{ color: 'var(--brand)', fontSize: 14 }}>Home</Link>
       </div>
     );
   }

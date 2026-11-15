@@ -119,11 +119,13 @@ export default function ClassMessages({ classId }: { classId: string }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }} data-testid="class-messages">
       <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, color: 'var(--c-meta)', maxWidth: '70ch' }}>
-        Students can message you and their classmates, make groups and post in the class&rsquo;s channels, from the
-        mailbox at the top of every page or the Messages page. Messages with phone numbers, addresses or emails are
-        refused. Every conversation between two students and every group is listed below (a student&rsquo;s talk with a guest they invited is too, marked guest), and students are told you can
-        read them. The class&rsquo;s channels are in your own mailbox, where you can lock, rename or delete them. A program sent in a message shows as a card: Open runs the copy, Watch shows a session live. Your own conversations with students are in your mailbox.
+        You can read every conversation between two students and every group, and students are told so. Your own conversations and the
+        class&rsquo;s channels are in your mailbox.
       </p>
+      <details style={{ fontSize: 12, color: 'var(--c-meta)', lineHeight: 1.5, maxWidth: '70ch' }}>
+          <summary style={{ cursor: 'pointer', color: 'var(--c-cyan)' }}>How this works</summary>
+          <p style={{ margin: '4px 0 0' }}>Messages with phone numbers, addresses or emails are refused. A student&rsquo;s talk with a guest they invited is listed too, marked guest. In your mailbox you can lock, rename or delete channels. A program sent in a message shows as a card: Open runs a copy, Watch follows a live session.</p>
+        </details>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
         <label htmlFor={`class-level-${classId}`} style={{ fontSize: 13, fontWeight: 600 }}>Student messages in this class</label>
@@ -147,8 +149,7 @@ export default function ClassMessages({ classId }: { classId: string }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <div style={{ fontSize: 13, fontWeight: 600 }}>One student</div>
         <p style={{ margin: 0, fontSize: 12, color: 'var(--c-dim)', maxWidth: '70ch' }}>
-          Teacher only: they can message you, nothing else. Off: they cannot send anything, even to you. The stricter of
-          this and the class setting is what counts.
+          Teacher only: they can message only you. Off: they cannot send anything. The stricter of this and the class setting applies.
         </p>
         {limited.length === 0 && <p style={{ margin: 0, fontSize: 13, color: 'var(--c-dim)' }}>Every student is On.</p>}
         {data.students.length > 0 && (

@@ -358,7 +358,7 @@ const RECIPES = {
 
   '2026-11-guest-approval': {
     people: [TEACHER],
-    path: '/teacher/?class=dev-class&tab=students',
+    path: '/teacher/?class=dev-class&tab=messages',
     async setup({ person }) {
       const sam = await person(SAM, '/');
       const jordan = await person(JORDAN, '/guest/');
@@ -448,7 +448,7 @@ const RECIPES = {
 
   '2026-11-message-levels': {
     people: [TEACHER],
-    path: '/teacher/?class=dev-class&tab=students',
+    path: '/teacher/?class=dev-class&tab=messages',
     posterOnly: true,
     async setup({ person }) {
       const l = await person(LEO, '/');
@@ -511,7 +511,7 @@ const RECIPES = {
 
   '2026-11-class-messages': {
     people: [TEACHER],
-    path: '/teacher/?class=dev-class&tab=students',
+    path: '/teacher/?class=dev-class&tab=messages',
     async setup({ person }) {
       const m = await person(MAYA, '/');
       const l = await person(LEO, '/');
@@ -767,7 +767,7 @@ const RECIPES = {
 
   '2026-11-teacher-game-changes': {
     people: [TEACHER],
-    path: '/teacher/?class=dev-class&tab=students',
+    path: '/teacher/?class=dev-class&tab=shared',
     posterOnly: true,
     async setup({ person }) {
       // Ivy publishes and shares a game; Ravi proposes a change; they talk it over (all through the API).
@@ -901,7 +901,7 @@ const RECIPES = {
   // Teacher: the Shared games row counts suggestions; its menu clears them (confirm shown, then Cancel).
   '2026-11-library-cleanup': {
     people: [TEACHER],
-    path: '/teacher/?class=dev-class&tab=students',
+    path: '/teacher/?class=dev-class&tab=shared',
     async setup({ person }) {
       const m = await person(MAYA, '/sandbox/');
       await publishGame(m.page, 'Maze Dash', MOSHION_DODGE);
@@ -926,7 +926,7 @@ const RECIPES = {
 
   '2026-11-class-together-panels': {
     people: [TEACHER],
-    path: '/teacher/?class=dev-class&tab=students',
+    path: '/teacher/?class=dev-class&tab=shared',
     async setup({ person }) {
       // Two students write a program together and leave; one publishes and shares a game.
       const s = await person(MAYA, '/sandbox/', { 'shCode:sandbox-mode': 'js' });

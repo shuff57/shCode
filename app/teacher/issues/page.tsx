@@ -434,7 +434,7 @@ function IssuesPageInner() {
     return (
       <div style={S.page}>
         <p style={{ color: 'var(--x-dc2626)', fontSize: 16, marginBottom: 16 }}>Staff access required.</p>
-        <Link href="/" style={{ color: 'var(--brand)', fontSize: 14 }}>← Home</Link>
+        <Link href="/" style={{ color: 'var(--brand)', fontSize: 14 }}>Home</Link>
       </div>
     );
   }

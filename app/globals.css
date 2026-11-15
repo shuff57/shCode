@@ -691,9 +691,7 @@ details.editor-card > summary:hover::before {
 }
 
 /* Requirement status overlays */
-.requirement.pass {
-  border-left: 4px solid var(--x-16a34a);
-}
+/* Pass or fail is said by the Passed / Not yet pill on the card, not by a coloured edge. */
 
 /* Console styles */
 
@@ -794,9 +792,6 @@ body.is-sizing-console iframe { pointer-events: none; }
   color: var(--x-f59e0b);
 }
 
-.requirement.fail {
-  border-left: 4px solid var(--x-dc2626);
-}
 
 /* Title and Passed / Not yet badge share one flex row: the title takes the
    room that is left and wraps inside it, the badge keeps its own width. It
@@ -2928,7 +2923,7 @@ a.mod-row:hover { background: var(--x-343746); border-top-color: var(--c-comment
 
 /* Targeted desktop corrections; the mobile cascade remains unchanged. */
 @media (min-width: 1024px) {
-  .home-module-summary { display: grid; grid-template-columns: 3.5rem minmax(0, 1fr) 240px 16px; align-items: center; }
+  .home-module-summary { display: grid; grid-template-columns: 3.5rem minmax(0, 1fr) 510px; align-items: center; }
   .home-module-progress { margin-left: 0; }
   .home-module-progress > button { display: grid !important; grid-template-columns: 80px 1fr; width: 220px; text-align: left; }
   .home-module-summary .module-open-affordance { justify-self: end; }
@@ -3063,7 +3058,8 @@ body:has(.content-lesson-main) .lesson-position { width: 100%; max-width: 1080px
 .home-module-progress .unit-progress-track { background: color-mix(in srgb, var(--c-fg) 18%, transparent) !important; height: 8px !important; border-radius: 4px !important; }
 .home-module-progress .unit-progress-count { font-size: var(--fs-body); }
 @media (min-width: 1024px) {
-  .home-module-summary { grid-template-columns: 3.5rem minmax(0, 1fr) 320px 16px; }
+  /* 510px: the progress badge (310) and a teacher's due-date chip (up to ~230) share this column; at 320 the chip ran out over the row's right edge and the chevron. */
+  .home-module-summary { grid-template-columns: 3.5rem minmax(0, 1fr) 510px; }
   .home-module-progress > button { grid-template-columns: 160px 1fr; width: 310px; column-gap: 12px; }
   .home-module-progress .unit-progress-track { width: 100% !important; }
 }
@@ -3126,7 +3122,7 @@ body:has(.content-lesson-main) .lesson-position { width: 100%; max-width: 1080px
    out-ranked the reset); the current page keeps its filled, bold, light-text state. */
 .docs-sidebar .docs-sidebar-pages li a { opacity: 1; color: var(--c-cyan); }
 .docs-sidebar .docs-sidebar-pages li a:hover:not(.current) { background: var(--muted); }
-.docs-sidebar .docs-sidebar-pages li a.current { color: var(--c-fg); box-shadow: inset 3px 0 0 var(--c-purple); }
+.docs-sidebar .docs-sidebar-pages li a.current { color: var(--c-fg); background: color-mix(in srgb, var(--c-purple) 16%, transparent); }
 
 /* Console and moSHion labs on desktop: Submit sits after Check in the editor toolbar, so the
    header's copy of the same button is hidden. */
@@ -3332,7 +3328,7 @@ a.mod-row.is-next {
 
 /* Rule 8, home: the module the "Next up" card points into stands apart from untouched ones;
    an untouched module's track is quiet instead of a long grey bar. */
-.home-module-current { background: color-mix(in srgb, var(--c-cyan) 8%, var(--muted)) !important; box-shadow: inset 4px 0 0 var(--c-cyan); }
+.home-module-current { background: color-mix(in srgb, var(--c-cyan) 8%, var(--muted)) !important; }
 .home-module-now {
   display: inline-flex; align-items: center; margin-left: 10px; padding: 1px 8px; border-radius: 999px; vertical-align: 2px;
   border: 1px solid color-mix(in srgb, var(--c-cyan) 55%, transparent); color: var(--c-cyan);
@@ -3443,9 +3439,6 @@ a.mod-row.is-next {
 /* Module Continue on a phone: "Continue:" on the first line, the whole lesson title under it. */
 @media (max-width: 720px) {
   .module-continue-action { flex-direction: column; align-items: flex-start; gap: 2px; }
-  /* the arrow ends the title's last line instead of taking a line of its own */
-  .module-continue-action > span[aria-hidden="true"] { display: none; }
-  .module-continue-title::after { content: " \2192" / ""; }
   .module-continue-title { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; }
 }
 
@@ -3689,7 +3682,7 @@ a.mod-row.is-next {
 .sq-head-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; max-width: 100%; }
 .sq-grader-note {
   font-family: var(--font-prose); font-size: 13px; line-height: 1.4; color: var(--c-fg);
-  border-left: 3px solid var(--c-orange); padding: 1px 0 1px 8px; cursor: help; text-align: right;
+  padding: 1px 0; cursor: help; text-align: right;
 }
 .sq-review-cols { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .sq-review-col { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
@@ -3740,8 +3733,6 @@ a.mod-row.is-next {
     background: transparent !important; border: 0 !important; border-top: 1px solid var(--c-line) !important;
     border-radius: 0 !important; padding: 16px 0 8px !important; margin-bottom: 4px !important;
   }
-  .student-quiz .quiz-question-card.is-correct { border-left: 4px solid var(--c-green) !important; padding-left: 10px !important; }
-  .student-quiz .quiz-question-card.is-wrong { border-left: 4px solid var(--c-red) !important; padding-left: 10px !important; }
   .student-quiz .quiz-question-card .quiz-option { width: 100%; box-sizing: border-box; }
   body:has(.content-lesson-main):has(.shd-tabstrip.shd-docs-only) { --lesson-tool-dock: calc(40px + env(safe-area-inset-bottom)); }
   body:has(.content-lesson-main) .shd-tabstrip.shd-docs-only { padding: 4px 12px calc(4px + env(safe-area-inset-bottom)) !important; }
@@ -3750,7 +3741,7 @@ a.mod-row.is-next {
   body:has(.content-lesson-main):has(.shd-tabstrip.shd-docs-only) .content-lesson-main { padding-bottom: calc(56px + env(safe-area-inset-bottom)) !important; }
 }
 /* 11. Phone module Continue: the lesson title is a caption (at most two lines) above a normal-height primary
-   button that reads "Continue →". One link, so its name is still "Continue: <lesson>". */
+   button that reads "Continue". One link, so its name is still "Continue: <lesson>". */
 @media (max-width: 720px) {
   .module-continue-action {
     background: transparent !important; color: var(--c-fg); padding: 0; min-height: 0;
@@ -3760,13 +3751,11 @@ a.mod-row.is-next {
     order: -1; font-weight: 500; font-size: 14px; line-height: 1.4; color: var(--c-fg);
     display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; white-space: normal;
   }
-  .module-continue-title::after { content: none; }
   .module-continue-colon { display: none; }
   .module-continue-verb {
     display: flex; align-items: center; justify-content: center; min-height: 44px; box-sizing: border-box; padding: 0 16px;
     border-radius: 6px; background: var(--c-green); color: var(--c-deep2); font-weight: 700; font-size: 15px;
   }
-  .module-continue-verb::after { content: " \2192" / ""; white-space: pre; }
   .module-continue-action:hover .module-continue-verb { background: var(--x-79fc99); }
 }
 /* 12. Phone reading: content headings clearly under the lesson title (h1 22, h2 18, h3 16), 20px above the first h2. */
@@ -3831,7 +3820,6 @@ a.mod-row.is-next {
    assignment is a quieter outlined panel. On a submission that needs a manual grade the rubric is open and
    compact beside the score field. */
 .sq-review-cols .sq-assignment { background: transparent; border: 1px solid color-mix(in srgb, var(--c-line) 80%, transparent); }
-.sq-review-answer { box-shadow: inset 3px 0 0 var(--c-cyan); padding-left: 15px !important; }
 .override-form.has-aside .override-main { container-type: inline-size; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
 @media (min-width: 1000px) {
   /* Same two columns as the assignment / answer row above, so the score field lines up under the answer. */
@@ -3918,7 +3906,7 @@ a.mod-row.is-next {
    screen), and an untouched starter marks the empty last line as the place to type. */
 .lab-check-tests {
   display: flex; align-items: baseline; gap: 6px 12px; flex-wrap: wrap; margin: 0 0 8px; padding: 8px 12px;
-  border: 1px solid var(--c-line); border-left: 3px solid var(--c-green); border-radius: 6px; background: var(--c-bg);
+  border: 1px solid var(--c-line); border-radius: 6px; background: var(--c-bg);
   font-family: var(--font-prose); font-size: 14px; line-height: 1.45; color: var(--c-fg);
 }
 .lab-check-tests-label { font-weight: 700; color: var(--c-fg); white-space: nowrap; }
@@ -4015,8 +4003,6 @@ a.mod-row.is-next {
     background: transparent !important; border: 0 !important; border-top: 1px solid var(--c-line) !important;
     border-radius: 0 !important; padding: 14px 0 8px !important; margin-bottom: 4px !important;
   }
-  .student-quiz .quiz-question-card.is-correct { border-left: 4px solid var(--c-green) !important; padding-left: 14px !important; }
-  .student-quiz .quiz-question-card.is-wrong { border-left: 4px solid var(--c-red) !important; padding-left: 14px !important; }
   .student-quiz .quiz-question-card > div:first-child { font-size: 16px !important; font-weight: 600; margin-bottom: 10px !important; }
   .student-quiz .quiz-question-card > div:first-child .prose-copy { font-size: 16px; font-weight: 600; }
   .student-quiz .quiz-question-card .quiz-options { gap: 6px; padding-left: 30px; }
@@ -4034,7 +4020,7 @@ a.mod-row.is-next {
    1.1.1 to 1.1.17", Show / Hide, remembered per module), so the Next up row is in the first screen. */
 .mod-done-fold {
   display: flex; align-items: center; gap: 10px; width: 100%; box-sizing: border-box; padding: 10px 14px;
-  background: transparent; border: 1px dashed var(--c-line); border-left: 4px solid var(--c-green); border-radius: 4px;
+  background: transparent; border: 1px dashed var(--c-line); border-radius: 4px;
   color: var(--c-fg); cursor: pointer; text-align: left; font-family: var(--font-prose); font-size: 15px; line-height: 1.4;
 }
 .mod-done-fold:hover { border-style: solid; background: color-mix(in srgb, var(--c-fg) 5%, transparent); }
@@ -4163,7 +4149,7 @@ a.mod-row.is-next {
 .lesson-overview li { margin-top: 0 !important; }
 .lesson-overview li a { display: block; padding: 5px 0 5px 12px; margin-left: -1px; border-left: 2px solid transparent; color: var(--c-meta) !important; text-decoration: none; }
 .lesson-overview li a:hover { color: var(--c-fg) !important; text-decoration: none; }
-.lesson-overview li a[aria-current="location"] { color: var(--c-cyan) !important; border-left-color: var(--c-cyan); font-weight: 600; }
+.lesson-overview li a[aria-current="location"] { color: var(--c-cyan) !important; font-weight: 600; }
 .lesson-overview li a:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 1px; }
 .lesson-overview li.outline-subheading a { padding-left: 24px; }
 .livecodeblock-preview .run-output:has(.livecode-empty) { display: flex; align-items: center; justify-content: center; }
@@ -4760,7 +4746,7 @@ input.dd-date { width: 152px; padding-right: 30px !important; }
 /* r10 S2 Module: a locked row is dimmed halfway, not to half opacity. Its title is about 80% of a full
    title's strength (over 7:1 on the row), the number, type label and duration read at the normal meta
    colour, and only the LOCKED pill and the left rail stay muted. Desktop and phone. */
-.mod-row[aria-disabled] { opacity: 1 !important; box-shadow: none !important; border-left-color: color-mix(in srgb, var(--c-line) 75%, var(--c-meta)) !important; }
+.mod-row[aria-disabled] { opacity: 1 !important; box-shadow: none !important; }
 .mod-row[aria-disabled] .mod-row-title { color: color-mix(in srgb, var(--c-fg) 80%, var(--card)) !important; }
 .mod-row[aria-disabled] .mod-row-title .mod-row-num, .mod-row[aria-disabled] .mod-row-duration { color: var(--c-meta) !important; }
 .mod-row[aria-disabled] .mod-row-badge {
@@ -4930,7 +4916,7 @@ input.dd-date { width: 152px; padding-right: 30px !important; }
    it the same way, with Next beside it. */
 .lesson-outcome {
   display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; margin: 16px 0 12px; padding: 14px 16px;
-  border: 1px solid color-mix(in srgb, var(--c-green) 45%, transparent); border-left: 4px solid var(--c-green);
+  border: 1px solid color-mix(in srgb, var(--c-green) 45%, transparent);
   border-radius: 8px; background: color-mix(in srgb, var(--c-green) 7%, var(--c-bg));
   font-family: var(--font-prose);
 }
@@ -4966,8 +4952,6 @@ input.dd-date { width: 152px; padding-right: 30px !important; }
 }
 /* B3/B4 Labs: once checked, the "Check looks for" row is the result, with each red line's reason, when it ran,
    and "Out of date" once the code changes. A phone shows it too (it used to be desktop-only). */
-.lab-check-tests.has-results { border-left-color: var(--c-cyan); }
-.lab-check-tests.has-results:has(li[data-status="failed"]) { border-left-color: var(--c-red); }
 .lab-check-item { display: flex; flex-direction: column; min-width: 0; }
 .lab-check-why { color: var(--c-meta); font-size: 13px; line-height: 1.45; }
 .lab-check-tests li[data-status="failed"] .lab-check-why { color: var(--x-ff7b7b, var(--c-red)); }
@@ -5035,7 +5019,7 @@ input.dd-date { width: 152px; padding-right: 30px !important; }
 /* G2, G4: the note kept with a score, and whether a score changes the grade. */
 .sq-teacher-note { font-family: var(--font-prose); font-size: 14px; line-height: 1.5; color: var(--c-fg); max-width: 80ch; overflow-wrap: anywhere; }
 .sq-teacher-note-label { font-weight: 700; color: var(--c-cyan); }
-.sq-weight-note { margin: 0; font-family: var(--font-prose); font-size: 14px; line-height: 1.5; color: var(--c-fg); max-width: 80ch; padding: 6px 10px; border-left: 3px solid var(--c-meta); background: color-mix(in srgb, var(--c-meta) 10%, transparent); border-radius: 2px; }
+.sq-weight-note { margin: 0; font-family: var(--font-prose); font-size: 14px; line-height: 1.5; color: var(--c-fg); max-width: 80ch; padding: 6px 10px; background: color-mix(in srgb, var(--c-meta) 10%, transparent); border-radius: 2px; }
 .sq-weight-tag { font-family: var(--font-prose); font-size: 13px; color: var(--c-meta); border: 1px solid var(--c-line); border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
 /* G5: a quiz hand-in read as questions and answers. */
 .sq-quiz { list-style: decimal; margin: 0; padding: 0 0 0 22px; display: grid; gap: 6px; font-family: var(--font-prose); font-size: 14px; line-height: 1.45; color: var(--c-fg); max-height: 320px; overflow-y: auto; }
@@ -5081,7 +5065,7 @@ input.dd-date { width: 152px; padding-right: 30px !important; }
 }
 .override-form > .override-heading { grid-column: 1 / -1; margin: 0; font-family: var(--font-prose); font-size: 15px; font-weight: 600; color: var(--c-fg); }
 /* T1: "does not count yet" reads as a caution, not a quiet aside. */
-.sq-weight-note.is-unfinished { border-left-color: var(--c-orange); background: color-mix(in srgb, var(--c-orange) 10%, transparent); }
+.sq-weight-note.is-unfinished { background: color-mix(in srgb, var(--c-orange) 10%, transparent); }
 /* T3: quiz answers with the option text, a quiz with no hand-in, an auto-scored quiz's score. */
 .sq-quiz-row > .sq-quiz-a { display: flex; margin-top: 2px; }
 .sq-quiz-k { color: var(--c-meta); }
@@ -5095,7 +5079,7 @@ input.dd-date { width: 152px; padding-right: 30px !important; }
 .dd-clear-space { display: inline-block; width: 18px; height: 18px; flex: 0 0 auto; }
 .dd-pair input::placeholder { color: var(--c-meta); opacity: 1; }
 /* T6: the roster opened from "N students behind", and a staff row that is listed but not counted. */
-.roster-filter-note { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 8px 0; padding: 8px 12px; border-left: 3px solid var(--c-red); background: color-mix(in srgb, var(--c-red) 8%, transparent); font-family: var(--font-prose); font-size: 14px; line-height: 1.5; color: var(--c-fg); }
+.roster-filter-note { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 8px 0; padding: 8px 12px; background: color-mix(in srgb, var(--c-red) 8%, transparent); font-family: var(--font-prose); font-size: 14px; line-height: 1.5; color: var(--c-fg); }
 .roster-staff-note { font-family: var(--font-prose); font-size: 13px; line-height: 18px; color: var(--c-meta); font-style: italic; }
 /* T8: the gradebook's class average row. */
 .gb-avg-row > * { background: color-mix(in srgb, var(--c-cyan) 7%, var(--c-deep)); border-bottom: 2px solid var(--c-line); font-family: var(--font-prose); font-variant-numeric: tabular-nums; }
@@ -5111,8 +5095,6 @@ input.dd-date { width: 152px; padding-right: 30px !important; }
 /* ux2 student */
 /* S2 quiz: a question changed since the Check keeps no mark and says so; the score line is out of date. */
 .quiz-q-verdict.is-changed { color: var(--c-orange); font-weight: 600; }
-.student-quiz .quiz-question-card.is-changed { border-left: 4px dashed var(--c-orange) !important; padding-left: 14px !important; }
-@media (max-width: 720px) { .student-quiz .quiz-question-card.is-changed { padding-left: 10px !important; } }
 .quiz-head-score.is-stale > span:first-of-type { opacity: 0.7; }
 .ux2-stale-word { color: var(--c-orange); font-weight: 600; }
 /* S4 written: the result belongs to an earlier answer. */
@@ -5127,12 +5109,11 @@ input.dd-date { width: 152px; padding-right: 30px !important; }
   .lab-work-area .lab-check-tests.lab-check-above, .lab-work-area .lab-ainote-above { display: none; }
   .lab-work-area .lab-check-summary {
     display: flex; align-items: center; height: 40px; margin: 0 0 6px; padding: 0 10px; box-sizing: border-box; overflow: hidden;
-    border: 1px solid var(--c-line); border-left: 3px solid var(--c-line); border-radius: 6px; background: var(--c-bg);
+    border: 1px solid var(--c-line); border-radius: 6px; background: var(--c-bg);
     font-family: var(--font-prose); font-size: 14px; color: var(--c-meta); white-space: nowrap;
   }
-  .lab-work-area .lab-check-summary.has-results { border-left-color: var(--c-green); color: var(--c-fg); }
-  .lab-work-area .lab-check-summary.has-failed { border-left-color: var(--c-red); }
-  .lab-work-area .lab-check-summary.is-stale { border-left-color: var(--c-orange); color: var(--c-orange); }
+  .lab-work-area .lab-check-summary.has-results { color: var(--c-fg); }
+  .lab-work-area .lab-check-summary.is-stale { color: var(--c-orange); }
   .lab-check-summary > span { overflow: hidden; text-overflow: ellipsis; }
   .lab-check-summary-btn {
     flex: 1 1 auto; min-width: 0; height: 100%; padding: 0; border: 0; background: transparent; color: inherit;
@@ -5304,7 +5285,7 @@ input.dd-date { padding-right: 8px !important; }
    The task reads top to bottom on the left (description, the whole intro, What to answer, How this is
    graded), all open; the answer box and Submit are on the right and stay in view while it is read. */
 .written-prompt {
-  margin: 0 0 14px; padding: 12px 16px; border: 1px solid var(--c-line); border-left: 3px solid var(--c-purple);
+  margin: 0 0 14px; padding: 12px 16px; border: 1px solid var(--c-line);
   border-radius: 6px; background: var(--c-deep2);
 }
 .written-prompt-title {
@@ -5485,3 +5466,8 @@ input.dd-date { padding-right: 8px !important; }
 @media (min-width: 761px) { .teacher-list-head { max-width: none; } }
 /* The gradebook shares the teacher frame; its table scrolls sideways inside it when it is wider. */
 .teacher-frame.teacher-gradebook { min-width: 0; }
+
+/* Class page: "Jump to" links on a tab with several sections (app/teacher/page.tsx SectionNav). */
+.teacher-section-link { color: var(--c-cyan); text-decoration: none; border: 1px solid var(--c-line); border-radius: 999px; padding: 2px 10px; }
+.teacher-section-link:hover { border-color: var(--c-cyan); background: color-mix(in srgb, var(--c-cyan) 10%, transparent); }
+.teacher-section-link:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; }

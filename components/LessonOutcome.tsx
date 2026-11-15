@@ -2,7 +2,7 @@
 
 // The one "it worked" block every student lesson shows where the student acted
 // (ux1 student B1/B2): a lasting success line, announced to screen readers, with
-// one primary "Next: <lesson> →" right there. Used by the reading/video/slides
+// one primary "Next: <lesson>" right there. Used by the reading/video/slides
 // completion panel, the quiz, the lab and the written answer, so all four say it
 // the same way. Nothing here navigates by itself: the student chooses Next.
 
@@ -55,13 +55,11 @@ export function NextLessonButton({
   if (next === undefined) return null;
   return next ? (
     <a ref={ref} className="completion-next" href={next.href}>
-      <span className="completion-next-verb">Next:</span> <span className="completion-next-title">{next.title}</span>{' '}
-      <span aria-hidden="true">→</span>
+      <span className="completion-next-verb">Next:</span> <span className="completion-next-title">{next.title}</span>
     </a>
   ) : (
     <a ref={ref} className="completion-next" href="/">
-      <span className="completion-next-verb">Unit done.</span> <span className="completion-next-title">Back to lessons</span>{' '}
-      <span aria-hidden="true">→</span>
+      <span className="completion-next-verb">Unit done.</span> <span className="completion-next-title">Back to lessons</span>
     </a>
   );
 }

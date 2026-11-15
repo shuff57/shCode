@@ -137,12 +137,12 @@ export function noticeAction(item: NoticeItem): string {
 /** The page an item opens, scrolled to the entry. */
 export function noticeHref(item: NoticeItem): string {
   if (item.kind === 'guest') {
-    if (item.audience === 'teacher' && item.classId) return `/teacher/?class=${encodeURIComponent(item.classId)}&tab=students#guests`;
+    if (item.audience === 'teacher' && item.classId) return `/teacher/?class=${encodeURIComponent(item.classId)}&tab=messages#guests`;
     return item.audience === 'host' ? '/account/#guests' : '/guest/';
   }
   if (item.kind === 'public') {
     // A teacher goes to the class's list; the owner to the Library tab the thing lives on.
-    if (item.classId) return `/teacher/?class=${encodeURIComponent(item.classId)}&tab=students#public-shares`;
+    if (item.classId) return `/teacher/?class=${encodeURIComponent(item.classId)}&tab=shared#public-shares`;
     return `/library/?tab=${item.what === 'game' ? 'games' : item.what === 'picture' ? 'pictures' : item.what === 'sound' ? 'sounds' : 'fonts'}`;
   }
   if (item.kind === 'change') return `/changes/?id=${encodeURIComponent(item.changeId)}#c-${encodeURIComponent(item.targetId)}`;

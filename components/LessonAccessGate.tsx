@@ -252,7 +252,7 @@ export default function LessonAccessGate({
             fontWeight: 600,
           }}
         >
-          ← Back to module {moduleId}
+          Back to module {moduleId}
         </Link>
       ) : (
         <Link
@@ -267,7 +267,7 @@ export default function LessonAccessGate({
             fontWeight: 600,
           }}
         >
-          ← Back to home
+          Back to home
         </Link>
       )}
     </div>
@@ -337,7 +337,7 @@ function NotYetPanel({ openAt, moduleId }: { openAt: number | null; moduleId: st
           fontWeight: 600,
         }}
       >
-        {moduleId ? `← Back to module ${moduleId}` : '← Back to home'}
+        {moduleId ? `Back to module ${moduleId}` : 'Back to home'}
       </Link>
     </div>
   );

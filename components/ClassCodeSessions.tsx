@@ -61,7 +61,7 @@ export default function ClassCodeSessions({ classId }: { classId: string }) {
   if (error) return <p style={{ color: 'var(--c-red)', fontSize: 13 }}>{error}</p>;
   if (!rows) return <p style={{ color: 'var(--c-dim)', fontSize: 13 }}>Loading…</p>;
   if (!rows.length) {
-    return <p style={{ color: 'var(--c-dim)', fontSize: 13, margin: 0 }}>No sessions yet. When students press &ldquo;Code together&rdquo; in the sandbox and write a program together, it shows up here for 30 days.</p>;
+    return <p style={{ color: 'var(--c-dim)', fontSize: 13, margin: 0 }}>No sessions yet. Programs students write together are kept here for 30 days.</p>;
   }
   const btn = { fontSize: 12, padding: '3px 8px', borderRadius: 4, cursor: 'pointer', background: 'transparent', color: 'var(--c-cyan)', border: '1px solid var(--c-line)' } as const;
   return (

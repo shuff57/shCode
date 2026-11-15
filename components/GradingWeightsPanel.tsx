@@ -120,7 +120,7 @@ export default function GradingWeightsPanel({ classId, desktop = false }: { clas
         )}
       </div>
       <p style={{ maxWidth: 640, margin: '0 0 8px', fontFamily: 'var(--font-prose)', fontSize: 14, lineHeight: 1.5, color: C.dim }}>
-        <strong style={{ color: C.text, fontWeight: 600 }}>Weight</strong> is a number you choose; <strong style={{ color: C.text, fontWeight: 600 }}>Share</strong> is its percent of the total. Only categories with work count toward a student’s grade; empty categories drop out.
+        <strong style={{ color: C.text, fontWeight: 600 }}>Share</strong> is each weight’s percent of the total. Categories with no work drop out of the grade.
       </p>
       {/* One column, so the header row below lines up with every row's fields. */}
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', maxWidth: 640 }}>
