@@ -1956,6 +1956,53 @@ export const SEMANTIC_CHECKS = [
   },
 
   {
+    name: 'switching away from an animated texture and back plays it again from frame 0, still crisp',
+    area: 'texture',
+    // Report 118 (2026-11-14): a death animation looked clean the first time and
+    // fuzzy, part-way through, the second. The texture setter stored the Ani it made
+    // in the sprite's own animations, so the NEXT `texture = 'death'` took the branch
+    // meant for an addAni() animation: it reused the old Ani wherever it had stopped
+    // and cleared `_texture`, which is what turns image smoothing off.
+    run({ runSketch }) {
+      const r = runSketch(`
+        function setup(){ new Canvas(200,200);
+          saveTexture('idle', 'data:image/png;base64,I4=', { frames: 2, frameDelay: 2 });
+          saveTexture('death', 'data:image/png;base64,D4=', { frames: 4, frameDelay: 2 });
+          p = new Sprite(100, 100, 40, 40); p.collider = 'none';
+          p.texture = 'idle';
+          starts = []; names = []; fresh = [];
+          visits = 0; first = null;
+        }
+        function update(){
+          // every 30 frames: die (7 frames of death), then back to idle
+          if (frameCount % 30 === 1) {
+            p.texture = 'death'; visits++;
+            starts.push(p.texture.frame); names.push(p.texture.name);
+            if (!first) first = p.ani; else fresh.push(p.ani !== first);
+          }
+          if (frameCount % 30 === 8) p.texture = 'idle';
+        }
+        function draw(){ background('#222'); }
+      `, { frames: 95 });
+      if (!r.ok) return 'sketch threw: ' + r.error?.message;
+      const b = r.box.sandbox;
+      if (b.visits < 3) return 'the sketch did not die three times: ' + b.visits;
+      if (b.starts.some((f) => f !== 0)) return 'a repeat of the animation did not start at frame 0: ' + JSON.stringify(b.starts);
+      if (b.names.some((n) => n !== 'death')) return 'sprite.texture.name read back ' + JSON.stringify(b.names);
+      // the texture, not an addAni() one: every drawImage of it must come after smoothing is turned off
+      const seq = r.ops.filter((o) => o.op === 'set:imageSmoothingEnabled' || o.op === 'drawImage');
+      for (let i = 0; i < seq.length; i++) {
+        if (seq[i].op !== 'drawImage') continue;
+        const prev = seq[i - 1];
+        if (!prev || prev.op !== 'set:imageSmoothingEnabled' || prev.args[0] !== false) {
+          return 'a texture was drawn smoothed (blurry) on a repeat; the op before drawImage #' + i + ' was ' + JSON.stringify(prev);
+        }
+      }
+      return true;
+    },
+  },
+
+  {
     name: 'sprite.texture reads back the texture: .name, and an animated one is controlled through it',
     area: 'texture',
     run({ runSketch }) {
