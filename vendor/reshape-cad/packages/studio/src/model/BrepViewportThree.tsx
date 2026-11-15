@@ -63,6 +63,7 @@
 // why that load lives in a module-level (not component-level) promise.
 
 import { useEffect, useRef, useState } from 'react';
+import { Maximize2, Minimize2 } from 'lucide-react';
 import type * as THREE_NS from 'three';
 import type { OrbitControls as OrbitControlsType } from 'three/examples/jsm/controls/OrbitControls.js';
 import type { LineSegments2 as LineSegments2Type } from 'three/examples/jsm/lines/LineSegments2.js';
@@ -759,6 +760,26 @@ export default function BrepViewportThree({
   const [loadingNote, setLoadingNote] = useState('loading the modelling kernel + three.js');
 
   const containerRef = useRef<HTMLDivElement | null>(null);
+  // Full screen for just this 3D view (no toolbar, rules panel or timeline). The browser owns the
+  // state and we mirror it, so Esc exits for free; the view strip, Home and the cube stay in the
+  // view. The canvas follows the new size through its ResizeObserver below. Hidden where the
+  // browser has no element full screen (iPhone Safari).
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [canFullscreen, setCanFullscreen] = useState(false);
+  useEffect(() => {
+    setCanFullscreen(typeof document !== 'undefined' && !!document.fullscreenEnabled && !!document.documentElement.requestFullscreen);
+    const onChange = () => setIsFullscreen(!!rootRef.current && document.fullscreenElement === rootRef.current);
+    document.addEventListener('fullscreenchange', onChange);
+    return () => document.removeEventListener('fullscreenchange', onChange);
+  }, []);
+  const toggleFullscreen = () => {
+    if (document.fullscreenElement && document.fullscreenElement === rootRef.current) {
+      void document.exitFullscreen?.();
+    } else {
+      rootRef.current?.requestFullscreen?.().catch(() => { /* refused: stay in the page */ });
+    }
+  };
   const engineRef = useRef<EngineAdapter | null>(null);
   const threeRef = useRef<Awaited<ReturnType<typeof loadThree>> | null>(null);
 
@@ -3985,11 +4006,22 @@ try {
 
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', minHeight: 320, background: COLORS.bg }}>
+    <div ref={rootRef} style={{ position: 'relative', width: '100%', height: '100%', minHeight: 320, background: COLORS.bg }}>
       <div
         ref={containerRef}
         style={{ width: '100%', height: '100%', touchAction: 'none', cursor: phase === 'ready' ? (windowZoom !== null ? 'crosshair' : 'grab') : 'default' }}
       />
+      {phase === 'ready' && canFullscreen && (
+        <button
+          type="button"
+          onClick={toggleFullscreen}
+          title={isFullscreen ? 'Leave full screen (Esc)' : 'Full screen the 3D view only'}
+          aria-label={isFullscreen ? 'Leave full screen' : 'Full screen the 3D view only'}
+          style={fullscreenButtonStyle}
+        >
+          {isFullscreen ? <Minimize2 size={14} aria-hidden="true" /> : <Maximize2 size={14} aria-hidden="true" />}
+        </button>
+      )}
       {phase === 'loading' && (
         <div style={overlayStyle}>
           <div style={{ color: COLORS.dim }}>{loadingNote}</div>
@@ -4498,6 +4530,15 @@ const filterStripStyle: React.CSSProperties = {
 const viewStripButtonStyle: React.CSSProperties = {
   padding: '4px 10px', background: COLORS.panel, border: `1px solid ${COLORS.line}`, borderRadius: 999,
   font: '12px ui-monospace, Menlo, Consolas, monospace', color: COLORS.fg, cursor: 'pointer',
+};
+
+// Top-right, a small square: the corner the badge stack used to use is empty in the studio
+// (badgesInStatusBar). A real button, so it takes pointer events, and it sits beside the canvas
+// container rather than inside it, so a click never starts an orbit.
+const fullscreenButtonStyle: React.CSSProperties = {
+  position: 'absolute', top: 12, right: 12, zIndex: 3, width: 30, height: 30, padding: 0,
+  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+  background: COLORS.panel, border: `1px solid ${COLORS.line}`, borderRadius: 4, color: COLORS.fg, cursor: 'pointer',
 };
 
 const viewStripActiveStyle: React.CSSProperties = {

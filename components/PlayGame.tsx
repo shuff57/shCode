@@ -37,7 +37,7 @@
 import { useEffect, useState } from 'react';
 import MoshionPreview from './MoshionPreview';
 import { packForUrl } from './DemoGameBlock';
-import Console from './Console';
+import ResizableConsole from './ResizableConsole';
 import { getGame, getGameAssets, remixIntoSandbox, type FullGame } from '../lib/games-client';
 import { builtinTextureNames, listWords, missingToShow, type GameAsset } from '../lib/game-assets';
 import { isGameId } from '../lib/games-core';
@@ -287,20 +287,16 @@ export default function PlayGame() {
           assetsOwnWins={g.mine}
         />
       </div>
-      <div style={{ height: 120, marginTop: 8, border: '1px solid var(--c-line)', borderRadius: 6, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        <div className="output-header">Console</div>
-        <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
-          <Console
-            resetKey={String(effectiveRunKey)}
-            // The engine's "No texture named X" reads like a bug when X is the author's own picture they haven't shared.
-            reword={(text) => {
-              const m = /^No texture named "([^"]+)"/.exec(text);
-              if (!m || !assets?.missing.includes(m[1])) return text;
-              return `"${m[1]}" is one of ${g.owner}'s own pictures, and it isn't shared with the class, so it can't show here. Ask ${g.owner} to share it.`;
-            }}
-          />
-        </div>
-      </div>
+      <ResizableConsole
+        resetKey={String(effectiveRunKey)}
+        style={{ marginTop: 8 }}
+        // The engine's "No texture named X" reads like a bug when X is the author's own picture they haven't shared.
+        reword={(text) => {
+          const m = /^No texture named "([^"]+)"/.exec(text);
+          if (!m || !assets?.missing.includes(m[1])) return text;
+          return `"${m[1]}" is one of ${g.owner}'s own pictures, and it isn't shared with the class, so it can't show here. Ask ${g.owner} to share it.`;
+        }}
+      />
       <GameSuggestions gameId={g.id} owner={g.owner} mine={g.mine} />
       <GameFamilyTree gameId={g.id} />
       <GameComments gameId={g.id} owner={g.owner} />

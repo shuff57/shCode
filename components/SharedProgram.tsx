@@ -20,7 +20,7 @@ import { LiveDocClient, type DocStatus } from '../lib/live-doc';
 import { deviceId } from '../lib/moshion-online';
 import MoshionPreview from './MoshionPreview';
 import { packForUrl } from './DemoGameBlock';
-import Console from './Console';
+import ResizableConsole from './ResizableConsole';
 import { fetchShare, shareHref } from '../lib/messages-client';
 import { LANG_LABEL, isShareId, type ShareView } from '../lib/messages-core';
 import { RUN_TIMEOUT_MS, errorWithLocation, runStudentCode, timerLimitMessage } from '../lib/js-runner-source';
@@ -162,10 +162,7 @@ function MoshionRun({ code, id, runKey, onRestart }: { code: string; id: string;
         {/* Its own room key, so a shared game's online rooms never mix with the sandbox's or a published game's. */}
         <MoshionPreview code={packForUrl(code)} runKey={runKey} gameKey={`share-${id}`} />
       </div>
-      <div style={{ height: 120, border: '1px solid var(--c-line)', borderRadius: 6, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        <div className="output-header">Console</div>
-        <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }}><Console resetKey={String(runKey)} /></div>
-      </div>
+      <ResizableConsole resetKey={String(runKey)} />
     </>
   );
 }

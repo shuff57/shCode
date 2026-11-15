@@ -35,7 +35,8 @@ import RequirementsSection from './RequirementsSection';
 import PlanChartPanel from './PlanChartPanel';
 import LessonSteps from './LessonSteps';
 import LabTaskCard, { LabTaskSidebar } from './LabTaskCard';
-import Console from './Console';
+import EditorPreviewSplit from './EditorPreviewSplit';
+import ResizableConsole from './ResizableConsole';
 import HistoryPanel from './HistoryPanel';
 import AssignmentHeader from './AssignmentHeader';
 import SubmitDialog from './SubmitDialog';
@@ -229,111 +230,6 @@ export default function LessonWorkspace({
   const [shortcutModalOpen, setShortcutModalOpen] = useState(false);
 
   const isAssignment = mode === 'assignment' || lesson.type === 'assignment' || lesson.type === 'project';
-
-  // enable pane resizing for editor and preview
-  useEffect(() => {
-    const split = document.getElementById('split') as HTMLElement | null;
-    const divider = document.getElementById('divider') as HTMLElement | null;
-    const left = document.getElementById('editorPane') as HTMLElement | null;
-    const right = document.getElementById('previewPane') as HTMLElement | null;
-    const overlay = document.getElementById('dragOverlay') as HTMLElement | null;
-    if (!split || !divider || !left || !right || !overlay) return;
-
-    let dragging = false;
-    let rect: DOMRect | null = null;
-    let rafId: number | null = null;
-
-    const relayoutEditor = () => {
-      if (rafId) return;
-      rafId = requestAnimationFrame(() => {
-        window.dispatchEvent(new Event('resize'));
-        rafId = null;
-      });
-    };
-
-    const setPositions = (clientX: number) => {
-      if (!rect) rect = split.getBoundingClientRect();
-      const min = 220;
-      const max = rect.width - 220;
-      let x = clientX - rect.left;
-      x = Math.max(min, Math.min(max, x));
-      const leftPct = (x / rect.width) * 100;
-      left.style.flex = `0 0 ${leftPct}%`;
-      right.style.flex = `0 0 ${100 - leftPct}%`;
-      relayoutEditor();
-    };
-
-    const onMove = (e: PointerEvent) => {
-      if (!dragging) return;
-      setPositions(e.clientX);
-      e.preventDefault();
-    };
-
-    const stopDrag = () => {
-      if (!dragging) return;
-      dragging = false;
-      overlay.style.display = 'none';
-      document.body.style.userSelect = '';
-      document.body.classList.remove('is-resizing');
-      window.removeEventListener('pointermove', onMove, false);
-      window.removeEventListener('pointerup', onUp, false);
-      window.removeEventListener('pointercancel', onCancel, false);
-      window.removeEventListener('blur', onWindowBlur, false);
-      document.removeEventListener('visibilitychange', onVisChange, false);
-    };
-
-    const onUp = (e: PointerEvent) => {
-      try {
-        divider.releasePointerCapture(e.pointerId);
-      } catch {}
-      stopDrag();
-    };
-
-    const onCancel = () => stopDrag();
-    const onWindowBlur = () => stopDrag();
-    const onVisChange = () => {
-      if (document.hidden) stopDrag();
-    };
-
-    const onPointerDown = (e: PointerEvent) => {
-      dragging = true;
-      rect = split.getBoundingClientRect();
-      overlay.style.display = 'block';
-      document.body.style.userSelect = 'none';
-      document.body.classList.add('is-resizing');
-      try {
-        divider.setPointerCapture(e.pointerId);
-      } catch {}
-      window.addEventListener('pointermove', onMove, false);
-      window.addEventListener('pointerup', onUp, false);
-      window.addEventListener('pointercancel', onCancel, false);
-      window.addEventListener('blur', onWindowBlur, false);
-      document.addEventListener('visibilitychange', onVisChange, false);
-      e.preventDefault();
-    };
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      const step = e.shiftKey ? 40 : 10;
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        rect = split.getBoundingClientRect();
-        const currentLeft = left.getBoundingClientRect().width || rect.width / 2;
-        const next = currentLeft + (e.key === 'ArrowRight' ? step : -step);
-        setPositions(rect.left + next);
-        e.preventDefault();
-      }
-    };
-
-    divider.addEventListener('pointerdown', onPointerDown, false);
-    divider.addEventListener('keydown', onKeyDown, false);
-    window.addEventListener('resize', relayoutEditor, false);
-
-    return () => {
-      stopDrag();
-      divider.removeEventListener('pointerdown', onPointerDown, false);
-      divider.removeEventListener('keydown', onKeyDown, false);
-      window.removeEventListener('resize', relayoutEditor, false);
-    };
-  }, []);
 
   useEffect(() => {
     setLesson(lesson);
@@ -1785,26 +1681,62 @@ export default function LessonWorkspace({
           {lessonProgress.authed && !solutionLoaded ? <TwoVersionsNotice lessonId={lesson.id} status={upload} /> : null}
           {isLab && requirements.length > 0 ? <>{labCheckSummary}{renderCheckRow('above')}</> : null}
           {aiCheck ? renderAiNote(isLab ? 'above' : 'only') : null}
-          <div
-            className="editor-preview-container"
-            id="split"
+          <EditorPreviewSplit
             style={{ scrollMarginBottom: 56 }}
+            // A text lesson has no output pane: the editor takes the whole width, and Grade is the only action.
+            editor={isTextMode ? <CodeEditor plainText /> : <CodeEditor />}
+            preview={isTextMode ? undefined : (
+              <>
+                {isConsoleMode ? (
+                  <>
+                    <div className="output-header">
+                      Output
+                      {ranAt && !isRunning ? (
+                        <span className={`run-stamp${runStale ? ' is-stale' : ''}`}>{runStale ? 'Out of date: run again' : `Ran ${ranWhen(ranAt, clock)}`}</span>
+                      ) : null}
+                    </div>
+                    <pre
+                      className={`console-output run-output${runStale ? ' is-stale' : ''}`}
+                      role="log"
+                      aria-live="polite"
+                      aria-atomic="false"
+                      aria-relevant="additions text"
+                      aria-label="Program output"
+                    >
+                      {consoleOutput.length === 0 ? (
+                        <div className="console-empty">
+                          {runKey === 0
+                            ? 'Click Run to see output.'
+                            : lesson.requirements.length > 0
+                              ? 'Ran. Nothing was printed. Your check results are listed with the buttons.'
+                              : 'Ran. Nothing was printed.'}
+                        </div>
+                      ) : (
+                        consoleOutput.map((log, i) => (
+                          <div key={i} className={`log-entry log-${log.type}`}>
+                            <span className="log-msg">{log.message}</span>
+                          </div>
+                        ))
+                      )}
+                    </pre>
+                  </>
+                ) : isMoshionMode ? (
+                  <>
+                    {ranAt && runKey > 0 ? (
+                      <span className={`run-stamp run-stamp-float${runStale ? ' is-stale' : ''}`}>{runStale ? 'Out of date: run again' : `Ran ${ranWhen(ranAt, clock)}`}</span>
+                    ) : null}
+                    <MoshionPreview ref={labFrameRef} code={q5Code} runKey={runKey} gameKey={lesson.id} />
+                  </>
+                ) : (
+                  <LivePreview srcDoc={srcDoc} />
+                )}
+              </>
+            )}
           >
-            {isTextMode ? (
-              // A text lesson has no output pane: the editor takes the whole
-              // width, and Grade is the only action.
-              <div className="pane" id="editorPane" style={{ flex: '1 1 100%' }}>
-                <CodeEditor plainText />
-              </div>
-            ) : isReshapeMode ? (
-              // ReshapeStudio is self-contained (its own toolbar, its own
-              // CodeEditor for the Code side, its own model tools for the
-              // Build side) -- it replaces this whole split rather than
-              // sharing it with a second, redundant CodeEditor in
-              // #editorPane. Same pattern SandboxWorkspace uses for its own
-              // reshape tab. The outer pane-resize effect above no-ops
-              // gracefully (early return) with #editorPane/#previewPane
-              // absent from the DOM.
+            {/* ReshapeStudio is self-contained (its own toolbar, its own CodeEditor for the Code side, its own
+                model tools for the Build side): it replaces the whole split rather than sharing a second,
+                redundant editor with it. The sandbox does the same. */}
+            {!isTextMode && isReshapeMode ? (
               <ReshapeStudio
                 key={`${lesson.id}-${reshapeResetKey}`}
                 value={files['script.js'] ?? ''}
@@ -1816,83 +1748,21 @@ export default function LessonWorkspace({
                 }}
                 lessonId={lesson.id}
               />
-            ) : (
-              <>
-                <div className="pane" id="editorPane">
-                  <CodeEditor />
-                </div>
-                <div
-                  className="divider"
-                  id="divider"
-                  tabIndex={0}
-                  aria-label="Resize editor and preview"
-                >
-                  <span className="drag-handle" aria-hidden="true"></span>
-                </div>
-                <div className="pane" id="previewPane">
-                  {isConsoleMode ? (
-                    <>
-                      <div className="output-header">
-                        Output
-                        {ranAt && !isRunning ? (
-                          <span className={`run-stamp${runStale ? ' is-stale' : ''}`}>{runStale ? 'Out of date: run again' : `Ran ${ranWhen(ranAt, clock)}`}</span>
-                        ) : null}
-                      </div>
-                      <pre
-                        className={`console-output run-output${runStale ? ' is-stale' : ''}`}
-                        role="log"
-                        aria-live="polite"
-                        aria-atomic="false"
-                        aria-relevant="additions text"
-                        aria-label="Program output"
-                      >
-                        {consoleOutput.length === 0 ? (
-                          <div className="console-empty">
-                            {runKey === 0
-                              ? 'Click Run to see output.'
-                              : lesson.requirements.length > 0
-                                ? 'Ran. Nothing was printed. Your check results are listed with the buttons.'
-                                : 'Ran. Nothing was printed.'}
-                          </div>
-                        ) : (
-                          consoleOutput.map((log, i) => (
-                            <div key={i} className={`log-entry log-${log.type}`}>
-                              <span className="log-msg">{log.message}</span>
-                            </div>
-                          ))
-                        )}
-                      </pre>
-                    </>
-                  ) : isMoshionMode ? (
-                    <>
-                      {ranAt && runKey > 0 ? (
-                        <span className={`run-stamp run-stamp-float${runStale ? ' is-stale' : ''}`}>{runStale ? 'Out of date: run again' : `Ran ${ranWhen(ranAt, clock)}`}</span>
-                      ) : null}
-                      <MoshionPreview ref={labFrameRef} code={q5Code} runKey={runKey} gameKey={lesson.id} />
-                    </>
-                  ) : (
-                    <LivePreview srcDoc={srcDoc} />
-                  )}
-                </div>
-                <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>
-              </>
-            )}
-          </div>
+            ) : undefined}
+          </EditorPreviewSplit>
           {/* Phones only (CSS): the full result under the editor, so a Check never pushes the line being
               typed under the on-screen keyboard (ux2 S3). The one-line summary above it keeps its height. */}
           {isLab && requirements.length > 0 ? renderCheckRow('below') : null}
           {isLab && aiCheck ? renderAiNote('below') : null}
           {!isConsoleMode && (
-            <details
-              className="console"
+            <ResizableConsole
+              collapsible
               open={consoleOpen}
-              onToggle={(e) => setConsoleOpen((e.currentTarget as HTMLDetailsElement).open)}
-            >
-              <summary>Console</summary>
-              <div className="console-body">
-                <Console resetKey={String(consoleResetKey)} />
-              </div>
-            </details>
+              onOpenChange={setConsoleOpen}
+              resetKey={String(consoleResetKey)}
+              defaultHeight={240}
+              style={{ marginTop: '1rem' }}
+            />
           )}
         </div>
       </div>

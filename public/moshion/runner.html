@@ -316,6 +316,14 @@
 		if (keys.length > 6) pairs.push('… +' + (keys.length - 6));
 		return (ctor ? ctor + ' ' : '') + '{ ' + pairs.join(', ') + ' }';
 	}
+	// The sandbox's "Full screen the game" button posts { source: 'preview-fit', on } when the game
+	// pane enters or leaves browser full screen: the canvas then scales up to fill the screen (the
+	// same rule as ?fit=1) and goes back to its own size afterwards. The sketch is not restarted.
+	window.addEventListener('message', function(e) {
+		var d = e.data;
+		if (!d || d.source !== 'preview-fit' || e.source !== window.parent) return;
+		document.body.classList.toggle('fit', !!d.on);
+	});
 	window.addEventListener('message', function(e) {
 		var d = e.data;
 		if (!d || d.source !== 'preview-eval') return;

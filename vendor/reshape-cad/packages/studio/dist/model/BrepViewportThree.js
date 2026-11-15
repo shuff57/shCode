@@ -62,6 +62,7 @@ import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-run
 // is loaded through a runtime-computed import rather than a static one, and
 // why that load lives in a module-level (not component-level) promise.
 import { useEffect, useRef, useState } from 'react';
+import { Maximize2, Minimize2 } from 'lucide-react';
 import { topLevel, sketchFrameOf } from '@shuff57/reshape-script/model-types';
 import { BrepRsEngineAdapter } from '@shuff57/reshape-kernel/brep-rs-engine-adapter';
 import { mergeMeshes } from '../mesh-export.js';
@@ -396,6 +397,27 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
     const [hoveringEdge, setHoveringEdge] = useState(false);
     const [loadingNote, setLoadingNote] = useState('loading the modelling kernel + three.js');
     const containerRef = useRef(null);
+    // Full screen for just this 3D view (no toolbar, rules panel or timeline). The browser owns the
+    // state and we mirror it, so Esc exits for free; the view strip, Home and the cube stay in the
+    // view. The canvas follows the new size through its ResizeObserver below. Hidden where the
+    // browser has no element full screen (iPhone Safari).
+    const rootRef = useRef(null);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [canFullscreen, setCanFullscreen] = useState(false);
+    useEffect(() => {
+        setCanFullscreen(typeof document !== 'undefined' && !!document.fullscreenEnabled && !!document.documentElement.requestFullscreen);
+        const onChange = () => setIsFullscreen(!!rootRef.current && document.fullscreenElement === rootRef.current);
+        document.addEventListener('fullscreenchange', onChange);
+        return () => document.removeEventListener('fullscreenchange', onChange);
+    }, []);
+    const toggleFullscreen = () => {
+        if (document.fullscreenElement && document.fullscreenElement === rootRef.current) {
+            void document.exitFullscreen?.();
+        }
+        else {
+            rootRef.current?.requestFullscreen?.().catch(() => { });
+        }
+    };
     const engineRef = useRef(null);
     const threeRef = useRef(null);
     /** Created once per mount, on the first successful draw, and reused for
@@ -3643,7 +3665,7 @@ export default function BrepViewportThree({ doc, deflection, onStats, onPick, pi
         applyCameraMode(cameraKind);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [phase, cameraKind]);
-    return (_jsxs("div", { style: { position: 'relative', width: '100%', height: '100%', minHeight: 320, background: COLORS.bg }, children: [_jsx("div", { ref: containerRef, style: { width: '100%', height: '100%', touchAction: 'none', cursor: phase === 'ready' ? (windowZoom !== null ? 'crosshair' : 'grab') : 'default' } }), phase === 'loading' && (_jsx("div", { style: overlayStyle, children: _jsx("div", { style: { color: COLORS.dim }, children: loadingNote }) })), phase === 'error' && (_jsxs("div", { style: overlayStyle, children: [_jsx("div", { style: { color: COLORS.bad, fontWeight: 700, marginBottom: 6 }, children: "The B-rep kernel failed to load." }), _jsx("div", { style: { color: COLORS.fg, maxWidth: 480, textAlign: 'center' }, children: loadError })] })), phase === 'ready' && stageHint && !buildError && showStageHint && (_jsx("div", { style: stageHintStyle, children: stageHint })), phase === 'ready' && stageHint && !buildError && !showStageHint && ruleActivityAt && (_jsx("div", { style: stageHintStyle, children: "Rules keep an edge level, upright, equal, parallel or at a right angle to another." })), phase === 'ready' && buildError && (_jsxs("div", { style: errorPanelStyle, children: [_jsx("div", { style: { color: COLORS.bad, fontWeight: 700, marginBottom: 4 }, children: "Could not build this model" }), _jsx("div", { style: { color: COLORS.fg }, children: buildError })] })), phase === 'ready' && typeof windowZoom === 'object' && windowZoom !== null && (() => {
+    return (_jsxs("div", { ref: rootRef, style: { position: 'relative', width: '100%', height: '100%', minHeight: 320, background: COLORS.bg }, children: [_jsx("div", { ref: containerRef, style: { width: '100%', height: '100%', touchAction: 'none', cursor: phase === 'ready' ? (windowZoom !== null ? 'crosshair' : 'grab') : 'default' } }), phase === 'ready' && canFullscreen && (_jsx("button", { type: "button", onClick: toggleFullscreen, title: isFullscreen ? 'Leave full screen (Esc)' : 'Full screen the 3D view only', "aria-label": isFullscreen ? 'Leave full screen' : 'Full screen the 3D view only', style: fullscreenButtonStyle, children: isFullscreen ? _jsx(Minimize2, { size: 14, "aria-hidden": "true" }) : _jsx(Maximize2, { size: 14, "aria-hidden": "true" }) })), phase === 'loading' && (_jsx("div", { style: overlayStyle, children: _jsx("div", { style: { color: COLORS.dim }, children: loadingNote }) })), phase === 'error' && (_jsxs("div", { style: overlayStyle, children: [_jsx("div", { style: { color: COLORS.bad, fontWeight: 700, marginBottom: 6 }, children: "The B-rep kernel failed to load." }), _jsx("div", { style: { color: COLORS.fg, maxWidth: 480, textAlign: 'center' }, children: loadError })] })), phase === 'ready' && stageHint && !buildError && showStageHint && (_jsx("div", { style: stageHintStyle, children: stageHint })), phase === 'ready' && stageHint && !buildError && !showStageHint && ruleActivityAt && (_jsx("div", { style: stageHintStyle, children: "Rules keep an edge level, upright, equal, parallel or at a right angle to another." })), phase === 'ready' && buildError && (_jsxs("div", { style: errorPanelStyle, children: [_jsx("div", { style: { color: COLORS.bad, fontWeight: 700, marginBottom: 4 }, children: "Could not build this model" }), _jsx("div", { style: { color: COLORS.fg }, children: buildError })] })), phase === 'ready' && typeof windowZoom === 'object' && windowZoom !== null && (() => {
                 const rect = windowZoom;
                 return (_jsx("div", { style: {
                         position: 'absolute',
@@ -3886,6 +3908,14 @@ const filterStripStyle = {
 const viewStripButtonStyle = {
     padding: '4px 10px', background: COLORS.panel, border: `1px solid ${COLORS.line}`, borderRadius: 999,
     font: '12px ui-monospace, Menlo, Consolas, monospace', color: COLORS.fg, cursor: 'pointer',
+};
+// Top-right, a small square: the corner the badge stack used to use is empty in the studio
+// (badgesInStatusBar). A real button, so it takes pointer events, and it sits beside the canvas
+// container rather than inside it, so a click never starts an orbit.
+const fullscreenButtonStyle = {
+    position: 'absolute', top: 12, right: 12, zIndex: 3, width: 30, height: 30, padding: 0,
+    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+    background: COLORS.panel, border: `1px solid ${COLORS.line}`, borderRadius: 4, color: COLORS.fg, cursor: 'pointer',
 };
 const viewStripActiveStyle = {
     // `border`, not `borderColor`: the base style sets the shorthand, and React

@@ -15,7 +15,8 @@ import { useLessonState } from '../lib/progress';
 import CodeEditor from './CodeEditor';
 import HistoryPanel from './HistoryPanel';
 import MoshionPreview from './MoshionPreview';
-import Console from './Console';
+import EditorPreviewSplit from './EditorPreviewSplit';
+import ResizableConsole from './ResizableConsole';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import AiHelpPanel from './AiHelpPanel';
 import TextureEditor from './TextureEditor';
@@ -463,163 +464,50 @@ export default function SandboxWorkspace() {
     }
   }, []);
 
-  // The console's height, set by the bar on its top edge (drag it, or focus it and use the
-  // up and down arrow keys). null = the default height. Kept for this visit, in and out of
-  // full screen. A taller console takes its room from the editor and the game, which always
-  // keep a usable height.
-  const [consoleH, setConsoleH] = useState<number | null>(null);
-  const consoleRef = useRef<HTMLDivElement>(null);
-  const clampConsole = useCallback((want: number) => {
+  // The game on its own: browser full screen for just the game pane (no editor, toolbar or console),
+  // from the button in the game's corner. Separate from `full` above, which stretches the whole
+  // sandbox. Like `full`, the browser owns the state and we only mirror it, so Esc just works.
+  const gamePaneRef = useRef<HTMLDivElement>(null);
+  const [gameFull, setGameFull] = useState(false);
+  const [gameFullOk, setGameFullOk] = useState(false);
+  useEffect(() => {
+    setGameFullOk(typeof document !== 'undefined' && !!document.fullscreenEnabled && !!document.documentElement.requestFullscreen);
+    const onFs = () => {
+      const pane = gamePaneRef.current;
+      const active = !!pane && document.fullscreenElement === pane;
+      setGameFull(active);
+      const frame = pane?.querySelector('iframe');
+      // The sketch scales up to fill the screen while it is on, and back after (runner.html).
+      frame?.contentWindow?.postMessage({ source: 'preview-fit', on: active }, '*');
+      // The keys go to the game at once, not to the button that was just clicked.
+      if (active) frame?.focus();
+    };
+    document.addEventListener('fullscreenchange', onFs);
+    return () => document.removeEventListener('fullscreenchange', onFs);
+  }, []);
+  const toggleGameFull = useCallback(() => {
+    // Only leave when it is THIS pane that is full screen: with the whole sandbox full screen, the
+    // button still means "just the game".
+    if (document.fullscreenElement && document.fullscreenElement === gamePaneRef.current) {
+      document.exitFullscreen?.();
+    } else {
+      gamePaneRef.current?.requestFullscreen?.().catch(() => { /* refused: stay windowed */ });
+    }
+  }, []);
+
+  // How tall the console may be made. It sits under the editor and the game in a shell of fixed height, so a
+  // taller console takes its room from them, and they always keep a usable height. ResizableConsole asks on
+  // every drag step and again when full screen changes. Measured against the shell's own bottom edge, not the
+  // panes' current sizes, so a console that is already too tall (just after leaving full screen) is cut back.
+  const maxConsoleHeight = useCallback(() => {
     const shell = shellRef.current;
     const split = shell?.querySelector<HTMLElement>('#split, .sandbox-split');
-    if (!shell || !split) return Math.round(want);
+    if (!shell || !split) return Number.POSITIVE_INFINITY;
     const keep = document.fullscreenElement ? 160 : 280; // what the editor and game keep
-    // Measured against the shell's own bottom edge, not the panes' current sizes, so a
-    // console that is already too tall (say, just after leaving full screen) is cut back.
     const bottom = shell.getBoundingClientRect().bottom - (parseFloat(getComputedStyle(shell).paddingBottom) || 0);
-    const most = bottom - (split.getBoundingClientRect().top + keep) - 12;
-    return Math.round(Math.max(72, Math.min(want, Math.max(72, most))));
+    return bottom - (split.getBoundingClientRect().top + keep) - 12;
   }, []);
-  const startConsoleDrag = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    const wrap = consoleRef.current;
-    const shell = shellRef.current;
-    if (!wrap || !shell || e.button !== 0) return;
-    e.preventDefault();
-    const bar = e.currentTarget;
-    bar.setPointerCapture(e.pointerId);
-    bar.focus();
-    const startY = e.clientY;
-    const startH = wrap.getBoundingClientRect().height;
-    shell.classList.add('is-sizing');
-    const move = (ev: PointerEvent) => setConsoleH(clampConsole(startH + (startY - ev.clientY)));
-    const end = () => {
-      shell.classList.remove('is-sizing');
-      bar.removeEventListener('pointermove', move);
-      bar.removeEventListener('pointerup', end);
-      bar.removeEventListener('pointercancel', end);
-    };
-    bar.addEventListener('pointermove', move);
-    bar.addEventListener('pointerup', end);
-    bar.addEventListener('pointercancel', end);
-  }, [clampConsole]);
-  const keyConsole = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
-    e.preventDefault();
-    const now = consoleRef.current?.getBoundingClientRect().height ?? 120;
-    const step = (e.shiftKey ? 80 : 24) * (e.key === 'ArrowUp' ? 1 : -1);
-    setConsoleH(clampConsole(now + step));
-  }, [clampConsole]);
-  // Leaving full screen (or a smaller window) can leave too little room: fit it again.
-  useEffect(() => {
-    if (consoleH === null) return;
-    const refit = () => setConsoleH((h) => (h === null ? h : clampConsole(h)));
-    const t = setTimeout(refit, 120);
-    window.addEventListener('resize', refit);
-    return () => { clearTimeout(t); window.removeEventListener('resize', refit); };
-  }, [full, consoleH === null, clampConsole]);
 
-
-  // Pane resize — same drag-handle plumbing as LessonWorkspace. No-ops
-  // gracefully (early return) when reSHape has replaced #split's contents
-  // wholesale, since #editorPane/#previewPane are not in the DOM then.
-  useEffect(() => {
-    const split = document.getElementById('split') as HTMLElement | null;
-    const divider = document.getElementById('divider') as HTMLElement | null;
-    const left = document.getElementById('editorPane') as HTMLElement | null;
-    const right = document.getElementById('previewPane') as HTMLElement | null;
-    const overlay = document.getElementById('dragOverlay') as HTMLElement | null;
-    if (!split || !divider || !left || !right || !overlay) return;
-
-    let dragging = false;
-    let rect: DOMRect | null = null;
-    let rafId: number | null = null;
-
-    const relayoutEditor = () => {
-      if (rafId) return;
-      rafId = requestAnimationFrame(() => {
-        window.dispatchEvent(new Event('resize'));
-        rafId = null;
-      });
-    };
-
-    const setPositions = (clientX: number) => {
-      if (!rect) rect = split.getBoundingClientRect();
-      const min = 220;
-      const max = rect.width - 220;
-      let x = clientX - rect.left;
-      x = Math.max(min, Math.min(max, x));
-      const leftPct = (x / rect.width) * 100;
-      left.style.flex = `0 0 ${leftPct}%`;
-      right.style.flex = `0 0 ${100 - leftPct}%`;
-      relayoutEditor();
-    };
-
-    const onMove = (e: PointerEvent) => {
-      if (!dragging) return;
-      setPositions(e.clientX);
-      e.preventDefault();
-    };
-
-    const stopDrag = () => {
-      if (!dragging) return;
-      dragging = false;
-      overlay.style.display = 'none';
-      document.body.style.userSelect = '';
-      document.body.classList.remove('is-resizing');
-      window.removeEventListener('pointermove', onMove, false);
-      window.removeEventListener('pointerup', onUp, false);
-      window.removeEventListener('pointercancel', onCancel, false);
-      window.removeEventListener('blur', onWindowBlur, false);
-      document.removeEventListener('visibilitychange', onVisChange, false);
-    };
-
-    const onUp = (e: PointerEvent) => {
-      try {
-        divider.releasePointerCapture(e.pointerId);
-      } catch {}
-      stopDrag();
-    };
-    const onCancel = () => stopDrag();
-    const onWindowBlur = () => stopDrag();
-    const onVisChange = () => { if (document.hidden) stopDrag(); };
-
-    const onPointerDown = (e: PointerEvent) => {
-      dragging = true;
-      rect = split.getBoundingClientRect();
-      overlay.style.display = 'block';
-      document.body.style.userSelect = 'none';
-      document.body.classList.add('is-resizing');
-      try { divider.setPointerCapture(e.pointerId); } catch {}
-      window.addEventListener('pointermove', onMove, false);
-      window.addEventListener('pointerup', onUp, false);
-      window.addEventListener('pointercancel', onCancel, false);
-      window.addEventListener('blur', onWindowBlur, false);
-      document.addEventListener('visibilitychange', onVisChange, false);
-      e.preventDefault();
-    };
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      const step = e.shiftKey ? 40 : 10;
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        rect = split.getBoundingClientRect();
-        const currentLeft = left.getBoundingClientRect().width || rect.width / 2;
-        const next = currentLeft + (e.key === 'ArrowRight' ? step : -step);
-        setPositions(rect.left + next);
-        e.preventDefault();
-      }
-    };
-
-    divider.addEventListener('pointerdown', onPointerDown, false);
-    divider.addEventListener('keydown', onKeyDown, false);
-    window.addEventListener('resize', relayoutEditor, false);
-
-    return () => {
-      stopDrag();
-      divider.removeEventListener('pointerdown', onPointerDown, false);
-      divider.removeEventListener('keydown', onKeyDown, false);
-      window.removeEventListener('resize', relayoutEditor, false);
-    };
-  }, [modeId]);
 
   const drawerTabs: DrawerTab[] = isFlow ? [
     {
@@ -817,6 +705,75 @@ export default function SandboxWorkspace() {
     </>
   ) : null;
 
+  // The two sides of the sandbox's split (components/EditorPreviewSplit.tsx).
+  const editorSlot = (
+    <>
+        {togetherLang && (mayTogether || together) && (
+          <CodeTogetherBar
+            key={togetherLang}
+            lang={togetherLang}
+            getText={getScript}
+            snapshot={togetherSnapshot}
+            onCollab={setCollabExt}
+            onActive={setTogether}
+            onHere={setTogetherHere}
+            keepCopy={keepTogetherCopy}
+            isUntouched={isUntouched}
+            open={togetherOpen}
+            onOpenChange={setTogetherOpen}
+            dialogHost={shellRef.current}
+            badgeHost={togetherBadge}
+            onSession={setTogetherCode}
+            invite={invite}
+          />
+        )}
+        <div style={{ flex: '1 1 auto', minHeight: 0 }}>
+          <CodeEditor collab={collabExt} />
+        </div>
+    </>
+  );
+  const previewSlot = (
+    <>
+        {!isConsole && runKey > 0 && gameFullOk && (
+          <button
+            type="button"
+            className="sandbox-game-fs"
+            onClick={toggleGameFull}
+            title={gameFull ? 'Leave full screen (Esc)' : 'Full screen the game only'}
+            aria-label={gameFull ? 'Leave full screen' : 'Full screen the game only'}
+          >
+            {gameFull ? <Minimize2 size={14} aria-hidden="true" /> : <Maximize2 size={14} aria-hidden="true" />}
+          </button>
+        )}
+        {isConsole ? (
+          <>
+            <div className="output-header">Output</div>
+            <pre
+                ref={outputRef}
+                className="console-output run-output"
+                role="log"
+                aria-live="polite"
+                aria-atomic="false"
+                aria-relevant="additions text"
+                aria-label="Program output"
+              >
+              {logs.length === 0 ? (
+                <div className="console-empty">Click Run to see output.</div>
+              ) : (
+                logs.map((log, i) => (
+                  <div key={i} className={`log-entry log-${log.type}`}>
+                    <span className="log-msg">{log.message}</span>
+                  </div>
+                ))
+              )}
+            </pre>
+          </>
+        ) : (
+          <MoshionPreview code={code} runKey={runKey} gameKey="sandbox" />
+        )}
+    </>
+  );
+
   return (
     <>
       <TabbedRightDrawer storageKey="shCode:sandbox-drawer" tabs={drawerTabs} inlineHostId="sandbox-tools-host" />
@@ -955,7 +912,8 @@ export default function SandboxWorkspace() {
           </div>
         )}
 
-        {!noProjects && <div className="editor-preview-container sandbox-split" id="split">
+        {!noProjects && (
+          <EditorPreviewSplit className="sandbox-split" previewRef={gamePaneRef} editor={editorSlot} preview={previewSlot}>
           {isReshape ? (
             <ReshapeStudio
               key={`${lesson.id}-${reshapeResetKey}`}
@@ -977,98 +935,18 @@ export default function SandboxWorkspace() {
             <div className="sandbox-flow" ref={flowFrameRef}>
               <DiagramEditor key={lesson.id} value={chart} onChange={onChartChange} height={flowH} />
             </div>
-          ) : (
-            <>
-              <div className="pane" id="editorPane">
-                {togetherLang && (mayTogether || together) && (
-                  <CodeTogetherBar
-                    key={togetherLang}
-                    lang={togetherLang}
-                    getText={getScript}
-                    snapshot={togetherSnapshot}
-                    onCollab={setCollabExt}
-                    onActive={setTogether}
-                    onHere={setTogetherHere}
-                    keepCopy={keepTogetherCopy}
-                    isUntouched={isUntouched}
-                    open={togetherOpen}
-                    onOpenChange={setTogetherOpen}
-                    dialogHost={shellRef.current}
-                    badgeHost={togetherBadge}
-                    onSession={setTogetherCode}
-                    invite={invite}
-                  />
-                )}
-                <div style={{ flex: '1 1 auto', minHeight: 0 }}>
-                  <CodeEditor collab={collabExt} />
-                </div>
-              </div>
-              <div
-                className="divider"
-                id="divider"
-                tabIndex={0}
-                aria-label="Resize editor and preview"
-              >
-                <span className="drag-handle" aria-hidden="true"></span>
-              </div>
-              <div className="pane" id="previewPane">
-                {isConsole ? (
-                  <>
-                    <div className="output-header">Output</div>
-                    <pre
-                        ref={outputRef}
-                        className="console-output run-output"
-                        role="log"
-                        aria-live="polite"
-                        aria-atomic="false"
-                        aria-relevant="additions text"
-                        aria-label="Program output"
-                      >
-                      {logs.length === 0 ? (
-                        <div className="console-empty">Click Run to see output.</div>
-                      ) : (
-                        logs.map((log, i) => (
-                          <div key={i} className={`log-entry log-${log.type}`}>
-                            <span className="log-msg">{log.message}</span>
-                          </div>
-                        ))
-                      )}
-                    </pre>
-                  </>
-                ) : (
-                  <MoshionPreview code={code} runKey={runKey} gameKey="sandbox" />
-                )}
-              </div>
-              <div className="drag-overlay" id="dragOverlay" aria-hidden="true"></div>
-            </>
-          )}
-        </div>}
+          ) : undefined}
+          </EditorPreviewSplit>
+        )}
 
         {!isConsole && !reshapeIsBuild && !isFlow && !noProjects && (
-          <>
-          <div
-            className="sandbox-console-divider"
-            role="separator"
-            aria-orientation="horizontal"
-            aria-label="Console height: drag up or down, or use the up and down arrow keys"
-            title="Drag to make the console taller or shorter"
-            tabIndex={0}
-            onPointerDown={startConsoleDrag}
-            onKeyDown={keyConsole}
-          >
-            <span className="sandbox-console-grip" aria-hidden="true" />
-          </div>
-          <div
-            className="sandbox-console-wrap"
-            ref={consoleRef}
-            style={consoleH !== null ? { height: consoleH, minHeight: 72, maxHeight: 'none' } : undefined}
-          >
-            <div className="output-header">Console</div>
-            <div className="sandbox-console-body">
-              <Console resetKey={String(consoleResetKey)} />
-            </div>
-          </div>
-          </>
+          <ResizableConsole
+            resetKey={String(consoleResetKey)}
+            defaultHeight={120}
+            maxHeight={maxConsoleHeight}
+            refitKey={full}
+            className="sandbox-console"
+          />
         )}
       </div>
       <style>{`
@@ -1120,60 +998,14 @@ export default function SandboxWorkspace() {
           min-height: 280px;
         }
         .sandbox-flow { flex: 1 1 auto; min-width: 0; min-height: 0; }
-        .sandbox-console-wrap {
-          display: flex;
-          flex-direction: column;
-          background: var(--card);
-          border: 1px solid var(--border);
-          border-radius: 4px;
-          overflow: hidden;
-          flex: 0 0 auto;
-          height: 120px;
-          min-height: 120px;
-          max-height: 60vh;
-        }
-        /* The bar on top of the console: drag it up for a taller console. It sits in the
-           shell's gap (negative margins), so it adds no height of its own. */
-        .sandbox-console-divider {
-          flex: 0 0 8px;
-          margin-block: -8px;
-          position: relative;
-          cursor: row-resize;
-          touch-action: none;
-          border-radius: 4px;
-          outline: none;
-        }
-        .sandbox-console-grip {
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          width: 40px;
-          height: 4px;
-          margin: -2px 0 0 -20px;
-          border-radius: 2px;
-          background: var(--border);
-        }
-        .sandbox-console-divider:hover .sandbox-console-grip,
-        .sandbox-console-divider:focus-visible .sandbox-console-grip { background: var(--c-cyan); }
-        .sandbox-console-divider:focus-visible { box-shadow: 0 0 0 2px var(--c-cyan); }
-        .sandbox-shell.is-sizing { user-select: none; cursor: row-resize; }
-        .sandbox-shell.is-sizing iframe { pointer-events: none; }
         /* A lobby bar above the canvas takes height from the row that holds it,
            so the console (empty most of the time, and still resizable) gives some back. */
-        .sandbox-shell:has([data-testid='moshion-lobby']) .sandbox-console-wrap {
+        .sandbox-shell:has([data-testid='moshion-lobby']) .sandbox-console .wsc-box.is-open:not([data-sized]) {
           height: 112px;
           min-height: 72px;
         }
-        .sandbox-shell:has([data-testid='moshion-lobby']) .sandbox-console-wrap .console-empty {
+        .sandbox-shell:has([data-testid='moshion-lobby']) .sandbox-console .console-empty {
           padding: 4px;
-        }
-        .sandbox-console-body { flex: 1; min-height: 0; padding: 6px 8px; overflow: hidden; display: flex; }
-        .sandbox-console-body .console-root {
-          flex: 1;
-          height: auto;
-          max-height: none;
-          min-height: 0;
-          resize: none;
         }
 
         /* ---- full screen ----
@@ -1196,6 +1028,22 @@ export default function SandboxWorkspace() {
         .sandbox-shell.is-full .sandbox-tb-end,
         .sandbox-shell.is-full .sandbox-tb-group { flex-wrap: nowrap; }
         .sandbox-shell.is-full .sandbox-toolbar { overflow-x: auto; }
+
+        /* The game's own full screen button: a small square in the game's top-right corner. Quiet until
+           the pointer or keyboard is on the game, so it never sits over the picture while playing. */
+        .sandbox-game-fs {
+          position: absolute; top: 8px; right: 8px; z-index: 6;
+          width: 30px; height: 30px; padding: 0;
+          display: inline-flex; align-items: center; justify-content: center;
+          background: var(--c-bg); color: var(--c-fg);
+          border: 1px solid var(--c-line); border-radius: 4px; cursor: pointer;
+          opacity: 0.55; transition: opacity 0.12s;
+        }
+        #previewPane:hover .sandbox-game-fs, .sandbox-game-fs:focus-visible, #previewPane:fullscreen .sandbox-game-fs { opacity: 1; }
+        .sandbox-game-fs:hover { border-color: var(--c-cyan); color: var(--c-cyan); }
+        .sandbox-game-fs:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; }
+        #previewPane:fullscreen { background: var(--bg); }
+        #previewPane:fullscreen #preview { width: 100%; height: 100%; }
       `}</style>
 
       <HistoryPanel

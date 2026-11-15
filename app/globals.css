@@ -696,26 +696,72 @@ details.editor-card > summary:hover::before {
 }
 
 /* Console styles */
-details.console {
-  margin-top: 1rem;
+
+/* The console box under an editor (components/ResizableConsole.tsx): the sandbox, lessons and assignments,
+   /play and shared programs. Its top edge is a bar to drag. The bar sits over the gap above the box
+   (absolute, so it needs no room of its own and works in a flex column and in a scrolling page alike). */
+.wsc { position: relative; flex: 0 0 auto; }
+.wsc-box {
+  display: flex;
+  flex-direction: column;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 4px;
+  overflow: hidden;
 }
-
-details.console > summary {
+.wsc-box.is-open {
+  height: var(--wsc-default, 120px);
+  min-height: 72px;
+  max-height: 60vh;
+}
+.wsc-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -12px;
+  height: 12px;
+  z-index: 3;
+  cursor: row-resize;
+  touch-action: none;
+  border-radius: 4px;
+  outline: none;
+}
+.wsc-grip {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 40px;
+  height: 4px;
+  margin: -2px 0 0 -20px;
+  border-radius: 2px;
+  background: var(--border);
+}
+.wsc-bar:hover .wsc-grip,
+.wsc-bar:focus-visible .wsc-grip { background: var(--c-cyan); }
+.wsc-bar:focus-visible { box-shadow: 0 0 0 2px var(--c-cyan); }
+/* The header as a button (lessons): looks like the plain header, with a chevron. */
+.wsc-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  font-family: inherit;
+  text-align: left;
   cursor: pointer;
-  padding: 6px 8px;
-  font-weight: bold;
-  list-style: none;
 }
-details.console > summary::-webkit-details-marker { display: none; }
-
-.console-body {
-  border-top: 1px solid var(--border);
-  padding: 8px;
-  background: var(--card);
-}
+.wsc-head:hover { color: var(--c-cyan); }
+.wsc-head:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: -2px; }
+.wsc-box:not(.is-open) .wsc-head { border-bottom: 0; }
+.wsc-body { flex: 1; min-height: 0; padding: 6px 8px; overflow: hidden; display: flex; }
+.wsc-body[hidden] { display: none; }
+.wsc-body .console-root { flex: 1; height: auto; max-height: none; min-height: 0; resize: none; }
+/* While the bar is dragged: no text selection, and a game under the pointer must not swallow the moves. */
+body.is-sizing-console { user-select: none; cursor: row-resize; }
+body.is-sizing-console iframe { pointer-events: none; }
 
 .console-root {
   display: flex;
@@ -724,17 +770,6 @@ details.console > summary::-webkit-details-marker { display: none; }
   overflow-y: auto;
   font-family: 'Courier New', monospace;
   font-size: 0.9rem;
-}
-
-/* Cap height when inside the collapsible console below editor.
-   Resizable so the student can drag it taller when they need to read
-   a long stack trace. */
-.console-body .console-root {
-  height: 320px;
-  max-height: 60vh;
-  min-height: 120px;
-  resize: vertical;
-  overflow: auto;
 }
 
 /* Fill the pane when used as the main output panel */
