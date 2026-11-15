@@ -24,6 +24,7 @@ import {
   deleteGame,
   getGame,
   listMyGames,
+  listPublicGames,
   listSharedGames,
   listStarredGames,
   setGameStarred,
@@ -40,6 +41,12 @@ import { GITHUB_WORD } from '../lib/game-flow-core';
 import { CHOICE_TEXT, canRemix, type ShareChoice } from '../lib/share-choice';
 import { sectionHeading, sectionNote, sectionStyle } from './library-ui';
 import ShareChoicePicker, { RemixCreditLine, lockedChoice, useLastChoice } from './ShareChoicePicker';
+import AudiencePicker from './AudiencePicker';
+import {
+   initialPick, pickProblem, pickToSpec, pickerMatters, samePick,
+  type AudienceOptions, type AudiencePick,
+} from '../lib/audience';
+import { fetchAudiences } from '../lib/audience-client';
 import GameChangesInbox from './GameChangesInbox';
 import { gameChangesHref } from '../lib/game-flow-client';
 import { builtinRef } from '../lib/builtin-games';
@@ -116,16 +123,22 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
   const [mine, setMine] = useState<Loaded<MyGame>>({ kind: 'loading' });
   const [shared, setShared] = useState<Loaded<SharedGame>>({ kind: 'loading' });
   const [starred, setStarred] = useState<Loaded<StarredGame>>({ kind: 'loading' });
+  // "Everyone" (migration 0058): what students made public; 'signed-out' here also means not in a class (403).
+  const [everyone, setEveryone] = useState<Loaded<SharedGame>>({ kind: 'loading' });
   const [busy, setBusy] = useState<string | null>(null);
   // Shown in this section, where the button was pressed (the panel's own
   // message line sits at the top, out of view by the time you reach Games).
   const [note, setNote] = useState<{ text: string; bad: boolean } | null>(null);
   /** The game whose sharing chooser is open, and the choice picked in it. */
   const [choosing, setChoosing] = useState<{ id: string; choice: ShareChoice } | null>(null);
+  // Which classes it goes to (migration 0057): what the server offers and the pick for the game being edited.
+  const [audOptions, setAudOptions] = useState<AudienceOptions | null>(null);
+  const [audPick, setAudPick] = useState<AudiencePick | null>(null);
   const [lastChoice, rememberChoice] = useLastChoice('game');
 
   const load = useCallback(async () => {
-    const [a, b, c] = await Promise.all([listMyGames(), listSharedGames(), listStarredGames()]);
+    const [a, b, c, e] = await Promise.all([listMyGames(), listSharedGames(), listStarredGames(), listPublicGames()]);
+    setEveryone(e.ok ? { kind: 'ok', games: e.value.games.filter((g) => !g.mine) } : e.status === 401 || e.status === 403 ? { kind: 'signed-out' } : { kind: 'error', text: e.error });
     setStarred(c.ok ? { kind: 'ok', games: c.value.games } : c.status === 401 ? { kind: 'signed-out' } : { kind: 'error', text: c.error });
     setMine(a.ok ? { kind: 'ok', games: a.value.games } : a.status === 401 ? { kind: 'signed-out' } : { kind: 'error', text: a.error });
     // The class list leaves out your own games: they are already under "My games".
@@ -171,12 +184,20 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
   function openChooser(g: MyGame) {
     if (choosing?.id === g.id) { setChoosing(null); return; }
     setChoosing({ id: g.id, choice: lockedChoice(g.remixedFrom, g.shared ? g.choice : lastChoice) });
+    setAudPick(null);
+    void fetchAudiences().then((o) => {
+      setAudOptions(o);
+      setAudPick(o ? initialPick(o, g.shared ? g.audience ?? null : null) : null);
+    });
   }
 
   async function applyShare(g: MyGame, share: boolean) {
     const choice = choosing?.id === g.id ? choosing.choice : g.choice;
     setBusy(g.id);
-    const r = await setGameShared(g.id, share, share ? choice : undefined);
+    // Send the classes only when there is something to choose and it differs from what the game has: a re-save
+    // that changes just the choice leaves the audience alone (the server keeps it either way).
+    const askAudience = share && pickerMatters(audOptions) && audPick !== null && !(g.shared && samePick(audPick, g.audience));
+    const r = await setGameShared(g.id, share, share ? choice : undefined, askAudience && audPick ? pickToSpec(audPick) : undefined);
     setBusy(null);
     if (!r.ok) { say(r.error, true); return; }
     setChoosing(null);
@@ -261,11 +282,12 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
               <button type="button" style={{ ...btn, color: 'var(--c-red)' }} disabled={busy === g.id} onClick={() => void remove(g)}>Delete</button>
               {choosing?.id === g.id && (
                 <div style={{ flex: '1 1 100%', minWidth: 0, marginTop: 4 }}>
+                  {audPick && <AudiencePicker options={audOptions} value={audPick} onChange={setAudPick} idPrefix={`game-audience-${g.id}`} compact pulled={g.pulled} />}
                   <ShareChoicePicker thing="game" value={choosing.choice} from={g.remixedFrom} idPrefix={`game-share-${g.id}`} compact
                     onChange={(c) => setChoosing({ id: g.id, choice: c })} />
                   <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                    <button type="button" style={playBtn} disabled={busy === g.id} onClick={() => void applyShare(g, true)}>
-                      {g.shared ? 'Save' : 'Share with my class'}
+                    <button type="button" style={playBtn} disabled={busy === g.id || (pickerMatters(audOptions) && !!audPick && !!pickProblem(audPick))} onClick={() => void applyShare(g, true)}>
+                      {g.shared ? 'Save' : audPick?.mode === 'public' ? 'Share with everyone' : 'Share with my class'}
                     </button>
                     {g.shared && (
                       <button type="button" style={btn} disabled={busy === g.id} onClick={() => void applyShare(g, false)}>Stop sharing</button>
@@ -319,6 +341,48 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
               )}
               {canRemix(g.choice) && (
                 <a href={gameChangesHref(g.id)} style={btn} title="Proposed changes to this game, and their conversations">Changes</a>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      </section>
+
+      <section aria-labelledby="games-everyone-h" style={sectionStyle}>
+      <h3 id="games-everyone-h" style={{ ...sectionHeading, margin: '0 0 6px' }}>Everyone ({everyone.kind === 'ok' ? everyone.games.length : '…'})</h3>
+      {everyone.kind === 'loading' && <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: 0 }}>Loading…</p>}
+      {everyone.kind === 'error' && <p style={{ fontSize: 13, color: 'var(--c-red)', margin: 0 }}>{everyone.text}</p>}
+      {everyone.kind === 'signed-out' && (
+        <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: 0 }}>Everyone is for people in a class. Join a class to see what students shared.</p>
+      )}
+      {everyone.kind === 'ok' && !everyone.games.length && (
+        <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: 0 }}>
+          No one has shared a game with everyone yet. Choose <strong style={{ color: 'var(--c-fg)' }}>Everyone</strong> when you share yours.
+        </p>
+      )}
+      {everyone.kind === 'ok' && everyone.games.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {everyone.games.map((g) => (
+            <div key={g.id} style={rowStyle}>
+              <div style={{ minWidth: 140, flex: '1 1 160px' }}>
+                <div style={{ fontSize: 13, fontWeight: 600 }}>{g.title}</div>
+                <div style={badge}>
+                  by {g.owner} · {g.modeLabel} · {CHOICE_TEXT.game[g.choice ?? 'credit'].short}
+                  {g.stars ? <> · <StarCount count={g.stars} starred={g.starred} /></> : null}
+                </div>
+                <RemixCreditLine from={g.remixedFrom} />
+              </div>
+              <button type="button" style={{ ...btn, display: 'inline-flex', alignItems: 'center', gap: 5 }} aria-pressed={!!g.starred}
+                disabled={busy === 'star-' + g.id} onClick={() => void star(g.id, !g.starred)}
+                title={g.starred ? 'Take your star back' : 'Star it: tells the maker you like it and keeps it in Starred'}>
+                <StarIcon on={!!g.starred} size={13} />{g.starred ? 'Starred' : 'Star'}
+              </button>
+              <a href={playHref(g.id)} style={playBtn}>Play</a>
+              {canRemix(g.choice) && (
+                <button type="button" style={btn} disabled={busy === g.id} onClick={() => void remix(g.id, false)}
+                  title="Copy this game's code into your own moSHion sandbox">
+                  Remix
+                </button>
               )}
             </div>
           ))}

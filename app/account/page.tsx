@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { LockKeyhole } from 'lucide-react';
 import { getCurrentUser, updateName, CurrentUser } from '../../lib/auth';
 import AppearanceSettings from '../../components/AppearanceSettings';
+import GuestInvites from '../../components/GuestInvites';
 import { openWhatsNew } from '../../components/WhatsNewModal';
 
 const S = {
@@ -166,6 +167,9 @@ export default function AccountPage() {
       </div>
 
       <AppearanceSettings />
+
+      {/* A student invites an account holder to the sessions they start; a teacher approves (migration 0059). */}
+      {user.role === 'student' && <GuestInvites />}
 
       {/* This role's live What's New entries (the last two weeks), newest first (components/WhatsNewModal.tsx). */}
       <section aria-labelledby="whats-new-h" style={{ ...S.card, marginTop: 24 }}>

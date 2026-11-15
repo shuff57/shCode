@@ -36,6 +36,9 @@ import {
   type LibraryKind,
 } from '../../_shared/library';
 import { originalItem } from '../../_shared/shareChoice';
+import { audienceMap, ownClassIds, type ItemAudience } from '../../_shared/audience';
+import { publicStates } from '../../_shared/publicShare';
+import type { PulledInfo } from '../../../lib/audience';
 import {
   PROVENANCE_COLUMNS,
   choiceOf,
@@ -65,13 +68,17 @@ export interface LibraryRow extends Partial<ProvenanceRow> {
   deleted_at: number | null;
   shared?: number;
   share_choice?: string | null;
+  audience_teacher?: string | null;
 }
 
-export function itemJson(r: LibraryRow) {
+/** `audience`: who a shared item goes to (functions/_shared/audience.ts); only the owner's list carries it. */
+export function itemJson(r: LibraryRow, audience?: ItemAudience | null, pulled?: PulledInfo | null) {
   return {
     id: r.id, kind: r.kind, name: r.name, bytes: r.bytes, mime: r.mime, meta: r.meta,
     hash: r.hash, updatedAt: r.updated_at, deletedAt: r.deleted_at, shared: !!r.shared,
     choice: choiceOf(r.share_choice), remixedFrom: provenanceFromRow(r),
+    ...(audience ? { audience } : {}),
+    ...(pulled ? { pulled } : {}),
   };
 }
 
@@ -79,14 +86,19 @@ const MAX_BODY = 512 * 1024;
 
 export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ env, data }: Ctx) => {
   const res = await env.DB.prepare(
-    `SELECT id, kind, name, bytes, mime, meta, hash, updated_at, deleted_at, share_choice, ${PROVENANCE_COLUMNS},
+    `SELECT id, kind, name, bytes, mime, meta, hash, updated_at, deleted_at, share_choice, audience_teacher, ${PROVENANCE_COLUMNS},
             EXISTS (SELECT 1 FROM library_shares s WHERE s.item_id = library_items.id) AS shared
        FROM library_items WHERE owner_email = ? ORDER BY kind, name`,
   ).bind(data.email).all<LibraryRow>();
   const rows = res.results ?? [];
   const used = (k: LibraryKind) => rows.filter((r) => r.kind === k && r.deleted_at == null).reduce((n, r) => n + r.bytes, 0);
+  const audiences = await audienceMap(
+    env.DB, 'item', rows.filter((r) => r.shared).map((r) => ({ id: r.id, audience_teacher: r.audience_teacher ?? null })), await ownClassIds(env.DB, data),
+  );
+  // A teacher took it down from "Everyone" (migration 0058): the owner is told on the item.
+  const pub = await publicStates(env.DB, 'item', rows.filter((r) => r.shared).map((r) => r.id));
   return json({
-    items: rows.map(itemJson),
+    items: rows.map((r) => itemJson(r, audiences.get(r.id), pub.get(r.id)?.pulled)),
     quota: {
       texture: { bytes: used('texture'), maxBytes: MAX_TOTAL_BYTES.texture, maxItemBytes: MAX_ITEM_BYTES.texture },
       sound: { bytes: used('sound'), maxBytes: MAX_TOTAL_BYTES.sound, maxItemBytes: MAX_ITEM_BYTES.sound },

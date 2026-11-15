@@ -4,14 +4,16 @@
 
 import { ownerLabel, studentClassIds, teacherClassIds } from './libraryShare';
 import {
-  GENERAL, GROUP_NOTE, MESSAGES_PER_CHANNEL, MESSAGES_PER_DAY, MESSAGES_PER_MINUTE, MESSAGES_PER_THREAD, THREAD_LIST_LIMIT,
+  GENERAL, GROUP_NOTE, MAX_EDITS_PER_MESSAGE, MENTIONS_PER_MESSAGE, MESSAGES_PER_CHANNEL, MESSAGES_PER_DAY, MESSAGES_PER_MINUTE,
+  MESSAGES_PER_THREAD, THREAD_LIST_LIMIT,
   THREAD_VIEW_LIMIT, WATCHED_NOTE, blockText, channelNote, cleanMessage, cleanShareCode, cleanShareTitle, groupLabel,
-  isShareLang, shareSnippet, snippetOf,
+  GUEST_THREAD_NOTE, hasMention, isPersonKey, isShareLang, shareSnippet, snippetOf,
   type MessageItem, type MessageLevel, type MessagePerson, type SendBlock, type ShareCard, type ShareKind, type ShareLang,
   type ThreadKind, type ThreadSummary, type ThreadView,
 } from '../../lib/messages-core';
 import { CODE_ROOM_GAMES } from '../../lib/live-protocol';
 import { getRoom, normalizeCode, roomKind } from './rooms';
+import { guestPair } from './guests';
 
 export type SessionData = { email: string; role: 'admin' | 'teacher' | 'student' };
 
@@ -70,8 +72,25 @@ export async function postBlock(
  */
 export async function sendRule(
   db: D1Database, cls: ClassInfo, from: string, to: string,
-): Promise<{ why: SendBlock; kind: 'teacher' | 'students' | null; fromRole: 'teacher' | 'student' | null; toRole: 'teacher' | 'student' | null }> {
+): Promise<{
+  why: SendBlock; kind: 'teacher' | 'students' | null; fromRole: 'teacher' | 'student' | null; toRole: 'teacher' | 'student' | null;
+  /** A host and their approved guest (migration 0060); `guestEmail` is the guest of the two. */
+  guest?: boolean; guestEmail?: string;
+}> {
   const [fromRole, toRole] = await Promise.all([roleIn(db, cls, from), roleIn(db, cls, to)]);
+  // A host and their guest (migration 0060): one of them is on no roster here, and that is allowed for exactly this pair,
+  // through the class that vouched. The HOST's messaging levels govern both directions (a teacher who sets that student to
+  // Off or Teacher only silences the pair), and the conversation stays a 'students' one, so the class's teachers read it.
+  if (!fromRole || !toRole) {
+    const pair = await guestPair(db, cls.id, from, to);
+    if (pair) {
+      let why: SendBlock = null;
+      if (cls.archived_at != null) why = 'archived';
+      else if (!pair.live) why = 'guest-ended';
+      else why = await postBlock(db, cls, pair.host, 'student', 'peers');
+      return { why, kind: 'students', fromRole: 'student', toRole: 'student', guest: true, guestEmail: pair.guest };
+    }
+  }
   const kind = fromRole === 'teacher' || toRole === 'teacher' ? 'teacher' : fromRole && toRole ? 'students' : null;
   let why: SendBlock = null;
   if (cls.archived_at != null) why = 'archived';
@@ -159,13 +178,15 @@ export function toPeople(rows: { email: string; name: string; teacher: boolean }
 export interface ThreadRow {
   id: string; class_id: string; kind: ThreadKind; created_at: number; last_at: number; class_name: string;
   title: string; locked: number; created_by: string;
+  /** A host and their guest (migration 0060). */
+  guest: number;
 }
 export interface MemberRow { email: string; name: string; teacher: number; read_at: number }
 
 export async function threadWithMembers(db: D1Database, id: string): Promise<{ thread: ThreadRow; members: MemberRow[] } | null> {
   const thread = await db.prepare(
     `SELECT t.id, t.class_id, t.kind, t.created_at, t.last_at, COALESCE(c.name, 'a class') AS class_name,
-            t.title, t.locked, t.created_by
+            t.title, t.locked, t.created_by, t.guest
        FROM message_threads t LEFT JOIN classes c ON c.id = t.class_id WHERE t.id = ?`,
   ).bind(id).first<ThreadRow>();
   if (!thread) return null;
@@ -176,14 +197,28 @@ export async function threadWithMembers(db: D1Database, id: string): Promise<{ t
 
 export interface MessageRow {
   id: string; author_email: string; body: string; created_at: number; deleted_at: number | null;
+  edited_at: number | null; retracted_at: number | null;
 }
 
 /** The newest `limit` messages, oldest first. */
 export async function threadMessages(db: D1Database, threadId: string, limit = THREAD_VIEW_LIMIT): Promise<MessageRow[]> {
   const rows = (await db.prepare(
-    `SELECT id, author_email, body, created_at, deleted_at FROM messages WHERE thread_id = ? ORDER BY created_at DESC, rowid DESC LIMIT ?`,
+    `SELECT id, author_email, body, created_at, deleted_at, edited_at, retracted_at FROM messages WHERE thread_id = ? ORDER BY created_at DESC, rowid DESC LIMIT ?`,
   ).bind(threadId, limit).all<MessageRow>()).results ?? [];
   return rows.reverse();
+}
+
+/** Every earlier version of the messages of a conversation, by message id, oldest first (the first is the original). */
+export async function threadHistory(db: D1Database, threadId: string): Promise<Map<string, { body: string; at: number }[]>> {
+  const rows = (await db.prepare(`SELECT message_id, body, replaced_at FROM message_edits WHERE thread_id = ? ORDER BY replaced_at, rowid`)
+    .bind(threadId).all<{ message_id: string; body: string; replaced_at: number }>()).results ?? [];
+  const out = new Map<string, { body: string; at: number }[]>();
+  for (const r of rows) {
+    const list = out.get(r.message_id) ?? [];
+    list.push({ body: r.body, at: r.replaced_at });
+    out.set(r.message_id, list);
+  }
+  return out;
 }
 
 // ---- a sandbox program sent in a message (migration 0054) ----------------------------------------
@@ -347,7 +382,16 @@ export async function threadView(db: D1Database, data: SessionData, threadId: st
   if (!a || !a.read) return null;
   const kind = a.thread.kind;
   const why = a.onlooker ? null : await threadBlock(db, a, data.email);
-  const [rows, shares] = await Promise.all([threadMessages(db, threadId, THREAD_VIEW_LIMIT + 1), threadShares(db, threadId)]);
+  const canSend = !a.onlooker && why === null;
+  // The class's teachers (and an admin) always get a message's words, however it was removed or deleted,
+  // and every earlier version of it. Nobody else does, so an edit or a delete cannot hide anything from them.
+  const seesOriginals = a.role === 'teacher' || data.role === 'admin';
+  const [rows, shares, mentionRows, history] = await Promise.all([
+    threadMessages(db, threadId, THREAD_VIEW_LIMIT + 1),
+    threadShares(db, threadId),
+    db.prepare(`SELECT message_id, email FROM message_mentions WHERE thread_id = ?`).bind(threadId).all<{ message_id: string; email: string }>(),
+    seesOriginals ? threadHistory(db, threadId) : Promise.resolve(new Map<string, { body: string; at: number }[]>()),
+  ]);
   const more = rows.length > THREAD_VIEW_LIMIT;
   const shown = more ? rows.slice(rows.length - THREAD_VIEW_LIMIT) : rows;
   const names = new Map(a.members.map((m) => [m.email, m]));
@@ -355,18 +399,33 @@ export async function threadView(db: D1Database, data: SessionData, threadId: st
   for (const r of shown) {
     if (!names.has(r.author_email)) names.set(r.author_email, { email: r.author_email, name: await nameOf(db, r.author_email), teacher: 0, read_at: 0 });
   }
+  const mentionedIn = new Map<string, string[]>();
+  for (const m of mentionRows.results ?? []) mentionedIn.set(m.message_id, [...(mentionedIn.get(m.message_id) ?? []), m.email]);
+  for (const emails of mentionedIn.values()) {
+    for (const e of emails) if (!names.has(e)) names.set(e, { email: e, name: await nameOf(db, e), teacher: 0, read_at: 0 });
+  }
   const messages: MessageItem[] = shown.map((r) => {
     const removed = r.deleted_at != null;
+    const deleted = r.retracted_at != null;
+    const mine = r.author_email === data.email;
+    // A removed message's words and program go to the class's teachers only; so do a deleted one's.
+    const hidden = (removed && !a.moderate) || (deleted && !seesOriginals);
+    const earlier = history.get(r.id);
     return {
       id: r.id,
-      mine: r.author_email === data.email,
+      mine,
       author: names.get(r.author_email)?.name ?? 'Someone',
       teacher: !!names.get(r.author_email)?.teacher,
-      // A removed message's words and program go to the class's teachers only.
-      body: removed && !a.moderate ? null : r.body,
+      body: hidden ? null : r.body,
       removed,
       at: r.created_at,
-      share: removed && !a.moderate ? null : shares.get(r.id) ?? null,
+      share: hidden ? null : shares.get(r.id) ?? null,
+      edited: r.edited_at != null,
+      deleted,
+      mentions: hidden ? [] : (mentionedIn.get(r.id) ?? []).map((e) => ({ name: names.get(e)?.name ?? 'Someone', me: e === data.email })),
+      canEdit: mine && !removed && !deleted && canSend,
+      canDelete: mine && !removed && !deleted && !a.onlooker,
+      ...(earlier?.length && !hidden ? { history: earlier } : {}),
     };
   });
   const title = titleFor(a, data.email);
@@ -374,10 +433,9 @@ export async function threadView(db: D1Database, data: SessionData, threadId: st
     ? (() => { const o = a.members.find((m) => m.email !== data.email); return a.onlooker || !o ? { name: title, teacher: false } : { name: o.name, teacher: !!o.teacher }; })()
     : { name: title, teacher: false };
   let note: string | null = null;
-  if (kind === 'students') note = WATCHED_NOTE;
+  if (kind === 'students') note = a.thread.guest ? GUEST_THREAD_NOTE : WATCHED_NOTE;
   else if (kind === 'group') note = GROUP_NOTE;
   else if (kind === 'channel') note = channelNote(a.thread.class_name);
-  const canSend = !a.onlooker && why === null;
   const isTeacher = a.role === 'teacher' || data.role === 'admin';
   const manage = kind === 'group' ? !!a.me && canSend
     : kind === 'channel' ? isTeacher || (a.thread.created_by === data.email && canSend)
@@ -389,6 +447,11 @@ export async function threadView(db: D1Database, data: SessionData, threadId: st
       .sort((x, y) => Number(y.teacher) - Number(x.teacher) || x.name.localeCompare(y.name));
   }
   const whyName = kind === 'channel' ? `#${a.thread.title}` : kind === 'group' ? title : other.name;
+  let mentionablePeople: ThreadView['mentionable'];
+  if (canSend && (kind === 'group' || kind === 'channel')) {
+    const pool = await mentionPool(db, a, data.email);
+    mentionablePeople = toPeople(pool, await personKeys(db, pool.map((p) => p.email)));
+  }
   return {
     id: a.thread.id,
     classId: a.thread.class_id,
@@ -397,6 +460,7 @@ export async function threadView(db: D1Database, data: SessionData, threadId: st
     title,
     other,
     ...(members ? { members } : {}),
+    ...(mentionablePeople ? { mentionable: mentionablePeople } : {}),
     ...(kind === 'channel' ? { locked: !!a.thread.locked } : {}),
     messages,
     more,
@@ -415,7 +479,7 @@ export const memberView = (db: D1Database, data: SessionData, threadId: string) 
 
 /** The caps on sending (a student only), or null when the message may go. */
 export async function capRefusal(
-  db: D1Database, data: SessionData, threadId: string | null, now = Date.now(), kind: ThreadKind = 'students',
+  db: D1Database, data: SessionData, threadId: string | null, now = Date.now(), kind: ThreadKind = 'students', forceCap = false,
 ): Promise<string | null> {
   if (threadId) {
     const cap = kind === 'channel' ? MESSAGES_PER_CHANNEL : MESSAGES_PER_THREAD;
@@ -426,7 +490,8 @@ export async function capRefusal(
         : `This conversation has ${cap} messages, the most one can hold.`;
     }
   }
-  if (data.role !== 'student') return null;
+  // A student is capped; so is a GUEST, whatever their account's role (migration 0060: an adult's account is no exception).
+  if (data.role !== 'student' && !forceCap) return null;
   const [minute, day] = await Promise.all([
     db.prepare(`SELECT COUNT(*) AS n FROM messages WHERE author_email = ? AND created_at > ?`).bind(data.email, now - 60_000).first<{ n: number }>(),
     db.prepare(`SELECT COUNT(*) AS n FROM messages WHERE author_email = ? AND created_at > ?`).bind(data.email, now - 86_400_000).first<{ n: number }>(),
@@ -445,12 +510,15 @@ export function newId(): string {
 /** Add a message (already cleaned and allowed), with its program if any, and mark the conversation read for its writer. */
 export async function appendMessage(
   db: D1Database, email: string, threadId: string, body: string, now = Date.now(), share: PendingShare | null = null,
+  mentions: { email: string }[] = [],
 ): Promise<void> {
   const id = newId();
   const steps = [
     db.prepare(`INSERT INTO messages (id, thread_id, author_email, body, created_at) VALUES (?, ?, ?, ?, ?)`).bind(id, threadId, email, body, now),
     db.prepare(`UPDATE message_threads SET last_at = MAX(last_at, ?) WHERE id = ?`).bind(now, threadId),
     db.prepare(`UPDATE message_members SET read_at = MAX(read_at, ?) WHERE thread_id = ? AND email = ?`).bind(now, threadId, email),
+    ...mentions.map((m) => db.prepare(`INSERT OR IGNORE INTO message_mentions (message_id, thread_id, email, created_at) VALUES (?, ?, ?, ?)`)
+      .bind(id, threadId, m.email, now)),
   ];
   if (share) {
     steps.push(db.prepare(
@@ -459,6 +527,117 @@ export async function appendMessage(
     ).bind(newId(), id, threadId, email, share.kind, share.lang, share.title, share.code, share.roomCode, share.roomCreatedAt, now));
   }
   await db.batch(steps);
+}
+
+// ---- @mentions, editing and deleting your own message (migration 0056) -----------------------------
+
+/** Whom an @ may name in a group (its other people) or a channel (everyone in the class now, teachers too). */
+export async function mentionPool(db: D1Database, a: Access, email: string): Promise<{ email: string; name: string; teacher: boolean }[]> {
+  const kind = a.thread.kind;
+  if (kind === 'group') return a.members.filter((m) => m.email !== email).map((m) => ({ email: m.email, name: m.name, teacher: !!m.teacher }));
+  if (kind === 'channel') return (await classPeople(db, a.thread.class_id)).filter((p) => p.email !== email);
+  return [];
+}
+
+/**
+ * The people a message really @mentions: the person keys the page sent, kept only for someone who may read
+ * this conversation AND whose `@name` is in the words. Anything else is dropped without an error (a page that
+ * deleted the text after picking the name should not fail the send). At most MENTIONS_PER_MESSAGE.
+ */
+export async function resolveMentions(
+  db: D1Database, a: Access, email: string, body: string, rawKeys: unknown,
+): Promise<{ email: string; name: string }[]> {
+  if (!Array.isArray(rawKeys) || !rawKeys.length || !body) return [];
+  const pool = await mentionPool(db, a, email);
+  if (!pool.length) return [];
+  const out = new Map<string, { email: string; name: string }>();
+  for (const k of [...new Set(rawKeys)].slice(0, MENTIONS_PER_MESSAGE * 2)) {
+    if (!isPersonKey(k)) continue;
+    const e = await emailForKey(db, k);
+    const p = e ? pool.find((x) => x.email === e) : undefined;
+    if (p && hasMention(body, p.name) && out.size < MENTIONS_PER_MESSAGE) out.set(p.email, { email: p.email, name: p.name });
+  }
+  return [...out.values()];
+}
+
+type OwnMessage = { id: string; thread_id: string; author_email: string; body: string; deleted_at: number | null; retracted_at: number | null; has_share: number };
+
+async function ownMessage(db: D1Database, threadId: string, messageId: unknown, email: string): Promise<OwnMessage | null> {
+  if (typeof messageId !== 'string' || !/^[0-9a-f]{32}$/.test(messageId)) return null;
+  const m = await db.prepare(
+    `SELECT m.id, m.thread_id, m.author_email, m.body, m.deleted_at, m.retracted_at,
+            EXISTS (SELECT 1 FROM message_shares s WHERE s.message_id = m.id) AS has_share
+       FROM messages m WHERE m.id = ?`,
+  ).bind(messageId).first<OwnMessage>();
+  // Someone else's message and a missing one look the same.
+  return m && m.thread_id === threadId && m.author_email === email ? m : null;
+}
+
+export type EditResult = { ok: true } | { ok: false; status: number; error: string; safety?: true };
+
+/**
+ * The author changes the words of their own message. The words being replaced are kept (message_edits)
+ * for the class's teachers; classmates see the new words and "(edited)". The caller has already checked the
+ * author may send in this conversation now (threadBlock). The safety check runs again on the new words.
+ */
+export async function editMessage(
+  db: D1Database, a: Access, email: string, messageId: unknown, rawBody: unknown, rawMentions: unknown, now = Date.now(),
+): Promise<EditResult> {
+  const m = await ownMessage(db, a.thread.id, messageId, email);
+  if (!m) return { ok: false, status: 404, error: 'Not found' };
+  if (m.deleted_at != null) return { ok: false, status: 403, error: 'A teacher removed this message, so it cannot be changed.' };
+  if (m.retracted_at != null) return { ok: false, status: 409, error: 'You deleted this message, so it cannot be changed.' };
+
+  // A message that carries a program may have no words at all.
+  let body = '';
+  if (!(m.has_share && typeof rawBody === 'string' && !rawBody.trim())) {
+    const c = cleanMessage(rawBody);
+    if ('error' in c) return { ok: false, status: 400, error: c.error, ...(c.safety ? { safety: true as const } : {}) };
+    body = c.body;
+  }
+  if (body === m.body) return { ok: true };
+
+  const [count, recent] = await Promise.all([
+    db.prepare(`SELECT COUNT(*) AS n FROM message_edits WHERE message_id = ?`).bind(m.id).first<{ n: number }>(),
+    db.prepare(`SELECT COUNT(*) AS n FROM message_edits WHERE edited_by = ? AND replaced_at > ?`).bind(email, now - 60_000).first<{ n: number }>(),
+  ]);
+  if ((count?.n ?? 0) >= MAX_EDITS_PER_MESSAGE) {
+    return { ok: false, status: 429, error: `A message can be changed ${MAX_EDITS_PER_MESSAGE} times. Delete it and send a new one.` };
+  }
+  if ((recent?.n ?? 0) >= MESSAGES_PER_MINUTE) {
+    return { ok: false, status: 429, error: `You have changed ${MESSAGES_PER_MINUTE} messages in the last minute, the most for one minute. Wait a moment and try again.` };
+  }
+
+  const keep = await resolveMentions(db, a, email, body, rawMentions);
+  const have = new Set(((await db.prepare(`SELECT email FROM message_mentions WHERE message_id = ?`).bind(m.id).all<{ email: string }>()).results ?? []).map((r) => r.email));
+  const keepSet = new Set(keep.map((k) => k.email));
+  const steps = [
+    db.prepare(`INSERT INTO message_edits (id, message_id, thread_id, body, replaced_at, edited_by) VALUES (?, ?, ?, ?, ?, ?)`)
+      .bind(newId(), m.id, m.thread_id, m.body, now, email),
+    db.prepare(`UPDATE messages SET body = ?, edited_at = ? WHERE id = ?`).bind(body, now, m.id),
+    // Someone no longer named is no longer told; someone already named keeps their row (and its time).
+    ...[...have].filter((e) => !keepSet.has(e)).map((e) => db.prepare(`DELETE FROM message_mentions WHERE message_id = ? AND email = ?`).bind(m.id, e)),
+    ...keep.filter((k) => !have.has(k.email)).map((k) => db.prepare(`INSERT OR IGNORE INTO message_mentions (message_id, thread_id, email, created_at) VALUES (?, ?, ?, ?)`)
+      .bind(m.id, m.thread_id, k.email, now)),
+  ];
+  await db.batch(steps);
+  return { ok: true };
+}
+
+/**
+ * The author deletes their own message. The words stay (for the class's teachers only): everyone else sees
+ * "Message deleted". Deleting twice is fine. A message a teacher removed is the teacher's to put back, not
+ * the author's to delete.
+ */
+export async function unsendMessage(db: D1Database, a: Access, email: string, messageId: unknown, now = Date.now()): Promise<EditResult> {
+  const m = await ownMessage(db, a.thread.id, messageId, email);
+  if (!m) return { ok: false, status: 404, error: 'Not found' };
+  if (m.deleted_at != null) return { ok: false, status: 403, error: 'A teacher removed this message.' };
+  // Its mention rows stay (a teacher reads who was named); the unread queries skip a deleted message.
+  if (m.retracted_at == null) {
+    await db.prepare(`UPDATE messages SET retracted_at = ? WHERE id = ? AND retracted_at IS NULL`).bind(now, m.id).run();
+  }
+  return { ok: true };
 }
 
 // ---- the mailbox list, groups and channels (migration 0055) -----------------------------------------
@@ -487,14 +666,30 @@ export async function ensureGeneral(db: D1Database, classIds: string[], now = Da
   ).bind(newId(), c, channelKey(c, GENERAL), now, GENERAL)));
 }
 
-/** How many conversations with something the person has not opened (two-person ones and groups; a channel is shown bold instead). */
-export async function unreadCount(db: D1Database, email: string): Promise<number> {
+/**
+ * How many conversations have something the person has not opened: two-person ones and groups (a channel is
+ * shown bold instead), plus a channel where someone @mentioned them since they last read it (migration 0056).
+ * A message its author deleted or a teacher removed counts for nothing.
+ */
+export async function unreadCount(db: D1Database, email: string, now = Date.now()): Promise<number> {
   const r = await db.prepare(
-    `SELECT COUNT(*) AS n FROM message_members m JOIN message_threads t ON t.id = m.thread_id AND t.kind != 'channel'
-      WHERE m.email = ?1 AND EXISTS (
-        SELECT 1 FROM messages x WHERE x.thread_id = m.thread_id AND x.author_email != ?1
-           AND x.created_at > m.read_at AND x.deleted_at IS NULL)`,
-  ).bind(email).first<{ n: number }>();
+    `SELECT
+       (SELECT COUNT(*) FROM message_members m JOIN message_threads t ON t.id = m.thread_id AND t.kind != 'channel'
+         WHERE m.email = ?1 AND EXISTS (
+           SELECT 1 FROM messages x WHERE x.thread_id = m.thread_id AND x.author_email != ?1
+              AND x.created_at > m.read_at AND x.deleted_at IS NULL AND x.retracted_at IS NULL))
+     + (SELECT COUNT(DISTINCT n.thread_id) FROM message_mentions n
+          JOIN messages x ON x.id = n.message_id
+          JOIN message_threads t ON t.id = n.thread_id AND t.kind = 'channel'
+          -- a channel keeps a read mark only once the person has opened or posted in it
+          LEFT JOIN message_members m ON m.thread_id = n.thread_id AND m.email = ?1
+         WHERE n.email = ?1 AND x.author_email != ?1 AND n.created_at > COALESCE(m.read_at, 0)
+           AND x.deleted_at IS NULL AND x.retracted_at IS NULL
+           AND (EXISTS (SELECT 1 FROM enrollments e WHERE e.class_id = t.class_id AND e.student_email = ?1 AND e.expires_at > ?2)
+                OR EXISTS (SELECT 1 FROM classes c WHERE c.id = t.class_id AND c.owner_email = ?1)
+                OR EXISTS (SELECT 1 FROM class_teachers ct WHERE ct.class_id = t.class_id AND ct.teacher_email = ?1))
+       ) AS n`,
+  ).bind(email, now).first<{ n: number }>();
   return r?.n ?? 0;
 }
 
@@ -502,12 +697,17 @@ interface ListRow {
   id: string; class_id: string; class_name: string | null; kind: ThreadKind; title: string; locked: number; last_at: number;
   others: string | null; n: number;
   m_author: string | null; m_author_name: string | null; m_body: string | null; m_at: number | null; m_deleted: number | null;
-  m_share_kind: ShareKind | null; m_share_title: string | null; unread: number;
+  m_share_kind: ShareKind | null; m_share_title: string | null; m_retracted: number | null; unread: number; mentioned: number;
 }
 
 const LAST = `x.author_email AS m_author,
             (SELECT a.name FROM message_members a WHERE a.thread_id = t.id AND a.email = x.author_email) AS m_author_name,
-            x.body AS m_body, x.created_at AS m_at, x.deleted_at AS m_deleted, xs.kind AS m_share_kind, xs.title AS m_share_title`;
+            x.body AS m_body, x.created_at AS m_at, x.deleted_at AS m_deleted, x.retracted_at AS m_retracted,
+            xs.kind AS m_share_kind, xs.title AS m_share_title`;
+/** Has someone @mentioned the reader (?1) in this thread (t) since they last read it (m.read_at)? */
+const MENTIONED = `EXISTS (SELECT 1 FROM message_mentions n JOIN messages u2 ON u2.id = n.message_id
+                      WHERE n.thread_id = t.id AND n.email = ?1 AND u2.author_email != ?1
+                        AND n.created_at > COALESCE(m.read_at, 0) AND u2.deleted_at IS NULL AND u2.retracted_at IS NULL) AS mentioned`;
 const LAST_JOIN = `LEFT JOIN messages x ON x.id = (SELECT y.id FROM messages y WHERE y.thread_id = t.id ORDER BY y.created_at DESC, y.rowid DESC LIMIT 1)
        LEFT JOIN message_shares xs ON xs.message_id = x.id`;
 
@@ -527,13 +727,16 @@ function summarize(r: ListRow, me: string): ThreadSummary {
     ...(r.kind === 'group' ? { people: r.n } : {}),
     ...(r.kind === 'channel' ? { locked: !!r.locked } : {}),
     last: r.m_at == null ? null : {
-      snippet: r.m_deleted != null ? '' : r.m_body || !r.m_share_kind ? snippetOf(r.m_body ?? '') : shareSnippet(r.m_share_kind, r.m_share_title ?? ''),
+      // A removed or deleted message gives no words to the list (a teacher opens it to read them).
+      snippet: r.m_deleted != null || r.m_retracted != null ? '' : r.m_body || !r.m_share_kind ? snippetOf(r.m_body ?? '') : shareSnippet(r.m_share_kind, r.m_share_title ?? ''),
       mine: r.m_author === me,
       at: r.m_at,
       removed: r.m_deleted != null,
+      ...(r.m_retracted != null && r.m_deleted == null ? { deleted: true } : {}),
       ...(r.kind === 'group' || r.kind === 'channel' ? { author: r.m_author_name ?? 'Someone' } : {}),
     },
     unread: !!r.unread,
+    ...(r.mentioned ? { mentioned: true } : {}),
   };
 }
 
@@ -546,7 +749,8 @@ export async function listThreads(db: D1Database, data: SessionData): Promise<Th
             (SELECT COUNT(*) FROM message_members o WHERE o.thread_id = t.id) AS n,
             ${LAST},
             EXISTS (SELECT 1 FROM messages u WHERE u.thread_id = t.id AND u.author_email != ?1
-                       AND u.created_at > m.read_at AND u.deleted_at IS NULL) AS unread
+                       AND u.created_at > m.read_at AND u.deleted_at IS NULL AND u.retracted_at IS NULL) AS unread,
+            ${MENTIONED}
        FROM message_members m
        JOIN message_threads t ON t.id = m.thread_id AND t.kind != 'channel'
        LEFT JOIN classes c ON c.id = t.class_id
@@ -563,7 +767,8 @@ export async function listThreads(db: D1Database, data: SessionData): Promise<Th
       `SELECT t.id, t.class_id, c.name AS class_name, t.kind, t.title, t.locked, t.last_at, NULL AS others, 0 AS n,
               ${LAST},
               EXISTS (SELECT 1 FROM messages u WHERE u.thread_id = t.id AND u.author_email != ?1
-                         AND u.created_at > COALESCE(m.read_at, 0) AND u.deleted_at IS NULL) AS unread
+                         AND u.created_at > COALESCE(m.read_at, 0) AND u.deleted_at IS NULL AND u.retracted_at IS NULL) AS unread,
+              ${MENTIONED}
          FROM message_threads t
          JOIN classes c ON c.id = t.class_id
          LEFT JOIN message_members m ON m.thread_id = t.id AND m.email = ?1
@@ -579,6 +784,8 @@ export async function listThreads(db: D1Database, data: SessionData): Promise<Th
 export async function deleteThread(db: D1Database, threadId: string): Promise<void> {
   await db.batch([
     db.prepare(`DELETE FROM message_shares WHERE thread_id = ?`).bind(threadId),
+    db.prepare(`DELETE FROM message_edits WHERE thread_id = ?`).bind(threadId),
+    db.prepare(`DELETE FROM message_mentions WHERE thread_id = ?`).bind(threadId),
     db.prepare(`DELETE FROM messages WHERE thread_id = ?`).bind(threadId),
     db.prepare(`DELETE FROM message_members WHERE thread_id = ?`).bind(threadId),
     db.prepare(`DELETE FROM message_threads WHERE id = ?`).bind(threadId),

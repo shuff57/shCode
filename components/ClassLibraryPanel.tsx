@@ -149,6 +149,20 @@ export default function ClassLibraryPanel() {
                   ),
                 }}
               />
+              <ClassLibrary
+                key="public-font"
+                kind="font"
+                source="public"
+                title="Everyone"
+                onMessage={say}
+                section={{
+                  signedOut: <>Everyone is for people in a class. Join a class to see what students shared.</>,
+                  empty: (
+                    <>Nothing is shared with everyone yet. Choose <strong style={{ color: 'var(--c-fg)' }}>Everyone</strong> when
+                      you share a font of yours.</>
+                  ),
+                }}
+              />
               <BuiltinFonts />
             </>
           )}
@@ -168,6 +182,20 @@ export default function ClassLibraryPanel() {
                     empty: (
                       <>Nothing shared yet. Press <strong style={{ color: 'var(--c-fg)' }}>Share with class</strong> on
                         a {what} of yours above and it shows up here for everyone in your class.</>
+                    ),
+                  }}
+                />
+                <ClassLibrary
+                  key={'public-' + kind}
+                  kind={kind}
+                  source="public"
+                  title="Everyone"
+                  onMessage={say}
+                  section={{
+                    signedOut: <>Everyone is for people in a class. Join a class to see what students shared.</>,
+                    empty: (
+                      <>Nothing is shared with everyone yet. Choose <strong style={{ color: 'var(--c-fg)' }}>Everyone</strong> when
+                        you share a {what} of yours.</>
                     ),
                   }}
                 />

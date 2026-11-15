@@ -17,6 +17,8 @@ import { buildMarkCriteria } from '../../lib/rubric-mark';
 import MostMissedPanel from '../../components/MostMissedPanel';
 import ClassLibraryModeration from '../../components/ClassLibraryModeration';
 import ClassGamesModeration from '../../components/ClassGamesModeration';
+import ClassPublicShares from '../../components/ClassPublicShares';
+import ClassGuests from '../../components/ClassGuests';
 import { useClearStudentLibrary } from '../../components/ClearStudentLibrary';
 import ClassCodeSessions from '../../components/ClassCodeSessions';
 import ClassMessages from '../../components/ClassMessages';
@@ -3436,6 +3438,12 @@ function DetailView({ classId, initialTab, initialFilter }: { classId: string; i
           <h2 style={S.h2}>Shared games</h2>
           <ClassGamesModeration classId={classId} />
         </div>
+        {/* What students shared with EVERYONE (migration 0058): live at once, so a teacher sees it here and can take it down.
+            The Activity feed's "made ... public" notice links to #public-shares. */}
+        <div style={S.card} id="public-shares-card">
+          <h2 style={S.h2}>Newly public</h2>
+          <ClassPublicShares classId={classId} />
+        </div>
         {/* Changes students proposed to each other's games, and their conversations (free text; teachers read them here) */}
         <div style={S.card}>
           <h2 style={S.h2}>Proposed changes to games</h2>
@@ -3445,6 +3453,11 @@ function DetailView({ classId, initialTab, initialFilter }: { classId: string; i
         <div style={S.card}>
           <h2 style={S.h2}>Messages</h2>
           <ClassMessages classId={classId} />
+        </div>
+        {/* Guests students asked to bring into the sessions they start (migration 0059): nothing opens until a teacher approves. */}
+        <div style={S.card} id="guests-card">
+          <h2 style={S.h2}>Guests</h2>
+          <ClassGuests classId={classId} />
         </div>
         {/* Programs students wrote together in the sandbox (Code together); kept 30 days */}
         <div style={S.card}>

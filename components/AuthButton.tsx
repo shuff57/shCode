@@ -84,6 +84,12 @@ export default function AuthButton() {
         >
           My account
         </Link>
+        {/* A student can be in several classes: this is how to add another (the header's yellow button shows only before the first). */}
+        {user.role === 'student' && (
+          <Link href="/join-class" style={menuItemStyle} data-testid="join-another-class">
+            Join a class
+          </Link>
+        )}
         {/* Every What's New entry for this role (components/WhatsNewModal.tsx); the dot means recent news not seen yet. */}
         <button
           type="button"

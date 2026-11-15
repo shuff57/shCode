@@ -32,6 +32,8 @@ import { originalGame } from '../../_shared/shareChoice';
 import { starsFor } from '../../_shared/gameStars';
 import { firstVersionStmt, openChangeCounts, saveVersionStmts, savedAs } from '../../_shared/gameFlow';
 import { ownerName } from '../../_shared/games';
+import { audienceMap, ownClassIds } from '../../_shared/audience';
+import { publicStates } from '../../_shared/publicShare';
 import { cleanMessage } from '../../../lib/game-flow-core';
 import { remixableBuiltin } from '../../../lib/builtin-games';
 import {
@@ -66,19 +68,26 @@ interface MineRow extends ProvenanceRow {
   shared: number;
   share_choice: string | null;
   version: number;
+  audience_teacher: string | null;
 }
 
 export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ env, data }: Ctx) => {
   const r = await env.DB.prepare(
-    `SELECT id, title, mode, players, LENGTH(code) AS bytes, created_at, updated_at, share_choice, version, ${PROVENANCE_COLUMNS},
+    `SELECT id, title, mode, players, LENGTH(code) AS bytes, created_at, updated_at, share_choice, version, audience_teacher, ${PROVENANCE_COLUMNS},
             EXISTS (SELECT 1 FROM library_game_shares s WHERE s.game_id = library_games.id) AS shared
        FROM library_games WHERE owner_email = ? AND deleted_at IS NULL
       ORDER BY updated_at DESC`,
   ).bind(data.email).all<MineRow>();
   const open = await openChangeCounts(env.DB, (r.results ?? []).map((g) => g.id));
   const stars = await starsFor(env.DB, (r.results ?? []).map((g) => g.id), data.email);
+  const audiences = await audienceMap(
+    env.DB, 'game', (r.results ?? []).filter((g) => g.shared).map((g) => ({ id: g.id, audience_teacher: g.audience_teacher ?? null })), await ownClassIds(env.DB, data),
+  );
+  const pub = await publicStates(env.DB, 'game', (r.results ?? []).filter((g) => g.shared).map((g) => g.id));
   return json({
     games: (r.results ?? []).map((g) => ({
+      ...(audiences.get(g.id) ? { audience: audiences.get(g.id) } : {}),
+      ...(pub.get(g.id)?.pulled ? { pulled: pub.get(g.id)!.pulled } : {}),
       version: g.version ?? 1, openChanges: open.get(g.id) ?? 0,
       stars: stars.counts.get(g.id) ?? 0, starred: stars.mine.has(g.id),
       id: g.id, title: g.title, mode: g.mode, players: g.players, bytes: g.bytes,

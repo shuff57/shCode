@@ -15,6 +15,7 @@
 // ever returns an email: a publisher shows as first name + last initial.
 
 import { ownerLabel, studentClassIds, teacherClassIds } from './libraryShare';
+import { gameIsPublic, viewerVetted } from './publicShare';
 import { PROVENANCE_COLUMNS, type ProvenanceRow } from '../../lib/share-choice';
 
 export type SessionData = { email: string; role: 'admin' | 'teacher' | 'student' };
@@ -80,11 +81,27 @@ export async function ownerName(db: D1Database, email: string): Promise<string> 
   return ownerLabel(st?.first_name ?? null, st?.last_name ?? null);
 }
 
+export interface VisibleGame { row: GameRow; mine: boolean; hidden: boolean; /** Seen only because it is public (migration 0058), through no class. */ viaPublic?: true }
+
 /**
  * One game the caller may open (play or remix), or null. `hidden` is true only
- * for a teacher looking at a game they hid; a student never gets one.
+ * for a teacher looking at a game they hid; a student never gets one. A game that is PUBLIC (migration 0058) is also
+ * open to a vetted viewer, marked `viaPublic`: they play, remix (if its choice allows) and star it, but anything that
+ * is class-only (proposed changes, versions, comments, suggestions) must refuse `viaPublic`: gameAccess does, and
+ * feedbackState finds no class to read it through.
  */
-export async function visibleGame(db: D1Database, data: SessionData, id: string): Promise<{ row: GameRow; mine: boolean; hidden: boolean } | null> {
+export async function visibleGame(db: D1Database, data: SessionData, id: string): Promise<VisibleGame | null> {
+  const viaClass = await classVisibleGame(db, data, id);
+  if (viaClass) return viaClass;
+  if (!(await viewerVetted(db, data)) || !(await gameIsPublic(db, id))) return null;
+  const row = await db.prepare(
+    `SELECT id, owner_email, title, code, mode, players, created_at, updated_at, share_choice, ${PROVENANCE_COLUMNS}
+       FROM library_games WHERE id = ? AND deleted_at IS NULL`,
+  ).bind(id).first<GameRow>();
+  return row ? { row, mine: false, hidden: false, viaPublic: true } : null;
+}
+
+async function classVisibleGame(db: D1Database, data: SessionData, id: string): Promise<VisibleGame | null> {
   const row = await db.prepare(
     `SELECT id, owner_email, title, code, mode, players, created_at, updated_at, share_choice, ${PROVENANCE_COLUMNS}
        FROM library_games WHERE id = ? AND deleted_at IS NULL`,

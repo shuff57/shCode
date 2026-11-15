@@ -45,6 +45,12 @@ import { LIBRARY_UPDATED, localLibraryItems, type LibraryKind } from '../lib/mos
 import { builtinTextureNames, listWords } from '../lib/game-assets';
 import { CHOICE_TEXT, type Provenance, type ShareChoice } from '../lib/share-choice';
 import ShareChoicePicker, { RemixCreditLine, lockedChoice, useLastChoice } from './ShareChoicePicker';
+import AudiencePicker from './AudiencePicker';
+import {
+   initialPick, pickProblem, pickToSpec, pickerMatters, samePick,
+  type AudienceOptions, type AudiencePick, type ItemAudience, type PulledInfo,
+} from '../lib/audience';
+import { fetchAudiences } from '../lib/audience-client';
 import { GITHUB_WORD, MESSAGE_MAX, cleanMessage } from '../lib/game-flow-core';
 import { bringInOwnNewest, gameChangesHref, startFromOwnNewest, type SyncResult } from '../lib/game-flow-client';
 import { GitHubWord } from './game-flow-ui';
@@ -70,7 +76,7 @@ const quiet: React.CSSProperties = {
   background: 'transparent', color: 'var(--c-fg)', border: '1px solid var(--c-line)',
 };
 
-interface Published { id: string; title: string; shared: boolean; choice: ShareChoice; version?: number }
+interface Published { id: string; title: string; shared: boolean; choice: ShareChoice; version?: number; audience?: ItemAudience | null; pulled?: PulledInfo | null }
 
 const GONE_TEXT = 'That game was deleted. Publish it again as a new game?';
 
@@ -120,6 +126,10 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
   const [itemsNote, setItemsNote] = useState<{ text: string; bad: boolean } | null>(null);
   const [lastChoice, rememberChoice] = useLastChoice('game');
   const [choice, setChoice] = useState<ShareChoice>(lastChoice);
+  // Which classes it goes to (migration 0057): what the server offers and the pick. Null options = not asked yet or
+  // it failed, and a share goes to every class as it always did.
+  const [audOptions, setAudOptions] = useState<AudienceOptions | null>(null);
+  const [audPick, setAudPick] = useState<AudiencePick | null>(null);
   /** Where the sandbox code was remixed from (lib/games-client.ts SandboxGame.from). */
   const [from, setFrom] = useState<Provenance | null>(null);
   /** The game the sandbox was published as is gone (deleted, or a 404 on Update). */
@@ -141,7 +151,7 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
     const r = await getGame(rec.id);
     if (r.ok && r.value.game.mine) {
       const g = r.value.game;
-      setPublished({ id: rec.id, title: g.title, shared: !!g.shared, choice: g.choice, version: g.version });
+      setPublished({ id: rec.id, title: g.title, shared: !!g.shared, choice: g.choice, version: g.version, audience: g.audience ?? null, pulled: g.pulled ?? null });
       setAhead(rec.version && g.version && g.version > rec.version ? { from: rec.version, newest: g.version } : null);
       setShare(!!g.shared);
       setFeedbackOn(g.feedbackOn !== false);
@@ -155,6 +165,18 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
       setGone(true);
     }
   }, []);
+  // The classes to offer, asked when the panel opens; the pick starts from what the game already has.
+  const publishedAudience = published?.audience ?? null;
+  useEffect(() => {
+    if (!open) return;
+    let live = true;
+    void fetchAudiences().then((o) => {
+      if (!live) return;
+      setAudOptions(o);
+      setAudPick(o ? initialPick(o, publishedAudience) : null);
+    });
+    return () => { live = false; };
+  }, [open, publishedAudience]);
   useEffect(() => {
     void refresh();
     const on = () => { setTitle(''); void refresh(); };
@@ -249,9 +271,14 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
     setGone(false);
     let shared = published && published.id === id ? published.shared : false;
     let shareNote = '';
-    if (share !== shared) {
-      const s = await setGameShared(id, share, stored);
-      if (s.ok) shared = s.value.shared;
+    // Sent when sharing turns on, and again when it stays on but the classes changed (migration 0057).
+    const askAudience = pickerMatters(audOptions) && audPick !== null;
+    const audienceChanged = share && shared && askAudience && audPick !== null
+      && !samePick(audPick, published && published.id === id ? published.audience : null);
+    let audienceNow: ItemAudience | null = published && published.id === id ? published.audience ?? null : null;
+    if (share !== shared || audienceChanged) {
+      const s = await setGameShared(id, share, stored, share && askAudience && audPick ? pickToSpec(audPick) : undefined);
+      if (s.ok) { shared = s.value.shared; audienceNow = shared ? s.value.audience ?? null : null; }
       else shareNote = ` It is not shared yet: ${s.error}`;
     }
     // A new game starts with feedback on; send the switch only when it differs from what the game has.
@@ -264,7 +291,7 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
       setFeedbackSaved(feedbackOn);
     }
     setBusy(false);
-    setPublished({ id, title: t.title, shared, choice: stored, version: r.value.game.version });
+    setPublished({ id, title: t.title, shared, choice: stored, version: r.value.game.version, audience: audienceNow, pulled: published?.pulled ?? null });
     setTitle(t.title);
     setMessage('');
     setNote({
@@ -393,6 +420,7 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
             <input type="checkbox" checked={share} onChange={(e) => setShare(e.target.checked)} />
             Share with my class
           </label>
+          {share && audPick && <AudiencePicker options={audOptions} value={audPick} onChange={setAudPick} idPrefix="publish-game-audience" pulled={published?.pulled} />}
           {share && (
             <ShareChoicePicker thing="game" value={choice} onChange={setChoice} from={from} idPrefix="publish-game" />
           )}
@@ -442,7 +470,7 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
           )}
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <button type="button" style={{ ...primary, opacity: busy || (!!published && !message.trim()) ? 0.6 : 1 }}
-              disabled={busy || (!!published && !message.trim())}
+              disabled={busy || (!!published && !message.trim()) || (share && pickerMatters(audOptions) && !!audPick && !!pickProblem(audPick))}
               title={published && !message.trim() ? 'Say what you changed first' : undefined}
               onClick={() => void go(gone && !published)}>
               {busy ? 'Publishing…' : published ? 'Update game' : gone ? 'Publish as a new game' : 'Publish'}

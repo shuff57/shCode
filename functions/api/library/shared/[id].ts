@@ -16,6 +16,7 @@
 import { isUploadId } from '../../../_shared/uploads';
 import { r2Key } from '../../../_shared/library';
 import { ownerLabel, sharedInto, studentClassIds, teacherClassIds } from '../../../_shared/libraryShare';
+import { publicItemRow, viewerVetted } from '../../../_shared/publicShare';
 import { PROVENANCE_COLUMNS, canRemix, choiceOf, provenanceFromRow, remixRefusal, type ProvenanceRow } from '../../../../lib/share-choice';
 
 interface Env {
@@ -32,14 +33,21 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
   const asTeacher = data.role === 'student' ? [] : await teacherClassIds(env.DB, data.email);
   const teaches = new Set(asTeacher);
   const rows = (await sharedInto(env.DB, [...new Set([...asStudent, ...asTeacher])])).filter((r) => r.id === id);
-  const visible = rows.find((r) => r.hidden_at == null || teaches.has(r.class_id) || data.role === 'admin');
-  if (!visible) return json({ error: 'Not found' }, 404);
+  let visible = rows.find((r) => r.hidden_at == null || teaches.has(r.class_id) || data.role === 'admin');
+  let viaPublic = false;
+  if (!visible) {
+    // Not through a class: a PUBLIC item (migration 0058) is open to a vetted viewer, and only to copy (never moderate).
+    const pub = (await viewerVetted(env.DB, data)) ? await publicItemRow(env.DB, id) : null;
+    if (!pub) return json({ error: 'Not found' }, 404);
+    visible = { ...pub, class_id: '', class_name: '', hidden_at: null };
+    viaPublic = true;
+  }
   const meta = await env.DB.prepare(`SELECT meta, share_choice, ${PROVENANCE_COLUMNS} FROM library_items WHERE id = ?`)
     .bind(id).first<ProvenanceRow & { meta: string | null; share_choice: string | null }>();
   const owner = ownerLabel(visible.first_name, visible.last_name);
   const choice = choiceOf(meta?.share_choice);
   const mine = visible.owner_email === data.email;
-  const moderates = data.role === 'admin' || rows.some((r) => teaches.has(r.class_id));
+  const moderates = !viaPublic && (data.role === 'admin' || rows.some((r) => teaches.has(r.class_id)));
   const canCopy = mine || canRemix(choice);
   const preview = new URL(request.url).searchParams.get('preview') === '1';
   if (!canCopy && !moderates && !preview) {

@@ -21,7 +21,13 @@ import {
 } from '../lib/library-sync';
 import type { LibraryKind } from '../lib/moshion-storage';
 import { CHOICE_TEXT, type ShareChoice } from '../lib/share-choice';
+import {
+  audienceSummary,  initialPick, pickProblem, pickToAudience, pickToSpec, pickerMatters,
+  type AudienceOptions, type AudiencePick,
+} from '../lib/audience';
+import { fetchAudiences } from '../lib/audience-client';
 import ShareChoicePicker, { lockedChoice, useLastChoice } from './ShareChoicePicker';
+import AudiencePicker from './AudiencePicker';
 
 const action: React.CSSProperties = {
   fontSize: 12, padding: '4px 10px', borderRadius: 4, cursor: 'pointer', whiteSpace: 'nowrap',
@@ -39,6 +45,10 @@ export default function ShareToggle({ kind, name, onMessage, compact = false }: 
   const [open, setOpen] = useState(false);
   const [last, remember] = useLastChoice('art');
   const [choice, setChoice] = useState<ShareChoice>(last);
+  // Which classes it goes to (migration 0057): what the server offers, and the pick. Null options = ask failed or
+  // not asked yet, and the share goes to every class as it always did.
+  const [options, setOptions] = useState<AudienceOptions | null>(null);
+  const [pick, setPick] = useState<AudiencePick | null>(null);
   const wrapRef = useRef<HTMLSpanElement>(null);
   const uid = useId().replace(/:/g, '');
   useEffect(() => {
@@ -68,12 +78,20 @@ export default function ShareToggle({ kind, name, onMessage, compact = false }: 
     // Shared: show its own choice. Not yet: the student's last one. A copy of a
     // "keep remixes open" item shows that one either way.
     setChoice(lockedChoice(from, shared && item ? item.choice : last));
+    if (!open) {
+      void fetchAudiences().then((o) => {
+        setOptions(o);
+        setPick(o ? initialPick(o, shared && item ? item.audience : null) : null);
+      });
+    }
     setOpen((o) => !o);
   };
+  const askAudience = (pickerMatters(options) || !!item?.pulled) && pick !== null;
+  const blocked = askAudience && pick ? pickProblem(pick) : null;
 
   async function apply(share: boolean) {
     setBusy(true);
-    const err = await setShared(kind, name, share, share ? choice : undefined);
+    const err = await setShared(kind, name, share, share ? choice : undefined, share && askAudience && pick ? pickToSpec(pick) : undefined);
     setBusy(false);
     if (!err) {
       setOpen(false);
@@ -82,7 +100,7 @@ export default function ShareToggle({ kind, name, onMessage, compact = false }: 
     onMessage?.(
       err ?? (!share
         ? `"${name}" is no longer shared with your class.`
-        : `"${name}" is shared with your class: ${CHOICE_TEXT.art[choice].short}.`
+        : `"${name}" is shared with ${askAudience && pick ? audienceSummary(options, pickToAudience(pick)) : 'your class'}: ${CHOICE_TEXT.art[choice].short}.`
           + (choice === 'play' ? ' They see it in your games but can\'t copy it.' : ' They can copy it from the Library.')),
       !!err,
     );
@@ -117,11 +135,12 @@ export default function ShareToggle({ kind, name, onMessage, compact = false }: 
             boxShadow: '0 8px 24px rgba(0,0,0,0.35)', color: 'var(--c-fg)', fontSize: 12, lineHeight: 1.45, textAlign: 'left',
           }}
         >
+          {askAudience && pick && <AudiencePicker options={options} value={pick} onChange={setPick} idPrefix={`audience-${uid}`} compact pulled={item.pulled} />}
           <ShareChoicePicker thing="art" value={choice} onChange={setChoice} from={from} idPrefix={`share-${uid}`} compact />
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            <button type="button" disabled={busy} onClick={() => void apply(true)}
+            <button type="button" disabled={busy || !!blocked} onClick={() => void apply(true)}
               style={{ ...action, background: 'var(--c-green)', color: 'var(--c-deep)', border: '1px solid var(--c-green)', fontWeight: 600 }}>
-              {busy ? 'Saving…' : shared ? 'Save' : 'Share with my class'}
+              {busy ? 'Saving…' : shared ? 'Save' : askAudience && pick?.mode === 'public' ? 'Share with everyone' : 'Share with my class'}
             </button>
             {shared && (
               <button type="button" disabled={busy} onClick={() => void apply(false)} style={action}>Stop sharing</button>

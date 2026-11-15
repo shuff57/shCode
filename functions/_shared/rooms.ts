@@ -2,6 +2,7 @@
 // and what may be sent through it lives here; the routes only call these.
 
 import { ownerLabel, studentClassIds, teacherClassIds } from './libraryShare';
+import { isApprovedGuestOf } from './guests';
 import { ROOM_CODE_LETTERS, randomRoomCode } from '../../lib/room-icons';
 
 export const ROOM_TTL_MS = 3 * 60 * 60 * 1000;
@@ -84,12 +85,15 @@ export async function liveClassIds(db: D1Database, email: string, now = Date.now
   return new Set([...s, ...t]);
 }
 
-/** Classmates only: the two share at least one live class. An admin may join anything. */
+/**
+ * Classmates only: the two share at least one live class. An admin may join anything. One narrow exception (migration
+ * 0059, functions/_shared/guests.ts): an APPROVED guest of this very host may join the rooms that host starts, and only those.
+ */
 export async function mayJoin(db: D1Database, hostEmail: string, email: string, role: Role, now = Date.now()): Promise<boolean> {
   if (role === 'admin' || hostEmail === email) return true;
   const [a, b] = await Promise.all([liveClassIds(db, hostEmail, now), liveClassIds(db, email, now)]);
   for (const id of a) if (b.has(id)) return true;
-  return false;
+  return isApprovedGuestOf(db, hostEmail, email, now);
 }
 
 export interface RoomRow {

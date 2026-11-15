@@ -44,6 +44,11 @@ const PII_WORDS: Record<string, string> = {
   'bank account number': 'a bank account number',
 };
 
+/** What a findPII label names, in plain words ("a phone number"); also used by the Public safety check. */
+export function piiWhat(label: string): string {
+  return PII_WORDS[label] ?? 'personal information';
+}
+
 /** The words a student sees when the safety check refuses a message. */
 export function piiRefusal(label: string): string {
   const what = PII_WORDS[label] ?? 'personal information';
@@ -67,7 +72,7 @@ export function cleanMessage(raw: unknown): { body: string } | { error: string; 
 /** Why a person may not send in a conversation right now, or null when they may. */
 export type SendBlock =
   | 'left' | 'other-left' | 'class-off' | 'muted' | 'archived'
-  | 'class-all-off' | 'all-off' | 'locked' | 'not-member' | null;
+  | 'class-all-off' | 'all-off' | 'locked' | 'not-member' | 'guest-ended' | null;
 
 /** A student's messaging level (0 On, 1 Teacher only, 2 Off); the stricter of class and student wins. */
 export type MessageLevel = 0 | 1 | 2;
@@ -79,6 +84,7 @@ export function blockText(why: SendBlock, other = 'They', className = 'this clas
     case 'class-all-off': return `Your teacher has turned off student messages in ${className}. You can still read them.`;
     case 'all-off': return `Your teacher has turned off your messages in ${className}. You can still read them.`;
     case 'locked': return `Only teachers can post in ${other}.`;
+    case 'guest-ended': return `You and ${other} are not set up as host and guest any more, so messages cannot be sent here. You can still read them.`;
     case 'not-member': return `You are not in ${other} any more.`;
     case 'left': return `You are not in ${className} any more, so you cannot send messages here.`;
     case 'other-left': return `${other} is not in ${className} any more, so messages cannot be sent here.`;
@@ -92,6 +98,8 @@ export function blockText(why: SendBlock, other = 'They', className = 'this clas
 /** The line shown above every conversation between two students. */
 export const WATCHED_NOTE = 'Your teacher can read messages between classmates.';
 export const GROUP_NOTE = 'Your teacher can read this group.';
+/** Above a conversation between a student and their guest (migration 0060): the class that invited the guest reads it. */
+export const GUEST_THREAD_NOTE = 'A teacher of the class that invited this guest can read these messages.';
 export function channelNote(className: string): string {
   return `Everyone in ${className} can read this channel, and so can your teacher.`;
 }
@@ -144,6 +152,8 @@ export interface MessagePerson {
   key: string;
   name: string;
   teacher: boolean;
+  /** This person is the reader's approved guest (migration 0060): messaging only, never for a group. */
+  guest?: boolean;
 }
 
 /** One conversation in the mailbox list. */
@@ -159,8 +169,10 @@ export interface ThreadSummary {
   /** A group: how many people; a channel: locked to teachers. */
   people?: number;
   locked?: boolean;
-  last: { snippet: string; mine: boolean; at: number; removed: boolean; author?: string } | null;
+  last: { snippet: string; mine: boolean; at: number; removed: boolean; deleted?: boolean; author?: string } | null;
   unread: boolean;
+  /** Someone @mentioned the reader in it since they last opened it (migration 0056). */
+  mentioned?: boolean;
 }
 
 /** One message as a page receives it. `body` is null once a teacher removed it (and `share` too). */
@@ -169,11 +181,75 @@ export interface MessageItem {
   mine: boolean;
   author: string;
   teacher: boolean;
+  /**
+   * The current words. null once a teacher removed it, or once its author deleted it, for everyone but the
+   * class's teachers (they always get the words).
+   */
   body: string | null;
   removed: boolean;
   at: number;
   /** A sandbox program sent with it (migration 0054), or null. */
   share: ShareCard | null;
+  /** The author changed the words after sending (migration 0056). */
+  edited: boolean;
+  /** The AUTHOR deleted it (not a teacher's Remove). Everyone but the class's teachers sees no words. */
+  deleted: boolean;
+  /** Who it @mentioned, by the name written after the @ (`me`: the reader). */
+  mentions: { name: string; me: boolean }[];
+  /** The reader wrote it, it is theirs to change, and they may send in this conversation now. */
+  canEdit: boolean;
+  /** The reader wrote it and it is not already deleted or removed. */
+  canDelete: boolean;
+  /**
+   * The class's teachers only: every earlier version, oldest first. The first is the original as first
+   * sent. Absent for anyone else, and when the words were never changed.
+   */
+  history?: { body: string; at: number }[];
+}
+
+// ---- edit, delete and @mention (migration 0056) ---------------------------------------------------
+
+/** Changes one message may take (an edit is kept in full for teachers, so this bounds that). */
+export const MAX_EDITS_PER_MESSAGE = 20;
+/** People one message may @mention. */
+export const MENTIONS_PER_MESSAGE = 10;
+/** The words students see where a student deleted a message. */
+export const DELETED_TEXT = 'Message deleted';
+
+/** Is `@<name>` written in these words (not part of a longer name or an email)? */
+export function hasMention(body: string, name: string): boolean {
+  if (!name) return false;
+  const esc = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(^|[^\\p{L}\\p{N}@_])@${esc}(?![\\p{L}\\p{N}_])`, 'u').test(body);
+}
+
+/**
+ * Cut a message's words into plain and @mention pieces, for drawing the mentions in bold. Only the names
+ * in `names` count; the longest name wins where two start the same way.
+ */
+export function mentionParts(body: string, names: string[]): { text: string; mention: string | null }[] {
+  const sorted = [...new Set(names)].filter(Boolean).sort((a, b) => b.length - a.length);
+  const out: { text: string; mention: string | null }[] = [];
+  let plain = '';
+  let i = 0;
+  while (i < body.length) {
+    let hit: string | null = null;
+    if (body[i] === '@' && (i === 0 || !/[\p{L}\p{N}@_]/u.test(body[i - 1]))) {
+      for (const n of sorted) {
+        if (body.startsWith(n, i + 1) && !/[\p{L}\p{N}_]/u.test(body[i + 1 + n.length] ?? '')) { hit = n; break; }
+      }
+    }
+    if (hit) {
+      if (plain) { out.push({ text: plain, mention: null }); plain = ''; }
+      out.push({ text: `@${hit}`, mention: hit });
+      i += 1 + hit.length;
+    } else {
+      plain += body[i];
+      i += 1;
+    }
+  }
+  if (plain) out.push({ text: plain, mention: null });
+  return out;
 }
 
 // ---- a sandbox program in a message (migration 0054) ---------------------------------------------
@@ -253,6 +329,8 @@ export interface ThreadView {
   other: { name: string; teacher: boolean };
   /** A group's people (the reader included). */
   members?: { key: string; name: string; teacher: boolean; me: boolean }[];
+  /** A group or channel: whom an @ can name (everyone who reads it but the reader; migration 0056). */
+  mentionable?: MessagePerson[];
   locked?: boolean;
   messages: MessageItem[];
   /** There are older messages than these (only the newest THREAD_VIEW_LIMIT are sent). */
@@ -281,6 +359,8 @@ export interface PeopleClass {
   classmatesBlocked: SendBlock;
   /** For a student whose messages are Off: nobody is listed, and this says why. */
   allBlocked?: SendBlock;
+  /** The reader is a GUEST here (migration 0060): `people` is just their host, and this is not a class they are in. */
+  guestOf?: boolean;
 }
 
 export function snippetOf(body: string, n = 90): string {

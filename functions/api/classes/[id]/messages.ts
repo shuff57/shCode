@@ -19,7 +19,7 @@
 
 import { canManageClass } from '../../../_shared/classAuth';
 import {
-  classPeople, emailForKey, json, personKeys, threadShares, threadWithMembers, threadMessages, type SessionData,
+  classPeople, emailForKey, json, personKeys, threadHistory, threadShares, threadWithMembers, threadMessages, type SessionData,
 } from '../../../_shared/messages';
 import { groupLabel, isLevel, isPersonKey, isThreadId, shareSnippet, snippetOf, type MessageLevel, type ShareKind } from '../../../../lib/messages-core';
 
@@ -101,7 +101,7 @@ async function threadView(env: Env, data: SessionData, classId: string, threadId
   const t = await readableThread(env, data, classId, threadId);
   if (!t) return null;
   const names = new Map(t.members.map((m) => [m.email, m]));
-  const [rows, shares] = await Promise.all([threadMessages(env.DB, threadId), threadShares(env.DB, threadId)]);
+  const [rows, shares, history] = await Promise.all([threadMessages(env.DB, threadId), threadShares(env.DB, threadId), threadHistory(env.DB, threadId)]);
   return {
     id: t.thread.id,
     people: t.members.map((m) => ({ name: m.name, teacher: !!m.teacher })),
@@ -114,6 +114,11 @@ async function threadView(env: Env, data: SessionData, classId: string, threadId
       at: r.created_at,
       // A teacher can still open a removed message's program (GET /api/shares/[id]).
       share: shares.get(r.id) ?? null,
+      // What a student changed or deleted stays here in full (migration 0056): the words as they stand,
+      // whether the author deleted it, and every earlier version, the first being the original.
+      edited: r.edited_at != null,
+      deleted: r.retracted_at != null,
+      ...(history.get(r.id)?.length ? { history: history.get(r.id) } : {}),
     })),
   };
 }

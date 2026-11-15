@@ -10,11 +10,12 @@ interface RateLimitConfig {
   windowSeconds: number;
 }
 
-export type RateLimitAction = 'login' | 'signup' | 'joinClass';
+export type RateLimitAction = 'login' | 'signup' | 'joinClass' | 'guestRedeem';
 
 const RATE_LIMITS: Record<RateLimitAction, RateLimitConfig> = {
   login: { attempts: 100, windowSeconds: 900 }, // 100 / 15 min — classroom-friendly, the email lockout is the tight one
   signup: { attempts: 30, windowSeconds: 3600 }, // 30 / hour per IP — allows a whole class signing up from one lab
+  guestRedeem: { attempts: 10, windowSeconds: 3600 }, // 10 / hour: the same brake for a guest's 8-character invite code (migration 0059)
   joinClass: { attempts: 10, windowSeconds: 3600 }, // 10 / hour — the only thing stopping brute-forcing a guessable 6-char code
 };
 

@@ -7,14 +7,19 @@
 //      'lock' | 'unlock'      a channel: only teachers post / everyone posts (a teacher of the class)
 //      'delete'               a channel (not #general) or a group (a teacher of the class)
 //      'remove' | 'restore' { messageId }  a teacher of the class, in any conversation of it but a teacher's own
+//      'edit'    { messageId, body, mentions? }  the author changes their own message (migration 0056); the words it
+//                had are kept for the class's teachers, classmates see "(edited)"; needs the right to send now
+//      'unsend'  { messageId }  the author deletes their own message; classmates see "Message deleted", the class's
+//                teachers still read the words. Works even when sending is blocked (deleting says less).
+// A send may carry `mentions`: person keys (see ThreadView.mentionable) of people @named in the words.
 //
 // Who may read is functions/_shared/messages.ts threadAccess (anyone else gets 404): two people, a group's
 // people, a channel's class, and the class's teachers for everything between students. Sending is re-checked
 // every time (threadBlock: leaving, the levels, a locked channel).
 
 import {
-  appendMessage, capRefusal, channelKey, classPeople, deleteThread, emailForKey, json, prepareSend, sendRefusal,
-  threadAccess, threadBlock, threadView, touchMember, type SessionData,
+  appendMessage, capRefusal, channelKey, classPeople, deleteThread, editMessage, emailForKey, json, prepareSend, resolveMentions,
+  sendRefusal, threadAccess, threadBlock, threadView, touchMember, unsendMessage, type SessionData,
 } from '../../_shared/messages';
 import { GENERAL, GROUP_MAX_PEOPLE, cleanChannelName, cleanGroupTitle, isPersonKey, isThreadId } from '../../../lib/messages-core';
 
@@ -50,14 +55,33 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async ({ par
   const a = await threadAccess(env.DB, data, id);
   if (!a || !a.read) return missing();
 
-  let body: { body?: unknown; share?: unknown; action?: unknown; title?: unknown; people?: unknown; messageId?: unknown };
+  let body: { body?: unknown; share?: unknown; action?: unknown; title?: unknown; people?: unknown; messageId?: unknown; mentions?: unknown };
   try { body = await request.json(); } catch { return json({ error: 'Invalid JSON body' }, 400); }
   const kind = a.thread.kind;
   const view = () => threadView(env.DB, data, id);
 
   if (body.action != null) {
-    const v = await threadView(env.DB, data, id, a);
     const act = body.action;
+
+    // Your own message: change it, or delete it. Someone reading as a teacher of the class writes nothing here.
+    if (act === 'edit' || act === 'unsend') {
+      if (a.onlooker) return json({ error: 'You are reading this as a teacher of the class, so you cannot change messages in it.' }, 403);
+      if (act === 'edit') {
+        // Editing is sending again: the same rules (leaving, the levels, a locked channel) apply.
+        const why = await threadBlock(env.DB, a, data.email);
+        if (why) {
+          const other = a.members.find((m) => m.email !== data.email)?.name ?? 'They';
+          return json(sendRefusal(why, kind === 'channel' ? `#${a.thread.title}` : other, a.thread.class_name), 403);
+        }
+      }
+      const r = act === 'edit'
+        ? await editMessage(env.DB, a, data.email, body.messageId, body.body, body.mentions)
+        : await unsendMessage(env.DB, a, data.email, body.messageId);
+      if (!r.ok) return json({ error: r.error, ...(r.safety ? { safety: true } : {}) }, r.status);
+      return json(await view());
+    }
+
+    const v = await threadView(env.DB, data, id, a);
 
     if (act === 'remove' || act === 'restore') {
       if (!a.moderate) return json({ error: 'Only a teacher of the class can do that.' }, 403);
@@ -148,10 +172,13 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async ({ par
   }
   const c = await prepareSend(env.DB, data.email, body, Date.now(), kind);
   if (!c.ok) return json(c.body, c.status);
-  const capped = await capRefusal(env.DB, data, id, Date.now(), kind);
+  // A guest is capped whatever their account's role (migration 0060: a host-and-guest thread carries the flag).
+  const capped = await capRefusal(env.DB, data, id, Date.now(), kind, !!a.thread.guest);
   if (capped) return json({ error: capped }, 429);
 
   if (kind === 'channel') await touchMember(env.DB, id, data.email, a.role === 'teacher');
-  await appendMessage(env.DB, data.email, id, c.body, Date.now(), c.share);
+  const now = Date.now();
+  const mentions = await resolveMentions(env.DB, a, data.email, c.body, body.mentions);
+  await appendMessage(env.DB, data.email, id, c.body, now, c.share, mentions);
   return json(await view(), 201);
 };

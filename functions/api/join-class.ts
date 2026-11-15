@@ -54,19 +54,20 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
 
   const now = Date.now();
   const expiresAt = getCurrentExpirationDate();
-  try {
-    await env.DB.prepare(
-      `INSERT INTO enrollments (class_id, student_email, enrolled_at, enrolled_by, expires_at)
-       VALUES (?, ?, ?, ?, ?)`,
-    )
-      .bind(classInfo.id, data.email, now, null, expiresAt)
-      .run();
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    if (msg.includes('UNIQUE')) {
-      return json({ error: 'You are already enrolled in this class' }, 409);
-    }
-    throw err;
+  // An enrollment keeps its row after it ends (expires_at passes, or a rollover), so a plain INSERT hit the primary
+  // key and told a returning student "already enrolled" with no way back in. An ENDED row is taken over (fresh dates,
+  // self-enrolled); an active one is left alone and still answers 409.
+  const res = await env.DB.prepare(
+    `INSERT INTO enrollments (class_id, student_email, enrolled_at, enrolled_by, expires_at)
+     VALUES (?1, ?2, ?3, NULL, ?4)
+     ON CONFLICT (class_id, student_email) DO UPDATE
+       SET enrolled_at = excluded.enrolled_at, enrolled_by = NULL, expires_at = excluded.expires_at
+       WHERE enrollments.expires_at <= ?3`,
+  )
+    .bind(classInfo.id, data.email, now, expiresAt)
+    .run();
+  if (!res.meta.changes) {
+    return json({ error: 'You are already enrolled in this class' }, 409);
   }
 
   return json(

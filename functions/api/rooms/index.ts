@@ -14,6 +14,7 @@ import {
   GAME_MAX, GAME_RE, LIST_LIMIT, MAX_OPEN_ROOMS_PER_HOST, MAX_SEATS, ROOM_TTL_MS, deviceOf, json, liveClassIds, liveRoomKey, pickRoomCode,
 } from '../../_shared/rooms';
 import { ownerLabel } from '../../_shared/libraryShare';
+import { guestHostsOf, isApprovedGuest } from '../../_shared/guests';
 import { CODE_OFFLINE, LIVE_OFFLINE, tellLiveRoom } from '../../_shared/live';
 import { codeLangOf } from '../../../lib/live-protocol';
 
@@ -48,7 +49,9 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ en
   const live = kind === 'code' || url.searchParams.get('live') === '1' ? 1 : 0;
   const now = Date.now();
   const mine = await liveClassIds(env.DB, data.email, now);
-  if (mine.size === 0) return json({ inClass: false, rooms: [] });
+  // An approved guest (migration 0059) also sees the sessions of the hosts who invited them, and only those.
+  const hosts = await guestHostsOf(env.DB, data.email, now);
+  if (mine.size === 0 && hosts.size === 0) return json({ inClass: false, rooms: [] });
 
   const r = await env.DB.prepare(
     `SELECT r.code, r.seats, r.host_email, r.created_at, s.first_name, s.last_name,
@@ -75,11 +78,12 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ en
     if (!theirs) { theirs = await liveClassIds(env.DB, x.host_email, now); hostClasses.set(x.host_email, theirs); }
     let shared = false;
     for (const id of theirs) if (mine.has(id)) { shared = true; break; }
-    if (!shared) continue;
+    if (!shared && !hosts.has(x.host_email)) continue;
     rooms.push({ code: x.code, host: ownerLabel(x.first_name, x.last_name), seats: x.seats, present: x.present, here: x.here > 0 });
     if (rooms.length >= LIST_LIMIT) break;
   }
-  return json({ inClass: true, rooms });
+  // `guest`: in no class, here only as someone's approved guest, so they can join a listed session but not start one.
+  return json({ inClass: true, guest: mine.size === 0, rooms });
 };
 
 export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ env, data, request }: Ctx) => {
@@ -109,6 +113,9 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ e
   if (data.role !== 'admin') {
     const classes = await liveClassIds(env.DB, data.email, now);
     if (classes.size === 0) {
+      if (await isApprovedGuest(env.DB, data.email, now)) {
+        return json({ error: 'As a guest you join a session your host starts. Ask them for their code; you cannot start one.' }, 403);
+      }
       return json({ error: 'Online play is for classmates, so join your class first (Join your class, at the top).' }, 403);
     }
   }

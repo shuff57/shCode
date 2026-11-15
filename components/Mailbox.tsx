@@ -15,14 +15,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Hash, Lock, Maximize2, PenSquare, Users } from 'lucide-react';
 import {
-  CHANNEL_NAME_MAX, GENERAL, GROUP_MAX_PEOPLE, GROUP_TITLE_MAX, MESSAGE_MAX, THREAD_POLL_MS, WATCHED_NOTE, blockText,
-  cleanChannelName, cleanMessage,
-  type MessageItem, type PeopleClass, type ThreadSummary, type ThreadView,
+  CHANNEL_NAME_MAX, DELETED_TEXT, GENERAL, GROUP_MAX_PEOPLE, GROUP_TITLE_MAX, MESSAGE_MAX, THREAD_POLL_MS, WATCHED_NOTE, blockText,
+  cleanChannelName, cleanMessage, hasMention, mentionParts,
+  type MessageItem, type MessagePerson, type PeopleClass, type ThreadSummary, type ThreadView,
 } from '../lib/messages-core';
 import {
-  createChannel, createGroup, fetchPeople, fetchThread, fetchThreads, manageThread, sendNew, sendReply,
+  createChannel, createGroup, deleteOwnMessage, editOwnMessage, fetchPeople, fetchThread, fetchThreads, manageThread, sendNew, sendReply,
 } from '../lib/messages-client';
 import ShareCardView from './ShareCardView';
+import MessageHistory from './MessageHistory';
 
 export type MailView =
   | { kind: 'list' } | { kind: 'thread'; id: string } | { kind: 'new' } | { kind: 'new-group' } | { kind: 'new-channel' };
@@ -68,12 +69,99 @@ function KindIcon({ kind, locked, size = 13 }: { kind: ThreadSummary['kind']; lo
   return null;
 }
 
-function Composer({ onSend, disabled, placeholder, autoFocus }: {
-  onSend: (text: string) => Promise<string | null>; disabled?: boolean; placeholder: string; autoFocus?: boolean;
+/**
+ * The keys of the people a message really @names: picked from the list AND still written in the words
+ * (the person may have deleted the text after picking it). The server checks them again.
+ */
+function mentionKeys(text: string, people: MessagePerson[] | undefined, picked: Set<string>): string[] {
+  return (people ?? []).filter((p) => picked.has(p.key) && hasMention(text, p.name)).map((p) => p.key);
+}
+
+/**
+ * A message box where typing "@" offers the people of the conversation (migration 0056). Picking one writes
+ * "@Name " into the words and tells the parent (`onPick`) which person it was; Up/Down/Enter/Tab/Escape work
+ * the list from the keyboard. With the list closed, Enter submits (Shift+Enter is a new line) and Escape cancels.
+ */
+function MentionField({ id, value, onChange, people, onPick, onSubmit, onCancel, placeholder, disabled, autoFocus, rows = 2, testid }: {
+  id: string; value: string; onChange: (text: string) => void; people?: MessagePerson[]; onPick: (p: MessagePerson) => void;
+  onSubmit: () => void; onCancel?: () => void; placeholder?: string; disabled?: boolean; autoFocus?: boolean; rows?: number; testid: string;
+}) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  const [caret, setCaret] = useState(0);
+  const [active, setActive] = useState(0);
+  const [dismissed, setDismissed] = useState(false);
+  // The "@word" the caret is at the end of, or null.
+  const query = useMemo(() => {
+    const m = /(^|[\s(])@([^\s@]*)$/u.exec(value.slice(0, caret));
+    return m ? m[2] : null;
+  }, [value, caret]);
+  const matches = useMemo(() => {
+    if (query === null || !people?.length) return [];
+    const q = query.toLowerCase();
+    return people.filter((p) => !q || p.name.toLowerCase().split(/\s+/).some((w) => w.startsWith(q))).slice(0, 6);
+  }, [query, people]);
+  useEffect(() => { setActive(0); setDismissed(false); }, [query]);
+  const open = !dismissed && matches.length > 0;
+  const listId = `${id}-mentions`;
+
+  const pick = (p: MessagePerson) => {
+    const start = value.slice(0, caret).lastIndexOf('@');
+    if (start < 0) return;
+    const insert = `@${p.name} `;
+    onChange(value.slice(0, start) + insert + value.slice(caret));
+    onPick(p);
+    const pos = start + insert.length;
+    window.requestAnimationFrame(() => { ref.current?.focus(); ref.current?.setSelectionRange(pos, pos); setCaret(pos); });
+  };
+
+  return (
+    <div style={{ position: 'relative', display: 'flex', flexDirection: 'column' }}>
+      {open && (
+        <ul id={listId} role="listbox" aria-label="People to mention" data-testid="mention-list"
+          style={{ position: 'absolute', bottom: '100%', left: 0, right: 0, margin: '0 0 4px', padding: 2, listStyle: 'none', zIndex: 5,
+            background: 'var(--c-deep)', border: '1px solid var(--c-line)', borderRadius: 6, boxShadow: '0 4px 14px rgba(0,0,0,0.35)' }}>
+          {matches.map((p, i) => (
+            <li key={p.key} id={`${listId}-${i}`} role="option" aria-selected={i === active} data-testid="mention-option"
+              // mousedown, not click: the textarea must not lose its caret before the name is written in
+              onMouseDown={(e) => { e.preventDefault(); pick(p); }} onMouseEnter={() => setActive(i)}
+              style={{ padding: '5px 8px', fontSize: 13, borderRadius: 4, cursor: 'pointer', color: 'var(--c-fg)',
+                background: i === active ? 'color-mix(in srgb, var(--brand) 22%, transparent)' : 'transparent' }}>
+              @{p.name}{p.teacher && <TeacherTag name={p.name} />}
+            </li>
+          ))}
+        </ul>
+      )}
+      <textarea id={id} ref={ref} value={value} disabled={disabled} autoFocus={autoFocus} placeholder={placeholder} rows={rows} data-testid={testid}
+        role={people?.length ? 'combobox' : undefined} aria-expanded={people?.length ? open : undefined} aria-controls={people?.length && open ? listId : undefined}
+        aria-activedescendant={open ? `${listId}-${active}` : undefined} aria-autocomplete={people?.length ? 'list' : undefined}
+        onChange={(e) => { onChange(e.target.value); setCaret(e.target.selectionStart ?? e.target.value.length); }}
+        onKeyUp={(e) => setCaret(e.currentTarget.selectionStart ?? 0)}
+        onClick={(e) => setCaret(e.currentTarget.selectionStart ?? 0)}
+        onKeyDown={(e) => {
+          if (e.nativeEvent.isComposing) return;
+          if (open) {
+            if (e.key === 'ArrowDown') { e.preventDefault(); setActive((i) => (i + 1) % matches.length); return; }
+            if (e.key === 'ArrowUp') { e.preventDefault(); setActive((i) => (i + matches.length - 1) % matches.length); return; }
+            if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); pick(matches[active]); return; }
+            if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); setDismissed(true); return; }
+          }
+          if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onSubmit(); }
+          else if (e.key === 'Escape' && onCancel) { e.preventDefault(); onCancel(); }
+        }}
+        style={{ ...field, resize: 'vertical', minHeight: 44, maxHeight: 160, lineHeight: 1.45, padding: '6px 8px', fontFamily: 'inherit' }} />
+    </div>
+  );
+}
+
+function Composer({ onSend, disabled, placeholder, autoFocus, people }: {
+  onSend: (text: string, mentions: string[]) => Promise<string | null>; disabled?: boolean; placeholder: string; autoFocus?: boolean;
+  /** A group or channel: whom an @ can name. */
+  people?: MessagePerson[];
 }) {
   const [text, setText] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const picked = useRef<Set<string>>(new Set());
   const length = [...text].length;
 
   const send = async () => {
@@ -82,10 +170,10 @@ function Composer({ onSend, disabled, placeholder, autoFocus }: {
     if ('error' in c) { setError(c.error); return; }
     setBusy(true);
     setError(null);
-    const err = await onSend(c.body);
+    const err = await onSend(c.body, mentionKeys(c.body, people, picked.current));
     setBusy(false);
     if (err) setError(err);
-    else setText('');
+    else { setText(''); picked.current = new Set(); }
   };
 
   const off = disabled || busy || !text.trim();
@@ -93,14 +181,12 @@ function Composer({ onSend, disabled, placeholder, autoFocus }: {
     <div style={{ borderTop: '1px solid var(--c-line)', padding: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
       {error && <p role="alert" style={{ margin: 0, fontSize: 12, lineHeight: 1.45, color: 'var(--c-red)' }}>{error}</p>}
       <label htmlFor="mailbox-compose" className="sr-only">Message</label>
-      <textarea id="mailbox-compose" value={text} disabled={disabled || busy} autoFocus={autoFocus}
-        onChange={(e) => { setText(e.target.value); if (error) setError(null); }}
-        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); void send(); } }}
-        placeholder={placeholder} rows={2} data-testid="mailbox-compose"
-        style={{ ...field, resize: 'vertical', minHeight: 44, maxHeight: 160, lineHeight: 1.45, padding: '6px 8px', fontFamily: 'inherit' }} />
+      <MentionField id="mailbox-compose" testid="mailbox-compose" value={text} disabled={disabled || busy} autoFocus={autoFocus} placeholder={placeholder}
+        people={people} onPick={(p) => { picked.current.add(p.key); }}
+        onChange={(t) => { setText(t); if (error) setError(null); }} onSubmit={() => void send()} />
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ fontSize: 11, color: length > MESSAGE_MAX ? 'var(--c-red)' : 'var(--c-dim)', flex: 1 }}>
-          {length > MESSAGE_MAX - 200 ? `${length} / ${MESSAGE_MAX}` : 'Enter sends · Shift+Enter for a new line'}
+          {length > MESSAGE_MAX - 200 ? `${length} / ${MESSAGE_MAX}` : people?.length ? 'Enter sends · @ names someone · Shift+Enter for a new line' : 'Enter sends · Shift+Enter for a new line'}
         </span>
         <button type="button" onClick={() => void send()} disabled={off} data-testid="mailbox-send" style={primary(off)}>
           {busy ? 'Sending…' : 'Send'}
@@ -111,6 +197,16 @@ function Composer({ onSend, disabled, placeholder, autoFocus }: {
 }
 
 // ---- the list ------------------------------------------------------------------------------------
+
+/** "@" beside a conversation where someone named you since you last opened it. */
+function MentionBadge() {
+  return (
+    <span data-testid="mention-badge" title="Someone mentioned you"
+      style={{ fontSize: 12, fontWeight: 700, lineHeight: 1, padding: '2px 6px', borderRadius: 9, flexShrink: 0, background: 'var(--c-yellow)', color: 'var(--c-bg)' }}>
+      <span aria-hidden="true">@</span><span className="sr-only">You were mentioned</span>
+    </span>
+  );
+}
 
 function Row({ t, selected, onOpen }: { t: ThreadSummary; selected: boolean; onOpen: (id: string) => void }) {
   const channel = t.kind === 'channel';
@@ -127,6 +223,7 @@ function Row({ t, selected, onOpen }: { t: ThreadSummary; selected: boolean; onO
             <KindIcon kind="channel" locked={t.locked} />
             {t.unread && <span className="sr-only">New messages in </span>}
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.title}</span>
+            {t.mentioned && <MentionBadge />}
           </span>
         ) : (
           <>
@@ -138,10 +235,11 @@ function Row({ t, selected, onOpen }: { t: ThreadSummary; selected: boolean; onO
                 <strong style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.title}</strong>
                 {t.kind !== 'group' && t.other.teacher && <TeacherTag name={t.other.name} />}
                 <span style={{ color: 'var(--c-dim)', fontSize: 11, flexShrink: 0 }}>· {t.className}</span>
+                {t.mentioned && <MentionBadge />}
               </span>
               {t.last && (
-                <span style={{ fontSize: 12, color: 'var(--c-meta)', display: 'block', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontStyle: t.last.removed ? 'italic' : 'normal' }}>
-                  {t.last.mine ? 'You: ' : t.last.author ? `${t.last.author}: ` : ''}{t.last.removed ? 'Removed by a teacher' : t.last.snippet}
+                <span style={{ fontSize: 12, color: 'var(--c-meta)', display: 'block', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontStyle: t.last.removed || t.last.deleted ? 'italic' : 'normal' }}>
+                  {t.last.mine ? 'You: ' : t.last.author ? `${t.last.author}: ` : ''}{t.last.removed ? 'Removed by a teacher' : t.last.deleted ? DELETED_TEXT : t.last.snippet}
                 </span>
               )}
               {t.last && <span style={{ fontSize: 11, color: 'var(--c-dim)', display: 'block', marginTop: 2 }}>{when(t.last.at)}</span>}
@@ -174,7 +272,7 @@ export function ConversationList({ threads, error, selected, onOpen }: {
   if (!threads.length) {
     return (
       <p style={{ margin: 0, padding: 12, fontSize: 13, lineHeight: 1.5, color: 'var(--c-dim)' }}>
-        No messages yet. Join a class, then press Message to write to your teacher or a classmate.
+        No messages yet. Join a class (or be invited as a guest), then press Message to write to your teacher or a classmate.
       </p>
     );
   }
@@ -221,38 +319,120 @@ export function NewButtons({ onPick }: { onPick: (v: MailView) => void }) {
 
 // ---- one conversation -----------------------------------------------------------------------------
 
-function MessageRow({ m, view, onModerate }: { m: MessageItem; view: ThreadView; onModerate: (m: MessageItem) => void }) {
+const linkButton = {
+  marginLeft: 8, fontSize: 10, padding: 0, border: 'none', background: 'none', color: 'var(--c-cyan)', cursor: 'pointer', textDecoration: 'underline',
+} as const;
+
+/** A message's words with each @mention in bold (the reader's own in a highlight). */
+function MessageWords({ body, mentions }: { body: string; mentions: MessageItem['mentions'] }) {
+  if (!mentions.length) return <>{body}</>;
+  const me = new Set(mentions.filter((x) => x.me).map((x) => x.name));
+  return (
+    <>
+      {mentionParts(body, mentions.map((x) => x.name)).map((part, i) => (part.mention === null
+        ? <span key={i}>{part.text}</span>
+        : (
+          <strong key={i} data-testid="mention" data-me={me.has(part.mention) ? '1' : undefined}
+            style={{ fontWeight: 700, color: me.has(part.mention) ? 'var(--c-bg)' : 'var(--c-cyan)', background: me.has(part.mention) ? 'var(--c-yellow)' : 'transparent', borderRadius: 3, padding: me.has(part.mention) ? '0 3px' : 0 }}>
+            {part.text}
+          </strong>
+        )))}
+    </>
+  );
+}
+
+function MessageRow({ m, view, onModerate, onEdit, onDelete }: {
+  m: MessageItem; view: ThreadView; onModerate: (m: MessageItem) => void;
+  /** Save new words; resolves to an error to show, or null when it saved. */
+  onEdit: (m: MessageItem, text: string, mentions: string[]) => Promise<string | null>;
+  onDelete: (m: MessageItem) => void;
+}) {
   const many = view.kind === 'group' || view.kind === 'channel' || view.onlooker;
   const removedWords = m.removed && m.body != null;
+  // Deleted by its author: classmates get no words (body null); a teacher gets them, struck through.
+  const deletedStub = m.deleted && m.body == null && !m.removed;
+  const deletedWords = m.deleted && m.body != null && !m.removed;
+  const struck = removedWords || deletedWords;
+  const mentionsMe = m.mentions.some((x) => x.me);
+
+  const [editing, setEditing] = useState(false);
+  const [text, setText] = useState('');
+  const [err, setErr] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const picked = useRef<Set<string>>(new Set());
+  const people = view.mentionable;
+
+  const startEdit = () => {
+    // The people it already names stay named unless the words change.
+    picked.current = new Set((people ?? []).filter((p) => m.mentions.some((x) => x.name === p.name)).map((p) => p.key));
+    setText(m.body ?? '');
+    setErr(null);
+    setEditing(true);
+  };
+  const save = async () => {
+    if (busy) return;
+    const c = m.share && !text.trim() ? { body: '' } : cleanMessage(text);
+    if ('error' in c) { setErr(c.error); return; }
+    if (c.body === (m.body ?? '')) { setEditing(false); return; }
+    setBusy(true);
+    setErr(null);
+    const e = await onEdit(m, c.body, mentionKeys(c.body, people, picked.current));
+    setBusy(false);
+    if (e) setErr(e); else setEditing(false);
+  };
+
   return (
-    <div data-testid="mailbox-message" style={{ alignSelf: m.mine ? 'flex-end' : 'flex-start', maxWidth: '85%' }}>
+    <div data-testid="mailbox-message" data-deleted={m.deleted ? '1' : undefined} style={{ alignSelf: m.mine ? 'flex-end' : 'flex-start', maxWidth: '85%', minWidth: editing ? '70%' : undefined }}>
       {many && !m.mine && (
         <div style={{ fontSize: 11, color: 'var(--c-meta)', marginBottom: 2 }}>
           <strong>{m.author}</strong>{m.teacher && <TeacherTag name={m.author} />}
         </div>
       )}
-      {(m.removed || m.body) && (
+      {editing ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <label className="sr-only" htmlFor={`edit-${m.id}`}>Change your message</label>
+          <MentionField id={`edit-${m.id}`} testid="mailbox-edit-field" value={text} onChange={(t) => { setText(t); if (err) setErr(null); }} people={people}
+            onPick={(p) => { picked.current.add(p.key); }} onSubmit={() => void save()} onCancel={() => setEditing(false)} disabled={busy} autoFocus rows={3} />
+          {err && <p role="alert" style={{ margin: 0, fontSize: 12, lineHeight: 1.45, color: 'var(--c-red)' }}>{err}</p>}
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <button type="button" style={primary(busy)} disabled={busy} onClick={() => void save()} data-testid="mailbox-edit-save">{busy ? 'Saving…' : 'Save'}</button>
+            <button type="button" style={small} onClick={() => setEditing(false)}>Cancel</button>
+            <span style={{ fontSize: 11, color: 'var(--c-dim)' }}>Your teacher can see what it said before.</span>
+          </div>
+        </div>
+      ) : (m.removed || m.deleted || m.body) && (
         <div style={{
           fontSize: 13, lineHeight: 1.45, padding: '6px 10px', borderRadius: 8, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere',
-          background: m.removed ? 'transparent' : m.mine ? 'color-mix(in srgb, var(--brand) 22%, var(--c-bg))' : 'var(--c-deep2)',
-          border: m.removed ? '1px dashed var(--c-line)' : '1px solid transparent',
-          color: m.removed ? 'var(--c-dim)' : 'var(--c-fg)', fontStyle: m.removed && !removedWords ? 'italic' : 'normal',
-          textDecoration: removedWords ? 'line-through' : 'none',
+          background: m.removed || m.deleted ? 'transparent' : m.mine ? 'color-mix(in srgb, var(--brand) 22%, var(--c-bg))' : 'var(--c-deep2)',
+          border: m.removed || m.deleted ? '1px dashed var(--c-line)' : mentionsMe ? '1px solid var(--c-yellow)' : '1px solid transparent',
+          color: m.removed || m.deleted ? 'var(--c-dim)' : 'var(--c-fg)', fontStyle: (m.removed && !removedWords) || deletedStub ? 'italic' : 'normal',
+          textDecoration: struck ? 'line-through' : 'none',
         }}>
-          {removedWords ? m.body : m.removed ? 'Removed by a teacher' : m.body}
+          {removedWords || deletedWords
+            ? m.body
+            : m.removed ? 'Removed by a teacher'
+            : deletedStub ? (m.mine ? 'You deleted this message' : DELETED_TEXT)
+            : <MessageWords body={m.body ?? ''} mentions={m.mentions} />}
         </div>
       )}
-      {m.share && <ShareCardView card={m.share} mine={m.mine} author={m.author} onlooker={view.onlooker} />}
+      {m.share && !editing && <ShareCardView card={m.share} mine={m.mine} author={m.author} onlooker={view.onlooker} />}
       <div style={{ fontSize: 10, color: 'var(--c-dim)', marginTop: 2, textAlign: m.mine ? 'right' : 'left' }}>
         {m.mine ? 'You' : m.author} · {clock(m.at)}
+        {m.edited && !m.deleted && <span data-testid="mailbox-edited"> · edited</span>}
         {removedWords && <span style={{ color: 'var(--c-orange)' }}> · removed (students see &ldquo;Removed by a teacher&rdquo;)</span>}
+        {!editing && m.canEdit && (
+          <button type="button" onClick={startEdit} data-testid="mailbox-edit" style={linkButton}>Edit</button>
+        )}
+        {!editing && m.canDelete && (
+          <button type="button" onClick={() => onDelete(m)} data-testid="mailbox-delete" style={linkButton}>Delete</button>
+        )}
         {view.moderate && (
-          <button type="button" onClick={() => onModerate(m)} data-testid="mailbox-remove"
-            style={{ marginLeft: 8, fontSize: 10, padding: 0, border: 'none', background: 'none', color: 'var(--c-cyan)', cursor: 'pointer', textDecoration: 'underline' }}>
+          <button type="button" onClick={() => onModerate(m)} data-testid="mailbox-remove" style={linkButton}>
             {m.removed ? 'Put back' : 'Remove'}
           </button>
         )}
       </div>
+      <MessageHistory history={m.history} deleted={deletedWords} />
     </div>
   );
 }
@@ -262,7 +442,7 @@ function PeoplePicker({ cls, chosen, setChosen, exclude = [], room }: {
   cls: PeopleClass; chosen: Set<string>; setChosen: (s: Set<string>) => void; exclude?: string[]; room: number;
 }) {
   const [filter, setFilter] = useState('');
-  const shown = cls.people.filter((p) => !exclude.includes(p.key) && (!filter.trim() || p.name.toLowerCase().includes(filter.trim().toLowerCase())));
+  const shown = cls.people.filter((p) => !p.guest && !exclude.includes(p.key) && (!filter.trim() || p.name.toLowerCase().includes(filter.trim().toLowerCase())));
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minHeight: 0 }}>
       <label className="sr-only" htmlFor="people-filter">Find a person</label>
@@ -423,12 +603,29 @@ export function ThreadPane({ id, onBack, onGone, onChanged }: {
         )}
         {v?.messages.map((m) => (
           <MessageRow key={m.id} m={m} view={v}
-            onModerate={(x) => void run(x.removed ? 'restore' : 'remove', { messageId: x.id }, x.removed ? undefined : 'Remove this message? Students will see "Removed by a teacher". You can put it back.')} />
+            onModerate={(x) => void run(x.removed ? 'restore' : 'remove', { messageId: x.id }, x.removed ? undefined : 'Remove this message? Students will see "Removed by a teacher". You can put it back.')}
+            onEdit={async (x, text, mentions) => {
+              const r = await editOwnMessage(id, x.id, text, mentions);
+              if (!r.ok) { if (r.status === 403 || r.status === 404) void load(); return r.error; }
+              setView(r.value);
+              onChanged?.();
+              return null;
+            }}
+            onDelete={(x) => {
+              if (busy || !window.confirm('Delete this message? Others will see "Message deleted". Your teacher can still read what it said.')) return;
+              setBusy(true);
+              void deleteOwnMessage(id, x.id).then((r) => {
+                setBusy(false);
+                if (!r.ok) { setNote(r.error); return; }
+                setView(r.value);
+                onChanged?.();
+              });
+            }} />
         ))}
       </div>
       {v && (v.canSend
-        ? <Composer placeholder={isChannel ? `Message #${v.title}` : `Message ${v.title}`} autoFocus onSend={async (text) => {
-            const r = await sendReply(id, text);
+        ? <Composer placeholder={isChannel ? `Message #${v.title}` : `Message ${v.title}`} autoFocus people={v.mentionable} onSend={async (text, mentions) => {
+            const r = await sendReply(id, text, undefined, mentions);
             if (!r.ok) { if (r.status === 403) void load(); return r.error; }
             setView(r.value);
             onChanged?.();
@@ -443,15 +640,20 @@ export function ThreadPane({ id, onBack, onGone, onChanged }: {
 
 // ---- making something new -------------------------------------------------------------------------
 
-function useClasses(): { classes: PeopleClass[] | null; error: string | null; classId: string; setClassId: (id: string) => void } {
+/**
+ * The classes a person may write in. `forGroups`: groups and channels are for the people OF a class, so the "Guest of ..."
+ * entry a guest gets (migration 0060) is left out, and PeoplePicker leaves out a student's own guests.
+ */
+function useClasses(forGroups = false): { classes: PeopleClass[] | null; error: string | null; classId: string; setClassId: (id: string) => void } {
   const [classes, setClasses] = useState<PeopleClass[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [classId, setClassId] = useState('');
   useEffect(() => {
     void fetchPeople().then((r) => {
       if (!r.ok) { setError(r.error); return; }
-      setClasses(r.value);
-      if (r.value.length) setClassId(r.value[0].id);
+      const usable = forGroups ? r.value.filter((c) => !c.guestOf) : r.value;
+      setClasses(usable);
+      if (usable.length) setClassId(usable[0].id);
     });
   }, []);
   return { classes, error, classId, setClassId };
@@ -543,7 +745,7 @@ export function NewMessage({ onBack, onSent }: { onBack: () => void; onSent: (id
 }
 
 export function NewGroup({ onBack, onMade }: { onBack: () => void; onMade: (id: string) => void }) {
-  const { classes, error, classId, setClassId } = useClasses();
+  const { classes, error, classId, setClassId } = useClasses(true);
   const [chosen, setChosen] = useState<Set<string>>(new Set());
   const [title, setTitle] = useState('');
   const [busy, setBusy] = useState(false);
@@ -594,7 +796,7 @@ export function NewGroup({ onBack, onMade }: { onBack: () => void; onMade: (id: 
 }
 
 export function NewChannel({ onBack, onMade }: { onBack: () => void; onMade: (id: string) => void }) {
-  const { classes, error, classId, setClassId } = useClasses();
+  const { classes, error, classId, setClassId } = useClasses(true);
   const [name, setName] = useState('');
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);

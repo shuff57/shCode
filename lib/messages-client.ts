@@ -67,8 +67,19 @@ export function sendNew(classId: string, to: string, body: string, share?: Outgo
   return ask<ThreadView>('/api/messages', post({ classId, to, body, share }));
 }
 
-export function sendReply(threadId: string, body: string, share?: OutgoingShare): Promise<Result<ThreadView>> {
-  return ask<ThreadView>(`/api/messages/${encodeURIComponent(threadId)}`, post({ body, share }));
+/** `mentions`: person keys (ThreadView.mentionable) of people @named in `body` (migration 0056). */
+export function sendReply(threadId: string, body: string, share?: OutgoingShare, mentions?: string[]): Promise<Result<ThreadView>> {
+  return ask<ThreadView>(`/api/messages/${encodeURIComponent(threadId)}`, post({ body, share, ...(mentions?.length ? { mentions } : {}) }));
+}
+
+/** Change your own message; the words it had are kept for the class's teachers. */
+export function editOwnMessage(threadId: string, messageId: string, body: string, mentions?: string[]): Promise<Result<ThreadView>> {
+  return manageThread(threadId, 'edit', { messageId, body, ...(mentions?.length ? { mentions } : {}) });
+}
+
+/** Delete your own message: classmates see "Message deleted", the class's teachers still read it. */
+export function deleteOwnMessage(threadId: string, messageId: string): Promise<Result<ThreadView>> {
+  return manageThread(threadId, 'unsend', { messageId });
 }
 
 /** A group of people of one class (migration 0055). */

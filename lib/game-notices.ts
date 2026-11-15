@@ -87,6 +87,7 @@ export function markGameCommentsSeen(gameId: string, at = Date.now()): void {
 /** The bell's item was clicked: mark it read before the page changes. */
 export function markNoticeRead(item: NoticeItem): void {
   if (item.kind === 'change') stamp(SEEN_KEY, item.changeId, Math.max(Date.now(), item.at));
+  else if (item.kind === 'public' || item.kind === 'guest') stamp(GAMES_SEEN_KEY, item.key, Math.max(Date.now(), item.at));
   else stamp(GAMES_SEEN_KEY, item.gameId, Math.max(Date.now(), item.at));
   announce();
 }

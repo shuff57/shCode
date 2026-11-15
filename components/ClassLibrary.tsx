@@ -41,8 +41,10 @@ interface SharedItem {
   remixedFrom?: Provenance | null;
 }
 
-export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, title, section }: {
+export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, title, section, source = 'class' }: {
   kind: LibraryKind;
+  /** 'public' lists "Everyone" (migration 0058: what students made public) instead of what the class shared. */
+  source?: 'class' | 'public';
   onCopied?: () => void;
   onMessage?: (text: string, bad: boolean) => void;
   /** How many items loaded (null: signed out or unreachable), for a panel's empty state. */
@@ -61,9 +63,11 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
 
   const load = useCallback(async () => {
     try {
-      const res = await fetch(`/api/library/shared?kind=${kind}`, { credentials: 'same-origin' });
+      const res = await fetch(source === 'public' ? '/api/public' : `/api/library/shared?kind=${kind}`, { credentials: 'same-origin' });
       if (!res.ok) { setItems(null); setLoaded(true); onLoaded?.(null); return; }
-      const list = ((await res.json()) as { items: SharedItem[] }).items;
+      const all = ((await res.json()) as { items: SharedItem[] }).items;
+      // /api/public lists every kind; this section shows one.
+      const list = source === 'public' ? all.filter((i) => i.kind === kind) : all;
       setItems(list);
       setLoaded(true);
       onLoaded?.(list.length);
@@ -74,7 +78,7 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
     }
     // onLoaded is a callback from the parent; reloading on its identity would loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [kind]);
+  }, [kind, source]);
   useEffect(() => {
     void load();
     window.addEventListener(LIBRARY_SHARES_CHANGED, load);

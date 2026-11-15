@@ -3,6 +3,7 @@
 //   change   per proposed-change conversation the caller is in (their game, their proposal, or one they
 //            commented in), the newest thing SOMEONE ELSE did there: proposed it, commented, accepted...
 //   comment  a classmate's comment on the caller's game, or a reply in a comment thread they wrote in
+//   public   (0058) a teacher: a student of theirs made something public; an owner: a teacher took it down
 // The caller's own actions are never items. What is unread is the browser's business (it remembers what
 // it opened). Same visibility as the pages they open: a conversation the caller only joined, or a comment
 // on someone else's game, is left out once the caller can no longer open that game or read its comments.
@@ -11,6 +12,8 @@
 import { json, type SessionData } from '../_shared/games';
 import { gameAccess } from '../_shared/gameFlow';
 import { feedbackState } from '../_shared/gameComments';
+import { publicNotices } from '../_shared/publicShare';
+import { guestNotices } from '../_shared/guests';
 import { NOTICE_LIMIT, snippetOf, type NoticeItem } from '../../lib/game-notices-core';
 
 interface Env {
@@ -90,6 +93,10 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ en
     });
   }
 
+  // "Newly public" for a teacher, "your teacher took it down" for an owner (migration 0058): told in the app, no email.
+  items.push(...await publicNotices(env.DB, data));
+  // Guests (migration 0059): a teacher is asked to decide; a host and a guest hear the decision.
+  items.push(...await guestNotices(env.DB, data));
   items.sort((a, b) => b.at - a.at);
   return json({ items: items.slice(0, NOTICE_LIMIT) });
 };

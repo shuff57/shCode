@@ -600,7 +600,14 @@ app.prepare().catch((err) => {
     // games) see the same students.
     const LIB_CLASS = process.env.DEV_REAL_DB === '1' ? 'dev-class' : 'devclass';
     libDb.sqlite.prepare(`INSERT OR IGNORE INTO classes (id, name, code, owner_email, school_year, created_at) VALUES (?, 'Dev class', 'DEVDEV', 'owner@dev.local', '2026-2027', 0)`).run(LIB_CLASS);
-    const ensureMember = (email, role = DEV_ROLE) => {
+    // A `dev_noclass=1` cookie is an account that is in NO class (dev only): a guest (migration 0059) is exactly that person,
+    // and every dev student is otherwise put in the dev class on each call, which would make them a classmate.
+    const noClassCookie = (req) => /(?:^|;\s*)dev_noclass=1(?:;|$)/.test(req.headers?.cookie || '');
+    const ensureMember = (email, role = DEV_ROLE, noClass = false) => {
+      if (noClass && role === 'student') {
+        libDb.sqlite.prepare(`INSERT OR IGNORE INTO students (email, password_hash, created_at, role, first_name, last_name) VALUES (?, 'x', 0, 'student', ?, 'Dev')`).run(email, email.split('@')[0]);
+        return;
+      }
       if (role === 'student') {
         libDb.sqlite.prepare(`INSERT OR IGNORE INTO enrollments (class_id, student_email, enrolled_at, expires_at) VALUES (?, ?, 0, 4102444800000)`).run(LIB_CLASS, email);
         libDb.sqlite.prepare(`INSERT OR IGNORE INTO students (email, password_hash, created_at, role, first_name, last_name) VALUES (?, 'x', 0, 'student', ?, 'Dev')`).run(email, email.split('@')[0]);
@@ -618,7 +625,7 @@ app.prepare().catch((err) => {
     const libRoute = (handler) => async (req, res) => {
       const email = devIdentity(req);
       const role = devRoleOf(req);
-      ensureMember(email, role);
+      ensureMember(email, role, noClassCookie(req));
       // A class created on the class page lives in dev-demo-api's database; copy its row here so the class
       // routes below (shared items, shared games, Code together sessions) know it, as one D1 would.
       if (demoApi && req.params.id && req.path.startsWith('/api/classes/')) {
@@ -662,6 +669,26 @@ app.prepare().catch((err) => {
     const gamesAssets = await import('./functions/api/games/[id]/assets.ts');
     const gamesShared = await import('./functions/api/games/shared/index.ts');
     const gamesModerate = await import('./functions/api/classes/[id]/game-shares/index.ts');
+    // Who a share can go to (migration 0057): the picker's options.
+    const audiences = await import('./functions/api/audiences.ts');
+    server.get('/api/audiences', libRoute(audiences.onRequestGet));
+    // Guests (migration 0059): invite, redeem, end, and a teacher's decisions.
+    const guestsMine = await import('./functions/api/guests/index.ts');
+    const guestsRedeem = await import('./functions/api/guests/redeem.ts');
+    const guestsOne = await import('./functions/api/guests/[id].ts');
+    const guestsClass = await import('./functions/api/classes/[id]/guests/index.ts');
+    server.get('/api/guests', libRoute(guestsMine.onRequestGet));
+    server.post('/api/guests', express.json(), libRoute(guestsMine.onRequestPost));
+    server.post('/api/guests/redeem', express.json(), libRoute(guestsRedeem.onRequestPost));
+    server.delete('/api/guests/:id', libRoute(guestsOne.onRequestDelete));
+    server.get('/api/classes/:id/guests', libRoute(guestsClass.onRequestGet));
+    server.post('/api/classes/:id/guests', express.json(), libRoute(guestsClass.onRequestPost));
+    // "Everyone" (migration 0058): the public list and a teacher's Newly public panel.
+    const publicList = await import('./functions/api/public.ts');
+    server.get('/api/public', libRoute(publicList.onRequestGet));
+    const publicShares = await import('./functions/api/classes/[id]/public-shares/index.ts');
+    server.get('/api/classes/:id/public-shares', libRoute(publicShares.onRequestGet));
+    server.post('/api/classes/:id/public-shares', express.json(), libRoute(publicShares.onRequestPost));
     server.get('/api/games', libRoute(gamesMine.onRequestGet));
     server.post('/api/games', express.json({ limit: '200kb' }), libRoute(gamesMine.onRequestPost));
     server.get('/api/games/shared', libRoute(gamesShared.onRequestGet));

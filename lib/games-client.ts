@@ -33,6 +33,7 @@ import { errorText } from './http-error';
 import type { GameMode } from './games-core';
 import type { GameAssetsResponse } from './game-assets';
 import { canRemix, parseProvenance, provenanceOf, remixRefusal, type Provenance, type ShareChoice } from './share-choice';
+import type { AudienceSpec, ItemAudience, PulledInfo } from './audience';
 import { ownedLocal } from './owned-storage';
 
 // `w1:<owner>:sandbox-game` (lib/owned-storage.ts).
@@ -55,6 +56,10 @@ export interface MyGame {
   shared: boolean;
   choice: ShareChoice;
   remixedFrom: Provenance | null;
+  /** Which classes it goes to once shared (migration 0057); missing when it is not shared. */
+  audience?: ItemAudience | null;
+  /** A teacher took it down from Everyone (migration 0058). */
+  pulled?: PulledInfo | null;
   /** The game's version (migration 0048) and how many proposed changes wait for it. */
   version?: number;
   openChanges?: number;
@@ -94,6 +99,10 @@ export interface FullGame {
   mine: boolean;
   hidden: boolean;
   shared?: boolean;
+  /** Which classes it goes to once shared (migration 0057), for the owner. */
+  audience?: ItemAudience | null;
+  /** A teacher took it down from Everyone (migration 0058), for the owner. */
+  pulled?: PulledInfo | null;
   updatedAt: number;
   choice: ShareChoice;
   /** False for someone else's "just play" game: no View code, no Remix. */
@@ -191,6 +200,11 @@ export function listSharedGames() {
   return call<{ games: SharedGame[] }>('/api/games/shared');
 }
 
+/** "Everyone" (migration 0058): games students made public. 403 for someone who is not in a class. */
+export function listPublicGames() {
+  return call<{ games: SharedGame[] }>('/api/public');
+}
+
 /** A game you starred (migration 0052), as GET /api/games/starred lists it. */
 export interface StarredGame {
   id: string;
@@ -261,11 +275,11 @@ export async function publishGame(
   return r;
 }
 
-export async function setGameShared(id: string, share: boolean, choice?: ShareChoice) {
-  const r = await call<{ shared: boolean; classes: number; choice: ShareChoice }>(`/api/games/${encodeURIComponent(id)}/share`, {
+export async function setGameShared(id: string, share: boolean, choice?: ShareChoice, audience?: AudienceSpec) {
+  const r = await call<{ shared: boolean; classes: number; choice: ShareChoice; audience?: ItemAudience | null }>(`/api/games/${encodeURIComponent(id)}/share`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(choice && share ? { share, choice } : { share }),
+    body: JSON.stringify({ share, ...(share && choice ? { choice } : {}), ...(share && audience ? { audience } : {}) }),
   });
   if (r.ok) announce();
   return r;

@@ -156,7 +156,7 @@ export default function NotificationBell({ enabled, staff = false }: { enabled: 
 
           {tab === 'activity' && (<>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderBottom: '1px solid var(--c-line)' }}>
-            <h2 style={{ fontSize: 13, margin: 0, flex: 1, color: 'var(--c-meta)', fontWeight: 400 }}>Games library activity</h2>
+            <h2 style={{ fontSize: 13, margin: 0, flex: 1, color: 'var(--c-meta)', fontWeight: 400 }}>Library activity</h2>
             <button type="button" disabled={!unread}
               onClick={() => { markAllNoticesRead(); setUnread(0); }}
               style={{
@@ -171,7 +171,7 @@ export default function NotificationBell({ enabled, staff = false }: { enabled: 
             {items === null && <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: 0, padding: 12 }}>Loading…</p>}
             {items !== null && items.length === 0 && (
               <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: 0, padding: 12, lineHeight: 1.5 }}>
-                Nothing yet. When a classmate proposes a change to your game, comments on it, or replies to you, it shows up here.
+                Nothing yet. When a classmate proposes a change to your game, comments on it, or replies to you, or a teacher takes something of yours down from Everyone, it shows up here.
               </p>
             )}
             {items !== null && items.length > 0 && (

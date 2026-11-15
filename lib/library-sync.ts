@@ -32,6 +32,7 @@ import {
   type LocalLibraryItem,
 } from './moshion-storage';
 import { choiceOf, parseProvenance, type Provenance, type ShareChoice } from './share-choice';
+import type { AudienceSpec, ItemAudience, PulledInfo } from './audience';
 import { ownedLocal } from './owned-storage';
 
 export interface ServerItem {
@@ -45,6 +46,10 @@ export interface ServerItem {
   choice?: ShareChoice;
   /** Where it was copied from, recorded by the server on its first upload. */
   remixedFrom?: Provenance | null;
+  /** Which classes a shared item goes to (migration 0057); missing when it is not shared. */
+  audience?: ItemAudience | null;
+  /** A teacher took it down from Everyone (migration 0058), with their optional reason. */
+  pulled?: PulledInfo | null;
 }
 export interface BaseEntry {
   id: string;
@@ -334,12 +339,16 @@ export interface AccountItem {
   shared: boolean;
   choice: ShareChoice;
   remixedFrom: Provenance | null;
+  /** Which classes it goes to once shared (migration 0057), or null. */
+  audience: ItemAudience | null;
+  /** A teacher took it down from Everyone (migration 0058), or null. */
+  pulled: PulledInfo | null;
 }
 
 /** The account copy of a saved item, once synced: its id, whether it is shared, its choice and its credit. */
 export function accountItem(kind: LibraryKind, name: string): AccountItem | null {
   const s = serverIndex.get(itemKey(kind, name));
-  return s ? { id: s.id, shared: !!s.shared, choice: choiceOf(s.choice), remixedFrom: parseProvenance(s.remixedFrom) } : null;
+  return s ? { id: s.id, shared: !!s.shared, choice: choiceOf(s.choice), remixedFrom: parseProvenance(s.remixedFrom), audience: s.audience ?? null, pulled: s.pulled ?? null } : null;
 }
 
 /**
@@ -363,7 +372,7 @@ export function signedInForSync(): boolean {
  * Share or unshare one synced item with the student's classes, with `choice`
  * (who may do what with it) when sharing. Returns an error sentence or null.
  */
-export async function setShared(kind: LibraryKind, name: string, share: boolean, choice?: ShareChoice): Promise<string | null> {
+export async function setShared(kind: LibraryKind, name: string, share: boolean, choice?: ShareChoice, audience?: AudienceSpec): Promise<string | null> {
   const s = serverIndex.get(itemKey(kind, name));
   if (!s) return 'Wait a moment: this is still syncing to your account.';
   try {
@@ -371,11 +380,11 @@ export async function setShared(kind: LibraryKind, name: string, share: boolean,
       method: 'POST',
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(share && choice ? { share, choice } : { share }),
+      body: JSON.stringify({ share, ...(share && choice ? { choice } : {}), ...(share && audience ? { audience } : {}) }),
     });
-    const body = (await res.json().catch(() => ({}))) as { error?: string; choice?: ShareChoice };
+    const body = (await res.json().catch(() => ({}))) as { error?: string; choice?: ShareChoice; audience?: ItemAudience | null };
     if (!res.ok) return body.error ?? `Could not ${share ? 'share' : 'unshare'} it (${res.status}).`;
-    serverIndex.set(itemKey(kind, name), { ...s, shared: share, choice: body.choice ?? s.choice });
+    serverIndex.set(itemKey(kind, name), { ...s, shared: share, choice: body.choice ?? s.choice, audience: share ? (body.audience ?? null) : null });
     try { window.dispatchEvent(new Event(LIBRARY_SHARES_CHANGED)); } catch { /* no window */ }
     return null;
   } catch {

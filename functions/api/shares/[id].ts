@@ -22,9 +22,12 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
   const row = await env.DB.prepare(`SELECT * FROM message_shares WHERE id = ?`).bind(id).first<ShareRow>();
   if (!row) return missing();
   const a = await threadAccess(env.DB, data, row.thread_id);
-  const msg = await env.DB.prepare(`SELECT deleted_at FROM messages WHERE id = ?`).bind(row.message_id).first<{ deleted_at: number | null }>();
+  const msg = await env.DB.prepare(`SELECT deleted_at, retracted_at FROM messages WHERE id = ?`).bind(row.message_id)
+    .first<{ deleted_at: number | null; retracted_at: number | null }>();
   if (!a || !a.read || !msg) return missing();
   if (msg.deleted_at != null && !a.moderate) return missing();
+  // A program its author deleted with the message (migration 0056) is the class's teachers' to open, nobody else's.
+  if (msg.retracted_at != null && !(a.role === 'teacher' || data.role === 'admin')) return missing();
 
   const author = a.members.find((m) => m.email === row.author_email);
   const view: ShareView = {

@@ -81,6 +81,9 @@ export async function gameAccess(db: D1Database, data: SessionData, gameId: stri
   if (maker || teacher) return { game, maker, teacher };
   const seen = await visibleGame(db, data, gameId);
   if (!seen || seen.hidden) return null;
+  // Proposed changes and versions are class-only (migration 0058): someone who sees the game only because it is public
+  // is never "anyone who can open it" here, or they would read students' free-text change conversations.
+  if (seen.viaPublic) return null;
   if (!canRemix(game.share_choice)) return null;
   return { game, maker: false, teacher: false };
 }

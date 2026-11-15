@@ -17,6 +17,8 @@
 // DELETE closes the game's open proposals.
 
 import { json, ownerName, visibleGame, type SessionData } from '../../_shared/games';
+import { audienceMap, ownClassIds, type ItemAudience } from '../../_shared/audience';
+import { publicState } from '../../_shared/publicShare';
 import { isGameId, modeLabel, type GameMode } from '../../../lib/games-core';
 import { canRemix, choiceOf, provenanceFromRow } from '../../../lib/share-choice';
 import { closeChangesStmts, contributorsOf, openChangeCounts } from '../../_shared/gameFlow';
@@ -33,8 +35,17 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
   if (!seen) return json({ error: 'Not found' }, 404);
   const { row } = seen;
   let shared = false;
+  let audience: ItemAudience | undefined;
+  let pulled: { reason: string | null; at: number } | null = null;
   if (seen.mine) {
+    pulled = (await publicState(env.DB, 'game', id))?.pulled ?? null;
     shared = !!(await env.DB.prepare(`SELECT 1 AS x FROM library_game_shares WHERE game_id = ? LIMIT 1`).bind(id).first());
+    // Which classes it goes to (migration 0057): the owner's picker starts from this. Read here, not off `row`:
+    // visibleGame does not select audience_teacher, and a missing value would read as a plain class share.
+    if (shared) {
+      const t = await env.DB.prepare(`SELECT audience_teacher FROM library_games WHERE id = ?`).bind(id).first<{ audience_teacher: string | null }>();
+      audience = (await audienceMap(env.DB, 'game', [{ id, audience_teacher: t?.audience_teacher ?? null }], await ownClassIds(env.DB, data))).get(id);
+    }
   }
   const vrow = await env.DB.prepare(`SELECT version, feedback_on FROM library_games WHERE id = ?`).bind(id).first<{ version: number; feedback_on: number | null }>();
   const contributors = await contributorsOf(env.DB, id);
@@ -45,7 +56,7 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
       id: row.id, title: row.title, code: row.code, mode: row.mode, players: row.players,
       modeLabel: modeLabel(row.mode as GameMode, row.players),
       owner: await ownerName(env.DB, row.owner_email), mine: seen.mine, hidden: seen.hidden,
-      ...(seen.mine ? { shared } : {}),
+      ...(seen.mine ? { shared, ...(audience ? { audience } : {}), ...(pulled ? { pulled } : {}) } : {}),
       // The creator's "Let classmates give feedback" switch (migration 0051).
       feedbackOn: (vrow?.feedback_on ?? 1) !== 0,
       choice: choiceOf(row.share_choice),

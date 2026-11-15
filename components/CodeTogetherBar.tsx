@@ -57,7 +57,7 @@ const NOTICE_MS = 6000;
 interface OpenSession { code: string; host: string; seats: number; present: number; here: boolean }
 type ListState =
   | { kind: 'loading' }
-  | { kind: 'rooms'; rooms: OpenSession[] }
+  | { kind: 'rooms'; rooms: OpenSession[]; /** In no class: here only as someone's approved guest (migration 0059), so they join but cannot start. */ guest?: boolean }
   | { kind: 'no-class' }
   | { kind: 'error'; text: string };
 
@@ -189,7 +189,7 @@ export default function CodeTogetherBar({
         if (!live) return;
         if (r.status !== 200) setList({ kind: 'error', text: errorOf(r) });
         else if (r.body.inClass === false) setList({ kind: 'no-class' });
-        else setList({ kind: 'rooms', rooms: Array.isArray(r.body.rooms) ? (r.body.rooms as OpenSession[]) : [] });
+        else setList({ kind: 'rooms', rooms: Array.isArray(r.body.rooms) ? (r.body.rooms as OpenSession[]) : [], guest: r.body.guest === true });
       } catch {
         if (live) setList({ kind: 'error', text: 'Could not reach the server. Trying again.' });
       }
@@ -467,6 +467,8 @@ export default function CodeTogetherBar({
 
   // ---- the popup ------------------------------------------------------------
   const blocked = list.kind === 'no-class';
+  // A guest (migration 0059) joins a session their host started; they cannot start one, so Start is not offered.
+  const guestOnly = list.kind === 'rooms' && !!list.guest;
   const dialog = !open ? null : (
     <CodeTogetherDialog title={session ? 'Coding together' : 'Code together'} onClose={close}>
       {session ? (
@@ -494,13 +496,14 @@ export default function CodeTogetherBar({
         </>
       ) : (
         <>
-          <p style={S.lead}>Write one program with classmates, at the same time.</p>
+          <p style={S.lead}>{guestOnly ? 'Join a session your host started. Ask them for the code, or pick it below.' : 'Write one program with classmates, at the same time.'}</p>
           {note ? <div aria-live="polite" style={{ color: 'var(--c-orange)' }} data-testid="together-note">{note}</div> : null}
           {error ? <div role="alert" style={{ color: 'var(--c-red)' }}>{error}</div> : null}
           {blocked ? (
             <div>Join a class to code together.</div>
           ) : (
             <>
+              {!guestOnly && (
               <section style={S.section} aria-labelledby={`${uid}-start`}>
                 <h3 id={`${uid}-start`} style={S.h3}>Start a session</h3>
                 <div style={row}>
@@ -520,6 +523,7 @@ export default function CodeTogetherBar({
                   <button type="button" style={btn} disabled={busy} onClick={() => void start()}>Start</button>
                 </div>
               </section>
+              )}
               <section style={S.section} aria-labelledby={`${uid}-join`}>
                 <h3 id={`${uid}-join`} style={S.h3}>Join with a code</h3>
                 <div style={row}>
@@ -542,7 +546,7 @@ export default function CodeTogetherBar({
                 {picking ? <PicturePicker id="code-together-pictures" typed={typed} setTyped={setTyped} busy={busy} /> : null}
               </section>
               <section style={S.section} aria-labelledby={`${uid}-open`}>
-                <h3 id={`${uid}-open`} style={S.h3}>Open {LANG_NAME[lang]} sessions in your classes</h3>
+                <h3 id={`${uid}-open`} style={S.h3}>{guestOnly ? `Open ${LANG_NAME[lang]} sessions from your hosts` : `Open ${LANG_NAME[lang]} sessions in your classes`}</h3>
                 {list.kind === 'loading' ? <div style={dim}>looking...</div> : null}
                 {list.kind === 'error' ? <div style={dim}>{list.text}</div> : null}
                 {list.kind === 'rooms' && list.rooms.length === 0 ? (

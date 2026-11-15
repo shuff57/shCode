@@ -19,6 +19,7 @@
 // the library's per-item cap is skipped. No email is ever in the response.
 
 import { gameClassesFor, json, visibleGame, type SessionData } from '../../../_shared/games';
+import { publicItemIdsOf } from '../../../_shared/publicShare';
 import { MAX_ITEM_BYTES, isKind, r2Key, type LibraryKind } from '../../../_shared/library';
 import { isGameId, usedItems } from '../../../../lib/games-core';
 import { metaFrames, type GameAsset } from '../../../../lib/game-assets';
@@ -53,6 +54,9 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
   let available: Set<string>;
   if (seen.mine) {
     available = new Set(used.map((u) => u.id));
+  } else if (seen.viaPublic) {
+    // Seen only because the game is public (migration 0058): it brings the author's items that are public too.
+    available = await publicItemIdsOf(env.DB, author);
   } else {
     const classes = await gameClassesFor(env.DB, data, id);
     available = new Set();

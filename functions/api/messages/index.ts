@@ -20,6 +20,7 @@ import {
   memberView, nameOf, newId, personKeys, postBlock, prepareSend, roleIn, sendRefusal, sendRule, toPeople, unreadCount,
   type SessionData,
 } from '../../_shared/messages';
+import { GUEST_TAG, liveGuestsOfHost, liveHostsOfGuest } from '../../_shared/guests';
 import {
   CHANNELS_PER_CLASS, GROUP_MAX_PEOPLE, MADE_PER_DAY, cleanChannelName, cleanGroupTitle, isPersonKey, pairKey,
   type PeopleClass, type SendBlock,
@@ -51,10 +52,30 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ en
         else if (l.own >= 1) blocked = 'muted';
       }
       const listed = allBlocked ? [] : teaches || !blocked ? everyone : everyone.filter((p) => p.teacher);
-      const keys = await personKeys(env.DB, listed.map((p) => p.email));
+      // The student's own approved guests of this class (migration 0060) can be written to like a classmate, tagged "(guest)",
+      // and only while their host (this student) is allowed to write to classmates.
+      const guests = !teaches && !allBlocked && !blocked
+        ? await Promise.all((await liveGuestsOfHost(env.DB, me, id)).map(async (g) => ({ email: g.email, name: (await nameOf(env.DB, g.email)) + GUEST_TAG, teacher: false })))
+        : [];
+      const keys = await personKeys(env.DB, [...listed, ...guests].map((p) => p.email));
       classes.push({
-        id, name: cls.name, teaches, people: toPeople(listed, keys),
+        id, name: cls.name, teaches,
+        people: [...toPeople(listed, keys), ...toPeople(guests, keys).map((p) => ({ ...p, guest: true }))],
         classmatesBlocked: allBlocked ?? blocked, ...(allBlocked ? { allBlocked } : {}),
+      });
+    }
+    // Someone's GUEST (migration 0060): not in the class, so it is not listed as one of theirs; the one person they may write to
+    // is their host, named by the host, and the host's own levels decide whether that is open.
+    for (const h of await liveHostsOfGuest(env.DB, me)) {
+      const cls = await classInfo(env.DB, h.classId);
+      if (!cls) continue;
+      const block = await postBlock(env.DB, cls, h.host, 'student', 'peers');
+      const hostName = await nameOf(env.DB, h.host);
+      const hostKeys = await personKeys(env.DB, [h.host]);
+      classes.push({
+        id: h.classId, name: `Guest of ${hostName}`, teaches: false, guestOf: true,
+        people: block ? [] : toPeople([{ email: h.host, name: hostName, teacher: false }], hostKeys),
+        classmatesBlocked: block, ...(block ? { allBlocked: block } : {}),
       });
     }
     classes.sort((a, b) => a.name.localeCompare(b.name));
@@ -137,7 +158,9 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ e
   // Someone who is not in the class learns nothing about who is.
   if (!rule.fromRole) return json({ error: 'That person is not in this class.' }, 404);
   if (rule.why === 'other-left') return json({ error: 'That person is not in this class.' }, 404);
-  const toName = await nameOf(env.DB, to, rule.toRole === 'teacher');
+  // The guest of a host-and-guest pair (migration 0060) is named with " (guest)" wherever the other person sees them.
+  const tagged = (email: string, name: string) => (rule.guest && email === rule.guestEmail ? name + GUEST_TAG : name);
+  const toName = tagged(to, await nameOf(env.DB, to, rule.toRole === 'teacher'));
   if (rule.why) return json(sendRefusal(rule.why, toName, cls.name), 403);
 
   const c = await prepareSend(env.DB, data.email, body);
@@ -145,17 +168,18 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ e
 
   const key = pairKey(cls.id, data.email, to);
   const existing = await env.DB.prepare(`SELECT id FROM message_threads WHERE pair_key = ?`).bind(key).first<{ id: string }>();
-  const capped = await capRefusal(env.DB, data, existing?.id ?? null);
+  // A guest is capped whatever their account's role (migration 0060).
+  const capped = await capRefusal(env.DB, data, existing?.id ?? null, Date.now(), 'students', !!rule.guest);
   if (capped) return json({ error: capped }, 429);
 
   let threadId = existing?.id;
   if (!threadId) {
     const id = newId();
-    const myName = await nameOf(env.DB, data.email, rule.fromRole === 'teacher');
+    const myName = tagged(data.email, await nameOf(env.DB, data.email, rule.fromRole === 'teacher'));
     await env.DB.batch([
       env.DB.prepare(
-        `INSERT OR IGNORE INTO message_threads (id, class_id, pair_key, kind, created_by, created_at, last_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      ).bind(id, cls.id, key, rule.kind, data.email, now, now),
+        `INSERT OR IGNORE INTO message_threads (id, class_id, pair_key, kind, created_by, created_at, last_at, guest) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      ).bind(id, cls.id, key, rule.kind, data.email, now, now, rule.guest ? 1 : 0),
     ]);
     // Two people starting the same conversation at once: both land in the one that won.
     threadId = (await env.DB.prepare(`SELECT id FROM message_threads WHERE pair_key = ?`).bind(key).first<{ id: string }>())!.id;

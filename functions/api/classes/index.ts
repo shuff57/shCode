@@ -3,6 +3,7 @@
 
 import { generateClassCode, getTeacherClasses, isTeacherOrAdmin } from '../../_shared/classAuth';
 import { getSchoolYear } from '../../_shared/schoolYear';
+import { joinTeacherAudiences } from '../../_shared/audience';
 
 interface Env {
   DB: D1Database;
@@ -46,6 +47,14 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   )
     .bind(id, name, code, data.email, schoolYear, createdAt)
     .run();
+
+  // Students who shared something with "all of this teacher's classes" (migration 0057) reach the new class too.
+  // Best effort: a failure here must never stop a class being made.
+  try {
+    await env.DB.batch(joinTeacherAudiences(env.DB, id, data.email, createdAt));
+  } catch (err) {
+    console.error('joinTeacherAudiences (class created) failed', err);
+  }
 
   return json(
     {

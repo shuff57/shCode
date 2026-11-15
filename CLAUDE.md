@@ -944,6 +944,148 @@ an Issues tab (`components/IssuesTab.tsx`) and /messages links Issues; staff kee
 go into a group or channel ("Send to..." lists them); an invitation (Code together, Watch live) only to a person or a
 group. Tests: `scripts/test-chat-groups.mjs` (npm test). Deploy: apply 0055 before the site.
 
+### Edit, delete and @mention (migration 0056, 2026-11-14; not deployed yet)
+Owner's decisions 2026-11-14. **Edit.** A person edits their own message (any time, no window; `POST /api/messages/[id]
+{action:'edit', messageId, body, mentions?}`, `editMessage()` in `functions/_shared/messages.ts`). `messages.body` is always
+the CURRENT words; the words replaced go into `message_edits` first, so the **first row is the original**. Classmates see the
+new words and "(edited)"; **only the class's teachers (and an admin) are ever sent `history`** (`seesOriginals` in
+`threadView`: role `teacher` of the class, which also covers a student-to-teacher conversation where the teacher is a member
+and `moderate` is false). Editing is sending again: `threadBlock` applies (a student whose level is Off cannot edit), the
+`findPII` check runs on the new words, 20 edits per message (`MAX_EDITS_PER_MESSAGE`), 10 a minute per person. **Delete.**
+`{action:'unsend', messageId}` sets `messages.retracted_at`; the words STAY in `body`. Everyone but the class's teachers gets
+`body: null` and no program ("Message deleted"); a teacher gets the words, struck through, "Deleted by its author". That is
+**separate from a teacher's Remove** (`deleted_at`/`deleted_by`, "Removed by a teacher", undone by Put back): a student cannot
+edit or delete a message a teacher removed. Deleting works even when sending is blocked (it says less). **Anything that reads
+`messages` for a student must treat `retracted_at` like `deleted_at`**: the unread queries, the list snippet, `GET /api/shares/[id]`
+(404 for everyone but the class's teachers) and `mayWatch` in `functions/_shared/live.ts` all do; a new reader must too.
+**@mention.** Typing `@` in a group or channel offers `ThreadView.mentionable` (a group's other people; a channel's whole
+class, teachers too; never a two-person conversation). The page writes `@Name ` into the words and sends the person KEYS
+(`mentions`); the server keeps one only if that person may read the conversation AND `hasMention(body, name)` finds
+`@name` in the words (silently dropped otherwise, at most `MENTIONS_PER_MESSAGE`). `message_mentions.created_at` is when the
+person was first named: an edit leaves a kept mention's row alone, adds rows for new names and deletes dropped ones. A
+mention counts on the envelope (`unreadCount`) even in a channel the person never opened (a channel's read mark exists only
+after they open or post, so that query uses `LEFT JOIN` and a still-in-the-class check), and the list marks the thread with
+an "@" badge (`ThreadSummary.mentioned`). Pieces: `lib/messages-core.ts` (`hasMention`, `mentionParts`, `MessageItem.edited|
+deleted|mentions|canEdit|canDelete|history`), `components/Mailbox.tsx` (`MentionField`, `MessageRow`), `components/MessageHistory.tsx`
+(the teacher's "show the original", also in `ClassMessages.tsx`). Deleting a conversation or a class removes `message_edits` and
+`message_mentions` too. Tests: `scripts/test-message-edits.mjs` (npm test). Apply 0056 (`npm run d1:migrate`) before the site.
+
+### Students in more than one class (2026-11-14)
+Nothing server-side ever stopped this: `enrollments` is keyed `(class_id, student_email)` and `POST /api/join-class` only
+refuses a repeat of the same class. What was missing was the way in: the header's yellow "Join your class" shows only while
+a student has NO class (`HeaderNav` `showJoin`), so a student in one class had no link to a second. Now the account menu has
+**Join a class** for every student (`AuthButton`), and `/join-class` lists the classes the student is in and says "Join another
+class". (It also read `className` from an answer that carries `enrollment.class_name`, so its success line always said "the
+class".) Lesson progress is NOT per class; due dates, waivers, weights and grades are (`studentGrading()` per class). Leaving a
+class is not built.
+
+### Leaving a class (2026-11-14; no migration)
+`POST /api/leave-class {classId}` (`functions/api/leave-class.ts`), the mirror of join-class, on the join page (each class chip has
+Leave, with an inline confirmation that says what stops). Students only. It deletes only the enrollment, as a teacher's removal
+does (`DELETE /api/classes/[id]/enrollments/[email]`): lesson state, drafts and submissions are keyed to the student and are kept,
+and the class code lets them back in. It also takes their shares out of that class: a share with just some classes leaves this
+one; a share with "all of <teacher>'s classes" (migration 0057) stays while they still have another class OWNED by that teacher
+and ends entirely (every row, and `audience_teacher`) when this was the last. Nothing they shared comes back on rejoin. Their
+messages stay and a teacher can still read them; they cannot send (`threadBlock` says they left). An ended enrollment reads as
+"not in that class" (404). Tests: `scripts/test-leave-class.mjs` (npm test). **join-class takes over an ENDED enrollment** (an
+`ON CONFLICT ... DO UPDATE ... WHERE expires_at <= now`: fresh dates, self-enrolled, one row); before 2026-11-14 the row's primary key
+blocked it with "already enrolled" and an expired or rolled-over student could never rejoin with the code. An active enrollment
+still answers 409.
+
+### Who a share goes to: "My classes" and "All of <teacher>'s classes" (migration 0057, 2026-11-14; not deployed yet)
+Step 1 of `codehs-review/ASSET-AUDIENCE-SPEC.md`. Owner's decisions: "any of my classes" means all of the TEACHER's classes;
+Public is built (next section) for accounts that are signed in AND in a class (an approved guest counts too, see Guests; open signup makes "any signed-in account" the open web). **A share is still one row per (item, class)** in `library_shares` /
+`library_game_shares`, so the ~14 readers and every teacher-side hide are untouched; the audience only decides WHICH classes get a
+row (`functions/_shared/audience.ts`, the one place). `POST /api/library/[id]/share` and `POST /api/games/[id]/share` take
+`audience: {classes:[id]} | {teacher:<person key>}`; `{teacher}` expands to every live class that teacher owns or co-teaches,
+INCLUDING ones the student is not in (so Cy in Period 3 sees what Ana in Period 1 shared), and is remembered in
+`audience_teacher` (an email, never sent to a page) so `joinTeacherAudiences` gives the item to a class that teacher creates
+(`functions/api/classes/index.ts`) or co-teaches later (`.../teachers/index.ts`). **A request with no `audience` for something
+already shared KEEPS its audience** (`currentAudience`): the Games Library chooser, a stale tab and any "change who may do what"
+save must never widen a narrowed share. Only a student may use `{teacher}`, only for a teacher they have a class with; classes
+must be ones the caller is in; a hidden share stays hidden when the audience changes. `GET /api/audiences` feeds the picker (a
+student's classes plus one entry per teacher with a class COUNT; other classes' names and every email are never sent). The
+owner's lists and `GET /api/games/[id]` carry `audience`. UI: `components/AudiencePicker.tsx` in `ShareToggle` (pictures,
+sounds, fonts), Publish game and the Games Library chooser; it renders nothing for a student in one class whose teacher has no
+others. Types and pure rules are `lib/audience.ts` (the server imports it, so no `fetch` there: the call is
+`lib/audience-client.ts`). `server.js` routes `/api/audiences` for dev. Tests: `scripts/test-audience.mjs` (npm test). Apply 0057
+before the site.
+
+### Everyone, the Public rung (migration 0058, 2026-11-14; not deployed yet)
+Step 2 of `codehs-review/ASSET-AUDIENCE-SPEC.md`. Owner's decisions: live at once, no delay; no email service (a teacher is told in
+the app); a pull shows the student "Your teacher took this down" with an optional short reason (140 characters); the gate is
+**vetted accounts only**, never "any signed-in account" (signup is open). Every rule is `functions/_shared/publicShare.ts`.
+- **Who sees it:** `viewerVetted` = a teacher, an admin, or a student in a live class; anyone else gets 403 from `GET /api/public`
+  and a 404 from every reader. **Who makes it:** a student in a live class, and only while NO live class of theirs has
+  `classes.public_sharing_off` (`ownerOkSql`/`ownerStatus`); an owner who leaves their last class goes dark.
+- **Making it:** `audience: {public:true}` on the two share routes. Live at once; the same `findPII` check as messages runs on an
+  item's name (a game: title AND code); refused 403 when a class switched it off or a teacher pulled it (`publicShareProblem`).
+  It also keeps the item in ALL the owner's classes (that is where a pulled one falls back to). One row per thing in
+  `public_shares`; `audienceMap` reports `{kind:'public'}` while the row is live.
+- **A public viewer gets** play, copy or remix (if its choice allows) and star; **never** comments, suggestions, proposed changes or
+  versions. `visibleGame` returns `viaPublic` for a game seen only through Everyone; `gameAccess` refuses `viaPublic` (otherwise a
+  public viewer would read students' free-text change conversations) and `feedbackState` finds no class to read it through. A new
+  reader of a game that is class-only must refuse `viaPublic`. `GET /api/games/[id]/assets` brings a public game's PUBLIC items
+  only; `GET /api/library/shared/[id]` falls back to a public item; `GET /api/public` is the list the Library's "Everyone" sections
+  draw (`ClassLibrary source="public"`, `GamesLibrary`).
+- **Pulling:** `POST /api/classes/[id]/public-shares {action:'pull', kind, id, reason?}` by an owner/co-teacher/admin of a class that
+  holds the student NOW; a student in two classes has two teachers and either may pull. **Sticky:** the row stays with
+  `hidden_at`, narrowing or stopping never deletes it (`unpublishStatement` only removes a LIVE row), so the student cannot make it
+  public again. **Putting back deletes the row** (`restorePublic`): permission, not publication, so a student who narrowed to their
+  classes after the pull is not republished against their choice (found by a test that asserted nothing). The class switch is
+  `class-off|class-on` on the same route. Panel: `components/ClassPublicShares.tsx`, the "Newly public" card on the Students tab
+  (`#public-shares`).
+- **Told in the app:** `publicNotices` adds a `public` kind to the envelope's Activity feed (`lib/game-notices-core.ts`): a teacher
+  sees "<name> made the game "X" public" (14 days, links to the class list); an owner sees "Your teacher took down your game "X"",
+  the reason as the snippet. Unread is keyed by the notice's `key`, not the game id. The badge counts it like any Activity item.
+- **Owner's side:** lists and `GET /api/games/[id]` carry `pulled: {reason, at}`; `AudiencePicker` shows Everyone, disabled with the
+  reason when closed (`pulled`, a class switch, or no class). The picker now shows even for a student in one class ("My class" with
+  no ticks), because Everyone is a new choice. `lib/audience.ts` stays pure (the server imports it).
+- Tests: `scripts/test-public-share.mjs` (npm test); its three safeguards were mutation-checked (public viewers refused by
+  `gameAccess`, the vetted gate, the sticky pull). Apply 0058 (`npm run d1:migrate`) before the site.
+
+### Guests, and messaging between a host and their guest (migrations 0059 and 0060, 2026-11-14; not deployed yet)
+`codehs-review/GUEST-COLLAB-SPEC.md`. Owner's decisions: a student invites an existing account, **a teacher approves**, **any
+account may be a guest and the teacher decides**, an approved guest counts as vetted for Everyone, and (later the same day) **a host
+and their guest can message each other in soSHial**. Every rule is `functions/_shared/guests.ts`.
+- **What a guest is:** a row in `sandbox_guests`, NOT an enrollment: on no roster, no gradebook, no `classPeople()`, no channel, no
+  group, no @mention. The sandbox was never gated on lessons; what a person with no class lacks is the class-bound features, and a
+  guest gets exactly these bridges: (1) join Code together sessions and game rooms their HOST starts (`rooms.ts` `mayJoin` asks
+  `isApprovedGuestOf`; `GET /api/rooms` lists only their hosts' sessions and answers `guest: true`, `POST` refuses them, and the
+  popup hides Start); (2) count as vetted for Everyone (`viewerVetted` in `publicShare.ts` asks `isApprovedGuest`);
+  (3) message the host (below). They cannot host, share into a class, or make anything public.
+- **Flow:** `POST /api/guests {classId, relation?}` (a student in a live class; 3 at a time; the host's own words, 60 characters,
+  `findPII`) makes an 8-character one-use code (7 days), shown only to the host on the account page (`components/GuestInvites.tsx`,
+  also a `/guest/?code=` link). The guest, signed in, uses it on `/guest` (`POST /api/guests/redeem`, throttled `guestRedeem`): it
+  ASKS ('pending'); nothing opens. A teacher of the vouching class approves or declines on the class page (`components/ClassGuests.tsx`,
+  `/api/classes/[id]/guests`): approved until the school year's cutoff (`ends_at`); **that list is the one place a guest's EMAIL is
+  sent** (signup has no verification, so the address, role and account age are what an approval turns on). Wrong, used, expired and
+  ended codes all read the same 404. A classmate of the host, an admin and a teacher of the class are refused at redeem (they already
+  join). **A teacher's no stands** (the pair cannot use another code); a host or guest ending it themselves does not bar the pair.
+- **When it holds:** approved, not past `ends_at`, the vouching class not archived and not `guests_off`, and the host still enrolled
+  (`liveGuestSql`). A per-class `classes.guests_off` switch shuts all of a class's guests out at once.
+- **Ending it** (host, guest or teacher; `DELETE /api/guests/[id]`, teacher `revoke`) drops the guest's seats in running sessions
+  AT ONCE: `guestSeats.ts closeGuestSeats` marks them left in D1 and sends the live room its existing `leave` control, which LiveDoc and
+  LiveRoom already handle (**no Worker change**; the spec's earlier "not instant" worry was wrong). `guests.ts` imports neither
+  `rooms.ts` nor `live.ts` (`mayJoin` imports it), which is why `closeGuestSeats` lives in its own file.
+- **Messaging (0060):** an ordinary two-person conversation (`kind 'students'`) filed under the HOST's vouching class with
+  `message_threads.guest = 1`, so the class's teachers read it and can Remove (it shows in their class Messages list, the guest named
+  with " (guest)"), the personal-details filter and caps run, and **the host's messaging level governs both directions** (a teacher who
+  sets that student to Teacher only or Off silences the pair; `sendRule` calls `postBlock` for the host). Host and guest ONLY: a
+  guest cannot write to a classmate (404), make a group, or see a channel; `sendRule` finds the pair through `guestPair` (approved
+  or ended rows only: **a pending guest cannot message**). The host's people list offers the guest tagged and `guest: true`
+  (`PeoplePicker` and `useClasses(true)` keep guests out of groups); the guest's list is one `guestOf` entry, "Guest of <host>", with
+  only the host. An ended pair (revoked, expired, class switched off or archived, host left) shows `why: 'guest-ended'` and cannot
+  send, but both still READ; a new approval reuses the same conversation (one per pair per class). A guest is capped (10 a minute,
+  200 a day) whatever their account's role (`capRefusal` `forceCap`). The note above it is `GUEST_THREAD_NOTE`.
+- **Told in the app:** `guestNotices` adds a `guest` kind to the Activity feed: a teacher is asked (until they decide), a host and a
+  guest hear a TEACHER's decision ("Your teacher approved/said no..."); a host or guest ending it themselves is not "Your teacher".
+- **Dev:** `server.js` enrolls every dev student in the dev class on each call, so a no-class account needs a `dev_noclass=1` cookie.
+- Tests: `scripts/test-guests.mjs` (104 checks, npm test); the expiry, host-left, pending-counts-as-approved, live-room-notified,
+  ended-guest-can-send, host-levels-ignored and uncapped-teacher-guest safeguards were each mutation-checked. Apply 0059 and 0060
+  (`npm run d1:migrate`) before the site. Not built: a "(guest)" tag in the Code together lobby list (only in the live presence name),
+  and "Send to..." a program to a guest was not specially handled (it uses the same people list, so it works for host and guest).
+
 ### Programs sent in messages: copy, Code together, Watch live (migration 0054, 2026-11-14)
 The sandbox's Share menu has **Send to...** (`components/SendProgramButton.tsx`, JavaScript and moSHion modes, signed
 in and in a class): pick a person (same list and rules as New message), an optional note, and one of three kinds, stored

@@ -4,6 +4,7 @@
 
 import { canManageClass } from '../../../../_shared/classAuth';
 import { normalizeEmail } from '../../../../_shared/auth';
+import { joinTeacherAudiences } from '../../../../_shared/audience';
 
 interface Env {
   DB: D1Database;
@@ -66,6 +67,13 @@ export const onRequestPost: PagesFunction<Env, 'id', SessionData> = async (conte
       return json({ error: 'Already a co-teacher' }, 409);
     }
     throw err;
+  }
+
+  // Shares made with "all of <this teacher>'s classes" (migration 0057) now include this class. Best effort.
+  try {
+    await env.DB.batch(joinTeacherAudiences(env.DB, classId, target, now));
+  } catch (err) {
+    console.error('joinTeacherAudiences (co-teacher added) failed', err);
   }
 
   return json(

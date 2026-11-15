@@ -12,6 +12,7 @@
 import { CONTROL_HEADER, codeLangOf, watchSeatOf, type DocTicket, type LiveTicket } from '../../lib/live-protocol';
 import { ownerLabel } from './libraryShare';
 import { type Role, deviceOf, getRoom, liveRoomKey, mayJoin, normalizeCode, roomKind, roomPlayers } from './rooms';
+import { isApprovedGuestOf } from './guests';
 
 export type LiveAuth =
   | { ok: true; kind: 'game'; ticket: LiveTicket; roomKey: string }
@@ -28,7 +29,7 @@ export const NOT_WATCHING = 'You were not invited to watch that session.';
  * May this person WATCH a Code together session (read it as it is typed, change nothing)? They must
  * share a live class with its host, as anyone joining must, and be either a teacher (or admin), or
  * someone a "Watch live" message (migration 0054) invited to this very session, in a message a
- * teacher has not removed. A watcher holds no seat in D1.
+ * teacher has not removed and its author has not deleted (migration 0056). A watcher holds no seat in D1.
  */
 async function mayWatch(db: D1Database, room: { code: string; created_at: number; host_email: string }, email: string, role: Role, now: number): Promise<boolean> {
   if (!(await mayJoin(db, room.host_email, email, role, now))) return false;
@@ -36,7 +37,7 @@ async function mayWatch(db: D1Database, room: { code: string; created_at: number
   const invited = await db.prepare(
     `SELECT 1 AS x FROM message_shares s
        JOIN message_members m ON m.thread_id = s.thread_id AND m.email = ?
-       JOIN messages x ON x.id = s.message_id AND x.deleted_at IS NULL
+       JOIN messages x ON x.id = s.message_id AND x.deleted_at IS NULL AND x.retracted_at IS NULL
       WHERE s.kind = 'watch' AND s.room_code = ? AND s.room_created_at = ? AND s.author_email != ?
       LIMIT 1`,
   ).bind(email, room.code, room.created_at, email).first();
@@ -75,7 +76,9 @@ export async function authorizeLive(
   if (room.closed_at || room.expires_at <= now) return { ok: false, status: 410, error: 'That room has closed. Ask for a new code.' };
   if (me.left_at) return { ok: false, status: 404, error: 'You left that room. Join it again to play.' };
   if (room.live !== 1) return { ok: false, status: 409, error: 'That room is not a real-time room.' };
-  const ticket: LiveTicket = { code, seat: me.seat, seats: room.seats, name: ownerLabel(me.first_name, me.last_name), expiresAt: room.expires_at };
+  // An approved guest (migration 0059) is shown as one in the session, so nobody mistakes them for a classmate.
+  const guestTag = role !== 'admin' && room.host_email !== email && (await isApprovedGuestOf(db, room.host_email, email, now)) ? ' (guest)' : '';
+  const ticket: LiveTicket = { code, seat: me.seat, seats: room.seats, name: ownerLabel(me.first_name, me.last_name) + guestTag, expiresAt: room.expires_at };
   const roomKey = liveRoomKey(room);
   if (roomKind(room) !== 'code') return { ok: true, kind: 'game', roomKey, ticket };
   const lang = codeLangOf(room.game);

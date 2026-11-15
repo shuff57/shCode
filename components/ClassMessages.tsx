@@ -11,6 +11,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { errorText } from '../lib/http-error';
 import { useFeedback } from './FeedbackProvider';
 import ShareCardView from './ShareCardView';
+import MessageHistory from './MessageHistory';
 import { LEVEL_LABEL, type MessageLevel, type ShareCard } from '../lib/messages-core';
 
 interface Overview {
@@ -25,7 +26,10 @@ interface Overview {
 interface Thread {
   id: string;
   people: { name: string; teacher: boolean }[];
-  messages: { id: string; author: string; teacher: boolean; body: string; removed: boolean; at: number; share?: ShareCard | null }[];
+  messages: {
+    id: string; author: string; teacher: boolean; body: string; removed: boolean; at: number; share?: ShareCard | null;
+    edited?: boolean; deleted?: boolean; history?: { body: string; at: number }[];
+  }[];
 }
 
 function when(ms: number): string {
@@ -117,7 +121,7 @@ export default function ClassMessages({ classId }: { classId: string }) {
       <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, color: 'var(--c-meta)', maxWidth: '70ch' }}>
         Students can message you and their classmates, make groups and post in the class&rsquo;s channels, from the
         mailbox at the top of every page or the Messages page. Messages with phone numbers, addresses or emails are
-        refused. Every conversation between two students and every group is listed below, and students are told you can
+        refused. Every conversation between two students and every group is listed below (a student&rsquo;s talk with a guest they invited is too, marked guest), and students are told you can
         read them. The class&rsquo;s channels are in your own mailbox, where you can lock, rename or delete them. A program sent in a message shows as a card: Open runs the copy, Watch shows a session live. Your own conversations with students are in your mailbox.
       </p>
 
@@ -208,6 +212,7 @@ export default function ClassMessages({ classId }: { classId: string }) {
                               {m.body}
                             </div>
                             {m.share && <ShareCardView card={m.share} mine={false} author={m.author} onlooker />}
+                            <MessageHistory history={m.history} deleted={m.deleted} />
                           </div>
                           <button type="button" style={btn} disabled={busy} data-testid="class-messages-remove"
                             onClick={() => void act({ action: m.removed ? 'restore' : 'remove', messageId: m.id }, (j) => {
