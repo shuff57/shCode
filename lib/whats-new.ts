@@ -49,6 +49,48 @@ export interface WhatsNewEntry {
 
 export const WHATS_NEW: WhatsNewEntry[] = [
   {
+    id: '2026-11-guest-pass',
+    date: '2026-11-15',
+    audience: 'student',
+    title: 'Invite a guest to code with you',
+    summary:
+      'You can bring someone with an account, like a cousin or a friend at another school, into the coding sessions you start. ' +
+      'You tell your teacher who they are, and your teacher has to say yes before anything opens. ' +
+      'You and your guest can message each other, and your teacher can read those messages.',
+    steps: [
+      'Open your Account page and find Guests. Say who they are, how old they are, and what you will do together.',
+      'Press Make a guest code, then send the code or the link to them.',
+      'They use it on the Guest page. Your teacher says yes or no, and you hear back in the envelope.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-guest-pass.mp4',
+      poster: '/whats-new/2026-11-guest-pass.jpg',
+      alt: "Sam fills in the Guests form on the Account page: Jordan Reyes, my cousin, 13 to 17, Lincoln High School, and what they will build. Pressing Make a guest code shows an 8-letter code to send to Jordan.",
+    },
+    action: { label: 'Open Account', href: '/account' },
+  },
+  {
+    id: '2026-11-guest-approval',
+    date: '2026-11-15',
+    audience: 'teacher',
+    title: 'Guests: you decide who joins',
+    summary:
+      'A student can ask to bring someone with an account into the coding sessions they start. Nothing opens until you say yes. ' +
+      'The class page now has a Guests card showing what the student wrote about them, plus the guest’s own address and account. ' +
+      'You can also read their messages and end a guest at any time.',
+    steps: [
+      'Open your class, then the Students tab, and find Guests.',
+      'Read who the student says it is, and the guest’s email, role and account age.',
+      'Press Approve, or Say no. End access later if you change your mind.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-guest-approval.mp4',
+      poster: '/whats-new/2026-11-guest-approval.jpg',
+      alt: "The Guests card on the class page shows a request: Jordan, invited by a student, with the student's note (name, age group, school, and plan) and the guest's address. The teacher presses Approve and Jordan moves to the Approved list.",
+    },
+    action: { label: 'Open my classes', href: '/teacher' },
+  },
+  {
     id: '2026-11-groups-channels',
     date: '2026-11-14',
     audience: 'student',

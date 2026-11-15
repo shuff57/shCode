@@ -260,6 +260,8 @@ const MAYA = { email: 'maya@example.org', role: 'student', label: "Maya's screen
 const LEO = { email: 'leo@example.org', role: 'student', label: "Leo's screen" };
 // No dev_student cookie: the dev server's own identity, which owns the seeded 'dev-class' (DEV_REAL_DB=1).
 const TEACHER = { email: null, role: 'teacher', label: 'Teacher' };
+// A guest is an account in NO class (dev only: the `dev_noclass=1` cookie keeps server.js from enrolling it in the dev class).
+const JORDAN = { email: 'jordan@example.org', role: 'student', label: "Jordan's screen", noClass: true };
 // The change-flow clips' people: Nia makes the game, Kai remixes and proposes; Ivy and Ravi for the teacher poster.
 const NIA = { email: 'nia@example.org', role: 'student', label: "Nia's screen (made the game)" };
 const KAI = { email: 'kai@example.org', role: 'student', label: "Kai's screen" };
@@ -323,7 +325,67 @@ async function sendByApi(page, toName, body) {
   }, [toName, body]);
 }
 
+// Guests (migration 0059/0062): Sam makes a guest code through the API with what a teacher decides on; Jordan, in no class, uses it.
+const GUEST_DETAILS = { classId: 'dev-class', name: 'Jordan Reyes', relation: 'my cousin', age: 'teen', org: 'Lincoln High School', purpose: 'Build a platformer together after school' };
+
 const RECIPES = {
+  '2026-11-guest-pass': {
+    people: [SAM],
+    path: '/account/',
+    async before({ pages: [p] }) {
+      await p.getByTestId('guest-make').waitFor({ timeout: 60000 });
+      await p.locator('#guests').scrollIntoViewIfNeeded();
+      await p.evaluate(() => window.scrollBy({ top: -40 }));
+    },
+    async run({ demos: [d], pages: [p] }) {
+            await d.click(p.getByTestId('guest-name'), { ms: 250, after: 60 });
+      await d.type('Jordan Reyes', 22);
+      await d.click(p.getByTestId('guest-relation'), { ms: 250, after: 60 });
+      await d.type('my cousin', 22);
+      await d.cursorTo(p.getByTestId('guest-age'), 250);
+      await p.getByTestId('guest-age').selectOption('teen');
+      await d.pause(150);
+      await d.click(p.getByTestId('guest-org'), { ms: 250, after: 60 });
+      await d.type('Lincoln High School', 18);
+      await d.click(p.getByTestId('guest-purpose'), { ms: 250, after: 60 });
+      await d.type('Build a platformer together', 18);
+      await d.click(p.getByTestId('guest-make'), { ms: 300, after: 200 });
+      await p.getByTestId('guest-code-shown').waitFor({ timeout: 15000 });
+      await d.scrollTo(p.getByTestId('guest-code-shown'), 600);
+      await d.pause(2200);
+    },
+  },
+
+  '2026-11-guest-approval': {
+    people: [TEACHER],
+    path: '/teacher/?class=dev-class&tab=students',
+    async setup({ person }) {
+      const sam = await person(SAM, '/');
+      const jordan = await person(JORDAN, '/guest/');
+      const code = await sam.page.evaluate(async (body) => {
+        const r = await fetch('/api/guests', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        if (!r.ok) throw new Error(await r.text());
+        return (await r.json()).code;
+      }, GUEST_DETAILS);
+      await jordan.page.evaluate(async (c) => {
+        const r = await fetch('/api/guests/redeem', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: c }) });
+        if (!r.ok) throw new Error(await r.text());
+      }, code);
+    },
+    async before({ pages: [p] }) {
+      await p.getByTestId('guest-pending').waitFor({ timeout: 60000 });
+    },
+    async run({ demos: [t], pages: [p] }) {
+      await t.scrollTo(p.locator('#guests'), 700);
+      await t.pause(1500);
+      await t.cursorTo(p.getByTestId('guest-details'), 500);
+      await t.pause(2000);
+      await t.click(p.getByTestId('guest-approve'), { ms: 500, after: 400 });
+      await p.getByTestId('guest-approved').waitFor({ timeout: 15000 });
+      await t.pause(2200);
+    },
+  },
+
   '2026-11-messages': {
     people: [SAM, ALEX],
     path: '/',
@@ -1149,6 +1211,7 @@ async function newPerson(browser, base, person, path, storage, { record, size, t
   await ctx.addCookies([
     ...(person.email ? [{ name: 'dev_student', value: person.email, url: base }] : []),
     { name: 'dev_role', value: person.role, url: base },
+    ...(person.noClass ? [{ name: 'dev_noclass', value: '1', url: base }] : []),
   ]);
   const sets = Object.entries(storage || {}).map(([k, v]) => `localStorage.setItem(${JSON.stringify(k)}, ${JSON.stringify(v)});`).join('');
   await ctx.addInitScript(`try{${sets}}catch(e){}`);
