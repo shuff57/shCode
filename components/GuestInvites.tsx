@@ -5,6 +5,8 @@
 // uses it on /guest, and a teacher of the class you pick says yes or no BEFORE anything opens. You never type an email.
 // A guest is not in your class: no grades, no class messages, no class library, and they cannot start sessions of their own.
 // You and they can message each other, and a teacher of the class you pick can read it (migration 0060).
+// The form asks the host for what the teacher decides on (migration 0062): the guest's full name, who they are, an age group, where they
+// go to school or work, and what they will do together.
 // Renders nothing for someone who is in no class and has no guests (a teacher, or a student with no class yet).
 
 import { useCallback, useEffect, useState } from 'react';
@@ -12,6 +14,7 @@ import { errorText } from '../lib/http-error';
 
 interface Hosted {
   id: string; status: 'invited' | 'pending' | 'approved' | 'declined' | 'revoked'; className: string; relation: string;
+  invitedName?: string; age?: string; org?: string; purpose?: string;
   guest: string | null; code?: string; expiresAt?: number; endsAt: number | null; decidedAt: number | null;
 }
 interface Mine {
@@ -22,6 +25,9 @@ interface Mine {
 }
 
 const RELATION_MAX = 60;
+const NAME_MAX = 60;
+const ORG_MAX = 80;
+const PURPOSE_MAX = 120;
 const card = { maxWidth: 560, margin: '24px auto 0', background: 'var(--c-deep)', border: '1px solid var(--c-line)', borderRadius: 8, padding: 24 } as const;
 const small = { fontSize: 12, padding: '3px 9px', borderRadius: 4, cursor: 'pointer', background: 'transparent', color: 'var(--c-cyan)', border: '1px solid var(--c-line)' } as const;
 const field = { fontSize: 13, padding: '6px 8px', borderRadius: 4, background: 'var(--c-bg)', color: 'var(--c-fg)', border: '1px solid var(--c-line)', minWidth: 0 } as const;
@@ -44,7 +50,12 @@ function line(h: Hosted): { text: string; color: string } {
 export default function GuestInvites() {
   const [mine, setMine] = useState<Mine | null>(null);
   const [classId, setClassId] = useState('');
+  // What your teacher reads to decide (migration 0062): all of it in your own words, none of it a phone, email or address.
+  const [name, setName] = useState('');
   const [relation, setRelation] = useState('');
+  const [age, setAge] = useState('');
+  const [org, setOrg] = useState('');
+  const [purpose, setPurpose] = useState('');
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<{ text: string; bad: boolean } | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
@@ -65,10 +76,10 @@ export default function GuestInvites() {
     if (!classId || busy) return;
     setBusy(true);
     setNote(null);
-    const res = await fetch('/api/guests', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ classId, relation }) });
+    const res = await fetch('/api/guests', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ classId, name, relation, age, org, purpose }) });
     setBusy(false);
     if (!res.ok) { setNote({ text: await errorText(res), bad: true }); return; }
-    setRelation('');
+    setName(''); setRelation(''); setAge(''); setOrg(''); setPurpose('');
     setNote({ text: 'Made a code. Send it, or the link, to the person you are inviting.', bad: false });
     await load();
   }
@@ -110,12 +121,37 @@ export default function GuestInvites() {
               </select>
             </label>
           )}
+          <p style={{ margin: 0, fontSize: 12, color: 'var(--c-dim)', lineHeight: 1.5 }}>
+            Your teacher reads all of this to decide, so be straight with them. Words only: no phone number, email or home address.
+          </p>
           <label style={{ fontSize: 13, color: 'var(--c-fg)', display: 'flex', flexDirection: 'column', gap: 3 }}>
-            Who is this? <span style={{ color: 'var(--c-dim)', fontSize: 12 }}>Your teacher reads it. Words only, like &ldquo;my cousin&rdquo; (no phone or email).</span>
+            Their full name
+            <input value={name} maxLength={NAME_MAX} onChange={(e) => setName(e.target.value)} placeholder="First and last name" autoComplete="off" style={field} data-testid="guest-name" />
+          </label>
+          <label style={{ fontSize: 13, color: 'var(--c-fg)', display: 'flex', flexDirection: 'column', gap: 3 }}>
+            Who are they to you?
             <input value={relation} maxLength={RELATION_MAX} onChange={(e) => setRelation(e.target.value)} placeholder="my cousin" style={field} data-testid="guest-relation" />
           </label>
+          <label style={{ fontSize: 13, color: 'var(--c-fg)', display: 'flex', flexDirection: 'column', gap: 3 }}>
+            How old are they?
+            <select value={age} onChange={(e) => setAge(e.target.value)} style={field} data-testid="guest-age">
+              <option value="">Choose…</option>
+              <option value="under13">Under 13</option>
+              <option value="teen">13 to 17</option>
+              <option value="adult">18 or older</option>
+            </select>
+            {age === 'under13' && <span style={{ color: 'var(--c-red)', fontSize: 12 }}>Guests have to be 13 or older.</span>}
+          </label>
+          <label style={{ fontSize: 13, color: 'var(--c-fg)', display: 'flex', flexDirection: 'column', gap: 3 }}>
+            Where do they go to school or work?
+            <input value={org} maxLength={ORG_MAX} onChange={(e) => setOrg(e.target.value)} placeholder="Pleasant Valley High School" style={field} data-testid="guest-org" />
+          </label>
+          <label style={{ fontSize: 13, color: 'var(--c-fg)', display: 'flex', flexDirection: 'column', gap: 3 }}>
+            What will you do together?
+            <input value={purpose} maxLength={PURPOSE_MAX} onChange={(e) => setPurpose(e.target.value)} placeholder="Build a game together after school" style={field} data-testid="guest-purpose" />
+          </label>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button type="submit" className="btn-primary" disabled={busy || offAll || live >= mine.limits.maxGuests || !classId} data-testid="guest-make">
+            <button type="submit" className="btn-primary" disabled={busy || offAll || live >= mine.limits.maxGuests || !classId || age === 'under13' || !name.trim() || !relation.trim() || !age || !org.trim() || !purpose.trim()} data-testid="guest-make">
               {busy ? 'Making…' : 'Make a guest code'}
             </button>
             <span style={{ fontSize: 12, color: 'var(--c-dim)' }}>{live} of {mine.limits.maxGuests} guests</span>
@@ -133,8 +169,8 @@ export default function GuestInvites() {
             return (
               <li key={h.id} data-testid="guest-hosted" style={{ border: '1px solid var(--c-line)', borderRadius: 6, padding: '8px 12px' }}>
                 <div style={{ fontSize: 13, color: 'var(--c-fg)' }}>
-                  <strong>{h.guest ?? (h.relation || 'A guest')}</strong>
-                  {h.guest && h.relation && <span style={{ color: 'var(--c-dim)' }}> · {h.relation}</span>}
+                  <strong>{h.guest ?? (h.invitedName || h.relation || 'A guest')}</strong>
+                  {(h.guest ? h.relation : h.invitedName && h.relation) && <span style={{ color: 'var(--c-dim)' }}> · {h.relation}</span>}
                   <span style={{ color: 'var(--c-dim)' }}> · {h.className}</span>
                 </div>
                 <div style={{ fontSize: 12, color: st.color, marginTop: 2 }}>{st.text}</div>

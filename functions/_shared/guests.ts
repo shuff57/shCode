@@ -41,6 +41,99 @@ export interface GuestRow {
   id: string; host_email: string; class_id: string; guest_email: string | null; code: string; relation: string;
   status: GuestStatus; invited_at: number; expires_at: number; redeemed_at: number | null;
   decided_by: string | null; decided_at: number | null; ends_at: number | null;
+  // migration 0061 (a school email as proof)
+  guest_name: string; guest_age: string; guest_org: string; guest_purpose: string; // migration 0062
+  school_email: string | null; school_phrase: string | null; school_phrase_at: number | null; school_tries: number; school_verified_at: number | null;
+}
+
+// ---- a school email as proof (migration 0061) ------------------------------------------------------------------
+//
+// The site never sends mail. A class that requires it keeps a list of school domains; the guest names a school address on one of
+// them; the TEACHER'S card shows a one-time phrase; the teacher emails it from their school account to that address; the guest types
+// it back (POST /api/guests/verify). Only someone who can read that inbox has it. The teacher's approval is still the gate after.
+
+/** How long a phrase lives, and how many wrong ones before it is cleared (a teacher makes a new one). */
+export const SCHOOL_PHRASE_TTL_MS = 7 * 24 * 3600_000;
+export const MAX_PHRASE_TRIES = 5;
+export const MAX_SCHOOL_DOMAINS = 10;
+export const SCHOOL_PHRASE_PREFIX = 'shcode-';
+const PHRASE_LEN = 6;
+
+/** Public mail services: a class listing one would let anyone in, so they are refused as school domains. */
+const PUBLIC_MAIL = new Set([
+  'gmail.com', 'googlemail.com', 'outlook.com', 'hotmail.com', 'live.com', 'msn.com', 'yahoo.com', 'ymail.com', 'icloud.com', 'me.com',
+  'aol.com', 'proton.me', 'protonmail.com', 'gmx.com', 'mail.com', 'zoho.com',
+]);
+const DOMAIN_RE = /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$/;
+
+/** A teacher's list of school domains, typed as one box ("chicousd.net, student.chicousd.net"): tidied, or a plain reason. */
+export function cleanSchoolDomains(raw: unknown): { domains: string[] } | { error: string } {
+  const parts = (Array.isArray(raw) ? raw.map(String) : String(raw ?? '').split(/[\s,;]+/))
+    .map((p) => p.trim().toLowerCase().replace(/^@/, '')).filter(Boolean);
+  const domains = [...new Set(parts)];
+  if (domains.length > MAX_SCHOOL_DOMAINS) return { error: `List at most ${MAX_SCHOOL_DOMAINS} school domains.` };
+  for (const d of domains) {
+    if (d.length > 100 || !DOMAIN_RE.test(d)) return { error: `"${d}" is not a domain. Type it like yourschool.org (no @, no spaces).` };
+    if (PUBLIC_MAIL.has(d)) return { error: `${d} is a public mail service anyone can sign up for. List your school's own domain.` };
+  }
+  return { domains };
+}
+
+export const parseDomainList = (stored: string | null | undefined): string[] => (stored ?? '').split(',').map((d) => d.trim()).filter(Boolean);
+
+/** Is this address on one of the domains (the domain itself or a subdomain of it)? */
+export function onSchoolDomain(email: string, domains: string[]): boolean {
+  const at = email.lastIndexOf('@');
+  if (at < 1) return false;
+  const host = email.slice(at + 1);
+  return domains.some((d) => host === d || host.endsWith(`.${d}`));
+}
+
+/** A school address as typed: lower case, one address, on a listed domain, or a plain reason. */
+export function cleanSchoolEmail(raw: unknown, domains: string[]): { email: string } | { error: string } {
+  if (typeof raw !== 'string' || !raw.trim()) return { error: 'This class needs your school email. Type it in.' };
+  const email = raw.trim().toLowerCase();
+  if (email.length > 254 || !/^[^\s@,;<>()"]+@[^\s@,;<>()"]+\.[^\s@,;<>()"]+$/.test(email)) return { error: 'That does not look like an email address.' };
+  if (!onSchoolDomain(email, domains)) {
+    return { error: `That is not a school address this class accepts. It has to end in ${domains.map((d) => `@${d}`).join(' or ')}.` };
+  }
+  return { email };
+}
+
+const PHRASE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+export function newSchoolPhrase(): string {
+  const bytes = new Uint8Array(PHRASE_LEN);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => PHRASE_ALPHABET[b % PHRASE_ALPHABET.length]).join('');
+}
+
+/** What the guest typed, as the 6 stored characters: any case, with or without "shcode-" and spaces; null if it cannot be one. */
+export function normalizeSchoolPhrase(raw: unknown): string | null {
+  let p = String(raw ?? '').toUpperCase().replace(/[\s_]/g, '');
+  if (p.startsWith('SHCODE')) p = p.slice(6).replace(/^-/, '');
+  p = p.replace(/-/g, '');
+  return p.length === PHRASE_LEN && [...p].every((ch) => PHRASE_ALPHABET.includes(ch)) ? p : null;
+}
+
+export type SchoolState = 'none' | 'need-address' | 'need-phrase' | 'locked' | 'verified';
+
+/**
+ * Where a waiting request stands on the school-email proof. 'none' = this class does not ask for one. 'need-phrase' = the teacher's
+ * card holds a live phrase for the guest to type back; 'locked' = the phrase ran out or was guessed at too often, and a teacher has to
+ * make a new one.
+ */
+export function schoolState(required: boolean, row: Pick<GuestRow, 'school_email' | 'school_phrase' | 'school_phrase_at' | 'school_verified_at'>, now = Date.now()): SchoolState {
+  if (row.school_verified_at) return 'verified';
+  if (!required) return 'none';
+  if (!row.school_email) return 'need-address';
+  if (row.school_phrase && row.school_phrase_at != null && row.school_phrase_at + SCHOOL_PHRASE_TTL_MS > now) return 'need-phrase';
+  return 'locked';
+}
+
+/** Backstop: a phrase older than its life is deleted wherever it is read, so none outlives 7 days sitting in the table. */
+export async function clearOldPhrases(db: D1Database, now = Date.now()): Promise<void> {
+  await db.prepare(`UPDATE sandbox_guests SET school_phrase = NULL WHERE school_phrase IS NOT NULL AND (school_phrase_at IS NULL OR school_phrase_at <= ?)`)
+    .bind(now - SCHOOL_PHRASE_TTL_MS).run();
 }
 
 export function newGuestCode(): string {
@@ -72,6 +165,50 @@ export function cleanRelation(raw: unknown): { relation: string } | { error: str
   const pii = findPII(relation);
   if (pii) return { error: `That looks like it has ${piiWhat(pii)} in it. Say who they are without it (like "my cousin" or "a friend from robotics club").` };
   return { relation };
+}
+
+// ---- what the host says about their guest (migration 0062) ---------------------------------------------------
+
+export const GUEST_NAME_MAX = 60;
+export const GUEST_ORG_MAX = 80;
+export const GUEST_PURPOSE_MAX = 120;
+export type GuestAge = 'teen' | 'adult';
+export const GUEST_AGE_LABEL: Record<GuestAge, string> = { teen: '13 to 17', adult: '18 or older' };
+
+export interface GuestDetails { name: string; relation: string; age: GuestAge; org: string; purpose: string }
+
+function oneLine(raw: unknown, ask: string, label: string, min: number, max: number, example: string): { text: string } | { error: string } {
+  if (typeof raw !== 'string' || !raw.trim()) return { error: `Tell your teacher ${ask}.` };
+  const text = raw.replace(/\s+/g, ' ').trim();
+  // eslint-disable-next-line no-control-regex
+  if (/[\u0000-\u001f\u007f]/.test(text)) return { error: `The ${label} has special characters in it. Type it again in plain words.` };
+  const len = [...text].length;
+  if (len < min) return { error: `Say a little more for the ${label} (at least ${min} characters).` };
+  if (len > max) return { error: `Keep the ${label} to ${max} characters or fewer.` };
+  const pii = findPII(text);
+  if (pii) return { error: `The ${label} looks like it has ${piiWhat(pii)} in it. Leave it out (${example}).` };
+  return { text };
+}
+
+/**
+ * Everything a teacher needs to decide on a guest, from the host: their full name (first and last), who they are to the host, an age
+ * group, where they go to school or work, and what they will do together. All required, in the host's own words, none of it a
+ * phone, email or street address (findPII). A guest has to be 13 or older: under 13 is refused with a reason, never stored.
+ */
+export function cleanGuestDetails(body: { name?: unknown; relation?: unknown; age?: unknown; org?: unknown; purpose?: unknown }): GuestDetails | { error: string } {
+  const name = oneLine(body.name, 'their full name', 'name', 3, GUEST_NAME_MAX, 'just the name');
+  if ('error' in name) return name;
+  if (name.text.split(' ').filter((w) => /\p{L}/u.test(w)).length < 2) return { error: 'Type their first and last name, so your teacher can tell who it is.' };
+  if (!/^[\p{L}][\p{L} .'’-]*$/u.test(name.text)) return { error: 'A name is letters, spaces and dashes only.' };
+  const rel = oneLine(body.relation, 'who they are to you', 'relationship', 2, RELATION_MAX, 'like "my cousin" or "a friend from robotics club"');
+  if ('error' in rel) return rel;
+  if (body.age === 'under13') return { error: 'Guests have to be 13 or older.' };
+  if (body.age !== 'teen' && body.age !== 'adult') return { error: 'Choose how old they are: 13 to 17, or 18 or older.' };
+  const org = oneLine(body.org, 'where they go to school or work', 'school or work', 2, GUEST_ORG_MAX, 'just the name of the school or place');
+  if ('error' in org) return org;
+  const purpose = oneLine(body.purpose, 'what you will do together', 'plan', 5, GUEST_PURPOSE_MAX, 'just what you will build or practise');
+  if ('error' in purpose) return purpose;
+  return { name: name.text, relation: rel.text, age: body.age, org: org.text, purpose: purpose.text };
 }
 
 // ---- who holds an approved guest row now ---------------------------------------------------------------------

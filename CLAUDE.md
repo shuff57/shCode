@@ -1080,10 +1080,42 @@ and their guest can message each other in soSHial**. Every rule is `functions/_s
   200 a day) whatever their account's role (`capRefusal` `forceCap`). The note above it is `GUEST_THREAD_NOTE`.
 - **Told in the app:** `guestNotices` adds a `guest` kind to the Activity feed: a teacher is asked (until they decide), a host and a
   guest hear a TEACHER's decision ("Your teacher approved/said no..."); a host or guest ending it themselves is not "Your teacher".
+- **A school email as proof (migration 0061, 2026-11-15; not deployed yet).** Owner's decisions: the district's mail blocks students'
+  incoming and outgoing OUTSIDE mail, so **the site sends and receives no email at all**; only school-account-to-school-account
+  mail works, and the proof rides on it. A class can switch it on (`classes.guest_school_required`, default off, with its own list
+  `guest_school_domains`: a teacher's allowlist, never a public mail service such as gmail.com, `cleanSchoolDomains`). Then: the
+  guest signs up with a personal address as always, and when redeeming names a SCHOOL address on that list (a subdomain counts, a
+  look-alike does not; a typo leaves the code unused); the row gets a one-time 6-character phrase (`school_phrase`, shown as
+  `shcode-XXXXXX`) that appears **only on the teacher's Guests card** (`GET /api/classes/[id]/guests`, `school.phrase`) and in no
+  other answer; the TEACHER emails it from their school account to that address; the guest types it back (`POST /api/guests/verify`).
+  That proves they read that inbox. **It never approves by itself:** `approve` is refused (409) until `school_verified_at` is set, and
+  the teacher's yes or no is still the gate after it. The phrase is deleted when used, when the request is decided, after 5 wrong tries
+  (`MAX_PHRASE_TRIES`; then the card says "locked" and the teacher presses "Make a new phrase", `school-phrase`), and after 7 days
+  (`clearOldPhrases` runs wherever the rows are read); the address stays on the row for the teacher's record and is shown only to that
+  class's teachers and to the guest themselves, never the host. A class that turns the proof on while someone is waiting asks that
+  guest for an address (`POST /api/guests/school`, which also changes a wrong one and kills the old phrase); turning it off returns
+  the approval to being the only gate (the fallback). No ID photo is stored. Teacher setting: `school-settings {required, domains}`
+  on the class guests route (`components/ClassGuests.tsx`); guest side: `SchoolProof` in `app/guest/page.tsx`. **Student-to-student
+  mail was NOT used as a proof:** the host would have to see the phrase and could pass it on by any route, so it would only prove the
+  host's say-so. Weakness left: it proves a person with a school address on the list, not that they are a good guest.
+- **What the host tells the teacher (migration 0062, 2026-11-15; not deployed yet).** Owner's decision: collect what a teacher needs to
+  decide on a guest. `POST /api/guests` now REQUIRES `name` (first and last, letters only), `relation` (who they are to the host),
+  `age` (`'teen'` 13 to 17 or `'adult'` 18+; **under 13 is refused with the reason and never stored**), `org` (where they go to school
+  or work) and `purpose` (what they will do together, 5 to 120 characters); every one is one line in the host's own words, run through
+  `findPII` (no phone, email or street address), rules in `cleanGuestDetails` (`functions/_shared/guests.ts`). The form is on the
+  Account page (`GuestInvites.tsx`). **Only a teacher of the class sees them** (the Guests card shows them, flags an adult in orange, and
+  says when the account's own name shares no word with the name given: `sameName`); the guest's own list never carries them, the host
+  sees their own words back. They are the host's claim, unverified: the address, role and account age on the card are still what an
+  approval turns on. Rows from before 0062 have empty strings and show only what they have.
+- **The school-email proof is built but OFF** (owner, 2026-11-15: for now a guest's pass rests on the teacher's approval alone; the
+  per-class switch stays unticked). Real mail from a district address to a student's inbox is done BY THE TEACHER from their own school
+  account; the site never sends mail.
 - **Dev:** `server.js` enrolls every dev student in the dev class on each call, so a no-class account needs a `dev_noclass=1` cookie.
-- Tests: `scripts/test-guests.mjs` (104 checks, npm test); the expiry, host-left, pending-counts-as-approved, live-room-notified,
-  ended-guest-can-send, host-levels-ignored and uncapped-teacher-guest safeguards were each mutation-checked. Apply 0059 and 0060
-  (`npm run d1:migrate`) before the site. Not built: a "(guest)" tag in the Code together lobby list (only in the live presence name),
+- Tests: `scripts/test-guest-school-email.mjs` (67 checks, npm test; twelve safeguards mutation-checked: the approve gate, phrase
+  deleted on use, wrong tries counted, lockout, 7-day deletion, domain check, look-alike domains, public mail, phrase kept after a
+  decision, the phrase leaking to the guest, a phrase matched for anyone, a confirmed address editable); `scripts/test-guests.mjs` (121 checks, npm test; the under-13 refusal, the first-and-last-name rule, the personal-details check and the required plan were each mutation-checked); the expiry, host-left, pending-counts-as-approved, live-room-notified,
+  ended-guest-can-send, host-levels-ignored and uncapped-teacher-guest safeguards were each mutation-checked. Apply 0059-0062
+  (`npm run d1:migrate`) before the site (0059 and 0060 are applied to production as of 2026-11-15). Not built: a "(guest)" tag in the Code together lobby list (only in the live presence name),
   and "Send to..." a program to a guest was not specially handled (it uses the same people list, so it works for host and guest).
 
 ### Programs sent in messages: copy, Code together, Watch live (migration 0054, 2026-11-14)

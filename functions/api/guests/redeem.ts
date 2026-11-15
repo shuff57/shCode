@@ -9,7 +9,9 @@
 // Anyone with an account may be a guest, a teacher included: the teacher decides, and sees the address and role to do it.
 
 import { checkRateLimit, rateLimitExceeded } from '../../_shared/rateLimit';
-import { MAX_PENDING_PER_CLASS, normalizeGuestCode, pendingInClass, type GuestRow } from '../../_shared/guests';
+import {
+  MAX_PENDING_PER_CLASS, cleanSchoolEmail, newSchoolPhrase, normalizeGuestCode, parseDomainList, pendingInClass, type GuestRow,
+} from '../../_shared/guests';
 import { ownerLabel } from '../../_shared/libraryShare';
 import { personLabel } from '../../_shared/messages';
 import { liveClassIds } from '../../_shared/rooms';
@@ -28,7 +30,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ e
   const limited = await checkRateLimit(env.DB, request, 'guestRedeem');
   if (!limited.allowed) return rateLimitExceeded(limited.retryAfter);
 
-  let body: { code?: unknown };
+  let body: { code?: unknown; schoolEmail?: unknown };
   try { body = await request.json(); } catch { return json({ error: 'Invalid JSON body' }, 400); }
   const code = normalizeGuestCode(body.code);
   if (!code) return json({ error: 'A guest code is 8 letters and numbers.' }, 400);
@@ -39,8 +41,8 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ e
   if (row.host_email === data.email) return json({ error: 'That is your own invite. Give the code to the person you are inviting.' }, 400);
 
   const cls = await env.DB.prepare(
-    `SELECT c.name, c.guests_off, c.archived_at, c.owner_email, t.first_name, t.last_name FROM classes c LEFT JOIN students t ON t.email = c.owner_email WHERE c.id = ?`,
-  ).bind(row.class_id).first<{ name: string; guests_off: number; archived_at: number | null; owner_email: string; first_name: string | null; last_name: string | null }>();
+    `SELECT c.name, c.guests_off, c.archived_at, c.owner_email, c.guest_school_required, c.guest_school_domains, t.first_name, t.last_name FROM classes c LEFT JOIN students t ON t.email = c.owner_email WHERE c.id = ?`,
+  ).bind(row.class_id).first<{ name: string; guests_off: number; archived_at: number | null; owner_email: string; guest_school_required: number; guest_school_domains: string; first_name: string | null; last_name: string | null }>();
   if (!cls || cls.archived_at != null) return json({ error: GONE }, 404);
   if (cls.guests_off) return json({ error: `Guests are turned off in ${cls.name}.` }, 403);
 
@@ -62,13 +64,32 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async ({ e
   if ((waiting?.n ?? 0) >= MAX_PENDING_AS_GUEST) return json({ error: `You already have ${MAX_PENDING_AS_GUEST} requests waiting for a teacher. Wait for some to be decided.` }, 409);
   if ((await pendingInClass(env.DB, row.class_id)) >= MAX_PENDING_PER_CLASS) return json({ error: 'That teacher has a lot of guests waiting. Try again later.' }, 409);
 
+  // A class that asks for a school email (migration 0061): it has to be on the class's list of domains, and the code is left
+  // unused if it is not, so a typo costs nothing. The teacher's card then holds a phrase to email to that address.
+  const needSchool = !!cls.guest_school_required;
+  let schoolEmail: string | null = null;
+  if (needSchool) {
+    const domains = parseDomainList(cls.guest_school_domains);
+    const school = cleanSchoolEmail(body.schoolEmail, domains);
+    if ('error' in school) return json({ error: school.error, needsSchoolEmail: true, domains }, 400);
+    schoolEmail = school.email;
+  }
+
   // Single use, even if two people press at once: only the one that finds it still 'invited' wins.
-  const res = await env.DB.prepare(
-    `UPDATE sandbox_guests SET guest_email = ?, status = 'pending', redeemed_at = ? WHERE id = ? AND status = 'invited'`,
-  ).bind(data.email, now, row.id).run();
+  const res = needSchool
+    ? await env.DB.prepare(
+      `UPDATE sandbox_guests SET guest_email = ?, status = 'pending', redeemed_at = ?, school_email = ?, school_phrase = ?, school_phrase_at = ?, school_tries = 0
+        WHERE id = ? AND status = 'invited'`,
+    ).bind(data.email, now, schoolEmail, newSchoolPhrase(), now, row.id).run()
+    : await env.DB.prepare(
+      `UPDATE sandbox_guests SET guest_email = ?, status = 'pending', redeemed_at = ? WHERE id = ? AND status = 'invited'`,
+    ).bind(data.email, now, row.id).run();
   if (!res.meta.changes) return json({ error: GONE }, 404);
 
-  return json({ ok: true, status: 'pending', host: hostName, className: cls.name, teacher: personLabel(cls.first_name, cls.last_name, true) }, 201);
+  return json({
+    ok: true, status: 'pending', host: hostName, className: cls.name, teacher: personLabel(cls.first_name, cls.last_name, true),
+    ...(needSchool ? { schoolProof: 'need-phrase', schoolEmail } : {}),
+  }, 201);
 };
 
 function json(body: unknown, status = 200): Response {

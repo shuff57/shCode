@@ -87,7 +87,9 @@ async function call(fn, user, url, params = {}, method = 'GET', body, extraEnv =
   if (!/^\/api\/classes\//.test(url)) bodies.push(text);
   return { status: res.status, body: JSON.parse(text) };
 }
-const invite = (u, classId, relation) => call(mine.onRequestPost, u, '/api/guests', {}, 'POST', { classId, ...(relation !== undefined ? { relation } : {}) });
+// Every invite now carries what a teacher decides on (migration 0062); a test overrides only what it is about.
+const DETAILS = { name: 'Fri Ends', relation: 'a friend', age: 'teen', org: 'Oak High School', purpose: 'build a game together' };
+const invite = (u, classId, relation, more = {}) => call(mine.onRequestPost, u, '/api/guests', {}, 'POST', { classId, ...DETAILS, ...(relation !== undefined ? { relation } : {}), ...more });
 const redeem$ = (u, code) => call(redeem.onRequestPost, u, '/api/guests/redeem', {}, 'POST', { code });
 const myGuests = (u) => call(mine.onRequestGet, u, '/api/guests');
 const end = (u, id) => call(one.onRequestDelete, u, `/api/guests/${id}`, { id }, 'DELETE');
@@ -119,6 +121,35 @@ r = await invite(ANA, 'C1', 'call me 555 201 3344');
 check("the host's own words are checked for personal details", r.status === 400 && /phone number/.test(r.body.error), r);
 r = await invite(ANA, 'C1', 'x'.repeat(61));
 check('...and kept short', r.status === 400);
+// What a teacher decides on (migration 0062): all of it is asked for, in the host's words, and none of it a phone, email or address.
+const rowsBefore = all(`SELECT id FROM sandbox_guests`).length;
+r = await invite(ANA, 'C1', undefined, { name: '' });
+check("a guest's name is required (400)", r.status === 400 && /their full name/.test(r.body.error), r);
+r = await invite(ANA, 'C1', undefined, { name: 'Cher' });
+check('...and it has to be a first and last name (400)', r.status === 400 && /first and last name/.test(r.body.error), r);
+r = await invite(ANA, 'C1', undefined, { name: 'Pat 555 Guest' });
+check('...in letters only (400)', r.status === 400);
+r = await invite(ANA, 'C1', undefined, { relation: '' });
+check('who they are to the host is required (400)', r.status === 400 && /who they are to you/.test(r.body.error), r);
+r = await invite(ANA, 'C1', undefined, { age: 'under13' });
+check('a guest under 13 is refused with the reason (400)', r.status === 400 && /13 or older/.test(r.body.error), r);
+r = await invite(ANA, 'C1', undefined, { age: undefined });
+check('an age group is required (400)', r.status === 400 && /how old/i.test(r.body.error), r);
+r = await invite(ANA, 'C1', undefined, { age: 'ancient' });
+check('...and only the listed ones (400)', r.status === 400);
+r = await invite(ANA, 'C1', undefined, { org: '' });
+check('where they go to school or work is required (400)', r.status === 400 && /school or work/.test(r.body.error), r);
+r = await invite(ANA, 'C1', undefined, { org: 'call 555 201 3344' });
+check('...and checked for personal details (400)', r.status === 400 && /phone number/.test(r.body.error), r);
+r = await invite(ANA, 'C1', undefined, { purpose: 'mail me at pat@home.test' });
+check('what they will do together is checked for personal details too (400)', r.status === 400 && /email/.test(r.body.error), r);
+r = await invite(ANA, 'C1', undefined, { purpose: undefined });
+check('what they will do together is required when left out entirely (400)', r.status === 400 && /do together/.test(r.body.error), r);
+r = await invite(ANA, 'C1', undefined, { purpose: 'hi' });
+check('...and has to say something (400)', r.status === 400);
+r = await invite(ANA, 'C1', undefined, { purpose: 'x'.repeat(121) });
+check('...and is kept short (400)', r.status === 400);
+check('none of those refusals made a row', all(`SELECT id FROM sandbox_guests`).length === rowsBefore);
 const A2 = (await invite(ANA, 'C1', 'a friend')).body;
 const A3 = (await invite(ANA, 'C1')).body;
 r = await invite(ANA, 'C1');
@@ -165,6 +196,11 @@ check('a teacher of ANOTHER class cannot see the list (403), nor a student', (aw
 r = await panel(T1, 'C1');
 const g = r.body.guests[0];
 check("the teacher's list shows who asked and who for, with the address, role, account age and the host's words", r.status === 200 && g.status === 'pending' && g.host === 'Ana Lopez' && g.guest.email === 'fri@s.test' && g.guest.name === 'Fri Ends' && g.guest.role === 'student' && g.guest.accountSince < now && g.relation === 'my cousin', r.body);
+check("...and what the host said: the guest's name, age group, school or work and plan", g.details.name === 'Fri Ends' && g.details.age === 'teen' && g.details.org === 'Oak High School' && g.details.purpose === 'build a game together', g.details);
+r = await myGuests(FRI);
+check("the guest's own list never carries what the host said about them", !JSON.stringify(r.body).includes('build a game together') && !JSON.stringify(r.body).includes('Oak High School'), r.body);
+r = await myGuests(ANA);
+check('the host sees their own words on the invite', r.body.hosted[0].invitedName === 'Fri Ends' && r.body.hosted[0].age === 'teen' && r.body.hosted[0].purpose === 'build a game together', r.body.hosted[0]);
 r = await panel(T1, 'C1', { action: 'approve', id: 'f'.repeat(32) });
 check('deciding something that is not in this class is a 404', r.status === 404);
 r = await panel(T2, 'C1', { action: 'approve', id: A1.id });

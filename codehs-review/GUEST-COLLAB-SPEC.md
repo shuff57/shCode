@@ -111,3 +111,11 @@ the host with Revoke. Limits (recommended): 3 active guests per student, 20 pend
   LiveRoom already honour `{op:'leave', seat}`, so a revoke marks the seat left in D1 and sends that control.
 - **Added:** a per-class off switch (`classes.guests_off`), "(guest)" in the live session name, and a rule that a TEACHER's no
   stands but a host or guest ending it themselves does not bar the pair.
+
+## A school email as proof (2026-11-15, migration 0061)
+
+Owner's decision: signup stays open with a personal address, but a class can require the guest to prove a SCHOOL address first.
+The district's mail blocks students' outside mail in both directions, so the site sends and receives nothing: the teacher's school
+account emails a one-time phrase to the guest's school address, and the guest types it back. Student-to-student mail was rejected as
+a proof (the host would see the phrase and could pass it on). The teacher's approval stays the gate after the proof, and a class that
+leaves the switch off behaves exactly as before. Rules, limits and the phrase's life are in `CLAUDE.md` under "Guests".

@@ -680,6 +680,11 @@ app.prepare().catch((err) => {
     server.get('/api/guests', libRoute(guestsMine.onRequestGet));
     server.post('/api/guests', express.json(), libRoute(guestsMine.onRequestPost));
     server.post('/api/guests/redeem', express.json(), libRoute(guestsRedeem.onRequestPost));
+    // The school-email proof (migration 0061)
+    const guestsVerify = await import('./functions/api/guests/verify.ts');
+    const guestsSchool = await import('./functions/api/guests/school.ts');
+    server.post('/api/guests/verify', express.json(), libRoute(guestsVerify.onRequestPost));
+    server.post('/api/guests/school', express.json(), libRoute(guestsSchool.onRequestPost));
     server.delete('/api/guests/:id', libRoute(guestsOne.onRequestDelete));
     server.get('/api/classes/:id/guests', libRoute(guestsClass.onRequestGet));
     server.post('/api/classes/:id/guests', express.json(), libRoute(guestsClass.onRequestPost));
