@@ -1,0 +1,30 @@
+.page { padding: 16px 24px 24px; color: var(--text); }
+.toolbar, .actions, .panelTitle { display: flex; align-items: center; gap: 12px; }
+.toolbar { justify-content: space-between; flex-wrap: wrap; }
+.toolbar h1 { font-size: 20px; font-weight: 650; margin: 0; }
+.toolbar p { font-size: 13px; color: var(--c-meta); margin: 4px 0 0; }
+.badge { font-size: 11px; font-weight: 500; border: 1px solid var(--border); border-radius: 20px; padding: 3px 8px; vertical-align: middle; }
+.actions { flex-wrap: wrap; font-size: 13px; }
+.actions button { padding: 7px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; }
+.actions .run { background: var(--brand); color: var(--on-brand); border-color: var(--brand); font-weight: 650; min-width: 85px; }
+.actions button:disabled { opacity: .5; cursor: default; }
+.actions a:focus-visible, .actions button:focus-visible, .divider:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.notice { font-size: 12px; color: var(--c-meta); margin: 12px 0; }
+.workspace { display: flex; height: calc(100dvh - 260px); min-height: 440px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--card); }
+.editor { width: var(--editor-width); min-width: 0; display: flex; flex-direction: column; }
+.panelTitle { justify-content: space-between; flex-wrap: wrap; padding: 10px 14px; min-height: 42px; background: var(--card); border-bottom: 1px solid var(--border); font-size: 12px; }
+.panelTitle span { color: var(--c-meta); font-size: 11px; }
+.code { flex: 1; min-height: 0; overflow: hidden; }
+.divider { width: 7px; flex-shrink: 0; cursor: col-resize; touch-action: none; background: var(--border); }
+.divider:hover, .divider:focus-visible { background: var(--brand); }
+.preview { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.preview iframe { width: 100%; flex: 1; min-height: 0; border: 0; background: #111; }
+.missing { padding: 24px; font-size: 14px; }
+.missing h2 { font-weight: 600; margin-bottom: 8px; }
+@media (max-width: 760px) {
+  .page { padding: 12px; }
+  .workspace { flex-direction: column; height: auto; }
+  .editor { width: 100%; height: 320px; }
+  .divider { display: none; }
+  .preview { flex: none; height: 650px; }
+}
