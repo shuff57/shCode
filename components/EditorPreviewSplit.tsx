@@ -6,7 +6,7 @@
 // the left and right arrow keys (Shift for bigger steps).
 //
 // The ids (#split, #editorPane, #divider, #previewPane, #dragOverlay) are kept: the stylesheet and other
-// code address the panes by them. There is one split on a page.
+// code address the panes by them. Embedded examples omit ids so several can share a page.
 //
 // Three shapes, all in the same box so the layout around it never changes:
 //   editor + preview   the split above;
@@ -25,11 +25,13 @@ interface Props {
   children?: ReactNode;
   className?: string;
   style?: CSSProperties;
+  /** Embedded examples may share a page; they use classes rather than the workspace's legacy ids. */
+  embedded?: boolean;
 }
 
 const MIN_PANE = 220;
 
-export default function EditorPreviewSplit({ editor, preview, previewRef, children, className, style }: Props) {
+export default function EditorPreviewSplit({ editor, preview, previewRef, children, className, style, embedded = false }: Props) {
   const splitRef = useRef<HTMLDivElement>(null);
   const leftRef = useRef<HTMLDivElement>(null);
   const rightRef = useRef<HTMLDivElement | null>(null);
@@ -55,6 +57,7 @@ export default function EditorPreviewSplit({ editor, preview, previewRef, childr
     let dragging = false;
     let rect: DOMRect | null = null;
     let rafId: number | null = null;
+    let share = 0.5;
 
     // The code editor sizes itself from a window 'resize', so tell it the pane changed.
     const relayoutEditor = () => {
@@ -65,16 +68,25 @@ export default function EditorPreviewSplit({ editor, preview, previewRef, childr
       });
     };
 
-    const setPositions = (clientX: number) => {
-      if (!rect) rect = split.getBoundingClientRect();
-      const min = MIN_PANE;
-      const max = rect.width - MIN_PANE;
-      let x = clientX - rect.left;
-      x = Math.max(min, Math.min(max, x));
-      const leftPct = (x / rect.width) * 100;
-      left.style.flex = `0 0 ${leftPct}%`;
-      right.style.flex = `0 0 ${100 - leftPct}%`;
+    const applyShare = () => {
+      const available = split.clientWidth - divider.offsetWidth;
+      if (available <= 0) return;
+      const min = Math.min(MIN_PANE, available / 2);
+      const width = Math.max(min, Math.min(available - min, available * share));
+      left.style.flex = `0 0 calc((100% - ${divider.offsetWidth}px) * ${width / available})`;
+      right.style.flex = '1 1 0';
+      divider.setAttribute('aria-valuenow', String(Math.round(width / available * 100)));
+      divider.setAttribute('aria-valuemin', String(Math.round(min / available * 100)));
+      divider.setAttribute('aria-valuemax', String(Math.round((available - min) / available * 100)));
       relayoutEditor();
+    };
+
+    const setPositions = (clientX: number) => {
+      rect = split.getBoundingClientRect();
+      const available = split.clientWidth - divider.offsetWidth;
+      if (available <= 0) return;
+      share = Math.max(0, Math.min(1, (clientX - rect.left - split.clientLeft) / available));
+      applyShare();
     };
 
     const onMove = (e: PointerEvent) => {
@@ -103,6 +115,8 @@ export default function EditorPreviewSplit({ editor, preview, previewRef, childr
     const onVisChange = () => { if (document.hidden) stopDrag(); };
 
     const onPointerDown = (e: PointerEvent) => {
+      if (e.button !== 0) return;
+      divider.focus();
       dragging = true;
       rect = split.getBoundingClientRect();
       overlay.style.display = 'block';
@@ -123,31 +137,33 @@ export default function EditorPreviewSplit({ editor, preview, previewRef, childr
         rect = split.getBoundingClientRect();
         const currentLeft = left.getBoundingClientRect().width || rect.width / 2;
         const next = currentLeft + (e.key === 'ArrowRight' ? step : -step);
-        setPositions(rect.left + next);
+        setPositions(rect.left + split.clientLeft + next);
         e.preventDefault();
       }
     };
 
     divider.addEventListener('pointerdown', onPointerDown, false);
     divider.addEventListener('keydown', onKeyDown, false);
-    window.addEventListener('resize', relayoutEditor, false);
+    const observer = new ResizeObserver(applyShare);
+    observer.observe(split);
+    applyShare();
 
     return () => {
       stopDrag();
       if (rafId) cancelAnimationFrame(rafId);
       divider.removeEventListener('pointerdown', onPointerDown, false);
       divider.removeEventListener('keydown', onKeyDown, false);
-      window.removeEventListener('resize', relayoutEditor, false);
+      observer.disconnect();
     };
   }, [hasPanes]);
 
   return (
-    <div className={'editor-preview-container' + (className ? ' ' + className : '')} id="split" ref={splitRef} style={style}>
+    <div className={'editor-preview-container workspace-split' + (className ? ' ' + className : '')} id={embedded ? undefined : 'split'} ref={splitRef} style={style}>
       {children !== undefined ? children : (
         <>
           <div
-            className="pane"
-            id="editorPane"
+            className="pane workspace-editor"
+            id={embedded ? undefined : 'editorPane'}
             ref={leftRef}
             style={hasPanes ? undefined : { flex: '1 1 100%' }}
           >
@@ -157,17 +173,19 @@ export default function EditorPreviewSplit({ editor, preview, previewRef, childr
             <>
               <div
                 className="divider"
-                id="divider"
+                id={embedded ? undefined : 'divider'}
                 ref={dividerRef}
                 tabIndex={0}
+                role="separator"
+                aria-orientation="vertical"
                 aria-label="Resize editor and preview"
               >
                 <span className="drag-handle" aria-hidden="true"></span>
               </div>
-              <div className="pane" id="previewPane" ref={setRight}>
+              <div className="pane workspace-preview" id={embedded ? undefined : 'previewPane'} ref={setRight}>
                 {preview}
               </div>
-              <div className="drag-overlay" id="dragOverlay" ref={overlayRef} aria-hidden="true"></div>
+              <div className="drag-overlay" id={embedded ? undefined : 'dragOverlay'} ref={overlayRef} aria-hidden="true"></div>
             </>
           )}
         </>

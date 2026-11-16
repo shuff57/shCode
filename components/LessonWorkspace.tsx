@@ -36,7 +36,7 @@ import PlanChartPanel from './PlanChartPanel';
 import LessonSteps from './LessonSteps';
 import LabTaskCard, { LabTaskSidebar } from './LabTaskCard';
 import EditorPreviewSplit from './EditorPreviewSplit';
-import ResizableConsole from './ResizableConsole';
+import CodeWorkspace from './CodeWorkspace';
 import HistoryPanel from './HistoryPanel';
 import AssignmentHeader from './AssignmentHeader';
 import SubmitDialog from './SubmitDialog';
@@ -155,11 +155,8 @@ export default function LessonWorkspace({
     reshapeMode === 'visual' ? ['build'] : reshapeMode === 'code' ? ['code'] : ['build', 'code'];
   const [resetMsg, setResetMsg] = useState<string | null>(null);
   const [consoleOutput, setConsoleOutput] = useState<Array<{type: string; message: string; timestamp: string}>>([]);
-  // Bumped on every Run/Stop (and on HTML auto-rebuild) so the Console
-  // component can clear scrollback. Also drives the auto-open behavior of
-  // the collapsible Console panel.
+  // Bumped on every Run/Stop (and on HTML auto-rebuild) to clear console scrollback.
   const [consoleResetKey, setConsoleResetKey] = useState(0);
-  const [consoleOpen, setConsoleOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   // Phone labs: whether the "More" disclosure (Reset / History / Save) is open.
   const [toolsOpen, setToolsOpen] = useState(false);
@@ -441,7 +438,6 @@ export default function LessonWorkspace({
       setConsoleOutput(logs);
       setRunKey((k) => k + 1);
       setConsoleResetKey((k) => k + 1);
-      setConsoleOpen(true);
       setTimeout(() => trackRun(runTests()), 200);
     };
 
@@ -555,7 +551,6 @@ export default function LessonWorkspace({
     setConsoleOutput(logs);
     setRunKey((k) => k + 1);
     setConsoleResetKey((k) => k + 1);
-    setConsoleOpen(true);
     setIsRunning(false);
   }
 
@@ -576,7 +571,6 @@ export default function LessonWorkspace({
     setRanOn(code);
     setRunKey((k) => k + 1);
     setConsoleResetKey((k) => k + 1);
-    setConsoleOpen(true);
     setIsRunning(true);
     setTimeout(() => runTestsRef.current(), 400);
   }
@@ -1478,8 +1472,6 @@ export default function LessonWorkspace({
                     </button>
                   )
                 )}
-                {/* The shortcut belongs to the first button (Run, or Check / Grade on a text lesson), so it sits right after it (climb4 r10 S7). */}
-                <span className="run-hint">Ctrl+Enter</span>
                 {aiCheck && !isTextMode && !isReshapeMode && (
                   // Run shows what the code prints; Check is the AI read that marks the Quest cards.
                   <button
@@ -1681,89 +1673,81 @@ export default function LessonWorkspace({
           {lessonProgress.authed && !solutionLoaded ? <TwoVersionsNotice lessonId={lesson.id} status={upload} /> : null}
           {isLab && requirements.length > 0 ? <>{labCheckSummary}{renderCheckRow('above')}</> : null}
           {aiCheck ? renderAiNote(isLab ? 'above' : 'only') : null}
-          <EditorPreviewSplit
-            style={{ scrollMarginBottom: 56 }}
-            // A text lesson has no output pane: the editor takes the whole width, and Grade is the only action.
-            editor={isTextMode ? <CodeEditor plainText /> : <CodeEditor />}
-            preview={isTextMode ? undefined : (
-              <>
-                {isConsoleMode ? (
-                  <>
-                    <div className="output-header">
-                      Output
-                      {ranAt && !isRunning ? (
-                        <span className={`run-stamp${runStale ? ' is-stale' : ''}`}>{runStale ? 'Out of date: run again' : `Ran ${ranWhen(ranAt, clock)}`}</span>
-                      ) : null}
-                    </div>
-                    <pre
-                      className={`console-output run-output${runStale ? ' is-stale' : ''}`}
-                      role="log"
-                      aria-live="polite"
-                      aria-atomic="false"
-                      aria-relevant="additions text"
-                      aria-label="Program output"
-                    >
-                      {consoleOutput.length === 0 ? (
-                        <div className="console-empty">
-                          {runKey === 0
-                            ? 'Click Run to see output.'
-                            : lesson.requirements.length > 0
-                              ? 'Ran. Nothing was printed. Your check results are listed with the buttons.'
-                              : 'Ran. Nothing was printed.'}
-                        </div>
-                      ) : (
-                        consoleOutput.map((log, i) => (
-                          <div key={i} className={`log-entry log-${log.type}`}>
-                            <span className="log-msg">{log.message}</span>
+          <CodeWorkspace consoleResetKey={!isConsoleMode && !isTextMode ? String(consoleResetKey) : undefined}>
+            <EditorPreviewSplit
+              style={{ scrollMarginBottom: 56 }}
+              // A text lesson has no output pane: the editor takes the whole width, and Grade is the only action.
+              editor={isTextMode ? <CodeEditor plainText /> : <CodeEditor />}
+              preview={isTextMode ? undefined : (
+                <>
+                  {isConsoleMode ? (
+                    <>
+                      <div className="output-header">
+                        Output
+                        {ranAt && !isRunning ? (
+                          <span className={`run-stamp${runStale ? ' is-stale' : ''}`}>{runStale ? 'Out of date: run again' : `Ran ${ranWhen(ranAt, clock)}`}</span>
+                        ) : null}
+                      </div>
+                      <pre
+                        className={`console-output run-output${runStale ? ' is-stale' : ''}`}
+                        role="log"
+                        aria-live="polite"
+                        aria-atomic="false"
+                        aria-relevant="additions text"
+                        aria-label="Program output"
+                      >
+                        {consoleOutput.length === 0 ? (
+                          <div className="console-empty">
+                            {runKey === 0
+                              ? 'Click Run to see output.'
+                              : lesson.requirements.length > 0
+                                ? 'Ran. Nothing was printed. Your check results are listed with the buttons.'
+                                : 'Ran. Nothing was printed.'}
                           </div>
-                        ))
-                      )}
-                    </pre>
-                  </>
-                ) : isMoshionMode ? (
-                  <>
-                    {ranAt && runKey > 0 ? (
-                      <span className={`run-stamp run-stamp-float${runStale ? ' is-stale' : ''}`}>{runStale ? 'Out of date: run again' : `Ran ${ranWhen(ranAt, clock)}`}</span>
-                    ) : null}
-                    <MoshionPreview ref={labFrameRef} code={q5Code} runKey={runKey} gameKey={lesson.id} />
-                  </>
-                ) : (
-                  <LivePreview srcDoc={srcDoc} />
-                )}
-              </>
-            )}
-          >
-            {/* ReshapeStudio is self-contained (its own toolbar, its own CodeEditor for the Code side, its own
-                model tools for the Build side): it replaces the whole split rather than sharing a second,
-                redundant editor with it. The sandbox does the same. */}
-            {!isTextMode && isReshapeMode ? (
-              <ReshapeStudio
-                key={`${lesson.id}-${reshapeResetKey}`}
-                value={files['script.js'] ?? ''}
-                onChange={(t) => updateFile('script.js', t)}
-                sides={reshapeSides}
-                onDocChange={(doc, refusals) => {
-                  setLatestModelDoc(doc);
-                  setLatestRefusals(refusals ?? null);
-                }}
-                lessonId={lesson.id}
-              />
-            ) : undefined}
-          </EditorPreviewSplit>
+                        ) : (
+                          consoleOutput.map((log, i) => (
+                            <div key={i} className={`log-entry log-${log.type}`}>
+                              <span className="log-msg">{log.message}</span>
+                            </div>
+                          ))
+                        )}
+                      </pre>
+                    </>
+                  ) : isMoshionMode ? (
+                    <>
+                      {ranAt && runKey > 0 ? (
+                        <span className={`run-stamp run-stamp-float${runStale ? ' is-stale' : ''}`}>{runStale ? 'Out of date: run again' : `Ran ${ranWhen(ranAt, clock)}`}</span>
+                      ) : null}
+                      <MoshionPreview ref={labFrameRef} code={q5Code} runKey={runKey} gameKey={lesson.id} />
+                    </>
+                  ) : (
+                    <LivePreview srcDoc={srcDoc} />
+                  )}
+                </>
+              )}
+            >
+              {/* ReshapeStudio is self-contained (its own toolbar, its own CodeEditor for the Code side, its own
+                  model tools for the Build side): it replaces the whole split rather than sharing a second,
+                  redundant editor with it. The sandbox does the same. */}
+              {!isTextMode && isReshapeMode ? (
+                <ReshapeStudio
+                  key={`${lesson.id}-${reshapeResetKey}`}
+                  value={files['script.js'] ?? ''}
+                  onChange={(t) => updateFile('script.js', t)}
+                  sides={reshapeSides}
+                  onDocChange={(doc, refusals) => {
+                    setLatestModelDoc(doc);
+                    setLatestRefusals(refusals ?? null);
+                  }}
+                  lessonId={lesson.id}
+                />
+              ) : undefined}
+            </EditorPreviewSplit>
+          </CodeWorkspace>
           {/* Phones only (CSS): the full result under the editor, so a Check never pushes the line being
               typed under the on-screen keyboard (ux2 S3). The one-line summary above it keeps its height. */}
           {isLab && requirements.length > 0 ? renderCheckRow('below') : null}
           {isLab && aiCheck ? renderAiNote('below') : null}
-          {!isConsoleMode && (
-            <ResizableConsole
-              collapsible
-              open={consoleOpen}
-              onOpenChange={setConsoleOpen}
-              resetKey={String(consoleResetKey)}
-              defaultHeight={240}
-              style={{ marginTop: '1rem' }}
-            />
-          )}
         </div>
       </div>
       {/* The lab's side column (wide screens): TabbedRightDrawer puts the open tab here. Empty, it takes no room. */}

@@ -121,7 +121,6 @@ export default function DocsSandbox({
         <div className="docs-sandbox-toolbar">
           <button type="button" className="docs-sandbox-run" onClick={run}>▶ Run</button>
           <button type="button" className="docs-sandbox-reset" onClick={reset}>Reset</button>
-          <span className="docs-sandbox-hint">Ctrl+Enter to run</span>
         </div>
         <div
           ref={containerRef}

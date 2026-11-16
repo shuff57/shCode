@@ -2,12 +2,11 @@
 
 // The console box under an editor, one component for every screen that has one: the sandbox, lessons and
 // assignments, /play and shared programs. Its top edge is a bar: drag it up for a taller console, or focus
-// it and use the up and down arrow keys (Shift for bigger steps). In lessons it also folds away
-// (`collapsible`), because a lesson page is long and a beginner does not need an empty console until they
-// print something. The rules for the size are lib/console-size.ts; the log itself is ./Console.
+// it and use the up and down arrow keys (Shift for bigger steps). Some standalone viewers also let it
+// fold away (`collapsible`). The rules for the size are lib/console-size.ts; the log itself is ./Console.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import Console from './Console';
 import { clampConsoleHeight, consoleKeyDelta, windowShare } from '../lib/console-size';
@@ -37,17 +36,21 @@ interface Props {
   refitKey?: unknown;
   className?: string;
   style?: CSSProperties;
+  /** An iframe-scoped console for an embedded reading example. */
+  children?: ReactNode;
 }
 
 export default function ResizableConsole({
-  resetKey, reword, collapsible = false, open, onOpenChange, defaultHeight = 120, maxHeight, refitKey, className, style,
+  resetKey, reword, collapsible = false, open, onOpenChange, defaultHeight = 120, maxHeight, refitKey, className, style, children,
 }: Props) {
   const [innerOpen, setInnerOpen] = useState(true);
   const isOpen = !collapsible || (open ?? innerOpen);
   const [height, setHeight] = useState<number | null>(rememberedHeight);
   const boxRef = useRef<HTMLDivElement>(null);
+  const dragCleanup = useRef<(() => void) | null>(null);
   const maxRef = useRef(maxHeight);
   maxRef.current = maxHeight;
+  useEffect(() => () => dragCleanup.current?.(), []);
 
   const setSize = useCallback((h: number | null) => {
     rememberedHeight = h;
@@ -67,9 +70,10 @@ export default function ResizableConsole({
   const startDrag = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     const box = boxRef.current;
     if (!box || e.button !== 0) return;
+    dragCleanup.current?.();
     e.preventDefault();
     const bar = e.currentTarget;
-    bar.setPointerCapture(e.pointerId);
+    try { bar.setPointerCapture(e.pointerId); } catch { /* pointer already cancelled */ }
     bar.focus();
     const startY = e.clientY;
     const startH = box.getBoundingClientRect().height;
@@ -82,10 +86,16 @@ export default function ResizableConsole({
       bar.removeEventListener('pointermove', move);
       bar.removeEventListener('pointerup', end);
       bar.removeEventListener('pointercancel', end);
+      bar.removeEventListener('lostpointercapture', end);
+      window.removeEventListener('blur', end);
+      dragCleanup.current = null;
     };
     bar.addEventListener('pointermove', move);
     bar.addEventListener('pointerup', end);
     bar.addEventListener('pointercancel', end);
+    bar.addEventListener('lostpointercapture', end);
+    window.addEventListener('blur', end);
+    dragCleanup.current = end;
   }, [clamp, setSize]);
 
   const onKey = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -98,13 +108,12 @@ export default function ResizableConsole({
 
   // A smaller window, or leaving full screen, can leave too little room for the height kept: fit it again.
   useEffect(() => {
-    if (height === null) return;
-    const refit = () => setHeight((h) => (h === null ? h : clamp(h)));
+    const refit = () => setHeight((h) => clamp(h ?? defaultHeight));
     const t = setTimeout(refit, 120);
     window.addEventListener('resize', refit);
     return () => { clearTimeout(t); window.removeEventListener('resize', refit); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refitKey, height === null, clamp]);
+  }, [refitKey, defaultHeight, clamp]);
 
   const sized = isOpen && height !== null;
   const boxStyle = {
@@ -144,13 +153,13 @@ export default function ResizableConsole({
             {isOpen ? <ChevronDown size={14} aria-hidden="true" /> : <ChevronRight size={14} aria-hidden="true" />}
             Console
           </button>
-        ) : (
+        ) : children ? null : (
           <div className="output-header">Console</div>
         )}
         {/* Always mounted, only hidden when folded away: the log keeps collecting what the program prints
             while it is closed, as the <details> it replaces did. */}
         <div className="wsc-body" hidden={!isOpen}>
-          <Console resetKey={resetKey} reword={reword} />
+          {children ?? <Console resetKey={resetKey} reword={reword} />}
         </div>
       </div>
     </div>

@@ -168,7 +168,6 @@
   --x-b9c5e8: #b9c5e8;
 }
 
-
 /* Body font chosen in Appearance (lib/prefs-core.ts FONTS); set before first
    paint as html[data-font]. Code editors keep their own monospace. */
 html[data-font="modern"] { --font-body: ui-monospace, 'Cascadia Code', 'Fira Code', 'JetBrains Mono', Menlo, Consolas, monospace; }
@@ -547,12 +546,6 @@ details.editor-card > summary:hover::before {
   background: var(--x-15803d);
 }
 
-.run-hint {
-  font-size: 0.8rem;
-  color: var(--text);
-  opacity: 0.5;
-}
-
 .output-header {
   background: var(--muted);
   padding: 6px 12px;
@@ -612,17 +605,6 @@ details.editor-card > summary:hover::before {
   position: relative;
   display: flex;
   flex-direction: column;
-}
-
-/* The lesson drawer remembers its open tab (TabbedRightDrawer,
-   localStorage `shCode:drawer:active`), so once a student opens Steps it stays
-   open on every lab after it and takes 320px off the page. At 1280 wide that
-   left a 50/50 split with a ~420px editor, and ordinary lines wrapped. The
-   editor keeps at least 480px (never more than 60% of the split, so a wide
-   drawer still leaves the preview room); the preview's canvas scales down to
-   fit instead. Desktop only: the phone layout stacks the panes. */
-@media (min-width: 721px) {
-  .editor-preview-container:not(.sandbox-split) > #editorPane { min-width: min(480px, 60%); }
 }
 
 #editor {
@@ -791,7 +773,6 @@ body.is-sizing-console iframe { pointer-events: none; }
 .log-warn {
   color: var(--x-f59e0b);
 }
-
 
 /* Title and Passed / Not yet badge share one flex row: the title takes the
    room that is left and wraps inside it, the badge keeps its own width. It
@@ -2025,7 +2006,6 @@ body.is-sizing-console iframe { pointer-events: none; }
   text-align: right;
 }
 
-
 /* Narrow screens: the assignment header row wraps instead of pushing the page sideways. */
 @media (max-width: 720px) {
   .assignment-header-center { flex-wrap: wrap; min-width: 0; max-width: 100%; }
@@ -2097,8 +2077,8 @@ body.is-sizing-console iframe { pointer-events: none; }
   .editor-body { margin: 8px 0; padding: 12px; }
   .editor-preview-container { flex-direction: column; height: auto; }
   .editor-preview-container > .pane { flex: none !important; width: 100%; min-width: 0; height: auto; }
-  .editor-preview-container > #editorPane { height: 380px; }
-  .editor-preview-container > #previewPane { height: 280px; }
+  .editor-preview-container > .workspace-editor { height: clamp(240px, 38svh, 380px); }
+  .editor-preview-container > .workspace-preview { height: 280px; }
   .editor-preview-container > .divider { display: none; }
   .run-toolbar > * { min-width: 0; }
 
@@ -2211,7 +2191,7 @@ body:has(.lesson-progress-footer) .editor-body { margin-top: 0; padding-top: 8px
   .home-module-summary > .home-module-progress { grid-column: 2; width: auto; margin: 0; display: flex !important; color: var(--c-meta); opacity: 1; }
   .run-toolbar { flex-wrap: nowrap; gap: 5px; overflow-x: auto; }
   .run-toolbar > * { flex-shrink: 0; }
-  .run-toolbar .run-hint, .run-toolbar .toolbar-button-label { display: none; }
+  .run-toolbar .toolbar-button-label { display: none; }
   .run-toolbar button { padding: 6px 8px; white-space: nowrap; }
   .student-quiz { margin-top: 8px !important; padding-top: 8px !important; }
   .student-quiz > p { margin-bottom: 10px !important; line-height: 1.4; }
@@ -2461,8 +2441,6 @@ body { box-sizing: border-box; padding-right: 20px; }
 @media (min-width: 721px) {
   body:has(.shd-tabstrip) .lab-work-area { margin-right: calc(var(--shd-rail-width) + var(--shd-rail-gap) + var(--shd-tabbed, 0px)); }
   body:has(.shd-tabstrip) .lab-work-area .editor-card { margin-right: 0; }
-  .lab-work-area .editor-preview-container:not(.sandbox-split) > #editorPane { min-width: min(480px, 64%); flex-basis: 64%; }  /* never starve the preview at medium widths or with a drawer open */
-  .lab-work-area #previewPane { min-width: 0; flex-basis: 36%; }
   .lab-work-area .console-empty { min-width: 0; }
 }
 @media (max-width: 720px) {
@@ -2473,7 +2451,6 @@ body { box-sizing: border-box; padding-right: 20px; }
   .lab-work-area .editor-card { width: 100%; }
   .lab-work-area .editor-body { margin: 0; }
   /* Leave Output visible below the editor on the first phone screen. */
-  .lab-work-area #editorPane { height: clamp(240px, 38svh, 360px); min-height: 240px; }
   .lab-work-area #editor .cm-editor { font-size: 12px !important; }
   /* Line-height on the scroller so code and gutters share the metric.
      (Wrapping and its hanging indent are set just below.) */
@@ -2500,7 +2477,6 @@ body { box-sizing: border-box; padding-right: 20px; }
 body:has(.lab-work-area) .lab-assignment-header { padding: 2px 0 8px; margin-bottom: 0; }
 body:has(.lab-work-area) { gap: 8px; }
 .lab-work-area .run-toolbar { gap: 8px; }
-.lab-work-area .run-hint { font-size: 12px; }
 
 .lab-work-area .ai-check-help { display: none; }
 @media (min-width: 721px) {
@@ -2607,7 +2583,7 @@ button, input, select, textarea { font-family: inherit; }
 :is(.content-lesson-main, .assignment-header-left, .docs-hub, .docs-main) h1,
 #titleRow h1 { font-size: var(--fs-h1) !important; font-weight: 700; }
 :is(.student-quiz, .completion-panel, .lab-task-card) h2 { font-size: var(--fs-h2) !important; }
-:is(.run-hint, .console-empty, .run-output .console-empty, .docs-sidebar-empty,
+:is(.console-empty, .run-output .console-empty, .docs-sidebar-empty,
 .docs-main-search-empty, .docs-sidebar-result-section, .docs-main-search-result-section,
 .docs-sandbox-hint, .docs-sandbox-preview-body .reshape-empty, .docs-breadcrumb,
 .docs-main-search-result-snippet, .lab-task-card .step-hints) {
@@ -2659,7 +2635,6 @@ a.mod-row:hover { background: var(--x-343746); border-top-color: var(--c-comment
   .run-toolbar { flex-wrap: nowrap; min-width: 0; gap: 8px; }
   .run-toolbar button { white-space: nowrap; min-height: 32px; flex-shrink: 0; }
   .run-toolbar > div { min-width: 0; }
-  .run-toolbar .run-hint { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .mod-row { flex-wrap: nowrap; }
   .mod-row-badge { min-width: 128px; }
   .mod-row-title { flex: 1 1 240px; }
@@ -2795,32 +2770,6 @@ a.mod-row:hover { background: var(--x-343746); border-top-color: var(--c-comment
   outline: 2px solid var(--shd-tab-accent, var(--c-purple));
   outline-offset: -3px;
 }
-@media (max-width: 720px) {
-  /* Only console labs: preserve the canvas height in graphical labs. Auto height
-     follows rendered (including folded/wrapped) lines, then scrolls at the cap. */
-  .lab-work-area:has(.output-header) #previewPane { height: clamp(120px, 16svh, 160px); }
-  .lab-work-area:has(.output-header) #editorPane { height: auto; min-height: 180px; max-height: 45svh; }
-  .lab-work-area:has(.output-header) #editorPane > div { height: auto !important; }
-  .lab-work-area:has(.output-header) #editor { height: auto; flex: 0 1 auto !important; }
-  .lab-work-area:has(.output-header) #editor > div { height: auto !important; }
-  .lab-work-area:has(.output-header) #editor .cm-editor { height: auto; }
-  .lab-work-area:has(.output-header) #editor .cm-scroller { min-height: 140px; max-height: calc(45svh - 40px); }
-}
-
-/* Console labs follow the rendered program, with a shared useful minimum.
-   Let long code/output scroll at the viewport cap; graphical previews keep
-   their existing canvas-sized split. */
-@media (min-width: 721px) {
-  .lab-work-area:has(.output-header) { align-items: start; }
-  .lab-work-area:has(.output-header) .editor-preview-container { height: auto; }
-  .lab-work-area:has(.output-header) .pane { height: auto; min-height: 320px; }
-  .lab-work-area:has(.output-header) #editorPane > div,
-  .lab-work-area:has(.output-header) #editor > div { height: auto !important; }
-  .lab-work-area:has(.output-header) #editor { height: auto; }
-  .lab-work-area:has(.output-header) #editor .cm-editor { height: auto; }
-  .lab-work-area:has(.output-header) #editor .cm-scroller { max-height: max(280px, calc(100svh - 400px)); }
-  .lab-work-area:has(.output-header) .run-output { height: auto; max-height: max(280px, calc(100svh - 400px)); }
-}
 
 @media (max-width: 720px) {
   /* Primary actions first; labelled, equally touchable tools in their own row. */
@@ -2892,9 +2841,6 @@ a.mod-row:hover { background: var(--x-343746); border-top-color: var(--c-comment
   .content-lesson-main .lesson-reading-body { max-width: none; min-width: 0; }
   .content-lesson-main .content-prose { max-width: 72ch; }
   .lesson-wide-media { width: 100% !important; }
-  .content-lesson-main .livecodeblock-body > :is(.livecodeblock-editor, .livecodeblock-preview) {
-    flex: 1 1 0; width: 50%; min-width: 0;
-  }
   .docs-hub > p { max-width: 72ch; }
 }
 @media (min-width: 1200px) {
@@ -2991,19 +2937,6 @@ body:has(.content-lesson-main) .lesson-position { width: 100%; max-width: 1080px
 }
 @media (min-width: 1024px) {
   body:has(.content-lesson-main) .lesson-position { max-width: 1200px; }
-}
-
-/* Console labs on desktop: code and Output fill the viewport down to the progress strip.
-   Long code scrolls inside the editor, long output inside Output. */
-@media (min-width: 721px) {
-  .lab-work-area:has(.output-header) .editor-preview-container { height: max(320px, calc(100svh - 370px)); }
-  .lab-work-area:has(.output-header) .pane { height: 100%; min-height: 0; }
-  .lab-work-area:has(.output-header) #editorPane > div,
-  .lab-work-area:has(.output-header) #editor > div { height: 100% !important; }
-  .lab-work-area:has(.output-header) #editor { height: 100%; }
-  .lab-work-area:has(.output-header) #editor .cm-editor { height: 100%; }
-  .lab-work-area:has(.output-header) #editor .cm-scroller { max-height: none; }
-  .lab-work-area:has(.output-header) .run-output { max-height: none; }
 }
 
 /* Console labs on a phone: one row of editor controls (labels kept, icons dropped) and a task
@@ -3205,7 +3138,7 @@ body:has(.content-lesson-main) .lesson-position { width: 100%; max-width: 1080px
 .assignment-unmet-hint, .assignment-score .score-text, .grade-quota-note,
 .module-meta-line, .module-page section > h2 + p, .mod-row-title > span:last-child, .mod-row-badge, .mod-row-duration,
 .home-module-title, .home-chapter > summary > span:nth-child(2), .home-continue-card > div > span:first-child,
-.home-module-progress .unit-progress-count, .sandbox-header .sandbox-subtitle, .sandbox-header .sandbox-run-hint,
+.home-module-progress .unit-progress-count, .sandbox-header .sandbox-subtitle,
 .console-empty, .written-actions > span, .student-quiz .quiz-guidance p,
 .progress-page .progress-summary-line, .progress-page .grade-summary-row, .progress-page details ul, .progress-page p, .progress-page li,
 .docs-hub > p, .docs-hub p, .account-page p, .account-page legend, .lesson-description-more, .completion-done-text,
@@ -3383,22 +3316,6 @@ a.mod-row.is-next {
   background: var(--c-line); color: var(--c-fg); font-size: var(--fs-micro); font-weight: 700;
 }
 
-/* Readings: a console example in a narrow column stacks Output under the code, so the editor
-   keeps the full width and a one-line statement does not wrap. */
-.livecodeblock { container-type: inline-size; }
-@media (min-width: 721px) {
-  @container (max-width: 960px) {
-    .livecodeblock-body:has(> .livecodeblock-preview--plain) { flex-direction: column !important; height: auto !important; }
-    .content-lesson-main .livecodeblock-body:has(> .livecodeblock-preview--plain) > .livecodeblock-editor {
-      flex: none !important; width: 100% !important; height: clamp(72px, calc(var(--lcb-lines, 8) * 20px + 28px), 260px) !important;
-      border-right: 0 !important; border-bottom: 1px solid var(--border);
-    }
-    .content-lesson-main .livecodeblock-body:has(> .livecodeblock-preview--plain) > .livecodeblock-preview--plain {
-      flex: none !important; width: 100% !important; height: 120px !important;
-    }
-  }
-}
-
 /* Sandbox and labs on a wide screen: the tool rail is wider and its labels read horizontally.
    Drawer behaviour, drag-resize and tab order are unchanged. */
 @media (min-width: 1200px) {
@@ -3464,7 +3381,6 @@ a.mod-row.is-next {
 
 /* Progress: what the "Missing or late" count is made of, as a quiet line under the filter chips. */
 .progress-attention-breakdown { margin: -4px 0 12px; font-family: var(--font-prose); font-size: var(--fs-meta); line-height: 1.5; color: var(--c-meta); text-align: right; }
-
 
 /* Quiz on a wide screen: the "N of M answered" count is docked to the question column, right-aligned on
    the "Check your understanding" row, and that row stays in view (sticky) while the questions scroll.
@@ -3875,7 +3791,6 @@ a.mod-row.is-next {
   .lab-assignment-header .assignment-quota:has([role="status"]) ~ .shd-inline-host { margin-left: 4px; padding-left: 12px; border-left: 1px solid var(--c-line); }
   #titleRow:has(> .shd-inline-host) { display: flex; align-items: center; gap: 16px; }
   .sandbox-header:has(> .shd-inline-host) { align-items: center; }
-  .sandbox-header .sandbox-run-hint + .shd-inline-host { margin-left: 8px; padding-left: 12px; border-left: 1px solid var(--c-line); }
   .shd-inline-tools { display: flex; gap: 6px; flex-wrap: nowrap; }
   .shd-inline-tool {
     height: 30px; padding: 0 12px; box-sizing: border-box; border-radius: 6px; border: 1px solid var(--c-line);
@@ -3898,12 +3813,8 @@ a.mod-row.is-next {
   body:has(.shd-inline-tools) .lab-work-area:has(#previewPane):not(:has(.output-header)) > .lab-task-card { padding-left: 14px !important; padding-right: 14px !important; }
   body:has(.shd-inline-tools) .lab-work-area:has(#previewPane):not(:has(.output-header)) .editor-body { padding-left: 6px; padding-right: 6px; }
   body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) #editor .cm-editor { font-size: 13px !important; }
-  body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) .editor-preview-container:not(.sandbox-split) > #editorPane { flex: 1 1 auto; min-width: 0; }
-  body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) .editor-preview-container:not(.sandbox-split) > #previewPane { flex: 0 0 408px; min-width: 0; }
 }
-/* r7 S2 Console lab, desktop: what Check looks for sits right under Run / Check / Submit (LessonWorkspace
-   .lab-check-tests), the editor and Output are as tall as the program plus room to type (not the whole
-   screen), and an untouched starter marks the empty last line as the place to type. */
+/* Console labs show checks under Run / Check / Submit and mark the empty starter line as the place to type. */
 .lab-check-tests {
   display: flex; align-items: baseline; gap: 6px 12px; flex-wrap: wrap; margin: 0 0 8px; padding: 8px 12px;
   border: 1px solid var(--c-line); border-radius: 6px; background: var(--c-bg);
@@ -3916,18 +3827,7 @@ a.mod-row.is-next {
 .lab-check-tests li[data-status="passed"] .lab-check-dot { color: var(--c-green); }
 .lab-check-tests li[data-status="failed"] .lab-check-dot { color: var(--c-red); }
 .lab-check-tests .lab-check-more { color: var(--c-meta); padding-left: 22px; }
-@media (min-width: 721px) {
-  .lab-work-area:has(.output-header) .editor-preview-container { height: auto; min-height: 0; }
-  .lab-work-area:has(.output-header) .pane { height: auto; min-height: 260px; }
-  .lab-work-area:has(.output-header) #editorPane > div,
-  .lab-work-area:has(.output-header) #editor > div { height: auto !important; }
-  .lab-work-area:has(.output-header) #editor { height: auto; }
-  .lab-work-area:has(.output-header) #editor .cm-editor { height: auto; }
-  .lab-work-area:has(.output-header) #editor .cm-scroller { min-height: 216px; max-height: max(280px, calc(100svh - 440px)); }
-  .lab-work-area:has(.output-header) .run-output { max-height: max(280px, calc(100svh - 440px)); }
-  .lab-work-area:has(.output-header) #previewPane { display: flex; flex-direction: column; }
-  .lab-work-area:has(.output-header) #previewPane .run-output { flex: 1 1 auto; }
-}
+
 .lab-work-area:has(.output-header) #editor .cm-content:not(:has(> .cm-line > span:not(.cm-codeComment))) > .cm-line:last-child:has(> br:only-child)::before {
   content: "\2190  type your answer on this line"; color: var(--c-cyan); font-style: italic; opacity: 0.85; pointer-events: none;
 }
@@ -3946,9 +3846,6 @@ a.mod-row.is-next {
     position: absolute; top: 4px; right: 6px; margin: 0; min-height: 32px; padding: 0 8px; border: 0;
     text-decoration: underline; text-underline-offset: 3px; background: transparent;
   }
-  .lab-work-area:has(.output-header) #editorPane { min-height: 0; max-height: none; }
-  .lab-work-area:has(.output-header) #editor .cm-scroller { min-height: 260px !important; max-height: 50svh; }
-  .lab-work-area:has(.output-header) #previewPane { height: 120px; }
 }
 /* r7 S4 Phone reading and quiz: the bottom bar reads as chrome. A soft fade above it says the text goes on
    underneath, and a thin cyan line on its top edge fills as the page is read (a scroll-driven animation; a
@@ -4279,14 +4176,9 @@ a.mod-row.is-next {
   body:has(.shd-inline-tools) .lab-work-area:has(#previewPane):not(:has(.output-header)) .editor-body { padding-left: 3px; padding-right: 3px; }
   body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) #editor .cm-gutters { padding-right: 3px; }
   body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) #editor .cm-line { padding-left: 4px; }
-  body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) .editor-preview-container:not(.sandbox-split) > #previewPane { flex-basis: 404px; }
 }
 @media (min-width: 721px) {
   .shd-inline-tool { color: var(--c-fg); font-weight: 600; display: inline-flex; align-items: center; gap: 7px; }
-  .shd-inline-tool::before {
-    content: ''; width: 7px; height: 7px; border-radius: 50%; flex: 0 0 auto;
-    background: var(--shd-tab-accent, var(--c-purple));
-  }
 }
 /* r8 S8 Console lab: the module strip at the foot reads at a glance (14px prose, 10px bars, the current
    lesson a wider pink block), and the task's last line points at the requirements where they are shown. */
@@ -4371,21 +4263,15 @@ a.mod-row.is-next {
 /* r8 S6 Written: the disabled Submit is a normal button with its reason as a short hint beside it. */
 .written-submit-hint { font-family: var(--font-prose); font-size: 14px; color: var(--c-meta); }
 .written-submit:disabled { cursor: not-allowed; }
-/* r8 S7 Sandbox toolbar: Run leads (Ctrl+Enter beside it), then Save with where the code is kept, then the
+/* r8 S7 Sandbox toolbar: Run leads, then Save with where the code is kept, then the
    quiet History / Reset; Full screen and the Share group (labelled, Code together and Publish game) sit at
    the far right. The tool buttons in the title row are one labelled group, "Tools". */
-.sandbox-run-key { font-family: var(--font-prose); font-size: 13px; color: var(--c-meta); white-space: nowrap; }
 @media (min-width: 721px) {
-  .sandbox-header .sandbox-run-hint { display: none; }
-  .sandbox-header .sandbox-run-hint + .shd-inline-host { margin-left: auto !important; padding-left: 0 !important; border-left: 0 !important; }
   .sandbox-toolbar { gap: 12px; }
   .sandbox-toolbar .sandbox-tb-end { margin-left: 8px !important; flex: 1 1 auto; min-width: 0; }
   .sandbox-toolbar .sandbox-tb-end > .sandbox-tb-view { margin-left: auto; }
   .sandbox-toolbar .sandbox-tb-end > .sandbox-tb-program { border-left: 1px solid var(--c-line); padding-left: 12px !important; }
   .sandbox-toolbar .sandbox-tb-end > .sandbox-tb-view { border-left: 0 !important; padding-left: 0 !important; }
-  .sandbox-header .shd-inline-host::before {
-    content: "Tools"; margin-right: 10px; font-family: var(--font-prose); font-size: 13px; font-weight: 600; color: var(--c-meta);
-  }
 }
 .sandbox-tb-label { font-family: var(--font-prose); font-size: 13px; font-weight: 600; color: var(--c-meta); margin-right: 2px; }
 .sandbox-tb-program .sandbox-save-btn { order: -1; }
@@ -4657,7 +4543,6 @@ input.dd-date { width: 152px; padding-right: 30px !important; }
   .lab-assignment-header .score-bar { display: none; }
   .lab-assignment-header .score-text { font-family: var(--font-prose); font-weight: 700; }
   .lab-assignment-header .assignment-unmet-hint { color: var(--c-meta); }
-  .lab-work-area:has(.output-header) #editor .cm-scroller { min-height: clamp(216px, calc(100svh - 470px), 520px); max-height: none; }
 }
 /* r9 S7 Phone lesson nav: the number leads. (The quiz's plain-text Check hint was reverted in r10.) */
 .lesson-nav-short .lesson-nav-num { font-weight: 700; color: var(--c-fg); }
@@ -4718,9 +4603,7 @@ input.dd-date { width: 152px; padding-right: 30px !important; }
 }
 /* r9 S13 Phone console lab: the editor leaves room for the Output heading and two lines of output above
    the bottom dock. */
-@media (max-width: 720px) {
-  .lab-work-area:has(.output-header) #editor .cm-scroller { min-height: 200px !important; max-height: 40svh; }
-}
+
 /* r9 S14 Account: Save is the app's primary action colour (the green Continue / Run), not the old blue. */
 .account-page .btn-primary { background: var(--c-green); color: var(--c-deep2); font-weight: 700; }
 /* end climb4 r9 student */
@@ -4777,7 +4660,6 @@ input.dd-date { width: 152px; padding-right: 30px !important; }
   .sandbox-shell .sandbox-toolbar .sandbox-mode { font-size: 13px !important; height: 32px; }
   .sandbox-shell .sandbox-toolbar .sandbox-mode:not(.is-active) { color: var(--c-meta) !important; font-weight: 600; }
   .sandbox-shell .sandbox-toolbar .sandbox-mode:not(.is-active):hover { color: var(--c-fg) !important; }
-  .sandbox-shell .sandbox-toolbar .sandbox-run-key { font-size: 12px; margin-left: -2px; }
   .sandbox-shell .sandbox-toolbar .sandbox-save-state { margin: 0 8px 0 4px; }
 }
 /* r10 S4 moSHion lab, desktop: the preview pane is exactly the 400px canvas, the editor's left gutter is
@@ -4785,19 +4667,17 @@ input.dd-date { width: 152px; padding-right: 30px !important; }
    after its longest line while the task column takes every pixel left over (wider prose lines). */
 @media (min-width: 1200px) {
   body:has(.shd-inline-tools) .lab-work-area:has(#previewPane):not(:has(.output-header)) { grid-template-columns: minmax(300px, 1fr) minmax(0, 1060px); gap: 10px; }
-  body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) .editor-preview-container:not(.sandbox-split) > #previewPane { flex-basis: 400px; }
   body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) #editor .cm-editor { font-size: 12.5px !important; }
   body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) #editor .cm-lineNumbers .cm-gutterElement { padding: 0 2px 0 4px; min-width: 16px !important; }
   body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) #editor .cm-foldGutter .cm-gutterElement { padding: 0 1px; }
   body:has(.shd-inline-tools) .lab-work-area:has(#previewPane):not(:has(.output-header)) > .lab-task-card { padding-left: 14px !important; padding-right: 12px !important; }
   body:has(.shd-inline-tools) .lab-work-area:not(:has(.output-header)) .lab-task-card .lesson-steps { padding-left: 16px !important; }
 }
-/* r10 S7 Labs, desktop: "Ctrl+Enter" sits right after Run (LessonWorkspace moved it), a shut Submit says
+/* Labs, desktop: a disabled Submit says
    why beside it (.toolbar-submit-hint), and the AI-grade allowance leaves the header until it runs low
    (its hover text and the low warning stay; the phone already did this). */
 .run-toolbar .toolbar-submit-hint { display: none; }
 @media (min-width: 721px) {
-  .lab-work-area .run-toolbar .btn-run + .run-hint { margin-left: -2px; margin-right: 6px; color: var(--c-meta); opacity: 1; font-family: var(--font-prose); font-size: 12px; }
   .run-toolbar .toolbar-submit-hint {
     display: inline; font-family: var(--font-prose); font-size: 13px; color: var(--c-meta); white-space: nowrap;
   }
@@ -5272,14 +5152,6 @@ input.dd-date { padding-right: 8px !important; }
     position: static; margin-top: 6px; padding: 0; min-height: 32px;
   }
 }
-/* With no "Check looks for" row over it, a console lab's editor reaches down to the module strip. */
-@media (min-width: 721px) {
-  .lab-work-area:has(.output-header) #editor .cm-scroller { min-height: clamp(216px, calc(100svh - 390px), 640px); }
-}
-@media (min-width: 721px) {
-  /* ...and makes room again while Check's results (and the checker's note) are shown above it. */
-  .lab-work-area:has(.output-header):has(.lab-check-above) #editor .cm-scroller { min-height: clamp(216px, calc(100svh - 510px), 520px); }
-}
 
 /* ---- Written answer (2026-11-13) ----
    The task reads top to bottom on the left (description, the whole intro, What to answer, How this is
@@ -5377,10 +5249,6 @@ input.dd-date { padding-right: 8px !important; }
   color: var(--c-meta); background: transparent; border: 1px solid transparent;
   transition: background-color 120ms, border-color 120ms, color 120ms;
 }
-.shd-switch-btn::before {
-  content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; vertical-align: 1px;
-  background: var(--shd-tab-accent, var(--c-purple));
-}
 .shd-switch-btn:hover { color: var(--c-fg); border-color: var(--c-line); }
 .shd-switch-btn[aria-pressed="true"] {
   color: var(--c-fg); border-color: var(--shd-tab-accent, var(--c-purple));
@@ -5420,12 +5288,12 @@ input.dd-date { padding-right: 8px !important; }
 .shd-handle.shd-handle-left { border-radius: 0 8px 8px 0; color: var(--c-yellow); }
 .shd-handle.shd-handle-left:hover { border-color: var(--c-yellow); background: color-mix(in srgb, var(--c-yellow) 14%, var(--c-deep2)); }
 .shd-handle.shd-handle-left:focus-visible { outline-color: var(--c-yellow); }
-/* With both sidebars open the work column narrows: the lab toolbar drops its hints first (Ctrl+Enter, "Pass
+/* With both sidebars open the work column narrows: the lab toolbar drops its Submit hint first ("Pass
    Check to submit"; Submit's own tooltip still says it), then the utility buttons' words keep their icons. */
 @media (min-width: 721px) {
   .lab-work-area > .editor-card { container-type: inline-size; container-name: labwork; }
   @container labwork (max-width: 860px) {
-    .run-toolbar .run-hint, .run-toolbar .toolbar-submit-hint { display: none; }
+    .run-toolbar .toolbar-submit-hint { display: none; }
   }
   @container labwork (max-width: 620px) {
     .run-toolbar .toolbar-utilities .toolbar-button-label { display: none; }
@@ -5471,3 +5339,29 @@ input.dd-date { padding-right: 8px !important; }
 .teacher-section-link { color: var(--c-cyan); text-decoration: none; border: 1px solid var(--c-line); border-radius: 999px; padding: 2px 10px; }
 .teacher-section-link:hover { border-color: var(--c-cyan); background: color-mix(in srgb, var(--c-cyan) 10%, transparent); }
 .teacher-section-link:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 2px; }
+
+/* Shared work surface: course pages and sandbox use the same height, split and console budget.
+   Reading examples may set --workspace-height to keep an authored example compact. */
+.code-workspace {
+  display: flex; flex-direction: column; gap: 12px; min-width: 0; min-height: 0;
+  height: var(--workspace-height, max(420px, calc(100svh - 280px)));
+}
+.code-workspace-fill { height: auto; }
+.code-workspace > .workspace-split { flex: 1 1 0; height: auto; min-height: 0; }
+.workspace-split > .pane { min-width: 0; min-height: 0; overflow: hidden; }
+.workspace-split .run-output { flex: 1 1 0; height: auto; min-height: 0; max-height: none; }
+.workspace-split #editor { height: auto; }
+.workspace-split .cm-editor { height: 100%; }
+.workspace-split .cm-scroller { min-height: 0; max-height: none; }
+.workspace-split > .divider { touch-action: none; }
+.workspace-split > .divider:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: -2px; }
+.wsc-body:has(> .liveconsole) { padding: 0; }
+.wsc-body > .liveconsole { flex: 1; display: flex; flex-direction: column; min-height: 0; border-top: 0; }
+.wsc-body > .liveconsole .liveconsole-scroll { flex: 1; min-height: 0; max-height: none; }
+.wsc-body > .liveconsole :is(.liveconsole-header, .liveconsole-input-row) { flex-shrink: 0; }
+@media (max-width: 720px) {
+  .code-workspace { height: auto; }
+  .code-workspace > .workspace-split { flex: none; }
+  .sandbox-work-area { display: flex !important; flex-direction: column; }
+  .sandbox-shell.is-full { overflow-y: auto; }
+}

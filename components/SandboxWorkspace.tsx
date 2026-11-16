@@ -16,7 +16,7 @@ import CodeEditor from './CodeEditor';
 import HistoryPanel from './HistoryPanel';
 import MoshionPreview from './MoshionPreview';
 import EditorPreviewSplit from './EditorPreviewSplit';
-import ResizableConsole from './ResizableConsole';
+import CodeWorkspace from './CodeWorkspace';
 import TabbedRightDrawer, { type DrawerTab } from './TabbedRightDrawer';
 import AiHelpPanel from './AiHelpPanel';
 import TextureEditor from './TextureEditor';
@@ -495,19 +495,6 @@ export default function SandboxWorkspace() {
     }
   }, []);
 
-  // How tall the console may be made. It sits under the editor and the game in a shell of fixed height, so a
-  // taller console takes its room from them, and they always keep a usable height. ResizableConsole asks on
-  // every drag step and again when full screen changes. Measured against the shell's own bottom edge, not the
-  // panes' current sizes, so a console that is already too tall (just after leaving full screen) is cut back.
-  const maxConsoleHeight = useCallback(() => {
-    const shell = shellRef.current;
-    const split = shell?.querySelector<HTMLElement>('#split, .sandbox-split');
-    if (!shell || !split) return Number.POSITIVE_INFINITY;
-    const keep = document.fullscreenElement ? 160 : 280; // what the editor and game keep
-    const bottom = shell.getBoundingClientRect().bottom - (parseFloat(getComputedStyle(shell).paddingBottom) || 0);
-    return bottom - (split.getBoundingClientRect().top + keep) - 12;
-  }, []);
-
 
   const drawerTabs: DrawerTab[] = isFlow ? [
     {
@@ -776,7 +763,7 @@ export default function SandboxWorkspace() {
 
   return (
     <>
-      <TabbedRightDrawer storageKey="shCode:sandbox-drawer" tabs={drawerTabs} inlineHostId="sandbox-tools-host" />
+      <TabbedRightDrawer storageKey="shCode:sandbox-drawer" tabs={drawerTabs} dockHostId="sandbox-dock-host" />
       <div
         className={
           'sandbox-shell'
@@ -788,10 +775,6 @@ export default function SandboxWorkspace() {
           <div className="sandbox-header">
             <h1 className="sandbox-title">Sandbox</h1>
             <span className="sandbox-subtitle">{mode.blurb}</span>
-            {/* Up here rather than at the end of the toolbar, where it took a row of its own at 1366 wide. */}
-            {!isReshape && !isFlow && <span className="run-hint sandbox-run-hint">Ctrl+Enter to run</span>}
-            {/* Desktop: the drawer's tool buttons (Textures, Sounds, Library, CODY, Docs) render here. */}
-            <div id="sandbox-tools-host" className="shd-inline-host" />
           </div>
         )}
 
@@ -805,7 +788,6 @@ export default function SandboxWorkspace() {
               startOpen={noProjects}
             />
             {!isFlow && !noProjects && <button className="btn-run" onClick={run} title="Run (Ctrl+Enter)" aria-keyshortcuts="Control+Enter">▶ Run</button>}
-            {!isFlow && !noProjects && <span className="sandbox-run-key" aria-hidden="true">Ctrl+Enter</span>}
             {isRunning && !isFlow && (
               <button
                 className="btn-secondary btn-sm"
@@ -912,42 +894,40 @@ export default function SandboxWorkspace() {
           </div>
         )}
 
-        {!noProjects && (
-          <EditorPreviewSplit className="sandbox-split" previewRef={gamePaneRef} editor={editorSlot} preview={previewSlot}>
-          {isReshape ? (
-            <ReshapeStudio
-              key={`${lesson.id}-${reshapeResetKey}`}
-              value={fileContents['script.js'] ?? ''}
-              onChange={(t) => updateFile('script.js', t)}
-              sides={reshapeSides}
-              startSide={build ? 'build' : 'code'}
-              onSideChange={setReshapeSide}
-              toolbarExtra={reshapeToolbarExtra}
-              // The sandbox's `value` on a fresh session is RESHAPE_STARTER
-              // (a Code-side teaching example, box+hole already in it), not
-              // saved progress -- auto-adopting it into Build pre-built a
-              // model before the student touched a tool. See this prop's
-              // own doc comment.
-              autoRunOnMount={false}
-              lessonId="sandbox"
-            />
-          ) : isFlow && chart ? (
-            <div className="sandbox-flow" ref={flowFrameRef}>
-              <DiagramEditor key={lesson.id} value={chart} onChange={onChartChange} height={flowH} />
-            </div>
-          ) : undefined}
-          </EditorPreviewSplit>
-        )}
-
-        {!isConsole && !reshapeIsBuild && !isFlow && !noProjects && (
-          <ResizableConsole
-            resetKey={String(consoleResetKey)}
-            defaultHeight={120}
-            maxHeight={maxConsoleHeight}
-            refitKey={full}
-            className="sandbox-console"
-          />
-        )}
+        <div className="sandbox-work-area">
+          {!noProjects && (
+            <CodeWorkspace
+              fill={full}
+              consoleResetKey={!isConsole && !reshapeIsBuild && !isFlow ? String(consoleResetKey) : undefined}
+            >
+              <EditorPreviewSplit className="sandbox-split" previewRef={gamePaneRef} editor={editorSlot} preview={previewSlot}>
+                {isReshape ? (
+                  <ReshapeStudio
+                    key={`${lesson.id}-${reshapeResetKey}`}
+                    value={fileContents['script.js'] ?? ''}
+                    onChange={(t) => updateFile('script.js', t)}
+                    sides={reshapeSides}
+                    startSide={build ? 'build' : 'code'}
+                    onSideChange={setReshapeSide}
+                    toolbarExtra={reshapeToolbarExtra}
+                    // The sandbox's `value` on a fresh session is RESHAPE_STARTER
+                    // (a Code-side teaching example, box+hole already in it), not
+                    // saved progress -- auto-adopting it into Build pre-built a
+                    // model before the student touched a tool. See this prop's
+                    // own doc comment.
+                    autoRunOnMount={false}
+                    lessonId="sandbox"
+                  />
+                ) : isFlow && chart ? (
+                  <div className="sandbox-flow" ref={flowFrameRef}>
+                    <DiagramEditor key={lesson.id} value={chart} onChange={onChartChange} height={flowH} />
+                  </div>
+                ) : undefined}
+              </EditorPreviewSplit>
+            </CodeWorkspace>
+          )}
+          <div id="sandbox-dock-host" className="lab-dock-host" />
+        </div>
       </div>
       <style>{`
         .sandbox-shell {
@@ -955,12 +935,9 @@ export default function SandboxWorkspace() {
           position: relative;
           flex-direction: column;
           gap: 10px;
-          height: calc(100vh - 180px);
-          min-height: 560px;
-          margin-right: 28px;
+          min-height: 0;
         }
         .sandbox-header { display: flex; align-items: baseline; gap: 12px; flex-shrink: 0; }
-        .sandbox-run-hint { margin-left: auto; white-space: nowrap; }
         .sandbox-title { margin: 0; font-size: 28px; color: var(--text); }
         .sandbox-subtitle { color: var(--c-meta); font-size: 0.85rem; }
         .sandbox-toolbar { margin-bottom: 0; flex-shrink: 0; gap: 8px; }
@@ -990,23 +967,9 @@ export default function SandboxWorkspace() {
           .sandbox-tb-end > * + * { border-left: 0; padding-left: 0; }
           .sandbox-tb-group { flex-wrap: wrap; }
           .sandbox-header { flex-wrap: wrap; row-gap: 2px; }
-          .sandbox-run-hint { display: none; }
         }
-        .sandbox-split.editor-preview-container {
-          height: auto;
-          flex: 1 1 auto;
-          min-height: 280px;
-        }
+        .sandbox-work-area { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; min-height: 0; }
         .sandbox-flow { flex: 1 1 auto; min-width: 0; min-height: 0; }
-        /* A lobby bar above the canvas takes height from the row that holds it,
-           so the console (empty most of the time, and still resizable) gives some back. */
-        .sandbox-shell:has([data-testid='moshion-lobby']) .sandbox-console .wsc-box.is-open:not([data-sized]) {
-          height: 112px;
-          min-height: 72px;
-        }
-        .sandbox-shell:has([data-testid='moshion-lobby']) .sandbox-console .console-empty {
-          padding: 4px;
-        }
 
         /* ---- full screen ----
            The normal layout, stretched over the whole screen (owner, 2026-11-13): the
@@ -1020,8 +983,8 @@ export default function SandboxWorkspace() {
           gap: 8px;
           background: var(--bg);
         }
-        .sandbox-shell.is-full .sandbox-header,
-        .sandbox-shell.is-full .sandbox-run-key { display: none; }
+        .sandbox-shell.is-full .sandbox-header { display: none; }
+        .sandbox-shell.is-full .sandbox-work-area { flex: 1 1 0; }
         .sandbox-shell.is-full .sandbox-split { min-height: 0; }
         /* One row: it scrolls sideways on a very narrow screen rather than wrapping. */
         .sandbox-shell.is-full .sandbox-toolbar,

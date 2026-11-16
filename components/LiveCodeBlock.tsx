@@ -7,6 +7,8 @@ import { Play, RotateCcw } from 'lucide-react';
 import MoshionPreview from './MoshionPreview';
 import LiveConsole from './LiveConsole';
 import CodeMirrorPane from './CodeMirrorPane';
+import CodeWorkspace from './CodeWorkspace';
+import EditorPreviewSplit from './EditorPreviewSplit';
 import { RUN_TIMEOUT_MS, errorWithLocation, lineColOf, runStudentCode } from '../lib/js-runner-source';
 import { ownedLocal } from '../lib/owned-storage';
 
@@ -261,57 +263,52 @@ export default function LiveCodeBlock({
           <RotateCcw size={12} /> Reset
         </button>
       </div>
-      <div
-        className="livecodeblock-body"
-        style={
-          {
-            '--lcb-editor-h': `${height}px`,
-            '--lcb-preview-side': `${previewSize}px`,
-            // How many lines the authored example has: a stacked block (globals.css) sizes its
-            // editor to the code instead of a fixed square.
-            '--lcb-lines': String(Math.max(2, initialCode.split('\n').length)),
-          } as CSSProperties
-        }
+      <CodeWorkspace
+        style={{ '--workspace-height': `${Math.max(280, height, previewSize) + (showConsole && !plain ? 132 : 0)}px` } as CSSProperties}
+        consoleResetKey={showConsole && !plain ? String(runKey) : undefined}
+        consoleContent={<LiveConsole iframeRef={iframeRef} resetKey={runKey} />}
       >
-        <div className="livecodeblock-editor">
-          <CodeMirrorPane
-            value={editorCode}
-            onChange={setEditorCode}
-            fileKey={storageKey ?? blockId ?? 'live'}
-            language="javascript"
-          />
-        </div>
-        <div className={`livecodeblock-preview${plain ? ' livecodeblock-preview--plain' : ''}`}>
-          {plain ? (
-            <>
-              <div className="output-header">Output</div>
-              <pre
-                className="console-output run-output"
-                role="log"
-                aria-live="polite"
-                aria-atomic="false"
-                aria-relevant="additions text"
-                aria-label="Program output"
-              >
-                {!hasRunPlain ? (
-                  <div className="console-empty livecode-empty"><span className="livecode-empty-icon" aria-hidden="true">▶</span><span>Press <strong>Run</strong> to see what this code prints.</span></div>
-                ) : plainLogs.length === 0 ? (
-                  <div className="console-empty">(no output)</div>
-                ) : (
-                  plainLogs.map((log, i) => (
-                    <div key={i} className={`log-entry log-${log.type}`}>
-                      <span className="log-msg">{log.message}</span>
-                    </div>
-                  ))
-                )}
-              </pre>
-            </>
-          ) : (
-            <MoshionPreview ref={iframeRef} code={committedCode} runKey={runKey} />
-          )}
-        </div>
-      </div>
-      {showConsole && !plain && <LiveConsole iframeRef={iframeRef} resetKey={runKey} />}
+        <EditorPreviewSplit embedded className="livecodeblock-body" editor={
+          <div className="livecodeblock-editor">
+            <CodeMirrorPane
+              value={editorCode}
+              onChange={setEditorCode}
+              fileKey={storageKey ?? blockId ?? 'live'}
+              language="javascript"
+            />
+          </div>
+        } preview={
+          <div className={`livecodeblock-preview${plain ? ' livecodeblock-preview--plain' : ''}`}>
+            {plain ? (
+              <>
+                <div className="output-header">Output</div>
+                <pre
+                  className="console-output run-output"
+                  role="log"
+                  aria-live="polite"
+                  aria-atomic="false"
+                  aria-relevant="additions text"
+                  aria-label="Program output"
+                >
+                  {!hasRunPlain ? (
+                    <div className="console-empty livecode-empty"><span className="livecode-empty-icon" aria-hidden="true">▶</span><span>Press <strong>Run</strong> to see what this code prints.</span></div>
+                  ) : plainLogs.length === 0 ? (
+                    <div className="console-empty">(no output)</div>
+                  ) : (
+                    plainLogs.map((log, i) => (
+                      <div key={i} className={`log-entry log-${log.type}`}>
+                        <span className="log-msg">{log.message}</span>
+                      </div>
+                    ))
+                  )}
+                </pre>
+              </>
+            ) : (
+              <MoshionPreview ref={iframeRef} code={committedCode} runKey={runKey} />
+            )}
+          </div>
+        } />
+      </CodeWorkspace>
       <style>{`
         /* Same chrome palette as the graded editor (.editor-card /
            .editor-body / .editor-file-toolbar in globals.css) so a live
@@ -333,76 +330,11 @@ export default function LiveCodeBlock({
           font-weight: 600;
         }
 
-        /* Column layout (default / narrow): editor stacked above preview.
-           Each child takes its own explicit height so nothing grows to
-           indeterminate parent size. */
-        .livecodeblock-body {
-          display: flex;
-          flex-direction: column;
-        }
-        .livecodeblock-editor {
-          height: var(--lcb-editor-h);
-          background: var(--card);
-          overflow: hidden;
-        }
-        .livecodeblock-preview {
-          width: 100%;
-          height: var(--lcb-preview-side);
-          background: var(--x-000000);
-          position: relative;
-        }
-        .livecodeblock-preview .reshape-frame,
-        .livecodeblock-preview .reshape-empty {
-          width: 100%;
-          height: 100%;
-          display: block;
-        }
-
-        /* Plain console-track mode: no canvas, so the preview pane becomes
-           a flexible Output column (like the in-app console lesson split)
-           instead of a fixed square. */
-        .livecodeblock-preview--plain {
-          background: var(--card);
-          display: flex;
-          flex-direction: column;
-        }
-        .livecodeblock-preview--plain .run-output {
-          height: 100%;
-        }
-
-        /* Row layout: editor and preview side-by-side, both matching the
-           preview's square height so the iframe is never clipped. */
-        @media (min-width: 720px) {
-          .livecodeblock-body {
-            flex-direction: row;
-            height: var(--lcb-preview-side);
-          }
-          .livecodeblock-editor {
-            flex: 1 1 0;
-            min-width: 0;
-            height: 100%;
-            border-right: 1px solid var(--border);
-          }
-          .livecodeblock-preview {
-            width: var(--lcb-preview-side);
-            height: 100%;
-            flex-shrink: 0;
-          }
-          .livecodeblock-preview--plain {
-            width: auto;
-            flex: 1 1 0;
-            min-width: 0;
-          }
-          /* Keep the action row for an embedded example on the first
-             desktop screen, above the fixed lesson progress strip. */
-          .livecodeblock-body { height: min(200px, var(--lcb-preview-side)); }
-          .livecodeblock-editor, .livecodeblock-preview { height: 100%; }
-        }
-
-        @media (max-width: 719px) {
-          .livecodeblock-editor { height: min(240px, var(--lcb-editor-h)); }
-          .livecodeblock-preview { height: min(160px, var(--lcb-preview-side)); }
-        }
+        .livecodeblock .livecodeblock-body { border: 0; border-radius: 0; box-shadow: none; }
+        .livecodeblock-editor, .livecodeblock-preview { height: 100%; width: 100%; min-height: 0; overflow: hidden; }
+        .livecodeblock-preview { background: var(--x-000000); position: relative; }
+        .livecodeblock-preview--plain { background: var(--card); display: flex; flex-direction: column; }
+        .livecodeblock-preview--plain .run-output { flex: 1; min-height: 0; }
 
         .livecodeblock-toolbar {
           display: flex;
