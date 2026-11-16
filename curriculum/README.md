@@ -5,6 +5,16 @@ Source of truth: `../curriculum-plan.md` (SLOs + calendar) and the bookSHelf tex
 for how a written book chapter becomes modules here, and how to resync a built unit
 when the book changes.
 
+## CAD redesign
+
+The [CAD chapter and lesson design](CAD-CHAPTER-DESIGN.md) is the draft continuation
+from the current 9.1 pilot onto reSHape Script and SolidCraft. It preserves the old
+course's useful design/measurement/testing progression while separating it from
+JSCAD-specific APIs. The first detailed lesson designs are under
+[design/cad](design/cad/). They are planning documents outside the live module loader;
+no new module is released or numbered in the student course by adding a draft there.
+The textbook remains the source for concepts and keeps its original section numbers.
+
 This directory contains the **build specs** used to generate individual learning artifacts (in-app lessons, assignment markdown, slide outlines, rubrics) from the curriculum plan.
 
 ## Layout

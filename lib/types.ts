@@ -287,6 +287,8 @@ export interface Lesson {
    *  'code' = script only, 'both' = both, Build first. A teacher's
    *  class/assignment mode (see lib/lesson-mode.ts) overrides this. */
   mode?: LessonMode;
+  /** Opt-in guarded script workspace. Legacy CAD lessons retain their existing studio until migrated. */
+  cadHost?: 'solidcraft';
   week?: number;
   slos?: string[];
   files: FileNode[];

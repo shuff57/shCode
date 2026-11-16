@@ -1,3 +1,10 @@
+> **CAD design update, 2026-11-15:** the [CAD chapter and lesson design](curriculum/CAD-CHAPTER-DESIGN.md)
+> proposes the new shCode CAD sequence around reSHape Script on SolidCraft, beginning
+> with the 9.1.12 OOP pilot. The JSCAD-specific Q3/Q4 APIs and dates below are historical
+> planning references, not instructions to build a new JSCAD integration. Existing book
+> references, assignment codes and saved lesson ids remain unchanged. The new unit
+> numbers and time allocation are drafts pending curriculum/calendar review.
+>
 > **Note, 2026-10-26:** every drawn-flowchart lab, gate and PA design part in this plan has since become a typed pseudocode plan (ids, assignment codes and credit unchanged). Read "chart", "draw" and "Check my diagram" below as written plans; the module docs under `curriculum/modules/` describe what ships.
 >
 > **Renumbered 2026-11-04 (unit repartition):** old 5.6-5.8 are now **7.1-7.3**, the Defender

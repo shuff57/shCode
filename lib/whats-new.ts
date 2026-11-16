@@ -49,6 +49,26 @@ export interface WhatsNewEntry {
 
 export const WHATS_NEW: WhatsNewEntry[] = [
   {
+    id: '2026-11-cad-pilot',
+    date: '2026-11-16',
+    audience: 'all',
+    title: 'Build 3D parts with code',
+    summary:
+      'Try the new reSHape CAD preview: write code to build a part, then turn the model to inspect it. ' +
+      'The new One class, two parts lesson keeps your script with your lesson work, and your teacher controls whether hand-modelling tools are available.',
+    steps: [
+      'Change a size in script.js, press Run, and confirm replacing the current model if asked.',
+      'Drag to turn the model. Press Fit part if it goes off screen.',
+      'In the preview, press Download script before leaving. In the pilot lesson, use Save and History.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-cad-pilot.mp4',
+      poster: '/whats-new/2026-11-cad-pilot.jpg',
+      alt: 'A student changes a box size in script.js, presses Run to rebuild a plate with a hole, then presses Fit part to centre the model.',
+    },
+    action: { label: 'Open CAD preview', href: '/sandbox/cad' },
+  },
+  {
     id: '2026-11-guest-pass',
     date: '2026-11-15',
     audience: 'student',

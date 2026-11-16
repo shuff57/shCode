@@ -3,6 +3,9 @@
 Static runtime snapshot for `/sandbox/cad/`. SolidCraft **0.30.1**, unmodified web build,
 and the guarded host from reshape-cad commit `49993b98bd4dd75ae879634cec787881b0d70d3c`.
 The scripts and examples here are public CAD runtime code, not classroom solutions.
+Host-only integration update: `pane/pane.js` accepts `?storage=off` so a shCode lesson
+uses its own account-scoped saving instead of the demo localStorage keys. The
+SolidCraft web build and the guard/translator bundles are unchanged.
 
 The two engine WASM files exceed Cloudflare Pages' 25 MiB asset limit. They are stored
 under content-addressed `solidcraft-runtime/` keys in the existing `shcode-uploads`

@@ -12806,6 +12806,20 @@
       "scoreKind": null
     },
     {
+      "id": "9-1-12-lab-one-class-two-parts",
+      "title": "9.1.12 Lab: One Class, Two Parts",
+      "unit": "9.1 Solid Shapes",
+      "preview": "reshape",
+      "cadHost": "solidcraft",
+      "type": "assignment",
+      "category": "Unit 3: reSHape: Solid Modelling",
+      "week": null,
+      "assignmentCode": null,
+      "maxScore": null,
+      "maxSubmissions": null,
+      "scoreKind": null
+    },
+    {
       "id": "moshion-bounce",
       "title": "5.2.16 Bouncy Ball",
       "unit": "5.2 Physics Feel",

@@ -108,8 +108,8 @@ const status = (s) => { $('status').textContent = s; };
 // every script-derived string (feature ids, body names, refusal sentences) goes through esc() before it reaches innerHTML
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmt = (n, d = 4) => (Number.isFinite(n) ? n.toFixed(d) : String(n));
-const lsGet = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
-const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch { /* storage unavailable: the pane still works */ } };
+const lsGet = (k) => { if (params.get('storage') === 'off') return null; try { return localStorage.getItem(k); } catch { return null; } };
+const lsSet = (k, v) => { if (params.get('storage') === 'off') return; try { localStorage.setItem(k, v); } catch { /* storage unavailable: the pane still works */ } };
 
 // ---- layout: resizable split, collapsible pane --------------------------------------------------------------------
 const clampW = (w) => Math.round(Math.max(300, Math.min(w, window.innerWidth * 0.7)));

@@ -187,7 +187,7 @@ check('every entry has an audience, a short title and summary, and at most 3 ste
   }
 });
 check('every action is an in-site page that exists', () => {
-  const pages = new Set(['/', '/sandbox', '/library', '/account', '/teacher', '/docs', '/fonts']);
+  const pages = new Set(['/', '/sandbox', '/sandbox/cad', '/library', '/account', '/teacher', '/docs', '/fonts']);
   for (const e of WHATS_NEW) {
     if (!e.action) continue;
     const { href, label } = e.action;

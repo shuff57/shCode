@@ -1,0 +1,120 @@
+{
+  "id": "9-1-12-lab-one-class-two-parts",
+  "title": "9.1.12 Lab: One Class, Two Parts",
+  "description": "Use one class to build two mounting plates, then change one instance without changing the other. SolidCraft pilot.",
+  "type": "assignment",
+  "estimateMins": 25,
+  "category": "Unit 3: reSHape: Solid Modelling",
+  "unit": "9.1 Solid Shapes",
+  "preview": "reshape",
+  "cadHost": "solidcraft",
+  "mode": "code",
+  "slos": [
+    "SLO-2",
+    "SLO-3"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "A part object keeps its own measurements",
+      "instructions": "You already know classes, constructors and `this` from moSHion. Here the object describes a physical part. In `MountingPlate`\u2019s constructor, keep the `width` and `x` arguments as `this.width` and `this.x`. The constructor records measurements; it does not build a solid yet.",
+      "hints": [
+        "Use the same instance-property pattern you used for a game object: `this.property = argument`."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "One method builds one plate",
+      "instructions": "Complete `build()`. Make a box using this instance\u2019s width, depth 30 and height 8: `box(width, depth, height, { at: [x, y, z] })`. Read width and x from `this`, and use 0 for y and z. Save that box in a local variable, then call `hole(body, { across: 6 })` on it. All measurements are in mm. Each call adds a step to the part\u2019s recipe; you do not return an array from `main()` or import a modelling library.",
+      "hints": [
+        "Inside a method, `this.width` reads the width of the instance whose method you called.",
+        "The hole\u2019s first argument is the box you just made."
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Create two instances",
+      "instructions": "Below the class, create one instance 36 mm wide at x = 0 and another 54 mm wide at x = 80. Give them different variable names. The x values keep the parts apart; making two variables point to the same instance would not give them independent measurements.",
+      "hints": [
+        "Use `new MountingPlate(width, x)` twice."
+      ]
+    },
+    {
+      "id": "s4",
+      "title": "Change only one object",
+      "instructions": "Before calling either build method, change the first instance\u2019s width to 42. Leave the second instance at 54. Call each instance\u2019s `build()` once, then Run. You should see two separate plates, each 30 deep and 8 high, each with a 6 mm through hole. Their widths should be 42 and 54. Re-running a script rebuilds its recipe; changing a JavaScript property after a solid was built does not retroactively resize that solid.",
+      "hints": [
+        "Use `firstObject.width = 42` with the name you chose. Change the object before calling its method.",
+        "Use Fit part if a plate is outside the view. Drag to orbit, Shift-drag to pan, and scroll to zoom."
+      ]
+    },
+    {
+      "id": "s5",
+      "title": "Check independence and keep your work",
+      "instructions": "Temporarily change only the first instance\u2019s width again, Run, and check that only its plate changes. Put it back to 42, Run, then Check. If any step is not built, read its sentence and fix that step; a refused hole does not count as a completed part. Use shCode\u2019s Save and History controls to keep a version. Reopen this lesson and check that your script rebuilds the same two parts. The teacher controls whether hand-modelling tools are available; camera controls still work when they are off.",
+      "hints": [
+        "Both instances use the same class, but each has its own stored width."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "A part class stores measurements and defines a build method",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "class\\s+[A-Za-z_$][\\w$]*\\s*\\{[\\s\\S]*constructor\\s*\\([\\s\\S]*this\\.[A-Za-z_$][\\w$]*\\s*=[\\s\\S]*build\\s*\\(",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "Keep each instance\u2019s measurements with this, and define build() inside the class."
+    },
+    {
+      "id": "r2",
+      "title": "Two separate instances are built",
+      "type": "regex",
+      "file": "script.js",
+      "pattern": "new\\s+[A-Za-z_$][\\w$]*\\s*\\([\\s\\S]*new\\s+[A-Za-z_$][\\w$]*\\s*\\([\\s\\S]*\\.build\\s*\\(\\s*\\)[\\s\\S]*\\.build\\s*\\(\\s*\\)",
+      "ignoreStrings": true,
+      "points": 0,
+      "hint": "Create two objects with new and call each build() method once."
+    },
+    {
+      "id": "r3",
+      "title": "The built plates are 42 and 54 mm wide, each with a 6 mm hole",
+      "type": "model",
+      "expect": [
+        {
+          "kind": "box",
+          "size": [
+            42,
+            30,
+            8
+          ]
+        },
+        {
+          "kind": "box",
+          "size": [
+            54,
+            30,
+            8
+          ]
+        },
+        {
+          "kind": "hole",
+          "diameter": 6
+        },
+        {
+          "kind": "hole",
+          "diameter": 6
+        }
+      ],
+      "points": 0,
+      "hint": "Build both objects after changing only the first width to 42. Run again after editing."
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  }
+}

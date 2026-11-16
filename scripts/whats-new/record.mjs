@@ -329,6 +329,27 @@ async function sendByApi(page, toName, body) {
 const GUEST_DETAILS = { classId: 'dev-class', name: 'Jordan Reyes', relation: 'my cousin', age: 'teen', org: 'Lincoln High School', purpose: 'Build a platformer together after school' };
 
 const RECIPES = {
+  '2026-11-cad-pilot': {
+    people: [SAM],
+    path: '/sandbox/cad/',
+    async before({ pages: [p] }) {
+      await p.getByRole('button', { name: 'Run', exact: true }).waitFor({ timeout: 180000 });
+      await p.waitForFunction(() => [...document.querySelectorAll('button')].some(b => b.textContent === 'Run' && !b.disabled), null, { timeout: 180000 });
+      await p.evaluate(() => window.scrollTo(0, 80));
+    },
+    async run({ demos: [d], pages: [p] }) {
+      await d.setCode('// Change a size, then Run.\nconst body = box(60, 30, 10)\nhole(body, { across: 6 })\n');
+      await d.pause(700);
+      await d.click(p.getByRole('button', { name: 'Run', exact: true }), { ms: 400, after: 200 });
+      await p.waitForFunction(() => [...document.querySelectorAll('button')].some(b => b.textContent === 'Run' && !b.disabled)
+        || document.querySelector('iframe[title="SolidCraft viewport and build results"]')?.contentDocument?.getElementById('cfy')?.offsetParent);
+      const confirm = p.frameLocator('iframe[title="SolidCraft viewport and build results"]').getByRole('button', { name: 'Replace and run', exact: true });
+      if (await confirm.isVisible()) await d.click(confirm, { ms: 350, after: 200 });
+      await p.getByRole('button', { name: 'Run', exact: true }).waitFor({ timeout: 60000 });
+      await p.waitForFunction(() => [...document.querySelectorAll('button')].some(b => b.textContent === 'Run' && !b.disabled));
+      await d.click(p.getByRole('button', { name: 'Fit part', exact: true }), { ms: 400, after: 1800 });
+    },
+  },
   '2026-11-guest-pass': {
     people: [SAM],
     path: '/account/',

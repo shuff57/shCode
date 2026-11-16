@@ -28,3 +28,11 @@
   .divider { display: none; }
   .preview { flex: none; height: 650px; }
 }
+
+.studioToolbar { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding:8px 0; }
+.studioToolbar > span { font-size:12px; color:var(--c-meta); flex:1 1 220px; }
+.studio { display:flex; flex-direction:column; height:100%; min-height:0; width:100%; }
+.lessonWorkspace { flex:1; height:auto; min-height:440px; }
+.engine { position:relative; flex:1; min-height:0; display:flex; }
+.policyCover { position:absolute; inset:0 0 210px; z-index:20; display:grid; place-items:center; padding:20px; background:var(--card); color:var(--text); font-size:13px; text-align:center; }
+@media (max-width:760px) { .studio { height:auto; } .lessonWorkspace { flex:none; height:auto; min-height:0; } }

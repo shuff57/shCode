@@ -25,6 +25,9 @@ function json(body: unknown, status = 200) {
 
 async function guard(context: Ctx) {
   const { env, data, params } = context;
+  if (data.role !== 'teacher' && data.role !== 'admin') {
+    return { error: json({ error: 'Only teachers can change classroom CAD settings' }, 403) };
+  }
   const classId = params.id;
   if (typeof classId !== 'string' || !classId) {
     return { error: json({ error: 'classId required' }, 400) };

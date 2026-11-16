@@ -21,6 +21,7 @@ import LessonOutcome from './LessonOutcome';
 import { isOutOfDate, latestSubmittedAt, ranWhen, submittedOn } from '../lib/outcome-words';
 import { grade } from '../lib/grader';
 import type { GradeReport as GradeReportType, GradeContext } from '../lib/grader';
+import { cadPolicy } from '../lib/solidcraft-policy';
 import { NO_TEACHER_MODES, resolveMode, type TeacherModes } from '../lib/lesson-mode';
 import type { ModelDoc } from '../lib/model-types';
 
@@ -62,6 +63,7 @@ import { CloudUpload, RotateCcw, Send } from 'lucide-react';
 // The B-rep kernel + three.js viewport are heavy; the ~270-odd non-reshape
 // lesson pages should never pay for them. Same pattern DiagramAssignmentView
 // uses for DiagramEditor.
+const SolidCraftStudio = dynamic(() => import('./SolidCraftStudio'), { ssr: false });
 const ReshapeStudio = dynamic(() => import('./reshape/ReshapeStudio'), { ssr: false });
 
 interface LessonWorkspaceProps {
@@ -129,6 +131,7 @@ export default function LessonWorkspace({
   // lib/grader.ts's TODO(A2) call site below) -- ReshapeStudio reports it
   // through onDocChange, null until its first successful build.
   const [latestModelDoc, setLatestModelDoc] = useState<ModelDoc | null>(null);
+  const [cadBuiltSource, setCadBuiltSource] = useState<string | null>(null);
   // Feature ids the kernel refused to build, from the same report; a
   // declared Round the kernel "shows without" must not pass a model check.
   const [latestRefusals, setLatestRefusals] = useState<Record<string, string> | null>(null);
@@ -142,14 +145,26 @@ export default function LessonWorkspace({
   // resolved the same way SandboxWorkspace resolves its own gate. Defaults
   // to 'both' (unreadable gate => never lock anyone out).
   const [teacherModes, setTeacherModes] = useState<TeacherModes>(NO_TEACHER_MODES);
+  const [cadPolicyLoaded, setCadPolicyLoaded] = useState(false);
+  const [cadPolicyError, setCadPolicyError] = useState(false);
   useEffect(() => {
     let live = true;
-    fetch('/api/my-lesson-modes')
-      .then((r) => (r.ok ? r.json() : NO_TEACHER_MODES))
-      .then((m) => { if (live) setTeacherModes(m ?? NO_TEACHER_MODES); })
-      .catch(() => { /* no gate readable, so no gate applied */ });
-    return () => { live = false; };
-  }, []);
+    async function refresh() {
+      try {
+        const r = await fetch('/api/my-lesson-modes', { cache: 'no-store' });
+        if (!r.ok) throw new Error('policy');
+        const m = await r.json();
+        if (live) { setTeacherModes(m ?? NO_TEACHER_MODES); setCadPolicyError(false); setCadPolicyLoaded(true); }
+      } catch { if (live) { setCadPolicyError(true); setCadPolicyLoaded(true); } }
+    }
+    void refresh();
+    // Teacher changes apply to an open CAD lesson too, without losing its code.
+    const timer = lesson.cadHost === 'solidcraft' ? window.setInterval(refresh, 5000) : null;
+    const focus = () => { void refresh(); };
+    window.addEventListener('focus', focus);
+    return () => { live = false; if (timer) window.clearInterval(timer); window.removeEventListener('focus', focus); };
+  }, [lesson.cadHost]);
+  const solidCraftPolicy = cadPolicy(lesson.id, cadPolicyError ? NO_TEACHER_MODES : teacherModes, cadPolicyError ? 'code' : lesson.mode ?? 'code');
   const reshapeMode = resolveMode(lesson.id, teacherModes, lesson.mode ?? null).mode;
   const reshapeSides: ('build' | 'code')[] =
     reshapeMode === 'visual' ? ['build'] : reshapeMode === 'code' ? ['code'] : ['build', 'code'];
@@ -976,6 +991,14 @@ export default function LessonWorkspace({
   const confirmSubmit = async () => {
     setSubmitOpen(false);
     if (typeof window === 'undefined' || !lesson) return;
+    if (lesson.cadHost === 'solidcraft') {
+      const current = useLessonStore.getState().fileContents;
+      const report = grade(lesson.requirements, current, lesson.grading?.passingScore ?? 0, { modelDoc: latestModelDoc, refusals: latestRefusals });
+      if (!latestModelDoc || cadBuiltSource !== (current['script.js'] ?? '') || report.results.some(r => r.status !== 'passed')) {
+        alert('Run the code now in your editor, then pass Check before submitting.');
+        return;
+      }
+    }
     try {
       await commitChanges('submitted');
     } catch (err) {
@@ -1069,13 +1092,14 @@ export default function LessonWorkspace({
       ? canSubmitMoshion({ cardsOk: allRequirementsPassed, run: moshionRun, currentText: moshionText, expectsRuntimeError })
       : runLetsSubmit({ error: runtimeError, pending: false }, expectsRuntimeError) &&
         (isNoPoints ? allRequirementsPassed : totalScore >= (lesson.grading?.passingScore ?? 0)));
-  const canSubmit = canSubmitByWork && !cap.unknown && !cap.reached;
+  const cadBuildCurrent = lesson.cadHost !== 'solidcraft' || (latestModelDoc !== null && cadBuiltSource === (files['script.js'] ?? ''));
+  const canSubmit = canSubmitByWork && cadBuildCurrent && !cap.unknown && !cap.reached;
   // The code on screen is the code just submitted: nothing new to hand in. Edit it and Submit opens
   // again (subject to the same checks), which is how a student redoes a submitted lab.
   const scriptNow = files['script.js'] ?? '';
   const submitLocked = submitted && submittedOnText !== null && submittedOnText === JSON.stringify(files);
   // Done on an earlier visit, from the saved lesson state the header and the module bar read.
-  const isLab = isConsoleMode || isMoshionMode;
+  const isLab = isConsoleMode || isMoshionMode || lesson.cadHost === 'solidcraft';
   const priorDone = isLab && !capped && lessonProgress.states[lesson.id] === 'completed';
   useEffect(() => {
     if (!priorDone || !lessonProgress.authed || priorSubmittedAt !== null) return;
@@ -1442,6 +1466,9 @@ export default function LessonWorkspace({
                     {aiCheck && aiCheckBusy ? 'Reading your steps…' : 'Check'}
                   </button>
                 )}
+                {lesson.cadHost === 'solidcraft' && (
+                  <button className="btn-run" onClick={() => trackRun(runTests())} disabled={!latestModelDoc}>Check</button>
+                )}
                 {aiGraded && (
                   // A scored part: Grade is the same counted AI read as Submit, so it
                   // spends one of the part's tries and stops when they are gone.
@@ -1673,7 +1700,7 @@ export default function LessonWorkspace({
           {lessonProgress.authed && !solutionLoaded ? <TwoVersionsNotice lessonId={lesson.id} status={upload} /> : null}
           {isLab && requirements.length > 0 ? <>{labCheckSummary}{renderCheckRow('above')}</> : null}
           {aiCheck ? renderAiNote(isLab ? 'above' : 'only') : null}
-          <CodeWorkspace consoleResetKey={!isConsoleMode && !isTextMode ? String(consoleResetKey) : undefined}>
+          <CodeWorkspace style={lesson.cadHost === 'solidcraft' ? { '--workspace-height': '720px' } as React.CSSProperties : undefined} consoleResetKey={!isConsoleMode && !isTextMode && lesson.cadHost !== 'solidcraft' ? String(consoleResetKey) : undefined}>
             <EditorPreviewSplit
               style={{ scrollMarginBottom: 56 }}
               // A text lesson has no output pane: the editor takes the whole width, and Grade is the only action.
@@ -1729,7 +1756,18 @@ export default function LessonWorkspace({
               {/* ReshapeStudio is self-contained (its own toolbar, its own CodeEditor for the Code side, its own
                   model tools for the Build side): it replaces the whole split rather than sharing a second,
                   redundant editor with it. The sandbox does the same. */}
-              {!isTextMode && isReshapeMode ? (
+              {!isTextMode && isReshapeMode && lesson.cadHost === 'solidcraft' ? (
+                <SolidCraftStudio
+                  key={`${lesson.id}-${reshapeResetKey}`}
+                  lessonId={lesson.id}
+                  value={files['script.js'] ?? ''}
+                  onChange={(text) => updateFile('script.js', text)}
+                  onDocChange={(doc, refusals) => { setLatestModelDoc(doc); setCadBuiltSource(doc ? files['script.js'] ?? '' : null); setLatestRefusals(refusals ?? null); setRuntimeError(null); }}
+                  toolsAllowed={solidCraftPolicy.toolsAllowed}
+                  policyLoaded={cadPolicyLoaded}
+                  policyReason={cadPolicyError ? 'Teacher settings could not be read. Modelling tools stay off; your script is still available.' : solidCraftPolicy.reason}
+                />
+              ) : !isTextMode && isReshapeMode ? (
                 <ReshapeStudio
                   key={`${lesson.id}-${reshapeResetKey}`}
                   value={files['script.js'] ?? ''}

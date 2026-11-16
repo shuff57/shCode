@@ -1,5 +1,6 @@
 // Host-side classroom control for the unmodified pinned canvas UI. When tools
 // are off, all direct engine input is covered; only camera requests are sent.
+import { cadToolbarCrop } from './solidcraft-viewport';
 type Camera = { target: number[]; yaw: number; pitch: number; distance: number };
 type UiReply = { ui: { layout: string; showBrowser: boolean; showTimeline: boolean; showNavigationBar: boolean }; viewport: [number, number, number, number]; camera: Camera };
 type Api = { request(method: string, params: object): Promise<unknown> };
@@ -12,6 +13,8 @@ export function createStudentTools(host: HTMLIFrameElement) {
   let camera: Camera | null = null;
   let pending: object | null = null;
   let sending = false;
+  let disposed = false;
+  let setting: Promise<void> = Promise.resolve();
   const frame = () => host.contentDocument?.getElementById('sc') as HTMLIFrameElement | null;
   const api = () => {
     const sc = (frame()?.contentWindow as ScWindow | null)?.solidcraft;
@@ -87,18 +90,21 @@ export function createStudentTools(host: HTMLIFrameElement) {
     measuring = true;
     try {
       bindKeys();
+      // ui.set and iframe resizes report their new settings before egui has
+      // rendered the corresponding viewport. Inspect after a complete frame.
+      const rendered = () => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+      await rendered();
       let reply = await api().request('ui.inspect', {}) as UiReply;
       if (!hidden) return;
       if (reply.ui.layout !== 'compact' || reply.ui.showBrowser || reply.ui.showTimeline || reply.ui.showNavigationBar) {
         await api().request('ui.set', { layout: 'compact', showBrowser: false, showTimeline: false, showNavigationBar: false });
+        await rendered();
         reply = await api().request('ui.inspect', {}) as UiReply;
         if (!hidden) return;
       }
       camera = reply.camera;
       const sc = frame(); if (!sc) throw new Error('SolidCraft is still loading.');
-      const [x, y, width] = reply.viewport;
-      const cut = Math.ceil(y * sc.clientWidth / (x + width));
-      if (!Number.isFinite(cut) || cut <= 0 || cut > sc.clientHeight * .8) throw new Error('The modelling toolbar could not be measured.');
+      const cut = cadToolbarCrop(reply.viewport, sc.clientWidth, sc.clientHeight);
       const top = `-${cut}px`, height = `calc(100% - 210px + ${cut}px)`;
       if (sc.style.top !== top) sc.style.top = top;
       if (sc.style.height !== height) sc.style.height = height;
@@ -106,20 +112,29 @@ export function createStudentTools(host: HTMLIFrameElement) {
   }
   return {
     measure, fit,
-    async setShown(shown: boolean) {
+    setShown(shown: boolean) {
+      // Serialize policy changes: a slow earlier On must never override a newer Off.
+      const next = setting.catch(() => {}).then(async () => {
+      if (disposed) return;
       if (shown) {
         // Restore the UI before allowing any direct input.
         if (previous) await api().request('ui.set', previous);
         hidden = false; pending = null; cover.hidden = true; clearCrop(); previous = null;
       } else {
-        if (!hidden) previous = (await api().request('ui.inspect', {}) as UiReply).ui;
+        if (!hidden) {
+          const { layout, showBrowser, showTimeline, showNavigationBar } = (await api().request('ui.inspect', {}) as UiReply).ui;
+          previous = { layout, showBrowser, showTimeline, showNavigationBar };
+        }
         hidden = true; cover.hidden = false; bindKeys();
         await api().request('ui.key', { key: 'Escape' });
         await measure();
       }
+      });
+      setting = next;
+      return next;
     },
     dispose() {
-      hidden = false; pending = null; cover.remove(); clearCrop();
+      disposed = true; hidden = false; pending = null; cover.remove(); clearCrop();
       for (const type of ['keydown', 'keyup', 'keypress']) blockedWindow?.removeEventListener(type, blockKey, true);
     },
   };
