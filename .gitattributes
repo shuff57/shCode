@@ -1,3 +1,6 @@
 # The moSHion preview runner. Forced LF so a CRLF checkout (Windows
 # core.autocrlf=true) cannot make the file read as changed for no reason.
 public/moshion/runner.html  text eol=lf
+
+# Preserve the pinned upstream CAD snapshot, including its license text and generated HTML.
+vendor/solidcraft-preview/** -whitespace

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import Link from 'next/link';
 import CodeMirrorPane from './CodeMirrorPane';
 import styles from './solidcraft-sandbox.module.css';
+import { createStudentTools } from '../lib/solidcraft-student-tools';
 
 type Host = {
   setScript(code: string): void;
@@ -31,6 +32,10 @@ export default function SolidCraftSandbox() {
   const [available, setAvailable] = useState<boolean | null>(null);
   const [width, setWidth] = useState(38);
   const [edited, setEdited] = useState(false);
+  const [toolsShown, setToolsShown] = useState(true);
+  const [toolsChanging, setToolsChanging] = useState(false);
+  const [toolsError, setToolsError] = useState('');
+  const studentTools = useRef<ReturnType<typeof createStudentTools> | null>(null);
   const running = useRef(false);
   const workspace = useRef<HTMLDivElement>(null);
 
@@ -74,6 +79,28 @@ export default function SolidCraftSandbox() {
   }, [available]);
 
   useEffect(() => {
+    if (!ready || !frame.current) return;
+    const tools = createStudentTools(frame.current);
+    studentTools.current = tools;
+    const sc = frame.current.contentDocument?.getElementById('sc');
+    const observer = new ResizeObserver(() => {
+      void tools.measure().catch(() => {
+        setToolsError('The toolbar moved. Show modelling tools, then hide them again.');
+      });
+    });
+    if (sc) observer.observe(sc);
+    return () => { observer.disconnect(); tools.dispose(); studentTools.current = null; };
+  }, [ready]);
+
+  async function toggleTools() {
+    if (!studentTools.current || toolsChanging) return;
+    setToolsChanging(true); setToolsError('');
+    try { await studentTools.current.setShown(!toolsShown); setToolsShown(!toolsShown); }
+    catch (e) { setToolsError(e instanceof Error ? e.message : 'The toolbar could not be changed.'); }
+    finally { setToolsChanging(false); }
+  }
+
+  useEffect(() => {
     const warn = (e: BeforeUnloadEvent) => { if (edited) { e.preventDefault(); e.returnValue = ''; } };
     window.addEventListener('beforeunload', warn);
     return () => window.removeEventListener('beforeunload', warn);
@@ -83,7 +110,7 @@ export default function SolidCraftSandbox() {
     const host = (frame.current?.contentWindow as HostWindow | null)?.__host;
     if (!host || !ready || running.current) return;
     running.current = true; setBusy(true);
-    try { host.setScript(code); await host.runUnconfirmed(); await showModel(frame.current); }
+    try { host.setScript(code); await host.runUnconfirmed(); await showModel(frame.current); await studentTools.current?.measure(); }
     catch (e) { setStatus(e instanceof Error ? e.message : 'The run did not finish.'); }
     finally { running.current = false; setBusy(false); }
   }
@@ -108,15 +135,20 @@ export default function SolidCraftSandbox() {
         <div className={styles.actions}>
           <Link href="/sandbox/">Back to sandbox</Link>
           <button onClick={download}>Download script</button>
+          <button disabled={!ready || busy || toolsChanging} onClick={toggleTools} aria-pressed={toolsShown}
+            title="Show or hide SolidCraft’s modelling toolbar. Keyboard shortcuts remain available.">
+            Modelling tools: {toolsShown ? 'On' : 'Off'}
+          </button>
           <button className={styles.run} disabled={!ready || busy} onClick={run}>{busy ? 'Building…' : 'Run'}</button>
         </div>
       </div>
       <p className={styles.notice}>Preview work is not saved to your shCode projects yet. Download your script to keep it.</p>
+      {toolsError && <p className={styles.notice} role="alert">{toolsError}</p>}
       <div ref={workspace} className={styles.workspace} style={{ '--editor-width': `${width}%` } as CSSProperties}>
         <section className={styles.editor} aria-label="Script editor" onKeyDown={e => {
           if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); void run(); }
         }}>
-          <div className={styles.panelTitle}><b>script.js</b><span>Ctrl / ⌘ + Enter to run</span></div>
+          <div className={styles.panelTitle}><b>script.js</b></div>
           <div className={styles.code}><CodeMirrorPane value={code} onChange={value => { setCode(value); setEdited(true); }} fileKey="solidcraft-preview-script" /></div>
         </section>
         <div className={styles.divider} role="separator" tabIndex={0} aria-label="Resize script editor" aria-orientation="vertical" aria-valuemin={25} aria-valuemax={65} aria-valuenow={Math.round(width)}
@@ -126,7 +158,7 @@ export default function SolidCraftSandbox() {
           onPointerUp={e => e.currentTarget.releasePointerCapture(e.pointerId)} />
         <section className={styles.preview} aria-label="SolidCraft model">
           <div className={styles.panelTitle}><b>Model</b><span role="status">{status}</span></div>
-          {available === false ? <div className={styles.missing}><h2>Prepare the local CAD preview</h2><p>Run <code>node scripts/prepare-solidcraft-preview.mjs</code> from shCode, then reload.</p></div>
+          {available === false ? <div className={styles.missing}><h2>CAD preview unavailable</h2><p>Reload this page to try again.</p></div>
             : available ? <iframe ref={frame} src="/solidcraft-preview/host.html" title="SolidCraft viewport and build results" />
             : <p className={styles.missing}>Checking the local CAD build…</p>}
         </section>
