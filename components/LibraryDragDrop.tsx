@@ -21,10 +21,11 @@ const Enabled = createContext(false);
 const collisions: CollisionDetection = (args) => {
   const type = args.active.data.current?.type;
   if (type === 'item' && args.pointerCoordinates) {
-    const folders = pointerWithin({ ...args, droppableContainers: args.droppableContainers.filter((c) => c.data.current?.type === 'move-folder') });
+    const folders = pointerWithin({ ...args, droppableContainers: args.droppableContainers.filter((c) => c.data.current?.type === 'move-folder' || c.data.current?.type === 'folder') });
     if (folders.length) return folders;
   }
-  return closestCenter({ ...args, droppableContainers: args.droppableContainers.filter((c) => c.data.current?.type === type) });
+  return closestCenter({ ...args, droppableContainers: args.droppableContainers.filter((c) => c.data.current?.type === type
+    || (type === 'item' && !args.pointerCoordinates && (c.data.current?.type === 'folder' || c.data.current?.type === 'move-folder'))) });
 };
 
 export function LibraryDragDrop({ enabled, folders, items, onSort, onMove, children }: {
@@ -52,10 +53,11 @@ export function LibraryDragDrop({ enabled, folders, items, onSort, onMove, child
         const source = active.data.current as DragData | undefined;
         const target = over.data.current as DragData | undefined;
         if (!source || !target) return;
-        if (source.type === 'item' && target.type === 'move-folder') onMove(source.key, target.key);
+        if (source.type === 'item' && (target.type === 'move-folder' || target.type === 'folder')) onMove(source.key, target.key);
         else if (source.type !== 'move-folder' && source.type === target.type && source.key !== target.key) onSort(source.type, source.key, target.key);
       }}>
-      <SortableContext items={[...folders.map((key) => dragId('folder', key)), ...items.map((key) => dragId('item', key))]} strategy={rectSortingStrategy}>
+      <SortableContext items={[...folders.map((key) => dragId('folder', key)), ...items.map((key) => dragId('item', key))]}
+        strategy={(args) => (args.activeIndex < folders.length) === (args.overIndex < folders.length) ? rectSortingStrategy(args) : null}>
         {children}
       </SortableContext>
       {mounted && createPortal(<DragOverlay dropAnimation={null}>

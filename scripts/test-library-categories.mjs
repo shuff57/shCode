@@ -24,7 +24,7 @@ assert.equal(categoryKey('Puzzle'), 'puzzle');
 assert.equal((await call(A, { kind: 'texture', name: ' Space   Project ' })).status, 200);
 let result = await call(A, { kind: 'texture', item: 'hero', name: 'space project' });
 assert.equal(result.status, 200);
-assert.deepEqual(result.body.categories, [{ kind: 'texture', name: 'Space Project', key: 'space project', position: 0, hidden: 0 }]);
+assert.deepEqual(result.body.categories, [{ kind: 'texture', name: 'Space Project', key: 'space project', position: 0, hidden: 0, icon: 'folder', color: 'purple' }]);
 assert.equal(itemCategory(result.body, 'texture', 'hero'), 'space project');
 assert.equal(itemCategory(result.body, 'sound', 'hero'), null);
 assert.deepEqual((await call(B)).body, { categories: [], assignments: [], layout: [], canManage: true });
@@ -150,3 +150,38 @@ assert.deepEqual(movedTo(['a', 'b', 'c'], 'b', 'b'), ['a', 'b', 'c']);
 assert.deepEqual(movedTo(['a', 'b'], 'missing', 'a'), ['a', 'b']);
 assert.deepEqual(movedTo(['a', 'b'], 'a', 'missing'), ['a', 'b']);
 console.log('PASS Drag reorder: adjacent forward, forward to end, backward, same slot, and invalid targets');
+
+// Folder appearance survives every metadata operation and is scoped like names.
+result = await call(A, { kind: 'sound', name: 'Space sounds', icon: 'rocket', color: 'cyan' });
+assert.equal(result.status, 200);
+const appearance = (data, key) => {
+  const c = data.categories.find((c) => c.kind === 'sound' && c.key === key);
+  return { icon: c.icon, color: c.color };
+};
+assert.deepEqual(appearance(result.body, 'space sounds'), { icon: 'rocket', color: 'cyan' });
+await call(A, { kind: 'sound', item: 'launch', name: 'Space sounds' });
+await call(A, { op: 'rename-folder', kind: 'sound', key: 'space sounds', name: 'Launch pad' });
+await call(A, { op: 'order-folders', kind: 'sound', entries: [{ key: 'space sounds', name: 'Launch pad' }] });
+saved = (await call(A)).body;
+assert.deepEqual(appearance(saved, 'space sounds'), { icon: 'rocket', color: 'cyan' });
+assert.equal(itemCategory(saved, 'sound', 'launch'), 'space sounds');
+await call(A, { op: 'rename-folder', kind: 'sound', key: 'space sounds', name: 'Launch pad', icon: 'star', color: 'pink' });
+saved = (await call(A)).body;
+assert.deepEqual(appearance(saved, 'space sounds'), { icon: 'star', color: 'pink' });
+assert.equal(categoryShelves(saved, 'sound', ['launch'], (x) => x).shelves.find((c) => c.key === 'space sounds').icon, 'star');
+await call(B, { kind: 'sound', name: 'Space sounds', icon: 'music', color: 'green' });
+assert.deepEqual(appearance((await call(A)).body, 'space sounds'), { icon: 'star', color: 'pink' });
+assert.deepEqual(appearance((await call(B)).body, 'space sounds'), { icon: 'music', color: 'green' });
+// A suggested folder gets appearance persisted on its first edit, too.
+await call(A, { op: 'rename-folder', kind: 'sound', key: 'voices', name: 'Voices', icon: 'heart', color: 'red' });
+assert.deepEqual(appearance((await call(A)).body, 'voices'), { icon: 'heart', color: 'red' });
+for (const op of ['create', 'rename-folder']) {
+  for (const style of [{ icon: 'unknown' }, { color: 'url(evil)' }, { icon: null }, { color: 9 }]) {
+    assert.equal((await call(A, { op, kind: 'sound', key: 'space sounds', name: 'Bad appearance', ...style })).status, 400);
+  }
+}
+await shared({ kind: 'sound', name: 'Starter sounds', icon: 'gamepad', color: 'orange' });
+assert.deepEqual(appearance((await call(B, undefined, 'builtin')).body, 'starter sounds'), { icon: 'gamepad', color: 'orange' });
+assert.equal((await shared({ op: 'rename-folder', kind: 'sound', key: 'starter sounds', name: 'Starter sounds', icon: 'code', color: 'yellow' }, 'student')).status, 403);
+assert.deepEqual(categoryOptions({ categories: [], assignments: [] }, 'sound')[0].icon, 'folder');
+console.log('PASS Folder appearance: create/edit, persistence through assignment/rename/reorder, defaults, validation, personal isolation and shared admin styling');

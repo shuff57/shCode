@@ -1,7 +1,13 @@
 /** Personal organization is separate from asset bytes, sharing, and editor metadata. */
 export const CATEGORY_KINDS = ['game', 'texture', 'sound', 'font', 'upload'] as const;
 export type CategoryKind = typeof CATEGORY_KINDS[number];
-export type LibraryCategory = { kind: CategoryKind; name: string; key: string; position?: number; hidden?: boolean | number };
+export const FOLDER_ICONS = ['folder', 'star', 'sparkles', 'rocket', 'gamepad', 'music', 'image', 'heart', 'book', 'code'] as const;
+export const FOLDER_COLORS = ['purple', 'pink', 'cyan', 'green', 'orange', 'yellow', 'red', 'gray'] as const;
+export type FolderIcon = typeof FOLDER_ICONS[number];
+export type FolderColor = typeof FOLDER_COLORS[number];
+export const isFolderIcon = (value: unknown): value is FolderIcon => FOLDER_ICONS.some(icon => icon === value);
+export const isFolderColor = (value: unknown): value is FolderColor => FOLDER_COLORS.some(color => color === value);
+export type LibraryCategory = { kind: CategoryKind; name: string; key: string; position?: number; hidden?: boolean | number; icon?: FolderIcon; color?: FolderColor };
 export type CategoryAssignment = { kind: CategoryKind; item: string; category: string };
 export type ItemLayout = { kind: CategoryKind; item: string; label: string | null; position: number; hidden: boolean | number };
 export type LibraryCategories = { categories: LibraryCategory[]; assignments: CategoryAssignment[]; layout?: ItemLayout[]; canManage?: boolean };
@@ -32,10 +38,11 @@ export function itemCategory(data: LibraryCategories, kind: CategoryKind, item: 
 
 /** Build shelves from current creations, ignoring assignments for deleted items. */
 export function categoryOptions(data: LibraryCategories, kind: CategoryKind, defaults: readonly string[] = SUGGESTED_CATEGORIES[kind]) {
-  const names = new Map(defaults.map((name) => [categoryKey(name), { key: categoryKey(name), name, position: 0 }]));
+  const names = new Map(defaults.map((name) => [categoryKey(name), { key: categoryKey(name), name, position: 0, icon: 'folder' as FolderIcon, color: 'purple' as FolderColor }]));
   for (const category of data.categories) if (category.kind === kind) {
     if (category.hidden) names.delete(category.key);
-    else names.set(category.key, { key: category.key, name: category.name, position: category.position ?? 0 });
+    else names.set(category.key, { key: category.key, name: category.name, position: category.position ?? 0,
+      icon: isFolderIcon(category.icon) ? category.icon : 'folder', color: isFolderColor(category.color) ? category.color : 'purple' });
   }
   return [...names.values()].sort((a, b) => a.position - b.position || a.name.localeCompare(b.name));
 }
@@ -75,7 +82,7 @@ export function categoryShelves<T>(data: LibraryCategories, kind: CategoryKind, 
     else { const members = buckets.get(category) ?? []; members.push(item); buckets.set(category, members); }
   }
   return {
-    shelves: options.map(({ key, name }) => ({ key, name, items: buckets.get(key) ?? [] })),
+    shelves: options.map(({ key, name, icon, color }) => ({ key, name, icon, color, items: buckets.get(key) ?? [] })),
     uncategorized,
   };
 }

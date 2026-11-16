@@ -8,6 +8,7 @@
 // Library too, on every computer; only for a student enrolled in this class (`canDelete`).
 
 import { FontSample } from './FontLibrary';
+import SoundPreviewButton from './SoundPreviewButton';
 import { useCallback, useEffect, useState } from 'react';
 import { errorText } from '../lib/http-error';
 import { useFeedback } from './FeedbackProvider';
@@ -106,8 +107,7 @@ export default function ClassLibraryModeration({ classId }: { classId: string })
               : r.kind === 'font'
               ? art[r.id] && <FontSample fontKey={`mod:${r.id}:${art[r.id].length}`} src={{ dataUri: art[r.id] }} text="Aa" size={20} />
               : (
-                <button type="button" aria-label={`Play ${r.name}`} style={{ ...btn, border: 'none' }}
-                  onClick={async () => { const d = await preview(r.id); if (d) new Audio(d).play().catch(() => {}); }}>▶</button>
+                <SoundPreviewButton sourceKey={r.id} source={() => preview(r.id)} label={r.name} style={{ ...btn, border: 'none' }} />
               )}
           </div>
           <div style={{ fontSize: 13, minWidth: 160 }}>

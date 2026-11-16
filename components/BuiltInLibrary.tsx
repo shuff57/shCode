@@ -1,6 +1,7 @@
 'use client';
 
 import { BuiltinLibraryItems } from './LibraryCategories';
+import SoundPreviewButton from './SoundPreviewButton';
 
 // "Built in" on the Library page and tab: every texture and sound that ships
 // with moSHion, so a student can find them without the docs. A built-in works
@@ -161,9 +162,7 @@ export default function BuiltInLibrary({ onMessage, kind }: {
               padding: 6, borderRadius: 6, border: '1px solid var(--c-line)', background: 'var(--c-deep2)',
               display: 'flex', alignItems: 'center', gap: 6,
             }}>
-              <button type="button" aria-label={`Play ${p.label}`}
-                onClick={() => { new Audio(p.file).play().catch(() => {}); }}
-                style={{ background: 'transparent', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4, cursor: 'pointer', padding: '2px 8px' }}>▶</button>
+              <SoundPreviewButton source={p.file} label={p.label} />
               <span style={{ fontSize: 12 }}>{p.label}</span>
               <button type="button" style={small} onClick={() => copyText(`let ${p.name} = loadSound('${p.name}');`)}
                 aria-label={`Copy code for ${p.label}`}>Copy code</button>

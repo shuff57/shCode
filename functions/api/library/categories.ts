@@ -1,4 +1,4 @@
-import { categoryKey, categoryName, isCategoryKind } from '../../../lib/library-categories';
+import { categoryKey, categoryName, isCategoryKind, isFolderIcon, isFolderColor } from '../../../lib/library-categories';
 
 type Session = { email: string; role: 'student' | 'teacher' | 'admin' };
 type Env = { DB: D1Database };
@@ -17,7 +17,7 @@ export const onRequestGet: PagesFunction<Env, string, Session> = async (context:
   const { env } = context;
   const { owner, canManage } = scope(context);
   const [categories, assignments, layout] = await Promise.all([
-    env.DB.prepare('SELECT kind, name, category_key AS key, position, hidden FROM library_categories WHERE owner_email = ? ORDER BY position, name COLLATE NOCASE').bind(owner).all(),
+    env.DB.prepare('SELECT kind, name, category_key AS key, position, hidden, icon, color FROM library_categories WHERE owner_email = ? ORDER BY position, name COLLATE NOCASE').bind(owner).all(),
     env.DB.prepare('SELECT kind, item_key AS item, category_key AS category FROM library_category_items WHERE owner_email = ?').bind(owner).all(),
     env.DB.prepare('SELECT kind, item_key AS item, label, position, hidden FROM library_item_layout WHERE owner_email = ?').bind(owner).all(),
   ]);
@@ -36,6 +36,12 @@ export const onRequestPut: PagesFunction<Env, string, Session> = async (context:
   if (!body || !isCategoryKind(body.kind)) return json({ error: 'Choose a kind of creation.' }, 400);
   const { kind, item } = body;
   const op = body.op ?? (item !== undefined ? 'assign' : 'create');
+  if ((op === 'create' || op === 'rename-folder') &&
+      ((body.icon !== undefined && !isFolderIcon(body.icon)) || (body.color !== undefined && !isFolderColor(body.color)))) {
+    return json({ error: 'Choose a folder icon and color from the available options.' }, 400);
+  }
+  const styleFolder = (key: string) => env.DB.prepare('UPDATE library_categories SET icon = COALESCE(?, icon), color = COALESCE(?, color) WHERE owner_email = ? AND kind = ? AND category_key = ?')
+    .bind(body.icon ?? null, body.color ?? null, owner, kind, key);
   if (!['create', 'assign', 'rename-folder', 'delete-folder', 'order-folders', 'order-items', 'label-item', 'hide-item'].includes(String(op))) return json({ error: 'Unknown organization action.' }, 400);
   if (['assign', 'label-item', 'hide-item'].includes(String(op))) {
     if (!validKey(item)) return json({ error: 'Choose a valid creation.' }, 400);
@@ -76,6 +82,7 @@ export const onRequestPut: PagesFunction<Env, string, Session> = async (context:
       if (other) return json({ error: 'A folder with that name already exists.' }, 409);
     }
     const statements = [env.DB.prepare(`INSERT INTO library_categories (owner_email, kind, category_key, name, hidden) VALUES (?, ?, ?, ?, ?) ON CONFLICT(owner_email, kind, category_key) DO UPDATE SET name = excluded.name, hidden = excluded.hidden`).bind(owner, kind, body.key, name, op === 'delete-folder' ? 1 : 0)];
+    if (op === 'rename-folder' && (body.icon !== undefined || body.color !== undefined)) statements.push(styleFolder(body.key));
     if (op === 'delete-folder') statements.push(env.DB.prepare('DELETE FROM library_category_items WHERE owner_email = ? AND kind = ? AND category_key = ?').bind(owner, kind, body.key));
     await env.DB.batch(statements);
     return onRequestGet(context);
@@ -102,6 +109,7 @@ export const onRequestPut: PagesFunction<Env, string, Session> = async (context:
   }
   if (op === 'assign' && exists?.hidden) return json({ error: 'That folder was deleted. Choose another folder.' }, 409);
   const statements = [env.DB.prepare(`INSERT INTO library_categories (owner_email, kind, category_key, name) VALUES (?, ?, ?, ?) ON CONFLICT(owner_email, kind, category_key) DO UPDATE SET hidden = 0`).bind(owner, kind, key, name)];
+  if (op === 'create' && (body.icon !== undefined || body.color !== undefined)) statements.push(styleFolder(key));
   if (op === 'assign') statements.push(env.DB.prepare(`INSERT INTO library_category_items (owner_email, kind, item_key, category_key) VALUES (?, ?, ?, ?) ON CONFLICT(owner_email, kind, item_key) DO UPDATE SET category_key = excluded.category_key`).bind(owner, kind, item, key));
   await env.DB.batch(statements);
   return onRequestGet(context);

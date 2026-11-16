@@ -1,6 +1,7 @@
 'use client';
 
 import CategorizedLibraryItems from './LibraryCategories';
+import SoundPreviewButton from './SoundPreviewButton';
 
 // "From your class": textures, sounds or fonts classmates shared (#81), with a preview
 // and "Copy to mine", which saves a copy into the student's own library (and so
@@ -191,10 +192,7 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
                   : <div style={{ fontSize: 12, color: 'var(--c-dim)' }}>Loading…</div>}
               </div>
             ) : (
-              <button type="button" aria-label={`Play ${it.name}`} onClick={async () => {
-                const c = await fetchArt(it.id);
-                if (c) new Audio(c.dataUri).play().catch(() => {});
-              }} style={{ background: 'transparent', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4, cursor: 'pointer', padding: '2px 8px' }}>▶</button>
+              <SoundPreviewButton sourceKey={it.id} source={async () => (await fetchArt(it.id))?.dataUri ?? null} label={it.name} />
             )}
             <div style={{ fontSize: 11, textAlign: kind === 'texture' ? 'center' : 'left', wordBreak: 'break-all' }}>
               <code>{it.name}</code>

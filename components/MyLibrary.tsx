@@ -3,6 +3,7 @@
 import { AudioLines } from 'lucide-react';
 import { libraryClasses as styles } from './library-ui';
 import CategorizedLibraryItems from './LibraryCategories';
+import SoundPreviewButton from './SoundPreviewButton';
 
 // "Yours" on the Library page and tab: every texture and sound the student has
 // saved, each with a Share button (ShareToggle) that puts it in the Library of
@@ -160,9 +161,7 @@ function MyLibraryInner({ onMessage, kind }: Props) {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           <CategorizedLibraryItems kind="sound" itemKey={(s) => s.name} items={sounds} preview={() => <AudioLines size={28} />} text={(s) => s.name}>{(s) => (
             <div key={'s:' + s.name} style={{ ...tile, width: 'auto', maxWidth: '100%', flexDirection: 'row', flexWrap: 'wrap' }}>
-              <button type="button" aria-label={`Play ${s.name}`}
-                onClick={() => { new Audio(s.dataUri).play().catch(() => {}); }}
-                style={{ background: 'transparent', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4, cursor: 'pointer', padding: '2px 8px' }}>▶</button>
+              <SoundPreviewButton source={s.dataUri} label={s.name} />
               <code style={{ fontSize: 11 }}>{s.name}</code>
               <RemixCredit item={{ kind: 'sound', name: s.name }} style={{ fontSize: 11 }} />
               <details className={styles.manage}>

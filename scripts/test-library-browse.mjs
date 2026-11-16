@@ -26,8 +26,8 @@ assert.deepEqual(searchLibraryItems(items, '  ', text), items);
 assert.deepEqual(searchLibraryItems(items, 'unknown', text), []);
 assert.deepEqual(searchLibraryItems([], 'space', text), []);
 assert.equal(items.length, 3);
-const render = (rows) => renderToStaticMarkup(h(LibraryItems, {
-  items: rows, text: (n) => String(n), children: (n) => h('article', { key: n }, `Item ${n}`),
+const render = (rows, showAll = false) => renderToStaticMarkup(h(LibraryItems, {
+  items: rows, showAll, text: (n) => String(n), children: (n) => h('article', { key: n }, `Item ${n}`),
 }));
 const many = render(Array.from({ length: 60 }, (_, i) => i));
 assert.equal((many.match(/<article>/g) ?? []).length, 24);
@@ -36,4 +36,8 @@ assert.match(many, /24 of 60/);
 assert.doesNotMatch(many, /Item 24</);
 assert.doesNotMatch(render([1, 2]), /Show more/);
 assert.equal(render([]), '');
+const uncategorized = render(Array.from({ length: 60 }, (_, i) => i), true);
+assert.equal((uncategorized.match(/<article>/g) ?? []).length, 60);
+assert.match(uncategorized, /60 of 60/);
+assert.doesNotMatch(uncategorized, /Show more/);
 console.log('PASS Library search, keyword matching, empty collections, counts, and bounded rendering');

@@ -42,6 +42,7 @@ import { renderMusic, renderSfxDef, type Rendered } from '../lib/sound/render';
 import { CLIP_EXTENSION, clipName, prepareClip, type ClipType } from '../lib/sound-import';
 import LibrarySyncNote from './LibrarySyncNote';
 import ShareToggle from './ShareToggle';
+import SoundPreviewButton from './SoundPreviewButton';
 import ClassLibrary from './ClassLibrary';
 import { matchRecording } from '../lib/sound/match';
 import type { SfxrParams } from '../lib/sound/vendor/jsfxr/sfxr.mjs';
@@ -1077,18 +1078,7 @@ zap.play();`}</pre>
                   {sourceLabel(s)}
                 </span>
                 <span style={{ flex: 1 }} />
-                <button
-                  style={btn}
-                  aria-label={`Play ${s.name}`}
-                  onClick={() => {
-                    const audio = new Audio(s.dataUri);
-                    audio.volume = Math.max(0, Math.min(1, s.volume));
-                    audio.playbackRate = s.rate;
-                    audio.play().catch(() => {});
-                  }}
-                >
-                  ▶
-                </button>
+                <SoundPreviewButton source={s.dataUri} label={s.name} volume={s.volume} rate={s.rate} style={btn} />
                 {s.source !== IMPORTED && (
                   <button style={btn} onClick={() => editSaved(s)} aria-label={`Edit ${s.name}`}>
                     Edit

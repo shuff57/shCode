@@ -1,12 +1,12 @@
 'use client';
 
-import { createContext, useContext, useEffect, useId, useRef, useState, cloneElement, type ReactElement, type ReactNode } from 'react';
-import { Folder, FolderOpen, LayoutGrid, Inbox, ArrowLeft, Plus, Pencil, Trash2 } from 'lucide-react';
+import { createContext, useContext, useEffect, useId, useRef, useState, cloneElement, type CSSProperties, type ReactElement, type ReactNode } from 'react';
+import { Folder, Star, Sparkles, Rocket, Gamepad2, Music, Image as ImageIcon, Heart, BookOpen, Code2, LayoutGrid, Inbox, ArrowLeft, Plus, Pencil, Trash2 } from 'lucide-react';
 import { libraryClasses as styles } from './library-ui';
 import LibraryItems from './LibraryItems';
 import { LibraryDragDrop, LibrarySortable, LibraryFolderDrop } from './LibraryDragDrop';
 import { errorText } from '../lib/http-error';
-import { categoryKey, categoryName, categoryShelves, categoryOptions, orderedItems, movedTo, itemCategory, type CategoryKind, type LibraryCategories, type LibraryScope } from '../lib/library-categories';
+import { FOLDER_ICONS, FOLDER_COLORS, categoryKey, categoryName, categoryShelves, categoryOptions, orderedItems, movedTo, itemCategory, type CategoryKind, type FolderIcon, type FolderColor, type LibraryCategories, type LibraryScope } from '../lib/library-categories';
 
 const EMPTY: LibraryCategories = { categories: [], assignments: [] };
 type CategoriesContext = {
@@ -17,6 +17,29 @@ type CategoriesContext = {
 };
 const Context = createContext<CategoriesContext | null>(null);
 const selectStyle = { maxWidth: '100%', minWidth: 0, fontSize: 12, padding: '5px 6px', borderRadius: 5, background: 'var(--c-bg)', color: 'var(--c-fg)', border: '1px solid var(--c-line)' };
+const folderIcons = { folder: Folder, star: Star, sparkles: Sparkles, rocket: Rocket, gamepad: Gamepad2, music: Music, image: ImageIcon, heart: Heart, book: BookOpen, code: Code2 };
+const folderColor = (color: FolderColor) => `var(--c-${color === 'gray' ? 'dim' : color})`;
+type Appearance = { icon: FolderIcon; color: FolderColor };
+const DEFAULT_APPEARANCE: Appearance = { icon: 'folder', color: 'purple' };
+
+function FolderAppearance({ value, onChange, disabled }: { value: Appearance; onChange: (value: Appearance) => void; disabled: boolean }) {
+  const title = (name: string) => name[0].toUpperCase() + name.slice(1);
+  return <div className={styles.folderAppearance}>
+    <fieldset disabled={disabled}>
+      <legend>Icon</legend>
+      <div className={styles.iconChoices}>{FOLDER_ICONS.map((icon) => {
+        const Icon = folderIcons[icon];
+        return <button type="button" key={icon} aria-label={`${title(icon)} icon`} title={title(icon)} aria-pressed={value.icon === icon}
+          style={{ color: folderColor(value.color) }} onClick={() => onChange({ ...value, icon })}><Icon size={17} aria-hidden="true" /></button>;
+      })}</div>
+    </fieldset>
+    <fieldset disabled={disabled}>
+      <legend>Color</legend>
+      <div className={styles.colorChoices}>{FOLDER_COLORS.map((color) => <button type="button" key={color} aria-label={`${title(color)} color`} title={title(color)} aria-pressed={value.color === color}
+        onClick={() => onChange({ ...value, color })}><span style={{ background: folderColor(color) }} /></button>)}</div>
+    </fieldset>
+  </div>;
+}
 
 export function LibraryCategoriesProvider({ children, scope = 'mine' }: { children: ReactNode; scope?: LibraryScope }) {
   const [data, setData] = useState<LibraryCategories>(EMPTY);
@@ -131,7 +154,8 @@ export default function CategorizedLibraryItems<T>({ items, text, kind, itemKey,
   }, [browsing, selected]);
   const [creating, setCreating] = useState(false);
   const [name, setName] = useState('');
-  const [editing, setEditing] = useState<{ key: string; name: string } | null>(null);
+  const [appearance, setAppearance] = useState<Appearance>(DEFAULT_APPEARANCE);
+  const [editing, setEditing] = useState<({ key: string; name: string } & Appearance) | null>(null);
   const [removed, setRemoved] = useState(false);
   const id = useId();
   if (!ctx) return <LibraryItems items={items} text={text}>{children}</LibraryItems>;
@@ -148,6 +172,7 @@ export default function CategorizedLibraryItems<T>({ items, text, kind, itemKey,
   const filtered = selected === null ? ordered : ordered.filter((item) => inCategory(item) === selected);
   const overview = categoryShelves(data, kind, ordered, itemKey, defaults);
   const uncategorized = overview.uncategorized.length;
+  const displayItems = browsing ? filtered : overview.uncategorized;
   const currentName = removed ? 'Removed items' : selected === null ? 'All creations' : selected === '' ? 'Uncategorized' : options.find(([key]) => key === selected)?.[1] ?? selected;
   const reorderFolders = (from: string, to: string) => {
     const keys = movedTo(options.map(([key]) => key), from, to);
@@ -159,7 +184,7 @@ export default function CategorizedLibraryItems<T>({ items, text, kind, itemKey,
   };
   const open = (key: string | null) => { setSelected(key); setRemoved(false); setBrowsing(true); };
   return <LibraryDragDrop enabled={canManage && !ctx.busy && !removed}
-    folders={browsing ? [] : options.map(([key]) => key)} items={browsing ? filtered.map(itemKey) : []}
+    folders={browsing ? [] : options.map(([key]) => key)} items={ready || browsing ? displayItems.map(itemKey) : []}
     onSort={(type, from, to) => { if (type === 'folder') reorderFolders(from, to); else reorderItems(from, to); }}
     onMove={(item, folder) => { const name = options.find(([key]) => key === folder)?.[1]; if (name) void ctx.save(kind, name, item, folder); }}>
     <div style={{ flexBasis: '100%', gridColumn: '1 / -1', width: '100%', marginBottom: 6 }}>
@@ -176,12 +201,13 @@ export default function CategorizedLibraryItems<T>({ items, text, kind, itemKey,
       {creating && <form onSubmit={(e) => {
         e.preventDefault();
         const clean = categoryName(name);
-        if (clean) void ctx.save(kind, clean).then((ok) => { if (ok) { setName(''); setCreating(false); } });
+        if (clean) void ctx.mutate({ op: 'create', kind, name: clean, ...appearance }).then((ok) => { if (ok) { setName(''); setAppearance(DEFAULT_APPEARANCE); setCreating(false); } });
       }} style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6, marginTop: 8 }}>
         <label htmlFor={`${id}-name`} style={{ fontSize: 12 }}>Category name</label>
         <input id={`${id}-name`} autoFocus maxLength={40} required value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Space project" style={selectStyle} />
         <button className="btn-secondary btn-sm" type="submit" disabled={ctx.busy || !categoryName(name)}>Create</button>
         <button className="btn-secondary btn-sm" type="button" onClick={() => { setCreating(false); setName(''); }}>Cancel</button>
+        <div style={{ flexBasis: '100%', maxWidth: 300 }}><FolderAppearance value={appearance} onChange={setAppearance} disabled={ctx.busy} /></div>
       </form>}
       {!browsing && <>
         <div className={styles.quickViews}>
@@ -192,27 +218,29 @@ export default function CategorizedLibraryItems<T>({ items, text, kind, itemKey,
         {canManage && <p style={{ fontSize: 12, color: 'var(--c-dim)' }}>Drag cards to reorder. Keyboard: focus a card, press Space, move with arrows, then Space again.</p>}
         {canManage && ctx.scope === 'builtin' && <button type="button" className="btn-secondary btn-sm" onClick={() => { setRemoved(true); setSelected(null); setBrowsing(true); }}>Removed items</button>}
         {ready && <div className={styles.shelves}>
-          {overview.shelves.map(({ key, name: title, items: members }) => {
+          {overview.shelves.map(({ key, name: title, items: members, icon, color }) => {
+            const Icon = folderIcons[editing?.key === key ? editing.icon : icon];
             const duplicateName = !!editing && options.some(([otherKey, title]) => otherKey !== key && categoryKey(title) === categoryKey(categoryName(editing.name) ?? ''));
             return <LibrarySortable key={key} type="folder" itemKey={key} label={title} disabled={editing?.key === key}>
-              <div className={styles.shelfContainer}>
+              <div className={styles.shelfContainer} style={{ '--folder-color': folderColor(editing?.key === key ? editing.color : color) } as CSSProperties}>
               {editing?.key === key ? <form className={styles.folderEdit}
                 onSubmit={(e) => {
                   e.preventDefault();
                   const name = categoryName(editing.name);
                   const duplicate = options.some(([otherKey, title]) => otherKey !== key && categoryKey(title) === categoryKey(name ?? ''));
                   if (!name || duplicate || ctx.busy) return;
-                  void ctx.mutate({ op: 'rename-folder', kind, key, name }).then((ok) => { if (ok) setEditing(null); });
+                  void ctx.mutate({ op: 'rename-folder', kind, key, name, icon: editing.icon, color: editing.color }).then((ok) => { if (ok) setEditing(null); });
                 }}
                 onKeyDown={(e) => { if (e.key === 'Escape' && !ctx.busy) { e.preventDefault(); e.stopPropagation(); setEditing(null); } }}>
-                <FolderOpen size={28} strokeWidth={1.4} aria-hidden="true" />
+                <Icon size={28} strokeWidth={1.4} aria-hidden="true" />
                 <label htmlFor={`${id}-folder-${key}`}>Folder name</label>
                 <input id={`${id}-folder-${key}`} autoFocus maxLength={40} required value={editing.name}
-                  disabled={ctx.busy} onChange={(e) => setEditing({ key, name: e.target.value })}
+                  disabled={ctx.busy} onChange={(e) => setEditing({ ...editing, name: e.target.value })}
                   aria-invalid={duplicateName}
                   style={selectStyle} />
                 {duplicateName &&
                   <span role="status" style={{ fontSize: 11, color: 'var(--c-orange)' }}>A folder with that name already exists.</span>}
+                <FolderAppearance value={editing} onChange={(value) => setEditing({ ...editing, ...value })} disabled={ctx.busy} />
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                   <button type="submit" className="btn-secondary btn-sm" disabled={ctx.busy || !categoryName(editing.name) || duplicateName}>{ctx.busy ? 'Saving…' : 'Save'}</button>
                   <button type="button" className="btn-secondary btn-sm" disabled={ctx.busy} onClick={() => setEditing(null)}>Cancel</button>
@@ -220,23 +248,22 @@ export default function CategorizedLibraryItems<T>({ items, text, kind, itemKey,
               </form> : <>
               <button type="button" data-library-drag-surface className={styles.shelf} onClick={() => open(key)} aria-label={`Open ${title}, ${members.length} creations`}>
               <div className={styles.shelfPreview} aria-hidden="true">
-                {members.length && preview ? members.slice(0, 3).map((item) => <span key={itemKey(item)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{preview(item)}</span>) : <FolderOpen size={28} strokeWidth={1.4} />}
+                {members.length && preview ? members.slice(0, 3).map((item) => <span key={itemKey(item)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{preview(item)}</span>) : <Icon size={28} strokeWidth={1.4} />}
               </div>
-              <span className={styles.shelfTitle}><Folder size={14} aria-hidden="true" />{title}</span>
+              <span className={styles.shelfTitle}><Icon size={14} aria-hidden="true" style={{ color: 'var(--folder-color)', flexShrink: 0 }} />{title}</span>
               <p className={styles.shelfMeta}>{members.length ? `${members.length} ${members.length === 1 ? 'creation' : 'creations'}` : 'Ready for your ideas'}</p>
               </button>
               </>}
               {canManage && editing?.key !== key && <div className={styles.folderActions}>
-                <button type="button" aria-label={`Rename ${title}`} disabled={ctx.busy} onClick={() => setEditing({ key, name: title })}><Pencil size={14} /></button>
+                <button type="button" aria-label={`Edit ${title}`} title="Edit name, icon and color" disabled={ctx.busy} onClick={() => setEditing({ key, name: title, icon, color })}><Pencil size={14} /></button>
                 <button type="button" aria-label={`Delete folder ${title}`} disabled={ctx.busy} onClick={() => { if (window.confirm(`Delete folder "${title}"? Its creations will move to Uncategorized. No creations will be deleted.`)) void ctx.mutate({ op: 'delete-folder', kind, key, name: title }); }}><Trash2 size={14} /></button>
               </div>}
               </div>
             </LibrarySortable>;
           })}
         </div>}
-        {canManage && uncategorized > 0 && <p style={{ fontSize: 12, color: 'var(--c-dim)', margin: '0 0 10px' }}>
-          {uncategorized} {uncategorized === 1 ? 'creation is' : 'creations are'} waiting for a category. Open Uncategorized, then use Add to category on a creation.
-        </p>}
+        {ready && <h4 style={{ fontSize: 14, margin: '8px 0 12px' }}>Uncategorized <span style={{ color: 'var(--c-dim)', fontWeight: 400 }}>· {uncategorized}</span></h4>}
+        {canManage && uncategorized > 0 && <p style={{ fontSize: 12, color: 'var(--c-dim)', margin: '0 0 10px' }}>Drag a creation onto a folder above, or use its category menu.</p>}
       </>}
       {browsing && <h4 ref={heading} tabIndex={-1} style={{ fontSize: 14, margin: '8px 0 12px', outline: 'none' }}>{currentName} <span style={{ color: 'var(--c-dim)', fontWeight: 400 }}>· {filtered.length}</span></h4>}
       {browsing && ready && !filtered.length && <p style={{ fontSize: 13, color: 'var(--c-dim)' }}>{canManage ? 'Nothing here yet. Open All creations and use Add to category to place something here.' : 'Nothing in this folder yet.'}</p>}
@@ -245,7 +272,7 @@ export default function CategorizedLibraryItems<T>({ items, text, kind, itemKey,
       <p style={{ fontSize: 12, color: 'var(--c-dim)' }}>Move to a folder: drag a creation onto one of these folders, or use its category menu.</p>
       <div className={styles.moveTargets}>{options.map(([key, title]) => <LibraryFolderDrop key={key} folderKey={key} label={title} />)}</div>
     </div>}
-    {browsing && <LibraryItems key={selected === null ? 'all' : `category:${selected}`} items={filtered} text={(item) => `${data.layout?.find((x) => x.kind === kind && x.item === itemKey(item))?.label ?? ''} ${text(item)}`}>{(item) => {
+    {(ready || browsing) && <LibraryItems key={!browsing ? 'uncategorized-below-folders' : selected === null ? 'all' : `category:${selected}`} items={displayItems} showAll={!browsing} text={(item) => `${data.layout?.find((x) => x.kind === kind && x.item === itemKey(item))?.label ?? ''} ${text(item)}`}>{(item) => {
       const card = children(item);
       const layout = data.layout?.find((x) => x.kind === kind && x.item === itemKey(item));
       return <LibrarySortable key={itemKey(item)} type="item" itemKey={itemKey(item)} label={layout?.label ?? text(item)}>{cloneElement(card, {
