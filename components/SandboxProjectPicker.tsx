@@ -13,6 +13,7 @@ import { useLessonStore } from '../lib/store';
 import { loadProgress, normalizeEol } from '../lib/version-control';
 import { fetchWorkspace } from '../lib/lesson-sync';
 import { SANDBOX_MODES, getMode, type SandboxModeId } from '../lib/sandbox-modes';
+import { SANDBOX_DEMOS } from '../lib/sandbox-demos';
 import { MAX_NAME_CHARS, MAX_PROJECTS, copyName, defaultName, projectLessonId } from '../lib/sandbox-projects-core';
 import {
   createProject,
@@ -93,6 +94,7 @@ export default function SandboxProjectPicker({
   const [making, setMaking] = useState(startOpen);
   const [newType, setNewType] = useState<SandboxModeId>('moshion');
   const [newName, setNewName] = useState('');
+  const [demoId, setDemoId] = useState('');
   const [renaming, setRenaming] = useState<string | null>(null);
   const [renameText, setRenameText] = useState('');
   const [busy, setBusy] = useState(false);
@@ -102,7 +104,12 @@ export default function SandboxProjectPicker({
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
 
   const full = projects.length >= MAX_PROJECTS;
-  const suggested = useMemo(() => defaultName(newType, getMode(newType).label, projects), [newType, projects]);
+  const demo = SANDBOX_DEMOS.find((d) => d.id === demoId && d.mode === newType);
+  const suggested = useMemo(() => {
+    if (!demo) return defaultName(newType, getMode(newType).label, projects);
+    return projects.some((p) => p.name.toLowerCase() === demo.name.toLowerCase())
+      ? copyName(demo.name, projects) : demo.name;
+  }, [demo, newType, projects]);
 
   function place() {
     const r = btnRef.current?.getBoundingClientRect();
@@ -148,8 +155,9 @@ export default function SandboxProjectPicker({
   }
 
   const make = () => act(
-    () => createProject(newType, newName.trim() || suggested),
-    () => { setNewName(''); close(); },
+    () => createProject(newType, newName.trim() || suggested,
+      demo ? { [getMode(newType).file]: demo.source } : undefined),
+    () => { setNewName(''); setDemoId(''); close(); },
   );
 
   const copy = (p: SandboxProject) => act(async () => {
@@ -242,7 +250,7 @@ export default function SandboxProjectPicker({
                       type="button"
                       role="radio"
                       aria-checked={on}
-                      onClick={() => setNewType(m.id)}
+                      onClick={() => { setNewType(m.id); setDemoId(''); }}
                       style={{
                         textAlign: 'left',
                         padding: '8px 10px',
@@ -264,6 +272,16 @@ export default function SandboxProjectPicker({
                 })}
               </div>
               <div style={{ color: 'var(--c-meta)', fontSize: 12, marginTop: -4 }}>{getMode(newType).blurb}</div>
+              <label style={{ display: 'grid', gap: 4, fontSize: 13 }}>
+                Start with
+                <select style={input} value={demoId} onChange={(e) => setDemoId(e.target.value)}>
+                  <option value="">Starter</option>
+                  {SANDBOX_DEMOS.filter((d) => d.mode === newType).map((d) => (
+                    <option key={d.id} value={d.id}>{d.name} demo</option>
+                  ))}
+                </select>
+              </label>
+              {demo && <div style={{ color: 'var(--c-meta)', fontSize: 12 }}>{demo.description} Creates your own editable copy.</div>}
               <label style={{ display: 'grid', gap: 4, fontSize: 13 }}>
                 Name
                 <input
