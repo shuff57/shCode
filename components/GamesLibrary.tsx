@@ -1,5 +1,10 @@
 'use client';
 
+import { Gamepad2 } from 'lucide-react';
+import { libraryClasses as styles } from './library-ui';
+import { BuiltinLibraryItems } from './LibraryCategories';
+import CategorizedLibraryItems from './LibraryCategories';
+
 // The Library's Games tab (migration 0042): "My games", the games you
 // published from the moSHion sandbox, each with Play, Open in sandbox, Share
 // with class and Delete; "Class games", each with Play, Remix and the
@@ -39,7 +44,7 @@ import { modeLabel, type GameMode } from '../lib/games-core';
 import { StarCount, StarIcon } from './GameStarButton';
 import { GITHUB_WORD } from '../lib/game-flow-core';
 import { CHOICE_TEXT, canRemix, type ShareChoice } from '../lib/share-choice';
-import { sectionHeading, sectionNote, sectionStyle } from './library-ui';
+import { type LibraryCollection, sectionHeading, sectionNote, sectionStyle } from './library-ui';
 import ShareChoicePicker, { RemixCreditLine, lockedChoice, useLastChoice } from './ShareChoicePicker';
 import AudiencePicker from './AudiencePicker';
 import {
@@ -97,7 +102,7 @@ function BuiltinGames({ onMessage }: { onMessage?: (text: string, bad: boolean) 
       <p style={sectionNote}>The games you build in the lessons, and games made for you to remix.</p>
       {note && <div role="status" style={{ fontSize: 12, margin: '0 0 6px', color: note.bad ? 'var(--c-red)' : 'var(--c-green)' }}>{note.text}</div>}
       {games && <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {games.map((g) => (
+        <BuiltinLibraryItems kind="game" itemKey={(g) => g.id} defaults={[...new Set(games.map((g) => modeLabel(g.mode, g.players)))]} defaultCategory={(g) => modeLabel(g.mode, g.players)} preview={() => <Gamepad2 size={28} />} items={games} text={(g) => `${g.title} ${g.author ?? ""} ${g.blurb}`}>{(g) => (
           <div key={g.id} style={rowStyle}>
             <div style={{ minWidth: 140, flex: '1 1 160px' }}>
               <div style={{ fontSize: 13, fontWeight: 600 }}>{g.title}{g.author && <span style={{ ...badge, fontWeight: 400 }}> · by {g.author}</span>}</div>
@@ -111,7 +116,7 @@ function BuiltinGames({ onMessage }: { onMessage?: (text: string, bad: boolean) 
               </button>
             )}
           </div>
-        ))}
+        )}</BuiltinLibraryItems>
       </div>}
     </section>
   );
@@ -119,7 +124,7 @@ function BuiltinGames({ onMessage }: { onMessage?: (text: string, bad: boolean) 
 
 type Loaded<T> = { kind: 'loading' } | { kind: 'signed-out' } | { kind: 'error'; text: string } | { kind: 'ok'; games: T[] };
 
-export default function GamesLibrary({ onMessage }: { onMessage?: (text: string, bad: boolean) => void }) {
+export default function GamesLibrary({ onMessage, collection = 'mine' }: { onMessage?: (text: string, bad: boolean) => void; collection?: LibraryCollection }) {
   const [mine, setMine] = useState<Loaded<MyGame>>({ kind: 'loading' });
   const [shared, setShared] = useState<Loaded<SharedGame>>({ kind: 'loading' });
   const [starred, setStarred] = useState<Loaded<StarredGame>>({ kind: 'loading' });
@@ -137,13 +142,20 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
   const [lastChoice, rememberChoice] = useLastChoice('game');
 
   const load = useCallback(async () => {
-    const [a, b, c, e] = await Promise.all([listMyGames(), listSharedGames(), listStarredGames(), listPublicGames()]);
-    setEveryone(e.ok ? { kind: 'ok', games: e.value.games.filter((g) => !g.mine) } : e.status === 401 || e.status === 403 ? { kind: 'signed-out' } : { kind: 'error', text: e.error });
-    setStarred(c.ok ? { kind: 'ok', games: c.value.games } : c.status === 401 ? { kind: 'signed-out' } : { kind: 'error', text: c.error });
-    setMine(a.ok ? { kind: 'ok', games: a.value.games } : a.status === 401 ? { kind: 'signed-out' } : { kind: 'error', text: a.error });
-    // The class list leaves out your own games: they are already under "My games".
-    setShared(b.ok ? { kind: 'ok', games: b.value.games.filter((g) => !g.mine) } : b.status === 401 ? { kind: 'signed-out' } : { kind: 'error', text: b.error });
-  }, []);
+    if (collection === 'mine') {
+      const a = await listMyGames();
+      setMine(a.ok ? { kind: 'ok', games: a.value.games } : a.status === 401 ? { kind: 'signed-out' } : { kind: 'error', text: a.error });
+    } else if (collection === 'class') {
+      const b = await listSharedGames();
+      setShared(b.ok ? { kind: 'ok', games: b.value.games.filter((g) => !g.mine) } : b.status === 401 ? { kind: 'signed-out' } : { kind: 'error', text: b.error });
+    } else if (collection === 'starred') {
+      const c = await listStarredGames();
+      setStarred(c.ok ? { kind: 'ok', games: c.value.games } : c.status === 401 ? { kind: 'signed-out' } : { kind: 'error', text: c.error });
+    } else if (collection === 'public') {
+      const e = await listPublicGames();
+      setEveryone(e.ok ? { kind: 'ok', games: e.value.games.filter((g) => !g.mine) } : e.status === 401 || e.status === 403 ? { kind: 'signed-out' } : { kind: 'error', text: e.error });
+    }
+  }, [collection]);
 
   async function star(id: string, on: boolean) {
     setBusy('star-' + id);
@@ -217,11 +229,12 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
     say(`Deleted "${g.title}".`);
   }
 
+  if (collection === 'builtin') return <BuiltinGames onMessage={onMessage} />;
+
   if (mine.kind === 'signed-out') {
     return (
       <div style={{ marginTop: 8 }}>
         <p style={{ ...sectionNote, margin: 0 }}>Sign in to publish games and play the ones your class made.</p>
-        <BuiltinGames onMessage={onMessage} />
       </div>
     );
   }
@@ -238,7 +251,7 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
           {note.text}
         </div>
       )}
-      <section aria-labelledby="games-mine-h" style={{ marginTop: 8 }}>
+      {collection === 'mine' && <section aria-labelledby="games-mine-h" style={{ marginTop: 8 }}>
       <h3 id="games-mine-h" style={{ ...sectionHeading, margin: '0 0 6px' }}>My games ({mine.kind === 'ok' ? mine.games.length : '…'})</h3>
       {mine.kind === 'loading' && <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: 0 }}>Loading…</p>}
       {mine.kind === 'error' && <p style={{ fontSize: 13, color: 'var(--c-red)', margin: 0 }}>{mine.text}</p>}
@@ -248,9 +261,9 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
           and press <strong style={{ color: 'var(--c-fg)' }}>Publish game</strong>.
         </p>
       )}
-      {mine.kind === 'ok' && mine.games.length > 0 && (
+      {mine.kind === 'ok' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {mine.games.map((g) => (
+          <CategorizedLibraryItems kind="game" itemKey={(g) => g.id} items={mine.games} preview={() => <Gamepad2 size={28} />} text={(g) => g.title}>{(g) => (
             <div key={g.id} style={rowStyle}>
               <div style={{ minWidth: 200, flex: '1 1 240px' }}>
                 <div style={{ fontSize: 13, fontWeight: 600 }}>{g.title}</div>
@@ -268,18 +281,23 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
                 title="Put this game's code in your moSHion sandbox; Publish game there updates it">
                 Open in sandbox
               </button>
-              <button type="button" style={g.shared ? { ...btn, color: 'var(--c-green)' } : btn}
-                aria-expanded={choosing?.id === g.id}
-                disabled={busy === g.id} onClick={() => openChooser(g)}
-                title={g.shared ? 'In your class' + "'" + 's Games. Click to change who can do what, or stop sharing.' : 'Put this in your class' + "'" + 's Games.'}>
-                {g.shared ? 'Shared with class ✓' : 'Share with class'}
-              </button>
-              <a href={gameChangesHref(g.id, 'history')} style={btn} title="Every version of this game, with what changed">History</a>
-              <a href={gameChangesHref(g.id)} style={g.openChanges ? { ...btn, color: 'var(--c-orange)', borderColor: 'color-mix(in srgb, var(--c-orange) 55%, transparent)' } : btn}
-                title="Changes classmates proposed to this game">
-                {g.openChanges ? `${g.openChanges} proposed ${g.openChanges === 1 ? 'change' : 'changes'}` : 'Proposed changes'}
-              </a>
-              <button type="button" style={{ ...btn, color: 'var(--c-red)' }} disabled={busy === g.id} onClick={() => void remove(g)}>Delete</button>
+              <details className={styles.manage}>
+                <summary>Share & manage</summary>
+                <div>
+                  <button type="button" style={g.shared ? { ...btn, color: 'var(--c-green)' } : btn}
+                    aria-expanded={choosing?.id === g.id}
+                    disabled={busy === g.id} onClick={() => openChooser(g)}
+                    title={g.shared ? 'In your class' + "'" + 's Games. Click to change who can do what, or stop sharing.' : 'Put this in your class' + "'" + 's Games.'}>
+                    {g.shared ? 'Shared with class ✓' : 'Share with class'}
+                  </button>
+                  <a href={gameChangesHref(g.id, 'history')} style={btn} title="Every version of this game, with what changed">History</a>
+                  <a href={gameChangesHref(g.id)} style={g.openChanges ? { ...btn, color: 'var(--c-orange)', borderColor: 'color-mix(in srgb, var(--c-orange) 55%, transparent)' } : btn}
+                    title="Changes classmates proposed to this game">
+                    {g.openChanges ? `${g.openChanges} proposed ${g.openChanges === 1 ? 'change' : 'changes'}` : 'Proposed changes'}
+                  </a>
+                  <button type="button" style={{ ...btn, color: 'var(--c-red)' }} disabled={busy === g.id} onClick={() => void remove(g)}>Delete</button>
+                </div>
+              </details>
               {choosing?.id === g.id && (
                 <div style={{ flex: '1 1 100%', minWidth: 0, marginTop: 4 }}>
                   {audPick && <AudiencePicker options={audOptions} value={audPick} onChange={setAudPick} idPrefix={`game-audience-${g.id}`} compact pulled={g.pulled} />}
@@ -297,16 +315,17 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
                 </div>
               )}
             </div>
-          ))}
+          )}</CategorizedLibraryItems>
         </div>
       )}
 
-      </section>
+      </section>}
 
-      <GameChangesInbox />
+      {collection === 'changes' && <GameChangesInbox />}
 
-      <section aria-labelledby="games-class-h" style={sectionStyle}>
+      {collection === 'class' && <section aria-labelledby="games-class-h" style={sectionStyle}>
       <h3 id="games-class-h" style={{ ...sectionHeading, margin: '0 0 6px' }}>Class games ({shared.kind === 'ok' ? shared.games.length : '…'})</h3>
+      {shared.kind === 'signed-out' && <p style={sectionNote}>Sign in to see your class games.</p>}
       {shared.kind === 'loading' && <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: 0 }}>Loading…</p>}
       {shared.kind === 'error' && <p style={{ fontSize: 13, color: 'var(--c-red)', margin: 0 }}>{shared.text}</p>}
       {shared.kind === 'ok' && !shared.games.length && (
@@ -314,7 +333,7 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
       )}
       {shared.kind === 'ok' && shared.games.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {shared.games.map((g) => (
+          <CategorizedLibraryItems kind="game" readOnly itemKey={(g) => g.id} defaults={[...new Set(shared.games.map((g) => g.owner))]} defaultCategory={(g) => g.owner} preview={() => <Gamepad2 size={28} />} items={shared.games} text={(g) => `${g.title} ${g.owner} ${g.modeLabel}`}>{(g) => (
             <div key={g.id} style={{ ...rowStyle, opacity: g.hidden ? 0.7 : 1 }}>
               <div style={{ minWidth: 140, flex: '1 1 160px' }}>
                 <div style={{ fontSize: 13, fontWeight: 600 }}>{g.title}</div>
@@ -343,12 +362,12 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
                 <a href={gameChangesHref(g.id)} style={btn} title="Proposed changes to this game, and their conversations">Changes</a>
               )}
             </div>
-          ))}
+          )}</CategorizedLibraryItems>
         </div>
       )}
-      </section>
+      </section>}
 
-      <section aria-labelledby="games-everyone-h" style={sectionStyle}>
+      {collection === 'public' && <section aria-labelledby="games-everyone-h" style={sectionStyle}>
       <h3 id="games-everyone-h" style={{ ...sectionHeading, margin: '0 0 6px' }}>Everyone ({everyone.kind === 'ok' ? everyone.games.length : '…'})</h3>
       {everyone.kind === 'loading' && <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: 0 }}>Loading…</p>}
       {everyone.kind === 'error' && <p style={{ fontSize: 13, color: 'var(--c-red)', margin: 0 }}>{everyone.text}</p>}
@@ -362,7 +381,7 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
       )}
       {everyone.kind === 'ok' && everyone.games.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {everyone.games.map((g) => (
+          <CategorizedLibraryItems kind="game" readOnly itemKey={(g) => g.id} defaults={[...new Set(everyone.games.map((g) => g.owner))]} defaultCategory={(g) => g.owner} preview={() => <Gamepad2 size={28} />} items={everyone.games} text={(g) => `${g.title} ${g.owner} ${g.modeLabel}`}>{(g) => (
             <div key={g.id} style={rowStyle}>
               <div style={{ minWidth: 140, flex: '1 1 160px' }}>
                 <div style={{ fontSize: 13, fontWeight: 600 }}>{g.title}</div>
@@ -385,16 +404,17 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
                 </button>
               )}
             </div>
-          ))}
+          )}</CategorizedLibraryItems>
         </div>
       )}
-      </section>
+      </section>}
 
       {/* GitHub's Stars list, in plain words (migration 0052). */}
-      <section aria-labelledby="games-starred-h" style={sectionStyle}>
+      {collection === 'starred' && <section aria-labelledby="games-starred-h" style={sectionStyle}>
       <h3 id="games-starred-h" style={{ ...sectionHeading, margin: '0 0 6px', display: 'flex', alignItems: 'center', gap: 6 }}>
         <StarIcon on size={15} /> Starred ({starred.kind === 'ok' ? starred.games.length : '…'})
       </h3>
+      {starred.kind === 'signed-out' && <p style={sectionNote}>Sign in to see your starred games.</p>}
       {starred.kind === 'loading' && <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: 0 }}>Loading…</p>}
       {starred.kind === 'error' && <p style={{ fontSize: 13, color: 'var(--c-red)', margin: 0 }}>{starred.text}</p>}
       {starred.kind === 'ok' && !starred.games.length && (
@@ -404,7 +424,7 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
       )}
       {starred.kind === 'ok' && starred.games.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {starred.games.map((g) => (
+          <CategorizedLibraryItems kind="game" readOnly itemKey={(g) => g.id} defaults={[...new Set(starred.games.map((g) => g.owner))]} defaultCategory={(g) => g.owner} preview={() => <Gamepad2 size={28} />} items={starred.games} text={(g) => `${g.title} ${g.owner} ${g.modeLabel}`}>{(g) => (
             <div key={g.id} style={rowStyle}>
               <div style={{ minWidth: 140, flex: '1 1 160px' }}>
                 <div style={{ fontSize: 13, fontWeight: 600 }}>{g.title}</div>
@@ -419,13 +439,11 @@ export default function GamesLibrary({ onMessage }: { onMessage?: (text: string,
               </button>
               <a href={playHref(g.id)} style={playBtn}>Play</a>
             </div>
-          ))}
+          )}</CategorizedLibraryItems>
         </div>
       )}
       <p style={{ ...sectionNote, margin: '6px 0 0' }}>{GITHUB_WORD.star}</p>
-      </section>
-
-      <BuiltinGames onMessage={onMessage} />
+      </section>}
     </div>
   );
 }

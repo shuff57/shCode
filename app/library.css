@@ -1,0 +1,61 @@
+/* Library styles are loaded by the server layout, including embedded Library panels. */
+.shcode-library-library { container-type: inline-size; }
+.shcode-library-workspace { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 24px; align-items: start; }
+.shcode-library-rail { display: flex; flex-direction: column; gap: 5px; position: sticky; top: 18px; }
+.shcode-library-destination { display: flex; align-items: center; gap: 9px; width: 100%; text-align: left; padding: 10px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: var(--c-dim); cursor: pointer; font-size: 13px; }
+.shcode-library-destination[aria-pressed="true"] { background: var(--c-deep2); border-color: var(--c-line); color: var(--c-fg); font-weight: 600; }
+.shcode-library-destination:hover { color: var(--c-fg); background: var(--c-deep2); }
+.shcode-library-railLabel { font-size: 10px; letter-spacing: .09em; text-transform: uppercase; color: var(--c-dim); margin: 4px 10px 8px; }
+.shcode-library-typeTabs { display: flex; gap: 5px; overflow-x: auto; margin: 0 0 18px; padding-bottom: 10px; border-bottom: 1px solid var(--c-line); }
+.shcode-library-typeTab { display: flex; align-items: center; gap: 7px; flex-shrink: 0; border: 1px solid transparent; background: transparent; color: var(--c-dim); border-radius: 7px; font-size: 13px; padding: 7px 10px; cursor: pointer; }
+.shcode-library-typeTab[aria-selected="true"] { background: var(--c-purple); color: var(--c-bg); font-weight: 700; }
+.shcode-library-main { min-width: 0; }
+.shcode-library-shelves { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 10px; margin: 10px 0 18px; }
+.shcode-library-shelf { min-width: 0; text-align: left; padding: 12px; border: 1px solid var(--c-line); border-radius: 10px; background: var(--c-deep2); color: var(--c-fg); cursor: pointer; }
+.shcode-library-shelf:hover { border-color: var(--c-purple); background: color-mix(in srgb, var(--c-purple) 7%, var(--c-bg)); }
+.shcode-library-shelfPreview { display: flex; align-items: center; justify-content: center; gap: 7px; height: 58px; border-radius: 6px; background: var(--c-bg); margin-bottom: 10px; overflow: hidden; color: var(--c-purple); }
+.shcode-library-shelfPreview > * { min-width: 0; max-width: 32%; }
+.shcode-library-shelfTitle { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+.shcode-library-shelfMeta { font-size: 11px; color: var(--c-dim); margin: 5px 0 0; }
+.shcode-library-quickViews { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 14px; }
+.shcode-library-quickView { display: inline-flex; align-items: center; gap: 7px; background: transparent; border: 1px solid var(--c-line); color: var(--c-fg); padding: 7px 10px; border-radius: 7px; cursor: pointer; font-size: 12px; }
+.shcode-library-quickView[aria-pressed="true"] { background: var(--c-deep2); border-color: var(--c-purple); }
+.shcode-library-breadcrumb { display: flex; gap: 7px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--c-dim); margin: 10px 0; }
+.shcode-library-backButton { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 10px 14px; border: 1px solid var(--c-purple); border-radius: 8px; background: color-mix(in srgb, var(--c-purple) 12%, var(--c-bg)); color: var(--c-fg); font-size: 14px; font-weight: 600; cursor: pointer; }
+.shcode-library-backButton:hover { background: color-mix(in srgb, var(--c-purple) 22%, var(--c-bg)); }
+.shcode-library-manage { width: 100%; font-size: 12px; color: var(--c-dim); }
+.shcode-library-manage summary { cursor: pointer; padding: 4px; }
+.shcode-library-manage[open] { flex-basis: 100%; }
+.shcode-library-manage > div { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; padding: 8px 4px; }
+.shcode-library-destination:focus-visible, .shcode-library-typeTab:focus-visible, .shcode-library-shelf:focus-visible, .shcode-library-quickView:focus-visible, .shcode-library-backButton:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 3px; }
+@container (max-width: 650px) {
+  .shcode-library-workspace { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .shcode-library-rail { position: static; flex-direction: row; flex-wrap: wrap; gap: 4px; }
+  .shcode-library-railLabel { display: none; }
+  .shcode-library-destination { width: auto; font-size: 12px; padding: 7px 9px; }
+  .shcode-library-typeTabs { margin-bottom: 12px; }
+  .shcode-library-shelves { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+}
+.shcode-library-shelfContainer { min-width: 0; border: 1px solid var(--c-line); border-radius: 10px; overflow: hidden; background: var(--c-deep2); }
+.shcode-library-shelfContainer > .shcode-library-shelf { width: 100%; border: 0; border-radius: 0; }
+.shcode-library-folderActions { display: flex; align-items: center; justify-content: space-between; gap: 3px; padding: 5px 7px; flex-wrap: wrap; border-top: 1px solid var(--c-line); color: var(--c-dim); }
+.shcode-library-folderActions button { display: inline-flex; align-items: center; justify-content: center; padding: 6px; min-width: 28px; min-height: 30px; border: 0; border-radius: 4px; color: var(--c-fg); background: transparent; cursor: pointer; }
+.shcode-library-folderActions button:hover { background: var(--c-bg); }
+.shcode-library-folderActions button:disabled { opacity: .35; cursor: default; }
+.shcode-library-folderActions button:focus-visible { outline: 2px solid var(--c-cyan); }
+.shcode-library-moveTargets { display: flex; flex-wrap: wrap; gap: 5px; width: 100%; }
+
+.shcode-library-dropTarget { outline: 2px solid var(--c-purple); outline-offset: 3px; background: color-mix(in srgb, var(--c-purple) 12%, var(--c-bg)) !important; }
+
+/* TouchSensor lets the page scroll normally until a long-press starts a drag. */
+.shcode-library-sortableCard { cursor: grab; }
+.shcode-library-sortableCard:active { cursor: grabbing; }
+.shcode-library-sortableCard [data-library-drag-surface] { cursor: inherit; }
+.shcode-library-sortableCard:focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 3px; }
+.shcode-library-dragPreview { display: inline-flex; align-items: center; gap: 8px; max-width: 260px; padding: 12px 16px; border: 1px solid var(--c-purple); border-radius: 8px; background: var(--c-bg); color: var(--c-fg); box-shadow: 0 8px 28px rgba(0,0,0,.3); overflow-wrap: anywhere; }
+.shcode-library-folderDrop { display: inline-flex; align-items: center; padding: 8px 12px; border: 1px dashed var(--c-line); border-radius: 6px; font-size: 12px; color: var(--c-fg); }
+
+.shcode-library-folderEdit { display: flex; flex-direction: column; gap: 8px; padding: 12px; cursor: default; }
+.shcode-library-folderEdit > svg { color: var(--c-purple); margin: 10px auto; }
+.shcode-library-folderEdit label { font-size: 12px; color: var(--c-dim); }
+.shcode-library-folderEdit input { width: 100%; box-sizing: border-box; }

@@ -581,6 +581,7 @@ app.prepare().catch((err) => {
     const { makeD1 } = await import('./scripts/_d1-sqlite.mjs');
     const libList = await import('./functions/api/library/index.ts');
     const libOne = await import('./functions/api/library/[id].ts');
+    const libCategories = await import('./functions/api/library/categories.ts');
     const libDb = makeD1();
     const libR2 = new Map();
     const UPLOADS = {
@@ -778,6 +779,8 @@ app.prepare().catch((err) => {
     const sketchSaves = await import('./functions/api/sketch-saves.ts');
     server.get('/api/sketch-saves', libRoute(sketchSaves.onRequestGet));
     server.put('/api/sketch-saves', express.json({ limit: '200kb' }), libRoute(sketchSaves.onRequestPut));
+    server.get('/api/library/categories', libRoute(libCategories.onRequestGet));
+    server.put('/api/library/categories', express.json(), libRoute(libCategories.onRequestPut));
     server.get('/api/library', libRoute(libList.onRequestGet));
     server.get('/api/library/shared', libRoute(shareList.onRequestGet));
     server.get('/api/library/shared/:id', libRoute(shareOne.onRequestGet));

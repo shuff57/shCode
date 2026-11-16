@@ -1,5 +1,8 @@
 'use client';
 
+import { BuiltinLibraryItems } from './LibraryCategories';
+import CategorizedLibraryItems from './LibraryCategories';
+
 // Fonts in the Library (Library -> Fonts, the Font maker at /fonts, the
 // sandbox's Fonts drawer): the student's own saved fonts (MyFonts: sample,
 // Copy textFont, Share with class, Delete) and the built-in ones (BuiltinFonts:
@@ -126,7 +129,7 @@ function MyFontsInner({ sample = '', onMessage, emptyHint }: ListProps) {
         </p>
       )}
       <div style={{ display: 'grid', gap: 8 }}>
-        {fonts.map((f) => (
+        <CategorizedLibraryItems kind="font" itemKey={(f) => f.name} items={fonts} preview={(f) => <FontSample fontKey={`shelf:${f.name}`} src={{ dataUri: f.dataUri }} text="Aa" size={22} />} text={(f) => f.name}>{(f) => (
           <div key={f.name} style={card}>
             <FontSample fontKey={`saved:${f.name}:${f.dataUri.length}`} src={{ dataUri: f.dataUri }} text={sample} />
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', fontSize: 11, color: 'var(--c-dim)' }}>
@@ -145,7 +148,7 @@ function MyFontsInner({ sample = '', onMessage, emptyHint }: ListProps) {
               <button type="button" onClick={() => void remove(f)} aria-label={`Delete ${f.name}`} style={delBtn}>Delete</button>
             </div>
           </div>
-        ))}
+        )}</CategorizedLibraryItems>
       </div>
     </section>
   );
@@ -163,7 +166,7 @@ export function BuiltinFonts({ sample = '' }: { sample?: string }) {
       </p>
       {cat && (
         <div style={{ display: 'grid', gap: 8 }}>
-          {names.map((n) => {
+          <BuiltinLibraryItems kind="font" itemKey={(n) => n} defaults={[...new Set(names.map((n) => cat.fonts[n].look))]} defaultCategory={(n) => cat.fonts[n].look} preview={(n) => <FontSample fontKey={`shelf-builtin:${n}`} src={{ builtin: n }} text="Aa" size={22} />} items={names} text={(n) => `${n} ${cat.fonts[n].look} ${cat.fonts[n].family}`}>{(n) => {
             const f = cat.fonts[n];
             return (
               <div key={n} style={card}>
@@ -174,7 +177,7 @@ export function BuiltinFonts({ sample = '' }: { sample?: string }) {
                 </div>
               </div>
             );
-          })}
+          }}</BuiltinLibraryItems>
         </div>
       )}
     </section>

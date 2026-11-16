@@ -1,5 +1,7 @@
 'use client';
 
+import LibraryItems from './LibraryItems';
+
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   UploadError,
@@ -204,7 +206,7 @@ export default function ImageLibrary({ onClose, onPick }: Props) {
           <p style={{ color: C.dim }}>No images yet.</p>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12 }}>
-            {items.map((it) => (
+            <LibraryItems items={items} text={(it) => it.filename}>{(it) => (
               <div key={it.id} style={{ background: C.panel, border: `1px solid ${C.line}`, borderRadius: 8, padding: 8 }}>
                 <div
                   style={{
@@ -243,7 +245,7 @@ export default function ImageLibrary({ onClose, onPick }: Props) {
                   </button>
                 </div>
               </div>
-            ))}
+            )}</LibraryItems>
           </div>
         )}
 

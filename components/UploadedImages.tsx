@@ -1,5 +1,7 @@
 'use client';
 
+import CategorizedLibraryItems from './LibraryCategories';
+
 // "Uploaded images (N)" on the Library's Pictures tab: the images the student
 // added through the editor's Images panel (components/ImageLibrary.tsx, the
 // /api/uploads routes), each with its size, Copy link and Delete. Same client
@@ -80,7 +82,7 @@ export default function UploadedImages({ onMessage }: { onMessage?: (text: strin
         <p style={{ fontSize: 13, color: 'var(--c-dim)', margin: 0 }}>No uploaded images.</p>
       ) : (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          {items.map((it) => (
+          <CategorizedLibraryItems kind="upload" itemKey={(it) => it.id} items={items} preview={(it) => <img src={it.url} alt="" style={{ width: 36, height: 36, objectFit: 'contain' }} />} text={(it) => it.filename}>{(it) => (
             <div key={it.id} style={tile}>
               <div style={{ width: 150, height: 80, display: 'grid', placeItems: 'center', background: 'var(--x-202020)', borderRadius: 4, overflow: 'hidden' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -99,7 +101,7 @@ export default function UploadedImages({ onMessage }: { onMessage?: (text: strin
                 </button>
               </div>
             </div>
-          ))}
+          )}</CategorizedLibraryItems>
         </div>
       )}
     </section>

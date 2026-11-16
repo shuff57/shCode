@@ -1,5 +1,9 @@
 'use client';
 
+import { AudioLines } from 'lucide-react';
+import { libraryClasses as styles } from './library-ui';
+import CategorizedLibraryItems from './LibraryCategories';
+
 // "Yours" on the Library page and tab: every texture and sound the student has
 // saved, each with a Share button (ShareToggle) that puts it in the Library of
 // their classes. Before this the only Share was a 10px link under each texture
@@ -123,11 +127,11 @@ function MyLibraryInner({ onMessage, kind }: Props) {
           )}
         </p>
       )}
-      {textures.length > 0 && (
+      {(kind === 'texture' || textures.length > 0) && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
-          {textures.map((t) => (
+          <CategorizedLibraryItems kind="texture" itemKey={(t) => t.name} items={textures} preview={(t) => <SpriteThumb src={t.dataUri} frames={t.frames} frameDelay={t.frameDelay} size={36} />} text={(t) => t.name}>{(t) => (
             <div key={'t:' + t.name} style={tile}>
-              <button type="button" className="sprite-open" onClick={() => setViewing(t.name)} style={{ background: 'var(--x-202020)' }}
+              <button type="button" className="sprite-open" data-library-drag-surface onClick={() => setViewing(t.name)} style={{ background: 'var(--x-202020)' }}
                 aria-label={(t.frames ?? 1) > 1 ? `${t.name}: see its ${t.frames} frames` : `${t.name}: see it bigger`}
                 title={(t.frames ?? 1) > 1 ? 'See each frame' : 'See it bigger'}>
                 <SpriteThumb src={t.dataUri} frames={t.frames} frameDelay={t.frameDelay} size={48} />
@@ -140,27 +144,37 @@ function MyLibraryInner({ onMessage, kind }: Props) {
                 </button>
               ) : null}
               <RemixCredit item={{ kind: 'texture', name: t.name }} style={{ fontSize: 11 }} />
-              <ShareToggle kind="texture" name={t.name} onMessage={onMessage} />
-              <Link href={editorUrl('texture', t.name)} {...away} style={{ fontSize: 11, color: 'var(--c-cyan)' }}>Edit</Link>
-              <button type="button" onClick={() => void remove(t)} aria-label={`Delete ${t.name}`} style={delBtn}>Delete</button>
+              <details className={styles.manage}>
+                <summary>Manage picture</summary>
+                <div>
+                  <ShareToggle kind="texture" name={t.name} onMessage={onMessage} />
+                  <Link href={editorUrl('texture', t.name)} {...away} style={{ fontSize: 11, color: 'var(--c-cyan)' }}>Edit</Link>
+                  <button type="button" onClick={() => void remove(t)} aria-label={`Delete ${t.name}`} style={delBtn}>Delete</button>
+                </div>
+              </details>
             </div>
-          ))}
+          )}</CategorizedLibraryItems>
         </div>
       )}
-      {sounds.length > 0 && (
+      {(kind === 'sound' || sounds.length > 0) && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          {sounds.map((s) => (
-            <div key={'s:' + s.name} style={{ ...tile, width: 'auto', flexDirection: 'row' }}>
+          <CategorizedLibraryItems kind="sound" itemKey={(s) => s.name} items={sounds} preview={() => <AudioLines size={28} />} text={(s) => s.name}>{(s) => (
+            <div key={'s:' + s.name} style={{ ...tile, width: 'auto', maxWidth: '100%', flexDirection: 'row', flexWrap: 'wrap' }}>
               <button type="button" aria-label={`Play ${s.name}`}
                 onClick={() => { new Audio(s.dataUri).play().catch(() => {}); }}
                 style={{ background: 'transparent', color: 'var(--c-fg)', border: '1px solid var(--c-line)', borderRadius: 4, cursor: 'pointer', padding: '2px 8px' }}>▶</button>
               <code style={{ fontSize: 11 }}>{s.name}</code>
               <RemixCredit item={{ kind: 'sound', name: s.name }} style={{ fontSize: 11 }} />
-              <ShareToggle kind="sound" name={s.name} onMessage={onMessage} />
-              <Link href={editorUrl('sound', s.name)} {...away} style={{ fontSize: 11, color: 'var(--c-cyan)' }}>Edit</Link>
-              <button type="button" onClick={() => void remove(s)} aria-label={`Delete ${s.name}`} style={delBtn}>Delete</button>
+              <details className={styles.manage}>
+                <summary>Manage sound</summary>
+                <div>
+                  <ShareToggle kind="sound" name={s.name} onMessage={onMessage} />
+                  <Link href={editorUrl('sound', s.name)} {...away} style={{ fontSize: 11, color: 'var(--c-cyan)' }}>Edit</Link>
+                  <button type="button" onClick={() => void remove(s)} aria-label={`Delete ${s.name}`} style={delBtn}>Delete</button>
+                </div>
+              </details>
             </div>
-          ))}
+          )}</CategorizedLibraryItems>
         </div>
       )}
       {viewer}

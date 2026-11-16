@@ -1,5 +1,7 @@
 'use client';
 
+import CategorizedLibraryItems from './LibraryCategories';
+
 // "From your class": textures, sounds or fonts classmates shared (#81), with a preview
 // and "Copy to mine", which saves a copy into the student's own library (and so
 // their account). Renders nothing when signed out or when nothing is shared.
@@ -167,14 +169,15 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
         </div>
       )}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-        {items.map((it) => (
+        <CategorizedLibraryItems kind={kind} readOnly itemKey={(it) => it.id} defaults={[...new Set(items.map((it) => it.owner))]} defaultCategory={(it) => it.owner}
+          preview={(it) => kind === 'texture' && art[it.id] ? <SpriteThumb src={art[it.id].dataUri} {...texMeta(art[it.id].meta)} size={36} /> : <span>{it.name.slice(0, 2)}</span>} items={items} text={(it) => `${it.name} ${it.owner}`}>{(it) => (
           <div key={it.id} style={{
             width: kind === 'texture' ? 92 : kind === 'font' ? '100%' : 'auto', padding: 6, borderRadius: 6,
             border: `1px solid ${it.hidden ? 'color-mix(in srgb, var(--c-orange) 53.3333%, transparent)' : 'var(--c-line)'}`, background: 'var(--c-deep2)',
             display: 'flex', flexDirection: kind === 'texture' ? 'column' : 'row', alignItems: 'center', gap: 6,
           }}>
             {kind === 'texture' ? (
-              <button type="button" className="sprite-open" onClick={() => setViewing(it.id)} disabled={!art[it.id]}
+              <button type="button" className="sprite-open" data-library-drag-surface onClick={() => setViewing(it.id)} disabled={!art[it.id]}
                 aria-label={`${it.name}: see it bigger and its frames`} title="See each frame"
                 style={{ width: 48, height: 48, background: 'var(--x-202020)' }}>
                 {art[it.id] && (
@@ -226,7 +229,7 @@ export default function ClassLibrary({ kind, onCopied, onMessage, onLoaded, titl
               </div>
             )}
           </div>
-        ))}
+        )}</CategorizedLibraryItems>
       </div>
       {(() => {
         const it = viewing ? items.find((x) => x.id === viewing) : undefined;

@@ -1,5 +1,7 @@
 'use client';
 
+import { BuiltinLibraryItems } from './LibraryCategories';
+
 // "Built in" on the Library page and tab: every texture and sound that ships
 // with moSHion, so a student can find them without the docs. A built-in works
 // in any sketch straight away (`sprite.texture = 'sword'`,
@@ -116,46 +118,45 @@ export default function BuiltInLibrary({ onMessage, kind }: {
   ) : null;
   const textureList = (
     <>
-        {Object.entries(groups).map(([group, list]) => (
-          <div key={group} style={{ marginBottom: 10 }}>
-            <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--c-dim)', margin: '6px 0' }}>
-              {GROUP_LABELS[group] ?? group} ({list.length})
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        <BuiltinLibraryItems kind="texture" itemKey={([name]) => name} items={Object.values(groups).flat()}
+          defaults={Object.keys(groups).map((g) => GROUP_LABELS[g] ?? g)}
+          defaultCategory={([, t]) => GROUP_LABELS[t.group] ?? t.group}
+          preview={([, t]) => <SpriteThumb src={(cat?.base ?? '/moshion/textures/') + t.file} frames={t.frames ?? 1} frameDelay={t.frameDelay ?? 6} size={36} />}
+          text={([name, t]) => `${name} ${GROUP_LABELS[t.group] ?? t.group}`}>
+          {([name, t]) => (
+            <div key={name} style={{
+              width: 120, padding: 6, borderRadius: 6, border: '1px solid var(--c-line)', background: 'var(--c-deep2)',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+            }}>
+              <button type="button" className="sprite-open" data-library-drag-surface onClick={() => setViewing(name)}
+                aria-label={t.frames && t.frames > 1 ? `${name}: see its ${t.frames} frames` : `${name}: see it bigger`}
+                title={t.frames && t.frames > 1 ? 'See each frame' : 'See it bigger'}
+                style={{ background: 'var(--x-202020)' }}>
+                <SpriteThumb src={(cat?.base ?? '/moshion/textures/') + t.file} frames={t.frames ?? 1} frameDelay={t.frameDelay ?? 6} size={42} />
+              </button>
+              <code style={{ fontSize: 11 }}>{name}</code>
+              {t.frames && t.frames > 1 ? (
+                <button type="button" onClick={() => setViewing(name)} aria-label={`See the ${t.frames} frames of ${name}`}
+                  style={{ background: 'none', border: 0, padding: 0, color: 'var(--c-cyan)', fontSize: 11, cursor: 'pointer' }}>
+                  {t.frames} frames
+                </button>
+              ) : null}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: '100%' }}>
+                <button type="button" style={small} onClick={() => copyText(`sprite.texture = '${name}';`)}
+                  aria-label={`Copy code for ${name}`}>Copy code</button>
+                <button type="button" style={small} onClick={() => void remixTexture(name, t)}
+                  aria-label={`Remix ${name}`} title="Make your own copy and open it in the Texture editor">Remix</button>
+              </div>
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {list.map(([name, t]) => (
-                <div key={name} style={{
-                  width: 120, padding: 6, borderRadius: 6, border: '1px solid var(--c-line)', background: 'var(--c-deep2)',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-                }}>
-                  <button type="button" className="sprite-open" onClick={() => setViewing(name)}
-                    aria-label={t.frames && t.frames > 1 ? `${name}: see its ${t.frames} frames` : `${name}: see it bigger`}
-                    title={t.frames && t.frames > 1 ? 'See each frame' : 'See it bigger'}
-                    style={{ background: 'var(--x-202020)' }}>
-                    <SpriteThumb src={(cat?.base ?? '/moshion/textures/') + t.file} frames={t.frames ?? 1} frameDelay={t.frameDelay ?? 6} size={42} />
-                  </button>
-                  <code style={{ fontSize: 11 }}>{name}</code>
-                  {t.frames && t.frames > 1 ? (
-                    <button type="button" onClick={() => setViewing(name)} aria-label={`See the ${t.frames} frames of ${name}`}
-                      style={{ background: 'none', border: 0, padding: 0, color: 'var(--c-cyan)', fontSize: 11, cursor: 'pointer' }}>
-                      {t.frames} frames
-                    </button>
-                  ) : null}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: '100%' }}>
-                    <button type="button" style={small} onClick={() => copyText(`sprite.texture = '${name}';`)}
-                      aria-label={`Copy code for ${name}`}>Copy code</button>
-                    <button type="button" style={small} onClick={() => void remixTexture(name, t)}
-                      aria-label={`Remix ${name}`} title="Make your own copy and open it in the Texture editor">Remix</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+          )}
+        </BuiltinLibraryItems>
+      </div>
     </>
   );
   const soundList = (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          {PALETTE.map((p) => (
+          <BuiltinLibraryItems kind="sound" itemKey={(p) => p.name} defaults={['Music', 'Sound effects']} defaultCategory={(p) => p.kind === 'music' ? 'Music' : 'Sound effects'} items={PALETTE} text={(p) => `${p.name} ${p.label} ${p.kind}`}>{(p) => (
             <div key={p.name} style={{
               padding: 6, borderRadius: 6, border: '1px solid var(--c-line)', background: 'var(--c-deep2)',
               display: 'flex', alignItems: 'center', gap: 6,
@@ -169,7 +170,7 @@ export default function BuiltInLibrary({ onMessage, kind }: {
               <button type="button" style={small} onClick={() => void remixSound(p)}
                 aria-label={`Remix ${p.label}`} title="Make your own copy and open it in the Sound mixer">Remix</button>
             </div>
-          ))}
+          )}</BuiltinLibraryItems>
         </div>
   );
 
