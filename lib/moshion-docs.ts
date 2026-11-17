@@ -1794,7 +1794,7 @@ function draw() {
   allSprites.draw(); // the sprites go here
   fill('white');
   textSize(16);
-  text('Click to add a dot. These words are over every sprite.', 20, 40);
+  text('Click to add a dot.', 20, 40); // drawn over every sprite
 }`,
       },
       {
