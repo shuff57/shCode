@@ -407,8 +407,12 @@ export function createSandbox({ width = 800, height = 600, timedTimers = false }
     keyDown: (k) => dispatch('window', 'keydown', { key: k, preventDefault() {} }),
     keyUp: (k) => dispatch('window', 'keyup', { key: k, preventDefault() {} }),
     mouseMove: (x, y) => dispatch('canvas', 'mousemove', { clientX: x, clientY: y }),
-    mouseDown: () => dispatch('canvas', 'mousedown', {}),
-    mouseUp: () => dispatch('window', 'mouseup', {}),
+    // button: 0 left (the default), 1 center, 2 right, as MouseEvent.button.
+    mouseDown: (button = 0) => dispatch('canvas', 'mousedown', { button }),
+    mouseUp: (button = 0) => dispatch('window', 'mouseup', { button }),
+    // The browser's right-click menu event on the canvas; answers whether the
+    // engine stopped the menu (preventDefault).
+    contextMenu: () => { let stopped = false; dispatch('canvas', 'contextmenu', { button: 2, preventDefault() { stopped = true; } }); return stopped; },
     // Focus leaves the sketch (a click on the editor, Alt-Tab): no keyup/mouseup follows.
     blur: () => dispatch('window', 'blur', {}),
   };

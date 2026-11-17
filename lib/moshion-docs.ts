@@ -2130,7 +2130,7 @@ function draw() {
 
 mouse.pressing() returns true while any mouse button is held. mouse.presses() is true only on the first frame of a click — use it for single-shot actions. mouse.released() is true on the frame the button is released.
 
-To tell the buttons apart, give the button's name: mouse.presses('right') is the first frame of a right-click, mouse.pressing('left') is true while the left button is held, and the same works for 'center' and for released(). With nothing in the brackets they answer for any button. mouse.left, mouse.center and mouse.right also count how many frames each button has been held. mouse.pos is the cursor as an {x, y} object, handy for passing straight to a method that takes a target.
+To tell the buttons apart, give the button's name: mouse.presses('right') is the first frame of a right-click, mouse.pressing('left') is true while the left button is held, and the same works for 'center' and for released(). With nothing in the brackets they answer for any button. Right-clicking the canvas does not open the browser's menu, so the right button is free for your game. mouse.left, mouse.center and mouse.right also count how many frames each button has been held. mouse.pos is the cursor as an {x, y} object, handy for passing straight to a method that takes a target.
 
 mouse.x and mouse.y are world coordinates — they already include the camera, so comparing them to a sprite's x and y always works. mouse.canvasPos is the same cursor measured in screen pixels instead. Use it for anything pinned to the screen rather than the world, like a HUD button: once the camera scrolls, mouse.x is somewhere out in the level while canvasPos is still where the cursor looks like it is.
 

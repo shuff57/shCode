@@ -1088,6 +1088,10 @@ export default function TextureEditor() {
             // zero cells and reports a feature broken that is not.
             data-texture-grid={`${w}x${h}`}
             onDragStart={(e) => e.preventDefault()}
+            // A right-click on the grid paints like any click; the browser's
+            // own menu opening over the cells on top of that is just in the
+            // way (shCode #127). Only the grid: the rest of the page keeps it.
+            onContextMenu={(e) => e.preventDefault()}
           >
             {grid.map((c, i) => {
               // Onion skin: the previous frame, faint, under the live one. It

@@ -1267,6 +1267,36 @@ export const SEMANTIC_CHECKS = [
     },
   },
   {
+    // shCode #127: the right button was readable, but the browser's own menu
+    // opened over the canvas on every right-click, so a game could not use it.
+    name: "a right-click on the canvas is mouse.presses('right') and opens no browser menu",
+    area: 'input',
+    run({ createSandbox }) {
+      const box = createSandbox();
+      box.run(`
+        seen = { right: 0, left: 0, rightUp: 0 };
+        function setup(){ new Canvas(200,200); }
+        function draw(){
+          if (mouse.presses('right')) seen.right++;
+          if (mouse.presses('left')) seen.left++;
+          if (mouse.released('right')) seen.rightUp++;
+        }
+      `);
+      box.pump(2);
+      box.input.mouseDown(2);
+      box.pump(2);
+      box.input.mouseUp(2);
+      const stopped = box.input.contextMenu();
+      box.pump(2);
+      const s = box.sandbox.seen;
+      if (s.right !== 1) return `mouse.presses('right') fired on ${s.right} frames for one right-click, expected 1`;
+      if (s.left !== 0) return `mouse.presses('left') fired on a right-click (${s.left} frames)`;
+      if (s.rightUp !== 1) return `mouse.released('right') fired on ${s.rightUp} frames, expected 1`;
+      if (!stopped) return 'the canvas let the browser open its right-click menu over the sketch';
+      return true;
+    },
+  },
+  {
     name: 'mouse.x is world space, mouse.canvasPos is screen space',
     area: 'input',
     // The two only differ once the camera moves, which is why a HUD hit-test
