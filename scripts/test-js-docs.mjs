@@ -176,11 +176,11 @@ try {
     contentSrc.includes('DocsDrawer') && contentSrc.includes('defaultSetId="js"'),
     'ContentLessonView.tsx must render DocsDrawer for readings/slides/examples/videos/quizzes');
 
-  const hubSrc = readFileSafe(path.join(root, 'app/docs/page.tsx'));
+  const hubSrc = readFileSafe(path.join(root, 'app/docs/page.tsx')) + readFileSafe(path.join(root, 'components/DocsHub.tsx'));
   const jsSectionPage = readFileSafe(path.join(root, 'app/docs/js/[section]/page.tsx'));
   ok('the docs hub links to the JS route',
-    hubSrc.includes('href="/docs/js/values"'),
-    'app/docs/page.tsx must carry a JavaScript card linking /docs/js/values');
+    hubSrc.includes("firstHref: '/docs/js/values'"),
+    'components/DocsHub.tsx must carry a JavaScript set whose first page is /docs/js/values');
   ok('the /docs/js route exists and renders the family bar',
     jsSectionPage.includes('DocsFamilyBar') && jsSectionPage.includes('JsDocsClient'),
     'app/docs/js/[section]/page.tsx must mount the family bar and the JS docs client');

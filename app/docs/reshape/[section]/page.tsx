@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { getAllSectionSlugs, getSection, sections } from '../../../../lib/reshape-docs';
 import DocsClient from '../../moshion/[section]/DocsClient';
 import DocsFamilyBar from '../../../../components/DocsFamilyBar';
+import DocsFrame from '../../../../components/DocsFrame';
 
 export function generateStaticParams() {
   return getAllSectionSlugs().map((section) => ({ section }));
@@ -17,10 +18,10 @@ export default async function ReshapeDocsSectionPage({
   const section = getSection(slug);
   if (!section) return notFound();
   return (
-    <>
-      <DocsFamilyBar currentId="reshape" />
+    <DocsFrame>
       <Suspense fallback={<div className="docs-main">Loading…</div>}>
         <DocsClient
+          tabs={<DocsFamilyBar currentId="reshape" />}
           section={section}
           allSections={sections}
           basePath="/docs/reshape"
@@ -29,6 +30,6 @@ export default async function ReshapeDocsSectionPage({
           preview="reshape"
         />
       </Suspense>
-    </>
+    </DocsFrame>
   );
 }

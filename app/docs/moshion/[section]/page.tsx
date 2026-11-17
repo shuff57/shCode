@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { getAllSectionSlugs, getSection, sections } from '../../../../lib/moshion-docs';
 import DocsClient from './DocsClient';
 import DocsFamilyBar from '../../../../components/DocsFamilyBar';
+import DocsFrame from '../../../../components/DocsFrame';
 
 export function generateStaticParams() {
   return getAllSectionSlugs().map((section) => ({ section }));
@@ -17,10 +18,10 @@ export default async function DocsSectionPage({
   const section = getSection(slug);
   if (!section) return notFound();
   return (
-    <>
-      <DocsFamilyBar currentId="moshion" />
+    <DocsFrame>
       <Suspense fallback={<div className="docs-main">Loading…</div>}>
         <DocsClient
+          tabs={<DocsFamilyBar currentId="moshion" />}
           section={section}
           allSections={sections}
           basePath="/docs/moshion"
@@ -29,6 +30,6 @@ export default async function DocsSectionPage({
           preview="moshion"
         />
       </Suspense>
-    </>
+    </DocsFrame>
   );
 }

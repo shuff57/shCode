@@ -2580,7 +2580,7 @@ button, input, select, textarea { font-family: inherit; }
 /* no !important, and graded quiz radios/checkboxes are disabled to lock answers, not to look unavailable */
 :where(button, select, textarea, input:not([type=radio]):not([type=checkbox])):disabled { opacity: .5; cursor: not-allowed; }
 :is(button, a):focus-visible { outline: 2px solid var(--c-cyan); outline-offset: 3px; }
-:is(.content-lesson-main, .assignment-header-left, .docs-hub, .docs-main) h1,
+:is(.content-lesson-main, .assignment-header-left, .docs-main) h1,
 #titleRow h1 { font-size: var(--fs-h1) !important; font-weight: 700; }
 :is(.student-quiz, .completion-panel, .lab-task-card) h2 { font-size: var(--fs-h2) !important; }
 :is(.console-empty, .run-output .console-empty, .docs-sidebar-empty,
@@ -2642,8 +2642,6 @@ a.mod-row:hover { background: var(--x-343746); border-top-color: var(--c-comment
 @media (max-width: 720px) {
   .home-continue-card { padding: 16px; align-items: flex-start; flex-direction: column; }
   .home-continue-action { align-self: flex-start; }
-  .docs-hub { padding: 24px 16px !important; }
-  .docs-hub > div { padding: 16px !important; }
   .mod-row { grid-template-columns: auto minmax(0, 1fr) 12px; }
   .mod-row-meta { flex-wrap: wrap; grid-column: 2; gap: 8px; justify-content: flex-end; }
   .mod-row-state { width: 100%; flex-basis: 100%; }
@@ -2841,7 +2839,6 @@ a.mod-row:hover { background: var(--x-343746); border-top-color: var(--c-comment
   .content-lesson-main .lesson-reading-body { max-width: none; min-width: 0; }
   .content-lesson-main .content-prose { max-width: 72ch; }
   .lesson-wide-media { width: 100% !important; }
-  .docs-hub > p { max-width: 72ch; }
 }
 @media (min-width: 1200px) {
   .lesson-reading-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; column-gap: 32px; align-items: start; }
@@ -3141,7 +3138,7 @@ body:has(.content-lesson-main) .lesson-position { width: 100%; max-width: 1080px
 .home-module-progress .unit-progress-count, .sandbox-header .sandbox-subtitle,
 .console-empty, .written-actions > span, .student-quiz .quiz-guidance p,
 .progress-page .progress-summary-line, .progress-page .grade-summary-row, .progress-page details ul, .progress-page p, .progress-page li,
-.docs-hub > p, .docs-hub p, .account-page p, .account-page legend, .lesson-description-more, .completion-done-text,
+.account-page p, .account-page legend, .lesson-description-more, .completion-done-text,
 .content-lesson-main .lesson-reading-body:not(.prose-copy) .content-prose :is(p, li) {
   font-family: var(--font-prose);
 }
@@ -3150,8 +3147,6 @@ body:has(.content-lesson-main) .lesson-position { width: 100%; max-width: 1080px
 .lesson-overview a { font-size: 14px; line-height: 1.4; }
 .home-module-progress .unit-progress-count, .assignment-score .score-text { font-variant-numeric: tabular-nums; }
 @media (min-width: 721px) { .student-quiz .quiz-guidance p { font-size: 14px !important; line-height: 1.5; max-width: 70ch; } }
-.docs-hub > p { font-size: 15px; line-height: 1.5; max-width: 70ch; }
-.docs-hub p { line-height: 1.5; }
 .account-page p { line-height: 1.5; max-width: 70ch; }
 .account-card form label { font-family: var(--font-prose); font-size: 14px !important; font-weight: 600 !important; }
 .sandbox-header .sandbox-subtitle { font-size: 14px; }
@@ -4289,9 +4284,6 @@ a.mod-row.is-next {
 .doc-live-reset:not(:disabled) { color: var(--c-fg) !important; }
 .doc-live-reset:not(:disabled):hover { border-color: var(--c-meta) !important; }
 .doc-live-reset:disabled { opacity: 0.5 !important; border-style: solid !important; cursor: not-allowed !important; }
-.docs-family-bar { padding-top: 4px !important; padding-bottom: 4px !important; }
-.docs-family-bar .docs-family-home { color: var(--c-meta) !important; font-family: var(--font-prose); font-size: 14px !important; }
-.docs-family-bar .docs-family-tab { padding: 3px 10px !important; }
 /* r8 S12 Quiz, desktop: the questions and answers are a readable column (answer rows end near their text),
    and the heading row's jump link is short. */
 @media (min-width: 721px) {

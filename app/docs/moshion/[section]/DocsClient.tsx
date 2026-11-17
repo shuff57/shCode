@@ -1,6 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import type { ReactNode } from 'react';
+import DocsRail from '../../../../components/DocsRail';
+import { libraryClasses as libraryStyles } from '../../../../components/library-ui';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -11,6 +14,8 @@ import {
 import DocsSandbox from './DocsSandbox';
 
 interface Props {
+  /** The set switcher (DocsFamilyBar), drawn as the Library's tabs at the top of the main column. */
+  tabs?: ReactNode;
   section: DocSection;
   allSections: DocSection[];
   basePath: string;
@@ -46,6 +51,7 @@ function HighlightedSnippet({ result }: { result: DocSearchResult }) {
 
 export default function DocsClient({
   section,
+  tabs,
   allSections,
   basePath,
   docsTitle,
@@ -141,85 +147,20 @@ export default function DocsClient({
   }
 
   return (
-    <div className="docs-layout">
-      <aside className="docs-sidebar">
-        <div className="docs-sidebar-search">
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search docs…"
-            aria-label="Search documentation"
-          />
-        </div>
-        <div className="docs-sidebar-scroll">
-          {isSearching ? (
-            <div className="docs-sidebar-results">
-              <div className="docs-sidebar-title">
-                {results.length} result{results.length === 1 ? '' : 's'}
-              </div>
-              {results.length === 0 ? (
-                <div className="docs-sidebar-empty">No matches.</div>
-              ) : (
-                <ul className="docs-sidebar-result-list">
-                  {results.map((r, i) => (
-                    <li key={`${r.sectionSlug}:${r.pageIndex}:${i}`}>
-                      <Link
-                        href={pageHref(basePath, r.sectionSlug, r.pageIndex)}
-                        onClick={() => setQuery('')}
-                      >
-                        <span className="docs-sidebar-result-title">{r.pageTitle}</span>
-                        <span className="docs-sidebar-result-section">{r.sectionTitle}</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          ) : (
-            <>
-              <div className="docs-sidebar-title">{docsTitle}</div>
-              <nav>
-                {allSections.map((s) => {
-                  const active = s.slug === section.slug;
-                  return (
-                    <div
-                      key={s.slug}
-                      className={`docs-sidebar-section${active ? ' active' : ''}`}
-                    >
-                      <Link
-                        href={`${basePath}/${s.slug}`}
-                        className="docs-sidebar-section-title"
-                      >
-                        {s.title}
-                      </Link>
-                      {active && s.pages.length > 1 && (
-                        <ul className="docs-sidebar-pages">
-                          {s.pages.map((p, i) => (
-                            <li key={i}>
-                              <Link
-                                href={`${basePath}/${s.slug}?page=${i + 1}`}
-                                className={i === pageIndex ? 'current' : ''}
-                              >
-                                {p.title}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  );
-                })}
-              </nav>
-              <div className="docs-sidebar-footer">
-                <Link href="/">Back to lessons</Link>
-              </div>
-            </>
-          )}
-        </div>
-      </aside>
+    <div className={`docs-layout ${libraryStyles.workspace}`}>
+      <DocsRail
+        title={docsTitle}
+        basePath={basePath}
+        sections={allSections}
+        currentSlug={section.slug}
+        pageIndex={pageIndex}
+        searching={isSearching}
+        results={results}
+        onPickResult={() => setQuery('')}
+      />
 
-      <main className="docs-main">
+      <main className={`docs-main ${libraryStyles.main}`}>
+        {tabs}
         <div className="docs-main-search" ref={dropdownRef}>
           <div className="docs-main-search-row">
             <input
