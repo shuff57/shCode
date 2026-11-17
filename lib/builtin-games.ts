@@ -48,6 +48,9 @@ export const BUILTIN_GAMES: BuiltinGameDef[] = [
   { id: 'paddle-rally', title: 'Paddle Rally', file: 'games/paddle-rally.js', author: 'Steven Huff', choice: 'credit',
     modeText: '2 to 4 players, one keyboard or online',
     blurb: 'Left and right, then bottom, then top. Miss the ball and lose a life; the last player in wins.' },
+  { id: 'jump-lab', title: 'Jump Lab', file: 'games/jump-lab.js', author: 'Steven Huff', choice: 'credit',
+    modeText: '1 player',
+    blurb: 'Try every jump call: double and triple jumps, jump power, jumps left, and ground that does not count.' },
 ];
 
 const REF_PREFIX = 'builtin-';

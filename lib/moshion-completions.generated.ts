@@ -1323,6 +1323,36 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "info": "A box riding on this sprite that only detects: it pushes nothing, weighs nothing, and colliding() never counts it."
   },
   {
+   "label": "jump",
+   "type": "method",
+   "detail": "(ground?: Sprite | Group): boolean",
+   "info": "Jump, if a jump is left: sets vel.y to jumpPower, upward."
+  },
+  {
+   "label": "maxJumps",
+   "type": "property",
+   "detail": "number",
+   "info": "The most jumps before landing again: 1 (the default) a normal jump, 2 a double jump."
+  },
+  {
+   "label": "jumpPower",
+   "type": "property",
+   "detail": "number",
+   "info": "How fast a jump starts, in pixels a frame, upward (the way gravity does not pull)."
+  },
+  {
+   "label": "jumpsLeft",
+   "type": "property",
+   "detail": "number",
+   "info": "How many jumps are left before landing."
+  },
+  {
+   "label": "onGround",
+   "type": "property",
+   "detail": "boolean",
+   "info": "True while ground is under the sprite's feet: what was last given to jump(ground), or any solid sprite."
+  },
+  {
    "label": "drag",
    "type": "property",
    "detail": "number",

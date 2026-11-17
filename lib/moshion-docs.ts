@@ -3135,7 +3135,7 @@ function draw() {
 
 Use kb.pressing for continuous left/right motion, and kb.presses(' ') for the jump so one tap equals one jump.
 
-For coyote time or double jumps, count frames since the last ground contact and allow jumps while that count is small.`,
+For a double jump, or a jump that a wall cannot hand back, set player.maxJumps = 2 and call player.jump(ground): the next page.`,
         code: `let player, ground;
 
 function setup() {
@@ -3159,6 +3159,58 @@ function update() {
 
 function draw() {
   background('#222');
+}`,
+      },
+      {
+        title: 'Double jumps',
+        body: `A sprite can count its own jumps. Set player.maxJumps = 2 and it may jump twice before it has to land again: 1 (the default) is an ordinary jump, 3 a triple jump. Set it in setup(), after the sprite has its size.
+
+player.jump(ground) in update() does the jump, but only while one is left. It gives back true when it jumped and false when it did not. ground is what the player jumps off, the same way player.colliding(ground) names it: a sprite, or a group such as platforms. Landing on it gives every jump back; landing on anything else (a crate, an enemy's head) does not. player.jump() with nothing in the brackets counts anything solid as ground. The player does not have to be touching ground to jump: with maxJumps 2 the second jump is in mid-air.
+
+player.jumpsLeft is how many jumps are left, and player.onGround is true while ground is under the sprite's feet. A wall beside it does not count, and neither does a coin or anything else with collider 'none'. Walking off a ledge uses up the first jump, so with maxJumps 1 there is no jumping in mid-air.
+
+player.jumpPower is how hard it jumps (the default is 8; more is higher). Change any of them later: player.maxJumps = 3 after a power-up, and player.jumpsLeft = player.maxJumps gives every jump back, even in mid-air.`,
+        code: `let player, platforms;
+
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 10;
+
+  player = new Sprite(200, 300, 30, 40);
+  player.color = 'deepskyblue';
+  player.rotationLock = true;
+  player.maxJumps = 2;
+
+  platforms = new Group();
+  platforms.collider = 'static';
+  platforms.color = 'slategray';
+  new platforms.Sprite(200, 390, 400, 20);
+  new platforms.Sprite(110, 260, 100, 12);
+}
+
+function update() {
+  if (kb.pressing('left')) {
+    player.vel.x = -4;
+  } else if (kb.pressing('right')) {
+    player.vel.x = 4;
+  } else {
+    player.vel.x = 0;
+  }
+
+  if (kb.presses(' ')) {
+    player.jump(platforms);
+  }
+
+  if (player.onGround) {
+    player.color = 'deepskyblue';
+  } else {
+    player.color = 'orange';
+  }
+}
+
+function drawTop() {
+  fill('white');
+  text('Jumps left: ' + player.jumpsLeft, 12, 24);
 }`,
       },
       {
