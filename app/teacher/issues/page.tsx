@@ -223,10 +223,13 @@ const SORT_LABEL: Record<SortKey, string> = {
   status: 'By status',
 };
 
-// 'newest' is the default because it is the order the API already returns
-// (ORDER BY created_at DESC for a staff caller), so the page still opens on
-// the arrangement staff are used to and re-sorting stays opt-in. 'votes'
-// matches the student queue's rule, ties broken newest-first.
+// 'votes' is the default (owner's decision 2026-11-17): students' thumbs-ups,
+// including the "Add my vote" a student gives instead of filing a repeat
+// (components/ReportIssueButton.tsx), decide what staff see first. It is the
+// student queue's rule, ties broken newest-first, so a report with no votes yet
+// still sits above older ones with none. The API itself answers a staff caller
+// newest-first; the page re-sorts.
+const DEFAULT_SORT: SortKey = 'votes';
 const SORTERS: Record<SortKey, (a: IssueReport, b: IssueReport) => number> = {
   newest: (a, b) => b.created_at - a.created_at,
   oldest: (a, b) => a.created_at - b.created_at,
@@ -264,7 +267,7 @@ function IssuesPageInner() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('open');
   const [kindFilter, setKindFilter] = useState<KindFilter>('all');
   const [ageFilter, setAgeFilter] = useState<AgeFilter>('any');
-  const [sortKey, setSortKey] = useState<SortKey>('newest');
+  const [sortKey, setSortKey] = useState<SortKey>(DEFAULT_SORT);
   const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [copied, setCopied] = useState('');
@@ -410,7 +413,7 @@ function IssuesPageInner() {
     setStatusFilter('open');
     setKindFilter('all');
     setAgeFilter('any');
-    setSortKey('newest');
+    setSortKey(DEFAULT_SORT);
     setQuery('');
   }
 
@@ -454,7 +457,7 @@ function IssuesPageInner() {
     statusFilter !== 'open' ||
     kindFilter !== 'all' ||
     ageFilter !== 'any' ||
-    sortKey !== 'newest' ||
+    sortKey !== DEFAULT_SORT ||
     query !== '';
 
   function download() {

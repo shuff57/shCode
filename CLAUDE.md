@@ -392,7 +392,8 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   with the grader and CODY) in `ai_help_usage`. The Report dialog (`components/ReportIssueButton.tsx`) runs it on
   Send and, on a match, shows "already fixed" (Reload) / "being worked on" / "on hold" / "already on the site" with Add my vote
   (a +1 on that report instead of a copy) or Send mine anyway; a report sent past a match carries `context.possibleRepeatOf`
-  (client-supplied, a hint), shown to staff as "Repeat of #N?" on /teacher/issues. Tests: `scripts/test-issue-check.mjs`.
+  (client-supplied, a hint), shown to staff as "Repeat of #N?" on /teacher/issues, which opens sorted Most voted (`DEFAULT_SORT`,
+  owner's decision 2026-11-17) so those votes decide what staff see first. Tests: `scripts/test-issue-check.mjs`.
 - **CODY** (Code. Optimizer. Development. Yielder.) is the student-facing name of the `/api/ai-help` tutor. In the free sandbox (`lessonId` `sandbox-js|moshion|reshape`, code mode only) it answers directly with code blocks up to 15 lines but never writes the whole program (#83, `isSandboxHelp` in `functions/api/ai-help.ts`); code that carries `// STEP` comments, a `// 5.3.4`-style lesson header or "reference solution" is pasted course work and gets the hint-only rules, decided server-side because the lesson id is client-supplied. On Workers AI (the `AI` binding) students have no per-student cap and get `X-RateLimit-Unlimited: 1`; the UI hides the "helps left" line. The per-student per-unit quota below applies only on the Ollama fallback. The global ceiling counts both.
 - `POST /api/ai-help` streams `text/plain` from Workers AI (`lib/workers-ai.ts`), trims code blocks to <=3 lines, and
   is quota'd per student **per unit** per UTC day (`AI_HELP_DAILY_LIMIT`). The
