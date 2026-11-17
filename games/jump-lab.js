@@ -16,7 +16,7 @@
 //   player.maxJumps
 //     Jumps before landing again (2 = a double jump).
 //   player.jumpPower
-//     How hard a jump is (the default is 8).
+//     How high: 1 is a normal jump, 2 is twice as high.
 //   player.jumpsLeft
 //     How many are left. Set it to give jumps back.
 //   player.onGround
@@ -38,7 +38,7 @@
 //   - Stand on the see-through ghost: it has collider
 //     'none', so you fall through.
 //   - Pick up the star (maxJumps 3), the boots (jumpPower
-//     11) and the feather floating in mid-air
+//     2: twice as high) and the feather floating in mid-air
 //     (jumpsLeft = maxJumps: every jump back).
 
 let player, platforms, crate, ghost;
@@ -87,7 +87,7 @@ function startAgain() {
   player.vel.x = 0;
   player.vel.y = 0;
   player.maxJumps = 2;
-  player.jumpPower = 8;
+  player.jumpPower = 1;
   star.visible = true;
   boots.visible = true;
   feather.visible = true;
@@ -124,10 +124,10 @@ function update() {
     player.maxJumps = 4;
   }
   if (kb.presses('[')) {
-    player.jumpPower = max(2, player.jumpPower - 1);
+    player.jumpPower = max(0.25, player.jumpPower - 0.25);
   }
   if (kb.presses(']')) {
-    player.jumpPower = min(16, player.jumpPower + 1);
+    player.jumpPower = min(4, player.jumpPower + 0.25);
   }
   if (kb.presses('r') || player.y > 460) {
     startAgain();
@@ -139,7 +139,7 @@ function update() {
   }
   if (boots.visible && player.overlaps(boots)) {
     boots.visible = false;
-    player.jumpPower = 11;
+    player.jumpPower = 2;
   }
   if (feather.visible && player.overlaps(feather)) {
     feather.visible = false;
@@ -166,7 +166,7 @@ function draw() {
     text('star: maxJumps 3', 478, 70);
   }
   if (boots.visible) {
-    text('boots: jumpPower 11', 470, 355);
+    text('boots: jumpPower 2', 480, 355);
   }
   if (feather.visible) {
     text('feather: every jump back', 338, 48);

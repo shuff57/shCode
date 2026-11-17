@@ -12,6 +12,7 @@
 //   7. 'math' mode jumps upward (y up); a group's sprites jump too;
 //   8. setting jumpsLeft in mid-air gives jumps back; bad values say what is wrong;
 //   9. a sketch's own jump() / onGround still win;
+//  11. jumpPower is a height multiplier: 1 rises 120 px, 2 twice that, at any gravity;
 //  10. jump(ground) names what refills the jumps: a crate that is not ground does not,
 //      a Group works, and a wrong argument says what to pass.
 //
@@ -65,7 +66,7 @@ function jumpNow(box) { box.sandbox.want = 1; box.pump(1); return box.sandbox.an
   check('a sprite resting on the ground is onGround', p.onGround === true, { y: p.y });
   check('standing, every jump is left', p.jumpsLeft === 2, p.jumpsLeft);
   check('first jump goes', jumpNow(box) === true);
-  check('the jump sets vel.y to -jumpPower', Math.abs(p.vel.y + 8) < 0.6, p.vel.y);
+  check('the jump goes up (vel.y negative), and jumpPower is 1 by default', p.vel.y < -4 && p.jumpPower === 1, { vy: p.vel.y, power: p.jumpPower });
   box.pump(8);
   check('in the air after one jump, one is left', p.jumpsLeft === 1, p.jumpsLeft);
   check('second jump goes in mid-air', jumpNow(box) === true);
@@ -132,7 +133,7 @@ function jumpNow(box) { box.sandbox.want = 1; box.pump(1); return box.sandbox.an
 {
   const box = boot(FLOOR, { maxJumps: 1 });
   box.pump(60);
-  box.sandbox.player.jumpPower = 1.5;
+  box.sandbox.player.jumpPower = 0.1; // rises ~12 px: the feet stay near the floor
   check('a weak jump goes', jumpNow(box) === true);
   const again = [jumpNow(box), jumpNow(box), jumpNow(box)];
   check('rising with the feet still touching does not give the jump back', again.every((a) => a === false), again);
@@ -149,7 +150,6 @@ function jumpNow(box) { box.sandbox.want = 1; box.pump(1); return box.sandbox.an
       world.gravity.y = -10;
       player = new Sprite(0, -100, 30, 40);
       player.rotationLock = true;
-      player.jumpPower = 9;
       bystander = new Sprite(150, 0, 20, 20, 'static');
       new Sprite(0, -190, 400, 20, 'static');
     }
@@ -158,7 +158,7 @@ function jumpNow(box) { box.sandbox.want = 1; box.pump(1); return box.sandbox.an
   box.pump(90);
   const { player, bystander } = box.sandbox;
   check("'math' mode: standing on the ground counts", player.onGround === true, { y: player.y });
-  check("'math' mode: the jump goes up (vel.y = +jumpPower)", player.jump() === true && player.vel.y === 9, player.vel.y);
+  check("'math' mode: the jump goes up (vel.y positive)", player.jump() === true && player.vel.y > 4, player.vel.y);
   check('a sprite that never jumps gets nothing added', !Object.getOwnPropertyNames(bystander).includes('_jumping'));
 }
 {
@@ -284,6 +284,40 @@ function crateSketch(call) {
   `);
   box.pump(1);
   check("jump('ground') (a string) says to pass the sprite or group", /sprite or group it jumps off/.test(box.sandbox.err), box.sandbox.err);
+}
+
+// 11. jumpPower is a height multiplier: 1 rises 120 px, 2 rises 240, at any gravity.
+function rise(gravity, power, scale = 1) {
+  const box = createSandbox();
+  box.run(`player = null;
+    function setup() {
+      new Canvas(400, 3000);
+      world.gravity.y = ${gravity};
+      new Sprite(200, 2990, 400, 20, 'static');
+      player = new Sprite(200, 2960, 24, 32);
+      player.rotationLock = true;
+      player.gravityScale = ${scale};
+      player.jumpPower = ${power};
+    }
+    function draw() {}`);
+  box.pump(240);
+  const p = box.sandbox.player;
+  const y0 = p.y;
+  p.jump();
+  let top = y0;
+  for (let i = 0; i < 3000; i++) {
+    box.pump(1);
+    top = Math.min(top, p.y);
+    if (p.vel.y > 0 && p.y > top + 1) break;
+  }
+  return y0 - top;
+}
+{
+  const one = rise(10, 1), two = rise(10, 2), half = rise(10, 0.5);
+  check('jumpPower 1 rises 120 px', Math.abs(one - 120) < 1, one);
+  check('jumpPower 2 rises twice as high, 0.5 half as high', Math.abs(two - 240) < 1 && Math.abs(half - 60) < 1, { two, half });
+  const g30 = rise(30, 1), scaled = rise(10, 1, 2);
+  check('the height is the same at gravity 30 and with gravityScale 2', Math.abs(g30 - 120) < 1 && Math.abs(scaled - 120) < 1, { g30, scaled });
 }
 
 console.log(`\n${passed} passed, ${failed} failed`);

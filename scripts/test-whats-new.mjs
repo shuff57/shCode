@@ -25,6 +25,7 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const { WHATS_NEW, LIVE_DAYS } = await import(join(root, 'lib/whats-new.ts'));
 const S = await import(join(root, 'lib/whats-new-state.ts'));
 const { sections } = await import(join(root, 'lib/moshion-docs.ts'));
+const { BUILTIN_GAMES } = await import(join(root, 'lib/builtin-games.ts'));
 
 const results = [];
 function check(name, fn) {
@@ -198,6 +199,10 @@ check('every action is an in-site page that exists', () => {
       const sec = sections.find((s) => s.slug === docs[1]);
       assert.ok(sec, `${e.id}: no moSHion docs section ${docs[1]}`);
       if (docs[2]) assert.ok(Number(docs[2]) >= 1 && Number(docs[2]) <= sec.pages.length, `${e.id}: ${href} has no such page`);
+    } else if (/^\/play\/?\?builtin=/.test(href)) {
+      // A built-in Library game: /play reads ?builtin= (components/PlayGame.tsx).
+      const id = /^\/play\/?\?builtin=([a-z0-9-]+)$/.exec(href)?.[1];
+      assert.ok(id && BUILTIN_GAMES.some((g) => g.id === id), `${e.id}: ${href} names no built-in game`);
     } else {
       // The Library opens on a tab from ?tab= (components/ClassLibraryPanel.tsx).
       const page = href.replace(/^\/library\?tab=(games|pictures|sounds|fonts)$/, '/library');

@@ -3169,7 +3169,7 @@ player.jump(ground) in update() does the jump, but only while one is left. It gi
 
 player.jumpsLeft is how many jumps are left, and player.onGround is true while ground is under the sprite's feet. A wall beside it does not count, and neither does a coin or anything else with collider 'none'. Walking off a ledge uses up the first jump, so with maxJumps 1 there is no jumping in mid-air.
 
-player.jumpPower is how hard it jumps (the default is 8; more is higher). Change any of them later: player.maxJumps = 3 after a power-up, and player.jumpsLeft = player.maxJumps gives every jump back, even in mid-air.`,
+player.jumpPower is how high it jumps. 1 (the default) is a normal jump of about 120 pixels, 2 is twice as high, and 0.5 is half as high. It is the same height whatever world.gravity.y is: moSHion works out how fast the jump has to start. Change any of them later: player.maxJumps = 3 after a power-up, and player.jumpsLeft = player.maxJumps gives every jump back, even in mid-air.`,
         code: `let player, platforms;
 
 function setup() {

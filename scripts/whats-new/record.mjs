@@ -312,6 +312,36 @@ function draw() {
 }
 `;
 
+const MOSHION_SPRITE_JUMP = `// Jumping: player.jump(ground)
+let player, platforms;
+
+function setup() {
+  new Canvas(400, 260);
+  world.gravity.y = 30;
+  player = new Sprite(200, 210, 24, 32);
+  player.maxJumps = 2;     // a double jump
+  player.jumpPower = 0.5;   // half a normal jump
+  platforms = new Group();
+  platforms.collider = 'static';
+  new platforms.Sprite(200, 250, 400, 20);
+}
+
+function update() {
+  if (kb.presses('space')) {
+    player.jump(platforms);
+  }
+}
+
+function draw() {
+  background('#282a36');
+  fill('white');
+  textSize(14);
+  text('jumpsLeft: ' + player.jumpsLeft, 16, 26);
+  text('onGround: ' + player.onGround, 16, 46);
+  text('SPACE jumps', 290, 26);
+}
+`;
+
 // Messages (migration 0053): one student sends a classmate a message through the API, for the teacher clip.
 async function sendByApi(page, toName, body) {
   return page.evaluate(async ([toName, body]) => {
@@ -571,6 +601,36 @@ const RECIPES = {
       await d.pause(2600);
       await hold(p, ['Space'], 120);
       await d.pause(2600);
+    },
+  },
+
+  // A sprite's jumping (upstream moshion fcb436b): a double jump, the count on screen.
+  '2026-11-sprite-jump': {
+    people: [SAM],
+    path: '/sandbox/',
+    storage: { 'shCode:sandbox-mode': 'moshion' },
+    async before({ demos: [d], pages: [p] }) {
+      await d.setCode(MOSHION_SPRITE_JUMP);
+      await p.getByRole('button', { name: /Run/ }).first().click();
+      await p.frameLocator('iframe').first().locator('canvas').first().waitFor({ timeout: 30000 });
+      // scroll so the editor shows player = new Sprite ... player.jump(platforms)
+      await p.locator('.cm-scroller').first().evaluate((el) => {
+        const line = [...el.querySelectorAll('.cm-line')].find((l) => l.textContent.includes('new Sprite('));
+        el.scrollTop = line ? line.offsetTop - 4 : 0;
+      });
+    },
+    async run({ demos: [d], pages: [p] }) {
+      await d.pause(1500);
+      await focusCanvas(p, d);
+      await d.pause(500);
+      await hold(p, ['Space'], 100);   // jump
+      await d.pause(450);
+      await hold(p, ['Space'], 100);   // and again in mid-air
+      await d.pause(450);
+      await hold(p, ['Space'], 100);   // none left: nothing happens
+      await d.pause(2600);             // lands, both jumps back
+      await hold(p, ['Space'], 100);
+      await d.pause(2200);
     },
   },
 

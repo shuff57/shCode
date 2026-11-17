@@ -1326,7 +1326,7 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "jump",
    "type": "method",
    "detail": "(ground?: Sprite | Group): boolean",
-   "info": "Jump, if a jump is left: sets vel.y to jumpPower, upward."
+   "info": "Jump, if a jump is left: launches it upward fast enough to rise 120 px x jumpPower, at any gravity."
   },
   {
    "label": "maxJumps",
@@ -1338,7 +1338,7 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "jumpPower",
    "type": "property",
    "detail": "number",
-   "info": "How fast a jump starts, in pixels a frame, upward (the way gravity does not pull)."
+   "info": "How high a jump goes: 1 (the default) is a normal jump of about 120 px, 2 twice as high, 0.5 half, whatever world.gravity.y is (the launch speed is worked out f"
   },
   {
    "label": "jumpsLeft",

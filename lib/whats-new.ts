@@ -49,6 +49,27 @@ export interface WhatsNewEntry {
 
 export const WHATS_NEW: WhatsNewEntry[] = [
   {
+    id: '2026-11-sprite-jump',
+    date: '2026-11-16',
+    audience: 'student',
+    title: 'Double jumps in moSHion',
+    summary:
+      'A sprite can count its own jumps now. Set player.maxJumps = 2 and call player.jump(platforms): ' +
+      'the player jumps while a jump is left, and landing on the platforms gives the jumps back. ' +
+      'Walls, crates and coins that are not your ground never give jumps back.',
+    steps: [
+      'In setup(), after the sprite has its size: player.maxJumps = 2 (1 is a normal jump). player.jumpPower = 2 jumps twice as high (1 is the default).',
+      "In update(): if (kb.presses('space')) { player.jump(platforms); }. Put your ground sprite or group in the brackets.",
+      'Show player.jumpsLeft on the screen, check player.onGround, and set player.jumpsLeft = player.maxJumps to give every jump back.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-sprite-jump.mp4',
+      poster: '/whats-new/2026-11-sprite-jump.jpg',
+      alt: 'A moSHion sketch in the sandbox: pressing Space makes a square jump, then jump again in mid-air; a third press does nothing, and jumpsLeft goes from 2 to 0 and back to 2 when it lands.',
+    },
+    action: { label: 'Try Jump Lab', href: '/play/?builtin=jump-lab' },
+  },
+  {
     id: '2026-11-cad-pilot',
     date: '2026-11-16',
     audience: 'all',
