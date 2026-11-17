@@ -88,9 +88,10 @@ function draw() {
       },
       {
         title: 'The sketch lifecycle',
-        body: `A moSHion sketch is made of up to four functions with special names. You never call them yourself: moSHion finds each one by its name and runs it at the right moment. You always need setup(). The other three are optional, and a sketch without one of them still runs.
+        body: `A moSHion sketch is made of up to five functions with special names. You never call them yourself: moSHion finds each one by its name and runs it at the right moment. You always need setup(). The other four are optional, and a sketch without one of them still runs.
 
 Each one has ONE job:
+preload() runs ONCE, BEFORE setup(), and only if your game loads files: loadSound(), loadJSON() and loadImage() go here, and the game waits until every file is ready. Most sketches do not need it ("Getting files ready", page 4).
 setup() runs ONCE, at the very start. Make the canvas and your sprites here.
 update() runs EVERY FRAME, BEFORE physics. The rules of your game go here: keys, movement, jumping, touching, score.
 draw() runs EVERY FRAME, AFTER physics. The picture BEHIND your sprites goes here: background() first, then any shapes or words.
@@ -107,7 +108,7 @@ Do you need update()? No. A sketch with only setup() and draw() works, and the c
 
 One rule is not optional: drawing goes in draw() or drawTop(), never in update(). update() runs first, so the background() at the top of draw() paints over anything update() drew.
 
-frameCount tells you how many frames have passed since the sketch started, which is handy for timing things without a clock. "Where does my code go?", the next page, sorts the usual lines into the four functions.`,
+frameCount tells you how many frames have passed since the sketch started, which is handy for timing things without a clock. "Where does my code go?", the next page, sorts the usual lines into the functions.`,
         code: `let player, ground;
 let jumps = 0;
 
@@ -150,6 +151,9 @@ function drawTop() {
       {
         title: 'Where does my code go?',
         body: `Not sure which function a line belongs in? Look up what the line does.
+
+In preload(), once, before setup(), only if your game loads files:
+loadSound('jump.mp3'), loadJSON('levels.json'), loadImage('hero.png'). The game waits for them, so setup() can use them.
 
 In setup(), once:
 new Canvas(400, 400).
@@ -224,10 +228,60 @@ function drawTop() {
 }`,
       },
       {
+        title: 'Getting files ready: preload()',
+        body: `A file takes a moment to arrive. Load a sound, a picture or a JSON file in setup() and the game starts without waiting: the sound is not ready yet, the picture's size is 0, and the JSON is still empty.
+
+preload() fixes that. Write it above setup() and load your files in it:
+preload() runs once, before setup(). The game waits until every file it asked for is ready, then runs setup().
+In setup() everything is there: a picture has its real width and height, the JSON's data is filled in, and sound.loaded is true.
+Only three loaders wait: loadSound(), loadJSON() and loadImage(). Called anywhere else, they load in the background, as always.
+
+It waits exactly as long as the files need, no more. A small file is ready in a blink and the game starts at once. A big file on a slow connection takes longer; after a moment the page says "Loading... 2 of 3 files" until it is done.
+
+A file that cannot load (a wrong name, a missing file) does not stop the game. The console says which file and why, and the game starts without it. If no file finishes for 10 seconds, the page says which file it is still waiting for and shows a Start anyway button. Press it to play without that file.
+
+One thing preload() cannot change: browsers keep sound off until the player clicks or presses a key. A sound that is ready still cannot play in setup(), and moSHion says so in the console. Play sound effects on an event (a key, a hit). Music started with .loop() waits and begins at the first click.
+
+loadImage(url) is new: it loads a picture by its address and gives it back, ready for sprite.image. For the built-in pictures you can also just write sprite.texture = 'apple'.`,
+        code: `let jump, apple, player;
+
+// ONCE, before setup(): the files this game needs
+function preload() {
+  jump = loadSound('jump');
+  apple = loadImage('textures/apple.png');
+}
+
+// ONCE, when every file is ready
+function setup() {
+  new Canvas(400, 300);
+  world.gravity.y = 10;
+  // the picture has its real size already, so the sprite can match it
+  player = new Sprite(200, 100, apple.width * 2, apple.height * 2);
+  player.image = apple;
+  new Sprite(200, 290, 400, 20, 'static');
+}
+
+function update() {
+  if (kb.presses(' ')) {
+    player.vel.y = -6;
+    jump.play();   // on an event, so the browser lets it play
+  }
+}
+
+function draw() {
+  background('#222');
+}
+
+function drawTop() {
+  fill('white');
+  text('apple: ' + apple.width + ' x ' + apple.height + ' px. Press space.', 10, 24, 16);
+}`,
+      },
+      {
         title: 'Global mode',
         body: `moSHion runs in "global mode." That means Canvas, Sprite, world, kb, and friends are already on the page — you just use them. No import, no new Engine(), no setup boilerplate.
 
-The same rule applies to setup, update, draw and drawTop. When you define a top-level function with one of those names, the engine finds it and calls it at the right time (the sketch lifecycle, page 2, says when).
+The same rule applies to preload, setup, update, draw and drawTop. When you define a top-level function with one of those names, the engine finds it and calls it at the right time (the sketch lifecycle, page 2, says when).
 
 To share a sprite between setup and update, declare a let at the top of your file and assign to it inside setup. If you use const inside setup, the variable is trapped there and update can't see it.`,
         code: `let player;
@@ -1795,9 +1849,9 @@ The sound mixer at /sound (also the Sounds tab beside a moSHion lesson's code) b
 
 If you have a lot of short effects, put them in one file and describe where each one lives: loadSound('sfx.mp3', { clips: { jump: [0, 0.25], hit: [0.5, 0.9] } }), then sfx.play('jump'). One download instead of a dozen. A clip name you haven't defined plays nothing, rather than blasting the whole file.
 
-Two things that will confuse you the first time. Sound files have to download before they can play, so a .play() in the first moment of a sketch is silently ignored — that's why you load in setup() and play on an event. .loop() is the exception: it remembers, and starts as soon as the file arrives, because music.loop() in setup() would otherwise never play at all.
+Two things that will confuse you the first time. Sound files have to download before they can play, so a .play() in the first moment of a sketch does nothing, and the console says so. Load them in preload() ("Getting files ready", Overview page 4) and they are ready by setup(). .loop() remembers: it starts as soon as the file arrives, so music.loop() in setup() works either way.
 
-And browsers refuse to make any noise until the player has clicked or pressed a key. moSHion unlocks the audio automatically on the first input, so mostly you won't notice — but it does mean a sound cannot play before the player has touched anything.`,
+And browsers keep sound off until the player has clicked or pressed a key, even for a sound that is ready. moSHion turns sound on at the first click or key press by itself. Before that, .play() does nothing and the console says "sound turns on after the first click or key press", so play effects on an event (a key, a hit), and start music with .loop(), which waits for that first click.`,
         code: `let coin, music, player, coins;
 
 function setup() {
@@ -2910,7 +2964,7 @@ function draw() {
         title: 'Erasing and loading files: clearStorage and loadJSON',
         body: `clearStorage() forgets everything your sketch stored with storeItem. After it, getItem on any name gives null. It clears the whole store at once, not just one name, so for a Reset button on a single high score use removeItem('highScore') instead.
 
-loadJSON(path, callback) reads a JSON file and hands the data to your callback when it arrives: loadJSON('level1.json', (data) => { level = data; }). It also returns an object that fills in once the file has loaded, but the callback form is the one to rely on, because a file takes a moment to arrive.`,
+loadJSON(path, callback) reads a JSON file and hands the data to your callback when it arrives: loadJSON('level1.json', (data) => { level = data; }). It also returns an object that fills in once the file has loaded. Outside preload() the callback form is the one to rely on, because a file takes a moment to arrive. Inside preload() ("Getting files ready", Overview page 4) the game waits for the file, so levels = loadJSON('levels.json') in preload() is filled in by setup(). A file that cannot load says so in the console.`,
       },
     ],
   },

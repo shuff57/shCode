@@ -353,6 +353,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "info": "Read a saved value back, or null. where: 'local' (default) or 'remote'."
  },
  {
+  "label": "loadImage",
+  "type": "function",
+  "detail": "(url: string): HTMLImageElement",
+  "info": "A picture by URL (or data: URI), the same shared <img> that `sprite.image = url` uses."
+ },
+ {
   "label": "loadJSON",
   "type": "function",
   "detail": "(path: string, callback?: (data: any) => void): Promise<any> & Record<string, any>",
@@ -489,6 +495,12 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "type": "function",
   "detail": "(base: number, exponent: number): number",
   "info": ""
+ },
+ {
+  "label": "preload",
+  "type": "function",
+  "detail": "(): void",
+  "info": "Optional."
  },
  {
   "label": "radians",

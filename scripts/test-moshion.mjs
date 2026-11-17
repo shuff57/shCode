@@ -19,7 +19,7 @@ import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
 import { Script } from 'node:vm';
 import { fileURLToPath } from 'node:url';
-import { runSketch, createSandbox } from './moshion-harness.mjs';
+import { runSketch, runSketchAsync, usesPreload, createSandbox } from './moshion-harness.mjs';
 import { SEMANTIC_CHECKS } from './moshion-checks.mjs';
 
 // Parity checks are written by critics and land in their own file so a critic
@@ -178,9 +178,12 @@ function collectCorpus() {
 // nothing is a failure dressed as a pass.
 const DRAW_OPS = new Set(['fillRect', 'strokeRect', 'fill', 'stroke', 'fillText', 'drawImage', 'arc']);
 
-function runCorpusItem(item) {
+async function runCorpusItem(item) {
   if (item.kind === 'scaffold') return runScaffoldItem(item);
-  const r = runSketch(item.code, { frames: 60, filename: `${item.lesson}.js` });
+  // A sketch with preload() waits on promises before setup(); every other
+  // sketch takes the synchronous path, unchanged.
+  const opts = { frames: 60, filename: `${item.lesson}.js` };
+  const r = usesPreload(item.code) ? await runSketchAsync(item.code, opts) : runSketch(item.code, opts);
   if (!r.ok) {
     return {
       ...meta(item), pass: false, reason: `${r.phase}: ${r.error?.message || 'unknown error'}`,
@@ -256,7 +259,9 @@ async function main() {
   if (ONLY !== 'semantic') {
     let corpus = collectCorpus();
     if (FILTER) corpus = corpus.filter((i) => i.lesson.includes(FILTER));
-    report.corpus = corpus.map(runCorpusItem);
+    // In order, one at a time: a preload() sketch yields, and two sketches
+    // interleaving would mix their engines' timers.
+    for (const item of corpus) report.corpus.push(await runCorpusItem(item));
   }
   if (ONLY !== 'corpus') {
     let checks = [...SEMANTIC_CHECKS, ...PARITY_CHECKS, ...SURFACE_CHECKS];
