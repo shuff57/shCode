@@ -2035,12 +2035,54 @@ function draw() {
 kb.pressed(key) and kb.releases(key) are old names that are easy to mix up: kb.pressed fires when the key comes back UP, the same as released(). To catch the moment a key goes down, use presses().`,
       },
       {
+        title: 'The mouse and a sprite: hover, click, hide the pointer',
+        body: `Every sprite has a .mouse that answers questions about the mouse and that one sprite.
+
+button.mouse.hovering() is true while the pointer is over the sprite. button.mouse.hovers() is true only on the first frame it gets there, and button.mouse.hovered() only on the first frame after it leaves: handy for a sound or a grow effect that should happen once.
+
+button.mouse.presses() is true on the frame a click starts on the sprite. button.mouse.pressing() stays true while the button is held down, even if the pointer slides off the sprite, which is just what dragging needs. button.mouse.released() is true on the frame you let go. Like mouse.presses(), each can take 'left', 'center' or 'right'.
+
+To hide the pointer, for a game with its own crosshair sprite, write mouse.visible = false. mouse.visible = true brings it back. mouse.pressing() (no sprite) is true while any mouse button is down anywhere.`,
+        code: `let button, crosshair;
+
+function setup() {
+  new Canvas(400, 300);
+  mouse.visible = false; // the crosshair sprite is the pointer now
+
+  button = new Sprite(200, 150, 160, 60, 'static');
+  button.color = 'slateblue';
+  button.text = 'Click me';
+
+  crosshair = new Sprite(0, 0, 12);
+  crosshair.collider = 'none';
+  crosshair.color = 'white';
+  crosshair.layer = 10;
+}
+
+function update() {
+  crosshair.x = mouse.x;
+  crosshair.y = mouse.y;
+
+  if (button.mouse.hovering()) button.color = 'mediumslateblue';
+  else button.color = 'slateblue';
+
+  if (button.mouse.pressing()) button.scale = 0.9;
+  else button.scale = 1;
+
+  if (button.mouse.presses()) button.text = 'Clicked!';
+}
+
+function draw() {
+  background('#222');
+}`,
+      },
+      {
         title: 'More about the mouse: drags, scroll, cursor',
         body: `mouse.position is another name for mouse.pos. mouse.isOnCanvas is true while the pointer is over the canvas.
 
 mouse.drags() is true on the first frame of a drag, mouse.dragging() counts the frames the pointer has been moving with a button held, and mouse.dragged() is true on the frame the drag ends. Each takes a button name: 'left', 'center' or 'right'.
 
-mouse.scrollDelta has an x and a y for how far the wheel moved since the last frame, and is 0 when it did not move. mouse.cursor changes the shape of the pointer over the canvas, with a CSS cursor name: mouse.cursor = 'pointer' gives a pointing hand.
+mouse.scrollDelta has an x and a y for how far the wheel moved since the last frame, and is 0 when it did not move. mouse.cursor changes the shape of the pointer over the canvas, with a CSS cursor name: mouse.cursor = 'pointer' gives a pointing hand, and mouse.cursor = 'none' hides it. mouse.visible = false hides the pointer too, and mouse.visible = true brings back the one you had before.
 
 mouse.pressed(button) and mouse.releases(button) are old names, like the kb ones: use presses() and released().`,
       },
