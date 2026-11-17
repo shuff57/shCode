@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { ChevronDown, CloudUpload, History, Maximize2, Minimize2, RotateCcw, Share2, Users } from 'lucide-react';
+import { ChevronDown, CloudUpload, History, Maximize2, Minimize2, PanelBottomClose, PanelBottomOpen, PanelLeftClose, PanelLeftOpen, RotateCcw, Share2, Users } from 'lucide-react';
 import type { Extension } from '@codemirror/state';
 import { useLessonStore } from '../lib/store';
 import { saveProgress } from '../lib/version-control';
@@ -258,6 +258,10 @@ export default function SandboxWorkspace() {
   // so a shape can be built and then looked at without the editor in the way.
   const shellRef = useRef<HTMLDivElement>(null);
   const [full, setFull] = useState(false);
+  // In full screen the editor and the console can each be put away (#119): the game then takes the room.
+  // Leaving full screen brings both back, so a hidden editor can never be lost outside it.
+  const [hideEditor, setHideEditor] = useState(false);
+  const [hideConsole, setHideConsole] = useState(false);
   const runRef = useRef<{ kill: () => void } | null>(null);
 
   useEffect(() => () => { runRef.current?.kill(); }, []);
@@ -447,6 +451,7 @@ export default function SandboxWorkspace() {
     const onFs = () => {
       const active = document.fullscreenElement === shellRef.current;
       setFull(active);
+      if (!active) { setHideEditor(false); setHideConsole(false); }
       setTimeout(() => window.dispatchEvent(new Event('resize')), 60);
     };
     document.addEventListener('fullscreenchange', onFs);
@@ -494,6 +499,22 @@ export default function SandboxWorkspace() {
       gamePaneRef.current?.requestFullscreen?.().catch(() => { /* refused: stay windowed */ });
     }
   }, []);
+  // A game started (or restarted) while its pane is full screen is a new frame: tell it to fit too. load
+  // does not bubble, so listen in the capture phase on the shell, which holds every pane.
+  useEffect(() => {
+    const shell = shellRef.current;
+    if (!shell) return;
+    const onLoad = (e: Event) => {
+      const pane = gamePaneRef.current;
+      if (pane && document.fullscreenElement === pane && e.target instanceof HTMLIFrameElement && pane.contains(e.target)) {
+        e.target.contentWindow?.postMessage({ source: 'preview-fit', on: true }, '*');
+        e.target.focus();
+      }
+    };
+    shell.addEventListener('load', onLoad, true);
+    return () => shell.removeEventListener('load', onLoad, true);
+  }, []);
+  const relayoutSoon = () => setTimeout(() => window.dispatchEvent(new Event('resize')), 60);
 
 
   const drawerTabs: DrawerTab[] = isFlow ? [
@@ -721,11 +742,11 @@ export default function SandboxWorkspace() {
   );
   const previewSlot = (
     <>
-        {!isConsole && runKey > 0 && gameFullOk && (
+        {!isConsole && gameFullOk && (
           <button
             type="button"
             className="sandbox-game-fs"
-            onClick={toggleGameFull}
+            onClick={() => { if (runKey === 0 && !gameFull) run(); toggleGameFull(); }}
             title={gameFull ? 'Leave full screen (Esc)' : 'Full screen the game only'}
             aria-label={gameFull ? 'Leave full screen' : 'Full screen the game only'}
           >
@@ -768,6 +789,8 @@ export default function SandboxWorkspace() {
         className={
           'sandbox-shell'
           + (full ? ' is-full' : '')
+          + (full && hideEditor ? ' hide-editor' : '')
+          + (full && hideConsole ? ' hide-console' : '')
         }
         ref={shellRef}
       >
@@ -822,6 +845,40 @@ export default function SandboxWorkspace() {
                     {full ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
                     {full ? 'Exit full screen' : 'Full screen'}
                   </button>
+                  {/* In full screen the game's corner button does this, and the row needs the room for the toggles. */}
+                  {!full && !isConsole && gameFullOk && (
+                    <button
+                      style={chipStyle}
+                      onClick={() => { if (runKey === 0) run(); toggleGameFull(); }}
+                      title="Fill the screen with just the game (Esc to leave)"
+                      data-testid="sandbox-game-only"
+                    >
+                      <Maximize2 size={12} />
+                      Game only
+                    </button>
+                  )}
+                  {full && (
+                    <button
+                      style={{ ...chipStyle, padding: '6px 8px' }}
+                      onClick={() => { setHideEditor((h) => !h); relayoutSoon(); }}
+                      title={hideEditor ? 'Show the code editor' : 'Hide the code editor (the preview gets its room)'}
+                      aria-label={hideEditor ? 'Show editor' : 'Hide editor'}
+                      data-testid="sandbox-hide-editor"
+                    >
+                      {hideEditor ? <PanelLeftOpen size={14} aria-hidden="true" /> : <PanelLeftClose size={14} aria-hidden="true" />}
+                    </button>
+                  )}
+                  {full && !isConsole && (
+                    <button
+                      style={{ ...chipStyle, padding: '6px 8px' }}
+                      onClick={() => { setHideConsole((h) => !h); relayoutSoon(); }}
+                      title={hideConsole ? 'Show the console' : 'Hide the console (it keeps what the program prints)'}
+                      aria-label={hideConsole ? 'Show console' : 'Hide console'}
+                      data-testid="sandbox-hide-console"
+                    >
+                      {hideConsole ? <PanelBottomOpen size={14} aria-hidden="true" /> : <PanelBottomClose size={14} aria-hidden="true" />}
+                    </button>
+                  )}
                 </div>
               )}
               {((togetherLang && (mayTogether || together)) || (mode.preview === 'moshion' && lessonProgress.authed)) && (
@@ -991,6 +1048,11 @@ export default function SandboxWorkspace() {
         .sandbox-shell.is-full .sandbox-tb-end,
         .sandbox-shell.is-full .sandbox-tb-group { flex-wrap: nowrap; }
         .sandbox-shell.is-full .sandbox-toolbar { overflow-x: auto; }
+        /* Hide editor / Hide console (#119): the panes are only hidden, never unmounted, so the code, the
+           running game and what the console has collected all stay. */
+        .sandbox-shell.hide-editor #editorPane, .sandbox-shell.hide-editor #divider { display: none !important; }
+        .sandbox-shell.hide-editor #previewPane { flex: 1 1 100% !important; }
+        .sandbox-shell.hide-console .wsc { display: none !important; }
 
         /* The game's own full screen button: a small square in the game's top-right corner. Quiet until
            the pointer or keyboard is on the game, so it never sits over the picture while playing. */
