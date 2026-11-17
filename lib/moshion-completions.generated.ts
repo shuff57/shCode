@@ -1846,13 +1846,19 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "autoDraw",
    "type": "property",
    "detail": "boolean",
-   "info": ""
+   "info": "Set on every member AND remembered for sprites that join later, so `allSprites.autoDraw = false` once in setup() covers sprites made afterwards."
   },
   {
    "label": "autoUpdate",
    "type": "property",
    "detail": "boolean",
-   "info": ""
+   "info": "Like autoDraw: false stops each member's own update(), for members now and later."
+  },
+  {
+   "label": "draw",
+   "type": "method",
+   "detail": "(): void",
+   "info": "Draws this group's sprites now, lowest layer first, with the camera, whatever their autoDraw says."
   }
  ],
  "Walls": [
@@ -2040,13 +2046,19 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "autoDraw",
    "type": "property",
    "detail": "boolean",
-   "info": ""
+   "info": "Set on every member AND remembered for sprites that join later, so `allSprites.autoDraw = false` once in setup() covers sprites made afterwards."
   },
   {
    "label": "autoUpdate",
    "type": "property",
    "detail": "boolean",
-   "info": ""
+   "info": "Like autoDraw: false stops each member's own update(), for members now and later."
+  },
+  {
+   "label": "draw",
+   "type": "method",
+   "detail": "(): void",
+   "info": "Draws this group's sprites now, lowest layer first, with the camera, whatever their autoDraw says."
   }
  ],
  "JointOptions": [
@@ -2980,13 +2992,19 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "autoDraw",
    "type": "property",
    "detail": "boolean",
-   "info": ""
+   "info": "Set on every member AND remembered for sprites that join later, so `allSprites.autoDraw = false` once in setup() covers sprites made afterwards."
   },
   {
    "label": "autoUpdate",
    "type": "property",
    "detail": "boolean",
-   "info": ""
+   "info": "Like autoDraw: false stops each member's own update(), for members now and later."
+  },
+  {
+   "label": "draw",
+   "type": "method",
+   "detail": "(): void",
+   "info": "Draws this group's sprites now, lowest layer first, with the camera, whatever their autoDraw says."
   }
  ],
  "SliderJoint": [
