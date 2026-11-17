@@ -392,6 +392,32 @@ async function sendByApi(page, toName, body) {
 const GUEST_DETAILS = { classId: 'dev-class', name: 'Jordan Reyes', relation: 'my cousin', age: 'teen', org: 'Lincoln High School', purpose: 'Build a platformer together after school' };
 
 const RECIPES = {
+  '2026-11-code-search': {
+    people: [SAM],
+    path: '/sandbox/',
+    storage: { 'shCode:sandbox-mode': 'moshion' },
+    async before({ demos: [d] }) {
+      await d.setCode('function setup() {\n  new Canvas(400, 400);\n}\n\nfunction draw() {\n  background(40, 42, 54);\n  fill(80, 250, 123);\n  circle(mouseX, mouseY, 40);\n  text(mouseX, 20, 30);\n}\n');
+      await d.page.keyboard.press('Control+Home');
+    },
+    async run({ demos: [d], pages: [p] }) {
+      await d.pause(600);
+      await d.page.keyboard.press('Control+f');
+      await p.getByRole('textbox', { name: 'Find in your code' }).waitFor({ timeout: 10000 });
+      await d.pause(500);
+      await d.type('mouseX', 110);
+      await d.pause(900);
+      await d.page.keyboard.press('Enter');
+      await d.pause(700);
+      await d.page.keyboard.press('Enter');
+      await d.pause(900);
+      await d.click(p.getByRole('button', { name: 'Show replace (Ctrl+H)' }), { ms: 450, after: 300 });
+      await d.click(p.getByRole('textbox', { name: 'Replace with' }), { ms: 350, after: 150 });
+      await d.type('pointerX', 90);
+      await d.pause(500);
+      await d.click(p.getByRole('button', { name: 'Replace every match' }), { ms: 450, after: 1800 });
+    },
+  },
   '2026-11-cad-pilot': {
     people: [SAM],
     path: '/sandbox/cad/',

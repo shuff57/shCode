@@ -9,6 +9,7 @@ import { bracketMatching, indentOnInput, HighlightStyle, syntaxHighlighting, fol
 import { closeBrackets, closeBracketsKeymap, closeCompletion } from '@codemirror/autocomplete';
 import { highlightSelectionMatches, selectNextOccurrence } from '@codemirror/search';
 import { jsAutocomplete } from '../lib/editor-completions';
+import { codeSearch } from '../lib/editor-search';
 import { taskCommentFold } from '../lib/editor-task-fold';
 import type { LabTaskScenario } from '../lib/lab-task-scenario';
 import { tags as t } from '@lezer/highlight';
@@ -192,6 +193,9 @@ function makeExtensions(
       rectangularSelection(),
       crosshairCursor(),
       keymap.of([{ key: 'Mod-d', run: selectNextOccurrence, preventDefault: true }]),
+      // Ctrl+F (Cmd+F) opens the editor's own Find, not the browser's; Ctrl+H opens Replace.
+      // Read-only samples on a reading page keep the browser's find (lib/editor-search.ts).
+      codeSearch(),
       // One Esc always goes back to one cursor. The suggestion list's own Esc runs at the highest
       // precedence and, for a moment after every keystroke, swallowed the key with nothing on
       // screen, so the extra cursors stayed. Same precedence, and added before jsAutocomplete().

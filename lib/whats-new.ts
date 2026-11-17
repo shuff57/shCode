@@ -49,6 +49,26 @@ export interface WhatsNewEntry {
 
 export const WHATS_NEW: WhatsNewEntry[] = [
   {
+    id: '2026-11-code-search',
+    date: '2026-11-17',
+    audience: 'all',
+    title: 'Find and replace in your code',
+    summary:
+      'Press Ctrl+F (Cmd+F on a Mac) in a lab or the sandbox and a Find bar opens right inside the code editor. ' +
+      'It lights up every match, says which one you are on ("2 of 5"), and can swap a name everywhere at once.',
+    steps: [
+      'Press Ctrl+F and type a word. Enter goes to the next match, Shift+Enter to the one before.',
+      'Aa matches upper and lower case exactly; Word skips matches inside longer names.',
+      'Press Replace (or Ctrl+H), type the new word, then Replace all. Ctrl+Z undoes it. Esc closes the bar.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-code-search.mp4',
+      poster: '/whats-new/2026-11-code-search.jpg',
+      alt: 'In the sandbox, Ctrl+F opens a Find bar above the code. Typing mouseX highlights both matches and shows "1 of 2"; Replace all changes them to pointerX.',
+    },
+    action: { label: 'Try it in the sandbox', href: '/sandbox' },
+  },
+  {
     id: '2026-11-four-functions',
     date: '2026-11-17',
     audience: 'student',
