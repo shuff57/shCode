@@ -508,7 +508,10 @@ export default function SandboxWorkspace() {
       const pane = gamePaneRef.current;
       if (pane && document.fullscreenElement === pane && e.target instanceof HTMLIFrameElement && pane.contains(e.target)) {
         e.target.contentWindow?.postMessage({ source: 'preview-fit', on: true }, '*');
+        // The frame's own window, not just the element: the element is already the active one, so
+        // focusing it again would not move the keys into a game that has just loaded.
         e.target.focus();
+        try { e.target.contentWindow?.focus(); } catch { /* the element focus stands */ }
       }
     };
     shell.addEventListener('load', onLoad, true);
