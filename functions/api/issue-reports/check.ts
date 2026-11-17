@@ -3,9 +3,10 @@
 // Any signed-in user. Body {kind, title, message}. Answers {match: CheckMatch | null, checked}.
 // The rules are lib/issue-check-core.ts: a word-overlap shortlist of the reports a
 // student may see (never a withdrawn one) and the What's New features of the
-// caller's audience, then a SMALL Workers AI model picks the one that is the
-// same problem or request. No shortlist = no model call. No binding = the word
-// overlap alone, and only when it is unmistakable.
+// caller's audience, then a Workers AI DECISION model (Clef) picks the one that
+// is the same problem or request, or "none", with a probability. No shortlist =
+// no model call. No binding = the word overlap alone, and only when it is
+// unmistakable.
 //
 // It never refuses a report: every failure (model down, timeout, quota spent,
 // bad body) answers 200 {match: null}, and the dialog files as it always did.
@@ -14,7 +15,10 @@
 
 import {
   buildCheckPrompt,
+  buildDecisionRequest,
+  isDecisionModel,
   parseCheckVerdict,
+  parseDecision,
   shortlist,
   toMatch,
   wordsOnlyVerdict,
@@ -39,9 +43,18 @@ interface Env {
 type SessionData = { email: string; role: 'admin' | 'teacher' | 'student' };
 type Ctx = EventContext<Env, string, SessionData>;
 
-export const DEFAULT_CHECK_MODEL = '@cf/meta/llama-3.1-8b-instruct-fp8';
+/**
+ * Cloudflare's decision model: a probability per option, no text to parse, a few
+ * hundred ms. (The first choice, @cf/meta/llama-3.1-8b-instruct-fp8, is retired by
+ * Workers AI on 2026-11-20.) A chat model id in ISSUE_CHECK_MODEL uses the JSON prompt.
+ */
+export const DEFAULT_CHECK_MODEL = '@cf/cloudflare/clef';
 const DEFAULT_DAILY_LIMIT = 25;
-const DEFAULT_GLOBAL_DAILY_LIMIT = 3000;
+/**
+ * The free 10,000 neurons a day are shared with the grader and CODY. A check is
+ * ~1,000 input tokens: on Clef ($0.24/M) about 22 neurons, so 200 is at most ~4,400.
+ */
+const DEFAULT_GLOBAL_DAILY_LIMIT = 200;
 /** Bucket in the shared ai_help_usage table (see functions/api/grade-written.ts). */
 const RATE_BUCKET = 'issue-check';
 /** Unreachable by any session email: an email never holds a NUL byte. */
@@ -120,11 +133,17 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
 
   if (!(await spend(env, data))) return json({ match: null, checked: false, limited: true });
 
+  const model = env.ISSUE_CHECK_MODEL || DEFAULT_CHECK_MODEL;
   let match: CheckMatch | null = null;
   try {
-    const { system, user } = buildCheckPrompt(query, list);
-    const text = await callModel(env.AI, env.ISSUE_CHECK_MODEL || DEFAULT_CHECK_MODEL, system, user);
-    const picked = parseCheckVerdict(text, list);
+    let picked;
+    if (isDecisionModel(model)) {
+      const out = await withTimeout(env.AI.run(model, buildDecisionRequest(query, list, model)));
+      picked = parseDecision(out, list).pick;
+    } else {
+      const { system, user } = buildCheckPrompt(query, list);
+      picked = parseCheckVerdict(await callModel(env.AI, model, system, user), list);
+    }
     match = picked ? toMatch(picked, 'ai') : null;
   } catch (err) {
     console.error('issue-check: model call failed', err);
@@ -162,9 +181,21 @@ async function spend(env: Env, data: SessionData): Promise<boolean> {
   }
 }
 
-async function callModel(ai: WorkersAi, model: string, system: string, user: string): Promise<unknown> {
+function withTimeout<T>(p: Promise<T>): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
-  const out = await Promise.race([
+  return Promise.race([
+    p,
+    new Promise<never>((_, reject) => {
+      timer = setTimeout(() => reject(new Error('issue check timed out')), MODEL_TIMEOUT_MS);
+    }),
+  ]).finally(() => {
+    if (timer !== undefined) clearTimeout(timer);
+  });
+}
+
+/** A chat model (ISSUE_CHECK_MODEL set to one): the JSON prompt, answered as text. */
+async function callModel(ai: WorkersAi, model: string, system: string, user: string): Promise<unknown> {
+  const out = await withTimeout(
     ai.run(model, {
       messages: [
         { role: 'system', content: system },
@@ -173,12 +204,7 @@ async function callModel(ai: WorkersAi, model: string, system: string, user: str
       temperature: 0,
       max_tokens: 120,
     }),
-    new Promise<never>((_, reject) => {
-      timer = setTimeout(() => reject(new Error('issue check timed out')), MODEL_TIMEOUT_MS);
-    }),
-  ]).finally(() => {
-    if (timer !== undefined) clearTimeout(timer);
-  });
+  );
   if (typeof out === 'string') return out;
   if (out && typeof out === 'object') {
     const o = out as { response?: unknown; choices?: { message?: { content?: unknown } }[] };

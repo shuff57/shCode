@@ -379,12 +379,17 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   server-side; clients cannot set it. Legacy NULLs coerce to `student_email`.
 - **The "already known?" check before a report is filed** (2026-11-17). `POST /api/issue-reports/check {kind, title, message}`
   (`functions/api/issue-reports/check.ts`, rules in `lib/issue-check-core.ts`): a word-overlap shortlist of the non-withdrawn
-  reports and the caller's What's New features, then a SMALL Workers AI model (`@cf/meta/llama-3.1-8b-instruct-fp8`, override
-  `ISSUE_CHECK_MODEL`) names the one that is the same problem or request. No shortlist = no model call; no `AI` binding = the
+  reports and the caller's What's New features, then Cloudflare's DECISION model `@cf/cloudflare/clef` (Workers AI, zero data
+  retention; one `choice` question over the shortlist plus `none`, a probability per option, no text to parse; a match needs
+  `DECISION_MIN` 0.75) names the one that is the same problem or request. `ISSUE_CHECK_MODEL` may name `@cf/cloudflare/clef-flash`
+  or a chat model (then the JSON prompt path). Measured live with `scripts/issue-check-live.mjs` (not in npm test; results in its
+  header): Clef 13/14 and 14/14 with no wrong match; Flash once matched "too dim" to "too bright"; the 8B Llama first chosen had 4-9
+  wrong matches and is retired by Workers AI 2026-11-20. No shortlist = no model call; no `AI` binding = the
   overlap alone, only when unmistakable (`WORDS_ONLY_MIN`). A ref not on the shortlist is refused, so it can only point at what
   /issues already shows a student; the answer carries title, status and the staff reply, never a reporter. It NEVER refuses a
   report: every failure answers 200 `{match: null}`. Quota: `ISSUE_CHECK_DAILY_LIMIT` (students, default 25) and
-  `ISSUE_CHECK_GLOBAL_DAILY_LIMIT` (3000) in `ai_help_usage`. The Report dialog (`components/ReportIssueButton.tsx`) runs it on
+  `ISSUE_CHECK_GLOBAL_DAILY_LIMIT` (200: a check is ~800 input tokens, ~18 neurons on Clef, and the free 10,000 a day are shared
+  with the grader and CODY) in `ai_help_usage`. The Report dialog (`components/ReportIssueButton.tsx`) runs it on
   Send and, on a match, shows "already fixed" (Reload) / "being worked on" / "on hold" / "already on the site" with Add my vote
   (a +1 on that report instead of a copy) or Send mine anyway; a report sent past a match carries `context.possibleRepeatOf`
   (client-supplied, a hint), shown to staff as "Repeat of #N?" on /teacher/issues. Tests: `scripts/test-issue-check.mjs`.
