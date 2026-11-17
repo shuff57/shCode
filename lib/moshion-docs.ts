@@ -88,37 +88,146 @@ function draw() {
       },
       {
         title: 'The sketch lifecycle',
-        body: `A moSHion sketch runs up to three functions on a loop. setup() runs once at the start — you make your canvas and your sprites there. update() runs every frame before physics steps — you read input and change velocities here. draw() runs every frame after physics — you clear the screen and draw any extras here.
+        body: `A moSHion sketch is made of up to four functions with special names. You never call them yourself: moSHion finds each one by its name and runs it at the right moment. You always need setup(). The other three are optional, and a sketch without one of them still runs.
 
-update() runs before physics on purpose. When you set player.vel.x in update(), the next physics step uses that new velocity. If you set it in draw(), physics has already moved the sprite for this frame.
+Each one has ONE job:
+setup() runs ONCE, at the very start. Make the canvas and your sprites here.
+update() runs EVERY FRAME, BEFORE physics. The rules of your game go here: keys, movement, jumping, touching, score.
+draw() runs EVERY FRAME, AFTER physics. The picture BEHIND your sprites goes here: background() first, then any shapes or words.
+drawTop() runs EVERY FRAME, LAST, on top of everything. The score, lives and other words that must stay readable go here. The camera is off while it runs, so (10, 20) is always near the top-left corner.
 
-By default the loop targets 60 frames per second. frameCount tells you how many frames have passed since the sketch started — handy for timing things without a clock.`,
-        code: `let player;
+Every frame happens in this order, about 60 times a second:
+1. your update() runs,
+2. the physics step moves every sprite: gravity, velocity and collisions all happen here,
+3. your draw() runs,
+4. moSHion paints the sprites, on top of whatever draw() drew,
+5. your drawTop() runs, on top of the sprites.
 
+Do you need update()? No. A sketch with only setup() and draw() works, and the course starts that way. Moving the rules into update() changes just one thing: a velocity you set there moves the sprite in this frame, while the same line in draw() waits for the next frame. At 60 frames a second you cannot see that. The real reason to use it is a sketch that reads in halves: the rules in update(), the picture in draw().
+
+One rule is not optional: drawing goes in draw() or drawTop(), never in update(). update() runs first, so the background() at the top of draw() paints over anything update() drew.
+
+frameCount tells you how many frames have passed since the sketch started, which is handy for timing things without a clock. "Where does my code go?", the next page, sorts the usual lines into the four functions.`,
+        code: `let player, ground;
+let jumps = 0;
+
+// ONCE, at the start: the canvas and your sprites
 function setup() {
   new Canvas(400, 400);
   world.gravity.y = 10;
   player = new Sprite(200, 100, 30, 30);
-  new Sprite(200, 380, 400, 20, 'static');
+  player.color = 'deepskyblue';
+  ground = new Sprite(200, 380, 400, 20, 'static');
 }
 
+// EVERY FRAME, BEFORE physics: the rules (keys, movement, score)
 function update() {
   if (kb.pressing('left'))       player.vel.x = -4;
   else if (kb.pressing('right')) player.vel.x = 4;
+  else                           player.vel.x = 0;
+
+  if (kb.presses(' ') && player.colliding(ground)) {
+    player.vel.y = -7;
+    jumps = jumps + 1;
+  }
 }
 
+// EVERY FRAME, AFTER physics: the picture BEHIND the sprites
 function draw() {
   background('#222');
+  fill('gold');
+  circle(340, 70, 50);   // a sun, behind everything
+}
+
+// EVERY FRAME, LAST: words ON TOP of everything
+function drawTop() {
   fill('white');
-  textSize(14);
-  text('frame: ' + frameCount, 10, 20);
+  textSize(16);
+  text('Jumps: ' + jumps, 10, 24);
+  text('frame: ' + frameCount, 10, 44);
+}`,
+      },
+      {
+        title: 'Where does my code go?',
+        body: `Not sure which function a line belongs in? Look up what the line does.
+
+In setup(), once:
+new Canvas(400, 400).
+The sprites and groups you start with: new Sprite(), new Group().
+Settings that start the game: world.gravity.y = 10, player.color, a collider.
+The first value of a variable made with let at the top of the file.
+
+In update(), every frame, before physics:
+Reading the keys and the mouse: kb.pressing(), kb.presses(), mouse.presses().
+Moving things: player.vel.x = 4, player.speed, moveTowards().
+Checking touches: player.collides(enemy), player.overlaps(coins, ...).
+Changing the score, the lives, a timer, or the level.
+Making or deleting a sprite because something happened: a bullet when space is pressed, a coin that was picked up.
+
+In draw(), every frame, after physics:
+background(), as its first line.
+Shapes and words that belong BEHIND the sprites: a sun, a floor pattern, a sign the player walks in front of.
+
+In drawTop(), every frame, last:
+The score, lives, a timer, "Game over": words that must sit on top of every sprite and stay put when the camera moves.
+
+A quick test for any line: if it CHANGES the game, it goes in update(). If you only LOOK at it, it goes in draw() or drawTop(). Behind the sprites is draw(), in front of them is drawTop().
+
+Never in update() or draw(): new Canvas() and the sprites you start with. Those two run 60 times a second, so you would make 60 new sprites every second. A sprite made because something happened (the bullet above) is different: it is made once, on the frame it happens.`,
+        code: `let player, coins;
+let score = 0;
+
+// setup(): the canvas, the sprites you start with, the settings
+function setup() {
+  new Canvas(400, 400);
+  world.gravity.y = 0;
+  player = new Sprite(200, 200, 30, 30);
+  player.color = 'deepskyblue';
+
+  coins = new Group();
+  coins.diameter = 18;
+  coins.color = 'gold';
+  coins.collider = 'none';
+  new coins.Sprite(120, 120);
+  new coins.Sprite(300, 260);
+  new coins.Sprite(260, 320);
+}
+
+// update(): keys, movement, touching, score
+function update() {
+  if (kb.pressing('left'))       player.vel.x = -4;
+  else if (kb.pressing('right')) player.vel.x = 4;
+  else                           player.vel.x = 0;
+  if (kb.pressing('up'))         player.vel.y = -4;
+  else if (kb.pressing('down'))  player.vel.y = 4;
+  else                           player.vel.y = 0;
+
+  player.overlaps(coins, (p, coin) => {
+    score = score + 1;
+    coin.delete();
+  });
+}
+
+// draw(): background first, then the picture behind the sprites
+function draw() {
+  background('#222');
+  fill('#333');
+  rect(0, 340, 400, 60);   // a floor stripe, under the sprites
+}
+
+// drawTop(): the score, on top of everything
+function drawTop() {
+  fill('white');
+  textSize(16);
+  text('Score: ' + score, 10, 24);
+  if (score === 3) text('All the coins!', 10, 48);
 }`,
       },
       {
         title: 'Global mode',
         body: `moSHion runs in "global mode." That means Canvas, Sprite, world, kb, and friends are already on the page — you just use them. No import, no new Engine(), no setup boilerplate.
 
-The same rule applies to setup, update, and draw. When you define a top-level function with one of those names, the engine finds it and calls it at the right time.
+The same rule applies to setup, update, draw and drawTop. When you define a top-level function with one of those names, the engine finds it and calls it at the right time (the sketch lifecycle, page 2, says when).
 
 To share a sprite between setup and update, declare a let at the top of your file and assign to it inside setup. If you use const inside setup, the variable is trapped there and update can't see it.`,
         code: `let player;
