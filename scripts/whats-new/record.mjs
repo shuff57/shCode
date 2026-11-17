@@ -342,6 +342,39 @@ function draw() {
 }
 `;
 
+// The four main functions, each with its one job made visible: update() moves and jumps,
+// draw() paints the sun and a sign BEHIND the player, drawTop() keeps the score ON TOP.
+const MOSHION_FOUR_FUNCTIONS = `let player, ground;
+let jumps = 0;
+
+function setup() {   // ONCE, at the start
+  new Canvas(400, 260);
+  world.gravity.y = 20;
+  player = new Sprite(60, 200, 40, 40);
+  player.color = 'deepskyblue';
+  ground = new Sprite(200, 250, 400, 20, 'static');
+}
+
+function update() {   // EVERY FRAME: the rules
+  player.vel.x = 0;
+  if (kb.pressing('right')) player.vel.x = 2;
+  if (kb.pressing('left')) player.vel.x = -2;
+  if (kb.presses('space') && player.colliding(ground)) {
+    player.vel.y = -6;
+    jumps++;
+  }
+}
+
+function draw() {   // EVERY FRAME: BEHIND the sprites
+  background('#282a36');
+  text('draw(): behind', 140, 215, 18, '#6272a4');
+}
+
+function drawTop() {   // EVERY FRAME: ON TOP of the sprites
+  text('drawTop(): Jumps ' + jumps, 10, 28, 18, 'white');
+}
+`;
+
 // Messages (migration 0053): one student sends a classmate a message through the API, for the teacher clip.
 async function sendByApi(page, toName, body) {
   return page.evaluate(async ([toName, body]) => {
@@ -601,6 +634,47 @@ const RECIPES = {
       await d.pause(2600);
       await hold(p, ['Space'], 120);
       await d.pause(2600);
+    },
+  },
+
+  // The four main functions (the lifecycle docs, 2026-11-17): the player walks in front of
+  // what draw() drew and jumps, and the drawTop() score stays on top.
+  '2026-11-four-functions': {
+    people: [SAM],
+    path: '/sandbox/',
+    storage: { 'shCode:sandbox-mode': 'moshion' },
+    async before({ demos: [d], pages: [p] }) {
+      await d.setCode(MOSHION_FOUR_FUNCTIONS);
+      await p.getByRole('button', { name: /Run/ }).first().click();
+      await p.frameLocator('iframe').first().locator('canvas').first().waitFor({ timeout: 30000 });
+      // scroll so the editor shows update(), draw() and drawTop()
+      await p.locator('.cm-scroller').first().evaluate((el) => {
+        const line = [...el.querySelectorAll('.cm-line')].find((l) => l.textContent.includes('function update()'));
+        el.scrollTop = line ? line.offsetTop - 4 : 0;
+      });
+    },
+    async run({ demos: [d], pages: [p] }) {
+      await d.pause(1500);
+      await focusCanvas(p, d);
+      await d.pause(400);
+      await p.keyboard.down('ArrowRight');   // walk onto the draw() sign: the player covers it
+      await d.pause(1250);
+      await p.keyboard.up('ArrowRight');
+      await d.pause(800);
+      await hold(p, ['Space'], 100);         // jump: the drawTop() count goes up
+      await d.pause(1400);
+      // show draw() and drawTop() in the editor
+      await p.locator('.cm-scroller').first().evaluate((el) => {
+        const line = [...el.querySelectorAll('.cm-line')].find((l) => l.textContent.includes('function draw()'));
+        if (line) el.scrollTo({ top: line.offsetTop - 4, behavior: 'smooth' });
+      });
+      await d.pause(800);
+      await p.keyboard.down('ArrowLeft');
+      await d.pause(500);
+      await hold(p, ['Space'], 100);
+      await d.pause(1000);
+      await p.keyboard.up('ArrowLeft');
+      await d.pause(1800);
     },
   },
 

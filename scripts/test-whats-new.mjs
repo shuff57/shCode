@@ -216,6 +216,12 @@ check('the real-time entry opens the Real-time play page', () => {
   const n = Number(/page=(\d+)/.exec(e.action.href)[1]);
   assert.equal(sections.find((s) => s.slug === 'multiplayer').pages[n - 1].title, 'Real-time play');
 });
+check('the four-functions entry opens "Where does my code go?"', () => {
+  const e = WHATS_NEW.find((x) => x.id === '2026-11-four-functions');
+  assert.ok(e, 'entry missing');
+  const n = Number(/page=(\d+)/.exec(e.action.href)[1]);
+  assert.equal(sections.find((s) => s.slug === 'overview').pages[n - 1].title, 'Where does my code go?');
+});
 check('every clip and poster is on disk, under /whats-new/, and small enough', () => {
   for (const e of WHATS_NEW) {
     if (!e.media) continue;

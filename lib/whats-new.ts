@@ -49,6 +49,27 @@ export interface WhatsNewEntry {
 
 export const WHATS_NEW: WhatsNewEntry[] = [
   {
+    id: '2026-11-four-functions',
+    date: '2026-11-17',
+    audience: 'student',
+    title: 'Which moSHion function does what',
+    summary:
+      'A moSHion sketch has four main functions, and each one has one job. setup() runs once at the start, ' +
+      'update() runs every frame for the rules, draw() paints what sits behind your sprites, and drawTop() ' +
+      'paints the score on top of them. The docs now say where each line goes.',
+    steps: [
+      'setup(): new Canvas() and the sprites you start with. update(): keys, moving, jumping and the score.',
+      'draw(): background() first, then anything behind the sprites. drawTop(): the score and lives, always on top.',
+      'Loading sounds, pictures or data? loadSound(), loadImage() and loadJSON() go in preload(), which runs before setup() and waits until they are ready.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-four-functions.mp4',
+      poster: '/whats-new/2026-11-four-functions.jpg',
+      alt: 'A moSHion sketch in the sandbox: a square walks in front of the words "draw(): behind", jumps twice, and "drawTop(): Jumps" at the top counts 0, 1, 2. The editor shows update(), draw() and drawTop().',
+    },
+    action: { label: 'Where does my code go?', href: '/docs/moshion/overview?page=3' },
+  },
+  {
     id: '2026-11-sprite-jump',
     date: '2026-11-16',
     audience: 'student',
