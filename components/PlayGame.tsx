@@ -50,6 +50,7 @@ import GameSuggestions from './GameSuggestions';
 import GameComments from './GameComments';
 import GameStarButton from './GameStarButton';
 import GameFamilyTree from './GameFamilyTree';
+import { GameFullScreenBox, GameFullScreenButton, useGameFullScreen } from './GameFullScreen';
 
 type State =
   | { kind: 'loading' }
@@ -85,6 +86,9 @@ export default function PlayGame() {
   const [assets, setAssets] = useState<{ list: GameAsset[]; missing: string[] } | null>(null);
   /** Try it: the proposed change being tried, or null for the game itself. */
   const [trying, setTrying] = useState<ChangeDetail | null>(null);
+  // #122: full screen for just the game. Pressing it before Play starts the game too.
+  const fs = useGameFullScreen();
+  const goFull = () => { if (runKey === 0) setRunKey(1); fs.toggle(); };
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -150,6 +154,7 @@ export default function PlayGame() {
             <button type="button" className="btn-run" onClick={() => setRunKey((k) => k + 1)}>
               {runKey === 0 ? '▶ Play' : '↻ Restart'}
             </button>
+            {fs.supported && <GameFullScreenButton onClick={goFull} style={quiet} />}
             {remixable && (
               <>
                 <button
@@ -175,9 +180,10 @@ export default function PlayGame() {
           </div>
         </div>
         {note && <div role="status" style={{ fontSize: 12, color: 'var(--c-green)', margin: '0 0 6px' }}>{note}</div>}
-        <div style={{ height: 'max(360px, calc(100vh - 230px))', border: '1px solid var(--c-line)', borderRadius: 6, overflow: 'hidden', display: 'flex' }}>
+        <GameFullScreenBox boxRef={fs.boxRef} full={fs.full} supported={fs.supported} onToggle={goFull}
+          style={{ height: 'max(360px, calc(100vh - 230px))', border: '1px solid var(--c-line)', borderRadius: 6, overflow: 'hidden', display: 'flex' }}>
           <MoshionPreview code={packForUrl(b.code)} runKey={runKey} gameKey={b.room ?? builtinRoomKey(b)} />
-        </div>
+        </GameFullScreenBox>
         {showCode && remixable && <CodeBlock code={b.code} />}
       </div>
     );
@@ -233,6 +239,7 @@ export default function PlayGame() {
           <button type="button" className="btn-run" onClick={() => setRunKey((k) => k + 1)}>
             {runKey === 0 ? '▶ Run' : '↻ Restart'}
           </button>
+          {fs.supported && <GameFullScreenButton onClick={goFull} style={quiet} />}
           {canRemix && (
             <>
               <button
@@ -278,7 +285,8 @@ export default function PlayGame() {
           {g.mine ? '' : ` Ask ${g.owner} to share them.`}
         </p>
       )}
-      <div style={{ height: 'max(360px, calc(100vh - 330px))', border: '1px solid var(--c-line)', borderRadius: 6, overflow: 'hidden', display: 'flex' }}>
+      <GameFullScreenBox boxRef={fs.boxRef} full={fs.full} supported={fs.supported} onToggle={goFull}
+        style={{ height: 'max(360px, calc(100vh - 330px))', border: '1px solid var(--c-line)', borderRadius: 6, overflow: 'hidden', display: 'flex' }}>
         <MoshionPreview
           code={packForUrl(runCode)}
           runKey={effectiveRunKey}
@@ -286,7 +294,7 @@ export default function PlayGame() {
           assets={assets?.list}
           assetsOwnWins={g.mine}
         />
-      </div>
+      </GameFullScreenBox>
       <ResizableConsole
         resetKey={String(effectiveRunKey)}
         style={{ marginTop: 8 }}
