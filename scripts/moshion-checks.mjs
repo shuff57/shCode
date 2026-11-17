@@ -343,6 +343,38 @@ export const SEMANTIC_CHECKS = [
     },
   },
   {
+    name: 'textLayer(n) also layers text() written in update(), with no draw() at all',
+    area: 'drawing',
+    // shCode #123/#126: a game written all in update() (background, text, then
+    // textLayer(10) every frame) got its text painted at once, under every sprite,
+    // because only draw() queued. Upstream spec: ../moshion tests/textlayer.spec.mjs.
+    run({ createSandbox }) {
+      const box = createSandbox();
+      box.run(`
+        function setup(){
+          new Canvas(200,200); world.gravity.y = 0;
+          hi = new Sprite(100, 100, 50, 50, 'static'); hi.color = '#ff00ff'; hi.layer = 20;
+          lo = new Sprite(100, 100, 80, 80, 'static'); lo.color = '#0000ff'; lo.layer = 5;
+        }
+        function update(){
+          background('#000000');
+          text('hud', 10, 20);
+          textLayer(10);
+        }
+      `);
+      if (box.errors.length) return `sketch threw: ${box.errors[0].message}`;
+      box.pump(2);
+      box.ops.length = 0;
+      box.pump(1);
+      const seq = box.ops
+        .filter((o) => o.op === 'fillText' || (o.op === 'fillRect' && (o.fill === '#0000ff' || o.fill === '#ff00ff')))
+        .map((o) => (o.op === 'fillText' ? o.args[0] : o.fill === '#0000ff' ? 'lo' : 'hi'));
+      const want = ['lo', 'hud', 'hi'];
+      if (JSON.stringify(seq) !== JSON.stringify(want)) return `paint order ${JSON.stringify(seq)}, wanted ${JSON.stringify(want)}`;
+      return true;
+    },
+  },
+  {
     name: 'textStyle(BOLD | ITALIC | BOLDITALIC | NORMAL) sets the font of text(); normal keeps the old font string',
     area: 'drawing',
     // shCode #103: textStyle did not exist, so a sketch calling it stopped with a ReferenceError.

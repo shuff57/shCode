@@ -2561,9 +2561,9 @@ function drawTop() {
         title: 'Text between sprites: textLayer()',
         body: `Text drawn in draw() goes under every sprite, and drawTop() puts it over all of them. To put words in between (a sign over the player but behind a tree), give the text a layer, the same way you give a sprite one.
 
-textLayer(5) works like textSize(): every text() you write after it in draw() goes on layer 5. It is painted over every sprite whose layer is 5 or lower, and under every sprite whose layer is higher. Change the number to move the text up or down. textLayer() with nothing in the brackets puts text back under every sprite.
+textLayer(5) works like textSize(): every text() you write after it, in update() or draw(), goes on layer 5. It is painted over every sprite whose layer is 5 or lower, and under every sprite whose layer is higher. Change the number to move the text up or down. textLayer() with nothing in the brackets puts text back under every sprite.
 
-Text is not a sprite, so text.layer = 10 does nothing: write textLayer(10) instead. drawTop() is still the place for a score or a timer, because it goes over everything, whatever the layer.`,
+It lasts until you change it, so text you write before textLayer() in the very first frame is the only text it misses. Text is not a sprite, so text.layer = 10 does nothing: write textLayer(10) instead. drawTop() is still the place for a score or a timer, because it goes over everything, whatever the layer.`,
         code: `let player, tree;
 
 function setup() {

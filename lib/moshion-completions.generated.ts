@@ -716,7 +716,7 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "label": "textLayer",
   "type": "function",
   "detail": "(n?: number | null): void",
-  "info": "Puts the text() calls that follow, in draw(), on layer `n` among the sprites: over every sprite whose `.layer` is `n` or lower, under every sprite whose `.layer"
+  "info": "Puts the text() calls that follow, in update() or draw(), on layer `n` among the sprites: over every sprite whose `.layer` is `n` or lower, under every sprite w"
  },
  {
   "label": "textLeading",
