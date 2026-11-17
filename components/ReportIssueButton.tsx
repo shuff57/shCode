@@ -5,7 +5,8 @@ import { createPortal } from 'react-dom';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Flag } from 'lucide-react';
-import { createIssueReport, IssueKind } from '../lib/issue-reports-api';
+import { checkIssueReport, createIssueReport, voteOnReport, type CheckMatch, IssueKind } from '../lib/issue-reports-api';
+import { matchHint } from '../lib/issue-check-core';
 import { uploadImage, deleteUpload, UploadError } from '../lib/uploads';
 import { useLessonStore } from '../lib/store';
 import { getCurrentUser } from '../lib/auth';
@@ -62,6 +63,17 @@ const PLACEHOLDER: Record<IssueKind, { title: string; body: string }> = {
   },
 };
 
+// What the dialog says when the check finds the report is already known
+// (POST /api/issue-reports/check, lib/issue-check-core.ts). Words for a
+// 14-year-old: what happened to it, then what they can do now.
+const KNOWN_TEXT: Record<CheckMatch['outcome'], { heading: string; line: string }> = {
+  fixed: { heading: 'This was already fixed', line: 'Reload the page to get the fix. If it still happens after that, send yours.' },
+  'in-progress': { heading: 'This is already being worked on', line: 'Add your vote so your teacher knows it matters to you too.' },
+  open: { heading: 'Someone already reported this', line: 'Add your vote so it moves up the list.' },
+  deferred: { heading: 'This is on hold for now', line: 'Your teacher decided to wait on this one. Your vote tells them it still matters.' },
+  live: { heading: 'This is already on the site', line: 'It may be what you are looking for.' },
+};
+
 const MAX_TITLE = 120;
 // Same limit as student image uploads (MAX_UPLOAD_BYTES in
 // functions/_shared/uploads.ts); the server re-checks and is authoritative.
@@ -95,6 +107,13 @@ export default function ReportIssueButton() {
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
+  // The "already known?" check (#issue-check). `match` is what it found; `checkedFor` is the text it
+  // checked, so "Send mine anyway" files at once instead of asking again about the same words.
+  const [checking, setChecking] = useState(false);
+  const [match, setMatch] = useState<CheckMatch | null>(null);
+  const [checkedFor, setCheckedFor] = useState<string | null>(null);
+  const [voted, setVoted] = useState(false);
+  const knownRef = useRef<HTMLHeadingElement>(null);
 
   // Screenshot: picked or pasted. The upload fires as soon as one is chosen,
   // so the report POST carries only the returned id and never the bytes.
@@ -274,6 +293,10 @@ export default function ReportIssueButton() {
     setOpen(false);
     setDone(false);
     setError(null);
+    setMatch(null);
+    setCheckedFor(null);
+    setVoted(false);
+    setChecking(false);
     setKind('bug');
     setTitle('');
     setMessage('');
@@ -314,16 +337,57 @@ export default function ReportIssueButton() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (sending || shotBusy) return;
+    if (sending || shotBusy || checking) return;
+    setError(null);
+    const words = `${kind}\n${title.trim()}\n${message.trim()}`;
+    if (checkedFor !== words) {
+      // Ask first. It never throws and answers null on any trouble, so the report still goes.
+      setChecking(true);
+      const found = await checkIssueReport(kind, title.trim(), message.trim());
+      setChecking(false);
+      setCheckedFor(words);
+      if (found) {
+        setMatch(found);
+        setTimeout(() => knownRef.current?.focus(), 0);
+        return;
+      }
+    }
+    await file(null);
+  }
+
+  /** File the report. `known` is set when the student sends it anyway past a match: a hint for the teacher. */
+  async function file(known: CheckMatch | null) {
+    if (sending) return;
     setSending(true);
     setError(null);
     try {
-      await createIssueReport(kind, title.trim(), message.trim(), captureContext(), shotId);
+      const ctx = captureContext();
+      if (known) ctx.possibleRepeatOf = matchHint(known);
+      await createIssueReport(kind, title.trim(), message.trim(), ctx, shotId);
       // The report owns the screenshot now. This must be set BEFORE the
       // auto-close below, or close() deletes the image out from under it.
       committedRef.current = true;
+      setMatch(null);
       setDone(true);
       setTimeout(() => close(), 1400);
+    } catch (err) {
+      // Back to the form, where the error is shown and Send can be pressed again.
+      setMatch(null);
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setSending(false);
+    }
+  }
+
+  /** "Add my vote": a thumbs up on the report it matched, instead of a second copy of it. */
+  async function voteForMatch() {
+    if (!match || match.source !== 'report' || sending) return;
+    setSending(true);
+    setError(null);
+    try {
+      await voteOnReport(Number(match.id), 1);
+      setVoted(true);
+      setTimeout(() => close(), 1800);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -376,6 +440,21 @@ export default function ReportIssueButton() {
               See what everyone else has reported
             </Link>
           </div>
+        ) : voted ? (
+          <div className="issue-done">
+            <p>Your vote was added. Thank you!</p>
+          </div>
+        ) : match ? (
+          <KnownPanel
+            match={match}
+            headingRef={knownRef}
+            busy={sending}
+            error={error}
+            onVote={() => void voteForMatch()}
+            onSend={() => void file(match)}
+            onBack={() => setMatch(null)}
+            onClose={close}
+          />
         ) : (
           <form onSubmit={submit} className="issue-form">
             <h3 ref={headingRef} tabIndex={-1} style={{ outline: 'none' }}>Report an issue</h3>
@@ -480,11 +559,11 @@ export default function ReportIssueButton() {
               </button>
               <button
                 type="submit"
-                disabled={sending || shotBusy || !ready}
+                disabled={sending || checking || shotBusy || !ready}
                 className="issue-send"
                 style={{ background: KIND_COLOR[kind] }}
               >
-                {sending ? 'Sending...' : 'Send report'}
+                {checking ? 'Checking...' : sending ? 'Sending...' : 'Send report'}
               </button>
             </div>
           </form>
@@ -616,8 +695,118 @@ export default function ReportIssueButton() {
           color: var(--text);
         }
         .issue-send { border: none; color: var(--x-1a1a1a); }
+        .issue-known { padding: 18px; }
+        .issue-known h3 { margin: 0 0 10px; font-size: 16px; outline: none; }
+        .issue-known-item {
+          background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+          padding: 10px 12px; margin-bottom: 10px; font-size: 13px;
+        }
+        .issue-known-title { font-weight: 700; margin: 0 0 4px; overflow-wrap: anywhere; }
+        .issue-known-status { display: inline-block; font-size: 11px; font-weight: 700; padding: 1px 8px;
+          border-radius: 999px; border: 1px solid var(--border); margin-bottom: 6px; }
+        .issue-known-reply { margin: 6px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; opacity: 0.85; }
+        .issue-known-line { margin: 0 0 12px; font-size: 13px; }
+        .issue-known-link { font-size: 12px; color: var(--brand); }
+        .issue-known-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; margin-top: 14px; }
+        .issue-known-actions button, .issue-known-actions a {
+          padding: 7px 14px; border-radius: 4px; font-size: 13px; font-weight: 600; font-family: inherit;
+          cursor: pointer; background: transparent; border: 1px solid var(--border); color: var(--text);
+          text-decoration: none;
+        }
+        .issue-known-actions .issue-known-primary { background: var(--brand); color: var(--on-brand); border-color: var(--brand); }
+        .issue-known-actions button:disabled { opacity: 0.5; cursor: wait; }
+        .issue-known-back { margin-right: auto; }
         .issue-send:disabled { opacity: 0.45; cursor: not-allowed; }
       `}</style>
     </>
+  );
+}
+
+const STATUS_WORDS: Record<CheckMatch['outcome'], string> = {
+  fixed: 'Fixed',
+  'in-progress': 'Being worked on',
+  open: 'Waiting for a look',
+  deferred: 'On hold',
+  live: 'On the site',
+};
+
+/**
+ * What the dialog shows in place of the form when the check found the report
+ * already known. The student always keeps the choice to send theirs anyway: a
+ * small model can be wrong, and a repeat of a "fixed" bug is exactly the
+ * report a teacher wants to hear about.
+ */
+function KnownPanel({
+  match,
+  headingRef,
+  busy,
+  error,
+  onVote,
+  onSend,
+  onBack,
+  onClose,
+}: {
+  match: CheckMatch;
+  headingRef: React.RefObject<HTMLHeadingElement | null>;
+  busy: boolean;
+  error: string | null;
+  onVote: () => void;
+  onSend: () => void;
+  onBack: () => void;
+  onClose: () => void;
+}) {
+  const text = KNOWN_TEXT[match.outcome] ?? KNOWN_TEXT.open;
+  const isReport = match.source === 'report';
+  // Their own report: no vote (you cannot second yourself), and no need to send it twice.
+  const ownOpen = isReport && match.mine && match.outcome !== 'fixed';
+  const heading = ownOpen ? 'You already reported this' : text.heading;
+  const canVote = isReport && !match.mine && match.outcome !== 'fixed';
+  return (
+    <div className="issue-known" data-testid="issue-known">
+      <h3 ref={headingRef} tabIndex={-1}>{heading}</h3>
+      <div className="issue-known-item">
+        <span className="issue-known-status">{STATUS_WORDS[match.outcome] ?? match.outcome}</span>
+        <p className="issue-known-title">
+          {isReport ? `#${match.id} ` : ''}{match.title}
+        </p>
+        {match.detail && (
+          <p className="issue-known-reply">
+            {isReport ? <><strong>Staff reply:</strong> {match.detail}</> : match.detail}
+          </p>
+        )}
+        {isReport && (
+          <Link href={match.href} className="issue-known-link" onClick={onClose}>
+            See it on the issues page
+          </Link>
+        )}
+      </div>
+      <p className="issue-known-line">{ownOpen ? 'Your teacher already has it. You do not need to send it again.' : text.line}</p>
+      {error && <div className="issue-error">{error}</div>}
+      <div className="issue-known-actions">
+        <button type="button" className="issue-known-back" onClick={onBack} disabled={busy}>
+          Back
+        </button>
+        <button type="button" onClick={onSend} disabled={busy} data-testid="issue-send-anyway">
+          {busy ? 'Sending...' : match.outcome === 'fixed' ? 'Still broken? Send' : 'Send mine anyway'}
+        </button>
+        {canVote ? (
+          <button type="button" className="issue-known-primary" onClick={onVote} disabled={busy} data-testid="issue-add-vote">
+            Add my vote
+          </button>
+        ) : match.outcome === 'fixed' ? (
+          <button type="button" className="issue-known-primary" onClick={() => { onClose(); setTimeout(() => window.location.reload(), 150); }} disabled={busy}>
+            Reload
+          </button>
+        ) : match.source === 'feature' && match.href ? (
+          <Link href={match.href} className="issue-known-primary" onClick={onClose}>
+            Show me
+          </Link>
+        ) : (
+          <button type="button" className="issue-known-primary" onClick={onClose} disabled={busy}>
+            OK
+          </button>
+        )}
+      </div>
+    </div>
   );
 }

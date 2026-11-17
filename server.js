@@ -6,6 +6,9 @@ import path from 'path';
 // reviewed locally, it has to be reviewed through the same function that
 // decides what a student may see in production.
 import { publicReport, rankReports, visibleToStudent } from './functions/_shared/issue-reports.ts';
+import { shortlist as issueShortlist, toMatch as issueToMatch, wordsOnlyVerdict as issueWordsOnly } from './lib/issue-check-core.ts';
+import { WHATS_NEW } from './lib/whats-new.ts';
+import { entriesFor as whatsNewFor } from './lib/whats-new-state.ts';
 // Both lesson-id routes below resolve paths through this. It lives in lib/ so
 // scripts/test-lesson-solution-parity.mjs can compare the real dev behaviour
 // against the Pages Function rather than a reimplementation of it.
@@ -1062,6 +1065,23 @@ app.prepare().catch((err) => {
     });
     console.log('  [dev] issue #' + devIssueSeq + ' [' + kind + '] ' + title.trim());
     res.status(201).json({ id: devIssueSeq, ok: true });
+  });
+
+  // The "already known?" check (functions/api/issue-reports/check.ts). The dev server has no Workers
+  // AI binding, so it answers as a deploy without one does: the word overlap alone, only when it is
+  // unmistakable. Same shortlist and same answer shape as the real route.
+  server.post('/api/issue-reports/check', express.json(), (req, res) => {
+    const { kind, title, message } = req.body || {};
+    const query = { kind: String(kind || 'bug'), title: String(title || '').trim(), message: String(message || '').trim() };
+    if (query.title.length < 3 || query.message.length < 3) return res.json({ match: null, checked: false });
+    const candidates = devIssues
+      .filter((r) => r.withdrawn_at === null)
+      .map((r) => ({ ref: 'r' + r.id, source: 'report', id: r.id, title: r.title || r.message.split('\n')[0], text: r.message,
+        status: r.status, note: r.resolution_note, mine: r.reporter_email === DEV_EMAIL }));
+    whatsNewFor(WHATS_NEW, DEV_ROLE).forEach((e, i) => candidates.push({ ref: 'f' + (i + 1), source: 'feature', id: e.id,
+      title: e.title, text: [e.summary, ...(e.steps || [])].join(' '), href: e.action?.href?.startsWith('/') ? e.action.href : '' }));
+    const top = issueWordsOnly(issueShortlist(query, candidates));
+    res.json({ match: top ? issueToMatch(top, 'words') : null, checked: true });
   });
 
   server.post('/api/issue-reports/:id/status', express.json(), (req, res) => {

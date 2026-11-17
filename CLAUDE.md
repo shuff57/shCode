@@ -377,6 +377,17 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   version to the account.
 - Teacher pushes to a student's pool stamp `authored_by_email = session.email`
   server-side; clients cannot set it. Legacy NULLs coerce to `student_email`.
+- **The "already known?" check before a report is filed** (2026-11-17). `POST /api/issue-reports/check {kind, title, message}`
+  (`functions/api/issue-reports/check.ts`, rules in `lib/issue-check-core.ts`): a word-overlap shortlist of the non-withdrawn
+  reports and the caller's What's New features, then a SMALL Workers AI model (`@cf/meta/llama-3.1-8b-instruct-fp8`, override
+  `ISSUE_CHECK_MODEL`) names the one that is the same problem or request. No shortlist = no model call; no `AI` binding = the
+  overlap alone, only when unmistakable (`WORDS_ONLY_MIN`). A ref not on the shortlist is refused, so it can only point at what
+  /issues already shows a student; the answer carries title, status and the staff reply, never a reporter. It NEVER refuses a
+  report: every failure answers 200 `{match: null}`. Quota: `ISSUE_CHECK_DAILY_LIMIT` (students, default 25) and
+  `ISSUE_CHECK_GLOBAL_DAILY_LIMIT` (3000) in `ai_help_usage`. The Report dialog (`components/ReportIssueButton.tsx`) runs it on
+  Send and, on a match, shows "already fixed" (Reload) / "being worked on" / "on hold" / "already on the site" with Add my vote
+  (a +1 on that report instead of a copy) or Send mine anyway; a report sent past a match carries `context.possibleRepeatOf`
+  (client-supplied, a hint), shown to staff as "Repeat of #N?" on /teacher/issues. Tests: `scripts/test-issue-check.mjs`.
 - **CODY** (Code. Optimizer. Development. Yielder.) is the student-facing name of the `/api/ai-help` tutor. In the free sandbox (`lessonId` `sandbox-js|moshion|reshape`, code mode only) it answers directly with code blocks up to 15 lines but never writes the whole program (#83, `isSandboxHelp` in `functions/api/ai-help.ts`); code that carries `// STEP` comments, a `// 5.3.4`-style lesson header or "reference solution" is pasted course work and gets the hint-only rules, decided server-side because the lesson id is client-supplied. On Workers AI (the `AI` binding) students have no per-student cap and get `X-RateLimit-Unlimited: 1`; the UI hides the "helps left" line. The per-student per-unit quota below applies only on the Ollama fallback. The global ceiling counts both.
 - `POST /api/ai-help` streams `text/plain` from Workers AI (`lib/workers-ai.ts`), trims code blocks to <=3 lines, and
   is quota'd per student **per unit** per UTC day (`AI_HELP_DAILY_LIMIT`). The

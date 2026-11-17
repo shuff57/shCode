@@ -1,6 +1,10 @@
 // Client wrappers for the issue-report endpoints. Same-origin; the session
 // cookie rides along automatically.
 
+import type { CheckMatch } from './issue-check-core';
+
+export type { CheckMatch };
+
 export type IssueKind = 'bug' | 'quirk' | 'enhancement';
 export type IssueStatus = 'open' | 'in-progress' | 'fixed' | 'deferred';
 
@@ -170,4 +174,35 @@ export async function voteOnReport(id: number, vote: -1 | 0 | 1): Promise<VoteTa
   });
   if (!res.ok) throw new Error(await readError(res));
   return (await res.json()) as VoteTally;
+}
+
+/** How long the dialog waits for the "already known?" check before filing anyway. */
+const CHECK_TIMEOUT_MS = 9000;
+
+/**
+ * Ask whether this report is already known: an earlier report (fixed, being
+ * worked on, waiting, on hold) or a feature already on the site. Never throws:
+ * a failure, a timeout or a server from before the check all answer null, and
+ * the caller files the report as it always did.
+ */
+export async function checkIssueReport(kind: IssueKind, title: string, message: string): Promise<CheckMatch | null> {
+  const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timer = setTimeout(() => ctrl?.abort(), CHECK_TIMEOUT_MS);
+  try {
+    const res = await fetch('/api/issue-reports/check', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kind, title, message }),
+      signal: ctrl?.signal,
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { match?: CheckMatch | null };
+    const m = data?.match;
+    return m && typeof m === 'object' && typeof m.title === 'string' && typeof m.outcome === 'string' ? m : null;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
 }

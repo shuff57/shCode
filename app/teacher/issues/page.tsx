@@ -600,7 +600,11 @@ function IssuesPageInner() {
           currentFileContent?: string;
           currentFileContentTruncated?: boolean;
           userAgent?: string;
+          /** Set by the Report dialog when the "already known?" check matched and the student sent it
+           *  anyway (lib/issue-check-core.ts matchHint). Client-supplied: a hint, never trusted. */
+          possibleRepeatOf?: { source?: string; id?: number | string; outcome?: string; title?: string };
         } | null;
+        const repeat = repeatLabel(context?.possibleRepeatOf);
 
         return (
           <div key={r.id} style={S.card}>
@@ -656,6 +660,21 @@ function IssuesPageInner() {
               <span style={{ fontSize: 12, color: 'var(--text)', opacity: 0.6 }}>
                 {r.reporter_email} · {fmtDate(r.created_at)}
               </span>
+
+              {repeat && (
+                <span
+                  title={`The check before filing matched ${repeat.full}. The student sent theirs anyway.`}
+                  style={{
+                    fontSize: 11,
+                    color: 'var(--text)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 4,
+                    padding: '2px 8px',
+                  }}
+                >
+                  {repeat.short}
+                </span>
+              )}
 
               {r.resolution_note && (
                 <span
@@ -733,6 +752,7 @@ function IssuesPageInner() {
                     )}
                     {context.currentFile && <div>File: <code>{context.currentFile}</code></div>}
                     {context.userAgent && <div style={{ wordBreak: 'break-all' }}>{context.userAgent}</div>}
+                    {repeat && <div>Sent anyway past a match: {repeat.full}</div>}
                   </div>
                 )}
 
@@ -860,4 +880,22 @@ export default function IssuesPage() {
       <IssuesPageInner />
     </Suspense>
   );
+}
+/** The "possible repeat" pill: what the pre-filing check matched, in a teacher's words. Null when absent or malformed. */
+function repeatLabel(
+  hint: { source?: string; id?: number | string; outcome?: string; title?: string } | undefined,
+): { short: string; full: string } | null {
+  if (!hint || typeof hint !== 'object') return null;
+  const title = typeof hint.title === 'string' ? hint.title.slice(0, 120) : '';
+  if (hint.source === 'report' && (typeof hint.id === 'number' || typeof hint.id === 'string')) {
+    const status = typeof hint.outcome === 'string' ? hint.outcome : '';
+    return {
+      short: `Repeat of #${String(hint.id).slice(0, 12)}?`,
+      full: `report #${String(hint.id).slice(0, 12)}${status ? ` (${status})` : ''}${title ? `: ${title}` : ''}`,
+    };
+  }
+  if (hint.source === 'feature') {
+    return { short: 'Already on the site?', full: `the What's New feature${title ? ` "${title}"` : ''}` };
+  }
+  return null;
 }
