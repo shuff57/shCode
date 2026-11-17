@@ -1012,7 +1012,7 @@ sprite.prevPos is where the sprite was at the end of the last frame and sprite.p
         title: 'Sprite housekeeping: removed, groups, joints, screenSpace',
         body: `sprite.removed is true once a sprite has been deleted, which is useful if you kept a variable pointing at it. sprite.groups lists every group the sprite is in, and sprite.joints lists every joint attached to it.
 
-sprite.autoDraw = false stops the engine drawing the sprite, and sprite.autoUpdate = false stops it running the sprite's update. Use them when you want to draw or update that sprite yourself.
+sprite.autoDraw = false stops the engine drawing the sprite, and sprite.autoUpdate = false stops it running the sprite's update. Use them when you want to draw or update that sprite yourself. For a whole group, see Groups: Drawing sprites yourself.
 
 sprite.screenSpace = true pins a sprite to the screen: it ignores the camera and is drawn on top of everything, which is what a score display or a health bar wants.
 
@@ -1763,6 +1763,38 @@ function draw() {
   fill('white');
   textSize(14);
   text('allSprites: ' + allSprites.length, 14, 22);
+}`,
+      },
+      {
+        title: 'Drawing sprites yourself: autoDraw and draw()',
+        body: `The engine draws every sprite for you after draw() runs. To choose the moment yourself, turn that off with allSprites.autoDraw = false. Set it once, in setup(): it covers the sprites you make later too, like bullets made in the middle of the game.
+
+Then call allSprites.draw() where you want the sprites to appear, in update() or draw(). It draws them right then, lowest layer first, so you can paint the background, then the sprites, then words over the top. Any group works the same way: enemies.autoDraw = false and enemies.draw() for just the enemies.
+
+autoUpdate works like autoDraw: ghosts.autoUpdate = false stops the update you gave each ghost, for the ghosts you have now and the ones you make later. Set either one back to true to hand the job back to the engine.`,
+        code: `let player;
+
+function setup() {
+  new Canvas(400, 300);
+  allSprites.autoDraw = false; // I will draw the sprites myself
+  player = new Sprite(200, 150, 50, 50);
+  player.color = 'deepskyblue';
+}
+
+function update() {
+  if (mouse.presses()) {
+    let dot = new Sprite(mouse.x, mouse.y, 16);
+    dot.color = 'gold';
+    dot.collider = 'none';
+  }
+}
+
+function draw() {
+  background('#222');
+  allSprites.draw(); // the sprites go here
+  fill('white');
+  textSize(16);
+  text('Click to add a dot. These words are over every sprite.', 20, 40);
 }`,
       },
       {

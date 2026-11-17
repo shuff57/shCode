@@ -375,6 +375,59 @@ export const SEMANTIC_CHECKS = [
     },
   },
   {
+    name: 'allSprites.autoDraw = false once also covers sprites made later, and allSprites.draw() paints them by layer',
+    area: 'drawing',
+    // shCode #124: the setting reached only the sprites already there, so a
+    // sketch had to set it every frame, and allSprites.draw() did not exist.
+    run({ createSandbox }) {
+      const box = createSandbox();
+      box.run(`
+        function setup(){
+          new Canvas(200,200); world.gravity.y = 0;
+          allSprites.autoDraw = false;
+          early = new Sprite(50, 50, 20, 20, 'static'); early.color = '#0000ff'; early.layer = 2;
+          emptyReads = new Group().autoDraw;
+          ghosts = new Group(); ghosts.autoUpdate = false;
+        }
+        var tick = 0, handDraw = false, ghostRan = false;
+        function update(){
+          tick++;
+          if (tick === 2) {
+            late = new Sprite(150, 150, 20, 20, 'static'); late.color = '#ff00ff'; late.layer = 1;
+            ghost = new ghosts.Sprite(100, 100, 10, 10, 'none'); ghost.update = () => { ghostRan = true; };
+          }
+        }
+        function draw(){
+          background('#000000');
+          if (handDraw) allSprites.draw();
+          text('over', 10, 10);
+        }
+      `);
+      if (box.errors.length) return `sketch threw: ${box.errors[0].message}`;
+      box.pump(4);
+      if (box.errors.length) return `sketch threw: ${box.errors[0].message}`;
+      const sb = box.sandbox;
+      if (sb.late.autoDraw !== false) return `a sprite made after allSprites.autoDraw = false has autoDraw ${sb.late.autoDraw}`;
+      if (allDrawn().length) return `with autoDraw false the engine still painted ${JSON.stringify(allDrawn())}`;
+      if (sb.emptyReads !== true) return `an untouched empty group's autoDraw read ${sb.emptyReads}, wanted true`;
+      if (sb.ghost.autoUpdate !== false || sb.ghostRan) return 'a sprite joining a group after group.autoUpdate = false still ran its update';
+      sb.handDraw = true;
+      box.ops.length = 0;
+      box.pump(1);
+      const seq = box.ops
+        .filter((o) => o.op === 'fillText' || (o.op === 'fillRect' && ['#000000', '#0000ff', '#ff00ff'].includes(o.fill)))
+        .map((o) => (o.op === 'fillText' ? o.args[0] : o.fill));
+      const want = ['#000000', '#ff00ff', '#0000ff', 'over'];
+      if (JSON.stringify(seq) !== JSON.stringify(want)) return `allSprites.draw() paint order ${JSON.stringify(seq)}, wanted ${JSON.stringify(want)}`;
+      return true;
+      function allDrawn() {
+        box.ops.length = 0;
+        box.pump(1);
+        return box.ops.filter((o) => o.op === 'fillRect' && (o.fill === '#0000ff' || o.fill === '#ff00ff')).map((o) => o.fill);
+      }
+    },
+  },
+  {
     name: 'textStyle(BOLD | ITALIC | BOLDITALIC | NORMAL) sets the font of text(); normal keeps the old font string',
     area: 'drawing',
     // shCode #103: textStyle did not exist, so a sketch calling it stopped with a ReferenceError.
