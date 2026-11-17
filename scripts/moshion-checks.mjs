@@ -599,6 +599,47 @@ export const SEMANTIC_CHECKS = [
     },
   },
   {
+    name: 'sprite.mouse: hovering/hovers/hovered, and presses/pressing/released for a press that began on the sprite; mouse.visible hides the pointer',
+    area: 'input',
+    // shCode #125: there was no way to ask whether the mouse was over a
+    // sprite, or clicked it, and nothing named for hiding the pointer.
+    run({ createSandbox }) {
+      const box = createSandbox();
+      box.run(`
+        var log = [];
+        function setup(){
+          mouse.cursor = 'crosshair';
+          new Canvas(300,300); world.gravity.y = 0;
+          btn = new Sprite(100, 100, 60, 40, 'static');
+          other = new Sprite(250, 250, 20, 20, 'static');
+        }
+        function update(){
+          const m = btn.mouse;
+          log.push([m.hovering(), m.hovers(), m.hovered(), m.presses(), m.pressing(), m.released(), other.mouse.presses()].map(Number).join(''));
+        }
+      `);
+      if (box.errors.length) return `sketch threw: ${box.errors[0].message}`;
+      const sb = box.sandbox;
+      box.pump(1);                                  // 0: pointer never seen
+      box.input.mouseMove(100, 100); box.pump(2);   // 1-2: over btn
+      box.input.mouseDown(); box.pump(2);           // 3-4: press on btn
+      box.input.mouseMove(10, 10); box.pump(1);     // 5: slid off, still held
+      box.input.mouseUp(); box.pump(2);             // 6-7: released off it
+      box.input.mouseMove(250, 250); box.input.mouseDown(); box.pump(1); // 8: press on the other sprite
+      box.input.mouseUp(); box.pump(1);
+      // columns: hovering hovers hovered presses pressing released other.presses
+      const want = ['0000000', '1100000', '1000000', '1001100', '1000100', '0010100', '0000010', '0000000', '0000001'];
+      const got = sb.log.slice(0, want.length);
+      if (JSON.stringify(got) !== JSON.stringify(want)) return `per-frame sprite.mouse ${JSON.stringify(got)}, wanted ${JSON.stringify(want)}`;
+      if (sb.mouse.cursor !== 'crosshair') return `mouse.cursor set before new Canvas() was lost: ${sb.mouse.cursor}`;
+      sb.mouse.visible = false;
+      if (sb.mouse.cursor !== 'none' || sb.mouse.visible !== false) return `mouse.visible = false left cursor ${sb.mouse.cursor}`;
+      sb.mouse.visible = true;
+      if (sb.mouse.cursor !== 'crosshair' || sb.mouse.visible !== true) return `mouse.visible = true gave cursor ${sb.mouse.cursor}, wanted crosshair back`;
+      return true;
+    },
+  },
+  {
     name: 'mouse.x / mouse.y track the pointer',
     area: 'input',
     run({ createSandbox }) {

@@ -1509,6 +1509,12 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "info": "This sprite in screen pixels rather than world coordinates."
   },
   {
+   "label": "mouse",
+   "type": "property",
+   "detail": "SpriteMouse",
+   "info": "The mouse as this sprite sees it: hovering(), hovers(), hovered(), and presses() / pressing() / released() / dragging() for a press that began on this sprite."
+  },
+  {
    "label": "life",
    "type": "property",
    "detail": "number",
@@ -2684,7 +2690,13 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "cursor",
    "type": "property",
    "detail": "string",
-   "info": "CSS cursor on the canvas element."
+   "info": "CSS cursor on the canvas element ('pointer', 'crosshair', 'none'...)."
+  },
+  {
+   "label": "visible",
+   "type": "property",
+   "detail": "boolean",
+   "info": "False hides the pointer over the canvas (cursor 'none'); true brings back the cursor it had before."
   },
   {
    "label": "scrollDelta",
@@ -2747,6 +2759,50 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "type": "property",
    "detail": "number",
    "info": ""
+  }
+ ],
+ "SpriteMouse": [
+  {
+   "label": "hovering",
+   "type": "method",
+   "detail": "(): boolean",
+   "info": "True while the pointer is over the sprite."
+  },
+  {
+   "label": "hovers",
+   "type": "method",
+   "detail": "(): boolean",
+   "info": "True on the first frame the pointer is over the sprite."
+  },
+  {
+   "label": "hovered",
+   "type": "method",
+   "detail": "(): boolean",
+   "info": "True on the first frame after the pointer left the sprite."
+  },
+  {
+   "label": "presses",
+   "type": "method",
+   "detail": "(button?: MouseButton): boolean",
+   "info": "True on the first frame of a press that began over the sprite."
+  },
+  {
+   "label": "pressing",
+   "type": "method",
+   "detail": "(button?: MouseButton): boolean",
+   "info": "True while a press that began over the sprite is held, even if the pointer has slid off it since."
+  },
+  {
+   "label": "released",
+   "type": "method",
+   "detail": "(button?: MouseButton): boolean",
+   "info": "True on the frame a press that began over the sprite is let go."
+  },
+  {
+   "label": "dragging",
+   "type": "method",
+   "detail": "(button?: MouseButton): number",
+   "info": "Frames the pointer has moved with a press that began over the sprite held (default 'left'), else 0."
   }
  ],
  "FrameTimer": [
