@@ -48,7 +48,7 @@ import ShareChoicePicker, { RemixCreditLine, lockedChoice, useLastChoice } from 
 import AudiencePicker from './AudiencePicker';
 import {
    initialPick, pickProblem, pickToSpec, pickerMatters, samePick,
-  type AudienceOptions, type AudiencePick, type ItemAudience, type PulledInfo,
+  type AudienceOptions, type AudiencePick, type AudienceSpec, type ItemAudience, type PulledInfo,
 } from '../lib/audience';
 import { fetchAudiences } from '../lib/audience-client';
 import { GITHUB_WORD, MESSAGE_MAX, cleanMessage } from '../lib/game-flow-core';
@@ -123,6 +123,8 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
   const [declared, setDeclared] = useState('1 player');
   const [used, setUsed] = useState<UsedItem[]>([]);
   const [sharingItems, setSharingItems] = useState(false);
+  // "Also share the pictures and sounds it uses" (#129): ticked by default, so publishing to the class brings the art.
+  const [shareArt, setShareArt] = useState(true);
   const [itemsNote, setItemsNote] = useState<{ text: string; bad: boolean } | null>(null);
   const [lastChoice, rememberChoice] = useLastChoice('game');
   const [choice, setChoice] = useState<ShareChoice>(lastChoice);
@@ -214,15 +216,17 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
     };
   }, [open, getCode]);
 
-  async function shareUsed() {
-    const todo = used.filter((u) => u.state === 'not-shared');
+  /** Share every used item not shared yet; `audience` = the game's own, when Publish does it, so the art goes where the game goes. */
+  async function shareUsed(audience?: AudienceSpec) {
+    // Read again rather than trust the panel's list: a sync may have finished since it was drawn.
+    const todo = (await findUsedItems(getCode())).filter((u) => u.state === 'not-shared');
     if (!todo.length) return;
     setSharingItems(true);
     setItemsNote(null);
     const errors: string[] = [];
     const done: string[] = [];
     for (const u of todo) {
-      const err = await setShared(u.kind, u.name, true);
+      const err = await setShared(u.kind, u.name, true, undefined, audience);
       if (err) errors.push(err);
       else done.push(u.name);
     }
@@ -290,6 +294,8 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
     } else {
       setFeedbackSaved(feedbackOn);
     }
+    // Publishing to the class shares the pictures and sounds the game uses too, unless the box was unticked (#129).
+    if (shared && shareArt) await shareUsed(askAudience && audPick ? pickToSpec(audPick) : undefined);
     setBusy(false);
     setPublished({ id, title: t.title, shared, choice: stored, version: r.value.game.version, audience: audienceNow, pulled: published?.pulled ?? null });
     setTitle(t.title);
@@ -450,6 +456,12 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
                   Classmates only see pictures and sounds you share with your class.
                   {used.some((u) => u.state === 'local') && ' One that is not saved to your account yet cannot be shared: it saves there by itself in a moment, then you can share it.'}
                 </p>
+              )}
+              {share && used.some((u) => u.state === 'not-shared') && (
+                <label style={{ display: 'flex', alignItems: 'center', gap: 6, margin: '0 0 6px', fontSize: 12 }}>
+                  <input type="checkbox" checked={shareArt} onChange={(e) => setShareArt(e.target.checked)} />
+                  Also share them with my class when I publish
+                </label>
               )}
               {used.some((u) => u.state === 'not-shared') && (
                 <button

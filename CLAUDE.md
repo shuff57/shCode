@@ -1232,10 +1232,14 @@ code into the `sandbox-moshion` draft, asks before replacing a draft that differ
 one as a History snapshot. Tests: `scripts/test-library-games.mjs`. Apply 0042 (`npm run d1:migrate`) before deploying.
 **A game's own pictures and sounds (2026-11-09).** A game stores only code; a sketch reads `texture:<name>` / sounds
 from the player's store, so the author's art must travel. The owner chose "warn and offer to share": the publish panel
-lists the author's saved items the code names (string literals, comments ignored: `usedItems` in `lib/games-core.ts`,
-built-in names excluded) as Shared / Not shared, with "Share them with my class". `GET /api/games/[id]/assets` (same
-404 rule as the game) returns the author's items that are used AND shared into a class the caller sees the game
-through (bytes from R2, no emails) plus `missing`; /play hands them to `MoshionPreview`'s `assets` prop, an OVERLAY on
+lists the author's saved items the code names (string literals, or a name put together from them like `'Enemy_' + kind`,
+comments ignored: `usedItems` in `lib/games-core.ts`, built-in names excluded) as Shared / Not shared, with "Share them
+with my class", and (#129, owner's decision 2026-11-17) "Also share them with my class when I publish", ticked by
+default, which shares the not-shared ones to the game's own audience when Publish shares the game. `GET
+/api/games/[id]/assets` (same 404 rule as the game) returns, to anyone but the author, EVERY live item of the author's
+shared into a class the caller sees the game through (or public, for a public game), used-looking or not, because a
+game can name a picture at run time; the author gets only their used items. Bytes from R2, no emails, plus `missing`
+(used items the caller cannot get); /play hands them to `MoshionPreview`'s `assets` prop, an OVERLAY on
 the store for that run only (`lib/moshion-storage.ts`: never written to the player's store, a sketch cannot overwrite
 or delete those keys; the game's item beats a same-named one of the player's), and names the missing ones ("Ask Sam R.
 to share them"). Tests: `scripts/test-game-assets.mjs`. server.js routes it for dev.

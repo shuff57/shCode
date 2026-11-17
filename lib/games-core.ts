@@ -87,7 +87,9 @@ export function modeLabel(mode: GameMode, players: number): string {
 // which items a game uses: the publish panel warns with them and
 // GET /api/games/[id]/assets serves them on /play. A name counts when it is a
 // whole string literal in the code (`'hero'`, or the explicit store key
-// `'texture:hero'` / `'sound:jump'`); comments do not count.
+// `'texture:hero'` / `'sound:jump'`), or when it is put together from such
+// literals (`'Enemy_' + 'Rammer'`, `'frame' + i`; see usesItem); comments do
+// not count.
 
 /**
  * Every string literal in `code`, as written between its quotes, with comments
@@ -152,7 +154,22 @@ export type AssetKind = 'texture' | 'sound' | 'font';
 
 /** Does a code with these string literals use the saved item `kind`:`name`? */
 export function usesItem(literals: ReadonlySet<string>, kind: AssetKind, name: string): boolean {
-  return literals.has(name) || literals.has(`${kind}:${name}`);
+  if (literals.has(name) || literals.has(`${kind}:${name}`)) return true;
+  // A name the code puts together from pieces also counts (#129):
+  // `'Enemy_' + kind` with `kind = 'Rammer'` elsewhere, `${type}_idle`, or
+  // `'frame' + i`. Without this such a game's art never reached a classmate.
+  return builtFrom(literals, name, 3) || builtFrom(literals, `${kind}:${name}`, 3);
+}
+
+/** Is `rest` two or more literal pieces (each >= 2 characters) end to end, optionally followed by a number? */
+function builtFrom(literals: ReadonlySet<string>, rest: string, pieces: number, used = 0): boolean {
+  if (used >= 1 && /^\d+$/.test(rest)) return true;
+  if (used >= 2 && rest === '') return true;
+  if (used >= pieces) return false;
+  for (let k = 2; k <= rest.length; k++) {
+    if (literals.has(rest.slice(0, k)) && builtFrom(literals, rest.slice(k), pieces, used + 1)) return true;
+  }
+  return false;
 }
 
 /**

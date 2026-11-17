@@ -301,8 +301,16 @@ export default function PlayGame() {
         // The engine's "No texture named X" reads like a bug when X is the author's own picture they haven't shared.
         reword={(text) => {
           const m = /^No texture named "([^"]+)"/.exec(text);
-          if (!m || !assets?.missing.includes(m[1])) return text;
-          return `"${m[1]}" is one of ${g.owner}'s own pictures, and it isn't shared with the class, so it can't show here. Ask ${g.owner} to share it.`;
+          if (!m) return text;
+          if (assets?.missing.includes(m[1])) {
+            return `"${m[1]}" is one of ${g.owner}'s own pictures, and it isn't shared with the class, so it can't show here. Ask ${g.owner} to share it.`;
+          }
+          // A name the code works out as it runs (#129): the server could not tell it was used. The engine only
+          // says this when the name is neither built in nor anywhere this run can see.
+          if (g.mine) {
+            return `"${m[1]}" isn't in your library on this computer. If you made it on another computer, open the Library there so it can save to your account, then reload this page.`;
+          }
+          return `"${m[1]}" isn't a built-in picture, and ${g.owner} hasn't shared a picture by that name with the class. If it is one of ${g.owner}'s own, ask them to share it.`;
         }}
       />
       <GameSuggestions gameId={g.id} owner={g.owner} mine={g.mine} />

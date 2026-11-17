@@ -2,14 +2,14 @@
 // A published game's own pictures and sounds (GET /api/games/[id]/assets,
 // lib/game-assets.ts, the string-literal rules in lib/games-core.ts) on a real
 // SQLite with every migration applied. What has to hold:
-//   1. a name counts only as a whole string literal in the code ('hero',
+//   1. a name counts only as a whole string literal in the code (or one put together from them, #129) ('hero',
 //      "coin", `anim`, 'sound:boom'); comments do not count, template pieces do;
 //   2. the route has the game's own access rule: a stranger, a student in
 //      another class and (once the teacher hides the game) a classmate get 404;
-//   3. a classmate gets only the publisher's items that the code uses AND that
-//      are shared, not hidden, into a class the classmate sees the game
-//      through; a deleted item never comes back; the publisher gets every used
-//      item of their own;
+//   3. a classmate gets every live item of the publisher that is shared, not
+//      hidden, into a class the classmate sees the game through, used in the
+//      code or not (#129: a name the code works out at run time); a deleted
+//      item never comes back; the publisher gets every used item of their own;
 //   4. `missing` names each used item the caller cannot see, and the play page
 //      leaves out a built-in picture name (the catalog still draws one);
 //   5. the bytes come from R2 and an object over the per-item cap is skipped;
@@ -46,6 +46,15 @@ check('stringLiterals: an unterminated quote stops at the line end', eq(core.str
 const lits = new Set(core.stringLiterals(`loadSound('sound:boom'); s.texture = 'hero';`));
 check('usesItem: a bare name or the explicit store key', core.usesItem(lits, 'texture', 'hero') && core.usesItem(lits, 'sound', 'boom') && !core.usesItem(lits, 'texture', 'boom'));
 check('usesItem: part of a longer string does not count', !core.usesItem(new Set(['heroes']), 'texture', 'hero'));
+{
+  // #129: a name the code builds from pieces ("No texture named "Enemy_Rammer"" on a classmate's computer).
+  const code = `const kinds = ['Rammer', 'Shooter'];\nfor (const k of kinds) { const e = new Sprite(); e.texture = 'Enemy_' + k; }\nb.texture = \`\${state}_idle\`; const st = 'Boss';\nf.texture = 'frame' + i;`;
+  const got = core.usedItems(code, ['Enemy_Rammer', 'Enemy_Shooter', 'Enemy_Tank', 'Boss_idle', 'frame3', 'Rammers'].map((name) => ({ kind: 'texture', name })));
+  check('usedItems #129: names put together from literals count (prefix + literal, template, + number)',
+    eq(got.map((g) => g.name), ['Enemy_Rammer', 'Enemy_Shooter', 'Boss_idle', 'frame3']), JSON.stringify(got));
+  check('usesItem #129: a piece of one character does not glue names together', !core.usesItem(new Set(['he', 'r', 'o']), 'texture', 'hero'));
+  check('usesItem #129: a number alone after nothing does not count', !core.usesItem(new Set(['x']), 'texture', '12'));
+}
 check('usedItems leaves out built-in picture names, but not a sound of that name',
   eq(core.usedItems(`x('coin'); y('hero')`, [{ kind: 'texture', name: 'coin' }, { kind: 'sound', name: 'coin' }, { kind: 'texture', name: 'hero' }], new Set(['coin'])),
     [{ kind: 'sound', name: 'coin' }, { kind: 'texture', name: 'hero' }]));
@@ -154,14 +163,16 @@ check('a stranger in no class gets 404', r.status === 404, r);
 
 // ---- 3 + 4. a classmate -----------------------------------------------------
 r = await get(BEN, gid);
-check('a classmate gets only shared, used, live items of the publisher',
-  r.status === 200 && eq(names(r.body), ['sound:boom', 'texture:anim', 'texture:hero']), r.body.assets?.map((a) => a.name));
+const SHARED_IN_C1 = ['sound:boom', 'texture:anim', 'texture:hero', 'texture:inComment', 'texture:unused'];
+check('a classmate gets every shared, live item of the publisher, used or not (#129)',
+  r.status === 200 && eq(names(r.body), SHARED_IN_C1), r.body.assets?.map((a) => a.name));
 check('missing: hidden, never shared, and shared only where the game is not',
   eq(r.body.missing, ['coinArt', 'jump', 'player', 'side']), r.body.missing);
 check('missingItems carries each kind',
   r.body.missingItems.some((m) => m.kind === 'sound' && m.name === 'jump') && r.body.missingItems.some((m) => m.kind === 'texture' && m.name === 'player'), r.body.missingItems);
 check('a deleted item is neither served nor missing', !names(r.body).includes('texture:ghost') && !r.body.missing.includes('ghost'));
-check('an item only in a comment, or not in the code, is not served', !names(r.body).some((x) => /inComment|unused/.test(x)));
+check('an item only in a comment, or not in the code, is served when shared but never named missing (#129)',
+  names(r.body).includes('texture:unused') && names(r.body).includes('texture:inComment') && !r.body.missing.some((x) => /inComment|unused/.test(x)));
 check("another student's item of a used name is never served", !names(r.body).includes('texture:benHero') && !r.body.missing.includes('benHero'));
 check('an R2 object over the per-item cap is skipped', !names(r.body).includes('texture:big'));
 const hero = r.body.assets.find((a) => a.name === 'hero');
@@ -175,7 +186,7 @@ check('listWords reads as a sentence', ga.listWords(['a']) === 'a' && ga.listWor
 // "Just use" (share_choice 'play', migration 0045) stops a copy, never the author's game.
 sql(`UPDATE library_items SET share_choice = 'play' WHERE owner_email = 'ana@s.test'`);
 r = await get(BEN, gid);
-check('just-use items are still served for the author\'s game', r.status === 200 && eq(names(r.body), ['sound:boom', 'texture:anim', 'texture:hero']), r.body.assets?.map((a) => a.name));
+check('just-use items are still served for the author\'s game', r.status === 200 && eq(names(r.body), SHARED_IN_C1), r.body.assets?.map((a) => a.name));
 sql(`UPDATE library_items SET share_choice = 'credit' WHERE owner_email = 'ana@s.test'`);
 
 // ---- the publisher ----------------------------------------------------------
@@ -185,7 +196,7 @@ check('the publisher gets every used live item of their own, shared or not',
 
 // ---- the teacher, and a hidden game ----------------------------------------
 r = await get(T1, gid);
-check('the class teacher sees the shared items (a hidden item stays out)', r.status === 200 && eq(names(r.body), ['sound:boom', 'texture:anim', 'texture:hero']) && r.body.missing.includes('coinArt'), r.body);
+check('the class teacher sees the shared items (a hidden item stays out)', r.status === 200 && eq(names(r.body), SHARED_IN_C1) && r.body.missing.includes('coinArt'), r.body);
 r = await call(mod.onRequestPost, T1, '/api/classes/C1/game-shares', { id: 'C1' }, 'POST', { gameId: gid, action: 'hide' });
 check('the teacher hides the game', r.status === 200, r);
 r = await get(BEN, gid);
