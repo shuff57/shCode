@@ -18,6 +18,16 @@ function tell(frame: HTMLIFrameElement | null | undefined, on: boolean) {
   frame?.contentWindow?.postMessage({ source: 'preview-fit', on }, '*');
 }
 
+// The keys go to the game at once. iframe.focus() alone is not enough when the game is still loading
+// (Full screen pressed before Play): the frame becomes the page's active element, the game's own window
+// never gets focus, and a second iframe.focus() is a no-op, so no key reached the game until it was
+// clicked. Focusing the frame's window moves real focus inside it.
+function focusGame(frame: HTMLIFrameElement | null | undefined) {
+  if (!frame) return;
+  frame.focus();
+  try { frame.contentWindow?.focus(); } catch { /* not reachable: the element focus above stands */ }
+}
+
 export function useGameFullScreen() {
   const boxRef = useRef<HTMLDivElement>(null);
   const [full, setFull] = useState(false);
@@ -31,7 +41,7 @@ export function useGameFullScreen() {
       setFull(active);
       const frame = box?.querySelector('iframe');
       tell(frame, active);
-      if (active) frame?.focus();
+      if (active) focusGame(frame);
     };
     document.addEventListener('fullscreenchange', onFs);
     return () => document.removeEventListener('fullscreenchange', onFs);
@@ -74,7 +84,7 @@ export function GameFullScreenBox({ boxRef, full, supported, onToggle, style, ch
     const onLoad = (e: Event) => {
       if (document.fullscreenElement === box && e.target instanceof HTMLIFrameElement) {
         tell(e.target, true);
-        e.target.focus();
+        focusGame(e.target);
       }
     };
     box.addEventListener('load', onLoad, true);
