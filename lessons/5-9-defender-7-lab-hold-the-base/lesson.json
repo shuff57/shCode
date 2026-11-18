@@ -3,6 +3,10 @@
   "title": "7.5.3 Lab: Hold the base, and start again",
   "description": "The drone can land as often as it likes. Give the base 3 hp, take 1 for every landing, end the round at 0, write Game over on top, and let R start a new round.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.5 Defender: hits, and a round",

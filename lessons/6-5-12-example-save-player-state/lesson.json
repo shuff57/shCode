@@ -3,6 +3,10 @@
   "title": "6.10.12 Worked Example: Save Full Player State",
   "description": "Build a game with a moving player, score, and level. Save everything as one JSON object with storeItem.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.10 Save and Load",

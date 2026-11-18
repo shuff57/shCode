@@ -314,7 +314,7 @@ export function shapeResult(parsed: any, rubric: RubricItem[]): GradeResponse {
 // `response` is the ONLY field the client is trusted to supply — the rubric and
 // prompt are looked up server-side (functions/_shared/aiGraders.ts), so there is
 // deliberately no rubric check here any more.
-const MAX_RESPONSE_CHARS = 8000;
+export const MAX_RESPONSE_CHARS = 8000;
 
 export function validateRequest(body: Partial<GradeRequest>): string | null {
   if (!body.response || body.response.trim().length < 20) {

@@ -3,6 +3,10 @@
   "title": "6.13.12 Plain English to Pseudocode: The Slingshot",
   "description": "Turn the plain-English rules of a slingshot into pseudocode: grab, stretch and release, guarded by one variable, with the force applied in exactly one frame.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.13 Joints",

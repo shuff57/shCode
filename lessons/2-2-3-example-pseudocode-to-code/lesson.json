@@ -2,6 +2,10 @@
   "id": "2-2-3-example-pseudocode-to-code",
   "title": "2.2.5 Worked Example: Pseudocode → code",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",

@@ -3,6 +3,10 @@
   "title": "1.3.21 Module 1.3 Quiz",
   "description": "Nine multiple-choice questions on naming, comments, documentation and READMEs. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.3 Documentation and Coding Conventions",

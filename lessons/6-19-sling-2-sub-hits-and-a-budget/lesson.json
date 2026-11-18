@@ -3,6 +3,10 @@
   "title": "6.19.2 Sub-build: Hits and a budget",
   "description": "One shot, one block, two hits. Take one off per shot and let the shot leave.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.19 Sling: hits and a budget",

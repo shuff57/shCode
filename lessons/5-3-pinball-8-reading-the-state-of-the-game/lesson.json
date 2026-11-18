@@ -3,6 +3,10 @@
   "title": "5.5.1 Reading: The state of the game",
   "description": "A round is either playing or over, and one flag holds which. Shows the losing condition as a position test, how draw() branches on the flag, and everything a restart has to put back — including the ball's velocity.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.5 Pinball: lose and start again",

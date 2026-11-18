@@ -3,6 +3,10 @@
   "title": "1.1.7 Classify the Task",
   "description": "Read each task from a school-lunch app and log which of the four phases it belongs to. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.1 Software Lifecycle",
@@ -108,6 +112,14 @@
         "description": "Logs the correct phase for putting the finished app in the app store. Help: 1.1.6 (The Four Phases)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Menu code is construction: Logs the correct phase for writing the code that shows the menu. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "School choice is inception: Logs the correct phase for deciding which schools the app will serve. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "App structure is elaboration: Logs the correct phase for drawing the overall structure of the app. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "App store release is deployment: Logs the correct phase for putting the finished app in the app store. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   }
 }

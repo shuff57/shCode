@@ -3,6 +3,10 @@
   "title": "6.1.4 Lab: The aim line on the table",
   "description": "Put the aim line on a table with rails, so the line is the shot you are about to take.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.1 Pocket: plan and the aim line",

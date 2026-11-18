@@ -3,6 +3,10 @@
   "title": "2.5.6 Wrap Only What Can Fail",
   "description": "Rewrite a try that wraps too much so the total still prints even when the risky line fails. Auto-graded.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",
@@ -68,6 +72,12 @@
         "description": "The total is logged after the catch block, not inside the try. Help: 2.5.4 (try...catch: Attempt and Recover)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "for loop present: The loop that computes the total is still in the file. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "loop runs before try; total logged after catch: The total is logged after the catch block, not inside the try. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

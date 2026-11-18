@@ -3,6 +3,10 @@
   "title": "6.5.1 Playtest and reflect: Pocket",
   "description": "Play your Pocket at least three times, find one thing that surprised you, link it to your code and choose one change. AI-graded with hints.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.5 Pocket: playtest and extend",

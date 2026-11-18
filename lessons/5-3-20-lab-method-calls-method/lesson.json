@@ -3,6 +3,10 @@
   "title": "7.2.6 Lab: A method calling this.otherMethod()",
   "description": "Write `Counter.bigStep()` which calls `this.addBy(5)` and returns `this.isHigh()`: one method dispatching another on the same instance.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.2 Writing Your Own Classes",

@@ -3,6 +3,10 @@
   "title": "6.1.3 Sub-build: An aim line",
   "description": "A ball, a pointer and a line. The smallest possible aim, before there is a table.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.1 Pocket: plan and the aim line",

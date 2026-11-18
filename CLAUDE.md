@@ -237,6 +237,8 @@ Cloudflare dashboard env vars pane (plain vars):
 | `GRADE_WRITTEN_DAILY_LIMIT` | var (optional) | Per-student daily submission cap for `POST /api/grade-written`; default `100` (was 30; two students hit 30 on 2026-10-29). Teachers/admins are exempt. `GET /api/grade-written` returns `quota {limit, used, remaining}` for a student and `components/GradeQuotaNote.tsx` shows it beside the attempt banner, so the cap is never a surprise. A dashboard value of this var overrides the default. A runaway-cost stop, not a pedagogical one — the course allows unlimited retries, so raise it rather than let a student hit it. |
 | `GRADE_WRITTEN_GLOBAL_DAILY_LIMIT` | var (optional) | GLOBAL per-deploy daily ceiling for `POST /api/grade-written`; default `10000`. Same backstop as `AI_HELP_GLOBAL_DAILY_LIMIT`, for the grader. |
 | `GRADE_WRITTEN_WORKERS_MODEL` | var (optional) | Workers AI model id for every AI call (grader, Check, tutor); default `@cf/google/gemma-4-26b-a4b-it`. Only read when the `AI` binding exists. |
+| `CLEF_CHECK_DAILY_LIMIT` | var (optional) | Per-student daily cap on the fast Check (`POST /api/clef-check`); default `400`. Its own bucket, so it never spends the grade-written allowance. Over it the browser quietly runs the slow Check instead. Teachers/admins exempt. |
+| `CLEF_CHECK_GLOBAL_DAILY_LIMIT` | var (optional) | Deploy-wide daily ceiling on fast Checks; default `40000` (about $20 a day at the measured cost). |
 | `OPENROUTER_API_KEY` | secret | Bearer key for `POST /api/p5play-convert` only (OpenRouter). Unset = that route answers 503 "not set up"; nothing else uses it. |
 | `P5PLAY_CONVERT_MODEL` | var (optional) | OpenRouter model id for the converter; default `deepseek/deepseek-v4.1-flash`. |
 | `P5PLAY_CONVERT_DAILY_LIMIT` | var (optional) | Conversions per person per UTC day; default `20`. Teachers/admins exempt. |
@@ -322,7 +324,8 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   `reason: 'enrollment' | 'tries' | 'not-released'`; a spent but unreleased capped
   quiz still returns the student's totals with `answersWithheld` and no key. Rules in
   `lib/solution-release-core.ts`, reads in `functions/_shared/solutionRelease.ts`.
-- **The grade is "so far", and there is ONE rule.** `studentGrading()` in `functions/_shared/grading.ts` is
+- **The grade is "so far", and there is ONE rule.** (What counts and what is "missing" change under grading
+  v2, behind one switch: see "Grading v2 and lesson.json `work`".) `studentGrading()` in `functions/_shared/grading.ts` is
   the only place a course grade is computed (teacher roster, student drawer, and `GET /api/my-gradebook`'s
   `grades`, one per class the student is in, each under that class's due dates, waivers and weights). A graded
   lesson counts when it is done, or when its class due date has passed and it is not done and not waived;
@@ -1554,6 +1557,120 @@ rubric and prompt are read by lesson id and the route's quota applies (shared wi
 The prompt and rubric text do ship to the browser (nothing redacts a formative lab); that is fine for a
 0-point practice check. Editing the file clears the AI's marks.
 Submit records the cards as shown, which is why an edit resets them; the summary, the hints and each red card's note stay as a note labelled "From your last Check" (`staleAiNote`, #68). Tests: `scripts/test-ai-check.mjs`.
+
+## Grading v2 and lesson.json `work` (2026-11-18; built, switched OFF)
+
+Owner's decisions: **everything a student makes is graded**; code is all-or-nothing; plans and text-box
+answers pass at **70%** (a partly met card or criterion counts half) and the gradebook keeps the score;
+quizzes stay a plain percent; practice a student had already skipped is not held against them.
+
+- **`work` on every lesson.json** (`lib/lesson-work.ts`): `{ kind: read | quiz | code | model | plan | written,
+  graded, why? }`. `type: "assignment"` never meant graded and `preview` names a page and a runner at once,
+  so neither could carry it. `generate-lessons-manifest.mjs` refuses a lesson whose kind disagrees with how it
+  is built (`workKindOf`), or whose `graded` differs from its kind's default without a `why` (the four 4.1
+  readings: the Q1 module counts every lesson). The manifest carries `kind` and `graded`.
+- **One switch, `GRADING_V2_FROM` in `lib/grading-v2.ts`, `null` = off**: every rule below then behaves exactly
+  as before, so this ships before it applies. Read by `lessonGradeCategory` (on: `work.graded` decides whether
+  a lesson counts, the module still decides the role; the old rule is `legacyGradeCategory`), `countsAsMissing`
+  / `predatesV2` (the ONE "missing" rule: `studentGrading`, my-gradebook, past-due, and both gradebooks'
+  `buildCell` `exempt`), `isPassingGrade` (text answers: `criteriaScore / n >= 0.7`, before: half met-or-partial),
+  `cardsPass` / `reportFromRequirements` (a `plan` lab: 70% of cards, partial half, required cards green; it
+  records its card score), and `lessonScoreFields` / `app/page.tsx maxScoreFor` (a plan's maxScore = card count).
+- **Skipped practice:** a lesson graded only because of v2 (`newlyGraded`), due before the stamp and not done,
+  is neither missing nor late for that student. Finishing it still counts; everything due after the stamp counts.
+- **Go-live, in order:** `node --import ./scripts/register-ts.mjs scripts/grading-v2-impact.mjs` (read-only:
+  every live class's grades with the switch off and on); `scripts/stamp-grading-v2.mjs --set-now` and commit;
+  `scripts/backfill-v2-plan-scores.mjs --emit-sql f.sql`, review, apply (plans finished before v2 stored 0 and
+  needed every card green, so they go to full marks; without it they read 0%); then deploy. Never move the stamp.
+- Measured 2026-11-18 on the live class (29 students): graded lessons 149 -> 475, no grade goes down, median +1
+  point, largest +8; the median student's missing count stays 6. 20 plan labs, 337 finished rows to backfill.
+- Tests: `scripts/test-grading-v2.mjs` (npm test; both switch positions; three safeguards mutation-checked).
+
+## Fast Check: Clef decides the cards (`aiCheck.clef`, 2026-11-18)
+
+A lab whose `aiCheck` carries `clef: { questions: { <requirement id>: "<one yes/no question>" } }` (optional
+`task`, else cut from the aiCheck prompt before "You cannot run their code") gets a two-step Check
+(`lib/clef-check-core.ts`, the rules; `functions/api/clef-check.ts`, the route; `runFastCheck` in
+`components/LessonWorkspace.tsx`):
+1. **Colours in about half a second.** `POST /api/clef-check {lessonId, response}` asks Clef
+   (`@cf/cloudflare/clef`, Workers AI, a decision model: one probability per question, no words, the same
+   answer every time) and bands each card: p >= 0.85 green, <= 0.15 red, between **unsure**. The browser
+   decides an unsure card with the lab's own pattern check (`grade()`) on the same files. Questions, task
+   and model come from `ai-graders.generated.ts` (`config.clef`), never the body, or the route is a free
+   model proxy. Own allowance bucket `clef-check` (env table). 503/404/429 all carry `offline: true`
+   and the browser then runs today's Check unchanged, so a student never sees the fast path fail.
+2. **Notes on demand** (owner's decision 2026-11-18). Check makes no AI call of its own: a red card
+   offers **Why?** (`explainCard`), which asks `/api/grade-written` with `onlyIds: [that card]`; the
+   server honours it only on a lesson with `config.clef`, not capped, not a chart, and only as a subset of
+   its own rubric (`onlyCards`). Its verdict NEVER changes a colour (`mergeClefNotes`): a note is kept
+   only where the AI agrees with the card, else the card keeps its hint / "It looks for" line. Measured
+   per call: Clef 21-38 neurons, gemma 27-43 for all cards, 22-30 for a few; so a Check costs about what
+   today's did, and "Why?" is the only extra spend. (An earlier note here said a Clef call was half a
+   gemma call; measured, they cost about the same.)
+
+Measured (spike 2026-11-18: three labs, synthetic fixtures plus 107 real
+submissions, two blind labellers who agreed on every cell both decided): Clef + band + pattern fallback
+scored 97.8 / 99.5 / 100% on 2.3.30 / 5.1.20 / 2.2.17 real work through the production path, against
+93.1 / 98.0 / 98.5% for the AI Check alone; colours 0.5-0.6 s in the browser against ~10 s; an all-green
+Check costs one Clef call (~$0.0005). **Questions must be written per card:** questions built from a
+card's own words scored 80.9% on 5.1.20 (its cards say "in draw()"; many students correctly use
+update(), which also runs every frame). Clef-flash was not repeatable; do not use it.
+
+Adding a lab: write `aiCheck.clef.questions` (one per card; only regex/inFunction cards, since an unsure
+answer falls back to the pattern check; the generator refuses anything else), run
+`generate-ai-graders.mjs`, then the gate:
+`cd scripts/clef-proxy && npx wrangler dev --port 8799` (local Workers AI proxy, never deployed), and
+`WORKERS_PROXY=http://localhost:8799 node --import ./scripts/register-ts.mjs scripts/clef-harness.mjs --lab <id> --fixtures scripts/clef-fixtures/<id>.json`.
+Add `--tolerance` to use the lab's ACCEPT / REJECT cases from `test-grader-tolerance.mjs` as fixtures
+(dumped through `TOLERANCE_CASES_OUT`; ACCEPT = every card green, REJECT = its named card red). It fails if
+the reference has a red card, the starter is green where its own pattern check is red (some cards are green
+on a starter by design: 1.1.3's "still present"), or a labelled fixture card is wrong.
+
+**Chapter 1 (2026-11-18): all 23 AI Check labs have questions**, gated with `--tolerance` (194 programs,
+629/629 labelled cards right, 14% of cards unsure). Then run against 463 real handed-in programs (every one
+was all green when handed in): a blind reviewer read every card Clef turned red. After rewriting the cards
+that caused false reds: 48 programs get a red card, 52 of the reviewer's 54 real catches are kept (an `=`
+instead of `===`, code inside a string, a placeholder left in, `.toLowerCase` without `()`), and 2 false
+reds remain (one where the lab's own regex agrees with Clef). **Lessons for writing questions:**
+- Clef answers every question of a lab in ONE request, so changing one question can move another card's
+  answer. Re-run the whole lab after any edit.
+- A generic "any names, spacing or style are fine" line breaks cards ABOUT names or spacing (it failed a
+  correct camelCase `favouriteColour`). Do not put it in a template.
+- "Code inside a string never runs" is right in general (it catches `typeof` written in quotes) but wrong for
+  a card about strings: say that `${...}` inside backticks is code, and that a single-quoted `${` is meant
+  to stay text.
+- Say "declared, then given its value on the same line or a later one": `let playerName` followed by
+  `playerName = "Alice"` was read as not declared with text.
+- Say what does NOT matter for the card ("whatever the names", "any number, however unrealistic"):
+  otherwise the task bleeds in (variables named `lol` failed "six variables"; an age of 7000 failed
+  "studentAge is a number").
+- Short, literal questions with an example beat long ones (`'${2024 + 1}'`, `numberNine + numberNineLarge`).
+- 1.2.16 "Use addition" (owner's decision): the rule is Step 1's, two number VARIABLES added; the card now says
+  so, and students who handed in `console.log(5 + 2)` before keep their pass. 1.3.19 r10: "mentions tax" (owner).
+
+**Chapters 2-3 (2026-11-18): all 139 AI Check labs have questions** (591 drafted from the card text, then fixed
+where a gate or real work disagreed). Gate: every lab passes `--tolerance` (now reading `test-grader-tolerance.mjs`
+AND `test-grader-tolerance-3x.mjs`) except 3.5.18's two "print inside a function nobody calls" cases, which its
+runtime card t2 refuses. Real work: 2,583 handed-in programs; a blind reviewer sampled 3 reds per card (285):
+before fixes 79% of Clef's reds were real gaps; after, 223 of 225 sampled real catches stay red and 5 of 57
+false reds remain. 381 programs (15%) get a red card, nearly all real gaps today's grading let through.
+- **Cards that run the code (`tests`) take no question**: Clef reads code, it does not run it. They keep their
+  last Run's result in the app (`runFastCheck` takes them from the pattern grader, never into the Clef verdicts),
+  and the harness does not score them. The generator requires a question on every regex/inFunction card only.
+- **The aiCheck prompt's task is often only Step 1** ("Write a for loop running from 1 to 20"). Clef and any
+  reviewer then miss what Step 2 asks (2.4.19 prints only the multiples of 3; one fix had accepted either
+  direction). Give such a lab an authored `aiCheck.clef.task`, and check a question against the REFERENCE.
+- Many cards name the reference's function or variable while the course accepts any name (the 3.x "renamed"
+  ACCEPT cases): say "any function name; the lesson's name is only a suggestion" and describe what it does.
+- Asking about the OUTPUT ("does it print ONLY 3, 6, 9...?") made Clef sure where asking about the structure
+  left it unsure and the lenient regex decided.
+- Clef does not trace calls: "a print inside a function nobody calls" needs a runtime card, not a question.
+- The harness now reads questions from lesson.json (not the generated file), so several labs can be edited and
+  tested at once; run `generate-ai-graders.mjs` before deploying.
+Fixtures are hand-written programs only; real student code never goes in the repo. The same
+`WORKERS_PROXY` makes the dev server run the real clef-check and grade-written handlers against Workers
+AI. Tests: `scripts/test-clef-check.mjs` (npm test). Deploy: nothing to apply (no migration; the `AI`
+binding already exists).
 
 ## AI grader
 

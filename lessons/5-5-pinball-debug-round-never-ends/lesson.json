@@ -3,6 +3,10 @@
   "title": "5.5.4 Debugging: The round that never ends",
   "description": "Two planted bugs. The ball falls into the pit, the word Game over appears, and the ball keeps falling anyway. Find both.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.5 Pinball: lose and start again",

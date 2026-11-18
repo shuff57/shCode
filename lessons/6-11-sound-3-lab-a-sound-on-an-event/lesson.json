@@ -3,6 +3,10 @@
   "title": "6.15.3 Lab: A sound on an event",
   "description": "Star catch makes no sound yet. Load two sounds once, in setup(), then play a chime for each star you catch and a low thud for each one you miss, each in the one place where its event happens once.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.15 Sound and Music",

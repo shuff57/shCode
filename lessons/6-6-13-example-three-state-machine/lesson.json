@@ -3,6 +3,10 @@
   "title": "6.11.13 Worked Example: Three-State Machine: Title, Play, Game Over",
   "description": "The complete beginner state machine: title screen → gameplay → game over → restart. The classic arcade loop.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.11 Game State Machines",

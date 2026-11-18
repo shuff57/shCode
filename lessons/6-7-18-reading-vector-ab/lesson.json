@@ -3,6 +3,10 @@
   "title": "6.13.8 Reading: Vector from A to B",
   "description": "Two numbers: dx and dy: encode the direction from one sprite to another. This is the math behind every force that points somewhere on purpose. Read this before 6.13.9 Worked Example: Launch a Sprite with applyForce.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 7,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.13 Joints",

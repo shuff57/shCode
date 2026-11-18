@@ -2,6 +2,10 @@
   "id": "2-3-21-example-fix-number-convert",
   "title": "2.3.21 Worked Example: Fix 2: Convert the Value with Number()",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The Switch Statement",

@@ -3,6 +3,10 @@
   "title": "7.7.3 Lab: Shoot them down",
   "description": "Shots fly straight through the enemies. Write hitEnemies: every shot against every enemy, a hit that removes the shot and takes 1 hp, and an enemy at 0 hp that scores its worth and leaves all three arrays.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 18,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.7 Defender: the hit loop",

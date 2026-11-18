@@ -3,6 +3,10 @@
   "title": "5.1.12 Video: The Frame Loop Explained",
   "description": "A 2-and-a-half-minute walkthrough of the frame loop: setup() runs once, draw() runs about 60 times a second, and a sprite moves because draw() changes its x a little each frame. Watch after Hello Sprite.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 3,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

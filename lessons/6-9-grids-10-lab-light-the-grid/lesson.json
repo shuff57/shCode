@@ -3,6 +3,10 @@
   "title": "6.14.10 Lab: Light the grid",
   "description": "An 8 by 8 grid of lights kept as data. The starter has the canvas, the draw loop and the words, and every function you need is there but empty. Build the grid, draw it from the data, flip a cell on a click, and count the lit cells.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.14 Grids and Tile Maps",

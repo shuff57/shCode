@@ -3,6 +3,10 @@
   "title": "7.1.16 Your Turn: Fill in a Constructor",
   "description": "Low-stakes autograded practice. The class shell is given; you write the constructor body that stores three arguments on this, then build two instances with different values. Follows 7.1.15 (Worked Example: Sprite Showcase) and comes before the Enemy class in 7.2.11.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.1 Classes and Instances",

@@ -3,6 +3,10 @@
   "title": "7.2.17 Read the Charts: Three Variables or Three Objects",
   "description": "The same feature drawn twice, procedural and object-oriented. No drawing: read both and answer what happens when a fourth enemy arrives.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.2 Writing Your Own Classes",

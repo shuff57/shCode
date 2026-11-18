@@ -3,6 +3,10 @@
   "title": "6.17.3 Worked Example: Release, launch, clean up",
   "description": "The launch with the sweep already in it: three shots, then the list stays empty as they leave.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.17 Sling: launch",

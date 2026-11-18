@@ -3,6 +3,10 @@
   "title": "3.6.15 Writeup: Pass by Value vs Reference",
   "description": "Explain pass by value and pass by reference in your own words, give one example of each, and describe a bug that could happen if you forget the difference.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.6 Functions: Pass by Value/Reference",

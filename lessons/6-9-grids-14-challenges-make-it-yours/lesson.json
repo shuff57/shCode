@@ -3,6 +3,10 @@
   "title": "6.14.14 Challenges: Make it yours",
   "description": "The brick wall is complete. Change one rule of your own: points by row, two-hit bricks, or a wall read from rows of text. Pick one; add an idea of your own on top if you like.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 30,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.14 Grids and Tile Maps",

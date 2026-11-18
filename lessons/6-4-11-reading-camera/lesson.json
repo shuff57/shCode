@@ -3,6 +3,10 @@
   "title": "6.9.11 Reading: moSHion docs: Camera",
   "description": "moshion docs chapter on Camera. Read before `6.9.16 Worked Example: Camera Follow`.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.9 Animated Sprites and Camera",

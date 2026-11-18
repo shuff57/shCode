@@ -3,6 +3,10 @@
   "title": "2.7.1 Individual PA Part 1: Concepts and Traces",
   "description": "Eight questions: three on the ideas of Chapter 2, five where you read a short program and say what it prints. Three tries: you see your total after each one, your best try counts, and the marking appears after the last.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 16,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.7 Chapter 2 Individual Performance Assessment",

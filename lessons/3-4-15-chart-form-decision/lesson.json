@@ -3,6 +3,10 @@
   "title": "3.4.15 Plain English to Pseudocode: Decision Tree for Form Choice",
   "description": "Turn the rule for choosing a function form into pseudocode: is it a main operation called from several places, and if not, is its body a single expression?",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.4 Function Expressions and Arrow Functions",
@@ -151,6 +155,17 @@
         "description": "The steps say that a longer body is written as an arrow with a block body and an explicit return.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "Asks if it is called from several places: Ask whether the function is a main operation called from several places.",
+        "r3": "Asks if the body is a single expression: Ask whether the function body is a single expression.",
+        "r4": "A declaration for the main operation: Write a function declaration for the main operation.",
+        "r5": "A one-line arrow for a single expression: Write a one-line arrow with an implicit return when the body is a single expression.",
+        "r6": "A block-body arrow for the rest: Write an arrow with a block body and an explicit return for everything else."
+      },
+      "task": "The student was given a four-step plain-English rule for choosing how to write a function and rewrote it as numbered pseudocode in README.md, between a first line and a last line that were already there. The rule: read in the job of the function; if it is a main operation called from several places, write a function declaration; otherwise, if its body is a single expression, write a one-line arrow with an implicit return; otherwise write an arrow with a block body and an explicit return."
+    }
   }
 }

@@ -3,6 +3,10 @@
   "title": "7.20.2 Sub-build: Send an action",
   "description": "H hosts, JOIN joins, and 1, 2 or 3 sends that action: every action, yours too, arrives in onMove and is listed on both computers with the seat that sent it.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.20 Quest: duel online",

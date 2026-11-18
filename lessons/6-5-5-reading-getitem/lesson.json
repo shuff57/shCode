@@ -3,6 +3,10 @@
   "title": "6.10.5 Reading: getItem: Load Saved Data",
   "description": "How getItem(key) reads back a value your game saved earlier, as the same type you saved. What to do when nothing was saved yet, and when you still get text, is in 6.10.6.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.10 Save and Load",

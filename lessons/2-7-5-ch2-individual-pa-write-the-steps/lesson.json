@@ -3,6 +3,10 @@
   "title": "2.7.5 Individual PA Part 5: Write the Steps",
   "description": "One problem, pick one of three, write the JavaScript it describes: a nested loop, a branch, a break or continue, a guard. Three attempts, no Run button.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.7 Chapter 2 Individual Performance Assessment",

@@ -3,6 +3,10 @@
   "title": "6.12.4 Reading: moSHion docs: mouse.pressing()",
   "description": "mouse.pressing() is true every frame the mouse button is held down. Read this before 6.12.5 so you understand the held vs. one-shot difference.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.12 Advanced Input",

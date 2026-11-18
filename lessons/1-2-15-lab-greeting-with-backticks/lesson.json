@@ -3,6 +3,10 @@
   "title": "1.2.15 Greeting with Backticks",
   "description": "Build a greeting with a template literal, then prove single quotes cannot do the same job. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",
@@ -108,6 +112,14 @@
         "description": "Logs a single-quoted string containing a literal ${ so the difference is visible. Help: 1.2.13 (Embedding Values with ${...})",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "myName is declared: Declares a variable called myName. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "A backtick string embeds myName: Uses a template literal containing ${myName}. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "A calculation is embedded: Embeds an expression containing an operator, such as ${2024 + 1}. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "Is there a console.log whose argument is a string written in SINGLE quotes (' ') that has the two characters ${ inside it? For example console.log('${2024 + 1}') counts. Code inside comments never runs."
+      }
+    }
   }
 }

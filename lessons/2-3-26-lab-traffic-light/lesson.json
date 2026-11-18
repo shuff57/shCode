@@ -3,6 +3,10 @@
   "title": "2.3.26 Rewrite the Traffic Light as a Switch",
   "description": "Rewrite an if/else-if chain that checks a traffic light color as an equivalent switch statement. Auto-graded.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The Switch Statement",
@@ -135,6 +139,16 @@
         "description": "Code contains three break statements, one for each of the green, yellow and red cases. Help: 2.3.3 (switch Statements)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "switch statement present: Code contains a switch statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Does the switch have a case 'green': label (single or double quotes) whose first statement is a console.log, like case 'green': console.log('Go');, or that sets a variable which is logged after the switch? This card is about how the green case is written, not about which case runs for the value light holds right now. Code inside comments never runs.",
+        "r3": "case 'yellow' present: case 'yellow' is directly followed by a console.log call, or sets the message variable that is logged after the switch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "case 'red' present: case 'red' is directly followed by a console.log call, or sets the message variable that is logged after the switch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "default label present: The default label is directly followed by a console.log call, or sets the message variable that is logged after the switch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "three breaks, one per case: Code contains three break statements, one for each of the green, yellow and red cases, with or without a semicolon after each break. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

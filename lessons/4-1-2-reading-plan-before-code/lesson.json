@@ -3,6 +3,11 @@
   "title": "4.1.2 Reading: Plan Before You Code",
   "description": "Write the steps as comments first, then fill in the code underneath. Read before the Q1 Synthesis Project.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": true,
+    "why": "Module 4.1 is the Q1 synthesis project: every lesson in it counts (lib/grading-weights.ts Q1_MODULE)."
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "4.1 Q1 Synthesis Project",

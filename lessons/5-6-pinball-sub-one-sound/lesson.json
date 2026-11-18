@@ -3,6 +3,10 @@
   "title": "5.6.2 Sub-build: One key, one sound",
   "description": "A key press plays one sound. Load it once, play it where the event happens, and hear the difference between once and every frame.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.6 Pinball: a sound on a hit",

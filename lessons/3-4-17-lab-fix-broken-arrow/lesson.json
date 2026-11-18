@@ -3,6 +3,10 @@
   "title": "3.4.17 Lab: Fix a Broken Arrow",
   "description": "A two-parameter arrow function was written without the parentheses around its parameters, so the line will not parse. Fix it. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.4.6",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -165,6 +169,13 @@
         "description": "area(3, 4) is 12 and area(5, 6) is 30. Help: 3.4.8 (Shorthand Rules)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Parameters wrapped in parentheses: An arrow function is written with parentheses around its parameter list. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Two parameters inside the parentheses: The parenthesised parameter list holds two comma-separated parameters. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "area is an arrow with two parameters: area itself is a const holding an arrow with two parameters in parentheses. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

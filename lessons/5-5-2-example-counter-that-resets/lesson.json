@@ -3,6 +3,10 @@
   "title": "7.3.2 Worked Example: The counter that resets",
   "description": "A tick() method that declares `let n = 0` and writes it out again, so the number on screen never moves. Then the one-line fix: change `this.n` directly.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.3 Inside a Class",

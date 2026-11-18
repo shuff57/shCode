@@ -2,6 +2,10 @@
   "id": "1-1-14-example-task-set-loop",
   "title": "1.1.14 Worked Example: Task Set for a Loop Bug",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.1 Software Lifecycle",

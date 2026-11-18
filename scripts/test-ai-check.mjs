@@ -166,7 +166,9 @@ if (typeof canSubmitMoshion === 'function' && typeof moshionRunStep === 'functio
   const handler = lw.slice(lw.indexOf("data.source === 'preview-status'"), lw.indexOf('setRuntimeError(err.hint'));
   check(/if \(fromLabFrame\) setMoshionRun\(\(r\) => moshionRunStep\(r, \{ type: 'came-up' \}\)\)/.test(handler), "LessonWorkspace: only the lab's own frame's preview-status counts as a clean run");
   check(/if \(isMoshionRef\.current && !fromLabFrame\) return;\s*(\/\/[^\n]*\s*)*setMoshionRun\(\(r\) => moshionRunStep\(r, \{ type: 'error' \}\)\)/.test(handler), "LessonWorkspace: a preview-error from the lab's frame clears the clean-run record");
-  check(/canSubmitMoshion\(\{ cardsOk: allRequirementsPassed, run: moshionRun, currentText: moshionText, expectsRuntimeError \}\)/.test(lw), 'LessonWorkspace: a moSHion lab gates Submit on canSubmitMoshion');
+  check(/canSubmitMoshion\(\{ cardsOk, run: moshionRun, currentText: moshionText, expectsRuntimeError \}\)/.test(lw), 'LessonWorkspace: a moSHion lab gates Submit on canSubmitMoshion');
+  // cardsOk is the one card rule (lib/grade-pass.ts cardsPass): every card green for code, 70% for a v2 plan.
+  check(/const cardsOk = cardsPass\(requirements, workKind\);/.test(lw), 'LessonWorkspace: the card gate is cardsPass(requirements, lesson.work.kind)');
   const ai = lw.slice(lw.indexOf('const runAiCheck = async'), lw.indexOf('runAiCheckRef.current = runAiCheck'));
   check(!/runQ5|setMoshionRun/.test(ai.split('fallBackToPatternCheck(')[0]), 'LessonWorkspace: Check\'s AI path neither runs nor touches the run record');
   check(/const text = aiText\(useLessonStore\.getState\(\)\.fileContents\)/.test(ai), 'LessonWorkspace: Check reads the store\'s text (no stale closure)');

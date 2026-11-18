@@ -3,6 +3,10 @@
   "title": "2.6.3 Group PA Part 3: Demo It",
   "description": "The writeup that goes with the live demo: who did what, three test cases, and where all five of Chapter 2's sections show up in your program. AI-graded with hints.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.6 Chapter 2 Group Performance Assessment",

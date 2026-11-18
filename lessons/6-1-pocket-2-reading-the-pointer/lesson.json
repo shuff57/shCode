@@ -3,6 +3,10 @@
   "title": "6.1.2 Reading: The pointer: press, hold, let go",
   "description": "Mouse and key input have the same three moments: a press on one frame, a hold on every frame, and a release on one frame.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.1 Pocket: plan and the aim line",

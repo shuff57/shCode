@@ -3,6 +3,10 @@
   "title": "6.11.22 Worked Example: Win Screen State",
   "description": "A win screen shows when the player reaches the goal. It's a distinct state with congratulations, final stats, and a 'Play Again?' option.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.11 Game State Machines",

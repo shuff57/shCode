@@ -3,6 +3,10 @@
   "title": "7.1.14 Your Turn: Build a Sprite",
   "description": "Low-stakes autograded practice. Instantiate the Sprite class twice (rectangle form and circle form), set properties on each instance, and give one sprite a stroke. Bridges the 7.1.7 / 7.1.13 worked examples and the 7.2.11 Enemy class worked example.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.1 Classes and Instances",

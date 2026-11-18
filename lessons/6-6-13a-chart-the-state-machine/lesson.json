@@ -3,6 +3,10 @@
   "title": "6.11.14 Plain English to Pseudocode: The Three-State Machine",
   "description": "Turn the plain-English rules of a three-state game into pseudocode: route by state, draw first, then ask whether to change state.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.11 Game State Machines",

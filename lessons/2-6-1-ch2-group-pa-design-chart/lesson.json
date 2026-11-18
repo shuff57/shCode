@@ -3,6 +3,10 @@
   "title": "2.6.1 Group PA Part 1: Design the Plan",
   "description": "Pick one of four problems with your partner and write the plan for it in pseudocode: the loop that walks the input, the skip or the stop the problem forces, a three-way classification and a guard against bad input. The build lesson does not open until this one does.",
   "type": "assignment",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.6 Chapter 2 Group Performance Assessment",

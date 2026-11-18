@@ -3,6 +3,10 @@
   "title": "1.1.22 Describe the Lifecycle",
   "description": "Describe the four framework activities, walk a real product through them, and map them onto the five-phase naming. AI-graded with hints.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 50,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.1 Software Lifecycle",

@@ -3,6 +3,10 @@
   "title": "6.22.3 Sub-build: A path from a list",
   "description": "Six squares in a list, one loop, one number on each. The picture is drawn from the data.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.22 Trail: plan and the path",

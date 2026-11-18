@@ -3,6 +3,10 @@
   "title": "3.7.8 Lab: Extract a Sub-List with `.slice()`",
   "description": "Create an array, copy a middle range and a run to the end with .slice(), then show the original is unchanged. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.7.3",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -279,6 +283,13 @@
         "description": "When items holds other values, middle and tail change with it, and console.log calls that run print both slices. Help: 3.7.6 (Taking Part of a List with .slice())",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Array declared: Declares an array with square brackets. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Two .slice() calls: Calls .slice() at least twice. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

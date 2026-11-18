@@ -1,0 +1,101 @@
+[
+ {
+  "name": "smuggle: whole program inside a console.log string",
+  "code": "console.log(\"for (let i = 1; i <= 5; i++) { console.log(i); } let total = 0; let n = 1; while (n <= 5) { total += n; n++; }\");",
+  "labels": [
+   0,
+   0,
+   1,
+   0,
+   0
+  ]
+ },
+ {
+  "name": "honest: for...of over an array, while with +=",
+  "code": "const scores = [3, 8, 5];\n// print each score\nfor (const s of scores) {\n  console.log('score', s);\n}\n// add 1 to 5 together\nlet sum = 0;\nlet k = 1;\nwhile (k <= 5) {\n  sum += k;\n  k++;\n}\nconsole.log(`sum is ${sum}`);",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ {
+  "name": "honest: countdown for, while adds prices until over budget",
+  "code": "for (let t = 5; t > 0; t--) {\n  console.log(t + '...');\n}\nlet spent = 0;\nlet price = 4;\nwhile (spent + price <= 20) {\n  spent = spent + price;\n  price = price + 1;\n}\nconsole.log('Spent', spent);",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ {
+  "name": "wrong: for loop logs only after the loop",
+  "code": "let evens = 0;\nfor (let i = 0; i < 10; i++) {\n  if (i % 2 === 0) evens++;\n}\nconsole.log(evens);\nlet total = 0;\nlet n = 1;\nwhile (n <= 10) {\n  total += n;\n  n++;\n}\nconsole.log(total);",
+  "labels": [
+   1,
+   1,
+   1,
+   0,
+   1
+  ]
+ },
+ {
+  "name": "wrong: two for loops, no while",
+  "code": "for (let i = 1; i <= 5; i++) {\n  console.log(i);\n}\nlet total = 0;\nfor (let n = 1; n <= 10; n++) {\n  total += n;\n}\nconsole.log(total);",
+  "labels": [
+   1,
+   0,
+   1,
+   1,
+   0
+  ]
+ },
+ {
+  "name": "wrong: while only steps its counter",
+  "code": "for (let i = 1; i <= 5; i++) {\n  console.log(i);\n}\nlet count = 0;\nwhile (count < 10) {\n  count++;\n}\nconsole.log(count);",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   0
+  ]
+ },
+ {
+  "name": "wrong: the total is added after the while loop",
+  "code": "for (let i = 1; i <= 3; i++) {\n  console.log('pass ' + i);\n}\nlet total = 0;\nlet n = 1;\nwhile (n <= 4) {\n  n = n + 1;\n}\ntotal = total + n;\nconsole.log(total);",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   0
+  ]
+ },
+ {
+  "name": "game: loops written only in comments",
+  "code": "// for (let i = 1; i <= 5; i++) { console.log(i) }\n// let total = 0; while (n <= 5) { total += n; n++ }\nconsole.log(1, 2, 3, 4, 5);\nconsole.log('total', 15);",
+  "labels": [
+   0,
+   0,
+   1,
+   0,
+   0
+  ]
+ },
+ {
+  "name": "game: while (false) holding the total",
+  "code": "for (let i = 1; i <= 5; i++) {\n  console.log(i);\n}\nlet total = 0;\nwhile (false) {\n  total += 1;\n}\nconsole.log(total);",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   null
+  ]
+ }
+]

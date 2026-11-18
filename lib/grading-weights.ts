@@ -12,6 +12,8 @@
 // numbered title, same as parseNumberedId in LessonSearchFilter.tsx),
 // preview, scoreKind and assignmentCode.
 
+import { GRADING_V2_FROM, gradingV2On } from './grading-v2';
+
 export type GradeCategory =
   | 'lab'
   | 'group'
@@ -86,14 +88,57 @@ export interface CategorizableLesson {
   preview?: string | null;
   scoreKind?: 'quiz' | 'written' | null;
   assignmentCode?: string | null;
+  /** lesson.json `work.graded`, carried by the manifest as `graded` (lib/lesson-work.ts). Read only
+   *  once grading v2 is switched on (lib/grading-v2.ts); absent = the rule from before v2. */
+  graded?: boolean | null;
+  work?: { graded?: boolean } | null;
 }
+
+const authoredGraded = (l: CategorizableLesson): boolean | null =>
+  typeof l.graded === 'boolean' ? l.graded : typeof l.work?.graded === 'boolean' ? l.work.graded : null;
 
 // Module id wins over preview/scoreKind/assignmentCode: a chapter test's own
 // parts still carry preview:"quiz" or an aiGrader on some parts, and the Q1
 // design chart (A4.1.0) still carries an assignmentCode -- checking those
 // first would misclassify them as plain Quiz/Written/Lab instead of the
 // test/synthesis they're actually part of.
-export function lessonGradeCategory(l: CategorizableLesson): GradeCategory | null {
+/**
+ * Whether a lesson counts toward the grade, and in which role. Before grading v2 it is read off the
+ * module, the preview, the rubric points and the assignmentCode (legacyGradeCategory). With v2 on, the
+ * lesson's own `work.graded` decides whether it counts; the module still decides the role.
+ */
+export function lessonGradeCategory(l: CategorizableLesson, v2From: number | null = GRADING_V2_FROM): GradeCategory | null {
+  const legacy = legacyGradeCategory(l);
+  const graded = authoredGraded(l);
+  if (!gradingV2On(v2From) || graded === null) return legacy;
+  if (!graded) return null;
+  return legacy ?? 'lab';
+}
+
+/** Graded only because of v2: its skipped past-due work from before the switch is not counted (countsAsMissing). */
+export function newlyGraded(l: CategorizableLesson, v2From: number | null = GRADING_V2_FROM): boolean {
+  return gradingV2On(v2From) && authoredGraded(l) === true && legacyGradeCategory(l) === null;
+}
+
+/**
+ * Does an unfinished, unwaived lesson count as missing (a 0) at `now`? Its due date has passed, and it
+ * is not v2 practice that was already past due when v2 was switched on (owner's decision 2026-11-18:
+ * practice a student skipped before the rules changed is not held against them; everything due after
+ * the switch counts). The ONE rule for "missing": the grade, the student's gradebook, the past-due list
+ * and the teacher grid all ask this.
+ */
+export function countsAsMissing(l: CategorizableLesson, dueAt: number | null, now: number, v2From: number | null = GRADING_V2_FROM): boolean {
+  if (dueAt === null || dueAt > now) return false;
+  return !predatesV2(l, dueAt, v2From);
+}
+
+/** v2 practice whose due date passed before the switch: never missing, never late (lib/gradebook-cell.ts `exempt`). */
+export function predatesV2(l: CategorizableLesson, dueAt: number | null, v2From: number | null = GRADING_V2_FROM): boolean {
+  return dueAt !== null && newlyGraded(l, v2From) && dueAt < (v2From as number);
+}
+
+// The rule before grading v2: the module, a quiz, a points rubric or an assignmentCode made a lesson count.
+export function legacyGradeCategory(l: CategorizableLesson): GradeCategory | null {
   const moduleId = moduleIdFromTitle(l.title);
   if (moduleId === Q1_MODULE) return 'q1';
   if (moduleId === Q2_MODULE) return 'q2';

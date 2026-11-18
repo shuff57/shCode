@@ -3,6 +3,10 @@
   "title": "2.1.40 Print Settings Advisor",
   "description": "Given filament type and layer height, print a recommended print temperature using else if and logical operators. Auto-graded.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",
@@ -119,6 +123,15 @@
         "description": "a separate if condition compares layerHeight on both sides of && or ||",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "PLA branch logs 200: if condition checks filamentType === 'PLA' and logs 200 Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "PETG branch chains and logs 235: an else if condition checks filamentType === 'PETG' and logs 235 Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "In the chain of if / else if branches on filamentType, is there a branch whose condition compares filamentType with the text \"ABS\" (=== or ==) and that logs 250 (as a number or as the text \"250\")? The ABS branch may come first (the if) or later (an else if); the order of the branches does not matter. No if the condition uses a misspelled variable name instead of filamentType, or if it compares a number such as 250 and logs the word ABS: that is backwards. Code inside comments never runs.",
+        "r4": "Does the chain on filamentType end with a plain else (no condition) that logs a message saying the filament type is unknown, such as \"Unknown filament type\"? Capital letters and extra punctuation do not matter: \"unknown filament type!\" counts. No if there is no chain on filamentType, no final else, or the else logs something else. Code inside comments never runs.",
+        "r5": "separate if warns on layerHeight range: a separate if condition compares layerHeight on both sides of && or || Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

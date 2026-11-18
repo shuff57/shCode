@@ -3,6 +3,10 @@
   "title": "1.5.23 Spot the Broken Pseudocode",
   "description": "Five multiple-choice questions on reading a broken plan, indentation, and why nothing running it is the point. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",

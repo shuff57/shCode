@@ -3,6 +3,10 @@
   "title": "2.2.6 Plain English to Pseudocode: Largest of Three",
   "description": "Turn the largest-of-three algorithm into pseudocode: two checks in a row, each one a question, with the no answer still carrying on to the next step.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",
@@ -150,6 +154,17 @@
         "description": "largest is printed by a step that comes after the final END IF (outside every check), once. Judge this card only by where the print sits relative to the last END IF; ignore whether earlier checks were nested.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "largest starts as a: Set largest to a before any check.",
+        "r3": "First check: b against largest: Check whether b is greater than largest and, if so, set largest to b.",
+        "r4": "Second check: c against largest: Check whether c is greater than largest (not than a) and, if so, set largest to c.",
+        "r5": "The no answer carries on: The first check is closed (END IF) before the second check begins, so the second one runs whichever way the first went.",
+        "r6": "Print after both checks: largest is printed once, after the last check has finished."
+      },
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: let largest = a; if (b > largest) { largest = b; } if (c > largest) { largest = c; } console.log(\"Largest:\", largest). The point: two separate checks one after the other, each compared with largest (the winner so far, never with a); the second check is NOT inside the first and is NOT an else-if, so it runs even when the first answer was no; largest is printed once, after both checks."
+    }
   }
 }

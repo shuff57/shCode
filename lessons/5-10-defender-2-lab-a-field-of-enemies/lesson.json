@@ -3,6 +3,10 @@
   "title": "7.6.2 Lab: A field of enemies",
   "description": "The drone is gone and enemies arrive on a beat, but nothing builds or moves them. Write spawnEnemy with one push per array, and the loop that makes enemies fall, land and leave all three arrays.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 18,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.6 Defender: many enemies",

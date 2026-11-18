@@ -3,6 +3,10 @@
   "title": "5.2.27 Video: update() Runs Before Physics",
   "description": "The frame order: update, physics, draw, paint, and why a velocity set in update() moves the sprite this frame. A 2-and-a-half-minute walkthrough of the next reading.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 3,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",

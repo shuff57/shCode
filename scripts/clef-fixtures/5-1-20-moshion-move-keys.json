@@ -1,0 +1,156 @@
+[
+ {
+  "name": "smuggle: reference printed as a string",
+  "code": "let player;\nfunction setup() {\n  console.log(`let player;\n\nfunction setup() {\n  new Canvas(400, 400);\n  player = new Sprite(200, 200, 40, 40);\n}\n\nfunction draw() {\n  background('#222');\n  if (kb.pressing('a')) player.vel.x = -4;\n  else if (kb.pressing('d')) player.vel.x = 4;\n  else player.vel.x = 0;\n  if (kb.pressing('w')) player.vel.y = -4;\n  else if (kb.pressing('s')) player.vel.y = 4;\n  else player.vel.y = 0;\n}`);\n}\nfunction draw() {\n}",
+  "labels": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ {
+  "name": "honest: arrow keys, braces, keys in update()",
+  "code": "let player;\nfunction setup() {\n  new Canvas(400, 400);\n  player = new Sprite(200, 200, 40, 40);\n}\nfunction update() {\n  if (kb.pressing('left')) {\n    player.vel.x = -3;\n  } else if (kb.pressing('right')) {\n    player.vel.x = 3;\n  } else {\n    player.vel.x = 0;\n  }\n  if (kb.pressing('up')) {\n    player.vel.y = -3;\n  } else if (kb.pressing('down')) {\n    player.vel.y = 3;\n  } else {\n    player.vel.y = 0;\n  }\n}\nfunction draw() {\n  background('navy');\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ {
+  "name": "honest: zero first, then two plain ifs, in a helper",
+  "code": "let hero;\nfunction setup() {\n  new Canvas(400, 400);\n  hero = new Sprite(200, 200, 30, 30);\n}\nfunction steer() {\n  hero.vel.x = 0;\n  hero.vel.y = 0;\n  if (kb.pressing('a')) hero.vel.x = -5;\n  if (kb.pressing('d')) hero.vel.x = 5;\n  if (kb.pressing('w')) hero.vel.y = -5;\n  if (kb.pressing('s')) hero.vel.y = 5;\n}\nfunction draw() {\n  background(30);\n  steer();\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ {
+  "name": "honest: ternaries",
+  "code": "let player;\nfunction setup() {\n  new Canvas(400, 400);\n  player = new Sprite(200, 200, 40, 40);\n}\nfunction draw() {\n  background('#111');\n  player.vel.x = kb.pressing('a') ? -4 : kb.pressing('d') ? 4 : 0;\n  player.vel.y = kb.pressing('w') ? -4 : kb.pressing('s') ? 4 : 0;\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ {
+  "name": "wrong: no else-to-zero (never stops)",
+  "code": "let player;\n\nfunction setup() {\n  new Canvas(400, 400);\n  player = new Sprite(200, 200, 40, 40);\n}\n\nfunction draw() {\n  background('#222');\n  if (kb.pressing('a')) player.vel.x = -4;\n  else if (kb.pressing('d')) player.vel.x = 4;\n  if (kb.pressing('w')) player.vel.y = -4;\n  else if (kb.pressing('s')) player.vel.y = 4;\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   0,
+   0,
+   1
+  ]
+ },
+ {
+  "name": "wrong: else under a second separate if",
+  "code": "let player;\n\nfunction setup() {\n  new Canvas(400, 400);\n  player = new Sprite(200, 200, 40, 40);\n}\n\nfunction draw() {\n  background('#222');\n  if (kb.pressing('a')) player.vel.x = -4;\n  if (kb.pressing('d')) player.vel.x = 4;\n  else player.vel.x = 0;\n  if (kb.pressing('w')) player.vel.y = -4;\n  if (kb.pressing('s')) player.vel.y = 4;\n  else player.vel.y = 0;\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   0,
+   0,
+   1
+  ]
+ },
+ {
+  "name": "wrong: keys read in setup() only",
+  "code": "let player;\nfunction setup() {\n  new Canvas(400, 400);\n  player = new Sprite(200, 200, 40, 40);\n  if (kb.pressing('a')) player.vel.x = -4;\n  else if (kb.pressing('d')) player.vel.x = 4;\n  else player.vel.x = 0;\n  if (kb.pressing('w')) player.vel.y = -4;\n  else if (kb.pressing('s')) player.vel.y = 4;\n  else player.vel.y = 0;\n}\nfunction draw() {\n  background('#222');\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   0,
+   0,
+   0,
+   0,
+   1
+  ]
+ },
+ {
+  "name": "wrong: background only in setup()",
+  "code": "let player;\n\nfunction setup() {\n  new Canvas(400, 400);\n  background('#222');\n  player = new Sprite(200, 200, 40, 40);\n}\n\nfunction draw() {\n  if (kb.pressing('a')) player.vel.x = -4;\n  else if (kb.pressing('d')) player.vel.x = 4;\n  else player.vel.x = 0;\n  if (kb.pressing('w')) player.vel.y = -4;\n  else if (kb.pressing('s')) player.vel.y = 4;\n  else player.vel.y = 0;\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   0
+  ]
+ },
+ {
+  "name": "wrong: sprite made in draw()",
+  "code": "let player;\n\nfunction setup() {\n  new Canvas(400, 400);\n}\n\nfunction draw() {\n  background('#222');\n  player = new Sprite(200, 200, 40, 40);\n  if (kb.pressing('a')) player.vel.x = -4;\n  else if (kb.pressing('d')) player.vel.x = 4;\n  else player.vel.x = 0;\n  if (kb.pressing('w')) player.vel.y = -4;\n  else if (kb.pressing('s')) player.vel.y = 4;\n  else player.vel.y = 0;\n}",
+  "labels": [
+   1,
+   1,
+   0,
+   1,
+   1,
+   null,
+   null,
+   1
+  ]
+ },
+ {
+  "name": "wrong: left and right only",
+  "code": "let player;\n\nfunction setup() {\n  new Canvas(400, 400);\n  player = new Sprite(200, 200, 40, 40);\n}\n\nfunction draw() {\n  background('#222');\n  if (kb.pressing('a')) player.vel.x = -4;\n  else if (kb.pressing('d')) player.vel.x = 4;\n  else player.vel.x = 0;\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   0,
+   1,
+   0,
+   1
+  ]
+ },
+ {
+  "name": "game: all the key code is in a comment",
+  "code": "let player;\n\nfunction setup() {\n  new Canvas(400, 400);\n  player = new Sprite(200, 200, 40, 40);\n}\n\nfunction draw() {\n  background('#222');\n  // if (kb.pressing('a')) player.vel.x = -4;\n  // else if (kb.pressing('d')) player.vel.x = 4;\n  // else player.vel.x = 0;\n  // if (kb.pressing('w')) player.vel.y = -4;\n  // else if (kb.pressing('s')) player.vel.y = 4;\n  // else player.vel.y = 0;\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   0,
+   0,
+   0,
+   0,
+   1
+  ]
+ }
+]

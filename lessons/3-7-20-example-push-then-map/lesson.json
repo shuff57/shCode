@@ -2,6 +2,10 @@
   "id": "3-7-20-example-push-then-map",
   "title": "3.7.20 Worked Example: Chaining `.map()` off a `.push()`-Built Array",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.7 Array Methods",

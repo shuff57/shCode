@@ -3,6 +3,10 @@
   "title": "7.13.3 Lab: Hit with the edges",
   "description": "The ball breaks bricks with its centre and sinks into them. Test its four edges instead, and send it back up-and-down or across depending on which edge hit.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.13 Breakout: bricks and edges",

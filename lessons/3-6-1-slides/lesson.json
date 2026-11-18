@@ -3,6 +3,10 @@
   "title": "3.6.1 Slides: Pass by Value/Reference",
   "description": "Unit 3.6 slides: what a function receives, mutating versus reassigning, side effects, and working on a copy.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.6 Functions: Pass by Value/Reference",

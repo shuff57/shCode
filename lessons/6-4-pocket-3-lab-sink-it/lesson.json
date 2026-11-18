@@ -3,6 +3,10 @@
   "title": "6.4.4 Lab: Sink it",
   "description": "The table with a pocket: a slow ball drops, a fast one rolls over, and the game says what happened.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.4 Pocket: the pocket",

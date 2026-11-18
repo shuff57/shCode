@@ -3,6 +3,10 @@
   "title": "2.4.1 Slides: Loop Control and Nested Loops",
   "description": "Unit 2.4 slides: loop control and nested loops.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

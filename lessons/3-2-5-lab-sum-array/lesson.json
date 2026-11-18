@@ -3,6 +3,10 @@
   "title": "3.3.12 Sum an Array",
   "description": "Use a for loop to add up all numbers in an array, then log the total. Auto-graded: the code runs and the total is checked.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",
@@ -145,6 +149,13 @@
         "description": "The output shows the total, 84. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "for loop present: Code contains a for loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "the loop adds to total: A for loop body adds each element to a running total (total += ..., or total = total + ...). Adding the same number every time, like total += 1, counts items instead of summing them. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

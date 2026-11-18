@@ -3,6 +3,10 @@
   "title": "7.12.5 Lab: Bounce",
   "description": "The ball moves by two speeds you control. Bounce it off three walls and the paddle, let the paddle steer it, and serve it again when it falls out.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.12 Breakout: plan, ball and paddle",

@@ -3,6 +3,10 @@
   "title": "2.6.2 Group PA Part 2: Build It",
   "description": "Turn the chart you just passed into a documented, loop-driven program. Eight checks, all of them things Chapter 2 taught. AI-graded: press Grade up to three times and your best counts. After your third try you can see how it is solved, once your teacher releases it.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 42,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.6 Chapter 2 Group Performance Assessment",

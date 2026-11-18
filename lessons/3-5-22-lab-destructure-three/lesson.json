@@ -3,6 +3,10 @@
   "title": "3.5.22 Lab: Destructure 3 Fields From an Object",
   "description": "Unpack three fields in one statement, use the bare names, and rewrite a function to destructure its parameter. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.5.7",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -178,6 +182,14 @@
         "description": "A console.log that actually runs prints a sentence using each of the three unpacked names; no printed line would say undefined. A print that never runs does not count.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Are at least three fields unpacked with a brace pattern from an object the program made earlier, for example const { name, age, city } = person? Unpacking from an object literal typed on that same line (const { a, b, c } = { a: 1, b: 2, c: 3 }) does not count. Code inside comments never runs.",
+        "r2": "Does a function have a brace pattern { ... } as its one parameter, for example function describe({ name, age }) or const show = ({ a, b }) => ...? (the lesson calls it describe) Any function name counts; the lesson's name is only a suggestion. Code inside comments never runs.",
+        "r3": "After the unpack, is each of the three names used on its own (no dot) in a printed sentence: a console.log of text built from them, or a variable built from them that is then printed? Printing typeof of the names does not count. A console.log inside a function counts only if that function is really called; naming it (typeof say) is not a call. Code inside comments never runs."
+      },
+      "task": "The student wrote JavaScript for a lab. You cannot run it: read it and judge what it WOULD do."
+    }
   }
 }

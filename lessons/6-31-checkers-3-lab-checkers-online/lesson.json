@@ -3,6 +3,10 @@
   "title": "6.31.3 Lab: Checkers online",
   "description": "Your checkers plays a classmate on another computer: a click sends four numbers, every move is checked by the same rule function and applied in onMove, and only the player whose turn it is may click.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.31 Checkers: play online",

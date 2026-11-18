@@ -3,6 +3,10 @@
   "title": "6.10.18 Worked Example: Delete and Overwrite a Save Slot",
   "description": "Manage save slots: delete old saves with removeItem, confirm before overwriting, handle the empty-slot case.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.10 Save and Load",

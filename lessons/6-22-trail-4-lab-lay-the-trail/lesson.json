@@ -3,6 +3,10 @@
   "title": "6.22.4 Lab: Lay the trail",
   "description": "The whole board from one line of text: rows that snake back and forth, and a token that steps along them to prove the order.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.22 Trail: plan and the path",

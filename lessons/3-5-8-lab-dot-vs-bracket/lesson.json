@@ -3,6 +3,10 @@
   "title": "3.5.8 Lab: Dot vs. Bracket — When You're Forced to Bracket",
   "description": "Read a key with a space and a key held in a variable, and print every key/value pair with Object.keys. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.5.3",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -222,6 +226,14 @@
         "description": "Code that runs prints the spaced key's value read with brackets, the value read with the key held in a variable, and, from a loop, every key of laptop with its value. A printed undefined names the read that found nothing. Help: 3.5.6 (Square Brackets and Computed Keys)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "square bracket access used: Reads a property with square brackets. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "spaced key reached in brackets: Reads laptop with square brackets and a quoted key that contains a space. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Object.keys walked with a loop: A loop goes over Object.keys(laptop), fetches each value with the key in square brackets, and prints it. A loop inside a function nobody calls never runs. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Does a variable hold one of the object's key names as a string, and is that SAME object then read with the variable in square brackets (obj[keyName]) and the value printed, directly or through a variable that is printed? Using the variable on a different object does not count. Code inside comments never runs."
+      }
+    }
   }
 }

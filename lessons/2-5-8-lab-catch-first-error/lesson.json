@@ -3,6 +3,10 @@
   "title": "2.5.8 Catch Your First Error",
   "description": "Write a try...catch that falls back gracefully when a variable doesn't exist, and confirm the program still finishes. Auto-graded.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",
@@ -89,6 +93,13 @@
         "description": "Welcome! is logged after the catch block closes. Help: 2.5.4 (try...catch: Attempt and Recover)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "try/catch present: Code contains a try block and a catch block. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "reads username inside try: The try block logs a variable called username. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Welcome! logged after the block: Welcome! is logged after the catch block closes. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

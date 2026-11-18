@@ -3,6 +3,10 @@
   "title": "3.7.23 Array Methods",
   "description": "Eight multiple-choice questions on .map(), .slice(), .concat(), spread, rest, and mutating versus non-mutating methods. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.7 Array Methods",

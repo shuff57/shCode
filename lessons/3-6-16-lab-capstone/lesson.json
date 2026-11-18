@@ -3,6 +3,10 @@
   "title": "3.6.16 Lab: Pass-by-Reference Capstone Practice",
   "description": "Build a small scorebook that adds scores without harming the caller's array, and a function that updates an object's property the caller can see. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.6.7",
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -597,6 +601,17 @@
         "description": "Console.log calls that run print the scores, the song and the library. Help: 3.6.5 (Changing vs. Reassigning)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Does the code define a function that takes a scores array and a new score (the lesson calls it addScore)? Any function name counts; the lesson's name is only a suggestion. Code inside comments never runs.",
+        "r2": "new array built with spread: addScore builds a new array using spread syntax. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Does the code define a function that takes a song object and records a play on it (the lesson calls it recordPlay)? Any function name counts; the lesson's name is only a suggestion. Code inside comments never runs.",
+        "r4": "Does the function that records a play assign to the plays property of the object it is given? Dot or bracket notation both count: song.plays += 1, song.plays++, obj.plays = obj.plays + 1, song[\"plays\"] += 1 and song['plays'] = 5 are all met (inside the brackets the quoted name is the property, not text). Any function and parameter names count; the lesson's name is only a suggestion. Changing a copy instead of the object it was given is not met. Code inside comments never runs.",
+        "r5": "Does the code define a function that returns a deep copy of a library object and calls structuredClone to make it (the lesson calls it copyBook)? Any function name counts; the lesson's name is only a suggestion. Code inside comments never runs.",
+        "r6": "structuredClone used: Code calls structuredClone for a deep copy Code inside a comment, or written inside quotes as text, never runs.",
+        "r7": "results logged: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

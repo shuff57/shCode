@@ -3,6 +3,10 @@
   "title": "6.17.2 Sub-build: Launch and arc",
   "description": "One arm, one stone, one arc. Launch on release and watch gravity bend the shot.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.17 Sling: launch",

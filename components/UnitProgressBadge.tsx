@@ -29,6 +29,8 @@ interface LessonRef {
   maxScore?: number | null;
   /** 'quiz' or 'written' -- only meaningful when maxScore is set. */
   scoreKind?: 'quiz' | 'written' | null;
+  /** lesson.json work.graded (lib/lesson-work.ts); read once grading v2 is on. */
+  graded?: boolean | null;
 }
 
 interface Props {

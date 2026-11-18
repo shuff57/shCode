@@ -3,6 +3,10 @@
   "title": "5.9.4 Challenges: Polish it your way",
   "description": "Your table works and feels better already. Add one more polish of your own: popups that fade instead of vanishing, a tilt rule that punishes shaking the table, or a heavier ball from round 2. Pick one; add an idea of your own on top if you like.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.9 Pinball: playtest and finish",

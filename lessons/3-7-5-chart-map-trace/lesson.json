@@ -3,6 +3,10 @@
   "title": "3.7.5 Plain English to Pseudocode: What `.map()` Does for You",
   "description": "Turn four plain-English steps into pseudocode for what .map() does: a loop you did not write, one result per item, collected in a new list.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.7 Array Methods",
@@ -151,6 +155,17 @@
         "description": "No step inside the repeating part prints, shows or returns the list. Showing it happens only after the loop. If the student never wrote a loop at all, mark this missing.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "The list starts empty, before the loop: withTax is started as an empty list, before the loop begins.",
+        "r3": "One loop over prices, closed: One loop over prices, closed with an END line such as END FOR.",
+        "r4": "The taxed price is added inside the loop: Each pass multiplies the price by 1.08 and adds the result to withTax.",
+        "r5": "The answer comes after the loop: Something is shown or returned once the loop is over.",
+        "r6": "Nothing is shown inside the loop: The answer comes after END FOR, not between FOR EACH and END FOR."
+      },
+      "task": "The student was given four plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md. The program they were describing: start with an empty list called withTax; go through the prices one at a time; for each price, multiply it by 1.08 and add the result to withTax; when there are no more prices, print withTax."
+    }
   }
 }

@@ -19,6 +19,8 @@ interface ManifestLesson {
   preview?: string | null;
   assignmentCode?: string | null;
   scoreKind?: 'quiz' | 'written' | null;
+  /** lesson.json work.graded (lib/lesson-work.ts); read once grading v2 is on. */
+  graded?: boolean | null;
 }
 
 interface ManifestData {
@@ -139,7 +141,7 @@ export default function ProgressPage() {
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {recentlyCompleted.map((l) => {
                 // Work with no grade category does not count, so it gets no percent (its 100 is a placeholder).
-                const counts = lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode }) !== null;
+                const counts = lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode, graded: l.graded }) !== null;
                 const score = !counts ? undefined : progress.scores[l.id] !== undefined || l.maxScore != null ? pctFor(l) : undefined;
                 return (
                   <li key={l.id} style={listItemStyle}>

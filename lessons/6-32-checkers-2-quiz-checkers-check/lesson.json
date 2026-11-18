@@ -3,6 +3,10 @@
   "title": "6.32.2 Check: the Checkers game",
   "description": "Five multiple-choice questions on dark squares, the halfway square, kings and toLowerCase, crowning in a chain, and checking a move in onMove. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.32 Checkers: playtest and extend",

@@ -3,6 +3,10 @@
   "title": "6.12.8 Video: Drag and Release",
   "description": "Clicking is one-shot, but dragging follows the cursor across frames, and physics will fight you if you don't know the trick. This video shows the snap-and-zero-velocity pattern that makes a drag feel smooth before you code it yourself.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.12 Advanced Input",

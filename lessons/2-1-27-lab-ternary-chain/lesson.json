@@ -3,6 +3,10 @@
   "title": "2.1.25 Chain Your Ternaries",
   "description": "Chain at least two conditional operators to pick from three or more values. Auto-graded.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",
@@ -96,6 +100,14 @@
         "description": "console.log is called with the rating variable. Help: 2.1.23 (Chaining Multiple ? Operators)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "90-or-above cutoff yields Excellent: score >= 90 ? ... chooses Excellent. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "70-or-above cutoff yields Good, else Needs work: score >= 70 ? chooses Good, otherwise Needs work. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "rating assigned by checking 90 before 70: rating is assigned from a chain that checks the 90 cutoff before the 70 cutoff. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Is the variable that stores the ternary chain's result passed to a console.log that runs? Any variable name counts (rating, topScore, grade...); the lesson's name is only a suggestion. Judge only the logging: what the chain tests and which words it picks do not matter here. Example: let label = score > 50 ? \"a\" : \"b\"; console.log(label); is met. Logging only score, or a console.log written inside a branch of the ternary, is not met. Code inside comments never runs."
+      }
+    }
   }
 }

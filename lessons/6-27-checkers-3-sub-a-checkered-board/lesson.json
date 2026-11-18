@@ -3,6 +3,10 @@
   "title": "6.27.3 Sub-build: A checkered board",
   "description": "Two loops, one test with %, one rect per square: the light and dark board drawn from row and column numbers.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.27 Checkers: plan and the board",

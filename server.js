@@ -354,12 +354,48 @@ app.prepare().catch((err) => {
   // No OLLAMA/Workers-AI credentials exist in dev, so the honest answer is an
   // empty list -- GraderPicker's hasGraderChoice() renders nothing below two
   // available targets, which is the correct unconfigured-dev surface.
-  server.post('/api/grade-written', express.json({limit:'96kb'}), (_req, res) => {
-    res.status(503).json({ok:false,error:'AI feedback is not configured on this local server. Your geometry checks and saved sketch still work.',offline:true});
-  });
-  server.get('/api/grade-written', (_req, res) => {
-    res.json({ graders: [], fallback: null });
-  });
+  //
+  // WORKERS_PROXY=http://localhost:8799 (a `wrangler dev` worker that forwards {model, inputs} to
+  // env.AI.run, see scripts/clef-harness.mjs) runs the REAL grade-written and clef-check handlers
+  // against real Workers AI, each over its own in-memory SQLite, so the fast Check and its notes can
+  // be tried end to end. Without it grade-written answers 503 as before and clef-check answers 503
+  // too, which sends the browser down today's Check path.
+  {
+    const proxy = process.env.WORKERS_PROXY;
+    const { makeD1: makeAiD1 } = await import('./scripts/_d1-sqlite.mjs');
+    const aiDb = makeAiD1();
+    const AI = proxy ? {
+      async run(model, inputs) {
+        const r = await fetch(proxy, { method: 'POST', body: JSON.stringify({ model, inputs }) });
+        const j = await r.json().catch(() => ({ ok: false, error: 'bad proxy answer' }));
+        if (!j.ok) throw new Error(j.error || 'proxy error');
+        return j.out;
+      },
+    } : undefined;
+    const NO_ASSETS = { async fetch() { return new Response('not found', { status: 404 }); } };
+    const realRoute = (handler) => async (req, res) => {
+      const request = new Request(`http://localhost${req.originalUrl}`, {
+        method: req.method, headers: { 'content-type': 'application/json' },
+        ...(req.method === 'GET' ? {} : { body: JSON.stringify(req.body ?? {}) }),
+      });
+      const out = await handler({ request, params: {}, data: { email: devIdentity(req), role: devRoleOf(req) }, env: { DB: aiDb, AI, ASSETS: NO_ASSETS } });
+      res.status(out.status).type(out.headers.get('content-type') || 'application/json').send(await out.text());
+    };
+    const clef = await import('./functions/api/clef-check.ts');
+    server.post('/api/clef-check', express.json({ limit: '96kb' }), realRoute(clef.onRequestPost));
+    if (AI) {
+      const gw = await import('./functions/api/grade-written.ts');
+      server.post('/api/grade-written', express.json({ limit: '96kb' }), realRoute(gw.onRequestPost));
+      server.get('/api/grade-written', realRoute(gw.onRequestGet));
+    } else {
+      server.post('/api/grade-written', express.json({limit:'96kb'}), (_req, res) => {
+        res.status(503).json({ok:false,error:'AI feedback is not configured on this local server. Your geometry checks and saved sketch still work.',offline:true});
+      });
+      server.get('/api/grade-written', (_req, res) => {
+        res.json({ graders: [], fallback: null });
+      });
+    }
+  }
   // Version-control commit pool. Real routes: functions/api/commits/index.ts
   // (GET ?lessonId= -> { commits }, POST -> { commit }) and commits/[id].ts
   // (DELETE). Held in memory, keyed by identity+lesson the way the D1 table is.

@@ -3,6 +3,10 @@
   "title": "1.1.11 Name That Umbrella",
   "description": "Read a testing scenario and log which umbrella activity it belongs to. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.1 Software Lifecycle",
@@ -45,6 +49,11 @@
         "description": "Logs the correct umbrella activity for Miguel's testing scenario. Help: 1.1.10 (Umbrella Activities)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "The right umbrella activity is logged: Logs the correct umbrella activity for Miguel's testing scenario. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   }
 }

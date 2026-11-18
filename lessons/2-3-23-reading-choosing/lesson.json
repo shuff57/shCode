@@ -3,6 +3,10 @@
   "title": "2.3.23 Reading: Choosing Between if...else and switch",
   "description": "Learn the one question that tells you which statement fits a problem. Read before 2.3.24 Worked Example: When switch Fits: Command Dispatch.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The Switch Statement",

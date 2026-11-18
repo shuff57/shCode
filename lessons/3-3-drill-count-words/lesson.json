@@ -3,6 +3,10 @@
   "title": "3.3.11 Lab: countWords(text)",
   "description": "Write countWords(text): split a sentence at its spaces and return how many words there are. Practice with split and length, not graded: the checks call your function.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",
@@ -158,6 +162,13 @@
         "description": "countWords(text) gives back how many words the text has, when the words are separated by single spaces. Help: 3.3.10 (Splitting Text into Lines (.split))",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "countWords is defined with one parameter: Code defines a function named countWords with exactly one parameter. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "countWords splits the text: countWords calls .split( in its body. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "countWords hands back a value with return: countWords contains a return statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

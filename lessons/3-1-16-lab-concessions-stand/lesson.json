@@ -3,6 +3,10 @@
   "title": "3.1.8 Lab: Concessions Stand",
   "description": "Write a parameterless function, concessions(), that prints the food and drink options at a cinema, then call it. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.1 Functions: Definition and Calls",
@@ -92,6 +96,13 @@
         "description": "Code calls concessions() as a statement. Help: 3.1.2 (Defining & Calling a Function)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "concessions defined, no parameters: Code defines a function named concessions with an empty parameter list. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "prints the options line: The function body logs the food/drink options. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "concessions is called: Code calls concessions() as a statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

@@ -3,6 +3,10 @@
   "title": "5.2.8 Reading: Gravity",
   "description": "world.gravity.y and dynamic vs static sprites. Read before 5.2.10 Lab: Tune Gravity.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",

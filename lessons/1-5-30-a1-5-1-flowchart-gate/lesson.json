@@ -3,6 +3,10 @@
   "title": "1.5.30 Plan It in Pseudocode (Part 1)",
   "description": "Plan the printer-credit rule in pseudocode with the keywords from the reading: take in the pages, ask the question, charge only the pages over 20, and report both answers. The plan comes before the code in 1.5.31.",
   "type": "assignment",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",
@@ -134,6 +138,16 @@
         "description": "The ELSE branch reports too: a student under the limit owes nothing, and that is printed.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "The page count comes in: The plan takes in the number of pages the student printed. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r2": "The question is about 20 pages: The plan asks whether the pages printed are over the 20 free pages. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r3": "Only the pages over 20 are charged: The charge is for the pages over 20 (pages minus 20), not for every page. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r4": "Each extra page costs 10 cents: The charge is 10 cents (0.10) for each of those pages. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r5": "Both answers are reported: The ELSE branch reports too: a student under the limit owes nothing, and that is printed. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done."
+      },
+      "task": "The student wrote pseudocode in README.md, between a first line and a last line that were already there. The problem: the school printer gives every student 20 free pages a week; after that each page over 20 costs 10 cents. The plan should take in the number of pages printed, ask whether it is over 20, charge 10 cents for ONLY the pages over 20 (pages minus 20, not every page), and report what is owed in BOTH cases (a student at or under 20 owes nothing, and that is reported, not left as an empty branch)."
+    }
   }
 }

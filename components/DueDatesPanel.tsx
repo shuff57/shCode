@@ -54,6 +54,8 @@ interface ManifestLesson {
   category: string | null;
   preview?: string | null;
   scoreKind?: 'quiz' | 'written' | null;
+  /** lesson.json work.graded (lib/lesson-work.ts); read once grading v2 is on. */
+  graded?: boolean | null;
   assignmentCode?: string | null;
 }
 

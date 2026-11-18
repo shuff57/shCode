@@ -3,6 +3,10 @@
   "title": "7.2.5 Lab: Method that returns a value",
   "description": "Add `Counter.isHigh()` which returns `true` when `this.n > 10`. The driver (the code in `draw()`) uses the return value to color the display red.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.2 Writing Your Own Classes",

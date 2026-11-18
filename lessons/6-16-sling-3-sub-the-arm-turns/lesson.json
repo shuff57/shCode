@@ -3,6 +3,10 @@
   "title": "6.16.3 Sub-build: The arm turns",
   "description": "One bar, one pointer, one angle. Aim before there is a wall.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.16 Sling: plan and the arm",

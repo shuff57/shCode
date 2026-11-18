@@ -3,6 +3,10 @@
   "title": "5.2.5 Lab: A beat and a one-shot",
   "description": "Blink a lamp every 30 frames, show a message once at frame 300, and repair a halfway check that sits inside another condition and never runs.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",

@@ -3,6 +3,10 @@
   "title": "5.1.11 Hello Sprite",
   "description": "Your first moSHion sketch: a canvas, a sprite, a background color.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

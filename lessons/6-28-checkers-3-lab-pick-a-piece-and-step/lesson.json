@@ -3,6 +3,10 @@
   "title": "6.28.3 Lab: Pick a piece and step",
   "description": "Red and black take turns: click one of your pieces to pick it up, click a square one step diagonally forward to move it, and every rule lives in moveKind.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.28 Checkers: pick up and move",

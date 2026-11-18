@@ -3,6 +3,10 @@
   "title": "3.4.2 Reading: A Function Is a Value",
   "description": "A function can be stored in a variable, copied, and passed around like a number or a string. Read before the function-expression exercises.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.4 Function Expressions and Arrow Functions",

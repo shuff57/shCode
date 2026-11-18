@@ -3,6 +3,10 @@
   "title": "6.20.1 Lab: Five shots, win or lose",
   "description": "A budget of five stones: win when the wall is down, lose when the stones are gone.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.20 Sling: five shots",

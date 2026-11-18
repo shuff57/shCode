@@ -3,6 +3,10 @@
   "title": "7.11.2 Check: Defender with classes",
   "description": "Seven multiple-choice questions on where things live after the refactor: hp on the enemy, a hit loop with no splices, what filter does not do, a parameter that is another object, static, the checklist, and the cost of a new fact. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.11 Defender C: playtest and check",

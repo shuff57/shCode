@@ -3,6 +3,10 @@
   "title": "7.21.2 Check: the Quest game",
   "description": "Five multiple-choice questions on the hp bar, after(), guarding, making enemies from KINDS in newGame, and why the sender rolls in a duel. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.21 Quest: playtest and extend",

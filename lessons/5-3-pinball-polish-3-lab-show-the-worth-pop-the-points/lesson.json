@@ -3,6 +3,10 @@
   "title": "5.7.4 Lab: Show the worth, pop the points",
   "description": "Your table from 5.6.3 scores and chimes, but a player cannot see what a bumper is worth or what a hit just gave them. Write each bumper's worth on it, and make a small \"+5\" pop up on every hit, float away and remove itself.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.7 Pinball: labels and popups",

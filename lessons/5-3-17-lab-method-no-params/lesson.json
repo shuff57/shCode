@@ -3,6 +3,10 @@
   "title": "7.2.3 Lab: Method with no params",
   "description": "Write `Counter.tick()`: a method that takes no arguments and mutates `this.n`. First method you write from scratch.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.2 Writing Your Own Classes",

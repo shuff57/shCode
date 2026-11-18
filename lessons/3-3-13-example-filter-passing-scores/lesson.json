@@ -2,6 +2,10 @@
   "id": "3-3-13-example-filter-passing-scores",
   "title": "3.3.17 Worked Example: Keeping Only the Passing Scores",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",

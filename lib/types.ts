@@ -62,6 +62,8 @@ export interface Requirement {
   title: string;
   description: string;
   status: 'pending' | 'running' | 'passed' | 'failed';
+  /** Red, but the AI found it partly met: a plan lab counts it as half a card (lib/grade-pass.ts cardScore). */
+  partial?: boolean;
   messages?: string[];
   type?: RequirementType;
   file?: string;
@@ -276,6 +278,8 @@ export interface StarterVariant {
 }
 
 export interface Lesson {
+  /** What the student makes and whether it is graded (lib/lesson-work.ts). Every lesson.json carries it. */
+  work?: import('./lesson-work').LessonWork;
   id: string;
   title: string;
   description: string;

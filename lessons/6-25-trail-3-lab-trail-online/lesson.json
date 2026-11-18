@@ -3,6 +3,10 @@
   "title": "6.25.3 Lab: Trail online",
   "description": "Your Trail plays a classmate on another computer: rolls are sent, every roll is checked and applied in onMove, and only the player whose turn it is may roll.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.25 Trail: play online",

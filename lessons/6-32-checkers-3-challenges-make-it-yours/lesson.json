@@ -3,6 +3,10 @@
   "title": "6.32.3 Challenges: Make it yours",
   "description": "Your checkers is complete. Change one rule of your own: show the legal squares, a draw after 40 quiet moves, or jumps you must take. Pick one; add an idea of your own on top if you like.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.32 Checkers: playtest and extend",

@@ -3,6 +3,10 @@
   "title": "5.11.4 Debugging: The pipes that never leave",
   "description": "Two planted bugs. Pipes vanish from the screen and the list grows for ever; then splicing skips every other pipe.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.11 Flappy: the world scrolls",

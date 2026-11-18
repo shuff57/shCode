@@ -3,6 +3,10 @@
   "title": "6.20.2 Debugging: The wall that falls on its own",
   "description": "Two planted bugs. The wall collapses before the first shot, and the last stone never counts.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.20 Sling: five shots",

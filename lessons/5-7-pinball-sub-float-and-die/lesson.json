@@ -3,6 +3,10 @@
   "title": "5.7.3 Sub-build: A word that floats and dies",
   "description": "Click and a small word pops up, floats, and removes itself. Build the popup alone, before it goes on a bumper.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.7 Pinball: labels and popups",

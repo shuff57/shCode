@@ -3,6 +3,10 @@
   "title": "1.5.31 Implement Your Plan (Part 2)",
   "description": "Turn the plan you just wrote into working JavaScript, and confirm the code matches the plan. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",
@@ -132,6 +136,15 @@
         "description": "Two or more console.log calls, so each path reports an outcome. Help: 1.2.2 (Declaring Variables with let and const)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r2": "pagesRequested is declared: A descriptive variable holds how many pages were asked for. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "creditRemaining is declared: A descriptive variable holds the credit left. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "The decision compares the two: An if statement compares pagesRequested against creditRemaining Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "Both branches exist: An else branch is present, matching the diamond's second exit Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r6": "Both branches print: Two or more console.log calls, so each path reports an outcome. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   }
 }

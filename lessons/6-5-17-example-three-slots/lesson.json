@@ -3,6 +3,10 @@
   "title": "6.10.17 Worked Example: Three Save Slots",
   "description": "Build three save slots. Each slot is a differently-named key. Press 1/2/3 to save, load with a simple text menu.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.10 Save and Load",

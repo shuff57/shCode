@@ -3,6 +3,10 @@
   "title": "2.2.1 Slides: Algorithms and Loops",
   "description": "Unit 2.2 slides: algorithms and loops.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",

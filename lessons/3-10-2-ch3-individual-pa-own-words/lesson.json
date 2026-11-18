@@ -3,6 +3,10 @@
   "title": "3.10.4 Individual PA Part 4: Reflect",
   "description": "Part 4 of 4, 10 points. A short write-up about the program you wrote in Part 3: three test cases, one thing you logged, and three Chapter 3 sections found in your code. Three tries; your best try counts.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 7,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.10 Chapter 3 Individual Performance Assessment",

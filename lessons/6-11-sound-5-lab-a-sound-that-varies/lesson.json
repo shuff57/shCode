@@ -3,6 +3,10 @@
   "title": "6.15.5 Lab: A sound that varies",
   "description": "The same sound every time tires the ear. Give each catch a random pitch with .rate and random(), and give each miss one of three thuds picked at random from a list.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.15 Sound and Music",

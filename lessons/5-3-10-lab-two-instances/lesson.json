@@ -3,6 +3,10 @@
   "title": "7.1.11 Lab: Two sprites, two property values",
   "description": "Instantiate b1 and b2 from the same class with different colors, then mutate only b1 to confirm each instance's state is independent.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.1 Classes and Instances",

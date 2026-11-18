@@ -3,6 +3,10 @@
   "title": "7.10.2 Lab: A Spawner for the waves",
   "description": "The waves move into a Spawner class: ready() says when the next wave is due and makeWave() builds it. A restart becomes new Spawner(), and Enemy counts the enemies it has built with a static counter.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 22,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.10 Defender C: a spawner",

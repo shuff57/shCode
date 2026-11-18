@@ -3,6 +3,10 @@
   "title": "5.2.25 Vel vs applyForce",
   "description": "Why setting .vel every frame fights the physics engine, and when applyForce is the better tool. AI-graded with hints.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",

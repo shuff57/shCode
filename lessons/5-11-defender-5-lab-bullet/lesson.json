@@ -3,6 +3,10 @@
   "title": "7.10.1 Lab: Bullet, and a hit that takes an enemy",
   "description": "Shots become Bullet objects. Write isAlive, hits(enemy) and spend, let fire() build a Bullet, and the hit loop loses every splice and its break; one function clears finished shots and enemies.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.10 Defender C: a spawner",

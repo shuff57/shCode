@@ -1781,6 +1781,15 @@ reject('3-6-13-lab-nested-mutation', 'own names, but the "deep" copy is a spread
   accept(id14, 'one call in a loop over a good and a bad text', js(R14, 'for (const t of [\'{"a":1}\', "junk"]) { console.log(readSave(t)); }'));
 }
 
+// TOLERANCE_CASES_OUT=<file>: write the cases and stop (scripts/clef-harness.mjs --tolerance), as in
+// test-grader-tolerance.mjs. Nothing is graded in that mode.
+if (process.env.TOLERANCE_CASES_OUT) {
+  writeFileSync(process.env.TOLERANCE_CASES_OUT, JSON.stringify(cases));
+  rmSync(out, { recursive: true, force: true });
+  console.log(`grader tolerance 3x: wrote ${cases.length} cases to ${process.env.TOLERANCE_CASES_OUT}`);
+  process.exit(0);
+}
+
 try {
   execFileSync(process.execPath, [
     path.join(root, 'node_modules', 'typescript', 'bin', 'tsc'), 'lib/run-tests-node.ts',

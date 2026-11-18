@@ -3,6 +3,10 @@
   "title": "1.4.20 Sort the Snippet",
   "description": "Three snippets, three paradigms. Log which is which, then name what JavaScript itself is. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",
@@ -108,6 +112,14 @@
         "description": "The fourth console.log answers STEP 4 -- the language itself, with multi-paradigm. Help: 1.4.19 (JavaScript Is Multi-Paradigm)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Snippet A is procedural: The first console.log answers STEP 1 -- Snippet A, with procedural. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "Snippet B is object-oriented: The second console.log answers STEP 2 -- Snippet B, with object-oriented. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "Snippet C is functional: The third console.log answers STEP 3 -- Snippet C, with functional. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "JavaScript is multi-paradigm: The fourth console.log answers STEP 4 -- the language itself, with multi-paradigm. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   }
 }

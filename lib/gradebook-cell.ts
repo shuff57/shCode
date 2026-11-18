@@ -82,6 +82,9 @@ export interface CellInput {
   submittedAt: number | null;
   dueAt: number | null;
   now: number;
+  /** Practice graded only since grading v2 and due before the switch (lib/grading-weights.ts predatesV2):
+   *  never late, so never "missing". */
+  exempt?: boolean;
 }
 
 export function buildCell(i: CellInput): GradebookCell {
@@ -94,7 +97,7 @@ export function buildCell(i: CellInput): GradebookCell {
     // A completed row with a NULL completed_at (legacy data) counts as ON
     // TIME — `?? dueAt` reads as "finished by the deadline". Guessing late on
     // missing data would accuse a student of something we cannot show.
-    late: isPastDue(i.dueAt, i.state === 'completed' ? (i.completedAt ?? i.dueAt) : null, i.now),
+    late: !i.exempt && isPastDue(i.dueAt, i.state === 'completed' ? (i.completedAt ?? i.dueAt) : null, i.now),
     // Only the latest submission votes, and only while it still has no score.
     // A teacher override writes a score onto the row but leaves the
     // gradingFailed marker in place, so the marker alone would go on claiming

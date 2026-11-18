@@ -3,6 +3,10 @@
   "title": "7.3.4 Lab: Share one number between two methods",
   "description": "`add()` declares its own `let step = 3`; `undo()` types the 3 again. A local in one method is invisible to the next, so the two numbers can drift. Put the step on `this` in the constructor and both methods use it.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.3 Inside a Class",

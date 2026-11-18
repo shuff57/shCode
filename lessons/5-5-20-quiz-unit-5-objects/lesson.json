@@ -3,6 +3,10 @@
   "title": "7.3.20 Unit 5 Check: classes, objects and methods",
   "description": "Eight multiple-choice questions closing Unit 5: class versus instance, the constructor, this, method syntax, separate state on two instances, arrays of instances, where a variable lives, and what a class variable is. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.3 Inside a Class",

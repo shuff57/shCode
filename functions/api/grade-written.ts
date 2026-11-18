@@ -71,6 +71,7 @@ import { describeDiagram } from '../../lib/diagram-mermaid';
 import { checkDiagram, allPassed } from '../../lib/diagram-check';
 import { splitRubric, scoreDiagram, mergeGrade, type DiagramScore } from '../../lib/diagram-score';
 import { DEFAULT_WORKERS_MODEL } from '../../lib/workers-ai';
+import { onlyCards } from '../../lib/clef-check-core';
 import { capFor, kindFor, attemptsUsed, recordGraded, recordOutage, isStaff, effectiveCap, cleanArtifact } from '../_shared/attempts';
 
 /** The Workers AI binding (`env.AI`). Narrowed to the one method this route
@@ -324,6 +325,12 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   // is not even structurally legal, or that arrives without its drawing, costs nothing.
   const { ruleItems, aiItems } = splitRubric(config.rubric);
   const hybrid = ruleItems.length > 0;
+  // The fast Check's notes request (lib/clef-check-core.ts): on a practice lab with Clef questions the
+  // browser asks only about its red cards. A subset of this server's own rubric, never new text, and
+  // never on a capped part or a chart, whose grade is a record.
+  const rubric = config.clef && !capped && !hybrid
+    ? onlyCards(config.rubric, (body as { onlyIds?: unknown }).onlyIds)
+    : config.rubric;
   let response = cadSnapshot?.response ?? body.response;
   let det: DiagramScore | null = null;
   if (hybrid) {
@@ -497,7 +504,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
     lessonTitle: config.lessonTitle,
     prompt: config.prompt,
     // A hybrid chart's model sees ONLY the wording items; the checked ones are not in its prompt.
-    rubric: hybrid ? aiItems : config.rubric,
+    rubric: hybrid ? aiItems : rubric,
     contextDocs: config.contextDocs,
     strict: config.strict,
     wordingOnly: hybrid,
@@ -505,7 +512,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   });
   // One place that turns the model's JSON into the grade the student gets, shared by both paths.
   const finish = (parsed: unknown) => {
-    if (!hybrid) return { ...shapeResult(parsed, config.rubric), grader: requested, graderModel: model, ...(cadSnapshot ? {feedbackOnly:true,artifactId:cadSnapshot.artifactId} : {}) };
+    if (!hybrid) return { ...shapeResult(parsed, rubric), grader: requested, graderModel: model, ...(cadSnapshot ? {feedbackOnly:true,artifactId:cadSnapshot.artifactId} : {}) };
     const ai = shapeResult(parsed, aiItems);
     return { ...mergeGrade(det as DiagramScore, ai, aiItems), grader: requested, graderModel: model };
   };

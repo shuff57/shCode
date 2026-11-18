@@ -3,6 +3,10 @@
   "title": "6.15.2 Worked Example: A sound board",
   "description": "One chime at four speeds on the keys 1 to 4, and a tune that T loops and X stops. Hold a key with kb.pressing, press T three times, and start the tune in setup() to see what each line does.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.15 Sound and Music",

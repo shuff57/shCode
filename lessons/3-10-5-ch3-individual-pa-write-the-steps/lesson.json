@@ -3,6 +3,10 @@
   "title": "3.10.3 Individual PA Part 3: Write the Steps",
   "description": "Part 3 of 4, 30 points. One problem, pick one of three, write the JavaScript it describes: functions with parameters and returns, an array of records, map, spread, and a save/load round trip. Three tries with feedback on each criterion; no Run button.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 19,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.10 Chapter 3 Individual Performance Assessment",

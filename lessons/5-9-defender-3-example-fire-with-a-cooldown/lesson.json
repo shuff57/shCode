@@ -3,6 +3,10 @@
   "title": "7.4.3 Worked Example: Fire with a cooldown",
   "description": "Hold Space and the ship fires one shot every 12 frames. Change COOLDOWN to 0, 4 and 30 and watch the gap between the shots.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.4 Defender: the ship, and shots",

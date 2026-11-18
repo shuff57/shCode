@@ -3,6 +3,10 @@
   "title": "6.25.2 Sub-build: Send and receive one number",
   "description": "Two tabs, one room, one number at a time. Every number sent, yours too, arrives in the same order on both.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.25 Trail: play online",

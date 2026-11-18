@@ -3,6 +3,10 @@
   "title": "3.1.5 Lab: Fix the Syntax and the Name",
   "description": "Take a broken function header — missing parentheses, wrong-case name — and fix both problems. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.1 Functions: Definition and Calls",
@@ -91,6 +95,13 @@
         "description": "Code calls showTotal() as a statement. Help: 3.1.2 (Defining & Calling a Function)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "showTotal defined, camelCase, with parentheses: Code defines a function named showTotal (not ShowTotal) with an empty parameter list. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "prints the total: The function body logs the total. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "showTotal is called: Code calls showTotal() as a statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

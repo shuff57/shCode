@@ -3,6 +3,10 @@
   "title": "3.3.1 Slides: Arrays",
   "description": "Unit 3.3 slides: arrays, indexes, push and pop, looping over an array, and nested arrays. Shown from a copy of the bookSHelf deck kept in this site.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",

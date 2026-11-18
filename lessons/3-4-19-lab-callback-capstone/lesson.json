@@ -3,6 +3,10 @@
   "title": "3.4.19 Lab: Callback Capstone",
   "description": "Write a counting helper that takes a callback, then use it with a one-line arrow to count matching values in an array. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.4.7",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -182,6 +186,16 @@
         "description": "countMatching([4, -2, 7, 0, -9, 3], n => n > 0) is 3, an array where nothing passes counts 0, and an empty array counts 0. Help: 3.4.12 (Example: Arrow Callback)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Helper defined: A function is defined that accepts an array and a test function. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "for loop present: Code contains a for loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Callback called inside the helper: The test function parameter is called inside the helper. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "At least two inline arrows passed: Two arrow functions appear in the file. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "Two calls, each with its own arrow: countMatching is called twice, and each call has an arrow written inside its parentheses. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

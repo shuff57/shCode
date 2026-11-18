@@ -3,6 +3,10 @@
   "title": "6.10.8 Video: More Than a Number: Saving Your Whole Game",
   "description": "A high score is one number. But your game has position, level, inventory: many pieces. JSON bundles them together.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.10 Save and Load",

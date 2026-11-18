@@ -3,6 +3,10 @@
   "title": "3.1.1 Slides: Functions",
   "description": "Unit 3.1 slides: calling a function, defining one, hoisting, and why functions make programs shorter and easier to change.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.1 Functions: Definition and Calls",

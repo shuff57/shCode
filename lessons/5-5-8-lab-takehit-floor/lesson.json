@@ -3,6 +3,10 @@
   "title": "7.3.8 Lab: takeHit with a floor at zero",
   "description": "The enemy starts at 5 health and is hit for 2 at a time. Write `takeHit(n)` so that health comes off and never goes below zero — the rule lives in the class, not in the scene.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.3 Inside a Class",

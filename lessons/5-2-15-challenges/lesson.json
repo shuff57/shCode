@@ -3,6 +3,10 @@
   "title": "5.2.26 Challenges: Optional Stretch",
   "description": "Add a second, harder-to-reach goal and track a two-goal completion count. Auto-graded.",
   "type": "challenge",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 30,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",

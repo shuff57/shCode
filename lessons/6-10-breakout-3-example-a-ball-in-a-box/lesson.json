@@ -3,6 +3,10 @@
   "title": "7.12.3 Worked Example: A ball in a box",
   "description": "A ball that bounces off three walls and a paddle that follows the mouse. Catch it on different parts of the paddle, take the steering away, and move the walls to see what each line controls.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.12 Breakout: plan, ball and paddle",

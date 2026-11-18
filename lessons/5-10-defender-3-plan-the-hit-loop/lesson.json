@@ -3,6 +3,10 @@
   "title": "7.7.1 Plan: The hit loop in plain words",
   "description": "Before any code: say in plain words how every shot meets every enemy, what a hit does to the shot and to the enemy, and which lists change. AI-graded with hints.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.7 Defender: the hit loop",

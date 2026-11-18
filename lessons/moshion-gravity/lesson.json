@@ -3,6 +3,10 @@
   "title": "5.2.9 Worked Example: Falling Block",
   "description": "A dynamic block falls under gravity and lands on the static ground. Read the example, then experiment. Follows 5.2.8 (Reading: Gravity).",
   "type": "example",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",

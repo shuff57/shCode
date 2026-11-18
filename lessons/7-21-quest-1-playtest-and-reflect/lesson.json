@@ -3,6 +3,10 @@
   "title": "7.21.1 Playtest and reflect: Quest",
   "description": "Play your Quest at least three times, the whole run once and a duel online if you can, find one thing that surprised you, link it to a method or function in your code and choose one change. AI-graded with hints.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.21 Quest: playtest and extend",

@@ -3,6 +3,10 @@
   "title": "7.2.22 Challenges",
   "description": "Pick one (or more) OOP stretch challenges: extend your Enemy class, write a Player class, or try subclassing with `extends`. Auto-graded.",
   "type": "challenge",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 30,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.2 Writing Your Own Classes",

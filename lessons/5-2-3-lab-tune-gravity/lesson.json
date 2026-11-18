@@ -3,6 +3,10 @@
   "title": "5.2.10 Lab: Tune Gravity",
   "description": "Try different world.gravity.y values on the same scene and describe how each one feels. Change the value, then write one sentence per value as a comment.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",

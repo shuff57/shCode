@@ -3,6 +3,10 @@
   "title": "3.2.2 Reading: Parameters",
   "description": "Parameters let you pass inputs into a function, so the same function can give a different result each time you call it.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.2 Parameters and Return Values",

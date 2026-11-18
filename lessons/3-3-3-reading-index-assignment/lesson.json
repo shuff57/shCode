@@ -3,6 +3,10 @@
   "title": "3.3.3 Reading: Changing an Item by Index",
   "description": "Learn how assigning to arr[i] replaces one item without changing the array's length. Read before the index-assignment lab.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",

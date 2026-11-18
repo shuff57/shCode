@@ -3,6 +3,10 @@
   "title": "7.16.4 Lab: Two fighters",
   "description": "Fill in the Fighter class's draw(x, y): a body, a name and an hp bar scaled by hp / maxHp. The hero and the goblin are already made; each one draws itself.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.16 Quest: plan and the fighters",

@@ -3,6 +3,10 @@
   "title": "7.3.15 Worked Example: Enemy.spawned",
   "description": "A `static spawned` counter bumped in the constructor, so it counts every enemy ever created rather than the ones still on screen. Also shows what resetting it from draw() every frame does.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.3 Inside a Class",

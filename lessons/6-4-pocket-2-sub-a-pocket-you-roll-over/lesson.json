@@ -3,6 +3,10 @@
   "title": "6.4.3 Sub-build: A pocket you roll over",
   "description": "A ball, a hole, and the speed test. No table, no rules yet.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.4 Pocket: the pocket",

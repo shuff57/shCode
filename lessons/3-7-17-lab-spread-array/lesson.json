@@ -3,6 +3,10 @@
   "title": "3.7.17 Lab: Build a New Array with Spread",
   "description": "Use spread to combine two arrays and to add loose values around a copied one, without changing any input. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.7.5",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -303,6 +307,14 @@
         "description": "When first and second hold other values, combined and framed change with them, and console.log calls that run print both new arrays and an original. Help: 3.7.14 (Spreading into a New Array or Object)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Spread used: Uses array spread, written as ... inside an array literal. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Two spread arrays combined: Spreads two arrays into one new array literal. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Calls console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Arrays declared: Declares at least two arrays. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

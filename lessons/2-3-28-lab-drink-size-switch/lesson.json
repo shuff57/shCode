@@ -3,6 +3,10 @@
   "title": "2.3.28 Build a Four-Case Switch: Drink Sizes",
   "description": "Write a switch with at least four cases and a default that prices a drink by size. Auto-graded.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The Switch Statement",
@@ -148,6 +152,17 @@
         "description": "Code contains four break statements, one for each of the S, M, L and XL cases. Help: 2.3.3 (switch Statements)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "switch statement present: Code contains a switch statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "case 'S' present: case 'S' is directly followed by a console.log call. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "case 'M' present: case 'M' is directly followed by a console.log call. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "case 'L' present: case 'L' is directly followed by a console.log call. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "case 'XL' present: case 'XL' is directly followed by a console.log call. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "default label present: The default label is directly followed by a console.log call. Code inside a comment, or written inside quotes as text, never runs.",
+        "r7": "four breaks, one per case: Code contains four break statements, one for each of the S, M, L and XL cases. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

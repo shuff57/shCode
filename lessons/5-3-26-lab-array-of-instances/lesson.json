@@ -3,6 +3,10 @@
   "title": "7.2.13 Lab: An array of Enemies",
   "description": "Store five Enemy instances in a single array by pushing new Enemy(...) calls into `enemies`: practice managing many instances without separate named variables.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.2 Writing Your Own Classes",

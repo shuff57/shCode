@@ -20,7 +20,14 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Logs the correct umbrella activity for Miguel's testing scenario. Help: 1.1.10 (Umbrella Activities)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.1.11 Name That Umbrella\". The task they were given: Read the scenario. Log the umbrella activity that best matches it, using console.log. Choose from training/communication, risk management, configuration management, quality management, architecture management, or security management.",
+      "kind": "console",
+      "questions": {
+        "r1": "The right umbrella activity is logged: Logs the correct umbrella activity for Miguel's testing scenario. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-1-15-write-a-task-set": {
     "lessonTitle": "1.1.15 Write a Task Set",
@@ -132,7 +139,20 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The fifth statement no longer prints its original text, \"Coding is one phase of four.\" Met only when the fifth console.log prints something else. If it still prints exactly \"Coding is one phase of four.\" (any quotes), it is missing. Help: 1.1.2 (console.log & sequential execution)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.1.3 Your First Statement\". The task they were given: Run the code below. Five messages appear in the console panel. This is your first time seeing a browser console print output. Then change the text of the fourth and fifth statements. The starter's fourth statement printed \"The console prints what I log.\" and its fifth printed \"Coding is one phase of four.\"; a student who left either one exactly as it was has NOT changed it, whatever the comments say.",
+      "kind": "console",
+      "questions": {
+        "r1": "First statement present: The first console.log statement is still present. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "Second statement present: The second console.log statement is still present. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "Third statement present: The third console.log statement is still present. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "Fourth statement is a console.log: The fourth line is still a console.log call. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "Fifth statement is a console.log: The fifth line is still a console.log call. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r6": "Fourth statement changed: The fourth statement no longer prints its original text. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r7": "Fifth statement changed: The fifth statement no longer prints its original text. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-1-4-sdlc-overview": {
     "lessonTitle": "1.1.4 What a Program Is",
@@ -174,7 +194,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Print your hobby, at least 6 console.log statements total",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.1.4 What a Program Is\". The task they were given: A **program** is a set of instructions that tells a computer what to do. **JavaScript** is the programming language you'll use this year. Let's write your first instruction. In `script.js`, under the Step 1 comment, type: ```js console.log(\"Hello, world!\"); ``` `console.log()` tells the computer to print whatever is inside the parentheses. Check the console panel below to see your output.",
+      "kind": "console",
+      "questions": {
+        "req1": "Hello world: Print \"Hello, world!\" using console.log. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req2": "Math expression: Use console.log with a math expression. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req3": "String concatenation: Join two strings with the + operator Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req4": "Boolean comparison: Print a comparison that evaluates to true or false Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req5": "Your name: Print your name to the console Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req6": "Your hobby: Print your hobby, at least 6 console.log statements total Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-1-7-classify-the-task": {
     "lessonTitle": "1.1.7 Classify the Task",
@@ -204,7 +236,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Logs the correct phase for putting the finished app in the app store. Help: 1.1.6 (The Four Phases)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.1.7 Classify the Task\". The task they were given: Read the task. Log the name of the phase that task belongs to, using console.log. Choose from inception, elaboration, construction, or deployment.",
+      "kind": "console",
+      "questions": {
+        "r1": "Menu code is construction: Logs the correct phase for writing the code that shows the menu. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "School choice is inception: Logs the correct phase for deciding which schools the app will serve. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "App structure is elaboration: Logs the correct phase for drawing the overall structure of the app. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "App store release is deployment: Logs the correct phase for putting the finished app in the app store. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-2-15-lab-greeting-with-backticks": {
     "lessonTitle": "1.2.15 Greeting with Backticks",
@@ -234,7 +276,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Logs a single-quoted string containing a literal ${ so the difference is visible. Help: 1.2.13 (Embedding Values with ${...})",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.2.15 Greeting with Backticks\". The task they were given: Declare a variable called `myName` and set it to your name in quotes.",
+      "kind": "console",
+      "questions": {
+        "r1": "myName is declared: Declares a variable called myName. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "A backtick string embeds myName: Uses a template literal containing ${myName}. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "A calculation is embedded: Embeds an expression containing an operator, such as ${2024 + 1}. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "Is there a console.log whose argument is a string written in SINGLE quotes (' ') that has the two characters ${ inside it? For example console.log('${2024 + 1}') counts. Code inside comments never runs."
+      }
+    }
   },
   "1-2-16-lab-operators-check": {
     "lessonTitle": "1.2.16 Operators and Expressions Check",
@@ -243,7 +295,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "req1",
         "title": "Use addition",
-        "description": "Use the + operator with numbers. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
+        "description": "Create two number variables and add them together with +. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
         "points": 1
       },
       {
@@ -270,7 +322,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Use console.log to display results. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.2.16 Operators and Expressions Check\". The task they were given: Create two number variables and add them together with +. Print the result with console.log.",
+      "kind": "console",
+      "questions": {
+        "req1": "Are two variables that were set to numbers added together with + somewhere in the code, whatever the variables are called? For example num1 + num2, str1 + str2 where str1 = 11, or `${a + b}`. Adding two plain numbers like 5 + 2 does not count.",
+        "req2": "Use multiplication: Use the * operator. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req3": "String concatenation: Concatenate strings using +, either inline literals or two previously-declared string variables. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req4": "Comparison operator: Use a comparison operator like ===, !==, <, >. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req5": "Log results: Use console.log to display results. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-2-21-null-vs-undefined": {
     "lessonTitle": "1.2.21 null vs undefined",
@@ -344,7 +407,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Logs the type of an object written with curly braces, either inline or via a variable holding one. Help: 1.2.23 (The typeof Operator)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.2.25 typeof Round-Up\". The task they were given: Log the type of a piece of text and the type of a number.",
+      "kind": "console",
+      "questions": {
+        "r1": "typeof a string: Logs the type of a quoted piece of text, either inline or via a variable holding one. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "typeof a number: Logs the type of a plain number, either inline or via a variable holding one. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "typeof true: Logs the type of a boolean, either inline or via a variable holding true/false. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "typeof undefined: Logs the type of undefined, either inline or via a variable left unassigned. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "Does the program log typeof null, either typeof null directly or typeof of a variable that holds null (for example console.log(typeof null))? Code inside a comment never runs. typeof written inside quotes is text, not code.",
+        "r6": "Does the program log the typeof of an object written with curly braces, such as typeof {}, typeof { name: 'Ada' } or typeof {name}, or typeof of a variable holding one? Whatever is inside the braces does not matter. Code inside a comment never runs. typeof written inside quotes is text, not code."
+      }
+    }
   },
   "1-2-26-lab-variables-types-check": {
     "lessonTitle": "1.2.26 Variables and Types Check",
@@ -374,7 +449,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Print a value to the console. Help: 1.2.3 (Every Value Has a Type)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.2.26 Variables and Types Check\". The task they were given: Use `let` or `const` to create a variable called `age` and set it to your age. Then create a second variable called `name` and set it to your name in quotes.",
+      "kind": "console",
+      "questions": {
+        "req1": "Declare age variable: Create a variable called age. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req2": "Declare name variable: Create a variable called name. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req3": "Use typeof: Use typeof to check a variable's type. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req4": "Use console.log: Print a value to the console. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-2-28-a1-2-1-fix-ten-declarations": {
     "lessonTitle": "1.2.28 Fix Ten Declarations",
@@ -440,7 +525,23 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "finalScore is declared with let and no value, so it holds undefined until set. Help: 1.2.2 (Declaring Variables with let and const)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.2.28 Fix Ten Declarations\". The task they were given: Several declarations are missing a keyword, a quote mark, or an equals sign. Repair them so the file runs.",
+      "kind": "console",
+      "questions": {
+        "r1": "Is studentAge declared (let, const or var) and given a NUMBER value, not text in quotes? Any number counts here, however unrealistic as an age. Code inside a comment never runs.",
+        "r2": "firstName is a string: firstName is declared and holds properly quoted text. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "isEnrolled is a real boolean: isEnrolled holds a real boolean -- true, false, or a comparison that produces one -- not quoted text. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "gradeLevel is declared with a keyword: gradeLevel uses let or const rather than being assigned with no keyword. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "maxStudents is a const: The value that never changes is declared with const. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r6": "unitPrice replaces the single-letter name: The mystery name p has been renamed to unitPrice. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r7": "itemCount replaces the second mystery name: The mystery name q has been renamed to itemCount. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r8": "Is the favourite-colour variable now declared with a camelCase name such as favouriteColour or favoriteColor (lowercase first word, each later word starting with a capital), instead of snake_case like favourite_colour or all lowercase like favouritecolour? Code inside comments never runs.",
+        "r9": "middleName is null, not the string \"null\": The deliberately-empty value uses the null keyword without quotes. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r10": "finalScore is declared but left unassigned: finalScore is declared with let and no value, so it holds undefined until set. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-2-29-a1-2-2-describe-an-object": {
     "lessonTitle": "1.2.29 Describe a Real Object",
@@ -488,7 +589,20 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Logs the type of at least one variable; the typeof may be labelled or stored in a variable first. Help: 1.2.23 (The typeof Operator)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.2.29 Describe a Real Object\". The task they were given: Choose something you can actually see. Declare at least six variables about it: at least two numbers, at least two strings, and at least one boolean. Use descriptive camelCase names.",
+      "kind": "console",
+      "questions": {
+        "r1": "Count the variables declared with let, const or var in the running code. Are there six or more? This card only counts declarations: what the names are and what they describe do not matter here. Code inside a comment never runs.",
+        "r2": "Do two or more variables hold plain numbers (like 15 or 0.25, not text in quotes)? Assigned on the declaration line or later; the names do not matter. Code inside a comment never runs.",
+        "r3": "At least two strings: Two or more variables hold text, in quotes or backticks, assigned on the declaration line or later. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "At least one boolean: A variable holds true or false, either literally or from a comparison, assigned on the declaration line or later. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "Two different string methods used: Uses two different string operations -- .length, .toUpperCase(), .includes(), .trim(), .replace() and others all count. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r6": "Does the program print a backtick string (template literal) with ${...} inside it that embeds a variable, either directly in console.log or through a variable that is printed later? Any other text around it is fine. Code inside a comment never runs.",
+        "r7": "typeof is used to check a type: Logs the type of at least one variable; the typeof may be labelled or stored in a variable first. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-2-5-lab-change-the-type": {
     "lessonTitle": "1.2.5 Change the Type",
@@ -524,7 +638,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Uses console.log with typeof thing to show the type. Help: 1.2.4 (Dynamically Typed)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.2.5 Change the Type\". The task they were given: Declare a variable called `thing` with `let` and set it to any piece of text in quotes.",
+      "kind": "console",
+      "questions": {
+        "r1": "thing is declared with let: Declares a variable called thing using let. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "thing starts as a string: thing holds text in quotes, whether from its own let or a later assignment. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "thing is reassigned without let: Assigns a new value to thing without re-declaring it. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "thing is given a boolean: At some point thing holds true or false, either literally or from a comparison. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "typeof is printed: Uses console.log with typeof thing to show the type. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-3-11-lab-rename-the-mystery-variables": {
     "lessonTitle": "1.3.11 Rename the Mystery Variables",
@@ -572,7 +697,20 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "No declaration of a, b, c, n, d or p remains in the file. Help: 1.3.7 (Avoid Single Letters and Abbreviations)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.3.11 Rename the Mystery Variables\". The task they were given: The first snippet builds a grade sentence with a, b and c. Rename them to subjectName, finalGrade and gradeReport. Keep the output the same.",
+      "kind": "console",
+      "questions": {
+        "r1": "subjectName replaces a: Declares subjectName holding the subject text. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "Is a variable named finalGrade declared in the running code and given a NUMBER value, like 88? Text in quotes such as \"88\" is a string, not a number, so it does not count. Code inside comments never runs.",
+        "r3": "gradeReport replaces c: Declares gradeReport built from the other two. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "hoursWorked replaces n: Declares hoursWorked holding the number of hours. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "hourlyRate replaces d: Declares hourlyRate holding the rate. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r6": "totalPay replaces p: Declares totalPay as hoursWorked times hourlyRate. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r7": "No single-letter variables left: No declaration of a, b, c, n, d or p remains in the file. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-3-12-rate-these-names": {
     "lessonTitle": "1.3.12 Rate These Names",
@@ -646,7 +784,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The reused variable no longer appears anywhere in the file. Help: 1.3.13 (Reuse or Create?)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.3.16 Split the Reused Variable\". The task they were given: The variable `stuff` is used for four unrelated things. Declare four separate variables instead: maxScore, playerName, isGameOver and levelCount.",
+      "kind": "console",
+      "questions": {
+        "r1": "Is there a variable named maxScore that holds a NUMBER (like 100, not \"100\" in quotes)? It may be declared and given its value on the same line, or declared first and assigned on a later line; spacing does not matter. Code inside a comment never runs.",
+        "r2": "Is there a variable named playerName that holds text in quotes or backticks (like \"Alice\")? It may be declared and given its value on the same line, or declared first and assigned on a later line; spacing does not matter. Code inside a comment never runs.",
+        "r3": "Is there a variable named isGameOver that holds a boolean: true, false, or a comparison that produces one, not quoted text and not a number? It may be declared and given its value on the same line, or declared first and assigned on a later line; spacing does not matter. Code inside a comment never runs.",
+        "r4": "Is there a variable named levelCount that holds a NUMBER (like 8, not \"8\" in quotes)? It may be declared and given its value on the same line, or declared first and assigned on a later line; spacing does not matter. Code inside a comment never runs.",
+        "r5": "All four are printed: Logs each of the four new variables. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r6": "stuff is gone: The reused variable no longer appears anywhere in the file. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-3-17-team-vocabulary": {
     "lessonTitle": "1.3.17 Team Vocabulary",
@@ -744,7 +894,23 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "README tells the reader about the tax rate they may need to change. Help: 1.3.6 (Human-Readable Names)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student worked on the lab \"1.3.19 Document a Messy Program\". The task they were given: a twelve-line program with no comments, no spacing and terrible names. Fix it to the class style guide (descriptive camelCase names, const for a value that never changes, spaces around operators, at least four explanatory comments) and write a short README.md that answers three prompts. You are given TWO files in one message: script.js first, then a line reading ----- README.md ----- followed by the README. Criteria about names, operators and comments are about script.js; the README criteria are about the README.",
+      "kind": "console",
+      "questions": {
+        "r1": "Is the tax rate (named taxRate or TAX_RATE) declared with const, not let or var, and given a NUMBER value such as 0.0725? A rate in quotes such as \"high\" or \"0.07\" is text, so it does not count. Code inside comments never runs.",
+        "r2": "bookTitle holds the title: Declares bookTitle with quoted text. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "unitPrice and quantity are named: Declares both unitPrice and quantity. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "subtotal is computed from them: subtotal is unitPrice times quantity. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "orderTotal uses the tax rate: orderTotal is computed from subtotal and taxRate. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r6": "No single-letter variables remain: No declaration of a one-letter variable is left in the file. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r7": "Operators are spaced: No cramped arithmetic like a*b remains: every operator has a space on each side. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r8": "At least four explanatory comments: Four or more comments explaining the code, written as // or /* */. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r9": "README answers all three prompts: Each of the three headings has a real answer under it -- a sentence or a bullet, not an empty heading. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r10": "Does README.md mention tax anywhere in what it tells the reader (for example the tax rate, or that the total includes tax)? Only README.md counts here, not the code. Headings, ## markers and wording do not matter."
+      }
+    }
   },
   "1-4-12-name-the-structure": {
     "lessonTitle": "1.4.12 Name the Structure",
@@ -774,7 +940,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The fourth console.log answers STEP 4 -- the password prompt, with both names in one string, selection first. Help: 1.4.10 (Sequence, Selection, Repetition)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.4.12 Name the Structure\". The task they were given: Read the description. Log which structure it needs, using console.log. Choose from: sequence, selection, repetition. Log one answer per step, in step order, one console.log each -- the first console.log is STEP 1.",
+      "kind": "console",
+      "questions": {
+        "r1": "Is the FIRST answer console.log the word 'sequence' (STEP 1: add tax, then print the total)? Count only console.log calls that print one of the answer words (sequence, selection, repetition); ignore comments, and any quotes, spacing or an extra label argument are fine.",
+        "r2": "Is the SECOND answer console.log the word 'selection' (STEP 2: pass or retake)? Count only console.log calls that print one of the answer words (sequence, selection, repetition); ignore comments, and any quotes, spacing or an extra label argument are fine.",
+        "r3": "Is the THIRD answer console.log the word 'repetition' (STEP 3: print every name on a list)? Count only console.log calls that print one of the answer words (sequence, selection, repetition); ignore comments, and any quotes, spacing or an extra label argument are fine.",
+        "r4": "Does the FOURTH answer console.log print both words 'selection' and 'repetition' in one string, selection first (joined by 'and', a comma or a space)? Count only console.log calls that print one of the answer words (sequence, selection, repetition); ignore comments, and any quotes, spacing or an extra label argument are fine."
+      }
+    }
   },
   "1-4-14-three-structures-three-examples": {
     "lessonTitle": "1.4.14 Three Structures, Three Examples",
@@ -836,7 +1012,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The fourth console.log answers STEP 4 -- the language itself, with multi-paradigm. Help: 1.4.19 (JavaScript Is Multi-Paradigm)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.4.20 Sort the Snippet\". The task they were given: Read the snippet in the comment. Log which paradigm it is, using console.log. Choose from: procedural, object-oriented, functional. Log one answer per step, in step order, one console.log each -- the first console.log is STEP 1.",
+      "kind": "console",
+      "questions": {
+        "r1": "Snippet A is procedural: The first console.log answers STEP 1 -- Snippet A, with procedural. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "Snippet B is object-oriented: The second console.log answers STEP 2 -- Snippet B, with object-oriented. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "Snippet C is functional: The third console.log answers STEP 3 -- Snippet C, with functional. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "JavaScript is multi-paradigm: The fourth console.log answers STEP 4 -- the language itself, with multi-paradigm. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-4-23-a1-4-1-two-languages": {
     "lessonTitle": "1.4.23 Two Languages, Two Purposes",
@@ -910,7 +1096,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The fifth console.log answers STEP 5 -- the data analysis job, with Python. Help: 1.4.2 (Why There Are So Many Languages)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.4.3 Match the Language to the Job\". The task they were given: Read the job. Log the name of the language designed for it, using console.log. Choose from: JavaScript, Python, C, SQL, Swift. Log one answer per step, in step order, one console.log each -- the first console.log is STEP 1.",
+      "kind": "console",
+      "questions": {
+        "r1": "A database question is SQL: The first console.log answers STEP 1 -- the database question, with SQL. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "An iPhone app is Swift: The second console.log answers STEP 2 -- the iPhone app, with Swift. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "An operating system is C: The third console.log answers STEP 3 -- the operating system, with C. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "An interactive web page is JavaScript: The fourth console.log answers STEP 4 -- the interactive web page, with JavaScript. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "Data analysis is Python: The fifth console.log answers STEP 5 -- the data analysis job, with Python. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-5-17-a1-5-2-computational-thinking": {
     "lessonTitle": "1.5.17 Computational Thinking",
@@ -991,7 +1188,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The check is closed (END IF) so both branches reach the same end.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: get a number; if the number is even, print \"even\"; otherwise print \"odd\". Both branches then rejoin at the same end (the check is closed with END IF, nothing else is needed after it). The point is one question with two answers that meet again.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r2": "Get a number first: A step that gets (or sets) the number before it is checked. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r3": "The question is even: Check whether the number is even. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r4": "Even is the yes answer: even is printed when the number is even. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r5": "Odd is the ELSE answer: odd is printed in the other branch. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r6": "Both answers rejoin: The check is closed (END IF) so both branches reach the same end. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-5-30-a1-5-1-flowchart-gate": {
     "lessonTitle": "1.5.30 Plan It in Pseudocode (Part 1)",
@@ -1028,7 +1237,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The ELSE branch reports too: a student under the limit owes nothing, and that is printed.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote pseudocode in README.md, between a first line and a last line that were already there. The problem: the school printer gives every student 20 free pages a week; after that each page over 20 costs 10 cents. The plan should take in the number of pages printed, ask whether it is over 20, charge 10 cents for ONLY the pages over 20 (pages minus 20, not every page), and report what is owed in BOTH cases (a student at or under 20 owes nothing, and that is reported, not left as an empty branch).",
+      "kind": "plan",
+      "questions": {
+        "r1": "The page count comes in: The plan takes in the number of pages the student printed. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r2": "The question is about 20 pages: The plan asks whether the pages printed are over the 20 free pages. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r3": "Only the pages over 20 are charged: The charge is for the pages over 20 (pages minus 20), not for every page. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r4": "Each extra page costs 10 cents: The charge is 10 cents (0.10) for each of those pages. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r5": "Both answers are reported: The ELSE branch reports too: a student under the limit owes nothing, and that is printed. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-5-31-a1-5-1-implement-your-plan": {
     "lessonTitle": "1.5.31 Implement Your Plan (Part 2)",
@@ -1064,7 +1284,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Two or more console.log calls, so each path reports an outcome. Help: 1.2.2 (Declaring Variables with let and const)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.5.31 Implement Your Plan (Part 2)\". The task they were given: Before any code, write your plan out as pseudocode comments at the top of the file. One instruction per line, indented to show what is inside the decision.",
+      "kind": "console",
+      "questions": {
+        "r2": "pagesRequested is declared: A descriptive variable holds how many pages were asked for. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "creditRemaining is declared: A descriptive variable holds the credit left. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "The decision compares the two: An if statement compares pagesRequested against creditRemaining Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "Both branches exist: An else branch is present, matching the diamond's second exit Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r6": "Both branches print: Two or more console.log calls, so each path reports an outcome. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-5-37-lab-settle-it-in-the-console": {
     "lessonTitle": "1.5.37 Settle It in the Console",
@@ -1094,7 +1325,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "At least three console.log calls, so something beyond the two given was checked. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.5.37 Settle It in the Console\". The task they were given: Write your prediction in a comment, then log 2 + 2 * 3.",
+      "kind": "console",
+      "questions": {
+        "r1": "Logs 2 + 2 * 3: Prints the un-bracketed expression. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "Logs (2 + 2) * 3: Prints the bracketed expression. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "Look only at the comments (lines starting with //, or /* */ blocks), wherever they are in the file. Does any comment say which operation is done first: words like order of operations, precedence, PEMDAS, BODMAS, multiply first, times before plus, or what brackets change? console.log text does not count.",
+        "r4": "A third expression of your own: At least three console.log calls, so something beyond the two given was checked. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-5-39-lab-cause-a-reference-error": {
     "lessonTitle": "1.5.39 Cause a ReferenceError on Purpose",
@@ -1124,7 +1365,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A comment saying which of the three parts solved it. Help: 1.5.38 (Reading an Error Message)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.5.39 Cause a ReferenceError on Purpose\". The task they were given: The file below has a misspelled name. Run it and read the error message that appears.",
+      "kind": "console",
+      "questions": {
+        "r2": "The misspelling is gone: No use of the misspelled name remains anywhere in the file. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "The corrected name is printed: Logs greeting, spelled correctly. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "The error message is recorded: A comment naming ReferenceError. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "The useful part is identified: A comment saying which of the three parts solved it. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-5-43-lab-debug-the-order-total": {
     "lessonTitle": "1.5.43 Debug the Order Total",
@@ -1160,7 +1411,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "An if/else comparing the total against the expected value and printing PASS or FAIL. Help: 1.5.40 (Testing and Test Cases)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.5.43 Debug the Order Total\". The task they were given: Before changing anything, work out by hand what the correct total is for 3 notebooks at 4.00 with 10% off and 8% tax. Write it in a comment as your expected outcome.",
+      "kind": "console",
+      "questions": {
+        "r1": "subtotal multiplies price by quantity: The quantity is actually used, with multiplication. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "The discount is subtracted: The discounted amount is the subtotal minus the discount, not plus. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "Tax is added to the discounted amount: The final total adds tax rather than subtracting it. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "At least three labelled prints: Three or more console.log calls whose text includes a label (string concatenation or a template literal both count). Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "A PASS/FAIL check is present: An if/else comparing the total against the expected value and printing PASS or FAIL. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-5-7-instructions-for-a-robot": {
     "lessonTitle": "1.5.7 Instructions for a Robot",
@@ -1476,7 +1738,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "console.log runs inside the if block, as step 2 asks. Help: 2.1.29 (Logical Operators)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.1.31 Guard with &&\". The task they were given: Create two number variables, for example, age and score, and give each a value.",
+      "kind": "console",
+      "questions": {
+        "r1": "&& combines two real comparisons: Some if condition joins two comparisons with &&, and each side compares a variable to a value with <, >, <=, >=, ===, !==, == or !=, like age >= 16 && score >= 70. Any variable names. Both sides may test the same variable: age >= 13 && age <= 17 is a range check and counts. With several if statements, one such if is enough. Not met: a single = (that assigns, it does not compare); a number variable compared to true or false; && with a bare value or variable and no comparison, like && score. Code inside comments never runs, and a condition written inside quotes is only text.",
+        "r2": "two variables declared: Two variables are declared and given values before the if, in any shape. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "a message is printed inside the if block: console.log runs inside the if block, as step 2 asks. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-1-13-lab-branch-or": {
     "lessonTitle": "2.1.32 Branch with ||",
@@ -1500,7 +1771,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "console.log runs inside the if block, as step 2 asks. Help: 2.1.29 (Logical Operators)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.1.32 Branch with ||\". The task they were given: Create two variables, for example, isWeekend and isHoliday, and give each a value (true or false, or numbers you can compare).",
+      "kind": "console",
+      "questions": {
+        "r1": "Does an if condition use || to combine checks of two different variables, for example if (isWeekend || isHoliday), if (a > 5 || b < 3), if (x === true || y === false) or if (!weekend || !holiday)? Any variable names count. Not counted: a bare true or false in place of a variable, like if (true || false); the same variable on both sides of ||; and a single = inside the condition, which is an assignment, not a check: if ((isWeekend = true) || (isHoliday = true)). Code inside comments never runs.",
+        "r2": "two variables declared: Two variables are declared and given values before the if, in any shape. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "a message is printed inside the if block: console.log runs inside the if block, as step 2 asks. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-1-14-lab-chain-else-if": {
     "lessonTitle": "2.1.8 Chain Three Branches",
@@ -1530,7 +1810,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "the closing else branch logs a message containing 'Battery full'. Help: 2.1.3 (If / Else if / Else)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.1.8 Chain Three Branches\". The task they were given: Create a variable called batteryPercent and set it to a number from 0 to 100.",
+      "kind": "console",
+      "questions": {
+        "r1": "below 20 logs Low battery: A message containing 'Low battery' (capitals and punctuation do not matter) is logged when batteryPercent is below 20, and not when it is 20. Judge the chain for every value, not only the one batteryPercent holds now. Low to high: if (batteryPercent < 20) or (<= 19) as the first test. A high-to-low chain is just as right: if (batteryPercent >= 90) Battery full, else if (>= 50) Battery good, else if (>= 20) Battery ok, else Low battery. Not met: <= 20 (20 would log it), or a branch that an earlier test always catches first. A misspelled name (batterPercent, consoe.log) crashes, so that branch logs nothing. Code inside comments never runs.",
+        "r2": "below 50 logs Battery ok: A message containing 'Battery ok' (capitals and punctuation do not matter) is logged when batteryPercent is 20 to 49, and not when it is 50. Low to high: else if (batteryPercent < 50) or (<= 49) after the below-20 test. A high-to-low chain is just as right: if (batteryPercent >= 90) Battery full, else if (>= 50) Battery good, else if (>= 20) Battery ok, else Low battery. Not met: <= 50 (50 would log it), or a branch that an earlier test always catches first, like an if (batteryPercent < 90) above it. A misspelled name (batterPercent, consoe.log) crashes, so that branch logs nothing. Code inside comments never runs.",
+        "r3": "below 90 logs Battery good: A message containing 'Battery good' (capitals and punctuation do not matter) is logged when batteryPercent is 50 to 89, and not when it is 90. Low to high: else if (batteryPercent < 90) or (<= 89) after the below-50 test; <= 89 is the same as < 90 for whole numbers. A high-to-low chain is just as right: if (batteryPercent >= 90) Battery full, else if (>= 50) Battery good, else if (>= 20) Battery ok, else Low battery. Not met: <= 90 (90 would log it), or a branch that an earlier test always catches first. A misspelled name (batterPercent, consoe.log) crashes, so that branch logs nothing. Code inside comments never runs.",
+        "r4": "final else logs Battery full: The chain ends in an else, and its branch for the highest values logs a message containing 'Battery full' (any capitals or punctuation). That branch is the final else when the lowest cutoff is tested first, or the first if (>= 90) when the highest is tested first. Whether it starts at 90 or 91 is judged by another card. A typo like consoe.log or batterPercent in any branch counts as not met. Code inside comments never runs."
+      }
+    }
   },
   "2-1-17-lab-nested-conditionals": {
     "lessonTitle": "2.1.11 Nest a Check",
@@ -1554,7 +1844,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "the outer else (paired with isLoggedIn) logs a message containing 'log in'. Help: 2.1.9 (Nested Conditionals)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.1.11 Nest a Check\". The task they were given: Create a variable called isLoggedIn (true or false) and a variable called isAdmin (true or false).",
+      "kind": "console",
+      "questions": {
+        "r1": "isAdmin check nested inside isLoggedIn, logs admin message: if (isLoggedIn) nests an if (isAdmin) whose block logs a message about admin. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "isAdmin's else logs user message: the else paired with if (isAdmin) logs a message about user. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "outer else logs please log in: the outer else (paired with isLoggedIn) logs a message containing 'log in'. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-1-20-lab-truthy-guard": {
     "lessonTitle": "2.1.14 Guard with a Truthy Check",
@@ -1572,7 +1871,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code contains an else branch that calls console.log. Help: 2.1.12 (Truthy and Falsy Values)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.1.14 Guard with a Truthy Check\". The task they were given: Create a variable called searchTerm and set it to an empty string \"\".",
+      "kind": "console",
+      "questions": {
+        "r1": "if statement tests searchTerm directly and logs: if statement condition is a bare searchTerm with no comparison operator, and logs inside the block. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "else branch logs: Code contains an else branch that calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-1-24-lab-ternary": {
     "lessonTitle": "2.1.22 Write Your First Ternary",
@@ -1596,7 +1903,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "console.log is called with the discount variable. Help: 2.1.20 (The Conditional Operator ?)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.1.22 Write Your First Ternary\". The task they were given: Create a variable called isMember and set it to true.",
+      "kind": "console",
+      "questions": {
+        "r1": "ternary on isMember yields 20 : 0: A ternary references isMember and chooses between 20 and 0, in that order. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Is the result of a ternary on isMember (for example isMember ? 20 : 0, or (isMember === true) ? 20 : 0) stored in a variable with = ? Any variable name counts; discount is only the lesson's suggestion. const, let or var, with or without semicolons. The numbers chosen do not matter for this card. Code inside comments never runs.",
+        "r3": "Is the variable that holds the isMember ternary's result passed to console.log, for example console.log(discount)? Any variable name counts; discount is only the lesson's suggestion, and the numbers in the ternary do not matter here. Passing it to a function of the student's own that calls console.log also counts. Logging only fixed text in quotes, such as console.log(\"got a discount\"), does not count. Code inside comments never runs."
+      }
+    }
   },
   "2-1-27-lab-ternary-chain": {
     "lessonTitle": "2.1.25 Chain Your Ternaries",
@@ -1626,7 +1942,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "console.log is called with the rating variable. Help: 2.1.23 (Chaining Multiple ? Operators)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.1.25 Chain Your Ternaries\". The task they were given: Create a variable called score and set it to a number from 0 to 100.",
+      "kind": "console",
+      "questions": {
+        "r1": "90-or-above cutoff yields Excellent: score >= 90 ? ... chooses Excellent. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "70-or-above cutoff yields Good, else Needs work: score >= 70 ? chooses Good, otherwise Needs work. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "rating assigned by checking 90 before 70: rating is assigned from a chain that checks the 90 cutoff before the 70 cutoff. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Is the variable that stores the ternary chain's result passed to a console.log that runs? Any variable name counts (rating, topScore, grade...); the lesson's name is only a suggestion. Judge only the logging: what the chain tests and which words it picks do not matter here. Example: let label = score > 50 ? \"a\" : \"b\"; console.log(label); is met. Logging only score, or a console.log written inside a branch of the ternary, is not met. Code inside comments never runs."
+      }
+    }
   },
   "2-1-30-lab-ternary-vs-if": {
     "lessonTitle": "2.1.28 Rewrite It as if/else",
@@ -1644,7 +1970,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "the else branch logs a message containing 'Please log in'. Help: 2.1.3 (If / Else if / Else)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.1.28 Rewrite It as if/else\". The task they were given: The comment below shows a ternary being used to run two different actions instead of picking a value: (loggedIn == \"yes\") ? console.log(\"Welcome back!\"): console.log(\"Please log in.\");",
+      "kind": "console",
+      "questions": {
+        "r1": "if checks loggedIn === yes and logs Welcome back: if statement compares loggedIn to 'yes' and logs a message containing 'Welcome back'. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "else logs Please log in: the else branch logs a message containing 'Please log in'. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-1-31-lab-flip-not": {
     "lessonTitle": "2.1.33 Flip It with !",
@@ -1662,7 +1996,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code calls console.log. Help: 2.1.29 (Logical Operators)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.1.33 Flip It with !\". The task they were given: Create a variable called isRaining and set it to true or false.",
+      "kind": "console",
+      "questions": {
+        "r1": "if condition is !isRaining and logs: Is there an if (!isRaining) { ... } whose block contains a console.log(...) call? Example: if (!isRaining) { console.log(\"Walk to school\") }. The message text, an else branch, and the current value of isRaining do not matter. !isRaining == true counts the same as !isRaining. A helper function that calls console.log counts as console.log. Ignore the comment's later step (logging isRaining and !isRaining after the if): it is not part of this card, so leaving it out does not lower this answer. Code inside comments never runs.",
+        "r2": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-1-33-lab-debug-door": {
     "lessonTitle": "2.1.35 Debug the Door",
@@ -1674,7 +2016,14 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "if statement condition combines isAlive and hasKey with && (either order). Help: 2.1.29 (Logical Operators)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.1.35 Debug the Door\". The task they were given: The starter code is meant to open a door only when the player is alive AND has a key, but it uses || instead of &&.",
+      "kind": "console",
+      "questions": {
+        "r1": "&& used to guard the door: if statement condition combines isAlive and hasKey with && (either order). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-1-34-lab-combine-logical": {
     "lessonTitle": "2.1.37 Combine &&, ||, and !",
@@ -1704,7 +2053,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A single if condition uses &&, a same-variable range check with ||, and ! together, not three separate ifs. Help: 2.1.30 (Combining conditions)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.1.37 Combine &&, ||, and !\". The task they were given: Create hasTicket (true/false), age (a number), and isBlocked (true/false).",
+      "kind": "console",
+      "questions": {
+        "r1": "&& combines with a real variable: if condition uses && together with a named variable, not a hardcoded true/false. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "|| compares the same variable on both sides: if condition uses || between two comparisons on the same variable (a range check, e.g. age < 5 || age >= 65). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Does any if condition use the NOT operator ! on a variable, like !isBlocked or !hasTicket? Any variable counts. A ! that is then compared, as in !isOpen == true or !isOpen === false, still uses ! on that variable. Only the presence of !name matters for this card, not what it is combined with or whether the logic is right. != and !== are not the NOT operator, and !true is not on a variable. Code inside comments never runs.",
+        "r4": "all three combined in one condition: A single if condition uses &&, a same-variable range check with ||, and ! together, not three separate ifs. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-1-36-lab-settings-advisor": {
     "lessonTitle": "2.1.40 Print Settings Advisor",
@@ -1740,7 +2099,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "a separate if condition compares layerHeight on both sides of && or ||",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.1.40 Print Settings Advisor\". The task they were given: Create a variable called filamentType set to 'PLA', 'PETG', or 'ABS', and a variable called layerHeight set to a number of millimeters (e.g. 0.2).",
+      "kind": "console",
+      "questions": {
+        "r1": "PLA branch logs 200: if condition checks filamentType === 'PLA' and logs 200 Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "PETG branch chains and logs 235: an else if condition checks filamentType === 'PETG' and logs 235 Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "In the chain of if / else if branches on filamentType, is there a branch whose condition compares filamentType with the text \"ABS\" (=== or ==) and that logs 250 (as a number or as the text \"250\")? The ABS branch may come first (the if) or later (an else if); the order of the branches does not matter. No if the condition uses a misspelled variable name instead of filamentType, or if it compares a number such as 250 and logs the word ABS: that is backwards. Code inside comments never runs.",
+        "r4": "Does the chain on filamentType end with a plain else (no condition) that logs a message saying the filament type is unknown, such as \"Unknown filament type\"? Capital letters and extra punctuation do not matter: \"unknown filament type!\" counts. No if there is no chain on filamentType, no final else, or the else logs something else. Code inside comments never runs.",
+        "r5": "separate if warns on layerHeight range: a separate if condition compares layerHeight on both sides of && or || Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-1-37-challenges": {
     "lessonTitle": "2.1.41 Challenges: Stretch Problems",
@@ -1800,7 +2170,22 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Challenge 3: uses both the $35 and $75 thresholds",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.1.41 Challenges: Stretch Problems\". The task they were given: Create a variable called year. Write a condition that logs 'Leap year' when the year is divisible by 4 (`year % 4 === 0` is true when year divides evenly by 4: the remainder is 0) and (not divisible by 100, or divisible by 400), and 'Not a leap year' otherwise. You will need &&, ||, and !.",
+      "kind": "console",
+      "questions": {
+        "r1": "checks divisibility by 4: Challenge 1: tests year % 4 Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "&& and || both used: Challenge 1: the leap year check combines && and || Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "logs both leap year messages: Challenge 1: logs both \"Leap year\" and \"Not a leap year\" Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Challenge 2: does the code store each rock-paper-scissors player's choice in its own variable (two players, two variables)? Any variable names count; playerOne and playerTwo are only the lesson's suggestion. How the choice is made (typed in, random, a ternary) does not matter. Code inside comments never runs.",
+        "r5": "else if chain used: Challenge 2: code contains an else if chain Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "logs a Tie result: Challenge 2: logs \"Tie\" for the matching case Code inside a comment, or written inside quotes as text, never runs.",
+        "r7": "isMember and orderTotal declared: Challenge 3: both isMember and orderTotal exist Code inside a comment, or written inside quotes as text, never runs.",
+        "r8": "nested if used: Challenge 3: an if statement nested inside another if's block Code inside a comment, or written inside quotes as text, never runs.",
+        "r9": "both shipping thresholds used: Challenge 3: uses both the $35 and $75 thresholds Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-1-38-a2-1-1-grade-advisor": {
     "lessonTitle": "2.1.42 Grade Recommendation Advisor",
@@ -1830,7 +2215,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code calls console.log",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.1.42 Grade Recommendation Advisor\". The task they were given: Create score (0-100), attendance (0-100, a percent), and lateAssignments (a count) and give each a hardcoded number value.",
+      "kind": "console",
+      "questions": {
+        "r1": "if statement present: An if statement tests score Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "else if chain present: An else if chain with at least two branches, each testing score against a real cutoff and logging Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "&& or || used to combine attendance and lateAssignments: One if or else if condition compares attendance to a number AND compares lateAssignments to a number, the two joined by && or ||, like attendance < 90 || lateAssignments >= 3. That condition may also test score: score >= 90 && attendance >= 90 && lateAssignments == 0 counts. Any comparison operator (<, >, <=, >=, ===, ==). Not met: a variable used bare with no comparison, like lateAssignments && attendance; or only one of the two ever compared. Code inside comments never runs, and a condition written inside quotes is only text.",
+        "r4": "console.log present: Code calls console.log Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-1-4a-chart-the-if-else": {
     "lessonTitle": "2.1.5 Plain English to Pseudocode: if / else",
@@ -1873,7 +2268,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Have a good day is printed once, after the if/else has finished.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: let temperature = 34; if (temperature > 30) { console.log(\"Too hot: stay inside\"); } else { console.log(\"Fine to go out\"); } console.log(\"Have a good day\"). The point is one question with two answers and a last line OUTSIDE the if/else that runs whichever branch was taken.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "temperature starts at 34: Set temperature to 34 before the check.",
+        "r3": "The question is over 30: Check whether temperature is over 30.",
+        "r4": "Too hot is the yes answer: Too hot: stay inside is printed when the temperature is over 30.",
+        "r5": "Fine to go out is the ELSE answer: Fine to go out is printed in the other branch.",
+        "r6": "Have a good day runs either way: Have a good day is printed once, after the if/else has finished."
+      }
+    }
   },
   "2-1-5-lab-first-if": {
     "lessonTitle": "2.1.6 Write Your First if",
@@ -1891,7 +2298,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "console.log is called inside the score >= 70 if block. Help: 2.1.3 (If / Else if / Else)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.1.6 Write Your First if\". The task they were given: Create a variable called score and assign it a number value of your choice.",
+      "kind": "console",
+      "questions": {
+        "r1": "if statement checks score >= 70: if statement's condition compares score to 70 with >=. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Is a console.log written inside the curly braces of the if block whose condition is score >= 70 (or 70 <= score)? This card is about where the console.log is written, not whether it runs for the current score: if (score >= 70) { console.log('pass') } counts even when score is 65. Spacing, quotes and semicolons do not matter. No if the if's condition is something else, such as score <= 70, or the console.log sits after the closing }. Code inside comments never runs."
+      }
+    }
   },
   "2-1-6-lab-add-else": {
     "lessonTitle": "2.1.7 Add an else",
@@ -1909,7 +2324,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code contains an else branch that calls console.log. Help: 2.1.3 (If / Else if / Else)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.1.7 Add an else\". The task they were given: Start with a variable called score holding a number and an if statement that checks score >= 70.",
+      "kind": "console",
+      "questions": {
+        "r1": "if block checks score >= 70 and logs: if statement's condition compares score to 70 with >=, and logs inside the block. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "else branch logs: Code contains an else branch that calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-2-10-lab-countdown": {
     "lessonTitle": "2.2.16 Countdown with while",
@@ -1933,7 +2356,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "count is decreased inside the loop.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.2.16 Countdown with while\". The task they were given: Create a variable called count and set it to 10.",
+      "kind": "console",
+      "questions": {
+        "r1": "while loop present: Code contains a while loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "console.log present: Code calls console.log Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "count goes down by 1: count is decreased inside the loop. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-2-11-fix-the-broken-chart": {
     "lessonTitle": "2.2.18 Fix the Broken Plan",
@@ -1976,7 +2408,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Too short is printed only in the branch for a rider who is NOT tall enough (under 48).",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: get the rider's height; if (height >= 48) { print \"You may ride\" } else { print \"Too short\" }. The plan the student started from only had the yes branch. The point is that the check needs BOTH answers written: the ELSE branch must exist and print Too short for riders under 48.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "The rider's height comes first: The plan gets the rider's height before it checks it.",
+        "r3": "The question is at least 48: Check whether the height is at least 48.",
+        "r4": "You may ride is the yes answer: You may ride is printed when the height is at least 48 (before any ELSE).",
+        "r5": "The other answer is written: The check has a second answer for a rider who is not tall enough (an ELSE, or an \"if not\" step).",
+        "r6": "Too short is the ELSE answer: Too short is printed in the other branch, for a rider under 48."
+      }
+    }
   },
   "2-2-12-a5-2-flowchart-decision": {
     "lessonTitle": "2.2.7 Write a Decision as Pseudocode",
@@ -2019,7 +2463,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The ticket price is printed.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The algorithm is: get the customer's age; if the age is under 13 the ticket price is $8, otherwise $14; print the ticket price. In JavaScript: const age = Number(prompt(\"Age?\")); let price; if (age < 13) { price = 8; } else { price = 14; } console.log(price). The point is one question about 13 with two answers carrying the right prices ($8 for under 13, $14 for 13 and over), with the age obtained before the question and the price printed.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "Gets the age before deciding: Get the customer's age (input, ask, read) before the check.",
+        "r3": "The question is about 13: Check the age against 13 (under 13, or 13 or over).",
+        "r4": "Right price for each answer: Under 13 costs $8 and 13 or over costs $14, on the matching branches.",
+        "r5": "Both answers are written: The decision has an ELSE (the other answer) and is closed with END IF.",
+        "r6": "Prints the price: The ticket price is printed."
+      }
+    }
   },
   "2-2-13-challenges": {
     "lessonTitle": "2.2.22 Challenges: Stretch Problems",
@@ -2049,7 +2505,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Uses % 2 to pick the even numbers.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.2.22 Challenges: Stretch Problems\". The task they were given: Loop through the integers 1 to 20. For each number: if it is divisible by both 3 and 5 (`i % 3 === 0` is true when i divides evenly by 3: the remainder is 0), log 'FizzBuzz'. If divisible by only 3, log 'Fizz'. If divisible by only 5, log 'Buzz'. Otherwise log the number itself.",
+      "kind": "console",
+      "questions": {
+        "r1": "A loop is present: Code contains a for loop or a while loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "if statement present: Code contains an if statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "FizzBuzz strings and % tests: Logs Fizz/Buzz/FizzBuzz and uses % to test divisibility. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "even-sum test: Uses % 2 to pick the even numbers. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-2-16-a2-2-1-loop-program": {
     "lessonTitle": "2.2.17 For + While Loop Program (Part B)",
@@ -2085,7 +2551,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Inside the while loop a variable is added to itself (total = total + n or total += n).",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.2.17 For + While Loop Program (Part B)\". The task they were given: Use a for loop to count or step through a range of numbers, logging something on each pass, for example, counting how many multiples of a number appear in a range (`n % 3 === 0` is true when n is a multiple of 3: the remainder is 0).",
+      "kind": "console",
+      "questions": {
+        "r1": "Is a for loop (for (...;...;...), for...of or for...in) written in the program's code? It counts even if its condition means it never runs. A loop that is only inside a comment or a string does not count.",
+        "r2": "Is a while loop written in the program's code? It counts even if its condition means it never runs. A loop that is only inside a comment or a string does not count.",
+        "r3": "Does the running code call console.log at least once? A call written inside a comment does not count.",
+        "r4": "Does the body of the for loop contain a console.log, so something is logged as the loop passes (it may sit inside an if in the body)? A log only after the loop ends means no.",
+        "r5": "Inside the while loop body, is a running total built: a variable that adds another value to itself on each pass, like total = total + n or total += n, where that variable is NOT just the loop's own counter stepping by one? A counter that only does count++ or count = count + 1 to control the loop means no. Adding after the loop ends means no."
+      }
+    }
   },
   "2-2-17b-lab-count-a-letter": {
     "lessonTitle": "2.2.20 Count a Letter in a Word",
@@ -2115,7 +2592,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "count is logged after the loop",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.2.20 Count a Letter in a Word\". The task they were given: Write a for loop whose counter i runs from 0 while i is less than word.length. Use < and not <=, or the last round reaches a position that does not exist.",
+      "kind": "console",
+      "questions": {
+        "r1": "loop runs to word.length with <: A for loop counts i from 0 while i < word.length. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "a character is tested by position: The if compares word[i] against a letter. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "the counter goes up inside the if: count is increased inside the if body, not somewhere else in the file. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Is count passed to a console.log that sits after the for loop's closing brace, so it runs once when the loop is done? Go by the braces, not the indentation. Example of counting them: for (...) { opens one, if (...) { opens a second, } else { closes and reopens, so it is still two, and }} closes both: a console.log(count) on the next line is after the loop, so met. Not met: the only console.log(count) is inside the loop body, printed on every pass. Code inside comments never runs."
+      }
+    }
   },
   "2-2-3a-chart-the-algorithm": {
     "lessonTitle": "2.2.6 Plain English to Pseudocode: Largest of Three",
@@ -2158,7 +2645,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "largest is printed by a step that comes after the final END IF (outside every check), once. Judge this card only by where the print sits relative to the last END IF; ignore whether earlier checks were nested.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: let largest = a; if (b > largest) { largest = b; } if (c > largest) { largest = c; } console.log(\"Largest:\", largest). The point: two separate checks one after the other, each compared with largest (the winner so far, never with a); the second check is NOT inside the first and is NOT an else-if, so it runs even when the first answer was no; largest is printed once, after both checks.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "largest starts as a: Set largest to a before any check.",
+        "r3": "First check: b against largest: Check whether b is greater than largest and, if so, set largest to b.",
+        "r4": "Second check: c against largest: Check whether c is greater than largest (not than a) and, if so, set largest to c.",
+        "r5": "The no answer carries on: The first check is closed (END IF) before the second check begins, so the second one runs whichever way the first went.",
+        "r6": "Print after both checks: largest is printed once, after the last check has finished."
+      }
+    }
   },
   "2-2-4-a5-1-algorithm-writeup": {
     "lessonTitle": "2.2.8 Algorithm in Plain English (Part A)",
@@ -2227,7 +2726,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The loop is closed, and total is printed once after it (not on every pass).",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: let total = 0; for (let i = 1; i <= 5; i++) { total = total + i; } console.log(\"Sum 1 to 5:\", total). The point: total starts at 0 ONCE before the loop (if it were reset inside the loop the answer would always be 5); the loop counts i from 1 to 5; the body adds i to total on every pass; the print is after the loop ends, once.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "total starts at 0 before the loop: Set total to 0 once, before the loop begins (not inside it).",
+        "r3": "The loop counts i from 1 to 5: A loop line that counts from 1 to 5.",
+        "r4": "i is added to total inside the loop: After the loop line, a step adds i to total.",
+        "r5": "The loop ends, then total is printed: The loop is closed, and total is printed once after it (not on every pass)."
+      }
+    }
   },
   "2-2-7-lab-count-to-ten": {
     "lessonTitle": "2.2.12 Count 1 to 10",
@@ -2245,7 +2755,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code calls console.log",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.2.12 Count 1 to 10\". The task they were given: Write a for loop that starts at 1 and runs while the counter is less than or equal to 10. On each iteration, use console.log to print the current counter value.",
+      "kind": "console",
+      "questions": {
+        "r1": "for loop present: Code contains a for loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "console.log present: Code calls console.log Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-3-13-lab-fix-fall-through": {
     "lessonTitle": "2.3.13 Fix the Fall-Through Bug",
@@ -2269,7 +2787,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code still contains a default label. Help: 2.3.9 (break and Fall-Through)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.3.13 Fix the Fall-Through Bug\". The task they were given: Run the code first and read the two lines it prints. Only one of them should print.",
+      "kind": "console",
+      "questions": {
+        "r1": "switch statement present: Code still contains a switch statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "break added after the apple case: A break statement now appears between the apple case and the banana case. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "default label still present: Code still contains a default label. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-3-17-lab-vowel-consonant": {
     "lessonTitle": "2.3.17 Group Cases: Vowel or Consonant",
@@ -2305,7 +2832,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code contains a break statement. Help: 2.3.9 (break and Fall-Through)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.3.17 Group Cases: Vowel or Consonant\". The task they were given: Create a variable called letter and assign it a single lowercase letter, for example 'e'.",
+      "kind": "console",
+      "questions": {
+        "r1": "switch statement present: Code contains a switch statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "'a' and 'e' cases grouped: case 'a' is stacked directly above case 'e' with no code between them. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "'u' case reaches the shared block: case 'u' is grouped in among the vowel cases and the shared block logs Vowel. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "default label present: The default label is directly followed by a console.log call that prints Consonant. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "break present: Code contains a break statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-3-19-lab-false-vs-zero": {
     "lessonTitle": "2.3.19 case false vs case 0: Predict, Then Run",
@@ -2341,7 +2879,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code contains three break statements, one for each of case false, case 0 and case '0'. Help: 2.3.9 (break and Fall-Through)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.3.19 case false vs case 0: Predict, Then Run\". The task they were given: Create a variable called value. Write a switch on value with three cases in this order: case false, case 0, case '0' (the string). Each case should log which one matched, and end with a break. Add a default too.",
+      "kind": "console",
+      "questions": {
+        "r1": "switch statement present: Code contains a switch statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "case false present: The switch has a case false: line whose next statement is a console.log(...) call, like case false: console.log('Boolean false'). Judge only how it is written: it does not matter what value is set to now, or whether this case would run this time. The order of the cases does not matter, and what the log prints does not matter. A missing break is another card. Code inside comments never runs.",
+        "r3": "case 0 present: case 0 is directly followed by a console.log call. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "case '0' present: case '0' is directly followed by a console.log call. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "three breaks, one per case: Code contains three break statements, one for each of case false, case 0 and case '0'. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-3-22-lab-fix-type-mismatch": {
     "lessonTitle": "2.3.22 Fix the Type Mismatch",
@@ -2371,7 +2920,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "case 2's body calls console.log, so the fix is visible in the output. Help: 2.3.18 (switch Compares Strictly)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.3.22 Fix the Type Mismatch\". The task they were given: Run the code and confirm it prints No medal. place is the string '2', and the cases are the numbers 1 and 2: strict equality means neither case can match.",
+      "kind": "console",
+      "questions": {
+        "r1": "switched value converted to a number: switch(...) wraps place in Number(...)/parseInt(...)/parseFloat(...), or place is reassigned from one of those before the switch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "case 1 unchanged: case 1 is still a plain number. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "case 2 unchanged: case 2 is still a plain number. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "case 2 actually prints output: case 2's body calls console.log, so the fix is visible in the output. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-3-26-lab-traffic-light": {
     "lessonTitle": "2.3.26 Rewrite the Traffic Light as a Switch",
@@ -2413,7 +2972,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code contains three break statements, one for each of the green, yellow and red cases. Help: 2.3.3 (switch Statements)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.3.26 Rewrite the Traffic Light as a Switch\". The task they were given: The comment at the top of script.js shows the chain you're rewriting. It's already there for reference: don't delete it.",
+      "kind": "console",
+      "questions": {
+        "r1": "switch statement present: Code contains a switch statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Does the switch have a case 'green': label (single or double quotes) whose first statement is a console.log, like case 'green': console.log('Go');, or that sets a variable which is logged after the switch? This card is about how the green case is written, not about which case runs for the value light holds right now. Code inside comments never runs.",
+        "r3": "case 'yellow' present: case 'yellow' is directly followed by a console.log call, or sets the message variable that is logged after the switch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "case 'red' present: case 'red' is directly followed by a console.log call, or sets the message variable that is logged after the switch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "default label present: The default label is directly followed by a console.log call, or sets the message variable that is logged after the switch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "three breaks, one per case: Code contains three break statements, one for each of the green, yellow and red cases, with or without a semicolon after each break. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-3-27-written-justify-choice": {
     "lessonTitle": "2.3.27 switch or if...else? Justify Your Choice",
@@ -2487,7 +3058,20 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code contains four break statements, one for each of the S, M, L and XL cases. Help: 2.3.3 (switch Statements)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.3.28 Build a Four-Case Switch: Drink Sizes\". The task they were given: Create a variable called size set to one of 'S', 'M', 'L', 'XL'.",
+      "kind": "console",
+      "questions": {
+        "r1": "switch statement present: Code contains a switch statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "case 'S' present: case 'S' is directly followed by a console.log call. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "case 'M' present: case 'M' is directly followed by a console.log call. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "case 'L' present: case 'L' is directly followed by a console.log call. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "case 'XL' present: case 'XL' is directly followed by a console.log call. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "default label present: The default label is directly followed by a console.log call. Code inside a comment, or written inside quotes as text, never runs.",
+        "r7": "four breaks, one per case: Code contains four break statements, one for each of the S, M, L and XL cases. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-3-29-a2-3-1-print-settings-advisor": {
     "lessonTitle": "2.3.30 Print Settings Advisor",
@@ -2553,7 +3137,23 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A comment explains what would print if a break were removed. Help: 2.3.3 (switch Statements)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.3.30 Print Settings Advisor\". The task they were given: Create a variable called filamentType and assign it one of: 'PLA', 'ABS', 'PETG', 'TPU'.",
+      "kind": "console",
+      "questions": {
+        "r1": "Is there a real switch statement in the code that would run? A switch that is commented out, or the word switch inside a string or comment, does not count.",
+        "r2": "Does the switch statement in the running code have a case that runs when filamentType is exactly 'PLA' (uppercase)? A case label like case 'PLA': counts, and so does case filamentType === 'PLA': inside switch (true). Text in a comment or inside a string does not count; 'pla' in lowercase never matches 'PLA'.",
+        "r3": "Does the switch statement in the running code have a case that runs when filamentType is exactly 'ABS' (uppercase)? A case label like case 'ABS': counts, and so does case filamentType === 'ABS': inside switch (true). Text in a comment or inside a string does not count; 'pla' in lowercase never matches 'PLA'.",
+        "r4": "Does the switch statement in the running code have a case that runs when filamentType is exactly 'PETG' (uppercase)? A case label like case 'PETG': counts, and so does case filamentType === 'PETG': inside switch (true). Text in a comment or inside a string does not count; 'pla' in lowercase never matches 'PLA'.",
+        "r5": "Does the switch statement in the running code have a case that runs when filamentType is exactly 'TPU' (uppercase)? A case label like case 'TPU': counts, and so does case filamentType === 'TPU': inside switch (true). Text in a comment or inside a string does not count; 'pla' in lowercase never matches 'PLA'.",
+        "r6": "Does the running switch statement have a default: label?",
+        "r7": "Does EACH of the four filament cases (PLA, ABS, PETG and TPU) end with its own break statement, so none of them falls through into the case below it? Missing a case, a case with no break, several breaks piled in one place, or breaks inside comments mean no.",
+        "r8": "For a filament the switch recognises, does the program print (console.log) a recommended temperature with an actual number, such as \"Temperature: 200\"? The number may be printed inside the case or after the switch from a variable the case set. Printing only the word \"temperature\" with no value, or printing from code that can never run, means no.",
+        "r9": "For a filament the switch recognises, does the program print (console.log) a recommended print speed with an actual number, such as \"Speed: 60\"? The number may be printed inside the case or after the switch from a variable the case set. Printing only the word \"speed\" with no value, or printing from code that can never run, means no.",
+        "r10": "Is there a comment that CORRECTLY explains what would print if a case's break (its stopping statement, its end) were removed? Without it the program keeps running into the case or default below. The comment may sit above the case label or inside the case, in any words. Yes if it says the code below would run or print too: naming the next case ('it falls into ABS, so both print'), the default or its message (in the last case, 'it would also print Unknown type'), or 'it keeps printing what is below until a break'. No if it only calls the result messy, mixed up, wrong, or 'a correct value then an incorrect one'; names the wrong case; or is a starter STEP instruction."
+      }
+    }
   },
   "2-3-30-challenges": {
     "lessonTitle": "2.3.31 Challenges: Stretch Problems",
@@ -2583,7 +3183,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "case 200, 404 and 500 each appear.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.3.31 Challenges: Stretch Problems\". The task they were given: Write a switch on a variable code. 200 prints OK, 404 prints Not Found, 500 prints Server Error, and default prints Unknown status.",
+      "kind": "console",
+      "questions": {
+        "r1": "switch statement present: Code contains a switch statement Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "case label present: Code contains a case label Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "break present: Code contains a break statement Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "HTTP status cases: case 200, 404 and 500 each appear. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-3-3a-chart-the-switch": {
     "lessonTitle": "2.3.6 Plain English to Pseudocode: a switch is a chain of questions",
@@ -2632,7 +3242,20 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Done is printed once, after the switch has finished, not inside a case.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: let grade = \"B\"; switch (grade) { case \"A\": console.log(\"Excellent\"); break; case \"B\": console.log(\"Good\"); break; case \"C\": console.log(\"Passing\"); break; default: console.log(\"Not a grade I know\"); } console.log(\"Done\"). The point is that a switch is a chain of three questions (A, then B, then C), each case ends with a break so it does not fall into the next one, the default catches everything else, and Done is OUTSIDE the switch so every path reaches it. An IF / ELSE IF / ELSE chain with the same messages is an equally correct way to write the same idea (the ELSE branches then play the part of the breaks).",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "grade starts as B: Set grade to B before the switch.",
+        "r3": "Three questions: A, then B, then C: Each case is its own question, asked in order: is grade A, then B, then C.",
+        "r4": "Each case prints its own message: A prints Excellent, B prints Good, C prints Passing.",
+        "r5": "Each case ends with a break: After each case's print there is a break (or the cases are an ELSE IF chain), so the arrow leaves the switch instead of falling into the next case.",
+        "r6": "The default is the last no: Not a grade I know is printed when none of the cases matched (default / else).",
+        "r7": "Done runs after the switch, every time: Done is printed once, after the switch has finished, not inside a case."
+      }
+    }
   },
   "2-3-4-lab-convert-to-switch": {
     "lessonTitle": "2.3.29 Convert an if-chain to switch",
@@ -2662,7 +3285,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code contains at least two break statements, one after each case body.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.3.29 Convert an if-chain to switch\". The task they were given: Create a variable called day and assign it a day-of-week string, for example 'Monday'.",
+      "kind": "console",
+      "questions": {
+        "r1": "switch statement present: Code contains a switch statement Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "case label present: A quoted case label is directly followed by a console.log call Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "default label present: The default label is directly followed by a console.log call Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "at least two breaks, one per case: Code contains at least two break statements, one after each case body. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-3-8-lab-animal-sounds": {
     "lessonTitle": "2.3.7 Build a Switch: Animal Sounds",
@@ -2704,7 +3337,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code contains three break statements, one for each of the dog, cat and cow cases.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.3.7 Build a Switch: Animal Sounds\". The task they were given: Create a variable called animal and assign it one of: 'dog', 'cat', 'cow'.",
+      "kind": "console",
+      "questions": {
+        "r1": "switch statement present: Code contains a switch statement Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Inside the switch, is there a case \"dog\": label (lower-case dog, as the value is spelled; 'Dog' would never match) whose first statement is a console.log printing a message with the word woof in it? Capitals and extra words in the message do not matter: \"Woof\", \"woof woof\" and \"WOOF!\" all count. Single or double quotes. Code inside comments never runs.",
+        "r3": "Inside the switch, is there a case \"cat\": label (lower-case cat, as the value is spelled; 'Cat' would never match) whose first statement is a console.log printing a message with the word meow in it? Capitals and extra words in the message do not matter: \"Meow\", \"meow meow\" and \"MEOW!\" all count. Single or double quotes. Code inside comments never runs.",
+        "r4": "case 'cow' present: case 'cow' is directly followed by a console.log call that prints Moo Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "default label present: The default label is directly followed by a console.log call Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "three breaks, one per case: Code contains three break statements, one for each of the dog, cat and cow cases. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-4-11-diagram-search-until-found": {
     "lessonTitle": "2.4.11 Plain English to Pseudocode: Search Until Found",
@@ -2753,7 +3398,20 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "When the check says no, current goes up by 1 and the check happens again.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: let current = 20; while (true) { if (current % 7 === 0) { console.log(\"Found: \" + current); break; } current++; }. It prints Found: 21. The point is that the loop has no condition of its own: the only way out is the if inside the body. The yes branch prints Found and then BREAKS (leaves the loop). The no path adds 1 to current and goes round again. Without the break the loop would never end. Writing the add 1 inside an ELSE or after the END IF is equally fine, as long as it only matters when the number was not found.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "current starts at 20: Set current to 20 before the loop.",
+        "r3": "A loop with no limit of its own: The steps repeat (forever / until found) rather than checking a counter.",
+        "r4": "The question: is current a multiple of 7?: Check whether the remainder of current divided by 7 is 0.",
+        "r5": "Found is printed in the yes branch: Found: and the number are printed after the check says yes.",
+        "r6": "The early exit is its own step: Right after the print, a step leaves the loop at once (break / stop / exit).",
+        "r7": "No means add 1 and try again: When the check says no, current goes up by 1 and the check happens again."
+      }
+    }
   },
   "2-4-12-lab-break-square": {
     "lessonTitle": "2.4.12 Break When the Square Passes 50",
@@ -2777,7 +3435,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code calls console.log. Help: 2.4.9 (Leaving Early with break)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.4.12 Break When the Square Passes 50\". The task they were given: Declare a variable called n and set it to 1.",
+      "kind": "console",
+      "questions": {
+        "r1": "while (true) loop present: n is declared and set to 1. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "break present: Inside the while (true) loop, n * n is compared to 50 and break runs when it is greater, with console.log also inside that check. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-4-15-diagram-continue": {
     "lessonTitle": "2.4.15 Plain English to Pseudocode: continue Skips, Doesn't Leave",
@@ -2820,7 +3487,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The print is INSIDE the loop (before the loop is closed), so it can run for each odd i. A print after the loop has ended runs only once.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: for (let i = 1; i <= 6; i++) { if (i % 2 === 0) { continue; } console.log(i); }. It prints 1, 3, 5. The point: continue skips the rest of ONE round and goes on to the next i; it does not leave the loop (that would be break).",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "The loop counts i from 1 to 6: A loop step that goes through i from 1 to 6.",
+        "r3": "The check is \"is i even?\": Inside the loop, a check for whether i is even (i % 2 is 0).",
+        "r4": "Even means continue (skip), not break: When i is even the steps CONTINUE: skip the rest of this round and move on to the next i. Not leave the loop.",
+        "r5": "The print comes after the check: i is printed after the check, so only the rounds that did not continue print.",
+        "r6": "The print is inside the loop: The print is a step of the loop body: the loop ends after it, so the next i comes round again."
+      }
+    }
   },
   "2-4-19-lab-multiples-of-three": {
     "lessonTitle": "2.4.19 Multiples of 3 with continue",
@@ -2850,7 +3529,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code calls console.log. Help: 2.4.13 (Skipping a Round with continue)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "Write a for loop running from 1 to 20 that prints only the multiples of 3. Inside the loop, if the current number is NOT a multiple of 3, use continue to skip it; otherwise log it.",
+      "kind": "console",
+      "questions": {
+        "r1": "Trace the for loop from 1 to 20. Does it print ONLY the multiples of 3 (3, 6, 9, 12, 15, 18), by using continue to skip every number that is not a multiple of 3 and logging the rest inside the loop? If it prints 1, 2, 4, 5 and the other non-multiples instead, the answer is no. Code inside comments never runs.",
+        "r2": "continue present: Code contains a continue statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "remainder operator used: Code uses % to test for a multiple of 3. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-4-22-diagram-fix-infinite-loop": {
     "lessonTitle": "2.4.22 Fix the Infinite Loop",
@@ -2893,7 +3582,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "There is an explicit written line that closes the loop or says it stops (END WHILE, END LOOP, a line saying the loop is over, or a stop when count reaches 0). Indentation alone, with no closing line, does not meet this.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: let count = 5; while (count > 0) { console.log(count); count = count - 1; } and then the program ends. The plan the student started from said REPEAT FOREVER, with no test and no stopping point, so it is an infinite loop. The point is that a loop needs a test on count that can become false (count > 0) and a place where the loop ends.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "count starts at 5: Set count to 5 before the loop.",
+        "r3": "The loop prints count: Each round prints the current count.",
+        "r4": "count goes down by 1: Each round count is reduced by 1.",
+        "r5": "The loop asks count > 0: The loop has a test that stops it: it repeats while count is above 0 (or until count reaches 0).",
+        "r6": "The loop is closed: The plan shows where the repeating steps end, so it can carry on to its end (END WHILE, \"loop ends\", \"stop\")."
+      }
+    }
   },
   "2-4-23-a2-4-1-debug-five-loops": {
     "lessonTitle": "2.4.23 Debug Five Loops",
@@ -2929,7 +3630,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A do...while loop logs something and its condition guarantees the body could otherwise be skipped (!greeted or greeted === false). Help: 2.4.5 (The do...while Loop)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.4.23 Debug Five Loops\". The task they were given: The commented-out version of Program 1 never stops because n never changes. Write a fixed, runnable version below it that logs n from 1 to 5, then stops. Add a comment explaining what was wrong.",
+      "kind": "console",
+      "questions": {
+        "r1": "Program 1: is there a runnable while loop on n (n <= 5, or n < 6) whose body logs n and adds 1 to n once per pass (n++, n += 1 or n = n + 1)? The fix may sit anywhere in the file, including right where the broken original was (uncommented and corrected in place, above the STEP note): that counts. Judge the runnable loop as it now reads; a missing comment explaining the bug and the other programs do not matter here. It must print exactly 1, 2, 3, 4, 5: adding 1 before the log (so it prints 2 to 6) or adding 1 twice per pass is not met. Code inside comments never runs.",
+        "r2": "Program 2: is there a runnable for loop that starts count at 10, runs while count > 0 (count >= 1 is the same), takes 1 from count each pass (count--, count -= 1 or count = count - 1) and logs count in its body? The fix may sit anywhere in the file, including right where the broken original was (uncommented and corrected in place, above the STEP note): that counts. Judge the runnable loop as it now reads; a missing comment explaining the bug and the other programs do not matter here. Code inside comments never runs.",
+        "r3": "Program 3: is there a runnable for loop that starts i at 1, runs while i <= 5 (i < 6 is the same for whole numbers), adds 1 each pass and logs i in its body? The fix may sit anywhere in the file, including right where the broken original was (uncommented and corrected in place, above the STEP note): that counts. Judge the runnable loop as it now reads; a missing comment explaining the bug and the other programs do not matter here. Code inside comments never runs.",
+        "r4": "Program 4: is there a runnable for loop that starts k at 1 (not 0), runs while k <= 5 (k < 6 is the same for whole numbers), adds 1 each pass and logs k in its body? The fix may sit anywhere in the file, including right where the broken original was (uncommented and corrected in place, above the STEP note): that counts. Judge the runnable loop as it now reads; a missing comment explaining the bug and the other programs do not matter here. Code inside comments never runs.",
+        "r5": "Program 5: is there a runnable do...while loop whose body logs something and whose condition is !greeted or greeted === false? What greeted is set to inside the body does not matter. The fix may sit anywhere in the file, including right where the broken original was (uncommented and corrected in place, above the STEP note): that counts. Judge the runnable loop as it now reads; a missing comment explaining the bug and the other programs do not matter here. But if a loop above it never ends (a while (greeted === true) whose body never changes greeted), the do...while is never reached: not met. Code inside comments never runs."
+      }
+    }
   },
   "2-4-26-diagram-nested-loops": {
     "lessonTitle": "2.4.26 Plain English to Pseudocode: Nested Loops",
@@ -2972,7 +3684,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The printed line shows BOTH the row and the col (like \"row 1, col 1\"). Printing only one of them does not meet this.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: for (let row = 1; row <= 3; row++) { for (let col = 1; col <= 4; col++) { console.log(\"row \" + row + \", col \" + col); } }. It prints 12 lines. The point: the col loop is INSIDE the row loop and starts over for every row; the print is inside the col loop; the row only moves on after the col loop has finished.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "The outer loop is row, 1 to 3: A loop step that goes through row from 1 to 3.",
+        "r3": "The inner loop is col, 1 to 4: A loop step that goes through col from 1 to 4.",
+        "r4": "The col loop sits inside the row loop: The col loop starts after the row loop starts and finishes before it does, so it restarts for every row.",
+        "r5": "The print is inside the col loop: The print is a step of the inner loop, so it happens for every col in every row.",
+        "r6": "The print shows both row and col: Each printed line says which row and which col it is."
+      }
+    }
   },
   "2-4-30-lab-triangle-of-stars": {
     "lessonTitle": "2.4.30 Triangle of Stars",
@@ -2996,7 +3720,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code calls console.log. Help: 2.4.24 (Nested Loops)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.4.30 Triangle of Stars\". The task they were given: Write an outer for loop with counter row running from 1 to 5.",
+      "kind": "console",
+      "questions": {
+        "r1": "Looking only at the loop structure: is there an outer for loop that counts from 1 to 5 (i <= 5 and i < 6 are the same), with an inner for loop inside it whose condition compares the inner counter to the outer loop's counter (like j <= i), and a console.log after the inner loop's closing } but still inside the outer loop? Any counter names. What the inner loop's body does to build the row (stars or numbers, = or +=, extra ++) does not matter for this card. Code inside comments never runs.",
+        "r2": "inner loop bound depends on row: The inner loop's condition compares its own counter to the outer loop's counter, not to a fixed number (any consistent counter names accepted, e.g. i/j). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-4-31-lab-fix-duplicate-pairs": {
     "lessonTitle": "2.4.31 Fix the Duplicate Pairs",
@@ -3008,7 +3741,14 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The inner loop's counter b starts at a + 1, not a fixed value, and the nested loops still log each pair. Help: 2.4.24 (Nested Loops)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.4.31 Fix the Duplicate Pairs\". The task they were given: Run the loop as it's given. Notice it prints 1-1, 1-2, 1-3, 2-1, 2-2, 2-3, 3-1, 3-2, 3-3: every pair twice, plus pairs of a number with itself.",
+      "kind": "console",
+      "questions": {
+        "r1": "inner loop starts at a + 1: The inner loop's counter b starts at a + 1, not a fixed value, and the nested loops still log each pair. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-4-32-a2-4-2-grid-pattern": {
     "lessonTitle": "2.4.32 Print a Grid Pattern",
@@ -3044,7 +3784,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code calls console.log. Help: 2.4.24 (Nested Loops)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.4.32 Print a Grid Pattern\". The task they were given: Declare a variable called rows and a variable called cols. Set each to a number of at least 5. Do not write the numbers directly into the loop headers: the loops must read them from these variables.",
+      "kind": "console",
+      "questions": {
+        "r1": "rows variable declared: A variable named rows is declared. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "cols variable declared: A variable named cols is declared. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Is there a for loop over the rows variable (like for (let i = 0; i < rows; i++)) with a for loop over the cols variable (like for (let j = 0; j < cols; j++)) nested inside it, and a console.log of the row inside the outer loop after the inner loop ends? Any counter names. Which character the row is built from (# or * or anything) does not matter for this card. Code inside comments never runs.",
+        "r4": "inner loop reads cols: The inner loop's condition compares its own counter against the cols variable, and the outer against rows, not hardcoded numbers (any consistent counter names accepted, e.g. i/j). Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-4-33-challenges": {
     "lessonTitle": "2.4.33 Challenges: Stretch Problems",
@@ -3068,7 +3819,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Uses % 3 and % 5.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.4.33 Challenges: Stretch Problems\". The task they were given: Print a 6x6 hollow square using nested loops: a \"#\" on the border rows and border columns, and a space everywhere else inside.",
+      "kind": "console",
+      "questions": {
+        "r1": "Does the code contain at least one for loop that is not inside a comment, for example for (let i = 1; i <= 50; i++) { ... }? One for loop is enough for this card, even if only one of the challenges is attempted or its answer is wrong: other cards judge that. Any counter name, let or var. The word for inside a comment or inside quotes is not a loop. Code inside comments never runs.",
+        "r2": "continue present: Code contains a continue statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "multiple-of-3 and multiple-of-5 tests: Uses % 3 and % 5. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-4-4-lab-write-both-loops": {
     "lessonTitle": "2.4.4 Write Both: Known Count, Unknown Count",
@@ -3092,7 +3852,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code calls console.log. Help: 2.4.2 (for vs while: Choosing a Loop)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.4.4 Write Both: Known Count, Unknown Count\". The task they were given: Use a for loop to print the numbers 1 through 8, one per console.log call. The count (8) is known before the loop starts, so for is the right tool.",
+      "kind": "console",
+      "questions": {
+        "r1": "for loop present: A for loop counts from 1 up to 8 and logs inside its own body. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "while loop present: A while loop doubles total on every pass until it exceeds 100. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-4-7-diagram-do-while": {
     "lessonTitle": "2.4.7 Plain English to Pseudocode: do...while",
@@ -3141,7 +3910,20 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "When the answer is yes, the steps go back and repeat the body.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: let attempts = 0; do { attempts++; console.log(\"Attempt \" + attempts); } while (attempts < 3). It prints Attempt 1, Attempt 2, Attempt 3. The point is that a do...while runs the body FIRST and asks its question (attempts < 3) AFTER the body, then goes back to the body if the answer is yes. A version that asks the question before the body is a while loop, not a do...while. 'DO ... WHILE attempts < 3' or 'repeat ... until attempts is 3' both express this correctly.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "attempts starts at 0: Set attempts to 0 before the loop.",
+        "r3": "The body adds 1 to attempts: One step inside the loop adds 1 to attempts.",
+        "r4": "The body prints Attempt and the number: Another step inside the loop prints Attempt followed by attempts.",
+        "r5": "The question is: attempts less than 3: The question compares attempts with 3 (less than 3 means go again).",
+        "r6": "The question comes AFTER the body: The question is written after the add and print steps, so the body runs before it is ever asked.",
+        "r7": "Yes goes back to the body: When the answer is yes, the steps go back and repeat the body."
+      }
+    }
   },
   "2-4-8-lab-do-while-count": {
     "lessonTitle": "2.4.8 do...while: Count 1 to 5",
@@ -3165,7 +3947,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code calls console.log. Help: 2.4.5 (The do...while Loop)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.4.8 do...while: Count 1 to 5\". The task they were given: Write a do...while loop that logs the numbers 1 through 5. Declare a counter, log it inside the loop, then update it before the while condition checks it.",
+      "kind": "console",
+      "questions": {
+        "r1": "do...while loop present: A do...while loop logs and increments a counter up through 5. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "second do...while with a condition that starts false: A second do...while loop logs something with a condition that is already false before the loop starts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-5-11-lab-fix-silent-catch": {
     "lessonTitle": "2.5.11 Fix the Silent Catch",
@@ -3183,7 +3974,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The catch block now logs something. Help: 2.5.10 (The Empty catch Trap)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.5.11 Fix the Silent Catch\". The task they were given: The starter's catch block is empty. Nothing tells you the order total failed to calculate.",
+      "kind": "console",
+      "questions": {
+        "r1": "try/catch present: Code still has a try block and a catch block. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "catch is no longer empty: The catch block now logs something. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-5-14-lab-report-the-error": {
     "lessonTitle": "2.5.14 Report the Error",
@@ -3207,7 +4006,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Catch block logs err.message. Help: 2.5.12 (Reading the Error Object)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.5.14 Report the Error\". The task they were given: Inside a try block, declare a constant set to null, then read a property off it (for example .name). Reading a property of null always raises a TypeError.",
+      "kind": "console",
+      "questions": {
+        "r1": "reads a property of null: Code reads a property off a value set to null, inside try. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "logs err.name: Catch block logs err.name. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "logs err.message: Catch block logs err.message. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-5-17-chart-validate-before-trust": {
     "lessonTitle": "2.5.17 Plain English to Pseudocode: Validate Before You Trust",
@@ -3250,7 +4058,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The Ordering print is after the checks, so it only runs on valid input.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: const typed = \"abc\"; const quantity = Number(typed); if (Number.isNaN(quantity)) { throw new Error(\"That is not a number: \" + typed); } if (quantity <= 0) { throw new Error(\"Quantity must be at least 1.\"); } console.log(\"Ordering \" + quantity + \" items.\"). The point is validate-before-use: both checks come BEFORE the work, each bad-input branch ENDS with a throw (it must not carry on), and the Ordering print is only reached when both checks passed.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "quantity is made from typed: Convert the typed text into the number quantity before checking it.",
+        "r3": "Check for not-a-number: A check asks whether quantity is not a number (NaN).",
+        "r4": "Check for 0 or less: A second check asks whether quantity is 0 or less (below 1).",
+        "r5": "Each bad-input branch throws: A failing check throws an error (stops or reports), one for each of the two checks.",
+        "r6": "The work comes after both checks: The Ordering print is after the checks, so it only runs on valid input."
+      }
+    }
   },
   "2-5-19-lab-reject-bad-input": {
     "lessonTitle": "2.5.19 Reject the Bad Input",
@@ -3274,7 +4094,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The catch block logs err.message. Help: 2.5.12 (Reading the Error Object)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.5.19 Reject the Bad Input\". The task they were given: Create a constant called password set to \"abc\".",
+      "kind": "console",
+      "questions": {
+        "r1": "checks password length: Code checks password.length against 8. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "throws a new Error: Code throws a new Error when the password is too short. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "catch logs err.message: The catch block logs err.message. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-5-20-lab-after-a-throw": {
     "lessonTitle": "2.5.20 What Happens After a throw?",
@@ -3298,7 +4127,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Catch block logs caught: followed by err.message. Help: 2.5.15 (Throwing Your Own Errors)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.5.20 What Happens After a throw?\". The task they were given: In a comment, predict what prints from this sequence: log \"start\", throw new Error(\"stop right here\"), log \"after the throw\", catch logs \"caught: \" + err.message.",
+      "kind": "console",
+      "questions": {
+        "r1": "logs start before the throw: Code logs \"start\" before the throw statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "throws with the exact message: Throws new Error with the message stop right here. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "catch reports caught plus the message: Catch block logs caught: followed by err.message. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-5-22-lab-when-finally-runs": {
     "lessonTitle": "2.5.22 When Does finally Run?",
@@ -3322,7 +4160,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The finally block logs Cleanup ran. Help: 2.5.21 (Cleaning Up with finally)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.5.22 When Does finally Run?\". The task they were given: In a comment, predict which blocks run when the try block succeeds: try and catch, try and finally, or all three.",
+      "kind": "console",
+      "questions": {
+        "r1": "try/catch/finally present: Code has a try, catch, and finally block. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "try block cannot fail: The try block logs Work done. with nothing that can error. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "finally logs cleanup: The finally block logs Cleanup ran. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-5-26-a2-5-1-loop-with-try-catch": {
     "lessonTitle": "2.5.26 Loop with try/catch",
@@ -3358,7 +4205,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Two throw new Error statements: one for NaN, one for a reading that is 0 or less.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.5.26 Loop with try/catch\". The task they were given: Write a for loop with i from 1 to 3. Inside, set a variable raw to \"12\" when i is 1, \"abc\" when i is 2, and \"-4\" when i is 3 (three separate if statements).",
+      "kind": "console",
+      "questions": {
+        "r1": "for loop present: Code loops over the three readings with a for loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "try/catch inside the loop: The loop body has a try block and a catch block. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "checks for NaN: Code checks the converted value with Number.isNaN(...) or isNaN(...). Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "catch reports err.message: The catch block logs a friendly message that includes err.message, not a generic string. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "throws an Error for the bad readings: Two throw new Error statements: one for NaN, one for a reading that is 0 or less. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-5-27-challenges": {
     "lessonTitle": "2.5.27 Challenges: Stretch Problems",
@@ -3376,7 +4234,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code uses a finally block for cleanup. Help: 2.5.15 (Throwing Your Own Errors)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.5.27 Challenges: Stretch Problems\". The task they were given: JavaScript does NOT throw on division by zero: it returns Infinity. Write code that divides two hardcoded numbers where the divisor could be 0. Inside a try, throw your own error if the divisor is 0, before dividing. Catch it and log a friendly message.",
+      "kind": "console",
+      "questions": {
+        "r1": "throw present: Code throws at least one error deliberately. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "finally present: Code uses a finally block for cleanup. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-5-6-lab-wrap-only-risk": {
     "lessonTitle": "2.5.6 Wrap Only What Can Fail",
@@ -3394,7 +4260,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The total is logged after the catch block, not inside the try. Help: 2.5.4 (try...catch: Attempt and Recover)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.5.6 Wrap Only What Can Fail\". The task they were given: The starter has a for loop that computes a total, wrapped inside one try block along with a risky console.log(label) line. Move the for loop and the let total = 0; declaration so they run before the try block, not inside it.",
+      "kind": "console",
+      "questions": {
+        "r1": "for loop present: The loop that computes the total is still in the file. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "loop runs before try; total logged after catch: The total is logged after the catch block, not inside the try. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-5-7-chart-try-catch": {
     "lessonTitle": "2.5.7 Plain English to Pseudocode: try/catch",
@@ -3431,7 +4305,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "\"Done.\" is printed AFTER the try/catch has finished (after END TRY), so it runs whether or not the try failed. Printing it only inside the catch does not meet this.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: try { console.log(quantity); } catch (err) { console.log(\"Could not read quantity.\"); } console.log(\"Done.\"). quantity was never created, so the try fails. The point: the catch runs ONLY when the try fails; the \"Done.\" line is after the whole try/catch so it runs on both paths.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "The risky line is tried first: A TRY step that attempts to print quantity.",
+        "r3": "There is a catch for failure: A catch step that only applies when the try failed.",
+        "r4": "The message is in the catch: Could not read quantity. is printed in the catch (failure) part, after the catch begins.",
+        "r5": "Done runs either way: Done. is printed after the try/catch has finished, so both paths reach it."
+      }
+    }
   },
   "2-5-8-lab-catch-first-error": {
     "lessonTitle": "2.5.8 Catch Your First Error",
@@ -3455,7 +4340,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Welcome! is logged after the catch block closes. Help: 2.5.4 (try...catch: Attempt and Recover)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.5.8 Catch Your First Error\". The task they were given: Write a try block that uses console.log to print a variable called username. Never declare username anywhere in this file.",
+      "kind": "console",
+      "questions": {
+        "r1": "try/catch present: Code contains a try block and a catch block. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "reads username inside try: The try block logs a variable called username. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Welcome! logged after the block: Welcome! is logged after the catch block closes. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "2-5-9-lab-what-runs": {
     "lessonTitle": "2.5.9 What Runs, What Doesn't",
@@ -3485,7 +4379,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "console.log(\"B\") appears right after console.log(boom).",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.5.9 What Runs, What Doesn't\". The task they were given: In a comment, predict which of these four lines will print: log \"A\", log an undeclared variable called boom, log \"B\", catch logs \"C\", and after the block, log \"D\".",
+      "kind": "console",
+      "questions": {
+        "r1": "logs A before the risky line: Code logs \"A\" before reading boom. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "catch logs C: The catch block logs \"C\". Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "D logged after the whole block: \"D\" is logged after the catch block closes. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Is there a console.log that prints B, in any quotes or backticks, on the line right after the console.log(boom) line? Code inside comments never runs."
+      }
+    }
   },
   "2-6-1-ch2-group-pa-design-chart": {
     "lessonTitle": "2.6.1 Group PA Part 1: Design the Plan",
@@ -3783,7 +4687,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Print what your functions return with console.log. Help: 3.2.11 (Getting a Value Back with `return`)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.4.21 Lab: Parameters, Return Values, and Arrow Syntax\". The task they were given: Write a function with a parameter and a return value, a second function of your own, and an arrow function, then call them and print the results. The lesson names the first function greet.",
+      "kind": "console",
+      "questions": {
+        "req1": "greet function: Declare a function called greet. Code inside a comment, or written inside quotes as text, never runs.",
+        "req2": "Return value: Return a value: a return statement, or an arrow whose body is one expression Code inside a comment, or written inside quotes as text, never runs.",
+        "req3": "Arrow function: Write an arrow function. Code inside a comment, or written inside quotes as text, never runs.",
+        "req4": "Call greet: Call the greet function. Code inside a comment, or written inside quotes as text, never runs.",
+        "req5": "Multiple functions: Define at least 2 functions. Code inside a comment, or written inside quotes as text, never runs.",
+        "req6": "Results printed: Print what your functions return with console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-1-13-lab-syntax-naming": {
     "lessonTitle": "3.1.5 Lab: Fix the Syntax and the Name",
@@ -3807,7 +4723,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code calls showTotal() as a statement. Help: 3.1.2 (Defining & Calling a Function)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.1.5 Lab: Fix the Syntax and the Name\". The task they were given: The starter's function header is missing something every function header needs. Add it.",
+      "kind": "console",
+      "questions": {
+        "r1": "showTotal defined, camelCase, with parentheses: Code defines a function named showTotal (not ShowTotal) with an empty parameter list. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "prints the total: The function body logs the total. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "showTotal is called: Code calls showTotal() as a statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-1-16-lab-concessions-stand": {
     "lessonTitle": "3.1.8 Lab: Concessions Stand",
@@ -3831,7 +4756,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code calls concessions() as a statement. Help: 3.1.2 (Defining & Calling a Function)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.1.8 Lab: Concessions Stand\". The task they were given: Define a function called concessions that takes no parameters.",
+      "kind": "console",
+      "questions": {
+        "r1": "concessions defined, no parameters: Code defines a function named concessions with an empty parameter list. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "prints the options line: The function body logs the food/drink options. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "concessions is called: Code calls concessions() as a statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-1-17-lab-terms-loop": {
     "lessonTitle": "3.1.9 Lab: Terms and Conditions Loop",
@@ -3861,7 +4795,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A for loop calls terms() once per user. Help: 3.1.2 (Defining & Calling a Function)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.1.9 Lab: Terms and Conditions Loop\". The task they were given: Define a function called terms that takes no parameters. Inside it, log \"Do you accept the terms and conditions?\", then read a Y or N with prompt().",
+      "kind": "console",
+      "questions": {
+        "r1": "terms defined, no parameters: Code defines a function named terms with an empty parameter list. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "reads an answer with prompt: terms() calls prompt() to read the user's answer. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "if/else on the answer: An if/else compares the answer to \"Y\" and logs a response either way. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "for loop calls terms(): A for loop calls terms() once per user. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-1-18-lab-refactor-receipt-header": {
     "lessonTitle": "3.1.10 Lab: Refactor the Receipt Header",
@@ -3891,7 +4835,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The three distinct book titles are still logged, in order. Help: 3.1.2 (Defining & Calling a Function)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.1.10 Lab: Refactor the Receipt Header\". The task they were given: The starter logs the same header line three times, once before each book. That is the repetition to remove.",
+      "kind": "console",
+      "questions": {
+        "r1": "printHeader defined, no parameters: Code defines a function named printHeader with an empty parameter list. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "header text lives inside printHeader: printHeader()'s body logs the header line. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Is printHeader() called three separate times by code that runs? Count the call statements: three written-out printHeader(); calls count wherever they sit, even side by side or inside a block that runs once. This card counts the calls only; whether each header still lands right before its book does not matter here. One call inside a loop that repeats it is not three separate calls. Code inside comments never runs.",
+        "r4": "Are the three book lines still printed by console.log calls that run, in this order: The Hobbit, then Dune, then Kindred? This card is only about the book lines being kept in order; where the header prints, and how printHeader is written or called, does not matter here. A book line that is commented out does not count. Code inside comments never runs."
+      }
+    }
   },
   "3-1-19-lab-refactor-grade-advisor": {
     "lessonTitle": "3.1.13 Lab: Refactor the Grade Advisor",
@@ -3933,7 +4887,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code calls printAdvice() as a statement. Help: 3.1.11 (The Function-Call Shape)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.1.13 Lab: Refactor the Grade Advisor\". The task they were given: score, attendance, and lateAssignments stay as top-level variables, exactly like in 2.1.42. Neither function below takes them as a parameter — that is next module's tool. Both functions just read the outer variables directly.",
+      "kind": "console",
+      "questions": {
+        "r1": "decideGrade defined, no parameters: Code defines a function named decideGrade with an empty parameter list. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "printAdvice defined, no parameters: Code defines a function named printAdvice with an empty parameter list. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "else if chain on score: An else if chain with at least two branches, each testing score against a real cutoff and logging. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "&& or || used to combine attendance and lateAssignments: An if condition compares attendance and lateAssignments each against a real value, combined with && or ||. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Is decideGrade() called as its own statement, outside the function's body, by code that runs, for example decideGrade(); on its own line? It may come before or after the printAdvice() call: the order of the two calls does not matter for this card. With or without a semicolon. Only defining the function, without calling it, is not met. Code inside comments never runs.",
+        "r6": "printAdvice is called: Code calls printAdvice() as a statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-1-21-chart-built-grade-advisor": {
     "lessonTitle": "3.1.14 Write Up What You Built",
@@ -3970,7 +4936,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The main program has no IF, ELSE or other decision. A decision written out in the main program is missing.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given a task and wrote numbered pseudocode in README.md, between a first line and a last line that were already there. The student refactored a grade advisor into two functions, decideGrade and printAdvice, and is writing up the MAIN program only: set up score, attendance and lateAssignments, CALL decideGrade, CALL printAdvice. The point is that the main program no longer contains any decision, because the branching moved inside the two functions. A write-up that puts an IF or ELSE (the grade chain or the attendance warning) in the main program has drawn the inside of a function and is missing the last criterion.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "The three values are set up: The main program sets up score, attendance and lateAssignments.",
+        "r3": "It calls decideGrade: The main program calls decideGrade.",
+        "r4": "It calls printAdvice: The main program calls printAdvice.",
+        "r5": "No decision is left in the main program: The branching moved inside the functions, so no IF or ELSE line is left in the main program."
+      }
+    }
   },
   "3-1-7-a7-2-pass-by-reference-writeup": {
     "lessonTitle": "3.6.15 Writeup: Pass by Value vs Reference",
@@ -4039,7 +5016,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The main program CALLS a second, different function whose job is the attendance and late-work warning. Writing the warning test out inline instead of calling is missing.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given a task and wrote numbered pseudocode in README.md, between a first line and a last line that were already there. The program being planned is a grade advisor: it has three values (score, attendance, lateAssignments), prints a recommended letter grade from the score, and prints a review warning when attendance is low or late work is high. The student should list at least two functions (a name and a one-line job each) and write the main program as steps that set up the three values and CALL each function by name. A step that writes out the inside of a function (the else-if chain, the warning test) instead of calling it does not count as a call. The function that decides the grade and the function that handles the warning must be two different functions.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "The three values are set up: The plan sets up score, attendance and lateAssignments.",
+        "r3": "Two functions are named: Under FUNCTIONS, write two lines: a function name, a dash, and what it does.",
+        "r4": "One function decides the grade: The plan calls a function that works out the recommended letter grade.",
+        "r5": "One function gives the advice: The plan calls a different function that handles the attendance and late-work warning."
+      }
+    }
   },
   "3-1-8-lab-findmax-iseven": {
     "lessonTitle": "3.2.26 Lab: findMax & isEven",
@@ -4087,7 +5075,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "isEven(n) returns true when n is even and false when it is odd, including 0 and negative numbers. Help: 3.2.11 (Getting a Value Back with `return`)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.2.26 Lab: findMax & isEven\". The task they were given: Define a function called findMax that takes two parameters, a and b. Inside the function, compare a and b, then return whichever value is larger.",
+      "kind": "console",
+      "questions": {
+        "r1": "findMax defined: Code defines a function named findMax (exact spelling). Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "isEven defined: Code defines a function named isEven (exact spelling). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "return statement present: Code contains a return statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "findMax compares its two values: findMax compares a and b (with > or <, or Math.max) inside its body. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "isEven uses the remainder operator: isEven uses % inside its body. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-1-9-lab-sum-to-n": {
     "lessonTitle": "3.2.28 Lab: Sum 1 to N",
@@ -4123,7 +5122,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "sumToN(n) returns 1 + 2 + ... + n: for example sumToN(5) is 15, sumToN(10) is 55 and sumToN(100) is 5050. Help: 3.2.11 (Getting a Value Back with `return`)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.2.28 Lab: Sum 1 to N\". The task they were given: Define a function called sumToN that takes one parameter, n. Inside the function, create a variable to hold the running total, starting at 0.",
+      "kind": "console",
+      "questions": {
+        "r1": "sumToN defined: Code defines a function named sumToN (exact spelling). Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "for loop present: Code contains a for loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "return statement present: Code contains a return statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "the loop adds to the total, then sumToN returns it: Inside sumToN, a for loop body adds to a running total and a return comes after the loop. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-10-2-ch3-individual-pa-own-words": {
     "lessonTitle": "3.10.4 Individual PA Part 4: Reflect",
@@ -4259,7 +5268,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "divide(a, b) returns a message that mentions zero when b is 0 and a divided by b for every other b. Help: 3.2.11 (Getting a Value Back with `return`)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.2.15 Lab: an Early-Return Guard Clause\". The task they were given: Define a function called divide that takes two parameters, a and b.",
+      "kind": "console",
+      "questions": {
+        "r1": "divide defined: Code defines a function named divide. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "if statement present: Code contains an if condition. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "return statement present: Code contains a return statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "results are logged: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "a guard if returns early: Inside divide, an if returns right away for the bad input, and a second return follows for the good result. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "no else needed: divide does not use else: the early return already handled the bad case. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-2-15-lab-fix-print-not-return": {
     "lessonTitle": "3.2.18 Lab: Fix a Function That Prints Instead of Returning",
@@ -4295,7 +5316,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Called on its own, area(width, height) gives back width times height and prints nothing itself. Help: 3.2.16 (Printing Is Not Returning)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.2.18 Lab: Fix a Function That Prints Instead of Returning\". The task they were given: Run the starter. The function prints the area, but the variable that stores the call prints as undefined. That is the tell of a missing return.",
+      "kind": "console",
+      "questions": {
+        "r1": "area defined: Code defines a function named area. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "area returns its answer: Inside area there is a return with a value, and area no longer prints with console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "result used in arithmetic: The value that area returns is used in arithmetic (for example doubled), proving a number came back. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "results are logged: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-2-18-chart-chained-calls": {
     "lessonTitle": "3.2.22 Plain English to Pseudocode: Data Flow Through Chained Calls",
@@ -4338,7 +5369,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Big is printed when the check is true and Small is printed otherwise (two alternatives, not both every time).",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given five plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: function double(n) { return n * 2; } function addTen(n) { return n + 10; } const result = addTen(double(5)); if (result > 25) print \"Big\" else print \"Small\". The point is that the inner call double(5) runs first, its value (10) is handed to the outer call addTen, result is set to what addTen returns (20), and only then is result compared with 25.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "Calls double with 5: Call double with the number 5.",
+        "r3": "The second call uses the first one's answer: addTen is called after double, on the value double handed back.",
+        "r4": "Result comes from addTen: Set result to what addTen handed back.",
+        "r5": "The check is result over 25: Check whether result is over 25.",
+        "r6": "Big or Small, one of them: Print Big when the check is true and Small otherwise."
+      }
+    }
   },
   "3-2-19-lab-compose-functions": {
     "lessonTitle": "3.2.23 Lab: Compose Two Functions",
@@ -4404,7 +5447,21 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "addSeven(n) returns n plus 7 for any number. Help: 3.2.20 (Building With Returned Values)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.2.23 Lab: Compose Two Functions\". The task they were given: Define a function called triple that takes one parameter n and returns n multiplied by 3.",
+      "kind": "console",
+      "questions": {
+        "r1": "triple defined: Code defines a function named triple. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "addSeven defined: Code defines a function named addSeven. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "returns a value: Code contains a return statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "one call nested in another: A call to one function is written as the argument of the other. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "results are logged: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "triple multiplies: triple multiplies: its body has a * (or adds the number to itself three times). Code inside a comment, or written inside quotes as text, never runs.",
+        "r7": "addSeven adds: addSeven adds: its body has a +. Code inside a comment, or written inside quotes as text, never runs.",
+        "r8": "both nesting orders: Both orders are written: triple inside addSeven and addSeven inside triple. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-2-5-lab-sum-array": {
     "lessonTitle": "3.3.12 Sum an Array",
@@ -4440,7 +5497,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The output shows the total, 84. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.3.12 Sum an Array\". The task they were given: The starter already creates the array: let numbers = [10, 25, 7, 42];. Leave that line exactly as it is.",
+      "kind": "console",
+      "questions": {
+        "r1": "for loop present: Code contains a for loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "the loop adds to total: A for loop body adds each element to a running total (total += ..., or total = total + ...). Adding the same number every time, like total += 1, counts items instead of summing them. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-2-7-arrays": {
     "lessonTitle": "3.3.24 Arrays",
@@ -4488,7 +5554,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "longFruits(fruits, minLength) returns a new array with only the items whose length is minLength or more, in order, and does not change the array it was given. Help: 3.3.15 (Arrays and Functions)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.3.24 Arrays\". The task they were given: Work with lists of values: create an array, add with push, remove with pop, loop through it, search it with a comparison, and write countFruit(fruits, name) and longFruits(fruits, minLength).",
+      "kind": "console",
+      "questions": {
+        "req1": "Create array: Declare an array using square brackets. Code inside a comment, or written inside quotes as text, never runs.",
+        "req2": "Use push: Somewhere in code that runs, .push(...) adds an item to an array, like fruits.push(\"date\"). Any array counts, including a new array built inside a function that gets called, like result.push(fruits[i]) in longFruits. It does not have to be the first array the program made. unshift, splice or setting an index are other ways and do not count as push. A function nobody calls never runs. Code inside comments never runs, and code written inside quotes is only text.",
+        "req3": "Use pop: Remove an element using .pop(). Code inside a comment, or written inside quotes as text, never runs.",
+        "req4": "Iterate with a for loop: Loop through the array with a for loop that has something in its body. Code inside a comment, or written inside quotes as text, never runs.",
+        "req5": "Search with a comparison: Inside a loop, compare each item to the one you want with === (or use includes / indexOf) and act on it. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-2-7-lab-rectangle-area": {
     "lessonTitle": "3.2.9 Lab: findRectangleArea (multi-parameter)",
@@ -4530,7 +5607,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Called with different widths and heights, findRectangleArea prints width times height. Help: 3.2.2 (Parameters)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.2.9 Lab: findRectangleArea (multi-parameter)\". The task they were given: Define a function called findRectangleArea that takes two parameters, width and height.",
+      "kind": "console",
+      "questions": {
+        "r1": "findRectangleArea defined: Code defines a function named findRectangleArea. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "two parameters: findRectangleArea is defined with two parameters. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "prints the area: findRectangleArea prints with console.log inside its body. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "called twice with two numbers: findRectangleArea is called at least twice, each with two arguments. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "the body multiplies width by height: Inside the function, two names are multiplied (width * height). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-2-8-chart-parameter-trace": {
     "lessonTitle": "3.2.10 Plain English to Pseudocode: Tracing Parameter Values",
@@ -4573,7 +5661,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The yes way out prints Over budget and the other way out prints Within budget (reversed only if the question is also reversed).",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: set base to 100; call showPriceWithTax with base (inside the call the value becomes the parameter price and it prints the price with tax; the body is not written out); then check whether base is over 80; if so print \"Over budget\", otherwise print \"Within budget\".",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "Sets base to 100: Set base to 100 before anything uses it.",
+        "r3": "Calls the function with base: Call showPriceWithTax and pass it base.",
+        "r4": "The call comes before the decision: Call the function first, then make the decision.",
+        "r5": "The decision tests base against 80: The check asks whether base is over 80.",
+        "r6": "Each answer prints the right message: Over budget for yes, Within budget for the other way out."
+      }
+    }
   },
   "3-2-drill-default-greeting": {
     "lessonTitle": "3.2.8 Lab: greet with a Default Name",
@@ -4597,7 +5697,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "greet() prints Hello, friend! and greet(name) prints Hello, then that name, then an exclamation mark. Help: 3.2.7 (Order Matters)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.2.8 Lab: greet with a Default Name\". The task they were given: Write a function declaration called greet that takes one parameter, name.",
+      "kind": "console",
+      "questions": {
+        "r1": "greet has a default parameter: Code defines greet with a default value written in the parentheses, as name = something. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "greet is called with no argument: Code calls greet() with nothing in the parentheses. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-2-drill-initials": {
     "lessonTitle": "3.2.19 Lab: initials(first, last)",
@@ -4621,7 +5729,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "initials(first, last) gives back the first letter of first followed by the first letter of last, as one string. Help: 2.2.19 (Walking Through a Word)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.2.19 Lab: initials(first, last)\". The task they were given: Write a function declaration called initials that takes two parameters, first and last.",
+      "kind": "console",
+      "questions": {
+        "r1": "initials is defined with two parameters: Code defines a function named initials with exactly two parameters. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "initials hands back a value with return: initials contains a return statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-2-drill-largest-of-three": {
     "lessonTitle": "3.2.27 Lab: largest(a, b, c)",
@@ -4651,7 +5767,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "largest(a, b, c) gives back the biggest of the three numbers, wherever it sits in the list. Help: 3.2.26 (Lab: findMax & isEven)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.2.27 Lab: largest(a, b, c)\". The task they were given: Write a function declaration called largest that takes three parameters, a, b and c.",
+      "kind": "console",
+      "questions": {
+        "r1": "largest is defined with three parameters: Code defines a function named largest with exactly three parameters. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "largest compares its numbers: largest compares the numbers (with > or <, or Math.max) inside its body. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "largest hands back a value with return: largest contains a return statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-2-drill-shout": {
     "lessonTitle": "3.2.6 Lab: shout(word)",
@@ -4681,7 +5806,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "shout(word) prints the word in capital letters, whatever word it is given. Help: 1.2.14 (String Methods in Practice)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.2.6 Lab: shout(word)\". The task they were given: Write a function declaration called shout with one parameter, word, as in 3.2.5.",
+      "kind": "console",
+      "questions": {
+        "r1": "shout is defined with one parameter: Code defines a function named shout with exactly one parameter. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "shout turns the word into capitals: shout uses .toUpperCase() in its body. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "shout is called: Code calls shout at least once. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-2-drill-square": {
     "lessonTitle": "3.2.13 Lab: square(n)",
@@ -4705,7 +5839,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "square(n) gives back n multiplied by itself, for any number. Help: 3.2.11 (Getting a Value Back with `return`)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.2.13 Lab: square(n)\". The task they were given: Write a function declaration called square that takes one parameter, n. You met square in 3.2.11; write it from memory, and look back only if you are stuck.",
+      "kind": "console",
+      "questions": {
+        "r1": "square is defined with one parameter: Code defines a function named square with exactly one parameter. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "square hands back a value with return: square contains a return statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-3-11-chart-the-array-loop": {
     "lessonTitle": "3.3.14 Plain English to Pseudocode: Looping Over an Array",
@@ -4748,7 +5890,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The count is printed once AFTER the loop ends, not inside the loop.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: const prices = [4.50, 12.00, 7.25, 30.00, 2.00]; let cheapCount = 0; for (let i = 0; i < prices.length; i++) { if (prices[i] < 10) { cheapCount = cheapCount + 1; } } console.log(\"Items under $10:\", cheapCount). The point is a decision nested inside a loop: a price that is not cheap still moves on to the next one, and the print happens once, after the loop.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "cheapCount starts at 0: Start cheapCount at 0, before the loop.",
+        "r3": "A loop over the prices: Loop over every price in the array.",
+        "r4": "Each price is checked against 10: Check whether a price is under 10.",
+        "r5": "A cheap price adds one: Adding one to cheapCount happens inside the check.",
+        "r6": "The print comes after the loop: Print the count once, after the loop has finished."
+      }
+    }
   },
   "3-3-14-lab-filter-function": {
     "lessonTitle": "3.3.19 Lab: Write a Function That Returns a New Array",
@@ -4796,7 +5950,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "doubled(numbers) returns a NEW array holding every number doubled, in the same order, and the array you pass in is not changed. Help: 3.3.15 (Arrays and Functions)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.3.19 Lab: Write a Function That Returns a New Array\". The task they were given: Write a function declaration called doubled that takes an array parameter (the numbers to double).",
+      "kind": "console",
+      "questions": {
+        "r1": "function with an array parameter that is not mutated: Code declares a function whose array parameter is never changed inside it (no push, pop, shift, unshift, splice, sort, reverse, fill or index assignment on it). Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "for loop present: Code uses a for or for...of loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": ".push used: Code calls .push(. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "function returns the new array: A return inside the function hands back the new array. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "the new array differs from the input: A pushed value is changed (arithmetic or a call) or only pushed when an if says so, so the result is not a plain copy. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "both arrays are logged: console.log is called at least twice: once for the returned array and once for the original. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-3-17-lab-nested-array-update": {
     "lessonTitle": "3.3.22 Lab: Read and Update a Nested Array",
@@ -4850,7 +6016,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The output shows 3 (the cell's value before the update) and 15 (the total of the updated grid). Help: 3.3.20 (Lists Inside Lists)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.3.22 Lab: Read and Update a Nested Array\". The task they were given: The starter already creates the grid: let grid = [[1, 2], [3, 4]];. Leave that line exactly as it is.",
+      "kind": "console",
+      "questions": {
+        "r1": "nested array literal present: Code declares a nested array. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "double-index access present: Code reads or writes with two indexes. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "nested for loops present: A for loop sits inside another for loop (braces optional). Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "a grid cell is updated: Code changes one cell with a double index and an assignment, like grid[1][0] = 8 (writing a cell back to itself changes nothing). Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "a running total is logged: Code adds numbers into a total with += (or total = total + ...) and then logs that total. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-3-4-lab-update-by-index": {
     "lessonTitle": "3.3.4 Lab: Update Scores by Index",
@@ -4886,7 +6064,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The output shows the updated scores, so 77 and 70 appear in what console.log printed. Help: 3.3.3 (Changing an Item by Index)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.3.4 Lab: Update Scores by Index\". The task they were given: The starter already creates the array: let scores = [72, 85, 90, 64];. Leave that line exactly as it is.",
+      "kind": "console",
+      "questions": {
+        "r1": "index assignment on scores: Code changes an item of scores by its index (scores[0] = ..., scores[i] += ..., scores[scores.length - 1] = ...), not scores[0] = scores[0]. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "scores starts as 72, 85, 90, 64: The code creates scores with the four starting values 72, 85, 90, 64 (the line the starter gives you). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-3-7-lab-shift-unshift-queue": {
     "lessonTitle": "3.3.8 Lab: Front-of-Line Queue",
@@ -4922,7 +6109,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The output shows ana (who was served) and the remaining line, bob and cy. Help: 3.3.7 (Adding and Removing from the Front)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.3.8 Lab: Front-of-Line Queue\". The task they were given: The starter already creates the line: let line = [\"ana\", \"bob\"];. Leave that line exactly as it is. Ana is first, so she will be served first.",
+      "kind": "console",
+      "questions": {
+        "r1": ".push used on the line: Code calls .push( on an array, and the same array is later shifted. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": ".shift result is used: The value .shift() hands back is stored and logged (or logged directly). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-3-drill-count-words": {
     "lessonTitle": "3.3.11 Lab: countWords(text)",
@@ -4952,7 +6148,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "countWords(text) gives back how many words the text has, when the words are separated by single spaces. Help: 3.3.10 (Splitting Text into Lines (.split))",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.3.11 Lab: countWords(text)\". The task they were given: Write a function declaration called countWords that takes one parameter, text. The words in text are separated by single spaces, and there is always at least one word.",
+      "kind": "console",
+      "questions": {
+        "r1": "countWords is defined with one parameter: Code defines a function named countWords with exactly one parameter. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "countWords splits the text: countWords calls .split( in its body. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "countWords hands back a value with return: countWords contains a return statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-3-drill-last-item": {
     "lessonTitle": "3.3.16 Lab: lastItem(items)",
@@ -4976,7 +6181,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "lastItem(items) gives back the last item of the array, and the array you pass in is not changed. Help: 3.3.15 (Arrays and Functions)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.3.16 Lab: lastItem(items)\". The task they were given: Write a function declaration called lastItem that takes one parameter, items, the array to look at.",
+      "kind": "console",
+      "questions": {
+        "r1": "lastItem is defined with one parameter: Code defines a function named lastItem with exactly one parameter. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "lastItem hands back a value with return: lastItem contains a return statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-3-drill-off-by-one": {
     "lessonTitle": "3.3.6 Lab: Fix the Off-by-One Loop",
@@ -5000,7 +6213,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "printPrices(prices) prints each price on its own line, in order, with no extra line at the end. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.3.6 Lab: Fix the Off-by-One Loop\". The task they were given: Run the code. printPrices should print 5, 12 and 8 and nothing else. Find the extra line.",
+      "kind": "console",
+      "questions": {
+        "r1": "printPrices is defined with one parameter: Code defines a function named printPrices with exactly one parameter. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "the loop stops at the last item: A for loop is still there, and its condition no longer lets the index reach the array's length (use < prices.length, not <=). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-3-drill-rotate-line": {
     "lessonTitle": "3.3.9 Lab: rotate(items)",
@@ -5030,7 +6251,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "rotate(items) gives back the same items with the first one moved to the end, and every item still there. Help: 3.3.7 (Adding and Removing from the Front)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.3.9 Lab: rotate(items)\". The task they were given: Inside rotate, remove the first item with items.shift() and keep it in a variable (3.3.7). The shell of the function is given: items is a parameter that holds the whole array.",
+      "kind": "console",
+      "questions": {
+        "r1": "rotate is defined with one parameter: Code defines a function named rotate with exactly one parameter. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "rotate takes the first item off with shift: rotate calls .shift() in its body. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "rotate hands the array back with return: rotate contains a return statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-3-drill-smallest": {
     "lessonTitle": "3.3.18 Lab: smallest(numbers)",
@@ -5060,7 +6290,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "smallest(numbers) gives back the smallest number in the array, and the array is not changed. Help: 3.3.15 (Arrays and Functions)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.3.18 Lab: smallest(numbers)\". The task they were given: Write a function declaration called smallest that takes one parameter, numbers, an array with at least one number.",
+      "kind": "console",
+      "questions": {
+        "r1": "smallest is defined with one parameter: Code defines a function named smallest with exactly one parameter. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "the running answer starts from the first item: smallest sets a variable to the array's first item, written as something[0]. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "smallest hands back a value with return: smallest contains a return statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-4-10-lab-implicit-return-drill": {
     "lessonTitle": "3.4.10 Lab: Implicit-Return Rewrite Drill",
@@ -5096,7 +6335,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "At least three values are printed. Help: 3.4.8 (Shorthand Rules)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.4.10 Lab: Implicit-Return Rewrite Drill\". The task they were given: Create three const variables, each assigned a single-expression arrow function with no braces and no return keyword. Give each one a different job: for example, one that multiplies, one that answers a yes/no question, and one that joins two strings.",
+      "kind": "console",
+      "questions": {
+        "r1": "At least three arrow functions: Code contains three or more arrow functions. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Implicit return used: Every arrow body is a bare expression: no arrow body starts with a brace. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Do three different variables (const, let or var) each hold an arrow function with at least one parameter, and is each of the three called somewhere, even all inside one template literal? Code inside comments never runs."
+      }
+    }
   },
   "3-4-13-lab-one-line-callback": {
     "lessonTitle": "3.4.13 Lab: Write a One-Line Arrow Callback",
@@ -5132,7 +6381,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "transform(2, n => n + 1) is 3 and transform(\"a\", s => s + \"b\") is \"ab\", with the value and the function given in either order. Help: 3.4.11 (Passing a Function)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.4.13 Lab: Write a One-Line Arrow Callback\". The task they were given: Define a function called transform with two parameters: a value and a function (in either order). Inside it, call the function you were handed on the value and return the result. The helper should not know what the function does.",
+      "kind": "console",
+      "questions": {
+        "r1": "Helper takes a function parameter: A function is defined that calls one of its parameters as a function. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Look at the arrow function that is passed to transform, whether it is written inside the call or stored in a const whose name is passed. Is its body a single expression right after the =>, with no { } braces, like n => n * 2? If its body is inside braces, even one short line, the answer is no. Code inside comments never runs.",
+        "r3": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "The result is printed: console.log prints what transform returns: the call sits inside console.log, or its result is stored and that variable is printed. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-4-15-chart-form-decision": {
     "lessonTitle": "3.4.15 Plain English to Pseudocode: Decision Tree for Form Choice",
@@ -5175,7 +6434,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The steps say that a longer body is written as an arrow with a block body and an explicit return.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given a four-step plain-English rule for choosing how to write a function and rewrote it as numbered pseudocode in README.md, between a first line and a last line that were already there. The rule: read in the job of the function; if it is a main operation called from several places, write a function declaration; otherwise, if its body is a single expression, write a one-line arrow with an implicit return; otherwise write an arrow with a block body and an explicit return.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "Asks if it is called from several places: Ask whether the function is a main operation called from several places.",
+        "r3": "Asks if the body is a single expression: Ask whether the function body is a single expression.",
+        "r4": "A declaration for the main operation: Write a function declaration for the main operation.",
+        "r5": "A one-line arrow for a single expression: Write a one-line arrow with an implicit return when the body is a single expression.",
+        "r6": "A block-body arrow for the rest: Write an arrow with a block body and an explicit return for everything else."
+      }
+    }
   },
   "3-4-16-lab-rewrite-three-arrows": {
     "lessonTitle": "3.4.16 Lab: Rewrite 3 Named Functions as Arrows",
@@ -5217,7 +6488,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "At least three values are printed. Help: 3.4.8 (Shorthand Rules)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.4.16 Lab: Rewrite 3 Named Functions as Arrows\". The task they were given: Define three separate function declarations, each with a different job: for example one that returns a number, one that returns a true/false answer, and one that returns a string. Use the function name() {} form.",
+      "kind": "console",
+      "questions": {
+        "r1": "Are at least three variables, declared with const, let or var, each assigned an arrow function? Code inside comments never runs.",
+        "r2": "Implicit return used: Every arrow body is a bare expression: no arrow body starts with a brace. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Three named arrows, each called: Three different const names each hold an arrow with at least one parameter, and each one is called. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Three function declarations: The three function declarations from step 1 are still in the file, beside the arrows that rewrite them. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-4-17-lab-fix-broken-arrow": {
     "lessonTitle": "3.4.17 Lab: Fix a Broken Arrow",
@@ -5253,7 +6535,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "area(3, 4) is 12 and area(5, 6) is 30. Help: 3.4.8 (Shorthand Rules)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.4.17 Lab: Fix a Broken Arrow\". The task they were given: Run the starter. The line where the arrow is defined throws a syntax error before anything else runs. The message may not mention parentheses; the clue is that the error is on the line that defines the arrow.",
+      "kind": "console",
+      "questions": {
+        "r1": "Parameters wrapped in parentheses: An arrow function is written with parentheses around its parameter list. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Two parameters inside the parentheses: The parenthesised parameter list holds two comma-separated parameters. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "area is an arrow with two parameters: area itself is a const holding an arrow with two parameters in parentheses. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-4-19-lab-callback-capstone": {
     "lessonTitle": "3.4.19 Lab: Callback Capstone",
@@ -5301,7 +6592,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "countMatching([4, -2, 7, 0, -9, 3], n => n > 0) is 3, an array where nothing passes counts 0, and an empty array counts 0. Help: 3.4.12 (Example: Arrow Callback)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.4.19 Lab: Callback Capstone\". The task they were given: Define a function called countMatching that takes an array and a test function. It should walk the array with a for loop, call the test on each element, and return how many elements passed the test.",
+      "kind": "console",
+      "questions": {
+        "r1": "Helper defined: A function is defined that accepts an array and a test function. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "for loop present: Code contains a for loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Callback called inside the helper: The test function parameter is called inside the helper. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "At least two inline arrows passed: Two arrow functions appear in the file. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "Two calls, each with its own arrow: countMatching is called twice, and each call has an arrow written inside its parentheses. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-4-20-chart-forms-comparison": {
     "lessonTitle": "3.4.20 Plain English to Pseudocode: Full Syntax-Forms Comparison",
@@ -5344,7 +6647,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The steps print the results of all three calls; one print step that covers all three forms is what is wanted.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given a five-step plain-English plan and rewrote it as numbered pseudocode in README.md, between a first line and a last line that were already there. The plan compares three ways to write the same add-two-numbers function: if the function is named, write addA as a function declaration with an explicit return; if it is not named, ask whether it is written with =>; if not, write addB as a function expression assigned to a const with an explicit return; if so, write addC as an arrow function with an implicit return; then print the results of the three calls.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "Named first, then the arrow question: Ask whether the function is named, and after that whether it is written with =>.",
+        "r3": "The declaration: Write addA as a function declaration.",
+        "r4": "The function expression: Write addB as a function expression assigned to a const.",
+        "r5": "The arrow with an implicit return: Write addC as an arrow function with an implicit return.",
+        "r6": "One print for all three: Print the results of all three calls."
+      }
+    }
   },
   "3-4-5-lab-declaration-to-expression": {
     "lessonTitle": "3.4.5 Lab: Rewrite a Declaration as an Expression",
@@ -5380,7 +6695,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "At least one line is printed and it is not undefined. Help: 3.4.4 (Function Expressions)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.4.5 Lab: Rewrite a Declaration as an Expression\". The task they were given: Create a const and assign it an unnamed function expression: the `function` keyword with no name after it, followed by the parameter list and body. It should compute and return a value from its parameter.",
+      "kind": "console",
+      "questions": {
+        "r1": "Is a variable assigned an anonymous function expression, written as = function (...) { ... }, for example let double = function (n) { return n * 2 }? const, let or var all count, with or without semicolons. Code inside comments never runs.",
+        "r2": "Function called through the variable: The assigned const is called inside a console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "The function uses its parameter: The function expression has a parameter and its body uses it. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-4-9-chart-expand-arrow": {
     "lessonTitle": "3.4.9 Plain English to Pseudocode: A Function That Calls Its Parameter Twice",
@@ -5423,7 +6748,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The print is the last step, after both calls. A print before the second call is missing.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given four plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The function is: function applyTwice(operation, value) { return operation(operation(value)); } called as applyTwice((n) => n * 2, 5). The point is that operation(operation(value)) is TWO calls with the inner one finishing first: read operation and value, call operation on value (first), call operation again on that answer (second), then print second. There is no decision and no loop.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "Reads operation and value: Read in both operation and value.",
+        "r3": "The first call: Call operation on value and keep the answer.",
+        "r4": "The second call uses the first answer: After the first call, call operation again on the first answer.",
+        "r5": "It prints the second answer: Print the answer of the second call.",
+        "r6": "The print comes last: The print is the last step, after both calls."
+      }
+    }
   },
   "3-5-11-chart-nested-access": {
     "lessonTitle": "3.5.11 Plain English to Pseudocode: Tracing a Nested Access",
@@ -5466,7 +6803,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The steps print one line when the customer is a VIP and a different line in the other case, so the VIP question has two different prints.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given a four-step plain-English plan and rewrote it as numbered pseudocode in README.md, between a first line and a last line that were already there. The plan: start a total at 0; loop over each item in order.items adding each item's price to the total; AFTER the loop read the customer name (order.customer.name); AFTER the loop ask whether the customer is a VIP (order.customer.vip), print the name and total with a VIP label if so, and a different print otherwise.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "The total starts at zero, before the loop: Start the total at zero before the loop begins.",
+        "r3": "Each price is added inside the loop: Inside the loop over the items, add each item's price to the total.",
+        "r4": "The customer name is read after the loop: After the loop, read the customer's name.",
+        "r5": "The VIP question is asked after the loop: After the loop, ask whether the customer is a VIP.",
+        "r6": "Each answer has its own print: A VIP gets one print and everyone else gets a different print."
+      }
+    }
   },
   "3-5-12-lab-nested-structure": {
     "lessonTitle": "3.5.12 Lab: Build a Small Nested-Object Structure",
@@ -5514,7 +6863,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code that runs prints the customer name read from order, and a loop prints every item's name and price, one item per line. A printed undefined names the read that found nothing. Help: 3.5.9 (Objects Inside Objects and Arrays)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.5.12 Lab: Build a Small Nested-Object Structure\". The task they were given: Create a variable for it (the lesson calls it order; use any name that fits what you are building) and assign it an object literal.",
+      "kind": "console",
+      "questions": {
+        "r1": "nested object built: order holds another object: written inside its braces, assigned with a dot, or built first and placed in. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "array of objects built: An array holds objects: written in the brackets, pushed in, or built first and listed. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "customer chain read: console.log prints a field of the customer reached with a chain (order.customer.name), or a variable holding that read or holding order.customer. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "index then field read: console.log prints a field read off one item: order.items[i].name, or the item held in a variable (a loop variable, a forEach parameter, or const item = order.items[i]) then a dot. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "loop prints each item: A loop over the items (for, for...of, while or forEach, on order.items, a variable holding it, or counting to the number of items) prints a field read off each item, itself or through a helper function it calls. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-5-15-lab-add-method": {
     "lessonTitle": "3.5.15 Lab: Add a Method to an Object",
@@ -5556,7 +6916,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A console.log that runs prints what a method of student returned, with no undefined and no blank line. A built-in such as toString, a call whose result is thrown away, and a print that never runs do not count. Help: 3.5.13 (Methods)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.5.15 Lab: Add a Method to an Object\". The task they were given: Create a variable (the lesson calls it student; name it for what you are building) holding an object literal with at least one data property, such as a name.",
+      "kind": "console",
+      "questions": {
+        "r1": "method defined on the object: A property is assigned a function. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "method called and its result printed: A method you defined on student is called, such as student.greet(), inside a console.log that runs, or its result is stored in a variable that is then printed. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "return used: The method hands a value back. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "result printed: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-5-18-lab-params-to-object": {
     "lessonTitle": "3.5.18 Lab: Rewrite a Multi-Parameter Function to Take an Object",
@@ -5598,7 +6968,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A console.log that runs prints what describeBox returned for an object literal, and no printed line says undefined (a key describeBox reads that the object does not have). A result thrown away, typed-in text, and a print that never runs do not count. Help: 3.5.16 (Objects as Named Arguments)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.5.18 Lab: Rewrite a Multi-Parameter Function to Take an Object\". The task they were given: Write a function (the lesson calls it describeBox; name it for what you are building) that takes three positional parameters (width, height and color) and returns a string built from them.",
+      "kind": "console",
+      "questions": {
+        "r1": "function defined: Defines a function. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Does the function read its values off its one options object, as options.width or opts.color (any parameter name), or by destructuring right in the parameter list, as in function describeBox({ width, height, color })? Unpacking it later in the body (const { width } = options) does not count for this card. Code inside comments never runs.",
+        "r3": "Is the function called with an object literal whose braces are typed right inside the call's parentheses, for example describeBox({ width: 2, height: 3, color: 'red' }), and is what it returns printed? Passing a variable that holds the object, such as describeBox(box), does not count, and the literal must go to this function, not to some other call. Code inside comments never runs.",
+        "r4": "result printed: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-5-21-chart-destructure-vs-access": {
     "lessonTitle": "3.5.21 Plain English to Pseudocode: Destructuring vs. Plain Access",
@@ -5641,7 +7021,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "After the check, the steps give back (return or print) the note. If it is given back before the check, or never, mark this missing.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program they were describing is describeBox(options): take width, height and color out of options in one step; build the note from color, width and height; if width is greater than height, add \" (wide)\" to the note; give the note back.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "Unpacks all three values in one step: Take width, height and color out of options in a single step.",
+        "r3": "The note is built after the unpack: Build the note after the values are out of options.",
+        "r4": "Asks whether width is greater than height: Check whether the width is greater than the height.",
+        "r5": "The wide case adds to the note: Inside the check, add \" (wide)\" to the note.",
+        "r6": "The note is given back after the check: Give the note back after the decision, on both paths."
+      }
+    }
   },
   "3-5-22-lab-destructure-three": {
     "lessonTitle": "3.5.22 Lab: Destructure 3 Fields From an Object",
@@ -5678,7 +7070,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A console.log that actually runs prints a sentence using each of the three unpacked names; no printed line would say undefined. A print that never runs does not count.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for a lab. You cannot run it: read it and judge what it WOULD do.",
+      "kind": "console",
+      "questions": {
+        "r1": "Are at least three fields unpacked with a brace pattern from an object the program made earlier, for example const { name, age, city } = person? Unpacking from an object literal typed on that same line (const { a, b, c } = { a: 1, b: 2, c: 3 }) does not count. Code inside comments never runs.",
+        "r2": "Does a function have a brace pattern { ... } as its one parameter, for example function describe({ name, age }) or const show = ({ a, b }) => ...? (the lesson calls it describe) Any function name counts; the lesson's name is only a suggestion. Code inside comments never runs.",
+        "r3": "After the unpack, is each of the three names used on its own (no dot) in a printed sentence: a console.log of text built from them, or a variable built from them that is then printed? Printing typeof of the names does not count. A console.log inside a function counts only if that function is really called; naming it (typeof say) is not a call. Code inside comments never runs."
+      }
+    }
   },
   "3-5-24-lab-parallel-arrays-refactor": {
     "lessonTitle": "3.5.24 Lab: Parallel-Arrays-vs-Object Refactor",
@@ -5726,7 +7127,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A loop that runs prints every player's name, group and score read from players, one player per line. Typed-in text, and a loop that never runs, do not count. A printed undefined names the read that found nothing. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.5.24 Lab: Parallel-Arrays-vs-Object Refactor\". The task they were given: The starter keeps three separate arrays, one per field, aligned by index: a name, a score and a group for each player. Read it and see how each field is fetched from a different array at the same index.",
+      "kind": "console",
+      "questions": {
+        "r1": "array of object records built: An array holds object records: written in the brackets, pushed in one at a time, or built first in variables and listed in the brackets. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "record fields read with a dot: console.log prints a record's field read with a dot (players[i].name, a record variable then a dot, or a helper that returns text read off its record), or the fields are unpacked from one record with braces. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "loop over players prints each record: A loop over the players array (for, for...of, while or forEach) prints something read from each record, itself or through a helper function it calls. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "output printed: Calls console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "the parallel arrays are gone: No array of plain values is left, however it is made (a list in brackets, split, Array.of, new Set): the names, scores and groups live only in players. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-5-25-lab-objects-capstone": {
     "lessonTitle": "3.5.25 Lab: Objects Capstone — Build, Read, Destructure",
@@ -5798,7 +7210,22 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code that runs prints: one record's field read with a dot, the spaced key's value, a nested field reached with a chain, each record's cost from a loop, the unpacked names, and every key and value of one record from a loop; at least eight lines, none undefined or NaN. Text typed in, and prints that never run, do not count. Help: 3.5.23 (A Record-Shaped Object)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.5.25 Lab: Objects Capstone — Build, Read, Destructure\". The task they were given: Create one array (the lesson calls it cart; use any name that fits) whose elements are objects. Give each object the same fields, for example a name, a price and a quantity. Include at least three records.",
+      "kind": "console",
+      "questions": {
+        "r1": "array of records built: An array holds object records: written in the brackets or pushed in one at a time. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "nested object present: An object literal holds another object literal. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "one record's field read with a dot and printed: console.log prints a field of one record picked by its number and read with a dot (cart[0].name), or a variable holding that read. A field printed by the loop in step 4 does not count for this step. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "spaced key read with brackets and printed: console.log prints a value read with square brackets and a quoted key (cart[1][\"item code\"]), or a variable holding one. Code inside a comment, or written inside quotes as text, never runs.",
+        "r9": "nested field read with a chain and printed: console.log prints a nested field reached with two dots in a row (cart[0].details.color), or a variable holding one. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "loop works out and prints each cost: A loop over the array of records (cart, or whatever the array is called; for, for...of, while or forEach, on the array or counting to its length) prints each record's price times its quantity: multiplied right in the print, through a variable, through a helper function that returns the product, or from the two read into variables first. Either order of the two numbers is fine (quantity * price). Code inside comments never runs, and code written inside quotes is only text.",
+        "r6": "Are two or more fields unpacked with a brace pattern from an object the program made earlier (not from an object literal typed on that same line), and is each bare name then used in a printed message, in console.log or a variable that is printed? Printing typeof of the names does not count. Code inside comments never runs.",
+        "r7": "Object.keys walked with a loop: A loop goes over Object.keys(...) of one record (cart[0], or a variable holding a record), fetches each value with the key in square brackets, and prints it. Code inside a comment, or written inside quotes as text, never runs.",
+        "r8": "output printed: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-5-5-lab-read-update-fields": {
     "lessonTitle": "3.5.5 Lab: Read and Update Object Fields",
@@ -5840,7 +7267,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A console.log that runs prints a field read from book (directly, or through a variable that is then printed), and another prints the whole object. Text typed in, a read thrown away, and a print that never runs do not count. Help: 3.5.4 (Reading and Changing Properties)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.5.5 Lab: Read and Update Object Fields\". The task they were given: Create a variable for it (the lesson calls it book; use any name that fits what you are building) and assign it an object literal with at least two properties, for example a title and a pages count.",
+      "kind": "console",
+      "questions": {
+        "r1": "object literal created: Declares an object with braces. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "property read with a dot and printed: console.log prints a property of book read with dot notation, directly or through a variable that is then printed. A print inside a function nobody calls never runs. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "a field changed and a field added: One dot assignment changes a property the object literal of book already had, and another dot assignment adds a property the literal did not have. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "whole object printed: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-5-8-lab-dot-vs-bracket": {
     "lessonTitle": "3.5.8 Lab: Dot vs. Bracket — When You're Forced to Bracket",
@@ -5882,7 +7319,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Code that runs prints the spaced key's value read with brackets, the value read with the key held in a variable, and, from a loop, every key of laptop with its value. A printed undefined names the read that found nothing. Help: 3.5.6 (Square Brackets and Computed Keys)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.5.8 Lab: Dot vs. Bracket — When You're Forced to Bracket\". The task they were given: Create an object (the lesson calls it laptop; name it for what you are building) that has at least one property whose key contains a space, written in quotes, such as \"screen size\".",
+      "kind": "console",
+      "questions": {
+        "r1": "square bracket access used: Reads a property with square brackets. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "spaced key reached in brackets: Reads laptop with square brackets and a quoted key that contains a space. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Object.keys walked with a loop: A loop goes over Object.keys(laptop), fetches each value with the key in square brackets, and prints it. A loop inside a function nobody calls never runs. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Does a variable hold one of the object's key names as a string, and is that SAME object then read with the variable in square brackets (obj[keyName]) and the value printed, directly or through a variable that is printed? Using the variable on a different object does not count. Code inside comments never runs."
+      }
+    }
   },
   "3-6-12-lab-object-param-mutation": {
     "lessonTitle": "3.6.12 Lab: Object-Parameter Mutation",
@@ -5954,7 +7401,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A console.log that runs prints the name or age of user, or the whole object. Help: 3.6.5 (Changing vs. Reassigning)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.6.12 Lab: Object-Parameter Mutation\". The task they were given: Define a function (the lesson calls it birthday; name it for what you are building) that takes one object parameter and adds 1 to its age property. Do not reassign the parameter; change the property the object already has.",
+      "kind": "console",
+      "questions": {
+        "r1": "Does the code define a function that takes one object and adds 1 to its age property (the lesson calls it birthday)? Any function name counts; the lesson's name is only a suggestion. Code inside comments never runs.",
+        "r2": "property mutated: Code assigns to a property on the parameter object. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Does the code define a second function that returns a copy of the object with the age one higher, leaving the original alone (the lesson calls it birthdaySafe)? Any function name counts; the lesson's name is only a suggestion. Code inside comments never runs.",
+        "r4": "object spread used: Code copies the object with spread syntax. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "results logged: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-6-13-lab-nested-mutation": {
     "lessonTitle": "3.6.13 Lab: Nested-Structure Mutation",
@@ -6002,7 +7460,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A structuredClone call that runs is given student, and what it returns is the object deep ends up holding. Help: 3.6.9 (Side Effects and Copies)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.6.13 Lab: Nested-Structure Mutation\". The task they were given: Create an object (the lesson calls it student; name it for what you are building) that contains a nested array called scores (for example, scores: [90, 85]). Make a shallow copy called shallow with the object spread syntax: a new object with the same keys.",
+      "kind": "console",
+      "questions": {
+        "r1": "outer object copied with spread: Code copies an object with the spread syntax. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "nested array pushed into: Code pushes a value into the nested array. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "deep made with structuredClone: Code makes deep by calling structuredClone. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "objects logged: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-6-16-lab-capstone": {
     "lessonTitle": "3.6.16 Lab: Pass-by-Reference Capstone Practice",
@@ -6098,7 +7566,20 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Console.log calls that run print the scores, the song and the library. Help: 3.6.5 (Changing vs. Reassigning)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.6.16 Lab: Pass-by-Reference Capstone Practice\". The task they were given: Define a function (the lesson calls it addScore; use any name that fits) taking (scores, score) that returns a NEW array containing the old scores plus the new one, without changing the array it was given. Use spread to build the new array.",
+      "kind": "console",
+      "questions": {
+        "r1": "Does the code define a function that takes a scores array and a new score (the lesson calls it addScore)? Any function name counts; the lesson's name is only a suggestion. Code inside comments never runs.",
+        "r2": "new array built with spread: addScore builds a new array using spread syntax. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Does the code define a function that takes a song object and records a play on it (the lesson calls it recordPlay)? Any function name counts; the lesson's name is only a suggestion. Code inside comments never runs.",
+        "r4": "Does the function that records a play assign to the plays property of the object it is given? Dot or bracket notation both count: song.plays += 1, song.plays++, obj.plays = obj.plays + 1, song[\"plays\"] += 1 and song['plays'] = 5 are all met (inside the brackets the quoted name is the property, not text). Any function and parameter names count; the lesson's name is only a suggestion. Changing a copy instead of the object it was given is not met. Code inside comments never runs.",
+        "r5": "Does the code define a function that returns a deep copy of a library object and calls structuredClone to make it (the lesson calls it copyBook)? Any function name counts; the lesson's name is only a suggestion. Code inside comments never runs.",
+        "r6": "structuredClone used: Code calls structuredClone for a deep copy Code inside a comment, or written inside quotes as text, never runs.",
+        "r7": "results logged: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-6-4-lab-predict-primitive-vs-array": {
     "lessonTitle": "3.6.4 Lab: Predict Output — Primitive vs. Array Argument",
@@ -6158,7 +7639,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A console.log that runs prints data from the number or the array. Typed text does not count. Help: 3.6.3 (Example: Mutating an Array Parameter)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.6.4 Lab: Predict Output — Primitive vs. Array Argument\". The task they were given: Write one function that reassigns a number parameter and one that mutates an array parameter, then log the caller's variables to prove which change escaped.",
+      "kind": "console",
+      "questions": {
+        "r1": "Does the code define a function for the number half of the task, one that takes a number parameter (the lesson calls it changeNum)? Any function name counts; the lesson's name is only a suggestion. Code inside comments never runs.",
+        "r2": "Does the code define a function for the array half of the task, one that takes an array parameter (the lesson calls it changeArr)? Any function name counts; the lesson's name is only a suggestion. Code inside comments never runs.",
+        "r3": ".push used: Code calls .push on the array parameter. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "caller variables logged: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-6-7-chart-reassign-vs-mutate": {
     "lessonTitle": "3.6.7 Plain English to Pseudocode: Reassignment vs. Mutation Trace",
@@ -6201,7 +7692,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The steps end with the caller printing scores as 0, 20, 30. [9, 9] or the original 10, 20, 30 is wrong; mark this missing.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program they were describing is process(nums): the caller has scores = [10, 20, 30] and calls process(scores). Inside, nums and scores name the same array. Step 1 sets item 0 of nums to 0 (a mutation of the shared array, so the caller sees it). Step 2 points nums at a brand new array [9, 9] (a reassignment of the local name only, so the caller does not see it). The caller then prints scores as 0, 20, 30.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "Mutation: item 0 is set to 0: Write 0 into item 0 of the array.",
+        "r3": "The caller sees the mutation: Say that the caller sees the change to item 0.",
+        "r4": "Reassignment: nums gets a new array: Point nums at a new array.",
+        "r5": "The caller does not see the reassignment: Say that the caller does not see the new array.",
+        "r6": "The caller prints 0, 20, 30: Say what the caller prints at the end: 0, 20, 30."
+      }
+    }
   },
   "3-6-8-lab-fix-reassign-bug": {
     "lessonTitle": "3.6.8 Lab: Fix a Function That Reassigns Instead of Mutating",
@@ -6243,7 +7746,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "addOne is called with the caller's array (quizScores) where the program reaches it, and that array is printed after. Help: 3.6.5 (Changing vs. Reassigning)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.6.8 Lab: Fix a Function That Reassigns Instead of Mutating\". The task they were given: The starter is meant to add 1 to every score in the caller's array. Run it and notice the caller's array comes back unchanged.",
+      "kind": "console",
+      "questions": {
+        "r1": "a loop visits each position: Code loops over the array (for, while or forEach). Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "indexed write into the parameter: Code assigns into the array parameter by index. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "caller array logged: Code calls console.log on the caller's array. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-7-11-lab-concat-two-lists": {
     "lessonTitle": "3.7.11 Lab: `.concat()` Two Lists",
@@ -6279,7 +7791,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "When first and second hold other values, joined changes with them, and console.log calls that run print joined and both originals. Help: 3.7.9 (Joining Lists with .concat())",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.7.11 Lab: `.concat()` Two Lists\". The task they were given: Create two arrays (the lesson calls them first and second; use any names that fit), each holding at least three values.",
+      "kind": "console",
+      "questions": {
+        "r1": "Two arrays declared: Declares at least two arrays with square brackets. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": ".concat() used: Calls .concat(). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-7-16-chart-spread-vs-rest": {
     "lessonTitle": "3.7.16 Plain English to Pseudocode: Spread vs. Rest, Side by Side",
@@ -6322,7 +7843,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "No step inside the repeating part returns, gives back or shows the total. Giving it back happens only after the loop. If the student never wrote a loop at all, mark this missing.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given four plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program they were describing is the body of total(...numbers): start a running total called sum (or total) at 0; go through the numbers one at a time; for each number, add it to the total; when there are no more numbers, give back the total.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "The total starts at zero, before the loop: The running total starts at zero, before the loop begins.",
+        "r3": "One loop over numbers, closed: One loop over numbers, closed with an END line such as END FOR.",
+        "r4": "Each number is added to the total, inside the loop: Each pass adds the loop's number to the running total.",
+        "r5": "The total is given back after the loop: The total is handed back once the loop is over.",
+        "r6": "Nothing is given back inside the loop: The answer comes after END FOR, not between FOR EACH and END FOR."
+      }
+    }
   },
   "3-7-17-lab-spread-array": {
     "lessonTitle": "3.7.17 Lab: Build a New Array with Spread",
@@ -6364,7 +7897,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "When first and second hold other values, combined and framed change with them, and console.log calls that run print both new arrays and an original. Help: 3.7.14 (Spreading into a New Array or Object)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.7.17 Lab: Build a New Array with Spread\". The task they were given: Create two arrays (the lesson calls them first and second; use any names that fit), each holding at least two values.",
+      "kind": "console",
+      "questions": {
+        "r1": "Spread used: Uses array spread, written as ... inside an array literal. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Two spread arrays combined: Spreads two arrays into one new array literal. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Calls console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Arrays declared: Declares at least two arrays. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-7-18-lab-spread-object": {
     "lessonTitle": "3.7.18 Lab: Build a New Object with Spread + Override",
@@ -6406,7 +7949,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "When settings holds other values, the values changed and extended copy from it change too, and console.log calls that run print both copies and settings. Help: 3.7.15 (Copying an Object with Changes)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.7.18 Lab: Build a New Object with Spread + Override\". The task they were given: The starter gives you an object with three properties (the lesson calls it settings; you may rename it): const settings = { theme: \"dark\", fontSize: 14, wrap: true }; Leave its keys and values as they are.",
+      "kind": "console",
+      "questions": {
+        "r1": "Object declared: Declares an object with curly braces. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Object spread used: Uses object spread, written as ... inside an object literal. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Override after the spread: Writes a property after the spread so the override wins. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "console.log present: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-7-21-lab-mutating-sort-drill": {
     "lessonTitle": "3.7.21 Lab: Mutating vs. Non-Mutating Methods Drill",
@@ -6448,7 +8001,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "At least three console.log calls that run print your data, and two prints of the array itself differ, before and after the method that changes it. Help: 3.7.19 (What Else Is Out There)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.7.21 Lab: Mutating vs. Non-Mutating Methods Drill\". The task they were given: Create a variable that holds an array of at least three values. You will demonstrate two methods on it.",
+      "kind": "console",
+      "questions": {
+        "r1": "Array declared: Makes an array in square brackets. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A mutating method is called: Calls .push() (or another in-place method). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A non-mutating method is called: Calls .map(), .slice() or .concat(), which return a new array. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "console.log present: Calls console.log to show before and after. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-7-22-lab-capstone": {
     "lessonTitle": "3.7.22 Lab: Array-Methods Capstone",
@@ -6502,7 +8065,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "When prices holds other numbers, bumped, middle and joined change with it, and console.log calls that run print them, prices, and both objects. Help: 3.7.20 (Chaining .map() off a .push()-Built Array)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.7.22 Lab: Array-Methods Capstone\". The task they were given: Create a variable (the lesson calls it prices; use any name that fits) and fill it with at least five numbers, using prices.push() as you build.",
+      "kind": "console",
+      "questions": {
+        "r1": "prices built with .push(): Declares prices as an array and adds to it with prices.push(). Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": ".map() used: Calls .map() to transform the list. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": ".slice() used: Calls .slice() to copy a range. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Arrays joined: Joins two arrays with .concat() or array spread. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Object spread with override: Builds an object copy with a property written after the spread. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "console.log present: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-7-4-lab-map-non-mutating": {
     "lessonTitle": "3.7.4 Lab: Transform a List Without Mutating the Input",
@@ -6538,7 +8113,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "doubled is what prices.map(...) gives back, changes when prices does, and console.log calls that run print doubled and prices. Help: 3.7.2 (Transforming a List with .map())",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.7.4 Lab: Transform a List Without Mutating the Input\". The task they were given: The starter gives you an array of numbers (the lesson calls it prices; you may rename it): const prices = [10, 20, 30]; Leave its three numbers as they are.",
+      "kind": "console",
+      "questions": {
+        "r1": "Array declared: Declares an array with square brackets. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": ".map() used: Calls .map() to build a transformed array. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-7-5-chart-map-trace": {
     "lessonTitle": "3.7.5 Plain English to Pseudocode: What `.map()` Does for You",
@@ -6581,7 +8165,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "No step inside the repeating part prints, shows or returns the list. Showing it happens only after the loop. If the student never wrote a loop at all, mark this missing.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given four plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md. The program they were describing: start with an empty list called withTax; go through the prices one at a time; for each price, multiply it by 1.08 and add the result to withTax; when there are no more prices, print withTax.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "The list starts empty, before the loop: withTax is started as an empty list, before the loop begins.",
+        "r3": "One loop over prices, closed: One loop over prices, closed with an END line such as END FOR.",
+        "r4": "The taxed price is added inside the loop: Each pass multiplies the price by 1.08 and adds the result to withTax.",
+        "r5": "The answer comes after the loop: Something is shown or returned once the loop is over.",
+        "r6": "Nothing is shown inside the loop: The answer comes after END FOR, not between FOR EACH and END FOR."
+      }
+    }
   },
   "3-7-8-lab-slice-sublist": {
     "lessonTitle": "3.7.8 Lab: Extract a Sub-List with `.slice()`",
@@ -6617,7 +8213,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "When items holds other values, middle and tail change with it, and console.log calls that run print both slices. Help: 3.7.6 (Taking Part of a List with .slice())",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.7.8 Lab: Extract a Sub-List with `.slice()`\". The task they were given: Create a variable (the lesson calls it items; use any name that fits your list) and assign it an array of at least five values.",
+      "kind": "console",
+      "questions": {
+        "r1": "Array declared: Declares an array with square brackets. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Two .slice() calls: Calls .slice() at least twice. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-8-10-lab-round-trip-object": {
     "lessonTitle": "3.8.10 Lab: Round-Trip an Object Through JSON",
@@ -6659,7 +8264,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "When player holds other values, saved and restored change with it; a console.log that runs prints a number of restored plus one, and another prints one of player's properties. Help: 3.8.9 (A Round Trip)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.8.10 Lab: Round-Trip an Object Through JSON\". The task they were given: Create a variable (the lesson calls it player; use any name that fits) holding an object with at least two properties, one of them a number.",
+      "kind": "console",
+      "questions": {
+        "r1": "Object declared: Declares an object with curly braces. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Saved with stringify: Calls JSON.stringify to produce text. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Restored with parse: Calls JSON.parse on the saved text. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Both logged: Calls console.log to print the restored object. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-8-11-lab-round-trip-array": {
     "lessonTitle": "3.8.11 Lab: Round-Trip an Array of Objects",
@@ -6701,7 +8316,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "When gameState holds other values, saved and restored change with it, and console.log calls that run print the second item's price plus ten and its name, read from restored. Help: 3.8.9 (A Round Trip)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.8.11 Lab: Round-Trip an Array of Objects\". The task they were given: Create a variable (the lesson calls it gameState; use any name that fits) holding an object with a player name and an array called items of at least two item objects. Each item should have a name and a price.",
+      "kind": "console",
+      "questions": {
+        "r1": "Game-state object declared: Declares an object with curly braces. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Saved with stringify: Calls JSON.stringify to produce text. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Restored with parse: Calls JSON.parse on the saved text. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Output printed: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-8-14-lab-malformed-json": {
     "lessonTitle": "3.8.14 Lab: Handle a Malformed JSON String",
@@ -6743,7 +8368,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "readSave('{\"a\":1}') returns { a: 1 } and readSave('{\"b\":[1,2]}') returns { b: [1, 2] }, and readSave(\"corrupted!!\") and readSave('{\"a\":') return a fallback object instead of throwing. Help: 3.8.13 (try/catch Around a Bad Parse)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.8.14 Lab: Handle a Malformed JSON String\". The task they were given: Define a function (the lesson calls it readSave; any name works) that takes one parameter, a string. Inside it, attempt to parse the text with JSON.parse.",
+      "kind": "console",
+      "questions": {
+        "r1": "Function defined: Defines a function. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Parse attempted: Calls JSON.parse. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "try block present: Uses a try statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "catch block present: Uses a catch clause. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Both paths logged: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-8-17-chart-save-load-round-trip": {
     "lessonTitle": "3.8.17 Plain English to Pseudocode: Save/Load Round Trip",
@@ -6786,7 +8422,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "When the parse fails the steps give back the defaults. If the failure case is never mentioned, mark this missing.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given four plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program they were describing is loadSettings(): read the text stored under the key \"settings\"; if nothing is stored (null), give back the defaults without parsing; otherwise try to parse the text and give the object back; if the parse fails, give back the defaults instead.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "Reads the stored text: Read the text stored under the key.",
+        "r3": "Nothing stored is checked before the parse: Ask whether anything is stored before the parse.",
+        "r4": "Nothing stored gives back the defaults: When nothing is stored, give back the defaults without parsing.",
+        "r5": "The parse is guarded by a try: The parse is wrapped in a TRY or has a way out for failing.",
+        "r6": "A failed parse gives back the defaults: If the parse fails, give back the defaults."
+      }
+    }
   },
   "3-8-18-lab-save-by-key": {
     "lessonTitle": "3.8.18 Lab: Save a State Object by Key",
@@ -6834,7 +8482,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A console.log that runs prints what localStorage.getItem reads back, and that text changes when state does. Help: 3.8.15 (Saving by Key)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.8.18 Lab: Save a State Object by Key\". The task they were given: Create a variable (the lesson calls it state; use any name that fits) holding an object with at least two properties, for example a score and a level.",
+      "kind": "console",
+      "questions": {
+        "r1": "State object declared: Declares an object with curly braces. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Stored by key: Calls localStorage.setItem. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Converted with stringify: Calls JSON.stringify before storing. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Key read back: Calls localStorage.getItem. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Stored text logged: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-8-19-lab-load-restore": {
     "lessonTitle": "3.8.19 Lab: Load and Restore a Saved State",
@@ -6882,7 +8541,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "When the stored text changes, restored and the printed value change with it; with nothing saved under any key, the code does not stop with an error and restored is a default object. Help: 3.8.15 (Saving by Key)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.8.19 Lab: Load and Restore a Saved State\". The task they were given: Store an object under a key using JSON.stringify and localStorage.setItem, so there is something to load. Once your load code works, you may delete or comment out this save line and run again to watch the missing-key path: your checks go red while the line is gone, on purpose (nothing is saved, so nothing can be restored). Put the save line back before you submit. The checker also runs your code once with nothing saved, so the missing-key path is checked either way.",
+      "kind": "console",
+      "questions": {
+        "r1": "Read by key: Calls localStorage.getItem. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Does the code handle a missing saved value: it tests the value read back against null (=== null, == null, or if (!value)), or gives it a default with || or ?? ? Code inside comments never runs.",
+        "r3": "Restored with parse: Calls JSON.parse. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "try/catch guard: Wraps the parse in try and catch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Restored state logged: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-8-22-lab-capstone": {
     "lessonTitle": "3.8.22 Lab: Saving-and-Loading Capstone",
@@ -6936,7 +8606,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A console.log that runs prints a value loadState() returned, and it changes when the stored text does. Help: 3.8.16 (The Whole Pattern)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.8.22 Lab: Saving-and-Loading Capstone\". The task they were given: Create a defaults object with at least two properties, then a state object describing a player with a score and a level.",
+      "kind": "console",
+      "questions": {
+        "r1": "Save function stores by key: Calls localStorage.setItem. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "State converted with stringify: Calls JSON.stringify. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Load reads the key: Calls localStorage.getItem. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Missing key handled: Tests the read value against null. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Parse guarded: Wraps JSON.parse in try and catch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "Restored state logged: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-8-23-lab-adapt-to-list": {
     "lessonTitle": "3.8.23 Lab: Adapt the Pattern to a List",
@@ -6978,7 +8660,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "When records holds other values, restored changes with it, and a console.log that runs prints one record's field from restored. Help: 3.8.15 (Saving by Key)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.8.23 Lab: Adapt the Pattern to a List\". The task they were given: Create a variable (the lesson calls it records; use any name that fits) holding an array of at least two objects. Each object should describe one thing with a name and a value.",
+      "kind": "console",
+      "questions": {
+        "r2": "List saved by key: Calls localStorage.setItem. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Converted with stringify: Calls JSON.stringify. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "List restored with parse: Calls JSON.parse on the saved list. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Restored list logged: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-8-7-lab-stringify-spot-drops": {
     "lessonTitle": "3.8.7 Lab: Stringify an Object and Spot What Got Dropped",
@@ -7020,7 +8712,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A console.log that runs prints the text JSON.stringify made from counter, and that text changes when counter does. Help: 3.8.6 (What Does Not Survive)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"3.8.7 Lab: Stringify an Object and Spot What Got Dropped\". The task they were given: Create a variable (the lesson calls it counter; use any name that fits) and assign it an object. Give it a number property, a function property (a method), and a third property whose value is undefined.",
+      "kind": "console",
+      "questions": {
+        "r1": "Object declared: Declares an object with curly braces. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A function value in the object: One property's value is a function. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "JSON text kept in a variable: Keeps what JSON.stringify gives back in a variable. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Result logged: Calls console.log on the stringified value. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "3-9-1-ch3-group-pa-design-chart": {
     "lessonTitle": "3.9.1 Group PA Part 1: Find and Fix the Plan",
@@ -7416,7 +9118,21 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "background(...) is called inside draw(), or in a function the student wrote that draw() calls, with any colour, so old frames do not pile up. A background() call only in setup() runs once, so it is not met. Help: 5.1.9 (background(color) wipe rule)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.20 Make it Move\". The task they were given: In setup(), make a 400 by 400 canvas and one sprite in the middle, stored in the player variable declared at the top. In draw(), paint the background first, then set player.vel.x from the left and right keys and player.vel.y from the up and down keys: if one key is held set a speed, else if the other key is held set the opposite speed, else set 0. Up is a negative vel.y. WASD ('a', 'd', 'w', 's') or the arrow keys ('left', 'right', 'up', 'down') are both fine. What the starter file already had: `let player;` at the top, then an empty setup() and an empty draw() holding only step comments. A file with nothing but those comments meets none of the criteria.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Is new Canvas(...) called in code that runs when the sketch starts (in setup(), or at the top level)? A call inside a comment or string does not count.",
+        "r2": "Does the running code create at least one sprite with new Sprite(...)? A call inside a comment or string does not count.",
+        "r8": "Is the sprite created once, with new Sprite(...) inside setup() (or a function setup() calls), and is there NO new Sprite(...) or new Canvas(...) inside draw()?",
+        "r3": "Is the left or right key ('a', 'd', 'left' or 'right') read with kb.pressing (or similar) in code that runs every frame: draw(), update(), or a function either of them calls? Reading it only in setup() runs once and does not count; neither does code in a comment.",
+        "r4": "Is the up or down key ('w', 's', 'up' or 'down') read with kb.pressing (or similar) in code that runs every frame: draw(), update(), or a function either of them calls? Reading it only in setup() runs once and does not count; neither does code in a comment.",
+        "r5": "Trace one frame: when the left key is held the sprite's vel.x ends the frame negative, when the right key is held it ends positive, and when neither is held it ends at 0. Is that true? A later statement that resets vel.x (for example an else under a second, separate if) undoes the key, which means no. No reset to 0 at all means no.",
+        "r6": "Trace one frame: when the up key is held the sprite's vel.y ends the frame set one way, when the down key is held it ends set the other way, and when neither is held it ends at 0. Is that true? A later statement that resets vel.y (for example an else under a second, separate if) undoes the key, which means no. No reset to 0 at all means no.",
+        "r7": "Is background(...) called every frame, in draw(), update(), or a function either of them calls, so old frames do not pile up? A background() only in setup() means no."
+      }
+    }
   },
   "5-1-21-a10-1-sprite-playground": {
     "lessonTitle": "5.1.23 Sprite Playground",

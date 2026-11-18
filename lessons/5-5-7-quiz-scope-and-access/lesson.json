@@ -3,6 +3,10 @@
   "title": "7.3.7 Check: Scope and access",
   "description": "Six multiple-choice questions on where a variable lives, why a local cannot be shared between methods, and what a method that owns a rule buys you. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.3 Inside a Class",

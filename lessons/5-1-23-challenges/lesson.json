@@ -3,6 +3,10 @@
   "title": "5.1.25 Challenges",
   "description": "Pick one or more of the stretch challenges and implement them in the editor. Auto-graded.",
   "type": "challenge",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 30,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

@@ -2,6 +2,10 @@
   "id": "3-5-10-example-nested-access",
   "title": "3.5.10 Worked Example: A Nested Object Access Chain",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.5 Objects and Properties",

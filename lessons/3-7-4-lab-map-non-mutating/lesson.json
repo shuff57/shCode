@@ -3,6 +3,10 @@
   "title": "3.7.4 Lab: Transform a List Without Mutating the Input",
   "description": "Use .map() to build a transformed copy of an array, then demonstrate the original is unchanged. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.7.2",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -213,6 +217,13 @@
         "description": "doubled is what prices.map(...) gives back, changes when prices does, and console.log calls that run print doubled and prices. Help: 3.7.2 (Transforming a List with .map())",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Array declared: Declares an array with square brackets. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": ".map() used: Calls .map() to build a transformed array. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

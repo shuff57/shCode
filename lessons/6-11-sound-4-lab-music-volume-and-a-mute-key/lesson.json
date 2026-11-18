@@ -3,6 +3,10 @@
   "title": "6.15.4 Lab: Music, volume and a mute key",
   "description": "A tune loops under Star catch, quieter than the effects. The up and down keys step its volume between 0 and 10, and M turns every sound off and on again.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.15 Sound and Music",

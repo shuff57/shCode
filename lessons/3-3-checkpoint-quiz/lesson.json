@@ -3,6 +3,10 @@
   "title": "3.3.23 Arrays Checkpoint",
   "description": "Eight multiple-choice questions on arrays: changing items by index, loops and the off-by-one, push, pop, shift and unshift, split, arrays and functions, and nested arrays. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",

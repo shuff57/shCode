@@ -3,6 +3,10 @@
   "title": "2.4.15 Plain English to Pseudocode: continue Skips, Doesn't Leave",
   "description": "Turn plain-English steps into pseudocode for a loop that skips the even numbers: continue ends one round early but stays in the loop.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
@@ -151,6 +155,17 @@
         "description": "The print is INSIDE the loop (before the loop is closed), so it can run for each odd i. A print after the loop has ended runs only once.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "The loop counts i from 1 to 6: A loop step that goes through i from 1 to 6.",
+        "r3": "The check is \"is i even?\": Inside the loop, a check for whether i is even (i % 2 is 0).",
+        "r4": "Even means continue (skip), not break: When i is even the steps CONTINUE: skip the rest of this round and move on to the next i. Not leave the loop.",
+        "r5": "The print comes after the check: i is printed after the check, so only the rounds that did not continue print.",
+        "r6": "The print is inside the loop: The print is a step of the loop body: the loop ends after it, so the next i comes round again."
+      },
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: for (let i = 1; i <= 6; i++) { if (i % 2 === 0) { continue; } console.log(i); }. It prints 1, 3, 5. The point: continue skips the rest of ONE round and goes on to the next i; it does not leave the loop (that would be break)."
+    }
   }
 }

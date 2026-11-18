@@ -3,6 +3,10 @@
   "title": "5.2.4 Lab: A random spot and colour",
   "description": "Once a second, move a coin to a random place, roll a whole-number die, and give the coin a random colour from a list.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 9,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",

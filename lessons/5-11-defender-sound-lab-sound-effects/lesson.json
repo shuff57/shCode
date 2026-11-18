@@ -3,6 +3,10 @@
   "title": "7.11.3 Lab: Sound effects",
   "description": "The game gets sound. Load a sound once in setup(), then play it from inside methods you already wrote: a zap from the Bullet constructor for every shot, and a boom from takeHit() for every enemy a shot finishes. A mute key is optional.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.11 Defender C: playtest and check",

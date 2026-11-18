@@ -3,6 +3,10 @@
   "title": "7.2.7 Plain English to Pseudocode: A Method That Calls a Method",
   "description": "Turn five plain-English steps into pseudocode: one decision, two calls to other methods, and a step that runs either way.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.2 Writing Your Own Classes",

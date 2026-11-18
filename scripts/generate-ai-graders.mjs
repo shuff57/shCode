@@ -36,6 +36,7 @@
 import { readFileSync, readdirSync, writeFileSync, existsSync, unlinkSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { clefTask, QUESTION_MIN, QUESTION_MAX } from '../lib/clef-check-core.ts';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '..');
@@ -73,6 +74,7 @@ for (const id of readdirSync(lessonsDir)) {
       );
       continue;
     }
+    let clef = null;
     if (g === lesson.aiCheck) {
       // aiCheck criteria ARE the lesson's requirement cards: the browser lays each verdict over the
       // card with the same id, so an id that matches no requirement is a verdict nobody sees.
@@ -80,6 +82,36 @@ for (const id of readdirSync(lessonsDir)) {
       for (const r of g.rubric) {
         if (!reqIds.has(r.id)) errors.push(`${id}: aiCheck rubric item ${r.id} matches no requirement id`);
       }
+      // aiCheck.clef: the fast Check (lib/clef-check-core.ts). Every card needs its own question, and
+      // only pattern cards can be the fallback for an unsure answer, so nothing else may carry one.
+      if (g.clef !== undefined) {
+        const c = g.clef;
+        const qs = c && typeof c.questions === 'object' && c.questions ? c.questions : null;
+        if (!qs) errors.push(`${id}: aiCheck.clef needs a questions object keyed by requirement id`);
+        else {
+          const rubricIds = g.rubric.map((r) => r.id);
+          // Every PATTERN card needs a question. A card that runs the code (`tests`) keeps its runtime result
+          // and takes none: Clef reads code, it does not run it.
+          const isPattern = (rid) => { const q = (lesson.requirements || []).find((r) => r.id === rid); return !q || !q.type || q.type === 'regex' || q.type === 'inFunction'; };
+          for (const rid of rubricIds) if (isPattern(rid) && !(rid in qs)) errors.push(`${id}: aiCheck.clef has no question for ${rid}`);
+          for (const [rid, q] of Object.entries(qs)) {
+            if (!rubricIds.includes(rid)) errors.push(`${id}: aiCheck.clef question ${rid} matches no aiCheck rubric id`);
+            if (typeof q !== 'string' || q.trim().length < QUESTION_MIN || q.trim().length > QUESTION_MAX) {
+              errors.push(`${id}: aiCheck.clef question ${rid} must be ${QUESTION_MIN}-${QUESTION_MAX} characters`);
+            }
+            const req = (lesson.requirements || []).find((r) => r.id === rid);
+            if (req && req.type && req.type !== 'regex' && req.type !== 'inFunction') {
+              errors.push(`${id}: aiCheck.clef question ${rid} is on a ${req.type} card; only regex and inFunction cards can take an unsure answer`);
+            }
+          }
+          const task = clefTask(c, g.prompt);
+          if (!task) errors.push(`${id}: aiCheck.clef has no task and the aiCheck prompt has no "You cannot run their code" to cut it from`);
+          if (c.task !== undefined && typeof c.task !== 'string') errors.push(`${id}: aiCheck.clef.task must be a string`);
+          clef = { task, kind: lesson.work?.kind === 'plan' ? 'plan' : lesson.preview === 'moshion' ? 'moshion' : 'console', questions: Object.fromEntries(rubricIds.filter((rid) => rid in qs).map((rid) => [rid, String(qs[rid]).trim()])) };
+        }
+      }
+    } else if (g && g.clef !== undefined) {
+      errors.push(`${id}: only aiCheck takes a clef block`);
     }
     for (const r of g.rubric) {
       if (!r.id) errors.push(`${id}: a rubric item has no id`);
@@ -151,6 +183,7 @@ for (const id of readdirSync(lessonsDir)) {
       ...(g.contextDocs ? { contextDocs: g.contextDocs } : {}),
       ...(g.strict ? { strict: true } : {}),
       ...(g.gate ? { gate: g.gate } : {}),
+      ...(clef ? { clef } : {}),
       ...(lesson.diagram && Array.isArray(lesson.diagram.rules) ? { diagramRules: lesson.diagram.rules } : {}),
     };
   }

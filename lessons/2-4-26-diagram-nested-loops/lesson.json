@@ -3,6 +3,10 @@
   "title": "2.4.26 Plain English to Pseudocode: Nested Loops",
   "description": "Turn plain-English steps into pseudocode for a row/col nested loop: the inner loop starts over for every round of the outer loop.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
@@ -151,6 +155,17 @@
         "description": "The printed line shows BOTH the row and the col (like \"row 1, col 1\"). Printing only one of them does not meet this.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "The outer loop is row, 1 to 3: A loop step that goes through row from 1 to 3.",
+        "r3": "The inner loop is col, 1 to 4: A loop step that goes through col from 1 to 4.",
+        "r4": "The col loop sits inside the row loop: The col loop starts after the row loop starts and finishes before it does, so it restarts for every row.",
+        "r5": "The print is inside the col loop: The print is a step of the inner loop, so it happens for every col in every row.",
+        "r6": "The print shows both row and col: Each printed line says which row and which col it is."
+      },
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: for (let row = 1; row <= 3; row++) { for (let col = 1; col <= 4; col++) { console.log(\"row \" + row + \", col \" + col); } }. It prints 12 lines. The point: the col loop is INSIDE the row loop and starts over for every row; the print is inside the col loop; the row only moves on after the col loop has finished."
+    }
   }
 }

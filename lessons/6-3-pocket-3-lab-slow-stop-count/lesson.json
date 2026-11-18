@@ -3,6 +3,10 @@
   "title": "6.3.3 Lab: Slow it, stop it, count it",
   "description": "The table, drag, the stop rule, and a shot counter: you can only shoot from rest.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.3 Pocket: slow to a stop",

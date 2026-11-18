@@ -3,6 +3,10 @@
   "title": "2.1.36 Reading: Parentheses and Operator Precedence",
   "description": "Learn why parentheses make a condition's intent clear even when they aren't strictly required. Read before 2.1.37 Combine &&, ||, and !.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",

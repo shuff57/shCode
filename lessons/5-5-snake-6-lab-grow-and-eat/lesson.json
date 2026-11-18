@@ -3,6 +3,10 @@
   "title": "5.14.3 Lab: Grow and eat",
   "description": "The snake is a three-cell body that moves as one cell, and the food does nothing. Move it by adding a head and removing the tail, then let eating keep the tail and add a point.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 14,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.14 Snake: grow",

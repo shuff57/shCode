@@ -3,6 +3,10 @@
   "title": "5.3.9 Lab: Put a goal on the table",
   "description": "Put a gold goal where the ball really goes. The score is drawn but does not change yet — counting is the next lesson. Your table carries forward.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.3 Pinball: the table",

@@ -3,6 +3,10 @@
   "title": "3.6.12 Lab: Object-Parameter Mutation",
   "description": "Mutate a property on an object parameter and prove the caller sees it, then write a non-mutating version that keeps the original untouched. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.6.5",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -415,6 +419,15 @@
         "description": "A console.log that runs prints the name or age of user, or the whole object. Help: 3.6.5 (Changing vs. Reassigning)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Does the code define a function that takes one object and adds 1 to its age property (the lesson calls it birthday)? Any function name counts; the lesson's name is only a suggestion. Code inside comments never runs.",
+        "r2": "property mutated: Code assigns to a property on the parameter object. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Does the code define a second function that returns a copy of the object with the age one higher, leaving the original alone (the lesson calls it birthdaySafe)? Any function name counts; the lesson's name is only a suggestion. Code inside comments never runs.",
+        "r4": "object spread used: Code copies the object with spread syntax. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "results logged: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

@@ -3,6 +3,10 @@
   "title": "5.5.3 Lab: Lose, and start again",
   "description": "Give the game an end: a flag for playing or over, a losing condition when the ball falls past the bottom, and a restart that puts the score back as well as the ball.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.5 Pinball: lose and start again",

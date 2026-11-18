@@ -3,6 +3,10 @@
   "title": "5.16.3 Challenges: Make it yours",
   "description": "The game is complete. Change one rule of your own: a snake that speeds up as it eats, a best score that survives a loss, or a fix for the quick double-turn. Pick one; add an idea of your own on top if you like.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.16 Snake: playtest and extend",

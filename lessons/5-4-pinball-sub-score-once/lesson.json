@@ -3,6 +3,10 @@
   "title": "5.4.3 Sub-build: Score once",
   "description": "One ball, one bumper, one score. Build the smallest thing that scores once per hit, before you put the same idea into your table.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.4 Pinball: score once",

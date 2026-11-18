@@ -3,6 +3,10 @@
   "title": "5.8.4 Debugging: The heavy ball that flies",
   "description": "Two planted bugs. The \"heavy\" ball shoots away and the light one barely moves. The labels are right; the physics is reversed.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.8 Pinball: physics knobs",

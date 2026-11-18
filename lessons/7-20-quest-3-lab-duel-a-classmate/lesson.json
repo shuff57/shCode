@@ -3,6 +3,10 @@
   "title": "7.20.3 Lab: Duel a classmate",
   "description": "H hosts a duel, Red against Blue, with a classmate on another computer: a choice sends { act, roll }, act runs in onMove only for the seat whose turn it is and only for a good move, and the campaign still plays offline.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.20 Quest: duel online",

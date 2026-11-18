@@ -3,6 +3,10 @@
   "title": "3.8.1 Slides: Saving and Loading Data",
   "description": "Unit 3.8 slides: JSON, JSON.stringify and JSON.parse, parsing that can fail, and saving by key in storage.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.8 Saving and Loading Data",

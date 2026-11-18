@@ -3,6 +3,10 @@
   "title": "5.2.13 Lab: Add a Jump",
   "description": "Gate a jump on a key press and a ground check. Auto-graded.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",

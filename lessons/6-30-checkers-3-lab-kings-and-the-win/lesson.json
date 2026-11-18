@@ -3,6 +3,10 @@
   "title": "6.30.3 Lab: Kings, and the win",
   "description": "Pieces are crowned on the far row and kings move both ways; crowning ends a chain; a player with no move left loses, and R plays again.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.30 Checkers: kings and the win",

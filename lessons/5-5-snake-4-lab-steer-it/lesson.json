@@ -3,6 +3,10 @@
   "title": "5.13.5 Lab: Steer it",
   "description": "The block only walks right and walks off the edge. Add the four arrow keys with two direction variables, forbid turning back on yourself, and end the round at a wall.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.13 Snake: grid and steering",

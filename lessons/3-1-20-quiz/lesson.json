@@ -3,6 +3,10 @@
   "title": "3.1.15 Functions: Definition and Calls",
   "description": "Eight multiple-choice questions on identifying calls, defining functions, hoisting, naming, and benefits. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.1 Functions: Definition and Calls",

@@ -3,6 +3,10 @@
   "title": "6.10.9 Reading: moSHion docs: JSON.stringify(obj)",
   "description": "JSON.stringify takes a JS object and turns it into a string you can store. Think of it as packing your game state into a box.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.10 Save and Load",

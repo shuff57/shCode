@@ -2,6 +2,10 @@
   "id": "2-5-5-example-wrap-what-can-fail",
   "title": "2.5.5 Worked Example, Only Wrap What Can Fail",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",

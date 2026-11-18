@@ -3,6 +3,10 @@
   "title": "2.5.7 Plain English to Pseudocode: try/catch",
   "description": "Turn plain-English steps into pseudocode for try/catch: attempt a risky step, run the catch only if it fails, then carry on either way.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",
@@ -133,6 +137,16 @@
         "description": "\"Done.\" is printed AFTER the try/catch has finished (after END TRY), so it runs whether or not the try failed. Printing it only inside the catch does not meet this.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "The risky line is tried first: A TRY step that attempts to print quantity.",
+        "r3": "There is a catch for failure: A catch step that only applies when the try failed.",
+        "r4": "The message is in the catch: Could not read quantity. is printed in the catch (failure) part, after the catch begins.",
+        "r5": "Done runs either way: Done. is printed after the try/catch has finished, so both paths reach it."
+      },
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: try { console.log(quantity); } catch (err) { console.log(\"Could not read quantity.\"); } console.log(\"Done.\"). quantity was never created, so the try fails. The point: the catch runs ONLY when the try fails; the \"Done.\" line is after the whole try/catch so it runs on both paths."
+    }
   }
 }

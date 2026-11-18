@@ -3,6 +3,10 @@
   "title": "1.7.3 Individual PA Part 3: Find and Fix",
   "description": "A book-order receipt with four bugs in it. Repair all four and name what kind each one was. Three tries, feedback on each bug, and your best try counts.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 11,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.7 Chapter 1 Individual Performance Assessment",

@@ -3,6 +3,10 @@
   "title": "7.3.19 Your Turn: Where the state lives",
   "description": "Three numbers from the wave spawner, and for each one: a local, a property on this, or a class variable — plus one sentence on why. Formative, AI-checked, no points.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.3 Inside a Class",

@@ -3,6 +3,10 @@
   "title": "6.15.9 Check: Sound and music",
   "description": "Eight multiple-choice questions on the browser's rule, loading once, play and loop, rate, a random pick, stopping the music on a new screen, and a saved 0. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.15 Sound and Music",

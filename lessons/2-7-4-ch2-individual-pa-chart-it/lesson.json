@@ -3,6 +3,10 @@
   "title": "2.7.4 Individual PA Part 4: Plan It",
   "description": "Pick one of three problems and write the plan for it in pseudocode: the loop, the value you work out, and the comparison that reports one of three outcomes. No JavaScript needed. Three tries; the AI marks whether the plan answers the problem you picked, and your best try counts.",
   "type": "assignment",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 7,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.7 Chapter 2 Individual Performance Assessment",
