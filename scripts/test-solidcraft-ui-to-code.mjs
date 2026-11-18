@@ -2,7 +2,7 @@
 // (lib/solidcraft-ui-to-code.ts). The round trip itself (made with the tools, written as code,
 // rebuilt through the guarded host page and compared) is a browser check; this pins the writing.
 import assert from 'node:assert/strict';
-import { curvesCode, featureCode, featuresCode, sketchPlane } from '../lib/solidcraft-ui-to-code.ts';
+import { matchFaces, curvesCode, featureCode, featuresCode, sketchPlane } from '../lib/solidcraft-ui-to-code.ts';
 
 // ---- sketch planes, from SolidCraft's frame ---------------------------------------------------------
 const XY={origin:[0,0,0],u:[1,0,0],v:[0,1,0]};
@@ -70,12 +70,17 @@ const ctx=()=>({sketchVars:new Map(),bodyVars:new Map([['b_pull1','part']]),take
  assert.deepEqual(featureCode({id:22,name:'Hole1',type:'HoleFeature',definition:{diameter:'4',depth:'6',hole:{type:'simple'},position:[50,30,10],direction:[0,0,-1]}},c),{lines:['hole(part, { across: 4, deep: 6, at: [20, 10] });']},'a blind hole from the top');
  assert.deepEqual(featureCode({id:22,name:'Hole1',type:'HoleFeature',definition:{diameter:'3',hole:{type:'simple'},position:[60,10,8],direction:[-1,0,0]}},c),{lines:["hole(part, { across: 3, at: [-10, 3], along: 'x' });"]},'along x: at is y and z');
  assert.match(featureCode({id:22,name:'Hole1',type:'HoleFeature',definition:{diameter:'4',depth:'6',hole:{type:'simple'},position:[50,30,0],direction:[0,0,1]}},c).error,/stops part way/,'a blind hole from the bottom is not written');
- assert.match(featureCode({id:22,name:'Hole1',type:'HoleFeature',definition:{diameter:'4',hole:{type:'counterbore'},position:[50,30,10],direction:[0,0,-1]}},c).error,/counterbore/);
+ assert.deepEqual(featureCode({id:22,name:'Hole1',type:'HoleFeature',definition:{diameter:'4',hole:{type:'counterbore',cb_diameter:'8',cb_depth:'3'},position:[50,30,10],direction:[0,0,-1]}},c),{lines:['hole(part, { across: 4, at: [20, 10], counterbore: { across: 8, deep: 3 } });']},'a counterbore from the top');
+assert.deepEqual(featureCode({id:22,name:'Hole1',type:'HoleFeature',definition:{diameter:'4',depth:6,hole:{type:'countersink',cs_diameter:'8',cs_angle:'90 deg'},position:[50,30,10],direction:[0,0,-1]}},c),{lines:['hole(part, { across: 4, deep: 6, at: [20, 10], countersink: { across: 8, angle: 90 } });']},'a blind countersink from the top');
+assert.match(featureCode({id:22,name:'Hole1',type:'HoleFeature',definition:{diameter:'4',hole:{type:'counterbore',cb_diameter:'8',cb_depth:'3'},position:[50,30,0],direction:[0,0,1]}},c).error,/counterbore is on a face the code cannot cut it from/,'a counterbore from below is not written: the guarded build cuts it at the top');
+assert.match(featureCode({id:22,name:'Hole1',type:'HoleFeature',definition:{diameter:'4',hole:{type:'counterbore',cb_diameter:'w',cb_depth:'3'},position:[50,30,10],direction:[0,0,-1]}},c).error,/counterbore is an expression/);
+assert.match(featureCode({id:22,name:'Hole1',type:'HoleFeature',definition:{diameter:'4',depth:6,hole:{type:'drilled',tip_angle:'118 deg'},position:[50,30,10],direction:[0,0,-1]}},c).error,/drill point/);
+assert.match(featureCode({id:22,name:'Hole1',type:'HoleFeature',definition:{diameter:'4',hole:{type:'counterbore',cb_diameter:'8',cb_depth:'3',tip_angle:'118 deg'},position:[50,30,10],direction:[0,0,-1]}},c).error,/drill point/);
  assert.match(featureCode({id:22,name:'Hole1',type:'HoleFeature',definition:{diameter:'4',hole:{type:'simple'},position:[50,30,10],direction:[0,0.6,-0.8]}},c).error,/not drilled along X, Y or Z/);
  // a turn about an axis through the origin: reSHape's turn about the box's centre (30, 20, 5), then the move that puts it where SolidCraft did
  assert.deepEqual(featureCode({id:24,name:'Move2',type:'MoveFeature',definition:{bodies:['b_pull1'],translate:['0','0','0'],angle:'90',rotate_axis:[0,0,1]}},c),{lines:['turn(part, [0, 0, 90]);','move(part, [-50, 10, 0]);']});
  assert.match(featureCode({id:24,name:'Move2',type:'MoveFeature',definition:{bodies:['b_pull1'],translate:['0','0','0'],angle:'30',rotate_axis:[1,1,0]}},c).error,/not X, Y or Z/);
- assert.match(featureCode({id:24,name:'Move2',type:'MoveFeature',definition:{bodies:['b_pull1'],translate:['1','0','0'],angle:'30',rotate_axis:[0,0,1]}},c).error,/moves and turns at once/);
+ assert.deepEqual(featureCode({id:24,name:'Move2',type:'MoveFeature',definition:{bodies:['b_pull1'],translate:['5','0','0'],angle:'90',rotate_axis:[0,0,1]}},c),{lines:['turn(part, [0, 0, 90]);','move(part, [-45, 10, 0]);']},'a move and a turn at once: SolidCraft turns, then moves; the move after the turn takes both');
  // a copy, a pattern in two directions, a cut both ways
  assert.match(featureCode({id:29,name:'Move3',type:'MoveFeature',definition:{bodies:['b_pull1'],body_names:['b_pull1 (2)'],copy:true,translate:['0','0','30']}},c).error,/copies the part/,'the guarded build refuses a copying move, so it is not written');
  assert.deepEqual(featureCode({id:30,name:'Pattern2',type:'RectangularPatternFeature',definition:{bodies:['b_pull1'],features:[],pattern:{count1:'3',count2:'2',dir1:[1,0,0],dir2:[0,1,0],spacing1:'50',spacing2:'40',type:'rectangular'}}},c),{lines:['linearPattern(part, { count: 3, step: [50, 0, 0] });','linearPattern(part, { count: 2, step: [0, 40, 0] });']});
@@ -88,5 +93,60 @@ const ctx=()=>({sketchVars:new Map(),bodyVars:new Map([['b_pull1','part']]),take
  assert.match(featureCode({id:25,name:'Fillet2',type:'FilletFeature',definition:{edges:[[1,2,3]],radius:'1'}},c).error,/could not be found/);
  assert.match(featureCode({id:26,name:'Fillet3',type:'FilletFeature',definition:{edges:[[60,20,10]],radius:'1'}},{...ctx(),bodyVars:new Map()}).error,/not in a variable of script\.js/);
  assert.match(featuresCode([{id:27,name:'Box2',type:'BoxFeature',definition:{length:'1',width:'1',height:'1'}},{id:28,name:'Loft1',type:'LoftFeature',definition:{}}],c).error,/Loft1/,'one feature that cannot be written stops the lot');
+}
+// the check after writing: flat faces matched one to one, in any order
+{
+  const ringTop = [235.6186763075792, 9.889334874029553, 9.88933487402955, 0], ringBottom = [235.61867630757922, 9.88933487402955, 9.889334874029549, -10];
+  assert.equal(matchFaces([ringTop, ringBottom], [[235.61867630757922, 9.88933487402955, 9.88933487402955, 0], [235.6186763075792, 9.889334874029553, 9.88933487402955, -10]]), true, 'two rings whose areas differ in the last digit, listed the other way round');
+  assert.equal(matchFaces([ringTop, ringTop], [ringTop, ringBottom]), false, 'one face cannot stand for two');
+  assert.equal(matchFaces([ringTop], [[235.6186763075792, 9.889334874029553, 9.88933487402955, 0.001]]), false, 'a face 1e-3 away is not the same face');
+}
+// a revolve: a new sketch with the profile laid out as spin() reads it (x out from the axis, y along it), then spin, groove or union
+{
+  const ctx = () => ({ sketchVars: new Map(), bodyVars: new Map([['b_box1', 'b']]), taken: new Set(['b']), geometry: new Map([['b_box1', { faces: [], edges: [] }]]) });
+  const rect = (x0, y0, x1, y1) => [[x0, y0, x1, y0], [x1, y0, x1, y1], [x1, y1, x0, y1], [x0, y1, x0, y0]].map(([a, b, c, d], i) => ({ id: `l${i}`, type: 'line', start_at: [a, b], end_at: [c, d] }));
+  const XZ = { origin: [0, 0, 0], u: [1, 0, 0], v: [0, 0, -1] }, XY = { origin: [0, 0, 0], u: [1, 0, 0], v: [0, 1, 0] };
+  const rev = (definition, profile) => featureCode({ id: 9, name: 'Revolve1', type: 'RevolveFeature', definition: { profiles: { type: 'all' }, convention: 'sketch_normal', operation: 'new_body', body_names: ['Body1'], ...definition }, profile }, ctx());
+  assert.deepEqual(rev({ axis: { type: 'world', axis: 'Z' }, angle: '90' }, { curves: rect(10, 0, 20, 10), frame: XZ }).lines,
+    ["const sk = sketch('top');", 'sk.polygon([[10, 0], [20, 0], [20, -10], [10, -10]]);', 'const part = spin(sk, 90);'], 'about Z, from the XZ plane, towards +Y');
+  assert.deepEqual(rev({ axis: { type: 'sketch_axis', axis: 'y' }, angle: '120' }, { curves: rect(10, 0, 20, 10), frame: XY }).lines.at(-1), 'const part = spin(sk, -120);', 'about Y: SolidCraft turns towards its normal (+Z), reSHape\'s +a from +X towards -Z');
+  assert.deepEqual(rev({ axis: { type: 'world', axis: 'Z' }, angle: '360', operation: 'cut', targets: ['b_box1'] }, { curves: rect(10, 0, 20, 10), frame: XZ }).lines.at(-1), 'groove(sk, b, 360);');
+  assert.deepEqual(rev({ axis: { type: 'world', axis: 'Z' }, angle: '360', operation: 'join', targets: ['b_box1'] }, { curves: rect(10, 0, 20, 10), frame: XZ }).lines.at(-1), 'union(b, spin(sk, 360));');
+  assert.deepEqual(rev({ axis: { type: 'world', axis: 'Z' }, angle: '360' }, { curves: [{ id: 'c', type: 'circle', center_at: [15, 5], radius: 3 }], frame: XZ }).lines.slice(0, 2), ["const sk = sketch('top');", 'sk.circle(6, { at: [15, -5] });'], 'one circle of radius 3: the one-shape circle takes its diameter');
+  assert.match(rev({ axis: { type: 'line', origin: [5, 0, 0], dir: [0, 0, 1] }, angle: '90' }, { curves: rect(10, 0, 20, 10), frame: XZ }).error, /not X, Y or Z through the origin/);
+  assert.match(rev({ axis: { type: 'sketch_line', curve: 'l0' }, angle: '90' }, { curves: rect(10, 0, 20, 10), frame: XZ }).error, /edge or an axis the code cannot name/);
+  assert.match(rev({ axis: { type: 'world', axis: 'Z' }, angle: '90' }, { curves: rect(10, 0, 20, 10), frame: { origin: [0, 0, 0], u: [0, 1, 0], v: [0, 0, 1] } }).error, /part way, from a plane the code cannot start a spin from/, 'part way from the YZ plane: reSHape starts from +X');
+  assert.match(rev({ axis: { type: 'world', axis: 'Z' }, angle: '90', symmetric: true }, { curves: rect(10, 0, 20, 10), frame: XZ }).error, /options the code cannot write/);
+  assert.match(rev({ axis: { type: 'world', axis: 'Z' }, angle: '90' }, { curves: [...rect(10, 0, 20, 10), { id: 'c', type: 'circle', center_at: [30, 5], radius: 2 }], frame: XZ }).error, /one outline of straight lines or one circle/);
+  assert.match(rev({ axis: { type: 'world', axis: 'Z' }, angle: 'a' }, { curves: rect(10, 0, 20, 10), frame: XZ }).error, /angle is an expression/);
+}
+// a torus, and a mirror at the end of the part's box nearer zero
+{
+  const ctx = (box) => ({ sketchVars: new Map(), bodyVars: new Map([['b_box1', 'b']]), taken: new Set(['b']), geometry: new Map(), boxes: new Map([['b_box1', box]]) });
+  const B = { min: [0, 0, 0], max: [40, 30, 20] };
+  assert.deepEqual(featureCode({ id: 3, name: 'Torus1', type: 'TorusFeature', definition: { body_names: ['Body1'], center: [5, 6, 7], major: '10', minor: '2', operation: 'new_body' } }, ctx(B)).lines, ['const donut = ring(24, 4, { at: [5, 6, 7] });']);
+  const mir = (plane, extra = {}, box = B) => featureCode({ id: 4, name: 'Mirror1', type: 'MirrorFeature', definition: { bodies: ['b_box1'], combine: true, features: [], plane, ...extra } }, ctx(box));
+  assert.deepEqual(mir({ type: 'origin', name: 'YZ' }).lines, ["mirror(b, 'left-right');"], 'across YZ, the low face of a part from x = 0');
+  assert.deepEqual(mir({ type: 'origin', name: 'XY' }).lines, ["mirror(b, 'top-bottom');"]);
+  assert.deepEqual(mir({ type: 'custom', plane: { origin: [0, 0, 0], x_dir: [1, 0, 0], y_dir: [0, 0, 1] } }).lines, ["mirror(b, 'front-back');"]);
+  assert.match(mir({ type: 'custom', plane: { origin: [40, 0, 0], x_dir: [0, 1, 0], y_dir: [0, 0, 1] } }).error, /not at the end of the part nearer the origin/, 'across its far face: reSHape mirrors across the near one');
+  assert.deepEqual(mir({ type: 'custom', plane: { origin: [0, 0, 0], x_dir: [0, 1, 0], y_dir: [0, 0, 1] } }, {}, { min: [-40, 0, 0], max: [0, 30, 20] }).lines, ["mirror(b, 'left-right');"], 'a part on the minus side: its high face is the nearer one');
+  assert.match(mir({ type: 'origin', name: 'YZ' }, { combine: false }).error, /keeps the mirrored copy apart/);
+  assert.match(mir({ type: 'custom', plane: { origin: [0, 0, 0], x_dir: [0.6, 0.8, 0], y_dir: [0, 0, 1] } }).error, /not square to X, Y or Z/);
+  assert.match(mir({ type: 'origin', name: 'YZ' }, {}, { min: [-10, 0, 0], max: [30, 30, 20] }).error, /not at the end of the part/, 'a part across the plane');
+}
+// a draft: every side wall, or one named face, pulled along +X, +Y or +Z about the plane at neutral
+{
+  const sq = (i, n, c, area = 600) => ({ index: i, plane_normal: n, centroid: c, area });
+  const faces = [sq(0, [1, 0, 0], [40, 15, 10]), sq(1, [-1, 0, 0], [0, 15, 10]), sq(2, [0, 1, 0], [20, 30, 10], 800), sq(3, [0, -1, 0], [20, 0, 10], 800), sq(4, [0, 0, 1], [20, 15, 20], 1200), sq(5, [0, 0, -1], [20, 15, 0], 1200)];
+  const ctx = () => ({ sketchVars: new Map(), bodyVars: new Map([['b_box1', 'b']]), taken: new Set(['b']), geometry: new Map([['b_box1', { faces, edges: [] }]]) });
+  const dr = (extra) => featureCode({ id: 5, name: 'Draft1', type: 'DraftFeature', definition: { faces: [[40, 15, 10]], angle: '8', neutral: { type: 'origin', name: 'XY' }, pull: [0, 0, 1], body: 'b_box1', ...extra } }, ctx());
+  assert.deepEqual(dr({}).lines, ["draft(b.face('right'), 8);"]);
+  assert.deepEqual(dr({ faces: [[40, 15, 10], [0, 15, 10], [20, 30, 10], [20, 0, 10]], angle: '5' }).lines, ['draft(b, 5);'], 'every side wall: the whole part');
+  assert.deepEqual(dr({ neutral: { type: 'custom', plane: { origin: [0, 0, 5], x_dir: [1, 0, 0], y_dir: [0, 1, 0] } } }).lines, ["draft(b.face('right'), 8, { neutral: 5 });"]);
+  assert.match(dr({ faces: [[40, 15, 10], [0, 15, 10]] }).error, /some of the side walls/);
+  assert.match(dr({ pull: [0, 0, -1] }).error, /pulls along a direction/);
+  assert.match(dr({ neutral: { type: 'origin', name: 'YZ' } }).error, /neutral plane is not one the code can name/);
+  assert.match(dr({ angle: 'a' }).error, /angle is an expression/);
 }
 console.log('SolidCraft tools to reSHape Script: planes from frames, sketches, extrude, pocket, union, fillet, chamfer, shell, cuboid, cylinder, subtract, patterns, moves, holes, turns, two-way patterns, cuts both ways, and refusals pass.');

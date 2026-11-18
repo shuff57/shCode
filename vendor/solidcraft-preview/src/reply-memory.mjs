@@ -58,7 +58,7 @@ export function compareReplies(a, b) {
  * with a shadow). A run stopped by the budget is not a row: SolidCraft did not run it.
  */
 export function createReplyMemory(bridge, { continueRuns = false, shadow = null, log = null } = {}) {
-  const exec = new Map(); const topo = new Map();
+  const exec = new Map(); const topo = new Map(); const born = new Map(); // list key -> m.gen when it was stored
   const now = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
   /** how many leading commands of `cmds` SolidCraft holds, when what it holds is the start of `cmds` (0: start from empty) */
   const heldOf = (cmds) => {
@@ -108,6 +108,9 @@ export function createReplyMemory(bridge, { continueRuns = false, shadow = null,
     page: null, // { list, cmds: string[], reply, results: [{feature}] | null } | null
     marks: [], // [{ id (SolidCraft checkpoint), cmds: string[], results }]: see backToMark
     hits: 0, runs: 0, continued: 0, restored: 0,
+    // shCode `?keep=on`: which run this is (pane.js memoForRun counts up), and how many hits were stored by an earlier run; hits also come from the same
+    // run asking a list twice, so `hits` alone does not say that an earlier Run's work was used
+    gen: 0, earlier: 0,
     /** whether execute(cmds, opts) would be answered from memory, without asking (the progress line is drawn only before a real run) */
     answers(cmds, opts = {}) {
       const hit = exec.get(keyOf(cmds) + (opts.budgetS ? '|b' : '|n'));
@@ -132,7 +135,7 @@ export function createReplyMemory(bridge, { continueRuns = false, shadow = null,
     async execute(cmds, opts = {}) {
       const list = keyOf(cmds); const k = list + (opts.budgetS ? '|b' : '|n');
       const hit = exec.get(k);
-      if (hit && !opts.replay && !(opts.budgetS && typeof hit.cpuMs === 'number' && hit.cpuMs > opts.budgetS * 1000)) { m.hits++; return structuredClone(hit); }
+      if (hit && !opts.replay && !(opts.budgetS && typeof hit.cpuMs === 'number' && hit.cpuMs > opts.budgetS * 1000)) { m.hits++; if ((born.get(k) ?? m.gen) < m.gen) m.earlier++; return structuredClone(hit); }
       const { replay: _replay, ...pass } = opts;
       if (opts.fresh && continueRuns) { if (!heldOf(cmds)) await backToMark(cmds); if (heldOf(cmds) && heldOf(cmds) < cmds.length) await markHeld(); }
       const held = opts.fresh ? heldOf(cmds) : 0; const heldResults = held ? m.page.results : null;
@@ -143,14 +146,14 @@ export function createReplyMemory(bridge, { continueRuns = false, shadow = null,
       // `ran` (the feature numbers of the commands this call ran) is the bridge's note to the memory, not part of the reply: a continued run has fewer of them
       const { ran, ...reply } = r ?? {};
       const results = r && r.ok && Array.isArray(ran) && ran.length === cmds.length - held && (!held || Array.isArray(heldResults)) ? [...(held ? heldResults : []), ...ran] : null;
-      if (r) exec.set(k, structuredClone(reply));
+      if (r) { exec.set(k, structuredClone(reply)); born.set(k, m.gen); }
       m.page = r && r.ok && opts.fresh ? { list, cmds: cmds.map((c) => JSON.stringify(c)), reply: structuredClone(reply), results } : null;
       if (opts.fresh) await note('execute', cmds, held, now() - t0, reply, async () => { const { ran: _x, ...ref } = (await shadow.execute(cmds, { fresh: true })) ?? {}; return ref; }, !!opts.budgetS);
       return r ? reply : r;
     },
     async topologyOf(cmds) {
       const list = keyOf(cmds); const hit = topo.get(list);
-      if (hit) { m.hits++; return structuredClone(hit); }
+      if (hit) { m.hits++; if ((born.get('t|' + list) ?? m.gen) < m.gen) m.earlier++; return structuredClone(hit); }
       // continued only when the feature numbers of the held commands are known: the reply carries one per command
       if (continueRuns) { if (!heldOf(cmds)) await backToMark(cmds); if (heldOf(cmds) && heldOf(cmds) < cmds.length) await markHeld(); }
       const held = heldOf(cmds); const heldResults = held && Array.isArray(m.page.results) ? m.page.results : null;
@@ -159,7 +162,7 @@ export function createReplyMemory(bridge, { continueRuns = false, shadow = null,
       if (heldResults) m.continued++;
       // it ran in SolidCraft, from an empty design or on top of the held commands; its reply is not an execute reply
       m.page = r && r.ok ? { list, cmds: cmds.map((c) => JSON.stringify(c)), reply: null, results: Array.isArray(r.results) && r.results.length === cmds.length ? structuredClone(r.results) : null } : null;
-      if (r && r.ok) topo.set(list, structuredClone(r));
+      if (r && r.ok) { topo.set(list, structuredClone(r)); born.set('t|' + list, m.gen); }
       await note('topologyOf', cmds, heldResults ? held : 0, now() - t0, r, () => shadow.topologyOf(cmds));
       return r;
     },

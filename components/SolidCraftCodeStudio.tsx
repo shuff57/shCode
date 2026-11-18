@@ -15,17 +15,21 @@ import styles from './solidcraft-sandbox.module.css';
 import { CAD_ENTRY, bundleProject, codeFiles, describeAt, locate, readEdgeNameProbe, readVariableProbe, stepLines, withEdgeNameProbe, withVariableProbe, type CadError, type SourceSection } from '../lib/solidcraft-code';
 import { cadLineMarks } from '../lib/cad-line-marks';
 import CadSketchOverlay from './CadSketchOverlay';
+import { installRuntimeCache } from '../lib/solidcraft-runtime-cache';
+
+// The engine and kernel kept by this page, so the credentialless host frame does not download 175 MB on every visit (?cache=parent).
+if (typeof window !== 'undefined') installRuntimeCache(window);
 import { edgeLabels, labelFaces, type ScEdge, type ScFace } from '../lib/solidcraft-labels';
 import { setCadModel, type CadModelBody, type CadTarget } from '../lib/cad-completions';
 import { insertion, fillingCall, pickText, sketchPlaneOf, topLevelNames, topLevelVariables, type Pick, type PickCode } from '../lib/solidcraft-picks';
-import { featuresCode, type TimelineFeature } from '../lib/solidcraft-ui-to-code';
+import { featuresCode, matchFaces, type TimelineFeature } from '../lib/solidcraft-ui-to-code';
 import { cadToolbarCrop } from '../lib/solidcraft-viewport';
 import { checkSolidCraftAvailability } from '../lib/solidcraft-availability';
 
 type Api = { request(method: string, params?: object): Promise<any>; execute(command: string, params?: object): Promise<any> };
 type Label = { key: string; text: string; pick: PickCode; x: number; y: number; plane?: boolean };
 type Feature = { id: string; kind: string; status: string; refusal: string | null; note?: string | null };
-type Summary = { error?: string; cancelled?: boolean; features?: Feature[]; warnings?: string[]; interpreterWarnings?: string[]; engineUse?: { runs: number; fromMemory: number } | null };
+type Summary = { error?: string; cancelled?: boolean; features?: Feature[]; warnings?: string[]; interpreterWarnings?: string[]; engineUse?: { runs: number; fromMemory: number; fromEarlierRuns?: number } | null };
 type Host = {
   confirmReplace: (() => boolean) | null;
   evaluate(source: string): Promise<{ errors: { message: string; line?: number | null }[]; doc?: { features?: { id?: unknown }[] } | null }>;
@@ -50,7 +54,8 @@ const plain = (s: string) => s.replace(/^(?:REFUSED BEFORE BUILD|ERROR|SCRIPT ER
 // inc=on: and runs those steps on top of what SolidCraft already holds, when it holds exactly the steps before them (vendor pane.js memoForRun);
 // embed=code: this page asks before replacing hand-made changes and shows the results, so the host skips the inspections only its own panel needs;
 // probeinc=on: the time-budget probe keeps its engine between probes and runs only new commands (needs the session kernel; without it, as before).
-const HOST_PAGE = '/solidcraft-preview/host.html?storage=off&keep=on&inc=on&embed=code&probeinc=on';
+// cache=parent: the engine (101 MB) and the kernel (74 MB) come from this page's Cache Storage after the first visit (lib/solidcraft-runtime-cache.ts).
+const HOST_PAGE = '/solidcraft-preview/host.html?storage=off&keep=on&inc=on&embed=code&probeinc=on&cache=parent';
 
 interface Props {
   lessonId: string;
@@ -81,6 +86,8 @@ export default function SolidCraftCodeStudio(props: Props) {
   const [available, setAvailable] = useState<boolean | null>(null);
   const [isolated, setIsolated] = useState<boolean | null>(null);
   const [ready, setReady] = useState(false);
+  /** bumps when SolidCraft's frame loaded again (a new API) */
+  const [scGen, setScGen] = useState(0);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState('Loading SolidCraft…');
   const [error, setError] = useState<CadError | null>(null);
@@ -146,6 +153,31 @@ export default function SolidCraftCodeStudio(props: Props) {
         // A teacher who turns tools off also turns off SolidCraft's keyboard shortcuts and menus.
         const block = (e: Event) => { if (!latest.current.toolsAllowed) { e.preventDefault(); e.stopImmediatePropagation(); } };
         for (const t of ['keydown', 'keyup', 'keypress', 'contextmenu']) inner!.addEventListener(t, block, true);
+        // SolidCraft's frame can load again: the host's crash guard reloads it after the engine stops. Its API is then a new one, and the
+        // design it holds is not the one this page remembers, so the page takes the new API, forgets what it built, and builds the code again
+        // (unless a Run is going on, which remembers it when it ends).
+        const scEl = frame.current?.contentDocument?.getElementById('sc') as HTMLIFrameElement | null;
+        scEl?.addEventListener('load', () => void (async () => {
+          const t0 = Date.now();
+          for (;;) {
+            const w = scEl.contentWindow as ScWindow | null;
+            // ready when it answers: a request made while its engine is still starting is never answered
+            // (the frame's window object stays the same across a reload; its solidcraft API is a new one)
+            const answers = w?.solidcraft && w.solidcraft !== api.current
+              ? await Promise.race([w.solidcraft.request('document.revision', {}).then(() => true, () => false), pause(1000).then(() => false)]) : false;
+            if (answers && w?.solidcraft) {
+              api.current = w.solidcraft; scWindow.current = w;
+              for (const t of ['keydown', 'keyup', 'keypress', 'contextmenu']) w.addEventListener(t, block, true);
+              baseline.current = null; builtRevision.current = null; facesCache.current.clear();
+              try { await w.solidcraft.request('ui.home', { open: false }); } catch { /* the view is still starting */ }
+              setScGen(g => g + 1);
+              if (!running.current) void runRef.current?.(true);
+              return;
+            }
+            if (!live || Date.now() - t0 > 150000) return;
+            await pause(200);
+          }
+        })());
         if (live) { setReady(true); setStatus('Ready'); }
       } catch (e) { if (live) setStatus(messageOf(e, 'SolidCraft did not finish loading.')); }
     })();
@@ -163,7 +195,7 @@ export default function SolidCraftCodeStudio(props: Props) {
     const f = frame.current; if (!f) return;
     setCrop(cadToolbarCrop(reply.viewport, f.clientWidth, f.clientHeight));
   }, [toolsOn]);
-  useEffect(() => { if (ready) void applyTools().catch(e => setStatus(messageOf(e, 'SolidCraft’s tools could not be switched.'))); }, [ready, applyTools, props.toolsAllowed]);
+  useEffect(() => { if (ready) void applyTools().catch(e => setStatus(messageOf(e, 'SolidCraft’s tools could not be switched.'))); }, [ready, applyTools, props.toolsAllowed, scGen]);
 
   const fit = useCallback(async () => { try { await api.current?.request('ui.camera', { fit: true }); } catch { /* the view keeps its camera */ } }, []);
 
@@ -220,9 +252,11 @@ export default function SolidCraftCodeStudio(props: Props) {
       const summary = await h.runUnconfirmed().finally(() => follow?.disconnect());
       const took = `${((performance.now() - t0) / 1000).toFixed(1)} s`; mark('host build', t0); const tAfter = performance.now();
       vars.current = found; setLabelsKey(k => k + 1);
-      builtRevision.current = JSON.stringify(await sc.request('document.revision', {}));
+      // the host's crash guard may have loaded SolidCraft again during the build: the API from now on is the current one
+      const scNow = api.current ?? sc;
+      builtRevision.current = JSON.stringify(await scNow.request('document.revision', {}));
       builtCode.current = source;
-      await rememberBaseline(sc, builtRevision.current); mark('after build', tAfter);
+      await rememberBaseline(scNow, builtRevision.current); mark('after build', tAfter);
       if (!summary || summary.cancelled) { setRefusals([]); setNotes([]); setStatus('The build did not finish. Run again.'); return false; }
       if (summary.error) { setRefusals([]); setNotes([]); setError({ message: plain(summary.error) }); setStatus('Nothing was built.'); return false; }
       builtSource.current = bundle.source;
@@ -234,8 +268,10 @@ export default function SolidCraftCodeStudio(props: Props) {
         if (seq === runSeq.current && lines.size) setRefusals(rs => rs.map(r => lines.has(r.id) ? { ...r, at: lines.get(r.id) } : r));
       }).catch(() => { /* the lines stay unknown; the sentences are shown */ });
       setNotes([...new Set([...(summary.warnings ?? []), ...(summary.interpreterWarnings ?? []), ...steps.map(f => f.note).filter((n): n is string => !!n)])]);
-      // How much of the build was new: steps whose engine work was remembered from an earlier Run were not built again.
-      const use = summary.engineUse; const reused = use && use.fromMemory > 0 ? use.runs === 0 ? ', nothing new to build' : ', only the changed steps rebuilt' : '';
+      // How much of the build was new: steps whose engine work was remembered from an earlier Run were not built again. (fromMemory alone also
+      // counts a list asked twice in this Run, so the first Run after opening the page would say it; fromEarlierRuns counts only an earlier Run's.)
+      const use = summary.engineUse; const earlier = use ? use.fromEarlierRuns ?? use.fromMemory : 0;
+      const reused = use && earlier > 0 ? use.runs === 0 ? ', nothing new to build' : ', only the changed steps rebuilt' : '';
       setStatus(`${refused.length ? `Built ${steps.length - refused.length} of ${steps.length} steps` : `Built ${steps.length} step${steps.length === 1 ? '' : 's'}`} in ${took}${reused}.`);
       if (automatic && !override) await fit();
       return !refused.length;
@@ -243,6 +279,7 @@ export default function SolidCraftCodeStudio(props: Props) {
     finally { running.current = false; setBusy(false); }
   }, [fit]);
   useEffect(() => { if (ready && builtCode.current === null) void run(true); }, [ready, run]);
+  const runRef = useRef(run); runRef.current = run;
 
   function resize(clientX: number) { const r = workspace.current?.getBoundingClientRect(); if (r) setWidth(Math.max(25, Math.min(65, 100 * (clientX - r.left) / r.width))); }
   // ---- labels and picks ---------------------------------------------------------------------------
@@ -400,11 +437,12 @@ export default function SolidCraftCodeStudio(props: Props) {
       for (const name of bodyNames(await sc.request('document.inspect', {}))) for (const f of ((await sc.execute('model.faces', { body: name })).faces ?? []) as ScFace[]) {
         if (Array.isArray(f.plane_normal)) flat.push([f.area ?? NaN, ...f.centroid]); else curved += f.area ?? NaN;
       }
-      return { flat: flat.sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2] || a[3] - b[3]), curved };
+      return { flat, curved };
     };
+    // Each flat face is matched with one of the other's within the tolerances, not paired by sorting: two faces whose areas differ in the last
+    // digit (the two rings of a revolve) sort either way round in two builds of the same part.
     const sameFaces = (a: { flat: number[][]; curved: number }, b: { flat: number[][]; curved: number }) =>
-      Math.abs(a.curved - b.curved) <= 1e-6 * Math.max(1, a.curved)
-      && a.flat.length === b.flat.length && a.flat.every((x, i) => x.every((v, k) => Math.abs(v - b.flat[i][k]) <= (k === 0 ? 1e-6 * Math.max(1, Math.abs(v)) : 1e-4)));
+      Math.abs(a.curved - b.curved) <= 1e-6 * Math.max(1, a.curved) && a.flat.length === b.flat.length && matchFaces(a.flat, b.flat);
     const adopt = async (sc: Api, rev: string) => {
       const base = baseline.current!; const doc = await sc.request('document.inspect', {});
       const timeline: { id: number; name: string; type: string }[] = doc.timeline ?? [];
@@ -415,7 +453,11 @@ export default function SolidCraftCodeStudio(props: Props) {
       for (const f of fresh) {
         const sk = f.type === 'Sketch' ? await sc.execute('sketch.inspect', { sketch: f.id }) : null;
         const plane = sk?.plane;
-        features.push({ id: f.id, name: f.name, type: f.type, definition: (await sc.execute('timeline.inspect', { feature: f.id })).definition ?? {}, curves: sk?.curves, frame: plane ? { origin: plane.origin, u: plane.x_dir, v: plane.y_dir } : undefined });
+        const definition = (await sc.execute('timeline.inspect', { feature: f.id })).definition ?? {};
+        // a revolve's profile is written again as spin() reads it, from its sketch's curves
+        const of = f.type === 'RevolveFeature' && typeof definition.sketch === 'number' ? await sc.execute('sketch.inspect', { sketch: definition.sketch }).catch(() => null) : null;
+        features.push({ id: f.id, name: f.name, type: f.type, definition, curves: sk?.curves, frame: plane ? { origin: plane.origin, u: plane.x_dir, v: plane.y_dir } : undefined,
+          profile: of?.plane ? { curves: of.curves ?? [], frame: { origin: of.plane.origin, u: of.plane.x_dir, v: of.plane.y_dir } } : undefined });
       }
       const files = latest.current.files; const entry = files[CAD_ENTRY] ?? '';
       // The guarded build names a sketch sk_<step>_<n> and a part b_<step>; the variable probe says which variable holds each step.
@@ -532,6 +574,7 @@ export default function SolidCraftCodeStudio(props: Props) {
           <CadSketchOverlay active={ready && !busy} sc={ready ? api.current : null} inner={ready ? scWindow.current : null} editor={editor}
             evaluate={ready && host.current ? host.current.evaluate : null} files={props.files} buildKey={labelsKey} crop={crop} geometry={geometry}
             pointsOn={pointsOn} liveOn={liveOn} toolbarHost={sketchBarHost} onInserted={setFilled} onMode={setSketchMode}
+            entryOpen={current === CAD_ENTRY} bodyVars={() => vars.current.bodies} onRun={() => void run()}
             suppressPick={() => { previewing.current = Date.now() + 800; void api.current?.execute('select.set', { items: [] }).catch(() => { /* the view is busy */ }); }} />
           {labels.length > 0 && <div className={styles.scLabels}>{labels.map(l => <button key={l.key} className={l.plane ? styles.planeLabel : styles.faceLabel} style={{ left: l.x, top: l.y }} onClick={() => insert(l.pick)} title={l.pick.code ? `Put ${l.pick.code} in your code` : l.pick.name}>{l.text}</button>)}</div>}
           {available && isolated && (!ready || busy) && <div className={styles.scCover}>{ready ? 'Building your code…' : status}</div>}

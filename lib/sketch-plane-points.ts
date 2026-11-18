@@ -165,6 +165,9 @@ export const toolCode = {
   line: (s: string, a: V2, b: V2) => `${s}.line(${pointCode(a)}, ${pointCode(b)});`,
   rectangle: (s: string, a: V2, b: V2) => `${s}.rectangle(${pointCode([Math.min(a[0], b[0]), Math.min(a[1], b[1])])}, ${pointCode([Math.max(a[0], b[0]), Math.max(a[1], b[1])])});`,
   circle: (s: string, c: V2, r: number) => `${s}.circle(${pointCode(c)}, { r: ${fmt(r)} });`,
+  // a slot in the drawing words (reSHape's own slot() cannot share a sketch with them): its two sides and its two caps, counter-clockwise
+  slot: (s: string, a: V2, b: V2, r: number) => slotGeoms(a, b, r).map(g => g.k === 'line' ? `${s}.line(${pointCode(g.a)}, ${pointCode(g.b)});`
+    : g.k === 'arc' ? `${s}.arc(${pointCode(g.c)}, ${pointCode(g.a)}, ${pointCode(g.b)}, '${g.sense}');` : '').join('\n'),
   lines: (s: string, pts: V2[], closed: boolean) => `${s}.lines([${[...pts, ...(closed ? [pts[0]] : [])].map(pointCode).join(', ')}]);`,
 };
 /**
@@ -182,4 +185,213 @@ export function sketchAtCursor(doc: string, cursor: number, sketches: Set<string
     if (line <= last) return name;
   }
   return null;
+}
+
+// ---- starting a sketch on a face, and finishing it into a feature ------------------------------------------------------------
+
+const cross3 = (a: number[], b: number[]): V3 => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const unit3 = (a: number[]): V3 => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+const exact = (a: number[]) => `[${a.map(x => { const r = Math.abs(x) < 1e-12 ? 0 : x; return String(Object.is(r, -0) ? 0 : r); }).join(', ')}]`;
+/**
+ * The sketch() arguments for a flat face: 'top', 10 for a face square to an axis (as solidcraft-picks writes it), else reSHape's frame
+ * form through the face, its normal (u x v) the face's outward normal so extrude goes out of the part and pocket into it. null when
+ * the face is not flat.
+ */
+export function faceSketchArgs(face: { plane_normal?: number[] | null; centroid: number[] }): string | null {
+  const n = face.plane_normal; if (!Array.isArray(n)) return null;
+  const axis = [0, 1, 2].find(i => Math.abs(Math.abs(n[i]) - 1) < 1e-6);
+  if (axis !== undefined) {
+    const word = axis === 2 ? 'top' : axis === 1 ? 'front' : 'side'; const at = face.centroid[axis];
+    return Math.abs(at) < 1e-9 ? `'${word}'` : `'${word}', ${fmt(at)}`;
+  }
+  const nn = unit3(n);
+  // u: level (square to Z) where the face is not flat-on to Z, so the sketch's x runs across the slope
+  const u = unit3(Math.hypot(nn[0], nn[1]) > 1e-9 ? [-nn[1], nn[0], 0] : [1, 0, 0]); const v = cross3(nn, u);
+  return `{ origin: ${pointCode3(face.centroid)}, u: ${exact(u)}, v: ${exact(v)} }`;
+}
+const pointCode3 = (p: number[]) => `[${p.map(fmt).join(', ')}]`;
+/** reSHape's sweep direction for a sketch: an extrude goes along it, a pocket against it (u x v; the front plane's is -Y). */
+export const sweepOf = (f: PlaneFrame): V3 => unit3(cross3(f.u, f.v));
+/**
+ * Which way extrude and pocket go from a sketch, given the centre of the part it sits on: an extrude away from the part and a
+ * pocket into it. `reversed` is reSHape's option that turns either round.
+ */
+export function finishDirections(f: PlaneFrame, partCentre: number[] | null): { extrudeReversed: boolean; pocketReversed: boolean } {
+  if (!partCentre) return { extrudeReversed: false, pocketReversed: false };
+  const s = sweepOf(f); const d = [partCentre[0] - f.origin[0], partCentre[1] - f.origin[1], partCentre[2] - f.origin[2]];
+  const side = s[0] * d[0] + s[1] * d[1] + s[2] * d[2]; // > 0: the part lies along the sweep
+  return { extrudeReversed: side > 1e-9, pocketReversed: side > 1e-9 };
+}
+/** A fresh variable name: base, base2, base3 … not in `taken`. */
+export function freshName(base: string, taken: Set<string>): string { let n = base, i = 2; while (taken.has(n)) n = `${base}${i++}`; return n; }
+
+// ---- the arc tool and moving a drawn point -------------------------------------------------------------------------------------
+
+/** An arc from a, counter-clockwise, to where the ray towards b crosses its circle. */
+export function arcCode(s: string, c: V2, a: V2, b: V2): string | null {
+  const r = Math.hypot(a[0] - c[0], a[1] - c[1]); const d = Math.hypot(b[0] - c[0], b[1] - c[1]);
+  if (r < 1e-9 || d < 1e-9) return null;
+  const end: V2 = [c[0] + (b[0] - c[0]) * r / d, c[1] + (b[1] - c[1]) * r / d];
+  if (Math.hypot(end[0] - a[0], end[1] - a[1]) < 1e-9) return null;
+  return `${s}.arc(${pointCode(c)}, ${pointCode(a)}, ${pointCode(end)}, 'ccw');`;
+}
+/**
+ * Moving a drawn point: the [x, y] literals in sketch `name`'s block whose value is `from` are rewritten as `to` (every one, so a
+ * corner two lines share, or a closed outline's first and last point, move together). Only plain number literals are found; a
+ * point written with a variable or a sum is not, and nothing is changed for it. The changes to make, in the document's offsets.
+ */
+export function movePointEdits(doc: string, name: string, from: V2, to: V2): { from: number; to: number; insert: string }[] {
+  const end = sketchBlockEnd(doc, name); if (end === null) return [];
+  const esc = name.replace(/\$/g, '\\$');
+  const decl = new RegExp(`^\\s*(?:const|let|var)\\s+${esc}\\s*=\\s*sketch\\s*\\(`, 'm').exec(doc); if (!decl) return [];
+  const block = doc.slice(decl.index, end); const out: { from: number; to: number; insert: string }[] = [];
+  const re = /\[\s*(-?(?:\d+\.?\d*|\.\d+))\s*,\s*(-?(?:\d+\.?\d*|\.\d+))\s*\]/g;
+  for (let m = re.exec(block); m; m = re.exec(block)) {
+    if (Math.abs(Number(m[1]) - from[0]) < 1e-9 && Math.abs(Number(m[2]) - from[1]) < 1e-9) out.push({ from: decl.index + m.index, to: decl.index + m.index + m[0].length, insert: pointCode(to) });
+  }
+  return out;
+}
+
+/**
+ * A sketch feature's curves for drawing: its geoms rows, or, for a plain outline (sk.polygon(…), sk.rect(…), sk.circle(d, { at }), d the diameter), which reSHape
+ * keeps as points only, the outline's sides or its circle (a circle's points are the two ends of a diameter). An outline with rounded, chamfered or
+ * bulged corners is not drawn: its straight sides would not be its shape.
+ */
+export function sketchGeoms(f: { geoms?: unknown; points?: unknown; shape?: unknown; rounds?: unknown; chamfers?: unknown; bulges?: unknown }): SketchGeom[] {
+  if (Array.isArray(f.geoms) && f.geoms.length) return f.geoms as SketchGeom[];
+  const pts = Array.isArray(f.points) ? (f.points as unknown[]).filter((q): q is V2 => Array.isArray(q) && q.length === 2 && q.every(x => typeof x === 'number')) : [];
+  const bent = [f.rounds, f.chamfers, f.bulges].some(x => Array.isArray(x) ? x.some(v => typeof v === 'number' ? v !== 0 : v !== null && v !== undefined) : x !== undefined && x !== null && typeof x === 'object' && Object.keys(x).length > 0);
+  if (bent) return [];
+  if (f.shape === 'circle' && pts.length === 2) return [{ k: 'circle', c: [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2], r: Math.hypot(pts[1][0] - pts[0][0], pts[1][1] - pts[0][1]) / 2 }];
+  if ((f.shape === undefined || f.shape === 'polygon') && pts.length >= 3) return pts.map((a, i) => ({ k: 'line', a, b: pts[(i + 1) % pts.length] }));
+  return [];
+}
+
+// ---- a size typed while drawing ----------------------------------------------------------------------------------------------
+
+/** The numbers typed: '25', '30, 20', '30 x 20'; null when it is not one or two numbers. */
+export function typedNumbers(typed: string): number[] | null {
+  const parts = typed.trim().split(/\s*[,x×]\s*|\s+/i).filter(Boolean);
+  if (!parts.length || parts.length > 2) return null;
+  const ns = parts.map(Number); return ns.every(Number.isFinite) ? ns : null;
+}
+/**
+ * The point a typed size puts down, from the points clicked so far and the pointer (which gives the direction):
+ * - line, polyline: the length from the last point, towards the pointer (+x when the pointer is on the point);
+ * - rectangle: 'w, h' (or one number: a square) from the first corner, into the pointer's quarter;
+ * - circle: the radius, towards the pointer;
+ * - arc, after its centre and start: the angle in degrees it turns counter-clockwise from the start.
+ * null when nothing can be put down (no first point, a size of 0 or less, or the wrong count of numbers).
+ */
+export function typedPoint(tool: string, pts: V2[], pointer: V2, typed: string): V2 | null {
+  const ns = typedNumbers(typed); if (!ns || !pts.length) return null;
+  const r3 = (q: number[]): V2 => [Math.round(q[0] * 1000) / 1000, Math.round(q[1] * 1000) / 1000];
+  const last = pts[pts.length - 1];
+  const towards = (from: V2): V2 => { const d = [pointer[0] - from[0], pointer[1] - from[1]]; const l = Math.hypot(d[0], d[1]); return l < 1e-9 ? [1, 0] : [d[0] / l, d[1] / l]; };
+  if (tool === 'line' || tool === 'polyline' || tool === 'circle') {
+    if (ns.length !== 1 || !(ns[0] > 0)) return null;
+    const from = tool === 'circle' ? pts[0] : last; const u = towards(from);
+    return r3([from[0] + u[0] * ns[0], from[1] + u[1] * ns[0]]);
+  }
+  if (tool === 'rectangle') {
+    const [w, h] = ns.length === 2 ? ns : [ns[0], ns[0]]; if (!(w > 0) || !(h > 0)) return null;
+    const a = pts[0]; const sx = pointer[0] < a[0] ? -1 : 1, sy = pointer[1] < a[1] ? -1 : 1;
+    return r3([a[0] + sx * w, a[1] + sy * h]);
+  }
+  if (tool === 'slot' && pts.length === 2) {
+    if (ns.length !== 1 || !(ns[0] > 0)) return null;
+    const [a, b] = pts; const d = [b[0] - a[0], b[1] - a[1]]; const l = Math.hypot(d[0], d[1]); if (!(l > 1e-9)) return null;
+    return r3([(a[0] + b[0]) / 2 - d[1] / l * ns[0], (a[1] + b[1]) / 2 + d[0] / l * ns[0]]);
+  }
+  if (tool === 'arc' && pts.length === 2) {
+    if (ns.length !== 1 || !(ns[0] !== 0) || Math.abs(ns[0]) >= 360) return null;
+    const [c, s] = pts; const t = ns[0] * Math.PI / 180; const d = [s[0] - c[0], s[1] - c[1]];
+    return r3([c[0] + d[0] * Math.cos(t) - d[1] * Math.sin(t), c[1] + d[0] * Math.sin(t) + d[1] * Math.cos(t)]);
+  }
+  return null;
+}
+/** The distance from p to the segment ab. */
+export function distToSegment(p: V2, a: V2, b: V2): number { return distToPolyline(p, [a, b]); }
+/** A slot's outline (the two caps and the two sides), as reSHape's slot(a, b, r) draws it, for the preview. */
+export function slotGeoms(a: V2, b: V2, r: number): SketchGeom[] {
+  const d = [b[0] - a[0], b[1] - a[1]]; const l = Math.hypot(d[0], d[1]); if (!(l > 1e-9) || !(r > 0)) return [];
+  const n: V2 = [-d[1] / l * r, d[0] / l * r]; const r3 = (q: number[]): V2 => [Math.round(q[0] * 1000) / 1000, Math.round(q[1] * 1000) / 1000];
+  const a1 = r3([a[0] + n[0], a[1] + n[1]]), a2 = r3([a[0] - n[0], a[1] - n[1]]), b1 = r3([b[0] + n[0], b[1] + n[1]]), b2 = r3([b[0] - n[0], b[1] - n[1]]);
+  // counter-clockwise: the side below a to b, the cap round b, the side above back to a, the cap round a
+  return [{ k: 'line', a: a2, b: b2 }, { k: 'arc', c: b, r, a: b2, b: b1, sense: 'ccw' }, { k: 'line', a: b1, b: a1 }, { k: 'arc', c: a, r, a: a1, b: a2, sense: 'ccw' }];
+}
+/** What the typed size means for the tool, for the readout: 'length 25', 'width 30, height 20', 'radius 5', 'angle 90°'. */
+export function typedWords(tool: string, pts: V2[], typed: string): string {
+  const ns = typedNumbers(typed); const t = typed.trim();
+  if (tool === 'rectangle') return ns && ns.length === 2 ? `width ${fmt(ns[0])}, height ${fmt(ns[1])}` : ns ? `${fmt(ns[0])} square` : t;
+  if (tool === 'circle' || (tool === 'slot' && pts.length === 2)) return `radius ${t}`;
+  if (tool === 'arc' && pts.length === 2) return `angle ${t}°`;
+  return `length ${t}`;
+}
+
+// ---- Delete: which line of the sketch's block drew which curve ---------------------------------------------------------------
+
+/** The lines of a sketch's block that draw (name.something(…)), with where each starts and ends in the doc (its newline included). */
+export function sketchStatementLines(doc: string, name: string): { from: number; to: number; text: string }[] {
+  const end = sketchBlockEnd(doc, name); if (end === null) return [];
+  const esc = name.replace(/\$/g, '\\$');
+  const decl = new RegExp(`^\\s*(?:const|let|var)\\s+${esc}\\s*=\\s*sketch\\s*\\(`, 'm').exec(doc); if (!decl) return [];
+  const out: { from: number; to: number; text: string }[] = [];
+  let at = doc.indexOf('\n', decl.index); // the line after the declaration
+  while (at >= 0 && at < end) {
+    const from = at + 1; const nl = doc.indexOf('\n', from); const lineEnd = nl < 0 ? doc.length : nl;
+    const text = doc.slice(from, lineEnd);
+    if (new RegExp(`^\\s*${esc}\\s*\\.`).test(text)) out.push({ from, to: nl < 0 ? lineEnd : nl + 1, text: text.trim() });
+    at = nl;
+  }
+  return out;
+}
+/**
+ * Which drawing line made each curve, from the sketch's curve count with the code cut short after each of its lines (counts[i]:
+ * after line i). null when the counts do not add up to the sketch's curves, or go down: then which line drew a curve is not known.
+ */
+export function curveOwners(counts: number[], total: number): number[] | null {
+  const owner: number[] = []; let prev = 0;
+  for (let i = 0; i < counts.length; i++) { if (!(counts[i] >= prev)) return null; for (let k = prev; k < counts[i]; k++) owner.push(i); prev = counts[i]; }
+  return prev === total ? owner : null;
+}
+/** The screen distance from a point to a polyline. */
+export function distToPolyline(p: V2, pts: V2[]): number {
+  let best = Infinity;
+  for (let i = 1; i < pts.length; i++) {
+    const [a, b] = [pts[i - 1], pts[i]]; const d = [b[0] - a[0], b[1] - a[1]]; const l2 = d[0] * d[0] + d[1] * d[1];
+    const t = l2 ? Math.max(0, Math.min(1, ((p[0] - a[0]) * d[0] + (p[1] - a[1]) * d[1]) / l2)) : 0;
+    best = Math.min(best, Math.hypot(p[0] - a[0] - t * d[0], p[1] - a[1] - t * d[1]));
+  }
+  return best;
+}
+
+// ---- the face a sketch sits on, as closed outlines (the grid is drawn inside them) ----------------------------------------------
+
+/**
+ * The part's edges that lie on a sketch plane, in the plane's 2D coordinates, joined into closed outlines: straight edges by their
+ * ends, a full circle (start = end) from its start and the point opposite. Pieces that do not close are left out.
+ */
+export function planeOutlines(edges: { a: V2; b: V2; mid: V2 }[], tol = 1e-6): V2[][] {
+  const loops: V2[][] = []; const open: { a: V2; b: V2; pts: V2[] }[] = [];
+  const near = (p: V2, q: V2) => Math.hypot(p[0] - q[0], p[1] - q[1]) <= tol;
+  for (const e of edges) {
+    if (near(e.a, e.b)) { // a whole circle: start and its opposite point (the middle of the edge)
+      const c: V2 = [(e.a[0] + e.mid[0]) / 2, (e.a[1] + e.mid[1]) / 2]; const r = Math.hypot(e.a[0] - c[0], e.a[1] - c[1]);
+      if (r > tol) loops.push(Array.from({ length: 49 }, (_, i) => [c[0] + r * Math.cos(2 * Math.PI * i / 48), c[1] + r * Math.sin(2 * Math.PI * i / 48)] as V2));
+      continue;
+    }
+    const straight = Math.abs((e.b[0] - e.a[0]) * (e.mid[1] - e.a[1]) - (e.b[1] - e.a[1]) * (e.mid[0] - e.a[0])) <= tol * Math.max(1, Math.hypot(e.b[0] - e.a[0], e.b[1] - e.a[1]));
+    open.push({ a: e.a, b: e.b, pts: straight ? [e.a, e.b] : [e.a, e.mid, e.b] });
+  }
+  while (open.length) {
+    const first = open.shift()!; const chain = [...first.pts]; let grew = true;
+    while (grew && !near(chain[0], chain[chain.length - 1])) {
+      grew = false; const tail = chain[chain.length - 1];
+      const i = open.findIndex(x => near(x.a, tail) || near(x.b, tail)); if (i < 0) break;
+      const x = open.splice(i, 1)[0]; chain.push(...(near(x.a, tail) ? x.pts.slice(1) : [...x.pts].reverse().slice(1))); grew = true;
+    }
+    if (chain.length > 3 && near(chain[0], chain[chain.length - 1])) loops.push(chain);
+  }
+  return loops;
 }

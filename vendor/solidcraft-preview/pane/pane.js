@@ -212,7 +212,11 @@ const PROBE_INC = params.get('probeinc') === 'on';
 const SESSION_KERNEL_URL = new URL('../kernel-session/solidcraft_referee_bg.wasm', BASE);
 const probeLog = []; // one row per probe: { cmds, last (the probed list's last command), budgetS, status, wallMs, cpuMs, loadMs, vol }
 let kernelModule = null;
-const compile = (url) => fetch(url).then((r) => { if (!r.ok) throw new Error(`${url.pathname}: HTTP ${r.status}`); return WebAssembly.compileStreaming(r); });
+// shCode `?cache=parent`: a kernel's bytes from the framing page's cache (src/runtime-cache.js), which answers only for the pinned files it knows,
+// checked there by size and sha256; else (null) it is downloaded as before.
+const HOST_ROOT = new URL('../', BASE).href;
+const fromCache = (url) => (typeof window.__runtimeBytes === 'function' && url.href.startsWith(HOST_ROOT) ? window.__runtimeBytes(url.href.slice(HOST_ROOT.length)) : Promise.resolve(null)).catch(() => null);
+const compile = (url) => fromCache(url).then((bytes) => bytes ? WebAssembly.compile(bytes) : fetch(url).then((r) => { if (!r.ok) throw new Error(`${url.pathname}: HTTP ${r.status}`); return WebAssembly.compileStreaming(r); }));
 const sessionKernel = (m) => WebAssembly.Module.exports(m).some((e) => e.name === 'run_from');
 const getModule = () => (kernelModule ??= (PROBE_INC ? compile(SESSION_KERNEL_URL).then((m) => (sessionKernel(m) ? m : compile(KERNEL_URL))).catch(() => compile(KERNEL_URL)) : compile(KERNEL_URL))
   .then((m) => { probeIncremental = PROBE_INC && sessionKernel(m); return m; }).catch((e) => { kernelModule = null; throw e; }));
@@ -361,7 +365,7 @@ async function memoForRun() {
   const same = k && k.memo.size() < KEEP_MAX && k.stops === engineStops.length && k.revision === await revisionNow();
   const m = k && k.memo.size() < KEEP_MAX ? k.memo : createReplyMemory(bridge, { continueRuns: INC_ON, shadow: window.__host.shadow ?? null, log: engineLog });
   if (!same) { m.page = null; m.marks = []; } // SolidCraft may hold something else now: start from an empty design, and never go back to an old mark
-  m.runs = 0; m.hits = 0; m.continued = 0; m.restored = 0; // this run's own figures, for engineUse
+  m.runs = 0; m.hits = 0; m.continued = 0; m.restored = 0; m.earlier = 0; m.gen++; // this run's own figures, for engineUse
   return m;
 }
 async function keepAfterRun(m) { if (KEEP_ON && m) kept = { memo: m, revision: await revisionNow(), stops: engineStops.length }; }
@@ -701,7 +705,7 @@ async function run({ confirmed = false } = {}) {
     const held = memo ? await memo.heldReply(tr.commands) : null;
     const fin = held ?? await runSC(tr.commands, { replay: true });
     pm('final replay', pt); pt = performance.now();
-    const engineUse = memo ? { runs: memo.runs, fromMemory: memo.hits, finalReplaySkipped: !!held, ...(INC_ON ? { continued: memo.continued, restored: memo.restored } : {}), ...(KEEP_ON ? { kept: memo.size() } : {}) } : null;
+    const engineUse = memo ? { runs: memo.runs, fromMemory: memo.hits, finalReplaySkipped: !!held, ...(INC_ON ? { continued: memo.continued, restored: memo.restored } : {}), ...(KEEP_ON ? { kept: memo.size(), fromEarlierRuns: memo.earlier } : {}) } : null;
     await keepAfterRun(memo);
     memo = null;
     keepNext = false;
