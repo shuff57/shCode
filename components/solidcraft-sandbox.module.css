@@ -98,3 +98,18 @@
 .faceLabel:hover, .planeLabel:hover { background:var(--brand); color:var(--on-brand); }
 .toolNote { margin:6px 0; padding:6px 10px; border:1px solid var(--c-green, #16a34a); border-radius:6px; font-size:12px; }
 .refusal { margin:0 0 4px; }
+/* Points: the sketch's [x, y] under the pointer, and the corner or centre it snapped to (SolidCraftCodeStudio). */
+.pointReadout { position:absolute; z-index:3; pointer-events:none; transform:translate(14px, 14px); padding:2px 6px; border-radius:4px; background:var(--card); color:var(--text); border:1px solid var(--border); font:12px/1.4 var(--font-mono, monospace); white-space:nowrap; }
+.pointDot { position:absolute; z-index:3; pointer-events:none; width:9px; height:9px; margin:-5px 0 0 -5px; border-radius:50%; background:var(--c-orange, #ffb86c); box-shadow:0 0 0 2px var(--card); }
+/* Live sketch (CadSketchOverlay): the grid on the sketch's plane, the part's edges on it, the sketch's own curves, a tool's preview. */
+.sketchOverlay { position:absolute; inset:0; width:100%; height:100%; z-index:2; pointer-events:none; overflow:hidden; }
+.gridMinor { stroke:rgb(148 163 184 / .22); stroke-width:1; }
+.gridMajor { stroke:rgb(148 163 184 / .45); stroke-width:1; }
+.gridAxis { stroke:rgb(96 165 250 / .75); stroke-width:1.5; }
+.sketchFace { stroke:rgb(250 204 21 / .9); stroke-width:2.5; }
+.sketchCurve { fill:none; stroke:var(--c-orange, #ffb86c); stroke-width:2; }
+.sketchPreview { fill:none; stroke:var(--c-orange, #ffb86c); stroke-width:1.5; stroke-dasharray:5 4; }
+.sketchBarHost:empty { display:none; }
+.sketchBar { display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.sketchPlane { color:var(--c-meta); }
+.sketchBar button[aria-pressed="true"], .sketchToolOn { background:var(--brand) !important; color:var(--on-brand) !important; border-color:var(--brand) !important; }

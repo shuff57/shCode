@@ -14,6 +14,7 @@ import CadFiles from './CadFiles';
 import styles from './solidcraft-sandbox.module.css';
 import { CAD_ENTRY, bundleProject, codeFiles, describeAt, locate, readEdgeNameProbe, readVariableProbe, stepLines, withEdgeNameProbe, withVariableProbe, type CadError, type SourceSection } from '../lib/solidcraft-code';
 import { cadLineMarks } from '../lib/cad-line-marks';
+import CadSketchOverlay from './CadSketchOverlay';
 import { edgeLabels, labelFaces, type ScEdge, type ScFace } from '../lib/solidcraft-labels';
 import { setCadModel, type CadModelBody, type CadTarget } from '../lib/cad-completions';
 import { insertion, fillingCall, pickText, sketchPlaneOf, topLevelNames, topLevelVariables, type Pick, type PickCode } from '../lib/solidcraft-picks';
@@ -93,6 +94,12 @@ export default function SolidCraftCodeStudio(props: Props) {
   const [width, setWidth] = useState(38);
   const [active, setActive] = useState(CAD_ENTRY);
   const [labelsOn, setLabelsOn] = useState(true);
+  // Points: the [x, y] under the pointer on the sketch at the cursor. Live sketch: the cursor in a sketch's lines turns the view to its
+  // plane, with a snap grid and sketch tools (components/CadSketchOverlay.tsx).
+  const [pointsOn, setPointsOn] = useState(false);
+  const [liveOn, setLiveOn] = useState(true);
+  const [sketchMode, setSketchMode] = useState<string | null>(null);
+  const [sketchBarHost, setSketchBarHost] = useState<HTMLSpanElement | null>(null);
   const [labels, setLabels] = useState<Label[]>([]);
   const [picked, setPicked] = useState<PickCode | null>(null);
   const [filled, setFilled] = useState('');
@@ -262,7 +269,7 @@ export default function SolidCraftCodeStudio(props: Props) {
   // Labels: each body's labelled faces and the three planes, placed with SolidCraft's own projection
   // (ui.worldToScreen) and shown only where that face is what the view shows there (ui.pick).
   useEffect(() => {
-    if (!ready || busy || !labelsOn) { setLabels([]); return; }
+    if (!ready || busy || !labelsOn || sketchMode) { setLabels([]); return; }
     let live = true; let camera = ''; let timer: ReturnType<typeof setTimeout>;
     const refresh = async () => {
       const sc = api.current; if (!sc || running.current) return;
@@ -304,7 +311,7 @@ export default function SolidCraftCodeStudio(props: Props) {
     const loop = async () => { try { await refresh(); } catch { /* the view is busy; try again */ } if (live) timer = setTimeout(loop, 400); };
     void loop();
     return () => { live = false; clearTimeout(timer); };
-  }, [ready, busy, labelsOn, labelsKey, crop, geometry]);
+  }, [ready, busy, labelsOn, labelsKey, crop, geometry, sketchMode]);
   // The model as built, for the editor's list in the brackets of sketch(), part.edge(), fillet()…
   // (lib/cad-completions.ts). The element highlighted in the list is selected in the view.
   const previewing = useRef(0);
@@ -485,6 +492,8 @@ export default function SolidCraftCodeStudio(props: Props) {
       <div className={styles.actions}>
         {props.toolsAllowed && <label className={styles.toolsSwitch}><input type="checkbox" checked={toolsOn} disabled={!ready} onChange={e => setToolsOn(e.target.checked)} /> SolidCraft tools</label>}
         <label className={styles.toolsSwitch}><input type="checkbox" checked={labelsOn} disabled={!ready} onChange={e => setLabelsOn(e.target.checked)} /> Labels</label>
+        <label className={styles.toolsSwitch} title="Show the [x, y] under the pointer on the plane of the sketch your cursor is in. Click to put the point in your code."><input type="checkbox" checked={pointsOn} disabled={!ready} onChange={e => setPointsOn(e.target.checked)} /> Points</label>
+        <label className={styles.toolsSwitch} title="With your cursor in a sketch's lines, the view turns to its plane, with a grid and sketch tools."><input type="checkbox" checked={liveOn} disabled={!ready} onChange={e => setLiveOn(e.target.checked)} /> Live sketch</label>
         <button disabled={!ready || busy} onClick={() => void fit()}>Fit</button>
         <button className={styles.run} disabled={!ready || busy || !props.policyLoaded} onClick={() => void run()} title="Run (Ctrl+Enter)">{busy ? 'Building…' : 'Run'}</button>
       </div>
@@ -492,7 +501,9 @@ export default function SolidCraftCodeStudio(props: Props) {
     {error && <p role="alert" className={styles.codeError}>{where && <button className={styles.errorAt} onClick={() => goTo(error)}>{where}</button>}{error.message}</p>}
     {refusals.length > 0 && <div role="alert" className={styles.codeError} aria-label="Steps not built">{refusals.map((r, i) => <p key={i} className={styles.refusal}>{r.at && <button className={styles.errorAt} onClick={() => goTo(r.at)} title="Show this line">{describeAt(r.at)}</button>}{r.text}</p>)}</div>}
     <div className={styles.pickBar} aria-live="polite">
-      {picked ? <><span>Selected: <b>{picked.name}</b> {picked.code && <code>{picked.code}</code>}</span>{picked.code && <button onClick={() => insert(picked)}>Insert</button>}</>
+      <span ref={setSketchBarHost} className={styles.sketchBarHost} />
+      {sketchMode ? null : picked ? <><span>Selected: <b>{picked.name}</b> {picked.code && <code>{picked.code}</code>}</span>{picked.code && <button onClick={() => insert(picked)}>Insert</button>}</>
+        : pointsOn ? <span>Points: the pointer shows <code>[x, y]</code> on the sketch your cursor is in. Click to put the point at your cursor.</span>
         : <span>In <code>sketch()</code>, <code>fillet()</code> or <code>part.edge()</code>, choose from the list, or click a face, edge or plane label in the view.</span>}
       {filled && <span className={styles.pickNote}>{filled}</span>}
     </div>
@@ -518,6 +529,10 @@ export default function SolidCraftCodeStudio(props: Props) {
             : isolated === false ? <p className={styles.missing}>This CAD workspace needs isolated iframe storage, available in current Chrome or Edge. Your files are kept.</p>
             : available && isolated ? <iframe {...{ credentialless: '' }} ref={frame} src={HOST_PAGE} title="SolidCraft" style={{ top: -crop, height: `calc(100% + ${crop}px)` }} />
             : <p className={styles.missing}>Checking the CAD build…</p>}
+          <CadSketchOverlay active={ready && !busy} sc={ready ? api.current : null} inner={ready ? scWindow.current : null} editor={editor}
+            evaluate={ready && host.current ? host.current.evaluate : null} files={props.files} buildKey={labelsKey} crop={crop} geometry={geometry}
+            pointsOn={pointsOn} liveOn={liveOn} toolbarHost={sketchBarHost} onInserted={setFilled} onMode={setSketchMode}
+            suppressPick={() => { previewing.current = Date.now() + 800; void api.current?.execute('select.set', { items: [] }).catch(() => { /* the view is busy */ }); }} />
           {labels.length > 0 && <div className={styles.scLabels}>{labels.map(l => <button key={l.key} className={l.plane ? styles.planeLabel : styles.faceLabel} style={{ left: l.x, top: l.y }} onClick={() => insert(l.pick)} title={l.pick.code ? `Put ${l.pick.code} in your code` : l.pick.name}>{l.text}</button>)}</div>}
           {available && isolated && (!ready || busy) && <div className={styles.scCover}>{ready ? 'Building your code…' : status}</div>}
         </div>

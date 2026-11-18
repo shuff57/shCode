@@ -226,11 +226,12 @@ export function locate(line:number|null|undefined,locations:SourceSection[]):{fi
 // After a run, the labels and the editor's lists name a part by its variable (part.face('top')). The guarded path
 // reports SolidCraft's bodies (b_pull1), not the variables, so the script is evaluated once more in the same opaque
 // runner with one line added at its end that stops it with the answer: each top-level variable's part (b_<step>)
-// or sketch (s:<step>). Nothing is built by this evaluation.
+// or sketch (s:<step>). Nothing is built by this evaluation. A sketch is asked first: the runner's friendly sketch is a proxy that answers any
+// property (so `__reshapeHandle` alone would take it for a part).
 export const MAP_MARK='__SHCODE_MAP__';
 export function withVariableProbe(source:string,names:string[]):string {
   const safe=names.filter(n=>/^[A-Za-z_$][\w$]*$/.test(n));
-  const each=safe.map(n=>`${JSON.stringify(n)}: (() => { try { const v = ${n}; if (!v || typeof v !== 'object') return null; if (v.__reshapeHandle) return 'b_' + v.rootId; if (typeof v.id === 'string' && /^sk\\d+$/.test(v.id)) return 's:' + v.id; return null; } catch (e) { return null; } })()`);
+  const each=safe.map(n=>`${JSON.stringify(n)}: (() => { try { const v = ${n}; if (!v || typeof v !== 'object') return null; if (typeof v.id === 'string' && /^sk\\d+$/.test(v.id)) return 's:' + v.id; if (v.__reshapeHandle === true && typeof v.rootId === 'string') return 'b_' + v.rootId; return null; } catch (e) { return null; } })()`);
   return `${source}\n;throw new Error(${JSON.stringify(MAP_MARK)} + JSON.stringify({ ${each.join(', ')} }));\n`;
 }
 /** The probe's answer: body name (b_pull1) to variable, and sketch id (sk1) to variable. First variable wins. */

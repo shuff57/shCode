@@ -103,6 +103,63 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
    line is marked in the editor with the sentence as its tooltip; the mark follows edits until the next Run.
 9. SolidCraft shows its own "autosave" toast inside the frame (storage is off in the host page).
 
+## Points on a sketch's plane (2026-11-18; with Live sketch off, or outside a sketch's block)
+
+- **What it does.** The **Points** switch in the studio's toolbar shows, over the view, the `[x, y]` under the pointer on
+  the plane of the sketch the editor cursor is in. That sketch is the variable of `lid.circle(` on the cursor's line or a
+  line above, or of its `const lid = sketch(...)`. With no sketch there, the top plane is used.
+  - It snaps to a part's corners, edge middles and face centres within 10 px; otherwise it rounds to 0.5 mm.
+  - A point off the plane is dropped onto it: a bottom corner reads as its x and y on a top-plane sketch.
+  - A click writes `[x, y]` at the editor cursor, after `, ` when it follows another point. It selects nothing in
+    SolidCraft, and a drag still turns the view.
+- **How.**
+  - The plane comes from reSHape's own document after each Run, with one more evaluation that builds nothing. So
+    `sketch('top', height)` has its real offset, and a framed sketch its frame.
+  - SolidCraft has `ui.worldToScreen` but nothing that goes the other way. A plane maps onto the screen by a projective
+    map, so four of its points, projected by SolidCraft, give that map exactly, and its inverse turns the pointer into
+    plane coordinates (`lib/sketch-plane-points.ts`).
+- **Fixed on the way.** The variable probe took a friendly sketch (a proxy that answers any property) for a part, so no
+  sketch variable was known. It now asks for a sketch id first.
+- **Checked.** `scripts/test-sketch-plane-points.mjs` (planes, the map, the active sketch, the written point). In the
+  browser, `/tmp/cad-drive/points-e2e.py`, 10 of 10:
+  - a top corner reads `[60, 40]` on `sketch('top', 10)` and a click writes it;
+  - a free point reads to 0.5 mm;
+  - a front-plane sketch reads x and z;
+  - Points off shows nothing.
+
+## Live sketch (2026-11-18)
+
+- **What it does.** With **Live sketch** on (the default), putting the editor cursor in a sketch's block puts the studio in
+  sketch mode, as SolidCraft is when a sketch is started on a face. The block is its `const lid = sketch(...)` line and the
+  `lid.…(…)` lines right after it.
+  - **The view.** It turns to face the sketch's plane, u to the right and v up, and turns back to where it was when the
+    cursor leaves the block or Done is pressed.
+  - **The grid.** A snap grid is drawn on the plane, its step following the zoom (0.1 to 500 mm, cells at least 14 px).
+    The part's edges that lie on the plane are drawn over it, so the face the sketch is on is outlined. Face labels are
+    hidden meanwhile.
+  - **The sketch.** Its own lines, circles and arcs are drawn as the code is typed, from reSHape's document re-read about
+    half a second after each change; nothing is built.
+  - **The tools.** The hint bar shows Line, Rectangle, Circle, Polyline and Done.
+    - Clicks snap to the sketch's own ends and centres, the part's corners, edge middles and face centres, else the grid.
+    - Each tool writes its reSHape line (`lid.rectangle(a, b);`, `lid.circle(c, { r });`, `lid.line(a, b);`,
+      `lid.lines([...]);`) at the end of the sketch's block, as one undoable edit.
+    - Polyline ends on its first point (closed) or Enter (open); Escape drops the points so far; a drag still turns the view.
+- **How.**
+  - **Camera angles.** SolidCraft's angles were measured: front is yaw 0 and pitch 0, right is yaw −π/2, top is pitch π/2,
+    and a positive roll turns the picture clockwise.
+  - **Facing the plane.** The eye is set along u × v, then rolled until u is level on the screen (`viewAngles` in
+    `lib/sketch-plane-points.ts`).
+  - **Drawing.** The grid and the curves are mapped through the plane-to-screen projective map, worked out again whenever
+    the camera moves (`components/CadSketchOverlay.tsx`).
+- **Checked.** Unit tests in `scripts/test-sketch-plane-points.mjs`. In the browser, `/tmp/cad-drive/sketch-mode-e2e.py`,
+  14 of 14:
+  - the top view for `sketch('top', 10)`, x to the right, and the front view for a front sketch;
+  - the grid, the face outline and the circle drawn;
+  - the code each of Rectangle, Circle and closed Polyline writes;
+  - a typed line drawn without a Run;
+  - Done turning the view back;
+  - the drawn code builds.
+
 ## Checked
 
 - Unit: `scripts/test-solidcraft-code.mjs` (files, joining with lines kept, the variable probe, lists,
