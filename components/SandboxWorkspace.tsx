@@ -30,6 +30,7 @@ import CodeTogetherBar, { useCodeTogetherAvailable } from './CodeTogetherBar';
 import SandboxProjectPicker from './SandboxProjectPicker';
 import { createProject, openProject, useSandboxProjects } from '../lib/sandbox-projects';
 import SendProgramButton from './SendProgramButton';
+import P5playConvertButton from './P5playConvertButton';
 import { projectLessonId } from '../lib/sandbox-projects-core';
 import { RUN_TIMEOUT_MS, errorWithLocation, runStudentCode, timerLimitMessage } from '../lib/js-runner-source';
 import {
@@ -828,6 +829,10 @@ export default function SandboxWorkspace() {
             {!noProjects && <div className="sandbox-tb-end">
               <div className="sandbox-tb-group sandbox-tb-program" role="group" aria-label="This program">
                 {renderCloudChips()}
+                {/* Paste a p5play program, an AI rebuilds it as a NEW moSHion project (functions/api/p5play-convert.ts). */}
+                {mode.preview === 'moshion' && lessonProgress.authed && !together && (
+                  <P5playConvertButton key={`p5play-${lesson.id}`} chipStyle={chipStyle} getCode={getScript} />
+                )}
                 <button
                   style={together ? { ...chipStyle, opacity: 0.45, cursor: 'not-allowed' } : chipStyle}
                   onClick={reset}

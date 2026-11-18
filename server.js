@@ -575,6 +575,37 @@ app.prepare().catch((err) => {
   server.post('/api/lesson-submissions', express.json({ limit: '1mb' }), runRoute(submissionsPost));
   server.get('/api/quiz-reveal', runRoute(quizRevealGet));
   server.get('/api/attempt-reveal', runRoute(attemptRevealGet));
+  // p5play -> moSHion (functions/api/p5play-convert.ts): the REAL handler, calling OpenRouter for real when
+  // OPENROUTER_API_KEY is in this shell (else it answers 503 "not set up", as production does). The API file
+  // it sends the model is read from public/ in place of the ASSETS binding.
+  {
+    const convert = await import('./functions/api/p5play-convert.ts');
+    // Its own in-memory SQLite (every migration applied) so the daily caps really count.
+    const { makeD1: makeConvertD1 } = await import('./scripts/_d1-sqlite.mjs');
+    const convertDb = makeConvertD1();
+    const ASSETS = {
+      async fetch(u) {
+        const p = new URL(u).pathname;
+        if (p !== '/moshion/docs/moshion.d.ts') return new Response('not found', { status: 404 });
+        return new Response(await fs.readFile(path.join(process.cwd(), 'public', p), 'utf8'));
+      },
+    };
+    server.post('/api/p5play-convert', express.json({ limit: '96kb' }), async (req, res) => {
+      const email = devIdentity(req);
+      const request = new Request(`http://localhost${req.originalUrl}`, {
+        method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(req.body ?? {}),
+      });
+      const out = await convert.onRequestPost({
+        request, params: {}, data: { email, role: devRoleOf(req) },
+        env: {
+          DB: convertDb, ASSETS,
+          OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
+          P5PLAY_CONVERT_MODEL: process.env.P5PLAY_CONVERT_MODEL,
+        },
+      });
+      res.status(out.status).type('application/json').send(await out.text());
+    });
+  }
   // The texture and sound library (functions/api/library/*): the REAL handlers
   // over an in-memory SQLite with every migration applied and an in-memory R2,
   // so the library sync (components/LibrarySync.tsx) runs end to end in dev.

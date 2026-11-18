@@ -205,6 +205,8 @@ demanded it.
   Check button in `functions/api/grade-written.ts`, the tutor and flowchart hints in
   `functions/api/ai-help.ts` (streamed by `lib/workers-ai.ts`). Ollama cloud (`OLLAMA_API_KEY`) is
   only the fallback for a dev server or a deploy with no binding.
+  **One exception:** the sandbox's "From p5play" converter (`POST /api/p5play-convert`) calls OpenRouter
+  (`OPENROUTER_API_KEY`, DeepSeek V4.1 Flash), owner's choice 2026-11-17. See "p5play to moSHion" below.
 
 ## Role model
 
@@ -235,6 +237,10 @@ Cloudflare dashboard env vars pane (plain vars):
 | `GRADE_WRITTEN_DAILY_LIMIT` | var (optional) | Per-student daily submission cap for `POST /api/grade-written`; default `100` (was 30; two students hit 30 on 2026-10-29). Teachers/admins are exempt. `GET /api/grade-written` returns `quota {limit, used, remaining}` for a student and `components/GradeQuotaNote.tsx` shows it beside the attempt banner, so the cap is never a surprise. A dashboard value of this var overrides the default. A runaway-cost stop, not a pedagogical one — the course allows unlimited retries, so raise it rather than let a student hit it. |
 | `GRADE_WRITTEN_GLOBAL_DAILY_LIMIT` | var (optional) | GLOBAL per-deploy daily ceiling for `POST /api/grade-written`; default `10000`. Same backstop as `AI_HELP_GLOBAL_DAILY_LIMIT`, for the grader. |
 | `GRADE_WRITTEN_WORKERS_MODEL` | var (optional) | Workers AI model id for every AI call (grader, Check, tutor); default `@cf/google/gemma-4-26b-a4b-it`. Only read when the `AI` binding exists. |
+| `OPENROUTER_API_KEY` | secret | Bearer key for `POST /api/p5play-convert` only (OpenRouter). Unset = that route answers 503 "not set up"; nothing else uses it. |
+| `P5PLAY_CONVERT_MODEL` | var (optional) | OpenRouter model id for the converter; default `deepseek/deepseek-v4.1-flash`. |
+| `P5PLAY_CONVERT_DAILY_LIMIT` | var (optional) | Conversions per person per UTC day; default `20`. Teachers/admins exempt. |
+| `P5PLAY_CONVERT_GLOBAL_DAILY_LIMIT` | var (optional) | Deploy-wide daily ceiling for the converter, everyone counted; default `500`. |
 
 ## D1 schema
 
@@ -734,6 +740,27 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   routes for dev. Tests: `scripts/test-draft-sync.mjs` (rules, the real handlers, two browsers sharing one database).
 - Deploy (stage 3): nothing to apply. No migration, no new variable. The drafts route change is backwards compatible
   (a page that sends no `baseUpdatedAt` behaves as before).
+
+### p5play to moSHion (2026-11-17; no migration)
+The moSHion sandbox's toolbar has **From p5play** (`components/P5playConvertButton.tsx`, signed in, not in a Code together
+session): paste a p5play program (or "Use the code in the editor"), `POST /api/p5play-convert {code}` asks DeepSeek V4.1 Flash
+on OpenRouter to rebuild it, and the result opens as a NEW moSHion project (`createProject`), so nothing is written over. The
+prompt is `lib/p5play-convert-core.ts`: the p5play-vs-moSHion differences (`CONVERT_RULES`: `createCanvas` -> `new Canvas`,
+logic into `update()`, HUD into `drawTop()`, no `drawSprites`/`createSprite`, `overlaps()` is a query, ...) plus the whole
+`public/moshion/docs/moshion.d.ts`, read through `ASSETS`. **When the engine's API changes, check `CONVERT_RULES` still holds.**
+The model answers one ```js fence then `NOTES:` bullets (`parseConvertAnswer`); a line it could not match carries
+`// CONVERTED:`. A cut-off answer (`finish_reason: length`) or no program is an error, never a half program. An answer that
+still calls a p5-only global (`leftoverP5Calls`, list `NOT_IN_MOSHION`; comments and strings ignored) gets ONE repair round;
+what is left is named in `warnings`. **`preload()` and `loadImage()` are moSHion's own since `b4fdc0f9`, so they are not on
+that list; the test fails if any listed name appears in `moshion.d.ts`.** `max_tokens` is `maxTokensFor(code)` (3000 to 16000),
+never a flat 32000: OpenRouter holds max_tokens x price against the balance up front, and a low balance then 402s every request
+(seen live; 402 reads "needs more credit, tell your teacher"). Measured live 2026-11-17: ~$0.002 and 3-15 s a conversion; the
+outputs ran 120 frames clean in `scripts/moshion-harness.mjs`. Only the paste and
+the API file leave the site (no email, name or lesson id); the request sets `provider.data_collection: 'deny'`; a paste with a
+phone, email or street address is refused first (`findPII`). Caps in `ai_help_usage`, bucket `p5play-convert` (and
+`p5play-convert:global`), counted when the model is called. No key = 503. Dev: `OPENROUTER_API_KEY=... npm run dev` runs the real
+handler over its own in-memory SQLite. Tests: `scripts/test-p5play-convert.mjs` (npm test; stubbed OpenRouter, no credits).
+Deploy: `wrangler pages secret put OPENROUTER_API_KEY --project-name shcode`, then the site.
 
 ### Image uploads
 - `GET /api/uploads` — caller's images + quota (40 files / 20 MB, 2 MB each)
