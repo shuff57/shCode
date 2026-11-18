@@ -184,7 +184,17 @@
         "description": "Every new Fighter gets its potions, in fourth place.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Guard halves the next hit: While a fighter is guarding, takeHit halves the hit (rounded down) and then turns the guard off; guard() turns it on. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A potion heals, capped, and uses one up: heal gives hp back but never above maxHp, takes one potion off the count, and does nothing when none are left. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Keys 1 to 3 pick the action: On your turn, 1, 2 and 3 each pick an action. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "The enemy can choose too: The enemy picks its action by a rule: a potion when it is low, or a guard by chance, instead of always attacking. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Every fighter gets five values: Each new Fighter(...) is handed five values, in this order: name, maxHp, power, potions, color. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Lab: Attack, guard or potion\". The task: add a guarding flag that halves the next hit with floor(n / 2) in takeHit and is then cleared, a potions count (a new constructor value, so every new Fighter call is handed five values: name, maxHp, power, potions, color) and heal(), which gives up to 12 hp back capped at maxHp and uses one up, doing nothing when none are left; one act(t, a, roll) does action 1 attack, 2 guard or 3 potion; keys 1, 2 and 3 pick the action on your turn; and the enemy chooses, drinking when it is low and has a potion and guarding some of the time. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   },
   "carryFrom": "7-17-quest-3-lab-trade-blows"
 }

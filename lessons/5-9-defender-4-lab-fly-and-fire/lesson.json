@@ -162,6 +162,15 @@
         "description": "Inside moveBullets()'s loop, an if that asks whether the shot's y has gone above the top (less than -20, or another value near the top such as less than 0) both deletes the shot's sprite (.delete() or .remove()) and splices it out of bullets at that index. Only one of the two is partial: a spliced shot that is not deleted stays on screen, and a deleted shot left in bullets keeps counting. A test with > (a y below the bottom) is the opposite and not met.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "The ship stays on the canvas: Two ifs in moveShip() put the ship back when it passes either side: x no smaller than 20 and no bigger than 380. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The cooldown counts down: fire() takes 1 off cooldown on every frame it is above 0, and never below 0: a countdown that runs past 0 never reaches 0 again, so the ship could not fire. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A shot is made only when Space is held and the cooldown is 0: The shot is pushed onto bullets inside an if that asks both, joined with &&: Space is held, and cooldown is 0. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Firing sets the cooldown again: Next to the push, cooldown is set back to 12 (any number above 0), so the next shot has to wait. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Shots that leave the top are deleted and spliced out: Inside an if that asks whether a shot's y is above the top, the shot is deleted from the screen and spliced out of bullets. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

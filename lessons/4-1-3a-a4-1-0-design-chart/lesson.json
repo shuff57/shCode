@@ -151,6 +151,17 @@
         "description": "An OUTPUT (or PRINT) line for the formatted verdict.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Ten to nineteen numbered steps: Number every line 1. 2. 3. and so on. A plan under ten steps has not been decided yet, and twenty or more is too big to hold in your head.",
+        "r2": "A decision with both ways out: An IF closed with END IF, with an ELSE for the other way.",
+        "r3": "A loop over your array: FOR EACH item IN list ... END FOR, with at least one step inside.",
+        "r4": "Functions planned as CALL lines: At least three CALL lines: one per function you plan to write.",
+        "r5": "Sorting, saving and loading are planned: A different CALL for each: one that sorts, one that saves, one that loads, with that word in the name.",
+        "r6": "One verdict line is printed: An OUTPUT (or PRINT) line for the formatted verdict."
+      },
+      "task": "The student was given plain-English steps for the lab \"4.1.5 Q1 Synthesis Design Plan\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Plan the **whole program** before writing any of it. **No JavaScript is written today.** The build lessons stay closed until this plan is green. From the project checklist, your program has to: - store at least five objects of your own design in an array - write a function of your own with at least 3 parameters - write a function of your own that returns a computed value, used elsewhere in the program - sort the array - read the array with a loop - make a decision with a conditional based on your data - save and load your data - print one formatted verdict line combining at least two things you calculated In `README.md`, write the **main program** as numbered pseudocode **between START and END**: the sequence that runs when the page loads. Number every line, including the indented ones and the END lines. Each keyword looks like this: - `CALL loadRecipes` (one line for each function you plan to write) - `IF there is a saved recipe list` ... `ELSE` ... `END IF` (a decision, with both ways out) - `FOR EACH recipe IN recipes` ... `END FOR` (walking your array) - `OUTPUT the verdict line` (the printed result), written for your own program Three rules make it a design. **One CALL per planned function, both directions**: every function you intend to write is on the plan, and every CALL becomes a real func"
+    }
   }
 }

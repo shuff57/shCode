@@ -154,7 +154,16 @@
         "description": "Inside the overlap if, once the shot is spliced, the inner loop stops (break, return, or a flag that ends the inner loop), so the spliced shot's index is never read again. With no way out, the next pass reads bullets[i], which is now another shot or nothing: not met.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Every shot is tested against every enemy: hitEnemies has a loop over bullets and, inside it, a loop over enemies (either way round), and tests them with overlaps. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A hit removes the shot: The shot that hit is deleted from the screen and spliced out of bullets. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A hit takes 1 hp: Inside the if that sees the overlap, and before its break, enemyHp[j] goes down by 1 (a line after the break never runs). Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "At 0 hp the enemy scores its worth and leaves all three arrays: When enemyHp[j] reaches 0, score goes up by enemyWorth[j] BEFORE the splices (after them, index j is a different enemy) and before the break, then index j is spliced out of enemies, enemyHp and enemyWorth (in hitEnemies, or in a removeEnemy helper it calls). Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "A shot that hit is not tested again: Inside the if that sees the overlap, the inner loop stops with break (or return), so a shot that has been spliced out is never read again. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "carryFrom": "5-10-defender-2-lab-a-field-of-enemies"
 }

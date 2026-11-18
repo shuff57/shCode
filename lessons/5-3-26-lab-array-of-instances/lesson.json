@@ -56,6 +56,11 @@
         "description": "At least one Enemy object ends up in the enemies array: pushed with enemies.push(new Enemy(...)), made first and then pushed, pushed in a loop, or built straight into the array. The step asks for five spread across the canvas; one or more counts for this card. Missing: no Enemy ever goes into enemies (for example, five separate variables instead). Help: 3.3.2 (Array Basics: Index, push, pop)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "enemies.push(new Enemy(...)) used at least once: Use `enemies.push(new Enemy(...))` to add Enemy instances to the array (listing them straight into the array also counts). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

@@ -108,6 +108,14 @@
         "description": "Each square shows its index.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A loop over the path: A loop visits every square in path. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A box at each square: A rect is drawn at each square's x and y. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Each square shows its number: The loop writes the square's number with text(). Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Sub-build: A path from a list\". The task: loop over a list of six { x, y } squares, draw a box at each one from its x and y, and write each square's number on it. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

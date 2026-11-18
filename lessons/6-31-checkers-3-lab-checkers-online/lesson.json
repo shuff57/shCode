@@ -157,7 +157,16 @@
         "description": "With status 'off', the game still plays on one computer.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A click sends four numbers: Online, a move is sent with online.send instead of being made on the spot. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "doMove runs in onMove: Every move that arrives runs doMove, on both computers. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "It checks the seat and the rules: Before onMove makes a move, it checks that the seat is the one whose turn it is and asks isLegal. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Offline still works: A check on online.status picks: send the move online, or make it straight away offline. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Lab: Checkers online\". The task: make checkers playable across two computers: set up online.onMove once to run doMove for each arriving move only when the seat that sent it is the seat whose turn it is (the host, seat 0, plays red), nobody has won, and isLegal agrees; host on H with a fresh game, or join from a JOIN code; on a click, send the move (from row, from column, to row, to column) with online.send instead of making it when online; let only the player whose seat matches the turn click; and keep offline play working when online.status is 'off'. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   },
   "carryFrom": "6-30-checkers-3-lab-kings-and-the-win"
 }

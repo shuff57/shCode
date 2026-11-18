@@ -90,6 +90,13 @@
         "description": "Each pipe gets a negative vel.x (or x is decreased every frame).",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Made on a timer: A timer (every/after, or frameCount %) creates pipes, not draw() every frame. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Gone from screen and list: An off-screen pipe is deleted and spliced out of the array. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a short moSHion sketch for \"Sub-build: Spawn and recycle\". The task: create pipes on a timer (every or after), push each into an array with a negative vel.x, and remove off-screen pipes from both the screen (delete) and the array (splice), looping backwards. This is a sub-build: a small isolated program whose only job is this one mechanic. Accept any names, helpers, arrow functions and ternaries. A line only in a comment or string does not count. Use short, plain notes for a 14-year-old, name their own line when something is missing, never write corrected code."
+    }
   }
 }

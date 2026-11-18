@@ -127,6 +127,14 @@
         "description": "A sprite's friction, normally the ball's, is set to any value (the steps try 0, then 5; a very low value keeps it rolling). Help: 5.2.15 (Bounciness and Friction)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Create multiple static walls: Count the sprites that really are static: a new Sprite(...) whose last argument is 'static', or a sprite whose .collider is set to 'static' afterwards. Two or more are needed. A new Sprite(x, y, w, h) with no 'static' and no .collider = 'static' line is dynamic, whatever its comment or variable name says (four walls made plain with only top.collider = 'static' is ONE static wall, so it does not count). A group counts: walls.collider = 'static' then several new walls.Sprite(...) lines makes that many static walls. Any variable name. Code inside comments never runs.",
+        "r2": "Create a dynamic ball: A dynamic sprite is present Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Make it bouncy: The ball's .bounciness is set near the top of the 0 to 1 range: 0.5 or more. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Set friction: Assign to .friction. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

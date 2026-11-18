@@ -172,7 +172,16 @@
         "description": "Beating the last one wins.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Enemies made from KINDS: Every kind in KINDS becomes a new Fighter, with map or a loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Beating one brings the next: After a win, which goes up by 1 and the enemy you face becomes the next one in the list. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "levelUp raises max hp and power: A method raises this fighter's own max hp and power, and the game calls it after a win. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Beating the last one wins: When the enemy you beat is the last one in the list, the game is over and you have won. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Lab: A run of enemies\". The task: keep the enemy kinds as plain data in KINDS and turn them into Fighters with map (or a loop) in newGame; track which enemy you face; write levelUp() so the hero gains max hp, full hp, power and potions; after a win, unless it was the last enemy, add 1 to which, level the hero up and make the next enemy the one you face; beating the last enemy ends the game with a win. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   },
   "carryFrom": "7-18-quest-3-lab-attack-guard-or-potion"
 }

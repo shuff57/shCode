@@ -243,6 +243,20 @@
         "description": "A check that prints PASS when it matches the known answer and FAIL when it does not. The checker cannot count your tests: three is on you, and the teacher reads for it. Help: 4.1.4 (Manual Testing: PASS / FAIL Checks)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "req1": "An array of your own: An array you declared to hold your data. Code inside a comment, or written inside quotes as text, never runs.",
+        "req2": "Five objects stored: At least five objects, each with your own properties. The checker cannot judge whether your object design is good; the teacher reads for that. Code inside a comment, or written inside quotes as text, never runs.",
+        "req3": "A 3+ parameter function: A function of your own with at least 3 parameters. Code inside a comment, or written inside quotes as text, never runs.",
+        "req4": "A function that returns a value: A function of your own that returns a computed value, used elsewhere in the program. A named function, an arrow, or a method all count. Code inside a comment, or written inside quotes as text, never runs.",
+        "req5": "A sort: A sort over your array — a built-in .sort() or a sort you wrote by hand. Code inside a comment, or written inside quotes as text, never runs.",
+        "req6": "Uses a loop: A `for`, `while`, or `for...of` loop somewhere in the program (e.g. walking your array). Code inside a comment, or written inside quotes as text, never runs.",
+        "req7": "Uses a conditional: An `if` statement or `switch` statement somewhere in the program. Code inside a comment, or written inside quotes as text, never runs.",
+        "req8": "Saves and loads with localStorage + JSON: Uses JSON.stringify/JSON.parse with localStorage. Code inside a comment, or written inside quotes as text, never runs.",
+        "req9": "Prints a formatted verdict: A console.log that prints one formatted line combining at least two things you calculated (joined with +, a template string, or comma-separated arguments). Code inside a comment, or written inside quotes as text, never runs.",
+        "req10": "Tests report PASS or FAIL: A check that prints PASS when it matches the known answer and FAIL when it does not. The checker cannot count your tests: three is on you, and the teacher reads for it. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

@@ -89,6 +89,13 @@
         "description": "A loop checks all body segments, not just the first.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A loop over the body: Every segment is tested against the head's next cell. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The round ends: A lost/over flag is set when the head meets the body. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a short moSHion sketch for \"Sub-build: Am I in my own tail?\". The task: before the snake moves, loop over the body and compare each segment with the cell the head is about to enter, and set a lost flag when they match. This is a sub-build: a small isolated program whose only job is this one mechanic. Accept any names, helpers, arrow functions and ternaries. A line only in a comment or string does not count. Use short, plain notes for a 14-year-old, name their own line when something is missing, never write corrected code."
+    }
   }
 }

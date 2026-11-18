@@ -86,6 +86,13 @@
         "description": "The stop test compares speed with a small number, then sets it to 0 or sets a flag.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Drag is set: The ball has a drag above 0. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Stopped is a threshold: The speed is tested against a small number and set to 0 (or a flag). Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Slow to a stop\". The task: give the ball drag and call it stopped when its speed falls under a small number, setting the speed to 0. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

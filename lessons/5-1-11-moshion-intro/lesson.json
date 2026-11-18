@@ -165,6 +165,15 @@
         "description": "background(...) is called inside draw(), or in a function the student wrote that draw() calls, with any colour, so each frame starts clean. A background() call only in setup() runs once, so it is not met. Help: 5.1.9 (background(color) wipe rule)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Is there a line new Canvas(...) outside any comment that gives a width and a height as two numbers, like new Canvas(400, 400), new Canvas(450,450) or new Canvas (400,400)? Any size counts, and a missing semicolon is fine in JavaScript. new Canvas(400*400) passes only one number, so it does not count. Code inside comments never runs.",
+        "r2": "Is there a line new Sprite(...) outside any comment, like new Sprite(), new Sprite(200, 200, 40, 40), player = new Sprite(200,200,40,40) or new Sprite(200, 200, 40, 40).color = 'pink'? Any numbers or none count, with or without a variable to hold it, and a missing semicolon is fine in JavaScript. Code inside comments never runs.",
+        "r5": "Is a new Sprite(...) line written inside function setup() (or in a function of your own that setup() calls), and is there NO new Sprite(...) and NO new Canvas(...) inside draw(), update() or a function they call? draw() runs about 60 times a second, so a sprite made there piles up. new Sprite() with any numbers or none counts, with or without a variable. When a file has two function setup() blocks, the last one is the one that runs. Code inside comments never runs.",
+        "r3": "Set a sprite color: A sprite has a color. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Does the function draw() that runs have a clear() or background(...) line in it, directly or through update() or a function of your own that it calls? Either one wipes the last frame: clear() with nothing in the brackets, or background with any color, and a missing semicolon is fine. When a file has two function draw() blocks, only the LAST one in the file runs, and a draw() written inside the braces of setup() never runs; if the draw() that runs is empty, the answer is no. A helper that nothing calls does not count. Code inside comments never runs."
+      }
+    }
   }
 }

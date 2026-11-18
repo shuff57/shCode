@@ -56,6 +56,11 @@
         "description": "Inside the Mover class there is a moveRight method with one parameter whose body adds that parameter to this.sprite.x. Partial: it adds a fixed number instead of the parameter, or sets the sprite's speed instead of its position. Missing: no moveRight method inside the class, or it changes something other than the sprite's x. Help: 7.2.8 (Why this.sprite, not extends Sprite)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "moveRight(dx) mutates this.sprite.x: Write a `moveRight(dx)` method that adds `dx` to `this.sprite.x` using `+=`. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

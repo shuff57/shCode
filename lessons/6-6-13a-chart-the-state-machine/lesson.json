@@ -154,6 +154,17 @@
         "description": "One state change per transition, and no GO TO or loop back.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Twelve or more numbered steps: Number every line 1. 2. 3. and so on, with something written after each number.",
+        "r2": "One chain: title, then play, then gameover: The three states are tested in one chain.",
+        "r3": "Title: draw, then check the key, then change state: The title branch draws, then checks for space, then changes the state.",
+        "r4": "Play: update, then check for death, then change state: The play branch updates the game, then checks if the player is dead, then changes the state.",
+        "r5": "Gameover: draw, then check the key, then change state: The gameover branch draws, then checks for r, then changes the state.",
+        "r6": "Three state changes, and nothing jumps: One state change per transition, and no GO TO or loop back."
+      },
+      "task": "The student was given plain-English steps for the lab \"6.11.14 Plain English to Pseudocode: The Three-State Machine\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Here is the plan in plain English: **1.** Each frame, look at which state the game is in: title, play or gameover. Only one of them runs. **2.** In the title state: draw the title screen, then if space was pressed, change the state to play. **3.** In the play state: update the game, then if the player is dead, change the state to gameover. **4.** In the gameover state: draw the game-over screen, then if r was pressed, change the state to title. **5.** Changing the state does not jump anywhere. It sets a variable, and the frame just ends. The same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps. In `README.md`, type these as numbered pseudocode **between the first and last line**. Use IF, ELSE IF and END IF for the routing (the last state is an ELSE IF too, so every state is tested by name), CALL for drawing and updating, and SET for a state change. Name the three calls `drawTitle`, `updateGame` and `drawGameOver`. Number every line, including the indented ones and the END IF lines. Each keyword looks like this, in a different program: - `IF mode is \"menu\"` ... `ELSE IF mode is \"game\"` ... `END IF` (route by a value) - `CALL drawMenu` (call another function) - `IF enter is pressed`"
+    }
   }
 }

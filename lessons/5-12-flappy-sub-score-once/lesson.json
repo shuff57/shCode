@@ -89,6 +89,13 @@
         "description": "A flag on the pipe is checked before scoring and set after, so each pipe scores once.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "The pass is detected: The bird's x is compared with a pipe's x, in a loop over the pipes. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Counted once: A per-pipe flag is set after counting, so the same pipe cannot score twice. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a short moSHion sketch for \"Sub-build: Score once per pipe\". The task: in a loop over the pipes, compare the bird's x with each pipe's x, add 1 to the score only when the pipe has not been counted, and mark that pipe as counted. This is a sub-build: a small isolated program whose only job is this one mechanic. Accept any names, helpers, arrow functions and ternaries. A line only in a comment or string does not count. Use short, plain notes for a 14-year-old, name their own line when something is missing, never write corrected code."
+    }
   }
 }

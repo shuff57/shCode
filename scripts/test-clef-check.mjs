@@ -185,13 +185,13 @@ for (const id of ['2-3-29-a2-3-1-print-settings-advisor', '5-1-20-moshion-move-k
 }
 check('5.1.20 is told moSHion engine facts', G['5-1-20-moshion-move-keys'].clef.kind, 'moshion');
 
-// Chapters 1-3 (2026-11-18): every AI Check lab has a question on each PATTERN card and none on a card
+// Chapters 1-7 (2026-11-18): every AI Check lab has a question on each PATTERN card and none on a card
 // that runs the code (`tests`), which keeps its runtime result.
 {
   const { readdirSync, existsSync } = await import('fs');
   let labs = 0; const wrong = [];
   for (const id of readdirSync(path.join(root, 'lessons'))) {
-    if (!/^[123]-/.test(id)) continue;
+    if (!/^[1-7]-/.test(id) && !/^moshion-/.test(id)) continue;
     const lp = path.join(root, 'lessons', id, 'lesson.json');
     if (!existsSync(lp)) continue;
     const l = JSON.parse(readFileSync(lp, 'utf8'));
@@ -205,7 +205,7 @@ check('5.1.20 is told moSHion engine facts', G['5-1-20-moshion-move-keys'].clef.
       if (pattern !== has) wrong.push(`${id} ${r.id}`);
     }
   }
-  check(`chapters 1-3: ${labs} AI Check labs, a question on every pattern card and none on a runtime card`, wrong.slice(0, 5), []);
+  check(`chapters 1-7: ${labs} AI Check labs, a question on every pattern card and none on a runtime card`, wrong.slice(0, 5), []);
 }
 
 console.log(failures ? `\n${failures} FAILED` : `\nall ${n} passed`);

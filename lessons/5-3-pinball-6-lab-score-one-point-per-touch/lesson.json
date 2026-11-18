@@ -107,7 +107,14 @@
         "description": "The remembering variable is given this frame's touch answer on every frame, outside the scoring if, or by an if/else that sets it to true while touching and false when not, every frame. Any name works. Not met: the update only inside the scoring if (then nothing ever sets it back), or no update at all. Help: 5.4.1 (Reading: A collision is not an event)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "The touch is checked once into a variable: This frame's collision answer is stored in a variable, so the same answer is used for the test and the memory. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Does the scoring if test the touch now AND not-the-touch-last-frame, joined by &&, with score += 1 inside it? Yes for if (touching && !wasTouching), if (isTouchingGoal && !wasTouchingGoal), if (touching && !verity), and for if (touching === true && wasTouched === false) when touching = ball.collides(goal). Any names, with or without let. No for const touching = ball.colliding(goal) followed by if (touching && wasTouching === false): colliding() gives a number, so after one frame the memory is 0, never false. No for the starter's if (ball.colliding(goal)) { score += 1 }, which scores every frame of a touch. Code inside comments never runs.",
+        "r3": "Is the memory variable (any name, such as wasTouching, wasTouched, wasTouchingGoal or verity) given this frame's touch answer on every frame, by a line like wasTouching = touching; or wasTouched = touching (no semicolon needed) in draw() that runs whether or not a point was scored? It may sit on its own line after the scoring if, or right after that if's closing brace on the same line, and it may be declared with let at the top or not at all. A memory set only inside the scoring if's braces, or never set, does not count. Code inside comments never runs."
+      }
+    }
   },
   "carryFrom": "5-3-pinball-3-lab-build-the-table"
 }

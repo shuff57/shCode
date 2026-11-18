@@ -141,7 +141,14 @@
         "description": "The popup sprite gets a .life above 0 (any number or variable), so moSHion deletes it a little later; a countdown of the student's own that ends in .delete() also counts. Not met: no .life on the popup, a .life of 0 or below, or .life put on the ball or a bumper instead (that deletes the ball or the bumper). Help: 5.7.1 (Reading: Words on a sprite, and sprites that run out)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Each bumper shows its worth: Each bumper wears its worth: its .text is set from its own worth (in setup() or in the loop, straight or through a variable; joined, in a template string or with String() all count), or set to a number, or text(...) draws the worth every frame. The popup's text alone does not count. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A popup is made only when a hit starts: A new Sprite(...) is made inside the if that is true only on the frame a touch starts (touching && !b.wasTouching, the one that adds the worth; touching === 1 also works), in an if nested in it, or in a helper it calls. Trap: if b.wasTouching = touching stores ball.colliding(b) itself, it holds the number 0 when apart, and 0 === false is false, so an if on b.wasTouching === false never runs after the first frame: that popup does not count. Only when the stored value is true/false (colliding(b) > 0) does === false work. Not under if (touching) or colliding() alone, an if on something else, in draw() alone, or in setup(). Comments never run.",
+        "r3": "The popup removes itself: The sprite made in draw() for the popup gets a .life above 0 (a number or a variable), or a countdown of your own that ends in .delete(). A .life on the ball or a bumper does not count: it deletes them. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "carryFrom": "5-3-pinball-sound-2-lab-a-chime-on-every-hit"
 }

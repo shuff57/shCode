@@ -157,7 +157,17 @@
         "description": "Reaching the last square ends the game.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A roll from 1 to 6: The die gives a whole number from 1 to 6. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A list of players: The players are a list of objects, each with its own square. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The turn passes: The turn moves to the next player and wraps back to 0, with % players.length or another way. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Never past the last square: A roll near the end stops on the last square, with min or a check. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "A winner on the last square: Reaching the last square ends the game with a winner. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Lab: Take turns to the finish\". The task: turn the one-token board into a race for two: a list of player objects, a die from 1 to 6, a takeTurn that moves the player whose turn it is without going past the last square, a winner on the last square, the turn passed to the next player, and R to start again. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   },
   "carryFrom": "6-22-trail-4-lab-lay-the-trail"
 }

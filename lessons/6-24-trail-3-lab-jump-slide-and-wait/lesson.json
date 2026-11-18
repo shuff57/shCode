@@ -136,7 +136,16 @@
         "description": "A waiting player is skipped once and the flag is cleared.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "J jumps ahead 3: Landing on a J moves the player 3 squares on. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "S slides back 3: Landing on an S moves the player 3 squares back, never below 0. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "W sets a flag: Landing on a W marks the player as waiting. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "A waiting player is skipped once: When the turn passes to a waiting player, the flag is cleared and the turn passes again. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Lab: Jump, slide and wait\". The task: after each move, read the letter of the square the player landed on: J moves them 3 ahead (not past the end), S moves them 3 back (not below 0), and W sets a waiting flag; when the turn passes to a waiting player, clear the flag and pass the turn again. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   },
   "carryFrom": "6-23-trail-3-lab-take-turns-to-the-finish"
 }

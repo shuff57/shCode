@@ -148,6 +148,15 @@
         "description": "A sprite's .stroke or .strokeWeight is assigned with =. Setting both is what step 4 asks and is welcome. A plain stroke(...) function call does not set a sprite's property. Missing: neither property is set on a sprite. Help: step 4 of this lab.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Canvas created with a size: Creates the canvas with explicit dimensions rather than leaving the placeholder Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Rectangle sprite (4-arg form): At least one `new Sprite(x, y, w, h)` call with four arguments (a fifth body-type argument such as 'static' is fine). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Circle sprite (3-arg form): At least one `new Sprite(x, y, diameter)` call with exactly three arguments. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Property set on an instance: At least one `.color` assignment on a sprite instance. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Stroke used: A `.stroke` or `.strokeWeight` property is assigned. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

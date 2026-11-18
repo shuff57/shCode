@@ -83,6 +83,12 @@
         "description": "draw() calls e.isAlive() and uses its answer (in a ternary, an if, or anywhere) to decide what the enemy shows, instead of comparing e.hp to 0 itself. If one hand comparison of e.hp is still left in draw(), it can still be met; name that leftover line in the note.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "isAlive() returns whether this.hp is above 0: The class has an `isAlive()` method that returns a comparison on `this.hp`. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "draw() asks isAlive() instead of comparing hp: The scene calls `e.isAlive()` rather than comparing `e.hp` itself. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

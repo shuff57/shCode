@@ -90,6 +90,13 @@
         "description": "The line uses the ball's x/y and mouse.x/mouse.y, in either order.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "The line follows the pointer: A line joins the ball and the pointer while the button is held. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The pull is shown: The distance from the ball to the pointer is shown as a number. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Sub-build: An aim line\". The task: draw a line from the cue ball to the pointer inside a mouse.pressing() test, and show the pull distance as a rounded number. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

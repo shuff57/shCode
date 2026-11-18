@@ -149,6 +149,15 @@
         "description": "The two new Message(...) calls are not given exactly the same arguments: a different position or different words is enough. Missing: identical arguments. Help: 7.1.4 (Reading: The new operator)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Constructor stores x: The constructor stores the x argument on this as a property named x. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Constructor stores y: The constructor stores the y argument on this as a property named y. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Constructor stores words: The constructor stores the words argument on this as a property named words. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Two instances built: Builds at least two Message instances with new. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "The two instances differ: The two new Message calls are not given identical arguments. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

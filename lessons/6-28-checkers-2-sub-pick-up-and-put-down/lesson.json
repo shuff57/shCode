@@ -109,6 +109,14 @@
         "description": "It moves only one square diagonally.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A click becomes a row and a column: The click position is divided by the square size and cut down with floor. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A click on the token picks it up: Clicking the token marks it as picked up. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "One square diagonally: The token moves only to a square one row and one column away, tested with abs or another way. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Pick up and put down\". The task: on a click, turn mouse.x and mouse.y into a row and a column with floor, pick the token up when the click is on it, and when it is picked up move it to a clicked square one row and one column away (abs, or another correct test). Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

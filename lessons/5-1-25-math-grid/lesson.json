@@ -150,6 +150,14 @@
         "description": "showMouse() is called inside draw(), or in a function the student wrote that draw() calls, so the pointer's (x, y) is written beside it every frame.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Is a grid drawn every frame, in draw() (or update(), or a function of your own that one of them calls)? Either showGrid(50) with any spacing, or loops of line(...) that cover the WHOLE canvas, like for (let x = -200; x <= 200; x += 50) line(x, -200, x, 200); and the same for y. With world.origin = 'math', (0, 0) is the centre and the canvas runs from -200 to 200, so hand-drawn lines that only run from 0 to width cover one quarter of it and do not count. showGrid() only in setup(), or in a helper nothing calls each frame, does not count. Code inside comments never runs.",
+        "r2": "Switch on math mode: The sketch sets world.origin to 'math'. Single quotes, double quotes or backticks all count. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A sprite above the centre: A sprite is made with a positive second number, its y, such as new Sprite(100, 50, 40, 40). A variable holding the y, or a sum such as 25 * 2, counts too. In math mode a positive y is above the centre. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Does draw() (or update(), or a function of your own that one of them calls) write the pointer's position beside it every frame? Either showMouse(), or a text(...) that prints the mouse's x and y (mouse.x and mouse.y, mouseX and mouseY, round(...) of them, or numbers worked out from them) at or near the pointer, like text(`(${mouseX}, ${mouseY})`, mouseX + 10, mouseY - 10) or text('x:' + Math.round(mouse.x) + ' y:' + Math.round(mouse.y), mouse.x, mouse.y). showMouse() only in setup(), or in a helper only setup() calls, does not count. Code inside comments never runs."
+      }
+    }
   }
 }

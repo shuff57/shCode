@@ -149,7 +149,16 @@
         "description": "Someone wins, and R starts again.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Crowned on the far row: A red piece on row 0 becomes 'R', and a black piece on the last row becomes 'B'. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A king can move back: The forward-only rule does not hold a king back: a king may move both ways. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A check for no moves: A function asks about every square of the board whether the player whose turn it is has any move left. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "A winner, and R to play again: When the player whose turn it is has no move left, the other player is the winner; once someone has won, R starts a new game. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Lab: Kings, and the win\". The task: crown a piece that lands on its far row ('r' on row 0 becomes 'R', 'b' on the last row becomes 'B'); make colorOf use toLowerCase so a king still belongs to its colour; let a king move backward; end a chain when a piece is crowned; after the turn passes, a player with no legal move (hasAnyMove asks moveKind about every square) loses, clicks stop, and R starts a new game. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   },
   "carryFrom": "6-29-checkers-3-lab-jumps-and-jumping-again"
 }

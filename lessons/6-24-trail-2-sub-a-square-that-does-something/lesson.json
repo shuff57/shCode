@@ -109,6 +109,14 @@
         "description": "Landing on S moves back.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Reads the letter under the token: The code reads the letter at the token's square. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "J moves ahead: Landing on a J moves the token forward. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "S moves back: Landing on an S moves the token back. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Sub-build: A square that does something\". The task: after each step, read the letter of the square under the token; on J move ahead 2 (staying on the row), on S go back to the start. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

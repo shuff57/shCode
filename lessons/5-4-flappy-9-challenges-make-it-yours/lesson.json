@@ -64,6 +64,11 @@
         "description": "At least one of: (1) something about the pipes, their speed or the gap, is worked out from the score, so the game gets harder as the score grows; (2) a best score that startRound() does not reset, updated when the score beats it (if (score > best), max(...), or similar), where showing it in drawTop() is what the challenge asks and is welcome; (3) each pipe gets a wobble speed from random, and the top and bottom halves move by the same amount. Missing: none of these is there, or the only change is how something looks. Help: 5.12.2 (Lab: Score a gap) and 5.11.3 (Lab: Pipes that come and go)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Your rule is in the code: One of the three challenges is there: something depends on the score (harder as you go, or a best score), or a wobble made with random moves the pipes up and down. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

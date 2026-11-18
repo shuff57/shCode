@@ -75,6 +75,12 @@
         "description": "The amount handed to takeHit is this.power (directly, or through a local copied from this.power), so a stronger player would hit harder. A typed 2 is not met: it matches today's power by luck and ignores the property.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "hit(other) asks the argument to take the hit: The method calls `takeHit` on the object it was handed, not on `this`. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The damage is the player's own power: The amount passed along comes from `this.power`, so one player can hit harder than another. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

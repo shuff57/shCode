@@ -119,6 +119,14 @@
         "description": "2 guards and 3 drinks.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Guard halves the next hit: While the flag is on, takeHit halves the hit (rounded down) and then turns the flag off; guard turns it on. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A potion heals, capped, and uses one up: heal gives hp back but never above maxHp, takes one potion off the count, and does nothing when none are left. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "2 guards and 3 drinks: Key 2 calls the guard and key 3 the potion. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Sub-build: A flag and a count inside an object\". The task: give the Knight a potions value in its constructor (new Knight(2)), guard(), which turns this.guarding on, make takeHit halve the hit with floor(n / 2) while guarding and then turn the flag off, and write heal(), which returns 0 with no potions left and otherwise uses one up and gives up to 12 hp back with min(this.hp + 12, this.maxHp), returning the hp gained; key 2 guards and key 3 drinks. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

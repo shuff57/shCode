@@ -151,6 +151,14 @@
         "description": "At least one of the five challenges is built and would really run in draw() (or update()): a held key changes the player's colour; a second sprite is placed around the player with cos and sin; a value is drawn with text(); a HUD of text() lines; or a sprite is moved up and down with sin. Other honest extras beyond a canvas, a sprite and a background also count, in draw() or a function the student wrote that draw() calls: a sprite that spins (rotation worked out from frameCount, or added to every frame, or a rotationSpeed set once in setup()), a sprite that grows, shrinks or pulses (its w, h or scale changed every frame), a sprite that wanders with random() or Math.random(), a fading trail (a see-through rgba background whose last number is below 1, or an array of past positions drawn with circle()), plain shapes such as circle() or rect(), the mouse's position, kb.presses(...), or a timer built from frameCount. Moving the player with the keys on its own is the earlier lab's job, not a challenge, so that alone is not met yet. Code in a function the student wrote counts only if draw() (or update()) calls it; a function nothing calls never runs.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Create a canvas: A canvas is created when the sketch starts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Create at least one sprite: A sprite exists in the sketch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Background set each frame: Calls background() inside draw(), or in a function of your own that draw() calls, with a colour of the student choosing. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Use at least one advanced feature: a technique beyond canvas + sprite + background, in draw() or a function draw() calls: one of the five challenges, or your own idea, such as a spin (rotation, or a rotationSpeed set once in setup()), a fading trail, a timer on frameCount, or a sprite that grows (player.w += 1, even only while a key is held), pulses or wanders. Moving the player with the keys, on its own, does not count. A colour set the same every frame with no if around it (player.color = 'red' alone) never changes, so it does not count; a colour changed under an if (a key, a frameCount timer) counts. Code in update() counts too. Code inside comments, or inside quotes as text, never runs."
+      }
+    }
   }
 }

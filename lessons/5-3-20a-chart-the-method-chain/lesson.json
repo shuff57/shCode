@@ -154,6 +154,17 @@
         "description": "One call for die and one for flashRed. Do not write what those methods do.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Five or more numbered steps: Number every step 1. 2. 3. and so on, with something written after each number.",
+        "r2": "The damage comes off health first: Health goes down by the damage, before the decision.",
+        "r3": "One decision about health being zero or less: Exactly one IF, about health and zero, closed with END IF.",
+        "r4": "The enemy only dies inside the decision: The call to die sits inside the decision.",
+        "r5": "The flash happens either way: The flash runs whether or not the enemy died, so it sits outside the decision.",
+        "r6": "Exactly two calls: One call for die and one for flashRed. Do not write what those methods do."
+      },
+      "task": "The student was given plain-English steps for the lab \"7.2.7 Plain English to Pseudocode: A Method That Calls a Method\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Here is the plan in plain English: **1.** The enemy is hit for some amount of damage. **2.** Take that amount off the enemy's health. **3.** If the health is now zero or less, the enemy dies. **4.** Either way, the enemy flashes red to show it was hit. **5.** Then control goes back to whoever hit it. The same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the five steps. In `README.md`, type these as numbered pseudocode **between the first and last line**. Use SET for a change, IF and END IF for a decision, and CALL for another method. The two methods here are named `die` and `flashRed`. Number every line, including the indented one and END IF. Each keyword looks like this, in a different program: - `SET score TO score + 10` (a change) - `IF lives <= 0` ... `END IF` (a decision; indent what is inside it) - `CALL playSound` (call another method; `CALL this.playSound` is fine too) The chart shows the shape."
+    }
   }
 }

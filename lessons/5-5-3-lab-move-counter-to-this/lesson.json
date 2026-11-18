@@ -57,6 +57,11 @@
         "description": "Each call to tick() leaves this.n one bigger than it was, because the new value is built from the old this.n: this.n += 1, this.n++, this.n = this.n + 1, or a local copied from this.n, raised by 1 and written back. A tick() that writes this.n from a local that starts at 0 on every call is not met: the count would stay at 1.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "tick() adds 1 to this.n: Inside `tick()`, the change lands on `this.n` (for example `this.n += 1`), so the value survives the call. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }
