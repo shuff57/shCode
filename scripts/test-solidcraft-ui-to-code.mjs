@@ -120,4 +120,33 @@ assert.match(featureCode({id:22,name:'Hole1',type:'HoleFeature',definition:{diam
   assert.match(rev({ axis: { type: 'world', axis: 'Z' }, angle: '90' }, { curves: [...rect(10, 0, 20, 10), { id: 'c', type: 'circle', center_at: [30, 5], radius: 2 }], frame: XZ }).error, /one outline of straight lines or one circle/);
   assert.match(rev({ axis: { type: 'world', axis: 'Z' }, angle: 'a' }, { curves: rect(10, 0, 20, 10), frame: XZ }).error, /angle is an expression/);
 }
+// a torus, and a mirror at the end of the part's box nearer zero
+{
+  const ctx = (box) => ({ sketchVars: new Map(), bodyVars: new Map([['b_box1', 'b']]), taken: new Set(['b']), geometry: new Map(), boxes: new Map([['b_box1', box]]) });
+  const B = { min: [0, 0, 0], max: [40, 30, 20] };
+  assert.deepEqual(featureCode({ id: 3, name: 'Torus1', type: 'TorusFeature', definition: { body_names: ['Body1'], center: [5, 6, 7], major: '10', minor: '2', operation: 'new_body' } }, ctx(B)).lines, ['const donut = ring(24, 4, { at: [5, 6, 7] });']);
+  const mir = (plane, extra = {}, box = B) => featureCode({ id: 4, name: 'Mirror1', type: 'MirrorFeature', definition: { bodies: ['b_box1'], combine: true, features: [], plane, ...extra } }, ctx(box));
+  assert.deepEqual(mir({ type: 'origin', name: 'YZ' }).lines, ["mirror(b, 'left-right');"], 'across YZ, the low face of a part from x = 0');
+  assert.deepEqual(mir({ type: 'origin', name: 'XY' }).lines, ["mirror(b, 'top-bottom');"]);
+  assert.deepEqual(mir({ type: 'custom', plane: { origin: [0, 0, 0], x_dir: [1, 0, 0], y_dir: [0, 0, 1] } }).lines, ["mirror(b, 'front-back');"]);
+  assert.match(mir({ type: 'custom', plane: { origin: [40, 0, 0], x_dir: [0, 1, 0], y_dir: [0, 0, 1] } }).error, /not at the end of the part nearer the origin/, 'across its far face: reSHape mirrors across the near one');
+  assert.deepEqual(mir({ type: 'custom', plane: { origin: [0, 0, 0], x_dir: [0, 1, 0], y_dir: [0, 0, 1] } }, {}, { min: [-40, 0, 0], max: [0, 30, 20] }).lines, ["mirror(b, 'left-right');"], 'a part on the minus side: its high face is the nearer one');
+  assert.match(mir({ type: 'origin', name: 'YZ' }, { combine: false }).error, /keeps the mirrored copy apart/);
+  assert.match(mir({ type: 'custom', plane: { origin: [0, 0, 0], x_dir: [0.6, 0.8, 0], y_dir: [0, 0, 1] } }).error, /not square to X, Y or Z/);
+  assert.match(mir({ type: 'origin', name: 'YZ' }, {}, { min: [-10, 0, 0], max: [30, 30, 20] }).error, /not at the end of the part/, 'a part across the plane');
+}
+// a draft: every side wall, or one named face, pulled along +X, +Y or +Z about the plane at neutral
+{
+  const sq = (i, n, c, area = 600) => ({ index: i, plane_normal: n, centroid: c, area });
+  const faces = [sq(0, [1, 0, 0], [40, 15, 10]), sq(1, [-1, 0, 0], [0, 15, 10]), sq(2, [0, 1, 0], [20, 30, 10], 800), sq(3, [0, -1, 0], [20, 0, 10], 800), sq(4, [0, 0, 1], [20, 15, 20], 1200), sq(5, [0, 0, -1], [20, 15, 0], 1200)];
+  const ctx = () => ({ sketchVars: new Map(), bodyVars: new Map([['b_box1', 'b']]), taken: new Set(['b']), geometry: new Map([['b_box1', { faces, edges: [] }]]) });
+  const dr = (extra) => featureCode({ id: 5, name: 'Draft1', type: 'DraftFeature', definition: { faces: [[40, 15, 10]], angle: '8', neutral: { type: 'origin', name: 'XY' }, pull: [0, 0, 1], body: 'b_box1', ...extra } }, ctx());
+  assert.deepEqual(dr({}).lines, ["draft(b.face('right'), 8);"]);
+  assert.deepEqual(dr({ faces: [[40, 15, 10], [0, 15, 10], [20, 30, 10], [20, 0, 10]], angle: '5' }).lines, ['draft(b, 5);'], 'every side wall: the whole part');
+  assert.deepEqual(dr({ neutral: { type: 'custom', plane: { origin: [0, 0, 5], x_dir: [1, 0, 0], y_dir: [0, 1, 0] } } }).lines, ["draft(b.face('right'), 8, { neutral: 5 });"]);
+  assert.match(dr({ faces: [[40, 15, 10], [0, 15, 10]] }).error, /some of the side walls/);
+  assert.match(dr({ pull: [0, 0, -1] }).error, /pulls along a direction/);
+  assert.match(dr({ neutral: { type: 'origin', name: 'YZ' } }).error, /neutral plane is not one the code can name/);
+  assert.match(dr({ angle: 'a' }).error, /angle is an expression/);
+}
 console.log('SolidCraft tools to reSHape Script: planes from frames, sketches, extrude, pocket, union, fillet, chamfer, shell, cuboid, cylinder, subtract, patterns, moves, holes, turns, two-way patterns, cuts both ways, and refusals pass.');

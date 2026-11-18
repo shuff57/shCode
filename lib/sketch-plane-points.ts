@@ -264,6 +264,53 @@ export function sketchGeoms(f: { geoms?: unknown; points?: unknown; shape?: unkn
   return [];
 }
 
+// ---- a size typed while drawing ----------------------------------------------------------------------------------------------
+
+/** The numbers typed: '25', '30, 20', '30 x 20'; null when it is not one or two numbers. */
+export function typedNumbers(typed: string): number[] | null {
+  const parts = typed.trim().split(/\s*[,x×]\s*|\s+/i).filter(Boolean);
+  if (!parts.length || parts.length > 2) return null;
+  const ns = parts.map(Number); return ns.every(Number.isFinite) ? ns : null;
+}
+/**
+ * The point a typed size puts down, from the points clicked so far and the pointer (which gives the direction):
+ * - line, polyline: the length from the last point, towards the pointer (+x when the pointer is on the point);
+ * - rectangle: 'w, h' (or one number: a square) from the first corner, into the pointer's quarter;
+ * - circle: the radius, towards the pointer;
+ * - arc, after its centre and start: the angle in degrees it turns counter-clockwise from the start.
+ * null when nothing can be put down (no first point, a size of 0 or less, or the wrong count of numbers).
+ */
+export function typedPoint(tool: string, pts: V2[], pointer: V2, typed: string): V2 | null {
+  const ns = typedNumbers(typed); if (!ns || !pts.length) return null;
+  const r3 = (q: number[]): V2 => [Math.round(q[0] * 1000) / 1000, Math.round(q[1] * 1000) / 1000];
+  const last = pts[pts.length - 1];
+  const towards = (from: V2): V2 => { const d = [pointer[0] - from[0], pointer[1] - from[1]]; const l = Math.hypot(d[0], d[1]); return l < 1e-9 ? [1, 0] : [d[0] / l, d[1] / l]; };
+  if (tool === 'line' || tool === 'polyline' || tool === 'circle') {
+    if (ns.length !== 1 || !(ns[0] > 0)) return null;
+    const from = tool === 'circle' ? pts[0] : last; const u = towards(from);
+    return r3([from[0] + u[0] * ns[0], from[1] + u[1] * ns[0]]);
+  }
+  if (tool === 'rectangle') {
+    const [w, h] = ns.length === 2 ? ns : [ns[0], ns[0]]; if (!(w > 0) || !(h > 0)) return null;
+    const a = pts[0]; const sx = pointer[0] < a[0] ? -1 : 1, sy = pointer[1] < a[1] ? -1 : 1;
+    return r3([a[0] + sx * w, a[1] + sy * h]);
+  }
+  if (tool === 'arc' && pts.length === 2) {
+    if (ns.length !== 1 || !(ns[0] !== 0) || Math.abs(ns[0]) >= 360) return null;
+    const [c, s] = pts; const t = ns[0] * Math.PI / 180; const d = [s[0] - c[0], s[1] - c[1]];
+    return r3([c[0] + d[0] * Math.cos(t) - d[1] * Math.sin(t), c[1] + d[0] * Math.sin(t) + d[1] * Math.cos(t)]);
+  }
+  return null;
+}
+/** What the typed size means for the tool, for the readout: 'length 25', 'width 30, height 20', 'radius 5', 'angle 90°'. */
+export function typedWords(tool: string, pts: V2[], typed: string): string {
+  const ns = typedNumbers(typed); const t = typed.trim();
+  if (tool === 'rectangle') return ns && ns.length === 2 ? `width ${fmt(ns[0])}, height ${fmt(ns[1])}` : ns ? `${fmt(ns[0])} square` : t;
+  if (tool === 'circle') return `radius ${t}`;
+  if (tool === 'arc' && pts.length === 2) return `angle ${t}°`;
+  return `length ${t}`;
+}
+
 // ---- Delete: which line of the sketch's block drew which curve ---------------------------------------------------------------
 
 /** The lines of a sketch's block that draw (name.something(…)), with where each starts and ends in the doc (its newline included). */

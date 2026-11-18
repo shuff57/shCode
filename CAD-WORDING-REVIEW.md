@@ -64,6 +64,13 @@ change the code to match.
   profile lies on its axis*** · ***its profile is not on a plane through its axis*** · ***its profile is not one outline of
   straight lines or one circle, which is what spin() takes*** · ***its sketch is not square to the way it turns*** · and the
   shared ones (uses only some regions of its sketch; the part it cuts / joins is not in a variable of script.js).
+- ***Torus, mirror, draft:*** ***its radius is an expression*** · ***its place is an expression*** · ***it mirrors more
+  than one body, or features*** · ***it keeps the mirrored copy apart from the part, and reSHape's mirror joins them*** ·
+  ***its plane is not one the code can name*** · ***its plane is not square to X, Y or Z*** · ***its plane is not at the end
+  of the part nearer the origin, which is where reSHape's mirror puts it*** · ***it has no faces*** · ***its angle is an
+  expression*** · ***it pulls along a direction the code cannot write yet (reSHape pulls along +X, +Y or +Z)*** · ***its
+  neutral plane is not one the code can name*** · ***one of its faces could not be found on the model*** · ***it tilts some
+  of the side walls, not one or all of them*** · ***the face it tilts has no name in reSHape Script***.
 - *Patterns:* it repeats more than one body, or features · it repeats with options the code cannot write yet · its
   (second) count or spacing is an expression · it turns about an axis that is not Z through the origin · its count or
   angle is an expression.
@@ -96,6 +103,7 @@ countersinks are now written as code, so *it has a counterbore, countersink or t
 | 4.8 | readout by the pointer | {lid} ({top plane at 10}): {[x, y]} · {kind}, where kind is one of: corner, middle of an edge, centre of a face, end of a line, middle of a line, centre of a circle, centre of an arc, end of an arc, point of the sketch, origin of the sketch, grid {5} mm. With "· drag to move it" on a point that can be dragged; "Move {[x, y]} to {[x, y]}" while dragging; "{Tool}: " first while a tool is on. |
 | 4.9 | readout, no sketch at the cursor | top plane, no sketch at the cursor: {[x, y]} |
 | 4.9b | ***readout, Delete on*** | ***Delete: {line} · click to remove it*** · ***Delete: finding the line that drew it…*** |
+| 4.9c | ***readout, a size typed*** | ***{Tool}: length {25} · Enter to put it at {[25, 0]}*** · ***width {30}, height {20}*** · ***{8} square*** · ***radius {7.5}*** · ***angle {90}°*** |
 | 4.10 | plane names in the readout and bar | top plane · front plane · side plane · {top} plane at {10} · a slanted plane |
 
 ## 5. reshape-cad's sketch-only view (packages/solidcraft-host/pane/src/sketch-only.mjs, pane.js; only behind ?sketch-only=1)

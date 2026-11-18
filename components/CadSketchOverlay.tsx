@@ -13,6 +13,8 @@
 //   - Delete: a click on a drawn curve removes the line of the sketch's block that drew it (all of a rectangle's four sides go with it).
 //     Which line drew which curve is found by evaluating the script cut short after each line of the block and counting the sketch's
 //     curves (nothing is built), so a line written with variables is found too;
+//   - after a tool's first click, a size can be typed (a line's length, a rectangle's width and height, a circle's radius, an arc's angle) and
+//     Enter puts the point down at it, in the pointer's direction;
 //   - Extrude and Pocket finish the sketch: they write the step after the sketch's block and Run.
 // "New sketch" starts one on a flat face clicked in the view (or on the top, front or side plane): it writes const sk = sketch(…)
 // at the end of script.js and goes into sketch mode on it.
@@ -28,7 +30,7 @@ import { bundleProject, CAD_ENTRY, readVariableProbe, withVariableProbe } from '
 import { topLevelNames, topLevelVariables } from '../lib/solidcraft-picks';
 import type { ScEdge, ScFace } from '../lib/solidcraft-labels';
 import {
-  activeSketch, applyProjective, arcCode, curveOwners, sketchGeoms, distToPolyline, faceSketchArgs, sketchStatementLines, finishDirections, fmt, freshName, fromPlane, geomPath, geomSnaps, gridStep,
+  activeSketch, applyProjective, arcCode, curveOwners, sketchGeoms, typedPoint, typedWords, distToPolyline, faceSketchArgs, sketchStatementLines, finishDirections, fmt, freshName, fromPlane, geomPath, geomSnaps, gridStep,
   movePointEdits, planeFrameOf, planeOutlines, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, sweepOf,
   toPlane, toolCode, viewAngles, type PlaneFrame, type SketchGeom, type SketchPlaceInput, type V2, type V3,
 } from '../lib/sketch-plane-points';
@@ -94,6 +96,8 @@ export default function CadSketchOverlay(p: Props) {
   const [depth, setDepth] = useState('10');
   const [note, setNote] = useState('');
   const toolPts = useRef<V2[]>([]);
+  /** a size typed after a tool's first click (Enter puts the point down at it) */
+  const typed = useRef('');
   const [drawing, setDrawing] = useState<{ grid: [V2, V2, boolean][]; axes: [V2, V2][]; outline: string; clip: boolean; curves: V2[][]; step: number } | null>(null);
   const [hover, setHover] = useState<{ x: number; y: number; text: string; dot: V2 | null; preview: V2[] | null; del?: number[] } | null>(null);
   /** Delete: which line of the block drew each of the sketch's curves, for the doc as it was when worked out */
@@ -274,7 +278,7 @@ export default function CadSketchOverlay(p: Props) {
   useEffect(() => {
     const inner = p.inner; const sc = p.sc; if (!shown || !inner || !sc) { setHover(null); return; }
     let down: V2 | null = null; let last: { q: V2; x: number; y: number } | null = null; let at: V2 | null = null;
-    let drag: { from: V2; to: V2 } | null = null; let swallowClick = false;
+    let drag: { from: V2; to: V2 } | null = null; let swallowClick = false; typed.current = '';
     const pointAt = (x: number, y: number, skip?: V2) => {
       const v = view.current; if (!v) return null;
       let best: (Snap & { d: number }) | null = null;
@@ -303,6 +307,11 @@ export default function CadSketchOverlay(p: Props) {
       last = { q: hit.q, x, y };
       const v = view.current!;
       if (drag) { drag.to = hit.q; setHover({ x, y: y - props.current.crop, text: `Move ${pointCode(drag.from)} to ${pointCode(hit.q)}${hit.kind ? ` · ${hit.kind}` : ''}`, dot: hit.dot, preview: null }); return; }
+      if (tool && typed.current && toolPts.current.length) {
+        const tq = typedPoint(tool, toolPts.current, hit.q, typed.current);
+        const words = typedWords(tool, toolPts.current, typed.current);
+        setHover({ x, y: y - props.current.crop, text: tq ? `${words} · Enter to put it at ${pointCode(tq)}` : words, dot: tq ? onScreen(tq) : null, preview: preview(tq ?? hit.q) }); return;
+      }
       const canDrag = !tool && hit.own && modeRef.current && editDrag(hit.q, hit.q).length;
       setHover({ x, y: y - props.current.crop, text: `${v.label}: ${pointCode(hit.q)}${hit.kind ? ` · ${hit.kind}` : ''}${canDrag ? ' · drag to move it' : ''}`, dot: hit.dot, preview: preview(hit.q) });
     };
@@ -380,6 +389,13 @@ export default function CadSketchOverlay(p: Props) {
         ed.dispatch({ changes: { from: head, insert: text }, selection: { anchor: head + text.length } });
         props.current.onInserted(`Inserted: ${text.replace(/^, /, '')}`); return;
       }
+      place(q);
+      show(last.x, last.y);
+    };
+    /** A tool's next point: clicked, or put down by a typed size. */
+    const place = (q: V2) => {
+      const name = modeRef.current; if (!tool || !name) return;
+      typed.current = '';
       const pts = toolPts.current;
       if (tool === 'polyline') {
         if (pts.length >= 3 && dist(q, pts[0]) < 1e-9) finishPolyline(true);
@@ -393,13 +409,26 @@ export default function CadSketchOverlay(p: Props) {
         const a = pts[0]; toolPts.current = [];
         if (tool === 'line' && dist(a, q) > 0) write(toolCode.line(name, a, q));
         if (tool === 'rectangle' && a[0] !== q[0] && a[1] !== q[1]) write(toolCode.rectangle(name, a, q));
-        if (tool === 'circle') { const step = view.current?.step ?? 0.5; const r = Math.max(step, Math.round(dist(a, q) / step) * step); write(toolCode.circle(name, a, r)); }
+        if (tool === 'circle') { const step = view.current?.step ?? 0.5; const d = dist(a, q); const r = typedRadius ?? Math.max(step, Math.round(d / step) * step); write(toolCode.circle(name, a, r)); }
       }
-      show(last.x, last.y);
+      typedRadius = null;
     };
+    let typedRadius: number | null = null; // a typed radius is kept as typed, not put on the grid
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && picking) { setPicking(false); e.preventDefault(); e.stopImmediatePropagation(); return; }
       if (!tool) return;
+      // a size, typed after the first click
+      const stop = () => { e.preventDefault(); e.stopImmediatePropagation(); if (last) show(last.x, last.y); };
+      if (toolPts.current.length && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        if (/^[0-9.,x -]$/.test(e.key) && (typed.current || e.key !== ' ')) { typed.current += e.key; return stop(); }
+        if (e.key === 'Backspace' && typed.current) { typed.current = typed.current.slice(0, -1); return stop(); }
+        if (e.key === 'Escape' && typed.current) { typed.current = ''; return stop(); }
+        if (e.key === 'Enter' && typed.current) {
+          const tq = typedPoint(tool, toolPts.current, last?.q ?? toolPts.current[toolPts.current.length - 1], typed.current);
+          if (tq) { if (tool === 'circle') typedRadius = Number(typed.current); place(tq); }
+          return stop();
+        }
+      }
       if (e.key === 'Escape') { toolPts.current = []; e.preventDefault(); e.stopImmediatePropagation(); if (last) show(last.x, last.y); }
       if (e.key === 'Enter' && tool === 'polyline') { finishPolyline(false); e.preventDefault(); e.stopImmediatePropagation(); }
     };

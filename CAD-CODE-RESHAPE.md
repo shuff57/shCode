@@ -118,7 +118,7 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
 
    After writing, the part is rebuilt from the code and compared by volume and box, as before. It is now also compared by
    every flat face's area and centre and by the curved faces' total area, so a hole in the wrong place or a part turned
-   the wrong way is reported, not passed. Round trips: `/tmp/cad-drive/tools2-e2e.py` (18 of 18 the same part, with the counterbore, the countersink, the move with a turn and six revolves).
+   the wrong way is reported, not passed. Round trips: `/tmp/cad-drive/tools2-e2e.py` (23 of 23 the same part, with the counterbore, the countersink, the move with a turn, six revolves, a torus, two mirrors and two drafts).
 8. **Done 2026-11-17: a refused step points at its line.** The line is found by evaluating the script cut short after each
    top-level statement of script.js until the step appears (`stepLines`; interpreter only, nothing built). A step made in
    an imported class goes on the script.js line that called it. The refusal shows "script.js line N" as a link, and the
@@ -210,6 +210,20 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
 
   Plus unit tests in `scripts/test-sketch-plane-points.mjs`.
 
+## Torus, mirror and draft written as code (2026-11-18)
+
+- **Torus:** `ring(across, tubeAcross, { at })`, across the outside diameter 2·(major + minor), tubeAcross 2·minor.
+- **Mirror:** `mirror(part, 'left-right' | 'front-back' | 'top-bottom')`. reSHape's mirror joins the part with its reflection
+  across the plane square to the word's axis at the end of the part's box nearer zero (the guarded build's own placement). So a
+  SolidCraft mirror is written only when it joins (combine), across an origin plane or a custom one square to X, Y or Z, and its
+  plane is at that end of the part's box. A mirrored copy kept apart, a plane across the middle of the part or at its far end,
+  and a slanted plane are refused.
+- **Draft:** `draft(part, a)` when every side wall is tilted, `draft(part.face('right'), a)` for one named face, with
+  `{ neutral: n }` for a neutral plane off zero. Only a pull along +X, +Y or +Z is written (reSHape has no other); some of the
+  side walls, another pull, or a neutral plane that is a face are refused.
+- **Checked:** tools2-e2e, 23 of 23 the same part (a torus, a mirror across YZ and across the bottom face, a draft of every
+  side wall, and a draft of one face about a plane part way up); unit tests for each refusal.
+
 ## More sketch tools (2026-11-18)
 
 - **Delete.** With the tool on, the curve under the pointer is marked in red with every curve its line drew (all of a
@@ -218,12 +232,25 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
     counting the sketch's curves (nothing is built; `sketchStatementLines`, `curveOwners`). So a line written with variables
     is found too. When the counts do not add up, nothing is removed.
   - It is shown when script.js is open, as New sketch is.
+- **Typed sizes.** After a tool's first click, a number typed shows in the readout with where Enter puts the point, and Enter
+  puts it down there, in the pointer's direction (`typedPoint`):
+  - Line and Polyline: the length from the last point;
+  - Rectangle: `30, 20` (or `30 x 20`) for width and height, one number for a square, into the pointer's quarter;
+  - Circle: the radius, kept as typed (not put on the grid);
+  - Arc, after its centre and start: the angle it turns counter-clockwise.
+
+  Backspace takes back a character; Escape clears the number first and the points the second time. Checked:
+  `/tmp/cad-drive/sketch-typed-e2e.py`, 9 of 9.
 - **Plain outlines are drawn.** `sk.polygon(…)`, `sk.rect(…)` and `sk.circle(r, { at })` are kept by reSHape as points only;
   Live sketch now draws them from those (`sketchGeoms`), snaps to their corners, and Delete and drag work on them. An outline
   with rounded, chamfered or bulged corners is not drawn, rather than drawn with straight sides.
 - **Checked.** `/tmp/cad-drive/sketch-delete-e2e.py`, 11 of 11: a rectangle written with a variable marked and removed whole,
   a circle on its own, the click not reaching SolidCraft, the rest of the code untouched and still building, and a polygon
   drawn and marked by its line.
+
+**Loft is not written.** reSHape's nearest word is `blend(a, b, gap)`, but the guarded build refuses every blend ("a loft
+between two sketches is not available in this version yet", measured with drawn and plain sketches), so a loft made with the
+tools stays refused as before.
 
 **A fix in the check after writing.** The part built from the code was compared face by face after sorting the flat faces by
 area. A revolve's two rings have areas that differ in the 16th digit, and SolidCraft and reSHape list them the other way round,

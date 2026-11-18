@@ -1,7 +1,7 @@
 // Points on a sketch's plane (lib/sketch-plane-points.ts): reSHape's plane frames, the projective map from the screen to a plane,
 // which sketch the editor cursor is in, and what a picked point writes into the code. The pointer in the real view is a browser check.
 import assert from 'node:assert/strict';
-import { sketchGeoms, curveOwners, distToPolyline, sketchStatementLines, arcCode, faceSketchArgs, finishDirections, freshName, movePointEdits, planeOutlines, sweepOf, activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
+import { typedNumbers, typedPoint, typedWords, sketchGeoms, curveOwners, distToPolyline, sketchStatementLines, arcCode, faceSketchArgs, finishDirections, freshName, movePointEdits, planeOutlines, sweepOf, activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
 
 // ---- planes, as reSHape resolves them: a named plane's origin is normal x offset ------------------------------------------
 const top10 = planeFrameOf({ plane: 'xy', offset: 10 });
@@ -126,4 +126,22 @@ console.log('PASS delete: the drawing lines of a sketch, which line drew each cu
   assert.deepEqual(sketchGeoms({}), []);
 }
 console.log('PASS plain outlines: a polygon\'s sides and a circle, from points');
+{ // a size typed while drawing
+  assert.deepEqual(typedNumbers('25'), [25]); assert.deepEqual(typedNumbers(' 30, 20 '), [30, 20]); assert.deepEqual(typedNumbers('30 x 20'), [30, 20]);
+  assert.equal(typedNumbers(''), null); assert.equal(typedNumbers('1,2,3'), null); assert.deepEqual(typedNumbers('2.'), [2], 'part way through typing 2.5');
+  assert.equal(typedNumbers('a'), null);
+  assert.deepEqual(typedPoint('line', [[0, 0]], [10, 0], '25'), [25, 0], 'a line 25 long towards the pointer');
+  assert.deepEqual(typedPoint('line', [[0, 0]], [3, 4], '10'), [6, 8]);
+  assert.deepEqual(typedPoint('line', [[5, 5]], [5, 5], '10'), [15, 5], 'pointer on the point: along +x');
+  assert.deepEqual(typedPoint('polyline', [[0, 0], [10, 0]], [10, 50], '5'), [10, 5], 'from the last point');
+  assert.deepEqual(typedPoint('rectangle', [[10, 10]], [0, 30], '30, 20'), [-20, 30], 'into the pointer\'s quarter');
+  assert.deepEqual(typedPoint('rectangle', [[0, 0]], [5, 5], '8'), [8, 8], 'one number: a square');
+  assert.deepEqual(typedPoint('circle', [[2, 2]], [2, 9], '5'), [2, 7], 'the radius');
+  assert.deepEqual(typedPoint('arc', [[0, 0], [10, 0]], [0, 0], '90'), [0, 10], 'an arc turning 90 degrees counter-clockwise');
+  assert.equal(typedPoint('arc', [[0, 0]], [0, 0], '90'), null, 'an arc needs its start first');
+  assert.equal(typedPoint('line', [], [1, 1], '5'), null, 'nothing before the first click');
+  assert.equal(typedPoint('line', [[0, 0]], [1, 1], '-5'), null); assert.equal(typedPoint('line', [[0, 0]], [1, 1], '5, 6'), null);
+  assert.equal(typedWords('rectangle', [[0, 0]], '30, 20'), 'width 30, height 20'); assert.equal(typedWords('line', [[0, 0]], '25'), 'length 25'); assert.equal(typedWords('arc', [[0, 0], [1, 0]], '90'), 'angle 90°');
+}
+console.log('PASS typed sizes: length, width and height, radius, angle');
 console.log('Sketch plane points: planes, the screen-to-plane map, the active sketch and the written point pass.');

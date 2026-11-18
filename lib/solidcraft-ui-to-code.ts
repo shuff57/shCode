@@ -242,6 +242,59 @@ export function featureCode(f: TimelineFeature, ctx: UiContext): Written {
       const word = f.type === 'ConeFeature' ? 'cone' : 'cylinder';
       return declare(ctx, d, word === 'cone' ? 'tip' : 'rod', `${word}(${fmt(2 * r)}, ${fmt(h)}${c.some((x: number) => x !== 0) ? `, { at: ${pt(c)} }` : ''})`);
     }
+    case 'TorusFeature': {
+      // reSHape's ring(across, tubeAcross): across is the outside diameter, 2 (major + minor); tubeAcross the tube's, 2 minor. Both stand along Z.
+      if (!newBody(d)) return why(`its operation is ${d.operation}`);
+      const R = plainNumber(d.major), r = plainNumber(d.minor); if (R === null || r === null) return why('its radius is an expression');
+      const given: (number | null)[] = Array.isArray(d.center) ? d.center.map((x: unknown) => plainNumber(x)) : [0, 0, 0];
+      if (given.some(x => x === null)) return why('its place is an expression');
+      const c = given as number[];
+      return declare(ctx, d, 'donut', `ring(${fmt(2 * (R + r))}, ${fmt(2 * r)}${c.some(x => x !== 0) ? `, { at: ${pt(c)} }` : ''})`);
+    }
+    case 'DraftFeature': {
+      // reSHape's draft(part, a) tilts every side wall, draft(part.face('right'), a) one, both pulled along +X, +Y or +Z about the plane square to
+      // it at { neutral } (0 when left out); the guarded build sends SolidCraft the same: pull +axis, neutral plane at neutral along it.
+      const pts: number[][] = Array.isArray(d.faces) ? d.faces.filter((q: unknown) => Array.isArray(q)) : [];
+      if (!pts.length) return why('it has no faces');
+      if (ctx.afterSolidStep) return why('it was made in the same go as another step, so where it is cannot be measured; make it on its own');
+      const a = plainNumber(d.angle); if (a === null) return why('its angle is an expression');
+      const pull: number[] = Array.isArray(d.pull) ? d.pull : [];
+      const k = [0, 1, 2].find(i => Math.abs(pull[i] - 1) < 1e-9 && [0, 1, 2].every(j => j === i || Math.abs(pull[j]) < 1e-9));
+      if (k === undefined) return why('it pulls along a direction the code cannot write yet (reSHape pulls along +X, +Y or +Z)');
+      const np = d.neutral ?? {}; let n: number;
+      if (np.type === 'origin' && ['YZ', 'XZ', 'XY'].indexOf(np.name) === k) n = 0;
+      else if (np.type === 'custom' && np.plane && Array.isArray(np.plane.origin) && Array.isArray(np.plane.x_dir) && Array.isArray(np.plane.y_dir)
+        && Math.abs(Math.abs(cross(np.plane.x_dir, np.plane.y_dir)[k]) - 1) < 1e-9) n = np.plane.origin[k];
+      else return why('its neutral plane is not one the code can name');
+      const body = bodyOfPoint(ctx, pts[0]); const part = owner(body); if (!body || !part) return why('its part is not in a variable of script.js');
+      const g = ctx.geometry.get(body)!;
+      const picked = new Set(pts.map(q => faceAtPoint(g.faces, q)?.index ?? -1)); if (picked.has(-1)) return why('one of its faces could not be found on the model');
+      const sides = g.faces.filter(f => Array.isArray(f.plane_normal) && Math.abs(f.plane_normal[k]) < 1e-9).map(f => f.index);
+      const opt = Math.abs(n) > 1e-12 ? `, { neutral: ${fmt(n)} }` : '';
+      if (sides.length && picked.size === sides.length && sides.every(i => picked.has(i))) return { lines: [`draft(${part}, ${fmt(a)}${opt});`] };
+      if (picked.size !== 1) return why('it tilts some of the side walls, not one or all of them');
+      const word = faceWord(ctx, body, pts[0]); if (!word) return why('the face it tilts has no name in reSHape Script');
+      return { lines: [`draft(${part}.face('${word}'), ${fmt(a)}${opt});`] };
+    }
+    case 'MirrorFeature': {
+      // reSHape's mirror(part, word) joins the part with its reflection across the plane square to the word's axis at the end of the part's box
+      // nearer zero (the guarded build's mirror: the box's low face, or its high one when that is nearer zero).
+      if (!Array.isArray(d.bodies) || d.bodies.length !== 1 || (Array.isArray(d.features) && d.features.length)) return why('it mirrors more than one body, or features');
+      const part = owner(d.bodies[0]); if (!part) return why('its part is not in a variable of script.js');
+      if (!d.combine) return why('it keeps the mirrored copy apart from the part, and reSHape\'s mirror joins them');
+      let k: number | undefined; let at: number;
+      const pl = d.plane ?? {};
+      if (pl.type === 'origin' && ['YZ', 'XZ', 'XY'].includes(pl.name)) { k = ['YZ', 'XZ', 'XY'].indexOf(pl.name); at = 0; }
+      else if (pl.type === 'custom' && pl.plane && Array.isArray(pl.plane.origin) && Array.isArray(pl.plane.x_dir) && Array.isArray(pl.plane.y_dir)) {
+        const n = cross(pl.plane.x_dir, pl.plane.y_dir); k = [0, 1, 2].find(i => Math.abs(Math.abs(n[i]) - 1) < 1e-9); at = k === undefined ? NaN : pl.plane.origin[k];
+      } else return why('its plane is not one the code can name');
+      if (k === undefined) return why('its plane is not square to X, Y or Z');
+      if (ctx.afterSolidStep) return why('it was made in the same go as another step, so where it is cannot be measured; make it on its own');
+      const box = ctx.boxes?.get(d.bodies[0]); if (!box) return why('the box of its part could not be read');
+      const face = Math.abs(box.min[k]) <= Math.abs(box.max[k]) ? box.min[k] : box.max[k];
+      if (Math.abs(at - face) > 1e-9) return why('its plane is not at the end of the part nearer the origin, which is where reSHape\'s mirror puts it');
+      return { lines: [`mirror(${part}, '${['left-right', 'front-back', 'top-bottom'][k]}');`] };
+    }
     case 'CombineFeature': {
       const word = ({ join: 'union', cut: 'subtract', intersect: 'intersect' } as Record<string, string>)[d.operation];
       if (!word || d.keep_tools || d.new_component) return why('it keeps its tools or makes a component');
