@@ -9,6 +9,7 @@
 // paste carrying a phone number, email or street address (lib/pii-check.ts).
 
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Wand2, X } from 'lucide-react';
 import { createProject } from '../lib/sandbox-projects';
 import { MAX_CONVERT_INPUT, looksLikeMoshionAlready } from '../lib/p5play-convert-core';
@@ -35,6 +36,11 @@ const quiet: React.CSSProperties = {
   padding: '6px 12px', borderRadius: 4, cursor: 'pointer', fontSize: 13,
   background: 'transparent', color: 'var(--c-fg)', border: '1px solid var(--c-line)',
 };
+
+/** The AI writes names in `backticks`: show those as code, everything else as plain text (never HTML). */
+function withCode(note: string): React.ReactNode[] {
+  return note.split(/`([^`\n]+)`/).map((part, i) => (i % 2 ? <code key={i}>{part}</code> : part));
+}
 
 export default function P5playConvertButton({ chipStyle, getCode }: Props) {
   const [open, setOpen] = useState(false);
@@ -107,7 +113,8 @@ export default function P5playConvertButton({ chipStyle, getCode }: Props) {
         <Wand2 size={12} aria-hidden="true" />
         From p5play
       </button>
-      {open && (
+      {/* Into <body>, as Code together's dialog is: inside the toolbar the editor's pane divider drew over it. */}
+      {open && typeof document !== 'undefined' && createPortal(
         <div
           onMouseDown={(e) => { if (e.target === e.currentTarget && !busy) setOpen(false); }}
           style={{
@@ -183,7 +190,7 @@ export default function P5playConvertButton({ chipStyle, getCode }: Props) {
                   <div style={{ marginTop: 8 }}>
                     <strong>What the AI changed</strong>
                     <ul style={{ margin: '4px 0 0', paddingLeft: 20 }}>
-                      {result.notes.map((n, i) => <li key={i}>{n}</li>)}
+                      {result.notes.map((n, i) => <li key={i}>{withCode(n)}</li>)}
                     </ul>
                   </div>
                 )}
@@ -213,7 +220,8 @@ export default function P5playConvertButton({ chipStyle, getCode }: Props) {
 
             {error && <p role="alert" style={{ margin: '10px 0 0', color: 'var(--c-red)' }}>{error}</p>}
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
