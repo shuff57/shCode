@@ -1,5 +1,6 @@
 import type { Requirement, FunctionClause } from './types';
 import type { ModelDoc } from './model-types';
+import { checkSketchOutline } from './solidcraft-sketch';
 import { checkModel, type Refusals } from './model-check';
 import type { TestRunResults } from './test-harness-source';
 import { bindPattern } from './student-names';
@@ -207,11 +208,13 @@ export function grade(
       case 'model':
         {
           const result = checkModel(req, context?.modelDoc ?? null, context?.refusals ?? null);
-          passed = result.passed;
+          const outlineError = req.sketchOutline ? checkSketchOutline(files, context?.modelDoc ?? null, context?.refusals ?? null, !!req.sketchScript) : null;
+          passed = result.passed && !outlineError;
+          if (outlineError) modelMessage = outlineError;
           // The checker's own sentence ("Expected a round 3; the round could
           // not be built: ...") is the only place the kernel's reason reaches
           // the student without clicking the warning step.
-          if (!passed && result.message) modelMessage = result.message;
+          if (!passed && result.message && !modelMessage) modelMessage = result.message;
         }
         break;
     }

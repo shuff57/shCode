@@ -35,6 +35,14 @@ const DEV_STUBS_ENABLED =
   process.env.NODE_ENV !== 'production' && process.env.SHCODE_ENABLE_DEV_STUBS === '1';
 
 const dev = process.env.NODE_ENV !== 'production';
+// The runtime directory is generated and gitignored. Prepare it before Next
+// indexes public files, including when this server is started directly.
+if (dev) {
+  const { prepareSolidCraftPreview } = await import('./scripts/prepare-solidcraft-preview.mjs');
+  const { missing } = await prepareSolidCraftPreview({ requireEngines: false });
+  if (missing.length) console.warn(`[solidcraft] Missing local 0.30.1 engine files: ${missing.join(', ')}. Set RESHAPE_CAD_DIR and SOLIDCRAFT_WEB_DIR to the pinned builds.`);
+  else console.log('[solidcraft] Local CAD runtime prepared.');
+}
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
@@ -116,6 +124,9 @@ app.prepare().catch((err) => {
   console.error('[dev-stub-gate] app.prepare() failed to start a handler:', err.message);
 }).then(async () => {
   const server = express();
+  // Serve the prepared host, modules and engines directly, with GET and HEAD.
+  // This also works if public files are refreshed after Next's startup scan.
+  if (dev) server.use('/solidcraft-preview', express.static(path.join(process.cwd(), 'public/solidcraft-preview'), { fallthrough: false }));
   // Set by the dev stubs below: the real-time rooms' socket stand-in (scripts/dev-live.mjs).
   let devLiveUpgrade = null;
 
@@ -343,6 +354,9 @@ app.prepare().catch((err) => {
   // No OLLAMA/Workers-AI credentials exist in dev, so the honest answer is an
   // empty list -- GraderPicker's hasGraderChoice() renders nothing below two
   // available targets, which is the correct unconfigured-dev surface.
+  server.post('/api/grade-written', express.json({limit:'96kb'}), (_req, res) => {
+    res.status(503).json({ok:false,error:'AI feedback is not configured on this local server. Your geometry checks and saved sketch still work.',offline:true});
+  });
   server.get('/api/grade-written', (_req, res) => {
     res.json({ graders: [], fallback: null });
   });

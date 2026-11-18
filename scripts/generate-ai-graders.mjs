@@ -59,7 +59,7 @@ for (const id of readdirSync(lessonsDir)) {
     continue;
   }
 
-  const graders = [lesson.aiGrader, lesson.diagram && lesson.diagram.aiGrader, lesson.aiCheck];
+  const graders = [lesson.aiGrader, lesson.diagram && lesson.diagram.aiGrader, lesson.aiCheck, lesson.cadFeedback];
   for (const g of graders) {
     if (!g || !Array.isArray(g.rubric) || g.rubric.length === 0) continue;
 
@@ -135,6 +135,7 @@ for (const id of readdirSync(lessonsDir)) {
     const ids = g.rubric.map((r) => r.id);
     if (new Set(ids).size !== ids.length) errors.push(`${id}: duplicate rubric ids`);
 
+    if (g === lesson.cadFeedback && (lesson.cadHost !== 'solidcraft' || lesson.cadScope !== 'sketch')) errors.push(`${id}: CAD feedback needs a sketch-only SolidCraft lesson`);
     out[id] = {
       lessonTitle: lesson.title,
       prompt: g.prompt,
@@ -145,6 +146,7 @@ for (const id of readdirSync(lessonsDir)) {
         ? { brief: lesson.description.trim() }
         : {}),
       rubric: g.rubric,
+      ...(g === lesson.cadFeedback ? { cadFeedback:true, cadRequirements:(lesson.requirements ?? []).map(r=>({...r,description:r.description ?? '',status:'pending'})) } : {}),
       ...(g.model ? { model: g.model } : {}),
       ...(g.contextDocs ? { contextDocs: g.contextDocs } : {}),
       ...(g.strict ? { strict: true } : {}),

@@ -81,6 +81,7 @@ export default function SandboxProjectPicker({
   locked = false,
   lockedTitle,
   startOpen = false,
+  beforeChange,
 }: {
   state: ProjectsState;
   /** Code together is on: switching would swap everyone's program. */
@@ -88,6 +89,7 @@ export default function SandboxProjectPicker({
   lockedTitle?: string;
   /** Open with the New project form showing (the student has no projects left). */
   startOpen?: boolean;
+  beforeChange?: () => Promise<boolean>;
 }) {
   const { projects, current, signedIn } = state;
   const [open, setOpen] = useState(startOpen);
@@ -148,6 +150,7 @@ export default function SandboxProjectPicker({
     if (busy) return;
     setBusy(true);
     setError(null);
+    if(beforeChange&&!await beforeChange()){setError('Your current work could not be saved. Keep the page open and try again.');setBusy(false);return;}
     const r = await fn();
     setBusy(false);
     if (!r.ok) { setError(r.error); return; }
@@ -156,7 +159,7 @@ export default function SandboxProjectPicker({
 
   const make = () => act(
     () => createProject(newType, newName.trim() || suggested,
-      demo ? { [getMode(newType).file]: demo.source } : undefined),
+      demo ? demo.files ?? { [getMode(newType).file]: demo.source } : undefined),
     () => { setNewName(''); setDemoId(''); close(); },
   );
 
@@ -342,7 +345,7 @@ export default function SandboxProjectPicker({
                 <li key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '2px 4px' }}>
                   <button
                     type="button"
-                    onClick={() => { if (!isOpen && !locked) openProject(p); close(); }}
+                    onClick={() => { if (!isOpen && !locked) void act(async()=>{openProject(p);return {ok:true};},close);else close(); }}
                     disabled={locked && !isOpen}
                     aria-current={isOpen ? 'true' : undefined}
                     style={{

@@ -46,7 +46,7 @@ import TeacherPushBanner from './TeacherPushBanner';
 import { useCloudWorkspace, noteDraftSaved } from '../lib/lesson-sync';
 import { UploadChip, TwoVersionsNotice, useUploadStatus } from './UploadStatus';
 import { isOffline, OFFLINE_HANDIN_TEXT } from '../lib/offline';
-import { addLocalSnapshot, NOT_KEPT_TEXT } from '../lib/local-history';
+import { addLocalSnapshot, keepInHistory, NOT_KEPT_TEXT } from '../lib/local-history';
 import CarryForwardBanner from './CarryForwardBanner';
 import GuestWorkOffer from './GuestWorkOffer';
 import DocsDrawer from './DocsDrawer';
@@ -63,6 +63,7 @@ import { CloudUpload, RotateCcw, Send } from 'lucide-react';
 // The B-rep kernel + three.js viewport are heavy; the ~270-odd non-reshape
 // lesson pages should never pay for them. Same pattern DiagramAssignmentView
 // uses for DiagramEditor.
+const SolidCraftSketch = dynamic(() => import('./SolidCraftSketch'), { ssr: false });
 const SolidCraftStudio = dynamic(() => import('./SolidCraftStudio'), { ssr: false });
 const ReshapeStudio = dynamic(() => import('./reshape/ReshapeStudio'), { ssr: false });
 
@@ -95,11 +96,18 @@ export default function LessonWorkspace({
   const commits = useLessonStore((s) => s.commits);
   const commitChanges = useLessonStore((s) => s.commitChanges);
 
+  const nativeSketchFlush=useRef<(()=>Promise<boolean>)|null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   // Live console-lesson runner, so a re-run or an unmount can stop it — including
   // one sitting on an open prompt() dialog.
   const runRef = useRef<{ kill: () => void } | null>(null);
   useEffect(() => () => { runRef.current?.kill(); }, []);
+
+  async function saveCurrentWorkspace() {
+    if(lesson.cadScope==='sketch' && (!nativeSketchFlush.current || !await nativeSketchFlush.current())) {window.alert('The native sketch could not be captured. Keep this page open and try Save again.');return;}
+    addLocalSnapshot(lesson.id,useLessonStore.getState().fileContents,'Saved on this device');
+    await cloud.save();
+  }
 
   const handleDownload = () => {
     if (!currentFile) return;
@@ -164,7 +172,9 @@ export default function LessonWorkspace({
     window.addEventListener('focus', focus);
     return () => { live = false; if (timer) window.clearInterval(timer); window.removeEventListener('focus', focus); };
   }, [lesson.cadHost]);
-  const solidCraftPolicy = cadPolicy(lesson.id, cadPolicyError ? NO_TEACHER_MODES : teacherModes, cadPolicyError ? 'code' : lesson.mode ?? 'code');
+  const solidCraftPolicy = cadPolicy(lesson.id, cadPolicyError ? NO_TEACHER_MODES : teacherModes, cadPolicyError ? 'code' : lesson.mode ?? (lesson.cadScope === 'sketch' ? 'visual' : 'code'));
+  const cadArtifact = (contents: Record<string, string>) => lesson.cadScope === 'sketch' ? JSON.stringify([contents['script.js'] ?? '', contents['sketch.json'] ?? '']) : contents['script.js'] ?? '';
+  const currentCadDoc = () => lesson.cadHost !== 'solidcraft' || cadBuiltSource === cadArtifact(useLessonStore.getState().fileContents) ? latestModelDoc : null;
   const reshapeMode = resolveMode(lesson.id, teacherModes, lesson.mode ?? null).mode;
   const reshapeSides: ('build' | 'code')[] =
     reshapeMode === 'visual' ? ['build'] : reshapeMode === 'code' ? ['code'] : ['build', 'code'];
@@ -755,7 +765,7 @@ export default function LessonWorkspace({
       setRequirements(planRequirements(text));
       return planGradeReport(text);
     }
-    const context: GradeContext = { modelDoc: latestModelDoc, refusals: latestRefusals, testResults: testRunRef.current };
+    const context: GradeContext = { modelDoc: currentCadDoc(), refusals: latestRefusals, testResults: testRunRef.current };
     const report = grade(
       lesson.requirements,
       files,
@@ -873,7 +883,7 @@ export default function LessonWorkspace({
   runAiCheckRef.current = runAiCheck;
 
   const runClientGrade = useCallback(() => {
-    const context: GradeContext = { modelDoc: latestModelDoc, refusals: latestRefusals, testResults: testRunRef.current };
+    const context: GradeContext = { modelDoc: currentCadDoc(), refusals: latestRefusals, testResults: testRunRef.current };
     const report = grade(
       lesson.requirements,
       files,
@@ -993,9 +1003,9 @@ export default function LessonWorkspace({
     if (typeof window === 'undefined' || !lesson) return;
     if (lesson.cadHost === 'solidcraft') {
       const current = useLessonStore.getState().fileContents;
-      const report = grade(lesson.requirements, current, lesson.grading?.passingScore ?? 0, { modelDoc: latestModelDoc, refusals: latestRefusals });
-      if (!latestModelDoc || cadBuiltSource !== (current['script.js'] ?? '') || report.results.some(r => r.status !== 'passed')) {
-        alert('Run the code now in your editor, then pass Check before submitting.');
+      const report = grade(lesson.requirements, current, lesson.grading?.passingScore ?? 0, { modelDoc: currentCadDoc(), refusals: latestRefusals });
+      if (!latestModelDoc || cadBuiltSource !== cadArtifact(current) || report.results.some(r => r.status !== 'passed')) {
+        alert(lesson.cadScope === 'sketch' ? 'Update the current sketch, then pass Check before submitting.' : 'Run the code now in your editor, then pass Check before submitting.');
         return;
       }
     }
@@ -1092,7 +1102,7 @@ export default function LessonWorkspace({
       ? canSubmitMoshion({ cardsOk: allRequirementsPassed, run: moshionRun, currentText: moshionText, expectsRuntimeError })
       : runLetsSubmit({ error: runtimeError, pending: false }, expectsRuntimeError) &&
         (isNoPoints ? allRequirementsPassed : totalScore >= (lesson.grading?.passingScore ?? 0)));
-  const cadBuildCurrent = lesson.cadHost !== 'solidcraft' || (latestModelDoc !== null && cadBuiltSource === (files['script.js'] ?? ''));
+  const cadBuildCurrent = lesson.cadHost !== 'solidcraft' || (latestModelDoc !== null && cadBuiltSource === cadArtifact(files));
   const canSubmit = canSubmitByWork && cadBuildCurrent && !cap.unknown && !cap.reached;
   // The code on screen is the code just submitted: nothing new to hand in. Edit it and Submit opens
   // again (subject to the same checks), which is how a student redoes a submitted lab.
@@ -1610,9 +1620,13 @@ export default function LessonWorkspace({
                     alignItems: 'center',
                     gap: 5,
                   }}
-                  onClick={() => {
-                    const what = isTextMode ? 'text' : 'code';
+                  onClick={async () => {
+                    const what = lesson.cadScope === 'sketch' ? 'sketch' : isTextMode ? 'text' : 'code';
                     if (window.confirm(`Reset your ${what} to the starter? Unsaved work will be lost.`)) {
+                      if (lesson.cadScope === 'sketch' && (!nativeSketchFlush.current || !await nativeSketchFlush.current())) {
+                        window.alert('The native sketch could not be captured for History. Keep this page open and try again.');
+                        return;
+                      }
                       // The code it replaces is put in History first; if it cannot be, nothing is reset.
                       // (The reference solution is not the person's work: it is discarded, not kept.)
                       if (!resetLesson(lesson, { discard: solutionLoaded })) { window.alert(NOT_KEPT_TEXT); return; }
@@ -1654,22 +1668,14 @@ export default function LessonWorkspace({
                   setSolutionLoaded(true);
                 }}
               />
-              <button className="btn-secondary btn-sm toolbar-history" aria-label="History" title="History" onClick={() => setHistoryOpen(true)}>
+              <button className="btn-secondary btn-sm toolbar-history" aria-label="History" title="History" onClick={async()=>{if(lesson.cadScope==='sketch'&&nativeSketchFlush.current&&!await nativeSketchFlush.current())return;setHistoryOpen(true);}}>
                 <span aria-hidden="true">↶</span><span className="toolbar-button-label">History</span>
               </button>
               {lessonProgress.authed && !solutionLoaded && (
                 <>
                   <button
                     className="btn-secondary btn-sm"
-                    onClick={() => {
-                      // Keep a copy on this device even if the cloud save fails.
-                      addLocalSnapshot(
-                        lesson.id,
-                        useLessonStore.getState().fileContents,
-                        'Saved on this device',
-                      );
-                      void cloud.save();
-                    }}
+                    onClick={()=>{void saveCurrentWorkspace();}}
                     disabled={cloud.saving}
                     aria-label="Save to cloud" title="Save this lesson to the cloud so you can open it on another device."
                   >
@@ -1756,7 +1762,25 @@ export default function LessonWorkspace({
               {/* ReshapeStudio is self-contained (its own toolbar, its own CodeEditor for the Code side, its own
                   model tools for the Build side): it replaces the whole split rather than sharing a second,
                   redundant editor with it. The sandbox does the same. */}
-              {!isTextMode && isReshapeMode && lesson.cadHost === 'solidcraft' ? (
+              {!isTextMode && isReshapeMode && lesson.cadHost === 'solidcraft' && lesson.cadScope === 'sketch' ? (
+                <SolidCraftSketch
+                  onFlushReady={(flush)=>{nativeSketchFlush.current=flush;}}
+                  onRequestSave={()=>{void saveCurrentWorkspace();}}
+                  feedbackEnabled={!!lesson.cadFeedback}
+                  key={`${lesson.id}-${reshapeResetKey}`}
+                  lessonId={lesson.id}
+                  value={files['sketch.json'] ?? ''}
+                  source={files['script.js'] ?? ''}
+                  starterSource={flattenFiles(lesson.files).find(f=>f.path==='script.js')?.content??''}
+                  editable={!cadPolicyError && cadPolicyLoaded && solidCraftPolicy.toolsAllowed}
+                  policyLoaded={cadPolicyLoaded}
+                  policyReason={cadPolicyError ? 'Teacher settings could not be read. Hand tools stay off; your script is available.' : solidCraftPolicy.toolsAllowed ? 'Native sketch tools are available; 3D tools stay off.' : 'Work with code. Your teacher controls access to hand sketch tools.'}
+                  onChange={(drawing) => updateFile('sketch.json', drawing)}
+                  onSourceChange={(source) => updateFile('script.js', source)}
+                  onBeforeBuild={()=>keepInHistory(lesson.id,useLessonStore.getState().fileContents,'Before running the 2D script')}
+                  onDocChange={(doc, refusals) => { setLatestModelDoc(doc); setCadBuiltSource(doc ? cadArtifact(useLessonStore.getState().fileContents) : null); setLatestRefusals(refusals ?? null); setRuntimeError(null); }}
+                />
+              ) : !isTextMode && isReshapeMode && lesson.cadHost === 'solidcraft' ? (
                 <SolidCraftStudio
                   key={`${lesson.id}-${reshapeResetKey}`}
                   lessonId={lesson.id}

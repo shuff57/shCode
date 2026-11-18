@@ -253,6 +253,8 @@ export interface CodeMirrorPaneProps {
   taskComment?: LabTaskScenario | null;
   /** The "Your task" panel shows the same scenario, so the fold is a bare marker. */
   taskCommentQuiet?: boolean;
+  /** The editor once it exists (null when it goes), for a host that inserts text at the cursor. */
+  onView?: (view: EditorView | null) => void;
 }
 
 export default function CodeMirrorPane({
@@ -264,12 +266,15 @@ export default function CodeMirrorPane({
   collab = null,
   taskComment = null,
   taskCommentQuiet = false,
+  onView,
 }: CodeMirrorPaneProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const collabSlot = useRef(new Compartment());
   const collabRef = useRef<Extension | null>(collab);
   collabRef.current = collab;
+  const onViewRef = useRef(onView);
+  onViewRef.current = onView;
 
   // Create or recreate editor when fileKey changes.
   useEffect(() => {
@@ -288,8 +293,10 @@ export default function CodeMirrorPane({
       parent: containerRef.current,
     });
     viewRef.current = view;
+    onViewRef.current?.(view);
 
     return () => {
+      onViewRef.current?.(null);
       view.destroy();
       viewRef.current = null;
     };

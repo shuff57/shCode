@@ -28,6 +28,7 @@
 // the panel says so and offers to bring it in before Update would replace it (GitHub's rejected push).
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Gamepad2 } from 'lucide-react';
 import {
   GAMES_CHANGED,
@@ -142,6 +143,7 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
   const [ahead, setAhead] = useState<{ from: number; newest: number } | null>(null);
   const [aheadRes, setAheadRes] = useState<SyncResult | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null); // the panel is portalled to <body>, outside wrapRef
 
   // What the sandbox draft is published as, checked against the server (a
   // deleted game, or another account on this browser, reads as unpublished).
@@ -196,7 +198,10 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
     const d = declaredMode(getCode());
     setDeclared(modeLabel(d.mode, d.players));
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
-    const onDown = (e: MouseEvent) => { if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false); };
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as Node;
+      if (wrapRef.current && !wrapRef.current.contains(t) && !dialogRef.current?.contains(t)) setOpen(false);
+    };
     window.addEventListener('keydown', onKey);
     window.addEventListener('mousedown', onDown);
     return () => { window.removeEventListener('keydown', onKey); window.removeEventListener('mousedown', onDown); };
@@ -324,12 +329,15 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
         <Gamepad2 size={12} />
         {label}
       </button>
-      {open && (
+      {open && createPortal(
         <div
+          ref={dialogRef}
+          data-publish-game-panel=""
           role="dialog"
           aria-label="Publish game"
           style={{
-            position: 'absolute', top: 'calc(100% + 6px)', right: 0, zIndex: 50, width: 'min(360px, calc(100vw - 32px))',
+            position: 'fixed', top: 16, left: '50%', transform: 'translateX(-50%)', zIndex: 1000, width: 'min(820px, calc(100vw - 32px))',
+            maxHeight: 'calc(100vh - 32px)', overflowY: 'auto', boxSizing: 'border-box',
             background: 'var(--c-deep2)', border: '1px solid var(--c-line)', borderRadius: 6, padding: 12,
             boxShadow: '0 8px 24px rgba(0,0,0,0.35)', color: 'var(--c-fg)', fontSize: 13, lineHeight: 1.5,
           }}
@@ -405,6 +413,8 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
               <div style={{ margin: '0 0 8px' }}><GitHubWord>{GITHUB_WORD.version}</GitHubWord></div>
             </>
           )}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '0 16px', alignItems: 'start' }}>
+          <div>
           <label style={{ display: 'block', margin: '0 0 4px' }} htmlFor="publish-game-title">Title</label>
           <input
             id="publish-game-title"
@@ -426,10 +436,6 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
             <input type="checkbox" checked={share} onChange={(e) => setShare(e.target.checked)} />
             Share with my class
           </label>
-          {share && audPick && <AudiencePicker options={audOptions} value={audPick} onChange={setAudPick} idPrefix="publish-game-audience" pulled={published?.pulled} />}
-          {share && (
-            <ShareChoicePicker thing="game" value={choice} onChange={setChoice} from={from} idPrefix="publish-game" />
-          )}
           {share && (
             <label style={{ display: 'flex', alignItems: 'center', gap: 6, margin: '0 0 10px' }}
               title="Classmates can write comments and pick suggestions under your game. You can change this later on its play page.">
@@ -437,6 +443,14 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
               Let classmates give feedback
             </label>
           )}
+          </div>
+          {share && (
+            <div>
+              {audPick && <AudiencePicker options={audOptions} value={audPick} onChange={setAudPick} idPrefix="publish-game-audience" pulled={published?.pulled} />}
+              <ShareChoicePicker thing="game" value={choice} onChange={setChoice} from={from} idPrefix="publish-game" />
+            </div>
+          )}
+          </div>
           {used.length > 0 && (
             <div style={{ margin: '0 0 10px', padding: '8px 10px', border: '1px solid var(--c-line)', borderRadius: 4 }}>
               <p style={{ margin: '0 0 4px' }}>{usesSentence(used)}</p>
@@ -499,7 +513,8 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
               {note.text}
             </div>
           )}
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

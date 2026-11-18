@@ -1,31 +1,38 @@
 # CAD Chapters and Lesson Design
 
-Draft for teacher review, 2026-11-15. Students carry their JavaScript knowledge from
-moSHion into programs that describe useful physical parts. The teaching sequence is
-**read a recipe → describe a part object → derive dimensions → build from a sketch →
-repeat from data → test a fit → deliver a reproducible design**.
+Draft updated 2026-11-16. Students carry their JavaScript knowledge from moSHion into
+programs that describe useful physical parts. The current sequence is **2D drawing →
+2D OOP → basic 3D CAD → advanced CAD → fit and reliability → a finished useful system**.
+The [lesson progression table](CAD-LESSON-PROGRESSION.md) makes the useful artifact at
+each stage explicit and is the sequence reference for new authoring.
 
-This is the design for new shCode CAD work. The runtime is reSHape Script on the
-pinned SolidCraft host. The first working integration is
-[9.1.12 One Class, Two Parts](../lessons/9-1-12-lab-one-class-two-parts/lesson.json).
+This is the design for new shCode CAD work. Stage A uses reSHape Script to build native SolidCraft 2D sketches, with the same
+editor-and-Run workflow as 3D. Native hand tools are teacher-controlled. Stage B adds
+classes and independent objects to those 2D scripts. The working integrations are
+[9.1.13 Organizer Outline](../lessons/9-1-13-lab-organizer-outline/lesson.json) for
+native sketching and [9.1.12 One Class, Two Parts](../lessons/9-1-12-lab-one-class-two-parts/lesson.json)
+for script-driven OOP CAD.
 The existing 9.1 module stays hidden during review. These drafts create no new course
 routes, release dates, student assignments or changes to saved progress.
 
-## Chapter map
+## Current chapter direction
 
-The numbers below are proposed **shCode course units**, following the existing 8.1
-Arcade Cabinet and 9.1 Solid Shapes. They do not rename textbook chapters. Book
-references keep their original numbers. No existing lesson id or assignment code
-moves; the pilot remains 9.1.12 even when later lessons revisit its idea.
+Proposed shCode units follow the existing game work; these are draft content allocations,
+not changes to textbook chapters, saved lesson ids or the live module loader. The table
+uses stage keys to avoid treating an unapproved allocation as released numbering.
 
-| Proposed unit | Central question | Proposed modules | Student evidence | Meetings |
-| --- | --- | --- | --- | ---: |
-| 9 Programming a Part | How does a program describe a physical part? | 9.1 Script and solid foundations; 9.2 Part objects; 9.3 Measurements and part families | Two independent instances; a changed measurement rebuilds the intended part | 5 |
-| 10 Sketches and Repeated Designs | How does a flat profile become a useful, repeated solid? | 10.1 Closed profiles; 10.2 Profiles into solids; 10.3 Designs from arrays | Dimensioned profile, successful pull/cut, a small data-driven family | 6 |
-| 11 Fits My Stuff | Can another person resize my design for their object? | 11.1 Measure and specify; 11.2 Build the first fit; 11.3 Swap and revise | Measurements, reusable part, peer resize record, revised version | 4 |
-| 12 Reliable Part Programs | How do I know a design program behaves correctly? | 12.1 Validation and test data; 12.2 Search and sort part records; 12.3 Organize a small part library | A test that catches a bug; a justified selection algorithm; reusable source | 5 |
-| 13 From Program to Physical Part | Can someone reproduce, inspect and make this version? | 13.1 Source and versions; 13.2 Fit coupons and print preparation; 13.3 Handoff and CAD transfer | Rebuildable source, versioned settings, measured coupon, handoff package | 4 |
-| 14 Design Build Test and Explain | Can I solve a bounded physical problem and show the evidence? | 14.1 Scope and design; 14.2 Build and iterate; 14.3 Test and improve; 14.4 Demonstrate and reflect | Specification, implementation, tests, fit evidence, revision history, explanation | 8 |
+| Stage | Chapter focus | Main outcome |
+| --- | --- | --- |
+| A | 2D drawing fundamentals | A measured, dimensioned organizer plan |
+| B | 2D designs with OOP | Reusable profile objects and a configurable layout |
+| C | Basic 3D CAD | A functional digital tray and accessory |
+| D | Advanced CAD | Refined, repeatable and composable parts |
+| E | Reliable designs and physical fit | Validated inputs, a tested fit and a reproducible handoff |
+| F | Design build test and explain | A useful organizer system with evidence and a second-size variant |
+
+The existing 9.1.12 pilot stays at its current id. It demonstrates a C-stage integration;
+it does not require the new course to begin in 3D. The earlier 9–14 allocation below
+is retained only as a pacing/content bank until these stages are expanded and mapped.
 
 **Planning allowance:** 32 meetings × 105 minutes = 56 contact hours, plus two reserve
 meetings = 59.5 hours. This reuses the old plan's combined 34-meeting Q3/Q4 allowance;
@@ -34,11 +41,11 @@ remaining meetings must be reconciled before dates are assigned. Independent hom
 and printer queues are outside those contact hours. A printed result is never assumed
 to appear during a code lesson.
 
-The first five meetings are allocated 2 + 1 + 2 across 9.1–9.3. Chapter 10 has two
+In that earlier allocation, the first five meetings were allocated 2 + 1 + 2 across 9.1–9.3. Chapter 10 has two
 meetings per module; chapter 11 has 1 + 2 + 1; chapter 12 has 2 + 2 + 1; chapter 13
 has 1 + 2 + 1; chapter 14 has 2 + 3 + 2 + 1. No module exceeds three meetings.
 
-## Learning progression
+## Content bank from the earlier allocation
 
 ### 9 Programming a Part
 
@@ -251,7 +258,10 @@ Textbook sections are under the sibling bookSHelf project's
 `Introduction to Programming Concepts and Methodologies/remastered/`; their original
 chapter/section names are retained for the concept join above.
 
-## Build order
+## Earlier build order to revise against the new sequence
+
+Use the A–F order in the [progression table](CAD-LESSON-PROGRESSION.md) for new work.
+The steps below record the earlier 3D-first proposal and must be adapted before build.
 
 1. Review this chapter map and the three detailed designs; reconcile the time allowance
    against the remaining semester before scheduling dates.

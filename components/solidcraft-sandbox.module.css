@@ -36,3 +36,65 @@
 .engine { position:relative; flex:1; min-height:0; display:flex; }
 .policyCover { position:absolute; inset:0 0 210px; z-index:20; display:grid; place-items:center; padding:20px; background:var(--card); color:var(--text); font-size:13px; text-align:center; }
 @media (max-width:760px) { .studio { height:auto; } .lessonWorkspace { flex:none; height:auto; min-height:0; } }
+
+.nativeStudio { display:flex; flex-direction:column; width:100%; height:100%; min-height:0; }
+.nativeEngine { position:relative; flex:1; min-height:500px; border:1px solid var(--border); border-radius:6px; overflow:hidden; }
+.nativeEngine iframe { width:100%; height:100%; border:0; display:block; }
+.nativeCover { position:absolute; inset:0; z-index:20; display:grid; place-items:center; background:var(--card); padding:24px; text-align:center; }
+.nativePaused { position:absolute; bottom:12px; left:12px; right:12px; padding:10px; border:1px solid var(--border); border-radius:4px; background:var(--card); font-size:13px; pointer-events:none; }
+.nativeFeedback { margin-top:8px; border:1px solid var(--border); border-radius:6px; padding:10px; max-height:230px; overflow:auto; font-size:13px; }
+.nativeFeedback summary { cursor:pointer; }
+.nativeFeedback p { margin:8px 0; }
+.nativeFeedback button { padding:6px 10px; border:1px solid var(--border); background:var(--card); color:var(--text); border-radius:4px; }
+.cadProject { display:flex;flex-direction:column;width:100%;height:100%;min-height:0; }
+.cadViews { display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:8px 0; }
+.cadViews strong { font-size:14px; }
+.cadViews > span { font-size:12px;color:var(--c-meta); }
+.cadViews div { display:flex;gap:6px; }
+.cadViews button { background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:6px 10px;cursor:pointer; }
+.cadViews button[aria-pressed=true] { background:var(--brand);color:var(--on-brand);border-color:var(--brand); }
+.sketchToPart { display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px; }
+.sketchToPart label { display:flex;align-items:center;gap:6px; }
+.sketchToPart input { width:100px;padding:5px 7px;border:1px solid var(--border);border-radius:4px;background:var(--card);color:var(--text); }
+.sketchToPart details { position:relative; }
+.sketchToPart summary { cursor:pointer; }
+.sketchToPart details[open] label { position:absolute;z-index:30;top:24px;padding:10px;background:var(--card);border:1px solid var(--border);border-radius:4px; }
+.sketchToPart > span { color:var(--c-meta); }
+.codeFiles { display:flex;gap:4px; }
+.codeFiles button { border:1px solid var(--border);border-radius:4px;background:var(--card);color:var(--text);padding:3px 7px;cursor:pointer; }
+.codeFiles button[aria-pressed=true] { background:var(--brand);color:var(--on-brand);border-color:var(--brand); }
+
+.cadViews .finishSketch { background:var(--brand);color:var(--on-brand);border-color:var(--brand); }
+.cadViews button:disabled { opacity:.55;cursor:default; }
+/* SolidCraft CAD as code: files on the left, the SolidCraft web app on the right. */
+.codeStudio { display:flex; flex-direction:column; height:100%; min-height:0; width:100%; }
+.codeStudio .workspace { height:calc(100dvh - 230px); }
+.toolsSwitch { display:flex; align-items:center; gap:6px; font-size:12px; }
+.codeError { margin:6px 0; padding:6px 10px; border:1px solid var(--c-orange, #d97706); border-radius:6px; font-size:12px; white-space:pre-wrap; }
+.errorAt { margin-right:8px; padding:1px 6px; font:inherit; font-weight:600; background:var(--card); color:var(--text); border:1px solid var(--border); border-radius:4px; cursor:pointer; }
+.cadFiles { border-bottom:1px solid var(--border); padding:6px 8px; display:flex; flex-direction:column; gap:6px; font-size:12px; }
+.fileList { display:flex; flex-wrap:wrap; gap:4px; }
+.fileTab { padding:3px 8px; font:inherit; font-family:var(--font-mono, monospace); background:var(--card); color:var(--text); border:1px solid var(--border); border-radius:4px; cursor:pointer; }
+.fileTab[aria-selected=true] { background:var(--brand); color:var(--on-brand); border-color:var(--brand); }
+.fileActions { display:flex; flex-wrap:wrap; gap:4px; }
+.fileActions button, .fileForm button { padding:2px 8px; font:inherit; background:var(--card); color:var(--text); border:1px solid var(--border); border-radius:4px; cursor:pointer; }
+.fileActions button:disabled { opacity:.5; cursor:default; }
+.fileForm { display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+.fileForm label { display:flex; align-items:center; gap:6px; }
+.fileForm input { width:160px; padding:3px 6px; border:1px solid var(--border); border-radius:4px; background:var(--card); color:var(--text); font-family:var(--font-mono, monospace); }
+.codeConsole { margin:0; max-height:96px; overflow:auto; padding:6px 10px; border-top:1px solid var(--border); font-size:11px; color:var(--c-meta); white-space:pre-wrap; }
+.scBox { position:relative; flex:1; min-height:0; overflow:hidden; background:#111; }
+.scBox iframe { position:absolute; left:0; width:100%; border:0; display:block; }
+.scCover { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgb(0 0 0 / .35); color:#fff; font-size:13px; pointer-events:none; }
+.pickBar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:0 0 6px; font-size:12px; color:var(--c-meta); }
+.pickBar b { color:var(--text); }
+.pickBar code { font-family:var(--font-mono, monospace); color:var(--text); background:var(--card); border:1px solid var(--border); border-radius:4px; padding:0 5px; }
+.pickBar button { padding:2px 8px; font:inherit; background:var(--card); color:var(--text); border:1px solid var(--border); border-radius:4px; cursor:pointer; }
+.pickNote { color:var(--c-green, #16a34a); }
+.scLabels { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+.faceLabel, .planeLabel { position:absolute; transform:translate(-50%, -50%); pointer-events:auto; padding:1px 6px; font:11px/1.5 var(--font-mono, monospace); border-radius:10px; cursor:pointer; white-space:nowrap; }
+.faceLabel { background:rgb(15 23 42 / .82); color:#e2e8f0; border:1px solid rgb(148 163 184 / .6); }
+.planeLabel { background:rgb(30 64 175 / .82); color:#dbeafe; border:1px solid rgb(147 197 253 / .7); }
+.faceLabel:hover, .planeLabel:hover { background:var(--brand); color:var(--on-brand); }
+.toolNote { margin:6px 0; padding:6px 10px; border:1px solid var(--c-green, #16a34a); border-radius:6px; font-size:12px; }
+.refusal { margin:0 0 4px; }

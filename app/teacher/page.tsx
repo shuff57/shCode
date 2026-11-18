@@ -198,6 +198,7 @@ function MiniBar({ pct }: { pct: number }) {
 
 interface LessonMeta {
   cadHost?: 'solidcraft';
+  cadScope?: 'sketch';
   id: string;
   title: string;
   unit: string | null;
@@ -3614,7 +3615,7 @@ function DetailView({ classId, initialTab, initialFilter }: { classId: string; i
             classId={classId}
             lessons={[...lessonMap.values()]
               .filter((l) => l.preview === 'reshape')
-              .map((l) => ({ id: l.id, title: l.title, cadHost: l.cadHost }))}
+              .map((l) => ({ id: l.id, title: l.title, cadHost: l.cadHost, cadScope: l.cadScope }))}
           />
                 </div>
       )}

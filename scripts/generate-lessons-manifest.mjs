@@ -89,6 +89,7 @@ const results = await Promise.all(
       unit: meta.unit ?? null,
       preview: meta.preview ?? null,
       ...(meta.cadHost ? { cadHost: meta.cadHost } : {}),
+      ...(meta.cadScope ? { cadScope: meta.cadScope } : {}),
       // type decides the route prefix (/assignment vs /lesson). Client-side
       // navigation has no other way to know it -- see lib/lesson-href.ts.
       type: meta.type ?? 'lesson',

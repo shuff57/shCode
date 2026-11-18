@@ -1,0 +1,113 @@
+# Code-first CAD on reSHape Script (2026-11-17)
+
+The code-first CAD workspace (`/sandbox/cad/`, `components/SolidCraftCodeStudio.tsx`) runs the student's
+files as reSHape Script through the guarded host page (`vendor/solidcraft-preview`, from reshape-cad's
+`packages/solidcraft-host`). Nothing reaches SolidCraft except through that path, so a step the engine
+cannot build correctly is refused in a sentence beside what did build. The earlier "CAD words" layer,
+which sent commands straight to SolidCraft with no guard, is retired.
+
+## How a Run goes
+
+1. `bundleProject()` (`lib/solidcraft-code.ts`) joins the files script.js imports into one script. Each
+   imported file becomes a function returning its exports; every file keeps its own line numbers, and
+   `locations` maps lines back to files.
+2. The host's opaque runner evaluates it (`__host.evaluate`). A script error is shown with its file and line.
+3. The same runner evaluates it once more with a closing line that reports which variable holds which part
+   (`withVariableProbe`): the guarded build names a part `b_<step>` (b_pull1), a sketch `sk_<step>_0`.
+   Nothing is built by this run. The labels, picks and lists name parts by these variables.
+4. `__host.setScript` + `__host.runUnconfirmed()`: the guarded build. Refused steps are listed above the code.
+
+## Run builds only what changed
+
+The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's vendored copy only (`vendor/solidcraft-preview/pane/pane.js` `memoForRun`, `src/reply-memory.mjs` `size`); `inc=on` is reshape-cad's existing switch.
+
+- **What it does.** The host's memory of engine replies is kept from one Run to the next.
+  - Every step is still translated and every guard still runs.
+  - Only command lists the engine has not answered before reach the engine, run on top of what SolidCraft holds.
+- **Why it is safe.**
+  - A reply depends on its command list alone, so memory never answers a list it has not seen.
+  - What SolidCraft holds is trusted only if its document revision is unchanged since the last Run and the engine has not stopped. Anything else drops it: SolidCraft's tools, undo, a reload, or a Run that did not finish.
+  - The final rebuild of the view is never answered from memory. It is skipped only when a fresh reading of SolidCraft matches.
+- **Measured on the host page** (the same 3 scripts with the default settings, then with `keep=on`):
+
+  | Run | Default | `keep=on` |
+  |---|---|---|
+  | add a round | 880 ms, 6 engine runs | 648 ms, 2 engine runs |
+  | add a pocket | 3263 ms, 10 engine runs | 2500 ms, 4 engine runs |
+  | same code again | 3177 ms, 10 engine runs | 457 ms, 0 engine runs |
+
+  The volumes are identical to the last digit.
+- **What the status line says.** It gives the time of each Run, and adds "only the changed steps rebuilt" or "nothing new to build".
+- reshape-cad's own pane still keeps its memory for one run only. Bringing `keep=on` there is the owner's call.
+
+## The words, then and now
+
+| Was (CAD words, unguarded) | Now (reSHape Script) |
+|---|---|
+| `sketch('XY' / 'XZ' / 'YZ')` | `sketch('top' / 'front' / 'side')` |
+| `sketch(part.face('top'))` | `sketch('top', 10)`: the plane through the face (click or list fills it) |
+| `sk.rectangle([x0,y0],[x1,y1])`, `sk.line`, `sk.arc(a, through, b)` | same rectangle and line; `sk.arc(centre, from, to, 'ccw')`; `sk.lines([...])` |
+| `sk.circle([x,y], r)` | `sk.circle([x,y], { r })` |
+| `extrude(sk, h, { direction })` | `extrude(sk, h, { reversed, midplane })` |
+| `cut(sk, depth)` (a pocket) | `pocket(sk, part, depth)` / `{ through: true }`; reSHape's `cut` is subtract |
+| `cuboid(l, w, h)` at the origin corner | `cuboid(w, d, h, { at })` centred on `at` |
+| `cylinder(r, h)`, `sphere(r)`, `cone(r, h, { topRadius })` | `cylinder(d, h)`, `sphere(d)`, `cone(d, h)` (pointed only), by diameter, centred |
+| `shell(part, t, { open: part.face('top') })` | `shell(part, { wall: t, open: 'top' })` |
+| `hole(face, { diameter, depth })` | `hole(part, { across, deep, at: [u, v], along: 'z' })` |
+| `mirror(part, 'YZ')` | `mirror(part, 'left-right')` |
+| `linearPattern(part, dir, n, s)` / `polarPattern(part, 'Z', n)` | `linearPattern(part, { count, step })` / `polarPattern(part, { count })` |
+| `translate`, `rotate` | `move`, `turn` |
+| `part.edges('top')`, `faceAt`, `edgeAt`, `body('Body1')`, `command(...)` | none (see gaps) |
+
+## Gaps (each needs an owner decision; none is built around)
+
+1. **Official names for move and turn.** reSHape's VOCABULARY has `move`/`turn`, not `translate`/`rotate`.
+   Adding them touches VOCABULARY (AGENTS.md: editing it rejects the slice).
+2. **Sentences use reSHape's own step names.** A refusal says "round1 (hollow)" when the code says
+   `fillet`/`shell`; an error says "hollow does not know the face". The wording is the owner's.
+3. **Done 2026-11-17: the lists leave out edges reSHape would refuse.** After each Run the studio asks reSHape for its
+   name for every labelled edge (one evaluation, nothing built: `withEdgeNameProbe`). The host page's own resolver then
+   checks each name against the design that Run built (`__host.checkNames` in the vendored `pane.js`, with `resolveAfter`
+   and the G-STALE preflight `staleConsumers`). It answers only from that Run's kept engine replies, or by reading the part
+   SolidCraft holds when its document is unchanged; nothing is run. An edge it cannot answer for stays in the list.
+   - Two rules come out of this. A round needs its edge to be whole on the part as built: a round on top/front shortens
+     top/left. And no round is allowed on a part that a pocket has cut, unless the pocket's result is kept under a name.
+   - The starter has a pocket, so its `fillet(part.edge(` list is empty: the build refuses every one of them.
+   - Clicking an edge in the view still fills it in, and the build still refuses it with its sentence.
+   - Checked against real builds (`/tmp/cad-drive/edges-e2e.py`, 4 scripts × 12 box edges): every listed edge is rounded
+     by the build, and every edge the build takes is listed.
+4. **Sketch on a face object** (`sketch(part.face('top'))`) is not in reSHape; the plane form
+   (`'top', 10`) covers flat faces square to an axis only.
+5. **No unnamed faces or edges** (`faceAt`/`edgeAt`), **no `edges(face)`**, **no frustum cone**.
+6. **`revolve` takes one plain `rect()`** sketch: a friendly `rectangle()` is refused.
+7. **Tools → code, 2026-11-17.** Now written:
+   - **The Hole tool:** plain holes along X, Y or Z, as `hole(part, { across, deep, at, along })`. `at` is measured from
+     the centre of the part's box; a blind hole only from the face at the high end of its axis.
+   - **A turn about X, Y or Z through the origin:** `turn(part, [..])` followed by the `move` that makes up for reSHape
+     turning about the centre of the part's box.
+   - **Patterns in two directions:** two `linearPattern` calls.
+   - **Cuts both ways:** `pocket(…, { midplane: true })`; both programs measure the total depth.
+   - **Sketches on slanted planes:** `sketch({ origin, u, v })`.
+
+   Still not written:
+   - **Copies:** the guarded build refuses `move(…, { copy: true })` ("a copying move is not mapped").
+   - Counterbore and countersink holes, a blind hole from below, a move and a turn at once, and turns about other axes.
+   - A hole or turn made in the same go as another step, because its place is measured from the part before both.
+
+   After writing, the part is rebuilt from the code and compared by volume and box, as before. It is now also compared by
+   every flat face's area and centre and by the curved faces' total area, so a hole in the wrong place or a part turned
+   the wrong way is reported, not passed. Round trips: `/tmp/cad-drive/tools2-e2e.py` (9 of 9 the same part).
+8. **Done 2026-11-17: a refused step points at its line.** The line is found by evaluating the script cut short after each
+   top-level statement of script.js until the step appears (`stepLines`; interpreter only, nothing built). A step made in
+   an imported class goes on the script.js line that called it. The refusal shows "script.js line N" as a link, and the
+   line is marked in the editor with the sentence as its tooltip; the mark follows edits until the next Run.
+9. SolidCraft shows its own "autosave" toast inside the frame (storage is off in the host page).
+
+## Checked
+
+- Unit: `scripts/test-solidcraft-code.mjs` (files, joining with lines kept, the variable probe, lists,
+  picks), `scripts/test-solidcraft-ui-to-code.mjs` (planes from SolidCraft's frames, sketches, features, refusals).
+- Browser, on the guarded host:
+  - **Words, labels, fill and lists (16 checks).** The starter builds at the hand-worked volume. Labels and the plane names show; a face fills `sketch()` as its plane; an edge fills `fillet()`. The list highlight selects in the view. A filled-in round builds at its volume. Refusals are shown beside the code: an edge changed by a pocket, and a round too big for its face. An imported class builds, an error in it names its file and line, and nothing is sent to the server.
+  - **Tools to code (10 checks).** Each of these is rewritten as reSHape Script and rebuilt to the same part: a round, a sketch on the top face, a pocket, and a sketch on SolidCraft's XZ plane extruded to the front. A copy-move is explained, with Undo.
+  - **Known engine defects through the same path.** Shell family C is refused by the hollow check, and an outline open by 1e-5 mm is refused as an open outline.

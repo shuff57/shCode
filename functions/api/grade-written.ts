@@ -1,3 +1,4 @@
+import { cadFeedbackResponse } from '../../lib/cad-feedback';
 // POST /api/grade-written — grades a written answer or a plain-English lab
 // with an AI model. Runs on Cloudflare Pages Functions, not in the static Next
 // bundle, so no key ever reaches the browser.
@@ -289,6 +290,12 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
     );
   }
 
+  let cadSnapshot: {artifactId:string;response:string} | null = null;
+  if (config.cadFeedback) {
+    try { cadSnapshot = await cadFeedbackResponse(body.cadEvidence, config.cadRequirements ?? []); }
+    catch (e) { return json({ok:false,error:e instanceof Error ? e.message : 'Invalid sketch evidence.'},422); }
+  } else if (body.cadEvidence !== undefined) return json({ok:false,error:'This lesson does not accept CAD feedback.'},422);
+
   // ----- Tries (capped Performance Assessment parts only) -----
   //
   // On a capped, AI-graded part THIS route spends the try: it records the counted
@@ -303,7 +310,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   // review queue because those read enrolled students only. A student who needs a clean slate
   // is given one by a teacher (POST /api/classes/[id]/tries-reset), not by unsubmit.
   const cap = capFor(body.lessonId);
-  const capped = cap !== undefined && kindFor(body.lessonId) === 'ai';
+  const capped = !config.cadFeedback && cap !== undefined && kindFor(body.lessonId) === 'ai';
   const tryCap = cap === undefined ? undefined : effectiveCap(cap, data.role);
   // Display-only copy of what was drawn, kept with the counted row for the teacher's view.
   //
@@ -317,7 +324,7 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   // is not even structurally legal, or that arrives without its drawing, costs nothing.
   const { ruleItems, aiItems } = splitRubric(config.rubric);
   const hybrid = ruleItems.length > 0;
-  let response = body.response;
+  let response = cadSnapshot?.response ?? body.response;
   let det: DiagramScore | null = null;
   if (hybrid) {
     const doc = sanitizeDiagramDoc((body as { artifact?: { doc?: unknown } }).artifact?.doc);
@@ -494,10 +501,11 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
     contextDocs: config.contextDocs,
     strict: config.strict,
     wordingOnly: hybrid,
+    cadFeedback: config.cadFeedback,
   });
   // One place that turns the model's JSON into the grade the student gets, shared by both paths.
   const finish = (parsed: unknown) => {
-    if (!hybrid) return { ...shapeResult(parsed, config.rubric), grader: requested, graderModel: model };
+    if (!hybrid) return { ...shapeResult(parsed, config.rubric), grader: requested, graderModel: model, ...(cadSnapshot ? {feedbackOnly:true,artifactId:cadSnapshot.artifactId} : {}) };
     const ai = shapeResult(parsed, aiItems);
     return { ...mergeGrade(det as DiagramScore, ai, aiItems), grader: requested, graderModel: model };
   };

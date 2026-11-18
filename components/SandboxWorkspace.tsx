@@ -23,7 +23,7 @@ import TextureEditor from './TextureEditor';
 import FontMaker from './FontMaker';
 import SoundMixer from './SoundMixer';
 import ClassLibraryPanel from './ClassLibraryPanel';
-import DocsDrawer from './DocsDrawer';
+import SolidCraftHelp from './SolidCraftHelp';
 import PublishGameButton from './PublishGameButton';
 import ProposeChangeButton from './ProposeChangeButton';
 import CodeTogetherBar, { useCodeTogetherAvailable } from './CodeTogetherBar';
@@ -33,22 +33,18 @@ import SendProgramButton from './SendProgramButton';
 import P5playConvertButton from './P5playConvertButton';
 import { projectLessonId } from '../lib/sandbox-projects-core';
 import { RUN_TIMEOUT_MS, errorWithLocation, runStudentCode, timerLimitMessage } from '../lib/js-runner-source';
-import {
-  NO_TEACHER_MODES,
-  canUseBuild,
-  canUseCode,
-  resolveMode,
-  whyLocked,
-  type TeacherModes,
-} from '../lib/lesson-mode';
+import type { TeacherModes } from '../lib/lesson-mode';
+import { sandboxCadPolicy } from '../lib/solidcraft-policy';
 import EditorPlaceholder from './diagram/EditorPlaceholder';
 import { emptyDiagram, type DiagramDoc } from '../lib/diagram-types';
-import { getMode, sandboxLesson } from '../lib/sandbox-modes';
+import { getMode, sandboxLesson, type SandboxModeId } from '../lib/sandbox-modes';
+import { isCodeCadProject } from '../lib/solidcraft-code';
 
-// The B-rep kernel + three.js viewport are heavy; a plain JS or moSHion
-// sandbox session should never pay for them. Same dynamic-import pattern
-// DiagramAssignmentView uses for DiagramEditor.
-const ReshapeStudio = dynamic(() => import('./reshape/ReshapeStudio'), { ssr: false });
+// SolidCraft loads only for CAD projects; JS and moSHion keep their own
+// workspaces. The retired CAD studio is no longer part of this surface.
+const SolidCraftProject = dynamic(() => import('./SolidCraftProject'), { ssr: false });
+const SolidCraftCodeStudio = dynamic(() => import('./SolidCraftCodeStudio'), { ssr: false });
+const DocsDrawer = dynamic(() => import('./DocsDrawer'), { ssr: false });
 // Same lazy chunk the lesson diagrams use; React Flow stays out of the other modes.
 const DiagramEditor = dynamic(() => import('./diagram/DiagramEditor'), {
   ssr: false,
@@ -70,13 +66,6 @@ function parseChart(text: string | undefined): DiagramDoc {
   return emptyDiagram();
 }
 
-// Which side (Build/Code) reSHape opens on. Read once at page load and
-// handed to ReshapeStudio as `startSide` -- the studio owns the toggle
-// itself from then on (see its own file header), so this is a
-// load-time default, not a live mirror of whatever side the student is
-// currently on.
-const BUILD_KEY = 'shCode:sandbox-reshape-build';
-
 // The plain outlined chip the Reset and Full screen buttons both wear. Snug
 // enough that the whole toolbar, Stop included, is one row at 1366 wide.
 const chipStyle: React.CSSProperties = {
@@ -97,8 +86,12 @@ interface LogLine {
   message: string;
 }
 
-export default function SandboxWorkspace() {
+export default function SandboxWorkspace({ initialMode }: { initialMode?: SandboxModeId } = {}) {
   const setLesson = useLessonStore((s) => s.setLesson);
+  const activeLessonId = useLessonStore((s) => s.lesson?.id);
+  const selectFile = useLessonStore((s) => s.selectFile);
+  const cadFlush = useRef<(() => Promise<boolean>) | null>(null);
+  const cadSaved = useRef<(() => Promise<void>) | null>(null);
   const fileContents = useLessonStore((s) => s.fileContents);
   const updateFile = useLessonStore((s) => s.updateFile);
   const resetLesson = useLessonStore((s) => s.resetLesson);
@@ -126,6 +119,7 @@ export default function SandboxWorkspace() {
   // Uploading by itself (lib/outbox.ts): its words replace the state line beside Save.
   const upload = useUploadStatus(lesson.id, lessonProgress.authed);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [capturing,setCapturing]=useState(false);
 
   // Code together (REALTIME-SPEC.md Part 2): the JavaScript and moSHion modes
   // only, for a student signed in and in a class. The toolbar button opens its
@@ -224,36 +218,23 @@ export default function SandboxWorkspace() {
     if (el && outputPinned.current) el.scrollTop = el.scrollHeight;
   }, [logs]);
 
-  // reSHape's own load-time default side -- see BUILD_KEY's comment above.
-  const [build, setBuild] = useState(true);
-  // The studio's CURRENT side, live -- reported back through onSideChange
-  // (unlike `build` above, which only ever seeds `startSide`). Drives the
-  // header/mode-tabs hide-in-Build chrome, which needs to know the real
-  // side, not just what it started on.
-  const [reshapeSide, setReshapeSide] = useState<'build' | 'code'>('build');
-  // Bumped on Reset to force ReshapeStudio to remount: it only hydrates its
-  // model from `value` once, at mount (see its own file header), so writing
-  // the starter back into fileContents while it stays mounted would leave
-  // the OLD model on screen next to the NEW starter text.
   const [reshapeResetKey, setReshapeResetKey] = useState(0);
-
-  // WHICH GEOMETRY ENGINE DRAWS reSHape. The B-rep kernel, always -- operator
-  // decision 2026-09-03, after the Chili3D gauntlet and the B-rep-default
-  // loop: oracle 134/134, three student lenses through the Build tools
-  // twice. The JSCAD runner and its ?engine=jscad / ?script=0 escape hatches
-  // are gone (CLAUDE.md's "JSCAD is retired" section).
-
-  // What the student's teachers have set. A failed or missing fetch resolves to
-  // 'both', so a gate that cannot be read never locks anyone out of their work.
-  const [teacherModes, setTeacherModes] = useState<TeacherModes>(NO_TEACHER_MODES);
-  useEffect(() => {
-    let live = true;
-    fetch('/api/my-lesson-modes')
-      .then((r) => (r.ok ? r.json() : NO_TEACHER_MODES))
-      .then((m) => { if (live) setTeacherModes(m ?? NO_TEACHER_MODES); })
-      .catch(() => { /* no gate readable, so no gate applied */ });
-    return () => { live = false; };
-  }, []);
+  const [teacherModes, setTeacherModes] = useState<TeacherModes|null>(null);
+  const [authorTools,setAuthorTools]=useState(false);
+  const cadAuthor=lessonProgress.role==='teacher'||lessonProgress.role==='admin';
+  const [cadPolicyLoaded,setCadPolicyLoaded]=useState(false);
+  const [cadPolicyError,setCadPolicyError]=useState(false);
+  useEffect(()=>{
+    const abort=new AbortController();let pending=false;
+    const read=async()=>{
+      if(pending||abort.signal.aborted)return;pending=true;
+      try {const r=await fetch('/api/my-lesson-modes',{signal:abort.signal});if(!r.ok)throw new Error();const modes=await r.json();if(!modes||!modes.lessons||typeof modes.lessons!=='object')throw new Error();if(!abort.signal.aborted){setTeacherModes(modes);setCadPolicyError(false);}}
+      catch {if(!abort.signal.aborted){setTeacherModes(null);setCadPolicyError(true);}}
+      finally {pending=false;if(!abort.signal.aborted)setCadPolicyLoaded(true);}
+    };
+    void read();const timer=setInterval(()=>void read(),5000);window.addEventListener('focus',read);
+    return()=>{abort.abort();clearInterval(timer);window.removeEventListener('focus',read);};
+  },[]);
 
   // Full screen puts the preview edge to edge and floats the editor over it,
   // so a shape can be built and then looked at without the editor in the way.
@@ -266,15 +247,6 @@ export default function SandboxWorkspace() {
   const runRef = useRef<{ kill: () => void } | null>(null);
 
   useEffect(() => () => { runRef.current?.kill(); }, []);
-
-  // Read in an effect rather than useState's initialiser so the server and
-  // client markup stay identical, which a static export needs.
-  useEffect(() => {
-    try {
-      const b = window.localStorage.getItem(BUILD_KEY);
-      if (b === '0') setBuild(false);
-    } catch { /* private mode */ }
-  }, []);
 
   // Each project is its own lesson id, so the store keeps independent drafts
   // and switching back finds your code where you left it. A switch stops the
@@ -289,6 +261,16 @@ export default function SandboxWorkspace() {
     setLogs([]);
     setTogetherOpen(false);
   }, [lesson, setLesson]);
+
+  const enteredMode=useRef(false);
+  useEffect(()=>{
+    if(!initialMode||!projectsState.loaded||enteredMode.current)return;
+    enteredMode.current=true;
+    if(project?.mode===initialMode)return;
+    const previous=projectsState.projects.find(p=>p.mode===initialMode);
+    if(previous)openProject(previous);
+    else void createProject(initialMode,getMode(initialMode).label+' project').then(r=>{if(!r.ok)window.alert(r.error);});
+  },[initialMode,projectsState.loaded,projectsState.projects,project?.mode]);
 
   // Keep the draft. Nothing else in the sandbox writes it, so without this a
   // reload dropped the student's code or chart back to the starter. Debounced
@@ -389,8 +371,7 @@ export default function SandboxWorkspace() {
     return now === '' || now === norm(mode.starter);
   }, [getScript, mode.starter]);
 
-  // js/moSHion only -- reSHape's Run lives inside ReshapeStudio now (it owns
-  // its own script.js -> iframe handoff, see that component's file header).
+  // CAD owns its editor and Run; this runner is for JS/moSHion only.
   const run = useCallback(() => {
     const script = fileContents['script.js'] || '';
     if (mode.preview === 'console') {
@@ -412,33 +393,43 @@ export default function SandboxWorkspace() {
     setIsRunning(false);
   }
 
-  function reset() {
-    if (window.confirm(isFlow ? 'Clear the chart and start over? This cannot be undone.' : 'Reset code to the starter? Unsaved work will be lost.')) {
+  async function reset() {
+    if (window.confirm(isFlow ? 'Clear the chart and start over? This cannot be undone.' : mode.preview==='reshape' ? 'Reset both CAD scripts to their starters? Your current project will be kept in History.' : 'Reset code to the starter? Unsaved work will be lost.')) {
+      if(!await beforeLeave()){window.alert('Your current work could not be saved. Keep this page open and try again.');return;}
       // resetLesson also wipes the saved draft; setLesson would load it back.
       // The code it replaces is put in History first; if it cannot be, nothing is reset.
       if (!resetLesson(lesson)) { window.alert(NOT_KEPT_TEXT); return; }
       stopRun();
       setLogs([]);
-      // ReshapeStudio's own "Clear model" button (inside its Build toolbar)
-      // wipes just the model, independent of this -- this resets the SAVED
-      // TEXT to the starter, so the studio needs a fresh mount to pick it up.
+      // Reopen CAD from the restored project files.
       if (mode.preview === 'reshape') setReshapeResetKey((k) => k + 1);
     }
   }
 
   // LessonWorkspace's Save handler in miniature: keep a copy on this device
   // even if the cloud write fails, then let lesson-sync merge and save.
-  function saveToCloud() {
-    addLocalSnapshot(lesson.id, useLessonStore.getState().fileContents, 'Saved on this device');
-    void cloud.save();
+  async function beforeLeave():Promise<boolean> {
+    if(mode.preview==='reshape'&&cadFlush.current&&!await cadFlush.current())return false;
+    const st=useLessonStore.getState();
+    if(st.lesson?.id!==lesson.id)return true;
+    const result=saveProgress(st.lesson.id,{fileContents:st.fileContents,commits:st.commits,lastCommittedFileContents:st.lastCommittedFileContents,completedSteps:[]});
+    if(result==='ok'){noteDraftSaved(st.lesson.id);try{await cadSaved.current?.();}catch{/* The durable project copy is already kept. */}}
+    return result==='ok';
+  }
+  async function saveToCloud() {
+    setCapturing(true);
+    try {
+      if(!await beforeLeave()){window.alert('Your current work could not be captured. Keep this page open and try Save again.');return;}
+      addLocalSnapshot(lesson.id, useLessonStore.getState().fileContents, 'Saved on this device');
+      await cloud.save();
+    } finally {setCapturing(false);}
   }
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key === 'Enter') {
         e.preventDefault();
-        // reSHape has its own Ctrl+Enter handling scoped to its Code side --
-        // see ReshapeStudio's own keydown effect.
+        // SolidCraft handles Ctrl/Command+Enter inside its own editor.
         if (mode.preview !== 'reshape' && mode.preview !== 'diagram') run();
       }
     };
@@ -601,7 +592,7 @@ export default function SandboxWorkspace() {
       key: 'docs',
       label: 'Docs',
       color: 'var(--c-purple)',
-      content: <DocsDrawer defaultSetId={mode.id} storageKey="shCode:sandbox-docs" />,
+      content: mode.preview==='reshape' ? <SolidCraftHelp words={isCodeCadProject(fileContents)}/> : <DocsDrawer defaultSetId={mode.id} storageKey="shCode:sandbox-docs" />,
       headerExtra: mode.docsHref ? (
         <a
           href={mode.docsHref}
@@ -618,30 +609,11 @@ export default function SandboxWorkspace() {
   const isConsole = mode.preview === 'console';
   const isReshape = mode.preview === 'reshape';
 
-  // The sandbox has no assignment, so only the class-wide gate can reach it.
-  // Per-assignment overrides apply in lessons, where a lesson id exists.
-  const gate = resolveMode('sandbox', teacherModes);
-  const mayBuild = canUseBuild(gate);
-  const mayCode = canUseCode(gate);
-  const lockNote = whyLocked(gate);
-  const reshapeSides = useMemo<('build' | 'code')[]>(() => {
-    const s: ('build' | 'code')[] = [];
-    if (mayBuild) s.push('build');
-    if (mayCode) s.push('code');
-    return s.length ? s : ['build', 'code'];
-  }, [mayBuild, mayCode]);
-  const reshapeIsBuild = isReshape && reshapeSide === 'build';
+  // A SolidCraft-command project has its own on/off switch for SolidCraft's tools; an author may always use them there.
+  const commandsCad=isReshape&&isCodeCadProject(fileContents);
+  const cad=sandboxCadPolicy(lessonProgress.role,authorTools||commandsCad,teacherModes);
+  const cadReason=cadAuthor?cad.reason:cadPolicyError?'Teacher settings could not be read. Hand tools stay off; your script is available.':cad.toolsAllowed?'Drawing tools are available. Mouse edits stay separate from your code.':'Work with code. Your teacher controls access to hand tools.';
 
-  // Reset and Full screen fold into ReshapeStudio's OWN toolbar row for
-  // reSHape (rather than a second row above it) so the ribbon reads as one
-  // strip, matching the pre-extraction sandbox the parity loop was judged
-  // against -- and the program-type tabs join them too, but only on the
-  // Code side; Build hides them the same way it always has (no room, and no
-  // reason to switch program type mid-model).
-  // History and Save ride in both toolbars: reSHape folds the sandbox's chrome
-  // into ReshapeStudio's own row, while every other mode has the normal one.
-  // What Save has done for the code on screen: always kept on this device (the local draft), and in the
-  // cloud once a Save in this visit succeeded and nothing has changed since.
   const contentKey = `${modeId}:${JSON.stringify(fileContents)}`;
   const [cloudKey, setCloudKey] = useState<string | null>(null);
   const wasSaving = useRef(false);
@@ -664,11 +636,11 @@ export default function SandboxWorkspace() {
             style={chipStyle}
             className="sandbox-save-btn"
             onClick={saveToCloud}
-            disabled={cloud.saving}
+            disabled={cloud.saving||capturing}
             title="Save this sandbox to the cloud so you can open it on another device."
           >
             <CloudUpload size={12} />
-            {cloud.saving ? 'Saving…' : 'Save'}
+            {cloud.saving||capturing ? 'Saving…' : 'Save'}
           </button>
           <span role="status" aria-live="polite" className="sandbox-save-note" data-kind={cloud.note?.kind ?? ''} hidden={!cloud.note}>
             {cloud.note ? `${cloud.note.kind === 'error' ? '✗' : '✓'} ${cloud.note.text}` : null}
@@ -688,7 +660,7 @@ export default function SandboxWorkspace() {
       )}
       <button
         style={chipStyle}
-        onClick={() => setHistoryOpen(true)}
+        onClick={async()=>{if(await beforeLeave())setHistoryOpen(true);}}
         title="Restore a version saved on this device or in the cloud"
       >
         <History size={12} />
@@ -696,26 +668,6 @@ export default function SandboxWorkspace() {
       </button>
     </>
   );
-
-  const reshapeToolbarExtra = isReshape ? (
-    <>
-      {!reshapeIsBuild && <SandboxProjectPicker state={projectsState} />}
-      {lockNote && <span className="sandbox-lock">{lockNote}</span>}
-      {renderCloudChips()}
-      <button style={chipStyle} onClick={reset}>
-        <RotateCcw size={12} />
-        Reset
-      </button>
-      <button
-        style={chipStyle}
-        onClick={toggleFull}
-        title={full ? 'Leave full screen (Esc)' : 'Fill the screen with the preview'}
-      >
-        {full ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
-        {full ? 'Exit full screen' : 'Full screen'}
-      </button>
-    </>
-  ) : null;
 
   // The two sides of the sandbox's split (components/EditorPreviewSplit.tsx).
   const editorSlot = (
@@ -798,23 +750,21 @@ export default function SandboxWorkspace() {
         }
         ref={shellRef}
       >
-        {!reshapeIsBuild && (
-          <div className="sandbox-header">
+        <div className="sandbox-header">
             <h1 className="sandbox-title">Sandbox</h1>
             <span className="sandbox-subtitle">{mode.blurb}</span>
-          </div>
-        )}
+        </div>
 
         {lessonProgress.authed && <TwoVersionsNotice lessonId={lesson.id} status={upload} />}
-        {!isReshape && (
-          <div className="run-toolbar sandbox-toolbar">
+        <div className="run-toolbar sandbox-toolbar">
             <SandboxProjectPicker
               state={projectsState}
               locked={together}
               lockedTitle="Leave Code together to switch projects"
               startOpen={noProjects}
+              beforeChange={beforeLeave}
             />
-            {!isFlow && !noProjects && <button className="btn-run" onClick={run} title="Run (Ctrl+Enter)" aria-keyshortcuts="Control+Enter">▶ Run</button>}
+            {!isFlow && !isReshape && !noProjects && <button className="btn-run" onClick={run} title="Run (Ctrl+Enter)" aria-keyshortcuts="Control+Enter">▶ Run</button>}
             {isRunning && !isFlow && (
               <button
                 className="btn-secondary btn-sm"
@@ -828,6 +778,7 @@ export default function SandboxWorkspace() {
                 view, then sharing with classmates (Code together, Publish game) at the far right. */}
             {!noProjects && <div className="sandbox-tb-end">
               <div className="sandbox-tb-group sandbox-tb-program" role="group" aria-label="This program">
+                {isReshape&&cadAuthor&&!commandsCad&&<label style={{display:"flex",alignItems:"center",gap:6,fontSize:12}}><input type="checkbox" checked={authorTools} onChange={e=>setAuthorTools(e.target.checked)}/> Drawing tools</label>}
                 {renderCloudChips()}
                 {/* Paste a p5play program, an AI rebuilds it as a NEW moSHion project (functions/api/p5play-convert.ts). */}
                 {mode.preview === 'moshion' && lessonProgress.authed && !together && (
@@ -949,8 +900,7 @@ export default function SandboxWorkspace() {
                 </div>
               )}
             </div>}
-          </div>
-        )}
+        </div>
 
         {noProjects && (
           <div className="sandbox-empty" role="status">
@@ -963,27 +913,32 @@ export default function SandboxWorkspace() {
           {!noProjects && (
             <CodeWorkspace
               fill={full}
-              consoleResetKey={!isConsole && !reshapeIsBuild && !isFlow ? String(consoleResetKey) : undefined}
+              consoleResetKey={!isConsole && !isReshape && !isFlow ? String(consoleResetKey) : undefined}
+              style={isReshape ? { '--workspace-height': '800px' } as React.CSSProperties : undefined}
             >
               <EditorPreviewSplit className="sandbox-split" previewRef={gamePaneRef} editor={editorSlot} preview={previewSlot}>
-                {isReshape ? (
-                  <ReshapeStudio
-                    key={`${lesson.id}-${reshapeResetKey}`}
-                    value={fileContents['script.js'] ?? ''}
-                    onChange={(t) => updateFile('script.js', t)}
-                    sides={reshapeSides}
-                    startSide={build ? 'build' : 'code'}
-                    onSideChange={setReshapeSide}
-                    toolbarExtra={reshapeToolbarExtra}
-                    // The sandbox's `value` on a fresh session is RESHAPE_STARTER
-                    // (a Code-side teaching example, box+hole already in it), not
-                    // saved progress -- auto-adopting it into Build pre-built a
-                    // model before the student touched a tool. See this prop's
-                    // own doc comment.
-                    autoRunOnMount={false}
-                    lessonId="sandbox"
+                {isReshape ? activeLessonId===lesson.id ? isCodeCadProject(fileContents) ? (
+                  // A project whose code is SolidCraft commands: the SolidCraft web app beside its files.
+                  <SolidCraftCodeStudio
+                    key={`${lesson.id}-${reshapeResetKey}`} lessonId={lesson.id} files={fileContents}
+                    toolsAllowed={(cadAuthor||!cadPolicyError&&cadPolicyLoaded)&&cad.toolsAllowed} policyLoaded={cadAuthor||cadPolicyLoaded} policyReason={cadReason}
+                    onFileChange={(path,text)=>{if(useLessonStore.getState().lesson?.id===lesson.id)updateFile(path,text);}}
+                    onFileRemove={path=>{if(useLessonStore.getState().lesson?.id===lesson.id)useLessonStore.getState().removeFile(path);}}
+                    onFileRename={(from,to)=>{if(useLessonStore.getState().lesson?.id===lesson.id)useLessonStore.getState().moveFile(from,to);}}
+                    onSelectSource={selectFile}
+                    onBeforeBuild={label=>keepInHistory(lesson.id,useLessonStore.getState().fileContents,label??'Before changing the CAD files')}
                   />
-                ) : isFlow && chart ? (
+                ) : (
+                  <SolidCraftProject
+                    key={`${lesson.id}-${reshapeResetKey}`} lessonId={lesson.id} files={fileContents}
+                    toolsAllowed={(cadAuthor||!cadPolicyError&&cadPolicyLoaded)&&cad.toolsAllowed} policyLoaded={cadAuthor||cadPolicyLoaded} policyReason={cadReason}
+                    onFileChange={(path,text)=>{if(useLessonStore.getState().lesson?.id===lesson.id)updateFile(path,text);}}
+                    onBeforeChange={beforeLeave}
+                    onBeforeBuild={label=>keepInHistory(lesson.id,useLessonStore.getState().fileContents,label??'Before running the 2D script')}
+                    onBeforeLink={()=>keepInHistory(lesson.id,useLessonStore.getState().fileContents,'Before changing sketch and 3D steps')}
+                    onSelectSource={selectFile} onFlushReady={flush=>{cadFlush.current=flush;}} onPersistReady={saved=>{cadSaved.current=saved;}} onSave={()=>void saveToCloud()}
+                  />
+                ) : <p role="status">Opening your CAD project…</p> : isFlow && chart ? (
                   <div className="sandbox-flow" ref={flowFrameRef}>
                     <DiagramEditor key={lesson.id} value={chart} onChange={onChartChange} height={flowH} />
                   </div>
@@ -1084,9 +1039,7 @@ export default function SandboxWorkspace() {
         onClose={() => setHistoryOpen(false)}
         lessonId={lesson.id}
         saveToAccount={lessonProgress.authed}
-        // ReshapeStudio only reads `value` at mount, so a restored version
-        // needs a fresh instance to put the old model back on screen. Code
-        // and chart modes resync from `fileContents` on their own.
+        // Reopen the restored CAD view and native sketch from the saved files.
         onRestore={() => {
           if (mode.preview === 'reshape') setReshapeResetKey((k) => k + 1);
         }}
@@ -1104,7 +1057,13 @@ function ShareMenu({ chipStyle, children }: { chipStyle: React.CSSProperties; ch
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!open) return;
-    const onDown = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    // Publish game's panel is portalled to <body> (so nothing stacks over it), so a click inside it
+    // is outside `ref` in the DOM but must not close the menu that owns it.
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as Element | null;
+      if (t?.closest?.('[data-publish-game-panel]')) return;
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
     document.addEventListener('mousedown', onDown);
     document.addEventListener('keydown', onKey);

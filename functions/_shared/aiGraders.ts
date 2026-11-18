@@ -29,6 +29,8 @@ export interface AiGraderConfig {
   brief?: string;
   /** Graded test part: the strict marking framing instead of the lenient default. */
   strict?: boolean;
+  cadFeedback?: boolean;
+  cadRequirements?: import('../../lib/types').Requirement[];
   /**
    * A flowchart part's own structural rules (lesson.diagram.rules), so the server can recompute the
    * checks it keeps beside a graded chart instead of trusting the browser's. Not secret: the page

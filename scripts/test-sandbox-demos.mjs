@@ -1,4 +1,5 @@
-// Run the examples, check flowchart structure, and build both solids on the shipped kernel.
+// Run examples and flowchart checks. CAD uses the shipped SolidCraft script
+// sandbox; scripts/test-solidcraft-sandbox.mjs builds it on the pinned engine.
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
@@ -7,10 +8,7 @@ import { SANDBOX_DEMOS } from '../lib/sandbox-demos.ts';
 import { SANDBOX_MODES } from '../lib/sandbox-modes.ts';
 import { DEFAULT_RULES } from '../lib/diagram-types.ts';
 import { checkDiagram } from '../lib/diagram-check.ts';
-import { runScript } from '../public/reshape/kernel/reshape-script.js';
-import * as brep from '../public/reshape/kernel/brep-rs/brep_rs.js';
-
-brep.initSync({ module: readFileSync(new URL('../public/reshape/kernel/brep-rs/brep_rs_bg.wasm', import.meta.url)) });
+import { evaluateCad } from './_solidcraft-harness.mjs';
 assert.equal(new Set(SANDBOX_DEMOS.map(d => d.id)).size, SANDBOX_DEMOS.length);
 for (const mode of SANDBOX_MODES) {
   assert.ok(SANDBOX_DEMOS.filter(d => d.mode === mode.id).length >= 2, mode.id + ' has two demos');
@@ -113,10 +111,10 @@ for (const demo of SANDBOX_DEMOS) {
     assert.equal(canvases, 1);
     assert.ok(circles > 1000);
   } else if (demo.mode === 'reshape') {
-    const result = runScript(demo.source);
+    const result = evaluateCad(demo.source);
     assert.deepEqual(result.errors, []);
-    const built = JSON.parse(brep.build_doc_json(JSON.stringify(result.doc)));
-    assert.deepEqual(built.refusals ?? {}, {}, JSON.stringify(built.refusals));
+    assert.ok(result.doc.features.length);
+    assert.equal(result.doc.features.some(f=>f.kind==='sketch'),demo.id==='organizer-outline');
   } else {
     const doc = JSON.parse(demo.source);
     const failures = checkDiagram(doc, DEFAULT_RULES).filter(r => !r.passed);

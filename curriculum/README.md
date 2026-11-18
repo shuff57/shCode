@@ -7,6 +7,9 @@ when the book changes.
 
 ## CAD redesign
 
+Start with the current [CAD lesson progression table](CAD-LESSON-PROGRESSION.md):
+2D drawing, 2D OOP, basic and advanced 3D CAD, then a tested useful product.
+
 The [CAD chapter and lesson design](CAD-CHAPTER-DESIGN.md) is the draft continuation
 from the current 9.1 pilot onto reSHape Script and SolidCraft. It preserves the old
 course's useful design/measurement/testing progression while separating it from

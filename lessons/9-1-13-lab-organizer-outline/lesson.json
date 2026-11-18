@@ -1,0 +1,111 @@
+{
+  "id": "9-1-13-lab-organizer-outline",
+  "title": "9.1.13 Lab: Organizer Outline",
+  "description": "Script, measure and save a native SolidCraft 2D outline for a desk organizer.",
+  "type": "assignment",
+  "estimateMins": 15,
+  "category": "Unit 3: reSHape: Solid Modelling",
+  "unit": "9.1 Solid Shapes",
+  "preview": "reshape",
+  "cadHost": "solidcraft",
+  "cadScope": "sketch",
+  "mode": "code",
+  "slos": [
+    "SLO-2"
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "title": "Build a sketch from code",
+      "instructions": "Read the starter script beside SolidCraft. width and depth are measurements in millimetres. sketch('top') creates an XY sketch; sk.rectangle([0, 0], [width, depth]) draws its outline. The two sk.length calls add native dimension constraints. Choose Run to build it.",
+      "hints": [
+        "Run rebuilds the sketch from your current code. Ctrl+Enter (or Command+Enter) also runs it."
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Set the width",
+      "instructions": "Change width to 60 in the script, then choose Run. The native SolidCraft sketch updates from that value. Width measures left to right; the rectangle keeps its horizontal and vertical constraints."
+    },
+    {
+      "id": "s3",
+      "title": "Set the depth",
+      "instructions": "Change depth to 40, then Run again. Keep one rectangular outline, 60 mm wide and 40 mm deep. Use Fit sketch to see the plan. It is still 2D: do not add a pull, box or other solid feature."
+    },
+    {
+      "id": "s4",
+      "title": "Check and keep the plan",
+      "instructions": "Choose Check after a successful Run. Save keeps your script together with the complete native sketch, including dimensions and constraints. Reopen the lesson and confirm the saved script rebuilds the outline. History keeps earlier versions. If your teacher enables native hand tools, you can inspect or edit the sketch visually; hand edits do not rewrite your code. Run the script again before Check. You can request AI feedback on the current script-built geometry and explain your design choices.",
+      "hints": [
+        "A code edit makes the last build out of date. Run again before Check.",
+        "If you edit with hand tools, the next Run keeps that native drawing in History before rebuilding from the script."
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "r1",
+      "title": "One closed rectangular base outline",
+      "type": "model",
+      "expect": [
+        {
+          "kind": "sketch"
+        }
+      ],
+      "sketchOutline": true,
+      "points": 0,
+      "hint": "Keep four straight edges joined into one rectangle, with no extra items.",
+      "sketchScript": true
+    },
+    {
+      "id": "r2",
+      "title": "The base is 60 mm wide",
+      "type": "model",
+      "expect": [
+        {
+          "kind": "sketch",
+          "width": 60
+        }
+      ],
+      "sketchOutline": true,
+      "points": 0,
+      "hint": "Set width to 60 in your script, then Run and Check again.",
+      "sketchScript": true
+    },
+    {
+      "id": "r3",
+      "title": "The base is 40 mm deep",
+      "type": "model",
+      "expect": [
+        {
+          "kind": "sketch",
+          "depth": 40
+        }
+      ],
+      "sketchOutline": true,
+      "points": 0,
+      "hint": "Set depth to 40 in your script, then Run and Check again.",
+      "sketchScript": true
+    }
+  ],
+  "grading": {
+    "totalPoints": 0,
+    "passingScore": 0,
+    "allowLateSubmit": true
+  },
+  "cadFeedback": {
+    "prompt": "Review the student’s flat rectangular organizer base outline. The task requires one closed four-edge rectangle, width 60 mm and depth 40 mm. Anchoring is optional. Explain a useful next step from the submitted geometry checks, solver report and optional student explanation. This is practice feedback; it does not change the lesson checklist or completion.",
+    "rubric": [
+      {
+        "id": "next-step",
+        "title": "A useful next step for this organizer outline",
+        "points": 0
+      },
+      {
+        "id": "design-reasoning",
+        "title": "Explain dimensions and remaining freedom in the sketch",
+        "points": 0
+      }
+    ]
+  }
+}

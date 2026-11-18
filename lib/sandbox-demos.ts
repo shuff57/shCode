@@ -1,6 +1,7 @@
 // Optional examples for new projects. Starters and existing projects stay intact.
 import type { DiagramDoc } from './diagram-types';
 import type { SandboxModeId } from './sandbox-modes';
+import { cadDemoFiles, SOLIDCRAFT_SKETCH_STARTER } from './solidcraft-project';
 
 export interface SandboxDemo {
   id: string;
@@ -8,6 +9,7 @@ export interface SandboxDemo {
   name: string;
   description: string;
   source: string;
+  files?: Record<string,string>;
 }
 
 function chart(nodes: DiagramDoc['nodes'], edges: DiagramDoc['edges']): string {
@@ -210,15 +212,21 @@ function drawTop() {
   },
   {
     id: 'mounting-plate', mode: 'reshape', name: 'Mounting plate',
-    description: 'A rounded plate with four bolt holes. Adjust it in Dimensions.',
+    description: 'A plate with four bolt holes. Change the script, then Run in SolidCraft.',
     source: `// A small mounting plate, in millimetres.
-// Change the dimensions or move a hole in the Dimensions panel.
-const plate = box(70, 50, 6, { corner: 1 })
+// Change a dimension or hole position, then Run.
+const plate = box(70, 50, 6)
 hole(plate, { across: 5, at: [-24, -14] })
 hole(plate, { across: 5, at: [24, -14] })
 hole(plate, { across: 5, at: [-24, 14] })
 hole(plate, { across: 5, at: [24, 14] })
 `,
+  },
+  {
+    id:'organizer-outline',mode:'reshape',name:'Organizer outline',
+    description:'A native SolidCraft 2D sketch driven by width and depth inputs.',
+    source:SOLIDCRAFT_SKETCH_STARTER,
+    files:cadDemoFiles(SOLIDCRAFT_SKETCH_STARTER,'sketch','sk'),
   },
   {
     id: 'desk-cup', mode: 'reshape', name: 'Desk cup',

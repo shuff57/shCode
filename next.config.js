@@ -1,9 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { PHASE_DEVELOPMENT_SERVER } from 'next/constants.js';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
   images: { unoptimized: true },
   trailingSlash: true,
   // The export writes ~1,030 pages (every lesson under both /lesson/ and
@@ -58,4 +58,9 @@ const nextConfig = {
   // the exported site out of ./out, which is what wrangler deploys.
 };
 
-export default nextConfig;
+export default function configForPhase(phase) {
+  // The dev server also receives unknown and newly authored lesson URLs. In
+  // export mode Next throws before the page can handle a missing lesson.
+  // Production remains a static Cloudflare Pages export with the same routes.
+  return { ...nextConfig, ...(phase === PHASE_DEVELOPMENT_SERVER ? {} : { output: 'export' }) };
+}

@@ -11640,6 +11640,75 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
     "model": "glm-5.3-flash:cloud",
     "contextDocs": []
   },
+  "9-1-13-lab-organizer-outline": {
+    "lessonTitle": "9.1.13 Lab: Organizer Outline",
+    "prompt": "Review the student’s flat rectangular organizer base outline. The task requires one closed four-edge rectangle, width 60 mm and depth 40 mm. Anchoring is optional. Explain a useful next step from the submitted geometry checks, solver report and optional student explanation. This is practice feedback; it does not change the lesson checklist or completion.",
+    "rubric": [
+      {
+        "id": "next-step",
+        "title": "A useful next step for this organizer outline",
+        "points": 0
+      },
+      {
+        "id": "design-reasoning",
+        "title": "Explain dimensions and remaining freedom in the sketch",
+        "points": 0
+      }
+    ],
+    "cadFeedback": true,
+    "cadRequirements": [
+      {
+        "id": "r1",
+        "title": "One closed rectangular base outline",
+        "type": "model",
+        "expect": [
+          {
+            "kind": "sketch"
+          }
+        ],
+        "sketchOutline": true,
+        "points": 0,
+        "hint": "Keep four straight edges joined into one rectangle, with no extra items.",
+        "sketchScript": true,
+        "description": "",
+        "status": "pending"
+      },
+      {
+        "id": "r2",
+        "title": "The base is 60 mm wide",
+        "type": "model",
+        "expect": [
+          {
+            "kind": "sketch",
+            "width": 60
+          }
+        ],
+        "sketchOutline": true,
+        "points": 0,
+        "hint": "Set width to 60 in your script, then Run and Check again.",
+        "sketchScript": true,
+        "description": "",
+        "status": "pending"
+      },
+      {
+        "id": "r3",
+        "title": "The base is 40 mm deep",
+        "type": "model",
+        "expect": [
+          {
+            "kind": "sketch",
+            "depth": 40
+          }
+        ],
+        "sketchOutline": true,
+        "points": 0,
+        "hint": "Set depth to 40 in your script, then Run and Check again.",
+        "sketchScript": true,
+        "description": "",
+        "status": "pending"
+      }
+    ]
+  },
   "moshion-bounce": {
     "lessonTitle": "5.2.16 Bouncy Ball",
     "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.16 Bouncy Ball\". The task they were given: Build a closed box with a ball in it: make four long thin static walls (top, bottom, left, right), make the ball as a dynamic sprite with one size number so it is a circle, store it in ball and colour it, make it bouncy (near the top of the 0 to 1 range), give it a friction value (the steps try 0 and then 5), and give it a sideways starting speed. What the starter file already had: `let ball;`, a 400 by 400 canvas, gravity turned on (world.gravity.y = 10), background painted in draw(), and four step comments in setup(). The starter meets none of the criteria. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: A sprite made with 'static' as its last argument never moves or falls; one made without it is dynamic, so gravity and collisions move it. A sprite's body type can also be set afterwards with .collider = 'static'. new Sprite(x, y, d) with one size number makes a circle that many pixels across. bounciness runs from 0 (sticks) to 1 (gives back all its energy). friction is drag along a surface; 0 slides freely. world.gravity.y starts at 0 until a sketch sets it. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",

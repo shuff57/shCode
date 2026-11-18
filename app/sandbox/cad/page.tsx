@@ -1,7 +1,7 @@
-import SolidCraftSandbox from '../../../components/SolidCraftSandbox';
+import SandboxWorkspace from '../../../components/SandboxWorkspace';
 
-export const metadata = { title: 'CAD sandbox preview · shCode' };
+export const metadata = { title: 'SolidCraft CAD sandbox · shCode' };
 
 export default function CadSandboxPage() {
-  return <SolidCraftSandbox />;
+  return <SandboxWorkspace initialMode="reshape" />;
 }
