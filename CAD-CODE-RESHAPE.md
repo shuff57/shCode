@@ -97,7 +97,7 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
      or `groove` (cut). reSHape's `spin(sk, a)` does not turn the sketch where it is drawn: the sketch is a profile, its x the
      distance out from the axis and its y the height along it, and the axis is the plane's normal through the origin (Z for
      `'top'`, Y for `'front'`, X for `'side'`), turned right-handed by a from +X (+Y for `'side'`), measured in the guarded
-     build. So the writer adds a new sketch with the profile laid out that way (`sk2.polygon([…])` or `sk2.circle(r, { at })`,
+     build. So the writer adds a new sketch with the profile laid out that way (`sk2.polygon([…])` or `sk2.circle(d, { at })`, d the diameter,
      one plain outline, which is what spin takes) and the spin; the sketch drawn with the tools stays as it was.
      - **Part way,** the sense is SolidCraft's: it turns the profile towards its sketch's normal.
      - **A whole turn** is the same solid from any plane through the axis, so its profile is laid out by its distance from
@@ -118,7 +118,7 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
 
    After writing, the part is rebuilt from the code and compared by volume and box, as before. It is now also compared by
    every flat face's area and centre and by the curved faces' total area, so a hole in the wrong place or a part turned
-   the wrong way is reported, not passed. Round trips: `/tmp/cad-drive/tools2-e2e.py` (23 of 23 the same part, with the counterbore, the countersink, the move with a turn, six revolves, a torus, two mirrors and two drafts).
+   the wrong way is reported, not passed. Round trips: `/tmp/cad-drive/tools2-e2e.py` (25 of 25 the same part, with the counterbore, the countersink, the move with a turn, seven revolves, a torus, two mirrors and three drafts).
 8. **Done 2026-11-17: a refused step points at its line.** The line is found by evaluating the script cut short after each
    top-level statement of script.js until the step appears (`stepLines`; interpreter only, nothing built). A step made in
    an imported class goes on the script.js line that called it. The refusal shows "script.js line N" as a link, and the
@@ -221,8 +221,9 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
 - **Draft:** `draft(part, a)` when every side wall is tilted, `draft(part.face('right'), a)` for one named face, with
   `{ neutral: n }` for a neutral plane off zero. Only a pull along +X, +Y or +Z is written (reSHape has no other); some of the
   side walls, another pull, or a neutral plane that is a face are refused.
-- **Checked:** tools2-e2e, 23 of 23 the same part (a torus, a mirror across YZ and across the bottom face, a draft of every
-  side wall, and a draft of one face about a plane part way up); unit tests for each refusal.
+- **Checked:** tools2-e2e, the same part for a torus, a mirror across YZ and across the bottom face, a draft of every side
+  wall, a draft of one face about a plane part way up, and a draft of one face of an extruded plate (reSHape names an
+  extruded part's faces for draft as it does a cuboid's); unit tests for each refusal.
 
 ## More sketch tools (2026-11-18)
 
@@ -232,6 +233,11 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
     counting the sketch's curves (nothing is built; `sketchStatementLines`, `curveOwners`). So a line written with variables
     is found too. When the counts do not add up, nothing is removed.
   - It is shown when script.js is open, as New sketch is.
+- **Slot.** Click the centres of its two caps, then its radius (the pointer's distance from the line between them, on the
+  grid's step) or type the radius. It is written in the drawing words, its two sides and two caps
+  (`sk.line(…)` ×2, `sk.arc(…, 'ccw')` ×2): reSHape's own `sk.slot(a, b, r)` cannot share a sketch with them ("Do not mix the two
+  ways on one sketch"). Checked: the outline extrudes to the volume reSHape's slot() gives (1051.289 mm³ for 20 × 8 with r 4
+  and 5 deep; the exact 1051.327 is 3.7e-5 above both, the engine's measure of a curved part, the same for either).
 - **Typed sizes.** After a tool's first click, a number typed shows in the readout with where Enter puts the point, and Enter
   puts it down there, in the pointer's direction (`typedPoint`):
   - Line and Polyline: the length from the last point;
@@ -241,12 +247,16 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
 
   Backspace takes back a character; Escape clears the number first and the points the second time. Checked:
   `/tmp/cad-drive/sketch-typed-e2e.py`, 9 of 9.
-- **Plain outlines are drawn.** `sk.polygon(…)`, `sk.rect(…)` and `sk.circle(r, { at })` are kept by reSHape as points only;
+- **Plain outlines are drawn.** `sk.polygon(…)`, `sk.rect(…)` and `sk.circle(d, { at })` (d the diameter) are kept by reSHape as points only;
   Live sketch now draws them from those (`sketchGeoms`), snaps to their corners, and Delete and drag work on them. An outline
   with rounded, chamfered or bulged corners is not drawn, rather than drawn with straight sides.
 - **Checked.** `/tmp/cad-drive/sketch-delete-e2e.py`, 11 of 11: a rectangle written with a variable marked and removed whole,
   a circle on its own, the click not reaching SolidCraft, the rest of the code untouched and still building, and a polygon
   drawn and marked by its line.
+
+**Fixed: a revolved circle was written at half its size.** reSHape's one-shape `sk.circle(d, { at })` takes the diameter, and
+the revolve writer gave it the radius. The check after writing would have said "not quite the one you made" (the volume is a
+quarter), so it was never passed as right. Now written with the diameter; a revolved circle (a ring) is one of the round trips.
 
 **Loft is not written.** reSHape's nearest word is `blend(a, b, gap)`, but the guarded build refuses every blend ("a loft
 between two sketches is not available in this version yet", measured with drawn and plain sketches), so a loft made with the

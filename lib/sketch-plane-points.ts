@@ -165,6 +165,9 @@ export const toolCode = {
   line: (s: string, a: V2, b: V2) => `${s}.line(${pointCode(a)}, ${pointCode(b)});`,
   rectangle: (s: string, a: V2, b: V2) => `${s}.rectangle(${pointCode([Math.min(a[0], b[0]), Math.min(a[1], b[1])])}, ${pointCode([Math.max(a[0], b[0]), Math.max(a[1], b[1])])});`,
   circle: (s: string, c: V2, r: number) => `${s}.circle(${pointCode(c)}, { r: ${fmt(r)} });`,
+  // a slot in the drawing words (reSHape's own slot() cannot share a sketch with them): its two sides and its two caps, counter-clockwise
+  slot: (s: string, a: V2, b: V2, r: number) => slotGeoms(a, b, r).map(g => g.k === 'line' ? `${s}.line(${pointCode(g.a)}, ${pointCode(g.b)});`
+    : g.k === 'arc' ? `${s}.arc(${pointCode(g.c)}, ${pointCode(g.a)}, ${pointCode(g.b)}, '${g.sense}');` : '').join('\n'),
   lines: (s: string, pts: V2[], closed: boolean) => `${s}.lines([${[...pts, ...(closed ? [pts[0]] : [])].map(pointCode).join(', ')}]);`,
 };
 /**
@@ -250,7 +253,7 @@ export function movePointEdits(doc: string, name: string, from: V2, to: V2): { f
 }
 
 /**
- * A sketch feature's curves for drawing: its geoms rows, or, for a plain outline (sk.polygon(…), sk.rect(…), sk.circle(r, { at })), which reSHape
+ * A sketch feature's curves for drawing: its geoms rows, or, for a plain outline (sk.polygon(…), sk.rect(…), sk.circle(d, { at }), d the diameter), which reSHape
  * keeps as points only, the outline's sides or its circle (a circle's points are the two ends of a diameter). An outline with rounded, chamfered or
  * bulged corners is not drawn: its straight sides would not be its shape.
  */
@@ -295,6 +298,11 @@ export function typedPoint(tool: string, pts: V2[], pointer: V2, typed: string):
     const a = pts[0]; const sx = pointer[0] < a[0] ? -1 : 1, sy = pointer[1] < a[1] ? -1 : 1;
     return r3([a[0] + sx * w, a[1] + sy * h]);
   }
+  if (tool === 'slot' && pts.length === 2) {
+    if (ns.length !== 1 || !(ns[0] > 0)) return null;
+    const [a, b] = pts; const d = [b[0] - a[0], b[1] - a[1]]; const l = Math.hypot(d[0], d[1]); if (!(l > 1e-9)) return null;
+    return r3([(a[0] + b[0]) / 2 - d[1] / l * ns[0], (a[1] + b[1]) / 2 + d[0] / l * ns[0]]);
+  }
   if (tool === 'arc' && pts.length === 2) {
     if (ns.length !== 1 || !(ns[0] !== 0) || Math.abs(ns[0]) >= 360) return null;
     const [c, s] = pts; const t = ns[0] * Math.PI / 180; const d = [s[0] - c[0], s[1] - c[1]];
@@ -302,11 +310,21 @@ export function typedPoint(tool: string, pts: V2[], pointer: V2, typed: string):
   }
   return null;
 }
+/** The distance from p to the segment ab. */
+export function distToSegment(p: V2, a: V2, b: V2): number { return distToPolyline(p, [a, b]); }
+/** A slot's outline (the two caps and the two sides), as reSHape's slot(a, b, r) draws it, for the preview. */
+export function slotGeoms(a: V2, b: V2, r: number): SketchGeom[] {
+  const d = [b[0] - a[0], b[1] - a[1]]; const l = Math.hypot(d[0], d[1]); if (!(l > 1e-9) || !(r > 0)) return [];
+  const n: V2 = [-d[1] / l * r, d[0] / l * r]; const r3 = (q: number[]): V2 => [Math.round(q[0] * 1000) / 1000, Math.round(q[1] * 1000) / 1000];
+  const a1 = r3([a[0] + n[0], a[1] + n[1]]), a2 = r3([a[0] - n[0], a[1] - n[1]]), b1 = r3([b[0] + n[0], b[1] + n[1]]), b2 = r3([b[0] - n[0], b[1] - n[1]]);
+  // counter-clockwise: the side below a to b, the cap round b, the side above back to a, the cap round a
+  return [{ k: 'line', a: a2, b: b2 }, { k: 'arc', c: b, r, a: b2, b: b1, sense: 'ccw' }, { k: 'line', a: b1, b: a1 }, { k: 'arc', c: a, r, a: a1, b: a2, sense: 'ccw' }];
+}
 /** What the typed size means for the tool, for the readout: 'length 25', 'width 30, height 20', 'radius 5', 'angle 90°'. */
 export function typedWords(tool: string, pts: V2[], typed: string): string {
   const ns = typedNumbers(typed); const t = typed.trim();
   if (tool === 'rectangle') return ns && ns.length === 2 ? `width ${fmt(ns[0])}, height ${fmt(ns[1])}` : ns ? `${fmt(ns[0])} square` : t;
-  if (tool === 'circle') return `radius ${t}`;
+  if (tool === 'circle' || (tool === 'slot' && pts.length === 2)) return `radius ${t}`;
   if (tool === 'arc' && pts.length === 2) return `angle ${t}°`;
   return `length ${t}`;
 }

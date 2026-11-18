@@ -437,7 +437,7 @@ function revolveCode(f: TimelineFeature, ctx: UiContext, why: (r: string) => Wri
   const v = fresh(ctx, 'sk'); let shape: string;
   const outline = closedOutline(drawn);
   if (outline) shape = `${v}.polygon([${outline.map(p => pt(flat(world(p)))).join(', ')}]);`;
-  else if (drawn.length === 1 && drawn[0].type === 'circle' && drawn[0].center_at && typeof drawn[0].radius === 'number') shape = `${v}.circle(${fmt(drawn[0].radius)}, { at: ${pt(flat(world(drawn[0].center_at)))} });`;
+  else if (drawn.length === 1 && drawn[0].type === 'circle' && drawn[0].center_at && typeof drawn[0].radius === 'number') shape = `${v}.circle(${fmt(2 * drawn[0].radius)}, { at: ${pt(flat(world(drawn[0].center_at)))} });`; // the one-shape circle takes its diameter
   else { ctx.taken.delete(v); return why('its profile is not one outline of straight lines or one circle, which is what spin() takes'); }
   // part way: SolidCraft turns the profile towards its sketch's normal; reSHape's spin(a) moves a point out along r in the direction axis x r
   let a = A;

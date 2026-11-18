@@ -8,7 +8,7 @@
 //     the zoom, with the face's outline drawn over it;
 //   - the sketch's own lines, circles and arcs are drawn as the code is typed (reSHape's document, re-evaluated in the opaque
 //     runner; nothing is built);
-//   - sketch tools (Line, Rectangle, Circle, Arc, Polyline) draw with snapped clicks and write the reSHape line at the end of the
+//   - sketch tools (Line, Rectangle, Circle, Arc, Slot, Polyline) draw with snapped clicks and write the reSHape line at the end of the
 //     sketch's block; a drawn point written as plain numbers can be dragged, and its numbers in the code change;
 //   - Delete: a click on a drawn curve removes the line of the sketch's block that drew it (all of a rectangle's four sides go with it).
 //     Which line drew which curve is found by evaluating the script cut short after each line of the block and counting the sketch's
@@ -30,14 +30,14 @@ import { bundleProject, CAD_ENTRY, readVariableProbe, withVariableProbe } from '
 import { topLevelNames, topLevelVariables } from '../lib/solidcraft-picks';
 import type { ScEdge, ScFace } from '../lib/solidcraft-labels';
 import {
-  activeSketch, applyProjective, arcCode, curveOwners, sketchGeoms, typedPoint, typedWords, distToPolyline, faceSketchArgs, sketchStatementLines, finishDirections, fmt, freshName, fromPlane, geomPath, geomSnaps, gridStep,
+  activeSketch, applyProjective, arcCode, curveOwners, distToSegment, sketchGeoms, slotGeoms, typedPoint, typedWords, distToPolyline, faceSketchArgs, sketchStatementLines, finishDirections, fmt, freshName, fromPlane, geomPath, geomSnaps, gridStep,
   movePointEdits, planeFrameOf, planeOutlines, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, sweepOf,
   toPlane, toolCode, viewAngles, type PlaneFrame, type SketchGeom, type SketchPlaceInput, type V2, type V3,
 } from '../lib/sketch-plane-points';
 
 type Api = { request(method: string, params?: object): Promise<any>; execute(command: string, params?: object): Promise<any> };
 type Evaluate = (source: string) => Promise<{ errors: { message: string; line?: number | null }[]; doc?: { features?: unknown[] } | null }>;
-type Tool = 'line' | 'rectangle' | 'circle' | 'arc' | 'polyline' | 'delete';
+type Tool = 'line' | 'rectangle' | 'circle' | 'arc' | 'slot' | 'polyline' | 'delete';
 type Box = { min: number[]; max: number[] };
 interface Sketch { id: string; place: SketchPlaceInput; frame: PlaneFrame; geoms: SketchGeom[] }
 type DrawLine = { from: number; to: number; text: string };
@@ -67,7 +67,7 @@ interface Props {
   onMode(name: string | null): void;
   onRun(): void;
 }
-const TOOLS: [Tool, string][] = [['line', 'Line'], ['rectangle', 'Rectangle'], ['circle', 'Circle'], ['arc', 'Arc'], ['polyline', 'Polyline'], ['delete', 'Delete']];
+const TOOLS: [Tool, string][] = [['line', 'Line'], ['rectangle', 'Rectangle'], ['circle', 'Circle'], ['arc', 'Arc'], ['slot', 'Slot'], ['polyline', 'Polyline'], ['delete', 'Delete']];
 const TOP: SketchPlaceInput = { plane: 'xy', offset: 0 };
 const dist = (a: number[], b: number[]) => Math.hypot(a[0] - b[0], a[1] - b[1]);
 const centreOf = (b: Box) => b.min.map((v, i) => (v + b.max[i]) / 2);
@@ -293,6 +293,11 @@ export default function CadSketchOverlay(p: Props) {
       const v = view.current; const pts = toolPts.current; if (!v || !tool || !pts.length) return null;
       if (tool === 'line' || tool === 'polyline') return [...pts, q].map(onScreen);
       if (tool === 'rectangle') { const a = pts[0]; return ([[a[0], a[1]], [q[0], a[1]], [q[0], q[1]], [a[0], q[1]], [a[0], a[1]]] as V2[]).map(onScreen); }
+      if (tool === 'slot') {
+        if (pts.length === 1) return [pts[0], q].map(onScreen);
+        const r = typed.current ? Number(typedNumbers0(typed.current)) : slotRadius(pts[0], pts[1], q);
+        return slotGeoms(pts[0], pts[1], r).flatMap(g => geomPath(g, 32)).map(onScreen);
+      }
       if (tool === 'arc') {
         if (pts.length === 1) return [pts[0], q].map(onScreen);
         const [c, a] = pts; const r = dist(a, c); const d = dist(q, c); if (d < 1e-9) return null;
@@ -401,6 +406,9 @@ export default function CadSketchOverlay(p: Props) {
         if (pts.length >= 3 && dist(q, pts[0]) < 1e-9) finishPolyline(true);
         else if (pts.length && dist(q, pts[pts.length - 1]) < 1e-9) finishPolyline(false); // the same point twice ends an open one
         else pts.push(q);
+      } else if (tool === 'slot') {
+        if (pts.length < 2) { if (!pts.length || dist(q, pts[pts.length - 1]) > 1e-9) pts.push(q); }
+        else { const [a, b] = pts; toolPts.current = []; const r = typedRadius ?? slotRadius(a, b, q); if (r > 0) write(toolCode.slot(name, a, b, r)); }
       } else if (tool === 'arc') {
         if (pts.length < 2) { if (!pts.length || dist(q, pts[0]) > 1e-9) pts.push(q); }
         else { const code = arcCode(name, pts[0], pts[1], q); toolPts.current = []; if (code) write(code); }
@@ -414,6 +422,9 @@ export default function CadSketchOverlay(p: Props) {
       typedRadius = null;
     };
     let typedRadius: number | null = null; // a typed radius is kept as typed, not put on the grid
+    /** a slot's radius from the pointer: its distance from the line between the two ends, on the grid's step */
+    const slotRadius = (a: V2, b: V2, q: V2) => { const step = view.current?.step ?? 0.5; return Math.max(step, Math.round(distToSegment(q, a, b) / step) * step); };
+    const typedNumbers0 = (t: string) => t.split(/[,x ]/)[0];
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && picking) { setPicking(false); e.preventDefault(); e.stopImmediatePropagation(); return; }
       if (!tool) return;
@@ -425,7 +436,7 @@ export default function CadSketchOverlay(p: Props) {
         if (e.key === 'Escape' && typed.current) { typed.current = ''; return stop(); }
         if (e.key === 'Enter' && typed.current) {
           const tq = typedPoint(tool, toolPts.current, last?.q ?? toolPts.current[toolPts.current.length - 1], typed.current);
-          if (tq) { if (tool === 'circle') typedRadius = Number(typed.current); place(tq); }
+          if (tq) { if (tool === 'circle' || tool === 'slot') typedRadius = Number(typed.current); place(tq); }
           return stop();
         }
       }

@@ -1,7 +1,7 @@
 // Points on a sketch's plane (lib/sketch-plane-points.ts): reSHape's plane frames, the projective map from the screen to a plane,
 // which sketch the editor cursor is in, and what a picked point writes into the code. The pointer in the real view is a browser check.
 import assert from 'node:assert/strict';
-import { typedNumbers, typedPoint, typedWords, sketchGeoms, curveOwners, distToPolyline, sketchStatementLines, arcCode, faceSketchArgs, finishDirections, freshName, movePointEdits, planeOutlines, sweepOf, activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
+import { distToSegment, slotGeoms, typedNumbers, typedPoint, typedWords, sketchGeoms, curveOwners, distToPolyline, sketchStatementLines, arcCode, faceSketchArgs, finishDirections, freshName, movePointEdits, planeOutlines, sweepOf, activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
 
 // ---- planes, as reSHape resolves them: a named plane's origin is normal x offset ------------------------------------------
 const top10 = planeFrameOf({ plane: 'xy', offset: 10 });
@@ -144,4 +144,18 @@ console.log('PASS plain outlines: a polygon\'s sides and a circle, from points')
   assert.equal(typedWords('rectangle', [[0, 0]], '30, 20'), 'width 30, height 20'); assert.equal(typedWords('line', [[0, 0]], '25'), 'length 25'); assert.equal(typedWords('arc', [[0, 0], [1, 0]], '90'), 'angle 90°');
 }
 console.log('PASS typed sizes: length, width and height, radius, angle');
+{ // the slot tool
+  assert.equal(toolCode.slot('sk', [10, 10], [30, 10], 4), "sk.line([10, 6], [30, 6]);\nsk.arc([30, 10], [30, 6], [30, 14], 'ccw');\nsk.line([30, 14], [10, 14]);\nsk.arc([10, 10], [10, 14], [10, 6], 'ccw');", 'in the drawing words, which mix with the other tools');
+  const g = slotGeoms([0, 0], [10, 0], 2);
+  assert.deepEqual(g.map(x => x.k), ['line', 'arc', 'line', 'arc']);
+  const pts = g.flatMap(x => geomPath(x, 64));
+  assert.ok(Math.abs(Math.max(...pts.map(q => q[0])) - 12) < 1e-9 && Math.abs(Math.min(...pts.map(q => q[0])) + 2) < 1e-9, 'the caps go round the outer ends');
+  assert.ok(Math.abs(Math.max(...pts.map(q => q[1])) - 2) < 1e-9 && Math.abs(Math.min(...pts.map(q => q[1])) + 2) < 1e-9, 'the sides 2 out');
+  assert.deepEqual(slotGeoms([0, 0], [0, 0], 2), [], 'no slot with both ends on one point');
+  assert.deepEqual(typedPoint('slot', [[0, 0], [10, 0]], [3, 3], '4'), [5, 4], 'a typed radius: a point that far from the middle');
+  assert.equal(distToSegment(typedPoint('slot', [[0, 0], [10, 0]], [3, 3], '4'), [0, 0], [10, 0]), 4);
+  assert.equal(typedPoint('slot', [[0, 0]], [3, 3], '4'), null, 'the radius comes after both ends');
+  assert.equal(typedWords('slot', [[0, 0], [10, 0]], '4'), 'radius 4');
+}
+console.log('PASS the slot tool: its code, its outline, a typed radius');
 console.log('Sketch plane points: planes, the screen-to-plane map, the active sketch and the written point pass.');

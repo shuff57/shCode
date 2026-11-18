@@ -97,7 +97,7 @@ countersinks are now written as code, so *it has a counterbore, countersink or t
 | 4.2 | bar while choosing | **New sketch** Click a flat face in the view, or a plane: [Top] [Front] [Side] [Cancel] |
 | 4.3 | over the view while choosing | Click a flat face for the new sketch |
 | 4.4 | notes | That face is curved; a sketch needs a flat face. · No face there. Click a flat face, or choose a plane. |
-| 4.5 | sketch bar | **Sketch {name}** {top plane at 10} · grid {5} mm [Line] [Rectangle] [Circle] [Arc] [Polyline] ***[Delete]*** depth [10] [Extrude] [Pocket] [Done] |
+| 4.5 | sketch bar | **Sketch {name}** {top plane at 10} · grid {5} mm [Line] [Rectangle] [Circle] [Arc] ***[Slot]*** [Polyline] ***[Delete]*** depth [10] [Extrude] [Pocket] [Done] |
 | 4.6 | notes | Give a depth above 0. · Pocket needs the part the sketch is on, kept in a variable of script.js (Run first). |
 | 4.7 | after a tool, drag or click | Added: {code} · Moved {[x, y]} to {[x, y]} · Inserted: {[x, y]} · ***Removed: {line}*** |
 | 4.8 | readout by the pointer | {lid} ({top plane at 10}): {[x, y]} · {kind}, where kind is one of: corner, middle of an edge, centre of a face, end of a line, middle of a line, centre of a circle, centre of an arc, end of an arc, point of the sketch, origin of the sketch, grid {5} mm. With "· drag to move it" on a point that can be dragged; "Move {[x, y]} to {[x, y]}" while dragging; "{Tool}: " first while a tool is on. |
