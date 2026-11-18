@@ -560,9 +560,9 @@ const RECIPES = {
     async run({ demos: [d], pages: [p] }) {
       const dialog = p.getByRole('dialog', { name: 'Publish game' });
       await d.pause(500);
-      // Publish game sits in the toolbar's Share menu.
+      // Publish game is a tab of the toolbar's Share dialog.
       await d.click(p.locator('.sandbox-share-trigger'), { ms: 450, after: 400 });
-      await d.click(p.getByRole('button', { name: 'Publish game' }), { ms: 400, after: 500 });
+      await d.click(p.getByRole('tab', { name: 'Publish game' }), { ms: 400, after: 500 });
       await d.click(p.locator('#publish-game-title'), { ms: 400, after: 150 });
       await p.keyboard.press('Control+A');
       await d.type('Enemy Parade', 45);
@@ -784,7 +784,7 @@ const RECIPES = {
       await ps.locator('.cm-content').first().waitFor({ timeout: 120000 });
       // The panel open with Alex chosen and a note: the clip is the send and what Alex gets.
       await ps.locator('.sandbox-share-trigger').click();
-      await ps.getByTestId('send-program').click();
+      await ps.getByRole('tab', { name: /Send to/ }).click(); // a tab of the Share dialog
       const to = ps.getByTestId('send-program-to');
       const opt = to.locator('option', { hasText: 'alex' }).first();
       await opt.waitFor({ state: 'attached', timeout: 20000 });
