@@ -70,6 +70,12 @@
         "description": "console.log is called inside the score >= 70 if block. Help: 2.1.3 (If / Else if / Else)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "if statement checks score >= 70: if statement's condition compares score to 70 with >=. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Is a console.log written inside the curly braces of the if block whose condition is score >= 70 (or 70 <= score)? This card is about where the console.log is written, not whether it runs for the current score: if (score >= 70) { console.log('pass') } counts even when score is 65. Spacing, quotes and semicolons do not matter. No if the if's condition is something else, such as score <= 70, or the console.log sits after the closing }. Code inside comments never runs."
+      }
+    }
   }
 }

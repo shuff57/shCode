@@ -217,6 +217,14 @@
         "description": "A console.log that runs prints what describeBox returned for an object literal, and no printed line says undefined (a key describeBox reads that the object does not have). A result thrown away, typed-in text, and a print that never runs do not count. Help: 3.5.16 (Objects as Named Arguments)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "function defined: Defines a function. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Does the function read its values off its one options object, as options.width or opts.color (any parameter name), or by destructuring right in the parameter list, as in function describeBox({ width, height, color })? Unpacking it later in the body (const { width } = options) does not count for this card. Code inside comments never runs.",
+        "r3": "Is the function called with an object literal whose braces are typed right inside the call's parentheses, for example describeBox({ width: 2, height: 3, color: 'red' }), and is what it returns printed? Passing a variable that holds the object, such as describeBox(box), does not count, and the literal must go to this function, not to some other call. Code inside comments never runs.",
+        "r4": "result printed: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

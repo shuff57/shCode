@@ -70,6 +70,12 @@
         "description": "Code contains an else branch that calls console.log. Help: 2.1.12 (Truthy and Falsy Values)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "if statement tests searchTerm directly and logs: if statement condition is a bare searchTerm with no comparison operator, and logs inside the block. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "else branch logs: Code contains an else branch that calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

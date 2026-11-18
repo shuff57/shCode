@@ -104,6 +104,14 @@
         "description": "Code contains at least two break statements, one after each case body.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "switch statement present: Code contains a switch statement Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "case label present: A quoted case label is directly followed by a console.log call Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "default label present: The default label is directly followed by a console.log call Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "at least two breaks, one per case: Code contains at least two break statements, one after each case body. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

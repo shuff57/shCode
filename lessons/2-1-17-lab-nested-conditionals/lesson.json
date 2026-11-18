@@ -89,6 +89,13 @@
         "description": "the outer else (paired with isLoggedIn) logs a message containing 'log in'. Help: 2.1.9 (Nested Conditionals)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "isAdmin check nested inside isLoggedIn, logs admin message: if (isLoggedIn) nests an if (isAdmin) whose block logs a message about admin. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "isAdmin's else logs user message: the else paired with if (isAdmin) logs a message about user. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "outer else logs please log in: the outer else (paired with isLoggedIn) logs a message containing 'log in'. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

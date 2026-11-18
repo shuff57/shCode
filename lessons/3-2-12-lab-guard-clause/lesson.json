@@ -248,6 +248,16 @@
         "description": "divide(a, b) returns a message that mentions zero when b is 0 and a divided by b for every other b. Help: 3.2.11 (Getting a Value Back with `return`)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "divide defined: Code defines a function named divide. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "if statement present: Code contains an if condition. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "return statement present: Code contains a return statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "results are logged: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "a guard if returns early: Inside divide, an if returns right away for the bad input, and a second return follows for the good result. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "no else needed: divide does not use else: the early return already handled the bad case. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

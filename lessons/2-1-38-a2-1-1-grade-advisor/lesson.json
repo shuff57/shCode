@@ -118,6 +118,14 @@
         "description": "Code calls console.log",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "if statement present: An if statement tests score Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "else if chain present: An else if chain with at least two branches, each testing score against a real cutoff and logging Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "&& or || used to combine attendance and lateAssignments: One if or else if condition compares attendance to a number AND compares lateAssignments to a number, the two joined by && or ||, like attendance < 90 || lateAssignments >= 3. That condition may also test score: score >= 90 && attendance >= 90 && lateAssignments == 0 counts. Any comparison operator (<, >, <=, >=, ===, ==). Not met: a variable used bare with no comparison, like lateAssignments && attendance; or only one of the two ever compared. Code inside comments never runs, and a condition written inside quotes is only text.",
+        "r4": "console.log present: Code calls console.log Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

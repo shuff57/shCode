@@ -93,6 +93,13 @@
         "description": "Uses % 3 and % 5.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Does the code contain at least one for loop that is not inside a comment, for example for (let i = 1; i <= 50; i++) { ... }? One for loop is enough for this card, even if only one of the challenges is attempted or its answer is wrong: other cards judge that. Any counter name, let or var. The word for inside a comment or inside quotes is not a loop. Code inside comments never runs.",
+        "r2": "continue present: Code contains a continue statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "multiple-of-3 and multiple-of-5 tests: Uses % 3 and % 5. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

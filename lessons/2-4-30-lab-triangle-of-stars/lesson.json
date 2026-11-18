@@ -96,6 +96,13 @@
         "description": "Code calls console.log. Help: 2.4.24 (Nested Loops)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Looking only at the loop structure: is there an outer for loop that counts from 1 to 5 (i <= 5 and i < 6 are the same), with an inner for loop inside it whose condition compares the inner counter to the outer loop's counter (like j <= i), and a console.log after the inner loop's closing } but still inside the outer loop? Any counter names. What the inner loop's body does to build the row (stars or numbers, = or +=, extra ++) does not matter for this card. Code inside comments never runs.",
+        "r2": "inner loop bound depends on row: The inner loop's condition compares its own counter to the outer loop's counter, not to a fixed number (any consistent counter names accepted, e.g. i/j). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

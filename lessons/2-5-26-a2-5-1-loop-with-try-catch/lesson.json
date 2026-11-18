@@ -129,6 +129,15 @@
         "description": "Two throw new Error statements: one for NaN, one for a reading that is 0 or less.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "for loop present: Code loops over the three readings with a for loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "try/catch inside the loop: The loop body has a try block and a catch block. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "checks for NaN: Code checks the converted value with Number.isNaN(...) or isNaN(...). Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "catch reports err.message: The catch block logs a friendly message that includes err.message, not a generic string. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "throws an Error for the bad readings: Two throw new Error statements: one for NaN, one for a reading that is 0 or less. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

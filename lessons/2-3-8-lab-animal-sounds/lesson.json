@@ -136,6 +136,16 @@
         "description": "Code contains three break statements, one for each of the dog, cat and cow cases.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "switch statement present: Code contains a switch statement Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Inside the switch, is there a case \"dog\": label (lower-case dog, as the value is spelled; 'Dog' would never match) whose first statement is a console.log printing a message with the word woof in it? Capitals and extra words in the message do not matter: \"Woof\", \"woof woof\" and \"WOOF!\" all count. Single or double quotes. Code inside comments never runs.",
+        "r3": "Inside the switch, is there a case \"cat\": label (lower-case cat, as the value is spelled; 'Cat' would never match) whose first statement is a console.log printing a message with the word meow in it? Capitals and extra words in the message do not matter: \"Meow\", \"meow meow\" and \"MEOW!\" all count. Single or double quotes. Code inside comments never runs.",
+        "r4": "case 'cow' present: case 'cow' is directly followed by a console.log call that prints Moo Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "default label present: The default label is directly followed by a console.log call Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "three breaks, one per case: Code contains three break statements, one for each of the dog, cat and cow cases. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

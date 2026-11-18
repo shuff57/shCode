@@ -284,6 +284,14 @@
         "description": "A structuredClone call that runs is given student, and what it returns is the object deep ends up holding. Help: 3.6.9 (Side Effects and Copies)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "outer object copied with spread: Code copies an object with the spread syntax. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "nested array pushed into: Code pushes a value into the nested array. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "deep made with structuredClone: Code makes deep by calling structuredClone. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "objects logged: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

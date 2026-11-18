@@ -155,6 +155,17 @@
         "description": "The Ordering print is after the checks, so it only runs on valid input.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "quantity is made from typed: Convert the typed text into the number quantity before checking it.",
+        "r3": "Check for not-a-number: A check asks whether quantity is not a number (NaN).",
+        "r4": "Check for 0 or less: A second check asks whether quantity is 0 or less (below 1).",
+        "r5": "Each bad-input branch throws: A failing check throws an error (stops or reports), one for each of the two checks.",
+        "r6": "The work comes after both checks: The Ordering print is after the checks, so it only runs on valid input."
+      },
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: const typed = \"abc\"; const quantity = Number(typed); if (Number.isNaN(quantity)) { throw new Error(\"That is not a number: \" + typed); } if (quantity <= 0) { throw new Error(\"Quantity must be at least 1.\"); } console.log(\"Ordering \" + quantity + \" items.\"). The point is validate-before-use: both checks come BEFORE the work, each bad-input branch ENDS with a throw (it must not carry on), and the Ordering print is only reached when both checks passed."
+    }
   }
 }

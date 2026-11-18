@@ -138,6 +138,16 @@
         "description": "The main program CALLS a second, different function whose job is the attendance and late-work warning. Writing the warning test out inline instead of calling is missing.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "The three values are set up: The plan sets up score, attendance and lateAssignments.",
+        "r3": "Two functions are named: Under FUNCTIONS, write two lines: a function name, a dash, and what it does.",
+        "r4": "One function decides the grade: The plan calls a function that works out the recommended letter grade.",
+        "r5": "One function gives the advice: The plan calls a different function that handles the attendance and late-work warning."
+      },
+      "task": "The student was given a task and wrote numbered pseudocode in README.md, between a first line and a last line that were already there. The program being planned is a grade advisor: it has three values (score, attendance, lateAssignments), prints a recommended letter grade from the score, and prints a review warning when attendance is low or late work is high. The student should list at least two functions (a name and a one-line job each) and write the main program as steps that set up the three values and CALL each function by name. A step that writes out the inside of a function (the else-if chain, the warning test) instead of calling it does not count as a call. The function that decides the grade and the function that handles the warning must be two different functions."
+    }
   }
 }

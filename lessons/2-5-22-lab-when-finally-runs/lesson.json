@@ -93,6 +93,13 @@
         "description": "The finally block logs Cleanup ran. Help: 2.5.21 (Cleaning Up with finally)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "try/catch/finally present: Code has a try, catch, and finally block. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "try block cannot fail: The try block logs Work done. with nothing that can error. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "finally logs cleanup: The finally block logs Cleanup ran. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

@@ -137,6 +137,16 @@
         "description": "The loop is closed, and total is printed once after it (not on every pass).",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "total starts at 0 before the loop: Set total to 0 once, before the loop begins (not inside it).",
+        "r3": "The loop counts i from 1 to 5: A loop line that counts from 1 to 5.",
+        "r4": "i is added to total inside the loop: After the loop line, a step adds i to total.",
+        "r5": "The loop ends, then total is printed: The loop is closed, and total is printed once after it (not on every pass)."
+      },
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: let total = 0; for (let i = 1; i <= 5; i++) { total = total + i; } console.log(\"Sum 1 to 5:\", total). The point: total starts at 0 ONCE before the loop (if it were reset inside the loop the answer would always be 5); the loop counts i from 1 to 5; the body adds i to total on every pass; the print is after the loop ends, once."
+    }
   }
 }

@@ -269,6 +269,14 @@
         "description": "When player holds other values, saved and restored change with it; a console.log that runs prints a number of restored plus one, and another prints one of player's properties. Help: 3.8.9 (A Round Trip)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Object declared: Declares an object with curly braces. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Saved with stringify: Calls JSON.stringify to produce text. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Restored with parse: Calls JSON.parse on the saved text. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Both logged: Calls console.log to print the restored object. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

@@ -157,6 +157,17 @@
         "description": "The ticket price is printed.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "Gets the age before deciding: Get the customer's age (input, ask, read) before the check.",
+        "r3": "The question is about 13: Check the age against 13 (under 13, or 13 or over).",
+        "r4": "Right price for each answer: Under 13 costs $8 and 13 or over costs $14, on the matching branches.",
+        "r5": "Both answers are written: The decision has an ELSE (the other answer) and is closed with END IF.",
+        "r6": "Prints the price: The ticket price is printed."
+      },
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The algorithm is: get the customer's age; if the age is under 13 the ticket price is $8, otherwise $14; print the ticket price. In JavaScript: const age = Number(prompt(\"Age?\")); let price; if (age < 13) { price = 8; } else { price = 14; } console.log(price). The point is one question about 13 with two answers carrying the right prices ($8 for under 13, $14 for 13 and over), with the age obtained before the question and the price printed."
+    }
   }
 }

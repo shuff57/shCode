@@ -181,6 +181,13 @@
         "description": "largest(a, b, c) gives back the biggest of the three numbers, wherever it sits in the list. Help: 3.2.26 (Lab: findMax & isEven)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "largest is defined with three parameters: Code defines a function named largest with exactly three parameters. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "largest compares its numbers: largest compares the numbers (with > or <, or Math.max) inside its body. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "largest hands back a value with return: largest contains a return statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

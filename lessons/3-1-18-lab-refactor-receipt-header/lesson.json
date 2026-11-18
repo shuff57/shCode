@@ -113,6 +113,14 @@
         "description": "The three distinct book titles are still logged, in order. Help: 3.1.2 (Defining & Calling a Function)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "printHeader defined, no parameters: Code defines a function named printHeader with an empty parameter list. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "header text lives inside printHeader: printHeader()'s body logs the header line. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Is printHeader() called three separate times by code that runs? Count the call statements: three written-out printHeader(); calls count wherever they sit, even side by side or inside a block that runs once. This card counts the calls only; whether each header still lands right before its book does not matter here. One call inside a loop that repeats it is not three separate calls. Code inside comments never runs.",
+        "r4": "Are the three book lines still printed by console.log calls that run, in this order: The Hobbit, then Dune, then Kindred? This card is only about the book lines being kept in order; where the header prints, and how printHeader is written or called, does not matter here. A book line that is commented out does not count. Code inside comments never runs."
+      }
+    }
   }
 }

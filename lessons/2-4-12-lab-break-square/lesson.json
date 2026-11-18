@@ -91,6 +91,13 @@
         "description": "Code calls console.log. Help: 2.4.9 (Leaving Early with break)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "while (true) loop present: n is declared and set to 1. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "break present: Inside the while (true) loop, n * n is compared to 50 and break runs when it is greater, with console.log also inside that check. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

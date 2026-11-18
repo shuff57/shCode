@@ -138,6 +138,14 @@
         "description": "At least one line is printed and it is not undefined. Help: 3.4.4 (Function Expressions)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Is a variable assigned an anonymous function expression, written as = function (...) { ... }, for example let double = function (n) { return n * 2 }? const, let or var all count, with or without semicolons. Code inside comments never runs.",
+        "r2": "Function called through the variable: The assigned const is called inside a console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "The function uses its parameter: The function expression has a parameter and its body uses it. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

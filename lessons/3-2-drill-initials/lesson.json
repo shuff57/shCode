@@ -150,6 +150,12 @@
         "description": "initials(first, last) gives back the first letter of first followed by the first letter of last, as one string. Help: 2.2.19 (Walking Through a Word)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "initials is defined with two parameters: Code defines a function named initials with exactly two parameters. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "initials hands back a value with return: initials contains a return statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

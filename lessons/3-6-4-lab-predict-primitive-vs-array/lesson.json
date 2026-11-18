@@ -314,6 +314,14 @@
         "description": "A console.log that runs prints data from the number or the array. Typed text does not count. Help: 3.6.3 (Example: Mutating an Array Parameter)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Does the code define a function for the number half of the task, one that takes a number parameter (the lesson calls it changeNum)? Any function name counts; the lesson's name is only a suggestion. Code inside comments never runs.",
+        "r2": "Does the code define a function for the array half of the task, one that takes an array parameter (the lesson calls it changeArr)? Any function name counts; the lesson's name is only a suggestion. Code inside comments never runs.",
+        "r3": ".push used: Code calls .push on the array parameter. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "caller variables logged: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

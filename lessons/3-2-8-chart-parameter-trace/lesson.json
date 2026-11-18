@@ -156,6 +156,17 @@
         "description": "The yes way out prints Over budget and the other way out prints Within budget (reversed only if the question is also reversed).",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "Sets base to 100: Set base to 100 before anything uses it.",
+        "r3": "Calls the function with base: Call showPriceWithTax and pass it base.",
+        "r4": "The call comes before the decision: Call the function first, then make the decision.",
+        "r5": "The decision tests base against 80: The check asks whether base is over 80.",
+        "r6": "Each answer prints the right message: Over budget for yes, Within budget for the other way out."
+      },
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: set base to 100; call showPriceWithTax with base (inside the call the value becomes the parameter price and it prints the price with tax; the body is not written out); then check whether base is over 80; if so print \"Over budget\", otherwise print \"Within budget\"."
+    }
   }
 }

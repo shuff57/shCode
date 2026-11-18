@@ -88,6 +88,13 @@
         "description": "Catch block logs err.message. Help: 2.5.12 (Reading the Error Object)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "reads a property of null: Code reads a property off a value set to null, inside try. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "logs err.name: Catch block logs err.name. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "logs err.message: Catch block logs err.message. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

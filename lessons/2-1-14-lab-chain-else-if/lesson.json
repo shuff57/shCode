@@ -103,6 +103,14 @@
         "description": "the closing else branch logs a message containing 'Battery full'. Help: 2.1.3 (If / Else if / Else)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "below 20 logs Low battery: A message containing 'Low battery' (capitals and punctuation do not matter) is logged when batteryPercent is below 20, and not when it is 20. Judge the chain for every value, not only the one batteryPercent holds now. Low to high: if (batteryPercent < 20) or (<= 19) as the first test. A high-to-low chain is just as right: if (batteryPercent >= 90) Battery full, else if (>= 50) Battery good, else if (>= 20) Battery ok, else Low battery. Not met: <= 20 (20 would log it), or a branch that an earlier test always catches first. A misspelled name (batterPercent, consoe.log) crashes, so that branch logs nothing. Code inside comments never runs.",
+        "r2": "below 50 logs Battery ok: A message containing 'Battery ok' (capitals and punctuation do not matter) is logged when batteryPercent is 20 to 49, and not when it is 50. Low to high: else if (batteryPercent < 50) or (<= 49) after the below-20 test. A high-to-low chain is just as right: if (batteryPercent >= 90) Battery full, else if (>= 50) Battery good, else if (>= 20) Battery ok, else Low battery. Not met: <= 50 (50 would log it), or a branch that an earlier test always catches first, like an if (batteryPercent < 90) above it. A misspelled name (batterPercent, consoe.log) crashes, so that branch logs nothing. Code inside comments never runs.",
+        "r3": "below 90 logs Battery good: A message containing 'Battery good' (capitals and punctuation do not matter) is logged when batteryPercent is 50 to 89, and not when it is 90. Low to high: else if (batteryPercent < 90) or (<= 89) after the below-50 test; <= 89 is the same as < 90 for whole numbers. A high-to-low chain is just as right: if (batteryPercent >= 90) Battery full, else if (>= 50) Battery good, else if (>= 20) Battery ok, else Low battery. Not met: <= 90 (90 would log it), or a branch that an earlier test always catches first. A misspelled name (batterPercent, consoe.log) crashes, so that branch logs nothing. Code inside comments never runs.",
+        "r4": "final else logs Battery full: The chain ends in an else, and its branch for the highest values logs a message containing 'Battery full' (any capitals or punctuation). That branch is the final else when the lowest cutoff is tested first, or the first if (>= 90) when the highest is tested first. Whether it starts at 90 or 91 is judged by another card. A typo like consoe.log or batterPercent in any branch counts as not met. Code inside comments never runs."
+      }
+    }
   }
 }

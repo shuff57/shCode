@@ -154,6 +154,17 @@
         "description": "Too short is printed only in the branch for a rider who is NOT tall enough (under 48).",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "The rider's height comes first: The plan gets the rider's height before it checks it.",
+        "r3": "The question is at least 48: Check whether the height is at least 48.",
+        "r4": "You may ride is the yes answer: You may ride is printed when the height is at least 48 (before any ELSE).",
+        "r5": "The other answer is written: The check has a second answer for a rider who is not tall enough (an ELSE, or an \"if not\" step).",
+        "r6": "Too short is the ELSE answer: Too short is printed in the other branch, for a rider under 48."
+      },
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: get the rider's height; if (height >= 48) { print \"You may ride\" } else { print \"Too short\" }. The plan the student started from only had the yes branch. The point is that the check needs BOTH answers written: the ELSE branch must exist and print Too short for riders under 48."
+    }
   }
 }

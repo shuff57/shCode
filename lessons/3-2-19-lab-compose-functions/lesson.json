@@ -307,6 +307,18 @@
         "description": "addSeven(n) returns n plus 7 for any number. Help: 3.2.20 (Building With Returned Values)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "triple defined: Code defines a function named triple. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "addSeven defined: Code defines a function named addSeven. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "returns a value: Code contains a return statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "one call nested in another: A call to one function is written as the argument of the other. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "results are logged: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "triple multiplies: triple multiplies: its body has a * (or adds the number to itself three times). Code inside a comment, or written inside quotes as text, never runs.",
+        "r7": "addSeven adds: addSeven adds: its body has a +. Code inside a comment, or written inside quotes as text, never runs.",
+        "r8": "both nesting orders: Both orders are written: triple inside addSeven and addSeven inside triple. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

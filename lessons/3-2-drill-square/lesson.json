@@ -139,6 +139,12 @@
         "description": "square(n) gives back n multiplied by itself, for any number. Help: 3.2.11 (Getting a Value Back with `return`)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "square is defined with one parameter: Code defines a function named square with exactly one parameter. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "square hands back a value with return: square contains a return statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

@@ -191,6 +191,14 @@
         "description": "Called on its own, area(width, height) gives back width times height and prints nothing itself. Help: 3.2.16 (Printing Is Not Returning)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "area defined: Code defines a function named area. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "area returns its answer: Inside area there is a return with a value, and area no longer prints with console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "result used in arithmetic: The value that area returns is used in arithmetic (for example doubled), proving a number came back. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "results are logged: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

@@ -155,6 +155,17 @@
         "description": "There is an explicit written line that closes the loop or says it stops (END WHILE, END LOOP, a line saying the loop is over, or a stop when count reaches 0). Indentation alone, with no closing line, does not meet this.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "count starts at 5: Set count to 5 before the loop.",
+        "r3": "The loop prints count: Each round prints the current count.",
+        "r4": "count goes down by 1: Each round count is reduced by 1.",
+        "r5": "The loop asks count > 0: The loop has a test that stops it: it repeats while count is above 0 (or until count reaches 0).",
+        "r6": "The loop is closed: The plan shows where the repeating steps end, so it can carry on to its end (END WHILE, \"loop ends\", \"stop\")."
+      },
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: let count = 5; while (count > 0) { console.log(count); count = count - 1; } and then the program ends. The plan the student started from said REPEAT FOREVER, with no test and no stopping point, so it is an infinite loop. The point is that a loop needs a test on count that can become false (count > 0) and a place where the loop ends."
+    }
   }
 }

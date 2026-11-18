@@ -155,6 +155,17 @@
         "description": "No step inside the repeating part returns, gives back or shows the total. Giving it back happens only after the loop. If the student never wrote a loop at all, mark this missing.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "The total starts at zero, before the loop: The running total starts at zero, before the loop begins.",
+        "r3": "One loop over numbers, closed: One loop over numbers, closed with an END line such as END FOR.",
+        "r4": "Each number is added to the total, inside the loop: Each pass adds the loop's number to the running total.",
+        "r5": "The total is given back after the loop: The total is handed back once the loop is over.",
+        "r6": "Nothing is given back inside the loop: The answer comes after END FOR, not between FOR EACH and END FOR."
+      },
+      "task": "The student was given four plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program they were describing is the body of total(...numbers): start a running total called sum (or total) at 0; go through the numbers one at a time; for each number, add it to the total; when there are no more numbers, give back the total."
+    }
   }
 }

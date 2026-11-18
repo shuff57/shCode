@@ -96,6 +96,13 @@
         "description": "The catch block logs err.message. Help: 2.5.12 (Reading the Error Object)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "checks password length: Code checks password.length against 8. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "throws a new Error: Code throws a new Error when the password is too short. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "catch logs err.message: The catch block logs err.message. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

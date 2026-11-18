@@ -229,6 +229,13 @@
         "description": "addOne is called with the caller's array (quizScores) where the program reaches it, and that array is printed after. Help: 3.6.5 (Changing vs. Reassigning)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "a loop visits each position: Code loops over the array (for, while or forEach). Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "indexed write into the parameter: Code assigns into the array parameter by index. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "caller array logged: Code calls console.log on the caller's array. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

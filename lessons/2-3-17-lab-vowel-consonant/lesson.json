@@ -123,6 +123,15 @@
         "description": "Code contains a break statement. Help: 2.3.9 (break and Fall-Through)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "switch statement present: Code contains a switch statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "'a' and 'e' cases grouped: case 'a' is stacked directly above case 'e' with no code between them. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "'u' case reaches the shared block: case 'u' is grouped in among the vowel cases and the shared block logs Vowel. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "default label present: The default label is directly followed by a console.log call that prints Consonant. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "break present: Code contains a break statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

@@ -187,6 +187,14 @@
         "description": "sumToN(n) returns 1 + 2 + ... + n: for example sumToN(5) is 15, sumToN(10) is 55 and sumToN(100) is 5050. Help: 3.2.11 (Getting a Value Back with `return`)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "sumToN defined: Code defines a function named sumToN (exact spelling). Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "for loop present: Code contains a for loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "return statement present: Code contains a return statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "the loop adds to the total, then sumToN returns it: Inside sumToN, a for loop body adds to a running total and a return comes after the loop. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

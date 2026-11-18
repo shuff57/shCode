@@ -156,6 +156,17 @@
         "description": "Big is printed when the check is true and Small is printed otherwise (two alternatives, not both every time).",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "Calls double with 5: Call double with the number 5.",
+        "r3": "The second call uses the first one's answer: addTen is called after double, on the value double handed back.",
+        "r4": "Result comes from addTen: Set result to what addTen handed back.",
+        "r5": "The check is result over 25: Check whether result is over 25.",
+        "r6": "Big or Small, one of them: Print Big when the check is true and Small otherwise."
+      },
+      "task": "The student was given five plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: function double(n) { return n * 2; } function addTen(n) { return n + 10; } const result = addTen(double(5)); if (result > 25) print \"Big\" else print \"Small\". The point is that the inner call double(5) runs first, its value (10) is handed to the outer call addTen, result is set to what addTen returns (20), and only then is result compared with 25."
+    }
   }
 }

@@ -88,6 +88,13 @@
         "description": "Code still contains a default label. Help: 2.3.9 (break and Fall-Through)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "switch statement present: Code still contains a switch statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "break added after the apple case: A break statement now appears between the apple case and the banana case. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "default label still present: Code still contains a default label. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

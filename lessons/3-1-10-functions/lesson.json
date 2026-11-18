@@ -195,6 +195,16 @@
         "description": "Print what your functions return with console.log. Help: 3.2.11 (Getting a Value Back with `return`)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "req1": "greet function: Declare a function called greet. Code inside a comment, or written inside quotes as text, never runs.",
+        "req2": "Return value: Return a value: a return statement, or an arrow whose body is one expression Code inside a comment, or written inside quotes as text, never runs.",
+        "req3": "Arrow function: Write an arrow function. Code inside a comment, or written inside quotes as text, never runs.",
+        "req4": "Call greet: Call the greet function. Code inside a comment, or written inside quotes as text, never runs.",
+        "req5": "Multiple functions: Define at least 2 functions. Code inside a comment, or written inside quotes as text, never runs.",
+        "req6": "Results printed: Print what your functions return with console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

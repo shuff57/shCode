@@ -116,6 +116,14 @@
         "description": "A for loop calls terms() once per user. Help: 3.1.2 (Defining & Calling a Function)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "terms defined, no parameters: Code defines a function named terms with an empty parameter list. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "reads an answer with prompt: terms() calls prompt() to read the user's answer. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "if/else on the answer: An if/else compares the answer to \"Y\" and logs a response either way. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "for loop calls terms(): A for loop calls terms() once per user. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

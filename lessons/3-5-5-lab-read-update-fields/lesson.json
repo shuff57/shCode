@@ -226,6 +226,14 @@
         "description": "A console.log that runs prints a field read from book (directly, or through a variable that is then printed), and another prints the whole object. Text typed in, a read thrown away, and a print that never runs do not count. Help: 3.5.4 (Reading and Changing Properties)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "object literal created: Declares an object with braces. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "property read with a dot and printed: console.log prints a property of book read with dot notation, directly or through a variable that is then printed. A print inside a function nobody calls never runs. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "a field changed and a field added: One dot assignment changes a property the object literal of book already had, and another dot assignment adds a property the literal did not have. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "whole object printed: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

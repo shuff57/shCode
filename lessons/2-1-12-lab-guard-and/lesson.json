@@ -85,6 +85,13 @@
         "description": "console.log runs inside the if block, as step 2 asks. Help: 2.1.29 (Logical Operators)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "&& combines two real comparisons: Some if condition joins two comparisons with &&, and each side compares a variable to a value with <, >, <=, >=, ===, !==, == or !=, like age >= 16 && score >= 70. Any variable names. Both sides may test the same variable: age >= 13 && age <= 17 is a range check and counts. With several if statements, one such if is enough. Not met: a single = (that assigns, it does not compare); a number variable compared to true or false; && with a bare value or variable and no comparison, like && score. Code inside comments never runs, and a condition written inside quotes is only text.",
+        "r2": "two variables declared: Two variables are declared and given values before the if, in any shape. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "a message is printed inside the if block: console.log runs inside the if block, as step 2 asks. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

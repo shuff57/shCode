@@ -155,6 +155,17 @@
         "description": "The steps print one line when the customer is a VIP and a different line in the other case, so the VIP question has two different prints.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "The total starts at zero, before the loop: Start the total at zero before the loop begins.",
+        "r3": "Each price is added inside the loop: Inside the loop over the items, add each item's price to the total.",
+        "r4": "The customer name is read after the loop: After the loop, read the customer's name.",
+        "r5": "The VIP question is asked after the loop: After the loop, ask whether the customer is a VIP.",
+        "r6": "Each answer has its own print: A VIP gets one print and everyone else gets a different print."
+      },
+      "task": "The student was given a four-step plain-English plan and rewrote it as numbered pseudocode in README.md, between a first line and a last line that were already there. The plan: start a total at 0; loop over each item in order.items adding each item's price to the total; AFTER the loop read the customer name (order.customer.name); AFTER the loop ask whether the customer is a VIP (order.customer.vip), print the name and total with a VIP label if so, and a different print otherwise."
+    }
   }
 }

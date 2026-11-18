@@ -177,6 +177,14 @@
         "description": "At least three console.log calls that run print your data, and two prints of the array itself differ, before and after the method that changes it. Help: 3.7.19 (What Else Is Out There)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Array declared: Makes an array in square brackets. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A mutating method is called: Calls .push() (or another in-place method). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A non-mutating method is called: Calls .map(), .slice() or .concat(), which return a new array. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "console.log present: Calls console.log to show before and after. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

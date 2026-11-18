@@ -192,6 +192,14 @@
         "description": "A console.log that runs prints the text JSON.stringify made from counter, and that text changes when counter does. Help: 3.8.6 (What Does Not Survive)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Object declared: Declares an object with curly braces. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A function value in the object: One property's value is a function. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "JSON text kept in a variable: Keeps what JSON.stringify gives back in a variable. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Result logged: Calls console.log on the stringified value. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

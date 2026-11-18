@@ -154,6 +154,17 @@
         "description": "The print is the last step, after both calls. A print before the second call is missing.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "Reads operation and value: Read in both operation and value.",
+        "r3": "The first call: Call operation on value and keep the answer.",
+        "r4": "The second call uses the first answer: After the first call, call operation again on the first answer.",
+        "r5": "It prints the second answer: Print the answer of the second call.",
+        "r6": "The print comes last: The print is the last step, after both calls."
+      },
+      "task": "The student was given four plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The function is: function applyTwice(operation, value) { return operation(operation(value)); } called as applyTwice((n) => n * 2, 5). The point is that operation(operation(value)) is TWO calls with the inner one finishing first: read operation and value, call operation on value (first), call operation again on that answer (second), then print second. There is no decision and no loop."
+    }
   }
 }

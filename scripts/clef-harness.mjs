@@ -10,16 +10,16 @@
 // Always graded: the lab's reference answer (must have NO red card) and its starter (no card green that the
 // lab's pattern check calls red). --fixtures adds labelled programs, a JSON array of {name, code, labels}, where labels
 // follow lesson.requirements order and each is 1, 0 or null (null = not scored). Run it after
-// generate-ai-graders.mjs, since the questions are read from the generated server config.
+// generate-ai-graders.mjs before deploying; the harness itself reads the questions from lesson.json.
 //
 // Exit 1 when the reference or starter fails, a fixture card is wrong, or no call succeeded.
 
 import { execFileSync } from 'child_process';
-import { existsSync, readFileSync, readdirSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { grade } from '../lib/grader.ts';
-import { CLEF_MODEL, cardsFromAnswer, clefInputs, resolveClefCards } from '../lib/clef-check-core.ts';
+import { CLEF_MODEL, cardsFromAnswer, clefInputs, clefTask, resolveClefCards } from '../lib/clef-check-core.ts';
 import { aiCheckText } from '../lib/ai-check.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -33,10 +33,19 @@ if (!lab || !proxy) {
 
 const lf = (s) => String(s).replace(/\r\n?/g, '\n');
 const lesson = JSON.parse(readFileSync(path.join(root, 'lessons', lab, 'lesson.json'), 'utf8'));
-const gts = readFileSync(path.join(root, 'functions/_shared/ai-graders.generated.ts'), 'utf8');
-const cfg = JSON.parse(gts.slice(gts.indexOf('= {') + 2, gts.lastIndexOf(';')))[lab]?.clef;
-if (!cfg) { console.error(`${lab} has no Clef questions in the generated config (add aiCheck.clef, run generate-ai-graders.mjs)`); process.exit(2); }
-const ids = lesson.requirements.map((r) => r.id);
+// The questions, task and kind as the generator builds them (scripts/generate-ai-graders.mjs), read from
+// lesson.json itself so several labs can be edited and tested at once without regenerating in between.
+const authored = lesson.aiCheck?.clef;
+if (!authored?.questions) { console.error(`${lab} has no aiCheck.clef questions`); process.exit(2); }
+const cfg = {
+  task: clefTask(authored, lesson.aiCheck.prompt),
+  kind: lesson.work?.kind === 'plan' ? 'plan' : lesson.preview === 'moshion' ? 'moshion' : 'console',
+  questions: Object.fromEntries(Object.entries(authored.questions).map(([k, v]) => [k, String(v).trim()])),
+};
+if (!cfg.task) { console.error(`${lab}: no task (add aiCheck.clef.task)`); process.exit(2); }
+// Only the cards Clef answers are scored here; a card that runs the code (`tests`) has no question and
+// keeps its runtime result in the app, which this harness does not run.
+const ids = lesson.requirements.map((r) => r.id).filter((id) => id in cfg.questions);
 const file = lesson.aiCheck.file ?? 'script.js';
 
 const dir = path.join(root, 'lessons', lab);
@@ -50,14 +59,23 @@ const programs = [];
 if (refFiles) programs.push({ name: 'reference', files: refFiles, rule: 'no-red' });
 programs.push({ name: 'starter', files: starterFiles, rule: 'no-green' });
 const fx = arg('fixtures');
-if (fx) for (const f of JSON.parse(readFileSync(fx, 'utf8'))) programs.push({ name: f.name, files: f.files ?? { ...starterFiles, [file]: lf(f.code) }, labels: f.labels });
+// A fixture's labels follow lesson.requirements order; keep only the cards scored here.
+const allIds = lesson.requirements.map((r) => r.id);
+const pick = (labels) => (Array.isArray(labels) ? ids.map((id) => labels[allIds.indexOf(id)] ?? null) : labels);
+if (fx) for (const f of JSON.parse(readFileSync(fx, 'utf8'))) programs.push({ name: f.name, files: f.files ?? { ...starterFiles, [file]: lf(f.code) }, labels: pick(f.labels) });
 // --tolerance: the lab's ACCEPT / REJECT cases from scripts/test-grader-tolerance.mjs (dumped through
 // TOLERANCE_CASES_OUT). ACCEPT = every card green; REJECT = its named card red, the others not scored.
 if (process.argv.includes('--tolerance')) {
-  const dump = path.join(root, 'node_modules', '.pkg-load-cache', 'tolerance-cases.json');
-  execFileSync(process.execPath, ['--import', path.join(root, 'scripts/register-ts.mjs'), path.join(root, 'scripts/test-grader-tolerance.mjs')],
-    { cwd: root, env: { ...process.env, TOLERANCE_CASES_OUT: dump }, stdio: 'pipe' });
-  for (const c of JSON.parse(readFileSync(dump, 'utf8')).filter((c) => c.id === lab)) {
+  const tolCases = [];
+  for (const t of ['test-grader-tolerance.mjs', 'test-grader-tolerance-3x.mjs']) {
+    const dump = path.join(root, 'node_modules', '.pkg-load-cache', `tolerance-cases-${t}.json`);
+    // Reuse a dump newer than the test file (a run over many labs dumps once).
+    const fresh = existsSync(dump) && statSync(dump).mtimeMs > statSync(path.join(root, 'scripts', t)).mtimeMs;
+    if (!fresh) execFileSync(process.execPath, ['--import', path.join(root, 'scripts/register-ts.mjs'), path.join(root, 'scripts', t)],
+      { cwd: root, env: { ...process.env, TOLERANCE_CASES_OUT: dump }, stdio: 'pipe' });
+    tolCases.push(...JSON.parse(readFileSync(dump, 'utf8')));
+  }
+  for (const c of tolCases.filter((c) => c.id === lab)) {
     if (c.expect === 'fail' && !ids.includes(c.req)) continue;
     const files = Object.fromEntries(Object.entries(c.files ?? {}).map(([k, v]) => [k, lf(v)]));
     const labels = c.expect === 'pass' ? ids.map(() => 1) : ids.map((id) => (id === c.req ? 0 : null));

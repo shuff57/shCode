@@ -151,6 +151,13 @@
         "description": "The output shows ana (who was served) and the remaining line, bob and cy. Help: 3.3.7 (Adding and Removing from the Front)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": ".push used on the line: Code calls .push( on an array, and the same array is later shifted. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": ".shift result is used: The value .shift() hands back is stored and logged (or logged directly). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

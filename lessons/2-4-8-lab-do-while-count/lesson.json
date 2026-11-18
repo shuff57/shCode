@@ -91,6 +91,13 @@
         "description": "Code calls console.log. Help: 2.4.5 (The do...while Loop)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "do...while loop present: A do...while loop logs and increments a counter up through 5. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "second do...while with a condition that starts false: A second do...while loop logs something with a condition that is already false before the loop starts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

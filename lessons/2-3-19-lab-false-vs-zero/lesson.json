@@ -120,6 +120,15 @@
         "description": "Code contains three break statements, one for each of case false, case 0 and case '0'. Help: 2.3.9 (break and Fall-Through)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "switch statement present: Code contains a switch statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "case false present: The switch has a case false: line whose next statement is a console.log(...) call, like case false: console.log('Boolean false'). Judge only how it is written: it does not matter what value is set to now, or whether this case would run this time. The order of the cases does not matter, and what the log prints does not matter. A missing break is another card. Code inside comments never runs.",
+        "r3": "case 0 present: case 0 is directly followed by a console.log call. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "case '0' present: case '0' is directly followed by a console.log call. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "three breaks, one per case: Code contains three break statements, one for each of case false, case 0 and case '0'. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

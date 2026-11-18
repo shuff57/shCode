@@ -100,6 +100,14 @@
         "description": "A single if condition uses &&, a same-variable range check with ||, and ! together, not three separate ifs. Help: 2.1.30 (Combining conditions)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "&& combines with a real variable: if condition uses && together with a named variable, not a hardcoded true/false. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "|| compares the same variable on both sides: if condition uses || between two comparisons on the same variable (a range check, e.g. age < 5 || age >= 65). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Does any if condition use the NOT operator ! on a variable, like !isBlocked or !hasTicket? Any variable counts. A ! that is then compared, as in !isOpen == true or !isOpen === false, still uses ! on that variable. Only the presence of !name matters for this card, not what it is combined with or whether the logic is right. != and !== are not the NOT operator, and !true is not on a variable. Code inside comments never runs.",
+        "r4": "all three combined in one condition: A single if condition uses &&, a same-variable range check with ||, and ! together, not three separate ifs. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

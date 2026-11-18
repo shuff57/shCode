@@ -70,6 +70,12 @@
         "description": "Code calls console.log. Help: 2.1.29 (Logical Operators)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "if condition is !isRaining and logs: Is there an if (!isRaining) { ... } whose block contains a console.log(...) call? Example: if (!isRaining) { console.log(\"Walk to school\") }. The message text, an else branch, and the current value of isRaining do not matter. !isRaining == true counts the same as !isRaining. A helper function that calls console.log counts as console.log. Ignore the comment's later step (logging isRaining and !isRaining after the if): it is not part of this card, so leaving it out does not lower this answer. Code inside comments never runs.",
+        "r2": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

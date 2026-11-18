@@ -486,6 +486,16 @@
         "description": "When prices holds other numbers, bumped, middle and joined change with it, and console.log calls that run print them, prices, and both objects. Help: 3.7.20 (Chaining .map() off a .push()-Built Array)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "prices built with .push(): Declares prices as an array and adds to it with prices.push(). Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": ".map() used: Calls .map() to transform the list. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": ".slice() used: Calls .slice() to copy a range. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Arrays joined: Joins two arrays with .concat() or array spread. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Object spread with override: Builds an object copy with a property written after the spread. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "console.log present: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

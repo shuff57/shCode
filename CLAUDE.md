@@ -1645,9 +1645,28 @@ reds remain (one where the lab's own regex agrees with Clef). **Lessons for writ
   otherwise the task bleeds in (variables named `lol` failed "six variables"; an age of 7000 failed
   "studentAge is a number").
 - Short, literal questions with an example beat long ones (`'${2024 + 1}'`, `numberNine + numberNineLarge`).
-- 1.2.16 "Use addition": the card says "+ with numbers", the regex wants Step 1's two variables; the question
-  follows the card. 1.3.19 r10: the question follows the course's ACCEPT ("mentions tax"), which is looser than
-  the card's wording. Owner to confirm both.
+- 1.2.16 "Use addition" (owner's decision): the rule is Step 1's, two number VARIABLES added; the card now says
+  so, and students who handed in `console.log(5 + 2)` before keep their pass. 1.3.19 r10: "mentions tax" (owner).
+
+**Chapters 2-3 (2026-11-18): all 139 AI Check labs have questions** (591 drafted from the card text, then fixed
+where a gate or real work disagreed). Gate: every lab passes `--tolerance` (now reading `test-grader-tolerance.mjs`
+AND `test-grader-tolerance-3x.mjs`) except 3.5.18's two "print inside a function nobody calls" cases, which its
+runtime card t2 refuses. Real work: 2,583 handed-in programs; a blind reviewer sampled 3 reds per card (285):
+before fixes 79% of Clef's reds were real gaps; after, 223 of 225 sampled real catches stay red and 5 of 57
+false reds remain. 381 programs (15%) get a red card, nearly all real gaps today's grading let through.
+- **Cards that run the code (`tests`) take no question**: Clef reads code, it does not run it. They keep their
+  last Run's result in the app (`runFastCheck` takes them from the pattern grader, never into the Clef verdicts),
+  and the harness does not score them. The generator requires a question on every regex/inFunction card only.
+- **The aiCheck prompt's task is often only Step 1** ("Write a for loop running from 1 to 20"). Clef and any
+  reviewer then miss what Step 2 asks (2.4.19 prints only the multiples of 3; one fix had accepted either
+  direction). Give such a lab an authored `aiCheck.clef.task`, and check a question against the REFERENCE.
+- Many cards name the reference's function or variable while the course accepts any name (the 3.x "renamed"
+  ACCEPT cases): say "any function name; the lesson's name is only a suggestion" and describe what it does.
+- Asking about the OUTPUT ("does it print ONLY 3, 6, 9...?") made Clef sure where asking about the structure
+  left it unsure and the lenient regex decided.
+- Clef does not trace calls: "a print inside a function nobody calls" needs a runtime card, not a question.
+- The harness now reads questions from lesson.json (not the generated file), so several labs can be edited and
+  tested at once; run `generate-ai-graders.mjs` before deploying.
 Fixtures are hand-written programs only; real student code never goes in the repo. The same
 `WORKERS_PROXY` makes the dev server run the real clef-check and grade-written handlers against Workers
 AI. Tests: `scripts/test-clef-check.mjs` (npm test). Deploy: nothing to apply (no migration; the `AI`

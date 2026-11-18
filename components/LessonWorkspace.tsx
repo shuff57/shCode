@@ -874,7 +874,15 @@ export default function LessonWorkspace({
     const { verdicts: colours } = resolveClefCards(cards, report);
     const shown = withHints(colours, lesson.requirements);
     aiVerdictsRef.current = { verdicts: shown, text };
-    setRequirements(applyAiVerdicts(useLessonStore.getState().requirements, shown));
+    // A card with no Clef question (one that runs the code, `tests`) shows what the pattern grader finds
+    // now: its last Run's result for this exact code, or "press Run". It is kept out of the Clef verdicts,
+    // so the next Run's result is never overwritten by this Check.
+    const fromReport = new Map(report.results.map((r) => [r.id, r]));
+    const base = useLessonStore.getState().requirements.map((r) => {
+      const g = colours[r.id] ? null : fromReport.get(r.id);
+      return g ? { ...r, status: g.status, messages: g.messages } : r;
+    });
+    setRequirements(applyAiVerdicts(base, shown));
     setCheckedAt(Date.now());
     setClock(Date.now());
     setCheckedOn(filesNow['script.js'] ?? '');

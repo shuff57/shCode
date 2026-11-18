@@ -156,6 +156,17 @@
         "description": "The count is printed once AFTER the loop ends, not inside the loop.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "cheapCount starts at 0: Start cheapCount at 0, before the loop.",
+        "r3": "A loop over the prices: Loop over every price in the array.",
+        "r4": "Each price is checked against 10: Check whether a price is under 10.",
+        "r5": "A cheap price adds one: Adding one to cheapCount happens inside the check.",
+        "r6": "The print comes after the loop: Print the count once, after the loop has finished."
+      },
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: const prices = [4.50, 12.00, 7.25, 30.00, 2.00]; let cheapCount = 0; for (let i = 0; i < prices.length; i++) { if (prices[i] < 10) { cheapCount = cheapCount + 1; } } console.log(\"Items under $10:\", cheapCount). The point is a decision nested inside a loop: a price that is not cheap still moves on to the next one, and the print happens once, after the loop."
+    }
   }
 }

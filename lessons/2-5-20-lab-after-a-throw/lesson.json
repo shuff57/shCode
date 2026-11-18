@@ -93,6 +93,13 @@
         "description": "Catch block logs caught: followed by err.message. Help: 2.5.15 (Throwing Your Own Errors)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "logs start before the throw: Code logs \"start\" before the throw statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "throws with the exact message: Throws new Error with the message stop right here. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "catch reports caught plus the message: Catch block logs caught: followed by err.message. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

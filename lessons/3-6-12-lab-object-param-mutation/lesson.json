@@ -419,6 +419,15 @@
         "description": "A console.log that runs prints the name or age of user, or the whole object. Help: 3.6.5 (Changing vs. Reassigning)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Does the code define a function that takes one object and adds 1 to its age property (the lesson calls it birthday)? Any function name counts; the lesson's name is only a suggestion. Code inside comments never runs.",
+        "r2": "property mutated: Code assigns to a property on the parameter object. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Does the code define a second function that returns a copy of the object with the age one higher, leaving the original alone (the lesson calls it birthdaySafe)? Any function name counts; the lesson's name is only a suggestion. Code inside comments never runs.",
+        "r4": "object spread used: Code copies the object with spread syntax. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "results logged: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

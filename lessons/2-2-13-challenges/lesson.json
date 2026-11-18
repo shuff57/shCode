@@ -110,6 +110,14 @@
         "description": "Uses % 2 to pick the even numbers.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A loop is present: Code contains a for loop or a while loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "if statement present: Code contains an if statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "FizzBuzz strings and % tests: Logs Fizz/Buzz/FizzBuzz and uses % to test divisibility. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "even-sum test: Uses % 2 to pick the even numbers. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

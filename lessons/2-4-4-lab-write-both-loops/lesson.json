@@ -88,6 +88,13 @@
         "description": "Code calls console.log. Help: 2.4.2 (for vs while: Choosing a Loop)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "for loop present: A for loop counts from 1 up to 8 and logs inside its own body. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "while loop present: A while loop doubles total on every pass until it exceeds 100. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

@@ -107,6 +107,15 @@
         "description": "Code calls console.log. Help: 2.4.13 (Skipping a Round with continue)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Trace the for loop from 1 to 20. Does it print ONLY the multiples of 3 (3, 6, 9, 12, 15, 18), by using continue to skip every number that is not a multiple of 3 and logging the rest inside the loop? If it prints 1, 2, 4, 5 and the other non-multiples instead, the answer is no. Code inside comments never runs.",
+        "r2": "continue present: Code contains a continue statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "remainder operator used: Code uses % to test for a multiple of 3. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "Write a for loop running from 1 to 20 that prints only the multiples of 3. Inside the loop, if the current number is NOT a multiple of 3, use continue to skip it; otherwise log it."
+    }
   }
 }

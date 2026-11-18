@@ -210,6 +210,13 @@
         "description": "rotate(items) gives back the same items with the first one moved to the end, and every item still there. Help: 3.3.7 (Adding and Removing from the Front)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "rotate is defined with one parameter: Code defines a function named rotate with exactly one parameter. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "rotate takes the first item off with shift: rotate calls .shift() in its body. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "rotate hands the array back with return: rotate contains a return statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

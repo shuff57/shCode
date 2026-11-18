@@ -307,6 +307,16 @@
         "description": "A console.log that runs prints a value loadState() returned, and it changes when the stored text does. Help: 3.8.16 (The Whole Pattern)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Save function stores by key: Calls localStorage.setItem. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "State converted with stringify: Calls JSON.stringify. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Load reads the key: Calls localStorage.getItem. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Missing key handled: Tests the read value against null. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Parse guarded: Wraps JSON.parse in try and catch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "Restored state logged: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

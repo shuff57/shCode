@@ -56,6 +56,11 @@
         "description": "if statement condition combines isAlive and hasKey with && (either order). Help: 2.1.29 (Logical Operators)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "&& used to guard the door: if statement condition combines isAlive and hasKey with && (either order). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

@@ -148,6 +148,13 @@
         "description": "The output shows the updated scores, so 77 and 70 appear in what console.log printed. Help: 3.3.3 (Changing an Item by Index)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "index assignment on scores: Code changes an item of scores by its index (scores[0] = ..., scores[i] += ..., scores[scores.length - 1] = ...), not scores[0] = scores[0]. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "scores starts as 72, 85, 90, 64: The code creates scores with the four starting values 72, 85, 90, 64 (the line the starter gives you). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

@@ -56,6 +56,11 @@
         "description": "The inner loop's counter b starts at a + 1, not a fixed value, and the nested loops still log each pair. Help: 2.4.24 (Nested Loops)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "inner loop starts at a + 1: The inner loop's counter b starts at a + 1, not a fixed value, and the nested loops still log each pair. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

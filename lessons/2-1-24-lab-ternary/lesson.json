@@ -85,6 +85,13 @@
         "description": "console.log is called with the discount variable. Help: 2.1.20 (The Conditional Operator ?)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "ternary on isMember yields 20 : 0: A ternary references isMember and chooses between 20 and 0, in that order. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Is the result of a ternary on isMember (for example isMember ? 20 : 0, or (isMember === true) ? 20 : 0) stored in a variable with = ? Any variable name counts; discount is only the lesson's suggestion. const, let or var, with or without semicolons. The numbers chosen do not matter for this card. Code inside comments never runs.",
+        "r3": "Is the variable that holds the isMember ternary's result passed to console.log, for example console.log(discount)? Any variable name counts; discount is only the lesson's suggestion, and the numbers in the ternary do not matter here. Passing it to a function of the student's own that calls console.log also counts. Logging only fixed text in quotes, such as console.log(\"got a discount\"), does not count. Code inside comments never runs."
+      }
+    }
   }
 }

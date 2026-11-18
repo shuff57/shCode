@@ -104,6 +104,14 @@
         "description": "case 2's body calls console.log, so the fix is visible in the output. Help: 2.3.18 (switch Compares Strictly)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "switched value converted to a number: switch(...) wraps place in Number(...)/parseInt(...)/parseFloat(...), or place is reassigned from one of those before the switch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "case 1 unchanged: case 1 is still a plain number. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "case 2 unchanged: case 2 is still a plain number. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "case 2 actually prints output: case 2's body calls console.log, so the fix is visible in the output. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

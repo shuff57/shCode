@@ -196,6 +196,13 @@
         "description": "smallest(numbers) gives back the smallest number in the array, and the array is not changed. Help: 3.3.15 (Arrays and Functions)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "smallest is defined with one parameter: Code defines a function named smallest with exactly one parameter. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "the running answer starts from the first item: smallest sets a variable to the array's first item, written as something[0]. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "smallest hands back a value with return: smallest contains a return statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

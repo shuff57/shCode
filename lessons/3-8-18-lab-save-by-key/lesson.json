@@ -213,6 +213,15 @@
         "description": "A console.log that runs prints what localStorage.getItem reads back, and that text changes when state does. Help: 3.8.15 (Saving by Key)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "State object declared: Declares an object with curly braces. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Stored by key: Calls localStorage.setItem. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Converted with stringify: Calls JSON.stringify before storing. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Key read back: Calls localStorage.getItem. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Stored text logged: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

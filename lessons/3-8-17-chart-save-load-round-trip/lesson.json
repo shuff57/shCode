@@ -155,6 +155,17 @@
         "description": "When the parse fails the steps give back the defaults. If the failure case is never mentioned, mark this missing.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "Reads the stored text: Read the text stored under the key.",
+        "r3": "Nothing stored is checked before the parse: Ask whether anything is stored before the parse.",
+        "r4": "Nothing stored gives back the defaults: When nothing is stored, give back the defaults without parsing.",
+        "r5": "The parse is guarded by a try: The parse is wrapped in a TRY or has a way out for failing.",
+        "r6": "A failed parse gives back the defaults: If the parse fails, give back the defaults."
+      },
+      "task": "The student was given four plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program they were describing is loadSettings(): read the text stored under the key \"settings\"; if nothing is stored (null), give back the defaults without parsing; otherwise try to parse the text and give the object back; if the parse fails, give back the defaults instead."
+    }
   }
 }

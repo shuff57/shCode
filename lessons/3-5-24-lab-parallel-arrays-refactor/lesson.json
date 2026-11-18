@@ -239,6 +239,15 @@
         "description": "A loop that runs prints every player's name, group and score read from players, one player per line. Typed-in text, and a loop that never runs, do not count. A printed undefined names the read that found nothing. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "array of object records built: An array holds object records: written in the brackets, pushed in one at a time, or built first in variables and listed in the brackets. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "record fields read with a dot: console.log prints a record's field read with a dot (players[i].name, a record variable then a dot, or a helper that returns text read off its record), or the fields are unpacked from one record with braces. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "loop over players prints each record: A loop over the players array (for, for...of, while or forEach) prints something read from each record, itself or through a helper function it calls. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "output printed: Calls console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "the parallel arrays are gone: No array of plain values is left, however it is made (a list in brackets, split, Array.of, new Set): the names, scores and groups live only in players. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

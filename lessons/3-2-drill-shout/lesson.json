@@ -168,6 +168,13 @@
         "description": "shout(word) prints the word in capital letters, whatever word it is given. Help: 1.2.14 (String Methods in Practice)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "shout is defined with one parameter: Code defines a function named shout with exactly one parameter. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "shout turns the word into capitals: shout uses .toUpperCase() in its body. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "shout is called: Code calls shout at least once. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

@@ -91,6 +91,13 @@
         "description": "count is decreased inside the loop.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "while loop present: Code contains a while loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "console.log present: Code calls console.log Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "count goes down by 1: count is decreased inside the loop. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

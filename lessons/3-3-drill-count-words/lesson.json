@@ -162,6 +162,13 @@
         "description": "countWords(text) gives back how many words the text has, when the words are separated by single spaces. Help: 3.3.10 (Splitting Text into Lines (.split))",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "countWords is defined with one parameter: Code defines a function named countWords with exactly one parameter. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "countWords splits the text: countWords calls .split( in its body. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "countWords hands back a value with return: countWords contains a return statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

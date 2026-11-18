@@ -72,6 +72,12 @@
         "description": "The catch block now logs something. Help: 2.5.10 (The Empty catch Trap)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "try/catch present: Code still has a try block and a catch block. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "catch is no longer empty: The catch block now logs something. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

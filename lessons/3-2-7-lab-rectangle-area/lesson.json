@@ -221,6 +221,15 @@
         "description": "Called with different widths and heights, findRectangleArea prints width times height. Help: 3.2.2 (Parameters)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "findRectangleArea defined: Code defines a function named findRectangleArea. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "two parameters: findRectangleArea is defined with two parameters. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "prints the area: findRectangleArea prints with console.log inside its body. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "called twice with two numbers: findRectangleArea is called at least twice, each with two arguments. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "the body multiplies width by height: Inside the function, two names are multiplied (width * height). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }
