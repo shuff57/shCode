@@ -1,4 +1,4 @@
-// Switch grading v2 on (lib/grading-v2.ts): stamp GRADING_V2_FROM with the go-live instant.
+// Switch grading v2 on (lib/grading-v2.ts): stamp GRADING_V2_STAMP with the go-live instant.
 //
 //   node --import ./scripts/register-ts.mjs scripts/stamp-grading-v2.mjs            # status
 //   node --import ./scripts/register-ts.mjs scripts/stamp-grading-v2.mjs --set-now  # switch on
@@ -13,13 +13,13 @@ import { fileURLToPath } from 'url';
 
 const file = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'lib', 'grading-v2.ts');
 const src = readFileSync(file, 'utf8');
-const re = /export const GRADING_V2_FROM: number \| null = (null|\d+);(?: \/\/ .*)?/;
+const re = /export const GRADING_V2_STAMP: number \| null = (null|\d+);(?: \/\/ .*)?/;
 const m = src.match(re);
-if (!m) { console.error('lib/grading-v2.ts: GRADING_V2_FROM line not found'); process.exit(2); }
+if (!m) { console.error('lib/grading-v2.ts: GRADING_V2_STAMP line not found'); process.exit(2); }
 const current = m[1] === 'null' ? null : Number(m[1]);
 
 if (!process.argv.includes('--set-now')) {
-  console.log(current === null ? 'grading v2 is OFF (GRADING_V2_FROM = null)' : `grading v2 is ON since ${new Date(current).toISOString()}`);
+  console.log(current === null ? 'grading v2 is OFF (GRADING_V2_STAMP = null)' : `grading v2 is ON since ${new Date(current).toISOString()}`);
   process.exit(0);
 }
 if (current !== null && !process.argv.includes('--force')) {
@@ -27,5 +27,5 @@ if (current !== null && !process.argv.includes('--force')) {
   process.exit(1);
 }
 const now = Date.now();
-writeFileSync(file, src.replace(re, `export const GRADING_V2_FROM: number | null = ${now}; // ${new Date(now).toISOString()}`));
+writeFileSync(file, src.replace(re, `export const GRADING_V2_STAMP: number | null = ${now}; // ${new Date(now).toISOString()}`));
 console.log(`grading v2 stamped ON at ${new Date(now).toISOString()}. Next: commit, run the plan-score backfill, then deploy.`);

@@ -19,7 +19,7 @@ import { DEFAULT_WEIGHTS } from '../lib/grading-weights.ts';
 import { buildDueIndex } from '../lib/due-dates-core.ts';
 import { workKindOf, workProblems } from '../lib/lesson-work.ts';
 import { lessonScoreFields } from './lesson-score-fields.mjs';
-import { GRADING_V2_FROM } from '../lib/grading-v2.ts';
+import { GRADING_V2_FROM, GRADING_V2_STAMP } from '../lib/grading-v2.ts';
 
 let n = 0, failures = 0;
 const check = (name, got, want) => {
@@ -31,7 +31,7 @@ const SWITCH = Date.UTC(2026, 10, 20);       // the stamp in these tests
 const DAY = 86400000;
 const NOW = SWITCH + 10 * DAY;
 
-check('the switch ships OFF', GRADING_V2_FROM, null);
+check('the switch ships OFF (no stamp, no dev preview)', [GRADING_V2_STAMP, process.env.NEXT_PUBLIC_GRADING_V2_PREVIEW ? 'preview set' : GRADING_V2_FROM], [null, null]);
 
 // ---------------------------------------------------------------- 1 + 2. what counts
 const practice = { title: '2.3.21 Greeting with Backticks', preview: 'console', graded: true };            // graded only by v2

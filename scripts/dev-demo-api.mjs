@@ -122,7 +122,10 @@ function startFakeOllama(onReady) {
 function seedClass(sql, root, teacherEmail) {
   const man = JSON.parse(fs.readFileSync(path.join(root, 'public', 'lessons-manifest.json'), 'utf8')).lessons;
   const modOf = (t) => /^(\d+\.\d+)\.\d+/.exec(t || '')?.[1] ?? null;
-  const graded = man.filter((l) => (l.assignmentCode || l.preview === 'quiz' || l.scoreKind === 'written') && modOf(l.title));
+  // With the grading v2 preview on (NEXT_PUBLIC_GRADING_V2_PREVIEW), seed by lesson.json work.graded, so practice
+  // labs are finished or skipped too; otherwise by the rule from before v2.
+  const v2Preview = Number(process.env.NEXT_PUBLIC_GRADING_V2_PREVIEW) > 0;
+  const graded = man.filter((l) => (v2Preview ? l.graded === true : (l.assignmentCode || l.preview === 'quiz' || l.scoreKind === 'written')) && modOf(l.title));
   const inMods = (mods) => graded.filter((l) => mods.includes(modOf(l.title)));
   const now = Date.now();
   const DAY = 86400000;

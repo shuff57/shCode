@@ -16,7 +16,25 @@
 //   5. the backfill again with --until <the deploy's finish time>; apply (finished plans the old code scored 0)
 // Do not move the stamp afterwards: an earlier instant would count practice students skipped before v2.
 // Rollback: set it back to null and deploy; the backfilled plan scores read 100% under the old rule too.
-export const GRADING_V2_FROM: number | null = null;
+// The go-live stamp. scripts/stamp-grading-v2.mjs edits this line.
+export const GRADING_V2_STAMP: number | null = null;
+
+/**
+ * A dev-server preview of v2 before it is stamped: NEXT_PUBLIC_GRADING_V2_PREVIEW=<epoch ms> on `npm run dev`
+ * (the dev server's own `--switch`). Ignored whenever NODE_ENV is "production", so a production build can only
+ * be switched on by the stamp above. Wrapped in try: a Pages Function has no `process`.
+ */
+function devPreview(): number | null {
+  try {
+    if (process.env.NODE_ENV === 'production') return null;
+    const v = Number(process.env.NEXT_PUBLIC_GRADING_V2_PREVIEW);
+    return Number.isFinite(v) && v > 0 ? v : null;
+  } catch {
+    return null;
+  }
+}
+
+export const GRADING_V2_FROM: number | null = GRADING_V2_STAMP ?? devPreview();
 
 /** Plans and text-box answers pass at this fraction of their cards (owner's decision 2026-11-18). */
 export const V2_PASS_FRACTION = 0.7;

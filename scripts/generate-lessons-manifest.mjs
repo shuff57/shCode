@@ -7,7 +7,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { lessonScoreFields } from './lesson-score-fields.mjs';
 import { workKindOf, workProblems } from '../lib/lesson-work.ts';
-import { GRADING_V2_FROM } from '../lib/grading-v2.ts';
+import { GRADING_V2_FROM, GRADING_V2_STAMP } from '../lib/grading-v2.ts';
+if (GRADING_V2_FROM !== null && GRADING_V2_STAMP === null) console.warn('[generate-lessons-manifest] DEV PREVIEW of grading v2 (NEXT_PUBLIC_GRADING_V2_PREVIEW): plan maxScores are written; do not commit this manifest');
 
 // lesson.json `work` (lib/lesson-work.ts): every lesson says what the student makes and whether it is
 // graded, and the build refuses one whose `work` disagrees with how the lesson is built.
