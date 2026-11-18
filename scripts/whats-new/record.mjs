@@ -442,7 +442,7 @@ function draw() {
 `;
 
 const RECIPES = {
-  // From p5play: paste a p5play program, Convert, open the result as a new project and run it.
+  // From p5play: paste a p5play v3 program, Convert, open the result as a new project and run it.
   // The answer is a REAL one recorded from the route (p5play-demo-answer.json), replayed so recording needs no key.
   '2026-11-p5play-convert': {
     people: [SAM],
@@ -452,35 +452,44 @@ const RECIPES = {
       const answer = JSON.parse(readFileSync(join(ROOT, 'scripts/whats-new/p5play-demo-answer.json'), 'utf8'));
       delete answer._about;
       await p.route('**/api/p5play-convert', async (route) => {
-        await new Promise((r) => setTimeout(r, 2200));
+        await new Promise((r) => setTimeout(r, 1400));
         await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(answer) });
       });
       await p.getByTestId('p5play-convert-button').waitFor({ timeout: 120000 });
     },
     async run({ demos: [d], pages: [p] }) {
       const input = readFileSync(join(ROOT, 'scripts/whats-new/p5play-demo-input.js'), 'utf8');
-      await d.pause(500);
-      await d.click(p.getByTestId('p5play-convert-button'), { ms: 500, after: 500 });
+      await d.pause(300);
+      await d.click(p.getByTestId('p5play-convert-button'), { ms: 450, after: 300 });
       await d.click(p.locator('#p5play-source'), { ms: 400, after: 150 });
       await p.keyboard.insertText(input);
-      await d.pause(900);
+      await d.pause(700);
       await d.click(p.getByRole('button', { name: 'Convert to moSHion' }), { ms: 450, after: 300 });
       await p.locator('#p5play-result').waitFor({ timeout: 20000 });
-      await d.pause(1200);
-      await d.scrollTo(p.getByText('What the AI changed'), 800);
-      await d.pause(1800);
-      await d.click(p.getByRole('button', { name: 'Open as a new project' }), { ms: 500, after: 900 });
+      await d.pause(700);
+      await d.scrollTo(p.getByText('What the AI changed'), 600);
+      await d.pause(1600);
+      await d.click(p.getByRole('button', { name: 'Open as a new project' }), { ms: 450, after: 500 });
       await p.locator('#p5play-result').waitFor({ state: 'detached', timeout: 20000 });
       await p.getByRole('button', { name: /Run/ }).first().waitFor({ timeout: 20000 });
-      await d.click(p.getByRole('button', { name: /Run/ }).first(), { ms: 450, after: 400 });
+      await d.click(p.getByRole('button', { name: /Run/ }).first(), { ms: 400, after: 200 });
       const canvas = p.frameLocator('iframe').first().locator('canvas').first();
       await canvas.waitFor({ timeout: 30000 });
       const box = await canvas.boundingBox();
       if (box) {
-        await d.moveTo(box.x + box.width * 0.3, box.y + box.height * 0.85, 500);
-        await d.moveTo(box.x + box.width * 0.7, box.y + box.height * 0.85, 1400);
+        // The converted p5play v3 shooter: the ship turns to the pointer and a click fires (mousePressed()
+        // became mouse.presses() in update()). Rocks start falling after a second.
+        await d.moveTo(box.x + box.width * 0.5, box.y + box.height * 0.35, 450);
+        await d.pause(500);
+        for (const [fx, fy] of [[0.35, 0.15], [0.6, 0.1], [0.72, 0.22]]) {
+          await d.moveTo(box.x + box.width * fx, box.y + box.height * fy, 300);
+          await d.pause(120);
+          await p.mouse.down();
+          await p.mouse.up();
+          await d.pause(350);
+        }
       }
-      await d.pause(1200);
+      await d.pause(800);
     },
   },
 

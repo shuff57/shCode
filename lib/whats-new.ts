@@ -54,8 +54,8 @@ export const WHATS_NEW: WhatsNewEntry[] = [
     audience: 'all',
     title: 'Bring in a p5play program',
     summary:
-      'Found a game written in p5play? Press From p5play in the moSHion sandbox and paste it. An AI rebuilds it in moSHion ' +
-      'and it opens as a new project, so nothing you have now is changed. A line the AI changed has a // CONVERTED: comment saying what it did.',
+      'Found a game written in p5play (version 3, or an older one)? Press From p5play in the moSHion sandbox and paste it. An AI rebuilds ' +
+      'it in moSHion and it opens as a new project, so nothing you have now is changed. A line the AI changed has a // CONVERTED: comment saying what it did.',
     steps: [
       'In the moSHion sandbox, press From p5play and paste the program (or press Use the code in the editor).',
       'Press Convert to moSHion. Read What the AI changed, then press Open as a new project.',
@@ -64,7 +64,7 @@ export const WHATS_NEW: WhatsNewEntry[] = [
     media: {
       clip: '/whats-new/2026-11-p5play-convert.mp4',
       poster: '/whats-new/2026-11-p5play-convert.jpg',
-      alt: 'A p5play catch game is pasted into the From p5play box and converted. The moSHion version appears with a list of what the AI changed; Open as a new project runs it, and the basket catches a star.',
+      alt: 'A p5play v3 space shooter is pasted into the From p5play box and converted. The moSHion version appears with a list of what the AI changed (mousePressed() moved into update(), the HUD into drawTop()); Open as a new project runs it, and clicks fire at falling rocks.',
     },
     action: { label: 'Open the moSHion sandbox', href: '/sandbox' },
   },

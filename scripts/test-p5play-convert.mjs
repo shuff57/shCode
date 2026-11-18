@@ -120,6 +120,24 @@ const count = (who, bucket) => db.sqlite.prepare('SELECT count FROM ai_help_usag
   reply = () => ({ choices: [{ message: { content: '```js\nfunction setup() {\n  new Canvas(' }, finish_reason: 'length' }] });
   const cut = await call({ code: P5 });
   check('cut-off answer: an error, no half program', cut.status === 502 && !cut.body.code && /cut off/.test(cut.body.error), cut);
+  {
+    // A cut-off answer is retried ONCE with double the budget (the hidden thinking counts against it).
+    db.sqlite.prepare('DELETE FROM ai_help_usage').run();
+    let k = 0;
+    sent = [];
+    reply = () => (k++ === 0
+      ? { choices: [{ message: { content: '```js\nfunction setup() {\n  new Canvas(' }, finish_reason: 'length' }] }
+      : { choices: [{ message: { content: '```js\n' + MOSHION + '\n```\nNOTES:\n- ok' }, finish_reason: 'stop' }] });
+    const retried = await call({ code: P5 }, { email: 'rex@s.test' });
+    check('cut off once: retried with double the budget, then converts', retried.status === 200 && sent.length === 2
+      && sent[1].body.max_tokens === 2 * sent[0].body.max_tokens, { status: retried.status, n: sent.length, b: sent.map((x) => x.body.max_tokens) });
+    check('cut off once: counted as ONE conversion', count('rex@s.test', 'p5play-convert') === 1, count('rex@s.test', 'p5play-convert'));
+    sent = [];
+    reply = () => ({ choices: [{ message: { content: '```js\nfunction setup() {\n  new Canvas(' }, finish_reason: 'length' }] });
+    const twice = await call({ code: P5 }, { email: 'rex@s.test' });
+    check('cut off twice: the error, after exactly two requests', twice.status === 502 && /cut off/.test(twice.body.error) && sent.length === 2, { s: twice.status, n: sent.length });
+    check('retryBudget: double, capped, none at the ceiling', core.retryBudget(6000) === 12000 && core.retryBudget(10000) === 16000 && core.retryBudget(16000) === null);
+  }
 
   reply = () => ({ choices: [{ message: { content: 'Sorry, I cannot help with that.' }, finish_reason: 'stop' }] });
   const none = await call({ code: P5 });
@@ -129,10 +147,10 @@ const count = (who, bucket) => db.sqlite.prepare('SELECT count FROM ai_help_usag
   const nul = await call({ code: P5 });
   check('null content: an error', nul.status === 502, nul);
 
-  check('max_tokens is sized to the program, not 32000', req.body.max_tokens === core.maxTokensFor(P5) && req.body.max_tokens <= 4000, req.body.max_tokens);
-  check('maxTokensFor: floor 3000, ceiling 16000, grows with the paste',
-    core.maxTokensFor('') === 3000 && core.maxTokensFor('x'.repeat(core.MAX_CONVERT_INPUT)) === 16000
-    && core.maxTokensFor('x'.repeat(7000)) === 5500);
+  check('max_tokens is sized to the program, not 32000', req.body.max_tokens === core.maxTokensFor(P5) && req.body.max_tokens <= 6000, req.body.max_tokens);
+  check('maxTokensFor: floor 6000, ceiling 16000, grows with the paste',
+    core.maxTokensFor('') === 6000 && core.maxTokensFor('x'.repeat(core.MAX_CONVERT_INPUT)) === 16000
+    && core.maxTokensFor('x'.repeat(7000)) === 8000);
 
   reply = () => new Response('{"error":{"message":"requires more credits"}}', { status: 402 });
   const broke = await call({ code: P5 });
@@ -196,6 +214,29 @@ function init_has(req, s) {
   check('leftovers: comments, strings and methods ignored', L('// drawSprites(x)\n/* push() */\ntext("image(a)");\narr.push(1); s.scale = 2; o.rotate(1);').length === 0);
   check('leftovers: moSHion\'s own createVector and loadJSON are allowed', L('let v = createVector(1, 2); loadJSON("a.json");').length === 0);
   check('leftovers: p5.Vector found', L('let v = p5.Vector.random2D();').includes('p5.'));
+
+  // p5play v3: event functions moSHion never calls, members it lacks, globals it lacks.
+  const V3 = 'function keyPressed() { jump(); }\nwindow.x = 1;\nmousePressed = () => {};\nplayer.addAnis({ run: { row: 0, frames: 8 } });\n'
+    + 'player.mirror.x = true; camera.zoom = 2; enemies.removeAll(); let fast = new enemies.Group();\n'
+    + 'if (contro.presses("a")) go(); player.img = "a.png"; player.moveTo(1, 2, 3); world.step(); world.timeScale = 0.5;\n'
+    + 'let a = loadAni("run.png", 8); triangle(0, 0, 1, 1, 2, 0); new RopeJoint(a, b); keyIsDown(LEFT_ARROW);';
+  const v3 = L(V3);
+  const want = ['keyPressed()', 'mousePressed()', 'addAnis()', 'mirror', 'camera.zoom', 'removeAll()', 'new group.Group()', 'contro',
+    '.img', 'moveTo()', 'world.step()', 'world.timeScale', 'loadAni', 'triangle', 'RopeJoint', 'keyIsDown'];
+  check('leftovers: p5play v3 gaps all found', want.every((w) => v3.includes(w)), { missing: want.filter((w) => !v3.includes(w)), got: v3 });
+  check('leftovers: what moSHion has is NOT flagged (sprite.mouse, changeAni, addAni, overlaps cb, joints, texture)',
+    L('if (player.mouse.hovering()) x(); player.addAni("run", "run.png", 8); player.changeAni("run"); player.ani.frameDelay = 4;\n'
+      + 'player.overlaps(coins, collect); new WheelJoint(car, wheel); new GlueJoint(a, b); s.texture = "coin"; camera.x = player.x;\n'
+      + 'enemies.amount = 3; enemies.cull(50); s.scale.x = -1; s.moveTowards(mouse, 0.1); world.autoStep = false; world.physicsUpdate();').length === 0);
+  check('leftovers: an event name in a comment or string, or as a method, is ignored',
+    L('// keyPressed() is now in update()\nconst tip = "function mousePressed() {}";\nbtn.mousePressed(go);').length === 0);
+  // None of the names the check bans may exist in the engine's typings.
+  const declaredMembers = (n) => new RegExp(`^\\s+(?:get |set |readonly )?${n}\\??\\s*[(:]`, 'm').test(apiDocs);
+  const memberClash = ['addAnis', 'mirror', 'zoom', 'timeScale', 'removeAll', 'moveTo', 'addCollider', 'img', 'anis']
+    .filter(declaredMembers);
+  check('no flagged p5play member is declared in moshion.d.ts', memberClash.length === 0, memberClash);
+  const eventClash = core.P5_EVENT_FUNCTIONS.filter((n) => declared.has(n));
+  check('no p5 event function is one moSHion calls (declared in moshion.d.ts)', eventClash.length === 0, eventClash);
 }
 
 // 4. caps
@@ -226,6 +267,12 @@ function init_has(req, s) {
   check('parse: bold **NOTES:** and numbered notes', p('```js\nfunction setup(){}\n```\n**NOTES:**\n1. first\n2) second')?.notes.join('|') === 'first|second');
   check('parse: at most 8 notes', p('```js\nfunction setup(){}\n```\nNOTES:\n' + '- n\n'.repeat(12))?.notes.length === 8);
   check('looksLikeMoshionAlready', core.looksLikeMoshionAlready(MOSHION) && !core.looksLikeMoshionAlready(P5));
+  check('looksLikeMoshionAlready: a p5play v3 sketch (new Canvas, all in draw()) is NOT moSHion',
+    !core.looksLikeMoshionAlready('function setup() {\n  new Canvas(400, 400);\n  player = new Sprite();\n}\nfunction draw() {\n  background(220);\n  if (kb.pressing("left")) player.vel.x = -3;\n}'));
+  check('looksLikeMoshionAlready: update() but a p5 event function left is NOT moSHion',
+    !core.looksLikeMoshionAlready('function setup() { new Canvas(400, 400); }\nfunction update() {}\nfunction keyPressed() {}'));
+  check('the prompt is about p5play v3 and names the event-function trap',
+    /p5play v3/.test(core.CONVERT_RULES) && /NEVER called/.test(core.CONVERT_RULES) && /sprite\.mouse/.test(core.CONVERT_RULES) && !/There is no sprite\.mouse/.test(core.CONVERT_RULES));
 }
 
 console.log(`\n${passed} passed, ${failed} failed`);

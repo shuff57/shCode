@@ -32,6 +32,7 @@ import {
   convertInputProblem,
   leftoverP5Calls,
   maxTokensFor,
+  retryBudget,
   parseConvertAnswer,
   type ConvertAnswer,
 } from '../../lib/p5play-convert-core';
@@ -152,8 +153,14 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
     { role: 'user', content: buildConvertUser(code) },
   ];
 
-  const maxTokens = maxTokensFor(code);
-  const first = await askModel(key, model, messages, maxTokens);
+  let maxTokens = maxTokensFor(code);
+  let first = await askModel(key, model, messages, maxTokens);
+  // Cut off at the budget (the hidden thinking counts too): once more with double, same conversion.
+  const bigger = 'cutOff' in first ? retryBudget(maxTokens) : null;
+  if (bigger) {
+    maxTokens = bigger;
+    first = await askModel(key, model, messages, maxTokens);
+  }
   if ('error' in first) return json({ error: first.error }, 502);
   let answer = first.answer;
 
@@ -186,7 +193,7 @@ async function askModel(
   model: string,
   messages: ChatMessage[],
   maxTokens: number,
-): Promise<{ answer: ConvertAnswer; text: string } | { error: string }> {
+): Promise<{ answer: ConvertAnswer; text: string } | { error: string; cutOff?: true }> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), MODEL_TIMEOUT_MS);
   let res: Response;
@@ -239,7 +246,7 @@ async function askModel(
   const choice = out.choices?.[0];
   const text = typeof choice?.message?.content === 'string' ? choice.message.content : '';
   if (choice?.finish_reason === 'length') {
-    return { error: 'The converted program came out too long and was cut off. Try converting a shorter program.' };
+    return { error: 'The converted program came out too long and was cut off. Try converting a shorter program.', cutOff: true };
   }
   const answer = parseConvertAnswer(text);
   if (!answer) {

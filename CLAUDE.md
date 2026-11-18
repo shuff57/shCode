@@ -745,17 +745,28 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
 The moSHion sandbox's toolbar has **From p5play** (`components/P5playConvertButton.tsx`, signed in, not in a Code together
 session): paste a p5play program (or "Use the code in the editor"), `POST /api/p5play-convert {code}` asks DeepSeek V4.1 Flash
 on OpenRouter to rebuild it, and the result opens as a NEW moSHion project (`createProject`), so nothing is written over. The
-prompt is `lib/p5play-convert-core.ts`: the p5play-vs-moSHion differences (`CONVERT_RULES`: `createCanvas` -> `new Canvas`,
-logic into `update()`, HUD into `drawTop()`, no `drawSprites`/`createSprite`, `overlaps()` is a query, ...) plus the whole
-`public/moshion/docs/moshion.d.ts`, read through `ASSETS`. **When the engine's API changes, check `CONVERT_RULES` still holds.**
+prompt is `lib/p5play-convert-core.ts`: **p5play v3** first (the owner's target; older v1/v2 names are a short section at the
+end), then the whole `public/moshion/docs/moshion.d.ts`, read through `ASSETS`. moSHion copies most of v3, so the rules say
+"keep every name that exists" and list only the differences (`CONVERT_RULES`): logic out of `draw()` into `update()`, HUD into
+`drawTop()`; **p5 event functions (`keyPressed`, `mousePressed`, ...) are never called by moSHion**, so their bodies move into
+`update()`; a v3 `overlaps(x, cb)`/`collides(x, cb)` set once in `setup()` becomes a per-frame call in `update()` (and v3's
+pass-through `overlaps` becomes `collider = 'none'`); `loadAni`/`addAnis`/`spriteSheet` grids become `addAni(name, strip, n)`;
+`mirror` is `scale.x = -1` (scale is art only); no `moveTo`, subgroups, index-function group defaults, `camera.zoom`,
+`world.timeScale`, `contro`, `RopeJoint`, polygons, `spriteArt`, `triangle`/`arc`. `sprite.mouse` DOES exist (an earlier rule
+said not). **When the engine's API changes, check `CONVERT_RULES` still holds.**
 The model answers one ```js fence then `NOTES:` bullets (`parseConvertAnswer`); a line it could not match carries
-`// CONVERTED:`. A cut-off answer (`finish_reason: length`) or no program is an error, never a half program. An answer that
-still calls a p5-only global (`leftoverP5Calls`, list `NOT_IN_MOSHION`; comments and strings ignored) gets ONE repair round;
-what is left is named in `warnings`. **`preload()` and `loadImage()` are moSHion's own since `b4fdc0f9`, so they are not on
-that list; the test fails if any listed name appears in `moshion.d.ts`.** `max_tokens` is `maxTokensFor(code)` (3000 to 16000),
-never a flat 32000: OpenRouter holds max_tokens x price against the balance up front, and a low balance then 402s every request
-(seen live; 402 reads "needs more credit, tell your teacher"). Measured live 2026-11-17: ~$0.002 and 3-15 s a conversion; the
-outputs ran 120 frames clean in `scripts/moshion-harness.mjs`. Only the paste and
+`// CONVERTED:`. A cut-off answer (`finish_reason: length`) is retried ONCE at double the budget (`retryBudget`; the hidden
+thinking counts against `max_tokens`), then it is an error, never a half program. An answer that still uses something moSHion
+lacks (`leftoverP5Calls`: globals in `NOT_IN_MOSHION`, a DEFINED `P5_EVENT_FUNCTIONS` function, v3 members in
+`P5PLAY_MEMBERS_NOT_IN_MOSHION`; comments and strings ignored) gets ONE repair round; what is left is named in `warnings`.
+`looksLikeMoshionAlready` needs `update()`/`drawTop()` as well as `new Canvas`, because v3 programs start with `new Canvas` too
+(every v3 paste used to be told "this already looks like moSHion"). **`preload()` and `loadImage()` are moSHion's own since `b4fdc0f9`, so they are not on
+that list; the test fails if any listed name, flagged member or event function appears in `moshion.d.ts`.** `max_tokens` is
+`maxTokensFor(code)` (6000 to 16000), never a flat 32000: OpenRouter holds max_tokens x price against the balance up front, and a
+low balance then 402s every request (seen live; 402 reads "needs more credit, tell your teacher"); 3000 was too few for a short
+but tricky v3 shooter. Measured live 2026-11-17: ~$0.002 and 5-16 s a conversion; three p5play v3 programs (an animated
+platformer with `keyPressed()`, a `mousePressed()` shooter with `camera.zoom`/`timeScale`, a `WheelJoint` car with `contro` and
+`triangle()`) all converted in one call and ran 180 frames clean in `scripts/moshion-harness.mjs`. Only the paste and
 the API file leave the site (no email, name or lesson id); the request sets `provider.data_collection: 'deny'`; a paste with a
 phone, email or street address is refused first (`findPII`). Caps in `ai_help_usage`, bucket `p5play-convert` (and
 `p5play-convert:global`), counted when the model is called. No key = 503. Dev: `OPENROUTER_API_KEY=... npm run dev` runs the real

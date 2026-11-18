@@ -138,7 +138,7 @@ export default function P5playConvertButton({ chipStyle, getCode }: Props) {
               </button>
             </div>
             <p style={{ margin: '0 0 10px', color: 'var(--c-dim)' }}>
-              Paste a program written for p5play. An AI rebuilds it in moSHion, and it opens as a new project, so
+              Paste a program written for p5play (version 3, or an older one). An AI rebuilds it in moSHion, and it opens as a new project, so
               nothing you have now is changed. The AI can get things wrong: run it and check. Your program is sent
               to an AI service outside shCode, so leave out names and anything personal.
             </p>
@@ -154,13 +154,13 @@ export default function P5playConvertButton({ chipStyle, getCode }: Props) {
                   rows={14}
                   spellCheck={false}
                   maxLength={MAX_CONVERT_INPUT}
-                  placeholder={'function setup() {\n  createCanvas(400, 400);\n  ...'}
+                  placeholder={'function setup() {\n  new Canvas(400, 400);\n  player = new Sprite();\n  ...'}
                   style={mono}
                   disabled={busy}
                 />
                 {already && (
                   <p style={{ margin: '4px 0 0', color: 'var(--c-orange)' }}>
-                    This already looks like moSHion (it has new Canvas and no p5 drawing calls). Converting it may change little.
+                    This already looks like moSHion (it has update() or drawTop() and nothing p5-only). Converting it may change little.
                   </p>
                 )}
                 <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap', alignItems: 'center' }}>
