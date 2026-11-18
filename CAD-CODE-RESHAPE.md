@@ -93,6 +93,20 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
      and the width at the face in both).
    - **A move and a turn at once** (2026-11-18): SolidCraft turns about the axis through the origin, then moves (x' = R·x + t),
      so it is `turn` and then one `move` by R·c − c + t.
+   - **A revolve** (2026-11-18), about X, Y or Z through the origin, as `spin` (new part), `union(part, spin(…))` (joined)
+     or `groove` (cut). reSHape's `spin(sk, a)` does not turn the sketch where it is drawn: the sketch is a profile, its x the
+     distance out from the axis and its y the height along it, and the axis is the plane's normal through the origin (Z for
+     `'top'`, Y for `'front'`, X for `'side'`), turned right-handed by a from +X (+Y for `'side'`), measured in the guarded
+     build. So the writer adds a new sketch with the profile laid out that way (`sk2.polygon([…])` or `sk2.circle(r, { at })`,
+     one plain outline, which is what spin takes) and the spin; the sketch drawn with the tools stays as it was.
+     - **Part way,** the sense is SolidCraft's: it turns the profile towards its sketch's normal.
+     - **A whole turn** is the same solid from any plane through the axis, so its profile is laid out by its distance from
+       the axis.
+     - **Still refused:** two sides, symmetric and "to" turns, an axis on an edge or a sketch line, a profile that is not one
+       outline of straight lines or one circle, and a part-way turn from a plane reSHape does not start in.
+     - **Checked:** the guarded build refuses a spin of a sketch drawn with the drawing words ("a spin takes one plain
+       outline") and builds the polygon one. tools2-e2e has six round trips: Z, Y and X part way, a whole turn from the YZ
+       plane, a groove, and a join, each the same part.
 
    Still not written:
    - **Copies:** the guarded build refuses `move(…, { copy: true })` ("a copying move is not mapped").
@@ -104,7 +118,7 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
 
    After writing, the part is rebuilt from the code and compared by volume and box, as before. It is now also compared by
    every flat face's area and centre and by the curved faces' total area, so a hole in the wrong place or a part turned
-   the wrong way is reported, not passed. Round trips: `/tmp/cad-drive/tools2-e2e.py` (12 of 12 the same part, with the counterbore, the countersink and the move with a turn).
+   the wrong way is reported, not passed. Round trips: `/tmp/cad-drive/tools2-e2e.py` (18 of 18 the same part, with the counterbore, the countersink, the move with a turn and six revolves).
 8. **Done 2026-11-17: a refused step points at its line.** The line is found by evaluating the script cut short after each
    top-level statement of script.js until the step appears (`stepLines`; interpreter only, nothing built). A step made in
    an imported class goes on the script.js line that called it. The refusal shows "script.js line N" as a link, and the
@@ -195,6 +209,27 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
   - the Arc tool.
 
   Plus unit tests in `scripts/test-sketch-plane-points.mjs`.
+
+## More sketch tools (2026-11-18)
+
+- **Delete.** With the tool on, the curve under the pointer is marked in red with every curve its line drew (all of a
+  rectangle's four sides), and the readout names the line; a click removes that line from the code.
+  - **Which line drew which curve** is found by evaluating the script cut short after each line of the sketch's block and
+    counting the sketch's curves (nothing is built; `sketchStatementLines`, `curveOwners`). So a line written with variables
+    is found too. When the counts do not add up, nothing is removed.
+  - It is shown when script.js is open, as New sketch is.
+- **Plain outlines are drawn.** `sk.polygon(…)`, `sk.rect(…)` and `sk.circle(r, { at })` are kept by reSHape as points only;
+  Live sketch now draws them from those (`sketchGeoms`), snaps to their corners, and Delete and drag work on them. An outline
+  with rounded, chamfered or bulged corners is not drawn, rather than drawn with straight sides.
+- **Checked.** `/tmp/cad-drive/sketch-delete-e2e.py`, 11 of 11: a rectangle written with a variable marked and removed whole,
+  a circle on its own, the click not reaching SolidCraft, the rest of the code untouched and still building, and a polygon
+  drawn and marked by its line.
+
+**A fix in the check after writing.** The part built from the code was compared face by face after sorting the flat faces by
+area. A revolve's two rings have areas that differ in the 16th digit, and SolidCraft and reSHape list them the other way round,
+so the top ring was compared with the bottom one and a right part was called "not quite the one you made". The faces are now
+matched one to one within the same tolerances, in any order (`matchFaces`). This can only have reported a right part as wrong,
+never a wrong one as right.
 
 ## Checked
 

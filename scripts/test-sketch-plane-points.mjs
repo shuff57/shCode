@@ -1,7 +1,7 @@
 // Points on a sketch's plane (lib/sketch-plane-points.ts): reSHape's plane frames, the projective map from the screen to a plane,
 // which sketch the editor cursor is in, and what a picked point writes into the code. The pointer in the real view is a browser check.
 import assert from 'node:assert/strict';
-import { arcCode, faceSketchArgs, finishDirections, freshName, movePointEdits, planeOutlines, sweepOf, activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
+import { sketchGeoms, curveOwners, distToPolyline, sketchStatementLines, arcCode, faceSketchArgs, finishDirections, freshName, movePointEdits, planeOutlines, sweepOf, activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
 
 // ---- planes, as reSHape resolves them: a named plane's origin is normal x offset ------------------------------------------
 const top10 = planeFrameOf({ plane: 'xy', offset: 10 });
@@ -104,4 +104,26 @@ console.log('PASS live sketch: the view for each plane, the grid step, arcs draw
   assert.equal(planeOutlines([{ a: [0, 0], b: [60, 0], mid: [30, 0] }]).length, 0, 'an edge that does not close is left out');
 }
 console.log('PASS a sketch on a face, the way extrude and pocket go, the arc tool, moving a point, the face\'s outline');
+{ // Delete: the drawing lines of a block, which line drew which curve, and the distance to a drawn curve
+  const doc = "const a = 1;\nconst sk = sketch('top');\nsk.rectangle([0, 0], [10, 5]);\n// c\nsk.circle([2, 2], { r: a });\nconst p = extrude(sk, 3);\n";
+  const L = sketchStatementLines(doc, 'sk');
+  assert.deepEqual(L.map(l => l.text), ['sk.rectangle([0, 0], [10, 5]);', 'sk.circle([2, 2], { r: a });'], 'the drawing lines, not the comment or the extrude');
+  assert.equal(doc.slice(L[0].from, L[0].to), 'sk.rectangle([0, 0], [10, 5]);\n', 'with its newline, so removing it leaves no blank line');
+  assert.deepEqual(sketchStatementLines(doc, 'other'), []);
+  assert.deepEqual(sketchStatementLines("const sk = sketch('top');\nsk.line([0, 0], [1, 1]);", 'sk').map(l => [l.from, l.to]), [[26, 50]], 'the last line of the file, no newline');
+  assert.deepEqual(curveOwners([4, 5], 5), [0, 0, 0, 0, 1], 'a rectangle is four curves of one line');
+  assert.equal(curveOwners([4, 5], 6), null, 'counts that do not add up: not known');
+  assert.equal(curveOwners([4, 3], 3), null, 'a count that goes down: not known');
+  assert.equal(distToPolyline([5, 3], [[0, 0], [10, 0]]), 3); assert.equal(distToPolyline([-4, 3], [[0, 0], [10, 0]]), 5);
+}
+console.log('PASS delete: the drawing lines of a sketch, which line drew each curve');
+{ // plain outlines drawn from their points
+  assert.deepEqual(sketchGeoms({ points: [[10, 0], [20, 0], [20, 10]] }), [{ k: 'line', a: [10, 0], b: [20, 0] }, { k: 'line', a: [20, 0], b: [20, 10] }, { k: 'line', a: [20, 10], b: [10, 0] }], 'a polygon: its sides, closed');
+  assert.deepEqual(sketchGeoms({ points: [[13.5, 5], [16.5, 5]], shape: 'circle' }), [{ k: 'circle', c: [15, 5], r: 1.5 }], 'a circle from the ends of a diameter');
+  const g = [{ k: 'circle', c: [1, 1], r: 1 }]; assert.equal(sketchGeoms({ geoms: g, points: [[0, 0], [1, 0], [1, 1]] }), g, 'geoms rows first');
+  assert.deepEqual(sketchGeoms({ points: [[0, 0], [10, 0], [10, 10], [0, 10]], rounds: [0, 2, 0, 0] }), [], 'a rounded corner: not drawn as straight sides');
+  assert.deepEqual(sketchGeoms({ points: [[0, 0], [10, 0], [10, 10], [0, 10]], rounds: [0, 0, 0, 0], chamfers: [], bulges: [] }), sketchGeoms({ points: [[0, 0], [10, 0], [10, 10], [0, 10]] }), 'no corner changed: drawn');
+  assert.deepEqual(sketchGeoms({}), []);
+}
+console.log('PASS plain outlines: a polygon\'s sides and a circle, from points');
 console.log('Sketch plane points: planes, the screen-to-plane map, the active sketch and the written point pass.');

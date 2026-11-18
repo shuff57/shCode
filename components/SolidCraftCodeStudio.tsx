@@ -22,7 +22,7 @@ if (typeof window !== 'undefined') installRuntimeCache(window);
 import { edgeLabels, labelFaces, type ScEdge, type ScFace } from '../lib/solidcraft-labels';
 import { setCadModel, type CadModelBody, type CadTarget } from '../lib/cad-completions';
 import { insertion, fillingCall, pickText, sketchPlaneOf, topLevelNames, topLevelVariables, type Pick, type PickCode } from '../lib/solidcraft-picks';
-import { featuresCode, type TimelineFeature } from '../lib/solidcraft-ui-to-code';
+import { featuresCode, matchFaces, type TimelineFeature } from '../lib/solidcraft-ui-to-code';
 import { cadToolbarCrop } from '../lib/solidcraft-viewport';
 import { checkSolidCraftAvailability } from '../lib/solidcraft-availability';
 
@@ -437,11 +437,12 @@ export default function SolidCraftCodeStudio(props: Props) {
       for (const name of bodyNames(await sc.request('document.inspect', {}))) for (const f of ((await sc.execute('model.faces', { body: name })).faces ?? []) as ScFace[]) {
         if (Array.isArray(f.plane_normal)) flat.push([f.area ?? NaN, ...f.centroid]); else curved += f.area ?? NaN;
       }
-      return { flat: flat.sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2] || a[3] - b[3]), curved };
+      return { flat, curved };
     };
+    // Each flat face is matched with one of the other's within the tolerances, not paired by sorting: two faces whose areas differ in the last
+    // digit (the two rings of a revolve) sort either way round in two builds of the same part.
     const sameFaces = (a: { flat: number[][]; curved: number }, b: { flat: number[][]; curved: number }) =>
-      Math.abs(a.curved - b.curved) <= 1e-6 * Math.max(1, a.curved)
-      && a.flat.length === b.flat.length && a.flat.every((x, i) => x.every((v, k) => Math.abs(v - b.flat[i][k]) <= (k === 0 ? 1e-6 * Math.max(1, Math.abs(v)) : 1e-4)));
+      Math.abs(a.curved - b.curved) <= 1e-6 * Math.max(1, a.curved) && a.flat.length === b.flat.length && matchFaces(a.flat, b.flat);
     const adopt = async (sc: Api, rev: string) => {
       const base = baseline.current!; const doc = await sc.request('document.inspect', {});
       const timeline: { id: number; name: string; type: string }[] = doc.timeline ?? [];
@@ -452,7 +453,11 @@ export default function SolidCraftCodeStudio(props: Props) {
       for (const f of fresh) {
         const sk = f.type === 'Sketch' ? await sc.execute('sketch.inspect', { sketch: f.id }) : null;
         const plane = sk?.plane;
-        features.push({ id: f.id, name: f.name, type: f.type, definition: (await sc.execute('timeline.inspect', { feature: f.id })).definition ?? {}, curves: sk?.curves, frame: plane ? { origin: plane.origin, u: plane.x_dir, v: plane.y_dir } : undefined });
+        const definition = (await sc.execute('timeline.inspect', { feature: f.id })).definition ?? {};
+        // a revolve's profile is written again as spin() reads it, from its sketch's curves
+        const of = f.type === 'RevolveFeature' && typeof definition.sketch === 'number' ? await sc.execute('sketch.inspect', { sketch: definition.sketch }).catch(() => null) : null;
+        features.push({ id: f.id, name: f.name, type: f.type, definition, curves: sk?.curves, frame: plane ? { origin: plane.origin, u: plane.x_dir, v: plane.y_dir } : undefined,
+          profile: of?.plane ? { curves: of.curves ?? [], frame: { origin: of.plane.origin, u: of.plane.x_dir, v: of.plane.y_dir } } : undefined });
       }
       const files = latest.current.files; const entry = files[CAD_ENTRY] ?? '';
       // The guarded build names a sketch sk_<step>_<n> and a part b_<step>; the variable probe says which variable holds each step.

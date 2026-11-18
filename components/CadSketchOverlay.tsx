@@ -10,6 +10,9 @@
 //     runner; nothing is built);
 //   - sketch tools (Line, Rectangle, Circle, Arc, Polyline) draw with snapped clicks and write the reSHape line at the end of the
 //     sketch's block; a drawn point written as plain numbers can be dragged, and its numbers in the code change;
+//   - Delete: a click on a drawn curve removes the line of the sketch's block that drew it (all of a rectangle's four sides go with it).
+//     Which line drew which curve is found by evaluating the script cut short after each line of the block and counting the sketch's
+//     curves (nothing is built), so a line written with variables is found too;
 //   - Extrude and Pocket finish the sketch: they write the step after the sketch's block and Run.
 // "New sketch" starts one on a flat face clicked in the view (or on the top, front or side plane): it writes const sk = sketch(…)
 // at the end of script.js and goes into sketch mode on it.
@@ -25,16 +28,17 @@ import { bundleProject, CAD_ENTRY, readVariableProbe, withVariableProbe } from '
 import { topLevelNames, topLevelVariables } from '../lib/solidcraft-picks';
 import type { ScEdge, ScFace } from '../lib/solidcraft-labels';
 import {
-  activeSketch, applyProjective, arcCode, faceSketchArgs, finishDirections, fmt, freshName, fromPlane, geomPath, geomSnaps, gridStep,
+  activeSketch, applyProjective, arcCode, curveOwners, sketchGeoms, distToPolyline, faceSketchArgs, sketchStatementLines, finishDirections, fmt, freshName, fromPlane, geomPath, geomSnaps, gridStep,
   movePointEdits, planeFrameOf, planeOutlines, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, sweepOf,
   toPlane, toolCode, viewAngles, type PlaneFrame, type SketchGeom, type SketchPlaceInput, type V2, type V3,
 } from '../lib/sketch-plane-points';
 
 type Api = { request(method: string, params?: object): Promise<any>; execute(command: string, params?: object): Promise<any> };
 type Evaluate = (source: string) => Promise<{ errors: { message: string; line?: number | null }[]; doc?: { features?: unknown[] } | null }>;
-type Tool = 'line' | 'rectangle' | 'circle' | 'arc' | 'polyline';
+type Tool = 'line' | 'rectangle' | 'circle' | 'arc' | 'polyline' | 'delete';
 type Box = { min: number[]; max: number[] };
-interface Sketch { place: SketchPlaceInput; frame: PlaneFrame; geoms: SketchGeom[] }
+interface Sketch { id: string; place: SketchPlaceInput; frame: PlaneFrame; geoms: SketchGeom[] }
+type DrawLine = { from: number; to: number; text: string };
 interface Snap { s: V2; q: V2; kind: string; own: boolean }
 interface Props {
   active: boolean;
@@ -61,7 +65,7 @@ interface Props {
   onMode(name: string | null): void;
   onRun(): void;
 }
-const TOOLS: [Tool, string][] = [['line', 'Line'], ['rectangle', 'Rectangle'], ['circle', 'Circle'], ['arc', 'Arc'], ['polyline', 'Polyline']];
+const TOOLS: [Tool, string][] = [['line', 'Line'], ['rectangle', 'Rectangle'], ['circle', 'Circle'], ['arc', 'Arc'], ['polyline', 'Polyline'], ['delete', 'Delete']];
 const TOP: SketchPlaceInput = { plane: 'xy', offset: 0 };
 const dist = (a: number[], b: number[]) => Math.hypot(a[0] - b[0], a[1] - b[1]);
 const centreOf = (b: Box) => b.min.map((v, i) => (v + b.max[i]) / 2);
@@ -72,9 +76,9 @@ async function readSketches(ev: Evaluate, files: Record<string, string>): Promis
   const probe = readVariableProbe((await ev(withVariableProbe(b.source, topLevelVariables(files[CAD_ENTRY] ?? '')))).errors);
   const r = await ev(b.source); if (!probe || !r.doc) return null;
   const next = new Map<string, Sketch>();
-  for (const f of (r.doc.features ?? []) as (SketchPlaceInput & { id?: unknown; kind?: unknown; geoms?: SketchGeom[] })[]) {
+  for (const f of (r.doc.features ?? []) as (SketchPlaceInput & { id?: unknown; kind?: unknown; geoms?: SketchGeom[]; points?: unknown; shape?: unknown })[]) {
     const v = f.kind === 'sketch' && typeof f.id === 'string' ? probe.sketches.get(f.id) : undefined;
-    if (v) { const place = { plane: f.plane, offset: f.offset, frame: f.frame }; next.set(v, { place, frame: planeFrameOf(place), geoms: Array.isArray(f.geoms) ? f.geoms : [] }); }
+    if (v) { const place = { plane: f.plane, offset: f.offset, frame: f.frame }; next.set(v, { id: f.id as string, place, frame: planeFrameOf(place), geoms: sketchGeoms(f) }); }
   }
   return next;
 }
@@ -91,7 +95,11 @@ export default function CadSketchOverlay(p: Props) {
   const [note, setNote] = useState('');
   const toolPts = useRef<V2[]>([]);
   const [drawing, setDrawing] = useState<{ grid: [V2, V2, boolean][]; axes: [V2, V2][]; outline: string; clip: boolean; curves: V2[][]; step: number } | null>(null);
-  const [hover, setHover] = useState<{ x: number; y: number; text: string; dot: V2 | null; preview: V2[] | null } | null>(null);
+  const [hover, setHover] = useState<{ x: number; y: number; text: string; dot: V2 | null; preview: V2[] | null; del?: number[] } | null>(null);
+  /** Delete: which line of the block drew each of the sketch's curves, for the doc as it was when worked out */
+  const owners = useRef<{ doc: string; name: string; lines: DrawLine[]; owner: number[] | null } | null>(null);
+  /** the sketch's curves on screen, as last drawn */
+  const curvesOnScreen = useRef<V2[][]>([]);
   const view = useRef<{ F: number[]; H: number[]; frame: PlaneFrame; step: number; snaps: Snap[]; label: string } | null>(null);
   const savedCamera = useRef<Record<string, unknown> | null>(null);
   const modeRef = useRef<string | null>(null);
@@ -107,6 +115,26 @@ export default function CadSketchOverlay(p: Props) {
     }, 450);
     return () => { live = false; clearTimeout(t); };
   }, [p.active, p.evaluate, filesKey, p.buildKey]);
+
+  // ---- Delete: which line drew which curve, worked out again when the code or the sketch changes while the tool is on --------------
+  useEffect(() => {
+    const ev = p.evaluate; if (!p.active || !ev || tool !== 'delete' || !mode || !p.entryOpen) { owners.current = null; return; }
+    let live = true;
+    const t = setTimeout(async () => {
+      const ed = props.current.editor.current; const sk = sketches.current.get(mode); if (!ed || !sk) return;
+      const doc = ed.state.doc.toString(); const lines = sketchStatementLines(doc, mode); const counts: number[] = [];
+      try {
+        for (const l of lines) {
+          const b = bundleProject({ ...props.current.files, [CAD_ENTRY]: doc.slice(0, l.to) }); if (b.errors.length) { counts.push(NaN); continue; }
+          const r = await ev(b.source); if (!live) return;
+          const f = (r.doc?.features ?? []).find((x: any) => x && x.kind === 'sketch' && x.id === sk.id) as Parameters<typeof sketchGeoms>[0] | undefined;
+          counts.push(f ? sketchGeoms(f).length : NaN);
+        }
+      } catch { counts.push(NaN); }
+      if (live) { owners.current = { doc, name: mode, lines, owner: curveOwners(counts, sk.geoms.length) }; refreshHover.current?.(); }
+    }, 300);
+    return () => { live = false; clearTimeout(t); };
+  }, [p.active, p.evaluate, p.entryOpen, tool, mode, version, filesKey]);
 
   // ---- sketch mode follows the editor cursor -----------------------------------------------------------------------------------
   useEffect(() => {
@@ -222,7 +250,7 @@ export default function CadSketchOverlay(p: Props) {
       corners.forEach((c, i) => { const p2 = screen[4 + i]; if (Array.isArray(p2)) snaps.push({ s: [p2[0], p2[1]], q: toPlane(f, c.p), kind: c.kind, own: false }); });
       for (const g of sk?.geoms ?? []) for (const n of geomSnaps(g)) { const sp = applyProjective(F, n.q); if (sp) snaps.push({ s: sp, q: n.q, kind: n.kind, own: !n.kind.startsWith('middle') }); }
       view.current = { F, H, frame: f, step, snaps, label }; refreshHover.current?.();
-      if (!s) { setDrawing({ grid: [], axes: [], outline: '', clip: false, curves: [], step }); return; }
+      if (!s) { curvesOnScreen.current = []; setDrawing({ grid: [], axes: [], outline: '', clip: false, curves: [], step }); return; }
       const [x0, y0, x1, y1] = [quad[0][0], quad[0][1], quad[2][0], quad[2][1]];
       while ((x1 - x0) / step > 120 || (y1 - y0) / step > 120) step *= 2;
       view.current.step = step; refreshHover.current?.();
@@ -234,7 +262,8 @@ export default function CadSketchOverlay(p: Props) {
       const sw = sweepOf(f); const on = (q: number[]) => Math.abs((q[0] - f.origin[0]) * sw[0] + (q[1] - f.origin[1]) * sw[1] + (q[2] - f.origin[2]) * sw[2]) < 1e-5;
       const loops = planeOutlines(edges.filter(e => on(e.a) && on(e.b) && on(e.mid)).map(e => ({ a: toPlane(f, e.a), b: toPlane(f, e.b), mid: toPlane(f, e.mid) })));
       const outline = pathOf(loops.map(l => l.map(toScreen)));
-      setDrawing({ grid, axes, outline, clip: loops.length > 0, curves: s.geoms.map(g => geomPath(g).map(toScreen)), step });
+      const curves = s.geoms.map(g => geomPath(g).map(toScreen)); curvesOnScreen.current = curves;
+      setDrawing({ grid, axes, outline, clip: loops.length > 0, curves, step });
     };
     const loop = async () => { try { await draw(); } catch { /* the view is busy */ } if (live) timer = setTimeout(loop, 150); };
     void loop();
@@ -269,12 +298,24 @@ export default function CadSketchOverlay(p: Props) {
     };
     const show = (x: number, y: number) => {
       if (picking) { last = null; setHover({ x, y: y - props.current.crop, text: 'Click a flat face for the new sketch', dot: null, preview: null }); return; }
+      if (tool === 'delete') { last = null; const d = deleteAt(x, y); setHover(d ? { x, y: y - props.current.crop, text: d.text, dot: null, preview: null, del: d.curves } : null); return; }
       const hit = pointAt(x, y, drag?.from); if (!hit) { last = null; setHover(null); return; }
       last = { q: hit.q, x, y };
       const v = view.current!;
       if (drag) { drag.to = hit.q; setHover({ x, y: y - props.current.crop, text: `Move ${pointCode(drag.from)} to ${pointCode(hit.q)}${hit.kind ? ` · ${hit.kind}` : ''}`, dot: hit.dot, preview: null }); return; }
       const canDrag = !tool && hit.own && modeRef.current && editDrag(hit.q, hit.q).length;
       setHover({ x, y: y - props.current.crop, text: `${v.label}: ${pointCode(hit.q)}${hit.kind ? ` · ${hit.kind}` : ''}${canDrag ? ' · drag to move it' : ''}`, dot: hit.dot, preview: preview(hit.q) });
+    };
+    /** Delete: the curve under the pointer (within 8 px), the line that drew it and all the curves that line drew */
+    const deleteAt = (x: number, y: number): { line: DrawLine | null; curves: number[]; text: string } | null => {
+      const cs = curvesOnScreen.current; const sy = y - props.current.crop; let best = -1; let bd = 8;
+      cs.forEach((c, i) => { const d = distToPolyline([x, sy], c); if (d <= bd) { bd = d; best = i; } });
+      if (best < 0) return null;
+      const o = owners.current; const ed = props.current.editor.current;
+      const known = o && ed && o.owner && o.name === modeRef.current && o.doc === ed.state.doc.toString() ? o : null;
+      if (!known) return { line: null, curves: [best], text: 'finding the line that drew it…' };
+      const k = known.owner![best]; const line = known.lines[k];
+      return { line, curves: known.owner!.flatMap((w, i) => w === k ? [i] : []), text: `${line.text} · click to remove it` };
     };
     const editDrag = (from: V2, to: V2) => { const ed = props.current.editor.current; const name = modeRef.current; return ed && name ? movePointEdits(ed.state.doc.toString(), name, from, to) : []; };
     const write = (code: string) => {
@@ -323,6 +364,13 @@ export default function CadSketchOverlay(p: Props) {
       if (swallowClick) { swallowClick = false; e.preventDefault(); e.stopImmediatePropagation(); return; }
       if (down && dist(down, [e.clientX, e.clientY]) > 4) return; // a drag turns the view; it draws nothing
       if (picking) { e.preventDefault(); e.stopImmediatePropagation(); props.current.suppressPick(); void startOnFace(e.clientX, e.clientY); return; }
+      if (tool === 'delete') {
+        const d = deleteAt(e.clientX, e.clientY); if (!d) return;
+        e.preventDefault(); e.stopImmediatePropagation(); props.current.suppressPick();
+        const ed = props.current.editor.current; if (!ed || !d.line) return;
+        ed.dispatch({ changes: { from: d.line.from, to: d.line.to } }); owners.current = null; curvesOnScreen.current = [];
+        props.current.onInserted(`Removed: ${d.line.text}`); setHover(null); return;
+      }
       if (!last) return;
       e.preventDefault(); e.stopImmediatePropagation(); props.current.suppressPick();
       const q = last.q; const name = modeRef.current;
@@ -411,7 +459,7 @@ export default function CadSketchOverlay(p: Props) {
   const toolbar = !host ? null : mode && s ? createPortal(
     <span className={styles.sketchBar} role="toolbar" aria-label="Sketch tools">
       <b>Sketch {mode}</b><span className={styles.sketchPlane}>{planeWords(s.place)}{drawing ? ` · grid ${fmt(drawing.step)} mm` : ''}</span>
-      {TOOLS.map(([t, label]) => <button key={t} aria-pressed={tool === t} className={tool === t ? styles.sketchToolOn : undefined}
+      {TOOLS.filter(([t]) => t !== 'delete' || p.entryOpen).map(([t, label]) => <button key={t} aria-pressed={tool === t} className={tool === t ? styles.sketchToolOn : undefined}
         onClick={() => { toolPts.current = []; setTool(tool === t ? null : t); }}>{label}</button>)}
       <span className={styles.sketchFinish}>
         <label>depth <input type="number" min="0" step="any" value={depth} onChange={e => setDepth(e.target.value)} aria-label="Depth" /></label>
@@ -438,7 +486,7 @@ export default function CadSketchOverlay(p: Props) {
         {drawing?.axes.map(([a, b], i) => <line key={`a${i}`} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]} className={styles.gridAxis} />)}
       </g>
       {drawing?.outline && <path d={drawing.outline} className={styles.sketchFace} />}
-      {drawing?.curves.map((c, i) => <polyline key={`c${i}`} points={c.map(q => q.join(',')).join(' ')} className={styles.sketchCurve} />)}
+      {drawing?.curves.map((c, i) => <polyline key={`c${i}`} points={c.map(q => q.join(',')).join(' ')} className={hover?.del?.includes(i) ? styles.sketchDelete : styles.sketchCurve} />)}
       {hover?.preview && <polyline points={hover.preview.map(q => q.join(',')).join(' ')} className={styles.sketchPreview} />}
     </svg>
     {hover?.dot && <span className={styles.pointDot} style={{ left: hover.dot[0], top: hover.dot[1] }} />}

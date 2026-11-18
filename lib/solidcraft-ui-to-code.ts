@@ -7,7 +7,9 @@
 // what the tools made.
 import { edgeByLabels, edgeLabels, faceByLabel, labelFaces, type ScEdge, type ScFace } from './solidcraft-labels';
 
-export interface TimelineFeature { id: number; name: string; type: string; definition: Record<string, any>; curves?: SketchCurve[]; /** a sketch's frame, from sketch.inspect */ frame?: SketchFrame }
+export interface TimelineFeature { id: number; name: string; type: string; definition: Record<string, any>; curves?: SketchCurve[]; /** a sketch's frame, from sketch.inspect */ frame?: SketchFrame;
+  /** a revolve's sketch, from sketch.inspect: its curves and frame (the spin's profile is written from them) */
+  profile?: { curves: SketchCurve[]; frame: SketchFrame } }
 export interface SketchCurve { id: string; type: string; construction?: boolean; link?: string | null; start_at?: number[]; end_at?: number[]; center_at?: number[]; radius?: number }
 export interface UiContext {
   /** timeline sketch id → the variable that holds it */
@@ -285,6 +287,7 @@ export function featureCode(f: TimelineFeature, ctx: UiContext): Written {
       const shift = sub(rc, c).map((v, i) => v + t[i]);
       return { lines: [`turn(${part}, ${pt(angles)});`, ...(shift.some(v => Math.abs(v) > 1e-9) ? [`move(${part}, ${pt(shift)});`] : [])] };
     }
+    case 'RevolveFeature': return revolveCode(f, ctx, why, owner);
     case 'HoleFeature': {
       if (ctx.afterSolidStep) return why('it was made in the same go as another step, so where it is cannot be measured; make it on its own');
       // reSHape's hole(part, { across, deep, at, along }): drilled along X, Y or Z, at: measured from the centre of the part's box across the face, a blind
@@ -328,6 +331,82 @@ function axisName(a: unknown): 'X' | 'Y' | 'Z' | null {
   return null;
 }
 /** `const <name> = <call>;` for a feature that makes a body, remembering which variable holds it. */
+/** The points of one closed outline of straight lines, in order (the first not repeated); null for anything else. */
+function closedOutline(curves: SketchCurve[]): number[][] | null {
+  const same = (a?: number[], b?: number[]) => !!a && !!b && Math.hypot(a[0] - b[0], a[1] - b[1]) < 1e-9;
+  if (curves.length < 3 || curves.some(c => c.type !== 'line' || !c.start_at || !c.end_at)) return null;
+  const todo = [...curves]; const first = todo.shift()!; const pts = [first.start_at!, first.end_at!];
+  while (todo.length) {
+    const end = pts[pts.length - 1]; const i = todo.findIndex(c => same(c.start_at, end) || same(c.end_at, end)); if (i < 0) return null;
+    const c = todo.splice(i, 1)[0]; pts.push(same(c.start_at, end) ? c.end_at! : c.start_at!);
+  }
+  return same(pts[0], pts[pts.length - 1]) ? pts.slice(0, -1) : null;
+}
+/**
+ * SolidCraft's revolve as reSHape's spin (groove for a cut). reSHape's spin(sk, a) does not turn the sketch where it is drawn: the sketch is a
+ * profile, its x the distance out from the axis and its y the height along it, and the axis is the plane's normal through the origin (Z for
+ * 'top', Y for 'front', X for 'side'), turned right-handed about +axis by a from +X (+Y for 'side') (measured in the guarded build, 2026-11-18). So
+ * a revolve about X, Y or Z through the origin is written as a new sketch holding its profile, laid out that way, and the spin.
+ */
+function revolveCode(f: TimelineFeature, ctx: UiContext, why: (r: string) => Written, owner: (b: unknown) => string | null): Written {
+  const d = f.definition ?? {};
+  if (d.angle2 !== undefined && d.angle2 !== null || d.symmetric || d.to) return why('it turns with options the code cannot write yet');
+  if (d.profiles && d.profiles.type !== 'all') return why('it uses only some regions of its sketch');
+  const A = plainNumber(d.angle ?? 360); if (A === null) return why('its angle is an expression');
+  const prof = f.profile; const fr = prof?.frame;
+  if (!prof || !fr || !Array.isArray(fr.origin) || !Array.isArray(fr.u) || !Array.isArray(fr.v)) return why('its sketch could not be read');
+  // the axis, as a line in the model
+  const ax = d.axis ?? {}; let at: number[]; let dir: number[];
+  if (ax.type === 'sketch_axis' && (ax.axis === 'x' || ax.axis === 'y')) { at = fr.origin; dir = ax.axis === 'x' ? fr.u : fr.v; }
+  else if (ax.type === 'world' && ['X', 'Y', 'Z'].includes(ax.axis)) { at = [0, 0, 0]; dir = [0, 1, 2].map(i => i === 'XYZ'.indexOf(ax.axis) ? 1 : 0); }
+  else if (ax.type === 'line' && Array.isArray(ax.origin) && Array.isArray(ax.dir)) { at = ax.origin; dir = ax.dir; }
+  else return why('it turns about an edge or an axis the code cannot name yet');
+  const len = Math.hypot(dir[0], dir[1], dir[2]); const k = [0, 1, 2].find(i => Math.abs(Math.abs(dir[i]) / (len || 1) - 1) < 1e-9);
+  const off = k === undefined ? [1] : at.map((x, i) => i === k ? 0 : x);
+  if (k === undefined || off.some(x => Math.abs(x) > 1e-9)) return why('it turns about an axis that is not X, Y or Z through the origin');
+  const word = k === 2 ? 'top' : k === 1 ? 'front' : 'side'; const R = k === 0 ? 1 : 0; // the profile's x: out along X (Y for 'side')
+  // the profile in the model, then as reSHape's spin reads it
+  const world = (p: number[]) => add(fr.origin, add(scale(fr.u, p[0]), scale(fr.v, p[1])));
+  const drawn = prof.curves.filter(c => !c.construction);
+  const across = (w: number[]) => w.map((x, i) => i === k ? 0 : x); // out from the axis
+  const side = (w: number[]) => across(w)[3 - k - R]; // off the plane the spin starts in
+  const curvePts = drawn.flatMap(c => [c.start_at, c.end_at, c.center_at].filter((q): q is number[] => Array.isArray(q)).map(world));
+  if (!curvePts.length) return why('its sketch could not be read');
+  const inStartPlane = curvePts.every(w => Math.abs(side(w)) < 1e-9);
+  // a whole turn is the same solid from any plane through the axis: the profile is then laid out by its distance from the axis
+  const full = Math.abs(Math.abs(A) - 360) < 1e-9;
+  if (!inStartPlane && !full) return why('it turns part way, from a plane the code cannot start a spin from yet');
+  const ref = curvePts.map(across).find(w => Math.hypot(...w) > 1e-9);
+  if (!ref) return why('its profile lies on its axis');
+  const hat = inStartPlane ? [0, 1, 2].map(i => i === R ? 1 : 0) : scale(ref, 1 / Math.hypot(...ref));
+  const flat = (w: number[]) => [dot(across(w), hat), w[k]];
+  if (!inStartPlane && curvePts.some(w => Math.hypot(...across(w).map((x, i) => x - dot(across(w), hat) * hat[i])) > 1e-6)) return why('its profile is not on a plane through its axis');
+  const v = fresh(ctx, 'sk'); let shape: string;
+  const outline = closedOutline(drawn);
+  if (outline) shape = `${v}.polygon([${outline.map(p => pt(flat(world(p)))).join(', ')}]);`;
+  else if (drawn.length === 1 && drawn[0].type === 'circle' && drawn[0].center_at && typeof drawn[0].radius === 'number') shape = `${v}.circle(${fmt(drawn[0].radius)}, { at: ${pt(flat(world(drawn[0].center_at)))} });`;
+  else { ctx.taken.delete(v); return why('its profile is not one outline of straight lines or one circle, which is what spin() takes'); }
+  // part way: SolidCraft turns the profile towards its sketch's normal; reSHape's spin(a) moves a point out along r in the direction axis x r
+  let a = A;
+  if (!full) {
+    const n = cross(fr.u, fr.v); const axisDir = [0, 1, 2].map(i => i === k ? 1 : 0);
+    const towards = dot(cross(axisDir, ref), n); if (Math.abs(towards) < 1e-9) { ctx.taken.delete(v); return why('its sketch is not square to the way it turns'); }
+    a = A * Math.sign(towards);
+  }
+  const head = [`const ${v} = sketch('${word}');`, shape];
+  if (d.operation === 'cut') {
+    const target = (Array.isArray(d.targets) ? d.targets[0] : undefined) ?? (ctx.geometry.size === 1 ? [...ctx.geometry.keys()][0] : undefined);
+    const part = owner(target); if (!part) { ctx.taken.delete(v); return why('the part it cuts is not in a variable of script.js'); }
+    return { lines: [...head, `groove(${v}, ${part}, ${fmt(a)});`] };
+  }
+  if (d.operation === 'join') {
+    const t = Array.isArray(d.targets) ? d.targets[0] : undefined; const part = owner(t); if (!part) { ctx.taken.delete(v); return why('the part it joins is not in a variable of script.js'); }
+    return { lines: [...head, `union(${part}, spin(${v}, ${fmt(a)}));`] };
+  }
+  if (!newBody(d)) { ctx.taken.delete(v); return why(`its operation is ${d.operation}`); }
+  const made = declare(ctx, d, 'part', `spin(${v}, ${fmt(a)})`);
+  return 'lines' in made ? { lines: [...head, ...made.lines] } : made;
+}
 function declare(ctx: UiContext, d: Record<string, any>, base: string, call: string): Written {
   const body = firstBody(d); if (!body) return { lines: [`${call};`] };
   const v = fresh(ctx, base); ctx.bodyVars.set(body, v); return { lines: [`const ${v} = ${call};`] };
@@ -337,4 +416,14 @@ export function featuresCode(features: TimelineFeature[], ctx: UiContext): Writt
   const lines: string[] = [];
   for (const f of features) { const w = featureCode(f, ctx); if ('error' in w) return w; lines.push(...w.lines); if (f.type !== 'Sketch') ctx.afterSolidStep = true; }
   return { lines };
+}
+
+// ---- the check after writing: is the part built from the code the one made with the tools -------------------------------
+/** Whether every face [area, x, y, z] of a has its own face in b: area within 1e-6 of it, centre within 1e-4 (one each, in any order). */
+export function matchFaces(a: number[][], b: number[][]): boolean {
+  const left = [...b];
+  return a.every(x => {
+    const i = left.findIndex(y => x.every((v, k) => Math.abs(v - y[k]) <= (k === 0 ? 1e-6 * Math.max(1, Math.abs(v)) : 1e-4)));
+    if (i < 0) return false; left.splice(i, 1); return true;
+  });
 }

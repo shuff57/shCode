@@ -249,6 +249,58 @@ export function movePointEdits(doc: string, name: string, from: V2, to: V2): { f
   return out;
 }
 
+/**
+ * A sketch feature's curves for drawing: its geoms rows, or, for a plain outline (sk.polygon(…), sk.rect(…), sk.circle(r, { at })), which reSHape
+ * keeps as points only, the outline's sides or its circle (a circle's points are the two ends of a diameter). An outline with rounded, chamfered or
+ * bulged corners is not drawn: its straight sides would not be its shape.
+ */
+export function sketchGeoms(f: { geoms?: unknown; points?: unknown; shape?: unknown; rounds?: unknown; chamfers?: unknown; bulges?: unknown }): SketchGeom[] {
+  if (Array.isArray(f.geoms) && f.geoms.length) return f.geoms as SketchGeom[];
+  const pts = Array.isArray(f.points) ? (f.points as unknown[]).filter((q): q is V2 => Array.isArray(q) && q.length === 2 && q.every(x => typeof x === 'number')) : [];
+  const bent = [f.rounds, f.chamfers, f.bulges].some(x => Array.isArray(x) ? x.some(v => typeof v === 'number' ? v !== 0 : v !== null && v !== undefined) : x !== undefined && x !== null && typeof x === 'object' && Object.keys(x).length > 0);
+  if (bent) return [];
+  if (f.shape === 'circle' && pts.length === 2) return [{ k: 'circle', c: [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2], r: Math.hypot(pts[1][0] - pts[0][0], pts[1][1] - pts[0][1]) / 2 }];
+  if ((f.shape === undefined || f.shape === 'polygon') && pts.length >= 3) return pts.map((a, i) => ({ k: 'line', a, b: pts[(i + 1) % pts.length] }));
+  return [];
+}
+
+// ---- Delete: which line of the sketch's block drew which curve ---------------------------------------------------------------
+
+/** The lines of a sketch's block that draw (name.something(…)), with where each starts and ends in the doc (its newline included). */
+export function sketchStatementLines(doc: string, name: string): { from: number; to: number; text: string }[] {
+  const end = sketchBlockEnd(doc, name); if (end === null) return [];
+  const esc = name.replace(/\$/g, '\\$');
+  const decl = new RegExp(`^\\s*(?:const|let|var)\\s+${esc}\\s*=\\s*sketch\\s*\\(`, 'm').exec(doc); if (!decl) return [];
+  const out: { from: number; to: number; text: string }[] = [];
+  let at = doc.indexOf('\n', decl.index); // the line after the declaration
+  while (at >= 0 && at < end) {
+    const from = at + 1; const nl = doc.indexOf('\n', from); const lineEnd = nl < 0 ? doc.length : nl;
+    const text = doc.slice(from, lineEnd);
+    if (new RegExp(`^\\s*${esc}\\s*\\.`).test(text)) out.push({ from, to: nl < 0 ? lineEnd : nl + 1, text: text.trim() });
+    at = nl;
+  }
+  return out;
+}
+/**
+ * Which drawing line made each curve, from the sketch's curve count with the code cut short after each of its lines (counts[i]:
+ * after line i). null when the counts do not add up to the sketch's curves, or go down: then which line drew a curve is not known.
+ */
+export function curveOwners(counts: number[], total: number): number[] | null {
+  const owner: number[] = []; let prev = 0;
+  for (let i = 0; i < counts.length; i++) { if (!(counts[i] >= prev)) return null; for (let k = prev; k < counts[i]; k++) owner.push(i); prev = counts[i]; }
+  return prev === total ? owner : null;
+}
+/** The screen distance from a point to a polyline. */
+export function distToPolyline(p: V2, pts: V2[]): number {
+  let best = Infinity;
+  for (let i = 1; i < pts.length; i++) {
+    const [a, b] = [pts[i - 1], pts[i]]; const d = [b[0] - a[0], b[1] - a[1]]; const l2 = d[0] * d[0] + d[1] * d[1];
+    const t = l2 ? Math.max(0, Math.min(1, ((p[0] - a[0]) * d[0] + (p[1] - a[1]) * d[1]) / l2)) : 0;
+    best = Math.min(best, Math.hypot(p[0] - a[0] - t * d[0], p[1] - a[1] - t * d[1]));
+  }
+  return best;
+}
+
 // ---- the face a sketch sits on, as closed outlines (the grid is drawn inside them) ----------------------------------------------
 
 /**

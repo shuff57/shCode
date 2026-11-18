@@ -109,6 +109,7 @@
 .sketchFace { fill:none; stroke:rgb(250 204 21 / .9); stroke-width:2.5; }
 .sketchCurve { fill:none; stroke:var(--c-orange, #ffb86c); stroke-width:2; }
 .sketchPreview { fill:none; stroke:var(--c-orange, #ffb86c); stroke-width:1.5; stroke-dasharray:5 4; }
+.sketchDelete { fill:none; stroke:var(--c-red, #ff5555); stroke-width:3.5; }
 .sketchBarHost:empty { display:none; }
 .sketchBar { display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap; }
 .sketchPlane { color:var(--c-meta); }

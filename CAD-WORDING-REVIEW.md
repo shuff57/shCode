@@ -58,6 +58,12 @@ change the code to match.
 - *Shapes and joins:* it is placed by distances from edges · its radius / height is an expression · it does not stand
   along Z · it has a flat top, and reSHape's cone is pointed · it keeps its tools or makes a component · its bodies are
   not named · one of its parts is not in a variable of script.js.
+- ***Revolve:*** ***it turns with options the code cannot write yet*** · ***its angle is an expression*** · ***its sketch
+  could not be read*** · ***it turns about an edge or an axis the code cannot name yet*** · ***it turns about an axis that is
+  not X, Y or Z through the origin*** · ***it turns part way, from a plane the code cannot start a spin from yet*** · ***its
+  profile lies on its axis*** · ***its profile is not on a plane through its axis*** · ***its profile is not one outline of
+  straight lines or one circle, which is what spin() takes*** · ***its sketch is not square to the way it turns*** · and the
+  shared ones (uses only some regions of its sketch; the part it cuts / joins is not in a variable of script.js).
 - *Patterns:* it repeats more than one body, or features · it repeats with options the code cannot write yet · its
   (second) count or spacing is an expression · it turns about an axis that is not Z through the origin · its count or
   angle is an expression.
@@ -84,11 +90,12 @@ countersinks are now written as code, so *it has a counterbore, countersink or t
 | 4.2 | bar while choosing | **New sketch** Click a flat face in the view, or a plane: [Top] [Front] [Side] [Cancel] |
 | 4.3 | over the view while choosing | Click a flat face for the new sketch |
 | 4.4 | notes | That face is curved; a sketch needs a flat face. · No face there. Click a flat face, or choose a plane. |
-| 4.5 | sketch bar | **Sketch {name}** {top plane at 10} · grid {5} mm [Line] [Rectangle] [Circle] [Arc] [Polyline] depth [10] [Extrude] [Pocket] [Done] |
+| 4.5 | sketch bar | **Sketch {name}** {top plane at 10} · grid {5} mm [Line] [Rectangle] [Circle] [Arc] [Polyline] ***[Delete]*** depth [10] [Extrude] [Pocket] [Done] |
 | 4.6 | notes | Give a depth above 0. · Pocket needs the part the sketch is on, kept in a variable of script.js (Run first). |
-| 4.7 | after a tool, drag or click | Added: {code} · Moved {[x, y]} to {[x, y]} · Inserted: {[x, y]} |
+| 4.7 | after a tool, drag or click | Added: {code} · Moved {[x, y]} to {[x, y]} · Inserted: {[x, y]} · ***Removed: {line}*** |
 | 4.8 | readout by the pointer | {lid} ({top plane at 10}): {[x, y]} · {kind}, where kind is one of: corner, middle of an edge, centre of a face, end of a line, middle of a line, centre of a circle, centre of an arc, end of an arc, point of the sketch, origin of the sketch, grid {5} mm. With "· drag to move it" on a point that can be dragged; "Move {[x, y]} to {[x, y]}" while dragging; "{Tool}: " first while a tool is on. |
 | 4.9 | readout, no sketch at the cursor | top plane, no sketch at the cursor: {[x, y]} |
+| 4.9b | ***readout, Delete on*** | ***Delete: {line} · click to remove it*** · ***Delete: finding the line that drew it…*** |
 | 4.10 | plane names in the readout and bar | top plane · front plane · side plane · {top} plane at {10} · a slanted plane |
 
 ## 5. reshape-cad's sketch-only view (packages/solidcraft-host/pane/src/sketch-only.mjs, pane.js; only behind ?sketch-only=1)

@@ -2,7 +2,7 @@
 // (lib/solidcraft-ui-to-code.ts). The round trip itself (made with the tools, written as code,
 // rebuilt through the guarded host page and compared) is a browser check; this pins the writing.
 import assert from 'node:assert/strict';
-import { curvesCode, featureCode, featuresCode, sketchPlane } from '../lib/solidcraft-ui-to-code.ts';
+import { matchFaces, curvesCode, featureCode, featuresCode, sketchPlane } from '../lib/solidcraft-ui-to-code.ts';
 
 // ---- sketch planes, from SolidCraft's frame ---------------------------------------------------------
 const XY={origin:[0,0,0],u:[1,0,0],v:[0,1,0]};
@@ -93,5 +93,31 @@ assert.match(featureCode({id:22,name:'Hole1',type:'HoleFeature',definition:{diam
  assert.match(featureCode({id:25,name:'Fillet2',type:'FilletFeature',definition:{edges:[[1,2,3]],radius:'1'}},c).error,/could not be found/);
  assert.match(featureCode({id:26,name:'Fillet3',type:'FilletFeature',definition:{edges:[[60,20,10]],radius:'1'}},{...ctx(),bodyVars:new Map()}).error,/not in a variable of script\.js/);
  assert.match(featuresCode([{id:27,name:'Box2',type:'BoxFeature',definition:{length:'1',width:'1',height:'1'}},{id:28,name:'Loft1',type:'LoftFeature',definition:{}}],c).error,/Loft1/,'one feature that cannot be written stops the lot');
+}
+// the check after writing: flat faces matched one to one, in any order
+{
+  const ringTop = [235.6186763075792, 9.889334874029553, 9.88933487402955, 0], ringBottom = [235.61867630757922, 9.88933487402955, 9.889334874029549, -10];
+  assert.equal(matchFaces([ringTop, ringBottom], [[235.61867630757922, 9.88933487402955, 9.88933487402955, 0], [235.6186763075792, 9.889334874029553, 9.88933487402955, -10]]), true, 'two rings whose areas differ in the last digit, listed the other way round');
+  assert.equal(matchFaces([ringTop, ringTop], [ringTop, ringBottom]), false, 'one face cannot stand for two');
+  assert.equal(matchFaces([ringTop], [[235.6186763075792, 9.889334874029553, 9.88933487402955, 0.001]]), false, 'a face 1e-3 away is not the same face');
+}
+// a revolve: a new sketch with the profile laid out as spin() reads it (x out from the axis, y along it), then spin, groove or union
+{
+  const ctx = () => ({ sketchVars: new Map(), bodyVars: new Map([['b_box1', 'b']]), taken: new Set(['b']), geometry: new Map([['b_box1', { faces: [], edges: [] }]]) });
+  const rect = (x0, y0, x1, y1) => [[x0, y0, x1, y0], [x1, y0, x1, y1], [x1, y1, x0, y1], [x0, y1, x0, y0]].map(([a, b, c, d], i) => ({ id: `l${i}`, type: 'line', start_at: [a, b], end_at: [c, d] }));
+  const XZ = { origin: [0, 0, 0], u: [1, 0, 0], v: [0, 0, -1] }, XY = { origin: [0, 0, 0], u: [1, 0, 0], v: [0, 1, 0] };
+  const rev = (definition, profile) => featureCode({ id: 9, name: 'Revolve1', type: 'RevolveFeature', definition: { profiles: { type: 'all' }, convention: 'sketch_normal', operation: 'new_body', body_names: ['Body1'], ...definition }, profile }, ctx());
+  assert.deepEqual(rev({ axis: { type: 'world', axis: 'Z' }, angle: '90' }, { curves: rect(10, 0, 20, 10), frame: XZ }).lines,
+    ["const sk = sketch('top');", 'sk.polygon([[10, 0], [20, 0], [20, -10], [10, -10]]);', 'const part = spin(sk, 90);'], 'about Z, from the XZ plane, towards +Y');
+  assert.deepEqual(rev({ axis: { type: 'sketch_axis', axis: 'y' }, angle: '120' }, { curves: rect(10, 0, 20, 10), frame: XY }).lines.at(-1), 'const part = spin(sk, -120);', 'about Y: SolidCraft turns towards its normal (+Z), reSHape\'s +a from +X towards -Z');
+  assert.deepEqual(rev({ axis: { type: 'world', axis: 'Z' }, angle: '360', operation: 'cut', targets: ['b_box1'] }, { curves: rect(10, 0, 20, 10), frame: XZ }).lines.at(-1), 'groove(sk, b, 360);');
+  assert.deepEqual(rev({ axis: { type: 'world', axis: 'Z' }, angle: '360', operation: 'join', targets: ['b_box1'] }, { curves: rect(10, 0, 20, 10), frame: XZ }).lines.at(-1), 'union(b, spin(sk, 360));');
+  assert.deepEqual(rev({ axis: { type: 'world', axis: 'Z' }, angle: '360' }, { curves: [{ id: 'c', type: 'circle', center_at: [15, 5], radius: 3 }], frame: XZ }).lines.slice(0, 2), ["const sk = sketch('top');", 'sk.circle(3, { at: [15, -5] });'], 'one circle');
+  assert.match(rev({ axis: { type: 'line', origin: [5, 0, 0], dir: [0, 0, 1] }, angle: '90' }, { curves: rect(10, 0, 20, 10), frame: XZ }).error, /not X, Y or Z through the origin/);
+  assert.match(rev({ axis: { type: 'sketch_line', curve: 'l0' }, angle: '90' }, { curves: rect(10, 0, 20, 10), frame: XZ }).error, /edge or an axis the code cannot name/);
+  assert.match(rev({ axis: { type: 'world', axis: 'Z' }, angle: '90' }, { curves: rect(10, 0, 20, 10), frame: { origin: [0, 0, 0], u: [0, 1, 0], v: [0, 0, 1] } }).error, /part way, from a plane the code cannot start a spin from/, 'part way from the YZ plane: reSHape starts from +X');
+  assert.match(rev({ axis: { type: 'world', axis: 'Z' }, angle: '90', symmetric: true }, { curves: rect(10, 0, 20, 10), frame: XZ }).error, /options the code cannot write/);
+  assert.match(rev({ axis: { type: 'world', axis: 'Z' }, angle: '90' }, { curves: [...rect(10, 0, 20, 10), { id: 'c', type: 'circle', center_at: [30, 5], radius: 2 }], frame: XZ }).error, /one outline of straight lines or one circle/);
+  assert.match(rev({ axis: { type: 'world', axis: 'Z' }, angle: 'a' }, { curves: rect(10, 0, 20, 10), frame: XZ }).error, /angle is an expression/);
 }
 console.log('SolidCraft tools to reSHape Script: planes from frames, sketches, extrude, pocket, union, fillet, chamfer, shell, cuboid, cylinder, subtract, patterns, moves, holes, turns, two-way patterns, cuts both ways, and refusals pass.');
