@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { ChevronDown, CloudUpload, History, Maximize2, Minimize2, PanelBottomClose, PanelBottomOpen, PanelLeftClose, PanelLeftOpen, RotateCcw, Share2, Users } from 'lucide-react';
+import { CloudUpload, Gamepad2, History, Maximize2, Minimize2, PanelBottomClose, PanelBottomOpen, PanelLeftClose, PanelLeftOpen, RotateCcw, Send as SendIcon, Users } from 'lucide-react';
 import type { Extension } from '@codemirror/state';
 import { useLessonStore } from '../lib/store';
 import { saveProgress } from '../lib/version-control';
@@ -30,6 +30,7 @@ import CodeTogetherBar, { useCodeTogetherAvailable } from './CodeTogetherBar';
 import SandboxProjectPicker from './SandboxProjectPicker';
 import { createProject, openProject, useSandboxProjects } from '../lib/sandbox-projects';
 import SendProgramButton from './SendProgramButton';
+import ShareDialog, { type ShareTab, type ShareTabSpec } from './ShareDialog';
 import P5playConvertButton from './P5playConvertButton';
 import { projectLessonId } from '../lib/sandbox-projects-core';
 import { RUN_TIMEOUT_MS, errorWithLocation, runStudentCode, timerLimitMessage } from '../lib/js-runner-source';
@@ -129,7 +130,20 @@ export default function SandboxWorkspace({ initialMode }: { initialMode?: Sandbo
   // and the mode tabs are locked, so one click cannot wipe or swap everyone's program.
   const togetherLang = modeId === 'js' || modeId === 'moshion' ? modeId : null;
   const mayTogether = useCodeTogetherAvailable(togetherLang, lessonProgress.authed);
-  const [togetherOpen, setTogetherOpen] = useState(false);
+  // One Share dialog holds Publish game, Code together and Send to... as tabs (components/ShareDialog.tsx). Code together's
+  // own popup is its tab: `togetherOpen` is "the dialog is open on that tab", so the toolbar button, an invitation and the
+  // session's own Close all still say it the way they did.
+  const [shareOpen, setShareOpen] = useState(false);
+  const [shareTab, setShareTab] = useState<ShareTab>('publish');
+  const shareTabRef = useRef(shareTab);
+  shareTabRef.current = shareTab;
+  const [togetherPane, setTogetherPane] = useState<HTMLDivElement | null>(null);
+  const togetherOpen = shareOpen && shareTab === 'together';
+  const setTogetherOpen = useCallback((v: boolean) => {
+    if (v) { setShareTab('together'); setShareOpen(true); }
+    // Code together closing itself (joined a session, Leave) must not shut the dialog while another tab is in use.
+    else if (shareTabRef.current === 'together') setShareOpen(false);
+  }, []);
   const [togetherHere, setTogetherHere] = useState(0);
   const [togetherBadge, setTogetherBadge] = useState<HTMLSpanElement | null>(null);
   const [collabExt, setCollabExt] = useState<Extension | null>(null);
@@ -259,7 +273,7 @@ export default function SandboxWorkspace({ initialMode }: { initialMode?: Sandbo
     setRunKey(0);
     setIsRunning(false);
     setLogs([]);
-    setTogetherOpen(false);
+    setShareOpen(false);
   }, [lesson, setLesson]);
 
   const enteredMode=useRef(false);
@@ -674,6 +688,43 @@ export default function SandboxWorkspace({ initialMode }: { initialMode?: Sandbo
     </>
   );
 
+  // The Share dialog's tabs: a tab appears only where what it does is available (the same tests the old menu used).
+  const closeShare = useCallback(() => setShareOpen(false), []);
+  const canTogether = !!togetherLang && (mayTogether || together);
+  const canPublish = mode.preview === 'moshion' && lessonProgress.authed;
+  const shareTabs: ShareTabSpec[] = [];
+  if (canPublish) {
+    // The Games library: publish this sketch so classmates can play and remix it.
+    shareTabs.push({
+      id: 'publish', label: 'Publish game', icon: <Gamepad2 size={14} aria-hidden="true" />,
+      pane: <PublishGameButton key={`publish-${lesson.id}`} getCode={getScript} embedded active={shareOpen && shareTab === 'publish'} onClose={closeShare} />,
+    });
+  }
+  if (canTogether) {
+    // Code together's own popup is drawn into this pane (CodeTogetherBar `embedded`).
+    shareTabs.push({
+      id: 'together', label: together ? 'Coding together' : 'Code together', icon: <Users size={14} aria-hidden="true" />,
+      pane: <div ref={setTogetherPane} />,
+    });
+    // Send a copy, or an invitation to this Code together session, in a message (migration 0054).
+    shareTabs.push({
+      id: 'send', label: 'Send to…', icon: <SendIcon size={14} aria-hidden="true" />,
+      pane: (
+        <SendProgramButton
+          key={`send-${lesson.id}`}
+          lang={togetherLang}
+          chipStyle={chipStyle}
+          getCode={getScript}
+          title={project?.name ?? ''}
+          session={together ? togetherCode : null}
+          embedded
+          active={shareOpen && shareTab === 'send'}
+          onClose={closeShare}
+        />
+      ),
+    });
+  }
+
   // The two sides of the sandbox's split (components/EditorPreviewSplit.tsx).
   const editorSlot = (
     <>
@@ -690,7 +741,9 @@ export default function SandboxWorkspace({ initialMode }: { initialMode?: Sandbo
             isUntouched={isUntouched}
             open={togetherOpen}
             onOpenChange={setTogetherOpen}
-            dialogHost={shellRef.current}
+            embedded
+            embedHost={togetherPane}
+            onInvite={() => setShareTab('send')}
             badgeHost={togetherBadge}
             onSession={setTogetherCode}
             invite={invite}
@@ -864,43 +917,20 @@ export default function SandboxWorkspace({ initialMode }: { initialMode?: Sandbo
                       <span ref={setTogetherBadge} style={{ display: 'inline-flex' }} />
                     </button>
                   )}
-                  {((togetherLang && (mayTogether || together)) || (mode.preview === 'moshion' && lessonProgress.authed)) && (
-                  <ShareMenu chipStyle={chipStyle}>
-                  {!together && togetherLang && mayTogether && (
-                    <button
-                      type="button"
-                      style={chipStyle}
-                      aria-haspopup="dialog"
-                      aria-expanded={togetherOpen}
-                      onClick={() => setTogetherOpen(true)}
-                      title="Write one program with classmates at the same time"
-                      data-testid="code-together-button"
-                      data-share-close=""
-                    >
-                      <Users size={12} aria-hidden="true" />
-                      Code together
-                    </button>
-                  )}
-                  {/* Send a copy, or an invitation to this Code together session, in a message (migration 0054). */}
-                  {togetherLang && (mayTogether || together) && (
-                    <SendProgramButton
-                      key={`send-${lesson.id}`}
-                      lang={togetherLang}
+                  {shareTabs.length > 0 && (
+                    <ShareDialog
                       chipStyle={chipStyle}
-                      getCode={getScript}
-                      title={project?.name ?? ''}
-                      session={together ? togetherCode : null}
+                      open={shareOpen}
+                      onOpenChange={setShareOpen}
+                      tab={shareTab}
+                      onTab={setShareTab}
+                      hostRef={shellRef}
+                      tabs={shareTabs}
                     />
                   )}
-                  {/* The Games library: publish this sketch so classmates can play and remix it. */}
+                  {/* Shown only while the code is a remix of a classmate's game: send the change back (lib/game-flow-core.ts). */}
                   {mode.preview === 'moshion' && lessonProgress.authed && (
-                    <>
-                      <PublishGameButton key={`publish-${lesson.id}`} getCode={getScript} />
-                      {/* Shown only while the code is a remix of a classmate's game: send the change back (lib/game-flow-core.ts). */}
-                      <ProposeChangeButton key={`propose-${lesson.id}`} getCode={getScript} />
-                    </>
-                  )}
-                  </ShareMenu>
+                    <ProposeChangeButton key={`propose-${lesson.id}`} getCode={getScript} />
                   )}
                 </div>
               )}
@@ -1050,55 +1080,5 @@ export default function SandboxWorkspace({ initialMode }: { initialMode?: Sandbo
         }}
       />
     </>
-  );
-}
-
-// The sandbox toolbar's Share button (climb4 r9 S9): one quiet button that opens a small panel with
-// Code together and Publish game, so the row is not packed with sharing controls beside Run.
-// Click outside or Escape closes it; Code together closes it as it opens its own dialog. Publish
-// game's panel opens inside it and the menu stays open while that panel is in use.
-function ShareMenu({ chipStyle, children }: { chipStyle: React.CSSProperties; children: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    // Publish game's panel is portalled to <body> (so nothing stacks over it), so a click inside it
-    // is outside `ref` in the DOM but must not close the menu that owns it.
-    const onDown = (e: MouseEvent) => {
-      const t = e.target as Element | null;
-      if (t?.closest?.('[data-publish-game-panel]')) return;
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
-    document.addEventListener('mousedown', onDown);
-    document.addEventListener('keydown', onKey);
-    return () => { document.removeEventListener('mousedown', onDown); document.removeEventListener('keydown', onKey); };
-  }, [open]);
-  return (
-    <div ref={ref} className="sandbox-share-menu">
-      <button
-        type="button"
-        style={chipStyle}
-        className="sandbox-share-trigger"
-        aria-haspopup="true"
-        aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-        title="Code together with classmates, or publish this sketch as a game"
-      >
-        <Share2 size={12} aria-hidden="true" />
-        Share
-        <ChevronDown size={12} aria-hidden="true" />
-      </button>
-      {open && (
-        <div
-          className="sandbox-share-panel"
-          role="group"
-          aria-label="Share with classmates"
-          onClick={(e) => { if ((e.target as HTMLElement).closest('[data-share-close]')) setOpen(false); }}
-        >
-          {children}
-        </div>
-      )}
-    </div>
   );
 }

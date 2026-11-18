@@ -42,6 +42,7 @@ import { CODE_ROOM_GAMES, type CodeLang } from '../lib/live-protocol';
 import { deviceId } from '../lib/moshion-online';
 import { leaveOnUnload, leaveRoom } from '../lib/room-leave';
 import { codeIcons } from '../lib/room-icons';
+import { shareHref } from '../lib/messages-client';
 
 const { row, btn, quiet, dim, codeInput, listItem } = lobbyStyles;
 const LIST_MS = 3000;
@@ -135,13 +136,21 @@ export interface CodeTogetherBarProps {
   onSession?: (code: string | null) => void;
   /** A session someone invited this student to (a message's Join): the popup opens with its code typed in. */
   invite?: string | null;
+  /**
+   * The popup's contents are a tab of the sandbox's Share dialog (components/ShareDialog.tsx): drawn into
+   * `embedHost` with no modal, backdrop or title of their own. `open` then means "that tab is showing".
+   */
+  embedded?: boolean;
+  embedHost?: HTMLElement | null;
+  /** In a session: "Send in a message" under Invite someone. The Share dialog uses it to open its Send to tab. */
+  onInvite?: () => void;
 }
 
 interface Session { code: string; hosting: boolean }
 
 export default function CodeTogetherBar({
   lang, getText, isUntouched, snapshot, onCollab, onActive, onHere, keepCopy, open, onOpenChange, dialogHost, badgeHost,
-  onSession, invite,
+  onSession, invite, embedded = false, embedHost = null, onInvite,
 }: CodeTogetherBarProps) {
   const [device] = useState(() => (typeof window === 'undefined' ? '' : deviceId()));
   const [session, setSession] = useState<Session | null>(null);
@@ -370,6 +379,16 @@ export default function CodeTogetherBar({
     try { await navigator.clipboard.writeText(s.code); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch { /* the code is on screen */ }
   };
 
+  // The same address a message's Join card opens (lib/messages-client.ts shareHref): the sandbox with this session's
+  // code typed in. Whoever opens it still presses Join themselves, which keeps their own code in History first.
+  const [linkCopied, setLinkCopied] = useState(false);
+  const inviteLink = (code: string) => new URL(shareHref({ id: '', kind: 'together', lang, room: code }), window.location.origin).href;
+  const copyLink = async () => {
+    const s = sessionRef.current;
+    if (!s) return;
+    try { await navigator.clipboard.writeText(inviteLink(s.code)); setLinkCopied(true); setTimeout(() => setLinkCopied(false), 1500); } catch { /* the link is on screen */ }
+  };
+
   const close = useCallback(() => cb.current.onOpenChange(false), []);
 
   // ---- in a session ----------------------------------------------------------
@@ -469,8 +488,8 @@ export default function CodeTogetherBar({
   const blocked = list.kind === 'no-class';
   // A guest (migration 0059) joins a session their host started; they cannot start one, so Start is not offered.
   const guestOnly = list.kind === 'rooms' && !!list.guest;
-  const dialog = !open ? null : (
-    <CodeTogetherDialog title={session ? 'Coding together' : 'Code together'} onClose={close}>
+  const content = (
+    <>
       {session ? (
         <>
           <p style={S.lead}>
@@ -484,6 +503,25 @@ export default function CodeTogetherBar({
               {copied ? 'Copied' : 'Copy'}
             </button>
           </div>
+          <section style={S.section} aria-labelledby={`${uid}-invite`}>
+            <h3 id={`${uid}-invite`} style={S.h3}>Invite someone</h3>
+            <div style={dim}>Send this link and it opens the sandbox with the code already typed in. They press Join.</div>
+            <div style={row}>
+              <input
+                readOnly
+                aria-label="Invite link"
+                value={inviteLink(session.code)}
+                onFocus={(e) => e.currentTarget.select()}
+                style={{ ...codeInput, flex: '1 1 240px', minWidth: 0, width: 'auto', letterSpacing: 0, textTransform: 'none', fontSize: '0.78rem' }}
+                data-testid="together-invite-link"
+              />
+              <button type="button" style={btn} onClick={() => void copyLink()} data-testid="together-copy-link">
+                {linkCopied ? 'Link copied' : 'Copy link'}
+              </button>
+              {onInvite ? <button type="button" style={quiet} onClick={onInvite} data-testid="together-send-invite">Send in a message…</button> : null}
+            </div>
+            <div style={{ ...dim, fontSize: '0.75rem' }}>Only classmates, and a guest your teacher has approved, can join.</div>
+          </section>
           <div style={row}>{peopleList()}</div>
           {longLine ? <div style={dim}>{longLine}</div> : null}
           {st?.notice ? <div style={{ color: 'var(--c-orange)' }}>{st.notice}</div> : null}
@@ -579,14 +617,22 @@ export default function CodeTogetherBar({
           )}
         </>
       )}
+    </>
+  );
+  const dialog = !open ? null : embedded ? (
+    <div style={S.body} data-testid="code-together-dialog">{content}</div>
+  ) : (
+    <CodeTogetherDialog title={session ? 'Coding together' : 'Code together'} onClose={close}>
+      {content}
     </CodeTogetherDialog>
   );
+  const dialogTarget = embedded ? embedHost : (dialogHost ?? (typeof document !== 'undefined' ? document.body : null));
 
   return (
     <>
       {badge && badgeHost ? createPortal(badge, badgeHost) : null}
       {toastEl}
-      {dialog && typeof document !== 'undefined' ? createPortal(dialog, dialogHost ?? document.body) : null}
+      {dialog && dialogTarget ? createPortal(dialog, dialogTarget) : null}
     </>
   );
 }

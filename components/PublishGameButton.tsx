@@ -111,8 +111,23 @@ function usesSentence(used: UsedItem[]): string {
   return `Your game uses ${parts.join(', and ')}.`;
 }
 
-export default function PublishGameButton({ getCode }: { getCode: () => string }) {
-  const [open, setOpen] = useState(false);
+/**
+ * `embedded`: the panel is a tab of the sandbox's Share dialog (components/ShareDialog.tsx). There is no button of
+ * its own and no popup chrome: `active` says the tab is showing (the panel's loads and listeners run only then),
+ * and Close calls `onClose`. Without it, this is the self-contained button + popup it always was.
+ */
+export default function PublishGameButton({ getCode, embedded = false, active = false, onClose }: {
+  getCode: () => string;
+  embedded?: boolean;
+  active?: boolean;
+  onClose?: () => void;
+}) {
+  const [openOwn, setOpenOwn] = useState(false);
+  const open = embedded ? active : openOwn;
+  const setOpen = useCallback((v: boolean | ((o: boolean) => boolean)) => {
+    if (embedded) { if (v === false) onClose?.(); return; }
+    setOpenOwn(v);
+  }, [embedded, onClose]);
   const [title, setTitle] = useState('');
   const [share, setShare] = useState(true);
   // The game's "Let classmates give feedback" switch (migration 0051): what is wanted, and what the server holds.
@@ -197,6 +212,7 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
     if (!open) return;
     const d = declaredMode(getCode());
     setDeclared(modeLabel(d.mode, d.players));
+    if (embedded) return; // the Share dialog owns Escape and the click outside
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
     const onDown = (e: MouseEvent) => {
       const t = e.target as Node;
@@ -205,7 +221,7 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
     window.addEventListener('keydown', onKey);
     window.addEventListener('mousedown', onDown);
     return () => { window.removeEventListener('keydown', onKey); window.removeEventListener('mousedown', onDown); };
-  }, [open, getCode]);
+  }, [open, getCode, embedded, setOpen]);
 
   // Which of the student's own pictures and sounds the code uses, kept fresh
   // while the panel is open (a sync finishing or a share changing moves them).
@@ -316,8 +332,19 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
   }
 
   const label = published ? 'Published ✓' : 'Publish game';
+  // Free-standing: a button, and a panel pinned to the middle of the window. Embedded: just the panel, in a tab.
+  const panelStyle: React.CSSProperties = embedded
+    ? { color: 'var(--c-fg)', fontSize: 13, lineHeight: 1.5 }
+    : {
+      position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 1000, width: 'min(820px, calc(100vw - 32px))',
+      maxHeight: 'calc(100vh - 32px)', overflowY: 'auto', boxSizing: 'border-box',
+      background: 'var(--c-deep2)', border: '1px solid var(--c-line)', borderRadius: 6, padding: 12,
+      boxShadow: '0 8px 24px rgba(0,0,0,0.35)', color: 'var(--c-fg)', fontSize: 13, lineHeight: 1.5,
+    };
+  const place = (el: React.ReactElement) => (embedded ? el : createPortal(el, document.body));
   return (
-    <div ref={wrapRef} style={{ position: 'relative', display: 'inline-flex' }}>
+    <div ref={wrapRef} style={embedded ? undefined : { position: 'relative', display: 'inline-flex' }}>
+      {!embedded && (
       <button
         type="button"
         style={published ? { ...chip, color: 'var(--c-green)', borderColor: 'color-mix(in srgb, var(--c-green) 53%, transparent)' } : chip}
@@ -329,18 +356,14 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
         <Gamepad2 size={12} />
         {label}
       </button>
-      {open && createPortal(
+      )}
+      {(embedded || open) && place(
         <div
           ref={dialogRef}
           data-publish-game-panel=""
-          role="dialog"
+          role={embedded ? 'group' : 'dialog'}
           aria-label="Publish game"
-          style={{
-            position: 'fixed', top: 16, left: '50%', transform: 'translateX(-50%)', zIndex: 1000, width: 'min(820px, calc(100vw - 32px))',
-            maxHeight: 'calc(100vh - 32px)', overflowY: 'auto', boxSizing: 'border-box',
-            background: 'var(--c-deep2)', border: '1px solid var(--c-line)', borderRadius: 6, padding: 12,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.35)', color: 'var(--c-fg)', fontSize: 13, lineHeight: 1.5,
-          }}
+          style={panelStyle}
         >
           <h2 style={{ fontSize: 14, margin: '0 0 6px' }}>{published ? 'Update your game' : 'Publish this sketch as a game'}</h2>
           <p style={{ margin: '0 0 8px', color: 'var(--c-dim)' }}>
@@ -514,7 +537,6 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
             </div>
           )}
         </div>,
-        document.body,
       )}
     </div>
   );
