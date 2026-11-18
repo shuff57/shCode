@@ -88,15 +88,23 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
    - **Patterns in two directions:** two `linearPattern` calls.
    - **Cuts both ways:** `pocket(…, { midplane: true })`; both programs measure the total depth.
    - **Sketches on slanted planes:** `sketch({ origin, u, v })`.
+   - **Counterbore and countersink holes** (2026-11-18), through or blind, from the face at the high end of the axis:
+     `counterbore: { across, deep }`, `countersink: { across, angle }` (SolidCraft's `cb_*` and `cs_*`, the included angle
+     and the width at the face in both).
+   - **A move and a turn at once** (2026-11-18): SolidCraft turns about the axis through the origin, then moves (x' = R·x + t),
+     so it is `turn` and then one `move` by R·c − c + t.
 
    Still not written:
    - **Copies:** the guarded build refuses `move(…, { copy: true })` ("a copying move is not mapped").
-   - Counterbore and countersink holes, a blind hole from below, a move and a turn at once, and turns about other axes.
+   - A blind hole from below, or a counterbore or countersink there: the guarded build cuts them from the face at the high end
+     of the axis only.
+   - A hole with a drill point, and turns about a slanted axis (reSHape turns about the box's centre, which moves after
+     each turn, so it cannot be written as several turns from the box before).
    - A hole or turn made in the same go as another step, because its place is measured from the part before both.
 
    After writing, the part is rebuilt from the code and compared by volume and box, as before. It is now also compared by
    every flat face's area and centre and by the curved faces' total area, so a hole in the wrong place or a part turned
-   the wrong way is reported, not passed. Round trips: `/tmp/cad-drive/tools2-e2e.py` (9 of 9 the same part).
+   the wrong way is reported, not passed. Round trips: `/tmp/cad-drive/tools2-e2e.py` (12 of 12 the same part, with the counterbore, the countersink and the move with a turn).
 8. **Done 2026-11-17: a refused step points at its line.** The line is found by evaluating the script cut short after each
    top-level statement of script.js until the step appears (`stepLines`; interpreter only, nothing built). A step made in
    an imported class goes on the script.js line that called it. The refusal shows "script.js line N" as a link, and the

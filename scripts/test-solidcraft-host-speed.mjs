@@ -40,6 +40,16 @@ console.log('PASS progress: every line written, drawn at most every 80 ms and al
   assert.equal(m.size(), 3);
 }
 console.log('PASS reply memory: answers() matches what execute() would answer from memory');
+{ // which hits an earlier run stored (pane.js `?keep=on` counts runs up in m.gen): a list asked twice in one run is not an earlier Run's work
+  const replies = { execute: async () => ({ ok: true, cpuMs: 1 }), topologyOf: async () => ({ ok: true, topology: { bodies: [] } }), inspect: async () => ({}) };
+  const m = createReplyMemory(replies); const a = [{ command: 'solid.box', params: {} }]; const b = [...a, { command: 'solid.hole', params: {} }];
+  m.gen = 1; await m.execute(a, { fresh: true }); await m.execute(a, { fresh: true }); await m.topologyOf(a); await m.topologyOf(a);
+  assert.deepEqual([m.hits, m.earlier], [2, 0], 'the first run: two hits, none from an earlier run');
+  m.gen = 2; m.hits = 0; m.earlier = 0;
+  await m.execute(a, { fresh: true }); await m.topologyOf(a); await m.execute(b, { fresh: true }); await m.execute(b, { fresh: true });
+  assert.deepEqual([m.hits, m.earlier], [3, 2], 'the next run: the first run\'s two lists count, the list asked twice in this run does not');
+}
+console.log('PASS reply memory: hits stored by an earlier run are counted apart');
 
 // ---- the kept probe worker (probe-client.mjs persistent): the budget judges the whole list -----------------------------------------------------------
 {

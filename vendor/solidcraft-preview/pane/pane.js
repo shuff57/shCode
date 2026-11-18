@@ -365,7 +365,7 @@ async function memoForRun() {
   const same = k && k.memo.size() < KEEP_MAX && k.stops === engineStops.length && k.revision === await revisionNow();
   const m = k && k.memo.size() < KEEP_MAX ? k.memo : createReplyMemory(bridge, { continueRuns: INC_ON, shadow: window.__host.shadow ?? null, log: engineLog });
   if (!same) { m.page = null; m.marks = []; } // SolidCraft may hold something else now: start from an empty design, and never go back to an old mark
-  m.runs = 0; m.hits = 0; m.continued = 0; m.restored = 0; // this run's own figures, for engineUse
+  m.runs = 0; m.hits = 0; m.continued = 0; m.restored = 0; m.earlier = 0; m.gen++; // this run's own figures, for engineUse
   return m;
 }
 async function keepAfterRun(m) { if (KEEP_ON && m) kept = { memo: m, revision: await revisionNow(), stops: engineStops.length }; }
@@ -705,7 +705,7 @@ async function run({ confirmed = false } = {}) {
     const held = memo ? await memo.heldReply(tr.commands) : null;
     const fin = held ?? await runSC(tr.commands, { replay: true });
     pm('final replay', pt); pt = performance.now();
-    const engineUse = memo ? { runs: memo.runs, fromMemory: memo.hits, finalReplaySkipped: !!held, ...(INC_ON ? { continued: memo.continued, restored: memo.restored } : {}), ...(KEEP_ON ? { kept: memo.size() } : {}) } : null;
+    const engineUse = memo ? { runs: memo.runs, fromMemory: memo.hits, finalReplaySkipped: !!held, ...(INC_ON ? { continued: memo.continued, restored: memo.restored } : {}), ...(KEEP_ON ? { kept: memo.size(), fromEarlierRuns: memo.earlier } : {}) } : null;
     await keepAfterRun(memo);
     memo = null;
     keepNext = false;

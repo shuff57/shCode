@@ -29,7 +29,7 @@ import { checkSolidCraftAvailability } from '../lib/solidcraft-availability';
 type Api = { request(method: string, params?: object): Promise<any>; execute(command: string, params?: object): Promise<any> };
 type Label = { key: string; text: string; pick: PickCode; x: number; y: number; plane?: boolean };
 type Feature = { id: string; kind: string; status: string; refusal: string | null; note?: string | null };
-type Summary = { error?: string; cancelled?: boolean; features?: Feature[]; warnings?: string[]; interpreterWarnings?: string[]; engineUse?: { runs: number; fromMemory: number } | null };
+type Summary = { error?: string; cancelled?: boolean; features?: Feature[]; warnings?: string[]; interpreterWarnings?: string[]; engineUse?: { runs: number; fromMemory: number; fromEarlierRuns?: number } | null };
 type Host = {
   confirmReplace: (() => boolean) | null;
   evaluate(source: string): Promise<{ errors: { message: string; line?: number | null }[]; doc?: { features?: { id?: unknown }[] } | null }>;
@@ -268,8 +268,10 @@ export default function SolidCraftCodeStudio(props: Props) {
         if (seq === runSeq.current && lines.size) setRefusals(rs => rs.map(r => lines.has(r.id) ? { ...r, at: lines.get(r.id) } : r));
       }).catch(() => { /* the lines stay unknown; the sentences are shown */ });
       setNotes([...new Set([...(summary.warnings ?? []), ...(summary.interpreterWarnings ?? []), ...steps.map(f => f.note).filter((n): n is string => !!n)])]);
-      // How much of the build was new: steps whose engine work was remembered from an earlier Run were not built again.
-      const use = summary.engineUse; const reused = use && use.fromMemory > 0 ? use.runs === 0 ? ', nothing new to build' : ', only the changed steps rebuilt' : '';
+      // How much of the build was new: steps whose engine work was remembered from an earlier Run were not built again. (fromMemory alone also
+      // counts a list asked twice in this Run, so the first Run after opening the page would say it; fromEarlierRuns counts only an earlier Run's.)
+      const use = summary.engineUse; const earlier = use ? use.fromEarlierRuns ?? use.fromMemory : 0;
+      const reused = use && earlier > 0 ? use.runs === 0 ? ', nothing new to build' : ', only the changed steps rebuilt' : '';
       setStatus(`${refused.length ? `Built ${steps.length - refused.length} of ${steps.length} steps` : `Built ${steps.length} step${steps.length === 1 ? '' : 's'}`} in ${took}${reused}.`);
       if (automatic && !override) await fit();
       return !refused.length;

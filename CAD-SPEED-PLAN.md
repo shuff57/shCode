@@ -46,7 +46,7 @@ a refusal or a time budget for speed.
 - **Delivery.**
   - Brotli-compressed wasm: 101 MB becomes about 25–30 MB.
   - `immutable` caching for the hashed files.
-- **Waterfall.**
+- **Waterfall** (measured 2026-11-18, not worth doing: see below).
   - Mount the frame while the availability check runs.
   - Replace the 200/500 ms polling with a ready message.
   - Compile the probe kernel in idle time after SolidCraft is ready; this helps the first budgeted Run only.
@@ -171,6 +171,34 @@ a refusal or a time budget for speed.
     from the cache, and a Run builds (`/tmp/cad-drive/crash-e2e.py`).
 - **Still to do (a deploy).** Store brotli copies in R2. That makes the first visit's download smaller; this change makes
   every later one zero.
+
+## Measured (2026-11-18): the waterfall, after the cache — not worth doing
+
+`/tmp/cad-drive/waterfall.py`: when each stage of opening `/sandbox/cad/` starts and ends, on localhost, a second visit
+(the engine from the studio page's cache).
+
+| s | Stage |
+|---|---|
+| 0.08 | the page's HTML is in |
+| 0.50 | the availability check starts (the page's own scripts before it) |
+| 0.55 | it ends; the frame is mounted, host.html and SolidCraft's index.html are loaded |
+| 1.10 | SolidCraft's API is up (the engine compiled from the cached bytes) |
+| 1.17 | the host page is ready |
+| 2.98 | the first part is shown (the first Run) |
+
+- **Mounting the frame during the availability check** would win its 50 ms.
+- **A ready message instead of the 200 ms polling** would win about 100 ms on average.
+- **Compiling the probe kernel ahead:** the first budgeted probe (a hollow) takes 0.31 s in all, compile included, so
+  at most about 0.2 s, paid for by every page with no budgeted step (74 MB compiled for nothing).
+- **So:** together well under half a second of about 3 s. Not done. The time left is the first Run itself (phase 1's
+  figures).
+
+**Fixed on the way: "only the changed steps rebuilt" on the first Run.** The ending was chosen on the reply memory's
+hits, and those also count a list asked twice in one Run, so the first Run after opening the page said it. The memory now
+notes which Run stored each reply (`src/reply-memory.mjs` `gen`, `earlier`), the pane reports `fromEarlierRuns`, and the
+ending is shown only for an earlier Run's work. Checked (`/tmp/cad-drive/probe-load.py`): the first Run says
+"Built 2 steps in 1.5 s.", an unchanged Run "…, nothing new to build", a changed wall "…, only the changed steps rebuilt".
+The words are unchanged.
 
 ## Phase 0, before anything: a speed bench in the repo
 `/tmp/cad-drive/profile.py` and `settle.py`, cleaned up into `scripts/`. It measures page load, the first Run, an unchanged Run, and a Run after a small change, for the starter and the heavy script. Every phase reports before and after numbers from it.

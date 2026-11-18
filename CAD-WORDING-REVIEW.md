@@ -62,15 +62,19 @@ change the code to match.
   (second) count or spacing is an expression · it turns about an axis that is not Z through the origin · its count or
   angle is an expression.
 - *Move and turn:* it moves more than one body · it moves / turns by an expression · **it copies the part, which the
-  guarded build does not make yet** · **it moves and turns at once** · **it turns about an axis that is not X, Y or Z
-  through the origin** · **the box of its part could not be read**.
-- *Hole tool:* **it has a counterbore, countersink or thread** · **its place could not be read** · **its depth is an
+  guarded build does not make yet** · **it turns about an axis that is not X, Y or Z
+  through the origin** · **the box of its part could not be read**. (*It moves and turns at once* is gone: since
+  2026-11-18 that is written as code.)
+- *Hole tool:* ***it has a drill point*** · ***its counterbore is an expression*** · ***its countersink is an
+  expression*** · ***it is a {kind} hole, which the code cannot write yet*** · ***its counterbore / countersink is on a face
+  the code cannot cut it from yet*** · **its place could not be read** · **its depth is an
   expression** · **it is drilled to a point** · **it is not drilled along X, Y or Z** · **the part it drills is not in a
   variable of script.js** · **it stops part way and is drilled from a face the code cannot drill from yet**.
 - *Any:* **it was made in the same go as another step, so where it is cannot be measured; make it on its own** · its part
   is not in a variable of script.js · SolidCraft's {tool} is not one of the code's words yet.
 
-The ones in bold are new since your last look (2026-11-17/18).
+The ones in bold are new since your last look (2026-11-17/18); in bold italics, new on 2026-11-18 (counterbores and
+countersinks are now written as code, so *it has a counterbore, countersink or thread* is gone).
 
 ## 4. Live sketch (components/CadSketchOverlay.tsx), all new
 

@@ -273,9 +273,8 @@ export function featureCode(f: TimelineFeature, ctx: UiContext): Written {
       // reSHape has move(part, offset, { copy: true }), but the guarded build refuses it ("a copying move is not mapped"), so a copy is not written.
       if (d.copy) return why('it copies the part, which the guarded build does not make yet');
       if (angle === 0) return { lines: [`move(${part}, ${pt(t)});`] };
-      // A turn: SolidCraft turns about an axis through the origin; reSHape's turn() about the centre of the part's box. The same turn is reSHape's turn
-      // and then a move by R.c - c (c the box's centre), about one of X, Y and Z only.
-      if (t.some(v => v !== 0)) return why('it moves and turns at once');
+      // A turn: SolidCraft turns about an axis through the origin, then moves by t (x' = R.x + t); reSHape's turn() turns about the centre of the
+      // part's box. The same motion is reSHape's turn and then a move by R.c - c + t (c the box's centre), about one of X, Y and Z only.
       if (ctx.afterSolidStep) return why('it was made in the same go as another step, so where it is cannot be measured; make it on its own');
       const ax = axisName(d.rotate_axis); if (!ax || d.origin) return why('it turns about an axis that is not X, Y or Z through the origin');
       const box = ctx.boxes?.get(d.bodies[0]); if (!box) return why('the box of its part could not be read');
@@ -283,14 +282,25 @@ export function featureCode(f: TimelineFeature, ctx: UiContext): Written {
       const rad = angle * Math.PI / 180; const [co, si] = [Math.cos(rad), Math.sin(rad)]; const [i, j] = [(k + 1) % 3, (k + 2) % 3];
       const rc = [...c]; rc[i] = co * c[i] - si * c[j]; rc[j] = si * c[i] + co * c[j];
       const angles = [0, 0, 0]; angles[k] = angle;
-      const shift = sub(rc, c);
+      const shift = sub(rc, c).map((v, i) => v + t[i]);
       return { lines: [`turn(${part}, ${pt(angles)});`, ...(shift.some(v => Math.abs(v) > 1e-9) ? [`move(${part}, ${pt(shift)});`] : [])] };
     }
     case 'HoleFeature': {
       if (ctx.afterSolidStep) return why('it was made in the same go as another step, so where it is cannot be measured; make it on its own');
       // reSHape's hole(part, { across, deep, at, along }): drilled along X, Y or Z, at: measured from the centre of the part's box across the face, a blind
       // hole from the face at the high end of its axis (measured: hole(b, { deep: 8 }) on a box 0..20 high cuts 12..20). A through hole is the same either way.
-      if (d.hole && d.hole.type !== 'simple') return why('it has a counterbore, countersink or thread');
+      // A counterbore or countersink is reSHape's counterbore: { across, deep } / countersink: { across, angle } (the included angle, its width at the
+      // face, as SolidCraft's cs_diameter and cs_angle); the guarded build cuts the recess at the high end of the axis, so only from that face.
+      const kind = d.hole?.type ?? 'simple';
+      if (kind === 'drilled' || (d.hole?.tip_angle !== undefined && d.hole?.tip_angle !== null)) return why('it has a drill point');
+      let recess: string | null = null; let recessName = '';
+      if (kind === 'counterbore') {
+        const w = plainNumber(d.hole.cb_diameter), dp = plainNumber(d.hole.cb_depth); if (w === null || dp === null) return why('its counterbore is an expression');
+        recess = `counterbore: { across: ${fmt(w)}, deep: ${fmt(dp)} }`; recessName = 'counterbore';
+      } else if (kind === 'countersink') {
+        const w = plainNumber(d.hole.cs_diameter), a = plainNumber(d.hole.cs_angle); if (w === null || a === null) return why('its countersink is an expression');
+        recess = `countersink: { across: ${fmt(w)}, angle: ${fmt(a)} }`; recessName = 'countersink';
+      } else if (kind !== 'simple') return why(`it is a ${String(kind)} hole, which the code cannot write yet`);
       if (!Array.isArray(d.position) || !Array.isArray(d.direction)) return why('its place could not be read');
       const across = plainNumber(d.diameter); if (across === null) return why('its size is an expression');
       const deep = d.depth === undefined || d.depth === null ? null : plainNumber(d.depth); if (d.depth !== undefined && d.depth !== null && deep === null) return why('its depth is an expression');
@@ -299,9 +309,11 @@ export function featureCode(f: TimelineFeature, ctx: UiContext): Written {
       const k = 'XYZ'.indexOf(ax);
       const body = bodyOfPoint(ctx, d.position); const part = owner(body); if (!body || !part) return why('the part it drills is not in a variable of script.js');
       const box = ctx.boxes?.get(body); if (!box) return why('the box of its part could not be read');
-      if (deep !== null && !(d.direction[k] < 0 && Math.abs(d.position[k] - box.max[k]) < 1e-6)) return why('it stops part way and is drilled from a face the code cannot drill from yet');
+      const fromHigh = d.direction[k] < 0 && Math.abs(d.position[k] - box.max[k]) < 1e-6;
+      if (deep !== null && !fromHigh) return why('it stops part way and is drilled from a face the code cannot drill from yet');
+      if (recess && !fromHigh) return why(`its ${recessName} is on a face the code cannot cut it from yet`);
       const c = box.min.map((v, i) => (v + box.max[i]) / 2); const [u, v] = k === 2 ? [0, 1] : k === 1 ? [0, 2] : [1, 2];
-      const opts = [`across: ${fmt(across)}`, ...(deep !== null ? [`deep: ${fmt(deep)}`] : []), `at: ${pt([d.position[u] - c[u], d.position[v] - c[v]])}`, ...(ax !== 'Z' ? [`along: '${ax.toLowerCase()}'`] : [])];
+      const opts = [`across: ${fmt(across)}`, ...(deep !== null ? [`deep: ${fmt(deep)}`] : []), `at: ${pt([d.position[u] - c[u], d.position[v] - c[v]])}`, ...(ax !== 'Z' ? [`along: '${ax.toLowerCase()}'`] : []), ...(recess ? [recess] : [])];
       return { lines: [`hole(${part}, { ${opts.join(', ')} });`] };
     }
     default:
