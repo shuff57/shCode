@@ -13,7 +13,8 @@
 //     showed a solid the report did not describe, in 2 of 55 scripts.)
 //   - heldReply(): the final replay may be skipped when SolidCraft holds exactly the accepted commands AND a fresh reading of it shows the bodies of that
 //     reply. What the student sees is then what the report says, by measurement and not by bookkeeping. Any doubt returns null, and the caller builds.
-// The memory lives for one run and is thrown away; nothing is kept between runs. No DOM here: pane.js makes one per run (`?memo=off` makes none).
+// The memory lives for one run and is thrown away; nothing is kept between runs. No DOM here: pane.js makes one per run (`?memo=off` makes none), or with
+// `?keep=on` (shCode) keeps it from one run to the next and drops `page` whenever SolidCraft may hold something else (pane.js memoForRun).
 //
 // Run only the new steps (`continueRuns`, off unless asked for). The layer builds a script one step at a time, and every engine run starts from an empty
 // design, so step k replays steps 1..k-1: SolidCraft's work grows with the square of the script. When SolidCraft holds, from an empty design and run to the
@@ -66,6 +67,37 @@ export function createReplyMemory(bridge, { continueRuns = false, shadow = null,
     for (let i = 0; i < p.cmds.length; i++) if (p.cmds[i] !== JSON.stringify(cmds[i])) return 0;
     return p.cmds.length;
   };
+  // shCode, marks (with continueRuns, and a bridge that has checkpoint/restoreCheckpoint): before SolidCraft runs more commands on top of what it holds,
+  // its design is checkpointed (SolidCraft's own edit.checkpoint) with the record of what it holds then. A list that does not start with what SolidCraft holds
+  // (a guard's variant, the list after it) goes back to the mark of its longest held prefix and runs only the rest, instead of starting from an empty design.
+  // SolidCraft's restore is exact (2026-11-17 spike: the same bodies, volumes, faces and timeline; 13 ms against 902 ms to rebuild 11 commands). Restoring
+  // uses up that checkpoint and every later one; any failure drops every mark and the run starts from empty. `m.marks` is dropped with `m.page` whenever
+  // SolidCraft may hold something else (pane.js memoForRun), so a mark never takes the student's design back to an earlier one.
+  const MAX_MARKS = 12;
+  const canMark = () => continueRuns && typeof bridge.checkpoint === 'function' && typeof bridge.restoreCheckpoint === 'function';
+  /** checkpoint what SolidCraft holds now (m.page, when it has feature numbers), unless that prefix is marked already */
+  const markHeld = async () => {
+    const p = m.page; if (!canMark() || !p || !p.cmds || !p.cmds.length || !Array.isArray(p.results)) return;
+    if (m.marks.some((k) => k.cmds.length === p.cmds.length && k.cmds.every((c, i) => c === p.cmds[i]))) return;
+    let id = null; try { id = await bridge.checkpoint(); } catch { id = null; }
+    if (!Number.isInteger(id)) return;
+    m.marks.push({ id, cmds: p.cmds.slice(), results: structuredClone(p.results) });
+    if (m.marks.length > MAX_MARKS) m.marks.shift();
+  };
+  /** for a list SolidCraft does not hold the start of: go back to the mark of its longest prefix; true when SolidCraft now holds it */
+  const backToMark = async (cmds) => {
+    if (!canMark() || !m.marks.length || heldOf(cmds)) return false;
+    const keys = cmds.map((c) => JSON.stringify(c)); let best = null;
+    for (const k of m.marks) if (k.cmds.length <= keys.length && (!best || k.cmds.length > best.cmds.length) && k.cmds.every((c, i) => c === keys[i])) best = k;
+    if (!best) return false;
+    try { await bridge.restoreCheckpoint(best.id); }
+    catch { m.marks = []; m.page = null; return false; }
+    m.marks = m.marks.filter((k) => k.id < best.id); // used up by the restore
+    m.page = { list: keyOf(cmds.slice(0, best.cmds.length)), cmds: best.cmds.slice(), reply: null, results: structuredClone(best.results) };
+    m.restored++;
+    await markHeld(); // the restore used this mark up: take it again, to come back here once more
+    return true;
+  };
   const note = async (kind, cmds, held, ms, r, ref, budget = false) => {
     if (!log) return;
     const row = { kind, n: cmds.length, held, ms: Math.round(ms), ok: !!(r && r.ok), last: cmds.at(-1)?.command ?? null, budget };
@@ -74,12 +106,35 @@ export function createReplyMemory(bridge, { continueRuns = false, shadow = null,
   };
   const m = {
     page: null, // { list, cmds: string[], reply, results: [{feature}] | null } | null
-    hits: 0, runs: 0, continued: 0,
+    marks: [], // [{ id (SolidCraft checkpoint), cmds: string[], results }]: see backToMark
+    hits: 0, runs: 0, continued: 0, restored: 0,
+    /** whether execute(cmds, opts) would be answered from memory, without asking (the progress line is drawn only before a real run) */
+    answers(cmds, opts = {}) {
+      const hit = exec.get(keyOf(cmds) + (opts.budgetS ? '|b' : '|n'));
+      return !!hit && !opts.replay && !(opts.budgetS && typeof hit.cpuMs === 'number' && hit.cpuMs > opts.budgetS * 1000);
+    },
+    answersTopology: (cmds) => topo.has(keyOf(cmds)),
+    /**
+     * shCode: the topology of `cmds` read off what SolidCraft holds, when the record says it holds exactly `cmds` with one feature number per command, and
+     * null otherwise. Nothing is run (bridge.topologyOf with every command held only reads faces and edges), and the record is left as it is. The caller
+     * checks first that SolidCraft's document has not changed since the record was made (pane.js checkNames).
+     */
+    async readHeld(cmds) {
+      const list = keyOf(cmds); const hit = topo.get(list);
+      if (hit) return structuredClone(hit);
+      if (!m.page || m.page.list !== list || !Array.isArray(m.page.results) || m.page.results.length !== cmds.length || !cmds.length) return null;
+      const r = await bridge.topologyOf(cmds, { held: cmds.length, heldResults: m.page.results });
+      if (r && r.ok) topo.set(list, structuredClone(r));
+      return r && r.ok ? r : null;
+    },
+    /** how many lists are remembered (pane.js `?keep=on` starts again past a limit) */
+    size: () => exec.size + topo.size,
     async execute(cmds, opts = {}) {
       const list = keyOf(cmds); const k = list + (opts.budgetS ? '|b' : '|n');
       const hit = exec.get(k);
       if (hit && !opts.replay && !(opts.budgetS && typeof hit.cpuMs === 'number' && hit.cpuMs > opts.budgetS * 1000)) { m.hits++; return structuredClone(hit); }
       const { replay: _replay, ...pass } = opts;
+      if (opts.fresh && continueRuns) { if (!heldOf(cmds)) await backToMark(cmds); if (heldOf(cmds) && heldOf(cmds) < cmds.length) await markHeld(); }
       const held = opts.fresh ? heldOf(cmds) : 0; const heldResults = held ? m.page.results : null;
       const t0 = now();
       const r = await bridge.execute(cmds, continueRuns && opts.fresh ? { ...pass, features: true, ...(held ? { held } : {}) } : pass); m.runs++;
@@ -97,6 +152,7 @@ export function createReplyMemory(bridge, { continueRuns = false, shadow = null,
       const list = keyOf(cmds); const hit = topo.get(list);
       if (hit) { m.hits++; return structuredClone(hit); }
       // continued only when the feature numbers of the held commands are known: the reply carries one per command
+      if (continueRuns) { if (!heldOf(cmds)) await backToMark(cmds); if (heldOf(cmds) && heldOf(cmds) < cmds.length) await markHeld(); }
       const held = heldOf(cmds); const heldResults = held && Array.isArray(m.page.results) ? m.page.results : null;
       const t0 = now();
       const r = await (heldResults ? bridge.topologyOf(cmds, { held, heldResults }) : bridge.topologyOf(cmds)); m.runs++;

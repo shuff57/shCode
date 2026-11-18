@@ -16,20 +16,24 @@ export const LINES = {
   slow: ' (this one is slow)',
 };
 
-export function createProgress({ say, yieldToPage = async () => {}, now = () => performance.now(), slowAfterMs = 10000, lines = LINES }) {
-  let pass = 0; let cur = null;
+// shCode: the line is written at every step, but the page is given a moment to draw it at most every `paintEveryMs`. A run answered from memory goes
+// through dozens of steps without an engine call, and a pause on each one was most of its time (0.17 s of 0.36 s on a 12-step part).
+export function createProgress({ say, yieldToPage = async () => {}, now = () => performance.now(), slowAfterMs = 10000, lines = LINES, paintEveryMs = 80 }) {
+  let pass = 0; let cur = null; let painted = -Infinity; let unpainted = false;
+  const paint = async (force = false) => { if (!force && now() - painted < paintEveryMs) { unpainted = true; return; } await yieldToPage(); painted = now(); unpainted = false; };
   const line = () => (pass > 1 ? lines.checking : lines.building)(cur.index + 1, cur.count, cur.id) + (cur.slow ? lines.slow : '');
   return {
     /** the layer's ctx.onStep: a new translation starts whenever step 0 comes round */
     async onStep(step) {
       if (step.index === 0) pass++;
       cur = { id: step.id, index: step.index, count: step.count, t0: now(), slow: false };
-      say(line()); await yieldToPage();
+      say(line()); await paint();
     },
-    /** before an engine call: when the step has been going for slowAfterMs, say so once (it can only be said between calls) */
-    async beforeEngine() {
-      if (!cur || cur.slow || now() - cur.t0 < slowAfterMs) return;
-      cur.slow = true; say(line()); await yieldToPage();
+    /** before an engine call: when the step has been going for slowAfterMs, say so once (it can only be said between calls). `real`: the engine will
+     *  really run (not answered from memory), so the line written last is drawn first even inside the paint interval: the page is busy until it returns */
+    async beforeEngine(real = true) {
+      if (cur && !cur.slow && now() - cur.t0 >= slowAfterMs) { cur.slow = true; say(line()); await paint(true); return; }
+      if (real && unpainted) await paint(true);
     },
     get pass() { return pass; },
   };
