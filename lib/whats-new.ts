@@ -55,7 +55,7 @@ export const WHATS_NEW: WhatsNewEntry[] = [
     title: 'Bring in a p5play program',
     summary:
       'Found a game written in p5play (version 3, or an older one)? Press From p5play in the moSHion sandbox and paste it. An AI rebuilds ' +
-      'it in moSHion and it opens as a new project, so nothing you have now is changed. A line the AI changed has a // CONVERTED: comment saying what it did.',
+      'it in moSHion and it opens as a new project, so nothing you have now is changed. A line the AI changed has a // CONVERTED: note saying what it did.',
     steps: [
       'In the moSHion sandbox, press From p5play and paste the program (or press Use the code in the editor).',
       'Press Convert to moSHion. Read What the AI changed, then press Open as a new project.',
