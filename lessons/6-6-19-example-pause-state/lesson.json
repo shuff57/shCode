@@ -3,6 +3,10 @@
   "title": "6.11.20 Worked Example: Adding a Pause State",
   "description": "Add a pause state to your game. When paused, stop movement and physics, show a PAUSED overlay. Press P to toggle pause on and off.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.11 Game State Machines",

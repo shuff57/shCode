@@ -12,6 +12,9 @@
 
 import type { GradeReport } from './grader';
 import type { Requirement } from './types';
+import type { ClefAuthored } from './clef-check-core';
+import { cardScore, cardsPass } from './grade-pass';
+import { GRADING_V2_FROM, gradingV2On } from './grading-v2';
 
 export interface AiCheckConfig {
   /** The file the student writes in. Defaults to README.md. */
@@ -24,6 +27,8 @@ export interface AiCheckConfig {
   /** The grading brief. Read on the server from the generated config, not from the browser. */
   prompt: string;
   rubric: { id: string; title: string; description?: string; points: number }[];
+  /** The fast Check: one Clef question per card (lib/clef-check-core.ts). Absent = today's AI Check only. */
+  clef?: ClefAuthored;
 }
 
 export interface AiCheckCriterion {
@@ -35,6 +40,8 @@ export interface AiCheckCriterion {
 export interface AiVerdict {
   passed: boolean;
   feedback: string;
+  /** The AI said "partial": still red, but a plan counts it as half a card (lib/grade-pass.ts cardScore). */
+  partial?: boolean;
 }
 
 export type AiVerdicts = Record<string, AiVerdict>;
@@ -214,7 +221,7 @@ export function verdictsFromCriteria(criteria: AiCheckCriterion[], knownIds: str
   const out: AiVerdicts = {};
   for (const c of criteria) {
     if (!known.has(c.id)) continue;
-    out[c.id] = { passed: c.verdict === 'met', feedback: (c.feedback ?? '').trim() };
+    out[c.id] = { passed: c.verdict === 'met', feedback: (c.feedback ?? '').trim(), ...(c.verdict === 'partial' ? { partial: true } : {}) };
   }
   return out;
 }
@@ -229,6 +236,7 @@ export function applyAiVerdicts(reqs: Requirement[], verdicts: AiVerdicts | null
       ...r,
       status: v.passed ? 'passed' : 'failed',
       messages: v.feedback ? [v.feedback] : [],
+      partial: !v.passed && !!v.partial,
     };
   });
 }
@@ -239,7 +247,17 @@ export function applyAiVerdicts(reqs: Requirement[], verdicts: AiVerdicts | null
  * replace the pattern check's; a lab whose cards are worth nothing is "passed" when every card
  * is green, as before.
  */
-export function reportFromRequirements(reqs: Requirement[], passingScore = 0): GradeReport {
+export function reportFromRequirements(reqs: Requirement[], passingScore = 0, kind?: string, v2From: number | null = GRADING_V2_FROM): GradeReport {
+  // Grading v2: a plan records its cards (met 1, partly met 0.5) out of the card count, and passes at
+  // 70% (lib/grade-pass.ts cardsPass). The manifest gives it the same maxScore, so the gradebook keeps
+  // the score. Everything else is unchanged.
+  if (kind === 'plan' && gradingV2On(v2From)) {
+    const results = reqs.map((r) => {
+      const status = (r.status === 'passed' ? 'passed' : 'failed') as 'passed' | 'failed';
+      return { id: r.id, title: r.title, status, messages: r.messages ?? [], pointsEarned: status === 'passed' ? 1 : r.partial ? 0.5 : 0, pointsPossible: 1 };
+    });
+    return { results, totalScore: cardScore(reqs), totalPossible: reqs.length, passed: cardsPass(reqs, kind, v2From), passingScore: 0 };
+  }
   const results = reqs.map((r) => {
     const status = (r.status === 'passed' ? 'passed' : 'failed') as 'passed' | 'failed';
     const possible = r.points ?? 0;

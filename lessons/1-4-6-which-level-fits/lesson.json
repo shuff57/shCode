@@ -3,6 +3,10 @@
   "title": "1.4.6 Which Level Fits?",
   "description": "Five multiple-choice questions on levels of abstraction and picking a language level against a deadline. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",

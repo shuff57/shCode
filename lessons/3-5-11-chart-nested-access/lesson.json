@@ -3,6 +3,10 @@
   "title": "3.5.11 Plain English to Pseudocode: Tracing a Nested Access",
   "description": "Turn a loop that reads a nested price from each item into pseudocode, then read the customer's name and ask the VIP question once, after the loop.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.5 Objects and Properties",

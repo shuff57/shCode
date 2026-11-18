@@ -3,6 +3,10 @@
   "title": "3.4.17 Lab: Fix a Broken Arrow",
   "description": "A two-parameter arrow function was written without the parentheses around its parameters, so the line will not parse. Fix it. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.4.6",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",

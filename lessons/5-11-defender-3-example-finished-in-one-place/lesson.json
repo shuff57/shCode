@@ -3,6 +3,10 @@
   "title": "7.9.3 Worked Example: Finished in one place",
   "description": "An Enemy class and the two-line reap: objects only change their state, and once a frame the scene removes finished ones from the screen, then from the list. Break it two ways and watch the ghosts.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.9 Defender C: design and the classes",

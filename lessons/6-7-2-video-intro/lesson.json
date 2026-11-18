@@ -3,6 +3,10 @@
   "title": "6.12.2 Video: Why Mechanics Matter for the Capstone",
   "description": "This is the last content unit before you design your own game. Mouse input, joints, and the slingshot pattern are the final building blocks: learn them here and you'll have everything you need to pitch and build a real project.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.12 Advanced Input",

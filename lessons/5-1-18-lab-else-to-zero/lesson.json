@@ -3,6 +3,10 @@
   "title": "5.1.19 Lab: Delete the else, watch drift",
   "description": "Start from a working WASD movement pattern, delete the two else lines and watch the sprite drift, then restore them and set a speed of your own.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

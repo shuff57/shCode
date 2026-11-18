@@ -3,6 +3,10 @@
   "title": "4.1.7 Q1 Reflection",
   "description": "Reflect on your first quarter of programming and connect your experience to the SDLC. AI-graded with hints.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "4.1 Q1 Synthesis Project",

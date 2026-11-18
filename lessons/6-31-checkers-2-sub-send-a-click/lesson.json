@@ -3,6 +3,10 @@
   "title": "6.31.2 Sub-build: Send a click",
   "description": "H hosts, JOIN joins, and a click sends the square you clicked: every click, yours too, arrives in onMove and is marked on both computers.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.31 Checkers: play online",

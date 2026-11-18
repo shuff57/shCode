@@ -3,6 +3,10 @@
   "title": "1.7.4 Individual PA Part 4: Outline It",
   "description": "Pick one of three problems and outline it in four short lines, alone: what you take in, the one value you work out, the question you ask, and what you report on each side. Three tries; the AI marks whether the outline answers your problem. Part 5 writes the full steps for the same problem.",
   "type": "assignment",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 7,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.7 Chapter 1 Individual Performance Assessment",

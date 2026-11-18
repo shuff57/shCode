@@ -3,6 +3,10 @@
   "title": "6.14.11 Lab: A wall of bricks",
   "description": "A wall of 40 bricks kept as an array of arrays of 1s and 0s. The drawing, the mouse and the words are done. Build the wall with two loops, find the brick under a pixel (the wall starts 60 pixels down), and count the bricks left.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.14 Grids and Tile Maps",

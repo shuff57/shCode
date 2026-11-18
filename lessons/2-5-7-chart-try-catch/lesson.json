@@ -3,6 +3,10 @@
   "title": "2.5.7 Plain English to Pseudocode: try/catch",
   "description": "Turn plain-English steps into pseudocode for try/catch: attempt a risky step, run the catch only if it fails, then carry on either way.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",

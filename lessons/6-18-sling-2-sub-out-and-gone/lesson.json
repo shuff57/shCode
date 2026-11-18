@@ -3,6 +3,10 @@
   "title": "6.18.2 Sub-build: Out and gone",
   "description": "One stone, one list, one sweep. Remove what leaves the screen from both places.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.18 Sling: out and gone",

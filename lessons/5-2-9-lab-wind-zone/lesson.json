@@ -3,6 +3,10 @@
   "title": "5.2.19 Lab: Wind Zone",
   "description": "Push the player with applyForce inside a conditional zone. Auto-graded.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",

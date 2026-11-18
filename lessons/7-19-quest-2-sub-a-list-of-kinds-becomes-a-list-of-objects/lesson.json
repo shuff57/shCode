@@ -3,6 +3,10 @@
   "title": "7.19.2 Sub-build: A list of kinds becomes a list of objects",
   "description": "KINDS is a list of plain { name, hp } objects; map turns it into a list of Monsters, and N moves which one you are looking at, stopping at the last.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.19 Quest: a run of enemies",

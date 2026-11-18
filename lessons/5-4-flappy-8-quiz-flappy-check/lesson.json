@@ -3,6 +3,10 @@
   "title": "5.12.5 Check: the flapping game",
   "description": "Eight multiple-choice questions on gravity and the flap, the scrolling world, timed spawning, removing what has left, scoring a pass once, and what a restart puts back. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.12 Flappy: crash, and finish",

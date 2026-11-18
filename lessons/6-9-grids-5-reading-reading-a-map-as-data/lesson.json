@@ -3,6 +3,10 @@
   "title": "6.14.5 Reading: Reading a map as data",
   "description": "The map is also data your own code can read. Scan it for a letter, turn a row and column into pixels and a pixel back into a row and column with floor, and check the row and column exist first.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.14 Grids and Tile Maps",
   "estimateMins": 12,

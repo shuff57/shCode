@@ -3,6 +3,10 @@
   "title": "5.2.29 Lab: Rules in update(), picture in draw()",
   "description": "The jump scene from 5.2.13 does everything in draw(). Split it in two: move the keys, the movement and the jump into update(), which moSHion runs before the physics step, and leave draw() with only the picture.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",

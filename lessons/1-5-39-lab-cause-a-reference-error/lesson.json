@@ -3,6 +3,10 @@
   "title": "1.5.39 Cause a ReferenceError on Purpose",
   "description": "Break it, read the three parts, say which one solved it, then fix it. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",
@@ -110,6 +114,14 @@
         "description": "A comment saying which of the three parts solved it. Help: 1.5.38 (Reading an Error Message)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r2": "The misspelling is gone: No use of the misspelled name remains anywhere in the file. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "The corrected name is printed: Logs greeting, spelled correctly. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "The error message is recorded: A comment naming ReferenceError. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "The useful part is identified: A comment saying which of the three parts solved it. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   }
 }

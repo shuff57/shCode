@@ -3,6 +3,10 @@
   "title": "3.7.22 Lab: Array-Methods Capstone",
   "description": "Combine the module's non-mutating tools: build a list, transform it with .map(), take a range with .slice(), join with .concat() or spread, and copy an object with an override. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.7.8",
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",

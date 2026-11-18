@@ -3,6 +3,10 @@
   "title": "3.2.18 Lab: Fix a Function That Prints Instead of Returning",
   "description": "A function computes correctly but prints its result, so the caller gets undefined. Fix it to return, and prove the fix with arithmetic. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.2 Parameters and Return Values",

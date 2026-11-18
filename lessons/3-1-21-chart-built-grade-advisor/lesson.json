@@ -3,6 +3,10 @@
   "title": "3.1.14 Write Up What You Built",
   "description": "Write the grade-advisor program you just refactored as pseudocode: set up the three values, call decideGrade(), call printAdvice(), and notice the main program has no decision left in it.",
   "type": "assignment",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.1 Functions: Definition and Calls",

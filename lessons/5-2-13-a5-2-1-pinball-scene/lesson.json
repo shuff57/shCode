@@ -3,6 +3,10 @@
   "title": "5.2.24 Pinball Scene",
   "description": "Build a pinball-style scene: static obstacles, a bouncy ball, gravity, and a reset key. Run plays it; the Check button has the AI mark the Quest cards.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 45,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",

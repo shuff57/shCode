@@ -3,6 +3,10 @@
   "title": "3.8.18 Lab: Save a State Object by Key",
   "description": "Turn a state object into JSON text and store it under a key, the way a page would keep it between visits. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.8.6",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",

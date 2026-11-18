@@ -3,6 +3,10 @@
   "title": "7.11.4 Challenges: Make it yours",
   "description": "The game is complete. Change one rule of your own: a best score that survives a restart, a boss every fifth wave, or a Ship class that owns its own cooldown. Pick one; add an idea of your own on top if you like.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.11 Defender C: playtest and check",

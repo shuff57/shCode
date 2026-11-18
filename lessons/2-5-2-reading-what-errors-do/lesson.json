@@ -3,6 +3,10 @@
   "title": "2.5.2 Reading: What an Error Actually Does",
   "description": "See what a runtime error does to a running program, and tell it apart from a syntax error. Read before 2.5.3 Runtime or Syntax?.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",

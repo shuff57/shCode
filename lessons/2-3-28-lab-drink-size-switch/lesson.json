@@ -3,6 +3,10 @@
   "title": "2.3.28 Build a Four-Case Switch: Drink Sizes",
   "description": "Write a switch with at least four cases and a default that prices a drink by size. Auto-graded.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The Switch Statement",

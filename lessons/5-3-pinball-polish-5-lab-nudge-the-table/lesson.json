@@ -3,6 +3,10 @@
   "title": "5.8.3 Lab: Nudge the table",
   "description": "Pinball players nudge the table to save a ball. Let a held arrow key push the ball with applyForce, choose the ball's mass so that push is a nudge and not a launch, and switch on debug to see the body moSHion uses for the ball.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.8 Pinball: physics knobs",

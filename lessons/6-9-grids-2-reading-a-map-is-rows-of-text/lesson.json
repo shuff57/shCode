@@ -3,6 +3,10 @@
   "title": "6.14.2 Reading: A map is rows of text",
   "description": "A level can be written as rows of text and built with Tiles. Covers the legend, Group defaults, the centre rule for x and y, and level.delete().",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.14 Grids and Tile Maps",

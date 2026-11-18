@@ -3,6 +3,10 @@
   "title": "3.5.15 Lab: Add a Method to an Object",
   "description": "Give an object a method, call it, and print its return value. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.5.5",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",

@@ -3,6 +3,10 @@
   "title": "3.5.26 Objects and Properties",
   "description": "Eight multiple-choice questions on object literals, dot vs bracket access, nesting, methods, and options objects. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.5 Objects and Properties",

@@ -3,6 +3,10 @@
   "title": "2.3.6 Plain English to Pseudocode: a switch is a chain of questions",
   "description": "Turn plain-English steps into pseudocode for a three-case switch: three questions in a row, a break after each case, and a last line that runs either way.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The Switch Statement",

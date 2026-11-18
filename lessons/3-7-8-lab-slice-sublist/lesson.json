@@ -3,6 +3,10 @@
   "title": "3.7.8 Lab: Extract a Sub-List with `.slice()`",
   "description": "Create an array, copy a middle range and a run to the end with .slice(), then show the original is unchanged. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.7.3",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",

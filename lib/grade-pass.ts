@@ -15,6 +15,8 @@
 // Directive: every consumer asking "is this student struggling?" comes
 // through here. Do not compare the totals at the call site.
 
+import { GRADING_V2_FROM, V2_PASS_FRACTION, gradingV2On } from './grading-v2';
+
 interface PassCriterion {
   verdict: 'met' | 'partial' | 'missing';
   source?: string;
@@ -55,10 +57,13 @@ export interface PassInput {
 }
 
 /** Pass/fail for a live grade result. */
-export function isPassingGrade(r: PassInput): boolean {
+export function isPassingGrade(r: PassInput, v2From: number | null = GRADING_V2_FROM): boolean {
   if (missedRequired(r.criteria)) return false;
   if (r.totalPossible === 0) {
     if (!r.criteria || r.criteria.length === 0) return false;
+    // Grading v2 (lib/grading-v2.ts): a text-box answer passes at 70% of its criteria, partial = half,
+    // the same number the gradebook records (criteriaScore). Before v2: half of them met or partial.
+    if (gradingV2On(v2From)) return criteriaScore(r.criteria) / r.criteria.length >= V2_PASS_FRACTION - 1e-9;
     const ok = r.criteria.filter((c) => c.verdict === 'met' || c.verdict === 'partial').length;
     return ok >= Math.ceil(r.criteria.length / 2);
   }
@@ -148,4 +153,35 @@ export function criteriaScore(criteria: ReadonlyArray<{ verdict: string }> | nul
 /** Does a rubric carry no points at all (a pass/fail rubric)? */
 export function isPassFailRubric(rubric: ReadonlyArray<{ points?: number }> | null | undefined): boolean {
   return Array.isArray(rubric) && rubric.length > 0 && rubric.every((r) => !(typeof r?.points === 'number' && r.points > 0));
+}
+
+/** A lab's card as the browser holds it: green, red, or red but partly met (AI verdict "partial"). */
+export interface CardMark {
+  status?: string;
+  partial?: boolean;
+  required?: boolean;
+}
+
+/** Cards met (1) and partly met (0.5): what a plan lab records as its score, out of the card count. */
+export function cardScore(cards: ReadonlyArray<CardMark>): number {
+  let n = 0;
+  for (const c of cards) {
+    if (c.status === 'passed') n += 1;
+    else if (c.partial) n += 0.5;
+  }
+  return n;
+}
+
+/**
+ * Does a lab's set of cards let it be handed in? Code and model labs: every card green (unchanged).
+ * A plan (lesson.json work.kind "plan") under grading v2: 70% of the cards, partly met counting half,
+ * and any required card green. Before v2 a plan needed every card green too.
+ */
+export function cardsPass(cards: ReadonlyArray<CardMark>, kind: string | undefined, v2From: number | null = GRADING_V2_FROM): boolean {
+  if (cards.length === 0) return false;
+  if (kind === 'plan' && gradingV2On(v2From)) {
+    if (cards.some((c) => c.required && c.status !== 'passed')) return false;
+    return cardScore(cards) / cards.length >= V2_PASS_FRACTION - 1e-9;
+  }
+  return cards.every((c) => c.status === 'passed');
 }

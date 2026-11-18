@@ -3,6 +3,10 @@
   "title": "6.3.2 Sub-build: Slow to a stop",
   "description": "One ball, moving, and a rule that calls it stopped. No table, no pockets.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.3 Pocket: slow to a stop",

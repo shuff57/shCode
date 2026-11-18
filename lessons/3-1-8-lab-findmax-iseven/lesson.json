@@ -3,6 +3,10 @@
   "title": "3.2.26 Lab: findMax & isEven",
   "description": "Define two functions, findMax(a, b) and isEven(n), that take parameters and return a value. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.2.4",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",

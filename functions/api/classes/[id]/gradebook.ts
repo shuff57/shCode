@@ -6,6 +6,7 @@ import { canManageClass } from '../../../_shared/classAuth';
 import { loadClassDueRows, loadClassDueWaivers, loadLessonScopeMap } from '../../../_shared/dueDates';
 import { buildDueIndex, resolveDueAt } from '../../../../lib/due-dates-core';
 import { buildCell } from '../../../../lib/gradebook-cell';
+import { predatesV2 } from '../../../../lib/grading-weights';
 
 interface Env {
   DB: D1Database;
@@ -159,6 +160,8 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
   // join. No due dates set -> an empty map and every cell is late:false.
   const dueRows = await loadClassDueRows(env.DB, classId);
   const dueDates: Record<string, number> = {};
+  // v2 practice due before the switch: never late or missing (lib/grading-weights.ts predatesV2).
+  const exempt = new Set<string>();
   if (dueRows.length > 0) {
     const scopeMap = await loadLessonScopeMap(env, request);
     if (scopeMap) {
@@ -166,6 +169,7 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
       for (const [lessonId, scope] of scopeMap) {
         const dueAt = resolveDueAt(index, { lessonId, moduleId: scope.moduleId, unitId: scope.unitId });
         if (dueAt !== null) dueDates[lessonId] = dueAt;
+        if (predatesV2({ title: scope.title, preview: scope.preview, scoreKind: scope.scoreKind, assignmentCode: scope.assignmentCode, graded: scope.graded }, dueAt)) exempt.add(lessonId);
       }
     }
   }
@@ -206,6 +210,7 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
         submittedAt: sub?.submitted_at ?? null,
         dueAt: waived?.has(lessonId) ? null : (dueDates[lessonId] ?? null),
         now,
+        exempt: exempt.has(lessonId),
       });
       cells[lessonId] = {
         state: cell.state,

@@ -3,6 +3,10 @@
   "title": "3.7.18 Lab: Build a New Object with Spread + Override",
   "description": "Use object spread to copy an object with one property overridden and one property added, leaving the original untouched. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.7.6",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",

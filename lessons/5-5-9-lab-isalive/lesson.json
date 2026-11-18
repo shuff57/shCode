@@ -3,6 +3,10 @@
   "title": "7.3.9 Lab: Give the class its own isAlive()",
   "description": "The scene asks `hp > 0` twice, by hand. Write `isAlive()` on the class and ask it instead, so the question 'is this enemy still up?' has exactly one answer in one place. What you see on screen does not change.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.3 Inside a Class",

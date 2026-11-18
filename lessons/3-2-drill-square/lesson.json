@@ -3,6 +3,10 @@
   "title": "3.2.13 Lab: square(n)",
   "description": "Write square(n) so that it hands back n times n with return, and use the value it gives back. The first return practice. Practice, not graded: the checks call your function.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.2 Parameters and Return Values",

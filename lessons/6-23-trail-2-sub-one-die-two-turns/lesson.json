@@ -3,6 +3,10 @@
   "title": "6.23.2 Sub-build: One die, two turns",
   "description": "One die, two names, one turn index. Roll and pass before there is a board.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.23 Trail: roll and take turns",

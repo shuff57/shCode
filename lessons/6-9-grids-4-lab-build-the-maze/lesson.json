@@ -3,6 +3,10 @@
   "title": "6.14.4 Lab: Build the maze",
   "description": "The screen is empty: three Groups, a map and a player, but no level. Set the defaults on walls, coins and the goal, then build the whole maze from rows of text with Tiles. You can then walk it, and the corner counts the coins left (5).",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.14 Grids and Tile Maps",

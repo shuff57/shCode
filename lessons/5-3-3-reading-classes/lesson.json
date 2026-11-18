@@ -3,6 +3,10 @@
   "title": "7.1.3 Reading: Class and instance",
   "description": "The words class and instance and how they relate: a class is a blueprint; `new` builds one instance from it. Read before 7.1.4.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.1 Classes and Instances",

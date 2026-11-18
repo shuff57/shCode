@@ -3,6 +3,10 @@
   "title": "6.7.6 Asteroid Field",
   "description": "Combine Groups, overlap detection, and safe despawn into a playable asteroid scene. WASD steers the ship; an overlap with any asteroid ends the game.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 60,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.7 Overlaps and Collisions",

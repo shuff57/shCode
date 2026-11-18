@@ -3,6 +3,10 @@
   "title": "3.2.25 Lab: Scope Prediction Exercise",
   "description": "Write a global and a local variable, then try to read the local one outside its function and watch the ReferenceError. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.2 Parameters and Return Values",

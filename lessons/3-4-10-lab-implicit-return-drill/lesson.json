@@ -3,6 +3,10 @@
   "title": "3.4.10 Lab: Implicit-Return Rewrite Drill",
   "description": "Write three one-line arrow functions using implicit return, and call each one. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.4.3",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",

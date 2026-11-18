@@ -3,6 +3,10 @@
   "title": "1.2.26 Variables and Types Check",
   "description": "Understand how to store and work with data using let, const, and typeof.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",
@@ -109,6 +113,14 @@
         "description": "Print a value to the console. Help: 1.2.3 (Every Value Has a Type)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "req1": "Declare age variable: Create a variable called age. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req2": "Declare name variable: Create a variable called name. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req3": "Use typeof: Use typeof to check a variable's type. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req4": "Use console.log: Print a value to the console. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   }
 }

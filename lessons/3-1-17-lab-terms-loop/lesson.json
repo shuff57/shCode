@@ -3,6 +3,10 @@
   "title": "3.1.9 Lab: Terms and Conditions Loop",
   "description": "Write terms(), a parameterless function that asks the user to accept terms and conditions, then call it once per user in a loop. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.1 Functions: Definition and Calls",

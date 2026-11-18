@@ -3,6 +3,10 @@
   "title": "3.7.5 Plain English to Pseudocode: What `.map()` Does for You",
   "description": "Turn four plain-English steps into pseudocode for what .map() does: a loop you did not write, one result per item, collected in a new list.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.7 Array Methods",

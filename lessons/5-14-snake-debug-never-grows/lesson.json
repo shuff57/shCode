@@ -3,6 +3,10 @@
   "title": "5.14.4 Debugging: The snake that never grows",
   "description": "Two planted bugs. The snake moves and leaves no body behind, and when it does grow the tail pops off immediately.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.14 Snake: grow",

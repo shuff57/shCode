@@ -3,6 +3,10 @@
   "title": "3.3.22 Lab: Read and Update a Nested Array",
   "description": "Read and reassign values in a nested array with double-index syntax, then sum every cell with a nested loop. Auto-graded: the code runs and the final grid and total are checked.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",

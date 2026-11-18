@@ -3,6 +3,10 @@
   "title": "6.3.1 Reading: Rolling to a stop",
   "description": "Top-down there is nothing to rub on, so drag does the slowing, and \"stopped\" is a speed under a number.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.3 Pocket: slow to a stop",

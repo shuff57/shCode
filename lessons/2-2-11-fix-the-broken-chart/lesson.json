@@ -3,6 +3,10 @@
   "title": "2.2.18 Fix the Broken Plan",
   "description": "A plan arrives with one missing idea: the rider-height check only says what happens when the rider is tall enough. Read the cards, find the gap, and repair it.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",

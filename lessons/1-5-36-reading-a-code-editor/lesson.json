@@ -3,6 +3,10 @@
   "title": "1.5.36 Reading: A Code Editor",
   "description": "The console is a scratchpad; the editor holds the program. The difference is permanence.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",

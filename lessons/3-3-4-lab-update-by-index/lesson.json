@@ -3,6 +3,10 @@
   "title": "3.3.4 Lab: Update Scores by Index",
   "description": "Reassign values inside an array by their index to update scores in place. Auto-graded: the code runs and the final scores are checked.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",

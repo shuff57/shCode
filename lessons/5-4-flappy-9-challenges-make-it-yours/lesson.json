@@ -3,6 +3,10 @@
   "title": "5.12.6 Challenges: Make it yours",
   "description": "The game is complete. Change one rule of your own: a narrower gap, pipes that speed up with the score, a best score that survives a crash, or a wobbling gap. Pick one; add an idea of your own on top if you like.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.12 Flappy: crash, and finish",

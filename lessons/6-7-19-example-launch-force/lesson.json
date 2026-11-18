@@ -2,6 +2,10 @@
   "id": "6-7-19-example-launch-force",
   "title": "6.13.9 Worked Example: Launch a Sprite with applyForce",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.13 Joints",

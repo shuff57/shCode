@@ -3,6 +3,10 @@
   "title": "2.4.15 Plain English to Pseudocode: continue Skips, Doesn't Leave",
   "description": "Turn plain-English steps into pseudocode for a loop that skips the even numbers: continue ends one round early but stays in the loop.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

@@ -1,0 +1,9 @@
+# A local-only Workers AI proxy for scripts/clef-harness.mjs and the dev server's WORKERS_PROXY.
+# Run: cd scripts/clef-proxy && npx wrangler dev --port 8799   (needs `wrangler login`; never deployed)
+# The AI binding always calls the real account, so each request is billed like production.
+name = "shcode-clef-proxy"
+main = "index.js"
+compatibility_date = "2026-10-01"
+
+[ai]
+binding = "AI"

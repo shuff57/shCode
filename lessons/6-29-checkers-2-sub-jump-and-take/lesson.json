@@ -3,6 +3,10 @@
   "title": "6.29.2 Sub-build: Jump and take",
   "description": "Red jumps black: two squares diagonally, over the halfway square, and the piece jumped over is gone.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.29 Checkers: jumps",

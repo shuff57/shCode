@@ -3,6 +3,10 @@
   "title": "5.1.26 Lab: A grid like math (optional)",
   "description": "Optional: a preview of an optional mode. Draw a grid over the canvas, then switch it to math mode, where (0, 0) is the centre and y grows up. Nothing after this lab needs it, and it is not graded.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

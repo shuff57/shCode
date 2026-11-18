@@ -3,6 +3,10 @@
   "title": "2.2.13 Reading: The while Loop",
   "description": "A while loop checks its condition before every run. Learn when to choose it over for, and how to avoid an infinite loop.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",

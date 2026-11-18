@@ -3,6 +3,10 @@
   "title": "9.1.12 Lab: One Class, Two Parts",
   "description": "Use one class to build two mounting plates, then change one instance without changing the other. SolidCraft pilot.",
   "type": "assignment",
+  "work": {
+    "kind": "model",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 3: reSHape: Solid Modelling",
   "unit": "9.1 Solid Shapes",

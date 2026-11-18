@@ -3,6 +3,10 @@
   "title": "2.4.11 Plain English to Pseudocode: Search Until Found",
   "description": "Turn plain-English steps into pseudocode for a search that has no limit of its own: the question inside the loop is the only way out, and the early exit is its own step.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

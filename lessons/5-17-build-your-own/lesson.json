@@ -3,6 +3,10 @@
   "title": "5.17.1 Build your own: a small game",
   "description": "Your game, not ours. Five things it must do, drawn from everything in this unit, and one rule: it cannot be one of the three games you already built.",
   "type": "project",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 60,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.17 Build your own",

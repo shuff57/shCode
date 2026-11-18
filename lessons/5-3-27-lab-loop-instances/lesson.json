@@ -3,6 +3,10 @@
   "title": "7.2.14 Lab: Loop over an array of instances",
   "description": "Write a `for...of` loop in `draw()` that calls `.render()` on each enemy: dispatching a method to every element in the array with one loop.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.2 Writing Your Own Classes",

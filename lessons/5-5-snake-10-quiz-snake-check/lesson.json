@@ -3,6 +3,10 @@
   "title": "5.16.2 Check: the Snake game",
   "description": "Six multiple-choice questions on the grid, the beat, steering without turning back, moving and growing with unshift and pop, and searching the snake. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.16 Snake: playtest and extend",

@@ -3,6 +3,10 @@
   "title": "2.4.22 Fix the Infinite Loop",
   "description": "A countdown plan arrives whose loop never says when it stops. Find the missing way out and add it, so the plan can finally reach its end.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

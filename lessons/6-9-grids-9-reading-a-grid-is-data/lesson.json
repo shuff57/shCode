@@ -3,6 +3,10 @@
   "title": "6.14.9 Reading: A grid is data",
   "description": "A grid you can change is an array of arrays, and the screen is a picture drawn from it every frame. Build one, draw it with rect, turn a click into a row and a column, check the bounds, flip a cell and count.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.14 Grids and Tile Maps",

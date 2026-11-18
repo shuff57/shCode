@@ -3,6 +3,10 @@
   "title": "6.32.1 Playtest and reflect: Checkers",
   "description": "Play your checkers at least three times, once online if you can, find one thing that surprised you, link it to a function in your code and choose one change. AI-graded with hints.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.32 Checkers: playtest and extend",

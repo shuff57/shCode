@@ -3,6 +3,10 @@
   "title": "3.8.7 Lab: Stringify an Object and Spot What Got Dropped",
   "description": "Build an object that has a method and an undefined property, stringify it, and find out in the output what JSON refused to carry. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.8.2",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",

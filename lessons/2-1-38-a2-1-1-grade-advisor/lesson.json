@@ -3,6 +3,10 @@
   "title": "2.1.42 Grade Recommendation Advisor",
   "description": "Use score, attendance, and lateAssignments to print a grade recommendation. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",

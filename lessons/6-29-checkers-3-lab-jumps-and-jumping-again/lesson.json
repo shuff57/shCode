@@ -3,6 +3,10 @@
   "title": "6.29.3 Lab: Jumps, and jumping again",
   "description": "moveKind learns a second answer, jump; doMove takes the jumped piece; and a piece that can jump again keeps the turn until it cannot.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.29 Checkers: jumps",

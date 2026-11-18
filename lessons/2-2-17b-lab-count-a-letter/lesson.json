@@ -3,6 +3,10 @@
   "title": "2.2.20 Count a Letter in a Word",
   "description": "Loop through a string and count how many times one letter appears. Auto-graded.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",

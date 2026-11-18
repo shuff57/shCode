@@ -3,6 +3,10 @@
   "title": "1.5.29 Reading: The Class Plan Convention",
   "description": "The rule for the rest of the course: every graded build opens with a plan, and the plan goes first. What a plan looks like, what the checks can and cannot see, and how big a plan should get.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",

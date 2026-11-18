@@ -3,6 +3,10 @@
   "title": "3.2.22 Plain English to Pseudocode: Data Flow Through Chained Calls",
   "description": "Turn five plain-English steps into pseudocode for two nested calls: double(5) first, addTen on what it hands back, then a Big/Small decision on the result.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "assignmentCode": "A3.2.3",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",

@@ -3,6 +3,10 @@
   "title": "3.5.1 Slides: Objects and Properties",
   "description": "Unit 3.5 slides: objects and properties, dot versus bracket access, nested objects, arrays of objects, methods, and destructuring.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.5 Objects and Properties",

@@ -3,6 +3,10 @@
   "title": "7.3.18 Lab: Build a wave",
   "description": "Build the spawner yourself: a frameCount timer that sends three enemies only when the field is clear, a hit that goes to the first one, and a filter that reaps the dead. Uses every idea in the module.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.3 Inside a Class",

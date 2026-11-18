@@ -3,6 +3,10 @@
   "title": "5.13.4 Sub-build: Step on a grid",
   "description": "A square jumps one cell at a time, on a beat. Build the step before there is a snake.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.13 Snake: grid and steering",

@@ -3,6 +3,10 @@
   "title": "7.4.4 Lab: Fly and fire",
   "description": "The ship slides off the canvas and Space does nothing. Keep the ship on the canvas with two ifs, fire on a cooldown, and delete the shots that leave the top.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 18,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.4 Defender: the ship, and shots",

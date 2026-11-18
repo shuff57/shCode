@@ -3,6 +3,10 @@
   "title": "7.14.1 Lab: Win or lose",
   "description": "Three balls to clear the wall. Count the bricks left, take a life for every ball that falls out, and end the game when the wall is cleared or the balls run out.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.14 Breakout: the game",

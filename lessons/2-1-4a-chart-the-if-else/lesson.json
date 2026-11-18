@@ -3,6 +3,10 @@
   "title": "2.1.5 Plain English to Pseudocode: if / else",
   "description": "Turn plain-English steps into pseudocode for an if/else: one question, two labelled answers, and a last line that runs either way.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",

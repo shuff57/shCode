@@ -3,6 +3,10 @@
   "title": "3.7.11 Lab: `.concat()` Two Lists",
   "description": "Join two arrays into a new one with .concat(), then show both originals are unchanged. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.7.4",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",

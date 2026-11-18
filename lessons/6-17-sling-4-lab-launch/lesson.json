@@ -3,6 +3,10 @@
   "title": "6.17.4 Lab: Launch!",
   "description": "The catapult fires: aim with the arm, release to launch, and watch the arc.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.17 Sling: launch",

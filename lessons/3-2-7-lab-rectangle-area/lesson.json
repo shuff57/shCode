@@ -3,6 +3,10 @@
   "title": "3.2.9 Lab: findRectangleArea (multi-parameter)",
   "description": "Define findRectangleArea(width, height) that works out the area and prints it, then call it twice. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.2 Parameters and Return Values",

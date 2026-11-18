@@ -3,6 +3,10 @@
   "title": "7.18.3 Lab: Attack, guard or potion",
   "description": "Each turn is a choice: 1 attacks, 2 guards (the next hit is halved) and 3 drinks a potion. One act(t, a, roll) does all three, for you and for an enemy that chooses for itself.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.18 Quest: choices",

@@ -3,6 +3,10 @@
   "title": "5.15.4 Debugging: The tail that never bites",
   "description": "Two planted bugs. The snake runs over its own body and keeps going. The search is there, but it asks the wrong question.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.15 Snake: search",

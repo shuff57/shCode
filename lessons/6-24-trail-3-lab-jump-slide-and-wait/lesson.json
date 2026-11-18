@@ -3,6 +3,10 @@
   "title": "6.24.3 Lab: Jump, slide and wait",
   "description": "The letters on the board come alive: J jumps ahead 3, S slides back 3, and W makes a player miss a turn.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.24 Trail: squares that do something",

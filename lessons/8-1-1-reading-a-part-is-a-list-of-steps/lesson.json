@@ -3,6 +3,10 @@
   "title": "9.1.1 Reading: A Part Is a List of Steps",
   "description": "Meet reSHape: a part is a recipe of steps you can always go back and change, in millimetres, shown as buttons or as text.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 8,
   "category": "Unit 3: reSHape: Solid Modelling",
   "unit": "9.1 Solid Shapes",

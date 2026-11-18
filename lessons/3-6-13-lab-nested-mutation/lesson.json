@@ -3,6 +3,10 @@
   "title": "3.6.13 Lab: Nested-Structure Mutation",
   "description": "Show that a spread copy is only one level deep: change a nested array inside the copy and the original still changes. Then fix it with a deep copy. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.6.6",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",

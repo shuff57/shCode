@@ -3,6 +3,10 @@
   "title": "2.7.3 Individual PA Part 3: Find and Fix",
   "description": "Four bugs in one program. Run it, read what happens, fix each one, and name what kind of bug it was. Fixed, the program runs top to bottom and prints a correct receipt.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 11,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.7 Chapter 2 Individual Performance Assessment",

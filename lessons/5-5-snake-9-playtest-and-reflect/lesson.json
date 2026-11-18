@@ -3,6 +3,10 @@
   "title": "5.16.1 Playtest and reflect: Snake",
   "description": "Play your game at least three times, find one thing that surprised you, link it to your code and choose one change. AI-graded with hints.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.16 Snake: playtest and extend",

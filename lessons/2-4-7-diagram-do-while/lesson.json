@@ -3,6 +3,10 @@
   "title": "2.4.7 Plain English to Pseudocode: do...while",
   "description": "Turn plain-English steps into pseudocode for a do...while loop: the body runs first, and the question comes after it.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

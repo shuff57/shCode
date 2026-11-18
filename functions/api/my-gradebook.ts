@@ -18,7 +18,7 @@
 import { loadLessonScopeMap, loadStudentDueRows, loadStudentLessonOverrides, loadStudentWaiversByClass } from '../_shared/dueDates';
 import { ATTEMPT_CAPS } from '../_shared/pa-pseudocode.generated';
 import { COUNT_SINCE } from '../../lib/attempt-cap';
-import { lessonGradeCategory } from '../../lib/grading-weights';
+import { lessonGradeCategory, countsAsMissing, predatesV2 } from '../../lib/grading-weights';
 import { loadClassWeights, studentGrading, type StudentGrading } from '../_shared/grading';
 import { buildDueIndex, buildOpenIndex, resolveDueAt } from '../../lib/due-dates-core';
 import { buildCell, type GradebookCell } from '../../lib/gradebook-cell';
@@ -133,9 +133,13 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async (cont
     }
   }
 
-  const isGraded = (id: string): boolean => {
+  const asLesson = (id: string) => {
     const sc = scopeMap?.get(id);
-    return !!sc && lessonGradeCategory({ title: sc.title, preview: sc.preview, scoreKind: sc.scoreKind, assignmentCode: sc.assignmentCode }) !== null;
+    return sc ? { title: sc.title, preview: sc.preview, scoreKind: sc.scoreKind, assignmentCode: sc.assignmentCode, graded: sc.graded } : null;
+  };
+  const isGraded = (id: string): boolean => {
+    const l = asLesson(id);
+    return !!l && lessonGradeCategory(l) !== null;
   };
   const SOON = 14 * 86400000;
 
@@ -148,7 +152,8 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async (cont
     ...stateByLesson.keys(),
     ...subByLesson.keys(),
     // Past due and never opened: only a graded lesson is "missing"; a reading or slide deck is not an assignment.
-    ...Object.keys(dueDates).filter((id) => dueDates[id] < now && isGraded(id)),
+    // The one "missing" rule (lib/grading-weights.ts countsAsMissing).
+    ...Object.keys(dueDates).filter((id) => isGraded(id) && countsAsMissing(asLesson(id)!, dueDates[id], now)),
     ...Object.keys(dueDates).filter((id) => dueDates[id] >= now && dueDates[id] - now <= SOON && isGraded(id)),
     ...Object.keys(opensAt).filter(isGraded),
   ]);
@@ -185,6 +190,7 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async (cont
       submittedAt: sub?.submitted_at ?? null,
       dueAt: dueDates[lessonId] ?? null,
       now,
+      exempt: (() => { const l = asLesson(lessonId); return !!l && predatesV2(l, dueDates[lessonId] ?? null); })(),
     });
   }
 

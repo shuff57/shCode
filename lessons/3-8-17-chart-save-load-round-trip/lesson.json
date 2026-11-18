@@ -3,6 +3,10 @@
   "title": "3.8.17 Plain English to Pseudocode: Save/Load Round Trip",
   "description": "Turn four plain-English steps into pseudocode for loadSettings(): read the key, check for nothing stored, then parse inside a try, with the defaults as the fallback on both exits.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.8 Saving and Loading Data",

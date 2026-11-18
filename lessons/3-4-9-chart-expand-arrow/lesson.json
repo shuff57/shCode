@@ -3,6 +3,10 @@
   "title": "3.4.9 Plain English to Pseudocode: A Function That Calls Its Parameter Twice",
   "description": "Turn four plain-English steps into pseudocode for applyTwice: read the operation and the value, make the first call, make the second call on its result, and print.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.4 Function Expressions and Arrow Functions",

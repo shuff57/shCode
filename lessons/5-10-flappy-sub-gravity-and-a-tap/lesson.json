@@ -3,6 +3,10 @@
   "title": "5.10.4 Sub-build: Gravity and a tap",
   "description": "A bird falls. One tap sends it back up. Build that alone, before there are pipes.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.10 Flappy: the flap",

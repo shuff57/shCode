@@ -3,6 +3,10 @@
   "title": "5.9.3 Playtest and polish: Pinball",
   "description": "Play your polished pinball at least three rounds, and hand it to someone for one if you can. Say what still felt rough, what one polish changed for a player, and what you would polish next. AI-graded with hints.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.9 Pinball: playtest and finish",

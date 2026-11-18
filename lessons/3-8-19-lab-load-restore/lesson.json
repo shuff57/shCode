@@ -3,6 +3,10 @@
   "title": "3.8.19 Lab: Load and Restore a Saved State",
   "description": "Read a saved key, cope with a never-saved key, and parse the stored text back into a usable object with a fallback. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.8.7",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",

@@ -3,6 +3,10 @@
   "title": "6.21.2 Check: the Sling game",
   "description": "Five multiple-choice questions on the arm, the launch, the sweep, the hit budget and the ending. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.21 Sling: playtest and extend",

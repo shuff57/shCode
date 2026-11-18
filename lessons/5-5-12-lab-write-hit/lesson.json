@@ -3,6 +3,10 @@
   "title": "7.3.12 Lab: Write hit(other)",
   "description": "The enemy already knows how to take a hit; the player is missing its half of the exchange. Write `hit(other)` so the receiver's power is applied to the object passed in.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.3 Inside a Class",

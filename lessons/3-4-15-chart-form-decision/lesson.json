@@ -3,6 +3,10 @@
   "title": "3.4.15 Plain English to Pseudocode: Decision Tree for Form Choice",
   "description": "Turn the rule for choosing a function form into pseudocode: is it a main operation called from several places, and if not, is its body a single expression?",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.4 Function Expressions and Arrow Functions",

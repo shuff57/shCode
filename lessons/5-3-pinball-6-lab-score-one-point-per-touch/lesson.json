@@ -3,6 +3,10 @@
   "title": "5.4.4 Lab: Score one point per touch",
   "description": "The starter scores on every frame the ball touches the goal, so one roll across the gold is worth 33 points. Fix it with a remembered last frame, so one touch is worth one point.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.4 Pinball: score once",

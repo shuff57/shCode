@@ -3,6 +3,10 @@
   "title": "7.12.4 Lab: The paddle",
   "description": "A paddle along the bottom that follows the mouse, or the arrow keys, and never leaves the screen. The canvas and the paddle are made for you.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.12 Breakout: plan, ball and paddle",

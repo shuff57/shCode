@@ -3,6 +3,10 @@
   "title": "7.1.8 Reading: Properties: data on this",
   "description": "A property is data stored on a single instance via `this.name = value`. Read before the property labs.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.1 Classes and Instances",

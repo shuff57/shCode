@@ -3,6 +3,10 @@
   "title": "7.17.3 Lab: Trade blows",
   "description": "Your hero and the goblin take turns: 1 attacks through the target's takeHit, the turn passes, the enemy hits back after a pause, and the battle ends with a win or a loss and R to play again.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.17 Quest: trade blows",

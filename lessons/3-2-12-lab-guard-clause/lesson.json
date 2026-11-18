@@ -3,6 +3,10 @@
   "title": "3.2.15 Lab: an Early-Return Guard Clause",
   "description": "Write a function whose first check returns early when the input is invalid, so the valid path runs without an else. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.2 Parameters and Return Values",

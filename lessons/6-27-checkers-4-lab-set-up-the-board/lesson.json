@@ -3,6 +3,10 @@
   "title": "6.27.4 Lab: Set up the board",
   "description": "Fill the empty grid: black on the dark squares of the top three rows, red on the bottom three. The drawing is already there, so the board appears as the letters do.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.27 Checkers: plan and the board",

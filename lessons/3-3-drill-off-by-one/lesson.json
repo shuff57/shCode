@@ -3,6 +3,10 @@
   "title": "3.3.6 Lab: Fix the Off-by-One Loop",
   "description": "A loop that should print every price also prints an extra undefined. Find the part of the loop that lets it run one round too long and fix it. Practice, not graded: the checks call your function.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",

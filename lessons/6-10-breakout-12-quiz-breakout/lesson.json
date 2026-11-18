@@ -3,6 +3,10 @@
   "title": "7.15.2 Check: Breakout",
   "description": "Eight multiple-choice questions on flipping a speed, the radius, the paddle bounce, steering, the ball's edges and prompt(). Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.15 Breakout: playtest and extend",

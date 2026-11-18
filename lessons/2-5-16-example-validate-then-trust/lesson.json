@@ -2,6 +2,10 @@
   "id": "2-5-16-example-validate-then-trust",
   "title": "2.5.16 Worked Example: Validate, Then Trust",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",

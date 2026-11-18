@@ -3,6 +3,10 @@
   "title": "7.13.1 Lab: A wall from text",
   "description": "The wall comes back from 6.14.11, written as rows of text this time. Build it from the text, draw it from the data, and let the ball's centre break bricks.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.13 Breakout: bricks and edges",

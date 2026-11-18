@@ -3,6 +3,10 @@
   "title": "5.10.5 Lab: Make it flap",
   "description": "The bird falls and nothing lifts it. Add a flap on the space bar that sets the bird's speed, then keep the bird from leaving the screen.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.10 Flappy: the flap",

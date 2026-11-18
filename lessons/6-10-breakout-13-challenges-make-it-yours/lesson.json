@@ -3,6 +3,10 @@
   "title": "7.15.3 Challenges: Make it yours",
   "description": "Your Breakout is complete. Change one rule of your own: a third mode, bricks that take two hits, or a second wall. Pick one; add an idea of your own on top if you like.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 30,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.15 Breakout: playtest and extend",

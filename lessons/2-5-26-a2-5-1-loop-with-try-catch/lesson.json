@@ -3,6 +3,10 @@
   "title": "2.5.26 Loop with try/catch",
   "description": "Loop over three raw readings and use try/catch to reject bad input with a friendly message instead of crashing. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",

@@ -3,6 +3,10 @@
   "title": "7.9.4 Lab: Enemy takes over",
   "description": "The game is Part B's, with a new Enemy class nothing uses yet. Finish the class, swap the three parallel arrays for one array of Enemy objects, and remove finished enemies in one place. The game must play exactly as before.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.9 Defender C: design and the classes",

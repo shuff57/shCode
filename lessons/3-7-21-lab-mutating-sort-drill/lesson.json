@@ -3,6 +3,10 @@
   "title": "3.7.21 Lab: Mutating vs. Non-Mutating Methods Drill",
   "description": "Demonstrate one method that changes its array and one that returns a new array, logging before and after each. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.7.7",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",

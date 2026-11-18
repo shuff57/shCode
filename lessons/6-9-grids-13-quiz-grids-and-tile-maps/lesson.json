@@ -3,6 +3,10 @@
   "title": "6.14.13 Check: Grids and tile maps",
   "description": "Seven multiple-choice questions on rows and columns, pixels and cells, the offset, bounds and level.delete(). Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.14 Grids and Tile Maps",

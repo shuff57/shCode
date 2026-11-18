@@ -3,6 +3,10 @@
   "title": "3.5.8 Lab: Dot vs. Bracket — When You're Forced to Bracket",
   "description": "Read a key with a space and a key held in a variable, and print every key/value pair with Object.keys. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.5.3",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",

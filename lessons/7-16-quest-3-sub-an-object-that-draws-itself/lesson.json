@@ -3,6 +3,10 @@
   "title": "7.16.3 Sub-build: An object that draws itself",
   "description": "A Bar class with a draw(x, y) method: a grey bar, and on top of it a coloured bar scaled by value / max. Two bars from one class, each drawing itself.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.16 Quest: plan and the fighters",

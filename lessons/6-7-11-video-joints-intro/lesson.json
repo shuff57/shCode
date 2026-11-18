@@ -3,6 +3,10 @@
   "title": "6.13.1 Video: Joints in moshion",
   "description": "Three joint types in five minutes: a distance joint keeps two sprites a fixed length apart, a hinge lets one pivot around another, and a slider rides a track. You don't need to master all three, just watch and pick the one that fits your game.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.13 Joints",

@@ -3,6 +3,10 @@
   "title": "6.14.8 Lab: The next level",
   "description": "The game has three maps in a list called levels, but the screen is blank and the goal ends nothing. Write loadLevel(n) to throw the old level away and build level n, then make the goal move on to the next level, and win after the last one.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.14 Grids and Tile Maps",
   "estimateMins": 20,

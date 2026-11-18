@@ -3,6 +3,10 @@
   "title": "3.1.8 Lab: Concessions Stand",
   "description": "Write a parameterless function, concessions(), that prints the food and drink options at a cinema, then call it. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.1 Functions: Definition and Calls",

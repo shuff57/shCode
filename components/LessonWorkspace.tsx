@@ -20,6 +20,10 @@ import { useAttemptCap, useCompletionRepair } from '../lib/use-attempt-cap';
 import LessonOutcome from './LessonOutcome';
 import { isOutOfDate, latestSubmittedAt, ranWhen, submittedOn } from '../lib/outcome-words';
 import { grade } from '../lib/grader';
+import { cardsPass } from '../lib/grade-pass';
+import { gradingV2On } from '../lib/grading-v2';
+import { mergeClefNotes, redIds, resolveClefCards, withHints } from '../lib/clef-check-core';
+import { fetchClefCards } from '../lib/clef-check-client';
 import type { GradeReport as GradeReportType, GradeContext } from '../lib/grader';
 import { cadPolicy } from '../lib/solidcraft-policy';
 import { NO_TEACHER_MODES, resolveMode, type TeacherModes } from '../lib/lesson-mode';
@@ -234,6 +238,13 @@ export default function LessonWorkspace({
   // The AI could not be reached for this exact text, so the pattern check marks the cards instead.
   // Without it a grader outage would lock Submit for every student at once.
   const aiFallbackRef = useRef<string | null>(null);
+  // Which Check is the latest: an older one's answer must not land on a newer one's cards.
+  const checkSeqRef = useRef(0);
+  // The fast Check's colours for the text they describe, so a "Why?" press explains those cards.
+  const fastCheckRef = useRef<{ text: string; colours: AiVerdicts } | null>(null);
+  // Cards whose "Why?" is being asked, and cards already asked (the button goes once it answers).
+  const [explaining, setExplaining] = useState<ReadonlySet<string>>(new Set());
+  const [explained, setExplained] = useState<ReadonlySet<string>>(new Set());
   // Set true when an admin/teacher inserts the reference solution; pauses
   // localStorage autosave so their progress record stays clean. Cleared by
   // the Reset button (which also restores the starter).
@@ -831,25 +842,96 @@ export default function LessonWorkspace({
     else runCode();
   };
 
+  // The AI Check's request body. The server reads the prompt and rubric by lessonId and ignores
+  // the rest; it is sent for older servers' validation only. `onlyIds` (fast Check notes) asks
+  // about just those cards; a server from before it grades them all, which the merge allows for.
+  const gradeBody = (text: string, onlyIds?: string[]) => ({
+    lessonId: lesson.id,
+    lessonTitle: lesson.title,
+    prompt: '',
+    response: text,
+    rubric: (aiCheck?.rubric ?? []).map((r) => ({ id: r.id, title: r.title, points: r.points })),
+    ...(onlyIds ? { onlyIds } : {}),
+  });
+
+  // The fast Check (lib/clef-check-core.ts): on a lab whose cards carry Clef questions the colours
+  // come back in about half a second and the cards are set at once; the AI Check then runs only for
+  // the notes, which never change a colour. Returns false when there is no fast answer, and the
+  // caller runs today's Check unchanged.
+  const runFastCheck = async (text: string, seq: number): Promise<boolean> => {
+    if (!aiCheck?.clef) return false;
+    const cards = await fetchClefCards(lesson.id, text);
+    if (!cards || seq !== checkSeqRef.current) return false;
+    const filesNow = useLessonStore.getState().fileContents;
+    if (aiText(filesNow) !== text) {
+      setAiCheckNote({ kind: 'ok', text: `Your ${isTextMode ? 'text' : 'code'} changed while it was being checked. Press Check again.` });
+      return true;
+    }
+    // Clef decides the cards it is sure of; the lab's own pattern check decides the rest, on the
+    // same files the fast Check read.
+    const context: GradeContext = { modelDoc: latestModelDoc, refusals: latestRefusals, testResults: testRunRef.current };
+    const report = grade(lesson.requirements, filesNow, lesson.grading?.passingScore || 0, context);
+    const { verdicts: colours } = resolveClefCards(cards, report);
+    const shown = withHints(colours, lesson.requirements);
+    aiVerdictsRef.current = { verdicts: shown, text };
+    setRequirements(applyAiVerdicts(useLessonStore.getState().requirements, shown));
+    setCheckedAt(Date.now());
+    setClock(Date.now());
+    setCheckedOn(filesNow['script.js'] ?? '');
+    const green = Object.values(colours).filter((v) => v.passed).length;
+    const red = redIds(colours);
+    fastCheckRef.current = { text, colours };
+    setExplaining(new Set());
+    setExplained(new Set());
+    // No AI notes by themselves (owner's decision 2026-11-18): a red card offers "Why?", which asks
+    // the AI about that one card. Most Checks therefore cost one Clef call and nothing else.
+    setAiCheckNote({
+      kind: 'ok',
+      text: `(${green} of ${aiCheck.rubric.length} passed.)${red.length ? ' Press "Why?" on a card for help with it.' : ''}`,
+    });
+    setAiCheckBusy(false);
+    return true;
+  };
+
+  // "Why?" on a red card after a fast Check: the AI Check, asked about that card only. Its verdict
+  // never changes the colour (mergeClefNotes); a note that disagrees with the card is dropped and the
+  // card keeps its own "It looks for" line.
+  const explainCard = async (id: string) => {
+    const fast = fastCheckRef.current;
+    if (!fast || aiVerdictsRef.current?.text !== fast.text || explaining.has(id)) return;
+    const { text, colours } = fast;
+    const seq = checkSeqRef.current;
+    setExplaining((prev) => new Set(prev).add(id));
+    try {
+      const { data } = await streamGrade(gradeBody(text, [id]), () => {});
+      if (seq !== checkSeqRef.current || aiVerdictsRef.current?.text !== text) return;
+      const ai = data?.ok ? verdictsFromCriteria(data.criteria ?? [], [id]) : {};
+      const note = mergeClefNotes({ [id]: colours[id] }, ai, lesson.requirements)[id];
+      const verdicts = { ...aiVerdictsRef.current.verdicts, [id]: note };
+      aiVerdictsRef.current = { verdicts, text };
+      setRequirements(applyAiVerdicts(useLessonStore.getState().requirements, verdicts));
+    } catch (e) {
+      console.warn('[ai-check why]', e);
+    } finally {
+      setExplaining((prev) => { const next = new Set(prev); next.delete(id); return next; });
+      setExplained((prev) => new Set(prev).add(id));
+    }
+  };
+
   const runAiCheck = async () => {
     if (!aiCheck || aiCheckBusy) return;
     // The store, not this render's `files`: a click can land before the render that follows the
     // last keystroke, and Ctrl+Enter calls this through a ref.
     const text = aiText(useLessonStore.getState().fileContents);
+    const seq = ++checkSeqRef.current;
     setAiCheckBusy(true);
     setAiCheckNote(null);
+    if (await runFastCheck(text, seq)) {
+      setAiCheckBusy(false);
+      return;
+    }
     try {
-      const { status, data, network } = await streamGrade(
-        {
-          lessonId: lesson.id,
-          lessonTitle: lesson.title,
-          // The server reads the prompt and rubric by lessonId and ignores these.
-          prompt: '',
-          response: text,
-          rubric: aiCheck.rubric.map((r) => ({ id: r.id, title: r.title, points: r.points })),
-        },
-        () => {},
-      );
+      const { status, data, network } = await streamGrade(gradeBody(text), () => {});
       if (data === null || !data.ok) {
         const kind = classifyGradeFailure(status, data, network);
         fallBackToPatternCheck(text, gradeFailureMessage({ kind, status, serverMessage: data?.error }));
@@ -903,6 +985,7 @@ export default function LessonWorkspace({
     if (!aiCheck || (!ai && fb === null) || ai?.text === aiCheckedText || fb === aiCheckedText) return;
     aiVerdictsRef.current = null;
     aiFallbackRef.current = null;
+    fastCheckRef.current = null;
     // #68: the advice outlives the edit (summary, hints, each red card's note), labelled as from
     // the last Check. The marks do not: Submit records the cards as shown.
     setAiCheckNote((prev) => staleAiNote(prev, ai?.verdicts ?? null, lesson.requirements));
@@ -993,7 +1076,7 @@ export default function LessonWorkspace({
       return;
     }
     // An aiCheck lab submits what the cards show, which may be the AI's verdicts.
-    const report = aiCheck ? reportFromRequirements(requirements, lesson?.grading?.passingScore ?? 0) : runClientGrade();
+    const report = aiCheck ? reportFromRequirements(requirements, lesson?.grading?.passingScore ?? 0, lesson.work?.kind) : runClientGrade();
     setGradeReport(report);
     setSubmitOpen(true);
   };
@@ -1061,6 +1144,11 @@ export default function LessonWorkspace({
   const passedCriteria = requirements.filter((r) => r.status === 'passed').length;
   const totalCriteria = requirements.length;
   const allRequirementsPassed = totalCriteria > 0 && passedCriteria === totalCriteria;
+  // What the cards must show to hand in: all green, or for a plan under grading v2, 70% with partly
+  // met cards counting half (lib/grade-pass.ts cardsPass). Same as allRequirementsPassed otherwise.
+  const workKind = lesson.work?.kind;
+  const planAtSeventy = workKind === 'plan' && gradingV2On();
+  const cardsOk = cardsPass(requirements, workKind);
   // Titles only -- AssignmentHeader shows these next to a disabled Submit so
   // a student isn't stuck guessing which of several 0-point criteria is
   // still red (issue #26). Doesn't change canSubmit at all.
@@ -1099,9 +1187,10 @@ export default function LessonWorkspace({
   const canSubmitByWork =
     isSummative ||
     (isMoshionMode
-      ? canSubmitMoshion({ cardsOk: allRequirementsPassed, run: moshionRun, currentText: moshionText, expectsRuntimeError })
+      ? canSubmitMoshion({ cardsOk, run: moshionRun, currentText: moshionText, expectsRuntimeError })
       : runLetsSubmit({ error: runtimeError, pending: false }, expectsRuntimeError) &&
-        (isNoPoints ? allRequirementsPassed : totalScore >= (lesson.grading?.passingScore ?? 0)));
+        // A v2 plan records a score out of its card count, so it is gated by its cards, not by points.
+        (isNoPoints || planAtSeventy ? cardsOk : totalScore >= (lesson.grading?.passingScore ?? 0)));
   const cadBuildCurrent = lesson.cadHost !== 'solidcraft' || (latestModelDoc !== null && cadBuiltSource === cadArtifact(files));
   const canSubmit = canSubmitByWork && cadBuildCurrent && !cap.unknown && !cap.reached;
   // The code on screen is the code just submitted: nothing new to hand in. Edit it and Submit opens
@@ -1206,6 +1295,18 @@ export default function LessonWorkspace({
                           <span className="sr-only">{r.status === 'passed' ? ' (done)' : r.status === 'failed' ? ' (not yet)' : ' (not checked yet)'}</span>
                           {r.status === 'failed' ? (
                             <span className="lab-check-why">{why ? checkLine(why) : r.description ? `Not yet. It looks for: ${checkLine(r.description)}` : 'Not found in your code yet.'}</span>
+                          ) : null}
+                          {r.status === 'failed' && !checksStale && fastCheckRef.current && aiVerdictsRef.current?.text === fastCheckRef.current.text && !explained.has(r.id) ? (
+                            <button
+                              type="button"
+                              className="lab-check-why-btn"
+                              onClick={() => void explainCard(r.id)}
+                              disabled={explaining.has(r.id)}
+                              aria-label={`Why is "${r.title}" not passing yet?`}
+                              style={{ alignSelf: 'flex-start', marginTop: 4, padding: '2px 10px', fontSize: 13, borderRadius: 6, border: '1px solid var(--c-line)', background: 'transparent', color: 'var(--c-fg)', cursor: explaining.has(r.id) ? 'wait' : 'pointer' }}
+                            >
+                              {explaining.has(r.id) ? 'Asking...' : 'Why?'}
+                            </button>
                           ) : null}
                         </span>
                       </li>
@@ -1527,7 +1628,7 @@ export default function LessonWorkspace({
                     className="btn-primary btn-sm toolbar-submit"
                     onClick={handleSubmit}
                     disabled={submitLocked || !canSubmit}
-                    title={submitLocked ? 'Already submitted. Change your code to submit again.' : !canSubmit ? (moshionWords.title ?? (allRequirementsPassed ? 'Run it, then Submit' : `Pass ${checkVerb} to submit`)) : undefined}
+                    title={submitLocked ? 'Already submitted. Change your code to submit again.' : !canSubmit ? (moshionWords.title ?? (cardsOk ? 'Run it, then Submit' : planAtSeventy ? `Reach 70% on ${checkVerb} to submit` : `Pass ${checkVerb} to submit`)) : undefined}
                   >
                     <Send size={14} />
                     Submit
@@ -1536,7 +1637,7 @@ export default function LessonWorkspace({
                 {(isMoshionMode || isConsoleMode) && !submitLocked && !canSubmit && !runtimeError && !isSummative && !cap.unknown && !cap.reached && !restingSubmitted && (
                   // Why Submit is shut, in a few words beside it (climb4 r10 S7); the full reason is on its hover.
                   <span className="toolbar-submit-hint">
-                    {allRequirementsPassed ? 'Run it, then Submit' : `Pass ${checkVerb} to submit`}
+                    {cardsOk ? 'Run it, then Submit' : planAtSeventy ? `Reach 70% on ${checkVerb} to submit` : `Pass ${checkVerb} to submit`}
                   </span>
                 )}
                 {resetMsg && (

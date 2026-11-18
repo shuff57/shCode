@@ -3,6 +3,10 @@
   "title": "7.8.3 Debugging: The enemy that would not die",
   "description": "The finished Part B game with one line missing. After a landing, a crimson 1 takes three shots and an orange 3 dies in one. Make it happen, find the line, fix it.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.8 Defender: waves and the cost",

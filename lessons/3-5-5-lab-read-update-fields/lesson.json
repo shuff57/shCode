@@ -3,6 +3,10 @@
   "title": "3.5.5 Lab: Read and Update Object Fields",
   "description": "Build one object, read a field with a dot, change a field, add a new field, and print the object. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.5.2",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",

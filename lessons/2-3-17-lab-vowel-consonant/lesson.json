@@ -3,6 +3,10 @@
   "title": "2.3.17 Group Cases: Vowel or Consonant",
   "description": "Write a switch with grouped cases that prints Vowel for a, e, i, o, u and Consonant for anything else. Auto-graded.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The Switch Statement",

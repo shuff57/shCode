@@ -3,6 +3,10 @@
   "title": "7.3.3 Lab: Move the counter onto this",
   "description": "The starter's tick() changes a local, so the number on screen stays at 1. Make the change land on `this.n` so it survives the call.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.3 Inside a Class",

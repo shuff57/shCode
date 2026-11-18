@@ -3,6 +3,10 @@
   "title": "5.11.2 Sub-build: Spawn and recycle",
   "description": "A pipe comes from the right, crosses, and is gone. Then two, then many, and none of them pile up.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.11 Flappy: the world scrolls",

@@ -3,6 +3,10 @@
   "title": "5.3.8 Lab: A tilted bumper",
   "description": "Put a tilted bumper under the ball so it rolls to the right. Your walls and ground carry forward.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.3 Pinball: the table",

@@ -3,6 +3,10 @@
   "title": "7.6.1 Reading: Many enemies, kept in parallel arrays",
   "description": "From one drone to many enemies. Each enemy's hp and worth sit in two more arrays beside the sprites, on purpose, and every push and every splice has to happen to all three.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.6 Defender: many enemies",

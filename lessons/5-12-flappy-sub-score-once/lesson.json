@@ -3,6 +3,10 @@
   "title": "5.12.1 Sub-build: Score once per pipe",
   "description": "A pipe crosses the bird. Count it once, however many frames the bird is beside it.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.12 Flappy: crash, and finish",

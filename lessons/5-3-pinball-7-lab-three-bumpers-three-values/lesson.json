@@ -3,6 +3,10 @@
   "title": "5.4.5 Lab: Three bumpers, three values",
   "description": "Three bumpers, worth 1, 5 and 10. The starter scores only the first, on every frame. Loop over all of them and let each bumper remember its own last frame, so every bumper scores once per hit and for its own value.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.4 Pinball: score once",

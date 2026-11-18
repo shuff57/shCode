@@ -3,6 +3,10 @@
   "title": "7.2.1 Reading: Methods: functions that live on a class",
   "description": "Method declaration syntax: inside a class body, methods are written without the `function` keyword. Read before the method labs.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.2 Writing Your Own Classes",

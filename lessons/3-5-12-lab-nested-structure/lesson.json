@@ -3,6 +3,10 @@
   "title": "3.5.12 Lab: Build a Small Nested-Object Structure",
   "description": "Build an object with a nested object and an array of objects, then read values out of it. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.5.4",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",

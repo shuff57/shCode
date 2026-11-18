@@ -3,6 +3,10 @@
   "title": "3.4.16 Lab: Rewrite 3 Named Functions as Arrows",
   "description": "Convert three function declarations into one-line arrow expressions and confirm each still behaves the same. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.4.5",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",

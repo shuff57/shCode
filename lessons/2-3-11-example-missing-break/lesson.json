@@ -2,6 +2,10 @@
   "id": "2-3-11-example-missing-break",
   "title": "2.3.11 Worked Example: A Missing break in the Middle",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The Switch Statement",

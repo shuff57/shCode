@@ -3,6 +3,10 @@
   "title": "3.1.5 Lab: Fix the Syntax and the Name",
   "description": "Take a broken function header — missing parentheses, wrong-case name — and fix both problems. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.1 Functions: Definition and Calls",

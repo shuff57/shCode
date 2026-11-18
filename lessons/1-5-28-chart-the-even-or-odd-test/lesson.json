@@ -3,6 +3,10 @@
   "title": "1.5.28 Plain English to Pseudocode: Even or Odd",
   "description": "Turn plain-English steps into pseudocode: get a number, ask whether it is even, print one of two answers, then end. Your first pseudocode practice, ungraded.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",
@@ -148,6 +152,17 @@
         "description": "The check is closed (END IF) so both branches reach the same end.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r2": "Get a number first: A step that gets (or sets) the number before it is checked. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r3": "The question is even: Check whether the number is even. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r4": "Even is the yes answer: even is printed when the number is even. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r5": "Odd is the ELSE answer: odd is printed in the other branch. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r6": "Both answers rejoin: The check is closed (END IF) so both branches reach the same end. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done."
+      },
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: get a number; if the number is even, print \"even\"; otherwise print \"odd\". Both branches then rejoin at the same end (the check is closed with END IF, nothing else is needed after it). The point is one question with two answers that meet again."
+    }
   }
 }

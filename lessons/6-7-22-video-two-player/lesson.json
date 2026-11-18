@@ -3,6 +3,10 @@
   "title": "6.12.12 Video: Two-Player Local Input",
   "description": "One keyboard, two players: WASD on the left, arrow keys on the right, each with their own sprite and score. This video shows the pattern once so you can wire it up in A17.1 without guessing.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.12 Advanced Input",

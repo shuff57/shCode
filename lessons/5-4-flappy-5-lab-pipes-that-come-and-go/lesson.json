@@ -3,6 +3,10 @@
   "title": "5.11.3 Lab: Pipes that come and go",
   "description": "The starter builds one pair of pipes and leaves it. Build a new pair on a timer, keep them in an array, and delete the ones that have left the screen.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.11 Flappy: the world scrolls",

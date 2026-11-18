@@ -3,6 +3,10 @@
   "title": "7.11.1 Playtest and reflect: Defender",
   "description": "Play your finished Defender at least three times and lose in three different ways, find one surprise, link it to a class or function, and compare one change with Part B. AI-graded with hints.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.11 Defender C: playtest and check",

@@ -3,6 +3,10 @@
   "title": "6.2.4 Lab: Take the shot",
   "description": "Pull back from the cue ball and let go: the ball crosses the table, and the rails stop it.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.2 Pocket: which way, how fast",

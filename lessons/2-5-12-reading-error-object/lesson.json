@@ -3,6 +3,10 @@
   "title": "2.5.12 Reading: Reading the Error Object",
   "description": "Read err.name and err.message to say exactly what went wrong. Read before 2.5.13 Worked Example: Reporting Instead of Guessing.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",

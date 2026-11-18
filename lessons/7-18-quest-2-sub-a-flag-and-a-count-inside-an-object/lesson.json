@@ -3,6 +3,10 @@
   "title": "7.18.2 Sub-build: A flag and a count inside an object",
   "description": "A Knight keeps a guarding flag, cleared by the next hit, which halves that hit with floor(n / 2), and a potions count that heals with min(hp + 12, maxHp) until it runs out.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.18 Quest: choices",

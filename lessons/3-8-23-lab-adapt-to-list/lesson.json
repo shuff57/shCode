@@ -3,6 +3,10 @@
   "title": "3.8.23 Lab: Adapt the Pattern to a List",
   "description": "Apply the save/load pattern to an array of records rather than a single object, and read one record's field back out. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.8.9",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",

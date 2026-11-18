@@ -3,6 +3,10 @@
   "title": "3.6.12 Lab: Object-Parameter Mutation",
   "description": "Mutate a property on an object parameter and prove the caller sees it, then write a non-mutating version that keeps the original untouched. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.6.5",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",

@@ -3,6 +3,10 @@
   "title": "5.14.2 Sub-build: One longer snake",
   "description": "A head in an array, and a body that follows it. Grow it by one, then eat something.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.14 Snake: grow",

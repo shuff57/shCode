@@ -3,6 +3,10 @@
   "title": "6.12.11 Fix the Broken Pseudocode: Dragging a Sprite",
   "description": "Repair half-finished pseudocode for dragging: give the mouse-up frame its own branch, put the velocity reset where it belongs, and stop a step jumping to itself.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.12 Advanced Input",

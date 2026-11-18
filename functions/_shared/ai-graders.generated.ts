@@ -20,7 +20,14 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Logs the correct umbrella activity for Miguel's testing scenario. Help: 1.1.10 (Umbrella Activities)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.1.11 Name That Umbrella\". The task they were given: Read the scenario. Log the umbrella activity that best matches it, using console.log. Choose from training/communication, risk management, configuration management, quality management, architecture management, or security management.",
+      "kind": "console",
+      "questions": {
+        "r1": "The right umbrella activity is logged: Logs the correct umbrella activity for Miguel's testing scenario. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-1-15-write-a-task-set": {
     "lessonTitle": "1.1.15 Write a Task Set",
@@ -132,7 +139,20 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The fifth statement no longer prints its original text, \"Coding is one phase of four.\" Met only when the fifth console.log prints something else. If it still prints exactly \"Coding is one phase of four.\" (any quotes), it is missing. Help: 1.1.2 (console.log & sequential execution)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.1.3 Your First Statement\". The task they were given: Run the code below. Five messages appear in the console panel. This is your first time seeing a browser console print output. Then change the text of the fourth and fifth statements. The starter's fourth statement printed \"The console prints what I log.\" and its fifth printed \"Coding is one phase of four.\"; a student who left either one exactly as it was has NOT changed it, whatever the comments say.",
+      "kind": "console",
+      "questions": {
+        "r1": "First statement present: The first console.log statement is still present. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "Second statement present: The second console.log statement is still present. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "Third statement present: The third console.log statement is still present. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "Fourth statement is a console.log: The fourth line is still a console.log call. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "Fifth statement is a console.log: The fifth line is still a console.log call. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r6": "Fourth statement changed: The fourth statement no longer prints its original text. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r7": "Fifth statement changed: The fifth statement no longer prints its original text. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-1-4-sdlc-overview": {
     "lessonTitle": "1.1.4 What a Program Is",
@@ -174,7 +194,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Print your hobby, at least 6 console.log statements total",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.1.4 What a Program Is\". The task they were given: A **program** is a set of instructions that tells a computer what to do. **JavaScript** is the programming language you'll use this year. Let's write your first instruction. In `script.js`, under the Step 1 comment, type: ```js console.log(\"Hello, world!\"); ``` `console.log()` tells the computer to print whatever is inside the parentheses. Check the console panel below to see your output.",
+      "kind": "console",
+      "questions": {
+        "req1": "Hello world: Print \"Hello, world!\" using console.log. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req2": "Math expression: Use console.log with a math expression. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req3": "String concatenation: Join two strings with the + operator Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req4": "Boolean comparison: Print a comparison that evaluates to true or false Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req5": "Your name: Print your name to the console Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req6": "Your hobby: Print your hobby, at least 6 console.log statements total Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-1-7-classify-the-task": {
     "lessonTitle": "1.1.7 Classify the Task",
@@ -204,7 +236,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Logs the correct phase for putting the finished app in the app store. Help: 1.1.6 (The Four Phases)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.1.7 Classify the Task\". The task they were given: Read the task. Log the name of the phase that task belongs to, using console.log. Choose from inception, elaboration, construction, or deployment.",
+      "kind": "console",
+      "questions": {
+        "r1": "Menu code is construction: Logs the correct phase for writing the code that shows the menu. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "School choice is inception: Logs the correct phase for deciding which schools the app will serve. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "App structure is elaboration: Logs the correct phase for drawing the overall structure of the app. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "App store release is deployment: Logs the correct phase for putting the finished app in the app store. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-2-15-lab-greeting-with-backticks": {
     "lessonTitle": "1.2.15 Greeting with Backticks",
@@ -234,7 +276,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Logs a single-quoted string containing a literal ${ so the difference is visible. Help: 1.2.13 (Embedding Values with ${...})",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.2.15 Greeting with Backticks\". The task they were given: Declare a variable called `myName` and set it to your name in quotes.",
+      "kind": "console",
+      "questions": {
+        "r1": "myName is declared: Declares a variable called myName. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "A backtick string embeds myName: Uses a template literal containing ${myName}. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "A calculation is embedded: Embeds an expression containing an operator, such as ${2024 + 1}. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "Is there a console.log whose argument is a string written in SINGLE quotes (' ') that has the two characters ${ inside it? For example console.log('${2024 + 1}') counts. Code inside comments never runs."
+      }
+    }
   },
   "1-2-16-lab-operators-check": {
     "lessonTitle": "1.2.16 Operators and Expressions Check",
@@ -243,7 +295,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       {
         "id": "req1",
         "title": "Use addition",
-        "description": "Use the + operator with numbers. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
+        "description": "Create two number variables and add them together with +. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
         "points": 1
       },
       {
@@ -270,7 +322,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Use console.log to display results. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.2.16 Operators and Expressions Check\". The task they were given: Create two number variables and add them together with +. Print the result with console.log.",
+      "kind": "console",
+      "questions": {
+        "req1": "Are two variables that were set to numbers added together with + somewhere in the code, whatever the variables are called? For example num1 + num2, str1 + str2 where str1 = 11, or `${a + b}`. Adding two plain numbers like 5 + 2 does not count.",
+        "req2": "Use multiplication: Use the * operator. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req3": "String concatenation: Concatenate strings using +, either inline literals or two previously-declared string variables. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req4": "Comparison operator: Use a comparison operator like ===, !==, <, >. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req5": "Log results: Use console.log to display results. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-2-21-null-vs-undefined": {
     "lessonTitle": "1.2.21 null vs undefined",
@@ -344,7 +407,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Logs the type of an object written with curly braces, either inline or via a variable holding one. Help: 1.2.23 (The typeof Operator)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.2.25 typeof Round-Up\". The task they were given: Log the type of a piece of text and the type of a number.",
+      "kind": "console",
+      "questions": {
+        "r1": "typeof a string: Logs the type of a quoted piece of text, either inline or via a variable holding one. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "typeof a number: Logs the type of a plain number, either inline or via a variable holding one. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "typeof true: Logs the type of a boolean, either inline or via a variable holding true/false. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "typeof undefined: Logs the type of undefined, either inline or via a variable left unassigned. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "Does the program log typeof null, either typeof null directly or typeof of a variable that holds null (for example console.log(typeof null))? Code inside a comment never runs. typeof written inside quotes is text, not code.",
+        "r6": "Does the program log the typeof of an object written with curly braces, such as typeof {}, typeof { name: 'Ada' } or typeof {name}, or typeof of a variable holding one? Whatever is inside the braces does not matter. Code inside a comment never runs. typeof written inside quotes is text, not code."
+      }
+    }
   },
   "1-2-26-lab-variables-types-check": {
     "lessonTitle": "1.2.26 Variables and Types Check",
@@ -374,7 +449,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Print a value to the console. Help: 1.2.3 (Every Value Has a Type)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.2.26 Variables and Types Check\". The task they were given: Use `let` or `const` to create a variable called `age` and set it to your age. Then create a second variable called `name` and set it to your name in quotes.",
+      "kind": "console",
+      "questions": {
+        "req1": "Declare age variable: Create a variable called age. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req2": "Declare name variable: Create a variable called name. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req3": "Use typeof: Use typeof to check a variable's type. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req4": "Use console.log: Print a value to the console. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-2-28-a1-2-1-fix-ten-declarations": {
     "lessonTitle": "1.2.28 Fix Ten Declarations",
@@ -440,7 +525,23 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "finalScore is declared with let and no value, so it holds undefined until set. Help: 1.2.2 (Declaring Variables with let and const)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.2.28 Fix Ten Declarations\". The task they were given: Several declarations are missing a keyword, a quote mark, or an equals sign. Repair them so the file runs.",
+      "kind": "console",
+      "questions": {
+        "r1": "Is studentAge declared (let, const or var) and given a NUMBER value, not text in quotes? Any number counts here, however unrealistic as an age. Code inside a comment never runs.",
+        "r2": "firstName is a string: firstName is declared and holds properly quoted text. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "isEnrolled is a real boolean: isEnrolled holds a real boolean -- true, false, or a comparison that produces one -- not quoted text. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "gradeLevel is declared with a keyword: gradeLevel uses let or const rather than being assigned with no keyword. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "maxStudents is a const: The value that never changes is declared with const. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r6": "unitPrice replaces the single-letter name: The mystery name p has been renamed to unitPrice. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r7": "itemCount replaces the second mystery name: The mystery name q has been renamed to itemCount. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r8": "Is the favourite-colour variable now declared with a camelCase name such as favouriteColour or favoriteColor (lowercase first word, each later word starting with a capital), instead of snake_case like favourite_colour or all lowercase like favouritecolour? Code inside comments never runs.",
+        "r9": "middleName is null, not the string \"null\": The deliberately-empty value uses the null keyword without quotes. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r10": "finalScore is declared but left unassigned: finalScore is declared with let and no value, so it holds undefined until set. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-2-29-a1-2-2-describe-an-object": {
     "lessonTitle": "1.2.29 Describe a Real Object",
@@ -488,7 +589,20 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Logs the type of at least one variable; the typeof may be labelled or stored in a variable first. Help: 1.2.23 (The typeof Operator)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.2.29 Describe a Real Object\". The task they were given: Choose something you can actually see. Declare at least six variables about it: at least two numbers, at least two strings, and at least one boolean. Use descriptive camelCase names.",
+      "kind": "console",
+      "questions": {
+        "r1": "Count the variables declared with let, const or var in the running code. Are there six or more? This card only counts declarations: what the names are and what they describe do not matter here. Code inside a comment never runs.",
+        "r2": "Do two or more variables hold plain numbers (like 15 or 0.25, not text in quotes)? Assigned on the declaration line or later; the names do not matter. Code inside a comment never runs.",
+        "r3": "At least two strings: Two or more variables hold text, in quotes or backticks, assigned on the declaration line or later. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "At least one boolean: A variable holds true or false, either literally or from a comparison, assigned on the declaration line or later. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "Two different string methods used: Uses two different string operations -- .length, .toUpperCase(), .includes(), .trim(), .replace() and others all count. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r6": "Does the program print a backtick string (template literal) with ${...} inside it that embeds a variable, either directly in console.log or through a variable that is printed later? Any other text around it is fine. Code inside a comment never runs.",
+        "r7": "typeof is used to check a type: Logs the type of at least one variable; the typeof may be labelled or stored in a variable first. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-2-5-lab-change-the-type": {
     "lessonTitle": "1.2.5 Change the Type",
@@ -524,7 +638,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Uses console.log with typeof thing to show the type. Help: 1.2.4 (Dynamically Typed)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.2.5 Change the Type\". The task they were given: Declare a variable called `thing` with `let` and set it to any piece of text in quotes.",
+      "kind": "console",
+      "questions": {
+        "r1": "thing is declared with let: Declares a variable called thing using let. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "thing starts as a string: thing holds text in quotes, whether from its own let or a later assignment. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "thing is reassigned without let: Assigns a new value to thing without re-declaring it. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "thing is given a boolean: At some point thing holds true or false, either literally or from a comparison. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "typeof is printed: Uses console.log with typeof thing to show the type. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-3-11-lab-rename-the-mystery-variables": {
     "lessonTitle": "1.3.11 Rename the Mystery Variables",
@@ -572,7 +697,20 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "No declaration of a, b, c, n, d or p remains in the file. Help: 1.3.7 (Avoid Single Letters and Abbreviations)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.3.11 Rename the Mystery Variables\". The task they were given: The first snippet builds a grade sentence with a, b and c. Rename them to subjectName, finalGrade and gradeReport. Keep the output the same.",
+      "kind": "console",
+      "questions": {
+        "r1": "subjectName replaces a: Declares subjectName holding the subject text. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "Is a variable named finalGrade declared in the running code and given a NUMBER value, like 88? Text in quotes such as \"88\" is a string, not a number, so it does not count. Code inside comments never runs.",
+        "r3": "gradeReport replaces c: Declares gradeReport built from the other two. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "hoursWorked replaces n: Declares hoursWorked holding the number of hours. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "hourlyRate replaces d: Declares hourlyRate holding the rate. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r6": "totalPay replaces p: Declares totalPay as hoursWorked times hourlyRate. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r7": "No single-letter variables left: No declaration of a, b, c, n, d or p remains in the file. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-3-12-rate-these-names": {
     "lessonTitle": "1.3.12 Rate These Names",
@@ -646,7 +784,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The reused variable no longer appears anywhere in the file. Help: 1.3.13 (Reuse or Create?)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.3.16 Split the Reused Variable\". The task they were given: The variable `stuff` is used for four unrelated things. Declare four separate variables instead: maxScore, playerName, isGameOver and levelCount.",
+      "kind": "console",
+      "questions": {
+        "r1": "Is there a variable named maxScore that holds a NUMBER (like 100, not \"100\" in quotes)? It may be declared and given its value on the same line, or declared first and assigned on a later line; spacing does not matter. Code inside a comment never runs.",
+        "r2": "Is there a variable named playerName that holds text in quotes or backticks (like \"Alice\")? It may be declared and given its value on the same line, or declared first and assigned on a later line; spacing does not matter. Code inside a comment never runs.",
+        "r3": "Is there a variable named isGameOver that holds a boolean: true, false, or a comparison that produces one, not quoted text and not a number? It may be declared and given its value on the same line, or declared first and assigned on a later line; spacing does not matter. Code inside a comment never runs.",
+        "r4": "Is there a variable named levelCount that holds a NUMBER (like 8, not \"8\" in quotes)? It may be declared and given its value on the same line, or declared first and assigned on a later line; spacing does not matter. Code inside a comment never runs.",
+        "r5": "All four are printed: Logs each of the four new variables. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r6": "stuff is gone: The reused variable no longer appears anywhere in the file. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-3-17-team-vocabulary": {
     "lessonTitle": "1.3.17 Team Vocabulary",
@@ -744,7 +894,23 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "README tells the reader about the tax rate they may need to change. Help: 1.3.6 (Human-Readable Names)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student worked on the lab \"1.3.19 Document a Messy Program\". The task they were given: a twelve-line program with no comments, no spacing and terrible names. Fix it to the class style guide (descriptive camelCase names, const for a value that never changes, spaces around operators, at least four explanatory comments) and write a short README.md that answers three prompts. You are given TWO files in one message: script.js first, then a line reading ----- README.md ----- followed by the README. Criteria about names, operators and comments are about script.js; the README criteria are about the README.",
+      "kind": "console",
+      "questions": {
+        "r1": "Is the tax rate (named taxRate or TAX_RATE) declared with const, not let or var, and given a NUMBER value such as 0.0725? A rate in quotes such as \"high\" or \"0.07\" is text, so it does not count. Code inside comments never runs.",
+        "r2": "bookTitle holds the title: Declares bookTitle with quoted text. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "unitPrice and quantity are named: Declares both unitPrice and quantity. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "subtotal is computed from them: subtotal is unitPrice times quantity. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "orderTotal uses the tax rate: orderTotal is computed from subtotal and taxRate. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r6": "No single-letter variables remain: No declaration of a one-letter variable is left in the file. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r7": "Operators are spaced: No cramped arithmetic like a*b remains: every operator has a space on each side. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r8": "At least four explanatory comments: Four or more comments explaining the code, written as // or /* */. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r9": "README answers all three prompts: Each of the three headings has a real answer under it -- a sentence or a bullet, not an empty heading. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r10": "Does README.md mention tax anywhere in what it tells the reader (for example the tax rate, or that the total includes tax)? Only README.md counts here, not the code. Headings, ## markers and wording do not matter."
+      }
+    }
   },
   "1-4-12-name-the-structure": {
     "lessonTitle": "1.4.12 Name the Structure",
@@ -774,7 +940,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The fourth console.log answers STEP 4 -- the password prompt, with both names in one string, selection first. Help: 1.4.10 (Sequence, Selection, Repetition)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.4.12 Name the Structure\". The task they were given: Read the description. Log which structure it needs, using console.log. Choose from: sequence, selection, repetition. Log one answer per step, in step order, one console.log each -- the first console.log is STEP 1.",
+      "kind": "console",
+      "questions": {
+        "r1": "Is the FIRST answer console.log the word 'sequence' (STEP 1: add tax, then print the total)? Count only console.log calls that print one of the answer words (sequence, selection, repetition); ignore comments, and any quotes, spacing or an extra label argument are fine.",
+        "r2": "Is the SECOND answer console.log the word 'selection' (STEP 2: pass or retake)? Count only console.log calls that print one of the answer words (sequence, selection, repetition); ignore comments, and any quotes, spacing or an extra label argument are fine.",
+        "r3": "Is the THIRD answer console.log the word 'repetition' (STEP 3: print every name on a list)? Count only console.log calls that print one of the answer words (sequence, selection, repetition); ignore comments, and any quotes, spacing or an extra label argument are fine.",
+        "r4": "Does the FOURTH answer console.log print both words 'selection' and 'repetition' in one string, selection first (joined by 'and', a comma or a space)? Count only console.log calls that print one of the answer words (sequence, selection, repetition); ignore comments, and any quotes, spacing or an extra label argument are fine."
+      }
+    }
   },
   "1-4-14-three-structures-three-examples": {
     "lessonTitle": "1.4.14 Three Structures, Three Examples",
@@ -836,7 +1012,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The fourth console.log answers STEP 4 -- the language itself, with multi-paradigm. Help: 1.4.19 (JavaScript Is Multi-Paradigm)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.4.20 Sort the Snippet\". The task they were given: Read the snippet in the comment. Log which paradigm it is, using console.log. Choose from: procedural, object-oriented, functional. Log one answer per step, in step order, one console.log each -- the first console.log is STEP 1.",
+      "kind": "console",
+      "questions": {
+        "r1": "Snippet A is procedural: The first console.log answers STEP 1 -- Snippet A, with procedural. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "Snippet B is object-oriented: The second console.log answers STEP 2 -- Snippet B, with object-oriented. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "Snippet C is functional: The third console.log answers STEP 3 -- Snippet C, with functional. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "JavaScript is multi-paradigm: The fourth console.log answers STEP 4 -- the language itself, with multi-paradigm. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-4-23-a1-4-1-two-languages": {
     "lessonTitle": "1.4.23 Two Languages, Two Purposes",
@@ -910,7 +1096,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The fifth console.log answers STEP 5 -- the data analysis job, with Python. Help: 1.4.2 (Why There Are So Many Languages)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.4.3 Match the Language to the Job\". The task they were given: Read the job. Log the name of the language designed for it, using console.log. Choose from: JavaScript, Python, C, SQL, Swift. Log one answer per step, in step order, one console.log each -- the first console.log is STEP 1.",
+      "kind": "console",
+      "questions": {
+        "r1": "A database question is SQL: The first console.log answers STEP 1 -- the database question, with SQL. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "An iPhone app is Swift: The second console.log answers STEP 2 -- the iPhone app, with Swift. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "An operating system is C: The third console.log answers STEP 3 -- the operating system, with C. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "An interactive web page is JavaScript: The fourth console.log answers STEP 4 -- the interactive web page, with JavaScript. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "Data analysis is Python: The fifth console.log answers STEP 5 -- the data analysis job, with Python. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-5-17-a1-5-2-computational-thinking": {
     "lessonTitle": "1.5.17 Computational Thinking",
@@ -991,7 +1188,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The check is closed (END IF) so both branches reach the same end.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: get a number; if the number is even, print \"even\"; otherwise print \"odd\". Both branches then rejoin at the same end (the check is closed with END IF, nothing else is needed after it). The point is one question with two answers that meet again.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r2": "Get a number first: A step that gets (or sets) the number before it is checked. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r3": "The question is even: Check whether the number is even. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r4": "Even is the yes answer: even is printed when the number is even. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r5": "Odd is the ELSE answer: odd is printed in the other branch. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r6": "Both answers rejoin: The check is closed (END IF) so both branches reach the same end. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-5-30-a1-5-1-flowchart-gate": {
     "lessonTitle": "1.5.30 Plan It in Pseudocode (Part 1)",
@@ -1028,7 +1237,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The ELSE branch reports too: a student under the limit owes nothing, and that is printed.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote pseudocode in README.md, between a first line and a last line that were already there. The problem: the school printer gives every student 20 free pages a week; after that each page over 20 costs 10 cents. The plan should take in the number of pages printed, ask whether it is over 20, charge 10 cents for ONLY the pages over 20 (pages minus 20, not every page), and report what is owed in BOTH cases (a student at or under 20 owes nothing, and that is reported, not left as an empty branch).",
+      "kind": "plan",
+      "questions": {
+        "r1": "The page count comes in: The plan takes in the number of pages the student printed. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r2": "The question is about 20 pages: The plan asks whether the pages printed are over the 20 free pages. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r3": "Only the pages over 20 are charged: The charge is for the pages over 20 (pages minus 20), not for every page. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r4": "Each extra page costs 10 cents: The charge is 10 cents (0.10) for each of those pages. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done.",
+        "r5": "Both answers are reported: The ELSE branch reports too: a student under the limit owes nothing, and that is printed. Judge what the plan's steps say, however they are worded. The lines the starter already had are not the student's work. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-5-31-a1-5-1-implement-your-plan": {
     "lessonTitle": "1.5.31 Implement Your Plan (Part 2)",
@@ -1064,7 +1284,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Two or more console.log calls, so each path reports an outcome. Help: 1.2.2 (Declaring Variables with let and const)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.5.31 Implement Your Plan (Part 2)\". The task they were given: Before any code, write your plan out as pseudocode comments at the top of the file. One instruction per line, indented to show what is inside the decision.",
+      "kind": "console",
+      "questions": {
+        "r2": "pagesRequested is declared: A descriptive variable holds how many pages were asked for. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "creditRemaining is declared: A descriptive variable holds the credit left. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "The decision compares the two: An if statement compares pagesRequested against creditRemaining Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "Both branches exist: An else branch is present, matching the diamond's second exit Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r6": "Both branches print: Two or more console.log calls, so each path reports an outcome. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-5-37-lab-settle-it-in-the-console": {
     "lessonTitle": "1.5.37 Settle It in the Console",
@@ -1094,7 +1325,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "At least three console.log calls, so something beyond the two given was checked. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.5.37 Settle It in the Console\". The task they were given: Write your prediction in a comment, then log 2 + 2 * 3.",
+      "kind": "console",
+      "questions": {
+        "r1": "Logs 2 + 2 * 3: Prints the un-bracketed expression. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "Logs (2 + 2) * 3: Prints the bracketed expression. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "Look only at the comments (lines starting with //, or /* */ blocks), wherever they are in the file. Does any comment say which operation is done first: words like order of operations, precedence, PEMDAS, BODMAS, multiply first, times before plus, or what brackets change? console.log text does not count.",
+        "r4": "A third expression of your own: At least three console.log calls, so something beyond the two given was checked. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-5-39-lab-cause-a-reference-error": {
     "lessonTitle": "1.5.39 Cause a ReferenceError on Purpose",
@@ -1124,7 +1365,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A comment saying which of the three parts solved it. Help: 1.5.38 (Reading an Error Message)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.5.39 Cause a ReferenceError on Purpose\". The task they were given: The file below has a misspelled name. Run it and read the error message that appears.",
+      "kind": "console",
+      "questions": {
+        "r2": "The misspelling is gone: No use of the misspelled name remains anywhere in the file. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "The corrected name is printed: Logs greeting, spelled correctly. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "The error message is recorded: A comment naming ReferenceError. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "The useful part is identified: A comment saying which of the three parts solved it. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-5-43-lab-debug-the-order-total": {
     "lessonTitle": "1.5.43 Debug the Order Total",
@@ -1160,7 +1411,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "An if/else comparing the total against the expected value and printing PASS or FAIL. Help: 1.5.40 (Testing and Test Cases)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"1.5.43 Debug the Order Total\". The task they were given: Before changing anything, work out by hand what the correct total is for 3 notebooks at 4.00 with 10% off and 8% tax. Write it in a comment as your expected outcome.",
+      "kind": "console",
+      "questions": {
+        "r1": "subtotal multiplies price by quantity: The quantity is actually used, with multiplication. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "The discount is subtracted: The discounted amount is the subtotal minus the discount, not plus. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "Tax is added to the discounted amount: The final total adds tax rather than subtracting it. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "At least three labelled prints: Three or more console.log calls whose text includes a label (string concatenation or a template literal both count). Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "A PASS/FAIL check is present: An if/else comparing the total against the expected value and printing PASS or FAIL. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   },
   "1-5-7-instructions-for-a-robot": {
     "lessonTitle": "1.5.7 Instructions for a Robot",
@@ -2085,7 +2347,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Inside the while loop a variable is added to itself (total = total + n or total += n).",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.2.17 For + While Loop Program (Part B)\". The task they were given: Use a for loop to count or step through a range of numbers, logging something on each pass, for example, counting how many multiples of a number appear in a range (`n % 3 === 0` is true when n is a multiple of 3: the remainder is 0).",
+      "kind": "console",
+      "questions": {
+        "r1": "Is a for loop (for (...;...;...), for...of or for...in) written in the program's code? It counts even if its condition means it never runs. A loop that is only inside a comment or a string does not count.",
+        "r2": "Is a while loop written in the program's code? It counts even if its condition means it never runs. A loop that is only inside a comment or a string does not count.",
+        "r3": "Does the running code call console.log at least once? A call written inside a comment does not count.",
+        "r4": "Does the body of the for loop contain a console.log, so something is logged as the loop passes (it may sit inside an if in the body)? A log only after the loop ends means no.",
+        "r5": "Inside the while loop body, is a running total built: a variable that adds another value to itself on each pass, like total = total + n or total += n, where that variable is NOT just the loop's own counter stepping by one? A counter that only does count++ or count = count + 1 to control the loop means no. Adding after the loop ends means no."
+      }
+    }
   },
   "2-2-17b-lab-count-a-letter": {
     "lessonTitle": "2.2.20 Count a Letter in a Word",
@@ -2553,7 +2826,23 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A comment explains what would print if a break were removed. Help: 2.3.3 (switch Statements)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"2.3.30 Print Settings Advisor\". The task they were given: Create a variable called filamentType and assign it one of: 'PLA', 'ABS', 'PETG', 'TPU'.",
+      "kind": "console",
+      "questions": {
+        "r1": "Is there a real switch statement in the code that would run? A switch that is commented out, or the word switch inside a string or comment, does not count.",
+        "r2": "Does the switch statement in the running code have a case that runs when filamentType is exactly 'PLA' (uppercase)? A case label like case 'PLA': counts, and so does case filamentType === 'PLA': inside switch (true). Text in a comment or inside a string does not count; 'pla' in lowercase never matches 'PLA'.",
+        "r3": "Does the switch statement in the running code have a case that runs when filamentType is exactly 'ABS' (uppercase)? A case label like case 'ABS': counts, and so does case filamentType === 'ABS': inside switch (true). Text in a comment or inside a string does not count; 'pla' in lowercase never matches 'PLA'.",
+        "r4": "Does the switch statement in the running code have a case that runs when filamentType is exactly 'PETG' (uppercase)? A case label like case 'PETG': counts, and so does case filamentType === 'PETG': inside switch (true). Text in a comment or inside a string does not count; 'pla' in lowercase never matches 'PLA'.",
+        "r5": "Does the switch statement in the running code have a case that runs when filamentType is exactly 'TPU' (uppercase)? A case label like case 'TPU': counts, and so does case filamentType === 'TPU': inside switch (true). Text in a comment or inside a string does not count; 'pla' in lowercase never matches 'PLA'.",
+        "r6": "Does the running switch statement have a default: label?",
+        "r7": "Does EACH of the four filament cases (PLA, ABS, PETG and TPU) end with its own break statement, so none of them falls through into the case below it? Missing a case, a case with no break, several breaks piled in one place, or breaks inside comments mean no.",
+        "r8": "For a filament the switch recognises, does the program print (console.log) a recommended temperature with an actual number, such as \"Temperature: 200\"? The number may be printed inside the case or after the switch from a variable the case set. Printing only the word \"temperature\" with no value, or printing from code that can never run, means no.",
+        "r9": "For a filament the switch recognises, does the program print (console.log) a recommended print speed with an actual number, such as \"Speed: 60\"? The number may be printed inside the case or after the switch from a variable the case set. Printing only the word \"speed\" with no value, or printing from code that can never run, means no.",
+        "r10": "Is there a comment that CORRECTLY explains what would print if one specific case's break were removed? Trace the real code: without that break, the program keeps running into the case directly below it, and on until the next break. The comment must describe what would actually print. A comment that names the wrong case, says nothing would print, is only a list of keywords, or is one of the starter's STEP instructions, means no."
+      }
+    }
   },
   "2-3-30-challenges": {
     "lessonTitle": "2.3.31 Challenges: Stretch Problems",
@@ -7416,7 +7705,21 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "background(...) is called inside draw(), or in a function the student wrote that draw() calls, with any colour, so old frames do not pile up. A background() call only in setup() runs once, so it is not met. Help: 5.1.9 (background(color) wipe rule)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.20 Make it Move\". The task they were given: In setup(), make a 400 by 400 canvas and one sprite in the middle, stored in the player variable declared at the top. In draw(), paint the background first, then set player.vel.x from the left and right keys and player.vel.y from the up and down keys: if one key is held set a speed, else if the other key is held set the opposite speed, else set 0. Up is a negative vel.y. WASD ('a', 'd', 'w', 's') or the arrow keys ('left', 'right', 'up', 'down') are both fine. What the starter file already had: `let player;` at the top, then an empty setup() and an empty draw() holding only step comments. A file with nothing but those comments meets none of the criteria.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Is new Canvas(...) called in code that runs when the sketch starts (in setup(), or at the top level)? A call inside a comment or string does not count.",
+        "r2": "Does the running code create at least one sprite with new Sprite(...)? A call inside a comment or string does not count.",
+        "r8": "Is the sprite created once, with new Sprite(...) inside setup() (or a function setup() calls), and is there NO new Sprite(...) or new Canvas(...) inside draw()?",
+        "r3": "Is the left or right key ('a', 'd', 'left' or 'right') read with kb.pressing (or similar) in code that runs every frame: draw(), update(), or a function either of them calls? Reading it only in setup() runs once and does not count; neither does code in a comment.",
+        "r4": "Is the up or down key ('w', 's', 'up' or 'down') read with kb.pressing (or similar) in code that runs every frame: draw(), update(), or a function either of them calls? Reading it only in setup() runs once and does not count; neither does code in a comment.",
+        "r5": "Trace one frame: when the left key is held the sprite's vel.x ends the frame negative, when the right key is held it ends positive, and when neither is held it ends at 0. Is that true? A later statement that resets vel.x (for example an else under a second, separate if) undoes the key, which means no. No reset to 0 at all means no.",
+        "r6": "Trace one frame: when the up key is held the sprite's vel.y ends the frame set one way, when the down key is held it ends set the other way, and when neither is held it ends at 0. Is that true? A later statement that resets vel.y (for example an else under a second, separate if) undoes the key, which means no. No reset to 0 at all means no.",
+        "r7": "Is background(...) called every frame, in draw(), update(), or a function either of them calls, so old frames do not pile up? A background() only in setup() means no."
+      }
+    }
   },
   "5-1-21-a10-1-sprite-playground": {
     "lessonTitle": "5.1.23 Sprite Playground",

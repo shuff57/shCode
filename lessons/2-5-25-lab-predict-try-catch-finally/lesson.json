@@ -3,6 +3,10 @@
   "title": "2.5.25 Predict, Then Run: try/catch/finally Together",
   "description": "Predict the output of a try/catch/finally with a throw inside it, then build it and check. Auto-graded.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",

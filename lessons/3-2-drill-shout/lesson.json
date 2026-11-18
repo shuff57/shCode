@@ -3,6 +3,10 @@
   "title": "3.2.6 Lab: shout(word)",
   "description": "Write a one-parameter function, shout, that prints its word in capital letters, then call it with two different words. Practice, not graded: the checks call your function.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.2 Parameters and Return Values",

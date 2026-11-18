@@ -3,6 +3,10 @@
   "title": "7.17.2 Sub-build: One object hits another",
   "description": "Press 1: one dummy's hit(other) makes the other take a hit, never below 0, and after(45, ...) lets the other one hit back a moment later.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.17 Quest: trade blows",

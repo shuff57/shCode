@@ -3,6 +3,10 @@
   "title": "2.4.23 Debug Five Loops",
   "description": "Five loop programs are broken: two never stop, two are off by one, one has a do...while logic error. Fix all five and explain each bug in a comment. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

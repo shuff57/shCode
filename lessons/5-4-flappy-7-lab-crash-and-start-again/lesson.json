@@ -3,6 +3,10 @@
   "title": "5.12.3 Lab: Crash, and start again",
   "description": "Touching a pipe ends the round. Reuse the playing flag from 5.5.1: freeze the world when it ends, run the game only while the flag is true, and make the restart clear the pipes as well as the bird and the score.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.12 Flappy: crash, and finish",

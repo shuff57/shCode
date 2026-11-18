@@ -3,6 +3,10 @@
   "title": "2.2.7 Write a Decision as Pseudocode",
   "description": "Turn a written ticket-price algorithm into numbered pseudocode: get the age, one question with two answers, and print the price. Green here unlocks the 2.2.8 A2.2.1 (Part A) plan.",
   "type": "assignment",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "assignmentCode": "A2.2.0",
   "estimateMins": 25,
   "category": "Unit 1: JavaScript Fundamentals",

@@ -3,6 +3,10 @@
   "title": "3.2.10 Plain English to Pseudocode: Tracing Parameter Values",
   "description": "Turn plain-English steps into pseudocode for a program that passes base into showPriceWithTax(price), then decides Over budget or Within budget from the same base.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "assignmentCode": "A3.2.2",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",

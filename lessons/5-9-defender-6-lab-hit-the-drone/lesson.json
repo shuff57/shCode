@@ -3,6 +3,10 @@
   "title": "7.5.2 Lab: Hit the drone",
   "description": "Shots fly straight through the falling drone. Use overlaps() so a shot that touches it scores, leaves the screen and the array, and sends the drone back to the top.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.5 Defender: hits, and a round",

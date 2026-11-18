@@ -3,6 +3,10 @@
   "title": "7.3.13 Lab: Reap the dead with filter",
   "description": "Dead enemies stay in the array, so the list never shortens and the next hit lands on a corpse. Build a new list of the living with `filter` and store it back in `enemies`.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.3 Inside a Class",

@@ -5,6 +5,7 @@ import { loadLessons } from '../lib/lessons';
 import { listUnits } from '../lib/curriculum';
 import type { Lesson } from '../lib/types';
 import { formQuestionCount } from '../lib/quiz-variant';
+import { GRADING_V2_FROM } from '../lib/grading-v2';
 
 // The home page draws cards. A card shows a title, a description, a badge and
 // a due chip -- it never touches a lesson's quiz, its grading rubric, its
@@ -44,6 +45,8 @@ function maxScoreFor(l: Lesson): number | null {
     // stores as the best (lib/grade-pass.ts criteriaScore; scripts/generate-lessons-manifest.mjs).
     if (g.rubric.length > 0) return g.rubric.length;
   }
+  // Grading v2: a plan with no rubric records its cards out of the card count (scripts/lesson-score-fields.mjs).
+  if (GRADING_V2_FROM !== null && l.work?.kind === 'plan' && l.requirements.length > 0) return l.requirements.length;
   return null;
 }
 

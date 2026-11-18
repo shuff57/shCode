@@ -3,6 +3,10 @@
   "title": "3.3.14 Plain English to Pseudocode: Looping Over an Array",
   "description": "Turn plain-English steps into pseudocode for a loop over an array with a check inside it: start the counter, look at each price, add one when it is under 10, and print once at the end.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "assignmentCode": "A3.3.2",
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",

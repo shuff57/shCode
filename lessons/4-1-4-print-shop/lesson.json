@@ -3,6 +3,10 @@
   "title": "4.1.6 Q1 Synthesis Project",
   "description": "Q1 synthesis: build a program that meets a checklist of requirements. Arrays of objects, functions, sorting, save/load, and your own tests — the rest is your call.",
   "type": "project",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 180,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "4.1 Q1 Synthesis Project",

@@ -3,6 +3,10 @@
   "title": "5.6.3 Lab: A chime on every bumper hit",
   "description": "The three-bumper table from 5.4.5 scores, but it is silent. Load a chime once, in setup(), and play it in the one place a hit happens exactly once, so each drop gives three chimes and never a buzz. Most browsers keep a page silent until you click it or press a key, so if the first drop is quiet, click the game and press R.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.6 Pinball: a sound on a hit",

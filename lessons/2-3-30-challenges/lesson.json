@@ -3,6 +3,10 @@
   "title": "2.3.31 Challenges: Stretch Problems",
   "description": "Stretch problems. Every challenge is required to continue. Auto-graded.",
   "type": "challenge",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The Switch Statement",

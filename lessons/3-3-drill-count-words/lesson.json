@@ -3,6 +3,10 @@
   "title": "3.3.11 Lab: countWords(text)",
   "description": "Write countWords(text): split a sentence at its spaces and return how many words there are. Practice with split and length, not graded: the checks call your function.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",

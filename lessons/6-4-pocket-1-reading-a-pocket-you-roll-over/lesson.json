@@ -3,6 +3,10 @@
   "title": "6.4.2 Reading: A pocket you roll over",
   "description": "A hole is a target, not a wall: pass-through, and only a slow ball drops.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.4 Pocket: the pocket",

@@ -18,7 +18,9 @@ import {
   DEFAULT_WEIGHTS,
   GRADE_CATEGORIES,
   type GradeCategory,
+  countsAsMissing,
 } from '../../lib/grading-weights';
+import { GRADING_V2_FROM } from '../../lib/grading-v2';
 import { resolveDueAt, type DueIndex } from '../../lib/due-dates-core';
 import type { LessonScope } from './dueDates';
 
@@ -109,6 +111,8 @@ export function studentGrading(
   states: StateRow[],
   weights: Weights,
   due: GradeDue,
+  /** Grading v2's switch (lib/grading-v2.ts). Only scripts/grading-v2-impact.mjs passes it, to compare. */
+  v2From: number | null = GRADING_V2_FROM,
 ): StudentGrading {
   if (!scopeMap) return { percent: 0, categories: [], gradedTotal: 0, doneCount: 0, counted: 0, missingCount: 0, missingIds: [] };
 
@@ -125,12 +129,14 @@ export function studentGrading(
   let missingCount = 0;
   const missingIds: string[] = [];
   for (const [lessonId, scope] of scopeMap) {
-    const category = lessonGradeCategory({
+    const asLesson = {
       title: scope.title,
       preview: scope.preview,
       scoreKind: scope.scoreKind,
       assignmentCode: scope.assignmentCode,
-    });
+      graded: scope.graded,
+    };
+    const category = lessonGradeCategory(asLesson, v2From);
     if (category == null) continue; // reading/example -- not graded
 
     gradedTotal += 1;
@@ -140,7 +146,8 @@ export function studentGrading(
     let counts = isDone;
     if (!isDone && !due.waived.has(lessonId)) {
       const dueAt = resolveDueAt(due.index, { lessonId, moduleId: scope.moduleId, unitId: scope.unitId });
-      if (dueAt !== null && dueAt <= due.now) {
+      // countsAsMissing: past due, and not v2 practice that was already past due at the switch.
+      if (countsAsMissing(asLesson, dueAt, due.now, v2From)) {
         counts = true;
         missingCount += 1;
         missingIds.push(lessonId);

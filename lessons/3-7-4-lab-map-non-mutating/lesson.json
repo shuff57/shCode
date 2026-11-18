@@ -3,6 +3,10 @@
   "title": "3.7.4 Lab: Transform a List Without Mutating the Input",
   "description": "Use .map() to build a transformed copy of an array, then demonstrate the original is unchanged. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.7.2",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",

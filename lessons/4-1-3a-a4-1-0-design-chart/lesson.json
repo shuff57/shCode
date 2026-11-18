@@ -3,6 +3,10 @@
   "title": "4.1.5 Q1 Synthesis Design Plan",
   "description": "Design day: plan the whole program as numbered pseudocode before any build time. One CALL per planned function, under twenty steps. The build lessons open when this is green.",
   "type": "assignment",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 50,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "4.1 Q1 Synthesis Project",

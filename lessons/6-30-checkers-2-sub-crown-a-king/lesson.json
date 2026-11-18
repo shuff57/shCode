@@ -3,6 +3,10 @@
   "title": "6.30.2 Sub-build: Crown a king",
   "description": "One red piece steps up the board; on the top row it becomes a king, 'R', which may also step back down.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.30 Checkers: kings and the win",

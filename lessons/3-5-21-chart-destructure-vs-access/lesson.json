@@ -3,6 +3,10 @@
   "title": "3.5.21 Plain English to Pseudocode: Destructuring vs. Plain Access",
   "description": "Turn four plain-English steps into pseudocode for describeBox(): unpack width, height and color from options in one step, build the note, add \"(wide)\" only when width is greater than height, then give the note back.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.5 Objects and Properties",

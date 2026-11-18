@@ -3,6 +3,10 @@
   "title": "5.1.7 Exploration: Move, resize and recolor a sprite",
   "description": "Change one number at a time in a sketch that already works, predict what will move, rerun, and check. Practice from 5.1.5 and 5.1.6. No new code to write.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

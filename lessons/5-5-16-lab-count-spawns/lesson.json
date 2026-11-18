@@ -3,6 +3,10 @@
   "title": "7.3.16 Lab: Count your spawns",
   "description": "The scene already prints `Enemy.spawned`, which is `undefined` because nothing declares it. Add a counter that belongs to the class and bump it in the constructor, so every enemy ever built is counted.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.3 Inside a Class",

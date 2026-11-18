@@ -3,6 +3,10 @@
   "title": "3.6.7 Plain English to Pseudocode: Reassignment vs. Mutation Trace",
   "description": "Turn plain-English steps into pseudocode for process(nums): one write mutates the shared array and the caller sees it, the other reassigns the local name and the caller does not.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.6 Functions: Pass by Value/Reference",

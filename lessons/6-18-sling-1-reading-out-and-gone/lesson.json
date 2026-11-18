@@ -3,6 +3,10 @@
   "title": "6.18.1 Reading: Out and gone",
   "description": "Every sprite you make needs two ways out: off the screen, and out of the array.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.18 Sling: out and gone",

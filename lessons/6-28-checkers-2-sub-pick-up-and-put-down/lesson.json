@@ -3,6 +3,10 @@
   "title": "6.28.2 Sub-build: Pick up and put down",
   "description": "One token on a small board: a click becomes a row and a column, a click on the token picks it up, and a click one square diagonally away puts it down there.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.28 Checkers: pick up and move",

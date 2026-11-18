@@ -3,6 +3,10 @@
   "title": "3.7.17 Lab: Build a New Array with Spread",
   "description": "Use spread to combine two arrays and to add loose values around a copied one, without changing any input. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.7.5",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",

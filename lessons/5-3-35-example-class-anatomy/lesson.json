@@ -3,6 +3,10 @@
   "title": "7.1.6 Worked Example: The parts of a class",
   "description": "One small class with each part labelled: the class name, the constructor, its parameters, and the properties it stores on this. Follows 7.1.5 (Reading: constructor and its parameters).",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.1 Classes and Instances",

@@ -3,6 +3,10 @@
   "title": "3.4.13 Lab: Write a One-Line Arrow Callback",
   "description": "Write a helper that takes a callback, then pass it a one-line arrow. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.4.4",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",

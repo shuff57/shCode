@@ -3,6 +3,10 @@
   "title": "6.23.3 Lab: Take turns to the finish",
   "description": "Two players, one die: roll, move, pass the turn, and stop on the last square to win.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.23 Trail: roll and take turns",

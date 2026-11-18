@@ -3,6 +3,10 @@
   "title": "2.2.6 Plain English to Pseudocode: Largest of Three",
   "description": "Turn the largest-of-three algorithm into pseudocode: two checks in a row, each one a question, with the no answer still carrying on to the next step.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",

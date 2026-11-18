@@ -3,6 +3,10 @@
   "title": "6.11.21 Fix the Broken Pseudocode: the Pause State",
   "description": "Repair half-finished pseudocode for a pause feature: give the not-playing frame its own branch, wire in the pause screen, stop a step jumping to itself, and add the way out.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.11 Game State Machines",

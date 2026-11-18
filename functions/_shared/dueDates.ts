@@ -46,6 +46,10 @@ export interface LessonScope {
   assignmentCode: string | null;
   maxScore: number | null;
   scoreKind: 'quiz' | 'written' | null;
+  /** lesson.json work.graded via the manifest (lib/lesson-work.ts); null on a manifest from before it. */
+  graded: boolean | null;
+  /** lesson.json work.kind via the manifest; null on a manifest from before it. */
+  kind: string | null;
 }
 
 // lessonFolderId -> { title, moduleId, unitId }. Cached in module scope for
@@ -87,6 +91,8 @@ export async function loadLessonScopeMap(
       assignmentCode: lesson.assignmentCode ?? null,
       maxScore: lesson.maxScore ?? null,
       scoreKind: lesson.scoreKind ?? null,
+      graded: typeof lesson.graded === 'boolean' ? lesson.graded : null,
+      kind: typeof lesson.kind === 'string' ? lesson.kind : null,
     });
   }
   scopeMapCache = map;

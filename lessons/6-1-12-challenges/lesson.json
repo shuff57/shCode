@@ -3,6 +3,10 @@
   "title": "6.7.7 Challenges",
   "description": "Pick one (or more) Groups stretch challenges: add a lives counter to Apple Catcher, vary apple sizes for varied points, or implement a `cull()` helper. Auto-graded.",
   "type": "challenge",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 30,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.7 Overlaps and Collisions",

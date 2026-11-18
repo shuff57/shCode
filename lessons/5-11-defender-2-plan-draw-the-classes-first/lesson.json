@@ -3,6 +3,10 @@
   "title": "7.9.2 Plan: Draw the classes first",
   "description": "Before any code: say what Bullet, Enemy and Spawner each remember and can do, one job that moves into a class, and which class fails the checklist's first question. AI-graded with hints.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.9 Defender C: design and the classes",

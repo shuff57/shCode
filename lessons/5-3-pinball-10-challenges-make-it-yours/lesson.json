@@ -3,6 +3,10 @@
   "title": "5.9.2 Challenges: Make it yours",
   "description": "The game is complete. Change one rule of your own: a second goal worth more, a bumper that slides, or a best score that survives a restart. Pick one, combine them, or invent one.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.9 Pinball: playtest and finish",

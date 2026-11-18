@@ -3,6 +3,10 @@
   "title": "6.10.23 Video: Your Game, Automatically Saved",
   "description": "Not every save needs a button press. Auto-save triggers on level transitions, checkpoints, or a timer: the player doesn't think about it.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.10 Save and Load",

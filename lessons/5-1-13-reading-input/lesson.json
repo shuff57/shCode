@@ -3,6 +3,10 @@
   "title": "5.1.13 Reading: kb.pressing(key)",
   "description": "How `kb.pressing(key)` checks whether a key is held this frame. Read before 5.1.14 (Key names: WASD and the arrow keys).",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

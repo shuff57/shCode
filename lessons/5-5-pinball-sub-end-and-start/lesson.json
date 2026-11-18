@@ -3,6 +3,10 @@
   "title": "5.5.2 Sub-build: End and start again",
   "description": "A ball falls into a pit, the round ends after three seconds, and R starts it again. Build the smallest version of losing, before you put it into your table.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.5 Pinball: lose and start again",

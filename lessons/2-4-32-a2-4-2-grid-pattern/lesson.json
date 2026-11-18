@@ -3,6 +3,10 @@
   "title": "2.4.32 Print a Grid Pattern",
   "description": "Write a nested-loop program that prints a grid of at least 5x5, with the dimensions controlled by variables, not hardcoded loop bounds. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

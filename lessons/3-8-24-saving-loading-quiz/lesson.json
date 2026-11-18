@@ -3,6 +3,10 @@
   "title": "3.8.24 Saving and Loading Data",
   "description": "Nine multiple-choice questions on JSON.stringify, JSON.parse, what does not survive a round trip, parse failures, saving by key with localStorage, and the browser sandbox. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.8 Saving and Loading Data",

@@ -3,6 +3,10 @@
   "title": "2.5.1 Slides: Handling Errors with try/catch",
   "description": "Unit 2.5 slides: handling errors with try/catch.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",

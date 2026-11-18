@@ -3,6 +3,10 @@
   "title": "6.14.6 Lab: Find the start",
   "description": "The maze is built, but the player always stands at a fixed spot in the corridor instead of on the P in the map. Scan the map for the P, turn its row and column into pixels, put the player there, and write the way back from pixels to a tile.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.14 Grids and Tile Maps",
   "estimateMins": 20,

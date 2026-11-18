@@ -3,6 +3,10 @@
   "title": "3.6.16 Lab: Pass-by-Reference Capstone Practice",
   "description": "Build a small scorebook that adds scores without harming the caller's array, and a function that updates an object's property the caller can see. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.6.7",
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",

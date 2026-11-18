@@ -3,6 +3,10 @@
   "title": "2.4.26 Plain English to Pseudocode: Nested Loops",
   "description": "Turn plain-English steps into pseudocode for a row/col nested loop: the inner loop starts over for every round of the outer loop.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",

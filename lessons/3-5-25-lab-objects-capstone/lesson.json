@@ -3,6 +3,10 @@
   "title": "3.5.25 Lab: Objects Capstone — Build, Read, Destructure",
   "description": "Build an array of records, read fields with dots and brackets, and destructure a record into variables. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.5.9",
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",

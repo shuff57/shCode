@@ -3,6 +3,10 @@
   "title": "7.8.2 Lab: Waves",
   "description": "Enemies stop arriving on a beat and come in waves instead: each wave only after the field is clear and a pause has run out, each one bigger and faster. Write nextWave and spawnWave, and start every round at wave 0.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 18,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.8 Defender: waves and the cost",

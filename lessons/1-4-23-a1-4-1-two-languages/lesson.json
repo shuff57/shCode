@@ -3,6 +3,10 @@
   "title": "1.4.23 Two Languages, Two Purposes",
   "description": "Pick two languages that aren't JavaScript and explain what each is for and why its paradigm fits. AI-graded with hints.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",

@@ -3,6 +3,10 @@
   "title": "1.2.25 typeof Round-Up",
   "description": "Run typeof over six different values and find the one answer that lies. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",
@@ -146,6 +150,16 @@
         "description": "Logs the type of an object written with curly braces, either inline or via a variable holding one. Help: 1.2.23 (The typeof Operator)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "typeof a string: Logs the type of a quoted piece of text, either inline or via a variable holding one. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "typeof a number: Logs the type of a plain number, either inline or via a variable holding one. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "typeof true: Logs the type of a boolean, either inline or via a variable holding true/false. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "typeof undefined: Logs the type of undefined, either inline or via a variable left unassigned. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "Does the program log typeof null, either typeof null directly or typeof of a variable that holds null (for example console.log(typeof null))? Code inside a comment never runs. typeof written inside quotes is text, not code.",
+        "r6": "Does the program log the typeof of an object written with curly braces, such as typeof {}, typeof { name: 'Ada' } or typeof {name}, or typeof of a variable holding one? Whatever is inside the braces does not matter. Code inside a comment never runs. typeof written inside quotes is text, not code."
+      }
+    }
   }
 }

@@ -3,6 +3,10 @@
   "title": "3.3.12 Sum an Array",
   "description": "Use a for loop to add up all numbers in an array, then log the total. Auto-graded: the code runs and the total is checked.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",

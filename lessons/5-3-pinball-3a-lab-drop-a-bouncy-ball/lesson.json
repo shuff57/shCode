@@ -3,6 +3,10 @@
   "title": "5.3.6 Lab: Drop a bouncy ball",
   "description": "Turn gravity on and drop a bouncy ball. It has nothing to land on yet; the next lab builds the walls and the ground.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.3 Pinball: the table",

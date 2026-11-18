@@ -3,6 +3,10 @@
   "title": "7.19.3 Lab: A run of enemies",
   "description": "Your hero fights a run of enemies made from KINDS with map: beating one levels you up and brings the next, and beating the last one wins.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.19 Quest: a run of enemies",

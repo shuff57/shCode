@@ -3,6 +3,10 @@
   "title": "7.16.1 Plan: Break Quest into parts",
   "description": "Before any code: list the parts of Quest, what the game must remember between frames, what to build first and what looks hard. AI-graded with hints.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.16 Quest: plan and the fighters",

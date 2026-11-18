@@ -3,6 +3,10 @@
   "title": "2.2.11 Plain English to Pseudocode: A for-loop That Accumulates",
   "description": "Turn the sum-1-to-5 loop into pseudocode: start the total before the loop, add i inside it, and print after it ends.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",

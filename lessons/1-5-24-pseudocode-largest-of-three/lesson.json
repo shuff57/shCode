@@ -3,6 +3,10 @@
   "title": "1.5.24 Pseudocode: Largest of Three",
   "description": "Five multiple-choice questions on reading pseudocode plans: which is pseudocode, which plan is correct, and what makes a loop end. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",

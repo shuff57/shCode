@@ -3,6 +3,10 @@
   "title": "3.4.5 Lab: Rewrite a Declaration as an Expression",
   "description": "Take a named function declaration and rewrite it as a function expression assigned to a const, then call it. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.4.2",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",

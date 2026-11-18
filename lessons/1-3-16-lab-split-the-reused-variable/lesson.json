@@ -3,6 +3,10 @@
   "title": "1.3.16 Split the Reused Variable",
   "description": "One variable doing four jobs. Give each job its own well-named variable. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.3 Documentation and Coding Conventions",
@@ -135,6 +139,16 @@
         "description": "The reused variable no longer appears anywhere in the file. Help: 1.3.13 (Reuse or Create?)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Is there a variable named maxScore that holds a NUMBER (like 100, not \"100\" in quotes)? It may be declared and given its value on the same line, or declared first and assigned on a later line; spacing does not matter. Code inside a comment never runs.",
+        "r2": "Is there a variable named playerName that holds text in quotes or backticks (like \"Alice\")? It may be declared and given its value on the same line, or declared first and assigned on a later line; spacing does not matter. Code inside a comment never runs.",
+        "r3": "Is there a variable named isGameOver that holds a boolean: true, false, or a comparison that produces one, not quoted text and not a number? It may be declared and given its value on the same line, or declared first and assigned on a later line; spacing does not matter. Code inside a comment never runs.",
+        "r4": "Is there a variable named levelCount that holds a NUMBER (like 8, not \"8\" in quotes)? It may be declared and given its value on the same line, or declared first and assigned on a later line; spacing does not matter. Code inside a comment never runs.",
+        "r5": "All four are printed: Logs each of the four new variables. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r6": "stuff is gone: The reused variable no longer appears anywhere in the file. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   }
 }

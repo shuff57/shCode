@@ -3,6 +3,10 @@
   "title": "1.2.28 Fix Ten Declarations",
   "description": "Ten broken variable declarations. Fix each one and say in a comment what was wrong. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",
@@ -205,6 +209,20 @@
         "description": "finalScore is declared with let and no value, so it holds undefined until set. Help: 1.2.2 (Declaring Variables with let and const)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Is studentAge declared (let, const or var) and given a NUMBER value, not text in quotes? Any number counts here, however unrealistic as an age. Code inside a comment never runs.",
+        "r2": "firstName is a string: firstName is declared and holds properly quoted text. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "isEnrolled is a real boolean: isEnrolled holds a real boolean -- true, false, or a comparison that produces one -- not quoted text. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "gradeLevel is declared with a keyword: gradeLevel uses let or const rather than being assigned with no keyword. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "maxStudents is a const: The value that never changes is declared with const. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r6": "unitPrice replaces the single-letter name: The mystery name p has been renamed to unitPrice. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r7": "itemCount replaces the second mystery name: The mystery name q has been renamed to itemCount. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r8": "Is the favourite-colour variable now declared with a camelCase name such as favouriteColour or favoriteColor (lowercase first word, each later word starting with a capital), instead of snake_case like favourite_colour or all lowercase like favouritecolour? Code inside comments never runs.",
+        "r9": "middleName is null, not the string \"null\": The deliberately-empty value uses the null keyword without quotes. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r10": "finalScore is declared but left unassigned: finalScore is declared with let and no value, so it holds undefined until set. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   }
 }
