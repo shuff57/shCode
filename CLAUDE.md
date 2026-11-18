@@ -1578,10 +1578,15 @@ quizzes stay a plain percent; practice a student had already skipped is not held
   records its card score), and `lessonScoreFields` / `app/page.tsx maxScoreFor` (a plan's maxScore = card count).
 - **Skipped practice:** a lesson graded only because of v2 (`newlyGraded`), due before the stamp and not done,
   is neither missing nor late for that student. Finishing it still counts; everything due after the stamp counts.
-- **Go-live, in order:** `node --import ./scripts/register-ts.mjs scripts/grading-v2-impact.mjs` (read-only:
-  every live class's grades with the switch off and on); `scripts/stamp-grading-v2.mjs --set-now` and commit;
-  `scripts/backfill-v2-plan-scores.mjs --emit-sql f.sql`, review, apply (plans finished before v2 stored 0 and
-  needed every card green, so they go to full marks; without it they read 0%); then deploy. Never move the stamp.
+- **Go-live, in order:** (1) `scripts/grading-v2-impact.mjs --switch <date>` (read-only: every live class's grades
+  off and on, and how many v2-only lessons fall due in the four weeks after); (2) `scripts/stamp-grading-v2.mjs
+  --set-now` and commit; (3) `scripts/backfill-v2-plan-scores.mjs --emit-sql a.sql --until <now>`, review, apply
+  (plans finished before v2 stored 0 and needed every card green, so they go to full marks; without it they read
+  0%); (4) `npm run deploy`; (5) the backfill AGAIN with `--until <the deploy's finish time>`: the old code kept
+  writing 0 for plans finished until the deploy was live, and a plan finished under v2 (a real card score) is
+  after that time so it is never touched. Never move the stamp. Rollback: stamp back to null and deploy.
+- Impact 2026-11-18 for "5 Intro Prog 2627": 185 v2-only lessons have no due date (they count only when done,
+  so they can only raise a grade); switching 2026-11-30 or 2027-01-04, none fall due in the next four weeks.
 - Measured 2026-11-18 on the live class (29 students): graded lessons 149 -> 475, no grade goes down, median +1
   point, largest +8; the median student's missing count stays 6. 20 plan labs, 337 finished rows to backfill.
 - Tests: `scripts/test-grading-v2.mjs` (npm test; both switch positions; three safeguards mutation-checked).
