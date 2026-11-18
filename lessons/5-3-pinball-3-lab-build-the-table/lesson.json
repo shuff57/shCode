@@ -60,7 +60,12 @@
         "description": "A static sprite is stored as the goal, in a colour the player can see. Help: 5.3.5 (Worked Example: The table and the goal)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A goal is on the table: A static sprite is stored as the goal, in a colour the player can see. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "carryFrom": "5-3-pinball-3c-lab-a-tilted-bumper"
 }

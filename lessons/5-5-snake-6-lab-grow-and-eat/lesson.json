@@ -123,6 +123,14 @@
         "description": "The eating test compares the new head's cell with the food's cell, column AND row (comparing the head sprite's x and y with the food's x and y, or segments[0] after the unshift, is the same idea), and the tail comes off only on a step that does not eat: in the else, after the eating branch has returned, behind an if that the snake did not eat, or behind a flag. Missing: the tail is removed whether or not the snake ate, or there is no eating test. Help: 5.14.1 (Reading: A body that grows)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A new head goes on the front: The snake moves by adding a cell to the front of the array. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The tail is removed and deleted: The last cell leaves the array and the screen. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Eating scores and replaces the food: Reaching the food adds a point and makes a new piece. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Eating keeps the tail, so the snake grows: The tail is removed only on a step that does not eat: the eating test compares the new head's cell with the food's cell, and the tail comes off in the else (or after the eating branch has returned). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

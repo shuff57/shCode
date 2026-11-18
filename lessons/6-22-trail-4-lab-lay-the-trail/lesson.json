@@ -109,6 +109,14 @@
         "description": "Each square keeps its centre and its letter.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A loop over the track: makePath loops over every letter of the track. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "An odd row is turned around: On an odd row the column is counted from the other side, so the path snakes. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Each square keeps x, y and kind: Each square pushed onto the list has an x, a y and its letter as kind. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Lab: Lay the trail\". The task: fill in makePath so it loops over the track text, works out each square's row and column from its index, turns odd rows around so the path snakes, and pushes { x, y, kind } for every square. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

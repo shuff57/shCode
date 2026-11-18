@@ -63,7 +63,12 @@
         "description": "The student's code adds at least one rule the starter did not have, and it would really run: a second thing that scores, something on the table that moves on its own, a best score kept across restarts, a score worth something other than 1, or a rule they invented (a timer, a speed change, a bonus, and so on). A change only to how things look, such as a colour or the words on screen, is not a new rule. Help: 5.4.5 (Lab: Three bumpers, three values)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Your game has a rule of your own: Any one challenge counts, or a rule you invented: a second thing that scores, something on the table that moves, a best score kept across restarts, or a score worth something other than 1. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "carryFrom": "5-3-pinball-9-lab-lose-and-start-again"
 }

@@ -57,6 +57,11 @@
         "description": "console.log is called with b.color and with b.size (two calls, or one call holding both, with or without labels), inside draw() or a function it calls. Printing them in setup() also reads the properties and counts. Partial: only one of the two. Missing: no console.log reads them, or only typed-in values are printed. Help: 7.1.3 (Class and instance)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Read b.color and b.size with console.log: Call console.log with b.color and with b.size inside draw() (labels are fine, e.g. console.log('color:', b.color)). update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

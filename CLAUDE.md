@@ -1578,10 +1578,15 @@ quizzes stay a plain percent; practice a student had already skipped is not held
   records its card score), and `lessonScoreFields` / `app/page.tsx maxScoreFor` (a plan's maxScore = card count).
 - **Skipped practice:** a lesson graded only because of v2 (`newlyGraded`), due before the stamp and not done,
   is neither missing nor late for that student. Finishing it still counts; everything due after the stamp counts.
-- **Go-live, in order:** `node --import ./scripts/register-ts.mjs scripts/grading-v2-impact.mjs` (read-only:
-  every live class's grades with the switch off and on); `scripts/stamp-grading-v2.mjs --set-now` and commit;
-  `scripts/backfill-v2-plan-scores.mjs --emit-sql f.sql`, review, apply (plans finished before v2 stored 0 and
-  needed every card green, so they go to full marks; without it they read 0%); then deploy. Never move the stamp.
+- **Go-live, in order:** (1) `scripts/grading-v2-impact.mjs --switch <date>` (read-only: every live class's grades
+  off and on, and how many v2-only lessons fall due in the four weeks after); (2) `scripts/stamp-grading-v2.mjs
+  --set-now` and commit; (3) `scripts/backfill-v2-plan-scores.mjs --emit-sql a.sql --until <now>`, review, apply
+  (plans finished before v2 stored 0 and needed every card green, so they go to full marks; without it they read
+  0%); (4) `npm run deploy`; (5) the backfill AGAIN with `--until <the deploy's finish time>`: the old code kept
+  writing 0 for plans finished until the deploy was live, and a plan finished under v2 (a real card score) is
+  after that time so it is never touched. Never move the stamp. Rollback: stamp back to null and deploy.
+- Impact 2026-11-18 for "5 Intro Prog 2627": 185 v2-only lessons have no due date (they count only when done,
+  so they can only raise a grade); switching 2026-11-30 or 2027-01-04, none fall due in the next four weeks.
 - Measured 2026-11-18 on the live class (29 students): graded lessons 149 -> 475, no grade goes down, median +1
   point, largest +8; the median student's missing count stays 6. 20 plan labs, 337 finished rows to backfill.
 - Tests: `scripts/test-grading-v2.mjs` (npm test; both switch positions; three safeguards mutation-checked).
@@ -1667,6 +1672,26 @@ false reds remain. 381 programs (15%) get a red card, nearly all real gaps today
 - Clef does not trace calls: "a print inside a function nobody calls" needs a runtime card, not a question.
 - The harness now reads questions from lesson.json (not the generated file), so several labs can be edited and
   tested at once; run `generate-ai-graders.mjs` before deploying.
+
+**Chapters 4-7 (2026-11-18): all 140 AI Check labs have questions** (mostly moSHion; no runtime cards). Gate:
+every lab passes `--tolerance` (1,097 course cases). Real work: 708 handed-in programs (most moSHion labs had
+none yet), every red reviewed blind: before fixes 79 of 128 reds were FALSE (62%; the gate had looked fine),
+after them 4 false reds remain and all 44 real catches stay red; 6% of programs get a red card.
+- **Clef is extremely sensitive to wording, and only real work shows it.** On one correct program: "Is
+  world.gravity.y set to a number other than 10 in the code (for example -10, 0, 5 or 20)?" -> 0.98, "Does the
+  student code set world.gravity.y to a value different from 10?" -> 0.13; "Is there a line new Canvas(...) that
+  is not inside a comment?" -> 0.92, the drafted "Create a canvas: A canvas is created when the sketch starts."
+  -> 0.06. Ask short, literal questions with concrete example values and code shapes; never trust a draft
+  that has only passed the gate.
+- A card about "changed from the starter" / "a value of your own" must state the starter's value: Clef never
+  sees the starter.
+- Name the equivalent forms students use (clear() for background(), walls made static through a group,
+  round(random(1, 6)), kb.holding as a held-key test, update() as well as draw()).
+- Left: 5.1.20 r5/r6 when update() sets the velocity and draw() sets it again (Clef stays unsure whatever the
+  wording; the regex decides), and one pinball r3 case. Several fixes rely on the regex deciding an unsure card.
+
+**Coverage: every AI Check lab in the course (302) now has Clef questions**; `test-clef-check.mjs` checks that
+every pattern card in Chapters 1-7 has one and no runtime card does.
 Fixtures are hand-written programs only; real student code never goes in the repo. The same
 `WORKERS_PROXY` makes the dev server run the real clef-check and grade-written handlers against Workers
 AI. Tests: `scripts/test-clef-check.mjs` (npm test). Deploy: nothing to apply (no migration; the `AI`

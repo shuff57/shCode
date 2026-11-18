@@ -81,6 +81,13 @@
         "description": "Clamped above the ground.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "The arm follows the pointer: Rotation from angleTo, or rotateTo toward the pointer. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Limited: A clamp or rotateTo keeps it out of the ground. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Lab: Turn the arm\". The task: aim the catapult arm at the pointer with angleTo or rotateTo, limited so it cannot point into the ground. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

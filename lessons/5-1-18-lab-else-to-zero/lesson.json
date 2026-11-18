@@ -133,6 +133,13 @@
         "description": "At least one movement line in draw() sets player.vel.x or player.vel.y to a speed other than 4 (or -4), so the sprite moves at a speed the student chose. 5.1.16 suggests 2 to 6, but any other speed that moves the sprite counts, including a decimal or a variable holding the speed. The lines that set the speed back to 0 are not a speed. If every movement line still uses 4, it is not met yet. Help: 5.1.16 (Movement pattern (if / else if / else))",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Restore else player.vel.x = 0: trace one frame three times, statements in order (the last assignment wins): (1) only the left key held: vel.x ends negative; (2) only the right key held: it ends positive; (3) neither held: it ends at 0. Yes only if all three hold. Any form counts: the else at the end of the if / else if chain, a 0 set first, a ? : ending in 0, or (kb.pressing('d') - kb.pressing('a')) * 3 (a held key is 1, a free one 0, so neither gives 0). An else under a separate second if is NO: if (a) vel.x = -3; if (d) vel.x = 3; else vel.x = 0; (holding left: -3, then the else sets 0). Code in draw(), update() or a function they call counts; code in comments never runs.",
+        "r2": "Restore else player.vel.y = 0: trace one frame three times, statements in order (the last assignment wins): (1) only the up key held: vel.y ends negative; (2) only the down key held: it ends positive; (3) neither held: it ends at 0. Yes only if all three hold. Any form counts: the else at the end of the if / else if chain, a 0 set first, a ? : ending in 0, or (kb.pressing('s') - kb.pressing('w')) * 3 (a held key is 1, a free one 0, so neither gives 0). An else under a separate second if is NO: if (w) vel.y = -3; if (s) vel.y = 3; else vel.y = 0; (holding up: -3, then the else sets 0). Code in draw(), update() or a function they call counts; code in comments never runs.",
+        "r3": "Is player.vel.x or player.vel.y set to a number other than 4, -4 or 0 on a line that tests kb.pressing (for example -2, 2, 3, -5, 6, 1 or 10)? The starter only ever used 4, -4 and 0, so any other number on even one key line means the student picked a speed of their own. A plain else line does not count: else player.vel.y = 2 is not a key line. Code inside comments never runs."
+      }
+    }
   }
 }

@@ -115,6 +115,14 @@
         "description": "The sketch hosts or joins.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Moves are received: online.onMove is given a function that runs for every move. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A move is sent: online.send sends a move. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Host or join: The sketch hosts a room or joins one. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Send and receive one number\". The task: set up online.onMove once to record every move that arrives, host a room on a key or join one from a code, and send a small move like { n: number } when the room is ready. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

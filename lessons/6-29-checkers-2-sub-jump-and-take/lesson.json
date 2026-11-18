@@ -109,6 +109,14 @@
         "description": "The jumped piece is removed from the grid.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Two squares diagonally: A jump lands two rows and two columns away, tested with abs or another way. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Black is on the halfway square: The square halfway between the two ends is worked out, and it must hold black. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The jumped piece is taken: The halfway square is emptied, so black leaves the board. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Jump and take\". The task: with red picked up, a click on an empty square two rows and two columns away is a jump when the halfway square ((r1 + r2) / 2, (c1 + c2) / 2) holds 'b': that square is emptied and red moves to the new square. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

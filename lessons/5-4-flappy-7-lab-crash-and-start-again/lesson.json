@@ -168,7 +168,17 @@
         "description": "Pressing R (kb.presses('r') or 'R'), directly or through a function it calls such as startRound(), empties the pipes array: pipes = [], pipes.length = 0, pipes.splice(0), or a loop that pops or splices every pipe. Deleting each pipe and its mate first is what step 4 asks and is welcome. Partial: the sprites are deleted but the array is never emptied, or the R check sits inside if (playing) and can never run after a crash. Missing: no R check, or R does not touch the pipes. Help: 5.11.1 (Reading: A world that scrolls)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A flag says whether the game is being played: A variable that starts true is the game's state. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Touching a pipe ends the round: A collision with the bird flips the flag (playing = false, or a game-over flag = true), directly or in a function it calls such as endRound(). Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "The crash freezes the world: Gravity goes to 0 and the pipes stop too (their vel.x goes to 0), so nothing keeps moving. The bird's own vel.x line from the starter does not count: it is the pipes that must stop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "The game runs only while the flag is true: The play code, including the new pipes on the beat, sits inside if (playing), so nothing new happens after a crash. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "Game over shows when the round ends: While the flag is false, the screen says Game over. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The restart clears the pipes: Pressing R empties the array so the next round starts clean. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "carryFrom": "5-4-flappy-6-lab-score-a-gap"
 }

@@ -89,6 +89,13 @@
         "description": "The shot leaves in the same branch, so it cannot count twice.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A hit takes one off: The block's own count is decremented under an overlap test. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The shot leaves on the hit: The shot is deleted and spliced in the same branch. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Hits and a budget\". The task: test every shot against every block; on a hit take one from that block's own hit count and delete and splice the shot, then remove a block whose count reaches 0. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

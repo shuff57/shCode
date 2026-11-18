@@ -3,7 +3,10 @@
 // local SQLite and runs the real loaders and studentGrading() twice, switch off and switch on (as if
 // stamped now, with the plan-score backfill applied). Nothing is written to D1.
 //
-//   node --import ./scripts/register-ts.mjs scripts/grading-v2-impact.mjs [--detail]
+//   node --import ./scripts/register-ts.mjs scripts/grading-v2-impact.mjs [--detail] [--switch 2026-12-01]
+//
+// --switch simulates stamping on that date (school-day midnight UTC) instead of now, and also lists how many
+// lessons graded only by v2 fall due in the four weeks after it, per class: the work that starts to count.
 //
 // Prints, per class, how many lessons count, and how each student's grade moves. Anonymous unless
 // --detail, which adds first name + last initial (teachers' own data, printed only to this terminal).
@@ -28,7 +31,11 @@ function remote(sql) {
   return JSON.parse(raw.slice(raw.indexOf('[')))[0].results ?? [];
 }
 
+const switchArg = (() => { const i = process.argv.indexOf('--switch'); return i < 0 ? null : process.argv[i + 1]; })();
 const now = Date.now();
+const switchAt = switchArg ? Date.parse(switchArg + 'T08:00:00Z') : now;
+if (!Number.isFinite(switchAt)) throw new Error('--switch wants YYYY-MM-DD');
+const evalAt = Math.max(now, switchAt);
 const db = makeD1();
 const sq = db.sqlite;
 function load(table, rows) {
@@ -82,13 +89,28 @@ for (const c of classes) {
   for (const email of students) {
     const states = sq.prepare('SELECT lesson_id, state, score FROM lesson_state WHERE student_email = ?').all(email);
     const statesOn = states.map((s) => (planMax.has(s.lesson_id) && s.state === 'completed' ? { ...s, score: planMax.get(s.lesson_id) } : s));
-    const due = { index, waived: waivers.get(email) ?? new Set(), now };
+    const due = { index, waived: waivers.get(email) ?? new Set(), now: evalAt };
     const off = studentGrading(scopeOff, states, weights, due, null);
-    const on = studentGrading(scopeOn, statesOn, weights, due, now);
+    const on = studentGrading(scopeOn, statesOn, weights, due, switchAt);
     rows.push({ email, off, on, delta: on.percent - off.percent });
   }
   const deltas = rows.map((r) => r.delta);
-  console.log(`\n== class "${c.name}" (${students.length} students)`);
+  console.log(`\n== class "${c.name}" (${students.length} students)${switchArg ? `, switch on ${switchArg}` : ''}`);
+  {
+    const { newlyGraded } = await import('../lib/grading-weights.ts');
+    const { resolveDueAt } = await import('../lib/due-dates-core.ts');
+    const weeks = [0, 0, 0, 0];
+    let noDate = 0;
+    for (const [id, sc] of scopeOn) {
+      const l = { title: sc.title, preview: sc.preview, scoreKind: sc.scoreKind, assignmentCode: sc.assignmentCode, graded: sc.graded };
+      if (!newlyGraded(l, switchAt)) continue;
+      const at = resolveDueAt(index, { lessonId: id, moduleId: sc.moduleId, unitId: sc.unitId });
+      if (at === null) { noDate++; continue; }
+      const w = Math.floor((at - switchAt) / (7 * 86400000));
+      if (w >= 0 && w < 4) weeks[w]++;
+    }
+    console.log(`   lessons graded only by v2, falling due in weeks 1-4 after the switch: ${weeks.join(' / ')}  (no due date set: ${noDate})`);
+  }
   console.log(`   graded lessons in the course: ${rows[0].off.gradedTotal} -> ${rows[0].on.gradedTotal}`);
   console.log(`   counted per student (median): ${pct(rows.map((r) => r.off.counted), 0.5)} -> ${pct(rows.map((r) => r.on.counted), 0.5)};  done (median): ${pct(rows.map((r) => r.off.doneCount), 0.5)} -> ${pct(rows.map((r) => r.on.doneCount), 0.5)};  missing (median): ${pct(rows.map((r) => r.off.missingCount), 0.5)} -> ${pct(rows.map((r) => r.on.missingCount), 0.5)}`);
   console.log(`   grade (median): ${f1(pct(rows.map((r) => r.off.percent), 0.5))}% -> ${f1(pct(rows.map((r) => r.on.percent), 0.5))}%`);

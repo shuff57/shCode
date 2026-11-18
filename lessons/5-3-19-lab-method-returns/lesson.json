@@ -56,6 +56,11 @@
         "description": "Inside the Counter class there is an isHigh() method that compares this.n with 10 and returns a value that is true when the count is over 10 and not true at 10 or below. Partial: the comparison is off by one (>= 10), or it compares something other than this.n. Missing: no isHigh method inside the class, or it compares but never returns anything. Help: 7.2.1 (Methods: functions that live on a class)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "isHigh() compares this.n to 10: Write an `isHigh()` method inside `Counter` whose body compares `this.n` to `10` (e.g. `return this.n > 10`). The driver (the code in `draw()`) paints the number red when it returns a truthy value: one an `if` treats as true, such as `true` itself. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

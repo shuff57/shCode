@@ -8912,7 +8912,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "An OUTPUT (or PRINT) line for the formatted verdict.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps for the lab \"4.1.5 Q1 Synthesis Design Plan\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Plan the **whole program** before writing any of it. **No JavaScript is written today.** The build lessons stay closed until this plan is green. From the project checklist, your program has to: - store at least five objects of your own design in an array - write a function of your own with at least 3 parameters - write a function of your own that returns a computed value, used elsewhere in the program - sort the array - read the array with a loop - make a decision with a conditional based on your data - save and load your data - print one formatted verdict line combining at least two things you calculated In `README.md`, write the **main program** as numbered pseudocode **between START and END**: the sequence that runs when the page loads. Number every line, including the indented ones and the END lines. Each keyword looks like this: - `CALL loadRecipes` (one line for each function you plan to write) - `IF there is a saved recipe list` ... `ELSE` ... `END IF` (a decision, with both ways out) - `FOR EACH recipe IN recipes` ... `END FOR` (walking your array) - `OUTPUT the verdict line` (the printed result), written for your own program Three rules make it a design. **One CALL per planned function, both directions**: every function you intend to write is on the plan, and every CALL becomes a real func",
+      "kind": "plan",
+      "questions": {
+        "r1": "Ten to nineteen numbered steps: Number every line 1. 2. 3. and so on. A plan under ten steps has not been decided yet, and twenty or more is too big to hold in your head.",
+        "r2": "A decision with both ways out: An IF closed with END IF, with an ELSE for the other way.",
+        "r3": "A loop over your array: FOR EACH item IN list ... END FOR, with at least one step inside.",
+        "r4": "Functions planned as CALL lines: At least three CALL lines: one per function you plan to write.",
+        "r5": "Sorting, saving and loading are planned: A different CALL for each: one that sorts, one that saves, one that loads, with that word in the name.",
+        "r6": "One verdict line is printed: An OUTPUT (or PRINT) line for the formatted verdict."
+      }
+    }
   },
   "4-1-4-print-shop": {
     "lessonTitle": "4.1.6 Q1 Synthesis Project",
@@ -8978,7 +8990,23 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A check that prints PASS when it matches the known answer and FAIL when it does not. The checker cannot count your tests: three is on you, and the teacher reads for it. Help: 4.1.4 (Manual Testing: PASS / FAIL Checks)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote JavaScript for the lab \"4.1.6 Q1 Synthesis Project\". The task they were given: A short pitch in README.md: what the program does. Written before any build time, so the rest of this list has something to serve.",
+      "kind": "console",
+      "questions": {
+        "req1": "An array of your own: An array you declared to hold your data. Code inside a comment, or written inside quotes as text, never runs.",
+        "req2": "Five objects stored: At least five objects, each with your own properties. The checker cannot judge whether your object design is good; the teacher reads for that. Code inside a comment, or written inside quotes as text, never runs.",
+        "req3": "A 3+ parameter function: A function of your own with at least 3 parameters. Code inside a comment, or written inside quotes as text, never runs.",
+        "req4": "A function that returns a value: A function of your own that returns a computed value, used elsewhere in the program. A named function, an arrow, or a method all count. Code inside a comment, or written inside quotes as text, never runs.",
+        "req5": "A sort: A sort over your array — a built-in .sort() or a sort you wrote by hand. Code inside a comment, or written inside quotes as text, never runs.",
+        "req6": "Uses a loop: A `for`, `while`, or `for...of` loop somewhere in the program (e.g. walking your array). Code inside a comment, or written inside quotes as text, never runs.",
+        "req7": "Uses a conditional: An `if` statement or `switch` statement somewhere in the program. Code inside a comment, or written inside quotes as text, never runs.",
+        "req8": "Saves and loads with localStorage + JSON: Uses JSON.stringify/JSON.parse with localStorage. Code inside a comment, or written inside quotes as text, never runs.",
+        "req9": "Prints a formatted verdict: A console.log that prints one formatted line combining at least two things you calculated (joined with +, a template string, or comma-separated arguments). Code inside a comment, or written inside quotes as text, never runs.",
+        "req10": "Tests report PASS or FAIL: A check that prints PASS when it matches the known answer and FAIL when it does not. The checker cannot count your tests: three is on you, and the teacher reads for it. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "4-1-5-q1-reflection-writeup": {
     "lessonTitle": "4.1.7 Q1 Reflection",
@@ -9040,7 +9068,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "background(...) is called inside draw(), or in a function the student wrote that draw() calls, with any colour, so each frame starts clean. A background() call only in setup() runs once, so it is not met. Help: 5.1.9 (background(color) wipe rule)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.11 Hello Sprite\". The task they were given: Make a first moSHion sketch. In setup(): make a 400 by 400 canvas, make a sprite at the centre (200, 200) that is 40 wide and 40 tall and store it in player, and give it a colour. In draw(): paint the background every frame so the sprite can be seen clearly. What the starter file already had: `let player;` at the top, then an empty setup() and an empty draw() holding only step comments. A file with nothing but those comments meets none of the criteria.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Is there a line new Canvas(...) outside any comment that gives a width and a height as two numbers, like new Canvas(400, 400), new Canvas(450,450) or new Canvas (400,400)? Any size counts, and a missing semicolon is fine in JavaScript. new Canvas(400*400) passes only one number, so it does not count. Code inside comments never runs.",
+        "r2": "Is there a line new Sprite(...) outside any comment, like new Sprite(), new Sprite(200, 200, 40, 40), player = new Sprite(200,200,40,40) or new Sprite(200, 200, 40, 40).color = 'pink'? Any numbers or none count, with or without a variable to hold it, and a missing semicolon is fine in JavaScript. Code inside comments never runs.",
+        "r5": "Is a new Sprite(...) line written inside function setup() (or in a function of your own that setup() calls), and is there NO new Sprite(...) and NO new Canvas(...) inside draw(), update() or a function they call? draw() runs about 60 times a second, so a sprite made there piles up. new Sprite() with any numbers or none counts, with or without a variable. When a file has two function setup() blocks, the last one is the one that runs. Code inside comments never runs.",
+        "r3": "Set a sprite color: A sprite has a color. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Does the function draw() that runs have a clear() or background(...) line in it, directly or through update() or a function of your own that it calls? Either one wipes the last frame: clear() with nothing in the brackets, or background with any color, and a missing semicolon is fine. When a file has two function draw() blocks, only the LAST one in the file runs, and a draw() written inside the braces of setup() never runs; if the draw() that runs is empty, the answer is no. A helper that nothing calls does not count. Code inside comments never runs."
+      }
+    }
   },
   "5-1-18-lab-else-to-zero": {
     "lessonTitle": "5.1.19 Lab: Delete the else, watch drift",
@@ -9064,7 +9103,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "At least one movement line in draw() sets player.vel.x or player.vel.y to a speed other than 4 (or -4), so the sprite moves at a speed the student chose. 5.1.16 suggests 2 to 6, but any other speed that moves the sprite counts, including a decimal or a variable holding the speed. The lines that set the speed back to 0 are not a speed. If every movement line still uses 4, it is not met yet. Help: 5.1.16 (Movement pattern (if / else if / else))",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.19 Lab: Delete the else, watch drift\". The task they were given: The starter ships a working WASD movement pattern in draw(): for each direction, an if / else if chain sets player.vel.x (or player.vel.y) from the keys and ends in an else that sets it back to 0. The student deletes both else lines, watches the sprite drift, then puts both else lines back so the sprite stops when no key is held, and changes the speed of 4 (and -4) to a speed of their own, from 2 to 6. What the starter file already had: exactly that working pattern, with a speed of 4 on every movement line. Because the starter already has both else lines, the first two criteria read as met on the starter; the speed criterion is the one the starter does not meet.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Restore else player.vel.x = 0: trace one frame three times, statements in order (the last assignment wins): (1) only the left key held: vel.x ends negative; (2) only the right key held: it ends positive; (3) neither held: it ends at 0. Yes only if all three hold. Any form counts: the else at the end of the if / else if chain, a 0 set first, a ? : ending in 0, or (kb.pressing('d') - kb.pressing('a')) * 3 (a held key is 1, a free one 0, so neither gives 0). An else under a separate second if is NO: if (a) vel.x = -3; if (d) vel.x = 3; else vel.x = 0; (holding left: -3, then the else sets 0). Code in draw(), update() or a function they call counts; code in comments never runs.",
+        "r2": "Restore else player.vel.y = 0: trace one frame three times, statements in order (the last assignment wins): (1) only the up key held: vel.y ends negative; (2) only the down key held: it ends positive; (3) neither held: it ends at 0. Yes only if all three hold. Any form counts: the else at the end of the if / else if chain, a 0 set first, a ? : ending in 0, or (kb.pressing('s') - kb.pressing('w')) * 3 (a held key is 1, a free one 0, so neither gives 0). An else under a separate second if is NO: if (w) vel.y = -3; if (s) vel.y = 3; else vel.y = 0; (holding up: -3, then the else sets 0). Code in draw(), update() or a function they call counts; code in comments never runs.",
+        "r3": "Is player.vel.x or player.vel.y set to a number other than 4, -4 or 0 on a line that tests kb.pressing (for example -2, 2, 3, -5, 6, 1 or 10)? The starter only ever used 4, -4 and 0, so any other number on even one key line means the student picked a speed of their own. A plain else line does not count: else player.vel.y = 2 is not a key line. Code inside comments never runs."
+      }
+    }
   },
   "5-1-20-moshion-move-keys": {
     "lessonTitle": "5.1.20 Make it Move",
@@ -9129,7 +9177,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "r3": "Is the left or right key ('a', 'd', 'left' or 'right') read with kb.pressing (or similar) in code that runs every frame: draw(), update(), or a function either of them calls? Reading it only in setup() runs once and does not count; neither does code in a comment.",
         "r4": "Is the up or down key ('w', 's', 'up' or 'down') read with kb.pressing (or similar) in code that runs every frame: draw(), update(), or a function either of them calls? Reading it only in setup() runs once and does not count; neither does code in a comment.",
         "r5": "Trace one frame: when the left key is held the sprite's vel.x ends the frame negative, when the right key is held it ends positive, and when neither is held it ends at 0. Is that true? A later statement that resets vel.x (for example an else under a second, separate if) undoes the key, which means no. No reset to 0 at all means no.",
-        "r6": "Trace one frame: when the up key is held the sprite's vel.y ends the frame set one way, when the down key is held it ends set the other way, and when neither is held it ends at 0. Is that true? A later statement that resets vel.y (for example an else under a second, separate if) undoes the key, which means no. No reset to 0 at all means no.",
+        "r6": "Trace one frame three times, running the statements in order (the last assignment to vel.y wins): (1) only the up key held: vel.y ends non-zero; (2) only the down key held: vel.y ends non-zero with the other sign; (3) neither held: vel.y ends at 0. Yes only if all three hold, whatever form gives the 0 (else, else if (!w), if (!w && !s), a 0 set first). YES: if (w) vel.y = -4; else vel.y = 0; if (s) vel.y = 4; (down: the else sets 0, then the second if sets 4). NO: if (w) vel.y = -4; if (s) vel.y = 4; else vel.y = 0; (up: -4, then the else sets 0). No reset to 0 at all means no. Code inside comments never runs.",
         "r7": "Is background(...) called every frame, in draw(), update(), or a function either of them calls, so old frames do not pile up? A background() only in setup() means no."
       }
     }
@@ -9192,7 +9240,22 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "background(...) is called inside draw(), or in a function the student wrote that draw() calls, with any colour, so previous frames do not stack up. Help: 5.1.9 (background(color) wipe rule)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.23 Sprite Playground\". The task they were given: Make a canvas (any size from 300 by 300 to 800 by 600) and two sprites: player, which the keys control, and mover, which moves on its own. In draw(): paint the background every frame; move the player with kb.pressing and WASD or the arrow keys by setting its velocity, with an else that sets the velocity back to 0 when no key is held; make the mover move on its own with no key held, for example worked out from frameCount (swing back and forth, orbit or spin), nudged a little every frame, or given a velocity; and draw a text label on the canvas with fill(), textSize() and text(). What the starter file already had: `let player, mover;` at the top, then an empty setup() and an empty draw() holding only step comments. A file with nothing but those comments meets none of the criteria.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Is there a line new Canvas(...) outside any comment that gives a width and a height as two numbers, like new Canvas(500, 400), new Canvas(300,300) or new Canvas (1000, 1000)? Any size counts, and a missing semicolon is fine in JavaScript. new Canvas(400*400) passes only one number, so it does not count. Code inside comments never runs.",
+        "r2": "Create at least 2 sprites: Two sprites exist in the sketch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r9": "Make your sprite once, in setup(): new Sprite(...) is written in setup(), or in a function that setup() calls, and no new Sprite(...) or new Canvas(...) is in draw(), which runs about 60 times a second. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Horizontal keyboard input: The left or right key (`'a'`, `'d'`, `'left'` or `'right'`) moves the player horizontally each frame, in draw() or in a function of your own that draw() calls (not setup(), which runs once). update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Vertical keyboard input: The up or down key (`'w'`, `'s'`, `'up'` or `'down'`) moves the player vertically each frame, in draw() or in a function of your own that draw() calls (not setup(), which runs once). update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Velocity resets to zero: The player stops when no movement key is held, on both axes: vel.x and vel.y each go back to 0 (an else at the end of each chain, or 0 at the top of draw() before the key checks), and no else undoes a key, so the player can move all four ways. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "Automatic motion for the mover: The mover (any name, not the sprite the keys drive) moves on its own, by its own rule, with no key held: worked out from frameCount, nudged a little every frame (the way 5.1.9 nudged the player), or given a velocity or a rotationSpeed. A line that copies the player's speed, or one inside an if that tests a key, moves it only when a key does, so it does not count. Code inside a comment, or written inside quotes as text, never runs.",
+        "r7": "On-screen text label: A text label is drawn on the canvas each frame, in draw() or in a function of your own that draw() calls (not setup(), which runs once). update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r8": "Clear the background each frame: Previous frames don't stack up: background() is called in draw(), or in a function of your own that draw() calls. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-1-22-a10-2-frame-loop": {
     "lessonTitle": "5.1.24 Frame Loop Writeup",
@@ -9251,7 +9314,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "At least one of the five challenges is built and would really run in draw() (or update()): a held key changes the player's colour; a second sprite is placed around the player with cos and sin; a value is drawn with text(); a HUD of text() lines; or a sprite is moved up and down with sin. Other honest extras beyond a canvas, a sprite and a background also count, in draw() or a function the student wrote that draw() calls: a sprite that spins (rotation worked out from frameCount, or added to every frame, or a rotationSpeed set once in setup()), a sprite that grows, shrinks or pulses (its w, h or scale changed every frame), a sprite that wanders with random() or Math.random(), a fading trail (a see-through rgba background whose last number is below 1, or an array of past positions drawn with circle()), plain shapes such as circle() or rect(), the mouse's position, kb.presses(...), or a timer built from frameCount. Moving the player with the keys on its own is the earlier lab's job, not a challenge, so that alone is not met yet. Code in a function the student wrote counts only if draw() (or update()) calls it; a function nothing calls never runs.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.25 Challenges\". The task they were given: In setup(), make a canvas of any size and at least one sprite, the player. Call background() as the first line of draw(). Then build at least one of five challenges in draw(): (1) while an arrow key is held, the player wears a different colour; (2) a second sprite circles the player, placed with cos and sin of frameCount; (3) one of the player's values is drawn on the canvas with text(); (4) a HUD at the top shows the frame count on one line and the player's x and y on the next; (5) a sprite bobs up and down on its own, placed with sin of frameCount. The step also offers an idea of their own, such as a player that spins with rotation worked out from frameCount, or a fading trail made by painting the background with a see-through rgba colour (its last number below 1). The starter's comments also suggest moving the player with the keys, but that is not one of the challenges. What the starter file already had: a top-level `let player;` (declared, not yet a sprite), a setup() with only comments (no canvas, no sprite) and a draw() that already calls background('#222') followed by step comments. The student may add more variables of their own. On the starter only the background criterion is met.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Create a canvas: A canvas is created when the sketch starts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Create at least one sprite: A sprite exists in the sketch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Background set each frame: Calls background() inside draw(), or in a function of your own that draw() calls, with a colour of the student choosing. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Use at least one advanced feature: a technique beyond canvas + sprite + background, in draw() or a function draw() calls: one of the five challenges, or your own idea, such as a spin (rotation, or a rotationSpeed set once in setup()), a fading trail, a timer on frameCount, or a sprite that grows (player.w += 1, even only while a key is held), pulses or wanders. Moving the player with the keys, on its own, does not count. A colour set the same every frame with no if around it (player.color = 'red' alone) never changes, so it does not count; a colour changed under an if (a key, a frameCount timer) counts. Code in update() counts too. Code inside comments, or inside quotes as text, never runs."
+      }
+    }
   },
   "5-1-25-math-grid": {
     "lessonTitle": "5.1.26 Lab: A grid like math (optional)",
@@ -9281,7 +9354,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "showMouse() is called inside draw(), or in a function the student wrote that draw() calls, so the pointer's (x, y) is written beside it every frame.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.26 Lab: A grid like math (optional)\". The task they were given: An optional lab. In draw(), after the background, call showGrid(50) to draw a grid. In setup(), on the line right after new Canvas(400, 400), switch on math mode with world.origin set to 'math', so (0, 0) is the centre and y grows up. Below that, still in setup(), make a sprite at (100, 50), 40 by 40, and store it in box. In draw(), call showMouse() so the pointer's (x, y) shows beside it. What the starter file already had: `let box;` at the top, a 400 by 400 canvas in setup(), and background('#222') in draw(), with step comments and nothing else. The starter meets none of the criteria.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Is a grid drawn every frame, in draw() (or update(), or a function of your own that one of them calls)? Either showGrid(50) with any spacing, or loops of line(...) that cover the WHOLE canvas, like for (let x = -200; x <= 200; x += 50) line(x, -200, x, 200); and the same for y. With world.origin = 'math', (0, 0) is the centre and the canvas runs from -200 to 200, so hand-drawn lines that only run from 0 to width cover one quarter of it and do not count. showGrid() only in setup(), or in a helper nothing calls each frame, does not count. Code inside comments never runs.",
+        "r2": "Switch on math mode: The sketch sets world.origin to 'math'. Single quotes, double quotes or backticks all count. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A sprite above the centre: A sprite is made with a positive second number, its y, such as new Sprite(100, 50, 40, 40). A variable holding the y, or a sum such as 25 * 2, counts too. In math mode a positive y is above the centre. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Does draw() (or update(), or a function of your own that one of them calls) write the pointer's position beside it every frame? Either showMouse(), or a text(...) that prints the mouse's x and y (mouse.x and mouse.y, mouseX and mouseY, round(...) of them, or numbers worked out from them) at or near the pointer, like text(`(${mouseX}, ${mouseY})`, mouseX + 10, mouseY - 10) or text('x:' + Math.round(mouse.x) + ' y:' + Math.round(mouse.y), mouse.x, mouse.y). showMouse() only in setup(), or in a helper only setup() calls, does not count. Code inside comments never runs."
+      }
+    }
   },
   "5-1-7-lab-one-sprite": {
     "lessonTitle": "5.1.7 Exploration: Move, resize and recolor a sprite",
@@ -9305,7 +9388,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The sprite's colour is set to something other than 'tomato': any colour name, hex code or other colour value the sketch can show counts. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.1.7 Exploration: Move, resize and recolor a sprite\". The task they were given: Start from a sketch that already works and change its numbers, one at a time: move the sprite away from the centre by changing the first two numbers in new Sprite(...), change its size with the last two numbers, and give it a colour other than tomato. There is no new code to write. What the starter file already had: a 360 by 360 canvas and one sprite made at x 180, y 180 (the centre), 60 wide and 60 tall, coloured 'tomato', and a dark background in draw(). Those starting values are not a change, so the starter meets none of the criteria.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "The starter has new Sprite(180, 180, 60, 60): the FIRST two numbers are its x and y, and (180, 180) is the center. Look only at those first two numbers. Is either of them anything other than 180? new Sprite(60, 60, 140, 30), new Sprite(100, 80, ...), new Sprite(180, 181, ...), new Sprite(-20, 50.5, ...) or new Sprite(random(360), random(360), ...) all count. new Sprite(180, 180, 20, 90) does NOT count: its size changed but it still sits at the center. Code inside comments never runs.",
+        "r2": "The starter has new Sprite(180, 180, 60, 60): the LAST two numbers are its width and height, 60 by 60. Look only at those last two numbers. Is either of them anything other than 60? new Sprite(183, 190, 61, 60) counts (61 is not 60), and so do new Sprite(..., 140, 30), new Sprite(..., 10, 60) and new Sprite(..., 40.5, 40.5). new Sprite(100, 80, 60, 60) does NOT count: it moved but it is still 60 by 60. Code inside comments never runs.",
+        "r3": "Recolored the sprite: Give the sprite a color other than tomato. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-10-defender-2-lab-a-field-of-enemies": {
     "lessonTitle": "7.6.2 Lab: A field of enemies",
@@ -9341,7 +9433,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Inside that landing if, the enemy's sprite is deleted (.delete() or .remove()) and index j is spliced out of enemies, enemyHp AND enemyWorth (or a removeEnemy(j) helper that does those four things is called there). Missing only the delete is partial: the enemy would stay stuck on the base. Splicing only one or two of the three arrays is not met.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.6.2 Lab: A field of enemies\". The task they were given: spawnOnBeat() already asks spawnEnemy(x, y, hp) for an enemy every 60 frames. Fill in spawnEnemy: build a 30 by 30 sprite at (x, y) with collider 'none', coloured orange when hp is more than 1 and crimson otherwise, with its hp written on it as text, then push the sprite onto enemies, hp onto enemyHp and hp * 10 onto enemyWorth. Then, in moveEnemies(), loop over enemies from the end to the start: move each one down by fallSpeed, and when one's y is more than BASE_Y, take 1 from baseHp, delete its sprite and splice index j out of all three arrays.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "spawnEnemy builds a pass-through sprite: spawnEnemy makes a new sprite and sets its collider to 'none', so shots and enemies pass through each other. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "One push per array: spawnEnemy pushes onto enemies, enemyHp and enemyWorth, so index j is the same enemy in all three. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Enemies fall: moveEnemies moves each enemy down by adding to its y. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "A landing costs the base 1: Inside an if that tests an enemy's y against BASE_Y, baseHp goes down by 1. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "A landed enemy leaves the screen and all three arrays: Inside the landing if, next to baseHp going down, the sprite is deleted and index j is spliced out of enemies, enemyHp and enemyWorth (or a removeEnemy helper that does it is called there). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-10-defender-3-plan-the-hit-loop": {
     "lessonTitle": "7.7.1 Plan: The hit loop in plain words",
@@ -9409,7 +9512,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Inside the overlap if, once the shot is spliced, the inner loop stops (break, return, or a flag that ends the inner loop), so the spliced shot's index is never read again. With no way out, the next pass reads bullets[i], which is now another shot or nothing: not met.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.7.3 Lab: Shoot them down\". The task they were given: Shots fly straight through the enemies. All the work is in hitEnemies(), which draw() already calls. Loop over bullets from the end to the start and, inside it, over enemies from the end to the start. When bullets[i] overlaps enemies[j]: delete the shot and splice it out of bullets; take 1 from enemyHp[j] and show the new number on the enemy; if that leaves enemyHp[j] at 0 or less, add enemyWorth[j] to score, delete the enemy's sprite and splice index j out of all three arrays; and end with break, because that shot is gone.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Every shot is tested against every enemy: hitEnemies has a loop over bullets and, inside it, a loop over enemies (either way round), and tests them with overlaps. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A hit removes the shot: The shot that hit is deleted from the screen and spliced out of bullets. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A hit takes 1 hp: Inside the if that sees the overlap, and before its break, enemyHp[j] goes down by 1 (a line after the break never runs). Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "At 0 hp the enemy scores its worth and leaves all three arrays: When enemyHp[j] reaches 0, score goes up by enemyWorth[j] BEFORE the splices (after them, index j is a different enemy) and before the break, then index j is spliced out of enemies, enemyHp and enemyWorth (in hitEnemies, or in a removeEnemy helper it calls). Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "A shot that hit is not tested again: Inside the if that sees the overlap, the inner loop stops with break (or return), so a shot that has been spliced out is never read again. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-10-defender-7-lab-waves": {
     "lessonTitle": "7.8.2 Lab: Waves",
@@ -9439,7 +9553,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "spawnWave() raises wave by 1 (+= 1, ++, or = wave + 1) and calls spawnEnemy(...) inside a for or while loop, so the number of enemies can grow with the wave. Calling spawnEnemy a fixed number of times by hand, with no loop, is partial.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.8.2 Lab: Waves\". The task they were given: Enemies now come in waves. In startRound(), set wave to 0 and wavePause to 60. In nextWave(), return straight away while any enemies are left; otherwise count wavePause down by 1, and when it reaches 0 call spawnWave() and set wavePause back to 90. In spawnWave(), add 1 to wave, make each wave fall a little faster than the last, and loop wave + 2 times, building each enemy with spawnEnemy(...), every third one a tough one with 3 hp.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Every round starts at wave 0 with a pause: startRound sets wave to 0 and gives wavePause a number of frames (a number, or a named constant). Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The pause counts down only on a clear field: nextWave counts wavePause down by 1 only on a clear field: it returns while any enemies are left, as 7.8.1 does (or, as in 7.3.18, starts a wave only when the field is clear on a frameCount beat). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "At 0 the next wave comes and the pause starts again: When wavePause reaches 0, nextWave calls spawnWave() and sets wavePause back to a number above 0 (or a named constant). Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "A wave adds 1 to the wave number and builds its enemies in a loop: spawnWave adds 1 to wave and calls spawnEnemy inside a loop. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-10-defender-8-debugging-the-enemy-that-would-not-die": {
     "lessonTitle": "7.8.3 Debugging: The enemy that would not die",
@@ -9457,7 +9581,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "In the kill (the if in hitEnemies() that sees an enemy's hp reach 0), index j is spliced out of enemies, enemyHp and enemyWorth (directly, or through a removeEnemy(j) helper that splices all three). The starter already does this, so it stays met unless the student's changes broke it, for example by deleting one of those splices or by calling a helper that is missing one.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.8.3 Debugging: The enemy that would not die\". The task they were given: The editor holds the finished Part B game with one line missing. After an enemy lands on the base, the labels in the next wave are wrong: a crimson 1 takes three shots and an orange 3 dies in one, and nothing crashes. The two places that remove an enemy, the landing in moveEnemies() and the kill in hitEnemies(), must each splice all three parallel arrays at the same index. Find the missing line and add it. Optionally, move the removal lines into function removeEnemy(j) and call it from both places.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A landed enemy leaves all three arrays: The landing in moveEnemies splices enemies, enemyHp and enemyWorth at the same index j, together (or calls a removeEnemy helper that does). Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A shot-down enemy leaves all three arrays: The kill in hitEnemies (or a removeEnemy helper it calls) splices enemies, enemyHp and enemyWorth. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-10-flappy-sub-gravity-and-a-tap": {
     "lessonTitle": "5.10.4 Sub-build: Gravity and a tap",
@@ -9476,7 +9608,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The key press sets vel.y to a negative number (or applies an upward force); it does not set y directly.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a short moSHion sketch for \"Sub-build: Gravity and a tap\". The task: turn gravity on in setup() and set the bird's vel.y to a negative number on a key press, so one tap reverses a fall. This is a sub-build: a small isolated program whose only job is this one mechanic. Accept any names, helpers, arrow functions and ternaries. A line only in a comment or string does not count. Use short, plain notes for a 14-year-old, name their own line when something is missing, never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Gravity is on: The world has gravity above 0, so sprites fall. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A tap goes up: A key press sets a negative vel.y, so the bird climbs. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-11-defender-2-plan-draw-the-classes-first": {
     "lessonTitle": "7.9.2 Plan: Draw the classes first",
@@ -9550,7 +9690,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Once a frame (clearEnemies() or a function like it that draw() calls while playing), every finished enemy's sprite is removed from the screen (e.remove(), or e.sprite.delete()) and then the finished enemies are dropped from the list (enemies = enemies.filter(...) keeping the living), in that order. A loop from the end to the start that removes and splices each finished enemy does the same job and is met. Filtering first and removing after is not met: the finished sprites are left behind on screen. A clear-up function that nothing calls is not met.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.9.4 Lab: Enemy takes over\". The task they were given: The game is Part B's with a new Enemy class nothing uses yet. Fill in Enemy's three empty methods: takeHit(n) takes n off this.hp, puts it back to 0 if it went below, and shows the new hp on the sprite; isAlive() returns whether this.hp is above 0; land() sets this.hp to 0. Make spawnEnemy push one new Enemy(x, y, hp, fallSpeed) into enemies, and delete enemyHp and enemyWorth everywhere. Make the scene ask the enemy: in moveEnemies() each enemy moves itself, and one that is alive and has reached the base costs the base 1 and calls land(); in hitEnemies() a hit tests the enemy's sprite and asks isAlive() first, then calls takeHit(1) and, when that leaves it not alive, adds its worth to score. Last, write clearEnemies(): first remove() every enemy that is not alive, then keep only the living in enemies with filter; call it last inside if (playing) in draw(). The game must play exactly as before.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "takeHit lowers hp, never below 0: takeHit(n) takes n off this.hp, then brings this.hp back to 0 if it went below (an if, or Math.max). Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "isAlive answers from hp: isAlive() returns true while this.hp is above 0 and false at 0. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "land() uses the enemy up: land() sets this.hp to 0, so the enemy is finished and the reap takes it away. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "One array of Enemy objects; enemyHp and enemyWorth are gone: Enemies are made with new Enemy(...) and kept in the one enemies array; no line names enemyHp or enemyWorth any more (setup, spawnEnemy, moveEnemies, hitEnemies and startRound all included). Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "The scene asks the enemy: The game calls the enemy's own methods: in hitEnemies() a hit asks e.isAlive() first and then calls .takeHit( (so a finished enemy cannot be scored twice), and a landing calls .reachedBase() and .land(). Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "Finished enemies leave the screen and the list: in a function that runs every frame (such as clearEnemies() called from draw()), each enemy that is not alive gets remove() called on it (the Enemy class's own remove(), which deletes its sprite, counts, as does e.sprite.remove() or e.sprite.delete()), and then enemies = enemies.filter(...) keeps only the living ones. Both are needed, remove() before the filter: a filter that runs first leaves the finished sprites on the screen. Any variable names, a for...of loop or forEach. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-11-defender-5-lab-bullet": {
     "lessonTitle": "7.10.1 Lab: Bullet, and a hit that takes an enemy",
@@ -9592,7 +9744,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Once a frame (clearFinished() or a function like it that draw() calls while playing), every finished shot's sprite is removed (b.remove(), or b.sprite.delete()) and then the finished shots are dropped from bullets (bullets = bullets.filter(...) keeping the living), in that order. A loop from the end to the start that removes and splices each finished shot is met too. Filtering first is not met: the sprites stay on screen. No clear-up for shots at all is not met.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.10.1 Lab: Bullet, and a hit that takes an enemy\". The task they were given: Shots become Bullet objects. In the Bullet class write isAlive() (true while this.spent is false AND this.sprite.y is more than -20), hits(enemy) (true when this shot is alive, that enemy is alive, and this sprite overlaps the enemy's sprite; it answers the question and changes nothing) and spend() (sets this.spent to true). Make fire() push a new Bullet built just above the ship onto bullets, and make moveBullets() just ask every shot to move(). Rewrite hitEnemies() as every shot against every enemy: if the shot hits the enemy, spend the shot, call takeHit(1) on the enemy and, when that leaves it not alive, add its worth to score, with no splice and no break. Rename clearEnemies() to clearFinished() and give it the same two parts for bullets (remove() the finished ones, then filter the living into bullets), above the part for enemies; startRound() calls remove() on each shot.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A bullet is alive while not spent and on screen: Bullet's isAlive() looks at this.spent and at this.sprite.y: true while the shot is not used up and still on the canvas. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "hits(enemy) asks about the other object's sprite: hits(enemy) returns whether this shot's sprite overlaps the sprite of the enemy it was handed, and only while this shot and that enemy are both alive (a spent shot must not hit again). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "spend() marks the shot used: spend() sets this.spent to true. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "fire() builds a Bullet: fire() makes its shot with new Bullet(...) instead of a bare sprite, and pushes it onto bullets (a Bullet that is never pushed is never moved or seen). Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "The hit loop asks the bullet: hitEnemies() asks the shot .hits( an enemy, and calls .spend() on it when it does. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "Finished shots leave the screen and the list: Once a frame, every finished shot is removed from the screen (remove()) and then dropped from the list (bullets = bullets.filter(...)), in that order, as the enemies already are. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-11-defender-6-lab-a-spawner-for-the-waves": {
     "lessonTitle": "7.10.2 Lab: A Spawner for the waves",
@@ -9634,7 +9798,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "wavePause, spawnWave() and nextWave() no longer appear in running code (a mention in a comment is fine), and the HUD in drawTop() reads spawner.wave instead of the old wave. A drawTop() that still reads the bare wave is not met: once the old variable is gone it stops the game with 'wave is not defined'. A leftover nextWave() or spawnWave() that is still called is not met; one left defined but never called is partial.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.10.2 Lab: A Spawner for the waves\". The task they were given: The waves move into a new Spawner class that keeps this.wave and this.pause. Write ready(enemiesLeft): answer false while enemiesLeft is above 0; otherwise count this.pause down by 1 and answer whether it has reached 0. Write makeWave(): add 1 to this.wave, set this.pause back to 90, work out the speed from this.wave, build the wave's enemies with new Enemy(...) into a new array in a loop, and return that array. In draw(), replace nextWave() with: when spawner.ready(...) says yes, enemies = spawner.makeWave(). In startRound(), the old wave lines become spawner = new Spawner(). Delete the old wave variables, spawnEnemy(), spawnWave() and nextWave(), and make the HUD in drawTop() read spawner.wave. Last, give Enemy a static spawned counter that starts at 0, add 1 to it in Enemy's constructor, set it back to 0 in startRound(), and show it on the game-over screen.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "ready() counts down only on a clear field: ready(enemiesLeft) answers false while enemies are left, and only on a clear field counts this.pause down by 1. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "makeWave() builds and returns a new array of enemies: makeWave() adds 1 to this.wave, builds the wave's enemies with new Enemy(...) and returns them. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "draw() asks the spawner: The game asks spawner.ready(...) and, when it says yes, keeps what spawner.makeWave() gives back (enemies = spawner.makeWave()). Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "A restart is a new Spawner: startRound() sets spawner = new Spawner(), so the wave and the pause start again together. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "The class counts its enemies, and a round resets the count: Enemy has static spawned = 0, its constructor adds 1 to Enemy.spawned, and startRound() sets Enemy.spawned back to 0. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "The old wave globals are gone: wavePause, spawnWave() and nextWave() are deleted, and the HUD in drawTop() reads spawner.wave instead of the old wave: the Spawner class does their jobs now. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-11-defender-7-playtest-and-reflect": {
     "lessonTitle": "7.11.1 Playtest and reflect: Defender",
@@ -9678,7 +9854,14 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "At least ONE of the three challenges really works in the code: (1) a best value that survives a restart (startRound() does not reset it) and is raised to the score when a round ends with a higher score (if (score > best) best = score, or Math.max, in any shape); (2) on every fifth wave (a % 5 test on the wave number, any shape) makeWave() adds one more Enemy to the array it returns; (3) a Ship class that keeps its own cooldown (this.cooldown) and does the moving or firing, with the scene using that class. Other numbers, colours or speeds than the suggested ones are fine. A best that startRound() sets back to 0 is not met: it never survives R. A boss that is built but never reaches the wave is not met. A different rule of the student's own, with none of the three, is partial: say this card looks for one of the three.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.11.4 Challenges: Make it yours\". The task they were given: The game is complete. Pick ONE of three challenges and add it (an idea of the student's own on top is welcome). Challenge 1, a best score: a variable best that startRound() never resets, raised when a round ends if the score beat it, and shown in drawTop(). Challenge 2, a boss wave: in makeWave(), on every fifth wave, push one more Enemy into the wave before it is returned, with 10 hp, half the wave's speed and a purple sprite. Challenge 3, a Ship class: a class Ship with its own this.sprite and this.cooldown, whose move() and fire() replace moveShip() and fire(), where fire() gives back a new Bullet or null and the scene pushes it. Then write one // comment at the top saying what the rule is.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Your rule is in the code: One of the three challenges is there: a best score kept across rounds, a boss on every fifth wave (this.wave % 5 === 0), or a Ship class that owns this.cooldown. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-11-defender-sound-lab-sound-effects": {
     "lessonTitle": "7.11.3 Lab: Sound effects",
@@ -9702,7 +9885,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A sound's .play() runs on the hit that finishes an enemy: in Enemy's takeHit() under an if that asks !this.isAlive() or this.hp <= 0 (or after an early return while the enemy is still alive), or in hitEnemies() inside the if that sees the enemy is no longer alive. A .play() inside isAlive() is not met: isAlive() is asked many times a frame. A .play() on every hit with no check is partial: it also plays on hits that do not finish the enemy.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.11.3 Lab: Sound effects\". The task they were given: The game is the 7.10.2 game with no sound. Make two sound variables and, in setup(), load each with loadSound and one of the course's built-in sounds by name, 'coin' or 'music' (the full paths '/moshion/assets/coin.wav' and '/moshion/assets/music.wav' load the same files and count the same; volume and rate can be changed). Play one sound once for every shot, as the last line of Bullet's constructor; and in Enemy's takeHit(n), after the hp line, play the other only when that hit leaves the enemy not alive. A mute key with masterVolume() is optional and has no criterion.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Sounds are loaded once, in setup(): setup() loads a sound into a variable with loadSound('coin') or loadSound('music') (the full path '/moshion/assets/coin.wav' counts too), so it is ready before the game needs it. Any variable name works. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A shot makes a sound: A sound's .play() runs once for every shot: in Bullet's constructor, or right beside new Bullet(...) in fire(). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A finished enemy makes a sound: A sound's .play() runs when a shot finishes an enemy: in Enemy's takeHit(), or under an if that asks the enemy isAlive() or about its hp. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-11-flappy-sub-spawn-and-recycle": {
     "lessonTitle": "5.11.2 Sub-build: Spawn and recycle",
@@ -9721,7 +9913,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Each pipe gets a negative vel.x (or x is decreased every frame).",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a short moSHion sketch for \"Sub-build: Spawn and recycle\". The task: create pipes on a timer (every or after), push each into an array with a negative vel.x, and remove off-screen pipes from both the screen (delete) and the array (splice), looping backwards. This is a sub-build: a small isolated program whose only job is this one mechanic. Accept any names, helpers, arrow functions and ternaries. A line only in a comment or string does not count. Use short, plain notes for a 14-year-old, name their own line when something is missing, never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Made on a timer: A timer (every/after, or frameCount %) creates pipes, not draw() every frame. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Gone from screen and list: An off-screen pipe is deleted and spliced out of the array. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-12-flappy-sub-score-once": {
     "lessonTitle": "5.12.1 Sub-build: Score once per pipe",
@@ -9740,7 +9940,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A flag on the pipe is checked before scoring and set after, so each pipe scores once.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a short moSHion sketch for \"Sub-build: Score once per pipe\". The task: in a loop over the pipes, compare the bird's x with each pipe's x, add 1 to the score only when the pipe has not been counted, and mark that pipe as counted. This is a sub-build: a small isolated program whose only job is this one mechanic. Accept any names, helpers, arrow functions and ternaries. A line only in a comment or string does not count. Use short, plain notes for a 14-year-old, name their own line when something is missing, never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "The pass is detected: The bird's x is compared with a pipe's x, in a loop over the pipes. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Counted once: A per-pipe flag is set after counting, so the same pipe cannot score twice. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-13-snake-sub-step-on-a-grid": {
     "lessonTitle": "5.13.4 Sub-build: Step on a grid",
@@ -9759,7 +9967,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "x changes by a cell-sized step, not by 1 or by velocity.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a short moSHion sketch for \"Sub-build: Step on a grid\". The task: move a block exactly one cell on a timer created in setup(), by adding a cell-sized constant to x, and keep it on the canvas. This is a sub-build: a small isolated program whose only job is this one mechanic. Accept any names, helpers, arrow functions and ternaries. A line only in a comment or string does not count. Use short, plain notes for a 14-year-old, name their own line when something is missing, never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "It steps on a beat: A timer (every or after) moves the block, not draw() every frame. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "One whole cell: The move changes x by a cell-sized step (a constant, or 20/24/25). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-14-snake-sub-one-longer-snake": {
     "lessonTitle": "5.14.2 Sub-build: One longer snake",
@@ -9778,7 +9994,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Adding a segment is unshift/push of a new cell; the tail is not dropped when growing.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a short moSHion sketch for \"Sub-build: One longer snake\". The task: keep the snake's body in an array, add the head's previous cell to it on every step, and draw every segment with a loop. This is a sub-build: a small isolated program whose only job is this one mechanic. Accept any names, helpers, arrow functions and ternaries. A line only in a comment or string does not count. Use short, plain notes for a 14-year-old, name their own line when something is missing, never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A body in an array: Segments are kept in an array and added to as the snake moves. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Drawn in a loop: The body array is read in a loop to draw the segments. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-15-snake-sub-own-tail": {
     "lessonTitle": "5.15.2 Sub-build: Am I in my own tail?",
@@ -9797,7 +10021,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A loop checks all body segments, not just the first.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a short moSHion sketch for \"Sub-build: Am I in my own tail?\". The task: before the snake moves, loop over the body and compare each segment with the cell the head is about to enter, and set a lost flag when they match. This is a sub-build: a small isolated program whose only job is this one mechanic. Accept any names, helpers, arrow functions and ternaries. A line only in a comment or string does not count. Use short, plain notes for a 14-year-old, name their own line when something is missing, never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A loop over the body: Every segment is tested against the head's next cell. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The round ends: A lost/over flag is set when the head meets the body. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-2-11-lab-reaching-the-goal": {
     "lessonTitle": "5.2.23 Lab: Reaching the Goal",
@@ -9827,7 +10059,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "After deleting, goal is set to null (or another empty value the guard treats as false, such as undefined), so the win check can never fire twice. Help: 5.2.21 (Reading: Cleanup and Delete)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.23 Lab: Reaching the Goal\". The task they were given: At the bottom of draw(), add an if that checks goal, so the win check only runs while the goal still exists. Inside it, work out the distance from the player to the goal: dx is the gap left to right between their x values, dy the gap up and down, and the distance is the square root of dx times dx plus dy times dy, kept in a variable. Still inside it, when the distance is less than 25, log a win message, delete the goal with goal.delete(), and set goal to null so the check can never run again. What the starter file already had: the finished scene: gravity, a player moved with a and d, a space-bar jump gated on the ground, a wind zone, walls, the ground, and a gold goal sprite stored in goal. The win check is not written yet, so the starter meets none of the criteria.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Guard the check on the goal still existing: The win check is wrapped in if (goal) so it stops running once the goal is gone. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Compute the distance and test it: The distance between player and goal is worked out from their positions (Math.sqrt(dx * dx + dy * dy), ** 0.5, Math.hypot(dx, dy), dist(...), or player.distanceTo(goal)) and is what the if tests: dist < 25. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Delete the goal on arrival: When the player reaches the goal, goal.delete() (or goal.remove()) is called. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Clear the goal variable: After deleting, goal is set to null so the win check can never fire twice. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-2-13-a5-2-1-pinball-scene": {
     "lessonTitle": "5.2.24 Pinball Scene",
@@ -9857,7 +10099,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Pressing a key repositions the ball (sets its x and/or y) so a lost ball can be brought back to the top. Help: 5.2.12 (Reading: Ground-Gated Actions)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.24 Pinball Scene\". The task they were given: Build a pinball-style scene: static obstacles, a bouncy ball, gravity, and a reset key.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Turn on gravity: world.gravity.y is set to a non-zero value. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Add at least three static obstacles: At least three 'static' sprites exist in the scene. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Make the ball genuinely bouncy: The ball's bounciness is set to 0.8 or more. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Add a reset key: Pressing a key repositions the ball (sets its x and/or y) so a lost ball can be brought back to the top. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-2-14-a5-2-2-vel-vs-applyforce": {
     "lessonTitle": "5.2.25 Vel vs applyForce",
@@ -9915,7 +10167,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "'All goals collected!' (any close wording) is printed with console.log from inside an if that only becomes true once both goals are gone. The step also asks for it to print only once: if nothing stops that if from staying true, it would print on every frame. Still mark this card met in that case, but say so in the note. Printing after only one goal is not met. Help: 5.2.23 (Lab: Reaching the Goal)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.26 Challenges: Optional Stretch\". The task they were given: Starting from the one-goal scene of 5.2.23, add a second goal sprite somewhere harder to reach and give it its own distance check in draw() that deletes it, the same shape as the first goal's check. Keep track of when both goals are gone (a counter that goes up by one per goal, or a test that both goal variables are gone), and print 'All goals collected!' with console.log only after both goals are gone, and only once. What the starter file already had: the one-goal scene: player, ground, walls, wind zone and jump, and one gold goal stored in goal with its own guarded distance check that logs a win, deletes it and sets it to null. That first check and its delete() were already in the starter, so on their own they do not meet the second-goal criteria. The starter meets none of the criteria.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Add a second goal sprite: A second goal sprite is created, so the scene has two goals as well as the player. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Give the second goal its own check: Each goal has its own distance check that deletes it, so the code calls .delete() for both goals. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Track collection progress: Your code knows when both goals are gone, either way content.md describes: a counter that goes up (or down) by one per goal and is then checked (collected === 2), or a check that both goal variables are gone (goal1 === null && goal2 === null, or !goal1 && !goal2). Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Is the finish message All goals collected (any capitals, with or without the !) printed with console.log inside an if about both goals? YES: if (collected === 2) { console.log('All goals collected!'); } YES: if (counter >= 2) console.log(\"All goals collected!\") YES: if (goal === null && goal2 === null) { console.log('all goals collected') } NO, other words: 'You win!', 'You Win!', 'All collected!', 'you found them all!'. The starter's 'You win!' for one goal does not count. Code inside comments never runs."
+      }
+    }
   },
   "5-2-3-lab-tune-gravity": {
     "lessonTitle": "5.2.10 Lab: Tune Gravity",
@@ -9927,7 +10189,14 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The world.gravity.y line that runs holds a value other than the starter's 10 (0, -5, 20 or any other value counts). A value written only in a note does not change the gravity. One exception: if the line is back at 10 but the student's own notes clearly describe what several other values did, they did the trying the lab asks for, so count it. Help: 5.2.8 (Reading: Gravity)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.10 Lab: Tune Gravity\". The task they were given: Try world.gravity.y at 10, then 0, then -5, then 20, running the sketch after each change, and write one sentence per value as a // comment at the bottom of the code saying how the player moved: did it fall, float or drift upward, fast or slow? There is no single right value. What the starter file already had: world.gravity.y set to 10 in setup(), a player moved with a and d, a static ground, a gold goal block, and a comment at the bottom that explains the task. That comment is the starter's instructions, not the student's notes.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Find the line world.gravity.y = N that is not inside a comment. Is N any number other than exactly 10? Every other number means yes: 0, 1, 5, 9, 15, 20, 80, 90, 100, 5000, -5 or -10 (20 counts even though the starter's closing comment also names 20). Only exactly 10 means no. Numbers that appear only in a comment do not count. Code inside comments never runs."
+      }
+    }
   },
   "5-2-5-lab-add-a-jump": {
     "lessonTitle": "5.2.13 Lab: Add a Jump",
@@ -9957,7 +10226,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Inside draw(), when the jump fires, the player's vel.y is set to a negative number (or a variable holding one), so the player goes up. A positive number pushes it down, which is the opposite, and setting it on every frame with no jump test makes it fly away, so neither is met. Help: 5.1.15 (Velocity: vel.x and vel.y)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.13 Lab: Add a Jump\". The task they were given: In draw(), make the player jump: when the jump key is pressed (an edge-triggered check that fires once per press) AND the player is touching the ground, set the player's vertical velocity to a negative number so it launches upward. What the starter file already had: gravity at 10, a player moved with a and d, a static ground, and a comment where the jump goes. The starter meets none of the criteria.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Use an edge-triggered key check: The jump key uses kb.presses(...), which fires once per press. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Check that the player is on the ground: Somewhere in the sketch, the player is checked against another sprite with .colliding(...). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Is the jump guarded by BOTH the key press and a ground check at once, joined with && (or one if nested inside the other)? Yes: if (kb.presses(' ') && player.colliding(ground)); else if (player.colliding(ground) && kb.presses('space')); if (kb.presses(' ')) { if (player.colliding(ground)) ... }; a ground flag works too: if (player.colliding(ground)) canJump = true; with if (kb.presses(' ') && canJump). No: two separate ifs that can each launch on their own, or the checks joined with || instead of &&. Code inside comments never runs.",
+        "r4": "When the jump fires, is the player's vel.y made negative so it goes up? Each of these is yes: player.vel.y = player.vel.y - 2 (subtracting from vel.y counts, even without spaces: player.vel.y=player.vel.y-2); player.vel.y = -5; player.vel.y = -7; a variable holding a negative number. The jump line may sit inside any if or else if, including an else if added to the a / d key chain, in draw() or update(). No: no vel.y change in the jump, or vel.y set to a positive number. Code inside comments never runs."
+      }
+    }
   },
   "5-2-9-lab-wind-zone": {
     "lessonTitle": "5.2.19 Lab: Wind Zone",
@@ -9981,7 +10260,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The force's second number (fy) is negative, straight in the call or through a variable holding a negative number, so the wind pushes up against gravity. Any size counts. A positive fy pushes down along with gravity, which is the opposite, so it is not met. Help: 5.2.18 (Forces vs Velocity)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.19 Lab: Wind Zone\". The task they were given: In draw(), add a wind zone: when the player's y position is above the zone line (the starter's comment uses y less than 200), call applyForce on the player with an upward force (a negative second number), so it pushes back against gravity instead of overriding the fall. What the starter file already had: gravity at 10, a player moved with a and d that jumps with the space bar from the ground, a static ground and two static side walls. The starter meets none of the criteria.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Use applyForce on the player: The player is pushed with .applyForce(fx, fy) somewhere in the sketch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Only apply the force inside a zone: The applyForce call is guarded by an if with a comparison (braces optional), not called unconditionally every frame. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The wind pushes up: The force's second number (fy) is negative, so the wind pushes the player up against gravity: applyForce(0, -3). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-2-random-3-lab-random-spot-and-colour": {
     "lessonTitle": "5.2.4 Lab: A random spot and colour",
@@ -10017,7 +10305,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "coin.color is set to an item of the colors list: read with square brackets and a position (a variable or an expression), or picked with random(colors). Setting one fixed colour is not met. Help: 5.2.2 (Reading: Random numbers and timers)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.4 Lab: A random spot and colour\". The task they were given: draw() already has a block that runs once a second, an if that tests frameCount % 60 === 0. Inside it: set coin.x to a random number from 30 to 370 and coin.y to a random number from 30 to 270, so the coin jumps somewhere new but stays fully on the 400 by 300 canvas; set roll to a random whole number from 1 to 6 (it is shown in the corner); and pick a random position in the colors list (a whole number from 0 up to the last position, using the list's .length so it keeps working if a colour is added), then set coin.color to the colour at that position. What the starter file already had: the canvas, the coin, a five-colour list called colors, roll starting at 0, the text that shows roll, and the empty once-a-second block with step comments. The starter meets none of the criteria.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "The coin gets a random x: The x position comes from random(...), straight on the line or through a variable first. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The coin gets a random y: The y position comes from random(...), straight on the line or through a variable first. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The die is a whole number from 1 to 6: the roll can come out as every one of 1, 2, 3, 4, 5 and 6, and never 0 or a decimal. random(a, b) gives a decimal from a up to but NOT including b, so floor(random(1, 6)) and int(random(1, 6)) are never 6 and do not count, floor(random(6)) alone gives 0 to 5, and random(1, 7) with no floor is a decimal. These count: roll = round(random(1, 6)) and roll = round((random(1, 6))) (round rounds 5.5 and up to 6, so all six come out; extra brackets change nothing), floor(random(1, 7)), int(random(1, 7)), Math.floor(random(1, 7)), floor(random(1, 6.1)) (the top is above 6), floor(random(6)) + 1, 1 + int(random(6)). Code inside comments never runs.",
+        "r4": "A random position in the colors list: A whole number from 0 to the list's last position is chosen at random, using the list's length. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "The coin takes the chosen colour: coin.color is set from the colors list. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-2-random-4-lab-beat-and-one-shot": {
     "lessonTitle": "5.2.5 Lab: A beat and a one-shot",
@@ -10053,7 +10352,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The frameCount === 70 test that logs 'Almost!' still exists and stands on its own: not inside if (on), not joined to on with && or ||, and not inside the beat's block or any other if, so it really runs on frame 70. Deleting the check is not a fix. The starter's version, wrapped in if (on), is not met yet. Help: 5.2.2 (Reading: Random numbers and timers)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.5 Lab: A beat and a one-shot\". The task they were given: In draw(): (1) a beat: every 30 frames, flip the variable on between true and false, so the lamp, which the starter already colours gold when on is true and gray when it is false, blinks twice a second; (2) a one-shot: when frameCount reaches 300, set message to 'Time is up!' and log it with console.log, once, not on every frame; (3) repair the 'Almost!' check at the bottom, which should log on frame 70 but sits inside if (on) and so never runs: the frame-70 test must not be inside another condition. What the starter file already had: the lamp sprite, on starting false, message starting empty, text that shows the frame number and the message, the if (on) block that colours the lamp, and at the bottom the frame-70 check wrapped inside if (on). The starter meets none of the criteria.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A repeating beat: The code tests frameCount % N === 0 to act every N frames. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The beat flips the lamp: Inside the beat, on is flipped to the opposite: with on = !on, a ternary, or an if/else that sets it to false when it is true and to true when it is false. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A one-shot at frame 300: The code tests frameCount === 300, which is true on one frame only. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "The one-shot sets the message: When frame 300 arrives, message is set to the words. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "The frame 70 check is not inside another condition: The frameCount === 70 test stands on its own, not wrapped in if (on) or joined to it with &&. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-2-update-2-lab-rules-in-update": {
     "lessonTitle": "5.2.29 Lab: Rules in update(), picture in draw()",
@@ -10083,7 +10393,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "draw() still paints the background with background(), and no key test (kb.pressing or kb.presses) is left in draw(), because the rules now live in update(). Words, fill and text size in draw() are the picture and are fine. Not met: a leftover copy of the key or jump lines still in draw(), or background() moved out of draw(). Help: 5.2.28 (Reading: update() runs before physics)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.29 Lab: Rules in update(), picture in draw()\". The task they were given: The starter is a jump scene that does everything in draw(). Add a function named update (all lower case) outside the other functions. Move the a/d movement (an if / else if / else that sets the player's horizontal velocity from kb.pressing) out of draw() and into update(). Move the jump (a kb.presses test joined with && to a colliding test against the ground, which sets a negative vertical velocity) out of draw() and into update() too. Leave draw() with only the picture: background(), fill(), textSize() and text(), and no key tests. What the starter file already had: gravity at 10, a player and a static ground made in setup(), and a draw() that paints the background, writes one line of words, moves the player with a and d, and makes it jump from the ground on space. It has no update() function, and its draw() still reads keys, so the starter meets none of the criteria.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "The sketch has an update() function: The sketch defines function update() { ... }, spelled all lower case, on its own and not inside setup() or draw(). moSHion runs it on every frame, before the physics step. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The keys move the player in update(): Inside update(), a kb.pressing(...) test moves the player: its vel.x is set, or its x is changed. Any keys count. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The jump is in update(): Inside update(), the jump waits for both a key press, kb.presses(...), and the ground, .colliding(...), joined with && (or one if inside the other), as in 5.2.13. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "draw() keeps only the picture: draw() still calls background(), and no key test (kb.pressing or kb.presses) is left in it: the rules now live in update(). update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-10-lab-two-instances": {
     "lessonTitle": "7.1.11 Lab: Two sprites, two property values",
@@ -10101,7 +10421,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The code assigns a new value to b1.color with =, and nothing anywhere assigns b2.color. Doing it on a space-bar press is what step 2 asks. Partial: b1 is replaced with a new Box instead of its color being written. Missing: b2.color is assigned too, or b1.color never changes. Help: 7.1.3 (Class and instance)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.1.11 Lab: Two sprites, two property values\". The task they were given: A Box class takes a colour: new Box(c) stores it in this.color. In setup(), create b1 = new Box('red') and b2 = new Box('blue'). In draw(), press space to change b1.color only, and watch b2 stay blue.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Two distinct new Box(...) calls: Create `b1` and `b2` with separate `new Box(...)` calls: each gets its own color argument. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Only b1.color is reassigned: Assign a new value to `b1.color` (not `b2.color`) to demonstrate independent instance state. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-13-lab-build-sprite": {
     "lessonTitle": "7.1.14 Your Turn: Build a Sprite",
@@ -10137,7 +10465,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A sprite's .stroke or .strokeWeight is assigned with =. Setting both is what step 4 asks and is welcome. A plain stroke(...) function call does not set a sprite's property. Missing: neither property is set on a sprite. Help: step 4 of this lab.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.1.14 Your Turn: Build a Sprite\". The task they were given: Starting from an empty setup(): create a canvas with new Canvas(width, height); store a rectangle sprite made with the 4-argument form new Sprite(x, y, width, height) in a variable and set its .color; store a circle sprite made with the 3-argument form new Sprite(x, y, diameter) and give it its own .color; then give one of the two sprites a .stroke and a .strokeWeight.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Canvas created with a size: Creates the canvas with explicit dimensions rather than leaving the placeholder Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Rectangle sprite (4-arg form): At least one `new Sprite(x, y, w, h)` call with four arguments (a fifth body-type argument such as 'static' is fine). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Circle sprite (3-arg form): At least one `new Sprite(x, y, diameter)` call with exactly three arguments. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Property set on an instance: At least one `.color` assignment on a sprite instance. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Stroke used: A `.stroke` or `.strokeWeight` property is assigned. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-17-lab-method-no-params": {
     "lessonTitle": "7.2.3 Lab: Method with no params",
@@ -10149,7 +10488,14 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Inside the Counter class there is a tick() method whose body adds 1 to this.n (+=, ++, or this.n = this.n + 1). Partial: it changes a different property, or adds something other than 1. Missing: no tick method inside the class, or its body does not change this.n. Help: 7.2.1 (Methods: functions that live on a class)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.2.3 Lab: Method with no params\". The task they were given: A Counter class stores this.n = 0. Inside the class body, after the constructor, write a tick() method that adds 1 to this.n. The driver in draw() already calls c.tick() when space is pressed and shows c.n on screen.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "tick() method increments this.n: Write a `tick()` method inside the `Counter` class that adds 1 to `this.n` using `+=` or `++`. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-18-lab-method-with-params": {
     "lessonTitle": "7.2.4 Lab: Method with parameters",
@@ -10167,7 +10513,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The method's body adds the parameter to this.n: +=, this.n = this.n + the parameter, or the same with the parameter first. Calling this.tick() in a loop that runs that many times also adds it. Partial: the parameter is used but replaces the count instead of adding to it. Missing: the parameter is never used. Help: 3.2.5 (Parameters and Arguments)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.2.4 Lab: Method with parameters\". The task they were given: The Counter class has n and tick(). Inside the class body, write an addBy(n) method that adds its argument to this.n. The driver in draw() already calls c.addBy(1), c.addBy(2) and c.addBy(3) on the keys 1, 2 and 3.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "addBy(n) method declared: Write an `addBy(n)` method inside `Counter` that takes a parameter and uses it. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Parameter used inside method body: The parameter passed to `addBy` is referenced inside the method body (e.g. `this.n += n`). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-19-lab-method-returns": {
     "lessonTitle": "7.2.5 Lab: Method that returns a value",
@@ -10179,7 +10533,14 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Inside the Counter class there is an isHigh() method that compares this.n with 10 and returns a value that is true when the count is over 10 and not true at 10 or below. Partial: the comparison is off by one (>= 10), or it compares something other than this.n. Missing: no isHigh method inside the class, or it compares but never returns anything. Help: 7.2.1 (Methods: functions that live on a class)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.2.5 Lab: Method that returns a value\". The task they were given: The Counter class has n, tick() and addBy(n). Inside the class body, write an isHigh() method that returns true when this.n is greater than 10 and false otherwise. The driver in draw() already uses c.isHigh() to paint the number red.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "isHigh() compares this.n to 10: Write an `isHigh()` method inside `Counter` whose body compares `this.n` to `10` (e.g. `return this.n > 10`). The driver (the code in `draw()`) paints the number red when it returns a truthy value: one an `if` treats as true, such as `true` itself. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-20-lab-method-calls-method": {
     "lessonTitle": "7.2.6 Lab: A method calling this.otherMethod()",
@@ -10191,7 +10552,14 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Inside the Counter class there is a bigStep() method that calls this.addBy with 5 and afterwards returns what this.isHigh() gives back. Partial: one of the two calls is missing, done by hand, or made on c instead of this; isHigh is asked before the 5 is added; or the answer is not returned. Missing: no bigStep method inside the class. Help: 7.2.1 (Methods: functions that live on a class)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.2.6 Lab: A method calling this.otherMethod()\". The task they were given: The Counter class has n, tick(), addBy(n) and isHigh(). Inside the class body, write a bigStep() method that calls this.addBy(5) and then returns this.isHigh(). The driver calls c.bigStep() when B is pressed.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "bigStep() calls this.addBy(5) and returns this.isHigh(): Write `bigStep()` inside `Counter`. It must call `this.addBy(5)` and return `this.isHigh()`. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-20a-chart-the-method-chain": {
     "lessonTitle": "7.2.7 Plain English to Pseudocode: A Method That Calls a Method",
@@ -10233,7 +10601,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "One call for die and one for flashRed. Do not write what those methods do.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps for the lab \"7.2.7 Plain English to Pseudocode: A Method That Calls a Method\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Here is the plan in plain English: **1.** The enemy is hit for some amount of damage. **2.** Take that amount off the enemy's health. **3.** If the health is now zero or less, the enemy dies. **4.** Either way, the enemy flashes red to show it was hit. **5.** Then control goes back to whoever hit it. The same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the five steps. In `README.md`, type these as numbered pseudocode **between the first and last line**. Use SET for a change, IF and END IF for a decision, and CALL for another method. The two methods here are named `die` and `flashRed`. Number every line, including the indented one and END IF. Each keyword looks like this, in a different program: - `SET score TO score + 10` (a change) - `IF lives <= 0` ... `END IF` (a decision; indent what is inside it) - `CALL playSound` (call another method; `CALL this.playSound` is fine too) The chart shows the shape.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Five or more numbered steps: Number every step 1. 2. 3. and so on, with something written after each number.",
+        "r2": "The damage comes off health first: Health goes down by the damage, before the decision.",
+        "r3": "One decision about health being zero or less: Exactly one IF, about health and zero, closed with END IF.",
+        "r4": "The enemy only dies inside the decision: The call to die sits inside the decision.",
+        "r5": "The flash happens either way: The flash runs whether or not the enemy died, so it sits outside the decision.",
+        "r6": "Exactly two calls: One call for die and one for flashRed. Do not write what those methods do."
+      }
+    }
   },
   "5-3-22-lab-mutate-sprite-prop": {
     "lessonTitle": "7.2.9 Lab: Mutate this.sprite.x from a method",
@@ -10245,7 +10625,14 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Inside the Mover class there is a moveRight method with one parameter whose body adds that parameter to this.sprite.x. Partial: it adds a fixed number instead of the parameter, or sets the sprite's speed instead of its position. Missing: no moveRight method inside the class, or it changes something other than the sprite's x. Help: 7.2.8 (Why this.sprite, not extends Sprite)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.2.9 Lab: Mutate this.sprite.x from a method\". The task they were given: A Mover class wraps a sprite: its constructor stores this.sprite = new Sprite(x, y, 30, 30). Inside the class body, write a moveRight(dx) method that adds dx to this.sprite.x. The driver calls m.moveRight(2) on every frame the right arrow is held.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "moveRight(dx) mutates this.sprite.x: Write a `moveRight(dx)` method that adds `dx` to `this.sprite.x` using `+=`. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-23-lab-cleanup": {
     "lessonTitle": "7.2.10 Lab: Cleanup with this.sprite.delete()",
@@ -10257,7 +10644,14 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Inside the Bubble class there is a pop() method that calls delete() or remove() on this.sprite, directly or through another method of the class. Partial: it hides the sprite instead, or deletes it through the global b instead of this. Missing: no pop method inside the class, or it never removes the sprite (delete this.sprite is the JavaScript operator, which leaves the sprite on screen). Help: 5.2.21 (Cleanup and Delete)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.2.10 Lab: Cleanup with this.sprite.delete()\". The task they were given: A Bubble class wraps a sprite: its constructor stores this.sprite = new Sprite(x, y, 20). Inside the class body, write a pop() method that calls this.sprite.delete(), so the bubble removes the sprite it owns. The driver calls b.pop() when the mouse is clicked.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "pop() calls this.sprite.delete(): Write a `pop()` method inside `Bubble` that calls `this.sprite.delete()` to remove the wrapped sprite. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-25-lab-three-vars": {
     "lessonTitle": "7.2.12 Lab: Three Enemies in three variables",
@@ -10287,7 +10681,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The e3 that draw() uses is given a new Enemy(...). Partial: a new let or const e3 inside setup(), which draw() never sees. Missing: e3 is never given an Enemy. Help: 7.1.3 (Class and instance)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.2.12 Lab: Three Enemies in three variables\". The task they were given: An Enemy class is given: new Enemy(x, y, hp) stores hp and builds a red square sprite. The starter declares let e1, e2, e3 at the top. In setup(), create three Enemy instances, e1, e2 and e3, at three different positions; draw() calls render() on each so its hp shows on its square.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Three separate new Enemy(...) calls: Create three Enemy instances: `e1`, `e2`, and `e3`, in `setup()`. Each must be a distinct `new Enemy(...)` call. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "e1 assigned to a new Enemy: Assign the first Enemy instance to the variable `e1`. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "e2 assigned to a new Enemy: Assign the second Enemy instance to the variable `e2`. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "e3 assigned to a new Enemy: Assign the third Enemy instance to the variable `e3`. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-26-lab-array-of-instances": {
     "lessonTitle": "7.2.13 Lab: An array of Enemies",
@@ -10299,7 +10703,14 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "At least one Enemy object ends up in the enemies array: pushed with enemies.push(new Enemy(...)), made first and then pushed, pushed in a loop, or built straight into the array. The step asks for five spread across the canvas; one or more counts for this card. Missing: no Enemy ever goes into enemies (for example, five separate variables instead). Help: 3.3.2 (Array Basics: Index, push, pop)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.2.13 Lab: An array of Enemies\". The task they were given: An Enemy class is given and enemies starts as an empty array. In setup(), call enemies.push(new Enemy(...)) five times with different x positions, so enemies.length is 5 and five red squares appear; draw() already loops over enemies and renders each one.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "enemies.push(new Enemy(...)) used at least once: Use `enemies.push(new Enemy(...))` to add Enemy instances to the array (listing them straight into the array also counts). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-27-lab-loop-instances": {
     "lessonTitle": "7.2.14 Lab: Loop over an array of instances",
@@ -10317,7 +10728,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Inside draw() (or a function it calls), render() is called on an enemy: on the loop variable, on enemies[i], or on the forEach item. Missing: render is called on the array itself, called with no object in front, or never called. Help: 3.3.5 (Looping Over Arrays) and 7.2.1 (Methods: functions that live on a class)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.2.14 Lab: Loop over an array of instances\". The task they were given: An Enemy class is given and setup() pushes five enemies into enemies. In draw(), write a for...of loop over enemies and call .render() on the loop variable, so all five hp labels appear.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "for loop over enemies in draw(): Write a `for...of` (or `for` index) loop over the `enemies` array inside `draw()`, or call `enemies.forEach(...)`, and render each enemy in it. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Method called on loop variable: Inside the loop body, call a method on the loop variable (e.g. `e.render()`). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-31-a12-1-collectible": {
     "lessonTitle": "7.2.19 Collectible Class",
@@ -10353,7 +10772,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Inside draw() (or a function it calls), the code tests whether the player touches a collectible's sprite: player.overlaps(...) given the sprite, the same test the other way round, overlapping(...), or colliding(...). Partial: the test is given the Collectible object instead of its sprite. Missing: no touch test in draw().",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.2.19 Collectible Class\". The task they were given: The Collectible class shell is given: constructor(x, y, value, color) and collect(), both empty. Fill in the constructor: store the data on this (at least the value) and create this.sprite = new Sprite(...) in the given colour. Write collect() so it deletes the sprite and returns this.value. In setup(), push at least five new Collectible(...) into collectibles at different positions, with different values and colours. In draw(), go through collectibles; when player.overlaps(c.sprite) is true, call c.collect(), add what it returns to totalScore, and remove that item from the array.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Constructor stores state on the object: The constructor body assigns at least one argument onto this: the class shell is provided, so this checks the part the student writes. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Constructor creates the sprite: The constructor creates the sprite this collectible owns. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "collect() method does work: A collect() method that deletes the sprite (via this.sprite.delete() or sprite.remove()) AND then returns something, with the delete before the return so it runs. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "At least one instance: At least one Collectible is instantiated. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Overlap detection: The code checks for overlap between player and a sprite (.overlaps() or .overlapping()). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-32-a12-2-oop-writeup": {
     "lessonTitle": "7.2.20 Procedural vs OOP Writeup",
@@ -10424,7 +10854,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "One of the student's classes uses at least one of: a this.<property> read or write, extends another class, or a super(...) call. Missing: none of these. Help: 7.2.21 (Encapsulation, inheritance, polymorphism)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.2.22 Challenges\". The task they were given: Pick one (or more) object-oriented challenge: (1) an Enemy class whose constructor stores x, y and hp on this, with an isAlive() method that returns whether this.hp is above 0, checked in draw(); (2) a Player class whose constructor makes a sprite and stores it on this.sprite, with a move(dir) method that sets this.sprite.vel.x and a jump() method that sets this.sprite.vel.y to a negative number, called from draw(); or (3) a Collectible class that stores x, y, value and color on this, and a PowerUp class that extends it, whose constructor calls super(...) with the same four arguments first, with a boost() method that returns double the value. Four things are checked: a class is defined, it has a constructor, an object is built from it with new, and it uses this.<property>, extends or super(...).",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Define at least one class: script.js contains at least one class definition. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Instantiates a class of your own: Builds an object from a class the student defined: new Canvas() and new Sprite() are boilerplate and do not count. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Write a constructor: At least one class has a constructor method. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Use one OOP feature: Your class uses at least one of: `this.<property>`, `extends`, or `super(`. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-36-lab-write-constructor": {
     "lessonTitle": "7.1.16 Your Turn: Fill in a Constructor",
@@ -10460,7 +10900,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The two new Message(...) calls are not given exactly the same arguments: a different position or different words is enough. Missing: identical arguments. Help: 7.1.4 (Reading: The new operator)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.1.16 Your Turn: Fill in a Constructor\". The task they were given: The Message class is given with constructor(x, y, words) and an empty body. Inside the constructor, store each argument on this instance: the x argument as a property named x, y as y, and words as words. Then, in setup(), build two Message instances with new, with different values, and store them in first and second; draw() already shows each one's words at its x and y.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Constructor stores x: The constructor stores the x argument on this as a property named x. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Constructor stores y: The constructor stores the y argument on this as a property named y. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Constructor stores words: The constructor stores the words argument on this as a property named words. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Two instances built: Builds at least two Message instances with new. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "The two instances differ: The two new Message calls are not given identical arguments. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-8-lab-read-property": {
     "lessonTitle": "7.1.9 Lab: Read a property",
@@ -10472,7 +10923,14 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "console.log is called with b.color and with b.size (two calls, or one call holding both, with or without labels), inside draw() or a function it calls. Printing them in setup() also reads the properties and counts. Partial: only one of the two. Missing: no console.log reads them, or only typed-in values are printed. Help: 7.1.3 (Class and instance)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.1.9 Lab: Read a property\". The task they were given: A Box class is given, and b = new Box() is built in setup(); b has a color property ('red') and a size property (40). Inside draw(), call console.log to print b.color and b.size, once each, so both values appear in the on-canvas console.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Read b.color and b.size with console.log: Call console.log with b.color and with b.size inside draw() (labels are fine, e.g. console.log('color:', b.color)). update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-9-lab-write-property": {
     "lessonTitle": "7.1.10 Lab: Write a property",
@@ -10490,7 +10948,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "draw() (or a function it calls) tests a key with kb.presses(...) (kb.pressing(...) also counts), so the sketch responds to the keyboard. Any key counts; the space bar is what the step asks. Missing: no key test in draw(). Help: 5.2.12 (Ground-Gated Actions)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.1.10 Lab: Write a property\". The task they were given: A Box class is given, and b = new Box() is built in setup(); draw() paints the box in b.color. Inside draw(), detect a space-bar press with kb.presses('space') and assign a new colour to b.color, so the box changes colour on screen.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Assign to b.color: Write `b.color = ...` inside `draw()` to change the box's color property. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Detect a key press: Use `kb.presses(...)` (or `kb.pressing(...)`) inside `draw()` to respond to keyboard input. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-pinball-10-challenges-make-it-yours": {
     "lessonTitle": "5.9.2 Challenges: Make it yours",
@@ -10502,7 +10968,14 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The student's code adds at least one rule the starter did not have, and it would really run: a second thing that scores, something on the table that moves on its own, a best score kept across restarts, a score worth something other than 1, or a rule they invented (a timer, a speed change, a bonus, and so on). A change only to how things look, such as a colour or the words on screen, is not a new rule. Help: 5.4.5 (Lab: Three bumpers, three values)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.9.2 Challenges: Make it yours\". The task they were given: The game is complete. Change one rule of the student's own choosing: (1) a second goal worth more than the first, with its own worth and its own remembered last frame; (2) a short static bumper that slides left and right, its x changed a little every frame in draw() and turned round at an edge by flipping the sign of its step; or (3) a best score kept in a second variable that is not reset when R is pressed, updated when the score beats it and shown beside the score. Combining them, or inventing a different rule, also counts. Then write one sentence as a // comment at the top naming the rule and what would happen without it. What the starter file already had: a finished game: two walls, one bumper, a ground, one gold goal scoring 1 per touch with a wasTouching memory, a playing flag, a Game over screen and an R restart. Anything the starter already had is not a new rule, so the starter does not meet the criterion.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Your game has a rule of your own: Any one challenge counts, or a rule you invented: a second thing that scores, something on the table that moves, a best score kept across restarts, or a score worth something other than 1. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-pinball-3-lab-build-the-table": {
     "lessonTitle": "5.3.9 Lab: Put a goal on the table",
@@ -10514,7 +10987,14 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A static sprite is stored as the goal, in a colour the player can see. Help: 5.3.5 (Worked Example: The table and the goal)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.9 Lab: Put a goal on the table\". The task they were given: In setup(), add a gold block with the same static body type as the bumper, stored in `goal`, where the ball really goes. The score is drawn but does not change yet. What the starter file already had: the previous labs' work: gravity on, two static walls, a tilted static bumper stored in `bumper`, a static ground stored in `ground` and a bouncy ball at (70, 60). There is no goal yet, so the starter meets none of the criteria. The student may have brought their own work forward from the lab before, so the file can have more than the starter lists; judge what is in the file.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A goal is on the table: A static sprite is stored as the goal, in a colour the player can see. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-pinball-3a-lab-drop-a-bouncy-ball": {
     "lessonTitle": "5.3.6 Lab: Drop a bouncy ball",
@@ -10538,7 +11018,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The ball's `bounciness` is set above 0.5, so it keeps most of its speed. Help: 5.2.15 (Reading: Bounciness and Friction)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.6 Lab: Drop a bouncy ball\". The task they were given: In setup(), turn gravity on so things fall, then build the ball as a circle (one size number) starting at (70, 60), with a colour and a bounciness above 0.5. There is no table yet, so the ball falling off the bottom is correct. What the starter file already had: a 400 by 400 canvas, `let ball, bumper, ground, goal, score;`, score set to 0, and a draw() that shows the score and puts the ball back at (70, 60) when R is pressed. There is no gravity and no ball yet, so the starter meets none of the criteria. The student may have brought their own work forward from the lab before, so the file can have more than the starter lists; judge what is in the file.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Gravity is on: `setup()` turns gravity on so things fall down the screen: a positive number, or a negative one if the sketch sets `world.origin = 'math'` (y grows up there). Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "There is a ball: A sprite is stored in `ball`, built with `new Sprite`. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The ball is genuinely bouncy: The ball's `bounciness` is set above 0.5, so it keeps most of its speed. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-pinball-3b-lab-walls-and-a-ground": {
     "lessonTitle": "5.3.7 Lab: Walls and a ground",
@@ -10556,7 +11045,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A static sprite is stored in `ground`, so the code can ask about it later. Help: 5.3.5 (Worked Example: The table and the goal)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.7 Lab: Walls and a ground\". The task they were given: In setup(), build two tall static walls, one at each side, and a static ground along the bottom stored in `ground`, short enough to leave a gap (the drain) at the bottom left. The ball may still fall through the gap: that is correct for this lab. What the starter file already had: the previous lab's work: a 400 by 400 canvas, `let ball, bumper, ground, goal, score;`, gravity turned on and a bouncy ball at (70, 60). There are no walls and no ground yet, so the starter meets none of the criteria. The student may have brought their own work forward from the lab before, so the file can have more than the starter lists; judge what is in the file.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Three things stay put: Three or more sprites are built with the static body type, so they do not fall. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The ground has a name: A static sprite is stored in `ground`, so the code can ask about it later. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-pinball-3c-lab-a-tilted-bumper": {
     "lessonTitle": "5.3.8 Lab: A tilted bumper",
@@ -10574,7 +11071,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The bumper's `rotation` is set to a number that is not 0, so the ball leaves at an angle. Help: 5.3.5 (Worked Example: The table and the goal)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.3.8 Lab: A tilted bumper\". The task they were given: In setup(), build a wide, thin static bumper stored in `bumper`, under and a little to the right of the ball's start, and tilt it by setting its rotation to a number that is not 0. What the starter file already had: the previous labs' work: gravity on, a bouncy ball at (70, 60), two static walls and a static ground stored in `ground`. There is no bumper yet, so the starter meets none of the criteria. The student may have brought their own work forward from the lab before, so the file can have more than the starter lists; judge what is in the file.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "The bumper has a name and stays put: A static sprite is stored in `bumper`, so it does not fall and the code can ask about it later. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The bumper is tilted: The bumper's `rotation` is set to a number that is not 0, so the ball leaves at an angle. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-pinball-6-lab-score-one-point-per-touch": {
     "lessonTitle": "5.4.4 Lab: Score one point per touch",
@@ -10598,7 +11103,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The remembering variable is given this frame's touch answer on every frame, outside the scoring if, or by an if/else that sets it to true while touching and false when not, every frame. Any name works. Not met: the update only inside the scoring if (then nothing ever sets it back), or no update at all. Help: 5.4.1 (Reading: A collision is not an event)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.4.4 Lab: Score one point per touch\". The task they were given: The starter adds a point on every frame the ball touches the gold goal, so one roll across it scores about 33. Fix it so one touch is worth one point: in draw(), check the touch once, into a variable; keep a second variable, made outside draw(), that remembers whether the ball was touching last frame; add a point only when the ball is touching now and was not a frame ago; then store this frame's answer in the memory, on every frame. What the starter file already had: the full table (walls, bumper, ground, gold goal, bouncy ball), score starting at 0, the R reset, and in draw() an if that adds 1 to the score whenever the ball is colliding with the goal. The starter meets none of the criteria.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "The touch is checked once into a variable: This frame's collision answer is stored in a variable, so the same answer is used for the test and the memory. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Does the scoring if test the touch now AND not-the-touch-last-frame, joined by &&, with score += 1 inside it? Yes for if (touching && !wasTouching), if (isTouchingGoal && !wasTouchingGoal), if (touching && !verity), and for if (touching === true && wasTouched === false) when touching = ball.collides(goal). Any names, with or without let. No for const touching = ball.colliding(goal) followed by if (touching && wasTouching === false): colliding() gives a number, so after one frame the memory is 0, never false. No for the starter's if (ball.colliding(goal)) { score += 1 }, which scores every frame of a touch. Code inside comments never runs.",
+        "r3": "Is the memory variable (any name, such as wasTouching, wasTouched, wasTouchingGoal or verity) given this frame's touch answer on every frame, by a line like wasTouching = touching; or wasTouched = touching (no semicolon needed) in draw() that runs whether or not a point was scored? It may sit on its own line after the scoring if, or right after that if's closing brace on the same line, and it may be declared with let at the top or not at all. A memory set only inside the scoring if's braces, or never set, does not count. Code inside comments never runs."
+      }
+    }
   },
   "5-3-pinball-7-lab-three-bumpers-three-values": {
     "lessonTitle": "5.4.5 Lab: Three bumpers, three values",
@@ -10622,7 +11136,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The score adds the bumper's own worth (not always 1), inside an if that is only true on the frame that bumper's touch starts: touching now and not touching last frame, by that bumper's own memory. Not met: adding the worth on every touching frame, or a memory test written as === false while the memory holds colliding()'s number, which is never true. Help: 5.4.1 (Reading: A collision is not an event)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.4.5 Lab: Three bumpers, three values\". The task they were given: Three bumpers in the array bumpers carry worth values of 1, 5 and 10. The starter scores only bumpers[0], and on every frame. In setup(), give each bumper its own wasTouching of false. In draw(), replace the single check with a loop over every bumper in the array; inside the loop, use the same edge check as 5.4.4 but on the bumper's own wasTouching, add that bumper's worth to the score only when its touch starts, and update its wasTouching on every frame. One drop should read 1, then 6, then 16. What the starter file already had: two walls, the three bumpers (each with its own worth) pushed into bumpers, a ground, a ball that rolls, score starting at 0, the R reset, and in draw() one if that adds 1 to the score whenever the ball is colliding with bumpers[0]. The starter meets none of the criteria.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Every bumper is checked in a loop: One loop visits every bumper in the array instead of naming one. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Does each bumper have its own memory property (b.wasTouching, bumpers[i].hit, any name) that is written on EVERY frame, both while touching and while not? Yes: b.wasTouching = touching; after the scoring if; b.hit = ball.colliding(b); if (ball.colliding(b)) { ...; b.wasTouching = true; } else { b.wasTouching = false; } (an if nested inside is fine). No: the memory is set only inside the scoring if, so it never goes back to false; one shared variable for all bumpers; the property written is spelled differently from the one read (b.wasTouchong = touching while the test reads b.wasTouching is a typo, so the memory is never updated). Code inside comments never runs.",
+        "r3": "Is each bumper's own worth added only on the frame a touch starts? Yes: if (touching && !b.wasTouching) score += b.worth; (any memory name, ! in front); if (ball.colliding(b)) { if (!b.hit) score += b.worth; }; score += b.worth inside an if on ball.collides(b), which is true only on a touch's first frame (any memory test beside it is fine); a memory set only to true or false, compared === false. No: score += b.worth on every touching frame; adding 1 instead of the worth; a memory set from colliding() (a number) compared === false, which never matches; testing the worth itself or a property that is not a memory. Code inside comments never runs."
+      }
+    }
   },
   "5-3-pinball-9-lab-lose-and-start-again": {
     "lessonTitle": "5.5.3 Lab: Lose, and start again",
@@ -10652,7 +11175,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The flag is tested somewhere in draw() and the test changes what happens: for example the play area while playing, and 'Game over' with the final score once the round has ended, or the same with a gameOver flag tested the other way round. An if with nothing inside its braces changes nothing, so it is not met. Help: 5.5.1 (Reading: The state of the game)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.5.3 Lab: Lose, and start again\". The task they were given: Give the game an end. Add a flag variable that says whether the game is being played, starting at true and created once (next to score, not every frame). In draw(), when the ball has fallen past the bottom of the canvas, set the flag to false. When the flag is false, draw 'Game over' and the final score instead of the play area. When R is pressed, set the flag back to true and put the score back to 0, as well as putting the ball back. What the starter file already had: the table, the goal scoring once per touch with a wasTouching memory, and an R key that puts the ball back at the top but leaves the score alone. There is no game-state flag yet: wasTouching is the goal's touch memory, not the state of the game. The starter meets none of the criteria.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A flag says whether the game is being played: A variable created once and starting true is the game's state. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The ball falling past the bottom ends the round: Losing is a position test: when the ball's y is past the bottom of the canvas, the round ends. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A restart puts the score back: Pressing R starts a fresh round, so the score returns to 0 along with the ball. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Is the flag that the losing test sets (any name: playing, flag, gameOver, lost) read somewhere by an if, an && or a ternary, so it changes what happens? For example if (playing) { ... } else { text('Game over', ...) }, if (flag === false) { text('Game over', ...) }, if (!playing) { ... }, or if (playing === false && kb.pressed('r')) { ...restart... }. The losing test may use ball.y or ball.pos.y, and the flag may start true or false. The flag read must be the one set when the ball falls, and an if whose braces are empty, with no else, changes nothing. Code inside comments never runs."
+      }
+    }
   },
   "5-3-pinball-plan-sketch-the-game": {
     "lessonTitle": "5.3.3 Plan: Sketch your pinball game",
@@ -10740,7 +11273,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The popup sprite gets a .life above 0 (any number or variable), so moSHion deletes it a little later; a countdown of the student's own that ends in .delete() also counts. Not met: no .life on the popup, a .life of 0 or below, or .life put on the ball or a bumper instead (that deletes the ball or the bumper). Help: 5.7.1 (Reading: Words on a sprite, and sprites that run out)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.7.4 Lab: Show the worth, pop the points\". The task they were given: The starter is their pinball table from 5.6.3: three bumpers in the array bumpers, worth 1, 5 and 10, scored in a loop with an edge check (touching now and not touching last frame, by each bumper's own wasTouching), with a chime played in that same if. (1) Write each bumper's worth on it with .text, for example b1.text = b1.worth; in setup() for each bumper, or a loop. (2) Inside the if that adds the worth, make a small popup sprite near the bumper, with collider 'none', a colour, .text set to '+' joined with the worth, and a small upward vel.y. (3) Give the popup a .life above 0 so it removes itself. What the starter file already had: walls, the three bumpers with worth and wasTouching, a ground, a ball that rolls, the score and its edge-checked loop in draw(), the chime loaded in setup() and played on each hit, and an R key that drops the ball again. The starter meets none of the criteria.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Each bumper shows its worth: Each bumper wears its worth: its .text is set from its own worth (in setup() or in the loop, straight or through a variable; joined, in a template string or with String() all count), or set to a number, or text(...) draws the worth every frame. The popup's text alone does not count. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A popup is made only when a hit starts: A new Sprite(...) is made inside the if that is true only on the frame a touch starts (touching && !b.wasTouching, the one that adds the worth; touching === 1 also works), in an if nested in it, or in a helper it calls. Trap: if b.wasTouching = touching stores ball.colliding(b) itself, it holds the number 0 when apart, and 0 === false is false, so an if on b.wasTouching === false never runs after the first frame: that popup does not count. Only when the stored value is true/false (colliding(b) > 0) does === false work. Not under if (touching) or colliding() alone, an if on something else, in draw() alone, or in setup(). Comments never run.",
+        "r3": "The popup removes itself: The sprite made in draw() for the popup gets a .life above 0 (a number or a variable), or a countdown of your own that ends in .delete(). A .life on the ball or a bumper does not count: it deletes them. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-pinball-polish-5-lab-nudge-the-table": {
     "lessonTitle": "5.8.3 Lab: Nudge the table",
@@ -10764,7 +11306,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A sprite's .debug is set to true (or to a variable that holds true), or a key flips it (for example ball.debug = !ball.debug under kb.presses). Not met: no debug, debug only set to false, or only in a comment. Help: 5.8.1 (Reading: Four knobs: mass, gravityScale, rotationLock, debug)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.8.3 Lab: Nudge the table\". The task they were given: The starter is their pinball table from 5.7.4: three bumpers labelled with their worth, scored once per hit with a chime and a popup that removes itself. (1) In draw(), push the ball with applyForce while an arrow key is held, under kb.pressing, for example if (kb.pressing('right')) ball.applyForce(5, 0); and the same with -5 for left. (2) In setup(), set the ball's mass, for example ball.mass = 1;, and try other numbers. (3) Switch on the collider outline with ball.debug = true; (a key that flips it is also fine). (4) A // comment at the top saying which mass felt right; no criterion checks that comment. What the starter file already had: everything from 5.7.4 (walls, labelled bumpers, popups with .life, the chime, the score, an R key), and no push, no mass and no debug. The starter meets none of the criteria.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Is ball.applyForce(...) (or applyForce on any sprite) inside an if on kb.pressing(...) or kb.holding(...)? For example if (kb.pressing('right')) ball.applyForce(5, 0); or if (kb.holding('s')) { ball.applyForce(0, 5) }: both are yes, since pressing and holding both stay true while the key is held. A held key setting a direction that one applyForce(dir, 0) then uses is also yes. Any key, any direction, braces or none, a helper, ||, a ternary. No for a push under kb.presses(...), which is true for one frame only, for an applyForce that ignores the keys, or for a key that changes vel.x instead of applyForce (velocity ignores mass). Code inside comments never runs.",
+        "r2": "The ball's weight is set: A sprite's .mass (or .density) is set to a number or a variable. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The collider outline is on: A sprite's .debug is set to true (or to a variable that holds true), or a key flips it with !. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-3-pinball-polish-6-playtest-and-polish": {
     "lessonTitle": "5.9.3 Playtest and polish: Pinball",
@@ -10808,7 +11359,14 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "At least one of: (1) popups whose .opacity goes down over time (worked out from .life, lowered by a step each frame, or similar); (2) a tilt rule: a count of nudges that goes up on a key press, reset on a frameCount beat or by R, and something that happens when it goes above 3; (3) a ball whose mass grows from round 2 (a round counter that R raises, and a mass set from it or inside an if on it); or a polish of the student's own that changes play, such as a score multiplier or bonus, or a gravityScale, rotationLock, bounciness or friction change. Missing: none of these, or only a colour or a fixed size changed. Help: 5.7.1 (Reading: Words on a sprite, and sprites that run out) and 5.8.1 (Reading: Four knobs: mass, gravityScale, rotationLock, debug)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.9.4 Challenges: Polish it your way\". The task they were given: The pinball table is finished (labelled bumpers, popups with .life, a chime, a held-key nudge with applyForce, a ball mass and debug). Add one polish: (1) popups that fade: keep each popup in a list and lower its .opacity every frame, for example p.opacity = p.life / 40; (2) a tilt rule: count nudges (add 1 on each kb.presses of an arrow), reset the count every 120 frames with frameCount % 120 === 0, and when the count goes above 3 lose the ball (for example ball.y = 500) and show TILT until R, which resets the count; or (3) a heavier ball in round 2: a round counter (the step calls it roundNumber, because round is already moSHion's round() function) that goes up on R, and a bigger .mass from round 2 on, with the round shown on screen. One of the three is enough, and an idea of the student's own on top is welcome. Step 2 also asks for a one-sentence // comment at the top naming the polish; no criterion checks that comment. What the starter file already had: everything from 5.8.3, including ball.mass set once in setup(), so that line alone is not a new polish.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Is a polish in the running code? The starter has ball.bounciness = 0, ball.mass = 1, score += b.worth, no rotationLock. Any ONE of these is yes: ball.rotationLock = true (the ball stops spinning); ball.gravityScale = 0.7; ball.bounciness = 0.4; a new friction; score += b.worth * 2 or + combo; a popup's .opacity changed each frame so it fades (= p.life / 40, -= 0.025, *= 0.9, or lowered when life is low); a tilt count (nudges++ on a key, or a budget counting down); ball.mass changed for a new round (R key, a helper, a round count). Not enough: gravityScale = 1, rotationLock = false, opacity set once, a colour change, mass changed only in setup(). Code inside comments never runs."
+      }
+    }
   },
   "5-3-pinball-sound-2-lab-a-chime-on-every-hit": {
     "lessonTitle": "5.6.3 Lab: A chime on every bumper hit",
@@ -10826,7 +11384,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A sound's play() runs only on the frame a bumper hit starts: inside the if that tests touching now and not touching last frame (the one that adds the bumper's worth), in an if nested inside it, or in a helper that if calls. Playing it above or below the score line both count. Not met: play() straight in draw() or in the loop outside that if, under an if on colliding() or touching alone, in that if's else, under a key press, or only in setup(). Help: 5.6.1 (Reading: A sound on a hit)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.6.3 Lab: A chime on every bumper hit\". The task they were given: The starter is a pinball table with three bumpers in the array bumpers, worth 1, 5 and 10, scored in a loop with an edge check (touching now and not touching last frame, by each bumper's own wasTouching). It is silent. In setup(), load the course's chime by its name, loadSound('coin'), into the variable chime that the starter already declares at the top with let. Then play the chime with its play() method inside the if that adds the bumper's worth, so it plays once per hit. Optionally set the chime's volume. What the starter file already had: walls, the three bumpers with worth and wasTouching, a ground, a ball that rolls, the score and its edge-checked loop in draw(), an R key that drops the ball again, and let chime; declared at the top with nothing loaded into it. The starter meets none of the criteria.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "The chime is loaded once, in setup(): Inside setup(), loadSound(...) is given a sound that really exists, spelled exactly: 'coin' or 'music', or the path '/moshion/assets/coin.wav', 'assets/coin.wav' or './assets/coin.wav' (music.wav the same). Any other spelling never plays, so it does not count: 'cion', 'Coin', 'coins', '/moshion/asset/coin.wav', 'coin.mp3'. The sound is kept where draw() can reach it: a variable from the top of the file, a bumper's property, or a list. let or const in front of it inside setup() makes a new local variable, so it does not count. No loadSound in draw() or update(). Any quotes, any name. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A hit plays the chime once: A sound's .play() runs inside the if that adds the bumper's worth and is true only on the frame a touch starts, such as touching && !b.wasTouching (== false also works, and a helper or nested if counts). b.wasTouching is set from colliding(), a number, so after the first frame it is never the value false: b.wasTouching === false is never true, so play() under it never runs and does not count. Not under if (touching) or colliding() alone, not straight in draw(), not in an else. update() runs every frame too, before draw(). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-4-flappy-3-lab-make-it-flap": {
     "lessonTitle": "5.10.5 Lab: Make it flap",
@@ -10850,7 +11416,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A test on the bird's y going past the bottom (greater than 400 or height, or a number a little inside it) or above the top (less than 0), in one if joined with || or in two ifs, whose body puts bird.y back on the screen (200, height / 2, or another on-screen spot). Setting vel.y to 0 there too is what step 2 asks and is welcome, but this criterion is about the position. Missing: no edge test, or the test never changes bird.y. Help: 5.10.3 (Worked Example: The bird that flaps)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.10.5 Lab: Make it flap\". The task they were given: The bird falls under gravity and nothing lifts it. In draw(), when the space bar is pressed, set the bird's vertical speed (bird.vel.y) to a negative number so each tap sends it up in one arc. Then, when the bird goes below the bottom of the 400 by 400 canvas or above the top, put it back in the middle with no speed.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "The space bar flaps the bird: A press of the space bar sets the bird's upward speed. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The flap sets the speed rather than adding: The line uses = so every flap is the same size. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The bird is put back when it leaves the screen: Leaving the top or bottom puts the position back. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-4-flappy-5-lab-pipes-that-come-and-go": {
     "lessonTitle": "5.11.3 Lab: Pipes that come and go",
@@ -10874,7 +11449,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A loop over pipes with an if that tests a pipe's x for being off the left edge (less than -30, less than 0, or similar), whose body both deletes that pipe's sprite (delete() or remove()) and takes it out of the array (splice, or rebuilding the array without it), in either order. Deleting its mate as well is what step 2 asks and is welcome. A backwards loop is what the reading teaches; a forward loop still does the job here. Partial: only one of the two (deleted but left in the array, or spliced out but left on the screen). Help: 5.11.1 (Reading: A world that scrolls)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.11.3 Lab: Pipes that come and go\". The task they were given: makePipe() is given: it builds one pair of pipes just off the right edge, moving left, and returns the top pipe (the bottom one is stored as its mate). In draw(), call it on a repeating beat (every 90 frames, as frameCount % 90 === 0 or as every(90, ...)) and push the result into the pipes array; the starter builds only one pair, on frame 1. Then loop over pipes from the end to the start and, when a pipe's x is less than -30, delete its mate and the pipe and splice it out of the array. Finally show pipes.length in drawTop().",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A pair is built on a repeating beat: A remainder test on the frame count, or an `every(90, ...)` timer, builds a pair at a steady rate. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Every pair goes into the array: The pair is built and pushed inside the beat's if (or inside the `every()` callback), so a pair arrives once per beat, not every frame. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Pipes that have left are deleted and spliced out: Inside an if that tests a pipe's x (off the left edge), the sprite is deleted and also taken out of the array. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-4-flappy-6-lab-score-a-gap": {
     "lessonTitle": "5.12.2 Lab: Score a gap",
@@ -10898,7 +11482,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Inside the test that reads the pipe's flag, the score goes up by one (score += 1, score++ or score = score + 1) and the same pipe's flag is set to true, in either order. Missing: the score goes up but the flag is never set (the score races), or the two happen in different places. Help: 5.4.1 (Reading: A collision is not an event)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.12.2 Lab: Score a gap\". The task they were given: Pipes already arrive, slide left and are cleaned up, and every pipe starts with passed set to false. In draw(), loop over the pipes; a pipe has been passed when its x is less than the bird's x and it has not been counted yet (!p.passed). Inside that test, add 1 to score and set that pipe's passed to true, so each pipe is counted once.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Every pipe is checked: A loop looks at each pipe in the array (a for...of loop, an index loop or forEach) and compares it with the bird inside the loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A pipe is passed when it is behind the bird: The pipe's x is compared with the bird's x and the pipe's own flag. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Each pipe is counted once: The score goes up and the pipe is flagged in the same step. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-4-flappy-7-lab-crash-and-start-again": {
     "lessonTitle": "5.12.3 Lab: Crash, and start again",
@@ -10940,7 +11533,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Pressing R (kb.presses('r') or 'R'), directly or through a function it calls such as startRound(), empties the pipes array: pipes = [], pipes.length = 0, pipes.splice(0), or a loop that pops or splices every pipe. Deleting each pipe and its mate first is what step 4 asks and is welcome. Partial: the sprites are deleted but the array is never emptied, or the R check sits inside if (playing) and can never run after a crash. Missing: no R check, or R does not touch the pipes. Help: 5.11.1 (Reading: A world that scrolls)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.12.3 Lab: Crash, and start again\". The task they were given: Touching a pipe ends the round. Add a playing flag that starts true. Inside the pipe loop, when bird.colliding(p) or bird.colliding(p.mate) is true, set playing to false and freeze the world: gravity to 0, the bird's vel.y to 0, and every pipe's and mate's vel.x to 0. Wrap the play code in draw() (the flap, the edge check, the new pipes on the beat and both pipe loops) in if (playing) { ... }, and draw 'Game over' in drawTop() when the round is over. When R is pressed (outside that if), delete every pipe and empty the array, reset the bird's position and speed, turn gravity back on, zero the score and set playing back to true.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A flag says whether the game is being played: A variable that starts true is the game's state. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Touching a pipe ends the round: A collision with the bird flips the flag (playing = false, or a game-over flag = true), directly or in a function it calls such as endRound(). Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "The crash freezes the world: Gravity goes to 0 and the pipes stop too (their vel.x goes to 0), so nothing keeps moving. The bird's own vel.x line from the starter does not count: it is the pipes that must stop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "The game runs only while the flag is true: The play code, including the new pipes on the beat, sits inside if (playing), so nothing new happens after a crash. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "Game over shows when the round ends: While the flag is false, the screen says Game over. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The restart clears the pipes: Pressing R empties the array so the next round starts clean. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-4-flappy-9-challenges-make-it-yours": {
     "lessonTitle": "5.12.6 Challenges: Make it yours",
@@ -10952,7 +11557,14 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "At least one of: (1) something about the pipes, their speed or the gap, is worked out from the score, so the game gets harder as the score grows; (2) a best score that startRound() does not reset, updated when the score beats it (if (score > best), max(...), or similar), where showing it in drawTop() is what the challenge asks and is welcome; (3) each pipe gets a wobble speed from random, and the top and bottom halves move by the same amount. Missing: none of these is there, or the only change is how something looks. Help: 5.12.2 (Lab: Score a gap) and 5.11.3 (Lab: Pipes that come and go)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.12.6 Challenges: Make it yours\". The task they were given: The Flappy game is complete. Change one rule: (1) harder as you go: the pipes get faster or the gap narrower as the score grows; (2) a best score: a second variable that is not reset when R is pressed, updated when the score beats it, and shown beside the score in drawTop(); or (3) a wobbling gap: each pipe wobbles up and down at a speed picked with random, turned the other way on a beat, with the top and bottom halves moving together. One of the three is enough. Step 2 also asks for a one-sentence // comment at the top naming the rule; no criterion checks that comment.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Your rule is in the code: One of the three challenges is there: something depends on the score (harder as you go, or a best score), or a wobble made with random moves the pipes up and down. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-4-flappy-plan-sketch-the-game": {
     "lessonTitle": "5.10.1 Plan: Sketch your Flappy game",
@@ -11035,7 +11647,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Adding to the score happens under an if that tests the stored answer AND the memory being false, so a held touch counts once.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a short moSHion sketch for \"Sub-build: Score once\". The task: store this frame's collision answer in a variable, remember the previous frame in another variable that starts false, add 1 to the score only when the answer is true and the memory is false, and update the memory every frame. This is a sub-build: a small isolated program whose only job is this one mechanic, so judge the mechanic itself and not style. Accept any variable names, helper functions, arrow functions, ternaries and semicolons. A line that only exists in a comment or a string does not count. moSHion facts: colliding(b) is 0 while apart and counts frames while touching, so an if on it alone is true every frame of a touch; a stored \"last frame\" value makes it true once. .life = n counts down one per frame and deletes the sprite at 0. A sprite with collider 'none' is passed through and has its gravity off. loadSound(name) in setup() (a built-in name such as 'coin', or a full path such as '/moshion/assets/coin.wav') and sound.play() where the event happens; a browser will not play sound before the student's first click or key. Write short, plain notes for a 14-year-old, name the student's own line when something is missing, and never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "This frame is stored: A variable holds this frame's collision answer (const/let/var = ... colliding(...) or overlaps(...)), so the same answer is used twice. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Score changes on the edge: The score is added to inside an `if` that tests the stored answer and the frame before (`if (touching && !wasTouching)` or equivalent). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-5-12-lab-write-hit": {
     "lessonTitle": "7.3.12 Lab: Write hit(other)",
@@ -11053,7 +11673,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The amount handed to takeHit is this.power (directly, or through a local copied from this.power), so a stronger player would hit harder. A typed 2 is not met: it matches today's power by luck and ignores the property.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.3.12 Lab: Write hit(other)\". The task they were given: The Enemy class already has takeHit(n). Inside the Player class, write a method hit(other) that takes one argument, another object, and asks THAT object to take damage equal to the player's own this.power. Space calls p.hit(e), so the enemy's hp should fall by 2 on each press.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "hit(other) asks the argument to take the hit: The method calls `takeHit` on the object it was handed, not on `this`. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The damage is the player's own power: The amount passed along comes from `this.power`, so one player can hit harder than another. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-5-13-lab-reap-the-dead": {
     "lessonTitle": "7.3.13 Lab: Reap the dead with filter",
@@ -11071,7 +11699,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The test inside filter keeps the living, in any shape: it asks each enemy isAlive(), or keeps those whose hp is above 0 (an arrow with or without braces, a function with return, === true). In a loop that pushes into a new list, the push must happen only for the enemies that ARE alive; in a loop that splices or shifts, it must happen for the enemies that are NOT alive. A test that keeps the dead (such as !e.isAlive() inside filter, or hp <= 0) is the opposite and not met.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.3.13 Lab: Reap the dead with filter\". The task they were given: Dead enemies stay in the enemies array, so the list never gets shorter and Space keeps hitting a corpse at the front. After the hit check and before the loop in draw(), build a new list that keeps only the enemies that are still alive, using filter, and store it back in enemies, so the count at the bottom goes 3, 2, 1, 0.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A filtered list is stored back in enemies: Does the code take the dead enemies out of the enemies array itself, so it gets shorter? Any of these counts: enemies = enemies.filter(...); a filter or a push-built new list that is then stored back in enemies; a backward loop, or a forward loop that steps back with i--, that splices out the dead; a while loop that shifts the front enemy off while it is dead, such as while (enemies.length && !enemies[0].isAlive()) enemies.shift(); Does not count: a new list never stored back in enemies, a loop that removes every enemy, or a forward splice with no i--. Any names, braces or none. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The test keeps the enemies that are still alive: The filter keeps the living — it asks each enemy `isAlive()`, or compares its health (a loop that pushes the living into a new list, or splices out the enemies that are not alive, also counts). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-5-16-lab-count-spawns": {
     "lessonTitle": "7.3.16 Lab: Count your spawns",
@@ -11089,7 +11725,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Inside the constructor, the CLASS counter goes up by 1: Enemy.spawned += 1, Enemy.spawned++, Enemy.spawned = Enemy.spawned + 1, or this.constructor.spawned += 1. this.spawned += 1 is not met: it changes the one new enemy, not the class's count. Counting in draw() beside the push instead of in the constructor is partial: it only counts enemies built in that one place.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.3.16 Lab: Count your spawns\". The task they were given: The scene prints Enemy.spawned, which says undefined because nothing declares it. Inside the class body, above the constructor, declare a static property named spawned that starts at 0; then, at the end of the constructor, add 1 to the class's counter, so every enemy ever built is counted. Each click builds one enemy.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A static counter named spawned is declared: The class body declares `static spawned` and starts it at 0. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The constructor counts every new enemy: The constructor adds one to the class's counter, so every enemy is counted wherever it was created. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-5-18-lab-wave-spawner": {
     "lessonTitle": "7.3.18 Lab: Build a wave",
@@ -11119,7 +11763,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Every frame the list is rebuilt from the living and stored back into enemies (enemies = enemies.filter(...) with a test that keeps isAlive() or hp above 0, in any shape). A filter whose result is not stored, or whose test keeps the dead, is not met. A loop from the end to the start that splices out each dead enemy also counts; say filter is the shape this lab practises.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.3.18 Lab: Build a wave\". The task they were given: draw() has three empty steps. First, when the field is clear, send a wave of three new enemies (at x = 90, 260 and 430, all at y = 100), but only on a frameCount timer, not on every frame. Second, Space knocks one hp off the first enemy in the list, and does nothing when the list is empty. Third, keep only the enemies that are still alive, storing the filtered list back in enemies.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A wave only arrives on a timer: The spawn check uses `frameCount` and a modulo, so it is true once every N frames rather than every frame. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A wave only arrives when the field is clear: The spawn check also asks whether the list is empty, so a new group waits for the last one to be cleared. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "New enemies are pushed onto the list: Each arriving enemy is a new instance put into the `enemies` array. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "The dead are filtered out: The list is rebuilt from the living with `filter`, and stored back into `enemies` (a loop from the end that splices out the dead also counts). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-5-19-assignment-where-state-lives": {
     "lessonTitle": "7.3.19 Your Turn: Where the state lives",
@@ -11150,7 +11804,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The all-time count is placed on the class rather than on an instance, with a reason.",
         "points": 0
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was asked, for a wave-spawner program, to say where each of three numbers should live — a local variable in a method, a property on `this`, or a class variable declared with `static` — and to give one sentence of reasoning for each. The three numbers: (1) the list of enemies still on the field, (2) one enemy's health, (3) how many enemies have ever been built. The right answers, in the course's terms: the list is a property of the scene (or a plain array at file scope, which is the same idea in this program) because it must outlive a frame and hold several objects; health is a property on `this` because each enemy needs its own copy; the all-time count is a class variable (`static`) because it belongs to the class rather than to any one enemy.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Three answers, each with a reason: Answer all three questions, and say why for each one. Numbered or bulleted answers are both fine.",
+        "r2": "The list of live enemies is placed and justified: Says where the list lives and why — it has to outlive one frame, and it holds several objects.",
+        "r3": "One enemy's health is placed and justified: Says where health lives and why — each enemy needs its own copy.",
+        "r4": "The count of enemies ever built is placed and justified: Says where the all-time count lives and why — it belongs to the class, not to any one enemy."
+      }
+    }
   },
   "5-5-3-lab-move-counter-to-this": {
     "lessonTitle": "7.3.3 Lab: Move the counter onto this",
@@ -11162,7 +11826,14 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Each call to tick() leaves this.n one bigger than it was, because the new value is built from the old this.n: this.n += 1, this.n++, this.n = this.n + 1, or a local copied from this.n, raised by 1 and written back. A tick() that writes this.n from a local that starts at 0 on every call is not met: the count would stay at 1.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.3.3 Lab: Move the counter onto this\". The task they were given: The starter's tick() makes a fresh local variable on every call, so the count on screen stays at 1 however often Space is pressed. Rewrite the body of tick() so the change lands on the object's own property this.n, and each press makes the count climb 1, 2, 3, 4.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "tick() adds 1 to this.n: Inside `tick()`, the change lands on `this.n` (for example `this.n += 1`), so the value survives the call. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-5-4-lab-locals-are-private": {
     "lessonTitle": "7.3.4 Lab: Share one number between two methods",
@@ -11186,7 +11857,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "undo() lowers this.points by the SAME stored property that add() uses (this.points -= this.step, or this.points = this.points - this.step), not by a typed 3 or a local of its own, so A then U always lands back where it started.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.3.4 Lab: Share one number between two methods\". The task they were given: add() keeps its own local step of 3 and undo() types the 3 again, so the two numbers could drift apart. Store the step once as a property on this in the constructor, then make add() raise this.points by that property and undo() lower it by the same property, so pressing A three times and U once comes back by exactly one step.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "The step is stored on this: The constructor stores the step as a property, so both methods can read the same number. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "add() uses this.step: `add()` adds the stored step rather than a local of its own. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "undo() uses the same this.step: `undo()` subtracts the stored step, so the two methods cannot drift apart. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-5-8-lab-takehit-floor": {
     "lessonTitle": "7.3.8 Lab: takeHit with a floor at zero",
@@ -11204,7 +11884,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "When takeHit finishes, this.hp is never below 0: an if after the subtraction that sets it back to 0, a ternary, Math.max(0, ...) or max(0, ...), or an if/else that sets 0 when the hit is bigger than what is left. A check that only asks whether hp is above 0 BEFORE subtracting is not met: 1 - 2 still gives -1.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.3.8 Lab: takeHit with a floor at zero\". The task they were given: The enemy starts with 5 health and each Space press calls takeHit(2). Write the body of takeHit(n): take the argument off this.hp, then keep this.hp from going below zero, so the lowest number the enemy ever shows is 0. The rule lives in the class, not in the scene.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "takeHit(n) subtracts the argument from this.hp: The argument is taken off `this.hp` inside the method. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "takeHit(n) never leaves health below zero: After subtracting, the method brings `this.hp` back to `0` if it went negative (a guard `if`, or `Math.max`). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-5-9-lab-isalive": {
     "lessonTitle": "7.3.9 Lab: Give the class its own isAlive()",
@@ -11222,7 +11910,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "draw() calls e.isAlive() and uses its answer (in a ternary, an if, or anywhere) to decide what the enemy shows, instead of comparing e.hp to 0 itself. If one hand comparison of e.hp is still left in draw(), it can still be met; name that leftover line in the note.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.3.9 Lab: Give the class its own isAlive()\". The task they were given: The scene asks e.hp > 0 twice, by hand. Add an isAlive() method to the Enemy class that takes no arguments and returns true while this.hp is above 0 and false once it is not, then make draw() ask e.isAlive() in place of both hand comparisons. What shows on screen should not change: the rule moves into the class, the behaviour stays.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "isAlive() returns whether this.hp is above 0: The class has an `isAlive()` method that returns a comparison on `this.hp`. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "draw() asks isAlive() instead of comparing hp: The scene calls `e.isAlive()` rather than comparing `e.hp` itself. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-5-pinball-sub-end-and-start": {
     "lessonTitle": "5.5.2 Sub-build: End and start again",
@@ -11241,7 +11937,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "R resets the ball's position and velocity and sets the round back to running; the score is reset too.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a short moSHion sketch for \"Sub-build: End and start again\". The task: end the round when the ball falls below the canvas (a flag), keep the game on screen and show Game over, and let R put the ball back at its start with no velocity and set the round running again. This is a sub-build: a small isolated program whose only job is this one mechanic, so judge the mechanic itself and not style. Accept any variable names, helper functions, arrow functions, ternaries and semicolons. A line that only exists in a comment or a string does not count. moSHion facts: colliding(b) is 0 while apart and counts frames while touching, so an if on it alone is true every frame of a touch; a stored \"last frame\" value makes it true once. .life = n counts down one per frame and deletes the sprite at 0. A sprite with collider 'none' is passed through and has its gravity off. loadSound(name) in setup() (a built-in name such as 'coin', or a full path such as '/moshion/assets/coin.wav') and sound.play() where the event happens; a browser will not play sound before the student's first click or key. Write short, plain notes for a 14-year-old, name the student's own line when something is missing, and never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Is a flag (any name: playing, lost, gameOver, over) changed when the ball is below the canvas, as in if (ball.y > height) playing = false; or if (ball.y >= 300) { playing = false } or lost = ball.y > 300, and is that flag read by an if somewhere, such as if (playing) { ... } else { text('Game over', ...) }, if (playing === true), if (!playing) or if (lost)? > and >= both count, and height or any number from about 300 up counts (the canvas is 300 tall). Code inside comments never runs.",
+        "r2": "Two things together. (1) An R key test, kb.presses('r') or kb.pressed('r'), moves the ball back near its start (ball.y = 50 or 60, ball.x = 200, velocity 0). (2) After that the flag is running again: playing = true (or lost = false) is set in the R block, OR an else sets it back whenever the ball is not below the canvas, as in if (ball.y > 400) { playing = false } else { playing = true }. Yes if both hold. No if nothing anywhere sets the flag back to running after it went false, even when R moves the ball and zeroes the score. Code inside comments never runs."
+      }
+    }
   },
   "5-5-snake-1-plan-break-snake-into-parts": {
     "lessonTitle": "5.13.1 Plan: Break Snake into parts",
@@ -11285,7 +11989,14 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "At least one of: (1) the beat lives in a variable that can change, is used in the frameCount % test, and gets smaller when the snake eats (a floor with max(...) or an if is what the challenge asks and is welcome); (2) a best score that startRound() does not reset, updated when the score beats it, where showing it is what the challenge asks and is welcome; (3) turns stored in their own variables (turnX and turnY, or other names) when a key is pressed, and copied into dx and dy at the start of step(). Missing: none of these is there, or the change would stop the sketch (subtracting from a const). Help: 5.13.2 (Reading: A world on a grid) and 5.13.5 (Lab: Steer it)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.16.3 Challenges: Make it yours\". The task they were given: The Snake game is complete. Change one rule: (1) a faster snake: turn const BEAT into a let variable used in frameCount % beat, made smaller every time the snake eats, with a floor so the game never becomes impossible; (2) a best score: a second variable that is not reset when R is pressed, updated when the score beats it, and shown beside the score in drawTop(); or (3) the quick double-turn fix: store each turn in turnX and turnY in draw() and apply it to dx and dy at the start of the next step(). One of the three is enough. Step 2 also asks for a one-sentence // comment at the top naming the rule; no criterion checks that comment.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Your rule is in the code: Is one of these three in the code (any variable name)? (1) A beat variable used in frameCount % beat that gets smaller when the snake eats. (2) A best score: a variable that startRound() does not reset, raised to the score when the score beats it, for example if (score > highScore) highScore = score; or highScore = max(highScore, score); either one counts, and showing it on screen is not needed. A best score that is only shown and never updated does not count. (3) Turns stored in turnX and turnY and applied to dx and dy in step(). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-5-snake-4-lab-steer-it": {
     "lessonTitle": "5.13.5 Lab: Steer it",
@@ -11309,7 +12020,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "After the step, a test of the new column or row being off the grid (below 0, or 20 or more; > 19 and === -1 style tests also count) sets playing to false. Testing all four sides is what step 3 asks; a test that clearly covers leaving the grid counts here. Moving the block on screen only in the else is also what step 3 asks and is welcome. Missing: nothing sets playing to false, or it is set false while the block is still on the grid. Help: 5.12.3 (Lab: Crash, and start again)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.13.5 Lab: Steer it\". The task they were given: The block (head) moves one cell per beat by dx and dy on a 20 by 20 grid of 20-pixel cells. In draw(), set dx and dy when an arrow key is pressed: up is dx = 0, dy = -1, and so on for down, left and right, each key setting both. Refuse a turn straight back: allow up and down only when dy === 0, and left and right only when dx === 0. After the step, if the new column or row is off the grid (below 0, or 20 or more), set playing to false; otherwise move the block on screen.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Each arrow key sets the direction: Pressing up, down, left or right changes dx and dy together. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A turn straight back is refused: Each of the four keys refuses a turn straight back: up and down only when the block is not already moving up or down (dy === 0), left and right only when dx === 0. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Leaving the grid ends the round: A column or row off the grid sets the flag false. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-5-snake-6-lab-grow-and-eat": {
     "lessonTitle": "5.14.3 Lab: Grow and eat",
@@ -11339,7 +12059,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The eating test compares the new head's cell with the food's cell, column AND row (comparing the head sprite's x and y with the food's x and y, or segments[0] after the unshift, is the same idea), and the tail comes off only on a step that does not eat: in the else, after the eating branch has returned, behind an if that the snake did not eat, or behind a flag. Missing: the tail is removed whether or not the snake ate, or there is no eating test. Help: 5.14.1 (Reading: A body that grows)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.14.3 Lab: Grow and eat\". The task they were given: The snake is an array, segments, with the head at segments[0], made of sprites built by makeSegment(col, row). All the work is in step(): replace its last two lines (delete the head and build a new one) with: put a new head at the front of segments with unshift, then pop the tail and delete it. Then, when the new head's cell is the food's cell (col === food.col and row === food.row), add 1 to score, delete the food, make a new one with makeFood(), and do not remove the tail on that step; otherwise remove the tail as before.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A new head goes on the front: The snake moves by adding a cell to the front of the array. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The tail is removed and deleted: The last cell leaves the array and the screen. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Eating scores and replaces the food: Reaching the food adds a point and makes a new piece. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Eating keeps the tail, so the snake grows: The tail is removed only on a step that does not eat: the eating test compares the new head's cell with the food's cell, and the tail comes off in the else (or after the eating branch has returned). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-5-snake-8-lab-dont-bite-yourself": {
     "lessonTitle": "5.15.3 Lab: Don't bite yourself",
@@ -11363,7 +12093,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "In makeFood(), a loop (while, or do...while) keeps choosing a new column and row for as long as isBody says that cell is part of the snake, and the picks can be changed (let, not const). Partial: an if that re-picks only once, or picks still declared const (the sketch stops with an error when it tries to change them). Missing: the food's cell is never checked. Help: 5.15.1 (Reading: Searching the array)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.15.3 Lab: Don't bite yourself\". The task they were given: Fill in isBody(col, row): loop through segments and return true as soon as one has the same col and row; after the loop, return false. In step(), add isBody(col, row) to the test that ends the round at the walls, so running into the body ends it too. In makeFood(), keep picking a new random cell for as long as isBody(col, row) is true; the two picks must become let, not const, so they can be changed.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "isBody searches the segments: A loop (for...of, or an index loop) goes through every segment and returns true when one matches. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A bite ends the round: The same test that checks the walls also asks isBody. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Food keeps re-picking until the cell is free: A while loop repeats the pick while the cell is part of the body. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-5-snake-9-playtest-and-reflect": {
     "lessonTitle": "5.16.1 Playtest and reflect: Snake",
@@ -11414,7 +12153,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "play() is called under a key test (presses or pressing), so it fires on the event and not every frame.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a short moSHion sketch for \"Sub-build: One key, one sound\". The task: load one sound once in setup(), keep it in a variable, and play it inside a key test so it fires once per press rather than every frame. This is a sub-build: a small isolated program whose only job is this one mechanic, so judge the mechanic itself and not style. Accept any variable names, helper functions, arrow functions, ternaries and semicolons. A line that only exists in a comment or a string does not count. moSHion facts: colliding(b) is 0 while apart and counts frames while touching, so an if on it alone is true every frame of a touch; a stored \"last frame\" value makes it true once. .life = n counts down one per frame and deletes the sprite at 0. A sprite with collider 'none' is passed through and has its gravity off. loadSound(name) in setup() (a built-in name such as 'coin', or a full path such as '/moshion/assets/coin.wav') and sound.play() where the event happens; a browser will not play sound before the student's first click or key. Write short, plain notes for a 14-year-old, name the student's own line when something is missing, and never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Is there a loadSound(...) call, not inside a comment, whose result is stored in a variable, in a place that runs once: inside setup(), or at the top level of the file outside every function (for example const blip = loadSound('coin'); or let chime; ... chime = loadSound('break'); near the top)? Both places count. A loadSound(...) inside draw() or update(), which run every frame, means no. No loadSound at all, like the starter, means no. Code inside comments never runs.",
+        "r2": "Played on the key: Play is called inside a key test (presses or pressing), not every frame. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-7-pinball-sub-float-and-die": {
     "lessonTitle": "5.7.3 Sub-build: A word that floats and dies",
@@ -11439,7 +12186,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A .life above 0, or a countdown that deletes it.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a short moSHion sketch for \"Sub-build: A word that floats and dies\". The task: on a mouse press make a small sprite at the pointer with collider 'none', give it .text with a short word or number, a colour and a small upward vel.y, and give it a .life above 0 so it removes itself. This is a sub-build: a small isolated program whose only job is this one mechanic, so judge the mechanic itself and not style. Accept any variable names, helper functions, arrow functions, ternaries and semicolons. A line that only exists in a comment or a string does not count. moSHion facts: colliding(b) is 0 while apart and counts frames while touching, so an if on it alone is true every frame of a touch; a stored \"last frame\" value makes it true once. .life = n counts down one per frame and deletes the sprite at 0. A sprite with collider 'none' is passed through and has its gravity off. loadSound(name) in setup() (a built-in name such as 'coin', or a full path such as '/moshion/assets/coin.wav') and sound.play() where the event happens; a browser will not play sound before the student's first click or key. Write short, plain notes for a 14-year-old, name the student's own line when something is missing, and never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A sprite is made on the click: A new Sprite is made inside a mouse test, not every frame. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "It wears words: The new sprite gets .text, so it shows a word or a number. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "It removes itself: The sprite gets a .life above 0. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-8-pinball-sub-two-masses": {
     "lessonTitle": "5.8.2 Sub-build: Two balls, two masses",
@@ -11458,7 +12214,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The same applyForce is called on both (or the same force number), so mass is the only variable.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a short moSHion sketch for \"Sub-build: Two balls, two masses\". The task: give two balls different masses in setup() and apply the same force to both on a key press, so the difference in mass is what makes them move differently. This is a sub-build: a small isolated program whose only job is this one mechanic, so judge the mechanic itself and not style. Accept any variable names, helper functions, arrow functions, ternaries and semicolons. A line that only exists in a comment or a string does not count. moSHion facts: colliding(b) is 0 while apart and counts frames while touching, so an if on it alone is true every frame of a touch; a stored \"last frame\" value makes it true once. .life = n counts down one per frame and deletes the sprite at 0. A sprite with collider 'none' is passed through and has its gravity off. loadSound(name) in setup() (a built-in name such as 'coin', or a full path such as '/moshion/assets/coin.wav') and sound.play() where the event happens; a browser will not play sound before the student's first click or key. Write short, plain notes for a 14-year-old, name the student's own line when something is missing, and never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Two different masses: Both balls get a mass, and the numbers differ. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The same push reaches both: applyForce (or a velocity set) is called on both balls, so the comparison is fair. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-9-defender-1-plan-break-defender-into-parts": {
     "lessonTitle": "7.4.1 Plan: Break Defender into parts",
@@ -11526,7 +12290,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Inside moveBullets()'s loop, an if that asks whether the shot's y has gone above the top (less than -20, or another value near the top such as less than 0) both deletes the shot's sprite (.delete() or .remove()) and splices it out of bullets at that index. Only one of the two is partial: a spliced shot that is not deleted stays on screen, and a deleted shot left in bullets keeps counting. A test with > (a y below the bottom) is the opposite and not met.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.4.4 Lab: Fly and fire\". The task they were given: Three functions to finish. In moveShip(), after the two lines that move the ship, add two ifs so ship.x never goes below 20 or above 380. In fire(), first count cooldown down by 1 while it is above 0; then, when Space is held AND cooldown is 0, build a 6 by 14 yellow shot with collider 'none' just above the ship, push it onto bullets, and set cooldown to 12. In moveBullets(), inside the loop that already runs from the end of bullets to the start, a shot whose y is less than -20 has left the top: delete its sprite and splice it out of bullets.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "The ship stays on the canvas: Two ifs in moveShip() put the ship back when it passes either side: x no smaller than 20 and no bigger than 380. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The cooldown counts down: fire() takes 1 off cooldown on every frame it is above 0, and never below 0: a countdown that runs past 0 never reaches 0 again, so the ship could not fire. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A shot is made only when Space is held and the cooldown is 0: The shot is pushed onto bullets inside an if that asks both, joined with &&: Space is held, and cooldown is 0. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Firing sets the cooldown again: Next to the push, cooldown is set back to 12 (any number above 0), so the next shot has to wait. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Shots that leave the top are deleted and spliced out: Inside an if that asks whether a shot's y is above the top, the shot is deleted from the screen and spliced out of bullets. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-9-defender-6-lab-hit-the-drone": {
     "lessonTitle": "7.5.2 Lab: Hit the drone",
@@ -11550,7 +12325,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Inside the same if, score goes up by exactly 1 (+= 1, ++, or = score + 1) and the drone goes back to the top (resetDrone(), or setting drone.y back above the screen). A score line outside the if, so it climbs on every frame, is not met.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.5.2 Lab: Hit the drone\". The task they were given: Shots fly straight through the falling drone. All the work is in hitDrone(), which already loops backwards over bullets. Inside the loop, test whether bullets[i] overlaps the drone. When it does, on that same frame: delete the shot's sprite and splice it out of bullets, add 1 to score, and call resetDrone(), which sends the drone back above the top at a random x.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "overlaps is used on the drone: Each shot asks overlaps(drone) on every frame. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The shot that hit leaves the screen and the array: Inside the overlaps if, the shot is deleted and spliced out of bullets on the frame it hits. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A hit scores 1 and resets the drone: Inside the same if, score goes up by 1 and the drone goes back to the top. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "5-9-defender-7-lab-hold-the-base": {
     "lessonTitle": "7.5.3 Lab: Hold the base, and start again",
@@ -11586,7 +12370,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Something that runs every frame (draw(), outside if (playing) { ... }, or the else of it) calls startRound() when R is pressed (kb.presses('r'), either case), directly or through the student's own function that calls it. An R check inside if (playing) { ... } is not met: after Game over it never runs. Resetting a few values by hand instead of calling startRound() is partial.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"7.5.3 Lab: Hold the base, and start again\". The task they were given: The drone can land as often as it likes. In startRound(), give baseHp 3 at the start of every round. In moveDrone(), inside the if that sees the drone reach the base, take 1 off baseHp, and when baseHp is 0 or less set playing to false. In drawTop(), when the round is over (not playing), write Game over and press R to play again in the middle of the screen. In draw(), after the whole if (playing) { ... } block, start a new round when R is pressed.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Every round starts with base hp: startRound() gives baseHp its starting value (3), so R gives the base its hp back. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Reaching the base costs 1: When the drone reaches the base, baseHp goes down by 1, inside the if that sees the landing (the way score goes up by 1 inside the if that sees a hit). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "At 0 the round ends: An if on baseHp reaching 0 sets playing to false. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Game over is written in drawTop when the round is over: In drawTop(), an if on !playing writes Game over (and press R) on top of the sprites. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "R starts a new round: In draw(), outside if (playing), pressing R calls startRound() (directly, or through a function of your own that calls it), so it works after Game over too. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-1-pocket-1-plan-break-pocket-into-parts": {
     "lessonTitle": "6.1.1 Plan: Break Pocket into parts",
@@ -11637,7 +12432,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The line uses the ball's x/y and mouse.x/mouse.y, in either order.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: An aim line\". The task: draw a line from the cue ball to the pointer inside a mouse.pressing() test, and show the pull distance as a rounded number. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "The line follows the pointer: A line joins the ball and the pointer while the button is held. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The pull is shown: The distance from the ball to the pointer is shown as a number. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-1-pocket-4-lab-the-aim-line": {
     "lessonTitle": "6.1.4 Lab: The aim line on the table",
@@ -11662,7 +12465,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "new Walls() is called in setup(), after new Canvas(), so the four rails exist. A call only in a comment or string does not count.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: The aim line on the table\". The task: add the table's rails with new Walls() after new Canvas(), draw an aim line from the cue ball to the pointer while the mouse is held, and show the pull distance. The cue ball is solid (collider 'dynamic'), so the rails can stop it; a 'none' ball passes through them. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "The line starts at the cue ball: The line begins at the cue ball and ends at the pointer, inside a press test. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The pull is shown: The distance from the ball to the pointer is shown. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The table has rails: `new Walls()` is called in `setup()`, after `new Canvas()`, so the four rails exist. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-10-breakout-1-plan-break-breakout-into-parts": {
     "lessonTitle": "7.12.1 Plan: Break Breakout into parts",
@@ -11777,7 +12589,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A clamp keeps it above the ground.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: The arm turns\". The task: turn the arm toward the pointer every frame with angleTo and keep the angle within limits so it cannot point into the ground. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "The arm follows the pointer: The rotation comes from angleTo the pointer. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "It stays out of the ground: The angle is limited with constrain, min/max or an if. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-16-sling-4-lab-turn-the-arm": {
     "lessonTitle": "6.16.4 Lab: Turn the arm",
@@ -11796,7 +12616,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Clamped above the ground.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: Turn the arm\". The task: aim the catapult arm at the pointer with angleTo or rotateTo, limited so it cannot point into the ground. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "The arm follows the pointer: Rotation from angleTo, or rotateTo toward the pointer. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Limited: A clamp or rotateTo keeps it out of the ground. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-17-sling-2-sub-launch-and-arc": {
     "lessonTitle": "6.17.2 Sub-build: Launch and arc",
@@ -11815,7 +12643,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The shot leaves along the arm, not at a fixed angle.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Launch and arc\". The task: make a shot on mouse.released(), at the arm, with direction from the arm rotation and a speed, and keep it in an array. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Made on release, kept: A new Sprite is made inside mouse.released() and pushed into an array. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Sent along the arm: The shot gets direction (and speed), not a random push. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-17-sling-4-lab-launch": {
     "lessonTitle": "6.17.4 Lab: Launch!",
@@ -11834,7 +12670,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Direction follows the arm.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: Launch!\". The task: fire a stone on release along the arm with a speed, and keep every stone in an array. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Fired on release: A new sprite is made inside mouse.released() and pushed into the array. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Along the arm: Direction comes from the arm rotation, with a speed. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-18-sling-2-sub-out-and-gone": {
     "lessonTitle": "6.18.2 Sub-build: Out and gone",
@@ -11853,7 +12697,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The loop starts at the end.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Out and gone\". The task: in a backwards loop, remove off-screen shots from the screen (delete) and from the array (splice). Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Two removals: A spent shot is deleted and spliced in the same branch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Backwards: The sweep runs from the end of the array. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-18-sling-3-lab-shots-that-leave": {
     "lessonTitle": "6.18.3 Lab: Shots that leave",
@@ -11872,7 +12724,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "delete and splice, backwards.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: Shots that leave\". The task: fire on release and sweep spent shots out of both the screen and the array, looping backwards. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Both removals: delete and splice in the same branch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Backwards: The loop runs from the end. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-19-sling-2-sub-hits-and-a-budget": {
     "lessonTitle": "6.19.2 Sub-build: Hits and a budget",
@@ -11891,7 +12751,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The shot leaves in the same branch, so it cannot count twice.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Hits and a budget\". The task: test every shot against every block; on a hit take one from that block's own hit count and delete and splice the shot, then remove a block whose count reaches 0. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A hit takes one off: The block's own count is decremented under an overlap test. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The shot leaves on the hit: The shot is deleted and spliced in the same branch. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-19-sling-3-lab-bring-the-wall-down": {
     "lessonTitle": "6.19.3 Lab: Bring the wall down",
@@ -11910,7 +12778,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The shot leaves when it hits.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: Bring the wall down\". The task: put a wall of blocks with per-block hit counts against the shots, remove the shot on the hit, and sweep spent blocks out of both places. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A hit takes one off: The block's count is decremented under an overlap test. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The shot leaves: The shot is deleted and spliced on the hit. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-2-pocket-2-sub-pull-back-and-let-go": {
     "lessonTitle": "6.2.2 Sub-build: Pull back and let go",
@@ -11929,7 +12805,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Both are set; direction uses angleTo and speed uses the distance.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Pull back and let go\". The task: set the ball's direction away from the pointer and its speed from the pull distance, capped, inside a mouse.released() test. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "The shot is on release: The direction/speed are set inside a mouse.released() test. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Power comes from the pull, capped: The speed uses dist/angleTo and is capped with min or constrain. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-2-pocket-4-lab-take-the-shot": {
     "lessonTitle": "6.2.4 Lab: Take the shot",
@@ -11948,7 +12832,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The direction is the angle to the pointer plus 180 (or the equivalent).",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: Take the shot\". The task: turn a pull-back into a shot: a line while held, then direction away from the pointer and speed from the capped pull, on release. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A shot on release: Direction and speed are set inside a mouse.released() test. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Power from the pull, capped: Speed comes from the distance and is capped. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-20-sling-1-lab-five-shots": {
     "lessonTitle": "6.20.1 Lab: Five shots, win or lose",
@@ -11973,7 +12865,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "R calls startRound(), which clears the old blocks and shots before it rebuilds.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: Five shots, win or lose\". The task: give the player five shots, spend one per launch, win when the blocks are gone, lose when the shots are gone and none are flying, and let R call startRound() so the round starts clean. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. A reset that pushes new blocks without deleting the old ones, or without emptying shots, is not a clean restart. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A shot is spent: The count goes down in the fire branch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Win and lose: Win on no blocks, lose on no shots left and none flying. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A clean restart: R calls `startRound()`, which clears the old blocks and shots before it rebuilds. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-20-sling-2-debug-wall-falls-on-its-own": {
     "lessonTitle": "6.20.2 Debugging: The wall that falls on its own",
@@ -11992,7 +12893,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The sweep comes before the end check.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Debugging: The wall that falls on its own\". The task: stabilise the block stack so it does not fall on its own, and clear spent shots before deciding win or lose. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "The stack holds: The bottom row is static, or blocks have rotationLock. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Cleanup before the check: The shot sweep runs before the win/lose test. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-21-sling-1-playtest-and-reflect": {
     "lessonTitle": "6.21.1 Playtest and reflect: Sling",
@@ -12081,7 +12990,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Each square shows its index.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: A path from a list\". The task: loop over a list of six { x, y } squares, draw a box at each one from its x and y, and write each square's number on it. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A loop over the path: A loop visits every square in path. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A box at each square: A rect is drawn at each square's x and y. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Each square shows its number: The loop writes the square's number with text(). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-22-trail-4-lab-lay-the-trail": {
     "lessonTitle": "6.22.4 Lab: Lay the trail",
@@ -12106,7 +13024,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Each square keeps its centre and its letter.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: Lay the trail\". The task: fill in makePath so it loops over the track text, works out each square's row and column from its index, turns odd rows around so the path snakes, and pushes { x, y, kind } for every square. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A loop over the track: makePath loops over every letter of the track. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "An odd row is turned around: On an odd row the column is counted from the other side, so the path snakes. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Each square keeps x, y and kind: Each square pushed onto the list has an x, a y and its letter as kind. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-23-trail-2-sub-one-die-two-turns": {
     "lessonTitle": "6.23.2 Sub-build: One die, two turns",
@@ -12125,7 +13052,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Each roll moves the turn on and wraps back to 0.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: One die, two turns\". The task: on SPACE, roll a whole number from 1 to 6 and pass the turn to the other player so it goes back to the first after the last. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A roll from 1 to 6: A whole number from 1 to 6, as floor(random(1, 7)) gives. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The turn passes: The turn moves to the other player, with % or another way that goes back to 0. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-23-trail-3-lab-take-turns-to-the-finish": {
     "lessonTitle": "6.23.3 Lab: Take turns to the finish",
@@ -12162,7 +13097,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Reaching the last square ends the game.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: Take turns to the finish\". The task: turn the one-token board into a race for two: a list of player objects, a die from 1 to 6, a takeTurn that moves the player whose turn it is without going past the last square, a winner on the last square, the turn passed to the next player, and R to start again. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A roll from 1 to 6: The die gives a whole number from 1 to 6. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A list of players: The players are a list of objects, each with its own square. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The turn passes: The turn moves to the next player and wraps back to 0, with % players.length or another way. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Never past the last square: A roll near the end stops on the last square, with min or a check. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "A winner on the last square: Reaching the last square ends the game with a winner. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-24-trail-2-sub-a-square-that-does-something": {
     "lessonTitle": "6.24.2 Sub-build: A square that does something",
@@ -12187,7 +13133,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Landing on S moves back.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: A square that does something\". The task: after each step, read the letter of the square under the token; on J move ahead 2 (staying on the row), on S go back to the start. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Reads the letter under the token: The code reads the letter at the token's square. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "J moves ahead: Landing on a J moves the token forward. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "S moves back: Landing on an S moves the token back. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-24-trail-3-lab-jump-slide-and-wait": {
     "lessonTitle": "6.24.3 Lab: Jump, slide and wait",
@@ -12218,7 +13173,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A waiting player is skipped once and the flag is cleared.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: Jump, slide and wait\". The task: after each move, read the letter of the square the player landed on: J moves them 3 ahead (not past the end), S moves them 3 back (not below 0), and W sets a waiting flag; when the turn passes to a waiting player, clear the flag and pass the turn again. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "J jumps ahead 3: Landing on a J moves the player 3 squares on. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "S slides back 3: Landing on an S moves the player 3 squares back, never below 0. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "W sets a flag: Landing on a W marks the player as waiting. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "A waiting player is skipped once: When the turn passes to a waiting player, the flag is cleared and the turn passes again. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-25-trail-2-sub-send-and-receive-one-number": {
     "lessonTitle": "6.25.2 Sub-build: Send and receive one number",
@@ -12243,7 +13208,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The sketch hosts or joins.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Send and receive one number\". The task: set up online.onMove once to record every move that arrives, host a room on a key or join one from a code, and send a small move like { n: number } when the room is ready. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Moves are received: online.onMove is given a function that runs for every move. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A move is sent: online.send sends a move. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Host or join: The sketch hosts a room or joins one. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-25-trail-3-lab-trail-online": {
     "lessonTitle": "6.25.3 Lab: Trail online",
@@ -12274,7 +13248,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "With status off, the game still plays on one computer.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: Trail online\". The task: make the race playable across two computers: set up online.onMove once to call takeTurn with the roll in every move, ignoring a move from a seat whose turn it is not or a roll that is not a whole number from 1 to 6; host on a key with a fresh game, or join from a JOIN code; send the roll with online.send instead of applying it when online; let only the player whose seat equals turn roll; and keep offline play working when online.status is off. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Rolls are sent: Online, the roll goes out with online.send instead of moving the token. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Turns are applied in onMove: Every move that arrives runs takeTurn, on both computers. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Only your seat rolls: Online, SPACE rolls only when online.seat matches turn. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Offline still works: Where SPACE rolls, a check on online.status picks: send the roll online, or take the turn straight away offline. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-26-trail-1-playtest-and-reflect": {
     "lessonTitle": "6.26.1 Playtest and reflect: Trail",
@@ -12363,7 +13347,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Each square is placed from its row and column.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: A checkered board\". The task: draw an 8 by 8 checkered board with two loops, one inside the other, picking a dark colour when the row plus the column is odd ((r + c) % 2 === 1, or another correct test) and drawing one rect per square from its column and row times the cell size. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Two loops, one inside the other: One loop visits the rows and a second loop inside it visits the columns. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A test with % 2: The colour is picked by a test on the row plus the column with % 2. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A square at each row and column: Each square is a rect placed from its column and row times the cell size. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-27-checkers-4-lab-set-up-the-board": {
     "lessonTitle": "6.27.4 Lab: Set up the board",
@@ -12388,7 +13381,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The bottom three rows get red.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: Set up the board\". The task: fill in makeBoard so a dark square ((r + c) % 2 === 1, or another correct test) holds 'b' on rows 0 to 2 and 'r' on rows 5 to 7, and every other square stays ''. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A dark-square test with % 2: A piece is placed only on a dark square, tested with % 2 on the row plus the column. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Black on the top rows: Black pieces ('b') go on the top three rows, rows 0, 1 and 2. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Red on the bottom rows: Red pieces ('r') go on the bottom three rows, rows 5, 6 and 7. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-28-checkers-2-sub-pick-up-and-put-down": {
     "lessonTitle": "6.28.2 Sub-build: Pick up and put down",
@@ -12413,7 +13415,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "It moves only one square diagonally.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Pick up and put down\". The task: on a click, turn mouse.x and mouse.y into a row and a column with floor, pick the token up when the click is on it, and when it is picked up move it to a clicked square one row and one column away (abs, or another correct test). Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A click becomes a row and a column: The click position is divided by the square size and cut down with floor. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A click on the token picks it up: Clicking the token marks it as picked up. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "One square diagonally: The token moves only to a square one row and one column away, tested with abs or another way. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-28-checkers-3-lab-pick-a-piece-and-step": {
     "lessonTitle": "6.28.3 Lab: Pick a piece and step",
@@ -12450,7 +13461,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "After a move it is the other colour's turn.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: Pick a piece and step\". The task: turn a click into a row and a column with floor (taking TOP off y), pick up a piece whose colour matches the turn, and write one rule function, moveKind, that answers 'step' only for a move one square diagonally forward (up for red, down for black) onto an empty square; isLegal asks it, and doMove moves the letter, clears the picked piece and passes the turn. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A click becomes a row and a column: The click is turned into a row and a column with floor, taking the strip at the top off first. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "You pick up your own piece: A click on a piece whose colour matches the turn remembers it as the picked piece. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "One square diagonally: A step is one row and one column away, tested with abs or another way. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Forward only, by colour: Red moves up the screen and black moves down: the direction depends on whose turn it is. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "The turn passes: After a move, the turn goes to the other player: red to black, black to red. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-29-checkers-2-sub-jump-and-take": {
     "lessonTitle": "6.29.2 Sub-build: Jump and take",
@@ -12475,7 +13497,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The jumped piece is removed from the grid.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Jump and take\". The task: with red picked up, a click on an empty square two rows and two columns away is a jump when the halfway square ((r1 + r2) / 2, (c1 + c2) / 2) holds 'b': that square is emptied and red moves to the new square. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Two squares diagonally: A jump lands two rows and two columns away, tested with abs or another way. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Black is on the halfway square: The square halfway between the two ends is worked out, and it must hold black. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The jumped piece is taken: The halfway square is emptied, so black leaves the board. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-29-checkers-3-lab-jumps-and-jumping-again": {
     "lessonTitle": "6.29.3 Lab: Jumps, and jumping again",
@@ -12506,7 +13537,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A piece that can jump again keeps the turn.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: Jumps, and jumping again\". The task: teach moveKind a second answer: 'jump' for two squares diagonally over a piece of the other colour (found halfway between the ends) onto an empty square; doMove asks moveKind before moving and empties the halfway square on a jump; after a jump, if the piece can jump again (canJumpFrom), the same player keeps the turn with that piece only and only a jump (chain), and otherwise the turn passes. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Two squares diagonally: A jump is two rows and two columns away, tested with abs or another way. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The middle square is the other colour: The halfway square must hold a piece of the other colour. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The jumped piece is taken: After a jump, the halfway square is emptied. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "A chain keeps the turn: After a jump, a piece that can jump again keeps the turn instead of passing it. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-3-pocket-2-sub-slow-to-a-stop": {
     "lessonTitle": "6.3.2 Sub-build: Slow to a stop",
@@ -12525,7 +13566,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The stop test compares speed with a small number, then sets it to 0 or sets a flag.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Slow to a stop\". The task: give the ball drag and call it stopped when its speed falls under a small number, setting the speed to 0. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Drag is set: The ball has a drag above 0. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Stopped is a threshold: The speed is tested against a small number and set to 0 (or a flag). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-3-pocket-3-lab-slow-stop-count": {
     "lessonTitle": "6.3.3 Lab: Slow it, stop it, count it",
@@ -12550,7 +13599,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The counter increments in the release branch.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: Slow it, stop it, count it\". The task: give the ball drag and a stop threshold, let the player shoot only when it is at rest, and count one shot per release. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "The ball slows: Drag is set on the ball. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Stopped is a threshold: Speed under a small number becomes 0 (or a flag). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "One shot, one count: The shot count goes up in the release branch, not every frame. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-30-checkers-2-sub-crown-a-king": {
     "lessonTitle": "6.30.2 Sub-build: Crown a king",
@@ -12569,7 +13627,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Only a king may step down.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Crown a king\". The task: when the piece lands on row 0 it becomes 'R', a king (drawn with a K); a plain piece only steps up, and a king may also step down one row. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Crowned on the top row: A piece that reaches row 0 becomes 'R'. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A king may step back: A king, and only a king, may also move down a row. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-30-checkers-3-lab-kings-and-the-win": {
     "lessonTitle": "6.30.3 Lab: Kings, and the win",
@@ -12600,7 +13666,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Someone wins, and R starts again.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: Kings, and the win\". The task: crown a piece that lands on its far row ('r' on row 0 becomes 'R', 'b' on the last row becomes 'B'); make colorOf use toLowerCase so a king still belongs to its colour; let a king move backward; end a chain when a piece is crowned; after the turn passes, a player with no legal move (hasAnyMove asks moveKind about every square) loses, clicks stop, and R starts a new game. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Crowned on the far row: A red piece on row 0 becomes 'R', and a black piece on the last row becomes 'B'. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A king can move back: The forward-only rule does not hold a king back: a king may move both ways. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A check for no moves: A function asks about every square of the board whether the player whose turn it is has any move left. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "A winner, and R to play again: When the player whose turn it is has no move left, the other player is the winner; once someone has won, R starts a new game. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-31-checkers-2-sub-send-a-click": {
     "lessonTitle": "6.31.2 Sub-build: Send a click",
@@ -12625,7 +13701,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "H hosts, or JOIN joins.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Send a click\". The task: set up online.onMove once in setup() so every move that arrives is added to marks with its seat, join when JOIN has a code, host on H, and on a click (once the room is ready) send the clicked row and column with online.send instead of marking it straight away. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Moves are received: online.onMove is given a function that runs for every move. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A click is sent: online.send sends the clicked square. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Host or join: The sketch hosts a room or joins one. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-31-checkers-3-lab-checkers-online": {
     "lessonTitle": "6.31.3 Lab: Checkers online",
@@ -12656,7 +13741,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "With status 'off', the game still plays on one computer.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: Checkers online\". The task: make checkers playable across two computers: set up online.onMove once to run doMove for each arriving move only when the seat that sent it is the seat whose turn it is (the host, seat 0, plays red), nobody has won, and isLegal agrees; host on H with a fresh game, or join from a JOIN code; on a click, send the move (from row, from column, to row, to column) with online.send instead of making it when online; let only the player whose seat matches the turn click; and keep offline play working when online.status is 'off'. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A click sends four numbers: Online, a move is sent with online.send instead of being made on the spot. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "doMove runs in onMove: Every move that arrives runs doMove, on both computers. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "It checks the seat and the rules: Before onMove makes a move, it checks that the seat is the one whose turn it is and asks isLegal. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Offline still works: A check on online.status picks: send the move online, or make it straight away offline. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-32-checkers-1-playtest-and-reflect": {
     "lessonTitle": "6.32.1 Playtest and reflect: Checkers",
@@ -12707,7 +13802,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The drop requires a speed under a small number.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: A pocket you roll over\". The task: make a pass-through pocket and drop the ball only when it overlaps it slowly, guarded so it happens once. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "The pocket is pass-through: The pocket sprite has collider = 'none'. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A slow ball drops, once: Overlap plus a speed test, guarded so it happens once. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-4-pocket-3-lab-sink-it": {
     "lessonTitle": "6.4.4 Lab: Sink it",
@@ -12732,7 +13835,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A word or a message shows the ball was pocketed.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: Sink it\". The task: make the pocket pass-through, drop a slow ball into it once, and show a word when it is sunk. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "The pocket is pass-through: The pocket has collider none. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Slow drop, guarded: Overlap plus speed test, once. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The game says so: Words appear when the ball is sunk. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "6-5-pocket-1-playtest-and-reflect": {
     "lessonTitle": "6.5.1 Playtest and reflect: Pocket",
@@ -12806,7 +13918,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "One state change per transition, and no GO TO or loop back.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps for the lab \"6.11.14 Plain English to Pseudocode: The Three-State Machine\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Here is the plan in plain English: **1.** Each frame, look at which state the game is in: title, play or gameover. Only one of them runs. **2.** In the title state: draw the title screen, then if space was pressed, change the state to play. **3.** In the play state: update the game, then if the player is dead, change the state to gameover. **4.** In the gameover state: draw the game-over screen, then if r was pressed, change the state to title. **5.** Changing the state does not jump anywhere. It sets a variable, and the frame just ends. The same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps. In `README.md`, type these as numbered pseudocode **between the first and last line**. Use IF, ELSE IF and END IF for the routing (the last state is an ELSE IF too, so every state is tested by name), CALL for drawing and updating, and SET for a state change. Name the three calls `drawTitle`, `updateGame` and `drawGameOver`. Number every line, including the indented ones and the END IF lines. Each keyword looks like this, in a different program: - `IF mode is \"menu\"` ... `ELSE IF mode is \"game\"` ... `END IF` (route by a value) - `CALL drawMenu` (call another function) - `IF enter is pressed`",
+      "kind": "plan",
+      "questions": {
+        "r1": "Twelve or more numbered steps: Number every line 1. 2. 3. and so on, with something written after each number.",
+        "r2": "One chain: title, then play, then gameover: The three states are tested in one chain.",
+        "r3": "Title: draw, then check the key, then change state: The title branch draws, then checks for space, then changes the state.",
+        "r4": "Play: update, then check for death, then change state: The play branch updates the game, then checks if the player is dead, then changes the state.",
+        "r5": "Gameover: draw, then check the key, then change state: The gameover branch draws, then checks for r, then changes the state.",
+        "r6": "Three state changes, and nothing jumps: One state change per transition, and no GO TO or loop back."
+      }
+    }
   },
   "6-6-19a-fix-the-pause-chart": {
     "lessonTitle": "6.11.21 Fix the Broken Pseudocode: the Pause State",
@@ -12848,7 +13972,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The play branch updates the game, and the paused frames do not.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps for the lab \"6.11.21 Fix the Broken Pseudocode: the Pause State\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Here is what the finished feature should do, in plain English: **1.** When the state is play: update the game, and if p was pressed, change the state to paused. **2.** When the state is not play (it is paused): draw the pause screen, and if p was pressed, change the state back to play. **3.** Every path ends at the end of the frame. No step may send you back to itself. The same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps. Someone started this pseudocode and stopped halfway. It is already in `README.md`. **Press Run before changing anything**: four checks should be red. Read each red card against the plan above, then repair it. Do not start over. The call names are `updateGame` and `drawPauseScreen`. A new keyword for this repair: `ELSE` starts the branch for every other case. In a different program: `IF door is open` ... `ELSE` ... `END IF`. The ELSE belongs to the decision it lines up with, so close the inner decision first. Renumber the lines if you like: every line just needs a number. When it is all green, check the thing no check covers: can the player get out of pause? Green means legal, not finished.",
+      "kind": "plan",
+      "questions": {
+        "r1": "Every frame that is not playing is handled: The play decision has a branch for the frames when the game is not playing.",
+        "r2": "The pause screen is drawn only when paused: The call to drawPauseScreen runs only on the paused frames.",
+        "r3": "Every step moves forward: No step sends you back to an earlier step. A state change is an ordinary step.",
+        "r4": "The player can leave pause: The paused branch checks for p and goes back to play.",
+        "r5": "Pausing needs a key press: The change to paused sits inside the check for p.",
+        "r6": "Playing updates the game: The play branch updates the game, and the paused frames do not."
+      }
+    }
   },
   "6-7-10a-fix-the-drag-chart": {
     "lessonTitle": "6.12.11 Fix the Broken Pseudocode: Dragging a Sprite",
@@ -12878,7 +14014,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The sprite follows the mouse only inside the check for the sprite being under it.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps for the lab \"6.12.11 Fix the Broken Pseudocode: Dragging a Sprite\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Here is what the finished feature should do, in plain English: **1.** While the mouse is pressing: if the sprite is under the mouse, move the sprite to the mouse. **2.** When the mouse is not pressing (it was let go): set the sprite velocity to zero, so it does not fly off. **3.** Every path ends at the end of the frame. No step may send you back to itself. The same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps. Someone charted picking the sprite up carefully, and stopped. Their pseudocode is already in `README.md`. **Press Run before changing anything**: three checks should be red. Read each red card against the plan above, then repair it. Do not start over. A new keyword for this repair: `ELSE` starts the branch for every other case. In a different program: `IF door is open` ... `ELSE` ... `END IF`. The ELSE belongs to the decision it lines up with, so close the inner decision first. Renumber the lines if you like: every line just needs a number. When it is green, trace this: the player presses the mouse somewhere empty, then drags across the sprite while still holding. Does your plan pick it up mid-drag? Should it?",
+      "kind": "plan",
+      "questions": {
+        "r1": "The frames where the mouse is up are handled: The pressing decision has a branch for when the mouse is not pressing.",
+        "r2": "The velocity reset happens on release only: The velocity is zeroed only on the frames where the mouse is up.",
+        "r3": "Every step moves forward: No step sends you back to an earlier step. Moving the sprite is one ordinary step per frame.",
+        "r4": "Moving the sprite needs the sprite under the mouse: The sprite follows the mouse only inside the check for the sprite being under it."
+      }
+    }
   },
   "6-7-21a-chart-the-slingshot": {
     "lessonTitle": "6.13.12 Plain English to Pseudocode: The Slingshot",
@@ -12920,7 +14066,19 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Three IF blocks, each closed with END IF.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student was given plain-English steps for the lab \"6.13.12 Plain English to Pseudocode: The Slingshot\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Here is the plan in plain English: **1.** Each frame, ask three questions in a row. **2.** Grab: if the mouse was just pressed while over the ball, the ball is now held. **3.** Stretch: if the ball is held and the mouse is still down, move the ball to the mouse and draw the band. **4.** Release: if the ball is held and the mouse was let go, work out the force, apply it to the ball, and the ball is no longer held. **5.** If nothing is being done to the ball (idle), all three answers are no and the frame just ends. The same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps. In `README.md`, type these as numbered pseudocode **between the first and last line**. Write three separate IF blocks, one per question, each closed with END IF. Name the variable `held` and the two calls `drawBand` and `applyForce`. Number every line, including the indented ones and the END IF lines. Each keyword looks like this, in a different program: - `IF key is pressed AND player is grounded` ... `END IF` (a question the frame asks) - `SET jumping TO true` (a change; use `false` to turn something off) - `CALL playSound` (call another function) - `SET player position TO the spawn point` (move something) The force is app",
+      "kind": "plan",
+      "questions": {
+        "r1": "Ten or more numbered steps: Number every line 1. 2. 3. and so on, with something written after each number.",
+        "r2": "Grab: pressing on the ball marks it held: When the mouse is pressed on the ball, held becomes true.",
+        "r3": "Stretch: while held and the mouse is down, the ball follows and the band is drawn: A question guarded by held, with the ball moved to the mouse and the band drawn inside it.",
+        "r4": "Release: while held, letting go launches the ball and clears held: A question guarded by held, with the force applied and held cleared inside it.",
+        "r5": "The launch happens once: The force is applied in one place only. A force every frame is the classic physics bug.",
+        "r6": "Three questions, each closed: Three IF blocks, each closed with END IF."
+      }
+    }
   },
   "6-9-grids-1-plan-break-the-coin-maze-into-parts": {
     "lessonTitle": "6.14.1 Plan: Break the Coin Maze into parts",
@@ -13067,7 +14225,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Each bar draws itself.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: An object that draws itself\". The task: give the Bar class a draw(x, y) method that draws a grey bar 200 wide and, on top of it, a bar in this.color whose width is 200 * this.value / this.max, with the numbers beside it; then call health.draw(...) and magic.draw(...) from draw() so each bar draws itself. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A draw method in the class: The class has a method that draws its bar with rect. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The bar is scaled by value / max: The coloured bar's width is the whole width times this.value / this.max. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Each bar draws itself: Both bars are drawn, each by calling its own draw method. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "7-16-quest-4-lab-two-fighters": {
     "lessonTitle": "7.16.4 Lab: Two fighters",
@@ -13092,7 +14259,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Hero and enemy both appear.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: Two fighters\". The task: fill in the Fighter class's draw(x, y) method so a fighter draws itself: a circle in its colour (grey once it is not alive), its name, and an hp bar made of a grey rect 120 wide with a rect on top that is 120 * this.hp / this.maxHp wide; then draw fighters[0] and fighters[1] from draw(). Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A draw method in the class: The Fighter class has a method that draws the fighter with circle or rect. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "An hp bar scaled by hp / maxHp: The full part of the bar is the whole width times this.hp / this.maxHp. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Both fighters drawn: The hero and the enemy each draw themselves every frame. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "7-17-quest-2-sub-one-object-hits-another": {
     "lessonTitle": "7.17.2 Sub-build: One object hits another",
@@ -13117,7 +14293,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The hit back waits with after.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: One object hits another\". The task: give the Dummy class takeHit(n), which lowers hp by n but never below 0, and hit(other), which makes the other dummy take a hit of this one's power through its takeHit; when 1 is pressed and both are alive, left hits right, and after(45, ...) makes right hit back a moment later if it is still alive. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "hp never below 0: takeHit takes the hit off hp with a floor at 0, using max or a test. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "One object hits another: A method is handed the other dummy and makes it take the hit through its own takeHit, and the sketch calls that method. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The hit back comes after a pause: after is given a number of frames and a function to run later. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "7-17-quest-3-lab-trade-blows": {
     "lessonTitle": "7.17.3 Lab: Trade blows",
@@ -13154,7 +14339,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A win or loss ends it, and R restarts.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: Trade blows\". The task: give Fighter takeHit(n), which lowers hp but never below 0 and returns the damage, and attack(target, roll), which hits the target through its takeHit for power plus roll; keep turn (0 or 1), a message and an over flag; on your turn 1 attacks with a roll of 0 to 3, the turn passes with turn = 1 - turn (or another correct way), and the enemy's turn comes after(45, enemyTurn); when a fighter has no hp left the battle is over with a win or loss message, and R starts a new game. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "takeHit never below 0: takeHit lowers hp by the hit but never below 0. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "attack goes through the target's takeHit: attack is handed the target and makes it take the hit through its own takeHit, and the game calls attack. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The turn passes: After a hit, the turn goes to the other fighter: 0 to 1, 1 to 0. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "The enemy acts after a pause: The enemy's turn is handed to after(frames, fn) to run a moment later, and after gets the function itself, not its result: after(45, enemyTurn) or after(45, () => enemyTurn()) count, with any number or expression for the frames and any function name. after(45, enemyTurn()) does not count: the () calls enemyTurn right now, with no pause, and hands after what it returns. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "A win or a loss ends it, and R restarts: When a fighter has no hp left the battle is over, and once it is over R starts a new game. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "7-18-quest-2-sub-a-flag-and-a-count-inside-an-object": {
     "lessonTitle": "7.18.2 Sub-build: A flag and a count inside an object",
@@ -13179,7 +14375,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "2 guards and 3 drinks.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: A flag and a count inside an object\". The task: give the Knight a potions value in its constructor (new Knight(2)), guard(), which turns this.guarding on, make takeHit halve the hit with floor(n / 2) while guarding and then turn the flag off, and write heal(), which returns 0 with no potions left and otherwise uses one up and gives up to 12 hp back with min(this.hp + 12, this.maxHp), returning the hp gained; key 2 guards and key 3 drinks. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Guard halves the next hit: While the flag is on, takeHit halves the hit (rounded down) and then turns the flag off; guard turns it on. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A potion heals, capped, and uses one up: heal gives hp back but never above maxHp, takes one potion off the count, and does nothing when none are left. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "2 guards and 3 drinks: Key 2 calls the guard and key 3 the potion. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "7-18-quest-3-lab-attack-guard-or-potion": {
     "lessonTitle": "7.18.3 Lab: Attack, guard or potion",
@@ -13216,7 +14421,18 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Every new Fighter gets its potions, in fourth place.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: Attack, guard or potion\". The task: add a guarding flag that halves the next hit with floor(n / 2) in takeHit and is then cleared, a potions count (a new constructor value, so every new Fighter call is handed five values: name, maxHp, power, potions, color) and heal(), which gives up to 12 hp back capped at maxHp and uses one up, doing nothing when none are left; one act(t, a, roll) does action 1 attack, 2 guard or 3 potion; keys 1, 2 and 3 pick the action on your turn; and the enemy chooses, drinking when it is low and has a potion and guarding some of the time. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Guard halves the next hit: While a fighter is guarding, takeHit halves the hit (rounded down) and then turns the guard off; guard() turns it on. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A potion heals, capped, and uses one up: heal gives hp back but never above maxHp, takes one potion off the count, and does nothing when none are left. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Keys 1 to 3 pick the action: On your turn, 1, 2 and 3 each pick an action. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "The enemy can choose too: The enemy picks its action by a rule: a potion when it is low, or a guard by chance, instead of always attacking. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Every fighter gets five values: Each new Fighter(...) is handed five values, in this order: name, maxHp, power, potions, color. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "7-19-quest-2-sub-a-list-of-kinds-becomes-a-list-of-objects": {
     "lessonTitle": "7.19.2 Sub-build: A list of kinds becomes a list of objects",
@@ -13235,7 +14451,15 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "N moves on and stops at the last.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: A list of kinds becomes a list of objects\". The task: turn every plain { name, hp } kind in KINDS into a new Monster with KINDS.map (or a loop that pushes), in place of the one Monster made by hand, and let N add 1 to which, stopping at the last monster. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A list of kinds becomes a list of objects: Every kind in KINDS becomes a new Monster, with map or a loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "N moves to the next one: N adds 1 to which, and stops at the last monster in the list. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "7-19-quest-3-lab-a-run-of-enemies": {
     "lessonTitle": "7.19.3 Lab: A run of enemies",
@@ -13266,7 +14490,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "Beating the last one wins.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: A run of enemies\". The task: keep the enemy kinds as plain data in KINDS and turn them into Fighters with map (or a loop) in newGame; track which enemy you face; write levelUp() so the hero gains max hp, full hp, power and potions; after a win, unless it was the last enemy, add 1 to which, level the hero up and make the next enemy the one you face; beating the last enemy ends the game with a win. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Enemies made from KINDS: Every kind in KINDS becomes a new Fighter, with map or a loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Beating one brings the next: After a win, which goes up by 1 and the enemy you face becomes the next one in the list. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "levelUp raises max hp and power: A method raises this fighter's own max hp and power, and the game calls it after a win. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Beating the last one wins: When the enemy you beat is the last one in the list, the game is over and you have won. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "7-20-quest-2-sub-send-an-action": {
     "lessonTitle": "7.20.2 Sub-build: Send an action",
@@ -13291,7 +14525,16 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The sketch opens or joins a room.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Send an action\". The task: set up online.onMove once in setup() so each arriving action (1, 2 or 3) is added to got with the seat that sent it; join when JOIN has a code; host on H while the status is 'off'; once the room is 'ready', keys 1, 2 and 3 send { act: 1 }, { act: 2 } or { act: 3 } with online.send. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Actions are received: online.onMove is given a function that runs for every move and uses the move that arrived, for example its act. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "An action is sent: A key you press sends its action: online.send sits inside the test for that key. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Host or join: The sketch hosts a room or joins one. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "7-20-quest-3-lab-duel-a-classmate": {
     "lessonTitle": "7.20.3 Lab: Duel a classmate",
@@ -13322,7 +14565,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The campaign still plays alone.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch for \"Lab: Duel a classmate\". The task: make Quest playable as a duel across two computers: a duel flag; newGame makes Red against Blue in a duel and the run of enemies otherwise; set up online.onMove once to run act for each arriving move only in a duel, while it is not over, when the seat that sent it is the seat whose turn it is and goodMove says the action is 1 to 3 and the roll 0 to 3 (whole numbers); host on H, or join from a JOIN code; on a choice, roll once and send { act, roll } with online.send in a duel instead of acting; let only the seat whose turn it is choose; the computer enemy and R only offline; and keep the campaign working offline. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "A choice sends the action and its roll: In a duel, the action and its roll are sent with online.send instead of being done on the spot. A list like [a, roll] counts only if onMove reads it by place. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "act runs in onMove: Every move that arrives runs act, on both computers. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "It checks the seat and the move: Read only the test inside online.onMove((m, seat) => ...) that guards act. Yes only if it holds BOTH: (a) the handler's seat parameter compared with turn (not online.seat, which is this computer; not a fixed number); (b) m's roll checked to be 0 to 3, inline or by a helper called with m, such as goodMove(m), whose body checks m.roll. No: if (duel && !over && seat === turn) act(...) has no move check at all, even if goodMove is written elsewhere in the file. No: goodMove(turn) checks turn, not m. No: a check that skips the roll. Any names. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "The campaign still works offline: One test picks: in a duel the move is sent; otherwise it is done straight away. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "7-21-quest-1-playtest-and-reflect": {
     "lessonTitle": "7.21.1 Playtest and reflect: Quest",
@@ -13453,7 +14706,17 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "A sprite's friction, normally the ball's, is set to any value (the steps try 0, then 5; a very low value keeps it rolling). Help: 5.2.15 (Bounciness and Friction)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.16 Bouncy Ball\". The task they were given: Build a closed box with a ball in it: make four long thin static walls (top, bottom, left, right), make the ball as a dynamic sprite with one size number so it is a circle, store it in ball and colour it, make it bouncy (near the top of the 0 to 1 range), give it a friction value (the steps try 0 and then 5), and give it a sideways starting speed. What the starter file already had: `let ball;`, a 400 by 400 canvas, gravity turned on (world.gravity.y = 10), background painted in draw(), and four step comments in setup(). The starter meets none of the criteria.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Create multiple static walls: Count the sprites that really are static: a new Sprite(...) whose last argument is 'static', or a sprite whose .collider is set to 'static' afterwards. Two or more are needed. A new Sprite(x, y, w, h) with no 'static' and no .collider = 'static' line is dynamic, whatever its comment or variable name says (four walls made plain with only top.collider = 'static' is ONE static wall, so it does not count). A group counts: walls.collider = 'static' then several new walls.Sprite(...) lines makes that many static walls. Any variable name. Code inside comments never runs.",
+        "r2": "Create a dynamic ball: A dynamic sprite is present Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Make it bouncy: The ball's .bounciness is set near the top of the 0 to 1 range: 0.5 or more. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Set friction: Assign to .friction. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "moshion-gravity": {
     "lessonTitle": "5.2.9 Worked Example: Falling Block",
@@ -13465,6 +14728,13 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "description": "The world.gravity.y line that runs ends with a value other than 10. Step 2 ends at 20, but 0, a negative number or any other value also shows the student changed it, so it counts. Gravity set back to 10, or a new value written only in a comment, is not met. Help: 5.2.8 (Reading: Gravity)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.9 Worked Example: Falling Block\". The task they were given: A worked example: a block falls under gravity and lands on a static ground. The student changes world.gravity.y from 10 to 0 (the block floats), then to 20 (it falls faster) and leaves it at 20, then removes 'static' from the ground to watch both fall, and adds a second falling block in another colour. Only the gravity change is checked. What the starter file already had: world.gravity.y set to 10 in setup(), an orange block and a gray static ground. With gravity still at 10 the criterion is not met.",
+      "kind": "moshion",
+      "questions": {
+        "r1": "Find the line that sets world.gravity.y and is not inside a comment. Is it set to anything other than exactly 10? YES: world.gravity.y = 1; world.gravity.y = -1; world.gravity.y = 5; world.gravity.y = 9; world.gravity.y = 20; world.gravity.y = 80; a huge number; a changing value such as random(...). NO: world.gravity.y = 10; (the starter). Code inside comments never runs."
+      }
+    }
   }
 };

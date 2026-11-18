@@ -75,6 +75,12 @@
         "description": "The test inside filter keeps the living, in any shape: it asks each enemy isAlive(), or keeps those whose hp is above 0 (an arrow with or without braces, a function with return, === true). In a loop that pushes into a new list, the push must happen only for the enemies that ARE alive; in a loop that splices or shifts, it must happen for the enemies that are NOT alive. A test that keeps the dead (such as !e.isAlive() inside filter, or hp <= 0) is the opposite and not met.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A filtered list is stored back in enemies: Does the code take the dead enemies out of the enemies array itself, so it gets shorter? Any of these counts: enemies = enemies.filter(...); a filter or a push-built new list that is then stored back in enemies; a backward loop, or a forward loop that steps back with i--, that splices out the dead; a while loop that shifts the front enemy off while it is dead, such as while (enemies.length && !enemies[0].isAlive()) enemies.shift(); Does not count: a new list never stored back in enemies, a loop that removes every enemy, or a forward splice with no i--. Any names, braces or none. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The test keeps the enemies that are still alive: The filter keeps the living — it asks each enemy `isAlive()`, or compares its health (a loop that pushes the living into a new list, or splices out the enemies that are not alive, also counts). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

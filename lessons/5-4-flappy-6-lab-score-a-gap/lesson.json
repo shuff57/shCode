@@ -98,6 +98,13 @@
         "description": "Inside the test that reads the pipe's flag, the score goes up by one (score += 1, score++ or score = score + 1) and the same pipe's flag is set to true, in either order. Missing: the score goes up but the flag is never set (the score races), or the two happen in different places. Help: 5.4.1 (Reading: A collision is not an event)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Every pipe is checked: A loop looks at each pipe in the array (a for...of loop, an index loop or forEach) and compares it with the bird inside the loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A pipe is passed when it is behind the bird: The pipe's x is compared with the bird's x and the pipe's own flag. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Each pipe is counted once: The score goes up and the pipe is flagged in the same step. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

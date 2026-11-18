@@ -109,6 +109,14 @@
         "description": "The counter increments in the release branch.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "The ball slows: Drag is set on the ball. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Stopped is a threshold: Speed under a small number becomes 0 (or a flag). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "One shot, one count: The shot count goes up in the release branch, not every frame. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Lab: Slow it, stop it, count it\". The task: give the ball drag and a stop threshold, let the player shoot only when it is at rest, and count one shot per release. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

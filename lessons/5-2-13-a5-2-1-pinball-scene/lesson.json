@@ -131,6 +131,14 @@
         "description": "Pressing a key repositions the ball (sets its x and/or y) so a lost ball can be brought back to the top. Help: 5.2.12 (Reading: Ground-Gated Actions)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Turn on gravity: world.gravity.y is set to a non-zero value. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Add at least three static obstacles: At least three 'static' sprites exist in the scene. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Make the ball genuinely bouncy: The ball's bounciness is set to 0.8 or more. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Add a reset key: Pressing a key repositions the ball (sets its x and/or y) so a lost ball can be brought back to the top. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

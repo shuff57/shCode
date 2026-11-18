@@ -123,7 +123,15 @@
         "description": "The flag is tested somewhere in draw() and the test changes what happens: for example the play area while playing, and 'Game over' with the final score once the round has ended, or the same with a gameOver flag tested the other way round. An if with nothing inside its braces changes nothing, so it is not met. Help: 5.5.1 (Reading: The state of the game)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A flag says whether the game is being played: A variable created once and starting true is the game's state. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The ball falling past the bottom ends the round: Losing is a position test: when the ball's y is past the bottom of the canvas, the round ends. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A restart puts the score back: Pressing R starts a fresh round, so the score returns to 0 along with the ball. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Is the flag that the losing test sets (any name: playing, flag, gameOver, lost) read somewhere by an if, an && or a ternary, so it changes what happens? For example if (playing) { ... } else { text('Game over', ...) }, if (flag === false) { text('Game over', ...) }, if (!playing) { ... }, or if (playing === false && kb.pressed('r')) { ...restart... }. The losing test may use ball.y or ball.pos.y, and the flag may start true or false. The flag read must be the one set when the ball falls, and an if whose braces are empty, with no else, changes nothing. Code inside comments never runs."
+      }
+    }
   },
   "carryFrom": "5-3-pinball-6-lab-score-one-point-per-touch"
 }

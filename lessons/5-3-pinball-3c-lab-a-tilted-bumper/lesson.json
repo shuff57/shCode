@@ -84,7 +84,13 @@
         "description": "The bumper's `rotation` is set to a number that is not 0, so the ball leaves at an angle. Help: 5.3.5 (Worked Example: The table and the goal)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "The bumper has a name and stays put: A static sprite is stored in `bumper`, so it does not fall and the code can ask about it later. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The bumper is tilted: The bumper's `rotation` is set to a number that is not 0, so the ball leaves at an angle. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "carryFrom": "5-3-pinball-3b-lab-walls-and-a-ground"
 }

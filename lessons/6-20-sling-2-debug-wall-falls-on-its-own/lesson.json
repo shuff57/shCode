@@ -85,6 +85,13 @@
         "description": "The sweep comes before the end check.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "The stack holds: The bottom row is static, or blocks have rotationLock. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Cleanup before the check: The shot sweep runs before the win/lose test. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Debugging: The wall that falls on its own\". The task: stabilise the block stack so it does not fall on its own, and clear spent shots before deciding win or lose. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

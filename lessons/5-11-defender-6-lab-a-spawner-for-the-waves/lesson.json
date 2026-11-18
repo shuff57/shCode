@@ -175,7 +175,17 @@
         "description": "wavePause, spawnWave() and nextWave() no longer appear in running code (a mention in a comment is fine), and the HUD in drawTop() reads spawner.wave instead of the old wave. A drawTop() that still reads the bare wave is not met: once the old variable is gone it stops the game with 'wave is not defined'. A leftover nextWave() or spawnWave() that is still called is not met; one left defined but never called is partial.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "ready() counts down only on a clear field: ready(enemiesLeft) answers false while enemies are left, and only on a clear field counts this.pause down by 1. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "makeWave() builds and returns a new array of enemies: makeWave() adds 1 to this.wave, builds the wave's enemies with new Enemy(...) and returns them. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "draw() asks the spawner: The game asks spawner.ready(...) and, when it says yes, keeps what spawner.makeWave() gives back (enemies = spawner.makeWave()). Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "A restart is a new Spawner: startRound() sets spawner = new Spawner(), so the wave and the pause start again together. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "The class counts its enemies, and a round resets the count: Enemy has static spawned = 0, its constructor adds 1 to Enemy.spawned, and startRound() sets Enemy.spawned back to 0. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "The old wave globals are gone: wavePause, spawnWave() and nextWave() are deleted, and the HUD in drawTop() reads spawner.wave instead of the old wave: the Spawner class does their jobs now. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "carryFrom": "5-11-defender-5-lab-bullet"
 }

@@ -117,6 +117,14 @@
         "description": "The bottom three rows get red.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A dark-square test with % 2: A piece is placed only on a dark square, tested with % 2 on the row plus the column. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Black on the top rows: Black pieces ('b') go on the top three rows, rows 0, 1 and 2. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Red on the bottom rows: Red pieces ('r') go on the bottom three rows, rows 5, 6 and 7. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Lab: Set up the board\". The task: fill in makeBoard so a dark square ((r + c) % 2 === 1, or another correct test) holds 'b' on rows 0 to 2 and 'r' on rows 5 to 7, and every other square stays ''. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

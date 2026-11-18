@@ -89,6 +89,13 @@
         "description": "Both are set; direction uses angleTo and speed uses the distance.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "The shot is on release: The direction/speed are set inside a mouse.released() test. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Power comes from the pull, capped: The speed uses dist/angleTo and is capped with min or constrain. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Pull back and let go\". The task: set the ball's direction away from the pointer and its speed from the pull distance, capped, inside a mouse.released() test. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

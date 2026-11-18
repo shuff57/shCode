@@ -74,6 +74,12 @@
         "description": "The method's body adds the parameter to this.n: +=, this.n = this.n + the parameter, or the same with the parameter first. Calling this.tick() in a loop that runs that many times also adds it. Partial: the parameter is used but replaces the count instead of adding to it. Missing: the parameter is never used. Help: 3.2.5 (Parameters and Arguments)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "addBy(n) method declared: Write an `addBy(n)` method inside `Counter` that takes a parameter and uses it. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Parameter used inside method body: The parameter passed to `addBy` is referenced inside the method body (e.g. `this.n += n`). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

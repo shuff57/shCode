@@ -85,7 +85,13 @@
         "description": "A static sprite is stored in `ground`, so the code can ask about it later. Help: 5.3.5 (Worked Example: The table and the goal)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Three things stay put: Three or more sprites are built with the static body type, so they do not fall. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The ground has a name: A static sprite is stored in `ground`, so the code can ask about it later. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "carryFrom": "5-3-pinball-3a-lab-drop-a-bouncy-ball"
 }

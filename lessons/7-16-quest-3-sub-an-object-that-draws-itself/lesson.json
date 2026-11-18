@@ -114,6 +114,14 @@
         "description": "Each bar draws itself.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A draw method in the class: The class has a method that draws its bar with rect. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The bar is scaled by value / max: The coloured bar's width is the whole width times this.value / this.max. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Each bar draws itself: Both bars are drawn, each by calling its own draw method. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Sub-build: An object that draws itself\". The task: give the Bar class a draw(x, y) method that draws a grey bar 200 wide and, on top of it, a bar in this.color whose width is 200 * this.value / this.max, with the numbers beside it; then call health.draw(...) and magic.draw(...) from draw() so each bar draws itself. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

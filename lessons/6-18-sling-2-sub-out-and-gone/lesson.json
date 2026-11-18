@@ -86,6 +86,13 @@
         "description": "The loop starts at the end.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Two removals: A spent shot is deleted and spliced in the same branch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Backwards: The sweep runs from the end of the array. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Out and gone\". The task: in a backwards loop, remove off-screen shots from the screen (delete) and from the array (splice). Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

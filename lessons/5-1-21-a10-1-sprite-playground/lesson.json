@@ -270,6 +270,19 @@
         "description": "background(...) is called inside draw(), or in a function the student wrote that draw() calls, with any colour, so previous frames do not stack up. Help: 5.1.9 (background(color) wipe rule)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Is there a line new Canvas(...) outside any comment that gives a width and a height as two numbers, like new Canvas(500, 400), new Canvas(300,300) or new Canvas (1000, 1000)? Any size counts, and a missing semicolon is fine in JavaScript. new Canvas(400*400) passes only one number, so it does not count. Code inside comments never runs.",
+        "r2": "Create at least 2 sprites: Two sprites exist in the sketch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r9": "Make your sprite once, in setup(): new Sprite(...) is written in setup(), or in a function that setup() calls, and no new Sprite(...) or new Canvas(...) is in draw(), which runs about 60 times a second. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Horizontal keyboard input: The left or right key (`'a'`, `'d'`, `'left'` or `'right'`) moves the player horizontally each frame, in draw() or in a function of your own that draw() calls (not setup(), which runs once). update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Vertical keyboard input: The up or down key (`'w'`, `'s'`, `'up'` or `'down'`) moves the player vertically each frame, in draw() or in a function of your own that draw() calls (not setup(), which runs once). update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Velocity resets to zero: The player stops when no movement key is held, on both axes: vel.x and vel.y each go back to 0 (an else at the end of each chain, or 0 at the top of draw() before the key checks), and no else undoes a key, so the player can move all four ways. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "Automatic motion for the mover: The mover (any name, not the sprite the keys drive) moves on its own, by its own rule, with no key held: worked out from frameCount, nudged a little every frame (the way 5.1.9 nudged the player), or given a velocity or a rotationSpeed. A line that copies the player's speed, or one inside an if that tests a key, moves it only when a key does, so it does not count. Code inside a comment, or written inside quotes as text, never runs.",
+        "r7": "On-screen text label: A text label is drawn on the canvas each frame, in draw() or in a function of your own that draw() calls (not setup(), which runs once). update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r8": "Clear the background each frame: Previous frames don't stack up: background() is called in draw(), or in a function of your own that draw() calls. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

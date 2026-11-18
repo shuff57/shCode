@@ -154,6 +154,17 @@
         "description": "The play branch updates the game, and the paused frames do not.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Every frame that is not playing is handled: The play decision has a branch for the frames when the game is not playing.",
+        "r2": "The pause screen is drawn only when paused: The call to drawPauseScreen runs only on the paused frames.",
+        "r3": "Every step moves forward: No step sends you back to an earlier step. A state change is an ordinary step.",
+        "r4": "The player can leave pause: The paused branch checks for p and goes back to play.",
+        "r5": "Pausing needs a key press: The change to paused sits inside the check for p.",
+        "r6": "Playing updates the game: The play branch updates the game, and the paused frames do not."
+      },
+      "task": "The student was given plain-English steps for the lab \"6.11.21 Fix the Broken Pseudocode: the Pause State\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Here is what the finished feature should do, in plain English: **1.** When the state is play: update the game, and if p was pressed, change the state to paused. **2.** When the state is not play (it is paused): draw the pause screen, and if p was pressed, change the state back to play. **3.** Every path ends at the end of the frame. No step may send you back to itself. The same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps. Someone started this pseudocode and stopped halfway. It is already in `README.md`. **Press Run before changing anything**: four checks should be red. Read each red card against the plan above, then repair it. Do not start over. The call names are `updateGame` and `drawPauseScreen`. A new keyword for this repair: `ELSE` starts the branch for every other case. In a different program: `IF door is open` ... `ELSE` ... `END IF`. The ELSE belongs to the decision it lines up with, so close the inner decision first. Renumber the lines if you like: every line just needs a number. When it is all green, check the thing no check covers: can the player get out of pause? Green means legal, not finished."
+    }
   }
 }

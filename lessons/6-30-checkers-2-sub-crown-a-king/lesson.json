@@ -90,6 +90,13 @@
         "description": "Only a king may step down.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Crowned on the top row: A piece that reaches row 0 becomes 'R'. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A king may step back: A king, and only a king, may also move down a row. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Crown a king\". The task: when the piece lands on row 0 it becomes 'R', a king (drawn with a K); a plain piece only steps up, and a king may also step down one row. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

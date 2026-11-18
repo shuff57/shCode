@@ -92,6 +92,13 @@
         "description": "The direction is the angle to the pointer plus 180 (or the equivalent).",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A shot on release: Direction and speed are set inside a mouse.released() test. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Power from the pull, capped: Speed comes from the distance and is capped. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Lab: Take the shot\". The task: turn a pull-back into a shot: a line while held, then direction away from the pointer and speed from the capped pull, on release. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

@@ -109,6 +109,14 @@
         "description": "Each square is placed from its row and column.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Two loops, one inside the other: One loop visits the rows and a second loop inside it visits the columns. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A test with % 2: The colour is picked by a test on the row plus the column with % 2. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A square at each row and column: Each square is a rect placed from its column and row times the cell size. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Sub-build: A checkered board\". The task: draw an 8 by 8 checkered board with two loops, one inside the other, picking a dark colour when the row plus the column is odd ((r + c) % 2 === 1, or another correct test) and drawing one rect per square from its column and row times the cell size. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }
