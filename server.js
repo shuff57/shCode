@@ -703,6 +703,9 @@ app.prepare().catch((err) => {
     server.post('/api/rooms/:code/send', express.json(), libRoute(roomSend.onRequestPost));
     // A tab that is closing leaves with navigator.sendBeacon, whose body is text/plain (lib/room-leave.ts).
     server.post('/api/rooms/:code/leave', express.json({ type: ['application/json', 'text/plain'] }), libRoute(roomLeave.onRequestPost));
+    // Code together: the other seated people's art the shared program uses.
+    const roomAssets = await import('./functions/api/rooms/[code]/assets.ts');
+    server.post('/api/rooms/:code/assets', express.json({ limit: '256kb' }), libRoute(roomAssets.onRequestPost));
     const liveRoute = await import('./functions/api/live/[code].ts');
     server.get('/api/live/:code', libRoute(liveRoute.onRequestGet));
     // Code together (code rooms go to the LiveDoc stand-in in scripts/dev-live.mjs):
@@ -796,6 +799,9 @@ app.prepare().catch((err) => {
     server.post('/api/messages/:id', express.json({ limit: '512kb' }), libRoute(messagesOne.onRequestPost));
     const messageShare = await import('./functions/api/shares/[id].ts');
     server.get('/api/shares/:id', libRoute(messageShare.onRequestGet));
+    // The sender's pictures and sounds for a sent moSHion program.
+    const messageShareAssets = await import('./functions/api/shares/[id]/assets.ts');
+    server.post('/api/shares/:id/assets', express.json({ limit: '256kb' }), libRoute(messageShareAssets.onRequestPost));
     server.get('/api/classes/:id/messages', libRoute(classMessages.onRequestGet));
     server.post('/api/classes/:id/messages', express.json(), libRoute(classMessages.onRequestPost));
     server.get('/api/game-changes/:cid', libRoute(changeOne.onRequestGet));

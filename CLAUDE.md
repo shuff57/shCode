@@ -1237,6 +1237,18 @@ under random concurrent edits, kind routing, the teacher route), `scripts/test-l
 wrangler dev). Deploy order: apply 0044 (`npm run d1:migrate`), `cd workers/live && npx wrangler deploy` (adds LiveDoc,
 tag v2, D1 binding), then the site (the repo wrangler.toml now declares `LIVE_DOC`; do not deploy the site from this
 tree before the Worker has the class).
+**The others' pictures and sounds (2026-11-17; no migration).** A sketch loads saved art from the RUNNER's library, so in
+a session only the person who drew a picture saw it. On each moSHion Run in a session the sandbox asks
+`POST /api/rooms/[code]/assets {code}` (caller seated now in an open `kind = 'code'` room, else 404) for the OTHER seated
+people's live items the program uses (`usedItems`), **shared with a class or not** (owner's decision 2026-11-17: coding one
+program together is the consent; the art reaches only the people in it), the lower seat's copy on a name clash. The frame
+waits up to 5 s for them and lays them over the store with `ownWins` (the runner's own same-named item still wins), for
+that run only. Bytes through `functions/_shared/itemAssets.ts` (shared with the games route). Tests:
+`scripts/test-session-assets.mjs` (npm test). **A program sent in a message** gets the same: `/shared`'s moSHion run asks
+`POST /api/shares/[id]/assets` (who may open it is `openShare`, `functions/_shared/shareAccess.ts`, also used by GET
+`/api/shares/[id]`) for the SENDER's used items, shared or not; a `copy` reads the code stored with it (never the
+request's), a `watch` the text the watcher runs, only while that session is open. Remix into the sandbox does not copy
+the art into the reader's library.
 
 ### Rooms close when the host's tab is gone; Code together is a popup (2026-11-08)
 On page hide, a game room or Code together tab leaves its seat with `navigator.sendBeacon` (fetch keepalive as the

@@ -40,6 +40,11 @@ import EditorPlaceholder from './diagram/EditorPlaceholder';
 import { emptyDiagram, type DiagramDoc } from '../lib/diagram-types';
 import { getMode, sandboxLesson, type SandboxModeId } from '../lib/sandbox-modes';
 import { isCodeCadProject } from '../lib/solidcraft-code';
+import { getSessionAssets } from '../lib/games-client';
+import type { GameAsset } from '../lib/game-assets';
+
+/** How long a Code together Run waits for the others' pictures before it starts without them. */
+const SESSION_ASSETS_WAIT_MS = 5000;
 
 // SolidCraft loads only for CAD projects; JS and moSHion keep their own
 // workspaces. The retired CAD studio is no longer part of this surface.
@@ -216,6 +221,21 @@ export default function SandboxWorkspace({ initialMode }: { initialMode?: Sandbo
   const [runKey, setRunKey] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [consoleResetKey, setConsoleResetKey] = useState(0);
+  // Code together: the other people's pictures and sounds this run's program uses (POST /api/rooms/[code]/assets),
+  // laid over this computer's store for the run only. The frame waits for them (at most SESSION_ASSETS_WAIT_MS), so
+  // its first store already has them, as /play does.
+  const [sessionAssets, setSessionAssets] = useState<{ run: number; list: GameAsset[] } | null>(null);
+  const assetsRoom = together && mode.preview === 'moshion' ? togetherCode : null;
+  useEffect(() => {
+    if (!assetsRoom || runKey === 0) return;
+    let live = true;
+    const done = (list: GameAsset[]) => { if (live) { live = false; setSessionAssets({ run: runKey, list }); } };
+    const timer = window.setTimeout(() => done([]), SESSION_ASSETS_WAIT_MS);
+    void getSessionAssets(assetsRoom, code).then((r) => done(r.ok ? r.value.assets ?? [] : []));
+    return () => { live = false; window.clearTimeout(timer); };
+    // `code` is set together with runKey by run(); a new run is what asks again.
+  }, [assetsRoom, runKey]);
+  const waitingForAssets = !!assetsRoom && runKey > 0 && sessionAssets?.run !== runKey;
   const [logs, setLogs] = useState<LogLine[]>([]);
   // The output follows the newest line, unless the student has scrolled up to read.
   const outputRef = useRef<HTMLPreElement | null>(null);
@@ -791,7 +811,13 @@ export default function SandboxWorkspace({ initialMode }: { initialMode?: Sandbo
             </pre>
           </>
         ) : (
-          <MoshionPreview code={code} runKey={runKey} gameKey="sandbox" />
+          <MoshionPreview
+            code={code}
+            runKey={waitingForAssets ? 0 : runKey}
+            gameKey="sandbox"
+            assets={assetsRoom && sessionAssets?.run === runKey ? sessionAssets.list : undefined}
+            assetsOwnWins
+          />
         )}
     </>
   );

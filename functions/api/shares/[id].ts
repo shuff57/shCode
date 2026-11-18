@@ -6,8 +6,9 @@
 // the message, only the class's teachers can still open it. A copy carries its code (run on /shared, never here); an invitation to
 // Code together carries the session's code only while that same session is open. No email in the answer.
 
-import { json, shareCard, threadAccess, type SessionData, type ShareRow } from '../../_shared/messages';
-import { isShareId, type ShareView } from '../../../lib/messages-core';
+import { json, shareCard, type SessionData } from '../../_shared/messages';
+import { openShare } from '../../_shared/shareAccess';
+import type { ShareView } from '../../../lib/messages-core';
 
 interface Env {
   DB: D1Database;
@@ -17,17 +18,9 @@ type Ctx = EventContext<Env, 'id', SessionData>;
 const missing = () => json({ error: 'That program is not there any more, or it was not sent to you.' }, 404);
 
 export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ params, env, data }: Ctx) => {
-  const id = String(params.id);
-  if (!isShareId(id)) return missing();
-  const row = await env.DB.prepare(`SELECT * FROM message_shares WHERE id = ?`).bind(id).first<ShareRow>();
-  if (!row) return missing();
-  const a = await threadAccess(env.DB, data, row.thread_id);
-  const msg = await env.DB.prepare(`SELECT deleted_at, retracted_at FROM messages WHERE id = ?`).bind(row.message_id)
-    .first<{ deleted_at: number | null; retracted_at: number | null }>();
-  if (!a || !a.read || !msg) return missing();
-  if (msg.deleted_at != null && !a.moderate) return missing();
-  // A program its author deleted with the message (migration 0056) is the class's teachers' to open, nobody else's.
-  if (msg.retracted_at != null && !(a.role === 'teacher' || data.role === 'admin')) return missing();
+  const opened = await openShare(env.DB, data, String(params.id));
+  if (!opened) return missing();
+  const { row, access: a } = opened;
 
   const author = a.members.find((m) => m.email === row.author_email);
   const view: ShareView = {

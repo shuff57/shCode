@@ -25,23 +25,15 @@
 
 import { gameClassesFor, json, visibleGame, type SessionData } from '../../../_shared/games';
 import { publicItemIdsOf } from '../../../_shared/publicShare';
-import { MAX_ITEM_BYTES, isKind, r2Key, type LibraryKind } from '../../../_shared/library';
+import { isKind } from '../../../_shared/library';
+import { loadItemAssets, type AssetItemRow } from '../../../_shared/itemAssets';
 import { isGameId, usedItems } from '../../../../lib/games-core';
-import { metaFrames, type GameAsset } from '../../../../lib/game-assets';
 
 interface Env {
   DB: D1Database;
   UPLOADS: R2Bucket;
 }
 type Ctx = EventContext<Env, 'id', SessionData>;
-
-interface ItemRow {
-  id: string;
-  kind: LibraryKind;
-  name: string;
-  mime: string;
-  meta: string | null;
-}
 
 export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ params, env, data }: Ctx) => {
   const id = String(params.id);
@@ -52,7 +44,7 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
 
   const items = await env.DB.prepare(
     `SELECT id, kind, name, mime, meta FROM library_items WHERE owner_email = ? AND deleted_at IS NULL ORDER BY kind, name`,
-  ).bind(author).all<ItemRow>();
+  ).bind(author).all<AssetItemRow>();
   const all = (items.results ?? []).filter((r) => isKind(r.kind));
   const used = usedItems(seen.row.code, all);
   if (seen.mine && !used.length) return json({ assets: [], missing: [], missingItems: [] });
@@ -83,22 +75,7 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
   // The publisher gets only what the code uses (the rest of their library is theirs on this computer anyway);
   // anyone else gets everything they may see (see (b) above).
   const serve = seen.mine ? used : all.filter((u) => available.has(u.id));
-  const assets: GameAsset[] = [];
-  if (env.UPLOADS) {
-    const got = await Promise.all(serve.map(async (u) => {
-      const obj = await env.UPLOADS.get(r2Key(u.id));
-      if (!obj) return null;
-      const text = await obj.text();
-      if (!text.startsWith('data:') || text.length > MAX_ITEM_BYTES[u.kind]) return null;
-      const a: GameAsset = { kind: u.kind, name: u.name, type: u.mime, data: text, meta: u.meta ?? null };
-      if (u.kind === 'texture') {
-        const f = metaFrames(u.meta);
-        if (f) a.frames = f;
-      }
-      return a;
-    }));
-    for (const a of got) if (a) assets.push(a);
-  }
+  const assets = await loadItemAssets(env.UPLOADS, serve);
   return json({
     assets,
     missing: [...new Set(missingItems.map((m) => m.name))].sort((a, b) => a.localeCompare(b)),

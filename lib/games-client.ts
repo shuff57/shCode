@@ -244,6 +244,15 @@ export function getGameAssets(id: string) {
   return call<GameAssetsResponse>(`/api/games/${encodeURIComponent(id)}/assets`);
 }
 
+/** In a Code together session: the other seated people's pictures, sounds and fonts `program` uses. */
+export function getSessionAssets(room: string, program: string) {
+  return call<{ assets: GameAssetsResponse['assets'] }>(`/api/rooms/${encodeURIComponent(room)}/assets`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: program }),
+  });
+}
+
 /**
  * Publish the code, updating `id` when given. An id this account does not own
  * (another student signed in on this browser, or the game was deleted) is
