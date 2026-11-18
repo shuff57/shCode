@@ -627,6 +627,10 @@ export default function SandboxWorkspace({ initialMode }: { initialMode?: Sandbo
       ? { kind: 'cloud', text: 'Saved to the cloud' }
       : { kind: 'changed', text: 'Changed since cloud save' };
 
+  // In the cloud and unchanged since (a Save or an upload by itself): the Save icon turns green and the
+  // state line goes away, since the green icon already says it. Any edit brings the line back.
+  const cloudSynced = upload.state !== 'none' ? upload.state === 'uploaded' : saveState.kind === 'cloud';
+
   const renderCloudChips = () => (
     <>
       {lessonProgress.authed && (
@@ -635,9 +639,10 @@ export default function SandboxWorkspace({ initialMode }: { initialMode?: Sandbo
           <button
             style={chipStyle}
             className="sandbox-save-btn"
+            data-synced={cloudSynced ? 'true' : undefined}
             onClick={saveToCloud}
             disabled={cloud.saving||capturing}
-            title="Save this sandbox to the cloud so you can open it on another device."
+            title={cloudSynced ? 'Saved to the cloud. Save again any time.' : 'Save this sandbox to the cloud so you can open it on another device.'}
           >
             <CloudUpload size={12} />
             {cloud.saving||capturing ? 'Saving…' : 'Save'}
@@ -647,7 +652,7 @@ export default function SandboxWorkspace({ initialMode }: { initialMode?: Sandbo
           </span>
         </span>
       )}
-      {lessonProgress.authed && (
+      {lessonProgress.authed && !cloudSynced && (
         upload.state !== 'none' ? (
           <span className="sandbox-save-state" data-state={sandboxDotState(upload.state)} data-upload-state={upload.state} title="Your code is kept on this computer and uploads to your account by itself.">
             <span className="sandbox-save-dot" aria-hidden="true" />{uploadText(upload)}

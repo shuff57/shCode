@@ -4080,6 +4080,7 @@ a.mod-row.is-next {
   display: inline-flex; align-items: center; gap: 6px; margin-left: 2px; white-space: nowrap;
   font-family: var(--font-prose); font-size: 13px; color: var(--c-meta);
 }
+.sandbox-tb-end .sandbox-save-btn[data-synced="true"] svg { color: var(--c-green); }
 .sandbox-save-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c-meta); }
 .sandbox-save-state[data-state="cloud"] .sandbox-save-dot { background: var(--c-green); }
 .sandbox-save-state[data-state="changed"] .sandbox-save-dot { background: var(--c-orange); }
