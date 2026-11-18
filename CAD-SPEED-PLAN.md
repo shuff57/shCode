@@ -139,5 +139,38 @@ a refusal or a time budget for speed.
   4. **Keep one frame mounted across the app.** Fewer mounts, but it does not help a fresh page load.
 - **Recommendation.** Do 1 now (a deploy), then 2. Do not do 3.
 
+## Done (2026-11-18): the engine kept by the studio page (option 2)
+
+- **What.**
+  - The studio page keeps the pinned engine (101 MB) and kernel (74 MB) in its own Cache Storage, in
+    `lib/solidcraft-runtime-cache.ts`.
+  - The credentialless host frame asks for the bytes with `?cache=parent`, in `vendor/solidcraft-preview/src/runtime-cache.js`.
+  - A file is handed over only if its size and sha256 match `SOLIDCRAFT_ASSETS`. A damaged copy is downloaded again, and
+    a download that does not match is refused and not kept.
+- **How SolidCraft gets it, its files unchanged.** Our host page loads SolidCraft's `index.html` through `srcdoc`, adding:
+  - a `<base>` tag;
+  - a `fetch` shim that answers its engine URL from the bytes;
+  - without its preload hint for the engine, which would download it again;
+  - without its service worker, which precached the engine, another 101 MB per visit, into storage the frame throws away.
+
+  The kernel is compiled from the bytes in `pane.js`. With no cache, or on any failure, the frame loads
+  `./solidcraft/index.html` as before.
+- **Measured, two visits in one browser** (`/tmp/cad-drive/cache-e2e.py`):
+
+  | Visit | Downloads |
+  |---|---|
+  | Before | The engine 3 times, by the page, its preload and its service worker; and the kernel |
+  | First visit with the cache | The engine once and the kernel once, both by the studio page |
+  | Second visit | Neither; only the dev-only session kernel, which is not pinned |
+
+  The part and the probes are the same on both visits.
+- **A fix found on the way: SolidCraft's frame loading again.** The crash guard reloads it after the engine stops.
+  - The studio kept the old API and hung on the next Run.
+  - It now takes the new API once SolidCraft answers, forgets what it built, and builds the code again.
+  - Checked with the real engine stop, `fc combined seed 215`: pk6 and pk8 are refused as recorded, SolidCraft comes back
+    from the cache, and a Run builds (`/tmp/cad-drive/crash-e2e.py`).
+- **Still to do (a deploy).** Store brotli copies in R2. That makes the first visit's download smaller; this change makes
+  every later one zero.
+
 ## Phase 0, before anything: a speed bench in the repo
 `/tmp/cad-drive/profile.py` and `settle.py`, cleaned up into `scripts/`. It measures page load, the first Run, an unchanged Run, and a Run after a small change, for the starter and the heavy script. Every phase reports before and after numbers from it.

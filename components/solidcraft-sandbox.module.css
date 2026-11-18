@@ -106,10 +106,14 @@
 .gridMinor { stroke:rgb(148 163 184 / .22); stroke-width:1; }
 .gridMajor { stroke:rgb(148 163 184 / .45); stroke-width:1; }
 .gridAxis { stroke:rgb(96 165 250 / .75); stroke-width:1.5; }
-.sketchFace { stroke:rgb(250 204 21 / .9); stroke-width:2.5; }
+.sketchFace { fill:none; stroke:rgb(250 204 21 / .9); stroke-width:2.5; }
 .sketchCurve { fill:none; stroke:var(--c-orange, #ffb86c); stroke-width:2; }
 .sketchPreview { fill:none; stroke:var(--c-orange, #ffb86c); stroke-width:1.5; stroke-dasharray:5 4; }
 .sketchBarHost:empty { display:none; }
 .sketchBar { display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap; }
 .sketchPlane { color:var(--c-meta); }
 .sketchBar button[aria-pressed="true"], .sketchToolOn { background:var(--brand) !important; color:var(--on-brand) !important; border-color:var(--brand) !important; }
+.sketchFinish { display:inline-flex; align-items:center; gap:4px; padding-left:6px; border-left:1px solid var(--border); }
+.sketchFinish input { width:5.5em; font:inherit; background:var(--card); color:var(--text); border:1px solid var(--border); border-radius:4px; padding:1px 4px; }
+.sketchNote { color:var(--c-orange, #ffb86c); }
+.newSketch { margin-right:8px; }

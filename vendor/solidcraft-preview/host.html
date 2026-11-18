@@ -14,7 +14,9 @@
 </head>
 <body>
 <!-- ./solidcraft/ is the pinned SolidCraft web build (trunk build --release, dist/web). Same origin as this page, so the page can reach window.solidcraft. -->
-<iframe id="sc" src="./solidcraft/index.html" title="SolidCraft"></iframe>
+<iframe id="sc" title="SolidCraft"></iframe>
+<!-- shCode: loads ./solidcraft/index.html into #sc; with ?cache=parent, through srcdoc with the engine from the framing page's cache (src/runtime-cache.js) -->
+<script src="./src/runtime-cache.js"></script>
 <div id="lock" hidden><span id="note"></span></div>
 <script type="module" src="./src/host.mjs"></script>
 <script type="module" src="./pane/pane.js"></script>

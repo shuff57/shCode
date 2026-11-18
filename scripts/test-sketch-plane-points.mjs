@@ -1,7 +1,7 @@
 // Points on a sketch's plane (lib/sketch-plane-points.ts): reSHape's plane frames, the projective map from the screen to a plane,
 // which sketch the editor cursor is in, and what a picked point writes into the code. The pointer in the real view is a browser check.
 import assert from 'node:assert/strict';
-import { activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
+import { arcCode, faceSketchArgs, finishDirections, freshName, movePointEdits, planeOutlines, sweepOf, activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
 
 // ---- planes, as reSHape resolves them: a named plane's origin is normal x offset ------------------------------------------
 const top10 = planeFrameOf({ plane: 'xy', offset: 10 });
@@ -74,4 +74,34 @@ console.log('PASS a picked point is written as [x, y], after a comma when it fol
   assert.equal(toolCode.line('lid', [0, 0], [10, 5]), 'lid.line([0, 0], [10, 5]);');
 }
 console.log('PASS live sketch: the view for each plane, the grid step, arcs drawn, where a new line goes, the code each tool writes');
+// ---- a sketch on a face, finished into a feature; the arc tool; moving a point; the face's outline ---------------------------
+{
+  assert.equal(faceSketchArgs({ plane_normal: [0, 0, 1], centroid: [30, 20, 10] }), "'top', 10");
+  assert.equal(faceSketchArgs({ plane_normal: [0, -1, 0], centroid: [30, 0, 5] }), "'front'");
+  assert.equal(faceSketchArgs({ plane_normal: [1, 0, 0], centroid: [60, 20, 5] }), "'side', 60");
+  assert.equal(faceSketchArgs({ plane_normal: null, centroid: [0, 0, 0] }), null, 'a curved face holds no sketch');
+  const slope = faceSketchArgs({ plane_normal: [0, -0.6, 0.8], centroid: [10, 5, 8] });
+  const fr = planeFrameOf({ frame: Function(`return ${slope}`)() });
+  assert.deepEqual(sweepOf(fr).map(x => +x.toFixed(9)), [0, -0.6, 0.8], 'a slanted face: the frame\'s u x v is the face\'s outward normal');
+  assert.ok(Math.abs(fr.u[2]) < 1e-12, 'its x runs level, across the slope');
+  // a 60 x 40 x 10 box: centre (30, 20, 5)
+  const c = [30, 20, 5];
+  assert.deepEqual(finishDirections(planeFrameOf({ plane: 'xy', offset: 10 }), c), { extrudeReversed: false, pocketReversed: false }, 'on the top face: up and down as written');
+  assert.deepEqual(finishDirections(planeFrameOf({ plane: 'xz', offset: 40 }), c), { extrudeReversed: true, pocketReversed: true }, 'on the back face, the front plane\'s -Y sweep points into the part: both turned round');
+  assert.deepEqual(finishDirections(planeFrameOf({ plane: 'xz', offset: 0 }), c), { extrudeReversed: false, pocketReversed: false }, 'on the front face');
+  assert.deepEqual(finishDirections(planeFrameOf({ plane: 'xy', offset: 0 }), c), { extrudeReversed: true, pocketReversed: true }, 'on the bottom face');
+  assert.equal(freshName('part', new Set(['part', 'part2'])), 'part3');
+  assert.equal(arcCode('lid', [0, 0], [5, 0], [0, 9]), "lid.arc([0, 0], [5, 0], [0, 5], 'ccw');", 'the end is put on the circle, towards the third click');
+  assert.equal(arcCode('lid', [0, 0], [0, 0], [1, 1]), null);
+  const doc = "const lid = sketch('top', 10);\nlid.line([0, 0], [10, 5]);\nlid.lines([[10, 5], [20, 5], [10, 5]]);\nlid.circle([30, 20], { r: 6 });\npocket(lid, part, 4, [10, 5]);\n";
+  const ed = movePointEdits(doc, 'lid', [10, 5], [12, 6]);
+  const moved = ed.reduceRight((d, e) => d.slice(0, e.from) + e.insert + d.slice(e.to), doc);
+  assert.equal(moved, "const lid = sketch('top', 10);\nlid.line([0, 0], [12, 6]);\nlid.lines([[12, 6], [20, 5], [12, 6]]);\nlid.circle([30, 20], { r: 6 });\npocket(lid, part, 4, [10, 5]);\n", 'every [10, 5] in the block moves; the one past it does not');
+  assert.equal(movePointEdits("const lid = sketch('top');\nlid.circle([w / 2, 5], { r: 1 });\n", 'lid', [30, 5], [31, 5]).length, 0, 'a point written with a variable is not changed');
+  const sq = planeOutlines([{ a: [0, 0], b: [60, 0], mid: [30, 0] }, { a: [60, 40], b: [60, 0], mid: [60, 20] }, { a: [60, 40], b: [0, 40], mid: [30, 40] }, { a: [0, 0], b: [0, 40], mid: [0, 20] }, { a: [36, 20], b: [36, 20], mid: [24, 20] }]);
+  assert.equal(sq.length, 2, 'the outside, joined from edges in any order and direction, and a round hole');
+  assert.ok(sq.some(l => l.length === 5) && sq.some(l => l.length === 49));
+  assert.equal(planeOutlines([{ a: [0, 0], b: [60, 0], mid: [30, 0] }]).length, 0, 'an edge that does not close is left out');
+}
+console.log('PASS a sketch on a face, the way extrude and pocket go, the arc tool, moving a point, the face\'s outline');
 console.log('Sketch plane points: planes, the screen-to-plane map, the active sketch and the written point pass.');

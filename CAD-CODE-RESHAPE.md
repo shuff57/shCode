@@ -160,6 +160,34 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
   - Done turning the view back;
   - the drawn code builds.
 
+## Starting and finishing a sketch (2026-11-18)
+
+- **New sketch.** It sits in the hint bar while Live sketch is on and script.js is open.
+  - Click a flat face, or choose Top, Front or Side. That writes `const sk = sketch('top', 10);` at the end of script.js
+    and starts sketch mode on it.
+  - A slanted face is written in the frame form, its normal the face's outward one (`faceSketchArgs`).
+- **Arc tool.** Click the centre, the start, then the end, which is put on the circle; it writes
+  `sk.arc(c, a, b, 'ccw')`.
+- **Drag.** A drawn point written as plain numbers can be dragged. Every `[x, y]` in the sketch's block with that value
+  is rewritten (`movePointEdits`), so two lines' shared corner moves together. A point written with a variable is not.
+- **Extrude and Pocket**, with a depth, write the step after the sketch's block and Run.
+  - **Extrude on a face** of a part in a variable writes `union(part, extrude(sk, d))`; elsewhere,
+    `const partN = extrude(sk, d)`.
+  - **Pocket** writes `pocket(sk, part, d)`.
+  - **Direction.** Both are turned round with `{ reversed: true }` when reSHape's sweep would go into the part (extrude)
+    or out of it (pocket); `finishDirections`, from the part's box centre.
+- **The grid** is kept to the face the sketch sits on: the part's edges on the plane, joined into outlines
+  (`planeOutlines`), clip it. A sketch on no face keeps the plane around the part.
+- **Checked.** `/tmp/cad-drive/sketch-flow-e2e.py`, 17 of 17:
+  - a new sketch on the top face;
+  - the grid clipped to the face;
+  - a rectangle, then a corner dragged without the view turning;
+  - Pocket cut 200 mm³ and the part rebuilt;
+  - a new sketch on the front face, extruded outwards (+250 mm³, the box to y = −5);
+  - the Arc tool.
+
+  Plus unit tests in `scripts/test-sketch-plane-points.mjs`.
+
 ## Checked
 
 - Unit: `scripts/test-solidcraft-code.mjs` (files, joining with lines kept, the variable probe, lists,

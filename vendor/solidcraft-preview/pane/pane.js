@@ -212,7 +212,11 @@ const PROBE_INC = params.get('probeinc') === 'on';
 const SESSION_KERNEL_URL = new URL('../kernel-session/solidcraft_referee_bg.wasm', BASE);
 const probeLog = []; // one row per probe: { cmds, last (the probed list's last command), budgetS, status, wallMs, cpuMs, loadMs, vol }
 let kernelModule = null;
-const compile = (url) => fetch(url).then((r) => { if (!r.ok) throw new Error(`${url.pathname}: HTTP ${r.status}`); return WebAssembly.compileStreaming(r); });
+// shCode `?cache=parent`: a kernel's bytes from the framing page's cache (src/runtime-cache.js), which answers only for the pinned files it knows,
+// checked there by size and sha256; else (null) it is downloaded as before.
+const HOST_ROOT = new URL('../', BASE).href;
+const fromCache = (url) => (typeof window.__runtimeBytes === 'function' && url.href.startsWith(HOST_ROOT) ? window.__runtimeBytes(url.href.slice(HOST_ROOT.length)) : Promise.resolve(null)).catch(() => null);
+const compile = (url) => fromCache(url).then((bytes) => bytes ? WebAssembly.compile(bytes) : fetch(url).then((r) => { if (!r.ok) throw new Error(`${url.pathname}: HTTP ${r.status}`); return WebAssembly.compileStreaming(r); }));
 const sessionKernel = (m) => WebAssembly.Module.exports(m).some((e) => e.name === 'run_from');
 const getModule = () => (kernelModule ??= (PROBE_INC ? compile(SESSION_KERNEL_URL).then((m) => (sessionKernel(m) ? m : compile(KERNEL_URL))).catch(() => compile(KERNEL_URL)) : compile(KERNEL_URL))
   .then((m) => { probeIncremental = PROBE_INC && sessionKernel(m); return m; }).catch((e) => { kernelModule = null; throw e; }));

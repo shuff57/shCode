@@ -183,3 +183,98 @@ export function sketchAtCursor(doc: string, cursor: number, sketches: Set<string
   }
   return null;
 }
+
+// ---- starting a sketch on a face, and finishing it into a feature ------------------------------------------------------------
+
+const cross3 = (a: number[], b: number[]): V3 => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const unit3 = (a: number[]): V3 => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+const exact = (a: number[]) => `[${a.map(x => { const r = Math.abs(x) < 1e-12 ? 0 : x; return String(Object.is(r, -0) ? 0 : r); }).join(', ')}]`;
+/**
+ * The sketch() arguments for a flat face: 'top', 10 for a face square to an axis (as solidcraft-picks writes it), else reSHape's frame
+ * form through the face, its normal (u x v) the face's outward normal so extrude goes out of the part and pocket into it. null when
+ * the face is not flat.
+ */
+export function faceSketchArgs(face: { plane_normal?: number[] | null; centroid: number[] }): string | null {
+  const n = face.plane_normal; if (!Array.isArray(n)) return null;
+  const axis = [0, 1, 2].find(i => Math.abs(Math.abs(n[i]) - 1) < 1e-6);
+  if (axis !== undefined) {
+    const word = axis === 2 ? 'top' : axis === 1 ? 'front' : 'side'; const at = face.centroid[axis];
+    return Math.abs(at) < 1e-9 ? `'${word}'` : `'${word}', ${fmt(at)}`;
+  }
+  const nn = unit3(n);
+  // u: level (square to Z) where the face is not flat-on to Z, so the sketch's x runs across the slope
+  const u = unit3(Math.hypot(nn[0], nn[1]) > 1e-9 ? [-nn[1], nn[0], 0] : [1, 0, 0]); const v = cross3(nn, u);
+  return `{ origin: ${pointCode3(face.centroid)}, u: ${exact(u)}, v: ${exact(v)} }`;
+}
+const pointCode3 = (p: number[]) => `[${p.map(fmt).join(', ')}]`;
+/** reSHape's sweep direction for a sketch: an extrude goes along it, a pocket against it (u x v; the front plane's is -Y). */
+export const sweepOf = (f: PlaneFrame): V3 => unit3(cross3(f.u, f.v));
+/**
+ * Which way extrude and pocket go from a sketch, given the centre of the part it sits on: an extrude away from the part and a
+ * pocket into it. `reversed` is reSHape's option that turns either round.
+ */
+export function finishDirections(f: PlaneFrame, partCentre: number[] | null): { extrudeReversed: boolean; pocketReversed: boolean } {
+  if (!partCentre) return { extrudeReversed: false, pocketReversed: false };
+  const s = sweepOf(f); const d = [partCentre[0] - f.origin[0], partCentre[1] - f.origin[1], partCentre[2] - f.origin[2]];
+  const side = s[0] * d[0] + s[1] * d[1] + s[2] * d[2]; // > 0: the part lies along the sweep
+  return { extrudeReversed: side > 1e-9, pocketReversed: side > 1e-9 };
+}
+/** A fresh variable name: base, base2, base3 … not in `taken`. */
+export function freshName(base: string, taken: Set<string>): string { let n = base, i = 2; while (taken.has(n)) n = `${base}${i++}`; return n; }
+
+// ---- the arc tool and moving a drawn point -------------------------------------------------------------------------------------
+
+/** An arc from a, counter-clockwise, to where the ray towards b crosses its circle. */
+export function arcCode(s: string, c: V2, a: V2, b: V2): string | null {
+  const r = Math.hypot(a[0] - c[0], a[1] - c[1]); const d = Math.hypot(b[0] - c[0], b[1] - c[1]);
+  if (r < 1e-9 || d < 1e-9) return null;
+  const end: V2 = [c[0] + (b[0] - c[0]) * r / d, c[1] + (b[1] - c[1]) * r / d];
+  if (Math.hypot(end[0] - a[0], end[1] - a[1]) < 1e-9) return null;
+  return `${s}.arc(${pointCode(c)}, ${pointCode(a)}, ${pointCode(end)}, 'ccw');`;
+}
+/**
+ * Moving a drawn point: the [x, y] literals in sketch `name`'s block whose value is `from` are rewritten as `to` (every one, so a
+ * corner two lines share, or a closed outline's first and last point, move together). Only plain number literals are found; a
+ * point written with a variable or a sum is not, and nothing is changed for it. The changes to make, in the document's offsets.
+ */
+export function movePointEdits(doc: string, name: string, from: V2, to: V2): { from: number; to: number; insert: string }[] {
+  const end = sketchBlockEnd(doc, name); if (end === null) return [];
+  const esc = name.replace(/\$/g, '\\$');
+  const decl = new RegExp(`^\\s*(?:const|let|var)\\s+${esc}\\s*=\\s*sketch\\s*\\(`, 'm').exec(doc); if (!decl) return [];
+  const block = doc.slice(decl.index, end); const out: { from: number; to: number; insert: string }[] = [];
+  const re = /\[\s*(-?(?:\d+\.?\d*|\.\d+))\s*,\s*(-?(?:\d+\.?\d*|\.\d+))\s*\]/g;
+  for (let m = re.exec(block); m; m = re.exec(block)) {
+    if (Math.abs(Number(m[1]) - from[0]) < 1e-9 && Math.abs(Number(m[2]) - from[1]) < 1e-9) out.push({ from: decl.index + m.index, to: decl.index + m.index + m[0].length, insert: pointCode(to) });
+  }
+  return out;
+}
+
+// ---- the face a sketch sits on, as closed outlines (the grid is drawn inside them) ----------------------------------------------
+
+/**
+ * The part's edges that lie on a sketch plane, in the plane's 2D coordinates, joined into closed outlines: straight edges by their
+ * ends, a full circle (start = end) from its start and the point opposite. Pieces that do not close are left out.
+ */
+export function planeOutlines(edges: { a: V2; b: V2; mid: V2 }[], tol = 1e-6): V2[][] {
+  const loops: V2[][] = []; const open: { a: V2; b: V2; pts: V2[] }[] = [];
+  const near = (p: V2, q: V2) => Math.hypot(p[0] - q[0], p[1] - q[1]) <= tol;
+  for (const e of edges) {
+    if (near(e.a, e.b)) { // a whole circle: start and its opposite point (the middle of the edge)
+      const c: V2 = [(e.a[0] + e.mid[0]) / 2, (e.a[1] + e.mid[1]) / 2]; const r = Math.hypot(e.a[0] - c[0], e.a[1] - c[1]);
+      if (r > tol) loops.push(Array.from({ length: 49 }, (_, i) => [c[0] + r * Math.cos(2 * Math.PI * i / 48), c[1] + r * Math.sin(2 * Math.PI * i / 48)] as V2));
+      continue;
+    }
+    const straight = Math.abs((e.b[0] - e.a[0]) * (e.mid[1] - e.a[1]) - (e.b[1] - e.a[1]) * (e.mid[0] - e.a[0])) <= tol * Math.max(1, Math.hypot(e.b[0] - e.a[0], e.b[1] - e.a[1]));
+    open.push({ a: e.a, b: e.b, pts: straight ? [e.a, e.b] : [e.a, e.mid, e.b] });
+  }
+  while (open.length) {
+    const first = open.shift()!; const chain = [...first.pts]; let grew = true;
+    while (grew && !near(chain[0], chain[chain.length - 1])) {
+      grew = false; const tail = chain[chain.length - 1];
+      const i = open.findIndex(x => near(x.a, tail) || near(x.b, tail)); if (i < 0) break;
+      const x = open.splice(i, 1)[0]; chain.push(...(near(x.a, tail) ? x.pts.slice(1) : [...x.pts].reverse().slice(1))); grew = true;
+    }
+    if (chain.length > 3 && near(chain[0], chain[chain.length - 1])) loops.push(chain);
+  }
+  return loops;
+}
