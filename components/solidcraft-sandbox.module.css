@@ -109,6 +109,10 @@
 .sketchFace { fill:none; stroke:rgb(250 204 21 / .9); stroke-width:2.5; }
 .sketchCurve { fill:none; stroke:var(--c-orange, #ffb86c); stroke-width:2; }
 .sketchPreview { fill:none; stroke:var(--c-orange, #ffb86c); stroke-width:1.5; stroke-dasharray:5 4; }
+.sketchDim { position:absolute; z-index:3; transform:translate(-50%, -50%); padding:0 4px; border-radius:3px; border:1px solid var(--border); background:var(--card); color:var(--c-meta); font:11px/1.5 var(--font-mono, monospace); white-space:nowrap; cursor:pointer; pointer-events:auto; }
+.sketchDim:hover { color:var(--text); border-color:var(--c-orange, #ffb86c); }
+.sketchDimFixed { cursor:default; pointer-events:none; opacity:.8; }
+.sketchDimEdit { position:absolute; z-index:4; transform:translate(-50%, -50%); width:6em; font:12px/1.4 var(--font-mono, monospace); }
 .sketchDelete { fill:none; stroke:var(--c-red, #ff5555); stroke-width:3.5; }
 .sketchBarHost:empty { display:none; }
 .sketchBar { display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap; }

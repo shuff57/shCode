@@ -15,6 +15,8 @@
 //     curves (nothing is built), so a line written with variables is found too;
 //   - after a tool's first click, a size can be typed (a line's length, a rectangle's width and height, a circle's radius, an arc's angle) and
 //     Enter puts the point down at it, in the pointer's direction;
+//   - each line shows its length and each circle or arc its radius; clicking a size written as plain numbers lets a new one be typed, and the
+//     code changes (a rectangle's width or height, a circle's radius, a line's end along it, with any corner it shares);
 //   - Extrude and Pocket finish the sketch: they write the step after the sketch's block and Run.
 // "New sketch" starts one on a flat face clicked in the view (or on the top, front or side plane): it writes const sk = sketch(…)
 // at the end of script.js and goes into sketch mode on it.
@@ -30,7 +32,7 @@ import { bundleProject, CAD_ENTRY, readVariableProbe, withVariableProbe } from '
 import { topLevelNames, topLevelVariables } from '../lib/solidcraft-picks';
 import type { ScEdge, ScFace } from '../lib/solidcraft-labels';
 import {
-  activeSketch, applyProjective, arcCode, curveOwners, distToSegment, sketchGeoms, slotGeoms, typedPoint, typedWords, distToPolyline, faceSketchArgs, sketchStatementLines, finishDirections, fmt, freshName, fromPlane, geomPath, geomSnaps, gridStep,
+  activeSketch, applyProjective, arcCode, curveOwners, dimensionOf, resizeEdits, distToSegment, sketchGeoms, slotGeoms, typedPoint, typedWords, distToPolyline, faceSketchArgs, sketchStatementLines, finishDirections, fmt, freshName, fromPlane, geomPath, geomSnaps, gridStep,
   movePointEdits, planeFrameOf, planeOutlines, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, sweepOf,
   toPlane, toolCode, viewAngles, type PlaneFrame, type SketchGeom, type SketchPlaceInput, type V2, type V3,
 } from '../lib/sketch-plane-points';
@@ -98,7 +100,9 @@ export default function CadSketchOverlay(p: Props) {
   const toolPts = useRef<V2[]>([]);
   /** a size typed after a tool's first click (Enter puts the point down at it) */
   const typed = useRef('');
-  const [drawing, setDrawing] = useState<{ grid: [V2, V2, boolean][]; axes: [V2, V2][]; outline: string; clip: boolean; curves: V2[][]; step: number } | null>(null);
+  const [drawing, setDrawing] = useState<{ grid: [V2, V2, boolean][]; axes: [V2, V2][]; outline: string; clip: boolean; curves: V2[][]; step: number; dims: { i: number; at: V2; text: string; value: number }[] } | null>(null);
+  /** a size being typed in place of a curve's dimension */
+  const [editing, setEditing] = useState<{ i: number; value: string } | null>(null);
   const [hover, setHover] = useState<{ x: number; y: number; text: string; dot: V2 | null; preview: V2[] | null; del?: number[] } | null>(null);
   /** Delete: which line of the block drew each of the sketch's curves, for the doc as it was when worked out */
   const owners = useRef<{ doc: string; name: string; lines: DrawLine[]; owner: number[] | null } | null>(null);
@@ -122,7 +126,7 @@ export default function CadSketchOverlay(p: Props) {
 
   // ---- Delete: which line drew which curve, worked out again when the code or the sketch changes while the tool is on --------------
   useEffect(() => {
-    const ev = p.evaluate; if (!p.active || !ev || tool !== 'delete' || !mode || !p.entryOpen) { owners.current = null; return; }
+    const ev = p.evaluate; if (!p.active || !ev || !mode || !p.entryOpen) { owners.current = null; setOwnersKey(k => k + 1); return; }
     let live = true;
     const t = setTimeout(async () => {
       const ed = props.current.editor.current; const sk = sketches.current.get(mode); if (!ed || !sk) return;
@@ -135,10 +139,23 @@ export default function CadSketchOverlay(p: Props) {
           counts.push(f ? sketchGeoms(f).length : NaN);
         }
       } catch { counts.push(NaN); }
-      if (live) { owners.current = { doc, name: mode, lines, owner: curveOwners(counts, sk.geoms.length) }; refreshHover.current?.(); }
+      if (live) { owners.current = { doc, name: mode, lines, owner: curveOwners(counts, sk.geoms.length) }; setOwnersKey(k => k + 1); refreshHover.current?.(); }
     }, 300);
     return () => { live = false; clearTimeout(t); };
-  }, [p.active, p.evaluate, p.entryOpen, tool, mode, version, filesKey]);
+  }, [p.active, p.evaluate, p.entryOpen, mode, version, filesKey]);
+  const [ownersKey, setOwnersKey] = useState(0); // which line drew which curve was worked out again
+  /** The edits that give curve i the size value, for the code as it is now; null when its size is not written as plain numbers. */
+  const resizeOf = (i: number, value: number) => {
+    const o = owners.current; const ed = p.editor.current; const sk = mode ? sketches.current.get(mode) : null;
+    if (!o || !o.owner || !ed || !sk || o.name !== mode || o.doc !== ed.state.doc.toString()) return null;
+    const line = o.lines[o.owner[i]]; const g = sk.geoms[i]; return line && g ? resizeEdits(o.doc, mode!, line, g, value) : null;
+  };
+  const applySize = () => {
+    const e = editing; setEditing(null); if (!e) return;
+    const v = Number(e.value); const edits = v > 0 ? resizeOf(e.i, v) : null; const ed = p.editor.current;
+    if (!edits || !ed) return;
+    ed.dispatch({ changes: edits }); p.onInserted(`Size changed to ${fmt(v)}`);
+  };
 
   // ---- sketch mode follows the editor cursor -----------------------------------------------------------------------------------
   useEffect(() => {
@@ -254,7 +271,7 @@ export default function CadSketchOverlay(p: Props) {
       corners.forEach((c, i) => { const p2 = screen[4 + i]; if (Array.isArray(p2)) snaps.push({ s: [p2[0], p2[1]], q: toPlane(f, c.p), kind: c.kind, own: false }); });
       for (const g of sk?.geoms ?? []) for (const n of geomSnaps(g)) { const sp = applyProjective(F, n.q); if (sp) snaps.push({ s: sp, q: n.q, kind: n.kind, own: !n.kind.startsWith('middle') }); }
       view.current = { F, H, frame: f, step, snaps, label }; refreshHover.current?.();
-      if (!s) { curvesOnScreen.current = []; setDrawing({ grid: [], axes: [], outline: '', clip: false, curves: [], step }); return; }
+      if (!s) { curvesOnScreen.current = []; setDrawing({ grid: [], axes: [], outline: '', clip: false, curves: [], step, dims: [] }); return; }
       const [x0, y0, x1, y1] = [quad[0][0], quad[0][1], quad[2][0], quad[2][1]];
       while ((x1 - x0) / step > 120 || (y1 - y0) / step > 120) step *= 2;
       view.current.step = step; refreshHover.current?.();
@@ -267,7 +284,8 @@ export default function CadSketchOverlay(p: Props) {
       const loops = planeOutlines(edges.filter(e => on(e.a) && on(e.b) && on(e.mid)).map(e => ({ a: toPlane(f, e.a), b: toPlane(f, e.b), mid: toPlane(f, e.mid) })));
       const outline = pathOf(loops.map(l => l.map(toScreen)));
       const curves = s.geoms.map(g => geomPath(g).map(toScreen)); curvesOnScreen.current = curves;
-      setDrawing({ grid, axes, outline, clip: loops.length > 0, curves, step });
+      const dims = s.geoms.flatMap((g, i) => { const d = dimensionOf(g); return d ? [{ i, at: toScreen(d.at), text: d.text, value: d.value }] : []; });
+      setDrawing({ grid, axes, outline, clip: loops.length > 0, curves, step, dims });
     };
     const loop = async () => { try { await draw(); } catch { /* the view is busy */ } if (live) timer = setTimeout(loop, 150); };
     void loop();
@@ -529,6 +547,15 @@ export default function CadSketchOverlay(p: Props) {
       {drawing?.curves.map((c, i) => <polyline key={`c${i}`} points={c.map(q => q.join(',')).join(' ')} className={hover?.del?.includes(i) ? styles.sketchDelete : styles.sketchCurve} />)}
       {hover?.preview && <polyline points={hover.preview.map(q => q.join(',')).join(' ')} className={styles.sketchPreview} />}
     </svg>
+    {mode && drawing?.dims.map(d => {
+      const can = !tool && !!resizeOf(d.i, d.value) && ownersKey >= 0;
+      if (editing?.i === d.i) return <input key={`d${d.i}`} className={styles.sketchDimEdit} style={{ left: d.at[0], top: d.at[1] }} autoFocus aria-label="New size"
+        value={editing.value} onChange={e => setEditing({ i: d.i, value: e.target.value })} onBlur={() => setEditing(null)}
+        onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); applySize(); } if (e.key === 'Escape') { e.preventDefault(); setEditing(null); } }} />;
+      return can ? <button key={`d${d.i}`} className={styles.sketchDim} style={{ left: d.at[0], top: d.at[1] }} title="Click to type a new size"
+        onClick={() => setEditing({ i: d.i, value: fmt(d.value) })}>{d.text}</button>
+        : <span key={`d${d.i}`} className={`${styles.sketchDim} ${styles.sketchDimFixed}`} style={{ left: d.at[0], top: d.at[1] }}>{d.text}</span>;
+    })}
     {hover?.dot && <span className={styles.pointDot} style={{ left: hover.dot[0], top: hover.dot[1] }} />}
     {hover && <span className={styles.pointReadout} style={{ left: hover.x, top: hover.y, ...(hover.x > (p.inner?.innerWidth ?? 1e9) - 300 ? { transform: 'translate(calc(-100% - 14px), 14px)' } : {}) }}>
       {tool ? `${TOOLS.find(t => t[0] === tool)![1]}: ` : ''}{hover.text}</span>}

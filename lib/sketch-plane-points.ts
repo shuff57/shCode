@@ -329,6 +329,50 @@ export function typedWords(tool: string, pts: V2[], typed: string): string {
   return `length ${t}`;
 }
 
+// ---- dimensions: each curve's size shown on it, and changed by typing a new one ------------------------------------------------
+
+/** Where a curve's size is shown and what it says: a line's length at its middle, a circle's or an arc's radius on it. */
+export function dimensionOf(g: SketchGeom): { at: V2; text: string; value: number; kind: 'length' | 'radius' } | null {
+  if (g.k === 'line') { const l = Math.hypot(g.b[0] - g.a[0], g.b[1] - g.a[1]); return l > 1e-9 ? { at: [(g.a[0] + g.b[0]) / 2, (g.a[1] + g.b[1]) / 2], text: fmt(l), value: l, kind: 'length' } : null; }
+  if (g.k === 'circle') return { at: [g.c[0] + g.r * Math.SQRT1_2, g.c[1] + g.r * Math.SQRT1_2], text: `r ${fmt(g.r)}`, value: g.r, kind: 'radius' };
+  if (g.k === 'arc') { const p = geomPath(g, 16); return { at: p[Math.floor(p.length / 2)], text: `r ${fmt(g.r)}`, value: g.r, kind: 'radius' }; }
+  return null;
+}
+const NUM = String.raw`-?(?:\d+\.?\d*|\.\d+)`;
+const PT = String.raw`\[\s*(${NUM})\s*,\s*(${NUM})\s*\]`;
+/**
+ * The code edits that give curve g (drawn by the drawing line `line`, from `doc`) the size `value`, or null when its numbers are not plain
+ * numbers there:
+ * - a circle, sk.circle([x, y], { r }) or the one-shape sk.circle(d, { at }): its radius (the diameter, twice it);
+ * - a side of sk.rectangle(a, b): b moves along that side, so the rectangle gets that width or height and a stays;
+ * - any other line: its end b moves along the line, with every [x, y] in the sketch's block that is b (so a corner it shares moves too).
+ */
+export function resizeEdits(doc: string, name: string, line: { from: number; to: number; text: string }, g: SketchGeom, value: number): { from: number; to: number; insert: string }[] | null {
+  if (!(value > 0)) return null;
+  const text = doc.slice(line.from, line.to);
+  if (g.k === 'circle') {
+    let m = new RegExp(String.raw`\.circle\(\s*${PT}\s*,\s*\{\s*r\s*:\s*(${NUM})\s*\}`).exec(text);
+    if (m) { const i = line.from + m.index + m[0].lastIndexOf(m[3]); return [{ from: i, to: i + m[3].length, insert: fmt(value) }]; }
+    m = new RegExp(String.raw`\.circle\(\s*(${NUM})\s*,\s*\{\s*at\s*:`).exec(text);
+    if (m) { const i = line.from + m.index + m[0].indexOf(m[1]); return [{ from: i, to: i + m[1].length, insert: fmt(2 * value) }]; }
+    return null;
+  }
+  if (g.k !== 'line') return null;
+  const rect = new RegExp(String.raw`\.rectangle\(\s*${PT}\s*,\s*(${PT})\s*\)`).exec(text);
+  if (rect) {
+    const [x0, y0, x1, y1] = [rect[1], rect[2], rect[4], rect[5]].map(Number);
+    const across = Math.abs(g.a[1] - g.b[1]) < 1e-9; // a side along x: the width
+    const nb: V2 = across ? [x0 + Math.sign(x1 - x0 || 1) * value, y1] : [x1, y0 + Math.sign(y1 - y0 || 1) * value];
+    const i = line.from + rect.index + rect[0].lastIndexOf(rect[3]);
+    return [{ from: i, to: i + rect[3].length, insert: pointCode(nb) }];
+  }
+  const l = Math.hypot(g.b[0] - g.a[0], g.b[1] - g.a[1]); if (!(l > 1e-9)) return null;
+  const nb: V2 = [Math.round((g.a[0] + (g.b[0] - g.a[0]) * value / l) * 1000) / 1000, Math.round((g.a[1] + (g.b[1] - g.a[1]) * value / l) * 1000) / 1000];
+  // only when the line's own code holds its end as plain numbers; then every [x, y] of the block that is that end moves with it
+  const edits = movePointEdits(doc, name, g.b, nb);
+  return edits.some(e => e.from >= line.from && e.to <= line.to) ? edits : null;
+}
+
 // ---- Delete: which line of the sketch's block drew which curve ---------------------------------------------------------------
 
 /** The lines of a sketch's block that draw (name.something(…)), with where each starts and ends in the doc (its newline included). */

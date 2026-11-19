@@ -1,7 +1,7 @@
 // Points on a sketch's plane (lib/sketch-plane-points.ts): reSHape's plane frames, the projective map from the screen to a plane,
 // which sketch the editor cursor is in, and what a picked point writes into the code. The pointer in the real view is a browser check.
 import assert from 'node:assert/strict';
-import { distToSegment, slotGeoms, typedNumbers, typedPoint, typedWords, sketchGeoms, curveOwners, distToPolyline, sketchStatementLines, arcCode, faceSketchArgs, finishDirections, freshName, movePointEdits, planeOutlines, sweepOf, activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
+import { dimensionOf, resizeEdits, distToSegment, slotGeoms, typedNumbers, typedPoint, typedWords, sketchGeoms, curveOwners, distToPolyline, sketchStatementLines, arcCode, faceSketchArgs, finishDirections, freshName, movePointEdits, planeOutlines, sweepOf, activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
 
 // ---- planes, as reSHape resolves them: a named plane's origin is normal x offset ------------------------------------------
 const top10 = planeFrameOf({ plane: 'xy', offset: 10 });
@@ -158,4 +158,19 @@ console.log('PASS typed sizes: length, width and height, radius, angle');
   assert.equal(typedWords('slot', [[0, 0], [10, 0]], '4'), 'radius 4');
 }
 console.log('PASS the slot tool: its code, its outline, a typed radius');
+{ // dimensions: shown on each curve, changed by typing
+  assert.deepEqual(dimensionOf({ k: 'line', a: [0, 0], b: [3, 4] }), { at: [1.5, 2], text: '5', value: 5, kind: 'length' });
+  assert.equal(dimensionOf({ k: 'circle', c: [0, 0], r: 2 }).text, 'r 2'); assert.equal(dimensionOf({ k: 'arc', c: [0, 0], r: 3, a: [3, 0], b: [0, 3], sense: 'ccw' }).text, 'r 3');
+  const doc = "const w = 4;\nconst sk = sketch('top');\nsk.rectangle([10, 5], [30, 15]);\nsk.circle([45, 20], { r: 5 });\nsk.lines([[0, 0], [10, 0], [10, 10]]);\nsk.circle(6, { at: [70, 5] });\nsk.rectangle([40, 40], [40 + w, 50]);\nsk.line([44, 40], [60, 40]);\n";
+  const L = sketchStatementLines(doc, 'sk');
+  const apply = (es) => { let d = doc; for (const e of [...es].sort((a, b) => b.from - a.from)) d = d.slice(0, e.from) + e.insert + d.slice(e.to); return d; };
+  assert.match(apply(resizeEdits(doc, 'sk', L[0], { k: 'line', a: [10, 5], b: [30, 5] }, 25)), /sk\.rectangle\(\[10, 5\], \[35, 15\]\);/, 'a rectangle\'s width');
+  assert.match(apply(resizeEdits(doc, 'sk', L[0], { k: 'line', a: [30, 5], b: [30, 15] }, 4)), /sk\.rectangle\(\[10, 5\], \[30, 9\]\);/, 'its height');
+  assert.match(apply(resizeEdits(doc, 'sk', L[1], { k: 'circle', c: [45, 20], r: 5 }, 7.5)), /\{ r: 7\.5 \}/, 'a circle\'s radius');
+  assert.match(apply(resizeEdits(doc, 'sk', L[2], { k: 'line', a: [0, 0], b: [10, 0] }, 20)), /sk\.lines\(\[\[0, 0\], \[20, 0\], \[10, 10\]\]\);/, 'a chain\'s side: its end moves, and the next side starts there');
+  assert.match(apply(resizeEdits(doc, 'sk', L[3], { k: 'circle', c: [70, 5], r: 3 }, 4)), /sk\.circle\(8, \{ at: \[70, 5\] \}\);/, 'the one-shape circle: its diameter');
+  assert.equal(resizeEdits(doc, 'sk', L[4], { k: 'line', a: [44, 50], b: [44, 40] }, 3), null, 'a side whose corner is written with a variable: not changed, though [44, 40] is written on another line');
+  assert.equal(resizeEdits(doc, 'sk', L[1], { k: 'circle', c: [45, 20], r: 5 }, 0), null, 'a size of 0 is not given');
+}
+console.log('PASS dimensions: lengths and radii shown, and changed in the code');
 console.log('Sketch plane points: planes, the screen-to-plane map, the active sketch and the written point pass.');

@@ -104,6 +104,7 @@ countersinks are now written as code, so *it has a counterbore, countersink or t
 | 4.9 | readout, no sketch at the cursor | top plane, no sketch at the cursor: {[x, y]} |
 | 4.9b | ***readout, Delete on*** | ***Delete: {line} · click to remove it*** · ***Delete: finding the line that drew it…*** |
 | 4.9c | ***readout, a size typed*** | ***{Tool}: length {25} · Enter to put it at {[25, 0]}*** · ***width {30}, height {20}*** · ***{8} square*** · ***radius {7.5}*** · ***angle {90}°*** |
+| 4.9d | ***dimensions on the curves*** | ***{25}*** (a length) · ***r {7.5}*** (a radius) · tooltip ***Click to type a new size*** · the box's label ***New size*** · after Enter ***Size changed to {7.5}*** |
 | 4.10 | plane names in the readout and bar | top plane · front plane · side plane · {top} plane at {10} · a slanted plane |
 
 ## 5. reshape-cad's sketch-only view (packages/solidcraft-host/pane/src/sketch-only.mjs, pane.js; only behind ?sketch-only=1)

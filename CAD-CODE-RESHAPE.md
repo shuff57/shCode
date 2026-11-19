@@ -238,6 +238,16 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
   (`sk.line(…)` ×2, `sk.arc(…, 'ccw')` ×2): reSHape's own `sk.slot(a, b, r)` cannot share a sketch with them ("Do not mix the two
   ways on one sketch"). Checked: the outline extrudes to the volume reSHape's slot() gives (1051.289 mm³ for 20 × 8 with r 4
   and 5 deep; the exact 1051.327 is 3.7e-5 above both, the engine's measure of a curved part, the same for either).
+- **Dimensions.** In sketch mode each line shows its length at its middle, and each circle and arc its radius on it
+  (`dimensionOf`). A size written as plain numbers is a button: a click opens it for typing, Enter writes the new size into
+  the code, Escape leaves it (`resizeEdits`):
+  - a side of `sk.rectangle(a, b)`: b moves along that side, so the rectangle gets that width or height and a stays;
+  - a circle: its `r` (the one-shape `sk.circle(d, { at })`: its diameter, twice the radius);
+  - any other line: its end moves along it, with every `[x, y]` of the block that is that end, so a corner it shares moves
+    too; only when that line's own code holds the end as plain numbers.
+
+  A size written with a name (`[5 + w, 35]`) is shown but cannot be clicked: it is changed in the code. Which line drew which
+  curve comes from the same cut-short evaluation as Delete. Checked: `/tmp/cad-drive/sketch-dims-e2e.py`, 7 of 7.
 - **Typed sizes.** After a tool's first click, a number typed shows in the readout with where Enter puts the point, and Enter
   puts it down there, in the pointer's direction (`typedPoint`):
   - Line and Polyline: the length from the last point;
