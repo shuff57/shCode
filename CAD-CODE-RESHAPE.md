@@ -188,10 +188,13 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
   - Click a flat face, or choose Top, Front or Side. That writes `const sk = sketch('top', 10);` at the end of script.js
     and starts sketch mode on it.
   - A slanted face is written in the frame form, its normal the face's outward one (`faceSketchArgs`).
-- **Arc tool.** Click the centre, the start, then the end, which is put on the circle; it writes
+- **Arc tool.** Click the centre, the start, then the end, which is put on the circle (written to 1e-9, so it is on it); it writes
   `sk.arc(c, a, b, 'ccw')`.
 - **Drag.** A drawn point written as plain numbers can be dragged. Every `[x, y]` in the sketch's block with that value
   is rewritten (`movePointEdits`), so two lines' shared corner moves together. A point written with a variable is not.
+  - A plain `sk.rectangle(a, b)` can also be dragged by the two corners its code does not write (2026-11-19): that
+    corner moves, the opposite one stays, and both of the rectangle's points are rewritten so its sides stay level and
+    upright. Checked: `sketch-drag-e2e.py`, 5 of 5, the moved rectangle extruding at its new size.
 - **Extrude and Pocket**, with a depth, write the step after the sketch's block and Run.
   - **Extrude on a face** of a part in a variable writes `union(part, extrude(sk, d))`; elsewhere,
     `const partN = extrude(sk, d)`.
@@ -252,15 +255,15 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
   tan of half the angle, so at a right angle the distance itself, on the grid's step, never above the largest that fits) or
   typed and Enter (`roundEdits` in `lib/sketch-plane-points.ts`).
   - The two lines are shortened to where the round meets them, a distance r / tan(θ/2) from the corner, and
-    `sk.arc(centre, from, to, 'ccw')` is written after the later of them, the short way round. Points are written to 0.001,
-    as every tool writes them.
+    `sk.arc(centre, from, to, 'ccw')` is written after the later of them, the short way round. Its points are written to
+    1e-9 (see "Points on an arc" below).
   - A rectangle or a polyline the corner belongs to is written out as its separate `sk.line(…)` lines first: the drawing
     words have no rounded rectangle, and reSHape's own `rect().round(k, r)` belongs to the plain outline, which does not mix
     with them.
   - A radius that uses up a whole line drops the line, and the arc meets the next one; a bigger one changes nothing and says
     the largest that fits.
-  - Not rounded, each with a sentence: an end where a line meets an arc or where three lines meet, two lines in a straight
-    line, and a corner written with a variable or a sum, or with more than three decimals.
+  - Not rounded, each with a sentence: an end where three curves meet, two lines in a straight line or a line and an arc
+    that run on smoothly, and a corner written with a variable or a sum, or with more than nine decimals.
   - Which line drew which curve comes from the same cut-short evaluation as Delete.
   - Checked: unit tests (a right angle either way round, 60°, a rectangle, a line used up, too big, a variable, an arc at the
     corner) and `/tmp/cad-drive/sketch-round-e2e.py`, 11 of 11: a rectangle rounded at two corners, one with a radius that
@@ -273,6 +276,34 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
   Checked: unit tests (a right angle, a slanted corner, a rectangle, a line used up, too big) and
   `/tmp/cad-drive/sketch-chamfer-e2e.py`, 10 of 10: a rectangle chamfered at two corners extrudes at exactly
   24000 + 5 × (600 − 12.5 − 200).
+- **Round and Chamfer where a line meets an arc, or two arcs meet** (2026-11-19). The corner is any end where exactly two
+  curves meet, each a line or an arc, at an angle (`cornerAt`, `cutCorners`).
+  - **Round.** The round's centre is where the two curves' offsets by r towards the inside of the corner cross: a line's
+    offset is a line, an arc's a circle of radius R + r (the corner outside its circle) or R − r (inside it). Of the
+    crossings, the one nearest the corner whose touching points lie on both curves (`roundAt`). The largest radius is found
+    by halving, to 0.001.
+  - **Chamfer.** On an arc, the cut is the point the distance from the corner in a straight line; the largest is the chord
+    to the arc's far end (its diameter past half a turn).
+  - **The arc that is cut** is written again from its far end (`cutCurve`): reSHape takes an arc's radius from its start,
+    so its radius stays what it was. A curve used up goes, as a line does.
+  - Checked: unit tests (a line and an arc worked out by hand: the centre at x = 30 − √(100 + 20r); the largest round, 40,
+    using up the line; the chamfer; an arc whose corner is its end; smooth joins; two arcs at a right angle) and
+    `/tmp/cad-drive/sketch-arc-corner-e2e.py`, 13 of 13: a rectangle with a quarter circle cut from a corner, rounded where the
+    bottom meets the arc and chamfered where the arc meets the side, extrudes at the area worked out by Green's theorem over
+    the exact curves (within 1e-4 of the cut block).
+- **Points on an arc are written to 1e-9** (2026-11-19). reSHape refuses a sketch whose arc's two ends miss one circle by
+  more than 1e-6 mm ("The rules of this sketch have to move its shape…"). A point rounded to 0.001 misses by up to about
+  7e-4 wherever the geometry is not exact. So a Round at a slanted corner wrote an arc the build refuses (at the test's
+  triangle corner, r 3, the old points miss by 2e-4), and so did the Arc tool, whose end is put on the circle and then
+  rounded (refused in the browser at a 6.8e-4 miss). Both now write those points to 1e-9 (`fmt9`,
+  `pointExact`), and a number exact to 0.001 is still written short, so right angles look as before. The Slot tool was never
+  affected: its caps' two ends sit either side of the centre and round alike. It is written the same way now anyway.
+  Checked: `/tmp/cad-drive/sketch-exact-arcs-e2e.py`, 6 of 6:
+  - the wedge the Arc tool used to write is refused;
+  - the Arc tool's wedge now builds, as far short of the area worked out by hand as a whole circle of that radius is (the
+    engine measures a curve by straight pieces);
+  - a round at a slanted corner of two lines, and a slanted slot, both drawn with the tools, extrude at the volume worked out
+    by hand.
 - **Typed sizes.** After a tool's first click, a number typed shows in the readout with where Enter puts the point, and Enter
   puts it down there, in the pointer's direction (`typedPoint`):
   - Line and Polyline: the length from the last point;

@@ -15,9 +15,9 @@
 //     curves (nothing is built), so a line written with variables is found too;
 //   - after a tool's first click, a size can be typed (a line's length, a rectangle's width and height, a circle's radius, an arc's angle) and
 //     Enter puts the point down at it, in the pointer's direction;
-//   - Round: a click on a corner where two lines meet, then the radius (from the pointer, or typed): the two lines are shortened to where the
-//     round meets them and an arc is written after them (a rectangle or polyline the corner belongs to is written out as its lines first);
-//     Chamfer the same, with the distance along each line and a straight line across;
+//   - Round: a click on a corner where two lines or arcs meet, then the radius (from the pointer, or typed): the two are shortened to where
+//     the round meets them and an arc is written after them (a rectangle or polyline the corner belongs to is written out as its lines first,
+//     an arc written again from its far end); Chamfer the same, with the distance from the corner on each and a straight line across;
 //   - each line shows its length and each circle or arc its radius; clicking a size written as plain numbers lets a new one be typed, and the
 //     code changes (a rectangle's width or height, a circle's radius, a line's end along it, with any corner it shares);
 //   - Extrude and Pocket finish the sketch: they write the step after the sketch's block and Run.
@@ -35,7 +35,7 @@ import { bundleProject, CAD_ENTRY, readVariableProbe, withVariableProbe } from '
 import { topLevelNames, topLevelVariables } from '../lib/solidcraft-picks';
 import type { ScEdge, ScFace } from '../lib/solidcraft-labels';
 import {
-  activeSketch, applyProjective, arcCode, chamferEdits, chamferGeom, cornerAt, largestRound, lineCorners, roundEdits, roundGeom, curveOwners, dimensionOf, resizeEdits, distToSegment, sketchGeoms, slotGeoms, typedPoint, typedWords, distToPolyline, faceSketchArgs, sketchStatementLines, finishDirections, fmt, freshName, fromPlane, geomPath, geomSnaps, gridStep,
+  activeSketch, applyProjective, arcCode, chamferEdits, chamferGeom, cornerAt, cutCorners, cutPreview, largestChamfer, largestRound, roundEdits, roundGeom, curveOwners, dimensionOf, resizeEdits, distToSegment, sketchGeoms, slotGeoms, typedPoint, typedWords, distToPolyline, faceSketchArgs, sketchStatementLines, finishDirections, fmt, freshName, fromPlane, geomPath, geomSnaps, gridStep,
   movePointEdits, planeFrameOf, planeOutlines, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, sweepOf,
   toPlane, toolCode, viewAngles, type PlaneFrame, type SketchGeom, type SketchPlaceInput, type V2, type V3,
 } from '../lib/sketch-plane-points';
@@ -337,18 +337,15 @@ export default function CadSketchOverlay(p: Props) {
         const sy = y - props.current.crop; const geoms = sketchNow()?.geoms ?? []; const round = tool === 'round';
         if (!toolPts.current.length) {
           const q = cornerUnder(x, sy);
-          if (!q) { setHover({ x, y: sy, text: 'Click a corner where two lines meet', dot: null, preview: null }); return; }
+          if (!q) { setHover({ x, y: sy, text: 'Click a corner where two lines or arcs meet', dot: null, preview: null }); return; }
           const c = cornerAt(geoms, q, tool);
           setHover({ x, y: sy, text: typeof c === 'string' ? c : `corner ${pointCode(q)} · click to ${tool} it`, dot: onScreen(q), preview: null }); return;
         }
         const q0 = toolPts.current[0]; const size = cutSize(q0, hit.q);
         const g = size === null ? cornerAt(geoms, q0, tool) as string : round ? roundGeom(geoms, q0, size) : chamferGeom(geoms, q0, size);
         if (typeof g === 'string') { setHover({ x, y: sy, text: g, dot: onScreen(q0), preview: null }); return; }
-        // the preview: from one line's far end, along it to the cut, across the corner, and along the other line to its far end
-        const far = g.lines.map(i => { const l = geoms[i] as { a: V2; b: V2 }; return dist(l.a, q0) < 1e-6 ? l.b : l.a; });
-        let across: V2[] = g.ends;
-        if ('arc' in g) { across = geomPath(g.arc, 32); if (dist(g.arc.a, g.ends[0]) > 1e-6) across.reverse(); }
-        const path = [far[0], ...across, far[1]];
+        // the preview: from one curve's far end, along it to the cut, across the corner, and along the other curve to its far end
+        const path = cutPreview(geoms, q0, g);
         setHover({ x, y: sy, text: `${round ? 'radius' : 'distance'} ${typed.current || fmt(size!)} · ${typed.current ? 'Enter' : 'click'} to ${tool} the corner`, dot: onScreen(q0), preview: path.map(onScreen) }); return;
       }
       if (tool && typed.current && toolPts.current.length) {
@@ -375,7 +372,7 @@ export default function CadSketchOverlay(p: Props) {
     /** the end of the sketch's lines within 10 px of the pointer, nearest first */
     const cornerUnder = (x: number, sy: number): V2 | null => {
       if (!view.current) return null; let best: V2 | null = null; let bd = 10;
-      for (const q of lineCorners(sketchNow()?.geoms ?? [])) { const d = dist(onScreen(q), [x, sy]); if (d <= bd) { bd = d; best = q; } }
+      for (const q of cutCorners(sketchNow()?.geoms ?? [])) { const d = dist(onScreen(q), [x, sy]); if (d <= bd) { bd = d; best = q; } }
       return best;
     };
     /**
@@ -387,7 +384,7 @@ export default function CadSketchOverlay(p: Props) {
       const geoms = sketchNow()?.geoms ?? []; const c = cornerAt(geoms, q0); if (typeof c === 'string') return null;
       const step = view.current?.step ?? 0.5; const round = tool === 'round';
       const n = Math.max(step, Math.round(dist(pointer, q0) * (round ? Math.tan(c.half) : 1) / step) * step);
-      const most = round ? largestRound(geoms, q0) : Math.floor(Math.min(...c.far.map(f => dist(f, q0))) * 1000 + 1e-6) / 1000;
+      const most = round ? largestRound(geoms, q0) : largestChamfer(geoms, q0);
       return most !== null && most > 0 && n > most ? most : n;
     };
     const doCut = (q0: V2, size: number) => {

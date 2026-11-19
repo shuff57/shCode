@@ -1,7 +1,7 @@
 // Points on a sketch's plane (lib/sketch-plane-points.ts): reSHape's plane frames, the projective map from the screen to a plane,
 // which sketch the editor cursor is in, and what a picked point writes into the code. The pointer in the real view is a browser check.
 import assert from 'node:assert/strict';
-import { chamferEdits, chamferGeom, cornerAt, largestRound, lineCorners, roundEdits, roundGeom, dimensionOf, resizeEdits, distToSegment, slotGeoms, typedNumbers, typedPoint, typedWords, sketchGeoms, curveOwners, distToPolyline, sketchStatementLines, arcCode, faceSketchArgs, finishDirections, freshName, movePointEdits, planeOutlines, sweepOf, activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
+import { chamferEdits, chamferGeom, cornerAt, cutCorners, cutPreview, largestChamfer, largestRound, roundEdits, roundGeom, dimensionOf, resizeEdits, distToSegment, slotGeoms, typedNumbers, typedPoint, typedWords, sketchGeoms, curveOwners, distToPolyline, sketchStatementLines, arcCode, faceSketchArgs, finishDirections, freshName, movePointEdits, planeOutlines, sweepOf, activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
 
 // ---- planes, as reSHape resolves them: a named plane's origin is normal x offset ------------------------------------------
 const top10 = planeFrameOf({ plane: 'xy', offset: 10 });
@@ -93,11 +93,25 @@ console.log('PASS live sketch: the view for each plane, the grid step, arcs draw
   assert.equal(freshName('part', new Set(['part', 'part2'])), 'part3');
   assert.equal(arcCode('lid', [0, 0], [5, 0], [0, 9]), "lid.arc([0, 0], [5, 0], [0, 5], 'ccw');", 'the end is put on the circle, towards the third click');
   assert.equal(arcCode('lid', [0, 0], [0, 0], [1, 1]), null);
+  { // a slanted end, and a slanted slot: every arc's two ends on one circle to 1e-6, which reSHape asks of an arc
+    const on = code => [...code.matchAll(/\.arc\(\[([-\d.]+), ([-\d.]+)\], \[([-\d.]+), ([-\d.]+)\], \[([-\d.]+), ([-\d.]+)\]/g)].every(m => { const [cx, cy, ax, ay, bx, by] = m.slice(1).map(Number); return Math.abs(Math.hypot(ax - cx, ay - cy) - Math.hypot(bx - cx, by - cy)) < 1e-6; });
+    assert.equal(arcCode('lid', [0, 0], [5, 0], [1, 1]), "lid.arc([0, 0], [5, 0], [3.535533906, 3.535533906], 'ccw');", 'the end put on the circle, to 1e-9');
+    assert.ok(on(arcCode('lid', [1.5, 2], [7, 3], [-4, 9])));
+    const slot = toolCode.slot('lid', [0, 0], [20, 7], 3); assert.equal((slot.match(/\.arc\(/g) || []).length, 2); assert.ok(on(slot), slot);
+  }
   const doc = "const lid = sketch('top', 10);\nlid.line([0, 0], [10, 5]);\nlid.lines([[10, 5], [20, 5], [10, 5]]);\nlid.circle([30, 20], { r: 6 });\npocket(lid, part, 4, [10, 5]);\n";
   const ed = movePointEdits(doc, 'lid', [10, 5], [12, 6]);
   const moved = ed.reduceRight((d, e) => d.slice(0, e.from) + e.insert + d.slice(e.to), doc);
   assert.equal(moved, "const lid = sketch('top', 10);\nlid.line([0, 0], [12, 6]);\nlid.lines([[12, 6], [20, 5], [12, 6]]);\nlid.circle([30, 20], { r: 6 });\npocket(lid, part, 4, [10, 5]);\n", 'every [10, 5] in the block moves; the one past it does not');
   assert.equal(movePointEdits("const lid = sketch('top');\nlid.circle([w / 2, 5], { r: 1 });\n", 'lid', [30, 5], [31, 5]).length, 0, 'a point written with a variable is not changed');
+  {
+    const r = "const sk = sketch('top', 10);\nsk.rectangle([10, 5], [40, 25]);\nsk.line([40, 5], [50, 0]);\n";
+    const mv = (from, to) => movePointEdits(r, 'sk', from, to).reduceRight((d, e) => d.slice(0, e.from) + e.insert + d.slice(e.to), r);
+    assert.equal(mv([40, 5], [45, 2]), "const sk = sketch('top', 10);\nsk.rectangle([10, 2], [45, 25]);\nsk.line([45, 2], [50, 0]);\n", 'a rectangle\'s corner its code does not write: the opposite corner stays, and a line from it moves too');
+    assert.equal(mv([10, 25], [8, 30]), "const sk = sketch('top', 10);\nsk.rectangle([8, 5], [40, 30]);\nsk.line([40, 5], [50, 0]);\n", 'its other unwritten corner');
+    assert.equal(mv([40, 25], [42, 26]), "const sk = sketch('top', 10);\nsk.rectangle([10, 5], [42, 26]);\nsk.line([40, 5], [50, 0]);\n", 'a written corner, as before');
+    assert.equal(movePointEdits("const sk = sketch('top');\nsk.rectangle([w, 5], [40, 25]);\n", 'sk', [40, 5], [41, 5]).length, 0, 'a rectangle written with a variable is not changed');
+  }
   const sq = planeOutlines([{ a: [0, 0], b: [60, 0], mid: [30, 0] }, { a: [60, 40], b: [60, 0], mid: [60, 20] }, { a: [60, 40], b: [0, 40], mid: [30, 40] }, { a: [0, 0], b: [0, 40], mid: [0, 20] }, { a: [36, 20], b: [36, 20], mid: [24, 20] }]);
   assert.equal(sq.length, 2, 'the outside, joined from edges in any order and direction, and a round hole');
   assert.ok(sq.some(l => l.length === 5) && sq.some(l => l.length === 49));
@@ -177,9 +191,9 @@ console.log('PASS dimensions: lengths and radii shown, and changed in the code')
   const apply = (doc, es) => { let d = doc; for (const e of [...es].sort((a, b) => b.from - a.from)) d = d.slice(0, e.from) + e.insert + d.slice(e.to); return d; };
   const doc = "const sk = sketch('top');\nsk.line([0, 0], [20, 0]);\nsk.line([20, 0], [20, 10]);\n";
   const G = [{ k: 'line', a: [0, 0], b: [20, 0] }, { k: 'line', a: [20, 0], b: [20, 10] }];
-  assert.deepEqual(lineCorners(G), [[0, 0], [20, 0], [20, 10]], 'each end once');
+  assert.deepEqual(cutCorners(G), [[0, 0], [20, 0], [20, 10]], 'each end once');
   const c = cornerAt(G, [20, 0]); assert.deepEqual(c.lines, [0, 1]); assert.ok(Math.abs(c.half - Math.PI / 4) < 1e-12, 'a right angle');
-  assert.match(cornerAt(G, [0, 0]), /two lines meet/, 'the end of one line is no corner');
+  assert.match(cornerAt(G, [0, 0]), /two lines or arcs meet/, 'the end of one line is no corner');
   const g = roundGeom(G, [20, 0], 5);
   assert.deepEqual(g.arc, { k: 'arc', c: [15, 5], r: 5, a: [15, 0], b: [20, 5], sense: 'ccw' }, 'the arc, the short way round, counter-clockwise');
   const L = sketchStatementLines(doc, 'sk'); let e = roundEdits(doc, 'sk', L, [0, 1], G, [20, 0], 5);
@@ -194,8 +208,8 @@ console.log('PASS dimensions: lengths and radii shown, and changed in the code')
   // a slanted corner: 60 degrees, so t = r / tan 30
   const S = [{ k: 'line', a: [0, 0], b: [10, 0] }, { k: 'line', a: [0, 0], b: [5, 5 * Math.sqrt(3)] }];
   const sg = roundGeom(S, [0, 0], 1); const t = 1 / Math.tan(Math.PI / 6);
-  assert.deepEqual(sg.ends, [[+t.toFixed(3), 0], [+(t / 2).toFixed(3), +(t * Math.sqrt(3) / 2).toFixed(3)]], 'the round meets each line t from the corner, to 0.001');
-  assert.ok(Math.abs(Math.hypot(sg.arc.c[0] - sg.ends[0][0], sg.arc.c[1] - sg.ends[0][1]) - 1) < 1e-3, 'the centre 1 from where it meets');
+  assert.deepEqual(sg.ends, [[+t.toFixed(9), 0], [+(t / 2).toFixed(9), +(t * Math.sqrt(3) / 2).toFixed(9)]], 'the round meets each line t from the corner, to 1e-9');
+  assert.ok(sg.ends.every(p => Math.abs(Math.hypot(sg.arc.c[0] - p[0], sg.arc.c[1] - p[1]) - 1) < 1e-8), 'the centre 1 from where it meets each line, to well inside the 1e-6 reSHape asks of an arc');
   assert.match(cornerAt([{ k: 'line', a: [0, 0], b: [10, 0] }, { k: 'line', a: [10, 0], b: [20, 0] }], [10, 0]), /straight on/, 'lines in a straight line');
   // a rectangle: written out as its four lines, with the round
   const rd = "const sk = sketch('top');\n  sk.rectangle([0, 0], [60, 40]);\nsk.circle([30, 20], { r: 5 });\n";
@@ -205,10 +219,60 @@ console.log('PASS dimensions: lengths and radii shown, and changed in the code')
   // written with a variable: not changed
   const vd = "const w = 20;\nconst sk = sketch('top');\nsk.line([0, 0], [w, 0]);\nsk.line([20, 0], [20, 10]);\n";
   assert.match(roundEdits(vd, 'sk', sketchStatementLines(vd, 'sk'), [0, 1], G, [20, 0], 5), /written with a variable/);
-  // an arc at the corner: not two lines
-  assert.match(cornerAt([...G, { k: 'arc', c: [20, 5], r: 5, a: [20, 0], b: [25, 5], sense: 'ccw' }], [20, 0]), /two lines meet/);
+  // three curves at the corner: not a corner of two
+  assert.match(cornerAt([...G, { k: 'arc', c: [20, 5], r: 5, a: [20, 0], b: [25, 5], sense: 'ccw' }], [20, 0]), /two lines or arcs meet/);
 }
 console.log('PASS round: a corner of two lines rounded, in the drawing words');
+{ // Round and Chamfer where a line meets an arc, or two arcs meet
+  const apply = (doc, es) => { let d = doc; for (const e of [...es].sort((a, b) => b.from - a.from)) d = d.slice(0, e.from) + e.insert + d.slice(e.to); return d; };
+  const near = (p, q, tol = 1e-3) => Math.hypot(p[0] - q[0], p[1] - q[1]) <= tol;
+  // a line along the x axis to [20, 0], then an arc about [30, 0] turning clockwise from [20, 0] up to [30, 10]: a right angle, inside it outside the circle
+  const doc = "const sk = sketch('top');\nsk.line([0, 0], [20, 0]);\nsk.arc([30, 0], [20, 0], [30, 10], 'cw');\n";
+  const G = [{ k: 'line', a: [0, 0], b: [20, 0] }, { k: 'arc', c: [30, 0], r: 10, a: [20, 0], b: [30, 10], sense: 'cw' }];
+  const L = sketchStatementLines(doc, 'sk');
+  assert.deepEqual(cutCorners(G), [[0, 0], [20, 0], [30, 10]], 'the arc\'s ends are corners too');
+  const c = cornerAt(G, [20, 0]); assert.ok(typeof c !== 'string' && c.arcs && Math.abs(c.half - Math.PI / 4) < 1e-12, 'a right angle between the line and the arc');
+  // by hand: the centre is r above the line and 10 + r from [30, 0], so x = 30 - sqrt(100 + 20 r); for r = 5, [15.858, 5]
+  const g = roundGeom(G, [20, 0], 5);
+  assert.deepEqual(g.arc, { k: 'arc', c: [15.857864376, 5], r: 5, a: [15.857864376, 0], b: [20.571909584, 3.333333333], sense: 'ccw' }, 'the round, counter-clockwise past the corner, to 1e-9');
+  let e = roundEdits(doc, 'sk', L, [0, 1], G, [20, 0], 5);
+  assert.equal(apply(doc, e.edits), "const sk = sketch('top');\nsk.line([0, 0], [15.857864376, 0]);\nsk.arc([30, 0], [30, 10], [20.571909584, 3.333333333], 'ccw');\nsk.arc([15.857864376, 5], [15.857864376, 0], [20.571909584, 3.333333333], 'ccw');\n", 'the line shortened, the arc written again from its far end (its radius stays 10), the round after');
+  assert.equal(largestRound(G, [20, 0]), 40, 'as big as uses up the line: 30 - sqrt(100 + 20 r) = 0');
+  e = roundEdits(doc, 'sk', L, [0, 1], G, [20, 0], 40);
+  assert.equal(apply(doc, e.edits), "const sk = sketch('top');\nsk.arc([30, 0], [30, 10], [24, 8], 'ccw');\nsk.arc([0, 40], [0, 0], [24, 8], 'ccw');\n", 'a round that uses up the line: the line goes');
+  assert.match(roundEdits(doc, 'sk', L, [0, 1], G, [20, 0], 41), /A radius of 41 does not fit between the line and the arc; the largest is 40\./);
+  const pv = cutPreview(G, [20, 0], g); assert.ok(near(pv[0], [0, 0]) && near(pv[pv.length - 1], [30, 10]) && pv.some(p => near(p, [15.857864376, 0])), 'the preview runs from the line\'s far end round to the arc\'s');
+  // chamfer: 5 along the line, and on the arc the point 5 from the corner in a straight line
+  const ch = chamferGeom(G, [20, 0], 5); assert.deepEqual(ch.ends, [[15, 0], [21.25, 4.841229183]]);
+  assert.equal(largestChamfer(G, [20, 0]), 14.142, 'the chord to the arc\'s far end');
+  e = chamferEdits(doc, 'sk', L, [0, 1], G, [20, 0], 5);
+  assert.equal(apply(doc, e.edits), "const sk = sketch('top');\nsk.line([0, 0], [15, 0]);\nsk.arc([30, 0], [30, 10], [21.25, 4.841229183], 'ccw');\nsk.line([15, 0], [21.25, 4.841229183]);\n");
+  assert.match(chamferGeom(G, [20, 0], 15), /A distance of 15 does not fit along the line and the arc; the largest is 14\.142\./);
+  // an arc that ends where the corner is written as its end (to): written again from its start, its sense kept
+  const d2 = "const sk = sketch('top');\nsk.arc([30, 0], [30, 10], [20, 0], 'ccw');\nsk.line([20, 0], [0, 0]);\n";
+  const G2 = [{ k: 'arc', c: [30, 0], r: 10, a: [30, 10], b: [20, 0], sense: 'ccw' }, { k: 'line', a: [20, 0], b: [0, 0] }];
+  assert.equal(apply(d2, roundEdits(d2, 'sk', sketchStatementLines(d2, 'sk'), [0, 1], G2, [20, 0], 5).edits), "const sk = sketch('top');\nsk.arc([30, 0], [30, 10], [20.571909584, 3.333333333], 'ccw');\nsk.line([15.857864376, 0], [0, 0]);\nsk.arc([15.857864376, 5], [15.857864376, 0], [20.571909584, 3.333333333], 'ccw');\n");
+  // where a line runs on smoothly into an arc (the arc's tangent there is the line's), or doubles back along it
+  assert.match(cornerAt([{ k: 'line', a: [0, 0], b: [20, 0] }, { k: 'arc', c: [20, 10], r: 10, a: [20, 0], b: [30, 10], sense: 'ccw' }], [20, 0]), /They run on smoothly there: there is no corner to round\./);
+  assert.match(cornerAt([{ k: 'line', a: [0, 0], b: [20, 0] }, { k: 'arc', c: [20, 10], r: 10, a: [20, 0], b: [10, 10], sense: 'cw' }], [20, 0], 'chamfer'), /no corner to chamfer/);
+  // two arcs at a right angle: about [0, 0] (the corner outside it) and about [10, 10] (the corner inside it)
+  const A = [{ k: 'arc', c: [0, 0], r: 10, a: [10, 0], b: [0, 10], sense: 'ccw' }, { k: 'arc', c: [10, 10], r: 10, a: [0, 10], b: [10, 20], sense: 'cw' }];
+  const ga = roundGeom(A, [0, 10], 2);
+  assert.ok(Math.abs(Math.hypot(ga.arc.c[0], ga.arc.c[1]) - 12) < 2e-3 && Math.abs(Math.hypot(ga.arc.c[0] - 10, ga.arc.c[1] - 10) - 8) < 2e-3, 'the round 2 outside one circle and 2 inside the other');
+  assert.ok(ga.ends.every(p => Math.abs(Math.hypot(p[0] - ga.arc.c[0], p[1] - ga.arc.c[1]) - 2) < 2e-3), 'and meets both');
+  assert.ok(near(ga.ends[0], [1.837, 9.83], 2e-3) && near(ga.ends[1], [0.255, 12.245], 2e-3), (JSON.stringify(ga.ends)));
+  assert.match(roundGeom(A, [0, 10], 10), /does not fit between the two arcs/, 'no bigger than the inside circle');
+  // every arc these write has its two ends on one circle to 1e-6 (reSHape's rule tolerance), whatever the angles
+  const onCircle = code => [...code.matchAll(/\.arc\(\[([-\d.]+), ([-\d.]+)\], \[([-\d.]+), ([-\d.]+)\], \[([-\d.]+), ([-\d.]+)\]/g)].every(m => { const [cx, cy, ax, ay, bx, by] = m.slice(1).map(Number); return Math.abs(Math.hypot(ax - cx, ay - cy) - Math.hypot(bx - cx, by - cy)) < 1e-6; });
+  for (const [r, q] of [[5, [20, 0]], [7.3, [20, 0]], [33.3, [20, 0]]]) assert.ok(onCircle(apply(doc, roundEdits(doc, 'sk', L, [0, 1], G, q, r).edits)), `round ${r}`);
+  for (const d of [1, 5, 9.9, 14.142]) assert.ok(onCircle(apply(doc, chamferEdits(doc, 'sk', L, [0, 1], G, [20, 0], d).edits)), `chamfer ${d}`);
+  const sl = "const sk = sketch('top');\nsk.line([0, 0], [10, 0]);\nsk.line([0, 0], [5, 7]);\n";
+  for (const r of [0.5, 1, 2.7]) assert.ok(onCircle(apply(sl, roundEdits(sl, 'sk', sketchStatementLines(sl, 'sk'), [0, 1], [{ k: 'line', a: [0, 0], b: [10, 0] }, { k: 'line', a: [0, 0], b: [5, 7] }], [0, 0], r).edits)), `a slanted corner of two lines, round ${r}`);
+  // an arc written with a name: not changed
+  const vd = "const r = 10;\nconst sk = sketch('top');\nsk.line([0, 0], [20, 0]);\nsk.arc([20 + r, 0], [20, 0], [30, 10], 'cw');\n";
+  assert.match(roundEdits(vd, 'sk', sketchStatementLines(vd, 'sk'), [0, 1], G, [20, 0], 5), /written with a variable/);
+}
+console.log('PASS round and chamfer where a line meets an arc, or two arcs meet');
 { // Chamfer: a corner of two lines cut by a straight line, the same distance along each
   const apply = (doc, es) => { let d = doc; for (const e of [...es].sort((a, b) => b.from - a.from)) d = d.slice(0, e.from) + e.insert + d.slice(e.to); return d; };
   const doc = "const sk = sketch('top');\nsk.line([0, 0], [20, 0]);\nsk.line([20, 0], [20, 10]);\n";

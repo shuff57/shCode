@@ -68,6 +68,13 @@ export function applyProjective(h: number[], p: V2): V2 | null {
 export function fmt(n: number): string { const r = Math.round(n * 1000) / 1000; return String(Object.is(r, -0) ? 0 : r); }
 /** A point as code: [x, y]. */
 export const pointCode = (q: V2) => `[${fmt(q[0])}, ${fmt(q[1])}]`;
+/**
+ * A number to 1e-9, for a point that has to sit on an arc: reSHape refuses a sketch whose rules (an arc's two ends on one circle) miss by more
+ * than 1e-6 mm, which a point rounded to 0.001 usually does. A number that is exact to 0.001 is written as short as before.
+ */
+export function fmt9(n: number): string { const r = Math.round(n * 1e9) / 1e9; return String(Object.is(r, -0) ? 0 : r); }
+export const pointExact = (q: V2) => `[${fmt9(q[0])}, ${fmt9(q[1])}]`;
+const r9 = (p: number[]): V2 => [Math.round(p[0] * 1e9) / 1e9, Math.round(p[1] * 1e9) / 1e9];
 /** Rounded to a grid step (a pointer is not exact; a snapped corner is). */
 export const toGrid = (q: V2, step = 0.5): V2 => [Math.round(q[0] / step) * step, Math.round(q[1] / step) * step];
 
@@ -166,8 +173,8 @@ export const toolCode = {
   rectangle: (s: string, a: V2, b: V2) => `${s}.rectangle(${pointCode([Math.min(a[0], b[0]), Math.min(a[1], b[1])])}, ${pointCode([Math.max(a[0], b[0]), Math.max(a[1], b[1])])});`,
   circle: (s: string, c: V2, r: number) => `${s}.circle(${pointCode(c)}, { r: ${fmt(r)} });`,
   // a slot in the drawing words (reSHape's own slot() cannot share a sketch with them): its two sides and its two caps, counter-clockwise
-  slot: (s: string, a: V2, b: V2, r: number) => slotGeoms(a, b, r).map(g => g.k === 'line' ? `${s}.line(${pointCode(g.a)}, ${pointCode(g.b)});`
-    : g.k === 'arc' ? `${s}.arc(${pointCode(g.c)}, ${pointCode(g.a)}, ${pointCode(g.b)}, '${g.sense}');` : '').join('\n'),
+  slot: (s: string, a: V2, b: V2, r: number) => slotGeoms(a, b, r).map(g => g.k === 'line' ? `${s}.line(${pointExact(g.a)}, ${pointExact(g.b)});`
+    : g.k === 'arc' ? `${s}.arc(${pointCode(g.c)}, ${pointExact(g.a)}, ${pointExact(g.b)}, '${g.sense}');` : '').join('\n'),
   lines: (s: string, pts: V2[], closed: boolean) => `${s}.lines([${[...pts, ...(closed ? [pts[0]] : [])].map(pointCode).join(', ')}]);`,
 };
 /**
@@ -227,29 +234,43 @@ export function freshName(base: string, taken: Set<string>): string { let n = ba
 
 // ---- the arc tool and moving a drawn point -------------------------------------------------------------------------------------
 
-/** An arc from a, counter-clockwise, to where the ray towards b crosses its circle. */
+/** An arc from a, counter-clockwise, to where the ray towards b crosses its circle (that end written to 1e-9, so it is on the circle). */
 export function arcCode(s: string, c: V2, a: V2, b: V2): string | null {
   const r = Math.hypot(a[0] - c[0], a[1] - c[1]); const d = Math.hypot(b[0] - c[0], b[1] - c[1]);
   if (r < 1e-9 || d < 1e-9) return null;
   const end: V2 = [c[0] + (b[0] - c[0]) * r / d, c[1] + (b[1] - c[1]) * r / d];
   if (Math.hypot(end[0] - a[0], end[1] - a[1]) < 1e-9) return null;
-  return `${s}.arc(${pointCode(c)}, ${pointCode(a)}, ${pointCode(end)}, 'ccw');`;
+  return `${s}.arc(${pointCode(c)}, ${pointCode(a)}, ${pointExact(end)}, 'ccw');`;
 }
 /**
  * Moving a drawn point: the [x, y] literals in sketch `name`'s block whose value is `from` are rewritten as `to` (every one, so a
  * corner two lines share, or a closed outline's first and last point, move together). Only plain number literals are found; a
- * point written with a variable or a sum is not, and nothing is changed for it. The changes to make, in the document's offsets.
+ * point written with a variable or a sum is not, and nothing is changed for it. A plain `sk.rectangle(a, b)` also moves by the
+ * two corners its code does not write: [b.x, a.y] and [a.x, b.y] become the new corner, its sides staying level and upright.
+ * The changes to make, in the document's offsets.
  */
 export function movePointEdits(doc: string, name: string, from: V2, to: V2): { from: number; to: number; insert: string }[] {
   const end = sketchBlockEnd(doc, name); if (end === null) return [];
   const esc = name.replace(/\$/g, '\\$');
   const decl = new RegExp(`^\\s*(?:const|let|var)\\s+${esc}\\s*=\\s*sketch\\s*\\(`, 'm').exec(doc); if (!decl) return [];
   const block = doc.slice(decl.index, end); const out: { from: number; to: number; insert: string }[] = [];
-  const re = /\[\s*(-?(?:\d+\.?\d*|\.\d+))\s*,\s*(-?(?:\d+\.?\d*|\.\d+))\s*\]/g;
-  for (let m = re.exec(block); m; m = re.exec(block)) {
-    if (Math.abs(Number(m[1]) - from[0]) < 1e-9 && Math.abs(Number(m[2]) - from[1]) < 1e-9) out.push({ from: decl.index + m.index, to: decl.index + m.index + m[0].length, insert: pointCode(to) });
+  const same = (x: string, y: string, p: V2) => Math.abs(Number(x) - p[0]) < 1e-9 && Math.abs(Number(y) - p[1]) < 1e-9;
+  const taken: [number, number][] = [];
+  const rect = new RegExp(String.raw`\.rectangle\(\s*(${PT})\s*,\s*(${PT})\s*\)`, 'g');
+  for (let m = rect.exec(block); m; m = rect.exec(block)) {
+    const [x0, y0, x1, y1] = [m[2], m[3], m[5], m[6]];
+    const a: V2 | null = same(x1, y0, from) ? [Number(x0), to[1]] : same(x0, y1, from) ? [to[0], Number(y0)] : null;
+    if (!a) continue;
+    const b: V2 = same(x1, y0, from) ? [to[0], Number(y1)] : [Number(x1), to[1]];
+    const s = decl.index + m.index + m[0].indexOf(m[1]); const e = decl.index + m.index + m[0].lastIndexOf(m[4]) + m[4].length;
+    out.push({ from: s, to: e, insert: `${pointCode(a)}, ${pointCode(b)}` }); taken.push([s, e]);
   }
-  return out;
+  const re = new RegExp(PT, 'g');
+  for (let m = re.exec(block); m; m = re.exec(block)) {
+    const s = decl.index + m.index;
+    if (same(m[1], m[2], from) && !taken.some(([ts, te]) => s >= ts && s < te)) out.push({ from: s, to: s + m[0].length, insert: pointCode(to) });
+  }
+  return out.sort((p, q) => p.from - q.from);
 }
 
 /**
@@ -291,22 +312,22 @@ export function typedPoint(tool: string, pts: V2[], pointer: V2, typed: string):
   if (tool === 'line' || tool === 'polyline' || tool === 'circle') {
     if (ns.length !== 1 || !(ns[0] > 0)) return null;
     const from = tool === 'circle' ? pts[0] : last; const u = towards(from);
-    return r3([from[0] + u[0] * ns[0], from[1] + u[1] * ns[0]]);
+    return r9([from[0] + u[0] * ns[0], from[1] + u[1] * ns[0]]);
   }
   if (tool === 'rectangle') {
     const [w, h] = ns.length === 2 ? ns : [ns[0], ns[0]]; if (!(w > 0) || !(h > 0)) return null;
     const a = pts[0]; const sx = pointer[0] < a[0] ? -1 : 1, sy = pointer[1] < a[1] ? -1 : 1;
-    return r3([a[0] + sx * w, a[1] + sy * h]);
+    return r9([a[0] + sx * w, a[1] + sy * h]);
   }
   if (tool === 'slot' && pts.length === 2) {
     if (ns.length !== 1 || !(ns[0] > 0)) return null;
     const [a, b] = pts; const d = [b[0] - a[0], b[1] - a[1]]; const l = Math.hypot(d[0], d[1]); if (!(l > 1e-9)) return null;
-    return r3([(a[0] + b[0]) / 2 - d[1] / l * ns[0], (a[1] + b[1]) / 2 + d[0] / l * ns[0]]);
+    return r9([(a[0] + b[0]) / 2 - d[1] / l * ns[0], (a[1] + b[1]) / 2 + d[0] / l * ns[0]]);
   }
   if (tool === 'arc' && pts.length === 2) {
     if (ns.length !== 1 || !(ns[0] !== 0) || Math.abs(ns[0]) >= 360) return null;
     const [c, s] = pts; const t = ns[0] * Math.PI / 180; const d = [s[0] - c[0], s[1] - c[1]];
-    return r3([c[0] + d[0] * Math.cos(t) - d[1] * Math.sin(t), c[1] + d[0] * Math.sin(t) + d[1] * Math.cos(t)]);
+    return r9([c[0] + d[0] * Math.cos(t) - d[1] * Math.sin(t), c[1] + d[0] * Math.sin(t) + d[1] * Math.cos(t)]);
   }
   return null;
 }
@@ -315,8 +336,8 @@ export function distToSegment(p: V2, a: V2, b: V2): number { return distToPolyli
 /** A slot's outline (the two caps and the two sides), as reSHape's slot(a, b, r) draws it, for the preview. */
 export function slotGeoms(a: V2, b: V2, r: number): SketchGeom[] {
   const d = [b[0] - a[0], b[1] - a[1]]; const l = Math.hypot(d[0], d[1]); if (!(l > 1e-9) || !(r > 0)) return [];
-  const n: V2 = [-d[1] / l * r, d[0] / l * r]; const r3 = (q: number[]): V2 => [Math.round(q[0] * 1000) / 1000, Math.round(q[1] * 1000) / 1000];
-  const a1 = r3([a[0] + n[0], a[1] + n[1]]), a2 = r3([a[0] - n[0], a[1] - n[1]]), b1 = r3([b[0] + n[0], b[1] + n[1]]), b2 = r3([b[0] - n[0], b[1] - n[1]]);
+  const n: V2 = [-d[1] / l * r, d[0] / l * r];
+  const a1 = r9([a[0] + n[0], a[1] + n[1]]), a2 = r9([a[0] - n[0], a[1] - n[1]]), b1 = r9([b[0] + n[0], b[1] + n[1]]), b2 = r9([b[0] - n[0], b[1] - n[1]]);
   // counter-clockwise: the side below a to b, the cap round b, the side above back to a, the cap round a
   return [{ k: 'line', a: a2, b: b2 }, { k: 'arc', c: b, r, a: b2, b: b1, sense: 'ccw' }, { k: 'line', a: b1, b: a1 }, { k: 'arc', c: a, r, a: a1, b: a2, sense: 'ccw' }];
 }
@@ -373,86 +394,220 @@ export function resizeEdits(doc: string, name: string, line: { from: number; to:
   return edits.some(e => e.from >= line.from && e.to <= line.to) ? edits : null;
 }
 
-// ---- Round: a corner where two lines meet, rounded with an arc -----------------------------------------------------------------
+// ---- Round and Chamfer: a corner where two curves meet, each a line or an arc --------------------------------------------------
 
-/** The corners a pointer can round: ends of the sketch's lines, each once. */
-export function lineCorners(geoms: SketchGeom[]): V2[] {
+type ArcGeom = SketchGeom & { k: 'arc' };
+const sub2 = (a: number[], b: number[]): V2 => [a[0] - b[0], a[1] - b[1]];
+const dot2 = (a: number[], b: number[]) => a[0] * b[0] + a[1] * b[1];
+const cross2 = (a: number[], b: number[]) => a[0] * b[1] - a[1] * b[0];
+const len2 = (a: number[]) => Math.hypot(a[0], a[1]);
+const ang2 = (a: number[]) => Math.atan2(a[1], a[0]);
+const turn2pi = (x: number) => { const t = 2 * Math.PI; return ((x % t) + t) % t; };
+const at6 = (a: V2, q: V2) => Math.hypot(a[0] - q[0], a[1] - q[1]) < 1e-6;
+/** An arc's sweep from a to b in its sense, in (0, 2π]. */
+function arcSweep(g: ArcGeom): number { const d = ang2(sub2(g.b, g.c)) - ang2(sub2(g.a, g.c)); const s = turn2pi(g.sense === 'cw' ? -d : d); return s < 1e-12 ? 2 * Math.PI : s; }
+/**
+ * A line or an arc seen from its end at corner q: the way it leaves q (t), its other end (far), and for an arc its centre, radius, sweep, and
+ * s = +1 when leaving q turns it counter-clockwise about its centre (−1 clockwise).
+ */
+interface FromCorner { k: 'line' | 'arc'; t: V2; far: V2; len: number; c: V2; R: number; s: number; sweep: number; atA: boolean }
+function fromCorner(g: SketchGeom, q: V2): FromCorner {
+  if (g.k === 'line') {
+    const atA = at6(g.a, q); const far = atA ? g.b : g.a; const d = sub2(far, q); const len = len2(d);
+    return { k: 'line', t: [d[0] / len, d[1] / len], far, len, c: q, R: 0, s: 0, sweep: 0, atA };
+  }
+  const a = g as ArcGeom; const atA = at6(a.a, q); const p = atA ? a.a : a.b; const s = (a.sense === 'cw' ? -1 : 1) * (atA ? 1 : -1);
+  // its radius is taken from its far end, the end it is written from once cut (reSHape takes an arc's radius from its start)
+  const rho = sub2(p, a.c); const R = len2(sub2(atA ? a.b : a.a, a.c)); const rl = len2(rho);
+  return { k: 'arc', t: [-s * rho[1] / rl, s * rho[0] / rl], far: atA ? a.b : a.a, len: 0, c: a.c, R, s, sweep: arcSweep(a), atA };
+}
+/** How far round arc f a point X is from the corner end (radians, in [0, 2π)). */
+const roundFrom = (f: FromCorner, q: V2, X: number[]) => turn2pi(f.s * (ang2(sub2(X, f.c)) - ang2(sub2(q, f.c))));
+const pairWords = (geoms: SketchGeom[], ix: number[]) => {
+  const arcs = ix.filter(i => geoms[i].k === 'arc').length;
+  return arcs === 0 ? 'these lines' : arcs === 1 ? 'the line and the arc' : 'the two arcs';
+};
+
+/** The corners a pointer can round or chamfer: ends of the sketch's lines and arcs, each once. */
+export function cutCorners(geoms: SketchGeom[]): V2[] {
   const out: V2[] = [];
-  for (const g of geoms) if (g.k === 'line') for (const q of [g.a, g.b]) if (!out.some(o => Math.hypot(o[0] - q[0], o[1] - q[1]) < 1e-6)) out.push(q);
+  for (const g of geoms) if (g.k === 'line' || g.k === 'arc') for (const q of [g.a, g.b]) if (!out.some(o => at6(o, q))) out.push(q);
   return out;
 }
-/** The two lines that meet at corner q, and the angle between them; a sentence when it is not a corner of two lines (to round or to chamfer). */
-export function cornerAt(geoms: SketchGeom[], q: V2, verb: 'round' | 'chamfer' = 'round'): { lines: [number, number]; far: [V2, V2]; half: number } | string {
-  const near = (a: V2) => Math.hypot(a[0] - q[0], a[1] - q[1]) < 1e-6;
-  const touching = geoms.flatMap((g, i) => g.k === 'line' ? (near(g.a) || near(g.b) ? [i] : []) : g.k === 'arc' && (near(g.a) || near(g.b)) ? [i] : []);
-  if (touching.length !== 2 || touching.some(i => geoms[i].k !== 'line')) return `Only a corner where two lines meet can be ${verb === 'round' ? 'rounded' : 'chamfered'}.`;
-  const far = touching.map(i => { const g = geoms[i] as { a: V2; b: V2 }; return near(g.a) ? g.b : g.a; }) as [V2, V2];
-  const u = far.map(f => { const d = [f[0] - q[0], f[1] - q[1]]; const l = Math.hypot(d[0], d[1]); return [d[0] / l, d[1] / l]; });
-  const cos = Math.max(-1, Math.min(1, u[0][0] * u[1][0] + u[0][1] * u[1][1]));
-  const angle = Math.acos(cos);
-  if (!(angle > 1e-6) || !(angle < Math.PI - 1e-6)) return `The two lines run straight on there: there is no corner to ${verb}.`;
-  return { lines: touching as [number, number], far, half: angle / 2 };
+/**
+ * The two curves (lines or arcs) that meet at corner q, their far ends, and half the angle between the ways they leave it; a sentence when it
+ * is not a corner of two of them (to round or to chamfer).
+ */
+export function cornerAt(geoms: SketchGeom[], q: V2, verb: 'round' | 'chamfer' = 'round'): { lines: [number, number]; far: [V2, V2]; half: number; arcs: boolean } | string {
+  const touching = geoms.flatMap((g, i) => (g.k === 'line' || g.k === 'arc') && (at6(g.a, q) || at6(g.b, q)) ? [i] : []);
+  if (touching.length !== 2) return `Only a corner where two lines or arcs meet can be ${verb === 'round' ? 'rounded' : 'chamfered'}.`;
+  const fs = touching.map(i => fromCorner(geoms[i], q));
+  const arcs = fs.some(f => f.k === 'arc');
+  const angle = Math.acos(Math.max(-1, Math.min(1, dot2(fs[0].t, fs[1].t))));
+  if (!(angle > 1e-6) || !(angle < Math.PI - 1e-6)) return arcs ? `They run on smoothly there: there is no corner to ${verb}.` : `The two lines run straight on there: there is no corner to ${verb}.`;
+  return { lines: touching as [number, number], far: [fs[0].far, fs[1].far], half: angle / 2, arcs };
 }
-/** The largest radius corner q takes: the round may use up the whole of the shorter line, which then goes (rounded down to 0.001). */
+/**
+ * The round of radius r at corner q, exactly (not yet written to 1e-9): its centre and where it meets each curve, or null when it does not fit.
+ * Its centre is where the two curves' offsets by r towards the inside of the corner cross (a line's offset is a line, an arc's a circle of
+ * radius R ± r), the crossing nearest the corner whose touching points lie on both curves.
+ */
+function roundAt(geoms: SketchGeom[], ix: [number, number], q: V2, r: number): { centre: V2; ends: [V2, V2]; used: [boolean, boolean] } | null {
+  const fs = ix.map(i => fromCorner(geoms[i], q));
+  const side = Math.sign(cross2(fs[0].t, fs[1].t));
+  type Off = { k: 'L'; p: V2; d: V2 } | { k: 'C'; c: V2; r: number };
+  const offs: Off[] = [];
+  for (let n = 0; n < 2; n++) {
+    const f = fs[n]; const sg = n === 0 ? side : -side; const nrm: V2 = [-f.t[1] * sg, f.t[0] * sg];
+    if (f.k === 'line') { offs.push({ k: 'L', p: [q[0] + nrm[0] * r, q[1] + nrm[1] * r], d: f.t }); continue; }
+    const inside = dot2(nrm, sub2(f.c, q)) > 0;
+    if (inside && r >= f.R - 1e-9) return null;
+    offs.push({ k: 'C', c: f.c, r: inside ? f.R - r : f.R + r });
+  }
+  const cands: V2[] = [];
+  const lineCircle = (L: { p: V2; d: V2 }, C: { c: V2; r: number }) => {
+    const w = sub2(L.p, C.c); const b = dot2(L.d, w); const disc = b * b - (dot2(w, w) - C.r * C.r);
+    if (disc < -1e-12) return; const sq = Math.sqrt(Math.max(0, disc));
+    for (const l of [-b - sq, -b + sq]) cands.push([L.p[0] + L.d[0] * l, L.p[1] + L.d[1] * l]);
+  };
+  const [o0, o1] = offs;
+  if (o0.k === 'L' && o1.k === 'L') {
+    const den = cross2(o0.d, o1.d); if (Math.abs(den) > 1e-12) { const l = cross2(sub2(o1.p, o0.p), o1.d) / den; cands.push([o0.p[0] + o0.d[0] * l, o0.p[1] + o0.d[1] * l]); }
+  } else if (o0.k === 'L' && o1.k === 'C') lineCircle(o0, o1);
+  else if (o0.k === 'C' && o1.k === 'L') lineCircle(o1, o0);
+  else if (o0.k === 'C' && o1.k === 'C') {
+    const d = sub2(o1.c, o0.c); const D = len2(d);
+    if (D > 1e-12 && D <= o0.r + o1.r + 1e-9 && D >= Math.abs(o0.r - o1.r) - 1e-9) {
+      const a = (o0.r * o0.r - o1.r * o1.r + D * D) / (2 * D); const h = Math.sqrt(Math.max(0, o0.r * o0.r - a * a));
+      const m: V2 = [o0.c[0] + d[0] * a / D, o0.c[1] + d[1] * a / D];
+      cands.push([m[0] - d[1] * h / D, m[1] + d[0] * h / D], [m[0] + d[1] * h / D, m[1] - d[0] * h / D]);
+    }
+  }
+  let best: { centre: V2; ends: [V2, V2]; used: [boolean, boolean] } | null = null; let bd = Infinity;
+  for (const P of cands) {
+    const touch = fs.map(f => {
+      if (f.k === 'line') { const s = dot2(sub2(P, q), f.t); return s > 1e-9 && s <= f.len + 1e-6 ? { T: [q[0] + f.t[0] * s, q[1] + f.t[1] * s] as V2, used: Math.abs(s - f.len) <= 1e-6 } : null; }
+      const u = sub2(P, f.c); const ul = len2(u); if (ul < 1e-12) return null;
+      const T: V2 = [f.c[0] + u[0] * f.R / ul, f.c[1] + u[1] * f.R / ul]; const phi = roundFrom(f, q, T);
+      return phi > 1e-9 && phi <= f.sweep + 1e-6 / f.R ? { T, used: Math.abs(phi - f.sweep) * f.R <= 1e-6 } : null;
+    });
+    if (!touch[0] || !touch[1]) continue;
+    const dq = len2(sub2(P, q)); if (dq < bd) { bd = dq; best = { centre: P, ends: [touch[0].T, touch[1].T], used: [touch[0].used, touch[1].used] }; }
+  }
+  return best;
+}
+/** The largest radius corner q takes, rounded down to 0.001 (between two lines: the round may use up the whole of the shorter one). */
 export function largestRound(geoms: SketchGeom[], q: V2): number | null {
   const c = cornerAt(geoms, q); if (typeof c === 'string') return null;
-  const short = Math.min(...c.far.map(f => Math.hypot(f[0] - q[0], f[1] - q[1])));
-  return Math.floor(short * Math.tan(c.half) * 1000 + 1e-6) / 1000;
+  if (!c.arcs) {
+    const short = Math.min(...c.far.map(f => Math.hypot(f[0] - q[0], f[1] - q[1])));
+    return Math.floor(short * Math.tan(c.half) * 1000 + 1e-6) / 1000;
+  }
+  // with an arc: the largest that still fits, found by halving (a round grows away from the corner along both curves as r grows)
+  const fits = (r: number) => roundAt(geoms, c.lines, q, r) !== null;
+  if (!fits(1e-3)) return 0;
+  let lo = 1e-3, hi = 2e-3;
+  while (fits(hi) && hi < 1e7) { lo = hi; hi *= 2; }
+  for (let n = 0; n < 60; n++) { const m = (lo + hi) / 2; if (fits(m)) lo = m; else hi = m; }
+  return Math.floor(lo * 1000 + 1e-6) / 1000;
 }
-/** The round's arc and where it meets the two lines, for the preview; a sentence when that radius does not fit. */
-export function roundGeom(geoms: SketchGeom[], q: V2, r: number): { arc: SketchGeom & { k: 'arc' }; ends: [V2, V2]; lines: [number, number]; used: [boolean, boolean] } | string {
+/** The round's arc and where it meets the two curves, for the preview; a sentence when that radius does not fit. */
+export function roundGeom(geoms: SketchGeom[], q: V2, r: number): { arc: ArcGeom; ends: [V2, V2]; lines: [number, number]; used: [boolean, boolean] } | string {
   const c = cornerAt(geoms, q); if (typeof c === 'string') return c;
   if (!(r > 0)) return 'Give a radius above 0.';
-  const t = r / Math.tan(c.half); const r3 = (p: number[]): V2 => [Math.round(p[0] * 1000) / 1000, Math.round(p[1] * 1000) / 1000];
+  if (c.arcs) {
+    const s = roundAt(geoms, c.lines, q, r);
+    if (!s) { const most = largestRound(geoms, q); return `A radius of ${fmt(r)} does not fit between ${pairWords(geoms, c.lines)}${most && most > 0 ? `; the largest is ${fmt(most)}` : ''}.`; }
+    const centre = r9(s.centre); const ends = s.ends.map((T, i) => s.used[i] ? c.far[i] : r9(T)) as [V2, V2];
+    // counter-clockwise from one end to the other, the way that passes the corner's side of the centre
+    const a0 = ang2(sub2(ends[0], centre)); const mid = a0 + turn2pi(ang2(sub2(ends[1], centre)) - a0) / 2;
+    const m: V2 = [centre[0] + Math.cos(mid), centre[1] + Math.sin(mid)]; const m2: V2 = [2 * centre[0] - m[0], 2 * centre[1] - m[1]];
+    const [a, b] = len2(sub2(m, q)) <= len2(sub2(m2, q)) ? ends : [ends[1], ends[0]];
+    return { arc: { k: 'arc', c: centre, r, a, b, sense: 'ccw' }, ends, lines: c.lines, used: s.used };
+  }
+  const t = r / Math.tan(c.half);
   const lens = c.far.map(f => Math.hypot(f[0] - q[0], f[1] - q[1]));
   if (lens.some(l => t > l + 1e-6)) { const most = largestRound(geoms, q); return `A radius of ${fmt(r)} does not fit between these lines${most && most > 0 ? `; the largest is ${fmt(most)}` : ''}.`; }
   const u = c.far.map((f, i) => [(f[0] - q[0]) / lens[i], (f[1] - q[1]) / lens[i]]);
   // a round that uses up a whole line meets the line's far end, and the line goes
   const used = lens.map(l => Math.abs(t - l) <= 1e-6) as [boolean, boolean];
-  const ends = u.map((d, i) => used[i] ? c.far[i] : r3([q[0] + d[0] * t, q[1] + d[1] * t])) as [V2, V2];
+  const ends = u.map((d, i) => used[i] ? c.far[i] : r9([q[0] + d[0] * t, q[1] + d[1] * t])) as [V2, V2];
   const bis = [u[0][0] + u[1][0], u[0][1] + u[1][1]]; const bl = Math.hypot(bis[0], bis[1]); const k = r / Math.sin(c.half) / bl;
-  const centre = r3([q[0] + bis[0] * k, q[1] + bis[1] * k]);
+  const centre = r9([q[0] + bis[0] * k, q[1] + bis[1] * k]);
   // the short way round, written counter-clockwise: from the end where turning left takes it to the other
   const cross = (ends[0][0] - centre[0]) * (ends[1][1] - centre[1]) - (ends[0][1] - centre[1]) * (ends[1][0] - centre[0]);
   const [a, b] = cross > 0 ? ends : [ends[1], ends[0]];
   return { arc: { k: 'arc', c: centre, r, a, b, sense: 'ccw' }, ends, lines: c.lines, used };
 }
-/** A chamfer of corner q: the same distance d along each line, joined by a straight line; a sentence when d does not fit. */
+/** The largest chamfer distance corner q takes, rounded down to 0.001: a line's length; an arc's chord to its far end, or its diameter past half a turn. */
+export function largestChamfer(geoms: SketchGeom[], q: V2): number | null {
+  const c = cornerAt(geoms, q, 'chamfer'); if (typeof c === 'string') return null;
+  const most = Math.min(...c.lines.map(i => { const f = fromCorner(geoms[i], q); return f.k === 'line' ? f.len : f.sweep >= Math.PI ? 2 * f.R : len2(sub2(f.far, q)); }));
+  return Math.floor(most * 1000 + 1e-6) / 1000;
+}
+/**
+ * A chamfer of corner q: a cut at the same distance d from the corner on each curve (along a line; on an arc, the point that far from the
+ * corner in a straight line), joined by a straight line; a sentence when d does not fit.
+ */
 export function chamferGeom(geoms: SketchGeom[], q: V2, d: number): { cut: SketchGeom & { k: 'line' }; ends: [V2, V2]; lines: [number, number]; used: [boolean, boolean] } | string {
   const c = cornerAt(geoms, q, 'chamfer'); if (typeof c === 'string') return c;
   if (!(d > 0)) return 'Give a distance above 0.';
-  const lens = c.far.map(f => Math.hypot(f[0] - q[0], f[1] - q[1]));
-  if (lens.some(l => d > l + 1e-6)) { const most = Math.floor(Math.min(...lens) * 1000 + 1e-6) / 1000; return `A distance of ${fmt(d)} does not fit along these lines; the largest is ${fmt(most)}.`; }
-  const r3 = (p: number[]): V2 => [Math.round(p[0] * 1000) / 1000, Math.round(p[1] * 1000) / 1000];
-  const used = lens.map(l => Math.abs(d - l) <= 1e-6) as [boolean, boolean];
-  const ends = c.far.map((f, i) => used[i] ? f : r3([q[0] + (f[0] - q[0]) * d / lens[i], q[1] + (f[1] - q[1]) * d / lens[i]])) as [V2, V2];
+  const most = largestChamfer(geoms, q)!;
+  const fs = c.lines.map(i => fromCorner(geoms[i], q));
+  const tooFar = fs.some(f => f.k === 'line' ? d > f.len + 1e-6 : 2 * Math.asin(Math.min(1, d / (2 * f.R))) > f.sweep + 1e-6 / f.R || d > 2 * f.R + 1e-6);
+  if (tooFar) return `A distance of ${fmt(d)} does not fit along ${pairWords(geoms, c.lines)}; the largest is ${fmt(most)}.`;
+  const cutOn = (f: FromCorner): { T: V2; used: boolean } => {
+    if (f.k === 'line') return { T: [q[0] + f.t[0] * d, q[1] + f.t[1] * d], used: Math.abs(d - f.len) <= 1e-6 };
+    const phi = 2 * Math.asin(Math.min(1, d / (2 * f.R))); const a = ang2(sub2(q, f.c)) + f.s * phi;
+    return { T: [f.c[0] + f.R * Math.cos(a), f.c[1] + f.R * Math.sin(a)], used: Math.abs(phi - f.sweep) * f.R <= 1e-6 };
+  };
+  const cuts = fs.map(cutOn); const used = cuts.map(x => x.used) as [boolean, boolean];
+  const ends = cuts.map((x, i) => x.used ? c.far[i] : r9(x.T)) as [V2, V2];
   return { cut: { k: 'line', a: ends[0], b: ends[1] }, ends, lines: c.lines, used };
 }
+/** What is left of curve g once its corner end q is moved to `end`, written from its far end (an arc keeps its radius exactly that way). */
+function cutCurve(g: SketchGeom, q: V2, end: V2): SketchGeom {
+  if (g.k === 'line') return at6(g.a, q) ? { k: 'line', a: end, b: g.b } : { k: 'line', a: g.a, b: end };
+  const a = g as ArcGeom; const sense = a.sense === 'cw' ? 'cw' : 'ccw';
+  return at6(a.a, q) ? { k: 'arc', c: a.c, r: a.r, a: a.b, b: end, sense: sense === 'cw' ? 'ccw' : 'cw' } : { k: 'arc', c: a.c, r: a.r, a: a.a, b: end, sense };
+}
+/** The preview of a round or chamfer: along the first curve from its far end to the cut, across the corner, and along the other to its far end. */
+export function cutPreview(geoms: SketchGeom[], q: V2, g: { ends: [V2, V2]; lines: [number, number]; used: [boolean, boolean]; arc?: ArcGeom }, pieces = 32): V2[] {
+  const piece = (n: number): V2[] => g.used[n] ? [g.ends[n]] : geomPath(cutCurve(geoms[g.lines[n]], q, g.ends[n]), pieces);
+  let across: V2[] = g.ends;
+  if (g.arc) { across = geomPath(g.arc, pieces); if (!at6(g.arc.a, g.ends[0])) across.reverse(); }
+  return [...piece(0), ...across, ...piece(1).reverse()];
+}
 /**
- * The code edits that cut corner q of sketch `name`: the two lines that meet there end at `cut.ends` instead (a line used up goes), and
- * `added` is written after the later of their lines. A rectangle or a polyline that one of them belongs to is written out as its separate lines
- * first (the drawing words have no rounded or chamfered rectangle). Only lines written as plain numbers are changed; for one written with a
- * variable, a sentence says so. `lines` and `owner` are the block's drawing lines and which of them drew each curve.
+ * The code edits that cut corner q of sketch `name`: the two curves that meet there end at `cut.ends` instead (one used up goes), and `added` is
+ * written after the later of their lines. A rectangle or a polyline that one of them belongs to is written out as its separate lines first (the
+ * drawing words have no rounded or chamfered rectangle); an arc is written again from its far end, so its radius stays as it was. Only curves
+ * written as plain numbers are changed; for one written with a variable, a sentence says so. `lines` and `owner` are the block's drawing lines
+ * and which of them drew each curve.
  */
 function cornerCutEdits(doc: string, name: string, lines: { from: number; to: number; text: string }[], owner: number[], geoms: SketchGeom[], q: V2,
   cut: { ends: [V2, V2]; lines: [number, number]; used: [boolean, boolean] }, added: string): { from: number; to: number; insert: string }[] | string {
   const esc = name.replace(/\$/g, '\\$');
   const plain = [String.raw`^${esc}\.line\(\s*${PT}\s*,\s*${PT}\s*\);?$`, String.raw`^${esc}\.rectangle\(\s*${PT}\s*,\s*${PT}\s*\);?$`,
     String.raw`^${esc}\.lines\(\s*\[\s*${PT}(?:\s*,\s*${PT})*\s*\]\s*\);?$`].map(s => new RegExp(s));
+  const arcLine = new RegExp(String.raw`^${esc}\.arc\(\s*${PT}\s*,\s*${PT}\s*,\s*${PT}\s*,\s*(['"])(?:ccw|cw)\7\s*\);?$`);
   const ks = [...new Set(cut.lines.map(i => owner[i]))].sort((x, y) => x - y);
+  const nineDecimals = (vs: number[]) => vs.every(v => Math.abs(Number(fmt9(v)) - v) <= 1e-12);
   for (const k of ks) {
-    const l = lines[k]; if (!l || !plain.some(re => re.test(l.text))) return 'That corner is written with a variable or a sum; change it in the code.';
+    const l = lines[k]; const isArc = !!l && arcLine.test(l.text);
+    if (!l || !(isArc || plain.some(re => re.test(l.text)))) return 'That corner is written with a variable or a sum; change it in the code.';
     const mine = geoms.flatMap((x, i) => owner[i] === k ? [x] : []);
-    if (mine.some(x => x.k !== 'line' || [...x.a, ...x.b].some(v => Math.abs(Number(fmt(v)) - v) > 1e-9))) return 'That corner is written with more than three decimals; change it in the code.';
+    const ok = isArc ? mine.length === 1 && mine[0].k === 'arc' && nineDecimals([...mine[0].c, ...mine[0].a, ...mine[0].b])
+      : mine.every(x => x.k === 'line' && nineDecimals([...x.a, ...x.b]));
+    if (!ok) return 'That corner is written with more than nine decimals; change it in the code.';
   }
-  const near = (a: V2) => Math.hypot(a[0] - q[0], a[1] - q[1]) < 1e-6;
   return ks.map(k => {
     const l = lines[k]; const raw = doc.slice(l.from, l.to); const indent = /^\s*/.exec(raw)![0]; const nl = raw.endsWith('\n') ? '\n' : '';
     const out = geoms.flatMap((x, i) => {
-      if (owner[i] !== k || x.k !== 'line') return [];
+      if (owner[i] !== k || (x.k !== 'line' && x.k !== 'arc')) return [];
       const j = cut.lines.indexOf(i); if (j >= 0 && cut.used[j]) return [];
-      const end = (p: V2) => j >= 0 && near(p) ? cut.ends[j] : p;
-      return [`${name}.line(${pointCode(end(x.a))}, ${pointCode(end(x.b))});`];
+      const y = j >= 0 ? cutCurve(x, q, cut.ends[j]) : x;
+      return [y.k === 'line' ? `${name}.line(${pointExact(y.a)}, ${pointExact(y.b)});` : `${name}.arc(${pointExact((y as ArcGeom).c)}, ${pointExact((y as ArcGeom).a)}, ${pointExact((y as ArcGeom).b)}, '${(y as ArcGeom).sense}');`];
     });
     if (k === ks[ks.length - 1]) out.push(added);
     return { from: l.from, to: l.to, insert: out.length ? out.map(s => indent + s).join('\n') + nl : '' };
@@ -462,15 +617,15 @@ function cornerCutEdits(doc: string, name: string, lines: { from: number; to: nu
 export function roundEdits(doc: string, name: string, lines: { from: number; to: number; text: string }[], owner: number[], geoms: SketchGeom[], q: V2, r: number):
   { edits: { from: number; to: number; insert: string }[]; arcCode: string } | string {
   const g = roundGeom(geoms, q, r); if (typeof g === 'string') return g;
-  const arcCode = `${name}.arc(${pointCode(g.arc.c)}, ${pointCode(g.arc.a)}, ${pointCode(g.arc.b)}, 'ccw');`;
+  const arcCode = `${name}.arc(${pointExact(g.arc.c)}, ${pointExact(g.arc.a)}, ${pointExact(g.arc.b)}, 'ccw');`;
   const edits = cornerCutEdits(doc, name, lines, owner, geoms, q, g, arcCode);
   return typeof edits === 'string' ? edits : { edits, arcCode };
 }
-/** Chamfering corner q of sketch `name` by d along each line: the code edits, and the line written across the corner. */
+/** Chamfering corner q of sketch `name` by d from the corner on each curve: the code edits, and the line written across the corner. */
 export function chamferEdits(doc: string, name: string, lines: { from: number; to: number; text: string }[], owner: number[], geoms: SketchGeom[], q: V2, d: number):
   { edits: { from: number; to: number; insert: string }[]; lineCode: string } | string {
   const g = chamferGeom(geoms, q, d); if (typeof g === 'string') return g;
-  const lineCode = `${name}.line(${pointCode(g.cut.a)}, ${pointCode(g.cut.b)});`;
+  const lineCode = `${name}.line(${pointExact(g.cut.a)}, ${pointExact(g.cut.b)});`;
   const edits = cornerCutEdits(doc, name, lines, owner, geoms, q, g, lineCode);
   return typeof edits === 'string' ? edits : { edits, lineCode };
 }
