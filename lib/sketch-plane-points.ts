@@ -373,6 +373,84 @@ export function resizeEdits(doc: string, name: string, line: { from: number; to:
   return edits.some(e => e.from >= line.from && e.to <= line.to) ? edits : null;
 }
 
+// ---- Round: a corner where two lines meet, rounded with an arc -----------------------------------------------------------------
+
+/** The corners a pointer can round: ends of the sketch's lines, each once. */
+export function lineCorners(geoms: SketchGeom[]): V2[] {
+  const out: V2[] = [];
+  for (const g of geoms) if (g.k === 'line') for (const q of [g.a, g.b]) if (!out.some(o => Math.hypot(o[0] - q[0], o[1] - q[1]) < 1e-6)) out.push(q);
+  return out;
+}
+/** The two lines that meet at corner q, and the angle between them; a sentence when it is not a corner of two lines. */
+export function cornerAt(geoms: SketchGeom[], q: V2): { lines: [number, number]; far: [V2, V2]; half: number } | string {
+  const near = (a: V2) => Math.hypot(a[0] - q[0], a[1] - q[1]) < 1e-6;
+  const touching = geoms.flatMap((g, i) => g.k === 'line' ? (near(g.a) || near(g.b) ? [i] : []) : g.k === 'arc' && (near(g.a) || near(g.b)) ? [i] : []);
+  if (touching.length !== 2 || touching.some(i => geoms[i].k !== 'line')) return 'Only a corner where two lines meet can be rounded.';
+  const far = touching.map(i => { const g = geoms[i] as { a: V2; b: V2 }; return near(g.a) ? g.b : g.a; }) as [V2, V2];
+  const u = far.map(f => { const d = [f[0] - q[0], f[1] - q[1]]; const l = Math.hypot(d[0], d[1]); return [d[0] / l, d[1] / l]; });
+  const cos = Math.max(-1, Math.min(1, u[0][0] * u[1][0] + u[0][1] * u[1][1]));
+  const angle = Math.acos(cos);
+  if (!(angle > 1e-6) || !(angle < Math.PI - 1e-6)) return 'The two lines run straight on there: there is no corner to round.';
+  return { lines: touching as [number, number], far, half: angle / 2 };
+}
+/** The largest radius corner q takes: the round may use up the whole of the shorter line, which then goes (rounded down to 0.001). */
+export function largestRound(geoms: SketchGeom[], q: V2): number | null {
+  const c = cornerAt(geoms, q); if (typeof c === 'string') return null;
+  const short = Math.min(...c.far.map(f => Math.hypot(f[0] - q[0], f[1] - q[1])));
+  return Math.floor(short * Math.tan(c.half) * 1000 + 1e-6) / 1000;
+}
+/** The round's arc and where it meets the two lines, for the preview; a sentence when that radius does not fit. */
+export function roundGeom(geoms: SketchGeom[], q: V2, r: number): { arc: SketchGeom & { k: 'arc' }; ends: [V2, V2]; lines: [number, number]; used: [boolean, boolean] } | string {
+  const c = cornerAt(geoms, q); if (typeof c === 'string') return c;
+  if (!(r > 0)) return 'Give a radius above 0.';
+  const t = r / Math.tan(c.half); const r3 = (p: number[]): V2 => [Math.round(p[0] * 1000) / 1000, Math.round(p[1] * 1000) / 1000];
+  const lens = c.far.map(f => Math.hypot(f[0] - q[0], f[1] - q[1]));
+  if (lens.some(l => t > l + 1e-6)) { const most = largestRound(geoms, q); return `A radius of ${fmt(r)} does not fit between these lines${most && most > 0 ? `; the largest is ${fmt(most)}` : ''}.`; }
+  const u = c.far.map((f, i) => [(f[0] - q[0]) / lens[i], (f[1] - q[1]) / lens[i]]);
+  // a round that uses up a whole line meets the line's far end, and the line goes
+  const used = lens.map(l => Math.abs(t - l) <= 1e-6) as [boolean, boolean];
+  const ends = u.map((d, i) => used[i] ? c.far[i] : r3([q[0] + d[0] * t, q[1] + d[1] * t])) as [V2, V2];
+  const bis = [u[0][0] + u[1][0], u[0][1] + u[1][1]]; const bl = Math.hypot(bis[0], bis[1]); const k = r / Math.sin(c.half) / bl;
+  const centre = r3([q[0] + bis[0] * k, q[1] + bis[1] * k]);
+  // the short way round, written counter-clockwise: from the end where turning left takes it to the other
+  const cross = (ends[0][0] - centre[0]) * (ends[1][1] - centre[1]) - (ends[0][1] - centre[1]) * (ends[1][0] - centre[0]);
+  const [a, b] = cross > 0 ? ends : [ends[1], ends[0]];
+  return { arc: { k: 'arc', c: centre, r, a, b, sense: 'ccw' }, ends, lines: c.lines, used };
+}
+/**
+ * Rounding corner q of sketch `name` with radius r: the code edits and the arc line written. The lines that meet there are shortened to where
+ * the round meets them, and the arc goes after the later of their lines. A rectangle or a polyline that one of them belongs to is written out
+ * as its separate lines first (the drawing words have no rounded rectangle). Only lines written as plain numbers are changed; for one written
+ * with a variable, a sentence says so. `lines` and `owner` are the block's drawing lines and which of them drew each curve.
+ */
+export function roundEdits(doc: string, name: string, lines: { from: number; to: number; text: string }[], owner: number[], geoms: SketchGeom[], q: V2, r: number):
+  { edits: { from: number; to: number; insert: string }[]; arcCode: string } | string {
+  const g = roundGeom(geoms, q, r); if (typeof g === 'string') return g;
+  const esc = name.replace(/\$/g, '\\$');
+  const plain = [String.raw`^${esc}\.line\(\s*${PT}\s*,\s*${PT}\s*\);?$`, String.raw`^${esc}\.rectangle\(\s*${PT}\s*,\s*${PT}\s*\);?$`,
+    String.raw`^${esc}\.lines\(\s*\[\s*${PT}(?:\s*,\s*${PT})*\s*\]\s*\);?$`].map(s => new RegExp(s));
+  const ks = [...new Set(g.lines.map(i => owner[i]))].sort((x, y) => x - y);
+  for (const k of ks) {
+    const l = lines[k]; if (!l || !plain.some(re => re.test(l.text))) return 'That corner is written with a variable or a sum; change it in the code.';
+    const mine = geoms.flatMap((x, i) => owner[i] === k ? [x] : []);
+    if (mine.some(x => x.k !== 'line' || [...x.a, ...x.b].some(v => Math.abs(Number(fmt(v)) - v) > 1e-9))) return 'That corner is written with more than three decimals; change it in the code.';
+  }
+  const arcCode = `${name}.arc(${pointCode(g.arc.c)}, ${pointCode(g.arc.a)}, ${pointCode(g.arc.b)}, 'ccw');`;
+  const near = (a: V2) => Math.hypot(a[0] - q[0], a[1] - q[1]) < 1e-6;
+  const edits = ks.map(k => {
+    const l = lines[k]; const raw = doc.slice(l.from, l.to); const indent = /^\s*/.exec(raw)![0]; const nl = raw.endsWith('\n') ? '\n' : '';
+    const out = geoms.flatMap((x, i) => {
+      if (owner[i] !== k || x.k !== 'line') return [];
+      const j = g.lines.indexOf(i); if (j >= 0 && g.used[j]) return [];
+      const end = (p: V2) => j >= 0 && near(p) ? g.ends[j] : p;
+      return [`${name}.line(${pointCode(end(x.a))}, ${pointCode(end(x.b))});`];
+    });
+    if (k === ks[ks.length - 1]) out.push(arcCode);
+    return { from: l.from, to: l.to, insert: out.length ? out.map(s => indent + s).join('\n') + nl : '' };
+  });
+  return { edits, arcCode };
+}
+
 // ---- Delete: which line of the sketch's block drew which curve ---------------------------------------------------------------
 
 /** The lines of a sketch's block that draw (name.something(…)), with where each starts and ends in the doc (its newline included). */

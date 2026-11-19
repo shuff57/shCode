@@ -248,6 +248,24 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
 
   A size written with a name (`[5 + w, 35]`) is shown but cannot be clicked: it is changed in the code. Which line drew which
   curve comes from the same cut-short evaluation as Delete. Checked: `/tmp/cad-drive/sketch-dims-e2e.py`, 7 of 7.
+- **Round.** A click on a corner where two lines meet, then the radius: from the pointer (its distance from the corner times
+  tan of half the angle, so at a right angle the distance itself, on the grid's step, never above the largest that fits) or
+  typed and Enter (`roundEdits` in `lib/sketch-plane-points.ts`).
+  - The two lines are shortened to where the round meets them, a distance r / tan(θ/2) from the corner, and
+    `sk.arc(centre, from, to, 'ccw')` is written after the later of them, the short way round. Points are written to 0.001,
+    as every tool writes them.
+  - A rectangle or a polyline the corner belongs to is written out as its separate `sk.line(…)` lines first: the drawing
+    words have no rounded rectangle, and reSHape's own `rect().round(k, r)` belongs to the plain outline, which does not mix
+    with them.
+  - A radius that uses up a whole line drops the line, and the arc meets the next one; a bigger one changes nothing and says
+    the largest that fits.
+  - Not rounded, each with a sentence: an end where a line meets an arc or where three lines meet, two lines in a straight
+    line, and a corner written with a variable or a sum, or with more than three decimals.
+  - Which line drew which curve comes from the same cut-short evaluation as Delete.
+  - Checked: unit tests (a right angle either way round, 60°, a rectangle, a line used up, too big, a variable, an arc at the
+    corner) and `/tmp/cad-drive/sketch-round-e2e.py`, 11 of 11: a rectangle rounded at two corners, one with a radius that
+    uses up a side, extrudes at the volume worked out by hand, 24000 + 5 × (600 − (25 + 400)(1 − π/4)), less 3.6e-5 of the
+    rounded block: the engine's measure of a curved part, as for the slot.
 - **Typed sizes.** After a tool's first click, a number typed shows in the readout with where Enter puts the point, and Enter
   puts it down there, in the pointer's direction (`typedPoint`):
   - Line and Polyline: the length from the last point;
