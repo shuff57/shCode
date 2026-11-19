@@ -34,6 +34,7 @@ type ParentRow = ProvenanceRow & {
   share_choice: string | null;
   first_name: string | null;
   last_name: string | null;
+  alias?: string | null;
 };
 
 async function lookUp(db: D1Database, sql: string, id: string, callerEmail: string): Promise<Original | null> {
@@ -45,7 +46,7 @@ async function lookUp(db: D1Database, sql: string, id: string, callerEmail: stri
     provenance: provenanceOf({
       id: row.id,
       title: row.title,
-      author: ownerLabel(row.first_name, row.last_name),
+      author: ownerLabel(row.first_name, row.last_name, row.alias),
       choice,
       provenance: provenanceFromRow(row),
     }),
@@ -56,7 +57,7 @@ async function lookUp(db: D1Database, sql: string, id: string, callerEmail: stri
 export function originalGame(db: D1Database, id: string, callerEmail: string): Promise<Original | null> {
   return lookUp(db,
     `SELECT g.id, g.title, g.owner_email, g.share_choice, ${PROVENANCE_COLUMNS.split(', ').map((c) => 'g.' + c).join(', ')},
-            st.first_name, st.last_name
+            st.first_name, st.last_name, st.alias
        FROM library_games g LEFT JOIN students st ON st.email = g.owner_email
       WHERE g.id = ?`, id, callerEmail);
 }
@@ -65,7 +66,7 @@ export function originalGame(db: D1Database, id: string, callerEmail: string): P
 export function originalItem(db: D1Database, id: string, callerEmail: string): Promise<Original | null> {
   return lookUp(db,
     `SELECT i.id, i.name AS title, i.owner_email, i.share_choice, ${PROVENANCE_COLUMNS.split(', ').map((c) => 'i.' + c).join(', ')},
-            st.first_name, st.last_name
+            st.first_name, st.last_name, st.alias
        FROM library_items i LEFT JOIN students st ON st.email = i.owner_email
       WHERE i.id = ?`, id, callerEmail);
 }

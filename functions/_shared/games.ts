@@ -42,6 +42,7 @@ export interface SharedGameRow extends ProvenanceRow {
   owner_email: string;
   first_name: string | null;
   last_name: string | null;
+  alias?: string | null;
   class_id: string;
   class_name: string;
   shared_at: number;
@@ -63,7 +64,7 @@ export async function gamesSharedInto(db: D1Database, classIds: string[]): Promi
   const marks = classIds.map(() => '?').join(',');
   const r = await db.prepare(
     `SELECT g.id, g.title, g.mode, g.players, LENGTH(g.code) AS bytes, g.owner_email,
-            st.first_name, st.last_name, s.class_id, c.name AS class_name, s.shared_at,
+            st.first_name, st.last_name, st.alias, s.class_id, c.name AS class_name, s.shared_at,
             g.updated_at, s.hidden_at, g.share_choice, ${PROVENANCE_COLUMNS.split(', ').map((c) => 'g.' + c).join(', ')}
        FROM library_game_shares s
        JOIN library_games g ON g.id = s.game_id AND g.deleted_at IS NULL
@@ -76,9 +77,9 @@ export async function gamesSharedInto(db: D1Database, classIds: string[]): Promi
 }
 
 export async function ownerName(db: D1Database, email: string): Promise<string> {
-  const st = await db.prepare(`SELECT first_name, last_name FROM students WHERE email = ?`)
-    .bind(email).first<{ first_name: string | null; last_name: string | null }>();
-  return ownerLabel(st?.first_name ?? null, st?.last_name ?? null);
+  const st = await db.prepare(`SELECT first_name, last_name, alias FROM students WHERE email = ?`)
+    .bind(email).first<{ first_name: string | null; last_name: string | null; alias?: string | null }>();
+  return ownerLabel(st?.first_name ?? null, st?.last_name ?? null, st?.alias ?? null);
 }
 
 export interface VisibleGame { row: GameRow; mine: boolean; hidden: boolean; /** Seen only because it is public (migration 0058), through no class. */ viaPublic?: true }

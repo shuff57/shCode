@@ -44,7 +44,7 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
   }
   const meta = await env.DB.prepare(`SELECT meta, share_choice, ${PROVENANCE_COLUMNS} FROM library_items WHERE id = ?`)
     .bind(id).first<ProvenanceRow & { meta: string | null; share_choice: string | null }>();
-  const owner = ownerLabel(visible.first_name, visible.last_name);
+  const owner = ownerLabel(visible.first_name, visible.last_name, visible.alias);
   const choice = choiceOf(meta?.share_choice);
   const mine = visible.owner_email === data.email;
   const moderates = !viaPublic && (data.role === 'admin' || rows.some((r) => teaches.has(r.class_id)));

@@ -66,9 +66,9 @@ export const onRequestGet: PagesFunction<Env, 'id' | 'email', SessionData> = asy
     .first();
   if (!enrollment) return json({ error: 'Student not found in this class' }, 404);
 
-  const nameRow = await env.DB.prepare('SELECT first_name, last_name FROM students WHERE email = ?')
+  const nameRow = await env.DB.prepare('SELECT first_name, last_name, alias FROM students WHERE email = ?')
     .bind(studentEmail)
-    .first<{ first_name: string | null; last_name: string | null }>();
+    .first<{ first_name: string | null; last_name: string | null; alias: string | null }>();
 
   // Fetch all lesson_state rows for this student.
   const stateRows = await env.DB.prepare(
@@ -165,6 +165,7 @@ export const onRequestGet: PagesFunction<Env, 'id' | 'email', SessionData> = asy
     student_email: studentEmail,
     firstName: nameRow?.first_name ?? null,
     lastName: nameRow?.last_name ?? null,
+    alias: nameRow?.alias ?? null,
     lessonState,
     latestSubmissions,
     grading,

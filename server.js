@@ -218,7 +218,7 @@ app.prepare().catch((err) => {
   let demoApi = null;
   if (process.env.DEV_REAL_DB === '1') {
     const { mountDemoApi } = await import('./scripts/dev-demo-api.mjs');
-    demoApi = mountDemoApi({ server, express, devIdentity, role: DEV_ROLE, roleOf: devRoleOf, root: process.cwd() });
+    demoApi = mountDemoApi({ server, express, devIdentity, role: DEV_ROLE, roleOf: devRoleOf, root: process.cwd(), ownerOf: (e) => devOwner.devOwnerId(e) });
   }
   server.get('/api/me', (req, res) => {
     // `wo` as the real route returns it (functions/api/me.ts), derived the dev way.

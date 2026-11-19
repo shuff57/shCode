@@ -13,6 +13,8 @@ export interface CurrentUser {
   role: Role;
   firstName: string | null;
   lastName: string | null;
+  /** The handle classmates see instead of the real name; null = none set. Teachers always see the real name. */
+  alias: string | null;
   /** True when login found no terms-acceptance record (older account). */
   needsTerms?: boolean;
   /** The account's work owner, when the server sends it (GET /api/me). */
@@ -68,6 +70,7 @@ async function fetchCurrentUser(): Promise<CurrentUser | null> {
       role?: string;
       firstName?: string | null;
       lastName?: string | null;
+      alias?: string | null;
       wo?: string;
     };
     if (!data.email) { meAnswer = 'unknown'; return null; }
@@ -76,6 +79,7 @@ async function fetchCurrentUser(): Promise<CurrentUser | null> {
       role: parseRole(data.role),
       firstName: data.firstName ?? null,
       lastName: data.lastName ?? null,
+      alias: data.alias ?? null,
       ...(typeof data.wo === 'string' ? { wo: data.wo } : {}),
     };
   } catch {
@@ -105,6 +109,7 @@ interface AuthResponse {
   role?: string;
   firstName?: string | null;
   lastName?: string | null;
+  alias?: string | null;
   needsTerms?: boolean;
   error?: string;
 }
@@ -125,6 +130,7 @@ async function postAuth(path: string, body: unknown): Promise<CurrentUser> {
     role: parseRole(data.role),
     firstName: data.firstName ?? null,
     lastName: data.lastName ?? null,
+    alias: data.alias ?? null,
     needsTerms: data.needsTerms === true,
   };
   return cache;
@@ -181,16 +187,20 @@ export async function logout(): Promise<void> {
   invalidateCurrentUser();
 }
 
-/** Update the signed-in user's name. Either half `null` clears that half. */
+/**
+ * Update the signed-in user's name. Either half `null` clears that half. `alias` is left alone when
+ * omitted (undefined), cleared when `null`, set when a string.
+ */
 export async function updateName(
   firstName: string | null,
   lastName: string | null,
+  alias?: string | null,
 ): Promise<CurrentUser> {
   const res = await fetch('/api/me', {
     method: 'PUT',
     credentials: 'same-origin',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ firstName, lastName }),
+    body: JSON.stringify(alias === undefined ? { firstName, lastName } : { firstName, lastName, alias }),
   });
   let data: AuthResponse = {};
   try { data = await res.json(); } catch { /* empty body */ }
@@ -201,6 +211,7 @@ export async function updateName(
     role: parseRole(data.role),
     firstName: data.firstName ?? null,
     lastName: data.lastName ?? null,
+    alias: data.alias ?? null,
   };
   return cache;
 }

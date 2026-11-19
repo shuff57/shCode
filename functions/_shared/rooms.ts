@@ -130,11 +130,11 @@ export function roomState(room: RoomRow, playerCount: number, now = Date.now()):
   return playerCount >= room.seats ? 'ready' : 'waiting';
 }
 
-export interface PlayerRow { seat: number; email: string; device: string; left_at: number | null; first_name: string | null; last_name: string | null }
+export interface PlayerRow { seat: number; email: string; device: string; left_at: number | null; first_name: string | null; last_name: string | null; alias?: string | null }
 
 export async function roomPlayers(db: D1Database, code: string): Promise<PlayerRow[]> {
   const r = await db.prepare(
-    `SELECT p.seat, p.email, p.device, p.left_at, s.first_name, s.last_name
+    `SELECT p.seat, p.email, p.device, p.left_at, s.first_name, s.last_name, s.alias
        FROM game_room_players p LEFT JOIN students s ON s.email = p.email
       WHERE p.code = ? ORDER BY p.seat`,
   ).bind(code).all<PlayerRow>();
@@ -143,7 +143,7 @@ export async function roomPlayers(db: D1Database, code: string): Promise<PlayerR
 
 /** What a player sees of the others: seat and first name + last initial, never an email. */
 export function publicPlayers(rows: PlayerRow[]): { seat: number; name: string; left: boolean }[] {
-  return rows.map((p) => ({ seat: p.seat, name: ownerLabel(p.first_name, p.last_name), left: p.left_at !== null }));
+  return rows.map((p) => ({ seat: p.seat, name: ownerLabel(p.first_name, p.last_name, p.alias), left: p.left_at !== null }));
 }
 
 /** The Durable Object a live room runs in: one per room, and a reused code is a new room. */
