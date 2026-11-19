@@ -1028,6 +1028,16 @@ deleted|mentions|canEdit|canDelete|history`), `components/Mailbox.tsx` (`Mention
 (the teacher's "show the original", also in `ClassMessages.tsx`). Deleting a conversation or a class removes `message_edits` and
 `message_mentions` too. Tests: `scripts/test-message-edits.mjs` (npm test). Apply 0056 (`npm run d1:migrate`) before the site.
 
+### Alias (migration 0066, 2026-11-19; not deployed yet)
+`students.alias` is an optional handle (2-20 characters, `lib/alias-core.ts` `cleanAlias`, `findPII` run, unique case-insensitively)
+set on /account through `PUT /api/me` (a body without the `alias` key leaves it alone, so an older page cannot clear it). **First
+and last name stay the real name** and are what grading and every teacher view read; the roster (`progress.ts`) and student drawer
+(`students/[email].ts`) add `alias` beside them. Classmate-facing labels go through `ownerLabel(first, last, alias)`
+(`functions/_shared/libraryShare.ts`): shared library, public, games (list, stars, family), rooms, Code together names.
+**Not covered yet:** messages (`message_members.name` is a snapshot taken when a person joins, and `@mention` matches the typed
+name, so an alias needs its own design), teacher moderation lists (deliberately real name), and the gradebook search. Tests:
+`scripts/test-alias.mjs`. Apply 0066 (`npm run d1:migrate`) before the site.
+
 ### Students in more than one class (2026-11-14)
 Nothing server-side ever stopped this: `enrollments` is keyed `(class_id, student_email)` and `POST /api/join-class` only
 refuses a repeat of the same class. What was missing was the way in: the header's yellow "Join your class" shows only while

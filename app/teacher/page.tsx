@@ -80,6 +80,8 @@ interface StudentProgress {
   total_score: number;
   firstName?: string | null;
   lastName?: string | null;
+  /** The handle classmates see for this student (the real name above is what grading uses). */
+  alias?: string | null;
   /** 0-100 grade-so-far under this class's weights and due dates (work done plus work past due). */
   weightedPercent: number;
   /** Graded lessons in the course, how many this student finished, and how many are past due and not done. */
@@ -115,6 +117,7 @@ interface StudentDetail {
   student_email: string;
   firstName?: string | null;
   lastName?: string | null;
+  alias?: string | null;
   lessonState: Record<string, LessonStateEntry>;
   latestSubmissions: Record<string, SubmissionEntry>;
   /** This class's due date per lesson (epoch ms); a waived lesson has none. */
@@ -918,6 +921,9 @@ function StudentDrawer({
             </div>
             {fullName(detail?.firstName, detail?.lastName) && (
               <div style={{ fontSize: 13, color: 'var(--c-meta)', fontFamily: 'monospace' }}>{email}</div>
+            )}
+            {detail?.alias && (
+              <div style={{ fontSize: 13, color: 'var(--c-meta)', fontFamily: 'monospace' }}>Alias: {detail.alias}</div>
             )}
           </div>
           <button
@@ -3436,7 +3442,7 @@ function DetailView({ classId, initialTab, initialFilter }: { classId: string; i
                           right end), so column 2 is only as wide as Open + ⋯ and the counts in row 2 fit one line. */}
                       <div role={compact ? undefined : 'cell'} style={{ minWidth: 0, gridColumn: compact ? '1 / -1' : undefined, gridRow: compact ? 1 : undefined, paddingRight: compact ? 64 : undefined, fontFamily: 'var(--font-prose)' }} title={`Enrolled ${fmt(row.enrolled_at)} by ${row.enrolled_by ?? 'self'}`}>
                         <div style={{ fontSize: compact ? 16 : 15, lineHeight: compact ? '22px' : '20px', fontWeight: compact ? 700 : 600, color: 'var(--c-fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fullName(prog?.firstName, prog?.lastName) ?? row.student_email}</div>
-                        {!compact && <div style={{ color: 'var(--c-meta)', fontSize: 13, lineHeight: '18px', marginTop: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.student_email}</div>}
+                        {!compact && <div style={{ color: 'var(--c-meta)', fontSize: 13, lineHeight: '18px', marginTop: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{prog?.alias ? `Alias: ${prog.alias} · ${row.student_email}` : row.student_email}</div>}
                         {staffRow && <div className="roster-staff-note">Teacher account: not counted in the class numbers</div>}
                       </div>
                       <div role={compact ? undefined : 'cell'} title="Grade so far, under this class's weights" style={{ gridColumn: compact ? '1 / -1' : undefined, gridRow: compact ? 1 : undefined, justifySelf: compact ? 'end' : undefined, display: 'flex', alignItems: compact ? 'baseline' : 'center', justifyContent: compact ? 'flex-end' : undefined, gap: compact ? 6 : 10, whiteSpace: 'nowrap', lineHeight: compact ? '22px' : '22px' }}>

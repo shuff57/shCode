@@ -8,6 +8,7 @@
 // client-supplied one — same ownership pattern as the uploads DELETE route.
 
 import { normalizeEmail } from '../_shared/auth';
+import { cleanAlias } from '../../lib/alias-core';
 
 interface Env {
   DB: D1Database;
@@ -21,12 +22,13 @@ const MAX_NAME_LEN = 100;
 interface StudentRow {
   first_name: string | null;
   last_name: string | null;
+  alias: string | null;
 }
 
 export const onRequestGet: PagesFunction<Env, string, Session> = async (context: Ctx) => {
   const { env, data } = context;
 
-  const row = await env.DB.prepare('SELECT first_name, last_name FROM students WHERE email = ?')
+  const row = await env.DB.prepare('SELECT first_name, last_name, alias FROM students WHERE email = ?')
     .bind(data.email)
     .first<StudentRow>();
 
@@ -35,6 +37,7 @@ export const onRequestGet: PagesFunction<Env, string, Session> = async (context:
     role: data.role,
     firstName: row?.first_name ?? null,
     lastName: row?.last_name ?? null,
+    alias: row?.alias ?? null,
     // The account's work owner (set by functions/_middleware.ts). The page compares it with the
     // owner it loaded with before uploading by itself (lib/outbox.ts); older pages ignore it.
     ...(data.wo ? { wo: data.wo } : {}),
@@ -44,6 +47,7 @@ export const onRequestGet: PagesFunction<Env, string, Session> = async (context:
 interface Body {
   firstName?: string | null;
   lastName?: string | null;
+  alias?: string | null;
 }
 
 /** Trim to null-if-empty, capped at MAX_NAME_LEN. */
@@ -73,11 +77,32 @@ export const onRequestPut: PagesFunction<Env, string, Session> = async (context:
   }
 
   const email = normalizeEmail(data.email);
+
+  // The alias is only touched when the body carries the key, so a client from before aliases
+  // (which sends just the two names) cannot clear one.
+  if ('alias' in body) {
+    const alias = cleanAlias(body.alias);
+    if (alias !== null && typeof alias === 'object') return json({ error: alias.error }, 400);
+    try {
+      await env.DB.prepare('UPDATE students SET first_name = ?, last_name = ?, alias = ? WHERE email = ?')
+        .bind(firstName, lastName, alias, email)
+        .run();
+    } catch (err) {
+      // The unique index on lower(alias): someone else already has it.
+      if (/UNIQUE|constraint/i.test(String((err as Error)?.message ?? err))) {
+        return json({ error: 'Someone already uses that alias. Try another.' }, 409);
+      }
+      throw err;
+    }
+    return json({ email, role: data.role, firstName, lastName, alias });
+  }
+
   await env.DB.prepare('UPDATE students SET first_name = ?, last_name = ? WHERE email = ?')
     .bind(firstName, lastName, email)
     .run();
+  const row = await env.DB.prepare('SELECT alias FROM students WHERE email = ?').bind(email).first<{ alias: string | null }>();
 
-  return json({ email, role: data.role, firstName, lastName });
+  return json({ email, role: data.role, firstName, lastName, alias: row?.alias ?? null });
 };
 
 function json(body: unknown, status = 200, headers: Record<string, string> = {}): Response {

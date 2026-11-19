@@ -33,7 +33,7 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ en
     if (seen.has(r.id)) continue;
     seen.set(r.id, {
       id: r.id, kind: r.kind, name: r.name, bytes: r.bytes,
-      owner: ownerLabel(r.first_name, r.last_name),
+      owner: ownerLabel(r.first_name, r.last_name, r.alias),
       mine: r.owner_email === data.email,
       classId: r.class_id, className: r.class_name,
       sharedAt: r.shared_at, hidden: r.hidden_at != null,

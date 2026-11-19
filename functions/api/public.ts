@@ -34,14 +34,14 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ en
       const choice = c?.choice ?? choiceOf(r.share_choice);
       const isMine = r.owner_email === data.email;
       return {
-        id: r.id, kind: r.kind, name: r.name, bytes: r.bytes, owner: ownerLabel(r.first_name, r.last_name), mine: isMine,
+        id: r.id, kind: r.kind, name: r.name, bytes: r.bytes, owner: ownerLabel(r.first_name, r.last_name, r.alias), mine: isMine,
         classId: '', className: 'Everyone', sharedAt: r.shared_at, hidden: false,
         choice, remixedFrom: c?.remixedFrom ?? null, canCopy: isMine || canRemix(choice),
       };
     }),
     games: games.map((r) => ({
       id: r.id, title: r.title, mode: r.mode, players: r.players, modeLabel: modeLabel(r.mode as GameMode, r.players), bytes: r.bytes,
-      owner: ownerLabel(r.first_name, r.last_name), mine: r.owner_email === data.email,
+      owner: ownerLabel(r.first_name, r.last_name, r.alias), mine: r.owner_email === data.email,
       classId: '', className: 'Everyone', sharedAt: r.shared_at, updatedAt: r.updated_at, hidden: false,
       choice: choiceOf(r.share_choice), remixedFrom: provenanceFromRow(r),
       stars: counts.get(r.id) ?? 0, starred: mine.has(r.id),

@@ -35,6 +35,7 @@ interface MemberRow {
   origin_id: string | null;
   first_name: string | null;
   last_name: string | null;
+  alias?: string | null;
 }
 
 export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ params, env, data }: Ctx) => {
@@ -46,7 +47,7 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
 
   const members = (await env.DB.prepare(
     `SELECT g.id, g.owner_email, g.title, g.created_at, g.deleted_at, g.remixed_from_id, g.remixed_from_title,
-            g.remixed_from_author, g.remixed_from_version, g.origin_id, st.first_name, st.last_name
+            g.remixed_from_author, g.remixed_from_version, g.origin_id, st.first_name, st.last_name, st.alias
        FROM library_games g LEFT JOIN students st ON st.email = g.owner_email
       WHERE g.id = ? OR g.remixed_from_id = ? OR g.origin_id = ?
       ORDER BY g.created_at LIMIT ${FAMILY_MAX}`,
@@ -55,7 +56,7 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
   if (!members.some((m) => m.id === gameId)) {
     const self = await env.DB.prepare(
       `SELECT g.id, g.owner_email, g.title, g.created_at, g.deleted_at, g.remixed_from_id, g.remixed_from_title,
-              g.remixed_from_author, g.remixed_from_version, g.origin_id, st.first_name, st.last_name
+              g.remixed_from_author, g.remixed_from_version, g.origin_id, st.first_name, st.last_name, st.alias
          FROM library_games g LEFT JOIN students st ON st.email = g.owner_email WHERE g.id = ?`,
     ).bind(gameId).first<MemberRow>();
     if (self) members.push(self);
@@ -81,7 +82,7 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
   const rows: FamilyRow[] = members.map((m) => ({
     id: m.id,
     title: m.title,
-    author: ownerLabel(m.first_name, m.last_name),
+    author: ownerLabel(m.first_name, m.last_name, m.alias),
     createdAt: m.created_at,
     parent: m.id === root ? null : m.remixed_from_id,
     fromVersion: m.remixed_from_version ?? null,

@@ -23,15 +23,15 @@ const NAMES_MAX = 50;
 
 async function view(env: Env, data: SessionData, gameId: string, hidden: boolean): Promise<StarView> {
   const rows = (await env.DB.prepare(
-    `SELECT s.from_email, st.first_name, st.last_name FROM game_stars s
+    `SELECT s.from_email, st.first_name, st.last_name, st.alias FROM game_stars s
        LEFT JOIN students st ON st.email = s.from_email
       WHERE s.game_id = ? ORDER BY s.created_at DESC`,
-  ).bind(gameId).all<{ from_email: string; first_name: string | null; last_name: string | null }>()).results ?? [];
+  ).bind(gameId).all<{ from_email: string; first_name: string | null; last_name: string | null; alias?: string | null }>()).results ?? [];
   return {
     count: rows.length,
     starred: rows.some((r) => r.from_email === data.email),
     canStar: !hidden,
-    by: rows.slice(0, NAMES_MAX).map((r) => (r.from_email === data.email ? 'You' : ownerLabel(r.first_name, r.last_name))),
+    by: rows.slice(0, NAMES_MAX).map((r) => (r.from_email === data.email ? 'You' : ownerLabel(r.first_name, r.last_name, r.alias))),
   };
 }
 

@@ -6,6 +6,7 @@ import { LockKeyhole } from 'lucide-react';
 import { getCurrentUser, updateName, CurrentUser } from '../../lib/auth';
 import AppearanceSettings from '../../components/AppearanceSettings';
 import GuestInvites from '../../components/GuestInvites';
+import { cleanAlias, ALIAS_MAX } from '../../lib/alias-core';
 import { openWhatsNew } from '../../components/WhatsNewModal';
 
 const S = {
@@ -48,6 +49,7 @@ export default function AccountPage() {
   const [loaded, setLoaded] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [alias, setAlias] = useState('');
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
 
@@ -56,6 +58,7 @@ export default function AccountPage() {
       setUser(u);
       setFirstName(u?.firstName ?? '');
       setLastName(u?.lastName ?? '');
+      setAlias(u?.alias ?? '');
       setLoaded(true);
     });
   }, []);
@@ -68,13 +71,21 @@ export default function AccountPage() {
     try {
       const trimmedFirst = firstName.trim();
       const trimmedLast = lastName.trim();
+      const cleanedAlias = cleanAlias(alias);
+      if (cleanedAlias !== null && typeof cleanedAlias === 'object') {
+        setMessage({ kind: 'error', text: cleanedAlias.error });
+        setSaving(false);
+        return;
+      }
       const updated = await updateName(
         trimmedFirst.length > 0 ? trimmedFirst : null,
         trimmedLast.length > 0 ? trimmedLast : null,
+        cleanedAlias,
       );
       setUser(updated);
       setFirstName(updated.firstName ?? '');
       setLastName(updated.lastName ?? '');
+      setAlias(updated.alias ?? '');
       setMessage({ kind: 'ok', text: 'Saved.' });
     } catch (err) {
       setMessage({ kind: 'error', text: err instanceof Error ? err.message : String(err) });
@@ -108,7 +119,7 @@ export default function AccountPage() {
       <div className="page-frame account-card" style={S.card}>
         <Link href="/" style={{ color: 'var(--c-cyan)', fontSize: 13, textDecoration: 'none' }}>Back to course</Link>
         <h1 style={S.h1}>My account</h1>
-        <p style={{ color: 'var(--c-meta)', marginTop: -14, marginBottom: 22 }}>Manage the name shown to your class.</p>
+        <p style={{ color: 'var(--c-meta)', marginTop: -14, marginBottom: 22 }}>Manage the name and alias shown to your class.</p>
 
         <h2 style={{ color: 'var(--c-fg)', fontSize: 18, margin: '0 0 12px' }}>Profile</h2>
         <div style={{ marginBottom: 22 }}>
@@ -144,6 +155,22 @@ export default function AccountPage() {
             placeholder="Optional"
             style={S.input}
           />
+
+          <label style={S.label} htmlFor="alias-input">Alias</label>
+          <input
+            id="alias-input"
+            type="text"
+            value={alias}
+            onChange={(e) => setAlias(e.target.value)}
+            maxLength={ALIAS_MAX}
+            placeholder="Optional"
+            aria-describedby="alias-help"
+            style={S.input}
+          />
+          <p id="alias-help" className="account-field-help">
+            Optional. A handle your classmates see instead of your name. Your teacher can still see who you are,
+            and your real name is what your work is graded under.
+          </p>
 
           {message && (
             <div

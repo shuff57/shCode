@@ -162,16 +162,16 @@ export async function publicShareProblem(
 
 export interface PublicItemRow {
   id: string; kind: 'texture' | 'sound' | 'font'; name: string; bytes: number; owner_email: string;
-  first_name: string | null; last_name: string | null; shared_at: number; share_choice: string | null;
+  first_name: string | null; last_name: string | null; alias?: string | null; shared_at: number; share_choice: string | null;
 }
 export interface PublicGameRow extends ProvenanceRow {
   id: string; title: string; mode: string; players: number; bytes: number; owner_email: string;
-  first_name: string | null; last_name: string | null; shared_at: number; updated_at: number; share_choice: string | null;
+  first_name: string | null; last_name: string | null; alias?: string | null; shared_at: number; updated_at: number; share_choice: string | null;
 }
 
 export async function publicItems(db: D1Database, now = Date.now()): Promise<PublicItemRow[]> {
   return (await db.prepare(
-    `SELECT i.id, i.kind, i.name, i.bytes, i.owner_email, st.first_name, st.last_name, p.shared_at, i.share_choice
+    `SELECT i.id, i.kind, i.name, i.bytes, i.owner_email, st.first_name, st.last_name, st.alias, p.shared_at, i.share_choice
        FROM public_shares p JOIN library_items i ON i.id = p.id AND i.deleted_at IS NULL
        LEFT JOIN students st ON st.email = i.owner_email
       WHERE p.kind = 'item' AND p.hidden_at IS NULL AND ${ownerOkSql('p.owner_email', now)}
@@ -181,7 +181,7 @@ export async function publicItems(db: D1Database, now = Date.now()): Promise<Pub
 
 export async function publicGames(db: D1Database, now = Date.now()): Promise<PublicGameRow[]> {
   return (await db.prepare(
-    `SELECT g.id, g.title, g.mode, g.players, LENGTH(g.code) AS bytes, g.owner_email, st.first_name, st.last_name,
+    `SELECT g.id, g.title, g.mode, g.players, LENGTH(g.code) AS bytes, g.owner_email, st.first_name, st.last_name, st.alias,
             p.shared_at, g.updated_at, g.share_choice, ${PROVENANCE_COLUMNS.split(', ').map((c) => 'g.' + c).join(', ')}
        FROM public_shares p JOIN library_games g ON g.id = p.id AND g.deleted_at IS NULL
        LEFT JOIN students st ON st.email = g.owner_email
@@ -193,7 +193,7 @@ export async function publicGames(db: D1Database, now = Date.now()): Promise<Pub
 /** One public item a vetted viewer may open (null = not public, pulled, owner blocked, or deleted). */
 export async function publicItemRow(db: D1Database, id: string, now = Date.now()): Promise<PublicItemRow | null> {
   return db.prepare(
-    `SELECT i.id, i.kind, i.name, i.bytes, i.owner_email, st.first_name, st.last_name, p.shared_at, i.share_choice
+    `SELECT i.id, i.kind, i.name, i.bytes, i.owner_email, st.first_name, st.last_name, st.alias, p.shared_at, i.share_choice
        FROM public_shares p JOIN library_items i ON i.id = p.id AND i.deleted_at IS NULL
        LEFT JOIN students st ON st.email = i.owner_email
       WHERE p.kind = 'item' AND p.id = ? AND p.hidden_at IS NULL AND ${ownerOkSql('p.owner_email', now)}`,
@@ -245,7 +245,7 @@ const WHAT: Record<string, ClassPublicRow['what']> = { texture: 'picture', sound
 export async function classPublicRows(db: D1Database, classId: string, now = Date.now()): Promise<ClassPublicRow[]> {
   const rows = (await db.prepare(
     `SELECT p.kind, p.id, p.shared_at, p.hidden_at, p.hidden_reason, i.kind AS item_kind,
-            CASE p.kind WHEN 'item' THEN i.name ELSE g.title END AS name, st.first_name, st.last_name
+            CASE p.kind WHEN 'item' THEN i.name ELSE g.title END AS name, st.first_name, st.last_name, st.alias
        FROM public_shares p
        JOIN enrollments e ON e.class_id = ?1 AND e.student_email = p.owner_email AND e.expires_at > ?2
        LEFT JOIN library_items i ON p.kind = 'item' AND i.id = p.id AND i.deleted_at IS NULL
@@ -259,7 +259,7 @@ export async function classPublicRows(db: D1Database, classId: string, now = Dat
   }>()).results ?? [];
   return rows.map((r) => ({
     kind: r.kind, id: r.id, what: r.kind === 'game' ? 'game' : WHAT[r.item_kind ?? ''] ?? 'picture', name: r.name,
-    owner: ownerLabel(r.first_name, r.last_name), sharedAt: r.shared_at,
+    owner: ownerLabel(r.first_name, r.last_name, r.alias), sharedAt: r.shared_at,
     pulled: r.hidden_at == null ? null : { reason: r.hidden_reason, at: r.hidden_at },
   }));
 }
@@ -299,7 +299,7 @@ export async function publicNotices(db: D1Database, data: Session, now = Date.no
       const marks = classes.map((_, i) => `?${i + 3}`).join(',');
       const rows = (await db.prepare(
         `SELECT p.kind, p.id, p.shared_at, MIN(e.class_id) AS class_id, i.kind AS item_kind,
-                CASE p.kind WHEN 'item' THEN i.name ELSE g.title END AS name, st.first_name, st.last_name
+                CASE p.kind WHEN 'item' THEN i.name ELSE g.title END AS name, st.first_name, st.last_name, st.alias
            FROM public_shares p
            JOIN enrollments e ON e.student_email = p.owner_email AND e.expires_at > ?1 AND e.class_id IN (${marks})
            LEFT JOIN library_items i ON p.kind = 'item' AND i.id = p.id AND i.deleted_at IS NULL
@@ -315,7 +315,7 @@ export async function publicNotices(db: D1Database, data: Session, now = Date.no
       for (const r of rows) {
         out.push({
           kind: 'public', key: `public:${r.kind}:${r.id}`, what: r.kind === 'game' ? 'game' : WHAT[r.item_kind ?? ''] ?? 'picture',
-          title: r.name, who: ownerLabel(r.first_name, r.last_name), pulled: false, classId: r.class_id, snippet: '', at: r.shared_at,
+          title: r.name, who: ownerLabel(r.first_name, r.last_name, r.alias), pulled: false, classId: r.class_id, snippet: '', at: r.shared_at,
         });
       }
     }

@@ -80,11 +80,11 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
   const scopeMap = await loadLessonScopeMap(env, request);
   const weights = await loadClassWeights(env.DB, classId);
   const nameRows = await env.DB.prepare(
-    `SELECT email, first_name, last_name FROM students WHERE email IN (
+    `SELECT email, first_name, last_name, alias FROM students WHERE email IN (
        SELECT student_email FROM enrollments WHERE class_id = ? AND expires_at > ?)`,
   )
     .bind(classId, now)
-    .all<{ email: string; first_name: string | null; last_name: string | null }>();
+    .all<{ email: string; first_name: string | null; last_name: string | null; alias: string | null }>();
   const names = new Map((nameRows.results ?? []).map((n) => [n.email, n]));
   const dueIndex = buildDueIndex(await loadClassDueRows(env.DB, classId));
   const waivers = await loadClassDueWaivers(env.DB, classId);
@@ -120,6 +120,8 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
         staff: staff.has(r.student_email),
         firstName: names.get(r.student_email)?.first_name ?? null,
         lastName: names.get(r.student_email)?.last_name ?? null,
+        // What classmates see; the real name above is what grading uses. Teacher views only.
+        alias: names.get(r.student_email)?.alias ?? null,
         weightedPercent: g.percent,
         gradedTotal: g.gradedTotal,
         gradedDone: g.doneCount,
