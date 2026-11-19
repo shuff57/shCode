@@ -266,6 +266,13 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
     corner) and `/tmp/cad-drive/sketch-round-e2e.py`, 11 of 11: a rectangle rounded at two corners, one with a radius that
     uses up a side, extrudes at the volume worked out by hand, 24000 + 5 × (600 − (25 + 400)(1 − π/4)), less 3.6e-5 of the
     rounded block: the engine's measure of a curved part, as for the slot.
+- **Chamfer.** The same as Round, with a distance in place of the radius: the two lines are shortened by it, each along
+  itself, and `sk.line(…)` is written across the corner after them (`chamferEdits`; one equal distance, as SolidCraft's
+  sketch chamfer). The pointer's distance from the corner gives it, on the grid's step and never above the shorter line;
+  a distance that uses up a line drops it. Round and Chamfer share the rewriting of the corner's lines (`cornerCutEdits`).
+  Checked: unit tests (a right angle, a slanted corner, a rectangle, a line used up, too big) and
+  `/tmp/cad-drive/sketch-chamfer-e2e.py`, 10 of 10: a rectangle chamfered at two corners extrudes at exactly
+  24000 + 5 × (600 − 12.5 − 200).
 - **Typed sizes.** After a tool's first click, a number typed shows in the readout with where Enter puts the point, and Enter
   puts it down there, in the pointer's direction (`typedPoint`):
   - Line and Polyline: the length from the last point;

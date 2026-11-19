@@ -381,16 +381,16 @@ export function lineCorners(geoms: SketchGeom[]): V2[] {
   for (const g of geoms) if (g.k === 'line') for (const q of [g.a, g.b]) if (!out.some(o => Math.hypot(o[0] - q[0], o[1] - q[1]) < 1e-6)) out.push(q);
   return out;
 }
-/** The two lines that meet at corner q, and the angle between them; a sentence when it is not a corner of two lines. */
-export function cornerAt(geoms: SketchGeom[], q: V2): { lines: [number, number]; far: [V2, V2]; half: number } | string {
+/** The two lines that meet at corner q, and the angle between them; a sentence when it is not a corner of two lines (to round or to chamfer). */
+export function cornerAt(geoms: SketchGeom[], q: V2, verb: 'round' | 'chamfer' = 'round'): { lines: [number, number]; far: [V2, V2]; half: number } | string {
   const near = (a: V2) => Math.hypot(a[0] - q[0], a[1] - q[1]) < 1e-6;
   const touching = geoms.flatMap((g, i) => g.k === 'line' ? (near(g.a) || near(g.b) ? [i] : []) : g.k === 'arc' && (near(g.a) || near(g.b)) ? [i] : []);
-  if (touching.length !== 2 || touching.some(i => geoms[i].k !== 'line')) return 'Only a corner where two lines meet can be rounded.';
+  if (touching.length !== 2 || touching.some(i => geoms[i].k !== 'line')) return `Only a corner where two lines meet can be ${verb === 'round' ? 'rounded' : 'chamfered'}.`;
   const far = touching.map(i => { const g = geoms[i] as { a: V2; b: V2 }; return near(g.a) ? g.b : g.a; }) as [V2, V2];
   const u = far.map(f => { const d = [f[0] - q[0], f[1] - q[1]]; const l = Math.hypot(d[0], d[1]); return [d[0] / l, d[1] / l]; });
   const cos = Math.max(-1, Math.min(1, u[0][0] * u[1][0] + u[0][1] * u[1][1]));
   const angle = Math.acos(cos);
-  if (!(angle > 1e-6) || !(angle < Math.PI - 1e-6)) return 'The two lines run straight on there: there is no corner to round.';
+  if (!(angle > 1e-6) || !(angle < Math.PI - 1e-6)) return `The two lines run straight on there: there is no corner to ${verb}.`;
   return { lines: touching as [number, number], far, half: angle / 2 };
 }
 /** The largest radius corner q takes: the round may use up the whole of the shorter line, which then goes (rounded down to 0.001). */
@@ -417,38 +417,62 @@ export function roundGeom(geoms: SketchGeom[], q: V2, r: number): { arc: SketchG
   const [a, b] = cross > 0 ? ends : [ends[1], ends[0]];
   return { arc: { k: 'arc', c: centre, r, a, b, sense: 'ccw' }, ends, lines: c.lines, used };
 }
+/** A chamfer of corner q: the same distance d along each line, joined by a straight line; a sentence when d does not fit. */
+export function chamferGeom(geoms: SketchGeom[], q: V2, d: number): { cut: SketchGeom & { k: 'line' }; ends: [V2, V2]; lines: [number, number]; used: [boolean, boolean] } | string {
+  const c = cornerAt(geoms, q, 'chamfer'); if (typeof c === 'string') return c;
+  if (!(d > 0)) return 'Give a distance above 0.';
+  const lens = c.far.map(f => Math.hypot(f[0] - q[0], f[1] - q[1]));
+  if (lens.some(l => d > l + 1e-6)) { const most = Math.floor(Math.min(...lens) * 1000 + 1e-6) / 1000; return `A distance of ${fmt(d)} does not fit along these lines; the largest is ${fmt(most)}.`; }
+  const r3 = (p: number[]): V2 => [Math.round(p[0] * 1000) / 1000, Math.round(p[1] * 1000) / 1000];
+  const used = lens.map(l => Math.abs(d - l) <= 1e-6) as [boolean, boolean];
+  const ends = c.far.map((f, i) => used[i] ? f : r3([q[0] + (f[0] - q[0]) * d / lens[i], q[1] + (f[1] - q[1]) * d / lens[i]])) as [V2, V2];
+  return { cut: { k: 'line', a: ends[0], b: ends[1] }, ends, lines: c.lines, used };
+}
 /**
- * Rounding corner q of sketch `name` with radius r: the code edits and the arc line written. The lines that meet there are shortened to where
- * the round meets them, and the arc goes after the later of their lines. A rectangle or a polyline that one of them belongs to is written out
- * as its separate lines first (the drawing words have no rounded rectangle). Only lines written as plain numbers are changed; for one written
- * with a variable, a sentence says so. `lines` and `owner` are the block's drawing lines and which of them drew each curve.
+ * The code edits that cut corner q of sketch `name`: the two lines that meet there end at `cut.ends` instead (a line used up goes), and
+ * `added` is written after the later of their lines. A rectangle or a polyline that one of them belongs to is written out as its separate lines
+ * first (the drawing words have no rounded or chamfered rectangle). Only lines written as plain numbers are changed; for one written with a
+ * variable, a sentence says so. `lines` and `owner` are the block's drawing lines and which of them drew each curve.
  */
-export function roundEdits(doc: string, name: string, lines: { from: number; to: number; text: string }[], owner: number[], geoms: SketchGeom[], q: V2, r: number):
-  { edits: { from: number; to: number; insert: string }[]; arcCode: string } | string {
-  const g = roundGeom(geoms, q, r); if (typeof g === 'string') return g;
+function cornerCutEdits(doc: string, name: string, lines: { from: number; to: number; text: string }[], owner: number[], geoms: SketchGeom[], q: V2,
+  cut: { ends: [V2, V2]; lines: [number, number]; used: [boolean, boolean] }, added: string): { from: number; to: number; insert: string }[] | string {
   const esc = name.replace(/\$/g, '\\$');
   const plain = [String.raw`^${esc}\.line\(\s*${PT}\s*,\s*${PT}\s*\);?$`, String.raw`^${esc}\.rectangle\(\s*${PT}\s*,\s*${PT}\s*\);?$`,
     String.raw`^${esc}\.lines\(\s*\[\s*${PT}(?:\s*,\s*${PT})*\s*\]\s*\);?$`].map(s => new RegExp(s));
-  const ks = [...new Set(g.lines.map(i => owner[i]))].sort((x, y) => x - y);
+  const ks = [...new Set(cut.lines.map(i => owner[i]))].sort((x, y) => x - y);
   for (const k of ks) {
     const l = lines[k]; if (!l || !plain.some(re => re.test(l.text))) return 'That corner is written with a variable or a sum; change it in the code.';
     const mine = geoms.flatMap((x, i) => owner[i] === k ? [x] : []);
     if (mine.some(x => x.k !== 'line' || [...x.a, ...x.b].some(v => Math.abs(Number(fmt(v)) - v) > 1e-9))) return 'That corner is written with more than three decimals; change it in the code.';
   }
-  const arcCode = `${name}.arc(${pointCode(g.arc.c)}, ${pointCode(g.arc.a)}, ${pointCode(g.arc.b)}, 'ccw');`;
   const near = (a: V2) => Math.hypot(a[0] - q[0], a[1] - q[1]) < 1e-6;
-  const edits = ks.map(k => {
+  return ks.map(k => {
     const l = lines[k]; const raw = doc.slice(l.from, l.to); const indent = /^\s*/.exec(raw)![0]; const nl = raw.endsWith('\n') ? '\n' : '';
     const out = geoms.flatMap((x, i) => {
       if (owner[i] !== k || x.k !== 'line') return [];
-      const j = g.lines.indexOf(i); if (j >= 0 && g.used[j]) return [];
-      const end = (p: V2) => j >= 0 && near(p) ? g.ends[j] : p;
+      const j = cut.lines.indexOf(i); if (j >= 0 && cut.used[j]) return [];
+      const end = (p: V2) => j >= 0 && near(p) ? cut.ends[j] : p;
       return [`${name}.line(${pointCode(end(x.a))}, ${pointCode(end(x.b))});`];
     });
-    if (k === ks[ks.length - 1]) out.push(arcCode);
+    if (k === ks[ks.length - 1]) out.push(added);
     return { from: l.from, to: l.to, insert: out.length ? out.map(s => indent + s).join('\n') + nl : '' };
   });
-  return { edits, arcCode };
+}
+/** Rounding corner q of sketch `name` with radius r: the code edits, and the arc line written after the two lines (see cornerCutEdits). */
+export function roundEdits(doc: string, name: string, lines: { from: number; to: number; text: string }[], owner: number[], geoms: SketchGeom[], q: V2, r: number):
+  { edits: { from: number; to: number; insert: string }[]; arcCode: string } | string {
+  const g = roundGeom(geoms, q, r); if (typeof g === 'string') return g;
+  const arcCode = `${name}.arc(${pointCode(g.arc.c)}, ${pointCode(g.arc.a)}, ${pointCode(g.arc.b)}, 'ccw');`;
+  const edits = cornerCutEdits(doc, name, lines, owner, geoms, q, g, arcCode);
+  return typeof edits === 'string' ? edits : { edits, arcCode };
+}
+/** Chamfering corner q of sketch `name` by d along each line: the code edits, and the line written across the corner. */
+export function chamferEdits(doc: string, name: string, lines: { from: number; to: number; text: string }[], owner: number[], geoms: SketchGeom[], q: V2, d: number):
+  { edits: { from: number; to: number; insert: string }[]; lineCode: string } | string {
+  const g = chamferGeom(geoms, q, d); if (typeof g === 'string') return g;
+  const lineCode = `${name}.line(${pointCode(g.cut.a)}, ${pointCode(g.cut.b)});`;
+  const edits = cornerCutEdits(doc, name, lines, owner, geoms, q, g, lineCode);
+  return typeof edits === 'string' ? edits : { edits, lineCode };
 }
 
 // ---- Delete: which line of the sketch's block drew which curve ---------------------------------------------------------------

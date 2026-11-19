@@ -17,6 +17,7 @@
 //     Enter puts the point down at it, in the pointer's direction;
 //   - Round: a click on a corner where two lines meet, then the radius (from the pointer, or typed): the two lines are shortened to where the
 //     round meets them and an arc is written after them (a rectangle or polyline the corner belongs to is written out as its lines first);
+//     Chamfer the same, with the distance along each line and a straight line across;
 //   - each line shows its length and each circle or arc its radius; clicking a size written as plain numbers lets a new one be typed, and the
 //     code changes (a rectangle's width or height, a circle's radius, a line's end along it, with any corner it shares);
 //   - Extrude and Pocket finish the sketch: they write the step after the sketch's block and Run.
@@ -34,14 +35,14 @@ import { bundleProject, CAD_ENTRY, readVariableProbe, withVariableProbe } from '
 import { topLevelNames, topLevelVariables } from '../lib/solidcraft-picks';
 import type { ScEdge, ScFace } from '../lib/solidcraft-labels';
 import {
-  activeSketch, applyProjective, arcCode, cornerAt, largestRound, lineCorners, roundEdits, roundGeom, curveOwners, dimensionOf, resizeEdits, distToSegment, sketchGeoms, slotGeoms, typedPoint, typedWords, distToPolyline, faceSketchArgs, sketchStatementLines, finishDirections, fmt, freshName, fromPlane, geomPath, geomSnaps, gridStep,
+  activeSketch, applyProjective, arcCode, chamferEdits, chamferGeom, cornerAt, largestRound, lineCorners, roundEdits, roundGeom, curveOwners, dimensionOf, resizeEdits, distToSegment, sketchGeoms, slotGeoms, typedPoint, typedWords, distToPolyline, faceSketchArgs, sketchStatementLines, finishDirections, fmt, freshName, fromPlane, geomPath, geomSnaps, gridStep,
   movePointEdits, planeFrameOf, planeOutlines, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, sweepOf,
   toPlane, toolCode, viewAngles, type PlaneFrame, type SketchGeom, type SketchPlaceInput, type V2, type V3,
 } from '../lib/sketch-plane-points';
 
 type Api = { request(method: string, params?: object): Promise<any>; execute(command: string, params?: object): Promise<any> };
 type Evaluate = (source: string) => Promise<{ errors: { message: string; line?: number | null }[]; doc?: { features?: unknown[] } | null }>;
-type Tool = 'line' | 'rectangle' | 'circle' | 'arc' | 'slot' | 'polyline' | 'round' | 'delete';
+type Tool = 'line' | 'rectangle' | 'circle' | 'arc' | 'slot' | 'polyline' | 'round' | 'chamfer' | 'delete';
 type Box = { min: number[]; max: number[] };
 interface Sketch { id: string; place: SketchPlaceInput; frame: PlaneFrame; geoms: SketchGeom[] }
 type DrawLine = { from: number; to: number; text: string };
@@ -71,7 +72,7 @@ interface Props {
   onMode(name: string | null): void;
   onRun(): void;
 }
-const TOOLS: [Tool, string][] = [['line', 'Line'], ['rectangle', 'Rectangle'], ['circle', 'Circle'], ['arc', 'Arc'], ['slot', 'Slot'], ['polyline', 'Polyline'], ['round', 'Round'], ['delete', 'Delete']];
+const TOOLS: [Tool, string][] = [['line', 'Line'], ['rectangle', 'Rectangle'], ['circle', 'Circle'], ['arc', 'Arc'], ['slot', 'Slot'], ['polyline', 'Polyline'], ['round', 'Round'], ['chamfer', 'Chamfer'], ['delete', 'Delete']];
 const TOP: SketchPlaceInput = { plane: 'xy', offset: 0 };
 const dist = (a: number[], b: number[]) => Math.hypot(a[0] - b[0], a[1] - b[1]);
 const centreOf = (b: Box) => b.min.map((v, i) => (v + b.max[i]) / 2);
@@ -332,21 +333,23 @@ export default function CadSketchOverlay(p: Props) {
       last = { q: hit.q, x, y };
       const v = view.current!;
       if (drag) { drag.to = hit.q; setHover({ x, y: y - props.current.crop, text: `Move ${pointCode(drag.from)} to ${pointCode(hit.q)}${hit.kind ? ` · ${hit.kind}` : ''}`, dot: hit.dot, preview: null }); return; }
-      if (tool === 'round') {
-        const sy = y - props.current.crop; const geoms = sketchNow()?.geoms ?? [];
+      if (tool === 'round' || tool === 'chamfer') {
+        const sy = y - props.current.crop; const geoms = sketchNow()?.geoms ?? []; const round = tool === 'round';
         if (!toolPts.current.length) {
           const q = cornerUnder(x, sy);
           if (!q) { setHover({ x, y: sy, text: 'Click a corner where two lines meet', dot: null, preview: null }); return; }
-          const c = cornerAt(geoms, q);
-          setHover({ x, y: sy, text: typeof c === 'string' ? c : `corner ${pointCode(q)} · click to round it`, dot: onScreen(q), preview: null }); return;
+          const c = cornerAt(geoms, q, tool);
+          setHover({ x, y: sy, text: typeof c === 'string' ? c : `corner ${pointCode(q)} · click to ${tool} it`, dot: onScreen(q), preview: null }); return;
         }
-        const q0 = toolPts.current[0]; const r = roundRadius(q0, hit.q); const g = r === null ? 'Only a corner where two lines meet can be rounded.' : roundGeom(geoms, q0, r);
+        const q0 = toolPts.current[0]; const size = cutSize(q0, hit.q);
+        const g = size === null ? cornerAt(geoms, q0, tool) as string : round ? roundGeom(geoms, q0, size) : chamferGeom(geoms, q0, size);
         if (typeof g === 'string') { setHover({ x, y: sy, text: g, dot: onScreen(q0), preview: null }); return; }
-        // the preview: from one line's far end, along it to the round, round it, and along the other line to its far end
+        // the preview: from one line's far end, along it to the cut, across the corner, and along the other line to its far end
         const far = g.lines.map(i => { const l = geoms[i] as { a: V2; b: V2 }; return dist(l.a, q0) < 1e-6 ? l.b : l.a; });
-        const arc = geomPath(g.arc, 32); if (dist(g.arc.a, g.ends[0]) > 1e-6) arc.reverse();
-        const path = [far[0], ...arc, far[1]];
-        setHover({ x, y: sy, text: `radius ${typed.current || fmt(r!)} · ${typed.current ? 'Enter' : 'click'} to round the corner`, dot: onScreen(q0), preview: path.map(onScreen) }); return;
+        let across: V2[] = g.ends;
+        if ('arc' in g) { across = geomPath(g.arc, 32); if (dist(g.arc.a, g.ends[0]) > 1e-6) across.reverse(); }
+        const path = [far[0], ...across, far[1]];
+        setHover({ x, y: sy, text: `${round ? 'radius' : 'distance'} ${typed.current || fmt(size!)} · ${typed.current ? 'Enter' : 'click'} to ${tool} the corner`, dot: onScreen(q0), preview: path.map(onScreen) }); return;
       }
       if (tool && typed.current && toolPts.current.length) {
         const tq = typedPoint(tool, toolPts.current, hit.q, typed.current);
@@ -367,7 +370,7 @@ export default function CadSketchOverlay(p: Props) {
       const k = known.owner![best]; const line = known.lines[k];
       return { line, curves: known.owner!.flatMap((w, i) => w === k ? [i] : []), text: `${line.text} · click to remove it` };
     };
-    // ---- Round: the corner under the pointer, the radius, and the code written
+    // ---- Round and Chamfer: the corner under the pointer, the size, and the code written
     const sketchNow = () => { const n = modeRef.current; return n ? sketches.current.get(n) ?? null : null; };
     /** the end of the sketch's lines within 10 px of the pointer, nearest first */
     const cornerUnder = (x: number, sy: number): V2 | null => {
@@ -375,22 +378,27 @@ export default function CadSketchOverlay(p: Props) {
       for (const q of lineCorners(sketchNow()?.geoms ?? [])) { const d = dist(onScreen(q), [x, sy]); if (d <= bd) { bd = d; best = q; } }
       return best;
     };
-    /** the radius: typed, else from how far the pointer is from the corner (so at a right angle it is that distance), on the grid's step */
-    const roundRadius = (q0: V2, pointer: V2): number | null => {
+    /**
+     * Round's radius or Chamfer's distance: typed, else from how far the pointer is from the corner, on the grid's step and never above the
+     * largest that fits (a radius is that distance times tan of half the angle, so at a right angle it is the distance itself).
+     */
+    const cutSize = (q0: V2, pointer: V2): number | null => {
       if (typed.current) return Number(typed.current);
       const geoms = sketchNow()?.geoms ?? []; const c = cornerAt(geoms, q0); if (typeof c === 'string') return null;
-      const step = view.current?.step ?? 0.5; const r = Math.max(step, Math.round(dist(pointer, q0) * Math.tan(c.half) / step) * step);
-      const most = largestRound(geoms, q0); return most !== null && most > 0 && r > most ? most : r;
+      const step = view.current?.step ?? 0.5; const round = tool === 'round';
+      const n = Math.max(step, Math.round(dist(pointer, q0) * (round ? Math.tan(c.half) : 1) / step) * step);
+      const most = round ? largestRound(geoms, q0) : Math.floor(Math.min(...c.far.map(f => dist(f, q0))) * 1000 + 1e-6) / 1000;
+      return most !== null && most > 0 && n > most ? most : n;
     };
-    const doRound = (q0: V2, r: number) => {
+    const doCut = (q0: V2, size: number) => {
       const ed = props.current.editor.current; const name = modeRef.current; const sk = sketchNow(); const o = owners.current;
       if (!ed || !name || !sk) return;
       const doc = ed.state.doc.toString();
       if (!o || !o.owner || o.name !== name || o.doc !== doc) { setNote('Still finding the lines that drew that corner; try again in a moment.'); return; }
-      const res = roundEdits(doc, name, o.lines, o.owner, sk.geoms, q0, r);
+      const res = tool === 'round' ? roundEdits(doc, name, o.lines, o.owner, sk.geoms, q0, size) : chamferEdits(doc, name, o.lines, o.owner, sk.geoms, q0, size);
       if (typeof res === 'string') { setNote(res); return; }
       ed.dispatch({ changes: res.edits }); owners.current = null; toolPts.current = []; typed.current = ''; setNote('');
-      props.current.onInserted(`Rounded the corner at ${pointCode(q0)}: ${res.arcCode}`);
+      props.current.onInserted('arcCode' in res ? `Rounded the corner at ${pointCode(q0)}: ${res.arcCode}` : `Chamfered the corner at ${pointCode(q0)}: ${res.lineCode}`);
     };
     const editDrag = (from: V2, to: V2) => { const ed = props.current.editor.current; const name = modeRef.current; return ed && name ? movePointEdits(ed.state.doc.toString(), name, from, to) : []; };
     const write = (code: string) => {
@@ -446,15 +454,15 @@ export default function CadSketchOverlay(p: Props) {
         ed.dispatch({ changes: { from: d.line.from, to: d.line.to } }); owners.current = null; curvesOnScreen.current = [];
         props.current.onInserted(`Removed: ${d.line.text}`); setHover(null); return;
       }
-      if (tool === 'round') {
+      if (tool === 'round' || tool === 'chamfer') {
         const sy = e.clientY - props.current.crop;
         if (!toolPts.current.length) {
           const q = cornerUnder(e.clientX, sy); if (!q) return;
           e.preventDefault(); e.stopImmediatePropagation(); props.current.suppressPick();
-          if (typeof cornerAt(sketchNow()?.geoms ?? [], q) !== 'string') { toolPts.current = [q]; typed.current = ''; }
+          if (typeof cornerAt(sketchNow()?.geoms ?? [], q, tool) !== 'string') { toolPts.current = [q]; typed.current = ''; }
         } else {
           e.preventDefault(); e.stopImmediatePropagation(); props.current.suppressPick();
-          const q0 = toolPts.current[0]; const r = roundRadius(q0, last?.q ?? q0); if (r !== null) doRound(q0, r);
+          const q0 = toolPts.current[0]; const n = cutSize(q0, last?.q ?? q0); if (n !== null) doCut(q0, n);
         }
         show(e.clientX, e.clientY); return;
       }
@@ -507,7 +515,7 @@ export default function CadSketchOverlay(p: Props) {
         if (/^[0-9.,x -]$/.test(e.key) && (typed.current || e.key !== ' ')) { typed.current += e.key; return stop(); }
         if (e.key === 'Backspace' && typed.current) { typed.current = typed.current.slice(0, -1); return stop(); }
         if (e.key === 'Escape' && typed.current) { typed.current = ''; return stop(); }
-        if (e.key === 'Enter' && typed.current && tool === 'round') { doRound(toolPts.current[0], Number(typed.current)); return stop(); }
+        if (e.key === 'Enter' && typed.current && (tool === 'round' || tool === 'chamfer')) { doCut(toolPts.current[0], Number(typed.current)); return stop(); }
         if (e.key === 'Enter' && typed.current) {
           const tq = typedPoint(tool, toolPts.current, last?.q ?? toolPts.current[toolPts.current.length - 1], typed.current);
           if (tq) { if (tool === 'circle' || tool === 'slot') typedRadius = Number(typed.current); place(tq); }
@@ -573,7 +581,7 @@ export default function CadSketchOverlay(p: Props) {
   const toolbar = !host ? null : mode && s ? createPortal(
     <span className={styles.sketchBar} role="toolbar" aria-label="Sketch tools">
       <b>Sketch {mode}</b><span className={styles.sketchPlane}>{planeWords(s.place)}{drawing ? ` · grid ${fmt(drawing.step)} mm` : ''}</span>
-      {TOOLS.filter(([t]) => (t !== 'delete' && t !== 'round') || p.entryOpen).map(([t, label]) => <button key={t} aria-pressed={tool === t} className={tool === t ? styles.sketchToolOn : undefined}
+      {TOOLS.filter(([t]) => (t !== 'delete' && t !== 'round' && t !== 'chamfer') || p.entryOpen).map(([t, label]) => <button key={t} aria-pressed={tool === t} className={tool === t ? styles.sketchToolOn : undefined}
         onClick={() => { toolPts.current = []; setTool(tool === t ? null : t); }}>{label}</button>)}
       <span className={styles.sketchFinish}>
         <label>depth <input type="number" min="0" step="any" value={depth} onChange={e => setDepth(e.target.value)} aria-label="Depth" /></label>

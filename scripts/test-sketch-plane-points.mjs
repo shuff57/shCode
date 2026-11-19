@@ -1,7 +1,7 @@
 // Points on a sketch's plane (lib/sketch-plane-points.ts): reSHape's plane frames, the projective map from the screen to a plane,
 // which sketch the editor cursor is in, and what a picked point writes into the code. The pointer in the real view is a browser check.
 import assert from 'node:assert/strict';
-import { cornerAt, largestRound, lineCorners, roundEdits, roundGeom, dimensionOf, resizeEdits, distToSegment, slotGeoms, typedNumbers, typedPoint, typedWords, sketchGeoms, curveOwners, distToPolyline, sketchStatementLines, arcCode, faceSketchArgs, finishDirections, freshName, movePointEdits, planeOutlines, sweepOf, activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
+import { chamferEdits, chamferGeom, cornerAt, largestRound, lineCorners, roundEdits, roundGeom, dimensionOf, resizeEdits, distToSegment, slotGeoms, typedNumbers, typedPoint, typedWords, sketchGeoms, curveOwners, distToPolyline, sketchStatementLines, arcCode, faceSketchArgs, finishDirections, freshName, movePointEdits, planeOutlines, sweepOf, activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
 
 // ---- planes, as reSHape resolves them: a named plane's origin is normal x offset ------------------------------------------
 const top10 = planeFrameOf({ plane: 'xy', offset: 10 });
@@ -209,4 +209,24 @@ console.log('PASS dimensions: lengths and radii shown, and changed in the code')
   assert.match(cornerAt([...G, { k: 'arc', c: [20, 5], r: 5, a: [20, 0], b: [25, 5], sense: 'ccw' }], [20, 0]), /two lines meet/);
 }
 console.log('PASS round: a corner of two lines rounded, in the drawing words');
+{ // Chamfer: a corner of two lines cut by a straight line, the same distance along each
+  const apply = (doc, es) => { let d = doc; for (const e of [...es].sort((a, b) => b.from - a.from)) d = d.slice(0, e.from) + e.insert + d.slice(e.to); return d; };
+  const doc = "const sk = sketch('top');\nsk.line([0, 0], [20, 0]);\nsk.line([20, 0], [20, 10]);\n";
+  const G = [{ k: 'line', a: [0, 0], b: [20, 0] }, { k: 'line', a: [20, 0], b: [20, 10] }]; const L = sketchStatementLines(doc, 'sk');
+  assert.deepEqual(chamferGeom(G, [20, 0], 4).cut, { k: 'line', a: [16, 0], b: [20, 4] });
+  let e = chamferEdits(doc, 'sk', L, [0, 1], G, [20, 0], 4);
+  assert.equal(apply(doc, e.edits), "const sk = sketch('top');\nsk.line([0, 0], [16, 0]);\nsk.line([20, 4], [20, 10]);\nsk.line([16, 0], [20, 4]);\n", 'both lines shortened, the cut after them');
+  e = chamferEdits(doc, 'sk', L, [0, 1], G, [20, 0], 10);
+  assert.equal(apply(doc, e.edits), "const sk = sketch('top');\nsk.line([0, 0], [10, 0]);\nsk.line([10, 0], [20, 10]);\n", 'a chamfer that uses up a line: the line goes');
+  assert.match(chamferEdits(doc, 'sk', L, [0, 1], G, [20, 0], 11), /A distance of 11 does not fit along these lines; the largest is 10\./);
+  assert.match(chamferGeom(G, [0, 0], 1), /can be chamfered\./, 'its own words for a corner it cannot cut');
+  assert.match(chamferGeom(G, [20, 0], 0), /above 0/);
+  const S = [{ k: 'line', a: [0, 0], b: [10, 0] }, { k: 'line', a: [0, 0], b: [6, 8] }];
+  assert.deepEqual(chamferGeom(S, [0, 0], 5).ends, [[5, 0], [3, 4]], 'along each line, whatever the angle');
+  const rd = "const sk = sketch('top');\nsk.rectangle([0, 0], [60, 40]);\n";
+  const RG = [{ k: 'line', a: [0, 0], b: [60, 0] }, { k: 'line', a: [60, 0], b: [60, 40] }, { k: 'line', a: [60, 40], b: [0, 40] }, { k: 'line', a: [0, 40], b: [0, 0] }];
+  e = chamferEdits(rd, 'sk', sketchStatementLines(rd, 'sk'), [0, 0, 0, 0], RG, [0, 0], 5);
+  assert.equal(apply(rd, e.edits), "const sk = sketch('top');\nsk.line([5, 0], [60, 0]);\nsk.line([60, 0], [60, 40]);\nsk.line([60, 40], [0, 40]);\nsk.line([0, 40], [0, 5]);\nsk.line([5, 0], [0, 5]);\n", 'a rectangle written out as its lines, with the cut');
+}
+console.log('PASS chamfer: a corner of two lines cut straight, in the drawing words');
 console.log('Sketch plane points: planes, the screen-to-plane map, the active sketch and the written point pass.');
