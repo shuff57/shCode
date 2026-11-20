@@ -118,6 +118,9 @@ export default function CadSketchOverlay(p: Props) {
   const [way, setWay] = useState<'one' | 'both' | 'through'>('one');
   /** Revolve: about the sketch's own x or y axis, by an angle */
   const [revAxis, setRevAxis] = useState<'x' | 'y'>('y'); const [revAngle, setRevAngle] = useState('360');
+  /** the Finish panel (depth, way, Extrude, Pocket, Revolve), opened from the bar so the bar keeps to one line */
+  const [finishOpen, setFinishOpen] = useState(false);
+  useEffect(() => { if (!mode) setFinishOpen(false); }, [mode]);
   /** Polygon: how many sides (3 to 24), read by the pointer's handlers through the ref */
   const [sides, setSides] = useState('6'); const sidesRef = useRef(6);
   useEffect(() => { const n = Number(sides); sidesRef.current = Number.isInteger(n) && n >= 3 && n <= 24 ? n : 0; }, [sides]);
@@ -849,7 +852,7 @@ export default function CadSketchOverlay(p: Props) {
     }
     const end = sketchBlockEnd(doc, name) ?? doc.length; const text = `\n${code}`;
     ed.dispatch({ changes: { from: end, insert: text }, selection: { anchor: end + text.length }, scrollIntoView: true });
-    p.onInserted(`Added: ${code}`); setTool(null); toolPts.current = [];
+    p.onInserted(`Added: ${code}`); setTool(null); toolPts.current = []; setFinishOpen(false);
     setTimeout(() => props.current.onRun(), 300); // once the new line has reached the files
   };
   const revolve = () => {
@@ -859,7 +862,7 @@ export default function CadSketchOverlay(p: Props) {
     if (typeof res === 'string') { setNote(res); return; }
     const end = sketchBlockEnd(doc, name) ?? doc.length; const text = `\n${res.join('\n')}`;
     ed.dispatch({ changes: { from: end, insert: text }, selection: { anchor: end + text.length }, scrollIntoView: true });
-    p.onInserted(`Added: ${res.join(' ')}`); setNote(''); setTool(null); toolPts.current = [];
+    p.onInserted(`Added: ${res.join(' ')}`); setNote(''); setTool(null); toolPts.current = []; setFinishOpen(false);
     setTimeout(() => props.current.onRun(), 300);
   };
   const done = () => {
@@ -888,12 +891,15 @@ export default function CadSketchOverlay(p: Props) {
         <label>count <input type="number" min="2" max="50" step="1" value={patCount} onChange={e => setPatCount(e.target.value)} aria-label="Count" /></label></>}
       {tool === 'polygon' && <label>sides <input type="number" min="3" max="24" step="1" value={sides} onChange={e => setSides(e.target.value)} aria-label="Sides" /></label>}
       <span className={styles.sketchFinish}>
+        <button aria-expanded={finishOpen} className={finishOpen ? styles.sketchToolOn : undefined} onClick={() => setFinishOpen(o => !o)}>Finish</button>
+        {finishOpen && <span className={styles.sketchFinishPanel} role="group" aria-label="Finish the sketch">
         <label>depth <input type="number" min="0" step="any" value={depth} onChange={e => setDepth(e.target.value)} aria-label="Depth" /></label>
         <select value={way} onChange={e => setWay(e.target.value as 'one' | 'both' | 'through')} aria-label="Way"><option value="one">one way</option><option value="both">both ways</option><option value="through">through (pocket)</option></select>
         <button onClick={() => finish('extrude')}>Extrude</button><button onClick={() => finish('pocket')}>Pocket</button>
         <select value={revAxis} onChange={e => setRevAxis(e.target.value as 'x' | 'y')} aria-label="Axis"><option value="y">about its y axis</option><option value="x">about its x axis</option></select>
         <label>angle <input type="number" min="1" max="360" step="any" value={revAngle} onChange={e => setRevAngle(e.target.value)} aria-label="Angle" /></label>
         <button onClick={revolve}>Revolve</button>
+      </span>}
       </span>
       <button onClick={done}>Done</button>
       {note && <span className={styles.sketchNote}>{note}</span>}

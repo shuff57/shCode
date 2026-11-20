@@ -467,6 +467,11 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
   line, and SolidCraft's frame below gets shorter. The overlay drew its map from the plane to the screen again only when the
   camera, the sketch or the crop changed, so after the wrap a pointer was read about 5 mm off (a hover at y = 20.4 read as
   [50, 25]); `sketch-polygon-e2e.py` caught it. The frame's size is now part of what redraws the map.
+- **The Finish panel** (2026-11-20, the owner's choice "tidy it"). Depth, the way, Extrude, Pocket, the axis, the angle and
+  Revolve moved from the bar into a panel that a Finish button opens below it; it shuts after Extrude, Pocket or Revolve
+  writes its step, and when sketch mode ends. The bar's choices and number boxes take the bar's colours. Measured at 1440 px:
+  the bar is still two lines (56 px), because its 19 tool buttons alone are wider than the window, so the panel shortens it
+  but does not bring it back to one line. The browser suites open the panel through one helper (`finish_box`).
 - **Points on an arc are written to 1e-9** (2026-11-19). reSHape refuses a sketch whose arc's two ends miss one circle by
   more than 1e-6 mm ("The rules of this sketch have to move its shape…"). A point rounded to 0.001 misses by up to about
   7e-4 wherever the geometry is not exact. So a Round at a slanted corner wrote an arc the build refuses (at the test's

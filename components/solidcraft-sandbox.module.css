@@ -123,7 +123,10 @@
 .sketchBar { display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap; }
 .sketchPlane { color:var(--c-meta); }
 .sketchBar button[aria-pressed="true"], .sketchToolOn { background:var(--brand) !important; color:var(--on-brand) !important; border-color:var(--brand) !important; }
-.sketchFinish { display:inline-flex; align-items:center; gap:4px; padding-left:6px; border-left:1px solid var(--border); }
+.sketchFinish { position:relative; display:inline-flex; align-items:center; gap:4px; padding-left:6px; border-left:1px solid var(--border); }
+.sketchFinishPanel { position:absolute; top:calc(100% + 6px); left:0; z-index:20; display:flex; align-items:center; gap:6px; flex-wrap:wrap; width:max-content; max-width:min(720px, 90vw); padding:8px 10px; background:var(--card); border:1px solid var(--border); border-radius:6px; box-shadow:0 6px 18px rgba(0,0,0,.25); }
+.sketchBar select, .sketchBar input[type=number] { font:inherit; background:var(--card); color:var(--text); border:1px solid var(--border); border-radius:4px; padding:1px 4px; }
+.sketchBar input[type=number] { width:4.5em; }
 .sketchFinish input { width:5.5em; font:inherit; background:var(--card); color:var(--text); border:1px solid var(--border); border-radius:4px; padding:1px 4px; }
 .sketchNote { color:var(--c-orange, #ffb86c); }
 .newSketch { margin-right:8px; }
