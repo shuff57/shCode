@@ -65,8 +65,8 @@ Every animation loops unless you set sprite.texture.loop = false, which plays it
     section: 'animation',
     page: 'textures',
     why: "shCode's texture editor makes textures a sketch can use by name.",
-    basedOn: '41136135e4',
-    append: `Draw your own in the texture editor — the Textures tab in the sandbox, or the Textures link in the header. Open a built-in, change it, save it under any name. Save more than one frame and the texture ANIMATES: sprite.texture = 'myWalk' plays it, with no addAni call, because a saved animation is stored as the same horizontal frame strip addAni already slices.`,
+    basedOn: '3a4adffd4a',
+    append: `Draw your own in the texture editor — the Textures tab in the sandbox, or the Textures link in the header. Open a built-in, change it, save it under any name. Save more than one frame and the texture ANIMATES: sprite.texture = 'myWalk' plays it, with no addAni call, because a saved animation is stored as the same horizontal frame strip addAni already slices. In this course, saved textures can be up to 64 KB each and 1 MB together.`,
   },
   {
     section: 'animation',

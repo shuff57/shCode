@@ -2913,7 +2913,7 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
   {
    "label": "dist",
    "type": "method",
-   "detail": "(v: Vec2): number",
+   "detail": "(v: Vec2 | [ number, number ]): number",
    "info": "The distance to another point."
   },
   {
