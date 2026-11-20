@@ -30,10 +30,10 @@ export interface DocOverride {
 export const overrides: DocOverride[] = [
   {
     section: 'animation',
-    page: 'textures',
-    why: "shCode ships its own, larger texture catalog (126) and a texture editor; the repo's page lists the repo's 105.",
-    basedOn: '1ec891fe70',
-    body: `sprite.texture = 'coin' picks art by NAME instead of by URL. moSHion ships a catalog of 126 pixel-art textures, so you can give a sprite a picture without finding, hosting, or spelling a file path.
+    page: 'texture-catalog',
+    why: "shCode ships its own, larger texture catalog (126 textures, 32 animated); the repo's page lists the repo's 105.",
+    basedOn: 'b3fc4f1916',
+    body: `moSHion ships 126 pixel-art textures. Every name below works the same way: sprite.texture = 'coin', sprite.texture = 'slime'.
 
 94 are stills; 32 are animated sprite sheets that simply play when you assign the name (see below). The terrain, things, battle, numbers and candy groups are newer: ground to build levels from, flags and switches, swords and shields, the digits 0-9 for a score or a die, and candy.
 
@@ -59,21 +59,14 @@ candy: candyGreen, candyOrange, candyYellow, swirl, swirlMint
 
 Animated ones to try: coinSpin (and coinSilverSpin, coinBronzeSpin), starTwinkle, gemSparkle (and gemGreenSparkle, gemYellowSparkle, gemOrangeSparkle), heartBlink, playerJump (one per player colour, like playerBlueJump), flagWave (one per flag colour), torchFlicker and boom.
 
-Every animation loops unless you set sprite.texture.loop = false, which plays it once and stops on the last picture. Two are made to play once: heartLose (a heart flashes, then shows half) and boom (an explosion that grows and fades). Show them for one loop, then change the picture or remove the sprite. heartLose shows 6 pictures for 10 frames each, so after(60, () => heart.texture = 'heartHalf'). boom shows 6 pictures for 6 frames each, so after(36, () => blast.remove()).
-
-Call textureNames() to print the list from inside a sketch, and hasTexture('coin') to check one name. A name that does not exist warns in the console and suggests near matches rather than failing silently, so a typo tells you what it was.
-
-Reading sprite.texture gives back the texture itself. Its name is sprite.texture.name, so ask if (s.texture.name === 'coin'). An animated texture is controlled through the same name: sprite.texture.frameDelay is the speed (game frames per picture, lower is faster), sprite.texture.frame is the picture showing now, sprite.texture.loop = false plays it once, and sprite.texture.frameCount says how many pictures it has. A sprite with no texture reads back null. An animation made with addAni counts too: sprite.texture is whichever animation is showing. Setting .texture clears .image, and setting .image clears the texture.
-
-Setting the texture a sprite already shows does nothing, so door.texture = 'openDoor' inside update() keeps the animation playing instead of starting it over every frame. Setting a different name starts that one at its first picture. To play the same one again from the start, set sprite.texture.frame = 0.
-
-Textures draw with smoothing turned off, so a 21x21 tile stretched across a 50x50 sprite stays blocky instead of blurring. A plain .image still smooths.
-
-Draw your own in the texture editor — the Textures tab in the sandbox, or the Textures link in the header. Open a built-in, change it, save it under any name. Save more than one frame and the texture ANIMATES: sprite.texture = 'myWalk' plays it, with no addAni call, because a saved animation is stored as the same horizontal frame strip addAni already slices.
-
-In code, saveTexture('myGuy', dataUrl) stores a data: URL under a name, and from then on sprite.texture = 'myGuy' finds it — including in a later sketch, because it lives in the same store as storeItem(). A saved name beats a built-in one, so saving 'coin' replaces the built-in coin everywhere. Pass { frames: 4 } as a third argument and the picture is read as a horizontal strip of 4 frames, which sprite.texture = 'myGuy' then plays without an addAni call. deleteTexture('myGuy') forgets it. Keep saved art small: the store holds 64 KB per value and 512 KB in total, which is generous for pixel art and far too small for a photograph.
-
-The built-in art is Kenney's "Platformer Art: Pixel Redux" pack, released under CC0 — public domain, free for classroom and commercial use alike.`,
+Every animation loops unless you set sprite.texture.loop = false, which plays it once and stops on the last picture. Two are made to play once: heartLose (a heart flashes, then shows half) and boom (an explosion that grows and fades). Show them for one loop, then change the picture or remove the sprite. heartLose shows 6 pictures for 10 frames each, so after(60, () => heart.texture = 'heartHalf'). boom shows 6 pictures for 6 frames each, so after(36, () => blast.remove()).`,
+  },
+  {
+    section: 'animation',
+    page: 'textures',
+    why: "shCode's texture editor makes textures a sketch can use by name.",
+    basedOn: '41136135e4',
+    append: `Draw your own in the texture editor — the Textures tab in the sandbox, or the Textures link in the header. Open a built-in, change it, save it under any name. Save more than one frame and the texture ANIMATES: sprite.texture = 'myWalk' plays it, with no addAni call, because a saved animation is stored as the same horizontal frame strip addAni already slices.`,
   },
   {
     section: 'animation',
