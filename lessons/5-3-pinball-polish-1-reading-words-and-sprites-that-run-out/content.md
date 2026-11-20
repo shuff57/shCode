@@ -26,7 +26,7 @@ The words always stay upright, even when the sprite turns.
 
 One more property changes how the whole sprite looks: `.opacity` runs from `1` (solid, where every sprite starts) down to `0` (invisible), and it fades the sprite's colour and its words together. `box.opacity = 0.5;` is half see-through. (A fourth number in `fill()` fades shapes you draw yourself; `.opacity` is the way to fade a sprite.)
 
-**Try it:** a box that spins (the `rotationSpeed` from 5.1.22) wearing the number 5, and a gold ball wearing a black word.
+**Try it:** a box that spins (the `angularVelocity` from 5.1.22) wearing the number 5, and a gold ball wearing a black word.
 
 ```js live
 let box, ball;
@@ -37,7 +37,7 @@ function setup() {
   box = new Sprite(120, 120, 90, 50);
   box.color = 'sienna';
   box.text = 5;
-  box.rotationSpeed = 1;
+  box.angularVelocity = 1;
 
   ball = new Sprite(290, 120, 70);
   ball.color = 'gold';
@@ -95,7 +95,7 @@ function draw() {
 
 1. In the second sketch, change `spark.life = 60;` to `spark.life = 180;` and press the space bar a few times. Each spark now stays about three seconds.
 2. Change `kb.presses(' ')` to `kb.pressing(' ')` and hold the space bar down. Now it is true on every frame you hold it, so a new spark appears every frame, 60 a second. `.life` still cleans them up, but this is the made-every-frame bug from 5.1 again. Change it back.
-3. In the first sketch, add `box.life = 3;` on the line after `box.rotationSpeed = 1;` and run it. The box is gone before you can see it. That is the do-not-use warning from 5.4.5.
+3. In the first sketch, add `box.life = 3;` on the line after `box.angularVelocity = 1;` and run it. The box is gone before you can see it. That is the do-not-use warning from 5.4.5.
 
 ---
 

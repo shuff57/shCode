@@ -2871,7 +2871,7 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
   {
    "label": "set",
    "type": "method",
-   "detail": "(x: number | Vec2, y?: number): Vector",
+   "detail": "(x: number | Vec2 | [ number, number ], y?: number): Vector",
    "info": "Sets x and y (or copies another point); returns the same vector."
   },
   {
@@ -2883,13 +2883,13 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
   {
    "label": "add",
    "type": "method",
-   "detail": "(x: number | Vec2, y?: number): Vector",
+   "detail": "(x: number | Vec2 | [ number, number ], y?: number): Vector",
    "info": "Adds another point (or x and y) to this one; returns the same vector."
   },
   {
    "label": "sub",
    "type": "method",
-   "detail": "(x: number | Vec2, y?: number): Vector",
+   "detail": "(x: number | Vec2 | [ number, number ], y?: number): Vector",
    "info": "Takes another point (or x and y) away from this one; returns the same vector."
   },
   {

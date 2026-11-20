@@ -30,8 +30,8 @@ function draw() {
 
   if (player.overlaps(coin)) {
     score = score + 1;
-    coin.position.x = random(50, 350);
-    coin.position.y = random(50, 250);
+    coin.pos.x = random(50, 350);
+    coin.pos.y = random(50, 250);
   }
 
   fill('white');
@@ -109,8 +109,8 @@ function draw() {
 
   if (player.overlaps(coin)) {
     score = score + 1;
-    coin.position.x = random(50, 350);
-    coin.position.y = random(50, 250);
+    coin.pos.x = random(50, 350);
+    coin.pos.y = random(50, 250);
   }
 
   fill('white');
@@ -201,8 +201,8 @@ function draw() {
 
   if (player.overlaps(coin)) {
     score = score + 1;
-    coin.position.x = random(50, 350);
-    coin.position.y = random(50, 250);
+    coin.pos.x = random(50, 350);
+    coin.pos.y = random(50, 250);
   }
 
   fill('white');
@@ -313,8 +313,8 @@ function draw() {
 
   if (player.overlaps(coin)) {
     score = score + 1;
-    coin.position.x = random(50, 350);
-    coin.position.y = random(50, 250);
+    coin.pos.x = random(50, 350);
+    coin.pos.y = random(50, 250);
   }
 
   fill('white');

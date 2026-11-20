@@ -56,7 +56,7 @@ Read the moving line from the inside out:
 - `mover.pos.x = mover.pos.x + 1;` in `draw()`, as in 5.1.9: the sprite creeps right one pixel a frame, and leaves the canvas in the end.
 - `mover.vel.x = 2;` once in `setup()`, as in 5.1.15: the engine carries it along, and it leaves the canvas in the end too.
 - `mover.rotation = mover.rotation + 3;` in `draw()`: it spins in place.
-- `mover.rotationSpeed = 3;` once in `setup()`: `rotationSpeed` is the spinning version of `vel`, in degrees per frame, and the engine keeps turning the sprite for you.
+- `mover.angularVelocity = 3;` once in `setup()`: `angularVelocity` is the spinning version of `vel`, in degrees per frame, and the engine keeps turning the sprite for you.
 
 The `sin()` way is the one to pick when the sprite should stay on screen.
 
@@ -102,5 +102,5 @@ function draw() {
 | **`sin(n)`** | Gives back a number between `-1` and `1`. As `n` grows, the answer swings smoothly back and forth. The same as `Math.sin(n)`. |
 | **`cos(n)`** | The partner of `sin()`: the same wave, a quarter of a swing later. `sin` for x and `cos` for y makes a circle. |
 | **Radians** | The angle unit `sin()` and `cos()` use. The wave repeats every time the number inside grows by about `6.28`. |
-| **`rotationSpeed`** | How many degrees a sprite turns each frame. Set it once and the engine keeps it spinning. |
+| **`angularVelocity`** | How many degrees a sprite turns each frame. Set it once and the engine keeps it spinning. |
 | **`collider = 'none'`** | Makes a sprite that does not bump into anything: other sprites pass straight through it. |

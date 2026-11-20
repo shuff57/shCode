@@ -202,12 +202,12 @@ function moveFlippers(playing) {
     const held = playing && (kb.pressing(f.keys[0]) || kb.pressing(f.keys[1]));
     const target = held ? f.up : f.rest;
     const diff = target - f.bar.rotation;
-    // rotationSpeed is degrees per frame, so "the angle still to go" lands
+    // angularVelocity is degrees per frame, so "the angle still to go" lands
     // exactly on the target: no overshoot, and it stays put once it arrives.
     // The cap is the flipper's top speed (fast up, slower back down).
     const topSpeed = held ? 20 : 10;
     const turn = Math.max(-topSpeed, Math.min(topSpeed, diff));
-    f.bar.rotationSpeed = turn;
+    f.bar.angularVelocity = turn;
     // The bar turns about its END, not its middle. Spinning it alone makes the
     // hinge fight us (it lags, then overshoots), so also give the middle the
     // sideways speed that goes with that turn: speed = turn (radians) x distance.

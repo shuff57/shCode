@@ -17,6 +17,6 @@ These are the same challenges as the Steps panel beside the editor. The Steps pa
 
 **Challenge 5: a wave (medium).** A sprite that bobs up and down on its own: every frame, set its `pos.y` to a middle value plus `sin(frameCount * 0.05) * 80`, the way 5.1.22's mover swings sideways.
 
-**Your own idea.** Something else beyond a canvas, a sprite and a background counts too. Two that work: a player that spins, with `player.rotation = frameCount * 2;` in `draw()` or `player.rotationSpeed = 3;` once in `setup()` (5.1.22), or a fading trail: write `background('rgba(34, 34, 34, 0.1)')` in place of `background('#222')`. The last number makes each frame's paint only 10% solid, so the old frames fade out slowly behind a moving sprite instead of vanishing at once (moSHion docs: Background and clearing).
+**Your own idea.** Something else beyond a canvas, a sprite and a background counts too. Two that work: a player that spins, with `player.rotation = frameCount * 2;` in `draw()` or `player.angularVelocity = 3;` once in `setup()` (5.1.22), or a fading trail: write `background('rgba(34, 34, 34, 0.1)')` in place of `background('#222')`. The last number makes each frame's paint only 10% solid, so the old frames fade out slowly behind a moving sprite instead of vanishing at once (moSHion docs: Background and clearing).
 
 Doing more than one challenge is fine: the check needs only one.
