@@ -4,7 +4,7 @@
 // both agreed on last time). The cases a student would notice:
 //   - nothing is ever silently lost: a clash keeps both copies (hero, hero_2);
 //   - a delete reaches the account only when the student pressed Delete; an item
-//     a sketch cleared with clearStorage() comes back down instead;
+//     a sketch removed with removeItem() (or storage the browser dropped) comes back down instead;
 //   - a delete on another device removes it here, unless it was changed here.
 //
 // Run: node scripts/test-library-sync.mjs
@@ -56,7 +56,7 @@ check('student pressed Delete here, unchanged there: delete on the account',
   [{ type: 'removeRemote', kind: 'texture', name: 'hero', id: 'i', baseHash: 'h1' }]);
 check('student pressed Delete here, but it changed on another device: the newer work comes back',
   types(planSync([], B([['texture:hero', 'i', 'h1']]), [S('hero', 'h2', 'i')], new Set(['texture:hero']))), ['forgetDelete:hero', 'download:hero']);
-check('missing here WITHOUT a Delete (a sketch ran clearStorage): download it again',
+check('missing here WITHOUT a Delete (a sketch removed it, or the browser dropped it): download it again',
   types(planSync([], B([['texture:hero', 'i', 'h1']]), [S('hero', 'h1', 'i')], new Set())), ['download:hero']);
 check('gone everywhere: forget the base',
   types(planSync([], B([['texture:hero', 'i', 'h1']]), [S('hero', 'h1', 'i', 99)], new Set())), ['dropBase:hero']);

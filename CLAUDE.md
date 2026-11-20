@@ -755,8 +755,8 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   A delete leaves a tombstone row so other devices learn of it. Tests: `scripts/test-library.mjs`.
 - `lib/library-sync.ts` merges three copies (this browser, the account, and the per-account BASE in
   `w1:<owner>:library-base`): changed on both keeps both (`hero`, `hero_2`). **A delete reaches the account
-  only when the student pressed Delete** (`w1:<owner>:library-deleted`); an item a sketch wiped with
-  `clearStorage()` is downloaded again. Mounted once in the root layout (`components/LibrarySync.tsx`);
+  only when the student pressed Delete** (`w1:<owner>:library-deleted`); an item a sketch removed with
+  `removeItem()` (or the browser dropped) is downloaded again; `clearStorage()` never touches library keys. Mounted once in the root layout (`components/LibrarySync.tsx`);
   `logout()` removes synced copies from the browser and leaves unsynced ones. Tests:
   `scripts/test-library-sync.mjs`. The dev server serves `/api/library` from the real handlers over an
   in-memory SQLite, so two browser sessions can act as two devices.
