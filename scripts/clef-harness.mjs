@@ -168,9 +168,10 @@ async function ask(code) {
           model: modelId,
           input: JSON.stringify(state),
           questions: Object.entries(cfg.questions).map(([name, instructions]) => ({ type: 'predicate', name, instructions })),
-          // --zdr off sends zdr:false, for models with no zero-data-retention route. Only for hand-written
-          // fixtures: a student's code must never go through a route that may keep it.
-          ...(arg('zdr') === 'off' ? { zdr: false } : {}),
+          // zdr:true by default: the request is routed only through zero-data-retention providers (or refused
+          // with a 503), whatever the account's own mode. --zdr off sends zdr:false, for models with no ZDR route;
+          // use it only for hand-written fixtures: a student's code must never go through a route that may keep it.
+          zdr: arg('zdr') !== 'off',
         }),
       });
       const body = await res.json().catch(() => null);

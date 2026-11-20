@@ -1,7 +1,8 @@
 {
  "1-5-37-lab-settle-it-in-the-console": {
   "questions": {
-   "r2": "Is there a console.log whose argument is the bracketed expression (2 + 2) * 3, with the brackets around the 2 + 2? console.log(2 + 2 * 3) without brackets alone is NO. What any comment says, or whether there is a comment at all, does not matter. Other console.log lines are fine."
+   "r2": "Is there a console.log whose argument is the bracketed expression (2 + 2) * 3, with the brackets around the 2 + 2? console.log(2 + 2 * 3) without brackets alone is NO. What any comment says, or whether there is a comment at all, does not matter. Other console.log lines are fine.",
+   "r1": "Is there a console.log whose argument is the expression 2 + 2 * 3 with no brackets (any spacing, like 2+2*3)? Other console.log lines are fine. NO if it only appears in a comment or in quotes."
   }
  },
  "1-3-16-lab-split-the-reused-variable": {
@@ -201,6 +202,41 @@
  "6-28-checkers-3-lab-pick-a-piece-and-step": {
   "questions": {
    "r4": "Does the step direction depend on whose piece it is: red must move up the screen (the row number gets smaller) and black down (the row number gets bigger)? YES if the rule picks a direction from the colour or the turn (like dir = turn === 'r' ? -1 : 1) and the move must match it. NO if one fixed direction is used for both colours, or if any direction is allowed. Code inside a comment, or inside quotes or backticks as text, never runs."
+  }
+ },
+ "1-5-39-lab-cause-a-reference-error": {
+  "questions": {
+   "r3": "Is there a console.log(greeting) written as code, with the variable spelled exactly greeting? YES: console.log(greeting); anywhere in the file. NO if greeting is only logged inside a comment, or the log uses a misspelling such as gretting or grettin. Lines that start with // STEP are the lesson's own instructions, not the student's work. Everything else in the file is irrelevant to this question.",
+   "r4": "Does a comment line in the file contain the word ReferenceError (any capitals), for example // ReferenceError gretting is not defined? YES if the word appears in any // comment. NO if it appears nowhere. Lines that start with // STEP are the lesson's own instructions, not the student's work. Everything else is irrelevant.",
+   "r5": "Is there a comment written by the student (not a // STEP line) that says which part of the error message told them what to change: the error type, the detail or message, or the place or line? Any wording that picks a part counts, like 'the detail helped me' or 'the first part, the error name'. NO if there is no such comment, or it only repeats the error text. Lines that start with // STEP are the lesson's own instructions, not the student's work. "
+  }
+ },
+ "1-5-43-lab-debug-the-order-total": {
+  "questions": {
+   "r1": "Is a variable (any name) set to the price variable multiplied by the quantity variable, like let subtotal = unitPrice * quantity;, with * and either order? NO if it adds them, or uses only one of the two. Comments never run. Lines that start with // STEP are the lesson's own instructions, not the student's work. ",
+   "r2": "Is the discounted amount worked out by SUBTRACTING the discount from the subtotal, like let discounted = subtotal - discount;? YES for subtotal - discount (or minus a discount rate times subtotal). NO if the two are added. How the discount itself is worked out does not matter. Comments never run. Lines that start with // STEP are the lesson's own instructions, not the student's work. ",
+   "r3": "Is the final total worked out by ADDING the tax to the discounted amount, like let total = discounted + tax;? YES for any addition of the discounted amount and the tax. NO if the tax is subtracted, or the total is only the discounted amount. How the tax itself is worked out does not matter. Comments never run. Lines that start with // STEP are the lesson's own instructions, not the student's work. "
+  }
+ },
+ "1-2-26-lab-variables-types-check": {
+  "questions": {
+   "req3": "Does the code use the typeof operator as code, like typeof age or typeof(name)? YES even if the result is not printed. NO if typeof appears only inside a comment, or only inside quotes such as console.log('typeof age'). Lines that start with // STEP are the lesson's own instructions, not the student's work. ",
+   "req4": "Is there a console.log( ... ) call written as code, not inside a comment or inside quotes? Whatever it prints is fine, even a plain word in quotes. NO if the only console.log is inside a comment. Lines that start with // STEP are the lesson's own instructions, not the student's work. "
+  }
+ },
+ "2-3-8-lab-animal-sounds": {
+  "questions": {
+   "r4": "Is there a case 'cow' (single or double quotes) whose next statement, on the same line or the line after, is a console.log that prints Moo (any capitals)? A break after it is fine, and so is a different order of cases. YES: case \"cow\": console.log(\"Moo\"); break;. NO if case cow is missing, prints something else, or is only in a comment. Code inside a comment, or inside quotes or backticks as text, never runs."
+  }
+ },
+ "1-2-29-a1-2-2-describe-an-object": {
+  "questions": {
+   "r7": "Is typeof used in code and its result logged: console.log(typeof x), a label then typeof x, or a variable set to typeof x that is then logged? Any of these is YES. NO if typeof appears only in a comment or inside quotes. Lines that start with // STEP are the lesson's own instructions, not the student's work. "
+  }
+ },
+ "2-1-36-lab-settings-advisor": {
+  "questions": {
+   "r1": "Is there an if whose condition compares filamentType to PLA (filamentType === 'PLA' or == 'PLA', any quotes) and whose block logs the temperature 200, either the bare number 200 or inside a message like 'Recommended temperature: 200C'? What the other branches do is irrelevant. NO if the condition is a single = (an assignment, not a comparison) or the block logs a different number. Code inside a comment, or inside quotes or backticks as text, never runs."
   }
  }
 }
