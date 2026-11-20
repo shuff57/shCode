@@ -3,7 +3,8 @@
 //   npm run sync:moshion              copy the engine, typings and docs from upstream main,
 //                                     reapply shCode's one local line, regenerate the editor
 //                                     autocomplete, run the moshion gates, stamp VENDORED.md
-//   npm run sync:moshion -- --check   exit 1 if the vendored copy differs from upstream main
+//   npm run sync:moshion -- --check   exit 1 if the vendored copy differs from upstream main,
+//                                     or if it cannot be checked (no checkout, offline)
 //                                     (deploy runs this; MOSHION_ALLOW_BEHIND=1 lets a deploy
 //                                     go out anyway, for an urgent shCode-only fix)
 //
@@ -62,16 +63,23 @@ function run(cmd, args, opts = {}) {
 }
 const git = (...a) => run('git', ['-C', upstream, ...a]);
 
+// --check (the deploy gate) fails CLOSED: a drift it could not check is not
+// "in sync". MOSHION_ALLOW_BEHIND=1 is the one way past it (offline, or an
+// urgent shCode-only fix), and it is said out loud.
 function skip(msg) {
   console.log(`[sync-moshion] ${msg}`);
-  process.exit(0); // an unreachable upstream never blocks a deploy; a KNOWN difference does
+  if (checkOnly && process.env.MOSHION_ALLOW_BEHIND !== '1') {
+    console.log('[sync-moshion] cannot confirm the vendored engine matches upstream, so the deploy stops. MOSHION_ALLOW_BEHIND=1 goes ahead anyway.');
+    process.exit(1);
+  }
+  process.exit(checkOnly ? 0 : 1);
 }
 
 if (!existsSync(join(upstream, '.git'))) skip(`no moshion checkout at ${upstream}; set MOSHION_DIR to check drift`);
 if (REF.startsWith('origin/')) {
   const f = git('fetch', '-q', 'origin');
   if (f.status !== 0) {
-    if (checkOnly) skip('could not reach origin (offline?); drift not checked');
+    if (checkOnly) skip('could not reach origin (offline?); drift not checked.');
     console.error('git fetch failed:\n' + (f.stderr || ''));
     process.exit(1);
   }

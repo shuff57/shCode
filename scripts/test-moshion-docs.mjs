@@ -44,12 +44,15 @@ check('every section slug and page id is unique and well formed', () => {
 
 check("every override was written against the shared page as it is now", () => {
   const sha = (t) => createHash('sha1').update(t).digest('hex').slice(0, 10);
+  // The whole page: an override that keeps the shared example must be re-read
+  // when that example changes, not only when the words do.
+  const pageHash = (p) => sha(JSON.stringify({ title: p.title, body: p.body, code: p.code ?? '' }));
   const stale = [];
   for (const o of overrides) {
     const page = sharedSections.find((s) => s.slug === o.section)?.pages.find((p) => p.id === o.page);
     assert.ok(page, `override for ${o.section}/${o.page}: the moshion repo has no such page`);
     assert.ok(o.why, `override for ${o.section}/${o.page} needs a why`);
-    if (sha(page.body) !== o.basedOn) stale.push(`${o.section}/${o.page} (now ${sha(page.body)})`);
+    if (pageHash(page) !== o.basedOn) stale.push(`${o.section}/${o.page} (now ${pageHash(page)})`);
     applyOverride(page, o); // throws if a swapped paragraph is gone
   }
   assert.deepEqual(stale, [], `the moshion repo changed these pages; re-read each override in lib/moshion-docs-shcode.ts against the new text, then set basedOn: ${stale.join(', ')}`);

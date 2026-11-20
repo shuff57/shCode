@@ -8,7 +8,7 @@
 // repo, so the engine's own site has it too.
 //
 // An override carries `basedOn`, the first 10 hex of the SHA-1 of the shared
-// page's body it was written against. When the moshion repo changes that page,
+// page it was written against (JSON of its title, body and code). When the moshion repo changes that page,
 // scripts/test-moshion-docs.mjs fails until someone re-reads the override and
 // updates the hash, so the two copies cannot drift apart unnoticed.
 
@@ -32,7 +32,7 @@ export const overrides: DocOverride[] = [
     section: 'animation',
     page: 'textures',
     why: "shCode ships its own, larger texture catalog (126) and a texture editor; the repo's page lists the repo's 105.",
-    basedOn: 'ae84b404e5',
+    basedOn: '1ec891fe70',
     body: `sprite.texture = 'coin' picks art by NAME instead of by URL. moSHion ships a catalog of 126 pixel-art textures, so you can give a sprite a picture without finding, hosting, or spelling a file path.
 
 94 are stills; 32 are animated sprite sheets that simply play when you assign the name (see below). The terrain, things, battle, numbers and candy groups are newer: ground to build levels from, flags and switches, swords and shields, the digits 0-9 for a score or a die, and candy.
@@ -79,28 +79,28 @@ The built-in art is Kenney's "Platformer Art: Pixel Redux" pack, released under 
     section: 'animation',
     page: 'add-ani',
     why: "shCode's texture editor makes animations a sketch can use by name.",
-    basedOn: '87de869013',
+    basedOn: 'de9bafb4f7',
     append: `The sheet can also be the name of an animation you drew in the Texture editor: sprite.addAni('walk', 'myWalk') uses its own frames and frame lengths, so changeAni switches between two drawn animations. Give a frame count to override it. loop, frame, tick, pause() and play() work on a drawn animation too, and on a texture you drew: after sprite.texture = 'openDoor', use sprite.texture.loop = false.`,
   },
   {
     section: 'animation',
     page: 'animation-objects',
     why: "shCode's texture editor gives each frame its own length.",
-    basedOn: '4050e4ee26',
+    basedOn: '5f9b11db26',
     append: `An animation you draw in the Textures tab can give each frame a different length, and frameDelays is where those lengths show up.`,
   },
   {
     section: 'text',
     page: 'fonts',
     why: "shCode students save fonts in their Library.",
-    basedOn: '0d028aadef',
+    basedOn: 'dfae633a23',
     append: `fontNames() also lists the fonts you saved in your Library, and textFont() takes their names the same way.`,
   },
   {
     section: 'sound',
     page: 'sound',
     why: "shCode's Library, sound mixer and the 190 KB limit on a saved sound.",
-    basedOn: '5e93906fe5',
+    basedOn: 'cbee28ae59',
     swap: {
       from: "The built-in sounds load by name, no pat",
       to: `moSHion ships a small 8-bit palette you load by name, no path needed: loadSound('coin') is a short chime and loadSound('music') is a short tune. There are also jump, hit, laser, powerup, explode, blip, select and tone, with title, win and lose for menus. For board and battle games there are dice, step, sword, clang, potion, levelup, crown, whoosh, pop and door. Every one is in the Library under Built in, where you can play it and copy the line that loads it. The longer path, loadSound('/moshion/assets/coin.wav'), still works. A sound that cannot load never plays, and the console says why.

@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Source repo | `shuff57/moshion` (local checkout `../moshion`) |
-| Commit | `c1a6893` |
+| Commit | `bea30be` |
 | Commit date | 2026-11-20 |
 
 `npm run sync:moshion` stamps the two rows above. What changed in each upstream commit is
@@ -51,5 +51,5 @@ changes, and what it keeps as its own.
    `lib/moshion-docs-shcode.ts` overrides, read the new text, fix the override, and update its
    `basedOn` hash.
 4. Commit, then deploy. `npm run deploy` runs `sync-moshion --check` first and refuses while this
-   copy differs from upstream `main` (`MOSHION_ALLOW_BEHIND=1` overrides it for an urgent
-   shCode-only fix).
+   copy differs from upstream `main`, or when it cannot check (no `../moshion`, offline);
+   `MOSHION_ALLOW_BEHIND=1` overrides it for an urgent shCode-only fix.
