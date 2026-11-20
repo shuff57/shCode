@@ -3,7 +3,7 @@
 | | |
 | --- | --- |
 | Source repo | `shuff57/moshion` (local checkout `../moshion`) |
-| Commit | `220175f` |
+| Commit | `bee1209` |
 | Commit date | 2026-11-20 |
 
 `npm run sync:moshion` stamps the two rows above. What changed in each upstream commit is

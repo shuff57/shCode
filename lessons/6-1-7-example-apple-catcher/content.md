@@ -60,7 +60,7 @@ basket.overlaps(apples, (b, apple) => {
 });
 ```
 
-`overlaps(group, callback)` walks every sprite in the group, calls the callback once per pair currently overlapping, and passes both sprites in. The callback is the right place to call `apple.delete()`: moSHion has already finished iterating, so destroying a sprite doesn't trip the iteration bug.
+`overlaps(group, callback)` walks every sprite in the group, calls the callback once per pair currently overlapping, and passes both sprites in. The callback is the right place to call `apple.delete()`: moSHion walks a copy of the group, so destroying a sprite doesn't trip the iteration bug.
 
 The boolean form (`basket.overlaps(apples)`) returns `true` if any apple is overlapping. Use that for "did anything hit me this frame" gates (game-over checks, hit flashes). Use the callback form for per-pair work.
 
