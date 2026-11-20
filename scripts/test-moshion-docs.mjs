@@ -20,6 +20,8 @@ import { fileURLToPath } from 'node:url';
 import { sections, applyOverride, localizePaths } from '../lib/moshion-docs.ts';
 import { sharedSections } from '../lib/moshion-docs-shared.generated.ts';
 import { overrides } from '../lib/moshion-docs-shcode.ts';
+import { sections as jsSections } from '../lib/js-docs.ts';
+import { MOSHION_MEMBERS } from '../lib/moshion-completions.generated.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 let failed = 0;
@@ -128,6 +130,100 @@ check('every example clears its canvas in draw() and never deletes while looping
     if (!p.code) continue;
     if (/new\s+(?:\w+\.)?Sprite\b|\btext\(/.test(p.code) && !/\bbackground\(|\bclear\(\)/.test(fnBody(p.code, 'draw'))) bad.push(`${s.slug}/${p.id}: never clears the canvas in draw()`);
     for (const g of deletesWhileLooping(p.code)) bad.push(`${s.slug}/${p.id}: deletes while looping over ${g}`);
+  }
+  assert.deepEqual(bad, []);
+});
+
+// codeOnly and shorthandIssues are copies of the moshion repo's scripts/build-docs.mjs; keep them identical.
+/** The code with strings, template literals and comments blanked out (same
+ *  length, so positions still line up), for the style checks below. */
+function codeOnly(code) {
+  let out = '';
+  let i = 0;
+  while (i < code.length) {
+    const c = code[i], n = code[i + 1];
+    if (c === '/' && n === '/') { const e = code.indexOf('\n', i); const j = e < 0 ? code.length : e; out += ' '.repeat(j - i); i = j; continue; }
+    if (c === '/' && n === '*') { const e = code.indexOf('*/', i + 2); const j = e < 0 ? code.length : e + 2; out += code.slice(i, j).replace(/[^\n]/g, ' '); i = j; continue; }
+    if (c === "'" || c === '"' || c === '`') {
+      let j = i + 1;
+      while (j < code.length && code[j] !== c) j += code[j] === '\\' ? 2 : 1;
+      out += c + code.slice(i + 1, j).replace(/[^\n]/g, ' ') + (j < code.length ? c : '');
+      i = j + 1;
+      continue;
+    }
+    out += c;
+    i++;
+  }
+  return out;
+}
+
+/** Where an example uses shorthand: ['line 7: if without { }', ...]. */
+function shorthandIssues(code) {
+  const src = codeOnly(code);
+  const issues = [];
+  const lineOf = (k) => src.slice(0, k).split('\n').length;
+  const after = (k) => { let j = k; while (j < src.length && /\s/.test(src[j])) j++; return j; };
+  for (const m of src.matchAll(/\b(if|for|while)\s*\(/g)) {
+    let depth = 1, j = m.index + m[0].length;
+    for (; j < src.length && depth; j++) { if (src[j] === '(') depth++; else if (src[j] === ')') depth--; }
+    const k = after(j);
+    if (src[k] !== '{' && !(m[1] === 'while' && src[k] === ';')) issues.push(`line ${lineOf(m.index)}: ${m[1]} without { }`);
+  }
+  for (const m of src.matchAll(/\belse\b/g)) {
+    const k = after(m.index + 4);
+    if (src[k] !== '{' && !src.startsWith('if', k)) issues.push(`line ${lineOf(m.index)}: else without { }`);
+  }
+  for (const m of src.matchAll(/=>/g)) {
+    if (src[after(m.index + 2)] !== '{') issues.push(`line ${lineOf(m.index)}: an arrow function without a { } body`);
+  }
+  // A block after `)`, `else` or `=>` keeps each statement on its own line.
+  for (let i = 0; i < src.length; i++) {
+    if (src[i] !== '{') continue;
+    let p = i - 1;
+    while (p >= 0 && (src[p] === ' ' || src[p] === '\t')) p--;
+    if (!(src[p] === ')' || src.slice(Math.max(0, p - 3), p + 1).endsWith('else') || src.slice(Math.max(0, p - 1), p + 1) === '=>')) continue;
+    let q = i + 1;
+    while (q < src.length && (src[q] === ' ' || src[q] === '\t')) q++;
+    if (src[q] !== '\n' && src[q] !== '}') issues.push(`line ${lineOf(i)}: statements on the same line as { ; put each on its own line`);
+  }
+  for (const m of src.matchAll(/\?(?![.?])/g)) {
+    if (src[m.index - 1] === '?') continue;
+    issues.push(`line ${lineOf(m.index)}: a ? b : c; write it as if / else`);
+  }
+  return issues;
+}
+
+check('every example uses braces and no shorthand (moSHion and JavaScript docs)', () => {
+  const bad = [];
+  for (const s of sections) for (const p of s.pages) {
+    for (const issue of shorthandIssues(p.code || '')) bad.push(`moshion ${s.slug}/${p.id}: ${issue}`);
+  }
+  for (const s of jsSections) for (const p of s.pages) {
+    if (!p.code) bad.push(`js ${s.slug}/${p.title}: no example`);
+    for (const issue of shorthandIssues(p.code || '')) bad.push(`js ${s.slug}/${p.title}: ${issue}`);
+  }
+  assert.deepEqual(bad, []);
+});
+
+// Sections with no examples, on purpose: Sharing is about buttons on shCode's pages, not code, and the
+// Reference is the generated list of every name (each name's example is on the page that teaches it).
+const NO_EXAMPLE_SECTIONS = ['sharing', 'reference'];
+
+check("every page has an example, and every name shCode adds (online, multiplayer(), save()) is used in one", () => {
+  const bad = [];
+  for (const s of sections) for (const p of s.pages) {
+    if (!p.code && !NO_EXAMPLE_SECTIONS.includes(s.slug)) bad.push(`${s.slug}/${p.id}: no example`);
+  }
+  const code = sections.flatMap((s) => s.pages.map((p) => codeOnly(p.code || ''))).join('\n');
+  const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const asGlobal = (n) => new RegExp(`(^|[^\\w$.])${esc(n)}($|[^\\w$])`).test(code);
+  const asMember = (n) => new RegExp(`\\.${esc(n)}($|[^\\w$])`).test(code);
+  const globals = ['multiplayer', 'online', 'game', 'players', 'turn', 'seat', 'nextTurn', 'myTurn', 'save', 'load', 'saved'];
+  for (const n of globals) if (!asGlobal(n)) bad.push(`${n}: no example uses it`);
+  for (const type of ['Game', 'Online']) {
+    assert.ok(MOSHION_MEMBERS[type], `the completions have no ${type} type`);
+    // A game.* name is also a global (players, turn, seat), so either use counts.
+    for (const m of MOSHION_MEMBERS[type]) if (!asMember(m.label) && !(type === 'Game' && asGlobal(m.label))) bad.push(`${type.toLowerCase()}.${m.label}: no example uses it`);
   }
   assert.deepEqual(bad, []);
 });

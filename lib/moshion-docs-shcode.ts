@@ -32,35 +32,35 @@ export const overrides: DocOverride[] = [
     section: 'animation',
     page: 'textures',
     why: "shCode's texture editor makes textures a sketch can use by name.",
-    basedOn: '3a4adffd4a',
+    basedOn: '1f21bff6f9',
     append: `Draw your own in the texture editor — the Textures tab in the sandbox, or the Textures link in the header. Open a built-in, change it, save it under any name. Save more than one frame and the texture ANIMATES: sprite.texture = 'myWalk' plays it, with no addAni call, because a saved animation is stored as the same horizontal frame strip addAni already slices. In this course, saved textures can be up to 64 KB each and 1 MB together.`,
   },
   {
     section: 'animation',
     page: 'add-ani',
     why: "shCode's texture editor makes animations a sketch can use by name.",
-    basedOn: 'de9bafb4f7',
+    basedOn: '9a33cdb8d9',
     append: `The sheet can also be the name of an animation you drew in the Texture editor: sprite.addAni('walk', 'myWalk') uses its own frames and frame lengths, so changeAni switches between two drawn animations. Give a frame count to override it. loop, frame, tick, pause() and play() work on a drawn animation too, and on a texture you drew: after sprite.texture = 'openDoor', use sprite.texture.loop = false.`,
   },
   {
     section: 'animation',
     page: 'animation-objects',
     why: "shCode's texture editor gives each frame its own length.",
-    basedOn: '5f9b11db26',
+    basedOn: 'c05426d946',
     append: `An animation you draw in the Textures tab can give each frame a different length, and frameDelays is where those lengths show up.`,
   },
   {
     section: 'text',
     page: 'fonts',
     why: "shCode students save fonts in their Library.",
-    basedOn: 'dfae633a23',
-    append: `fontNames() also lists the fonts you saved in your Library, and textFont() takes their names the same way.`,
+    basedOn: '77e6fd2adc',
+    append: `In this course the fonts you saved yourself are the ones in your Library (Library, then Fonts). textFont() takes their names exactly as you saved them, capitals too.`,
   },
   {
     section: 'sound',
     page: 'sound',
     why: "shCode's Library, sound mixer and the 190 KB limit on a saved sound.",
-    basedOn: 'cbee28ae59',
+    basedOn: '418ec8f5c3',
     swap: {
       from: "The built-in sounds load by name, no pat",
       to: `moSHion ships a small 8-bit palette you load by name, no path needed: loadSound('coin') is a short chime and loadSound('music') is a short tune. There are also jump, hit, laser, powerup, explode, blip, select and tone, with title, win and lose for menus. For board and battle games there are dice, step, sword, clang, potion, levelup, crown, whoosh, pop and door. Every one is in the Library under Built in, where you can play it and copy the line that loads it. The longer path, loadSound('/moshion/assets/coin.wav'), still works. A sound that cannot load never plays, and the console says why.
@@ -91,6 +91,7 @@ To keep several values together, use saved(name, defaults). It gives back an obj
 A remote save can hold up to 100 names, 16 KB for one value and 64 KB in total, which is plenty for scores, levels and settings. Never save a password: anyone who can see your code can read it.`,
       code: `let player;
 let score = 0;
+let lastScore;
 
 function setup() {
   new Canvas(400, 400);
@@ -98,11 +99,17 @@ function setup() {
   player = saved('player', { best: 0, plays: 0 }, 'remote');
   player.plays += 1;
   player.save();
+  // One value on its own: load() is null the first time.
+  lastScore = load('last', 'remote');
+  if (lastScore === null) {
+    lastScore = 0;
+  }
 }
 
 function update() {
   if (kb.presses(' ')) {
     score++;
+    save('last', score, 'remote');
     if (score > player.best) {
       player.best = score;
       player.save();
@@ -120,6 +127,7 @@ function draw() {
   fill('#888');
   textSize(12);
   text('Plays: ' + player.plays + '   space = score', 14, 76);
+  text('Last time you scored ' + lastScore, 14, 96);
 }`,
     },
   },
@@ -155,7 +163,9 @@ After the call your sketch has a few new names: players (how many), turn (whose 
 }
 
 function update() {
-  if (kb.presses('space')) nextTurn();
+  if (kb.presses('space')) {
+    nextTurn();
+  }
 }
 
 function draw() {
@@ -183,8 +193,12 @@ function setup() {
 
 function update() {
   if (winner === -1) {
-    if (kb.presses('1')) add(1);
-    if (kb.presses('2')) add(2);
+    if (kb.presses('1')) {
+      add(1);
+    }
+    if (kb.presses('2')) {
+      add(2);
+    }
   }
 }
 
@@ -194,14 +208,20 @@ function draw() {
 
 function add(n) {
   count = min(count + n, 21);
-  if (count === 21) winner = turn;
-  else nextTurn();
+  if (count === 21) {
+    winner = turn;
+  } else {
+    nextTurn();
+  }
 }
 
 function drawTop() {
   text('Count: ' + count, 10, 40, 24, 'white');
-  if (winner === -1) text('Player ' + (turn + 1) + ': press 1 or 2', 10, 80, 16, 'gold');
-  else text('Player ' + (winner + 1) + ' reached 21 and wins!', 10, 80, 16, 'gold');
+  if (winner === -1) {
+    text('Player ' + (turn + 1) + ': press 1 or 2', 10, 80, 16, 'gold');
+  } else {
+    text('Player ' + (winner + 1) + ' reached 21 and wins!', 10, 80, 16, 'gold');
+  }
 }`,
         },
         {
@@ -223,18 +243,29 @@ function setup() {
   new Canvas(400, 200);
   multiplayer('versus', 2);
   online.onMove((move, who) => {
-    if (winner !== -1 || who !== turn) return;
-    if (move.add !== 1 && move.add !== 2) return;
+    if (winner !== -1 || who !== turn) {
+      return;
+    }
+    if (move.add !== 1 && move.add !== 2) {
+      return;
+    }
     count = min(count + move.add, 21);
-    if (count === 21) winner = turn;
-    else nextTurn();
+    if (count === 21) {
+      winner = turn;
+    } else {
+      nextTurn();
+    }
   });
 }
 
 function update() {
   if (winner === -1 && myTurn()) {
-    if (kb.presses('1')) online.send({ add: 1 });
-    if (kb.presses('2')) online.send({ add: 2 });
+    if (kb.presses('1')) {
+      online.send({ add: 1 });
+    }
+    if (kb.presses('2')) {
+      online.send({ add: 2 });
+    }
   }
 }
 
@@ -244,10 +275,15 @@ function draw() {
 
 function drawTop() {
   text('Count: ' + count, 10, 40, 24, 'white');
-  if (!game.ready) text('Waiting for players: use the bar above', 10, 80, 14, '#8393c4');
-  else if (winner !== -1) text('Player ' + (winner + 1) + ' wins!', 10, 80, 16, 'gold');
-  else if (myTurn()) text('Your turn: press 1 or 2', 10, 80, 16, 'gold');
-  else text('Player ' + (turn + 1) + ' is thinking...', 10, 80, 16, '#8393c4');
+  if (!game.ready) {
+    text('Waiting for players: use the bar above', 10, 80, 14, '#8393c4');
+  } else if (winner !== -1) {
+    text('Player ' + (winner + 1) + ' wins!', 10, 80, 16, 'gold');
+  } else if (myTurn()) {
+    text('Your turn: press 1 or 2', 10, 80, 16, 'gold');
+  } else {
+    text('Player ' + (turn + 1) + ' is thinking...', 10, 80, 16, '#8393c4');
+  }
 }`,
         },
         {
@@ -262,12 +298,16 @@ function setup() {
   new Canvas(400, 200);
   multiplayer('coop', 4);
   online.onMove((move, who) => {
-    if (move.pump === 1 && water < 100) water = min(water + 5, 100);
+    if (move.pump === 1 && water < 100) {
+      water = min(water + 5, 100);
+    }
   });
 }
 
 function update() {
-  if (myTurn() && water < 100 && kb.presses('space')) online.send({ pump: 1 });
+  if (myTurn() && water < 100 && kb.presses('space')) {
+    online.send({ pump: 1 });
+  }
 }
 
 function draw() {
@@ -279,9 +319,14 @@ function draw() {
 }
 
 function drawTop() {
-  if (!game.ready) text('Waiting for the team: use the bar above', 10, 40, 14, '#8393c4');
-  else text('You are player ' + (seat + 1) + ' of ' + players + '. SPACE pumps!', 10, 40, 14, 'gold');
-  if (water === 100) text('Full! The team did it.', 10, 80, 18, 'limegreen');
+  if (!game.ready) {
+    text('Waiting for the team: use the bar above', 10, 40, 14, '#8393c4');
+  } else {
+    text('You are player ' + (seat + 1) + ' of ' + players + '. SPACE pumps!', 10, 40, 14, 'gold');
+  }
+  if (water === 100) {
+    text('Full! The team did it.', 10, 80, 18, 'limegreen');
+  }
 }`,
         },
         {
@@ -299,12 +344,16 @@ function setup() {
   new Canvas(400, 160);
   multiplayer('coop', 2);
   online.onMove((move, who) => {
-    if (move.jump === true) jumps += 1;
+    if (move.jump === true) {
+      jumps += 1;
+    }
   });
 }
 
 function update() {
-  if (myTurn() && kb.presses('space')) online.send({ jump: true });
+  if (myTurn() && kb.presses('space')) {
+    online.send({ jump: true });
+  }
 }
 
 function draw() {
@@ -325,7 +374,9 @@ online.share(sprite) shows this sprite on every other computer. About 15 times a
 
 The copies of other players' sprites are in online.peers: online.peers[1] is the sprite player 2 (seat 1) shares, ready to draw or test. A copy has collider 'none', so it never pushes anything: ask overlaps() if you want to know when you touch it.
 
-In the example each player steers their own square with the arrow keys and sees the other square glide around. Try it alone with a second browser tab.
+online.unshare(sprite) stops showing that sprite on the other computers; share it again to bring it back. game.realtime is true in a real-time room, and game.code and game.status are the room's code and how it is doing ('waiting', 'ready' and so on).
+
+In the example each player steers their own square with the arrow keys and sees the other square glide around; H hides your square from the others and shows it again. Try it alone with a second browser tab.
 
 What real time does NOT do, honestly:
 
@@ -337,6 +388,7 @@ Lag is real. A copy is drawn about a tenth of a second behind, so it can glide s
 
 The limits are the same as before: game data only in a move (numbers, true or false, short one-word labels), and at most 30 messages a second from each computer, sharing included. A sprite that has not moved is only sent once a second.`,
           code: `let me;
+let hidden = false;
 
 function setup() {
   new Canvas(400, 300);
@@ -349,13 +401,32 @@ function setup() {
 function update() {
   me.vel.x = 0;
   me.vel.y = 0;
-  if (kb.pressing('left')) me.vel.x = -4;
-  if (kb.pressing('right')) me.vel.x = 4;
-  if (kb.pressing('up')) me.vel.y = -4;
-  if (kb.pressing('down')) me.vel.y = 4;
+  if (kb.pressing('left')) {
+    me.vel.x = -4;
+  }
+  if (kb.pressing('right')) {
+    me.vel.x = 4;
+  }
+  if (kb.pressing('up')) {
+    me.vel.y = -4;
+  }
+  if (kb.pressing('down')) {
+    me.vel.y = 4;
+  }
   me.x = constrain(me.x, 20, 380);
   me.y = constrain(me.y, 20, 280);
-  if (seat === 1) me.color = 'deepskyblue';
+  if (seat === 1) {
+    me.color = 'deepskyblue';
+  }
+  // H hides your square from the other screen, and shows it again.
+  if (kb.presses('h')) {
+    hidden = !hidden;
+    if (hidden) {
+      online.unshare(me);
+    } else {
+      online.share(me);
+    }
+  }
 }
 
 function draw() {
@@ -363,13 +434,24 @@ function draw() {
 }
 
 function drawTop() {
-  if (!game.ready) text('Waiting for a player: use the bar above', 10, 24, 14, '#8393c4');
-  else {
+  if (!game.ready) {
+    text('Waiting for a player: use the bar above', 10, 24, 14, '#8393c4');
+  } else {
     text('You are player ' + (seat + 1) + '.', 10, 24, 14, 'white');
-    text('Arrow keys move your square.', 10, 44, 14, 'white');
+    text('Arrow keys move your square. H hides it.', 10, 44, 14, 'white');
   }
-  let other = online.peers[seat === 0 ? 1 : 0];
-  if (other && me.overlaps(other)) text('Touching!', 10, 68, 16, 'limegreen');
+  // game.code, game.status and game.realtime describe the room.
+  if (game.realtime && online.live) {
+    text('Real-time room ' + game.code + ': ' + game.status, 10, 280, 12, '#8393c4');
+  }
+  let otherSeat = 1;
+  if (seat === 1) {
+    otherSeat = 0;
+  }
+  let other = online.peers[otherSeat];
+  if (other && me.overlaps(other)) {
+    text('Touching!', 10, 68, 16, 'limegreen');
+  }
 }`,
         },
         {
@@ -394,7 +476,9 @@ function setup() {
   new Canvas(400, 300);
   multiplayer('coop', 2, { realtime: true });
   online.onMove((move, who) => {
-    if (online.isHost) keys[who] = move;
+    if (online.isHost) {
+      keys[who] = move;
+    }
   });
 }
 
@@ -403,14 +487,24 @@ function draw() {
 }
 
 function update() {
-  if (!game.ready) return;
+  if (!game.ready) {
+    return;
+  }
   // Everyone: send my keys when they change.
   let dx = 0;
   let dy = 0;
-  if (kb.pressing('left')) dx = -1;
-  if (kb.pressing('right')) dx = 1;
-  if (kb.pressing('up')) dy = -1;
-  if (kb.pressing('down')) dy = 1;
+  if (kb.pressing('left')) {
+    dx = -1;
+  }
+  if (kb.pressing('right')) {
+    dx = 1;
+  }
+  if (kb.pressing('up')) {
+    dy = -1;
+  }
+  if (kb.pressing('down')) {
+    dy = 1;
+  }
   if (dx + ',' + dy !== sentKeys) {
     sentKeys = dx + ',' + dy;
     online.send({ dx: dx, dy: dy });
@@ -420,7 +514,10 @@ function update() {
     if (boxes.length === 0) {
       for (let i = 0; i < players; i++) {
         let box = new Sprite(100 + i * 200, 150, 40, 40);
-        box.color = i === 0 ? 'gold' : 'deepskyblue';
+        box.color = 'deepskyblue';
+        if (i === 0) {
+          box.color = 'gold';
+        }
         boxes.push(box);
         online.share(box);
       }
@@ -436,13 +533,16 @@ function update() {
 }
 
 function drawTop() {
-  if (!game.ready) text('Waiting for a player: use the bar above', 10, 24, 14, '#8393c4');
-  else if (online.isHost) {
+  if (!game.ready) {
+    text('Waiting for a player: use the bar above', 10, 24, 14, '#8393c4');
+  } else if (online.isHost) {
     text('You are the host:', 10, 24, 14, 'gold');
     text('your computer runs the game.', 10, 44, 14, 'gold');
   } else {
     text('The host runs the game.', 10, 24, 14, 'white');
     text('Your keys go to the host.', 10, 44, 14, 'white');
+    // online.sharedBy(0) lists the sprites the host (seat 0) shares.
+    text('The host shares ' + online.sharedBy(0).length + ' sprites.', 10, 64, 14, 'white');
   }
 }`,
         },
@@ -455,7 +555,50 @@ online.host(players) starts a room for 2 to 4 players and online.code becomes th
 
 online.status is one of 'off', 'connecting', 'waiting', 'ready', 'closed' or 'error', and if it is 'error' then online.error says what went wrong in words. online.seat is your place in the room, 0 for the host, and online.seats is how many players the room is for. online.players lists who is in it. online.live is true while you are in a real-time room.
 
-online.unshare(sprite) stops showing one of your sprites on the other computers, and online.unshare() stops all of them. The game object has status and code too, for a sketch that used multiplayer().`,
+online.unshare(sprite) stops showing one of your sprites on the other computers, and online.unshare() stops all of them. The game object has status and code too, for a sketch that used multiplayer().
+
+The example is a bare lobby: H hosts a room, J joins the code in friendCode (put a classmate's code there), L leaves, and the screen prints everything the online object knows.`,
+          code: `let friendCode = 'BHKE'; // a classmate's room code goes here
+
+function setup() {
+  new Canvas(400, 300);
+}
+
+function update() {
+  if (kb.presses('h')) {
+    online.host(2);
+  }
+  if (kb.presses('j')) {
+    online.join(friendCode);
+  }
+  if (kb.presses('l')) {
+    online.leave();
+  }
+}
+
+function draw() {
+  background('#1b1d2a');
+}
+
+function drawTop() {
+  text('H host   J join ' + friendCode + '   L leave', 10, 24, 14, '#8393c4');
+  text('Status: ' + online.status, 10, 54, 16, 'white');
+  if (online.code) {
+    text('Room code: ' + online.code, 10, 80, 16, 'gold');
+    text('You are seat ' + online.seat + ' of ' + online.seats, 10, 104, 14, 'white');
+    text('Real-time room: ' + online.live, 10, 124, 14, 'white');
+  }
+  if (online.codeIcons) {
+    text('As pictures: ' + online.codeIcons.join(', '), 10, 144, 14, 'gold');
+  }
+  for (let i = 0; i < online.players.length; i++) {
+    let p = online.players[i];
+    text('Seat ' + p.seat + ': ' + p.name, 10, 174 + i * 20, 14, 'white');
+  }
+  if (online.status === 'error') {
+    text(online.error, 10, 270, 14, 'tomato');
+  }
+}`,
         },
       ],
     },

@@ -327,16 +327,25 @@ if (score >= 90) {
       },
       {
         title: 'The conditional operator ?',
-        body: `The ? operator is a compact if/else for choosing a VALUE. condition ? valueIfTrue : valueIfFalse.
+        body: `You will meet the ? operator in other people's code. It is a short if/else for choosing a VALUE: condition ? valueIfTrue : valueIfFalse. For example, age >= 18 ? 10 : 6 is 10 when age is 18 or more, and 6 otherwise.
 
-It is not a statement — it is an expression, which means it produces a value you can store in a variable. Use it when both branches are short and the whole thing is one choice. If the branches are longer, or there are more than two, use a plain if/else: the longer form is easier to read.
+In this course we write the same choice as a plain if/else, as in the example: give the variable one value, then change it in the if. It takes a few more lines and is much easier to read, and every branch has room for more steps later. The comments in the example show the ? way of writing each choice, so you can read it when you see it.
 
 The ? operator is also called the ternary operator, because it is the one operator in the language that takes three parts.`,
         code: `const age = 17;
-const price = age >= 18 ? 10 : 6;
+
+// Other code might write: const price = age >= 18 ? 10 : 6;
+let price = 6;
+if (age >= 18) {
+  price = 10;
+}
 console.log(price);   // 6
 
-const message = age >= 18 ? "Welcome" : "Come back later";
+// Other code might write: const message = age >= 18 ? "Welcome" : "Come back later";
+let message = "Come back later";
+if (age >= 18) {
+  message = "Welcome";
+}
 console.log(message);`,
       },
       {
@@ -428,7 +437,9 @@ for (let i = 1; i <= 10; i++) {
 
 // continue — print only the odd numbers
 for (let i = 1; i <= 10; i++) {
-  if (i % 2 === 0) continue;
+  if (i % 2 === 0) {
+    continue;
+  }
   console.log(i);
 }`,
       },
@@ -518,7 +529,9 @@ const result = double(21);
 console.log(result);   // 42
 
 function isEven(n) {
-  if (n % 2 === 0) return true;
+  if (n % 2 === 0) {
+    return true;
+  }
   return false;
 }
 
@@ -529,18 +542,24 @@ console.log(isEven(7));   // false`,
         title: 'Arrow functions',
         body: `An arrow function is a shorter way to write a function. The arrow => replaces the word function, and the parameter list moves in front of it.
 
-Two shorthand rules make arrows shorter still. With one parameter, the parentheses are optional: n => n * 2. And when the body is a single expression, the return is implied — no braces, no return keyword.
+In this course an arrow function always has its body in { }, and a value comes back with return, exactly like a function declaration: (n) => { return n * 2; }.
 
-Braces bring return back: an arrow with a body in { } needs an explicit return, exactly like a function declaration. The shorthand only applies to the one-expression form.
+You will see a shorter form in other people's code: n => n * 2, with no parentheses, no braces and no return. It means the same thing, because a one-expression arrow returns its expression by itself. The comments in the example show it, so you can read it when you meet it; write the braced form yourself.
 
 Arrows are the form you will see in array methods like map and filter, and in callbacks throughout the course.`,
-        code: `const double = (n) => n * 2;
+        code: `// Other code might write: const double = n => n * 2;
+const double = (n) => {
+  return n * 2;
+};
 console.log(double(21));   // 42
 
-const greet = (name) => "Hello, " + name;
+// Other code might write: const greet = name => "Hello, " + name;
+const greet = (name) => {
+  return "Hello, " + name;
+};
 console.log(greet("Ada"));
 
-// With a block body, return is explicit again.
+// A body can hold more than one step.
 const describe = (n) => {
   const doubled = n * 2;
   return doubled + " is double " + n;
@@ -556,10 +575,14 @@ That is what makes callbacks possible: a function that takes a function. The arr
 A function that takes a function is a higher-order function. You will meet them constantly from here on: map, filter, and the event callbacks in moSHion.`,
         code: `const numbers = [1, 2, 3, 4];
 
-const doubled = numbers.map((n) => n * 2);
+const doubled = numbers.map((n) => {
+  return n * 2;
+});
 console.log(doubled);   // [2, 4, 6, 8]
 
-const evens = numbers.filter((n) => n % 2 === 0);
+const evens = numbers.filter((n) => {
+  return n % 2 === 0;
+});
 console.log(evens);     // [2, 4]`,
       },
     ],
@@ -637,10 +660,14 @@ slice takes a part of an array: slice(1, 3) is items at indexes 1 and 2 — the 
 All three take a function as their argument — the arrow functions from the Functions section.`,
         code: `const numbers = [1, 2, 3, 4, 5];
 
-const doubled = numbers.map((n) => n * 2);
+const doubled = numbers.map((n) => {
+  return n * 2;
+});
 console.log(doubled);            // [2, 4, 6, 8, 10]
 
-const evens = numbers.filter((n) => n % 2 === 0);
+const evens = numbers.filter((n) => {
+  return n % 2 === 0;
+});
 console.log(evens);              // [2, 4]
 
 const middle = numbers.slice(1, 4);
