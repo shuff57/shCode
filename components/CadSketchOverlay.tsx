@@ -293,14 +293,22 @@ export default function CadSketchOverlay(p: Props) {
       const outline = pathOf(loops.map(l => l.map(toScreen)));
       const curves = s.geoms.map(g => geomPath(g).map(toScreen)); curvesOnScreen.current = curves;
       const dims: Dim[] = s.geoms.flatMap((g, i) => { const d = dimensionOf(g); return d ? [{ key: `d${i}`, i, at: toScreen(d.at), text: d.text, value: d.value }] : []; });
-      // each angle inside its corner, 44 px out along the line between the two lines, with a 14 px arc across it; a corner too small on
-      // screen for its label (lines under about 45 px) shows none until the view comes closer
+      // each angle inside its corner, out along the line between the two lines (44 px, else 30 or 60 px where that label covers none of
+      // the lengths, radii and angles already placed), with an arc of up to 14 px across it. A corner too small on screen for its label
+      // (lines under about 45 px), or with no place free, shows none until the view comes closer (the labels are 11 px monospace: about
+      // 7 px a character, 18 px high, with their padding)
       const pxmm = Math.min(dist(o, one), dist(o, oneV)); const marks: V2[][] = [];
+      const labelBox = (at: V2, text: string) => { const w = 7 * text.length + 10; return [at[0] - w / 2, at[1] - 9, at[0] + w / 2, at[1] + 9]; };
+      const placed = dims.map(d => labelBox(d.at, d.text));
+      const covers = (b: number[]) => placed.some(c => b[0] < c[2] && c[0] < b[2] && b[1] < c[3] && c[1] < b[3]);
       angleDims(s.geoms).forEach((a, k) => {
         const lens = [a.i, a.j].map(n => { const g = s.geoms[n]; return g.k === 'line' ? dist(g.a, g.b) : 0; });
-        const rho = Math.min(44, 0.6 * Math.min(...lens) * pxmm) / pxmm; if (rho * pxmm < 26) return;
-        const b = [a.ui[0] + a.uj[0], a.ui[1] + a.uj[1]]; const bl = Math.hypot(b[0], b[1]) || 1;
-        dims.push({ key: `a${k}`, i: -1, at: toScreen([a.q[0] + b[0] / bl * rho, a.q[1] + b[1] / bl * rho]), text: `${fmt(a.value)}°`, value: a.value, angle: a });
+        const shortPx = Math.min(...lens) * pxmm; if (0.6 * shortPx < 26) return;
+        const b = [a.ui[0] + a.uj[0], a.ui[1] + a.uj[1]]; const bl = Math.hypot(b[0], b[1]) || 1; const text = `${fmt(a.value)}°`;
+        const spot = [44, 30, 60].map(want => { const rho = Math.min(want, 0.8 * shortPx) / pxmm; const at = toScreen([a.q[0] + b[0] / bl * rho, a.q[1] + b[1] / bl * rho]); return { rho, at, bx: labelBox(at, text) }; })
+          .find(c => !covers(c.bx));
+        if (!spot) return; const { rho, at } = spot; placed.push(spot.bx);
+        dims.push({ key: `a${k}`, i: -1, at, text, value: a.value, angle: a });
         const sg = Math.sign(a.ui[0] * a.uj[1] - a.ui[1] * a.uj[0]) || 1; const th = a.value * Math.PI / 180; const r = Math.min(14, 0.4 * rho * pxmm) / pxmm;
         marks.push(Array.from({ length: 13 }, (_, n) => { const t = sg * th * n / 12; const c = Math.cos(t), si = Math.sin(t);
           return toScreen([a.q[0] + r * (a.ui[0] * c - a.ui[1] * si), a.q[1] + r * (a.ui[0] * si + a.ui[1] * c)]); }));

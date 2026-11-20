@@ -253,8 +253,11 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
   curve comes from the same cut-short evaluation as Delete. Checked: `/tmp/cad-drive/sketch-dims-e2e.py`, 7 of 7.
 - **Angle dimensions** (2026-11-20). Each corner where exactly two lines end shows the angle between them, inside the corner
   with a small arc across it (`angleDims`). A level and an upright line meeting at a right angle show none (every rectangle
-  would have four), nor do two lines running straight on, a corner where an arc or a third curve ends, or a corner too small
-  on screen for its label (its lines under about 45 px; it shows when the view comes closer).
+  would have four), nor do two lines running straight on, or a corner where an arc or a third curve ends.
+  - **Where the label goes:** 44 px out along the line halfway between the two lines, else 30 or 60 px, at the first of these
+    where it covers none of the lengths, radii and angles already placed. A corner too small on screen for its label (its
+    lines under about 45 px), or with no free place, shows no angle until the view comes closer. Lengths and radii are placed
+    as before; only angles give way.
   - **Changing it** (`angleEdits`): a click opens the angle for typing (above 0, below 180), and the later-drawn line turns
     about the corner, keeping its length. Its far end is written to 1e-9 with every `[x, y]` of the block that is that end,
     so a side sharing that end follows (a closed polyline stays closed). When the later line cannot turn, the earlier one does.
@@ -263,9 +266,11 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
     upright. Otherwise the angle is shown but cannot be clicked. `movePointEdits` takes how to write the new point for this.
   - Checked: unit tests (a triangle's three angles, no angle at a rectangle, straight on, three lines, an arc; turning the
     later line with the side that follows, the earlier one when the later is written with a variable, neither, a circle
-    centred or a rectangle's corner on the end, 180 and 0 refused). In the browser, `/tmp/cad-drive/sketch-angle-e2e.py`, 10 of 10:
-    - a triangle's 63.435°, 45° and 71.565° and a small triangle's two angles shown, a rectangle's none, each with its arc;
-    - the small triangle's corner whose two far ends are written with variables shown but not clickable;
+    centred or a rectangle's corner on the end, 180 and 0 refused). In the browser, `/tmp/cad-drive/sketch-angle-e2e.py`, 11 of 11:
+    - in a second sketch, a corner whose two far ends are written with variables shown but not clickable, the other one
+      clickable;
+    - a triangle's 63.435°, 45° and 71.565° shown, each with its arc; a rectangle's none; a thin triangle's none (its angle
+      labels would cover its lengths), its lengths still shown;
     - 45° typed as 60: the right side turns to `[25.857864376, 29.494897428]` and the closing side follows; the other two
       corners then show 57.081° and 62.919°; 200 changes nothing; Escape leaves the code;
     - the sketch extrudes at 5 × (150√6 + 100 + 70) more than the part, within 1e-3.
@@ -369,6 +374,23 @@ area. A revolve's two rings have areas that differ in the 16th digit, and SolidC
 so the top ring was compared with the bottom one and a right part was called "not quite the one you made". The faces are now
 matched one to one within the same tolerances, in any order (`matchFaces`). This can only have reported a right part as wrong,
 never a wrong one as right.
+
+## Rules (constraints) in Live sketch: not added (2026-11-20)
+
+The owner left the choice to me ("you decide", 2026-11-20). Between (a) the sketch tools writing plain outlines (`rect`,
+`polygon`) wherever a sketch is one closed outline, so reSHape's rules (`.across()`, `.up()`, `.length()`, equal, parallel,
+perpendicular, pin, angle) can be added to it, and (b) no rules in Live sketch, I took (b):
+
+- reSHape's rules attach only to plain outlines, and a plain outline does not mix with the drawing words (`sk.line`, `sk.arc`,
+  `sk.rectangle`, `sk.lines`) in one sketch. Round, Chamfer and Trim work by writing a shape out as drawing words, so under
+  (a) every tool would need a second form of its code, and a sketch would switch form as soon as one of them was used.
+- A solved outline's shape is not the numbers written in its points: the rules move it ("The rules of this sketch have to move
+  its shape…"). The dimensions on the sketch (lengths, radii, angles) change the numbers in the code directly, which is what
+  a student reads; under (a) a typed size and a rule could pull the same point two ways.
+- What rules give, setting a size or an angle exactly, the dimensions already give by typing.
+
+Rules stay available by hand in the code on a plain outline, as before; nothing in Live sketch writes or removes them. This is
+easy to revisit: nothing was built either way.
 
 ## Checked
 
