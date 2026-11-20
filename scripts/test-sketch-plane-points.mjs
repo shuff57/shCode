@@ -1,7 +1,7 @@
 // Points on a sketch's plane (lib/sketch-plane-points.ts): reSHape's plane frames, the projective map from the screen to a plane,
 // which sketch the editor cursor is in, and what a picked point writes into the code. The pointer in the real view is a browser check.
 import assert from 'node:assert/strict';
-import { angleDims, angleEdits, extendGeom, extendEdits, tangentAt, tangentArc, curveCode, mirrorGeom, offsetGeoms, offsetChain, offsetDistance, crossings, trimGeom, trimEdits, chamferEdits, chamferGeom, cornerAt, cutCorners, cutPreview, largestChamfer, largestRound, roundEdits, roundGeom, dimensionOf, resizeEdits, distToSegment, slotGeoms, typedNumbers, typedPoint, typedWords, sketchGeoms, curveOwners, distToPolyline, sketchStatementLines, arcCode, faceSketchArgs, finishDirections, freshName, movePointEdits, planeOutlines, sweepOf, activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
+import { angleDims, angleEdits, extendGeom, extendEdits, tangentAt, tangentArc, curveCode, mirrorGeom, offsetGeoms, offsetChain, offsetDistance, alignPoint, sketchCrossings, polygonPoints, patternGeoms, patternSource, moveEdits, revolveSketch, crossings, trimGeom, trimEdits, chamferEdits, chamferGeom, cornerAt, cutCorners, cutPreview, largestChamfer, largestRound, roundEdits, roundGeom, dimensionOf, resizeEdits, distToSegment, slotGeoms, typedNumbers, typedPoint, typedWords, sketchGeoms, curveOwners, distToPolyline, sketchStatementLines, arcCode, faceSketchArgs, finishDirections, freshName, movePointEdits, planeOutlines, sweepOf, activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
 
 // ---- planes, as reSHape resolves them: a named plane's origin is normal x offset ------------------------------------------
 const top10 = planeFrameOf({ plane: 'xy', offset: 10 });
@@ -448,6 +448,96 @@ console.log('PASS mirror: a curve\'s mirror image about a line');
   assert.equal(offsetDistance(rect[0], [5, -3]), 3); assert.equal(offsetDistance(C[0], [1, 0]), 4);
 }
 console.log('PASS offset: a curve or its chain to one side, the corners sharp');
+{ // Snaps and guides
+  const G = [{ k: 'line', a: [0, 0], b: [28, 0] }, { k: 'line', a: [10, -5], b: [10, 5] }, { k: 'line', a: [20, 0], b: [20, 10] }, { k: 'circle', c: [30, 0], r: 5 }];
+  assert.deepEqual(sketchCrossings(G), [[10, 0], [25, 0]], 'where two curves cross (an end on another curve is an end, snapped already)');
+  assert.deepEqual(sketchCrossings([{ k: 'line', a: [0, 0], b: [10, 10] }, { k: 'line', a: [0, 10], b: [10, 0] }, { k: 'line', a: [0, 5], b: [10, 5] }]), [[5, 5]], 'three through one point: once');
+  const A = [[10, 5], [30, 20]];
+  assert.deepEqual(alignPoint([17.3, 5.4], A, 1, 5), { q: [15, 5], level: [10, 5], upright: null }, 'level with a point: its y, the x on the grid');
+  assert.deepEqual(alignPoint([29.6, 12.1], A, 1, 5), { q: [30, 10], level: null, upright: [30, 20] }, 'upright from a point: its x');
+  assert.deepEqual(alignPoint([30.4, 5.2], A, 1, 5), { q: [30, 5], level: [10, 5], upright: [30, 20] }, 'both at once: where the two guides cross');
+  assert.deepEqual(alignPoint([22, 13], A, 1, 5), { q: [20, 15], level: null, upright: null }, 'lined up with none: on the grid');
+  assert.deepEqual(alignPoint([17, 5.3], [[10, 5], [12, 5.2], [16, 5]], 1, 5).level, [12, 5.2], 'the nearest across');
+  assert.deepEqual(alignPoint([17, 5.3], [[10, 5], [16, 5]], 1, 5).level, [16, 5], 'on a tie, the nearer along');
+  assert.deepEqual(alignPoint([45, 10.1], [[37.27, 9.546]], 1.4, 5), { q: [45, 10], level: null, upright: null }, 'nearer a grid line than a point across: the grid wins, no guide');
+  assert.deepEqual(alignPoint([45, 9.6], [[37.27, 9.546]], 1.4, 5), { q: [45, 9.546], level: [37.27, 9.546], upright: null }, 'nearer the point: level with it');
+}
+{ // a point lined up with an arc's end has more than three decimals: the tools write it to 1e-9, so an arc's centre and ends agree
+  assert.equal(toolCode.line('sk', [45, 9.546387625], [55, 30]), 'sk.line([45, 9.546387625], [55, 30]);');
+  assert.match(toolCode.slot('sk', [45, 9.546387625], [55, 30], 3), /sk\.arc\(\[45, 9\.546387625\], /, 'a slot\'s cap centred on it');
+  assert.equal(toolCode.circle('sk', [1 / 3, 2], 4), 'sk.circle([0.333333333, 2], { r: 4 });');
+  assert.equal(toolCode.line('sk', [10, 5], [30, 5]), 'sk.line([10, 5], [30, 5]);', 'a point on the grid is written as before');
+}
+console.log('PASS snaps and guides: crossings, and points lined up with the sketch\'s points');
+{ // Polygon and Centre rectangle
+  assert.deepEqual(polygonPoints([0, 0], [10, 0], 4), [[10, 0], [0, 10], [-10, 0], [0, -10]], 'a square on its corner');
+  const hex = polygonPoints([20, 20], [30, 20], 6);
+  assert.deepEqual(hex, [[30, 20], [25, 28.660254038], [15, 28.660254038], [10, 20], [15, 11.339745962], [25, 11.339745962]], 'a hexagon, to 1e-9');
+  assert.equal(toolCode.polygon('sk', [0, 0], [10, 0], 4), 'sk.lines([[10, 0], [0, 10], [-10, 0], [0, -10], [10, 0]]);', 'written closed');
+  assert.equal(toolCode.centreRectangle('sk', [20, 15], [30, 20]), 'sk.rectangle([10, 10], [30, 20]);', 'a rectangle about its centre');
+  assert.equal(toolCode.centreRectangle('sk', [20, 15], [10, 10]), 'sk.rectangle([10, 10], [30, 20]);', 'from the other corner, the same');
+  assert.deepEqual(typedPoint('crect', [[20, 15]], [25, 12], '10, 6'), [25, 12], 'typed width and height about the centre, towards the pointer');
+  assert.deepEqual(typedPoint('polygon', [[0, 0]], [0, 3], '8'), [0, 8], 'a typed radius to a corner, towards the pointer');
+  assert.equal(typedWords('polygon', [[0, 0]], '8'), 'radius 8'); assert.equal(typedWords('crect', [[0, 0]], '10, 6'), 'width 10, height 6');
+}
+console.log('PASS polygon and centre rectangle');
+{ // Pattern: copies in a row or round a centre
+  const C = [{ k: 'circle', c: [10, 5], r: 2 }];
+  assert.deepEqual(patternGeoms(C, 0, { row: [12, 0] }, 4), { copies: [{ k: 'circle', c: [22, 5], r: 2 }, { k: 'circle', c: [34, 5], r: 2 }, { k: 'circle', c: [46, 5], r: 2 }], kind: 'circle' }, 'a row of holes');
+  const ring = patternGeoms([{ k: 'circle', c: [30, 10], r: 1.5 }], 0, { centre: [30, 20] }, 4).copies.map(g => g.c);
+  assert.deepEqual(ring, [[40, 20], [30, 30], [20, 20]], 'round a centre, a quarter turn each');
+  assert.deepEqual(patternGeoms([{ k: 'circle', c: [30, 10], r: 1.5 }], 0, { centre: [30, 20] }, 6).copies[0].c, [38.660254038, 15], 'a sixth of a turn, to 1e-9');
+  const sq = [{ k: 'line', a: [0, 0], b: [5, 0] }, { k: 'line', a: [5, 0], b: [5, 5] }, { k: 'line', a: [5, 5], b: [0, 5] }, { k: 'line', a: [0, 5], b: [0, 0] }];
+  assert.deepEqual(patternSource(sq, 2).ref, [5, 5], 'an outline stands for itself by the first point of its chain from the side clicked');
+  const row = patternGeoms(sq, 0, { row: [5, 0] }, 2);
+  assert.deepEqual(row, { copies: [{ k: 'line', a: [5, 0], b: [10, 0] }, { k: 'line', a: [10, 0], b: [10, 5] }, { k: 'line', a: [10, 5], b: [5, 5] }], kind: 'outline' },
+    'squares side by side: the shared side is drawn already, so it is left out');
+  const arc = [{ k: 'arc', c: [0, 0], r: 3, a: [3, 0], b: [0, 3], sense: 'ccw' }];
+  assert.deepEqual(patternSource(arc, 0).ref, [0, 0], 'one arc stands for itself by its centre');
+  assert.deepEqual(patternGeoms(arc, 0, { centre: [0, 0] }, 4).copies[0], { k: 'arc', c: [0, 0], r: 3, a: [0, 3], b: [-3, 0], sense: 'ccw' }, 'an arc turned round its own centre');
+  assert.equal(patternGeoms(C, 0, { row: [0, 0] }, 3), 'Click where the first copy goes, away from where it is now.');
+  assert.equal(patternGeoms(C, 0, { row: [5, 0] }, 1), 'Give a count from 2 to 50.'); assert.equal(patternGeoms(C, 0, { row: [5, 0] }, 2.5), 'Give a count from 2 to 50.');
+  assert.equal(patternGeoms([{ k: 'circle', c: [0, 0], r: 2 }], 0, { centre: [0, 0] }, 3), 'Every copy is drawn already.', 'a circle round its own centre');
+}
+console.log('PASS pattern: copies in a row or round a centre');
+{ // Select, move and copy
+  const apply = (doc, es) => { let d = doc; for (const e of [...es].sort((a, b) => b.from - a.from)) d = d.slice(0, e.from) + e.insert + d.slice(e.to); return d; };
+  const doc = "const w = 3;\nconst sk = sketch('top');\nsk.rectangle([0, 0], [10, 5]);\nsk.circle([20, 5], { r: 2 });\nsk.lines([[30, 0], [40, 0], [40, 5]]);\nsk.arc([0, 20], [5, 20], [0, 25], 'ccw');\nsk.circle([50, 5], { r: w });\n";
+  const L = sketchStatementLines(doc, 'sk');
+  const G = [{ k: 'line', a: [0, 0], b: [10, 0] }, { k: 'line', a: [10, 0], b: [10, 5] }, { k: 'line', a: [10, 5], b: [0, 5] }, { k: 'line', a: [0, 5], b: [0, 0] },
+    { k: 'circle', c: [20, 5], r: 2 }, { k: 'line', a: [30, 0], b: [40, 0] }, { k: 'line', a: [40, 0], b: [40, 5] }, { k: 'arc', c: [0, 20], r: 5, a: [5, 20], b: [0, 25], sense: 'ccw' }, { k: 'circle', c: [50, 5], r: 3 }];
+  const O = [0, 0, 0, 0, 1, 2, 2, 3, 4];
+  let r = moveEdits(doc, 'sk', L, O, G, [0, 1, 2, 3, 4], [5, 10], false);
+  assert.match(apply(doc, r.edits), /sk\.rectangle\(\[5, 10\], \[15, 15\]\);\nsk\.circle\(\[25, 15\], \{ r: 2 \}\);\n/, 'a whole rectangle stays a rectangle, a circle keeps its radius');
+  r = moveEdits(doc, 'sk', L, O, G, [7], [0.5, 1 / 3], false);
+  assert.match(apply(doc, r.edits), /sk\.arc\(\[0\.5, 20\.333333333\], \[5\.5, 20\.333333333\], \[0\.5, 25\.333333333\], 'ccw'\);/, 'an arc: all three points, to 1e-9');
+  r = moveEdits(doc, 'sk', L, O, G, [6], [5, 0], false);
+  assert.match(apply(doc, r.edits), /sk\.line\(\[30, 0\], \[40, 0\]\);\nsk\.line\(\[45, 0\], \[45, 5\]\);/, 'part of a polyline: written out as its lines first');
+  r = moveEdits(doc, 'sk', L, O, G, [0, 1, 2, 3, 4], [5, 10], true);
+  assert.deepEqual([r.edits, r.added], [[], ['sk.rectangle([5, 10], [15, 15]);', 'sk.circle([25, 15], { r: 2 });']], 'a copy: the whole lines shifted, written after');
+  r = moveEdits(doc, 'sk', L, O, G, [6], [5, 0], true); assert.deepEqual(r.added, ['sk.line([45, 0], [45, 5]);'], 'a copy of part: the curve alone');
+  assert.equal(moveEdits(doc, 'sk', L, O, G, [8], [5, 0], false), 'That curve is written with a variable or a sum; change it in the code.');
+  assert.equal(moveEdits(doc, 'sk', L, O, G, [], [5, 0], false), 'Choose a curve first.');
+  assert.equal(moveEdits(doc, 'sk', L, O, G, [4], [0, 0], false), 'Click where they go, away from where they are.');
+}
+console.log('PASS select, move and copy');
+{ // Revolve: the sketch turned about one of its own axes, as reSHape's spin
+  const rect = (x0, y0, x1, y1) => [{ k: 'line', a: [x0, y0], b: [x1, y0] }, { k: 'line', a: [x1, y0], b: [x1, y1] }, { k: 'line', a: [x1, y1], b: [x0, y1] }, { k: 'line', a: [x0, y1], b: [x0, y0] }];
+  const front = planeFrameOf({ plane: 'xz' }), top = planeFrameOf({ plane: 'xy' });
+  assert.deepEqual(revolveSketch(rect(0, 0, 10, 20), front, 'y', 360, 'sk2', 'part2'), ["const sk2 = sketch('top');", 'sk2.polygon([[0, 0], [10, 0], [10, 20], [0, 20]]);', 'const part2 = spin(sk2, 360);'],
+    'front, about its y axis (Z): a cylinder, the profile as spin reads it from the top plane');
+  assert.deepEqual(revolveSketch(rect(-10, 0, 0, 20), front, 'y', 360, 's', 'p')[1], 's.polygon([[10, 0], [0, 0], [0, 20], [10, 20]]);', 'on the other side of the axis, a whole turn: the same');
+  assert.equal(revolveSketch(rect(-10, 0, 0, 20), front, 'y', 90, 's', 'p'), 'For part of a turn, draw the profile on the positive side of the axis.');
+  assert.equal(revolveSketch(rect(-5, 0, 5, 20), front, 'y', 360, 's', 'p'), 'The profile crosses the axis it turns about.');
+  assert.deepEqual(revolveSketch(rect(0, 2, 10, 5), top, 'x', 90, 's', 'p'), ["const s = sketch('side');", 's.polygon([[2, 0], [2, 10], [5, 10], [5, 0]]);', 'const p = spin(s, 90);'], 'top, about its x axis (X), part way: spin from the side plane');
+  assert.equal(revolveSketch(rect(0, 2, 10, 5), front, 'x', 90, 's', 'p'), 'From this plane only a whole turn can be written: give 360.');
+  assert.deepEqual(revolveSketch(rect(0, 2, 10, 5), front, 'x', 360, 's', 'p')[1], 's.polygon([[2, 0], [2, 10], [5, 10], [5, 0]]);', 'front, about X, a whole turn: laid out by distance from the axis');
+  assert.equal(revolveSketch(rect(0, 0, 10, 20), planeFrameOf({ plane: 'xz', offset: 5 }), 'y', 360, 's', 'p'), 'It turns only about X, Y or Z through the origin: draw it on a plane through the origin.');
+  assert.deepEqual(revolveSketch([{ k: 'circle', c: [20, 10], r: 5 }], front, 'y', 360, 's', 'p')[1], 's.circle(10, { at: [20, 10] });', 'a circle: a ring');
+  assert.equal(revolveSketch(rect(0, 0, 10, 20).slice(0, 3), front, 'y', 360, 's', 'p'), 'Revolve takes one closed outline of straight lines, or one circle.');
+  assert.equal(revolveSketch(rect(0, 0, 10, 20), front, 'y', 0, 's', 'p'), 'Give an angle from 1 to 360 degrees.');
+}
+console.log('PASS revolve: a sketch turned about its own axis, as spin');
 { // Chamfer: a corner of two lines cut by a straight line, the same distance along each
   const apply = (doc, es) => { let d = doc; for (const e of [...es].sort((a, b) => b.from - a.from)) d = d.slice(0, e.from) + e.insert + d.slice(e.to); return d; };
   const doc = "const sk = sketch('top');\nsk.line([0, 0], [20, 0]);\nsk.line([20, 0], [20, 10]);\n";

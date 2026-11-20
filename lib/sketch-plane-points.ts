@@ -168,14 +168,26 @@ export function sketchBlockEnd(doc: string, name: string): number | null {
   return starts[last] + lines[last].length;
 }
 /** The code each sketch tool writes, in reSHape's friendly sketch words. */
+/** A regular polygon's corners: n of them about centre c, the first at q, the rest turned on counter-clockwise, to 1e-9. */
+export function polygonPoints(c: V2, q: V2, n: number): V2[] {
+  const d = [q[0] - c[0], q[1] - c[1]]; const out: V2[] = [q];
+  for (let k = 1; k < n; k++) { const t = 2 * Math.PI * k / n; out.push([Math.round((c[0] + d[0] * Math.cos(t) - d[1] * Math.sin(t)) * 1e9) / 1e9 + 0, Math.round((c[1] + d[0] * Math.sin(t) + d[1] * Math.cos(t)) * 1e9) / 1e9 + 0]); }
+  return out;
+}
+/** The code each drawing tool writes. Points are written to 1e-9: a point snapped to an arc's end, or lined up with one, has more than three
+ * decimals, and an arc whose centre and ends are rounded differently is refused by the build (see "Points on an arc"). */
 export const toolCode = {
-  line: (s: string, a: V2, b: V2) => `${s}.line(${pointCode(a)}, ${pointCode(b)});`,
-  rectangle: (s: string, a: V2, b: V2) => `${s}.rectangle(${pointCode([Math.min(a[0], b[0]), Math.min(a[1], b[1])])}, ${pointCode([Math.max(a[0], b[0]), Math.max(a[1], b[1])])});`,
-  circle: (s: string, c: V2, r: number) => `${s}.circle(${pointCode(c)}, { r: ${fmt(r)} });`,
+  line: (s: string, a: V2, b: V2) => `${s}.line(${pointExact(a)}, ${pointExact(b)});`,
+  rectangle: (s: string, a: V2, b: V2) => `${s}.rectangle(${pointExact([Math.min(a[0], b[0]), Math.min(a[1], b[1])])}, ${pointExact([Math.max(a[0], b[0]), Math.max(a[1], b[1])])});`,
+  circle: (s: string, c: V2, r: number) => `${s}.circle(${pointExact(c)}, { r: ${fmt(r)} });`,
   // a slot in the drawing words (reSHape's own slot() cannot share a sketch with them): its two sides and its two caps, counter-clockwise
   slot: (s: string, a: V2, b: V2, r: number) => slotGeoms(a, b, r).map(g => g.k === 'line' ? `${s}.line(${pointExact(g.a)}, ${pointExact(g.b)});`
-    : g.k === 'arc' ? `${s}.arc(${pointCode(g.c)}, ${pointExact(g.a)}, ${pointExact(g.b)}, '${g.sense}');` : '').join('\n'),
-  lines: (s: string, pts: V2[], closed: boolean) => `${s}.lines([${[...pts, ...(closed ? [pts[0]] : [])].map(pointCode).join(', ')}]);`,
+    : g.k === 'arc' ? `${s}.arc(${pointExact(g.c)}, ${pointExact(g.a)}, ${pointExact(g.b)}, '${g.sense}');` : '').join('\n'),
+  /** a regular polygon of n sides about centre c, one corner at q, as one closed run of lines */
+  polygon: (s: string, c: V2, q: V2, n: number) => toolCode.lines(s, polygonPoints(c, q, n), true),
+  /** a rectangle about its centre c, one corner at q */
+  centreRectangle: (s: string, c: V2, q: V2) => toolCode.rectangle(s, [Math.round((2 * c[0] - q[0]) * 1e9) / 1e9, Math.round((2 * c[1] - q[1]) * 1e9) / 1e9], q),
+  lines: (s: string, pts: V2[], closed: boolean) => `${s}.lines([${[...pts, ...(closed ? [pts[0]] : [])].map(pointExact).join(', ')}]);`,
 };
 /**
  * The sketch whose block the cursor's line is in (its declaration line, the name.something(…) lines right after it, and blank
@@ -240,16 +252,16 @@ export function arcCode(s: string, c: V2, a: V2, b: V2): string | null {
   if (r < 1e-9 || d < 1e-9) return null;
   const end: V2 = [c[0] + (b[0] - c[0]) * r / d, c[1] + (b[1] - c[1]) * r / d];
   if (Math.hypot(end[0] - a[0], end[1] - a[1]) < 1e-9) return null;
-  return `${s}.arc(${pointCode(c)}, ${pointCode(a)}, ${pointExact(end)}, 'ccw');`;
+  return `${s}.arc(${pointExact(c)}, ${pointExact(a)}, ${pointExact(end)}, 'ccw');`;
 }
 /**
  * Moving a drawn point: the [x, y] literals in sketch `name`'s block whose value is `from` are rewritten as `to` (every one, so a
  * corner two lines share, or a closed outline's first and last point, move together). Only plain number literals are found; a
  * point written with a variable or a sum is not, and nothing is changed for it. A plain `sk.rectangle(a, b)` also moves by the
  * two corners its code does not write: [b.x, a.y] and [a.x, b.y] become the new corner, its sides staying level and upright.
- * The changes to make, in the document's offsets; `code` writes the new point (to 0.001 unless told otherwise).
+ * The changes to make, in the document's offsets; `code` writes the new point (to 1e-9 unless told otherwise).
  */
-export function movePointEdits(doc: string, name: string, from: V2, to: V2, code: (q: V2) => string = pointCode): { from: number; to: number; insert: string }[] {
+export function movePointEdits(doc: string, name: string, from: V2, to: V2, code: (q: V2) => string = pointExact): { from: number; to: number; insert: string }[] {
   const end = sketchBlockEnd(doc, name); if (end === null) return [];
   const esc = name.replace(/\$/g, '\\$');
   const decl = new RegExp(`^\\s*(?:const|let|var)\\s+${esc}\\s*=\\s*sketch\\s*\\(`, 'm').exec(doc); if (!decl) return [];
@@ -309,15 +321,15 @@ export function typedPoint(tool: string, pts: V2[], pointer: V2, typed: string):
   const r3 = (q: number[]): V2 => [Math.round(q[0] * 1000) / 1000, Math.round(q[1] * 1000) / 1000];
   const last = pts[pts.length - 1];
   const towards = (from: V2): V2 => { const d = [pointer[0] - from[0], pointer[1] - from[1]]; const l = Math.hypot(d[0], d[1]); return l < 1e-9 ? [1, 0] : [d[0] / l, d[1] / l]; };
-  if (tool === 'line' || tool === 'polyline' || tool === 'circle') {
+  if (tool === 'line' || tool === 'polyline' || tool === 'circle' || tool === 'polygon') {
     if (ns.length !== 1 || !(ns[0] > 0)) return null;
-    const from = tool === 'circle' ? pts[0] : last; const u = towards(from);
+    const from = tool === 'circle' || tool === 'polygon' ? pts[0] : last; const u = towards(from);
     return r9([from[0] + u[0] * ns[0], from[1] + u[1] * ns[0]]);
   }
-  if (tool === 'rectangle') {
+  if (tool === 'rectangle' || tool === 'crect') {
     const [w, h] = ns.length === 2 ? ns : [ns[0], ns[0]]; if (!(w > 0) || !(h > 0)) return null;
-    const a = pts[0]; const sx = pointer[0] < a[0] ? -1 : 1, sy = pointer[1] < a[1] ? -1 : 1;
-    return r9([a[0] + sx * w, a[1] + sy * h]);
+    const a = pts[0]; const sx = pointer[0] < a[0] ? -1 : 1, sy = pointer[1] < a[1] ? -1 : 1; const k = tool === 'crect' ? 0.5 : 1;
+    return r9([a[0] + sx * w * k, a[1] + sy * h * k]);
   }
   if (tool === 'slot' && pts.length === 2) {
     if (ns.length !== 1 || !(ns[0] > 0)) return null;
@@ -344,8 +356,8 @@ export function slotGeoms(a: V2, b: V2, r: number): SketchGeom[] {
 /** What the typed size means for the tool, for the readout: 'length 25', 'width 30, height 20', 'radius 5', 'angle 90°'. */
 export function typedWords(tool: string, pts: V2[], typed: string): string {
   const ns = typedNumbers(typed); const t = typed.trim();
-  if (tool === 'rectangle') return ns && ns.length === 2 ? `width ${fmt(ns[0])}, height ${fmt(ns[1])}` : ns ? `${fmt(ns[0])} square` : t;
-  if (tool === 'circle' || (tool === 'slot' && pts.length === 2)) return `radius ${t}`;
+  if (tool === 'rectangle' || tool === 'crect') return ns && ns.length === 2 ? `width ${fmt(ns[0])}, height ${fmt(ns[1])}` : ns ? `${fmt(ns[0])} square` : t;
+  if (tool === 'circle' || tool === 'polygon' || (tool === 'slot' && pts.length === 2)) return `radius ${t}`;
   if (tool === 'arc' && pts.length === 2) return `angle ${t}°`;
   return `length ${t}`;
 }
@@ -908,6 +920,155 @@ export function offsetGeoms(geoms: SketchGeom[], i: number, p: V2, d: number): {
     if (crossings(out[x], out[y]).some(X => !shared.some(s2 => len2(sub2(s2, X)) < 1e-7))) return tooFar;
   }
   return { pieces: out, kind: n > 1 ? (ch.closed ? 'outline' : 'curves') : kindWord(g) };
+}
+
+// ---- Snaps and guides: where two curves cross, and a point lined up with the sketch's points ------------------------------------
+
+/** Where the sketch's curves cross or touch, each once, leaving out the curves' own ends (those are snapped to already). */
+export function sketchCrossings(geoms: SketchGeom[]): V2[] {
+  const ends = geoms.flatMap(g => g.k === 'line' || g.k === 'arc' ? [g.a, g.b] : []); const out: V2[] = [];
+  for (let i = 0; i < geoms.length; i++) for (let j = i + 1; j < geoms.length; j++) for (const X of crossings(geoms[i], geoms[j])) {
+    const q = r9(X); if (!ends.some(e => len2(sub2(e, q)) < 1e-7) && !out.some(o => len2(sub2(o, q)) < 1e-7)) out.push(q);
+  }
+  return out;
+}
+/**
+ * A free point lined up with the sketch's points: its y becomes the y of the point nearest across within tol (level with it), its x the x of
+ * the one nearest up and down within tol (upright from it), each only when the pointer is no nearer the grid's line than that point; a
+ * coordinate lined up with none goes on the grid's step.
+ */
+export function alignPoint(free: V2, anchors: V2[], tol: number, step: number): { q: V2; level: V2 | null; upright: V2 | null } {
+  // the nearest across (on a tie, the nearer along, so the guide is short)
+  const nearest = (k: 0 | 1) => {
+    let best: V2 | null = null;
+    for (const a of anchors) {
+      const off = Math.abs(free[k] - a[k]); if (!(off < tol)) continue;
+      if (!best) { best = a; continue; }
+      const bo = Math.abs(free[k] - best[k]);
+      if (off < bo || (off === bo && Math.abs(free[1 - k] - a[1 - k]) < Math.abs(free[1 - k] - best[1 - k]))) best = a;
+    }
+    return best;
+  };
+  const g = (x: number) => Math.round(x / step) * step;
+  // a guide only where the pointer is no nearer the grid's line than the guide: a click on a grid point stays there
+  const keep = (a: V2 | null, k: 0 | 1) => a && Math.abs(free[k] - a[k]) <= Math.abs(free[k] - g(free[k])) ? a : null;
+  const level = keep(nearest(1), 1), upright = keep(nearest(0), 0);
+  return { q: [upright ? upright[0] : g(free[0]), level ? level[1] : g(free[1])], level, upright };
+}
+
+// ---- Pattern: copies of a curve, or of the chain joined to it, in a row or round a centre --------------------------------------
+
+/** The curves a pattern copies when curve i is clicked (a circle; else the chain joined to it, see offsetChain), and the point that stands for them. */
+export function patternSource(geoms: SketchGeom[], i: number): { curves: SketchGeom[]; ref: V2; kind: string } | null {
+  const g = geoms[i]; if (!g) return null;
+  if (g.k === 'circle') return { curves: [g], ref: g.c, kind: 'circle' };
+  const ch = offsetChain(geoms, i); if (!ch) return null;
+  const n = ch.pieces.length; const one = n === 1 && g.k === 'arc';
+  return { curves: ch.pieces, ref: one ? g.c : ch.pieces[0].a, kind: n > 1 ? (ch.closed ? 'outline' : 'curves') : kindWord(g) };
+}
+/**
+ * Copies of curve i's pattern source (patternSource), `count` in all with it: in a row, each the step `row` on from the last; or round a centre,
+ * each turned 360 / count degrees on (counter-clockwise). Points are put on a curve's end within 1e-7, else written to 1e-9; a copy that is drawn
+ * already is left out. A sentence when the count is not 2 to 50, the row's step is nothing, or every copy is drawn already.
+ */
+export function patternGeoms(geoms: SketchGeom[], i: number, how: { row: V2 } | { centre: V2 }, count: number): { copies: SketchGeom[]; kind: string } | string {
+  const src = patternSource(geoms, i); if (!src) return 'Only a line, an arc or a circle can be patterned.';
+  if (!(Number.isInteger(count) && count >= 2 && count <= 50)) return 'Give a count from 2 to 50.';
+  if ('row' in how && len2(how.row) < 1e-9) return 'Click where the first copy goes, away from where it is now.';
+  const ends = geoms.flatMap(h => h.k === 'line' || h.k === 'arc' ? [h.a, h.b] : []);
+  const copies: SketchGeom[] = [];
+  for (let k = 1; k < count; k++) {
+    const t = 'centre' in how ? 2 * Math.PI * k / count : 0; const c = Math.cos(t), sn = Math.sin(t);
+    const move = (p: V2): V2 => 'row' in how ? [p[0] + how.row[0] * k, p[1] + how.row[1] * k]
+      : [how.centre[0] + (p[0] - how.centre[0]) * c - (p[1] - how.centre[1]) * sn, how.centre[1] + (p[0] - how.centre[0]) * sn + (p[1] - how.centre[1]) * c];
+    const pt = (p: V2) => nearEnd(ends, move(p));
+    for (const g of src.curves) {
+      const cp: SketchGeom = g.k === 'line' ? { k: 'line', a: pt(g.a), b: pt(g.b) } : g.k === 'circle' ? { k: 'circle', c: r9(move(g.c)), r: g.r }
+        : { k: 'arc', c: r9(move((g as ArcGeom).c)), r: (g as ArcGeom).r, a: pt((g as ArcGeom).a), b: pt((g as ArcGeom).b), sense: (g as ArcGeom).sense };
+      if (!geoms.some(h => sameCurve(h, cp)) && !copies.some(h => sameCurve(h, cp))) copies.push(cp);
+    }
+  }
+  return copies.length ? { copies, kind: src.kind } : 'Every copy is drawn already.';
+}
+
+// ---- Select, move and copy: chosen curves moved or copied by a step ------------------------------------------------------------
+
+/**
+ * The code edits that move (or copy) the chosen curves of sketch `name` by d. A drawing line whose curves are all chosen keeps its form, its
+ * points shifted (a rectangle stays a rectangle; a circle's radius stays); one only partly chosen is written out as its curves first
+ * (rewriteCurves). A copy is written after the sketch's block (`added`), the whole line shifted or the chosen curves alone. Points are written
+ * to 1e-9. A sentence when a line to change is written with a variable or a sum, or nothing is chosen, or d is nothing.
+ */
+export function moveEdits(doc: string, name: string, lines: { from: number; to: number; text: string }[], owner: number[], geoms: SketchGeom[],
+  chosen: number[], d: V2, copy: boolean): { edits: { from: number; to: number; insert: string }[]; added: string[] } | string {
+  if (!chosen.length) return 'Choose a curve first.';
+  if (len2(d) < 1e-9) return 'Click where they go, away from where they are.';
+  const esc = name.replace(/\$/g, '\\$');
+  const plain = [String.raw`\.line\(\s*${PT}\s*,\s*${PT}\s*\)`, String.raw`\.rectangle\(\s*${PT}\s*,\s*${PT}\s*\)`, String.raw`\.(?:lines|polygon)\(\s*\[\s*${PT}(?:\s*,\s*${PT})*\s*\]\s*\)`,
+    String.raw`\.arc\(\s*${PT}\s*,\s*${PT}\s*,\s*${PT}\s*,\s*(['"])(?:ccw|cw)\7\s*\)`, String.raw`\.circle\(\s*${PT}\s*,\s*\{\s*r\s*:\s*${NUM}\s*\}\s*\)`,
+    String.raw`\.circle\(\s*${NUM}\s*,\s*\{\s*at\s*:\s*${PT}\s*\}\s*\)`].map(x => new RegExp(String.raw`^\s*${esc}` + x + String.raw`;?\s*$`));
+  const shift = (text: string) => text.replace(new RegExp(PT, 'g'), (_m, x, y) => pointExact([Number(x) + d[0], Number(y) + d[1]]));
+  const ends = geoms.flatMap(h => h.k === 'line' || h.k === 'arc' ? [h.a, h.b] : []);
+  const mv = (p: V2) => nearEnd(ends, [p[0] + d[0], p[1] + d[1]]);
+  const moved = (g: SketchGeom): SketchGeom => g.k === 'line' ? { k: 'line', a: mv(g.a), b: mv(g.b) } : g.k === 'circle' ? { k: 'circle', c: r9([g.c[0] + d[0], g.c[1] + d[1]]), r: g.r }
+    : g.k === 'arc' ? { k: 'arc', c: r9([g.c[0] + d[0], g.c[1] + d[1]]), r: g.r, a: mv(g.a), b: mv(g.b), sense: g.sense } : g;
+  const ks = [...new Set(chosen.map(i => owner[i]))].sort((x, y) => x - y);
+  const whole = ks.filter(k => geoms.every((_g, i) => owner[i] !== k || chosen.includes(i)));
+  const part = chosen.filter(i => !whole.includes(owner[i]));
+  for (const k of whole) if (!lines[k] || !plain.some(re => re.test(lines[k].text))) return 'That curve is written with a variable or a sum; change it in the code.';
+  const edits: { from: number; to: number; insert: string }[] = []; const added: string[] = [];
+  for (const k of whole) {
+    const l = lines[k]; const raw = doc.slice(l.from, l.to);
+    if (copy) added.push(shift(raw).trim()); else edits.push({ from: l.from, to: l.to, insert: shift(raw) });
+  }
+  if (part.length) {
+    if (copy) for (const i of part) added.push(curveCode(name, moved(geoms[i])));
+    else { const e = rewriteCurves(doc, name, lines, owner, geoms, part, i => part.includes(i) ? [moved(geoms[i])] : null, [], 'curve'); if (typeof e === 'string') return e; edits.push(...e); }
+  }
+  return { edits: edits.sort((x, y) => x.from - y.from), added };
+}
+
+// ---- Revolve: the sketch turned about one of its own axes, as reSHape's spin ---------------------------------------------------
+
+/** The points of the sketch's one closed outline of lines, in order; null when its curves are not that. */
+function oneOutline(geoms: SketchGeom[]): V2[] | null {
+  if (geoms.length < 3 || geoms.some(g => g.k !== 'line')) return null;
+  const todo = [...geoms] as (SketchGeom & { k: 'line' })[]; const first = todo.shift()!; const pts: V2[] = [first.a, first.b];
+  while (todo.length) {
+    const end = pts[pts.length - 1]; const i = todo.findIndex(c => at6(c.a, end) || at6(c.b, end)); if (i < 0) return null;
+    const c = todo.splice(i, 1)[0]; pts.push(at6(c.a, end) ? c.b : c.a);
+  }
+  return at6(pts[0], pts[pts.length - 1]) ? pts.slice(0, -1) : null;
+}
+/**
+ * Sketch `name` turned `angle` degrees about its own x or y axis, as reSHape's spin. spin(sk, a) does not turn a sketch where it is drawn: the
+ * sketch is a profile, its x the distance out from the axis and its y the height along it, the axis the plane's normal through the origin (Z
+ * for 'top', Y for 'front', X for 'side'), turned from +X (+Y for 'side') (see revolveCode in solidcraft-ui-to-code.ts). So the code is a new
+ * sketch holding the profile laid out that way, as one plain outline (spin takes one outline of straight lines, or one circle), and the spin.
+ * The axis must be X, Y or Z through the origin. A part turn starts from the sketch's plane only where spin starts (else a whole turn only).
+ * A sentence when it cannot be written.
+ */
+export function revolveSketch(geoms: SketchGeom[], frame: PlaneFrame, axis: 'x' | 'y', angle: number, sk: string, part: string): string[] | string {
+  if (!(Number.isFinite(angle) && angle !== 0 && Math.abs(angle) <= 360)) return 'Give an angle from 1 to 360 degrees.';
+  const outline = oneOutline(geoms); const circle = geoms.length === 1 && geoms[0].k === 'circle' ? geoms[0] : null;
+  if (!outline && !circle) return 'Revolve takes one closed outline of straight lines, or one circle.';
+  const dir = axis === 'x' ? frame.u : frame.v; const k = [0, 1, 2].find(i => Math.abs(Math.abs(dir[i]) - 1) < 1e-9);
+  if (k === undefined || frame.origin.some((x, i) => i !== k && Math.abs(x) > 1e-9)) return 'It turns only about X, Y or Z through the origin: draw it on a plane through the origin.';
+  const R = k === 0 ? 1 : 0; const word = k === 2 ? 'top' : k === 1 ? 'front' : 'side';
+  const world = (q: V2) => fromPlane(frame, q); const across = (w: number[]) => w.map((x, i) => i === k ? 0 : x);
+  const pts = outline ?? [circle!.c]; const ws = pts.map(world);
+  const full = Math.abs(Math.abs(angle) - 360) < 1e-9;
+  const inStart = ws.every(w => Math.abs(across(w)[3 - k - R]) < 1e-9);
+  if (!inStart && !full) return 'From this plane only a whole turn can be written: give 360.';
+  const ref = ws.map(across).find(w => Math.hypot(...w) > 1e-9); if (!ref) return 'The profile lies on the axis it turns about.';
+  let hat = inStart ? [0, 1, 2].map(i => i === R ? 1 : 0) : ref.map(x => x / Math.hypot(...ref));
+  const out = (w: number[]) => dot(across(w), hat);
+  const rs = outline ? ws.map(out) : [out(ws[0]) - circle!.r, out(ws[0]) + circle!.r];
+  if (rs.some(r => r < -1e-9) && rs.some(r => r > 1e-9)) return 'The profile crosses the axis it turns about.';
+  if (rs.some(r => r < -1e-9)) { if (!full) return 'For part of a turn, draw the profile on the positive side of the axis.'; hat = hat.map(x => -x); }
+  const flat = (w: number[]): V2 => [out(w) + 0, w[k] + 0];
+  const shape = outline ? `${sk}.polygon([${ws.map(w => pointExact(flat(w))).join(', ')}]);` : `${sk}.circle(${fmt9(2 * circle!.r)}, { at: ${pointExact(flat(ws[0]))} });`;
+  return [`const ${sk} = sketch('${word}');`, shape, `const ${part} = spin(${sk}, ${fmt(angle)});`];
 }
 
 // ---- Angle dimensions: the angle where two lines meet, changed by turning one of them about the corner -------------------------

@@ -387,6 +387,86 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
     sector's shortfall less the inner one's, 0.076 mm³, was measured).
   - Found while testing: a typed distance did not show in the readout until the pointer moved (Offset kept no last pointer
     position). Fixed.
+- **Snaps and guides** (2026-11-20). The pointer also snaps to where two of the sketch's curves cross (`sketchCrossings`;
+  a curve's own end is snapped to already). A point not snapped to anything is lined up with the sketch's own points (ends
+  and centres) and the tool's points so far: within 8 px across, its y becomes that point's y ("level with"); within 8 px up
+  and down, its x becomes that point's x ("upright from"); otherwise each goes on the grid's step as before (`alignPoint`).
+  A guide wins only where the pointer is no nearer the grid's line than the guide, so a click on a grid point stays there.
+  The nearest point across wins, and on a tie the nearer along, so the dashed guide drawn from it is short. A point lined
+  up both ways sits where the two guides cross. This holds for every tool and for dragging a point, in sketch mode only.
+  - Checked: unit tests (crossings each once, an end on a curve left out, three lines through one point; level, upright,
+    both, neither, the nearest across, the nearer on a tie). In the browser, `/tmp/cad-drive/sketch-snaps-e2e.py`, 5 of 5:
+    a line drawn from where two lines cross starts exactly there; a line ends at `[33.3, 35]`, off the 5 mm grid, level with
+    its own start and upright from a short line's end, with both named and two guides drawn; lined up with nothing, the
+    grid and no guide. Every earlier sketch suite was run again with the guides on.
+  - **Found by that run:** `sketch-exact-arcs-e2e.py` failed. A slot's first click at y = 10 was lined up level with a round's
+    arc end at y = 9.546…, and the Slot tool wrote its cap's centre to 0.001 while writing the cap's ends to 1e-9; the build
+    refused it ("The rules of this sketch have to move its shape (by up to 0.00015 mm)…"). Snapping to an arc's end could
+    already do this before guides. Every drawing tool (`toolCode`, `arcCode`) and a dragged point (`movePointEdits`) now
+    write points to 1e-9; a point on the grid is written exactly as before (`[10, 5]`). A unit test pins it.
+  - The same run showed the guide winning over a grid point the click was right on (the slot's start went to y = 9.546…, a
+    longer slot than drawn, built right but not what was meant). Hence the rule that the nearer of the grid and the guide wins.
+- **Centre rectangle and Polygon** (2026-11-20). Centre rectangle: a click on the centre, then a corner; it is written as a
+  plain `sk.rectangle(a, b)`, the opposite corner put where the centre says (`toolCode.centreRectangle`). Polygon: a click on
+  the centre, then a corner; the number of sides is in the bar ("sides", 3 to 24, 6 to start) and the polygon is written as
+  one closed `sk.lines([...])`, its first corner where clicked and the rest turned on counter-clockwise, to 1e-9
+  (`polygonPoints`, `toolCode.polygon`). A typed size works as for their neighbours: a width and height about the centre, or
+  the radius to a corner, towards the pointer.
+  - Checked: unit tests (a square on its corner, a hexagon to 1e-9, the code written closed, a centre rectangle from either
+    corner, typed sizes and their words). In the browser, `/tmp/cad-drive/sketch-polygon-e2e.py`, 7 of 7: a centre rectangle; 2
+    sides refused in the bar; a hexagon from a typed radius of 8; both extruding at (20 × 10 + 96√3) × 5 exactly.
+- **Pattern** (2026-11-20). A click on a circle, or on a line or arc (with the chain joined to it, as Offset takes), then a
+  second click; the bar says how (`in a row` or `round a centre`) and how many in all (`count`, 2 to 50, 4 to start).
+  - In a row: the second click is where the curves' point goes in the first copy (a circle's or one arc's centre, else the
+    chain's first point from the side clicked, shown as a dot); each copy is that step on from the last. The guides help: the
+    point is among the points the second click lines up with.
+  - Round a centre: the second click is the centre; the copies are spread over a whole turn, counter-clockwise.
+  - Each copy is written as drawing words after the sketch's block; its points are put on a curve's end within 1e-7, else
+    written to 1e-9 (`patternGeoms`, `patternSource`). A copy drawn already is left out (squares side by side share a side
+    once); when every copy is, or the count is not 2 to 50, or a row's step is nothing, nothing is written and a sentence says so.
+  - Checked: unit tests (a row of holes, a ring a quarter turn and a sixth of a turn each, an outline's point, side by side
+    sharing a side, an arc round its own centre, the refusals). In the browser, `/tmp/cad-drive/sketch-pattern-e2e.py`, 9 of 9:
+    a row of 4 holes 10 apart; the same row again refused; a count of 1 refused; a ring of 4; all of them extruding at
+    25π × 5 within 2e-4 (the engine measures a circle about 1.7e-4 low).
+- **Select, move and copy** (2026-11-20). With Select on, a box dragged on the view (the view does not turn) chooses the curves
+  wholly inside it; a click on a curve chooses it or leaves it out; a click on nothing, or Esc, chooses none. With curves
+  chosen, Move or Copy in the bar, then a point to take them from and a point to put them at (snaps and guides as for any
+  point), or after the first point a typed `dx, dy` and Enter (`moveEdits`).
+  - A drawing line whose curves are all chosen keeps its form, its points shifted: a rectangle stays a rectangle, a circle
+    keeps its radius, an arc moves all three points. One only partly chosen (one side of a polyline) is written out as its
+    curves first, as Trim does. Points are written to 1e-9.
+  - Copy writes the shifted lines (or the chosen curves alone) after the sketch's block and changes nothing else.
+  - A line to change written with a variable or a sum is not changed, and a sentence says so. The choice is cleared when the
+    sketch's code changes, since the curves' order may change with it.
+  - Checked: unit tests (a whole rectangle and circle moved, an arc to 1e-9, part of a polyline, copies whole and in part,
+    the refusals). In the browser, `/tmp/cad-drive/sketch-select-e2e.py`, 9 of 9: a box round a rectangle and a circle chooses
+    their five curves with the view still; moved by [5, 15], the rectangle stays a rectangle; one side of a polyline copied by
+    a typed `0, 20`; a circle with a variable radius refused; the part still builds.
+- **One way, both ways, through** (2026-11-20). Beside the depth in the sketch bar, a choice (`Way`): one way (as before, the
+  way the face points), both ways (`{ midplane: true }`: the depth in all, half each side of the sketch's plane), or through
+  (a pocket only: `{ through: true }`, kept with `reversed` where the pocket goes the other way; reSHape still takes the depth
+  as written). Extrude with through writes nothing, in a sentence.
+  - Checked: `/tmp/cad-drive/sketch-way-e2e.py`, 8 of 8, each built by the guarded build and measured: a 10 × 5 pocket through
+    at depth 4 cuts the whole 10 mm (23500); a 10 × 10 extrude 10 both ways adds 5 (24500); a 10 × 10 pocket 6 both ways cuts
+    3 (23700); Extrude through refused.
+- **Revolve in the sketch bar** (2026-11-20). The sketch is turned about its own x or y axis (`Axis`) by `angle` degrees
+  (`revolveSketch`). reSHape's `spin(sk, a)` reads its sketch as a profile laid out its own way (see "A revolve" under Gaps),
+  so, as for SolidCraft's revolve, a new sketch holding the profile laid out that way is written, as one plain outline, then
+  `const partN = spin(skN, a);`. The sketch drawn with the tools stays as it was.
+  - The axis must be X, Y or Z through the origin, so the sketch must be on a plane through the origin. A part turn is
+    written only where spin starts from the sketch's own plane (the top plane about X or Y, the front plane about Z); from
+    the others a whole turn only. The sketch must be one closed outline of straight lines, or one circle (what spin takes).
+    A profile crossing the axis is refused; one wholly on the negative side is turned over for a whole turn and refused for
+    part of one. Each refusal is a sentence in the bar; nothing is written.
+  - Checked: unit tests (front about Z, the other side, part turns, crossing, top about X part way, front about X whole,
+    an offset plane, a circle, an open outline, a 0 angle). In the browser, `/tmp/cad-drive/sketch-revolve-e2e.py`, 6 of 6: a
+    front rectangle turned whole about its y axis is a cylinder of 2000π; a top rectangle turned 90° about its x axis is a
+    quarter ring of 52.5π (each within 2e-4, the engine measuring curves a little low); an offset plane and two outlines refused.
+- **Found by the full run, 2026-11-20: the view's map went stale when the frame was resized.** The sketch bar now holds more
+  (the way, the axis and angle for Revolve, a tool's own boxes), so choosing Polygon (its Sides box) wraps it onto a second
+  line, and SolidCraft's frame below gets shorter. The overlay drew its map from the plane to the screen again only when the
+  camera, the sketch or the crop changed, so after the wrap a pointer was read about 5 mm off (a hover at y = 20.4 read as
+  [50, 25]); `sketch-polygon-e2e.py` caught it. The frame's size is now part of what redraws the map.
 - **Points on an arc are written to 1e-9** (2026-11-19). reSHape refuses a sketch whose arc's two ends miss one circle by
   more than 1e-6 mm ("The rules of this sketch have to move its shape…"). A point rounded to 0.001 misses by up to about
   7e-4 wherever the geometry is not exact. So a Round at a slanted corner wrote an arc the build refuses (at the test's
