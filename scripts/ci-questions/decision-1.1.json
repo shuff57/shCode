@@ -6,7 +6,6 @@
  },
  "1-3-16-lab-split-the-reused-variable": {
   "questions": {
-   "r5": "Is there a console.log of each of the four variables maxScore, playerName, isGameOver and levelCount (any order, any extra text)? This card only asks whether all four are logged. Whether a variable is declared before the line that uses it does not matter here.",
    "r6": "Is the variable stuff gone from the code: never declared, assigned or used? The word stuff may still appear in a comment as ordinary prose, and that is fine. Names like maxScore, playerName or levelCount are irrelevant."
   }
  },

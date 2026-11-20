@@ -335,7 +335,9 @@ for (const id of Object.values(L)) {
 
   accept(L.split, 'boolean from a comparison: 9 < 10', edit(S, bool, 'let isGameOver = 9 < 10;'));
   accept(L.split, 'boolean from the other variables',
-    edit(S, bool, 'let isGameOver = levelCount >= maxScore;'));
+    // maxScore is declared above this line; levelCount is declared BELOW it, so reading it here would throw
+    // (a let read before its declaration) and was a program that could not run.
+    edit(S, bool, 'let isGameOver = maxScore >= 50;'));
   accept(L.split, 'boolean via Boolean()', edit(S, bool, 'let isGameOver = Boolean(0);'));
   accept(L.split, 'boolean via !false', edit(S, bool, 'let isGameOver = !false;'));
   accept(L.split, 'var throughout',
