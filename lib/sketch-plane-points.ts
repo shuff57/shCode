@@ -666,6 +666,10 @@ function onCurve(g: SketchGeom, X: V2): boolean {
 }
 /** Where curves g and h cross or touch (one's end on the other counts). */
 export function crossings(g: SketchGeom, h: SketchGeom): V2[] {
+  return carrierMeets(g, h).filter(X => onCurve(g, X) && onCurve(h, X));
+}
+/** Where the carriers of g and h meet: g's and h's lines run on for ever, their arcs go all the way round. */
+function carrierMeets(g: SketchGeom, h: SketchGeom): V2[] {
   const A = carrierOf(g), B = carrierOf(h); if (!A || !B) return [];
   const pts: V2[] = [];
   const lineCircle = (L: { p: V2; d: V2 }, C: { c: V2; r: number }) => {
@@ -685,7 +689,13 @@ export function crossings(g: SketchGeom, h: SketchGeom): V2[] {
     const m: V2 = [A.c[0] + d[0] * a / D, A.c[1] + d[1] * a / D];
     pts.push([m[0] - d[1] * hh / D, m[1] + d[0] * hh / D]); if (hh > 1e-12) pts.push([m[0] + d[1] * hh / D, m[1] - d[0] * hh / D]);
   }
-  return pts.filter(X => onCurve(g, X) && onCurve(h, X));
+  return pts;
+}
+/** A point put on the nearest of `ends` within 1e-7 of it, so two curves meet by value; else written to 1e-9. */
+function nearEnd(ends: V2[], raw: V2): V2 {
+  let best: V2 | null = null; let bd = 1e-7;
+  for (const e of ends) { const d = len2(sub2(e, raw)); if (d < bd) { bd = d; best = e; } }
+  return best ?? r9(raw);
 }
 const kindWord = (g: SketchGeom) => g.k === 'circle' ? 'circle' : g.k === 'arc' ? 'arc' : 'line';
 /**
@@ -702,7 +712,7 @@ export function trimGeom(geoms: SketchGeom[], i: number, p: V2): { piece: Sketch
   for (let j = 0; j < geoms.length; j++) {
     if (j === i) continue;
     for (const raw of crossings(g, geoms[j])) {
-      const X = ends.find(e => len2(sub2(e, raw)) < 1e-7) ?? r9(raw); const t = along(g, X);
+      const X = nearEnd(ends, raw); const t = along(g, X);
       if (g.k !== 'circle' && (t < eps || t > total - eps || t > total)) continue; // the curve's own ends are no cut
       if (!cuts.some(c => Math.abs(c.t - t) < eps || len2(sub2(c.X, X)) < 1e-9)) cuts.push({ t, X });
     }
@@ -731,6 +741,173 @@ export function trimEdits(doc: string, name: string, lines: { from: number; to: 
   const t = trimGeom(geoms, i, p); if (typeof t === 'string') return t;
   const edits = rewriteCurves(doc, name, lines, owner, geoms, [i], j => j === i ? t.keep : null, [], t.kind);
   return typeof edits === 'string' ? edits : { edits, keepCode: t.keep.map(g => curveCode(name, g)), kind: t.kind };
+}
+
+// ---- Extend: a line or an arc grown from the end nearer the pointer to the first curve in its way ---------------------------------
+
+/**
+ * Extending curve i of `geoms` from its end nearer plane point p: that end moves on (a line straight on, an arc on round its circle, in either
+ * case away from its other end) to the first place it meets another curve. That place is put on another curve's end when within 1e-7 of it,
+ * else written to 1e-9. `piece` is what is added; a sentence when the curve is not a line or an arc, or nothing lies ahead of that end.
+ */
+export function extendGeom(geoms: SketchGeom[], i: number, p: V2): { grown: SketchGeom; piece: SketchGeom; to: V2; kind: string } | string {
+  const g = geoms[i]; if (!g || (g.k !== 'line' && g.k !== 'arc')) return 'Only a line or an arc can be extended.';
+  const kind = kindWord(g); const total = lengthOf(g); const tp = along(g, p);
+  // which end: for an arc, a pointer off the arc counts with the end it is nearer round the circle
+  const atB = g.k === 'line' ? tp > 0.5 : tp <= total ? tp > total / 2 : tp - total < 2 * Math.PI - tp;
+  const ends = geoms.flatMap((h, j) => j !== i && (h.k === 'line' || h.k === 'arc') ? [h.a, h.b] : []);
+  const eps = g.k === 'line' ? 1e-9 / len2(sub2(g.b, g.a)) : 1e-9 / g.r;
+  let best: { ahead: number; X: V2 } | null = null;
+  for (let j = 0; j < geoms.length; j++) {
+    if (j === i) continue;
+    for (const raw of carrierMeets(g, geoms[j])) {
+      if (!onCurve(geoms[j], raw)) continue;
+      const X = nearEnd(ends, raw); const t = along(g, X);
+      const ahead = g.k === 'line' ? (atB ? t - 1 : -t) : (atB ? t - total : 2 * Math.PI - t);
+      if (!(ahead > eps) || (g.k === 'arc' && (t <= total + eps || ahead >= 2 * Math.PI - total - eps))) continue;
+      if (!best || ahead < best.ahead) best = { ahead, X };
+    }
+  }
+  if (!best) return `Nothing lies ahead of this end of the ${kind}.`;
+  const X = best.X; const from = atB ? g.b : g.a;
+  if (g.k === 'line') return { grown: atB ? { k: 'line', a: g.a, b: X } : { k: 'line', a: X, b: g.b }, piece: { k: 'line', a: from, b: X }, to: X, kind };
+  const sense = g.sense === 'cw' ? 'cw' : 'ccw'; const other = sense === 'cw' ? 'ccw' : 'cw';
+  return { grown: { k: 'arc', c: g.c, r: g.r, a: atB ? g.a : X, b: atB ? X : g.b, sense }, piece: { k: 'arc', c: g.c, r: g.r, a: from, b: X, sense: atB ? sense : other }, to: X, kind };
+}
+/** Extending curve i of sketch `name` from its end nearer p: the code edits, and the code of the grown curve (see extendGeom, rewriteCurves). */
+export function extendEdits(doc: string, name: string, lines: { from: number; to: number; text: string }[], owner: number[], geoms: SketchGeom[], i: number, p: V2):
+  { edits: { from: number; to: number; insert: string }[]; code: string; kind: string } | string {
+  const t = extendGeom(geoms, i, p); if (typeof t === 'string') return t;
+  const edits = rewriteCurves(doc, name, lines, owner, geoms, [i], j => j === i ? [t.grown] : null, [], t.kind);
+  return typeof edits === 'string' ? edits : { edits, code: curveCode(name, t.grown), kind: t.kind };
+}
+
+// ---- Tangent arc: an arc that leaves a line's or an arc's free end without a corner -------------------------------------------
+
+/**
+ * The way the curve ending at q runs on past it (a line straight on, an arc along its tangent there), and which curve that is; a sentence when
+ * no line or arc ends at q, or two curves do (then there is no one way to run on).
+ */
+export function tangentAt(geoms: SketchGeom[], q: V2): { t: V2; i: number } | string {
+  const at = geoms.flatMap((g, k) => (g.k === 'line' || g.k === 'arc') && (at6(g.a, q) || at6(g.b, q)) ? [k] : []);
+  if (!at.length) return 'Click the end of a line or arc.';
+  if (at.length > 1) return 'Two curves end there: click the free end of a line or arc.';
+  const f = fromCorner(geoms[at[0]], q); return { t: [0 - f.t[0], 0 - f.t[1]], i: at[0] };
+}
+/**
+ * The arc that leaves q along t (a unit vector) and ends at e: its centre is on the normal to t at q, as far from e as from q, written to
+ * 1e-9. Null when e is q, or on the line through q along t (straight on or straight back: no arc gets there leaving that way).
+ */
+export function tangentArc(q: V2, t: V2, e: V2): SketchGeom & { k: 'arc' } | null {
+  const d = sub2(e, q); const n: V2 = [-t[1], t[0]]; const nd = dot2(n, d); const dd = dot2(d, d);
+  if (dd < 1e-18 || Math.abs(nd) < 1e-9 * Math.sqrt(dd)) return null;
+  const s = dd / (2 * nd);
+  return { k: 'arc', c: r9([q[0] + n[0] * s, q[1] + n[1] * s]), r: Math.abs(s), a: q, b: e, sense: s > 0 ? 'ccw' : 'cw' };
+}
+
+// ---- Mirror: a curve's mirror image about a line of the sketch -----------------------------------------------------------------
+
+/** Whether two curves are the same curve (a line either way round; an arc the same piece of the same circle, either way round). */
+function sameCurve(g: SketchGeom, h: SketchGeom): boolean {
+  const eq = (p: number[], q: number[]) => len2(sub2(p, q)) < 1e-9;
+  if (g.k === 'line' && h.k === 'line') return (eq(g.a, h.a) && eq(g.b, h.b)) || (eq(g.a, h.b) && eq(g.b, h.a));
+  if (g.k === 'circle' && h.k === 'circle') return eq(g.c, h.c) && Math.abs(g.r - h.r) < 1e-9;
+  if (g.k === 'arc' && h.k === 'arc') return eq(g.c, h.c) && ((g.sense === h.sense && eq(g.a, h.a) && eq(g.b, h.b)) || (g.sense !== h.sense && eq(g.a, h.b) && eq(g.b, h.a)));
+  return false;
+}
+/**
+ * The mirror image of curve i of `geoms` about the line through about[0] and about[1]: a line's two ends, an arc's centre and ends (it then
+ * turns the other way), a circle's centre, each put on a curve's end when within 1e-7 of it, else written to 1e-9. A sentence when it is not
+ * a line, an arc or a circle, is its own mirror image, or its mirror image is drawn already.
+ */
+export function mirrorGeom(geoms: SketchGeom[], about: [V2, V2], i: number): { copy: SketchGeom; kind: string } | string {
+  const g = geoms[i]; if (!g || (g.k !== 'line' && g.k !== 'arc' && g.k !== 'circle')) return 'Only a line, an arc or a circle can be mirrored.';
+  const A = about[0]; const D = sub2(about[1], A); const L = len2(D); const u: V2 = [D[0] / L, D[1] / L];
+  const ends = geoms.flatMap(h => h.k === 'line' || h.k === 'arc' ? [h.a, h.b] : []);
+  const m = (p: V2): V2 => { const d = sub2(p, A); const k = 2 * dot2(u, d); const raw: V2 = [A[0] + k * u[0] - d[0], A[1] + k * u[1] - d[1]]; return nearEnd(ends, raw); };
+  const kind = kindWord(g);
+  const copy: SketchGeom = g.k === 'line' ? { k: 'line', a: m(g.a), b: m(g.b) } : g.k === 'circle' ? { k: 'circle', c: r9(m(g.c)), r: g.r }
+    : { k: 'arc', c: r9(m(g.c)), r: g.r, a: m(g.a), b: m(g.b), sense: g.sense === 'cw' ? 'ccw' : 'cw' };
+  if (sameCurve(copy, g)) return `This ${kind} is its own mirror image.`;
+  if (geoms.some(h => sameCurve(copy, h))) return `Its mirror image is drawn already.`;
+  return { copy, kind };
+}
+
+// ---- Offset: a copy of a curve, or of the chain of curves joined end to end with it, a distance to one side ---------------------
+
+type Piece = (SketchGeom & { k: 'line' }) | ArcGeom;
+const flip = (g: Piece): Piece => g.k === 'line' ? { k: 'line', a: g.b, b: g.a } : { k: 'arc', c: g.c, r: g.r, a: g.b, b: g.a, sense: g.sense === 'cw' ? 'ccw' : 'cw' };
+/**
+ * The chain of lines and arcs joined end to end through curve i, each turned to run on from the one before (curve i as drawn), and where
+ * curve i is in it. A joint where more than two curves end stops the chain there. Closed when it comes back round to curve i.
+ */
+export function offsetChain(geoms: SketchGeom[], i: number): { pieces: Piece[]; closed: boolean; at: number } | null {
+  const g = geoms[i]; if (!g || (g.k !== 'line' && g.k !== 'arc')) return null;
+  const others = (q: V2, not: number) => geoms.flatMap((h, k) => k !== not && (h.k === 'line' || h.k === 'arc') && (at6(h.a, q) || at6(h.b, q)) ? [k] : []);
+  const used = new Set([i]); const fwd: Piece[] = [g as Piece]; const back: Piece[] = []; let closed = false;
+  for (let cur = i, piece = g as Piece; ;) {
+    const o = others(piece.b, cur); if (o.length !== 1) break;
+    if (o[0] === i) { closed = true; break; } if (used.has(o[0])) break;
+    const h = geoms[o[0]] as Piece; piece = at6(h.a, piece.b) ? h : flip(h); cur = o[0]; used.add(cur); fwd.push(piece);
+  }
+  if (!closed) for (let cur = i, piece = g as Piece; ;) {
+    const o = others(piece.a, cur); if (o.length !== 1 || used.has(o[0])) break;
+    const h = geoms[o[0]] as Piece; piece = at6(h.b, piece.a) ? h : flip(h); cur = o[0]; used.add(cur); back.unshift(piece);
+  }
+  return { pieces: [...back, ...fwd], closed, at: back.length };
+}
+/** How far plane point p is from curve g's carrier (a line run on for ever, an arc's whole circle). */
+export function offsetDistance(g: SketchGeom, p: V2): number {
+  if (g.k === 'line') { const d = sub2(g.b, g.a); return Math.abs(cross2(d, sub2(p, g.a))) / len2(d); }
+  return g.k === 'arc' || g.k === 'circle' ? Math.abs(len2(sub2(p, g.c)) - g.r) : 0;
+}
+/**
+ * The offset of curve i of `geoms` by d on the side of plane point p: a circle's concentric circle; else every curve of its chain (offsetChain)
+ * moved d to that side (a line along itself, an arc to a radius d more or less about the same centre), each two that follow on meeting where
+ * their carriers cross (a sharp corner; where they ran on smoothly, they still meet without one). Points are written to 1e-9. A sentence when
+ * it cannot be: a line turned round, an arc past its centre or round the other way, two neighbours that do not meet, or the offset running
+ * into itself.
+ */
+export function offsetGeoms(geoms: SketchGeom[], i: number, p: V2, d: number): { pieces: SketchGeom[]; kind: string } | string {
+  const g = geoms[i]; if (!g || (g.k !== 'line' && g.k !== 'arc' && g.k !== 'circle')) return 'Only a line, an arc or a circle can be offset.';
+  if (!(d > 0)) return 'Give a distance above 0.';
+  const tooFar = `At ${fmt(d)} the offset runs into itself; give a smaller distance.`;
+  if (g.k === 'circle') {
+    const R = len2(sub2(p, g.c)) < g.r ? g.r - d : g.r + d;
+    return R > 1e-9 ? { pieces: [{ k: 'circle', c: g.c, r: r9([R, 0])[0] }], kind: 'circle' } : tooFar;
+  }
+  const ch = offsetChain(geoms, i)!; const P = ch.pieces; const me = P[ch.at];
+  const left = me.k === 'line' ? cross2(sub2(me.b, me.a), sub2(p, me.a)) >= 0 : (len2(sub2(p, me.c)) < me.r) === (me.sense === 'ccw');
+  const dd = left ? d : -d;
+  const out: Piece[] = [];
+  for (const q of P) {
+    if (q.k === 'line') { const u = sub2(q.b, q.a); const l = len2(u); const n: V2 = [-u[1] / l * dd, u[0] / l * dd]; out.push({ k: 'line', a: [q.a[0] + n[0], q.a[1] + n[1]], b: [q.b[0] + n[0], q.b[1] + n[1]] }); continue; }
+    const R = q.r - (q.sense === 'ccw' ? dd : -dd); if (!(R > 1e-9)) return tooFar;
+    const at = (x: V2): V2 => [q.c[0] + (x[0] - q.c[0]) * R / q.r, q.c[1] + (x[1] - q.c[1]) * R / q.r];
+    out.push({ k: 'arc', c: q.c, r: R, a: at(q.a), b: at(q.b), sense: q.sense });
+  }
+  // neighbours meet: where their carriers cross nearest where they end now, or where they already meet
+  const n = out.length; const joints = ch.closed ? n : n - 1;
+  for (let k = 0; k < joints; k++) {
+    const A = out[k], B = out[(k + 1) % n]; const mid: V2 = [(A.b[0] + B.a[0]) / 2, (A.b[1] + B.a[1]) / 2];
+    let X: V2 | null = len2(sub2(A.b, B.a)) < 1e-9 ? mid : null;
+    if (!X) for (const c of carrierMeets(A, B)) if (!X || len2(sub2(c, mid)) < len2(sub2(X, mid))) X = c;
+    if (!X) return `At ${fmt(d)} two of these curves no longer meet; give a smaller distance.`;
+    A.b = r9(X); B.a = A.b;
+  }
+  for (const q of out) { if (q.k === 'line') { q.a = r9(q.a); q.b = r9(q.b); } }
+  if (!ch.closed) for (const q of [out[0], out[n - 1]]) if (q.k === 'arc') { q.a = r9(q.a); q.b = r9(q.b); }
+  // the same way round as before, and not running into itself
+  for (let k = 0; k < n; k++) {
+    const q = out[k], o = P[k];
+    if (q.k === 'line' && o.k === 'line' && !(dot2(sub2(q.b, q.a), sub2(o.b, o.a)) > 0)) return tooFar;
+    if (q.k === 'arc' && o.k === 'arc' && Math.abs(arcSweep(q) - arcSweep(o)) >= Math.PI) return tooFar;
+  }
+  for (let x = 0; x < n; x++) for (let y = x + 1; y < n; y++) {
+    const shared = [...(y === x + 1 ? [out[x].b] : []), ...(ch.closed && x === 0 && y === n - 1 ? [out[0].a] : [])];
+    if (crossings(out[x], out[y]).some(X => !shared.some(s2 => len2(sub2(s2, X)) < 1e-7))) return tooFar;
+  }
+  return { pieces: out, kind: n > 1 ? (ch.closed ? 'outline' : 'curves') : kindWord(g) };
 }
 
 // ---- Angle dimensions: the angle where two lines meet, changed by turning one of them about the corner -------------------------

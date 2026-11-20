@@ -1,7 +1,7 @@
 // Points on a sketch's plane (lib/sketch-plane-points.ts): reSHape's plane frames, the projective map from the screen to a plane,
 // which sketch the editor cursor is in, and what a picked point writes into the code. The pointer in the real view is a browser check.
 import assert from 'node:assert/strict';
-import { angleDims, angleEdits, crossings, trimGeom, trimEdits, chamferEdits, chamferGeom, cornerAt, cutCorners, cutPreview, largestChamfer, largestRound, roundEdits, roundGeom, dimensionOf, resizeEdits, distToSegment, slotGeoms, typedNumbers, typedPoint, typedWords, sketchGeoms, curveOwners, distToPolyline, sketchStatementLines, arcCode, faceSketchArgs, finishDirections, freshName, movePointEdits, planeOutlines, sweepOf, activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
+import { angleDims, angleEdits, extendGeom, extendEdits, tangentAt, tangentArc, curveCode, mirrorGeom, offsetGeoms, offsetChain, offsetDistance, crossings, trimGeom, trimEdits, chamferEdits, chamferGeom, cornerAt, cutCorners, cutPreview, largestChamfer, largestRound, roundEdits, roundGeom, dimensionOf, resizeEdits, distToSegment, slotGeoms, typedNumbers, typedPoint, typedWords, sketchGeoms, curveOwners, distToPolyline, sketchStatementLines, arcCode, faceSketchArgs, finishDirections, freshName, movePointEdits, planeOutlines, sweepOf, activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
 
 // ---- planes, as reSHape resolves them: a named plane's origin is normal x offset ------------------------------------------
 const top10 = planeFrameOf({ plane: 'xy', offset: 10 });
@@ -359,6 +359,95 @@ console.log('PASS round and chamfer where a line meets an arc, or two arcs meet'
   assert.equal(run("const sk = sketch('top');\nsk.circle([0, 0], { r: 5 });\nsk.line([-10, 0], [10, 0]);\n", [{ k: 'circle', c: [0, 0], r: 5 }, { k: 'line', a: [-10, 0], b: [10, 0] }, { k: 'point', p: [0, 0] }], [0, 1, 1], 2, [0, 0]), 'Only a line, an arc or a circle can be trimmed.');
 }
 console.log('PASS trim: the piece between two crossings cut away, lines, arcs and circles');
+{ // Extend: a line or an arc grown from the end nearer the pointer to the first curve in its way
+  const apply = (doc, es) => { let d = doc; for (const e of [...es].sort((a, b) => b.from - a.from)) d = d.slice(0, e.from) + e.insert + d.slice(e.to); return d; };
+  const L = { k: 'line', a: [0, 0], b: [10, 0] };
+  const walls = [L, { k: 'line', a: [30, -5], b: [30, 5] }, { k: 'line', a: [20, -5], b: [20, 5] }, { k: 'line', a: [15, 1], b: [15, 5] }];
+  let e = extendGeom(walls, 0, [9, 0.2]);
+  assert.deepEqual([e.grown, e.piece, e.to, e.kind], [{ k: 'line', a: [0, 0], b: [20, 0] }, { k: 'line', a: [10, 0], b: [20, 0] }, [20, 0], 'line'], 'to the nearer of two walls; one that does not reach the line is passed by');
+  assert.equal(extendGeom(walls, 0, [1, 0]), 'Nothing lies ahead of this end of the line.', 'the other end: nothing behind it');
+  e = extendGeom([...walls, { k: 'line', a: [-5, -5], b: [-5, 5] }], 0, [1, 0]); assert.deepEqual(e.grown, { k: 'line', a: [-5, 0], b: [10, 0] }, 'and with a wall behind it');
+  e = extendGeom([L, { k: 'circle', c: [40, 0], r: 5 }], 0, [9, 0]); assert.deepEqual(e.to, [35, 0], 'to a circle: where it first meets it');
+  e = extendGeom([L, { k: 'line', a: [10, 0], b: [10, 5] }, { k: 'line', a: [20, -5], b: [20, 5] }], 0, [9, 0]); assert.deepEqual(e.to, [20, 0], 'an end joined to another line is extended past the joint');
+  const arc = { k: 'arc', c: [0, 0], r: 10, a: [10, 0], b: [0, 10], sense: 'ccw' }; const wall = { k: 'line', a: [-6, -20], b: [-6, 20] };
+  e = extendGeom([arc, wall], 0, [1, 9.9]);
+  assert.deepEqual([e.grown, e.to, e.kind], [{ k: 'arc', c: [0, 0], r: 10, a: [10, 0], b: [-6, 8], sense: 'ccw' }, [-6, 8], 'arc'], 'an arc on round its circle, its own way');
+  assert.deepEqual(e.piece, { k: 'arc', c: [0, 0], r: 10, a: [0, 10], b: [-6, 8], sense: 'ccw' });
+  e = extendGeom([arc, wall], 0, [9.9, 1]);
+  assert.deepEqual([e.grown, e.piece.sense], [{ k: 'arc', c: [0, 0], r: 10, a: [-6, -8], b: [0, 10], sense: 'ccw' }, 'cw'], 'from its start: back round the circle the other way');
+  e = extendGeom([arc, { k: 'line', a: [20, -1], b: [20, 1] }], 0, [1, 9.9]); assert.equal(e, 'Nothing lies ahead of this end of the arc.');
+  assert.equal(extendGeom([{ k: 'circle', c: [0, 0], r: 3 }, wall], 0, [3, 0]), 'Only a line or an arc can be extended.');
+  const doc = "const w = 10;\nconst sk = sketch('top');\nsk.line([0, 0], [10, 0]);\nsk.line([20, -5], [20, 5]);\nsk.line([0, 3], [w, 3]);\n";
+  const G = [L, { k: 'line', a: [20, -5], b: [20, 5] }, { k: 'line', a: [0, 3], b: [10, 3] }]; const SL = sketchStatementLines(doc, 'sk');
+  const r = extendEdits(doc, 'sk', SL, [0, 1, 2], G, 0, [9, 0]);
+  assert.match(apply(doc, r.edits), /sk\.line\(\[0, 0\], \[20, 0\]\);\nsk\.line\(\[20, -5\], \[20, 5\]\);/, 'the code: the line written again to its new end'); assert.equal(r.code, 'sk.line([0, 0], [20, 0]);');
+  assert.equal(extendEdits(doc, 'sk', SL, [0, 1, 2], G, 2, [9, 3]), 'That line is written with a variable or a sum; change it in the code.');
+}
+console.log('PASS extend: a line or an arc grown to the first curve in its way');
+{ // Tangent arc: from a free end, leaving it without a corner
+  const L = { k: 'line', a: [0, 0], b: [10, 0] };
+  assert.deepEqual(tangentAt([L], [10, 0]), { t: [1, 0], i: 0 }, 'a line runs straight on past its end');
+  assert.deepEqual(tangentAt([L], [0, 0]), { t: [-1, 0], i: 0 }, 'and the other way past its start');
+  assert.equal(tangentAt([L, { k: 'line', a: [10, 0], b: [10, 5] }], [10, 0]), 'Two curves end there: click the free end of a line or arc.');
+  assert.equal(tangentAt([L], [5, 0]), 'Click the end of a line or arc.');
+  assert.deepEqual(tangentArc([10, 0], [1, 0], [10, 10]), { k: 'arc', c: [10, 5], r: 5, a: [10, 0], b: [10, 10], sense: 'ccw' }, 'a half circle up, to the left of the way on');
+  assert.deepEqual(tangentArc([10, 0], [1, 0], [10, -10]), { k: 'arc', c: [10, -5], r: 5, a: [10, 0], b: [10, -10], sense: 'cw' }, 'and down, clockwise');
+  assert.deepEqual(tangentArc([10, 0], [1, 0], [15, 5]), { k: 'arc', c: [10, 5], r: 5, a: [10, 0], b: [15, 5], sense: 'ccw' }, 'a quarter');
+  assert.equal(tangentArc([10, 0], [1, 0], [20, 0]), null, 'straight on: no arc'); assert.equal(tangentArc([10, 0], [1, 0], [0, 0]), null, 'straight back: none');
+  assert.equal(tangentArc([10, 0], [1, 0], [10, 0]), null, 'the end itself: none');
+  const arc = { k: 'arc', c: [0, 0], r: 10, a: [10, 0], b: [0, 10], sense: 'ccw' };
+  const ta = tangentAt([arc], [0, 10]); assert.deepEqual(ta.t.map(v => +v.toFixed(12) + 0), [-1, 0], 'an arc runs on along its tangent at its end');
+  assert.deepEqual(tangentAt([arc], [10, 0]).t.map(v => +v.toFixed(12) + 0), [0, -1], 'and back along it at its start');
+  const s = tangentArc([0, 10], ta.t, [-10, 20]); assert.deepEqual(s, { k: 'arc', c: [0, 20], r: 10, a: [0, 10], b: [-10, 20], sense: 'cw' }, 'an S: the next arc turns the other way');
+  const g = tangentArc([10, 0], [1, 0], [13, 2]); // centre [10, 3.25], not on the grid: written to 1e-9, its two ends equally far from it
+  assert.equal(curveCode('sk', g), "sk.arc([10, 3.25], [10, 0], [13, 2], 'ccw');");
+  const g2 = tangentArc([0, 0], [Math.SQRT1_2, Math.SQRT1_2], [0, 7]);
+  assert.ok(Math.abs(Math.hypot(g2.c[0], g2.c[1]) - Math.hypot(g2.c[0], g2.c[1] - 7)) < 2e-9, `a slanted start: both ends on the written circle, ${g2.c}`);
+}
+console.log('PASS tangent arc: from a free end without a corner');
+{ // Mirror: a curve's mirror image about a line of the sketch
+  const ax = { k: 'line', a: [30, 0], b: [30, 20] }; const about = [ax.a, ax.b];
+  const G = [ax, { k: 'line', a: [10, 5], b: [20, 15] }, { k: 'arc', c: [20, 10], r: 5, a: [25, 10], b: [20, 15], sense: 'ccw' }, { k: 'circle', c: [20, 10], r: 3 },
+    { k: 'line', a: [20, 5], b: [30, 5] }, { k: 'circle', c: [30, 10], r: 2 }, { k: 'line', a: [25, 18], b: [35, 18] }, { k: 'arc', c: [0, 0], r: 1, a: [1, 0], b: [0, 1], sense: 'ccw' }];
+  assert.deepEqual(mirrorGeom(G, about, 1), { copy: { k: 'line', a: [50, 5], b: [40, 15] }, kind: 'line' }, 'a line: both ends');
+  assert.deepEqual(mirrorGeom(G, about, 2), { copy: { k: 'arc', c: [40, 10], r: 5, a: [35, 10], b: [40, 15], sense: 'cw' }, kind: 'arc' }, 'an arc turns the other way');
+  assert.deepEqual(mirrorGeom(G, about, 3).copy, { k: 'circle', c: [40, 10], r: 3 }, 'a circle');
+  assert.deepEqual(mirrorGeom(G, about, 4).copy, { k: 'line', a: [40, 5], b: [30, 5] }, 'an end on the mirror line stays where it is, so the two meet');
+  assert.equal(mirrorGeom(G, about, 5), 'This circle is its own mirror image.'); assert.equal(mirrorGeom(G, about, 6), 'This line is its own mirror image.');
+  assert.equal(mirrorGeom(G, about, 0), 'This line is its own mirror image.', 'the mirror line itself');
+  assert.equal(mirrorGeom([...G, { k: 'line', a: [40, 15], b: [50, 5] }], about, 1), 'Its mirror image is drawn already.', 'drawn already, either way round');
+  assert.equal(mirrorGeom([...G, { k: 'arc', c: [40, 10], r: 5, a: [40, 15], b: [35, 10], sense: 'ccw' }], about, 2), 'Its mirror image is drawn already.', 'an arc drawn already the other way round');
+  assert.deepEqual(mirrorGeom(G, [[0, 0], [10, 10]], 1).copy, { k: 'line', a: [5, 10], b: [15, 20] }, 'about a slanted line');
+  assert.deepEqual(mirrorGeom(G, [[0, 0], [1, 2]], 7).copy, { k: 'arc', c: [0, 0], r: 1, a: [-0.6, 0.8], b: [0.8, 0.6], sense: 'cw' }, 'written to 1e-9');
+  const near = [ax, { k: 'line', a: [20, 5], b: [29.99999999, 5] }, { k: 'line', a: [30.00000001, 5], b: [40, 0] }];
+  assert.deepEqual(mirrorGeom(near, about, 1).copy, { k: 'line', a: [40, 5], b: [30.00000001, 5] }, 'a point within 1e-7 of an end is put on it');
+}
+console.log('PASS mirror: a curve\'s mirror image about a line');
+{ // Offset: a curve, or the chain joined to it, a distance to one side, the corners sharp
+  const rect = [{ k: 'line', a: [0, 0], b: [20, 0] }, { k: 'line', a: [20, 0], b: [20, 10] }, { k: 'line', a: [20, 10], b: [0, 10] }, { k: 'line', a: [0, 10], b: [0, 0] }];
+  assert.deepEqual(offsetGeoms(rect, 0, [10, 2], 2), { pieces: [{ k: 'line', a: [2, 2], b: [18, 2] }, { k: 'line', a: [18, 2], b: [18, 8] }, { k: 'line', a: [18, 8], b: [2, 8] }, { k: 'line', a: [2, 8], b: [2, 2] }], kind: 'outline' }, 'a rectangle inwards');
+  assert.deepEqual(offsetGeoms(rect, 2, [10, 12], 1).pieces.map(q => [q.a, q.b]), [[[21, 11], [-1, 11]], [[-1, 11], [-1, -1]], [[-1, -1], [21, -1]], [[21, -1], [21, 11]]], 'and outwards, from another side: the chain starts at the side clicked');
+  assert.equal(offsetGeoms(rect, 0, [10, 2], 5), 'At 5 the offset runs into itself; give a smaller distance.', 'inwards by half its height: two sides would close up');
+  assert.equal(offsetGeoms(rect, 0, [10, 2], 6), 'At 6 the offset runs into itself; give a smaller distance.');
+  const L = [{ k: 'line', a: [0, 0], b: [10, 0] }, { k: 'line', a: [10, 10], b: [10, 0] }];
+  assert.deepEqual(offsetGeoms(L, 0, [5, 1], 1), { pieces: [{ k: 'line', a: [0, 1], b: [9, 1] }, { k: 'line', a: [9, 1], b: [9, 10] }], kind: 'curves' }, 'an open chain, the second line drawn the other way round');
+  assert.deepEqual(offsetGeoms([L[0]], 0, [3, -4], 2), { pieces: [{ k: 'line', a: [0, -2], b: [10, -2] }], kind: 'line' }, 'one line, to the pointer\'s side');
+  const C = [{ k: 'circle', c: [0, 0], r: 5 }];
+  assert.deepEqual(offsetGeoms(C, 0, [1, 0], 2).pieces, [{ k: 'circle', c: [0, 0], r: 3 }]); assert.deepEqual(offsetGeoms(C, 0, [9, 0], 2).pieces, [{ k: 'circle', c: [0, 0], r: 7 }], 'a circle inside and out');
+  assert.equal(offsetGeoms(C, 0, [1, 0], 5), 'At 5 the offset runs into itself; give a smaller distance.');
+  const slot = [{ k: 'line', a: [0, 0], b: [20, 0] }, { k: 'arc', c: [20, 5], r: 5, a: [20, 0], b: [20, 10], sense: 'ccw' }, { k: 'line', a: [20, 10], b: [0, 10] }, { k: 'arc', c: [0, 5], r: 5, a: [0, 10], b: [0, 0], sense: 'ccw' }];
+  assert.deepEqual(offsetGeoms(slot, 0, [10, -1], 1).pieces, [{ k: 'line', a: [0, -1], b: [20, -1] }, { k: 'arc', c: [20, 5], r: 6, a: [20, -1], b: [20, 11], sense: 'ccw' },
+    { k: 'line', a: [20, 11], b: [0, 11] }, { k: 'arc', c: [0, 5], r: 6, a: [0, 11], b: [0, -1], sense: 'ccw' }], 'a slot outwards: its smooth joints stay smooth');
+  assert.equal(offsetGeoms(slot, 0, [10, 1], 4).pieces[1].r, 1, 'inwards'); assert.equal(offsetGeoms(slot, 0, [10, 1], 5), 'At 5 the offset runs into itself; give a smaller distance.', 'to the arcs\' centres');
+  const D = [{ k: 'line', a: [0, 0], b: [20, 0] }, { k: 'arc', c: [10, 0], r: 10, a: [20, 0], b: [0, 0], sense: 'ccw' }];
+  const dOut = offsetGeoms(D, 0, [10, -1], 1); const x = 10 + Math.sqrt(120);
+  assert.deepEqual(dOut.pieces, [{ k: 'line', a: [+(20 - x).toFixed(9), -1], b: [+x.toFixed(9), -1] }, { k: 'arc', c: [10, 0], r: 11, a: [+x.toFixed(9), -1], b: [+(20 - x).toFixed(9), -1], sense: 'ccw' }],
+    'a half circle on a line, outwards: the line and the arc meet sharp where they cross, to 1e-9 (two curves meeting at both ends)');
+  const br = offsetChain([...rect, { k: 'line', a: [20, 0], b: [30, 0] }], 0);
+  assert.deepEqual([br.pieces.length, br.closed, br.pieces[0].a, br.pieces[3].b], [4, false, [20, 0], [20, 0]], 'a joint of three stops the chain there: it runs round the other way and stays open');
+  assert.equal(offsetDistance(rect[0], [5, -3]), 3); assert.equal(offsetDistance(C[0], [1, 0]), 4);
+}
+console.log('PASS offset: a curve or its chain to one side, the corners sharp');
 { // Chamfer: a corner of two lines cut by a straight line, the same distance along each
   const apply = (doc, es) => { let d = doc; for (const e of [...es].sort((a, b) => b.from - a.from)) d = d.slice(0, e.from) + e.insert + d.slice(e.to); return d; };
   const doc = "const sk = sketch('top');\nsk.line([0, 0], [20, 0]);\nsk.line([20, 0], [20, 10]);\n";

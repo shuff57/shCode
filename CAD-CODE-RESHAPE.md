@@ -332,6 +332,61 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
     - a circle on one side made a bump by cutting away its inner half and the side between its crossings;
     - a stray line removed whole;
     - the outline extrudes at (800 + 12.5π) × 5 more than the part, within 1e-4.
+- **Extend** (2026-11-20). With the tool on, a line or an arc under the pointer is grown from its end nearer the pointer to the
+  first curve in its way, the added piece drawn dashed first (`extendGeom`, `extendEdits`).
+  - A line runs straight on; an arc runs on round its circle, the way it goes from that end (from its start, back the other
+    way), and never as far as its own other end. A pointer off an arc counts with the end it is nearer round the circle.
+  - The curve in the way can be a line, an arc or a circle, found where the curve's carrier meets it (`carrierMeets`, which
+    `crossings` now also uses). An end joined to another curve is extended past the joint.
+  - The code: the line that drew it is written again in the drawing words through `rewriteCurves`, as Trim does. The new end
+    is put on another curve's end when within 1e-7 of it, else written to 1e-9.
+  - Checked: unit tests (the nearer of two walls, a wall that does not reach, the end with nothing ahead, a circle, a joined
+    end, an arc either way round, a circle refused, the code, a variable). In the browser, `/tmp/cad-drive/sketch-extend-e2e.py`,
+    10 of 10: a quarter arc extended round its circle to a wall at `[47, 37]`; an open outline closed by extending its bottom
+    and top lines to a wall and trimming the wall's overhangs, which extrudes at 35 × 20 × 5 more than the part.
+- **Tangent arc** (2026-11-20). A click on the free end of a line or an arc, then where the arc ends: the arc leaves that end
+  the way its curve runs on there, so the two meet without a corner (`tangentAt`, `tangentArc`). Its centre is on the normal
+  to that way at the end, as far from the arc's end as from its start; the arc turns counter-clockwise when its end lies to the
+  left of the way on, clockwise to the right. It is written as `sk.arc(centre, start, end, 'ccw' | 'cw')`, the centre to 1e-9
+  (it is no round number when, say, the end is 2 across and 3 up from a level line's end: `[30, 12.166666667]`).
+  - Not a start: an end that two curves share (no one way to run on). No arc: an end straight on from the start or straight
+    back (a sentence says so, and nothing is drawn). Typed sizes are not taken.
+  - Checked: unit tests (a line's end either way, an arc's end either way, half and quarter circles either way round, an S,
+    straight on and back, the centre to 1e-9 with both ends on its circle). In the browser, `/tmp/cad-drive/sketch-tangent-e2e.py`,
+    11 of 11: two lines joined into a stadium by two tangent half circles, extruding at (25 × 20 + 100π) × 5 within 1e-4 of
+    it; a point straight on refused; an end two curves share refused; an arc with the centre `[30, 12.166666667]` closing an
+    outline that builds at its area worked out by hand (the four corners and the arc's segment), within 1e-4.
+- **Mirror** (2026-11-20). A click on a line of the sketch to mirror about (it is then drawn thick and faint), then on each
+  line, arc or circle to mirror: its mirror image is written after the sketch's block, as `sk.line`, `sk.arc` or `sk.circle`
+  (`mirrorGeom`). An arc's image turns the other way. Esc, or choosing the tool again, lets another line be chosen.
+  - Each point is put on the nearest curve end within 1e-7 of it, else written to 1e-9, so a half profile ending on the
+    mirror line meets its image there by value. Trim and Extend now also take the nearest end within 1e-7, not the first one
+    found (`nearEnd`): a unit test caught the first-found rule putting a mirrored point back on the end it came from, 2e-8 away.
+  - Nothing is written for a curve that is its own mirror image (the mirror line itself, a circle centred on it, a line
+    across it evenly), or whose mirror image is drawn already (either way round): a sentence says so.
+  - Checked: unit tests (a line, an arc, a circle, an end on the mirror line, its own image three ways, drawn already two
+    ways, a slanted mirror line, a point written to 1e-9, the nearest end). In the browser, `/tmp/cad-drive/sketch-mirror-e2e.py`,
+    9 of 9: half a profile (a polyline, a rounded corner, a top line) mirrored about its axis, the axis deleted, and the
+    symmetric outline extruding at 2 × (275 + 6.25π) × 5 within 1e-4; the axis and a curve mirrored already not written.
+- **Offset** (2026-11-20). A click on a line, arc or circle, then the side and distance from the pointer (its distance from
+  the curve, on the grid's step) or a typed distance and Enter: a copy that far to that side is written after the sketch's block
+  (`offsetChain`, `offsetGeoms`, `offsetDistance`).
+  - A circle: the circle that much smaller or larger about the same centre.
+  - A line or an arc: with the chain of lines and arcs joined end to end with it (a rectangle's four sides, a slot, an open
+    run); a joint where three curves end stops the chain there. Each is moved to the same side: a line along itself, an arc
+    to a radius d more or less about the same centre. Each two that follow on meet where their carriers cross nearest their
+    ends (a sharp corner); where they ran on smoothly (a slot's arcs) they still meet without one. Points are written to 1e-9.
+  - Nothing is written, and a sentence says so, when a line would turn round or close up, an arc would pass its centre or
+    wrap round the other way, two neighbours no longer meet, or the copy crosses itself anywhere but at its own joints.
+  - Checked: unit tests (a rectangle in and out, in by half its height and more, an open chain, one line, a circle in and
+    out and to its centre, a slot in and out and to its arcs' centres, a half circle on a line meeting sharp to 1e-9, a joint
+    of three). In the browser, `/tmp/cad-drive/sketch-offset-e2e.py`, 12 of 12: a circle offset by the pointer's distance; a
+    rectangle offset 3 inwards by a typed distance into a frame that extrudes at (30 × 20 − 24 × 14) × 5 exactly, a typed 10
+    refused; a half circle on a line offset 2 outwards, its sharp corners at 25 ± √140 written to 1e-9, building at the ring's
+    area by hand within 2e-4 of the arcs' sectors (the engine measures each arc's sector about 1.7e-4 low; here the outer
+    sector's shortfall less the inner one's, 0.076 mm³, was measured).
+  - Found while testing: a typed distance did not show in the readout until the pointer moved (Offset kept no last pointer
+    position). Fixed.
 - **Points on an arc are written to 1e-9** (2026-11-19). reSHape refuses a sketch whose arc's two ends miss one circle by
   more than 1e-6 mm ("The rules of this sketch have to move its shape…"). A point rounded to 0.001 misses by up to about
   7e-4 wherever the geometry is not exact. So a Round at a slanted corner wrote an arc the build refuses (at the test's
