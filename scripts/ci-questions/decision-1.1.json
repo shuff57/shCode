@@ -2,12 +2,14 @@
  "1-5-37-lab-settle-it-in-the-console": {
   "questions": {
    "r2": "Is there a console.log whose argument is the bracketed expression (2 + 2) * 3, with the brackets around the 2 + 2? console.log(2 + 2 * 3) without brackets alone is NO. What any comment says, or whether there is a comment at all, does not matter. Other console.log lines are fine.",
-   "r1": "Is there a console.log whose argument is the expression 2 + 2 * 3 with no brackets (any spacing, like 2+2*3)? Other console.log lines are fine. NO if it only appears in a comment or in quotes."
+   "r1": "Is there a console.log whose argument is the expression 2 + 2 * 3 with no brackets (any spacing, like 2+2*3)? Other console.log lines are fine. NO if it only appears in a comment or in quotes.",
+   "r4": "Is this true of the student's code: A third expression of your own: At least three console.log calls, so something beyond the two given was checked. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
   }
  },
  "1-3-16-lab-split-the-reused-variable": {
   "questions": {
-   "r6": "Is the variable stuff gone from the code: never declared, assigned or used? The word stuff may still appear in a comment as ordinary prose, and that is fine. Names like maxScore, playerName or levelCount are irrelevant."
+   "r6": "Is the variable stuff gone from the code: never declared, assigned or used? The word stuff may still appear in a comment as ordinary prose, and that is fine. Names like maxScore, playerName or levelCount are irrelevant.",
+   "r5": "Is this true of the student's code: All four are printed: Logs each of the four new variables. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
   }
  },
  "1-4-20-sort-the-snippet": {
@@ -125,7 +127,8 @@
  },
  "2-1-37-challenges": {
   "questions": {
-   "r3": "Does the code contain a console.log(\"Leap year\") AND a separate console.log(\"Not a leap year\"), each message printed by its own console.log (normally the two branches of an if / else)? Both messages must appear in console.log calls. Other lines do not matter."
+   "r3": "Does the code contain a console.log(\"Leap year\") AND a separate console.log(\"Not a leap year\"), each message printed by its own console.log (normally the two branches of an if / else)? Both messages must appear in console.log calls. Other lines do not matter.",
+   "r8": "Is this true of the student's code: nested if used: Challenge 3: an if statement nested inside another if's block Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
   }
  },
  "2-1-38-a2-1-1-grade-advisor": {
@@ -191,7 +194,8 @@
    "r1": "Ignore any console.log that is only a heading or label (like \"My answers:\"). Among the remaining logs, is the FIRST one the text SQL (any capital letters)? Code in comments never runs.",
    "r2": "Ignore any console.log that is only a heading or label (like \"My answers:\"). Among the remaining logs, is the SECOND one the text Swift (any capital letters)? Code in comments never runs.",
    "r4": "Ignore any console.log that is only a heading or label (like \"My answers:\"). Among the remaining logs, is the FOURTH one the text JavaScript (any capital letters, or Javascript)? Code in comments never runs.",
-   "r5": "Ignore any console.log that is only a heading or label (like \"My answers:\"). Among the remaining logs, is the FIFTH one the text Python (any capital letters)? Code in comments never runs."
+   "r5": "Ignore any console.log that is only a heading or label (like \"My answers:\"). Among the remaining logs, is the FIFTH one the text Python (any capital letters)? Code in comments never runs.",
+   "r3": "Is this true of the student's code: An operating system is C: The third console.log answers STEP 3 -- the operating system, with C. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
   }
  },
  "6-30-checkers-3-lab-kings-and-the-win": {
@@ -208,20 +212,25 @@
   "questions": {
    "r3": "Is there a console.log(greeting) written as code, with the variable spelled exactly greeting? YES: console.log(greeting); anywhere in the file. NO if greeting is only logged inside a comment, or the log uses a misspelling such as gretting or grettin. Lines that start with // STEP are the lesson's own instructions, not the student's work. Everything else in the file is irrelevant to this question.",
    "r4": "Does a comment line in the file contain the word ReferenceError (any capitals), for example // ReferenceError gretting is not defined? YES if the word appears in any // comment. NO if it appears nowhere. Lines that start with // STEP are the lesson's own instructions, not the student's work. Everything else is irrelevant.",
-   "r5": "Is there a comment written by the student (not a // STEP line) that says which part of the error message told them what to change: the error type, the detail or message, or the place or line? Any wording that picks a part counts, like 'the detail helped me' or 'the first part, the error name'. NO if there is no such comment, or it only repeats the error text. Lines that start with // STEP are the lesson's own instructions, not the student's work. "
+   "r5": "Is there a comment written by the student (not a // STEP line) that says which part of the error message told them what to change: the error type, the detail or message, or the place or line? Any wording that picks a part counts, like 'the detail helped me' or 'the first part, the error name'. NO if there is no such comment, or it only repeats the error text. Lines that start with // STEP are the lesson's own instructions, not the student's work. ",
+   "r2": "Is this true of the student's code: The misspelling is gone: No use of the misspelled name remains anywhere in the file. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
   }
  },
  "1-5-43-lab-debug-the-order-total": {
   "questions": {
    "r1": "Is a variable (any name) set to the price variable multiplied by the quantity variable, like let subtotal = unitPrice * quantity;, with * and either order? NO if it adds them, or uses only one of the two. Comments never run. Lines that start with // STEP are the lesson's own instructions, not the student's work. ",
    "r2": "Is the discounted amount worked out by SUBTRACTING the discount from the subtotal, like let discounted = subtotal - discount;? YES for subtotal - discount (or minus a discount rate times subtotal). NO if the two are added. How the discount itself is worked out does not matter. Comments never run. Lines that start with // STEP are the lesson's own instructions, not the student's work. ",
-   "r3": "Is the final total worked out by ADDING the tax to the discounted amount, like let total = discounted + tax;? YES for any addition of the discounted amount and the tax. NO if the tax is subtracted, or the total is only the discounted amount. How the tax itself is worked out does not matter. Comments never run. Lines that start with // STEP are the lesson's own instructions, not the student's work. "
+   "r3": "Is the final total worked out by ADDING the tax to the discounted amount, like let total = discounted + tax;? YES for any addition of the discounted amount and the tax. NO if the tax is subtracted, or the total is only the discounted amount. How the tax itself is worked out does not matter. Comments never run. Lines that start with // STEP are the lesson's own instructions, not the student's work. ",
+   "r4": "Is this true of the student's code: At least three labelled prints: Three or more console.log calls whose text includes a label (string concatenation or a template literal both count). Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r5": "Is this true of the student's code: A PASS/FAIL check is present: An if/else comparing the total against the expected value and printing PASS or FAIL. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
   }
  },
  "1-2-26-lab-variables-types-check": {
   "questions": {
    "req3": "Does the code use the typeof operator as code, like typeof age or typeof(name)? YES even if the result is not printed. NO if typeof appears only inside a comment, or only inside quotes such as console.log('typeof age'). Lines that start with // STEP are the lesson's own instructions, not the student's work. ",
-   "req4": "Is there a console.log( ... ) call written as code, not inside a comment or inside quotes? Whatever it prints is fine, even a plain word in quotes. NO if the only console.log is inside a comment. Lines that start with // STEP are the lesson's own instructions, not the student's work. "
+   "req4": "Is there a console.log( ... ) call written as code, not inside a comment or inside quotes? Whatever it prints is fine, even a plain word in quotes. NO if the only console.log is inside a comment. Lines that start with // STEP are the lesson's own instructions, not the student's work. ",
+   "req1": "Is this true of the student's code: Declare age variable: Create a variable called age. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "req2": "Is this true of the student's code: Declare name variable: Create a variable called name. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
   }
  },
  "2-3-8-lab-animal-sounds": {
@@ -231,12 +240,227 @@
  },
  "1-2-29-a1-2-2-describe-an-object": {
   "questions": {
-   "r7": "Is typeof used in code and its result logged: console.log(typeof x), a label then typeof x, or a variable set to typeof x that is then logged? Any of these is YES. NO if typeof appears only in a comment or inside quotes. Lines that start with // STEP are the lesson's own instructions, not the student's work. "
+   "r7": "Is typeof used in code and its result logged: console.log(typeof x), a label then typeof x, or a variable set to typeof x that is then logged? Any of these is YES. NO if typeof appears only in a comment or inside quotes. Lines that start with // STEP are the lesson's own instructions, not the student's work. ",
+   "r3": "Is this true of the student's code: At least two strings: Two or more variables hold text, in quotes or backticks, assigned on the declaration line or later. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r4": "Is this true of the student's code: At least one boolean: A variable holds true or false, either literally or from a comparison, assigned on the declaration line or later. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r5": "Is this true of the student's code: Two different string methods used: Uses two different string operations -- .length, .toUpperCase(), .includes(), .trim(), .replace() and others all count. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
   }
  },
  "2-1-36-lab-settings-advisor": {
   "questions": {
    "r1": "Is there an if whose condition compares filamentType to PLA (filamentType === 'PLA' or == 'PLA', any quotes) and whose block logs the temperature 200, either the bare number 200 or inside a message like 'Recommended temperature: 200C'? What the other branches do is irrelevant. NO if the condition is a single = (an assignment, not a comparison) or the block logs a different number. Code inside a comment, or inside quotes or backticks as text, never runs."
+  }
+ },
+ "1-1-11-name-that-umbrella": {
+  "questions": {
+   "r1": "Is this true of the student's code: The right umbrella activity is logged: Logs the correct umbrella activity for Miguel's testing scenario. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "1-1-3-first-statement": {
+  "questions": {
+   "r1": "Is this true of the student's code: First statement present: The first console.log statement is still present. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r2": "Is this true of the student's code: Second statement present: The second console.log statement is still present. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r3": "Is this true of the student's code: Third statement present: The third console.log statement is still present. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r4": "Is this true of the student's code: Fourth statement is a console.log: The fourth line is still a console.log call. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r5": "Is this true of the student's code: Fifth statement is a console.log: The fifth line is still a console.log call. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r6": "Is this true of the student's code: Fourth statement changed: The fourth statement no longer prints its original text. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r7": "Is this true of the student's code: Fifth statement changed: The fifth statement no longer prints its original text. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "1-1-4-sdlc-overview": {
+  "questions": {
+   "req1": "Is this true of the student's code: Hello world: Print \"Hello, world!\" using console.log. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "req2": "Is this true of the student's code: Math expression: Use console.log with a math expression. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "req3": "Is this true of the student's code: String concatenation: Join two strings with the + operator Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "req4": "Is this true of the student's code: Boolean comparison: Print a comparison that evaluates to true or false Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "req5": "Is this true of the student's code: Your name: Print your name to the console Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "req6": "Is this true of the student's code: Your hobby: Print your hobby, at least 6 console.log statements total Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "1-1-7-classify-the-task": {
+  "questions": {
+   "r1": "Is this true of the student's code: Menu code is construction: Logs the correct phase for writing the code that shows the menu. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r2": "Is this true of the student's code: School choice is inception: Logs the correct phase for deciding which schools the app will serve. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r3": "Is this true of the student's code: App structure is elaboration: Logs the correct phase for drawing the overall structure of the app. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r4": "Is this true of the student's code: App store release is deployment: Logs the correct phase for putting the finished app in the app store. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "1-2-15-lab-greeting-with-backticks": {
+  "questions": {
+   "r1": "Is this true of the student's code: myName is declared: Declares a variable called myName. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r2": "Is this true of the student's code: A backtick string embeds myName: Uses a template literal containing ${myName}. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r3": "Is this true of the student's code: A calculation is embedded: Embeds an expression containing an operator, such as ${2024 + 1}. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "1-2-16-lab-operators-check": {
+  "questions": {
+   "req2": "Is this true of the student's code: Use multiplication: Use the * operator. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "req3": "Is this true of the student's code: String concatenation: Concatenate strings using +, either inline literals or two previously-declared string variables. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "req4": "Is this true of the student's code: Comparison operator: Use a comparison operator like ===, !==, <, >. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "req5": "Is this true of the student's code: Log results: Use console.log to display results. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "1-2-25-lab-typeof-round-up": {
+  "questions": {
+   "r1": "Is this true of the student's code: typeof a string: Logs the type of a quoted piece of text, either inline or via a variable holding one. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r2": "Is this true of the student's code: typeof a number: Logs the type of a plain number, either inline or via a variable holding one. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r3": "Is this true of the student's code: typeof true: Logs the type of a boolean, either inline or via a variable holding true/false. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r4": "Is this true of the student's code: typeof undefined: Logs the type of undefined, either inline or via a variable left unassigned. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "1-2-28-a1-2-1-fix-ten-declarations": {
+  "questions": {
+   "r2": "Is this true of the student's code: firstName is a string: firstName is declared and holds properly quoted text. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r3": "Is this true of the student's code: isEnrolled is a real boolean: isEnrolled holds a real boolean -- true, false, or a comparison that produces one -- not quoted text. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r4": "Is this true of the student's code: gradeLevel is declared with a keyword: gradeLevel uses let or const rather than being assigned with no keyword. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r5": "Is this true of the student's code: maxStudents is a const: The value that never changes is declared with const. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r6": "Is this true of the student's code: unitPrice replaces the single-letter name: The mystery name p has been renamed to unitPrice. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r7": "Is this true of the student's code: itemCount replaces the second mystery name: The mystery name q has been renamed to itemCount. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r9": "Is this true of the student's code: middleName is null, not the string \"null\": The deliberately-empty value uses the null keyword without quotes. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r10": "Is this true of the student's code: finalScore is declared but left unassigned: finalScore is declared with let and no value, so it holds undefined until set. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "1-2-5-lab-change-the-type": {
+  "questions": {
+   "r1": "Is this true of the student's code: thing is declared with let: Declares a variable called thing using let. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r2": "Is this true of the student's code: thing starts as a string: thing holds text in quotes, whether from its own let or a later assignment. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r3": "Is this true of the student's code: thing is reassigned without let: Assigns a new value to thing without re-declaring it. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r4": "Is this true of the student's code: thing is given a boolean: At some point thing holds true or false, either literally or from a comparison. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r5": "Is this true of the student's code: typeof is printed: Uses console.log with typeof thing to show the type. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "1-3-11-lab-rename-the-mystery-variables": {
+  "questions": {
+   "r1": "Is this true of the student's code: subjectName replaces a: Declares subjectName holding the subject text. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r3": "Is this true of the student's code: gradeReport replaces c: Declares gradeReport built from the other two. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r4": "Is this true of the student's code: hoursWorked replaces n: Declares hoursWorked holding the number of hours. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r5": "Is this true of the student's code: hourlyRate replaces d: Declares hourlyRate holding the rate. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r6": "Is this true of the student's code: totalPay replaces p: Declares totalPay as hoursWorked times hourlyRate. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r7": "Is this true of the student's code: No single-letter variables left: No declaration of a, b, c, n, d or p remains in the file. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "1-3-19-a1-3-1-document-a-messy-program": {
+  "questions": {
+   "r2": "Is this true of the student's code: bookTitle holds the title: Declares bookTitle with quoted text. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r3": "Is this true of the student's code: unitPrice and quantity are named: Declares both unitPrice and quantity. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r4": "Is there a variable literally named subtotal that is set to unitPrice multiplied by quantity (variables literally named unitPrice and quantity)? NO if those values still have short or messy names such as s, p, q or x, even if the arithmetic is the same. Comments never run. Lines starting with // STEP are the lesson's own instructions.",
+   "r5": "Is this true of the student's code: orderTotal uses the tax rate: orderTotal is computed from subtotal and taxRate. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r6": "Is this true of the student's code: No single-letter variables remain: No declaration of a one-letter variable is left in the file. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r7": "Is this true of the student's code: Operators are spaced: No cramped arithmetic like a*b remains: every operator has a space on each side. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r8": "Is this true of the student's code: At least four explanatory comments: Four or more comments explaining the code, written as // or /* */. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r9": "Is this true of the student's code: README answers all three prompts: Each of the three headings has a real answer under it -- a sentence or a bullet, not an empty heading. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "1-5-31-a1-5-1-implement-your-plan": {
+  "questions": {
+   "r2": "Is this true of the student's code: pagesRequested is declared: A descriptive variable holds how many pages were asked for. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r3": "Is this true of the student's code: creditRemaining is declared: A descriptive variable holds the credit left. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r4": "Is this true of the student's code: The decision compares the two: An if statement compares pagesRequested against creditRemaining Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r5": "Is this true of the student's code: Both branches exist: An else branch is present, matching the diamond's second exit Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r6": "Is this true of the student's code: Both branches print: Two or more console.log calls, so each path reports an outcome. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "2-1-34-lab-combine-logical": {
+  "questions": {
+   "r1": "Is there an if whose condition uses && with at least one named variable on a side (hasTicket, isBlocked, age >= 18, isBlocked == false), anywhere in the condition, including inside brackets next to ||? NO if the sides are only the literals true and false, or && is not in the condition.",
+   "r2": "Is there an || in an if condition whose two sides compare the SAME variable, for example age < 5 || age >= 65 or age<21 || age>40? Other && or || joined to the condition elsewhere do not matter. NO if the two sides of the || test different variables, or there is no ||."
+  }
+ },
+ "2-2-13-challenges": {
+  "questions": {
+   "r4": "Is this true of the student's code: even-sum test: Uses % 2 to pick the even numbers. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "2-3-4-lab-convert-to-switch": {
+  "questions": {
+   "r2": "Is there a case with a quoted label (case \"Monday\":) that is followed, on the same line or the next lines, by a console.log call? Stacked labels count: case \"Saturday\": case \"Sunday\": console.log(\"Weekend\") has quoted labels directly followed by console.log. NO if there are no quoted case labels, or no console.log after any of them. Comments never run."
+  }
+ },
+ "2-5-14-lab-report-the-error": {
+  "questions": {
+   "r2": "Is this true of the student's code: logs err.name: Catch block logs err.name. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "2-5-20-lab-after-a-throw": {
+  "questions": {
+   "r3": "Is this true of the student's code: catch reports caught plus the message: Catch block logs caught: followed by err.message. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "2-5-26-a2-5-1-loop-with-try-catch": {
+  "questions": {
+   "r3": "Is this true of the student's code: checks for NaN: Code checks the converted value with Number.isNaN(...) or isNaN(...). Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
+   "r4": "Is this true of the student's code: catch reports err.message: The catch block logs a friendly message that includes err.message, not a generic string. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "3-1-10-functions": {
+  "questions": {
+   "req3": "Is there an arrow function written as code: an => with parameters on its left and a body on its right, like const f = (x) => x * 2, name => name.length, or points => 40 handed straight to another call? Where it is used does not matter. NO if => appears only inside a comment or inside quotes. Lines starting with // Step are the lesson's own instructions."
+  }
+ },
+ "3-6-4-lab-predict-primitive-vs-array": {
+  "questions": {
+   "r4": "Is this true of the student's code: caller variables logged: Code calls console.log. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "3-7-22-lab-capstone": {
+  "questions": {
+   "r1": "Is this true of the student's code: prices built with .push(): Declares prices as an array and adds to it with prices.push(). Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "3-8-10-lab-round-trip-object": {
+  "questions": {
+   "r4": "Is this true of the student's code: Both logged: Calls console.log to print the restored object. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "3-8-19-lab-load-restore": {
+  "questions": {
+   "r3": "Is this true of the student's code: Restored with parse: Calls JSON.parse. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "3-8-22-lab-capstone": {
+  "questions": {
+   "r3": "Is this true of the student's code: Load reads the key: Calls localStorage.getItem. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "5-2-15-challenges": {
+  "questions": {
+   "r3": "Is this true of the student's code: Track collection progress: Your code knows when both goals are gone, either way content.md describes: a counter that goes up (or down) by one per goal and is then checked (collected === 2), or a check that both goal variables are gone (goal1 === null && goal2 === null, or !goal1 && !goal2). Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "5-2-9-lab-wind-zone": {
+  "questions": {
+   "r3": "Is this true of the student's code: The wind pushes up: The force's second number (fy) is negative, so the wind pushes the player up against gravity: applyForce(0, -3). Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "5-3-31-a12-1-collectible": {
+  "questions": {
+   "r5": "Is this true of the student's code: Overlap detection: The code checks for overlap between player and a sprite (.overlaps() or .overlapping()). Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "5-3-9-lab-write-property": {
+  "questions": {
+   "r2": "Is this true of the student's code: Detect a key press: Use `kb.presses(...)` (or `kb.pressing(...)`) inside `draw()` to respond to keyboard input. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "5-3-pinball-10-challenges-make-it-yours": {
+  "questions": {
+   "r1": "Is this true of the student's code: Your game has a rule of your own: Any one challenge counts, or a rule you invented: a second thing that scores, something on the table that moves, a best score kept across restarts, or a score worth something other than 1. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "5-8-pinball-sub-two-masses": {
+  "questions": {
+   "r2": "Is this true of the student's code: The same push reaches both: applyForce (or a velocity set) is called on both balls, so the comparison is fair. Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine."
+  }
+ },
+ "2-1-12-lab-guard-and": {
+  "questions": {
+   "r1": "Is there an if whose condition joins two comparisons with &&, where each side compares a variable to a value with <, >, <=, >=, ===, !==, == or !=? Any variable names, and the value may be a number, text, true or false: age >= 16 && score >= 70, x === true && y === false and age >= 13 && age <= 17 all count. NO if a side is a single = (an assignment), or a bare variable or literal with no comparison, or && is only in a comment or quotes."
+  }
+ },
+ "2-4-23-a2-4-1-debug-five-loops": {
+  "questions": {
+   "r1": "Is there a while loop that is real code (not inside a // comment), with the condition n <= 5 (or n < 6), whose body contains both console.log(n) and n++ (or n += 1, or n = n + 1), in either order? The broken original shown in comments does not count and is not the fix. NO if the loop has no update inside it.",
+   "r5": "Is there a do...while loop that is real code (not inside a // comment), whose body logs something and whose while condition is !greeted or greeted === false? What greeted is set to inside the body does not matter. The commented-out broken original does not count."
   }
  }
 }

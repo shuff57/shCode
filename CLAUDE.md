@@ -1633,10 +1633,16 @@ Everything else below (the route name, the cards, the pattern-check fallback, th
   (`{ "<lesson id>": { "questions": { "<card id>": "..." } } }`) is laid over them by `generate-ai-graders.mjs` (an override for a card
   the lesson has no question for is a build error). The harness (`scripts/clef-harness.mjs --provider cheaperinference --model
   decision-1.1 --questions-file scripts/ci-questions/decision-1.1.json --band 0.8,0.15`, key in `CI_API_KEY`) is the gate: 2495/2495
-  programs, about 16% of cards left to the pattern check (Clef: 8.3%).
+  programs, about 15% of cards left to the pattern check (Clef: 8.3%).
 - **The gate misses generic wording.** Measured on 4,000 real handed-in programs: cards still on the lesson's generic wording
   ("Answer yes only if this is fully done") gave confident false reds in the debug labs that no fixture showed. Write per-card questions
   that name the YES and the NO forms, and check a new lab against real work (blind-reviewed disagreements), not only the gate.
+  Reviewed rounds on 4,000 real programs took the model's false reds from 168 to 3 (of 15,925 cards) and left 12 false greens
+  (mostly a typo such as "Unkown filament type" that the question accepts). What worked: cards phrased as a QUESTION naming the YES and
+  NO forms; a terse statement card ("Calls JSON.parse.") reworded to "Is this true of the student's code: ..."; and never telling
+  the model to count only code that "really runs" (it then says a catch block that nothing throws into never runs).
+  Review method: list the cells where the model's final verdict and the lab's own pattern check disagree, have them labelled by
+  readers who cannot see either verdict, and read a card for its INTENT (2.4.19 r1 prints the non-multiples of 3, so its red is right).
 - **A 429 from the provider's per-minute limit is 503 `offline`** (the browser runs the slow Check); a classroom burst past the
   key's limit degrades quietly, it never shows a student an error.
 - Tests: `scripts/test-decision-check.mjs` (request, answer, band, `askDecision`, and the real route over a stubbed fetch),
