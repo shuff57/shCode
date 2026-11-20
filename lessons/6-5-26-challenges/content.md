@@ -41,14 +41,14 @@ Use a profile name as a prefix for all save keys. For example, player "Alex" sav
 
 ---
 
-### Option 4: Bulk delete with double-confirmation (medium)
+### Option 4: Delete this game's saves, with double-confirmation (medium)
 
-Add a "Delete all saves" option that requires two key presses to confirm: first press asks "Are you sure?", second press confirms. This prevents accidental data loss from a stray keystroke.
+Add a "Delete my saves" option that requires two key presses to confirm: first press asks "Are you sure?", second press confirms. This prevents accidental data loss from a stray keystroke. It deletes this game's saves only: every sketch shares one store (6.10.16), so `clearStorage()` would erase your other games' saves too.
 
 **Hints:**
 - Use a state variable: `let confirmWipe = false;`
 - First press of the delete key sets `confirmWipe = true` and shows "Press D again to confirm"
-- Second press (while `confirmWipe` is true) calls `clearStorage()` and resets the flag
+- Second press (while `confirmWipe` is true) calls `removeItem()` on each of this game's names (a list such as `['slot1', 'slot2', 'slot3']` and a loop) and resets the flag
 - If the player presses any other key, cancel: `confirmWipe = false`
 - After wiping, reset all game state to defaults
 

@@ -55,7 +55,9 @@ After `removeItem('itemB')`, `getItem('itemB')` returns `null`: it no longer exi
 
 WARNING: `clearStorage()` removes every save made with `storeItem`, and not just this game's: all your sketches share one store, so another game's high score goes too. There is no undo. Your saved pictures, sounds and fonts are kept. Use it in a settings menu with a confirmation prompt, never as a default action; to reset one game, `removeItem` its own names instead.
 
-```js live
+This example is here to read, not to run: running it would erase the saves of every game you have made.
+
+```js
 let beforeClear = '';
 let afterClear = '';
 
