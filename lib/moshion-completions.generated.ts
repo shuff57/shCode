@@ -1380,13 +1380,13 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "drag",
    "type": "property",
    "detail": "number",
-   "info": "Linear damping — air resistance."
+   "info": "How quickly it slows down, like air resistance: 0 is none."
   },
   {
    "label": "rotationDrag",
    "type": "property",
    "detail": "number",
-   "info": "Angular damping."
+   "info": "How quickly its spinning slows down: 0 is none."
   },
   {
    "label": "rotationLock",
