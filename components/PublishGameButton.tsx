@@ -28,6 +28,7 @@
 // the panel says so and offers to bring it in before Update would replace it (GitHub's rejected push).
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Gamepad2 } from 'lucide-react';
 import {
   GAMES_CHANGED,
@@ -48,7 +49,7 @@ import ShareChoicePicker, { RemixCreditLine, lockedChoice, useLastChoice } from 
 import AudiencePicker from './AudiencePicker';
 import {
    initialPick, pickProblem, pickToSpec, pickerMatters, samePick,
-  type AudienceOptions, type AudiencePick, type ItemAudience, type PulledInfo,
+  type AudienceOptions, type AudiencePick, type AudienceSpec, type ItemAudience, type PulledInfo,
 } from '../lib/audience';
 import { fetchAudiences } from '../lib/audience-client';
 import { GITHUB_WORD, MESSAGE_MAX, cleanMessage } from '../lib/game-flow-core';
@@ -110,8 +111,23 @@ function usesSentence(used: UsedItem[]): string {
   return `Your game uses ${parts.join(', and ')}.`;
 }
 
-export default function PublishGameButton({ getCode }: { getCode: () => string }) {
-  const [open, setOpen] = useState(false);
+/**
+ * `embedded`: the panel is a tab of the sandbox's Share dialog (components/ShareDialog.tsx). There is no button of
+ * its own and no popup chrome: `active` says the tab is showing (the panel's loads and listeners run only then),
+ * and Close calls `onClose`. Without it, this is the self-contained button + popup it always was.
+ */
+export default function PublishGameButton({ getCode, embedded = false, active = false, onClose }: {
+  getCode: () => string;
+  embedded?: boolean;
+  active?: boolean;
+  onClose?: () => void;
+}) {
+  const [openOwn, setOpenOwn] = useState(false);
+  const open = embedded ? active : openOwn;
+  const setOpen = useCallback((v: boolean | ((o: boolean) => boolean)) => {
+    if (embedded) { if (v === false) onClose?.(); return; }
+    setOpenOwn(v);
+  }, [embedded, onClose]);
   const [title, setTitle] = useState('');
   const [share, setShare] = useState(true);
   // The game's "Let classmates give feedback" switch (migration 0051): what is wanted, and what the server holds.
@@ -123,6 +139,8 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
   const [declared, setDeclared] = useState('1 player');
   const [used, setUsed] = useState<UsedItem[]>([]);
   const [sharingItems, setSharingItems] = useState(false);
+  // "Also share the pictures and sounds it uses" (#129): ticked by default, so publishing to the class brings the art.
+  const [shareArt, setShareArt] = useState(true);
   const [itemsNote, setItemsNote] = useState<{ text: string; bad: boolean } | null>(null);
   const [lastChoice, rememberChoice] = useLastChoice('game');
   const [choice, setChoice] = useState<ShareChoice>(lastChoice);
@@ -140,6 +158,7 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
   const [ahead, setAhead] = useState<{ from: number; newest: number } | null>(null);
   const [aheadRes, setAheadRes] = useState<SyncResult | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null); // the panel is portalled to <body>, outside wrapRef
 
   // What the sandbox draft is published as, checked against the server (a
   // deleted game, or another account on this browser, reads as unpublished).
@@ -193,12 +212,16 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
     if (!open) return;
     const d = declaredMode(getCode());
     setDeclared(modeLabel(d.mode, d.players));
+    if (embedded) return; // the Share dialog owns Escape and the click outside
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
-    const onDown = (e: MouseEvent) => { if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false); };
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as Node;
+      if (wrapRef.current && !wrapRef.current.contains(t) && !dialogRef.current?.contains(t)) setOpen(false);
+    };
     window.addEventListener('keydown', onKey);
     window.addEventListener('mousedown', onDown);
     return () => { window.removeEventListener('keydown', onKey); window.removeEventListener('mousedown', onDown); };
-  }, [open, getCode]);
+  }, [open, getCode, embedded, setOpen]);
 
   // Which of the student's own pictures and sounds the code uses, kept fresh
   // while the panel is open (a sync finishing or a share changing moves them).
@@ -214,15 +237,17 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
     };
   }, [open, getCode]);
 
-  async function shareUsed() {
-    const todo = used.filter((u) => u.state === 'not-shared');
+  /** Share every used item not shared yet; `audience` = the game's own, when Publish does it, so the art goes where the game goes. */
+  async function shareUsed(audience?: AudienceSpec) {
+    // Read again rather than trust the panel's list: a sync may have finished since it was drawn.
+    const todo = (await findUsedItems(getCode())).filter((u) => u.state === 'not-shared');
     if (!todo.length) return;
     setSharingItems(true);
     setItemsNote(null);
     const errors: string[] = [];
     const done: string[] = [];
     for (const u of todo) {
-      const err = await setShared(u.kind, u.name, true);
+      const err = await setShared(u.kind, u.name, true, undefined, audience);
       if (err) errors.push(err);
       else done.push(u.name);
     }
@@ -290,6 +315,8 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
     } else {
       setFeedbackSaved(feedbackOn);
     }
+    // Publishing to the class shares the pictures and sounds the game uses too, unless the box was unticked (#129).
+    if (shared && shareArt) await shareUsed(askAudience && audPick ? pickToSpec(audPick) : undefined);
     setBusy(false);
     setPublished({ id, title: t.title, shared, choice: stored, version: r.value.game.version, audience: audienceNow, pulled: published?.pulled ?? null });
     setTitle(t.title);
@@ -305,8 +332,19 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
   }
 
   const label = published ? 'Published ✓' : 'Publish game';
+  // Free-standing: a button, and a panel pinned to the middle of the window. Embedded: just the panel, in a tab.
+  const panelStyle: React.CSSProperties = embedded
+    ? { color: 'var(--c-fg)', fontSize: 13, lineHeight: 1.5 }
+    : {
+      position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 1000, width: 'min(820px, calc(100vw - 32px))',
+      maxHeight: 'calc(100vh - 32px)', overflowY: 'auto', boxSizing: 'border-box',
+      background: 'var(--c-deep2)', border: '1px solid var(--c-line)', borderRadius: 6, padding: 12,
+      boxShadow: '0 8px 24px rgba(0,0,0,0.35)', color: 'var(--c-fg)', fontSize: 13, lineHeight: 1.5,
+    };
+  const place = (el: React.ReactElement) => (embedded ? el : createPortal(el, document.body));
   return (
-    <div ref={wrapRef} style={{ position: 'relative', display: 'inline-flex' }}>
+    <div ref={wrapRef} style={embedded ? undefined : { position: 'relative', display: 'inline-flex' }}>
+      {!embedded && (
       <button
         type="button"
         style={published ? { ...chip, color: 'var(--c-green)', borderColor: 'color-mix(in srgb, var(--c-green) 53%, transparent)' } : chip}
@@ -318,15 +356,14 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
         <Gamepad2 size={12} />
         {label}
       </button>
-      {open && (
+      )}
+      {(embedded || open) && place(
         <div
-          role="dialog"
+          ref={dialogRef}
+          data-publish-game-panel=""
+          role={embedded ? 'group' : 'dialog'}
           aria-label="Publish game"
-          style={{
-            position: 'absolute', top: 'calc(100% + 6px)', right: 0, zIndex: 50, width: 'min(360px, calc(100vw - 32px))',
-            background: 'var(--c-deep2)', border: '1px solid var(--c-line)', borderRadius: 6, padding: 12,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.35)', color: 'var(--c-fg)', fontSize: 13, lineHeight: 1.5,
-          }}
+          style={panelStyle}
         >
           <h2 style={{ fontSize: 14, margin: '0 0 6px' }}>{published ? 'Update your game' : 'Publish this sketch as a game'}</h2>
           <p style={{ margin: '0 0 8px', color: 'var(--c-dim)' }}>
@@ -399,6 +436,8 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
               <div style={{ margin: '0 0 8px' }}><GitHubWord>{GITHUB_WORD.version}</GitHubWord></div>
             </>
           )}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '0 16px', alignItems: 'start' }}>
+          <div>
           <label style={{ display: 'block', margin: '0 0 4px' }} htmlFor="publish-game-title">Title</label>
           <input
             id="publish-game-title"
@@ -420,10 +459,6 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
             <input type="checkbox" checked={share} onChange={(e) => setShare(e.target.checked)} />
             Share with my class
           </label>
-          {share && audPick && <AudiencePicker options={audOptions} value={audPick} onChange={setAudPick} idPrefix="publish-game-audience" pulled={published?.pulled} />}
-          {share && (
-            <ShareChoicePicker thing="game" value={choice} onChange={setChoice} from={from} idPrefix="publish-game" />
-          )}
           {share && (
             <label style={{ display: 'flex', alignItems: 'center', gap: 6, margin: '0 0 10px' }}
               title="Classmates can write comments and pick suggestions under your game. You can change this later on its play page.">
@@ -431,6 +466,14 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
               Let classmates give feedback
             </label>
           )}
+          </div>
+          {share && (
+            <div>
+              {audPick && <AudiencePicker options={audOptions} value={audPick} onChange={setAudPick} idPrefix="publish-game-audience" pulled={published?.pulled} />}
+              <ShareChoicePicker thing="game" value={choice} onChange={setChoice} from={from} idPrefix="publish-game" />
+            </div>
+          )}
+          </div>
           {used.length > 0 && (
             <div style={{ margin: '0 0 10px', padding: '8px 10px', border: '1px solid var(--c-line)', borderRadius: 4 }}>
               <p style={{ margin: '0 0 4px' }}>{usesSentence(used)}</p>
@@ -450,6 +493,12 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
                   Classmates only see pictures and sounds you share with your class.
                   {used.some((u) => u.state === 'local') && ' One that is not saved to your account yet cannot be shared: it saves there by itself in a moment, then you can share it.'}
                 </p>
+              )}
+              {share && used.some((u) => u.state === 'not-shared') && (
+                <label style={{ display: 'flex', alignItems: 'center', gap: 6, margin: '0 0 6px', fontSize: 12 }}>
+                  <input type="checkbox" checked={shareArt} onChange={(e) => setShareArt(e.target.checked)} />
+                  Also share them with my class when I publish
+                </label>
               )}
               {used.some((u) => u.state === 'not-shared') && (
                 <button
@@ -487,7 +536,7 @@ export default function PublishGameButton({ getCode }: { getCode: () => string }
               {note.text}
             </div>
           )}
-        </div>
+        </div>,
       )}
     </div>
   );

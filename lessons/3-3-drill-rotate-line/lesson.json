@@ -3,6 +3,10 @@
   "title": "3.3.9 Lab: rotate(items)",
   "description": "Write rotate(items): the first item goes to the back of the array and the function returns the array. Practice with shift and push, not graded: the checks call your function.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",
@@ -206,6 +210,13 @@
         "description": "rotate(items) gives back the same items with the first one moved to the end, and every item still there. Help: 3.3.7 (Adding and Removing from the Front)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "rotate is defined with one parameter: Code defines a function named rotate with exactly one parameter. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "rotate takes the first item off with shift: rotate calls .shift() in its body. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "rotate hands the array back with return: rotate contains a return statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

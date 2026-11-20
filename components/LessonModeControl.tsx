@@ -14,6 +14,7 @@ import type { LessonMode } from '../lib/lesson-mode';
 
 interface LessonOption {
   cadHost?: 'solidcraft';
+  cadScope?: 'sketch';
   id: string;
   title: string;
 }
@@ -73,12 +74,12 @@ export default function LessonModeControl({ classId, lessons }: Props) {
 
   const perLesson = new Map((modes?.lessons ?? []).map((r) => [r.lesson_id, r.mode as LessonMode]));
 
-  function Row({ id, label, current, scriptCad = false }: { id: string; label: string; current: LessonMode | null; scriptCad?: boolean }) {
+  function Row({ id, label, current, scriptCad = false, sketch = false }: { id: string; label: string; current: LessonMode | null; scriptCad?: boolean; sketch?: boolean }) {
     return (
       <div className="lmc-row">
         <span className="lmc-label" style={{ fontSize: 14 }} title={id}>{label}</span>
         <span className="lmc-choices">
-          {(scriptCad ? [{ value: null, label: 'Use class setting', hint: 'Use the class setting, then the lesson default' }, { value: 'code' as const, label: 'Modelling tools off', hint: 'Students build by writing code; only camera controls are available in the view' }, { value: 'both' as const, label: 'Modelling tools on', hint: 'Allow hand modelling alongside the script editor' }] : CHOICES).map((c) => (
+          {(scriptCad ? [{ value: null, label: 'Use class setting', hint: 'Use the class setting, then the lesson default' }, { value: 'code' as const, label: sketch ? 'Drawing paused' : 'Modelling tools off', hint: sketch ? 'Keep the saved sketch visible and pause drawing' : 'Students build by writing code; only camera controls are available in the view' }, { value: 'both' as const, label: sketch ? 'Sketch only' : 'Modelling tools on', hint: sketch ? 'Allow 2D drawing and dimensions; 3D tools remain unavailable' : 'Allow hand modelling alongside the script editor' }] : CHOICES).map((c) => (
             <button
               key={String(c.value)}
               type="button"
@@ -102,8 +103,7 @@ export default function LessonModeControl({ classId, lessons }: Props) {
       <div className="lmc-head">
         <strong style={{ fontSize: 18, fontWeight: 700 }}>Shape tools or code</strong>
         <span className="lmc-sub" style={{ color: 'var(--c-meta)', fontSize: 13 }}>
-          For CAD script lessons, control the modelling toolbar here; students cannot change it. An assignment setting beats the class setting. Anything left on
-          &ldquo;their choice&rdquo; lets the student decide.
+          For CAD script lessons, control the modelling toolbar here; students cannot change it. An assignment setting beats the class setting. Sketch-only lessons always keep 3D tools off. For other lessons, &ldquo;their choice&rdquo; lets the student decide.
         </span>
       </div>
 
@@ -115,7 +115,7 @@ export default function LessonModeControl({ classId, lessons }: Props) {
         <>
           <div className="lmc-sep" style={{ color: 'var(--c-meta)', fontSize: 13 }}>Per assignment</div>
           {lessons.map((l) => (
-            <Row key={l.id} id={l.id} label={l.title} current={perLesson.get(l.id) ?? null} scriptCad={l.cadHost === 'solidcraft'} />
+            <Row key={l.id} id={l.id} label={l.title} current={perLesson.get(l.id) ?? null} scriptCad={l.cadHost === 'solidcraft'} sketch={l.cadScope === 'sketch'} />
           ))}
         </>
       )}

@@ -3,6 +3,10 @@
   "title": "1.2.31 Module 1.2 Quiz",
   "description": "Eight multiple-choice questions on dynamic typing, the seven primitives, and null vs undefined. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",

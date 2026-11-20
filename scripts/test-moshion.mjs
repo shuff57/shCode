@@ -19,7 +19,7 @@ import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
 import { Script } from 'node:vm';
 import { fileURLToPath } from 'node:url';
-import { runSketch, runSketchAsync, createSandbox } from './moshion-harness.mjs';
+import { runSketch, runSketchAsync, usesPreload, createSandbox } from './moshion-harness.mjs';
 import { SEMANTIC_CHECKS } from './moshion-checks.mjs';
 import { sections as docSections } from '../lib/moshion-docs.ts';
 
@@ -174,14 +174,12 @@ function collectCorpus() {
 // nothing is a failure dressed as a pass.
 const DRAW_OPS = new Set(['fillRect', 'strokeRect', 'fill', 'stroke', 'fillText', 'drawImage', 'arc']);
 
-// A sketch with preload() waits on promises before setup(), so it runs through
-// the async harness entry; everything else stays synchronous.
-const HAS_PRELOAD = /function\s+preload\s*\(/;
-
 async function runCorpusItem(item) {
   if (item.kind === 'scaffold') return runScaffoldItem(item);
+  // A sketch with preload() waits on promises before setup(); every other
+  // sketch takes the synchronous path, unchanged.
   const opts = { frames: 60, filename: `${item.lesson}.js` };
-  const r = HAS_PRELOAD.test(item.code) ? await runSketchAsync(item.code, opts) : runSketch(item.code, opts);
+  const r = usesPreload(item.code) ? await runSketchAsync(item.code, opts) : runSketch(item.code, opts);
   if (!r.ok) {
     return {
       ...meta(item), pass: false, reason: `${r.phase}: ${r.error?.message || 'unknown error'}`,
@@ -257,6 +255,8 @@ async function main() {
   if (ONLY !== 'semantic') {
     let corpus = collectCorpus();
     if (FILTER) corpus = corpus.filter((i) => i.lesson.includes(FILTER));
+    // In order, one at a time: a preload() sketch yields, and two sketches
+    // interleaving would mix their engines' timers.
     for (const item of corpus) report.corpus.push(await runCorpusItem(item));
   }
   if (ONLY !== 'corpus') {

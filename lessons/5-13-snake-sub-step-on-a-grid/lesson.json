@@ -3,6 +3,10 @@
   "title": "5.13.4 Sub-build: Step on a grid",
   "description": "A square jumps one cell at a time, on a beat. Build the step before there is a snake.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.13 Snake: grid and steering",
@@ -85,6 +89,13 @@
         "description": "x changes by a cell-sized step, not by 1 or by velocity.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "It steps on a beat: A timer (every or after) moves the block, not draw() every frame. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "One whole cell: The move changes x by a cell-sized step (a constant, or 20/24/25). Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a short moSHion sketch for \"Sub-build: Step on a grid\". The task: move a block exactly one cell on a timer created in setup(), by adding a cell-sized constant to x, and keep it on the canvas. This is a sub-build: a small isolated program whose only job is this one mechanic. Accept any names, helpers, arrow functions and ternaries. A line only in a comment or string does not count. Use short, plain notes for a 14-year-old, name their own line when something is missing, never write corrected code."
+    }
   }
 }

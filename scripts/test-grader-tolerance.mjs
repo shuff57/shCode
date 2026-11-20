@@ -2875,14 +2875,22 @@ for (const id of Object.values(L)) {
 {
   const id = '2-3-29-a2-3-1-print-settings-advisor';
   const sol = solutionFiles(id)['script.js'];
-  const note = '// If this break were removed, PLA' + AP + 's settings would print and then PETG' + AP + 's';
+  const note = '// If this break were removed, PLA' + AP + 's settings would print and then ABS' + AP + 's';
   const reword = (line) => ({ ...solutionFiles(id), 'script.js': sol.split(note).join(line) });
   if (!sol.includes(note)) throw new Error('2.3.30 case: the reference comment moved');
-  accept(id, 'the comment in the step' + AP + 's own words', reword('// Without its stopping statement, PLA' + AP + 's settings would print and then PETG' + AP + 's'));
-  accept(id, 'the comment says it falls through', reword('// Take the end off the PLA case and it falls into PETG, so both print:'));
+  accept(id, 'the comment in the step' + AP + 's own words', reword('// Without its stopping statement, PLA' + AP + 's settings would print and then ABS' + AP + 's'));
+  accept(id, 'the comment says it falls through', reword('// Take the end off the PLA case and it falls into ABS, so both print:'));
 }
 
 // ---------------------------------------------------------------- run
+// TOLERANCE_CASES_OUT=<file>: write the cases and stop, so scripts/clef-harness.mjs --tolerance can use the
+// same ACCEPT / REJECT programs as fixtures for a lab's Clef questions. Nothing is graded in that mode.
+if (process.env.TOLERANCE_CASES_OUT) {
+  writeFileSync(process.env.TOLERANCE_CASES_OUT, JSON.stringify(cases));
+  rmSync(out, { recursive: true, force: true });
+  console.log(`grader tolerance: wrote ${cases.length} cases to ${process.env.TOLERANCE_CASES_OUT}`);
+  process.exit(0);
+}
 try {
   execFileSync(
     process.execPath,

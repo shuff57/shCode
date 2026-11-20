@@ -3,6 +3,10 @@
   "title": "5.2.9 Worked Example: Falling Block",
   "description": "A dynamic block falls under gravity and lands on the static ground. Read the example, then experiment. Follows 5.2.8 (Reading: Gravity).",
   "type": "example",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",
@@ -74,6 +78,11 @@
         "description": "The world.gravity.y line that runs ends with a value other than 10. Step 2 ends at 20, but 0, a negative number or any other value also shows the student changed it, so it counts. Gravity set back to 10, or a new value written only in a comment, is not met. Help: 5.2.8 (Reading: Gravity)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Find the line that sets world.gravity.y and is not inside a comment. Is it set to anything other than exactly 10? YES: world.gravity.y = 1; world.gravity.y = -1; world.gravity.y = 5; world.gravity.y = 9; world.gravity.y = 20; world.gravity.y = 80; a huge number; a changing value such as random(...). NO: world.gravity.y = 10; (the starter). Code inside comments never runs."
+      }
+    }
   }
 }

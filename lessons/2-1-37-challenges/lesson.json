@@ -3,6 +3,10 @@
   "title": "2.1.41 Challenges: Stretch Problems",
   "description": "Stretch problems. Every challenge is required to continue. Auto-graded.",
   "type": "challenge",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",
@@ -185,6 +189,19 @@
         "description": "Challenge 3: uses both the $35 and $75 thresholds",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "checks divisibility by 4: Challenge 1: tests year % 4 Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "&& and || both used: Challenge 1: the leap year check combines && and || Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "logs both leap year messages: Challenge 1: logs both \"Leap year\" and \"Not a leap year\" Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Challenge 2: does the code store each rock-paper-scissors player's choice in its own variable (two players, two variables)? Any variable names count; playerOne and playerTwo are only the lesson's suggestion. How the choice is made (typed in, random, a ternary) does not matter. Code inside comments never runs.",
+        "r5": "else if chain used: Challenge 2: code contains an else if chain Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "logs a Tie result: Challenge 2: logs \"Tie\" for the matching case Code inside a comment, or written inside quotes as text, never runs.",
+        "r7": "isMember and orderTotal declared: Challenge 3: both isMember and orderTotal exist Code inside a comment, or written inside quotes as text, never runs.",
+        "r8": "nested if used: Challenge 3: an if statement nested inside another if's block Code inside a comment, or written inside quotes as text, never runs.",
+        "r9": "both shipping thresholds used: Challenge 3: uses both the $35 and $75 thresholds Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

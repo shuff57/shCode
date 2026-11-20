@@ -3,6 +3,10 @@
   "title": "6.23.2 Sub-build: One die, two turns",
   "description": "One die, two names, one turn index. Roll and pass before there is a board.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.23 Trail: roll and take turns",
@@ -93,6 +97,13 @@
         "description": "Each roll moves the turn on and wraps back to 0.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A roll from 1 to 6: A whole number from 1 to 6, as floor(random(1, 7)) gives. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The turn passes: The turn moves to the other player, with % or another way that goes back to 0. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Sub-build: One die, two turns\". The task: on SPACE, roll a whole number from 1 to 6 and pass the turn to the other player so it goes back to the first after the last. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

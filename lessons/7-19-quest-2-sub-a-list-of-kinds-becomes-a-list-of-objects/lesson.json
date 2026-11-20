@@ -3,6 +3,10 @@
   "title": "7.19.2 Sub-build: A list of kinds becomes a list of objects",
   "description": "KINDS is a list of plain { name, hp } objects; map turns it into a list of Monsters, and N moves which one you are looking at, stopping at the last.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.19 Quest: a run of enemies",
@@ -86,6 +90,13 @@
         "description": "N moves on and stops at the last.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A list of kinds becomes a list of objects: Every kind in KINDS becomes a new Monster, with map or a loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "N moves to the next one: N adds 1 to which, and stops at the last monster in the list. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Sub-build: A list of kinds becomes a list of objects\". The task: turn every plain { name, hp } kind in KINDS into a new Monster with KINDS.map (or a loop that pushes), in place of the one Monster made by hand, and let N add 1 to which, stopping at the last monster. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

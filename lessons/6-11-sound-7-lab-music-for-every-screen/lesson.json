@@ -3,6 +3,10 @@
   "title": "6.15.7 Lab: Music for every screen",
   "description": "Star catch has a title, the game, a win and a loss, and every change of screen goes through goTo(next). Make goTo change the music: stop what was playing, loop the tune on the title and in the game, and play it once for a win or a loss.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.15 Sound and Music",

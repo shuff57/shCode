@@ -3,6 +3,10 @@
   "title": "5.3.8 Lab: A tilted bumper",
   "description": "Put a tilted bumper under the ball so it rolls to the right. Your walls and ground carry forward.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.3 Pinball: the table",
@@ -80,7 +84,13 @@
         "description": "The bumper's `rotation` is set to a number that is not 0, so the ball leaves at an angle. Help: 5.3.5 (Worked Example: The table and the goal)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "The bumper has a name and stays put: A static sprite is stored in `bumper`, so it does not fall and the code can ask about it later. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The bumper is tilted: The bumper's `rotation` is set to a number that is not 0, so the ball leaves at an angle. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "carryFrom": "5-3-pinball-3b-lab-walls-and-a-ground"
 }

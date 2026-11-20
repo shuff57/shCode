@@ -3,6 +3,10 @@
   "title": "7.2.14 Lab: Loop over an array of instances",
   "description": "Write a `for...of` loop in `draw()` that calls `.render()` on each enemy: dispatching a method to every element in the array with one loop.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.2 Writing Your Own Classes",
@@ -72,7 +76,13 @@
         "description": "Inside draw() (or a function it calls), render() is called on an enemy: on the loop variable, on enemies[i], or on the forEach item. Missing: render is called on the array itself, called with no object in front, or never called. Help: 3.3.5 (Looping Over Arrays) and 7.2.1 (Methods: functions that live on a class)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "for loop over enemies in draw(): Write a `for...of` (or `for` index) loop over the `enemies` array inside `draw()`, or call `enemies.forEach(...)`, and render each enemy in it. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Method called on loop variable: Inside the loop body, call a method on the loop variable (e.g. `e.render()`). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "carryFrom": "5-3-26-lab-array-of-instances"
 }

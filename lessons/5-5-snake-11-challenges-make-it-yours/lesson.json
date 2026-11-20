@@ -3,6 +3,10 @@
   "title": "5.16.3 Challenges: Make it yours",
   "description": "The game is complete. Change one rule of your own: a snake that speeds up as it eats, a best score that survives a loss, or a fix for the quick double-turn. Pick one; add an idea of your own on top if you like.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.16 Snake: playtest and extend",
@@ -59,7 +63,12 @@
         "description": "At least one of: (1) the beat lives in a variable that can change, is used in the frameCount % test, and gets smaller when the snake eats (a floor with max(...) or an if is what the challenge asks and is welcome); (2) a best score that startRound() does not reset, updated when the score beats it, where showing it is what the challenge asks and is welcome; (3) turns stored in their own variables (turnX and turnY, or other names) when a key is pressed, and copied into dx and dy at the start of step(). Missing: none of these is there, or the change would stop the sketch (subtracting from a const). Help: 5.13.2 (Reading: A world on a grid) and 5.13.5 (Lab: Steer it)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Your rule is in the code: Is one of these three in the code (any variable name)? (1) A beat variable used in frameCount % beat that gets smaller when the snake eats. (2) A best score: a variable that startRound() does not reset, raised to the score when the score beats it, for example if (score > highScore) highScore = score; or highScore = max(highScore, score); either one counts, and showing it on screen is not needed. A best score that is only shown and never updated does not count. (3) Turns stored in turnX and turnY and applied to dx and dy in step(). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "carryFrom": "5-5-snake-8-lab-dont-bite-yourself"
 }

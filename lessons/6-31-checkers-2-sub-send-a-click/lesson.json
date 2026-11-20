@@ -3,6 +3,10 @@
   "title": "6.31.2 Sub-build: Send a click",
   "description": "H hosts, JOIN joins, and a click sends the square you clicked: every click, yours too, arrives in onMove and is marked on both computers.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.31 Checkers: play online",
@@ -112,6 +116,14 @@
         "description": "H hosts, or JOIN joins.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Moves are received: online.onMove is given a function that runs for every move. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A click is sent: online.send sends the clicked square. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Host or join: The sketch hosts a room or joins one. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Send a click\". The task: set up online.onMove once in setup() so every move that arrives is added to marks with its seat, join when JOIN has a code, host on H, and on a click (once the room is ready) send the clicked row and column with online.send instead of marking it straight away. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

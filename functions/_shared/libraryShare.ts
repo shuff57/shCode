@@ -18,6 +18,7 @@ export interface SharedRow {
   owner_email: string;
   first_name: string | null;
   last_name: string | null;
+  alias?: string | null;
   class_id: string;
   class_name: string;
   shared_at: number;
@@ -43,8 +44,13 @@ export async function teacherClassIds(db: D1Database, email: string): Promise<st
   return (r.results ?? []).map((x) => x.id);
 }
 
-/** How a classmate's name shows: first name and last initial, never the email. */
-export function ownerLabel(first: string | null, last: string | null): string {
+/**
+ * How a classmate's name shows: their alias when they set one, else first name and last initial,
+ * never the email. Teacher views that must name the real person pass no alias.
+ */
+export function ownerLabel(first: string | null, last: string | null, alias?: string | null): string {
+  const a = (alias ?? '').trim();
+  if (a) return a;
   const f = (first ?? '').trim();
   const l = (last ?? '').trim();
   if (f && l) return `${f} ${l[0].toUpperCase()}.`;
@@ -58,7 +64,7 @@ export async function sharedInto(db: D1Database, classIds: string[]): Promise<Sh
   if (!classIds.length) return [];
   const marks = classIds.map(() => '?').join(',');
   const r = await db.prepare(
-    `SELECT i.id, i.kind, i.name, i.bytes, i.owner_email, st.first_name, st.last_name,
+    `SELECT i.id, i.kind, i.name, i.bytes, i.owner_email, st.first_name, st.last_name, st.alias,
             s.class_id, c.name AS class_name, s.shared_at, s.hidden_at
        FROM library_shares s
        JOIN library_items i ON i.id = s.item_id AND i.deleted_at IS NULL

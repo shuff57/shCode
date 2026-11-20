@@ -3,6 +3,10 @@
   "title": "6.17.2 Sub-build: Launch and arc",
   "description": "One arm, one stone, one arc. Launch on release and watch gravity bend the shot.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.17 Sling: launch",
@@ -85,6 +89,13 @@
         "description": "The shot leaves along the arm, not at a fixed angle.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Made on release, kept: A new Sprite is made inside mouse.released() and pushed into an array. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Sent along the arm: The shot gets direction (and speed), not a random push. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Launch and arc\". The task: make a shot on mouse.released(), at the arm, with direction from the arm rotation and a speed, and keep it in an array. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

@@ -3,6 +3,10 @@
   "title": "7.20.2 Sub-build: Send an action",
   "description": "H hosts, JOIN joins, and 1, 2 or 3 sends that action: every action, yours too, arrives in onMove and is listed on both computers with the seat that sent it.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.20 Quest: duel online",
@@ -113,6 +117,14 @@
         "description": "The sketch opens or joins a room.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Actions are received: online.onMove is given a function that runs for every move and uses the move that arrived, for example its act. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "An action is sent: A key you press sends its action: online.send sits inside the test for that key. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Host or join: The sketch hosts a room or joins one. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Sub-build: Send an action\". The task: set up online.onMove once in setup() so each arriving action (1, 2 or 3) is added to got with the seat that sent it; join when JOIN has a code; host on H while the status is 'off'; once the room is 'ready', keys 1, 2 and 3 send { act: 1 }, { act: 2 } or { act: 3 } with online.send. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

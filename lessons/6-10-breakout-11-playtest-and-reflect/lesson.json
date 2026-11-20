@@ -3,6 +3,10 @@
   "title": "7.15.1 Playtest and reflect: Breakout",
   "description": "Play your finished Breakout with the mouse and with the keys, try to break it, find one surprise, link it to your code and choose one change. AI-graded with hints.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.15 Breakout: playtest and extend",

@@ -1,6 +1,6 @@
 const material = 'PLA';
 
-// If this break were removed, PLA's settings would print and then PETG's
+// If this break were removed, PLA's settings would print and then ABS's
 // settings would print too, because the case below it would fall through.
 switch (material) {
   case 'PLA':

@@ -3,6 +3,10 @@
   "title": "5.2.19 Lab: Wind Zone",
   "description": "Push the player with applyForce inside a conditional zone. Auto-graded.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",
@@ -85,6 +89,13 @@
         "description": "The force's second number (fy) is negative, straight in the call or through a variable holding a negative number, so the wind pushes up against gravity. Any size counts. A positive fy pushes down along with gravity, which is the opposite, so it is not met. Help: 5.2.18 (Forces vs Velocity)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Use applyForce on the player: The player is pushed with .applyForce(fx, fy) somewhere in the sketch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Only apply the force inside a zone: The applyForce call is guarded by an if with a comparison (braces optional), not called unconditionally every frame. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The wind pushes up: The force's second number (fy) is negative, so the wind pushes the player up against gravity: applyForce(0, -3). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

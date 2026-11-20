@@ -3,6 +3,10 @@
   "title": "3.3.6 Lab: Fix the Off-by-One Loop",
   "description": "A loop that should print every price also prints an extra undefined. Find the part of the loop that lets it run one round too long and fix it. Practice, not graded: the checks call your function.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",
@@ -170,6 +174,12 @@
         "description": "printPrices(prices) prints each price on its own line, in order, with no extra line at the end. Help: 3.3.5 (Looping Over Arrays (for / for…of))",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "printPrices is defined with one parameter: Code defines a function named printPrices with exactly one parameter. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "the loop stops at the last item: A for loop is still there, and its condition no longer lets the index reach the array's length (use < prices.length, not <=). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

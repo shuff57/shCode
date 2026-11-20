@@ -3,6 +3,10 @@
   "title": "2.5.15 Reading: Throwing Your Own Errors",
   "description": "Raise your own error with throw when a value breaks the program's rules, not the language's. Read before 2.5.16 Worked Example: Validate, Then Trust.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",

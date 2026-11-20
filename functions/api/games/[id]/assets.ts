@@ -8,35 +8,32 @@
 //
 // Same access as GET /api/games/[id] (visibleGame): the owner, a classmate in
 // a class it is shared into and not hidden, a teacher of that class. Anything
-// else is 404. An item is served when
-//   (a) its name is a string literal in the game's code (lib/games-core.ts
-//       usedItems; comments do not count), and
-//   (b) it is live (not deleted), and
-//   (c) the caller is the publisher, or it is shared, not hidden, into a class
-//       the caller sees the game through.
-// A used item that fails (c) is named in `missing` so /play can say so. Bytes
+// else is 404. An item is served when it is live (not deleted) and either
+//   (a) the caller is the publisher and the item is USED: its name is a string
+//       literal in the game's code, or is put together from them
+//       (lib/games-core.ts usedItems; comments do not count); or
+//   (b) it is shared, not hidden, into a class the caller sees the game through
+//       (or public, for a game seen only through Everyone). EVERY such item is
+//       served, used-looking or not (#129): a game can name a picture from
+//       something the code never spells out (an enemy type read from a table,
+//       a level number), and these items are already the caller's to see in
+//       the class library, so sending them shows nothing new. Bounded by the
+//       library's own caps (MAX_ITEMS_PER_KIND in functions/_shared/library.ts).
+// A used item the caller cannot get is named in `missing` so /play can say so. Bytes
 // come from R2 (UPLOADS, library/<id>), never a public URL, and an object over
 // the library's per-item cap is skipped. No email is ever in the response.
 
 import { gameClassesFor, json, visibleGame, type SessionData } from '../../../_shared/games';
 import { publicItemIdsOf } from '../../../_shared/publicShare';
-import { MAX_ITEM_BYTES, isKind, r2Key, type LibraryKind } from '../../../_shared/library';
+import { isKind } from '../../../_shared/library';
+import { loadItemAssets, type AssetItemRow } from '../../../_shared/itemAssets';
 import { isGameId, usedItems } from '../../../../lib/games-core';
-import { metaFrames, type GameAsset } from '../../../../lib/game-assets';
 
 interface Env {
   DB: D1Database;
   UPLOADS: R2Bucket;
 }
 type Ctx = EventContext<Env, 'id', SessionData>;
-
-interface ItemRow {
-  id: string;
-  kind: LibraryKind;
-  name: string;
-  mime: string;
-  meta: string | null;
-}
 
 export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ params, env, data }: Ctx) => {
   const id = String(params.id);
@@ -47,9 +44,10 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
 
   const items = await env.DB.prepare(
     `SELECT id, kind, name, mime, meta FROM library_items WHERE owner_email = ? AND deleted_at IS NULL ORDER BY kind, name`,
-  ).bind(author).all<ItemRow>();
-  const used = usedItems(seen.row.code, (items.results ?? []).filter((r) => isKind(r.kind)));
-  if (!used.length) return json({ assets: [], missing: [], missingItems: [] });
+  ).bind(author).all<AssetItemRow>();
+  const all = (items.results ?? []).filter((r) => isKind(r.kind));
+  const used = usedItems(seen.row.code, all);
+  if (seen.mine && !used.length) return json({ assets: [], missing: [], missingItems: [] });
 
   let available: Set<string>;
   if (seen.mine) {
@@ -74,22 +72,10 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async ({ para
   }
 
   const missingItems = used.filter((u) => !available.has(u.id)).map((u) => ({ kind: u.kind, name: u.name }));
-  const assets: GameAsset[] = [];
-  if (env.UPLOADS) {
-    const got = await Promise.all(used.filter((u) => available.has(u.id)).map(async (u) => {
-      const obj = await env.UPLOADS.get(r2Key(u.id));
-      if (!obj) return null;
-      const text = await obj.text();
-      if (!text.startsWith('data:') || text.length > MAX_ITEM_BYTES[u.kind]) return null;
-      const a: GameAsset = { kind: u.kind, name: u.name, type: u.mime, data: text, meta: u.meta ?? null };
-      if (u.kind === 'texture') {
-        const f = metaFrames(u.meta);
-        if (f) a.frames = f;
-      }
-      return a;
-    }));
-    for (const a of got) if (a) assets.push(a);
-  }
+  // The publisher gets only what the code uses (the rest of their library is theirs on this computer anyway);
+  // anyone else gets everything they may see (see (b) above).
+  const serve = seen.mine ? used : all.filter((u) => available.has(u.id));
+  const assets = await loadItemAssets(env.UPLOADS, serve);
   return json({
     assets,
     missing: [...new Set(missingItems.map((m) => m.name))].sort((a, b) => a.localeCompare(b)),

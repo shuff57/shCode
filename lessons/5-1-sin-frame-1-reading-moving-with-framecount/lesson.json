@@ -3,6 +3,10 @@
   "title": "5.1.22 Reading: Moving on its own: frameCount and sin()",
   "description": "frameCount counts the frames, sin() turns that count into a smooth back-and-forth wave, and together they make a sprite move with no key held. Read before 5.1.23.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

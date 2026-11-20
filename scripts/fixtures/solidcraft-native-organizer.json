@@ -1,0 +1,240 @@
+{
+  "version": 2,
+  "editor": "solidcraft",
+  "native": {
+    "format": "solidcraft/48",
+    "name": "Organizer outline",
+    "units": "mm",
+    "params": [
+      {
+        "name": "d1",
+        "expr": "60 mm",
+        "unit": "mm",
+        "model": true
+      },
+      {
+        "name": "d2",
+        "expr": "40 mm",
+        "unit": "mm",
+        "model": true
+      }
+    ],
+    "features": [
+      {
+        "id": 1,
+        "name": "Organizer outline",
+        "suppressed": false,
+        "type": "sketch",
+        "plane": {
+          "type": "origin",
+          "name": "XY"
+        },
+        "sketch": {
+          "points": [
+            {
+              "id": "origin",
+              "pos": [
+                0,
+                0
+              ],
+              "fixed": true
+            },
+            {
+              "id": "p1",
+              "pos": [
+                0,
+                0
+              ],
+              "fixed": false
+            },
+            {
+              "id": "p2",
+              "pos": [
+                60,
+                0
+              ],
+              "fixed": false
+            },
+            {
+              "id": "p3",
+              "pos": [
+                60,
+                40
+              ],
+              "fixed": false
+            },
+            {
+              "id": "p4",
+              "pos": [
+                0,
+                40
+              ],
+              "fixed": false
+            }
+          ],
+          "curves": [
+            {
+              "id": "l1",
+              "type": "line",
+              "a": 1,
+              "b": 2,
+              "construction": false
+            },
+            {
+              "id": "l2",
+              "type": "line",
+              "a": 2,
+              "b": 3,
+              "construction": false
+            },
+            {
+              "id": "l3",
+              "type": "line",
+              "a": 3,
+              "b": 4,
+              "construction": false
+            },
+            {
+              "id": "l4",
+              "type": "line",
+              "a": 4,
+              "b": 1,
+              "construction": false
+            }
+          ],
+          "constraints": [
+            {
+              "id": "k1",
+              "type": "horizontal",
+              "l": 0
+            },
+            {
+              "id": "k2",
+              "type": "horizontal",
+              "l": 2
+            },
+            {
+              "id": "k3",
+              "type": "vertical",
+              "l": 1
+            },
+            {
+              "id": "k4",
+              "type": "vertical",
+              "l": 3
+            },
+            {
+              "id": "k5",
+              "type": "coincident",
+              "p": 0,
+              "q": 1
+            },
+            {
+              "id": "k6",
+              "type": "length",
+              "l": 0,
+              "value": 60,
+              "param": "d1",
+              "text": [
+                0,
+                -10
+              ]
+            },
+            {
+              "id": "k7",
+              "type": "length",
+              "l": 1,
+              "value": 40,
+              "param": "d2",
+              "text": [
+                0.5,
+                -11
+              ]
+            }
+          ],
+          "counters": {
+            "k": 7,
+            "l": 4,
+            "p": 4
+          }
+        }
+      }
+    ],
+    "next_id": 2,
+    "next_component_color_index": 0
+  },
+  "doc": {
+    "version": 1,
+    "features": [
+      {
+        "id": "sk1",
+        "kind": "sketch",
+        "plane": "xy",
+        "offset": 0,
+        "points": [],
+        "geoms": [
+          {
+            "id": 1,
+            "k": "line",
+            "a": [
+              0,
+              0
+            ],
+            "b": [
+              60,
+              0
+            ],
+            "construction": false
+          },
+          {
+            "id": 2,
+            "k": "line",
+            "a": [
+              60,
+              0
+            ],
+            "b": [
+              60,
+              40
+            ],
+            "construction": false
+          },
+          {
+            "id": 3,
+            "k": "line",
+            "a": [
+              60,
+              40
+            ],
+            "b": [
+              0,
+              40
+            ],
+            "construction": false
+          },
+          {
+            "id": 4,
+            "k": "line",
+            "a": [
+              0,
+              40
+            ],
+            "b": [
+              0,
+              0
+            ],
+            "construction": false
+          }
+        ]
+      }
+    ]
+  },
+  "solver": {
+    "status": "solved",
+    "dof": 0,
+    "ownDof": null,
+    "worstRes": null,
+    "profiles": 1
+  },
+  "editing": false
+}

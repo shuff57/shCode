@@ -3,6 +3,10 @@
   "title": "3.2.7 Reading: Order Matters",
   "description": "A function matches arguments to parameters by position, not by name, so swapping two arguments changes the answer without raising an error.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.2 Parameters and Return Values",

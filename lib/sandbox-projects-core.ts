@@ -30,7 +30,7 @@ export interface SandboxProject {
 export const LEGACY_NAMES: Record<SandboxModeId, string> = {
   js: 'JavaScript sandbox',
   moshion: 'moSHion sandbox',
-  reshape: 'reSHape sandbox',
+  reshape: 'SolidCraft CAD sandbox',
   flow: 'Flowchart sandbox',
 };
 

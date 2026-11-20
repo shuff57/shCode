@@ -3,6 +3,10 @@
   "title": "6.10.25 Worked Example: Auto-Save on Level Complete or Timer",
   "description": "Implement two auto-save triggers: when the player reaches a level-complete zone, and a timer-based save every 30 seconds.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.10 Save and Load",

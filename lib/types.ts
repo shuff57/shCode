@@ -62,6 +62,8 @@ export interface Requirement {
   title: string;
   description: string;
   status: 'pending' | 'running' | 'passed' | 'failed';
+  /** Red, but the AI found it partly met: a plan lab counts it as half a card (lib/grade-pass.ts cardScore). */
+  partial?: boolean;
   messages?: string[];
   type?: RequirementType;
   file?: string;
@@ -107,6 +109,10 @@ export interface Requirement {
   /** type: 'model' only. The features (and named fields on them) the
    *  student's ModelDoc must contain — see lib/model-check.ts. */
   expect?: ModelExpect[];
+  /** On a model criterion, also verify the saved/current simple 2D outline. */
+  sketchOutline?: boolean;
+  /** Require the current 2D geometry to come from this exact script run. */
+  sketchScript?: boolean;
   /** type: 'model' only. Absolute tolerance for numeric field comparisons.
    *  Defaults to 0.01 (see lib/model-check.ts). */
   tolerance?: number;
@@ -272,6 +278,8 @@ export interface StarterVariant {
 }
 
 export interface Lesson {
+  /** What the student makes and whether it is graded (lib/lesson-work.ts). Every lesson.json carries it. */
+  work?: import('./lesson-work').LessonWork;
   id: string;
   title: string;
   description: string;
@@ -289,6 +297,8 @@ export interface Lesson {
   mode?: LessonMode;
   /** Opt-in guarded script workspace. Legacy CAD lessons retain their existing studio until migrated. */
   cadHost?: 'solidcraft';
+  /** A lesson ceiling: teacher tools-on never exposes 3D tools in this workspace. */
+  cadScope?: 'sketch';
   week?: number;
   slos?: string[];
   files: FileNode[];
@@ -296,6 +306,8 @@ export interface Lesson {
   requirements: Requirement[];
   grading?: Grading;
   aiGrader?: AiGraderConfig;
+  /** Optional feedback on a current sketch; never scores completion. */
+  cadFeedback?: AiGraderConfig;
   /** A Grade button above a plain-English-to-pseudocode lab's editor ("Grade with AI" on a code
    *  lesson); the AI's verdicts replace the Quest cards' red and green. Deliberately NOT `aiGrader`:
    *  that field makes a lesson a scored written part everywhere (manifest, gradebook, attempt caps).

@@ -3,6 +3,10 @@
   "title": "3.2.26 Lab: findMax & isEven",
   "description": "Define two functions, findMax(a, b) and isEven(n), that take parameters and return a value. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.2.4",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -273,6 +277,15 @@
         "description": "isEven(n) returns true when n is even and false when it is odd, including 0 and negative numbers. Help: 3.2.11 (Getting a Value Back with `return`)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "findMax defined: Code defines a function named findMax (exact spelling). Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "isEven defined: Code defines a function named isEven (exact spelling). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "return statement present: Code contains a return statement. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "findMax compares its two values: findMax compares a and b (with > or <, or Math.max) inside its body. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "isEven uses the remainder operator: isEven uses % inside its body. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

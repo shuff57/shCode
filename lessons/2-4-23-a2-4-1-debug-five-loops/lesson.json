@@ -3,6 +3,10 @@
   "title": "2.4.23 Debug Five Loops",
   "description": "Five loop programs are broken: two never stop, two are off by one, one has a do...while logic error. Fix all five and explain each bug in a comment. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
@@ -132,6 +136,15 @@
         "description": "A do...while loop logs something and its condition guarantees the body could otherwise be skipped (!greeted or greeted === false). Help: 2.4.5 (The do...while Loop)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Program 1: is there a runnable while loop on n (n <= 5, or n < 6) whose body logs n and adds 1 to n once per pass (n++, n += 1 or n = n + 1)? The fix may sit anywhere in the file, including right where the broken original was (uncommented and corrected in place, above the STEP note): that counts. Judge the runnable loop as it now reads; a missing comment explaining the bug and the other programs do not matter here. It must print exactly 1, 2, 3, 4, 5: adding 1 before the log (so it prints 2 to 6) or adding 1 twice per pass is not met. Code inside comments never runs.",
+        "r2": "Program 2: is there a runnable for loop that starts count at 10, runs while count > 0 (count >= 1 is the same), takes 1 from count each pass (count--, count -= 1 or count = count - 1) and logs count in its body? The fix may sit anywhere in the file, including right where the broken original was (uncommented and corrected in place, above the STEP note): that counts. Judge the runnable loop as it now reads; a missing comment explaining the bug and the other programs do not matter here. Code inside comments never runs.",
+        "r3": "Program 3: is there a runnable for loop that starts i at 1, runs while i <= 5 (i < 6 is the same for whole numbers), adds 1 each pass and logs i in its body? The fix may sit anywhere in the file, including right where the broken original was (uncommented and corrected in place, above the STEP note): that counts. Judge the runnable loop as it now reads; a missing comment explaining the bug and the other programs do not matter here. Code inside comments never runs.",
+        "r4": "Program 4: is there a runnable for loop that starts k at 1 (not 0), runs while k <= 5 (k < 6 is the same for whole numbers), adds 1 each pass and logs k in its body? The fix may sit anywhere in the file, including right where the broken original was (uncommented and corrected in place, above the STEP note): that counts. Judge the runnable loop as it now reads; a missing comment explaining the bug and the other programs do not matter here. Code inside comments never runs.",
+        "r5": "Program 5: is there a runnable do...while loop whose body logs something and whose condition is !greeted or greeted === false? What greeted is set to inside the body does not matter. The fix may sit anywhere in the file, including right where the broken original was (uncommented and corrected in place, above the STEP note): that counts. Judge the runnable loop as it now reads; a missing comment explaining the bug and the other programs do not matter here. But if a loop above it never ends (a while (greeted === true) whose body never changes greeted), the do...while is never reached: not met. Code inside comments never runs."
+      }
+    }
   }
 }

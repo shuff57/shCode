@@ -3,6 +3,10 @@
   "title": "1.4.22 Module 1.4 Quiz",
   "description": "Eight multiple-choice questions on purpose-driven languages, levels of abstraction, and the three paradigms. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",

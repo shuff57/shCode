@@ -3,6 +3,10 @@
   "title": "6.17.4 Lab: Launch!",
   "description": "The catapult fires: aim with the arm, release to launch, and watch the arc.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.17 Sling: launch",
@@ -82,6 +86,13 @@
         "description": "Direction follows the arm.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Fired on release: A new sprite is made inside mouse.released() and pushed into the array. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Along the arm: Direction comes from the arm rotation, with a speed. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Lab: Launch!\". The task: fire a stone on release along the arm with a speed, and keep every stone in an array. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

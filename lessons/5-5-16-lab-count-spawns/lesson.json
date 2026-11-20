@@ -3,6 +3,10 @@
   "title": "7.3.16 Lab: Count your spawns",
   "description": "The scene already prints `Enemy.spawned`, which is `undefined` because nothing declares it. Add a counter that belongs to the class and bump it in the constructor, so every enemy ever built is counted.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.3 Inside a Class",
@@ -80,6 +84,12 @@
         "description": "Inside the constructor, the CLASS counter goes up by 1: Enemy.spawned += 1, Enemy.spawned++, Enemy.spawned = Enemy.spawned + 1, or this.constructor.spawned += 1. this.spawned += 1 is not met: it changes the one new enemy, not the class's count. Counting in draw() beside the push instead of in the constructor is partial: it only counts enemies built in that one place.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A static counter named spawned is declared: The class body declares `static spawned` and starts it at 0. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The constructor counts every new enemy: The constructor adds one to the class's counter, so every enemy is counted wherever it was created. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

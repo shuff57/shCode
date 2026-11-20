@@ -103,7 +103,7 @@ check('sandbox records a device snapshot on Save', workspace.includes('addLocalS
 check('sandbox renders HistoryPanel', workspace.includes('<HistoryPanel'), true);
 check('HistoryPanel gets the sandbox lesson id', workspace.includes('lessonId={lesson.id}'), true);
 check('Save is gated on being signed in', workspace.includes('lessonProgress.authed &&'), true);
-check('history restore remounts a reSHape model', workspace.includes('onRestore={() =>'), true);
+check('History restore remounts the CAD workspace', workspace.includes('onRestore={() =>'), true);
 
 const modes = readFileSync(join(root, 'lib', 'sandbox-modes.ts'), 'utf8');
 check('an old sandbox keeps its lesson id; a project brings its own', /lessonId = `sandbox-\$\{mode\.id\}`/.test(modes) && /id: lessonId,/.test(modes), true);

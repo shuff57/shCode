@@ -54,7 +54,7 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ en
   if (mine.size === 0 && hosts.size === 0) return json({ inClass: false, rooms: [] });
 
   const r = await env.DB.prepare(
-    `SELECT r.code, r.seats, r.host_email, r.created_at, s.first_name, s.last_name,
+    `SELECT r.code, r.seats, r.host_email, r.created_at, s.first_name, s.last_name, s.alias,
             (SELECT COUNT(*) FROM game_room_players p WHERE p.code = r.code AND p.left_at IS NULL) AS present,
             (SELECT COUNT(*) FROM game_room_players p WHERE p.code = r.code) AS taken,
             (SELECT COUNT(*) FROM game_room_players p WHERE p.code = r.code AND p.email = ?3 AND p.device = ?4) AS here
@@ -63,7 +63,7 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ en
       ORDER BY r.created_at DESC LIMIT 200`,
   ).bind(game, now, data.email, device, live, kind).all<{
     code: string; seats: number; host_email: string; created_at: number;
-    first_name: string | null; last_name: string | null; present: number; taken: number; here: number;
+    first_name: string | null; last_name: string | null; alias?: string | null; present: number; taken: number; here: number;
   }>();
   // Not full: a seat whose player left is still theirs (a rejoin gives it
   // back), so a room is joinable only while it has a seat nobody holds --
@@ -79,7 +79,7 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ en
     let shared = false;
     for (const id of theirs) if (mine.has(id)) { shared = true; break; }
     if (!shared && !hosts.has(x.host_email)) continue;
-    rooms.push({ code: x.code, host: ownerLabel(x.first_name, x.last_name), seats: x.seats, present: x.present, here: x.here > 0 });
+    rooms.push({ code: x.code, host: ownerLabel(x.first_name, x.last_name, x.alias), seats: x.seats, present: x.present, here: x.here > 0 });
     if (rooms.length >= LIST_LIMIT) break;
   }
   // `guest`: in no class, here only as someone's approved guest, so they can join a listed session but not start one.

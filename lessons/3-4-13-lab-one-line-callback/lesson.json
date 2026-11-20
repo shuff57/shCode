@@ -3,6 +3,10 @@
   "title": "3.4.13 Lab: Write a One-Line Arrow Callback",
   "description": "Write a helper that takes a callback, then pass it a one-line arrow. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.4.4",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -139,6 +143,14 @@
         "description": "transform(2, n => n + 1) is 3 and transform(\"a\", s => s + \"b\") is \"ab\", with the value and the function given in either order. Help: 3.4.11 (Passing a Function)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Helper takes a function parameter: A function is defined that calls one of its parameters as a function. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Look at the arrow function that is passed to transform, whether it is written inside the call or stored in a const whose name is passed. Is its body a single expression right after the =>, with no { } braces, like n => n * 2? If its body is inside braces, even one short line, the answer is no. Code inside comments never runs.",
+        "r3": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "The result is printed: console.log prints what transform returns: the call sits inside console.log, or its result is stored and that variable is printed. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

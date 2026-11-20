@@ -3,6 +3,10 @@
   "title": "3.8.2 Reading: Data Has to Outlive the Program",
   "description": "See why a value that only lives in memory is gone the moment the tab closes, and why everything that stores data stores text. Read before the stringify reading.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.8 Saving and Loading Data",

@@ -3,6 +3,10 @@
   "title": "5.4.5 Lab: Three bumpers, three values",
   "description": "Three bumpers, worth 1, 5 and 10. The starter scores only the first, on every frame. Loop over all of them and let each bumper remember its own last frame, so every bumper scores once per hit and for its own value.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.4 Pinball: score once",
@@ -104,6 +108,13 @@
         "description": "The score adds the bumper's own worth (not always 1), inside an if that is only true on the frame that bumper's touch starts: touching now and not touching last frame, by that bumper's own memory. Not met: adding the worth on every touching frame, or a memory test written as === false while the memory holds colliding()'s number, which is never true. Help: 5.4.1 (Reading: A collision is not an event)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Every bumper is checked in a loop: One loop visits every bumper in the array instead of naming one. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Does each bumper have its own memory property (b.wasTouching, bumpers[i].hit, any name) that is written on EVERY frame, both while touching and while not? Yes: b.wasTouching = touching; after the scoring if; b.hit = ball.colliding(b); if (ball.colliding(b)) { ...; b.wasTouching = true; } else { b.wasTouching = false; } (an if nested inside is fine). No: the memory is set only inside the scoring if, so it never goes back to false; one shared variable for all bumpers; the property written is spelled differently from the one read (b.wasTouchong = touching while the test reads b.wasTouching is a typo, so the memory is never updated). Code inside comments never runs.",
+        "r3": "Is each bumper's own worth added only on the frame a touch starts? Yes: if (touching && !b.wasTouching) score += b.worth; (any memory name, ! in front); if (ball.colliding(b)) { if (!b.hit) score += b.worth; }; score += b.worth inside an if on ball.collides(b), which is true only on a touch's first frame (any memory test beside it is fine); a memory set only to true or false, compared === false. No: score += b.worth on every touching frame; adding 1 instead of the worth; a memory set from colliding() (a number) compared === false, which never matches; testing the worth itself or a property that is not a memory. Code inside comments never runs."
+      }
+    }
   }
 }

@@ -3,6 +3,10 @@
   "title": "3.10.2 Individual PA Part 2: Find and Fix",
   "description": "Part 2 of 4, 20 points. Four broken programs. Identify each bug, name its type (syntax / runtime / logic), and fix it. Three tries, feedback on each bug, and your best try counts.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 11,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.10 Chapter 3 Individual Performance Assessment",

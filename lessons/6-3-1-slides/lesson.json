@@ -3,6 +3,10 @@
   "title": "6.8.1 Slides: Physics Applications",
   "description": "Physics Applications slides. Placeholder until the deck is built from the book.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.8 Physics Applications",

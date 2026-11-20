@@ -3,6 +3,10 @@
   "title": "6.13.7 Reading: moSHion docs: applyForce(fx, fy)",
   "description": "applyForce(fx, fy) adds a one-frame impulse to a sprite: the physics engine turns it into motion. Read this before 6.13.9 Worked Example: Launch a Sprite with applyForce.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.13 Joints",

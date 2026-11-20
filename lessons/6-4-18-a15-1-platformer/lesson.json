@@ -3,6 +3,10 @@
   "title": "6.9.18 Side-Scrolling Platformer",
   "description": "Combine animated sprites, a camera that follows the player, three or more platforms, working jump mechanics, and a visible end goal into a playable side-scroller. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 90,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.9 Animated Sprites and Camera",

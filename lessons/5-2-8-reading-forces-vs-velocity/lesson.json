@@ -3,6 +3,10 @@
   "title": "5.2.18 Reading: Forces vs Velocity",
   "description": "applyForce vs setting .vel directly. Read before 5.2.19 Lab: Wind Zone.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",

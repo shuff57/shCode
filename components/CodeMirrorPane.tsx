@@ -9,6 +9,7 @@ import { bracketMatching, indentOnInput, HighlightStyle, syntaxHighlighting, fol
 import { closeBrackets, closeBracketsKeymap, closeCompletion } from '@codemirror/autocomplete';
 import { highlightSelectionMatches, selectNextOccurrence } from '@codemirror/search';
 import { jsAutocomplete } from '../lib/editor-completions';
+import { codeSearch } from '../lib/editor-search';
 import { taskCommentFold } from '../lib/editor-task-fold';
 import type { LabTaskScenario } from '../lib/lab-task-scenario';
 import { tags as t } from '@lezer/highlight';
@@ -192,6 +193,9 @@ function makeExtensions(
       rectangularSelection(),
       crosshairCursor(),
       keymap.of([{ key: 'Mod-d', run: selectNextOccurrence, preventDefault: true }]),
+      // Ctrl+F (Cmd+F) opens the editor's own Find, not the browser's; Ctrl+H opens Replace.
+      // Read-only samples on a reading page keep the browser's find (lib/editor-search.ts).
+      codeSearch(),
       // One Esc always goes back to one cursor. The suggestion list's own Esc runs at the highest
       // precedence and, for a moment after every keystroke, swallowed the key with nothing on
       // screen, so the extra cursors stayed. Same precedence, and added before jsAutocomplete().
@@ -249,6 +253,8 @@ export interface CodeMirrorPaneProps {
   taskComment?: LabTaskScenario | null;
   /** The "Your task" panel shows the same scenario, so the fold is a bare marker. */
   taskCommentQuiet?: boolean;
+  /** The editor once it exists (null when it goes), for a host that inserts text at the cursor. */
+  onView?: (view: EditorView | null) => void;
 }
 
 export default function CodeMirrorPane({
@@ -260,12 +266,15 @@ export default function CodeMirrorPane({
   collab = null,
   taskComment = null,
   taskCommentQuiet = false,
+  onView,
 }: CodeMirrorPaneProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const collabSlot = useRef(new Compartment());
   const collabRef = useRef<Extension | null>(collab);
   collabRef.current = collab;
+  const onViewRef = useRef(onView);
+  onViewRef.current = onView;
 
   // Create or recreate editor when fileKey changes.
   useEffect(() => {
@@ -284,8 +293,10 @@ export default function CodeMirrorPane({
       parent: containerRef.current,
     });
     viewRef.current = view;
+    onViewRef.current?.(view);
 
     return () => {
+      onViewRef.current?.(null);
       view.destroy();
       viewRef.current = null;
     };

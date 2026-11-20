@@ -343,6 +343,91 @@ export const SEMANTIC_CHECKS = [
     },
   },
   {
+    name: 'textLayer(n) also layers text() written in update(), with no draw() at all',
+    area: 'drawing',
+    // shCode #123/#126: a game written all in update() (background, text, then
+    // textLayer(10) every frame) got its text painted at once, under every sprite,
+    // because only draw() queued. Upstream spec: ../moshion tests/textlayer.spec.mjs.
+    run({ createSandbox }) {
+      const box = createSandbox();
+      box.run(`
+        function setup(){
+          new Canvas(200,200); world.gravity.y = 0;
+          hi = new Sprite(100, 100, 50, 50, 'static'); hi.color = '#ff00ff'; hi.layer = 20;
+          lo = new Sprite(100, 100, 80, 80, 'static'); lo.color = '#0000ff'; lo.layer = 5;
+        }
+        function update(){
+          background('#000000');
+          text('hud', 10, 20);
+          textLayer(10);
+        }
+      `);
+      if (box.errors.length) return `sketch threw: ${box.errors[0].message}`;
+      box.pump(2);
+      box.ops.length = 0;
+      box.pump(1);
+      const seq = box.ops
+        .filter((o) => o.op === 'fillText' || (o.op === 'fillRect' && (o.fill === '#0000ff' || o.fill === '#ff00ff')))
+        .map((o) => (o.op === 'fillText' ? o.args[0] : o.fill === '#0000ff' ? 'lo' : 'hi'));
+      const want = ['lo', 'hud', 'hi'];
+      if (JSON.stringify(seq) !== JSON.stringify(want)) return `paint order ${JSON.stringify(seq)}, wanted ${JSON.stringify(want)}`;
+      return true;
+    },
+  },
+  {
+    name: 'allSprites.autoDraw = false once also covers sprites made later, and allSprites.draw() paints them by layer',
+    area: 'drawing',
+    // shCode #124: the setting reached only the sprites already there, so a
+    // sketch had to set it every frame, and allSprites.draw() did not exist.
+    run({ createSandbox }) {
+      const box = createSandbox();
+      box.run(`
+        function setup(){
+          new Canvas(200,200); world.gravity.y = 0;
+          allSprites.autoDraw = false;
+          early = new Sprite(50, 50, 20, 20, 'static'); early.color = '#0000ff'; early.layer = 2;
+          emptyReads = new Group().autoDraw;
+          ghosts = new Group(); ghosts.autoUpdate = false;
+        }
+        var tick = 0, handDraw = false, ghostRan = false;
+        function update(){
+          tick++;
+          if (tick === 2) {
+            late = new Sprite(150, 150, 20, 20, 'static'); late.color = '#ff00ff'; late.layer = 1;
+            ghost = new ghosts.Sprite(100, 100, 10, 10, 'none'); ghost.update = () => { ghostRan = true; };
+          }
+        }
+        function draw(){
+          background('#000000');
+          if (handDraw) allSprites.draw();
+          text('over', 10, 10);
+        }
+      `);
+      if (box.errors.length) return `sketch threw: ${box.errors[0].message}`;
+      box.pump(4);
+      if (box.errors.length) return `sketch threw: ${box.errors[0].message}`;
+      const sb = box.sandbox;
+      if (sb.late.autoDraw !== false) return `a sprite made after allSprites.autoDraw = false has autoDraw ${sb.late.autoDraw}`;
+      if (allDrawn().length) return `with autoDraw false the engine still painted ${JSON.stringify(allDrawn())}`;
+      if (sb.emptyReads !== true) return `an untouched empty group's autoDraw read ${sb.emptyReads}, wanted true`;
+      if (sb.ghost.autoUpdate !== false || sb.ghostRan) return 'a sprite joining a group after group.autoUpdate = false still ran its update';
+      sb.handDraw = true;
+      box.ops.length = 0;
+      box.pump(1);
+      const seq = box.ops
+        .filter((o) => o.op === 'fillText' || (o.op === 'fillRect' && ['#000000', '#0000ff', '#ff00ff'].includes(o.fill)))
+        .map((o) => (o.op === 'fillText' ? o.args[0] : o.fill));
+      const want = ['#000000', '#ff00ff', '#0000ff', 'over'];
+      if (JSON.stringify(seq) !== JSON.stringify(want)) return `allSprites.draw() paint order ${JSON.stringify(seq)}, wanted ${JSON.stringify(want)}`;
+      return true;
+      function allDrawn() {
+        box.ops.length = 0;
+        box.pump(1);
+        return box.ops.filter((o) => o.op === 'fillRect' && (o.fill === '#0000ff' || o.fill === '#ff00ff')).map((o) => o.fill);
+      }
+    },
+  },
+  {
     name: 'textStyle(BOLD | ITALIC | BOLDITALIC | NORMAL) sets the font of text(); normal keeps the old font string',
     area: 'drawing',
     // shCode #103: textStyle did not exist, so a sketch calling it stopped with a ReferenceError.
@@ -510,6 +595,47 @@ export const SEMANTIC_CHECKS = [
       const c = box.sandbox.counts;
       if (c.presses !== 1) return `mouse.presses() fired on ${c.presses} frames, expected exactly 1`;
       if (c.released !== 1) return `mouse.released() fired on ${c.released} frames, expected exactly 1`;
+      return true;
+    },
+  },
+  {
+    name: 'sprite.mouse: hovering/hovers/hovered, and presses/pressing/released for a press that began on the sprite; mouse.visible hides the pointer',
+    area: 'input',
+    // shCode #125: there was no way to ask whether the mouse was over a
+    // sprite, or clicked it, and nothing named for hiding the pointer.
+    run({ createSandbox }) {
+      const box = createSandbox();
+      box.run(`
+        var log = [];
+        function setup(){
+          mouse.cursor = 'crosshair';
+          new Canvas(300,300); world.gravity.y = 0;
+          btn = new Sprite(100, 100, 60, 40, 'static');
+          other = new Sprite(250, 250, 20, 20, 'static');
+        }
+        function update(){
+          const m = btn.mouse;
+          log.push([m.hovering(), m.hovers(), m.hovered(), m.presses(), m.pressing(), m.released(), other.mouse.presses()].map(Number).join(''));
+        }
+      `);
+      if (box.errors.length) return `sketch threw: ${box.errors[0].message}`;
+      const sb = box.sandbox;
+      box.pump(1);                                  // 0: pointer never seen
+      box.input.mouseMove(100, 100); box.pump(2);   // 1-2: over btn
+      box.input.mouseDown(); box.pump(2);           // 3-4: press on btn
+      box.input.mouseMove(10, 10); box.pump(1);     // 5: slid off, still held
+      box.input.mouseUp(); box.pump(2);             // 6-7: released off it
+      box.input.mouseMove(250, 250); box.input.mouseDown(); box.pump(1); // 8: press on the other sprite
+      box.input.mouseUp(); box.pump(1);
+      // columns: hovering hovers hovered presses pressing released other.presses
+      const want = ['0000000', '1100000', '1000000', '1001100', '1000100', '0010100', '0000010', '0000000', '0000001'];
+      const got = sb.log.slice(0, want.length);
+      if (JSON.stringify(got) !== JSON.stringify(want)) return `per-frame sprite.mouse ${JSON.stringify(got)}, wanted ${JSON.stringify(want)}`;
+      if (sb.mouse.cursor !== 'crosshair') return `mouse.cursor set before new Canvas() was lost: ${sb.mouse.cursor}`;
+      sb.mouse.visible = false;
+      if (sb.mouse.cursor !== 'none' || sb.mouse.visible !== false) return `mouse.visible = false left cursor ${sb.mouse.cursor}`;
+      sb.mouse.visible = true;
+      if (sb.mouse.cursor !== 'crosshair' || sb.mouse.visible !== true) return `mouse.visible = true gave cursor ${sb.mouse.cursor}, wanted crosshair back`;
       return true;
     },
   },
@@ -1137,6 +1263,36 @@ export const SEMANTIC_CHECKS = [
       if (!(p.any > 0)) return 'mouse.pressing() regressed — it must stay "any button"';
       const pos = box.sandbox.pos;
       if (!pos || pos.x !== 40 || pos.y !== 60) return 'mouse.pos was ' + JSON.stringify(pos) + ', expected {x:40,y:60}';
+      return true;
+    },
+  },
+  {
+    // shCode #127: the right button was readable, but the browser's own menu
+    // opened over the canvas on every right-click, so a game could not use it.
+    name: "a right-click on the canvas is mouse.presses('right') and opens no browser menu",
+    area: 'input',
+    run({ createSandbox }) {
+      const box = createSandbox();
+      box.run(`
+        seen = { right: 0, left: 0, rightUp: 0 };
+        function setup(){ new Canvas(200,200); }
+        function draw(){
+          if (mouse.presses('right')) seen.right++;
+          if (mouse.presses('left')) seen.left++;
+          if (mouse.released('right')) seen.rightUp++;
+        }
+      `);
+      box.pump(2);
+      box.input.mouseDown(2);
+      box.pump(2);
+      box.input.mouseUp(2);
+      const stopped = box.input.contextMenu();
+      box.pump(2);
+      const s = box.sandbox.seen;
+      if (s.right !== 1) return `mouse.presses('right') fired on ${s.right} frames for one right-click, expected 1`;
+      if (s.left !== 0) return `mouse.presses('left') fired on a right-click (${s.left} frames)`;
+      if (s.rightUp !== 1) return `mouse.released('right') fired on ${s.rightUp} frames, expected 1`;
+      if (!stopped) return 'the canvas let the browser open its right-click menu over the sketch';
       return true;
     },
   },

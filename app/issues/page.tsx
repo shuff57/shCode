@@ -139,6 +139,16 @@ export default function IssuesPage() {
     load();
   }, [user, load]);
 
+  // A link from the envelope's Issues tab names one report (/issues#report-77). The list arrives after the
+  // page, so the browser's own jump to the anchor finds nothing: go there once the reports are in.
+  const [jumped, setJumped] = useState(false);
+  useEffect(() => {
+    if (jumped || loading || !reports.length) return;
+    setJumped(true);
+    const m = /^#report-(\d+)$/.exec(window.location.hash);
+    if (m) document.getElementById(`report-${m[1]}`)?.scrollIntoView({ block: 'start' });
+  }, [jumped, loading, reports]);
+
   function applyVote(id: number, next: VoteState) {
     setVoteError('');
     setReports((prev) =>
@@ -215,7 +225,7 @@ export default function IssuesPage() {
         const context = r.context as { path?: string; lessonId?: string } | null;
         const busy = withdrawBusy.has(r.id);
         return (
-          <div key={r.id} style={r.withdrawn ? { ...S.card, opacity: 0.55 } : S.card}>
+          <div key={r.id} id={`report-${r.id}`} style={r.withdrawn ? { ...S.card, opacity: 0.55, scrollMarginTop: 80 } : { ...S.card, scrollMarginTop: 80 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
               <span
                 style={{

@@ -3,6 +3,10 @@
   "title": "7.1.12 Reading: this is a noun",
   "description": "`this` always refers to one specific thing: the instance the method was called on. Read before the substitution rule example.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.1 Classes and Instances",

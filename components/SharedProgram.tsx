@@ -21,7 +21,8 @@ import { deviceId } from '../lib/moshion-online';
 import MoshionPreview from './MoshionPreview';
 import { packForUrl } from './DemoGameBlock';
 import ResizableConsole from './ResizableConsole';
-import { fetchShare, shareHref } from '../lib/messages-client';
+import { fetchShare, fetchShareAssets, shareHref } from '../lib/messages-client';
+import type { GameAsset } from '../lib/game-assets';
 import { LANG_LABEL, isShareId, type ShareView } from '../lib/messages-core';
 import { RUN_TIMEOUT_MS, errorWithLocation, runStudentCode, timerLimitMessage } from '../lib/js-runner-source';
 import { createProject } from '../lib/sandbox-projects';
@@ -152,7 +153,21 @@ export default function SharedProgram() {
   );
 }
 
+/** How long the frame waits for the sender's pictures before it runs without them. */
+const ASSETS_WAIT_MS = 5000;
+
 function MoshionRun({ code, id, runKey, onRestart }: { code: string; id: string; runKey: number; onRestart: () => void }) {
+  // The sender's pictures and sounds this program uses (POST /api/shares/[id]/assets), laid over this computer's
+  // store for the run only. The frame waits for them, as /play does, so its first store already has them.
+  const [art, setArt] = useState<{ code: string; list: GameAsset[] } | null>(null);
+  useEffect(() => {
+    let live = true;
+    const done = (list: GameAsset[]) => { if (live) { live = false; setArt({ code, list }); } };
+    const timer = window.setTimeout(() => done([]), ASSETS_WAIT_MS);
+    void fetchShareAssets(id, code).then((r) => done(r.ok ? r.value.assets ?? [] : []));
+    return () => { live = false; window.clearTimeout(timer); };
+  }, [id, code]);
+  const ready = art?.code === code;
   return (
     <>
       <div style={{ display: 'flex', gap: 8 }}>
@@ -160,7 +175,7 @@ function MoshionRun({ code, id, runKey, onRestart }: { code: string; id: string;
       </div>
       <div style={{ height: 'max(320px, calc(100vh - 420px))', border: '1px solid var(--c-line)', borderRadius: 6, overflow: 'hidden', display: 'flex' }}>
         {/* Its own room key, so a shared game's online rooms never mix with the sandbox's or a published game's. */}
-        <MoshionPreview code={packForUrl(code)} runKey={runKey} gameKey={`share-${id}`} />
+        <MoshionPreview code={packForUrl(code)} runKey={ready ? runKey : 0} gameKey={`share-${id}`} assets={ready ? art.list : undefined} assetsOwnWins />
       </div>
       <ResizableConsole resetKey={String(runKey)} />
     </>

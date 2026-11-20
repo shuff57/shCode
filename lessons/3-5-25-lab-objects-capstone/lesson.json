@@ -3,6 +3,10 @@
   "title": "3.5.25 Lab: Objects Capstone — Build, Read, Destructure",
   "description": "Build an array of records, read fields with dots and brackets, and destructure a record into variables. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.5.9",
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -362,6 +366,19 @@
         "description": "Code that runs prints: one record's field read with a dot, the spaced key's value, a nested field reached with a chain, each record's cost from a loop, the unpacked names, and every key and value of one record from a loop; at least eight lines, none undefined or NaN. Text typed in, and prints that never run, do not count. Help: 3.5.23 (A Record-Shaped Object)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "array of records built: An array holds object records: written in the brackets or pushed in one at a time. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "nested object present: An object literal holds another object literal. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "one record's field read with a dot and printed: console.log prints a field of one record picked by its number and read with a dot (cart[0].name), or a variable holding that read. A field printed by the loop in step 4 does not count for this step. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "spaced key read with brackets and printed: console.log prints a value read with square brackets and a quoted key (cart[1][\"item code\"]), or a variable holding one. Code inside a comment, or written inside quotes as text, never runs.",
+        "r9": "nested field read with a chain and printed: console.log prints a nested field reached with two dots in a row (cart[0].details.color), or a variable holding one. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "loop works out and prints each cost: A loop over the array of records (cart, or whatever the array is called; for, for...of, while or forEach, on the array or counting to its length) prints each record's price times its quantity: multiplied right in the print, through a variable, through a helper function that returns the product, or from the two read into variables first. Either order of the two numbers is fine (quantity * price). Code inside comments never runs, and code written inside quotes is only text.",
+        "r6": "Are two or more fields unpacked with a brace pattern from an object the program made earlier (not from an object literal typed on that same line), and is each bare name then used in a printed message, in console.log or a variable that is printed? Printing typeof of the names does not count. Code inside comments never runs.",
+        "r7": "Object.keys walked with a loop: A loop goes over Object.keys(...) of one record (cart[0], or a variable holding a record), fetches each value with the key in square brackets, and prints it. Code inside a comment, or written inside quotes as text, never runs.",
+        "r8": "output printed: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

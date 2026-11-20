@@ -3,6 +3,10 @@
   "title": "6.14.12 Playtest and reflect: Coin Maze and bricks",
   "description": "Play your finished Coin Maze to the end and clear your brick wall, try to break each, find one surprise, link it to your code and choose one change. AI-graded with hints.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.14 Grids and Tile Maps",

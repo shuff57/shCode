@@ -3,6 +3,10 @@
   "title": "7.6.2 Lab: A field of enemies",
   "description": "The drone is gone and enemies arrive on a beat, but nothing builds or moves them. Write spawnEnemy with one push per array, and the loop that makes enemies fall, land and leave all three arrays.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 18,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.6 Defender: many enemies",
@@ -148,6 +152,15 @@
         "description": "Inside that landing if, the enemy's sprite is deleted (.delete() or .remove()) and index j is spliced out of enemies, enemyHp AND enemyWorth (or a removeEnemy(j) helper that does those four things is called there). Missing only the delete is partial: the enemy would stay stuck on the base. Splicing only one or two of the three arrays is not met.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "spawnEnemy builds a pass-through sprite: spawnEnemy makes a new sprite and sets its collider to 'none', so shots and enemies pass through each other. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "One push per array: spawnEnemy pushes onto enemies, enemyHp and enemyWorth, so index j is the same enemy in all three. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Enemies fall: moveEnemies moves each enemy down by adding to its y. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "A landing costs the base 1: Inside an if that tests an enemy's y against BASE_Y, baseHp goes down by 1. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "A landed enemy leaves the screen and all three arrays: Inside the landing if, next to baseHp going down, the sprite is deleted and index j is spliced out of enemies, enemyHp and enemyWorth (or a removeEnemy helper that does it is called there). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

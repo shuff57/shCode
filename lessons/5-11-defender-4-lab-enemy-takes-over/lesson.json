@@ -3,6 +3,10 @@
   "title": "7.9.4 Lab: Enemy takes over",
   "description": "The game is Part B's, with a new Enemy class nothing uses yet. Finish the class, swap the three parallel arrays for one array of Enemy objects, and remove finished enemies in one place. The game must play exactly as before.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.9 Defender C: design and the classes",
@@ -170,6 +174,16 @@
         "description": "Once a frame (clearEnemies() or a function like it that draw() calls while playing), every finished enemy's sprite is removed from the screen (e.remove(), or e.sprite.delete()) and then the finished enemies are dropped from the list (enemies = enemies.filter(...) keeping the living), in that order. A loop from the end to the start that removes and splices each finished enemy does the same job and is met. Filtering first and removing after is not met: the finished sprites are left behind on screen. A clear-up function that nothing calls is not met.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "takeHit lowers hp, never below 0: takeHit(n) takes n off this.hp, then brings this.hp back to 0 if it went below (an if, or Math.max). Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "isAlive answers from hp: isAlive() returns true while this.hp is above 0 and false at 0. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "land() uses the enemy up: land() sets this.hp to 0, so the enemy is finished and the reap takes it away. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "One array of Enemy objects; enemyHp and enemyWorth are gone: Enemies are made with new Enemy(...) and kept in the one enemies array; no line names enemyHp or enemyWorth any more (setup, spawnEnemy, moveEnemies, hitEnemies and startRound all included). Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "The scene asks the enemy: The game calls the enemy's own methods: in hitEnemies() a hit asks e.isAlive() first and then calls .takeHit( (so a finished enemy cannot be scored twice), and a landing calls .reachedBase() and .land(). Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "Finished enemies leave the screen and the list: in a function that runs every frame (such as clearEnemies() called from draw()), each enemy that is not alive gets remove() called on it (the Enemy class's own remove(), which deletes its sprite, counts, as does e.sprite.remove() or e.sprite.delete()), and then enemies = enemies.filter(...) keeps only the living ones. Both are needed, remove() before the filter: a filter that runs first leaves the finished sprites on the screen. Any variable names, a for...of loop or forEach. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

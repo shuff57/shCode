@@ -3,6 +3,10 @@
   "title": "6.12.11 Fix the Broken Pseudocode: Dragging a Sprite",
   "description": "Repair half-finished pseudocode for dragging: give the mouse-up frame its own branch, put the velocity reset where it belongs, and stop a step jumping to itself.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.12 Advanced Input",
@@ -114,6 +118,15 @@
         "description": "The sprite follows the mouse only inside the check for the sprite being under it.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "The frames where the mouse is up are handled: The pressing decision has a branch for when the mouse is not pressing.",
+        "r2": "The velocity reset happens on release only: The velocity is zeroed only on the frames where the mouse is up.",
+        "r3": "Every step moves forward: No step sends you back to an earlier step. Moving the sprite is one ordinary step per frame.",
+        "r4": "Moving the sprite needs the sprite under the mouse: The sprite follows the mouse only inside the check for the sprite being under it."
+      },
+      "task": "The student was given plain-English steps for the lab \"6.12.11 Fix the Broken Pseudocode: Dragging a Sprite\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Here is what the finished feature should do, in plain English: **1.** While the mouse is pressing: if the sprite is under the mouse, move the sprite to the mouse. **2.** When the mouse is not pressing (it was let go): set the sprite velocity to zero, so it does not fly off. **3.** Every path ends at the end of the frame. No step may send you back to itself. The same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps. Someone charted picking the sprite up carefully, and stopped. Their pseudocode is already in `README.md`. **Press Run before changing anything**: three checks should be red. Read each red card against the plan above, then repair it. Do not start over. A new keyword for this repair: `ELSE` starts the branch for every other case. In a different program: `IF door is open` ... `ELSE` ... `END IF`. The ELSE belongs to the decision it lines up with, so close the inner decision first. Renumber the lines if you like: every line just needs a number. When it is green, trace this: the player presses the mouse somewhere empty, then drags across the sprite while still holding. Does your plan pick it up mid-drag? Should it?"
+    }
   }
 }

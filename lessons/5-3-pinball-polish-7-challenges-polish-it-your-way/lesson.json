@@ -3,6 +3,10 @@
   "title": "5.9.4 Challenges: Polish it your way",
   "description": "Your table works and feels better already. Add one more polish of your own: popups that fade instead of vanishing, a tilt rule that punishes shaking the table, or a heavier ball from round 2. Pick one; add an idea of your own on top if you like.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.9 Pinball: playtest and finish",
@@ -61,7 +65,12 @@
         "description": "At least one of: (1) popups whose .opacity goes down over time (worked out from .life, lowered by a step each frame, or similar); (2) a tilt rule: a count of nudges that goes up on a key press, reset on a frameCount beat or by R, and something that happens when it goes above 3; (3) a ball whose mass grows from round 2 (a round counter that R raises, and a mass set from it or inside an if on it); or a polish of the student's own that changes play, such as a score multiplier or bonus, or a gravityScale, rotationLock, bounciness or friction change. Missing: none of these, or only a colour or a fixed size changed. Help: 5.7.1 (Reading: Words on a sprite, and sprites that run out) and 5.8.1 (Reading: Four knobs: mass, gravityScale, rotationLock, debug)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Is a polish in the running code? The starter has ball.bounciness = 0, ball.mass = 1, score += b.worth, no rotationLock. Any ONE of these is yes: ball.rotationLock = true (the ball stops spinning); ball.gravityScale = 0.7; ball.bounciness = 0.4; a new friction; score += b.worth * 2 or + combo; a popup's .opacity changed each frame so it fades (= p.life / 40, -= 0.025, *= 0.9, or lowered when life is low); a tilt count (nudges++ on a key, or a budget counting down); ball.mass changed for a new round (R key, a helper, a round count). Not enough: gravityScale = 1, rotationLock = false, opacity set once, a colour change, mass changed only in setup(). Code inside comments never runs."
+      }
+    }
   },
   "carryFrom": "5-3-pinball-polish-5-lab-nudge-the-table"
 }

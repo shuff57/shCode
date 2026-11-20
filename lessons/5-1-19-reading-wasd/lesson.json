@@ -3,6 +3,10 @@
   "title": "5.1.14 Reading: Key names: WASD and the arrow keys",
   "description": "The name you give kb.pressing() picks the key: single letters for WASD, words for the arrow keys. Either set works. Read before 5.1.15.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

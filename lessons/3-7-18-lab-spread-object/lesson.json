@@ -3,6 +3,10 @@
   "title": "3.7.18 Lab: Build a New Object with Spread + Override",
   "description": "Use object spread to copy an object with one property overridden and one property added, leaving the original untouched. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.7.6",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -322,6 +326,14 @@
         "description": "When settings holds other values, the values changed and extended copy from it change too, and console.log calls that run print both copies and settings. Help: 3.7.15 (Copying an Object with Changes)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Object declared: Declares an object with curly braces. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Object spread used: Uses object spread, written as ... inside an object literal. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Override after the spread: Writes a property after the spread so the override wins. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "console.log present: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

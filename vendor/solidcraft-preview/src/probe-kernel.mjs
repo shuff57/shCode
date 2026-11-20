@@ -54,5 +54,14 @@ export function instantiateKernel(wasmModule) {
       const ret = wasm.run(p, n);
       try { return JSON.parse(str(ret[0], ret[1])); } finally { wasm.__wbindgen_free(ret[0], ret[1], 1); }
     },
+    // The kernel built with the "session" feature (kernel/build.sh FEATURES=session): sessions kept in slots between calls (probe-worker.mjs).
+    /** run `commands` on a scratch copy of slot `from` (an empty design when from < 0) and keep the result in slot `to` (when to >= 0); run()'s reply */
+    runFrom: typeof wasm.run_from === 'function' ? (from, to, commands) => {
+      const p = put(JSON.stringify({ commands })); const n = vecLen;
+      const ret = wasm.run_from(from, to, p, n);
+      try { return JSON.parse(str(ret[0], ret[1])); } finally { wasm.__wbindgen_free(ret[0], ret[1], 1); }
+    } : null,
+    /** empty slot `slot`, or every slot when slot < 0 */
+    dropSlot: typeof wasm.drop_slot === 'function' ? (slot) => wasm.drop_slot(slot) : null,
   };
 }

@@ -16,6 +16,7 @@
 
 import type { RubricItem } from '../../lib/grade-written-core';
 import type { DiagramGate, DiagramRule } from '../../lib/diagram-types';
+import type { ClefConfig } from '../../lib/clef-check-core';
 import { AI_GRADERS } from './ai-graders.generated';
 
 export interface AiGraderConfig {
@@ -29,6 +30,8 @@ export interface AiGraderConfig {
   brief?: string;
   /** Graded test part: the strict marking framing instead of the lenient default. */
   strict?: boolean;
+  cadFeedback?: boolean;
+  cadRequirements?: import('../../lib/types').Requirement[];
   /**
    * A flowchart part's own structural rules (lesson.diagram.rules), so the server can recompute the
    * checks it keeps beside a graded chart instead of trusting the browser's. Not secret: the page
@@ -41,6 +44,13 @@ export interface AiGraderConfig {
    * from the browser's copy by lib/quiz-redact.ts.
    */
   gate?: DiagramGate;
+  /**
+   * The fast Check (functions/api/clef-check.ts): one Clef question per card, the task line and which
+   * engine facts apply. Only on an aiCheck lab that authored `aiCheck.clef`. Not secret (the browser's
+   * copy of aiCheck carries the same questions); it lives here so the route never takes questions
+   * from the request, which would make it an open model proxy.
+   */
+  clef?: ClefConfig;
 }
 
 // `env` and `request` are no longer needed (there is nothing to fetch) but the

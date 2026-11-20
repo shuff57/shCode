@@ -3,6 +3,10 @@
   "title": "5.3.1 Reading: Play the finished game",
   "description": "Play the finished pinball game, flippers and all, before you build any of it. Names the parts it is made of and the module where each one is built, and says plainly which parts come later.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.3 Pinball: the table",

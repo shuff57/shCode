@@ -3,6 +3,10 @@
   "title": "1.4.21 Video: Why Are There So Many Programming Languages?",
   "description": "A short survey of the language landscape. Watch after the readings, as a second pass over the same ground in someone else's words.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",

@@ -3,6 +3,10 @@
   "title": "5.1.20 Make it Move",
   "description": "Drive a sprite with the keyboard by setting vel.x and vel.y from the keys that are held. Use WASD or the arrow keys, your choice.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",
@@ -236,6 +240,18 @@
         "description": "background(...) is called inside draw(), or in a function the student wrote that draw() calls, with any colour, so old frames do not pile up. A background() call only in setup() runs once, so it is not met. Help: 5.1.9 (background(color) wipe rule)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Is new Canvas(...) called in code that runs when the sketch starts (in setup(), or at the top level)? A call inside a comment or string does not count.",
+        "r2": "Does the running code create at least one sprite with new Sprite(...)? A call inside a comment or string does not count.",
+        "r8": "Is the sprite created once, with new Sprite(...) inside setup() (or a function setup() calls), and is there NO new Sprite(...) or new Canvas(...) inside draw()?",
+        "r3": "Is the left or right key ('a', 'd', 'left' or 'right') read with kb.pressing (or similar) in code that runs every frame: draw(), update(), or a function either of them calls? Reading it only in setup() runs once and does not count; neither does code in a comment.",
+        "r4": "Is the up or down key ('w', 's', 'up' or 'down') read with kb.pressing (or similar) in code that runs every frame: draw(), update(), or a function either of them calls? Reading it only in setup() runs once and does not count; neither does code in a comment.",
+        "r5": "Trace one frame: when the left key is held the sprite's vel.x ends the frame negative, when the right key is held it ends positive, and when neither is held it ends at 0. Is that true? A later statement that resets vel.x (for example an else under a second, separate if) undoes the key, which means no. No reset to 0 at all means no.",
+        "r6": "Trace one frame three times, running the statements in order (the last assignment to vel.y wins): (1) only the up key held: vel.y ends non-zero; (2) only the down key held: vel.y ends non-zero with the other sign; (3) neither held: vel.y ends at 0. Yes only if all three hold, whatever form gives the 0 (else, else if (!w), if (!w && !s), a 0 set first). YES: if (w) vel.y = -4; else vel.y = 0; if (s) vel.y = 4; (down: the else sets 0, then the second if sets 4). NO: if (w) vel.y = -4; if (s) vel.y = 4; else vel.y = 0; (up: -4, then the else sets 0). No reset to 0 at all means no. Code inside comments never runs.",
+        "r7": "Is background(...) called every frame, in draw(), update(), or a function either of them calls, so old frames do not pile up? A background() only in setup() means no."
+      }
+    }
   }
 }

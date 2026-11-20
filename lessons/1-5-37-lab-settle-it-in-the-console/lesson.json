@@ -3,6 +3,10 @@
   "title": "1.5.37 Settle It in the Console",
   "description": "Two expressions, one pair of brackets, and a question answered in four seconds. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",
@@ -109,6 +113,14 @@
         "description": "At least three console.log calls, so something beyond the two given was checked. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Logs 2 + 2 * 3: Prints the un-bracketed expression. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "Logs (2 + 2) * 3: Prints the bracketed expression. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "Look only at the comments (lines starting with //, or /* */ blocks), wherever they are in the file. Does any comment say which operation is done first: words like order of operations, precedence, PEMDAS, BODMAS, multiply first, times before plus, or what brackets change? console.log text does not count.",
+        "r4": "A third expression of your own: At least three console.log calls, so something beyond the two given was checked. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   }
 }

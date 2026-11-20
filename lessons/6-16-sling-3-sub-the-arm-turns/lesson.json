@@ -3,6 +3,10 @@
   "title": "6.16.3 Sub-build: The arm turns",
   "description": "One bar, one pointer, one angle. Aim before there is a wall.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.16 Sling: plan and the arm",
@@ -86,6 +90,13 @@
         "description": "A clamp keeps it above the ground.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "The arm follows the pointer: The rotation comes from angleTo the pointer. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "It stays out of the ground: The angle is limited with constrain, min/max or an if. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Sub-build: The arm turns\". The task: turn the arm toward the pointer every frame with angleTo and keep the angle within limits so it cannot point into the ground. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

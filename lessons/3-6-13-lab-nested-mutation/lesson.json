@@ -3,6 +3,10 @@
   "title": "3.6.13 Lab: Nested-Structure Mutation",
   "description": "Show that a spread copy is only one level deep: change a nested array inside the copy and the original still changes. Then fix it with a deep copy. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.6.6",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -280,6 +284,14 @@
         "description": "A structuredClone call that runs is given student, and what it returns is the object deep ends up holding. Help: 3.6.9 (Side Effects and Copies)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "outer object copied with spread: Code copies an object with the spread syntax. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "nested array pushed into: Code pushes a value into the nested array. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "deep made with structuredClone: Code makes deep by calling structuredClone. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "objects logged: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

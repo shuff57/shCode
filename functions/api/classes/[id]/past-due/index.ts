@@ -20,7 +20,7 @@ import { classStaffEmails, withoutStaff } from '../../../../_shared/classStaff';
 import { loadClassDueRows, loadClassDueWaivers, loadLessonScopeMap } from '../../../../_shared/dueDates';
 import { loadClassWeights, studentGrading } from '../../../../_shared/grading';
 import { buildDueIndex, resolveDueAt } from '../../../../../lib/due-dates-core';
-import { lessonGradeCategory } from '../../../../../lib/grading-weights';
+import { lessonGradeCategory, countsAsMissing } from '../../../../../lib/grading-weights';
 
 interface Env {
   DB: D1Database;
@@ -67,9 +67,11 @@ export const onRequestGet: PagesFunction<Env, 'id', SessionData> = async (contex
   // Every GRADED lesson whose deadline has already passed (class-wide, before waivers), earliest first.
   const overdue = new Map<string, { lessonId: string; title: string; dueAt: number }>();
   for (const [lessonId, scope] of scopeMap) {
-    if (lessonGradeCategory({ title: scope.title, preview: scope.preview, scoreKind: scope.scoreKind, assignmentCode: scope.assignmentCode }) === null) continue;
+    const asLesson = { title: scope.title, preview: scope.preview, scoreKind: scope.scoreKind, assignmentCode: scope.assignmentCode, graded: scope.graded };
+    if (lessonGradeCategory(asLesson) === null) continue;
     const dueAt = resolveDueAt(index, { lessonId, moduleId: scope.moduleId, unitId: scope.unitId });
-    if (dueAt !== null && dueAt <= now) overdue.set(lessonId, { lessonId, title: scope.title, dueAt });
+    // The one "missing" rule (lib/grading-weights.ts): v2 practice already past due at the switch is not listed.
+    if (countsAsMissing(asLesson, dueAt, now)) overdue.set(lessonId, { lessonId, title: scope.title, dueAt: dueAt as number });
   }
   if (overdue.size === 0) return json({ asOf: now, lessonCount: 0, scope: 'graded', students: [] });
 

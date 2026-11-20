@@ -6,6 +6,9 @@ import path from 'path';
 // reviewed locally, it has to be reviewed through the same function that
 // decides what a student may see in production.
 import { publicReport, rankReports, visibleToStudent } from './functions/_shared/issue-reports.ts';
+import { shortlist as issueShortlist, toMatch as issueToMatch, wordsOnlyVerdict as issueWordsOnly } from './lib/issue-check-core.ts';
+import { WHATS_NEW } from './lib/whats-new.ts';
+import { entriesFor as whatsNewFor } from './lib/whats-new-state.ts';
 // Both lesson-id routes below resolve paths through this. It lives in lib/ so
 // scripts/test-lesson-solution-parity.mjs can compare the real dev behaviour
 // against the Pages Function rather than a reimplementation of it.
@@ -32,6 +35,14 @@ const DEV_STUBS_ENABLED =
   process.env.NODE_ENV !== 'production' && process.env.SHCODE_ENABLE_DEV_STUBS === '1';
 
 const dev = process.env.NODE_ENV !== 'production';
+// The runtime directory is generated and gitignored. Prepare it before Next
+// indexes public files, including when this server is started directly.
+if (dev) {
+  const { prepareSolidCraftPreview } = await import('./scripts/prepare-solidcraft-preview.mjs');
+  const { missing } = await prepareSolidCraftPreview({ requireEngines: false });
+  if (missing.length) console.warn(`[solidcraft] Missing local 0.30.1 engine files: ${missing.join(', ')}. Set RESHAPE_CAD_DIR and SOLIDCRAFT_WEB_DIR to the pinned builds.`);
+  else console.log('[solidcraft] Local CAD runtime prepared.');
+}
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
@@ -113,6 +124,9 @@ app.prepare().catch((err) => {
   console.error('[dev-stub-gate] app.prepare() failed to start a handler:', err.message);
 }).then(async () => {
   const server = express();
+  // Serve the prepared host, modules and engines directly, with GET and HEAD.
+  // This also works if public files are refreshed after Next's startup scan.
+  if (dev) server.use('/solidcraft-preview', express.static(path.join(process.cwd(), 'public/solidcraft-preview'), { fallthrough: false }));
   // Set by the dev stubs below: the real-time rooms' socket stand-in (scripts/dev-live.mjs).
   let devLiveUpgrade = null;
 
@@ -204,7 +218,7 @@ app.prepare().catch((err) => {
   let demoApi = null;
   if (process.env.DEV_REAL_DB === '1') {
     const { mountDemoApi } = await import('./scripts/dev-demo-api.mjs');
-    demoApi = mountDemoApi({ server, express, devIdentity, role: DEV_ROLE, roleOf: devRoleOf, root: process.cwd() });
+    demoApi = mountDemoApi({ server, express, devIdentity, role: DEV_ROLE, roleOf: devRoleOf, root: process.cwd(), ownerOf: (e) => devOwner.devOwnerId(e) });
   }
   server.get('/api/me', (req, res) => {
     // `wo` as the real route returns it (functions/api/me.ts), derived the dev way.
@@ -340,9 +354,48 @@ app.prepare().catch((err) => {
   // No OLLAMA/Workers-AI credentials exist in dev, so the honest answer is an
   // empty list -- GraderPicker's hasGraderChoice() renders nothing below two
   // available targets, which is the correct unconfigured-dev surface.
-  server.get('/api/grade-written', (_req, res) => {
-    res.json({ graders: [], fallback: null });
-  });
+  //
+  // WORKERS_PROXY=http://localhost:8799 (a `wrangler dev` worker that forwards {model, inputs} to
+  // env.AI.run, see scripts/clef-harness.mjs) runs the REAL grade-written and clef-check handlers
+  // against real Workers AI, each over its own in-memory SQLite, so the fast Check and its notes can
+  // be tried end to end. Without it grade-written answers 503 as before and clef-check answers 503
+  // too, which sends the browser down today's Check path.
+  {
+    const proxy = process.env.WORKERS_PROXY;
+    const { makeD1: makeAiD1 } = await import('./scripts/_d1-sqlite.mjs');
+    const aiDb = makeAiD1();
+    const AI = proxy ? {
+      async run(model, inputs) {
+        const r = await fetch(proxy, { method: 'POST', body: JSON.stringify({ model, inputs }) });
+        const j = await r.json().catch(() => ({ ok: false, error: 'bad proxy answer' }));
+        if (!j.ok) throw new Error(j.error || 'proxy error');
+        return j.out;
+      },
+    } : undefined;
+    const NO_ASSETS = { async fetch() { return new Response('not found', { status: 404 }); } };
+    const realRoute = (handler) => async (req, res) => {
+      const request = new Request(`http://localhost${req.originalUrl}`, {
+        method: req.method, headers: { 'content-type': 'application/json' },
+        ...(req.method === 'GET' ? {} : { body: JSON.stringify(req.body ?? {}) }),
+      });
+      const out = await handler({ request, params: {}, data: { email: devIdentity(req), role: devRoleOf(req) }, env: { DB: aiDb, AI, ASSETS: NO_ASSETS } });
+      res.status(out.status).type(out.headers.get('content-type') || 'application/json').send(await out.text());
+    };
+    const clef = await import('./functions/api/clef-check.ts');
+    server.post('/api/clef-check', express.json({ limit: '96kb' }), realRoute(clef.onRequestPost));
+    if (AI) {
+      const gw = await import('./functions/api/grade-written.ts');
+      server.post('/api/grade-written', express.json({ limit: '96kb' }), realRoute(gw.onRequestPost));
+      server.get('/api/grade-written', realRoute(gw.onRequestGet));
+    } else {
+      server.post('/api/grade-written', express.json({limit:'96kb'}), (_req, res) => {
+        res.status(503).json({ok:false,error:'AI feedback is not configured on this local server. Your geometry checks and saved sketch still work.',offline:true});
+      });
+      server.get('/api/grade-written', (_req, res) => {
+        res.json({ graders: [], fallback: null });
+      });
+    }
+  }
   // Version-control commit pool. Real routes: functions/api/commits/index.ts
   // (GET ?lessonId= -> { commits }, POST -> { commit }) and commits/[id].ts
   // (DELETE). Held in memory, keyed by identity+lesson the way the D1 table is.
@@ -572,6 +625,37 @@ app.prepare().catch((err) => {
   server.post('/api/lesson-submissions', express.json({ limit: '1mb' }), runRoute(submissionsPost));
   server.get('/api/quiz-reveal', runRoute(quizRevealGet));
   server.get('/api/attempt-reveal', runRoute(attemptRevealGet));
+  // p5play -> moSHion (functions/api/p5play-convert.ts): the REAL handler, calling OpenRouter for real when
+  // OPENROUTER_API_KEY is in this shell (else it answers 503 "not set up", as production does). The API file
+  // it sends the model is read from public/ in place of the ASSETS binding.
+  {
+    const convert = await import('./functions/api/p5play-convert.ts');
+    // Its own in-memory SQLite (every migration applied) so the daily caps really count.
+    const { makeD1: makeConvertD1 } = await import('./scripts/_d1-sqlite.mjs');
+    const convertDb = makeConvertD1();
+    const ASSETS = {
+      async fetch(u) {
+        const p = new URL(u).pathname;
+        if (p !== '/moshion/docs/moshion.d.ts') return new Response('not found', { status: 404 });
+        return new Response(await fs.readFile(path.join(process.cwd(), 'public', p), 'utf8'));
+      },
+    };
+    server.post('/api/p5play-convert', express.json({ limit: '96kb' }), async (req, res) => {
+      const email = devIdentity(req);
+      const request = new Request(`http://localhost${req.originalUrl}`, {
+        method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(req.body ?? {}),
+      });
+      const out = await convert.onRequestPost({
+        request, params: {}, data: { email, role: devRoleOf(req) },
+        env: {
+          DB: convertDb, ASSETS,
+          OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
+          P5PLAY_CONVERT_MODEL: process.env.P5PLAY_CONVERT_MODEL,
+        },
+      });
+      res.status(out.status).type('application/json').send(await out.text());
+    });
+  }
   // The texture and sound library (functions/api/library/*): the REAL handlers
   // over an in-memory SQLite with every migration applied and an in-memory R2,
   // so the library sync (components/LibrarySync.tsx) runs end to end in dev.
@@ -655,6 +739,9 @@ app.prepare().catch((err) => {
     server.post('/api/rooms/:code/send', express.json(), libRoute(roomSend.onRequestPost));
     // A tab that is closing leaves with navigator.sendBeacon, whose body is text/plain (lib/room-leave.ts).
     server.post('/api/rooms/:code/leave', express.json({ type: ['application/json', 'text/plain'] }), libRoute(roomLeave.onRequestPost));
+    // Code together: the other seated people's art the shared program uses.
+    const roomAssets = await import('./functions/api/rooms/[code]/assets.ts');
+    server.post('/api/rooms/:code/assets', express.json({ limit: '256kb' }), libRoute(roomAssets.onRequestPost));
     const liveRoute = await import('./functions/api/live/[code].ts');
     server.get('/api/live/:code', libRoute(liveRoute.onRequestGet));
     // Code together (code rooms go to the LiveDoc stand-in in scripts/dev-live.mjs):
@@ -748,6 +835,9 @@ app.prepare().catch((err) => {
     server.post('/api/messages/:id', express.json({ limit: '512kb' }), libRoute(messagesOne.onRequestPost));
     const messageShare = await import('./functions/api/shares/[id].ts');
     server.get('/api/shares/:id', libRoute(messageShare.onRequestGet));
+    // The sender's pictures and sounds for a sent moSHion program.
+    const messageShareAssets = await import('./functions/api/shares/[id]/assets.ts');
+    server.post('/api/shares/:id/assets', express.json({ limit: '256kb' }), libRoute(messageShareAssets.onRequestPost));
     server.get('/api/classes/:id/messages', libRoute(classMessages.onRequestGet));
     server.post('/api/classes/:id/messages', express.json(), libRoute(classMessages.onRequestPost));
     server.get('/api/game-changes/:cid', libRoute(changeOne.onRequestGet));
@@ -1062,6 +1152,23 @@ app.prepare().catch((err) => {
     });
     console.log('  [dev] issue #' + devIssueSeq + ' [' + kind + '] ' + title.trim());
     res.status(201).json({ id: devIssueSeq, ok: true });
+  });
+
+  // The "already known?" check (functions/api/issue-reports/check.ts). The dev server has no Workers
+  // AI binding, so it answers as a deploy without one does: the word overlap alone, only when it is
+  // unmistakable. Same shortlist and same answer shape as the real route.
+  server.post('/api/issue-reports/check', express.json(), (req, res) => {
+    const { kind, title, message } = req.body || {};
+    const query = { kind: String(kind || 'bug'), title: String(title || '').trim(), message: String(message || '').trim() };
+    if (query.title.length < 3 || query.message.length < 3) return res.json({ match: null, checked: false });
+    const candidates = devIssues
+      .filter((r) => r.withdrawn_at === null)
+      .map((r) => ({ ref: 'r' + r.id, source: 'report', id: r.id, title: r.title || r.message.split('\n')[0], text: r.message,
+        status: r.status, note: r.resolution_note, mine: r.reporter_email === DEV_EMAIL }));
+    whatsNewFor(WHATS_NEW, DEV_ROLE).forEach((e, i) => candidates.push({ ref: 'f' + (i + 1), source: 'feature', id: e.id,
+      title: e.title, text: [e.summary, ...(e.steps || [])].join(' '), href: e.action?.href?.startsWith('/') ? e.action.href : '' }));
+    const top = issueWordsOnly(issueShortlist(query, candidates));
+    res.json({ match: top ? issueToMatch(top, 'words') : null, checked: true });
   });
 
   server.post('/api/issue-reports/:id/status', express.json(), (req, res) => {

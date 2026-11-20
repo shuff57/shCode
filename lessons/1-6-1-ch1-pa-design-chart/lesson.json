@@ -3,6 +3,10 @@
   "title": "1.6.1 Group PA Part 1: Design the Plan",
   "description": "Pick one of four problems with your partner and type the plan in pseudocode: take in the numbers, work out one value, compare it against the limit, and report on each side. The build lesson does not open until this one does.",
   "type": "assignment",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.6 Chapter 1 Group Performance Assessment",

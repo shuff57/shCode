@@ -3,6 +3,7 @@
 // announced with MESSAGES_CHANGED so the bell recounts without asking the server again.
 
 import { errorText } from './http-error';
+import type { GameAsset } from './game-assets';
 import type { PeopleClass, ShareKind, ShareLang, ShareView, ThreadSummary, ThreadView } from './messages-core';
 
 export const MESSAGES_CHANGED = 'shcode:messages-changed';
@@ -99,6 +100,15 @@ export function manageThread<T = ThreadView>(id: string, action: string, extra: 
 
 export function fetchShare(id: string): Promise<Result<ShareView>> {
   return ask<ShareView>(`/api/shares/${encodeURIComponent(id)}`);
+}
+
+/** The sender's pictures and sounds a sent moSHion program uses; `program` is the text a watcher is running. */
+export function fetchShareAssets(id: string, program: string): Promise<Result<{ assets: GameAsset[] }>> {
+  return ask<{ assets: GameAsset[] }>(`/api/shares/${encodeURIComponent(id)}/assets`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: program }),
+  });
 }
 
 /** Where a program's card leads: the copy's own page, or the sandbox ready to join the session. */

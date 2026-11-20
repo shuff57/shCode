@@ -57,15 +57,15 @@ export async function authorizeLive(
     if (room.closed_at || room.expires_at <= now) return { ok: false, status: 410, error: 'That session has ended.' };
     const players = await roomPlayers(db, code);
     const host = players.find((p) => p.seat === 0);
-    const me = await db.prepare(`SELECT first_name, last_name FROM students WHERE email = ?`).bind(email).first<{ first_name: string | null; last_name: string | null }>();
+    const me = await db.prepare(`SELECT first_name, last_name, alias FROM students WHERE email = ?`).bind(email).first<{ first_name: string | null; last_name: string | null; alias?: string | null }>();
     return {
       ok: true,
       kind: 'code',
       roomKey: liveRoomKey(room),
       ticket: {
-        code, seat: watchSeatOf(email, device), seats: room.seats, name: ownerLabel(me?.first_name ?? null, me?.last_name ?? null),
+        code, seat: watchSeatOf(email, device), seats: room.seats, name: ownerLabel(me?.first_name ?? null, me?.last_name ?? null, me?.alias ?? null),
         expiresAt: room.expires_at, kind: 'code', email, host: room.host_email,
-        hostName: host ? ownerLabel(host.first_name, host.last_name) : '', lang, roomKey: liveRoomKey(room), startedAt: room.created_at, watch: true,
+        hostName: host ? ownerLabel(host.first_name, host.last_name, host.alias) : '', lang, roomKey: liveRoomKey(room), startedAt: room.created_at, watch: true,
       },
     };
   }
@@ -78,7 +78,7 @@ export async function authorizeLive(
   if (room.live !== 1) return { ok: false, status: 409, error: 'That room is not a real-time room.' };
   // An approved guest (migration 0059) is shown as one in the session, so nobody mistakes them for a classmate.
   const guestTag = role !== 'admin' && room.host_email !== email && (await isApprovedGuestOf(db, room.host_email, email, now)) ? ' (guest)' : '';
-  const ticket: LiveTicket = { code, seat: me.seat, seats: room.seats, name: ownerLabel(me.first_name, me.last_name) + guestTag, expiresAt: room.expires_at };
+  const ticket: LiveTicket = { code, seat: me.seat, seats: room.seats, name: ownerLabel(me.first_name, me.last_name, me.alias) + guestTag, expiresAt: room.expires_at };
   const roomKey = liveRoomKey(room);
   if (roomKind(room) !== 'code') return { ok: true, kind: 'game', roomKey, ticket };
   const lang = codeLangOf(room.game);
@@ -90,7 +90,7 @@ export async function authorizeLive(
     roomKey,
     ticket: {
       ...ticket, kind: 'code', email, host: room.host_email,
-      hostName: host ? ownerLabel(host.first_name, host.last_name) : '', lang, roomKey, startedAt: room.created_at,
+      hostName: host ? ownerLabel(host.first_name, host.last_name, host.alias) : '', lang, roomKey, startedAt: room.created_at,
     },
   };
 }

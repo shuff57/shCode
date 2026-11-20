@@ -3,6 +3,10 @@
   "title": "2.2.8 Algorithm in Plain English (Part A)",
   "description": "Define algorithm in your own words, then write a precise numbered algorithm for an everyday task. AI-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",

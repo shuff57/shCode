@@ -3,6 +3,10 @@
   "title": "5.2.15 Reading: Bounciness and Friction",
   "description": "The two properties and the combining rule. Read before 5.2.16 Bouncy Ball.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",

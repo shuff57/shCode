@@ -3,6 +3,10 @@
   "title": "7.2.12 Lab: Three Enemies in three variables",
   "description": "Instantiate e1, e2, and e3 from the Enemy class at three different positions: three independent instances, each in its own named variable.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.2 Writing Your Own Classes",
@@ -106,6 +110,14 @@
         "description": "The e3 that draw() uses is given a new Enemy(...). Partial: a new let or const e3 inside setup(), which draw() never sees. Missing: e3 is never given an Enemy. Help: 7.1.3 (Class and instance)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Three separate new Enemy(...) calls: Create three Enemy instances: `e1`, `e2`, and `e3`, in `setup()`. Each must be a distinct `new Enemy(...)` call. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "e1 assigned to a new Enemy: Assign the first Enemy instance to the variable `e1`. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "e2 assigned to a new Enemy: Assign the second Enemy instance to the variable `e2`. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "e3 assigned to a new Enemy: Assign the third Enemy instance to the variable `e3`. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

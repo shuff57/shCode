@@ -3,6 +3,10 @@
   "title": "5.6.2 Sub-build: One key, one sound",
   "description": "A key press plays one sound. Load it once, play it where the event happens, and hear the difference between once and every frame.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.6 Pinball: a sound on a hit",
@@ -82,6 +86,13 @@
         "description": "play() is called under a key test (presses or pressing), so it fires on the event and not every frame.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Is there a loadSound(...) call, not inside a comment, whose result is stored in a variable, in a place that runs once: inside setup(), or at the top level of the file outside every function (for example const blip = loadSound('coin'); or let chime; ... chime = loadSound('break'); near the top)? Both places count. A loadSound(...) inside draw() or update(), which run every frame, means no. No loadSound at all, like the starter, means no. Code inside comments never runs.",
+        "r2": "Played on the key: Play is called inside a key test (presses or pressing), not every frame. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a short moSHion sketch for \"Sub-build: One key, one sound\". The task: load one sound once in setup(), keep it in a variable, and play it inside a key test so it fires once per press rather than every frame. This is a sub-build: a small isolated program whose only job is this one mechanic, so judge the mechanic itself and not style. Accept any variable names, helper functions, arrow functions, ternaries and semicolons. A line that only exists in a comment or a string does not count. moSHion facts: colliding(b) is 0 while apart and counts frames while touching, so an if on it alone is true every frame of a touch; a stored \"last frame\" value makes it true once. .life = n counts down one per frame and deletes the sprite at 0. A sprite with collider 'none' is passed through and has its gravity off. loadSound(name) in setup() (a built-in name such as 'coin', or a full path such as '/moshion/assets/coin.wav') and sound.play() where the event happens; a browser will not play sound before the student's first click or key. Write short, plain notes for a 14-year-old, name the student's own line when something is missing, and never write corrected code."
+    }
   }
 }

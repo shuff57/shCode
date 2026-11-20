@@ -3,6 +3,10 @@
   "title": "2.2.12 Count 1 to 10",
   "description": "Write a for loop that logs every integer from 1 to 10. Auto-graded.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",
@@ -63,6 +67,12 @@
         "description": "Code calls console.log",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "for loop present: Code contains a for loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "console.log present: Code calls console.log Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

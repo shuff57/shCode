@@ -3,6 +3,10 @@
   "title": "3.7.11 Lab: `.concat()` Two Lists",
   "description": "Join two arrays into a new one with .concat(), then show both originals are unchanged. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.7.4",
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -224,6 +228,13 @@
         "description": "When first and second hold other values, joined changes with them, and console.log calls that run print joined and both originals. Help: 3.7.9 (Joining Lists with .concat())",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Two arrays declared: Declares at least two arrays with square brackets. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": ".concat() used: Calls .concat(). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

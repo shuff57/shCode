@@ -3,6 +3,10 @@
   "title": "6.28.3 Lab: Pick a piece and step",
   "description": "Red and black take turns: click one of your pieces to pick it up, click a square one step diagonally forward to move it, and every rule lives in moveKind.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.28 Checkers: pick up and move",
@@ -163,7 +167,17 @@
         "description": "After a move it is the other colour's turn.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A click becomes a row and a column: The click is turned into a row and a column with floor, taking the strip at the top off first. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "You pick up your own piece: A click on a piece whose colour matches the turn remembers it as the picked piece. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "One square diagonally: A step is one row and one column away, tested with abs or another way. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Forward only, by colour: Red moves up the screen and black moves down: the direction depends on whose turn it is. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "The turn passes: After a move, the turn goes to the other player: red to black, black to red. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Lab: Pick a piece and step\". The task: turn a click into a row and a column with floor (taking TOP off y), pick up a piece whose colour matches the turn, and write one rule function, moveKind, that answers 'step' only for a move one square diagonally forward (up for red, down for black) onto an empty square; isLegal asks it, and doMove moves the letter, clears the picked piece and passes the turn. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   },
   "carryFrom": "6-27-checkers-4-lab-set-up-the-board"
 }

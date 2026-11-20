@@ -3,6 +3,10 @@
   "title": "1.5.45 Module 1.5 Quiz",
   "description": "Twelve multiple-choice questions on computational thinking, decomposition, abstraction, pseudocode, flowcharts, recursion and debugging. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",

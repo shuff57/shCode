@@ -205,6 +205,8 @@ demanded it.
   Check button in `functions/api/grade-written.ts`, the tutor and flowchart hints in
   `functions/api/ai-help.ts` (streamed by `lib/workers-ai.ts`). Ollama cloud (`OLLAMA_API_KEY`) is
   only the fallback for a dev server or a deploy with no binding.
+  **One exception:** the sandbox's "From p5play" converter (`POST /api/p5play-convert`) calls OpenRouter
+  (`OPENROUTER_API_KEY`, DeepSeek V4.1 Flash), owner's choice 2026-11-17. See "p5play to moSHion" below.
 
 ## Role model
 
@@ -235,6 +237,12 @@ Cloudflare dashboard env vars pane (plain vars):
 | `GRADE_WRITTEN_DAILY_LIMIT` | var (optional) | Per-student daily submission cap for `POST /api/grade-written`; default `100` (was 30; two students hit 30 on 2026-10-29). Teachers/admins are exempt. `GET /api/grade-written` returns `quota {limit, used, remaining}` for a student and `components/GradeQuotaNote.tsx` shows it beside the attempt banner, so the cap is never a surprise. A dashboard value of this var overrides the default. A runaway-cost stop, not a pedagogical one — the course allows unlimited retries, so raise it rather than let a student hit it. |
 | `GRADE_WRITTEN_GLOBAL_DAILY_LIMIT` | var (optional) | GLOBAL per-deploy daily ceiling for `POST /api/grade-written`; default `10000`. Same backstop as `AI_HELP_GLOBAL_DAILY_LIMIT`, for the grader. |
 | `GRADE_WRITTEN_WORKERS_MODEL` | var (optional) | Workers AI model id for every AI call (grader, Check, tutor); default `@cf/google/gemma-4-26b-a4b-it`. Only read when the `AI` binding exists. |
+| `CLEF_CHECK_DAILY_LIMIT` | var (optional) | Per-student daily cap on the fast Check (`POST /api/clef-check`); default `400`. Its own bucket, so it never spends the grade-written allowance. Over it the browser quietly runs the slow Check instead. Teachers/admins exempt. |
+| `CLEF_CHECK_GLOBAL_DAILY_LIMIT` | var (optional) | Deploy-wide daily ceiling on fast Checks; default `40000` (about $20 a day at the measured cost). |
+| `OPENROUTER_API_KEY` | secret | Bearer key for `POST /api/p5play-convert` only (OpenRouter). Unset = that route answers 503 "not set up"; nothing else uses it. |
+| `P5PLAY_CONVERT_MODEL` | var (optional) | OpenRouter model id for the converter; default `deepseek/deepseek-v4.1-flash`. |
+| `P5PLAY_CONVERT_DAILY_LIMIT` | var (optional) | Conversions per person per UTC day; default `20`. Teachers/admins exempt. |
+| `P5PLAY_CONVERT_GLOBAL_DAILY_LIMIT` | var (optional) | Deploy-wide daily ceiling for the converter, everyone counted; default `500`. |
 
 ## D1 schema
 
@@ -316,7 +324,8 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   `reason: 'enrollment' | 'tries' | 'not-released'`; a spent but unreleased capped
   quiz still returns the student's totals with `answersWithheld` and no key. Rules in
   `lib/solution-release-core.ts`, reads in `functions/_shared/solutionRelease.ts`.
-- **The grade is "so far", and there is ONE rule.** `studentGrading()` in `functions/_shared/grading.ts` is
+- **The grade is "so far", and there is ONE rule.** (What counts and what is "missing" change under grading
+  v2, behind one switch: see "Grading v2 and lesson.json `work`".) `studentGrading()` in `functions/_shared/grading.ts` is
   the only place a course grade is computed (teacher roster, student drawer, and `GET /api/my-gradebook`'s
   `grades`, one per class the student is in, each under that class's due dates, waivers and weights). A graded
   lesson counts when it is done, or when its class due date has passed and it is not done and not waived;
@@ -377,6 +386,23 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   version to the account.
 - Teacher pushes to a student's pool stamp `authored_by_email = session.email`
   server-side; clients cannot set it. Legacy NULLs coerce to `student_email`.
+- **The "already known?" check before a report is filed** (2026-11-17). `POST /api/issue-reports/check {kind, title, message}`
+  (`functions/api/issue-reports/check.ts`, rules in `lib/issue-check-core.ts`): a word-overlap shortlist of the non-withdrawn
+  reports and the caller's What's New features, then Cloudflare's DECISION model `@cf/cloudflare/clef` (Workers AI, zero data
+  retention; one `choice` question over the shortlist plus `none`, a probability per option, no text to parse; a match needs
+  `DECISION_MIN` 0.75) names the one that is the same problem or request. `ISSUE_CHECK_MODEL` may name `@cf/cloudflare/clef-flash`
+  or a chat model (then the JSON prompt path). Measured live with `scripts/issue-check-live.mjs` (not in npm test; results in its
+  header): Clef 13/14 and 14/14 with no wrong match; Flash once matched "too dim" to "too bright"; the 8B Llama first chosen had 4-9
+  wrong matches and is retired by Workers AI 2026-11-20. No shortlist = no model call; no `AI` binding = the
+  overlap alone, only when unmistakable (`WORDS_ONLY_MIN`). A ref not on the shortlist is refused, so it can only point at what
+  /issues already shows a student; the answer carries title, status and the staff reply, never a reporter. It NEVER refuses a
+  report: every failure answers 200 `{match: null}`. Quota: `ISSUE_CHECK_DAILY_LIMIT` (students, default 25) and
+  `ISSUE_CHECK_GLOBAL_DAILY_LIMIT` (200: a check is ~800 input tokens, ~18 neurons on Clef, and the free 10,000 a day are shared
+  with the grader and CODY) in `ai_help_usage`. The Report dialog (`components/ReportIssueButton.tsx`) runs it on
+  Send and, on a match, shows "already fixed" (Reload) / "being worked on" / "on hold" / "already on the site" with Add my vote
+  (a +1 on that report instead of a copy) or Send mine anyway; a report sent past a match carries `context.possibleRepeatOf`
+  (client-supplied, a hint), shown to staff as "Repeat of #N?" on /teacher/issues, which opens sorted Most voted (`DEFAULT_SORT`,
+  owner's decision 2026-11-17) so those votes decide what staff see first. Tests: `scripts/test-issue-check.mjs`.
 - **CODY** (Code. Optimizer. Development. Yielder.) is the student-facing name of the `/api/ai-help` tutor. In the free sandbox (`lessonId` `sandbox-js|moshion|reshape`, code mode only) it answers directly with code blocks up to 15 lines but never writes the whole program (#83, `isSandboxHelp` in `functions/api/ai-help.ts`); code that carries `// STEP` comments, a `// 5.3.4`-style lesson header or "reference solution" is pasted course work and gets the hint-only rules, decided server-side because the lesson id is client-supplied. On Workers AI (the `AI` binding) students have no per-student cap and get `X-RateLimit-Unlimited: 1`; the UI hides the "helps left" line. The per-student per-unit quota below applies only on the Ollama fallback. The global ceiling counts both.
 - `POST /api/ai-help` streams `text/plain` from Workers AI (`lib/workers-ai.ts`), trims code blocks to <=3 lines, and
   is quota'd per student **per unit** per UTC day (`AI_HELP_DAILY_LIMIT`). The
@@ -718,6 +744,38 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
 - Deploy (stage 3): nothing to apply. No migration, no new variable. The drafts route change is backwards compatible
   (a page that sends no `baseUpdatedAt` behaves as before).
 
+### p5play to moSHion (2026-11-17; no migration)
+The moSHion sandbox's toolbar has **From p5play** (`components/P5playConvertButton.tsx`, signed in, not in a Code together
+session): paste a p5play program (or "Use the code in the editor"), `POST /api/p5play-convert {code}` asks DeepSeek V4.1 Flash
+on OpenRouter to rebuild it, and the result opens as a NEW moSHion project (`createProject`), so nothing is written over. The
+prompt is `lib/p5play-convert-core.ts`: **p5play v3** first (the owner's target; older v1/v2 names are a short section at the
+end), then the whole `public/moshion/docs/moshion.d.ts`, read through `ASSETS`. moSHion copies most of v3, so the rules say
+"keep every name that exists" and list only the differences (`CONVERT_RULES`): logic out of `draw()` into `update()`, HUD into
+`drawTop()`; **p5 event functions (`keyPressed`, `mousePressed`, ...) are never called by moSHion**, so their bodies move into
+`update()`; a v3 `overlaps(x, cb)`/`collides(x, cb)` set once in `setup()` becomes a per-frame call in `update()` (and v3's
+pass-through `overlaps` becomes `collider = 'none'`); `loadAni`/`addAnis`/`spriteSheet` grids become `addAni(name, strip, n)`;
+`mirror` is `scale.x = -1` (scale is art only); no `moveTo`, subgroups, index-function group defaults, `camera.zoom`,
+`world.timeScale`, `contro`, `RopeJoint`, polygons, `spriteArt`, `triangle`/`arc`. `sprite.mouse` DOES exist (an earlier rule
+said not). **When the engine's API changes, check `CONVERT_RULES` still holds.**
+The model answers one ```js fence then `NOTES:` bullets (`parseConvertAnswer`); a line it could not match carries
+`// CONVERTED:`. A cut-off answer (`finish_reason: length`) is retried ONCE at double the budget (`retryBudget`; the hidden
+thinking counts against `max_tokens`), then it is an error, never a half program. An answer that still uses something moSHion
+lacks (`leftoverP5Calls`: globals in `NOT_IN_MOSHION`, a DEFINED `P5_EVENT_FUNCTIONS` function, v3 members in
+`P5PLAY_MEMBERS_NOT_IN_MOSHION`; comments and strings ignored) gets ONE repair round; what is left is named in `warnings`.
+`looksLikeMoshionAlready` needs `update()`/`drawTop()` as well as `new Canvas`, because v3 programs start with `new Canvas` too
+(every v3 paste used to be told "this already looks like moSHion"). **`preload()` and `loadImage()` are moSHion's own since `b4fdc0f9`, so they are not on
+that list; the test fails if any listed name, flagged member or event function appears in `moshion.d.ts`.** `max_tokens` is
+`maxTokensFor(code)` (6000 to 16000), never a flat 32000: OpenRouter holds max_tokens x price against the balance up front, and a
+low balance then 402s every request (seen live; 402 reads "needs more credit, tell your teacher"); 3000 was too few for a short
+but tricky v3 shooter. Measured live 2026-11-17: ~$0.002 and 5-16 s a conversion; three p5play v3 programs (an animated
+platformer with `keyPressed()`, a `mousePressed()` shooter with `camera.zoom`/`timeScale`, a `WheelJoint` car with `contro` and
+`triangle()`) all converted in one call and ran 180 frames clean in `scripts/moshion-harness.mjs`. Only the paste and
+the API file leave the site (no email, name or lesson id); the request sets `provider.data_collection: 'deny'`; a paste with a
+phone, email or street address is refused first (`findPII`). Caps in `ai_help_usage`, bucket `p5play-convert` (and
+`p5play-convert:global`), counted when the model is called. No key = 503. Dev: `OPENROUTER_API_KEY=... npm run dev` runs the real
+handler over its own in-memory SQLite. Tests: `scripts/test-p5play-convert.mjs` (npm test; stubbed OpenRouter, no credits).
+Deploy: `wrangler pages secret put OPENROUTER_API_KEY --project-name shcode`, then the site.
+
 ### Image uploads
 - `GET /api/uploads` — caller's images + quota (40 files / 20 MB, 2 MB each)
 - `POST /api/uploads` — store one image. Raw body with `X-Filename`, or
@@ -984,6 +1042,16 @@ deleted|mentions|canEdit|canDelete|history`), `components/Mailbox.tsx` (`Mention
 (the teacher's "show the original", also in `ClassMessages.tsx`). Deleting a conversation or a class removes `message_edits` and
 `message_mentions` too. Tests: `scripts/test-message-edits.mjs` (npm test). Apply 0056 (`npm run d1:migrate`) before the site.
 
+### Alias (migration 0066, 2026-11-19; not deployed yet)
+`students.alias` is an optional handle (2-20 characters, `lib/alias-core.ts` `cleanAlias`, `findPII` run, unique case-insensitively)
+set on /account through `PUT /api/me` (a body without the `alias` key leaves it alone, so an older page cannot clear it). **First
+and last name stay the real name** and are what grading and every teacher view read; the roster (`progress.ts`) and student drawer
+(`students/[email].ts`) add `alias` beside them. Classmate-facing labels go through `ownerLabel(first, last, alias)`
+(`functions/_shared/libraryShare.ts`): shared library, public, games (list, stars, family), rooms, Code together names.
+**Not covered yet:** messages (`message_members.name` is a snapshot taken when a person joins, and `@mention` matches the typed
+name, so an alias needs its own design), teacher moderation lists (deliberately real name), and the gradebook search. Tests:
+`scripts/test-alias.mjs`. Apply 0066 (`npm run d1:migrate`) before the site.
+
 ### Students in more than one class (2026-11-14)
 Nothing server-side ever stopped this: `enrollments` is keyed `(class_id, student_email)` and `POST /api/join-class` only
 refuses a repeat of the same class. What was missing was the way in: the header's yellow "Join your class" shows only while
@@ -1196,6 +1264,18 @@ under random concurrent edits, kind routing, the teacher route), `scripts/test-l
 wrangler dev). Deploy order: apply 0044 (`npm run d1:migrate`), `cd workers/live && npx wrangler deploy` (adds LiveDoc,
 tag v2, D1 binding), then the site (the repo wrangler.toml now declares `LIVE_DOC`; do not deploy the site from this
 tree before the Worker has the class).
+**The others' pictures and sounds (2026-11-17; no migration).** A sketch loads saved art from the RUNNER's library, so in
+a session only the person who drew a picture saw it. On each moSHion Run in a session the sandbox asks
+`POST /api/rooms/[code]/assets {code}` (caller seated now in an open `kind = 'code'` room, else 404) for the OTHER seated
+people's live items the program uses (`usedItems`), **shared with a class or not** (owner's decision 2026-11-17: coding one
+program together is the consent; the art reaches only the people in it), the lower seat's copy on a name clash. The frame
+waits up to 5 s for them and lays them over the store with `ownWins` (the runner's own same-named item still wins), for
+that run only. Bytes through `functions/_shared/itemAssets.ts` (shared with the games route). Tests:
+`scripts/test-session-assets.mjs` (npm test). **A program sent in a message** gets the same: `/shared`'s moSHion run asks
+`POST /api/shares/[id]/assets` (who may open it is `openShare`, `functions/_shared/shareAccess.ts`, also used by GET
+`/api/shares/[id]`) for the SENDER's used items, shared or not; a `copy` reads the code stored with it (never the
+request's), a `watch` the text the watcher runs, only while that session is open. Remix into the sandbox does not copy
+the art into the reader's library.
 
 ### Rooms close when the host's tab is gone; Code together is a popup (2026-11-08)
 On page hide, a game room or Code together tab leaves its seat with `navigator.sendBeacon` (fetch keepalive as the
@@ -1229,10 +1309,14 @@ code into the `sandbox-moshion` draft, asks before replacing a draft that differ
 one as a History snapshot. Tests: `scripts/test-library-games.mjs`. Apply 0042 (`npm run d1:migrate`) before deploying.
 **A game's own pictures and sounds (2026-11-09).** A game stores only code; a sketch reads `texture:<name>` / sounds
 from the player's store, so the author's art must travel. The owner chose "warn and offer to share": the publish panel
-lists the author's saved items the code names (string literals, comments ignored: `usedItems` in `lib/games-core.ts`,
-built-in names excluded) as Shared / Not shared, with "Share them with my class". `GET /api/games/[id]/assets` (same
-404 rule as the game) returns the author's items that are used AND shared into a class the caller sees the game
-through (bytes from R2, no emails) plus `missing`; /play hands them to `MoshionPreview`'s `assets` prop, an OVERLAY on
+lists the author's saved items the code names (string literals, or a name put together from them like `'Enemy_' + kind`,
+comments ignored: `usedItems` in `lib/games-core.ts`, built-in names excluded) as Shared / Not shared, with "Share them
+with my class", and (#129, owner's decision 2026-11-17) "Also share them with my class when I publish", ticked by
+default, which shares the not-shared ones to the game's own audience when Publish shares the game. `GET
+/api/games/[id]/assets` (same 404 rule as the game) returns, to anyone but the author, EVERY live item of the author's
+shared into a class the caller sees the game through (or public, for a public game), used-looking or not, because a
+game can name a picture at run time; the author gets only their used items. Bytes from R2, no emails, plus `missing`
+(used items the caller cannot get); /play hands them to `MoshionPreview`'s `assets` prop, an OVERLAY on
 the store for that run only (`lib/moshion-storage.ts`: never written to the player's store, a sketch cannot overwrite
 or delete those keys; the game's item beats a same-named one of the player's), and names the missing ones ("Ask Sam R.
 to share them"). Tests: `scripts/test-game-assets.mjs`. server.js routes it for dev.
@@ -1497,6 +1581,145 @@ rubric and prompt are read by lesson id and the route's quota applies (shared wi
 The prompt and rubric text do ship to the browser (nothing redacts a formative lab); that is fine for a
 0-point practice check. Editing the file clears the AI's marks.
 Submit records the cards as shown, which is why an edit resets them; the summary, the hints and each red card's note stay as a note labelled "From your last Check" (`staleAiNote`, #68). Tests: `scripts/test-ai-check.mjs`.
+
+## Grading v2 and lesson.json `work` (2026-11-18; built, switched OFF)
+
+Owner's decisions: **everything a student makes is graded**; code is all-or-nothing; plans and text-box
+answers pass at **70%** (a partly met card or criterion counts half) and the gradebook keeps the score;
+quizzes stay a plain percent; practice a student had already skipped is not held against them.
+
+- **`work` on every lesson.json** (`lib/lesson-work.ts`): `{ kind: read | quiz | code | model | plan | written,
+  graded, why? }`. `type: "assignment"` never meant graded and `preview` names a page and a runner at once,
+  so neither could carry it. `generate-lessons-manifest.mjs` refuses a lesson whose kind disagrees with how it
+  is built (`workKindOf`), or whose `graded` differs from its kind's default without a `why` (the four 4.1
+  readings: the Q1 module counts every lesson). The manifest carries `kind` and `graded`.
+- **One switch, `GRADING_V2_FROM` in `lib/grading-v2.ts`, `null` = off**: every rule below then behaves exactly
+  as before, so this ships before it applies. Read by `lessonGradeCategory` (on: `work.graded` decides whether
+  a lesson counts, the module still decides the role; the old rule is `legacyGradeCategory`), `countsAsMissing`
+  / `predatesV2` (the ONE "missing" rule: `studentGrading`, my-gradebook, past-due, and both gradebooks'
+  `buildCell` `exempt`), `isPassingGrade` (text answers: `criteriaScore / n >= 0.7`, before: half met-or-partial),
+  `cardsPass` / `reportFromRequirements` (a `plan` lab: 70% of cards, partial half, required cards green; it
+  records its card score), and `lessonScoreFields` / `app/page.tsx maxScoreFor` (a plan's maxScore = card count).
+- **Skipped practice:** a lesson graded only because of v2 (`newlyGraded`), due before the stamp and not done,
+  is neither missing nor late for that student. Finishing it still counts; everything due after the stamp counts.
+- **Go-live, in order:** (1) `scripts/grading-v2-impact.mjs --switch <date>` (read-only: every live class's grades
+  off and on, and how many v2-only lessons fall due in the four weeks after); (2) `scripts/stamp-grading-v2.mjs
+  --set-now` and commit; (3) `scripts/backfill-v2-plan-scores.mjs --emit-sql a.sql --until <now>`, review, apply
+  (plans finished before v2 stored 0 and needed every card green, so they go to full marks; without it they read
+  0%); (4) `npm run deploy`; (5) the backfill AGAIN with `--until <the deploy's finish time>`: the old code kept
+  writing 0 for plans finished until the deploy was live, and a plan finished under v2 (a real card score) is
+  after that time so it is never touched. Never move the stamp. Rollback: stamp back to null and deploy.
+- Impact 2026-11-18 for "5 Intro Prog 2627": 185 v2-only lessons have no due date (they count only when done,
+  so they can only raise a grade); switching 2026-11-30 or 2027-01-04, none fall due in the next four weeks.
+- Measured 2026-11-18 on the live class (29 students): graded lessons 149 -> 475, no grade goes down, median +1
+  point, largest +8; the median student's missing count stays 6. 20 plan labs, 337 finished rows to backfill.
+- Tests: `scripts/test-grading-v2.mjs` (npm test; both switch positions; three safeguards mutation-checked).
+
+## Fast Check: Clef decides the cards (`aiCheck.clef`, 2026-11-18)
+
+A lab whose `aiCheck` carries `clef: { questions: { <requirement id>: "<one yes/no question>" } }` (optional
+`task`, else cut from the aiCheck prompt before "You cannot run their code") gets a two-step Check
+(`lib/clef-check-core.ts`, the rules; `functions/api/clef-check.ts`, the route; `runFastCheck` in
+`components/LessonWorkspace.tsx`):
+1. **Colours in about half a second.** `POST /api/clef-check {lessonId, response}` asks Clef
+   (`@cf/cloudflare/clef`, Workers AI, a decision model: one probability per question, no words, the same
+   answer every time) and bands each card: p >= 0.85 green, <= 0.15 red, between **unsure**. The browser
+   decides an unsure card with the lab's own pattern check (`grade()`) on the same files. Questions, task
+   and model come from `ai-graders.generated.ts` (`config.clef`), never the body, or the route is a free
+   model proxy. Own allowance bucket `clef-check` (env table). 503/404/429 all carry `offline: true`
+   and the browser then runs today's Check unchanged, so a student never sees the fast path fail.
+2. **Notes on demand** (owner's decision 2026-11-18). Check makes no AI call of its own: a red card
+   offers **Why?** (`explainCard`), which asks `/api/grade-written` with `onlyIds: [that card]`; the
+   server honours it only on a lesson with `config.clef`, not capped, not a chart, and only as a subset of
+   its own rubric (`onlyCards`). Its verdict NEVER changes a colour (`mergeClefNotes`): a note is kept
+   only where the AI agrees with the card, else the card keeps its hint / "It looks for" line. Measured
+   per call: Clef 21-38 neurons, gemma 27-43 for all cards, 22-30 for a few; so a Check costs about what
+   today's did, and "Why?" is the only extra spend. (An earlier note here said a Clef call was half a
+   gemma call; measured, they cost about the same.)
+
+Measured (spike 2026-11-18: three labs, synthetic fixtures plus 107 real
+submissions, two blind labellers who agreed on every cell both decided): Clef + band + pattern fallback
+scored 97.8 / 99.5 / 100% on 2.3.30 / 5.1.20 / 2.2.17 real work through the production path, against
+93.1 / 98.0 / 98.5% for the AI Check alone; colours 0.5-0.6 s in the browser against ~10 s; an all-green
+Check costs one Clef call (~$0.0005). **Questions must be written per card:** questions built from a
+card's own words scored 80.9% on 5.1.20 (its cards say "in draw()"; many students correctly use
+update(), which also runs every frame). Clef-flash was not repeatable; do not use it.
+
+Adding a lab: write `aiCheck.clef.questions` (one per card; only regex/inFunction cards, since an unsure
+answer falls back to the pattern check; the generator refuses anything else), run
+`generate-ai-graders.mjs`, then the gate:
+`cd scripts/clef-proxy && npx wrangler dev --port 8799` (local Workers AI proxy, never deployed), and
+`WORKERS_PROXY=http://localhost:8799 node --import ./scripts/register-ts.mjs scripts/clef-harness.mjs --lab <id> --fixtures scripts/clef-fixtures/<id>.json`.
+Add `--tolerance` to use the lab's ACCEPT / REJECT cases from `test-grader-tolerance.mjs` as fixtures
+(dumped through `TOLERANCE_CASES_OUT`; ACCEPT = every card green, REJECT = its named card red). It fails if
+the reference has a red card, the starter is green where its own pattern check is red (some cards are green
+on a starter by design: 1.1.3's "still present"), or a labelled fixture card is wrong.
+
+**Chapter 1 (2026-11-18): all 23 AI Check labs have questions**, gated with `--tolerance` (194 programs,
+629/629 labelled cards right, 14% of cards unsure). Then run against 463 real handed-in programs (every one
+was all green when handed in): a blind reviewer read every card Clef turned red. After rewriting the cards
+that caused false reds: 48 programs get a red card, 52 of the reviewer's 54 real catches are kept (an `=`
+instead of `===`, code inside a string, a placeholder left in, `.toLowerCase` without `()`), and 2 false
+reds remain (one where the lab's own regex agrees with Clef). **Lessons for writing questions:**
+- Clef answers every question of a lab in ONE request, so changing one question can move another card's
+  answer. Re-run the whole lab after any edit.
+- A generic "any names, spacing or style are fine" line breaks cards ABOUT names or spacing (it failed a
+  correct camelCase `favouriteColour`). Do not put it in a template.
+- "Code inside a string never runs" is right in general (it catches `typeof` written in quotes) but wrong for
+  a card about strings: say that `${...}` inside backticks is code, and that a single-quoted `${` is meant
+  to stay text.
+- Say "declared, then given its value on the same line or a later one": `let playerName` followed by
+  `playerName = "Alice"` was read as not declared with text.
+- Say what does NOT matter for the card ("whatever the names", "any number, however unrealistic"):
+  otherwise the task bleeds in (variables named `lol` failed "six variables"; an age of 7000 failed
+  "studentAge is a number").
+- Short, literal questions with an example beat long ones (`'${2024 + 1}'`, `numberNine + numberNineLarge`).
+- 1.2.16 "Use addition" (owner's decision): the rule is Step 1's, two number VARIABLES added; the card now says
+  so, and students who handed in `console.log(5 + 2)` before keep their pass. 1.3.19 r10: "mentions tax" (owner).
+
+**Chapters 2-3 (2026-11-18): all 139 AI Check labs have questions** (591 drafted from the card text, then fixed
+where a gate or real work disagreed). Gate: every lab passes `--tolerance` (now reading `test-grader-tolerance.mjs`
+AND `test-grader-tolerance-3x.mjs`) except 3.5.18's two "print inside a function nobody calls" cases, which its
+runtime card t2 refuses. Real work: 2,583 handed-in programs; a blind reviewer sampled 3 reds per card (285):
+before fixes 79% of Clef's reds were real gaps; after, 223 of 225 sampled real catches stay red and 5 of 57
+false reds remain. 381 programs (15%) get a red card, nearly all real gaps today's grading let through.
+- **Cards that run the code (`tests`) take no question**: Clef reads code, it does not run it. They keep their
+  last Run's result in the app (`runFastCheck` takes them from the pattern grader, never into the Clef verdicts),
+  and the harness does not score them. The generator requires a question on every regex/inFunction card only.
+- **The aiCheck prompt's task is often only Step 1** ("Write a for loop running from 1 to 20"). Clef and any
+  reviewer then miss what Step 2 asks (2.4.19 prints only the multiples of 3; one fix had accepted either
+  direction). Give such a lab an authored `aiCheck.clef.task`, and check a question against the REFERENCE.
+- Many cards name the reference's function or variable while the course accepts any name (the 3.x "renamed"
+  ACCEPT cases): say "any function name; the lesson's name is only a suggestion" and describe what it does.
+- Asking about the OUTPUT ("does it print ONLY 3, 6, 9...?") made Clef sure where asking about the structure
+  left it unsure and the lenient regex decided.
+- Clef does not trace calls: "a print inside a function nobody calls" needs a runtime card, not a question.
+- The harness now reads questions from lesson.json (not the generated file), so several labs can be edited and
+  tested at once; run `generate-ai-graders.mjs` before deploying.
+
+**Chapters 4-7 (2026-11-18): all 140 AI Check labs have questions** (mostly moSHion; no runtime cards). Gate:
+every lab passes `--tolerance` (1,097 course cases). Real work: 708 handed-in programs (most moSHion labs had
+none yet), every red reviewed blind: before fixes 79 of 128 reds were FALSE (62%; the gate had looked fine),
+after them 4 false reds remain and all 44 real catches stay red; 6% of programs get a red card.
+- **Clef is extremely sensitive to wording, and only real work shows it.** On one correct program: "Is
+  world.gravity.y set to a number other than 10 in the code (for example -10, 0, 5 or 20)?" -> 0.98, "Does the
+  student code set world.gravity.y to a value different from 10?" -> 0.13; "Is there a line new Canvas(...) that
+  is not inside a comment?" -> 0.92, the drafted "Create a canvas: A canvas is created when the sketch starts."
+  -> 0.06. Ask short, literal questions with concrete example values and code shapes; never trust a draft
+  that has only passed the gate.
+- A card about "changed from the starter" / "a value of your own" must state the starter's value: Clef never
+  sees the starter.
+- Name the equivalent forms students use (clear() for background(), walls made static through a group,
+  round(random(1, 6)), kb.holding as a held-key test, update() as well as draw()).
+- Left: 5.1.20 r5/r6 when update() sets the velocity and draw() sets it again (Clef stays unsure whatever the
+  wording; the regex decides), and one pinball r3 case. Several fixes rely on the regex deciding an unsure card.
+
+**Coverage: every AI Check lab in the course (302) now has Clef questions**; `test-clef-check.mjs` checks that
+every pattern card in Chapters 1-7 has one and no runtime card does.
+Fixtures are hand-written programs only; real student code never goes in the repo. The same
+`WORKERS_PROXY` makes the dev server run the real clef-check and grade-written handlers against Workers
+AI. Tests: `scripts/test-clef-check.mjs` (npm test). Deploy: nothing to apply (no migration; the `AI`
+binding already exists).
 
 ## AI grader
 

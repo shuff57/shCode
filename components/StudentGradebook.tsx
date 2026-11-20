@@ -38,6 +38,8 @@ interface ManifestLesson {
   preview?: string | null;
   assignmentCode?: string | null;
   scoreKind?: 'quiz' | 'written' | null;
+  /** lesson.json work.graded (lib/lesson-work.ts); read once grading v2 is on. */
+  graded?: boolean | null;
 }
 
 interface Props {
@@ -194,7 +196,7 @@ export default function StudentGradebook({ lessons }: Props) {
     // student never opened is not "Missing": it is not an assignment. Ones they did open still show.
     .filter(({ lesson, status }) => {
       if (status !== 'missing' && status !== 'not-started') return true;
-      return lessonGradeCategory({ title: lesson.title, preview: lesson.preview, scoreKind: lesson.scoreKind, assignmentCode: lesson.assignmentCode }) !== null;
+      return lessonGradeCategory({ title: lesson.title, preview: lesson.preview, scoreKind: lesson.scoreKind, assignmentCode: lesson.assignmentCode, graded: lesson.graded }) !== null;
     })
     .sort((a, b) => Number(b.status === 'missing') - Number(a.status === 'missing'));
 
@@ -341,6 +343,7 @@ export default function StudentGradebook({ lessons }: Props) {
                   preview: lesson.preview,
                   scoreKind: lesson.scoreKind,
                   assignmentCode: lesson.assignmentCode,
+                  graded: lesson.graded,
                 });
                 // Finished work that does not count toward the grade says so instead of "100%".
                 const practice = practiceDisplay(category !== null, status);

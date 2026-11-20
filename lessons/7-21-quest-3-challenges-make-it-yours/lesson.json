@@ -3,6 +3,10 @@
   "title": "7.21.3 Challenges: Make it yours",
   "description": "Your Quest is complete. Change one thing of your own: a fourth enemy kind, a special move with a cooldown, or a shop that spends gold. Pick one; add an idea of your own on top if you like.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.21 Quest: playtest and extend",

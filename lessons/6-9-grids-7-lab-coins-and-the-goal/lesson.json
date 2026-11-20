@@ -3,6 +3,10 @@
   "title": "6.14.7 Lab: Coins and the goal",
   "description": "The player walks the maze but the coins do nothing and the goal never opens. Pick up each coin when the player touches it, count it in the score, and let the goal win only when no coin is left.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.14 Grids and Tile Maps",
   "estimateMins": 20,

@@ -3,6 +3,10 @@
   "title": "6.12.9 Reading: Snap a Sprite to the Cursor",
   "description": "How to move a sprite exactly to the cursor position each frame during a drag. Zeroing the velocity is the step that keeps physics from fighting your snap.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.12 Advanced Input",

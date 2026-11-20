@@ -3,6 +3,10 @@
   "title": "7.8.2 Lab: Waves",
   "description": "Enemies stop arriving on a beat and come in waves instead: each wave only after the field is clear and a pause has run out, each one bigger and faster. Write nextWave and spawnWave, and start every round at wave 0.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 18,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.8 Defender: waves and the cost",
@@ -134,7 +138,15 @@
         "description": "spawnWave() raises wave by 1 (+= 1, ++, or = wave + 1) and calls spawnEnemy(...) inside a for or while loop, so the number of enemies can grow with the wave. Calling spawnEnemy a fixed number of times by hand, with no loop, is partial.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Every round starts at wave 0 with a pause: startRound sets wave to 0 and gives wavePause a number of frames (a number, or a named constant). Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The pause counts down only on a clear field: nextWave counts wavePause down by 1 only on a clear field: it returns while any enemies are left, as 7.8.1 does (or, as in 7.3.18, starts a wave only when the field is clear on a frameCount beat). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "At 0 the next wave comes and the pause starts again: When wavePause reaches 0, nextWave calls spawnWave() and sets wavePause back to a number above 0 (or a named constant). Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "A wave adds 1 to the wave number and builds its enemies in a loop: spawnWave adds 1 to wave and calls spawnEnemy inside a loop. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "carryFrom": "5-10-defender-5-lab-shoot-them-down"
 }

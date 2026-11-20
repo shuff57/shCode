@@ -3,6 +3,10 @@
   "title": "5.15.3 Lab: Don't bite yourself",
   "description": "The snake passes through itself and the food can appear under its body. Write one search helper and use it both to end the round on a bite and to keep the food off the snake.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 14,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.15 Snake: search",
@@ -103,7 +107,14 @@
         "description": "In makeFood(), a loop (while, or do...while) keeps choosing a new column and row for as long as isBody says that cell is part of the snake, and the picks can be changed (let, not const). Partial: an if that re-picks only once, or picks still declared const (the sketch stops with an error when it tries to change them). Missing: the food's cell is never checked. Help: 5.15.1 (Reading: Searching the array)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "isBody searches the segments: A loop (for...of, or an index loop) goes through every segment and returns true when one matches. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A bite ends the round: The same test that checks the walls also asks isBody. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Food keeps re-picking until the cell is free: A while loop repeats the pick while the cell is part of the body. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "carryFrom": "5-5-snake-6-lab-grow-and-eat"
 }

@@ -3,6 +3,10 @@
   "title": "3.2.29 Parameters and Return Values",
   "description": "Ten multiple-choice questions on parameters, arguments, return, scope, early return, and why printing is not returning. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.2 Parameters and Return Values",

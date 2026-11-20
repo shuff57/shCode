@@ -3,6 +3,10 @@
   "title": "1.4.3 Match the Language to the Job",
   "description": "Four jobs, four languages. Log the language each job was designed for. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",
@@ -129,6 +133,15 @@
         "description": "The fifth console.log answers STEP 5 -- the data analysis job, with Python. Help: 1.4.2 (Why There Are So Many Languages)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A database question is SQL: The first console.log answers STEP 1 -- the database question, with SQL. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "An iPhone app is Swift: The second console.log answers STEP 2 -- the iPhone app, with Swift. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "An operating system is C: The third console.log answers STEP 3 -- the operating system, with C. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "An interactive web page is JavaScript: The fourth console.log answers STEP 4 -- the interactive web page, with JavaScript. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "Data analysis is Python: The fifth console.log answers STEP 5 -- the data analysis job, with Python. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   }
 }

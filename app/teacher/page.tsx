@@ -80,6 +80,8 @@ interface StudentProgress {
   total_score: number;
   firstName?: string | null;
   lastName?: string | null;
+  /** The handle classmates see for this student (the real name above is what grading uses). */
+  alias?: string | null;
   /** 0-100 grade-so-far under this class's weights and due dates (work done plus work past due). */
   weightedPercent: number;
   /** Graded lessons in the course, how many this student finished, and how many are past due and not done. */
@@ -115,6 +117,7 @@ interface StudentDetail {
   student_email: string;
   firstName?: string | null;
   lastName?: string | null;
+  alias?: string | null;
   lessonState: Record<string, LessonStateEntry>;
   latestSubmissions: Record<string, SubmissionEntry>;
   /** This class's due date per lesson (epoch ms); a waived lesson has none. */
@@ -198,6 +201,7 @@ function MiniBar({ pct }: { pct: number }) {
 
 interface LessonMeta {
   cadHost?: 'solidcraft';
+  cadScope?: 'sketch';
   id: string;
   title: string;
   unit: string | null;
@@ -212,6 +216,8 @@ interface LessonMeta {
   /** Grade-category inputs (lib/grading-weights.ts lessonGradeCategory): which lessons are graded at all. */
   assignmentCode?: string | null;
   scoreKind?: 'quiz' | 'written' | null;
+  /** lesson.json work.graded (lib/lesson-work.ts); read once grading v2 is on. */
+  graded?: boolean | null;
 }
 
 /**
@@ -916,6 +922,9 @@ function StudentDrawer({
             {fullName(detail?.firstName, detail?.lastName) && (
               <div style={{ fontSize: 13, color: 'var(--c-meta)', fontFamily: 'monospace' }}>{email}</div>
             )}
+            {detail?.alias && (
+              <div style={{ fontSize: 13, color: 'var(--c-meta)', fontFamily: 'monospace' }}>Alias: {detail.alias}</div>
+            )}
           </div>
           <button
             style={{ background: 'none', border: 'none', color: 'var(--c-meta)', cursor: 'pointer', fontSize: 20, lineHeight: 1, padding: '4px 8px' }}
@@ -984,7 +993,7 @@ function StudentDrawer({
                   const practice =
                     !!meta &&
                     !!practiceDisplay(
-                      lessonGradeCategory({ title: meta.title, preview: meta.preview, scoreKind: meta.scoreKind, assignmentCode: meta.assignmentCode }) !== null,
+                      lessonGradeCategory({ title: meta.title, preview: meta.preview, scoreKind: meta.scoreKind, assignmentCode: meta.assignmentCode, graded: meta.graded }) !== null,
                       'done',
                     ) &&
                     ls?.state === 'completed';
@@ -1036,11 +1045,11 @@ function StudentDrawer({
                   const briefPoints = brief ? brief.rubric.reduce((n, c) => n + (c.points > 0 ? c.points : 0), 0) : 0;
                   // What a score on this lesson is out of: the part's maximum, else the hand-in's own, else its rubric's.
                   const outOf = meta?.maxScore ?? (sub && sub.possible !== null && sub.possible > 0 ? sub.possible : null) ?? (briefPoints > 0 ? briefPoints : null);
-                  const weight = meta ? scoreWeight({ counts: lessonGradeCategory({ title: meta.title, preview: meta.preview, scoreKind: meta.scoreKind, assignmentCode: meta.assignmentCode }) !== null, maxScore: meta.maxScore }) : null;
+                  const weight = meta ? scoreWeight({ counts: lessonGradeCategory({ title: meta.title, preview: meta.preview, scoreKind: meta.scoreKind, assignmentCode: meta.assignmentCode, graded: meta.graded }) !== null, maxScore: meta.maxScore }) : null;
                   // Practice work never shows a points value, finished or not. `practice` is true only once the
                   // lesson is done, so a teacher's score on an unfinished hand-in needs its own "does it count"
                   // check (an id with no current lesson.json keeps the counted look, as `practice` does).
-                  const counted = !meta || lessonGradeCategory({ title: meta.title, preview: meta.preview, scoreKind: meta.scoreKind, assignmentCode: meta.assignmentCode }) !== null;
+                  const counted = !meta || lessonGradeCategory({ title: meta.title, preview: meta.preview, scoreKind: meta.scoreKind, assignmentCode: meta.assignmentCode, graded: meta.graded }) !== null;
                   const shownScore =
                     ls?.state === 'completed' && !practice && ls.score !== null ? ls.score : teacherScored && counted ? sub!.score : null;
                   // Does a teacher score here change the grade now? The queue card's helper, so the words match (ux2 T1).
@@ -1066,7 +1075,7 @@ function StudentDrawer({
                           )}
                         </span>
                         {stateBadge(ls?.state, !!sub, !!detail.grading?.missingIds?.includes(lesson.id), practice, teacherScored && counted)}
-                        {sub && showLateBadge(!!meta && !practice && lessonGradeCategory({ title: meta.title, preview: meta.preview, scoreKind: meta.scoreKind, assignmentCode: meta.assignmentCode }) !== null, submissionWasLate(sub.submitted_at, sub.due_at_submit)) && (
+                        {sub && showLateBadge(!!meta && !practice && lessonGradeCategory({ title: meta.title, preview: meta.preview, scoreKind: meta.scoreKind, assignmentCode: meta.assignmentCode, graded: meta.graded }) !== null, submissionWasLate(sub.submitted_at, sub.due_at_submit)) && (
                           <span style={{ background: 'color-mix(in srgb, var(--c-red) 18.0%, transparent)', color: 'var(--c-red)', border: '1px solid var(--c-red)', borderRadius: 4, padding: '4px 8px', fontSize: 12, fontWeight: 700, flexShrink: 0 }} title={`Handed in after the due date (${sub.due_at_submit ? formatDue(sub.due_at_submit) : ''})`}>
                             Late
                           </span>
@@ -1220,7 +1229,7 @@ function StudentDrawer({
                         <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid color-mix(in srgb, var(--c-line) 20%, transparent)' }}>
                           <div style={{ fontSize: 13, color: 'var(--c-meta)', marginBottom: 8 }}>
                             Submitted: {fmtTs(sub.submitted_at)}
-                            {showLateBadge(!!meta && lessonGradeCategory({ title: meta.title, preview: meta.preview, scoreKind: meta.scoreKind, assignmentCode: meta.assignmentCode }) !== null, submissionWasLate(sub.submitted_at, sub.due_at_submit)) && (
+                            {showLateBadge(!!meta && lessonGradeCategory({ title: meta.title, preview: meta.preview, scoreKind: meta.scoreKind, assignmentCode: meta.assignmentCode, graded: meta.graded }) !== null, submissionWasLate(sub.submitted_at, sub.due_at_submit)) && (
                               <span style={{ marginLeft: 8, color: 'var(--c-red)', fontWeight: 700 }}>Late, was due {formatDue(sub.due_at_submit as number)}</span>
                             )}
                             {submissionScoreLabel(sub) && (
@@ -1574,7 +1583,7 @@ function GradebookView({
   const orderedLessons: LessonMeta[] = [];
   for (const u of unitOrder) orderedLessons.push(...byUnit[u]);
   const isGradedLesson = (l: LessonMeta) =>
-    lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode }) !== null;
+    lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode, graded: l.graded }) !== null;
   const moduleChoices = moduleOptions(orderedLessons, isGradedLesson);
   // Paging by module: the pages, the one shown (the teacher's pick, else the address, else the module
   // that was due most recently), and its neighbours. A pick that is no longer a page (the manifest
@@ -1763,7 +1772,7 @@ function GradebookView({
   // A reading or a slide deck has a due date through its module but is not graded, so only graded lessons
   // count as a problem here, the same set the grade's "past due" number counts.
   const gradedIds = new Set(
-    [...everyLesson, ...displayLessons].filter((l) => lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode }) !== null).map((l) => l.id),
+    [...everyLesson, ...displayLessons].filter((l) => lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode, graded: l.graded }) !== null).map((l) => l.id),
   );
   const isProblem = (st: GradebookStudent) =>
     Object.entries(st.cells).some(([id, c]) => gradedIds.has(id) && (c.pending || (c.late && c.state !== 'completed')));
@@ -1787,7 +1796,7 @@ function GradebookView({
   // in the course's own order. Each category gets a total column; the numbers are the server's
   // (studentGrading via /progress), never recomputed here.
   const catOf = new Map(
-    displayLessons.map((l) => [l.id, lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode })] as const),
+    displayLessons.map((l) => [l.id, lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode, graded: l.graded })] as const),
   );
   const shownCats = GRADE_CATEGORIES.filter((c) => displayLessons.some((l) => catOf.get(l.id) === c));
 
@@ -2975,7 +2984,7 @@ function DetailView({ classId, initialTab, initialFilter }: { classId: string; i
   const lessonWeights = useMemo(() => {
     const out: Record<string, ScoreWeight> = {};
     for (const [id, l] of lessonMap) {
-      const w = scoreWeight({ counts: lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode }) !== null, maxScore: l.maxScore });
+      const w = scoreWeight({ counts: lessonGradeCategory({ title: l.title, preview: l.preview, scoreKind: l.scoreKind, assignmentCode: l.assignmentCode, graded: l.graded }) !== null, maxScore: l.maxScore });
       if (w) out[id] = w;
     }
     return out;
@@ -3433,7 +3442,7 @@ function DetailView({ classId, initialTab, initialFilter }: { classId: string; i
                           right end), so column 2 is only as wide as Open + ⋯ and the counts in row 2 fit one line. */}
                       <div role={compact ? undefined : 'cell'} style={{ minWidth: 0, gridColumn: compact ? '1 / -1' : undefined, gridRow: compact ? 1 : undefined, paddingRight: compact ? 64 : undefined, fontFamily: 'var(--font-prose)' }} title={`Enrolled ${fmt(row.enrolled_at)} by ${row.enrolled_by ?? 'self'}`}>
                         <div style={{ fontSize: compact ? 16 : 15, lineHeight: compact ? '22px' : '20px', fontWeight: compact ? 700 : 600, color: 'var(--c-fg)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{fullName(prog?.firstName, prog?.lastName) ?? row.student_email}</div>
-                        {!compact && <div style={{ color: 'var(--c-meta)', fontSize: 13, lineHeight: '18px', marginTop: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.student_email}</div>}
+                        {!compact && <div style={{ color: 'var(--c-meta)', fontSize: 13, lineHeight: '18px', marginTop: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{prog?.alias ? `Alias: ${prog.alias} · ${row.student_email}` : row.student_email}</div>}
                         {staffRow && <div className="roster-staff-note">Teacher account: not counted in the class numbers</div>}
                       </div>
                       <div role={compact ? undefined : 'cell'} title="Grade so far, under this class's weights" style={{ gridColumn: compact ? '1 / -1' : undefined, gridRow: compact ? 1 : undefined, justifySelf: compact ? 'end' : undefined, display: 'flex', alignItems: compact ? 'baseline' : 'center', justifyContent: compact ? 'flex-end' : undefined, gap: compact ? 6 : 10, whiteSpace: 'nowrap', lineHeight: compact ? '22px' : '22px' }}>
@@ -3614,7 +3623,7 @@ function DetailView({ classId, initialTab, initialFilter }: { classId: string; i
             classId={classId}
             lessons={[...lessonMap.values()]
               .filter((l) => l.preview === 'reshape')
-              .map((l) => ({ id: l.id, title: l.title, cadHost: l.cadHost }))}
+              .map((l) => ({ id: l.id, title: l.title, cadHost: l.cadHost, cadScope: l.cadScope }))}
           />
                 </div>
       )}

@@ -3,6 +3,10 @@
   "title": "5.6.4 Debugging: The sound on every frame",
   "description": "Two planted bugs. Press Space once and the sound stutters; then it stops working after a reload. Find both.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.6 Pinball: a sound on a hit",

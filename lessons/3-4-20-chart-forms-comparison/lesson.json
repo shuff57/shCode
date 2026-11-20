@@ -3,6 +3,10 @@
   "title": "3.4.20 Plain English to Pseudocode: Full Syntax-Forms Comparison",
   "description": "Turn one operation, adding two numbers, into pseudocode that walks through all three function forms: is it named, is it written with =>, and one print that shows all three results.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.4 Function Expressions and Arrow Functions",
@@ -151,6 +155,17 @@
         "description": "The steps print the results of all three calls; one print step that covers all three forms is what is wanted.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "Named first, then the arrow question: Ask whether the function is named, and after that whether it is written with =>.",
+        "r3": "The declaration: Write addA as a function declaration.",
+        "r4": "The function expression: Write addB as a function expression assigned to a const.",
+        "r5": "The arrow with an implicit return: Write addC as an arrow function with an implicit return.",
+        "r6": "One print for all three: Print the results of all three calls."
+      },
+      "task": "The student was given a five-step plain-English plan and rewrote it as numbered pseudocode in README.md, between a first line and a last line that were already there. The plan compares three ways to write the same add-two-numbers function: if the function is named, write addA as a function declaration with an explicit return; if it is not named, ask whether it is written with =>; if not, write addB as a function expression assigned to a const with an explicit return; if so, write addC as an arrow function with an implicit return; then print the results of the three calls."
+    }
   }
 }

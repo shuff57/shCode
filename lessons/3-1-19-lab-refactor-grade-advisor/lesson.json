@@ -3,6 +3,10 @@
   "title": "3.1.13 Lab: Refactor the Grade Advisor",
   "description": "Take your grade-advisor program from 2.1.42 and break it into two named, parameterless functions: decideGrade() and printAdvice(). Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.1 Functions: Definition and Calls",
@@ -153,6 +157,16 @@
         "description": "Code calls printAdvice() as a statement. Help: 3.1.11 (The Function-Call Shape)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "decideGrade defined, no parameters: Code defines a function named decideGrade with an empty parameter list. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "printAdvice defined, no parameters: Code defines a function named printAdvice with an empty parameter list. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "else if chain on score: An else if chain with at least two branches, each testing score against a real cutoff and logging. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "&& or || used to combine attendance and lateAssignments: An if condition compares attendance and lateAssignments each against a real value, combined with && or ||. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Is decideGrade() called as its own statement, outside the function's body, by code that runs, for example decideGrade(); on its own line? It may come before or after the printAdvice() call: the order of the two calls does not matter for this card. With or without a semicolon. Only defining the function, without calling it, is not met. Code inside comments never runs.",
+        "r6": "printAdvice is called: Code calls printAdvice() as a statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

@@ -3,6 +3,10 @@
   "title": "7.20.3 Lab: Duel a classmate",
   "description": "H hosts a duel, Red against Blue, with a classmate on another computer: a choice sends { act, roll }, act runs in onMove only for the seat whose turn it is and only for a good move, and the campaign still plays offline.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.20 Quest: duel online",
@@ -171,7 +175,16 @@
         "description": "The campaign still plays alone.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A choice sends the action and its roll: In a duel, the action and its roll are sent with online.send instead of being done on the spot. A list like [a, roll] counts only if onMove reads it by place. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "act runs in onMove: Every move that arrives runs act, on both computers. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "It checks the seat and the move: Read only the test inside online.onMove((m, seat) => ...) that guards act. Yes only if it holds BOTH: (a) the handler's seat parameter compared with turn (not online.seat, which is this computer; not a fixed number); (b) m's roll checked to be 0 to 3, inline or by a helper called with m, such as goodMove(m), whose body checks m.roll. No: if (duel && !over && seat === turn) act(...) has no move check at all, even if goodMove is written elsewhere in the file. No: goodMove(turn) checks turn, not m. No: a check that skips the roll. Any names. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "The campaign still works offline: One test picks: in a duel the move is sent; otherwise it is done straight away. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Lab: Duel a classmate\". The task: make Quest playable as a duel across two computers: a duel flag; newGame makes Red against Blue in a duel and the run of enemies otherwise; set up online.onMove once to run act for each arriving move only in a duel, while it is not over, when the seat that sent it is the seat whose turn it is and goodMove says the action is 1 to 3 and the roll 0 to 3 (whole numbers); host on H, or join from a JOIN code; on a choice, roll once and send { act, roll } with online.send in a duel instead of acting; let only the seat whose turn it is choose; the computer enemy and R only offline; and keep the campaign working offline. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   },
   "carryFrom": "7-19-quest-3-lab-a-run-of-enemies"
 }

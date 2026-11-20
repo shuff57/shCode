@@ -2,6 +2,10 @@
   "id": "3-8-13-example-try-catch-parse",
   "title": "3.8.13 Worked Example: `try`/`catch` Around a Bad Parse",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.8 Saving and Loading Data",

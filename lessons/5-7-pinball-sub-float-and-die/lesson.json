@@ -3,6 +3,10 @@
   "title": "5.7.3 Sub-build: A word that floats and dies",
   "description": "Click and a small word pops up, floats, and removes itself. Build the popup alone, before it goes on a bumper.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.7 Pinball: labels and popups",
@@ -105,6 +109,14 @@
         "description": "A .life above 0, or a countdown that deletes it.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A sprite is made on the click: A new Sprite is made inside a mouse test, not every frame. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "It wears words: The new sprite gets .text, so it shows a word or a number. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "It removes itself: The sprite gets a .life above 0. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a short moSHion sketch for \"Sub-build: A word that floats and dies\". The task: on a mouse press make a small sprite at the pointer with collider 'none', give it .text with a short word or number, a colour and a small upward vel.y, and give it a .life above 0 so it removes itself. This is a sub-build: a small isolated program whose only job is this one mechanic, so judge the mechanic itself and not style. Accept any variable names, helper functions, arrow functions, ternaries and semicolons. A line that only exists in a comment or a string does not count. moSHion facts: colliding(b) is 0 while apart and counts frames while touching, so an if on it alone is true every frame of a touch; a stored \"last frame\" value makes it true once. .life = n counts down one per frame and deletes the sprite at 0. A sprite with collider 'none' is passed through and has its gravity off. loadSound(name) in setup() (a built-in name such as 'coin', or a full path such as '/moshion/assets/coin.wav') and sound.play() where the event happens; a browser will not play sound before the student's first click or key. Write short, plain notes for a 14-year-old, name the student's own line when something is missing, and never write corrected code."
+    }
   }
 }

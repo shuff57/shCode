@@ -3,6 +3,10 @@
   "title": "7.14.2 Lab: Pick a mode",
   "description": "A title screen that waits for a key: 1 plays with the mouse, 2 with the arrow keys. Write the choices, read the key, and send R back to the title. With a note on prompt().",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.14 Breakout: the game",

@@ -3,6 +3,10 @@
   "title": "6.6.3 Reading: moSHion docs: Groups",
   "description": "moshion docs chapter on Groups. Read before `6.6.5 Groups Sandbox`.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.6 Groups",

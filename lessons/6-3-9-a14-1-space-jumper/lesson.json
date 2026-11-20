@@ -3,6 +3,10 @@
   "title": "6.8.9 Space Jumper",
   "description": "Build a one-sprite platformer: WASD moves, space jumps, but only when touching the ground.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 40,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.8 Physics Applications",

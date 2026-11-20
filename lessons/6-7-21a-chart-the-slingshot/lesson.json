@@ -3,6 +3,10 @@
   "title": "6.13.12 Plain English to Pseudocode: The Slingshot",
   "description": "Turn the plain-English rules of a slingshot into pseudocode: grab, stretch and release, guarded by one variable, with the force applied in exactly one frame.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.13 Joints",
@@ -150,6 +154,17 @@
         "description": "Three IF blocks, each closed with END IF.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Ten or more numbered steps: Number every line 1. 2. 3. and so on, with something written after each number.",
+        "r2": "Grab: pressing on the ball marks it held: When the mouse is pressed on the ball, held becomes true.",
+        "r3": "Stretch: while held and the mouse is down, the ball follows and the band is drawn: A question guarded by held, with the ball moved to the mouse and the band drawn inside it.",
+        "r4": "Release: while held, letting go launches the ball and clears held: A question guarded by held, with the force applied and held cleared inside it.",
+        "r5": "The launch happens once: The force is applied in one place only. A force every frame is the classic physics bug.",
+        "r6": "Three questions, each closed: Three IF blocks, each closed with END IF."
+      },
+      "task": "The student was given plain-English steps for the lab \"6.13.12 Plain English to Pseudocode: The Slingshot\" and rewrote them as numbered, step-by-step pseudocode in README.md. The task they were given: Here is the plan in plain English: **1.** Each frame, ask three questions in a row. **2.** Grab: if the mouse was just pressed while over the ball, the ball is now held. **3.** Stretch: if the ball is held and the mouse is still down, move the ball to the mouse and draw the band. **4.** Release: if the ball is held and the mouse was let go, work out the force, apply it to the ball, and the ball is no longer held. **5.** If nothing is being done to the ball (idle), all three answers are no and the frame just ends. The same plan is drawn as a flow chart above the editor. You do not draw it, you read it: follow the arrows and match each box to one of the steps. In `README.md`, type these as numbered pseudocode **between the first and last line**. Write three separate IF blocks, one per question, each closed with END IF. Name the variable `held` and the two calls `drawBand` and `applyForce`. Number every line, including the indented ones and the END IF lines. Each keyword looks like this, in a different program: - `IF key is pressed AND player is grounded` ... `END IF` (a question the frame asks) - `SET jumping TO true` (a change; use `false` to turn something off) - `CALL playSound` (call another function) - `SET player position TO the spawn point` (move something) The force is app"
+    }
   }
 }

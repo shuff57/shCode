@@ -1,0 +1,370 @@
+[
+ {
+  "name": "honest: plain, correct comment",
+  "code": "let filamentType = 'PLA';\n\n// If PLA's break were removed, PLA's settings would print and then ABS's\n// settings would print too, because the code falls through into the next case.\nswitch (filamentType) {\n  case 'PLA':\n    console.log('Temperature: 200C, Speed: 60 mm/s');\n    break;\n  case 'ABS':\n    console.log('Temperature: 240C, Speed: 50 mm/s');\n    break;\n  case 'PETG':\n    console.log('Temperature: 230C, Speed: 55 mm/s');\n    break;\n  case 'TPU':\n    console.log('Temperature: 220C, Speed: 30 mm/s');\n    break;\n  default:\n    console.log('Unknown filament');\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ {
+  "name": "honest: double quotes + template literals",
+  "code": "let filamentType = \"ABS\";\nlet t, s;\n// Without the break after ABS, ABS's line prints and then PETG's line prints,\n// and it stops at PETG's break.\nswitch (filamentType) {\n  case \"PLA\":\n    t = 200; s = 60;\n    console.log(`PLA temperature ${t} and speed ${s}`);\n    break;\n  case \"ABS\":\n    t = 240; s = 50;\n    console.log(`ABS temperature ${t} and speed ${s}`);\n    break;\n  case \"PETG\":\n    t = 230; s = 55;\n    console.log(`PETG temperature ${t} and speed ${s}`);\n    break;\n  case \"TPU\":\n    t = 220; s = 25;\n    console.log(`TPU temperature ${t} and speed ${s}`);\n    break;\n  default:\n    console.log(\"I don't know that filament.\");\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ {
+  "name": "honest: two logs per case, block comment",
+  "code": "const filamentType = 'TPU';\n/* If TPU's break were taken out, TPU's two lines would print and then\n   the default's \"unknown\" message would print as well. */\nswitch (filamentType) {\n  case 'PLA':\n    console.log('Nozzle temperature: 205');\n    console.log('Print speed: 60');\n    break;\n  case 'ABS':\n    console.log('Nozzle temperature: 245');\n    console.log('Print speed: 45');\n    break;\n  case 'PETG':\n    console.log('Nozzle temperature: 235');\n    console.log('Print speed: 50');\n    break;\n  case 'TPU':\n    console.log('Nozzle temperature: 225');\n    console.log('Print speed: 20');\n    break;\n  default:\n    console.log('Unknown filament type');\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ {
+  "name": "honest: values set in cases, one log after the switch",
+  "code": "let filamentType = 'PETG';\nlet temperature = 0;\nlet speed = 0;\n// If PETG's break were removed, PETG's numbers would be replaced by TPU's\n// (220 and 30), so TPU's settings would be what prints.\nswitch (filamentType) {\n  case 'PLA':\n    temperature = 200;\n    speed = 60;\n    break;\n  case 'ABS':\n    temperature = 240;\n    speed = 50;\n    break;\n  case 'PETG':\n    temperature = 230;\n    speed = 55;\n    break;\n  case 'TPU':\n    temperature = 220;\n    speed = 30;\n    break;\n  default:\n    console.log('Unknown filament');\n}\nconsole.log('Recommended temperature: ' + temperature + ', speed: ' + speed);",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ {
+  "name": "honest: inside a function, abbreviations Temp/spd",
+  "code": "let filamentType = 'PLA';\n\nfunction advise(type) {\n  switch (type) {\n    // removing this break means PLA prints its line and then ABS prints too\n    case 'PLA':\n      console.log('PLA -> temp 200C, print speed 60mm/s');\n      break;\n    case 'ABS':\n      console.log('ABS -> temp 240C, print speed 50mm/s');\n      break;\n    case 'PETG':\n      console.log('PETG -> temp 230C, print speed 55mm/s');\n      break;\n    case 'TPU':\n      console.log('TPU -> temp 220C, print speed 25mm/s');\n      break;\n    default:\n      console.log('Not a filament I know');\n  }\n}\n\nadvise(filamentType);",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ {
+  "name": "honest: comment placed after the switch",
+  "code": "let filamentType = 'ABS';\nswitch (filamentType) {\n  case 'PLA':\n    console.log('Temperature: 200C, Speed: 60 mm/s');\n    break;\n  case 'ABS':\n    console.log('Temperature: 240C, Speed: 50 mm/s');\n    break;\n  case 'PETG':\n    console.log('Temperature: 230C, Speed: 55 mm/s');\n    break;\n  case 'TPU':\n    console.log('Temperature: 220C, Speed: 30 mm/s');\n    break;\n  default:\n    console.log('Unknown filament');\n}\n// Fall-through: if ABS had no break, the ABS settings print and then the PETG\n// settings print, then PETG's break stops it.",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ {
+  "name": "wrong: no TPU case",
+  "code": "let filamentType = 'PLA';\n// If PLA's break were removed, PLA's settings would print and then ABS's\n// settings would print too, because the code falls through into the next case.\nswitch (filamentType) {\n  case 'PLA':\n    console.log('Temperature: 200C, Speed: 60 mm/s');\n    break;\n  case 'ABS':\n    console.log('Temperature: 240C, Speed: 50 mm/s');\n    break;\n  case 'PETG':\n    console.log('Temperature: 230C, Speed: 55 mm/s');\n    break;\n  default:\n    console.log('Unknown filament');\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   0,
+   1,
+   0,
+   1,
+   1,
+   1
+  ]
+ },
+ {
+  "name": "wrong: no default",
+  "code": "let filamentType = 'PLA';\n// If PLA's break were removed, PLA's settings would print and then ABS's\n// settings would print too, because the code falls through into the next case.\nswitch (filamentType) {\n  case 'PLA':\n    console.log('Temperature: 200C, Speed: 60 mm/s');\n    break;\n  case 'ABS':\n    console.log('Temperature: 240C, Speed: 50 mm/s');\n    break;\n  case 'PETG':\n    console.log('Temperature: 230C, Speed: 55 mm/s');\n    break;\n  case 'TPU':\n    console.log('Temperature: 220C, Speed: 30 mm/s');\n    break;\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   0,
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ {
+  "name": "wrong: ABS has no break (4 breaks total thanks to default)",
+  "code": "let filamentType = 'PLA';\n// If PLA's break were removed, PLA's settings would print and then ABS's\n// settings would print too, because the code falls through into the next case.\nswitch (filamentType) {\n  case 'PLA':\n    console.log('Temperature: 200C, Speed: 60 mm/s');\n    break;\n  case 'ABS':\n    console.log('Temperature: 240C, Speed: 50 mm/s');\n  case 'PETG':\n    console.log('Temperature: 230C, Speed: 55 mm/s');\n    break;\n  case 'TPU':\n    console.log('Temperature: 220C, Speed: 30 mm/s');\n    break;\n  default:\n    console.log('Unknown filament');\n    break;\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   0,
+   1,
+   1,
+   null
+  ]
+ },
+ {
+  "name": "wrong: prints temperature only, no speed",
+  "code": "let filamentType = 'PLA';\n// If PLA's break were removed, PLA's settings would print and then ABS's\n// settings would print too, because the code falls through into the next case.\nswitch (filamentType) {\n  case 'PLA':\n    console.log('Temperature: 200');\n    break;\n  case 'ABS':\n    console.log('Temperature: 240');\n    break;\n  case 'PETG':\n    console.log('Temperature: 230');\n    break;\n  case 'TPU':\n    console.log('Temperature: 220');\n    break;\n  default:\n    console.log('Unknown filament');\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   0,
+   1
+  ]
+ },
+ {
+  "name": "wrong: if/else chain instead of a switch",
+  "code": "let filamentType = 'PLA';\n// if there were no else here it would keep checking\nif (filamentType === 'PLA') {\n  console.log('Temperature: 200, Speed: 60');\n} else if (filamentType === 'ABS') {\n  console.log('Temperature: 240, Speed: 50');\n} else if (filamentType === 'PETG') {\n  console.log('Temperature: 230, Speed: 55');\n} else if (filamentType === 'TPU') {\n  console.log('Temperature: 220, Speed: 30');\n} else {\n  console.log('Unknown filament');\n}",
+  "labels": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   null,
+   null,
+   0
+  ]
+ },
+ {
+  "name": "wrong: comment explains it incorrectly (\"nothing would print\")",
+  "code": "let filamentType = 'PLA';\n// If the break after PLA were removed, nothing would print at all because\n// the switch would not know where to stop.\nswitch (filamentType) {\n  case 'PLA':\n    console.log('Temperature: 200C, Speed: 60 mm/s');\n    break;\n  case 'ABS':\n    console.log('Temperature: 240C, Speed: 50 mm/s');\n    break;\n  case 'PETG':\n    console.log('Temperature: 230C, Speed: 55 mm/s');\n    break;\n  case 'TPU':\n    console.log('Temperature: 220C, Speed: 30 mm/s');\n    break;\n  default:\n    console.log('Unknown filament');\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   0
+  ]
+ },
+ {
+  "name": "wrong: no fall-through comment at all",
+  "code": "let filamentType = 'PLA';\n// Print settings for each filament\nswitch (filamentType) {\n  case 'PLA':\n    console.log('Temperature: 200C, Speed: 60 mm/s');\n    break;\n  case 'ABS':\n    console.log('Temperature: 240C, Speed: 50 mm/s');\n    break;\n  case 'PETG':\n    console.log('Temperature: 230C, Speed: 55 mm/s');\n    break;\n  case 'TPU':\n    console.log('Temperature: 220C, Speed: 30 mm/s');\n    break;\n  default:\n    console.log('Unknown filament');\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   0
+  ]
+ },
+ {
+  "name": "wrong: lowercase case labels (never match \"PLA\")",
+  "code": "let filamentType = 'PLA';\n// If PLA's break were removed, PLA's settings would print and then ABS's\n// settings would print too, because the code falls through into the next case.\nswitch (filamentType) {\n  case 'pla':\n    console.log('Temperature: 200C, Speed: 60 mm/s');\n    break;\n  case 'abs':\n    console.log('Temperature: 240C, Speed: 50 mm/s');\n    break;\n  case 'petg':\n    console.log('Temperature: 230C, Speed: 55 mm/s');\n    break;\n  case 'tpu':\n    console.log('Temperature: 220C, Speed: 30 mm/s');\n    break;\n  default:\n    console.log('Unknown filament');\n}",
+  "labels": [
+   1,
+   0,
+   0,
+   0,
+   0,
+   1,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "name": "wrong: the whole switch is commented out",
+  "code": "let filamentType = 'PLA';\n// If PLA's break were removed, PLA's settings would print and then ABS's\n// settings would print too, because the code falls through into the next case.\n// switch (filamentType) {\n//   case 'PLA':\n//     console.log('Temperature: 200, Speed: 60');\n//     break;\n//   case 'ABS':\n//     console.log('Temperature: 240, Speed: 50');\n//     break;\n//   case 'PETG':\n//     console.log('Temperature: 230, Speed: 55');\n//     break;\n//   case 'TPU':\n//     console.log('Temperature: 220, Speed: 30');\n//     break;\n//   default:\n//     console.log('Unknown');\n// }\nconsole.log('Temperature: 200, Speed: 60');",
+  "labels": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   null
+  ]
+ },
+ {
+  "name": "game: keyword soup in a comment, one hard-coded log",
+  "code": "let filamentType = 'PLA';\n// switch (filamentType) case 'PLA' case 'ABS' case 'PETG' case 'TPU' default: break break break break\n// break removed falls through\nconsole.log('temperature speed');",
+  "labels": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ {
+  "name": "game: right shape, logs only the words \"temperature speed\"",
+  "code": "let filamentType = 'PLA';\n// If PLA's break were removed, PLA's settings would print and then ABS's\n// settings would print too, because the code falls through into the next case.\nswitch (filamentType) {\n  case 'PLA':\n    console.log('temperature speed');\n    break;\n  case 'ABS':\n    console.log('temperature speed');\n    break;\n  case 'PETG':\n    console.log('temperature speed');\n    break;\n  case 'TPU':\n    console.log('temperature speed');\n    break;\n  default:\n    console.log('Unknown filament');\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   0,
+   0,
+   1
+  ]
+ },
+ {
+  "name": "game: fall-through comment is keyword soup",
+  "code": "let filamentType = 'PLA';\n// break removed fall through without stop\nswitch (filamentType) {\n  case 'PLA':\n    console.log('Temperature: 200C, Speed: 60 mm/s');\n    break;\n  case 'ABS':\n    console.log('Temperature: 240C, Speed: 50 mm/s');\n    break;\n  case 'PETG':\n    console.log('Temperature: 230C, Speed: 55 mm/s');\n    break;\n  case 'TPU':\n    console.log('Temperature: 220C, Speed: 30 mm/s');\n    break;\n  default:\n    console.log('Unknown filament');\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   0
+  ]
+ },
+ {
+  "name": "game: four breaks, all piled in default",
+  "code": "let filamentType = 'PLA';\n// If PLA's break were removed, PLA's settings would print and then ABS's\n// settings would print too, because the code falls through into the next case.\nswitch (filamentType) {\n  case 'PLA':\n    console.log('Temperature: 200C, Speed: 60 mm/s');\n  case 'ABS':\n    console.log('Temperature: 240C, Speed: 50 mm/s');\n  case 'PETG':\n    console.log('Temperature: 230C, Speed: 55 mm/s');\n  case 'TPU':\n    console.log('Temperature: 220C, Speed: 30 mm/s');\n  default:\n    console.log('Unknown filament');\n    break; break; break; break;\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   0,
+   1,
+   1,
+   null
+  ]
+ },
+ {
+  "name": "game: case labels only in a string",
+  "code": "let filamentType = 'PLA';\nconsole.log(\"case 'PLA': case 'ABS': case 'PETG': case 'TPU': temperature speed break break break break\");\nswitch (filamentType) {\n  default:\n    console.log('done');\n}",
+  "labels": [
+   1,
+   0,
+   0,
+   0,
+   0,
+   1,
+   0,
+   0,
+   0,
+   0
+  ]
+ },
+ {
+  "name": "unusual: switch (true) with comparisons",
+  "code": "let filamentType = 'PETG';\n// If the PETG case lost its break, PETG's line would print and then TPU's line\n// would print too.\nswitch (true) {\n  case filamentType === 'PLA':\n    console.log('Temperature 200, speed 60');\n    break;\n  case filamentType === 'ABS':\n    console.log('Temperature 240, speed 50');\n    break;\n  case filamentType === 'PETG':\n    console.log('Temperature 230, speed 55');\n    break;\n  case filamentType === 'TPU':\n    console.log('Temperature 220, speed 30');\n    break;\n  default:\n    console.log('Unknown');\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ {
+  "name": "unusual: degrees and mm/s words, no \"temperature\"/\"speed\"",
+  "code": "let filamentType = 'PLA';\n// If PLA's break were removed, PLA's settings would print and then ABS's\n// settings would print too, because the code falls through into the next case.\nswitch (filamentType) {\n  case 'PLA':\n    console.log('Nozzle 200 degrees C, 60 mm/s');\n    break;\n  case 'ABS':\n    console.log('Nozzle 240 degrees C, 50 mm/s');\n    break;\n  case 'PETG':\n    console.log('Nozzle 230 degrees C, 55 mm/s');\n    break;\n  case 'TPU':\n    console.log('Nozzle 220 degrees C, 30 mm/s');\n    break;\n  default:\n    console.log('Unknown filament');\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   null,
+   null,
+   1
+  ]
+ },
+ {
+  "name": "honest: return instead of break inside a function",
+  "code": "let filamentType = 'ABS';\n// If ABS returned nothing and had no return, it would fall into PETG and\n// PETG's settings would be what comes back.\nfunction settings(type) {\n  switch (type) {\n    case 'PLA': return 'Temperature 200, speed 60';\n    case 'ABS': return 'Temperature 240, speed 50';\n    case 'PETG': return 'Temperature 230, speed 55';\n    case 'TPU': return 'Temperature 220, speed 30';\n    default: return 'Unknown filament';\n  }\n}\nconsole.log(settings(filamentType));",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   1,
+   null,
+   1,
+   1,
+   1
+  ]
+ }
+]

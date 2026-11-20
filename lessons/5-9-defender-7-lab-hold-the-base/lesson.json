@@ -3,6 +3,10 @@
   "title": "7.5.3 Lab: Hold the base, and start again",
   "description": "The drone can land as often as it likes. Give the base 3 hp, take 1 for every landing, end the round at 0, write Game over on top, and let R start a new round.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.5 Defender: hits, and a round",
@@ -146,7 +150,16 @@
         "description": "Something that runs every frame (draw(), outside if (playing) { ... }, or the else of it) calls startRound() when R is pressed (kb.presses('r'), either case), directly or through the student's own function that calls it. An R check inside if (playing) { ... } is not met: after Game over it never runs. Resetting a few values by hand instead of calling startRound() is partial.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Every round starts with base hp: startRound() gives baseHp its starting value (3), so R gives the base its hp back. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Reaching the base costs 1: When the drone reaches the base, baseHp goes down by 1, inside the if that sees the landing (the way score goes up by 1 inside the if that sees a hit). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "At 0 the round ends: An if on baseHp reaching 0 sets playing to false. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Game over is written in drawTop when the round is over: In drawTop(), an if on !playing writes Game over (and press R) on top of the sprites. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "R starts a new round: In draw(), outside if (playing), pressing R calls startRound() (directly, or through a function of your own that calls it), so it works after Game over too. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "carryFrom": "5-9-defender-6-lab-hit-the-drone"
 }

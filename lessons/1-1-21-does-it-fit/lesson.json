@@ -3,6 +3,10 @@
   "title": "1.1.21 Does It Fit?",
   "description": "Four multiple-choice questions on prescriptive process models and where they break. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 7,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.1 Software Lifecycle",

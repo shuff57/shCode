@@ -3,11 +3,15 @@
 // -> solveDoc -> translator (+ phase 2 sketch mapper) -> window.solidcraft (same page, no postMessage relay) -> viewport.
 // Built by build.sh into bundle/; served same-origin by serve.mjs under /pane/.
 import { createUpstreamBridge } from '../src/upstream-bridge.mjs';
+import { translateSketchOnly } from './src/sketch-only.mjs';
+import { translateProjectSketch } from './src/project-sketch.mjs';
+import { createBuildStamp } from './src/build-stamp.mjs';
+import { sourceLocation } from './src/source-location.mjs';
 import { createReplyMemory } from '../src/reply-memory.mjs';
 import { createCrashGuard } from '../src/crash-guard.mjs';
 import { createProgress, yieldToBrowser } from '../src/progress.mjs';
 import { createProber } from '../src/probe-client.mjs';
-import { solveDoc, mt, arc, translateDoc, resolveAfter, FEATURE_KINDS, docProfileIndices, checkRules, hostFromUsage, hostPrepare, preflightScript, soupSolve, isSoup, sketchCheck, refusedRule, placedMap, shapeNote, spinNote, placementHint, joinApartNote, pieceCount } from './bundle/host-lib.js';
+import { solveDoc, mt, arc, translateDoc, resolveAfter, staleConsumers, FEATURE_KINDS, mapSketch, docProfileIndices, checkRules, hostFromUsage, hostPrepare, preflightScript, soupSolve, isSoup, sketchCheck, refusedRule, placedMap, shapeNote, spinNote, placementHint, joinApartNote, pieceCount } from './bundle/host-lib.js';
 
 const BASE = new URL('.', import.meta.url);
 const params = new URLSearchParams(location.search);
@@ -141,6 +145,7 @@ applyLayout();
 let EXAMPLES = [];
 try { EXAMPLES = await (await fetch(new URL('examples.json', BASE), { cache: 'no-store' })).json(); } catch { $('expect').textContent = 'examples.json missing: run phase5/make-reference.mjs'; }
 let current = null; // the gallery example whose script is in the editor, unmodified
+let sourceLocations = [];
 
 // ---- examples + editor ---------------------------------------------------------------------------------------------
 const GROUPS = [['3d', '3D scripts'], ['2d', 'Constrained 2D sketches (solidcraft solver)'], ['friendly', 'Friendly sketch syntax (lowered to the soup)'], ['diag', 'Sketch diagnostics'], ['refusal', 'Expected refusals'], ['stub', 'Shell with material standing on the open face (shell-stub fix)'], ['diverge', 'Built, but DIVERGES from an independent reference (not a pass)'], ['misuse', 'Friendly sketch misuse (expected script errors, nothing built)']];
@@ -165,6 +170,7 @@ function load(id) {
 }
 $('exsel').onchange = () => { if ($('exsel').value) load($('exsel').value); };
 $('src').addEventListener('input', () => {
+  sourceLocations = [];
   gutter(null);
   lsSet('sc_pane_src', $('src').value);
   if (current && $('src').value !== current.script) { current = null; $('exsel').value = ''; $('expect').textContent = ''; }
@@ -199,11 +205,28 @@ const lazySc = createCrashGuard({
 // The kernel is the referee wasm of the pinned 0.30.1 engine (kernel/build.sh), served at ../kernel/ (see README). Without it (or with ?probe=off) a budgeted run is NOT
 // limited and the pane says so in the status line; the layer's G-BUDGET then stays advice only.
 const KERNEL_URL = new URL('../kernel/solidcraft_referee_bg.wasm', BASE);
+// `?probeinc=on` (shCode): the kernel built with sessions (kernel-session/, kernel/build.sh FEATURES=session), and a probe Worker kept between probes that runs
+// only the commands after what it already holds, while the budget still judges the whole list (probe-worker.mjs, probe-client.mjs). Without that kernel
+// (not served, or it has no run_from) the probe is as it always was.
+const PROBE_INC = params.get('probeinc') === 'on';
+const SESSION_KERNEL_URL = new URL('../kernel-session/solidcraft_referee_bg.wasm', BASE);
 const probeLog = []; // one row per probe: { cmds, last (the probed list's last command), budgetS, status, wallMs, cpuMs, loadMs, vol }
 let kernelModule = null;
-const getModule = () => (kernelModule ??= WebAssembly.compileStreaming(fetch(KERNEL_URL)).catch((e) => { kernelModule = null; throw e; }));
-const rawProber = createProber({ makeWorker: () => new Worker(new URL('../src/probe-worker.mjs', import.meta.url), { type: 'module' }), getModule });
-const prober = params.get('probe') === 'off' ? null : { async probe(cmds, b) { const t0 = performance.now(); const r = await rawProber.probe(cmds, b); probeLog.push({ cmds: cmds.length, last: cmds.length ? cmds[cmds.length - 1].command : null, budgetS: b, status: r.status, wallMs: Math.round(performance.now() - t0), cpuMs: r.cpuMs ?? null, loadMs: r.loadMs ?? null, vol: r.reply && r.reply.measure ? r.reply.measure.bodies.reduce((a, b) => a + (b.volume_mm3 ?? 0), 0) : null }); return r; } };
+// shCode `?cache=parent`: a kernel's bytes from the framing page's cache (src/runtime-cache.js), which answers only for the pinned files it knows,
+// checked there by size and sha256; else (null) it is downloaded as before.
+const HOST_ROOT = new URL('../', BASE).href;
+const fromCache = (url) => (typeof window.__runtimeBytes === 'function' && url.href.startsWith(HOST_ROOT) ? window.__runtimeBytes(url.href.slice(HOST_ROOT.length)) : Promise.resolve(null)).catch(() => null);
+const compile = (url) => fromCache(url).then((bytes) => bytes ? WebAssembly.compile(bytes) : fetch(url).then((r) => { if (!r.ok) throw new Error(`${url.pathname}: HTTP ${r.status}`); return WebAssembly.compileStreaming(r); }));
+const sessionKernel = (m) => WebAssembly.Module.exports(m).some((e) => e.name === 'run_from');
+const getModule = () => (kernelModule ??= (PROBE_INC ? compile(SESSION_KERNEL_URL).then((m) => (sessionKernel(m) ? m : compile(KERNEL_URL))).catch(() => compile(KERNEL_URL)) : compile(KERNEL_URL))
+  .then((m) => { probeIncremental = PROBE_INC && sessionKernel(m); return m; }).catch((e) => { kernelModule = null; throw e; }));
+let probeIncremental = false; // known once the kernel is loaded
+const makeProbeWorker = () => new Worker(new URL('../src/probe-worker.mjs', import.meta.url), { type: 'module' });
+const plainProber = createProber({ makeWorker: makeProbeWorker, getModule });
+const keptProber = PROBE_INC ? createProber({ makeWorker: makeProbeWorker, getModule, persistent: true }) : null;
+const rawProber = { probe: async (cmds, b) => { await getModule().catch(() => {}); return (probeIncremental ? keptProber : plainProber).probe(cmds, b); } };
+const FULL_PROBE_LOG = params.get('probelog') === 'full'; // tests: keep each probe's command list too, to replay it elsewhere
+const prober = params.get('probe') === 'off' ? null : { async probe(cmds, b) { const t0 = performance.now(); const r = await rawProber.probe(cmds, b); probeLog.push({ ...(FULL_PROBE_LOG ? { list: cmds } : {}), held: r.held ?? null, cmds: cmds.length, last: cmds.length ? cmds[cmds.length - 1].command : null, budgetS: b, status: r.status, wallMs: Math.round(performance.now() - t0), cpuMs: r.cpuMs ?? null, loadMs: r.loadMs ?? null, vol: r.reply && r.reply.measure ? r.reply.measure.bodies.reduce((a, b) => a + (b.volume_mm3 ?? 0), 0) : null }); return r; } };
 const capS = params.get('budgetCapS') ? Number(params.get('budgetCapS')) : undefined;
 const bridge = createUpstreamBridge(lazySc, { prober, capS });
 let keepNext = false; // kept so the run logic reads unchanged; this build has no stash, so it is never acted on
@@ -323,13 +346,36 @@ let soups = {}; // sketch command name -> { sketchId, geoms, rules, names, notes
 let memo = null;
 const MEMO_ON = params.get('memo') !== 'off';
 const INC_ON = params.get('inc') === 'on';
+// `?keep=on` (shCode, off unless asked for): the memory is kept from one run() to the next, so a run after a small change asks the engine only for the lists
+// it has not answered yet, and with `?inc=on` runs them on top of what SolidCraft holds. The memory of replies stands on what reply-memory.mjs stands on: a
+// list's reply depends on the list alone. What SolidCraft holds (memo.page) is kept only when SolidCraft's document is exactly as the last run left it (same
+// revision, no engine stop since): anything done in SolidCraft in between, an engine stop and reload, or a run that did not finish drops it. The final
+// replay is never answered from memory (heldReply reads SolidCraft afresh). The memory is started again past KEEP_MAX lists.
+const KEEP_ON = MEMO_ON && params.get('keep') === 'on';
+// `?embed=code` (shCode's code-first CAD workspace): the page that embeds this one asks before replacing hand-made changes and shows the results itself,
+// with this panel hidden. So run() does not inspect SolidCraft beforehand to decide whether to ask (the answer is the parent's), and does not refresh the
+// "Restore my design" button afterwards (this build has no restore). Nothing that decides what is built or refused is skipped.
+const EMBED_CODE = params.get('embed') === 'code';
+const KEEP_MAX = 2000;
+let kept = null; // { memo, revision, stops } after a run() that finished; null before the first and after one that did not
+const revisionNow = async () => JSON.stringify(await lazySc.request('document.revision', {}));
+async function memoForRun() {
+  if (!KEEP_ON) return MEMO_ON ? createReplyMemory(bridge, { continueRuns: INC_ON, shadow: window.__host.shadow ?? null, log: engineLog }) : null;
+  const k = kept; kept = null;
+  const same = k && k.memo.size() < KEEP_MAX && k.stops === engineStops.length && k.revision === await revisionNow();
+  const m = k && k.memo.size() < KEEP_MAX ? k.memo : createReplyMemory(bridge, { continueRuns: INC_ON, shadow: window.__host.shadow ?? null, log: engineLog });
+  if (!same) { m.page = null; m.marks = []; } // SolidCraft may hold something else now: start from an empty design, and never go back to an old mark
+  m.runs = 0; m.hits = 0; m.continued = 0; m.restored = 0; m.earlier = 0; m.gen++; // this run's own figures, for engineUse
+  return m;
+}
+async function keepAfterRun(m) { if (KEEP_ON && m) kept = { memo: m, revision: await revisionNow(), stops: engineStops.length }; }
 const engineLog = [];
 // The status line names the step being built (src/progress.mjs; the words are the owner's, 2026-11-14). `?progress=off` gives the one line it used to be.
 const PROGRESS_ON = params.get('progress') !== 'off';
 let progress = null; // alive during one run()
 const eng = {
-  execute: async (cmds, opts = {}) => { if (progress) await progress.beforeEngine(); if (memo) return memo.execute(cmds, opts); const { replay: _r, ...pass } = opts; return bridge.execute(cmds, pass); },
-  topologyOf: async (cmds) => { if (progress) await progress.beforeEngine(); return memo ? memo.topologyOf(cmds) : bridge.topologyOf(cmds); },
+  execute: async (cmds, opts = {}) => { if (progress) await progress.beforeEngine(!(memo && memo.answers(cmds, opts))); if (memo) return memo.execute(cmds, opts); const { replay: _r, ...pass } = opts; return bridge.execute(cmds, pass); },
+  topologyOf: async (cmds) => { if (progress) await progress.beforeEngine(!(memo && memo.answersTopology(cmds))); return memo ? memo.topologyOf(cmds) : bridge.topologyOf(cmds); },
 };
 /** `opts.replay`: this run is the one that puts SolidCraft on `cmds` for the view, so the list itself is really run (its sketch readings may come from memory). */
 async function runSC(cmds, opts) {
@@ -370,7 +416,7 @@ function showFeatures(tr, notes = new Map()) {
     const kind = f.kind === 'fillet' ? (/^bevel/.test(f.id) ? 'bevel' : 'round') : f.kind === 'shell' ? 'hollow' : f.kind;
     const result = f.status === 'refused' ? 'not built' : f.status === 'built' ? 'built' : '';
     // a built step says nothing, except where the page has something the student should know (notes: a shape placed by default, a join that joins nothing)
-    const note = f.status === 'refused' ? esc(f.refusal) : f.status === 'built' ? esc(notes.get(f.id) ?? '') : f.kind === 'sketch' ? 'drawn; it is built by the step that uses it' : '';
+    const note = f.status === 'refused' ? esc(f.refusal) : f.status === 'built' ? esc(notes.get(f.id) ?? '') : f.kind === 'sketch' ? params.get('sketch-only') === '1' ? 'drawn as a flat sketch' : 'drawn; it is built by the step that uses it' : '';
     return `<tr><td>${esc(f.id)}</td><td>${esc(kind)}</td><td class="${esc(f.status)}" style="white-space:nowrap">${esc(result)}</td><td>${note}</td></tr>`;
   }).join('');
   $('features').innerHTML = `<table><tr><th>step</th><th>kind</th><th>result</th><th>what happened</th></tr>${rows}</table>`;
@@ -550,6 +596,7 @@ function failState(summary, status_, headline, detail) {
 // the document with the one it built; per document, not per page). A run that would replace manual work asks first, and
 // then the bridge sets the old design aside (keep_previous), bound to its document: Restore returns it to that document.
 let busy = false;
+const builtStamp = createBuildStamp();
 let lastInspect = null;
 async function refreshUndo() {
   try {
@@ -563,6 +610,8 @@ async function refreshUndo() {
   } catch { return null; }
 }
 function askConfirm(s) {
+  // Embedded classrooms keep the prompt in the parent, above its input cover.
+  if (typeof window.__host?.confirmReplace === 'function') return Promise.resolve(window.__host.confirmReplace(s));
   const bodies = s.measure?.bodies ?? [];
   const what = bodies.length ? `${bodies.length} body(ies), ${fmt(bodies.reduce((t, b) => t + b.volume_mm3, 0), 3)} mm3` : 'an open sketch or other unsaved changes';
 
@@ -587,11 +636,14 @@ async function run({ confirmed = false } = {}) {
     // a ModelDoc example (no script form) runs as is while its editor text is unedited; anything else goes through the sandbox
     const srcText = $('src').value;
     const fromExample = !!(ex?.doc && srcText === ex.script);
+    const pm = (n, a) => { try { performance.measure(`host:${n}`, { start: a, end: performance.now() }); } catch {} }; let pt = performance.now();
     const r = fromExample ? { errors: [], doc: ex.doc } : await evaluate(srcText);
+    pm('evaluate', pt); pt = performance.now();
     if (r.errors.length) {
       const e0 = r.errors[0];
       const syntax = e0.line == null;
-      const where = syntax ? 'syntax error; the interpreter reports no line for these' : `line ${e0.line}${e0.col != null ? ', column ' + e0.col : ''}`;
+      const location = sourceLocation(e0.line, sourceLocations);
+      const where = syntax ? 'syntax error; the interpreter reports no line for these' : `${location ? `${location.file}, line ${location.line}` : `line ${e0.line}`}${e0.col != null ? ', column ' + e0.col : ''}`;
       const fs = failState(summary, 'script error', `${ex?.expectError ? 'EXPECTED ' : ''}SCRIPT ERROR (${where}): ${e0.message}`, (syntax ? 'The script is probably incomplete (an unclosed bracket, string or call). ' : '') + 'Nothing was sent to solidcraft; your design is untouched.');
       markError(e0.line ?? null);
       if (ex?.expectError) {
@@ -613,13 +665,15 @@ async function run({ confirmed = false } = {}) {
     const prep = hostPrepare(r, { recorded: !fromExample });
     Object.assign(summary, { warnings: prep.warnings, interpreterWarnings: r.warnings ?? [] });
     if (prep.refusal) return failState(summary, 'refused', `REFUSED BEFORE BUILD: ${prep.refusal}`, 'Nothing was sent to solidcraft; your design is untouched.');
-    const doc = prep.doc;
+    const doc = prep.doc; pm('prepare', pt); pt = performance.now();
     $('doc').textContent = JSON.stringify(doc.features, null, 1);
     status('waiting for solidcraft...');
     await waitForBridge();
-    const before = await bridge.inspect();
-    const nBodies = before.measure?.bodies?.length ?? 0;
-    const manual = before.ok && before.produced_untouched !== true && (before.dirty === true || nBodies > 0);
+    const before = EMBED_CODE ? null : await bridge.inspect();
+    const nBodies = before?.measure?.bodies?.length ?? 0;
+    const api = scApi();
+    const nativeBefore = EMBED_CODE ? null : await lazySc.request('document.inspect', {});
+    const manual = !EMBED_CODE && before.ok && !builtStamp.matches(api, nativeBefore) && (before.dirty === true || nBodies > 0);
     if (manual && !confirmed) {
       status('waiting for your confirmation...');
       const yes = await askConfirm(before);
@@ -631,6 +685,8 @@ async function run({ confirmed = false } = {}) {
       }
     }
     keepNext = manual; // only a design that is the user's own is set aside
+    builtStamp.clear();
+    pm('inspect before', pt); pt = performance.now();
     status('translating and building in solidcraft...');
     const t0 = performance.now();
     soups = {};
@@ -638,15 +694,19 @@ async function run({ confirmed = false } = {}) {
     // probeBlockedNoAcrossCut: but a blocked plain through bore ACROSS a cylinder is not test-cut, only its guards are asked (owner decision 2026-11-15: the cut takes
     // 3 to 30 s and is thrown away; 27 of 7784 documents spent 9 to 37 s on it; pilot-2026-11b/PILOT-2.md);
     // probeBlockedSteps: the same for a hollow, draft, round or bevel, by translating once more without the steps that were not built (host-entry.mjs)
-    memo = MEMO_ON ? createReplyMemory(bridge, { continueRuns: INC_ON, shadow: window.__host.shadow ?? null, log: engineLog }) : null;
+    memo = await memoForRun(); lastTranslation = null;
     progress = PROGRESS_ON ? createProgress({ say: status, yieldToPage: yieldToBrowser(window) }) : null;
-    const tr = await translateDoc(doc, { arc, mt, runSC, soups, followMoves: true, probeBlocked: true, probeBlockedNoAcrossCut: true, probeBlockedSteps: true, fromUsage: prep.fromUsage, topologyOf: (cmds) => eng.topologyOf(cmds), ...(progress ? { onStep: (s) => progress.onStep(s) } : {}) });
-    progress = null;
+    const context = { arc, mt, mapSketch, runSC, soups, followMoves: true, probeBlocked: true, probeBlockedNoAcrossCut: true, probeBlockedSteps: true, fromUsage: prep.fromUsage, topologyOf: (cmds) => eng.topologyOf(cmds), ...(progress ? { onStep: (s) => progress.onStep(s) } : {}) };
+    const tr = params.get('sketch-only') === '1' ? await translateSketchOnly(doc,context) : params.get('project-sketch') === '1' ? await translateProjectSketch(doc,context,translateDoc) : await translateDoc(doc,context);
+    lastTranslation = params.get('sketch-only') === '1' || params.get('project-sketch') === '1' ? null : { tr, doc, fromUsage: prep.fromUsage };
+    progress = null; pm('translate', pt); pt = performance.now();
     // Leave the viewport on exactly the accepted commands (the last attempt may have been a refused variant). When SolidCraft already holds exactly that list
     // and a fresh reading of it shows the bodies of that reply (heldReply), nothing is run again; otherwise the list is really run, never answered from memory.
     const held = memo ? await memo.heldReply(tr.commands) : null;
     const fin = held ?? await runSC(tr.commands, { replay: true });
-    const engineUse = memo ? { runs: memo.runs, fromMemory: memo.hits, finalReplaySkipped: !!held, ...(INC_ON ? { continued: memo.continued } : {}) } : null;
+    pm('final replay', pt); pt = performance.now();
+    const engineUse = memo ? { runs: memo.runs, fromMemory: memo.hits, finalReplaySkipped: !!held, ...(INC_ON ? { continued: memo.continued, restored: memo.restored } : {}), ...(KEEP_ON ? { kept: memo.size(), fromEarlierRuns: memo.earlier } : {}) } : null;
+    await keepAfterRun(memo);
     memo = null;
     keepNext = false;
     $('cmds').textContent = JSON.stringify(tr.commands, null, 1);
@@ -685,7 +745,7 @@ async function run({ confirmed = false } = {}) {
       ...(failedCmd ? [['refused command', `${failedCmd.command} ${JSON.stringify(failedCmd.params ?? {})}`]] : []),
       ['time', `${Math.round(performance.now() - t0)} ms`],
     ]);
-    status(refused.length ? `built with ${refused.length} step${refused.length === 1 ? '' : 's'} not built` : 'built');
+    status(params.get('sketch-only') === '1' && !refused.length ? 'Sketch updated' : refused.length ? `built with ${refused.length} step${refused.length === 1 ? '' : 's'} not built` : 'built');
     const bodies = fin?.measure?.bodies ?? [];
     summary = {
       id: ex?.id ?? null, ok: fin.ok, verdict: v.text, pass: v.pass, dofMatch: v.dofMatch ?? null, detail: v.detail ?? '',
@@ -696,14 +756,15 @@ async function run({ confirmed = false } = {}) {
       refusedCommand: failedCmd ?? null, commands: tr.commands.length, engineUse,
       warnings: prep.warnings, interpreterWarnings: r.warnings ?? [],
     };
-    window.__lastRun = { tr, fin, doc, summary };
+    window.__lastRun = { tr, fin, doc, summary }; pm('report', pt);
+    if (fin.ok) builtStamp.remember(scApi(), await lazySc.request('document.inspect', {}));
   } catch (e) {
     memo = null; progress = null;
     keepNext = false;
     failState(summary, 'error: ' + e.message, `ERROR: ${e.message}`, 'The run did not finish.');
   } finally {
     busy = false; $('run').disabled = false;
-    await refreshUndo();
+    if (!EMBED_CODE) await refreshUndo();
   }
   return summary;
 }
@@ -765,6 +826,46 @@ status('waiting for solidcraft...');
 waitForBridge().then(() => { if ($('status').textContent === 'waiting for solidcraft...') status('ready'); return refreshUndo(); }) // a run that already finished keeps its own status line
 .catch((e) => status(e.message));
 
+// shCode (`keep=on`): which edge or face names would resolve on their part in the design the last run() built, for the code-first studio's lists, so a list
+// does not offer an edge reSHape would refuse (an edge a later round or pocket changed). The layer's own resolver answers (resolveAfter, the rule the build
+// itself uses). Its engine questions are answered only from that run's kept replies, or by reading the part SolidCraft holds when SolidCraft's document is
+// exactly as that run left it; nothing is run. A name whose answer would need the engine is { known: false }, and the studio then keeps offering it.
+// `names`: [{ name: TopoName, want: 'edge' | 'face', target: feature id, as: 'fillet' (default) | 'shell' | 'draft' | null }]. With `as`, the step that would use
+// the name is also put through the build's own preflight rule for it (G-STALE, staleConsumers: a round on a part a pocket has cut is refused) and refused when
+// its target was refused. Nothing is built from the answers: a name used in a script is resolved again by the build.
+let lastTranslation = null;
+async function checkNames(names) {
+  const unknown = () => names.map(() => ({ known: false }));
+  const k = kept; const last = lastTranslation;
+  if (!KEEP_ON || !k || !last || memo || !Array.isArray(names)) return unknown();
+  const same = k.stops === engineStops.length && k.revision === await revisionNow();
+  let missed = false;
+  const topologyOf = async (cmds) => {
+    const r = k.memo.answersTopology(cmds) || same ? await k.memo.readHeld(cmds) : null;
+    if (r) return r;
+    missed = true; throw new Error('not kept from the last run');
+  };
+  const runOff = async () => { missed = true; throw new Error('nothing is run here'); };
+  const ctx = { arc, mt, runSC: runOff, soups, followMoves: true, probeBlocked: true, probeBlockedNoAcrossCut: true, probeBlockedSteps: true, fromUsage: last.fromUsage, topologyOf };
+  const out = [];
+  const refusedIds = new Set(last.tr.features.filter((f) => f.status === 'refused').map((f) => f.id));
+  const FIELD = { fillet: 'edge', shell: 'open', draft: 'face' };
+  for (const n of names) {
+    missed = false;
+    const as = n.as === undefined ? 'fillet' : n.as;
+    if (as && FIELD[as]) {
+      const probe = { id: '__shcode_check', kind: as, target: n.target, [FIELD[as]]: n.name };
+      if (refusedIds.has(n.target) || staleConsumers({ ...last.doc, features: [...last.doc.features, probe] }).has(probe.id)) { out.push({ known: true, ok: false, sentence: null }); continue; }
+    }
+    try {
+      const r = await resolveAfter(last.tr, last.doc, n.name, ctx, n.want === 'face' ? 'face' : 'edge', n.target ?? null, null);
+      out.push(missed ? { known: false } : r.ok ? { known: true, ok: true } : { known: true, ok: false, sentence: r.sentence ?? null });
+    } catch { out.push({ known: false }); }
+    if (kept !== k) return [...out, ...names.slice(out.length).map(() => ({ known: false }))]; // a run started: what is left is not known
+  }
+  return out;
+}
+
 /** Verification hook (phase 4): translate a ModelDoc directly (no script, no sandbox). */
 async function translateRaw(docIn, names = []) {
   await waitForBridge();
@@ -795,8 +896,12 @@ async function translateRaw(docIn, names = []) {
 }
 // Not a security boundary (this is the page's own JS): hooks for the verification scripts. `run` here never asks.
 window.__host = {
-  run, bridge, probeLog, runLog, engineLog, engineStops, shadow: null, createUpstreamBridge, runSC, evaluate, validDoc, restoreTest, EXAMPLES, translateRaw, restore, refreshUndo,
+  get buildRevision() { return builtStamp.revision; },
+  confirmReplace: null,
+  run, bridge, probeLog, runLog, engineLog, engineStops, shadow: null, createUpstreamBridge, runSC, evaluate, validDoc, restoreTest, EXAMPLES, translateRaw, restore, refreshUndo, checkNames,
   runExample: async (id, opts) => { load(id); return run({ confirmed: true, ...(opts ?? {}) }); },
-  setScript: (code) => { $('src').value = code; $('src').dispatchEvent(new Event('input')); },
+  setScript: (code, locations = []) => { $('src').value = code; $('src').dispatchEvent(new Event('input')); sourceLocations = locations; },
   runUnconfirmed: () => run({}),
+  // shCode saves every sketch-tool edit before replacing this read-only view.
+  runSavedSketch: () => params.get('sketch-only') === '1' ? run({ confirmed: true }) : Promise.reject(new Error('This host is not a sketch-only view.')),
 };

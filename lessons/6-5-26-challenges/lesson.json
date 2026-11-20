@@ -3,6 +3,10 @@
   "title": "6.10.27 Challenges: Extended Save Features",
   "description": "Extend your save system: save file previews (show slot contents before loading), save timestamps, multiple profiles, or deleting this game's saves with double-confirmation.",
   "type": "challenge",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 30,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.10 Save and Load",

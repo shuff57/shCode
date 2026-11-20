@@ -3,6 +3,10 @@
   "title": "3.9.3 Group PA Part 3: Reflect",
   "description": "Part 3 of 3, worth 25%. A short write-up with your partner: who did what, three test cases, one thing you logged, and three Chapter 3 sections found in your code. Grade up to three times; your best try counts.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.9 Chapter 3 Group Performance Assessment",

@@ -3,6 +3,10 @@
   "title": "6.4.4 Lab: Sink it",
   "description": "The table with a pocket: a slow ball drops, a fast one rolls over, and the game says what happened.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.4 Pocket: the pocket",
@@ -100,6 +104,14 @@
         "description": "A word or a message shows the ball was pocketed.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "The pocket is pass-through: The pocket has collider none. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Slow drop, guarded: Overlap plus speed test, once. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The game says so: Words appear when the ball is sunk. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Lab: Sink it\". The task: make the pocket pass-through, drop a slow ball into it once, and show a word when it is sunk. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

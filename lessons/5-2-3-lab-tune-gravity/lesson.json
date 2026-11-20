@@ -3,6 +3,10 @@
   "title": "5.2.10 Lab: Tune Gravity",
   "description": "Try different world.gravity.y values on the same scene and describe how each one feels. Change the value, then write one sentence per value as a comment.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",
@@ -56,6 +60,11 @@
         "description": "The world.gravity.y line that runs holds a value other than the starter's 10 (0, -5, 20 or any other value counts). A value written only in a note does not change the gravity. One exception: if the line is back at 10 but the student's own notes clearly describe what several other values did, they did the trying the lab asks for, so count it. Help: 5.2.8 (Reading: Gravity)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Find the line world.gravity.y = N that is not inside a comment. Is N any number other than exactly 10? Every other number means yes: 0, 1, 5, 9, 15, 20, 80, 90, 100, 5000, -5 or -10 (20 counts even though the starter's closing comment also names 20). Only exactly 10 means no. Numbers that appear only in a comment do not count. Code inside comments never runs."
+      }
+    }
   }
 }

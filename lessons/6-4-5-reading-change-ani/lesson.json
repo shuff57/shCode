@@ -3,6 +3,10 @@
   "title": "6.9.5 Reading: changeAni(name)",
   "description": "How sprite.changeAni(name) swaps the active animation between previously registered names. Read before 6.9.8 (Worked Example).",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.9 Animated Sprites and Camera",

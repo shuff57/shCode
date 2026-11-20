@@ -3,6 +3,10 @@
   "title": "7.3.10 Reading: A parameter that is another object",
   "description": "In `a.distanceTo(b)` the method has two instances in play: `this` is the receiver, `other` is the parameter. Shows where that symmetry ends — `player.hit(enemy)` and `enemy.hit(player)` mean opposite things.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.3 Inside a Class",

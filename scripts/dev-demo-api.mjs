@@ -18,6 +18,7 @@ import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
 import { openMemoryDb, requireSqlite } from './lib/sqlite-adapter.mjs';
+import { onRequestGet as meGet, onRequestPut as mePut } from '../functions/api/me.ts';
 import { onRequestGet as stateIndexGet } from '../functions/api/lesson-state/index.ts';
 import { onRequestPost as statePost, onRequestDelete as stateDelete } from '../functions/api/lesson-state/[lessonId].ts';
 import { onRequestGet as submissionsGet, onRequestPost as submissionsPost } from '../functions/api/lesson-submissions/index.ts';
@@ -177,7 +178,7 @@ function seedClass(sql, root, teacherEmail) {
   }
 }
 
-export function mountDemoApi({ server, express, devIdentity, role, roleOf, root }) {
+export function mountDemoApi({ server, express, devIdentity, role, roleOf, root, ownerOf }) {
   const db = openDb(root);
   let fakePort = 0;
   startFakeOllama((p) => { fakePort = p; });
@@ -303,6 +304,15 @@ export function mountDemoApi({ server, express, devIdentity, role, roleOf, root 
   server.get('/api/quiz-reveal', route(quizRevealGet));
   server.get('/api/my-gradebook', route(myGradebookGet));
   // Teacher side: the class pages' real handlers, so the grid, the roster and the drawer show real numbers.
+  // The account's own name and alias (migration 0066): the real handlers, so /account saves into this database.
+  // GET keeps the `wo` the dev stub in server.js sent (ownerOf), which the outbox compares with the page's owner.
+  server.get('/api/me', async (req, res) => {
+    const email = devIdentity(req);
+    ensure(email);
+    const out = await meGet({ request: new Request(`http://localhost${req.originalUrl}`), env, params: {}, data: { email, role: roleOf ? roleOf(req) : role, ...(ownerOf ? { wo: ownerOf(email) } : {}) }, waitUntil() {} });
+    res.status(out.status).type('application/json').send(await out.text());
+  });
+  server.put('/api/me', json, route(mePut));
   server.get('/api/classes', route(classesGet));
   // Day-one class admin (ux2 T7): these were missing here, so Create class, Bulk enroll and co-teachers answered
   // a bare 404 in dev only. The real handlers; production routes them by file name.

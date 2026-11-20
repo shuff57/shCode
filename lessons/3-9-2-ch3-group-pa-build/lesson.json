@@ -3,6 +3,10 @@
   "title": "3.9.2 Group PA Part 2: Build It",
   "description": "Part 2 of 3, worth 50%. Turn the plan you just wrote into documented functions and a short main section that uses all eight Chapter 3 sections. Grade up to three times; your best try counts, and each partner has their own three. After your third try you can see how it is solved, once your teacher releases it.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 42,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.9 Chapter 3 Group Performance Assessment",

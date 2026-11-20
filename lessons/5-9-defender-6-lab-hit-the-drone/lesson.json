@@ -3,6 +3,10 @@
   "title": "7.5.2 Lab: Hit the drone",
   "description": "Shots fly straight through the falling drone. Use overlaps() so a shot that touches it scores, leaves the screen and the array, and sends the drone back to the top.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.5 Defender: hits, and a round",
@@ -112,6 +116,13 @@
         "description": "Inside the same if, score goes up by exactly 1 (+= 1, ++, or = score + 1) and the drone goes back to the top (resetDrone(), or setting drone.y back above the screen). A score line outside the if, so it climbs on every frame, is not met.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "overlaps is used on the drone: Each shot asks overlaps(drone) on every frame. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The shot that hit leaves the screen and the array: Inside the overlaps if, the shot is deleted and spliced out of bullets on the frame it hits. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A hit scores 1 and resets the drone: Inside the same if, score goes up by 1 and the drone goes back to the top. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

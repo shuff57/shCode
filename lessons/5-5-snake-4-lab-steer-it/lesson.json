@@ -3,6 +3,10 @@
   "title": "5.13.5 Lab: Steer it",
   "description": "The block only walks right and walks off the edge. Add the four arrow keys with two direction variables, forbid turning back on yourself, and end the round at a wall.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.13 Snake: grid and steering",
@@ -103,6 +107,13 @@
         "description": "After the step, a test of the new column or row being off the grid (below 0, or 20 or more; > 19 and === -1 style tests also count) sets playing to false. Testing all four sides is what step 3 asks; a test that clearly covers leaving the grid counts here. Moving the block on screen only in the else is also what step 3 asks and is welcome. Missing: nothing sets playing to false, or it is set false while the block is still on the grid. Help: 5.12.3 (Lab: Crash, and start again)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Each arrow key sets the direction: Pressing up, down, left or right changes dx and dy together. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A turn straight back is refused: Each of the four keys refuses a turn straight back: up and down only when the block is not already moving up or down (dy === 0), left and right only when dx === 0. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Leaving the grid ends the round: A column or row off the grid sets the flag false. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

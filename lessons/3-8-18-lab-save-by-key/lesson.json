@@ -3,6 +3,10 @@
   "title": "3.8.18 Lab: Save a State Object by Key",
   "description": "Turn a state object into JSON text and store it under a key, the way a page would keep it between visits. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.8.6",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -209,6 +213,15 @@
         "description": "A console.log that runs prints what localStorage.getItem reads back, and that text changes when state does. Help: 3.8.15 (Saving by Key)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "State object declared: Declares an object with curly braces. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Stored by key: Calls localStorage.setItem. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Converted with stringify: Calls JSON.stringify before storing. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Key read back: Calls localStorage.getItem. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Stored text logged: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

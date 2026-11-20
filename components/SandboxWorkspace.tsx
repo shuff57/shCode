@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { ChevronDown, CloudUpload, History, Maximize2, Minimize2, RotateCcw, Share2, Users } from 'lucide-react';
+import { CloudUpload, Gamepad2, History, Maximize2, Minimize2, PanelBottomClose, PanelBottomOpen, PanelLeftClose, PanelLeftOpen, RotateCcw, Send as SendIcon, Users } from 'lucide-react';
 import type { Extension } from '@codemirror/state';
 import { useLessonStore } from '../lib/store';
 import { saveProgress } from '../lib/version-control';
@@ -23,31 +23,34 @@ import TextureEditor from './TextureEditor';
 import FontMaker from './FontMaker';
 import SoundMixer from './SoundMixer';
 import ClassLibraryPanel from './ClassLibraryPanel';
-import DocsDrawer from './DocsDrawer';
+import SolidCraftHelp from './SolidCraftHelp';
 import PublishGameButton from './PublishGameButton';
 import ProposeChangeButton from './ProposeChangeButton';
 import CodeTogetherBar, { useCodeTogetherAvailable } from './CodeTogetherBar';
 import SandboxProjectPicker from './SandboxProjectPicker';
 import { createProject, openProject, useSandboxProjects } from '../lib/sandbox-projects';
 import SendProgramButton from './SendProgramButton';
+import ShareDialog, { type ShareTab, type ShareTabSpec } from './ShareDialog';
+import P5playConvertButton from './P5playConvertButton';
 import { projectLessonId } from '../lib/sandbox-projects-core';
 import { RUN_TIMEOUT_MS, errorWithLocation, runStudentCode, timerLimitMessage } from '../lib/js-runner-source';
-import {
-  NO_TEACHER_MODES,
-  canUseBuild,
-  canUseCode,
-  resolveMode,
-  whyLocked,
-  type TeacherModes,
-} from '../lib/lesson-mode';
+import type { TeacherModes } from '../lib/lesson-mode';
+import { sandboxCadPolicy } from '../lib/solidcraft-policy';
 import EditorPlaceholder from './diagram/EditorPlaceholder';
 import { emptyDiagram, type DiagramDoc } from '../lib/diagram-types';
-import { getMode, sandboxLesson } from '../lib/sandbox-modes';
+import { getMode, sandboxLesson, type SandboxModeId } from '../lib/sandbox-modes';
+import { isCodeCadProject } from '../lib/solidcraft-code';
+import { getSessionAssets } from '../lib/games-client';
+import type { GameAsset } from '../lib/game-assets';
 
-// The B-rep kernel + three.js viewport are heavy; a plain JS or moSHion
-// sandbox session should never pay for them. Same dynamic-import pattern
-// DiagramAssignmentView uses for DiagramEditor.
-const ReshapeStudio = dynamic(() => import('./reshape/ReshapeStudio'), { ssr: false });
+/** How long a Code together Run waits for the others' pictures before it starts without them. */
+const SESSION_ASSETS_WAIT_MS = 5000;
+
+// SolidCraft loads only for CAD projects; JS and moSHion keep their own
+// workspaces. The retired CAD studio is no longer part of this surface.
+const SolidCraftProject = dynamic(() => import('./SolidCraftProject'), { ssr: false });
+const SolidCraftCodeStudio = dynamic(() => import('./SolidCraftCodeStudio'), { ssr: false });
+const DocsDrawer = dynamic(() => import('./DocsDrawer'), { ssr: false });
 // Same lazy chunk the lesson diagrams use; React Flow stays out of the other modes.
 const DiagramEditor = dynamic(() => import('./diagram/DiagramEditor'), {
   ssr: false,
@@ -69,13 +72,6 @@ function parseChart(text: string | undefined): DiagramDoc {
   return emptyDiagram();
 }
 
-// Which side (Build/Code) reSHape opens on. Read once at page load and
-// handed to ReshapeStudio as `startSide` -- the studio owns the toggle
-// itself from then on (see its own file header), so this is a
-// load-time default, not a live mirror of whatever side the student is
-// currently on.
-const BUILD_KEY = 'shCode:sandbox-reshape-build';
-
 // The plain outlined chip the Reset and Full screen buttons both wear. Snug
 // enough that the whole toolbar, Stop included, is one row at 1366 wide.
 const chipStyle: React.CSSProperties = {
@@ -96,8 +92,12 @@ interface LogLine {
   message: string;
 }
 
-export default function SandboxWorkspace() {
+export default function SandboxWorkspace({ initialMode }: { initialMode?: SandboxModeId } = {}) {
   const setLesson = useLessonStore((s) => s.setLesson);
+  const activeLessonId = useLessonStore((s) => s.lesson?.id);
+  const selectFile = useLessonStore((s) => s.selectFile);
+  const cadFlush = useRef<(() => Promise<boolean>) | null>(null);
+  const cadSaved = useRef<(() => Promise<void>) | null>(null);
   const fileContents = useLessonStore((s) => s.fileContents);
   const updateFile = useLessonStore((s) => s.updateFile);
   const resetLesson = useLessonStore((s) => s.resetLesson);
@@ -125,6 +125,7 @@ export default function SandboxWorkspace() {
   // Uploading by itself (lib/outbox.ts): its words replace the state line beside Save.
   const upload = useUploadStatus(lesson.id, lessonProgress.authed);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [capturing,setCapturing]=useState(false);
 
   // Code together (REALTIME-SPEC.md Part 2): the JavaScript and moSHion modes
   // only, for a student signed in and in a class. The toolbar button opens its
@@ -134,7 +135,20 @@ export default function SandboxWorkspace() {
   // and the mode tabs are locked, so one click cannot wipe or swap everyone's program.
   const togetherLang = modeId === 'js' || modeId === 'moshion' ? modeId : null;
   const mayTogether = useCodeTogetherAvailable(togetherLang, lessonProgress.authed);
-  const [togetherOpen, setTogetherOpen] = useState(false);
+  // One Share dialog holds Publish game, Code together and Send to... as tabs (components/ShareDialog.tsx). Code together's
+  // own popup is its tab: `togetherOpen` is "the dialog is open on that tab", so the toolbar button, an invitation and the
+  // session's own Close all still say it the way they did.
+  const [shareOpen, setShareOpen] = useState(false);
+  const [shareTab, setShareTab] = useState<ShareTab>('publish');
+  const shareTabRef = useRef(shareTab);
+  shareTabRef.current = shareTab;
+  const [togetherPane, setTogetherPane] = useState<HTMLDivElement | null>(null);
+  const togetherOpen = shareOpen && shareTab === 'together';
+  const setTogetherOpen = useCallback((v: boolean) => {
+    if (v) { setShareTab('together'); setShareOpen(true); }
+    // Code together closing itself (joined a session, Leave) must not shut the dialog while another tab is in use.
+    else if (shareTabRef.current === 'together') setShareOpen(false);
+  }, []);
   const [togetherHere, setTogetherHere] = useState(0);
   const [togetherBadge, setTogetherBadge] = useState<HTMLSpanElement | null>(null);
   const [collabExt, setCollabExt] = useState<Extension | null>(null);
@@ -207,6 +221,21 @@ export default function SandboxWorkspace() {
   const [runKey, setRunKey] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [consoleResetKey, setConsoleResetKey] = useState(0);
+  // Code together: the other people's pictures and sounds this run's program uses (POST /api/rooms/[code]/assets),
+  // laid over this computer's store for the run only. The frame waits for them (at most SESSION_ASSETS_WAIT_MS), so
+  // its first store already has them, as /play does.
+  const [sessionAssets, setSessionAssets] = useState<{ run: number; list: GameAsset[] } | null>(null);
+  const assetsRoom = together && mode.preview === 'moshion' ? togetherCode : null;
+  useEffect(() => {
+    if (!assetsRoom || runKey === 0) return;
+    let live = true;
+    const done = (list: GameAsset[]) => { if (live) { live = false; setSessionAssets({ run: runKey, list }); } };
+    const timer = window.setTimeout(() => done([]), SESSION_ASSETS_WAIT_MS);
+    void getSessionAssets(assetsRoom, code).then((r) => done(r.ok ? r.value.assets ?? [] : []));
+    return () => { live = false; window.clearTimeout(timer); };
+    // `code` is set together with runKey by run(); a new run is what asks again.
+  }, [assetsRoom, runKey]);
+  const waitingForAssets = !!assetsRoom && runKey > 0 && sessionAssets?.run !== runKey;
   const [logs, setLogs] = useState<LogLine[]>([]);
   // The output follows the newest line, unless the student has scrolled up to read.
   const outputRef = useRef<HTMLPreElement | null>(null);
@@ -223,53 +252,35 @@ export default function SandboxWorkspace() {
     if (el && outputPinned.current) el.scrollTop = el.scrollHeight;
   }, [logs]);
 
-  // reSHape's own load-time default side -- see BUILD_KEY's comment above.
-  const [build, setBuild] = useState(true);
-  // The studio's CURRENT side, live -- reported back through onSideChange
-  // (unlike `build` above, which only ever seeds `startSide`). Drives the
-  // header/mode-tabs hide-in-Build chrome, which needs to know the real
-  // side, not just what it started on.
-  const [reshapeSide, setReshapeSide] = useState<'build' | 'code'>('build');
-  // Bumped on Reset to force ReshapeStudio to remount: it only hydrates its
-  // model from `value` once, at mount (see its own file header), so writing
-  // the starter back into fileContents while it stays mounted would leave
-  // the OLD model on screen next to the NEW starter text.
   const [reshapeResetKey, setReshapeResetKey] = useState(0);
-
-  // WHICH GEOMETRY ENGINE DRAWS reSHape. The B-rep kernel, always -- operator
-  // decision 2026-09-03, after the Chili3D gauntlet and the B-rep-default
-  // loop: oracle 134/134, three student lenses through the Build tools
-  // twice. The JSCAD runner and its ?engine=jscad / ?script=0 escape hatches
-  // are gone (CLAUDE.md's "JSCAD is retired" section).
-
-  // What the student's teachers have set. A failed or missing fetch resolves to
-  // 'both', so a gate that cannot be read never locks anyone out of their work.
-  const [teacherModes, setTeacherModes] = useState<TeacherModes>(NO_TEACHER_MODES);
-  useEffect(() => {
-    let live = true;
-    fetch('/api/my-lesson-modes')
-      .then((r) => (r.ok ? r.json() : NO_TEACHER_MODES))
-      .then((m) => { if (live) setTeacherModes(m ?? NO_TEACHER_MODES); })
-      .catch(() => { /* no gate readable, so no gate applied */ });
-    return () => { live = false; };
-  }, []);
+  const [teacherModes, setTeacherModes] = useState<TeacherModes|null>(null);
+  const [authorTools,setAuthorTools]=useState(false);
+  const cadAuthor=lessonProgress.role==='teacher'||lessonProgress.role==='admin';
+  const [cadPolicyLoaded,setCadPolicyLoaded]=useState(false);
+  const [cadPolicyError,setCadPolicyError]=useState(false);
+  useEffect(()=>{
+    const abort=new AbortController();let pending=false;
+    const read=async()=>{
+      if(pending||abort.signal.aborted)return;pending=true;
+      try {const r=await fetch('/api/my-lesson-modes',{signal:abort.signal});if(!r.ok)throw new Error();const modes=await r.json();if(!modes||!modes.lessons||typeof modes.lessons!=='object')throw new Error();if(!abort.signal.aborted){setTeacherModes(modes);setCadPolicyError(false);}}
+      catch {if(!abort.signal.aborted){setTeacherModes(null);setCadPolicyError(true);}}
+      finally {pending=false;if(!abort.signal.aborted)setCadPolicyLoaded(true);}
+    };
+    void read();const timer=setInterval(()=>void read(),5000);window.addEventListener('focus',read);
+    return()=>{abort.abort();clearInterval(timer);window.removeEventListener('focus',read);};
+  },[]);
 
   // Full screen puts the preview edge to edge and floats the editor over it,
   // so a shape can be built and then looked at without the editor in the way.
   const shellRef = useRef<HTMLDivElement>(null);
   const [full, setFull] = useState(false);
+  // In full screen the editor and the console can each be put away (#119): the game then takes the room.
+  // Leaving full screen brings both back, so a hidden editor can never be lost outside it.
+  const [hideEditor, setHideEditor] = useState(false);
+  const [hideConsole, setHideConsole] = useState(false);
   const runRef = useRef<{ kill: () => void } | null>(null);
 
   useEffect(() => () => { runRef.current?.kill(); }, []);
-
-  // Read in an effect rather than useState's initialiser so the server and
-  // client markup stay identical, which a static export needs.
-  useEffect(() => {
-    try {
-      const b = window.localStorage.getItem(BUILD_KEY);
-      if (b === '0') setBuild(false);
-    } catch { /* private mode */ }
-  }, []);
 
   // Each project is its own lesson id, so the store keeps independent drafts
   // and switching back finds your code where you left it. A switch stops the
@@ -282,8 +293,18 @@ export default function SandboxWorkspace() {
     setRunKey(0);
     setIsRunning(false);
     setLogs([]);
-    setTogetherOpen(false);
+    setShareOpen(false);
   }, [lesson, setLesson]);
+
+  const enteredMode=useRef(false);
+  useEffect(()=>{
+    if(!initialMode||!projectsState.loaded||enteredMode.current)return;
+    enteredMode.current=true;
+    if(project?.mode===initialMode)return;
+    const previous=projectsState.projects.find(p=>p.mode===initialMode);
+    if(previous)openProject(previous);
+    else void createProject(initialMode,getMode(initialMode).label+' project').then(r=>{if(!r.ok)window.alert(r.error);});
+  },[initialMode,projectsState.loaded,projectsState.projects,project?.mode]);
 
   // Keep the draft. Nothing else in the sandbox writes it, so without this a
   // reload dropped the student's code or chart back to the starter. Debounced
@@ -384,8 +405,7 @@ export default function SandboxWorkspace() {
     return now === '' || now === norm(mode.starter);
   }, [getScript, mode.starter]);
 
-  // js/moSHion only -- reSHape's Run lives inside ReshapeStudio now (it owns
-  // its own script.js -> iframe handoff, see that component's file header).
+  // CAD owns its editor and Run; this runner is for JS/moSHion only.
   const run = useCallback(() => {
     const script = fileContents['script.js'] || '';
     if (mode.preview === 'console') {
@@ -407,33 +427,43 @@ export default function SandboxWorkspace() {
     setIsRunning(false);
   }
 
-  function reset() {
-    if (window.confirm(isFlow ? 'Clear the chart and start over? This cannot be undone.' : 'Reset code to the starter? Unsaved work will be lost.')) {
+  async function reset() {
+    if (window.confirm(isFlow ? 'Clear the chart and start over? This cannot be undone.' : mode.preview==='reshape' ? 'Reset both CAD scripts to their starters? Your current project will be kept in History.' : 'Reset code to the starter? Unsaved work will be lost.')) {
+      if(!await beforeLeave()){window.alert('Your current work could not be saved. Keep this page open and try again.');return;}
       // resetLesson also wipes the saved draft; setLesson would load it back.
       // The code it replaces is put in History first; if it cannot be, nothing is reset.
       if (!resetLesson(lesson)) { window.alert(NOT_KEPT_TEXT); return; }
       stopRun();
       setLogs([]);
-      // ReshapeStudio's own "Clear model" button (inside its Build toolbar)
-      // wipes just the model, independent of this -- this resets the SAVED
-      // TEXT to the starter, so the studio needs a fresh mount to pick it up.
+      // Reopen CAD from the restored project files.
       if (mode.preview === 'reshape') setReshapeResetKey((k) => k + 1);
     }
   }
 
   // LessonWorkspace's Save handler in miniature: keep a copy on this device
   // even if the cloud write fails, then let lesson-sync merge and save.
-  function saveToCloud() {
-    addLocalSnapshot(lesson.id, useLessonStore.getState().fileContents, 'Saved on this device');
-    void cloud.save();
+  async function beforeLeave():Promise<boolean> {
+    if(mode.preview==='reshape'&&cadFlush.current&&!await cadFlush.current())return false;
+    const st=useLessonStore.getState();
+    if(st.lesson?.id!==lesson.id)return true;
+    const result=saveProgress(st.lesson.id,{fileContents:st.fileContents,commits:st.commits,lastCommittedFileContents:st.lastCommittedFileContents,completedSteps:[]});
+    if(result==='ok'){noteDraftSaved(st.lesson.id);try{await cadSaved.current?.();}catch{/* The durable project copy is already kept. */}}
+    return result==='ok';
+  }
+  async function saveToCloud() {
+    setCapturing(true);
+    try {
+      if(!await beforeLeave()){window.alert('Your current work could not be captured. Keep this page open and try Save again.');return;}
+      addLocalSnapshot(lesson.id, useLessonStore.getState().fileContents, 'Saved on this device');
+      await cloud.save();
+    } finally {setCapturing(false);}
   }
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key === 'Enter') {
         e.preventDefault();
-        // reSHape has its own Ctrl+Enter handling scoped to its Code side --
-        // see ReshapeStudio's own keydown effect.
+        // SolidCraft handles Ctrl/Command+Enter inside its own editor.
         if (mode.preview !== 'reshape' && mode.preview !== 'diagram') run();
       }
     };
@@ -447,6 +477,7 @@ export default function SandboxWorkspace() {
     const onFs = () => {
       const active = document.fullscreenElement === shellRef.current;
       setFull(active);
+      if (!active) { setHideEditor(false); setHideConsole(false); }
       setTimeout(() => window.dispatchEvent(new Event('resize')), 60);
     };
     document.addEventListener('fullscreenchange', onFs);
@@ -494,6 +525,25 @@ export default function SandboxWorkspace() {
       gamePaneRef.current?.requestFullscreen?.().catch(() => { /* refused: stay windowed */ });
     }
   }, []);
+  // A game started (or restarted) while its pane is full screen is a new frame: tell it to fit too. load
+  // does not bubble, so listen in the capture phase on the shell, which holds every pane.
+  useEffect(() => {
+    const shell = shellRef.current;
+    if (!shell) return;
+    const onLoad = (e: Event) => {
+      const pane = gamePaneRef.current;
+      if (pane && document.fullscreenElement === pane && e.target instanceof HTMLIFrameElement && pane.contains(e.target)) {
+        e.target.contentWindow?.postMessage({ source: 'preview-fit', on: true }, '*');
+        // The frame's own window, not just the element: the element is already the active one, so
+        // focusing it again would not move the keys into a game that has just loaded.
+        e.target.focus();
+        try { e.target.contentWindow?.focus(); } catch { /* the element focus stands */ }
+      }
+    };
+    shell.addEventListener('load', onLoad, true);
+    return () => shell.removeEventListener('load', onLoad, true);
+  }, []);
+  const relayoutSoon = () => setTimeout(() => window.dispatchEvent(new Event('resize')), 60);
 
 
   const drawerTabs: DrawerTab[] = isFlow ? [
@@ -576,7 +626,7 @@ export default function SandboxWorkspace() {
       key: 'docs',
       label: 'Docs',
       color: 'var(--c-purple)',
-      content: <DocsDrawer defaultSetId={mode.id} storageKey="shCode:sandbox-docs" />,
+      content: mode.preview==='reshape' ? <SolidCraftHelp words={isCodeCadProject(fileContents)}/> : <DocsDrawer defaultSetId={mode.id} storageKey="shCode:sandbox-docs" />,
       headerExtra: mode.docsHref ? (
         <a
           href={mode.docsHref}
@@ -593,30 +643,11 @@ export default function SandboxWorkspace() {
   const isConsole = mode.preview === 'console';
   const isReshape = mode.preview === 'reshape';
 
-  // The sandbox has no assignment, so only the class-wide gate can reach it.
-  // Per-assignment overrides apply in lessons, where a lesson id exists.
-  const gate = resolveMode('sandbox', teacherModes);
-  const mayBuild = canUseBuild(gate);
-  const mayCode = canUseCode(gate);
-  const lockNote = whyLocked(gate);
-  const reshapeSides = useMemo<('build' | 'code')[]>(() => {
-    const s: ('build' | 'code')[] = [];
-    if (mayBuild) s.push('build');
-    if (mayCode) s.push('code');
-    return s.length ? s : ['build', 'code'];
-  }, [mayBuild, mayCode]);
-  const reshapeIsBuild = isReshape && reshapeSide === 'build';
+  // A SolidCraft-command project has its own on/off switch for SolidCraft's tools; an author may always use them there.
+  const commandsCad=isReshape&&isCodeCadProject(fileContents);
+  const cad=sandboxCadPolicy(lessonProgress.role,authorTools||commandsCad,teacherModes);
+  const cadReason=cadAuthor?cad.reason:cadPolicyError?'Teacher settings could not be read. Hand tools stay off; your script is available.':cad.toolsAllowed?'Drawing tools are available. Mouse edits stay separate from your code.':'Work with code. Your teacher controls access to hand tools.';
 
-  // Reset and Full screen fold into ReshapeStudio's OWN toolbar row for
-  // reSHape (rather than a second row above it) so the ribbon reads as one
-  // strip, matching the pre-extraction sandbox the parity loop was judged
-  // against -- and the program-type tabs join them too, but only on the
-  // Code side; Build hides them the same way it always has (no room, and no
-  // reason to switch program type mid-model).
-  // History and Save ride in both toolbars: reSHape folds the sandbox's chrome
-  // into ReshapeStudio's own row, while every other mode has the normal one.
-  // What Save has done for the code on screen: always kept on this device (the local draft), and in the
-  // cloud once a Save in this visit succeeded and nothing has changed since.
   const contentKey = `${modeId}:${JSON.stringify(fileContents)}`;
   const [cloudKey, setCloudKey] = useState<string | null>(null);
   const wasSaving = useRef(false);
@@ -630,6 +661,10 @@ export default function SandboxWorkspace() {
       ? { kind: 'cloud', text: 'Saved to the cloud' }
       : { kind: 'changed', text: 'Changed since cloud save' };
 
+  // In the cloud and unchanged since (a Save or an upload by itself): the Save icon turns green and the
+  // state line goes away, since the green icon already says it. Any edit brings the line back.
+  const cloudSynced = upload.state !== 'none' ? upload.state === 'uploaded' : saveState.kind === 'cloud';
+
   const renderCloudChips = () => (
     <>
       {lessonProgress.authed && (
@@ -638,19 +673,20 @@ export default function SandboxWorkspace() {
           <button
             style={chipStyle}
             className="sandbox-save-btn"
+            data-synced={cloudSynced ? 'true' : undefined}
             onClick={saveToCloud}
-            disabled={cloud.saving}
-            title="Save this sandbox to the cloud so you can open it on another device."
+            disabled={cloud.saving||capturing}
+            title={cloudSynced ? 'Saved to the cloud. Save again any time.' : 'Save this sandbox to the cloud so you can open it on another device.'}
           >
             <CloudUpload size={12} />
-            {cloud.saving ? 'Saving…' : 'Save'}
+            {cloud.saving||capturing ? 'Saving…' : 'Save'}
           </button>
           <span role="status" aria-live="polite" className="sandbox-save-note" data-kind={cloud.note?.kind ?? ''} hidden={!cloud.note}>
             {cloud.note ? `${cloud.note.kind === 'error' ? '✗' : '✓'} ${cloud.note.text}` : null}
           </span>
         </span>
       )}
-      {lessonProgress.authed && (
+      {lessonProgress.authed && !cloudSynced && (
         upload.state !== 'none' ? (
           <span className="sandbox-save-state" data-state={sandboxDotState(upload.state)} data-upload-state={upload.state} title="Your code is kept on this computer and uploads to your account by itself.">
             <span className="sandbox-save-dot" aria-hidden="true" />{uploadText(upload)}
@@ -663,7 +699,7 @@ export default function SandboxWorkspace() {
       )}
       <button
         style={chipStyle}
-        onClick={() => setHistoryOpen(true)}
+        onClick={async()=>{if(await beforeLeave())setHistoryOpen(true);}}
         title="Restore a version saved on this device or in the cloud"
       >
         <History size={12} />
@@ -672,25 +708,42 @@ export default function SandboxWorkspace() {
     </>
   );
 
-  const reshapeToolbarExtra = isReshape ? (
-    <>
-      {!reshapeIsBuild && <SandboxProjectPicker state={projectsState} />}
-      {lockNote && <span className="sandbox-lock">{lockNote}</span>}
-      {renderCloudChips()}
-      <button style={chipStyle} onClick={reset}>
-        <RotateCcw size={12} />
-        Reset
-      </button>
-      <button
-        style={chipStyle}
-        onClick={toggleFull}
-        title={full ? 'Leave full screen (Esc)' : 'Fill the screen with the preview'}
-      >
-        {full ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
-        {full ? 'Exit full screen' : 'Full screen'}
-      </button>
-    </>
-  ) : null;
+  // The Share dialog's tabs: a tab appears only where what it does is available (the same tests the old menu used).
+  const closeShare = useCallback(() => setShareOpen(false), []);
+  const canTogether = !!togetherLang && (mayTogether || together);
+  const canPublish = mode.preview === 'moshion' && lessonProgress.authed;
+  const shareTabs: ShareTabSpec[] = [];
+  if (canPublish) {
+    // The Games library: publish this sketch so classmates can play and remix it.
+    shareTabs.push({
+      id: 'publish', label: 'Publish game', icon: <Gamepad2 size={14} aria-hidden="true" />,
+      pane: <PublishGameButton key={`publish-${lesson.id}`} getCode={getScript} embedded active={shareOpen && shareTab === 'publish'} onClose={closeShare} />,
+    });
+  }
+  if (canTogether) {
+    // Code together's own popup is drawn into this pane (CodeTogetherBar `embedded`).
+    shareTabs.push({
+      id: 'together', label: together ? 'Coding together' : 'Code together', icon: <Users size={14} aria-hidden="true" />,
+      pane: <div ref={setTogetherPane} />,
+    });
+    // Send a copy, or an invitation to this Code together session, in a message (migration 0054).
+    shareTabs.push({
+      id: 'send', label: 'Send to…', icon: <SendIcon size={14} aria-hidden="true" />,
+      pane: (
+        <SendProgramButton
+          key={`send-${lesson.id}`}
+          lang={togetherLang}
+          chipStyle={chipStyle}
+          getCode={getScript}
+          title={project?.name ?? ''}
+          session={together ? togetherCode : null}
+          embedded
+          active={shareOpen && shareTab === 'send'}
+          onClose={closeShare}
+        />
+      ),
+    });
+  }
 
   // The two sides of the sandbox's split (components/EditorPreviewSplit.tsx).
   const editorSlot = (
@@ -708,7 +761,9 @@ export default function SandboxWorkspace() {
             isUntouched={isUntouched}
             open={togetherOpen}
             onOpenChange={setTogetherOpen}
-            dialogHost={shellRef.current}
+            embedded
+            embedHost={togetherPane}
+            onInvite={() => setShareTab('send')}
             badgeHost={togetherBadge}
             onSession={setTogetherCode}
             invite={invite}
@@ -721,11 +776,11 @@ export default function SandboxWorkspace() {
   );
   const previewSlot = (
     <>
-        {!isConsole && runKey > 0 && gameFullOk && (
+        {!isConsole && gameFullOk && (
           <button
             type="button"
             className="sandbox-game-fs"
-            onClick={toggleGameFull}
+            onClick={() => { if (runKey === 0 && !gameFull) run(); toggleGameFull(); }}
             title={gameFull ? 'Leave full screen (Esc)' : 'Full screen the game only'}
             aria-label={gameFull ? 'Leave full screen' : 'Full screen the game only'}
           >
@@ -756,7 +811,13 @@ export default function SandboxWorkspace() {
             </pre>
           </>
         ) : (
-          <MoshionPreview code={code} runKey={runKey} gameKey="sandbox" />
+          <MoshionPreview
+            code={code}
+            runKey={waitingForAssets ? 0 : runKey}
+            gameKey="sandbox"
+            assets={assetsRoom && sessionAssets?.run === runKey ? sessionAssets.list : undefined}
+            assetsOwnWins
+          />
         )}
     </>
   );
@@ -768,26 +829,26 @@ export default function SandboxWorkspace() {
         className={
           'sandbox-shell'
           + (full ? ' is-full' : '')
+          + (full && hideEditor ? ' hide-editor' : '')
+          + (full && hideConsole ? ' hide-console' : '')
         }
         ref={shellRef}
       >
-        {!reshapeIsBuild && (
-          <div className="sandbox-header">
+        <div className="sandbox-header">
             <h1 className="sandbox-title">Sandbox</h1>
             <span className="sandbox-subtitle">{mode.blurb}</span>
-          </div>
-        )}
+        </div>
 
         {lessonProgress.authed && <TwoVersionsNotice lessonId={lesson.id} status={upload} />}
-        {!isReshape && (
-          <div className="run-toolbar sandbox-toolbar">
+        <div className="run-toolbar sandbox-toolbar">
             <SandboxProjectPicker
               state={projectsState}
               locked={together}
               lockedTitle="Leave Code together to switch projects"
               startOpen={noProjects}
+              beforeChange={beforeLeave}
             />
-            {!isFlow && !noProjects && <button className="btn-run" onClick={run} title="Run (Ctrl+Enter)" aria-keyshortcuts="Control+Enter">▶ Run</button>}
+            {!isFlow && !isReshape && !noProjects && <button className="btn-run" onClick={run} title="Run (Ctrl+Enter)" aria-keyshortcuts="Control+Enter">▶ Run</button>}
             {isRunning && !isFlow && (
               <button
                 className="btn-secondary btn-sm"
@@ -801,7 +862,12 @@ export default function SandboxWorkspace() {
                 view, then sharing with classmates (Code together, Publish game) at the far right. */}
             {!noProjects && <div className="sandbox-tb-end">
               <div className="sandbox-tb-group sandbox-tb-program" role="group" aria-label="This program">
+                {isReshape&&cadAuthor&&!commandsCad&&<label style={{display:"flex",alignItems:"center",gap:6,fontSize:12}}><input type="checkbox" checked={authorTools} onChange={e=>setAuthorTools(e.target.checked)}/> Drawing tools</label>}
                 {renderCloudChips()}
+                {/* Paste a p5play program, an AI rebuilds it as a NEW moSHion project (functions/api/p5play-convert.ts). */}
+                {mode.preview === 'moshion' && lessonProgress.authed && !together && (
+                  <P5playConvertButton key={`p5play-${lesson.id}`} chipStyle={chipStyle} getCode={getScript} />
+                )}
                 <button
                   style={together ? { ...chipStyle, opacity: 0.45, cursor: 'not-allowed' } : chipStyle}
                   onClick={reset}
@@ -822,6 +888,40 @@ export default function SandboxWorkspace() {
                     {full ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
                     {full ? 'Exit full screen' : 'Full screen'}
                   </button>
+                  {/* In full screen the game's corner button does this, and the row needs the room for the toggles. */}
+                  {!full && !isConsole && gameFullOk && (
+                    <button
+                      style={chipStyle}
+                      onClick={() => { if (runKey === 0) run(); toggleGameFull(); }}
+                      title="Fill the screen with just the game (Esc to leave)"
+                      data-testid="sandbox-game-only"
+                    >
+                      <Maximize2 size={12} />
+                      Game only
+                    </button>
+                  )}
+                  {full && (
+                    <button
+                      style={{ ...chipStyle, padding: '6px 8px' }}
+                      onClick={() => { setHideEditor((h) => !h); relayoutSoon(); }}
+                      title={hideEditor ? 'Show the code editor' : 'Hide the code editor (the preview gets its room)'}
+                      aria-label={hideEditor ? 'Show editor' : 'Hide editor'}
+                      data-testid="sandbox-hide-editor"
+                    >
+                      {hideEditor ? <PanelLeftOpen size={14} aria-hidden="true" /> : <PanelLeftClose size={14} aria-hidden="true" />}
+                    </button>
+                  )}
+                  {full && !isConsole && (
+                    <button
+                      style={{ ...chipStyle, padding: '6px 8px' }}
+                      onClick={() => { setHideConsole((h) => !h); relayoutSoon(); }}
+                      title={hideConsole ? 'Show the console' : 'Hide the console (it keeps what the program prints)'}
+                      aria-label={hideConsole ? 'Show console' : 'Hide console'}
+                      data-testid="sandbox-hide-console"
+                    >
+                      {hideConsole ? <PanelBottomOpen size={14} aria-hidden="true" /> : <PanelBottomClose size={14} aria-hidden="true" />}
+                    </button>
+                  )}
                 </div>
               )}
               {((togetherLang && (mayTogether || together)) || (mode.preview === 'moshion' && lessonProgress.authed)) && (
@@ -843,49 +943,25 @@ export default function SandboxWorkspace() {
                       <span ref={setTogetherBadge} style={{ display: 'inline-flex' }} />
                     </button>
                   )}
-                  {((togetherLang && (mayTogether || together)) || (mode.preview === 'moshion' && lessonProgress.authed)) && (
-                  <ShareMenu chipStyle={chipStyle}>
-                  {!together && togetherLang && mayTogether && (
-                    <button
-                      type="button"
-                      style={chipStyle}
-                      aria-haspopup="dialog"
-                      aria-expanded={togetherOpen}
-                      onClick={() => setTogetherOpen(true)}
-                      title="Write one program with classmates at the same time"
-                      data-testid="code-together-button"
-                      data-share-close=""
-                    >
-                      <Users size={12} aria-hidden="true" />
-                      Code together
-                    </button>
-                  )}
-                  {/* Send a copy, or an invitation to this Code together session, in a message (migration 0054). */}
-                  {togetherLang && (mayTogether || together) && (
-                    <SendProgramButton
-                      key={`send-${lesson.id}`}
-                      lang={togetherLang}
+                  {shareTabs.length > 0 && (
+                    <ShareDialog
                       chipStyle={chipStyle}
-                      getCode={getScript}
-                      title={project?.name ?? ''}
-                      session={together ? togetherCode : null}
+                      open={shareOpen}
+                      onOpenChange={setShareOpen}
+                      tab={shareTab}
+                      onTab={setShareTab}
+                      hostRef={shellRef}
+                      tabs={shareTabs}
                     />
                   )}
-                  {/* The Games library: publish this sketch so classmates can play and remix it. */}
+                  {/* Shown only while the code is a remix of a classmate's game: send the change back (lib/game-flow-core.ts). */}
                   {mode.preview === 'moshion' && lessonProgress.authed && (
-                    <>
-                      <PublishGameButton key={`publish-${lesson.id}`} getCode={getScript} />
-                      {/* Shown only while the code is a remix of a classmate's game: send the change back (lib/game-flow-core.ts). */}
-                      <ProposeChangeButton key={`propose-${lesson.id}`} getCode={getScript} />
-                    </>
-                  )}
-                  </ShareMenu>
+                    <ProposeChangeButton key={`propose-${lesson.id}`} getCode={getScript} />
                   )}
                 </div>
               )}
             </div>}
-          </div>
-        )}
+        </div>
 
         {noProjects && (
           <div className="sandbox-empty" role="status">
@@ -898,27 +974,32 @@ export default function SandboxWorkspace() {
           {!noProjects && (
             <CodeWorkspace
               fill={full}
-              consoleResetKey={!isConsole && !reshapeIsBuild && !isFlow ? String(consoleResetKey) : undefined}
+              consoleResetKey={!isConsole && !isReshape && !isFlow ? String(consoleResetKey) : undefined}
+              style={isReshape ? { '--workspace-height': '800px' } as React.CSSProperties : undefined}
             >
               <EditorPreviewSplit className="sandbox-split" previewRef={gamePaneRef} editor={editorSlot} preview={previewSlot}>
-                {isReshape ? (
-                  <ReshapeStudio
-                    key={`${lesson.id}-${reshapeResetKey}`}
-                    value={fileContents['script.js'] ?? ''}
-                    onChange={(t) => updateFile('script.js', t)}
-                    sides={reshapeSides}
-                    startSide={build ? 'build' : 'code'}
-                    onSideChange={setReshapeSide}
-                    toolbarExtra={reshapeToolbarExtra}
-                    // The sandbox's `value` on a fresh session is RESHAPE_STARTER
-                    // (a Code-side teaching example, box+hole already in it), not
-                    // saved progress -- auto-adopting it into Build pre-built a
-                    // model before the student touched a tool. See this prop's
-                    // own doc comment.
-                    autoRunOnMount={false}
-                    lessonId="sandbox"
+                {isReshape ? activeLessonId===lesson.id ? isCodeCadProject(fileContents) ? (
+                  // A project whose code is SolidCraft commands: the SolidCraft web app beside its files.
+                  <SolidCraftCodeStudio
+                    key={`${lesson.id}-${reshapeResetKey}`} lessonId={lesson.id} files={fileContents}
+                    toolsAllowed={(cadAuthor||!cadPolicyError&&cadPolicyLoaded)&&cad.toolsAllowed} policyLoaded={cadAuthor||cadPolicyLoaded} policyReason={cadReason}
+                    onFileChange={(path,text)=>{if(useLessonStore.getState().lesson?.id===lesson.id)updateFile(path,text);}}
+                    onFileRemove={path=>{if(useLessonStore.getState().lesson?.id===lesson.id)useLessonStore.getState().removeFile(path);}}
+                    onFileRename={(from,to)=>{if(useLessonStore.getState().lesson?.id===lesson.id)useLessonStore.getState().moveFile(from,to);}}
+                    onSelectSource={selectFile}
+                    onBeforeBuild={label=>keepInHistory(lesson.id,useLessonStore.getState().fileContents,label??'Before changing the CAD files')}
                   />
-                ) : isFlow && chart ? (
+                ) : (
+                  <SolidCraftProject
+                    key={`${lesson.id}-${reshapeResetKey}`} lessonId={lesson.id} files={fileContents}
+                    toolsAllowed={(cadAuthor||!cadPolicyError&&cadPolicyLoaded)&&cad.toolsAllowed} policyLoaded={cadAuthor||cadPolicyLoaded} policyReason={cadReason}
+                    onFileChange={(path,text)=>{if(useLessonStore.getState().lesson?.id===lesson.id)updateFile(path,text);}}
+                    onBeforeChange={beforeLeave}
+                    onBeforeBuild={label=>keepInHistory(lesson.id,useLessonStore.getState().fileContents,label??'Before running the 2D script')}
+                    onBeforeLink={()=>keepInHistory(lesson.id,useLessonStore.getState().fileContents,'Before changing sketch and 3D steps')}
+                    onSelectSource={selectFile} onFlushReady={flush=>{cadFlush.current=flush;}} onPersistReady={saved=>{cadSaved.current=saved;}} onSave={()=>void saveToCloud()}
+                  />
+                ) : <p role="status">Opening your CAD project…</p> : isFlow && chart ? (
                   <div className="sandbox-flow" ref={flowFrameRef}>
                     <DiagramEditor key={lesson.id} value={chart} onChange={onChartChange} height={flowH} />
                   </div>
@@ -991,6 +1072,11 @@ export default function SandboxWorkspace() {
         .sandbox-shell.is-full .sandbox-tb-end,
         .sandbox-shell.is-full .sandbox-tb-group { flex-wrap: nowrap; }
         .sandbox-shell.is-full .sandbox-toolbar { overflow-x: auto; }
+        /* Hide editor / Hide console (#119): the panes are only hidden, never unmounted, so the code, the
+           running game and what the console has collected all stay. */
+        .sandbox-shell.hide-editor #editorPane, .sandbox-shell.hide-editor #divider { display: none !important; }
+        .sandbox-shell.hide-editor #previewPane { flex: 1 1 100% !important; }
+        .sandbox-shell.hide-console .wsc { display: none !important; }
 
         /* The game's own full screen button: a small square in the game's top-right corner. Quiet until
            the pointer or keyboard is on the game, so it never sits over the picture while playing. */
@@ -1014,57 +1100,11 @@ export default function SandboxWorkspace() {
         onClose={() => setHistoryOpen(false)}
         lessonId={lesson.id}
         saveToAccount={lessonProgress.authed}
-        // ReshapeStudio only reads `value` at mount, so a restored version
-        // needs a fresh instance to put the old model back on screen. Code
-        // and chart modes resync from `fileContents` on their own.
+        // Reopen the restored CAD view and native sketch from the saved files.
         onRestore={() => {
           if (mode.preview === 'reshape') setReshapeResetKey((k) => k + 1);
         }}
       />
     </>
-  );
-}
-
-// The sandbox toolbar's Share button (climb4 r9 S9): one quiet button that opens a small panel with
-// Code together and Publish game, so the row is not packed with sharing controls beside Run.
-// Click outside or Escape closes it; Code together closes it as it opens its own dialog. Publish
-// game's panel opens inside it and the menu stays open while that panel is in use.
-function ShareMenu({ chipStyle, children }: { chipStyle: React.CSSProperties; children: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
-    document.addEventListener('mousedown', onDown);
-    document.addEventListener('keydown', onKey);
-    return () => { document.removeEventListener('mousedown', onDown); document.removeEventListener('keydown', onKey); };
-  }, [open]);
-  return (
-    <div ref={ref} className="sandbox-share-menu">
-      <button
-        type="button"
-        style={chipStyle}
-        className="sandbox-share-trigger"
-        aria-haspopup="true"
-        aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-        title="Code together with classmates, or publish this sketch as a game"
-      >
-        <Share2 size={12} aria-hidden="true" />
-        Share
-        <ChevronDown size={12} aria-hidden="true" />
-      </button>
-      {open && (
-        <div
-          className="sandbox-share-panel"
-          role="group"
-          aria-label="Share with classmates"
-          onClick={(e) => { if ((e.target as HTMLElement).closest('[data-share-close]')) setOpen(false); }}
-        >
-          {children}
-        </div>
-      )}
-    </div>
   );
 }

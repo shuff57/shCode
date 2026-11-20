@@ -3,6 +3,10 @@
   "title": "6.9.7 Reading: sprite.image (single-frame art)",
   "description": "How sprite.image = url displays a still image without any animation cycle. Read before 6.9.9 (Animated Sprites Sandbox).",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.9 Animated Sprites and Camera",

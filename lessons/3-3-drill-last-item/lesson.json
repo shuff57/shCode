@@ -3,6 +3,10 @@
   "title": "3.3.16 Lab: lastItem(items)",
   "description": "Write lastItem(items): read the last item of an array parameter and return it, leaving the array exactly as it was. Practice, not graded: the checks call your function.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",
@@ -169,6 +173,12 @@
         "description": "lastItem(items) gives back the last item of the array, and the array you pass in is not changed. Help: 3.3.15 (Arrays and Functions)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "lastItem is defined with one parameter: Code defines a function named lastItem with exactly one parameter. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "lastItem hands back a value with return: lastItem contains a return statement. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

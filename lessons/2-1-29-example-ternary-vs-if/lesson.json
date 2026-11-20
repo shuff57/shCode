@@ -2,6 +2,10 @@
   "id": "2-1-29-example-ternary-vs-if",
   "title": "2.1.27 Worked Example: Rewriting a Misused Ternary",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.1 Conditionals",

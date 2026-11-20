@@ -3,6 +3,10 @@
   "title": "1.1.18 Same Framework, Different Weight",
   "description": "Five multiple-choice questions on the four Ps and why two teams elaborate the same framework differently. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.1 Software Lifecycle",

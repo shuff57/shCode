@@ -124,12 +124,19 @@ function simplify(v) {
 
 // ---- sandbox --------------------------------------------------------------
 
-export function createSandbox({ width = 800, height = 600 } = {}) {
+// `timedTimers`: a setTimeout with a delay waits for the fake clock instead of
+// firing on the next drain, and clearTimeout works. Off by default, so every
+// existing sketch runs exactly as it always has; runSketchAsync() turns it on
+// for a sketch with preload(), whose loading note (300 ms) and Start anyway
+// (10 s) must not fire the instant they are set.
+export function createSandbox({ width = 800, height = 600, timedTimers = false } = {}) {
   const ops = [];
   const consoleLines = [];
   const errors = [];
   const rafQueue = [];
   const timers = [];
+  const later = []; // timedTimers only: { id, due, fn }
+  let timerId = 0;
   const listeners = new Map(); // target-key -> {type -> [fn]}
   let clock = 0;
 
@@ -313,8 +320,22 @@ export function createSandbox({ width = 800, height = 600 } = {}) {
     Date: Object.assign(function Date_() { return new global.Date(0); }, { now: () => clock, prototype: global.Date.prototype }),
     requestAnimationFrame: (fn) => { rafQueue.push(fn); return rafQueue.length; },
     cancelAnimationFrame: () => {},
-    setTimeout: (fn, _ms) => { timers.push(fn); return timers.length; },
-    clearTimeout: () => {},
+    setTimeout: timedTimers
+      ? (fn, ms) => {
+        const id = ++timerId;
+        if (ms > 0) later.push({ id, due: clock + ms, fn });
+        else { const t = () => fn(); t.__id = id; timers.push(t); }
+        return id;
+      }
+      : (fn, _ms) => { timers.push(fn); return timers.length; },
+    clearTimeout: timedTimers
+      ? (id) => {
+        const i = later.findIndex((t) => t.id === id);
+        if (i >= 0) later.splice(i, 1);
+        const j = timers.findIndex((t) => t.__id === id);
+        if (j >= 0) timers.splice(j, 1);
+      }
+      : () => {},
     setInterval: () => 0,
     clearInterval: () => {},
     localStorage: {
@@ -371,6 +392,9 @@ export function createSandbox({ width = 800, height = 600 } = {}) {
     const cb = rafQueue.shift();
     if (!cb) return false;
     clock += FRAME_MS;
+    for (let i = later.length - 1; i >= 0; i--) {
+      if (later[i].due <= clock) timers.push(later.splice(i, 1)[0].fn);
+    }
     try { cb(clock); } catch (e) { errors.push(e); return false; }
     drainTimers();
     return true;
@@ -392,14 +416,19 @@ export function createSandbox({ width = 800, height = 600 } = {}) {
     keyDown: (k) => dispatch('window', 'keydown', { key: k, preventDefault() {} }),
     keyUp: (k) => dispatch('window', 'keyup', { key: k, preventDefault() {} }),
     mouseMove: (x, y) => dispatch('canvas', 'mousemove', { clientX: x, clientY: y }),
-    mouseDown: () => dispatch('canvas', 'mousedown', {}),
-    mouseUp: () => dispatch('window', 'mouseup', {}),
+    // button: 0 left (the default), 1 center, 2 right, as MouseEvent.button.
+    mouseDown: (button = 0) => dispatch('canvas', 'mousedown', { button }),
+    mouseUp: (button = 0) => dispatch('window', 'mouseup', { button }),
+    // The browser's right-click menu event on the canvas; answers whether the
+    // engine stopped the menu (preventDefault).
+    contextMenu: () => { let stopped = false; dispatch('canvas', 'contextmenu', { button: 2, preventDefault() { stopped = true; } }); return stopped; },
     // Focus leaves the sketch (a click on the editor, Alt-Tab): no keyup/mouseup follows.
     blur: () => dispatch('window', 'blur', {}),
   };
 
   return {
     sandbox, ops, consoleLines, errors, input, audioLog, pump, step, drainTimers,
+    get started() { return rafQueue.length > 0; },
     get canvas() { return createdCanvas; },
     get frames() { return Math.round(clock / FRAME_MS); },
     run(code, filename = 'sketch.js') {
@@ -449,28 +478,31 @@ export function runSketch(code, { frames = 60, filename = 'sketch.js', beforeFra
 }
 
 /**
- * runSketch for a sketch with preload(): the engine waits for its files with
- * promises, which only settle between turns of the event loop, so this lets
- * the loop turn `turns` times (the fake files all answer at once) before it
- * runs the frames. Same result shape as runSketch.
+ * runSketch() for a sketch with preload(): the engine waits on promises before
+ * setup(), and a promise only settles once this synchronous harness yields.
+ * Yields (microtasks and the fake fetch/decode) until setup() has run, at most
+ * 50 times, then pumps frames exactly like runSketch(). The fake clock does not
+ * move while it waits, so the loading note and Start anyway never fire.
  */
-export async function runSketchAsync(code, { frames = 60, filename = 'sketch.js', turns = 20 } = {}) {
+export async function runSketchAsync(code, { frames = 60, filename = 'sketch.js', beforeFrames } = {}) {
   let box;
   try {
-    box = createSandbox();
+    box = createSandbox({ timedTimers: true });
   } catch (e) {
     return { ok: false, phase: 'boot', error: e, ops: [], console: [], frames: 0 };
   }
   const loaded = box.run(code, filename);
-  // A fixed number of turns, not "until there is a canvas": the engine makes
-  // canvases of its own (decoding a picture) before setup() ever runs.
-  for (let i = 0; loaded && !box.errors.length && i < turns; i++) {
+  for (let i = 0; loaded && !box.errors.length && !box.started && i < 50; i++) {
     await new Promise((r) => setImmediate(r));
     box.drainTimers();
   }
-  if (!loaded || box.errors.length) {
-    return { ok: false, phase: 'setup', error: box.errors[0], ops: box.ops, console: box.consoleLines, frames: 0, box };
+  if (!loaded || box.errors.length || !box.started) {
+    return {
+      ok: false, phase: box.started ? 'setup' : 'preload', error: box.errors[0] || new Error('setup() never ran after preload()'),
+      ops: box.ops, console: box.consoleLines, frames: 0, box,
+    };
   }
+  if (typeof beforeFrames === 'function') beforeFrames(box);
   const ran = box.pump(frames);
   return {
     ok: box.errors.length === 0,
@@ -482,5 +514,8 @@ export async function runSketchAsync(code, { frames = 60, filename = 'sketch.js'
     box,
   };
 }
+
+/** True when a sketch defines preload() and so must go through runSketchAsync(). */
+export function usesPreload(code) { return /\bfunction\s+preload\s*\(/.test(String(code)); }
 
 export { FRAME_MS };

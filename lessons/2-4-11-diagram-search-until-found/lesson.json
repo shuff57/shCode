@@ -3,6 +3,10 @@
   "title": "2.4.11 Plain English to Pseudocode: Search Until Found",
   "description": "Turn plain-English steps into pseudocode for a search that has no limit of its own: the question inside the loop is the only way out, and the early exit is its own step.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.4 Loop Control and Nested Loops",
@@ -170,6 +174,18 @@
         "description": "When the check says no, current goes up by 1 and the check happens again.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "current starts at 20: Set current to 20 before the loop.",
+        "r3": "A loop with no limit of its own: The steps repeat (forever / until found) rather than checking a counter.",
+        "r4": "The question: is current a multiple of 7?: Check whether the remainder of current divided by 7 is 0.",
+        "r5": "Found is printed in the yes branch: Found: and the number are printed after the check says yes.",
+        "r6": "The early exit is its own step: Right after the print, a step leaves the loop at once (break / stop / exit).",
+        "r7": "No means add 1 and try again: When the check says no, current goes up by 1 and the check happens again."
+      },
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: let current = 20; while (true) { if (current % 7 === 0) { console.log(\"Found: \" + current); break; } current++; }. It prints Found: 21. The point is that the loop has no condition of its own: the only way out is the if inside the body. The yes branch prints Found and then BREAKS (leaves the loop). The no path adds 1 to current and goes round again. Without the break the loop would never end. Writing the add 1 inside an ELSE or after the END IF is equally fine, as long as it only matters when the number was not found."
+    }
   }
 }

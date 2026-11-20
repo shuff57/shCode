@@ -3,6 +3,10 @@
   "title": "3.5.15 Lab: Add a Method to an Object",
   "description": "Give an object a method, call it, and print its return value. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.5.5",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -205,6 +209,14 @@
         "description": "A console.log that runs prints what a method of student returned, with no undefined and no blank line. A built-in such as toString, a call whose result is thrown away, and a print that never runs do not count. Help: 3.5.13 (Methods)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "method defined on the object: A property is assigned a function. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "method called and its result printed: A method you defined on student is called, such as student.greet(), inside a console.log that runs, or its result is stored in a variable that is then printed. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "return used: The method hands a value back. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "result printed: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

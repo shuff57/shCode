@@ -28,14 +28,22 @@ export interface SendProgramButtonProps {
   title: string;
   /** The Code together session this tab is in, or null. */
   session: string | null;
+  /** A tab of the sandbox's Share dialog (components/ShareDialog.tsx): no button, no popup chrome of its own. */
+  embedded?: boolean;
+  /** Embedded: the tab is showing (the people are loaded only then). */
+  active?: boolean;
+  /** Embedded: what Close does. */
+  onClose?: () => void;
 }
 
 const field: React.CSSProperties = {
   fontSize: 13, padding: '4px 6px', borderRadius: 4, background: 'var(--c-deep)', color: 'var(--c-fg)', border: '1px solid var(--c-line)',
 };
 
-export default function SendProgramButton({ lang, chipStyle, getCode, title, session }: SendProgramButtonProps) {
-  const [open, setOpen] = useState(false);
+export default function SendProgramButton({ lang, chipStyle, getCode, title, session, embedded = false, active = false, onClose }: SendProgramButtonProps) {
+  const [openOwn, setOpenOwn] = useState(false);
+  const open = embedded ? active : openOwn;
+  const setOpen = (v: boolean) => { if (embedded) { if (!v) onClose?.(); } else setOpenOwn(v); };
   const [classes, setClasses] = useState<PeopleClass[] | null>(null);
   // Groups and channels (migration 0055) are places to send to as well; an invitation goes to people only.
   const [places, setPlaces] = useState<ThreadSummary[]>([]);
@@ -99,21 +107,25 @@ export default function SendProgramButton({ lang, chipStyle, getCode, title, ses
   };
 
   return (
-    <div style={{ position: 'relative', display: 'inline-flex' }}>
+    <div style={embedded ? undefined : { position: 'relative', display: 'inline-flex' }}>
+      {!embedded && (
       <button type="button" style={chipStyle} aria-expanded={open} aria-haspopup="dialog" data-testid="send-program"
         title="Send this program to a classmate or your teacher in a message"
-        onClick={() => { setOpen((o) => !o); setSent(null); setError(null); }}>
+        onClick={() => { setOpenOwn((o) => !o); setSent(null); setError(null); }}>
         <Send size={12} aria-hidden="true" />
         Send to…
       </button>
+      )}
       {open && (
-        <div role="dialog" aria-label="Send this program" data-testid="send-program-panel"
-          style={{
-            position: 'absolute', top: 'calc(100% + 6px)', right: 0, zIndex: 50, width: 'min(360px, calc(100vw - 32px))',
-            background: 'var(--c-deep2)', border: '1px solid var(--c-line)', borderRadius: 6, padding: 12,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.35)', color: 'var(--c-fg)', fontSize: 13, lineHeight: 1.5,
-            display: 'flex', flexDirection: 'column', gap: 8,
-          }}>
+        <div role={embedded ? 'group' : 'dialog'} aria-label="Send this program" data-testid="send-program-panel"
+          style={embedded
+            ? { color: 'var(--c-fg)', fontSize: 13, lineHeight: 1.5, display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 560 }
+            : {
+              position: 'absolute', top: 'calc(100% + 6px)', right: 0, zIndex: 50, width: 'min(360px, calc(100vw - 32px))',
+              background: 'var(--c-deep2)', border: '1px solid var(--c-line)', borderRadius: 6, padding: 12,
+              boxShadow: '0 8px 24px rgba(0,0,0,0.35)', color: 'var(--c-fg)', fontSize: 13, lineHeight: 1.5,
+              display: 'flex', flexDirection: 'column', gap: 8,
+            }}>
           <h2 style={{ fontSize: 14, margin: 0 }}>Send this program</h2>
           {loadError && <p role="alert" style={{ margin: 0, color: 'var(--c-red)' }}>{loadError}</p>}
           {!classes && !loadError && <p style={{ margin: 0, color: 'var(--c-dim)' }}>Loading…</p>}

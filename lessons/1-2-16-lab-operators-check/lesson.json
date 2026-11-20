@@ -3,6 +3,10 @@
   "title": "1.2.16 Operators and Expressions Check",
   "description": "Practice arithmetic, string concatenation, and comparison operators.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",
@@ -37,7 +41,7 @@
     {
       "id": "req1",
       "title": "Use addition",
-      "description": "Use the + operator with numbers. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
+      "description": "Create two number variables and add them together with +. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
       "type": "regex",
       "file": "script.js",
       "pattern": "(?=[\\s\\S]*(?:let|const|var)\\s+[\\w$]+\\s*=\\s*-?[\\d.]+(?:[\\s\\S]*?(?:,\\s*[\\w$]+\\s*=|(?:let|const|var)\\s+[\\w$]+\\s*=)\\s*-?[\\d.]+))[\\s\\S]*\\w+\\s*\\+\\s*\\w+",
@@ -99,7 +103,7 @@
       {
         "id": "req1",
         "title": "Use addition",
-        "description": "Use the + operator with numbers. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
+        "description": "Create two number variables and add them together with +. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
         "points": 1
       },
       {
@@ -126,6 +130,15 @@
         "description": "Use console.log to display results. Help: 1.2.7 (Arithmetic Operators and Type Coercion)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "req1": "Are two variables that were set to numbers added together with + somewhere in the code, whatever the variables are called? For example num1 + num2, str1 + str2 where str1 = 11, or `${a + b}`. Adding two plain numbers like 5 + 2 does not count.",
+        "req2": "Use multiplication: Use the * operator. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req3": "String concatenation: Concatenate strings using +, either inline literals or two previously-declared string variables. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req4": "Comparison operator: Use a comparison operator like ===, !==, <, >. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "req5": "Log results: Use console.log to display results. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   }
 }

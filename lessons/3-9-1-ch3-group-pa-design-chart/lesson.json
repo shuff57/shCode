@@ -3,6 +3,10 @@
   "title": "3.9.1 Group PA Part 1: Find and Fix the Plan",
   "description": "Pick one of four problems with your partner, then repair the plan: it is already written, and four lines in it are wrong — the wrong function for a job, calls missing something they need, and a report in the wrong place. The build lesson does not open until this one is done.",
   "type": "assignment",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.9 Chapter 3 Group Performance Assessment",

@@ -3,6 +3,10 @@
   "title": "7.11.3 Lab: Sound effects",
   "description": "The game gets sound. Load a sound once in setup(), then play it from inside methods you already wrote: a zap from the Bullet constructor for every shot, and a boom from takeHit() for every enemy a shot finishes. A mute key is optional.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.11 Defender C: playtest and check",
@@ -116,7 +120,14 @@
         "description": "A sound's .play() runs on the hit that finishes an enemy: in Enemy's takeHit() under an if that asks !this.isAlive() or this.hp <= 0 (or after an early return while the enemy is still alive), or in hitEnemies() inside the if that sees the enemy is no longer alive. A .play() inside isAlive() is not met: isAlive() is asked many times a frame. A .play() on every hit with no check is partial: it also plays on hits that do not finish the enemy.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Sounds are loaded once, in setup(): setup() loads a sound into a variable with loadSound('coin') or loadSound('music') (the full path '/moshion/assets/coin.wav' counts too), so it is ready before the game needs it. Any variable name works. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A shot makes a sound: A sound's .play() runs once for every shot: in Bullet's constructor, or right beside new Bullet(...) in fire(). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A finished enemy makes a sound: A sound's .play() runs when a shot finishes an enemy: in Enemy's takeHit(), or under an if that asks the enemy isAlive() or about its hp. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "carryFrom": "5-11-defender-6-lab-a-spawner-for-the-waves"
 }

@@ -3,6 +3,10 @@
   "title": "6.29.3 Lab: Jumps, and jumping again",
   "description": "moveKind learns a second answer, jump; doMove takes the jumped piece; and a piece that can jump again keeps the turn until it cannot.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.29 Checkers: jumps",
@@ -138,7 +142,16 @@
         "description": "A piece that can jump again keeps the turn.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Two squares diagonally: A jump is two rows and two columns away, tested with abs or another way. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The middle square is the other colour: The halfway square must hold a piece of the other colour. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The jumped piece is taken: After a jump, the halfway square is emptied. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "A chain keeps the turn: After a jump, a piece that can jump again keeps the turn instead of passing it. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Lab: Jumps, and jumping again\". The task: teach moveKind a second answer: 'jump' for two squares diagonally over a piece of the other colour (found halfway between the ends) onto an empty square; doMove asks moveKind before moving and empties the halfway square on a jump; after a jump, if the piece can jump again (canJumpFrom), the same player keeps the turn with that piece only and only a jump (chain), and otherwise the turn passes. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   },
   "carryFrom": "6-28-checkers-3-lab-pick-a-piece-and-step"
 }

@@ -3,6 +3,10 @@
   "title": "5.2.5 Lab: A beat and a one-shot",
   "description": "Blink a lamp every 30 frames, show a message once at frame 300, and repair a halfway check that sits inside another condition and never runs.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",
@@ -142,6 +146,15 @@
         "description": "The frameCount === 70 test that logs 'Almost!' still exists and stands on its own: not inside if (on), not joined to on with && or ||, and not inside the beat's block or any other if, so it really runs on frame 70. Deleting the check is not a fix. The starter's version, wrapped in if (on), is not met yet. Help: 5.2.2 (Reading: Random numbers and timers)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A repeating beat: The code tests frameCount % N === 0 to act every N frames. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The beat flips the lamp: Inside the beat, on is flipped to the opposite: with on = !on, a ternary, or an if/else that sets it to false when it is true and to true when it is false. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A one-shot at frame 300: The code tests frameCount === 300, which is true on one frame only. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "The one-shot sets the message: When frame 300 arrives, message is set to the words. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "The frame 70 check is not inside another condition: The frameCount === 70 test stands on its own, not wrapped in if (on) or joined to it with &&. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

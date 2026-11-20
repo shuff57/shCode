@@ -208,7 +208,7 @@ export default function AiHelpPanel({ lesson }: Props) {
         </div>
       ) : (
         <div style={{ color: 'var(--c-comment)', fontSize: 12.5, fontStyle: 'italic' }}>
-          No runtime errors yet. Ask CODY anything below — it sees your current code and the moSHion docs.
+          No runtime errors yet. Ask CODY a question about the code you’re working on.
         </div>
       )}
 

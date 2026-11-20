@@ -3,6 +3,10 @@
   "title": "6.10.3 Reading: storeItem: Save Game Data",
   "description": "How storeItem(key, value) writes a value into the browser's save slot so it survives page reloads. Your game can remember things between sessions.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.10 Save and Load",

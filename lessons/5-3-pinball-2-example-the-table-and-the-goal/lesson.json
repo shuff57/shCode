@@ -3,6 +3,10 @@
   "title": "5.3.5 Worked Example: The table and the goal",
   "description": "Names the table's sprites, adds a gold goal bar on the ball's path, then shows the score that jumps by 33 when the ball rolls across it once — deliberately, because 5.4.1 explains why.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.3 Pinball: the table",

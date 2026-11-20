@@ -51,6 +51,8 @@ interface LessonState {
   resetLesson: (lesson: Lesson, opts?: { discard?: boolean }) => boolean;
   selectFile: (path: string) => void;
   updateFile: (path: string, value: string) => void;
+  /** Drop a file from the open workspace (a project's file list). Saving afterwards stores the workspace without it. */
+  removeFile: (path: string) => void;
   moveFile: (from: string, to: string) => void;
   setSidebarOpen: (open: boolean) => void;
   setActiveTab: (tab: 'Files' | 'Grading') => void;
@@ -220,6 +222,15 @@ export const useLessonStore = create<LessonState>((set, get) => ({
       }
     }
   },
+
+  removeFile: (path) =>
+    set((state) => {
+      if (!(path in state.fileContents)) return {};
+      const contents = { ...state.fileContents };
+      delete contents[path];
+      const currentFile = state.currentFile === path ? (Object.keys(contents)[0] ?? state.currentFile) : state.currentFile;
+      return { fileContents: contents, currentFile };
+    }),
 
   moveFile: (from, to) =>
     set((state) => {

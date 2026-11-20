@@ -3,6 +3,10 @@
   "title": "6.15.8 Lab: A settings screen that remembers",
   "description": "A sound options screen: up and down step the level, M mutes, and both are saved with storeItem when they change and loaded with getItem when the game starts, so the game remembers them.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.15 Sound and Music",

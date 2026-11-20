@@ -3,6 +3,10 @@
   "title": "5.8.3 Lab: Nudge the table",
   "description": "Pinball players nudge the table to save a ball. Let a held arrow key push the ball with applyForce, choose the ball's mass so that push is a nudge and not a launch, and switch on debug to see the body moSHion uses for the ball.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.8 Pinball: physics knobs",
@@ -116,7 +120,14 @@
         "description": "A sprite's .debug is set to true (or to a variable that holds true), or a key flips it (for example ball.debug = !ball.debug under kb.presses). Not met: no debug, debug only set to false, or only in a comment. Help: 5.8.1 (Reading: Four knobs: mass, gravityScale, rotationLock, debug)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Is ball.applyForce(...) (or applyForce on any sprite) inside an if on kb.pressing(...) or kb.holding(...)? For example if (kb.pressing('right')) ball.applyForce(5, 0); or if (kb.holding('s')) { ball.applyForce(0, 5) }: both are yes, since pressing and holding both stay true while the key is held. A held key setting a direction that one applyForce(dir, 0) then uses is also yes. Any key, any direction, braces or none, a helper, ||, a ternary. No for a push under kb.presses(...), which is true for one frame only, for an applyForce that ignores the keys, or for a key that changes vel.x instead of applyForce (velocity ignores mass). Code inside comments never runs.",
+        "r2": "The ball's weight is set: A sprite's .mass (or .density) is set to a number or a variable. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The collider outline is on: A sprite's .debug is set to true (or to a variable that holds true), or a key flips it with !. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "carryFrom": "5-3-pinball-polish-3-lab-show-the-worth-pop-the-points"
 }

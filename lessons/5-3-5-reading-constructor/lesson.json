@@ -3,6 +3,10 @@
   "title": "7.1.5 Reading: constructor and its parameters",
   "description": "How the constructor receives arguments from `new` and stores them on `this`. Read right after 7.1.4.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.1 Classes and Instances",

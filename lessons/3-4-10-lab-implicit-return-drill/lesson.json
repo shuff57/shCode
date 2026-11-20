@@ -3,6 +3,10 @@
   "title": "3.4.10 Lab: Implicit-Return Rewrite Drill",
   "description": "Write three one-line arrow functions using implicit return, and call each one. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.4.3",
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -134,6 +138,14 @@
         "description": "At least three values are printed. Help: 3.4.8 (Shorthand Rules)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "At least three arrow functions: Code contains three or more arrow functions. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Implicit return used: Every arrow body is a bare expression: no arrow body starts with a brace. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Do three different variables (const, let or var) each hold an arrow function with at least one parameter, and is each of the three called somewhere, even all inside one template literal? Code inside comments never runs."
+      }
+    }
   }
 }

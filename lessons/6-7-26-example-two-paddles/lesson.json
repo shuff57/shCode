@@ -2,6 +2,10 @@
   "id": "6-7-26-example-two-paddles",
   "title": "6.12.16 Worked Example: Two Paddles, Two Schemes",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.12 Advanced Input",

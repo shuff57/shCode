@@ -3,6 +3,10 @@
   "title": "6.20.1 Lab: Five shots, win or lose",
   "description": "A budget of five stones: win when the wall is down, lose when the stones are gone.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.20 Sling: five shots",
@@ -112,6 +116,14 @@
         "description": "R calls startRound(), which clears the old blocks and shots before it rebuilds.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A shot is spent: The count goes down in the fire branch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Win and lose: Win on no blocks, lose on no shots left and none flying. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "A clean restart: R calls `startRound()`, which clears the old blocks and shots before it rebuilds. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Lab: Five shots, win or lose\". The task: give the player five shots, spend one per launch, win when the blocks are gone, lose when the shots are gone and none are flying, and let R call startRound() so the round starts clean. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. A reset that pushes new blocks without deleting the old ones, or without emptying shots, is not a clean restart. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

@@ -3,6 +3,10 @@
   "title": "3.3.24 Arrays",
   "description": "Work with lists of values: create, add, remove, and iterate.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.3.1",
   "estimateMins": 40,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -345,6 +349,15 @@
         "description": "longFruits(fruits, minLength) returns a new array with only the items whose length is minLength or more, in order, and does not change the array it was given. Help: 3.3.15 (Arrays and Functions)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "req1": "Create array: Declare an array using square brackets. Code inside a comment, or written inside quotes as text, never runs.",
+        "req2": "Use push: Somewhere in code that runs, .push(...) adds an item to an array, like fruits.push(\"date\"). Any array counts, including a new array built inside a function that gets called, like result.push(fruits[i]) in longFruits. It does not have to be the first array the program made. unshift, splice or setting an index are other ways and do not count as push. A function nobody calls never runs. Code inside comments never runs, and code written inside quotes is only text.",
+        "req3": "Use pop: Remove an element using .pop(). Code inside a comment, or written inside quotes as text, never runs.",
+        "req4": "Iterate with a for loop: Loop through the array with a for loop that has something in its body. Code inside a comment, or written inside quotes as text, never runs.",
+        "req5": "Search with a comparison: Inside a loop, compare each item to the one you want with === (or use includes / indexOf) and act on it. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

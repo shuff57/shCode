@@ -3,6 +3,10 @@
   "title": "1.3.19 Document a Messy Program",
   "description": "Twelve lines with no comments, no spacing and terrible names. Fix it to the class style guide and write the README. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 40,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.3 Documentation and Coding Conventions",
@@ -209,6 +213,20 @@
         "description": "README tells the reader about the tax rate they may need to change. Help: 1.3.6 (Human-Readable Names)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Is the tax rate (named taxRate or TAX_RATE) declared with const, not let or var, and given a NUMBER value such as 0.0725? A rate in quotes such as \"high\" or \"0.07\" is text, so it does not count. Code inside comments never runs.",
+        "r2": "bookTitle holds the title: Declares bookTitle with quoted text. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "unitPrice and quantity are named: Declares both unitPrice and quantity. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "subtotal is computed from them: subtotal is unitPrice times quantity. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "orderTotal uses the tax rate: orderTotal is computed from subtotal and taxRate. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r6": "No single-letter variables remain: No declaration of a one-letter variable is left in the file. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r7": "Operators are spaced: No cramped arithmetic like a*b remains: every operator has a space on each side. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r8": "At least four explanatory comments: Four or more comments explaining the code, written as // or /* */. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r9": "README answers all three prompts: Each of the three headings has a real answer under it -- a sentence or a bullet, not an empty heading. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r10": "Does README.md mention tax anywhere in what it tells the reader (for example the tax rate, or that the total includes tax)? Only README.md counts here, not the code. Headings, ## markers and wording do not matter."
+      }
+    }
   }
 }

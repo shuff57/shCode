@@ -3,6 +3,10 @@
   "title": "7.17.2 Sub-build: One object hits another",
   "description": "Press 1: one dummy's hit(other) makes the other take a hit, never below 0, and after(45, ...) lets the other one hit back a moment later.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.17 Quest: trade blows",
@@ -113,6 +117,14 @@
         "description": "The hit back waits with after.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "hp never below 0: takeHit takes the hit off hp with a floor at 0, using max or a test. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "One object hits another: A method is handed the other dummy and makes it take the hit through its own takeHit, and the sketch calls that method. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The hit back comes after a pause: after is given a number of frames and a function to run later. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Sub-build: One object hits another\". The task: give the Dummy class takeHit(n), which lowers hp by n but never below 0, and hit(other), which makes the other dummy take a hit of this one's power through its takeHit; when 1 is pressed and both are alive, left hits right, and after(45, ...) makes right hit back a moment later if it is still alive. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

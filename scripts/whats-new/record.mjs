@@ -32,7 +32,7 @@
 // Never touches the playwright-cli session `mom`: this launches its own browser.
 
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { tmpdir, homedir } from 'node:os';
 import { join, dirname } from 'node:path';
@@ -342,6 +342,39 @@ function draw() {
 }
 `;
 
+// The four main functions, each with its one job made visible: update() moves and jumps,
+// draw() paints the sun and a sign BEHIND the player, drawTop() keeps the score ON TOP.
+const MOSHION_FOUR_FUNCTIONS = `let player, ground;
+let jumps = 0;
+
+function setup() {   // ONCE, at the start
+  new Canvas(400, 260);
+  world.gravity.y = 20;
+  player = new Sprite(60, 200, 40, 40);
+  player.color = 'deepskyblue';
+  ground = new Sprite(200, 250, 400, 20, 'static');
+}
+
+function update() {   // EVERY FRAME: the rules
+  player.vel.x = 0;
+  if (kb.pressing('right')) player.vel.x = 2;
+  if (kb.pressing('left')) player.vel.x = -2;
+  if (kb.presses('space') && player.colliding(ground)) {
+    player.vel.y = -6;
+    jumps++;
+  }
+}
+
+function draw() {   // EVERY FRAME: BEHIND the sprites
+  background('#282a36');
+  text('draw(): behind', 140, 215, 18, '#6272a4');
+}
+
+function drawTop() {   // EVERY FRAME: ON TOP of the sprites
+  text('drawTop(): Jumps ' + jumps, 10, 28, 18, 'white');
+}
+`;
+
 // Messages (migration 0053): one student sends a classmate a message through the API, for the teacher clip.
 async function sendByApi(page, toName, body) {
   return page.evaluate(async ([toName, body]) => {
@@ -358,7 +391,221 @@ async function sendByApi(page, toName, body) {
 // Guests (migration 0059/0062): Sam makes a guest code through the API with what a teacher decides on; Jordan, in no class, uses it.
 const GUEST_DETAILS = { classId: 'dev-class', name: 'Jordan Reyes', relation: 'my cousin', age: 'teen', org: 'Lincoln High School', purpose: 'Build a platformer together after school' };
 
+// #127: left click and right click do different things.
+const MOSHION_RIGHT_CLICK = `// Left click: a green dot. Right click: a red one.
+let dots;
+
+function setup() {
+  new Canvas(400, 300);
+  dots = new Group();
+  dots.collider = 'none';
+}
+
+function update() {
+  if (mouse.presses('left')) new dots.Sprite(mouse.x, mouse.y, 28).color = 'limegreen';
+  if (mouse.presses('right')) new dots.Sprite(mouse.x, mouse.y, 28).color = 'tomato';
+}
+
+function draw() {
+  background('#282a36');
+}
+
+function drawTop() {
+  fill('white');
+  textSize(15);
+  text('Left click: green   Right click: red', 40, 28);
+}
+`;
+
+// #129: a picture name worked out in code, so the publish panel has to find it.
+const MOSHION_ENEMY_ART = `// Each enemy's picture comes from its kind: 'Enemy_' + kind
+let enemies;
+
+function setup() {
+  new Canvas(400, 300);
+  enemies = new Group();
+  enemies.collider = 'none';
+  const kinds = ['Rammer', 'Spinner', 'Rammer'];
+  for (let i = 0; i < kinds.length; i++) {
+    const e = new enemies.Sprite(80 + i * 120, 150, 64, 64);
+    e.texture = 'Enemy_' + kinds[i];
+  }
+}
+
+function update() {
+  for (const e of enemies) e.rotation += 2;
+}
+
+function draw() {
+  background('#282a36');
+}
+`;
+
 const RECIPES = {
+  // From p5play: paste a p5play v3 program, Convert, open the result as a new project and run it.
+  // The answer is a REAL one recorded from the route (p5play-demo-answer.json), replayed so recording needs no key.
+  '2026-11-p5play-convert': {
+    people: [SAM],
+    path: '/sandbox/',
+    storage: { 'shCode:sandbox-mode': 'moshion' },
+    async before({ pages: [p] }) {
+      const answer = JSON.parse(readFileSync(join(ROOT, 'scripts/whats-new/p5play-demo-answer.json'), 'utf8'));
+      delete answer._about;
+      await p.route('**/api/p5play-convert', async (route) => {
+        await new Promise((r) => setTimeout(r, 1400));
+        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(answer) });
+      });
+      await p.getByTestId('p5play-convert-button').waitFor({ timeout: 120000 });
+    },
+    async run({ demos: [d], pages: [p] }) {
+      const input = readFileSync(join(ROOT, 'scripts/whats-new/p5play-demo-input.js'), 'utf8');
+      await d.pause(300);
+      await d.click(p.getByTestId('p5play-convert-button'), { ms: 450, after: 300 });
+      await d.click(p.locator('#p5play-source'), { ms: 400, after: 150 });
+      await p.keyboard.insertText(input);
+      await d.pause(700);
+      await d.click(p.getByRole('button', { name: 'Convert to moSHion' }), { ms: 450, after: 300 });
+      await p.locator('#p5play-result').waitFor({ timeout: 20000 });
+      await d.pause(700);
+      await d.scrollTo(p.getByText('What the AI changed'), 600);
+      await d.pause(1600);
+      await d.click(p.getByRole('button', { name: 'Open as a new project' }), { ms: 450, after: 500 });
+      await p.locator('#p5play-result').waitFor({ state: 'detached', timeout: 20000 });
+      await p.getByRole('button', { name: /Run/ }).first().waitFor({ timeout: 20000 });
+      await d.click(p.getByRole('button', { name: /Run/ }).first(), { ms: 400, after: 200 });
+      const canvas = p.frameLocator('iframe').first().locator('canvas').first();
+      await canvas.waitFor({ timeout: 30000 });
+      const box = await canvas.boundingBox();
+      if (box) {
+        // The converted p5play v3 shooter: the ship turns to the pointer and a click fires (mousePressed()
+        // became mouse.presses() in update()). Rocks start falling after a second.
+        await d.moveTo(box.x + box.width * 0.5, box.y + box.height * 0.35, 450);
+        await d.pause(500);
+        for (const [fx, fy] of [[0.35, 0.15], [0.6, 0.1], [0.72, 0.22]]) {
+          await d.moveTo(box.x + box.width * fx, box.y + box.height * fy, 300);
+          await d.pause(120);
+          await p.mouse.down();
+          await p.mouse.up();
+          await d.pause(350);
+        }
+      }
+      await d.pause(800);
+    },
+  },
+
+  // #127: a game can use the right mouse button (the browser's menu no longer opens over the canvas).
+  '2026-11-right-click': {
+    people: [SAM],
+    path: '/sandbox/',
+    storage: { 'shCode:sandbox-mode': 'moshion' },
+    async before({ demos: [d], pages: [p] }) {
+      await d.setCode(MOSHION_RIGHT_CLICK);
+      await p.getByRole('button', { name: /Run/ }).first().click();
+      await p.frameLocator('iframe').first().locator('canvas').first().waitFor({ timeout: 30000 });
+      await p.locator('.cm-scroller').first().evaluate((el) => {
+        const line = [...el.querySelectorAll('.cm-line')].find((l) => l.textContent.includes('function update()'));
+        el.scrollTop = line ? line.offsetTop - 4 : 0;
+      });
+    },
+    async run({ demos: [d], pages: [p] }) {
+      const box = await p.frameLocator('iframe').first().locator('canvas').first().boundingBox();
+      if (!box) throw new Error('no canvas');
+      const at = (fx, fy) => [box.x + box.width * fx, box.y + box.height * fy];
+      await d.pause(800);
+      const clicks = [[0.25, 0.45, 'left'], [0.45, 0.6, 'right'], [0.62, 0.4, 'left'], [0.78, 0.62, 'right'], [0.35, 0.75, 'right'], [0.7, 0.8, 'left']];
+      for (const [fx, fy, button] of clicks) {
+        await d.moveTo(...at(fx, fy), 450);
+        await d.pause(120);
+        await p.mouse.down({ button });
+        await p.mouse.up({ button });
+        await d.pause(600);
+      }
+      await d.pause(1500);
+    },
+  },
+
+  // #129: a game's pictures go with it. Sam's enemy pictures are named in code ('Enemy_' + kind); the
+  // publish panel finds them and shares them with the class by default, then the game plays with them.
+  '2026-11-game-art-shared': {
+    people: [SAM],
+    path: '/sandbox/',
+    storage: { 'shCode:sandbox-mode': 'moshion' },
+    async before({ demos: [d], pages: [p] }) {
+      // Sam's two pictures, saved to Sam's account (not shared yet).
+      await p.evaluate(async () => {
+        const draw = (paint) => {
+          const c = document.createElement('canvas'); c.width = 32; c.height = 32;
+          const g = c.getContext('2d'); g.imageSmoothingEnabled = false; paint(g); return c.toDataURL('image/png');
+        };
+        const rammer = draw((g) => {
+          g.fillStyle = '#ff5555'; g.fillRect(4, 8, 24, 20);
+          g.fillStyle = '#f8f8f2'; g.fillRect(4, 2, 4, 8); g.fillRect(24, 2, 4, 8);
+          g.fillStyle = '#282a36'; g.fillRect(9, 14, 4, 4); g.fillRect(19, 14, 4, 4); g.fillRect(10, 22, 12, 2);
+        });
+        const spinner = draw((g) => {
+          g.fillStyle = '#8be9fd'; g.fillRect(12, 0, 8, 32); g.fillRect(0, 12, 32, 8);
+          g.fillStyle = '#bd93f9'; g.fillRect(8, 8, 16, 16);
+          g.fillStyle = '#282a36'; g.fillRect(13, 13, 6, 6);
+        });
+        for (const [name, dataUri] of [['Enemy_Rammer', rammer], ['Enemy_Spinner', spinner]]) {
+          await fetch('/api/library', { method: 'PUT', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ kind: 'texture', name, dataUri, meta: null, baseHash: null }) });
+        }
+      });
+      await p.reload({ waitUntil: 'networkidle' });
+      await p.locator('.cm-content').first().waitFor({ timeout: 120000 });
+      await d.setCode(MOSHION_ENEMY_ART);
+      await p.keyboard.press('Control+Home');
+    },
+    async run({ demos: [d], pages: [p] }) {
+      const dialog = p.getByRole('dialog', { name: 'Publish game' });
+      await d.pause(500);
+      // Publish game is a tab of the toolbar's Share dialog.
+      await d.click(p.locator('.sandbox-share-trigger'), { ms: 450, after: 400 });
+      await d.click(p.getByRole('tab', { name: 'Publish game' }), { ms: 400, after: 500 });
+      await d.click(p.locator('#publish-game-title'), { ms: 400, after: 150 });
+      await p.keyboard.press('Control+A');
+      await d.type('Enemy Parade', 45);
+      const alsoArt = dialog.getByRole('checkbox', { name: /Also share them with my class/ });
+      await alsoArt.waitFor({ timeout: 20000 });
+      await d.scrollTo(alsoArt, 600);
+      await d.cursorTo(alsoArt, 500);
+      await d.pause(1800);
+      await d.click(dialog.getByRole('button', { name: /^Publish$/ }), { ms: 450, after: 1200 });
+      const id = await myGameId(p, 'Enemy Parade');
+      await p.goto(new URL(`/play/?game=${id}`, p.url()).href, { waitUntil: 'networkidle' });
+      await d.click(p.getByRole('button', { name: /(^|▶ )(Play|Run)$/ }).first(), { ms: 450, after: 300 });
+      await p.frameLocator('iframe').first().locator('canvas').first().waitFor({ timeout: 30000 });
+      await d.pause(2600);
+    },
+  },
+
+  '2026-11-code-search': {
+    people: [SAM],
+    path: '/sandbox/',
+    storage: { 'shCode:sandbox-mode': 'moshion' },
+    async before({ demos: [d] }) {
+      await d.setCode('function setup() {\n  new Canvas(400, 400);\n}\n\nfunction draw() {\n  background(40, 42, 54);\n  fill(80, 250, 123);\n  circle(mouseX, mouseY, 40);\n  text(mouseX, 20, 30);\n}\n');
+      await d.page.keyboard.press('Control+Home');
+    },
+    async run({ demos: [d], pages: [p] }) {
+      await d.pause(600);
+      await d.page.keyboard.press('Control+f');
+      await p.getByRole('textbox', { name: 'Find in your code' }).waitFor({ timeout: 10000 });
+      await d.pause(500);
+      await d.type('mouseX', 110);
+      await d.pause(900);
+      await d.page.keyboard.press('Enter');
+      await d.pause(700);
+      await d.page.keyboard.press('Enter');
+      await d.pause(900);
+      await d.click(p.getByRole('button', { name: 'Show replace (Ctrl+H)' }), { ms: 450, after: 300 });
+      await d.click(p.getByRole('textbox', { name: 'Replace with' }), { ms: 350, after: 150 });
+      await d.type('pointerX', 90);
+      await d.pause(500);
+      await d.click(p.getByRole('button', { name: 'Replace every match' }), { ms: 450, after: 1800 });
+    },
+  },
   '2026-11-cad-pilot': {
     people: [SAM],
     path: '/sandbox/cad/',
@@ -537,7 +784,7 @@ const RECIPES = {
       await ps.locator('.cm-content').first().waitFor({ timeout: 120000 });
       // The panel open with Alex chosen and a note: the clip is the send and what Alex gets.
       await ps.locator('.sandbox-share-trigger').click();
-      await ps.getByTestId('send-program').click();
+      await ps.getByRole('tab', { name: /Send to/ }).click(); // a tab of the Share dialog
       const to = ps.getByTestId('send-program-to');
       const opt = to.locator('option', { hasText: 'alex' }).first();
       await opt.waitFor({ state: 'attached', timeout: 20000 });
@@ -601,6 +848,47 @@ const RECIPES = {
       await d.pause(2600);
       await hold(p, ['Space'], 120);
       await d.pause(2600);
+    },
+  },
+
+  // The four main functions (the lifecycle docs, 2026-11-17): the player walks in front of
+  // what draw() drew and jumps, and the drawTop() score stays on top.
+  '2026-11-four-functions': {
+    people: [SAM],
+    path: '/sandbox/',
+    storage: { 'shCode:sandbox-mode': 'moshion' },
+    async before({ demos: [d], pages: [p] }) {
+      await d.setCode(MOSHION_FOUR_FUNCTIONS);
+      await p.getByRole('button', { name: /Run/ }).first().click();
+      await p.frameLocator('iframe').first().locator('canvas').first().waitFor({ timeout: 30000 });
+      // scroll so the editor shows update(), draw() and drawTop()
+      await p.locator('.cm-scroller').first().evaluate((el) => {
+        const line = [...el.querySelectorAll('.cm-line')].find((l) => l.textContent.includes('function update()'));
+        el.scrollTop = line ? line.offsetTop - 4 : 0;
+      });
+    },
+    async run({ demos: [d], pages: [p] }) {
+      await d.pause(1500);
+      await focusCanvas(p, d);
+      await d.pause(400);
+      await p.keyboard.down('ArrowRight');   // walk onto the draw() sign: the player covers it
+      await d.pause(1250);
+      await p.keyboard.up('ArrowRight');
+      await d.pause(800);
+      await hold(p, ['Space'], 100);         // jump: the drawTop() count goes up
+      await d.pause(1400);
+      // show draw() and drawTop() in the editor
+      await p.locator('.cm-scroller').first().evaluate((el) => {
+        const line = [...el.querySelectorAll('.cm-line')].find((l) => l.textContent.includes('function draw()'));
+        if (line) el.scrollTo({ top: line.offsetTop - 4, behavior: 'smooth' });
+      });
+      await d.pause(800);
+      await p.keyboard.down('ArrowLeft');
+      await d.pause(500);
+      await hold(p, ['Space'], 100);
+      await d.pause(1000);
+      await p.keyboard.up('ArrowLeft');
+      await d.pause(1800);
     },
   },
 

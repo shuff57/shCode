@@ -3,6 +3,10 @@
   "title": "1.2.1 Slides: Variables and Data Types",
   "description": "Variables and Data Types slides.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",

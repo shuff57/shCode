@@ -3,6 +3,10 @@
   "title": "5.13.3 Worked Example: A block that walks the grid",
   "description": "One block steps right a cell at a time and wraps around the edge. Change the beat and the cell size to see what each one controls.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.13 Snake: grid and steering",

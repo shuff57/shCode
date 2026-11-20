@@ -3,6 +3,10 @@
   "title": "1.2.29 Describe a Real Object",
   "description": "Six variables describing something in the room, printed as a sentence with a template literal. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 30,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",
@@ -157,6 +161,17 @@
         "description": "Logs the type of at least one variable; the typeof may be labelled or stored in a variable first. Help: 1.2.23 (The typeof Operator)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Count the variables declared with let, const or var in the running code. Are there six or more? This card only counts declarations: what the names are and what they describe do not matter here. Code inside a comment never runs.",
+        "r2": "Do two or more variables hold plain numbers (like 15 or 0.25, not text in quotes)? Assigned on the declaration line or later; the names do not matter. Code inside a comment never runs.",
+        "r3": "At least two strings: Two or more variables hold text, in quotes or backticks, assigned on the declaration line or later. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "At least one boolean: A variable holds true or false, either literally or from a comparison, assigned on the declaration line or later. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "Two different string methods used: Uses two different string operations -- .length, .toUpperCase(), .includes(), .trim(), .replace() and others all count. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r6": "Does the program print a backtick string (template literal) with ${...} inside it that embeds a variable, either directly in console.log or through a variable that is printed later? Any other text around it is fine. Code inside a comment never runs.",
+        "r7": "typeof is used to check a type: Logs the type of at least one variable; the typeof may be labelled or stored in a variable first. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   }
 }

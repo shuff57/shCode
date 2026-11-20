@@ -3,6 +3,10 @@
   "title": "6.26.2 Check: the Trail game",
   "description": "Five multiple-choice questions on the snaking path, passing the turn, min, onMove and the waiting flag. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.26 Trail: playtest and extend",

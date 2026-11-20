@@ -3,6 +3,10 @@
   "title": "7.3.18 Lab: Build a wave",
   "description": "Build the spawner yourself: a frameCount timer that sends three enemies only when the field is clear, a hit that goes to the first one, and a filter that reaps the dead. Uses every idea in the module.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.3 Inside a Class",
@@ -124,6 +128,14 @@
         "description": "Every frame the list is rebuilt from the living and stored back into enemies (enemies = enemies.filter(...) with a test that keeps isAlive() or hp above 0, in any shape). A filter whose result is not stored, or whose test keeps the dead, is not met. A loop from the end to the start that splices out each dead enemy also counts; say filter is the shape this lab practises.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A wave only arrives on a timer: The spawn check uses `frameCount` and a modulo, so it is true once every N frames rather than every frame. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A wave only arrives when the field is clear: The spawn check also asks whether the list is empty, so a new group waits for the last one to be cleared. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "New enemies are pushed onto the list: Each arriving enemy is a new instance put into the `enemies` array. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "The dead are filtered out: The list is rebuilt from the living with `filter`, and stored back into `enemies` (a loop from the end that splices out the dead also counts). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

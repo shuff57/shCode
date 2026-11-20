@@ -3,6 +3,10 @@
   "title": "7.2.10 Lab: Cleanup with this.sprite.delete()",
   "description": "Write `Bubble.pop()` which calls `this.sprite.delete()` so the object removes its own sprite on click.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.2 Writing Your Own Classes",
@@ -52,6 +56,11 @@
         "description": "Inside the Bubble class there is a pop() method that calls delete() or remove() on this.sprite, directly or through another method of the class. Partial: it hides the sprite instead, or deletes it through the global b instead of this. Missing: no pop method inside the class, or it never removes the sprite (delete this.sprite is the JavaScript operator, which leaves the sprite on screen). Help: 5.2.21 (Cleanup and Delete)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "pop() calls this.sprite.delete(): Write a `pop()` method inside `Bubble` that calls `this.sprite.delete()` to remove the wrapped sprite. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

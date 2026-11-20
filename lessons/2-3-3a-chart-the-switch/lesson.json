@@ -3,6 +3,10 @@
   "title": "2.3.6 Plain English to Pseudocode: a switch is a chain of questions",
   "description": "Turn plain-English steps into pseudocode for a three-case switch: three questions in a row, a break after each case, and a last line that runs either way.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The Switch Statement",
@@ -170,6 +174,18 @@
         "description": "Done is printed once, after the switch has finished, not inside a case.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "grade starts as B: Set grade to B before the switch.",
+        "r3": "Three questions: A, then B, then C: Each case is its own question, asked in order: is grade A, then B, then C.",
+        "r4": "Each case prints its own message: A prints Excellent, B prints Good, C prints Passing.",
+        "r5": "Each case ends with a break: After each case's print there is a break (or the cases are an ELSE IF chain), so the arrow leaves the switch instead of falling into the next case.",
+        "r6": "The default is the last no: Not a grade I know is printed when none of the cases matched (default / else).",
+        "r7": "Done runs after the switch, every time: Done is printed once, after the switch has finished, not inside a case."
+      },
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program is: let grade = \"B\"; switch (grade) { case \"A\": console.log(\"Excellent\"); break; case \"B\": console.log(\"Good\"); break; case \"C\": console.log(\"Passing\"); break; default: console.log(\"Not a grade I know\"); } console.log(\"Done\"). The point is that a switch is a chain of three questions (A, then B, then C), each case ends with a break so it does not fall into the next one, the default catches everything else, and Done is OUTSIDE the switch so every path reaches it. An IF / ELSE IF / ELSE chain with the same messages is an equally correct way to write the same idea (the ELSE branches then play the part of the breaks)."
+    }
   }
 }

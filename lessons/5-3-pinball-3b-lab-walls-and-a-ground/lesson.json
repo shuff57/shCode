@@ -3,6 +3,10 @@
   "title": "5.3.7 Lab: Walls and a ground",
   "description": "Build two walls and a ground with a gap for the ball to drain through. Your ball from the last lab carries forward.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.3 Pinball: the table",
@@ -81,7 +85,13 @@
         "description": "A static sprite is stored in `ground`, so the code can ask about it later. Help: 5.3.5 (Worked Example: The table and the goal)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Three things stay put: Three or more sprites are built with the static body type, so they do not fall. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The ground has a name: A static sprite is stored in `ground`, so the code can ask about it later. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "carryFrom": "5-3-pinball-3a-lab-drop-a-bouncy-ball"
 }

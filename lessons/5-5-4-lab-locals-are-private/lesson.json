@@ -3,6 +3,10 @@
   "title": "7.3.4 Lab: Share one number between two methods",
   "description": "`add()` declares its own `let step = 3`; `undo()` types the 3 again. A local in one method is invisible to the next, so the two numbers can drift. Put the step on `this` in the constructor and both methods use it.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.3 Inside a Class",
@@ -104,6 +108,13 @@
         "description": "undo() lowers this.points by the SAME stored property that add() uses (this.points -= this.step, or this.points = this.points - this.step), not by a typed 3 or a local of its own, so A then U always lands back where it started.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "The step is stored on this: The constructor stores the step as a property, so both methods can read the same number. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "add() uses this.step: `add()` adds the stored step rather than a local of its own. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "undo() uses the same this.step: `undo()` subtracts the stored step, so the two methods cannot drift apart. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

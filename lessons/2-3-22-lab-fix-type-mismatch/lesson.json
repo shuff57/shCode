@@ -3,6 +3,10 @@
   "title": "2.3.22 Fix the Type Mismatch",
   "description": "This code should print Second place and prints No medal instead. Fix it without changing the case values. Auto-graded.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The Switch Statement",
@@ -100,6 +104,14 @@
         "description": "case 2's body calls console.log, so the fix is visible in the output. Help: 2.3.18 (switch Compares Strictly)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "switched value converted to a number: switch(...) wraps place in Number(...)/parseInt(...)/parseFloat(...), or place is reassigned from one of those before the switch. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "case 1 unchanged: case 1 is still a plain number. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "case 2 unchanged: case 2 is still a plain number. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "case 2 actually prints output: case 2's body calls console.log, so the fix is visible in the output. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

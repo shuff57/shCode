@@ -3,6 +3,10 @@
   "title": "1.7.5 Individual PA Part 5: Write the Steps",
   "description": "Pseudocode for the problem you outlined in Part 4. Plain English arranged like code, one instruction per line, indentation carrying the branches.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.7 Chapter 1 Individual Performance Assessment",

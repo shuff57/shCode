@@ -3,6 +3,10 @@
   "title": "7.16.4 Lab: Two fighters",
   "description": "Fill in the Fighter class's draw(x, y): a body, a name and an hp bar scaled by hp / maxHp. The hero and the goblin are already made; each one draws itself.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.16 Quest: plan and the fighters",
@@ -113,6 +117,14 @@
         "description": "Hero and enemy both appear.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A draw method in the class: The Fighter class has a method that draws the fighter with circle or rect. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "An hp bar scaled by hp / maxHp: The full part of the bar is the whole width times this.hp / this.maxHp. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Both fighters drawn: The hero and the enemy each draw themselves every frame. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Lab: Two fighters\". The task: fill in the Fighter class's draw(x, y) method so a fighter draws itself: a circle in its colour (grey once it is not alive), its name, and an hp bar made of a grey rect 120 wide with a rect on top that is 120 * this.hp / this.maxHp wide; then draw fighters[0] and fighters[1] from draw(). Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

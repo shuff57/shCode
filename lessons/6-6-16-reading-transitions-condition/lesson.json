@@ -3,6 +3,10 @@
   "title": "6.11.17 Reading: moSHion docs: Condition-Driven Transitions",
   "description": "Condition-driven transitions happen automatically when something in the game changes. Score ≥ 100 → 'win', health ≤ 0 → 'gameover'. The game state triggers it.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.11 Game State Machines",

@@ -3,6 +3,10 @@
   "title": "7.5.4 Check: Ship and shots",
   "description": "Six multiple-choice questions on keeping the ship on the canvas, the cooldown, removing shots, overlaps() and the playing gate. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.5 Defender: hits, and a round",

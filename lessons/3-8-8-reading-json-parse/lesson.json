@@ -3,6 +3,10 @@
   "title": "3.8.8 Reading: `JSON.parse` — Text Back to Object",
   "description": "Learn how JSON.parse turns a JSON string back into a real value whose numbers add and whose arrays have a length. Read before the round-trip labs.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.8 Saving and Loading Data",

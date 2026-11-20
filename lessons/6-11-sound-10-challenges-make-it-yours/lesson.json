@@ -3,6 +3,10 @@
   "title": "6.15.10 Challenges: Make it yours",
   "description": "Your Star catch has sound, music and saved options. Add one sound rule of your own: a streak that climbs, a chime that comes from where you caught it, or chords cut from one file. Pick one; add an idea of your own on top if you like.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.15 Sound and Music",

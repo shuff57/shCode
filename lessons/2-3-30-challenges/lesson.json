@@ -3,6 +3,10 @@
   "title": "2.3.31 Challenges: Stretch Problems",
   "description": "Stretch problems. Every challenge is required to continue. Auto-graded.",
   "type": "challenge",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The Switch Statement",
@@ -106,6 +110,14 @@
         "description": "case 200, 404 and 500 each appear.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "switch statement present: Code contains a switch statement Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "case label present: Code contains a case label Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "break present: Code contains a break statement Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "HTTP status cases: case 200, 404 and 500 each appear. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

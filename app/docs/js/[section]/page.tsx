@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { getAllSectionSlugs, getSection, sections } from '../../../../lib/js-docs';
 import JsDocsClient from './JsDocsClient';
 import DocsFamilyBar from '../../../../components/DocsFamilyBar';
+import DocsFrame from '../../../../components/DocsFrame';
 
 export function generateStaticParams() {
   return getAllSectionSlugs().map((section) => ({ section }));
@@ -17,10 +18,10 @@ export default async function JsDocsSectionPage({
   const section = getSection(slug);
   if (!section) return notFound();
   return (
-    <>
-      <DocsFamilyBar currentId="js" />
+    <DocsFrame>
       <Suspense fallback={<div className="docs-main">Loading…</div>}>
         <JsDocsClient
+          tabs={<DocsFamilyBar currentId="js" />}
           section={section}
           allSections={sections}
           basePath="/docs/js"
@@ -28,6 +29,6 @@ export default async function JsDocsSectionPage({
           searchPlaceholder="Search the JavaScript docs…"
         />
       </Suspense>
-    </>
+    </DocsFrame>
   );
 }

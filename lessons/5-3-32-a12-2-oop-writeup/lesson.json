@@ -3,6 +3,10 @@
   "title": "7.2.20 Procedural vs OOP Writeup",
   "description": "Comparison of procedural and object-oriented programming.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 40,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.2 Writing Your Own Classes",

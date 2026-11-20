@@ -3,6 +3,10 @@
   "title": "5.2.23 Lab: Reaching the Goal",
   "description": "Use the finished scene's distance check to win once with delete(). Auto-graded.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",
@@ -123,6 +127,14 @@
         "description": "After deleting, goal is set to null (or another empty value the guard treats as false, such as undefined), so the win check can never fire twice. Help: 5.2.21 (Reading: Cleanup and Delete)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Guard the check on the goal still existing: The win check is wrapped in if (goal) so it stops running once the goal is gone. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Compute the distance and test it: The distance between player and goal is worked out from their positions (Math.sqrt(dx * dx + dy * dy), ** 0.5, Math.hypot(dx, dy), dist(...), or player.distanceTo(goal)) and is what the if tests: dist < 25. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Delete the goal on arrival: When the player reaches the goal, goal.delete() (or goal.remove()) is called. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Clear the goal variable: After deleting, goal is set to null so the win check can never fire twice. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

@@ -3,6 +3,10 @@
   "title": "6.28.1 Reading: From a click to a square, and one rule function",
   "description": "A click becomes a row and a column with floor; picking a piece up is remembering { r, c }; a step is one square diagonally forward with abs, onto an empty square; every rule lives in one function the click only asks.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 14,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.28 Checkers: pick up and move",

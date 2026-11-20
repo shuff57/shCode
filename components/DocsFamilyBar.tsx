@@ -1,61 +1,32 @@
 import Link from 'next/link';
+import { Box, Braces, Gamepad2, type LucideIcon } from 'lucide-react';
 import { DOCS_FAMILY } from '../lib/docs-family';
+import { libraryClasses as styles } from './library-ui';
 
-// The family switcher at the top of every /docs/<set> page. One Docs tab in
+// Same icons as the /docs hub's rail (components/DocsHub.tsx).
+const ICONS: Record<string, LucideIcon> = { js: Braces, moshion: Gamepad2, reshape: Box };
+
+// The family switcher at the top of every /docs/<set> page's main column. One Docs tab in
 // the nav leads here; this bar moves between the reference sets, with the
-// current set highlighted and the others one click away.
+// current set highlighted and the others one click away. The tabs wear the
+// Library's type-tab look (.docs-family-tab in app/library.css).
 export default function DocsFamilyBar({ currentId }: { currentId: string }) {
   return (
-    <div
-      className="docs-family-bar"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 6,
-        padding: '8px 16px',
-        background: 'var(--c-deep2)',
-        borderBottom: '1px solid var(--c-line)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 10,
-      }}
-    >
-      <Link
-        href="/docs"
-        className="docs-family-home"
-        style={{
-          color: 'var(--c-comment)',
-          fontSize: 13,
-          fontWeight: 600,
-          textDecoration: 'none',
-          marginRight: 8,
-        }}
-      >
-        Docs
-      </Link>
+    <nav className={`${styles.typeTabs} docs-family-bar`} aria-label="Reference sets">
       {DOCS_FAMILY.map((m) => {
-        const active = m.id === currentId;
+        const Icon = ICONS[m.id];
         return (
           <Link
             key={m.id}
             href={`/docs/${m.id}/${m.rootSection}`}
-            aria-current={active ? 'page' : undefined}
+            aria-current={m.id === currentId ? 'page' : undefined}
             className="docs-family-tab"
-            style={{
-              padding: '4px 12px',
-              borderRadius: 4,
-              fontSize: 13,
-              fontWeight: 600,
-              textDecoration: 'none',
-              background: active ? 'var(--c-purple)' : 'transparent',
-              color: active ? 'var(--c-deep2)' : 'var(--c-purple)',
-              border: '1px solid var(--c-purple)',
-            }}
           >
+            {Icon && <Icon size={15} aria-hidden="true" />}
             {m.label}
           </Link>
         );
       })}
-    </div>
+    </nav>
   );
 }

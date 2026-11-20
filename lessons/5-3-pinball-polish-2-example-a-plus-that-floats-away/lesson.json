@@ -3,6 +3,10 @@
   "title": "5.7.2 Worked Example: A \"+5\" that floats away",
   "description": "A two-bumper table where each bumper wears its worth, and each hit makes one small gold popup that floats up and removes itself with .life. Then the same popup made under if (touching), which piles up into a gold smear: the popup goes where the score goes.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.7 Pinball: labels and popups",

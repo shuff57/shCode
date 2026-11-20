@@ -3,6 +3,10 @@
   "title": "3.4.1 Slides: Function Expressions and Arrow Functions",
   "description": "Unit 3.4 slides: functions as values, function expressions, arrow functions and their shorthand rules, callbacks, and hoisting.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.4 Function Expressions and Arrow Functions",

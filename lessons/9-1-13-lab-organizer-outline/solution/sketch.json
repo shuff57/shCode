@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "entities": [
+    {
+      "id": "s1",
+      "kind": "rectangle",
+      "x": 0,
+      "y": 0,
+      "width": 60,
+      "depth": 40,
+      "anchored": false
+    }
+  ]
+}

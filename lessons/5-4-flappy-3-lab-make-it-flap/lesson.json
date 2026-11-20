@@ -3,6 +3,10 @@
   "title": "5.10.5 Lab: Make it flap",
   "description": "The bird falls and nothing lifts it. Add a flap on the space bar that sets the bird's speed, then keep the bird from leaving the screen.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.10 Flappy: the flap",
@@ -94,6 +98,13 @@
         "description": "A test on the bird's y going past the bottom (greater than 400 or height, or a number a little inside it) or above the top (less than 0), in one if joined with || or in two ifs, whose body puts bird.y back on the screen (200, height / 2, or another on-screen spot). Setting vel.y to 0 there too is what step 2 asks and is welcome, but this criterion is about the position. Missing: no edge test, or the test never changes bird.y. Help: 5.10.3 (Worked Example: The bird that flaps)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "The space bar flaps the bird: A press of the space bar sets the bird's upward speed. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The flap sets the speed rather than adding: The line uses = so every flap is the same size. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The bird is put back when it leaves the screen: Leaving the top or bottom puts the position back. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

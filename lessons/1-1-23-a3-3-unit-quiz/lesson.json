@@ -3,6 +3,10 @@
   "title": "1.1.23 Unit 1.1 Quiz",
   "description": "Ten multiple-choice questions on the four phases, umbrella activities, actions and task sets, the four Ps, and prescriptive models. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.1 Software Lifecycle",

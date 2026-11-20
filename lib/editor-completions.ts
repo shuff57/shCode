@@ -32,6 +32,7 @@ import { Prec, type Extension } from '@codemirror/state';
 import { insertNewlineAndIndent } from '@codemirror/commands';
 import { keymap } from '@codemirror/view';
 import { MOSHION_GLOBALS, MOSHION_MEMBERS, MOSHION_TYPE_OF, type MoshionCompletion } from './moshion-completions.generated';
+import { cadCompletionPreview, cadCompletionSource } from './cad-completions';
 
 const SKIP_NODES = new Set(['String', 'TemplateString', 'LineComment', 'BlockComment', 'RegExp']);
 
@@ -131,6 +132,8 @@ export function jsAutocomplete(): Extension {
     enterNewlineOnExactMatch,
     autocompletion({ activateOnTypingDelay: 100, maxRenderedOptions: 60, icons: true }),
     javascriptLanguage.data.of({ autocomplete: moshionCompletionSource }),
+    javascriptLanguage.data.of({ autocomplete: cadCompletionSource }),
+    cadCompletionPreview,
     javascriptLanguage.data.of({ autocomplete: builtinCompletionSource }),
   ];
 }

@@ -3,6 +3,10 @@
   "title": "3.4.22 Function Expressions and Arrow Functions",
   "description": "Eight multiple-choice questions on function values, expressions, arrow shorthand, callbacks, and hoisting. Checked instantly.",
   "type": "assignment",
+  "work": {
+    "kind": "quiz",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.4 Function Expressions and Arrow Functions",

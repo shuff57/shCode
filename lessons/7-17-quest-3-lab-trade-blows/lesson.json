@@ -3,6 +3,10 @@
   "title": "7.17.3 Lab: Trade blows",
   "description": "Your hero and the goblin take turns: 1 attacks through the target's takeHit, the turn passes, the enemy hits back after a pause, and the battle ends with a win or a loss and R to play again.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.17 Quest: trade blows",
@@ -190,7 +194,17 @@
         "description": "A win or loss ends it, and R restarts.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "takeHit never below 0: takeHit lowers hp by the hit but never below 0. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "attack goes through the target's takeHit: attack is handed the target and makes it take the hit through its own takeHit, and the game calls attack. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The turn passes: After a hit, the turn goes to the other fighter: 0 to 1, 1 to 0. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "The enemy acts after a pause: The enemy's turn is handed to after(frames, fn) to run a moment later, and after gets the function itself, not its result: after(45, enemyTurn) or after(45, () => enemyTurn()) count, with any number or expression for the frames and any function name. after(45, enemyTurn()) does not count: the () calls enemyTurn right now, with no pause, and hands after what it returns. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "A win or a loss ends it, and R restarts: When a fighter has no hp left the battle is over, and once it is over R starts a new game. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Lab: Trade blows\". The task: give Fighter takeHit(n), which lowers hp but never below 0 and returns the damage, and attack(target, roll), which hits the target through its takeHit for power plus roll; keep turn (0 or 1), a message and an over flag; on your turn 1 attacks with a roll of 0 to 3, the turn passes with turn = 1 - turn (or another correct way), and the enemy's turn comes after(45, enemyTurn); when a fighter has no hp left the battle is over with a win or loss message, and R starts a new game. Accept any names, helpers, ternaries, nested ifs, switch statements and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   },
   "carryFrom": "7-16-quest-4-lab-two-fighters"
 }

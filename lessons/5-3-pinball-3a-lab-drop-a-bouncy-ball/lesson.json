@@ -3,6 +3,10 @@
   "title": "5.3.6 Lab: Drop a bouncy ball",
   "description": "Turn gravity on and drop a bouncy ball. It has nothing to land on yet; the next lab builds the walls and the ground.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 6,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.3 Pinball: the table",
@@ -97,6 +101,13 @@
         "description": "The ball's `bounciness` is set above 0.5, so it keeps most of its speed. Help: 5.2.15 (Reading: Bounciness and Friction)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Gravity is on: `setup()` turns gravity on so things fall down the screen: a positive number, or a negative one if the sketch sets `world.origin = 'math'` (y grows up there). Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "There is a ball: A sprite is stored in `ball`, built with `new Sprite`. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The ball is genuinely bouncy: The ball's `bounciness` is set above 0.5, so it keeps most of its speed. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

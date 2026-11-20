@@ -3,6 +3,10 @@
   "title": "7.17.1 Reading: A method that hits another object, and after()",
   "description": "attack(target, roll) hits through the target's takeHit, which keeps hp at 0 or more and returns the damage; turn = 1 - turn passes the turn; after(45, enemyTurn) gives the enemy its turn a moment later.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.17 Quest: trade blows",

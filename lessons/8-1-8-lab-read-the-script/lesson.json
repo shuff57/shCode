@@ -3,6 +3,10 @@
   "title": "9.1.8 Lab: Read the Script",
   "description": "Find the number that controls the hole in the script, and change it. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "model",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 3: reSHape: Solid Modelling",
   "unit": "9.1 Solid Shapes",

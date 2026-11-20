@@ -3,6 +3,10 @@
   "title": "3.2.8 Lab: greet with a Default Name",
   "description": "Write greet(name) so that calling it with no argument greets \"friend\", using a default parameter, and calling it with a name greets that name. Practice, not graded: the checks call your function.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.2 Parameters and Return Values",
@@ -141,6 +145,12 @@
         "description": "greet() prints Hello, friend! and greet(name) prints Hello, then that name, then an exclamation mark. Help: 3.2.7 (Order Matters)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "greet has a default parameter: Code defines greet with a default value written in the parentheses, as name = something. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "greet is called with no argument: Code calls greet() with nothing in the parentheses. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

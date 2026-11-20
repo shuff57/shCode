@@ -3,6 +3,7 @@
 // switching projects never clobbers the code left in another one.
 
 import type { Lesson } from './types';
+import { CAD_CODE_SETTINGS, CAD_SETTINGS_FILE, CAD_STARTER } from './solidcraft-code';
 
 export type SandboxModeId = 'js' | 'moshion' | 'reshape' | 'flow';
 
@@ -49,17 +50,6 @@ function draw() {
 }
 `;
 
-// Every dimension is declared in getParameterDefinitions() rather than written
-// as a literal in main(). That is what lets the Dimensions panel drive the model
-// without touching a character of the source.
-const RESHAPE_STARTER = `// reSHape sandbox -- solid modelling.
-// Every line is one step, the same steps the Build tools make.
-// Every number becomes a slider in the Dimensions panel.
-
-const body = box(40, 40, 20, { corner: 4 })
-hole(body, { across: 10 })
-`;
-
 export const SANDBOX_MODES: SandboxMode[] = [
   {
     id: 'js',
@@ -81,12 +71,12 @@ export const SANDBOX_MODES: SandboxMode[] = [
   },
   {
     id: 'reshape',
-    label: 'reSHape',
-    blurb: 'Solid modelling. Drag a dimension and the model rebuilds.',
+    label: 'SolidCraft CAD',
+    blurb: 'Script-driven 2D sketches and 3D parts. Change a measurement, then Run.',
     preview: 'reshape',
-    docsHref: '/docs/reshape',
+    docsHref: null,
     file: 'script.js',
-    starter: RESHAPE_STARTER,
+    starter: CAD_STARTER,
   },
   {
     id: 'flow',
@@ -112,6 +102,7 @@ export function sandboxLesson(mode: SandboxMode, lessonId = `sandbox-${mode.id}`
     estimateMins: 0,
     unit: 'Sandbox',
     preview: mode.preview,
+    ...(mode.id==='reshape'?{cadHost:'solidcraft' as const}:{}),
     files: [
       {
         type: 'file',
@@ -120,6 +111,9 @@ export function sandboxLesson(mode: SandboxMode, lessonId = `sandbox-${mode.id}`
         path: mode.file,
         content: mode.starter,
       },
+      ...(mode.id==='reshape' ? [
+        {type:'file' as const,id:`${lessonId}-cad`,name:CAD_SETTINGS_FILE,path:CAD_SETTINGS_FILE,content:CAD_CODE_SETTINGS},
+      ] : []),
     ],
     steps: [],
     requirements: [],

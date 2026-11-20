@@ -3,6 +3,10 @@
   "title": "1.2.5 Change the Type",
   "description": "Give one variable three different types in a row and print what typeof says each time. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.2 Variables and Data Types",
@@ -132,6 +136,15 @@
         "description": "Uses console.log with typeof thing to show the type. Help: 1.2.4 (Dynamically Typed)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "thing is declared with let: Declares a variable called thing using let. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "thing starts as a string: thing holds text in quotes, whether from its own let or a later assignment. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "thing is reassigned without let: Assigns a new value to thing without re-declaring it. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "thing is given a boolean: At some point thing holds true or false, either literally or from a comparison. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "typeof is printed: Uses console.log with typeof thing to show the type. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   }
 }

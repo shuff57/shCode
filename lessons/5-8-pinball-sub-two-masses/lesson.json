@@ -3,6 +3,10 @@
   "title": "5.8.2 Sub-build: Two balls, two masses",
   "description": "The same push on two balls, one heavy and one light. Build it small, then feel the difference before you tune your table.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.8 Pinball: physics knobs",
@@ -86,6 +90,13 @@
         "description": "The same applyForce is called on both (or the same force number), so mass is the only variable.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Two different masses: Both balls get a mass, and the numbers differ. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The same push reaches both: applyForce (or a velocity set) is called on both balls, so the comparison is fair. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a short moSHion sketch for \"Sub-build: Two balls, two masses\". The task: give two balls different masses in setup() and apply the same force to both on a key press, so the difference in mass is what makes them move differently. This is a sub-build: a small isolated program whose only job is this one mechanic, so judge the mechanic itself and not style. Accept any variable names, helper functions, arrow functions, ternaries and semicolons. A line that only exists in a comment or a string does not count. moSHion facts: colliding(b) is 0 while apart and counts frames while touching, so an if on it alone is true every frame of a touch; a stored \"last frame\" value makes it true once. .life = n counts down one per frame and deletes the sprite at 0. A sprite with collider 'none' is passed through and has its gravity off. loadSound(name) in setup() (a built-in name such as 'coin', or a full path such as '/moshion/assets/coin.wav') and sound.play() where the event happens; a browser will not play sound before the student's first click or key. Write short, plain notes for a 14-year-old, name the student's own line when something is missing, and never write corrected code."
+    }
   }
 }

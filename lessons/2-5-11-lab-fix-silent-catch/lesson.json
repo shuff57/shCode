@@ -3,6 +3,10 @@
   "title": "2.5.11 Fix the Silent Catch",
   "description": "An empty catch block is hiding a failure. Add a report so the next person can see it. Auto-graded.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",
@@ -68,6 +72,12 @@
         "description": "The catch block now logs something. Help: 2.5.10 (The Empty catch Trap)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "try/catch present: Code still has a try block and a catch block. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "catch is no longer empty: The catch block now logs something. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

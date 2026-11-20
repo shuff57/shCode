@@ -3,6 +3,10 @@
   "title": "6.26.3 Challenges: Make it yours",
   "description": "Your Trail is complete. Change one rule of your own: three players, a token that hops one square at a time, or a new letter. Pick one; add an idea of your own on top if you like.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.26 Trail: playtest and extend",

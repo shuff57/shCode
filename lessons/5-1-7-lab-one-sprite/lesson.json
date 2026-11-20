@@ -3,6 +3,10 @@
   "title": "5.1.7 Exploration: Move, resize and recolor a sprite",
   "description": "Change one number at a time in a sketch that already works, predict what will move, rerun, and check. Practice from 5.1.5 and 5.1.6. No new code to write.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",
@@ -108,6 +112,13 @@
         "description": "The sprite's colour is set to something other than 'tomato': any colour name, hex code or other colour value the sketch can show counts. Help: 5.1.6 (Sprite: new Sprite(x, y, w, h) + .color)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "The starter has new Sprite(180, 180, 60, 60): the FIRST two numbers are its x and y, and (180, 180) is the center. Look only at those first two numbers. Is either of them anything other than 180? new Sprite(60, 60, 140, 30), new Sprite(100, 80, ...), new Sprite(180, 181, ...), new Sprite(-20, 50.5, ...) or new Sprite(random(360), random(360), ...) all count. new Sprite(180, 180, 20, 90) does NOT count: its size changed but it still sits at the center. Code inside comments never runs.",
+        "r2": "The starter has new Sprite(180, 180, 60, 60): the LAST two numbers are its width and height, 60 by 60. Look only at those last two numbers. Is either of them anything other than 60? new Sprite(183, 190, 61, 60) counts (61 is not 60), and so do new Sprite(..., 140, 30), new Sprite(..., 10, 60) and new Sprite(..., 40.5, 40.5). new Sprite(100, 80, 60, 60) does NOT count: it moved but it is still 60 by 60. Code inside comments never runs.",
+        "r3": "Recolored the sprite: Give the sprite a color other than tomato. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

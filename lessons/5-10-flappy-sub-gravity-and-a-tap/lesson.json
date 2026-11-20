@@ -3,6 +3,10 @@
   "title": "5.10.4 Sub-build: Gravity and a tap",
   "description": "A bird falls. One tap sends it back up. Build that alone, before there are pipes.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.10 Flappy: the flap",
@@ -86,6 +90,13 @@
         "description": "The key press sets vel.y to a negative number (or applies an upward force); it does not set y directly.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Gravity is on: The world has gravity above 0, so sprites fall. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A tap goes up: A key press sets a negative vel.y, so the bird climbs. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a short moSHion sketch for \"Sub-build: Gravity and a tap\". The task: turn gravity on in setup() and set the bird's vel.y to a negative number on a key press, so one tap reverses a fall. This is a sub-build: a small isolated program whose only job is this one mechanic. Accept any names, helpers, arrow functions and ternaries. A line only in a comment or string does not count. Use short, plain notes for a 14-year-old, name their own line when something is missing, never write corrected code."
+    }
   }
 }

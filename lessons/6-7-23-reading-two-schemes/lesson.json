@@ -3,6 +3,10 @@
   "title": "6.12.13 Reading: Two Key Schemes, Independent State",
   "description": "Two players on one keyboard means two separate key sets and two separate sets of variables: one for each player. Read this before 6.12.16 Worked Example: Two Paddles, Two Schemes.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 7,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.12 Advanced Input",

@@ -3,6 +3,10 @@
   "title": "7.2.22 Challenges",
   "description": "Pick one (or more) OOP stretch challenges: extend your Enemy class, write a Player class, or try subclassing with `extends`. Auto-graded.",
   "type": "challenge",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 30,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.2 Writing Your Own Classes",
@@ -127,6 +131,14 @@
         "description": "One of the student's classes uses at least one of: a this.<property> read or write, extends another class, or a super(...) call. Missing: none of these. Help: 7.2.21 (Encapsulation, inheritance, polymorphism)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Define at least one class: script.js contains at least one class definition. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Instantiates a class of your own: Builds an object from a class the student defined: new Canvas() and new Sprite() are boilerplate and do not count. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Write a constructor: At least one class has a constructor method. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Use one OOP feature: Your class uses at least one of: `this.<property>`, `extends`, or `super(`. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

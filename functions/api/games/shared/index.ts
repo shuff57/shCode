@@ -30,7 +30,7 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ en
     seen.set(r.id, {
       id: r.id, title: r.title, mode: r.mode, players: r.players,
       modeLabel: modeLabel(r.mode as GameMode, r.players), bytes: r.bytes,
-      owner: ownerLabel(r.first_name, r.last_name),
+      owner: ownerLabel(r.first_name, r.last_name, r.alias),
       mine: r.owner_email === data.email,
       classId: r.class_id, className: r.class_name,
       sharedAt: r.shared_at, updatedAt: r.updated_at, hidden: r.hidden_at != null,

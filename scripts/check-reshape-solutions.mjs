@@ -121,6 +121,10 @@ try {
     let cfg;
     try { cfg = JSON.parse(read(cfgPath)); } catch { continue; }
     if (cfg.preview !== 'reshape') continue;
+    // A SolidCraft 2D sketch lab (cadHost: 'solidcraft', cadScope: 'sketch') is written with the SolidCraft runner's sketch words (sk.rectangle, ...),
+    // which this runtime does not have, and is graded on that path: scripts/test-solidcraft-sketch-script.mjs runs its reference solution there and
+    // requires every requirement to pass. A SolidCraft lab with 3D parts (9-1-12) is plain reSHape and is still checked here.
+    if (cfg.cadHost === 'solidcraft' && cfg.cadScope === 'sketch') { console.log(`SKIP ${id}: a SolidCraft sketch lab, gated by test-solidcraft-sketch-script.mjs`); continue; }
 
     const modelReqs = (cfg.requirements ?? []).filter((r) => r.type === 'model');
     if (!modelReqs.length) continue;

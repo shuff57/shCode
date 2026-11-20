@@ -3,6 +3,10 @@
   "title": "3.1.14 Write Up What You Built",
   "description": "Write the grade-advisor program you just refactored as pseudocode: set up the three values, call decideGrade(), call printAdvice(), and notice the main program has no decision left in it.",
   "type": "assignment",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.1 Functions: Definition and Calls",
@@ -134,6 +138,16 @@
         "description": "The main program has no IF, ELSE or other decision. A decision written out in the main program is missing.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "The three values are set up: The main program sets up score, attendance and lateAssignments.",
+        "r3": "It calls decideGrade: The main program calls decideGrade.",
+        "r4": "It calls printAdvice: The main program calls printAdvice.",
+        "r5": "No decision is left in the main program: The branching moved inside the functions, so no IF or ELSE line is left in the main program."
+      },
+      "task": "The student was given a task and wrote numbered pseudocode in README.md, between a first line and a last line that were already there. The student refactored a grade advisor into two functions, decideGrade and printAdvice, and is writing up the MAIN program only: set up score, attendance and lateAssignments, CALL decideGrade, CALL printAdvice. The point is that the main program no longer contains any decision, because the branching moved inside the two functions. A write-up that puts an IF or ELSE (the grade chain or the attendance warning) in the main program has drawn the inside of a function and is missing the last criterion."
+    }
   }
 }

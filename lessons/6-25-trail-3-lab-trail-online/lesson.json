@@ -3,6 +3,10 @@
   "title": "6.25.3 Lab: Trail online",
   "description": "Your Trail plays a classmate on another computer: rolls are sent, every roll is checked and applied in onMove, and only the player whose turn it is may roll.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.25 Trail: play online",
@@ -146,7 +150,16 @@
         "description": "With status off, the game still plays on one computer.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Rolls are sent: Online, the roll goes out with online.send instead of moving the token. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Turns are applied in onMove: Every move that arrives runs takeTurn, on both computers. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Only your seat rolls: Online, SPACE rolls only when online.seat matches turn. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Offline still works: Where SPACE rolls, a check on online.status picks: send the roll online, or take the turn straight away offline. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Lab: Trail online\". The task: make the race playable across two computers: set up online.onMove once to call takeTurn with the roll in every move, ignoring a move from a seat whose turn it is not or a roll that is not a whole number from 1 to 6; host on a key with a fresh game, or join from a JOIN code; send the roll with online.send instead of applying it when online; let only the player whose seat equals turn roll; and keep offline play working when online.status is off. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   },
   "carryFrom": "6-24-trail-3-lab-jump-slide-and-wait"
 }

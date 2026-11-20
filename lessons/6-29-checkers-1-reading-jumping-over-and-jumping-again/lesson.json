@@ -3,6 +3,10 @@
   "title": "6.29.1 Reading: Jumping over, and jumping again",
   "description": "A jump is two squares diagonally over a piece of the other colour, found halfway between the ends and taken off; after a jump, a piece that can jump again keeps the turn.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.29 Checkers: jumps",

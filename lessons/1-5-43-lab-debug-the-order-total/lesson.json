@@ -3,6 +3,10 @@
   "title": "1.5.43 Debug the Order Total",
   "description": "Three bugs, none of which produce an error message. Narrow them down with labelled prints. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 25,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.5 Program Design Tools and Environments",
@@ -129,6 +133,15 @@
         "description": "An if/else comparing the total against the expected value and printing PASS or FAIL. Help: 1.5.40 (Testing and Test Cases)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "subtotal multiplies price by quantity: The quantity is actually used, with multiplication. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "The discount is subtracted: The discounted amount is the subtotal minus the discount, not plus. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r3": "Tax is added to the discounted amount: The final total adds tax rather than subtracting it. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "At least three labelled prints: Three or more console.log calls whose text includes a label (string concatenation or a template literal both count). Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "A PASS/FAIL check is present: An if/else comparing the total against the expected value and printing PASS or FAIL. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   }
 }

@@ -3,6 +3,10 @@
   "title": "7.3.8 Lab: takeHit with a floor at zero",
   "description": "The enemy starts at 5 health and is hit for 2 at a time. Write `takeHit(n)` so that health comes off and never goes below zero — the rule lives in the class, not in the scene.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.3 Inside a Class",
@@ -79,6 +83,12 @@
         "description": "When takeHit finishes, this.hp is never below 0: an if after the subtraction that sets it back to 0, a ternary, Math.max(0, ...) or max(0, ...), or an if/else that sets 0 when the hit is bigger than what is left. A check that only asks whether hp is above 0 BEFORE subtracting is not met: 1 - 2 still gives -1.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "takeHit(n) subtracts the argument from this.hp: The argument is taken off `this.hp` inside the method. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "takeHit(n) never leaves health below zero: After subtracting, the method brings `this.hp` back to `0` if it went negative (a guard `if`, or `Math.max`). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

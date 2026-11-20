@@ -3,6 +3,10 @@
   "title": "5.5.2 Sub-build: End and start again",
   "description": "A ball falls into a pit, the round ends after three seconds, and R starts it again. Build the smallest version of losing, before you put it into your table.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.5 Pinball: lose and start again",
@@ -86,6 +90,13 @@
         "description": "R resets the ball's position and velocity and sets the round back to running; the score is reset too.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Is a flag (any name: playing, lost, gameOver, over) changed when the ball is below the canvas, as in if (ball.y > height) playing = false; or if (ball.y >= 300) { playing = false } or lost = ball.y > 300, and is that flag read by an if somewhere, such as if (playing) { ... } else { text('Game over', ...) }, if (playing === true), if (!playing) or if (lost)? > and >= both count, and height or any number from about 300 up counts (the canvas is 300 tall). Code inside comments never runs.",
+        "r2": "Two things together. (1) An R key test, kb.presses('r') or kb.pressed('r'), moves the ball back near its start (ball.y = 50 or 60, ball.x = 200, velocity 0). (2) After that the flag is running again: playing = true (or lost = false) is set in the R block, OR an else sets it back whenever the ball is not below the canvas, as in if (ball.y > 400) { playing = false } else { playing = true }. Yes if both hold. No if nothing anywhere sets the flag back to running after it went false, even when R moves the ball and zeroes the score. Code inside comments never runs."
+      },
+      "task": "The student wrote a short moSHion sketch for \"Sub-build: End and start again\". The task: end the round when the ball falls below the canvas (a flag), keep the game on screen and show Game over, and let R put the ball back at its start with no velocity and set the round running again. This is a sub-build: a small isolated program whose only job is this one mechanic, so judge the mechanic itself and not style. Accept any variable names, helper functions, arrow functions, ternaries and semicolons. A line that only exists in a comment or a string does not count. moSHion facts: colliding(b) is 0 while apart and counts frames while touching, so an if on it alone is true every frame of a touch; a stored \"last frame\" value makes it true once. .life = n counts down one per frame and deletes the sprite at 0. A sprite with collider 'none' is passed through and has its gravity off. loadSound(name) in setup() (a built-in name such as 'coin', or a full path such as '/moshion/assets/coin.wav') and sound.play() where the event happens; a browser will not play sound before the student's first click or key. Write short, plain notes for a 14-year-old, name the student's own line when something is missing, and never write corrected code."
+    }
   }
 }

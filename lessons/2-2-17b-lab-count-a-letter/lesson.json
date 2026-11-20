@@ -3,6 +3,10 @@
   "title": "2.2.20 Count a Letter in a Word",
   "description": "Loop through a string and count how many times one letter appears. Auto-graded.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.2 Algorithms and Loops",
@@ -104,6 +108,14 @@
         "description": "count is logged after the loop",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "loop runs to word.length with <: A for loop counts i from 0 while i < word.length. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "a character is tested by position: The if compares word[i] against a letter. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "the counter goes up inside the if: count is increased inside the if body, not somewhere else in the file. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Is count passed to a console.log that sits after the for loop's closing brace, so it runs once when the loop is done? Go by the braces, not the indentation. Example of counting them: for (...) { opens one, if (...) { opens a second, } else { closes and reopens, so it is still two, and }} closes both: a console.log(count) on the next line is after the loop, so met. Not met: the only console.log(count) is inside the loop body, printed on every pass. Code inside comments never runs."
+      }
+    }
   }
 }

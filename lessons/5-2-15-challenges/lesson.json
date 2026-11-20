@@ -3,6 +3,10 @@
   "title": "5.2.26 Challenges: Optional Stretch",
   "description": "Add a second, harder-to-reach goal and track a two-goal completion count. Auto-graded.",
   "type": "challenge",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 30,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",
@@ -122,7 +126,15 @@
         "description": "'All goals collected!' (any close wording) is printed with console.log from inside an if that only becomes true once both goals are gone. The step also asks for it to print only once: if nothing stops that if from staying true, it would print on every frame. Still mark this card met in that case, but say so in the note. Printing after only one goal is not met. Help: 5.2.23 (Lab: Reaching the Goal)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Add a second goal sprite: A second goal sprite is created, so the scene has two goals as well as the player. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Give the second goal its own check: Each goal has its own distance check that deletes it, so the code calls .delete() for both goals. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Track collection progress: Your code knows when both goals are gone, either way content.md describes: a counter that goes up (or down) by one per goal and is then checked (collected === 2), or a check that both goal variables are gone (goal1 === null && goal2 === null, or !goal1 && !goal2). Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Is the finish message All goals collected (any capitals, with or without the !) printed with console.log inside an if about both goals? YES: if (collected === 2) { console.log('All goals collected!'); } YES: if (counter >= 2) console.log(\"All goals collected!\") YES: if (goal === null && goal2 === null) { console.log('all goals collected') } NO, other words: 'You win!', 'You Win!', 'All collected!', 'you found them all!'. The starter's 'You win!' for one goal does not count. Code inside comments never runs."
+      }
+    }
   },
   "carryFrom": "5-2-11-lab-reaching-the-goal"
 }

@@ -3,6 +3,10 @@
   "title": "2.3.29 Convert an if-chain to switch",
   "description": "Rewrite an if/else-if chain as a switch statement with at least two cases, a default, and break. Auto-graded.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The Switch Statement",
@@ -100,6 +104,14 @@
         "description": "Code contains at least two break statements, one after each case body.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "switch statement present: Code contains a switch statement Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "case label present: A quoted case label is directly followed by a console.log call Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "default label present: The default label is directly followed by a console.log call Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "at least two breaks, one per case: Code contains at least two break statements, one after each case body. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

@@ -2,6 +2,10 @@
   "id": "2-3-24-example-command-dispatch",
   "title": "2.3.24 Worked Example: When switch Fits: Command Dispatch",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.3 The Switch Statement",

@@ -3,6 +3,10 @@
   "title": "3.5.12 Lab: Build a Small Nested-Object Structure",
   "description": "Build an object with a nested object and an array of objects, then read values out of it. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.5.4",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -254,6 +258,15 @@
         "description": "Code that runs prints the customer name read from order, and a loop prints every item's name and price, one item per line. A printed undefined names the read that found nothing. Help: 3.5.9 (Objects Inside Objects and Arrays)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "nested object built: order holds another object: written inside its braces, assigned with a dot, or built first and placed in. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "array of objects built: An array holds objects: written in the brackets, pushed in, or built first and listed. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "customer chain read: console.log prints a field of the customer reached with a chain (order.customer.name), or a variable holding that read or holding order.customer. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "index then field read: console.log prints a field read off one item: order.items[i].name, or the item held in a variable (a loop variable, a forEach parameter, or const item = order.items[i]) then a dot. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "loop prints each item: A loop over the items (for, for...of, while or forEach, on order.items, a variable holding it, or counting to the number of items) prints a field read off each item, itself or through a helper function it calls. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

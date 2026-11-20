@@ -6,6 +6,12 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { lessonScoreFields } from './lesson-score-fields.mjs';
+import { workKindOf, workProblems } from '../lib/lesson-work.ts';
+import { GRADING_V2_FROM } from '../lib/grading-v2.ts';
+
+// lesson.json `work` (lib/lesson-work.ts): every lesson says what the student makes and whether it is
+// graded, and the build refuses one whose `work` disagrees with how the lesson is built.
+const workErrors = [];
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
@@ -36,6 +42,10 @@ const results = await Promise.all(
       return null;
     }
     const meta = JSON.parse(raw);
+    {
+      const files = (await fs.readdir(path.join(lessonsDir, id))).filter((f) => f !== 'lesson.json');
+      for (const p of workProblems(meta.work, workKindOf(meta, files))) workErrors.push(`${id}: ${p}`);
+    }
     if (Array.isArray(meta.requirements) && meta.requirements.length > 0) {
       reqTitles[meta.id ?? id] = meta.requirements
         .filter((r) => r && typeof r.id === 'string')
@@ -82,13 +92,14 @@ const results = await Promise.all(
       [meta.quiz, meta.aiGrader, meta.diagram, meta.grading]
         .map((b) => (b && typeof b === 'object' ? b.maxSubmissions : undefined))
         .find((n) => typeof n === 'number') ?? null;
-    const { maxScore, scoreKind } = lessonScoreFields(meta, quizCount);
+    const { maxScore, scoreKind } = lessonScoreFields(meta, quizCount, GRADING_V2_FROM !== null);
     return {
       id: meta.id ?? id,
       title: meta.title ?? id,
       unit: meta.unit ?? null,
       preview: meta.preview ?? null,
       ...(meta.cadHost ? { cadHost: meta.cadHost } : {}),
+      ...(meta.cadScope ? { cadScope: meta.cadScope } : {}),
       // type decides the route prefix (/assignment vs /lesson). Client-side
       // navigation has no other way to know it -- see lib/lesson-href.ts.
       type: meta.type ?? 'lesson',
@@ -108,9 +119,19 @@ const results = await Promise.all(
       // assignmentCode's 'lab'), so it stays rubric-POINTS based: a capped pass/fail rubric
       // gets a maxScore for its percent but must not move from Lab to Written.
       scoreKind,
+      // lesson.json work (lib/lesson-work.ts). `graded` decides whether the lesson counts once grading v2
+      // is on (lib/grading-weights.ts lessonGradeCategory); before that it is carried and not read.
+      kind: meta.work?.kind ?? null,
+      graded: typeof meta.work?.graded === 'boolean' ? meta.work.graded : null,
     };
   }),
 );
+
+if (workErrors.length) {
+  console.error(`[generate-lessons-manifest] ${workErrors.length} lesson(s) with a wrong "work" block:`);
+  for (const e of workErrors.slice(0, 40)) console.error('  ' + e);
+  process.exit(1);
+}
 
 const lessons = results.filter((l) => l !== null);
 

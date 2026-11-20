@@ -25,6 +25,7 @@ interface Row extends ProvenanceRow {
   owner_email: string;
   first_name: string | null;
   last_name: string | null;
+  alias?: string | null;
   updated_at: number;
   share_choice: string | null;
   starred_at: number;
@@ -32,7 +33,7 @@ interface Row extends ProvenanceRow {
 
 export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ env, data }: Ctx) => {
   const rows = (await env.DB.prepare(
-    `SELECT g.id, g.title, g.mode, g.players, g.owner_email, st.first_name, st.last_name, g.updated_at, g.share_choice,
+    `SELECT g.id, g.title, g.mode, g.players, g.owner_email, st.first_name, st.last_name, st.alias, g.updated_at, g.share_choice,
             ${PROVENANCE_COLUMNS.split(', ').map((c) => 'g.' + c).join(', ')}, s.created_at AS starred_at
        FROM game_stars s
        JOIN library_games g ON g.id = s.game_id AND g.deleted_at IS NULL
@@ -61,7 +62,7 @@ export const onRequestGet: PagesFunction<Env, string, SessionData> = async ({ en
     games: listed.map((r) => ({
       id: r.id, title: r.title, mode: r.mode, players: r.players,
       modeLabel: modeLabel(r.mode as GameMode, r.players),
-      owner: ownerLabel(r.first_name, r.last_name), mine: r.owner_email === data.email,
+      owner: ownerLabel(r.first_name, r.last_name, r.alias), mine: r.owner_email === data.email,
       updatedAt: r.updated_at, starredAt: r.starred_at,
       choice: choiceOf(r.share_choice), remixedFrom: provenanceFromRow(r),
       stars: counts.get(r.id) ?? 0, starred: true,

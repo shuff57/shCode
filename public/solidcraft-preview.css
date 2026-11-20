@@ -7,3 +7,9 @@ html body #scp { top: auto; left: 0; right: 0; bottom: 0; width: 100%; height: 2
 #scp .body > .card { margin-bottom: 8px; }
 #scp #verdict.fail, #scp .state-red { border-left: 0; padding-left: 0; }
 #scp .confirm { margin-bottom: 8px; }
+
+html.shcode-sketch-only #scp .card:has(#result) { display:none; }
+
+/* The code-first CAD workspace (components/SolidCraftCodeStudio.tsx) shows the results itself: SolidCraft fills the page. */
+html.shcode-code-studio body #sc { inset: 0; width: 100%; height: 100%; }
+html.shcode-code-studio body #scp, html.shcode-code-studio body #lock { display: none !important; }

@@ -3,6 +3,10 @@
   "title": "3.4.11 Reading: Passing a Function to a Function",
   "description": "Because a function is a value, it can be an argument. Learn what a callback is and why passing one separates the loop from the rule.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.4 Function Expressions and Arrow Functions",

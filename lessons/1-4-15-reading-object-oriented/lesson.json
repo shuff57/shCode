@@ -3,6 +3,10 @@
   "title": "1.4.15 Reading: Object-Oriented Programming",
   "description": "Bundling data with the behaviour that acts on it. Definition 1.4.4, and why Chapter 5 exists.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",

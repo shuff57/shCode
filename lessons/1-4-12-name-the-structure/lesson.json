@@ -3,6 +3,10 @@
   "title": "1.4.12 Name the Structure",
   "description": "Four described programs. Log which of the three structures each one needs. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.4 Programming Paradigms and Languages",
@@ -108,6 +112,14 @@
         "description": "The fourth console.log answers STEP 4 -- the password prompt, with both names in one string, selection first. Help: 1.4.10 (Sequence, Selection, Repetition)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Is the FIRST answer console.log the word 'sequence' (STEP 1: add tax, then print the total)? Count only console.log calls that print one of the answer words (sequence, selection, repetition); ignore comments, and any quotes, spacing or an extra label argument are fine.",
+        "r2": "Is the SECOND answer console.log the word 'selection' (STEP 2: pass or retake)? Count only console.log calls that print one of the answer words (sequence, selection, repetition); ignore comments, and any quotes, spacing or an extra label argument are fine.",
+        "r3": "Is the THIRD answer console.log the word 'repetition' (STEP 3: print every name on a list)? Count only console.log calls that print one of the answer words (sequence, selection, repetition); ignore comments, and any quotes, spacing or an extra label argument are fine.",
+        "r4": "Does the FOURTH answer console.log print both words 'selection' and 'repetition' in one string, selection first (joined by 'and', a comma or a space)? Count only console.log calls that print one of the answer words (sequence, selection, repetition); ignore comments, and any quotes, spacing or an extra label argument are fine."
+      }
+    }
   }
 }

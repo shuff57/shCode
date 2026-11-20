@@ -49,6 +49,107 @@ export interface WhatsNewEntry {
 
 export const WHATS_NEW: WhatsNewEntry[] = [
   {
+    id: '2026-11-p5play-convert',
+    date: '2026-11-17',
+    audience: 'all',
+    title: 'Bring in a p5play program',
+    summary:
+      'Found a game written in p5play (version 3, or an older one)? Press From p5play in the moSHion sandbox and paste it. An AI rebuilds ' +
+      'it in moSHion and it opens as a new project, so nothing you have now is changed. A line the AI changed has a // CONVERTED: note saying what it did.',
+    steps: [
+      'In the moSHion sandbox, press From p5play and paste the program (or press Use the code in the editor).',
+      'Press Convert to moSHion. Read What the AI changed, then press Open as a new project.',
+      'Run it and check: the AI can get things wrong. Leave names and anything personal out of what you paste.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-p5play-convert.mp4',
+      poster: '/whats-new/2026-11-p5play-convert.jpg',
+      alt: 'A p5play v3 space shooter is pasted into the From p5play box and converted. The moSHion version appears with a list of what the AI changed (mousePressed() moved into update(), the HUD into drawTop()); Open as a new project runs it, and clicks fire at falling rocks.',
+    },
+    action: { label: 'Open the moSHion sandbox', href: '/sandbox' },
+  },
+  {
+    id: '2026-11-right-click',
+    date: '2026-11-17',
+    audience: 'student',
+    title: 'Right-click in your games',
+    summary:
+      'A game can now use the right mouse button. Right-clicking the game no longer opens the browser\'s menu over it, ' +
+      "so mouse.presses('right') and mouse.presses('left') can do two different things.",
+    steps: [
+      "mouse.presses('left') is true on the frame the left button goes down; mouse.presses('right') for the right button.",
+      "mouse.pressing('right') stays true while it is held down.",
+      'Right-clicking outside the game still opens the browser menu as usual.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-right-click.mp4',
+      poster: '/whats-new/2026-11-right-click.jpg',
+      alt: 'A moSHion sketch in the sandbox: left clicks drop green dots and right clicks drop red dots, with no browser menu in the way.',
+    },
+    action: { label: 'Try it in the sandbox', href: '/sandbox' },
+  },
+  {
+    id: '2026-11-game-art-shared',
+    date: '2026-11-17',
+    audience: 'student',
+    title: "Your game's pictures go with it",
+    summary:
+      'When you publish a game, its pictures and sounds now go with it, even ones whose names your code puts together, ' +
+      "like 'Enemy_' + kind. Classmates who play it see your art instead of a \"No texture named\" message.",
+    steps: [
+      'Press Share, then Publish game. The panel lists the pictures and sounds your game uses.',
+      'Also share them with my class when I publish is ticked for you, so they are shared along with the game.',
+      'A picture you only saved on this computer has to reach your account first: it does that by itself in a moment.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-game-art-shared.mp4',
+      poster: '/whats-new/2026-11-game-art-shared.jpg',
+      alt: "The Publish game panel lists Enemy_Rammer and Enemy_Spinner as not shared yet, with Also share them with my class ticked. After Publish, the game plays with both enemy pictures.",
+    },
+    action: { label: 'Open the moSHion sandbox', href: '/sandbox' },
+  },
+  {
+    id: '2026-11-code-search',
+    date: '2026-11-17',
+    audience: 'all',
+    title: 'Find and replace in your code',
+    summary:
+      'Press Ctrl+F (Cmd+F on a Mac) in a lab or the sandbox and a Find bar opens right inside the code editor. ' +
+      'It lights up every match, says which one you are on ("2 of 5"), and can swap a name everywhere at once.',
+    steps: [
+      'Press Ctrl+F and type a word. Enter goes to the next match, Shift+Enter to the one before.',
+      'Aa matches upper and lower case exactly; Word skips matches inside longer names.',
+      'Press Replace (or Ctrl+H), type the new word, then Replace all. Ctrl+Z undoes it. Esc closes the bar.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-code-search.mp4',
+      poster: '/whats-new/2026-11-code-search.jpg',
+      alt: 'In the sandbox, Ctrl+F opens a Find bar above the code. Typing mouseX highlights both matches and shows "1 of 2"; Replace all changes them to pointerX.',
+    },
+    action: { label: 'Try it in the sandbox', href: '/sandbox' },
+  },
+  {
+    id: '2026-11-four-functions',
+    date: '2026-11-17',
+    audience: 'student',
+    title: 'Which moSHion function does what',
+    summary:
+      'A moSHion sketch has four main functions, and each one has one job. setup() runs once at the start, ' +
+      'update() runs every frame for the rules, draw() paints what sits behind your sprites, and drawTop() ' +
+      'paints the score on top of them. The docs now say where each line goes.',
+    steps: [
+      'setup(): new Canvas() and the sprites you start with. update(): keys, moving, jumping and the score.',
+      'draw(): background() first, then anything behind the sprites. drawTop(): the score and lives, always on top.',
+      'Loading sounds, pictures or data? loadSound(), loadImage() and loadJSON() go in preload(), which runs before setup() and waits until they are ready.',
+    ],
+    media: {
+      clip: '/whats-new/2026-11-four-functions.mp4',
+      poster: '/whats-new/2026-11-four-functions.jpg',
+      alt: 'A moSHion sketch in the sandbox: a square walks in front of the words "draw(): behind", jumps twice, and "drawTop(): Jumps" at the top counts 0, 1, 2. The editor shows update(), draw() and drawTop().',
+    },
+    action: { label: 'Where does my code go?', href: '/docs/moshion/overview?page=where-does-my-code-go' },
+  },
+  {
     id: '2026-11-sprite-jump',
     date: '2026-11-16',
     audience: 'student',

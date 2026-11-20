@@ -3,6 +3,10 @@
   "title": "3.3.19 Lab: Write a Function That Returns a New Array",
   "description": "Write a function that builds and returns a new array of transformed values (for example, each number doubled with result.push(n * 2), as in 3.3.15), proving the original is untouched. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.3.3",
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -258,6 +262,16 @@
         "description": "doubled(numbers) returns a NEW array holding every number doubled, in the same order, and the array you pass in is not changed. Help: 3.3.15 (Arrays and Functions)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "function with an array parameter that is not mutated: Code declares a function whose array parameter is never changed inside it (no push, pop, shift, unshift, splice, sort, reverse, fill or index assignment on it). Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "for loop present: Code uses a for or for...of loop. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": ".push used: Code calls .push(. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "function returns the new array: A return inside the function hands back the new array. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "the new array differs from the input: A pushed value is changed (arithmetic or a call) or only pushed when an if says so, so the result is not a plain copy. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "both arrays are logged: console.log is called at least twice: once for the returned array and once for the original. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

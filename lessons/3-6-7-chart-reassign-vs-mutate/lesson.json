@@ -3,6 +3,10 @@
   "title": "3.6.7 Plain English to Pseudocode: Reassignment vs. Mutation Trace",
   "description": "Turn plain-English steps into pseudocode for process(nums): one write mutates the shared array and the caller sees it, the other reassigns the local name and the caller does not.",
   "type": "lesson",
+  "work": {
+    "kind": "plan",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.6 Functions: Pass by Value/Reference",
@@ -151,6 +155,17 @@
         "description": "The steps end with the caller printing scores as 0, 20, 30. [9, 9] or the original 10, 20, 30 is wrong; mark this missing.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Numbered steps: Number your steps 1. 2. 3. and so on, with something written after each number.",
+        "r2": "Mutation: item 0 is set to 0: Write 0 into item 0 of the array.",
+        "r3": "The caller sees the mutation: Say that the caller sees the change to item 0.",
+        "r4": "Reassignment: nums gets a new array: Point nums at a new array.",
+        "r5": "The caller does not see the reassignment: Say that the caller does not see the new array.",
+        "r6": "The caller prints 0, 20, 30: Say what the caller prints at the end: 0, 20, 30."
+      },
+      "task": "The student was given plain-English steps and rewrote them as numbered, step-by-step pseudocode in README.md, between a first line and a last line that were already there. The program they were describing is process(nums): the caller has scores = [10, 20, 30] and calls process(scores). Inside, nums and scores name the same array. Step 1 sets item 0 of nums to 0 (a mutation of the shared array, so the caller sees it). Step 2 points nums at a brand new array [9, 9] (a reassignment of the local name only, so the caller does not see it). The caller then prints scores as 0, 20, 30."
+    }
   }
 }

@@ -3,6 +3,10 @@
   "title": "5.14.2 Sub-build: One longer snake",
   "description": "A head in an array, and a body that follows it. Grow it by one, then eat something.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.14 Snake: grow",
@@ -85,6 +89,13 @@
         "description": "Adding a segment is unshift/push of a new cell; the tail is not dropped when growing.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A body in an array: Segments are kept in an array and added to as the snake moves. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "Drawn in a loop: The body array is read in a loop to draw the segments. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a short moSHion sketch for \"Sub-build: One longer snake\". The task: keep the snake's body in an array, add the head's previous cell to it on every step, and draw every segment with a loop. This is a sub-build: a small isolated program whose only job is this one mechanic. Accept any names, helpers, arrow functions and ternaries. A line only in a comment or string does not count. Use short, plain notes for a 14-year-old, name their own line when something is missing, never write corrected code."
+    }
   }
 }

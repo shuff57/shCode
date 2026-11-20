@@ -3,6 +3,10 @@
   "title": "3.2.9 Lab: findRectangleArea (multi-parameter)",
   "description": "Define findRectangleArea(width, height) that works out the area and prints it, then call it twice. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 8,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.2 Parameters and Return Values",
@@ -217,6 +221,15 @@
         "description": "Called with different widths and heights, findRectangleArea prints width times height. Help: 3.2.2 (Parameters)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "findRectangleArea defined: Code defines a function named findRectangleArea. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "two parameters: findRectangleArea is defined with two parameters. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "prints the area: findRectangleArea prints with console.log inside its body. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "called twice with two numbers: findRectangleArea is called at least twice, each with two arguments. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "the body multiplies width by height: Inside the function, two names are multiplied (width * height). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

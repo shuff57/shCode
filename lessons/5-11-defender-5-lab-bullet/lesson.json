@@ -3,6 +3,10 @@
   "title": "7.10.1 Lab: Bullet, and a hit that takes an enemy",
   "description": "Shots become Bullet objects. Write isAlive, hits(enemy) and spend, let fire() build a Bullet, and the hit loop loses every splice and its break; one function clears finished shots and enemies.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "7.10 Defender C: a spawner",
@@ -171,7 +175,17 @@
         "description": "Once a frame (clearFinished() or a function like it that draw() calls while playing), every finished shot's sprite is removed (b.remove(), or b.sprite.delete()) and then the finished shots are dropped from bullets (bullets = bullets.filter(...) keeping the living), in that order. A loop from the end to the start that removes and splices each finished shot is met too. Filtering first is not met: the sprites stay on screen. No clear-up for shots at all is not met.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "A bullet is alive while not spent and on screen: Bullet's isAlive() looks at this.spent and at this.sprite.y: true while the shot is not used up and still on the canvas. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "hits(enemy) asks about the other object's sprite: hits(enemy) returns whether this shot's sprite overlaps the sprite of the enemy it was handed, and only while this shot and that enemy are both alive (a spent shot must not hit again). Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "spend() marks the shot used: spend() sets this.spent to true. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "fire() builds a Bullet: fire() makes its shot with new Bullet(...) instead of a bare sprite, and pushes it onto bullets (a Bullet that is never pushed is never moved or seen). Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "The hit loop asks the bullet: hitEnemies() asks the shot .hits( an enemy, and calls .spend() on it when it does. Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "Finished shots leave the screen and the list: Once a frame, every finished shot is removed from the screen (remove()) and then dropped from the list (bullets = bullets.filter(...)), in that order, as the enemies already are. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "carryFrom": "5-11-defender-4-lab-enemy-takes-over"
 }

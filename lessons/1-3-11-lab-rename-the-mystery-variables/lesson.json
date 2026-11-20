@@ -3,6 +3,10 @@
   "title": "1.3.11 Rename the Mystery Variables",
   "description": "Two snippets of single-letter code. Rename every variable so each line explains itself. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "1.3 Documentation and Coding Conventions",
@@ -151,6 +155,17 @@
         "description": "No declaration of a, b, c, n, d or p remains in the file. Help: 1.3.7 (Avoid Single Letters and Abbreviations)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "subjectName replaces a: Declares subjectName holding the subject text. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r2": "Is a variable named finalGrade declared in the running code and given a NUMBER value, like 88? Text in quotes such as \"88\" is a string, not a number, so it does not count. Code inside comments never runs.",
+        "r3": "gradeReport replaces c: Declares gradeReport built from the other two. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r4": "hoursWorked replaces n: Declares hoursWorked holding the number of hours. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r5": "hourlyRate replaces d: Declares hourlyRate holding the rate. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r6": "totalPay replaces p: Declares totalPay as hoursWorked times hourlyRate. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done.",
+        "r7": "No single-letter variables left: No declaration of a, b, c, n, d or p remains in the file. Judge the student's code as it would actually run. Code inside a comment or a string never runs, unless this card is about a comment, in which case read the comment. The starter's STEP comments are not the student's work. Any names, spacing, quotes or style are fine. Answer yes only if this is fully done."
+      }
+    }
   }
 }

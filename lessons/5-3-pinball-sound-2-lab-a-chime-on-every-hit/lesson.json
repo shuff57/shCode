@@ -3,6 +3,10 @@
   "title": "5.6.3 Lab: A chime on every bumper hit",
   "description": "The three-bumper table from 5.4.5 scores, but it is silent. Load a chime once, in setup(), and play it in the one place a hit happens exactly once, so each drop gives three chimes and never a buzz. Most browsers keep a page silent until you click it or press a key, so if the first drop is quiet, click the game and press R.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.6 Pinball: a sound on a hit",
@@ -88,7 +92,13 @@
         "description": "A sound's play() runs only on the frame a bumper hit starts: inside the if that tests touching now and not touching last frame (the one that adds the bumper's worth), in an if nested inside it, or in a helper that if calls. Playing it above or below the score line both count. Not met: play() straight in draw() or in the loop outside that if, under an if on colliding() or touching alone, in that if's else, under a key press, or only in setup(). Help: 5.6.1 (Reading: A sound on a hit)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "The chime is loaded once, in setup(): Inside setup(), loadSound(...) is given a sound that really exists, spelled exactly: 'coin' or 'music', or the path '/moshion/assets/coin.wav', 'assets/coin.wav' or './assets/coin.wav' (music.wav the same). Any other spelling never plays, so it does not count: 'cion', 'Coin', 'coins', '/moshion/asset/coin.wav', 'coin.mp3'. The sound is kept where draw() can reach it: a variable from the top of the file, a bumper's property, or a list. let or const in front of it inside setup() makes a new local variable, so it does not count. No loadSound in draw() or update(). Any quotes, any name. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "A hit plays the chime once: A sound's .play() runs inside the if that adds the bumper's worth and is true only on the frame a touch starts, such as touching && !b.wasTouching (== false also works, and a helper or nested if counts). b.wasTouching is set from colliding(), a number, so after the first frame it is never the value false: b.wasTouching === false is never true, so play() under it never runs and does not count. Not under if (touching) or colliding() alone, not straight in draw(), not in an else. update() runs every frame too, before draw(). Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   },
   "carryFrom": "5-3-pinball-7-lab-three-bumpers-three-values"
 }

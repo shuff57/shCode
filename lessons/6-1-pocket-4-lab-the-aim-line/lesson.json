@@ -3,6 +3,10 @@
   "title": "6.1.4 Lab: The aim line on the table",
   "description": "Put the aim line on a table with rails, so the line is the shot you are about to take.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 15,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.1 Pocket: plan and the aim line",
@@ -109,6 +113,14 @@
         "description": "new Walls() is called in setup(), after new Canvas(), so the four rails exist. A call only in a comment or string does not count.",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "The line starts at the cue ball: The line begins at the cue ball and ends at the pointer, inside a press test. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The pull is shown: The distance from the ball to the pointer is shown. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The table has rails: `new Walls()` is called in `setup()`, after `new Canvas()`, so the four rails exist. Code inside a comment, or written inside quotes as text, never runs."
+      },
+      "task": "The student wrote a moSHion sketch for \"Lab: The aim line on the table\". The task: add the table's rails with new Walls() after new Canvas(), draw an aim line from the cue ball to the pointer while the mouse is held, and show the pull distance. The cue ball is solid (collider 'dynamic'), so the rails can stop it; a 'none' ball passes through them. Accept any names, helpers, ternaries and semicolons; a line only in a comment or string does not count. Short, plain notes for a 14-year-old; never write corrected code."
+    }
   }
 }

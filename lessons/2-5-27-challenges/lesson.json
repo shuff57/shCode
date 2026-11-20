@@ -3,6 +3,10 @@
   "title": "2.5.27 Challenges: Stretch Problems",
   "description": "Stretch problems. Every challenge is required to continue. Auto-graded.",
   "type": "challenge",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 10,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "2.5 Handling Errors with try/catch",
@@ -73,6 +77,12 @@
         "description": "Code uses a finally block for cleanup. Help: 2.5.15 (Throwing Your Own Errors)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "throw present: Code throws at least one error deliberately. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "finally present: Code uses a finally block for cleanup. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

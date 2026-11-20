@@ -3,6 +3,10 @@
   "title": "5.1.24 Frame Loop Writeup",
   "description": "Written reflection on setup/draw and the 60fps math. AI-graded with hints.",
   "type": "assignment",
+  "work": {
+    "kind": "written",
+    "graded": true
+  },
   "estimateMins": 20,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

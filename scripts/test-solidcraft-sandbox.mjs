@@ -1,0 +1,76 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { cadView,cadSettings,cadDemoFiles,cadSketchLink,CAD_SETTINGS_FILE,CAD_SOURCE,SOLIDCRAFT_SOLID_STARTER,SOLIDCRAFT_SKETCH_STARTER,SOLIDCRAFT_PROJECT_STARTER } from '../lib/solidcraft-project.ts';
+import { getMode,sandboxLesson } from '../lib/sandbox-modes.ts';
+import { CAD_STARTER,isCodeCadProject } from '../lib/solidcraft-code.ts';
+import { projectLessonId,parseProjectLessonId } from '../lib/sandbox-projects-core.ts';
+import { SANDBOX_DEMOS } from '../lib/sandbox-demos.ts';
+import { makeD1 } from './_d1-sqlite.mjs';
+import { onRequestGet,onRequestPut } from '../functions/api/lesson-sync/[lessonId].ts';
+import { onRequestGet as history } from '../functions/api/lesson-sync-history/index.ts';
+import { evaluateCad,buildCad } from './_solidcraft-harness.mjs';
+import { createBuildStamp } from '../vendor/solidcraft-preview/pane/src/build-stamp.mjs';
+const stamp=createBuildStamp(),api={};
+assert.equal(stamp.matches(api,{revision:7}),false);
+stamp.remember(api,{revision:7,dirty:true});
+assert.equal(stamp.matches(api,{revision:7,dirty:true}),true,'a script-built dirty document needs no replacement prompt');
+assert.equal(stamp.matches(api,{revision:8}),false,'a hand edit, undo or document switch needs confirmation');
+assert.equal(stamp.matches({},{revision:7}),false,'a restarted engine cannot reuse a revision stamp');
+stamp.clear();assert.equal(stamp.matches(api,{revision:7}),false,'a failed build leaves no accepted stamp');
+stamp.remember(api,{});assert.equal(stamp.matches(api,{}),false,'missing revision fails closed');
+const mode=getMode('reshape');
+assert.equal(mode.label,'SolidCraft CAD');
+assert.equal(mode.preview,'reshape');
+const id=projectLessonId({id:'k3x9q0w2ab',mode:'reshape'});
+assert.equal(id,'sandbox-reshape-k3x9q0w2ab');
+assert.deepEqual(parseProjectLessonId(id),{id:'k3x9q0w2ab',mode:'reshape'});
+const lesson=sandboxLesson(mode,id);
+assert.equal(lesson.cadHost,'solidcraft');
+assert.deepEqual(lesson.files.map(f=>f.path),['script.js','cad.json'],'a new project: script.js and its settings');
+assert.equal(lesson.files[0].content,CAD_STARTER,'new CAD projects are SolidCraft commands');
+assert.equal(isCodeCadProject(Object.fromEntries(lesson.files.map(f=>[f.path,f.content]))),true);
+assert.equal(isCodeCadProject({'script.js':SOLIDCRAFT_PROJECT_STARTER,'cad.json':cadSettings('solid')}),false,'a reSHape Script project keeps its own workspace');
+assert.equal(cadView({}),'solid');assert.equal(cadView({'cad.json':'invalid'}),'solid');
+assert.equal(cadView({'cad.json':cadSettings('sketch')}),'sketch');
+const oldSource='// My existing CAD project\nconst part = box(31,24,8);\n';
+const files={'script.js':oldSource,'cad.json':cadSettings('sketch'),'sketch.json':fs.readFileSync('scripts/fixtures/solidcraft-native-organizer.json','utf8')};
+const db=makeD1();const ASSETS={fetch:async()=>new Response(JSON.stringify({lessons:[]}))};
+const ctx=(method,body,email='cad@test')=>({env:{DB:db,ASSETS},data:{email,role:'student'},params:{lessonId:id},request:new Request('http://test/api/lesson-sync/'+id,{method,...(body?{headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{})})});
+assert.equal((await onRequestPut(ctx('PUT',{files,baseRevision:0}))).status,200);
+const saved=await (await onRequestGet(ctx('GET'))).json();assert.deepEqual(saved.files,files);
+assert.equal(saved.files['script.js'],oldSource,'existing source is kept byte for byte');
+assert.equal((await (await onRequestGet(ctx('GET',null,'other@test'))).json()).files,null);
+const changed={...files,'script.js':SOLIDCRAFT_SOLID_STARTER,[CAD_SETTINGS_FILE]:cadSettings('solid')};
+assert.equal((await onRequestPut(ctx('PUT',{files:changed,baseRevision:1}))).status,200);
+const hc={env:{DB:db},data:{email:'cad@test',role:'student'},params:{},request:new Request('http://test/api/lesson-sync-history?lessonId='+id)};
+const versions=await (await history(hc)).json();assert.equal(versions.saves.length,2);
+const first=await (await history({...hc,request:new Request('http://test/api/lesson-sync-history?id='+versions.saves.at(-1).id)})).json();
+assert.deepEqual(first.save.files,files);
+assert.equal((await onRequestPut(ctx('PUT',{files:first.save.files,baseRevision:2}))).status,200);
+assert.deepEqual((await (await onRequestGet(ctx('GET'))).json()).files,files,'restoring keeps the view, both scripts and native constraints together');
+db.sqlite.close();
+const workspace=fs.readFileSync('components/SandboxWorkspace.tsx','utf8');
+assert.equal(workspace.includes('ReshapeStudio'),false,'retired CAD UI is no longer mounted by the sandbox');
+assert.match(workspace,/import\('\.\/SolidCraftProject'\)/);
+assert.match(workspace,/import\('\.\/SolidCraftCodeStudio'\)/,'SolidCraft-command projects open the code workspace');
+assert.match(workspace,/isCodeCadProject\(fileContents\) \? \(/);
+assert.match(workspace,/beforeChange=\{beforeLeave\}/,'project switches flush pending native work');
+assert.match(workspace,/activeLessonId===lesson.id/,'a newly opened project cannot mount another project’s source');
+assert.match(fs.readFileSync('app/sandbox/cad/page.tsx','utf8'),/<SandboxWorkspace initialMode="reshape"/);
+assert.equal(fs.existsSync('components/SolidCraftSandbox.tsx'),false,'the unsaved duplicate preview is retired');
+const sketchDemo=SANDBOX_DEMOS.find(d=>d.id==='organizer-outline');
+assert.deepEqual(sketchDemo.files,cadDemoFiles(sketchDemo.source,'sketch','sk'));
+assert.equal(cadView(sketchDemo.files),'sketch');assert.equal(sketchDemo.files[CAD_SOURCE],sketchDemo.source);assert.deepEqual(cadSketchLink(sketchDemo.files),{variable:'sk'});
+for(const source of [oldSource,SOLIDCRAFT_SOLID_STARTER,SOLIDCRAFT_SKETCH_STARTER,SOLIDCRAFT_PROJECT_STARTER,...SANDBOX_DEMOS.filter(d=>d.mode==='reshape').map(d=>d.source)])assert.deepEqual(evaluateCad(source).errors,[]);
+if(process.argv.includes('--kernel')){
+ const dir=process.argv[process.argv.indexOf('--kernel')+1];
+ const examples=[{id:'starter',source:SOLIDCRAFT_SOLID_STARTER,expected:40*30*10-Math.PI*3**2*10},{id:'project starter',source:SOLIDCRAFT_PROJECT_STARTER,expected:60*40*10-Math.PI*3**2*10},{id:'existing',source:oldSource,expected:31*24*8},...SANDBOX_DEMOS.filter(d=>d.mode==='reshape').map(d=>({...d,expected:d.id==='mounting-plate'?70*50*6-4*Math.PI*2.5**2*6:d.id==='desk-cup'?Math.PI*(25**2*65-22**2*62):null}))];
+ for(const example of examples){
+  const view=example.id==='organizer-outline'?'sketch':'solid';const built=await buildCad(example.source,dir,view);
+  assert.equal(built.fin.ok,true,example.id);assert.equal(built.tr.features.some(f=>f.status==='refused'),false,JSON.stringify(built.tr.features));
+  if(view==='sketch'){assert.equal(built.fin.measure.bodies.length,0);assert.ok(Math.abs(built.fin.sketches[0].profile_list[0].area_mm2-2400)<1e-6);}
+  else {assert.equal(built.fin.measure.bodies.length,1);assert.equal(built.fin.measure.bodies[0].closed,true);const volume=built.fin.measure.bodies[0].volume_mm3;assert.ok(Math.abs(volume-example.expected)/example.expected<.001,`${example.id}: native volume ${volume}, independent volume ${example.expected}`);}
+  console.log('PASS pinned SolidCraft '+example.id);
+ }
+}
+console.log('SolidCraft sandbox: preserved project ids/source, saved 2D/3D files, account isolation, History restore, entry routing and retired UI exclusion pass.');

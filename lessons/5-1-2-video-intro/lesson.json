@@ -3,6 +3,10 @@
   "title": "5.1.2 Video: Your first moSHion sketch",
   "description": "A 2-and-a-half-minute walkthrough of the canvas, a sprite, and the Run button. Watch before the Hello Sprite lesson.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 3,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.1 Hello Sprite and Movement",

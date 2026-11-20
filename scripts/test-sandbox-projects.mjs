@@ -78,7 +78,7 @@ for (const id of ['sandbox-js', 'sandbox-reshape']) {
   db.sqlite.prepare('INSERT INTO lesson_sync (student_email, lesson_id, files_gz, revision, updated_at) VALUES (?, ?, ?, 1, 1)').run(OTHER, id, gz);
 }
 [st, body] = await getList(OTHER);
-check('the old sandboxes with saved code become projects', strip(body.projects), ['js:js:JavaScript sandbox', 'reshape:reshape:reSHape sandbox']);
+check('the old sandboxes with saved code become projects', strip(body.projects), ['js:js:JavaScript sandbox', 'reshape:reshape:SolidCraft CAD sandbox']);
 [st, body] = await getList(OTHER);
 check('seeding happens once', body.projects.length, 2);
 
@@ -92,7 +92,7 @@ check('an old id of another type is refused', (await create({ id: 'flow', mode: 
 check('a project needs a name', (await create({ id: 'zzzz1234ef', mode: 'js', name: ' \n ' }))[0], 400);
 check('an old sandbox can be added by its id', (await create({ id: 'js', mode: 'js', name: 'JavaScript sandbox' }))[0], 201);
 [st, body] = await getList(OTHER);
-check('another student does not see them', strip(body.projects), ['js:js:JavaScript sandbox', 'reshape:reshape:reSHape sandbox']);
+check('another student does not see them', strip(body.projects), ['js:js:JavaScript sandbox', 'reshape:reshape:SolidCraft CAD sandbox']);
 
 [st, body] = await rename('abcd1234ef', 'Rocket\u0000 race');
 check('rename', [st, body.project?.name], [200, 'Rocket race']);
@@ -141,7 +141,7 @@ const ws = read('components/SandboxWorkspace.tsx');
 check('the sandbox follows the open project', [ws.includes('useSandboxProjects()'), ws.includes('<SandboxProjectPicker')], [true, true]);
 check('the type tabs are gone', /data-sandbox-mode=/.test(ws), false);
 check('switching projects is locked in Code together', /<SandboxProjectPicker[\s\S]{0,80}locked=\{together\}/.test(ws), true);
-check('a reSHape model and a chart remount per project', [ws.includes('key={`${lesson.id}-${reshapeResetKey}`}'), ws.includes('<DiagramEditor key={lesson.id}')], [true, true]);
+check('SolidCraft and a chart remount per project', [ws.includes('key={`${lesson.id}-${reshapeResetKey}`}'), ws.includes('<DiagramEditor key={lesson.id}')], [true, true]);
 const games = read('lib/games-client.ts');
 check('Remix makes a new project', /export async function remixIntoSandbox[\s\S]*createProject\('moshion'/.test(games), true);
 check('the published-as record is per project', games.includes('sandboxGameKey(lessonId)'), true);

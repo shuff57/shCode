@@ -3,6 +3,10 @@
   "title": "3.8.11 Lab: Round-Trip an Array of Objects",
   "description": "Round-trip a game-state shape — an object holding an array of item objects — through stringify and parse, then read a nested field back. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.8.4",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -279,6 +283,14 @@
         "description": "When gameState holds other values, saved and restored change with it, and console.log calls that run print the second item's price plus ten and its name, read from restored. Help: 3.8.9 (A Round Trip)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "Game-state object declared: Declares an object with curly braces. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Saved with stringify: Calls JSON.stringify to produce text. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "Restored with parse: Calls JSON.parse on the saved text. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Output printed: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

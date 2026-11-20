@@ -3,6 +3,10 @@
   "title": "3.8.23 Lab: Adapt the Pattern to a List",
   "description": "Apply the save/load pattern to an array of records rather than a single object, and read one record's field back out. Auto-graded.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "assignmentCode": "A3.8.9",
   "estimateMins": 15,
   "category": "Unit 1: JavaScript Fundamentals",
@@ -227,6 +231,14 @@
         "description": "When records holds other values, restored changes with it, and a console.log that runs prints one record's field from restored. Help: 3.8.15 (Saving by Key)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r2": "List saved by key: Calls localStorage.setItem. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "Converted with stringify: Calls JSON.stringify. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "List restored with parse: Calls JSON.parse on the saved list. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "Restored list logged: Calls console.log. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

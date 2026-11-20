@@ -1,4 +1,5 @@
 import LessonWorkspace from '../../../components/LessonWorkspace';
+import { notFound } from 'next/navigation';
 import ContentLessonView from '../../../components/ContentLessonView';
 import LessonProgressFooter from '../../../components/LessonProgressFooter';
 import LessonAccessGate from '../../../components/LessonAccessGate';
@@ -20,7 +21,7 @@ export default async function AssignmentPage({
   const { id } = await params;
   const lesson = await getLesson(id);
 
-  if (!lesson) return <div className="p-4">Assignment not found</div>;
+  if (!lesson) notFound();
 
   const numMatch = lesson.title.match(/^(\d+)\.(\d+)\.\d+/);
   const moduleId = numMatch ? `${numMatch[1]}.${numMatch[2]}` : null;

@@ -3,6 +3,10 @@
   "title": "3.3.22 Lab: Read and Update a Nested Array",
   "description": "Read and reassign values in a nested array with double-index syntax, then sum every cell with a nested loop. Auto-graded: the code runs and the final grid and total are checked.",
   "type": "assignment",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 1: JavaScript Fundamentals",
   "unit": "3.3 Arrays",
@@ -214,6 +218,16 @@
         "description": "The output shows 3 (the cell's value before the update) and 15 (the total of the updated grid). Help: 3.3.20 (Lists Inside Lists)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "nested array literal present: Code declares a nested array. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "double-index access present: Code reads or writes with two indexes. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "nested for loops present: A for loop sits inside another for loop (braces optional). Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "console.log present: Code calls console.log. Code inside a comment, or written inside quotes as text, never runs.",
+        "r5": "a grid cell is updated: Code changes one cell with a double index and an assignment, like grid[1][0] = 8 (writing a cell back to itself changes nothing). Code inside a comment, or written inside quotes as text, never runs.",
+        "r6": "a running total is logged: Code adds numbers into a total with += (or total = total + ...) and then logs that total. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

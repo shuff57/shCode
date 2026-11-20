@@ -3,6 +3,10 @@
   "title": "5.2.29 Lab: Rules in update(), picture in draw()",
   "description": "The jump scene from 5.2.13 does everything in draw(). Split it in two: move the keys, the movement and the jump into update(), which moSHion runs before the physics step, and leave draw() with only the picture.",
   "type": "lesson",
+  "work": {
+    "kind": "code",
+    "graded": true
+  },
   "estimateMins": 12,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "5.2 Physics Feel",
@@ -138,6 +142,14 @@
         "description": "draw() still paints the background with background(), and no key test (kb.pressing or kb.presses) is left in draw(), because the rules now live in update(). Words, fill and text size in draw() are the picture and are fine. Not met: a leftover copy of the key or jump lines still in draw(), or background() moved out of draw(). Help: 5.2.28 (Reading: update() runs before physics)",
         "points": 1
       }
-    ]
+    ],
+    "clef": {
+      "questions": {
+        "r1": "The sketch has an update() function: The sketch defines function update() { ... }, spelled all lower case, on its own and not inside setup() or draw(). moSHion runs it on every frame, before the physics step. update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs.",
+        "r2": "The keys move the player in update(): Inside update(), a kb.pressing(...) test moves the player: its vel.x is set, or its x is changed. Any keys count. Code inside a comment, or written inside quotes as text, never runs.",
+        "r3": "The jump is in update(): Inside update(), the jump waits for both a key press, kb.presses(...), and the ground, .colliding(...), joined with && (or one if inside the other), as in 5.2.13. Code inside a comment, or written inside quotes as text, never runs.",
+        "r4": "draw() keeps only the picture: draw() still calls background(), and no key test (kb.pressing or kb.presses) is left in it: the rules now live in update(). update() runs every frame too, before draw(): code in draw(), in update(), or in a function either of them calls all counts. Code inside a comment, or written inside quotes as text, never runs."
+      }
+    }
   }
 }

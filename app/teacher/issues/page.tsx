@@ -223,10 +223,13 @@ const SORT_LABEL: Record<SortKey, string> = {
   status: 'By status',
 };
 
-// 'newest' is the default because it is the order the API already returns
-// (ORDER BY created_at DESC for a staff caller), so the page still opens on
-// the arrangement staff are used to and re-sorting stays opt-in. 'votes'
-// matches the student queue's rule, ties broken newest-first.
+// 'votes' is the default (owner's decision 2026-11-17): students' thumbs-ups,
+// including the "Add my vote" a student gives instead of filing a repeat
+// (components/ReportIssueButton.tsx), decide what staff see first. It is the
+// student queue's rule, ties broken newest-first, so a report with no votes yet
+// still sits above older ones with none. The API itself answers a staff caller
+// newest-first; the page re-sorts.
+const DEFAULT_SORT: SortKey = 'votes';
 const SORTERS: Record<SortKey, (a: IssueReport, b: IssueReport) => number> = {
   newest: (a, b) => b.created_at - a.created_at,
   oldest: (a, b) => a.created_at - b.created_at,
@@ -264,7 +267,7 @@ function IssuesPageInner() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('open');
   const [kindFilter, setKindFilter] = useState<KindFilter>('all');
   const [ageFilter, setAgeFilter] = useState<AgeFilter>('any');
-  const [sortKey, setSortKey] = useState<SortKey>('newest');
+  const [sortKey, setSortKey] = useState<SortKey>(DEFAULT_SORT);
   const [query, setQuery] = useState('');
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [copied, setCopied] = useState('');
@@ -410,7 +413,7 @@ function IssuesPageInner() {
     setStatusFilter('open');
     setKindFilter('all');
     setAgeFilter('any');
-    setSortKey('newest');
+    setSortKey(DEFAULT_SORT);
     setQuery('');
   }
 
@@ -454,7 +457,7 @@ function IssuesPageInner() {
     statusFilter !== 'open' ||
     kindFilter !== 'all' ||
     ageFilter !== 'any' ||
-    sortKey !== 'newest' ||
+    sortKey !== DEFAULT_SORT ||
     query !== '';
 
   function download() {
@@ -600,7 +603,11 @@ function IssuesPageInner() {
           currentFileContent?: string;
           currentFileContentTruncated?: boolean;
           userAgent?: string;
+          /** Set by the Report dialog when the "already known?" check matched and the student sent it
+           *  anyway (lib/issue-check-core.ts matchHint). Client-supplied: a hint, never trusted. */
+          possibleRepeatOf?: { source?: string; id?: number | string; outcome?: string; title?: string };
         } | null;
+        const repeat = repeatLabel(context?.possibleRepeatOf);
 
         return (
           <div key={r.id} style={S.card}>
@@ -656,6 +663,21 @@ function IssuesPageInner() {
               <span style={{ fontSize: 12, color: 'var(--text)', opacity: 0.6 }}>
                 {r.reporter_email} · {fmtDate(r.created_at)}
               </span>
+
+              {repeat && (
+                <span
+                  title={`The check before filing matched ${repeat.full}. The student sent theirs anyway.`}
+                  style={{
+                    fontSize: 11,
+                    color: 'var(--text)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 4,
+                    padding: '2px 8px',
+                  }}
+                >
+                  {repeat.short}
+                </span>
+              )}
 
               {r.resolution_note && (
                 <span
@@ -733,6 +755,7 @@ function IssuesPageInner() {
                     )}
                     {context.currentFile && <div>File: <code>{context.currentFile}</code></div>}
                     {context.userAgent && <div style={{ wordBreak: 'break-all' }}>{context.userAgent}</div>}
+                    {repeat && <div>Sent anyway past a match: {repeat.full}</div>}
                   </div>
                 )}
 
@@ -860,4 +883,22 @@ export default function IssuesPage() {
       <IssuesPageInner />
     </Suspense>
   );
+}
+/** The "possible repeat" pill: what the pre-filing check matched, in a teacher's words. Null when absent or malformed. */
+function repeatLabel(
+  hint: { source?: string; id?: number | string; outcome?: string; title?: string } | undefined,
+): { short: string; full: string } | null {
+  if (!hint || typeof hint !== 'object') return null;
+  const title = typeof hint.title === 'string' ? hint.title.slice(0, 120) : '';
+  if (hint.source === 'report' && (typeof hint.id === 'number' || typeof hint.id === 'string')) {
+    const status = typeof hint.outcome === 'string' ? hint.outcome : '';
+    return {
+      short: `Repeat of #${String(hint.id).slice(0, 12)}?`,
+      full: `report #${String(hint.id).slice(0, 12)}${status ? ` (${status})` : ''}${title ? `: ${title}` : ''}`,
+    };
+  }
+  if (hint.source === 'feature') {
+    return { short: 'Already on the site?', full: `the What's New feature${title ? ` "${title}"` : ''}` };
+  }
+  return null;
 }

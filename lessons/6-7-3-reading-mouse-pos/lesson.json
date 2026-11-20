@@ -3,6 +3,10 @@
   "title": "6.12.3 Reading: moSHion docs: mouse.x and mouse.y",
   "description": "mouse.x and mouse.y give you the cursor's position on the canvas every frame. Read this before the mouse input worked examples.",
   "type": "lesson",
+  "work": {
+    "kind": "read",
+    "graded": false
+  },
   "estimateMins": 5,
   "category": "Unit 2: moSHion: Applied Game Development",
   "unit": "6.12 Advanced Input",

@@ -336,6 +336,9 @@ export function createUpstreamBridge(sc, { prober = null, capS } = {}) {
       return stamp({ ok: true, completed: Number.isInteger(batch.completed) ? batch.completed + n : batch.completed, ...(ran ? { ran } : {}), ...snap });
     },
     async inspect() { return { ok: true, ...(await snapshot(sc)) }; },
+    // shCode (reply-memory.mjs marks): SolidCraft's own checkpoints of the design, to go back to a prefix of the commands it holds without running it again
+    async checkpoint() { const r = await sc.execute('edit.checkpoint', {}); return Number.isInteger(r?.checkpoint) ? r.checkpoint : null; },
+    async restoreCheckpoint(id) { await sc.execute('edit.restore_checkpoint', { checkpoint: id }); },
     async restorePrevious() { return { ok: false, error: 'restoring your previous design is not built on this build' }; },
   };
 }
