@@ -77,11 +77,21 @@ check('no example reads keys or moves sprites in draw() (the rules go in update(
   assert.deepEqual(bad, []);
 });
 
-check('every example clears its canvas and never deletes while looping over a group itself', () => {
+// The body of `function name() { ... }`, by counting braces ('' if there is none).
+function fnBody(code, name) {
+  const m = new RegExp(`function\\s+${name}\\s*\\([^)]*\\)\\s*\\{`).exec(code);
+  if (!m) return '';
+  let depth = 1, i = m.index + m[0].length;
+  const start = i;
+  for (; i < code.length && depth; i++) { if (code[i] === '{') depth++; else if (code[i] === '}') depth--; }
+  return code.slice(start, i - 1);
+}
+
+check('every example clears its canvas in draw() and never deletes while looping over a group itself', () => {
   const bad = [];
   for (const s of sections) for (const p of s.pages) {
     if (!p.code) continue;
-    if (/new\s+(?:\w+\.)?Sprite\b|\btext\(/.test(p.code) && !/\bbackground\(|\bclear\(\)/.test(p.code)) bad.push(`${s.slug}/${p.id}: never clears the canvas`);
+    if (/new\s+(?:\w+\.)?Sprite\b|\btext\(/.test(p.code) && !/\bbackground\(|\bclear\(\)/.test(fnBody(p.code, 'draw'))) bad.push(`${s.slug}/${p.id}: never clears the canvas in draw()`);
     for (const m of p.code.matchAll(/for\s*\(\s*(?:const|let|var)\s+(\w+)\s+of\s+([\w.]+)\s*\)\s*\{([\s\S]*?)\n\s*\}/g)) {
       if (new RegExp(`\\b${m[1]}\\.(delete|remove)\\(`).test(m[3])) bad.push(`${s.slug}/${p.id}: deletes while looping over ${m[2]}`);
     }
