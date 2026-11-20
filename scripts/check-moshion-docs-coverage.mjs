@@ -1,5 +1,5 @@
 // Every public moSHion name in the engine's typings must be explained somewhere in the
-// in-app docs (lib/moshion-docs.ts), or be listed in the known-gaps file with a reason.
+// in-app docs (lib/moshion-docs.ts): on a written page, or by its doc comment in the API reference.
 //
 // Why. A feature can land in the engine without a sentence anywhere: `sprite.texture.pause()`
 // shipped with no docs until someone noticed (#117).

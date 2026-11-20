@@ -2336,7 +2336,7 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "origin",
    "type": "property",
    "detail": "'screen' | 'math'",
-   "info": "Which way the coordinates go."
+   "info": "Which way the coordinates go: 'screen' (the default; (0, 0) is the top-left corner, y grows down) or 'math' ((0, 0) is the centre, y grows up)."
   },
   {
    "label": "gravity",
