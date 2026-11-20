@@ -802,7 +802,8 @@ ONCE, in that repo's `docs/content/` (one file per section, every page with a pe
 notes on shared pages (Library, texture editor, mixer) are `lib/moshion-docs-shcode.ts`, joined by `lib/moshion-docs.ts`.
 Link a page by id, `/docs/moshion/<section>?page=<id>`, never by number: `scripts/test-moshion-docs.mjs` (npm test)
 fails on a number, an unknown id, or an override written against an older copy of a shared page (`basedOn`).
-`npm run deploy` refuses while the vendored copy differs from upstream `main` (`MOSHION_ALLOW_BEHIND=1` to override).
+`npm run deploy` refuses while the vendored copy differs from upstream `main`, or when it cannot check (no `../moshion`
+beside the checkout, offline: from a worktree set `MOSHION_DIR`); `MOSHION_ALLOW_BEHIND=1` overrides it.
 `extras.js` holds only what needs shCode's server (account saves, rooms, `multiplayer()`).
 
 ### moSHion fonts and text layout (2026-11-12, phase 1 of 3)
