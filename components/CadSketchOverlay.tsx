@@ -36,13 +36,16 @@ import { bundleProject, CAD_ENTRY, readVariableProbe, withVariableProbe } from '
 import { topLevelNames, topLevelVariables } from '../lib/solidcraft-picks';
 import type { ScEdge, ScFace } from '../lib/solidcraft-labels';
 import {
-  activeSketch, applyProjective, arcCode, chamferEdits, chamferGeom, cornerAt, cutCorners, cutPreview, trimEdits, trimGeom, largestChamfer, largestRound, roundEdits, roundGeom, curveOwners, dimensionOf, resizeEdits, distToSegment, sketchGeoms, slotGeoms, typedPoint, typedWords, distToPolyline, faceSketchArgs, sketchStatementLines, finishDirections, fmt, freshName, fromPlane, geomPath, geomSnaps, gridStep,
+  activeSketch, angleDims, angleEdits, applyProjective, arcCode, chamferEdits, chamferGeom, cornerAt, cutCorners, cutPreview, trimEdits, trimGeom, largestChamfer, largestRound, roundEdits, roundGeom, curveOwners, dimensionOf, resizeEdits, distToSegment, sketchGeoms, slotGeoms, typedPoint, typedWords, distToPolyline, faceSketchArgs, sketchStatementLines, finishDirections, fmt, freshName, fromPlane, geomPath, geomSnaps, gridStep,
   movePointEdits, planeFrameOf, planeOutlines, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, sweepOf,
   toPlane, toolCode, viewAngles, type PlaneFrame, type SketchGeom, type SketchPlaceInput, type V2, type V3,
 } from '../lib/sketch-plane-points';
+import type { AngleDim } from '../lib/sketch-plane-points';
 
 type Api = { request(method: string, params?: object): Promise<any>; execute(command: string, params?: object): Promise<any> };
 type Evaluate = (source: string) => Promise<{ errors: { message: string; line?: number | null }[]; doc?: { features?: unknown[] } | null }>;
+/** A dimension shown on the sketch: curve i's size, or (with `angle`) the angle where two lines meet. */
+type Dim = { key: string; i: number; at: V2; text: string; value: number; angle?: AngleDim };
 type Tool = 'line' | 'rectangle' | 'circle' | 'arc' | 'slot' | 'polyline' | 'round' | 'chamfer' | 'trim' | 'delete';
 type Box = { min: number[]; max: number[] };
 interface Sketch { id: string; place: SketchPlaceInput; frame: PlaneFrame; geoms: SketchGeom[] }
@@ -104,9 +107,9 @@ export default function CadSketchOverlay(p: Props) {
   const toolPts = useRef<V2[]>([]);
   /** a size typed after a tool's first click (Enter puts the point down at it) */
   const typed = useRef('');
-  const [drawing, setDrawing] = useState<{ grid: [V2, V2, boolean][]; axes: [V2, V2][]; outline: string; clip: boolean; curves: V2[][]; step: number; dims: { i: number; at: V2; text: string; value: number }[] } | null>(null);
-  /** a size being typed in place of a curve's dimension */
-  const [editing, setEditing] = useState<{ i: number; value: string } | null>(null);
+  const [drawing, setDrawing] = useState<{ grid: [V2, V2, boolean][]; axes: [V2, V2][]; outline: string; clip: boolean; curves: V2[][]; step: number; dims: Dim[]; marks: V2[][] } | null>(null);
+  /** a size or an angle being typed in place of its dimension */
+  const [editing, setEditing] = useState<{ d: Dim; value: string } | null>(null);
   const [hover, setHover] = useState<{ x: number; y: number; text: string; dot: V2 | null; preview: V2[] | null; del?: number[]; cut?: V2[] } | null>(null);
   /** Delete: which line of the block drew each of the sketch's curves, for the doc as it was when worked out */
   const owners = useRef<{ doc: string; name: string; lines: DrawLine[]; owner: number[] | null } | null>(null);
@@ -148,17 +151,18 @@ export default function CadSketchOverlay(p: Props) {
     return () => { live = false; clearTimeout(t); };
   }, [p.active, p.evaluate, p.entryOpen, mode, version, filesKey]);
   const [ownersKey, setOwnersKey] = useState(0); // which line drew which curve was worked out again
-  /** The edits that give curve i the size value, for the code as it is now; null when its size is not written as plain numbers. */
-  const resizeOf = (i: number, value: number) => {
+  /** The edits that give dimension d the value (a curve's size, or an angle), for the code as it is now; null when it is not written as plain numbers. */
+  const changeOf = (d: Dim, value: number) => {
     const o = owners.current; const ed = p.editor.current; const sk = mode ? sketches.current.get(mode) : null;
     if (!o || !o.owner || !ed || !sk || o.name !== mode || o.doc !== ed.state.doc.toString()) return null;
-    const line = o.lines[o.owner[i]]; const g = sk.geoms[i]; return line && g ? resizeEdits(o.doc, mode!, line, g, value) : null;
+    if (d.angle) return angleEdits(o.doc, mode!, o.lines, o.owner, sk.geoms, d.angle, value);
+    const line = o.lines[o.owner[d.i]]; const g = sk.geoms[d.i]; return line && g ? resizeEdits(o.doc, mode!, line, g, value) : null;
   };
   const applySize = () => {
     const e = editing; setEditing(null); if (!e) return;
-    const v = Number(e.value); const edits = v > 0 ? resizeOf(e.i, v) : null; const ed = p.editor.current;
+    const v = Number(e.value); const edits = v > 0 ? changeOf(e.d, v) : null; const ed = p.editor.current;
     if (!edits || !ed) return;
-    ed.dispatch({ changes: edits }); p.onInserted(`Size changed to ${fmt(v)}`);
+    ed.dispatch({ changes: edits }); p.onInserted(e.d.angle ? `Angle changed to ${fmt(v)}°` : `Size changed to ${fmt(v)}`);
   };
 
   // ---- sketch mode follows the editor cursor -----------------------------------------------------------------------------------
@@ -275,7 +279,7 @@ export default function CadSketchOverlay(p: Props) {
       corners.forEach((c, i) => { const p2 = screen[4 + i]; if (Array.isArray(p2)) snaps.push({ s: [p2[0], p2[1]], q: toPlane(f, c.p), kind: c.kind, own: false }); });
       for (const g of sk?.geoms ?? []) for (const n of geomSnaps(g)) { const sp = applyProjective(F, n.q); if (sp) snaps.push({ s: sp, q: n.q, kind: n.kind, own: !n.kind.startsWith('middle') }); }
       view.current = { F, H, frame: f, step, snaps, label }; refreshHover.current?.();
-      if (!s) { curvesOnScreen.current = []; setDrawing({ grid: [], axes: [], outline: '', clip: false, curves: [], step, dims: [] }); return; }
+      if (!s) { curvesOnScreen.current = []; setDrawing({ grid: [], axes: [], outline: '', clip: false, curves: [], step, dims: [], marks: [] }); return; }
       const [x0, y0, x1, y1] = [quad[0][0], quad[0][1], quad[2][0], quad[2][1]];
       while ((x1 - x0) / step > 120 || (y1 - y0) / step > 120) step *= 2;
       view.current.step = step; refreshHover.current?.();
@@ -288,8 +292,20 @@ export default function CadSketchOverlay(p: Props) {
       const loops = planeOutlines(edges.filter(e => on(e.a) && on(e.b) && on(e.mid)).map(e => ({ a: toPlane(f, e.a), b: toPlane(f, e.b), mid: toPlane(f, e.mid) })));
       const outline = pathOf(loops.map(l => l.map(toScreen)));
       const curves = s.geoms.map(g => geomPath(g).map(toScreen)); curvesOnScreen.current = curves;
-      const dims = s.geoms.flatMap((g, i) => { const d = dimensionOf(g); return d ? [{ i, at: toScreen(d.at), text: d.text, value: d.value }] : []; });
-      setDrawing({ grid, axes, outline, clip: loops.length > 0, curves, step, dims });
+      const dims: Dim[] = s.geoms.flatMap((g, i) => { const d = dimensionOf(g); return d ? [{ key: `d${i}`, i, at: toScreen(d.at), text: d.text, value: d.value }] : []; });
+      // each angle inside its corner, 44 px out along the line between the two lines, with a 14 px arc across it; a corner too small on
+      // screen for its label (lines under about 45 px) shows none until the view comes closer
+      const pxmm = Math.min(dist(o, one), dist(o, oneV)); const marks: V2[][] = [];
+      angleDims(s.geoms).forEach((a, k) => {
+        const lens = [a.i, a.j].map(n => { const g = s.geoms[n]; return g.k === 'line' ? dist(g.a, g.b) : 0; });
+        const rho = Math.min(44, 0.6 * Math.min(...lens) * pxmm) / pxmm; if (rho * pxmm < 26) return;
+        const b = [a.ui[0] + a.uj[0], a.ui[1] + a.uj[1]]; const bl = Math.hypot(b[0], b[1]) || 1;
+        dims.push({ key: `a${k}`, i: -1, at: toScreen([a.q[0] + b[0] / bl * rho, a.q[1] + b[1] / bl * rho]), text: `${fmt(a.value)}°`, value: a.value, angle: a });
+        const sg = Math.sign(a.ui[0] * a.uj[1] - a.ui[1] * a.uj[0]) || 1; const th = a.value * Math.PI / 180; const r = Math.min(14, 0.4 * rho * pxmm) / pxmm;
+        marks.push(Array.from({ length: 13 }, (_, n) => { const t = sg * th * n / 12; const c = Math.cos(t), si = Math.sin(t);
+          return toScreen([a.q[0] + r * (a.ui[0] * c - a.ui[1] * si), a.q[1] + r * (a.ui[0] * si + a.ui[1] * c)]); }));
+      });
+      setDrawing({ grid, axes, outline, clip: loops.length > 0, curves, step, dims, marks });
     };
     const loop = async () => { try { await draw(); } catch { /* the view is busy */ } if (live) timer = setTimeout(loop, 150); };
     void loop();
@@ -638,15 +654,16 @@ export default function CadSketchOverlay(p: Props) {
       {drawing?.curves.map((c, i) => <polyline key={`c${i}`} points={c.map(q => q.join(',')).join(' ')} className={hover?.del?.includes(i) ? styles.sketchDelete : styles.sketchCurve} />)}
       {hover?.preview && <polyline points={hover.preview.map(q => q.join(',')).join(' ')} className={styles.sketchPreview} />}
       {hover?.cut && <polyline points={hover.cut.map(q => q.join(',')).join(' ')} className={styles.sketchDelete} />}
+      {mode && drawing?.marks.map((m, k) => <polyline key={`m${k}`} points={m.map(q => q.join(',')).join(' ')} className={styles.sketchAngle} />)}
     </svg>
     {mode && drawing?.dims.map(d => {
-      const can = !tool && !!resizeOf(d.i, d.value) && ownersKey >= 0;
-      if (editing?.i === d.i) return <input key={`d${d.i}`} className={styles.sketchDimEdit} style={{ left: d.at[0], top: d.at[1] }} autoFocus aria-label="New size"
-        value={editing.value} onChange={e => setEditing({ i: d.i, value: e.target.value })} onBlur={() => setEditing(null)}
+      const can = !tool && !!changeOf(d, d.value) && ownersKey >= 0;
+      if (editing?.d.key === d.key) return <input key={d.key} className={styles.sketchDimEdit} style={{ left: d.at[0], top: d.at[1] }} autoFocus aria-label={d.angle ? 'New angle' : 'New size'}
+        value={editing.value} onChange={e => setEditing({ d, value: e.target.value })} onBlur={() => setEditing(null)}
         onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); applySize(); } if (e.key === 'Escape') { e.preventDefault(); setEditing(null); } }} />;
-      return can ? <button key={`d${d.i}`} className={styles.sketchDim} style={{ left: d.at[0], top: d.at[1] }} title="Click to type a new size"
-        onClick={() => setEditing({ i: d.i, value: fmt(d.value) })}>{d.text}</button>
-        : <span key={`d${d.i}`} className={`${styles.sketchDim} ${styles.sketchDimFixed}`} style={{ left: d.at[0], top: d.at[1] }}>{d.text}</span>;
+      return can ? <button key={d.key} className={styles.sketchDim} style={{ left: d.at[0], top: d.at[1] }} title={d.angle ? 'Click to type a new angle' : 'Click to type a new size'}
+        onClick={() => setEditing({ d, value: fmt(d.value) })}>{d.text}</button>
+        : <span key={d.key} className={`${styles.sketchDim} ${styles.sketchDimFixed}`} style={{ left: d.at[0], top: d.at[1] }}>{d.text}</span>;
     })}
     {hover?.dot && <span className={styles.pointDot} style={{ left: hover.dot[0], top: hover.dot[1] }} />}
     {hover && <span className={styles.pointReadout} style={{ left: hover.x, top: hover.y, ...(hover.x > (p.inner?.innerWidth ?? 1e9) - 300 ? { transform: 'translate(calc(-100% - 14px), 14px)' } : {}) }}>

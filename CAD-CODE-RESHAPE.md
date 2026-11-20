@@ -251,6 +251,24 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
 
   A size written with a name (`[5 + w, 35]`) is shown but cannot be clicked: it is changed in the code. Which line drew which
   curve comes from the same cut-short evaluation as Delete. Checked: `/tmp/cad-drive/sketch-dims-e2e.py`, 7 of 7.
+- **Angle dimensions** (2026-11-20). Each corner where exactly two lines end shows the angle between them, inside the corner
+  with a small arc across it (`angleDims`). A level and an upright line meeting at a right angle show none (every rectangle
+  would have four), nor do two lines running straight on, a corner where an arc or a third curve ends, or a corner too small
+  on screen for its label (its lines under about 45 px; it shows when the view comes closer).
+  - **Changing it** (`angleEdits`): a click opens the angle for typing (above 0, below 180), and the later-drawn line turns
+    about the corner, keeping its length. Its far end is written to 1e-9 with every `[x, y]` of the block that is that end,
+    so a side sharing that end follows (a closed polyline stays closed). When the later line cannot turn, the earlier one does.
+  - A line turns only when its far end is written as plain numbers in its own line and only lines end there, none of them a
+    rectangle's side: an arc or a circle there would be left off its curve, and a rectangle's corner moves only level and
+    upright. Otherwise the angle is shown but cannot be clicked. `movePointEdits` takes how to write the new point for this.
+  - Checked: unit tests (a triangle's three angles, no angle at a rectangle, straight on, three lines, an arc; turning the
+    later line with the side that follows, the earlier one when the later is written with a variable, neither, a circle
+    centred or a rectangle's corner on the end, 180 and 0 refused). In the browser, `/tmp/cad-drive/sketch-angle-e2e.py`, 10 of 10:
+    - a triangle's 63.435°, 45° and 71.565° and a small triangle's two angles shown, a rectangle's none, each with its arc;
+    - the small triangle's corner whose two far ends are written with variables shown but not clickable;
+    - 45° typed as 60: the right side turns to `[25.857864376, 29.494897428]` and the closing side follows; the other two
+      corners then show 57.081° and 62.919°; 200 changes nothing; Escape leaves the code;
+    - the sketch extrudes at 5 × (150√6 + 100 + 70) more than the part, within 1e-3.
 - **Round.** A click on a corner where two lines meet, then the radius: from the pointer (its distance from the corner times
   tan of half the angle, so at a right angle the distance itself, on the grid's step, never above the largest that fits) or
   typed and Enter (`roundEdits` in `lib/sketch-plane-points.ts`).

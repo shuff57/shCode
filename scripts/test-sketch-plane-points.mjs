@@ -1,7 +1,7 @@
 // Points on a sketch's plane (lib/sketch-plane-points.ts): reSHape's plane frames, the projective map from the screen to a plane,
 // which sketch the editor cursor is in, and what a picked point writes into the code. The pointer in the real view is a browser check.
 import assert from 'node:assert/strict';
-import { crossings, trimGeom, trimEdits, chamferEdits, chamferGeom, cornerAt, cutCorners, cutPreview, largestChamfer, largestRound, roundEdits, roundGeom, dimensionOf, resizeEdits, distToSegment, slotGeoms, typedNumbers, typedPoint, typedWords, sketchGeoms, curveOwners, distToPolyline, sketchStatementLines, arcCode, faceSketchArgs, finishDirections, freshName, movePointEdits, planeOutlines, sweepOf, activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
+import { angleDims, angleEdits, crossings, trimGeom, trimEdits, chamferEdits, chamferGeom, cornerAt, cutCorners, cutPreview, largestChamfer, largestRound, roundEdits, roundGeom, dimensionOf, resizeEdits, distToSegment, slotGeoms, typedNumbers, typedPoint, typedWords, sketchGeoms, curveOwners, distToPolyline, sketchStatementLines, arcCode, faceSketchArgs, finishDirections, freshName, movePointEdits, planeOutlines, sweepOf, activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
 
 // ---- planes, as reSHape resolves them: a named plane's origin is normal x offset ------------------------------------------
 const top10 = planeFrameOf({ plane: 'xy', offset: 10 });
@@ -187,6 +187,46 @@ console.log('PASS the slot tool: its code, its outline, a typed radius');
   assert.equal(resizeEdits(doc, 'sk', L[1], { k: 'circle', c: [45, 20], r: 5 }, 0), null, 'a size of 0 is not given');
 }
 console.log('PASS dimensions: lengths and radii shown, and changed in the code');
+{ // angle dimensions: where two lines meet, changed by turning one about the corner
+  const apply = (doc, es) => { let d = doc; for (const e of [...es].sort((a, b) => b.from - a.from)) d = d.slice(0, e.from) + e.insert + d.slice(e.to); return d; };
+  const tri = [{ k: 'line', a: [0, 0], b: [20, 0] }, { k: 'line', a: [20, 0], b: [10, 10] }, { k: 'line', a: [10, 10], b: [0, 0] }];
+  const A = angleDims(tri);
+  assert.deepEqual(A.map(a => [a.q, a.i, a.j, +a.value.toFixed(9)]), [[[0, 0], 0, 2, 45], [[20, 0], 0, 1, 45], [[10, 10], 1, 2, 90]], 'a triangle: 45, 45 and a slanted right angle');
+  const rect = [{ k: 'line', a: [0, 0], b: [10, 0] }, { k: 'line', a: [10, 0], b: [10, 5] }, { k: 'line', a: [10, 5], b: [0, 5] }, { k: 'line', a: [0, 5], b: [0, 0] }];
+  assert.deepEqual(angleDims(rect), [], 'a level and an upright line: no angle shown');
+  assert.deepEqual(angleDims([{ k: 'line', a: [0, 0], b: [10, 0] }, { k: 'line', a: [10, 0], b: [20, 0] }]), [], 'straight on: none');
+  assert.deepEqual(angleDims([...tri, { k: 'line', a: [0, 0], b: [-5, 3] }]).map(a => a.q), [[20, 0], [10, 10]], 'three lines at a corner: none there');
+  assert.deepEqual(angleDims([{ k: 'line', a: [0, 0], b: [10, 0] }, { k: 'arc', c: [0, 5], r: 5, a: [0, 0], b: [5, 5], sense: 'ccw' }]), [], 'a line and an arc: none');
+  const doc = "const sk = sketch('top');\nsk.lines([[0, 0], [20, 0], [10, 10], [0, 0]]);\n";
+  const L = sketchStatementLines(doc, 'sk');
+  assert.match(apply(doc, angleEdits(doc, 'sk', L, [0, 0, 0], tri, A[0], 60)), /sk\.lines\(\[\[0, 0\], \[20, 0\], \[7\.071067812, 12\.247448714\], \[0, 0\]\]\);/,
+    'the later line turns to 60 degrees about the corner, its length kept, written to 1e-9; the side that shares its end follows');
+  const doc2 = "const w = 10;\nconst sk = sketch('top');\nsk.line([0, 0], [20, 0]);\nsk.line([0, 0], [w, 10]);\n";
+  const G2 = [{ k: 'line', a: [0, 0], b: [20, 0] }, { k: 'line', a: [0, 0], b: [10, 10] }]; const L2 = sketchStatementLines(doc2, 'sk'); const A2 = angleDims(G2);
+  assert.equal(+A2[0].value.toFixed(9), 45);
+  assert.match(apply(doc2, angleEdits(doc2, 'sk', L2, [0, 1], G2, A2[0], 30)), /sk\.line\(\[0, 0\], \[19\.318516526, 5\.176380902\]\);\nsk\.line\(\[0, 0\], \[w, 10\]\);/,
+    'the later line\'s end is written with a variable: the earlier line turns instead');
+  const doc3 = "const w = 10;\nconst sk = sketch('top');\nsk.line([0, 0], [w + 10, 0]);\nsk.line([0, 0], [w, 10]);\n";
+  assert.equal(angleEdits(doc3, 'sk', sketchStatementLines(doc3, 'sk'), [0, 1], G2, A2[0], 30), null, 'neither written as plain numbers: no change');
+  const doc4 = "const sk = sketch('top');\nsk.line([0, 0], [20, 0]);\nsk.line([0, 0], [10, 10]);\nsk.arc([10, 0], [10, 10], [0, 0], 'ccw');\n";
+  const G4 = [...G2, { k: 'arc', c: [10, 0], r: 10, a: [10, 10], b: [0, 0], sense: 'ccw' }];
+  assert.equal(angleDims(G4).length, 0, 'an arc ends at the corner: no angle');
+  const doc5 = "const sk = sketch('top');\nsk.line([0, 0], [20, 0]);\nsk.line([0, 0], [10, 10]);\nsk.circle([10, 10], { r: 2 });\n";
+  const G5 = [...G2, { k: 'circle', c: [10, 10], r: 2 }];
+  assert.match(apply(doc5, angleEdits(doc5, 'sk', sketchStatementLines(doc5, 'sk'), [0, 1, 2], G5, angleDims(G5)[0], 30)), /sk\.line\(\[0, 0\], \[19\.318516526, 5\.176380902\]\);\nsk\.line\(\[0, 0\], \[10, 10\]\);/,
+    'a circle is centred on the later line\'s end: the earlier line turns, the circle stays');
+  const doc6 = "const sk = sketch('top');\nsk.rectangle([20, -5], [30, 0]);\nsk.line([0, 0], [20, 0]);\nsk.line([0, 0], [10, 10]);\nsk.line([10, 10], [15, 20]);\n";
+  const G6 = [{ k: 'line', a: [20, -5], b: [30, -5] }, { k: 'line', a: [30, -5], b: [30, 0] }, { k: 'line', a: [30, 0], b: [20, 0] }, { k: 'line', a: [20, 0], b: [20, -5] }, ...G2, { k: 'line', a: [10, 10], b: [15, 20] }];
+  const A6 = angleDims(G6).find(a => a.q[0] === 0 && a.q[1] === 0);
+  assert.match(apply(doc6, angleEdits(doc6, 'sk', sketchStatementLines(doc6, 'sk'), [0, 0, 0, 0, 1, 2, 3], G6, A6, 90)), /sk\.line\(\[0, 0\], \[0, 14\.142135624\]\);\nsk\.line\(\[0, 14\.142135624\], \[15, 20\]\);/,
+    'the later line turns, and the line that starts at its end follows');
+  const doc7 = "const sk = sketch('top');\nsk.rectangle([10, 10], [20, 15]);\nsk.line([0, 0], [20, 0]);\nsk.line([0, 0], [10, 10]);\n";
+  const G7 = [{ k: 'line', a: [10, 10], b: [20, 10] }, { k: 'line', a: [20, 10], b: [20, 15] }, { k: 'line', a: [20, 15], b: [10, 15] }, { k: 'line', a: [10, 15], b: [10, 10] }, ...G2];
+  assert.match(apply(doc7, angleEdits(doc7, 'sk', sketchStatementLines(doc7, 'sk'), [0, 0, 0, 0, 1, 2], G7, angleDims(G7).find(a => a.q[0] === 0), 30)), /sk\.rectangle\(\[10, 10\], \[20, 15\]\);\nsk\.line\(\[0, 0\], \[19\.318516526, 5\.176380902\]\);/,
+    'a rectangle\'s corner on the later line\'s end: the earlier line turns, the rectangle stays');
+  assert.equal(angleEdits(doc, 'sk', L, [0, 0, 0], tri, A[0], 180), null, '180 degrees is not an angle to give'); assert.equal(angleEdits(doc, 'sk', L, [0, 0, 0], tri, A[0], 0), null);
+}
+console.log('PASS angle dimensions: shown where two lines meet, changed by turning one line about the corner');
 { // Round: a corner where two lines meet, rounded with an arc
   const apply = (doc, es) => { let d = doc; for (const e of [...es].sort((a, b) => b.from - a.from)) d = d.slice(0, e.from) + e.insert + d.slice(e.to); return d; };
   const doc = "const sk = sketch('top');\nsk.line([0, 0], [20, 0]);\nsk.line([20, 0], [20, 10]);\n";

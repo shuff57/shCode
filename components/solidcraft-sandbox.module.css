@@ -114,6 +114,7 @@
 .sketchDimFixed { cursor:default; pointer-events:none; opacity:.8; }
 .sketchDimEdit { position:absolute; z-index:4; transform:translate(-50%, -50%); width:6em; font:12px/1.4 var(--font-mono, monospace); }
 .sketchDelete { fill:none; stroke:var(--c-red, #ff5555); stroke-width:3.5; }
+.sketchAngle { fill:none; stroke:var(--c-orange, #ffb86c); stroke-width:1.25; opacity:.8; }
 .sketchBarHost:empty { display:none; }
 .sketchBar { display:inline-flex; align-items:center; gap:6px; flex-wrap:wrap; }
 .sketchPlane { color:var(--c-meta); }

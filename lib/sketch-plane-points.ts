@@ -247,9 +247,9 @@ export function arcCode(s: string, c: V2, a: V2, b: V2): string | null {
  * corner two lines share, or a closed outline's first and last point, move together). Only plain number literals are found; a
  * point written with a variable or a sum is not, and nothing is changed for it. A plain `sk.rectangle(a, b)` also moves by the
  * two corners its code does not write: [b.x, a.y] and [a.x, b.y] become the new corner, its sides staying level and upright.
- * The changes to make, in the document's offsets.
+ * The changes to make, in the document's offsets; `code` writes the new point (to 0.001 unless told otherwise).
  */
-export function movePointEdits(doc: string, name: string, from: V2, to: V2): { from: number; to: number; insert: string }[] {
+export function movePointEdits(doc: string, name: string, from: V2, to: V2, code: (q: V2) => string = pointCode): { from: number; to: number; insert: string }[] {
   const end = sketchBlockEnd(doc, name); if (end === null) return [];
   const esc = name.replace(/\$/g, '\\$');
   const decl = new RegExp(`^\\s*(?:const|let|var)\\s+${esc}\\s*=\\s*sketch\\s*\\(`, 'm').exec(doc); if (!decl) return [];
@@ -263,12 +263,12 @@ export function movePointEdits(doc: string, name: string, from: V2, to: V2): { f
     if (!a) continue;
     const b: V2 = same(x1, y0, from) ? [to[0], Number(y1)] : [Number(x1), to[1]];
     const s = decl.index + m.index + m[0].indexOf(m[1]); const e = decl.index + m.index + m[0].lastIndexOf(m[4]) + m[4].length;
-    out.push({ from: s, to: e, insert: `${pointCode(a)}, ${pointCode(b)}` }); taken.push([s, e]);
+    out.push({ from: s, to: e, insert: `${code(a)}, ${code(b)}` }); taken.push([s, e]);
   }
   const re = new RegExp(PT, 'g');
   for (let m = re.exec(block); m; m = re.exec(block)) {
     const s = decl.index + m.index;
-    if (same(m[1], m[2], from) && !taken.some(([ts, te]) => s >= ts && s < te)) out.push({ from: s, to: s + m[0].length, insert: pointCode(to) });
+    if (same(m[1], m[2], from) && !taken.some(([ts, te]) => s >= ts && s < te)) out.push({ from: s, to: s + m[0].length, insert: code(to) });
   }
   return out.sort((p, q) => p.from - q.from);
 }
@@ -731,6 +731,53 @@ export function trimEdits(doc: string, name: string, lines: { from: number; to: 
   const t = trimGeom(geoms, i, p); if (typeof t === 'string') return t;
   const edits = rewriteCurves(doc, name, lines, owner, geoms, [i], j => j === i ? t.keep : null, [], t.kind);
   return typeof edits === 'string' ? edits : { edits, keepCode: t.keep.map(g => curveCode(name, g)), kind: t.kind };
+}
+
+// ---- Angle dimensions: the angle where two lines meet, changed by turning one of them about the corner -------------------------
+
+/** An angle to show: at corner q of lines i and j (i drawn first), in degrees, with the ways the two lines leave q. */
+export interface AngleDim { q: V2; i: number; j: number; value: number; ui: V2; uj: V2 }
+/**
+ * The angles to show: one at each corner where exactly two curves end and both are lines, unless they run straight on, or are a level and
+ * an upright line (that right angle the grid shows, and every rectangle would have four).
+ */
+export function angleDims(geoms: SketchGeom[]): AngleDim[] {
+  const out: AngleDim[] = [];
+  const level = (t: V2) => Math.abs(t[0]) < 1e-12 || Math.abs(t[1]) < 1e-12;
+  for (const q of cutCorners(geoms)) {
+    const at = geoms.flatMap((g, k) => (g.k === 'line' || g.k === 'arc') && (at6(g.a, q) || at6(g.b, q)) ? [k] : []);
+    if (at.length !== 2 || at.some(k => geoms[k].k !== 'line')) continue;
+    const [i, j] = at; const fi = fromCorner(geoms[i], q), fj = fromCorner(geoms[j], q);
+    if (!(fi.len > 1e-9 && fj.len > 1e-9)) continue;
+    if (level(fi.t) && level(fj.t) && Math.abs(dot2(fi.t, fj.t)) < 1e-12) continue;
+    const s = Math.abs(cross2(fi.t, fj.t)); if (s < 1e-9) continue;
+    out.push({ q, i, j, value: Math.atan2(s, dot2(fi.t, fj.t)) * 180 / Math.PI, ui: fi.t, uj: fj.t });
+  }
+  return out;
+}
+/**
+ * The code edits that make angle d `value` degrees (above 0, below 180): the later line turns about the corner and keeps its length; when it
+ * cannot, the earlier one does. Its far end is written to 1e-9, with every [x, y] of the block that is that end (so a line that shares the end
+ * follows it, see movePointEdits). A line turns only when its far end is written as plain numbers in its own line, and only lines end there,
+ * none of them a rectangle's side (an arc or a circle there would be left off its curve). Null when neither line can turn.
+ */
+export function angleEdits(doc: string, name: string, lines: { from: number; to: number; text: string }[], owner: number[], geoms: SketchGeom[],
+  d: AngleDim, value: number): { from: number; to: number; insert: string }[] | null {
+  if (!(value > 0 && value < 180)) return null;
+  for (const [t, f] of [[d.j, d.i], [d.i, d.j]]) {
+    const gt = geoms[t], gf = geoms[f]; const own = lines[owner[t]]; if (!gt || !gf || !own) continue;
+    const ft = fromCorner(gt, d.q), ff = fromCorner(gf, d.q); const F = ft.far;
+    const there = geoms.flatMap((g, k) => ((g.k === 'line' || g.k === 'arc') && (at6(g.a, F) || at6(g.b, F))) || ((g.k === 'arc' || g.k === 'circle') && at6(g.c, F)) ? [k] : []);
+    if (there.some(k => geoms[k].k !== 'line' || !lines[owner[k]] || /\.rectangle\(/.test(lines[owner[k]].text))) continue;
+    const re = new RegExp(PT, 'g'); let written = false;
+    for (let m = re.exec(own.text); m; m = re.exec(own.text)) if (Math.abs(Number(m[1]) - F[0]) < 1e-9 && Math.abs(Number(m[2]) - F[1]) < 1e-9) written = true;
+    if (!written) continue;
+    const th = (Math.sign(cross2(ff.t, ft.t)) || 1) * value * Math.PI / 180; const c = Math.cos(th), s = Math.sin(th);
+    const u: V2 = [ff.t[0] * c - ff.t[1] * s, ff.t[0] * s + ff.t[1] * c];
+    const edits = movePointEdits(doc, name, F, r9([d.q[0] + u[0] * ft.len, d.q[1] + u[1] * ft.len]), pointExact);
+    if (edits.some(e => e.from >= own.from && e.to <= own.to)) return edits;
+  }
+  return null;
 }
 
 // ---- Delete: which line of the sketch's block drew which curve ---------------------------------------------------------------
