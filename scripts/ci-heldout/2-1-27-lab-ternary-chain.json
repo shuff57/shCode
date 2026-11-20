@@ -1,0 +1,82 @@
+[
+ {
+  "name": "H correct multi-line chain",
+  "code": "const score = 72;\nconst rating = score >= 90\n  ? \"Excellent\"\n  : score >= 70\n    ? \"Good\"\n    : \"Needs work\";\nconsole.log(rating);",
+  "labels": [
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ {
+  "name": "H if / else if instead of ternary",
+  "code": "const score = 72;\nlet rating;\nif (score >= 90) { rating = \"Excellent\"; }\nelse if (score >= 70) { rating = \"Good\"; }\nelse { rating = \"Needs work\"; }\nconsole.log(rating);",
+  "labels": [
+   0,
+   0,
+   0,
+   1
+  ]
+ },
+ {
+  "name": "H 70 checked before 90",
+  "code": "const score = 95;\nconst rating = score >= 70 ? \"Good\" : score >= 90 ? \"Excellent\" : \"Needs work\";\nconsole.log(rating);",
+  "labels": [
+   null,
+   null,
+   0,
+   1
+  ]
+ },
+ {
+  "name": "H prints the word rating, not the variable",
+  "code": "const score = 85;\nconst rating = score >= 90 ? \"Excellent\" : score >= 70 ? \"Good\" : \"Needs work\";\nconsole.log(\"rating\");",
+  "labels": [
+   1,
+   1,
+   1,
+   0
+  ]
+ },
+ {
+  "name": "H wrong second cutoff 80",
+  "code": "const score = 85;\nconst rating = score >= 90 ? \"Excellent\" : score >= 80 ? \"Good\" : \"Needs work\";\nconsole.log(rating);",
+  "labels": [
+   1,
+   0,
+   null,
+   1
+  ]
+ },
+ {
+  "name": "H wrong word for the top band",
+  "code": "const score = 95;\nconst rating = score >= 90 ? \"Great\" : score >= 70 ? \"Good\" : \"Needs work\";\nconsole.log(rating);",
+  "labels": [
+   0,
+   1,
+   1,
+   1
+  ]
+ },
+ {
+  "name": "H parenthesised inner ternary",
+  "code": "const score = 60;\nconst rating = score >= 90 ? \"Excellent\" : (score >= 70 ? \"Good\" : \"Needs work\");\nconsole.log(rating);",
+  "labels": [
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ {
+  "name": "H ternary printed directly, no rating variable",
+  "code": "const score = 85;\nconsole.log(score >= 90 ? \"Excellent\" : score >= 70 ? \"Good\" : \"Needs work\");",
+  "labels": [
+   1,
+   1,
+   0,
+   0
+  ]
+ }
+]

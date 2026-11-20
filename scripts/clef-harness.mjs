@@ -25,14 +25,34 @@ import { aiCheckText } from '../lib/ai-check.ts';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (n, d) => { const i = process.argv.indexOf('--' + n); return i < 0 ? d : process.argv[i + 1]; };
 const lab = arg('lab');
+// --provider workers (default): Clef through the local wrangler proxy, as production runs it.
+// --provider cheaperinference --model <id>: any decision model on CheaperInference's POST /v1/decisions
+// (jev-1.14.0, pplx-decider-v1.3, ...), key in CI_API_KEY. The same questions, the same state, the same
+// band and pattern fallback; only the model behind them changes. The key is read from the environment
+// and never printed or written to --json.
+// --provider typesafe [--model jev-1.14.0]: TypeSafe's own POST /v1/systemone, key in TYPESAFE_API_KEY. Its
+// request and answer are already Clef's shape (state + noul questions, answers.<id>.noul), so the body is
+// clefInputs() with the model swapped. Billed $0.042 per million input tokens, computed from usage.
+const bandArg = arg('band') ? arg('band').split(',').map(Number) : null;
+if (bandArg && (bandArg.length !== 2 || !(bandArg[0] > bandArg[1]) || bandArg.some((x) => !(x >= 0 && x <= 1)))) { console.error('--band takes hi,lo with 0 <= lo < hi <= 1, e.g. --band 0.8,0.15'); process.exit(2); }
+const provider = arg('provider', 'workers');
+const modelId = arg('model', provider === 'workers' ? CLEF_MODEL : provider === 'typesafe' ? 'jev-1.14.0' : '');
 const proxy = process.env.WORKERS_PROXY;
-if (!lab || !proxy) {
-  console.error('usage: WORKERS_PROXY=http://localhost:8799 node --import ./scripts/register-ts.mjs scripts/clef-harness.mjs --lab <lessonId> [--fixtures f.json] [--json out.json]');
+const ciKey = process.env.CI_API_KEY;
+const tsKey = process.env.TYPESAFE_API_KEY;
+const CI_URL = process.env.CI_URL || 'https://api.cheaperinference.com/v1/decisions';
+const TS_URL = process.env.TYPESAFE_URL || 'https://api.typesafe.ai/v1/systemone';
+if (!lab || (provider === 'workers' && !proxy) || (provider === 'cheaperinference' && (!ciKey || !modelId)) || (provider === 'typesafe' && !tsKey) || !['workers', 'cheaperinference', 'typesafe'].includes(provider)) {
+  console.error('usage: WORKERS_PROXY=http://localhost:8799 node --import ./scripts/register-ts.mjs scripts/clef-harness.mjs --lab <lessonId> [--fixtures f.json] [--json out.json]\n' +
+    '   or: CI_API_KEY=... node --import ./scripts/register-ts.mjs scripts/clef-harness.mjs --provider cheaperinference --model pplx-decider-v1.3 --lab <lessonId> ...\n' +
+    '   or: TYPESAFE_API_KEY=... node --import ./scripts/register-ts.mjs scripts/clef-harness.mjs --provider typesafe --model jev-1.14.0 --lab <lessonId> ...');
   process.exit(2);
 }
 
 const lf = (s) => String(s).replace(/\r\n?/g, '\n');
-const lesson = JSON.parse(readFileSync(path.join(root, 'lessons', lab, 'lesson.json'), 'utf8'));
+// --lesson-file reads the lesson's JSON from somewhere else (a copy from git, say) while the lab's starter and
+// solution files still come from lessons/<lab>/. The working tree's lesson.json is never touched.
+const lesson = JSON.parse(readFileSync(arg('lesson-file', path.join(root, 'lessons', lab, 'lesson.json')), 'utf8'));
 // The questions, task and kind as the generator builds them (scripts/generate-ai-graders.mjs), read from
 // lesson.json itself so several labs can be edited and tested at once without regenerating in between.
 const authored = lesson.aiCheck?.clef;
@@ -42,6 +62,15 @@ const cfg = {
   kind: lesson.work?.kind === 'plan' ? 'plan' : lesson.preview === 'moshion' ? 'moshion' : 'console',
   questions: Object.fromEntries(Object.entries(authored.questions).map(([k, v]) => [k, String(v).trim()])),
 };
+// --questions-file overrides question wording (and task) per lab without touching lesson.json, which also feeds
+// production Clef: { "<lab>": { "task"?: "...", "questions": { "<card id>": "..." } } }. Cards not named keep
+// the lesson's own wording. This is how a second model gets its own tuned questions.
+const qf = arg('questions-file');
+if (qf && existsSync(qf)) {
+  const o = JSON.parse(readFileSync(qf, 'utf8'))[lab];
+  if (o?.questions) for (const [k, v] of Object.entries(o.questions)) if (k in cfg.questions) cfg.questions[k] = String(v).trim();
+  if (o?.task) cfg.task = String(o.task).trim();
+}
 if (!cfg.task) { console.error(`${lab}: no task (add aiCheck.clef.task)`); process.exit(2); }
 // Only the cards Clef answers are scored here; a card that runs the code (`tests`) has no question and
 // keeps its runtime result in the app, which this harness does not run.
@@ -83,13 +112,83 @@ if (process.argv.includes('--tolerance')) {
   }
 }
 
+let costUsd = 0;
+// CI_RPM caps how many requests per minute THIS process starts (a key has its own per-minute limit; several
+// harnesses running side by side each need their share). Unset = no cap.
+const ciRpm = Number(process.env.CI_RPM || 0);
+let nextSlot = 0;
+async function throttle() {
+  if (!(ciRpm > 0)) return;
+  const at = Math.max(Date.now(), nextSlot);
+  nextSlot = at + 60000 / ciRpm;
+  if (at > Date.now()) await new Promise((r) => setTimeout(r, at - Date.now()));
+}
+// CheaperInference's answer (an array of {type:'predicate', name, probability}, or {type:'refusal'}) as the
+// {answers: {id: {noul}}} shape cardsFromAnswer reads. A refusal or a missing name has no `noul`, so that
+// card is unsure and the pattern check decides it, exactly as for a malformed Clef answer.
+function ciToClefShape(j) {
+  const answers = {};
+  for (const a of Array.isArray(j.answers) ? j.answers : []) {
+    if (a?.name && a.type === 'predicate') answers[a.name] = { noul: a.probability };
+  }
+  return { answers };
+}
+
 async function ask(code) {
   for (let attempt = 0; ; attempt++) {
-    const res = await fetch(proxy, { method: 'POST', body: JSON.stringify({ model: CLEF_MODEL, inputs: clefInputs(cfg, code) }) });
-    const j = await res.json().catch(() => ({ ok: false, error: 'bad proxy answer' }));
-    if (j.ok) return { ms: j.ms, cards: cardsFromAnswer(j.out, Object.keys(cfg.questions)), tokens: j.out?.usage?.input_tokens ?? null };
-    if (attempt === 2) throw new Error(j.error);
-    await new Promise((r) => setTimeout(r, 2000 * (attempt + 1)));
+    let j;
+    if (provider === 'workers') {
+      const res = await fetch(proxy, { method: 'POST', body: JSON.stringify({ model: CLEF_MODEL, inputs: clefInputs(cfg, code) }) });
+      j = await res.json().catch(() => ({ ok: false, error: 'bad proxy answer' }));
+      if (j.ok) return { ms: j.ms, cards: cardsFromAnswer(j.out, Object.keys(cfg.questions)), tokens: j.out?.usage?.input_tokens ?? null };
+    } else if (provider === 'typesafe') {
+      const t0 = Date.now();
+      const res = await fetch(TS_URL, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', authorization: `Bearer ${tsKey}` },
+        body: JSON.stringify({ ...clefInputs(cfg, code), model: modelId }),
+      });
+      const body = await res.json().catch(() => null);
+      const ms = Date.now() - t0;
+      if (res.ok && body) {
+        costUsd += ((body.usage?.input_tokens ?? 0) * 0.042) / 1e6;
+        return { ms, cards: cardsFromAnswer(body, Object.keys(cfg.questions)), tokens: body.usage?.input_tokens ?? null };
+      }
+      j = { ok: false, error: `HTTP ${res.status}: ${JSON.stringify(body?.error ?? body ?? 'no body').slice(0, 200)}` };
+      if ([401, 402, 403].includes(res.status)) throw new Error(j.error);
+    } else {
+      // The state is sent as named JSON fields (about / task / student_code), the same content Clef gets.
+      await throttle();
+      const t0 = Date.now();
+      const state = clefInputs(cfg, code).state;
+      const res = await fetch(CI_URL, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', authorization: `Bearer ${ciKey}` },
+        body: JSON.stringify({
+          model: modelId,
+          input: JSON.stringify(state),
+          questions: Object.entries(cfg.questions).map(([name, instructions]) => ({ type: 'predicate', name, instructions })),
+          // --zdr off sends zdr:false, for models with no zero-data-retention route. Only for hand-written
+          // fixtures: a student's code must never go through a route that may keep it.
+          ...(arg('zdr') === 'off' ? { zdr: false } : {}),
+        }),
+      });
+      const body = await res.json().catch(() => null);
+      const ms = Date.now() - t0;
+      if (res.ok && body) {
+        const billed = Number(body.billing?.billed_cost_usd ?? 0);
+        if (Number.isFinite(billed)) costUsd += billed;
+        return { ms, cards: cardsFromAnswer(ciToClefShape(body), Object.keys(cfg.questions)), tokens: body.usage?.input_tokens ?? null };
+      }
+      j = { ok: false, error: `HTTP ${res.status}: ${body?.error?.message ?? body?.error ?? 'no body'}` };
+      // A rejected key or an empty balance will not heal on a retry: stop at once.
+      if ([401, 402, 403].includes(res.status)) throw new Error(j.error);
+    }
+    // A 429 is the key's requests-per-minute cap, not a bad answer: wait it out (the window is a minute) and
+    // try again up to six times, so a rate-limited run never records a false ERROR.
+    const limited = String(j.error).startsWith('HTTP 429');
+    if (attempt >= (limited ? 5 : 2)) throw new Error(j.error);
+    await new Promise((r) => setTimeout(r, limited ? 12000 * (attempt + 1) : 2000 * (attempt + 1)));
   }
 }
 
@@ -104,6 +203,9 @@ await Promise.all(Array.from({ length: pool }, async () => {
       const a = await ask(aiCheckText(lesson.aiCheck, p.files));
       calls++;
       const report = grade(lesson.requirements, p.files);
+      // --band hi,lo: this model's own "sure" lines (the shared BAND is Clef's). A card between them is unsure
+      // and the pattern check decides it, as always.
+      if (bandArg) a.cards = a.cards.map((c) => ({ ...c, verdict: c.p === null ? 'unsure' : c.p >= bandArg[0] ? 'met' : c.p <= bandArg[1] ? 'missing' : 'unsure' }));
       const { verdicts, decidedBy } = resolveClefCards(a.cards, report);
       rows.push({ ...p, ...a, verdicts, decidedBy });
     } catch (e) {
@@ -143,7 +245,10 @@ for (const r of rows) {
 }
 const unsure = rows.filter((r) => !r.error).reduce((s, r) => s + Object.values(r.decidedBy).filter((d) => d === 'pattern').length, 0);
 const cells = rows.filter((r) => !r.error).length * ids.length;
-console.log(`\n${lab}: ${ok} ok, ${bad} failing, ${calls} calls; ${unsure}/${cells} cards went to the pattern check ("?")` +
-  (scored ? `; fixtures ${right}/${scored} cards right (${(100 * right / scored).toFixed(1)}%)` : ''));
+const msSorted = rows.filter((r) => !r.error).map((r) => r.ms).sort((a, b) => a - b);
+const median = msSorted.length ? msSorted[Math.floor(msSorted.length / 2)] : null;
+console.log(`\n${lab} [${provider === 'workers' ? CLEF_MODEL : modelId}]: ${ok} ok, ${bad} failing, ${calls} calls; ${unsure}/${cells} cards went to the pattern check ("?")` +
+  (scored ? `; fixtures ${right}/${scored} cards right (${(100 * right / scored).toFixed(1)}%)` : '') +
+  (median != null ? `; median ${median} ms` : '') + (provider !== 'workers' ? `; billed $${costUsd.toFixed(6)}` : ''));
 if (arg('json')) writeFileSync(arg('json'), JSON.stringify(rows, null, 1));
 process.exit(bad || calls === 0 ? 1 : 0);

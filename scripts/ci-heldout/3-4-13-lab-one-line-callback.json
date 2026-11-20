@@ -1,0 +1,112 @@
+[
+ {
+  "name": "H correct, named arrow passed",
+  "code": "function transform(value, fn) { return fn(value); }\nconst double = n => n * 2;\nconsole.log(transform(5, double));",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   null
+  ]
+ },
+ {
+  "name": "H arrow with a braces body",
+  "code": "function transform(value, fn) { return fn(value); }\nconsole.log(transform(5, n => { return n * 2; }));",
+  "labels": [
+   1,
+   0,
+   1,
+   1,
+   null
+  ]
+ },
+ {
+  "name": "H function expression passed, not an arrow",
+  "code": "function transform(value, fn) { return fn(value); }\nconsole.log(transform(5, function (n) { return n + 1; }));",
+  "labels": [
+   1,
+   0,
+   1,
+   1,
+   null
+  ]
+ },
+ {
+  "name": "H result stored then printed",
+  "code": "function transform(value, fn) { return fn(value); }\nconst out = transform(\"hi\", s => s + \"!\");\nconsole.log(out);",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   null
+  ]
+ },
+ {
+  "name": "H helper never calls its function parameter",
+  "code": "function transform(value, fn) { return value; }\nconsole.log(transform(2, n => n + 1));",
+  "labels": [
+   0,
+   1,
+   1,
+   1,
+   null
+  ]
+ },
+ {
+  "name": "H no console.log at all",
+  "code": "function transform(value, fn) { return fn(value); }\nconst out = transform(2, n => n + 1);",
+  "labels": [
+   1,
+   1,
+   0,
+   0,
+   null
+  ]
+ },
+ {
+  "name": "H prints only a message, not the result",
+  "code": "function transform(value, fn) { return fn(value); }\ntransform(2, n => n + 1);\nconsole.log(\"done\");",
+  "labels": [
+   1,
+   1,
+   1,
+   0,
+   null
+  ]
+ },
+ {
+  "name": "H arrow first, value second",
+  "code": "function transform(fn, value) { return fn(value); }\nconsole.log(transform(n => n - 1, 10));",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   null
+  ]
+ },
+ {
+  "name": "H only commented-out console.log",
+  "code": "function transform(value, fn) { return fn(value); }\nconst r = transform(2, n => n + 1);\n// console.log(r);",
+  "labels": [
+   1,
+   1,
+   0,
+   0,
+   null
+  ]
+ },
+ {
+  "name": "H arrow body on the next line, still one expression",
+  "code": "function transform(value, fn) { return fn(value); }\nconst inc = n =>\n  n + 1;\nconsole.log(transform(2, inc));",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   null
+  ]
+ }
+]
