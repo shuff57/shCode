@@ -1307,7 +1307,7 @@ The two in-class activities above are now in-app: "draw the same loop twice" is 
 - **AP CSP Discussion (15 min):** Metadata. A save file stores values plus structure (what each field means). What other metadata do games keep — timestamps, versions, player IDs?
 
 **Assignments:**
-- **A6.5.1 (Lab, File I/O coverage, in-app `6-5-26-challenges`):** Add persistent high scores to your §6.4 game — top 3 with player initials, reads on start, writes when a new score qualifies, and a "clear" button that calls `clearStorage`. Prove persistence by closing and reopening the browser.
+- **A6.5.1 (Lab, File I/O coverage, in-app `6-5-26-challenges`):** Add persistent high scores to your §6.4 game — top 3 with player initials, reads on start, writes when a new score qualifies, and a "clear" button that removes this game's own saves with `removeItem` (not `clearStorage`, which erases every game's saves). Prove persistence by closing and reopening the browser.
 
 **Teacher Notes:**
 - `getItem` returns strings. Expect bugs from `getItem('x') + 1` concatenating. Teach `Number()`/`JSON.parse()` explicitly — the exact same trap named in Q1 §3.8.
