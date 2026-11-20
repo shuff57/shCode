@@ -1,0 +1,14 @@
+[
+  {"name": "H correct, no braces, bodies on the same line",
+   "code": "let filamentType = \"ABS\"\nlet layerHeight = 0.2\nif (filamentType === \"PLA\") console.log(200)\nelse if (filamentType === \"PETG\") console.log(235)\nelse if (filamentType === \"ABS\") console.log(250)\nelse console.log(\"Unknown filament type\")\nif (layerHeight < 0.1 || layerHeight > 0.4) console.log(\"Warning: layer height is unsafe\")\n",
+   "labels": [1, 1, 1, 1, 1]},
+  {"name": "H correct, no braces, bodies on the next line",
+   "code": "let filamentType = \"PETG\"\nlet layerHeight = 0.3\nif (filamentType === \"PLA\")\n  console.log(200)\nelse if (filamentType === \"PETG\")\n  console.log(235)\nelse if (filamentType === \"ABS\")\n  console.log(250)\nelse\n  console.log(\"Unknown filament type\")\nif (layerHeight < 0.1 || layerHeight > 0.4)\n  console.log(\"Warning\")\n",
+   "labels": [1, 1, 1, 1, 1]},
+  {"name": "H PETG branch logs the wrong number, no braces",
+   "code": "let filamentType = \"ABS\"\nlet layerHeight = 0.2\nif (filamentType === \"PLA\") console.log(200)\nelse if (filamentType === \"PETG\") console.log(325)\nelse if (filamentType === \"ABS\") console.log(250)\nelse console.log(\"Unknown filament type\")\nif (layerHeight < 0.1 || layerHeight > 0.4) console.log(\"Warning\")\n",
+   "labels": [1, 0, 1, 1, 1]},
+  {"name": "H layer height warning compares only one side",
+   "code": "let filamentType = \"PLA\"\nlet layerHeight = 0.5\nif (filamentType === \"PLA\") { console.log(200) } else if (filamentType === \"PETG\") { console.log(235) } else if (filamentType === \"ABS\") { console.log(250) } else { console.log(\"Unknown filament type\") }\nif (layerHeight > 0.4) { console.log(\"Warning\") }\n",
+   "labels": [1, 1, 1, 1, 0]}
+]

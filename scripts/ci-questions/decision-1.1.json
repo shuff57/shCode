@@ -248,7 +248,9 @@
  },
  "2-1-36-lab-settings-advisor": {
   "questions": {
-   "r1": "Is there an if whose condition compares filamentType to PLA (filamentType === 'PLA' or == 'PLA', any quotes) and whose block logs the temperature 200, either the bare number 200 or inside a message like 'Recommended temperature: 200C'? What the other branches do is irrelevant. NO if the condition is a single = (an assignment, not a comparison) or the block logs a different number. Code inside a comment, or inside quotes or backticks as text, never runs."
+   "r1": "Is there an if whose condition compares filamentType to PLA (filamentType === 'PLA' or == 'PLA', any quotes) and whose block logs the temperature 200, either the bare number 200 or inside a message like 'Recommended temperature: 200C'? What the other branches do is irrelevant. NO if the condition is a single = (an assignment, not a comparison) or the block logs a different number. Code inside a comment, or inside quotes or backticks as text, never runs.",
+   "r2": "In the chain of if / else if branches on filamentType, is there an else if whose condition compares filamentType with the text PETG (=== or ==, any quotes) and whose body logs 235 (as a number or as text containing 235)? The body may be in { } braces or just the next statement with no braces, on the same line or the next. NO if the condition uses a misspelled variable, a single = (assignment), or the branch logs a different number. Comments never run.",
+   "r5": "Is there an if statement, separate from the filament chain, whose condition compares layerHeight with a number on BOTH sides of && or || (for example layerHeight < 0.1 || layerHeight > 0.4, or layerHeight >= 0.1 && layerHeight <= 0.4), and whose body logs a message? The body may have braces or not. NO if only one side compares layerHeight, or there is no && or ||. Comments never run."
   }
  },
  "1-1-11-name-that-umbrella": {
