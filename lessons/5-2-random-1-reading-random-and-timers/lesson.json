@@ -11,7 +11,7 @@
   "slos": [
     "SLO-3"
   ],
-  "externalLink": "/docs/moshion/patterns?page=5",
+  "externalLink": "/docs/moshion/patterns?page=timers",
   "externalLinkLabel": "Open the in-app moSHion docs",
   "contentFile": "content.md",
   "steps": [],

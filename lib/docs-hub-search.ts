@@ -19,8 +19,8 @@ export interface HubSearchResult extends DocSearchResult {
 }
 
 /** The same URL shape the set's own sidebar links use (page 1 has no query). */
-export function docPageHref(basePath: string, slug: string, pageIndex: number): string {
-  return pageIndex === 0 ? `${basePath}/${slug}` : `${basePath}/${slug}?page=${pageIndex + 1}`;
+export function docPageHref(basePath: string, slug: string, pageIndex: number, pageId?: string): string {
+  return pageIndex === 0 ? `${basePath}/${slug}` : `${basePath}/${slug}?page=${pageId ?? pageIndex + 1}`;
 }
 
 /** Results whose page title holds the first word come first, then those in a topic named for it
@@ -34,7 +34,7 @@ export function searchAllDocs(sets: HubDocSet[], query: string, limit = 20): Hub
   for (const set of sets) {
     for (const r of searchDocs(set.sections, query, 200)) {
       all.push({
-        r: { ...r, setId: set.id, setLabel: set.label, href: docPageHref(set.basePath, r.sectionSlug, r.pageIndex) },
+        r: { ...r, setId: set.id, setLabel: set.label, href: docPageHref(set.basePath, r.sectionSlug, r.pageIndex, r.pageId) },
         rank: r.pageTitle.toLowerCase().includes(primary) ? 0 : r.sectionTitle.toLowerCase().includes(primary) ? 1 : 2,
         order: order++,
       });

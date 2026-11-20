@@ -43,6 +43,6 @@ for (const r of searchAllDocs(sets, 'a', 200)) {
   const section = set.sections.find((s) => s.slug === r.sectionSlug);
   assert.ok(section, `${r.href} names a real section`);
   assert.ok(r.pageIndex >= 0 && r.pageIndex < section.pages.length, `${r.href} names a real page`);
-  assert.equal(r.href, docPageHref(set.basePath, r.sectionSlug, r.pageIndex));
+  assert.equal(r.href, docPageHref(set.basePath, r.sectionSlug, r.pageIndex, r.pageId));
 }
 console.log('test-docs-hub-search: all checks passed');

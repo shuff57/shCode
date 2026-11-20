@@ -66,12 +66,12 @@ export const GITHUB_WORD = {
   remix: 'On GitHub, a copy of someone else’s project is called a fork.',
 } as const;
 
-/** The docs pages that teach this flow (lib/moshion-docs.ts, section 'sharing'). ?page= counts from 1. */
+/** The docs pages that teach this flow (lib/moshion-docs-shcode.ts, section 'sharing'), by page id. */
 export const FLOW_DOCS = {
-  versions: '/docs/moshion/sharing?page=1',
-  propose: '/docs/moshion/sharing?page=3',
-  sync: '/docs/moshion/sharing?page=4',
-  github: '/docs/moshion/sharing?page=5',
+  versions: '/docs/moshion/sharing?page=versions',
+  propose: '/docs/moshion/sharing?page=proposing',
+  sync: '/docs/moshion/sharing?page=newest-version',
+  github: '/docs/moshion/sharing?page=github',
 } as const;
 
 /** What a status reads as on a badge. */

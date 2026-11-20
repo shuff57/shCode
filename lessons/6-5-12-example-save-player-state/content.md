@@ -70,8 +70,8 @@ function draw() {
   else if (kb.pressing('down')) player.vel.y = 4;
   else player.vel.y = 0;
 
-  if (kb.pressed('space')) score = score + 10;
-  if (kb.pressed('l')) level = level + 1;
+  if (kb.presses('space')) score = score + 10;
+  if (kb.presses('l')) level = level + 1;
 
   fill('white');
   textSize(16);
@@ -115,10 +115,10 @@ function draw() {
   else if (kb.pressing('down')) player.vel.y = 4;
   else player.vel.y = 0;
 
-  if (kb.pressed('space')) score = score + 10;
-  if (kb.pressed('l')) level = level + 1;
+  if (kb.presses('space')) score = score + 10;
+  if (kb.presses('l')) level = level + 1;
 
-  if (kb.pressed('s')) {
+  if (kb.presses('s')) {
     let saveObj = {
       score: score,
       level: level,
@@ -172,10 +172,10 @@ function draw() {
   else if (kb.pressing('down')) player.vel.y = 4;
   else player.vel.y = 0;
 
-  if (kb.pressed('space')) score = score + 10;
-  if (kb.pressed('l')) level = level + 1;
+  if (kb.presses('space')) score = score + 10;
+  if (kb.presses('l')) level = level + 1;
 
-  if (kb.pressed('s')) {
+  if (kb.presses('s')) {
     let saveObj = {
       score: score,
       level: level,

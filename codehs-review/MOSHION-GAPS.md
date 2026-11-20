@@ -1,5 +1,7 @@
 # moSHion API gaps against a 2D game-dev curriculum
 
+> **Archived snapshot (2026-10-30).** Kept for the specs that cite it. It describes an older engine; many gaps listed here are closed. For the engine today read `public/moshion/docs/moshion.d.ts` and the docs at `/docs/moshion` (API reference section).
+
 Reviewed 2026-10-30. Read-only review. Repo = `/home/shuff57/Documents/GitHub/moshion` (HEAD `ca3327d`, 2026-10-03);
 vendored = `shCode/public/moshion/`. Line numbers are in the REPO `moshion.js` (3226 lines) unless marked "vendored" (3111 lines).
 "run" = I executed it in headless Chromium against a scratch copy (nothing in either repo touched). Everything else is code-read.

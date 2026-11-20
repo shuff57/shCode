@@ -1,5 +1,7 @@
 # moSHion coverage: have we covered everything?
 
+> **Archived snapshot (2026-11-02).** Kept for the specs that cite it. It describes an older engine; many gaps listed here are closed. For the engine today read `public/moshion/docs/moshion.d.ts` and the docs at `/docs/moshion` (API reference section).
+
 Audited 2026-11-02, branch `codehs-inspiration`, read-only. Engine: `public/moshion/moshion.js` vendored from
 moSHion `d8068bb` (default gravity 0, `world.origin = 'math'` available). The course is the 330 lessons in
 category "Unit 2: moSHion" (5.1-5.11, 6.1-6.11, 7.1), taken in title-number order (`5.6.15` before `5.7.1`), not

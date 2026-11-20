@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
+  pageLink,
+  resolvePageIndex,
   searchDocs,
   type DocSearchResult,
   type DocSection,
@@ -24,11 +26,6 @@ interface Props {
   preview: 'moshion' | 'reshape';
 }
 
-function pageHref(basePath: string, slug: string, pageIndex: number) {
-  return pageIndex === 0
-    ? `${basePath}/${slug}`
-    : `${basePath}/${slug}?page=${pageIndex + 1}`;
-}
 
 function HighlightedSnippet({ result }: { result: DocSearchResult }) {
   if (!result.matchLength) return <>{result.snippet}</>;
@@ -54,8 +51,7 @@ export default function DocsClient({
 }: Props) {
   const params = useSearchParams();
   const router = useRouter();
-  const pageParam = Number(params.get('page') || '1');
-  const pageIndex = Math.min(Math.max(pageParam, 1), section.pages.length) - 1;
+  const pageIndex = resolvePageIndex(section, params.get('page'));
   const page = section.pages[pageIndex];
 
   const hasPrev = pageIndex > 0;
@@ -113,10 +109,15 @@ export default function DocsClient({
     return () => window.removeEventListener('mousedown', onClick);
   }, []);
 
+  function hrefFor(r: DocSearchResult) {
+    const s = allSections.find((x) => x.slug === r.sectionSlug);
+    return s ? pageLink(basePath, s, r.pageIndex) : `${basePath}/${r.sectionSlug}`;
+  }
+
   function gotoResult(r: DocSearchResult) {
     setDropdownOpen(false);
     setQuery('');
-    router.push(pageHref(basePath, r.sectionSlug, r.pageIndex));
+    router.push(hrefFor(r));
   }
 
   function handleMainKey(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -165,7 +166,7 @@ export default function DocsClient({
                   {results.map((r, i) => (
                     <li key={`${r.sectionSlug}:${r.pageIndex}:${i}`}>
                       <Link
-                        href={pageHref(basePath, r.sectionSlug, r.pageIndex)}
+                        href={hrefFor(r)}
                         onClick={() => setQuery('')}
                       >
                         <span className="docs-sidebar-result-title">{r.pageTitle}</span>
@@ -198,7 +199,7 @@ export default function DocsClient({
                           {s.pages.map((p, i) => (
                             <li key={i}>
                               <Link
-                                href={`${basePath}/${s.slug}?page=${i + 1}`}
+                                href={pageLink(basePath, s, i)}
                                 className={i === pageIndex ? 'current' : ''}
                               >
                                 {p.title}
@@ -299,14 +300,14 @@ export default function DocsClient({
           {hasPrev ? (
             <Link
               className="btn-secondary btn-sm"
-              href={`${basePath}/${section.slug}?page=${pageIndex}`}
+              href={pageLink(basePath, section, pageIndex - 1)}
             >
               Previous: {section.pages[pageIndex - 1].title}
             </Link>
           ) : prevSection ? (
             <Link
               className="btn-secondary btn-sm"
-              href={`${basePath}/${prevSection.slug}?page=${prevSection.pages.length}`}
+              href={pageLink(basePath, prevSection, prevSection.pages.length - 1)}
             >
               Previous: {prevSection.title}
             </Link>
@@ -316,7 +317,7 @@ export default function DocsClient({
           {hasNext ? (
             <Link
               className="btn-secondary btn-sm"
-              href={`${basePath}/${section.slug}?page=${pageIndex + 2}`}
+              href={pageLink(basePath, section, pageIndex + 1)}
             >
               Next: {section.pages[pageIndex + 1].title}
             </Link>

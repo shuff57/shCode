@@ -71,6 +71,13 @@
 
   let FRAME_ = 0;
   let START_TIME_ = 0;   // performance.now() right before setup() runs, for millis()
+  // While preload() runs: the files it asked for, as {label, promise}. Every
+  // loader pushes onto it; null the rest of the time, so a loader called in
+  // setup() or draw() loads in the background exactly as it always has.
+  let LOAD_PENDING_ = null;
+  function _joinPreload_(label, promise) {
+    if (LOAD_PENDING_) LOAD_PENDING_.push({ label: String(label), promise: promise });
+  }
   let FPS_ = 0;           // 1 / last frame's dt, for frameRate()
   // deltaTime (shCode #104, 2026-11-12): milliseconds since the previous frame,
   // as in p5 -- about 16.7 at 60 frames a second, more on a slow computer. A
@@ -138,6 +145,15 @@
     return KEY_ALIASES_[k] || k;
   }
 
+  // A plain-words console note shown once per run for each `key`, for code
+  // that works but very likely does not do what its writer meant.
+  const WARNED_ONCE_ = new Set();
+  function _warnOnce(key, msg) {
+    if (WARNED_ONCE_.has(key)) return;
+    WARNED_ONCE_.add(key);
+    console.warn(msg);
+  }
+
   const kb = {
     holdThreshold: 12,
     // Boolean, matching the course (5.1.5/6.3.3: "returns true every frame
@@ -155,7 +171,14 @@
     // frame the key comes back UP, not the frame it goes down. Matched here
     // exactly even though several reading lessons (6.5.11 etc.) read like
     // they expect a down-edge trigger — see build report for the disagreement.
-    pressed: (k) => kb.released(k),
+    // Kept (saved programs depend on it), but the first call each run says
+    // so in the console, because `if (kb.pressed('space'))` nearly always
+    // means presses().
+    pressed: (k) => {
+      _warnOnce('kb.pressed', 'kb.pressed() is true when the key comes back UP. ' +
+        'To act the moment it goes down, use kb.presses().');
+      return kb.released(k);
+    },
     // The reference API's releases() is a literal alias of released() (verified
     // against the reference implementation: `releases(inp) { return
     // this.released(inp); }`) — both are already true for exactly one frame
@@ -192,7 +215,12 @@
     holding: (b) => { const v = MOUSE[_btnSlot(b)]; return v >= mouse.holdThreshold ? v : 0; },
     held: (b) => MOUSE[_btnSlot(b)] === -2,
     released: (b) => MOUSE[_btnSlot(b)] <= -1,
-    pressed: (b) => mouse.released(b),
+    // The same up-edge alias as kb.pressed() above, with the same one-time note.
+    pressed: (b) => {
+      _warnOnce('mouse.pressed', 'mouse.pressed() is true when the button comes back UP. ' +
+        'To act the moment it goes down, use mouse.presses().');
+      return mouse.released(b);
+    },
     // Same alias relationship as kb.releases() above (the reference implementation).
     releases: (b) => mouse.released(b),
     // True once the browser has reported the cursor inside the canvas and
@@ -201,8 +229,16 @@
     get isOnCanvas() { return MOUSE._onCanvas; },
     // CSS cursor on the canvas element itself — the reference API's mouse.cursor
     // (the reference implementation) reads/writes $.canvas.style.cursor directly.
-    get cursor() { return CANVAS_ ? CANVAS_.style.cursor : 'default'; },
-    set cursor(v) { if (CANVAS_) CANVAS_.style.cursor = v; },
+    // Set before new Canvas() it is kept and applied when the canvas is made.
+    get cursor() { return CANVAS_ ? CANVAS_.style.cursor : (MOUSE._cursor ?? 'default'); },
+    set cursor(v) { MOUSE._cursor = v; if (CANVAS_) CANVAS_.style.cursor = v; },
+    // mouse.visible = false hides the pointer over the canvas (cursor 'none');
+    // true brings back the cursor it had before (shCode #125).
+    get visible() { return mouse.cursor !== 'none'; },
+    set visible(v) {
+      if (v) { if (mouse.cursor === 'none') mouse.cursor = MOUSE._cursorBefore || ''; }
+      else if (mouse.cursor !== 'none') { MOUSE._cursorBefore = mouse.cursor === 'default' ? '' : mouse.cursor; mouse.cursor = 'none'; }
+    },
     // Wheel delta accumulated since the last frame, zeroed in the per-frame
     // sweep (matches the reference API's postDraw: `m.scrollDelta.x = 0` etc,
     // the reference implementation) — read it once per draw() call, not per event.
@@ -359,7 +395,7 @@
         set y(v) { const c = _world().getGravity(); _world().setGravity(pl.Vec2(c.x, v)); },
       };
     },
-    set(v) { _world().setGravity(pl.Vec2(v.x, v.y)); },
+    set(v) { const [x, y] = _vecParts(v, 'world.gravity'); _world().setGravity(pl.Vec2(x, y)); },
   });
 
   // camera.off() / camera.on() switch drawing between world space and screen
@@ -446,6 +482,7 @@
       CANVAS_ = document.createElement('canvas');
       CANVAS_.width = w; CANVAS_.height = h;
       CTX_ = CANVAS_.getContext('2d');
+      if (MOUSE._cursor != null) CANVAS_.style.cursor = MOUSE._cursor; // mouse.cursor/visible set before the canvas
       // An untouched camera must be a no-op, so it starts centred on the
       // canvas rather than at the world origin (in 'math' mode the centre IS
       // the origin, so it starts at (0, 0) -- see _parkCamera).
@@ -469,6 +506,60 @@
     if (a.length === 2) return `rgba(${n(a[0])},${n(a[0])},${n(a[0])},${al(a[1])})`;
     if (a.length === 3) return `rgb(${n(a[0])},${n(a[1])},${n(a[2])})`;
     return `rgba(${n(a[0])},${n(a[1])},${n(a[2])},${al(a[3])})`;
+  }
+
+  // rgba() and randomColor(): colours as one CSS string, which is what
+  // fill(), stroke(), background() and .color already take. Building an rgba
+  // string by hand is a lot of concatenation for a beginner:
+  //   sprite.color = 'rgba(' + r + ', ' + g + ', ' + b + ', ' + a + ')';
+  // Moved here from shCode's own extras file (2026-11-20), same behaviour.
+  function _rgbaChannel(n) {
+    const v = Math.round(Number(n));
+    if (!isFinite(v)) return 0;
+    return Math.max(0, Math.min(255, v));
+  }
+  function _rgbaAlpha(n) {
+    const v = Number(n);
+    if (!isFinite(v)) return 1;
+    return Math.max(0, Math.min(1, v));
+  }
+
+  // rgba(r, g, b, a) -> 'rgba(r, g, b, a)'
+  // rgba([r, g, b], a) also works. Channels are rounded and clamped to 0-255;
+  // alpha is clamped to 0-1 and defaults to 1. Accepts expressions, so
+  // rgba(255, 99, 71, random(0.2, 0.8)) is one call.
+  function rgba(r, g, b, a) {
+    if (Array.isArray(r)) {
+      const triple = r;
+      // rgba([r, g, b], a): the alpha arrives in the second parameter, which is
+      // about to be overwritten by the green channel, so take it first.
+      const alphaArg = a !== undefined ? a : (typeof g === 'number' ? g : triple[3]);
+      r = triple[0];
+      g = triple[1];
+      b = triple[2];
+      a = alphaArg;
+    }
+    if (a === undefined) a = 1;
+    return 'rgba(' + _rgbaChannel(r) + ', ' + _rgbaChannel(g) + ', ' + _rgbaChannel(b) + ', ' + _rgbaAlpha(a) + ')';
+  }
+
+  // randomColor()            -> random rgb, fully opaque
+  // randomColor(a)           -> random rgb at alpha a
+  // randomColor(minA, maxA)  -> random rgb, random alpha in the range
+  // Rolls the engine's own seeded random(), so randomSeed() repeats it.
+  function randomColor(minA, maxA) {
+    if (minA === undefined) minA = 1;
+    if (maxA === undefined) maxA = minA;
+    let lo = _rgbaAlpha(minA);
+    let hi = _rgbaAlpha(maxA);
+    if (hi < lo) { const t = lo; lo = hi; hi = t; }
+    const a = lo === hi ? lo : lo + random() * (hi - lo);
+    return rgba(
+      Math.floor(random() * 256),
+      Math.floor(random() * 256),
+      Math.floor(random() * 256),
+      a,
+    );
   }
 
   function background(...args) {
@@ -513,6 +604,32 @@
       img.src = art;
       ART_CACHE_.set(art, img);
     }
+    return img;
+  }
+  // loadImage(url): the same shared <img> that `sprite.image = url` uses, so
+  // the two never decode a picture twice. Called in preload(), the game waits
+  // for it and img.width / img.height are real in setup(). Anywhere else it
+  // loads in the background, like a sprite's image always has.
+  const IMG_WARNED_ = new Set();
+  function _imageLoadWarn(url) {
+    if (IMG_WARNED_.has(url)) return;
+    IMG_WARNED_.add(url);
+    console.warn("loadImage('" + url + "') could not load that picture. Check the name and the path " +
+      "(capitals count), and that the file is a PNG, JPEG, GIF or WebP.");
+  }
+  function loadImage(url) {
+    const img = loadArt_(url);
+    if (typeof url !== 'string') return img;
+    const settled = new Promise((resolve) => {
+      if (img.complete && img.naturalWidth > 0) return resolve(img);
+      if (img._failed || (img.complete && img.naturalWidth === 0)) {
+        _imageLoadWarn(url);
+        return resolve(img);
+      }
+      img.addEventListener('load', () => resolve(img), { once: true });
+      img.addEventListener('error', () => { _imageLoadWarn(url); resolve(img); }, { once: true });
+    });
+    _joinPreload_(url, settled);
     return img;
   }
   // canvas / ImageBitmap have no `complete`; they are ready the moment they exist.
@@ -724,13 +841,45 @@
     throw new TypeError(`sprite.shape must be 'circle' or 'rect', not ${JSON.stringify(v)}`);
   }
 
+  // `sprite.vel = createVector(3, 0)`, `sprite.pos = {x, y}`, `[x, y]`: the
+  // numbers to copy INTO a live vector. Assigning used to swap the live proxy
+  // for the plain object, so the sprite stopped answering to physics with no
+  // error. Anything without two numbers is refused in plain words.
+  function _vecParts(v, where) {
+    if (Array.isArray(v) && v.length >= 2 && typeof v[0] === 'number' && typeof v[1] === 'number') return [v[0], v[1]];
+    if (v && typeof v === 'object' && typeof v.x === 'number' && typeof v.y === 'number') return [v.x, v.y];
+    throw new TypeError(`${where} must be a point with x and y, like createVector(3, 0), {x: 3, y: 0} or [3, 0], not ` +
+      (v === null ? 'null' : typeof v === 'object' ? JSON.stringify(v) : typeof v === 'string' ? JSON.stringify(v) : String(v)));
+  }
+
   function liveVec(read, write) {
-    return {
+    const v = {
       get x() { return read().x; },
       get y() { return read().y; },
       set x(v) { const c = read(); write(v, c.y); },
       set y(v) { const c = read(); write(c.x, v); },
     };
+    // Both axes in one write, for whole-vector assignment (so a velocity is
+    // never judged half old, half new by the speed-cap note).
+    Object.defineProperty(v, '_write', { value: write, enumerable: false });
+    // The Vector methods, so sprite.vel.set(0, 0), pos.add(...) and friends
+    // work on the live vector exactly as on createVector()'s. A sketch that
+    // assigned a Vector used to get one by accident (and lose physics); now it
+    // keeps both. Each change is one write; each returns the live vector.
+    const two = (x, y) => (x && typeof x === 'object' ? [x.x, x.y] : [x, y]);
+    const methods = {
+      set(x, y) { const [a, b] = two(x, y); write(a || 0, b || 0); return v; },
+      copy() { const c = read(); return new Vector(c.x, c.y); },
+      add(x, y) { const [a, b] = two(x, y); const c = read(); write(c.x + a, c.y + b); return v; },
+      sub(x, y) { const [a, b] = two(x, y); const c = read(); write(c.x - a, c.y - b); return v; },
+      mult(n) { const c = read(); write(c.x * n, c.y * n); return v; },
+      div(n) { const c = read(); write(c.x / n, c.y / n); return v; },
+      mag() { const c = read(); return Math.sqrt(c.x * c.x + c.y * c.y); },
+      dist(o) { const c = read(); return Math.sqrt((c.x - o.x) ** 2 + (c.y - o.y) ** 2); },
+      normalize() { const c = read(); const m = Math.sqrt(c.x * c.x + c.y * c.y); if (m !== 0) write(c.x / m, c.y / m); return v; },
+    };
+    for (const [k, fn] of Object.entries(methods)) Object.defineProperty(v, k, { value: fn, enumerable: false });
+    return v;
   }
 
   const WARNED_ANIS_ = new Set();
@@ -813,7 +962,7 @@
       this._buildFixture();
       if (wantsNone) this.collider = 'none';
 
-      this.pos = liveVec(
+      this._pos = liveVec(
         () => { const p = this._body.getPosition(); return { x: p.x * PXM, y: p.y * PXM }; },
         (x, y) => this._body.setPosition(pl.Vec2(x / PXM, y / PXM)),
       );
@@ -824,7 +973,7 @@
       // The ceiling is `world.maxSpeed` (one global, default 60, opt-in to
       // raise -- see its definition for the cost); setting a speed past it
       // warns once per run, naming that knob, instead of failing silently.
-      this.vel = liveVec(
+      this._vel = liveVec(
         () => { const v = this._body.getLinearVelocity(); return { x: v.x * PXM / FPS, y: v.y * PXM / FPS }; },
         (x, y) => { noteSpeed_(x, y); this._body.setLinearVelocity(pl.Vec2(x * FPS / PXM, y * FPS / PXM)); },
       );
@@ -1061,6 +1210,36 @@
     // canvasPos means "where is this on screen"; for these it is identity.
     // "On screen" is the fixed frame drawTop() draws in: raw pixels in
     // 'screen' mode, the centred y-up frame with the camera removed in 'math'.
+    // sprite.mouse: the mouse as this sprite sees it (shCode #125), the
+    // reference API's names. hovering() is true while the pointer is over the
+    // sprite, hovers() on the first frame it is, hovered() on the first frame
+    // after it left. presses(), pressing() and released() are mouse.presses()
+    // and friends for a press that STARTED on this sprite: pressing() stays
+    // true while the button is held, even if the pointer slides off, which is
+    // what dragging wants; dragging() counts frames like mouse.dragging().
+    // Each takes 'left' | 'center' | 'right' or nothing (any button), like
+    // mouse. The point test is world.getSpriteAt()'s, so a sprite under
+    // another one still counts as hovered; nothing is tracked for a sprite
+    // until a sketch first reads its .mouse.
+    get mouse() {
+      if (!this._mouseApi) {
+        const s = this;
+        Object.defineProperty(this, '_mouseApi', { configurable: true, enumerable: false, writable: true, value: {
+          hovering: () => _mouseOver(s),
+          hovers: () => _mouseOver(s) && !s._mHoverPrev,
+          hovered: () => !!s._mHoverPrev && !_mouseOver(s),
+          presses: (b) => mouse.presses(b) && _mouseOwns(s, _btnSlot(b)),
+          pressing: (b) => mouse.pressing(b) && _mouseOwns(s, _btnSlot(b)),
+          released: (b) => mouse.released(b) && _mouseOwns(s, _btnSlot(b)),
+          dragging: (b) => (_mouseOwns(s, _btnSlot(b || 'left')) ? mouse.dragging(b) : 0),
+        } });
+        _mouseWatch(s);
+      }
+      return this._mouseApi;
+    }
+    // A sketch that already used .mouse as its own field keeps it.
+    set mouse(v) { Object.defineProperty(this, 'mouse', { value: v, writable: true, configurable: true, enumerable: true }); }
+
     get canvasPos() {
       if (this.screenSpace) return { x: this.x, y: this.y };
       const o = _frameOrigin();
@@ -1308,7 +1487,7 @@
     // replacing it — sprite.vel is a live proxy onto the physics body, so
     // swapping the object out would disconnect it.
     get velocity() { return this.vel; }
-    set velocity(v) { this.vel.x = v.x; this.vel.y = v.y; }
+    set velocity(v) { this.vel = v; }
 
     // still art — mutually exclusive with an active `ani` (2.4.3d).
     // Accepts: an emoji / short text (a string that is not a URL), an image URL,
@@ -1562,6 +1741,15 @@
       return c;
     }
 
+    // pos and vel are live vectors onto the physics body (see liveVec).
+    // Assigning a whole vector copies its x and y in, so
+    // `player.vel = createVector(3, 0)` moves the sprite; it used to replace
+    // the live vector with the plain object and disconnect it from physics.
+    get pos() { return this._pos; }
+    set pos(v) { const [x, y] = _vecParts(v, 'sprite.pos'); this._pos._write(x, y); }
+    get vel() { return this._vel; }
+    set vel(v) { const [x, y] = _vecParts(v, 'sprite.vel'); this._vel._write(x, y); }
+
     get x() { return this.pos.x; }
     set x(v) { this.pos.x = v; }
     get y() { return this.pos.y; }
@@ -1570,7 +1758,7 @@
     // `sprite.position` is the reference API's own name for `sprite.pos` (verified
     // against the reference implementation) — plain alias, same live vector.
     get position() { return this.pos; }
-    set position(v) { this.pos.x = v.x; this.pos.y = v.y; }
+    set position(v) { this.pos = v; }
 
     get rotation() { return (this._body.getAngle() * 180) / Math.PI; }
     set rotation(deg) { this._body.setAngle((deg * Math.PI) / 180); }
@@ -1989,7 +2177,9 @@
       // scaled with the sprite's art (real p5play draws sprite text
       // axis-aligned; six lessons use this for HP/score labels that
       // shouldn't spin with the sprite).
-      if (this.text) {
+      // The number 0 is a label too (a score, a countdown); null, undefined
+      // and '' draw nothing.
+      if (this.text || this.text === 0) {
         CTX_.save();
         CTX_.globalAlpha = this.opacity;
         CTX_.translate(this.x, this.y);
@@ -2214,7 +2404,10 @@
       }
       Object.defineProperty(this, 'Sprite', { value: GroupSprite, enumerable: false });
     }
-    newSprite(x, y, w, h) { const s = new Sprite(x, y, w, h); this.push(s); return s; }
+    // group.newSprite(...) is `new group.Sprite(...)` under another name: the
+    // same factory, so it gets every group default (colour, collider, size,
+    // made-up fields). It used to build a plain Sprite and only push it.
+    newSprite(...args) { return new this.Sprite(...args); }
 
     // texture: same cascade-and-remember behaviour as `image`, by catalog name.
     get texture() { return this._groupTexture == null ? null : this._groupTexture; }
@@ -2257,6 +2450,10 @@
         if (this.includes(s)) continue; // already a member — a no-op, like the reference API
         if (s && s._groups && !s._groups.includes(this)) s._groups.push(this);
         super.push(s);
+        // A group's autoDraw/autoUpdate, once set, reach members that join
+        // later too (shCode #124).
+        if (s && this._autoDraw !== undefined) s.autoDraw = this._autoDraw;
+        if (s && this._autoUpdate !== undefined) s.autoUpdate = this._autoUpdate;
       }
       return this.length;
     }
@@ -2266,12 +2463,18 @@
     // (2.3.3/2.3.7: "group.remove(sprite) only unparents; there is no
     // sprite.remove() on Group" — a real, documented distinction this
     // engine previously got wrong by destroying on group.remove()).
+    // Because `coins.remove(c)` reads like "get rid of c", the first such
+    // call each run that leaves a live sprite behind says so in the console.
     remove(s) {
       const i = this.indexOf(s);
       if (i >= 0) this.splice(i, 1);
       if (s && s._groups) {
         const gi = s._groups.indexOf(this);
         if (gi >= 0) s._groups.splice(gi, 1);
+      }
+      if (s instanceof Sprite && !s._dead) {
+        _warnOnce('group.remove', 'group.remove(sprite) only takes the sprite out of the group; it is still on screen. ' +
+          'To get rid of it, use sprite.remove().');
       }
     }
     // add(sprite) is push(sprite) under a different name — same membership
@@ -2328,16 +2531,39 @@
     attractTo(x, y, force) { for (const s of [...this]) s.attractTo(x, y, force); }
     repelFrom(x, y, force) { for (const s of [...this]) s.repelFrom(x, y, force); }
 
-    // autoDraw/autoUpdate: cascading accessors, same pattern as the methods
-    // above rather than the factory's copy-to-future-members convention —
-    // `enemies.autoDraw = false` freezes every CURRENT enemy on the spot.
-    // The getter reports true only if every member agrees, so a
-    // partially-toggled group reads as false rather than silently picking
-    // one member's answer.
-    get autoDraw() { return this.every((s) => s.autoDraw); }
-    set autoDraw(v) { for (const s of this) s.autoDraw = v; }
-    get autoUpdate() { return this.every((s) => s.autoUpdate); }
-    set autoUpdate(v) { for (const s of this) s.autoUpdate = v; }
+    // autoDraw/autoUpdate: set on every CURRENT member, and remembered for
+    // every sprite that joins the group later (push() applies it), so
+    // `allSprites.autoDraw = false` once in setup() also covers the bullets
+    // made a minute later. It used to reach only the members already there, so
+    // a sketch had to set it again every frame (shCode #124). The getter
+    // reports true only if every member agrees, so a partially-toggled group
+    // reads as false rather than silently picking one member's answer; an
+    // empty group reports what it was last told (true if never).
+    get autoDraw() { return this.length ? this.every((s) => s.autoDraw) : this._autoDraw !== false; }
+    set autoDraw(v) {
+      Object.defineProperty(this, '_autoDraw', { value: !!v, writable: true, configurable: true, enumerable: false });
+      for (const s of this) s.autoDraw = !!v;
+    }
+    get autoUpdate() { return this.length ? this.every((s) => s.autoUpdate) : this._autoUpdate !== false; }
+    set autoUpdate(v) {
+      Object.defineProperty(this, '_autoUpdate', { value: !!v, writable: true, configurable: true, enumerable: false });
+      for (const s of this) s.autoUpdate = !!v;
+    }
+
+    // group.draw(): paint this group's sprites NOW, lowest layer first, the
+    // way the engine paints them after draw() (camera, culling, a sprite's own
+    // .draw, its animation). It draws them whatever autoDraw says, so with
+    // `allSprites.autoDraw = false` a sketch decides when the world is drawn:
+    // `background(...)`, then `allSprites.draw()`, then text on top
+    // (shCode #124). screenSpace members are drawn after the rest, without the
+    // camera, as the engine does. Call it in update() or draw(); in drawTop()
+    // the camera is off, so world sprites would be drawn without it.
+    draw() {
+      if (!CTX_) return;
+      const list = this.filter((s) => s && !s._dead).sort((a, b) => a.layer - b.layer);
+      _drawSprites(list.filter((s) => !s.screenSpace), true, true);
+      _drawSprites(list.filter((s) => s.screenSpace), false, true);
+    }
 
     // cull(margin) or cull(top, bottom, left, right): delete members that have
     // drifted this far outside the canvas, returning how many went. With a
@@ -2577,6 +2803,41 @@
     const nx = Math.max(b.l, Math.min(x, b.r));
     const ny = Math.max(b.t, Math.min(y, b.b));
     return Math.hypot(x - nx, y - ny) <= radius;
+  }
+
+  // sprite.mouse bookkeeping (shCode #125). Only sprites whose .mouse has
+  // been read are watched. At the start of each frame a press that has just
+  // begun is given to every watched sprite under the pointer (_mOwn, per
+  // button slot); at the end, each remembers whether it was hovered, which is
+  // what hovers()/hovered() compare against.
+  const MOUSE_SPRITES_ = new Set();
+  const MOUSE_SLOTS_ = ['_c', '_bl', '_bc', '_br'];
+  function _mouseOver(s) {
+    return MOUSE._seen && MOUSE._onCanvas && !s._dead && _spriteNear(s, MOUSE.x, MOUSE.y, 0);
+  }
+  function _mouseOwns(s, slot) { return !!(s._mOwn && s._mOwn[slot]); }
+  function _mouseClaim(s) {
+    const over = _mouseOver(s);
+    for (const slot of MOUSE_SLOTS_) {
+      const v = MOUSE[slot];
+      if (v === 1 || v === -3) { // this button's press began since the last frame
+        if (!s._mOwn) Object.defineProperty(s, '_mOwn', { value: {}, enumerable: false });
+        s._mOwn[slot] = over;
+      }
+    }
+  }
+  function _mouseWatch(s) {
+    MOUSE_SPRITES_.add(s);
+    _mouseClaim(s); // read for the first time on the very frame of a press
+  }
+  function _spriteMouseFrameStart() {
+    for (const s of MOUSE_SPRITES_) {
+      if (s._dead) { MOUSE_SPRITES_.delete(s); continue; }
+      _mouseClaim(s);
+    }
+  }
+  function _spriteMouseFrameEnd() {
+    for (const s of MOUSE_SPRITES_) s._mHoverPrev = _mouseOver(s);
   }
 
   // getSpritesAt(x, y, radius, group): every live sprite at a point, topmost
@@ -3270,36 +3531,41 @@
     // level. `sprite.screenSpace = true` is ours, not the reference API's. Screen-space
     // sprites draw last so a HUD is never buried under the world, and their
     // .layer still orders them among themselves.
-    const drawPass = (list, useCamera) => {
-      if (!list.length) return;
-      const view = _cullView(useCamera);
-      CTX_.save();
-      _applyFrame(useCamera && camera._active);
-      for (const s of list) {
-        if (s._queuedText) {
-          // _paintText applies its own frame from an untransformed context,
-          // with the camera as it was when text() was called.
-          CTX_.restore();
-          _paintText(s.str, s.x, s.y, s.size, s.color, s.align, s.cam, s.st);
-          CTX_.save();
-          _applyFrame(useCamera && camera._active);
-          continue;
-        }
-        if (!s.autoDraw) continue; // Sprite, SPEC-surface #3: false skips this sprite entirely
-        if (s.ani) s.ani._advance(); // advances on or off screen, so culling never freezes it
-        // A sketch-assigned sprite.draw REPLACES the default rendering for
-        // that sprite (Sprite, SPEC-surface #3) — everything else (layer
-        // order, ani advance, autoDraw gating above) still applies around it.
-        // It is never culled: it may do more than draw.
-        if (typeof s.draw === 'function') s.draw();
-        else if (!view || !_offView(s, view)) s._draw();
-      }
-      CTX_.restore();
-    };
-
     const world = ordered.filter((s) => !s.screenSpace);
-    drawPass(texts && texts.length ? _withTexts(world, texts) : world, true);
-    drawPass(ordered.filter((s) => s.screenSpace), false);
+    _drawSprites(texts && texts.length ? _withTexts(world, texts) : world, true, false);
+    _drawSprites(ordered.filter((s) => s.screenSpace), false, false);
+  }
+
+  // One pass of render(), and group.draw()'s painter. `force` draws a sprite
+  // whose autoDraw is false (group.draw() is the sketch asking for it).
+  function _drawSprites(list, useCamera, force) {
+    if (!list.length) return;
+    const view = _cullView(useCamera);
+    CTX_.save();
+    _applyFrame(useCamera && camera._active);
+    for (const s of list) {
+      if (s._queuedText) {
+        // _paintText applies its own frame from an untransformed context,
+        // with the camera as it was when text() was called.
+        CTX_.restore();
+        _paintText(s.str, s.x, s.y, s.size, s.color, s.align, s.cam, s.st);
+        CTX_.save();
+        _applyFrame(useCamera && camera._active);
+        continue;
+      }
+      if (!s.autoDraw && !force) continue; // Sprite, SPEC-surface #3: false skips this sprite entirely
+      // Advances on or off screen, so culling never freezes it; once a frame,
+      // so a sprite drawn by group.draw() and by the engine does not run at
+      // double speed.
+      if (s.ani && s._aniFrame !== FRAME_) { s._aniFrame = FRAME_; s.ani._advance(); }
+      // A sketch-assigned sprite.draw REPLACES the default rendering for
+      // that sprite (Sprite, SPEC-surface #3) — everything else (layer
+      // order, ani advance, autoDraw gating above) still applies around it.
+      // It is never culled: it may do more than draw.
+      if (typeof s.draw === 'function') s.draw();
+      else if (!view || !_offView(s, view)) s._draw();
+    }
+    CTX_.restore();
   }
 
   // Off-screen culling for render(). A sprite whose whole picture lies outside
@@ -3585,7 +3851,7 @@
   // textLayer(n): put text() among the sprites (shCode #101, 2026-11-11).
   // Text drawn in draw() is painted BEFORE render(), so it sits under every
   // sprite, and drawTop() puts it over all of them; nothing went in between.
-  // After textLayer(n), each text() called from draw() is remembered with
+  // After textLayer(n), each text() called from update() or draw() is remembered with
   // everything it needs (words, place, size, colour, alignment, camera on or
   // off) and painted by render() among the world's sprites: over every sprite
   // whose .layer is n or lower, under every sprite whose .layer is higher.
@@ -3594,12 +3860,12 @@
   // nothing (or null) goes back to the old way, painted at once. Like
   // textSize(), the setting lasts until it is changed.
   //
-  // It only queues while draw() runs. Called from drawTop(), a sprite's own
-  // .draw or setup(), text() still paints at once (render() is not coming, or
-  // is running now). A sketch that never calls textLayer() draws exactly what
+  // It queues while update() and draw() run (update() too since shCode
+  // #123/#126). Called from drawTop(), a sprite's own .draw or setup(), text()
+  // still paints at once (render() is not coming, or is running now). A sketch that never calls textLayer() draws exactly what
   // it drew before: same canvas calls, same order.
   let TEXT_LAYER_ = null;
-  let TEXT_QUEUE_ = null; // an array only while draw() runs
+  let TEXT_QUEUE_ = null; // an array only while update() and draw() run
   function textLayer(n) {
     if (n === undefined || n === null) { TEXT_LAYER_ = null; return; }
     if (typeof n !== 'number' || !Number.isFinite(n)) {
@@ -4093,19 +4359,41 @@
   // global) teaches the callback form only — "you cannot write `let data =
   // loadJSON(...)` and use the return value" — never q5's preload/`_loaders`
   // pattern (loadJSON called in setup(), used unconditionally in draw()
-  // because the framework awaited it first). Matching that preload gate
-  // would mean changing moshion's boot sequence (`start()`), which is out of
-  // scope here — flagged to team-lead, not built.
+  // because the framework awaited it first). moSHion's version of that gate
+  // is preload() (see start()): called there, the game waits for the file and
+  // the object is filled in by setup(). Anywhere else, the callback form.
   function loadJSON(path, callback) {
     const result = {};
-    const req = typeof fetch === 'function' ? fetch(path).then((r) => r.json()) : Promise.resolve({});
+    const req = typeof fetch === 'function' ? fetch(path).then((r) => {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    }) : Promise.resolve({});
+    let fileOk = false;
+    let parsed = {};
+    // The promise settles with the parsed JSON, NOT with `result`: `result`
+    // is thenable (its then is this promise's), and a promise settled with a
+    // thenable adopts it, so returning `result` here made the promise wait on
+    // itself for ever. `await loadJSON(url)` never finished until 2026-11-17,
+    // and preload() waits on this same promise.
     const promise = req
       .then((data) => {
+        fileOk = true;
+        parsed = data;
         Object.assign(result, data);
         if (typeof callback === 'function') callback(result);
-        return result;
+        return parsed;
       })
-      .catch(() => result);
+      .catch((e) => {
+        // A wrong name used to give an empty object and nothing on screen.
+        // (An error thrown by the sketch's own callback stays silent here, as
+        // it always has: it is not the file's fault.)
+        if (!fileOk) {
+          console.warn("loadJSON('" + path + "') could not load: " + (e && e.message ? e.message : String(e)) +
+            '. Check the name and the path, and that the file is JSON.');
+        }
+        return parsed;
+      });
+    _joinPreload_(path, promise);
     result.then = promise.then.bind(promise);
     result.catch = promise.catch.bind(promise);
     return result;
@@ -4160,6 +4448,13 @@
   function _unlockAudio() {
     const ctx = AUDIO_CTX_;
     if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+  }
+  // True from the player's first key, click or tap. Until then the browser
+  // keeps sound off, and play() skips (see play()).
+  let GESTURE_SEEN_ = false;
+  function _gestureUnlock() {
+    GESTURE_SEEN_ = true;
+    _unlockAudio();
   }
 
   class Sound {
@@ -4258,6 +4553,18 @@
      * overlap. Returns the voice, or null if the sound is not loaded yet.
      */
     play(clipName) {
+      // Loaded, but the browser still has sound off because the player has
+      // not clicked or pressed a key yet. Started now, the voice would sit in
+      // the suspended context and sound at the first click, late: a jump
+      // chime from setup() going off when the player first presses a key.
+      // Skipped instead, and said once (owner's decision 2026-11-17). Only
+      // before the FIRST gesture: after it, resume() is on its way and a
+      // play() in that instant sounds a few ms late, which is fine.
+      if (this._buffer && AUDIO_CTX_ && AUDIO_CTX_.state === 'suspended' && !GESTURE_SEEN_) {
+        _warnSoundOnce('locked:' + this.url, `${_soundLabel(this.url)}.play() did nothing: sound turns on after the first click or key press. ` +
+          'Play it on an event (a key press, a hit) instead of in setup(), or use .loop() for music, which starts at the first click.');
+        return null;
+      }
       const src = this._voice();
       if (!src) {
         // Still a no-op (a chime arriving late is worse than none), but said
@@ -4403,7 +4710,11 @@
     }
   }
 
-  function loadSound(url, opts) { return new Sound(url, opts); }
+  function loadSound(url, opts) {
+    const s = new Sound(url, opts);
+    _joinPreload_(url, s.ready);
+    return s;
+  }
 
   // What a failed loadSound() says in the console, in plain words. Once per
   // file (and once per too-early play), since the calls are often in draw().
@@ -4536,7 +4847,125 @@
 
   function noLoop() { _loopRunning = false; }
 
+  // ---- preload() ------------------------------------------------------
+  //
+  // An optional fifth hook, run once BEFORE setup(). The loaders it calls
+  // (loadSound, loadJSON, loadImage) hand their object back at once, as
+  // always, and the game waits until every one has settled: loaded or failed.
+  // Owner's decisions, 2026-11-17 (docs/LOAD-SPEC.md):
+  //   - no time limit: setup() runs the moment the last file settles, a tenth
+  //     of a second or a minute on a slow line;
+  //   - a failed file never stops the game (its loader says why, once);
+  //   - progress, not a clock: if NO file settles for 10 s, the note names the
+  //     file it is waiting for and offers Start anyway. Waiting stays the
+  //     default; the file keeps loading after the button;
+  //   - a fixed note, "Loading... 2 of 3 files", shown only past 300 ms.
+  // A sketch without preload() never reaches any of this: start() calls
+  // _beginGame() on the same tick, exactly as before.
+  const PRELOAD_NOTE_MS_ = 300;
+  const PRELOAD_STALL_MS_ = 10000;
+
+  function _preloadNote() {
+    const el = document.createElement('div');
+    el.setAttribute('role', 'status');
+    el.setAttribute('data-moshion-preload', '');
+    el.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:90;' +
+      'padding:10px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.18);background:rgba(20,20,28,0.9);color:#f0f0f0;' +
+      'font:14px/1.4 system-ui,sans-serif;text-align:center;max-width:80vw;';
+    const msg = document.createElement('div');
+    el.appendChild(msg);
+    return { el: el, msg: msg };
+  }
+
+  function _waitForPreload(pending) {
+    return new Promise((resolve) => {
+      const total = pending.length;
+      const done = new Array(total).fill(false);
+      let count = 0;
+      let finished = false;
+      let note = null;
+      let stallTimer = null;
+      let button = null;
+
+      const firstWaiting = () => { for (let i = 0; i < total; i++) if (!done[i]) return pending[i].label; return ''; };
+      const render = () => {
+        if (!note) return;
+        note.msg.textContent = 'Loading... ' + count + ' of ' + total + (total === 1 ? ' file' : ' files');
+        if (button) {
+          note.msg.textContent = 'Still waiting for ' + firstWaiting();
+          if (!button.parentNode) note.el.appendChild(button);
+        }
+      };
+      const showNote = () => {
+        if (finished || note || !document.body) return;
+        note = _preloadNote();
+        render();
+        document.body.appendChild(note.el);
+      };
+      const finish = () => {
+        if (finished) return;
+        finished = true;
+        clearTimeout(noteTimer);
+        clearTimeout(stallTimer);
+        if (note && note.el.parentNode) note.el.parentNode.removeChild(note.el);
+        resolve();
+      };
+      const onStall = () => {
+        if (finished) return;
+        const name = firstWaiting();
+        console.warn(name + ' has not finished after 10 seconds. If the name is right, the file may be very large. ' +
+          'The game is still waiting for it; press Start anyway to play without it.');
+        button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = 'Start anyway';
+        button.style.cssText = 'display:block;margin:8px auto 0;padding:6px 14px;border:0;border-radius:6px;' +
+          'background:#f0f0f0;color:#14141c;font:inherit;cursor:pointer;';
+        button.addEventListener('click', finish);
+        showNote();
+        render();
+      };
+      // Restarted every time ANY file settles: a big file on a slow line is
+      // not a stall while the files around it keep finishing.
+      const armStall = () => { clearTimeout(stallTimer); stallTimer = setTimeout(onStall, PRELOAD_STALL_MS_); };
+      const noteTimer = setTimeout(showNote, PRELOAD_NOTE_MS_);
+
+      if (total === 0) { finish(); return; }
+      armStall();
+      pending.forEach((p, i) => {
+        Promise.resolve(p.promise).catch(() => {}).then(() => {
+          if (done[i]) return;
+          done[i] = true;
+          count++;
+          if (count === total) { finish(); return; }
+          if (!button) armStall();
+          render();
+        });
+      });
+    });
+  }
+
   function start() {
+    const preloadFn = typeof window.preload === 'function' ? window.preload : null;
+    if (!preloadFn) { _beginGame(); return; }
+    LOAD_PENDING_ = [];
+    let pending;
+    try {
+      // An error in here (a typo, a missing variable) is thrown from start()
+      // the same way one in setup() is, and the game does not start.
+      preloadFn.call(global);
+    } finally {
+      pending = LOAD_PENDING_;
+      LOAD_PENDING_ = null;
+    }
+    // An error in setup() here becomes this promise's rejection, which the
+    // runner reports with its stack (its 'unhandledrejection' handler), so it
+    // names the student's line. Rethrowing it from a setTimeout instead was
+    // tried: thrown from the engine's own script in the sandboxed (opaque
+    // origin) frame, the browser hides it as "Script error.".
+    _waitForPreload(pending).then(() => { _beginGame(); });
+  }
+
+  function _beginGame() {
     const setupFn = window.setup || (() => {});
     const updateFn = window.update || (() => {});
     const drawFn = window.draw || (() => {});
@@ -4564,7 +4993,7 @@
       // Browsers only honour AudioContext.resume() from inside a real user
       // gesture. Hooking it here means a sketch never has to think about it:
       // the first key or click the player presses unlocks sound for good.
-      _unlockAudio();
+      _gestureUnlock();
       const k = _key(e.key);
       _pressKey(k);
       // ...and the direction name it doubles as, so 'right' and 'd' both answer.
@@ -4633,11 +5062,16 @@
       MOUSE.scrollDelta.y += e.deltaY;
     });
     CANVAS_.addEventListener('mousedown', (e) => {
-      _unlockAudio(); // same reason as keydown above
+      _gestureUnlock(); // same reason as keydown above
       if (!MOUSE._c || MOUSE._c < 0) MOUSE._c = 1;
       const b = MOUSE_BTN_[(e && e.button) || 0];
       if (b && (!MOUSE[b] || MOUSE[b] < 0)) MOUSE[b] = 1;
     });
+    // A right-click on the canvas is a game's button, not the browser's.
+    // Without this the browser's own menu opened over the sketch on every
+    // right-click, so mouse.presses('right') was there but unusable in a
+    // game (shCode #127). Only the canvas: the rest of the page keeps its menu.
+    CANVAS_.addEventListener('contextmenu', (e) => { if (e && e.preventDefault) e.preventDefault(); });
     window.addEventListener('mouseup', (e) => {
       // Only a button that is down can come up. mouseup is on window, so a
       // click that started anywhere else in the frame also lands here, and
@@ -4685,7 +5119,7 @@
     CANVAS_.addEventListener('touchstart', (e) => {
       const t = _touchAt(e);
       if (!t) return;
-      _unlockAudio(); // same reason as keydown/mousedown above
+      _gestureUnlock(); // same reason as keydown/mousedown above
       // Position BEFORE the press counter, and not optional: a tap carries
       // its position and its press in the same event — there is no hover
       // first — so a sketch reading mouse.x on the frame it sees presses()
@@ -4754,29 +5188,37 @@
       if (dt > 0) FPS_ = 1 / dt; // frameRate() reads this — matches real q5's 1000/deltaTime
 
       FRAME_++;
+      _spriteMouseFrameStart(); // sprite.mouse: who a press that just began belongs to
 
-      updateFn(step);
-      // Per-sprite update override (Sprite, SPEC-surface #3): "before
-      // physics", matching where the reference API's own allSprites.update() runs
-      // relative to physicsUpdate (its pre-draw pass, ~8049-8057) — a sprite's
-      // custom update can move it by hand before this frame's physics step
-      // sees that position. autoUpdate = false skips a sprite entirely.
-      for (const s of ALL_) {
-        if (s._dead || !s.autoUpdate) continue;
-        if (typeof s.update === 'function') s.update();
-      }
-      _runTimers(); // every()/after(): after update, before physics
-      _settleJumps(); // jump counts see this frame's landings before the next jump
-      // world.autoStep (World, SPEC-surface #5): false means the sketch
-      // calls world.physicsUpdate() itself instead of this automatic step.
-      if (AUTO_STEP_) {
-        stepPhysics();
-        _updateContacts();
-        _updateOverlaps();
-      }
-      TEXT_QUEUE_ = []; // text() under textLayer(n) waits for render()
+      // text() under textLayer(n) is queued from here until render(): in
+      // update() as well as draw() (shCode #123/#126: a game written all in
+      // update() set textLayer(10) and its text still sat under every sprite,
+      // because only draw() queued). Timers, a sprite's own .update and
+      // collision callbacks run in between, so their text() is queued too.
+      TEXT_QUEUE_ = [];
       let queuedTexts;
-      try { drawFn(); } finally { queuedTexts = TEXT_QUEUE_; TEXT_QUEUE_ = null; }
+      try {
+        updateFn(step);
+        // Per-sprite update override (Sprite, SPEC-surface #3): "before
+        // physics", matching where the reference API's own allSprites.update() runs
+        // relative to physicsUpdate (its pre-draw pass, ~8049-8057) — a sprite's
+        // custom update can move it by hand before this frame's physics step
+        // sees that position. autoUpdate = false skips a sprite entirely.
+        for (const s of ALL_) {
+          if (s._dead || !s.autoUpdate) continue;
+          if (typeof s.update === 'function') s.update();
+        }
+        _runTimers(); // every()/after(): after update, before physics
+        _settleJumps(); // jump counts see this frame's landings before the next jump
+        // world.autoStep (World, SPEC-surface #5): false means the sketch
+        // calls world.physicsUpdate() itself instead of this automatic step.
+        if (AUTO_STEP_) {
+          stepPhysics();
+          _updateContacts();
+          _updateOverlaps();
+        }
+        drawFn();
+      } finally { queuedTexts = TEXT_QUEUE_; TEXT_QUEUE_ = null; }
       render(queuedTexts);
       _drawOverlays(); // showGrid()/showMouse(): over the world, under the HUD
       // drawTop(): the HUD hook. render() paints sprites AFTER the sketch's
@@ -4803,6 +5245,7 @@
       // Matches the reference API's postDraw sweep (the reference implementation): a
       // negative (just-released) state is visible for exactly one frame
       // then decays to 0; a positive (held) state keeps counting up.
+      _spriteMouseFrameEnd(); // sprite.mouse: hovered this frame? (for hovers()/hovered())
       for (const k in KEYS_) {
         if (KEYS_[k] < 0) KEYS_[k] = 0;
         else if (KEYS_[k] > 0) KEYS_[k]++;
@@ -4962,9 +5405,12 @@
   global.frameRate = frameRate;
   global.nf = nf;
   global.createVector = createVector;
+  global.rgba = rgba;
+  global.randomColor = randomColor;
   global.Vector = Vector;
   global.loadJSON = loadJSON;
   global.loadSound = loadSound;
+  global.loadImage = loadImage;
   global.masterVolume = masterVolume;
   global.Sound = Sound;
 
@@ -4974,10 +5420,15 @@
   // tags in the page have executed, which is when the student sketch has
   // defined window.setup. The immediate check handles the edge case where
   // the engine <script> tag appears after the student sketch.
+  let PRELOAD_ONLY_WARNED_ = false;
   function _tryAutoBoot() {
     if (typeof global.setup === 'function' && !global._moshionStarted) {
       global._moshionStarted = true;
       start();
+    } else if (typeof global.preload === 'function' && typeof global.setup !== 'function' &&
+               !global._moshionStarted && !PRELOAD_ONLY_WARNED_) {
+      PRELOAD_ONLY_WARNED_ = true;
+      console.warn('preload() is there, but there is no setup() to start the game. Add function setup() { new Canvas(400, 400); }.');
     }
   }
   // Exposed because the sketch does not always arrive before these two

@@ -194,11 +194,11 @@ check('every action is an in-site page that exists', () => {
     const { href, label } = e.action;
     assert.ok(label && label.length <= 30, `${e.id} action label`);
     assert.ok(href.startsWith('/') && !href.startsWith('//'), `${e.id}: ${href} is not in-site`);
-    const docs = /^\/docs\/moshion\/([a-z-]+)(?:\?page=(\d+))?$/.exec(href);
+    const docs = /^\/docs\/moshion\/([a-z-]+)(?:\?page=([a-z][a-z0-9-]*))?$/.exec(href);
     if (docs) {
       const sec = sections.find((s) => s.slug === docs[1]);
       assert.ok(sec, `${e.id}: no moSHion docs section ${docs[1]}`);
-      if (docs[2]) assert.ok(Number(docs[2]) >= 1 && Number(docs[2]) <= sec.pages.length, `${e.id}: ${href} has no such page`);
+      if (docs[2]) assert.ok(sec.pages.some((p) => p.id === docs[2]), `${e.id}: ${href} has no such page`);
     } else if (/^\/play\/?\?builtin=/.test(href)) {
       // A built-in Library game: /play reads ?builtin= (components/PlayGame.tsx).
       const id = /^\/play\/?\?builtin=([a-z0-9-]+)$/.exec(href)?.[1];
@@ -213,8 +213,8 @@ check('every action is an in-site page that exists', () => {
 check('the real-time entry opens the Real-time play page', () => {
   const e = WHATS_NEW.find((x) => x.id === '2026-11-realtime-play');
   assert.ok(e, 'entry missing');
-  const n = Number(/page=(\d+)/.exec(e.action.href)[1]);
-  assert.equal(sections.find((s) => s.slug === 'multiplayer').pages[n - 1].title, 'Real-time play');
+  const id = /page=([a-z-]+)/.exec(e.action.href)[1];
+  assert.equal(sections.find((s) => s.slug === 'multiplayer').pages.find((p) => p.id === id).title, 'Real-time play');
 });
 check('every clip and poster is on disk, under /whats-new/, and small enough', () => {
   for (const e of WHATS_NEW) {

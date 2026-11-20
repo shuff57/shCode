@@ -19,8 +19,9 @@ import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
 import { Script } from 'node:vm';
 import { fileURLToPath } from 'node:url';
-import { runSketch, createSandbox } from './moshion-harness.mjs';
+import { runSketch, runSketchAsync, createSandbox } from './moshion-harness.mjs';
 import { SEMANTIC_CHECKS } from './moshion-checks.mjs';
+import { sections as docSections } from '../lib/moshion-docs.ts';
 
 // Parity checks are written by critics and land in their own file so a critic
 // and a builder can never collide on one. Optional: absent file = no parity run.
@@ -151,19 +152,14 @@ function collectCorpus() {
   // own `new Canvas`, so all 53 are full sketches. If a bare fragment is ever
   // added it will fail here for not drawing — loudly, which is the right way
   // round. Do not add a lenient branch for it without a real one to point at.
-  const docsPath = join(REPO, 'lib', 'moshion-docs.ts');
-  if (existsSync(docsPath)) {
-    const src = readFileSync(docsPath, 'utf8');
-    let n = 0;
-    for (const m of src.matchAll(/\bcode: `([\s\S]*?)`/g)) {
-      n++;
-      const code = m[1].replace(/\\`/g, '`').replace(/\\\$/g, '$');
-      if (!MOSHION_MARKER.test(code)) continue;
+  for (const section of docSections) {
+    for (const page of section.pages) {
+      if (!page.code || !MOSHION_MARKER.test(page.code)) continue;
       items.push({
         kind: 'docs',
         lesson: 'docs/moshion',
-        path: `lib/moshion-docs.ts#example${n}`,
-        code,
+        path: `docs/moshion/${section.slug}?page=${page.id}`,
+        code: page.code,
         expectDraw: true,
       });
     }
@@ -178,9 +174,14 @@ function collectCorpus() {
 // nothing is a failure dressed as a pass.
 const DRAW_OPS = new Set(['fillRect', 'strokeRect', 'fill', 'stroke', 'fillText', 'drawImage', 'arc']);
 
-function runCorpusItem(item) {
+// A sketch with preload() waits on promises before setup(), so it runs through
+// the async harness entry; everything else stays synchronous.
+const HAS_PRELOAD = /function\s+preload\s*\(/;
+
+async function runCorpusItem(item) {
   if (item.kind === 'scaffold') return runScaffoldItem(item);
-  const r = runSketch(item.code, { frames: 60, filename: `${item.lesson}.js` });
+  const opts = { frames: 60, filename: `${item.lesson}.js` };
+  const r = HAS_PRELOAD.test(item.code) ? await runSketchAsync(item.code, opts) : runSketch(item.code, opts);
   if (!r.ok) {
     return {
       ...meta(item), pass: false, reason: `${r.phase}: ${r.error?.message || 'unknown error'}`,
@@ -256,7 +257,7 @@ async function main() {
   if (ONLY !== 'semantic') {
     let corpus = collectCorpus();
     if (FILTER) corpus = corpus.filter((i) => i.lesson.includes(FILTER));
-    report.corpus = corpus.map(runCorpusItem);
+    for (const item of corpus) report.corpus.push(await runCorpusItem(item));
   }
   if (ONLY !== 'corpus') {
     let checks = [...SEMANTIC_CHECKS, ...PARITY_CHECKS, ...SURFACE_CHECKS];

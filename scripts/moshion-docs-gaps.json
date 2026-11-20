@@ -1,6 +1,0 @@
-{
- "note": "moSHion names in the typings that no page of lib/moshion-docs.ts mentions yet. Documenting one means deleting it here (the check fails until you do). Never add a name here to make the check pass for a NEW feature: write its docs sentence instead.",
- "gaps": [
-  "toString"
- ]
-}

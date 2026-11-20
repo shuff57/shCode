@@ -277,15 +277,14 @@ No internet required — the engine and physics (planck.js, a pure-JS Box2D port
 
 | File | Covers |
 |---|---|
-| `public/moshion/moshion.js` | The entire engine (~800 lines, hand-authored, no build step). Reference source for any behavior the docs don't spell out |
+| `public/moshion/moshion.js` | The entire engine (about 5,000 lines, hand-authored, no build step), vendored from the moshion repo by `npm run sync:moshion`. Reference source for any behavior the docs don't spell out |
 | `public/moshion/planck.min.js` | planck.js v1.5.0 (Box2D port, MIT) — the physics backend |
-| `public/moshion/runner.html` | Sandbox host: loads planck + moSHion, injects a sketch from `?code=<base64url>` |
+| `public/moshion/runner.html` | Sandbox host: loads planck + moSHion, runs a sketch posted to it |
+| `public/moshion/extras.js` | shCode-only additions: account saves, online rooms, `multiplayer()` |
 | `public/moshion/docs/moshion.d.ts` | Full public API (hand-authored types). Anchor notation: `moshion → moshion.d.ts → <ClassName>` |
-| `public/moshion/docs/README.md` | Project overview, runtime layout, credits |
-| `public/moshion/docs/challenges.md` | Bundled challenge briefs (15-challenge ladder) |
 | `public/moshion/docs/LICENSE.md` | MIT for the facade; MIT (upstream) for planck.js; credit to q5play as the inspiration; `assets/` unresolved |
-| `public/moshion/docs/CLAUDE.md` | Engine architecture notes (lifecycle, class map, unit invariants) — dev reference, not student-facing |
-| `public/moshion/docs/index.html` | Docs index page (open `docs/` in a browser) |
+| `public/moshion/VENDORED.md` | Which upstream commit this copy is, and the one line shCode changes |
+| `/docs/moshion` (in-app) | The student docs; the API reference section lists every name in moshion.d.ts |
 
 ### moshion.d.ts class anchors
 

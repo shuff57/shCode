@@ -793,6 +793,18 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   (`components/PrefsSync.tsx`) and clears it on sign-out. UI: `components/AppearanceSettings.tsx` on `/account`; the
   home background is `components/HomeBackdrop.tsx`. Tests: `scripts/test-prefs.mjs`.
 
+### The moSHion engine and its docs (2026-11-20)
+The engine lives in the moshion repo (`../moshion`) and is vendored here by `npm run sync:moshion`
+(`public/moshion/VENDORED.md` says what is copied, what is changed and what is shCode's own). The docs are written
+ONCE, in that repo's `docs/content/` (one file per section, every page with a permanent `id`; its
+`scripts/build-docs.mjs` adds an API reference generated from `moshion.d.ts`). The sync copies them in as
+`lib/moshion-docs-shared.generated.ts`; shCode's own pages (Multiplayer, Sharing your game, account saves) and its
+notes on shared pages (Library, texture editor, mixer) are `lib/moshion-docs-shcode.ts`, joined by `lib/moshion-docs.ts`.
+Link a page by id, `/docs/moshion/<section>?page=<id>`, never by number: `scripts/test-moshion-docs.mjs` (npm test)
+fails on a number, an unknown id, or an override written against an older copy of a shared page (`basedOn`).
+`npm run deploy` refuses while the vendored copy differs from upstream `main` (`MOSHION_ALLOW_BEHIND=1` to override).
+`extras.js` holds only what needs shCode's server (account saves, rooms, `multiplayer()`).
+
 ### moSHion fonts and text layout (2026-11-12, phase 1 of 3)
 `textFont('name')`, `fontNames()`, `textWeight(100..900)`, `textStyle()`, `textDecoration(UNDERLINE|STRIKETHROUGH|NONE)`,
 `textOutline(color, px)`, `textSpacing(px)`, `textLeading(px)`, `textWrap(width, WORD|CHAR)`, and `\n` in `text()` starts a

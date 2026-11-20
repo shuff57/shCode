@@ -4,6 +4,9 @@
 // over these functions.
 
 export interface DocPage {
+  /** A page's permanent address within its section (?page=<id>). The moSHion
+   *  docs give every page one; a link that names it survives pages moving. */
+  id?: string;
   title: string;
   body: string;
   code?: string;
@@ -19,6 +22,8 @@ export interface DocSearchResult {
   sectionSlug: string;
   sectionTitle: string;
   pageIndex: number;
+  /** The page's id, when it has one: links use it so they survive pages moving. */
+  pageId?: string;
   pageTitle: string;
   snippet: string;
   matchStart: number;
@@ -35,7 +40,7 @@ export function searchDocs(
   const tokens = q.toLowerCase().split(/\s+/).filter(Boolean);
   if (tokens.length === 0) return [];
   const primary = tokens[0];
-  const results: DocSearchResult[] = [];
+  const results: (DocSearchResult & { rank: number })[] = [];
 
   for (const section of sections) {
     section.pages.forEach((page, pageIndex) => {
@@ -68,9 +73,11 @@ export function searchDocs(
       const matchStart = lower.indexOf(primary);
 
       results.push({
+        rank: best.weight,
         sectionSlug: section.slug,
         sectionTitle: section.title,
         pageIndex,
+        ...(page.id ? { pageId: page.id } : {}),
         pageTitle: page.title,
         snippet,
         matchStart: matchStart >= 0 ? matchStart : 0,
@@ -79,7 +86,32 @@ export function searchDocs(
     });
   }
 
-  return results.slice(0, limit);
+  // A hit in a page's title beats one in its words, which beats one only in its
+  // code; within each, the book's order stands (Array.prototype.sort is stable).
+  return results
+    .sort((a, b) => a.rank - b.rank)
+    .slice(0, limit)
+    .map(({ rank: _rank, ...r }) => r);
+}
+
+/** What a link puts after ?page= for this page: its id, else its number from 1. */
+export function pageParam(section: DocSection, pageIndex: number): string {
+  return section.pages[pageIndex]?.id ?? String(pageIndex + 1);
+}
+
+/** The link to one page. The first page of a section needs no ?page=. */
+export function pageLink(basePath: string, section: DocSection, pageIndex: number): string {
+  return pageIndex === 0 ? `${basePath}/${section.slug}` : `${basePath}/${section.slug}?page=${pageParam(section, pageIndex)}`;
+}
+
+/** Which page a ?page= value names: an id, or a number from 1 (older links). Unknown -> 0. */
+export function resolvePageIndex(section: DocSection, param: string | null | undefined): number {
+  if (!param) return 0;
+  const byId = section.pages.findIndex((p) => p.id === param);
+  if (byId >= 0) return byId;
+  const n = Number(param);
+  if (Number.isInteger(n) && n >= 1) return Math.min(n, section.pages.length) - 1;
+  return 0;
 }
 
 export function getSection(

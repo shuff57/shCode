@@ -44,7 +44,7 @@ function setup() {
 function draw() {
   background('#222');
 
-  if (kb.pressed('s')) {
+  if (kb.presses('s')) {
     let saveObj = {
       score: score,
       level: level,
@@ -55,7 +55,7 @@ function draw() {
     console.log('game saved');
   }
 
-  if (kb.pressed('space')) {
+  if (kb.presses('space')) {
     score = score + 10;
   }
 

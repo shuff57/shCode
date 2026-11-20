@@ -1,17 +1,17 @@
-// Every public moSHion name in the engine's typings must appear in the in-app docs
-// (lib/moshion-docs.ts), or be listed in the known-gaps file with a reason.
+// Every public moSHion name in the engine's typings must be explained somewhere in the
+// in-app docs (lib/moshion-docs.ts), or be listed in the known-gaps file with a reason.
 //
-// Why. The docs are written by hand in two places (shCode's lib/moshion-docs.ts and the
-// moshion repo's docs/data/moshion-docs.js), and a feature can land in the engine
-// without a sentence in either: `sprite.texture.pause()` shipped in the engine with
-// no docs page until someone noticed (#117). shCode's docs are the course reference
-// students read, so they are the one this guards.
+// Why. A feature can land in the engine without a sentence anywhere: `sprite.texture.pause()`
+// shipped with no docs until someone noticed (#117).
 //
 // How. Names come from the generated autocomplete data (itself built from
-// public/moshion/docs/moshion.d.ts). A global counts as documented when its name
-// appears as a whole word in the docs text. A member counts when `.name` or `name(`
-// appears (so a common word like "name" or "x" is not credited by prose).
-// A name that is documented nowhere and not in scripts/moshion-docs-gaps.json FAILS.
+// public/moshion/docs/moshion.d.ts). A name counts as explained when a written page uses
+// it, or when its line in the generated API reference carries a description from its doc
+// comment in moshion.d.ts. A reference line that says "No description yet." explains
+// nothing, so a name with no page and no doc comment still FAILS: write the sentence in
+// moshion.d.ts (in the moshion repo) or on a page.
+// A global counts when its name appears as a whole word. A member counts when `.name` or
+// `name(` appears (so a common word like "name" or "x" is not credited by prose).
 // A name in the gaps file that is now documented FAILS too, so the file only shrinks.
 //
 // Run: node --import ./scripts/register-ts.mjs scripts/check-moshion-docs-coverage.mjs
@@ -26,7 +26,12 @@ import { MOSHION_GLOBALS, MOSHION_MEMBERS } from '../lib/moshion-completions.gen
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GAPS = join(root, 'scripts/moshion-docs-gaps.json');
 
-const text = sections.flatMap((s) => [s.title, ...s.pages.flatMap((p) => [p.title, p.body, p.code || ''])]).join('\n');
+const text = sections
+  .flatMap((s) => [s.title, ...s.pages.flatMap((p) => [p.title, p.body, p.code || ''])])
+  .join('\n')
+  .split('\n')
+  .filter((line) => !line.endsWith('No description yet.'))
+  .join('\n');
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const has = (re) => re.test(text);
 
@@ -51,7 +56,7 @@ const undocumented = [...documented.entries()].filter(([, ok]) => !ok).map(([k])
 
 if (process.argv.includes('--write-gaps')) {
   writeFileSync(GAPS, JSON.stringify({
-    note: 'moSHion names in the typings that no page of lib/moshion-docs.ts mentions yet. Documenting one means deleting it here (the check fails until you do). Never add a name here to make the check pass for a NEW feature: write its docs sentence instead.',
+    note: 'moSHion names in the typings that the docs explain nowhere yet. Documenting one means deleting it here (the check fails until you do). Never add a name here to make the check pass for a NEW feature: write its docs sentence instead.',
     gaps: undocumented,
   }, null, 1) + '\n');
   console.log(`wrote ${undocumented.length} gaps to scripts/moshion-docs-gaps.json`);
@@ -65,7 +70,7 @@ const stale = [...known].filter((k) => !undocumented.includes(k));
 let bad = false;
 if (fresh.length) {
   bad = true;
-  console.error(`FAIL: ${fresh.length} moSHion name(s) in the typings are not in lib/moshion-docs.ts:\n  ${fresh.join('\n  ')}\nAdd a sentence to the matching docs page (the sync:moshion output says which typings changed).`);
+  console.error(`FAIL: ${fresh.length} moSHion name(s) in the typings are explained nowhere in the docs:\n  ${fresh.join('\n  ')}\nGive each a doc comment in moshion.d.ts or a sentence on a docs page (both in the moshion repo), then sync.`);
 }
 if (stale.length) {
   bad = true;

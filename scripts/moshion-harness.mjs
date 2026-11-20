@@ -95,7 +95,10 @@ function makeCtx(ops) {
       }
       ops.push({ op: m, args: args.map(simplify), fill: state.fillStyle, stroke: state.strokeStyle });
       if (m === 'measureText') return { width: String(args[0] ?? '').length * 6 };
-      if (m === 'createLinearGradient') return { addColorStop() {} };
+      if (m === 'createLinearGradient' || m === 'createRadialGradient') return { addColorStop() {} };
+      // A real CanvasPattern has setTransform(); sprite.pattern anchors its
+      // tiles to the sprite's corner with it.
+      if (m === 'createPattern') return { setTransform() {} };
       return undefined;
     };
   }
@@ -287,6 +290,12 @@ export function createSandbox({ width = 800, height = 600 } = {}) {
     },
     document,
     Image: FakeImage,
+    // Enough of DOMMatrix for a pattern's setTransform(new DOMMatrix().translate(x, y)).
+    DOMMatrix: class {
+      constructor() { this.a = 1; this.b = 0; this.c = 0; this.d = 1; this.e = 0; this.f = 0; }
+      translate(x = 0, y = 0) { const m = new this.constructor(); Object.assign(m, this); m.e += x; m.f += y; return m; }
+      scale(sx = 1, sy = sx) { const m = new this.constructor(); Object.assign(m, this); m.a *= sx; m.d *= sy; return m; }
+    },
     Audio: FakeAudio,
     AudioContext: FakeAudioContext,
     // A sketch fetching an audio file gets plausible bytes back rather than a
@@ -427,6 +436,41 @@ export function runSketch(code, { frames = 60, filename = 'sketch.js', beforeFra
     };
   }
   if (typeof beforeFrames === 'function') beforeFrames(box);
+  const ran = box.pump(frames);
+  return {
+    ok: box.errors.length === 0,
+    phase: box.errors.length ? 'frame' : 'done',
+    error: box.errors[0] || null,
+    ops: box.ops,
+    console: box.consoleLines,
+    frames: ran,
+    box,
+  };
+}
+
+/**
+ * runSketch for a sketch with preload(): the engine waits for its files with
+ * promises, which only settle between turns of the event loop, so this lets
+ * the loop turn `turns` times (the fake files all answer at once) before it
+ * runs the frames. Same result shape as runSketch.
+ */
+export async function runSketchAsync(code, { frames = 60, filename = 'sketch.js', turns = 20 } = {}) {
+  let box;
+  try {
+    box = createSandbox();
+  } catch (e) {
+    return { ok: false, phase: 'boot', error: e, ops: [], console: [], frames: 0 };
+  }
+  const loaded = box.run(code, filename);
+  // A fixed number of turns, not "until there is a canvas": the engine makes
+  // canvases of its own (decoding a picture) before setup() ever runs.
+  for (let i = 0; loaded && !box.errors.length && i < turns; i++) {
+    await new Promise((r) => setImmediate(r));
+    box.drainTimers();
+  }
+  if (!loaded || box.errors.length) {
+    return { ok: false, phase: 'setup', error: box.errors[0], ops: box.ops, console: box.consoleLines, frames: 0, box };
+  }
   const ran = box.pump(frames);
   return {
     ok: box.errors.length === 0,

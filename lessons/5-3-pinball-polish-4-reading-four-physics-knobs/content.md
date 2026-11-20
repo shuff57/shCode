@@ -97,7 +97,7 @@ function setup() {
   c = new Sprite(300, 50, 40);
   c.color = 'tomato';
   c.gravityScale = 0;
-  c.text = '0';   // a plain 0 would show nothing (5.7.1)
+  c.text = 0;
 }
 
 function draw() {

@@ -400,7 +400,7 @@ export const WHATS_NEW: WhatsNewEntry[] = [
       poster: '/whats-new/2026-11-save-to-account.jpg',
       alt: 'One student on two computers side by side: the game reads Plays: 1 on the first, then Plays: 2 on the second.',
     },
-    action: { label: 'Read Saving to your account', href: '/docs/moshion/persistence?page=2' },
+    action: { label: 'Read Saving to your account', href: '/docs/moshion/persistence?page=account-saves' },
   },
   {
     id: '2026-11-game-suggestions',
@@ -571,7 +571,7 @@ export const WHATS_NEW: WhatsNewEntry[] = [
       poster: '/whats-new/2026-11-realtime-play.jpg',
       alt: 'Two browser windows side by side: a square steered in one moves in the other at the same moment.',
     },
-    action: { label: 'Read Real-time play', href: '/docs/moshion/multiplayer?page=6' },
+    action: { label: 'Read Real-time play', href: '/docs/moshion/multiplayer?page=realtime' },
   },
   {
     id: '2026-11-games-library',
