@@ -77,6 +77,18 @@ check('no example reads keys or moves sprites in draw() (the rules go in update(
   assert.deepEqual(bad, []);
 });
 
+check('every example clears its canvas and never deletes while looping over a group itself', () => {
+  const bad = [];
+  for (const s of sections) for (const p of s.pages) {
+    if (!p.code) continue;
+    if (/new\s+(?:\w+\.)?Sprite\b|\btext\(/.test(p.code) && !/\bbackground\(|\bclear\(\)/.test(p.code)) bad.push(`${s.slug}/${p.id}: never clears the canvas`);
+    for (const m of p.code.matchAll(/for\s*\(\s*(?:const|let|var)\s+(\w+)\s+of\s+([\w.]+)\s*\)\s*\{([\s\S]*?)\n\s*\}/g)) {
+      if (new RegExp(`\\b${m[1]}\\.(delete|remove)\\(`).test(m[3])) bad.push(`${s.slug}/${p.id}: deletes while looping over ${m[2]}`);
+    }
+  }
+  assert.deepEqual(bad, []);
+});
+
 function walk(dir, out = []) {
   for (const name of readdirSync(dir)) {
     if (name === 'node_modules' || name.startsWith('.')) continue;
