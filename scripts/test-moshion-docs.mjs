@@ -77,14 +77,49 @@ check('no example reads keys or moves sprites in draw() (the rules go in update(
   assert.deepEqual(bad, []);
 });
 
-// The body of `function name() { ... }`, by counting braces ('' if there is none).
+// The same scanners as the moshion repo's scripts/build-docs.mjs (fnBody, blockFrom,
+// deletesWhileLooping); shCode does not vendor that script, so keep these identical.
+/** The body of `function name() { ... }` in an example ('' if none). Braces
+ *  are counted in code only: a brace inside a string, a template, a regex-free
+ *  comment or a character class in text('{') does not end the body early. */
 function fnBody(code, name) {
   const m = new RegExp(`function\\s+${name}\\s*\\([^)]*\\)\\s*\\{`).exec(code);
-  if (!m) return '';
-  let depth = 1, i = m.index + m[0].length;
-  const start = i;
-  for (; i < code.length && depth; i++) { if (code[i] === '{') depth++; else if (code[i] === '}') depth--; }
+  return m ? blockFrom(code, m.index + m[0].length) : '';
+}
+
+/** The text of the block that starts just after the '{' at `start`, up to its
+ *  matching '}', counting braces in code only (strings, templates and
+ *  comments are skipped). */
+function blockFrom(code, start) {
+  let depth = 1;
+  let i = start;
+  while (i < code.length && depth) {
+    const c = code[i], n = code[i + 1];
+    if (c === '/' && n === '/') { const e = code.indexOf('\n', i); i = e < 0 ? code.length : e; continue; }
+    if (c === '/' && n === '*') { const e = code.indexOf('*/', i + 2); i = e < 0 ? code.length : e + 2; continue; }
+    if (c === "'" || c === '"' || c === '`') {
+      i++;
+      while (i < code.length && code[i] !== c) i += code[i] === '\\' ? 2 : 1;
+      i++;
+      continue;
+    }
+    if (c === '{') depth++;
+    else if (c === '}') depth--;
+    i++;
+  }
   return code.slice(start, i - 1);
+}
+
+/** Each `for (x of group)` loop that deletes x inside its body (braced or one
+ *  statement) without looping over a copy: [name of the group, ...]. */
+function deletesWhileLooping(code) {
+  const out = [];
+  for (const m of code.matchAll(/for\s*\(\s*(?:const|let|var)\s+(\w+)\s+of\s+([\w.]+)\s*\)\s*(\{?)/g)) {
+    const after = m.index + m[0].length;
+    const body = m[3] ? blockFrom(code, after) : code.slice(after, code.indexOf(';', after) + 1);
+    if (new RegExp(`\\b${m[1]}\\.(delete|remove)\\(`).test(body)) out.push(m[2]);
+  }
+  return out;
 }
 
 check('every example clears its canvas in draw() and never deletes while looping over a group itself', () => {
@@ -92,9 +127,7 @@ check('every example clears its canvas in draw() and never deletes while looping
   for (const s of sections) for (const p of s.pages) {
     if (!p.code) continue;
     if (/new\s+(?:\w+\.)?Sprite\b|\btext\(/.test(p.code) && !/\bbackground\(|\bclear\(\)/.test(fnBody(p.code, 'draw'))) bad.push(`${s.slug}/${p.id}: never clears the canvas in draw()`);
-    for (const m of p.code.matchAll(/for\s*\(\s*(?:const|let|var)\s+(\w+)\s+of\s+([\w.]+)\s*\)\s*\{([\s\S]*?)\n\s*\}/g)) {
-      if (new RegExp(`\\b${m[1]}\\.(delete|remove)\\(`).test(m[3])) bad.push(`${s.slug}/${p.id}: deletes while looping over ${m[2]}`);
-    }
+    for (const g of deletesWhileLooping(p.code)) bad.push(`${s.slug}/${p.id}: deletes while looping over ${g}`);
   }
   assert.deepEqual(bad, []);
 });

@@ -1,6 +1,7 @@
 // Keep the vendored moSHion engine and its docs current with upstream (shuff57/moshion, `main`).
 //
-//   npm run sync:moshion              copy the engine, typings and docs from upstream main,
+//   npm run sync:moshion              copy the engine, typings, docs, texture catalog and ground
+//                                     tiles from upstream main,
 //                                     reapply shCode's one local line, regenerate the editor
 //                                     autocomplete, run the moshion gates, stamp VENDORED.md
 //   npm run sync:moshion -- --check   exit 1 if the vendored copy differs from upstream main,
@@ -15,14 +16,15 @@
 // so another session's uncommitted work there cannot leak in.
 //
 // What it copies: moshion.js (with the /moshion/textures/ base line),
-// docs/moshion.d.ts, planck.min.js, and the built docs (docs/data/moshion-docs.js,
-// written as lib/moshion-docs-shared.generated.ts). Textures, fonts, sounds,
-// runner.html and extras.js are shCode's own or synced by their generators
-// (see VENDORED.md). The docs are written ONCE, in the moshion repo's
+// docs/moshion.d.ts, planck.min.js, the built docs (docs/data/moshion-docs.js,
+// written as lib/moshion-docs-shared.generated.ts), the texture catalog
+// (textures/, with shCode's base path in its manifest) and the two ground
+// tiles. Fonts, sounds, runner.html and extras.js are shCode's own (see
+// VENDORED.md). The docs are written ONCE, in the moshion repo's
 // docs/content/; shCode's own pages are lib/moshion-docs-shcode.ts.
 
 import { spawnSync } from 'node:child_process';
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, readdirSync, unlinkSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 
@@ -56,7 +58,17 @@ const FILES = [
   { from: 'docs/moshion.d.ts', to: 'public/moshion/docs/moshion.d.ts' },
   { from: 'planck.min.js', to: 'public/moshion/planck.min.js' },
   { from: 'docs/data/moshion-docs.js', to: 'lib/moshion-docs-shared.generated.ts', docs: true },
+  { from: 'docs/LICENSE.md', to: 'public/moshion/docs/LICENSE.md' },
+  // The two ground tiles are drawn by the repo's scripts/make-ground-tiles.py.
+  { from: 'assets/ground_tile.png', to: 'public/moshion/assets/ground_tile.png', binary: true },
+  { from: 'assets/grass_tile.png', to: 'public/moshion/assets/grass_tile.png', binary: true },
 ];
+// The texture catalog, made by the repo's scripts/make-textures.py (and
+// make-anim-sheets.py, make-runner-sheet.py): every PNG and its LICENSE.txt
+// byte for byte, the manifest with shCode's base path. A file the repo no
+// longer has is removed here too (see TEXTURES_DIR below).
+const TEXTURES_DIR = 'public/moshion/textures';
+const TEXTURE_BASE = (t) => t.replace('"base": "textures/"', '"base": "/moshion/textures/"');
 
 function run(cmd, args, opts = {}) {
   return spawnSync(cmd, args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, ...opts });
@@ -88,9 +100,15 @@ const head = git('rev-parse', '--short', REF).stdout.trim();
 if (!head) skip(`no ${REF} in ${upstream}`);
 
 function upstreamText(file) {
+  if (file.binary) {
+    const b = spawnSync('git', ['-C', upstream, 'show', `${REF}:${file.from}`], { maxBuffer: 64 * 1024 * 1024 });
+    if (b.status !== 0) throw new Error(`${REF} has no ${file.from}`);
+    return b.stdout;
+  }
   const r = git('show', `${REF}:${file.from}`);
   if (r.status !== 0) throw new Error(`${REF} has no ${file.from}`);
   let t = r.stdout;
+  if (file.texBase) t = TEXTURE_BASE(t);
   if (file.patch) {
     if (!t.includes(UP_LINE)) throw new Error(`moshion.js no longer contains the textures base line; update UP_LINE in ${fileURLToPath(import.meta.url)}`);
     t = t.replace(UP_LINE, OUR_LINE);
@@ -99,14 +117,33 @@ function upstreamText(file) {
   return t;
 }
 
+// Add the catalog's files to the list, and note the ones only shCode still has.
+const listed = git('ls-tree', '--name-only', `${REF}`, 'textures/').stdout.trim().split('\n').filter(Boolean);
+if (!listed.length) throw new Error(`${REF} has no textures/ directory`);
+for (const f of listed) {
+  const name = f.slice('textures/'.length);
+  const manifest = name === 'textures.json' || name === 'textures.js';
+  FILES.push({ from: f, to: `${TEXTURES_DIR}/${name}`, binary: !manifest, texBase: manifest });
+}
+const upstreamTextures = new Set(listed.map((f) => f.slice('textures/'.length)));
+const extraTextures = readdirSync(join(root, TEXTURES_DIR)).filter((n) => !upstreamTextures.has(n));
+
 const drifted = [];
 for (const file of FILES) {
   const want = upstreamText(file);
-  const have = existsSync(join(root, file.to)) ? readFileSync(join(root, file.to), 'utf8') : '';
-  // The docs module stamps the commit it came from; compare it without that line.
-  const norm = (t) => (file.docs ? t.replace(/commit [0-9a-f]+\)|'[0-9a-f]{7,}';/g, '') : t);
-  if (norm(want) !== norm(have)) drifted.push({ ...file, want });
+  const path = join(root, file.to);
+  let same;
+  if (file.binary) {
+    same = existsSync(path) && Buffer.compare(readFileSync(path), want) === 0;
+  } else {
+    const have = existsSync(path) ? readFileSync(path, 'utf8') : '';
+    // The docs module stamps the commit it came from; compare it without that line.
+    const norm = (t) => (file.docs ? t.replace(/commit [0-9a-f]+\)|'[0-9a-f]{7,}';/g, '') : t);
+    same = norm(want) === norm(have);
+  }
+  if (!same) drifted.push({ ...file, want });
 }
+for (const n of extraTextures) drifted.push({ to: `${TEXTURES_DIR}/${n}`, remove: true });
 
 const vendoredDoc = join(vendored, 'VENDORED.md');
 const doc = readFileSync(vendoredDoc, 'utf8');
@@ -133,6 +170,7 @@ if (!drifted.length) {
 const dtsPath = join(vendored, 'docs/moshion.d.ts');
 const dtsBefore = existsSync(dtsPath) ? readFileSync(dtsPath, 'utf8') : '';
 for (const d of drifted) {
+  if (d.remove) { unlinkSync(join(root, d.to)); console.log(`[sync-moshion] removed ${d.to} (not in the repo any more)`); continue; }
   writeFileSync(join(root, d.to), d.want);
   console.log(`[sync-moshion] updated ${d.to}`);
 }

@@ -209,6 +209,11 @@ export function pruneLocalOrigins(keep: Set<string>): void {
 // that breaks the day someone saves a name containing a quote. Encode it.
 
 const TEXTURE_PREFIX = 'texture:';
+/** A key that holds the student's library (art, sounds, fonts, their editor data), which
+ *  clearStorage() must never erase. Prefixes are defined beside each kind in this file. */
+export function isLibraryKey(k: string): boolean {
+  return [TEXTURE_PREFIX, TEXMETA_PREFIX, SOUND_PREFIX, SNDMETA_PREFIX, FONT_PREFIX, FONTMETA_PREFIX].some((p) => k.startsWith(p));
+}
 // An animation is the same image key holding a horizontal STRIP, plus its
 // frame count here. Two keys, so a still and an animation load identically and
 // dropping the meta downgrades rather than breaks. 'texmeta:' deliberately
@@ -734,7 +739,13 @@ export function useMoshionStorage(
       }
 
       if (d.op === 'clear') {
-        writeStore({});
+        // clearStorage() erases what sketches saved, never the student's
+        // saved pictures, sounds and fonts (and their editor data), which
+        // live in the same store. A Reset in one game, or running lesson
+        // 6.5.16's example, used to wipe a guest's whole library.
+        const kept: Store = {};
+        for (const [k, v] of Object.entries(readStore())) if (isLibraryKey(k)) kept[k] = v;
+        writeStore(kept);
         return;
       }
       if (typeof d.key !== 'string') return;

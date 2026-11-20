@@ -22,7 +22,7 @@ const EXTRAS = join(REPO, 'public', 'moshion', 'extras.js');
 // empty catalog and every `sprite.texture = 'coin'` warns instead of drawing,
 // which is a different engine from the one that ships. Absent = the catalog
 // has not been generated; that is a real state (a fresh clone before
-// make-moshion-textures.py has run) and the engine already falls back to
+// the texture catalog has been synced) and the engine already falls back to
 // saved-textures-only, so it is not fatal here.
 const TEXTURES = join(REPO, 'public', 'moshion', 'textures', 'textures.js');
 // The built-in font catalog (scripts/fetch-moshion-fonts.mjs), loaded before

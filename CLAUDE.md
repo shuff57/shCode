@@ -794,7 +794,8 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   home background is `components/HomeBackdrop.tsx`. Tests: `scripts/test-prefs.mjs`.
 
 ### The moSHion engine and its docs (2026-11-20)
-The engine lives in the moshion repo (`../moshion`) and is vendored here by `npm run sync:moshion`
+The engine lives in the moshion repo (`../moshion`) and is vendored here by `npm run sync:moshion` (with its
+texture catalog, ground tiles and LICENSE.md: there are no texture generators in shCode any more)
 (`public/moshion/VENDORED.md` says what is copied, what is changed and what is shCode's own). The docs are written
 ONCE, in that repo's `docs/content/` (one file per section, every page with a permanent `id`; its
 `scripts/build-docs.mjs` adds an API reference generated from `moshion.d.ts`). The sync copies them in as

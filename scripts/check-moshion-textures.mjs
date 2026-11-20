@@ -20,7 +20,7 @@
 //      actually reads window.MOSHION_TEXTURES
 //
 // It is a tripwire, not a proof: it cannot tell a correct crop from a wrong
-// one. `make-moshion-textures.py` covers that end by refusing to write a
+// one. The moshion repo's `make-textures.py` covers that end by refusing to write a
 // fully transparent tile, which is what an off-by-one index produces.
 //
 // Run:  node scripts/check-moshion-textures.mjs
@@ -43,7 +43,7 @@ const note = (m) => fail.push(m);
 
 if (!existsSync(path.join(root, DIR, 'textures.json'))) {
   console.error(`\nFAIL  ${DIR}/textures.json is missing.`);
-  console.error('      Run: python scripts/make-moshion-textures.py\n');
+  console.error('      The catalog comes from the moshion repo: run npm run sync:moshion\n');
   process.exit(1);
 }
 
@@ -104,7 +104,7 @@ if (!jsBody) {
   if (!parsed) {
     note('textures.js payload is not valid JSON');
   } else if (JSON.stringify(parsed) !== JSON.stringify(manifest)) {
-    note('textures.js and textures.json disagree -- re-run make-moshion-textures.py');
+    note('textures.js and textures.json disagree -- run npm run sync:moshion (the moshion repo makes both)');
   }
 }
 
