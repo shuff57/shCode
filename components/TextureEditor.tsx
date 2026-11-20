@@ -214,7 +214,7 @@ export default function TextureEditor() {
       .catch((e) => {
         if (!alive) return;
         setMessage({
-          text: `Built-in textures unavailable (${e.message}). Run: python scripts/make-moshion-textures.py. Drawing and saving still work.`,
+          text: `Built-in textures unavailable (${e.message}). Reload the page; if it keeps happening, tell your teacher. Drawing and saving still work.`,
           bad: true,
         });
       });

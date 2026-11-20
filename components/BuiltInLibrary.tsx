@@ -11,7 +11,8 @@ import SoundPreviewButton from './SoundPreviewButton';
 // editor or the Sound mixer (lib/remix.ts); Share can then hand it to the class.
 //
 // Textures come from public/moshion/textures/textures.json (made by
-// scripts/make-moshion-textures.py from a CC0 sheet); sounds from PALETTE in
+// the moshion repo's scripts/make-textures.py from a CC0 sheet, copied in by
+// npm run sync:moshion); sounds from PALETTE in
 // lib/sound/presets.ts (rendered by scripts/make-moshion-sounds.mjs).
 
 import { SpriteThumb, SpriteViewer } from './SpriteThumb';

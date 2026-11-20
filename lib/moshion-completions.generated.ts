@@ -116,7 +116,7 @@ export const MOSHION_GLOBALS: MoshionCompletion[] = [
   "label": "clearStorage",
   "type": "function",
   "detail": "(): void",
-  "info": "Forgets every saved value."
+  "info": "Forgets every value saved with storeItem, by every sketch on the site; saved pictures, sounds and fonts are kept."
  },
  {
   "label": "constrain",
