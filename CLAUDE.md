@@ -237,6 +237,8 @@ Cloudflare dashboard env vars pane (plain vars):
 | `GRADE_WRITTEN_DAILY_LIMIT` | var (optional) | Per-student daily submission cap for `POST /api/grade-written`; default `100` (was 30; two students hit 30 on 2026-10-29). Teachers/admins are exempt. `GET /api/grade-written` returns `quota {limit, used, remaining}` for a student and `components/GradeQuotaNote.tsx` shows it beside the attempt banner, so the cap is never a surprise. A dashboard value of this var overrides the default. A runaway-cost stop, not a pedagogical one — the course allows unlimited retries, so raise it rather than let a student hit it. |
 | `GRADE_WRITTEN_GLOBAL_DAILY_LIMIT` | var (optional) | GLOBAL per-deploy daily ceiling for `POST /api/grade-written`; default `10000`. Same backstop as `AI_HELP_GLOBAL_DAILY_LIMIT`, for the grader. |
 | `GRADE_WRITTEN_WORKERS_MODEL` | var (optional) | Workers AI model id for every AI call (grader, Check, tutor); default `@cf/google/gemma-4-26b-a4b-it`. Only read when the `AI` binding exists. |
+| `CHEAPERINFERENCE_API_KEY` | secret | Bearer key (`ci_live_...`) for the fast Check's model, Microsoft `decision-1.1` through CheaperInference (`POST /api/clef-check`, which replaced Cloudflare Clef 2026-11-21). Unset = that route answers 503 `offline`, and every Check runs the slow way. Every request carries `zdr: true`. |
+| `DECISION_CHECK_MODEL` | var (optional) | Model id for the fast Check; default `decision-1.1`. |
 | `CLEF_CHECK_DAILY_LIMIT` | var (optional) | Per-student daily cap on the fast Check (`POST /api/clef-check`); default `400`. Its own bucket, so it never spends the grade-written allowance. Over it the browser quietly runs the slow Check instead. Teachers/admins exempt. |
 | `CLEF_CHECK_GLOBAL_DAILY_LIMIT` | var (optional) | Deploy-wide daily ceiling on fast Checks; default `40000` (about $20 a day at the measured cost). |
 | `OPENROUTER_API_KEY` | secret | Bearer key for `POST /api/p5play-convert` only (OpenRouter). Unset = that route answers 503 "not set up"; nothing else uses it. |
@@ -1614,6 +1616,31 @@ quizzes stay a plain percent; practice a student had already skipped is not held
 - Measured 2026-11-18 on the live class (29 students): graded lessons 149 -> 475, no grade goes down, median +1
   point, largest +8; the median student's missing count stays 6. 20 plan labs, 337 finished rows to backfill.
 - Tests: `scripts/test-grading-v2.mjs` (npm test; both switch positions; three safeguards mutation-checked).
+
+## Fast Check: Microsoft decision-1.1 decides the cards (`aiCheck.clef`; Clef retired 2026-11-21)
+
+**Model swap, 2026-11-21 (owner's decision).** The fast Check no longer calls Cloudflare Clef. `functions/api/clef-check.ts` calls
+Microsoft `decision-1.1` through CheaperInference (`POST https://api.cheaperinference.com/v1/decisions`, secret
+`CHEAPERINFERENCE_API_KEY`; rules in `lib/decision-check-core.ts`: request, answer reader, `DECISION_BAND` 0.80 / 0.15, `askDecision`).
+Everything else below (the route name, the cards, the pattern-check fallback, the quota bucket, notes on demand) is unchanged; read
+"Clef" in the text below as "the decision model". Only the fast Check moved: the issue-report "already known?" check still uses Clef.
+- **Data leaves Cloudflare.** The student's code goes to CheaperInference, then the serving provider. Every request asks `zdr: true`
+  (zero data retention, routed only through providers that keep nothing, else 503 = offline) and the account's Data Protection mode
+  is on. The owner accepted this having read CheaperInference's terms (2026-11-17): without ZDR it retains request content until
+  deleted on request; its Terms 4.6 say do not submit "children's data"; the serving provider's retention is not stated. Do not
+  turn the account's Data Protection mode off.
+- **Questions:** the lesson's `aiCheck.clef.questions` are tuned for Clef; `scripts/ci-questions/decision-1.1.json`
+  (`{ "<lesson id>": { "questions": { "<card id>": "..." } } }`) is laid over them by `generate-ai-graders.mjs` (an override for a card
+  the lesson has no question for is a build error). The harness (`scripts/clef-harness.mjs --provider cheaperinference --model
+  decision-1.1 --questions-file scripts/ci-questions/decision-1.1.json --band 0.8,0.15`, key in `CI_API_KEY`) is the gate: 2495/2495
+  programs, about 16% of cards left to the pattern check (Clef: 8.3%).
+- **The gate misses generic wording.** Measured on 4,000 real handed-in programs: cards still on the lesson's generic wording
+  ("Answer yes only if this is fully done") gave confident false reds in the debug labs that no fixture showed. Write per-card questions
+  that name the YES and the NO forms, and check a new lab against real work (blind-reviewed disagreements), not only the gate.
+- **A 429 from the provider's per-minute limit is 503 `offline`** (the browser runs the slow Check); a classroom burst past the
+  key's limit degrades quietly, it never shows a student an error.
+- Tests: `scripts/test-decision-check.mjs` (request, answer, band, `askDecision`, and the real route over a stubbed fetch),
+  `scripts/test-clef-check.mjs`.
 
 ## Fast Check: Clef decides the cards (`aiCheck.clef`, 2026-11-18)
 

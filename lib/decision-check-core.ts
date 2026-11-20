@@ -1,17 +1,16 @@
-// DRAFT, NOT WIRED IN: an alternative decision model for the fast Check, behind CheaperInference's
-// POST /v1/decisions (OpenAI Decisions shape). Nothing imports this file; functions/api/clef-check.ts
-// still calls Workers AI Clef. Measured 2026-11-20 with scripts/clef-harness.mjs --provider cheaperinference
-// --model decision-1.1 (Microsoft): see scripts/ci-questions/decision-1.1.json for the questions it needs.
+// The fast Check's model: Microsoft decision-1.1 behind CheaperInference's POST /v1/decisions (OpenAI Decisions
+// shape), which REPLACED Cloudflare Clef here (2026-11-21, owner's decision). functions/api/clef-check.ts calls
+// askDecision(). Measured with scripts/clef-harness.mjs --provider cheaperinference --model decision-1.1.
 //
-// What it takes to switch (none of it done):
-//   1. A secret CHEAPERINFERENCE_API_KEY, and a fetch to DECISION_URL in the route instead of env.AI.run.
-//   2. The per-model questions: generate-ai-graders.mjs would read scripts/ci-questions/decision-1.1.json
-//      over lesson.json's own `aiCheck.clef.questions` (the lesson wording is tuned for Clef; this model needs
-//      its own for about 57 cards). Questions must come from the server's config, never the body.
-//   3. The student's code leaves Cloudflare (to CheaperInference, then Microsoft). Decide that first.
-//   4. The key has a per-minute request limit; a 429 must read as "offline" (the browser then runs the
-//      slow Check), exactly as the Clef route does for its own refusals. DONE here: askDecision() below
-//      returns null for a 429 and every other failure; the route only has to answer 503 { offline: true }.
+//   - The per-model questions are scripts/ci-questions/decision-1.1.json, laid over lesson.json's own
+//     `aiCheck.clef.questions` by generate-ai-graders.mjs (the lesson wording was tuned for Clef; this model needs
+//     its own for some cards). Questions come from the server's config, never the body.
+//   - The student's code LEAVES Cloudflare (to CheaperInference, then Microsoft). Every request carries
+//     `zdr: true` so it is routed only through zero-data-retention providers (the account's own Data Protection
+//     mode is on too). The owner decided this 2026-11-21, having read CheaperInference's terms; those say
+//     "Do not submit ... children's data" and do not state the serving provider's retention.
+//   - The key has a per-minute request limit; a 429 reads as "offline" (the browser then runs the slow Check),
+//     exactly as the route does for any failure: askDecision() returns null for a 429 and every other failure.
 //
 // Pure: no fetch, no DOM. It reuses clef-check-core's state, band and answer reader, so a card comes out in
 // the same { id, verdict, p } shape and everything downstream (pattern fallback, notes) is unchanged.
@@ -34,6 +33,10 @@ export const DECISION_BAND = { hi: 0.8, lo: 0.15 } as const;
 export function decisionRequest(cfg: ClefConfig, code: string, model: string = DECISION_MODEL) {
   return {
     model,
+    // Zero data retention, asked for on EVERY request: the call is routed only through providers that keep
+    // nothing, or refused with a 503 (which reads as "offline" below). The account's own mode does the same;
+    // this makes the request safe even if that setting is ever changed. A student's code never goes anywhere else.
+    zdr: true as const,
     // The same named fields Clef is given (about / task / student_code), as one string: this API's `input` is text.
     input: JSON.stringify(clefInputs(cfg, code).state),
     // One yes/no question per card, named by the card's id so the answer maps back without relying on order.
@@ -65,17 +68,19 @@ export function cardsFromDecisionAnswer(body: unknown, ids: string[]): ClefCard[
  * Check and a student never sees the fast path fail. `fetchFn` is injected so this stays pure and testable.
  */
 export async function askDecision(
-  fetchFn: (url: string, init: { method: string; headers: Record<string, string>; body: string }) => Promise<{ ok: boolean; status: number; json(): Promise<unknown> }>,
+  fetchFn: (url: string, init: { method: string; headers: Record<string, string>; body: string; signal?: AbortSignal }) => Promise<{ ok: boolean; status: number; json(): Promise<unknown> }>,
   apiKey: string,
   cfg: ClefConfig,
   code: string,
   model: string = DECISION_MODEL,
+  signal?: AbortSignal,
 ): Promise<ClefCard[] | null> {
   try {
     const res = await fetchFn(DECISION_URL, {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(decisionRequest(cfg, code, model)),
+      ...(signal ? { signal } : {}),
     });
     if (!res.ok) return null;
     return cardsFromDecisionAnswer(await res.json(), Object.keys(cfg.questions));

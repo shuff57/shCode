@@ -19,7 +19,8 @@ check('one named predicate per card, in order', req.questions.map((q) => [q.type
 check('the question text is the config\'s own', req.questions[1].instructions, 'Does it move?');
 const state = JSON.parse(req.input);
 check('state carries the engine facts, the task and the code', [typeof state.about, state.task, state.student_code], ['string', 'Make a sprite move.', 'let x = 1;']);
-check('the body holds nothing else the caller could steer', Object.keys(req).sort(), ['input', 'model', 'questions']);
+check('the body holds nothing else the caller could steer', Object.keys(req).sort(), ['input', 'model', 'questions', 'zdr']);
+check('every request asks for zero data retention', req.zdr, true);
 
 const ok = { answers: [{ type: 'predicate', name: 'r1', probability: 0.97 }, { type: 'predicate', name: 'r2', probability: 0.04 }] };
 check('sure answers: met and missing', cardsFromDecisionAnswer(ok, ['r1', 'r2']).map((c) => c.verdict), ['met', 'missing']);
@@ -53,6 +54,46 @@ check('401 is null', await askDecision(reply(401, {}), 'k', cfg, 'x'), null);
 check('a network error is null, not a throw', await askDecision(async () => { throw new Error('down'); }, 'k', cfg, 'x'), null);
 check('a body that is not JSON is null', await askDecision(async () => ({ ok: true, status: 200, json: async () => { throw new Error('bad'); } }), 'k', cfg, 'x'), null);
 check('a 200 with no answers array is null', await askDecision(reply(200, { nope: 1 }), 'k', cfg, 'x'), null);
+
+// ---------------------------------------------------------------- the route (functions/api/clef-check.ts)
+// The REAL handler over an in-memory D1, with fetch stubbed: no network, no key.
+{
+  const { makeD1 } = await import('./_d1-sqlite.mjs');
+  const { onRequestPost } = await import('../functions/api/clef-check.ts');
+  const LAB = '2-1-36-lab-settings-advisor';
+  const generated = (await import('../functions/_shared/ai-graders.generated.ts')).default ?? (await import('../functions/_shared/ai-graders.generated.ts'));
+  const cfgQs = (generated.AI_GRADERS ?? generated.default ?? generated)[LAB]?.clef?.questions;
+  const NO_ASSETS = { async fetch() { return new Response('not found', { status: 404 }); } };
+  const call = async (env, body, role = 'student') => {
+    const request = new Request('http://localhost/api/clef-check', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+    const res = await onRequestPost({ request, params: {}, data: { email: 'a@b.c', role }, env: { DB: makeD1(), ASSETS: NO_ASSETS, ...env } });
+    return { status: res.status, json: await res.json() };
+  };
+  const realFetch = globalThis.fetch;
+  const sent = [];
+  const stub = (status, body, throws) => { globalThis.fetch = async (url, init) => { sent.push({ url: String(url), init }); if (throws) throw new Error('down'); return new Response(JSON.stringify(body), { status }); }; };
+  try {
+    check('route: no CHEAPERINFERENCE_API_KEY is 503 offline (the slow Check)', await call({}, { lessonId: LAB, response: 'let a = 1;' }).then((r) => [r.status, r.json.offline]), [503, true]);
+    const ids = Object.keys(cfgQs);
+    stub(200, { answers: ids.map((id, i) => ({ type: 'predicate', name: id, probability: i === 0 ? 0.97 : 0.02 })) });
+    const ok = await call({ CHEAPERINFERENCE_API_KEY: 'k1' }, { lessonId: LAB, response: 'let a = 1;', questions: { x: 'steer me' }, model: 'evil' });
+    check('route: a good answer is 200 with the cards, banded at this model\'s lines', [ok.status, ok.json.cards.map((c) => c.verdict)], [200, ids.map((_, i) => (i === 0 ? 'met' : 'missing'))]);
+    const posted = JSON.parse(sent.at(-1).init.body);
+    check('route: it calls the decisions URL with the bearer key', [sent.at(-1).url, sent.at(-1).init.headers.Authorization], [DECISION_URL, 'Bearer k1']);
+    check('route: zero data retention is on the wire', posted.zdr, true);
+    check('route: questions and model are the server\'s, never the body\'s', [posted.model, posted.questions.map((q) => q.name), posted.questions.map((q) => q.instructions)], [DECISION_MODEL, ids, ids.map((id) => cfgQs[id])]);
+    stub(429, { error: 'rate' });
+    check('route: the provider\'s 429 is 503 offline, not a 429 to the student', await call({ CHEAPERINFERENCE_API_KEY: 'k1' }, { lessonId: LAB, response: 'let a = 1;' }).then((r) => [r.status, r.json.offline]), [503, true]);
+    stub(0, null, true);
+    check('route: a network failure is 503 offline', await call({ CHEAPERINFERENCE_API_KEY: 'k1' }, { lessonId: LAB, response: 'let a = 1;' }).then((r) => [r.status, r.json.offline]), [503, true]);
+    stub(200, { nope: 1 });
+    check('route: an unusable answer is 503 offline', await call({ CHEAPERINFERENCE_API_KEY: 'k1' }, { lessonId: LAB, response: 'let a = 1;' }).then((r) => [r.status, r.json.offline]), [503, true]);
+    const before = sent.length;
+    check('route: a lesson with no fast check is 404 and makes no call', await call({ CHEAPERINFERENCE_API_KEY: 'k1' }, { lessonId: 'no-such-lesson', response: 'x' }).then((r) => [r.status, sent.length === before]), [404, true]);
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+}
 
 if (failures) { console.error(`\n${failures} failing`); process.exit(1); }
 console.log(`\n${n} checks passed`);

@@ -118,7 +118,17 @@ try {
   const seen = [];
   let answer = () => ({ answers: { a: { noul: 0.99 }, b: { noul: 0.5 } }, usage: { input_tokens: 900 } });
   const AI = { async run(model, inputs) { seen.push({ model, inputs }); return answer(model, inputs); } };
-  const env = (extra = {}) => ({ DB: db, ASSETS, AI, CLEF_CHECK_DAILY_LIMIT: '2', OLLAMA_API_KEY: 'unused', OLLAMA_HOST: 'http://127.0.0.1:9', ...extra });
+  // The fast Check calls CheaperInference (decision-1.1) by fetch; every other fetch goes through untouched.
+  const realFetch = globalThis.fetch;
+  const ciSeen = [];
+  let ciAnswer = () => ({ status: 200, body: { answers: [{ type: 'predicate', name: 'a', probability: 0.99 }, { type: 'predicate', name: 'b', probability: 0.5 }] } });
+  globalThis.fetch = async (url, init) => {
+    if (!String(url).includes('cheaperinference.com')) return realFetch(url, init);
+    ciSeen.push({ url: String(url), headers: init.headers, body: JSON.parse(init.body) });
+    const a = ciAnswer();
+    return new Response(JSON.stringify(a.body), { status: a.status });
+  };
+  const env = (extra = {}) => ({ DB: db, ASSETS, AI, CHEAPERINFERENCE_API_KEY: 'test-key', CLEF_CHECK_DAILY_LIMIT: '2', OLLAMA_API_KEY: 'unused', OLLAMA_HOST: 'http://127.0.0.1:9', ...extra });
   const post = async (route, url, body, { role = 'student', email = 'kid@example.test', e = env() } = {}) => {
     const res = await route.onRequestPost({
       request: new Request('https://example.test' + url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }),
@@ -131,10 +141,10 @@ try {
   let r = await post(clefRoute, '/api/clef-check', { lessonId: 'fast', response: code, questions: { a: 'INJECTED' } });
   check('fast Check answers cards in question order with the band applied',
     [r.status, r.body.ok, r.body.cards.map((c) => [c.id, c.verdict])], [200, true, [['a', 'met'], ['b', 'unsure']]]);
-  check('it asks Clef with the SERVER questions, never the body\'s',
-    [seen.at(-1).model, seen.at(-1).inputs.questions.a.instructions, JSON.stringify(seen.at(-1).inputs).includes('INJECTED')],
-    ['@cf/cloudflare/clef', 'SERVER QUESTION A', false]);
-  check('the student code reaches Clef only as state', seen.at(-1).inputs.state.student_code, code);
+  check('it asks decision-1.1 with the SERVER questions, never the body\'s',
+    [ciSeen.at(-1).body.model, ciSeen.at(-1).body.questions[0].instructions, JSON.stringify(ciSeen.at(-1).body).includes('INJECTED')],
+    ['decision-1.1', 'SERVER QUESTION A', false]);
+  check('the student code reaches the model only as state, with zero data retention on', [JSON.parse(ciSeen.at(-1).body.input).student_code, ciSeen.at(-1).body.zdr], [code, true]);
 
   r = await post(clefRoute, '/api/clef-check', { lessonId: 'fast', response: code });
   r = await post(clefRoute, '/api/clef-check', { lessonId: 'fast', response: code });
@@ -147,17 +157,18 @@ try {
     [['clef-check', 2]]);
 
   r = await post(clefRoute, '/api/clef-check', { lessonId: 'plain', response: code }, { email: 'b@example.test' });
-  check('a lesson with no Clef questions is 404 + offline', [r.status, r.body.offline], [404, true]);
-  r = await post(clefRoute, '/api/clef-check', { lessonId: 'fast', response: code }, { email: 'c@example.test', e: env({ AI: undefined }) });
-  check('no binding is 503 + offline', [r.status, r.body.offline], [503, true]);
-  answer = () => { throw new Error('boom'); };
+  check('a lesson with no fast-check questions is 404 + offline', [r.status, r.body.offline], [404, true]);
+  r = await post(clefRoute, '/api/clef-check', { lessonId: 'fast', response: code }, { email: 'c@example.test', e: env({ CHEAPERINFERENCE_API_KEY: undefined }) });
+  check('no key is 503 + offline', [r.status, r.body.offline], [503, true]);
+  ciAnswer = () => ({ status: 429, body: { error: 'rate limit' } });
   r = await post(clefRoute, '/api/clef-check', { lessonId: 'fast', response: code }, { email: 'd@example.test' });
-  check('a Clef outage is 503 + offline, never a grade', [r.status, r.body.ok, r.body.offline], [503, false, true]);
-  answer = () => ({ response: 'not a decision' });
+  check('the provider\'s per-minute 429 is 503 + offline, never a grade', [r.status, r.body.ok, r.body.offline], [503, false, true]);
+  ciAnswer = () => ({ status: 200, body: { response: 'not a decision' } });
   r = await post(clefRoute, '/api/clef-check', { lessonId: 'fast', response: code }, { email: 'e@example.test' });
   check('an answer with no probabilities is 503 + offline', [r.status, r.body.offline], [503, true]);
   r = await post(clefRoute, '/api/clef-check', { lessonId: 'fast', response: 'x'.repeat(9000) }, { email: 'f@example.test' });
   check('code over the size limit is 400 before any model call', r.status, 400);
+  globalThis.fetch = realFetch;
   r = await post(clefRoute, '/api/clef-check', { lessonId: 'fast', response: '   ' }, { email: 'g@example.test' });
   check('empty code is 400', r.status, 400);
 
