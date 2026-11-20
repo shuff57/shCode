@@ -1648,6 +1648,7 @@ Everything else below (the route name, the cards, the pattern-check fallback, th
   indentation, all labelled met. Run them through the harness with `--fixtures` (one lab at a time, as for the gate). 1,400 variants over
   264 labs pass. Clicking Check on a correct brace-less program once gave a red card, because the model was unsure and the lab's regex needs a
   `{`; the style variants are how to look for that before a student does.
+- **How often it falls back:** every offline answer bumps `ai_help_usage` (`unit = 'clef-check:offline'`, one row per day, identity `\x00GLOBAL`); check it after a rollout.
 - **A 429 from the provider's per-minute limit is 503 `offline`** (the browser runs the slow Check); a classroom burst past the
   key's limit degrades quietly, it never shows a student an error.
 - Tests: `scripts/test-decision-check.mjs` (request, answer, band, `askDecision`, and the real route over a stubbed fetch),

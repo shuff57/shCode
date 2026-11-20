@@ -40,6 +40,7 @@ type Ctx = EventContext<Env, string, SessionData>;
 
 const BUCKET = 'clef-check';
 const GLOBAL_BUCKET = 'clef-check:global';
+const OFFLINE_BUCKET = 'clef-check:offline';
 // Same reserved identity as grade-written: an email never holds a NUL byte.
 const GLOBAL_IDENTITY = '\x00GLOBAL';
 const DEFAULT_DAILY_LIMIT = 400;
@@ -122,6 +123,9 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
     clearTimeout(timer);
   }
   if (!cards) {
+    // Counted per day so a silent outage (or the key's per-minute limit) is visible: the browser quietly runs the slow
+    // Check, so nothing else would show it. Read it with: SELECT day, count FROM ai_help_usage WHERE unit = 'clef-check:offline'.
+    try { await bump(env.DB, GLOBAL_IDENTITY, OFFLINE_BUCKET, new Date().toISOString().slice(0, 10)); } catch { /* counting must never break the Check */ }
     console.error('clef-check: the decision model could not answer');
     return json({ ok: false, error: 'The fast check could not answer.', offline: true }, 503);
   }

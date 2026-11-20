@@ -88,6 +88,16 @@ check('a 200 with no answers array is null', await askDecision(reply(200, { nope
     check('route: a network failure is 503 offline', await call({ CHEAPERINFERENCE_API_KEY: 'k1' }, { lessonId: LAB, response: 'let a = 1;' }).then((r) => [r.status, r.json.offline]), [503, true]);
     stub(200, { nope: 1 });
     check('route: an unusable answer is 503 offline', await call({ CHEAPERINFERENCE_API_KEY: 'k1' }, { lessonId: LAB, response: 'let a = 1;' }).then((r) => [r.status, r.json.offline]), [503, true]);
+    {
+      const DB = makeD1();
+      stub(429, { error: 'rate' });
+      for (let i = 0; i < 2; i++) {
+        const request = new Request('http://localhost/api/clef-check', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ lessonId: LAB, response: 'let a = 1;' }) });
+        await onRequestPost({ request, params: {}, data: { email: 'a@b.c', role: 'student' }, env: { DB, ASSETS: NO_ASSETS, CHEAPERINFERENCE_API_KEY: 'k1' } });
+      }
+      const row = DB.sqlite.prepare("SELECT count FROM ai_help_usage WHERE unit = 'clef-check:offline'").get();
+      check('route: each offline answer is counted per day (a silent outage is visible)', row?.count, 2);
+    }
     const before = sent.length;
     check('route: a lesson with no fast check is 404 and makes no call', await call({ CHEAPERINFERENCE_API_KEY: 'k1' }, { lessonId: 'no-such-lesson', response: 'x' }).then((r) => [r.status, sent.length === before]), [404, true]);
   } finally {
