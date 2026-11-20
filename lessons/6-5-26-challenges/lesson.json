@@ -1,7 +1,7 @@
 {
   "id": "6-5-26-challenges",
   "title": "6.10.27 Challenges: Extended Save Features",
-  "description": "Extend your save system: save file previews (show slot contents before loading), save timestamps, multiple profiles, or a 'delete all saves' with double-confirmation.",
+  "description": "Extend your save system: save file previews (show slot contents before loading), save timestamps, multiple profiles, or deleting this game's saves with double-confirmation.",
   "type": "challenge",
   "estimateMins": 30,
   "category": "Unit 2: moSHion: Applied Game Development",
@@ -33,7 +33,7 @@
     {
       "id": "s3",
       "title": "Test with reloads",
-      "instructions": "Reload the page and verify your feature survives. Saves with timestamps should still show accurate times. Profile switching should keep player data separate. Bulk delete should wipe everything and let you start fresh.",
+      "instructions": "Reload the page and verify your feature survives. Saves with timestamps should still show accurate times. Profile switching should keep player data separate. Deleting your saves should remove this game's saves only: your other games' saves should still be there.",
       "hints": [
         "Open the browser console (F12) and check for errors when loading saves.",
         "If timestamps show NaN, check that you're storing a number, not a string."
