@@ -130,9 +130,9 @@ function localChanged(): void {
 
 // Deletes the student MADE (the editor's or the mixer's Delete), kept until the
 // sync has removed them from the account. Only these reach the account: an
-// item that is merely missing here -- a sketch called clearStorage(), or the
-// browser dropped its storage -- is downloaded again instead of deleted
-// everywhere.
+// item that is merely missing here -- a sketch called removeItem() on it, or
+// the browser dropped its storage -- is downloaded again instead of deleted
+// everywhere. (clearStorage() keeps library items: see isLibraryKey.)
 const LOCAL_DELETES_KEY = 'library-deleted'; // w1:<owner>:library-deleted
 export function readLocalDeletes(): string[] {
   const v = ownedLocal.getJSON<unknown[]>(LOCAL_DELETES_KEY);

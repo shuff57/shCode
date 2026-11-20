@@ -80,8 +80,8 @@ check('no example reads keys or moves sprites in draw() (the rules go in update(
 // The same scanners as the moshion repo's scripts/build-docs.mjs (fnBody, blockFrom,
 // deletesWhileLooping); shCode does not vendor that script, so keep these identical.
 /** The body of `function name() { ... }` in an example ('' if none). Braces
- *  are counted in code only: a brace inside a string, a template, a regex-free
- *  comment or a character class in text('{') does not end the body early. */
+ *  are counted in code only: a brace inside a string (text('{')), a template
+ *  or a comment does not end the body early. */
 function fnBody(code, name) {
   const m = new RegExp(`function\\s+${name}\\s*\\([^)]*\\)\\s*\\{`).exec(code);
   return m ? blockFrom(code, m.index + m[0].length) : '';

@@ -14,7 +14,8 @@
 //   deleted there        -> delete here, unless it changed here (then re-upload)
 //   deleted here         -> delete there, but ONLY when the student pressed
 //                           Delete (readLocalDeletes). An item merely missing
-//                           here -- a sketch ran clearStorage() -- comes back.
+//                           here -- a sketch removed it with removeItem(), or the
+//                           browser dropped its storage -- comes back.
 //
 // planSync() is that table and nothing else, so it is tested on its own
 // (scripts/test-library-sync.mjs); runSync() does the I/O around it.

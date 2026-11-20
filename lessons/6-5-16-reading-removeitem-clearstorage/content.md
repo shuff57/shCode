@@ -1,11 +1,11 @@
 ## removeItem and clearStorage
 
-You already know `storeItem` (write) and `getItem` (read). Now you need the other two operations: delete one key or wipe everything.
+You already know `storeItem` (write) and `getItem` (read). Now you need the other two operations: delete one save, or delete every save.
 
 **What you'll learn:**
 
-- `removeItem('keyName')` removes exactly one saved key: the rest of localStorage is untouched.
-- `clearStorage()` removes **every** key: nothing survives.
+- `removeItem('keyName')` removes exactly one save: every other save is untouched.
+- `clearStorage()` removes **every** save, from every game on this site. Your saved pictures, sounds and fonts are kept.
 - Pick the right tool for the job: surgical delete vs. full reset.
 
 ---
@@ -51,9 +51,9 @@ After `removeItem('itemB')`, `getItem('itemB')` returns `null`: it no longer exi
 
 ---
 
-### clearStorage: wipe everything
+### clearStorage: erase every save
 
-WARNING: `clearStorage()` removes every key your app has ever stored. There is no undo. Use it in a settings menu with a confirmation prompt, never as a default action.
+WARNING: `clearStorage()` removes every save made with `storeItem`, and not just this game's: all your sketches share one store, so another game's high score goes too. There is no undo. Your saved pictures, sounds and fonts are kept. Use it in a settings menu with a confirmation prompt, never as a default action; to reset one game, `removeItem` its own names instead.
 
 ```js live
 let beforeClear = '';
@@ -91,8 +91,8 @@ function draw() {
 
 | `removeItem(key)` | `clearStorage()` |
 |---|---|
-| Removes **one** key | Removes **every** key |
-| Other keys stay intact | Nothing survives |
+| Removes **one** save | Removes **every** save, in every game |
+| Other saves stay intact | Only saved pictures, sounds and fonts survive |
 | Use for: deleting one save slot | Use for: factory-reset settings |
 | Safe: you control what goes | Dangerous: no undo, confirm first |
 
@@ -102,6 +102,6 @@ function draw() {
 
 | Term | Meaning |
 |---|---|
-| **removeItem(key)** | Deletes a single key-value pair from localStorage. After this, `getItem(key)` returns `null`. |
-| **clearStorage()** | Removes every key your domain has stored. Irreversible: confirm before calling. |
+| **removeItem(key)** | Deletes one save. After this, `getItem(key)` returns `null`. |
+| **clearStorage()** | Removes every save, from every game on this site (saved pictures, sounds and fonts are kept). Irreversible: confirm before calling. |
 | **null** | The value `getItem` returns when the key doesn't exist (or was deleted). |
