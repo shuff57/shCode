@@ -1,7 +1,7 @@
 // Points on a sketch's plane (lib/sketch-plane-points.ts): reSHape's plane frames, the projective map from the screen to a plane,
 // which sketch the editor cursor is in, and what a picked point writes into the code. The pointer in the real view is a browser check.
 import assert from 'node:assert/strict';
-import { chamferEdits, chamferGeom, cornerAt, cutCorners, cutPreview, largestChamfer, largestRound, roundEdits, roundGeom, dimensionOf, resizeEdits, distToSegment, slotGeoms, typedNumbers, typedPoint, typedWords, sketchGeoms, curveOwners, distToPolyline, sketchStatementLines, arcCode, faceSketchArgs, finishDirections, freshName, movePointEdits, planeOutlines, sweepOf, activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
+import { crossings, trimGeom, trimEdits, chamferEdits, chamferGeom, cornerAt, cutCorners, cutPreview, largestChamfer, largestRound, roundEdits, roundGeom, dimensionOf, resizeEdits, distToSegment, slotGeoms, typedNumbers, typedPoint, typedWords, sketchGeoms, curveOwners, distToPolyline, sketchStatementLines, arcCode, faceSketchArgs, finishDirections, freshName, movePointEdits, planeOutlines, sweepOf, activeSketch, applyProjective, fromPlane, geomPath, geomSnaps, gridStep, planeFrameOf, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, toGrid, toolCode, toPlane, viewAngles } from '../lib/sketch-plane-points.ts';
 
 // ---- planes, as reSHape resolves them: a named plane's origin is normal x offset ------------------------------------------
 const top10 = planeFrameOf({ plane: 'xy', offset: 10 });
@@ -273,6 +273,52 @@ console.log('PASS round: a corner of two lines rounded, in the drawing words');
   assert.match(roundEdits(vd, 'sk', sketchStatementLines(vd, 'sk'), [0, 1], G, [20, 0], 5), /written with a variable/);
 }
 console.log('PASS round and chamfer where a line meets an arc, or two arcs meet');
+{ // Trim: the piece of a curve between the two crossings nearest the pointer, cut away
+  const apply = (doc, es) => { let d = doc; for (const e of [...es].sort((a, b) => b.from - a.from)) d = d.slice(0, e.from) + e.insert + d.slice(e.to); return d; };
+  const run = (doc, G, owner, i, p) => { const e = trimEdits(doc, 'sk', sketchStatementLines(doc, 'sk'), owner, G, i, p); return typeof e === 'string' ? e : apply(doc, e.edits); };
+  // a line crossed once: the side the pointer is on goes
+  let doc = "const sk = sketch('top');\nsk.line([0, 0], [20, 0]);\nsk.line([10, -5], [10, 5]);\n";
+  let G = [{ k: 'line', a: [0, 0], b: [20, 0] }, { k: 'line', a: [10, -5], b: [10, 5] }];
+  assert.deepEqual(crossings(G[0], G[1]), [[10, 0]]);
+  assert.equal(run(doc, G, [0, 1], 0, [15, 0.3]), "const sk = sketch('top');\nsk.line([0, 0], [10, 0]);\nsk.line([10, -5], [10, 5]);\n", 'the right of the crossing goes');
+  assert.equal(run(doc, G, [0, 1], 0, [4, 0]), "const sk = sketch('top');\nsk.line([10, 0], [20, 0]);\nsk.line([10, -5], [10, 5]);\n", 'the left');
+  // crossed twice: the middle goes, the two ends stay
+  doc = "const sk = sketch('top');\nsk.line([0, 0], [30, 0]);\nsk.line([10, -5], [10, 5]);\nsk.line([20, -5], [20, 5]);\n";
+  G = [{ k: 'line', a: [0, 0], b: [30, 0] }, { k: 'line', a: [10, -5], b: [10, 5] }, { k: 'line', a: [20, -5], b: [20, 5] }];
+  assert.equal(run(doc, G, [0, 1, 2], 0, [15, 0]), "const sk = sketch('top');\nsk.line([0, 0], [10, 0]);\nsk.line([20, 0], [30, 0]);\nsk.line([10, -5], [10, 5]);\nsk.line([20, -5], [20, 5]);\n");
+  // a rectangle's side: the rectangle is written out as its lines
+  doc = "const sk = sketch('top');\nsk.rectangle([0, 0], [20, 10]);\nsk.line([10, -5], [10, 5]);\n";
+  G = [{ k: 'line', a: [0, 0], b: [20, 0] }, { k: 'line', a: [20, 0], b: [20, 10] }, { k: 'line', a: [20, 10], b: [0, 10] }, { k: 'line', a: [0, 10], b: [0, 0] }, { k: 'line', a: [10, -5], b: [10, 5] }];
+  assert.equal(run(doc, G, [0, 0, 0, 0, 1], 0, [15, 0]), "const sk = sketch('top');\nsk.line([0, 0], [10, 0]);\nsk.line([20, 0], [20, 10]);\nsk.line([20, 10], [0, 10]);\nsk.line([0, 10], [0, 0]);\nsk.line([10, -5], [10, 5]);\n");
+  // where another line ends on it: that end is a crossing too, and the line ends on it by value
+  G = [{ k: 'line', a: [0, 0], b: [20, 0] }, { k: 'line', a: [10, 0], b: [10, 10] }];
+  assert.deepEqual(trimGeom(G, 0, [15, 0]).keep, [{ k: 'line', a: [0, 0], b: [10, 0] }]);
+  // a circle crossed by a line: the arc the pointer is on goes, the other half is left as an arc
+  doc = "const sk = sketch('top');\nsk.circle([0, 0], { r: 5 });\nsk.line([-10, 0], [10, 0]);\n";
+  G = [{ k: 'circle', c: [0, 0], r: 5 }, { k: 'line', a: [-10, 0], b: [10, 0] }];
+  assert.equal(run(doc, G, [0, 1], 0, [0, 5]), "const sk = sketch('top');\nsk.arc([0, 0], [-5, 0], [5, 0], 'ccw');\nsk.line([-10, 0], [10, 0]);\n", 'the top half goes');
+  assert.equal(run(doc, G, [0, 1], 0, [0.2, -4.9]), "const sk = sketch('top');\nsk.arc([0, 0], [5, 0], [-5, 0], 'ccw');\nsk.line([-10, 0], [10, 0]);\n", 'the bottom half');
+  // the line through it, between the circle's two crossings
+  assert.equal(run(doc, G, [0, 1], 1, [1, 0]), "const sk = sketch('top');\nsk.circle([0, 0], { r: 5 });\nsk.line([-10, 0], [-5, 0]);\nsk.line([5, 0], [10, 0]);\n");
+  // an arc crossed by a slanted line: what is left keeps its sense, its ends on its circle to 1e-6
+  doc = "const sk = sketch('top');\nsk.arc([0, 0], [10, 0], [0, 10], 'ccw');\nsk.line([0, 0], [10, 10]);\n";
+  G = [{ k: 'arc', c: [0, 0], r: 10, a: [10, 0], b: [0, 10], sense: 'ccw' }, { k: 'line', a: [0, 0], b: [10, 10] }];
+  assert.equal(run(doc, G, [0, 1], 0, [9.5, 3]), "const sk = sketch('top');\nsk.arc([0, 0], [7.071067812, 7.071067812], [0, 10], 'ccw');\nsk.line([0, 0], [10, 10]);\n");
+  assert.equal(run(doc, G, [0, 1], 1, [8, 8]), "const sk = sketch('top');\nsk.arc([0, 0], [10, 0], [0, 10], 'ccw');\nsk.line([0, 0], [7.071067812, 7.071067812]);\n", 'the line beyond the arc goes');
+  // a crossing on another curve's end written to 1e-9: that end exactly, so the two meet by value
+  G = [{ k: 'arc', c: [0, 0], r: 10, a: [10, 0], b: [0, 10], sense: 'ccw' }, { k: 'line', a: [0, 0], b: [7.071067812, 7.071067812] }];
+  assert.deepEqual(trimGeom(G, 0, [9.5, 3]).keep[0].a, [7.071067812, 7.071067812]);
+  // nothing crosses it: the whole curve goes; lying along another line is no crossing
+  doc = "const sk = sketch('top');\nsk.line([0, 0], [20, 0]);\nsk.line([5, 0], [30, 0]);\nsk.circle([50, 0], { r: 5 });\n";
+  G = [{ k: 'line', a: [0, 0], b: [20, 0] }, { k: 'line', a: [5, 0], b: [30, 0] }, { k: 'circle', c: [50, 0], r: 5 }];
+  assert.ok(trimGeom(G, 0, [10, 0]).whole, 'along another line');
+  assert.equal(run(doc, G, [0, 1, 2], 2, [55, 0]), "const sk = sketch('top');\nsk.line([0, 0], [20, 0]);\nsk.line([5, 0], [30, 0]);\n");
+  // written with a variable
+  doc = "const w = 20;\nconst sk = sketch('top');\nsk.line([0, 0], [w, 0]);\nsk.line([10, -5], [10, 5]);\n";
+  assert.equal(run(doc, [{ k: 'line', a: [0, 0], b: [20, 0] }, { k: 'line', a: [10, -5], b: [10, 5] }], [0, 1], 0, [15, 0]), 'That line is written with a variable or a sum; change it in the code.');
+  assert.equal(run("const sk = sketch('top');\nsk.circle([0, 0], { r: 5 });\nsk.line([-10, 0], [10, 0]);\n", [{ k: 'circle', c: [0, 0], r: 5 }, { k: 'line', a: [-10, 0], b: [10, 0] }, { k: 'point', p: [0, 0] }], [0, 1, 1], 2, [0, 0]), 'Only a line, an arc or a circle can be trimmed.');
+}
+console.log('PASS trim: the piece between two crossings cut away, lines, arcs and circles');
 { // Chamfer: a corner of two lines cut by a straight line, the same distance along each
   const apply = (doc, es) => { let d = doc; for (const e of [...es].sort((a, b) => b.from - a.from)) d = d.slice(0, e.from) + e.insert + d.slice(e.to); return d; };
   const doc = "const sk = sketch('top');\nsk.line([0, 0], [20, 0]);\nsk.line([20, 0], [20, 10]);\n";

@@ -578,40 +578,54 @@ export function cutPreview(geoms: SketchGeom[], q: V2, g: { ends: [V2, V2]; line
   if (g.arc) { across = geomPath(g.arc, pieces); if (!at6(g.arc.a, g.ends[0])) across.reverse(); }
   return [...piece(0), ...across, ...piece(1).reverse()];
 }
+/** A curve in the drawing words, its points to 1e-9. */
+export function curveCode(name: string, g: SketchGeom): string {
+  if (g.k === 'line') return `${name}.line(${pointExact(g.a)}, ${pointExact(g.b)});`;
+  if (g.k === 'arc') return `${name}.arc(${pointExact(g.c)}, ${pointExact(g.a)}, ${pointExact(g.b)}, '${g.sense === 'cw' ? 'cw' : 'ccw'}');`;
+  if (g.k === 'circle') return `${name}.circle(${pointExact(g.c)}, { r: ${fmt9(g.r)} });`;
+  return '';
+}
 /**
- * The code edits that cut corner q of sketch `name`: the two curves that meet there end at `cut.ends` instead (one used up goes), and `added` is
- * written after the later of their lines. A rectangle or a polyline that one of them belongs to is written out as its separate lines first (the
- * drawing words have no rounded or chamfered rectangle); an arc is written again from its far end, so its radius stays as it was. Only curves
- * written as plain numbers are changed; for one written with a variable, a sentence says so. `lines` and `owner` are the block's drawing lines
- * and which of them drew each curve.
+ * The code edits that change some of sketch `name`'s curves: `change(i)` gives what curve i becomes (nothing, one curve, or several), or null to
+ * leave it. Each line of the block that drew a changed curve is written again as its curves one by one in the drawing words (a rectangle or a
+ * polyline as its separate lines: the drawing words have no rounded, chamfered or trimmed rectangle), and `added` after the last of those lines.
+ * Only lines written as plain numbers (to nine decimals) are changed; for others a sentence about `what` ("corner", "line", ...) says so.
+ * `lines` and `owner` are the block's drawing lines and which of them drew each curve.
  */
-function cornerCutEdits(doc: string, name: string, lines: { from: number; to: number; text: string }[], owner: number[], geoms: SketchGeom[], q: V2,
-  cut: { ends: [V2, V2]; lines: [number, number]; used: [boolean, boolean] }, added: string): { from: number; to: number; insert: string }[] | string {
+function rewriteCurves(doc: string, name: string, lines: { from: number; to: number; text: string }[], owner: number[], geoms: SketchGeom[],
+  changed: number[], change: (i: number) => SketchGeom[] | null, added: string[], what: string): { from: number; to: number; insert: string }[] | string {
   const esc = name.replace(/\$/g, '\\$');
-  const plain = [String.raw`^${esc}\.line\(\s*${PT}\s*,\s*${PT}\s*\);?$`, String.raw`^${esc}\.rectangle\(\s*${PT}\s*,\s*${PT}\s*\);?$`,
+  const many = [String.raw`^${esc}\.line\(\s*${PT}\s*,\s*${PT}\s*\);?$`, String.raw`^${esc}\.rectangle\(\s*${PT}\s*,\s*${PT}\s*\);?$`,
     String.raw`^${esc}\.lines\(\s*\[\s*${PT}(?:\s*,\s*${PT})*\s*\]\s*\);?$`].map(s => new RegExp(s));
   const arcLine = new RegExp(String.raw`^${esc}\.arc\(\s*${PT}\s*,\s*${PT}\s*,\s*${PT}\s*,\s*(['"])(?:ccw|cw)\7\s*\);?$`);
-  const ks = [...new Set(cut.lines.map(i => owner[i]))].sort((x, y) => x - y);
+  const circleLine = new RegExp(String.raw`^${esc}\.circle\(\s*${PT}\s*,\s*\{\s*r\s*:\s*${NUM}\s*\}\s*\);?$`);
+  const ks = [...new Set(changed.map(i => owner[i]))].sort((x, y) => x - y);
   const nineDecimals = (vs: number[]) => vs.every(v => Math.abs(Number(fmt9(v)) - v) <= 1e-12);
   for (const k of ks) {
-    const l = lines[k]; const isArc = !!l && arcLine.test(l.text);
-    if (!l || !(isArc || plain.some(re => re.test(l.text)))) return 'That corner is written with a variable or a sum; change it in the code.';
+    const l = lines[k]; const kind = !l ? null : arcLine.test(l.text) ? 'arc' : circleLine.test(l.text) ? 'circle' : many.some(re => re.test(l.text)) ? 'line' : null;
+    if (!kind) return `That ${what} is written with a variable or a sum; change it in the code.`;
     const mine = geoms.flatMap((x, i) => owner[i] === k ? [x] : []);
-    const ok = isArc ? mine.length === 1 && mine[0].k === 'arc' && nineDecimals([...mine[0].c, ...mine[0].a, ...mine[0].b])
-      : mine.every(x => x.k === 'line' && nineDecimals([...x.a, ...x.b]));
-    if (!ok) return 'That corner is written with more than nine decimals; change it in the code.';
+    const ok = kind === 'line' ? mine.every(x => x.k === 'line' && nineDecimals([...x.a, ...x.b]))
+      : mine.length === 1 && mine[0].k === kind && nineDecimals(mine[0].k === 'arc' ? [...mine[0].c, ...mine[0].a, ...mine[0].b] : mine[0].k === 'circle' ? [...mine[0].c, mine[0].r] : []);
+    if (!ok) return `That ${what} is written with more than nine decimals; change it in the code.`;
   }
   return ks.map(k => {
     const l = lines[k]; const raw = doc.slice(l.from, l.to); const indent = /^\s*/.exec(raw)![0]; const nl = raw.endsWith('\n') ? '\n' : '';
-    const out = geoms.flatMap((x, i) => {
-      if (owner[i] !== k || (x.k !== 'line' && x.k !== 'arc')) return [];
-      const j = cut.lines.indexOf(i); if (j >= 0 && cut.used[j]) return [];
-      const y = j >= 0 ? cutCurve(x, q, cut.ends[j]) : x;
-      return [y.k === 'line' ? `${name}.line(${pointExact(y.a)}, ${pointExact(y.b)});` : `${name}.arc(${pointExact((y as ArcGeom).c)}, ${pointExact((y as ArcGeom).a)}, ${pointExact((y as ArcGeom).b)}, '${(y as ArcGeom).sense}');`];
-    });
-    if (k === ks[ks.length - 1]) out.push(added);
+    const out = geoms.flatMap((x, i) => owner[i] !== k ? [] : (change(i) ?? [x]).map(y => curveCode(name, y)));
+    if (k === ks[ks.length - 1]) out.push(...added);
     return { from: l.from, to: l.to, insert: out.length ? out.map(s => indent + s).join('\n') + nl : '' };
   });
+}
+/**
+ * The code edits that cut corner q of sketch `name`: the two curves that meet there end at `cut.ends` instead (one used up goes), and `added` is
+ * written after the later of their lines; an arc is written again from its far end, so its radius stays as it was (see rewriteCurves).
+ */
+function cornerCutEdits(doc: string, name: string, lines: { from: number; to: number; text: string }[], owner: number[], geoms: SketchGeom[], q: V2,
+  cut: { ends: [V2, V2]; lines: [number, number]; used: [boolean, boolean] }, added: string): { from: number; to: number; insert: string }[] | string {
+  return rewriteCurves(doc, name, lines, owner, geoms, cut.lines, i => {
+    const j = cut.lines.indexOf(i); if (j < 0) return null;
+    return cut.used[j] ? [] : [cutCurve(geoms[i], q, cut.ends[j])];
+  }, [added], 'corner');
 }
 /** Rounding corner q of sketch `name` with radius r: the code edits, and the arc line written after the two lines (see cornerCutEdits). */
 export function roundEdits(doc: string, name: string, lines: { from: number; to: number; text: string }[], owner: number[], geoms: SketchGeom[], q: V2, r: number):
@@ -628,6 +642,95 @@ export function chamferEdits(doc: string, name: string, lines: { from: number; t
   const lineCode = `${name}.line(${pointExact(g.cut.a)}, ${pointExact(g.cut.b)});`;
   const edits = cornerCutEdits(doc, name, lines, owner, geoms, q, g, lineCode);
   return typeof edits === 'string' ? edits : { edits, lineCode };
+}
+
+// ---- Trim: the piece of a curve between the two crossings nearest the pointer, cut away -----------------------------------------
+
+type Carrier = { k: 'L'; p: V2; d: V2 } | { k: 'C'; c: V2; r: number };
+const carrierOf = (g: SketchGeom): Carrier | null => g.k === 'line' ? { k: 'L', p: g.a, d: sub2(g.b, g.a) } : g.k === 'arc' || g.k === 'circle' ? { k: 'C', c: g.c, r: g.r } : null;
+/** Where curve g runs, as a number along it: a line 0 to 1 from a to b; an arc the turn from a in its sense; a circle the angle from +x, counter-clockwise. */
+function along(g: SketchGeom, X: number[]): number {
+  if (g.k === 'line') { const d = sub2(g.b, g.a); return dot2(sub2(X, g.a), d) / dot2(d, d); }
+  if (g.k === 'arc') { const t = ang2(sub2(X, g.c)) - ang2(sub2(g.a, g.c)); return turn2pi(g.sense === 'cw' ? -t : t); }
+  if (g.k === 'circle') return turn2pi(ang2(sub2(X, g.c)));
+  return 0;
+}
+/** How long curve g is, in its own measure (see along). */
+const lengthOf = (g: SketchGeom) => g.k === 'line' ? 1 : g.k === 'arc' ? arcSweep(g as ArcGeom) : 2 * Math.PI;
+/** Whether a point on curve g's carrier lies on the curve itself (its ends included). */
+function onCurve(g: SketchGeom, X: V2): boolean {
+  if (g.k === 'circle') return true;
+  if (g.k === 'line') { const t = along(g, X); const l = len2(sub2(g.b, g.a)); return t >= -1e-9 / l && t <= 1 + 1e-9 / l; }
+  if (g.k === 'arc') { const t = along(g, X); const s = arcSweep(g as ArcGeom); return t <= s + 1e-9 / g.r || t >= 2 * Math.PI - 1e-9 / g.r; }
+  return false;
+}
+/** Where curves g and h cross or touch (one's end on the other counts). */
+export function crossings(g: SketchGeom, h: SketchGeom): V2[] {
+  const A = carrierOf(g), B = carrierOf(h); if (!A || !B) return [];
+  const pts: V2[] = [];
+  const lineCircle = (L: { p: V2; d: V2 }, C: { c: V2; r: number }) => {
+    const dl = len2(L.d); const u: V2 = [L.d[0] / dl, L.d[1] / dl]; const w = sub2(L.p, C.c); const b = dot2(u, w); const disc = b * b - (dot2(w, w) - C.r * C.r);
+    if (disc < -1e-9 * Math.max(1, C.r)) return; const sq = Math.sqrt(Math.max(0, disc));
+    for (const l of sq < 1e-12 ? [-b] : [-b - sq, -b + sq]) pts.push([L.p[0] + u[0] * l, L.p[1] + u[1] * l]);
+  };
+  if (A.k === 'L' && B.k === 'L') {
+    const den = cross2(A.d, B.d); if (Math.abs(den) < 1e-12 * len2(A.d) * len2(B.d)) return []; // parallel lines: an overlap is not a crossing
+    const t = cross2(sub2(B.p, A.p), B.d) / den; pts.push([A.p[0] + A.d[0] * t, A.p[1] + A.d[1] * t]);
+  } else if (A.k === 'L' && B.k === 'C') lineCircle(A, B);
+  else if (A.k === 'C' && B.k === 'L') lineCircle(B, A);
+  else if (A.k === 'C' && B.k === 'C') {
+    const d = sub2(B.c, A.c); const D = len2(d); if (D < 1e-12) return [];
+    if (D > A.r + B.r + 1e-9 || D < Math.abs(A.r - B.r) - 1e-9) return [];
+    const a = (A.r * A.r - B.r * B.r + D * D) / (2 * D); const h2 = A.r * A.r - a * a; const hh = Math.sqrt(Math.max(0, h2));
+    const m: V2 = [A.c[0] + d[0] * a / D, A.c[1] + d[1] * a / D];
+    pts.push([m[0] - d[1] * hh / D, m[1] + d[0] * hh / D]); if (hh > 1e-12) pts.push([m[0] + d[1] * hh / D, m[1] - d[0] * hh / D]);
+  }
+  return pts.filter(X => onCurve(g, X) && onCurve(h, X));
+}
+const kindWord = (g: SketchGeom) => g.k === 'circle' ? 'circle' : g.k === 'arc' ? 'arc' : 'line';
+/**
+ * Trimming curve i of `geoms` at plane point p (the pointer, on or near the curve): the piece between the two crossings with the other curves
+ * nearest p is cut away, and the rest is kept (a line or arc: up to two pieces; a circle crossed twice or more: the arc that is left). With
+ * nothing crossing it, the whole curve goes. A crossing within 1e-7 of another curve's end is put on that end exactly, so the two meet by value;
+ * the rest are written to 1e-9.
+ */
+export function trimGeom(geoms: SketchGeom[], i: number, p: V2): { piece: SketchGeom; keep: SketchGeom[]; whole: boolean; kind: string } | string {
+  const g = geoms[i]; if (!g || (g.k !== 'line' && g.k !== 'arc' && g.k !== 'circle')) return 'Only a line, an arc or a circle can be trimmed.';
+  const ends = geoms.flatMap((h, j) => j !== i && (h.k === 'line' || h.k === 'arc') ? [h.a, h.b] : []);
+  const total = lengthOf(g); const eps = g.k === 'line' ? 1e-9 / len2(sub2(g.b, g.a)) : 1e-9 / g.r;
+  const cuts: { t: number; X: V2 }[] = [];
+  for (let j = 0; j < geoms.length; j++) {
+    if (j === i) continue;
+    for (const raw of crossings(g, geoms[j])) {
+      const X = ends.find(e => len2(sub2(e, raw)) < 1e-7) ?? r9(raw); const t = along(g, X);
+      if (g.k !== 'circle' && (t < eps || t > total - eps || t > total)) continue; // the curve's own ends are no cut
+      if (!cuts.some(c => Math.abs(c.t - t) < eps || len2(sub2(c.X, X)) < 1e-9)) cuts.push({ t, X });
+    }
+  }
+  cuts.sort((x, y) => x.t - y.t);
+  const kind = kindWord(g);
+  if (g.k === 'circle') {
+    if (cuts.length < 2) return { piece: g, keep: [], whole: true, kind };
+    const tp = along(g, p); let k = cuts.length - 1; for (let n = 0; n < cuts.length; n++) if (cuts[n].t <= tp) k = n;
+    const lo = cuts[k], hi = cuts[(k + 1) % cuts.length];
+    return { piece: { k: 'arc', c: g.c, r: g.r, a: lo.X, b: hi.X, sense: 'ccw' }, keep: [{ k: 'arc', c: g.c, r: g.r, a: hi.X, b: lo.X, sense: 'ccw' }], whole: false, kind };
+  }
+  if (!cuts.length) return { piece: g, keep: [], whole: true, kind };
+  let tp = along(g, p); if (g.k === 'arc' && tp > total) tp = tp - total < 2 * Math.PI - tp ? total : 0; tp = Math.max(0, Math.min(total, tp));
+  const bounds = [{ t: 0, X: g.a }, ...cuts, { t: total, X: g.b }];
+  let n = 0; while (n < bounds.length - 2 && bounds[n + 1].t <= tp) n++;
+  const lo = bounds[n], hi = bounds[n + 1]; const keep: SketchGeom[] = [];
+  const part = (a: V2, b: V2): SketchGeom => g.k === 'line' ? { k: 'line', a, b } : { k: 'arc', c: g.c, r: g.r, a, b, sense: g.sense === 'cw' ? 'cw' : 'ccw' };
+  if (n > 0) keep.push(part(g.a, lo.X));
+  if (n + 1 < bounds.length - 1) keep.push(part(hi.X, g.b));
+  return { piece: part(lo.X, hi.X), keep, whole: false, kind };
+}
+/** Trimming curve i of sketch `name` at p: the code edits, and the code of what is left of it (see trimGeom, rewriteCurves). */
+export function trimEdits(doc: string, name: string, lines: { from: number; to: number; text: string }[], owner: number[], geoms: SketchGeom[], i: number, p: V2):
+  { edits: { from: number; to: number; insert: string }[]; keepCode: string[]; kind: string } | string {
+  const t = trimGeom(geoms, i, p); if (typeof t === 'string') return t;
+  const edits = rewriteCurves(doc, name, lines, owner, geoms, [i], j => j === i ? t.keep : null, [], t.kind);
+  return typeof edits === 'string' ? edits : { edits, keepCode: t.keep.map(g => curveCode(name, g)), kind: t.kind };
 }
 
 // ---- Delete: which line of the sketch's block drew which curve ---------------------------------------------------------------

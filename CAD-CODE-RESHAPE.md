@@ -291,6 +291,24 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
     `/tmp/cad-drive/sketch-arc-corner-e2e.py`, 13 of 13: a rectangle with a quarter circle cut from a corner, rounded where the
     bottom meets the arc and chamfered where the arc meets the side, extrudes at the area worked out by Green's theorem over
     the exact curves (within 1e-4 of the cut block).
+- **Trim** (2026-11-19). With the tool on, the piece of a line, arc or circle under the pointer is marked in red; a click
+  cuts it away (`trimGeom`, `trimEdits`).
+  - **The piece** runs between the two places nearest the pointer where the curve crosses or touches another curve (another
+    curve's end lying on it counts; a line lying along another line does not), or the curve's own end.
+  - **What is left:** a line or an arc keeps up to two pieces, an arc in its own sense. A circle crossed at two places or
+    more becomes the arc that is left. A curve that nothing crosses goes whole.
+  - **The code:** the line that drew it is written again in the drawing words (a rectangle or a polyline as its separate
+    lines), through the same rewriting as Round and Chamfer (`rewriteCurves`), which now also takes `sk.circle(c, { r })`.
+    - A crossing is written to 1e-9. A crossing within 1e-7 of another curve's end is put on that end exactly, so the two
+      meet by value.
+    - A line written with a variable or a sum is not changed, and a sentence says so.
+  - Checked: unit tests (a line crossed once and twice, a rectangle's side, a line ending on another, a circle and the line
+    through it, an arc and a slanted line, a crossing on an end written to 1e-9, nothing crossing, lines lying along each
+    other, a variable). In the browser, `/tmp/cad-drive/sketch-trim-e2e.py`, 11 of 11:
+    - two overlapping rectangles made one outline by cutting away the four pieces inside the overlap;
+    - a circle on one side made a bump by cutting away its inner half and the side between its crossings;
+    - a stray line removed whole;
+    - the outline extrudes at (800 + 12.5π) × 5 more than the part, within 1e-4.
 - **Points on an arc are written to 1e-9** (2026-11-19). reSHape refuses a sketch whose arc's two ends miss one circle by
   more than 1e-6 mm ("The rules of this sketch have to move its shape…"). A point rounded to 0.001 misses by up to about
   7e-4 wherever the geometry is not exact. So a Round at a slanted corner wrote an arc the build refuses (at the test's

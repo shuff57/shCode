@@ -18,6 +18,7 @@
 //   - Round: a click on a corner where two lines or arcs meet, then the radius (from the pointer, or typed): the two are shortened to where
 //     the round meets them and an arc is written after them (a rectangle or polyline the corner belongs to is written out as its lines first,
 //     an arc written again from its far end); Chamfer the same, with the distance from the corner on each and a straight line across;
+//   - Trim: a click on a piece of a line, arc or circle cuts it away between the two crossings with the other curves nearest the pointer;
 //   - each line shows its length and each circle or arc its radius; clicking a size written as plain numbers lets a new one be typed, and the
 //     code changes (a rectangle's width or height, a circle's radius, a line's end along it, with any corner it shares);
 //   - Extrude and Pocket finish the sketch: they write the step after the sketch's block and Run.
@@ -35,14 +36,14 @@ import { bundleProject, CAD_ENTRY, readVariableProbe, withVariableProbe } from '
 import { topLevelNames, topLevelVariables } from '../lib/solidcraft-picks';
 import type { ScEdge, ScFace } from '../lib/solidcraft-labels';
 import {
-  activeSketch, applyProjective, arcCode, chamferEdits, chamferGeom, cornerAt, cutCorners, cutPreview, largestChamfer, largestRound, roundEdits, roundGeom, curveOwners, dimensionOf, resizeEdits, distToSegment, sketchGeoms, slotGeoms, typedPoint, typedWords, distToPolyline, faceSketchArgs, sketchStatementLines, finishDirections, fmt, freshName, fromPlane, geomPath, geomSnaps, gridStep,
+  activeSketch, applyProjective, arcCode, chamferEdits, chamferGeom, cornerAt, cutCorners, cutPreview, trimEdits, trimGeom, largestChamfer, largestRound, roundEdits, roundGeom, curveOwners, dimensionOf, resizeEdits, distToSegment, sketchGeoms, slotGeoms, typedPoint, typedWords, distToPolyline, faceSketchArgs, sketchStatementLines, finishDirections, fmt, freshName, fromPlane, geomPath, geomSnaps, gridStep,
   movePointEdits, planeFrameOf, planeOutlines, planeWords, pointCode, pointInsertion, projective, sketchAtCursor, sketchBlockEnd, sweepOf,
   toPlane, toolCode, viewAngles, type PlaneFrame, type SketchGeom, type SketchPlaceInput, type V2, type V3,
 } from '../lib/sketch-plane-points';
 
 type Api = { request(method: string, params?: object): Promise<any>; execute(command: string, params?: object): Promise<any> };
 type Evaluate = (source: string) => Promise<{ errors: { message: string; line?: number | null }[]; doc?: { features?: unknown[] } | null }>;
-type Tool = 'line' | 'rectangle' | 'circle' | 'arc' | 'slot' | 'polyline' | 'round' | 'chamfer' | 'delete';
+type Tool = 'line' | 'rectangle' | 'circle' | 'arc' | 'slot' | 'polyline' | 'round' | 'chamfer' | 'trim' | 'delete';
 type Box = { min: number[]; max: number[] };
 interface Sketch { id: string; place: SketchPlaceInput; frame: PlaneFrame; geoms: SketchGeom[] }
 type DrawLine = { from: number; to: number; text: string };
@@ -72,7 +73,7 @@ interface Props {
   onMode(name: string | null): void;
   onRun(): void;
 }
-const TOOLS: [Tool, string][] = [['line', 'Line'], ['rectangle', 'Rectangle'], ['circle', 'Circle'], ['arc', 'Arc'], ['slot', 'Slot'], ['polyline', 'Polyline'], ['round', 'Round'], ['chamfer', 'Chamfer'], ['delete', 'Delete']];
+const TOOLS: [Tool, string][] = [['line', 'Line'], ['rectangle', 'Rectangle'], ['circle', 'Circle'], ['arc', 'Arc'], ['slot', 'Slot'], ['polyline', 'Polyline'], ['round', 'Round'], ['chamfer', 'Chamfer'], ['trim', 'Trim'], ['delete', 'Delete']];
 const TOP: SketchPlaceInput = { plane: 'xy', offset: 0 };
 const dist = (a: number[], b: number[]) => Math.hypot(a[0] - b[0], a[1] - b[1]);
 const centreOf = (b: Box) => b.min.map((v, i) => (v + b.max[i]) / 2);
@@ -106,7 +107,7 @@ export default function CadSketchOverlay(p: Props) {
   const [drawing, setDrawing] = useState<{ grid: [V2, V2, boolean][]; axes: [V2, V2][]; outline: string; clip: boolean; curves: V2[][]; step: number; dims: { i: number; at: V2; text: string; value: number }[] } | null>(null);
   /** a size being typed in place of a curve's dimension */
   const [editing, setEditing] = useState<{ i: number; value: string } | null>(null);
-  const [hover, setHover] = useState<{ x: number; y: number; text: string; dot: V2 | null; preview: V2[] | null; del?: number[] } | null>(null);
+  const [hover, setHover] = useState<{ x: number; y: number; text: string; dot: V2 | null; preview: V2[] | null; del?: number[]; cut?: V2[] } | null>(null);
   /** Delete: which line of the block drew each of the sketch's curves, for the doc as it was when worked out */
   const owners = useRef<{ doc: string; name: string; lines: DrawLine[]; owner: number[] | null } | null>(null);
   /** the sketch's curves on screen, as last drawn */
@@ -329,6 +330,13 @@ export default function CadSketchOverlay(p: Props) {
     const show = (x: number, y: number) => {
       if (picking) { last = null; setHover({ x, y: y - props.current.crop, text: 'Click a flat face for the new sketch', dot: null, preview: null }); return; }
       if (tool === 'delete') { last = null; const d = deleteAt(x, y); setHover(d ? { x, y: y - props.current.crop, text: d.text, dot: null, preview: null, del: d.curves } : null); return; }
+      if (tool === 'trim') {
+        last = null; const t = trimAt(x, y); const sy = y - props.current.crop;
+        if (!t) { setHover({ x, y: sy, text: 'Click the piece of a line, arc or circle to cut away', dot: null, preview: null }); return; }
+        const g = trimGeom(sketchNow()?.geoms ?? [], t.i, t.p);
+        if (typeof g === 'string') { setHover({ x, y: sy, text: g, dot: null, preview: null }); return; }
+        setHover({ x, y: sy, text: g.whole ? `nothing crosses this ${g.kind}: click to remove it` : `click to cut away this piece of the ${g.kind}`, dot: null, preview: null, cut: geomPath(g.piece, 48).map(onScreen) }); return;
+      }
       const hit = pointAt(x, y, drag?.from); if (!hit) { last = null; setHover(null); return; }
       last = { q: hit.q, x, y };
       const v = view.current!;
@@ -366,6 +374,24 @@ export default function CadSketchOverlay(p: Props) {
       if (!known) return { line: null, curves: [best], text: 'finding the line that drew it…' };
       const k = known.owner![best]; const line = known.lines[k];
       return { line, curves: known.owner!.flatMap((w, i) => w === k ? [i] : []), text: `${line.text} · click to remove it` };
+    };
+    /** Trim: the curve under the pointer (within 8 px) and the pointer's point on the sketch's plane */
+    const trimAt = (x: number, y: number): { i: number; p: V2 } | null => {
+      const cs = curvesOnScreen.current; const sy = y - props.current.crop; let best = -1; let bd = 8;
+      cs.forEach((c, i) => { const d = distToPolyline([x, sy], c); if (d <= bd) { bd = d; best = i; } });
+      const v = view.current; const p = v ? applyProjective(v.H, [x, y]) : null;
+      return best >= 0 && p ? { i: best, p } : null;
+    };
+    const doTrim = (x: number, y: number) => {
+      const t = trimAt(x, y); const ed = props.current.editor.current; const name = modeRef.current; const sk = sketchNow(); const o = owners.current;
+      if (!t || !ed || !name || !sk) return false;
+      const doc = ed.state.doc.toString();
+      if (!o || !o.owner || o.name !== name || o.doc !== doc) { setNote('Still finding the line that drew it; try again in a moment.'); return true; }
+      const res = trimEdits(doc, name, o.lines, o.owner, sk.geoms, t.i, t.p);
+      if (typeof res === 'string') { setNote(res); return true; }
+      ed.dispatch({ changes: res.edits }); owners.current = null; curvesOnScreen.current = []; setNote(''); setHover(null);
+      props.current.onInserted(res.keepCode.length ? `Trimmed the ${res.kind}: ${res.keepCode.join(' ')}` : `Removed the ${res.kind}`);
+      return true;
     };
     // ---- Round and Chamfer: the corner under the pointer, the size, and the code written
     const sketchNow = () => { const n = modeRef.current; return n ? sketches.current.get(n) ?? null : null; };
@@ -450,6 +476,10 @@ export default function CadSketchOverlay(p: Props) {
         const ed = props.current.editor.current; if (!ed || !d.line) return;
         ed.dispatch({ changes: { from: d.line.from, to: d.line.to } }); owners.current = null; curvesOnScreen.current = [];
         props.current.onInserted(`Removed: ${d.line.text}`); setHover(null); return;
+      }
+      if (tool === 'trim') {
+        if (!trimAt(e.clientX, e.clientY)) return;
+        e.preventDefault(); e.stopImmediatePropagation(); props.current.suppressPick(); doTrim(e.clientX, e.clientY); return;
       }
       if (tool === 'round' || tool === 'chamfer') {
         const sy = e.clientY - props.current.crop;
@@ -578,7 +608,7 @@ export default function CadSketchOverlay(p: Props) {
   const toolbar = !host ? null : mode && s ? createPortal(
     <span className={styles.sketchBar} role="toolbar" aria-label="Sketch tools">
       <b>Sketch {mode}</b><span className={styles.sketchPlane}>{planeWords(s.place)}{drawing ? ` · grid ${fmt(drawing.step)} mm` : ''}</span>
-      {TOOLS.filter(([t]) => (t !== 'delete' && t !== 'round' && t !== 'chamfer') || p.entryOpen).map(([t, label]) => <button key={t} aria-pressed={tool === t} className={tool === t ? styles.sketchToolOn : undefined}
+      {TOOLS.filter(([t]) => (t !== 'delete' && t !== 'round' && t !== 'chamfer' && t !== 'trim') || p.entryOpen).map(([t, label]) => <button key={t} aria-pressed={tool === t} className={tool === t ? styles.sketchToolOn : undefined}
         onClick={() => { toolPts.current = []; setTool(tool === t ? null : t); }}>{label}</button>)}
       <span className={styles.sketchFinish}>
         <label>depth <input type="number" min="0" step="any" value={depth} onChange={e => setDepth(e.target.value)} aria-label="Depth" /></label>
@@ -607,6 +637,7 @@ export default function CadSketchOverlay(p: Props) {
       {drawing?.outline && <path d={drawing.outline} className={styles.sketchFace} />}
       {drawing?.curves.map((c, i) => <polyline key={`c${i}`} points={c.map(q => q.join(',')).join(' ')} className={hover?.del?.includes(i) ? styles.sketchDelete : styles.sketchCurve} />)}
       {hover?.preview && <polyline points={hover.preview.map(q => q.join(',')).join(' ')} className={styles.sketchPreview} />}
+      {hover?.cut && <polyline points={hover.cut.map(q => q.join(',')).join(' ')} className={styles.sketchDelete} />}
     </svg>
     {mode && drawing?.dims.map(d => {
       const can = !tool && !!resizeOf(d.i, d.value) && ownersKey >= 0;
