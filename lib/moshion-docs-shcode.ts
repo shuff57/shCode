@@ -100,7 +100,7 @@ function setup() {
   player.plays += 1;
   player.save();
   // One value on its own: load() is null the first time.
-  lastScore = load('last', 'remote');
+  lastScore = load('demo.last', 'remote');
   if (lastScore === null) {
     lastScore = 0;
   }
@@ -109,7 +109,7 @@ function setup() {
 function update() {
   if (kb.presses(' ')) {
     score++;
-    save('last', score, 'remote');
+    save('demo.last', score, 'remote');
     if (score > player.best) {
       player.best = score;
       player.save();
@@ -565,10 +565,11 @@ function setup() {
 }
 
 function update() {
-  if (kb.presses('h')) {
+  // Only one room at a time: H and J do nothing while you are in one.
+  if (kb.presses('h') && !online.code) {
     online.host(2);
   }
-  if (kb.presses('j')) {
+  if (kb.presses('j') && !online.code) {
     online.join(friendCode);
   }
   if (kb.presses('l')) {
@@ -585,7 +586,7 @@ function drawTop() {
   text('Status: ' + online.status, 10, 54, 16, 'white');
   if (online.code) {
     text('Room code: ' + online.code, 10, 80, 16, 'gold');
-    text('You are seat ' + online.seat + ' of ' + online.seats, 10, 104, 14, 'white');
+    text('You are player ' + (online.seat + 1) + ' of ' + online.seats + ' (seat ' + online.seat + ')', 10, 104, 14, 'white');
     text('Real-time room: ' + online.live, 10, 124, 14, 'white');
   }
   if (online.codeIcons) {

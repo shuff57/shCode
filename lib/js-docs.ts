@@ -250,7 +250,7 @@ console.log(x);`,
 
 === is strict equality: the values must be the same type AND the same value. 5 === "5" is false. The loose == does type conversion and is the source of a whole class of bugs — this course uses === everywhere and never ==.
 
-!= is the strict not-equal partner of ===. The ordering operators <, >, <=, >= work on numbers, and on strings they compare alphabetically.
+!== is the strict not-equal partner of ===. The ordering operators <, >, <=, >= work on numbers, and on strings they compare alphabetically.
 
 One equals sign stores a value. Three ask a question. Never confuse the two — JavaScript lets you put the storing one inside an if, where you meant to ask the question, and the program runs with a silent wrong answer.`,
         code: `console.log(5 === 5);    // true

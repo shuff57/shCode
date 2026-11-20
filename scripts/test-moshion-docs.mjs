@@ -19,7 +19,7 @@ import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { sections, applyOverride, localizePaths } from '../lib/moshion-docs.ts';
 import { sharedSections } from '../lib/moshion-docs-shared.generated.ts';
-import { overrides } from '../lib/moshion-docs-shcode.ts';
+import { overrides, extraPages, extraSections } from '../lib/moshion-docs-shcode.ts';
 import { sections as jsSections } from '../lib/js-docs.ts';
 import { MOSHION_MEMBERS } from '../lib/moshion-completions.generated.ts';
 
@@ -134,27 +134,78 @@ check('every example clears its canvas in draw() and never deletes while looping
   assert.deepEqual(bad, []);
 });
 
-// codeOnly and shorthandIssues are copies of the moshion repo's scripts/build-docs.mjs; keep them identical.
-/** The code with strings, template literals and comments blanked out (same
- *  length, so positions still line up), for the style checks below. */
+// codeOnly, shorthandIssues and proseShorthand are copies of the moshion repo's scripts/build-docs.mjs;
+// keep them identical (the upstream build applies them to the shared pages).
+/** The code with strings, comments and regular expressions blanked out (same
+ *  length, so positions still line up), for the style checks below. The code
+ *  inside a template's ${ } is kept: it is code, and shorthand there counts. */
 function codeOnly(code) {
-  let out = '';
-  let i = 0;
-  while (i < code.length) {
-    const c = code[i], n = code[i + 1];
-    if (c === '/' && n === '/') { const e = code.indexOf('\n', i); const j = e < 0 ? code.length : e; out += ' '.repeat(j - i); i = j; continue; }
-    if (c === '/' && n === '*') { const e = code.indexOf('*/', i + 2); const j = e < 0 ? code.length : e + 2; out += code.slice(i, j).replace(/[^\n]/g, ' '); i = j; continue; }
-    if (c === "'" || c === '"' || c === '`') {
-      let j = i + 1;
-      while (j < code.length && code[j] !== c) j += code[j] === '\\' ? 2 : 1;
-      out += c + code.slice(i + 1, j).replace(/[^\n]/g, ' ') + (j < code.length ? c : '');
-      i = j + 1;
-      continue;
+  const out = code.split('');
+  const blank = (a, b) => {
+    for (let k = a; k < b && k < out.length; k++) if (out[k] !== '\n') out[k] = ' ';
+  };
+  // After one of these, a / starts a regular expression; after a value it divides.
+  const regexMay = (i, prev) => prev === '' || /[(,=:[!&|?{};+\-*%<>~^]/.test(prev) ||
+    /(^|[^\w$])(return|typeof|case|in|of|else|do)\s*$/.test(code.slice(Math.max(0, i - 12), i));
+  function template(i) {
+    // i is just after the opening backtick; returns the index after the closing one.
+    let start = i;
+    while (i < code.length && code[i] !== '`') {
+      if (code[i] === '\\') { i += 2; continue; }
+      if (code[i] === '$' && code[i + 1] === '{') {
+        blank(start, i);
+        i = scan(i + 2, true) + 1;
+        start = i;
+        continue;
+      }
+      i++;
     }
-    out += c;
-    i++;
+    blank(start, i);
+    return i + 1;
   }
-  return out;
+  // Scans code from i. Inside a template's ${ }, stops at its closing }.
+  function scan(i, inExpr) {
+    let depth = 0;
+    let prev = '';
+    while (i < code.length) {
+      const c = code[i], n = code[i + 1];
+      if (c === '/' && n === '/') { const e = code.indexOf('\n', i); const j = e < 0 ? code.length : e; blank(i, j); i = j; continue; }
+      if (c === '/' && n === '*') { const e = code.indexOf('*/', i + 2); const j = e < 0 ? code.length : e + 2; blank(i, j); i = j; continue; }
+      if (c === '/' && regexMay(i, prev)) {
+        let j = i + 1, inClass = false;
+        while (j < code.length && code[j] !== '\n' && (code[j] !== '/' || inClass)) {
+          if (code[j] === '\\') { j += 2; continue; }
+          if (code[j] === '[') inClass = true;
+          else if (code[j] === ']') inClass = false;
+          j++;
+        }
+        blank(i + 1, j);
+        i = j + 1;
+        while (i < code.length && /[a-z]/.test(code[i])) i++;
+        prev = 'a';
+        continue;
+      }
+      if (c === "'" || c === '"') {
+        let j = i + 1;
+        while (j < code.length && code[j] !== c && code[j] !== '\n') j += code[j] === '\\' ? 2 : 1;
+        blank(i + 1, j);
+        i = j + 1;
+        prev = 'a';
+        continue;
+      }
+      if (c === '`') { i = template(i + 1); prev = 'a'; continue; }
+      if (c === '{') depth++;
+      else if (c === '}') {
+        if (inExpr && depth === 0) return i;
+        depth--;
+      }
+      if (!/\s/.test(c)) prev = c;
+      i++;
+    }
+    return i;
+  }
+  scan(0, false);
+  return out.join('');
 }
 
 /** Where an example uses shorthand: ['line 7: if without { }', ...]. */
@@ -172,6 +223,20 @@ function shorthandIssues(code) {
   for (const m of src.matchAll(/\belse\b/g)) {
     const k = after(m.index + 4);
     if (src[k] !== '{' && !src.startsWith('if', k)) issues.push(`line ${lineOf(m.index)}: else without { }`);
+  }
+  for (const m of src.matchAll(/\bdo\b/g)) {
+    if (src[after(m.index + 2)] !== '{') issues.push(`line ${lineOf(m.index)}: do without { }`);
+  }
+  // One statement per line: a ; with more code after it on the same line (a for
+  // loop's own header is the one place two ;s share a line).
+  let parens = 0;
+  for (let i = 0; i < src.length; i++) {
+    if (src[i] === '(') parens++;
+    else if (src[i] === ')') parens--;
+    else if (src[i] === ';' && parens === 0) {
+      const e = src.indexOf('\n', i);
+      if (src.slice(i + 1, e < 0 ? src.length : e).trim()) issues.push(`line ${lineOf(i)}: more code after a ; on the same line; put each statement, and a closing }, on its own line`);
+    }
   }
   for (const m of src.matchAll(/=>/g)) {
     if (src[after(m.index + 2)] !== '{') issues.push(`line ${lineOf(m.index)}: an arrow function without a { } body`);
@@ -193,14 +258,40 @@ function shorthandIssues(code) {
   return issues;
 }
 
+/** Shorthand in a code snippet inside prose (a page's body, a typings comment):
+ *  a one-line arrow, a ternary, or an if / for / while whose body is not in { }.
+ *  A braced snippet on one line is fine in a sentence. */
+function proseShorthand(text) {
+  const out = [];
+  for (const line of (text || '').split('\n')) {
+    const at = (k) => line.slice(Math.max(0, k - 30), k + 40).trim();
+    for (const m of line.matchAll(/=>\s*(\S)/g)) if (m[1] !== '{') out.push(`a one-line arrow function (give it a { } body): …${at(m.index)}…`);
+    for (const m of line.matchAll(/[\w)\]'"]\s\?\s[^?.:]{1,40}\s:\s/g)) out.push(`a ? b : c (say it as if / else): …${at(m.index)}…`);
+    for (const m of line.matchAll(/\b(if|while)\s*\(([^()]|\([^()]*\))*\)\s*(?![{\s]|$|is\b|it\b|and\b|or\b|the\b|you\b)[A-Za-z_$][\w$]*\s*[.(=+\-]/g)) out.push(`${m[1]} without { } (put the body in braces): …${at(m.index)}…`);
+  }
+  return out;
+}
+
 check('every example uses braces and no shorthand (moSHion and JavaScript docs)', () => {
   const bad = [];
   for (const s of sections) for (const p of s.pages) {
     for (const issue of shorthandIssues(p.code || '')) bad.push(`moshion ${s.slug}/${p.id}: ${issue}`);
   }
+  // shCode's own pages: their text is checked here (the shared pages' text is checked upstream).
+  for (const x of [...extraPages.map((e) => ({ slug: e.section, page: e.page })), ...extraSections.flatMap((e) => e.section.pages.map((page) => ({ slug: e.section.slug, page })))]) {
+    for (const issue of proseShorthand(x.page.body)) bad.push(`moshion ${x.slug}/${x.page.id}: the text has ${issue}`);
+  }
+  for (const o of overrides) for (const t of [o.body, o.append, o.swap && o.swap.to]) {
+    for (const issue of proseShorthand(t)) bad.push(`override ${o.section}/${o.page}: the text has ${issue}`);
+  }
   for (const s of jsSections) for (const p of s.pages) {
     if (!p.code) bad.push(`js ${s.slug}/${p.title}: no example`);
     for (const issue of shorthandIssues(p.code || '')) bad.push(`js ${s.slug}/${p.title}: ${issue}`);
+    // These two pages explain a short form so students can read it in other people's code;
+    // their text shows it on purpose (their examples are still checked above).
+    if (!['The conditional operator ?', 'Arrow functions'].includes(p.title)) {
+      for (const issue of proseShorthand(p.body)) bad.push(`js ${s.slug}/${p.title}: the text has ${issue}`);
+    }
   }
   assert.deepEqual(bad, []);
 });
