@@ -464,5 +464,10 @@
    "r1": "Is there a while loop that is real code (not inside a // comment), with the condition n <= 5 (or n < 6), whose body contains both console.log(n) and n++ (or n += 1, or n = n + 1), in either order? The broken original shown in comments does not count and is not the fix. NO if the loop has no update inside it.",
    "r5": "Is there a do...while loop that is real code (not inside a // comment), whose body logs something and whose while condition is !greeted or greeted === false? What greeted is set to inside the body does not matter. The commented-out broken original does not count."
   }
+ },
+ "4-1-4-print-shop": {
+  "questions": {
+   "req9": "Is there a console.log that prints ONE line combining at least two calculated values (variables or expressions, not only typed-in text): joined with +, in a template string with two or more ${...}, or as comma-separated arguments like console.log('Total:', total, 'Tax:', tax)? Single or double quotes are both fine. NO if the log shows only one value, or only plain text. Comments never run."
+  }
  }
 }

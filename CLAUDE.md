@@ -1643,6 +1643,11 @@ Everything else below (the route name, the cards, the pattern-check fallback, th
   the model to count only code that "really runs" (it then says a catch block that nothing throws into never runs).
   Review method: list the cells where the model's final verdict and the lab's own pattern check disagree, have them labelled by
   readers who cannot see either verdict, and read a card for its INTENT (2.4.19 r1 prints the non-multiples of 3, so its red is right).
+- **Style variants (2026-11-21).** `python3 scripts/make-format-variants.py` writes `scripts/ci-heldout/variants/<lab>.json` (gitignored): each
+  lab's reference with single-statement bodies unwrapped (no braces), no semicolons, single quotes, braces on their own line, and tab
+  indentation, all labelled met. Run them through the harness with `--fixtures` (one lab at a time, as for the gate). 1,400 variants over
+  264 labs pass. Clicking Check on a correct brace-less program once gave a red card, because the model was unsure and the lab's regex needs a
+  `{`; the style variants are how to look for that before a student does.
 - **A 429 from the provider's per-minute limit is 503 `offline`** (the browser runs the slow Check); a classroom burst past the
   key's limit degrades quietly, it never shows a student an error.
 - Tests: `scripts/test-decision-check.mjs` (request, answer, band, `askDecision`, and the real route over a stubbed fetch),
