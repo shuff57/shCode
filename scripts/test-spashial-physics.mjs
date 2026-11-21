@@ -178,6 +178,28 @@ const fresh = (gravity = [0, -10, 0]) => {
   w.dispose();
 }
 
+// 11b. material changes are live, and sleeping can be switched off
+{
+  const { w } = fresh();
+  const b = w.createBody({ shape: 'sphere', w: 1, collider: 'dynamic', pos: [0, 0.5, 0], friction: 0.6, bounciness: 0 });
+  run(w, 150);
+  ok(!w.isAwake(b), 'a body at rest goes to sleep');
+  w.allowSleeping = false;
+  ok(w.allowSleeping === false && w.isAwake(b), 'allowSleeping = false wakes it');
+  run(w, 150);
+  ok(w.isAwake(b), 'and it stays awake');
+  w.setBounciness(b, 0.9); w.setFriction(b, 0.2);
+  ok(b.def.bounciness === 0.9 && b.def.friction === 0.2, 'friction and bounciness change without a rebuild');
+  const key = b.key;
+  w.setBounciness(b, 0.5);
+  ok(b.key === key, 'the body is the same body');
+  w.allowSleeping = true;
+  w.setPose(b, [0, 6, 0], [0, 0, 0, 1]);
+  run(w, 60);
+  ok(w.getVelocity(b)[1] < -1, 'a dropped bouncy ball is falling');
+  w.dispose();
+}
+
 // 12. bad input fails loudly, in plain words
 {
   const w = createPhysics(J);

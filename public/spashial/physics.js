@@ -257,6 +257,16 @@ export function createPhysics(J, { gravity = [0, 0, 0] } = {}) {
       world.setVelocity(rec, vel);
       world.setAngularVelocity(rec, ang);
     },
+    /** Live material changes: no rebuild, so a sketch may set these every frame. */
+    setFriction(rec, f) { rec.def.friction = f; bi.SetFriction(rec.bodyId, f); },
+    setBounciness(rec, r) { rec.def.bounciness = r; bi.SetRestitution(rec.bodyId, r); },
+    get allowSleeping() { return system.GetPhysicsSettings().get_mAllowSleeping(); },
+    set allowSleeping(on) {
+      const s = system.GetPhysicsSettings();
+      s.set_mAllowSleeping(!!on);
+      system.SetPhysicsSettings(s);
+      if (!on) for (const rec of all) if (rec.def.collider === 'dynamic') bi.ActivateBody(rec.bodyId);
+    },
     getPose: pose,
     setPose(rec, pos, quat) {
       const p = new J.RVec3(pos[0], pos[1], pos[2]), q = new J.Quat(quat[0], quat[1], quat[2], quat[3]);
