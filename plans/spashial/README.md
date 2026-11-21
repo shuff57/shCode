@@ -24,7 +24,9 @@ changed yet.
 | Decision | Choice | Why |
 | --- | --- | --- |
 | Renderer | three.js on **WebGL2** | Runs on the Ultra 7 and on Chromebooks from one code path. The headless browser here has no WebGPU, and shallot (WebGPU-only, Rust/wasm, 14 MB package) failed its first spike. WebGPU can come later **behind the same API**. |
-| Name of a 3D object | **`Thing`** (provisional) | `Body` is the obvious word but collides with the DOM's global `Body` interface (the fetch mixin): `class Body` merges with it and every object grows `.text()`/`.json()` in editor typings. `Thing`, `Solid`, `Shape`, `Piece`, `Actor` are all free. One identifier to rename while this is only a spec. |
+| Name of a 3D object | **`Asset`** (owner's choice, 2026-11-21) | `Body` is the obvious word but collides with the DOM's global `Body` interface (the fetch mixin): `class Body` merges with it and every object grows `.text()`/`.json()` in editor typings. `Asset` is free in the DOM and in moSHion. **Caution:** shCode already says "assets" for Library items (pictures, sounds, fonts, models; `/api/games/[id]/assets`, `itemAssets.ts`), so a sentence like "the game's assets" is now ambiguous. Docs should say "Library items" for the files. |
+| Gravity | **Off** by default (owner's choice) | Like moSHion: `world.gravity.y = -10` makes things fall. |
+| Torus | Real collider, **kept** (owner's choice) | A ring of 16 capsules; see "Torus collider" below. Neither library has a torus primitive. |
 | Units, axes, angles | Y up, right-handed, ~1 unit = 1 m, **degrees** | Degrees match moSHion. shPlay used radians plus a helper. |
 | Colliders and touch verbs | moSHion's, word for word | `'dynamic' \| 'static' \| 'kinematic' \| 'none'`; `collides/colliding/collided/overlaps...` |
 | Hooks | `setup / update / draw / drawTop / preload` | `drawTop()` is a 2D screen layer, so moSHion's `text()`, `rect()` etc. build the HUD unchanged. |
@@ -91,6 +93,32 @@ be slower than this machine, so treat it as an upper bound until measured there.
 - Jolt running in the browser (only Node was tested), including the build with a
   separate `.wasm` file. See the integration notes.
 
+### What Jolt is
+
+An open-source (MIT) C++ rigid-body physics library by Jorrit Rouwé. Its README
+says it is used by *Horizon Forbidden West* and *Death Stranding 2*, and it claims
+a deterministic simulation (identical inputs give identical results, which could
+let a multiplayer game send only inputs; the limits are in its docs, and whether
+the npm WebAssembly build keeps that guarantee is **not verified**). The npm
+package `jolt-physics` is JoltPhysics.js, the same library compiled to WebAssembly.
+
+## Torus collider (experiment, `scripts/spashial-bench/torus.mjs`)
+
+Jolt has no torus primitive, so a torus is a compound shape: a ring of N capsules
+along the major circle. With R = 1, tube r = 0.3, N = 16:
+
+- A ball of radius 0.5 (fits the 0.7 hole) falls through a static ring: PASS.
+- A ball of radius 0.9 rests on the ring at y = 2.645; an exact torus gives 2.663
+  (1.8 cm off, matching the ring's approximation error of 1.9 cm at N = 16): PASS.
+- A dynamic torus dropped tilted settles flat at y = 0.291 (exact 0.3), at rest: PASS.
+- **Cost is the catch:** 200 awake tori cost 11.6 ms/step (12 capsules), 13.4 ms
+  (16) or 19.4 ms (24), against 2.1 ms for 200 spheres, so about 6x a sphere. A
+  torus should be treated as an expensive object. Static tori were not measured.
+
+Accuracy (ring error, m, at R = 1): 0.034 at N = 12, 0.019 at N = 16, 0.009 at N = 24.
+N = 16 is the default in the spec. Rapier has compound shapes as well, but this
+was only tried in Jolt.
+
 ## Integration facts that bite (found while checking)
 
 1. **The preview iframe is sandboxed without `allow-same-origin`**, so it has an
@@ -114,12 +142,10 @@ be slower than this machine, so treat it as an upper bound until measured there.
 
 ## Open questions
 
-- Should a 3D world start with gravity on? moSHion starts at 0 (nothing falls
-  until `world.gravity.y` is set); the old shPlay fell by default. The spec
-  follows moSHion; a 14-year-old's first cube will not fall until told to.
-- `torus` is dropped from the physics shapes (no primitive collider in either
-  library); shPlay had one. Keep it visual-only, or drop it?
-- The name `Thing`. Free in the DOM and in moSHion. Cheap to change now.
+- Is `Asset` clear enough next to the Library's "assets"? See the caution in the
+  decisions table. If it causes confusion in docs, renaming is one identifier in
+  `spashial.d.ts` while nothing is built on it.
+- Should a torus (or any compound shape) show a cost warning in the perf HUD?
 - Shared declarations (`Kb`, `Mouse`, `Sound`, storage, maths) are copied in slim
   form so the file stands alone. A build step should merge them from moSHion's
   file instead, or they will drift.
@@ -129,7 +155,7 @@ be slower than this machine, so treat it as an upper bound until measured there.
 1. Run the benchmark on the real Ultra 7 desktop, and a Chromebook if one is handy.
 2. Run Jolt in a browser, inside a sandboxed iframe, from `public/` with the
    header entry above. This is the real test of the choice.
-3. Build the engine core against `spashial.d.ts`: world, `Thing`, `Group`, the
+3. Build the engine core against `spashial.d.ts`: world, `Asset`, `Group`, the
    touch verbs, `update()` at a fixed step, a perf HUD and the render-scale
    fallback. Then assets, then the Sandbox mode (which needs a migration for the
    new project type; not applied without asking), then multiplayer (needs a

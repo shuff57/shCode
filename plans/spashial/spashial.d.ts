@@ -3,7 +3,7 @@
 // This file IS the contract: the engine underneath (three.js on WebGL2 today,
 // WebGPU maybe later; a physics library chosen by plans/spashial/README.md)
 // can change without a lesson noticing. Mirror moSHion wherever 3D allows, so a
-// student who knows Sprite already knows Thing. Every departure is marked
+// student who knows Sprite already knows Asset. Every departure is marked
 // "DIFFERS FROM moSHion" so it can be argued with.
 //
 // Conventions (all different from the old shPlay facade, deliberately):
@@ -24,7 +24,7 @@
 
 interface Vec3 { x: number; y: number; z: number }
 
-/** A 3D vector with the usual maths, live where it hangs off a Thing:
+/** A 3D vector with the usual maths, live where it hangs off a Asset:
  *  `ball.pos.set(0, 5, 0)` moves the ball. Same class as moSHion's Vector. */
 declare class Vector implements Vec3 {
   constructor(x?: number, y?: number, z?: number);
@@ -43,18 +43,18 @@ declare class Vector implements Vec3 {
 declare function createVector(x?: number, y?: number, z?: number): Vector;
 
 type Collider = 'dynamic' | 'static' | 'kinematic' | 'none';
-type ThingShape = 'box' | 'sphere' | 'cylinder' | 'capsule' | 'cone' | 'hull' | 'mesh';
+type AssetShape = 'box' | 'sphere' | 'cylinder' | 'capsule' | 'cone' | 'torus' | 'hull' | 'mesh';
 
-// ---- Thing (moSHion's Sprite) -------------------------------------------------
+// ---- Asset (moSHion's Sprite) -------------------------------------------------
 
-declare class Thing {
+declare class Asset {
   /** No arguments: a 1x1x1 box in front of the camera. */
   constructor();
   constructor(x: number, y: number, z: number);
   /** One size: a cube (or a sphere of that diameter, with shape 'sphere'). */
   constructor(x: number, y: number, z: number, size: number);
   constructor(x: number, y: number, z: number, w: number, h: number, d: number);
-  /** `new Thing(0, 5, 0, 2, 'static')` is a 2-unit static cube. */
+  /** `new Asset(0, 5, 0, 2, 'static')` is a 2-unit static cube. */
   constructor(x: number, y: number, z: number, size: number, collider: Collider);
   constructor(x: number, y: number, z: number, w: number, h: number, d: number, collider: Collider);
 
@@ -74,7 +74,7 @@ declare class Thing {
    *  sphere has one size (`diameter`), a capsule has `diameter` and `h`. */
   w: number; h: number; d: number;
   diameter: number;
-  shape: ThingShape;
+  shape: AssetShape;
   /** Visual only, like moSHion's scale: the collider keeps its size. */
   scale: Vector;
 
@@ -118,26 +118,26 @@ declare class Thing {
   distanceTo(target: Vec3): number;
   moveTowards(target: Vec3, tracking?: number): void;
   moveAway(target: Vec3, repel?: number): void;
-  clone(): Thing;
+  clone(): Asset;
   /** Takes it out of the world: it stops drawing and colliding. */
   remove(): void;
   delete(): void;
   /** Pointer interaction by ray from the camera, same verbs as moSHion's SpriteMouse. */
-  mouse: ThingMouse;
+  mouse: AssetMouse;
 
   // The touch verbs: the table is moSHion's, word for word.
   //               first frame   every frame (count)   last frame
   //   physics     collides      colliding             collided
   //   overlap     overlaps*     overlapping           overlapped
-  overlaps(other: Thing | Group, cb?: (self: Thing, other: Thing) => void): boolean;
-  colliding(other: Thing | Group, cb?: (self: Thing, other: Thing) => void): number;
-  collides(other: Thing | Group, cb?: (self: Thing, other: Thing) => void): boolean;
-  collided(other: Thing | Group, cb?: (self: Thing, other: Thing) => void): boolean;
-  overlapping(other: Thing | Group, cb?: (self: Thing, other: Thing) => void): number;
-  overlapped(other: Thing | Group, cb?: (self: Thing, other: Thing) => void): boolean;
+  overlaps(other: Asset | Group, cb?: (self: Asset, other: Asset) => void): boolean;
+  colliding(other: Asset | Group, cb?: (self: Asset, other: Asset) => void): number;
+  collides(other: Asset | Group, cb?: (self: Asset, other: Asset) => void): boolean;
+  collided(other: Asset | Group, cb?: (self: Asset, other: Asset) => void): boolean;
+  overlapping(other: Asset | Group, cb?: (self: Asset, other: Asset) => void): number;
+  overlapped(other: Asset | Group, cb?: (self: Asset, other: Asset) => void): boolean;
 }
 
-interface ThingMouse {
+interface AssetMouse {
   hovering(): boolean;
   hovers(): boolean;
   hovered(): boolean;
@@ -147,46 +147,49 @@ interface ThingMouse {
 }
 
 /** Friendly shortcuts that are just bodies with a shape, so shPlay-style lessons
- *  read the same: `new Cube(0, 1, 0)` is `new Thing(0, 1, 0, 1)`. */
-declare class Cube extends Thing {}
-declare class Sphere extends Thing {}
-declare class Cylinder extends Thing {}
-declare class Capsule extends Thing {}
-declare class Cone extends Thing {}
+ *  read the same: `new Cube(0, 1, 0)` is `new Asset(0, 1, 0, 1)`. */
+declare class Cube extends Asset {}
+declare class Sphere extends Asset {}
+declare class Cylinder extends Asset {}
+declare class Capsule extends Asset {}
+declare class Cone extends Asset {}
+/** A donut lying flat. Its collider is a real ring of 16 capsules (see README), accurate to about 2 cm,
+ *  but it costs several times a sphere: a game should use few of them. */
+declare class Torus extends Asset {}
 /** A big flat static body: a floor. `new Floor()` fills the view; `new Floor(40)` is 40 across. */
-declare class Floor extends Thing { constructor(size?: number) }
+declare class Floor extends Asset { constructor(size?: number) }
 
 // ---- Group (moSHion's Group) -------------------------------------------------
 
-declare class Group extends Array<Thing> {
-  /** `new coins.Thing(x, y, z)` makes a body with this group's settings, in it. */
-  Thing: typeof Thing;
-  newThing(x: number, y: number, z: number, size?: number): Thing;
+declare class Group extends Array<Asset> {
+  /** `new coins.Asset(x, y, z)` makes a body with this group's settings, in it. */
+  Asset: typeof Asset;
+  newAsset(x: number, y: number, z: number, size?: number): Asset;
   color: string;
   texture: string | null;
   model: string | null;
   collider: Collider;
   bounciness: number;
   friction: number;
-  overlaps(other: Thing | Group, cb?: (self: Thing, other: Thing) => void): boolean;
-  colliding(other: Thing | Group, cb?: (self: Thing, other: Thing) => void): number;
-  collides(other: Thing | Group, cb?: (self: Thing, other: Thing) => void): boolean;
-  collided(other: Thing | Group, cb?: (self: Thing, other: Thing) => void): boolean;
-  overlapping(other: Thing | Group, cb?: (self: Thing, other: Thing) => void): number;
-  overlapped(other: Thing | Group, cb?: (self: Thing, other: Thing) => void): boolean;
+  overlaps(other: Asset | Group, cb?: (self: Asset, other: Asset) => void): boolean;
+  colliding(other: Asset | Group, cb?: (self: Asset, other: Asset) => void): number;
+  collides(other: Asset | Group, cb?: (self: Asset, other: Asset) => void): boolean;
+  collided(other: Asset | Group, cb?: (self: Asset, other: Asset) => void): boolean;
+  overlapping(other: Asset | Group, cb?: (self: Asset, other: Asset) => void): number;
+  overlapped(other: Asset | Group, cb?: (self: Asset, other: Asset) => void): boolean;
   applyForce(fx: number, fy: number, fz: number): void;
   /** Deletes members that fell or flew past `margin` units outside the play area. */
-  cull(margin?: number, cb?: (body: Thing, n: number) => void): number;
-  add(...bodies: Thing[]): number;
-  contains(b: Thing): boolean;
-  remove(b: Thing): void;
+  cull(margin?: number, cb?: (body: Asset, n: number) => void): number;
+  add(...bodies: Asset[]): number;
+  contains(b: Asset): boolean;
+  remove(b: Asset): void;
   delete(): void;
   amount: number;
 }
-declare const allThings: Group;
+declare const allAssets: Group;
 
 /** Builds a level from layers of text, bottom layer first: each character the
- *  legend names becomes one `new group.Thing()` at that cell. Like moSHion's
+ *  legend names becomes one `new group.Asset()` at that cell. Like moSHion's
  *  Tiles with a floor number. */
 declare class Tiles extends Group {
   constructor(layers: string[][], x: number, y: number, z: number, cell: number, legend: Record<string, Group>);
@@ -196,16 +199,16 @@ declare class Tiles extends Group {
 
 interface JointOptions { anchor?: Vec3; axis?: Vec3; collideConnected?: boolean }
 declare class Joint { remove(): void }
-declare class HingeJoint extends Joint { constructor(a: Thing, b: Thing, opts?: JointOptions) }
-declare class DistanceJoint extends Joint { constructor(a: Thing, b: Thing, opts?: JointOptions & { length?: number }) }
-declare class SliderJoint extends Joint { constructor(a: Thing, b: Thing, opts?: JointOptions) }
+declare class HingeJoint extends Joint { constructor(a: Asset, b: Asset, opts?: JointOptions) }
+declare class DistanceJoint extends Joint { constructor(a: Asset, b: Asset, opts?: JointOptions & { length?: number }) }
+declare class SliderJoint extends Joint { constructor(a: Asset, b: Asset, opts?: JointOptions) }
 /** Welds two bodies into one rigid piece. */
-declare class GlueJoint extends Joint { constructor(a: Thing, b: Thing) }
+declare class GlueJoint extends Joint { constructor(a: Asset, b: Asset) }
 
 // ---- world --------------------------------------------------------------------
 
 interface RayHit {
-  thing: Thing | null;
+  asset: Asset | null;
   point: Vec3;
   /** Unit length, pointing away from the surface that was hit. */
   normal: Vec3;
@@ -219,7 +222,7 @@ interface World {
    *  3D start with gravity on? See README.) */
   gravity: Vec3;
   /** The topmost body under a screen point (what the mouse is over), or undefined. */
-  getThingAt(screenX: number, screenY: number): Thing | undefined;
+  getAssetAt(screenX: number, screenY: number): Asset | undefined;
   /** Closest SOLID body on the line (sensors and collider 'none' are looked
    *  through), or null. `world.rayCast(p.pos, { x: p.x, y: p.y - 1.1, z: p.z })` asks "on the ground?". */
   rayCast(from: Vec3, to: Vec3): RayHit | null;
@@ -247,7 +250,7 @@ interface Camera {
   lookAt(x: number, y: number, z: number): void;
   lookAt(target: Vec3): void;
   /** Follows a body from behind and above, smoothly. `tracking` is the share of the gap closed each frame. */
-  follow(target: Thing, opts?: { distance?: number; height?: number; tracking?: number }): void;
+  follow(target: Asset, opts?: { distance?: number; height?: number; tracking?: number }): void;
   /** Circles a point. Mouse drag turns it when `drag` is true. */
   orbit(target: Vec3, opts?: { distance?: number; drag?: boolean }): void;
   /** Stops follow() or orbit() and leaves the camera where it is. */
@@ -347,7 +350,7 @@ declare const online: {
   join(code: string): void;
   leave(): void;
   /** Up to 8 bodies, 15 Hz. Each carries position AND rotation, not just x/y. */
-  share(...bodies: Thing[]): void;
-  peers: Record<number, Thing[]>;
-  sharedBy(seat: number): Thing[];
+  share(...bodies: Asset[]): void;
+  peers: Record<number, Asset[]>;
+  sharedBy(seat: number): Asset[];
 };
