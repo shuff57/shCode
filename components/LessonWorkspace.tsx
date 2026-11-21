@@ -886,7 +886,9 @@ export default function LessonWorkspace({
     setCheckedAt(Date.now());
     setClock(Date.now());
     setCheckedOn(filesNow['script.js'] ?? '');
-    const green = Object.values(colours).filter((v) => v.passed).length;
+    // Every rubric card counts: Clef's colour where it judged one, else what the lab's own check found (a card
+    // that runs the code, or one marked patternOnly).
+    const green = aiCheck.rubric.filter((c) => (colours[c.id] ? colours[c.id].passed : fromReport.get(c.id)?.status === 'passed')).length;
     const red = redIds(colours);
     fastCheckRef.current = { text, colours };
     setExplaining(new Set());
@@ -1304,7 +1306,7 @@ export default function LessonWorkspace({
                           {r.status === 'failed' ? (
                             <span className="lab-check-why">{why ? checkLine(why) : r.description ? `Not yet. It looks for: ${checkLine(r.description)}` : 'Not found in your code yet.'}</span>
                           ) : null}
-                          {r.status === 'failed' && !checksStale && fastCheckRef.current && aiVerdictsRef.current?.text === fastCheckRef.current.text && !explained.has(r.id) ? (
+                          {r.status === 'failed' && !checksStale && fastCheckRef.current && fastCheckRef.current.colours[r.id] && aiVerdictsRef.current?.text === fastCheckRef.current.text && !explained.has(r.id) ? (
                             <button
                               type="button"
                               className="lab-check-why-btn"

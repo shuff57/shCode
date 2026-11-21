@@ -9109,8 +9109,7 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
       "kind": "moshion",
       "questions": {
         "r1": "Restore else player.vel.x = 0: trace one frame three times, statements in order (the last assignment wins): (1) only the left key held: vel.x ends negative; (2) only the right key held: it ends positive; (3) neither held: it ends at 0. Yes only if all three hold. Any form counts: the else at the end of the if / else if chain, a 0 set first, a ? : ending in 0, or (kb.pressing('d') - kb.pressing('a')) * 3 (a held key is 1, a free one 0, so neither gives 0). An else under a separate second if is NO: if (a) vel.x = -3; if (d) vel.x = 3; else vel.x = 0; (holding left: -3, then the else sets 0). Code in draw(), update() or a function they call counts; code in comments never runs.",
-        "r2": "Restore else player.vel.y = 0: trace one frame three times, statements in order (the last assignment wins): (1) only the up key held: vel.y ends negative; (2) only the down key held: it ends positive; (3) neither held: it ends at 0. Yes only if all three hold. Any form counts: the else at the end of the if / else if chain, a 0 set first, a ? : ending in 0, or (kb.pressing('s') - kb.pressing('w')) * 3 (a held key is 1, a free one 0, so neither gives 0). An else under a separate second if is NO: if (w) vel.y = -3; if (s) vel.y = 3; else vel.y = 0; (holding up: -3, then the else sets 0). Code in draw(), update() or a function they call counts; code in comments never runs.",
-        "r3": "Is player.vel.x or player.vel.y set to a number other than 4, -4 or 0 on a line that tests kb.pressing (for example -2, 2, 3, -5, 6, 1 or 10)? The starter only ever used 4, -4 and 0, so any other number on even one key line means the student picked a speed of their own. A plain else line does not count: else player.vel.y = 2 is not a key line. Code inside comments never runs."
+        "r2": "Restore else player.vel.y = 0: trace one frame three times, statements in order (the last assignment wins): (1) only the up key held: vel.y ends negative; (2) only the down key held: it ends positive; (3) neither held: it ends at 0. Yes only if all three hold. Any form counts: the else at the end of the if / else if chain, a 0 set first, a ? : ending in 0, or (kb.pressing('s') - kb.pressing('w')) * 3 (a held key is 1, a free one 0, so neither gives 0). An else under a separate second if is NO: if (w) vel.y = -3; if (s) vel.y = 3; else vel.y = 0; (holding up: -3, then the else sets 0). Code in draw(), update() or a function they call counts; code in comments never runs."
       }
     }
   },
@@ -10176,25 +10175,6 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "r2": "Give the second goal its own check: Each goal has its own distance check that deletes it, so the code calls .delete() for both goals. Code inside a comment, or written inside quotes as text, never runs.",
         "r3": "Is this true of the student's code: Track collection progress: Your code knows when both goals are gone, either way content.md describes: a counter that goes up (or down) by one per goal and is then checked (collected === 2), or a check that both goal variables are gone (goal1 === null && goal2 === null, or !goal1 && !goal2). Judge the code as written, without running it: text inside a comment or quotes does not count, and lines starting with // STEP are the lesson's own instructions. Any names, spacing or style are fine.",
         "r4": "Is the finish message All goals collected (any capitals, with or without the !) printed with console.log inside an if about both goals? YES: if (collected === 2) { console.log('All goals collected!'); } YES: if (counter >= 2) console.log(\"All goals collected!\") YES: if (goal === null && goal2 === null) { console.log('all goals collected') } NO, other words: 'You win!', 'You Win!', 'All collected!', 'you found them all!'. The starter's 'You win!' for one goal does not count. Code inside comments never runs."
-      }
-    }
-  },
-  "5-2-3-lab-tune-gravity": {
-    "lessonTitle": "5.2.10 Lab: Tune Gravity",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.10 Lab: Tune Gravity\". The task they were given: Try world.gravity.y at 10, then 0, then -5, then 20, running the sketch after each change, and write one sentence per value as a // comment at the bottom of the code saying how the player moved: did it fall, float or drift upward, fast or slow? There is no single right value. What the starter file already had: world.gravity.y set to 10 in setup(), a player moved with a and d, a static ground, a gold goal block, and a comment at the bottom that explains the task. That comment is the starter's instructions, not the student's notes. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: world.gravity.y sets the pull: a positive number pulls down the screen (y grows downward), 0 means no pull, and a negative number pulls things up. Comments never run, so the student's notes do not change the gravity; only the real world.gravity.y line does. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
-    "rubric": [
-      {
-        "id": "r1",
-        "title": "Gravity changed from the starting value",
-        "description": "The world.gravity.y line that runs holds a value other than the starter's 10 (0, -5, 20 or any other value counts). A value written only in a note does not change the gravity. One exception: if the line is back at 10 but the student's own notes clearly describe what several other values did, they did the trying the lab asks for, so count it. Help: 5.2.8 (Reading: Gravity)",
-        "points": 1
-      }
-    ],
-    "clef": {
-      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.10 Lab: Tune Gravity\". The task they were given: Try world.gravity.y at 10, then 0, then -5, then 20, running the sketch after each change, and write one sentence per value as a // comment at the bottom of the code saying how the player moved: did it fall, float or drift upward, fast or slow? There is no single right value. What the starter file already had: world.gravity.y set to 10 in setup(), a player moved with a and d, a static ground, a gold goal block, and a comment at the bottom that explains the task. That comment is the starter's instructions, not the student's notes.",
-      "kind": "moshion",
-      "questions": {
-        "r1": "Find the line world.gravity.y = N that is not inside a comment. Is N any number other than exactly 10? Every other number means yes: 0, 1, 5, 9, 15, 20, 80, 90, 100, 5000, -5 or -10 (20 counts even though the starter's closing comment also names 20). Only exactly 10 means no. Numbers that appear only in a comment do not count. Code inside comments never runs."
       }
     }
   },
@@ -14715,25 +14695,6 @@ export const AI_GRADERS: Record<string, AiGraderConfig> = {
         "r2": "Create a dynamic ball: A dynamic sprite is present Code inside a comment, or written inside quotes as text, never runs.",
         "r3": "Make it bouncy: The ball's .bounciness is set near the top of the 0 to 1 range: 0.5 or more. Code inside a comment, or written inside quotes as text, never runs.",
         "r4": "Set friction: Assign to .friction. Code inside a comment, or written inside quotes as text, never runs."
-      }
-    }
-  },
-  "moshion-gravity": {
-    "lessonTitle": "5.2.9 Worked Example: Falling Block",
-    "prompt": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.9 Worked Example: Falling Block\". The task they were given: A worked example: a block falls under gravity and lands on a static ground. The student changes world.gravity.y from 10 to 0 (the block floats), then to 20 (it falls faster) and leaves it at 20, then removes 'static' from the ground to watch both fall, and adds a second falling block in another colour. Only the gravity change is checked. What the starter file already had: world.gravity.y set to 10 in setup(), an orange block and a gray static ground. With gravity still at 10 the criterion is not met. You cannot run their code: read it and judge what it WOULD do when the sketch runs. Judge each criterion by whether the idea is achieved, however the student wrote it. Different variable and function names, if / else chains or ternaries, helper functions, template strings, arrow functions, semicolons, spacing, quotes and order are all fine. Do not require any particular structure unless the criterion names one. Mark a criterion missing only when the idea is absent or the code does the opposite. Code inside a comment or inside a string never runs, so a line the student only wrote in a comment does not count. moSHion facts that matter here: world.gravity.y sets how hard things are pulled: a positive number pulls down the screen because y grows downward, and 0 means no pull. Only the line that really runs counts; a value written only in a comment changes nothing. Write each note for THIS student's own code: in a not-met note, name the exact line or name in their code that causes the problem (quote at most a few words of it), say in plain words what it does now versus what the criterion needs, and give one concrete next thing to try, but do NOT write the corrected code. In a met note, say in one short phrase what in their code satisfied it. Do not use generic praise. Write for a 14-year-old reader: short sentences and plain, everyday words.",
-    "rubric": [
-      {
-        "id": "r1",
-        "title": "You changed the gravity",
-        "description": "The world.gravity.y line that runs ends with a value other than 10. Step 2 ends at 20, but 0, a negative number or any other value also shows the student changed it, so it counts. Gravity set back to 10, or a new value written only in a comment, is not met. Help: 5.2.8 (Reading: Gravity)",
-        "points": 1
-      }
-    ],
-    "clef": {
-      "task": "The student wrote a moSHion sketch (p5-style JavaScript with a physics world) for the lab \"5.2.9 Worked Example: Falling Block\". The task they were given: A worked example: a block falls under gravity and lands on a static ground. The student changes world.gravity.y from 10 to 0 (the block floats), then to 20 (it falls faster) and leaves it at 20, then removes 'static' from the ground to watch both fall, and adds a second falling block in another colour. Only the gravity change is checked. What the starter file already had: world.gravity.y set to 10 in setup(), an orange block and a gray static ground. With gravity still at 10 the criterion is not met.",
-      "kind": "moshion",
-      "questions": {
-        "r1": "Find the line that sets world.gravity.y and is not inside a comment. Is it set to anything other than exactly 10? YES: world.gravity.y = 1; world.gravity.y = -1; world.gravity.y = 5; world.gravity.y = 9; world.gravity.y = 20; world.gravity.y = 80; a huge number; a changing value such as random(...). NO: world.gravity.y = 10; (the starter). Code inside comments never runs."
       }
     }
   }

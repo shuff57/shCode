@@ -200,11 +200,59 @@ check('5.1.20 is told moSHion engine facts', G['5-1-20-moshion-move-keys'].clef.
     const rubric = new Set(l.aiCheck.rubric.map((r) => r.id));
     for (const r of l.requirements.filter((r) => rubric.has(r.id))) {
       const pattern = !r.type || r.type === 'regex' || r.type === 'inFunction';
-      const has = !!g?.clef?.questions?.[r.id];
+      // A pattern card has a question, or is listed in clef.patternOnly (the lab's own check decides it).
+      const has = !!g?.clef?.questions?.[r.id] || (l.aiCheck.clef?.patternOnly ?? []).includes(r.id);
       if (pattern !== has) wrong.push(`${id} ${r.id}`);
     }
   }
   check(`chapters 1-7: ${labs} AI Check labs, a question on every pattern card and none on a runtime card`, wrong.slice(0, 5), []);
+}
+
+// ---------------------------------------------------------------- 6. patternOnly (2026-11-19)
+// A card that compares a value ("a number other than the starter's") is decided by the lab's own check:
+// Clef got values right only when its question named them (5.1.18 r3: 8, 100, 0.5 wrong; the regex right).
+{
+  const g = G['5-1-18-lab-else-to-zero'];
+  check('5.1.18: r1 and r2 keep their questions, r3 has none and is still a rubric card',
+    [Object.keys(g.clef.questions), g.rubric.some((r) => r.id === 'r3')], [['r1', 'r2'], true]);
+
+  const { mkdirSync: mk, writeFileSync: wf, rmSync: rm } = await import('fs');
+  const dir = path.join(root, 'lessons', 'zz-patternonly-test');
+  const reqs = [
+    { id: 'r1', title: 'A', description: 'a', type: 'regex', file: 'script.js', pattern: 'x', flags: '', points: 0, status: 'pending' },
+    { id: 'r2', title: 'B', description: 'b', type: 'regex', file: 'script.js', pattern: 'y', flags: '', points: 0, status: 'pending' },
+    { id: 't1', title: 'T', description: 't', type: 'tests', file: 'script.js', points: 0, status: 'pending' },
+  ];
+  const lessonWith = (clef) => ({
+    id: 'zz-patternonly-test', title: '0.0.0 Test', type: 'assignment', preview: 'console', requirements: reqs,
+    aiCheck: {
+      file: 'script.js', rubricTitle: 'x', prompt: 'Do it. You cannot run their code: read it.',
+      rubric: reqs.map((r) => ({ id: r.id, title: r.title, description: r.description, points: 1 })), clef,
+    },
+  });
+  const Q = 'Is there a line that does the thing the card names, outside any comment?';
+  const refused = (clef) => {
+    mk(dir, { recursive: true });
+    wf(path.join(dir, 'lesson.json'), JSON.stringify(lessonWith(clef)));
+    try {
+      execFileSync(process.execPath, ['--import', path.join(root, 'scripts/register-ts.mjs'), path.join(root, 'scripts/generate-ai-graders.mjs')], { cwd: root, stdio: 'pipe' });
+      return 'ACCEPTED';
+    } catch (e) {
+      return String(e.stderr || '').split('\n').filter((l) => l.includes('zz-patternonly-test')).join(' | ');
+    } finally {
+      rm(dir, { recursive: true, force: true });
+    }
+  };
+  try {
+    check('patternOnly on a card that runs the code is refused', /t1 is not a regex or inFunction card/.test(refused({ questions: { r1: Q }, patternOnly: ['r2', 't1'] })), true);
+    check('patternOnly naming no rubric card is refused', /patternOnly zz matches no aiCheck rubric id/.test(refused({ questions: { r1: Q }, patternOnly: ['r2', 'zz'] })), true);
+    check('a card in patternOnly AND questions is refused', /r1 is in patternOnly and has a question/.test(refused({ questions: { r1: Q, r2: Q }, patternOnly: ['r1'] })), true);
+    check('patternOnly that is not a list of ids is refused', /patternOnly must be an array/.test(refused({ questions: { r1: Q, r2: Q }, patternOnly: 'r2' })), true);
+    check('every card patternOnly (no questions) is refused: such a lab needs no clef block', /has no questions/.test(refused({ questions: {}, patternOnly: ['r1', 'r2'] })), true);
+    check('a pattern card with neither a question nor patternOnly is still refused', /has no question for r2/.test(refused({ questions: { r1: Q } })), true);
+  } finally {
+    rm(dir, { recursive: true, force: true });
+  }
 }
 
 console.log(failures ? `\n${failures} FAILED` : `\nall ${n} passed`);
