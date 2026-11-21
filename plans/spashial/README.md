@@ -191,6 +191,68 @@ change the work done against `spashial.d.ts`, which is the seam either way.
    both argue for the vendored copy.
 4. The vendored `three.module.js` and Jolt both want a header entry like (1).
 
+## Milestone 1: what exists (2026-11-21)
+
+Runnable now, standalone, no lesson wiring. Try it:
+
+    node scripts/build-spashial-vendor.mjs      # Jolt + three.js into public/spashial/vendor/ (prebuild does it too)
+    node scripts/spashial-serve.mjs             # serves public/ with the CORS headers; open /spashial/sandbox.html
+
+| File | What it is |
+| --- | --- |
+| `public/spashial/physics.js` | The only file that talks to Jolt. No three.js. 53 tests in Node (`scripts/test-spashial-physics.mjs`, in `npm test`). |
+| `public/spashial/spashial.js` | The sketch API on top: `Asset`, `Group`, `world`, `camera`, lights, `kb`, `mouse`, the fixed-step loop, perf panel, auto quality. |
+| `public/spashial/runner.html` | The sandboxed preview page. Same `preview-console` / `preview-error` messages as the moSHion runner, code via `?code=` base64url. |
+| `public/spashial/sandbox.html` | Standalone dev page: editor, seven example sketches, the exact production iframe sandbox. |
+| `scripts/drive-spashial.py` | Browser test (56 checks, run by hand): drives the sandbox page and asserts on numbers read from inside the sandboxed iframe. |
+
+**Built and tested in a browser:** `Asset` with box, sphere, cylinder, capsule, cone and
+torus; live `pos`, `vel` (units per frame), `rotation` (degrees), `angularVelocity`;
+`w/h/d/diameter/shape/scale`, `color/opacity/visible/metalness/roughness`;
+`collider` (dynamic, static, kinematic, none), `friction/bounciness/density/mass/lockRotation`;
+forces, impulses, `lookAt`, `distanceTo`, `moveTowards/Away`, `clone`, `remove`; the six touch
+verbs on an Asset and on a `Group`, with callbacks; `Group` (`new g.Asset()`, `add`, `remove`,
+`amount`, `cull`, cascading properties); `world.gravity`, `rayCast`, `rayCastAll`, `getAssetAt`,
+`explodeAt`, `allowSleeping`, `autoStep`/`physicsUpdate`; `camera` (`pos`, `lookAt`, `fov`,
+`follow`, `orbit`, `free`); ambient, sun, point and spot lights; `background`; `kb`; `mouse`;
+a 2D HUD layer for `drawTop()` (`fill`, `text`, `rect`, `circle`, `line`, ...); `showPerf`;
+`quality`; errors with plain words and line numbers; the loop stops on the first error.
+
+**Not built yet** (in the spec, absent from the engine): textures, glTF models, joints, `Tiles`,
+the billboard `text` label, `hull`/`mesh` shapes, `maxSpeed`, sounds, storage, `multiplayer`/`online`,
+`Walls`-style helpers. Setting an unknown property is silently allowed, as in moSHion; so a
+sketch that sets `a.texture = 'coin'` today does nothing and says nothing.
+
+**Choices made while building (change any of them):**
+- **Friction defaults to 0.5, not moSHion's 0.** Jolt (like Box2D) grips with the geometric mean of
+  the two frictions, so a 0 default means nothing in a 3D scene ever stops sliding.
+- Gravity starts at 0, as decided. Changing it wakes sleeping bodies (found by a test; Jolt does not).
+- `Floor` has its top surface at y = 0. A new `Asset()` with no arguments sits where the camera looks.
+- Physics is fixed at 60 Hz and the picture is interpolated between steps, so a 144 Hz screen is smooth.
+- Auto quality cannot read GPU headroom (frame time is pinned at 16.7 ms on a 60 Hz screen either way),
+  so it drops the render scale when frames run long and occasionally *tries* a step back up,
+  waiting longer after each failure. Render scale never exceeds 1.
+- Shadows and antialiasing are off by default.
+
+**Found by testing, not by reading:**
+- Jolt leaves sleeping bodies asleep when gravity changes (fixed).
+- The Group touch verbs answered "yes" whenever asked, whatever the members said: a copy-paste
+  `merge: () => true`. Caught by the browser driver, fixed.
+- A clone is made on top of its original, so two solid bodies overlap and push apart. That is
+  documented moSHion behaviour, and it made one of my own tests fail until I understood it.
+
+**Known limits and next work:**
+- One draw call per Asset (67 calls for 80 bodies in the Rain example). 300 bodies means about 300
+  calls. Instancing identical shapes is the obvious next performance step; not measured on an Ultra 7.
+- Frame rate was only seen on software GL (30 fps for 80 bodies, scale 0.5), which says nothing
+  about integrated graphics. Run the Rain example with `showPerf()` on the real machine.
+- Pointer lock (`mouse.lock()`) needs `allow-pointer-lock` in the iframe's sandbox; the production
+  sandbox does not have it, so a first-person camera needs that decision.
+- The keyboard needs the preview to have focus: click the picture first.
+- Jolt shapes are not yet released when an Asset is removed (reference counting); a long session that
+  makes and removes thousands of shapes may grow. Not measured.
+- Nothing here is wired into LessonWorkspace or the Sandbox modes, and no migration exists.
+
 ## Open questions
 
 - Is `Asset` clear enough next to the Library's "assets"? See the caution in the

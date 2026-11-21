@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>spaSHial runner</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+	html, body { margin: 0; height: 100%; background: #1e1f29; overflow: hidden; }
+	canvas { display: block; position: absolute; top: 0; left: 0; outline: none; }
+	#hud { pointer-events: none; }
+	#error { position: fixed; top: 0; left: 0; right: 0; background: rgba(220,38,38,0.92); color: #fff; padding: 8px 12px; font: 12px/1.4 monospace; white-space: pre-wrap; display: none; z-index: 100; }
+	#empty { position: fixed; inset: 0; display: grid; place-items: center; color: #6272a4; font: 13px system-ui; }
+</style>
+<script>
+// Pipe console + errors to the parent. Same messages as the moSHion and old shPlay runners:
+//   { source: 'preview-console', type, args }   and   { source: 'preview-error', error: {...} }
+(function () {
+	function send(type, args) {
+		try {
+			var safe = Array.prototype.slice.call(args).map(function (a) {
+				if (a instanceof Error) return a.stack || a.message;
+				if (typeof a === 'object') { try { return JSON.parse(JSON.stringify(a)); } catch (e) { return String(a); } }
+				return a;
+			});
+			window.parent.postMessage({ source: 'preview-console', type: type, args: safe }, '*');
+		} catch (e) { /* parent gone */ }
+	}
+	['log', 'warn', 'error', 'info'].forEach(function (t) {
+		var orig = console[t];
+		console[t] = function () { send(t, arguments); orig.apply(console, arguments); };
+	});
+	function studentFrame(stack) {
+		if (!stack) return null;
+		var sources = window.__previewSources || {};
+		var lines = String(stack).split('\n');
+		var rx = /([A-Za-z_][\w./-]*\.js):(\d+):(\d+)/;
+		for (var i = 0; i < lines.length; i++) {
+			var m = rx.exec(lines[i]);
+			if (m && Object.prototype.hasOwnProperty.call(sources, m[1])) return { file: m[1], line: +m[2], col: +m[3] };
+		}
+		return null;
+	}
+	function snippet(file, line) {
+		var src = (window.__previewSources || {})[file];
+		if (!src || !line) return '';
+		return (src.split('\n')[line - 1] || '').replace(/^\s+/, '').slice(0, 200);
+	}
+	function report(err, fallback, f, l, c) {
+		var loc = studentFrame(err && err.stack);
+		if (!loc && f && (window.__previewSources || {})[f]) loc = { file: f, line: l || 0, col: c || 0 };
+		var name = (err && err.name) || 'Error', msg = (err && err.message) || fallback || String(err);
+		var file = loc ? loc.file : null, line = loc ? loc.line : null, col = loc ? loc.col : null;
+		try {
+			window.parent.postMessage({ source: 'preview-error', error: { name: name, message: msg, file: file, line: line, col: col, snippet: file ? snippet(file, line) : '' } }, '*');
+		} catch (e) { /* parent gone */ }
+		var where = file ? file + ':' + line + (col ? ':' + col : '') : '';
+		send('error', [name + ': ' + msg + (where ? '  (' + where + ')' : '')]);
+		var el = document.getElementById('error');
+		if (el) { el.style.display = 'block'; el.textContent = name + ': ' + msg + (where ? '  @ ' + where : ''); }
+	}
+	window.addEventListener('error', function (e) { report(e.error, e.message, e.filename, e.lineno, e.colno); });
+	window.addEventListener('unhandledrejection', function (e) {
+		var r = e.reason;
+		report(r && r.stack ? r : new Error(r && r.message ? r.message : String(r)), 'Unhandled promise rejection');
+	});
+})();
+</script>
+<script type="importmap">
+{ "imports": { "three": "./vendor/three/three.module.min.js" } }
+</script>
+</head>
+<body>
+<canvas id="canvas" tabindex="0"></canvas>
+<canvas id="hud"></canvas>
+<div id="error"></div>
+<div id="empty">Click Run to start your sketch.</div>
+<script type="module">
+// Boot order:
+//   1. Decode the sketch from ?code=<base64url>.
+//   2. Load the engine: it loads Jolt, then defines Asset, world, camera... on window.
+//   3. Inject the sketch as a classic script, so its setup()/update()/draw() become globals.
+//   4. start(): preload(), setup(), then the loop.
+(async function () {
+	var encoded = new URLSearchParams(location.search).get('code');
+	if (!encoded) return;
+	var code;
+	try {
+		var b64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+		while (b64.length % 4) b64 += '=';
+		code = decodeURIComponent(escape(atob(b64)));
+	} catch (e) { console.error('Failed to decode sketch:', e.message || e); return; }
+	document.getElementById('empty').remove();
+	window.__previewSources = { 'sketch.js': code };
+
+	var engine;
+	try {
+		var mod = await import('./spashial.js');
+		engine = await mod.boot();
+	} catch (e) { console.error(e); window.parent.postMessage({ source: 'preview-error', error: { name: e.name || 'Error', message: 'The 3D engine failed to start: ' + (e.message || e), file: null, line: null, col: null, snippet: '' } }, '*'); return; }
+
+	var s = document.createElement('script');
+	s.textContent = code + '\n//# sourceURL=sketch.js\n' +
+		['setup', 'update', 'draw', 'drawTop', 'preload'].map(function (n) { return ';if(typeof ' + n + '==="function"){window.' + n + '=' + n + '}'; }).join('');
+	document.head.appendChild(s);
+	// An error in setup() goes through the same handler as any other, so it carries a line number.
+	try { engine.start(); } catch (e) { window.dispatchEvent(new ErrorEvent('error', { error: e, message: e && e.message })); return; }
+	window.parent.postMessage({ source: 'preview-ready' }, '*');
+})();
+</script>
+</body>
+</html>

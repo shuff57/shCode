@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>spaSHial sandbox</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+	* { box-sizing: border-box; }
+	html, body { margin: 0; height: 100%; background: #14151c; color: #f8f8f2; font: 13px system-ui, sans-serif; }
+	body { display: flex; flex-direction: column; }
+	header { display: flex; gap: 10px; align-items: center; padding: 8px 12px; background: #1e1f29; border-bottom: 1px solid #44475a; }
+	h1 { margin: 0; font-size: 15px; color: #ffb86c; }
+	button, select { font: inherit; padding: 5px 12px; border-radius: 4px; border: 1px solid #44475a; background: #282a36; color: #f8f8f2; cursor: pointer; }
+	button.run { background: #2d8a4e; border-color: #2d8a4e; font-weight: 600; }
+	.hint { margin-left: auto; color: #8393c4; }
+	main { flex: 1; display: grid; grid-template-columns: minmax(280px, 40%) 1fr; min-height: 0; }
+	textarea { width: 100%; height: 100%; resize: none; border: 0; border-right: 1px solid #44475a; background: #14151c; color: #f8f8f2; padding: 12px; font: 13px/1.5 ui-monospace, monospace; tab-size: 2; outline: none; }
+	.right { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+	iframe { flex: 1; width: 100%; border: 0; background: #1e1f29; min-height: 0; }
+	#log { height: 120px; overflow: auto; background: #0e0f14; border-top: 1px solid #44475a; padding: 6px 12px; font: 12px/1.5 ui-monospace, monospace; white-space: pre-wrap; }
+	#log .error { color: #ff6e6e; } #log .warn { color: #f1fa8c; } #log .ok { color: #50fa7b; }
+</style>
+</head>
+<body>
+<header>
+	<h1>spaSHial</h1>
+	<button class="run" id="run">&#9654; Run</button>
+	<select id="examples" aria-label="Load an example sketch"><option value="">Examples</option></select>
+	<span class="hint">Ctrl+Enter runs. Click the picture, then use the keyboard.</span>
+</header>
+<main>
+	<textarea id="code" spellcheck="false" aria-label="Sketch code"></textarea>
+	<div class="right">
+		<!-- the same sandbox attributes as components/MoshionPreview.tsx: an opaque origin, no allow-same-origin -->
+		<iframe id="frame" sandbox="allow-scripts allow-downloads allow-modals" allow="autoplay; fullscreen; gamepad; clipboard-write" title="Sketch preview"></iframe>
+		<div id="log" aria-live="polite"></div>
+	</div>
+</main>
+<script>
+const EXAMPLES = {
+'Falling cubes': `// Nothing falls until you turn gravity on.
+function setup() {
+  world.gravity.y = -10;
+  new Floor();
+  new Cube(0, 6, 0).color = 'tomato';
+  new Cube(0.4, 8, 0.2, 1.5).color = 'gold';
+  new Sphere(-1.5, 7, 0, 1).color = 'skyblue';
+  camera.pos = [0, 4, 10];
+  camera.lookAt(0, 1, 0);
+}
+`,
+'All the shapes': `// Six shapes, dropped from the same height.
+function setup() {
+  world.gravity.y = -10;
+  new Floor();
+  const kinds = [Cube, Sphere, Cylinder, Capsule, Cone, Torus];
+  kinds.forEach((Kind, i) => {
+    const a = new Kind(-5 + i * 2, 4 + i * 0.5, 0, 1.2);
+    a.color = ['tomato', 'gold', 'limegreen', 'skyblue', 'orchid', 'orange'][i];
+  });
+  camera.pos = [0, 4, 11];
+  camera.lookAt(0, 1, 0);
+}
+`,
+'A tower of cubes': `// Friction keeps a stack standing. Click the picture and press Space to knock it over.
+function setup() {
+  world.gravity.y = -10;
+  new Floor();
+  for (let layer = 0; layer < 8; layer++) {
+    const c = new Cube(0, 0.5 + layer, 0);
+    c.color = layer % 2 ? 'gold' : 'tomato';
+    c.friction = 0.6;
+  }
+  camera.pos = [6, 5, 9];
+  camera.lookAt(0, 3, 0);
+}
+function update() {
+  if (kb.presses('space')) world.explodeAt(2, 0.5, 0, 6, 8, 0.3);
+}
+`,
+'Through the ring': `// A ball that fits the hole falls through a torus; a bigger one rests on it.
+let ring;
+function setup() {
+  world.gravity.y = -10;
+  new Floor();
+  ring = new Torus(0, 2, 0, 2.4, 0.6, 2.4, 'static');
+  ring.color = 'orchid';
+  new Sphere(0, 7, 0, 0.8).color = 'skyblue';
+  new Sphere(0.2, 10, 0, 1.8).color = 'tomato';
+  camera.pos = [0, 4, 9];
+  camera.lookAt(0, 2, 0);
+}
+`,
+'Walk and jump (WASD + Space)': `// A player that cannot tip over, a camera that follows, and a ground check with a ray.
+let player;
+function setup() {
+  world.gravity.y = -10;
+  new Floor();
+  player = new Cube(0, 2, 0, 1);
+  player.color = 'tomato';
+  player.lockRotation = true;
+  player.friction = 0;
+  for (let i = 0; i < 6; i++) {
+    const step = new Cube(4 + i * 2, 0.5 + i * 0.5, -3, 2, 1 + i, 2, 'static');
+    step.color = '#6272a4';
+  }
+  camera.follow(player, { distance: 9, height: 5 });
+}
+function update() {
+  const speed = 0.12;
+  let dx = 0, dz = 0;
+  if (kb.pressing('a')) dx -= 1;
+  if (kb.pressing('d')) dx += 1;
+  if (kb.pressing('w')) dz -= 1;
+  if (kb.pressing('s')) dz += 1;
+  player.vel.x = dx * speed;
+  player.vel.z = dz * speed;
+  const onGround = world.rayCast(player.pos, [player.x, player.y - 0.6, player.z]);
+  if (kb.presses('space') && onGround) player.applyImpulse(0, 7, 0);
+}
+function drawTop() {
+  fill('white'); textSize(14);
+  text('WASD to move, Space to jump', 12, 12);
+}
+`,
+'Touch verbs': `// A sensor zone ('none') reports overlaps without blocking. Balls turn green inside it.
+let zone, balls;
+function setup() {
+  world.gravity.y = -10;
+  new Floor();
+  zone = new Cube(0, 2, 0, 5, 1, 5, 'none');
+  zone.color = '#50fa7b'; zone.opacity = 0.25;
+  balls = new Group();
+  for (let i = 0; i < 12; i++) {
+    const b = new balls.Asset(random(-2, 2), 4 + i * 1.2, random(-2, 2), 0.6);
+    b.collider = 'dynamic'; b.bounciness = 0.5;
+  }
+  camera.pos = [0, 5, 11];
+  camera.lookAt(0, 1.5, 0);
+}
+function update() {
+  for (const b of balls) b.color = b.overlaps(zone) ? 'limegreen' : 'tomato';
+  if (balls.collides(allAssets)) { /* a ball touched something this frame */ }
+}
+function drawTop() {
+  fill('white'); textSize(14);
+  text('inside the zone: ' + balls.filter((b) => b.overlaps(zone)).length + ' of ' + balls.length, 12, 12);
+}
+`,
+'Rain (performance)': `// Spawns cubes and spheres, culls the ones that fall away, and shows the performance panel.
+let rain;
+function setup() {
+  world.gravity.y = -10;
+  new Floor(30);
+  rain = new Group();
+  showPerf(true);
+  camera.orbit([0, 2, 0], { distance: 16, drag: true });
+}
+function update() {
+  if (frameCount % 3 === 0 && rain.length < 300) {
+    const a = new rain.Asset(random(-4, 4), 14, random(-4, 4), 0.7);
+    a.shape = frameCount % 2 ? 'sphere' : 'box';
+    a.color = ['tomato', 'gold', 'skyblue', 'orchid'][frameCount % 4];
+    a.friction = 0.4;
+  }
+  rain.cull();
+}
+`,
+};
+const $ = (id) => document.getElementById(id);
+const sel = $('examples'), ta = $('code'), frame = $('frame'), log = $('log');
+Object.keys(EXAMPLES).forEach((k) => sel.add(new Option(k, k)));
+const KEY = 'spashial:sandbox:code';
+try { ta.value = localStorage.getItem(KEY) || EXAMPLES['Falling cubes']; } catch { ta.value = EXAMPLES['Falling cubes']; }
+
+function encode(code) {
+	const b64 = btoa(unescape(encodeURIComponent(code)));
+	return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+let run = 0;
+function runIt() {
+	log.textContent = '';
+	try { localStorage.setItem(KEY, ta.value); } catch {}
+	frame.src = './runner.html?code=' + encode(ta.value) + '&r=' + (++run);
+}
+function line(cls, text) { const d = document.createElement('div'); d.className = cls; d.textContent = text; log.appendChild(d); log.scrollTop = log.scrollHeight; }
+window.addEventListener('message', (e) => {
+	if (e.source !== frame.contentWindow) return;
+	const m = e.data || {};
+	if (m.source === 'preview-console') line(m.type === 'error' ? 'error' : m.type === 'warn' ? 'warn' : '', (m.args || []).join(' '));
+	else if (m.source === 'preview-error') { const x = m.error; line('error', `${x.name}: ${x.message}${x.line ? `  (line ${x.line})` : ''}${x.snippet ? `\n    ${x.snippet}` : ''}`); }
+	else if (m.source === 'preview-ready') line('ok', 'running');
+});
+$('run').onclick = runIt;
+sel.onchange = () => { if (sel.value) { ta.value = EXAMPLES[sel.value]; runIt(); sel.value = ''; } };
+ta.addEventListener('keydown', (e) => {
+	if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); runIt(); }
+	if (e.key === 'Tab') { e.preventDefault(); const s = ta.selectionStart; ta.setRangeText('  ', s, ta.selectionEnd, 'end'); }
+});
+runIt();
+</script>
+</body>
+</html>

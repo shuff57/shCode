@@ -95,9 +95,15 @@ declare class Asset {
   debug: boolean;
 
   collider: Collider;
+  /** 0 (no bounce, the default) to 1 (bounces back as high). */
   bounciness: number;
+  /** How much it grips what it slides on. DIFFERS FROM moSHion: the default is 0.5, not 0.
+   *  Two bodies grip with the geometric mean of their frictions, so with moSHion's default of 0
+   *  nothing in a 3D scene would ever stop sliding. */
   friction: number;
+  /** Default 1: a 1-unit cube weighs 1 kg. */
   density: number;
+  /** Setting it overrides density; a static, kinematic or 'none' asset reads 0. */
   mass: number;
   /** DIFFERS FROM moSHion: a cheap way to keep a body upright. true stops it
    *  tipping over (a character); the three axes are `lockRotation.x` etc. */
