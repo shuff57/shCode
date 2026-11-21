@@ -1643,6 +1643,12 @@ Everything else below (the route name, the cards, the pattern-check fallback, th
   (mostly a typo such as "Unkown filament type" that the question accepts). What worked: cards phrased as a QUESTION naming the YES and
   NO forms; a terse statement card ("Calls JSON.parse.") reworded to "Is this true of the student's code: ..."; and never telling
   the model to count only code that "really runs" (it then says a catch block that nothing throws into never runs).
+  **The template's tail must not contradict its card** (2026-11-21): "text inside quotes does not count" was on cards whose answer IS
+  quoted text (1.1.4 "Hello, world!", 1.4.3's `C`, the 1.1.7 phase names), "text inside a comment" on a card counting comments (1.3.19
+  r8), and "any names are fine" on cards about one exact name (1.2.28's renames). 56 tails now say what the card needs (read the quoted
+  text; `${...}` in backticks is code; quotes make a value text; the exact name matters; a descriptive name; spacing is the point).
+  The gate then caught the one wrong call: a card naming a variable the course lets students rename (3.7.22 `prices`, its ACCEPT
+  "renamed" cases) keeps "any names are fine". Before saying a name matters, check the lab's tolerance cases for a rename.
   Review method: list the cells where the model's final verdict and the lab's own pattern check disagree, have them labelled by
   readers who cannot see either verdict, and read a card for its INTENT (2.4.19 r1 prints the non-multiples of 3, so its red is right).
 - **Style variants (2026-11-21).** `python3 scripts/make-format-variants.py` writes `scripts/ci-heldout/variants/<lab>.json` (gitignored): each
