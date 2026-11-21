@@ -1,11 +1,11 @@
-// The gate for a lab's Clef questions (lesson.json `aiCheck.clef`), through the same code path
-// production uses (clefInputs -> Clef -> band -> pattern check for unsure cards).
+// The gate for a lab's fast-check questions (lesson.json `aiCheck.clef`, plus scripts/ci-questions/decision-1.1.json),
+// through the same code path production uses (decisionRequest -> decision-1.1 -> cardsFromDecisionAnswer ->
+// pattern check for unsure cards). Cloudflare Clef is retired (2026-11-21) and this no longer asks it.
 //
-// Not part of `npm test`: every program is a real Workers AI call (about $0.0005 each).
+// Not part of `npm test`: every program is a real CheaperInference call (about $0.00002 each).
 //
-//   cd scripts/clef-proxy && npx wrangler dev --port 8799        # in another terminal
-//   WORKERS_PROXY=http://localhost:8799 node --import ./scripts/register-ts.mjs \
-//     scripts/clef-harness.mjs --lab 2-3-29-a2-3-1-print-settings-advisor [--fixtures f.json] [--tolerance] [--json out.json]
+//   CI_API_KEY=... node --import ./scripts/register-ts.mjs scripts/clef-harness.mjs \
+//     --lab 2-3-29-a2-3-1-print-settings-advisor [--fixtures f.json] [--tolerance] [--json out.json]
 //
 // Always graded: the lab's reference answer (must have NO red card) and its starter (no card green that the
 // lab's pattern check calls red). --fixtures adds labelled programs, a JSON array of {name, code, labels}, where labels
@@ -19,34 +19,24 @@ import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from '
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { grade } from '../lib/grader.ts';
-import { BAND, CLEF_MODEL, cardsFromAnswer, clefInputs, clefTask, resolveClefCards } from '../lib/clef-check-core.ts';
-import { DECISION_BAND, cardsFromDecisionAnswer, decisionModelFor, decisionRequest } from '../lib/decision-check-core.ts';
+import { clefTask, resolveClefCards } from '../lib/clef-check-core.ts';
+import { DECISION_BAND, DECISION_MODEL, cardsFromDecisionAnswer, decisionModelFor, decisionRequest } from '../lib/decision-check-core.ts';
 import { aiCheckText } from '../lib/ai-check.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (n, d) => { const i = process.argv.indexOf('--' + n); return i < 0 ? d : process.argv[i + 1]; };
 const lab = arg('lab');
-// --provider workers (default): Clef through the local wrangler proxy, as production runs it.
-// --provider cheaperinference --model <id>: any decision model on CheaperInference's POST /v1/decisions
-// (jev-1.14.0, pplx-decider-v1.3, ...), key in CI_API_KEY. The same questions, the same state, the same
-// band and pattern fallback; only the model behind them changes. The key is read from the environment
-// and never printed or written to --json.
-// --provider typesafe [--model jev-1.14.0]: TypeSafe's own POST /v1/systemone, key in TYPESAFE_API_KEY. Its
-// request and answer are already Clef's shape (state + noul questions, answers.<id>.noul), so the body is
-// clefInputs() with the model swapped. Billed $0.042 per million input tokens, computed from usage.
+// --model <id>: default decision-1.1, the production model. Another model on CheaperInference's POST /v1/decisions
+// can be tried, with --band (it gets decision-1.1's questions file only if it is a build of decision-1.1). The key is
+// read from CI_API_KEY and never printed or written to --json.
 const bandArg = arg('band') ? arg('band').split(',').map(Number) : null;
 if (bandArg && (bandArg.length !== 2 || !(bandArg[0] > bandArg[1]) || bandArg.some((x) => !(x >= 0 && x <= 1)))) { console.error('--band takes hi,lo with 0 <= lo < hi <= 1, e.g. --band 0.8,0.15'); process.exit(2); }
-const provider = arg('provider', 'workers');
-const modelId = arg('model', provider === 'workers' ? CLEF_MODEL : provider === 'typesafe' ? 'jev-1.14.0' : '');
-const proxy = process.env.WORKERS_PROXY;
+const modelId = arg('model', DECISION_MODEL);
 const ciKey = process.env.CI_API_KEY;
-const tsKey = process.env.TYPESAFE_API_KEY;
 const CI_URL = process.env.CI_URL || 'https://api.cheaperinference.com/v1/decisions';
-const TS_URL = process.env.TYPESAFE_URL || 'https://api.typesafe.ai/v1/systemone';
-if (!lab || (provider === 'workers' && !proxy) || (provider === 'cheaperinference' && (!ciKey || !modelId)) || (provider === 'typesafe' && !tsKey) || !['workers', 'cheaperinference', 'typesafe'].includes(provider)) {
-  console.error('usage: WORKERS_PROXY=http://localhost:8799 node --import ./scripts/register-ts.mjs scripts/clef-harness.mjs --lab <lessonId> [--fixtures f.json] [--json out.json]\n' +
-    '   or: CI_API_KEY=... node --import ./scripts/register-ts.mjs scripts/clef-harness.mjs --provider cheaperinference --model pplx-decider-v1.3 --lab <lessonId> ...\n' +
-    '   or: TYPESAFE_API_KEY=... node --import ./scripts/register-ts.mjs scripts/clef-harness.mjs --provider typesafe --model jev-1.14.0 --lab <lessonId> ...');
+if (!lab || !ciKey || arg('provider', 'cheaperinference') !== 'cheaperinference') {
+  console.error('usage: CI_API_KEY=... node --import ./scripts/register-ts.mjs scripts/clef-harness.mjs --lab <lessonId> [--model decision-1.1] [--band hi,lo] [--fixtures f.json] [--tolerance] [--json out.json]\n' +
+    '(Clef, the old --provider workers, and --provider typesafe are retired.)');
   process.exit(2);
 }
 
@@ -63,13 +53,12 @@ const cfg = {
   kind: lesson.work?.kind === 'plan' ? 'plan' : lesson.preview === 'moshion' ? 'moshion' : 'console',
   questions: Object.fromEntries(Object.entries(authored.questions).map(([k, v]) => [k, String(v).trim()])),
 };
-// --questions-file overrides question wording (and task) per lab without touching lesson.json, which also feeds
-// production Clef: { "<lab>": { "task"?: "...", "questions": { "<card id>": "..." } } }. Cards not named keep
-// the lesson's own wording. This is how a second model gets its own tuned questions.
-// For a build of decision-1.1 on CheaperInference it defaults to scripts/ci-questions/decision-1.1.json, the file
+// --questions-file overrides question wording (and task) per lab without touching lesson.json:
+// { "<lab>": { "task"?: "...", "questions": { "<card id>": "..." } } }. Cards not named keep the lesson's own wording.
+// For a build of decision-1.1 it defaults to scripts/ci-questions/decision-1.1.json, the file
 // production lays over the lesson's own (generate-ai-graders.mjs), so the gate asks what production asks.
 // `--questions-file none` tests the lesson's own wording. A path that does not exist is an error, never skipped.
-const isDecision11 = provider === 'cheaperinference' && !decisionModelFor(modelId).ignored;
+const isDecision11 = !decisionModelFor(modelId).ignored;
 const qfArg = arg('questions-file', isDecision11 ? path.join(root, 'scripts', 'ci-questions', 'decision-1.1.json') : undefined);
 const qf = qfArg === 'none' ? undefined : qfArg;
 if (qf && !existsSync(qf)) { console.error(`--questions-file ${qf} does not exist`); process.exit(2); }
@@ -79,7 +68,7 @@ if (qf) {
   if (o?.task) cfg.task = String(o.task).trim();
 }
 if (!cfg.task) { console.error(`${lab}: no task (add aiCheck.clef.task)`); process.exit(2); }
-// Only the cards Clef answers are scored here; a card that runs the code (`tests`) has no question and
+// Only the cards the model answers are scored here; a card that runs the code (`tests`) has no question and
 // keeps its runtime result in the app, which this harness does not run.
 const ids = lesson.requirements.map((r) => r.id).filter((id) => id in cfg.questions);
 const file = lesson.aiCheck.file ?? 'script.js';
@@ -130,34 +119,14 @@ async function throttle() {
   nextSlot = at + 60000 / ciRpm;
   if (at > Date.now()) await new Promise((r) => setTimeout(r, at - Date.now()));
 }
-// CheaperInference's "sure" lines: --band if given, else decision-1.1's own (DECISION_BAND, as production) for a
-// build of decision-1.1, else Clef's shared BAND for any other model being tried.
-const ciLines = bandArg ? { hi: bandArg[0], lo: bandArg[1] } : isDecision11 ? DECISION_BAND : BAND;
+// The "sure" lines: --band if given, else decision-1.1's own (DECISION_BAND, as production). Another model needs --band.
+if (!bandArg && !isDecision11) { console.error(`${modelId} is not decision-1.1: give it --band hi,lo`); process.exit(2); }
+const ciLines = bandArg ? { hi: bandArg[0], lo: bandArg[1] } : DECISION_BAND;
 
 async function ask(code) {
   for (let attempt = 0; ; attempt++) {
     let j;
-    if (provider === 'workers') {
-      const res = await fetch(proxy, { method: 'POST', body: JSON.stringify({ model: CLEF_MODEL, inputs: clefInputs(cfg, code) }) });
-      j = await res.json().catch(() => ({ ok: false, error: 'bad proxy answer' }));
-      if (j.ok) return { ms: j.ms, cards: cardsFromAnswer(j.out, Object.keys(cfg.questions)), tokens: j.out?.usage?.input_tokens ?? null };
-    } else if (provider === 'typesafe') {
-      const t0 = Date.now();
-      const res = await fetch(TS_URL, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', authorization: `Bearer ${tsKey}` },
-        body: JSON.stringify({ ...clefInputs(cfg, code), model: modelId }),
-      });
-      const body = await res.json().catch(() => null);
-      const ms = Date.now() - t0;
-      if (res.ok && body) {
-        costUsd += ((body.usage?.input_tokens ?? 0) * 0.042) / 1e6;
-        return { ms, cards: cardsFromAnswer(body, Object.keys(cfg.questions)), tokens: body.usage?.input_tokens ?? null };
-      }
-      j = { ok: false, error: `HTTP ${res.status}: ${JSON.stringify(body?.error ?? body ?? 'no body').slice(0, 200)}` };
-      if ([401, 402, 403].includes(res.status)) throw new Error(j.error);
-    } else {
-      // The state is sent as named JSON fields (about / task / student_code), the same content Clef gets.
+    {
       await throttle();
       const t0 = Date.now();
       // The request production sends (decisionRequest), so the gate cannot drift from the route.
@@ -204,9 +173,6 @@ await Promise.all(Array.from({ length: pool }, async () => {
       const a = await ask(aiCheckText(lesson.aiCheck, p.files));
       calls++;
       const report = grade(lesson.requirements, p.files);
-      // --band hi,lo: this model's own "sure" lines (the shared BAND is Clef's). A card between them is unsure
-      // and the pattern check decides it, as always.
-      if (bandArg && provider !== 'cheaperinference') a.cards = a.cards.map((c) => ({ ...c, verdict: c.p === null ? 'unsure' : c.p >= bandArg[0] ? 'met' : c.p <= bandArg[1] ? 'missing' : 'unsure' }));
       const { verdicts, decidedBy } = resolveClefCards(a.cards, report);
       rows.push({ ...p, ...a, verdicts, decidedBy });
     } catch (e) {
@@ -248,8 +214,8 @@ const unsure = rows.filter((r) => !r.error).reduce((s, r) => s + Object.values(r
 const cells = rows.filter((r) => !r.error).length * ids.length;
 const msSorted = rows.filter((r) => !r.error).map((r) => r.ms).sort((a, b) => a - b);
 const median = msSorted.length ? msSorted[Math.floor(msSorted.length / 2)] : null;
-console.log(`\n${lab} [${provider === 'workers' ? CLEF_MODEL : modelId}]: ${ok} ok, ${bad} failing, ${calls} calls; ${unsure}/${cells} cards went to the pattern check ("?")` +
+console.log(`\n${lab} [${modelId}]: ${ok} ok, ${bad} failing, ${calls} calls; ${unsure}/${cells} cards went to the pattern check ("?")` +
   (scored ? `; fixtures ${right}/${scored} cards right (${(100 * right / scored).toFixed(1)}%)` : '') +
-  (median != null ? `; median ${median} ms` : '') + (provider !== 'workers' ? `; billed $${costUsd.toFixed(6)}` : ''));
+  (median != null ? `; median ${median} ms` : '') + `; billed $${costUsd.toFixed(6)}`);
 if (arg('json')) writeFileSync(arg('json'), JSON.stringify(rows, null, 1));
 process.exit(bad || calls === 0 ? 1 : 0);

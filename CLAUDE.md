@@ -1631,8 +1631,7 @@ Everything else below (the route name, the cards, the pattern-check fallback, th
   turn the account's Data Protection mode off.
 - **Questions:** the lesson's `aiCheck.clef.questions` are tuned for Clef; `scripts/ci-questions/decision-1.1.json`
   (`{ "<lesson id>": { "questions": { "<card id>": "..." } } }`) is laid over them by `generate-ai-graders.mjs` (an override for a card
-  the lesson has no question for is a build error). The harness (`scripts/clef-harness.mjs --provider cheaperinference --model
-  decision-1.1`, key in `CI_API_KEY`) is the gate; for a build of decision-1.1 it sends production's own request (`decisionRequest`),
+  the lesson has no question for is a build error). The harness (`scripts/clef-harness.mjs`, decision-1.1 by default, key in `CI_API_KEY`) is the gate; for a build of decision-1.1 it sends production's own request (`decisionRequest`),
   reads the answer with `cardsFromDecisionAnswer`, defaults to that questions file (`--questions-file none` = the lesson's wording; a
   path that does not exist stops it) and to `DECISION_BAND` (`--band hi,lo` overrides). It: 2495/2495
   programs, about 15% of cards left to the pattern check (Clef: 8.3%).
@@ -1666,7 +1665,11 @@ Everything else below (the route name, the cards, the pattern-check fallback, th
 - Tests: `scripts/test-decision-check.mjs` (request, answer, band, `askDecision`, and the real route over a stubbed fetch),
   `scripts/test-clef-check.mjs`.
 
-## Fast Check: Clef decides the cards (`aiCheck.clef`, 2026-11-18)
+## Fast Check before decision-1.1: Clef (`aiCheck.clef`, 2026-11-18 to 2026-11-21, retired)
+
+**Clef is retired and nothing calls it or tests it** (its band, answer reader, harness provider and tests were removed
+2026-11-21). The model, band, gate and questions file are in the section above. What still holds from here: the
+two-step Check, notes on demand, and the lessons for writing questions; the measurements below are Clef's.
 
 A lab whose `aiCheck` carries `clef: { questions: { <requirement id>: "<one yes/no question>" } }` (optional
 `task`, else cut from the aiCheck prompt before "You cannot run their code") gets a two-step Check
@@ -1697,10 +1700,9 @@ card's own words scored 80.9% on 5.1.20 (its cards say "in draw()"; many student
 update(), which also runs every frame). Clef-flash was not repeatable; do not use it.
 
 Adding a lab: write `aiCheck.clef.questions` (one per card; only regex/inFunction cards, since an unsure
-answer falls back to the pattern check; the generator refuses anything else), run
-`generate-ai-graders.mjs`, then the gate:
-`cd scripts/clef-proxy && npx wrangler dev --port 8799` (local Workers AI proxy, never deployed), and
-`WORKERS_PROXY=http://localhost:8799 node --import ./scripts/register-ts.mjs scripts/clef-harness.mjs --lab <id> --fixtures scripts/clef-fixtures/<id>.json`.
+answer falls back to the pattern check; the generator refuses anything else), add a decision-1.1 wording to
+`scripts/ci-questions/decision-1.1.json` where the lesson's does not suit it, run `generate-ai-graders.mjs`, then the gate:
+`CI_API_KEY=... node --import ./scripts/register-ts.mjs scripts/clef-harness.mjs --lab <id> --fixtures scripts/clef-fixtures/<id>.json`.
 Add `--tolerance` to use the lab's ACCEPT / REJECT cases from `test-grader-tolerance.mjs` as fixtures
 (dumped through `TOLERANCE_CASES_OUT`; ACCEPT = every card green, REJECT = its named card red). It fails if
 the reference has a red card, the starter is green where its own pattern check is red (some cards are green
@@ -1767,9 +1769,9 @@ after them 4 false reds remain and all 44 real catches stay red; 6% of programs 
 
 **Coverage: every AI Check lab in the course (302) now has Clef questions**; `test-clef-check.mjs` checks that
 every pattern card in Chapters 1-7 has one and no runtime card does.
-Fixtures are hand-written programs only; real student code never goes in the repo. The same
-`WORKERS_PROXY` makes the dev server run the real clef-check and grade-written handlers against Workers
-AI. Tests: `scripts/test-clef-check.mjs` (npm test). Deploy: nothing to apply (no migration; the `AI`
+Fixtures are hand-written programs only; real student code never goes in the repo. `WORKERS_PROXY`
+(`scripts/clef-proxy`, a local Workers AI proxy) still makes the dev server run the real grade-written handler
+(the notes) against Workers AI; the fast Check's route needs `CHEAPERINFERENCE_API_KEY` instead. Tests: `scripts/test-clef-check.mjs` (npm test). Deploy: nothing to apply (no migration; the `AI`
 binding already exists).
 
 ## AI grader

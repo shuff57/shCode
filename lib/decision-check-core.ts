@@ -15,16 +15,16 @@
 //   - The questions file and DECISION_BAND were measured on decision-1.1 ONLY. Another model needs its own
 //     questions file, its own band and a gate run (scripts/clef-harness.mjs) before production asks it.
 //
-// Pure: no fetch, no DOM. It reuses clef-check-core's state, so a card comes out in the same
+// Pure: no fetch, no DOM. It reuses clef-check-core's checkState, so a card comes out in the same
 // { id, verdict, p } shape and everything downstream (pattern fallback, notes) is unchanged.
 
-import { clefInputs, type ClefCard, type ClefConfig, type ClefVerdict } from './clef-check-core';
+import { checkState, type ClefCard, type ClefConfig, type ClefVerdict } from './clef-check-core';
 
 export const DECISION_URL = 'https://api.cheaperinference.com/v1/decisions';
 export const DECISION_MODEL = 'decision-1.1';
 
 /**
- * This model's own "sure" lines. Clef's shared BAND (0.85 / 0.15, lib/clef-check-core.ts) is NOT changed.
+ * This model's "sure" lines.
  * Measured 2026-11-20 on the 300-lab gate (about 6,000 labelled cells): with the tuned questions, a 0.80 "met"
  * line sends 17.2% of cards to the pattern check, against 21.1% at 0.85, and adds no failing program; below it,
  * confident errors climb (0.75: 9 false greens, 0.70: 14), all on near-miss wrong answers. The "missing" line
@@ -52,8 +52,8 @@ export function decisionRequest(cfg: ClefConfig, code: string, model: string = D
     // nothing, or refused with a 503 (which reads as "offline" below). The account's own mode does the same;
     // this makes the request safe even if that setting is ever changed. A student's code never goes anywhere else.
     zdr: true as const,
-    // The same named fields Clef is given (about / task / student_code), as one string: this API's `input` is text.
-    input: JSON.stringify(clefInputs(cfg, code).state),
+    // The named fields (about / task / student_code), as one string: this API's `input` is text.
+    input: JSON.stringify(checkState(cfg, code)),
     // One yes/no question per card, named by the card's id so the answer maps back without relying on order.
     questions: Object.entries(cfg.questions).map(([name, instructions]) => ({ type: 'predicate' as const, name, instructions })),
   };
@@ -87,7 +87,7 @@ export function cardsFromDecisionAnswer(
 /**
  * One call, as the route would make it. Resolves to the cards, or to `null` for EVERY way it can fail: a 429
  * (the key's per-minute limit), any other non-200, a network error, or an unreadable answer. The route turns
- * `null` into `503 { offline: true }`, exactly as it does for a Clef failure, so the browser runs the slow
+ * `null` into `503 { offline: true }`, so the browser runs the slow
  * Check and a student never sees the fast path fail. `fetchFn` is injected so this stays pure and testable.
  */
 export async function askDecision(

@@ -5,7 +5,6 @@
 // Run: node --import ./scripts/register-ts.mjs scripts/test-decision-check.mjs   (in `npm test`)
 
 import { DECISION_MODEL, DECISION_URL, askDecision, decisionBand, decisionModelFor, decisionRequest, cardsFromDecisionAnswer } from '../lib/decision-check-core.ts';
-import { BAND, band } from '../lib/clef-check-core.ts';
 
 let n = 0, failures = 0;
 const check = (name, got, want) => {
@@ -35,13 +34,12 @@ check('a probability that is not a number is unsure', cardsFromDecisionAnswer({ 
 check('a choice answer is not read as a yes', cardsFromDecisionAnswer({ answers: [{ type: 'choice', name: 'r1', choice: true }] }, ['r1'])[0].verdict, 'unsure');
 check('a whole answer that is not an array is unusable', [cardsFromDecisionAnswer(null, ['r1']), cardsFromDecisionAnswer({ answers: {} }, ['r1']), cardsFromDecisionAnswer('x', ['r1'])], [null, null, null]);
 
-// this model's own band (0.80 / 0.15), distinct from Clef's 0.85 / 0.15
-check('0.80 is met here (it is unsure at Clef\'s 0.85)', [decisionBand(0.8), band(0.8)], ['met', 'unsure']);
+// this model's band (0.80 / 0.15)
+check('0.80 is met', decisionBand(0.8), 'met');
 check('just under 0.80 is unsure', decisionBand(0.799), 'unsure');
 check('0.15 is missing, 0.16 is unsure', [decisionBand(0.15), decisionBand(0.16)], ['missing', 'unsure']);
 check('no number is unsure, never green', [decisionBand(null), decisionBand(NaN)], ['unsure', 'unsure']);
 check('cards from an answer use this model\'s band', cardsFromDecisionAnswer({ answers: [{ type: 'predicate', name: 'r1', probability: 0.82 }] }, ['r1'])[0].verdict, 'met');
-check('Clef\'s own band is untouched', [BAND.hi, BAND.lo], [0.85, 0.15]);
 {
   const near = cardsFromDecisionAnswer({ answers: [{ type: 'predicate', name: 'r1', probability: 0.7996 }, { type: 'predicate', name: 'r2', probability: 0.1504 }] }, ['r1', 'r2']);
   check('banded on the raw probability: 0.7996 is unsure though it shows as 0.8', [near[0].verdict, near[0].p], ['unsure', 0.8]);
