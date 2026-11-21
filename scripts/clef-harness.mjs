@@ -1,11 +1,11 @@
-// The gate for a lab's Clef questions (lesson.json `aiCheck.clef`), through the same code path
-// production uses (clefInputs -> Clef -> band -> pattern check for unsure cards).
+// The gate for a lab's fast-check questions (lesson.json `aiCheck.clef`, plus scripts/ci-questions/decision-1.1.json),
+// through the same code path production uses (decisionRequest -> decision-1.1 -> cardsFromDecisionAnswer ->
+// pattern check for unsure cards). Cloudflare Clef is retired (2026-11-21) and this no longer asks it.
 //
-// Not part of `npm test`: every program is a real Workers AI call (about $0.0005 each).
+// Not part of `npm test`: every program is a real CheaperInference call (about $0.00002 each).
 //
-//   cd scripts/clef-proxy && npx wrangler dev --port 8799        # in another terminal
-//   WORKERS_PROXY=http://localhost:8799 node --import ./scripts/register-ts.mjs \
-//     scripts/clef-harness.mjs --lab 2-3-29-a2-3-1-print-settings-advisor [--fixtures f.json] [--tolerance] [--json out.json]
+//   CI_API_KEY=... node --import ./scripts/register-ts.mjs scripts/clef-harness.mjs \
+//     --lab 2-3-29-a2-3-1-print-settings-advisor [--fixtures f.json] [--tolerance] [--json out.json]
 //
 // Always graded: the lab's reference answer (must have NO red card) and its starter (no card green that the
 // lab's pattern check calls red). --fixtures adds labelled programs, a JSON array of {name, code, labels}, where labels
@@ -19,20 +19,31 @@ import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from '
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { grade } from '../lib/grader.ts';
-import { CLEF_MODEL, cardsFromAnswer, clefInputs, clefTask, resolveClefCards } from '../lib/clef-check-core.ts';
+import { clefTask, resolveClefCards } from '../lib/clef-check-core.ts';
+import { DECISION_BAND, DECISION_MODEL, cardsFromDecisionAnswer, decisionModelFor, decisionRequest } from '../lib/decision-check-core.ts';
 import { aiCheckText } from '../lib/ai-check.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (n, d) => { const i = process.argv.indexOf('--' + n); return i < 0 ? d : process.argv[i + 1]; };
 const lab = arg('lab');
-const proxy = process.env.WORKERS_PROXY;
-if (!lab || !proxy) {
-  console.error('usage: WORKERS_PROXY=http://localhost:8799 node --import ./scripts/register-ts.mjs scripts/clef-harness.mjs --lab <lessonId> [--fixtures f.json] [--json out.json]');
+// --model <id>: default decision-1.1, the production model. Another model on CheaperInference's POST /v1/decisions
+// can be tried, with --band (it gets decision-1.1's questions file only if it is a build of decision-1.1). The key is
+// read from CI_API_KEY and never printed or written to --json.
+const bandArg = arg('band') ? arg('band').split(',').map(Number) : null;
+if (bandArg && (bandArg.length !== 2 || !(bandArg[0] > bandArg[1]) || bandArg.some((x) => !(x >= 0 && x <= 1)))) { console.error('--band takes hi,lo with 0 <= lo < hi <= 1, e.g. --band 0.8,0.15'); process.exit(2); }
+const modelId = arg('model', DECISION_MODEL);
+const ciKey = process.env.CI_API_KEY;
+const CI_URL = process.env.CI_URL || 'https://api.cheaperinference.com/v1/decisions';
+if (!lab || !ciKey || arg('provider', 'cheaperinference') !== 'cheaperinference') {
+  console.error('usage: CI_API_KEY=... node --import ./scripts/register-ts.mjs scripts/clef-harness.mjs --lab <lessonId> [--model decision-1.1] [--band hi,lo] [--fixtures f.json] [--tolerance] [--json out.json]\n' +
+    '(Clef, the old --provider workers, and --provider typesafe are retired.)');
   process.exit(2);
 }
 
 const lf = (s) => String(s).replace(/\r\n?/g, '\n');
-const lesson = JSON.parse(readFileSync(path.join(root, 'lessons', lab, 'lesson.json'), 'utf8'));
+// --lesson-file reads the lesson's JSON from somewhere else (a copy from git, say) while the lab's starter and
+// solution files still come from lessons/<lab>/. The working tree's lesson.json is never touched.
+const lesson = JSON.parse(readFileSync(arg('lesson-file', path.join(root, 'lessons', lab, 'lesson.json')), 'utf8'));
 // The questions, task and kind as the generator builds them (scripts/generate-ai-graders.mjs), read from
 // lesson.json itself so several labs can be edited and tested at once without regenerating in between.
 const authored = lesson.aiCheck?.clef;
@@ -42,8 +53,22 @@ const cfg = {
   kind: lesson.work?.kind === 'plan' ? 'plan' : lesson.preview === 'moshion' ? 'moshion' : 'console',
   questions: Object.fromEntries(Object.entries(authored.questions).map(([k, v]) => [k, String(v).trim()])),
 };
+// --questions-file overrides question wording (and task) per lab without touching lesson.json:
+// { "<lab>": { "task"?: "...", "questions": { "<card id>": "..." } } }. Cards not named keep the lesson's own wording.
+// For a build of decision-1.1 it defaults to scripts/ci-questions/decision-1.1.json, the file
+// production lays over the lesson's own (generate-ai-graders.mjs), so the gate asks what production asks.
+// `--questions-file none` tests the lesson's own wording. A path that does not exist is an error, never skipped.
+const isDecision11 = !decisionModelFor(modelId).ignored;
+const qfArg = arg('questions-file', isDecision11 ? path.join(root, 'scripts', 'ci-questions', 'decision-1.1.json') : undefined);
+const qf = qfArg === 'none' ? undefined : qfArg;
+if (qf && !existsSync(qf)) { console.error(`--questions-file ${qf} does not exist`); process.exit(2); }
+if (qf) {
+  const o = JSON.parse(readFileSync(qf, 'utf8'))[lab];
+  if (o?.questions) for (const [k, v] of Object.entries(o.questions)) if (k in cfg.questions) cfg.questions[k] = String(v).trim();
+  if (o?.task) cfg.task = String(o.task).trim();
+}
 if (!cfg.task) { console.error(`${lab}: no task (add aiCheck.clef.task)`); process.exit(2); }
-// Only the cards Clef answers are scored here; a card that runs the code (`tests`) has no question and
+// Only the cards the model answers are scored here; a card that runs the code (`tests`) has no question and
 // keeps its runtime result in the app, which this harness does not run.
 const ids = lesson.requirements.map((r) => r.id).filter((id) => id in cfg.questions);
 const file = lesson.aiCheck.file ?? 'script.js';
@@ -83,13 +108,57 @@ if (process.argv.includes('--tolerance')) {
   }
 }
 
+let costUsd = 0;
+// CI_RPM caps how many requests per minute THIS process starts (a key has its own per-minute limit; several
+// harnesses running side by side each need their share). Unset = no cap.
+const ciRpm = Number(process.env.CI_RPM || 0);
+let nextSlot = 0;
+async function throttle() {
+  if (!(ciRpm > 0)) return;
+  const at = Math.max(Date.now(), nextSlot);
+  nextSlot = at + 60000 / ciRpm;
+  if (at > Date.now()) await new Promise((r) => setTimeout(r, at - Date.now()));
+}
+// The "sure" lines: --band if given, else decision-1.1's own (DECISION_BAND, as production). Another model needs --band.
+if (!bandArg && !isDecision11) { console.error(`${modelId} is not decision-1.1: give it --band hi,lo`); process.exit(2); }
+const ciLines = bandArg ? { hi: bandArg[0], lo: bandArg[1] } : DECISION_BAND;
+
 async function ask(code) {
   for (let attempt = 0; ; attempt++) {
-    const res = await fetch(proxy, { method: 'POST', body: JSON.stringify({ model: CLEF_MODEL, inputs: clefInputs(cfg, code) }) });
-    const j = await res.json().catch(() => ({ ok: false, error: 'bad proxy answer' }));
-    if (j.ok) return { ms: j.ms, cards: cardsFromAnswer(j.out, Object.keys(cfg.questions)), tokens: j.out?.usage?.input_tokens ?? null };
-    if (attempt === 2) throw new Error(j.error);
-    await new Promise((r) => setTimeout(r, 2000 * (attempt + 1)));
+    let j;
+    {
+      await throttle();
+      const t0 = Date.now();
+      // The request production sends (decisionRequest), so the gate cannot drift from the route.
+      // zdr:true by default: the request is routed only through zero-data-retention providers (or refused
+      // with a 503), whatever the account's own mode. --zdr off sends zdr:false, for models with no ZDR route;
+      // use it only for hand-written fixtures: a student's code must never go through a route that may keep it.
+      const reqBody = { ...decisionRequest(cfg, code, modelId), zdr: arg('zdr') !== 'off' };
+      const res = await fetch(CI_URL, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', authorization: `Bearer ${ciKey}` },
+        body: JSON.stringify(reqBody),
+      });
+      const body = await res.json().catch(() => null);
+      const ms = Date.now() - t0;
+      if (res.ok && body) {
+        const billed = Number(body.billing?.billed_cost_usd ?? 0);
+        if (Number.isFinite(billed)) costUsd += billed;
+        const cards = cardsFromDecisionAnswer(body, Object.keys(cfg.questions), ciLines);
+        if (cards) return { ms, cards, tokens: body.usage?.input_tokens ?? null };
+        // Production reads this as offline (the slow Check runs); here it is retried, then recorded as an ERROR.
+        j = { ok: false, error: 'an answer with no answers list' };
+      } else {
+        j = { ok: false, error: `HTTP ${res.status}: ${body?.error?.message ?? body?.error ?? 'no body'}` };
+        // A rejected key or an empty balance will not heal on a retry: stop at once.
+        if ([401, 402, 403].includes(res.status)) throw new Error(j.error);
+      }
+    }
+    // A 429 is the key's requests-per-minute cap, not a bad answer: wait it out (the window is a minute) and
+    // try again up to six times, so a rate-limited run never records a false ERROR.
+    const limited = String(j.error).startsWith('HTTP 429');
+    if (attempt >= (limited ? 5 : 2)) throw new Error(j.error);
+    await new Promise((r) => setTimeout(r, limited ? 12000 * (attempt + 1) : 2000 * (attempt + 1)));
   }
 }
 
@@ -143,7 +212,10 @@ for (const r of rows) {
 }
 const unsure = rows.filter((r) => !r.error).reduce((s, r) => s + Object.values(r.decidedBy).filter((d) => d === 'pattern').length, 0);
 const cells = rows.filter((r) => !r.error).length * ids.length;
-console.log(`\n${lab}: ${ok} ok, ${bad} failing, ${calls} calls; ${unsure}/${cells} cards went to the pattern check ("?")` +
-  (scored ? `; fixtures ${right}/${scored} cards right (${(100 * right / scored).toFixed(1)}%)` : ''));
+const msSorted = rows.filter((r) => !r.error).map((r) => r.ms).sort((a, b) => a - b);
+const median = msSorted.length ? msSorted[Math.floor(msSorted.length / 2)] : null;
+console.log(`\n${lab} [${modelId}]: ${ok} ok, ${bad} failing, ${calls} calls; ${unsure}/${cells} cards went to the pattern check ("?")` +
+  (scored ? `; fixtures ${right}/${scored} cards right (${(100 * right / scored).toFixed(1)}%)` : '') +
+  (median != null ? `; median ${median} ms` : '') + `; billed $${costUsd.toFixed(6)}`);
 if (arg('json')) writeFileSync(arg('json'), JSON.stringify(rows, null, 1));
 process.exit(bad || calls === 0 ? 1 : 0);

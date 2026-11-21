@@ -1,0 +1,82 @@
+[
+ {
+  "name": "H correct, banana and a",
+  "code": "let word = \"banana\";\nlet count = 0;\nfor (let i = 0; i < word.length; i++) {\n  if (word[i] === \"a\") {\n    count++;\n  }\n}\nconsole.log(count);",
+  "labels": [
+   1,
+   1,
+   1,
+   1
+  ]
+ },
+ {
+  "name": "H counter outside the if",
+  "code": "let word = \"strawberry\";\nlet count = 0;\nfor (let i = 0; i < word.length; i++) {\n  if (word[i] === \"r\") {\n  }\n  count = count + 1;\n}\nconsole.log(count);",
+  "labels": [
+   1,
+   1,
+   0,
+   1
+  ]
+ },
+ {
+  "name": "H logged only inside the loop",
+  "code": "let word = \"strawberry\";\nlet count = 0;\nfor (let i = 0; i < word.length; i++) {\n  if (word[i] === \"r\") {\n    count = count + 1;\n    console.log(count);\n  }\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   0
+  ]
+ },
+ {
+  "name": "H loop goes one past the end",
+  "code": "let word = \"strawberry\";\nlet count = 0;\nfor (let i = 0; i <= word.length; i++) {\n  if (word[i] === \"r\") {\n    count = count + 1;\n  }\n}\nconsole.log(count);",
+  "labels": [
+   0,
+   1,
+   1,
+   1
+  ]
+ },
+ {
+  "name": "H for...of with no index",
+  "code": "let word = \"strawberry\";\nlet count = 0;\nfor (const ch of word) {\n  if (ch === \"r\") {\n    count = count + 1;\n  }\n}\nconsole.log(count);",
+  "labels": [
+   0,
+   0,
+   1,
+   1
+  ]
+ },
+ {
+  "name": "H log only in a comment",
+  "code": "let word = \"strawberry\";\nlet count = 0;\nfor (let i = 0; i < word.length; i++) {\n  if (word[i] === \"r\") {\n    count = count + 1;\n  }\n}\n// console.log(count);",
+  "labels": [
+   1,
+   1,
+   1,
+   0
+  ]
+ },
+ {
+  "name": "H while loop instead of for",
+  "code": "let word = \"strawberry\";\nlet count = 0;\nlet i = 0;\nwhile (i < word.length) {\n  if (word[i] === \"r\") {\n    count = count + 1;\n  }\n  i++;\n}\nconsole.log(count);",
+  "labels": [
+   0,
+   1,
+   1,
+   1
+  ]
+ },
+ {
+  "name": "H count += 1 and a different letter",
+  "code": "let word = \"mississippi\";\nlet count = 0;\nfor (let i = 0; i < word.length; i += 1) {\n  if (word[i] === \"s\") {\n    count += 1;\n  }\n}\nconsole.log(\"s appears \" + count + \" times\");",
+  "labels": [
+   1,
+   1,
+   1,
+   1
+  ]
+ }
+]

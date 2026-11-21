@@ -360,6 +360,8 @@ app.prepare().catch((err) => {
   // against real Workers AI, each over its own in-memory SQLite, so the fast Check and its notes can
   // be tried end to end. Without it grade-written answers 503 as before and clef-check answers 503
   // too, which sends the browser down today's Check path.
+  // The fast Check itself (clef-check) no longer uses Workers AI: it calls CheaperInference with
+  // CHEAPERINFERENCE_API_KEY=ci_live_... in the environment (unset = 503 offline, the slow Check).
   {
     const proxy = process.env.WORKERS_PROXY;
     const { makeD1: makeAiD1 } = await import('./scripts/_d1-sqlite.mjs');
@@ -378,7 +380,7 @@ app.prepare().catch((err) => {
         method: req.method, headers: { 'content-type': 'application/json' },
         ...(req.method === 'GET' ? {} : { body: JSON.stringify(req.body ?? {}) }),
       });
-      const out = await handler({ request, params: {}, data: { email: devIdentity(req), role: devRoleOf(req) }, env: { DB: aiDb, AI, ASSETS: NO_ASSETS } });
+      const out = await handler({ request, params: {}, data: { email: devIdentity(req), role: devRoleOf(req) }, env: { DB: aiDb, AI, ASSETS: NO_ASSETS, CHEAPERINFERENCE_API_KEY: process.env.CHEAPERINFERENCE_API_KEY } });
       res.status(out.status).type(out.headers.get('content-type') || 'application/json').send(await out.text());
     };
     const clef = await import('./functions/api/clef-check.ts');

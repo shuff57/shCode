@@ -4,30 +4,35 @@
 // in about half a second. The browser colours the cards from it at once, decides the unsure ones with
 // the lab's own pattern check, and then asks /api/grade-written for the notes as before.
 //
+// The model is Microsoft decision-1.1 through CheaperInference (lib/decision-check-core.ts), which replaced
+// Cloudflare Clef 2026-11-21. The route keeps its name (the browser and the quota bucket are unchanged).
+// Every request asks for zero data retention.
+//
 // Same trust rule as /api/grade-written: the questions, task and model come from the server's own
 // config (functions/_shared/ai-graders.generated.ts) by lesson id, never from the body. The response
 // text is the only client-controlled field. Without that rule this route would be a free model proxy.
 //
-// Refusals are plain: 503 { offline: true } when there is no Workers AI binding or Clef fails (the
-// browser then runs today's Check unchanged), 404 when the lesson has no Clef questions, 429 past
+// Refusals are plain: 503 { offline: true } when there is no CHEAPERINFERENCE_API_KEY or the model call fails
+// for ANY reason, a 429 from the provider's per-minute limit included (the browser then runs today's Check
+// unchanged), 404 when the lesson has no fast-check questions, 429 past
 // the daily allowance. Its counter is its own bucket in ai_help_usage, so a fast Check never spends
 // a student's grade-written allowance; the notes request still does, exactly as Check did before.
 
 import { loadAiGrader } from '../_shared/aiGraders';
 import { isLessonAccessible, lockedResponse, type SessionData } from '../_shared/lessonAccess';
-import { CLEF_MODEL, cardsFromAnswer, clefInputs } from '../../lib/clef-check-core';
+import { DECISION_MODEL, askDecision, decisionModelFor } from '../../lib/decision-check-core';
 import { MAX_RESPONSE_CHARS } from '../../lib/grade-written-core';
-
-interface WorkersAi {
-  run(model: string, inputs: Record<string, unknown>): Promise<unknown>;
-}
 
 interface Env {
   DB: D1Database;
-  AI?: WorkersAi;
-  /** Per-student daily cap on fast Checks. Default 400: each costs about $0.0005, so this is a runaway stop. */
+  /** Bearer key for CheaperInference (POST /v1/decisions). Unset = the fast Check answers 503 offline. */
+  CHEAPERINFERENCE_API_KEY?: string;
+  /** Optional model id for the fast Check; default `decision-1.1`. Only a build of decision-1.1 (`decision-1.1-<suffix>`)
+   *  is accepted, since the questions and band were measured on it; anything else is ignored (logged). */
+  DECISION_CHECK_MODEL?: string;
+  /** Per-student daily cap on fast Checks. Default 400: each costs about $0.00004, so this is a runaway stop. */
   CLEF_CHECK_DAILY_LIMIT?: string;
-  /** Deploy-wide daily ceiling. Default 40000 (about $20 a day at the measured cost). */
+  /** Deploy-wide daily ceiling. Default 40000 (about $2 a day at the measured cost). */
   CLEF_CHECK_GLOBAL_DAILY_LIMIT?: string;
   ASSETS?: Fetcher;
 }
@@ -36,6 +41,8 @@ type Ctx = EventContext<Env, string, SessionData>;
 
 const BUCKET = 'clef-check';
 const GLOBAL_BUCKET = 'clef-check:global';
+const OFFLINE_BUCKET = 'clef-check:offline';
+const ALL_UNSURE_BUCKET = 'clef-check:all-unsure';
 // Same reserved identity as grade-written: an email never holds a NUL byte.
 const GLOBAL_IDENTITY = '\x00GLOBAL';
 const DEFAULT_DAILY_LIMIT = 400;
@@ -66,6 +73,11 @@ async function bump(db: D1Database, who: string, bucket: string, day: string): P
     .run();
 }
 
+/** One more offline answer today, deploy-wide. Counting must never break the Check, so a failure is swallowed. */
+async function countOffline(db: D1Database, bucket: string): Promise<void> {
+  try { await bump(db, GLOBAL_IDENTITY, bucket, new Date().toISOString().slice(0, 10)); } catch { /* ignore */ }
+}
+
 export const onRequestPost: PagesFunction<Env, string, SessionData> = async (context: Ctx) => {
   const { request, env, data } = context;
 
@@ -87,7 +99,13 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
 
   const cfg = (await loadAiGrader(env, request, lessonId))?.clef;
   if (!cfg) return json({ ok: false, error: 'This lesson has no fast check.', offline: true }, 404);
-  if (!env.AI) return json({ ok: false, error: 'The fast check is not set up on this server.', offline: true }, 503);
+  if (!env.CHEAPERINFERENCE_API_KEY) {
+    // Counted too: a deploy that forgot the secret is the likeliest rollout mistake, and every Check then
+    // quietly runs the slow way.
+    await countOffline(env.DB, OFFLINE_BUCKET);
+    console.error('clef-check: CHEAPERINFERENCE_API_KEY is not set');
+    return json({ ok: false, error: 'The fast check is not set up on this server.', offline: true }, 503);
+  }
 
   if (data.role === 'student') {
     const day = new Date().toISOString().slice(0, 10);
@@ -107,24 +125,27 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
     await bump(env.DB, GLOBAL_IDENTITY, GLOBAL_BUCKET, day);
   }
 
-  let out: unknown;
-  let timer: ReturnType<typeof setTimeout> | undefined;
+  // askDecision returns null for every failure (a 429 from the provider's per-minute limit, a 5xx, a refusal of
+  // the zero-data-retention route, a timeout, a body it cannot read), and the browser then runs today's Check.
+  const { model, ignored } = decisionModelFor(env.DECISION_CHECK_MODEL);
+  if (ignored) console.error(`clef-check: DECISION_CHECK_MODEL is not a build of ${DECISION_MODEL}; asking ${DECISION_MODEL}`);
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), TIMEOUT_MS);
+  let cards: Awaited<ReturnType<typeof askDecision>>;
   try {
-    out = await Promise.race([
-      env.AI.run(CLEF_MODEL, clefInputs(cfg, response)),
-      new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new Error('Clef timed out')), TIMEOUT_MS); }),
-    ]);
-  } catch (e) {
-    console.error('clef-check: model call failed', e instanceof Error ? e.message : e);
-    return json({ ok: false, error: 'The fast check could not answer.', offline: true }, 503);
+    cards = await askDecision((url, init) => fetch(url, init), env.CHEAPERINFERENCE_API_KEY, cfg, response, model, ctl.signal);
   } finally {
-    if (timer !== undefined) clearTimeout(timer);
+    clearTimeout(timer);
   }
-
-  const cards = cardsFromAnswer(out, Object.keys(cfg.questions));
   if (!cards) {
-    console.error('clef-check: unusable answer');
+    // Counted per day so a silent outage (or the key's per-minute limit) is visible: the browser quietly runs the slow
+    // Check, so nothing else would show it. Read it with: SELECT day, count FROM ai_help_usage WHERE unit = 'clef-check:offline'.
+    await countOffline(env.DB, OFFLINE_BUCKET);
+    console.error('clef-check: the decision model could not answer');
     return json({ ok: false, error: 'The fast check could not answer.', offline: true }, 503);
   }
+  // Every card unsure (all refusals, or none answered) is a 200, but the pattern check decides everything, so it is
+  // as good as offline and counted on its own: unit 'clef-check:all-unsure'.
+  if (cards.length > 0 && cards.every((c) => c.verdict === 'unsure' && c.p === null)) await countOffline(env.DB, ALL_UNSURE_BUCKET);
   return json({ ok: true, cards });
 };

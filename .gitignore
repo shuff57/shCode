@@ -92,3 +92,4 @@ bun.lock
 
 # Local guarded SolidCraft preview; generated symlinks, not deploy assets.
 public/solidcraft-preview/
+scripts/ci-heldout/variants/

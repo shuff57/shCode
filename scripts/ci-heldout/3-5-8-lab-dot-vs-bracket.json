@@ -1,0 +1,98 @@
+[
+ {
+  "name": "H correct, own names",
+  "code": "const laptop = { \"screen size\": 15, ram: 8 };\nconsole.log(laptop[\"screen size\"]);\nconst which = \"ram\";\nconsole.log(laptop[which]);\nfor (const k of Object.keys(laptop)) {\n  console.log(k, laptop[k]);\n}",
+  "labels": [
+   1,
+   1,
+   1,
+   1,
+   null,
+   null
+  ]
+ },
+ {
+  "name": "H for...in instead of Object.keys",
+  "code": "const laptop = { \"screen size\": 15, ram: 8 };\nconsole.log(laptop[\"screen size\"]);\nconst which = \"ram\";\nconsole.log(laptop[which]);\nfor (const k in laptop) {\n  console.log(laptop[k]);\n}",
+  "labels": [
+   1,
+   1,
+   0,
+   1,
+   null,
+   null
+  ]
+ },
+ {
+  "name": "H dot access only",
+  "code": "const laptop = { \"screen size\": 15, ram: 8 };\nconsole.log(laptop.ram);",
+  "labels": [
+   0,
+   0,
+   0,
+   0,
+   null,
+   null
+  ]
+ },
+ {
+  "name": "H keys printed but never the values",
+  "code": "const laptop = { \"screen size\": 15, ram: 8 };\nconsole.log(laptop[\"screen size\"]);\nconst which = \"ram\";\nconsole.log(laptop[which]);\nfor (const k of Object.keys(laptop)) {\n  console.log(k);\n}",
+  "labels": [
+   1,
+   1,
+   0,
+   1,
+   null,
+   null
+  ]
+ },
+ {
+  "name": "H variable key read but never printed",
+  "code": "const laptop = { \"screen size\": 15, ram: 8 };\nconsole.log(laptop[\"screen size\"]);\nconst which = \"ram\";\nconst v = laptop[which];",
+  "labels": [
+   1,
+   1,
+   null,
+   0,
+   null,
+   null
+  ]
+ },
+ {
+  "name": "H Object.keys loop inside a function nobody calls",
+  "code": "const laptop = { \"screen size\": 15, ram: 8 };\nconsole.log(laptop[\"screen size\"]);\nconst which = \"ram\";\nconsole.log(laptop[which]);\nfunction show() {\n  for (const k of Object.keys(laptop)) console.log(laptop[k]);\n}",
+  "labels": [
+   1,
+   1,
+   0,
+   1,
+   null,
+   null
+  ]
+ },
+ {
+  "name": "H brackets but the key has no space",
+  "code": "const laptop = { brand: \"X\", ram: 8 };\nconsole.log(laptop[\"ram\"]);\nconst which = \"brand\";\nconsole.log(laptop[which]);\nfor (const k of Object.keys(laptop)) {\n  console.log(k + \": \" + laptop[k]);\n}",
+  "labels": [
+   1,
+   0,
+   1,
+   1,
+   null,
+   null
+  ]
+ },
+ {
+  "name": "H the whole thing inside a comment",
+  "code": "const laptop = { \"screen size\": 15, ram: 8 };\n// console.log(laptop[\"screen size\"]);\n// const which = \"ram\"; console.log(laptop[which]);\n// for (const k of Object.keys(laptop)) console.log(laptop[k]);\nconsole.log(\"done\");",
+  "labels": [
+   0,
+   0,
+   0,
+   0,
+   null,
+   null
+  ]
+ }
+]

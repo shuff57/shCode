@@ -3,14 +3,13 @@
 // binding over SQLite (every migration applied).
 //
 // What it pins down:
-//   1. The band: only a sure answer decides a card; anything else (in between, missing, malformed)
-//      is unsure and goes to the pattern check, never green.
-//   2. The colours: Clef where sure, the pattern check where not. The AI's notes are kept only where
+//   1. (decision-1.1's band and answer reader are in scripts/test-decision-check.mjs; Clef is retired.)
+//   2. The colours: the model where sure, the pattern check where not. The AI's notes are kept only where
 //      the AI agrees with the colour, and never change it.
 //   3. The route reads its questions from the server config, never the body; refuses plainly
 //      (no config 404, no binding 503, outage 503, too long 400); counts its own daily allowance
 //      for students only.
-//   4. grade-written honours `onlyIds` only on a lesson with Clef questions, only as a subset.
+//   4. grade-written honours `onlyIds` only on a lesson with fast-check questions, only as a subset.
 //   5. The three spike labs carry a question for every card.
 //
 // Run: node --import ./scripts/register-ts.mjs scripts/test-clef-check.mjs   (also part of `npm test`)
@@ -21,7 +20,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { makeD1 } from './_d1-sqlite.mjs';
 import {
-  BAND, band, cardsFromAnswer, clefInputs, clefTask, mergeClefNotes, onlyCards, redIds, resolveClefCards, withHints,
+  checkState, clefTask, mergeClefNotes, onlyCards, redIds, resolveClefCards, withHints,
 } from '../lib/clef-check-core.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -31,22 +30,11 @@ const check = (name, got, want) => {
   else { failures++; console.error(`FAIL: ${name}\n  got  ${JSON.stringify(got)}\n  want ${JSON.stringify(want)}`); }
 };
 
-// ---------------------------------------------------------------- 1. the band
-check('at HI is green', band(BAND.hi), 'met');
-check('just under HI is unsure', band(BAND.hi - 0.001), 'unsure');
-check('at LO is red', band(BAND.lo), 'missing');
-check('just over LO is unsure', band(BAND.lo + 0.001), 'unsure');
-check('no number is unsure, never green', [band(null), band(NaN)], ['unsure', 'unsure']);
-check('a whole answer that is not Clef-shaped is unusable', [cardsFromAnswer(null, ['a']), cardsFromAnswer({ x: 1 }, ['a'])], [null, null]);
-check('a card missing from the answer, or out of range, is unsure',
-  cardsFromAnswer({ answers: { a: { noul: 0.99 }, c: { noul: 1.7 } } }, ['a', 'b', 'c']).map((c) => c.verdict),
-  ['met', 'unsure', 'unsure']);
-
 // ---------------------------------------------------------------- 2. colours and notes
 const report = (passed) => ({ results: Object.entries(passed).map(([id, ok]) => ({ id, status: ok ? 'passed' : 'failed' })) });
 const cards = [{ id: 'a', verdict: 'met', p: 0.97 }, { id: 'b', verdict: 'missing', p: 0.02 }, { id: 'c', verdict: 'unsure', p: 0.5 }, { id: 'd', verdict: 'unsure', p: 0.4 }];
 const { verdicts: colours, decidedBy } = resolveClefCards(cards, report({ a: false, b: true, c: true, d: false }));
-check('Clef decides sure cards whatever the pattern check says', [colours.a.passed, colours.b.passed], [true, false]);
+check('the model decides sure cards whatever the pattern check says', [colours.a.passed, colours.b.passed], [true, false]);
 check('the pattern check decides unsure cards', [colours.c.passed, colours.d.passed], [true, false]);
 check('decidedBy says which', decidedBy, { a: 'clef', b: 'clef', c: 'pattern', d: 'pattern' });
 check('an unsure card the pattern check has no result for stays red',
@@ -74,10 +62,10 @@ check('the task is cut from the prompt before "You cannot run their code"',
   clefTask({ questions: {} }, 'Do the thing. You cannot run their code: read it.'), 'Do the thing.');
 check('an authored task wins; a prompt with nothing to cut gives none',
   [clefTask({ questions: {}, task: ' Mine. ' }, 'x'), clefTask({ questions: {} }, 'No marker here.')], ['Mine.', null]);
-const inputs = clefInputs({ task: 'T', kind: 'moshion', questions: { a: 'Is it there?' } }, 'code!');
-check('the Clef body carries the code as data and every question as noul',
-  [inputs.model, inputs.state.student_code, inputs.questions.a, /update\(\)/.test(inputs.state.about)],
-  ['clef', 'code!', { type: 'noul', instructions: 'Is it there?' }, true]);
+const state = checkState({ task: 'T', kind: 'moshion', questions: { a: 'Is it there?' } }, 'code!');
+check('the model is told the engine facts, the task and the code, as data',
+  [state.student_code, state.task, /update\(\)/.test(state.about), Object.keys(state).sort()],
+  ['code!', 'T', true, ['about', 'student_code', 'task']]);
 
 // ---------------------------------------------------------------- 3 + 4. the real handlers
 mkdirSync(path.join(root, 'node_modules', '.pkg-load-cache'), { recursive: true });
@@ -118,7 +106,17 @@ try {
   const seen = [];
   let answer = () => ({ answers: { a: { noul: 0.99 }, b: { noul: 0.5 } }, usage: { input_tokens: 900 } });
   const AI = { async run(model, inputs) { seen.push({ model, inputs }); return answer(model, inputs); } };
-  const env = (extra = {}) => ({ DB: db, ASSETS, AI, CLEF_CHECK_DAILY_LIMIT: '2', OLLAMA_API_KEY: 'unused', OLLAMA_HOST: 'http://127.0.0.1:9', ...extra });
+  // The fast Check calls CheaperInference (decision-1.1) by fetch; every other fetch goes through untouched.
+  const realFetch = globalThis.fetch;
+  const ciSeen = [];
+  let ciAnswer = () => ({ status: 200, body: { answers: [{ type: 'predicate', name: 'a', probability: 0.99 }, { type: 'predicate', name: 'b', probability: 0.5 }] } });
+  globalThis.fetch = async (url, init) => {
+    if (!String(url).includes('cheaperinference.com')) return realFetch(url, init);
+    ciSeen.push({ url: String(url), headers: init.headers, body: JSON.parse(init.body) });
+    const a = ciAnswer();
+    return new Response(JSON.stringify(a.body), { status: a.status });
+  };
+  const env = (extra = {}) => ({ DB: db, ASSETS, AI, CHEAPERINFERENCE_API_KEY: 'test-key', CLEF_CHECK_DAILY_LIMIT: '2', OLLAMA_API_KEY: 'unused', OLLAMA_HOST: 'http://127.0.0.1:9', ...extra });
   const post = async (route, url, body, { role = 'student', email = 'kid@example.test', e = env() } = {}) => {
     const res = await route.onRequestPost({
       request: new Request('https://example.test' + url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }),
@@ -131,10 +129,10 @@ try {
   let r = await post(clefRoute, '/api/clef-check', { lessonId: 'fast', response: code, questions: { a: 'INJECTED' } });
   check('fast Check answers cards in question order with the band applied',
     [r.status, r.body.ok, r.body.cards.map((c) => [c.id, c.verdict])], [200, true, [['a', 'met'], ['b', 'unsure']]]);
-  check('it asks Clef with the SERVER questions, never the body\'s',
-    [seen.at(-1).model, seen.at(-1).inputs.questions.a.instructions, JSON.stringify(seen.at(-1).inputs).includes('INJECTED')],
-    ['@cf/cloudflare/clef', 'SERVER QUESTION A', false]);
-  check('the student code reaches Clef only as state', seen.at(-1).inputs.state.student_code, code);
+  check('it asks decision-1.1 with the SERVER questions, never the body\'s',
+    [ciSeen.at(-1).body.model, ciSeen.at(-1).body.questions[0].instructions, JSON.stringify(ciSeen.at(-1).body).includes('INJECTED')],
+    ['decision-1.1', 'SERVER QUESTION A', false]);
+  check('the student code reaches the model only as state, with zero data retention on', [JSON.parse(ciSeen.at(-1).body.input).student_code, ciSeen.at(-1).body.zdr], [code, true]);
 
   r = await post(clefRoute, '/api/clef-check', { lessonId: 'fast', response: code });
   r = await post(clefRoute, '/api/clef-check', { lessonId: 'fast', response: code });
@@ -147,17 +145,18 @@ try {
     [['clef-check', 2]]);
 
   r = await post(clefRoute, '/api/clef-check', { lessonId: 'plain', response: code }, { email: 'b@example.test' });
-  check('a lesson with no Clef questions is 404 + offline', [r.status, r.body.offline], [404, true]);
-  r = await post(clefRoute, '/api/clef-check', { lessonId: 'fast', response: code }, { email: 'c@example.test', e: env({ AI: undefined }) });
-  check('no binding is 503 + offline', [r.status, r.body.offline], [503, true]);
-  answer = () => { throw new Error('boom'); };
+  check('a lesson with no fast-check questions is 404 + offline', [r.status, r.body.offline], [404, true]);
+  r = await post(clefRoute, '/api/clef-check', { lessonId: 'fast', response: code }, { email: 'c@example.test', e: env({ CHEAPERINFERENCE_API_KEY: undefined }) });
+  check('no key is 503 + offline', [r.status, r.body.offline], [503, true]);
+  ciAnswer = () => ({ status: 429, body: { error: 'rate limit' } });
   r = await post(clefRoute, '/api/clef-check', { lessonId: 'fast', response: code }, { email: 'd@example.test' });
-  check('a Clef outage is 503 + offline, never a grade', [r.status, r.body.ok, r.body.offline], [503, false, true]);
-  answer = () => ({ response: 'not a decision' });
+  check('the provider\'s per-minute 429 is 503 + offline, never a grade', [r.status, r.body.ok, r.body.offline], [503, false, true]);
+  ciAnswer = () => ({ status: 200, body: { response: 'not a decision' } });
   r = await post(clefRoute, '/api/clef-check', { lessonId: 'fast', response: code }, { email: 'e@example.test' });
   check('an answer with no probabilities is 503 + offline', [r.status, r.body.offline], [503, true]);
   r = await post(clefRoute, '/api/clef-check', { lessonId: 'fast', response: 'x'.repeat(9000) }, { email: 'f@example.test' });
   check('code over the size limit is 400 before any model call', r.status, 400);
+  globalThis.fetch = realFetch;
   r = await post(clefRoute, '/api/clef-check', { lessonId: 'fast', response: '   ' }, { email: 'g@example.test' });
   check('empty code is 400', r.status, 400);
 
@@ -165,7 +164,7 @@ try {
   answer = (_m, inputs) => ({ response: JSON.stringify({ criteria: [{ id: 'a', earned: 0, verdict: 'missing', feedback: 'n' }, { id: 'b', earned: 0, verdict: 'missing', feedback: 'n' }], summary: 's', hints: [] }), _prompt: inputs });
   const lastPrompt = () => JSON.stringify(seen.at(-1).inputs.messages);
   r = await post(gradeRoute, '/api/grade-written', { lessonId: 'fast', response: code + ' // long enough to grade', onlyIds: ['b'] }, { email: 'h@example.test' });
-  check('on a Clef lab the notes request grades only the asked cards',
+  check('on a fast-check lab the notes request grades only the asked cards',
     [r.status, r.body.criteria.map((c) => c.id), lastPrompt().includes('Has a loop'), lastPrompt().includes('Logs')], [200, ['b'], false, true]);
   r = await post(gradeRoute, '/api/grade-written', { lessonId: 'plain', response: code + ' // long enough to grade', onlyIds: ['b'] }, { email: 'i@example.test' });
   check('on any other lesson onlyIds is ignored (whole rubric)', [r.status, r.body.criteria.map((c) => c.id)], [200, ['a', 'b']]);
@@ -180,7 +179,7 @@ const gts = readFileSync(path.join(root, 'functions/_shared/ai-graders.generated
 const G = JSON.parse(gts.slice(gts.indexOf('= {') + 2, gts.lastIndexOf(';')));
 for (const id of ['2-3-29-a2-3-1-print-settings-advisor', '5-1-20-moshion-move-keys', '2-2-16-a2-2-1-loop-program']) {
   const g = G[id];
-  check(`${id}: a Clef question for every card, task set`,
+  check(`${id}: a question for every card, task set`,
     [!!g?.clef, g?.rubric.every((r) => (g.clef?.questions[r.id] ?? '').length >= 20), !!g?.clef?.task], [true, true, true]);
 }
 check('5.1.20 is told moSHion engine facts', G['5-1-20-moshion-move-keys'].clef.kind, 'moshion');

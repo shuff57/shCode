@@ -1,0 +1,101 @@
+[
+ {
+  "name": "H correct, book object, template string",
+  "code": "const book = { name: \"Dune\", pages: 412, author: \"Herbert\" };\nconst { name, pages, author } = book;\nconsole.log(`${name} by ${author}, ${pages} pages`);\nfunction describe({ name, pages }) { return name + \" \" + pages; }\nconsole.log(describe(book));",
+  "labels": [
+   1,
+   1,
+   1,
+   null,
+   null
+  ]
+ },
+ {
+  "name": "H no destructuring at all",
+  "code": "const item = { title: \"Pen\", cost: 2, quantity: 10 };\nconsole.log(item.title + \" \" + item.cost + \" \" + item.quantity);\nfunction describe(o) { return o.title + \" x\" + o.quantity; }\nconsole.log(describe(item));",
+  "labels": [
+   0,
+   0,
+   0,
+   null,
+   null
+  ]
+ },
+ {
+  "name": "H only two fields unpacked",
+  "code": "const item = { title: \"Pen\", cost: 2, quantity: 10 };\nconst { title, cost } = item;\nconsole.log(title + \" \" + cost);\nfunction describe({ title, quantity }) { return title + \" x\" + quantity; }\nconsole.log(describe(item));",
+  "labels": [
+   0,
+   1,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "name": "H three unpacked, only two printed, no helper print of the third",
+  "code": "const item = { title: \"Pen\", cost: 2, quantity: 10 };\nconst { title, cost, quantity } = item;\nconsole.log(title, cost);\nfunction describe({ title }) { return title; }\nconsole.log(describe(item));",
+  "labels": [
+   1,
+   1,
+   0,
+   null,
+   null
+  ]
+ },
+ {
+  "name": "H describe takes a plain parameter and unpacks inside",
+  "code": "const item = { title: \"Pen\", cost: 2, quantity: 10 };\nconst { title, cost, quantity } = item;\nconsole.log(title + cost + quantity);\nfunction describe(o) { const { title, quantity } = o; return title + quantity; }\nconsole.log(describe(item));",
+  "labels": [
+   1,
+   0,
+   1,
+   null,
+   null
+  ]
+ },
+ {
+  "name": "H sentence built into a variable then printed",
+  "code": "const item = { title: \"Pen\", cost: 2, quantity: 10 };\nconst { title, cost, quantity } = item;\nconst msg = title + \" costs \" + cost + \" with \" + quantity + \" left\";\nconsole.log(msg);\nfunction describe({ title, cost }) { return title + cost; }\nconsole.log(describe(item));",
+  "labels": [
+   1,
+   1,
+   1,
+   null,
+   null
+  ]
+ },
+ {
+  "name": "H only typeof printed",
+  "code": "const item = { title: \"Pen\", cost: 2, quantity: 10 };\nconst { title, cost, quantity } = item;\nconsole.log(typeof title, typeof cost, typeof quantity);\nfunction describe({ title, quantity }) { return title + quantity; }\nconsole.log(describe(item));",
+  "labels": [
+   1,
+   1,
+   0,
+   null,
+   null
+  ]
+ },
+ {
+  "name": "H renamed while unpacking, no describe",
+  "code": "const item = { title: \"Pen\", cost: 2, quantity: 10 };\nconst { title: t, cost: c, quantity: q } = item;\nconsole.log(t + \" \" + c + \" \" + q);",
+  "labels": [
+   1,
+   0,
+   1,
+   null,
+   null
+  ]
+ },
+ {
+  "name": "H unpacking only in a comment",
+  "code": "// const { title, cost, quantity } = item;\nconst item = { title: \"Pen\", cost: 2, quantity: 10 };\nconsole.log(item.title + item.cost + item.quantity);\nfunction describe({ title, quantity }) { return title + quantity; }\nconsole.log(describe(item));",
+  "labels": [
+   0,
+   1,
+   0,
+   null,
+   null
+  ]
+ }
+]

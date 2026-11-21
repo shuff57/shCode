@@ -237,6 +237,8 @@ Cloudflare dashboard env vars pane (plain vars):
 | `GRADE_WRITTEN_DAILY_LIMIT` | var (optional) | Per-student daily submission cap for `POST /api/grade-written`; default `100` (was 30; two students hit 30 on 2026-10-29). Teachers/admins are exempt. `GET /api/grade-written` returns `quota {limit, used, remaining}` for a student and `components/GradeQuotaNote.tsx` shows it beside the attempt banner, so the cap is never a surprise. A dashboard value of this var overrides the default. A runaway-cost stop, not a pedagogical one — the course allows unlimited retries, so raise it rather than let a student hit it. |
 | `GRADE_WRITTEN_GLOBAL_DAILY_LIMIT` | var (optional) | GLOBAL per-deploy daily ceiling for `POST /api/grade-written`; default `10000`. Same backstop as `AI_HELP_GLOBAL_DAILY_LIMIT`, for the grader. |
 | `GRADE_WRITTEN_WORKERS_MODEL` | var (optional) | Workers AI model id for every AI call (grader, Check, tutor); default `@cf/google/gemma-4-26b-a4b-it`. Only read when the `AI` binding exists. |
+| `CHEAPERINFERENCE_API_KEY` | secret | Bearer key (`ci_live_...`) for the fast Check's model, Microsoft `decision-1.1` through CheaperInference (`POST /api/clef-check`, which replaced Cloudflare Clef 2026-11-21). Unset = that route answers 503 `offline`, and every Check runs the slow way. Every request carries `zdr: true`. |
+| `DECISION_CHECK_MODEL` | var (optional) | Model id for the fast Check; default `decision-1.1`. Only a build of decision-1.1 (`decision-1.1-<suffix>`) is used: the questions file and the band were measured on it, so any other id is ignored (logged) and decision-1.1 is asked. Another model needs its own questions, band and gate run first. |
 | `CLEF_CHECK_DAILY_LIMIT` | var (optional) | Per-student daily cap on the fast Check (`POST /api/clef-check`); default `400`. Its own bucket, so it never spends the grade-written allowance. Over it the browser quietly runs the slow Check instead. Teachers/admins exempt. |
 | `CLEF_CHECK_GLOBAL_DAILY_LIMIT` | var (optional) | Deploy-wide daily ceiling on fast Checks; default `40000` (about $20 a day at the measured cost). |
 | `OPENROUTER_API_KEY` | secret | Bearer key for `POST /api/p5play-convert` only (OpenRouter). Unset = that route answers 503 "not set up"; nothing else uses it. |
@@ -1615,7 +1617,59 @@ quizzes stay a plain percent; practice a student had already skipped is not held
   point, largest +8; the median student's missing count stays 6. 20 plan labs, 337 finished rows to backfill.
 - Tests: `scripts/test-grading-v2.mjs` (npm test; both switch positions; three safeguards mutation-checked).
 
-## Fast Check: Clef decides the cards (`aiCheck.clef`, 2026-11-18)
+## Fast Check: Microsoft decision-1.1 decides the cards (`aiCheck.clef`; Clef retired 2026-11-21)
+
+**Model swap, 2026-11-21 (owner's decision).** The fast Check no longer calls Cloudflare Clef. `functions/api/clef-check.ts` calls
+Microsoft `decision-1.1` through CheaperInference (`POST https://api.cheaperinference.com/v1/decisions`, secret
+`CHEAPERINFERENCE_API_KEY`; rules in `lib/decision-check-core.ts`: request, answer reader, `DECISION_BAND` 0.80 / 0.15, `askDecision`).
+Everything else below (the route name, the cards, the pattern-check fallback, the quota bucket, notes on demand) is unchanged; read
+"Clef" in the text below as "the decision model". Only the fast Check moved: the issue-report "already known?" check still uses Clef.
+- **Data leaves Cloudflare.** The student's code goes to CheaperInference, then the serving provider. Every request asks `zdr: true`
+  (zero data retention, routed only through providers that keep nothing, else 503 = offline) and the account's Data Protection mode
+  is on. The owner accepted this having read CheaperInference's terms (2026-11-17): without ZDR it retains request content until
+  deleted on request; its Terms 4.6 say do not submit "children's data"; the serving provider's retention is not stated. Do not
+  turn the account's Data Protection mode off.
+- **Questions:** the lesson's `aiCheck.clef.questions` are tuned for Clef; `scripts/ci-questions/decision-1.1.json`
+  (`{ "<lesson id>": { "questions": { "<card id>": "..." } } }`) is laid over them by `generate-ai-graders.mjs` (an override for a card
+  the lesson has no question for is a build error). The harness (`scripts/clef-harness.mjs`, decision-1.1 by default, key in `CI_API_KEY`) is the gate; for a build of decision-1.1 it sends production's own request (`decisionRequest`),
+  reads the answer with `cardsFromDecisionAnswer`, defaults to that questions file (`--questions-file none` = the lesson's wording; a
+  path that does not exist stops it) and to `DECISION_BAND` (`--band hi,lo` overrides). It: 2495/2495
+  programs, about 15% of cards left to the pattern check (Clef: 8.3%).
+- **The gate misses generic wording.** Measured on 4,000 real handed-in programs: cards still on the lesson's generic wording
+  ("Answer yes only if this is fully done") gave confident false reds in the debug labs that no fixture showed. Write per-card questions
+  that name the YES and the NO forms, and check a new lab against real work (blind-reviewed disagreements), not only the gate.
+  Reviewed rounds on 4,000 real programs took the model's false reds from 168 to 3 (of 15,925 cards) and left 12 false greens
+  (mostly a typo such as "Unkown filament type" that the question accepts). What worked: cards phrased as a QUESTION naming the YES and
+  NO forms; a terse statement card ("Calls JSON.parse.") reworded to "Is this true of the student's code: ..."; and never telling
+  the model to count only code that "really runs" (it then says a catch block that nothing throws into never runs).
+  **The template's tail must not contradict its card** (2026-11-21): "text inside quotes does not count" was on cards whose answer IS
+  quoted text (1.1.4 "Hello, world!", 1.4.3's `C`, the 1.1.7 phase names), "text inside a comment" on a card counting comments (1.3.19
+  r8), and "any names are fine" on cards about one exact name (1.2.28's renames). 56 tails now say what the card needs (read the quoted
+  text; `${...}` in backticks is code; quotes make a value text; the exact name matters; a descriptive name; spacing is the point).
+  The gate then caught the one wrong call: a card naming a variable the course lets students rename (3.7.22 `prices`, its ACCEPT
+  "renamed" cases) keeps "any names are fine". Before saying a name matters, check the lab's tolerance cases for a rename.
+  Review method: list the cells where the model's final verdict and the lab's own pattern check disagree, have them labelled by
+  readers who cannot see either verdict, and read a card for its INTENT (2.4.19 r1 prints the non-multiples of 3, so its red is right).
+- **Style variants (2026-11-21).** `python3 scripts/make-format-variants.py` writes `scripts/ci-heldout/variants/<lab>.json` (gitignored): each
+  lab's reference with single-statement bodies unwrapped (no braces), no semicolons, single quotes, braces on their own line, and tab
+  indentation, all labelled met. A variant is kept only if it parses AND `scripts/same-program.mjs` finds it the same program as the reference (syntax
+  trees compared, so a removed `;` that joins two lines or a tab inside a template literal is dropped, not mislabelled; 2026-11-21: 872
+  kept, 88 dropped, all for syntax). The lab list goes to `scripts/ci-heldout/variants/labs.txt`. Run them through the harness with `--fixtures` (one lab at a time, as for the gate). 1,400 variants over
+  264 labs pass. Clicking Check on a correct brace-less program once gave a red card, because the model was unsure and the lab's regex needs a
+  `{`; the style variants are how to look for that before a student does.
+- **How often it falls back:** every offline answer bumps `ai_help_usage` (`unit = 'clef-check:offline'`, one row per day, identity `\x00GLOBAL`),
+  a deploy with no `CHEAPERINFERENCE_API_KEY` included; an answer that refuses or skips EVERY card (a 200, but the pattern check decides
+  everything) bumps `unit = 'clef-check:all-unsure'`. Check both after a rollout.
+- **A 429 from the provider's per-minute limit is 503 `offline`** (the browser runs the slow Check); a classroom burst past the
+  key's limit degrades quietly, it never shows a student an error.
+- Tests: `scripts/test-decision-check.mjs` (request, answer, band, `askDecision`, and the real route over a stubbed fetch),
+  `scripts/test-clef-check.mjs`.
+
+## Fast Check before decision-1.1: Clef (`aiCheck.clef`, 2026-11-18 to 2026-11-21, retired)
+
+**Clef is retired and nothing calls it or tests it** (its band, answer reader, harness provider and tests were removed
+2026-11-21). The model, band, gate and questions file are in the section above. What still holds from here: the
+two-step Check, notes on demand, and the lessons for writing questions; the measurements below are Clef's.
 
 A lab whose `aiCheck` carries `clef: { questions: { <requirement id>: "<one yes/no question>" } }` (optional
 `task`, else cut from the aiCheck prompt before "You cannot run their code") gets a two-step Check
@@ -1646,10 +1700,9 @@ card's own words scored 80.9% on 5.1.20 (its cards say "in draw()"; many student
 update(), which also runs every frame). Clef-flash was not repeatable; do not use it.
 
 Adding a lab: write `aiCheck.clef.questions` (one per card; only regex/inFunction cards, since an unsure
-answer falls back to the pattern check; the generator refuses anything else), run
-`generate-ai-graders.mjs`, then the gate:
-`cd scripts/clef-proxy && npx wrangler dev --port 8799` (local Workers AI proxy, never deployed), and
-`WORKERS_PROXY=http://localhost:8799 node --import ./scripts/register-ts.mjs scripts/clef-harness.mjs --lab <id> --fixtures scripts/clef-fixtures/<id>.json`.
+answer falls back to the pattern check; the generator refuses anything else), add a decision-1.1 wording to
+`scripts/ci-questions/decision-1.1.json` where the lesson's does not suit it, run `generate-ai-graders.mjs`, then the gate:
+`CI_API_KEY=... node --import ./scripts/register-ts.mjs scripts/clef-harness.mjs --lab <id> --fixtures scripts/clef-fixtures/<id>.json`.
 Add `--tolerance` to use the lab's ACCEPT / REJECT cases from `test-grader-tolerance.mjs` as fixtures
 (dumped through `TOLERANCE_CASES_OUT`; ACCEPT = every card green, REJECT = its named card red). It fails if
 the reference has a red card, the starter is green where its own pattern check is red (some cards are green
@@ -1716,9 +1769,9 @@ after them 4 false reds remain and all 44 real catches stay red; 6% of programs 
 
 **Coverage: every AI Check lab in the course (302) now has Clef questions**; `test-clef-check.mjs` checks that
 every pattern card in Chapters 1-7 has one and no runtime card does.
-Fixtures are hand-written programs only; real student code never goes in the repo. The same
-`WORKERS_PROXY` makes the dev server run the real clef-check and grade-written handlers against Workers
-AI. Tests: `scripts/test-clef-check.mjs` (npm test). Deploy: nothing to apply (no migration; the `AI`
+Fixtures are hand-written programs only; real student code never goes in the repo. `WORKERS_PROXY`
+(`scripts/clef-proxy`, a local Workers AI proxy) still makes the dev server run the real grade-written handler
+(the notes) against Workers AI; the fast Check's route needs `CHEAPERINFERENCE_API_KEY` instead. Tests: `scripts/test-clef-check.mjs` (npm test). Deploy: nothing to apply (no migration; the `AI`
 binding already exists).
 
 ## AI grader

@@ -45,6 +45,9 @@ const outFile = path.join(root, 'functions', '_shared', 'ai-graders.generated.ts
 // The old public copy. Remove it so a stale one is never deployed.
 const legacyPublicFile = path.join(root, 'public', 'ai-graders.json');
 
+// Per-card question overrides for the fast Check's model, { "<lesson id>": { "questions": { "<card id>": "..." } } }.
+const DECISION_OVERRIDES = JSON.parse(readFileSync(path.join(here, 'ci-questions', 'decision-1.1.json'), 'utf8'));
+
 const out = {};
 const errors = [];
 
@@ -86,7 +89,14 @@ for (const id of readdirSync(lessonsDir)) {
       // only pattern cards can be the fallback for an unsure answer, so nothing else may carry one.
       if (g.clef !== undefined) {
         const c = g.clef;
-        const qs = c && typeof c.questions === 'object' && c.questions ? c.questions : null;
+        // The questions the fast Check ASKS are the lesson's own, with any per-model override laid over them
+        // (scripts/ci-questions/decision-1.1.json: the lesson wording was tuned for Clef; decision-1.1 needs its
+        // own for some cards, measured on the gate and on real handed-in work). An override only replaces a
+        // question the lesson already has; it never adds a card.
+        const own = c && typeof c.questions === 'object' && c.questions ? c.questions : null;
+        const qs = own
+          ? { ...own, ...Object.fromEntries(Object.entries(DECISION_OVERRIDES[id]?.questions ?? {}).filter(([rid]) => rid in own)) }
+          : null;
         if (!qs) errors.push(`${id}: aiCheck.clef needs a questions object keyed by requirement id`);
         else {
           const rubricIds = g.rubric.map((r) => r.id);
@@ -189,6 +199,12 @@ for (const id of readdirSync(lessonsDir)) {
   }
 }
 
+// An override that matches no card is a typo or a retired card: say so rather than silently asking the lesson's wording.
+for (const [lab, o] of Object.entries(DECISION_OVERRIDES)) {
+  for (const rid of Object.keys(o.questions ?? {})) {
+    if (!out[lab]?.clef?.questions || !(rid in out[lab].clef.questions)) errors.push(`scripts/ci-questions/decision-1.1.json: ${lab} ${rid} matches no aiCheck.clef question`);
+  }
+}
 if (errors.length) {
   console.error('generate-ai-graders: FAILED');
   for (const e of errors) console.error('  ' + e);
