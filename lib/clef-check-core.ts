@@ -25,6 +25,12 @@ export interface ClefAuthored {
   questions: Record<string, string>;
   /** What the student was asked to do. Absent: the aiCheck prompt up to "You cannot run their code". */
   task?: string;
+  /**
+   * Pattern cards with no question: the lab's own check decides them, like a card that runs the code. For a
+   * card that compares a value ("a number other than the starter's"), where Clef only gets values right
+   * that its question names and the regex gets any value right.
+   */
+  patternOnly?: string[];
 }
 
 /** What the server holds (functions/_shared/ai-graders.generated.ts), built by generate-ai-graders.mjs. */

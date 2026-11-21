@@ -103,7 +103,21 @@ for (const id of readdirSync(lessonsDir)) {
           // Every PATTERN card needs a question. A card that runs the code (`tests`) keeps its runtime result
           // and takes none: Clef reads code, it does not run it.
           const isPattern = (rid) => { const q = (lesson.requirements || []).find((r) => r.id === rid); return !q || !q.type || q.type === 'regex' || q.type === 'inFunction'; };
-          for (const rid of rubricIds) if (isPattern(rid) && !(rid in qs)) errors.push(`${id}: aiCheck.clef has no question for ${rid}`);
+          // `patternOnly`: pattern cards the lab's own check decides, never Clef. For a card whose rule is a
+          // comparison of a value ("a number other than the starter's") Clef was measured wrong on values the
+          // question did not name, while the regex handled any value (scripts/test-clef-check.mjs, 5.1.18 r3).
+          let patternOnly = [];
+          if (c.patternOnly !== undefined) {
+            if (!Array.isArray(c.patternOnly) || c.patternOnly.some((x) => typeof x !== 'string')) errors.push(`${id}: aiCheck.clef.patternOnly must be an array of requirement ids`);
+            else patternOnly = c.patternOnly;
+          }
+          for (const rid of patternOnly) {
+            if (!rubricIds.includes(rid)) errors.push(`${id}: aiCheck.clef.patternOnly ${rid} matches no aiCheck rubric id`);
+            else if (!isPattern(rid)) errors.push(`${id}: aiCheck.clef.patternOnly ${rid} is not a regex or inFunction card`);
+            if (rid in qs) errors.push(`${id}: aiCheck.clef ${rid} is in patternOnly and has a question; pick one`);
+          }
+          for (const rid of rubricIds) if (isPattern(rid) && !(rid in qs) && !patternOnly.includes(rid)) errors.push(`${id}: aiCheck.clef has no question for ${rid}`);
+          if (!Object.keys(qs).length) errors.push(`${id}: aiCheck.clef has no questions; a lab that leaves every card to its pattern check should have no clef block`);
           for (const [rid, q] of Object.entries(qs)) {
             if (!rubricIds.includes(rid)) errors.push(`${id}: aiCheck.clef question ${rid} matches no aiCheck rubric id`);
             if (typeof q !== 'string' || q.trim().length < QUESTION_MIN || q.trim().length > QUESTION_MAX) {
