@@ -1,9 +1,10 @@
 // In-app shPlay reference for the AI help endpoint.
-// Reuses DocSection / DocPage / RelevantDoc types from q5play-docs.
+// Reuses DocSection from docs-core and RelevantDoc from moshion-docs (q5play-docs is gone).
 // 13 sections cover all Unit 3 Module Phase 0 APIs.
 // Bodies are stubs here; content is enriched per-module during Waves 1–13.
 
-import type { DocSection, RelevantDoc } from './q5play-docs';
+import type { DocSection } from './docs-core';
+import type { RelevantDoc } from './moshion-docs';
 
 export type { DocSection, RelevantDoc };
 
