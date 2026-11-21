@@ -1,0 +1,15 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Jolt in the sandbox</title>
+<body style="font:14px monospace;background:#111;color:#ddd">
+<p>Parent page. The iframe below uses the SAME sandbox attributes as components/MoshionPreview.tsx
+(<code>allow-scripts allow-downloads allow-modals</code>, no allow-same-origin), so it has an opaque origin.</p>
+<pre id="out">waiting...</pre>
+<iframe id="f" sandbox="allow-scripts allow-downloads allow-modals" src="/child.html" style="width:300px;height:100px;border:1px solid #444"></iframe>
+<script>
+  window.__result = null;
+  addEventListener('message', (e) => {
+    window.__result = e.data;
+    document.getElementById('out').textContent = JSON.stringify(e.data, null, 2);
+  });
+</script>

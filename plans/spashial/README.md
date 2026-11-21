@@ -23,7 +23,7 @@ changed yet.
 
 | Decision | Choice | Why |
 | --- | --- | --- |
-| Renderer | three.js on **WebGL2** | Runs on the Ultra 7 and on Chromebooks from one code path. The headless browser here has no WebGPU, and shallot (WebGPU-only, Rust/wasm, 14 MB package) failed its first spike. WebGPU can come later **behind the same API**. |
+| Renderer | three.js on **WebGL2** | Runs on the Ultra 7 and on Chromebooks from one code path. The headless browser here has no WebGPU. WebGPU can come later **behind the same API**. Shallot (WebGPU-only) is not ruled out on size: see "Shallot, measured". |
 | Name of a 3D object | **`Asset`** (owner's choice, 2026-11-21) | `Body` is the obvious word but collides with the DOM's global `Body` interface (the fetch mixin): `class Body` merges with it and every object grows `.text()`/`.json()` in editor typings. `Asset` is free in the DOM and in moSHion. **Caution:** shCode already says "assets" for Library items (pictures, sounds, fonts, models; `/api/games/[id]/assets`, `itemAssets.ts`), so a sentence like "the game's assets" is now ambiguous. Docs should say "Library items" for the files. |
 | Gravity | **Off** by default (owner's choice) | Like moSHion: `world.gravity.y = -10` makes things fall. |
 | Torus | Real collider, **kept** (owner's choice) | A ring of 16 capsules; see "Torus collider" below. Neither library has a torus primitive. |
@@ -90,8 +90,8 @@ be slower than this machine, so treat it as an upper bound until measured there.
   Physics is CPU-bound and is meaningful; rendering needs a real Ultra 7 box.
 - Anything on the Ultra 7 or a Chromebook. Re-run `node bench.mjs` there; the
   script writes `results.json` with the machine's CPU.
-- Jolt running in the browser (only Node was tested), including the build with a
-  separate `.wasm` file. See the integration notes.
+- Jolt in a browser on the target machines. It was tested in headless Chrome 157
+  on this one (see "Jolt in the sandbox"), not on the Ultra 7 or a Chromebook.
 
 ### What Jolt is
 
@@ -118,6 +118,57 @@ along the major circle. With R = 1, tube r = 0.3, N = 16:
 Accuracy (ring error, m, at R = 1): 0.034 at N = 12, 0.019 at N = 16, 0.009 at N = 24.
 N = 16 is the default in the spec. Rapier has compound shapes as well, but this
 was only tried in Jolt.
+
+## Jolt in the sandbox (`scripts/spashial-bench/browser/`)
+
+The real test of the choice: Jolt's separate-`.wasm` build (`jolt-physics.wasm.js`
++ `.wasm`, single-threaded, so no SharedArrayBuffer or COOP/COEP headers needed)
+loaded and run inside an iframe with the exact attributes of
+`components/MoshionPreview.tsx` (`allow-scripts allow-downloads allow-modals`).
+`serve.mjs` serves it like Cloudflare Pages would. Headless Chrome 157, this machine.
+
+- **Without CORS headers it does not load.** `Access-Control-Allow-Origin` absent
+  gives `Access to script ... from origin 'null' has been blocked by CORS policy`.
+  This is the failure predicted from the `/reshape/kernel/*` precedent, reproduced.
+- **With the two headers it works.** Three runs, all with `self.origin === 'null'`
+  and `localStorage` throwing (so the sandbox really was on; note `location.origin`
+  is derived from the URL and says otherwise, so do not test with that):
+  the 105-box pyramid stood (0 boxes moved), nothing escaped the bin, no console errors.
+- Load + init 174-310 ms. Pyramid step 1.2-1.5 ms mean. 400 awake bodies
+  2.9-4.0 ms mean (Node gave 2.9 ms), so the Node numbers carry over to the browser
+  within noise on this machine.
+- Headers needed on whatever folder holds the files (same two as `/reshape/kernel/*`):
+
+      /spashial/vendor/*
+        Access-Control-Allow-Origin: *
+        Cross-Origin-Resource-Policy: cross-origin
+
+  Cloudflare Pages serves `.wasm` as `application/wasm`. Not applied to
+  `public/_headers` yet: where the files live is undecided (below).
+- Not tested: a strict CSP (the site sets none in `_headers` or the middleware, so
+  none applies today), the Ultra 7, a Chromebook, Safari or Firefox.
+
+## Shallot, measured (`~/Documents/GitHub/shallot`, v0.10.5 / 0.11.0-next.1)
+
+An earlier note called it a "14 MB package". That is the npm tarball (sources,
+tests, 30 examples), not what a game ships. Built from its own examples, gzipped:
+
+| | gzip |
+| --- | --- |
+| minimal example (renderer + ECS, no physics) | 0.71 MB |
+| physics example (adds physics, plus a Svelte UI and a font) | 2.1 MB |
+| of which its physics solver wasm (1.22 MB raw) | 0.45 MB |
+| for comparison: Jolt wasm + JS, and three.js | 0.88 MB + 0.19 MB = 1.07 MB |
+
+So size does not separate them: shallot's solver is smaller than Jolt's, and a
+whole shallot game is comparable to Jolt plus three.js. What does separate them:
+shallot is **WebGPU-only** (unproven on school Chromebooks; the headless browser
+here cannot run it), pre-1.0 with frequent API changes, and would need a beginner
+facade over its ECS. Its physics is a Box3D port (Box2D's author), the same
+lineage as moSHion's planck, which may make behaviour feel familiar. Its physics
+speed and stacking were **not benchmarked**. Open: add it to `bench.mjs` and test
+its WebGPU render on the Ultra 7 and a Chromebook before deciding. This does not
+change the work done against `spashial.d.ts`, which is the seam either way.
 
 ## Integration facts that bite (found while checking)
 
@@ -153,8 +204,11 @@ was only tried in Jolt.
 ## Next steps
 
 1. Run the benchmark on the real Ultra 7 desktop, and a Chromebook if one is handy.
-2. Run Jolt in a browser, inside a sandboxed iframe, from `public/` with the
-   header entry above. This is the real test of the choice.
+2. Decide how Jolt's files reach `public/`: commit them (about 3 MB raw: 2.0 MB
+   wasm + 0.97 MB JS, versus the 1.2 MB three.js already committed), or copy
+   them from `node_modules` at prebuild like `public/reshape/kernel/` is. Then
+   add the `_headers` entry above. (Running Jolt in a sandboxed browser iframe
+   is done: see "Jolt in the sandbox".)
 3. Build the engine core against `spashial.d.ts`: world, `Asset`, `Group`, the
    touch verbs, `update()` at a fixed step, a perf HUD and the render-scale
    fallback. Then assets, then the Sandbox mode (which needs a migration for the
