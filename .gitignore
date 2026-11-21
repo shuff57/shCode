@@ -56,6 +56,9 @@ grader-tolerance-audit.txt
 public/reshape/kernel/
 public/reshape/kernel-cors-control.js
 
+# Copied from node_modules by scripts/build-spashial-vendor.mjs (Jolt wasm + three.js).
+public/spashial/vendor/
+
 # evolver agent data (untracked by design, see _workspace/README.md)
 _workspace/
 
