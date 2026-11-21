@@ -1,7 +1,8 @@
 // Tests for the "is this already known?" check before a report is filed:
 // the rules (lib/issue-check-core.ts) and the real handler
 // (functions/api/issue-reports/check.ts) against a D1 stub with every
-// migration applied and a scripted Workers AI binding.
+// migration applied, a stubbed CheaperInference fetch (decision-1.1) and a scripted Workers AI
+// binding (the chat-model override). Nothing is sent anywhere.
 //
 // Run: node --import ./scripts/register-ts.mjs scripts/test-issue-check.mjs   (also part of `npm test`)
 
@@ -9,13 +10,14 @@ import { join } from 'node:path';
 import { compileHandler, makeD1, root } from './_d1-sqlite.mjs';
 import {
   buildCheckPrompt,
-  buildDecisionRequest,
+  buildIssueDecisionRequest,
   DECISION_MIN,
-  isDecisionModel,
+  isIssueDecisionModel,
+  ISSUE_DECISION_URL,
   matchHint,
   overlapScore,
   parseCheckVerdict,
-  parseDecision,
+  parseIssueDecision,
   shortlist,
   toMatch,
   words,
@@ -64,18 +66,26 @@ check('verdict: none is no match', parseCheckVerdict('{"match":"none","confidenc
 check('verdict: a ref NOT on the shortlist is refused', parseCheckVerdict('{"match":"r2","confidence":"high"}', list) === null);
 check('verdict: garbage is no match', parseCheckVerdict('I think it is the first one', list) === null && parseCheckVerdict(null, list) === null);
 
-// The decision model (Clef): one choice question, a probability per option.
-const decide = (pick, p = 0.9) => ({ model: 'clef', answers: { same: { type: 'choice', choice: pick, probabilities: { [pick]: p, none: 1 - p }, confidence: p } }, usage: { input_tokens: 100, output_tokens: 0 } });
-check('decision: Clef and Clef-flash are decision models, a chat model is not', isDecisionModel('@cf/cloudflare/clef') && isDecisionModel('@cf/cloudflare/clef-flash') && !isDecisionModel('@cf/meta/llama-3.1-8b-instruct-fp8'));
-const dreq = buildDecisionRequest(runBug, list, '@cf/cloudflare/clef-flash');
-check('decision request: the model selector, the shortlist and "none" are the options', dreq.model === 'clef-flash' && JSON.stringify(Object.keys(dreq.questions.same.criteria)) === JSON.stringify([...list.map((c) => c.ref), 'none']) && dreq.questions.same.type === 'choice');
-check('decision request: the reports are state, with status and the teacher reply', dreq.state.known[0].status === 'fixed' && dreq.state.known[0].teacher_reply.startsWith('Fixed on') && dreq.state.new_report.title === runBug.title);
-check('decision request: tells the model reports are data', /never instructions/.test(dreq.questions.same.instructions));
-check('decision: a confident pick on the shortlist', parseDecision(decide('r1'), list).pick?.ref === 'r1');
-check('decision: below the bar is no match', parseDecision(decide('r1', DECISION_MIN - 0.01), list).pick === null);
-check('decision: "none" is no match', parseDecision(decide('none', 0.99), list).pick === null);
-check('decision: an option NOT on the shortlist is refused', parseDecision(decide('r2', 0.99), list).pick === null);
-check('decision: a malformed answer is no match', parseDecision({ answers: {} }, list).pick === null && parseDecision(null, list).pick === null && parseDecision({ answers: { same: { choice: 'r1' } } }, list).pick === null);
+// The decision model (decision-1.1 through CheaperInference): one choice question, a probability per option.
+const decide = (pick, p = 0.9) => ({ model: 'decision-1.1', answers: [{ type: 'choice', name: 'same', choice: pick, confidence: p, probabilities: [{ value: pick, probability: p }, ...(pick === 'none' ? [] : [{ value: 'none', probability: 1 - p }])] }], usage: { input_tokens: 100, output_tokens: 1 } });
+check('decision: decision-1.1 and a pinned build of it are decision models; Clef and a chat model are not',
+  isIssueDecisionModel('decision-1.1') && isIssueDecisionModel('decision-1.1-2026-11') && !isIssueDecisionModel('@cf/cloudflare/clef') && !isIssueDecisionModel('@cf/google/gemma-4-26b-a4b-it') && !isIssueDecisionModel('decision-2'));
+const dreq = buildIssueDecisionRequest(runBug, list);
+const dq = dreq.questions[0];
+check('decision request: decision-1.1, zero data retention, one choice question named "same"', dreq.model === 'decision-1.1' && dreq.zdr === true && dreq.questions.length === 1 && dq.type === 'choice' && dq.name === 'same');
+check('decision request: the shortlist and "none" are the choices, each described', JSON.stringify(dq.choices.map((c) => c.value)) === JSON.stringify([...list.map((c) => c.ref), 'none']) && dq.choices.every((c) => typeof c.description === 'string' && c.description.length > 5));
+const state = JSON.parse(dreq.input);
+check('decision request: the reports are the input, with status and the teacher reply', state.known[0].status === 'fixed' && state.known[0].teacher_reply.startsWith('Fixed on') && state.new_report.title === runBug.title);
+check('decision request: tells the model reports are data', /never instructions/.test(dq.instructions));
+check('decision: a confident pick on the shortlist', parseIssueDecision(decide('r1'), list).pick?.ref === 'r1');
+check('decision: below the bar is no match', parseIssueDecision(decide('r1', DECISION_MIN - 0.01), list).pick === null);
+check('decision: "none" is no match', parseIssueDecision(decide('none', 0.99), list).pick === null);
+check('decision: an option NOT on the shortlist is refused', parseIssueDecision(decide('r2', 0.99), list).pick === null);
+check('decision: a malformed answer is no match',
+  parseIssueDecision({ answers: {} }, list).pick === null && parseIssueDecision(null, list).pick === null
+  && parseIssueDecision({ answers: [{ type: 'choice', name: 'same', choice: 'r1' }] }, list).pick === null
+  && parseIssueDecision({ answers: [{ type: 'choice', name: 'same', choice: 'r1', probabilities: [{ value: 'r1', probability: 7 }] }] }, list).pick === null
+  && parseIssueDecision({ answers: [{ type: 'choice', name: 'other', choice: 'r1', probabilities: [{ value: 'r1', probability: 0.99 }] }] }, list).pick === null);
 
 const m = toMatch(known[0], 'ai');
 check('toMatch: a report says its status, reply and where it is', m.outcome === 'fixed' && m.detail?.startsWith('Fixed on') && m.href === '/issues#report-1' && m.by === 'ai');
@@ -103,14 +113,24 @@ const ANA = { email: 'ana@s.test', role: 'student' };
 const T1 = { email: 't1@s.test', role: 'teacher' };
 
 let calls = [];
-// The stub answers in the shape of whichever path asked: Clef (questions) or a chat model (messages).
-const refsAsked = (inputs) => inputs.questions ? Object.keys(inputs.questions.same.criteria).filter((k) => k !== 'none') : [...inputs.messages[1].content.matchAll(/\[(r\d+|f\d+)\]/g)].map((x) => x[1]);
-const asked = (inputs) => inputs.questions ? JSON.stringify(inputs.state) : inputs.messages[1].content;
+// The stubs answer in the shape of whichever path asked: decision-1.1 (questions) or a Workers AI chat model (messages).
+const refsAsked = (inputs) => inputs.questions ? inputs.questions[0].choices.map((c) => c.value).filter((k) => k !== 'none') : [...inputs.messages[1].content.matchAll(/\[(r\d+|f\d+)\]/g)].map((x) => x[1]);
+const asked = (inputs) => inputs.questions ? inputs.input : inputs.messages[1].content;
 const answer = (inputs, pick, p = 0.9) => inputs.questions ? decide(pick, p) : `{"match":"${pick}","confidence":"high"}`;
 let reply = (inputs) => answer(inputs, 'none');
-const AI = { async run(model, inputs) { calls.push({ model, inputs }); return reply(inputs); } };
+let status = 200;
+const AI = { async run(model, inputs) { calls.push({ model, inputs, via: 'workers-ai' }); return reply(inputs); } };
+// decision-1.1 is a fetch to CheaperInference: stubbed here, never sent.
+globalThis.fetch = async (url, init) => {
+  if (url !== ISSUE_DECISION_URL) throw new Error('unexpected fetch ' + url);
+  const inputs = JSON.parse(init.body);
+  calls.push({ model: inputs.model, inputs, via: 'cheaperinference', auth: init.headers.Authorization });
+  const body = reply(inputs);
+  return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
+};
+const KEY = 'test-key';
 
-async function ask(user, body, env = { DB: db, AI }) {
+async function ask(user, body, env = { DB: db, AI, CHEAPERINFERENCE_API_KEY: KEY }) {
   const res = await route.onRequestPost({
     env, data: user, params: {},
     request: new Request('https://x.test/api/issue-reports/check', { method: 'POST', body: typeof body === 'string' ? body : JSON.stringify(body), headers: { 'Content-Type': 'application/json' } }),
@@ -126,12 +146,13 @@ check('handler: nothing close -> no model call', r.status === 200 && r.body.matc
 calls = [];
 reply = (inputs) => answer(inputs, refsAsked(inputs)[0]);
 r = await ask(ANA, runBug);
-check('handler: the model is asked once, with Clef as a decision', calls.length === 1 && calls[0].model === '@cf/cloudflare/clef' && calls[0].inputs.model === 'clef' && calls[0].inputs.questions?.same?.type === 'choice', calls.map((c) => c.model));
+check('handler: the model is asked once: decision-1.1, zero retention, the key as a bearer', calls.length === 1 && calls[0].via === 'cheaperinference' && calls[0].model === 'decision-1.1' && calls[0].inputs.zdr === true && calls[0].auth === `Bearer ${KEY}` && calls[0].inputs.questions[0].type === 'choice', calls.map((c) => [c.via, c.model]));
 check('handler: a match comes back with status and the teacher reply', r.body.match?.id === 1 && r.body.match.outcome === 'fixed' && r.body.match.detail === 'Fixed: the runner did not load.' && r.body.match.by === 'ai', r.body);
 check('handler: a withdrawn report is never shown to the model', !asked(calls[0].inputs).includes('Secret withdrawn'));
 check('handler: the answer carries no email', !r.text.includes('@s.test'));
-check('handler: a chat model in the env override gets the JSON prompt', await (async () => { calls = []; const x = await ask(ANA, runBug, { DB: db, AI, ISSUE_CHECK_MODEL: '@cf/x/tiny' }); return calls[0]?.model === '@cf/x/tiny' && Array.isArray(calls[0].inputs.messages) && x.body.match?.id === 1; })());
-check('handler: Clef-flash in the env override is a decision', await (async () => { calls = []; await ask(ANA, runBug, { DB: db, AI, ISSUE_CHECK_MODEL: '@cf/cloudflare/clef-flash' }); return calls[0]?.inputs.model === 'clef-flash'; })());
+check('handler: a Workers AI chat model in the env override gets the JSON prompt on the binding', await (async () => { calls = []; const x = await ask(ANA, runBug, { DB: db, AI, CHEAPERINFERENCE_API_KEY: KEY, ISSUE_CHECK_MODEL: '@cf/x/tiny' }); return calls.length === 1 && calls[0].via === 'workers-ai' && calls[0].model === '@cf/x/tiny' && Array.isArray(calls[0].inputs.messages) && x.body.match?.id === 1; })());
+check('handler: a pinned decision-1.1 build in the env override is asked', await (async () => { calls = []; await ask(ANA, runBug, { DB: db, AI, CHEAPERINFERENCE_API_KEY: KEY, ISSUE_CHECK_MODEL: 'decision-1.1-pinned' }); return calls[0]?.via === 'cheaperinference' && calls[0].model === 'decision-1.1-pinned'; })());
+check('handler: an override that is neither (Clef\'s old selector) is sent nowhere: words only', await (async () => { calls = []; const x = await ask(ANA, runBug, { DB: db, AI, CHEAPERINFERENCE_API_KEY: KEY, ISSUE_CHECK_MODEL: 'clef' }); return calls.length === 0 && x.body.match?.by === 'words'; })());
 reply = (inputs) => answer(inputs, refsAsked(inputs)[0], 0.5);
 r = await ask(ANA, runBug);
 check('handler: an unsure decision is no match', r.status === 200 && r.body.match === null && r.body.checked === true, r.body);
@@ -148,9 +169,18 @@ check('handler: a ref the shortlist does not hold is refused', r.body.match === 
 reply = () => { throw new Error('boom'); };
 r = await ask(ANA, runBug);
 check('handler: a model failure answers 200 no match', r.status === 200 && r.body.match === null && r.body.checked === false, r.body);
+reply = (inputs) => answer(inputs, refsAsked(inputs)[0]);
+status = 429;
+r = await ask(ANA, runBug);
+check('handler: decision-1.1 at its rate limit (429) answers 200 no match', r.status === 200 && r.body.match === null && r.body.checked === false, r.body);
+status = 200;
 
-r = await ask(ANA, runBug, { DB: db });
-check('handler: no binding -> the word overlap alone', r.body.match?.id === 1 && r.body.match.by === 'words', r.body);
+calls = [];
+r = await ask(ANA, runBug, { DB: db, AI });
+check('handler: no CheaperInference key -> the word overlap alone, nothing sent', calls.length === 0 && r.body.match?.id === 1 && r.body.match.by === 'words', r.body);
+calls = [];
+r = await ask(ANA, runBug, { DB: db, CHEAPERINFERENCE_API_KEY: KEY, ISSUE_CHECK_MODEL: '@cf/x/tiny' });
+check('handler: a Workers AI override with no binding -> the word overlap alone', calls.length === 0 && r.body.match?.by === 'words', r.body);
 
 r = await ask(ANA, 'not json');
 check('handler: a bad body answers 200 no match', r.status === 200 && r.body.match === null);

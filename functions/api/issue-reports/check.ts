@@ -3,10 +3,16 @@
 // Any signed-in user. Body {kind, title, message}. Answers {match: CheckMatch | null, checked}.
 // The rules are lib/issue-check-core.ts: a word-overlap shortlist of the reports a
 // student may see (never a withdrawn one) and the What's New features of the
-// caller's audience, then a Workers AI DECISION model (Clef) picks the one that
-// is the same problem or request, or "none", with a probability. No shortlist =
-// no model call. No binding = the word overlap alone, and only when it is
-// unmistakable.
+// caller's audience, then the DECISION model decision-1.1 (CheaperInference,
+// zero data retention on every request) picks the one that is the same problem or
+// request, or "none", with a probability. No shortlist = no model call. No key =
+// the word overlap alone, and only when it is unmistakable.
+//
+// The report text LEAVES Cloudflare (to CheaperInference, then the provider serving
+// decision-1.1), exactly as a student's code does for the fast Check
+// (lib/decision-check-core.ts). ISSUE_CHECK_MODEL set to a Workers AI chat model
+// (an @cf/ id) keeps it on Cloudflare instead. Cloudflare Clef did this until
+// 2026-11-21 and is retired.
 //
 // It never refuses a report: every failure (model down, timeout, quota spent,
 // bad body) answers 200 {match: null}, and the dialog files as it always did.
@@ -15,10 +21,12 @@
 
 import {
   buildCheckPrompt,
-  buildDecisionRequest,
-  isDecisionModel,
+  buildIssueDecisionRequest,
+  isIssueDecisionModel,
+  ISSUE_DECISION_MODEL,
+  ISSUE_DECISION_URL,
   parseCheckVerdict,
-  parseDecision,
+  parseIssueDecision,
   shortlist,
   toMatch,
   wordsOnlyVerdict,
@@ -35,7 +43,9 @@ interface WorkersAi {
 interface Env {
   DB: D1Database;
   AI?: WorkersAi;
-  /** Workers AI model for the check; a small one on purpose (it runs before every report). */
+  /** Bearer key for decision-1.1 (the same secret as the fast Check). */
+  CHEAPERINFERENCE_API_KEY?: string;
+  /** decision-1.1 (default) or a pinned build of it, or a Workers AI chat model id (@cf/...). */
   ISSUE_CHECK_MODEL?: string;
   ISSUE_CHECK_DAILY_LIMIT?: string;
   ISSUE_CHECK_GLOBAL_DAILY_LIMIT?: string;
@@ -44,16 +54,14 @@ type SessionData = { email: string; role: 'admin' | 'teacher' | 'student' };
 type Ctx = EventContext<Env, string, SessionData>;
 
 /**
- * Cloudflare's decision model: a probability per option, no text to parse, a few
- * hundred ms. (The first choice, @cf/meta/llama-3.1-8b-instruct-fp8, is retired by
- * Workers AI on 2026-11-20.) A chat model id in ISSUE_CHECK_MODEL uses the JSON prompt.
+ * A decision model: a probability per option, no text to parse, under a second.
+ * Measured on scripts/issue-check-live.mjs 2026-11-21: 13/14, no wrong match, the
+ * same as Clef before it. A Workers AI chat model id in ISSUE_CHECK_MODEL uses the
+ * JSON prompt instead.
  */
-export const DEFAULT_CHECK_MODEL = '@cf/cloudflare/clef';
+export const DEFAULT_CHECK_MODEL = ISSUE_DECISION_MODEL;
 const DEFAULT_DAILY_LIMIT = 25;
-/**
- * The free 10,000 neurons a day are shared with the grader and CODY. A check is
- * ~1,000 input tokens: on Clef ($0.24/M) about 22 neurons, so 200 is at most ~4,400.
- */
+/** A check is ~800 input tokens on decision-1.1; 200 a day is a backstop, not a budget. */
 const DEFAULT_GLOBAL_DAILY_LIMIT = 200;
 /** Bucket in the shared ai_help_usage table (see functions/api/grade-written.ts). */
 const RATE_BUCKET = 'issue-check';
@@ -126,23 +134,26 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
   const list = shortlist(query, candidates);
   if (list.length === 0) return json({ match: null, checked: true });
 
-  if (!env.AI) {
+  const model = (env.ISSUE_CHECK_MODEL || '').trim() || DEFAULT_CHECK_MODEL;
+  const decision = isIssueDecisionModel(model);
+  // Only a Workers AI id (@cf/...) runs on the binding: anything else that is not
+  // decision-1.1 (Clef's old selector, a typo) is not sent anywhere.
+  const usable = decision ? !!env.CHEAPERINFERENCE_API_KEY : model.startsWith('@cf/') && !!env.AI;
+  if (!usable) {
     const top = wordsOnlyVerdict(list);
     return json({ match: top ? toMatch(top, 'words') : null, checked: true });
   }
 
   if (!(await spend(env, data))) return json({ match: null, checked: false, limited: true });
 
-  const model = env.ISSUE_CHECK_MODEL || DEFAULT_CHECK_MODEL;
   let match: CheckMatch | null = null;
   try {
     let picked;
-    if (isDecisionModel(model)) {
-      const out = await withTimeout(env.AI.run(model, buildDecisionRequest(query, list, model)));
-      picked = parseDecision(out, list).pick;
+    if (decision) {
+      picked = parseIssueDecision(await askDecision(env.CHEAPERINFERENCE_API_KEY as string, buildIssueDecisionRequest(query, list, model)), list).pick;
     } else {
       const { system, user } = buildCheckPrompt(query, list);
-      picked = parseCheckVerdict(await callModel(env.AI, model, system, user), list);
+      picked = parseCheckVerdict(await callModel(env.AI as WorkersAi, model, system, user), list);
     }
     match = picked ? toMatch(picked, 'ai') : null;
   } catch (err) {
@@ -191,6 +202,25 @@ function withTimeout<T>(p: Promise<T>): Promise<T> {
   ]).finally(() => {
     if (timer !== undefined) clearTimeout(timer);
   });
+}
+
+/** decision-1.1: one POST. A non-200 (a 429 at the key's per-minute limit, a 503 when no
+ *  zero-retention provider is free) throws, which the caller answers as "no match". */
+async function askDecision(key: string, body: unknown): Promise<unknown> {
+  const controller = new AbortController();
+  const res = await withTimeout(
+    fetch(ISSUE_DECISION_URL, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    }),
+  ).catch((err) => {
+    controller.abort();
+    throw err;
+  });
+  if (!res.ok) throw new Error(`decision-1.1 answered ${res.status}`);
+  return res.json();
 }
 
 /** A chat model (ISSUE_CHECK_MODEL set to one): the JSON prompt, answered as text. */

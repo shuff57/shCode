@@ -1156,9 +1156,9 @@ app.prepare().catch((err) => {
     res.status(201).json({ id: devIssueSeq, ok: true });
   });
 
-  // The "already known?" check (functions/api/issue-reports/check.ts). The dev server has no Workers
-  // AI binding, so it answers as a deploy without one does: the word overlap alone, only when it is
-  // unmistakable. Same shortlist and same answer shape as the real route.
+  // The "already known?" check (functions/api/issue-reports/check.ts). The dev server never sends a
+  // report to the model, so it answers as a deploy with no CHEAPERINFERENCE_API_KEY does: the word
+  // overlap alone, only when it is unmistakable. Same shortlist and same answer shape as the real route.
   server.post('/api/issue-reports/check', express.json(), (req, res) => {
     const { kind, title, message } = req.body || {};
     const query = { kind: String(kind || 'bug'), title: String(title || '').trim(), message: String(message || '').trim() };
