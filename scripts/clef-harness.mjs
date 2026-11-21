@@ -19,7 +19,8 @@ import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from '
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { grade } from '../lib/grader.ts';
-import { CLEF_MODEL, cardsFromAnswer, clefInputs, clefTask, resolveClefCards } from '../lib/clef-check-core.ts';
+import { BAND, CLEF_MODEL, cardsFromAnswer, clefInputs, clefTask, resolveClefCards } from '../lib/clef-check-core.ts';
+import { DECISION_BAND, cardsFromDecisionAnswer, decisionModelFor, decisionRequest } from '../lib/decision-check-core.ts';
 import { aiCheckText } from '../lib/ai-check.ts';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -65,8 +66,14 @@ const cfg = {
 // --questions-file overrides question wording (and task) per lab without touching lesson.json, which also feeds
 // production Clef: { "<lab>": { "task"?: "...", "questions": { "<card id>": "..." } } }. Cards not named keep
 // the lesson's own wording. This is how a second model gets its own tuned questions.
-const qf = arg('questions-file');
-if (qf && existsSync(qf)) {
+// For a build of decision-1.1 on CheaperInference it defaults to scripts/ci-questions/decision-1.1.json, the file
+// production lays over the lesson's own (generate-ai-graders.mjs), so the gate asks what production asks.
+// `--questions-file none` tests the lesson's own wording. A path that does not exist is an error, never skipped.
+const isDecision11 = provider === 'cheaperinference' && !decisionModelFor(modelId).ignored;
+const qfArg = arg('questions-file', isDecision11 ? path.join(root, 'scripts', 'ci-questions', 'decision-1.1.json') : undefined);
+const qf = qfArg === 'none' ? undefined : qfArg;
+if (qf && !existsSync(qf)) { console.error(`--questions-file ${qf} does not exist`); process.exit(2); }
+if (qf) {
   const o = JSON.parse(readFileSync(qf, 'utf8'))[lab];
   if (o?.questions) for (const [k, v] of Object.entries(o.questions)) if (k in cfg.questions) cfg.questions[k] = String(v).trim();
   if (o?.task) cfg.task = String(o.task).trim();
@@ -123,16 +130,9 @@ async function throttle() {
   nextSlot = at + 60000 / ciRpm;
   if (at > Date.now()) await new Promise((r) => setTimeout(r, at - Date.now()));
 }
-// CheaperInference's answer (an array of {type:'predicate', name, probability}, or {type:'refusal'}) as the
-// {answers: {id: {noul}}} shape cardsFromAnswer reads. A refusal or a missing name has no `noul`, so that
-// card is unsure and the pattern check decides it, exactly as for a malformed Clef answer.
-function ciToClefShape(j) {
-  const answers = {};
-  for (const a of Array.isArray(j.answers) ? j.answers : []) {
-    if (a?.name && a.type === 'predicate') answers[a.name] = { noul: a.probability };
-  }
-  return { answers };
-}
+// CheaperInference's "sure" lines: --band if given, else decision-1.1's own (DECISION_BAND, as production) for a
+// build of decision-1.1, else Clef's shared BAND for any other model being tried.
+const ciLines = bandArg ? { hi: bandArg[0], lo: bandArg[1] } : isDecision11 ? DECISION_BAND : BAND;
 
 async function ask(code) {
   for (let attempt = 0; ; attempt++) {
@@ -160,30 +160,30 @@ async function ask(code) {
       // The state is sent as named JSON fields (about / task / student_code), the same content Clef gets.
       await throttle();
       const t0 = Date.now();
-      const state = clefInputs(cfg, code).state;
+      // The request production sends (decisionRequest), so the gate cannot drift from the route.
+      // zdr:true by default: the request is routed only through zero-data-retention providers (or refused
+      // with a 503), whatever the account's own mode. --zdr off sends zdr:false, for models with no ZDR route;
+      // use it only for hand-written fixtures: a student's code must never go through a route that may keep it.
+      const reqBody = { ...decisionRequest(cfg, code, modelId), zdr: arg('zdr') !== 'off' };
       const res = await fetch(CI_URL, {
         method: 'POST',
         headers: { 'content-type': 'application/json', authorization: `Bearer ${ciKey}` },
-        body: JSON.stringify({
-          model: modelId,
-          input: JSON.stringify(state),
-          questions: Object.entries(cfg.questions).map(([name, instructions]) => ({ type: 'predicate', name, instructions })),
-          // zdr:true by default: the request is routed only through zero-data-retention providers (or refused
-          // with a 503), whatever the account's own mode. --zdr off sends zdr:false, for models with no ZDR route;
-          // use it only for hand-written fixtures: a student's code must never go through a route that may keep it.
-          zdr: arg('zdr') !== 'off',
-        }),
+        body: JSON.stringify(reqBody),
       });
       const body = await res.json().catch(() => null);
       const ms = Date.now() - t0;
       if (res.ok && body) {
         const billed = Number(body.billing?.billed_cost_usd ?? 0);
         if (Number.isFinite(billed)) costUsd += billed;
-        return { ms, cards: cardsFromAnswer(ciToClefShape(body), Object.keys(cfg.questions)), tokens: body.usage?.input_tokens ?? null };
+        const cards = cardsFromDecisionAnswer(body, Object.keys(cfg.questions), ciLines);
+        if (cards) return { ms, cards, tokens: body.usage?.input_tokens ?? null };
+        // Production reads this as offline (the slow Check runs); here it is retried, then recorded as an ERROR.
+        j = { ok: false, error: 'an answer with no answers list' };
+      } else {
+        j = { ok: false, error: `HTTP ${res.status}: ${body?.error?.message ?? body?.error ?? 'no body'}` };
+        // A rejected key or an empty balance will not heal on a retry: stop at once.
+        if ([401, 402, 403].includes(res.status)) throw new Error(j.error);
       }
-      j = { ok: false, error: `HTTP ${res.status}: ${body?.error?.message ?? body?.error ?? 'no body'}` };
-      // A rejected key or an empty balance will not heal on a retry: stop at once.
-      if ([401, 402, 403].includes(res.status)) throw new Error(j.error);
     }
     // A 429 is the key's requests-per-minute cap, not a bad answer: wait it out (the window is a minute) and
     // try again up to six times, so a rate-limited run never records a false ERROR.
@@ -206,7 +206,7 @@ await Promise.all(Array.from({ length: pool }, async () => {
       const report = grade(lesson.requirements, p.files);
       // --band hi,lo: this model's own "sure" lines (the shared BAND is Clef's). A card between them is unsure
       // and the pattern check decides it, as always.
-      if (bandArg) a.cards = a.cards.map((c) => ({ ...c, verdict: c.p === null ? 'unsure' : c.p >= bandArg[0] ? 'met' : c.p <= bandArg[1] ? 'missing' : 'unsure' }));
+      if (bandArg && provider !== 'cheaperinference') a.cards = a.cards.map((c) => ({ ...c, verdict: c.p === null ? 'unsure' : c.p >= bandArg[0] ? 'met' : c.p <= bandArg[1] ? 'missing' : 'unsure' }));
       const { verdicts, decidedBy } = resolveClefCards(a.cards, report);
       rows.push({ ...p, ...a, verdicts, decidedBy });
     } catch (e) {

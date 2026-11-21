@@ -238,7 +238,7 @@ Cloudflare dashboard env vars pane (plain vars):
 | `GRADE_WRITTEN_GLOBAL_DAILY_LIMIT` | var (optional) | GLOBAL per-deploy daily ceiling for `POST /api/grade-written`; default `10000`. Same backstop as `AI_HELP_GLOBAL_DAILY_LIMIT`, for the grader. |
 | `GRADE_WRITTEN_WORKERS_MODEL` | var (optional) | Workers AI model id for every AI call (grader, Check, tutor); default `@cf/google/gemma-4-26b-a4b-it`. Only read when the `AI` binding exists. |
 | `CHEAPERINFERENCE_API_KEY` | secret | Bearer key (`ci_live_...`) for the fast Check's model, Microsoft `decision-1.1` through CheaperInference (`POST /api/clef-check`, which replaced Cloudflare Clef 2026-11-21). Unset = that route answers 503 `offline`, and every Check runs the slow way. Every request carries `zdr: true`. |
-| `DECISION_CHECK_MODEL` | var (optional) | Model id for the fast Check; default `decision-1.1`. |
+| `DECISION_CHECK_MODEL` | var (optional) | Model id for the fast Check; default `decision-1.1`. Only a build of decision-1.1 (`decision-1.1-<suffix>`) is used: the questions file and the band were measured on it, so any other id is ignored (logged) and decision-1.1 is asked. Another model needs its own questions, band and gate run first. |
 | `CLEF_CHECK_DAILY_LIMIT` | var (optional) | Per-student daily cap on the fast Check (`POST /api/clef-check`); default `400`. Its own bucket, so it never spends the grade-written allowance. Over it the browser quietly runs the slow Check instead. Teachers/admins exempt. |
 | `CLEF_CHECK_GLOBAL_DAILY_LIMIT` | var (optional) | Deploy-wide daily ceiling on fast Checks; default `40000` (about $20 a day at the measured cost). |
 | `OPENROUTER_API_KEY` | secret | Bearer key for `POST /api/p5play-convert` only (OpenRouter). Unset = that route answers 503 "not set up"; nothing else uses it. |
@@ -1632,7 +1632,9 @@ Everything else below (the route name, the cards, the pattern-check fallback, th
 - **Questions:** the lesson's `aiCheck.clef.questions` are tuned for Clef; `scripts/ci-questions/decision-1.1.json`
   (`{ "<lesson id>": { "questions": { "<card id>": "..." } } }`) is laid over them by `generate-ai-graders.mjs` (an override for a card
   the lesson has no question for is a build error). The harness (`scripts/clef-harness.mjs --provider cheaperinference --model
-  decision-1.1 --questions-file scripts/ci-questions/decision-1.1.json --band 0.8,0.15`, key in `CI_API_KEY`) is the gate: 2495/2495
+  decision-1.1`, key in `CI_API_KEY`) is the gate; for a build of decision-1.1 it sends production's own request (`decisionRequest`),
+  reads the answer with `cardsFromDecisionAnswer`, defaults to that questions file (`--questions-file none` = the lesson's wording; a
+  path that does not exist stops it) and to `DECISION_BAND` (`--band hi,lo` overrides). It: 2495/2495
   programs, about 15% of cards left to the pattern check (Clef: 8.3%).
 - **The gate misses generic wording.** Measured on 4,000 real handed-in programs: cards still on the lesson's generic wording
   ("Answer yes only if this is fully done") gave confident false reds in the debug labs that no fixture showed. Write per-card questions
@@ -1645,10 +1647,14 @@ Everything else below (the route name, the cards, the pattern-check fallback, th
   readers who cannot see either verdict, and read a card for its INTENT (2.4.19 r1 prints the non-multiples of 3, so its red is right).
 - **Style variants (2026-11-21).** `python3 scripts/make-format-variants.py` writes `scripts/ci-heldout/variants/<lab>.json` (gitignored): each
   lab's reference with single-statement bodies unwrapped (no braces), no semicolons, single quotes, braces on their own line, and tab
-  indentation, all labelled met. Run them through the harness with `--fixtures` (one lab at a time, as for the gate). 1,400 variants over
+  indentation, all labelled met. A variant is kept only if it parses AND `scripts/same-program.mjs` finds it the same program as the reference (syntax
+  trees compared, so a removed `;` that joins two lines or a tab inside a template literal is dropped, not mislabelled; 2026-11-21: 872
+  kept, 88 dropped, all for syntax). The lab list goes to `scripts/ci-heldout/variants/labs.txt`. Run them through the harness with `--fixtures` (one lab at a time, as for the gate). 1,400 variants over
   264 labs pass. Clicking Check on a correct brace-less program once gave a red card, because the model was unsure and the lab's regex needs a
   `{`; the style variants are how to look for that before a student does.
-- **How often it falls back:** every offline answer bumps `ai_help_usage` (`unit = 'clef-check:offline'`, one row per day, identity `\x00GLOBAL`); check it after a rollout.
+- **How often it falls back:** every offline answer bumps `ai_help_usage` (`unit = 'clef-check:offline'`, one row per day, identity `\x00GLOBAL`),
+  a deploy with no `CHEAPERINFERENCE_API_KEY` included; an answer that refuses or skips EVERY card (a 200, but the pattern check decides
+  everything) bumps `unit = 'clef-check:all-unsure'`. Check both after a rollout.
 - **A 429 from the provider's per-minute limit is 503 `offline`** (the browser runs the slow Check); a classroom burst past the
   key's limit degrades quietly, it never shows a student an error.
 - Tests: `scripts/test-decision-check.mjs` (request, answer, band, `askDecision`, and the real route over a stubbed fetch),

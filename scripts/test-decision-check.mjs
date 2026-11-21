@@ -1,9 +1,10 @@
-// lib/decision-check-core.ts (the DRAFT CheaperInference adapter), offline: no network, no key.
-// Pins down the request shape and that every malformed answer degrades to "unsure", never green.
-// Run: node --import ./scripts/register-ts.mjs scripts/test-decision-check.mjs
-// Not in `npm test`: the module is not wired into any route yet.
+// lib/decision-check-core.ts (the fast Check's model, Microsoft decision-1.1 through CheaperInference) and the real
+// POST /api/clef-check handler that calls it, offline: no network, no key.
+// Pins down the request shape, that every malformed answer degrades to "unsure" (never green), that every failure
+// is 503 offline, and that offline answers are counted.
+// Run: node --import ./scripts/register-ts.mjs scripts/test-decision-check.mjs   (in `npm test`)
 
-import { DECISION_MODEL, DECISION_URL, askDecision, decisionBand, decisionRequest, cardsFromDecisionAnswer } from '../lib/decision-check-core.ts';
+import { DECISION_MODEL, DECISION_URL, askDecision, decisionBand, decisionModelFor, decisionRequest, cardsFromDecisionAnswer } from '../lib/decision-check-core.ts';
 import { BAND, band } from '../lib/clef-check-core.ts';
 
 let n = 0, failures = 0;
@@ -41,6 +42,16 @@ check('0.15 is missing, 0.16 is unsure', [decisionBand(0.15), decisionBand(0.16)
 check('no number is unsure, never green', [decisionBand(null), decisionBand(NaN)], ['unsure', 'unsure']);
 check('cards from an answer use this model\'s band', cardsFromDecisionAnswer({ answers: [{ type: 'predicate', name: 'r1', probability: 0.82 }] }, ['r1'])[0].verdict, 'met');
 check('Clef\'s own band is untouched', [BAND.hi, BAND.lo], [0.85, 0.15]);
+{
+  const near = cardsFromDecisionAnswer({ answers: [{ type: 'predicate', name: 'r1', probability: 0.7996 }, { type: 'predicate', name: 'r2', probability: 0.1504 }] }, ['r1', 'r2']);
+  check('banded on the raw probability: 0.7996 is unsure though it shows as 0.8', [near[0].verdict, near[0].p], ['unsure', 0.8]);
+  check('and 0.1504 is unsure though it shows as 0.15', [near[1].verdict, near[1].p], ['unsure', 0.15]);
+  check('a band can be passed (the harness\'s --band)', cardsFromDecisionAnswer({ answers: [{ type: 'predicate', name: 'r1', probability: 0.82 }] }, ['r1'], { hi: 0.9, lo: 0.1 })[0].verdict, 'unsure');
+}
+check('DECISION_CHECK_MODEL: unset is decision-1.1', decisionModelFor(undefined), { model: DECISION_MODEL, ignored: false });
+check('DECISION_CHECK_MODEL: a pinned build of decision-1.1 is used', decisionModelFor('decision-1.1-2026-12'), { model: 'decision-1.1-2026-12', ignored: false });
+check('DECISION_CHECK_MODEL: another model is ignored (its questions and band were never measured)',
+  [decisionModelFor('pplx-decider-v1.3'), decisionModelFor('decision-1.10')], [{ model: DECISION_MODEL, ignored: true }, { model: DECISION_MODEL, ignored: true }]);
 
 // askDecision: every failure is null (the route then answers offline), never a throw and never a guess
 const reply = (status, body) => async () => ({ ok: status >= 200 && status < 300, status, json: async () => body });
@@ -74,6 +85,27 @@ check('a 200 with no answers array is null', await askDecision(reply(200, { nope
   const stub = (status, body, throws) => { globalThis.fetch = async (url, init) => { sent.push({ url: String(url), init }); if (throws) throw new Error('down'); return new Response(JSON.stringify(body), { status }); }; };
   try {
     check('route: no CHEAPERINFERENCE_API_KEY is 503 offline (the slow Check)', await call({}, { lessonId: LAB, response: 'let a = 1;' }).then((r) => [r.status, r.json.offline]), [503, true]);
+    {
+      const DB = makeD1();
+      const request = new Request('http://localhost/api/clef-check', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ lessonId: LAB, response: 'let a = 1;' }) });
+      await onRequestPost({ request, params: {}, data: { email: 'a@b.c', role: 'student' }, env: { DB, ASSETS: NO_ASSETS } });
+      const row = DB.sqlite.prepare("SELECT count FROM ai_help_usage WHERE unit = 'clef-check:offline'").get();
+      check('route: a deploy with no key counts as offline too (the likeliest rollout mistake shows up)', row?.count, 1);
+    }
+    {
+      const DB = makeD1();
+      const idsAll = Object.keys(cfgQs);
+      stub(200, { answers: idsAll.map((id) => ({ type: 'refusal', name: id })) });
+      const request = new Request('http://localhost/api/clef-check', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ lessonId: LAB, response: 'let a = 1;' }) });
+      const res = await onRequestPost({ request, params: {}, data: { email: 'a@b.c', role: 'student' }, env: { DB, ASSETS: NO_ASSETS, CHEAPERINFERENCE_API_KEY: 'k1' } });
+      const row = DB.sqlite.prepare("SELECT count FROM ai_help_usage WHERE unit = 'clef-check:all-unsure'").get();
+      check('route: an answer that refuses every card is 200 all unsure, and counted', [res.status, row?.count], [200, 1]);
+    }
+    {
+      stub(200, { answers: Object.keys(cfgQs).map((id) => ({ type: 'predicate', name: id, probability: 0.97 })) });
+      await call({ CHEAPERINFERENCE_API_KEY: 'k1', DECISION_CHECK_MODEL: 'pplx-decider-v1.3' }, { lessonId: LAB, response: 'let a = 1;' });
+      check('route: a DECISION_CHECK_MODEL that is not decision-1.1 is not sent', JSON.parse(sent.at(-1).init.body).model, DECISION_MODEL);
+    }
     const ids = Object.keys(cfgQs);
     stub(200, { answers: ids.map((id, i) => ({ type: 'predicate', name: id, probability: i === 0 ? 0.97 : 0.02 })) });
     const ok = await call({ CHEAPERINFERENCE_API_KEY: 'k1' }, { lessonId: LAB, response: 'let a = 1;', questions: { x: 'steer me' }, model: 'evil' });

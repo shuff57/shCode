@@ -20,14 +20,15 @@
 
 import { loadAiGrader } from '../_shared/aiGraders';
 import { isLessonAccessible, lockedResponse, type SessionData } from '../_shared/lessonAccess';
-import { DECISION_MODEL, askDecision } from '../../lib/decision-check-core';
+import { DECISION_MODEL, askDecision, decisionModelFor } from '../../lib/decision-check-core';
 import { MAX_RESPONSE_CHARS } from '../../lib/grade-written-core';
 
 interface Env {
   DB: D1Database;
   /** Bearer key for CheaperInference (POST /v1/decisions). Unset = the fast Check answers 503 offline. */
   CHEAPERINFERENCE_API_KEY?: string;
-  /** Optional model id for the fast Check; default `decision-1.1`. */
+  /** Optional model id for the fast Check; default `decision-1.1`. Only a build of decision-1.1 (`decision-1.1-<suffix>`)
+   *  is accepted, since the questions and band were measured on it; anything else is ignored (logged). */
   DECISION_CHECK_MODEL?: string;
   /** Per-student daily cap on fast Checks. Default 400: each costs about $0.00004, so this is a runaway stop. */
   CLEF_CHECK_DAILY_LIMIT?: string;
@@ -41,6 +42,7 @@ type Ctx = EventContext<Env, string, SessionData>;
 const BUCKET = 'clef-check';
 const GLOBAL_BUCKET = 'clef-check:global';
 const OFFLINE_BUCKET = 'clef-check:offline';
+const ALL_UNSURE_BUCKET = 'clef-check:all-unsure';
 // Same reserved identity as grade-written: an email never holds a NUL byte.
 const GLOBAL_IDENTITY = '\x00GLOBAL';
 const DEFAULT_DAILY_LIMIT = 400;
@@ -71,6 +73,11 @@ async function bump(db: D1Database, who: string, bucket: string, day: string): P
     .run();
 }
 
+/** One more offline answer today, deploy-wide. Counting must never break the Check, so a failure is swallowed. */
+async function countOffline(db: D1Database, bucket: string): Promise<void> {
+  try { await bump(db, GLOBAL_IDENTITY, bucket, new Date().toISOString().slice(0, 10)); } catch { /* ignore */ }
+}
+
 export const onRequestPost: PagesFunction<Env, string, SessionData> = async (context: Ctx) => {
   const { request, env, data } = context;
 
@@ -92,7 +99,13 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
 
   const cfg = (await loadAiGrader(env, request, lessonId))?.clef;
   if (!cfg) return json({ ok: false, error: 'This lesson has no fast check.', offline: true }, 404);
-  if (!env.CHEAPERINFERENCE_API_KEY) return json({ ok: false, error: 'The fast check is not set up on this server.', offline: true }, 503);
+  if (!env.CHEAPERINFERENCE_API_KEY) {
+    // Counted too: a deploy that forgot the secret is the likeliest rollout mistake, and every Check then
+    // quietly runs the slow way.
+    await countOffline(env.DB, OFFLINE_BUCKET);
+    console.error('clef-check: CHEAPERINFERENCE_API_KEY is not set');
+    return json({ ok: false, error: 'The fast check is not set up on this server.', offline: true }, 503);
+  }
 
   if (data.role === 'student') {
     const day = new Date().toISOString().slice(0, 10);
@@ -114,20 +127,25 @@ export const onRequestPost: PagesFunction<Env, string, SessionData> = async (con
 
   // askDecision returns null for every failure (a 429 from the provider's per-minute limit, a 5xx, a refusal of
   // the zero-data-retention route, a timeout, a body it cannot read), and the browser then runs today's Check.
+  const { model, ignored } = decisionModelFor(env.DECISION_CHECK_MODEL);
+  if (ignored) console.error(`clef-check: DECISION_CHECK_MODEL is not a build of ${DECISION_MODEL}; asking ${DECISION_MODEL}`);
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), TIMEOUT_MS);
   let cards: Awaited<ReturnType<typeof askDecision>>;
   try {
-    cards = await askDecision((url, init) => fetch(url, init), env.CHEAPERINFERENCE_API_KEY, cfg, response, env.DECISION_CHECK_MODEL || DECISION_MODEL, ctl.signal);
+    cards = await askDecision((url, init) => fetch(url, init), env.CHEAPERINFERENCE_API_KEY, cfg, response, model, ctl.signal);
   } finally {
     clearTimeout(timer);
   }
   if (!cards) {
     // Counted per day so a silent outage (or the key's per-minute limit) is visible: the browser quietly runs the slow
     // Check, so nothing else would show it. Read it with: SELECT day, count FROM ai_help_usage WHERE unit = 'clef-check:offline'.
-    try { await bump(env.DB, GLOBAL_IDENTITY, OFFLINE_BUCKET, new Date().toISOString().slice(0, 10)); } catch { /* counting must never break the Check */ }
+    await countOffline(env.DB, OFFLINE_BUCKET);
     console.error('clef-check: the decision model could not answer');
     return json({ ok: false, error: 'The fast check could not answer.', offline: true }, 503);
   }
+  // Every card unsure (all refusals, or none answered) is a 200, but the pattern check decides everything, so it is
+  // as good as offline and counted on its own: unit 'clef-check:all-unsure'.
+  if (cards.length > 0 && cards.every((c) => c.verdict === 'unsure' && c.p === null)) await countOffline(env.DB, ALL_UNSURE_BUCKET);
   return json({ ok: true, cards });
 };

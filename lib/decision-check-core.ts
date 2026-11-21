@@ -12,10 +12,13 @@
 //   - The key has a per-minute request limit; a 429 reads as "offline" (the browser then runs the slow Check),
 //     exactly as the route does for any failure: askDecision() returns null for a 429 and every other failure.
 //
-// Pure: no fetch, no DOM. It reuses clef-check-core's state, band and answer reader, so a card comes out in
-// the same { id, verdict, p } shape and everything downstream (pattern fallback, notes) is unchanged.
+//   - The questions file and DECISION_BAND were measured on decision-1.1 ONLY. Another model needs its own
+//     questions file, its own band and a gate run (scripts/clef-harness.mjs) before production asks it.
+//
+// Pure: no fetch, no DOM. It reuses clef-check-core's state, so a card comes out in the same
+// { id, verdict, p } shape and everything downstream (pattern fallback, notes) is unchanged.
 
-import { cardsFromAnswer, clefInputs, type ClefCard, type ClefConfig, type ClefVerdict } from './clef-check-core';
+import { clefInputs, type ClefCard, type ClefConfig, type ClefVerdict } from './clef-check-core';
 
 export const DECISION_URL = 'https://api.cheaperinference.com/v1/decisions';
 export const DECISION_MODEL = 'decision-1.1';
@@ -28,6 +31,18 @@ export const DECISION_MODEL = 'decision-1.1';
  * stays at 0.15: raising it to 0.20 made 7 false reds. Held-out programs: 154/158 at either line.
  */
 export const DECISION_BAND = { hi: 0.8, lo: 0.15 } as const;
+
+/**
+ * The model the route asks, from the optional DECISION_CHECK_MODEL. Only a build of decision-1.1 is accepted
+ * (`decision-1.1` itself, or a pinned `decision-1.1-<suffix>`), because the questions and the band above were
+ * measured on it; anything else is ignored and decision-1.1 is asked. `ignored` says so, for the log.
+ */
+export function decisionModelFor(configured: string | undefined): { model: string; ignored: boolean } {
+  const v = (configured ?? '').trim();
+  if (!v) return { model: DECISION_MODEL, ignored: false };
+  if (v === DECISION_MODEL || v.startsWith(DECISION_MODEL + '-')) return { model: v, ignored: false };
+  return { model: DECISION_MODEL, ignored: true };
+}
 
 /** The JSON body for POST DECISION_URL. The code is the only part the request supplies. */
 export function decisionRequest(cfg: ClefConfig, code: string, model: string = DECISION_MODEL) {
@@ -49,16 +64,24 @@ export function decisionRequest(cfg: ClefConfig, code: string, model: string = D
  * missing or unnamed answer, or a probability outside 0..1 makes that card unsure (never green), so the
  * lab's pattern check decides it.
  */
-export function cardsFromDecisionAnswer(body: unknown, ids: string[]): ClefCard[] | null {
+export function cardsFromDecisionAnswer(
+  body: unknown,
+  ids: string[],
+  lines: { hi: number; lo: number } = DECISION_BAND,
+): ClefCard[] | null {
   const list = (body as { answers?: unknown } | null)?.answers;
   if (!Array.isArray(list)) return null;
-  const answers: Record<string, { noul: unknown }> = {};
+  const raw: Record<string, unknown> = {};
   for (const a of list as Array<{ type?: unknown; name?: unknown; probability?: unknown }>) {
-    if (a && a.type === 'predicate' && typeof a.name === 'string') answers[a.name] = { noul: a.probability };
+    if (a && a.type === 'predicate' && typeof a.name === 'string') raw[a.name] = a.probability;
   }
-  const cards = cardsFromAnswer({ answers }, ids);
-  // cardsFromAnswer bands at Clef's lines; re-band at this model's own.
-  return cards && cards.map((c) => ({ ...c, verdict: decisionBand(c.p) }));
+  // Banded on the RAW probability, rounded only for display: rounding first made 0.7996 read 0.8 and go green,
+  // under the 0.80 line.
+  return ids.map((id) => {
+    const r = raw[id];
+    const p = typeof r === 'number' && r >= 0 && r <= 1 ? r : null;
+    return { id, verdict: decisionBand(p, lines), p: p === null ? null : Math.round(p * 1000) / 1000 };
+  });
 }
 
 /**
@@ -89,9 +112,9 @@ export async function askDecision(
   }
 }
 
-export function decisionBand(p: number | null): ClefVerdict {
+export function decisionBand(p: number | null, lines: { hi: number; lo: number } = DECISION_BAND): ClefVerdict {
   if (p === null || !Number.isFinite(p)) return 'unsure';
-  if (p >= DECISION_BAND.hi) return 'met';
-  if (p <= DECISION_BAND.lo) return 'missing';
+  if (p >= lines.hi) return 'met';
+  if (p <= lines.lo) return 'missing';
   return 'unsure';
 }
