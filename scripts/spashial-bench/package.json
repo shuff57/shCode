@@ -1,0 +1,11 @@
+{
+  "name": "spashial-bench",
+  "private": true,
+  "type": "module",
+  "description": "Physics library benchmark for spaSHial. Own package.json: never installs into the app.",
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "0.21.0",
+    "cannon-es": "0.20.0",
+    "jolt-physics": "1.1.1"
+  }
+}
