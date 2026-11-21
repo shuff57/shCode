@@ -1470,7 +1470,7 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "surfaceSpeed",
    "type": "property",
    "detail": "number",
-   "info": "Conveyor-belt tangent speed, px/frame, re-applied to live contacts."
+   "info": "Makes the sprite a conveyor belt: what stands on it is carried this many pixels per frame, right when positive, left when negative, whichever sprite was made fi"
   },
   {
    "label": "visualOnly",
@@ -2262,7 +2262,13 @@ export const MOSHION_MEMBERS: Record<string, MoshionCompletion[]> = {
    "label": "pause",
    "type": "method",
    "detail": "(): void",
-   "info": "Web Audio cannot resume a stopped source, so this is stop()."
+   "info": "Stops the sound but remembers the place: the next loop() (or play(), for music started with play()) carries on from there."
+  },
+  {
+   "label": "paused",
+   "type": "property",
+   "detail": "boolean",
+   "info": "True between pause() and the next play(), loop() or stop()."
   },
   {
    "label": "stop",
