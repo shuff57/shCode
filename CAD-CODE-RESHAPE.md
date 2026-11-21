@@ -472,6 +472,11 @@ The host page is opened with `keep=on&inc=on`. `keep=on` is new, in shCode's ven
   writes its step, and when sketch mode ends. The bar's choices and number boxes take the bar's colours. Measured at 1440 px:
   the bar is still two lines (56 px), because its 19 tool buttons alone are wider than the window, so the panel shortens it
   but does not bring it back to one line. The browser suites open the panel through one helper (`finish_box`).
+- **Two tool menus** (2026-11-20, the owner's choice). The 19 tool buttons are grouped under two buttons, Draw (Line, Rectangle,
+  Centre rectangle, Circle, Arc, Tangent arc, Slot, Polyline, Polygon) and Change (Mirror, Pattern, Offset, Round, Chamfer,
+  Trim, Extend, Select, Delete). A click opens one below the bar; choosing a tool shuts it, and so does pressing the view.
+  The menu's button names the tool that is on ("Draw: Polygon"). Measured at 1440 px: the bar is one line again (25 px, with
+  a tool's own boxes showing), where it was two (56 px). The browser suites reach a tool through one helper (`tool_button`).
 - **Points on an arc are written to 1e-9** (2026-11-19). reSHape refuses a sketch whose arc's two ends miss one circle by
   more than 1e-6 mm ("The rules of this sketch have to move its shape…"). A point rounded to 0.001 misses by up to about
   7e-4 wherever the geometry is not exact. So a Round at a slanted corner wrote an arc the build refuses (at the test's
