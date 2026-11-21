@@ -1,19 +1,25 @@
-// LIVE check of the "is this already known?" model against real Workers AI.
-// NOT part of npm test: it calls Cloudflare and spends (very few) neurons.
+// LIVE check of the "is this already known?" model.
+// NOT part of npm test: it calls the model and spends (a fraction of a cent).
 // Every case is made up; no student report is sent.
 //
-//   node --import ./scripts/register-ts.mjs scripts/issue-check-live.mjs [model ...]
+//   CI_API_KEY=... node --import ./scripts/register-ts.mjs scripts/issue-check-live.mjs [model ...]
 //
-// Default models: @cf/cloudflare/clef and @cf/cloudflare/clef-flash. A chat model id
-// (e.g. @cf/google/gemma-4-26b-a4b-it) runs through the JSON-prompt path instead.
-// Credentials: CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID, else the wrangler
-// login in ~/.wrangler/config/default.toml (never printed).
+// Default model: decision-1.1 (CheaperInference, key in CI_API_KEY). A Workers AI chat
+// model id (e.g. @cf/google/gemma-4-26b-a4b-it) runs through the JSON-prompt path instead,
+// with CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID, else the wrangler login in
+// ~/.wrangler/config/default.toml (never printed).
 //
 // Each case runs twice: "shortlist" is the production path (word overlap first,
 // no model call when nothing is close); "all" hands the model every candidate,
 // which shows what a better shortlist would gain.
 //
-// Results, 2026-11-17 (14 cases, shortlist / all):
+// Results, 2026-11-21 (14 cases, shortlist / all):
+//   decision-1.1                        13/14, 0 wrong matches / 13/14, 1 WRONG   ~820 ms / ~1,000 ms
+//     The miss on the production (shortlist) path: "rename a file" put the Sandbox's rename-a-project feature
+//     (0.52) just above the deferred rename request (0.48), so neither reached 0.75 and the student is asked
+//     nothing, which is the safe way to be wrong. Handed EVERY candidate it picked that feature at 0.83.
+//     Correct picks: 0.92-1.00. "Run broken in another lesson" gave r1 0.73, under the bar (either is fine).
+// Results, 2026-11-17, before decision-1.1 (Clef is retired; its path is deleted):
 //   @cf/cloudflare/clef                 13/14, 0 wrong matches / 14/14, 0 wrong   ~470 ms / ~750 ms
 //   @cf/cloudflare/clef-flash           14/14, 0 wrong / 13/14, 1 WRONG ("too dim" matched "too bright" at 0.83)  ~190 / ~370 ms
 //   @cf/meta/llama-3.1-8b-instruct-fp8   9/14, 4 wrong, 2 timeouts / 5/14, 9 wrong, incl. obeying the injection
@@ -25,17 +31,18 @@ import { readFileSync, existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import {
   buildCheckPrompt,
-  buildDecisionRequest,
+  buildIssueDecisionRequest,
   DECISION_MIN,
-  isDecisionModel,
+  isIssueDecisionModel,
+  ISSUE_DECISION_URL,
   parseCheckVerdict,
-  parseDecision,
+  parseIssueDecision,
   shortlist,
 } from '../lib/issue-check-core.ts';
 import { WHATS_NEW } from '../lib/whats-new.ts';
 import { entriesFor } from '../lib/whats-new-state.ts';
 
-const models = process.argv.slice(2).length ? process.argv.slice(2) : ['@cf/cloudflare/clef', '@cf/cloudflare/clef-flash'];
+const models = process.argv.slice(2).length ? process.argv.slice(2) : ['decision-1.1'];
 
 async function creds() {
   if (process.env.CLOUDFLARE_API_TOKEN && process.env.CLOUDFLARE_ACCOUNT_ID) {
@@ -85,7 +92,20 @@ const cases = [
   { name: 'unrelated', kind: 'bug', title: 'My mouse is broken', message: 'The school mouse on desk 4 does not click.', expect: 'none' },
 ];
 
-const { token, account } = await creds();
+// Cloudflare credentials only when a Workers AI model is asked for.
+const { token, account } = models.some((m) => !isIssueDecisionModel(m)) ? await creds() : {};
+async function runDecision11(model, query, list) {
+  const key = process.env.CI_API_KEY;
+  if (!key) throw new Error('decision-1.1 needs CI_API_KEY (the CheaperInference key)');
+  const t0 = Date.now();
+  const res = await fetch(ISSUE_DECISION_URL, {
+    method: 'POST', headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(buildIssueDecisionRequest(query, list, model)),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(`${model}: ${res.status} ${JSON.stringify(json).slice(0, 300)}`);
+  return { result: json, ms: Date.now() - t0 };
+}
 async function run(model, body) {
   const t0 = Date.now();
   const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/ai/run/${model}`, {
@@ -98,13 +118,13 @@ async function run(model, body) {
 
 async function judge(model, query, list) {
   if (list.length === 0) return { answer: 'none', note: 'no shortlist, no call', ms: 0, tokens: 0 };
-  if (isDecisionModel(model)) {
-    const { result, ms } = await run(model, buildDecisionRequest(query, list, model));
-    const d = parseDecision(result, list);
-    const probs = Object.entries(result.answers?.same?.probabilities ?? {}).sort((a, b) => b[1] - a[1]).slice(0, 3);
+  if (isIssueDecisionModel(model)) {
+    const { result, ms } = await runDecision11(model, query, list);
+    const d = parseIssueDecision(result, list);
+    const probs = (result.answers?.[0]?.probabilities ?? []).slice().sort((a, b) => b.probability - a.probability).slice(0, 3);
     return {
       answer: d.pick ? d.pick.ref : 'none', ms, tokens: result.usage?.input_tokens ?? 0,
-      note: probs.map(([k, v]) => `${k} ${v.toFixed(2)}`).join(', '),
+      note: probs.map((r) => `${r.value} ${r.probability.toFixed(2)}`).join(', '),
     };
   }
   const { system, user } = buildCheckPrompt(query, list);

@@ -390,17 +390,19 @@ Non-obvious bits (the rest is filename-routed — `find functions/api -name "*.t
   server-side; clients cannot set it. Legacy NULLs coerce to `student_email`.
 - **The "already known?" check before a report is filed** (2026-11-17). `POST /api/issue-reports/check {kind, title, message}`
   (`functions/api/issue-reports/check.ts`, rules in `lib/issue-check-core.ts`): a word-overlap shortlist of the non-withdrawn
-  reports and the caller's What's New features, then Cloudflare's DECISION model `@cf/cloudflare/clef` (Workers AI, zero data
-  retention; one `choice` question over the shortlist plus `none`, a probability per option, no text to parse; a match needs
-  `DECISION_MIN` 0.75) names the one that is the same problem or request. `ISSUE_CHECK_MODEL` may name `@cf/cloudflare/clef-flash`
-  or a chat model (then the JSON prompt path). Measured live with `scripts/issue-check-live.mjs` (not in npm test; results in its
-  header): Clef 13/14 and 14/14 with no wrong match; Flash once matched "too dim" to "too bright"; the 8B Llama first chosen had 4-9
-  wrong matches and is retired by Workers AI 2026-11-20. No shortlist = no model call; no `AI` binding = the
+  reports and the caller's What's New features, then the DECISION model Microsoft `decision-1.1` through CheaperInference
+  (`CHEAPERINFERENCE_API_KEY`, the fast Check's secret; `zdr: true` on every request; one `choice` question over the shortlist plus
+  `none`, a probability per option, no text to parse; a match needs `DECISION_MIN` 0.75) names the one that is the same problem or
+  request. **The report text leaves Cloudflare**, as the fast Check's code does. Cloudflare Clef did this until 2026-11-21 and is
+  retired (owner's decision; the Clef path is deleted). `ISSUE_CHECK_MODEL` may pin a `decision-1.1-<suffix>` build or name a Workers
+  AI chat model (`@cf/...`, then the JSON prompt path on the `AI` binding, text stays on Cloudflare); any other value is sent nowhere.
+  Measured live with `scripts/issue-check-live.mjs` (made-up reports only; not in npm test; results in its header): decision-1.1
+  13/14 with no wrong match on the production path, as Clef was; Clef-flash once matched "too dim" to "too bright"; the 8B Llama
+  first chosen had 4-9 wrong matches. No shortlist = no model call; no key (or no binding for an `@cf/` override) = the
   overlap alone, only when unmistakable (`WORDS_ONLY_MIN`). A ref not on the shortlist is refused, so it can only point at what
   /issues already shows a student; the answer carries title, status and the staff reply, never a reporter. It NEVER refuses a
   report: every failure answers 200 `{match: null}`. Quota: `ISSUE_CHECK_DAILY_LIMIT` (students, default 25) and
-  `ISSUE_CHECK_GLOBAL_DAILY_LIMIT` (200: a check is ~800 input tokens, ~18 neurons on Clef, and the free 10,000 a day are shared
-  with the grader and CODY) in `ai_help_usage`. The Report dialog (`components/ReportIssueButton.tsx`) runs it on
+  `ISSUE_CHECK_GLOBAL_DAILY_LIMIT` (200 a day, a backstop: a check is ~800 input tokens) in `ai_help_usage`. The Report dialog (`components/ReportIssueButton.tsx`) runs it on
   Send and, on a match, shows "already fixed" (Reload) / "being worked on" / "on hold" / "already on the site" with Add my vote
   (a +1 on that report instead of a copy) or Send mine anyway; a report sent past a match carries `context.possibleRepeatOf`
   (client-supplied, a hint), shown to staff as "Repeat of #N?" on /teacher/issues, which opens sorted Most voted (`DEFAULT_SORT`,
@@ -1623,7 +1625,7 @@ quizzes stay a plain percent; practice a student had already skipped is not held
 Microsoft `decision-1.1` through CheaperInference (`POST https://api.cheaperinference.com/v1/decisions`, secret
 `CHEAPERINFERENCE_API_KEY`; rules in `lib/decision-check-core.ts`: request, answer reader, `DECISION_BAND` 0.80 / 0.15, `askDecision`).
 Everything else below (the route name, the cards, the pattern-check fallback, the quota bucket, notes on demand) is unchanged; read
-"Clef" in the text below as "the decision model". Only the fast Check moved: the issue-report "already known?" check still uses Clef.
+"Clef" in the text below as "the decision model". The issue-report "already known?" check moved to decision-1.1 too (see its note under API surface).
 - **Data leaves Cloudflare.** The student's code goes to CheaperInference, then the serving provider. Every request asks `zdr: true`
   (zero data retention, routed only through providers that keep nothing, else 503 = offline) and the account's Data Protection mode
   is on. The owner accepted this having read CheaperInference's terms (2026-11-17): without ZDR it retains request content until
